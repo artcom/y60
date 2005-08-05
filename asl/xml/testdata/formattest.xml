@@ -1,0 +1,54 @@
+<mediaformat>
+
+	<AviInputFile name="test.avi" >
+		<AviTrackReader index="0" samples="4567532" duration="345.34">
+			<AudioFormat samples_per_second="11025" bits_per_sample="16" channels="mono"/>
+		</AviTrackReader>
+		<AviTrackReader index="1" samples="25456" duration="345.34">
+			<VideoFormat frames_per_second="15" width="320" height="240" bytes_per_pixel="3"/>
+		</AviTrackReader>
+		<AviTrackReader index="2" samples="25456" duration="345.34">
+			<TextFormat description="normal"/>
+		</AviTrackReader>
+	</AviInputFile>
+
+	<MediaFilePart name="test.avi" in_position="432.24" out_position="544.34"/>
+
+	<AviInputFile name="test.avi" >
+		<AviTrackReader index="0" samples="4567532" duration="345.34">
+			<current_position sample="2234" time="21.23"/>
+			<AudioFormat samples_per_second="11025" bits_per_sample="16" channels="mono"/>
+		</AviTrackReader>
+		<AviTrackReader index="1" samples="25456" duration="345.34">
+			<VideoFormat frames_per_second="15" width="320" height="240" bytes_per_pixel="3"/>
+		</AviTrackReader>
+		<AviTrackReader index="2" samples="25456" duration="345.34">
+			<TextFormat description="normal"/>
+		</AviTrackReader>
+	</AviInputFile>
+
+	<MediaFileChain>
+		<AviInputFile name="test.avi" >
+			<AviTrackReader current_pos="1234" current_time="12.34"/>
+			<AviTrackReader current_pos="1234" current_time="12.34"/>
+			<AviTrackReader current_pos="1234" current_time="12.34"/>
+		</AviInputFile>
+		<AviInputFile name="test1.avi"/>
+		<AviInputFile name="test2.avi"/>
+		<AviInputFile name="test3.avi"/>
+		<MediaFilePart name="test.avi" in_position="432.24" out_position="544.34"/>
+		<MediaFilePart name="test.avi" in_position="244.35" out_position="343.12"/>
+	</MediaFileChain>
+
+	<AviOutputFile name="test.avi" >
+		<AviTrackWriter index="0">
+			<AudioFormat samples_per_second="11025" bits_per_sample="16" channels="mono"/>
+		</AviTrackWriter>
+		<AviTrackWriter index="1" samples="25456" duration="345.34">
+			<VideoFormat frames_per_second="15" width="320" height="240" bytes_per_pixel="3"/>
+		</AviTrackWriter>
+		<AviTrackWriter index="2" samples="25456" duration="345.34">
+			<TextFormat description="normal"/>
+		</AviTrackWriter>
+	</AviOutputFile>
+</mediaformat>

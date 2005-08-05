@@ -1,0 +1,75 @@
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+
+<glade-interface>
+
+<widget class="GtkWindow" id="mainWindow">
+  <property name="visible">True</property>
+  <property name="title" translatable="yes">ART+COM Y60 Viewer</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_NONE</property>
+  <property name="modal">False</property>
+  <property name="default_width">400</property>
+  <property name="default_height">300</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">False</property>
+  <property name="decorated">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
+  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+
+  <child>
+    <widget class="GtkVBox" id="vbox1">
+      <property name="visible">True</property>
+      <property name="homogeneous">False</property>
+      <property name="spacing">0</property>
+      <child>
+        <widget class="GtkHBox" id="list">
+	      <property name="visible">True</property>
+	      <property name="homogeneous">False</property>
+	      <property name="spacing">0</property>
+        </widget>
+      
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">True</property>
+	  <property name="fill">True</property>
+	</packing>
+      </child>
+    </widget>
+  </child>
+</widget>
+
+<widget class="GtkMenu" id="viewportMenu">
+
+  <child>
+    <widget class="GtkCheckMenuItem" id="wireframe">
+      <property name="visible">True</property>
+      <property name="label" translatable="yes">wireframe</property>
+      <property name="use_underline">True</property>
+      <property name="active">False</property>
+      <signal name="activate" handler="on_wireframe_activate" last_modification_time="Thu, 24 Mar 2005 11:17:12 GMT"/>
+    </widget>
+  </child>
+
+  <child>
+    <widget class="GtkMenuItem" id="next_camera">
+      <property name="visible">True</property>
+      <property name="label" translatable="yes">Next Camera</property>
+      <property name="use_underline">True</property>
+      <signal name="activate" handler="on_next_camera_activate" last_modification_time="Thu, 24 Mar 2005 11:22:29 GMT"/>
+    </widget>
+  </child>
+
+  <child>
+    <widget class="GtkMenuItem" id="prev_camera">
+      <property name="visible">True</property>
+      <property name="label" translatable="yes">Prev Camera</property>
+      <property name="use_underline">True</property>
+      <signal name="activate" handler="on_prev_camera_activate" last_modification_time="Thu, 24 Mar 2005 11:22:29 GMT"/>
+    </widget>
+  </child>
+</widget>
+
+</glade-interface>

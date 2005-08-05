@@ -1,0 +1,152 @@
+<scene xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="y60.xsd">
+	<shapes>
+		<shape name="W_rfel" id="s0">
+			<positions>
+				<position>[-100,-100,-100]</position>
+				<position>[-100,100,-100]</position>
+				<position>[100,-100,-100]</position>
+				<position>[100,100,-100]</position>
+				<position>[100,-100,100]</position>
+				<position>[100,100,100]</position>
+				<position>[-100,-100,100]</position>
+				<position>[-100,100,100]</position>
+			</positions>
+			<colors />
+			<normals>
+				<normal>[0,0,-1]</normal>
+				<normal>[0,0,-1]</normal>
+				<normal>[0,0,-1]</normal>
+				<normal>[0,0,-1]</normal>
+				<normal>[1,0,0]</normal>
+				<normal>[0,0,-1]</normal>
+				<normal>[1,0,0]</normal>
+				<normal>[1,0,0]</normal>
+				<normal>[0,0,1]</normal>
+				<normal>[1,0,0]</normal>
+				<normal>[0,0,1]</normal>
+				<normal>[0,0,1]</normal>
+				<normal>[-1,0,0]</normal>
+				<normal>[0,0,1]</normal>
+				<normal>[-1,0,0]</normal>
+				<normal>[0,0,-1]</normal>
+				<normal>[0,1,0]</normal>
+				<normal>[0,0,1]</normal>
+				<normal>[1,0,0]</normal>
+				<normal>[0,0,-1]</normal>
+				<normal>[0,-1,0]</normal>
+				<normal>[0,0,-1]</normal>
+				<normal>[0,-1,0]</normal>
+				<normal>[0,-1,0]</normal>
+			</normals>
+			<uvsets>
+				<uvset name="uvset1">
+					<uvcoord>[1,1]</uvcoord>
+					<uvcoord>[1,0]</uvcoord>
+					<uvcoord>[0,0]</uvcoord>
+					<uvcoord>[0,1]</uvcoord>
+					<uvcoord>[1,1]</uvcoord>
+					<uvcoord>[1,0]</uvcoord>
+					<uvcoord>[0,0]</uvcoord>
+					<uvcoord>[0,1]</uvcoord>
+					<uvcoord>[1,1]</uvcoord>
+					<uvcoord>[1,0]</uvcoord>
+					<uvcoord>[0,0]</uvcoord>
+					<uvcoord>[0,1]</uvcoord>
+					<uvcoord>[1,1]</uvcoord>
+					<uvcoord>[1,0]</uvcoord>
+					<uvcoord>[0,0]</uvcoord>
+					<uvcoord>[0,1]</uvcoord>
+					<uvcoord>[1,1]</uvcoord>
+					<uvcoord>[1,0]</uvcoord>
+					<uvcoord>[0,0]</uvcoord>
+					<uvcoord>[0,1]</uvcoord>
+					<uvcoord>[1,1]</uvcoord>
+					<uvcoord>[1,0]</uvcoord>
+					<uvcoord>[0,0]</uvcoord>
+					<uvcoord>[0,1]</uvcoord>
+				</uvset>
+			</uvsets>
+			<primitives>
+				<triangle materialref="m0">
+					<vertex position="0" normal="0" texcoords="[[0,0]]" />
+					<vertex position="1" normal="1" texcoords="[[0,1]]" />
+					<vertex position="3" normal="2" texcoords="[[0,2]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="0" normal="0" texcoords="[[0,0]]" />
+					<vertex position="3" normal="2" texcoords="[[0,2]]" />
+					<vertex position="2" normal="3" texcoords="[[0,3]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="2" normal="4" texcoords="[[0,4]]" />
+					<vertex position="3" normal="5" texcoords="[[0,5]]" />
+					<vertex position="5" normal="6" texcoords="[[0,6]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="2" normal="4" texcoords="[[0,4]]" />
+					<vertex position="5" normal="6" texcoords="[[0,6]]" />
+					<vertex position="4" normal="7" texcoords="[[0,7]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="4" normal="8" texcoords="[[0,8]]" />
+					<vertex position="5" normal="9" texcoords="[[0,9]]" />
+					<vertex position="7" normal="10" texcoords="[[0,10]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="4" normal="8" texcoords="[[0,8]]" />
+					<vertex position="7" normal="10" texcoords="[[0,10]]" />
+					<vertex position="6" normal="11" texcoords="[[0,11]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="6" normal="12" texcoords="[[0,12]]" />
+					<vertex position="7" normal="13" texcoords="[[0,13]]" />
+					<vertex position="1" normal="14" texcoords="[[0,14]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="6" normal="12" texcoords="[[0,12]]" />
+					<vertex position="1" normal="14" texcoords="[[0,14]]" />
+					<vertex position="0" normal="15" texcoords="[[0,15]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="1" normal="16" texcoords="[[0,16]]" />
+					<vertex position="7" normal="17" texcoords="[[0,17]]" />
+					<vertex position="5" normal="18" texcoords="[[0,18]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="1" normal="16" texcoords="[[0,16]]" />
+					<vertex position="5" normal="18" texcoords="[[0,18]]" />
+					<vertex position="3" normal="19" texcoords="[[0,19]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="6" normal="20" texcoords="[[0,20]]" />
+					<vertex position="0" normal="21" texcoords="[[0,21]]" />
+					<vertex position="2" normal="22" texcoords="[[0,22]]" />
+				</triangle>
+				<triangle materialref="m0">
+					<vertex position="6" normal="20" texcoords="[[0,20]]" />
+					<vertex position="2" normal="22" texcoords="[[0,22]]" />
+					<vertex position="4" normal="23" texcoords="[[0,23]]" />
+				</triangle>
+			</primitives>
+		</shape>
+	</shapes>
+	<materials>
+		<material name="default_material" type="phong" id="m0">
+			<properties>
+				<value name="diffuse" type="float4">[0.8,0.8,0.8,1]</value>
+				<value name="shininess" type="float">64</value>
+				<value name="specular" type="float4">[1,1,1,1]</value>
+			</properties>
+			<vertexparameters>
+				<value name="normal" type="float3" />
+			</vertexparameters>
+			<textures />
+		</material>
+	</materials>
+	<world>
+		<light></light>
+		<transform matrix="[[1.99689,-0.104608,0.0385094,0],[0.158809,2.99406,-0.101799,0],[-0.0697671,0.139598,3.99695,0],[0,0,0,1]]" />
+		<body />
+		<transform matrix="[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]" />
+	</world>
+</scene>

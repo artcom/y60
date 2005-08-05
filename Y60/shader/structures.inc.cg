@@ -1,0 +1,16 @@
+/*
+This structure defines the common vertex-to-fragment shader interface
+*/   
+
+struct vert2frag {
+    float4 homPosition  : POSITION;
+    float2 texCoord0    : TEXCOORD0;
+    float2 texCoord1    : TEXCOORD1;
+    float2 texCoord2    : TEXCOORD2;
+    float3 eyeSpacePosition  : TEXCOORD5;
+    float3 eyeSpaceNormal    : TEXCOORD6;
+    float3 lightVec     : TEXCOORD7;
+    float4 primColor    : COLOR0;
+    float4 secColor     : TEXCOORD4;  // COLOR1 doesn't work here (Alpha doesn't get through)
+};
+

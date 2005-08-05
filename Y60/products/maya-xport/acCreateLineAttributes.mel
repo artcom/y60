@@ -1,0 +1,32 @@
+// This will create color attribute for lines
+global proc acCreateLineAttributes() {
+    int $myResult = 0;
+    string $dagnodes[];
+    $dagnodes = `selectedNodes -dagObjects`;
+
+    string $dagnode;
+    for ($dagnode in $dagnodes ) {
+        if( `attributeExists ac_linecolor $dagnode`) {
+            print("Linecolor attribute already exists in " + $dagnode + ".\n");
+        } else {
+            print("Adding line attributes to " + $dagnode + ".\n");
+            addAttr -ln ac_linewidth -at double -defaultValue 1 $dagnode;
+
+            addAttr -ln ac_linecolor -at double3  $dagnode;
+            addAttr -ln ac_linecolor_r -at double -p ac_linecolor -defaultValue 1 $dagnode;
+            addAttr -ln ac_linecolor_g -at double -p ac_linecolor -defaultValue 1 $dagnode;
+            addAttr -ln ac_linecolor_b -at double -p ac_linecolor -defaultValue 1 $dagnode;
+            addAttr -ln ac_linecolor_alpha -at double -defaultValue 1 $dagnode;
+
+            addAttr -ln ac_blendfunc -dt "string" $dagnode;
+            eval("setAttr -type \"string\"" + $dagnode + ".ac_blendfunc \"[src_alpha, one_minus_src_alpha]\"");
+
+        }
+        $myResult = 1;
+    }
+
+    if ($myResult == "0") {
+        error "No object selected";
+    }
+}
+

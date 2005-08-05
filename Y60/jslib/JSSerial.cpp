@@ -1,0 +1,591 @@
+//=============================================================================
+// Copyright (C) 2003, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: JSSerial.cpp,v $
+//   $Author: christian $
+//   $Revision: 1.6 $
+//   $Date: 2005/04/28 17:12:58 $
+//
+//
+//=============================================================================
+
+#include "JSSerial.h"
+#include "JScppUtils.h"
+
+#include <asl/SerialDeviceFactory.h>
+#include <asl/DebugPort.h>
+#include <iostream>
+
+using namespace std;
+using namespace asl;
+
+namespace jslib {
+
+const unsigned DEFAULT_BAUD_RATE    = 9600;
+const unsigned DEFAULT_BITS         = 8;
+const unsigned DEFAULT_PARITY       = unsigned(SerialDevice::NO_PARITY);
+const unsigned DEFAULT_STOP_BITS    = 1;
+const bool     DEFAULT_HW_HANDSHAKE = false;
+
+const unsigned READ_BUFFER_SIZE     = 1024;
+
+static JSBool
+toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Prints the comport device name.");
+    DOC_END;
+    std::string myStringRep = JSSerial::getJSWrapper(cx,obj).getNative().getDeviceName();
+    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
+    *rval = STRING_TO_JSVAL(myString);
+    return JS_TRUE;
+}
+
+
+static JSBool
+open(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Opens the serial interface");
+    DOC_PARAM_OPT("Baud rate", DOC_TYPE_INTEGER, DEFAULT_BAUD_RATE);
+    DOC_PARAM_OPT("Data bits", DOC_TYPE_INTEGER, DEFAULT_BITS);
+    DOC_PARAM_OPT("Parity",    DOC_TYPE_ENUMERATION, DEFAULT_PARITY);
+    DOC_PARAM_OPT("Stop Bits", DOC_TYPE_INTEGER, DEFAULT_STOP_BITS);
+    DOC_PARAM_OPT("Hardware handshake", DOC_TYPE_BOOLEAN, DEFAULT_HW_HANDSHAKE);
+    DOC_END;
+
+    try {
+        unsigned myBaudRate    = DEFAULT_BAUD_RATE;
+        unsigned myBits        = DEFAULT_BITS;
+        unsigned myParity      = DEFAULT_PARITY;
+        unsigned myStopBits    = DEFAULT_STOP_BITS;
+        bool     myHwHandshake = DEFAULT_HW_HANDSHAKE;
+
+        for (unsigned i = 0; i < argc; ++i) {
+            if (JSVAL_IS_VOID(argv[i])) {
+                JS_ReportError(cx, "JSSerial::open(): Argument #%d is undefined", i + 1);
+                return JS_FALSE;
+            }
+        }
+
+        if (argc > 0) {
+            if (!convertFrom(cx, argv[0], myBaudRate)) {
+                JS_ReportError(cx, "JSSerial::open(): argument #1 must be an integer (Baud Rate)");
+                return JS_FALSE;
+            }
+        }
+        if (argc > 1) {
+            if (!convertFrom(cx, argv[1], myBits)) {
+                JS_ReportError(cx, "JSSerial::open(): argument #2 must be an integer (Data Bits)");
+                return JS_FALSE;
+            }
+        }
+        if (argc > 2) {
+            if (!convertFrom(cx, argv[2], myParity)) {
+                JS_ReportError(cx, "JSSerial::open(): argument #3 must be an integer (Parity Mode)");
+                return JS_FALSE;
+            }
+            if (myParity > 2) {
+                JS_ReportError(cx, "JSSerial::open(): Illegal parity mode %d, "
+                                   "must be between NO_PARITY, EVEN_PARITY or ODD_PARITY", myParity);
+                return JS_FALSE;
+            }
+        }
+        if (argc > 3) {
+            if (!convertFrom(cx, argv[3], myStopBits)) {
+                JS_ReportError(cx, "JSSerial::open(): argument #4 must be an integer (Stop Bits)");
+                return JS_FALSE;
+            }
+        }
+        if (argc > 4) {
+            if (!convertFrom(cx, argv[4], myHwHandshake)) {
+                JS_ReportError(cx, "JSSerial::open(): argument #5 must be a boolean (Hardware Handshake)");
+                return JS_FALSE;
+            }
+        }
+        if (argc > 5) {
+            JS_ReportError(cx, "JSSerial::open(): Wrong number of arguments, between 0 and 5 expected.");
+            return JS_FALSE;
+        }
+
+        JSSerial::getJSWrapper(cx,obj).openNative().open(myBaudRate, myBits,
+            SerialDevice::ParityMode(myParity), myStopBits, myHwHandshake);
+        JSSerial::getJSWrapper(cx,obj).closeNative();
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Closes the serial device");
+    DOC_END;
+    return Method<JSSerial::NATIVE>::call(&JSSerial::NATIVE::close,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Reads the size of the input buffer, without removing data from it.");
+    DOC_RVAL("Number of bytes in the input buffer", DOC_TYPE_INTEGER);
+    DOC_END;
+    return Method<JSSerial::NATIVE>::call(&JSSerial::NATIVE::peek,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+setPacketFormat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets the format for packets send via the serial device");
+    DOC_PARAM("Start byte", DOC_TYPE_INTEGER);
+    DOC_PARAM("End byte", DOC_TYPE_INTEGER);
+    DOC_PARAM("Payload size (may be zero for variable sized payloads.)", DOC_TYPE_INTEGER);
+    DOC_PARAM("Error checking type", DOC_TYPE_ENUMERATION);
+    DOC_END;
+    try {
+        unsigned char myStartByte;
+        unsigned char myEndByte;
+        unsigned      mySize;
+        unsigned      myErrorChecking;
+
+        for (unsigned i = 0; i < argc; ++i) {
+            if (JSVAL_IS_VOID(argv[i])) {
+                JS_ReportError(cx, "JSSerial::setPacketFormat(): Argument #%d is undefined", i + 1);
+                return JS_FALSE;
+            }
+        }
+
+        if (argc != 4) {
+            JS_ReportError(cx, "JSSerial::setPacketFormat(): expected 4 arguments, got %d. "
+                               "Usage: (StartByte, EndByte, Size, Errorchecking)", argc);
+            return JS_FALSE;
+        }
+
+        uCCP & myUCCP = JSSerial::getObject(cx, obj).getUCCP();
+
+        if (!convertFrom(cx, argv[0], myStartByte)) {
+            JS_ReportError(cx, "JSSerial::setPacketFormat(): argument #1 must be an integer (Start Byte)");
+            return JS_FALSE;
+        }
+        if (!convertFrom(cx, argv[1], myEndByte)) {
+            JS_ReportError(cx, "JSSerial::setPacketFormat(): argument #2 must be an integer (End Byte)");
+            return JS_FALSE;
+        }
+
+        myUCCP.setFrame(myStartByte, myEndByte);
+
+        if (!convertFrom(cx, argv[2], mySize)) {
+            JS_ReportError(cx, "JSSerial::setPacketFormat(): argument #3 must be an integer (payload size)");
+            return JS_FALSE;
+        }
+
+        if (mySize == 0) {
+            myUCCP.setVariablePayloadSize();
+        } else {
+            myUCCP.setFixedPayloadSize(mySize);
+        }
+
+        if (!convertFrom(cx, argv[3], myErrorChecking)) {
+            JS_ReportError(cx, "JSSerial::setPacketFormat(): argument #4 must be an integer (errorchecking)");
+            return JS_FALSE;
+        }
+
+        if (myErrorChecking > 2) {
+            JS_ReportError(cx, "JSSerial::setPacketFormat(): Invalid error checking format");
+            return JS_FALSE;
+        }
+
+        myUCCP.setErrorChecking(uCCP::ErrorChecking(myErrorChecking));
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Reads data from serial device");
+    DOC_PARAM_OPT("Bytes to read", DOC_TYPE_INTEGER, READ_BUFFER_SIZE);
+    DOC_RVAL("Bufferdata", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        if (argc > 1) {
+            JS_ReportError(cx, "JSSerial::read(): Wrong number of arguments, expected one or none, got %d.", argc);
+            return JS_FALSE;
+        }
+
+        size_t myReadBytes = READ_BUFFER_SIZE;
+        if (argc == 1) {
+             if (!convertFrom(cx, argv[0], myReadBytes)) {
+                JS_ReportError(cx, "JSSerial::read(): Argument #1 must be a unsigned (bytes to read)");
+                return JS_FALSE;
+            }
+        }
+
+
+        string myResult;
+        char myBuffer[READ_BUFFER_SIZE];
+
+        do {
+            JSSerial::getJSWrapper(cx,obj).openNative().read(myBuffer, myReadBytes);
+            JSSerial::getJSWrapper(cx,obj).closeNative();
+            myResult.append(myBuffer, myReadBytes);
+        } while (myReadBytes == READ_BUFFER_SIZE);
+
+        JSString * myString = JS_NewStringCopyN(cx, myResult.c_str(), myResult.size());
+        *rval = STRING_TO_JSVAL(myString);
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Writes data to the serial device");
+    DOC_PARAM("Bytes to write", DOC_TYPE_STRING);
+    DOC_RESET;
+    DOC_PARAM("Bytes to write (array of unsigned chars)", DOC_TYPE_ARRAY);
+    DOC_END;
+    try {
+        if (argc != 1) {
+            JS_ReportError(cx, "JSSerial::write(): Wrong number of arguments, "
+                               "expected one (Bytes to write), got %d.", argc);
+            return JS_FALSE;
+        }
+        if (JSVAL_IS_VOID(argv[0])) {
+            JS_ReportError(cx, "JSSerial::write(): Argument #0 is undefined");
+            return JS_FALSE;
+        }
+
+        string myString;
+        if (JSVAL_IS_STRING(argv[0])) {
+            if (!convertFrom(cx, argv[0], myString)) {
+                JS_ReportError(cx, "JSSerial::write(): Argument #1 must be an string or an array of unsigned char (Bytes to write)");
+                return JS_FALSE;
+            }
+        } else {
+            if (JSA_charArrayToString(cx, argv, myString) == JS_FALSE) {
+                return JS_FALSE;
+            }
+
+            if (myString.empty()) {
+                JS_ReportError(cx, "JSSerial::write(): Argument #1 must be an string or an array of unsigned char (Bytes to write)");
+                return JS_FALSE;
+            }
+        }
+
+        JSSerial::getJSWrapper(cx,obj).openNative().write(myString.c_str(), myString.size());
+        JSSerial::getJSWrapper(cx,obj).closeNative();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+receivePacket(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Recieve one packet from the serial device.");
+    DOC_RVAL("The oldest packet in the queue, or empty string if there are no packets in the queue", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        if (argc != 0) {
+            JS_ReportError(cx, "JSSerial::receivePacket(): Wrong number of arguments, expected none, got %d.", argc);
+            return JS_FALSE;
+        }
+
+        uCCP & myUCCP = JSSerial::getObject(cx, obj).getUCCP();
+        myUCCP.recive();
+
+        string myPayload = "";
+        if (myUCCP.pendingPackets() > 0) {
+            myPayload = myUCCP.popPacket();
+        }
+
+        JSString * myString = JS_NewStringCopyN(cx, myPayload.c_str(), myPayload.size());
+        *rval = STRING_TO_JSVAL(myString);
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+sendPacket(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sends a string over the serial device which is packeted with the specified packet format.");
+    DOC_PARAM("String to send", DOC_TYPE_STRING);
+    DOC_RESET;
+    DOC_PARAM("Array of unsigned char to send", DOC_TYPE_ARRAY);
+    DOC_END;
+    try {
+        if (argc != 1) {
+            JS_ReportError(cx, "JSSerial::sendPacket(): Wrong number of arguments, "
+                               "expected one (Bytes to send), got %d.", argc);
+            return JS_FALSE;
+        }
+        if (JSVAL_IS_VOID(argv[0])) {
+            JS_ReportError(cx, "JSSerial::sendPacket(): Argument #0 is undefined");
+            return JS_FALSE;
+        }
+
+        string myString;
+        if (JSVAL_IS_STRING(argv[0])) {
+            if (!convertFrom(cx, argv[0], myString)) {
+                JS_ReportError(cx, "JSSerial::sendPacket(): Argument #1 must be an string or an array of unsigned char (Bytes to write)");
+                return JS_FALSE;
+            }
+        } else {
+            if (JSA_charArrayToString(cx, argv, myString) == JS_FALSE) {
+                return JS_FALSE;
+            }
+
+            if (myString.empty()) {
+                JS_ReportError(cx, "JSSerial::sendPacket(): Argument #1 must be an string or an array of unsigned char (Bytes to write)");
+                return JS_FALSE;
+            }
+        }
+
+        JSSerial::getObject(cx, obj).getUCCP().send(myString);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+setNoisy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets the serial device to noisy mode for debug purposes");
+    DOC_PARAM("Noisy Flag", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    try {
+        if (argc > 1) {
+            JS_ReportError(cx, "JSSerial::setNoisy(): Wrong number of arguments, "
+                               "expected one (noisy flag), got %d.", argc);
+            return JS_FALSE;
+        }
+
+        bool myNoisyFlag;
+        if (argc == 0) {
+            myNoisyFlag = true;
+        }
+
+        if (argc == 1) {
+            if (JSVAL_IS_VOID(argv[0])) {
+                JS_ReportError(cx, "JSSerial::setNoisy(): Argument #0 is undefined");
+                return JS_FALSE;
+            }
+
+            if (!convertFrom(cx, argv[0], myNoisyFlag)) {
+                JS_ReportError(cx, "JSSerial::setNoisy(): Argument #1 must be boolean (noisy flag)");
+                return JS_FALSE;
+            }
+        }
+
+        JSSerial::getJSWrapper(cx,obj).openNative().setNoisy(myNoisyFlag);
+        JSSerial::getJSWrapper(cx,obj).closeNative();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+printPacketStatistic(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Prints out statistics about send/received/lost packets");
+    DOC_END;
+    try {
+        if (argc != 0) {
+            JS_ReportError(cx, "JSSerial::printPacketStatistic(): Wrong number of arguments, expected none, got %d.", argc);
+            return JS_FALSE;
+        }
+
+        JSSerial::getObject(cx, obj).getUCCP().printStatistic(cerr);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+printPacketFormat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Prints the current packet format as ascii graphic");
+    DOC_END;
+    try {
+        if (argc != 0) {
+            JS_ReportError(cx, "JSSerial::printPacketFormat(): Wrong number of arguments, expected none, got %d.", argc);
+            return JS_FALSE;
+        }
+
+        JSSerial::getObject(cx, obj).getUCCP().printPacketFormat(cerr);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JSFunctionSpec *
+JSSerial::Functions() {
+    AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
+    static JSFunctionSpec myFunctions[] = {
+        // name                  native                   nargs
+        {"toString",             toString,                0},
+        {"open",                 open,                    5},
+        {"close",                close,                   0},
+        {"read",                 read,                    1},
+        {"peek",                 peek,                    0},
+        {"write",                write,                   1},
+        {"receivePacket",        receivePacket,           0},
+        {"setPacketFormat",      setPacketFormat,         4},
+        {"sendPacket",           sendPacket,              1},
+        {"setNoisy",             setNoisy,                1},
+        {"printPacketStatistic", printPacketStatistic,    0},
+        {"printPacketFormat",    printPacketFormat,       0},
+        {0}
+    };
+    return myFunctions;
+}
+
+JSPropertySpec *
+JSSerial::Properties() {
+    static JSPropertySpec myProperties[] = {
+        {"isOpen", PROP_isOpen, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"status", PROP_status, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {0}
+    };
+    return myProperties;
+}
+
+// getproperty handling
+JSBool
+JSSerial::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    switch (theID) {
+        case PROP_isOpen:
+            *vp = as_jsval(cx, getNative().isOpen());
+            return JS_TRUE;
+        case PROP_status:
+            {
+                JSClassTraits<NATIVE>::ScopedNativeRef myObjRef(cx, obj);
+                *vp = as_jsval(cx, myObjRef.getNative().getStatusLine());
+            }
+            return JS_TRUE;
+        default:
+            JS_ReportError(cx,"JSSerial::getProperty: index %d out of range", theID);
+            return JS_FALSE;
+    }
+}
+
+// setproperty handling
+JSBool
+JSSerial::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    switch (theID) {
+        case PROP_isOpen:
+            //jsval dummy;
+            //return Method<NATIVE>::call(&NATIVE::isOpen, cx, obj, 1, vp, &dummy);
+            return JS_FALSE;
+        case PROP_status:
+            {
+                jsval dummy;
+                return Method<NATIVE>::call(&NATIVE::setStatusLine, cx, obj, 1, vp, &dummy);
+            }
+        default:
+            JS_ReportError(cx,"JSSerial::setPropertySwitch: index %d out of range", theID);
+            return JS_FALSE;
+    }
+}
+
+JSBool
+JSSerial::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates a new serial device");
+    DOC_PARAM("Zero based com-port number", DOC_TYPE_INTEGER);
+    DOC_RESET;
+    DOC_PARAM("Use port '999' to create a debug loopback device", DOC_TYPE_INTEGER);
+    DOC_END;
+    if (JSA_GetClass(cx,obj) != Class()) {
+        JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
+        return JS_FALSE;
+    }
+    JSSerial * myNewObject = 0;
+
+    if (argc == 1) {
+        if (JSVAL_IS_VOID(argv[0])) {
+            JS_ReportError(cx,"JSSerial::Constructor: bad argument #1 (undefined)");
+            return JS_FALSE;
+        }
+
+        unsigned myPortNumber = 0;
+        if (!convertFrom(cx, argv[0], myPortNumber)) {
+            JS_ReportError(cx, "JSSerial::Constructor: argument #1 must be an integer (PortNumber)");
+            return JS_FALSE;
+        }
+
+        if (myPortNumber == 999) {
+            OWNERPTR myNewSerial = OWNERPTR(new DebugPort("MyDebug Port #999"));
+            myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
+        } else {
+            OWNERPTR myNewSerial = OWNERPTR(getSerialDevice(myPortNumber));
+            myNewObject = new JSSerial(myNewSerial, &(*myNewSerial));
+        }
+    } else {
+        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (PortNumber) %d",ClassName(), argc);
+        return JS_FALSE;
+    }
+
+    if (myNewObject) {
+        JS_SetPrivate(cx,obj,myNewObject);
+        return JS_TRUE;
+    }
+    JS_ReportError(cx,"JSSerial::Constructor: bad parameters");
+    return JS_FALSE;
+}
+
+JSConstIntPropertySpec *
+JSSerial::ConstIntProperties() {
+
+    static JSConstIntPropertySpec myProperties[] = {
+        "NO_PARITY",         PROP_NO_PARITY,         SerialDevice::NO_PARITY,
+        "EVEN_PARITY",       PROP_EVEN_PARITY,       SerialDevice::EVEN_PARITY,
+        "ODD_PARITY",        PROP_ODD_PARITY,        SerialDevice::ODD_PARITY,
+        "NO_CHECKING",       PROP_NO_CHECKING,       uCCP::NO_CHECKING,
+        "CRC8_CHECKING",     PROP_CRC8_CHECKING,     uCCP::CRC8_CHECKING,
+        "CHECKSUM_CHECKING", PROP_CHECKSUM_CHECKING, uCCP::CHECKSUM_CHECKING,
+        "CTS",               PROP_STATUS_CTS,        SerialDevice::CTS,
+        "DSR",               PROP_STATUS_DSR,        SerialDevice::DSR,
+        "RI",                PROP_STATUS_RI,         SerialDevice::RI,
+        "CD",                PROP_STATUS_CD,         SerialDevice::CD,
+        "DTR",               PROP_STATUS_DTR,        SerialDevice::DTR,
+        "RTS",               PROP_STATUS_RTS,        SerialDevice::RTS,
+        {0}
+    };
+    return myProperties;
+}
+
+JSPropertySpec *
+JSSerial::StaticProperties() {
+    static JSPropertySpec myProperties[] = {{0}};
+    return myProperties;
+}
+
+JSFunctionSpec *
+JSSerial::StaticFunctions() {
+    static JSFunctionSpec myFunctions[] = {{0}};
+    return myFunctions;
+}
+
+JSObject *
+JSSerial::initClass(JSContext *cx, JSObject *theGlobalObject) {
+    JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+    DOC_CREATE(JSSerial);
+    return myClass;
+}
+
+bool convertFrom(JSContext *cx, jsval theValue, JSSerial::NATIVE & theSerial) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSSerial::NATIVE >::Class()) {
+                theSerial = JSClassTraits<JSSerial::NATIVE>::getNativeRef(cx,myArgument);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+jsval as_jsval(JSContext *cx, JSSerial::OWNERPTR theOwner) {
+    JSObject * myReturnObject = JSSerial::Construct(cx, theOwner, &(*theOwner));
+    return OBJECT_TO_JSVAL(myReturnObject);
+}
+
+jsval as_jsval(JSContext *cx, JSSerial::OWNERPTR theOwner, JSSerial::NATIVE * theSerial) {
+    JSObject * myObject = JSSerial::Construct(cx, theOwner, theSerial);
+    return OBJECT_TO_JSVAL(myObject);
+}
+
+}

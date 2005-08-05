@@ -1,0 +1,5 @@
+STRINGTABLE Facxmlexport
+{
+	Facxmlexport		    "AC Y60 Export";
+	AC_Y60_INLINE_TEXTURES  "Inline Textures";
+}

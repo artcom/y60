@@ -1,0 +1,32 @@
+///////////////// Fragment shader /////////////////////
+struct fragmentOutput
+{
+    float4 color : COLOR;
+};
+fragmentOutput mainFragment(float4 theColor : COLOR)
+{
+    fragmentOutput myOUT;
+    
+    myOUT.color = theColor; 
+    
+    return myOUT;
+} 
+
+
+///////////////// Vertex shader /////////////////////
+
+struct vertexOutput {
+    float4 position : POSITION;
+    float4 color: COLOR;
+};
+
+vertexOutput mainVertex(float4 thePosition : POSITION,
+                        uniform float4x4 GL_MODELVIEW_PROJECTION /*do not change*/)
+{
+    vertexOutput myOUT;
+    myOUT.position = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    myOUT.color = float4(1,1,1,1);
+
+    return myOUT;
+    
+}

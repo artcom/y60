@@ -1,0 +1,47 @@
+<WatchdogConfig logfile="watch.log" watchFrequency="15">
+    <!--
+    NOTE: The format for the projector control has changed considerably during O2 development in Nov.2004.
+          The only customizable strings for the <UdpControl> are the ones for <SystemHalt> and
+          <RestartApplication>. The projector commands are handled internally by the Projector.cpp base class
+          and are not customizable. The recognized commands are:
+          projector_on
+          projector_off
+          projector_shutter_open
+          projector_shutter_close
+          projector_power_low (lamp output)
+          projector_power_high
+          The commands are passed to all connected projectors and are observed by those projectors that
+          support the given command.
+          -->
+    <UdpControl port="2346">
+        <SystemHalt powerDownProjectors="true" command="halt"/>    
+        <SystemReboot powerDownProjectors="true" command="reboot"/>
+        <RestartApplication command="restart_app"/>
+		<ProjectorControl powerUpOnStartup="false">
+			<Projector type="panasonic" port="0">
+				<FirstID>1</FirstID>
+				<NumProjectors>12</NumProjectors>
+			</Projector>
+		</ProjectorControl>
+    </UdpControl>
+    <!--<RebootTime>15:30</RebootTime>-->
+    <!--<HaltTime>16:10</HaltTime>-->
+    <Application binary="calc.exe">
+        <Arguments>
+            <Argument>test.txt</Argument>
+        </Arguments>
+        <!--<Heartbeat>
+            <Heartbeat_File>${TEMP}/heartbeat.xml</Heartbeat_File>
+            <Allow_Missing_Heartbeats>5</Allow_Missing_Heartbeats>
+            <Heartbeat_Frequency>1</Heartbeat_Frequency>
+            <FirstHeartBeatDelay>120</FirstHeartBeatDelay>
+        </Heartbeat>-->
+        <WaitDuringStartup>0</WaitDuringStartup>
+        <WaitDuringRestart>10</WaitDuringRestart>
+        <Memory_Threshold>100000</Memory_Threshold>
+        <!--<RestartDay>Monday</RestartDay>-->
+        <RestartTime>12:02</RestartTime>
+        <CheckMemoryTime>00:00</CheckMemoryTime>
+        <CheckTimedMemoryThreshold>150000</CheckTimedMemoryThreshold>
+    </Application>
+</WatchdogConfig>

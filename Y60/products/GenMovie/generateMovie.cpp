@@ -1,0 +1,360 @@
+//=============================================================================
+//
+// Copyright (C) 2000-2004, ART+COM AG Berlin
+//
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+
+#include <y60/ImageLoader.h>
+#include <y60/MovieEncoding.h>
+#include <y60/M60Header.h>
+
+#include <asl/Arguments.h>
+#include <asl/numeric_functions.h>
+#include <asl/file_functions.h>
+#include <asl/directory_functions.h>
+#include <asl/MappedBlock.h>
+#include <asl/Matrix4.h>
+#include <asl/RunLengthEncoder.h>
+
+#include <dom/Nodes.h>
+#include <set>
+#include <algorithm>
+#include <iostream>
+#include <string>
+#include <ctype.h>
+
+using namespace std;
+using namespace asl;
+using namespace y60;
+
+#define DB(x) // x
+
+////////////////////////////////////////////////////////////////////////
+//
+// For file format specification see som/M60Decoder.cpp
+//
+////////////////////////////////////////////////////////////////////////
+
+Ptr<ImageLoader> ourPreviousFrame(0);
+float            ourFramesPerSecond = 25.0f;
+
+void printVersion();
+
+asl::Arguments::AllowedOption myOptions[] = {
+                                             {"--outfile",      "%s"},
+                                             {"--source-dir",   "%s"},
+                                             {"--encoding",     "%s"},
+                                             {"--resize",       "%s"},
+                                             {"--fps",          "%s"},
+                                             {"--version",      ""  },
+                                             {"--help",         ""  },
+                                             {"", ""}
+                                            };
+asl::Arguments myArguments(myOptions);
+
+void
+printHelp() {
+    // TODO: Please help to maintain this function
+    myArguments.printUsage();
+    AC_PRINT << "Command line options:" << endl
+         << "  --outfile       FILE   write movie to FILE" << endl
+         << "  --source-dir    DIR    search for input files in DIR. files on the command line will be ignored." << endl
+         << "  --encoding      MODE   set movie encoding mode to MODE (default: DRLE)." << endl
+         << "  --resize        MODE   set frame resize mode in case of non power of two dimensions to MODE (default: scale) [none, pad]." << endl
+         << "  --fps           FLOAT  Set the playback speed in frames per second (default is 25)" << endl
+         << "  --version              print version information and exit" << endl
+         << "  --help                 print this help text and exit" << endl
+         << endl
+         << "Valid encoding modes:" << endl
+         << "RLE, DIFF, DRLE" << endl;
+}
+
+string
+getTargetFilename(const string & theTargetDir, const string & theSourceFileName) {
+
+    return theTargetDir + theDirectorySeparator +
+        theSourceFileName.substr(0,theSourceFileName.find_last_of("."))+".dxt";
+}
+
+void writeHeader(asl::WriteableStream & theTargetBlock, MovieEncoding theCompression,
+    Ptr<ImageLoader> theFirstImage, unsigned int theTotalFrameCount)
+{
+    asl::Matrix4f myImageMatrix = theFirstImage->getImageMatrix();
+    asl::Vector4f mySize(float(theFirstImage->GetWidth()), float(theFirstImage->GetHeight()), 0, 0);
+    mySize = asl::product(mySize, myImageMatrix);
+
+    M60Header myHeader;
+    myHeader.framecount   = theTotalFrameCount;
+    myHeader.fps          = ourFramesPerSecond;
+    myHeader.width        = unsigned(mySize[0]);
+    myHeader.height       = unsigned(mySize[1]);
+    myHeader.framewidth   = theFirstImage->GetWidth();
+    myHeader.frameheight  = theFirstImage->GetHeight();
+    myHeader.compression  = unsigned(theCompression);
+    myHeader.pixelformat  = unsigned(theFirstImage->getEncoding());
+
+    theTargetBlock.appendData(myHeader);
+}
+
+void
+appendFrame(const string & theSourceFile, asl::WriteableStream & theTargetBlock,
+            MovieEncoding theMovieEncoding, const std::string & theResizeMode, unsigned int theTotalFrameCount)
+{
+    if (!fileExists(theSourceFile) || isDirectory(theSourceFile)) {
+        cerr << "Skipping image : " << theSourceFile << endl;
+        return;
+    }
+    cerr << "Loading image : " << theSourceFile << endl;
+    Ptr<ImageLoader> myFrame(new ImageLoader(
+                    Ptr<ReadableBlock>(new ConstMappedBlock(theSourceFile)),
+                    theSourceFile));
+    if (theResizeMode != "none" ) {
+        myFrame->ensurePowerOfTwo(theResizeMode, SINGLE, 1);
+    }
+
+    if (!ourPreviousFrame) {
+        cerr << "Writing header: encoding: " << theMovieEncoding << ", framewidth: " << myFrame->GetWidth() << ", frameheight: " <<
+            myFrame->GetHeight() << endl;
+        writeHeader(theTargetBlock, theMovieEncoding, myFrame, theTotalFrameCount);
+    } else {
+        // Check if current frame matches first frame
+        if (myFrame->GetWidth() != ourPreviousFrame->GetWidth()) {
+            throw asl::Exception(string("Frame ") + theSourceFile + " has width: " +
+                as_string(myFrame->GetWidth()) + " previous frame had: " +
+                as_string(ourPreviousFrame->GetWidth()));
+        }
+        if (myFrame->GetHeight() != ourPreviousFrame->GetHeight()) {
+            throw asl::Exception(string("Frame ") + theSourceFile + " has height: " +
+                as_string(myFrame->GetHeight()) + " previous frame had: " +
+                as_string(ourPreviousFrame->GetHeight()));
+        }
+        if (myFrame->getEncoding() != ourPreviousFrame->getEncoding()) {
+            throw asl::Exception(string("Frame ") + theSourceFile + " has encoding: " +
+                as_string(myFrame->getEncoding()) + " previous frame had: " +
+                as_string(ourPreviousFrame->getEncoding()));
+        }
+        if (myFrame->getHeaderSize() != ourPreviousFrame->getHeaderSize()) {
+            throw asl::Exception(string("Frame ") + theSourceFile + " has header size: " +
+                as_string(myFrame->getHeaderSize()) + " previous frame had: " +
+                as_string(ourPreviousFrame->getHeaderSize()));
+        }
+        if (myFrame->getRaster()->pixels().size() != ourPreviousFrame->getRaster()->pixels().size()) {
+            throw asl::Exception(string("Frame ") + theSourceFile + " has different size than previous frame");
+        }
+    }
+
+    dom::ValuePtr myNewFrame;
+    if (ourPreviousFrame && (theMovieEncoding == MOVIE_DIFF || theMovieEncoding == MOVIE_DRLE)) {
+        myNewFrame = dom::ValuePtr(myFrame->getData()->clone(0));
+        raster_cast(myNewFrame)->sub(*ourPreviousFrame->getData());
+    } else {
+        myNewFrame = myFrame->getData();
+    }
+    if (theMovieEncoding == MOVIE_RLE || theMovieEncoding == MOVIE_DRLE) {
+		DB(
+			cerr << "  Appending compressed frame with size: " << myNewFrame->accessReadableBlock().size() << endl;
+			cerr << "  at fileposition: " << theTargetBlock.size() << endl;
+		)
+		theTargetBlock.appendUnsigned32(myNewFrame->accessReadableBlock().size());
+        theTargetBlock.append(myNewFrame->accessReadableBlock());
+	} else {
+		DB(
+			cerr << "  Appending uncompressed frame with size: " << raster_cast(myNewFrame)->pixels().size() << endl;
+			cerr << "  at fileposition: " << theTargetBlock.size() << endl;
+		)
+		theTargetBlock.appendUnsigned32(raster_cast(myNewFrame)->pixels().size());
+		theTargetBlock.append(raster_cast(myNewFrame)->pixels());
+	}
+
+    ourPreviousFrame = myFrame;
+}
+
+int main( int argc, char *argv[])  {
+    cout << getBaseName(argv[0]) << " copyright (c) 2001-2004 ART+COM AG" << endl;
+    string myArgDesc = string("[image ... ]\nSee '") + string(getBaseName(argv[0])) +
+                              " --help' for more information.";
+    myArguments.setArgumentDescription(myArgDesc.c_str());
+
+    if (!myArguments.parse( argc, argv )) {
+        return 1;
+    }
+    if (myArguments.haveOption("--help")) {
+        printHelp();
+        return 0;
+    }
+    if (myArguments.haveOption("--version")) {
+        printVersion();
+        return 0;
+    }
+
+    if (myArguments.haveOption("--fps")) {
+        ourFramesPerSecond = asl::as<float>(myArguments.getOptionArgument("--fps"));
+    }
+
+    dom::NodePtr myXmlConfigDocument(new dom::Document());
+    dom::NodePtr myXmlConfig(0);
+    set<string> mySourceFiles;
+
+    try {
+        if ( myArguments.haveOption("--source-dir")) {
+            string mySourceDirectory = myArguments.getOptionArgument("--source-dir");
+            DIR * myDir = opendir(mySourceDirectory.c_str());
+            dirent * myDirEntry = 0;
+            while ( (myDirEntry = readdir(myDir))) {
+                string myFilename(myDirEntry->d_name);
+                string myPathname = mySourceDirectory + theDirectorySeparator + myFilename;
+                if (isDirectory(myPathname)) {
+                    cerr << "Skipping directory " << myFilename << endl;
+                    continue;
+                }
+                if (myFilename[0] != '.') {
+                    mySourceFiles.insert(myPathname);
+                }
+            }
+            if (mySourceFiles.size() == 0) {
+                string myErrorMsg = string("Can't find source images in directory '")
+                    + mySourceDirectory + "':";
+                perror(myErrorMsg.c_str());
+                return 1;
+            } else {
+                cout << "Found " << mySourceFiles.size() << " files in directory '"
+                    << mySourceDirectory << "'." << endl;
+            }
+        } else if (myArguments.getCount() > 0) {
+            cout << "Got " << myArguments.getCount() << " files on the command line." << endl;
+            for (int i=0; i < myArguments.getCount(); ++i) {
+                mySourceFiles.insert(string(myArguments.getArgument(i)));
+            }
+        } else {
+            cerr << "### ERROR: No input files found." << endl;
+            return 1;
+        }
+
+        string myTargetFileName;
+        if (myArguments.haveOption("--outfile")) {
+            myTargetFileName = myArguments.getOptionArgument("--outfile");
+        } else {
+            cerr << "### ERROR: No output file specified" << endl;
+            return -1;
+        }
+
+        MovieEncoding myMovieEncoding = MOVIE_DRLE;
+        std::string theEncodingFormat = "DRLE";
+        if (myArguments.haveOption("--encoding")) {
+            theEncodingFormat = myArguments.getOptionArgument("--encoding");
+        } else {
+            cout << "Using default encoding type '" << theEncodingFormat << "'" << endl;
+        }
+        try {
+            myMovieEncoding = MovieEncoding(getEnumFromString(theEncodingFormat.c_str(), MovieEncodingString));
+        } catch (ParseException & ex) {
+            cerr << "### ERROR: Format '" << theEncodingFormat
+                << "' not supported!" << endl << endl << ex << endl;
+            printHelp();
+            return 1;
+        }
+
+        std::string myResizeMode = IMAGE_RESIZE_SCALE;
+        if (myArguments.haveOption("--resize")) {
+            myResizeMode = myArguments.getOptionArgument("--resize");
+
+           string::iterator myIter = myResizeMode.begin();
+           string::iterator myEnd  = myResizeMode.end();
+           for (;myIter!=myEnd;++myIter) {
+               *myIter = tolower(*myIter);
+           }
+        } else {
+            cout << "Using default resize mode '" << myResizeMode << "'" << endl;
+        }
+
+        if (myResizeMode != IMAGE_RESIZE_SCALE &&
+            myResizeMode != "none" &&
+            myResizeMode != IMAGE_RESIZE_PAD ) {
+                cerr << "### ERROR: Resizemode '" << myResizeMode
+                    << "' not supported!" << endl << endl << endl;
+                printHelp();
+                return 1;
+        }
+
+        if (mySourceFiles.size() == 0) {
+            cerr << "### WARNING: No images to process!" << endl;
+            return 0;
+        }
+
+        cout << "Info: Starting with image " << *(mySourceFiles.begin()) << endl;
+        cout << "Info: Processing " << mySourceFiles.size() << " image(s)" << endl;
+        cout << "Info: Last image is image " << *(--(mySourceFiles.end())) << endl;
+
+        cout << "creating target file " << myTargetFileName << endl;
+#ifdef USE_MAPPED_BLOCK_WRITE
+        asl::MappedBlock myTargetBlock(myTargetFileName.c_str());
+#else
+        asl::WriteableFile myTargetBlock(myTargetFileName.c_str());
+#endif
+        unsigned long myFrameCount = 0;
+
+        vector<string> myBrokenFrames;
+
+        for (set<string>::iterator myIt = mySourceFiles.begin(); myIt != mySourceFiles.end(); ++myIt) {
+            int myRetryCount = 0;
+            bool myOKFlag = false;
+
+            do {
+                myOKFlag = false;
+                try {
+                    appendFrame(*myIt, myTargetBlock, myMovieEncoding, myResizeMode, mySourceFiles.size());
+                    myOKFlag = true;
+                } catch (const asl::Exception & e) {
+                    cerr << "### ERROR: Exception occured while processing " << *myIt << endl << e << endl;
+                } catch (const exception & e) {
+                    cerr << "### ERROR: Exception occured while processing " << *myIt << endl << e.what() << endl;
+                } catch (...) {
+                    cerr << "### ERROR: Unknown exception occured while processing " << *myIt << endl;
+                }
+                ++myRetryCount;
+            } while (myRetryCount < 3 && !myOKFlag);
+            if (!myOKFlag) {
+                cerr << "### ERROR: Skipping file " << *myIt << " after " << myRetryCount
+                    << " retrys" << endl;
+                myBrokenFrames.push_back(*myIt);
+            } else {
+                myFrameCount++;
+            }
+        }
+
+        // Write framecount into header
+        //M60Header * myHeader = reinterpret_cast<M60Header *>(myTargetBlock.begin());
+        //myHeader->framecount = myFrameCount;
+
+        cerr << "----------------------------------------------------" << endl;
+        cerr << "Generate movie done. Framecount: " << myFrameCount << endl;
+        if (myBrokenFrames.size()) {
+            cerr << "Broken frames:" << endl;
+            for (unsigned i = 0; i < myBrokenFrames.size(); ++i) {
+                cerr << "    " << myBrokenFrames[i] << endl;
+            }
+        }
+        cerr << "----------------------------------------------------" << endl;
+    }
+    catch (asl::Exception & e) {
+        cerr << "### ERROR: " << e << endl;
+        return -1;
+    }
+    catch (...) {
+        cerr << "### ERROR: Unknown exception occured." << endl;
+        return -1;
+    }
+    return 0;
+}
+
+
+void
+printVersion() {
+    cout << "CVS $Revision: 1.29 $ $Date: 2005/04/24 00:41:20 $." << endl;
+    cout << "Build at " << __DATE__ << " " << __TIME__ << "." << endl;
+}

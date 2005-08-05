@@ -1,0 +1,20 @@
+
+global proc acCreateTextureAttributes() {
+    int $myResult = 0;
+    string $nodes[];
+    $nodes = `ls -type file -selection`;
+
+    string $currentNode;
+    for ($currentNode in $nodes) {
+        if ( ! `attributeExists acMipmaps $currentNode`) {
+            print("Adding mipmap toggle to " + $currentNode + ".\n");
+            addAttr -ln ac_mipmaps -at bool $currentNode;
+            $myResult = 1;
+        }
+    }
+
+    if ($myResult == "0") {
+        error "No texture file node selected";
+    }
+}
+

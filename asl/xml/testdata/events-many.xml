@@ -1,0 +1,215 @@
+<events>
+<navigate url="http://www.somewhere.com/" post="&amp;name=bla%20vgs&amp;id=454345asd"/>
+<loaded/>
+<mouse message="move">
+    <relpos relativeto="element" x="0.4567" y="0.1232">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+<mouse message="move">
+    <relpos relativeto="element" x="0.45627" y="0.12332">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+<mouse message="move">
+    <relpos relativeto="element" x="0.45367" y="0.12232">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+<mouse message="move">
+    <relpos relativeto="element" x="0.45627" y="0.12332">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+<mouse message="move">
+    <relpos relativeto="element" x="0.42567" y="0.12132">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+
+<scroll x="0" y="1234">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+</scroll>
+<scroll x="0" y="233">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+</scroll>
+<scroll x="0" y="345">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+</scroll>
+<scroll x="0" y="12434">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+</scroll>
+<scroll x="0" y="12334">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+</scroll>
+<scroll x="0" y="11234">
+        <framepath>
+            <frame>234</frame>
+            <frame>455</frame>
+            <frame>674</frame>
+        </framepath>
+</scroll>
+
+<highlight type="square" color="green">
+    <relpos relativeto="element" x="0.4567" y="0.1232">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</highlight>
+<highlight type="square" color="green">
+    <relpos relativeto="element" x="0.4567" y="0.1232">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</highlight>
+<highlight type="square" color="green">
+    <relpos relativeto="element" x="0.4567" y="0.1232">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</highlight>
+<mouse message="move">
+    <relpos relativeto="element" x="0.4567" y="0.1232">
+        <framepath/>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+<mouse message="move">
+    <relpos relativeto="element" x="0.4256" y="0.1132">
+        <framepath/>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+<mouse message="down">
+    <relpos relativeto="element" x="0.4267" y="0.1132">
+        <framepath/>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+<mouse message="up">
+    <relpos relativeto="element" x="0.2567" y="0.1213">
+        <framepath/>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+<navigate url="http://www.other.com/" post="&amp;name=bla%20vgs&amp;id=454345asd"/>
+</events>
+
+    

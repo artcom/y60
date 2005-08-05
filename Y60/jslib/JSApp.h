@@ -1,0 +1,70 @@
+//=============================================================================
+// Copyright (C) 2003, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: JSApp.h,v $
+//   $Author: martin $
+//   $Revision: 1.6 $
+//   $Date: 2005/02/16 12:22:21 $
+//
+//
+//=============================================================================
+
+#ifndef __Y60_JSAPP_INCLUDED__
+#define __Y60_JSAPP_INCLUDED__
+
+#include "jssettings.h"
+#include <js/jsapi.h>
+
+#include <asl/PlugInBase.h>
+#include <asl/MappedBlock.h>
+#include <asl/PackageManager.h>
+#include <vector>
+#include <string>
+#include <map>
+#include <list>
+
+
+struct JSStackFrame;
+
+namespace jslib {
+
+    extern JSContext * ourJSContext;
+
+    class JSApp {
+        public:
+            JSApp();
+            static void setIncludePath(const std::string & theIncludePath);
+            static asl::PackageManagerPtr getPackageManager();
+            static void setReportWarnings(bool theEnableFlag);
+            static void setQuitFlag(bool theQuitFlag);
+            static bool getQuitFlag();
+            void setStrictFlag(bool theStrictFlag);
+            void setJSVersion(int theVersion);
+            JSRuntime * initialize();
+            void shutdown();
+            static void ShellErrorReporter(JSContext *cx, const char *message,
+                    JSErrorReport *report);
+            int run(const std::string & theScriptFilename,
+                    const std::vector<std::string> & theScriptArgs);
+            static JSObject * copyArguments(JSContext * theContext,
+                 const std::vector<std::string> & theScriptArgs );
+        protected:
+            virtual bool initClasses(JSContext * theContext, JSObject * theGlobalObject);
+        private:
+            void Process(JSContext *cx, JSObject *obj, const char *filename);
+            int processArguments(JSContext * theContext, JSObject * theObject,
+                const std::string & theScriptFilename,
+                const std::vector<std::string> & theScriptArgs );
+
+            bool   ourStrictFlag;
+            int    ourJSVersion;
+    };
+}
+#endif

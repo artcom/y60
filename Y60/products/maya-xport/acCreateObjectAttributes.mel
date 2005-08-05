@@ -1,0 +1,24 @@
+// This will create a billboard and sensor select box for all selected nodes
+global proc acCreateObjectAttributes() {
+    int $myResult = 0;
+    string $dagnodes[];
+    $dagnodes = `selectedNodes -dagObjects`;
+
+    string $dagnode;
+    for ($dagnode in $dagnodes ) {
+        if( `attributeExists ac_billboard $dagnode` || `attributeExists ac_sensor $dagnode`) {
+        } else {
+            print("Adding billboard attribute to " + $dagnode + ".\n");
+            addAttr -ln ac_billboard -at "enum" -en "none:axis:point:" -defaultValue 0 $dagnode;
+            print("Adding sensor attribute to " + $dagnode + ".\n");
+            addAttr -ln ac_sensor -at "enum" -en "none:approximation" -defaultValue 0 $dagnode;
+            addAttr -ln ac_sensor_radius -at "float"  -defaultValue 5 $dagnode;
+            $myResult = 1;
+        }
+    }
+
+    if ($myResult == "0") {
+        error "No object selected";
+    }
+}
+

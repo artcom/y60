@@ -1,0 +1,92 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: wave_2d.cg,v $
+//   $Author: valentin $
+//   $Revision: 1.7 $
+//   $Date: 2004/08/25 11:28:17 $
+//
+//  Description: 
+//=============================================================================
+
+struct app2vert { 
+    float4 Position : POSITION;
+    float4 Center   : COLOR0;
+    float2 TexCoord : TEXCOORD0;
+};
+
+struct vert2frag {
+    float4 homPosition : POSITION;
+    float4 LocalCenter : TEXCOORD0;
+    float4 Vertex      : TEXCOORD1;
+    float4 WaveParams  : TEXCOORD2;
+    float2 TexCoord    : TEXCOORD3;
+};
+
+vert2frag main(app2vert IN,    
+               uniform float4 WaveParams, 
+               uniform float4 WaveColor, // UNUSED
+               uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vert2frag OUT;
+
+    const float PI = 3.1415927;
+    const float EARTH_RADIUS = 0.1895; // XXX UGLY (from SceneConfig.js)
+   
+    float latRad = (IN.Center.y - 0.5) * PI;
+    float lonRad = (IN.Center.x - 0.5) * 2.0 * PI;
+
+    float latSin, latCos;
+    sincos(latRad, latSin, latCos);
+
+    float lonSin, lonCos;
+    sincos(lonRad, lonSin, lonCos);
+
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.LocalCenter = float4(lonSin * latCos * EARTH_RADIUS, latSin * EARTH_RADIUS, lonCos * latCos * EARTH_RADIUS, IN.Center.w);
+    
+    OUT.Vertex = float4(IN.Position.x, IN.Position.y, IN.Position.z, 0.0);
+    OUT.WaveParams = WaveParams;
+    OUT.TexCoord = IN.TexCoord;
+
+    return OUT;
+}
+
+
+float4 mainFragment(vert2frag IN,
+                    uniform sampler2D paintTex): COLOR
+{
+    float myTime = IN.WaveParams.x;
+    float myScale = IN.WaveParams.y;
+    float myAlpha = IN.LocalCenter.w;
+    IN.LocalCenter.w = 0.0;
+
+    // should be x/y/z of Koeln/Bonn (or maybe the coordinates of the last impact?)
+    const float4 myGlobalCenter = float4(0.0147512,0.146325,0.118711,0.0);
+    float myGlobalDistance = distance(IN.LocalCenter, myGlobalCenter) * 30.0; // factor determines time offset from global center
+    myTime = max(myTime - myGlobalDistance, 0.0);
+
+    float myDistance = distance(IN.Vertex, IN.LocalCenter);
+    float waveDist = abs(myDistance - myTime * 0.05); // factor slows down movement of wave front
+
+    float myAttenuation = 1.0 - smoothstep(0.0, 0.02, waveDist); // factor is width of wave front
+    myAttenuation *= 1.0 - step(myTime, 0.0);
+    
+    myDistance = sin(myDistance * myScale - myTime); // range [-1..1]
+    myDistance = myDistance * 0.5 + 0.5;             // scale to range [0..1]
+    myDistance *= myAttenuation;
+
+    float4 textureColor = tex2D(paintTex, IN.TexCoord);
+    float4 myColor = textureColor;
+    myColor.w = max(textureColor.w, myDistance);
+    myColor.w *= myAlpha;
+
+    return myColor;
+}

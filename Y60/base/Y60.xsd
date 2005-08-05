@@ -1,0 +1,2626 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="Point3f">
+        <xs:annotation>
+            <xs:documentation>Type for simple 3-dimensional points with float values.
+Points are used instead of vectors, if a position in space has to be represented.
+
+Example:
+[1.4, 1.5, 1.6]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Quaternionf">
+        <xs:annotation>
+            <xs:documentation>Type for quaternions with float values.
+Quaternions represent orientations in the three-dimensional space.
+
+Example:
+[0.2, 0.4, 0.7, 0.5]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector2f">
+        <xs:annotation>
+            <xs:documentation>Type for simple 2-dimensional vectors with float values.
+
+Example:
+[1.4, 1.5]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector3f">
+        <xs:annotation>
+            <xs:documentation>Type for simple 3-dimensional vectors with float values.
+
+Example:
+[1.4, 1.5, 1.6]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector4f">
+        <xs:annotation>
+            <xs:documentation>Type for simple 4-dimensional vectors with float values.
+
+Example:
+[1.4, 1.5, 1.6, 1.7]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Vector2i">
+        <xs:annotation>
+            <xs:documentation>Type for simple 2-dimensional vectors with integer values.
+
+Example:
+[300, -500]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfBool">
+        <xs:annotation>
+            <xs:documentation>Type for a vector of boolean values.
+
+Example:
+[0, 1, 0, 1, 1]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfSignedInt">
+        <xs:annotation>
+            <xs:documentation>Type for a vector of signed integer values.
+
+Example:
+[10, 11, -1, 12, 13, 0]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfUnsignedInt">
+        <xs:annotation>
+            <xs:documentation>Type for a vector of unsigned integer values.
+
+Example:
+[10, 11, 12, 13, 0]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfFloat">
+        <xs:annotation>
+            <xs:documentation>Type for a vector of float values.
+
+Example:
+[0.1, 0.2, 0.0, -1.1, 100.0]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfVector2i">
+        <xs:annotation>
+            <xs:documentation>Type for a vector that contains 2-dimensional vectors of integers.
+
+Example:
+[[0, 1], [2, 3], [10, 90]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfVector2f">
+        <xs:annotation>
+            <xs:documentation>Type for a vector that contains 2-dimensional vectors of floats.
+
+Example:
+[[0.1, 1.1], [-2.5, -3.14], [10.0, 90.0]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfVector3f">
+        <xs:annotation>
+            <xs:documentation>Type for a vector that contains 3-dimensional vectors of floats.
+
+Example:
+[[0.1, 1.1, 2.1], [-2.5, -3.14, 2.17], [10.0, 90.0, 100.0]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfVector4f">
+        <xs:annotation>
+            <xs:documentation>Type for a vector that contains 4-dimensional vectors of floats.
+
+Example:
+[[0.1, 1.1, 2.1, 3.1], [-2.5, -3.14, 2.17, 0.0], [10.0, 90.0, 100.0, 110.0]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfQuaternionf">
+        <xs:annotation>
+            <xs:documentation>Type for a vector that contains quaternions.
+Quaternions represent orientations in 3-dimensional space.
+
+Example:
+[[0.1, 1.1, 2.1, 1.0], [-2.5, -3.14, 2.17, 1.0], [10.0, 90.0, 100.0, 0.0]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfRankedFeature">
+        <xs:annotation>
+            <xs:documentation>Type for a vector that contains ranked features.
+A ranked feature is a string with a number that represents its ranking. The higher the number
+the better the ranking.
+
+Example:
+[30[lambert],20[flat],10[unlit]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="VectorOfString">
+        <xs:annotation>
+            <xs:documentation>Type for a vector that strings.
+The strings are not quoted.
+
+Example:
+[frontfacing,backfacing]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Matrix4f">
+        <xs:annotation>
+            <xs:documentation>Type for a 4 by 4 matrix of float values.
+The first word shows the type of the matrix. Currently the following matrix types are supported:
+identity, x_rotating, y_rotating, z_rotating, rotating, scaling, orthogonal, linear,
+translating, affine, unknown
+The matrix type identifier is optional.
+
+Example:
+identity[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Box3f">
+        <xs:annotation>
+            <xs:documentation>Type for a 3-dimensional box of float values.
+The box is axis aligned. The two points represent two opposite corners of the box.
+
+Example:
+[[0.1, 0.2, 0.3], [1.0, 2.0, 3.0]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfRGB">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding red/green/blue.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfRGBA">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding red/green/blue/alpha.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfBGR">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding blue/green/red.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfBGRA">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding blue/green/red/alpha.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfGRAY">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with 8 bit greylevel pixel encoding.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfGRAY16">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with 16 bit greylevel pixel encoding.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfGRAYS16">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with 16 bit signed greylevel pixel encoding.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfDXT1">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding DXT1.
+DXT1 is a texture-compression format, that compresses non-alpha textures to 16% size and
+alpha-textures to 12.5% size.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfDXT1A">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding DXT1a.
+DXT1a is a texture-compression format, that compresses non-alpha textures to 16% size and
+alpha-textures to 12.5% size.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfDXT3">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding DXT3.
+DXT3 is a texture-compression format, that compresses textures to 25% size.
+The first two numbers in brackets represent the width and height of the raster.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfDXT5">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding DXT5.
+DXT5 is a texture-compression format, that compresses textures to 25% size.
+The first two numbers in brackets represent the width and height of the raster.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:element name="rasterofrgb">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has the pixel type red/green/blue.
+
+Example:
+&lt;rasterofrgb&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofrgb&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfRGB"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofrgba">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has the pixel type red/green/blue/alpha.
+
+Example:
+&lt;rasterofrgba&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofrgba&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfRGBA"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofbgr">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has the pixel type blue/green/red.
+
+Example:
+&lt;rasterofbgr&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofbgr&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfBGR"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofbgra">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has the pixel type blue/green/red/alpha.
+
+Example:
+&lt;rasterofbgra&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofbgra&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfBGRA"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofgray">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has monocrome 8-bit pixel values.
+
+Example:
+&lt;rasterofgray&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofgray&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfGRAY"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofgray16">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has monocrome 16-bit pixel values.
+
+Example:
+&lt;rasterofgray16&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofgray16&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfGRAY16"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofgrays16">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has monocrome signed 16-bit pixel values.
+
+Example:
+&lt;rasterofgrays16&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofgrays16&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfGRAYS16"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofdxt1">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data is texture-compressed with the DXT1 algorithm.
+This algorithm reduces alpha-textures to 12.5% size and non-alpha textures to 16.6% size.
+
+Example:
+&lt;rasterofdxt1&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofdxt1&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfDXT1"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofdxt1a">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data is texture-compressed with the DXT1a algorithm.
+This algorithm reduces alpha-textures to 12.5% size and non-alpha textures to 16.6% size.
+
+Example:
+&lt;rasterofdxt1a&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofdxt1a&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfDXT1A"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofdxt3">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data is texture-compressed with the DXT3 algorithm.
+This algorithm reduces textures to 25% size.
+
+Example:
+&lt;rasterofdxt3&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofdxt3&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfDXT3"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofdxt5">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data is texture-compressed with the DXT5 algorithm.
+This algorithm reduces textures to 25% size.
+
+Example:
+&lt;rasterofdxt5&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofdxt5&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfDXT5"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofbool">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of bool values as text child.
+The example shows how the element is used to describe the animation of a visibility-attribute over time.
+
+Example:
+&lt;vectorofbool&gt;[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0]&lt;/vectorofbool&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfBool">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectoroffloat">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of float values as text child.
+
+Example:
+&lt;vectoroffloat&gt;[-0.0580993,-0.0691883,-0.0776232,-0.0876958,-0.0978448]&lt;/vectoroffloat&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfFloat">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofunsigned">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of unsigned integer values as text child.
+
+Example:
+&lt;vectorofunsigned&gt;[1,2,3,4,5]&lt;/vectorofunsigned&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfUnsignedInt">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofvector2f">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of 2-dimensional float vectors as text child.
+The example shows how the element is used to list a number of uv-coordinates inside a shape element.
+
+Example:
+&lt;vectorofvector2f name='map1'&gt;[[0,1],[1,1],[0,0],[1,0],[0,-1]]&lt;/vectorofvector2f&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfVector2f">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofvector3f">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of 3-dimensional float vectors as text child.
+The example shows how the element is used to list a number of normal-vectors inside a shape element.
+
+Example:
+&lt;vectorofvector3f name='normal'&gt;[[0,0,1],[0,1,0],[0,0,-1],[0,-1,0],[1,0,0],[-1,0,0],]&lt;/vectorofvector3f&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfVector3f">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofquaternionf">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of quaternions with float values as text child.
+Quaternions are used to describe orientations in 3-dimensional space.
+The example shows how the element is used to describe the animation of a quaternion over time.
+
+Example:
+&lt;vectorofquaternionf&gt;[[0,0,0,1],[0,-0.0620661,0,0.998072],[0,-0.117031,0,0.993128],[0,-0.166658,0,0.986015]]&lt;/vectorofquaternionf&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfQuaternionf">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofvector4f">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of 4-dimensional float vectors as text child.
+The example shows how the element is used to list a number of color-values inside a shape element.
+
+Example:
+&lt;vectorofvector4f name='color'&gt;[[0,0,0,0],[1,1,1,1]]&lt;/vectorofvector4f&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfVector4f">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofstring">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of strings as text child.
+The example shows how the element is used to set the blendfunction of a material.
+
+Example:
+&lt;vectorofstring name='blendfunction'&gt;[src_alpha,one_minus_src_alpha]&lt;/vectorofstring&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfString">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="scene">
+        <xs:annotation>
+            <xs:documentation>The scene is the toplevel node of an Y60 Document.
+It contains descriptions for the scenegraph (worlds), render areas (canvases), materials,
+lightsources, animations, shapes and images</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="revision" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Locale SVN revision number of the exporting system's 'pro60' repository.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:sequence>
+                <xs:element ref="worlds">
+                    <xs:annotation>
+                        <xs:documentation>Contains the scenegraph hierachy</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="canvases">
+                    <xs:annotation>
+                        <xs:documentation>Contains render areas and viewports</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="materials">
+                    <xs:annotation>
+                        <xs:documentation>Contains material definitions</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="lightsources">
+                    <xs:annotation>
+                        <xs:documentation>Contains light definitions</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="animations">
+                    <xs:annotation>
+                        <xs:documentation>Contains all global timeline animations</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="characters">
+                    <xs:annotation>
+                        <xs:documentation>Contains character animations</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="shapes">
+                    <xs:annotation>
+                        <xs:documentation>Contains the geometric of all objects in the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="images">
+                    <xs:annotation>
+                        <xs:documentation>Contains images that are referenced by textures in materials</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="worlds">
+        <xs:annotation>
+            <xs:documentation>Toplevel element for all worlds in the scenegraph.
+This element can contain any number of world elements.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="world">
+                    <xs:annotation>
+                        <xs:documentation>Contains the scenegraph hierachy for one world</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="world">
+        <xs:annotation>
+            <xs:documentation>The world is the toplevel node for the scenegraph.
+It contains a hierachy of scenegraph object.
+Currently the following scenegraph nodes are supported:
+body, camera, light, transform, lod, joint</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType">
+                    <xs:attribute name="skyboxmaterial" type="xs:IDREF">
+                        <xs:annotation>
+                            <xs:documentation>Id of a material, that will be used as skybox.
+The material must include a cubemap texture.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="lodscale" type="xs:float">
+                        <xs:annotation>
+                            <xs:documentation>Global scale which is multiplied with the camera distance, before the lod-level is calculated.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="fogmode" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Sets the type of OpenGL fog used. Valid values are: 'off', 'linear', 'exp' and 'exp2'.
+Please refer to OpenGL documentation for details on fog calculation.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="fogrange" type="Vector2f">
+                        <xs:annotation>
+                            <xs:documentation>Sets the range inbetween which OpenGL fog is shown.
+The first value is the fog-start (distance from the camera, where the fog is first visible).
+The second value is the fog-end (distance from the camera, from where only fog is visible).
+For details see documentation on the glFogf(GL_FOG_START) and glFogf(GL_FOG_END) function.
+
+Example:
+fogrange='[100.0,130.5]'
+
+Note:
+The fogrange is only used in 'linear' fog mode.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="fogdensity" type="xs:float">
+                        <xs:annotation>
+                            <xs:documentation>Sets the density of OpenGL fog.
+For details see the documentation of the glFogf(GL_FOG_DENSITY) function.
+
+Note:
+The fogdensity is only used in 'exp' and 'exp2' fog modes.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="fogcolor" type="Vector4f">
+                        <xs:annotation>
+                            <xs:documentation>Sets the color of OpenGL fog.
+
+Example:
+fogcolor='[1,0,0,1]' for red fog.
+
+Note: Alpha component is ignored.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="canvases">
+        <xs:annotation>
+            <xs:documentation>Toplevel element for all canvas elements.
+This element can contain any number of canvas elements.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="canvas">
+                    <xs:annotation>
+                        <xs:documentation>Contains one render areas (canvas) and its viewports</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="canvas">
+        <xs:annotation>
+            <xs:documentation>OpenGl render area.
+Webster: A canvas is a piece of cloth backed or framed as a surface for a painting.
+Normally, there is just one canvas, with one viewport, with one camera rendering throw this viewport.
+But a canvas can have multiple viewports. And there can be multiple canvases, too.
+Multiple canvases can be used for multi-view rendering of a scene, as it is used in Modelling Programs.
+A canvas can be used as texture for a material in the future.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique id for this canvas.
+Usually 'cv' plus a number, such as 'cv0'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Human readable name for this canvas.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="backgroundcolor" type="Vector4f">
+                <xs:annotation>
+                    <xs:documentation>Sets the OpenGL clear color.
+
+Example:
+backgroundcolor='[1,0,0,0]' to set the backgroundcolor to red.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="target" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>Defines a rendering target (pbuffer). 
+Must reference an existing image in scene if set.
+
+Note: The image should have mipmapping disabled since existing mipmap levels
+aren't updated when subloading. It has to be disabled before the first load
+occurs.
+Note2: When reading from the framebuffer the image is flipped vertically. A
+solution might be to use a scaling image matrix of [1,-1,1].
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="viewport">
+                    <xs:annotation>
+                        <xs:documentation>Defines a view into the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="viewport">
+        <xs:annotation>
+            <xs:documentation>Defines the render viewport.
+A viewport is a rectangular area, inside the canvas.
+Each vertex in the scene must be projected onto the 2D camera viewport plane in order to be display on the screen.
+A canvas can have multiple viewport.
+A possible application is edge blending, where you render the same scene into two overlapping viewports.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique id for this viewport.
+Usually 'vp' plus a number, such as 'vp0'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A human readable name for the viewport.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="orientation" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Orientation of the viewport. Must be either 'portrait' or 'landscape'.
+The default is 'landscape'. Use 'portrait' mode to turn the screen and mouse events by 90 degrees.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="camera" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>Id of the camera that is attached to this viewport.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="position" type="Vector2f">
+                <xs:annotation>
+                    <xs:documentation>Position of the viewport on the canvas.
+Coordinates are between [0,0] (upper left corner) and [1,1] (lower right corner)</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="size" type="Vector2f">
+                <xs:annotation>
+                    <xs:documentation>Size of the viewport on the canvas.
+Default is [1,1] which sets the size of the viewport to the size of the canvas.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="backfaceculling" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns backface culling on/off.
+If backface culling is enabled, only one side of the polygon is rendered, depending on the face normal.
+Backface culling is enabled by default.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="wireframe" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns wireframe rendering on/off.
+Wireframe is disabled by default.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="lighting" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns lighting on/off.
+Lighting is enabled by default.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="flatshading" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns flatshading on/off.
+Flatshading means, that each polygon is shaded in only one color.
+Flatshading is disabled by default.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="texturing" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns texturing on/off.
+Texturing is enabled by default.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="culling" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns culling on/off.
+If culling is turned on, only bodies that are visible in the view frustrum are passed to the renderer.
+Culling is enabled by default.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="debugculling" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns debug culling on/off.
+If debug culling is turned on, the culling view frustrum is frozen and drawn to the screen.
+When you move around in the scene, you can see that only a part of the scene is rendered.
+Debug culling is disabled by default.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="overlays">
+                    <xs:annotation>
+                        <xs:documentation>Contains overlay elements, that are rendered on top of the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="overlays">
+        <xs:annotation>
+            <xs:documentation>Parent node for all overlays.
+This element can include any number of overlay elements.
+Overlays are rectangles rendered on top of the scene with an ortographic projection.
+Overlays are useful for GUI elements and On-Screen-Displays.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="overlay">
+                    <xs:annotation>
+                        <xs:documentation>Defines an rectangular overlay element, that is rendered on top of the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="materials">
+        <xs:annotation>
+            <xs:documentation>Parent node for all materials.
+This element can include any number of material elements.
+Materials define, how a geometry is textured and shaded.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="material">
+                    <xs:annotation>
+                        <xs:documentation>Material definition</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="lightsources">
+        <xs:annotation>
+            <xs:documentation>Parent node for all lightsources.
+This element can include any number of lightsource elements.
+Lightsources are referenced by light elements in the world.
+They define how a given light is rendered (e.g. its type and color).</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="lightsource">
+                    <xs:annotation>
+                        <xs:documentation>Lightsource definition</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="animations">
+        <xs:annotation>
+            <xs:documentation>Parent node for all animations.
+This element can include any number of animation elements.
+Animations are exported from Maya. They change attributes of world-elements over time.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="animation">
+                    <xs:annotation>
+                        <xs:documentation>Animation of one attribute in the scene over time.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="characters">
+        <xs:annotation>
+            <xs:documentation>Parent node for all characters.
+This element can include any number of character elements.
+Characters are exported from Maya. They are similar to animations, except they do not run on a global timeline,
+they must be triggered individually.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="character">
+                    <xs:annotation>
+                        <xs:documentation>A bundles animation-clips belonging to one character</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="character">
+        <xs:annotation>
+            <xs:documentation>A character is usefull to group animations.
+A animated character contains a number of clips, which contain a number of animations.
+
+Example:
+There are two animated objects in the scene: 'dog' and 'cat' (characters)
+Each character can do two things: 'walk' and 'sitdown' (clips)
+Each movement consists of many submovements: 'rotate leg', 'bend leg', 'move to', etc. (animations)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique id for this character.
+Usually 'ch' plus a number, such as 'ch0'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A human readable name for the character.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="clip">
+                    <xs:annotation>
+                        <xs:documentation>A bundle of animation belonging to one clip</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="clip">
+        <xs:annotation>
+            <xs:documentation>A clip is usefull to group animations.
+A clip should contain one movements of a character, which usually consists of many submovements.
+
+Example:
+There are two animated objects in the scene: 'dog' and 'cat' (characters)
+Each character can do two things: 'walk' and 'sitdown' (clips)
+Each movement consists of many submovements: 'rotate leg', 'bend leg', 'move to', etc. (animations)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique id for this clip.
+Usually 'cl' plus a number, such as 'cl0'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A human readable name for the clip.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="animation">
+                    <xs:annotation>
+                        <xs:documentation>Defines the change of an attibute in the scenegraph over time.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="shapes">
+        <xs:annotation>
+            <xs:documentation>Parent node for all shape nodes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="shape">
+                    <xs:annotation>
+                        <xs:documentation>Defines the geometriy of an object in the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="images">
+        <xs:annotation>
+            <xs:documentation>Parent node for all image, movie and video nodes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="ImageBase">
+                    <xs:annotation>
+                        <xs:documentation>Image, movie or video node</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="shape">
+        <xs:annotation>
+            <xs:documentation>A shape node describes a piece of geometrie.
+A shape is referenced by one or more body nodes, which place the geometrie into the world.
+
+The shape node consists of two parts. In the first part (vertexdata) the positions, colors,
+normals, uv-coordinates, etc. are defined in plain lists. In the second part (primitives), this
+data is referenced and grouped into geometric primitives, such as triangles and quads.
+
+See also the indices-node (shape-&gt;primitives-&gt;elemements-&gt;indices) for an example.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="vertexdata">
+                    <xs:annotation>
+                        <xs:documentation>Contains positions, colors, normals, uv-coordinates,
+and other vertex data</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="primitives">
+                    <xs:annotation>
+                        <xs:documentation>Contains primitives, such as triangles and quads, that
+reference the vertexdata</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique id for this shape.
+Usually 's' plus a number, such as 's0'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A human readable name for the shape.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="boundingbox" type="Box3f">
+                <xs:annotation>
+                    <xs:documentation>The bounding box of the shape in 'shapespace'.
+This attribute is maintained by the scene and should not be changed from JavaScript.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="renderstyle" type="VectorOfString">
+                <xs:annotation>
+                    <xs:documentation>A list of optional renderstyle strings.
+
+Currently the following styles are supported:
+'backfacing'      - The backfaces of the shape are rendered
+'frontfacing'     - The frontfaces of the shape are rendered
+'bounding_volume' - The bounding volumes of the shape are rendered
+'ignore_depth'    - The shape is rendered without z-Buffer testing</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vertexdata">
+        <xs:annotation>
+            <xs:documentation>The vertexdata node containts plain lists of positions, colors, normals, uv-coordinates,
+and other vertex data (such as skin and bones weights).
+Thouse values are indexed in the primitives-node of the shape.
+
+See also the indices-node (shape-&gt;primitives-&gt;elemements-&gt;indices) for an example.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="vectorofbool">
+                    <xs:annotation>
+                        <xs:documentation>List of bool values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectoroffloat">
+                    <xs:annotation>
+                        <xs:documentation>List of float values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofunsigned">
+                    <xs:annotation>
+                        <xs:documentation>List of unsigned values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector2f">
+                    <xs:annotation>
+                        <xs:documentation>List of vector2f values (e.g. UV-Coordinates)</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector3f">
+                    <xs:annotation>
+                        <xs:documentation>List of vector3f values (e.g. Positions)</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector4f">
+                    <xs:annotation>
+                        <xs:documentation>List of vector4f values (e.g. colors)</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofstring">
+                    <xs:annotation>
+                        <xs:documentation>List of string values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="primitives">
+        <xs:annotation>
+            <xs:documentation>The primitives node containts all primitives out of which a shape is made.
+Primitives are simple geometric elements, such as triangles, quads or lines.
+The primitives of a shape are grouped in lists of same primitiv-type and same material.
+This reduces the neccessary calls to gl and therefore optimizes the rendering performance.
+
+See also the indices-node (shape-&gt;primitives-&gt;elemements-&gt;indices) for an example.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="elements">
+                    <xs:annotation>
+                        <xs:documentation>Contains list of simple gemetric elements such as triangles</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="elements">
+        <xs:annotation>
+            <xs:documentation>The elements node containts a list of primitives of the same type and same material.
+                The meaning of element is interchangable with primitive.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="indices">
+                    <xs:annotation>
+                        <xs:documentation>List of indices to vertex data for the element</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="halfedges">
+                    <xs:annotation>
+                        <xs:documentation>List Edge-Twins</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="material" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>The id of a material that will be used to render the list of elements.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="type" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>The type of elements, which are referenced in the indices-node.
+
+Supported types are:
+'points'        - each vertex in the list is rendered as a single point
+'lines'         - every two vertices in the list are rendered as a line segment
+'linestrip'     - all vertices in the list are rendered as a connected line
+'lineloop'      - all vertices in the list are rendered as a connected line, the first and last vertex is connected
+'triangles'     - every three vertices in the list are rendered as a triangle
+'trianglestrip' - all vertices in the list are rendered as connected triangles (see OpenGl GL_TRIANGLE_STRIP description for details)
+'trianglefan'   - all vertices in the list are rendered as connected triangles (see OpenGl GL_TRIANGLE_FAN description for details)
+'quads'         - every four vertices in the list are rendered as a quad
+'quadstrip'     - all vertices in the list are rendered as connected quads (see OpenGl GL_QUAD_STRIP description for details)
+'polygon'       - all vertices in the list are rendered as a connected polygon (see OpenGl GL_POLYGON description for details)</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="halfedges">
+        <xs:annotation>
+            <xs:documentation>The halfedges Node contains mesh information [TS TODO]</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfSignedInt">
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="indices">
+        <xs:annotation>
+            <xs:documentation>The indices node containts a list of indices to vertex data of the shape.
+                Each entry in this list represents one vertex to be rendered.
+                Many vertices can reference the same vertex data.
+
+Example:
+A cube consists of 8 corners and 6 sides. It therefore only needs 8 positions and 6 normals, e.g.
+&lt;vertexdata&gt;
+    &lt;vectorofvector3f name='position'&gt;[[-1,-1,1],[1,-1,1],[-1,1,1],[1,1,1],[-1,1,-1],[1,1,-1],[-1,-1,-1],[1,-1,-1]]&lt;/vectorofvector3f&gt;
+    &lt;vectorofvector3f name='normal'&gt;[[0,0,1],[0,1,0],[0,0,-1],[0,-1,0],[1,0,0],[-1,0,0]]&lt;/vectorofvector3f&gt;
+&lt;/vertexdata&gt;
+
+If the cube is made of triangles, there are 36 vertices, which share the vertex data above
+&lt;elements type='triangles' material='m0'&gt;
+    &lt;indices vertexdata='position' role='position'&gt;[0,1,2,1,3,2,2,3,4,3,5,4,4,5,6,5,7,6,6,7,0,7,1,0,1,
+7,3,7,5,3,6,0,4,0,2,4]&lt;/indices&gt;
+    &lt;indices vertexdata='normal' role='normal'&gt;[0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5]&lt;/indices&gt;
+&lt;/elements&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfUnsignedInt">
+                    <xs:attribute name="vertexdata" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>References the name of the vertex data node, which the indices refer to.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="role" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Tells the renderer the role of this data, i.e. how this data has to be used.
+
+The following roles are currently defined:
+
+'position'          - The vertexposition (Vector3f)
+'normal'            - The vertexnormal (Vector3f)
+'color'             - The vertexcolor (Vector4f)
+'texcoord0'         - The texture coordinate of the first texture (Vector2f)
+(...)
+'texcoord7'         - The texture coordinate of the seventh texture (Vector2f)
+'joint_weights_0'   - The weights of the first four most important joints (Vector4f)
+'joint_indices_0'   - The indices of the first four most important joints (Vector4i)
+'joint_weights_1'   - The weights of the next four most important joints (Vector4f)
+'joint_indices_1'   - The indices of the first four most important joints (Vector4i)</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="lightsource">
+        <xs:annotation>
+            <xs:documentation>The lightsource node defines the properties of a light source</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="properties">
+                    <xs:annotation>
+                        <xs:documentation>Contains properties for the lightsource.
+
+Possible properties are (see OpenGL documentation for details):
+ambient (Vector4f)   - The ambient color.
+diffuse (Vector4f)   - The diffuse color.
+specular (Vector4f)  - The specular color.
+attenuation (float)  - How strong does the light attenuate over distance. (Positional lights only)
+
+cutoff (float)      Value that specifies the maximum spread angle of a light source.
+                    Only values in the range [0, 90], and the special value 180, are accepted.
+                    If the angle between the direction of the light and the direction from the light
+                    to the vertex being lighted is greater than the spot cutoff angle,
+                    the light is completely masked. Otherwise, its intensity is controlled by the spot exponent
+                    and the attenuation factors. The default spot cutoff is 180, resulting in uniform light distribution.
+
+exponent (float)    Value that specifies the intensity distribution of the light.
+                    Only values in the range [0,128] are accepted.
+					Effective light intensity is attenuated by the cosine of the angle between the direction of the light and
+					the direction from the light to the vertex being lighted, raised to the power of the spot exponent. Thus,
+					higher spot exponents result in a more focused light source, regardless of the spot cutoff angle.
+					The initial spot exponent is 0, resulting in uniform light distribution.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique id for this ligthsource.
+Usually 'ls' plus a number, such as 'ls0'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A human readable name for the ligthsource.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="type" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>The lightsource type.
+
+Supported types are:
+'directional'    - Light without a position but with a direction (such as sunlight)
+'positional'     - Light with a position and direction (such as a lamp)
+'ambient'        - Light without position and without direction (diffuse light)</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="animation">
+        <xs:annotation>
+            <xs:documentation>Animations are used to change attributes of the scene over time.
+Basically any attribute in the world-hierachy can be animated, but so far only the following
+are exported from maya:
+- position
+- orientation
+- size
+- visiblitiy
+
+The animation works a bit like a movie. The list of values contained as child node are used to set
+the animated property over time. The animations are exported with 25 frames per second, meaning that
+even if nothing changes, there are 25 values in the list per second.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="vectorofbool">
+                    <xs:annotation>
+                        <xs:documentation>List of animated bool values (e.g. visibility)</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectoroffloat">
+                    <xs:annotation>
+                        <xs:documentation>List of animated float values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofunsigned">
+                    <xs:annotation>
+                        <xs:documentation>List of animated unsigend values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector2f">
+                    <xs:annotation>
+                        <xs:documentation>List of animated vector2f values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector3f">
+                    <xs:annotation>
+                        <xs:documentation>List of animated vector3f values (e.g position, scale)</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector4f">
+                    <xs:annotation>
+                        <xs:documentation>List of animated vector4f values (e.g. colors)</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofquaternionf">
+                    <xs:annotation>
+                        <xs:documentation>List of animated orientation values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofstring">
+                    <xs:annotation>
+                        <xs:documentation>List of animated string values</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique id for the animation.
+Usually 'a' plus a number, such as 'a0'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A human readable name for the animation.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="enabled" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Enables/disables playback of the animation.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="attribute" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Name of the attribute to be animated (e.g. position, orientation)</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="node" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>Id of the node to be animated, must be inside the world node.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="begin" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>Time in seconds when the animation starts, relative to the start of the programm.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="duration" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>Duration in seconds of the animation.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="clipin" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>The time from the start of the animation-timeline when the animation should start.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="clipout" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>The time from the start of the animation-timeline when the animation should end.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="pause" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>Pause in seconds after the animation, before the next loop starts.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="count" type="xs:unsignedInt">
+                <xs:annotation>
+                    <xs:documentation>Number of loops the animation will run. Zero means run forever.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="direction" type="xs:string">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="forward|reverse|pong"/>
+                </xs:restriction>
+                <xs:annotation>
+                    <xs:documentation>The direction of the animation.
+
+Allowed values are:
+'forward'  - Play forward
+'reverse'  - Play backward
+'pong'     - Play forward, then backward, than forward, ...</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="overlay">
+        <xs:annotation>
+            <xs:documentation>Overlays are used to create rectangular elements on top of the scene.
+
+Overlays are not part of the world hierachy. They are rendered in a second pass, on top of the scene.
+Overlays are independant of the camera position. They are always screen aligned. The coordinates are
+set in pixel units.
+
+Overlays can be usefull for GUI elements, On-Screen-Display of text or display of movies.
+
+Overlays are rendered pixel-exact. I.e. a pixel in an image/movie will be mapped to one pixel on the screen.
+
+Overlays can be manipulated with attributes in several ways:
+- position and size
+- visiblity and alpha
+- uv-mapping of the source image (cropping/scaling/repeating)
+- border color and width
+
+Overlays can be used hierachically.
+The child overlays inherit the following attributes from their parents:
+- position
+- alpha</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="overlay">
+                    <xs:annotation>
+                        <xs:documentation>An overlay can contain other overlays, that inherit position and alpha value.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique id for the overlay.
+Usually 'o' plus a number, such as 'o0'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A human readable name for the overlay.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="visible" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Sets the overlay visible/invisible.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="position" type="Vector2f">
+                <xs:annotation>
+                    <xs:documentation>The position of the upper-left corner of the overlay on the screen in pixels.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="srcorigin" type="Vector2f">
+                <xs:annotation>
+                    <xs:documentation>The crop position in the source image. Values must be between zero and one.
+
+A value of [0,0] is default. It means that the source image is not cropped.
+A value of [0.5,0] would crop the left half of the source image.
+A value of [0,0.5] would crop the top half of the source image.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="srcsize" type="Vector2f">
+                <xs:annotation>
+                    <xs:documentation>The relative size of the selected region in the source image.
+A value of [1,1] is default. It means that the source image is used completely.
+A value of [0.5, 0.5] would crop the upper left part of the image.
+A value of [2,1] would repeat the image on the right side once.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="alpha" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>An alpha value between 0 and 1. Zero means completely transparent, one means opaque</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="width" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>The width of the overlay in pixel.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="height" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>The height of the overlay in pixel.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="material" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>Id of the material to be used for the overlay.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="bordercolor" type="Vector4f">
+                <xs:annotation>
+                    <xs:documentation>Color of the border</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="borderwidth" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>Width of the border. Will be used to set glLineWidth()</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="topborder" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns right top on/off</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="bottomborder" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns bottom border on/off</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="leftborder" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns left border on/off</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="rightborder" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns right border on/off</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="material">
+        <xs:annotation>
+            <xs:documentation>A material defines how a piece of geometry (shape or overlay) will be rendered.
+It contains references to image-nodes for texturing and other material definitions, such as colors.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="requires">
+                    <xs:annotation>
+                        <xs:documentation>Contains requirements, which are matched against shaders in the shaderlibrary
+to find the best matching shader for this material.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="properties">
+                    <xs:annotation>
+                        <xs:documentation>Contains material properties, such as colors.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="textures">
+                    <xs:annotation>
+                        <xs:documentation>Contains texture definitions.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:ID">
+                <xs:annotation>
+                    <xs:documentation>Unique id for the material.
+Usually 'm' plus a number, such as 'm0'.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A human readable name for the material.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="transparent" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Tells the renderer if this material is transparent or not.
+Transparent materials are rendered in z-order in a second pass.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="writedepthbuffer" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turn depthbuffer writing on/off.
+For transparent shapes, that intersect heavily it is sometimes visually more pleasing
+to render without depth buffer</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="requires">
+        <xs:annotation>
+            <xs:documentation>A list of features, that are required by a shader to render a given material.
+The material requirements are used to find the best matching shader in the shaderlibrary.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="feature">
+                    <xs:annotation>
+                        <xs:documentation>A required shader-feature for the material.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="feature">
+        <xs:annotation>
+            <xs:documentation>A required feature of a shader to render a given material.
+All shaders in the shaderlibrary will be checked against this feature to determin the best
+matching shader.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="class" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Type of the feature. Possible types are 'textures', 'lighting', 'vertexparams' and 'physics'</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="values" type="VectorOfRankedFeature">
+                <xs:annotation>
+                    <xs:documentation>A ranked list of feature values.
+Typical format of the ranked list is:
+    &lt;feature class='lighting' values='[30[lambert],20[flat],10[unlit]]'/&gt;
+which means that the lighting should be applied with a lambert-shader, if that is not
+possible a flat-shader should be used and as last ressort the unlit-shader could be taken.
+
+The following values are possible for the different classes:
+lighting:       phong, lambert, flat, unlit, toon
+textures:       paint, bump, environment, skybox
+vertexparams:   color
+physics:        skin, waves, wind, wave_2d, wave_1d, hexwisp
+
+If multitexturing should be used the texture-attribute should contain a list of texture usages, such as:
+[paint,paint,bump]</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="properties">
+        <xs:annotation>
+            <xs:documentation>List of material properties. Typical properties include:
+
+diffuse      - diffuse color
+ambient      - ambient color
+specular     - specular color
+shininess    - strength of specular reflection
+surfacecolor - color for unlit materials</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="unsignedint">
+                    <xs:annotation>
+                        <xs:documentation>Property of type unsigned integer</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="float">
+                    <xs:annotation>
+                        <xs:documentation>Property of type float</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="point3f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Point3f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vector2f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Vector2f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vector3f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Vector3f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vector4f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Vector4f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="matrix4f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type Matrix4f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector2f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vector of Vector2f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofvector4f">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vector of Vector4f</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="vectorofstring">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vector of String</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="sampler2d">
+                    <xs:annotation>
+                        <xs:documentation>Property that references a CG texture</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="samplerCUBE">
+                    <xs:annotation>
+                        <xs:documentation>Property that references a CG cubemap</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="unsignedint">
+        <xs:annotation>
+            <xs:documentation>Property that contains an unsigned integer as text child
+
+Example:
+&lt;unsignedint name='foo'&gt;123&lt;/unsignedint&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:unsignedInt">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="float">
+        <xs:annotation>
+            <xs:documentation>Property that contains an float as text child
+
+Example:
+&lt;float name='foo'&gt;4.56&lt;/float&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:float">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="point3f">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a 3-dimensional point of float values as text child
+
+Example:
+&lt;point3f name='foo'&gt;[1.2,2.3,4]&lt;/point3f&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Point3f">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vector2f">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a 2-dimensional vector of float values as text child
+
+Example:
+&lt;vector2f name='foo'&gt;[2.3,4]&lt;/vector2f&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Vector2f">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vector3f">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a 3-dimensional vector of float values as text child
+
+Example:
+&lt;vector3f name='foo'&gt;[2.4,1.9,7.5]&lt;/vector3f&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Vector3f">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vector4f">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a 4-dimensional vector of float values as text child
+
+Example:
+&lt;vector4f name='foo'&gt;[3.8,2.4,1.9,7.5]&lt;/vector4f&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Vector4f">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="matrix4f">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a 4-dimensional matrix of float values as text child
+
+Example:
+&lt;matrix4f name='foo'&gt;[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]&lt;/matrix4f&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Matrix4f">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="quaternionf">
+        <xs:annotation>
+            <xs:documentation>Property that contains an a quaternion of float values as text child
+
+Example:
+&lt;quaternionf name='foo'&gt;[3.8,2.4,1.9,7.5]&lt;/quaternionf&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Quaternionf">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sampler2d">
+        <xs:annotation>
+            <xs:documentation>Property that contains an an index of a 2D texture as text child
+
+Example:
+&lt;sampler2d name='foo'&gt;1&lt;/sampler2d&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="samplerCUBE">
+        <xs:annotation>
+            <xs:documentation>Property that contains an an index of a cubemap-texture as text child
+
+Example:
+&lt;samplerCUBE name='foo'&gt;1&lt;/samplerCUBE&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="textures">
+        <xs:annotation>
+            <xs:documentation>List of textures that belong to the material.
+
+The number of texture child nodes must be the same as the number of textures defined in the material requirements node.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="texture">
+                    <xs:annotation>
+                        <xs:documentation>Contains texture attributes and reference to an image node</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="texture">
+        <xs:annotation>
+            <xs:documentation>Defines the properties of a texture used in a material
+and contains the reference to an image node.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="image" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>Id of the image node referenced by this texture</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="applymode" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Defines how the texture is applied (blended) with the texture or color below
+
+Possible values are (see also OpenGL documentation on GL_TEXTURE_ENV_MODE):
+'modulate'   - Color and alpha values are multiplied with the values of the texture below
+'decal'      - Color values are blended with alpha, alpha values are replaced
+'replace'    - Color and alpha values are replaced
+'blend'      - Color values are blended, alpha values are multiplied
+'add'        - Color and alpha values are added</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="wrapmode" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>The wrapmode of the texture. That is how the texture will be continued,
+after the edge (for texture coordinates greater one or less than zero).
+
+Possible values are:
+'repeat'         - The texture is repeated
+'clamp'          - The last pixel at the border of the texture is repeated
+'clamp_to_edge'  - The last pixel at the border, but not the border itself is repeated</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="sprite" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Set this flag, to render the texture as point sprite.
+Point sprites are always facing the screen (like billboards) and only need one vertex to be rendered.
+They are usefull for particle rendering (snowflakes, etc.)</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="matrix" type="Matrix4f">
+                <xs:annotation>
+                    <xs:documentation>Defines a texture-coordinate matrix.
+All texture coordinates will be multiplied with this matrix.
+Usefull to animate texture coordinates, or to tweak texture repeat and position.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ImageBase" type="imageType" abstract="true">
+        <xs:annotation>
+            <xs:documentation>Base class for images, movies and videos</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:complexType name="imageType">
+        <xs:annotation>
+            <xs:documentation>Base type for images, movies and videos</xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="rasterofrgb">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type rgb</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofrgba">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type rgba</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofbgr">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type bgr</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofbgra">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type bgra</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofabgr">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type abgr</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofgray">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type graylevel</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofgray16">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type graylevel 16 bit</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofgrays16">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type greylevel signed 16 bit</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofdxt1">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type dxt1 texture-compression</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofdxt1a">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type dxt1a texture-compression</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofdxt3">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type dxt3 texture-compression</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofdxt5">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type dxt5 texture-compression</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID">
+            <xs:annotation>
+                <xs:documentation>Unique id for the image. Usually 'i' plus a number.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="name" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Human readable name for the image</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="src" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Image source file name.
+If the image is not inlined, it will be loaded from this file.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="width" type="xs:unsignedInt">
+            <xs:annotation>
+                <xs:documentation>Width of the image</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="height" type="xs:unsignedInt">
+            <xs:annotation>
+                <xs:documentation>Height of the image</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="depth" type="xs:unsignedInt">
+            <xs:annotation>
+                <xs:documentation>Number of layers in the image (for 3D-textures)</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="matrix" type="Matrix4f">
+            <xs:annotation>
+                <xs:documentation>UV-coordiante matrix. This matrix will be multiplied with
+all uv-coordiates. (In addition to the texture matrix). It is usefull to scale non-power-of-two textures to the right dimensions.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pixelformat" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Pixelformat of the image. Possible values are:
+RGB, BGR,RGBA,BGRA,GRAY,GRAY16,GENERIC_RGB,GENERIC_RGBA,GENERIC_ALPHA,GENERIC_LUMINANCE,
+GENERIC_LUMINANCE_ALPHA,GENERIC_INTENSITY,S3TC_DXT1,S3TC_DXT1A,S3TC_DXT3,S3TC_DXT5,GRAYS16</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="internal_format" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Format used by OpenGl internally</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="type" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Type of the image.
+
+The following types are supported:
+'single'    - for normal images
+'cubemap'   - for images containing 6 tiles to create a cubemap</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="mipmap" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>Set this flag to create mipmaps of the image upon first load</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="resize" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Resizes the image to next power-of-two upon first load.
+
+The following values are possible:
+'none'   - do not resize
+'scale'  - scale the image using bilinear filtering
+'pad'    - pad the image with the border pixels</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="filter" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Apply a image filter.
+Possible values are:
+'none'             - no filter applied
+'heightToNormal'   - convert height map into a normal map (for bumpmapping)
+'glur'             - combined blur and glow filter</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="filter_params" type="VectorOfFloat">
+            <xs:annotation>
+                <xs:documentation>A list of float values used by the filter as paramters</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="tile" type="Vector2i">
+            <xs:annotation>
+                <xs:documentation>Defines how a cubemap image is tiles
+(e.g. [1,6] for one image wide and 6 images high</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="color_bias" type="Vector4f">
+            <xs:annotation>
+                <xs:documentation>Adds an offset to the color and alpha value of each pixel during image upload</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="color_scale" type="Vector4f">
+            <xs:annotation>
+                <xs:documentation>Multiplies a scale to the color and alpha value of each pixel during image upload</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:element name="image" substitutionGroup="ImageBase">
+        <xs:annotation>
+            <xs:documentation>Contains attributes and run length encoded pixel-data of an image</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="imageType"/>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+
+
+    <xs:element name="binary">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:element type="xs:CDATA"/>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+
+    <xs:element name="movie" substitutionGroup="ImageBase">
+        <xs:annotation>
+            <xs:documentation>Contains attributes and run length encoded pixel-data of a movie-frame</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+
+            <xs:complexContent>
+                <xs:extension base="imageType">
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element ref="binary">
+                        </xs:element>
+                    </xs:sequence>
+               </xs:extension>
+            </xs:complexContent>
+
+            <xs:attribute name="currentframe" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>The current frame of the movie</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="framecount" type="xs:unsignedInt">
+                <xs:annotation>
+                    <xs:documentation>The total framecount of the movie
+Note: MPEG-Movies often contain an invalid value.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="fps" type="xs:double">
+                <xs:annotation>
+                    <xs:documentation>Frame rate the movie was encoded with.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="playspeed" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>Sets the playspeed of the movie,
+use values greater one for fast forward and less than minus one for fast reverse.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="cachesize" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Number of video frames cached by the movie decoder, during playback.
+For your information only.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="playmode" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Sets the playmode of the movie.
+
+Possible values are:
+'nodisk'   - No disk inserted or no movie found.
+'play'     - Playing
+'pause'    - Paused. Play will continue at the current time/frame
+'stop'     - Stopped. Play will start at beginnig of the movie, black frame is shown</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="volume" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>Volume of audio-playback. Default is 1.0</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="avdelay" type="xs:double">
+                <xs:annotation>
+                    <xs:documentation>Number of seconds the audio-track is played after the video-track.
+Default is zero for ffmpeg and 0.3 for wmv decoding.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="audio" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Flag to playback movies with audio-track without audio-decoding.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="loopcount" type="xs:unsignedInt">
+                <xs:annotation>
+                    <xs:documentation>Number of loops the movie will play. If set to zero, the movie will run forever</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="capture" substitutionGroup="ImageBase">
+        <xs:annotation>
+            <xs:documentation>Contains attributes and run length encoded pixel-data of a video capture device</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="imageType"/>
+            </xs:complexContent>
+            <xs:attribute name="fps" type="xs:double">
+                <xs:annotation>
+                    <xs:documentation>Frame rate the device does deliver.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="playmode" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Sets the playmode of the device.
+
+Possible values are:
+'nodisk'   - No device found.
+'play'     - Playing
+'pause'    - Paused. This is the mostly the same as stopped.
+'stop'     - Stopped. Play will start at beginnig of the movie, black frame is shown</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="device" type="xs:unsignedInt">
+                <xs:annotation>
+                    <xs:documentation>Device ID to capture from. Default is 0 (the first one available).</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:annotation>
+                <xs:documentation>Norm to capture in. Usually PAL. Ignored for non-capable devices.</xs:documentation>
+            </xs:annotation>
+            <xs:attribute name="norm" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="SceneGraphNode" type="SceneGraphNodeType" abstract="true">
+        <xs:annotation>
+            <xs:documentation>Base class for all nodes inside the scenegraph (subnode of world)
+
+Current subnodes include:
+- Body
+- Transform
+- Include
+- Camera
+- Light
+- Lod
+- Joint</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:complexType name="SceneGraphNodeType">
+        <xs:annotation>
+            <xs:documentation>Base type for all nodes inside the scenegraph (subnode of world)</xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="SceneGraphNode">
+                <xs:annotation>
+                    <xs:documentation>Scene graph nodes can contain any number of other scenegraph nodes.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID">
+            <xs:annotation>
+                <xs:documentation>Unique id for the node.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="name" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Human readable name for the scenegraph node</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="position" type="Vector3f">
+            <xs:annotation>
+                <xs:documentation>Position of the node in units.
+The position is relative to the nodes parent.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="orientation" type="Quaternionf">
+            <xs:annotation>
+                <xs:documentation>Orientation of the node in the world.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="scale" type="Vector3f">
+            <xs:annotation>
+                <xs:documentation>Scale of the node</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="shear" type="Vector3f">
+            <xs:annotation>
+                <xs:documentation>Shear is exported but not supported, yet.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pivot" type="Vector3f">
+            <xs:annotation>
+                <xs:documentation>Pivot point. Rotations use this point as center.
+By default the pivot point is [0,0,0] but for cases such as doors, it is useful to set the pivot to the door-angle.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="pivottranslation" type="Vector3f">
+            <xs:annotation>
+                <xs:documentation>Special pivot exported from maya. Neccessary for correct animations of joints.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="globalmatrix" type="Matrix4f">
+            <xs:annotation>
+                <xs:documentation>The global (or world-) transformation-matrix is calculated once per frame
+from position/orientation/size attributes. You can directly manipulate it during pre-render step.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="boundingbox" type="Box3f">
+            <xs:annotation>
+                <xs:documentation>The axis-aligned bounding box of element in world-space.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="frozen" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>An optimization flag for static parts of the scene. If a part of the scene is frozen, the node and its
+child node will not be looked at any more after the first traversal through the scene.
+You can set the static part of very large scenes (e.g. houses, landscape) frozen to improve rendering performance.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="visible" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>Toggles visiblity of the node and its subnodes</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="insensible" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>Insensible nodes, will be ignored by intersection algorithms, such as picking</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="billboard" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Sets up the node as billboard. Use 'axis' or 'point' strings for axis-/point-billboards</xs:documentation>
+            </xs:annotation>
+            <xs:restriction base="xs:string">
+                <xs:pattern value="axis|point"/>
+            </xs:restriction>
+        </xs:attribute>
+        <xs:attribute name="sensor" type="xs:string">
+            <xs:annotation>
+                <xs:documentation>Sensor nodes can be used to detect, if someone touches it.</xs:documentation>
+            </xs:annotation>
+            <xs:restriction base="xs:string">
+                <xs:pattern value="approximation"/>
+            </xs:restriction>
+        </xs:attribute>
+        <xs:attribute name="sensorradius" type="xs:float">
+            <xs:annotation>
+                <xs:documentation>The radius of a sensor node in units.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="cullable" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>If this flag is set to false, the node will not be culled.
+Useful for cameras and lights.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:element name="body" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>A body represents one piece of geometry in the scene.
+Each body references a shape node, which contains the description of the geometry.
+The body node itself defines the position of this geometry in the world-space.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType">
+                    <xs:attribute name="shape" type="xs:IDREF">
+                        <xs:annotation>
+                            <xs:documentation>Id of the shape (geometry) for the body.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="skeleton" type="VectorOfString">
+                        <xs:annotation>
+                            <xs:documentation>A list of ids, that reference joint nodes, which contain the skeleton of
+a character. If a body has a skeleton attribute, the skin and bones shader can use the skeleton to deform the skin, relative to
+the joint positions and orientations.
+Several bodies can use the same skeleton. (e.g. for an army of marching soldiers)</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="camera" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>A camera is referenced by the viewport and is used to render a view of the scene.
+It can be moved like all other scenegraph nodes, and other nodes (such as lights) can be attached to it, as child nodes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType">
+                    <xs:attribute name="hfov" type="xs:float">
+                        <xs:annotation>
+                            <xs:documentation>The horizontal field of view of the camera in degrees.
+The default is 54.4 degree, which is similar to the field of view of the eyes.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="width" type="xs:float">
+                        <xs:annotation>
+                            <xs:documentation>If this attribute is nonzero, the camera will be used in ortoghonal mode.
+The attribute then defines the width of the frustrum in GL/database units.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="nearplane" type="xs:float">
+                        <xs:annotation>
+                            <xs:documentation>Distance to the nearplane in units.
+Only objects beyond the nearplane will be rendered.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute name="farplane" type="xs:float">
+                        <xs:annotation>
+                            <xs:documentation>Distance to the farplane in units.
+Only objects closer than the farplane will be rendered.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="light" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Defines the position and orientation of a light inside the scene
+and references a lightsource, which contains the definitions of the light properties (such as color).</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType">
+                    <xs:attribute name="lightsource" type="xs:IDREF">
+                        <xs:annotation>
+                            <xs:documentation>Id of the lightsource connected to this light.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="transform" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Transform nodes are used to group other nodes inside the scene.
+Attributes of the transform node, such as scale, position and orientation are inherited by all child nodes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType"/>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="include" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Include Nodes are used to include external X60-Files into the scene.
+Attributes of the node, such as scale, position and orientation are inherited by all child nodes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element ref="world">
+                            <xs:annotation>
+                                <xs:documentation>Include nodes can contain whole new worlds.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+            <xs:attribute name="src" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>source file name.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="lod" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>A lod node is used to control the level of detail used to render parts of a scene.
+A lod node is similar to a transform node. It groups any number of other scenegraph nodes. The difference is that only one child node at a time is shown.
+Which child is shown depends on the distance from the camera and is controlled by the ranges attribute.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType">
+                    <xs:attribute name="ranges" type="VectorOfFloat">
+                        <xs:annotation>
+                            <xs:documentation>Controls which child is selected depending on the distance to the camera.
+The distance is calculated as distance between the camera and the center of the bounding box of the lod node in units.
+There has to be one value less in ranges than the number of child nodes of the lod node.
+
+Exampel:
+&lt;lod ranges='[5,15]'&gt;
+    &lt;body name='cube'&gt;
+    &lt;body name='sphere'&gt;
+    &lt;body name='cylinder'&gt;
+&lt;lod&gt;
+
+The cube will be shown if the camera is closer than 5 units.
+The sphere will be shown, if the camera is between 5 and 15 units.
+The cylinder will be shown, if the camera is further away than 15 units.
+
+Note:
+The distance from the camera to the bounding box center is multiplied by the 'lodscale' attribute of the world node before evaluation.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="joint" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Joints are used to construct skeletons for skin and bones animations.
+A body can 'use' a skeleton by setting its skeleton attribute to the ids of the required joints.
+Joints are exported from maya and usually will not be edited by hand.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType">
+                    <xs:attribute name="jointorientation" type="Quaternionf">
+                        <xs:annotation>
+                            <xs:documentation>Special orientation exported from maya for correct animation and rotiation of joints.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

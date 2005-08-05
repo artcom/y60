@@ -1,0 +1,279 @@
+//=============================================================================
+// Copyright (C) 2003, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: AnimationManager.cpp,v $
+//   $Author: christian $
+//   $Revision: 1.20 $
+//   $Date: 2005/03/04 18:25:35 $
+//
+//  Description: This class holds all the lights.
+//
+//=============================================================================
+
+#include "AnimationManager.h"
+#include "Animation.h"
+#include <y60/typedefs.h>
+#include <y60/NodeNames.h>
+
+using namespace std;
+using namespace asl;
+
+namespace y60 {
+
+    AnimationManager::AnimationManager(){
+    }
+
+    AnimationManager::~AnimationManager() {
+    }
+
+    //dom::ValuePtr
+    dom::NodePtr
+    AnimationManager::findAnimatedValue(dom::NodePtr theNode,
+                                        const string & theAttributeRef,
+                                        AnimationBase::VectorComponent & myVectorComponent,
+                                        bool & theAngleAttributeFlag)
+    {
+        string myAttributeName = theAttributeRef;
+
+        if (theAttributeRef[theAttributeRef.length() - 2] == '.') {
+            char myLastChar = tolower(theAttributeRef[theAttributeRef.length() - 1]);
+            switch (myLastChar) {
+                case 'x':
+                case 'r':
+                    myVectorComponent = AnimationBase::X;
+                    break;
+                case 'y':
+                case 'g':
+                    myVectorComponent = AnimationBase::Y;
+                    break;
+                case 'z':
+                case 'b':
+                    myVectorComponent = AnimationBase::Z;
+                    break;
+                case 'w':
+                case 'a':
+                    myVectorComponent = AnimationBase::W;
+                    break;
+             }
+             if (myVectorComponent != AnimationBase::SCALAR) {
+                myAttributeName = myAttributeName.substr(0, myAttributeName.length() - 2);
+             }
+        }
+
+        dom::NodePtr myAnimatedAttribute = theNode->getAttribute(myAttributeName);
+        if (!myAnimatedAttribute) {
+            throw AnimationManagerException(string("Animated attribute '") + myAttributeName +
+                "' not found in \n" + as_string(*theNode), PLUS_FILE_LINE);
+        }
+        // theAngleAttributeFlag = (myAttributeName == "orientation");
+        //return myAnimatedAttribute->nodeValueWrapperPtr();
+        return myAnimatedAttribute;
+    }
+
+    AnimationPtr
+    AnimationManager::createAnimation(const dom::NodePtr theNode, dom::NodePtr theWorld) {
+        // Find node to be animated
+        dom::NodePtr myAnimatedNode;
+        dom::NodePtr myAttribute = theNode->getAttribute(ANIM_NODEREF_ATTRIB);
+        string myNodeRef;
+        if (myAttribute) {
+            myNodeRef = myAttribute->nodeValue();
+            myAnimatedNode   = theWorld->getElementById(myNodeRef);
+        } else {
+            throw AnimationManagerException(string("Attribute 'node' not defined in \n") +
+                as_string(*theNode), PLUS_FILE_LINE);
+        }
+
+        // Find attribute to be animated
+        //dom::ValuePtr   myNodeValue;
+        dom::NodePtr   myAnimatedAttribute;
+        string          myAttributeRef;
+        bool            myAngleAttribute = false;
+        AnimationBase::VectorComponent myVectorComponent = AnimationBase::SCALAR;
+        myAttribute = theNode->getAttribute(ANIM_ATTRIBUTE_ATTRIB);
+        if (myAttribute) {
+            myAttributeRef = myAttribute->nodeValue();
+            myAnimatedAttribute = findAnimatedValue(myAnimatedNode, myAttributeRef, myVectorComponent, myAngleAttribute);
+        } else {
+            throw AnimationManagerException(string("Attribute 'attribute' not defined in \n") +
+                as_string(*theNode), PLUS_FILE_LINE);
+        }
+
+        // Get type of animated values
+        dom::NodePtr myValueList(0);
+        for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
+            dom::NodePtr myChild = theNode->childNode(i);
+            if (myChild->nodeType() == dom::Node::ELEMENT_NODE) {
+                myValueList = myChild;
+                break;
+            }
+        }
+
+        if (!myValueList) {
+            throw AnimationManagerException(
+                string("Animation node does not contain value list: \n") +
+                asl::as_string(*theNode), PLUS_FILE_LINE);
+        }
+
+        string myTypeName = myValueList->nodeName();
+
+        // Setup animation template class
+        bool myTypeStringIsValid = false;
+        if (myVectorComponent == AnimationBase::SCALAR) {
+            if (myTypeName == SOM_VECTOR_BOOL_NAME) {
+                const bool * myValue = myAnimatedAttribute->nodeValuePtr<bool>();
+                if (myValue) {
+                    return AnimationPtr(new Animation<AcBool>(theNode, myValueList, myAnimatedAttribute, 0, myAngleAttribute));
+                }
+                myTypeStringIsValid = true;
+            } else if (myTypeName == SOM_VECTOR_FLOAT_NAME) {
+                const float * myValue = myAnimatedAttribute->nodeValuePtr<float>();
+                if (myValue) {
+                    return AnimationPtr(new Animation<float>(theNode, myValueList, myAnimatedAttribute, 0, myAngleAttribute));
+                }
+                myTypeStringIsValid = true;
+            } else if (myTypeName == SOM_VECTOR_UNSIGNED_NAME) {
+                const unsigned * myValue = myAnimatedAttribute->nodeValuePtr<unsigned>();
+                if (myValue) {
+                    return AnimationPtr(new Animation<unsigned>(theNode, myValueList, myAnimatedAttribute, 0, myAngleAttribute));
+                }
+                myTypeStringIsValid = true;
+            } else if (myTypeName == SOM_VECTOR_STRING_NAME) {
+                const string * myValue = myAnimatedAttribute->nodeValuePtr<string>();
+                if (myValue) {
+                    return AnimationPtr(new Animation<string>(theNode, myValueList, myAnimatedAttribute, 0, myAngleAttribute));
+                }
+                myTypeStringIsValid = true;
+            } else if (myTypeName == SOM_VECTOR_QUATERNIONF_NAME) {
+                const asl::Quaternionf * myValue = myAnimatedAttribute->nodeValuePtr<asl::Quaternionf>();
+                if (myValue) {
+                    return AnimationPtr(new Animation<asl::Quaternionf>(theNode, myValueList, myAnimatedAttribute, 0, myAngleAttribute));
+                }
+                myTypeStringIsValid = true;
+            }
+        } else {
+            if (myTypeName == SOM_VECTOR_FLOAT_NAME) {
+                const asl::Vector3f * myVector3fValue = myAnimatedAttribute->nodeValuePtr<asl::Vector3f>();
+                if (myVector3fValue) {
+                    return AnimationPtr(new Animation<float, asl::Vector3f>(theNode, myValueList, myAnimatedAttribute, myVectorComponent, myAngleAttribute));
+                }
+                const asl::Vector4f * myVector4fValue = myAnimatedAttribute->nodeValuePtr<asl::Vector4f>();
+                if (myVector4fValue) {
+                    return AnimationPtr(new Animation<float, asl::Vector4f>(theNode, myValueList, myAnimatedAttribute, myVectorComponent, myAngleAttribute));
+                }
+                myTypeStringIsValid = true;
+            }
+        }
+
+        // Error handling
+        if (myTypeStringIsValid) {
+            throw AnimationManagerException(string("Attribute '") +
+                myAttributeRef + "'with type '" +
+                myAnimatedAttribute->nodeValueWrapperPtr()->name() + "' does not match type of animation values: '" +
+                myTypeName + "'. Animated node id: " +
+                myNodeRef, PLUS_FILE_LINE);
+        } else {
+            throw AnimationManagerException(string("Animation of attribute '") +
+                myAttributeRef + "'with type '" +
+                myAnimatedAttribute->nodeValueWrapperPtr()->name() + "' not supported. Animated nodeid: " +
+                myNodeRef, PLUS_FILE_LINE);
+        }
+    }
+
+    void
+    AnimationManager::loadGlobals(const dom::NodePtr theNode, dom::NodePtr theWorld) {
+        _myGlobalAnimations = AnimationClipPtr(new AnimationClip(theNode, *this, theWorld));
+        _myGlobalAnimations->setActive();
+    }
+
+    void
+    AnimationManager::loadCharacters(const dom::NodePtr theNode, dom::NodePtr theWorld) {
+        _myCharacter.clear();
+        unsigned myCharacterCount = theNode->childNodesLength();
+        for (unsigned i = 0; i < myCharacterCount; ++i) {
+            const dom::NodePtr myNode = theNode->childNode(i);
+            if (myNode->nodeType() == dom::Node::ELEMENT_NODE &&
+                myNode->nodeName() == CHARACTER_NODE_NAME)
+            {
+                string myCharacterName = myNode->dom::Node::getAttributeString(NAME_ATTRIB);
+                if (_myCharacter.find(myCharacterName) == _myCharacter.end() ) {
+                    _myCharacter[myCharacterName] = AnimationCharacterPtr(new AnimationCharacter(myNode,
+                                                                              *this, theWorld));
+                } else {
+                    throw AnimationManagerException(string("Duplicate character: ") + myCharacterName, PLUS_FILE_LINE);
+                }
+            }
+        }
+    }
+
+    void
+    AnimationManager::update() {
+        _myGlobalAnimations->update();
+        _myGlobalAnimations->setActive();
+    }
+
+    void
+    AnimationManager::run(double theTime) {
+        _myGlobalAnimations->run(theTime);
+
+        AnimationCharacterMap::iterator myCharacterBegin = _myCharacter.begin();
+        AnimationCharacterMap::iterator myCharacterEnd   = _myCharacter.end();
+        for (; myCharacterBegin != myCharacterEnd; ++myCharacterBegin) {
+            myCharacterBegin->second->run(theTime);
+        }
+    }
+
+    void
+    AnimationManager::playClip(double theTime, const string & theCharacterName, const string & theClipName) {
+        getCharacter(theCharacterName, PLUS_FILE_LINE)->playClip(theTime, theClipName);
+    }
+
+    bool
+    AnimationManager::isClipActive(const string & theCharacterName, const string & theClipName) {
+        return getCharacter(theCharacterName, PLUS_FILE_LINE)->isClipActive(theClipName);
+    }
+
+    bool
+    AnimationManager::isCharacterActive(const std::string & theCharacterName) {
+        return getCharacter(theCharacterName, PLUS_FILE_LINE)->isActive();
+    }
+
+    void
+    AnimationManager::stop(const std::string & theCharacterName) {
+        getCharacter(theCharacterName, PLUS_FILE_LINE)->stop();
+    }
+
+    void
+    AnimationManager::setClipLoops(const std::string & theCharacterName,
+                                   const std::string & theClipName, unsigned int theLoops) {
+        getCharacter(theCharacterName, PLUS_FILE_LINE)->setClipLoops(theClipName, theLoops);
+    }
+    void
+    AnimationManager::setClipForwardDirection(const std::string & theCharacterName,
+                                   const std::string & theClipName, bool theFlag) {
+        getCharacter(theCharacterName, PLUS_FILE_LINE)->setClipForwardDirection(theClipName, theFlag);
+    }
+
+    unsigned int
+    AnimationManager::getLoops(const std::string & theCharacterName,
+                                   const std::string & theClipName) {
+        return getCharacter(theCharacterName, PLUS_FILE_LINE)->getLoops(theClipName);
+    }
+
+    AnimationCharacterPtr
+    AnimationManager::getCharacter(const std::string & theCharacterName, const std::string & theContext=PLUS_FILE_LINE) {
+         if (_myCharacter.find(theCharacterName) != _myCharacter.end() ) {
+            return _myCharacter[theCharacterName];
+        } else {
+            throw AnimationManagerException(string("Unknown character: ") + theCharacterName, theContext);
+        }
+    }
+
+}

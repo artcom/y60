@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<Texture>
+  <Countryside directory="../../TestImages" 
+               blend="0"
+               lightingfactor="3.0">
+    <Indexmap>index_big.png</Indexmap>
+  </Countryside>
+</Texture>

@@ -1,0 +1,36 @@
+Random release notes for the texture generator & TexPreProc:
+
+- The windows version doesn't compile anymore . It shouldn't be a big
+  problem to get working, but we didn't need it, so we didn't support
+  it anymore.
+
+- The tests are incomplete. Don't rely on them.
+
+Nice to have:
+
+- The intensity of the light-, attenuation- and shadowmaps applied
+  should be configurable. The way it is now, the maps have to be
+  modified if the lighting intensity needs to change. This causes more
+  work than nessesary and also leads to banding at low contrast
+  levels.
+
+- At large levels of magnification, there is a visible border between
+  different patches. This is because filtering doesn't work on texture
+  borders without duplicated pixels. To solve this problem, we need to
+  add a one-texel border consisting of the texels in the adjacent
+  textures to each texture and change texture coordinates accordingly.
+
+- There are several places in which the texture generator can still be
+  optimized for speed.
+
+- Texture bitmaps are loaded once for each instance of the texture
+  generator. They could be shared.
+
+Known bugs:
+
+  None :-).
+
+Uli, 12/5/2001
+
+
+

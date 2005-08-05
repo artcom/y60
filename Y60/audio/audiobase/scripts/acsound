@@ -1,0 +1,33 @@
+#!/bin/bash
+
+alsactl=/usr/sbin/alsactl
+asoundcfg=/etc/asound.conf
+aconnect=/usr/bin/aconnect
+alsascrdir=/etc/alsa.d
+
+# See how we were called.
+case "$1" in
+  start)
+        /sbin/modprobe snd-rme9652
+	/sbin/modprobe via82cxxx_audio
+	alsactl restore
+	;;
+  stop)
+	/sbin/lsmod | grep -E "^snd" | grep -v "snd-rme9652-mem" | while read line; do \
+	     /sbin/rmmod `echo $line | cut -d ' ' -f 1`; \
+	     done	
+	rmmod via82cxxx_audio
+	rmmod uart401
+	rmmod ac97_codec
+	rmmod sound
+	;;
+  restart|reload)
+	$0 stop
+	$0 start
+	;;
+  *)
+        echo "Usage: acound {start|stop|restart}"
+        exit 1
+esac
+
+exit 0

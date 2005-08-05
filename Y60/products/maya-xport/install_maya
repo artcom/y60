@@ -1,0 +1,43 @@
+#!/bin/bash
+
+set -e
+
+if [ "$DEBUG" == "1" ]; then
+    VARIANT="DBG"
+else
+    VARIANT="OPT"
+fi
+
+if [ -z $MAYA_SDK ]; then
+    echo "### ERROR: MAYA_SDK is not set"
+    exit 1
+fi
+
+SCRIPT_DIR=""
+if [ "$OS" == "Windows_NT" ] ; then
+    cp -v $PRO/lib/libeay32.dll "$MAYA_SDK/bin/"
+    cp -v $PRO/lib/libcurl.dll "$MAYA_SDK/bin/"
+    cp -v $PRO/lib/pthreadVC.dll "$MAYA_SDK/bin/"
+    cp -v $PRO/lib/ssleay32.dll "$MAYA_SDK/bin/"
+
+    cp -v o.ANT.WIN.${VARIANT}/mayaY60-export${VARIANT}.dll "$MAYA_SDK/bin/plug-ins/mayaY60-export.mll"
+    SCRIPT_DIR="$MAYA_SDK/scripts/others"
+else
+    if [ -z $MAYA_VERSION ]; then
+        echo "### WARNING: MAYA_VERSION is not set"
+    fi
+
+    DIR="$HOME/maya/${MAYA_VERSION}"
+    mkdir -p "${DIR}/plug-ins"
+
+    cp -v o.ANT.LINUX.${VARIANT}/libmayaY60-export${VARIANT}.so ${DIR}/plug-ins/mayaY60-export.so
+    SCRIPT_DIR="${DIR}/scripts"
+fi
+
+echo "### INFO: Installing scripts to $SCRIPT_DIR"
+mkdir -p "$SCRIPT_DIR"
+cp -v acY60XmlExportOptions.mel ${SCRIPT_DIR}
+cp -v acCreateObjectAttributes.mel ${SCRIPT_DIR}
+cp -v acCreateMaterialAttributes.mel ${SCRIPT_DIR}
+cp -v acCreateTextureAttributes.mel ${SCRIPT_DIR}
+cp -v acCreateLineAttributes.mel ${SCRIPT_DIR}

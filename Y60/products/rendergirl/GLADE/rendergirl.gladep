@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
+<!DOCTYPE glade-project SYSTEM "http://glade.gnome.org/glade-project-2.0.dtd">
+
+<glade-project>
+  <name>Rendergirl</name>
+  <program_name>rendergirl</program_name>
+  <directory>GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE</directory>
+  <source_directory>GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\src</source_directory>
+  <msvc_directory>GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\msvc</msvc_directory>
+  <devcpp_directory>GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\devcpp</devcpp_directory>
+  <pixmaps_directory>GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\GLADE\.</pixmaps_directory>
+  <gnome_support>FALSE</gnome_support>
+</glade-project>

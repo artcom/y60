@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<Texture>
+  <Countryside directory="../TestImages" 
+  	       blend="0.5"
+  	       lightingfactor="3.0">
+    <Indexmap>timingTest_index.png</Indexmap>
+  </Countryside>
+  <Tiles directory="../TestImages">  
+    <Tile index="0">
+      <File size="2" opacity="1.0">tex0.png</File>
+    </Tile>
+    <Tile index="1">
+      <File size="2" opacity="1.0">tex2.png</File>
+    </Tile>
+    <Tile index="2">
+      <File size="2" opacity="1.0">tex4.png</File>
+    </Tile>
+    <Tile index="3">
+      <File size="2" opacity="1.0">tex6.png</File>
+    </Tile>
+  </Tiles>
+</Texture>

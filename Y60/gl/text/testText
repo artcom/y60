@@ -1,0 +1,35 @@
+#! /bin/bash
+if [ "$PRO" == "" ] ; then
+    Y60_DIR=.
+else
+    Y60_DIR=$PRO/src/Y60
+fi
+
+if [ "$1" == "" ] ; then
+    MODELNAME=$PRO/testmodels/cube.x60
+else
+    MODELNAME="$1"
+fi
+
+
+if [ "$2" == "" ] ; then
+    if [ "$USE_CG" == "1" ] ; then
+        SHADERLIB=$PRO/src/Y60/shader/shaderlibrary.xml
+    else
+    	SHADERLIB=$PRO/src/Y60/shader/shaderlibrary_nocg.xml
+    fi
+else
+    SHADERLIB="$2"
+fi
+
+shift
+shift
+
+APPLICATION=acxpshellOPT
+
+if [ "$DEBUG" == "1" ] ; then
+    APPLICATION=acxpshellDBG
+fi
+
+echo $APPLICATION -I $Y60_DIR/js $Y60_DIR/gl/text/testText.js $MODELNAME $SHADERLIB $*
+$APPLICATION -I $Y60_DIR/js $Y60_DIR/gl/text/testText.js $MODELNAME $SHADERLIB $*

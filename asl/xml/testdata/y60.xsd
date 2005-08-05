@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:simpleType name="Point3">
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="Vector3">
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="Vector4">
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:simpleType name="Int2">
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+		
+	<xs:simpleType name="Matrix44">
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:element name="scene">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="shapes" />
+				<xs:element ref="materials"  />
+				<xs:element ref="world" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="shapes">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="shape" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="materials">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="material" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="shape">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="positions"  />
+				<xs:element ref="colors"  />
+				<xs:element ref="normals"  />
+				<xs:element ref="uvsets" />
+				<xs:element ref="primitives" />
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:ID" />
+			<xs:attribute name="name" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="positions">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="position" type="Point3" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="colors">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="color" type="Vector4" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="normals">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="normal" type="Vector3" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="uvsets">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="uvset" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="uvset">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="uvcoord" type="Int2" />
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:ID" />
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="primitives">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="triangle" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="triangle">
+		<xs:complexType>
+			<xs:sequence minOccurs="3" maxOccurs="3">
+				<xs:element ref="vertex" />
+			</xs:sequence>
+			<xs:attribute name="materialref" type="xs:IDREF" />
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="vertex">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="parameter" />
+			</xs:sequence>
+			<xs:attribute name="position" type="xs:unsignedLong" />
+			<xs:attribute name="normal" type="xs:unsignedLong" />
+			<xs:attribute name="texcoords" type="VectorULong2" />
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="parameter">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="name" type="xs:string" />
+					<xs:attribute name="type" type="xs:string" />
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:simpleType name="VectorULong2">
+		<xs:restriction base="xs:string" />
+	</xs:simpleType>
+	
+	<xs:element name="material">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="properties" />
+				<xs:element ref="vertexparameters" />
+				<xs:element ref="textures" />
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" />
+			<xs:attribute name="type" type="xs:string" />
+			<xs:attribute name="id" type="xs:ID" />
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="properties">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="value" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="vertexparameters">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="value" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="textures">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="texture" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="value">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="name" type="xs:string" />
+					<xs:attribute name="type" type="xs:string" />
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="texture">
+		<xs:complexType>
+			<xs:attribute name="src" type="xs:string" />
+			<xs:attribute name="applymode" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+	
+    <xs:element name="node" type="nodeType" abstract="true"/>
+    
+    <xs:complexType name="nodeType">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="node" />
+		</xs:sequence>
+		<xs:attribute name="position" type="Point3" />
+		<xs:attribute name="orientation" type="Point3" />
+		<xs:attribute name="scale" type="Point3" />
+    </xs:complexType>
+    
+	<xs:element name="world">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="node" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="body" substitutionGroup="node">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="nodeType">
+					<xs:attribute name="shape" type="xs:IDREF" />
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="light" substitutionGroup="node">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="nodeType">
+					<xs:attribute name="emitter" type="xs:IDREF" />
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="transform" substitutionGroup="node">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="nodeType">
+					<xs:attribute name="type" type="xs:string" />
+					<xs:attribute name="matrix" type="Matrix44" />
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	
+</xs:schema>

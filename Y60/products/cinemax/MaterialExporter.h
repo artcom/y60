@@ -1,0 +1,99 @@
+//=============================================================================
+// Copyright (C) 2003, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: MaterialExporter.h,v $
+//   $Author: valentin $
+//   $Revision: 1.20 $
+//   $Date: 2005/04/29 15:07:34 $
+//
+//  Description: This class implements a polygon exporter plugin for maya.
+//
+//=============================================================================
+
+#ifndef _ac_c4d_MaterialExporter_h_
+#define _ac_c4d_MaterialExporter_h_
+
+#include "c4d_include.h"
+
+#include <y60/MaterialBuilder.h>
+#include <y60/SceneBuilder.h>
+#include <y60/DataTypes.h>
+#include <y60/NodeValueNames.h>
+
+#include <string>
+#include <vector>
+#include <map>
+
+struct ExportedMaterialInfo {
+    std::string _myMaterialId;
+    unsigned    _myTextureCount;
+	std::vector<LONG> _myTexureMapping;
+	ExportedMaterialInfo(): _myMaterialId(""),  _myTextureCount(0) {}
+};
+
+struct MaterialTextureTagCombo {
+	TextureTag * _myTextureTag;
+	Material *   _myMaterial;
+};
+
+typedef std::map<std::string, ExportedMaterialInfo> MaterialInfoMap;
+
+typedef std::vector<std::pair<TextureTag*, UVWTag*> > TextureList;
+typedef std::vector<UVWTag*> UVTagList;
+typedef std::vector<MaterialTextureTagCombo> MaterialList;
+class MaterialExporter {
+	public:
+    	MaterialExporter(y60::SceneBuilderPtr theSceneBuilder,
+    	                 const Filename & theDocumentPath, bool theInlineTextures = true);
+	    ~MaterialExporter() {};
+
+		ExportedMaterialInfo  initiateExport(BaseObject * theNode, TextureList theTextureList,
+                                             y60::SceneBuilder & theSceneBuilder);
+		
+		void writeMaterial(const ExportedMaterialInfo & theMaterialId, BaseObject * theNode, TextureList theTextureList,
+			               y60::SceneBuilder & theSceneBuilder, 
+						   const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord);
+
+		void writeMaterial(const ExportedMaterialInfo & theMaterialId, BaseObject * theNode, 
+			               y60::SceneBuilder & theSceneBuilder, 
+						   const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord);
+
+    private:
+        y60::SceneBuilderPtr  _mySceneBuilder;
+
+	    MaterialInfoMap         _myMaterialMap;
+		ExportedMaterialInfo    _myDefaultMaterialInfo;
+		y60::MaterialBuilderPtr _myMaterialBuilder;
+		y60::MaterialBuilderPtr _myDefaultMaterialBuilder;
+		MaterialList            _myMaterials;
+
+	    Filename             _myDocumentPath;
+        bool                 _myInlineTextures;
+        void getColor(BaseChannel * theColorChannel, asl::Vector4f & theColor);
+        const std::string getTexturePath(Filename & theDocumentpath, String & theTextureFilename);
+
+        bool exportTexture(const String & theName, y60::MaterialBuilderPtr theMaterialBuilder, y60::SceneBuilder & theSceneBuilder, 
+                           BaseContainer * theContainer, const std::string & theUsage, TextureTag * theTextureTag,
+						   const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord);
+        bool exportShader(PluginShader * theShader, 
+                          y60::MaterialBuilderPtr theMaterialBuilder, 
+                          Material* theMaterial, 
+                          y60::SceneBuilder & theSceneBuilder,
+                          BaseContainer * theColorContainer,
+						  TextureTag * theTextureTag, 
+						  const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord);
+
+        ExportedMaterialInfo createDefaultMaterial();
+
+
+};
+
+#endif
+

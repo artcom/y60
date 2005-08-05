@@ -1,0 +1,72 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: wind.cg,v $
+//   $Author: martin $
+//   $Revision: 1.2 $
+//   $Date: 2003/11/20 15:24:31 $
+//
+//  Description: Cg wind for flags 
+//=============================================================================
+
+#include "structures.inc.cg"
+#include "linalg.inc.cg"
+
+#define WAVE
+#define FREQTIME x
+#define FREQ y
+#define AMPLITUDE z
+
+
+struct app2vert { 
+    float4 Position     : POSITION;
+    float2 texCoord     : TEXCOORD0;
+};
+
+void calcWave(float4 thePosition, float4 theParams, float4 theDirection,
+              float out theSine, float out theCosine) {
+    float d = dot(thePosition, theDirection) * theParams.FREQ + theParams.FREQTIME;
+    sincos(d, theSine, theCosine);
+}
+
+vert2frag main(
+            app2vert IN, 
+            uniform float4x4 GL_MODELVIEW_PROJECTION,
+            uniform float4   diffuse,
+            uniform float4   WindParams,
+            uniform float4   WindDirection
+            )
+{
+    vert2frag OUT;
+    
+    float mySine1, myCosine1;
+    
+    calcWave(IN.Position, WindParams, WindDirection, mySine1, myCosine1);
+
+    float myWeight1 = clamp(IN.Position.x, -1.0, 1.0);
+    float myOffset = WindParams.AMPLITUDE * mySine1 * myWeight1;
+    float4 myObjPosition = IN.Position;
+    myObjPosition.z += myOffset;
+
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, myObjPosition);
+    OUT.texCoord0 = IN.texCoord;
+    OUT.primColor = diffuse;
+    return OUT;
+}
+
+
+float4 mainFragment(vert2frag IN,
+                    uniform sampler2D paintTex
+                    ): COLOR
+{
+    float4 textureColor = tex2D(paintTex, IN.texCoord0);
+    float4 myColor = float4(lerp(IN.primColor.rgb, textureColor.rgb * IN.primColor.rgb, textureColor.a), IN.primColor.a);
+    return myColor;
+}

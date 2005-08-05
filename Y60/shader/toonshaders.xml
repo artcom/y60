@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+
+<shaders>
+    <shader id="s0" name="phongbump" cost="100">
+        <supports>
+            <feature class="lighting" values="[phong,lambert]"/>
+            <feature class="textures" values="[paint,bump]"/>
+        </supports>
+        <fragmentshader profile="FP30" file="phongBump.cg" entryfunction="mainFragment">
+            <properties>
+                 <sampler2d name="decal0">0</sampler2d>
+                 <sampler2d name="bump0">1</sampler2d>
+            </properties>
+        </fragmentshader>
+        <vertexshader profile="VP30" file="phongBump.cg" entryfunction="mainVertex">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector3f name="normal"/>
+                 <vector3f name="position"/>
+                 <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/> 
+                 <vector3f name="texcoord2" function="tangent"/>
+            </vertexparameters>
+         </vertexshader>
+      </shader>
+    <shader id="s1" name="bump" cost="100">
+        <supports>
+            <feature class="lighting" values="[phong,lambert]"/>
+            <feature class="textures" values="[bump]"/>
+        </supports>
+        <fragmentshader profile="FP30" file="phongBump.cg" entryfunction="mainFragment">
+            <properties>
+                 <sampler2d name="bump0">0</sampler2d>
+            </properties>
+        </fragmentshader>
+        <vertexshader profile="VP30" file="phongBump.cg" entryfunction="mainVertex">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/> 
+                <vector3f name="texcoord2" function="tangent"/>
+            </vertexparameters>
+         </vertexshader>
+      </shader>
+      <shader id="s2" name="tex_lambert" cost="120">
+        <supports>
+            <feature class="textures" values="[paint]"/>
+            <feature class="lighting" values="[lambert]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+      </shader>
+      <shader id="s3" name="tex_phong" cost="120">
+        <supports>
+            <feature class="textures" values="[paint]"/>
+            <feature class="lighting" values="[phong]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+            </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+      </shader>
+    <shader id="s4" name="lambert" cost="120">
+        <supports>
+            <feature class="lighting" values="[lambert]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0,0,0,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+             </properties>
+            <vertexparameters>
+               <vector3f  name="normal"/>
+               <vector3f  name="position"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+      </shader>
+
+    <shader id="s5" name="water" cost="1">
+        <supports>
+            <feature class="physics" values="[waves]"/>
+            <feature class="textures" values="[paint]"/>
+            <feature class="lighting" values="[lambert]"/>
+        </supports>
+        <vertexshader profile="VP30" file="water.cg" entryfunction="main" compilerargs="-DTOON">
+            <properties>
+                <vector4f name="Wave1Params">[0.18, 0.18, 0.4, 1]</vector4f>
+                <vector4f name="Wave1Direction" >[0, 0, -1, 0]</vector4f>
+                <vector4f name="Wave2Params">[0.3, 0.3, 0.03, 1]</vector4f>
+                <vector4f name="Wave2Direction">[-0.707, 0.0, -0.707, 0]</vector4f>
+                <vector4f name="Wave3Params">[0.3, 0.3, 0.03, 1]</vector4f>
+                <vector4f name="Wave3Direction">[-0.707, 0.0, -0.707, 0]</vector4f>
+            </properties>
+            <vertexparameters>
+                <vector3f  name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="toon2.cg" entryfunction="mainFragment" compilerargs="-DTOON">
+            <properties>
+                <vector4f name="ambient">[0.4,0.4,0.4,1]</vector4f>
+                <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
+                <vector4f name="specular">[1.0,1.0,1.0,1]</vector4f>
+                <float name="shininess">40</float>
+                <sampler2d name="decalTex">0</sampler2d>
+                <sampler2d name="hatchTex">1</sampler2d>
+                <sampler2d name="diffuseRamp">2</sampler2d>
+                <sampler2d name="specularRamp">3</sampler2d>
+                <sampler2d name="edgeRamp">4</sampler2d>
+            </properties>
+        </fragmentshader>
+         <textures>
+            <texture src="shadertex/hatch.jpg" name="hatchTex" applymode="decal"/>
+            <texture src="shadertex/DiffuseRamp.png" name="diffuseRamp" applymode="decal"/>
+            <texture src="shadertex/SpecularRamp.png" name="specularRamp" applymode="decal"/>
+            <texture src="shadertex/EdgeRamp.png" name="edgeRamp" applymode="decal"/>
+         </textures>
+    </shader>
+    <shader id="s6" name="toon" cost="10">
+        <supports>
+            <feature class="textures" values="[paint]"/>
+            <feature class="lighting" values="[lambert]"/>
+        </supports>
+        <fragmentshader profile="FP30" file="toon2.cg" entryfunction="mainFragment" compilerargs="-DTOON">
+            <properties>
+                <vector4f name="ambient">[0.4,0.4,0.4,1]</vector4f>
+                <vector4f name="diffuse">[0.8,0.8,0.8,1]</vector4f>
+                <vector4f name="specular">[1.0,1.0,1.0,1]</vector4f>
+                <float name="shininess">40</float>
+                <sampler2d name="decalTex">0</sampler2d>
+                <sampler2d name="hatchTex">1</sampler2d>
+                <sampler2d name="diffuseRamp">2</sampler2d>
+                <sampler2d name="specularRamp">3</sampler2d>
+                <sampler2d name="edgeRamp">4</sampler2d>
+            </properties>
+        </fragmentshader>
+        <vertexshader profile="VP30" file="toon2.cg" entryfunction="mainVertex" compilerargs="-DTOON">
+            <properties>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+         </vertexshader>
+         <textures>
+            <texture src="shadertex/hatch.jpg" name="hatchTex" applymode="decal"/>
+            <texture src="shadertex/DiffuseRamp.png" name="diffuseRamp" applymode="decal"/>
+            <texture src="shadertex/SpecularRamp.png" name="specularRamp" applymode="decal"/>
+            <texture src="shadertex/EdgeRamp.png" name="edgeRamp" applymode="decal"/>
+         </textures>
+      </shader>
+
+</shaders>
+

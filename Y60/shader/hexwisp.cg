@@ -1,0 +1,72 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: hexwisp.cg,v $
+//   $Author: martin $
+//   $Revision: 1.9 $
+//   $Date: 2004/09/01 16:58:17 $
+//
+//  Description:
+//=============================================================================
+
+#define WISP_COUNT 7 
+// #define DEBUG
+
+struct app2vert {
+    float4 Position : POSITION;
+    float4 Color : COLOR0;
+    float2 TexCoord : TEXCOORD0;
+};
+
+struct vert2frag {
+    float4 homPosition : POSITION;
+    float2 myTexCoord : TEXCOORD0;
+    float4 myWispUV   : TEXCOORD1;
+    float4 Color : COLOR0;
+};
+
+vert2frag main(app2vert IN,
+               uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vert2frag OUT;
+
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.myTexCoord = IN.TexCoord;
+    OUT.Color = IN.Color;
+    return OUT;
+}
+
+
+float4 mainFragment(vert2frag IN,
+                    uniform float2 wispScale,
+                    uniform float2 mirrorpoint,
+                    uniform float2 wisppos[WISP_COUNT],
+                    uniform sampler2D paintTex,
+                    uniform sampler2D wispTex): COLOR
+{
+    float4 textureColor = tex2D(paintTex, IN.myTexCoord);
+    float4 myColor = textureColor;
+    float4 myWispColor = float4(0,0,0,0);
+
+    for (int i=0; i < WISP_COUNT; ++i) {
+        float2 myWispUV = ((abs(IN.myTexCoord-mirrorpoint) - abs(wisppos[i]-mirrorpoint))*wispScale)+float2(0.5,0.5);
+        float4 myWispTexel = tex2D(wispTex, clamp(myWispUV,0,1));
+        myWispColor = myWispColor.a >= myWispTexel.a ? myWispColor : myWispTexel;
+    }
+#ifdef DEBUG
+    if (distance(IN.myTexCoord, mirrorpoint) < 0.01) {
+        return float4(1,0,0,1);
+    } else {
+        return float4(lerp(myColor.rgb, myWispColor.rgb, myWispColor.a), myColor.a+myWispColor.a);
+    }
+#else
+    return float4(lerp(myColor.rgb, myWispColor.rgb, myWispColor.a), myColor.a ? (myColor.a+myWispColor.a)*IN.Color.a : 0);
+#endif
+}

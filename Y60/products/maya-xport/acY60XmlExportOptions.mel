@@ -1,0 +1,66 @@
+
+
+global proc int acY60XmlExportOptions(string $parent,
+                                      string $action,
+                                      string $initialSettings,
+                                      string $resultCallback)
+{
+    int $myResult = 0;
+    string $currentOptions;
+    string $optionList[];
+    string $optionBreakDown[];
+    int $index;
+
+
+    string $ttt = "### Action: " + $action + "\n";
+    print($ttt);
+
+    if ($action == "post") {
+        setParent $parent;
+        columnLayout -cal left -adj true acY60TypeColumn;
+            checkBox -label "Binary representation" acY60BinaryFormat;
+            checkBox -label "Inline textures" acInlineTextures;
+
+        $currentOptions = $initialSettings;
+        if (size($currentOptions) > 0) {
+            tokenize( $currentOptions, ";", $optionList);
+            for ($index = 0; $index < size($optionList); $index++) {
+                tokenize($optionList[$index], "=", $optionBreakDown);
+                if ($optionBreakDown[0] == "binary") {
+                    if ($optionBreakDown[1] == "0") {
+                        checkBox -edit -value false acY60BinaryFormat;
+                    } else {
+                        checkBox -edit -value true acY60BinaryFormat;
+                    }
+                } else if ($optionBreakDown[0] == "inlineTextures") {
+                    if ($optionBreakDown[1] == "0") {
+                        checkBox -edit -value false acInlineTextures;
+                    } else {
+                        checkBox -edit -value true acInlineTextures;
+                    }
+                }
+            }
+        }
+        $myResult = 1;
+    } else if ($action == "query") {
+        if (`checkBox -query -value acY60BinaryFormat` == 1) {
+            $currentOptions = $currentOptions + "binary=1;";
+        } else {
+            $currentOptions = $currentOptions + "binary=0;";
+        }
+
+        if (`checkBox -query -value acInlineTextures` == 1) {
+            $currentOptions = $currentOptions + "inlineTextures=1;";
+        } else {
+            $currentOptions = $currentOptions + "inlineTextures=0;";
+        }
+
+        eval($resultCallback+" \""+$currentOptions+"\"");
+
+        $myResult = 1;
+    } else {
+        $myResult = 0;
+    }
+
+    return $myResult;
+}

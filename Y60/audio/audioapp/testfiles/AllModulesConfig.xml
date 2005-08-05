@@ -1,0 +1,42 @@
+<AudioConfig latency="0.1" sampleRate="48000"  priorityClass="SCHED_FIFO" priority="MAX">
+    <AudioEater id="Eater" numChannels="1"/>
+    <SoundOut id="SoundOut" numChannels="7" 
+        timeSource="true" volume="0.1"/>
+    <Lowpass id="Lowpass" frequency="4000">
+        <Output channel="0" dest="SoundOut.0"/>
+    </Lowpass>
+    <BandRejectFilter id="BandReject" frequency="600" bandwidth="200">
+        <Output channel="0" dest="SoundOut.1"/>
+    </BandRejectFilter>
+    <StereoMixer id="Music">
+        <Output channel="0" dest="Lowpass.0"/> 
+        <Output channel="1" dest="BandReject.0"/> 
+    </StereoMixer>
+    <StereoMixer id="SFX1">
+        <Output channel="0" dest="SoundOut.2"/>
+        <Output channel="1" dest="SoundOut.3"/>
+    </StereoMixer>
+    <TFilter id="T0" numChannels="3">
+        <Output channel="0" dest="SoundOut.4"/>
+        <Output channel="1" dest="SoundOut.5"/>
+        <Output channel="2" dest="Eater.0"/>
+    </TFilter>
+    <Difference id="Diff" volume="0.5">
+        <Output channel="0" dest="SoundOut.6"/>
+    </Difference>
+    <StereoMixer id="SFX2">
+        <Output channel="0" dest="T0.0"/> 
+        <Output channel="1" dest="Diff.0"/> 
+    </StereoMixer>
+    <SineGenerator id="Beep0">
+        <Output channel="0" dest="Diff.1"/>
+    </SineGenerator>
+    <!--
+    <SoundIn id="DME-In" numChannels="2">
+        <Output channel="0" dest="SFX2.Right"/>
+        <Output channel="1" dest="SFX2.Left"/>
+    </SoundIn>
+    -->
+</AudioConfig>  
+
+

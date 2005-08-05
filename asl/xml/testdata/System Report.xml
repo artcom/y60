@@ -1,0 +1,1723 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="ReportStyle.xsl"?>
+
+<Report>
+  <Module>
+    <Title>General</Title>
+
+          <InfoItem>
+            <Title>Program Name</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value>SiSoft Sandra Professional</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Program Version</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value>99.7.5.16</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Registered User</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value>Internal Use</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Registered Company</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value>SiSoftware</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Report Done By</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value>AdrianS</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>System ID</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value>1178</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Run ID</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value>7094</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Report Done On</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value>12 July 1999</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Report Done At</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value>21:56:09</Value>
+          </InfoItem>
+
+  </Module>
+
+  <Module>
+    <Title>Comments</Title>
+
+          <InfoItem>
+            <Title>This is a sample XML report.</Title>
+            <Icon>0</Icon>
+            <Format>1</Format>
+            <Value></Value>
+          </InfoItem>
+
+  </Module>
+
+  <Module>
+    <Title>Sound Card Information</Title>
+
+    <DeviceClass>
+      <Title>Wave Input Devices (Recording)</Title>
+      <Icon>0</Icon>
+
+      <Device>
+        <Title>SB Live! Wave In [D000]</Title>
+        <Icon>0</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>SB Live! Wave In [D000]</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Creative Labs</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4 / 2</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Wave Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Maximum Sampling Bits</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>16-bit</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Maximum Sampling Rate</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>44.1kHz</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Stereo</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>Game Compatible Device</Title>
+        <Icon>0</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Game Compatible Device</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Microsoft</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>90 / 1</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Wave Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Maximum Sampling Bits</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>8-bit</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Maximum Sampling Rate</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>11.025kHz</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Mono</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>Voice Modem Wave #00 Line</Title>
+        <Icon>0</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Voice Modem Wave #00 Line</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Microsoft</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>80 / 1</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Wave Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Maximum Sampling Bits</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>8-bit</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Maximum Sampling Rate</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>11.025kHz</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Mono</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>Microsoft Sound Mapper</Title>
+        <Icon>0</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Microsoft Sound Mapper</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Microsoft</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.03</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>2 / 1</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Wave Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Maximum Sampling Bits</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>16-bit</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Maximum Sampling Rate</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>44.1kHz</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Stereo</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+    </DeviceClass>
+
+    <DeviceClass>
+      <Title>Wave Output Devices (Playback)</Title>
+      <Icon>0</Icon>
+
+      <Device>
+        <Title>SB Live! Wave Out [D000]</Title>
+        <Icon>0</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>SB Live! Wave Out [D000]</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Creative Labs</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>104 / 2</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Wave Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Maximum Sampling Bits</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>16-bit</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Maximum Sampling Rate</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>44.1kHz</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Stereo</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Device Capabilities</Title>
+          <Icon>4</Icon>
+
+          <InfoItem>
+            <Title>Pitch Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Playback Rate Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synchronous Operation</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Sample Accurate Position Information</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>DirectSound Certified</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Volume Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Balance Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>Game Compatible Device</Title>
+        <Icon>0</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Game Compatible Device</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Microsoft</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>89 / 1</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Wave Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Maximum Sampling Bits</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>8-bit</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Maximum Sampling Rate</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>11.025kHz</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Mono</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Device Capabilities</Title>
+          <Icon>4</Icon>
+
+          <InfoItem>
+            <Title>Pitch Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Playback Rate Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synchronous Operation</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Sample Accurate Position Information</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>DirectSound Certified</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Volume Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>Voice Modem Wave #00 Line</Title>
+        <Icon>0</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Voice Modem Wave #00 Line</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Microsoft</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>81 / 1</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Wave Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Maximum Sampling Bits</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>8-bit</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Maximum Sampling Rate</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>11.025kHz</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Mono</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Device Capabilities</Title>
+          <Icon>4</Icon>
+
+          <InfoItem>
+            <Title>Pitch Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Playback Rate Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synchronous Operation</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Sample Accurate Position Information</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>DirectSound Certified</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Volume Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>Microsoft Sound Mapper</Title>
+        <Icon>0</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Microsoft Sound Mapper</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Microsoft</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.03</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>2 / 1</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Wave Information</Title>
+          <Icon>1</Icon>
+
+          <InfoItem>
+            <Title>Maximum Sampling Bits</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>16-bit</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Maximum Sampling Rate</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>44.1kHz</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Stereo</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Device Capabilities</Title>
+          <Icon>4</Icon>
+
+          <InfoItem>
+            <Title>Pitch Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Playback Rate Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synchronous Operation</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Sample Accurate Position Information</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>DirectSound Certified</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Volume Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Balance Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+    </DeviceClass>
+
+    <DeviceClass>
+      <Title>MIDI Input Devices (Control)</Title>
+      <Icon>1</Icon>
+
+      <Device>
+        <Title>SB Live! MIDI In [D000]</Title>
+        <Icon>1</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>SB Live! MIDI In [D000]</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Creative Labs</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>202 / 2</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+    </DeviceClass>
+
+    <DeviceClass>
+      <Title>MIDI Output Devices (Playback)</Title>
+      <Icon>1</Icon>
+
+      <Device>
+        <Title>Creative S/W Synth</Title>
+        <Icon>1</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Creative S/W Synth</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Creative Labs</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>1.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>310 / 2</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Synthesizer Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>MIDI Device Type</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Special Synthesizer</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synthesizer Voices</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>1024</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synthesizer Notes</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>1024</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>16</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported Mask</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>FFFFh</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Device Capabilities</Title>
+          <Icon>4</Icon>
+
+          <InfoItem>
+            <Title>Patch Caching</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Stream Support</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Volume Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Performance Tips</Title>
+          <Icon>-4</Icon>
+
+          <InfoItem>
+            <Title>Warning W710</Title>
+            <Icon>-5</Icon>
+            <Format>0</Format>
+            <Value>Driver may be obsolete. Check that it is the latest version.</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>A: SB Live! MIDI Synth</Title>
+        <Icon>1</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>A: SB Live! MIDI Synth</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Creative Labs</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>306 / 2</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Synthesizer Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>MIDI Device Type</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Special Synthesizer</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synthesizer Voices</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>64</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synthesizer Notes</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>64</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>16</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported Mask</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>FFFFh</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Device Capabilities</Title>
+          <Icon>4</Icon>
+
+          <InfoItem>
+            <Title>Patch Caching</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Stream Support</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Volume Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Balance Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>B: SB Live! MIDI Synth</Title>
+        <Icon>1</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>B: SB Live! MIDI Synth</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Creative Labs</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>306 / 2</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Synthesizer Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>MIDI Device Type</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Special Synthesizer</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synthesizer Voices</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>64</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Synthesizer Notes</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>64</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>16</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported Mask</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>FFFFh</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Device Capabilities</Title>
+          <Icon>4</Icon>
+
+          <InfoItem>
+            <Title>Patch Caching</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Stream Support</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Volume Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Balance Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>SB Live! MIDI Out [D000]</Title>
+        <Icon>1</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>SB Live! MIDI Out [D000]</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Creative Labs</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>201 / 2</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Synthesizer Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>MIDI Device Type</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>MIDI Port</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>16</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported Mask</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>FFFFh</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Device Capabilities</Title>
+          <Icon>4</Icon>
+
+          <InfoItem>
+            <Title>Patch Caching</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Stream Support</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Volume Control</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+      <Device>
+        <Title>MIDI Mapper</Title>
+        <Icon>1</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>MIDI Mapper</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Microsoft</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>1 / 1</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Specific Synthesizer Information</Title>
+          <Icon>2</Icon>
+
+          <InfoItem>
+            <Title>MIDI Device Type</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>MIDI Mapper</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>16</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels Supported Mask</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>FFFFh</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Device Capabilities</Title>
+          <Icon>4</Icon>
+
+          <InfoItem>
+            <Title>Patch Caching</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Stream Support</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Volume Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Balance Control</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+    </DeviceClass>
+
+    <DeviceClass>
+      <Title>Mixer Devices (Mixing)</Title>
+      <Icon>2</Icon>
+
+      <Device>
+        <Title>SB Live! Mixer [D000]</Title>
+        <Icon>2</Icon>
+
+        <InfoGroup>
+          <Title>General Device Information</Title>
+          <Icon>3</Icon>
+
+          <InfoItem>
+            <Title>Device Name</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>SB Live! Mixer [D000]</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Manufacturer</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Creative Labs</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Version</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>4.00</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Product ID</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>409 / 2</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Play Control Line</Title>
+          <Icon>3</Icon>
+
+          <InfoItem>
+            <Title>Component Type</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Speakers  (Destination)</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Stereo</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Line is Active</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Line is Disconnected</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Source Line</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+        <InfoGroup>
+          <Title>Record Control Line</Title>
+          <Icon>3</Icon>
+
+          <InfoItem>
+            <Title>Component Type</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Wave Input  (Destination)</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Channels</Title>
+            <Icon>-1</Icon>
+            <Format>0</Format>
+            <Value>Mono</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Line is Active</Title>
+            <Icon>-2</Icon>
+            <Format>0</Format>
+            <Value>Yes</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Line is Disconnected</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>Source Line</Title>
+            <Icon>-3</Icon>
+            <Format>0</Format>
+            <Value>No</Value>
+          </InfoItem>
+
+        </InfoGroup>
+
+      </Device>
+
+    </DeviceClass>
+
+  </Module>
+
+  <Module>
+    <Title>Hardware IRQ Settings</Title>
+
+          <InfoItem>
+            <Title>0</Title>
+            <Icon>1</Icon>
+            <Format>1</Format>
+            <Value>System timer</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>1</Title>
+            <Icon>10</Icon>
+            <Format>1</Format>
+            <Value>Standard 101/102-Key or Microsoft Natural Keyboard</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>2</Title>
+            <Icon>1</Icon>
+            <Format>1</Format>
+            <Value>Programmable interrupt controller</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>3</Title>
+            <Icon>21</Icon>
+            <Format>1</Format>
+            <Value>Communications Port (COM2)</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>4</Title>
+            <Icon>21</Icon>
+            <Format>1</Format>
+            <Value>Communications Port (COM1)</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>5</Title>
+            <Icon>11</Icon>
+            <Format>1</Format>
+            <Value>Creative SB Live! Value</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>5</Title>
+            <Icon>27</Icon>
+            <Format>1</Format>
+            <Value>Intel 82371AB/EB PCI to USB Universal Host Controller</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>5</Title>
+            <Icon>1</Icon>
+            <Format>1</Format>
+            <Value>IRQ Holder for PCI Steering</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>6</Title>
+            <Icon>6</Icon>
+            <Format>1</Format>
+            <Value>Standard Floppy Disk Controller</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>7</Title>
+            <Icon>21</Icon>
+            <Format>1</Format>
+            <Value>ECP Printer Port (LPT1)</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>8</Title>
+            <Icon>1</Icon>
+            <Format>1</Format>
+            <Value>System CMOS/real time clock</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>10</Title>
+            <Icon>16</Icon>
+            <Format>1</Format>
+            <Value>Intel(R) PRO/100+ PCI Adapter</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>10</Title>
+            <Icon>1</Icon>
+            <Format>1</Format>
+            <Value>IRQ Holder for PCI Steering</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>11</Title>
+            <Icon>1</Icon>
+            <Format>1</Format>
+            <Value>IRQ Holder for PCI Steering</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>11</Title>
+            <Icon>5</Icon>
+            <Format>1</Format>
+            <Value>Matrox Millennium G200 AGP - English</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>12</Title>
+            <Icon>14</Icon>
+            <Format>1</Format>
+            <Value>PS/2 Compatible Mouse Port</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>13</Title>
+            <Icon>1</Icon>
+            <Format>1</Format>
+            <Value>Numeric data processor</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>14</Title>
+            <Icon>8</Icon>
+            <Format>1</Format>
+            <Value>Intel 82371AB/EB PCI Bus Master IDE Controller</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>14</Title>
+            <Icon>8</Icon>
+            <Format>1</Format>
+            <Value>Primary IDE controller (dual fifo)</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>15</Title>
+            <Icon>8</Icon>
+            <Format>1</Format>
+            <Value>Intel 82371AB/EB PCI Bus Master IDE Controller</Value>
+          </InfoItem>
+
+          <InfoItem>
+            <Title>15</Title>
+            <Icon>8</Icon>
+            <Format>1</Format>
+            <Value>Secondary IDE controller (dual fifo)</Value>
+          </InfoItem>
+
+  </Module>
+
+</Report>
+

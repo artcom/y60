@@ -1,0 +1,81 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: chrome.cg,v $
+//   $Author: ulrich $
+//   $Revision: 1.3 $
+//   $Date: 2004/09/07 13:08:02 $
+//
+//  Description: environment mapping shader
+//=============================================================================
+
+#define DIRECTIONAL_LIGHT_COUNT 1
+#define POSITIONAL_LIGHT_COUNT  1
+
+struct app2vert {
+    float3 Position  : POSITION;
+    float3 Normal    : NORMAL;
+};
+
+struct vert2frag {
+    float4 homPosition   : POSITION;    
+    float4 primColor     : COLOR0;
+    float3 reflectVector : TEXCOORD0;
+};
+
+vert2frag mainVertex(app2vert IN,
+                     uniform float4   diffuse,
+                     uniform float4   ambient,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 AC_OBJECTWORLD,
+                     uniform float4x4 AC_OBJECTWORLD_IT,
+                     uniform float3   AC_CAMERA_POSITION,
+                     uniform float3   AC_DIRECTIONAL_LIGHTS[DIRECTIONAL_LIGHT_COUNT],
+                     uniform float4   AC_DIRECTIONAL_LIGHT_COLORS[DIRECTIONAL_LIGHT_COUNT],
+                     uniform float3   AC_POSITIONAL_LIGHTS[POSITIONAL_LIGHT_COUNT],
+                     uniform float4   AC_POSITIONAL_LIGHT_COLORS[POSITIONAL_LIGHT_COUNT],
+                     uniform float4   AC_AMBIENT_LIGHT_COLOR
+                     )
+{
+    vert2frag OUT;
+
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, float4(IN.Position, 1));
+
+    float3 myWorldPosition = mul(AC_OBJECTWORLD, float4(IN.Position,1)).xyz;
+    float3 myWorldNormal = normalize(mul(AC_OBJECTWORLD_IT, float4(IN.Normal,1)).xyz);
+
+    float4 myDiffuse = float4(0,0,0,1);
+
+    int i;
+    for (i = 0; i < DIRECTIONAL_LIGHT_COUNT; ++i) {
+        myDiffuse  += max(0, dot(AC_DIRECTIONAL_LIGHTS[i], myWorldNormal)) * AC_DIRECTIONAL_LIGHT_COLORS[i];
+    }
+
+    for (i = 0; i < POSITIONAL_LIGHT_COUNT; ++i) {
+        float3 posLightDirection = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
+        myDiffuse  += max(0, dot(myWorldNormal, posLightDirection)) * AC_POSITIONAL_LIGHT_COLORS[i];
+    }
+
+    OUT.primColor = myDiffuse*diffuse + AC_AMBIENT_LIGHT_COLOR*ambient;    
+        
+    float3 myViewVector = normalize(myWorldPosition - AC_CAMERA_POSITION);
+    OUT.reflectVector = reflect(myViewVector, myWorldNormal);
+    // inside-out transformation
+    OUT.reflectVector.z = -OUT.reflectVector.z;
+
+    return OUT;
+}
+
+float4 mainFragment(vert2frag IN,
+                    uniform samplerCUBE envTex
+                    ): COLOR
+{
+    return texCUBE(envTex, IN.reflectVector) + IN.primColor;
+}

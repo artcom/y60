@@ -1,0 +1,49 @@
+#!/bin/bash
+source $PRO/build/common_makedist
+
+############################# common setup ############################################
+
+PACKAGENAME=c4d-Y60-export-win32.zip
+DIST_BIN_DIR=${DIST_DIR}/c4d
+
+################################ libraries ############################################
+
+Y60_LIBS="pthreadVC.dll"
+
+WINDOWS_SYSTEM_LIBS="msvcp71.dll msvcp71d.dll msvcr71.dll msvcr71d.dll"
+WINDOWS_SYSTEM32_DIR="$SYSTEMROOT/system32"
+
+#######################################################################################
+
+startMessage
+
+echo "Creating Cinema4D Plugin Package"
+
+removeDistribution
+
+echo "    Creating package directories"
+mkdir -p "$DIST_BIN_DIR/Plugins/Y60/res/description"
+mkdir -p "$DIST_BIN_DIR/Plugins/Y60/res/strings_us"
+mkdir -p "$DIST_BIN_DIR/Plugins/Y60/res/strings_us/description"
+
+echo "    Copying files"
+copyFile o.ANT.WIN.OPT/cinemaxY60-exportOPT.dll "$DIST_BIN_DIR/Plugins/Y60/cinemaxY60-export.cdl"
+copyFile res/c4d_symbols.h       "$DIST_BIN_DIR/Plugins/Y60/res/c4d_symbols.h"
+copyFile res/Facbinaryexport.h   "$DIST_BIN_DIR/Plugins/Y60/res/description"
+copyFile res/Facbinaryexport.res "$DIST_BIN_DIR/Plugins/Y60/res/description"
+copyFile res/Facxmlexport.h      "$DIST_BIN_DIR/Plugins/Y60/res/description"
+copyFile res/Facxmlexport.res    "$DIST_BIN_DIR/Plugins/Y60/res/description"
+copyFile res/c4d_strings.str     "$DIST_BIN_DIR/Plugins/Y60/res/strings_us/c4d_strings.str"
+copyFile res/Facbinaryexport.str "$DIST_BIN_DIR/Plugins/Y60/res/strings_us/description"
+copyFile res/Facxmlexport.str    "$DIST_BIN_DIR/Plugins/Y60/res/strings_us/description"
+
+echo "    Copy Y60 libraries"
+copySet $PRO/lib "$Y60_LIBS" $DIST_BIN_DIR
+
+echo "    Copy windows system libraries"
+copySet $WINDOWS_SYSTEM32_DIR "$WINDOWS_SYSTEM_LIBS" $DIST_BIN_DIR
+
+zipFiles
+removeIntermediates
+
+endMessage 1 $PACKAGENAME

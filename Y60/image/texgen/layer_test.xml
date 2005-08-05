@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<Texture blend="0">
+  <Tile index="0">
+    <File size="1" opacity="0.5">TestImages/tex0.png</File>
+    <File size="2" opacity="0.5">TestImages/tex2.png</File>
+  </Tile>
+</Texture>

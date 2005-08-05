@@ -1,0 +1,108 @@
+//#undef TOON
+//#define DIRECTIONAL_LIGHT
+
+#include "structures.inc.cg"
+
+#define AMBIENT  x
+#define DIFFUSE  y
+#define SPECULAR z
+
+vert2frag mainVertex(float4 position : POSITION,
+                     float4 normal   : NORMAL,
+                     float2 texcoord0 : TEXCOORD0,
+
+#ifdef DIRECTIONAL_LIGHT
+                  uniform float4 AC_DIRECTIONAL_LIGHTS[1],         // Light Direction
+#else
+                  uniform float4 AC_POSITIONAL_LIGHTS[1],         // Light Position
+#endif
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 GL_MODELVIEW,
+                     uniform float4x4 GL_MODELVIEW_IT
+                     )
+{
+  vert2frag OUT;
+  OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, position);
+  OUT.eyeSpacePosition = mul(GL_MODELVIEW, position).xyz;
+  OUT.eyeSpaceNormal =  mul(GL_MODELVIEW_IT, normal).xyz;
+  OUT.texCoord0 = texcoord0;
+  OUT.texCoord1 = texcoord0;
+#ifdef DIRECTIONAL_LIGHT
+  OUT.lightVec = normalize(AC_DIRECTIONAL_LIGHTS[0].xyz);
+#else
+  float4 lightPos;
+  lightPos = AC_POSITIONAL_LIGHTS[0];
+  OUT.lightVec = normalize(lightPos.xyz - OUT.eyeSpacePosition.xyz);
+#endif
+  return OUT;
+}
+
+float4 mainFragment(vert2frag IN,
+                  uniform float4 ambient,
+                  uniform float4 diffuse,
+                  uniform float4 specular,
+                  uniform sampler2D decalTex,
+                  uniform sampler2D hatchTex,
+                  uniform sampler2D specularRamp,
+                  uniform sampler2D diffuseRamp,
+                  uniform sampler2D edgeRamp,
+                  uniform float shininess ) : COLOR
+{
+
+  // Calculate diffuse lighting
+  float3 N = normalize(IN.eyeSpaceNormal);
+  float3 L = normalize(IN.lightVec);
+
+  float diffuseLight = dot(L, N);
+
+  // Calculate specular lighting
+  float3 V = float3(0,0,1);
+  float3 H = normalize(L + V);
+  float specularLight = dot(N,H);
+
+  float4 lighting = lit(diffuseLight, specularLight, shininess);
+
+#ifdef TOON
+  // Perform edge detection
+//  float edge = max(0, dot(N, V));
+/*
+  // Apply step functions
+  if (lighting.DIFFUSE > 0) {
+      lighting.DIFFUSE  = tex2D(diffuseRamp,  float2(lighting.DIFFUSE, 0)).x;
+  }
+  if (lighting.SPECULAR > 0.05) {
+     lighting.SPECULAR = tex2D(specularRamp, float2(lighting.SPECULAR,0)).x;
+  }
+  edge = tex2D(edgeRamp, float2(edge,0)).x;
+*/
+  if (lighting.DIFFUSE > 0) {
+      lighting.DIFFUSE = lighting.DIFFUSE < 0.7 ? 0.5 : 1;
+  }
+  lighting.SPECULAR = lighting.SPECULAR < 0.8 ? 0 : 1;
+//  edge = edge < 0.04 ? 0 : 1;
+#else
+  float edge = 1;
+#endif
+#ifdef CONST
+  lighting.DIFFUSE = 1;
+  lighting.SPECULAR = 0;
+#endif
+
+  // Compute the final color
+  float4 OutColor;
+  float4 TexColor;
+  TexColor = tex2D(decalTex, IN.texCoord0);
+  if (lighting.DIFFUSE == 0) {
+      ambient.rgb *= tex2D(hatchTex, IN.texCoord1);
+      ambient.rgb *= TexColor.rgb;
+  } else {
+      diffuse.rgb *= TexColor.rgb;
+      ambient.rgb = float3(0,0,0);
+  }
+
+   OutColor.rgb  = /*edge **/ (ambient.rgb * lighting.AMBIENT
+                        + diffuse.rgb * lighting.DIFFUSE
+                        + specular.rgb * lighting.z);
+  OutColor.a    = TexColor.a;
+  return OutColor;
+}

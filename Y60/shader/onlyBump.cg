@@ -1,0 +1,59 @@
+float3 expand(float3 v) {
+    return (v - 0.5) * 2;
+}
+
+float3 compress(float3 v) {
+    return (v + 1.0) * 0.5;
+}
+
+///////////////// Fragment shader /////////////////////
+void mainFragment(         float2 normalMapTexCoord : TEXCOORD0,
+                           float3 lightDir          : TEXCOORD1,
+                          // float3 normal            : TEXCOORD2,
+                   out     float4 color             : COLOR,
+                   uniform sampler2D normalMap )
+{
+    float3 light = normalize(lightDir);
+
+    float3 normal = expand(tex2D(normalMap, normalMapTexCoord).xyz);
+    //float3 normal = tex2D(normalMap, normalMapTexCoord).xyz;
+    color = dot(normal, light);
+  
+    //color = float4(normal,1); // show  normal
+    //color = float4(dot(normal, light).xxx,1); // show diffuse lighting
+    //color = float4(compress(lightDir).xyz, 1); // show light direction
+} 
+
+
+///////////////// Vertex shader /////////////////////
+
+void mainVertex(        float3 position       : POSITION,
+                        float3 normal         : NORMAL,
+                        float2 texCoord       : TEXCOORD0,
+                        float3 tangent        : TEXCOORD1,
+                out     float4 oPosition      : POSITION,
+                out     float3 oNormal        : TEXCOORD2,
+                out     float2 normalMapCoord : TEXCOORD0,
+                out     float3 lightDirection : TEXCOORD1,
+                uniform float3 lightPosition,
+                uniform float3 eyePosition,
+                uniform float4x4 GL_MODELVIEW_PROJECTION /*do not change*/)
+{
+   oPosition = mul(GL_MODELVIEW_PROJECTION, float4(position, 1));
+
+   lightDirection = lightPosition - position;
+
+   float3 binormal = cross(tangent, normal);
+   //float3x3 rotation = float3x3(tangent, binormal, normal); //orig 
+   // float3x3 rotation = float3x3(tangent, normal, binormal);
+   // float3x3 rotation = float3x3(normal, tangent, binormal);
+   // float3x3 rotation = float3x3(normal, binormal, tangent);
+    float3x3 rotation = float3x3(binormal, tangent, normal); // no rotation
+   // float3x3 rotation = float3x3(binormal, normal,tangent);
+
+   lightDirection = mul(rotation, lightDirection); 
+   normalMapCoord = texCoord;
+   //oNormal = normal;
+   //oNormal = tangent;
+   oNormal = binormal;
+}

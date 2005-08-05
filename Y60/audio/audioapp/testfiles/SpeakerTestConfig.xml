@@ -1,0 +1,37 @@
+<AudioConfig latency="0.1" sampleRate="48000" priorityClass="SCHED_OTHER" priority="MIN+1b">
+    <SoundOut id="SoundOut" numChannels="16" 
+              timeSource="true" volume="0.88888888"/>
+    <StereoMixer id="A">
+        <Output channel="0" dest="SoundOut.0"/>
+        <Output channel="1" dest="SoundOut.1"/>
+    </StereoMixer>
+    <StereoMixer id="B">
+        <Output channel="0" dest="SoundOut.2"/>
+        <Output channel="1" dest="SoundOut.3"/>
+    </StereoMixer>
+    <StereoMixer id="C">
+        <Output channel="0" dest="SoundOut.4"/>
+        <Output channel="1" dest="SoundOut.5"/>
+    </StereoMixer>
+    <StereoMixer id="D">
+        <Output channel="0" dest="SoundOut.6"/>
+        <Output channel="1" dest="SoundOut.7"/>
+    </StereoMixer>
+    <StereoMixer id="E">
+        <Output channel="0" dest="SoundOut.8"/>
+        <Output channel="1" dest="SoundOut.9"/>
+    </StereoMixer>
+    <StereoMixer id="F">
+        <Output channel="0" dest="SoundOut.10"/>
+        <Output channel="1" dest="SoundOut.11"/>
+    </StereoMixer>
+    <StereoMixer id="G">
+        <Output channel="0" dest="SoundOut.12"/>
+        <Output channel="1" dest="SoundOut.13"/>
+    </StereoMixer>
+    <StereoMixer id="H">
+        <Output channel="0" dest="SoundOut.14"/>
+        <Output channel="1" dest="SoundOut.15"/>
+    </StereoMixer>
+</AudioConfig>  
+

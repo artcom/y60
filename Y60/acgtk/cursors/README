@@ -1,0 +1,15 @@
+HOWTO create a cursor
+=====================
+
+1. Create a bitmap with only black, white and fully transparent pixels.
+2. Export this bitmap with The Gimp's XBM exporter. Enable the alpha mask
+   and enter the hot spot in the XBM export dialog.
+3. Add your cursor to acgtk/CustomCursors.h
+4. Include the bitmap and the mask file in CustomCursors.cpp
+5. Call the INIT_CURSOR macro in CustomCursors::init()
+6. In jsgtk/JSGdkCursor.cpp add a value to StaticPropertyNumbers
+7. Call the DEFINE_STATIC_PROP macro in JSGdkCursor::StaticProperties()
+8. Dispatch in getStaticProperty as usual.
+9. Call GdkCursor.initCustomCursors() in your JS code and your cursor will be  available 
+   as GdkCursor.AC_YOUR_CURSOR
+

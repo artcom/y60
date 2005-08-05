@@ -1,0 +1,45 @@
+<events>
+<navigate url="http://www.somewhere.com/" post="&amp;name=bla%20vgs&amp;id=454345asd"/>
+<loaded/>
+<mouse message="move">
+    <relpos relativeto="element" x="0.4567" y="0.1232">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</mouse>
+
+<scroll x="0" y="1234">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+</scroll>
+
+<highlight type="square" color="green">
+    <relpos relativeto="element" x="0.4567" y="0.1232">
+        <framepath>
+            <frame>23</frame>
+            <frame>45</frame>
+            <frame>67</frame>
+        </framepath>
+        <elementpath>
+            <element>23</element>
+            <element>42</element>
+            <element>855</element>
+            <element>476</element>
+        </elementpath>
+    </relpos>
+</highlight>
+</events>
+
+    

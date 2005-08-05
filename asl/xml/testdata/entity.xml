@@ -1,0 +1,22 @@
+<!DOCTYPE scene [
+    <!ENTITY bla "another">
+    <!ENTITY bla2 "another2">
+    <!ENTITY together "&bla2;&bla;">
+]>
+<scene version="1">
+    <info>
+        <title>&#220;ber gro&#223;e und kleine &#181;-Prozessoren</title>
+        <actor>
+            <name>Pavel</name>
+            <category>amateur</category>
+            <image url="http://www.artcom.de/images/pavel"/>
+        </actor>
+        <model-urls>
+            <model url="http://www.slashdot.org/&bla;"/>
+            <model url="http://www.heise.de/"/>
+            <model url="&bla2;http://www.stadtplandienst.de/"/>
+            <model url="http://www.teleauskunft.com/"/>
+        </model-urls>
+        <data url="http://www.artcom.de/model.iv&together;" duration="3:43"/>
+    </info>
+</scene>

@@ -1,0 +1,194 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: water.cg,v $
+//   $Author: martin $
+//   $Revision: 1.21 $
+//   $Date: 2004/03/10 16:49:44 $
+//
+//  Description: Cg perspective waves
+//=============================================================================
+
+#include "structures.inc.cg"
+#include "linalg.inc.cg"
+
+#define WAVE
+//#define WAVE3  // enable high-frequency waves
+#define FREQTIME x
+#define FREQ y
+#define AMPLITUDE z
+
+
+struct app2vert {
+    float4 Position     : POSITION;
+    float2 TexCoord     : TEXCOORD0;
+
+};
+
+void calcWave(float4 thePosition, float4 theParams, float4 theDirection,
+              float out theSine, float out theCosine) {
+    float d = dot(thePosition, theDirection) * theParams.FREQ + theParams.FREQTIME;
+    sincos(d, theSine, theCosine);
+}
+
+vert2frag main(
+            app2vert IN,
+            uniform float4x4 GL_MODELVIEW_PROJECTION,
+            uniform float4x4 GL_PROJECTION,
+            uniform float4x4 AC_OBJECTWORLD,
+            uniform float3   AC_CAMERA_POSITION,
+            uniform float4x4 AC_CAMERA_I,
+            uniform float4x4 AC_CAMERA_T,
+            uniform float4x4 AC_VIEWPROJECTION,
+            uniform float4   WaterPlane,            // .xyz=normal, w=offset to origin
+#ifndef CONST
+#ifdef DIRECTIONAL_LIGHT
+            uniform float3 AC_DIRECTIONAL_LIGHTS[1],         // Light Direction
+#else
+            uniform float3 AC_POSITIONAL_LIGHTS[1],         // Light Position
+#endif
+#endif
+            uniform float4   Wave1Params,
+            uniform float4   Wave1Direction,
+            uniform float4   Wave2Params,
+            uniform float4   Wave2Direction,
+            uniform float4   diffuse,
+#ifdef WAVE3
+            uniform float4   Wave3Params,
+            uniform float4   Wave3Direction,
+#endif
+            uniform float4   Wave1NearFarWave2NearFarSmooth,
+            uniform float4   WaveOffset,
+            uniform float3   Tex1NearFarScale,
+            uniform float3   Tex2NearFarScale,
+            uniform float    Tex3Scale
+            )
+{
+    vert2frag OUT;
+
+    float mySine1, myCosine1;
+    float4 myNearPlanePos = mul(AC_OBJECTWORLD, IN.Position); // set in JS to cover the near plane.
+
+    myNearPlanePos /= myNearPlanePos.w;
+
+    // intersect with the water plane
+    float3 result;
+    float3 myViewVector = normalize(myNearPlanePos.xyz-AC_CAMERA_POSITION);
+    float dist = intersection(AC_CAMERA_POSITION, myViewVector,
+                WaterPlane, result);
+
+    float4 myWorldSpacePos;
+    if (dist > 0) {
+        myWorldSpacePos = float4(result,1);
+    } else {
+        float farAway = 100000000.0;
+        // put the vertex to some place under the horizon, behind the far plane
+        myWorldSpacePos = float4(projectVectorOnPlane(myViewVector, WaterPlane)*farAway,1);
+        dist = farAway;
+    }
+
+
+    // float myScaleFactor = distance(AC_CAMERA_POSITION,myWorldSpacePos) / distance(AC_CAMERA_POSITION.xyz,myNearPlanePos);
+    // float mySampleFreqFactor = myScaleFactor/-dot(WaterPlane.xyz,myViewVector);
+    // float myViewAngleSinus = -dot(WaterPlane.xyz,myViewVector);
+    float myWeight1 =  1-smoothstep(Wave1NearFarWave2NearFarSmooth.x,Wave1NearFarWave2NearFarSmooth.y, dist);
+    float myWeight2 =  1-smoothstep(Wave1NearFarWave2NearFarSmooth.z,Wave1NearFarWave2NearFarSmooth.w, dist);
+
+    float4 myWaterPlanePos = myWorldSpacePos - WaveOffset;
+#ifdef WAVE
+    calcWave(myWaterPlanePos, Wave1Params, Wave1Direction, mySine1, myCosine1);
+
+    float mySine2, myCosine2;
+    calcWave(myWaterPlanePos, Wave2Params, Wave2Direction, mySine2, myCosine2);
+#ifdef WAVE3
+    float mySine3, myCosine3;
+    calcWave(myWaterPlanePos, Wave3Params, Wave3Direction, mySine3, myCosine3);
+
+    float myYOffset = Wave3Params.AMPLITUDE * mySine3 + Wave2Params.AMPLITUDE * mySine2 + Wave1Params.AMPLITUDE * mySine1;
+#else
+    float myYOffset = Wave2Params.AMPLITUDE * mySine2 * myWeight2 + Wave1Params.AMPLITUDE * mySine1 * myWeight1;
+#endif
+    myWorldSpacePos.y += myYOffset;
+#endif
+
+#ifdef CONST
+    OUT.primColor = float4(1,1,1,smoothstep(Tex1NearFarScale.x,Tex1NearFarScale.y, dist));
+    OUT.secColor  = float4(diffuse.rgb,smoothstep(Tex2NearFarScale.x,Tex2NearFarScale.y, dist));
+#else
+
+    float4 homEyeSpacePosition = mul(AC_CAMERA_I, myWorldSpacePos);
+    OUT.eyeSpacePosition = homEyeSpacePosition.xyz/homEyeSpacePosition.w;
+
+    // normal is (-d f(x, y)/dx, 1.0, -d f(x, y)/dy)
+    float3 WorldSpaceNormal;
+    WorldSpaceNormal.xz = - myCosine1 * Wave1Params.z * Wave1Params.y * (Wave1Direction.xz);
+    WorldSpaceNormal.xz = WorldSpaceNormal.xz - myCosine2 * Wave2Params.z * Wave2Params.y * (Wave2Direction.xz);
+#ifdef WAVE3
+    WorldSpaceNormal.xz = WorldSpaceNormal.xz - myCosine3 * Wave3Params.z * Wave3Params.y * (Wave3Direction.xz);
+#endif
+    WorldSpaceNormal.y  = 1.0;
+
+    //transfom normal into eye-space using the inverse-transposed of the inverse-camera
+    float4 homEyeSpaceNormal = mul(AC_CAMERA_T, float4(WorldSpaceNormal,1));
+    OUT.eyeSpaceNormal = homEyeSpaceNormal.xyz/homEyeSpaceNormal.w;
+
+#ifdef DIRECTIONAL_LIGHT
+    OUT.lightVec = normalize(AC_DIRECTIONAL_LIGHTS[0]);
+#else
+    OUT.lightVec = normalize(AC_POSITIONAL_LIGHTS[0] - OUT.eyeSpacePosition.xyz);
+#endif
+#endif
+    // entspricht GL_MODELVIEW_PROJECTION ohne OBJECT->WORLD Transformation
+    OUT.homPosition = mul(AC_VIEWPROJECTION, myWorldSpacePos);
+    // OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.texCoord0 = myWaterPlanePos.xz/Tex1NearFarScale.z;
+    OUT.texCoord1 = myWaterPlanePos.xz/Tex2NearFarScale.z;
+    OUT.texCoord2 = myWaterPlanePos.xz/Tex3Scale;
+    return OUT;
+}
+
+
+float4 mainFragment(vert2frag IN,
+#ifndef CONST
+                    uniform float4 ambient,
+                    uniform float4 diffuse,
+                    uniform float4 specular,
+                    uniform float shininess,
+#endif
+                    uniform sampler2D waterTex1,
+                    uniform sampler2D waterTex2,
+                    uniform sampler2D waterTex3
+                    ): COLOR
+{
+#ifdef CONST
+    float3 Color1 = lerp(tex2D(waterTex1, IN.texCoord0).rgb, IN.primColor.rgb, IN.primColor.a);
+    float3 Color2 = lerp(tex2D(waterTex2, IN.texCoord1).rgb, tex2D(waterTex3, IN.texCoord2).rgb, IN.secColor.a);
+#else
+    float3 myNormal = normalize(IN.eyeSpaceNormal);
+
+    // diffuse term
+    float3 myLightDirection = normalize(IN.lightVec);
+    float diffuseLight = dot(myNormal.xyz, myLightDirection);
+    // specular term
+    float3 myViewDirection = float3(0,0,1);
+    float3 myHalfVector = normalize(myLightDirection + myViewDirection);
+    float specularLight = dot(myNormal.xyz, myHalfVector);
+
+    float4 lighting = lit(diffuseLight, specularLight, shininess);
+
+//    float4 NearColor = tex2D(waterTex1, IN.texCoord0) * tex2D(waterTex2, IN.texCoord0);
+    diffuse.rgb *= TexColor.rgb;
+    float4 NearColor = float4(ambient.rgb * lighting.x + diffuse.rgb * lighting.y + specular.rgb * lighting.z,1);
+
+
+#endif
+    // return float4(IN.primColor.rgb*IN.primColor.a + NearColor.rgb*(1.0-IN.primColor.a),1);
+    return float4(Color1*Color2,1);
+}

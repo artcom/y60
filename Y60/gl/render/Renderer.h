@@ -1,0 +1,180 @@
+//=============================================================================
+// Copyright (C) 2003, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: Renderer.h,v $
+//   $Author: ulrich $
+//   $Revision: 1.66 $
+//   $Date: 2005/04/18 16:50:09 $
+//
+//  Description: A simple renderer.
+//
+//=============================================================================
+
+#ifndef _ac_renderer_Renderer_h_
+#define _ac_renderer_Renderer_h_
+
+#include "BodyPart.h"
+#include "RenderState.h"
+
+#include <y60/TextRendererManager.h>
+
+#include <y60/Body.h>
+#include <y60/Canvas.h>
+#include <y60/Viewport.h>
+#include <y60/Scene.h>
+#include <y60/MaterialBase.h>
+#include <y60/Light.h>
+
+#include <asl/Frustum.h>
+#include <asl/Dashboard.h>
+#include <asl/linearAlgebra.h>
+#include <asl/intersection.h>
+#include <asl/Exception.h>
+
+#ifdef WIN32
+#   include <windows.h>
+#endif
+
+#include <GL/gl.h>
+
+// CG support
+#include <Cg/cg.h>
+#include <Cg/cgGL.h>
+
+#include <string>
+#include <vector>
+#include <list>
+
+namespace y60 {
+    class Overlay;
+}
+
+namespace y60 {
+
+    DEFINE_EXCEPTION(RendererException, asl::Exception);
+
+    class Renderer {
+        public:
+            Renderer(unsigned int theRenderingCaps = -1 /*get em all*/);
+            virtual ~Renderer();
+
+            void preRender(const y60::CanvasPtr & theCanvas);
+            void render(y60::ViewportPtr theViewport);
+            void postRender();
+
+            void preloadShader();
+            IShaderLibraryPtr getShaderLibrary();
+
+            bool getStatisticsOn() const;
+            void setStatisticsOn(bool theOn);
+            bool getCulling() const;
+            void setCulling(bool theOn);
+
+            TextRendererManager & getTextManager() {
+                return _myTextRendererManager;
+            }
+
+            enum {
+                BV_NONE      = 0,
+                BV_SHAPE     = 1,
+                BV_BODY      = 2,
+                BV_HIERARCHY = 4
+            };
+            void setBoundingVolumeMode(unsigned short theMode);
+            unsigned short getBoundingVolumeMode() const;
+
+            void setCurrentScene(y60::ScenePtr theScene);
+
+            y60::ScenePtr getCurrentScene() const {
+                return _myScene;
+            }
+
+            void initGL();
+
+            void draw(const asl::LineSegment<float> & theLine,
+                    const asl::Vector4f & theColor,
+                    const asl::Matrix4f & theTransformation);
+            void draw(const asl::Triangle<float> & theTriangle,
+                    const asl::Vector4f & theColor,
+                    const asl::Matrix4f & theTransformation);
+            void draw(const asl::Box3<float> & theBox,
+                    const asl::Vector4f & theColor,
+                    const asl::Matrix4f & theTransformation);
+            void draw(const asl::Sphere<float> & theSphere,
+                      const asl::Vector4f & theColor,
+                      const asl::Matrix4f & theTransformation);
+       private:
+            void setupViewport(ViewportPtr theViewport);
+
+            void resetModelView();
+            void bindViewMatrix(y60::CameraPtr theCamera);
+            void setProjection(ViewportPtr theViewport);
+            bool activateViewport(const ViewportPtr & theViewport);
+            void rotateBillboard(y60::BodyPtr theBody, const Camera & theCamera);
+
+            GLenum getPrimitiveGLType(y60::PrimitiveType theType);
+
+            void switchMaterial(int theMaterialIndex);
+            void deactivatePreviousMaterial() const;
+
+            dom::NodePtr getActiveLodChild(dom::NodePtr theNode, const y60::CameraPtr theCamera);
+
+            void createRenderList(dom::NodePtr theNode, BodyPartMap & theBodyParts,
+                                  const y60::CameraPtr theCamera,
+                                  const asl::Matrix4f & theEyeSpaceTransform,
+                                  ViewportPtr theViewport,
+                                  bool theOverlapFrustumFlag);
+            void renderBodyPart(const BodyPart & theBodyPart,
+                                const Viewport & theViewport,
+                                const Camera & theCamera);
+            void renderPrimitives(const BodyPart & theBodyPart,
+                                  y60::MaterialBasePtr theMaterial);
+
+            void renderBoundingBox(const asl::Box3f & theBox);
+            void renderBoundingBoxHierarchy(dom::NodePtr theNode);
+
+            void renderFrustum(const ViewportPtr & theViewport);
+            void renderOverlays(ViewportPtr theViewport);
+            void renderOverlay(dom::NodePtr theOverlayNode, const asl::Vector2f thePosition = asl::Vector2f(0.0f, 0.0f), float theAlpha = 1);
+            void renderTextSnippets(ViewportPtr theViewport);
+
+            void renderBox(const asl::Point3f & theLTF, const asl::Point3f & theRBF,
+                           const asl::Point3f & theRTF, const asl::Point3f & theLBF,
+                           const asl::Point3f & theLTBK, const asl::Point3f & theRBBK,
+                           const asl::Point3f & theRTBK, const asl::Point3f & theLBBK,
+                           const asl::Vector4f & theColor, asl::Vector4f theBackColor = asl::Vector4f(0,0,0,0));
+
+            void enableFog();
+            void enableVisibleLights();
+            void enableLight(y60::LightPtr & theLight, int theActiveLightIndex);
+            void renderSkyBox(y60::CameraPtr theCamera);
+
+            double getBillboardRotation(const asl::Matrix4f & theBillboardMatrix,
+                                        const asl::Matrix4f & theCameraMatrix);
+            // renderer members
+            TextRendererManager     _myTextRendererManager;
+            unsigned int            _myRenderingCaps;
+            y60::ScenePtr           _myScene;
+
+            // OpenGl state chache
+            RenderState             _myState;
+
+            unsigned short          _myBoundingVolumeMode;
+
+            // transient state (valid during one render pass)
+            y60::VertexRegisterFlags _myLastVertexRegisterFlags;
+            unsigned                _myPreviousMaterialIndex;
+            y60::Body *             _myPreviousBody;
+};
+
+    typedef asl::Ptr<Renderer> RendererPtr;
+}
+
+#endif // _ac_renderer_Renderer_h_

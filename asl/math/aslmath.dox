@@ -1,0 +1,77 @@
+
+/** @defgroup aslmath The ASL Math Library (aslmath)
+ *
+ * @section MathOperatorGuide Math Operator Guide
+ *
+ * This document doesn <b>not</b> describe what you have to implement.
+ * It only shows how to implement things if you have to.
+ *
+ * @subsection OpsWithOwnType Operations With Own Type
+ *
+ * @par Comparison
+ * @code
+ * bool operator==(const Vec &, const Vec &);  // calls equal()
+ * bool operator!=(const Vec &, const Vec &);  // calls unequal()
+ * bool equal(const Vec &, const Vec &);
+ * bool unequal(const Vec &, const Vec &);
+ * bool almostEqual(const Vec &, const Vec &);
+ * @endcode
+ *
+ * @par Assignment
+ * @code
+ * class Vec {
+ *     public:
+ *         Vec & operator=(const Vec &); // calls assign()
+ *         void assign(const Vec &);
+ * };
+ * @endcode
+ *
+ * @par Multiplication
+ * @code
+ * class Vec {
+ *     public:
+ *          Vec operator*(const Vec &) const;
+ *          void operator*=(const Vec &);
+ *          void mult(const Vec &);
+ * };
+ * Vec product(const Vec &, const Vec &);
+ * @endcode
+ *
+ * @par Division
+ * @code
+ * class Vec {
+ *      public:
+ *          Vec operator/(const Vec &) const;
+ *          void operator/=(const Vec &);
+ *          void div(const Vec &);
+ * };
+ * Vec quotient(const Vec &, const Vec &);
+ * @endcode
+ *
+ * @par Addition
+ * @code
+ * class Vec {
+ *      public:
+ *          Vec operator+(const Vec &) const;
+ *          void operator+=(const Vec &);
+ *          void add(const Vec &);
+ * };
+ * Vec sum(const Vec &, const Vec &);
+ * @endcode
+ *
+ * @par Subtraction
+ * @code
+ * class Vec {
+ *      private:
+ *          Vec operator-(const Vec &) const;
+ *          void operator-=(const Vec &);
+ *          void sub(const Vec &);
+ * };
+ * Vec difference(const Vec &, const Vec &);
+ * @endcode
+ *
+ * @subsection scalar_operation Operations With Scalars
+ *
+ */
+
+/* vim: set filetype=cpp : */

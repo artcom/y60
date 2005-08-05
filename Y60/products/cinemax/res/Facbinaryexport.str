@@ -1,0 +1,5 @@
+STRINGTABLE Facbinaryexport
+{
+	Facbinaryexport		        "AC Y60 Export";
+	AC_Y60_INLINE_TEXTURES_BIN  "Inline Textures";
+}

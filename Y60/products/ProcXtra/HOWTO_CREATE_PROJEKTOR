@@ -1,0 +1,20 @@
+***
+
+"Proc.x32" ist nur ein anderer Name für o.ANT.WIN.*/acProcXtra*.dll
+und kann einfach kopiert werden. "install.sh" macht genau das und kopiert
+nach "Programme\Macromedia\Director 8.5 G\Xtras"... (Pfad ist hardcoded)
+"install.sh DBG" kopiert die Debug-Variante ins "Xtras"-Verzeichnis zum
+debugging.
+
+***
+
+"Datei" -> "Öffnen"
+	ProcTest.dir
+
+"Datei" -> "Projektor erstellen"
+	ProcTest.dir
+	Proc.x32 (auf aktuelle Version achten)
+"Hinzufügen"
+"Erstellen"
+	Dateinamen wählen, speichern
+Done.

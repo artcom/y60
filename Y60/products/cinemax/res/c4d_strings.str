@@ -1,0 +1,8 @@
+// C4D-StringResource
+// Identifier	Text
+
+STRINGTABLE
+{
+    IDS_Y60_XML_EXPORT      "ART+COM Y60 XML";
+    IDS_Y60_BINARY_EXPORT   "ART+COM Y60 Binary";
+}

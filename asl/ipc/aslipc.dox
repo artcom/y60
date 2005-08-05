@@ -1,0 +1,8 @@
+
+/** \defgroup aslipc Interprocess Communications (aslipc)
+ *  Classes for networked or local communication between processes. Policies determine what protocoll is
+ *  used (see ConduitPolicy). Multithreaded servers accept multiple connections to clients.
+ */
+
+/* vim: set filetype=cpp : */
+

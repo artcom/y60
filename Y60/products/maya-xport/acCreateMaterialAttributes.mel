@@ -1,0 +1,22 @@
+
+// This will create a pysics select box for all selected materials
+global proc acCreateMaterialAttributes() {
+    int $myResult = 0;
+    string $nodes[];
+    $nodes = `ls -type lambert -selection`;
+    
+    string $node;
+    for ($node in $nodes ) {
+        if( `attributeExists ac_physics $node` ) {  
+        } else {
+            print("Adding physics attribute to " + $node + ".\n");
+            addAttr -ln ac_physics -dt "string" $node;
+            $myResult = 1;
+        }
+    }
+    
+    if ($myResult == "0") {
+        error "No material selected";
+    }
+}
+

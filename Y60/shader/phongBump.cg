@@ -1,0 +1,152 @@
+struct a2v {
+    float4 Position : POSITION; //in object space 
+    float3 Normal : NORMAL; //in object space 
+    float2 TexCoord : TEXCOORD0;
+    float2 dummy : TEXCOORD1; //in object space 
+    float3 T : TEXCOORD2; //in object space 
+//    float3 B : TEXCOORD2; //in object space 
+//    float3 N : TEXCOORD3; //in object space 
+}; 
+struct v2f {
+    float4 Position : POSITION; //in projection space 
+    float4 Normal : COLOR0; //in tangent space 
+    float4 lightDirectionUnsigned : COLOR1; //in tangent space
+    float3 TexCoord0 : TEXCOORD0; 
+    float2 TexCoord1 : TEXCOORD1; 
+    float4 lightDirection : TEXCOORD2; //in tangent space 
+    float4 HalfAngleVector : TEXCOORD3; //in tangent space
+}; 
+
+
+float3 compress(float3 v) {
+    return 0.5 * v + 0.5;
+}
+
+float3 expand(float3 v) {
+    return 2.0 * (v - 0.5);
+}
+
+float4 compress(float4 v) {
+    return 0.5 * v + 0.5;
+}
+
+float4 expand(float4 v) {
+    return 2.0 * (v - 0.5);
+}
+
+v2f mainVertex(a2v IN,
+        uniform float4x4 GL_MODELVIEW_PROJECTION,
+        uniform float4x4 TextureMat,
+        uniform float4 lightPosition, //in object space 
+        uniform float4 eyePosition ) //in object space 
+{ 
+    v2f OUT; // pass texture coordinates for
+    
+    // fetching the diffuse map 
+    OUT.TexCoord0.xy = IN.TexCoord.xy;
+    
+    // pass texture coordinates for
+    // fetching the normal map
+    OUT.TexCoord1.xy = IN.TexCoord.xy; 
+    
+    // compute the 3x3 transform from 
+    // tangent space to object space 
+    float3   binormal          = cross(IN.T, IN.Normal);
+    float3x3 objToTangentSpace = float3x3(IN.T, binormal, IN.Normal);
+    //float3x3 objToTangentSpace = float3x3(binormal, IN.T, IN.Normal);
+    /*
+    objToTangentSpace[0] = cross(IN.T, IN.Normal);
+    objToTangentSpace[1] = IN.T;
+    objToTangentSpace[2] = IN.Normal;
+    */
+    
+    // transform normal from
+    // object space to tangent space
+    OUT.Normal.xyz = compress(mul(objToTangentSpace, IN.Normal));
+    
+    // transform light vector from 
+    // object space to tangent space 
+    float3 myLightDirection = normalize(lightPosition - IN.Position);
+    float3 lightVectorInTangentSpace = mul(objToTangentSpace, myLightDirection.xyz);
+    OUT.lightDirection.xyz = lightVectorInTangentSpace;
+    OUT.lightDirectionUnsigned.xyz = compress(lightVectorInTangentSpace);
+    
+    // compute view vector
+    float3 viewVector = normalize(eyePosition.xyz - IN.Position.xyz);
+    
+    // compute half angle vector 
+    float3 halfAngleVector = normalize(myLightDirection.xyz + viewVector);
+    
+    // transform half-angle vector from
+    // object space to tangent space
+    OUT.HalfAngleVector.xyz = mul(objToTangentSpace, halfAngleVector); 
+    
+    // transform position to projection space
+    OUT.Position = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    
+    return OUT;
+}
+
+float4 mainFragment(v2f IN,
+        uniform sampler2D decal0,
+        uniform sampler2D bump0
+//        uniform sampler2D IlluminationMap,
+//        uniform float Ambient) : COLOR 
+        ) : COLOR 
+{ 
+    // fetch base color 
+    float4 color = tex2D(decal0, IN.TexCoord0.xy);
+    //float4 color = float4(0.5,0.5,0.5,0.5);
+   
+    // fetch bump normal and expand it to [-1,1] 
+    float4 bumpNormal = expand(tex2D(bump0, IN.TexCoord1.xy));
+    
+    // compute the dot product between
+    // the bump normal and the light vector,
+    // compute the dot product between
+    // the bump normal and the half angle vector,
+    // fetch the illumination map using 
+    // the result of the two previous dot products 
+    // as texture coordinates 
+    // returns the diffuse color in the
+    // color components and the specular color in the 
+    // alpha component 
+    
+    float2 illumCoord = float2(dot(IN.lightDirection.xyz, bumpNormal.xyz),
+            dot(normalize(IN.HalfAngleVector.xyz), bumpNormal.xyz));
+    
+    //float4 illumination = tex2D(IlluminationMap, illumCoord); 
+    float4 illumination = float4(illumCoord.xxx, 1.0); 
+   
+    // expand iterated normal to [-1,1] 
+    float4 normal = expand(IN.Normal); 
+    
+    // compute self-shadowing term 
+    float shadow = saturate(4 * dot(normal.xyz, IN.lightDirectionUnsigned.xyz));
+    
+    // compute final color
+    //return (Ambient * color + shadow) * (illumination * color + illumination.wwww);
+    //return (float4(0.5, 0.5, 0.5, 1) * color + shadow) * (illumination * color + illumination.wwww);
+    //return float4((float4(0.5, 0.5, 0.5, 1) * color + shadow) * (illumination * color).rgb, 1.0);
+    //return float4((float4(0.5, 0.5, 0.5, 1) * color + shadow) * (illumination * color + illumination.wwww).rgb, 1.0);
+    //return color + dot(bumpNormal.xyz, IN.lightDirection.xyz);
+    //return dot(bumpNormal.xyz, IN.lightDirection.xyz);
+    //return IN.lightDirection;
+    //return float4(IN.TexCoord1,0,1); // show bump uv
+    //return color; // show texture 
+    //return color * float4(0.5, 0.5, 0.5, 1.0); // show ambient component 
+    //return color * illumination; // show diffuse component 
+    //return (0.35 * color * float4(1.0, 1.0, 1.0, 1.0)) + 
+    //        0.65 * saturate(color * illumination); // show diffuse and ambient component 
+    //return float4(illumCoord.yyy, 1.0);
+    float specular = saturate(dot(normalize(bumpNormal.xyz), normalize(IN.HalfAngleVector.xyz)));
+    float specular2 = specular * specular;
+    float specular4 = specular2 * specular2;
+    float specular8 = specular4 * specular4;
+    //return float4(specular4, specular4, specular4, 1.0); // Show specular highlight.
+    return saturate(0.20 * color * float4(1.0, 1.0, 1.0, 1.0) + 
+            0.6 * saturate(color * illumination) + 
+            0.6 * float4(specular4, specular4,  specular4, 1.0)); // alle Lampen an.
+
+}
+

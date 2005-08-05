@@ -1,0 +1,70 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: wave_1d.cg,v $
+//   $Author: valentin $
+//   $Revision: 1.3 $
+//   $Date: 2004/08/25 11:28:17 $
+//
+//  Description: 
+//=============================================================================
+
+struct app2vert { 
+    float4 Position  : POSITION;
+    float4 Arclength : COLOR0;
+};
+
+struct vert2frag {
+    float4 homPosition : POSITION;
+    float4 ArcLength   : TEXCOORD0;
+    float4 WaveParams  : TEXCOORD2;
+    float4 Color       : COLOR0;
+};
+
+vert2frag main(app2vert IN,    
+               uniform float4 WaveParams, 
+               uniform float4 WaveColor,
+               uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vert2frag OUT;
+
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    OUT.ArcLength   = IN.Arclength;
+    OUT.WaveParams  = WaveParams;
+    OUT.Color       = WaveColor;
+
+    return OUT;
+}
+
+
+float4 mainFragment(vert2frag IN,
+                    uniform sampler2D paintTex): COLOR
+{
+    float myTime  = IN.WaveParams.x;
+    float myScale = IN.WaveParams.y;
+    
+    float myDistance   = IN.ArcLength.x;
+    float myTimeOffset = IN.ArcLength.y;
+
+    myTime = max(myTime - myTimeOffset, 0.0);
+
+    float waveDist = abs(myDistance - myTime * 0.1); // factor slows down movement of wave front
+    float myAttenuation = 1.0 - smoothstep(0.0, 0.1, waveDist); // factor is width of wave front
+    myAttenuation *= 1.0 - step(myTime, 0.0);
+
+    myDistance = sin(myDistance * myScale - myTime); // range [-1..1]
+    myDistance = myDistance * 0.3 + 0.7;             // scale to range [0.4..1]
+    myDistance *= myAttenuation;
+
+    float4 myColor = IN.Color;
+    myColor.w = max(myDistance, 0.25); //IN.Color.w);
+
+    return myColor;
+}

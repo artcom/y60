@@ -1,0 +1,2 @@
+#!/bin/bash
+DEBUG=1 ./install_c4d

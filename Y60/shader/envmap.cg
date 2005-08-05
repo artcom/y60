@@ -1,0 +1,172 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//   $RCSfile: envmap.cg,v $
+//   $Author: martin $
+//   $Revision: 1.9 $
+//   $Date: 2004/03/10 16:49:44 $
+//
+//  Description: environment mapping shader
+//=============================================================================
+#define FRESNEL // experimental
+
+#define FRESNEL_POWER  1.0
+#define FRESNEL_SCALE  1.0
+#define FRESNEL_BIAS   0.0
+
+#ifdef DIRLIGHT
+#define LIGHTING
+#endif
+#ifdef POSLIGHT
+#ifndef LIGHTING
+#define LIGHTING
+#endif
+#endif
+
+
+struct app2vert {
+    float4 Position         : POSITION;
+    float4 Normal           : NORMAL;
+    float2 texCoord         : TEXCOORD0;
+    float2 texCoord1        : TEXCOORD1;
+};
+
+
+struct vert2frag {
+    float4 homPosition   : POSITION;
+    float2 texCoord0     : TEXCOORD0;
+    float2 texCoord1     : TEXCOORD1;
+    float4 worldPosition : TEXCOORD2;
+    float3 reflectVector : TEXCOORD3;
+    float3 refractVector : TEXCOORD4;
+    float4 lighting      : TEXCOORD5;
+    float4 specColor     : TEXCOORD6;
+    float4 primColor     : COLOR0;
+    float reflectionFactor : COLOR1;
+};
+
+vert2frag mainVertex(
+            app2vert IN,
+            uniform float4x4 GL_MODELVIEW_PROJECTION,
+            uniform float4x4 AC_OBJECTWORLD_IT,
+            uniform float4x4 AC_OBJECTWORLD,
+            uniform float3 AC_CAMERA_POSITION,
+#ifdef DIRLIGHT
+            uniform float3 AC_DIRECTIONAL_LIGHTS[1],
+#endif
+#ifdef POSLIGHT
+            uniform float3 AC_POSITIONAL_LIGHTS[1],
+#endif
+            uniform float4 diffuse,
+            uniform float4 specular,
+            uniform float  shininess
+            )
+{
+    vert2frag OUT;
+
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position);
+    float3 myWorldNormal = normalize(mul(AC_OBJECTWORLD_IT, IN.Normal).xyz);
+    float3 myWorldPosition = mul(AC_OBJECTWORLD, IN.Position).xyz;
+    float3 myViewVector = normalize(myWorldPosition-AC_CAMERA_POSITION);
+    OUT.reflectVector = reflect(myViewVector,myWorldNormal);
+    // inside-out transformation
+    OUT.reflectVector.z = -OUT.reflectVector.z;
+
+#ifdef FRESNEL
+    OUT.reflectionFactor = FRESNEL_BIAS + FRESNEL_SCALE *
+            pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER);
+#endif
+    OUT.primColor = diffuse;
+    
+#ifdef PAINT
+    OUT.texCoord0 = IN.texCoord;
+#if PAINT==2
+    OUT.texCoord1 = IN.texCoord1;
+#endif
+#endif
+
+// lighting
+#ifdef DIRLIGHT
+    {
+        float3 dirLightVec = normalize(AC_DIRECTIONAL_LIGHTS[0]);
+        float  diffuseLight = dot(myWorldNormal, dirLightVec);
+        
+        float3 halfVec = normalize(dirLightVec+myViewVector);
+        float specularLight = dot(myWorldNormal,halfVec);
+        
+        OUT.lighting = lit(diffuseLight, specularLight, 12);
+        OUT.specColor = specular * IN.lighting.z;
+    }
+#else
+    OUT.lighting = float4(0,0,0,0);
+#endif
+#ifdef POSLIGHT
+    {
+        float3 dirLightVec = normalize(AC_POSITIONAL_LIGHTS[0]-myWorldPosition);
+        float  diffuseLight = dot(myWorldNormal, dirLightVec);
+        
+        float3 halfVec = normalize(dirLightVec - myViewVector);
+        float specularLight = dot(myWorldNormal,halfVec);
+                
+        OUT.lighting += lit(diffuseLight, specularLight, 3*shininess);
+        OUT.specColor = specular * OUT.lighting.z;
+    }
+
+#endif
+    return OUT;
+}
+
+
+float4 mainFragment(vert2frag   IN,
+                    uniform samplerCUBE envTex,
+#ifdef PAINT
+                    uniform sampler2D decalTex,
+#if PAINT==2
+                    uniform sampler2D emmisiveTex,
+#endif
+#endif
+                    uniform float4 ambient
+                    ): COLOR
+{
+    float4 myReflectedColor = texCUBE(envTex, IN.reflectVector);
+
+#ifdef PAINT
+    float4 myOuterTexel = tex2D(decalTex, IN.texCoord0) * IN.primColor;
+  #if PAINT==2
+    float4 myEmmisiveColor = tex2D(emmisiveTex, IN.texCoord1);
+    #ifdef FRESNEL
+        float3 myInnerColor = lerp(myEmmisiveColor.rgb, myReflectedColor.rgb, (1-myEmmisiveColor.a)*IN.reflectionFactor);
+        // float3 myInnerColor = lerp(myEmmisiveColor.rgb, myReflectedColor.rgb, IN.reflectionFactor);
+    #else
+        float3 myInnerColor = lerp(myReflectedColor.rgb, myEmmisiveColor.rgb, myEmmisiveColor.a);
+    #endif
+  #else
+    float3 myInnerColor = myReflectedColor.rgb;
+  #endif
+#else
+    float4 myOuterTexel = IN.primColor;
+    float3 myInnerColor = myReflectedColor.rgb;
+#endif
+
+#ifdef LIGHTING
+   float3 myOuterColor = myOuterTexel.rgb*IN.lighting.y+myOuterTexel.rgb*ambient;
+   float4 mySpecColor = IN.specColor;
+#else
+   float3 myOuterColor = myOuterTexel.rgb;
+   float4 mySpecColor = float4(0,0,0,0);
+#endif
+
+    float myEnvIntensity = (myReflectedColor.r + myReflectedColor.g + myReflectedColor.b) / 3.0;
+    float myBlendFactor = myReflectedColor.a;
+    float3 myBlendedColor = lerp(myOuterColor, myInnerColor, myEnvIntensity);
+    float4 myColor = float4(lerp(myOuterColor, myBlendedColor, myBlendFactor), myOuterTexel.a) + mySpecColor;
+    
+    return myColor;
+}

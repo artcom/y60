@@ -1,0 +1,97 @@
+#!/bin/bash
+
+############################# common setup ############################################
+
+PLUGIN_NAME=mayaY60-export
+CODENAME=$PLUGIN_NAME
+
+############################# linux setup #############################################
+
+Y60_LINUX_LIBS="aslbase aslxml y60som"
+
+############################# windows setup ###########################################
+
+Y60_WIN_LIBS="pthreadVC.dll libcurl.dll libeay32.dll ssleay32.dll"
+
+WINDOWS_SYSTEM_LIBS="msvcp71.dll msvcp71d.dll msvcr71.dll msvcr71d.dll"
+WINDOWS_SYSTEM32_DIR="$SYSTEMROOT/system32"
+
+#######################################################################################
+
+source $PRO/build/common_makedist
+
+collectLinuxLibs() {
+    echo "  Installing linux libraries"
+    for LIB in $Y60_LINUX_LIBS; do
+        LIBNAME=lib${LIB}OPT.so
+        copyFile $DIST_LIB_DIR/${LIBNAME} ${DIST_LIB_DIR};
+        strip $DIST_LIB_DIR/${LIBNAME}
+    done
+}
+
+makedistLinux() {
+    echo "Building linux distribution";
+    PACKAGENAME=${PLUGIN_NAME}-linux.tar.bz2
+    DIST_BIN_DIR=${DIST_DIR}/${CODENAME}/maya/5.0
+    DIST_LIB_DIR=${DIST_DIR}/${CODENAME}/lib
+
+    removeDistribution
+
+    echo "    Creating distribution directories"
+    mkdir -p ${DIST_LIB_DIR}
+    mkdir -p ${DIST_BIN_DIR}/plug-ins
+    mkdir -p ${DIST_BIN_DIR}/scripts
+
+    collectLinuxLibs
+
+    echo "    Installing plugin"
+    copyFile o.ANT.LINUX.OPT/lib${PLUGIN_NAME}OPT.so ${DIST_BIN_DIR}/plug-ins/${CODENAME}.so
+    copyWildSet . "*.mel" ${DIST_BIN_DIR}/scripts
+
+    echo "    Creating tar archive"
+    cd ${DIST_BIN_DIR}
+    tar cjf ../../${PACKAGENAME} *
+
+    removeIntermediates
+}
+
+makedistWindows() {
+    echo "Building windows distribution"
+    PACKAGENAME=${PLUGIN_NAME}-win32.zip
+    DIST_BIN_DIR=${DIST_DIR}/${CODENAME}
+
+    removeDistribution
+
+    echo "    Creating distribution directories"
+    mkdir -p ${DIST_BIN_DIR}/bin/plug-ins
+    mkdir -p ${DIST_BIN_DIR}/scripts/others
+
+    echo "    Copy Y60 libraries"
+    copySet $PRO/lib "$Y60_WIN_LIBS" ${DIST_BIN_DIR}/bin
+
+    echo "    Installing plugin"
+    copyFile o.ANT.WIN.OPT/${PLUGIN_NAME}OPT.dll ${DIST_BIN_DIR}/bin/plug-ins/${CODENAME}.mll
+    copyWildSet . "*.mel" ${DIST_BIN_DIR}/scripts/others
+
+    echo "    Copy windows system libraries"
+    copySet $WINDOWS_SYSTEM32_DIR "$WINDOWS_SYSTEM_LIBS" $DIST_BIN_DIR/bin
+
+    zipFiles
+    removeIntermediates
+}
+
+SUCCESS=0
+
+startMessage
+
+if [ -d o.ANT.WIN.OPT ]; then
+    makedistWindows
+    SUCCESS=1
+fi
+
+if [ -d o.ANT.LINUX.OPT ]; then
+    makedistLinux
+    SUCCESS=1
+fi
+
+endMessage $SUCCESS $PACKAGENAME
