@@ -70,31 +70,60 @@ void HWSampleSink::setSelf(const HWSampleSinkPtr& mySelf)
 void HWSampleSink::play() {
     AC_DEBUG << "HWSampleSink::play";
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    _myLockedSelf = _mySelf.lock();
-    _myVolumeFader->setVolume(_myVolume);
-    if (_myBufferQueue.empty()) {
-        AC_WARNING << "HWSampleSink: Play called, but no buffers are queued.";
+    if (_myState != RUNNING) {
+        _myLockedSelf = _mySelf.lock();
+        _myVolumeFader->setVolume(_myVolume);
+        if (_myBufferQueue.empty()) {
+            AC_WARNING << "HWSampleSink: Play called, but no buffers are queued.";
+        }
+        _myState = RUNNING;
+        _myStopWhenEmpty = false;
+        AudioTimeSource::run();
+    } else {
+        AC_DEBUG << "HWSampleSink::play: Play received when alredy playing. Ignored.";
     }
-    _myState = RUNNING;
-    _myStopWhenEmpty = false;
-    AudioTimeSource::run();
 }
 
 void HWSampleSink::pause() {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     AC_DEBUG << "HWSampleSink::pause";
-    _myState = PAUSING_FADE_OUT;
-    _myVolumeFader->setVolume(0);
+    if (_myState == RUNNING) {
+        _myState = PAUSING_FADE_OUT;
+        _myVolumeFader->setVolume(0);
+    } else {
+        AC_DEBUG << "HWSampleSink::pause: Pause received in state " << 
+                stateToString(getState()) << ". Ignored.";
+    }
 }
 
 void HWSampleSink::stop(bool theRunUntilEmpty) {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     AC_DEBUG << "HWSampleSink::stop";
     if (theRunUntilEmpty) {
-        _myStopWhenEmpty = true;
+        if (_myState == RUNNING) {
+            _myStopWhenEmpty = true;
+        } else {
+            AC_DEBUG << "HWSampleSink::stop: stop(RunUntilEmpty) received in state " << 
+                    stateToString(getState()) << ". Ignored.";
+        }
     } else {
-        _myState = STOPPING_FADE_OUT;
-        _myVolumeFader->setVolume(0);
+        switch(_myState) {
+            case RUNNING:
+                _myState = STOPPING_FADE_OUT;
+                _myVolumeFader->setVolume(0);
+                break;
+            case PAUSING_FADE_OUT:
+                _myState = STOPPING_FADE_OUT;
+                break;
+            case PAUSING_SILENT:
+            case PAUSED:
+                _myState = STOPPING_SILENT;
+                AudioTimeSource::stop();
+                break;
+            default:
+                AC_DEBUG << "HWSampleSink::stop: stop received in state " << 
+                        stateToString(getState()) << ". Ignored.";
+        }
     }
 }
 
@@ -182,6 +211,10 @@ std::string HWSampleSink::stateToString(State theState) {
         default:
             return "unknown HWSampleSink state!?";
     }
+}
+
+unsigned HWSampleSink::getNumUnderruns() const {
+    return _numUnderruns;
 }
 
 void HWSampleSink::dumpState() {

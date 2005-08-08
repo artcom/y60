@@ -49,6 +49,17 @@ class HWSampleSink: public AudioTimeSource
                     PAUSED              // Sound is paused.
         };
 
+        // Possible state transitions:
+        // Source State       Command    
+        //                    play()    stop()              pause()
+        // STOPPED            RUNNING   ignored             ignored
+        // RUNNING            ignored   STOPPING_FADE_OUT   PAUSING_FADE_OUT
+        // STOPPING_FADE_OUT  RUNNING   ignored             ignored
+        // STOPPING_SILENT    RUNNING   ignored             ignored
+        // PAUSING_FADE_OUT   RUNNING   STOPPING_FADE_OUT   ignored
+        // PAUSING_SILENT     RUNNING   STOPPING_SILENT     ignored
+        // PAUSED             RUNNING   STOPPING_SILENT     ignored
+
         HWSampleSink(const std::string & myName, SampleFormat mySampleFormat, 
                 unsigned mySampleRate, unsigned numChannels);
         virtual ~HWSampleSink();
@@ -68,6 +79,7 @@ class HWSampleSink: public AudioTimeSource
         std::string getName() const;
         State getState() const;
         static std::string stateToString(State theState);
+        unsigned getNumUnderruns() const;
 
         virtual void dumpState();
 
