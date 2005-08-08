@@ -356,21 +356,18 @@ class SoundTestSuite : public UnitTestSuite {
             myMedia->setSysConfig(0.02, "");
 #endif
             myMedia->setAppConfig(44100, 2, _myUseDummyPump);
-/*
+
             addTest(new TestPlay());
             addTest(new TestFireAndForget());
             addTest(new TestTwoSounds());
-*/            
             addTest(new TestStop());
             addTest(new TestStopByItself());
-            
             addTest(new TestPause());
-/*
             addTest(new TestStopAll());
             addTest(new TestLoop());
             addTest(new TestVolume());
             addTest(new StressTest(5));
-*/
+
             // 24 Hour test :-).
 //            addTest(new StressTest(myMedia, 60*60*24));
         }
