@@ -13,7 +13,7 @@ using namespace std;
 
 namespace y60 {
 
-Mesh::Mesh(dom::NodePtr theShapeNode) : _myShapeNode(theShapeNode), _myPositions(0), _myNormals(0), _myColors(0), _myHalfEdges(0), _myWriteLockCount(0), _myEdgeList(0), _myMaxError(0.0), _mySimplifyMode(false)  {
+Mesh::Mesh(dom::NodePtr theShapeNode) : _myShapeNode(theShapeNode), _myPositions(0), _myNormals(0), _myColors(0), _myHalfEdges(0), _myWriteLockCount(0), _myEdgeList(0), _myMaxError(0.0), _mySimplifyMode(false), _myNormalVerticesNode(0)  {
     _myElementsNode = theShapeNode->childNode(PRIMITIVE_LIST_NAME)->childNode(ELEMENTS_NODE_NAME);
     _myHalfEdgesNode = _myElementsNode->childNode(HALFEDGES_NODE_NAME);
     _myColorIndexNode = _myElementsNode->childNodeByAttribute(VERTEX_INDICES_NAME, VERTEX_DATA_ROLE_ATTRIB, COLOR_ROLE);
@@ -22,47 +22,51 @@ Mesh::Mesh(dom::NodePtr theShapeNode) : _myShapeNode(theShapeNode), _myPositions
     _myVertexDataNode = theShapeNode->childNode(VERTEX_DATA_NAME);
 
     string myPositionsName = _myPositionIndexNode->getAttributeValue<string>(VERTEX_DATA_ATTRIB);
-    string myNormalsName = _myNormalIndexNode->getAttributeValue<string>(VERTEX_DATA_ATTRIB);
     _myPositionIndexNode = _myPositionIndexNode->childNode(0);
-    _myNormalIndexNode = _myNormalIndexNode->childNode(0);
-    _myColorIndexNode = _myColorIndexNode->childNode(0);
+    if (_myColorIndexNode) {
+        _myColorIndexNode = _myColorIndexNode->childNode(0);
+    }
     _myHalfEdgesNode = _myHalfEdgesNode->childNode(0);
-    //_myEdgeList = EdgeListPtr(new EdgeList(_myHalfEdgesNode, _myPositionIndexNode));
     _myPositionVerticesNode = _myVertexDataNode->childNodeByAttribute(SOM_VECTOR_VECTOR3F_NAME, NAME_ATTRIB, myPositionsName)->childNode(0);
-    _myNormalVerticesNode = _myVertexDataNode->childNodeByAttribute(SOM_VECTOR_VECTOR3F_NAME, NAME_ATTRIB, myNormalsName)->childNode(0);
+    if (_myNormalIndexNode) {
+        string myNormalsName = _myNormalIndexNode->getAttributeValue<string>(VERTEX_DATA_ATTRIB);
+        _myNormalIndexNode = _myNormalIndexNode->childNode(0);
+        _myNormalVerticesNode = _myVertexDataNode->childNodeByAttribute(SOM_VECTOR_VECTOR3F_NAME, NAME_ATTRIB, myNormalsName)->childNode(0);
+    }
 
 }
 
 unsigned 
 Mesh::colorize(unsigned int theStartIndex, unsigned theColorIndex) {
     lockWrite();
-    // recursive depth painter
-    // XXX Works only for single primitives
-    EdgeList::iterator iter = _myEdgeList->getHalfEdge(theStartIndex);
-    if (theStartIndex < 0 || theStartIndex > _myPositions->size()) {
-        AC_ERROR << "Illegal Index " << theStartIndex << ". The Shape has only " << _myPositionIndexNode->nodeValueRef<VectorOfUnsignedInt>().size() << " indices.";
-        return 0;
-    } 
-    unsigned int myCount = 0;
-    list<unsigned int> myToDoList;
-    myToDoList.push_back(theStartIndex);
+    if (_myColors) {
+        // recursive depth painter
+        // XXX Works only for single primitives
+        EdgeList::iterator iter = _myEdgeList->getHalfEdge(theStartIndex);
+        if (theStartIndex < 0 || theStartIndex > _myPositions->size()) {
+            AC_ERROR << "Illegal Index " << theStartIndex << ". The Shape has only " << _myPositionIndexNode->nodeValueRef<VectorOfUnsignedInt>().size() << " indices.";
+            return 0;
+        } 
+        unsigned int myCount = 0;
+        list<unsigned int> myToDoList;
+        myToDoList.push_back(theStartIndex);
 
-    // color this face
-    while(myToDoList.begin() != myToDoList.end()) {
-        *iter = myToDoList.front();
-        myToDoList.pop_front();
-        if ((*_myColors)[*iter] == theColorIndex) continue;
-        for (unsigned int i = 0; i < 3; ++i) {
-            (*_myColors)[*iter] = theColorIndex;
-            if (iter.twinIndex() != -1 && (*_myColors)[iter.twinIndex()] != theColorIndex) {
-                myToDoList.push_back(iter.twinIndex());
+        // color this face
+        while(myToDoList.begin() != myToDoList.end()) {
+            *iter = myToDoList.front();
+            myToDoList.pop_front();
+            if ((*_myColors)[*iter] == theColorIndex) continue;
+            for (unsigned int i = 0; i < 3; ++i) {
+                (*_myColors)[*iter] = theColorIndex;
+                if (iter.twinIndex() != -1 && (*_myColors)[iter.twinIndex()] != theColorIndex) {
+                    myToDoList.push_back(iter.twinIndex());
+                }
+                ++iter;
+                ++myCount;
             }
-            ++iter;
-            ++myCount;
         }
     }
     unlockWrite();
-    //AC_INFO << "Colorized " << myCount << " vertices.";
     return myCount;
 }
 
@@ -88,32 +92,10 @@ Mesh::deleteFace(unsigned theIndex) {
                     (*_myHalfEdges)[myHalfEdgeValue] = myIndex+i;
                 }
             }
-            /*
-            if (_myEdgeError.size() == _myPositions->size()) {
-                _myErrors -= eraseErrorMap(_myEdgeError[myIndex+i], myIndex+i);
-                _myErrors -= eraseErrorMap(_myEdgeError[myReverseIndex+i], myReverseIndex+i);
-                _myErrors += insertErrorMap(_myEdgeError[myReverseIndex+i], myIndex+i);
-                _myEdgeError[myIndex+i] = _myEdgeError[myReverseIndex+i];
-            } else {
-                AC_ERROR << _myEdgeError.size() << " = _myEdgeError.size() != _myPositions->size() = " << _myPositions->size();
-            }
-            */
-
         }
         //AC_INFO << "Overwriting " << myIndex << " with " << myReverseIndex;
         myDelta = myReverseIndex - myIndex;
-    } else {
-        /*
-        // We are deleting the last face in the list, still we need to 
-        // delete it from the errormap
-        if (_myEdgeError.size() == _myPositions->size()) {
-            for (int i = 0; i < _myFaceSize; ++i) { 
-                _myErrors -= eraseErrorMap(_myEdgeError[myIndex+i], myIndex+i);
-            }
-        }
-        */
-        AC_TRACE << "Deleting last " << myIndex;
-    }
+    } 
     unsigned myNewSize = myReverseIndex;
     if (_myNormals) {
         _myNormals->resize(myNewSize);
@@ -186,71 +168,7 @@ Mesh::calcEdgeError(unsigned theIndex) {
         return NumericTraits<float>::max();
     }
 }
-/*
-unsigned
-Mesh::generateErrorMap(float theMaxError) {
-    MAKE_SCOPE_TIMER(generateErrorMap);
-    _myErrorMap.clear();
-    _myMaxError = theMaxError;
-    unsigned myNumInserted = 0;
-    for (int i = 0; i < _myEdgeError.size(); ++i) {
-        myNumInserted += insertErrorMap(_myEdgeError[i], i);
-    }
-    return myNumInserted;
-}
-*/
-/*
-unsigned
-Mesh::eraseErrorMap(float theValue, int theIndex) {
-    MAKE_SCOPE_TIMER(eraseErrorMap);
-    if (theValue > _myMaxError) {
-        return 0;
-    }
 
-    ErrorMap::iterator myItem = _myErrorMap.find(theValue);
-    unsigned myReturn = 0;
-    if (myItem == _myErrorMap.end()) {
-        AC_ERROR << "item should be in map but isn't: " << theIndex;
-    } else {
-        // erase
-        myReturn = myItem->second.erase(theIndex);
-        if (myItem->second.empty()) {
-            _myErrorMap.erase(myItem);
-        }
-    }
-    return myReturn;
-}
-*/
-/*
-unsigned
-Mesh::insertErrorMap(float theNewValue, int theIndex) {
-    MAKE_SCOPE_TIMER(insertErrorMap);
-    if (theNewValue <= _myMaxError) {
-        ErrorMap::iterator myItem = _myErrorMap.find(theNewValue);
-        if (myItem == _myErrorMap.end()) {
-            set<int> mySet; mySet.insert(theIndex);
-            ErrorMap::value_type myValue(theNewValue, mySet);
-            myItem = _myErrorMap.insert(myValue).first;
-        } else {
-            set<int> & mySet = myItem->second;
-            mySet.insert(theIndex);
-            //ErrorMap::value_type myValue(myErrorValue, mySet);
-            //myItem = _myErrorMap.insert(myValue);
-        }
-        return 1;
-    } else {
-        return 0;
-    }
-}
-*/
-/*
-void 
-Mesh::updateErrorMap(float theOldValue, float theNewValue, int theIndex) {
-    MAKE_SCOPE_TIMER(updateErrorMap);
-    _myErrors -= eraseErrorMap(theOldValue, theIndex);
-    _myErrors += insertErrorMap(theNewValue, theIndex);
-}
-*/
 void
 Mesh::computeError() {
     MAKE_SCOPE_TIMER(computeError);
@@ -272,11 +190,19 @@ Mesh::check() const {
     MAKE_SCOPE_TIMER(Mesh_check);
     bool mySuccess = true;
     const VectorOfUnsignedInt & myPositions = _myPositions ? *_myPositions : _myPositionIndexNode->nodeValueRef<VectorOfUnsignedInt>();
-    const VectorOfUnsignedInt & myNormals = _myNormals ? *_myNormals : _myNormalIndexNode->nodeValueRef<VectorOfUnsignedInt>();
-    const VectorOfUnsignedInt & myColors = _myColors ? *_myColors : _myColorIndexNode->nodeValueRef<VectorOfUnsignedInt>();
+    const VectorOfUnsignedInt * myNormals = _myNormals ? _myNormals : &_myNormalIndexNode->nodeValueRef<VectorOfUnsignedInt>();
+    const VectorOfUnsignedInt * myColors = _myColors ? _myColors : &_myColorIndexNode->nodeValueRef<VectorOfUnsignedInt>();
     const VectorOfSignedInt & myHalfEdges = _myHalfEdges ? *_myHalfEdges : _myHalfEdgesNode->nodeValueRef<VectorOfSignedInt>();
-    if (!(myColors.size() == myPositions.size()) && (myPositions.size() == myNormals.size()) && (myNormals.size() == myHalfEdges.size())) {
-        AC_WARNING << "Indices node sizes inconsistent! Colors: " << myColors.size() << ", Positions: " << myPositions.size() << ", Normals: " << myNormals.size() << ", HalfEdges: " << myHalfEdges.size();
+    if (myPositions.size() != myHalfEdges.size()) {
+        AC_WARNING << "Indices node sizes inconsistent! Positions: " << myPositions.size() << ", HalfEdges: " << myHalfEdges.size();
+        mySuccess = false;
+    }
+    if (myNormals && myNormals->size() != myPositions.size()) {
+        AC_WARNING << "Indices node sizes inconsistent! Positions: " << myPositions.size() << ", Normals: " << myNormals->size();
+        mySuccess = false;
+    }
+    if (myColors && myColors->size() != myPositions.size()) {
+        AC_WARNING << "Indices node sizes inconsistent! Colors: " << myColors->size() << ", Positions: " << myPositions.size();
         mySuccess = false;
     }
     // Check halfedges connectivity
@@ -288,21 +214,19 @@ Mesh::check() const {
             } else if (myHalfEdges.at(myValue) != i) {
                 mySuccess = false;
                 AC_WARNING << "HalfEdge at " << i << " does point to " << myHalfEdges.at(i) << " but there is reverse connectivity to " << myHalfEdges.at(myHalfEdges.at(i));
-                /*
-                (*_myColors)[i] = 1;
-                (*_myColors)[myHalfEdges.at(i)] = 1;
-                */
             }
         }
     }
 
     // Check position and normals are equal
-    for (int i = 0; i < myPositions.size(); ++i) {
-        if (myPositions[i] != myNormals[i]) {
-            AC_WARNING << "Position at " << i << " is different to its normal position";
-            mySuccess = false;
+    if (myNormals) {
+        for (int i = 0; i < myPositions.size(); ++i) {
+            if (myPositions[i] != (*myNormals)[i]) {
+                AC_WARNING << "Position at " << i << " is different to its normal position";
+                mySuccess = false;
+            }
+            // XXX TODO: Check if myPositions[i] is inside vertices.size()
         }
-        // XXX TODO: Check if myPositions[i] is inside vertices.size()
     }
     AC_INFO << "# of faces: " << myPositions.size() / _myFaceSize; 
     return mySuccess;
@@ -312,8 +236,16 @@ void
 Mesh::lockWrite() {
     if (_myWriteLockCount++ == 0) {
         _myPositions = _myPositionIndexNode->dom::Node::nodeValuePtrOpen<vector<unsigned int> >();
-        _myNormals = _myNormalIndexNode->dom::Node::nodeValuePtrOpen<vector<unsigned int> >();
-        _myColors = _myColorIndexNode->dom::Node::nodeValuePtrOpen<vector<unsigned int> >();
+        if (_myNormalIndexNode) {
+            _myNormals = _myNormalIndexNode->dom::Node::nodeValuePtrOpen<vector<unsigned int> >();
+        } else {
+            _myNormals = 0;
+        }
+        if (_myColorIndexNode) {
+            _myColors = _myColorIndexNode->dom::Node::nodeValuePtrOpen<vector<unsigned int> >();
+        } else {
+            _myColors = 0;
+        }
         _myHalfEdges = _myHalfEdgesNode->dom::Node::nodeValuePtrOpen<vector<signed int> >();
         _myPositionVertices = _myPositionVerticesNode->dom::Node::nodeValuePtrOpen<vector<Vector3f> >();
         _myNormalVertices = _myNormalVerticesNode->dom::Node::nodeValuePtrOpen<vector<Vector3f> >();        
@@ -326,10 +258,14 @@ Mesh::unlockWrite(bool theForceFlag /*= false*/) {
     if (_myWriteLockCount == 1 || theForceFlag) {
         _myPositionIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
         _myPositions = 0;
-        _myNormalIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
-        _myNormals = 0;
-        _myColorIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
-        _myColors = 0;
+        if (_myColorIndexNode) {
+            _myNormalIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
+            _myNormals = 0;
+        }
+        if (_myColorIndexNode) {
+            _myColorIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
+            _myColors = 0;
+        }
         _myHalfEdgesNode->dom::Node::nodeValuePtrClose<vector<signed int> >();
         _myHalfEdges = 0;
         _myPositionVerticesNode->dom::Node::nodeValuePtrClose<vector<Vector3f> >();
@@ -425,8 +361,12 @@ Mesh::edgeCollapse(unsigned thePosition) {
         int myCurrentStar = *i;
         MESH_ASSURE((*_myPositions)[myCurrentStar] == myOldPosition);
         (*_myPositions)[myCurrentStar] = (*_myPositions)[myPos2];
-        (*_myNormals)[myCurrentStar] = (*_myNormals)[myPos2];
-        (*_myColors)[myCurrentStar] = (*_myColors)[myPos2];
+        if (_myNormals) {
+            (*_myNormals)[myCurrentStar] = (*_myNormals)[myPos2];
+        }
+        if (_myColors) {
+            (*_myColors)[myCurrentStar] = (*_myColors)[myPos2];
+        }
     }
     // XXX Possible Test: myOldPosition should now no longer exist in the positions list
     // connect myTwin.next().twin() with myTwin.prev().twin()
@@ -550,8 +490,8 @@ Mesh::collapseByError(float theMaxError) {
 unsigned
 Mesh::deleteIndicesByColor(unsigned int theColor) {
     lockWrite();
-    MESH_ASSURE((_myColors->size() == _myPositions->size()) && (_myPositions->size() == _myNormals->size()) && (_myNormals->size() == _myHalfEdges->size()));
-    AC_TRACE << "Colors: " << _myColors->size() << ", Positions: " << _myPositions->size() << ", Normals: " << _myNormals->size() << ", HalfEdges: " << _myHalfEdges->size();
+    //MESH_ASSURE((_myColors->size() == _myPositions->size()) && (_myPositions->size() == _myNormals->size()) && (_myNormals->size() == _myHalfEdges->size()));
+    //AC_TRACE << "Colors: " << _myColors->size() << ", Positions: " << _myPositions->size() << ", Normals: " << _myNormals->size() << ", HalfEdges: " << _myHalfEdges->size();
 
     int myReverseIndex = _myColors->size()-_myFaceSize;
     int myIndex = 0;
@@ -573,7 +513,9 @@ Mesh::deleteIndicesByColor(unsigned int theColor) {
                     if (myHalfEdgeValue >= 0) {
                         (*_myHalfEdges)[myHalfEdgeValue] = myIndex+i;
                     }
-                    (*_myNormals)[myIndex+i] = (*_myNormals)[myReverseIndex+i];
+                    if (_myNormals) {
+                        (*_myNormals)[myIndex+i] = (*_myNormals)[myReverseIndex+i];
+                    }
                     (*_myPositions)[myIndex+i] = (*_myPositions)[myReverseIndex+i];
                 }
                 myReverseIndex -= _myFaceSize;
@@ -582,11 +524,15 @@ Mesh::deleteIndicesByColor(unsigned int theColor) {
         myIndex += _myFaceSize;
     }
     unsigned myOldSize = _myPositions->size();
-    _myNormals->resize(myIndex);
+    if (_myNormals) {
+        _myNormals->resize(myIndex);
+    }
     _myPositions->resize(myIndex);
     _myHalfEdges->resize(myIndex);
-    _myColors->resize(myIndex);
-    MESH_ASSURE((_myColors->size() == _myPositions->size()) && (_myPositions->size() == _myNormals->size()) && (_myNormals->size() == _myHalfEdges->size()) && (_myHalfEdges->size() == myIndex));
+    if (_myColors) {
+        _myColors->resize(myIndex);
+    }
+    //MESH_ASSURE((_myColors->size() == _myPositions->size()) && (_myPositions->size() == _myNormals->size()) && (_myNormals->size() == _myHalfEdges->size()) && (_myHalfEdges->size() == myIndex));
     unlockWrite();
     return myOldSize - myIndex;
 }

@@ -205,11 +205,11 @@ namespace y60 {
 #endif                    
 
                 AC_INFO << "unlocking data bins";
-                unlockDataBins();
                 if(_myVertexNormalFlag) {
                     AC_INFO << "copying index bins";
                     _myElementBuilder->copyIndexBin(POSITIONS, NORMALS, NORMAL_ROLE);
                 }
+                unlockDataBins();
                 AC_INFO << "done";
                 return myShapeNode;
             }
@@ -258,6 +258,8 @@ namespace y60 {
                     _myNormals = _myNormalNode->dom::Node::nodeValuePtrOpen<std::vector<asl::Vector3f> >();
 					_myNormals->reserve(_myVertexCount);
                     //_myElemen   tBuilder->createIndex(NORMAL_ROLE, NORMALS);
+                } else {
+                    _myNormals = 0;
                 }
 
                 if (_myVertexColorFlag) {
