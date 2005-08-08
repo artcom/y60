@@ -39,6 +39,7 @@ Mesh::Mesh(dom::NodePtr theShapeNode) : _myShapeNode(theShapeNode), _myPositions
 unsigned 
 Mesh::colorize(unsigned int theStartIndex, unsigned theColorIndex) {
     lockWrite();
+    unsigned int myCount = 0;
     if (_myColors) {
         // recursive depth painter
         // XXX Works only for single primitives
@@ -47,7 +48,6 @@ Mesh::colorize(unsigned int theStartIndex, unsigned theColorIndex) {
             AC_ERROR << "Illegal Index " << theStartIndex << ". The Shape has only " << _myPositionIndexNode->nodeValueRef<VectorOfUnsignedInt>().size() << " indices.";
             return 0;
         } 
-        unsigned int myCount = 0;
         list<unsigned int> myToDoList;
         myToDoList.push_back(theStartIndex);
 
