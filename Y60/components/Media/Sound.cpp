@@ -55,7 +55,9 @@ void Sound::setSelf(const SoundPtr& mySelf)
 void Sound::play ()
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    if (!_myFormatContext) {
+    AC_DEBUG << "Sound::play";
+    checkForClose();
+    if (!isOpen()) {
         open();
     }
     _myLockedSelf = _mySelf.lock();
@@ -66,6 +68,7 @@ void Sound::play ()
 void Sound::pause ()
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
+    AC_DEBUG << "Sound::pause";
     _mySampleSink->pause();
     _myLockedSelf = SoundPtr(0);
 }
@@ -73,10 +76,9 @@ void Sound::pause ()
 void Sound::stop ()
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
+    AC_DEBUG << "Sound::stop";
     _mySampleSink->stop();
-    _myBufferCache.clear();
     close();
-    _myDecodingComplete = true;
     _myLockedSelf = SoundPtr(0);
 }
 
@@ -132,6 +134,10 @@ bool Sound::isPlaying() const {
     return (_mySampleSink->getState() == HWSampleSink::RUNNING);
 }
 
+unsigned Sound::getNumUnderruns() const {
+    return _mySampleSink->getNumUnderruns();
+}
+
 void Sound::update(double theTimeSlice) {
     AutoLocker<ThreadLock> myLocker(_myLock);
 
@@ -140,6 +146,7 @@ void Sound::update(double theTimeSlice) {
     double myTimeToBuffer = double(_mySampleSink->getBufferedTime())+
             myBuffersFilledRatio*theTimeSlice+
             (1-myBuffersFilledRatio)*_myMaxUpdateTime;
+    AC_TRACE << "myTimeToBuffer: " << myTimeToBuffer;
     if (_myDecodingComplete) {
         if (isPlaying()) {
             if (_myIsLooping) {
@@ -149,21 +156,24 @@ void Sound::update(double theTimeSlice) {
                     _myBufferCache.pop_front();
                 }
             }
-        } else {
-            _myLockedSelf = SoundPtr(0);
         } 
     } else {
         bool myEOF = false;
-        while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
-            myEOF = decode();
-        }
-        if (myEOF) {
-            if (!_myIsLooping) {
-                _mySampleSink->stop(true);
+        if (isOpen()) {
+            while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
+                AC_TRACE << "decode";
+                myEOF = decode();
             }
-            _myDecodingComplete = true;
+            if (myEOF) {
+                if (!_myIsLooping) {
+                    _mySampleSink->stop(true);
+                }
+                _myDecodingComplete = true;
+                AC_TRACE << "_myDecodingComplete";
+            }
         }
-    }       
+    }
+    checkForClose();
 }
 
 void Sound::open() {
@@ -216,9 +226,21 @@ void Sound::open() {
     AC_INFO << "Sample rate: " << _mySampleRate << endl;
 }
 
+void Sound::checkForClose() {
+    // This function closes the decoder if playback has finished.
+    if (_myDecodingComplete && !isPlaying() && isOpen() && !_myIsLooping) {
+        AC_TRACE << "!isPlaying etc.";
+        close();
+        _myLockedSelf = SoundPtr(0);
+        _myDecodingComplete = false;
+    }
+
+}
+
 void Sound::close() {
     AC_DEBUG << "Sound::close()";
 
+    _myBufferCache.clear();
     if (_myFormatContext) {
         AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
         if (myCodecContext) {
@@ -228,6 +250,10 @@ void Sound::close() {
         _myFormatContext = 0;
         _myStreamIndex = -1;
     }
+}
+
+bool Sound::isOpen() const {
+    return (_myFormatContext != 0);
 }
 
 bool Sound::decode() {

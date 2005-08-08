@@ -49,6 +49,7 @@ class Sound :
         virtual asl::Time getBufferedTime () const;
         virtual bool canSeek () const;
         virtual bool isPlaying() const;
+        virtual unsigned getNumUnderruns() const;
 
         // Interface to Media.
         void update(double theTimeSlice);
@@ -56,6 +57,8 @@ class Sound :
     private:
         void open();
         void close();
+        void checkForClose();
+        bool isOpen() const;
         bool decode();
         void queueSamples(asl::AudioBufferPtr theBuffer);
         

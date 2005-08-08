@@ -10,8 +10,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef INCL_TESTFFMPEG
-#define INCL_TESTFFMPEG
+#ifndef INCL_TESTSOUND
+#define INCL_TESTSOUND
 
 #include <asl/UnitTest.h>
 
@@ -27,11 +27,36 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
-class TestPlay : public UnitTest {
+class SoundTestBase: public UnitTest {
     public:
-        TestPlay(Ptr<Media> myMedia) 
-            : UnitTest("TestPlay"),
-              _myMedia(myMedia)
+        SoundTestBase(const char * myName) 
+            : UnitTest(myName)
+        {  
+            PlugInBasePtr myPlugIn = PlugInManager::get().getPlugIn("y60Media");
+            _myMedia = dynamic_cast_Ptr<Media>(myPlugIn);
+        }
+
+    protected:
+        Ptr<Media> getMedia() {
+            return _myMedia;
+        }
+       
+        void checkTime(SoundPtr theSound, asl::Time theTime) {
+            double myTime = theSound->getCurrentTime();
+            ENSURE(myTime > theTime-0.1 && myTime < theTime+0.2);
+            if (myTime <= theTime-0.1 || myTime >= theTime+0.2) {
+                AC_WARNING << "Time measured: " << myTime << ", time expected: " << theTime;
+            }
+        }
+        
+    private:
+        Ptr<Media> _myMedia;
+};
+
+class TestPlay : public SoundTestBase {
+    public:
+        TestPlay() 
+            : SoundTestBase("TestPlay")
         {  
         }
 
@@ -44,21 +69,18 @@ class TestPlay : public UnitTest {
 
     private:
         void play(const std::string & theURI) {
-            SoundPtr mySound = _myMedia->createSound(theURI);
+            SoundPtr mySound = getMedia()->createSound(theURI);
             mySound->play();
             while(mySound->isPlaying()) {
                 msleep(100);
             }
         }
-    
-        Ptr<Media> _myMedia;
 };
 
-class TestFireAndForget: public UnitTest {
+class TestFireAndForget: public SoundTestBase {
     public:
-        TestFireAndForget(Ptr<Media> myMedia) 
-            : UnitTest("TestFireAndForget"),
-              _myMedia(myMedia)
+        TestFireAndForget() 
+            : SoundTestBase("TestFireAndForget")
         {  
         }
 
@@ -66,139 +88,161 @@ class TestFireAndForget: public UnitTest {
             Time myDuration;
             {
                 SoundPtr mySound = 
-                        _myMedia->createSound("../../testfiles/stereotest441.wav");
+                        getMedia()->createSound("../../testfiles/stereotest441.wav");
                 mySound->play();
                 myDuration = mySound->getDuration();
             }
             msleep(unsigned(myDuration*1000)+200);
-            ENSURE(_myMedia->getNumSounds() == 0);
+            ENSURE(getMedia()->getNumSounds() == 0);
         }
-
-    private:
-        Ptr<Media> _myMedia;
 };
 
 
-class TestTwoSounds: public UnitTest {
+class TestTwoSounds: public SoundTestBase {
     public:
-        TestTwoSounds(Ptr<Media> myMedia) 
-            : UnitTest("TestTwoSounds"),
-              _myMedia(myMedia)
+        TestTwoSounds() 
+            : SoundTestBase("TestTwoSounds")
         {  
         }
 
         void run() {
             Time myDuration;
-            SoundPtr mySound = _myMedia->createSound("../../testfiles/aussentuer.mp3");
+            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
             mySound->play();
             myDuration = mySound->getDuration();
-            mySound = _myMedia->createSound("../../testfiles/stereotest441.wav");
+            mySound = getMedia()->createSound("../../testfiles/stereotest441.wav");
             mySound->play();
             myDuration = maximum(myDuration, mySound->getDuration());
             msleep(unsigned(myDuration*1000));
         }
-
-    private:
-        Ptr<Media> _myMedia;
 };
 
-class TestStopAll: public UnitTest {
+class TestStopAll: public SoundTestBase {
     public:
-        TestStopAll(Ptr<Media> myMedia) 
-            : UnitTest("TestStopAll"),
-              _myMedia(myMedia)
+        TestStopAll() 
+            : SoundTestBase("TestStopAll")
         {  
         }
 
         void run() {
             {
-                SoundPtr mySound = _myMedia->createSound("../../testfiles/aussentuer.mp3");
+                SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
                 mySound->play();
-                mySound = _myMedia->createSound("../../testfiles/stereotest441.wav");
+                mySound = getMedia()->createSound("../../testfiles/stereotest441.wav");
                 mySound->play();
             }
             msleep(700);
-            _myMedia->stopAll();
-            ENSURE(_myMedia->getNumSounds() == 0);
+            getMedia()->stopAll();
+            ENSURE(getMedia()->getNumSounds() == 0);
         }
-
-    private:
-        Ptr<Media> _myMedia;
 };
 
-class TestStop: public UnitTest {
+class TestStop: public SoundTestBase {
     public:
-        TestStop(Ptr<Media> myMedia) 
-            : UnitTest("TestStop"),
-              _myMedia(myMedia)
+        TestStop() 
+            : SoundTestBase("TestStop")
         {  
         }
 
         void run() {
-            SoundPtr mySound = _myMedia->createSound("../../testfiles/aussentuer.mp3");
+            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
             mySound->play();
             msleep(200);
-            double myTime = mySound->getCurrentTime();
-            ENSURE(myTime > 0.1 && myTime < 0.3);
+            checkTime(mySound, 0.2);
             
             mySound->stop();
             msleep(100);
-            myTime = mySound->getCurrentTime();
-            ENSURE(myTime < 0.001);
+            checkTime(mySound, 0);
             
             mySound->play();
-            myTime = mySound->getCurrentTime();
             msleep(200);
-            myTime = mySound->getCurrentTime();
-            ENSURE(myTime > 0.1 && myTime < 0.3);
+            checkTime(mySound, 0.2);
 
             mySound->stop();
-        }
 
-     private:
-        Ptr<Media> _myMedia;
+            mySound->play();
+            mySound->stop();
+
+            ENSURE(mySound->getNumUnderruns() == 0);
+        }
 };
 
-class TestPause: public UnitTest {
+class TestStopByItself: public SoundTestBase {
     public:
-        TestPause(Ptr<Media> myMedia) 
-            : UnitTest("TestPause"),
-              _myMedia(myMedia)
+        TestStopByItself() 
+            : SoundTestBase("TestStopByItself")
         {  
         }
-       
+
         void run() {
-            SoundPtr mySound = _myMedia->createSound("../../testfiles/aussentuer.mp3");
+            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
             mySound->play();
-            msleep(200);
-            double myTime = mySound->getCurrentTime();
-            ENSURE(myTime > 0.1 && myTime < 0.3);
-            mySound->pause();
-            msleep(400);
-            myTime = mySound->getCurrentTime();
-            ENSURE(myTime > 0.1 && myTime < 0.3);
-            mySound->play();
-            myTime = mySound->getCurrentTime();
-            ENSURE(myTime > 0.1 && myTime < 0.3);
             while(mySound->isPlaying()) {
                 msleep(100);
             }
-        }
+            
+            mySound->play();
+            msleep(100);
+            mySound->stop();
 
-    private:
-        Ptr<Media> _myMedia;
+            ENSURE(mySound->getNumUnderruns() == 0);
+        }
 };
 
-class TestLoop: public UnitTest {
+class TestPause: public SoundTestBase {
     public:
-        TestLoop(Ptr<Media> myMedia) 
-            : UnitTest("TestLoop"),
-              _myMedia(myMedia)
+        TestPause() 
+            : SoundTestBase("TestPause")
         {  
         }
        
         void run() {
-            SoundPtr mySound = _myMedia->createSound("../../testfiles/aussentuer.mp3", true);
+            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
+            mySound->play();
+            msleep(200);
+            checkTime(mySound, 0.2);
+            mySound->pause();
+            msleep(400);
+            checkTime(mySound, 0.2);
+            mySound->play();
+            checkTime(mySound, 0.2);
+            while(mySound->isPlaying()) {
+                msleep(100);
+            }
+            ENSURE(mySound->getNumUnderruns() == 0);
+
+            mySound->play();
+            msleep(200);
+            mySound->pause();
+            msleep(100);
+            checkTime(mySound, 0.3);
+            mySound->stop();
+            checkTime(mySound, 0);
+
+            mySound->play();
+            mySound->pause();
+            msleep(100);
+            checkTime(mySound, 0);
+            mySound->stop();
+
+            mySound->play();
+            msleep(200);
+            mySound->pause();
+            mySound->stop();
+
+            ENSURE(mySound->getNumUnderruns() == 0);
+        }
+};
+
+class TestLoop: public SoundTestBase {
+    public:
+        TestLoop() 
+            : SoundTestBase("TestLoop")
+        {  
+        }
+       
+        void run() {
+            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3", true);
             mySound->play();
             msleep(3000);
             double myTime = mySound->getCurrentTime();
@@ -213,22 +257,18 @@ class TestLoop: public UnitTest {
             ENSURE(myTime > 3.5 && myTime < 5.5);
             mySound->stop();
         }
-
-    private:
-        Ptr<Media> _myMedia;
 };
 
-class TestVolume: public UnitTest {
+class TestVolume: public SoundTestBase {
     public:
-        TestVolume(Ptr<Media> myMedia) 
-            : UnitTest("TestVolume"),
-              _myMedia(myMedia)
+        TestVolume() 
+            : SoundTestBase("TestVolume")
         {  
         }
        
         void run() {
             {   // Sound volume 
-                SoundPtr mySound = _myMedia->createSound("../../testfiles/aussentuer.mp3");
+                SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
                 mySound->setVolume(0.2f);
                 mySound->play();
                 msleep(200);
@@ -241,30 +281,26 @@ class TestVolume: public UnitTest {
                 mySound->stop();
             }
             {   // Global volume
-                SoundPtr mySound = _myMedia->createSound("../../testfiles/aussentuer.mp3");
-                _myMedia->setVolume(0.2f);
+                SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
+                getMedia()->setVolume(0.2f);
                 mySound->play();
                 msleep(200);
-                _myMedia->setVolume(0.5f);
+                getMedia()->setVolume(0.5f);
                 msleep(200);
-                ENSURE(almostEqual(_myMedia->getVolume(), 0.5));
-                _myMedia->fadeToVolume(1, 0.3f);
+                ENSURE(almostEqual(getMedia()->getVolume(), 0.5));
+                getMedia()->fadeToVolume(1, 0.3f);
                 msleep(400);
-                ENSURE(almostEqual(_myMedia->getVolume(), 1));
+                ENSURE(almostEqual(getMedia()->getVolume(), 1));
                 mySound->stop();
             }
             
         }
-
-    private:
-        Ptr<Media> _myMedia;
 };
 
-class StressTest: public UnitTest {
+class StressTest: public SoundTestBase {
     public:
-        StressTest(Ptr<Media> myMedia, double myDuration) 
-            : UnitTest("StressTest"),
-              _myMedia(myMedia),
+        StressTest(double myDuration) 
+            : SoundTestBase("StressTest"),
               _myDuration(myDuration)
         {  
         }
@@ -272,7 +308,7 @@ class StressTest: public UnitTest {
         void run() {
             Time myStartTime;
             while(double(Time())-myStartTime < _myDuration) { 
-                SoundPtr mySound = _myMedia->createSound
+                SoundPtr mySound = getMedia()->createSound
                         ("../../testfiles/stereotest441.wav", false);
                 mySound->setVolume(0.2f);
                 mySound->play();
@@ -285,12 +321,11 @@ class StressTest: public UnitTest {
 
     private:
         double _myDuration;
-        Ptr<Media> _myMedia;
 };
 
-class FFMpegTestSuite : public UnitTestSuite {
+class SoundTestSuite : public UnitTestSuite {
     public:
-        FFMpegTestSuite(const char * myName, bool myUseDummyPump) 
+        SoundTestSuite(const char * myName, bool myUseDummyPump) 
             : UnitTestSuite(myName),
               _myUseDummyPump (myUseDummyPump)
         {}
@@ -309,15 +344,18 @@ class FFMpegTestSuite : public UnitTestSuite {
 #endif
             myMedia->setAppConfig(44100, 2, _myUseDummyPump);
 
-            addTest(new TestPlay(myMedia));
-            addTest(new TestFireAndForget(myMedia));
-            addTest(new TestTwoSounds(myMedia));
-            addTest(new TestPause(myMedia));
-            addTest(new TestStop(myMedia));
-            addTest(new TestStopAll(myMedia));
-            addTest(new TestLoop(myMedia));
-            addTest(new TestVolume(myMedia));
-            addTest(new StressTest(myMedia, 5));
+            addTest(new TestPlay());
+            addTest(new TestFireAndForget());
+            addTest(new TestTwoSounds());
+            addTest(new TestStop());
+            addTest(new TestStopByItself());
+            
+            addTest(new TestPause());
+            
+            addTest(new TestStopAll());
+            addTest(new TestLoop());
+            addTest(new TestVolume());
+            addTest(new StressTest(5));
 
             // 24 Hour test :-).
 //            addTest(new StressTest(myMedia, 60*60*24));

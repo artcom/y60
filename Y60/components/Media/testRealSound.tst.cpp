@@ -9,7 +9,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "TestFFMpeg.h"
+#include "TestSound.h"
 
 #include <asl/Pump.h>
 #include <asl/Dashboard.h>
@@ -20,7 +20,7 @@ using namespace asl;
 int main(int argc, char *argv[])
 {
     Dashboard::get();  // Make sure the dashboard gets deleted after the pumps.
-    FFMpegTestSuite mySuite(argv[0], false);
+    SoundTestSuite mySuite(argv[0], false);
 
     try {
         mySuite.run();
