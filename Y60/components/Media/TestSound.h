@@ -145,7 +145,13 @@ class TestStop: public SoundTestBase {
         }
 
         void run() {
-            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
+            runLoop(false);
+            runLoop(true);
+        }
+        
+    private:
+        void runLoop(bool theLoop) {
+            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3", theLoop);
             mySound->play();
             msleep(200);
             checkTime(mySound, 0.2);
@@ -211,6 +217,13 @@ class TestPause: public SoundTestBase {
             }
             ENSURE(mySound->getNumUnderruns() == 0);
 
+            runLoop(false);
+            runLoop(true);
+        }
+        
+    private:
+        void runLoop(bool theLoop) {
+            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3", theLoop);
             mySound->play();
             msleep(200);
             mySound->pause();
@@ -343,20 +356,21 @@ class SoundTestSuite : public UnitTestSuite {
             myMedia->setSysConfig(0.02, "");
 #endif
             myMedia->setAppConfig(44100, 2, _myUseDummyPump);
-
+/*
             addTest(new TestPlay());
             addTest(new TestFireAndForget());
             addTest(new TestTwoSounds());
+*/            
             addTest(new TestStop());
             addTest(new TestStopByItself());
             
             addTest(new TestPause());
-            
+/*
             addTest(new TestStopAll());
             addTest(new TestLoop());
             addTest(new TestVolume());
             addTest(new StressTest(5));
-
+*/
             // 24 Hour test :-).
 //            addTest(new StressTest(myMedia, 60*60*24));
         }
