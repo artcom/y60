@@ -69,7 +69,6 @@ private:
     dom::NodePtr                    _myVertexDataNode;
     dom::NodePtr                    _myPositionVerticesNode;
     dom::NodePtr                    _myNormalVerticesNode;
-    //std::vector<dom::NodePtr>       _myIndexNodes;
     EdgeListPtr                     _myEdgeList;
 
     std::vector<asl::Vector3f> *    _myNormalVertices;

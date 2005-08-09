@@ -16,10 +16,6 @@ namespace y60 {
 Mesh::Mesh(dom::NodePtr theShapeNode) : _myShapeNode(theShapeNode), _myPositions(0), _myNormals(0), _myColors(0), _myHalfEdges(0), _myWriteLockCount(0), _myEdgeList(0), _myMaxError(0.0), _mySimplifyMode(false), _myNormalVerticesNode(0)  {
     _myElementsNode = theShapeNode->childNode(PRIMITIVE_LIST_NAME)->childNode(ELEMENTS_NODE_NAME);
     _myHalfEdgesNode = _myElementsNode->childNode(HALFEDGES_NODE_NAME);
-    //_myIndexNodes.push_back(_myHalfEdgesNode);
-    //for (int i = 0; i < _myElementsNode->childNodesLength(); ++i) {
-    //    _myIndexNodes.push_back(_myElementsNode->childNode(i));
-    //}
 
     _myColorIndexNode = _myElementsNode->childNodeByAttribute(VERTEX_INDICES_NAME, VERTEX_DATA_ROLE_ATTRIB, COLOR_ROLE);
     _myNormalIndexNode = _myElementsNode->childNodeByAttribute(VERTEX_INDICES_NAME, VERTEX_DATA_ROLE_ATTRIB, NORMAL_ROLE);
@@ -255,6 +251,7 @@ Mesh::lockWrite() {
         _myPositionVertices = _myPositionVerticesNode->dom::Node::nodeValuePtrOpen<vector<Vector3f> >();
         _myNormalVertices = _myNormalVerticesNode->dom::Node::nodeValuePtrOpen<vector<Vector3f> >();        
         _myEdgeList = EdgeListPtr(new EdgeList(*_myHalfEdges, *_myPositions));
+
     }
 }
 
@@ -624,7 +621,6 @@ Mesh::colorSweptSphere(const asl::Sphere<float> & theSphere,
 
 void 
 Mesh::notifyProgress(double theProgress, const std::string & theMessage) {
-    //cerr << "progress = " << theProgress << endl;
     _myProgressSignal.emit(theProgress, Glib::ustring(theMessage));
 }
 
