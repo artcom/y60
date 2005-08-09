@@ -47,6 +47,12 @@ namespace jslib {
             static bool getQuitFlag();
             void setStrictFlag(bool theStrictFlag);
             void setJSVersion(int theVersion);
+            static void setProgramName(const std::string & theProgramName) {
+                _myProgramName = theProgramName;
+            }
+            static const std::string & getProgramName() {
+                return _myProgramName;
+            }
             JSRuntime * initialize();
             void shutdown();
             static void ShellErrorReporter(JSContext *cx, const char *message,
@@ -65,6 +71,7 @@ namespace jslib {
 
             bool   ourStrictFlag;
             int    ourJSVersion;
+            static std::string _myProgramName;
     };
 }
 #endif

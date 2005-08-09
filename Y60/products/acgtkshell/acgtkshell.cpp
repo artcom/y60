@@ -140,7 +140,7 @@ acMain(int argc, char **argv) {
             for (unsigned i=1; i<myArgCount; ++i) {
                 myScriptArgs.push_back(ourArguments.getArgument(i));
             }
-
+            myApp.setProgramName(ourArguments.getProgramName());
             rv = myApp.run(myFilename, myScriptArgs);
         }
     } catch (asl::Exception & ex) {

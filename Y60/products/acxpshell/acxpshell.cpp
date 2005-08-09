@@ -123,6 +123,7 @@ main(int argc, char **argv) {
             AC_FATAL << SDL_GetError() << endl;
             rv = 1;
         } else {
+            myApp.setProgramName(ourArguments.getProgramName());
             rv = myApp.run(myFilename, myScriptArgs);
             SDL_Quit();
         }

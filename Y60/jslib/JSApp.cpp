@@ -82,7 +82,7 @@ JSBool reportWarnings = JS_TRUE;
 std::string ourIncludePath;
 std::string ourTopScriptFilename;
 
-// PackageManagerPtr JSApp::ourPackageManager(new PackageManager());
+std::string JSApp::_myProgramName;
 
 JSApp::JSApp() : ourStrictFlag(false), ourJSVersion(0)
 {}
@@ -1131,6 +1131,14 @@ getDocumentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 }
 
 static JSBool
+GetProgramName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("returns the name of the executable, e.g. acxpshellOPT.exe");
+    DOC_END;
+    *rval = as_jsval(cx, JSApp::getProgramName());
+    return JS_TRUE;
+}
+
+static JSBool
 createUniqueId(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns an almost universally unique node id");
     DOC_END;
@@ -1352,6 +1360,7 @@ static JSFunctionSpec glob_functions[] = {
     {"fileExists",      FileExists,     1},
     {"getBaseName",     GetBaseName,    1},
     {"getDirName",      GetDirName,     1},
+    {"getProgramName",  GetProgramName, 0},
     {"hostname",        HostName,       1},
     {"expandEnvironment", ExpandEnvironment, 1},
     {"includePath",     IncludePath,    1},
