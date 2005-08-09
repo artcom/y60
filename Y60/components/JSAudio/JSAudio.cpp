@@ -50,7 +50,7 @@ checkArguments(const string & theMethodName, uintN argc, jsval *argv, unsigned t
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Prints 'JSAudio'. :)");
     DOC_END;
     std::string myStringRep = "JSAudio";
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());

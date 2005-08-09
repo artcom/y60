@@ -72,6 +72,7 @@ namespace jslib {
         DOC_TYPE_ARRAY, // js-array
         DOC_TYPE_VECTOR2F,
         DOC_TYPE_VECTOR3F,
+        DOC_TYPE_VECTOR4F,
         DOC_TYPE_POINT3F,
         DOC_TYPE_QUATERNIONF,
         DOC_TYPE_MATRIX4F,
@@ -91,7 +92,7 @@ namespace jslib {
     static const std::string DocTypeDescription[] = {
         "__intern__",
         "string", "integer", "float", "boolean", "enumeration", "array",
-        "Vector2", "Vector3", "Point", "Quaternion", "Matrix", "Box",
+        "Vector2", "Vector3", "Vector4", "Point", "Quaternion", "Matrix", "Box",
         "Line", "Ray", "LineSegment", "Plane", "Triangle", "Sphere", "Frustum",
         "Node", "NodeList", "Object"
     };
