@@ -24,7 +24,8 @@ class AudioTimeSource {
     public:
         AudioTimeSource(unsigned myInitialDelay, unsigned mySampleRate);
         virtual ~AudioTimeSource();
-        
+      
+        void setCurrentTime(asl::Time theTime);
         virtual Time getCurrentTime();
 
     protected:
@@ -39,7 +40,9 @@ class AudioTimeSource {
         asl::Time _mySysTimeAtLastBuffer;
         unsigned _myInitialDelay;
         unsigned _mySampleRate;
-
+    
+        asl::Time _myGlobalTimeOffset;
+        
         bool _myRunning;
 };
 

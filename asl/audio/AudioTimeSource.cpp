@@ -21,11 +21,19 @@ AudioTimeSource::AudioTimeSource(unsigned myInitialDelay, unsigned mySampleRate)
       _mySysTimeAtLastBuffer(0),
       _myInitialDelay(myInitialDelay),
       _myRunning(false),
-      _mySampleRate(mySampleRate)
+      _mySampleRate(mySampleRate),
+      _myGlobalTimeOffset(0)
 {
 }
 
 AudioTimeSource::~AudioTimeSource() {
+}
+
+void AudioTimeSource::setCurrentTime(asl::Time theTime) {
+    AutoLocker<ThreadLock> myLocker(_myTimeLock);
+    _myGlobalTimeOffset = theTime;
+    _mySentFrames = 0;
+    _mySysTimeAtLastBuffer = Time();
 }
 
 Time AudioTimeSource::getCurrentTime() {
@@ -37,10 +45,10 @@ Time AudioTimeSource::getCurrentTime() {
         }
         AutoLocker<ThreadLock> myLocker(_myTimeLock);
         double myTimeOffset = Time()-_mySysTimeAtLastBuffer;
-        return double(_mySentFrames)/_mySampleRate+myTimeOffset;
+        return double(_mySentFrames)/_mySampleRate+myTimeOffset+_myGlobalTimeOffset;
     } else {
         AutoLocker<ThreadLock> myLocker(_myTimeLock);
-        return double(_mySentFrames)/_mySampleRate;
+        return double(_mySentFrames)/_mySampleRate+_myGlobalTimeOffset;
     }
         
 }
@@ -48,6 +56,7 @@ Time AudioTimeSource::getCurrentTime() {
 void AudioTimeSource::stop() {
     AutoLocker<ThreadLock> myLocker(_myTimeLock);
     _mySentFrames = 0;
+    _myGlobalTimeOffset = 0;
     _myRunning = false;
 }
 
