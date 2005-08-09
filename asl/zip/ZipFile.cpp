@@ -20,6 +20,7 @@
 #include "unzip.h"
 #include "zlib.h"
 #include "ioapi.h"
+#include <asl/Logger.h>
 
 #include <string>
 
@@ -35,6 +36,7 @@ namespace asl {
 ZipFile::ZipFile(const char *  theInputFileName) : _myInputStream(0)
 {
     _myInputStream = unzOpen(theInputFileName);
+    AC_DEBUG << "opening " << theInputFileName;
     if (_myInputStream == 0) {
         throw ZipFileException(string("can't open zip file '") + theInputFileName + "'",
                 PLUS_FILE_LINE);
@@ -44,7 +46,8 @@ ZipFile::ZipFile(const char *  theInputFileName) : _myInputStream(0)
 
 ZipFile::~ZipFile() {
     if (_myInputStream) {
-        unzCloseCurrentFile(_myInputStream);
+        int retVal = unzClose(_myInputStream);
+        AC_DEBUG << "closing zip file returns " << retVal;
     }
 }
 
