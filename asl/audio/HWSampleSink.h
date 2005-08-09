@@ -97,6 +97,7 @@ class HWSampleSink: public AudioTimeSource
         unsigned getBytesPerFrame() const;
 
     private:
+        void changeState(State newState);
         AudioBufferBase* getNextBuffer();
         void setMarker(AudioBufferBase& theBuffer, float theValue);
         // _myQueueLock is locked on write access to buffer queue and whenver data needed

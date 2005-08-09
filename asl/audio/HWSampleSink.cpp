@@ -28,7 +28,7 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
       _myStopWhenEmpty(false),
       _numChannels(numChannels)
 {
-    AC_DEBUG << "HWSampleSink";
+    AC_DEBUG << "HWSampleSink::HWSampleSinkPtr (" << _myName << ")";
     _myName = myName;
     _mySampleFormat = mySampleFormat;
     _mySampleRate = mySampleRate;
@@ -41,7 +41,7 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
     _myFrameCount = 0;
     _myVolume = 1;
     _myVolumeFader = Ptr<VolumeFader>(new VolumeFader(_mySampleFormat));
-    _myState = STOPPED;
+    changeState(STOPPED);
     _numChannels = numChannels;
     _myBackupBuffer = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 32, 
                 _numChannels, _mySampleRate));
@@ -50,7 +50,7 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
 }
 
 HWSampleSink::~HWSampleSink() {
-    AC_DEBUG << "~HWSampleSink";
+    AC_DEBUG << "~HWSampleSink (" << _myName << ")";
     if (_myState != STOPPED) {
         AC_WARNING << "Deleting SampleSink that's still running!";
     }
@@ -58,7 +58,7 @@ HWSampleSink::~HWSampleSink() {
         AC_WARNING << _numUnderruns << " underruns in SampleSink for " << _myName << endl;
     }
     Pump::get().removeSampleSink(_mySelf);
-    AC_DEBUG << "~HWSampleSink end";
+    AC_DEBUG << "~HWSampleSink end (" << _myName << ")";
 }
 
 void HWSampleSink::setSelf(const HWSampleSinkPtr& mySelf)
@@ -68,7 +68,7 @@ void HWSampleSink::setSelf(const HWSampleSinkPtr& mySelf)
 }
 
 void HWSampleSink::play() {
-    AC_DEBUG << "HWSampleSink::play";
+    AC_DEBUG << "HWSampleSink::play (" << _myName << ")";
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     if (_myState != RUNNING) {
         _myLockedSelf = _mySelf.lock();
@@ -76,7 +76,7 @@ void HWSampleSink::play() {
         if (_myBufferQueue.empty()) {
             AC_WARNING << "HWSampleSink: Play called, but no buffers are queued.";
         }
-        _myState = RUNNING;
+        changeState(RUNNING);
         _myStopWhenEmpty = false;
         AudioTimeSource::run();
     } else {
@@ -86,9 +86,9 @@ void HWSampleSink::play() {
 
 void HWSampleSink::pause() {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    AC_DEBUG << "HWSampleSink::pause";
+    AC_DEBUG << "HWSampleSink::pause (" << _myName << ")";
     if (_myState == RUNNING) {
-        _myState = PAUSING_FADE_OUT;
+        changeState(PAUSING_FADE_OUT);
         _myVolumeFader->setVolume(0);
     } else {
         AC_DEBUG << "HWSampleSink::pause: Pause received in state " << 
@@ -98,8 +98,9 @@ void HWSampleSink::pause() {
 
 void HWSampleSink::stop(bool theRunUntilEmpty) {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    AC_DEBUG << "HWSampleSink::stop";
+    AC_DEBUG << "HWSampleSink::stop (" << _myName << ")";
     if (theRunUntilEmpty) {
+//        cerr << "RunUntilEmpty" << endl;
         if (_myState == RUNNING) {
             _myStopWhenEmpty = true;
         } else {
@@ -107,18 +108,23 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
                     stateToString(getState()) << ". Ignored.";
         }
     } else {
+//        cerr << "!RunUntilEmpty" << endl;
         switch(_myState) {
             case RUNNING:
-                _myState = STOPPING_FADE_OUT;
+//                cerr << "Running" << endl;
+                changeState(STOPPING_FADE_OUT);
                 _myVolumeFader->setVolume(0);
+                _myStopWhenEmpty = false;
                 break;
             case PAUSING_FADE_OUT:
-                _myState = STOPPING_FADE_OUT;
+                changeState(STOPPING_FADE_OUT);
+                _myStopWhenEmpty = false;
                 break;
             case PAUSING_SILENT:
             case PAUSED:
-                _myState = STOPPING_SILENT;
+                changeState(STOPPING_SILENT);
                 AudioTimeSource::stop();
+                _myStopWhenEmpty = false;
                 break;
             default:
                 AC_DEBUG << "HWSampleSink::stop: stop received in state " << 
@@ -301,11 +307,11 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
     // Check if fadeouts are finished. Can't stop here because that could result in
     // a delete of the current sink. That in turn would garble the Pump's mix loop.
     if (_myState == STOPPING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) {
-        _myState = STOPPING_SILENT;
+        changeState(STOPPING_SILENT);
         AudioTimeSource::stop();
     }
     if (_myState == PAUSING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) {
-        _myState = PAUSING_SILENT;
+        changeState(PAUSING_SILENT);
         AudioTimeSource::pause();
     }
     AC_TRACE << "HWSampleSink::~deliverData";
@@ -313,14 +319,15 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
 
 void HWSampleSink::reallyStop() {
     AC_DEBUG << "reallyStop";
+    AutoLocker<ThreadLock> myLocker(_myQueueLock);
     switch (_myState) {
         case STOPPING_SILENT:
-            _myState = STOPPED;
+            changeState(STOPPED);
             _myBufferQueue.clear();
             _myPosInInputBuffer = 0;
             break;
         case PAUSING_SILENT:
-            _myState = PAUSED;
+            changeState(PAUSED);
             break;
         default:
             AC_WARNING << "HWSampleSink::reallyStop: Illegal state";
@@ -356,19 +363,27 @@ void HWSampleSink::lock() {
 void HWSampleSink::unlock() {
     _myQueueLock.unlock();
 }
+        
+void HWSampleSink::changeState(State newState) {
+    AC_DEBUG << "HWSampleSink ( " << _myName <<"): " << stateToString(_myState) << " -> "
+        << stateToString(newState);
+    _myState = newState;
+}
 
 AudioBufferBase* HWSampleSink::getNextBuffer() {
     ASSURE_MSG(getState() != STOPPED,
             "HWSampleSink::getNextBuffer() should not be called when the sink isn't active.");
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     if (_myBufferQueue.empty()) {
-        if (_myStopWhenEmpty) {
-            _myState = STOPPING_SILENT;
-            AudioTimeSource::stop();
-        } else {
-            _numUnderruns++;
-            if (_numUnderruns == 1) {
-                AC_DEBUG << "Underrun for sample sink " << _myName;
+        if (_myState != STOPPING_SILENT) {
+            if (_myStopWhenEmpty) {
+                changeState(STOPPING_SILENT);
+                AudioTimeSource::stop();
+            } else {
+                _numUnderruns++;
+                if (_numUnderruns == 1) {
+                    AC_DEBUG << "Underrun for sample sink " << _myName;
+                }
             }
         }
         _isUsingBackupBuffer = true;

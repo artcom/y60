@@ -38,7 +38,6 @@ void TestPump::runWithPump(bool useDummyPump) {
 
         // Test different buffer sizes.
 //        playSingleSound(32768);
-
         playSingleSound(8);            
         playSingleSound(19);   
         playSingleSound(256);  
