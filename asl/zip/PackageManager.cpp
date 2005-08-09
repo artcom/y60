@@ -40,8 +40,32 @@ PackageManager::add(IPackagePtr thePackage) {
         }
     }
 
-    AC_TRACE << "adding Package '" << thePackage->getPath() << "'";
+    AC_DEBUG << "adding Package '" << thePackage->getPath() << "'";
     _myPackages.push_front(thePackage);
+}
+
+bool 
+PackageManager::remove(IPackagePtr thePackage) {
+    for (PackageList::iterator it=_myPackages.begin(); it!=_myPackages.end(); ++it) {
+        if ((*it)->getPath() == thePackage->getPath()) {
+            _myPackages.erase(it);
+            AC_DEBUG << "Package '" << thePackage->getPath() << "' has been removed.";
+            return true;
+        }
+    }
+    return false;
+}
+
+bool 
+PackageManager::remove(const std::string & thePackageName) {
+    for (PackageList::iterator it=_myPackages.begin(); it!=_myPackages.end(); ++it) {
+        if ((*it)->getPath() == thePackageName) {
+            _myPackages.erase(it);
+            AC_DEBUG << "Package '" << thePackageName << "' has been removed.";
+            return true;
+        }
+    }
+    return false;
 }
 
 void

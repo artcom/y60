@@ -48,11 +48,22 @@ class PackageManager {
         /// add a package to the package manager
         void add(IPackagePtr thePackage);
 
+        /// removes a package from the package manager
+        /** @returns true if the package has been removed
+         */
+        bool remove(IPackagePtr thePackage);
+
+        /// removes a package from the package manager
+        /**    @param thePackageName the name of the directory or zip-file to remove
+               @returns true if the package has been removed
+         */
+        bool remove(const std::string & thePackageName);
+
         /// add multiple directorys and/or zip files to the package manager.
         /** Automatically creates DirectoryPackages or ZipPackages and adds them.
-            @param thePaths a semicolon-delimited list of directorys or zip-files
+            @param thePackageNames a semicolon-delimited list of directorys or zip-files
         */
-        void add(const std::string & thePackageName);
+        void add(const std::string & thePackageNames);
 
         /// adds the contents of other PackageManager.
         /** All packages contained in theOther are also added to this.

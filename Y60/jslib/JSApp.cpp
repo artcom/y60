@@ -387,6 +387,25 @@ IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+RemovePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("removes the given path from the include path.");
+    DOC_PARAM("thePath", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        if (!argc)
+            return JS_TRUE;
+
+        string myIncludePath;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myIncludePath)) {
+            JS_ReportError(cx, "removePath(): argument #1 must be a string. (the path)");
+            return JS_FALSE;
+        }
+        JSApp::getPackageManager()->remove(myIncludePath);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 listFiles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages \
 and returns all files in theRelativePath. If theRelativePath is a file it returns theRelativePath.");
@@ -1330,6 +1349,7 @@ static JSFunctionSpec glob_functions[] = {
     {"hostname",        HostName,       1},
     {"expandEnvironment", ExpandEnvironment, 1},
     {"includePath",     IncludePath,    1},
+    {"removePath",      RemovePath,    1},
     {"listFiles",       listFiles,      2},
     {"getWholeFile",    GetWholeFile,   1},
     {"getDocumentation", getDocumentation, 0},

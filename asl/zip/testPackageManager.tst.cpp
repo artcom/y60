@@ -121,7 +121,13 @@ class PackageManagerUnitTest : public UnitTest {
                 myPackageManager.add("../../testfiles/testdir");
                 myEntries = myPackageManager.listFiles("subdir1", "../../testfiles/testdir");
                 ENSURE(myEntries.size() == 1);
-            }   
+            }  
+            ENSURE(!myPackageManager.searchFile("testfiles/test.zip").empty())
+            ENSURE(myPackageManager.remove("../.."));
+            ENSURE(myPackageManager.remove("../../testfiles"));
+            ENSURE(myPackageManager.remove("../../testfiles/test.zip"));
+            ENSURE(myPackageManager.remove(""));
+            ENSURE(myPackageManager.searchFile("testfiles/test.zip").empty());
         }
 };
 
