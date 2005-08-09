@@ -463,7 +463,7 @@ main(int argc, char* argv[] ) {
     ourArguments.parse(argc, argv);
     std::string myRevision="$Revision$";
     myRevision.erase(0, 1);
-    myRevision.erase(myRevision.size()-1, 1);
+    myRevision.erase(myRevision.size()-2, 2);
 
     AC_PRINT << ourArguments.getProgramName() << " Copyright (C) 2003-2005 ART+COM";
     AC_INFO << "Build date " << __DATE__;

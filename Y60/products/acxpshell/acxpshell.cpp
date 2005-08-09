@@ -27,8 +27,7 @@
 #include <asl/DirectoryPackage.h>
 #include <asl/string_functions.h>
 #include <asl/os_functions.h>
-
-#include <y60/Revision.h>
+#include <asl/Revision.h>
 
 #include <iostream>
 
@@ -63,7 +62,18 @@ main(int argc, char **argv) {
 
         AC_PRINT << ourArguments.getProgramName() << " Copyright (C) 2003-2005 ART+COM";
         AC_INFO << "Build date " << __DATE__ << " " << __TIME__;
-        AC_INFO << "Revision: " << y60::ourRevision;
+        AC_INFO << "Revision: " << asl::ourRevision;
+
+        if (ourArguments.haveOption("--version")) {
+            AC_PRINT << "build on " << __DATE__ << " at " << __TIME__
+                     << " (Rev: " << asl::ourRevision << ")";
+            return 0;
+        }
+
+        if (ourArguments.haveOption("--revision")) {
+            AC_PRINT << "Revision: " << asl::ourRevision;
+            return 0;
+        }
 
         // look in AC_TEXTURE_DIR if set
         std::string myTextureDirs = asl::expandEnvironment("${AC_TEXTURE_DIR}");
@@ -85,17 +95,6 @@ main(int argc, char **argv) {
         }
 
         myApp.setStrictFlag(true);
-
-        if (ourArguments.haveOption("--version")) {
-            AC_PRINT << "build on " << __DATE__ << " at " << __TIME__
-                     << " (Rev: " << y60::ourRevision << ")";
-            exit(0);
-        }
-
-        if (ourArguments.haveOption("--revision")) {
-            AC_PRINT << "Revision: " << y60::ourRevision;
-            exit(0);
-        }
 
         if (ourArguments.haveOption("--jsversion")) {
             myApp.setJSVersion(asl::as<int>(ourArguments.getOptionArgument("--jsversion")));

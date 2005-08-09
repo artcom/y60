@@ -8,12 +8,12 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef AC_Y60_REVISION_INCLUDED
-#define AC_Y60_REVISION_INCLUDED
+#ifndef AC_ASL_REVISION_INCLUDED
+#define AC_ASL_REVISION_INCLUDED
 
 #include <string>
 
-namespace y60 {
+namespace asl {
     extern std::string ourRevision;
 }
 

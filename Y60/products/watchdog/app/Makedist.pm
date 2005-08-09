@@ -1,6 +1,8 @@
 package Makedist;
 use MakedistTools;
 
+$PRODUCT_NAME   = "watchdog";
+
 sub runLocalMakedist($) {    
     my $theDistDir = $_[0];
         
