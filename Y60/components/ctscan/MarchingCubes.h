@@ -265,8 +265,8 @@ namespace y60 {
                 if (_myVertexColorFlag) {
                     dom::NodePtr myColorNode = _myShapeBuilder->ShapeBuilder::createVertexDataBin<asl::Vector4f>(COLOR_ROLE);
                     std::vector<asl::Vector4f> * myColors = myColorNode->dom::Node::nodeValuePtrOpen<std::vector<asl::Vector4f> >();
-                    myColors->reserve(4);
-                    myColors->push_back(asl::Vector4f(1,1,1,1));
+                    myColors->reserve(4);                    
+                    myColors->push_back(asl::Vector4f(189.0f/255.0f,191.0f/255.0f,136.0f/255.0f,1.0f));
                     myColors->push_back(asl::Vector4f(1,0,0,1));
                     myColors->push_back(asl::Vector4f(0,1,0,1));
                     myColors->push_back(asl::Vector4f(0,0,1,1));

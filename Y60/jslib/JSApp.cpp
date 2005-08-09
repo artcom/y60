@@ -1258,47 +1258,53 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("The command to execute", DOC_TYPE_STRING);
     DOC_RVAL("The return code of the command", DOC_TYPE_INTEGER);
     DOC_END;
-    if (argc == 1) {
-        if (JSVAL_IS_VOID(argv[0])) {
+    ensureParamCount(argc, 1, 2);
+    if (JSVAL_IS_VOID(argv[0])) {
+        JS_ReportError(cx, "exec(): Argument #%d is undefined.", 1);
+        return JS_FALSE;
+    }
+    string myCommandString;
+    if ( ! convertFrom(cx, argv[0], myCommandString)) {
+        JS_ReportError(cx, "exec(): argument #1 must be a string");
+        return JS_FALSE;
+    }
+    string myArgs;
+    string myCommand;
+    if (argc > 1) {
+        if (JSVAL_IS_VOID(argv[1])) {
             JS_ReportError(cx, "exec(): Argument #%d is undefined.", 1);
             return JS_FALSE;
         }
-
-        string myCommandString;
-        if ( ! convertFrom(cx, argv[0], myCommandString)) {
-            JS_ReportError(cx, "exec(): argument #1 must be a string");
+        if ( ! convertFrom(cx, argv[1], myArgs)) {
+            JS_ReportError(cx, "exec(): argument #2 must be a string");
             return JS_FALSE;
         }
-        int myRetVal;
-#ifdef WIN32
+        myCommand = myCommandString;
+    } else {
         std::string::size_type myIndex = myCommandString.find(" ");
-
-        std::string myCommand;
-        std::string myArgs;
         if (myIndex != string::npos) {
             myCommand = myCommandString.substr(0, myIndex);
             myArgs = myCommandString.substr(myIndex + 1, myCommandString.size() - myIndex);
         } else {
             myCommand = myCommandString;
         }
-        cerr << "cmd = '" << myCommand << "' args = '" << myArgs << "'"  << endl;
-        myRetVal = (int) ShellExecute(NULL, "open", myCommand.c_str(),
-                ( myArgs.empty() ? NULL : myArgs.c_str()), NULL, SW_SHOWNORMAL);
-        if (myRetVal > 32) {
-            myRetVal = 0;
-        }
-#else
-        myRetVal = system(myCommandString.c_str());
-        if (myRetVal && (myRetVal != -1)) {
-            myRetVal = WEXITSTATUS(myRetVal);
-        }
-
-#endif
-        *rval = as_jsval(cx, myRetVal);
-        return JS_TRUE;
     }
-    JS_ReportError(cx,"exec: bad number of arguments - should be one, got %d", argc);
-    return JS_FALSE;
+    int myRetVal;
+#ifdef WIN32
+    cerr << "cmd = '" << myCommand << "' args = '" << myArgs << "'"  << endl;
+    myRetVal = (int) ShellExecute(NULL, "open", myCommand.c_str(),
+        ( myArgs.empty() ? NULL : myArgs.c_str()), NULL, SW_SHOWNORMAL);
+    if (myRetVal > 32) {
+        myRetVal = 0;
+    }
+#else
+    myRetVal = system((myCommand + " " + myArgs).c_str());
+    if (myRetVal && (myRetVal != -1)) {
+        myRetVal = WEXITSTATUS(myRetVal);
+    }
+#endif
+    *rval = as_jsval(cx, myRetVal);
+    return JS_TRUE;
 }
 
 static JSBool
@@ -1360,7 +1366,7 @@ static JSFunctionSpec glob_functions[] = {
     {"urlEncode", urlEncode, 1},
     {"urlDecode", urlDecode, 1},
 
-    {"exec", execute, 1},
+    {"exec", execute, 2},
     {"operatingSystem", operatingSystem, 0},
     {0}
 };
