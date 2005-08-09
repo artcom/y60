@@ -56,7 +56,9 @@ Mesh::colorize(unsigned int theStartIndex, unsigned theColorIndex) {
         while(myToDoList.begin() != myToDoList.end()) {
             *iter = myToDoList.front();
             myToDoList.pop_front();
-            if ((*_myColors)[*iter] == theColorIndex) continue;
+            if ((*_myColors)[*iter] == theColorIndex) {
+                continue;
+            }
             for (unsigned int i = 0; i < 3; ++i) {
                 (*_myColors)[*iter] = theColorIndex;
                 if (iter.twinIndex() != -1 && (*_myColors)[iter.twinIndex()] != theColorIndex) {

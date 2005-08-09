@@ -17,13 +17,32 @@
 //=============================================================================
 
 
-function getFilenameDialog(theTitle, theAction) {
+function getFilenameDialog(theTitle, theAction, thePatterns, theShortcuts) {
 
     var myFileChooserDialog = new FileChooserDialog(theTitle, theAction);
 
+    if (thePatterns) {
+        for (var i = 0; i < thePatterns.length; ++i) {
+            myFileChooserDialog.add_filter_pattern( thePatterns[i].pattern, 
+                    thePatterns[i].name + " (" + thePatterns[i].pattern + ")");
+        }
+    }
+
+    if (theShortcuts) {
+        for (var i = 0; i < theShortcuts.length; ++i) {
+            myFileChooserDialog.add_shortcut_folder( theShortcuts[i] );
+        }
+    }
+
+    if (thePatterns) {
+        for (var i = 0; i < thePatterns.length; ++i) {
+            myFileChooserDialog.add_filter_pattern( thePatterns[i].pattern, 
+                    thePatterns[i].name + " (" + thePatterns[i].pattern + ")");
+        }
+    }
+
     myFileChooserDialog.add_button(StockID.CANCEL,Dialog.RESPONSE_CANCEL);
     myFileChooserDialog.add_button(StockID.OK,Dialog.RESPONSE_OK);
-
 
     var myRetVal = myFileChooserDialog.run();
      // :-( otherwise dialog won't close before mainwindow gets focus
@@ -41,7 +60,7 @@ function getFilenameDialog(theTitle, theAction) {
 function askUserForFilename(theTitle) {
     var myWriteItFlag = false;
     while ( true ) {
-        var myFilename = getFilenameDialog(theTitle, FileChooserDialog.ACTION_SAVE);
+        var myFilename = getFilenameDialog(theTitle, FileChooserDialog.ACTION_SAVE, null);
         if (myFilename) {
             if (fileExists(myFilename)) {
                 var myDialog = new MessageDialog("<b>File exists.</b>\nDo you want to overwrite it?",

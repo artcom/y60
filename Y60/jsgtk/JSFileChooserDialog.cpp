@@ -53,6 +53,47 @@ Get_filename(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+add_filter_pattern(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        Gtk::FileChooserDialog * myNative=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        Glib::ustring myPattern;
+        convertFrom(cx, argv[0], myPattern);
+
+        Glib::ustring myName;
+        convertFrom(cx, argv[1], myName);
+
+        Gtk::FileFilter myFilter;
+        myFilter.add_pattern( myPattern );
+        myFilter.set_name( myName );
+
+        myNative->add_filter( myFilter );
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+add_shortcut_folder(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+
+    try {
+        ensureParamCount(argc, 1);
+        Gtk::FileChooserDialog * myNative=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        Glib::ustring myFolder;
+        convertFrom(cx, argv[0], myFolder);
+
+        myNative->add_shortcut_folder(myFolder);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION
+}
 
 
 JSFunctionSpec *
@@ -62,6 +103,8 @@ JSFileChooserDialog::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"get_filename",         Get_filename,            0},
+        {"add_filter_pattern",   add_filter_pattern,      2},
+        {"add_shortcut_folder",  add_shortcut_folder,     1},
         {0}
     };
     return myFunctions;
