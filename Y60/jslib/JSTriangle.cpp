@@ -30,7 +30,7 @@ typedef asl::Triangle<Number> NATIVE;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns a string representation of the triangle.");
     DOC_END;
     std::string myStringRep = asl::as_string(JSTriangle::getJSWrapper(cx,obj).getNative());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -129,7 +129,15 @@ JSTriangle::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *ob
 
 JSBool
 JSTriangle::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Constructs a triangle from three points, from a triangle or an empty one.");
+    DOC_PARAM("Point 1 as Vector3", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("Point 2 as Vector3", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("Point 3 as Vector3", DOC_TYPE_VECTOR3F);
+    DOC_RESET;
+    DOC_PARAM("Array[3] of Vector3", DOC_TYPE_ARRAY);
+    DOC_RESET;
+    DOC_PARAM("Triangle", DOC_TYPE_TRIANGLE);
+    DOC_RESET;
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?",ClassName());

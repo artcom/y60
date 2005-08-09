@@ -36,7 +36,7 @@ namespace jslib {
 
 	static JSBool
 	toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Printd 'JSScriptablePlugin'");
     DOC_END;
 		std::string myStringRep = "JSScriptablePlugin";
 		JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -63,7 +63,8 @@ namespace jslib {
 
 	static JSBool
 	onUpdateSettings(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Define a callback to be called when a given settings node changes.");
+    DOC_PARAM("theConfigNode", DOC_TYPE_NODE);
     DOC_END;
 		try {
 			if (argc != 1) {
@@ -152,8 +153,7 @@ namespace jslib {
 	JSBool
 	JSScriptablePlugin::Constructor(JSContext *cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
         AC_TRACE << "JSScriptablePlugin::Constructor: " << JSA_GetClass(cx,obj)->name;
-
-        DOC_BEGIN("");
+        DOC_BEGIN("Constructs a ScriptablePlugin.");
         DOC_END;
 		try {
 			const char * myClassName = JSA_GetClass(cx,obj)->name;

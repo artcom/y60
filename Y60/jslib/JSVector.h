@@ -421,7 +421,7 @@ struct JSVector  {
 
     static JSBool
     toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns a string representation of the vector.");
     DOC_END;
         std::string myStringRep = asl::as_string(getNativeRef(cx,obj));
         JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -431,7 +431,7 @@ struct JSVector  {
 
     static JSBool
     clone(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Copy constructor");
     DOC_END;
         *rval = OBJECT_TO_JSVAL(Construct(cx,getNativeRef(cx,obj)));
         return JS_TRUE;
@@ -502,25 +502,45 @@ struct JSVector  {
 
     static JSBool
     add(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Add another vector or a scalar.");
+    DOC_PARAM("Number", DOC_TYPE_INTEGER);
+    DOC_RESET;
+    DOC_PARAM("Number", DOC_TYPE_FLOAT);
+    DOC_RESET;
+    DOC_PARAM("Vector", DOC_TYPE_VECTOR3F);
     DOC_END;
         return callMethod(&NATIVE_VECTOR::add, cx, obj, argc, argv, rval);
     }
     static JSBool
     sub(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Subtract another vector or a scalar.");
+    DOC_PARAM("Number", DOC_TYPE_INTEGER);
+    DOC_RESET;
+    DOC_PARAM("Number", DOC_TYPE_FLOAT);
+    DOC_RESET;
+    DOC_PARAM("Vector", DOC_TYPE_VECTOR3F);
     DOC_END;
         return callMethod(&NATIVE_VECTOR::sub, cx, obj, argc, argv, rval);
     }
     static JSBool
     mult(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Multiply with another vector or a scalar.");
+    DOC_PARAM("Number", DOC_TYPE_INTEGER);
+    DOC_RESET;
+    DOC_PARAM("Number", DOC_TYPE_FLOAT);
+    DOC_RESET;
+    DOC_PARAM("Vector", DOC_TYPE_VECTOR3F);
     DOC_END;
         return callMethod(&NATIVE_VECTOR::mult, cx, obj, argc, argv, rval);
     }
     static JSBool
     div(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Divide by another vector or a scalar.");
+    DOC_PARAM("Number", DOC_TYPE_INTEGER);
+    DOC_RESET;
+    DOC_PARAM("Number", DOC_TYPE_FLOAT);
+    DOC_RESET;
+    DOC_PARAM("Vector", DOC_TYPE_VECTOR3F);
     DOC_END;
         return callMethod(&NATIVE_VECTOR::div, cx, obj, argc, argv, rval);
     }
@@ -973,7 +993,7 @@ struct JSVector  {
 private:
     static JSBool
     Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Constructs a JSVector from a provided array, a given size or constructs an empty one.");
     DOC_END;
         IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << std::endl);
         if (JSA_GetClass(cx,obj) != Class()) {

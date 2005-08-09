@@ -33,7 +33,7 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Prints the index of the current renderer.");
     DOC_END;
     std::string myStringRep = std::string("Renderer@") + as_string(obj);
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -43,7 +43,23 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Draws a line segment, triangle, sphere or box in a given color and transformation matrix.");
+    DOC_PARAM("line segment", DOC_TYPE_LINESEGMENT);
+    DOC_PARAM("color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("transformation", DOC_TYPE_MATRIX4F);
+    DOC_RESET;
+    DOC_PARAM("triangle", DOC_TYPE_TRIANGLE);
+    DOC_PARAM("color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("transformation", DOC_TYPE_MATRIX4F);
+    DOC_RESET;
+    DOC_PARAM("sphere", DOC_TYPE_SPHERE);
+    DOC_PARAM("color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("transformation", DOC_TYPE_MATRIX4F);
+    DOC_RESET;
+    DOC_PARAM("box", DOC_TYPE_BOX3F);
+    DOC_PARAM("color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("transformation", DOC_TYPE_MATRIX4F);
+    DOC_RESET;
     DOC_END;
     if (argc == 3) {
         if (JSLineSegment::matchesClassOf(cx, argv[0])) {
@@ -80,13 +96,14 @@ draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     JS_ReportError(cx,"JSRenderWindow::draw: bad number of arguments, 3 expected");
     return JS_FALSE;
 }
+
 JSFunctionSpec *
 JSRenderer::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
-        {"draw",               draw,                      3},
+        {"draw",                 draw,                    3},
         {0}
     };
     return myFunctions;
@@ -234,7 +251,8 @@ JSRenderer::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
 
 JSBool
 JSRenderer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("NOTE: Do not create a renderer with new! Access existing \
+renderers by accessing the RenderWindow's renderer property.");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Base::Class()) {

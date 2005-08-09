@@ -29,18 +29,14 @@ typedef asl::Plane<Number> NATIVE;
 
 static JSBool
 normalize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    DOC_BEGIN("");
+    DOC_BEGIN("Normailzes the plane.");
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::normalize,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    DOC_BEGIN("");
+    DOC_BEGIN("Prints a string representation of the plane.");
     DOC_END;
     std::string myStringRep = asl::as_string(JSPlane::getJSWrapper(cx,obj).getNative());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -113,7 +109,7 @@ JSPlane::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
         case PROP_offset:
             return Method<NATIVE>::call(&NATIVE::setOffset, cx, obj, 1, vp, &dummy);
         default:
-            JS_ReportError(cx,"JSRenderer::setPropertySwitch: index %d out of range", theID);
+            JS_ReportError(cx,"JSPlane::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
     }
 };
@@ -121,9 +117,13 @@ JSPlane::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
 
 JSBool
 JSPlane::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    DOC_BEGIN("");
+    DOC_BEGIN("Construct a plane from three points, with normal/distance, from another plane or construct an empty one.");
+    DOC_PARAM("Vector3", DOC_TYPE_VECTOR3F);
+    DOC_RESET;
+    DOC_PARAM("plane", DOC_TYPE_PLANE);
+    DOC_RESET;
+    DOC_PARAM("distance", DOC_TYPE_FLOAT);
+    DOC_PARAM("normal", DOC_TYPE_VECTOR3F);
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {

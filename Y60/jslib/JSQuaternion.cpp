@@ -290,7 +290,7 @@ JSQuaternion::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *ob
         case PROP_real:
             return Method<NATIVE>::call(&NATIVE::setRealPart, cx, obj, 1, vp, &dummy);
         default:
-            JS_ReportError(cx,"JSRenderer::setPropertySwitch: index %d out of range", theID);
+            JS_ReportError(cx,"JSQuaternion::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
     }
 };

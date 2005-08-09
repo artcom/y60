@@ -210,14 +210,14 @@ JSLogger::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
     switch (theID) {
         case 0:
         default:
-            JS_ReportError(cx,"JSRenderer::setPropertySwitch: index %d out of range", theID);
+            JS_ReportError(cx,"JSLogger::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
     }
 };
 
 JSBool
 JSLogger::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("JSLogger cannot be constructed.");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     /*

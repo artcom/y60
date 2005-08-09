@@ -99,7 +99,7 @@ JSBool JSNamedNodeMap::setPropertyIndex(unsigned long theIndex, JSContext *cx, J
 
 JSBool
 JSNamedNodeMap::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Constructs a new NamedNodeMap.");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {

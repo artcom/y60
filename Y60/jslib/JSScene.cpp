@@ -72,7 +72,7 @@ typedef y60::Scene NATIVE;
 
 JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns a string representation of the Scene's DOM.");
     DOC_END;
     std::string myStringRep = asl::as_string(JSScene::getJSWrapper(cx,obj).getNative().getSceneDom());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -82,7 +82,16 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns the intersections of a body with a given line, line segment or ray.");
+    DOC_PARAM("Body", DOC_TYPE_NODE);
+    DOC_PARAM("Line", DOC_TYPE_LINE);
+    DOC_RESET;
+    DOC_PARAM("Body", DOC_TYPE_NODE);
+    DOC_PARAM("LineSegment", DOC_TYPE_LINESEGMENT);
+    DOC_RESET;
+    DOC_PARAM("Body", DOC_TYPE_NODE);
+    DOC_PARAM("Ray", DOC_TYPE_RAY);
+    DOC_RVAL("IntersectionInfoVector", DOC_TYPE_ARRAY)
     DOC_END;
     try {
         ensureParamCount(argc, 2);
@@ -112,7 +121,11 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 static JSBool
 collideWithBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns the collisions detected by recursively testing a sphere with a given motion vector and a body node.");
+    DOC_PARAM("Body", DOC_TYPE_NODE);
+    DOC_PARAM("Sphere", DOC_TYPE_SPHERE);
+    DOC_PARAM("MotionVector", DOC_TYPE_VECTOR3F);
+    DOC_RVAL("CollisionInfoVector", DOC_TYPE_ARRAY)
     DOC_END;
     try {
         ensureParamCount(argc, 3);
@@ -131,7 +144,11 @@ collideWithBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 
 static JSBool
 collideWithBodiesOnce(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns the first collision detected by recursively testing a sphere with a given motion vector and a body node.");
+    DOC_PARAM("Body", DOC_TYPE_NODE);
+    DOC_PARAM("Sphere", DOC_TYPE_SPHERE);
+    DOC_PARAM("MotionVector", DOC_TYPE_VECTOR3F);
+    DOC_RVAL("CollisionInfo", DOC_TYPE_OBJECT)
     DOC_END;
     try {
         ensureParamCount(argc, 3);
@@ -150,7 +167,7 @@ collideWithBodiesOnce(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 
 static JSBool
 update(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("updates the components of the scene that are set in theUpdateFlags");
+    DOC_BEGIN("Updates the components of the scene that are set in theUpdateFlags.");
     DOC_END;
     JSBool mySuccess = Method<NATIVE>::call(&NATIVE::update,cx,obj,argc,argv,rval);
     *rval = as_jsval(cx, mySuccess);
@@ -159,7 +176,9 @@ update(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 bodyVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Calculates the volume of a given body.");
+    DOC_PARAM("BodyNode", DOC_TYPE_NODE);
+    DOC_RVAL("Volume", DOC_TYPE_FLOAT)
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -177,21 +196,22 @@ bodyVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 getWorldSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns the world's size including camera position.");
+    DOC_RVAL("Distance", DOC_TYPE_FLOAT)
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::getWorldSize,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Empties the scene.");
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::clear,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 updateGlobalMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Dont use this! Its all magic now.");
+    DOC_BEGIN("DEPRECATED! Don't use this! Its all magic now.");
     DOC_END;
     try {
         AC_WARNING << "UpdateGlobal Matrix is depricated. You should not need to use it anymore" << endl;
@@ -215,7 +235,7 @@ updateGlobalMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
 
 static JSBool
 createStubs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Create a minimal empty world.");
     DOC_END;
     try {
         ensureParamCount(argc, 0, 0);
@@ -340,14 +360,18 @@ JSScene::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
     switch (theID) {
         case 0:
         default:
-            JS_ReportError(cx,"JSRenderer::setPropertySwitch: index %d out of range", theID);
+            JS_ReportError(cx,"JSScene::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
     }
 };
 
 JSBool
 JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates a scene from the given file");
+    DOC_BEGIN("Creates a scene from the given file or an empty scene if no file is given.");
+    DOC_PARAM("Filename", DOC_TYPE_STRING);
+    DOC_RESET;
+    DOC_PARAM("Filename", DOC_TYPE_STRING);
+    DOC_PARAM("Target for ProgressCallback", DOC_TYPE_STRING);
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {
@@ -420,6 +444,8 @@ jsval as_jsval(JSContext *cx, asl::Ptr<y60::Scene> theScene) {
 JSBool
 JSScene::save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Saves the scene to a file.");
+    DOC_PARAM("Filename", DOC_TYPE_STRING);
+    DOC_PARAM("BinaryFlag", DOC_TYPE_BOOLEAN);
     DOC_END;
     ensureParamCount(argc, 1, 2);
     return Method<JSScene::NATIVE>::call(&JSScene::NATIVE::save,cx,obj,argc,argv,rval);

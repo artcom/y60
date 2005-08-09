@@ -124,7 +124,7 @@ intersects(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Prints a string representation of a sphere.");
     DOC_END;
     std::string myStringRep = asl::as_string(JSSphere::getJSWrapper(cx,obj).getNative());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -234,7 +234,7 @@ JSSphere::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
         case PROP_radius:
             return Method<NATIVE>::call(&NATIVE::setRadius, cx, obj, 1, vp, &dummy);
         default:
-            JS_ReportError(cx,"JSRenderer::setPropertySwitch: index %d out of range", theID);
+            JS_ReportError(cx,"JSSphere::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
     }
 };
@@ -242,7 +242,14 @@ JSSphere::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
 
 JSBool
 JSSphere::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Constructs a sphere from center/radius, center/point on surface, from another sphere or an empty one.");
+    DOC_PARAM("a sphere", DOC_TYPE_SPHERE);
+    DOC_RESET;
+    DOC_PARAM("center", DOC_TYPE_POINT3F);
+    DOC_PARAM("radius", DOC_TYPE_FLOAT);
+    DOC_RESET;
+    DOC_PARAM("center", DOC_TYPE_POINT3F);
+    DOC_PARAM("point on surface", DOC_TYPE_POINT3F);
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {

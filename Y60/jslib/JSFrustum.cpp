@@ -146,7 +146,7 @@ JSFrustum::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
     switch (theID) {
         case 0:
         default:
-            JS_ReportError(cx,"JSRenderer::setPropertySwitch: index %d out of range", theID);
+            JS_ReportError(cx,"JSFrustum::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
     }
 };

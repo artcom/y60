@@ -1187,7 +1187,7 @@ JSNode::Construct(JSContext *cx, dom::NodePtr theNode) {
 
 JSBool
 JSNode::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Constructing a node from scratch or from a string.");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {
