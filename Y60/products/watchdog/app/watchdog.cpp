@@ -10,7 +10,7 @@
 //
 //   $RCSfile: watchdog.cpp,v $
 //   $Author: ulrich $
-//   $Revision: 1.29 $
+//   $Revision$
 //   $Date: 2005/04/19 10:02:40 $
 //
 //
