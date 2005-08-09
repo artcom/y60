@@ -52,6 +52,7 @@ const string ourDefaultConfigFile = "watchdog.xml";
 asl::Arguments ourArguments;
 const asl::Arguments::AllowedOption ourAllowedOptions[] = {
     {"--configfile", "XML configuration file"},
+    {"--revision", ""},
     {"", ""}
 };
 
@@ -460,9 +461,18 @@ int
 main(int argc, char* argv[] ) {
     ourArguments.addAllowedOptions(ourAllowedOptions);
     ourArguments.parse(argc, argv);
+    std::string myRevision="$Revision$";
+    myRevision.erase(0, 1);
+    myRevision.erase(myRevision.size()-1, 1);
 
-    cerr << ourArguments.getProgramName() << " Copyright (C) 2003-2005 ART+COM" << endl;
-    cerr << "Build date " << __DATE__ << " $Revision: 1.29 $" << endl << endl;
+    AC_PRINT << ourArguments.getProgramName() << " Copyright (C) 2003-2005 ART+COM";
+    AC_INFO << "Build date " << __DATE__;
+    AC_INFO << myRevision;
+
+    if (ourArguments.haveOption("--revision")) {
+        AC_PRINT << myRevision;
+        exit(0);
+    }
 
     dom::Document myConfigDoc;
     if (ourArguments.haveOption("--configfile")) {
