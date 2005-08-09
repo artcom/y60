@@ -16,6 +16,11 @@ namespace y60 {
 Mesh::Mesh(dom::NodePtr theShapeNode) : _myShapeNode(theShapeNode), _myPositions(0), _myNormals(0), _myColors(0), _myHalfEdges(0), _myWriteLockCount(0), _myEdgeList(0), _myMaxError(0.0), _mySimplifyMode(false), _myNormalVerticesNode(0)  {
     _myElementsNode = theShapeNode->childNode(PRIMITIVE_LIST_NAME)->childNode(ELEMENTS_NODE_NAME);
     _myHalfEdgesNode = _myElementsNode->childNode(HALFEDGES_NODE_NAME);
+    //_myIndexNodes.push_back(_myHalfEdgesNode);
+    //for (int i = 0; i < _myElementsNode->childNodesLength(); ++i) {
+    //    _myIndexNodes.push_back(_myElementsNode->childNode(i));
+    //}
+
     _myColorIndexNode = _myElementsNode->childNodeByAttribute(VERTEX_INDICES_NAME, VERTEX_DATA_ROLE_ATTRIB, COLOR_ROLE);
     _myNormalIndexNode = _myElementsNode->childNodeByAttribute(VERTEX_INDICES_NAME, VERTEX_DATA_ROLE_ATTRIB, NORMAL_ROLE);
     _myPositionIndexNode = _myElementsNode->childNodeByAttribute(VERTEX_INDICES_NAME, VERTEX_DATA_ROLE_ATTRIB, POSITION_ROLE);
@@ -258,7 +263,7 @@ Mesh::unlockWrite(bool theForceFlag /*= false*/) {
     if (_myWriteLockCount == 1 || theForceFlag) {
         _myPositionIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
         _myPositions = 0;
-        if (_myColorIndexNode) {
+        if (_myNormalIndexNode) {
             _myNormalIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
             _myNormals = 0;
         }
