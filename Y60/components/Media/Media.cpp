@@ -85,16 +85,22 @@ unsigned Media::getNumSounds() const {
 }
 
 void Media::stopAll() {
-    AutoLocker<ThreadLock> myLocker(_myLock);
-    std::vector < SoundWeakPtr >::iterator it;
-    for (it = _mySounds.begin(); it != _mySounds.end(); ++it) {
-        SoundPtr curSound = (*it).lock();
-        if (curSound) {
-            curSound->stop();
+    {
+        AutoLocker<ThreadLock> myLocker(_myLock);
+        AC_DEBUG << "Media::stopAll";
+        std::vector < SoundWeakPtr >::iterator it;
+        for (it = _mySounds.begin(); it != _mySounds.end(); ++it) {
+            SoundPtr curSound = (*it).lock();
+            if (curSound) {
+                cerr << "stopAll: stopping " << curSound->getName() << endl;
+                curSound->stop();
+            }
         }
     }
     msleep(100);
+
     update();
+    AC_DEBUG << "Media::stopAll end";
 }
 
 void Media::update() {

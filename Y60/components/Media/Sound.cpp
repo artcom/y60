@@ -36,13 +36,14 @@ Sound::Sound (string myURI, HWSampleSinkPtr mySampleSink, bool theLoop)
 Sound::Sound (const string & myURI, Ptr < ReadableStream > myStream,
         HWSampleSinkPtr mySampleSink, bool theLoo)
 {
-    AC_DEBUG << "Sound::Sound";
+    AC_DEBUG << "Sound::Sound (" << _myURI << ")";
     _myLockedSelf = SoundPtr(0);
 }
 
 Sound::~Sound()
 {
-    AC_DEBUG << "Sound::~Sound";
+    AC_DEBUG << "Sound::~Sound (" << _myURI << ")";
+    _myBufferCache.clear();
     close();
 }
 
@@ -55,8 +56,7 @@ void Sound::setSelf(const SoundPtr& mySelf)
 void Sound::play ()
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    AC_DEBUG << "Sound::play";
-    checkForClose();
+    AC_DEBUG << "Sound::play (" << _myURI << ")";
     if (!isOpen()) {
         open();
     }
@@ -68,7 +68,7 @@ void Sound::play ()
 void Sound::pause ()
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    AC_DEBUG << "Sound::pause";
+    AC_DEBUG << "Sound::pause (" << _myURI << ")";
     _mySampleSink->pause();
     _myLockedSelf = SoundPtr(0);
 }
@@ -76,8 +76,9 @@ void Sound::pause ()
 void Sound::stop ()
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    AC_DEBUG << "Sound::stop";
+    AC_DEBUG << "Sound::stop (" << _myURI << ")";
     _mySampleSink->stop();
+    _myBufferCache.clear();
     close();
     _myLockedSelf = SoundPtr(0);
 }
@@ -146,38 +147,43 @@ void Sound::update(double theTimeSlice) {
     double myTimeToBuffer = double(_mySampleSink->getBufferedTime())+
             myBuffersFilledRatio*theTimeSlice+
             (1-myBuffersFilledRatio)*_myMaxUpdateTime;
-    AC_TRACE << "myTimeToBuffer: " << myTimeToBuffer;
     if (_myDecodingComplete) {
-        if (isPlaying()) {
-            if (_myIsLooping) {
+        if (_myIsLooping) {
+            if (isPlaying()) {
                 while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer) {
                     // queueSamples pushes the buffer onto the list again :-).
                     queueSamples(_myBufferCache.front());
                     _myBufferCache.pop_front();
                 }
             }
-        } 
-    } else {
-        bool myEOF = false;
-        if (isOpen()) {
-            while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
-                AC_TRACE << "decode";
-                myEOF = decode();
-            }
-            if (myEOF) {
-                if (!_myIsLooping) {
-                    _mySampleSink->stop(true);
-                }
-                _myDecodingComplete = true;
-                AC_TRACE << "_myDecodingComplete";
+        } else {
+            if (!isPlaying()) {
+                _myDecodingComplete = false;
+                _myLockedSelf = SoundPtr(0);
             }
         }
     }
-    checkForClose();
+    if (!_myDecodingComplete) {
+        bool myEOF = false;
+        if (isOpen()) {
+            AC_DEBUG << "decode";
+            while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
+                myEOF = decode();
+            }
+            if (myEOF) {
+                _myDecodingComplete = true;
+                if (!_myIsLooping) {
+                    _mySampleSink->stop(true);
+//                    _myLockedSelf = SoundPtr(0);
+                }
+                close();
+            }
+        }
+    }
 }
 
 void Sound::open() {
-    AC_DEBUG << "Sound::open " << _myURI;
+    AC_DEBUG << "Sound::open (" << _myURI << ")" << _myURI;
 
     // register all formats and codecs
     static bool avRegistered = false;
@@ -226,21 +232,10 @@ void Sound::open() {
     AC_INFO << "Sample rate: " << _mySampleRate << endl;
 }
 
-void Sound::checkForClose() {
-    // This function closes the decoder if playback has finished.
-    if (_myDecodingComplete && !isPlaying() && isOpen() && !_myIsLooping) {
-        AC_TRACE << "!isPlaying etc.";
-        close();
-        _myLockedSelf = SoundPtr(0);
-        _myDecodingComplete = false;
-    }
-
-}
-
 void Sound::close() {
-    AC_DEBUG << "Sound::close()";
+    AutoLocker<ThreadLock> myLocker(_myLock);
+    AC_DEBUG << "Sound::close() (" << _myURI << ")";
 
-    _myBufferCache.clear();
     if (_myFormatContext) {
         AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
         if (myCodecContext) {
@@ -257,6 +252,7 @@ bool Sound::isOpen() const {
 }
 
 bool Sound::decode() {
+    ASSURE(_myFormatContext);
     AVPacket myPacket;
 
     AVCodecContext * myCodec = &(_myFormatContext->streams[_myStreamIndex]->codec);

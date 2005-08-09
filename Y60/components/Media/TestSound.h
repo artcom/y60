@@ -125,6 +125,7 @@ class TestStopAll: public SoundTestBase {
         }
 
         void run() {
+            ENSURE(getMedia()->getNumSounds() == 0);
             {
                 SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
                 mySound->play();
@@ -181,18 +182,34 @@ class TestStopByItself: public SoundTestBase {
         }
 
         void run() {
-            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
-            mySound->play();
-            while(mySound->isPlaying()) {
-                msleep(100);
+            {
+                SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
+                mySound->play();
+                while(mySound->isPlaying()) {
+                    msleep(100);
+                }
+                
+                ENSURE(mySound->getNumUnderruns() == 0);
             }
-            
-            mySound->play();
             msleep(100);
-            mySound->stop();
+            ENSURE(getMedia()->getNumSounds() == 0);
 
-            ENSURE(mySound->getNumUnderruns() == 0);
+            {
+                SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
+                mySound->play();
+                while(mySound->isPlaying()) {
+                    msleep(100);
+                }
+
+                mySound->play();
+                msleep(100);
+                mySound->stop();
+                ENSURE(mySound->getNumUnderruns() == 0);
+            }
+            msleep(100);
+            ENSURE(getMedia()->getNumSounds() == 0);
         }
+
 };
 
 class TestPause: public SoundTestBase {
@@ -203,47 +220,52 @@ class TestPause: public SoundTestBase {
         }
        
         void run() {
-            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
-            mySound->play();
-            msleep(200);
-            checkTime(mySound, 0.2);
-            mySound->pause();
-            msleep(400);
-            checkTime(mySound, 0.2);
-            mySound->play();
-            checkTime(mySound, 0.2);
-            while(mySound->isPlaying()) {
-                msleep(100);
+            {
+                SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3");
+                mySound->play();
+                msleep(200);
+                checkTime(mySound, 0.2);
+                mySound->pause();
+                msleep(400);
+                checkTime(mySound, 0.2);
+                mySound->play();
+                checkTime(mySound, 0.2);
+                while(mySound->isPlaying()) {
+                    msleep(100);
+                }
+                ENSURE(mySound->getNumUnderruns() == 0);
             }
-            ENSURE(mySound->getNumUnderruns() == 0);
-
             runLoop(false);
             runLoop(true);
         }
         
     private:
         void runLoop(bool theLoop) {
-            SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3", theLoop);
-            mySound->play();
-            msleep(200);
-            mySound->pause();
+            {
+                SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3", theLoop);
+                mySound->play();
+                msleep(200);
+                mySound->pause();
+                msleep(100);
+                checkTime(mySound, 0.3);
+                mySound->stop();
+                checkTime(mySound, 0);
+
+                mySound->play();
+                mySound->pause();
+                msleep(100);
+                checkTime(mySound, 0);
+                mySound->stop();
+
+                mySound->play();
+                msleep(200);
+                mySound->pause();
+                mySound->stop();
+
+                ENSURE(mySound->getNumUnderruns() == 0);
+            }
             msleep(100);
-            checkTime(mySound, 0.3);
-            mySound->stop();
-            checkTime(mySound, 0);
-
-            mySound->play();
-            mySound->pause();
-            msleep(100);
-            checkTime(mySound, 0);
-            mySound->stop();
-
-            mySound->play();
-            msleep(200);
-            mySound->pause();
-            mySound->stop();
-
-            ENSURE(mySound->getNumUnderruns() == 0);
+            ENSURE(getMedia()->getNumSounds() == 0);
         }
 };
 
@@ -310,6 +332,49 @@ class TestVolume: public SoundTestBase {
         }
 };
 
+class TestSeek: public SoundTestBase {
+    public:
+        TestSeek()
+            : SoundTestBase("TestSeek")
+        {
+        }
+
+        void run() {
+            SoundPtr mySound = getMedia()->createSound
+                    ("../../testfiles/sz5-1_c-beam Warnung_Time_1.WAV");
+            // Seek at start
+            mySound->seek(1.0);
+            checkTime(mySound, 1.0);
+            mySound->play();
+            checkTime(mySound, 1.0);
+            msleep(200);
+            checkTime(mySound, 1.2);
+
+            // Seek while playing
+            mySound->seek(2.0);
+            checkTime(mySound, 2.0);
+            msleep(200);
+            
+            // Seek while paused
+            mySound->pause();
+            mySound->seek(3.0);
+            checkTime(mySound, 3.0);
+            mySound->play();
+            checkTime(mySound, 3.0);
+            msleep(200);
+
+            // Seek while stopped
+            mySound->stop();
+            mySound->seek(4.0);
+            checkTime(mySound, 4.0);
+            mySound->play();
+            checkTime(mySound, 4.0);
+            msleep(200);
+            checkTime(mySound, 4.2);
+            mySound->stop();
+        }
+};
+
 class StressTest: public SoundTestBase {
     public:
         StressTest(double myDuration) 
@@ -323,7 +388,7 @@ class StressTest: public SoundTestBase {
             while(double(Time())-myStartTime < _myDuration) { 
                 SoundPtr mySound = getMedia()->createSound
                         ("../../testfiles/stereotest441.wav", false);
-                mySound->setVolume(0.2f);
+                mySound->setVolume(0.1f);
                 mySound->play();
                 double r1 = rand()/double(RAND_MAX);
                 unsigned myTime = unsigned(50*r1);
@@ -366,6 +431,7 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new TestStopAll());
             addTest(new TestLoop());
             addTest(new TestVolume());
+//            addTest(new TestSeek());
             addTest(new StressTest(5));
 
             // 24 Hour test :-).
