@@ -343,24 +343,25 @@ class TestSeek: public SoundTestBase {
             SoundPtr mySound = getMedia()->createSound
                     ("../../testfiles/sz5-1_c-beam Warnung_Time_1.WAV");
             // Seek at start
-            mySound->seek(1.0);
-            checkTime(mySound, 1.0);
+            mySound->seek(0.5);
+            checkTime(mySound, 0.5);
             mySound->play();
-            checkTime(mySound, 1.0);
+            checkTime(mySound, 0.5);
             msleep(200);
-            checkTime(mySound, 1.2);
+            checkTime(mySound, 0.7);
 
             // Seek while playing
             mySound->seek(2.0);
             checkTime(mySound, 2.0);
             msleep(200);
+            checkTime(mySound, 2.2);
             
             // Seek while paused
             mySound->pause();
-            mySound->seek(3.0);
-            checkTime(mySound, 3.0);
+            mySound->seek(4.0);
+            checkTime(mySound, 4.0);
             mySound->play();
-            checkTime(mySound, 3.0);
+            checkTime(mySound, 4.0);
             msleep(200);
 
             // Seek while stopped
@@ -431,7 +432,7 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new TestStopAll());
             addTest(new TestLoop());
             addTest(new TestVolume());
-//            addTest(new TestSeek());
+            addTest(new TestSeek());
             addTest(new StressTest(5));
 
             // 24 Hour test :-).

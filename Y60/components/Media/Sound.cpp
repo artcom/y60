@@ -11,6 +11,7 @@
 #include "Sound.h"
 
 #include <asl/Auto.h>
+#include <asl/Pump.h>
 
 using namespace std;
 using namespace asl;
@@ -116,10 +117,37 @@ Time Sound::getCurrentTime() {
 
 void Sound::seek (Time thePosition)
 {
+    AutoLocker<ThreadLock> myLocker(_myLock);
+    AC_DEBUG << "Sound::seek()";
+    bool myIsPlaying = isPlaying();
+    _mySampleSink->stop();
+    _myBufferCache.clear();
+    // Forget the old sample sink. It'll fade out and then destroy itself.
+    _mySampleSink = Pump::get().createSampleSink(_myURI);
+    if (!isOpen()) {
+        open();
+    }
+#if (LIBAVCODEC_BUILD < 4738)
+    int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE));
+#else
+    int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE), 
+            AVSEEK_FLAG_BACKWARD);
+#endif
+    if (ret < 0) {
+        AC_WARNING << "Unable to seek to timestamp=" << thePosition;
+        return;
+    }
+    _mySampleSink->setCurrentTime(thePosition);
+    _myLockedSelf = _mySelf.lock();
+    if (myIsPlaying) {
+        update(0.1);
+        _mySampleSink->play();
+    }
 }
 
 void Sound::seekRelative (Time theAmount)
 {
+    AutoLocker<ThreadLock> myLocker(_myLock);
 }
 
 Time Sound::getBufferedTime () const
@@ -166,7 +194,6 @@ void Sound::update(double theTimeSlice) {
     if (!_myDecodingComplete) {
         bool myEOF = false;
         if (isOpen()) {
-            AC_DEBUG << "decode";
             while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
                 myEOF = decode();
             }
