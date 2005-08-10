@@ -41,7 +41,8 @@
 #include <y60/Image.h>
 #include <y60/NodeNames.h>
 #include <y60/Y60xsd.h>
-#include <y60/Revision.h>
+
+#include <asl/Revision.h>
 
 #include <iostream>
 
