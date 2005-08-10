@@ -60,7 +60,7 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
             var myAge = _mySceneViewer.getCurrentTime() - _myMaxMemoryTime;
             var myRed   = 1;
             var myGreen = 1;
-            const MAX_MEMORY_GREEN_TIME = 30;
+            const MAX_MEMORY_GREEN_TIME = 300;
             if (myAge < MAX_MEMORY_GREEN_TIME) {
                 myGreen = myAge / MAX_MEMORY_GREEN_TIME;
             }

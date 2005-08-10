@@ -293,17 +293,6 @@ SDLWindow::dumpSDLGLParams() {
     AC_PRINT << "  SDL_GL_STENCIL_SIZE = " << value << endl;
 }
 
-asl::Ptr<y60::OffscreenBuffer>
-SDLWindow::createOffscreenBuffer(unsigned long theWidth, unsigned long theHeight, const std::string & theFormat) {
-    if (theWidth != 0 && theHeight !=0) {
-        asl::Ptr<y60::OffscreenBuffer> myResult = asl::Ptr<y60::OffscreenBuffer>(new y60::OffscreenBuffer(theWidth, theHeight));
-        if (myResult->ok()) {
-            return myResult;
-        }
-    }
-    return asl::Ptr<y60::OffscreenBuffer>(0);
-}
-
 void
 SDLWindow::resetCursor() {
     if (_myStandardCursor) {

@@ -41,18 +41,15 @@ DEFINE_EXCEPTION(GLContextException, asl::Exception);
         virtual bool saveCurrent() = 0;
     };
 
-    class OffscreenBuffer;
 
     class GLContext : public DrawingContext {
         public:
             GLContext();
-            GLContext(OffscreenBuffer & thePBuffer);
 
             virtual ~GLContext();
     
             virtual bool activate() const;
             virtual bool saveCurrent();
-            void destroy(OffscreenBuffer & thePBuffer);
 
     	    static void checkLastError(const std::string & theScope);
         protected:

@@ -182,11 +182,41 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myDummyOverlay = new ImageOverlay(myOverlayManager, "../../testfiles/black.rgb");
         obj.myDummyImageId = getDescendantByTagName(obj.myScene, "images").lastChild.id;
         obj.myOverlay = new Overlay(myOverlayManager, new Vector4f(1,2,3,1), [10, 20], [100,200]);
-        testCommonProperties([10,20], [100,200], [1,2,3,1]);
+        //testCommonProperties([10,20], [100,200], [1,2,3,1]);
 
         obj.myOverlay = new ImageOverlay(myOverlayManager, "../../testfiles/DiffuseRamp.png", [30, 40]);
         obj.myImageId = getDescendantByTagName(obj.myScene, "images").lastChild.id;
-        testCommonProperties([30,40], [32,1], [1,1,1,1]);
+        //testCommonProperties([30,40], [32,1], [1,1,1,1]);
+        
+        ///////////////////////////////////////////////////////////////////////////////////////
+        //
+        // Test multiple image support
+        //
+        ///////////////////////////////////////////////////////////////////////////////////////
+
+
+        var mySources = ["/usr/local/danielk/pro60/testmodels/tex/testbild00.rgb", "/usr/local/danielk/pro60/testmodels/tex/rgbtest_256.png"];
+        obj.myMultiOverlay = new ImageOverlay(myOverlayManager, mySources);
+        ENSURE('obj.myMultiOverlay.images.length == 2');
+
+        obj.myMultiOverlay.position = new Vector2f(300,300);
+        window.scene.save("save.x60");        
+        
+        var myImages = obj.myMultiOverlay.images;
+        myImages.push( obj.myMultiOverlay.images[0].cloneNode(true) );
+        // the following wont work, we modified images in place 
+        // ENSURE('obj.myMultiOverlay.images.length == 2');
+        obj.myMultiOverlay.images = myImages;
+        ENSURE('obj.myMultiOverlay.images.length == 3');
+    window.scene.save("save3.x60");        
+        myImages = [];
+        myImages.push(obj.myMultiOverlay.images[0]);
+        obj.myMultiOverlay.images = myImages;
+        ENSURE('obj.myMultiOverlay.images.length == 1');
+    window.scene.save("save1.x60");        
+
+
+
 
         ///////////////////////////////////////////////////////////////////////////////////////
         //

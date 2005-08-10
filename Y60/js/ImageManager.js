@@ -34,7 +34,6 @@ ImageManager.prototype.Constructor = function(obj, theImagesNode, theScene) {
             myImageNode = Node.createElement("image");
             _myImagesNode.appendChild(myImageNode);
             myImageNode.name = theImageName;
-            myImageNode.id = createUniqueId();
             myImageNode.resize = "pad";
         }
         return myImageNode;
@@ -44,7 +43,6 @@ ImageManager.prototype.Constructor = function(obj, theImagesNode, theScene) {
         var myImageNode = Node.createElement("image");
         _myImagesNode.appendChild(myImageNode);
         myImageNode.name = theSource;
-        myImageNode.id = createUniqueId();
         myImageNode.src = theSource;
         myImageNode.resize = "pad";
         return myImageNode;

@@ -209,26 +209,72 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.image getter = function() {
-        return Protected.myImage;
+        return Protected.myImages[0];
     }
     Public.image setter = function(theImage) {
-        Protected.myImage = theImage;
-        Public.texture.image = theImage.id;
+        Protected.myImages[0] = theImage;
+        _myTextures.childNodes[0].image = theImage.id;
+    }
+    
+    Public.images setter = function(theImages) {
+        for (var i = 0; i < theImages.length; ++i) {
+            if (i < _myTextures.childNodes.length) {
+                _myTextures.childNodes[i].image = theImages[i].id;
+            } else {
+                Protected.addTexture(theImages[i].id);
+            }
+        }
+        i = _myTextures.childNodes.length;
+        while (i-- > theImages.length) {
+            _myTextures.removeChild(_myTextures.lastChild);
+        }
+        addTextureRequirements(_myTextures.childNodesLength());
+        Protected.myImages = theImages;
+    }
+    
+    Public.images getter = function() {
+        /*
+        var myImages = [];
+        for (var i = 0; i < Protected.myImages.length; ++i) {
+            myImages.push(Protected.myImages[i]);
+        }*/
+        return Protected.myImages;
     }
 
+    Public.textures getter = function() {
+        return _myTextures;
+    }
+
+    Public.textures setter = function(theTextures) {
+        for(var i = 0; i < theTextures.length; ++i) {
+            if (i < _myTextures.childNodes.length) {
+                _myTextures.replaceChild(theTextures[i], _myTextures.childNodes[i]);
+            } else {
+                _myTextures.appendChild(theTextures[i]);
+            }
+        }
+        i = _myTextures.childNodes.length;
+        while (i-- > theTextures.length) {
+            _myTextures.removeChild(_myTextures.lastChild);
+        }
+        Protected.onTextureChange();
+    }
+    
     Public.texture getter = function() {
-        return _myTexture;
+        return _myTextures.childNodes[0];
     }
-
+    
     Public.texture setter = function(theTexture) {
-        _myTexture = theTexture;
         _myTextures.replaceChild(theTexture, _myTextures.firstChild);
         Protected.onTextureChange();
     }
 
     Base.removeFromScene = Public.removeFromScene;
     Public.removeFromScene = function() {
-        Protected.myImage.parentNode.removeChild(Protected.myImage);
+        var myParent = Protected.myImages[0].parentNode;
+        for(var i = 0;i < Protected.myImages.length; ++i) {
+            myParent.removeChild(Protected.myImages[i]);
+        }
         Base.removeFromScene();
     }
 
@@ -237,9 +283,14 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Protected.onTextureChange = function() {
-        Protected.myImage = Public.texture.getElementById(Public.texture.image);
-        if (Protected.myImage == null) {
-            throw new Exception("Could not find image with id: " + Public.texture.image, fileline());
+        Protected.myImages = [];
+        for (var i = 0; i < _myTextures.childNodes.length; ++i) {
+            var myId = _myTextures.childNodes[i].image;
+            var myImage = _myTextures.getElementById(myId);
+            if (myImage == null) {
+                throw new Exception("Could not find image with id: " + myId, fileline());
+            }
+            Protected.myImages.push(myImage);
         }
     }
 
@@ -249,7 +300,6 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
             throw new Exception("TextureOverlay can only have one texture, but it has: " + _myTextures.childNodes.length, fileline());
         }
 
-        _myTexture = _myTextures.firstChild;
         Protected.onTextureChange();
     }
 
@@ -258,15 +308,15 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
         if (!_myTextures) {
             _myTextures = Public.material.appendChild(Node.createElement("textures"));
         }
-        _myTexture  = _myTextures.appendChild(Node.createElement("texture"));
-        _myTexture.applymode = "modulate";
-        _myTexture.wrapmode  = "repeat";
-        _myTexture.image     = theImageId;
+        var myTexture  = _myTextures.appendChild(Node.createElement("texture"));
+        myTexture.applymode = "modulate";
+        myTexture.wrapmode  = "repeat";
+        myTexture.image     = theImageId;
         addTextureRequirements(_myTextures.childNodesLength());
-        return _myTexture;
+        return myTexture;
     }
 
-    Protected.myImage = null;
+    Protected.myImages = [];
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
@@ -299,27 +349,25 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
         var myRequiresNode = getDescendantByTagName(Public.material, "requires", false);
         if (myRequiresNode) {
             var myTextureFeatures = getDescendantByAttribute(myRequiresNode, "class", "textures", false);
-            if (myTextureFeatures) {
-                myTextureFeatures.values = createTextureFeatureString(theTextureCount);
-            } else {
-                myTextureFeatures = new Node('<feature class="textures" values="[100[paint]]"/>').firstChild;
+            if (myTextureFeatures == null) {
+                myTextureFeatures = new Node('<feature class="textures"/>').firstChild;
                 myRequiresNode.appendChild(myTextureFeatures);
             }
+            myTextureFeatures.values = createTextureFeatureString(theTextureCount);
 
             var myTexcoordFeatures = getDescendantByAttribute(myRequiresNode, "class", "texcoord", false);
-            if (myTexcoordFeatures) {
-                myTexcoordFeatures.values = createTexcoordFeatureString(theTextureCount);
-            } else {
-                myTexcoordFeatures = new Node('<feature class="texcoord" values="[100[uv_map]]"/>').firstChild;
+            if (myTexcoordFeatures == null) {
+                myTexcoordFeatures = new Node('<feature class="texcoord"/>').firstChild;
                 myRequiresNode.appendChild(myTexcoordFeatures);
             }
+            myTexcoordFeatures.values = createTexcoordFeatureString(theTextureCount);
+            
         } else {
             throw new Exception("TextureOverlay material has no requires node.", fileline());
         }
     }
 
     var _myTextures        = null;
-    var _myTexture         = null;
 }
 
 // Pure virtual base class
@@ -332,32 +380,40 @@ function ImageOverlayBase(Public, Protected, theManager, theSource, thePosition,
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     function addImage(theSource) {
-        Protected.myImage = Node.createElement("image");
-        theManager.images.appendChild(Protected.myImage);
-        Protected.myImage.src  = theSource;
-        Protected.myImage.name = theSource;
-        Protected.myImage.resize = "pad";
-        Protected.addTexture(Protected.myImage.id);
+        var myImage = null;
+        if (typeof(theSource) == "string") { // detect strings
+            myImage = Node.createElement("image");
+            theManager.images.appendChild(myImage);
+            myImage.src  = theSource;
+            myImage.name = theSource;
+            myImage.resize = "pad";
+            
+        } else if (typeof(theSource) == "object" 
+                && "previousSibling" in theSource) { // detect nodes
+            myImage = theSource;
+
+        } else {
+            print("### ERROR: Invalid type of source argument in addImage: " 
+                + typeof(theSource) + " " + fileline());
+            return;
+        }
+        
+        Protected.addTexture(myImage.id);
+        Protected.myImages.push(myImage);
     }
 
     function setup() {
-        if (typeof(theSource) == "string") { // detect strings
-            addImage(theSource);
-            theManager.scene.update(Renderer.IMAGES);
-        } else if ("previousSibling" in theSource) { // detect nodes
-            Protected.myImage = theSource;
-            Protected.addTexture(Protected.myImage.id);
-        } else if ("splice" in theSource) { // detect arrays
+        //detect array
+        if (typeof(theSource) == "object" && "splice" in theSource) {
             for (var i = 0; i < theSource.length; ++i) {
                 addImage(theSource[i]);
             }
-            theManager.scene.update(Renderer.IMAGES);
         } else {
-            print("### ERROR: Invalid type of source argument in addImage: " + typeof(theSource) + " " + fileline());
-            return;
+            addImage(theSource);
         }
+        theManager.scene.update(Renderer.IMAGES);
 
-        var mySize    = getImageSize(Protected.myImage);
+        var mySize    = getImageSize(Protected.myImages[0]);
         Public.width  = mySize.x;
         Public.height = mySize.y;
     }
@@ -367,7 +423,7 @@ function ImageOverlayBase(Public, Protected, theManager, theSource, thePosition,
 
 /// Creates an overlay and with an image as content
 //  @param theManager   Object       The overlay manager for the used viewport
-//  @param theSource    String/Node  Image file name or image node
+//  @param theSource    String/Node  Image file name or image node or array thereof
 //  @param thePosition  Vector2f     Pixelposition of the overlay (optional, default is [0,0])
 //  @param theParent    Node         Parent overlay node (optional, default is toplevel)
 function ImageOverlay(theManager, theSource, thePosition, theParent) {
@@ -409,31 +465,33 @@ function MovieOverlayBase(Public, Protected, theManager, theSource, thePosition,
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     function setup() {
+        var myImage = null;
         if (typeof(theSource) == "object") {
-            Protected.myImage = theSource;
+            myImage = theSource;
         } else {
-            Protected.myImage = Node.createElement("movie");
-            theManager.images.appendChild(Protected.myImage);
-            Protected.myImage.src  = theSource;
-            Protected.myImage.name = theSource;
-            Protected.myImage.resize = "pad";
+            myImage = Node.createElement("movie");
+            theManager.images.appendChild(myImage);
+            myImage.src  = theSource;
+            myImage.name = theSource;
+            myImage.resize = "pad";
             if (theAudioFlag == undefined) {
                 theAudioFlag = true;
             }
-            Protected.myImage.audio = theAudioFlag;
-            window.loadMovieFrame(Protected.myImage);
+            myImage.audio = theAudioFlag;
+            window.loadMovieFrame(myImage);
         }
 
         var mySize = null;
-        if (Protected.myImage.src.search(/\.m60/) != -1) {
-            mySize = getImageSize(Protected.myImage);
+        if (myImage.src.search(/\.m60/) != -1) {
+            mySize = getImageSize(myImage);
         } else {
-            mySize = new Vector2i(Protected.myImage.width, Protected.myImage.height);
+            mySize = new Vector2i(myImage.width, myImage.height);
         }
+        Protected.myImages.push(myImage);
 
         Public.width  = mySize.x;
         Public.height = mySize.y;
-        Protected.addTexture(Protected.myImage.id);
+        Protected.addTexture(myImage.id);
     }
 
     setup();

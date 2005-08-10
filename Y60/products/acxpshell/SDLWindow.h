@@ -29,7 +29,6 @@
 #include <y60/jssettings.h>
 #include <y60/JScppUtils.h>
 #include <y60/AbstractRenderWindow.h>
-#include <y60/OffscreenBuffer.h>
 #include <y60/KeyEvent.h>
 #include <y60/WindowEvent.h>
 
@@ -61,8 +60,6 @@ public:
     virtual void deactivateGLContext();
 
     virtual y60::TTFTextRendererPtr createTTFRenderer();
-    static asl::Ptr<y60::OffscreenBuffer> createOffscreenBuffer(unsigned long theWidth,
-            unsigned long theHeight, const std::string & theFormat);
     void resetCursor();
     // <CursorDesc data="[]" size="[]", hotSize="[]" />
     void createCursor(dom::NodePtr & theCursorInfo);

@@ -22,7 +22,6 @@
 //=============================================================================
 
 #include "GLContext.h"
-#include "OffscreenBuffer.h"
 #include "GLUtils.h"
 
 #include <asl/Logger.h>
@@ -45,52 +44,6 @@ namespace y60 {
         : _myDisplay(0), _myDrawable(0), _myGLXContext(0)  
 #endif
     { }
-
-    GLContext::GLContext(OffscreenBuffer & thePBuffer) {
-#ifdef WIN32
-        OffscreenBuffer::OSHandle myHpbuffer = thePBuffer.getOSHandle();
-         // Get the device context.
-        _myHdc = wglGetPbufferDCARB(myHpbuffer);
-        if ( _myHdc == 0) {
-            throw FrameBuffer::Exception(string("OffscreenFrameBuffer::pbuffer creation error:")+
-                    "wglGetPbufferDCARB() failed",PLUS_FILE_LINE);
-        }
-        checkLastError(PLUS_FILE_LINE);
-
-        // Create a gl context for the p-buffer.
-        _myHglrc = wglCreateContext(_myHdc);
-        if ( _myHglrc == 0) {
-            throw FrameBuffer::Exception(string("OffscreenFrameBuffer::pbuffer creation error:")+
-                    "wglCreateContext() failed",PLUS_FILE_LINE);
-        }
-        checkLastError(PLUS_FILE_LINE);
-#endif
-#ifdef LINUX
-        // TODO: port GLX calls. see example at
-        // http://software.sci.utah.edu/doc/Developer/CodeViews/html/PBuffer_8cc-source.html
-        _myDisplay = thePBuffer.getDisplay();
-       checkLastError(PLUS_FILE_LINE);
-#endif
-    }
-
-    void
-    GLContext::destroy(OffscreenBuffer & thePBuffer) {
-#ifdef WIN32
-        // Check if we are currently rendering in the pbuffer
-        if (wglGetCurrentContext() == _myHglrc ) {
-            wglMakeCurrent(0,0);
-        }
-        // delete the pbuffer context
-        wglDeleteContext( _myHglrc );
-        wglReleasePbufferDCARB( thePBuffer.getOSHandle() , _myHdc );
-#endif
-#ifdef LINUX
-        if (_myGLXContext) {
-            glXDestroyContext( _myDisplay, _myGLXContext );
-            _myGLXContext = 0;
-        }
-#endif        
-     }
 
     GLContext::~GLContext() {
     }
