@@ -217,7 +217,7 @@ namespace asl {
         return myString;
     }
 
-    void binToBase64(const unsigned char * theData, unsigned int theLength, std::string & theDest, const char * theCodeTable = cb67);
+    void binToBase64(const unsigned char * theData, unsigned int theLength, std::string & theDest, const char * theCodeTable = cb66);
     unsigned base64ToBin(const std::string & theSource, unsigned char * theDest, unsigned int maxLength);
 
     /* @} */
