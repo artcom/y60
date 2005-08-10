@@ -43,10 +43,10 @@ class HWSampleSink: public AudioTimeSource
         enum State {STOPPED,            // No sound is playing.
                     RUNNING,            // Sound is playing.
                     STOPPING_FADE_OUT,  // Client has sent stop cmd, fadeout in progress.
-                    STOPPING_SILENT,    // Fadeout has finished, waiting for stop.
                     PAUSING_FADE_OUT,   // Client has sent pause cmd, fadeout in progress.
-                    PAUSING_SILENT,     // Fadeout has finished, waiting for stop.
-                    PAUSED              // Sound is paused.
+                    PAUSED,             // Sound is paused.
+                    PLAYBACK_DONE       // All buffers have been played, __myStopWhenEmpty
+                                        // is set.
         };
 
         // Possible state transitions:
@@ -55,10 +55,8 @@ class HWSampleSink: public AudioTimeSource
         // STOPPED            RUNNING   ignored             ignored
         // RUNNING            ignored   STOPPING_FADE_OUT   PAUSING_FADE_OUT
         // STOPPING_FADE_OUT  RUNNING   ignored             ignored
-        // STOPPING_SILENT    RUNNING   ignored             ignored
         // PAUSING_FADE_OUT   RUNNING   STOPPING_FADE_OUT   ignored
-        // PAUSING_SILENT     RUNNING   STOPPING_SILENT     ignored
-        // PAUSED             RUNNING   STOPPING_SILENT     ignored
+        // PAUSED             RUNNING   STOPPED             ignored
 
         HWSampleSink(const std::string & myName, SampleFormat mySampleFormat, 
                 unsigned mySampleRate, unsigned numChannels);
@@ -72,9 +70,6 @@ class HWSampleSink: public AudioTimeSource
         virtual float getVolume() const;
         AudioBufferPtr createBuffer(unsigned theNumFrames);
         void queueSamples(AudioBufferPtr& theBuffer);
-        void seek(asl::Time thePosition);
-        void seekRelative(asl::Time theAmount);
-        bool canSeek() const;
         asl::Time getBufferedTime() const;
         std::string getName() const;
         State getState() const;
@@ -88,7 +83,6 @@ class HWSampleSink: public AudioTimeSource
     
         void lock();
         void unlock();
-        virtual void reallyStop();
 
         unsigned getNumChannels() const;
         unsigned getSampleRate() const;

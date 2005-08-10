@@ -57,8 +57,6 @@ class Pump : public AudioTimeSource, private PosixThread
         virtual void dumpState() const;
 
         // Interface to HWSampleSink
-        virtual void removeSampleSink(const HWSampleSinkWeakPtr& theSink);
-
         void lock();
         void unlock();
 
@@ -91,8 +89,8 @@ class Pump : public AudioTimeSource, private PosixThread
 
     private:
         void run();
-        void killDeadSinks();
         virtual void pump() = 0;
+        void removeDeadSinks();
 
         std::vector < HWSampleSinkWeakPtr > _mySampleSinks;
         asl::ThreadLock _mySinkLock;

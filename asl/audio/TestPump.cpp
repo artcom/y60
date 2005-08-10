@@ -33,8 +33,6 @@ void TestPump::runWithPump(bool useDummyPump) {
         Pump::get().setBritzelTest(true);
         
         testBufferAlloc();
-        testPumpTimer();
-        testSinkTimer();
 
         // Test different buffer sizes.
 //        playSingleSound(32768);
@@ -45,6 +43,8 @@ void TestPump::runWithPump(bool useDummyPump) {
         playSingleSound(1472); 
         playSingleSound(8096); 
 
+        testPumpTimer();
+        testSinkTimer();
         testMix();
         testMultiplePlay();
         testVolume();
@@ -56,7 +56,7 @@ void TestPump::runWithPump(bool useDummyPump) {
 
         ENSURE(Pump::get().getNumClicks() == 0);
 
-        testUnderrun();
+//        testUnderrun();
 
         AC_DEBUG << "Memory at start: " << myBeginMemory << endl;
         AC_DEBUG << "Memory at end: " << getProcessMemoryUsage() << endl;

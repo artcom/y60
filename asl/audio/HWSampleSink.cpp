@@ -26,9 +26,10 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
         unsigned mySampleRate, unsigned numChannels)
     : AudioTimeSource(0, mySampleRate),
       _myStopWhenEmpty(false),
-      _numChannels(numChannels)
+      _numChannels(numChannels),
+      _myState(STOPPED)
 {
-    AC_DEBUG << "HWSampleSink::HWSampleSinkPtr (" << _myName << ")";
+    AC_DEBUG << "HWSampleSink::HWSampleSink (" << _myName << ")";
     _myName = myName;
     _mySampleFormat = mySampleFormat;
     _mySampleRate = mySampleRate;
@@ -41,7 +42,6 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
     _myFrameCount = 0;
     _myVolume = 1;
     _myVolumeFader = Ptr<VolumeFader>(new VolumeFader(_mySampleFormat));
-    changeState(STOPPED);
     _numChannels = numChannels;
     _myBackupBuffer = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 32, 
                 _numChannels, _mySampleRate));
@@ -57,7 +57,6 @@ HWSampleSink::~HWSampleSink() {
     if (_numUnderruns > 0) {
         AC_WARNING << _numUnderruns << " underruns in SampleSink for " << _myName << endl;
     }
-    Pump::get().removeSampleSink(_mySelf);
     AC_DEBUG << "~HWSampleSink end (" << _myName << ")";
 }
 
@@ -120,10 +119,12 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
                 changeState(STOPPING_FADE_OUT);
                 _myStopWhenEmpty = false;
                 break;
-            case PAUSING_SILENT:
             case PAUSED:
-                changeState(STOPPING_SILENT);
+                changeState(STOPPED);
                 AudioTimeSource::stop();
+                AC_TRACE << "PAUSED: _myBufferQueue.clear();";
+                _myBufferQueue.clear();
+                _myPosInInputBuffer = 0;
                 _myStopWhenEmpty = false;
                 break;
             default:
@@ -158,18 +159,8 @@ AudioBufferPtr HWSampleSink::createBuffer(unsigned theNumFrames) {
 
 void HWSampleSink::queueSamples(AudioBufferPtr& theBuffer) {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
-//    AC_TRACE << "queueSamples: " << *theBuffer << endl;
+    AC_TRACE << "queueSamples: " << *theBuffer << endl;
     _myBufferQueue.push_back(theBuffer);
-}
-
-void HWSampleSink::seek(asl::Time thePosition) {
-}
-
-void HWSampleSink::seekRelative(asl::Time theAmount) {
-}
-
-bool HWSampleSink::canSeek() const {
-    return true;
 }
 
 asl::Time HWSampleSink::getBufferedTime() const {
@@ -202,20 +193,17 @@ std::string HWSampleSink::stateToString(State theState) {
         case STOPPING_FADE_OUT:
             return "STOPPING_FADE_OUT";
             break;
-        case STOPPING_SILENT:
-            return "STOPPING_SILENT";
-            break;
         case PAUSING_FADE_OUT:
             return "PAUSING_FADE_OUT";
             break;
-        case PAUSING_SILENT:
-            return "PAUSING_SILENT";
+        case PLAYBACK_DONE:
+            return "PLAYBACK_DONE";
             break;
         case PAUSED:
             return "PAUSED";
             break;
         default:
-            return "unknown HWSampleSink state!?";
+            return "unknown HWSampleSink state";
     }
 }
 
@@ -240,7 +228,7 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
     unsigned curOutputFrame = 0;
     AudioBufferBase* mySourceBuffer = getNextBuffer();
     unsigned myFramesInBuffer = mySourceBuffer->getNumFrames()-_myPosInInputBuffer;
-    AC_TRACE << "  _myPosInInputBuffer: " << _myPosInInputBuffer;
+//    AC_TRACE << "  _myPosInInputBuffer: " << _myPosInInputBuffer;
     unsigned numFramesToCopy = min(theBuffer.getNumFrames(), myFramesInBuffer);
 //    AC_TRACE << "copyFrames - 1 (0, " << _myPosInInputBuffer << ", " << numFramesToCopy << ")";
 //    AC_TRACE << "mySourceBuffer: " << *mySourceBuffer;
@@ -249,7 +237,7 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
     curOutputFrame += numFramesToCopy;
     if (curOutputFrame == theBuffer.getNumFrames()) {
         _myPosInInputBuffer += numFramesToCopy;
-        AC_TRACE << "_myPosInInputBuffer 1: " << _myPosInInputBuffer << endl;
+//        AC_TRACE << "_myPosInInputBuffer 1: " << _myPosInInputBuffer << endl;
     } else {
         _myPosInInputBuffer = 0;
         while (curOutputFrame < theBuffer.getNumFrames()) {
@@ -268,18 +256,18 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
             AC_ERROR << "Internal error in HWSampleSink::deliverData()";
         }
         _myPosInInputBuffer = numFramesToCopy;
-        AC_TRACE << "_myPosInInputBuffer 2: " << _myPosInInputBuffer << endl;
+//        AC_TRACE << "_myPosInInputBuffer 2: " << _myPosInInputBuffer << endl;
     }
     if (_isUsingBackupBuffer) {
         _myPosInInputBuffer = 0;
-        AC_TRACE << "_myPosInInputBuffer 3: " << _myPosInInputBuffer << endl;
+//        AC_TRACE << "_myPosInInputBuffer 3: " << _myPosInInputBuffer << endl;
     }
     if (_myPosInInputBuffer == mySourceBuffer->getNumFrames()) {
         _myPosInInputBuffer = 0;
         if (!_isUsingBackupBuffer) {
             _myBufferQueue.pop_front();
         }
-        AC_TRACE << "_myPosInInputBuffer 4: " << _myPosInInputBuffer << endl;
+//        AC_TRACE << "_myPosInInputBuffer 4: " << _myPosInInputBuffer << endl;
     }
 
     {
@@ -306,34 +294,22 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
 */
     // Check if fadeouts are finished. Can't stop here because that could result in
     // a delete of the current sink. That in turn would garble the Pump's mix loop.
-    if (_myState == STOPPING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) {
-        changeState(STOPPING_SILENT);
+    if ((_myState == STOPPING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) ||
+            _myState == PLAYBACK_DONE)
+    {
+        changeState(STOPPED);
+        AC_TRACE << "_myBufferQueue.clear();";
+        _myBufferQueue.clear();
+        _myPosInInputBuffer = 0;
+        _myLockedSelf = HWSampleSinkPtr(0);
         AudioTimeSource::stop();
     }
     if (_myState == PAUSING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) {
-        changeState(PAUSING_SILENT);
+        changeState(PAUSED);
+        _myLockedSelf = HWSampleSinkPtr(0);
         AudioTimeSource::pause();
     }
     AC_TRACE << "HWSampleSink::~deliverData";
-}
-
-void HWSampleSink::reallyStop() {
-    AC_DEBUG << "reallyStop";
-    AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    switch (_myState) {
-        case STOPPING_SILENT:
-            changeState(STOPPED);
-            _myBufferQueue.clear();
-            _myPosInInputBuffer = 0;
-            break;
-        case PAUSING_SILENT:
-            changeState(PAUSED);
-            break;
-        default:
-            AC_WARNING << "HWSampleSink::reallyStop: Illegal state";
-    }
-    _myLockedSelf = HWSampleSinkPtr(0);
-    AC_DEBUG << "~reallyStop";
 }
 
 unsigned HWSampleSink::getNumChannels() const {
@@ -375,14 +351,15 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
             "HWSampleSink::getNextBuffer() should not be called when the sink isn't active.");
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     if (_myBufferQueue.empty()) {
-        if (_myState != STOPPING_SILENT) {
+        if (_myState != PLAYBACK_DONE) {
             if (_myStopWhenEmpty) {
-                changeState(STOPPING_SILENT);
+                changeState(PLAYBACK_DONE);
                 AudioTimeSource::stop();
             } else {
                 _numUnderruns++;
                 if (_numUnderruns == 1) {
                     AC_DEBUG << "Underrun for sample sink " << _myName;
+                    exit(-1);
                 }
             }
         }
