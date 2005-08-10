@@ -36,7 +36,8 @@ namespace y60 {
         virtual void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels, 
                 bool useDummy);
 
-        virtual SoundPtr createSound(const std::string & theURI, bool theLoop = false);
+        virtual SoundPtr createSound(const std::string & theURI, bool theLoop = false,
+                const std::string & theName = "");
         virtual SoundPtr createSound(const std::string & theURI, 
                 asl::Ptr < asl::ReadableStream > theStream, bool theLoop = false);
         virtual void setVolume(float theVolume);

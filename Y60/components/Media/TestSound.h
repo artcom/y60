@@ -18,6 +18,7 @@
 #include "Media.h"
 
 #include <asl/numeric_functions.h>
+#include <asl/string_functions.h>
 #include <asl/PlugInManager.h>
 #include <asl/Pump.h>
 
@@ -386,14 +387,17 @@ class StressTest: public SoundTestBase {
        
         void run() {
             Time myStartTime;
+            int i = 0;
             while(double(Time())-myStartTime < _myDuration) { 
                 SoundPtr mySound = getMedia()->createSound
-                        ("../../testfiles/stereotest441.wav", false);
+                        ("../../testfiles/stereotest441.wav", false,
+                         "../../testfiles/stereotest441.wav"+asl::as_string(i));
                 mySound->setVolume(0.1f);
                 mySound->play();
                 double r1 = rand()/double(RAND_MAX);
-                unsigned myTime = unsigned(50*r1);
+                unsigned myTime = unsigned(10*r1);
                 msleep(myTime);
+                ++i;
             }
             SUCCESS("StressTest");
         }
@@ -436,7 +440,7 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new StressTest(5));
 
             // 24 Hour test :-).
-//            addTest(new StressTest(myMedia, 60*60*24));
+//            addTest(new StressTest(60*60*24));
         }
 
     private:

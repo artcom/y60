@@ -51,9 +51,15 @@ void Media::setAppConfig(unsigned mySampleRate, unsigned numOutputChannels,
     Pump::setAppConfig(mySampleRate, numOutputChannels, useDummy);
 }
 
-SoundPtr Media::createSound(const string & theURI, bool theLoop) {
+SoundPtr Media::createSound(const string & theURI, bool theLoop,
+        const std::string & theName)
+{
     AutoLocker<ThreadLock> myLocker(_myLock);
-    HWSampleSinkPtr mySampleSink = Pump::get().createSampleSink(theURI); 
+    string myName = theName;
+    if (myName.empty()) {
+        myName = theURI;
+    }
+    HWSampleSinkPtr mySampleSink = Pump::get().createSampleSink(myName); 
     SoundPtr mySound = SoundPtr(new Sound(theURI, mySampleSink, theLoop));
     mySound->setSelf(mySound);
     _mySounds.push_back(mySound);
