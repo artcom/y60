@@ -74,7 +74,7 @@ namespace y60 {
             setNode(mySceneNode);
         } else {
             _myDocument->appendChild(getNode());
-            getNode()->appendAttribute(REVISION_ATTRIB, ourRevision);
+            getNode()->appendAttribute(REVISION_ATTRIB, asl::ourRevision);
         }
 
         // Create container nodes
