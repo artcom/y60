@@ -34,6 +34,7 @@ public:
     unsigned deleteIndicesByColor(unsigned int theColor);
     unsigned deleteDanglingVertices();
     bool check() const;
+    bool isClosed() const;
     void lockWrite();
     void unlockWrite(bool theForceFlag = false);
     void computeError();

@@ -135,6 +135,12 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
     return _mySlices.size();
 }
 
+int
+CTScan::setSlices(std::vector<dom::ResizeableRasterPtr> theSlices) {
+    _mySlices = theSlices;
+    return _mySlices.size();
+}
+
 void
 CTScan::clear() {
     _mySlices.clear();

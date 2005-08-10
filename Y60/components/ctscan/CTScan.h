@@ -27,10 +27,6 @@
 #include <asl/pixel_functions.h>
 #include <asl/palgo.h>
 #include <asl/raster.h>
-#ifndef WIN32
-#include <dicom/osconfig.h>
-#endif
-#include <dcmimage.h>
 #include <string>
 #include <sigc++/sigc++.h>
 #include <glibmm/ustring.h>
@@ -60,6 +56,7 @@ class CTScan {
         virtual ~CTScan();
        
         int loadSlices(asl::PackageManager & thePackageManager, const std::string & theSubDir, const std::string& thePackage);
+        int setSlices(std::vector<dom::ResizeableRasterPtr> theSlices);
 
         void reconstructToImage(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
 

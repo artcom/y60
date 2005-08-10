@@ -189,6 +189,17 @@ Mesh::computeError() {
 }
 
 bool
+Mesh::isClosed() const {
+    const VectorOfSignedInt & myHalfEdges = _myHalfEdges ? *_myHalfEdges : _myHalfEdgesNode->nodeValueRef<VectorOfSignedInt>();
+    for (int i = 0; i < myHalfEdges.size(); ++i) {
+        if (myHalfEdges[i] < 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool
 Mesh::check() const {
     MAKE_SCOPE_TIMER(Mesh_check);
     bool mySuccess = true;
