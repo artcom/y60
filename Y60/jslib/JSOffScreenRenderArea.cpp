@@ -29,7 +29,7 @@ typedef jslib::AbstractRenderWindow BASE;
 typedef JSAbstractRenderWindow<OffScreenRenderArea> JSBASE;
 
 static JSBool
-renderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
     DOC_BEGIN("renders my current scene onto the texture given by the target attribute of my canvas. the underlying raster value is ignored or updated.");
     DOC_PARAM_OPT("theCopyToImageFlag", DOC_TYPE_BOOLEAN, false);
@@ -42,9 +42,9 @@ renderToTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     if (argc > 0) {
         bool myCopyToImageFlag;
         convertFrom(cx, argv[0], myCopyToImageFlag);
-        myNative->renderToTexture(myCopyToImageFlag);
+        myNative->renderToCanvas(myCopyToImageFlag);
     } else {
-        myNative->renderToTexture();
+        myNative->renderToCanvas();
     }
     return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -54,7 +54,7 @@ JSFunctionSpec *
 JSOffScreenRenderArea::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
-        {"renderToTexture",      renderToTexture,           1},
+        {"renderToCanvas",      renderToCanvas,           1},
         {"setScene",             JSBASE::setScene,          0},
         {0}
     };

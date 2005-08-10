@@ -24,15 +24,18 @@
 #include <asl/Logger.h>
 #include <dom/Nodes.h>
 #include <dom/Value.h>
+#include <y60/OffScreenBuffer.h>
 
 /**
  * 
  * @ingroup Y60jslib
  */ 
+
 namespace jslib {
     class y60::Image;
     
-class OffScreenRenderArea : public AbstractRenderWindow {
+class OffScreenRenderArea : public y60::OffScreenBuffer, 
+                            public AbstractRenderWindow {
     public:
         static asl::Ptr<OffScreenRenderArea> create();
         
@@ -53,7 +56,7 @@ class OffScreenRenderArea : public AbstractRenderWindow {
          * the underlying raster value is ignored
          * else the texture is copied into the raster.
          */
-        void renderToTexture(bool theCopyToImageFlag = false); 
+        void renderToCanvas(bool theCopyToImageFlag = false); 
 
 
         /**
@@ -85,17 +88,12 @@ class OffScreenRenderArea : public AbstractRenderWindow {
             return y60::TTFTextRendererPtr(0);
         }
         
-
+        
     private:
-        void copyTextureToImage(asl::Ptr<y60::Image, dom::ThreadingModel> theImage);
         dom::ResizeableRasterPtr ensureRaster(asl::Ptr<y60::Image, dom::ThreadingModel> theImage);
         const asl::Ptr<y60::Image, dom::ThreadingModel> getImage() const;
         asl::Ptr<y60::Image, dom::ThreadingModel> getImage();
-        void copyFrameBufferToTexture(asl::Ptr<y60::Image, dom::ThreadingModel> theImage);
-        void bindTexture(asl::Ptr<y60::Image, dom::ThreadingModel> theTexture);
-        void bindOffScreenFrameBuffer(asl::Ptr<y60::Image, dom::ThreadingModel> theTexture);
-        
-        unsigned _myOffScreenBuffer ,_myDepthBuffer;
+
 };
 
 }
