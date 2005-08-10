@@ -27,7 +27,6 @@
 #include <asl/DirectoryPackage.h>
 #include <asl/string_functions.h>
 #include <asl/os_functions.h>
-#include <asl/Revision.h>
 
 #include <iostream>
 
@@ -43,8 +42,6 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
     {"--jsversion", "VERSION"},
     {"-I", "include path (semicolon-separated)"},
     {"--no-jswarnings", ""},
-    {"--version", ""},
-    {"--revision", ""},
     {"--pause-on-error", ""},
     {"--std-logfile", "logfile base filename for stdout/stderr"},
     {"--help", ""},
@@ -56,24 +53,11 @@ main(int argc, char **argv) {
     int rv = 1;
     try {
         ourArguments.addAllowedOptions(ourAllowedOptions);
-        ourArguments.parse(argc, argv);
+        if (!ourArguments.parse(argc, argv)) {
+            return 0;
+        }
 
         asl::StdOutputRedirector myRedirector(ourArguments);
-
-        AC_PRINT << ourArguments.getProgramName() << " Copyright (C) 2003-2005 ART+COM";
-        AC_INFO << "Build date " << __DATE__ << " " << __TIME__;
-        AC_INFO << "Revision: " << asl::ourRevision;
-
-        if (ourArguments.haveOption("--version")) {
-            AC_PRINT << "build on " << __DATE__ << " at " << __TIME__
-                     << " (Rev: " << asl::ourRevision << ")";
-            return 0;
-        }
-
-        if (ourArguments.haveOption("--revision")) {
-            AC_PRINT << "Revision: " << asl::ourRevision;
-            return 0;
-        }
 
         // look in AC_TEXTURE_DIR if set
         std::string myTextureDirs = asl::expandEnvironment("${AC_TEXTURE_DIR}");

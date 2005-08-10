@@ -24,6 +24,8 @@
 #include "Arguments.h"
 #include "Logger.h"
 
+#include <asl/Revision.h>
+
 #include <sstream>
 
 using namespace std; 
@@ -50,6 +52,8 @@ Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
         } 
         ++i;
     }
+    _allowedOptions["--revision"] = "";
+    _allowedOptions["--version"] = "";
 }
 
 const string & 
@@ -115,6 +119,14 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
         } else if (argv[i][0] == OPTION_START_CHAR) {
             map<string,string>::const_iterator foundItem = _allowedOptions.find(argv[i]);  
             if (foundItem != _allowedOptions.end()) {
+                if (foundItem->first == "--revision") {
+                    printRevision();
+                    return false;
+                }
+                if (foundItem->first == "--version") {
+                    printVersion();
+                    return false;
+                }
                 _options[argv[i]] = i; 
                 if (foundItem->second != "") {
                     // needs argument
@@ -142,11 +154,28 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
                 _programName = argv[0];
                 string::size_type myRealNameStart = _programName.rfind(theDirectorySeparator);
                 _programName = _programName.substr(++myRealNameStart);
+                printCopyright();
             }
         }
         
     }
     return argc != 0;
+}
+
+void 
+Arguments::printCopyright() const {
+    AC_PRINT << _programName << " Copyright (C) 2003-2005 ART+COM";
+}
+
+void 
+Arguments::printRevision() const {
+    AC_PRINT << "Revision: " << ourRevision;
+}
+
+void 
+Arguments::printVersion() const {
+    AC_PRINT << "build on " << __DATE__ << " at " << __TIME__
+             << " (Rev: " << asl::ourRevision << ")";
 }
 
 void 

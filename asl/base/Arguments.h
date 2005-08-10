@@ -48,6 +48,9 @@ public:
     bool parse(std::vector<std::string> myArgs, int errorHandlingPolicy=BailOnUnknownOptions); 
     bool parse(int argc, const char * const argv[], int errorHandlingPolicy=BailOnUnknownOptions);
     void printUsage() const;
+    void printRevision() const;
+    void printVersion() const;
+    void printCopyright() const;
     void setArgumentDescription(const char * theArgumentDescription);
 
     int getCount() const {

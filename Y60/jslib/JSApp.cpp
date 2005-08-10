@@ -705,8 +705,7 @@ BuildDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     try {
         //fprintf(gOutFile, "built on %s at %s\n", __DATE__, __TIME__);
-        AC_PRINT << "built on " << __DATE__<< " at " << __TIME__
-                 << " (Rev: " << asl::ourRevision << ")";
+        AC_PRINT << "built on " << __DATE__<< " at " << __TIME__;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
