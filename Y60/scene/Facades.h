@@ -95,7 +95,7 @@ namespace y60 {
         public JointOrientationTag::Plug
     {
     public:
-        JointFacade(dom::Node & theNode) : 
+        JointFacade(dom::Node & theNode) :
             TransformHierarchyFacade(theNode),
             JointOrientationTag::Plug(theNode)
         {}
@@ -113,6 +113,8 @@ namespace y60 {
                 // local matrix
                 TransformHierarchyFacade::registerDependenciesForLocalMatrix();
                 LocalMatrixTag::Plug::dependsOn<JointOrientationTag>(*this);
+
+                LocalMatrixTag::Plug::setCalculatorFunction(&JointFacade::recalculateLocalMatrix);
             }
         }
 
@@ -154,7 +156,7 @@ namespace y60 {
     template <class T>
     inline asl::Ptr<T, dom::ThreadingModel>
     createFacade(dom::NodePtr theParent) {
-        dom::NodePtr myNode = theParent.appendChild(dom::NodePtr(new dom::Element(T::name)));                
+        dom::NodePtr myNode = theParent.appendChild(dom::NodePtr(new dom::Element(T::name)));
         return myNode->getFacade<T>();
     }
 

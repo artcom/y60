@@ -24,7 +24,7 @@
 #include <y60/NodeNames.h>
 
 #include <asl/Box.h>
-#include <asl/Logger.h> 
+#include <asl/Logger.h>
 
 using namespace std;
 using namespace asl;
@@ -33,18 +33,18 @@ using namespace dom;
 namespace y60 {
 
     DEFINE_EXCEPTION(SkinAndBonesException, asl::Exception);
-        
+
     void
     SkinAndBones::setup(NodePtr theSceneNode) {
-        // Cache BoneMatrix material property 
+        // Cache BoneMatrix material property
         NodePtr myBoneMatrixProp = findPropertyNode("BoneMatrix");
         if (myBoneMatrixProp) {
             _myBoneMatrixPropertyNode = myBoneMatrixProp->childNode(0);
         } else {
-            throw SkinAndBonesException(std::string("Could not find BoneMatrix property in material: ") + getId(), 
+            throw SkinAndBonesException(std::string("Could not find BoneMatrix property in material: ") + getId(),
                     PLUS_FILE_LINE);
         }
-              
+
         // Find connected skin
         NodePtr myShapesNode = theSceneNode->childNode(SHAPE_LIST_NAME);
         NodePtr myWorldsNode = theSceneNode->childNode(WORLD_LIST_NAME);
@@ -56,12 +56,19 @@ namespace y60 {
         vector<NodePtr> myElements;
         myShapesNode->getNodesByAttribute(ELEMENTS_NODE_NAME, MATERIAL_REF_ATTRIB, getId(), myElements);
 
-        if (myElements.size() > 1) {
-            AC_WARNING << myElements.size() << " elements use material " << getId() << endl;
+
+        string myShapeId;
+        for (unsigned i = 0; i < myElements.size(); ++i) {
+            string myOtherShapeId = myElements[i]->parentNode()->parentNode()->getAttributeString(ID_ATTRIB);
+            if (i == 0) {
+                myShapeId = myOtherShapeId;
+            }  else {
+                if (myOtherShapeId != myShapeId) {
+                    AC_WARNING << "Shape " << myOtherShapeId << " uses skin-and-bones material already used by shape " << myShapeId;
+                }
+            }
         }
 
-        //TODO: check if parentNode exists
-        const string & myShapeId = myElements[0]->parentNode()->parentNode()->getAttributeString(ID_ATTRIB);
         vector<NodePtr> mySkeletons;
         myWorldsNode->getNodesByAttribute(BODY_NODE_NAME, BODY_SHAPE_ATTRIB, myShapeId, mySkeletons);
 
@@ -71,10 +78,10 @@ namespace y60 {
 
         // Cache bounding box
         _myBoundingBoxNode = mySkeletons[0]->getFacade()->getNamedItem(BOUNDING_BOX_ATTRIB);
-        
+
         // Find connected joints
         NodePtr mySkeletonAttribute = mySkeletons[0]->getAttribute(SKELETON_ATTRIB);
-        
+
         if (!mySkeletonAttribute) {
             throw SkinAndBonesException(std::string("Skeleton node does not contain skeleton attribute:\n")
                  + asl::as_string(*mySkeletons[0]), PLUS_FILE_LINE);
@@ -99,21 +106,21 @@ namespace y60 {
             _myJointSpaceTransforms.push_back(asl::inverse(myInitialMatrix));
         }
 
-        _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>()->resize(_myJointMatrices.size() * 3);        
+        _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>()->resize(_myJointMatrices.size() * 3);
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
     }
 
-    void 
+    void
     SkinAndBones::update(TextureManager & theTextureManager, const dom::NodePtr theImages) {
-        MaterialBase::update(theTextureManager, theImages);                                
+        MaterialBase::update(theTextureManager, theImages);
 
-        VectorOfVector4f * myBoneMatrixProperty = _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>();        
+        VectorOfVector4f * myBoneMatrixProperty = _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>();
         if (!myBoneMatrixProperty) {
             throw SkinAndBonesException("SkinAndBones shader update has been called before setup", PLUS_FILE_LINE);
         }
 
-        Box3f * myBoundingBox = _myBoundingBoxNode->nodeValuePtrOpen<Box3f>();
-        myBoundingBox->makeEmpty();
+        //Box3f * myBoundingBox = _myBoundingBoxNode->nodeValuePtrOpen<Box3f>();
+        //myBoundingBox->makeEmpty();
 
         for (unsigned i = 0; i < _myJointMatrices.size(); ++i) {
             Matrix4f myMatrix(_myJointSpaceTransforms[i]);
@@ -122,10 +129,10 @@ namespace y60 {
             myBoneMatrixProperty->at(i * 3 + 0) = myMatrix.getColumn(0);
             myBoneMatrixProperty->at(i * 3 + 1) = myMatrix.getColumn(1);
             myBoneMatrixProperty->at(i * 3 + 2) = myMatrix.getColumn(2);
-            
-            myBoundingBox->extendBy(asPoint(_myJointMatrices[i]->getTranslation()));
-        }                                                
+
+            //myBoundingBox->extendBy(asPoint(_myJointMatrices[i]->getTranslation()));
+        }
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
-        _myBoundingBoxNode->nodeValuePtrClose<Box3f>();
+        //_myBoundingBoxNode->nodeValuePtrClose<Box3f>();
    }
-} 
+}
