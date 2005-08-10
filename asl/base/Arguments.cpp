@@ -12,9 +12,9 @@
 //   $Author  : $
 //   $Revision: 1.8 $
 //   $Date    : $
-//   
 //
-//  Description: 
+//
+//  Description:
 //
 // (CVS log at the bottom of this file)
 //
@@ -23,12 +23,11 @@
 #include "settings.h"
 #include "Arguments.h"
 #include "Logger.h"
-
-#include <asl/Revision.h>
+#include "Revision.h"
 
 #include <sstream>
 
-using namespace std; 
+using namespace std;
 
 #define DB(x) // x
 
@@ -40,7 +39,7 @@ Arguments::Arguments(const AllowedOption * allowedOptions)  {
     addAllowedOptions(allowedOptions);
 }
 
-void 
+void
 Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
     int i = 0;
     while ((string(allowedOptions[i].theName) != "" ||  string(allowedOptions[i].theArgumentName) != "")
@@ -48,24 +47,24 @@ Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
         if (allowedOptions[i].theName != "") {
             _allowedOptions[allowedOptions[i].theName] = allowedOptions[i].theArgumentName;
         } else {
-            _argumentNames.push_back(allowedOptions[i].theArgumentName); 
-        } 
+            _argumentNames.push_back(allowedOptions[i].theArgumentName);
+        }
         ++i;
     }
     _allowedOptions["--revision"] = "";
     _allowedOptions["--version"] = "";
 }
 
-const string & 
+const string &
 Arguments::getOptionArgument(const string & option) const {
     map<string, string>::const_iterator it = _allowedOptions.find(option);
 
     if (it == _allowedOptions.end()) {
         throw IllegalOptionQuery(option,PLUS_FILE_LINE);
     }
-   
+
     if (!it->second.empty()) {
-        map<string,int>::const_iterator foundItem = _options.find(option);  
+        map<string,int>::const_iterator foundItem = _options.find(option);
         if (foundItem != _options.end()) {
             return _allArguments[foundItem->second + 1];
         }
@@ -75,7 +74,7 @@ Arguments::getOptionArgument(const string & option) const {
 }
 
 
-bool 
+bool
 Arguments::haveOption(const string & option) const {
     if (_allowedOptions.find(option) == _allowedOptions.end()) {
         throw IllegalOptionQuery(option,PLUS_FILE_LINE);
@@ -83,7 +82,7 @@ Arguments::haveOption(const string & option) const {
     return _options.find(option) != _options.end();
 }
 
-std::vector<std::string> 
+std::vector<std::string>
 Arguments::getOptionNames() const {
     vector<string> myOptionNames;
     map<string, int>::const_iterator it = _options.begin();
@@ -97,27 +96,27 @@ Arguments::getOptionNames() const {
 bool
 Arguments::parse(std::vector<string> myArgs, int errorHandlingPolicy) {
     vector<const char *> myArgv;
-    
+
     for (int i = 0; i < myArgs.size(); ++i) {
         myArgv.push_back(myArgs[i].c_str());
-    } 
+    }
     return parse(myArgv.size(), &(*myArgv.begin()), errorHandlingPolicy);
 }
 
-bool 
+bool
 Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
     bool myIgnoreFurtherOptionsFlag = false;
     for (int i = 0; i < argc; ++i) {
         _allArguments.push_back(string(argv[i]));
         DB(AC_DEBUG << "Parsing '" << argv[i] << "'" << endl);
-        
+
         if (myIgnoreFurtherOptionsFlag) {
             _justArguments.push_back(i);
         } else if (string("--") == argv[i]) {
             DB(AC_DEBUG << "Ignoring" << endl);
             myIgnoreFurtherOptionsFlag = true;
         } else if (argv[i][0] == OPTION_START_CHAR) {
-            map<string,string>::const_iterator foundItem = _allowedOptions.find(argv[i]);  
+            map<string,string>::const_iterator foundItem = _allowedOptions.find(argv[i]);
             if (foundItem != _allowedOptions.end()) {
                 if (foundItem->first == "--revision") {
                     printRevision();
@@ -127,29 +126,29 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
                     printVersion();
                     return false;
                 }
-                _options[argv[i]] = i; 
+                _options[argv[i]] = i;
                 if (foundItem->second != "") {
                     // needs argument
                     if (argc <= i+1) {
                         //no argument available
-                        AC_ERROR << "Argument missing for option '" << argv[i] << "'" << endl; 
+                        AC_ERROR << "Argument missing for option '" << argv[i] << "'" << endl;
                         printUsage();
                         return false;
                     }
                     // take next argument
-                    ++i; 
+                    ++i;
                     _allArguments.push_back(argv[i]);
                 }
             } else {
                 if (errorHandlingPolicy & BailOnUnknownOptions) {
-                    AC_ERROR << "Illegal option: " << argv[i]; 
+                    AC_ERROR << "Illegal option: " << argv[i];
                     printUsage();
                     return false;
                 }
             }
-        } else {    
+        } else {
             if (i) {
-                _justArguments.push_back(i);                
+                _justArguments.push_back(i);
             } else {
                 _programName = argv[0];
                 string::size_type myRealNameStart = _programName.rfind(theDirectorySeparator);
@@ -157,28 +156,28 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
                 printCopyright();
             }
         }
-        
+
     }
     return argc != 0;
 }
 
-void 
+void
 Arguments::printCopyright() const {
     AC_PRINT << _programName << " Copyright (C) 2003-2005 ART+COM";
 }
 
-void 
+void
 Arguments::printRevision() const {
     AC_PRINT << "Revision: " << ourRevision;
 }
 
-void 
+void
 Arguments::printVersion() const {
     AC_PRINT << "build on " << __DATE__ << " at " << __TIME__
              << " (Rev: " << asl::ourRevision << ")";
 }
 
-void 
+void
 Arguments::printUsage() const {
     ostringstream myUsage;
     myUsage << "Usage: " << _programName << " ";
