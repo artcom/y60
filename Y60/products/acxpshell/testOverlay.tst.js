@@ -195,12 +195,11 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         ///////////////////////////////////////////////////////////////////////////////////////
 
 
-        var mySources = ["/usr/local/danielk/pro60/testmodels/tex/testbild00.rgb", "/usr/local/danielk/pro60/testmodels/tex/rgbtest_256.png"];
+        var mySources = ["../../testfiles/black.rgb", "../../DiffuseRamp.png"];
         obj.myMultiOverlay = new ImageOverlay(myOverlayManager, mySources);
         ENSURE('obj.myMultiOverlay.images.length == 2');
 
         obj.myMultiOverlay.position = new Vector2f(300,300);
-        window.scene.save("save.x60");        
         
         var myImages = obj.myMultiOverlay.images;
         myImages.push( obj.myMultiOverlay.images[0].cloneNode(true) );
@@ -208,12 +207,10 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         // ENSURE('obj.myMultiOverlay.images.length == 2');
         obj.myMultiOverlay.images = myImages;
         ENSURE('obj.myMultiOverlay.images.length == 3');
-    window.scene.save("save3.x60");        
         myImages = [];
         myImages.push(obj.myMultiOverlay.images[0]);
         obj.myMultiOverlay.images = myImages;
         ENSURE('obj.myMultiOverlay.images.length == 1');
-    window.scene.save("save1.x60");        
 
 
 
