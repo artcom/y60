@@ -35,6 +35,7 @@
 #include <asl/Arguments.h>
 #include <asl/PlugInManager.h>
 #include <asl/Logger.h>
+#include <asl/Revision.h>
 
 #include <js/jsapi.h>
 #include <js/jsprf.h>
@@ -56,7 +57,6 @@
 #include <y60/Image.h>
 #include <y60/CommonTags.h>
 #include <y60/Request.h>
-#include <y60/Revision.h>
 
 #include <errno.h>
 #include <stdio.h>
@@ -706,7 +706,7 @@ BuildDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         //fprintf(gOutFile, "built on %s at %s\n", __DATE__, __TIME__);
         AC_PRINT << "built on " << __DATE__<< " at " << __TIME__
-                 << " (Rev: " << ourRevision << ")";
+                 << " (Rev: " << asl::ourRevision << ")";
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -716,7 +716,7 @@ Revision(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Prints the SVN revision number of pro60 at time of build.");
     DOC_END;
     try {
-        AC_PRINT << "Revision: " << ourRevision;
+        AC_PRINT << "Revision: " << asl::ourRevision;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
