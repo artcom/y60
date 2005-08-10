@@ -10,6 +10,7 @@
 //=============================================================================
 
 #include "CTScan.h"
+#include "Mesh.h"
 
 #include <y60/IDecoder.h>
 #include <asl/PlugInManager.h>
@@ -43,7 +44,7 @@ class MarchTest : public UnitTest {
                 for (int y = 0; y < theSize; ++y) {
                     for (int x = 0; x < theSize; ++x) {
                         float myDistance = magnitude(difference(Vector3f(x,y,z), myCenter));
-                        myPixels[y*theSize+x] = Unsigned8((1.0f-clamp(myDistance*2/ theSize, 0.0f, 1.0f))*255); 
+                        myPixels[y*theSize+x] = Unsigned8((1.0f-clamp(myDistance*2.5f/ (theSize), 0.0f, 1.0f))*255); 
                     }
                 }
             }
@@ -59,11 +60,18 @@ class MarchTest : public UnitTest {
 
             myCTScan->setSlices(mySlices);
             myCTScan->setVoxelSize(Vector3f(1.0f,1.0f,1.0f));
-            Box3i myBox(Point3i(0,0,0), Point3i(mySize-1,mySize-1,mySize-1));
-            ScenePtr myScene = myCTScan->polygonize(myBox, 200.0, 1, true, myPackageManager); 
-            ShapePtr myShape = myScene->getShapesRoot()->childNode(0)->getFacade<Shape>();
-            ENSURE(myShape);
-            myScene->save("test.x60", false);
+            Box3i myBox(Point3i(0,0,0), Point3i(mySize,mySize,mySize));
+
+            for (int i = 0; i < 256; ++i) {
+                ScenePtr myScene = myCTScan->polygonize(myBox, float(i), 1, true, myPackageManager); 
+                dom::NodePtr myShape = myScene->getShapesRoot()->childNode(0);
+                ENSURE(myShape);
+                Mesh myMesh(myShape);
+                ENSURE(myMesh.isClosed());
+                if (!myMesh.isClosed()) {
+                    myScene->save(as_string(i)+"_test.x60", false);
+                }
+            }
         }
 };
 
