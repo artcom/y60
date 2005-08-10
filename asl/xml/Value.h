@@ -521,7 +521,7 @@ namespace dom {
             T theResult;
             if (!asl::fromString(theValue,theResult)) {
                 throw ConversionFailed("could not convert string value '"+theValue+"' to type '"+typeid(T).name()+"'",
-                    "Value<T>::setString");
+                    "Value<T>::asT()");
             };
             return theResult;
         }
