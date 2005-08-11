@@ -35,6 +35,8 @@ public:
     EdgeList(dom::NodePtr theHalfEdgesNode, dom::NodePtr theIndicesNode);
     EdgeList(const VectorOfSignedInt & theHalfEdges, const VectorOfUnsignedInt & theIndices);
 
+    typedef std::deque<int> Star;
+
     class iterator {
     public:
         //iterator(dom::NodePtr theHalfEdgesNode, dom::NodePtr theIndicesNode, int theIndex = 0);
@@ -113,7 +115,7 @@ public:
          * @return the star of the current halfedge if it is not on the
          *         border, else an empty vector
          */
-        std::vector<int> EdgeList::iterator::getInnerStar() const;
+        EdgeList::Star EdgeList::iterator::getInnerStar() const;
 
         DEFINE_EXCEPTION(Exception, asl::Exception);
 
@@ -126,7 +128,6 @@ public:
     };
 
     EdgeList::iterator getHalfEdge(int theIndex) const;
-    typedef std::deque<int> Star;
     Star EdgeList::getStar(int theIndex) const;
     EdgeList::iterator undefined() const;
 

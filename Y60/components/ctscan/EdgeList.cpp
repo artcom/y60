@@ -72,14 +72,13 @@ EdgeList::iterator EdgeList::iterator::prevStar() const {
     return twin().next();
 }
 
-std::vector<int> EdgeList::iterator::getInnerStar() const {
+EdgeList::Star EdgeList::iterator::getInnerStar() const {
     EdgeList::iterator myStart = *this;
     EdgeList::iterator i = *this;
-    std::vector<int> myResult;
+    EdgeList::Star myResult;
     do {
         if (*i < 0) {
-            myResult.clear();
-            break;
+            return EdgeList::Star();
         }
         myResult.push_back(*i);
         i = i.nextStar();

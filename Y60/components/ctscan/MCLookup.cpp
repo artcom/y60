@@ -3,6 +3,7 @@
 #include <asl/Exception.h>
 #include <asl/Logger.h>
 #include <asl/string_functions.h>
+#include <algorithm>
 
 using namespace std;
 using namespace asl;

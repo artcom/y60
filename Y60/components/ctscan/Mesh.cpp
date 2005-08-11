@@ -139,8 +139,8 @@ Mesh::calcEdgeError(unsigned theIndex) {
         const Vector3f myEdgeV[] = {myVertices[myPositions[*myEdge]], myVertices[myPositions[*myEdge.next()]], myVertices[myPositions[*myEdge.next().next()]]};
         const Vector3f myTwinV[] = {myVertices[myPositions[*myTwin]], myVertices[myPositions[*myTwin.next()]], myVertices[myPositions[*myTwin.next().next()]]};
 
-        //float myFaceArea = computeFaceArea(myEdgeV[0], myEdgeV[1], myEdgeV[2]);
-        //float myTwinArea = computeFaceArea(myTwinV[0], myTwinV[1], myTwinV[2]);
+        float myFaceArea = computeFaceArea(myEdgeV[0], myEdgeV[1], myEdgeV[2]);
+        float myTwinArea = computeFaceArea(myTwinV[0], myTwinV[1], myTwinV[2]);
         Vector3f myNormal = generateFaceNormal(myEdgeV[0], myEdgeV[1], myEdgeV[2]);
         Vector3f myTwinNormal = generateFaceNormal(myTwinV[0], myTwinV[1], myTwinV[2]);
         //float myCreaseAngle = dot(myNormal, myTwinNormal);
@@ -148,12 +148,13 @@ Mesh::calcEdgeError(unsigned theIndex) {
 
         // walk around star of myEdge
         float myAngleMax = 0;
-        vector<int> myStar = myEdge.getInnerStar();
+        //EdgeList::Star myStar = _myEdgeList->getStar(theIndex);
+        EdgeList::Star myStar = myEdge.getInnerStar();
         // Don't remove outer vertices!
         if (myStar.empty()) {
             return NumericTraits<float>::max();
         }
-        for (vector<int>::const_iterator i = myStar.begin(); i != myStar.end(); ++i) {
+        for (EdgeList::Star::const_iterator i = myStar.begin(); i != myStar.end(); ++i) {
             MESH_ASSURE(*i >= 0);
             EdgeList::iterator myStarEdge = _myEdgeList->getHalfEdge(*i);
             const Vector3f myStarFace[] = {myVertices[myPositions[*myStarEdge]], myVertices[myPositions[*myStarEdge.next()]], myVertices[myPositions[*myStarEdge.next().next()]]};
@@ -161,8 +162,10 @@ Mesh::calcEdgeError(unsigned theIndex) {
             myAngleMax = max(myAngleMax, min((1.0f-dot(myStarNormal, myTwinNormal))/2.0f, 
                                              (1.0f-dot(myStarNormal, myNormal))/2.0f));
         }
+        float myAreaFactor = 1.0f - 1.0f / (1.0f + myFaceArea + myTwinArea);
+        myAreaFactor  = 1.0;
         //float myReturn = (1.0f - myCreaseAngle) * (myFaceArea + myTwinArea) + (myAngleSum * (myEdgeLength + 1));
-        float myReturn = (myAngleMax * myEdgeLength);
+        float myReturn = (myAngleMax * myEdgeLength * myAreaFactor);
         //AC_INFO << "F-A: " << myCreaseAngle << ", Size: " << (myFaceArea + myTwinArea) << ", E-A: " << myAngleSum  
         //    << ", E-L: " << myEdgeLength << " -> [" << theIndex << "] = " << myReturn;
         return myReturn;
@@ -176,6 +179,7 @@ void
 Mesh::computeError() {
     MAKE_SCOPE_TIMER(computeError);
     lockWrite();
+    _myErrorMap.clear();
     _myErrorMap.resize(_myPositions->size());
 
     for (int i = 0; i < _myPositions->size(); ++i) {
@@ -337,6 +341,16 @@ Mesh::edgeCollapse(unsigned thePosition) {
     int myPos1 = thePosition;
     int myPos2 = (*_myHalfEdges)[thePosition];
     AC_TRACE << "Collapsing " << myPos1 << " to " << myPos2;
+#if 1
+    float myNewError = calcEdgeError(thePosition);
+    float myOldError = _myErrorMap.at(thePosition);
+    if (!almostEqual(myOldError, myNewError)) {
+        AC_ERROR << "error not up to date @ " << thePosition << ", old: " << myOldError << ", new: " << myNewError;
+        _myErrorMap.updateError(thePosition, myNewError);
+        unlockWrite();
+        return true;
+    }
+#endif
     if (myPos2 == -1) {
         AC_INFO << "Error trying to collapse outer edge #" << thePosition;
         unlockWrite();
@@ -347,17 +361,7 @@ Mesh::edgeCollapse(unsigned thePosition) {
         unlockWrite();
         return false;
     }
-    /* 
-    float myNewError = calcEdgeError(thePosition);
-    float myOldError = _myEdgeError[thePosition];
-    if (!almostEqual(myOldError, myNewError)) {
-        AC_ERROR << "error not up to date @ " << thePosition;
-        AC_ERROR << "     old error " << myOldError;
-        AC_ERROR << "     new error " << myNewError;
-        unlockWrite();
-        return false;
-    }
-    */
+    
     // this is an EdgeList transaction
     EdgeList::iterator myEdge = _myEdgeList->getHalfEdge(thePosition);
     EdgeList::iterator myTwin = myEdge.twin();
@@ -405,6 +409,11 @@ Mesh::edgeCollapse(unsigned thePosition) {
         (*_myHalfEdges)[*iter] = -1;
         ++iter;
     } while (myTwin != iter);
+    iter = myEdge;
+    do {
+        (*_myHalfEdges)[*iter] = -1;
+        ++iter;
+    } while (myEdge != iter);
 
     AC_TRACE << "Deleting face: " << *myEdge << " and " << myTwinIndex << ", Safe: " << mySafeIndex << ", size: " << _myHalfEdges->size();
     int myDelta = deleteFace(*myEdge);
@@ -439,8 +448,7 @@ Mesh::edgeCollapse(unsigned thePosition) {
 
     for (set<int>::const_iterator i = myDirtySet.begin(); i != myDirtySet.end(); ++i) {
         _myErrorMap.updateError(*i, calcEdgeError(*i));
-        AC_INFO << "Recomputed: " << *i << " to " << _myErrorMap.at(*i);
-        //(*_myColors)[*i] = 2;
+        AC_TRACE << "Recomputed: " << *i << " to " << _myErrorMap.at(*i);
     }
 
     unlockWrite();
@@ -471,11 +479,10 @@ Mesh::collapseByError(float theMaxError) {
         AC_INFO << "Going to delete about " << myInitialErrors << " edges";
 
         while (!_myErrorMap.empty() && _mySimplifyMode) {
-            AC_INFO << "getting front";
             int myEdge = _myErrorMap.front();
-            AC_INFO << "Collapsing edge: " << myEdge;
-            AC_INFO << "         error = " << _myErrorMap.at(myEdge); 
-            AC_INFO << "         count = " << _myErrorMap.getErrorCount();
+            AC_TRACE << "Collapsing edge: " << myEdge;
+            AC_TRACE << "         error = " << _myErrorMap.at(myEdge); 
+            AC_TRACE << "         count = " << _myErrorMap.getErrorCount();
             if (edgeCollapse(myEdge)) {
                 ++myNumModified;
             } else {
@@ -515,6 +522,10 @@ Mesh::deleteIndicesByColor(unsigned int theColor) {
         if ((*_myColors)[myIndex] == theColor) {
             // move something here from the myReverseIndex
             while ((*_myColors)[myReverseIndex] == theColor && myReverseIndex > myIndex) {
+                int myOldTwin = (*_myHalfEdges)[myReverseIndex];
+                if (myOldTwin >= 0 && myOldTwin < myReverseIndex) {
+                    (*_myHalfEdges)[myOldTwin] = -1;
+                }
                 myReverseIndex -= _myFaceSize;
             }
             if (myReverseIndex <= myIndex) {
@@ -522,6 +533,10 @@ Mesh::deleteIndicesByColor(unsigned int theColor) {
                 break;
             } else {
                 for (int i = 0; i < _myFaceSize; ++i) {
+                    int myOldTwin = (*_myHalfEdges)[myIndex+i];
+                    if (myOldTwin >= 0 && myOldTwin < myReverseIndex) {
+                        (*_myHalfEdges)[myOldTwin] = -1;
+                    }
                     (*_myColors)[myIndex+i] = (*_myColors)[myReverseIndex+i];
                     int myHalfEdgeValue = (*_myHalfEdges)[myReverseIndex+i];
                     (*_myHalfEdges)[myIndex+i] = myHalfEdgeValue;
