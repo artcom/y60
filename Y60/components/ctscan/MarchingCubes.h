@@ -22,7 +22,7 @@
 
 #include "edge_data.h"
 #include "face_data.h"
-#include "halfedge_data.h"
+#include "HalfEdgeTable.h"
 
 #include "CTScan.h"
 
@@ -75,7 +75,8 @@ namespace y60 {
 				_myVertexCount(0),
 				_myHalfEdgeCount(0),
                 _myDownSampleRate(theDownSampleRate),
-                _myLineStride(0)
+                _myLineStride(0),
+                _myHalfEdgeTable()
             {
                 if ( ! _myVoxelData) {
                     throw MarchingCubesException("CTScan ptr is zero.", PLUS_FILE_LINE);
@@ -324,11 +325,13 @@ namespace y60 {
 				} else {
 					myOnVertex = &MarchingCubes<VoxelT>::outputVertex;
 				}
+                AC_TRACE << "triangulateVoxel(" << cubeIndex << ", " << iMarch << "," << jMarch << "," << kMarch << ")";
 
                 i = 0;
                 while((ourEdgeData[cubeIndex][i] != -1) && (i < 12)) {
 
                     edge = ourEdgeData[cubeIndex][i];
+                    AC_TRACE << "     edge case :" << edge;
 
                     switch (edge) {
                         case 0:
@@ -488,24 +491,24 @@ namespace y60 {
 					}
 				} else {
 					int myFirstFaceIndex = _myHalfEdges->size();
+                    AC_INFO << "-------------";
 					for (int i = 0; i < 12; ++i) {
 						int myCornerIndex = ourFaceData[cubeIndex][i];
 						if (myCornerIndex == -1) break;
 						int myNextCornerIndex = ourFaceData[cubeIndex][i - (i % 3) + ((i+1) % 3)];
 						int myIndex = edgeTable[myCornerIndex];
 						int myNextIndex = edgeTable[myNextCornerIndex];
-						int myTwin = ourHalfEdgeData[cubeIndex][i];
-						if (myTwin == INVALID_EDGE) {
-							throw MarchingCubesException("Twin is unexpectedly invalid.", PLUS_FILE_LINE);
-						}
+						// int myTwin = ourHalfEdgeData[cubeIndex][i];
+                        HalfEdgeTable::HalfEdgeNeighbor & myNeighbor = _myHalfEdgeTable.cubeCases[cubeIndex].neighbors.at(i);
 						int myHalfEdge = -1;
-						if (myTwin <= 12) {
-							// local twin
-							myHalfEdge = myTwin + myFirstFaceIndex;
+						if (myNeighbor.type == HalfEdgeTable::INTERNAL) {
+							myHalfEdge = myNeighbor.internal_index + myFirstFaceIndex;
 						} else {
 							// external twin
-							unsigned myClass = myTwin >> 24;
-							if (myClass >= 4) {
+							if (myNeighbor.type == HalfEdgeTable::MAX_X ||
+                                myNeighbor.type == HalfEdgeTable::MAX_Y ||
+                                myNeighbor.type == HalfEdgeTable::MAX_Z) 
+                            {
 								// Add to the map
 								EdgeId myKey(myIndex, myNextIndex);
 								int myValue = _myHalfEdges->size();
@@ -518,7 +521,7 @@ namespace y60 {
 								EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
 								if (_myHalfEdgeCache.end() == iter) {
 									if (!_myStartZ && !_myStartY && !_myStartX) {
-										//AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << edge << " iMarch: " << iMarch << ", jMarch: " << jMarch << ", kMarch: " << kMarch << " Dumping cache.";
+										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << edge << " iMarch: " << iMarch << ", jMarch: " << jMarch << ", kMarch: " << kMarch << " Dumping cache.";
 										//throw MarchingCubesException("Not found in cache.", PLUS_FILE_LINE);                                    
 									}
 								} else {
@@ -533,6 +536,7 @@ namespace y60 {
 						_myHalfEdges->push_back(myHalfEdge); // push the other edge
 						AC_TRACE << "   size is now " << _myHalfEdges->size();
 						_myIndices->push_back(myIndex);
+                        AC_INFO << myIndex << (*_myVertices)[myIndex]; 
 					}
 				}
             }
@@ -1054,6 +1058,7 @@ namespace y60 {
             int  _myHalfEdgeCount;
 			int  _myVertexCount;
             int  _myUsedSegs;
+            HalfEdgeTable _myHalfEdgeTable;
 
             const int _myDownSampleRate;
             int _myLineStride;
