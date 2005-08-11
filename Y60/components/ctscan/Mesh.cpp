@@ -128,6 +128,51 @@ Mesh::colorizeError(float theMaximumError, unsigned theColor) {
     return myCount;
 }
 
+#if 1
+float
+Mesh::calcEdgeError(unsigned theIndex) {
+    MAKE_SCOPE_TIMER(calcEdgeError);
+    if ((*_myHalfEdges)[theIndex] >= 0) {
+        vector<Vector3f> & myVertices = *_myPositionVertices;
+        vector<unsigned> & myPositions = *_myPositions;
+        EdgeList::iterator myEdge = _myEdgeList->getHalfEdge(theIndex);
+        EdgeList::iterator myTwin = _myEdgeList->getHalfEdge(myEdge.twinIndex());
+        const Vector3f myEdgeV[] = {myVertices[myPositions[*myEdge]], myVertices[myPositions[*myEdge.next()]], myVertices[myPositions[*myEdge.next().next()]]};
+        const Vector3f myTwinV[] = {myVertices[myPositions[*myTwin]], myVertices[myPositions[*myTwin.next()]], myVertices[myPositions[*myTwin.next().next()]]};
+
+        float myFaceArea = computeFaceArea(myEdgeV[0], myEdgeV[1], myEdgeV[2]);
+        float myTwinArea = computeFaceArea(myTwinV[0], myTwinV[1], myTwinV[2]);
+        Vector3f myNormal = generateFaceNormal(myEdgeV[0], myEdgeV[1], myEdgeV[2]);
+        Vector3f myTwinNormal = generateFaceNormal(myTwinV[0], myTwinV[1], myTwinV[2]);
+        float myCreaseAngle = dot(myNormal, myTwinNormal);
+        float myEdgeLength = length(myEdgeV[1] - myEdgeV[0]);
+
+        // walk around star of myEdge
+        float myAngleSum = 0;
+
+        EdgeList::Star myStar = myEdge.getInnerStar();
+        // Don't remove outer vertices!
+        if (0 == myStar.size()) {
+            return NumericTraits<float>::max();
+        }
+        for (EdgeList::Star::const_iterator i = myStar.begin(); i != myStar.end(); ++i) {
+            MESH_ASSURE(*i >= 0);
+            EdgeList::iterator myStarEdge = _myEdgeList->getHalfEdge(*i);
+            Vector3f myEdgeVector = normalized(myVertices[myPositions[*myStarEdge.next()]] - myVertices[myPositions[*i]]);
+            myAngleSum += min(abs(dot(myEdgeVector, myTwinNormal)), abs(dot(myEdgeVector, myNormal)));
+        }
+        float myReturn = (1.0f - myCreaseAngle) * (myFaceArea + myTwinArea) +
+            (myAngleSum * (myEdgeLength + 1));
+        //AC_INFO << "F-A: " << myCreaseAngle << ", Size: " << (myFaceArea + myTwinArea) << ", E-A: " << myAngleSum  
+        //    << ", E-L: " << myEdgeLength << " -> [" << theIndex << "] = " << myReturn;
+        return myReturn / 2.0f;
+    } else {
+        // Large Value
+        return NumericTraits<float>::max();
+    }
+}
+
+#else
 float
 Mesh::calcEdgeError(unsigned theIndex) {
     MAKE_SCOPE_TIMER(calcEdgeError);
@@ -163,7 +208,6 @@ Mesh::calcEdgeError(unsigned theIndex) {
                                              (1.0f-dot(myStarNormal, myNormal))/2.0f));
         }
         float myAreaFactor = 1.0f - 1.0f / (1.0f + myFaceArea + myTwinArea);
-        myAreaFactor  = 1.0;
         //float myReturn = (1.0f - myCreaseAngle) * (myFaceArea + myTwinArea) + (myAngleSum * (myEdgeLength + 1));
         float myReturn = (myAngleMax * myEdgeLength * myAreaFactor);
         //AC_INFO << "F-A: " << myCreaseAngle << ", Size: " << (myFaceArea + myTwinArea) << ", E-A: " << myAngleSum  
@@ -174,6 +218,7 @@ Mesh::calcEdgeError(unsigned theIndex) {
         return NumericTraits<float>::max();
     }
 }
+#endif
 
 void
 Mesh::computeError() {
@@ -345,7 +390,9 @@ Mesh::edgeCollapse(unsigned thePosition) {
     float myNewError = calcEdgeError(thePosition);
     float myOldError = _myErrorMap.at(thePosition);
     if (!almostEqual(myOldError, myNewError)) {
-        AC_ERROR << "error not up to date @ " << thePosition << ", old: " << myOldError << ", new: " << myNewError;
+        // XXX This actually happens but we silently handle it for the 0.71 release and
+        // fix it later
+        // AC_ERROR << "error not up to date @ " << thePosition << ", old: " << myOldError << ", new: " << myNewError;
         _myErrorMap.updateError(thePosition, myNewError);
         unlockWrite();
         return true;
