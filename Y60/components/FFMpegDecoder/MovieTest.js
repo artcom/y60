@@ -34,11 +34,11 @@ function FFMpegTest(theArguments) {
         //"c:/TEST_MOVIES/MPEG/MPEG_4_LORES.wmv",
         //"c:/TEST_MOVIES/MPEG/bmw_aichi_windkanal_1280.mpg",
         //"c:/TEST_MOVIES/MPEG/bmw_aichi_windkanal_pal.m2v",
-        //"c:/TEST_MOVIES/MPEG/counter_768.mpg",
+        "c:/TEST_MOVIES/MPEG/counter_768.mpg",
         //"c:/TEST_MOVIES/MPEG/mpeg2_1024_768_15000bps.m2v",
         //"c:/TEST_MOVIES/MPEG/mpeg2_1280_960_20000.m2v",
         //"c:/TEST_MOVIES/MPEG/aichi.m2v",
-        "c:/TEST_MOVIES/MPEG/linetest.m2v",
+        //"c:/TEST_MOVIES/MPEG/linetest.m2v",
     ];
 
     var _myMovies       = [];
@@ -49,7 +49,7 @@ function FFMpegTest(theArguments) {
     Base.setup = Public.setup;
     Public.setup = function() {
         Public.setSplashScreen(false);
-        Base.setup(820, 500);
+        Base.setup(840, 500);
         window.fixedFrameTime = 0.04;
         setupMovies();
     }
@@ -127,6 +127,8 @@ function FFMpegTest(theArguments) {
             var myMovie = new MovieOverlay(Public.getOverlayManager(), _myMovieSources[i], new Vector2f(300, _myPos));
             myMovie.movie.playspeed = thePlaySpeed;
             myMovie.movie.playmode  = thePlayMode;
+            myMovie.width  = 400;
+            myMovie.height = 300;
             //myMovie.movie.startime  = theStartTime;
             _myMovies.push(myMovie);
             _myPos += 20;

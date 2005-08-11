@@ -20,6 +20,7 @@
 #include "FFMpegDecoder.h"
 #include "FrameAnalyser.h"
 
+#include <audio/AudioController.h>
 #include <asl/Logger.h>
 #include <asl/os_functions.h>
 #include <asl/file_functions.h>
@@ -37,16 +38,10 @@ EXPORT asl::PlugInBase * y60FFMpegDecoder_instantiatePlugIn(asl::DLHandle myDLHa
 
 namespace y60 {
 
-    FFMpegDecoder::VideoFrame::VideoFrame(unsigned theBufferSize) {
-        _myBuffer = new unsigned char[theBufferSize];
+    asl::Ptr<MovieDecoderBase> FFMpegDecoder::instance() const {
+        return asl::Ptr<MovieDecoderBase>(new FFMpegDecoder(getDLHandle()));
     }
 
-    FFMpegDecoder::VideoFrame::~VideoFrame() {
-        delete[] _myBuffer;
-        _myBuffer = 0;
-    }
-
-    // FFMpegDecoder
     FFMpegDecoder::FFMpegDecoder(asl::DLHandle theDLHandle) :
         PlugInBase(theDLHandle),
         _myFormatContext(0),
@@ -54,39 +49,10 @@ namespace y60 {
         _myVStreamIndex(-1),
         _myVStream(0),
         _myAStreamIndex(-1),
-        _myAStream(0),
-        _myLowerCacheTimestamp(INT_MAX),
-        _myUpperCacheTimestamp(INT_MIN),
-        _myFirstTimestamp(0),
-        _myStartTimestamp(0),
-        _myLastVideoTimestamp(0),
-        _myEOFVideoTimestamp(INT_MIN)
+        _myAStream(0)
     {}
 
     FFMpegDecoder::~FFMpegDecoder() {
-        closeMovie();
-    }
-
-    asl::Ptr<MovieDecoderBase> FFMpegDecoder::instance() const {
-        return asl::Ptr<MovieDecoderBase>(new FFMpegDecoder(getDLHandle()));
-    }
-
-    std::string
-    FFMpegDecoder::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
-        string myExtension = asl::toLowerCase(asl::getExtension(theUrl));
-        if (myExtension == "mpg" || myExtension == "m2v" || myExtension == "mov" || 
-            myExtension == "avi" || myExtension == "mpeg") 
-        {
-            return MIME_TYPE_MPG;
-        } else {
-            return "";
-        }
-    }
-
-    void
-    FFMpegDecoder::closeMovie() {
-        AC_DEBUG << "FFMpegDecoder::closeMovie";
-
         if (_myVStream) {
             avcodec_close(&_myVStream->codec);
             _myVStreamIndex = -1;
@@ -103,8 +69,25 @@ namespace y60 {
             _myFrame = 0;
         }
 
+        if (_myAudioSamples) {
+            delete[] _myAudioSamples;
+            _myAudioSamples = 0;
+        }
+
         av_close_input_file(_myFormatContext);
         _myFormatContext = 0;
+    }
+
+    std::string
+    FFMpegDecoder::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+        string myExtension = asl::toLowerCase(asl::getExtension(theUrl));
+        if (myExtension == "mpg" || myExtension == "m2v" || myExtension == "mov" || 
+            myExtension == "avi" || myExtension == "mpeg") 
+        {
+            return MIME_TYPE_MPG;
+        } else {
+            return "";
+        }
     }
 
     bool
@@ -122,7 +105,7 @@ namespace y60 {
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
-            AC_PRINT << "FFMpegDecoder avcodec version " << LIBAVCODEC_IDENT;
+            AC_INFO << "FFMpegDecoder avcodec version " << LIBAVCODEC_IDENT;
             av_log_set_level(AV_LOG_ERROR);
             av_register_all();
             avRegistered = true;
@@ -147,90 +130,10 @@ namespace y60 {
             }
         }
 
-        if (_myVStreamIndex < 0) {
-            throw FFMpegDecoderException(std::string("No video stream found: ") + theFilename, PLUS_FILE_LINE);
-        }
+        setupVideo(theFilename);
+        setupAudio(theFilename);
 
-        // open codec
-        AVCodec * myCodec = avcodec_find_decoder(_myVStream->codec.codec_id);
-        if (!myCodec) {
-            throw FFMpegDecoderException(std::string("Unable to find decoder: ") + theFilename, PLUS_FILE_LINE);
-        }
-        if (avcodec_open(&_myVStream->codec, myCodec) < 0) {
-            throw FFMpegDecoderException(std::string("Unable to open codec: ") + theFilename, PLUS_FILE_LINE);
-        }
-
-        // allocate frame for YUV data
-        _myFrame = avcodec_alloc_frame();
-
-        setPixelFormat(y60::BGR);
-        setFrameWidth(_myVStream->codec.width);
-        setFrameHeight(_myVStream->codec.height);
-
-        // Setup size and image matrix
-        float myXResize = float(_myVStream->codec.width) / asl::nextPowerOfTwo(_myVStream->codec.width);
-        float myYResize = float(_myVStream->codec.height) / asl::nextPowerOfTwo(_myVStream->codec.height);
-
-        asl::Matrix4f myMatrix;
-        myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
-        setImageMatrix(myMatrix);
-
-        // Hack to correct wrong frame rates that seem to be generated
-        // by some codecs
-        if (_myVStream->codec.frame_rate > 1000 && _myVStream->codec.frame_rate_base == 1) {
-            _myVStream->codec.frame_rate_base = 1000;
-        }
-        float myFPS = _myVStream->codec.frame_rate / (float) _myVStream->codec.frame_rate_base;
-        if (myFPS > 1000.0f) {
-            myFPS /= 1000.0f;
-        }
-        setFrameRate(myFPS);
-        if (_myVStream->duration == AV_NOPTS_VALUE ||
-            int(myFPS * (_myVStream->duration / (double) AV_TIME_BASE)) <= 0)
-        {
-            AC_WARNING << "url='" << theFilename << "' contains no valid duration";
-            setFrameCount(INT_MAX);
-        } else {
-            setFrameCount(int(myFPS * (_myVStream->duration / (float) AV_TIME_BASE)));
-        }
-        AC_INFO << "url='" << theFilename << "' fps=" << myFPS << " framecount=" << getFrameCount();
-
-        _myLastVideoTimestamp = 0;
-        _myEOFVideoTimestamp = INT_MIN;
-/*
-        // Get first timestamp
-        AVPacket myPacket;
-        bool myEndOfFileFlag = (av_read_frame(_myFormatContext, &myPacket) < 0);
-        _myFirstTimestamp = myPacket.dts;
-        av_free_packet(&myPacket);
-        AC_TRACE << "firstTimestamp=" << _myFirstTimestamp;
-
-        // Get Starttime
-        if (_myVStream->start_time != AV_NOPTS_VALUE) {
-            _myStartTimestamp = _myVStream->start_time;
-            AC_TRACE << "startTimestamp=" << _myStartTimestamp;
-        } else {
-            _myStartTimestamp = 0;
-        }
-
-        // seek to start
-#if (LIBAVCODEC_BUILD < 4738)
-        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp);
-#else
-        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp, AVSEEK_FLAG_BACKWARD);
-#endif
-        if (myResult < 0) {
-            AC_ERROR << "Could not seek to start timestamp " << _myStartTimestamp;
-        }
-*/
-        // create cache
-        _myFrameCache.resize(FRAME_CACHE_SIZE);
-        unsigned myBufferSize = getFrameWidth() * getFrameHeight() * 3;
-        for (unsigned i = 0; i < FRAME_CACHE_SIZE; ++i) {
-            _myFrameCache[i] = VideoFramePtr(new VideoFrame(myBufferSize));
-        }
-        _myCacheWriteIndex = 0;
-
+        // Setup mpeg-frame analyser
         string myFrameAnalyserString;
         if (asl::get_environment_var("Y60_FRAME_ANALYSER", myFrameAnalyserString)) {            
             FrameAnalyser myFrameAnalyser(_myFormatContext, _myVStream, _myVStreamIndex);
@@ -238,6 +141,186 @@ namespace y60 {
         }
     }
 
+    void
+    FFMpegDecoder::setupVideo(const std::string & theFilename) {
+        if (_myVStream) {
+            // open codec
+            AVCodec * myCodec = avcodec_find_decoder(_myVStream->codec.codec_id);
+            if (!myCodec) {
+                throw FFMpegDecoderException(std::string("Unable to find decoder: ") + theFilename, PLUS_FILE_LINE);
+            }
+            if (avcodec_open(&_myVStream->codec, myCodec) < 0) {
+                throw FFMpegDecoderException(std::string("Unable to open codec: ") + theFilename, PLUS_FILE_LINE);
+            }
+
+            setPixelFormat(y60::BGR);
+            setFrameWidth(_myVStream->codec.width);
+            setFrameHeight(_myVStream->codec.height);
+
+            // Setup size and image matrix
+            float myXResize = float(_myVStream->codec.width) / asl::nextPowerOfTwo(_myVStream->codec.width);
+            float myYResize = float(_myVStream->codec.height) / asl::nextPowerOfTwo(_myVStream->codec.height);
+
+            asl::Matrix4f myMatrix;
+            myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
+            setImageMatrix(myMatrix);
+
+            // Hack to correct wrong frame rates that seem to be generated
+            // by some codecs
+            if (_myVStream->codec.frame_rate > 1000 && _myVStream->codec.frame_rate_base == 1) {
+                _myVStream->codec.frame_rate_base = 1000;
+            }
+            float myFPS = _myVStream->codec.frame_rate / (float) _myVStream->codec.frame_rate_base;
+            if (myFPS > 1000.0f) {
+                myFPS /= 1000.0f;
+            }
+            setFrameRate(myFPS);
+
+            if (_myVStream->duration == AV_NOPTS_VALUE ||
+                int(myFPS * (_myVStream->duration / (double) AV_TIME_BASE)) <= 0)
+            {
+                AC_WARNING << "url='" << theFilename << "' contains no valid duration";
+                setFrameCount(INT_MAX);
+            } else {
+                setFrameCount(int(myFPS * (_myVStream->duration / (float) AV_TIME_BASE)));
+            }
+
+            // allocate frame for YUV data
+            _myFrame = avcodec_alloc_frame();
+
+            unsigned myBufferSize = getFrameWidth() * getFrameHeight() * 3;
+            _myVideoFrame = VideoFramePtr(new VideoFrame(myBufferSize));
+
+            AC_INFO << "url='" << theFilename << "' fps=" << myFPS << " framecount=" << getFrameCount();            
+        } else {
+            AC_INFO << "FFMpegDecoder::load " << theFilename << " no video stream found";
+            _myVStream      = 0;
+            _myVStreamIndex = -1;
+        }
+    }
+
+    void 
+    FFMpegDecoder::initBufferedSource(unsigned theNumChannels, unsigned theSampleRate, unsigned theSampleBits) {
+        AudioApp::AudioController & myAudioController = AudioApp::AudioController::get();
+        std::string myURL = getMovie()->get<ImageSourceTag>();
+        if (theSampleBits != 16) {
+            AC_WARNING << "Movie '" << myURL << "' contains " << theSampleBits
+                << " bit audio stream. Only 16 bit supported. Playing movie without sound.";
+        } else {
+            if (!myAudioController.isRunning()) {
+                myAudioController.init(asl::maximum(theSampleRate, (unsigned) 44100));
+            }
+
+            std::string myId = myAudioController.createReader(myURL, "Mixer", theSampleRate, theNumChannels);
+            _myAudioBufferedSource = dynamic_cast<AudioBase::BufferedSource *>(myAudioController.getFileReaderFromID(myId));
+            _myAudioBufferedSource->setVolume(getMovie()->get<VolumeTag>());
+            _myAudioBufferedSource->setSampleBits(theSampleBits);
+            AC_INFO << "Audio: channels=" << theNumChannels << ", samplerate=" << theSampleRate << ", samplebits=" << theSampleBits;
+        }
+
+    }
+
+    void
+    FFMpegDecoder::setupAudio(const std::string & theFilename) {
+        if (_myAStream && getAudioFlag()) {
+            AVCodec * myCodec = avcodec_find_decoder(_myAStream->codec.codec_id);
+            if (!myCodec) {
+                throw FFMpegDecoderException(std::string("Unable to find audio decoder: ") + theFilename, PLUS_FILE_LINE);
+            }
+            if (avcodec_open(&_myAStream->codec, myCodec) < 0 ) {
+                throw FFMpegDecoderException(std::string("Unable to open audio codec: ") + theFilename, PLUS_FILE_LINE);
+            }
+
+            initBufferedSource(_myAStream->codec.channels, _myAStream->codec.sample_rate, 16);
+            _myAudioSamples = new unsigned char[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+        } else {
+            AC_INFO << "FFMpegDecoder::load " << theFilename << " no audio stream found or audio disabled";
+            _myAStream      = 0;
+            _myAStreamIndex = -1;
+        }
+    }
+
+    double
+    FFMpegDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+        int64_t myFrameTimestamp = (int64_t)asl::round(theTime * AV_TIME_BASE);
+        AC_TRACE << "readFrame: time=" << theTime << " timestamp=" << myFrameTimestamp;
+        if (!decodeFrame(myFrameTimestamp, theTargetRaster)) {
+            AC_PRINT << "EOF reached!";
+            setEOF(true);
+            _myAudioBufferedSource->setRunning(false);
+        }
+        return theTime;
+    }
+
+    bool
+    FFMpegDecoder::decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
+        int64_t myTimePerFrame = (int64_t)(AV_TIME_BASE / getFrameRate());
+
+        AVPacket myPacket;
+        memset(&myPacket, 0, sizeof(myPacket));
+
+        // until a frame is found or eof
+        while (true) {
+            bool myEndOfFileFlag = (av_read_frame(_myFormatContext, &myPacket) < 0);
+            if (!myEndOfFileFlag) {
+                if (myPacket.stream_index == _myVStreamIndex) {
+                    int myFrameCompleteFlag = 0;
+                    int myLen = avcodec_decode_video(&_myVStream->codec, _myFrame, &myFrameCompleteFlag,
+                                                     myPacket.data, myPacket.size);
+
+                    if (myLen < 0) {
+                        AC_ERROR << "av_decode_video error";
+                    } else if (myLen < myPacket.size) {
+                        AC_ERROR << "av_decode_video: Could not decode video in one step";
+                    }
+
+                    if (myFrameCompleteFlag) {                        
+                        break;
+                    } 
+                } else if (myPacket.stream_index == _myAStreamIndex && getAudioFlag()) {
+                    addAudioPacket(myPacket);
+                } 
+            } else { 
+                // end of file reached
+                av_free_packet(&myPacket);
+                return false;
+            }
+        }
+        
+        av_free_packet(&myPacket);
+        convertFrame(_myFrame, _myVideoFrame->getBuffer());
+        copyFrame(_myVideoFrame, theTargetRaster);
+
+        return true;
+    }
+
+    void
+    FFMpegDecoder::addAudioPacket(const AVPacket & thePacket) {
+        int mySampleSize = 0;
+        int myLen = avcodec_decode_audio(&_myAStream->codec, (int16_t*)_myAudioSamples, &mySampleSize,
+            thePacket.data, thePacket.size);
+
+        if (myLen < 0) {
+            AC_ERROR << "avcodec_decode_audio error";
+        } else if (myLen < thePacket.size) {
+            AC_ERROR << "avcodec_decode_audio: Could not decode video in one step";
+        }
+
+        double myTime = thePacket.dts / (double)AV_TIME_BASE;
+        _myAudioBufferedSource->addBuffer(myTime, (const unsigned char*)_myAudioSamples, mySampleSize);
+
+
+        if (!_myAudioBufferedSource->isRunning()) {
+            _myAudioBufferedSource->setRunning(true);
+        }
+        
+        float myVolume = getMovie()->get<VolumeTag>();
+        if (!asl::almostEqual(_myAudioBufferedSource->getVolume(), myVolume)) {
+            _myAudioBufferedSource->setVolume(myVolume);
+        } 
+    }
+
+/*
     double
     FFMpegDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
         int64_t myFrameTimestamp = (int64_t)asl::round(theTime * AV_TIME_BASE);
@@ -291,10 +374,10 @@ namespace y60 {
         return theTime;
     }
 
+
     bool
     FFMpegDecoder::decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
         int64_t myTimePerFrame = (int64_t)(AV_TIME_BASE / getFrameRate());
-
         // seek if timestamp is outside these boundaries
         if (theTimestamp < _myLowerCacheTimestamp || theTimestamp > (_myUpperCacheTimestamp + myTimePerFrame*2)) {
 
@@ -342,10 +425,9 @@ namespace y60 {
                     _myEOFVideoTimestamp = _myLastVideoTimestamp;
                 }
 
-                /* some codecs, such as MPEG, transmit the I and P frame with a
-                 * latency of one frame. You must do the following to have a
-                 * chance to get the last frame of the video
-                 */
+                // some codecs, such as MPEG, transmit the I and P frame with a
+                // latency of one frame. You must do the following to have a
+                // chance to get the last frame of the video
                 int frameFinished = 0;
                 int myLen = avcodec_decode_video(&_myVStream->codec, _myFrame, &frameFinished, NULL, 0);
                 if (frameFinished) {
@@ -410,6 +492,7 @@ namespace y60 {
 
         return true;
     }
+*/
 
     void FFMpegDecoder::convertFrame(AVFrame * theFrame, unsigned char * theBuffer) {
         if (!theFrame) {
@@ -440,6 +523,8 @@ namespace y60 {
     }
 
     void FFMpegDecoder::copyFrame(VideoFramePtr theVideoFrame, dom::ResizeableRasterPtr theTargetRaster) {
+        // TODO: Pass target raster owning dom node instead of target raster and replace raster instead
+        // of copy raster
         theTargetRaster->resize(getFrameWidth(), getFrameHeight());
         memcpy(theTargetRaster->pixels().begin(), theVideoFrame->getBuffer(), theTargetRaster->pixels().size());
     }
