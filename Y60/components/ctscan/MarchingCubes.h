@@ -316,7 +316,7 @@ namespace y60 {
                 asl::Vector3f myVertexNormal;
 				int (MarchingCubes<VoxelT>::*myOnVertex)(const asl::Point3f & thePosition, const asl::Vector3f & theNormal) = 0;
 
-                MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[cubeIndex]; 
+                const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[cubeIndex]; 
 
 				if (theDryRun) { 
 					myOnVertex = &MarchingCubes<VoxelT>::countVertex;
@@ -324,8 +324,8 @@ namespace y60 {
 					myOnVertex = &MarchingCubes<VoxelT>::outputVertex;
 				}
                 AC_TRACE << "triangulateVoxel(" << cubeIndex << ", " << iMarch << "," << jMarch << "," << kMarch << ")";
-
-                for (int i = 0; i < myCubeCase.edges.size(); ++i) {
+                int myEdgeCount = myCubeCase.edges.size();
+                for (int i = 0; i < myEdgeCount; ++i) {
                     edge = myCubeCase.edges[i];
                     AC_TRACE << "     edge case :" << edge;
 
@@ -478,7 +478,8 @@ namespace y60 {
                 _myOld6Pt = edgeTable[6];
                 _myOld10Pt = edgeTable[10];
 				if (theDryRun) {
-					for (int i = 0; i < myCubeCase.faces.size(); ++i) {
+                    int myFaceCount = myCubeCase.faces.size();
+					for (int i = 0; i < myFaceCount; ++i) {
 						int myCornerIndex = myCubeCase.faces[i];
 						++_myHalfEdgeCount;
 					}
@@ -491,7 +492,7 @@ namespace y60 {
 						int myIndex = edgeTable[myCornerIndex];
 						int myNextIndex = edgeTable[myNextCornerIndex];
 						// int myTwin = ourHalfEdgeData[cubeIndex][i];
-                        MCLookup::HalfEdgeNeighbor & myNeighbor = myCubeCase.neighbors.at(i);
+                        const MCLookup::HalfEdgeNeighbor & myNeighbor = myCubeCase.neighbors[i];
 						int myHalfEdge = -1;
 						if (myNeighbor.type == MCLookup::INTERNAL) {
 							myHalfEdge = myNeighbor.internal_index + myFirstFaceIndex;
@@ -513,7 +514,7 @@ namespace y60 {
 								EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
 								if (_myHalfEdgeCache.end() == iter) {
 									if (!_myStartZ && !_myStartY && !_myStartX) {
-										// AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << edge << " iMarch: " << iMarch << ", jMarch: " << jMarch << ", kMarch: " << kMarch << " Dumping cache.";
+										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << edge << " iMarch: " << iMarch << ", jMarch: " << jMarch << ", kMarch: " << kMarch << " Dumping cache.";
 										//throw MarchingCubesException("Not found in cache.", PLUS_FILE_LINE);                                    
 									}
 								} else {
