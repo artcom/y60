@@ -138,6 +138,10 @@ namespace y60 {
             MaterialRequirementList    _myRequirements;
             IShaderPtr                 _myShader;
 
+            dom::NodePtr getNode() {
+                return _myMaterialNode;
+            }
+
         private:
             void addTextures(const dom::NodePtr theTextureListNode,
                               TextureManager & theTextureMananger);

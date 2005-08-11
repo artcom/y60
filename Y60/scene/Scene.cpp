@@ -582,6 +582,14 @@ namespace y60 {
                 DB(AC_TRACE << " ANIMATIONS");
             }
             update(myUpdateFlags);
+
+            // TODO: Create material-facades and update skin-and-bones materials only,
+            // if the attached joint-globalmatrices have changend.
+            for (unsigned i = 0; i < _myMaterials.size(); ++i) {
+                if (dynamic_cast_Ptr<SkinAndBones>(_myMaterials[i])) {
+                    _myMaterials[i]->update(*_myTextureManager, getImagesRoot());
+                }
+            }
             _myPreviousDomVersion = _mySceneDom->nodeVersion();
         }
     }

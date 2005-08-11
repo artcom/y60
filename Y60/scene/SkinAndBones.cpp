@@ -56,18 +56,23 @@ namespace y60 {
         vector<NodePtr> myElements;
         myShapesNode->getNodesByAttribute(ELEMENTS_NODE_NAME, MATERIAL_REF_ATTRIB, getId(), myElements);
 
-
+        Node * myShape;
         string myShapeId;
         for (unsigned i = 0; i < myElements.size(); ++i) {
-            string myOtherShapeId = myElements[i]->parentNode()->parentNode()->getAttributeString(ID_ATTRIB);
+            Node * myOtherShape = myElements[i]->parentNode()->parentNode();
             if (i == 0) {
-                myShapeId = myOtherShapeId;
+                myShape = myOtherShape;
+                myShapeId = myShape->getAttributeString(ID_ATTRIB);
             }  else {
+                const string & myOtherShapeId = myOtherShape->getAttributeString(ID_ATTRIB);
                 if (myOtherShapeId != myShapeId) {
                     AC_WARNING << "Shape " << myOtherShapeId << " uses skin-and-bones material already used by shape " << myShapeId;
                 }
             }
         }
+
+        // Cache bounding box
+        _myBoundingBoxNode = myShape->getFacade()->getNamedItem(BOUNDING_BOX_ATTRIB);
 
         vector<NodePtr> mySkeletons;
         myWorldsNode->getNodesByAttribute(BODY_NODE_NAME, BODY_SHAPE_ATTRIB, myShapeId, mySkeletons);
@@ -75,10 +80,7 @@ namespace y60 {
         if (mySkeletons.size() > 1) {
             throw SkinAndBonesException(string("More than one skeletons use the shape ") + myShapeId, PLUS_FILE_LINE);
         }
-
-        // Cache bounding box
-        _myBoundingBoxNode = mySkeletons[0]->getFacade()->getNamedItem(BOUNDING_BOX_ATTRIB);
-
+        
         // Find connected joints
         NodePtr mySkeletonAttribute = mySkeletons[0]->getAttribute(SKELETON_ATTRIB);
 
@@ -97,12 +99,10 @@ namespace y60 {
                     +asl::as_string(*mySkeletons[0]), PLUS_FILE_LINE);
             }
 
-            //const Matrix4f * myGlobalMatrix = myJoint->getAttribute(GLOBAL_MATRIX_ATTRIB)->nodeValuePtr<Matrix4f>();
             const asl::Matrix4f * myGlobalMatrix = &myJoint->getFacade<TransformHierarchyFacade>()->get<GlobalMatrixTag>();
             _myJointMatrices.push_back(myGlobalMatrix);
 
             Matrix4f myInitialMatrix(*myGlobalMatrix);
-
             _myJointSpaceTransforms.push_back(asl::inverse(myInitialMatrix));
         }
 
@@ -119,8 +119,8 @@ namespace y60 {
             throw SkinAndBonesException("SkinAndBones shader update has been called before setup", PLUS_FILE_LINE);
         }
 
-        //Box3f * myBoundingBox = _myBoundingBoxNode->nodeValuePtrOpen<Box3f>();
-        //myBoundingBox->makeEmpty();
+        Box3f * myBoundingBox = _myBoundingBoxNode->nodeValuePtrOpen<Box3f>();
+        myBoundingBox->makeEmpty();
 
         for (unsigned i = 0; i < _myJointMatrices.size(); ++i) {
             Matrix4f myMatrix(_myJointSpaceTransforms[i]);
@@ -130,9 +130,10 @@ namespace y60 {
             myBoneMatrixProperty->at(i * 3 + 1) = myMatrix.getColumn(1);
             myBoneMatrixProperty->at(i * 3 + 2) = myMatrix.getColumn(2);
 
-            //myBoundingBox->extendBy(asPoint(_myJointMatrices[i]->getTranslation()));
+            myBoundingBox->extendBy(asPoint(_myJointMatrices[i]->getTranslation()));
         }
+
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
-        //_myBoundingBoxNode->nodeValuePtrClose<Box3f>();
+        _myBoundingBoxNode->nodeValuePtrClose<Box3f>();        
    }
 }
