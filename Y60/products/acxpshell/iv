@@ -6,6 +6,7 @@ else
 fi
 
 APPLICATION=acxpshellOPT
+ARGS="-I $PRO/src/Y60/js;$PRO/lib $PRO/src/Y60/js/ImageViewer.js $SHADERLIB $*"
 
 if [ "$DEBUG" == "1" ] ; then
     APPLICATION=acxpshellDBG
@@ -20,7 +21,18 @@ if uname -r | grep -q "^2.6" ; then
     echo "setting LD_ASSUME_KERNEL=2.4.99"
 fi
 
-COMMAND="$APPLICATION -I $PRO/src/Y60/js;$PRO/lib $PRO/src/Y60/js/ImageViewer.js $SHADERLIB $*"
+if [ "$DEBUG" = "vc" ]; then
+    echo Visual Studio Debuger Setup
+    echo --------------------------------------------------------------------------------------
+    echo $PRO/bin/acxpshellDBG.exe
+    echo $ARGS
+    echo `cmd /C cd`
+    echo --------------------------------------------------------------------------------------
+    exit 0
+fi
+
+
+COMMAND="$APPLICATION $ARGS"
 echo $COMMAND
 $COMMAND
 exit $?
