@@ -569,9 +569,11 @@ Mesh::deleteIndicesByColor(unsigned int theColor) {
         if ((*_myColors)[myIndex] == theColor) {
             // move something here from the myReverseIndex
             while ((*_myColors)[myReverseIndex] == theColor && myReverseIndex > myIndex) {
-                int myOldTwin = (*_myHalfEdges)[myReverseIndex];
-                if (myOldTwin >= 0 && myOldTwin < myReverseIndex) {
-                    (*_myHalfEdges)[myOldTwin] = -1;
+                for (int i = 0; i < _myFaceSize; ++i) {
+                    int myOldTwin = (*_myHalfEdges)[myReverseIndex+i];
+                    if (myOldTwin >= 0) {
+                        (*_myHalfEdges).at(myOldTwin) = -1;
+                    }
                 }
                 myReverseIndex -= _myFaceSize;
             }
@@ -581,8 +583,8 @@ Mesh::deleteIndicesByColor(unsigned int theColor) {
             } else {
                 for (int i = 0; i < _myFaceSize; ++i) {
                     int myOldTwin = (*_myHalfEdges)[myIndex+i];
-                    if (myOldTwin >= 0 && myOldTwin < myReverseIndex) {
-                        (*_myHalfEdges)[myOldTwin] = -1;
+                    if (myOldTwin >= 0) {
+                        (*_myHalfEdges).at(myOldTwin) = -1;
                     }
                     (*_myColors)[myIndex+i] = (*_myColors)[myReverseIndex+i];
                     int myHalfEdgeValue = (*_myHalfEdges)[myReverseIndex+i];
