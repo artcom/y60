@@ -79,6 +79,13 @@ void OffScreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
     postOffScreenRender(myTexture, theCopyToImageFlag);
 }    
 
+
+void OffScreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
+    AbstractRenderWindow::setRenderingCaps(theRenderingCaps);
+    OffScreenBuffer::setUseGLFramebufferObject(theRenderingCaps & y60::FRAMEBUFFER_SUPPORT);
+}
+
+
 bool OffScreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
         ensureRaster(getImage());

@@ -11,21 +11,25 @@ using namespace dom;
 namespace y60 {
 
 
-OffScreenBuffer::OffScreenBuffer(bool theGLExtensionUsageFlag) 
-    : _myGLExtensionUsageFlag(theGLExtensionUsageFlag),
+OffScreenBuffer::OffScreenBuffer(bool theUseGLFramebufferObject) 
+    : _myUseGLFramebufferObject(theUseGLFramebufferObject),
       _myOffScreenBuffer(0), _myDepthBuffer(0)
 {
 }
 
 void OffScreenBuffer::preOffScreenRender( ImagePtr theTexture) {
-    if (_myGLExtensionUsageFlag) {
+    AC_TRACE << "OffScreenBuffer::preOffScreenRender " 
+             << " w/ gl framebuffer extension " << _myUseGLFramebufferObject;
+    if (_myUseGLFramebufferObject) {
         bindOffScreenFrameBuffer(theTexture);
     }
 }
 
 
 void OffScreenBuffer::postOffScreenRender( ImagePtr theTexture, bool theCopyToImageFlag) {
-    if (_myGLExtensionUsageFlag) {
+    AC_TRACE << "OffScreenBuffer::postOffScreenRender " 
+             << " w/ gl framebuffer extension " << _myUseGLFramebufferObject;
+    if (_myUseGLFramebufferObject) {
         bindTexture(theTexture);
     } else {
         copyFrameBufferToTexture(theTexture);
@@ -40,7 +44,7 @@ void OffScreenBuffer::copyTextureToImage(ImagePtr theImage) {
     AC_TRACE << "OffScreenBuffer::copyTextureToImage ";
 
 #ifdef GL_EXT_framebuffer_object
-    if (_myGLExtensionUsageFlag) {
+    if (_myUseGLFramebufferObject) {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myOffScreenBuffer);
     }
 #endif
@@ -54,7 +58,7 @@ void OffScreenBuffer::copyTextureToImage(ImagePtr theImage) {
     theImage->getRasterValueNode()->bumpVersion();
 
 #ifdef GL_EXT_framebuffer_object
-    if (_myGLExtensionUsageFlag) {
+    if (_myUseGLFramebufferObject) {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
     }
 #endif

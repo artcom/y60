@@ -31,21 +31,15 @@ namespace y60 {
     class OffScreenBuffer {
         public:
 
-        inline void setGLExtensionUsage(bool theFlag) {
-            _myGLExtensionUsageFlag = theFlag;
-        }
-        inline bool getGLExtensionUsage() {
-            return _myGLExtensionUsageFlag;
-        }
         
         /**
          * Allows Offscreen rendering into a texture.
-         * Renders by default into the frame buffers back buffer
+         * Renders by default into the framebuffers back buffer
          * Renders into an off screen framebuffer using the 
          * EXT_framebuffer_object GL extension if 
          * my rendercaps include y60::FRAMEBUFFER_SUPPORT
          */
-        OffScreenBuffer(bool theGLExtensionUsageFlag = true);
+        OffScreenBuffer(bool theUseGLFramebufferObject = true);
         virtual ~OffScreenBuffer() {}
 
         /**
@@ -63,13 +57,24 @@ namespace y60 {
         void postOffScreenRender(asl::Ptr<Image, dom::ThreadingModel> theImage, 
                 bool theCopyToImageFlag = false); 
 
+        /**
+         * set to true if you want to render on a offscreen EXT_framebuffer_object
+         * if false we render on the framebuffers back buffer
+         */
+        inline void setUseGLFramebufferObject(bool theFlag) {
+            _myUseGLFramebufferObject = theFlag;
+        }
+        inline bool getUseGLFramebufferObject() {
+            return _myUseGLFramebufferObject;
+        }
+
     private:
         void copyTextureToImage(asl::Ptr<Image, dom::ThreadingModel> theImage);
         void copyFrameBufferToTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
         void bindTexture(asl::Ptr<Image, dom::ThreadingModel> theTexture);
         void bindOffScreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture);
         
-        bool _myGLExtensionUsageFlag;
+        bool _myUseGLFramebufferObject;
         unsigned _myOffScreenBuffer ,_myDepthBuffer;
     };
 }

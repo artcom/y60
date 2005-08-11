@@ -89,7 +89,7 @@ namespace jslib {
 
         bool hasCap(unsigned int theCap);
         bool hasCapAsString(const std::string & theCapStr);
-        void setRenderingCaps(unsigned int theRenderingCaps);
+        virtual void setRenderingCaps(unsigned int theRenderingCaps);
         unsigned int getRenderingCaps();
         bool printStatistics(unsigned int theOnScreenFlag, unsigned int theStatisticFlags);
         double getFrameRate() const;

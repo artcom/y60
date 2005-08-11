@@ -79,6 +79,7 @@ class OffScreenRenderArea : public y60::OffScreenBuffer,
 
         // AbstractRenderWindow
         virtual void initDisplay();
+        virtual void setRenderingCaps(unsigned int theRenderingCaps);
 
         //TODO make some stuff from AbstractRenderWindow private
 
