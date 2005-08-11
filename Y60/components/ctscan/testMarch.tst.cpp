@@ -75,8 +75,8 @@ class MarchTest : public UnitTest {
         }
             
         void run() {
-            // testSphere();
-            testWaves();
+            testSphere();
+            // testWaves();
         }
         
         void testWaves() {
@@ -100,7 +100,7 @@ class MarchTest : public UnitTest {
                 //if (!myMesh.isClosed()) {
                 //    myScene->save(as_string(i)+"_test.x60", false);
                 //}
-                myScene->save(as_string(i)+"_test.x60", false);
+                // myScene->save(as_string(i)+"_test.x60", false);
             //}
         }
         void testSphere() {
@@ -120,9 +120,6 @@ class MarchTest : public UnitTest {
                 ENSURE(myShape);
                 Mesh myMesh(myShape);
                 ENSURE(myMesh.isClosed());
-                if (!myMesh.isClosed()) {
-                    myScene->save(as_string(i)+"_test.x60", false);
-                }
             }
         }
 };

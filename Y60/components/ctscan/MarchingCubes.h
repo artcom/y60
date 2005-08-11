@@ -20,10 +20,7 @@
 #ifndef Y60_MARCHING_CUBES_INCLUDED
 #define Y60_MARCHING_CUBES_INCLUDED
 
-#include "edge_data.h"
-#include "face_data.h"
-#include "HalfEdgeTable.h"
-
+#include "MCLookup.h"
 #include "CTScan.h"
 
 #include <y60/Scene.h>
@@ -76,7 +73,7 @@ namespace y60 {
 				_myHalfEdgeCount(0),
                 _myDownSampleRate(theDownSampleRate),
                 _myLineStride(0),
-                _myHalfEdgeTable()
+                _myMCLookup()
             {
                 if ( ! _myVoxelData) {
                     throw MarchingCubesException("CTScan ptr is zero.", PLUS_FILE_LINE);
@@ -314,11 +311,12 @@ namespace y60 {
             inline void triangulateVoxel(int cubeIndex, int iMarch, int jMarch, int kMarch, bool theDryRun) {
                 int edgeTable[12], edge;
                 int vertOffset;
-                int i;
                 int offset;
                 asl::Point3f  myVertexPosition;
                 asl::Vector3f myVertexNormal;
 				int (MarchingCubes<VoxelT>::*myOnVertex)(const asl::Point3f & thePosition, const asl::Vector3f & theNormal) = 0;
+
+                MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[cubeIndex]; 
 
 				if (theDryRun) { 
 					myOnVertex = &MarchingCubes<VoxelT>::countVertex;
@@ -327,10 +325,8 @@ namespace y60 {
 				}
                 AC_TRACE << "triangulateVoxel(" << cubeIndex << ", " << iMarch << "," << jMarch << "," << kMarch << ")";
 
-                i = 0;
-                while((ourEdgeData[cubeIndex][i] != -1) && (i < 12)) {
-
-                    edge = ourEdgeData[cubeIndex][i];
+                for (int i = 0; i < myCubeCase.edges.size(); ++i) {
+                    edge = myCubeCase.edges[i];
                     AC_TRACE << "     edge case :" << edge;
 
                     switch (edge) {
@@ -475,39 +471,35 @@ namespace y60 {
                             break;
                     }
                     edgeTable[edge] = vertOffset;
-                    i++;
                 }
                 // update old stuff
                 _myOld11Pt = edgeTable[11];
                 _myOld2Pt = edgeTable[2];
                 _myOld6Pt = edgeTable[6];
                 _myOld10Pt = edgeTable[10];
-
 				if (theDryRun) {
-					for (int i = 0; i < 12; ++i) {
-						int myCornerIndex = ourFaceData[cubeIndex][i];
-						if (myCornerIndex == -1) break;
+					for (int i = 0; i < myCubeCase.faces.size(); ++i) {
+						int myCornerIndex = myCubeCase.faces[i];
 						++_myHalfEdgeCount;
 					}
 				} else {
 					int myFirstFaceIndex = _myHalfEdges->size();
-                    AC_INFO << "-------------";
-					for (int i = 0; i < 12; ++i) {
-						int myCornerIndex = ourFaceData[cubeIndex][i];
-						if (myCornerIndex == -1) break;
-						int myNextCornerIndex = ourFaceData[cubeIndex][i - (i % 3) + ((i+1) % 3)];
+                    // AC_INFO << "-------------";
+					for (int i = 0; i < myCubeCase.faces.size(); ++i) {
+						int myCornerIndex = myCubeCase.faces[i];
+						int myNextCornerIndex = myCubeCase.faces[i - (i % 3) + ((i+1) % 3)];
 						int myIndex = edgeTable[myCornerIndex];
 						int myNextIndex = edgeTable[myNextCornerIndex];
 						// int myTwin = ourHalfEdgeData[cubeIndex][i];
-                        HalfEdgeTable::HalfEdgeNeighbor & myNeighbor = _myHalfEdgeTable.cubeCases[cubeIndex].neighbors.at(i);
+                        MCLookup::HalfEdgeNeighbor & myNeighbor = myCubeCase.neighbors.at(i);
 						int myHalfEdge = -1;
-						if (myNeighbor.type == HalfEdgeTable::INTERNAL) {
+						if (myNeighbor.type == MCLookup::INTERNAL) {
 							myHalfEdge = myNeighbor.internal_index + myFirstFaceIndex;
 						} else {
 							// external twin
-							if (myNeighbor.type == HalfEdgeTable::MAX_X ||
-                                myNeighbor.type == HalfEdgeTable::MAX_Y ||
-                                myNeighbor.type == HalfEdgeTable::MAX_Z) 
+							if (myNeighbor.type == MCLookup::MAX_X ||
+                                myNeighbor.type == MCLookup::MAX_Y ||
+                                myNeighbor.type == MCLookup::MAX_Z) 
                             {
 								// Add to the map
 								EdgeId myKey(myIndex, myNextIndex);
@@ -521,7 +513,7 @@ namespace y60 {
 								EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
 								if (_myHalfEdgeCache.end() == iter) {
 									if (!_myStartZ && !_myStartY && !_myStartX) {
-										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << edge << " iMarch: " << iMarch << ", jMarch: " << jMarch << ", kMarch: " << kMarch << " Dumping cache.";
+										// AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << edge << " iMarch: " << iMarch << ", jMarch: " << jMarch << ", kMarch: " << kMarch << " Dumping cache.";
 										//throw MarchingCubesException("Not found in cache.", PLUS_FILE_LINE);                                    
 									}
 								} else {
@@ -536,7 +528,7 @@ namespace y60 {
 						_myHalfEdges->push_back(myHalfEdge); // push the other edge
 						AC_TRACE << "   size is now " << _myHalfEdges->size();
 						_myIndices->push_back(myIndex);
-                        AC_INFO << myIndex << (*_myVertices)[myIndex]; 
+                        AC_TRACE << myIndex << (*_myVertices)[myIndex]; 
 					}
 				}
             }
@@ -1058,7 +1050,7 @@ namespace y60 {
             int  _myHalfEdgeCount;
 			int  _myVertexCount;
             int  _myUsedSegs;
-            HalfEdgeTable _myHalfEdgeTable;
+            MCLookup _myMCLookup;
 
             const int _myDownSampleRate;
             int _myLineStride;
