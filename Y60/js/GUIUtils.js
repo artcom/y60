@@ -57,11 +57,17 @@ function getFilenameDialog(theTitle, theAction, thePatterns, theShortcuts) {
 }
 
 
-function askUserForFilename(theTitle) {
+function askUserForFilename(theTitle, theSuffix) {
     var myWriteItFlag = false;
     while ( true ) {
-        var myFilename = getFilenameDialog(theTitle, FileChooserDialog.ACTION_SAVE, null);
-        if (myFilename) {
+        var myFilename = getFilenameDialog(theTitle, FileChooserDialog.ACTION_SAVE, null, null);
+        if (myFilename.length > 0) {
+            if (theSuffix) {
+                var myFilenameString = new String( basename( myFilename ));
+                if (myFilenameString.lastIndexOf('.') == -1) {
+                    myFilename += "." + theSuffix;
+                }
+            }
             if (fileExists(myFilename)) {
                 var myDialog = new MessageDialog("<b>File exists.</b>\nDo you want to overwrite it?",
                                                  true, MessageDialog.MESSAGE_QUESTION, 
