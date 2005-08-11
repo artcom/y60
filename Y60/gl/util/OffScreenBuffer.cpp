@@ -1,8 +1,9 @@
 
 #include "OffScreenBuffer.h"
+#include "GLUtils.h"
+#include "PixelEncodingInfo.h"
 
 #include <y60/Image.h>
-#include <y60/PixelEncodingInfo.h>
 #include <asl/Logger.h>
 
 
