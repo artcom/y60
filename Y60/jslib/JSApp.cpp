@@ -712,10 +712,10 @@ BuildDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 Revision(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Prints the SVN revision number of pro60 at time of build.");
+    DOC_BEGIN("returns the SVN revision number of pro60 at time of build.");
     DOC_END;
     try {
-        AC_PRINT << "Revision: " << asl::ourRevision;
+        *rval = as_jsval(cx, asl::ourRevision);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

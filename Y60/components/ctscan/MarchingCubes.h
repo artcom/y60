@@ -29,6 +29,7 @@
 #include <asl/Box.h>
 #include <asl/Logger.h>
 
+#include <algorithm>
 #include <stdio.h>
 
 // TODO: check what this does .... maybe we need diffrent values for voxel types
@@ -119,8 +120,8 @@ namespace y60 {
                                      theBox.getMax()[1]/_myDownSampleRate,
                                      theBox.getMax()[2]/_myDownSampleRate);
 
-                swap( myTempBox[asl::Box3i::MIN][0], myTempBox[asl::Box3i::MIN][1]);
-                swap( myTempBox[asl::Box3i::MAX][0], myTempBox[asl::Box3i::MAX][1]);
+                std::swap( myTempBox[asl::Box3i::MIN][0], myTempBox[asl::Box3i::MIN][1]);
+                std::swap( myTempBox[asl::Box3i::MAX][0], myTempBox[asl::Box3i::MAX][1]);
 
                 checkBox(myTempBox);
                 _myVBox = myTempBox;
