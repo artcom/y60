@@ -14,7 +14,10 @@
 #include <asl/HWSampleSink.h>
 #include <asl/Stream.h>
 
-#define EMULATE_INTTYPES
+#ifdef WINDOWS 
+    #define EMULATE_INTTYPES
+#endif
+
 #include <ffmpeg/avformat.h>
 
 namespace y60 {
