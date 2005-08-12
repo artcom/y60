@@ -324,7 +324,7 @@ namespace y60 {
 					myOnVertex = &MarchingCubes<VoxelT>::outputVertex;
 				}
                 AC_TRACE << "triangulateVoxel(" << cubeIndex << ", " << iMarch << "," << jMarch << "," << kMarch << ")";
-                const vector<int> & myEdges = myCubeCase.edges;
+                const std::vector<int> & myEdges = myCubeCase.edges;
                 int myEdgeCount = myEdges.size();
                 for (int i = 0; i < myEdgeCount; ++i) {
                     edge = myEdges[i];
