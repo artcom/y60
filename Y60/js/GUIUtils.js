@@ -34,13 +34,6 @@ function getFilenameDialog(theTitle, theAction, thePatterns, theShortcuts) {
         }
     }
 
-    if (thePatterns) {
-        for (var i = 0; i < thePatterns.length; ++i) {
-            myFileChooserDialog.add_filter_pattern( thePatterns[i].pattern, 
-                    thePatterns[i].name + " (" + thePatterns[i].pattern + ")");
-        }
-    }
-
     myFileChooserDialog.add_button(StockID.CANCEL,Dialog.RESPONSE_CANCEL);
     myFileChooserDialog.add_button(StockID.OK,Dialog.RESPONSE_OK);
 
