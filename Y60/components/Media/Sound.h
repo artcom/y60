@@ -14,7 +14,7 @@
 #include <asl/HWSampleSink.h>
 #include <asl/Stream.h>
 
-#ifdef WINDOWS 
+#ifdef WIN32 
     #define EMULATE_INTTYPES
 #endif
 
