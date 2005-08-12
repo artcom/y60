@@ -21,26 +21,15 @@
 #define _ac_y60_FFMpegDecoder_h_
 
 #include "VideoFrame.h"
+#include "AudioFrame.h"
+#include "FrameConveyor.h"
+#include "DecoderContext.h"
 #include <y60/MovieDecoderBase.h>
 #include <audio/BufferedSource.h>
 #include <asl/PlugInBase.h>
 #include <asl/Block.h>
 #include <string>
 #include <vector>
-
-#ifdef WIN32
-// Disable FFMPeg Warning in Windows
-#pragma warning(push)
-#pragma warning(disable:4244)
-#define EMULATE_INTTYPES
-#endif
-
-#include <ffmpeg/avformat.h>
-
-#ifdef WIN32
-// Reenable Warning in Windows
-#pragma warning(pop)
-#endif
 
 namespace y60 {
 
@@ -89,24 +78,23 @@ namespace y60 {
 
         private:
             void initBufferedSource(unsigned theNumChannels, unsigned theSampleRate, unsigned theSampleBits);
-            void addAudioPacket(const AVPacket & thePacket);
+            void addAudioPacket();
 
             /// Decode frame at theTimestamp into theTargetRaster. Returns true if EOF was met.
-            bool decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
-            void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
-            void copyFrame(VideoFramePtr theVideoFrame, dom::ResizeableRasterPtr theTargetRaster);
+            bool decodeFrame(long long & theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
 
-            AVFormatContext * _myFormatContext;           
-            AVFrame *         _myFrame;
+            /// Convert frame vom YUV to RGB
+            void convertFrame(AVFrame * theFrame, dom::ResizeableRasterPtr theTargetRaster);
 
-            VideoFramePtr     _myVideoFrame;        
-            int               _myVStreamIndex;
-            AVStream *        _myVStream;
+            /// Copy raster to raster
+            void copyFrame(dom::ResizeableRasterPtr theVideoFrame, dom::ResizeableRasterPtr theTargetRaster);
 
+            AVFrame *         _myVideoFrame;
             AudioBase::BufferedSource * _myAudioBufferedSource;
-            unsigned char *   _myAudioSamples;
-            int               _myAStreamIndex;
-            AVStream *        _myAStream;
+            AudioFrame        _myAudioFrame;
+
+            DecoderContext    _myContext;
+            FrameConveyor     _myFrameConveyor;
     };
 
     typedef asl::Ptr<FFMpegDecoder> FFMpegDecoderPtr;
