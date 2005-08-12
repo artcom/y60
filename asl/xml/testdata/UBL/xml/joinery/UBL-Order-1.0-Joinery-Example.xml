@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Order xmlns:res="urn:oasis:names:specification:ubl:schema:xsd:AcknowledgementResponseCode-1.0" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-1.0" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-1.0" xmlns:cur="urn:oasis:names:specification:ubl:schema:xsd:CurrencyCode-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:oasis:names:specification:ubl:schema:xsd:Order-1.0" xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Order-1.0 ../../xsd/maindoc/UBL-Order-1.0.xsd">
+	<BuyersID>S03-034257</BuyersID>
+	<cbc:IssueDate>2003-02-03</cbc:IssueDate>
+	<cac:BuyerParty>
+		<cac:Party>
+			<cac:PartyName>
+				<cbc:Name>Jerry Builder plc</cbc:Name>
+			</cac:PartyName>
+			<cac:Address>
+				<cbc:StreetName>Marsh Lane</cbc:StreetName>
+				<cbc:CityName>Nowhere</cbc:CityName>
+				<cbc:PostalZone>NR18 4XX</cbc:PostalZone>
+				<cbc:CountrySubentity>Norfolk</cbc:CountrySubentity>
+			</cac:Address>
+			<cac:Contact>
+				<cbc:Name>Eva Brick</cbc:Name>
+			</cac:Contact>
+		</cac:Party>
+	</cac:BuyerParty>
+	<cac:SellerParty>
+		<cac:Party>
+			<cac:PartyName>
+				<cbc:Name>Specialist Windows plc</cbc:Name>
+			</cac:PartyName>
+			<cac:Address>
+				<cbc:BuildingName>Snowhill Works</cbc:BuildingName>
+				<cbc:CityName>Little Snoring</cbc:CityName>
+				<cbc:PostalZone>SM2 3NW</cbc:PostalZone>
+				<cbc:CountrySubentity>Whereshire</cbc:CountrySubentity>
+			</cac:Address>
+		</cac:Party>
+	</cac:SellerParty>
+	<cac:Delivery>
+		<cbc:RequestedDeliveryDateTime>2003-02-24T00:00:00</cbc:RequestedDeliveryDateTime>
+		<cac:DeliveryAddress>
+			<cbc:StreetName>Riverside Rd.</cbc:StreetName>
+			<cbc:BuildingName>Plot 17, Whitewater Estate</cbc:BuildingName>
+			<cbc:CityName>Whetstone</cbc:CityName>
+			<cbc:CountrySubentity>Middlesex</cbc:CountrySubentity>
+		</cac:DeliveryAddress>
+	</cac:Delivery>
+	<cac:OrderLine>
+		<cac:LineItem>
+			<cac:BuyersID>A</cac:BuyersID>
+			<cbc:Quantity quantityUnitCode="unit">2</cbc:Quantity>
+			<cac:Item>
+				<cac:SellersItemIdentification>
+					<cac:ID>236WV</cac:ID>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>wood</cac:AttributeID>
+						<cbc:Description>soft</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>finish</cac:AttributeID>
+						<cbc:Description>primed</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>fittings</cac:AttributeID>
+						<cbc:Description>satin</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>glazing</cac:AttributeID>
+						<cbc:Description>single</cbc:Description>
+					</cac:PhysicalAttribute>
+				</cac:SellersItemIdentification>
+			</cac:Item>
+		</cac:LineItem>
+	</cac:OrderLine>
+	<cac:OrderLine>
+		<cac:LineItem>
+			<cac:BuyersID>B</cac:BuyersID>
+			<cbc:Quantity quantityUnitCode="unit">3</cbc:Quantity>
+			<cac:Item>
+				<cac:SellersItemIdentification>
+					<cac:ID>340TW</cac:ID>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>hand</cac:AttributeID>
+						<cbc:Description>RH</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>wood</cac:AttributeID>
+						<cbc:Description>hard</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>finish</cac:AttributeID>
+						<cbc:Description>stain</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>fittings</cac:AttributeID>
+						<cbc:Description>brass</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>glazing</cac:AttributeID>
+						<cbc:Description>double</cbc:Description>
+					</cac:PhysicalAttribute>
+				</cac:SellersItemIdentification>
+			</cac:Item>
+		</cac:LineItem>
+	</cac:OrderLine>
+	<cac:OrderLine>
+		<cac:LineItem>
+			<cac:BuyersID>C</cac:BuyersID>
+			<cbc:Quantity quantityUnitCode="unit">3</cbc:Quantity>
+			<cac:Item>
+				<cac:SellersItemIdentification>
+					<cac:ID>340TW</cac:ID>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>hand</cac:AttributeID>
+						<cbc:Description>LH</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>wood</cac:AttributeID>
+						<cbc:Description>hard</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>finish</cac:AttributeID>
+						<cbc:Description>stain</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>fittings</cac:AttributeID>
+						<cbc:Description>brass</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>glazing</cac:AttributeID>
+						<cbc:Description>double</cbc:Description>
+					</cac:PhysicalAttribute>
+				</cac:SellersItemIdentification>
+			</cac:Item>
+		</cac:LineItem>
+	</cac:OrderLine>
+	<cac:OrderLine>
+		<cac:LineItem>
+			<cac:BuyersID>D</cac:BuyersID>
+			<cbc:Quantity quantityUnitCode="unit">1</cbc:Quantity>
+			<cac:Item>
+				<cac:SellersItemIdentification>
+					<cac:ID>FDDR15</cac:ID>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>hand</cac:AttributeID>
+						<cbc:Description>RH</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>wood</cac:AttributeID>
+						<cbc:Description>hard</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>finish</cac:AttributeID>
+						<cbc:Description>stain</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>fittings</cac:AttributeID>
+						<cbc:Description>brass</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>glazing</cac:AttributeID>
+						<cbc:Description>safety</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:MeasurementDimension>
+						<cac:AttributeID>height</cac:AttributeID>
+						<cbc:Measure measureUnitCode="inches">78</cbc:Measure>
+						<cbc:Description>Height in inches</cbc:Description>
+					</cac:MeasurementDimension>
+					<cac:MeasurementDimension>
+						<cac:AttributeID>width</cac:AttributeID>
+						<cbc:Measure measureUnitCode="inches">33</cbc:Measure>
+						<cbc:Description>Width in inches</cbc:Description>
+					</cac:MeasurementDimension>
+				</cac:SellersItemIdentification>
+			</cac:Item>
+		</cac:LineItem>
+	</cac:OrderLine>
+	<cac:OrderLine>
+		<cac:LineItem>
+			<cac:BuyersID>E</cac:BuyersID>
+			<cbc:Quantity quantityUnitCode="feet">30</cbc:Quantity>
+			<cac:Item>
+				<cac:SellersItemIdentification>
+					<cac:ID>HW100X50</cac:ID>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>wood</cac:AttributeID>
+						<cbc:Description>hard</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:PhysicalAttribute>
+						<cac:AttributeID>finish</cac:AttributeID>
+						<cbc:Description>stain</cbc:Description>
+					</cac:PhysicalAttribute>
+					<cac:MeasurementDimension>
+						<cac:AttributeID>length</cac:AttributeID>
+						<cbc:Measure measureUnitCode="feet">6</cbc:Measure>
+						<cbc:Description>Lenght in feet</cbc:Description>
+					</cac:MeasurementDimension>
+				</cac:SellersItemIdentification>
+			</cac:Item>
+		</cac:LineItem>
+	</cac:OrderLine>
+</Order>
