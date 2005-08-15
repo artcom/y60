@@ -104,11 +104,6 @@ namespace y60 {
                 return _myThreshold;
             }
 
-            inline bool 
-            isOutside(const VoxelT theValue) const {
-                return theValue < _myThreshold[0] || theValue > _myThreshold[1];
-            }
-            
             void setBox(const asl::Box3i & theBox) {
                 asl::Box3i myTempBox(theBox.getMin()[0]/_myDownSampleRate,
                                      theBox.getMin()[1]/_myDownSampleRate,
@@ -723,6 +718,12 @@ namespace y60 {
                 return _mySlices[z*_myDownSampleRate][_myLineStride*y*_myDownSampleRate + x*_myDownSampleRate];
             }
 
+            inline bool
+            isOutside(int x, int y, int z) const {
+                const VoxelT & myValue = at(x, y, z);
+                return myValue < _myThreshold[0] || myValue > _myThreshold[1];
+            }
+
             void march(bool theDryRun) {
                 AC_TRACE << "MarchingCubes::march()";
                 int i, j, k;
@@ -782,37 +783,37 @@ namespace y60 {
                             // offset = _myDimensions[1] * i + j;
                             cubeIndex = 0;
 
-                            if(isOutside(at(j, i, lowSlice))) {
+                            if(isOutside(j, i, lowSlice)) {
                                 cubeIndex |= BIT_0;
                             }
-                            if(isOutside(at(j, i, highSlice))) {
+                            if(isOutside(j, i, highSlice)) {
                                 cubeIndex |= BIT_4;
                             }
 
                             // offset++;
 
-                            if(isOutside(at(j+1, i, lowSlice))) {
+                            if(isOutside(j+1, i, lowSlice)) {
                                 cubeIndex |= BIT_3;
                             }
-                            if(isOutside(at(j+1, i, highSlice))) {
+                            if(isOutside(j+1, i, highSlice)) {
                                 cubeIndex |= BIT_7;
                             }
 
                             // offset = _myDimensions[1] * (i + 1) + j;
 
-                            if(isOutside(at(j, i+1, lowSlice))) {
+                            if(isOutside(j, i+1, lowSlice)) {
                                 cubeIndex |= BIT_1;
                             }
-                            if(isOutside(at(j, i+1, highSlice))) {
+                            if(isOutside(j, i+1, highSlice)) {
                                 cubeIndex |= BIT_5;
                             }
 
                             // offset++; // = (j+1, i+1)
 
-                            if(isOutside(at(j+1, i+1, lowSlice))) {
+                            if(isOutside(j+1, i+1, lowSlice)) {
                                 cubeIndex |= BIT_2;
                             }
-                            if(isOutside(at(j+1, i+1, highSlice))) {
+                            if(isOutside(j+1, i+1, highSlice)) {
                                 cubeIndex |= BIT_6;
                             }
 
