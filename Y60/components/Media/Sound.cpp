@@ -35,7 +35,7 @@ Sound::Sound (string myURI, HWSampleSinkPtr mySampleSink, bool theLoop)
 }
 
 Sound::Sound (const string & myURI, Ptr < ReadableStream > myStream,
-        HWSampleSinkPtr mySampleSink, bool theLoo)
+        HWSampleSinkPtr mySampleSink, bool theLoop)
 {
     AC_DEBUG << "Sound::Sound (" << _myURI << ")";
     _myLockedSelf = SoundPtr(0);
@@ -186,6 +186,7 @@ void Sound::update(double theTimeSlice) {
             }
         } else {
             if (!isPlaying()) {
+                AC_DEBUG << "Sound::update: Playback complete";
                 _myDecodingComplete = false;
                 _myLockedSelf = SoundPtr(0);
             }
@@ -199,6 +200,7 @@ void Sound::update(double theTimeSlice) {
             }
             if (myEOF) {
                 _myDecodingComplete = true;
+                AC_DEBUG << "Sound::update: DecodingComplete";
                 if (!_myIsLooping) {
                     _mySampleSink->stop(true);
 //                    _myLockedSelf = SoundPtr(0);

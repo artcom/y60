@@ -92,15 +92,29 @@ unsigned Media::getNumSounds() const {
 
 void Media::stopAll() {
     {
-        AutoLocker<ThreadLock> myLocker(_myLock);
         AC_DEBUG << "Media::stopAll";
         std::vector < SoundWeakPtr >::iterator it;
-        for (it = _mySounds.begin(); it != _mySounds.end(); ++it) {
-            SoundPtr curSound = (*it).lock();
-            if (curSound) {
-                cerr << "stopAll: stopping " << curSound->getName() << endl;
-                curSound->stop();
+        unsigned myNumSoundsStopped = 0;
+        // Here, we'd like to just lock the Sounds, iterate through the sounds and
+        // call stop on all of them. This takes too long, though, so we can't lock 
+        // the whole time. That in turn means that the list of sounds might change 
+        // while we're iterating through it.
+        for (int i = _mySounds.size()-1; i >= 0; --i) {
+            AutoLocker<ThreadLock> myLocker(_myLock);
+            if (i >= _mySounds.size()) {
+                // This can happen if sounds have been deleted in the meantime.
+                i = _mySounds.size()-1;
             }
+            SoundPtr curSound = _mySounds[i].lock();
+            if (curSound) {
+                AC_TRACE << "stopAll: Stopping " << curSound->getName();
+                curSound->stop();
+                myNumSoundsStopped++;
+            }
+            msleep(1);
+        }
+        if (myNumSoundsStopped) {
+            AC_DEBUG << "stopAll: " << myNumSoundsStopped << " sounds stopped.";
         }
     }
     msleep(100);

@@ -243,7 +243,8 @@ class TestPause: public SoundTestBase {
     private:
         void runLoop(bool theLoop) {
             {
-                SoundPtr mySound = getMedia()->createSound("../../testfiles/aussentuer.mp3", theLoop);
+                SoundPtr mySound = getMedia()->createSound
+                        ("../../testfiles/aussentuer.mp3", theLoop);
                 mySound->play();
                 msleep(200);
                 mySound->pause();
@@ -391,14 +392,15 @@ class StressTest: public SoundTestBase {
             while(double(Time())-myStartTime < _myDuration) { 
                 SoundPtr mySound = getMedia()->createSound
                         ("../../testfiles/stereotest441.wav", false,
-                         "../../testfiles/stereotest441.wav"+asl::as_string(i));
-                mySound->setVolume(0.1f);
+                         "../../testfiles/stereotest441.wav "+asl::as_string(i));
+                mySound->setVolume(0.03f);
                 mySound->play();
                 double r1 = rand()/double(RAND_MAX);
                 unsigned myTime = unsigned(10*r1);
                 msleep(myTime);
                 ++i;
             }
+            getMedia()->stopAll();
             SUCCESS("StressTest");
         }
 
@@ -433,10 +435,11 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new TestStop());
             addTest(new TestStopByItself());
             addTest(new TestPause());
-            addTest(new TestStopAll());
+            addTest(new TestStopAll());            
             addTest(new TestLoop());
             addTest(new TestVolume());
             addTest(new TestSeek());
+          
             addTest(new StressTest(5));
 
             // 24 Hour test :-).
