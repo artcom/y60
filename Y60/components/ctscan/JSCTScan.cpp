@@ -169,33 +169,6 @@ countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     try {
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
 
-        ensureParamCount(argc, 3);
-
-        // have to convert a Box3f into a Box3i because Box3i isn't available in JS
-        asl::Box3f myFloatBox;
-        convertFrom(cx, argv[0], myFloatBox);
-        asl::Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
-                              static_cast<int>( myFloatBox[Box3f::MIN][1]),
-                              static_cast<int>( myFloatBox[Box3f::MIN][2]),
-                              static_cast<int>( myFloatBox[Box3f::MAX][0]),
-                              static_cast<int>( myFloatBox[Box3f::MAX][1]),
-                              static_cast<int>( myFloatBox[Box3f::MAX][2]));
-        double myThreshold;
-        convertFrom(cx, argv[1], myThreshold);
-        int myDownSampleRate;
-        convertFrom(cx, argv[2], myDownSampleRate);
-
-        CTScan & myCTScan = myObj.getNative();
-        int myTriangleCount = myCTScan.countTriangles(myVoxelBox, myThreshold, myDownSampleRate);
-        *rval = as_jsval(cx, myTriangleCount);
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-static JSBool
-polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    try {
-        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
-
         ensureParamCount(argc, 4);
 
         // have to convert a Box3f into a Box3i because Box3i isn't available in JS
@@ -207,23 +180,48 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                               static_cast<int>( myFloatBox[Box3f::MAX][0]),
                               static_cast<int>( myFloatBox[Box3f::MAX][1]),
                               static_cast<int>( myFloatBox[Box3f::MAX][2]));
-        double myThreshold;
-        convertFrom(cx, argv[1], myThreshold);
-
+        double myThresholdMin;
+        convertFrom(cx, argv[1], myThresholdMin);
+        double myThresholdMax;
+        convertFrom(cx, argv[2], myThresholdMax);
         int myDownSampleRate;
-        convertFrom(cx, argv[2], myDownSampleRate);
-
-        bool myCreateNormalsFlag;
-        convertFrom(cx, argv[3], myCreateNormalsFlag);
-
-        //std::string myFilename;
-        //convertFrom(cx, argv[3], myFilename);
-
-        //bool mySaveBinaryFlag;
-        //convertFrom(cx, argv[4], mySaveBinaryFlag);
+        convertFrom(cx, argv[3], myDownSampleRate);
 
         CTScan & myCTScan = myObj.getNative();
-        ScenePtr myScene = myCTScan.polygonize(myVoxelBox, myThreshold, myDownSampleRate,  
+        int myTriangleCount = myCTScan.countTriangles(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate);
+        *rval = as_jsval(cx, myTriangleCount);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+static JSBool
+polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+
+        ensureParamCount(argc, 5);
+
+        // have to convert a Box3f into a Box3i because Box3i isn't available in JS
+        asl::Box3f myFloatBox;
+        convertFrom(cx, argv[0], myFloatBox);
+        asl::Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
+                              static_cast<int>( myFloatBox[Box3f::MIN][1]),
+                              static_cast<int>( myFloatBox[Box3f::MIN][2]),
+                              static_cast<int>( myFloatBox[Box3f::MAX][0]),
+                              static_cast<int>( myFloatBox[Box3f::MAX][1]),
+                              static_cast<int>( myFloatBox[Box3f::MAX][2]));
+        double myThresholdMin;
+        convertFrom(cx, argv[1], myThresholdMin);
+        double myThresholdMax;
+        convertFrom(cx, argv[2], myThresholdMax);
+
+        int myDownSampleRate;
+        convertFrom(cx, argv[3], myDownSampleRate);
+
+        bool myCreateNormalsFlag;
+        convertFrom(cx, argv[4], myCreateNormalsFlag);
+
+        CTScan & myCTScan = myObj.getNative();
+        ScenePtr myScene = myCTScan.polygonize(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,  
             myCreateNormalsFlag, JSApp::getPackageManager());
         *rval = as_jsval(cx, myScene);
         return JS_TRUE;
@@ -264,8 +262,8 @@ JSCTScan::Functions() {
         {"getVoxelSize",         getVoxelSize,            0},
         {"getVoxelDimensions",   getVoxelDimensions,      0},
         {"getValueRange",        getValueRange,           0},
-        {"polygonize",           polygonize,              4},
-        {"countTriangles",       countTriangles,          3},
+        {"polygonize",           polygonize,              5},
+        {"countTriangles",       countTriangles,          4},
         {"create3DTexture",      create3DTexture,         2},
         {"computeHistogram",     computeHistogram,        1},
         {0}

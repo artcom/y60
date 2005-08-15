@@ -81,11 +81,12 @@ class CTScan {
         /** Returns the minimum/maximum voxel value possible in the dataset */
         asl::Vector2d getValueRange();
 
-        unsigned int countTriangles(const asl::Box3i & theVoxelBox, double theThreshold, int theDownSampleRate);
+        unsigned int countTriangles(const asl::Box3i & theVoxelBox, 
+            double theThresholdMin, double theThresholdMax, int theDownSampleRate);
 
         /** Create an isosurface from the voxel dataset */
-        ScenePtr polygonize(const asl::Box3i & theVoxelBox, double theThreshold, int theDownSampleRate, 
-            bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager);
+        ScenePtr polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
+            int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager);
 
         /** Create a downscaled 3D texture from the dataset */
         void create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize);
@@ -128,12 +129,12 @@ class CTScan {
         template <class VoxelT>
         void
         countMarchingCubes(const asl::Box3i & theVoxelBox,
-                             double theThreshold, int theDownSampleRate,
+                             double theThresholdMin, double theThresholdMax, int theDownSampleRate,
                              unsigned int & theVertexCount, unsigned int & theTriangleCount );
         template <class VoxelT> 
         void
         applyMarchingCubes(const asl::Box3i & theVoxelBox, 
-                             double theThreshold, int theDownSampleRate,
+                             double theThresholdMin, double theThresholdMax, int theDownSampleRate,
                              bool theCreateNormalsFlag, 
                              ScenePtr theScene);
         template <class VoxelT>

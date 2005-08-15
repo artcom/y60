@@ -95,11 +95,9 @@ namespace y60 {
             }
             ~MarchingCubes() {}
 
-            // TODO: normalize threshold to -1.0 to 1.0 
-            void setThreshold(VoxelT theThreshold) {
-                _myThreshold[0] = theThreshold;
-                _myThreshold[1] = 220;
-                //_myThreshold[1] = NumericTraits<VoxelT>::max();
+            void setThreshold(asl::Vector2<VoxelT> theThreshold) {
+                _myThreshold[0] = theThreshold[0];
+                _myThreshold[1] = theThreshold[1];
             }
 
             const asl::Vector2<VoxelT> & getThreshold() const {
@@ -513,12 +511,14 @@ namespace y60 {
                     return 0;
                 } else {
                     //throw MarchingCubesException("Threshold is neither crossed from top or bottom", PLUS_FILE_LINE);
-                    if ((theFirstValue < _myThreshold[1] && theSecondValue > _myThreshold[1]) ||
-                        (theFirstValue > _myThreshold[1] && theSecondValue < _myThreshold[1])) 
+                    if ((theFirstValue <= _myThreshold[1] && theSecondValue > _myThreshold[1]) ||
+                        (theFirstValue > _myThreshold[1] && theSecondValue <= _myThreshold[1])) 
                     {
-                        throw MarchingCubesException("Threshold is neither crossed from top or bottom", PLUS_FILE_LINE);
+                        return 1;
+                    } else {
+                        throw MarchingCubesException(std::string("Threshold is neither crossed from top or bottom with first: " ) + 
+                            as_string(int(theFirstValue)) + " and second: " + as_string(int(theSecondValue)), PLUS_FILE_LINE);
                     }
-                    return 1;
                 }
             }
 

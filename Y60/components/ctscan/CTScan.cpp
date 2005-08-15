@@ -227,7 +227,7 @@ CTScan::getValueRange() {
 template <class VoxelT>
 void
 CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox,
-                             double theThreshold, int theDownSampleRate,
+                             double theThresholdMin, double theThresholdMax, int theDownSampleRate,
                              bool theCreateNormalsFlag, ScenePtr theScene)
 {
     SceneBuilderPtr mySceneBuilder = theScene->getSceneBuilder();
@@ -236,7 +236,7 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox,
     // here we go ...
     MarchingCubes<VoxelT> myMarcher(theDownSampleRate, mySceneBuilder, this);
     myMarcher.setBox(theVoxelBox);
-    myMarcher.setThreshold(VoxelT(theThreshold));
+    myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
     myMarcher.calcNormals(theCreateNormalsFlag);
     myMarcher.estimate();
     dom::NodePtr myShapeNode = myMarcher.apply("polygonal_shape", myMaterialId);
@@ -252,32 +252,32 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox,
 template <class VoxelT>
 void
 CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox,
-                             double theThreshold, int theDownSampleRate,
+                             double theThresholdMin, double theThresholdMax, int theDownSampleRate,
                              unsigned int & theVertexCount, unsigned int & theTriangleCount )
 {
     // here we go ...
     MarchingCubes<VoxelT> myMarcher(theDownSampleRate, SceneBuilderPtr(0), this);
     myMarcher.setBox(theVoxelBox);
-    myMarcher.setThreshold(VoxelT(theThreshold));
+    myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
     myMarcher.calcNormals(false);
     myMarcher.estimate(&theVertexCount, &theTriangleCount);
 }
 
 unsigned int
-CTScan::countTriangles(const asl::Box3i & theVoxelBox, double theThreshold, int theDownSampleRate)
+CTScan::countTriangles(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, int theDownSampleRate)
 {
     unsigned int myVertexCount;
     unsigned int myTriangleCount;
 
     switch (_myEncoding) {
         case y60::GRAY:
-            countMarchingCubes<unsigned char>(theVoxelBox, theThreshold, theDownSampleRate, myVertexCount, myTriangleCount);
+            countMarchingCubes<unsigned char>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, myVertexCount, myTriangleCount);
             break;
         case y60::GRAY16:
-            countMarchingCubes<unsigned short>(theVoxelBox, theThreshold, theDownSampleRate, myVertexCount, myTriangleCount);
+            countMarchingCubes<unsigned short>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, myVertexCount, myTriangleCount);
             break;
         case y60::GRAYS16:
-            countMarchingCubes<short>(theVoxelBox, theThreshold, theDownSampleRate, myVertexCount, myTriangleCount);
+            countMarchingCubes<short>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, myVertexCount, myTriangleCount);
             break;
         default:
             throw CTScanException("Unhandled voxel type in CTScan::countTriangles()", PLUS_FILE_LINE);
@@ -285,7 +285,7 @@ CTScan::countTriangles(const asl::Box3i & theVoxelBox, double theThreshold, int 
     return myTriangleCount;
 }
 ScenePtr
-CTScan::polygonize(const asl::Box3i & theVoxelBox, double theThreshold, int theDownSampleRate, 
+CTScan::polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, int theDownSampleRate, 
                    bool theCreateNormalsFlag, PackageManagerPtr thePackageManager)
 {
     asl::Time myStartTime;
@@ -294,13 +294,13 @@ CTScan::polygonize(const asl::Box3i & theVoxelBox, double theThreshold, int theD
     myScene->createStubs(thePackageManager);    
     switch (_myEncoding) {
         case y60::GRAY:
-            applyMarchingCubes<unsigned char>(theVoxelBox, theThreshold, theDownSampleRate, theCreateNormalsFlag, myScene);
+            applyMarchingCubes<unsigned char>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, theCreateNormalsFlag, myScene);
             break;
         case y60::GRAY16:
-            applyMarchingCubes<unsigned short>(theVoxelBox, theThreshold, theDownSampleRate, theCreateNormalsFlag, myScene);
+            applyMarchingCubes<unsigned short>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, theCreateNormalsFlag, myScene);
             break;
         case y60::GRAYS16:
-            applyMarchingCubes<short>(theVoxelBox, theThreshold, theDownSampleRate, theCreateNormalsFlag, myScene);
+            applyMarchingCubes<short>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, theCreateNormalsFlag, myScene);
             break;
         default:
             throw CTScanException("Unhandled voxel type in CTScan::polygonize()", PLUS_FILE_LINE);
