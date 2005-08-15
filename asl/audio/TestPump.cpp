@@ -82,7 +82,7 @@ void TestPump::playSingleSound(unsigned theFramesPerBuffer, unsigned theDuration
         createSampleSink("TestSink", 44100, 2);
     ENSURE(myPump.getNumSinks() == 1);
     msleep(theDuration);
-    queueSineBuffers(mySampleSink, SF_F32, theFramesPerBuffer, 2, 440, 44100, 0.0015*theDuration);
+    queueSineBuffers(mySampleSink, SF_F32, theFramesPerBuffer, 2, 440, 44100, 0.0015*theDuration+0.1);
     mySampleSink->play();
     msleep(theDuration);
     mySampleSink->stop();
