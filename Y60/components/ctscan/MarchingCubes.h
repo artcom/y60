@@ -499,6 +499,13 @@ namespace y60 {
 				}
             }
 
+            inline bool
+            isOutside(int x, int y, int z) const {
+                const VoxelT & myValue = at(x, y, z);
+                return myValue < _myThreshold[0] || myValue > _myThreshold[1];
+            }
+
+
             inline int findThresholdBoundary(const VoxelT theFirstValue, const VoxelT theSecondValue) const {
                 if ((theFirstValue < _myThreshold[0] && theSecondValue >= _myThreshold[0]) ||
                     (theFirstValue >= _myThreshold[0] && theSecondValue < _myThreshold[0])) 
@@ -716,16 +723,6 @@ namespace y60 {
             const VoxelT &
             at(int x, int y, int z) const {
                 return _mySlices[z*_myDownSampleRate][_myLineStride*y*_myDownSampleRate + x*_myDownSampleRate];
-            }
-
-            inline bool
-            isOutside(int x, int y, int z) const {
-                const VoxelT & myValue = at(x, y, z);
-                if (x < 32) {
-                    return myValue < _myThreshold[0] || myValue > _myThreshold[1];
-                } else {
-                    return myValue < 10 || myValue > 200;
-                }
             }
 
             void march(bool theDryRun) {
