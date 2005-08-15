@@ -22,12 +22,14 @@ Sound::Sound (string myURI, HWSampleSinkPtr mySampleSink, bool theLoop)
     : _myURI (myURI),
       _mySampleSink(mySampleSink),
       _mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
+      _myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
       _myFormatContext(0),
       _myStreamIndex(-1),
       _myDecodingComplete(false),
       _myIsLooping(theLoop),
       _myTargetBufferedTime(1.0),
-      _myMaxUpdateTime(0.2)
+      _myMaxUpdateTime(0.2),
+      _myResampleContext(0)
 {
     AC_DEBUG << "Sound::Sound";
     _myLockedSelf = SoundPtr(0);
@@ -259,6 +261,11 @@ void Sound::open() {
     _myNumChannels = myCodecContext->channels;
     AC_INFO << "Number of channels: " << _myNumChannels << endl;
     AC_INFO << "Sample rate: " << _mySampleRate << endl;
+
+    if (_mySampleRate != Pump::get().getNativeSampleRate()) {
+        _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,    
+                Pump::get().getNativeSampleRate(), _mySampleRate);
+    }
 }
 
 void Sound::close() {
@@ -266,6 +273,10 @@ void Sound::close() {
     AC_DEBUG << "Sound::close() (" << _myURI << ")";
 
     if (_myFormatContext) {
+        if (_myResampleContext) {
+            audio_resample_close(_myResampleContext);
+            _myResampleContext = 0;
+        }
         AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
         if (myCodecContext) {
             avcodec_close(myCodecContext);
@@ -299,9 +310,19 @@ bool Sound::decode() {
             myLen = avcodec_decode_audio(myCodec, (int16_t*)_mySamples.begin(), 
                     &myBytesDecoded, myData, myDataLen);
             if (myLen > 0 && myBytesDecoded > 0) {
-                AudioBufferPtr myBuffer = _mySampleSink->createBuffer(
-                        myBytesDecoded/(getBytesPerSample(SF_S16)*_myNumChannels));
-                myBuffer->convert(_mySamples.begin(), SF_S16, _mySampleRate, _myNumChannels);
+                int numSamples = myBytesDecoded/(getBytesPerSample(SF_S16)*_myNumChannels);
+                AudioBufferPtr myBuffer;
+                if (_myResampleContext) {
+                    numSamples = audio_resample(_myResampleContext, 
+                            (int16_t*)(_myResampledSamples.begin()),
+                            (int16_t*)(_mySamples.begin()), 
+                            numSamples);
+                    myBuffer = _mySampleSink->createBuffer(numSamples);
+                    myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
+                } else {
+                    myBuffer = _mySampleSink->createBuffer(numSamples);
+                    myBuffer->convert(_mySamples.begin(), SF_S16, _myNumChannels);
+                }
                 queueSamples(myBuffer);
                 myData += myLen;
                 myDataLen -= myLen;

@@ -14,8 +14,13 @@
 #include <asl/HWSampleSink.h>
 #include <asl/Stream.h>
 
-#ifdef WIN32 
-    #define EMULATE_INTTYPES
+#ifdef WIN32
+#pragma warning( disable : 4244 ) // Disable ffmpeg warning
+#define EMULATE_INTTYPES
+#endif
+#include <ffmpeg/avformat.h>
+#ifdef WIN32
+#pragma warning( default : 4244 ) // Reenable warning
 #endif
 
 #include <ffmpeg/avformat.h>
@@ -74,6 +79,7 @@ class Sound :
         AVFormatContext * _myFormatContext;
         int _myStreamIndex;
         asl::Block _mySamples;
+        asl::Block _myResampledSamples;
         unsigned _mySampleRate;
         unsigned _myNumChannels;
 
@@ -86,6 +92,9 @@ class Sound :
 
         asl::Time _myTargetBufferedTime;
         asl::Time _myMaxUpdateTime; // Max. time to prefetch per update.
+
+		ReSampleContext * _myResampleContext;
+        
 };
 
 } // namespace

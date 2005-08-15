@@ -65,7 +65,7 @@ class TestPlay : public SoundTestBase {
             play("../../testfiles/aussentuer.mp3");
             play("../../testfiles/sz5-1_c-beam Warnung_Time_1.WAV");
             play("../../testfiles/stereotest441.wav");
-//            play("../../testfiles/stereotest480.wav");
+            play("../../testfiles/stereotest480.wav");
         }
 
     private:
@@ -81,7 +81,7 @@ class TestPlay : public SoundTestBase {
 class TestBroken : public SoundTestBase {
     public:
         TestBroken() 
-            : SoundTestBase("TestPlay")
+            : SoundTestBase("TestBroken")
         {  
         }
 
@@ -99,7 +99,7 @@ class TestBroken : public SoundTestBase {
                 while(mySound->isPlaying()) {
                     msleep(100);
                 }
-            } catch (SoundException& e) {
+            } catch (SoundException&) {
                 myException = true;
             }
             ENSURE(myException);
