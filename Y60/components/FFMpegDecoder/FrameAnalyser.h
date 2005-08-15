@@ -20,7 +20,10 @@
 #ifndef _ac_y60_FrameAnalyser_h_
 #define _ac_y60_FrameAnalyser_h_
 
-#include "FFMpegDecoder.h"
+struct AVStream;
+struct AVPacket;
+struct AVFrame;
+struct AVFormatContext;
 
 namespace asl {
     class Table;

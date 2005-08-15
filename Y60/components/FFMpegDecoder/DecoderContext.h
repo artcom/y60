@@ -20,6 +20,7 @@
 #ifndef _ac_y60_DecoderContext_h_
 #define _ac_y60_DecoderContext_h_
 
+#include <asl/Ptr.h>
 #include <string>
 
 struct AVFrame;
@@ -39,13 +40,9 @@ namespace y60 {
                 FrameTypeEOF
             };
 
-            DecoderContext();
+            DecoderContext(const std::string & theFilename);
             ~DecoderContext();
 
-            bool hasVideo() const;
-            bool hasAudio() const;
-            void load(const std::string & theFilename);            
-            void runFrameAnalyser();
             FrameType decode(AVFrame * theVideoFrame, AudioFrame * theAudioFrame);
 
             AVStream * getVideoStream() {
@@ -56,6 +53,13 @@ namespace y60 {
                 return _myAudioStream;
             }
 
+            const std::string & getFilename() const {
+                return _myFilename;
+            }
+
+            unsigned getWidth(); 
+            unsigned getHeight();
+
             PixelFormat getPixelFormat(); 
 
         private:
@@ -64,7 +68,10 @@ namespace y60 {
             AVStream *        _myAudioStream;
             int               _myVideoStreamIndex;
             int               _myAudioStreamIndex;
+            std::string       _myFilename;
     };
+
+    typedef asl::Ptr<DecoderContext> DecoderContextPtr;
 }
 
 #endif

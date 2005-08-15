@@ -19,55 +19,207 @@
 
 #include "FrameConveyor.h"
 #include "VideoFrame.h"
+#include "FFMpegPixelEncoding.h"
+#include "DecoderContext.h"
 
 #include <audio/AudioController.h>
+#include <audio/BufferedSource.h>
 #include <asl/Logger.h>
+#include <asl/Block.h>
 
-#define DB(x) //x
+#define DB(x) // x
 
 using namespace std;
 using namespace asl;
 
 namespace y60 {
 
-    FrameConveyor::FrameConveyor() {
-    }
+    const unsigned MAX_FRAME_CACHE_SIZE = 1000;
+    const double STARTUP_AUDIO_CACHE_TIME = 2;
+
+    FrameConveyor::FrameConveyor() :
+        _myVideoFrame(0),        
+        _myAudioFrame(AVCODEC_MAX_AUDIO_FRAME_SIZE)
+    {}
 
     FrameConveyor::~FrameConveyor() {
+        if (_myVideoFrame) {
+            av_free(_myVideoFrame);
+            _myVideoFrame = 0;
+        }
     }
     
-    void
-    FrameConveyor::setup(unsigned theWidth, unsigned theHeight, PixelEncoding thePixelEncoding) {
-        _myFrameCache[0] = VideoFramePtr(new VideoFrame(theWidth, theHeight, thePixelEncoding));
+    void 
+    FrameConveyor::load(DecoderContextPtr theContext, AudioBase::BufferedSource * theAudioBufferedSource) {
+        _myContext = theContext;
+        _myAudioBufferedSource = theAudioBufferedSource;
+        _myVideoFrame = avcodec_alloc_frame();
+        if (theAudioBufferedSource) {
+            setupAudio();
+        }
+        fillCache(0);
     }
 
-    /*
-    void 
-    FrameConveyor::initBufferedSource(unsigned theNumChannels, unsigned theSampleRate, unsigned theSampleBits) {
-        AudioApp::AudioController & myAudioController = AudioApp::AudioController::get();
-        std::string myURL = getMovie()->get<ImageSourceTag>();
-        if (theSampleBits != 16) {
-            AC_WARNING << "Movie '" << myURL << "' contains " << theSampleBits
-                << " bit audio stream. Only 16 bit supported. Playing movie without sound.";
-        } else {
-            if (!myAudioController.isRunning()) {
-                myAudioController.init(asl::maximum(theSampleRate, (unsigned) 44100));
-            }
+    void
+    FrameConveyor::fillCache(double theStartTimestamp) {
+        AC_TRACE << "Fill audio/video-cache...";
+        _myFrameCache.clear();
 
-            std::string myId = myAudioController.createReader(myURL, "Mixer", theSampleRate, theNumChannels);
-            _myAudioBufferedSource = dynamic_cast<AudioBase::BufferedSource *>(myAudioController.getFileReaderFromID(myId));
-            _myAudioBufferedSource->setVolume(getMovie()->get<VolumeTag>());
-            _myAudioBufferedSource->setSampleBits(theSampleBits);
-            AC_INFO << "Audio: channels=" << theNumChannels << ", samplerate=" << theSampleRate << ", samplebits=" << theSampleBits;
+        bool myValidFilePosition = true;
+        while(myValidFilePosition && 
+              _myFrameCache.size() < MAX_FRAME_CACHE_SIZE &&
+              _myAudioBufferedSource->getCacheFillLevelInSecs() < STARTUP_AUDIO_CACHE_TIME) 
+        {
+            myValidFilePosition = decodeFrame(0);
+            DB(cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
+               cerr << "  A-Buffersize: " << _myAudioBufferedSource->getCacheFillLevel() << " of: " << _myAudioBufferedSource->getCacheSize() << endl;
+               cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;);
         }
 
+        DB(
+            if (!myValidFilePosition) {
+                cerr << "   until end of file" << endl;
+            } else if (_myFrameCache.size() > MAX_FRAME_CACHE_SIZE) {
+                cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE << endl;
+            } else if (_myAudioBufferedSource->getCacheFillLevelInSecs() >= STARTUP_AUDIO_CACHE_TIME) {
+                cerr << "   until audio cache size larger than " << STARTUP_AUDIO_CACHE_TIME << endl;
+            }
+        )
     }
-*/
 
-    dom::ResizeableRasterPtr
-    FrameConveyor::getFrame(long long theTimestamp) {
-        return _myFrameCache[0]->getRaster();
+    void
+    FrameConveyor::updateCache(double theTimestamp) {
     }
 
+    bool
+    FrameConveyor::getFrame(double theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
+        updateCache(theTimestamp);
+        if (_myFrameCache.empty() ) {
+            AC_ERROR << "FrameConveyor:: No frames to deliver because framecache is empty.";
+            return true; // Not end of file
+        }
 
+        // Find frame in cache that is closest to the requested timestamp
+        VideoFramePtr myFrame;
+        FrameCache::iterator myNextFrameIt     = _myFrameCache.lower_bound(theTimestamp);
+        FrameCache::iterator myPreviousFrameIt = myNextFrameIt;
+        if (myNextFrameIt != _myFrameCache.begin()) {
+            myPreviousFrameIt--; //normal case
+        }   
+        if (myNextFrameIt == _myFrameCache.end()) {
+            myNextFrameIt--;
+        }
+        double myNextFrameDelta = fabs(myNextFrameIt->first - theTimestamp);
+        double myPreviousFrameDelta = fabs(myPreviousFrameIt->first - theTimestamp);
+
+        if (myNextFrameDelta < myPreviousFrameDelta) {
+            myFrame = myNextFrameIt->second;
+        } else {
+            myFrame = myPreviousFrameIt->second;
+        }
+
+        DB(
+            cerr << "getFrame: " << theTimestamp << "the system time " << asl::Time() << endl;
+            cerr << "    previous/next:     " << myPreviousFrameIt->first << " / " << myNextFrameIt->first << endl;
+            cerr << "   using frame: " << myFrame->getTimestamp() << endl;
+        )
+
+        copyFrame(myFrame->getData()->begin(), theTargetRaster);
+        return true;
+    }
+
+    void
+    FrameConveyor::setupAudio() {
+        AVStream * myAudioStream = _myContext->getAudioStream();
+        if (myAudioStream) {
+            AVCodec * myCodec = avcodec_find_decoder(myAudioStream->codec.codec_id);
+            if (!myCodec) {
+                throw FrameConveyorException(std::string("Unable to find audio decoder: ") + _myContext->getFilename(), PLUS_FILE_LINE);
+            }
+            if (avcodec_open(&myAudioStream->codec, myCodec) < 0 ) {
+                throw FrameConveyorException(std::string("Unable to open audio codec: ") + _myContext->getFilename(), PLUS_FILE_LINE);
+            }
+        } else {
+            AC_INFO << _myContext->getFilename() << ": No audio stream found.";
+        }
+    }
+
+    bool
+    FrameConveyor::decodeFrame(double theTimestamp) {
+        int64_t myFrameTimestamp = (int64_t)asl::round(theTimestamp * AV_TIME_BASE);
+        AC_TRACE << "decodeFrame: time=" << theTimestamp << " timestamp=" << myFrameTimestamp;
+
+        if (!_myContext) {
+            throw FrameConveyorException(std::string("No decoding context set, yet."), PLUS_FILE_LINE);
+        }
+
+        bool myValidFilePosition = true;
+ 
+        DecoderContext::FrameType myFrameType;
+        if (_myAudioBufferedSource) {
+            myFrameType = _myContext->decode(_myVideoFrame, &_myAudioFrame);
+        } else {
+            myFrameType = _myContext->decode(_myVideoFrame, 0);
+        }
+
+        switch (myFrameType) {
+            case DecoderContext::FrameTypeVideo:
+            {
+                unsigned myBPP = getBytesRequired(1, getPixelEncoding(_myContext->getVideoStream()));
+                VideoFramePtr myNewFrame = VideoFramePtr(new VideoFrame(_myContext->getWidth(), _myContext->getHeight(), myBPP));
+
+                convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
+                myNewFrame->setTimestamp(_myVideoFrame->pts / (double)AV_TIME_BASE);
+                _myFrameCache[myNewFrame->getTimestamp()] = myNewFrame;
+                break;
+            }
+            case DecoderContext::FrameTypeAudio:
+                _myAudioBufferedSource->addBuffer(_myAudioFrame.getTimestamp(), _myAudioFrame.getSamples(), 
+                                                  _myAudioFrame.getSampleSize());
+                break;
+            case DecoderContext::FrameTypeEOF:
+                break;
+            default:
+                throw FrameConveyorException(std::string("Unknown frame type: ") + as_string(myFrameType), PLUS_FILE_LINE);
+        }
+
+        return (myFrameType != DecoderContext::FrameTypeEOF);
+    }
+
+    void 
+    FrameConveyor::convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer) {
+        if (!_myContext || !theFrame) {
+            AC_ERROR << "FFMpegDecoder::decodeVideoFrame no context or invalid frame";
+            return;
+        }
+
+        unsigned int myLineSizeBytes = getBytesRequired(_myContext->getWidth(), getPixelEncoding(_myContext->getVideoStream()));
+        AVPicture myDestPict;
+        myDestPict.data[0] = theTargetBuffer;
+        myDestPict.data[1] = theTargetBuffer + 1;
+        myDestPict.data[2] = theTargetBuffer + 2;
+
+        myDestPict.linesize[0] = myLineSizeBytes;
+        myDestPict.linesize[1] = myLineSizeBytes;
+        myDestPict.linesize[2] = myLineSizeBytes;
+
+        // convert to RGB
+        int myDestFmt;
+        if (_myContext->getPixelFormat() == y60::RGB) {
+            myDestFmt = PIX_FMT_RGB24;
+        } else {
+            myDestFmt = PIX_FMT_BGR24;
+        }
+
+        img_convert(&myDestPict, myDestFmt, (AVPicture*)theFrame, _myContext->getPixelFormat(),
+                    _myContext->getWidth(), _myContext->getHeight());
+    }
+
+    void 
+    FrameConveyor::copyFrame(unsigned char * theSourceBuffer, dom::ResizeableRasterPtr theTargetRaster) {
+        // TODO: Pass target raster owning dom node instead of target raster and replace raster instead
+        // of copy raster
+        theTargetRaster->resize(_myContext->getWidth(), _myContext->getHeight());
+        memcpy(theTargetRaster->pixels().begin(), theSourceBuffer, theTargetRaster->pixels().size());
+    }
 }

@@ -20,36 +20,32 @@
 #ifndef _ac_y60_VideoFrame_h_
 #define _ac_y60_VideoFrame_h_
 
-#include <y60/PixelEncoding.h>
 #include <asl/Ptr.h>
-#include <dom/Value.h>
+#include <asl/Block.h>
 
 namespace y60 {
 
     class VideoFrame {
         public:
-            VideoFrame::VideoFrame(unsigned theWidth, unsigned theHeight, PixelEncoding thePixelEncoding) {
-                _myBuffer = dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(thePixelEncoding, theWidth, theHeight));
+            VideoFrame::VideoFrame(unsigned theWidth, unsigned theHeight, unsigned theBPP) {
+                _myBuffer = asl::Ptr<asl::Block>(new asl::Block( theWidth * theHeight * theBPP));
             }
 
-            VideoFrame::~VideoFrame() {
-            }
-
-            void setTimestamp(long long theTimestamp) {
+            void setTimestamp(double theTimestamp) {
                 _myTimestamp = theTimestamp;
             }
 
-            long long getTimestamp() const {
+            double getTimestamp() const {
                 return _myTimestamp;
             }
-            
-            dom::ResizeableRasterPtr getRaster() {
+
+            asl::Ptr<asl::Block> getData() {
                 return _myBuffer;
             }
 
         private:
-            long long _myTimestamp;
-            dom::ResizeableRasterPtr _myBuffer;
+            double _myTimestamp;
+            asl::Ptr<asl::Block> _myBuffer;
     };
     typedef asl::Ptr<VideoFrame> VideoFramePtr;
 }

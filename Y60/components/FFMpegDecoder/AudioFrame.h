@@ -32,7 +32,7 @@ namespace y60 {
                 _myBuffer = new unsigned char[theFrameSize];
             }
 
-            AudioFrame::AudioFrame() {
+            AudioFrame::~AudioFrame() {
                 if (_myBuffer) {
                     delete[] _myBuffer;
                     _myBuffer = 0;
@@ -52,9 +52,9 @@ namespace y60 {
             }
 
         private:
-            double _myTimestamp;
+            double          _myTimestamp;
             unsigned char * _myBuffer;
-            unsigned _mySampleSize;
+            unsigned        _mySampleSize;
     };
     typedef asl::Ptr<AudioFrame> AudioFramePtr;
 }

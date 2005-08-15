@@ -23,9 +23,19 @@
 #include <y60/PixelEncoding.h>
 #include <string>
 
+#ifdef WIN32
+#pragma warning( disable : 4244 ) // Disable ffmpeg warning
+#define EMULATE_INTTYPES
+#endif
+#include <ffmpeg/avcodec.h>
+#include <ffmpeg/avformat.h>
+#ifdef WIN32
+#pragma warning( default : 4244 ) // Renable ffmpeg warning
+#endif
+
 namespace y60 {
 
-    PixelEncoding 
+    inline PixelEncoding 
     getPixelEncoding(AVStream * theStream) {
         switch (theStream->codec.pix_fmt) {
             case PIX_FMT_RGB24:
@@ -41,7 +51,7 @@ namespace y60 {
         }
     }
 
-    std::string
+    inline std::string
     getPixelEncodingInfo(AVStream * theStream) {
         switch (theStream->codec.pix_fmt) {
             case PIX_FMT_YUV420P:

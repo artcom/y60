@@ -50,7 +50,7 @@ function FFMpegTest(theArguments) {
     Public.setup = function() {
         Public.setSplashScreen(false);
         Base.setup(840, 500);
-        window.fixedFrameTime = 0.04;
+        //window.fixedFrameTime = 0.04;
         setupMovies();
     }
 

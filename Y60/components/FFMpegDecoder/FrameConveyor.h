@@ -20,14 +20,22 @@
 #ifndef _ac_y60_FrameConveyor_h_
 #define _ac_y60_FrameConveyor_h_
 
-#include <y60/PixelEncoding.h>
+#include "AudioFrame.h"
+
 #include <asl/Ptr.h>
 #include <dom/Value.h>
 #include <map>
 
+namespace AudioBase {
+    class BufferedSource;
+}
+
+struct AVFrame;
+
 namespace y60 {
 
     class VideoFrame;
+    class DecoderContext;
 
     DEFINE_EXCEPTION(FrameConveyorException, asl::Exception);
 
@@ -36,12 +44,32 @@ namespace y60 {
             FrameConveyor();
             ~FrameConveyor();
 
-            void setup(unsigned theWidth, unsigned theHeight, PixelEncoding thePixelEncoding);
+            void load(asl::Ptr<DecoderContext> theContext, AudioBase::BufferedSource * theAudioBufferedSource); 
 
-            dom::ResizeableRasterPtr getFrame(long long theTimestamp);
+            bool getFrame(double theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
 
         private:
-            std::map<long long, asl::Ptr<VideoFrame> > _myFrameCache;
+            /// Decode frame at theTimestamp into theTargetRaster. Returns true if EOF was met.
+            bool decodeFrame(double theTimestamp);
+
+            /// Convert frame vom YUV to RGB
+            void convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer);
+
+            /// Copy raster to raster
+            void copyFrame(unsigned char * theSourceBuffer, dom::ResizeableRasterPtr theTargetRaster);
+
+            void fillCache(double theStartTimestamp);
+            void updateCache(double theTimestamp);
+
+            void setupAudio();
+
+            asl::Ptr<DecoderContext>    _myContext;
+            AVFrame *                   _myVideoFrame;
+            AudioFrame                  _myAudioFrame;
+            AudioBase::BufferedSource * _myAudioBufferedSource;
+
+            typedef std::map<double, asl::Ptr<VideoFrame> > FrameCache;
+            FrameCache _myFrameCache;
     };
 }
 

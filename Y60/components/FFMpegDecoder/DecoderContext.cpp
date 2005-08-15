@@ -40,51 +40,13 @@ using namespace asl;
 
 namespace y60 {
 
-    DecoderContext::DecoderContext() : 
-        _myFormatContext(0),
+    DecoderContext::DecoderContext(const std::string & theFilename) : 
         _myVideoStream(0),
         _myAudioStream(0),
         _myVideoStreamIndex(-1),
-        _myAudioStreamIndex(-1)
-    {}
-
-    DecoderContext::~DecoderContext() {
-        if (_myVideoStream) {
-            avcodec_close(&_myVideoStream->codec);
-            _myVideoStreamIndex = -1;
-            _myVideoStream = 0;
-        }
-        if (_myAudioStream) {
-            avcodec_close(&_myAudioStream->codec);
-            _myAudioStreamIndex = -1;
-            _myAudioStream = 0;
-        }
-
-        av_close_input_file(_myFormatContext);
-        _myFormatContext = 0;
-    }
-
-    bool
-    DecoderContext::hasVideo() const {
-        return (_myVideoStream ? true : false);
-    }
-
-    bool
-    DecoderContext::hasAudio() const {
-        return (_myAudioStream ? true : false);
-    }
-
-    PixelFormat 
-    DecoderContext::getPixelFormat() {
-        if (_myVideoStream) {
-            return _myVideoStream->codec.pix_fmt;
-        } else {
-            return PIX_FMT_NB;
-        }
-    }
-
-    void
-    DecoderContext::load(const std::string & theFilename) {
+        _myAudioStreamIndex(-1),
+        _myFilename(theFilename)
+    {
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
@@ -111,16 +73,53 @@ namespace y60 {
                 _myAudioStreamIndex = i;
                 _myAudioStream = _myFormatContext->streams[i];
             }
-        }
-    }
+        }    
 
-    void
-    DecoderContext::runFrameAnalyser() {
+        // open codec
+        AVCodec * myCodec = avcodec_find_decoder(_myVideoStream->codec.codec_id);
+        if (!myCodec) {
+            throw FFMpegDecoderException(std::string("Unable to find decoder: ") + theFilename, PLUS_FILE_LINE);
+        }
+        if (avcodec_open(&_myVideoStream->codec, myCodec) < 0) {
+            throw FFMpegDecoderException(std::string("Unable to open codec: ") + theFilename, PLUS_FILE_LINE);
+        }
+
         string myFrameAnalyserString;
         if (asl::get_environment_var("Y60_FRAME_ANALYSER", myFrameAnalyserString)) {            
             FrameAnalyser myFrameAnalyser(_myFormatContext, _myVideoStream, _myVideoStreamIndex);
             myFrameAnalyser.run(asl::as<unsigned>(myFrameAnalyserString));
         }
+    }
+
+    DecoderContext::~DecoderContext() {
+        if (_myVideoStream) {
+            avcodec_close(&_myVideoStream->codec);
+            _myVideoStreamIndex = -1;
+            _myVideoStream = 0;
+        }
+        if (_myAudioStream) {
+            avcodec_close(&_myAudioStream->codec);
+            _myAudioStreamIndex = -1;
+            _myAudioStream = 0;
+        }
+
+        av_close_input_file(_myFormatContext);
+        _myFormatContext = 0;
+    }
+
+    PixelFormat 
+    DecoderContext::getPixelFormat() {
+        if (_myVideoStream) {
+            return _myVideoStream->codec.pix_fmt;
+        } else {
+            return PIX_FMT_NB;
+        }
+    }
+    unsigned DecoderContext::getWidth() {
+        return _myVideoStream->codec.width;
+    }
+    unsigned DecoderContext::getHeight() {
+        return _myVideoStream->codec.height;
     }
 
     DecoderContext::FrameType
@@ -134,13 +133,13 @@ namespace y60 {
             if (myPacket.stream_index == _myVideoStreamIndex) {
                 int myFrameCompleteFlag = 0;
                 int myLen = avcodec_decode_video(&_myVideoStream->codec, theVideoFrame, &myFrameCompleteFlag,
-                                                    myPacket.data, myPacket.size);
-
+                                                 myPacket.data, myPacket.size);
                 if (myLen < 0) {
                     AC_ERROR << "av_decode_video error";
                 } else if (myLen < myPacket.size) {
                     AC_ERROR << "av_decode_video: Could not decode video in one step";
                 }
+                theVideoFrame->pts = myPacket.dts;
 
                 if (myFrameCompleteFlag) { 
                     myFrameType = FrameTypeVideo;
