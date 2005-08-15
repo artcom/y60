@@ -292,11 +292,11 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
             AC_WARNING << "Strange state...";
     }
 */
-    // Check if fadeouts are finished. Can't stop here because that could result in
-    // a delete of the current sink. That in turn would garble the Pump's mix loop.
+    // Check if fadeouts are finished.
     if ((_myState == STOPPING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) ||
             _myState == PLAYBACK_DONE)
     {
+        MAKE_SCOPE_TIMER(Stop_Sink);
         changeState(STOPPED);
         AC_TRACE << "_myBufferQueue.clear();";
         _myBufferQueue.clear();
