@@ -98,7 +98,8 @@ namespace y60 {
             // TODO: normalize threshold to -1.0 to 1.0 
             void setThreshold(VoxelT theThreshold) {
                 _myThreshold[0] = theThreshold;
-                _myThreshold[1] = NumericTraits<VoxelT>::max();
+                _myThreshold[1] = 220;
+                //_myThreshold[1] = NumericTraits<VoxelT>::max();
             }
 
             const asl::Vector2<VoxelT> & getThreshold() const {
@@ -511,7 +512,7 @@ namespace y60 {
                 {
                     return 0;
                 } else {
-                    throw MarchingCubesException("Threshold is neither crossed from top or bottom", PLUS_FILE_LINE);
+                    //throw MarchingCubesException("Threshold is neither crossed from top or bottom", PLUS_FILE_LINE);
                     if ((theFirstValue < _myThreshold[1] && theSecondValue > _myThreshold[1]) ||
                         (theFirstValue > _myThreshold[1] && theSecondValue < _myThreshold[1])) 
                     {
