@@ -359,7 +359,6 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
                 _numUnderruns++;
                 if (_numUnderruns == 1) {
                     AC_DEBUG << "Underrun for sample sink " << _myName;
-                    exit(-1);
                 }
             }
         }
