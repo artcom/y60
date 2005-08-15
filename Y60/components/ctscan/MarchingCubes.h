@@ -721,7 +721,11 @@ namespace y60 {
             inline bool
             isOutside(int x, int y, int z) const {
                 const VoxelT & myValue = at(x, y, z);
-                return myValue < _myThreshold[0] || myValue > _myThreshold[1];
+                if (x < 32) {
+                    return myValue < _myThreshold[0] || myValue > _myThreshold[1];
+                } else {
+                    return myValue < 10 || myValue > 200;
+                }
             }
 
             void march(bool theDryRun) {
