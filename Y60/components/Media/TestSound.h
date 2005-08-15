@@ -393,10 +393,10 @@ class StressTest: public SoundTestBase {
                 SoundPtr mySound = getMedia()->createSound
                         ("../../testfiles/stereotest441.wav", false,
                          "../../testfiles/stereotest441.wav "+asl::as_string(i));
-                mySound->setVolume(0.03f);
+                mySound->setVolume(0.05f);
                 mySound->play();
                 double r1 = rand()/double(RAND_MAX);
-                unsigned myTime = unsigned(10*r1);
+                unsigned myTime = unsigned(50*r1);
                 msleep(myTime);
                 ++i;
             }

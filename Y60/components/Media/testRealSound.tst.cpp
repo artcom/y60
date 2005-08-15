@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 
     try {
         mySuite.run();
+        Dashboard::get().print(cerr);
     } catch (const asl::Exception & ex) {
         cerr << "Exception during test execution: " << ex << endl;
         return -1;
