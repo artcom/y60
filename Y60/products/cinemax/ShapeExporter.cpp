@@ -110,12 +110,18 @@ ShapeExporter::writeShape(BaseObject * theNode, BaseObject * thePolygonNode, boo
     myUVTagList.clear();
     TextureTag * myTextureTag = 0;
     for (LONG i = 0; (myTextureTag = static_cast<TextureTag*>(thePolygonNode->GetTag(Ttexture, i))); ++i) {
-        UVWTag * myUvTag = static_cast<UVWTag*>(thePolygonNode->GetTag(Tuvw, i));
-        if (!myUvTag) {
-            myUvTag = GenerateUVW(theNode, theNode->GetMg(),myTextureTag, myTextureTag->GetMl(), NULL);
-        }
-        myUVTagList.push_back(myUvTag);
-        myMaterialList.push_back(std::pair<TextureTag*,UVWTag*>(myTextureTag, myUvTag));
+		GeData myData;
+        myTextureTag->GetParameter(DescID(TEXTURETAG_RESTRICTION), myData, 0);
+        String myRestriction = myData.GetString();
+		// do not take account for material, that are used in other selections
+        if (myBaseSelection->GetName() == myRestriction ||  myRestriction == "") {			
+			UVWTag * myUvTag = static_cast<UVWTag*>(thePolygonNode->GetTag(Tuvw, i));
+			if (!myUvTag) {
+				myUvTag = GenerateUVW(theNode, theNode->GetMg(),myTextureTag, myTextureTag->GetMl(), NULL);
+			}
+			myUVTagList.push_back(myUvTag);
+			myMaterialList.push_back(std::pair<TextureTag*,UVWTag*>(myTextureTag, myUvTag));
+		}
     }
 
 	// if no material is found, search above the node
