@@ -361,9 +361,7 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
                 _numUnderruns++;
                 if (_numUnderruns == 1) {
                     AC_WARNING << "Underrun for sample sink " << _myName;
-                } else {
-                    AC_TRACE << "Underrun for sample sink " << _myName;
-                }
+                }             
             }
         }
         _isUsingBackupBuffer = true;
