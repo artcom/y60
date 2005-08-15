@@ -46,7 +46,7 @@ class AudioBufferBase {
                 const AudioBufferBase& theSrcBuffer,
                 unsigned theSrcStartFrame, unsigned numFrames) = 0;
         virtual void convert(void * theReadPtr, SampleFormat theSrcSampleFormat, 
-                unsigned theSrcSampleRate, unsigned theSrcNumChannels) = 0;
+                unsigned theSrcNumChannels) = 0;
         virtual void copyToRawMem(void * theWritePtr, unsigned theStartByte,
                 unsigned theLength) = 0;
 

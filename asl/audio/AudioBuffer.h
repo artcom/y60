@@ -165,23 +165,14 @@ class AudioBuffer: public AudioBufferBase {
         }
 
         void convert(void * theReadPtr, SampleFormat theSrcSampleFormat, 
-                unsigned theSrcSampleRate, unsigned theSrcNumChannels)
+                unsigned theSrcNumChannels)
         {
             if (theSrcSampleFormat == getSampleFormat() && 
-                    theSrcSampleRate == getSampleRate() &&
                     theSrcNumChannels == getNumChannels()) 
             {
                 memcpy(((char*)begin()), theReadPtr, getNumFrames()*getBytesPerFrame());
             } else {
                 ASSURE(getNumChannels() == 2);
-                if (theSrcSampleRate != getSampleRate()) {
-                    AC_WARNING << "Sample rate conversion.";
-                    if (theSrcSampleFormat == SF_S16) {
-                        // sample rate conversion
-                    } else {
-                        // bork
-                    }
-                }
                 if (getSampleFormat() == SF_F32 && theSrcSampleFormat == SF_S16)
                 {
                     // Conversion from S16 to float.
@@ -304,7 +295,8 @@ class AudioBuffer: public AudioBufferBase {
             for (const SAMPLE * mySample = begin()+_numChannels; mySample != end(); 
                     mySample += _numChannels)
             {
-                if (fabs(sampleToFloat(*mySample)-sampleToFloat(*(mySample-_numChannels))) > MaxDiff) 
+                if (fabs(sampleToFloat(*mySample)-sampleToFloat(*(mySample-_numChannels))) 
+                        > MaxDiff) 
                 {
                     return true;
                 }

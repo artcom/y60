@@ -69,13 +69,13 @@ class TestPump: public UnitTest{
                 }
                 if (curSample == mySamples+numFramesPerBuffer*numChannels) {
                     asl::AudioBufferPtr myBuffer = mySampleSink->createBuffer(numFramesPerBuffer);
-                    myBuffer->convert(mySamples, mySF, mySampleRate, numChannels);
+                    myBuffer->convert(mySamples, mySF, numChannels);
                     mySampleSink->queueSamples(myBuffer);
                     curSample = mySamples;
                 }
             }
             asl::AudioBufferPtr myBuffer = mySampleSink->createBuffer((curSample-mySamples)/numChannels);
-            myBuffer->convert(mySamples, mySF, mySampleRate, numChannels);
+            myBuffer->convert(mySamples, mySF, numChannels);
             mySampleSink->queueSamples(myBuffer);
         };
 };
