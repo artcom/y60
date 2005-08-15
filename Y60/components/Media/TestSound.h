@@ -78,6 +78,34 @@ class TestPlay : public SoundTestBase {
         }
 };
 
+class TestBroken : public SoundTestBase {
+    public:
+        TestBroken() 
+            : SoundTestBase("TestPlay")
+        {  
+        }
+
+        void run() {
+            play("../../testfiles/leer.wav");
+            play("../../testfiles/broken.wav");
+        }
+
+    private:
+        void play(const std::string & theURI) {
+            bool myException = false;
+            try {
+                SoundPtr mySound = getMedia()->createSound(theURI);
+                mySound->play();
+                while(mySound->isPlaying()) {
+                    msleep(100);
+                }
+            } catch (SoundException& e) {
+                myException = true;
+            }
+            ENSURE(myException);
+        }
+};
+
 class TestFireAndForget: public SoundTestBase {
     public:
         TestFireAndForget() 
@@ -430,6 +458,7 @@ class SoundTestSuite : public UnitTestSuite {
             myMedia->setAppConfig(44100, 2, _myUseDummyPump);
 
             addTest(new TestPlay());
+            addTest(new TestBroken());
             addTest(new TestFireAndForget());
             addTest(new TestTwoSounds());
             addTest(new TestStop());
