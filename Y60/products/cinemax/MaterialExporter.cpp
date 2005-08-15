@@ -174,6 +174,8 @@ MaterialExporter::exportTexture(const String & theMaterialName, y60::MaterialBui
     myTextureMatrix.makeIdentity();
 
     if (myTextureMappingMode != TEXCOORD_UV_MAP) {
+		Matrix4f myTexGenMatrix;
+		myTexGenMatrix.makeIdentity();
 
         Matrix4f myNormalizeObjectCoordsMatrix;
         myNormalizeObjectCoordsMatrix.makeIdentity();
@@ -246,12 +248,21 @@ MaterialExporter::exportTexture(const String & theMaterialName, y60::MaterialBui
         */
         
         // 2. apply operations
-        myTextureMatrix.postMultiply(myPosMatrix);
-        myTextureMatrix.postMultiply(myRotMatrix);
-        myTextureMatrix.postMultiply(myScaleMatrix);
+        myTexGenMatrix.postMultiply(myPosMatrix);
+        myTexGenMatrix.postMultiply(myRotMatrix);
+        myTexGenMatrix.postMultiply(myScaleMatrix);
 
         // 1. normalize object dimensions to [0,1]
-        myTextureMatrix.postMultiply(myNormalizeObjectCoordsMatrix);
+        myTexGenMatrix.postMultiply(myNormalizeObjectCoordsMatrix);
+
+        VectorOfVector4f myTexGenParams;
+        myTexGenParams.push_back(myTexGenMatrix.getColumn(0));
+        myTexGenParams.push_back(myTexGenMatrix.getColumn(1));
+        myTexGenParams.push_back(myTexGenMatrix.getColumn(2));
+        myTexGenParams.push_back(myTexGenMatrix.getColumn(3));
+        setPropertyValue<VectorOfVector4f>(theMaterialBuilder->getNode(),
+                "vectorofvector4f", "texgenparam0", myTexGenParams);
+
     }
     std::string myWrapMode = TEXTURE_WRAP_REPEAT; // TODO: extract wrap mode
     theMaterialBuilder->createTextureNode(myImageId, myApplyMode, theUsage, myWrapMode, 
