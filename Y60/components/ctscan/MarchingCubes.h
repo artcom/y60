@@ -32,11 +32,6 @@
 #include <algorithm>
 #include <stdio.h>
 
-// TODO: check what this does .... maybe we need diffrent values for voxel types
-//       other than unsigned short
-#define IsIn(value) (((value)) < _myThreshold)
-//#define IsIn(value) (((value)) >= _myThreshold)
-
 //#define DEBUG_INDEXTABLES
 //#define DUPECHECKER
 
@@ -56,7 +51,6 @@ namespace y60 {
             typedef std::map<EdgeId, int> EdgeCache;
 
             MarchingCubes(int theDownSampleRate, SceneBuilderPtr theSceneBuilder, CTScan * theVoxelData) :
-                _myDataValueOffset(0), 
                 _myVertexNormalFlag(false),
                 _myVertexColorFlag(true),
                 _myInvertNormalsFlag(0),
@@ -82,12 +76,9 @@ namespace y60 {
 
                 _myLineStride = theVoxelData->getVoxelDimensions()[0];
                 
-                // _myDimBox = theVoxelData->getVoxelDimensions();
-                
                 _myDimensions[0] = theVoxelData->getVoxelDimensions()[1] / _myDownSampleRate;
                 _myDimensions[1] = theVoxelData->getVoxelDimensions()[0] / _myDownSampleRate;
                 _myDimensions[2] = theVoxelData->getVoxelDimensions()[2] / _myDownSampleRate;
-                
                 
                 _myVoxelSize = theVoxelData->getVoxelAspect()*_myDownSampleRate;
 
@@ -106,10 +97,17 @@ namespace y60 {
 
             // TODO: normalize threshold to -1.0 to 1.0 
             void setThreshold(VoxelT theThreshold) {
-                _myThreshold = theThreshold + _myDataValueOffset;
+                _myThreshold[0] = theThreshold;
+                _myThreshold[1] = NumericTraits<VoxelT>::max();
             }
-            VoxelT  getThreshold() const {
-                return _myThreshold - _myDataValueOffset;
+
+            const asl::Vector2<VoxelT> & getThreshold() const {
+                return _myThreshold;
+            }
+
+            inline bool 
+            isOutside(const VoxelT theValue) const {
+                return theValue < _myThreshold[0] || theValue > _myThreshold[1];
             }
             
             void setBox(const asl::Box3i & theBox) {
@@ -182,30 +180,12 @@ namespace y60 {
                 AC_INFO << "starting real march";
                 march(false);
                 _myHalfEdgeCache.clear();                
-                AC_INFO << "settings vertex colors to 0";
                 if(_myVertexColorFlag) {
                     dom::Node::WritableValue<VectorOfUnsignedInt> myColorIndexLock(_myColorIndexNode);
                     VectorOfUnsignedInt & myColorIndex = myColorIndexLock.get();
                     myColorIndex.resize(_myHalfEdgeCount, 0);
                 }
-
-                //_myElementBuilder->generateHalfEdges();
-#if 0               
-                {
-					dom::Node::WritableValue<VectorOfSignedInt> myHalfEdgesLock(_myHalfEdgeNode);
-					VectorOfSignedInt & _myHalfEdges = myHalfEdgesLock.get();
-					dom::Node::WritableValue<VectorOfUnsignedInt> myIndicesLock(_myIndexNode);
-					VectorOfUnsignedInt & myIndices = myIndicesLock.get();
-                    AC_INFO << "_myVertices.size()=" << _myVertices->size();
-                    AC_INFO << "_myHalfEdges.size()=" << _myHalfEdges.size();
-                    AC_INFO << "myIndices.size()=" << myIndices.size();
-                    AC_INFO << "_myNormals.size()=" << _myNormals->size();
-                }
-#endif                    
-
-                AC_INFO << "unlocking data bins";
                 if(_myVertexNormalFlag) {
-                    AC_INFO << "copying index bins";
                     _myElementBuilder->copyIndexBin(POSITIONS, NORMALS, NORMAL_ROLE);
                 }
                 unlockDataBins();
@@ -278,16 +258,20 @@ namespace y60 {
                 return _myShapeBuilder->getNode();
             }
             int 
-            outputVertex(const asl::Point3f & thePosition, const asl::Vector3f & theNormal) {
-                asl::Vector3f myVertex(thePosition[1], - thePosition[0], thePosition[2]);
+            outputVertex(int n, int iMarch, int jMarch, int kMarch) {
+                asl::Point3f myVertexPosition;
+                asl::Vector3f myVertexNormal;
+                calcVoxelIntersect(n, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
+
+                asl::Vector3f myVertex(myVertexPosition[1], - myVertexPosition[0], myVertexPosition[2]);
                 _myVertices->push_back(myVertex);
                 if (_myVertexNormalFlag) {
-                    _myNormals->push_back(normalized(asl::Vector3f(theNormal[1], - theNormal[0], theNormal[2])));
+                    _myNormals->push_back(normalized(asl::Vector3f(myVertexNormal[1], - myVertexNormal[0], myVertexNormal[2])));
                 }
                 return _myVertices->size()-1;
             }
 			int
-			countVertex(const asl::Point3f & thePosition, const asl::Vector3f & theNormal) {
+			countVertex(int n, int iMarch, int jMarch, int kMarch) {
 				return ++_myVertexCount;
 			}
 
@@ -315,7 +299,7 @@ namespace y60 {
                 int offset;
                 asl::Point3f  myVertexPosition;
                 asl::Vector3f myVertexNormal;
-				int (MarchingCubes<VoxelT>::*myOnVertex)(const asl::Point3f & thePosition, const asl::Vector3f & theNormal) = 0;
+				int (MarchingCubes<VoxelT>::*myOnVertex)(int n, int iMarch, int jMarch, int kMarch) = 0;
 
                 const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[cubeIndex]; 
 
@@ -335,10 +319,8 @@ namespace y60 {
                         case 0:
                             if(_myStartZ) {
                                 if (_myStartY) {
-                                    calcVoxelIntersect(0, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                                    vertOffset = (this->*myOnVertex) (myVertexPosition, myVertexNormal);
+                                    vertOffset = (this->*myOnVertex) (0, iMarch, jMarch, kMarch);
                                 } else {
-                                    //if (_myOld2Pt < 0) throw MarchingCubesException("No old2Pt.", PLUS_FILE_LINE);
                                     vertOffset = _myOld2Pt;
                                 }
                             } else {
@@ -349,14 +331,12 @@ namespace y60 {
 
                         case 1:
                             if (_myStartZ) {
-                                calcVoxelIntersect(1, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                                vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                                vertOffset = (this->*myOnVertex)  (1, iMarch, jMarch, kMarch);
                             } else {
                                 offset = _myDimensions[1] * (iMarch + 1) + jMarch;
                                 vertOffset = _myYEdge[offset];
                             }
                             if (_myStartZ) {
-                                // [TS] XXX Can we savely write to _myYEdge here?
                                 offset = _myDimensions[1] * (iMarch + 1) + jMarch;
                                 _myYEdge[offset] = vertOffset;
                             }
@@ -364,8 +344,7 @@ namespace y60 {
 
                         case 2:
                             if (_myStartZ) {
-                                calcVoxelIntersect(2, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                                vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                                vertOffset = (this->*myOnVertex)  (2, iMarch, jMarch, kMarch);
                             } else {
                                 offset = _myDimensions[1] * iMarch + jMarch + 1;
                                 vertOffset = _myXEdge[offset];
@@ -373,9 +352,8 @@ namespace y60 {
                             break;
 
                         case 3:
-                            if(_myStartZ && _myStartX) { // XXX
-                                calcVoxelIntersect(3, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                                vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                            if(_myStartZ && _myStartX) { 
+                                vertOffset = (this->*myOnVertex)  (3, iMarch, jMarch, kMarch);
                             } else {
                                 offset = _myDimensions[1] * iMarch + jMarch;
                                 vertOffset = _myYEdge[offset];
@@ -384,8 +362,7 @@ namespace y60 {
 
                         case 4:
                             if(_myStartY) {
-                                calcVoxelIntersect(4, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                                vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                                vertOffset = (this->*myOnVertex)  (4, iMarch, jMarch, kMarch);
                             } else {
                                 vertOffset = _myOld6Pt;
                             }
@@ -394,8 +371,7 @@ namespace y60 {
                             break;
 
                         case 5:
-                            calcVoxelIntersect(5, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                            vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                            vertOffset = (this->*myOnVertex)  (5, iMarch, jMarch, kMarch);
                             _myTopYEdge[jMarch] = vertOffset;
                             // Only write to _myYEdge for the last voxel because otherwise it
                             // has already been / will be written by 7. We shouldn't write here
@@ -407,8 +383,7 @@ namespace y60 {
                             break;
 
                         case 6:
-                            calcVoxelIntersect(6, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                            vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                            vertOffset = (this->*myOnVertex)  (6, iMarch, jMarch, kMarch);
 
                             if(jMarch == _myVBox[asl::Box3i::MAX][1] - 1) {
                                 offset = _myDimensions[1] * iMarch + _myVBox[asl::Box3i::MAX][1];
@@ -418,8 +393,7 @@ namespace y60 {
 
                         case 7:
                             if(_myStartX) {
-                                calcVoxelIntersect(7, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);                                
-                                vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                                vertOffset = (this->*myOnVertex)  (7, iMarch, jMarch, kMarch);
                             } else {
                                 vertOffset = _myTopYEdge[jMarch];
                             }
@@ -430,10 +404,8 @@ namespace y60 {
                         case 8:
                             if(_myStartX) {
                                 if (_myStartY) {
-                                    calcVoxelIntersect(8, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                                    vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                                    vertOffset = (this->*myOnVertex)  (8, iMarch, jMarch, kMarch);
                                 } else {
-                                    //if (_myOld11Pt < 0) throw MarchingCubesException("No old2Pt.", PLUS_FILE_LINE);
                                     vertOffset = _myOld11Pt;
                                 }
                             } else {
@@ -443,8 +415,7 @@ namespace y60 {
 
                         case 9:
                             if(_myStartY) {
-                                calcVoxelIntersect(9, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);                                
-                                vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                                vertOffset = (this->*myOnVertex)  (9, iMarch, jMarch, kMarch);
                             } else {
                                 vertOffset = _myOld10Pt;
                             }
@@ -452,8 +423,7 @@ namespace y60 {
                             break;
 
                         case 10:
-                            calcVoxelIntersect(10, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                            vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                            vertOffset = (this->*myOnVertex)  (10, iMarch, jMarch, kMarch);
 
                             if(jMarch == _myVBox[asl::Box3i::MAX][1] - 1) {
                                 _myZEdge[_myVBox[asl::Box3i::MAX][1]] = vertOffset;
@@ -462,8 +432,7 @@ namespace y60 {
 
                         case 11:
                             if(_myStartX) {
-                                calcVoxelIntersect(11, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
-                                vertOffset = (this->*myOnVertex)  (myVertexPosition, myVertexNormal);
+                                vertOffset = (this->*myOnVertex)  (11, iMarch, jMarch, kMarch);
                             } else {
                                 vertOffset = _myZEdge[jMarch + 1];
                             }
@@ -536,18 +505,36 @@ namespace y60 {
 				}
             }
 
+            inline int findThresholdBoundary(const VoxelT theFirstValue, const VoxelT theSecondValue) const {
+                if ((theFirstValue < _myThreshold[0] && theSecondValue >= _myThreshold[0]) ||
+                    (theFirstValue >= _myThreshold[0] && theSecondValue < _myThreshold[0])) 
+                {
+                    return 0;
+                } else {
+                    throw MarchingCubesException("Threshold is neither crossed from top or bottom", PLUS_FILE_LINE);
+                    if ((theFirstValue < _myThreshold[1] && theSecondValue > _myThreshold[1]) ||
+                        (theFirstValue > _myThreshold[1] && theSecondValue < _myThreshold[1])) 
+                    {
+                        throw MarchingCubesException("Threshold is neither crossed from top or bottom", PLUS_FILE_LINE);
+                    }
+                    return 1;
+                }
+            }
+
+
             void calcVoxelIntersect(int n, int iMarch, int jMarch, int kMarch, 
                     asl::Point3f & theVertexPosition, asl::Vector3f & theVertexNormal) 
             {
                 float li;
                 asl::Vector3f g0, g1, g2, g3, g4, g5, g6, g7;
+                int myThresholdIndex = 0;
 
                 switch(n) {
                     case 0:
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
-
-                        li = (float)(_myThreshold - _myCur0Val) / (float)(_myCur1Val - _myCur0Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur0Val, _myCur1Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur0Val) / (float)(_myCur1Val - _myCur0Val);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
 
                         if (_myVertexNormalFlag){
@@ -555,19 +542,13 @@ namespace y60 {
                             calcGradient(float(_myIPre1Val) - _myCur0Val, float(_myCur2Val) - _myJPost1Val, float(_myCur5Val) - _myKPost1Val, g1);
                             theVertexNormal = -1.0 * (g0 + li * (g1 - g0));
                         }
-
-                        if(!((_myCur0Val <= _myThreshold && _myCur1Val >= _myThreshold) || 
-                             (_myCur0Val >= _myThreshold && _myCur1Val <= _myThreshold)))
-                        {
-                            fprintf(stderr, "ERROR: case 0\n");
-                        }
                         break;
 
                     case 1:
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
-
-                        li = (float)(_myThreshold - _myCur1Val) / (float)(_myCur2Val - _myCur1Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur1Val, _myCur2Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur1Val) / (float)(_myCur2Val - _myCur1Val);
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if (_myVertexNormalFlag) {
@@ -575,20 +556,13 @@ namespace y60 {
                             calcGradient(float(_myIPre2Val) - _myCur3Val, float(_myJPre2Val) - _myCur1Val, float(_myCur6Val) - _myKPost2Val, g2);
                             theVertexNormal = -1.0 * (g1 + li * (g2 - g1));
                         }
-
-                        if (!((_myCur1Val <= _myThreshold && _myCur2Val >= _myThreshold) ||
-                             (_myCur1Val >= _myThreshold && _myCur2Val <= _myThreshold))) 
-                        {
-                            fprintf(stderr, "ERROR: case 1 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     case 2:
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
-
-                        li = (float)(_myThreshold - _myCur3Val) / (float)(_myCur2Val - _myCur3Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur2Val, _myCur3Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur3Val) / (float)(_myCur2Val - _myCur3Val);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
 
                         if(_myVertexNormalFlag){
@@ -596,20 +570,13 @@ namespace y60 {
                             calcGradient(float(_myCur2Val) - _myIPost3Val, float(_myJPre3Val) - _myCur0Val, float(_myCur7Val) - _myKPost3Val, g3);
                             theVertexNormal = -1.0 * (g3 + li * (g2 - g3));
                         }
-
-                        if(!((_myCur3Val <= _myThreshold && _myCur2Val >= _myThreshold) ||
-                            (_myCur3Val >= _myThreshold && _myCur2Val <= _myThreshold))) 
-                        {
-                            fprintf(stderr, "ERROR: case 2 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     case 3:
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
-
-                        li = (float)(_myThreshold - _myCur0Val) / (float)(_myCur3Val - _myCur0Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur0Val, _myCur3Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur0Val) / (float)(_myCur3Val - _myCur0Val);
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if(_myVertexNormalFlag) {
@@ -617,20 +584,13 @@ namespace y60 {
                             calcGradient(float(_myCur2Val) - _myIPost3Val, float(_myJPre3Val) - _myCur0Val, float(_myCur7Val) - _myKPost3Val, g3);
                             theVertexNormal = -1.0 * (g0 + li * (g3 - g0));
                         }
-
-                        if(!((_myCur0Val <= _myThreshold && _myCur3Val >= _myThreshold) ||
-                            (_myCur0Val >= _myThreshold && _myCur3Val <= _myThreshold))) 
-                        {
-                            fprintf(stderr, "ERROR: case 3 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     case 4:
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
-
-                        li = (float)(_myThreshold - _myCur4Val) / (float)(_myCur5Val - _myCur4Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur4Val, _myCur5Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur4Val) / (float)(_myCur5Val - _myCur4Val);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
 
                         if(_myVertexNormalFlag) {
@@ -638,20 +598,13 @@ namespace y60 {
                             calcGradient(float(_myIPre5Val) - _myCur4Val, float(_myCur6Val) - _myJPost5Val, float(_myKPre5Val) - _myCur1Val, g5);
                             theVertexNormal = -1.0 * (g4 + li * (g5 - g4));
                         }
-
-                        if(!((_myCur4Val <= _myThreshold && _myCur5Val >= _myThreshold) ||
-                            (_myCur4Val >= _myThreshold && _myCur5Val <= _myThreshold)))
-                        {
-                            fprintf(stderr, "ERROR: case 4 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     case 5:
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
-
-                        li = (float)(_myThreshold - _myCur5Val) / (float)(_myCur6Val - _myCur5Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur5Val, _myCur6Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur5Val) / (float)(_myCur6Val - _myCur5Val);
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if(_myVertexNormalFlag) {
@@ -659,21 +612,13 @@ namespace y60 {
                             calcGradient(float(_myIPre6Val) - _myCur7Val, float(_myJPre6Val) - _myCur5Val, float(_myKPre6Val) - _myCur2Val, g6);
                             theVertexNormal = -1.0 * (g5 + li * (g6 - g5));
                         }
-
-                        if(!((_myCur5Val <= _myThreshold && _myCur6Val >= _myThreshold) ||
-                            (_myCur5Val >= _myThreshold && _myCur6Val <= _myThreshold))) 
-                        {
-                            fprintf(stderr, "ERROR: case 5 (%d, %d, %d) %d <> %d <> %d\n",
-                                    iMarch, jMarch, kMarch, _myCur5Val, _myThreshold, _myCur6Val);
-                        }
-
                         break;
 
                     case 6:
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
-
-                        li = (float)(_myThreshold - _myCur7Val) / (float)(_myCur6Val - _myCur7Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur6Val, _myCur7Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur7Val) / (float)(_myCur6Val - _myCur7Val);
                         theVertexPosition[0] = ((float)iMarch+ li) * _myVoxelSize[0];
 
                         if(_myVertexNormalFlag) {
@@ -681,20 +626,13 @@ namespace y60 {
                             calcGradient(float(_myCur6Val) - _myIPost7Val, float(_myJPre7Val) - _myCur4Val, float(_myKPre7Val) - _myCur3Val, g7);
                             theVertexNormal = -1.0 * (g7 + li * (g6 - g7));
                         }
-
-                        if(!((_myCur7Val <= _myThreshold && _myCur6Val >= _myThreshold) ||
-                            (_myCur7Val >= _myThreshold && _myCur6Val <= _myThreshold)))
-                        {
-                            fprintf(stderr, "ERROR: case 6 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     case 7:
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
-
-                        li = (float)(_myThreshold - _myCur4Val) / (float)(_myCur7Val - _myCur4Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur4Val, _myCur7Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur4Val) / (float)(_myCur7Val - _myCur4Val);
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if(_myVertexNormalFlag) {
@@ -702,20 +640,13 @@ namespace y60 {
                             calcGradient(float(_myCur6Val) - _myIPost7Val, float(_myJPre7Val) - _myCur4Val, float(_myKPre7Val) - _myCur3Val, g7);
                             theVertexNormal = -1.0 * (g4 + li * (g7 - g4));
                         }
-
-                        if(!((_myCur4Val <= _myThreshold && _myCur7Val >= _myThreshold) ||
-                            (_myCur4Val >= _myThreshold && _myCur7Val <= _myThreshold))) 
-                        {
-                            fprintf(stderr, "ERROR: case 7 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     case 8:
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
-
-                        li = (float)(_myThreshold - _myCur0Val) / (float)(_myCur4Val - _myCur0Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur0Val, _myCur4Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur0Val) / (float)(_myCur4Val - _myCur0Val);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
@@ -723,20 +654,13 @@ namespace y60 {
                             calcGradient(float(_myCur5Val) - _myIPost4Val, float(_myCur7Val) - _myJPost4Val, float(_myKPre4Val) - _myCur0Val, g4);
                             theVertexNormal = -1.0 * (g0 + li * (g4 - g0));
                         }
-
-                        if(!((_myCur0Val <= _myThreshold && _myCur4Val >= _myThreshold) ||
-                            (_myCur0Val >= _myThreshold && _myCur4Val <= _myThreshold))) 
-                        {
-                            fprintf(stderr, "ERROR: case 8 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     case 9:
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
-
-                        li = (float)(_myThreshold - _myCur1Val) / (float)(_myCur5Val - _myCur1Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur1Val, _myCur5Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur1Val) / (float)(_myCur5Val - _myCur1Val);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
@@ -744,20 +668,13 @@ namespace y60 {
                             calcGradient(float(_myIPre5Val) - _myCur4Val, float(_myCur6Val) - _myJPost5Val, float(_myKPre5Val) - _myCur1Val, g5);
                             theVertexNormal = -1.0 * (g1 + li * (g5 - g1));
                         }
-
-                        if(!((_myCur1Val <= _myThreshold && _myCur5Val >= _myThreshold) ||
-                            (_myCur1Val >= _myThreshold && _myCur5Val <= _myThreshold))) 
-                        {
-                            fprintf(stderr, "ERROR: case 9 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     case 10:
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
-
-                        li = (float)(_myThreshold - _myCur2Val) / (float)(_myCur6Val - _myCur2Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur2Val, _myCur6Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur2Val) / (float)(_myCur6Val - _myCur2Val);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
@@ -766,19 +683,13 @@ namespace y60 {
                             theVertexNormal = -1.0 * (g2 + li * (g6 - g2));
                         }
 
-                        if(!((_myCur2Val <= _myThreshold && _myCur6Val >= _myThreshold) ||
-                            (_myCur2Val >= _myThreshold && _myCur6Val <= _myThreshold))) 
-                        {
-                            fprintf(stderr, "ERROR: case 10 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     case 11:
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
-
-                        li = (float)(_myThreshold - _myCur3Val) / (float)(_myCur7Val - _myCur3Val);
+                        myThresholdIndex = findThresholdBoundary(_myCur3Val, _myCur7Val);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCur3Val) / (float)(_myCur7Val - _myCur3Val);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
@@ -786,13 +697,6 @@ namespace y60 {
                             calcGradient(float(_myCur6Val) - _myIPost7Val, float(_myJPre7Val) - _myCur4Val, float(_myKPre7Val) - _myCur3Val, g7);
                             theVertexNormal = -1.0 * (g3 + li * (g7 - g3));
                         }
-
-                        if(!((_myCur3Val <= _myThreshold && _myCur7Val >= _myThreshold) ||
-                             (_myCur3Val >= _myThreshold && _myCur7Val <= _myThreshold)))
-                        {
-                            fprintf(stderr, "ERROR: case 11 (%d, %d, %d)\n", iMarch, jMarch, kMarch);
-                        }
-
                         break;
 
                     default:
@@ -877,38 +781,37 @@ namespace y60 {
                             // offset = _myDimensions[1] * i + j;
                             cubeIndex = 0;
 
-                            // if(IsIn((*lowSlice)[offset])) {
-                            if(IsIn(at(j, i, lowSlice))) {
+                            if(isOutside(at(j, i, lowSlice))) {
                                 cubeIndex |= BIT_0;
                             }
-                            if(IsIn(at(j, i, highSlice))) {
+                            if(isOutside(at(j, i, highSlice))) {
                                 cubeIndex |= BIT_4;
                             }
 
                             // offset++;
 
-                            if(IsIn(at(j+1, i, lowSlice))) {
+                            if(isOutside(at(j+1, i, lowSlice))) {
                                 cubeIndex |= BIT_3;
                             }
-                            if(IsIn(at(j+1, i, highSlice))) {
+                            if(isOutside(at(j+1, i, highSlice))) {
                                 cubeIndex |= BIT_7;
                             }
 
                             // offset = _myDimensions[1] * (i + 1) + j;
 
-                            if(IsIn(at(j, i+1, lowSlice))) {
+                            if(isOutside(at(j, i+1, lowSlice))) {
                                 cubeIndex |= BIT_1;
                             }
-                            if(IsIn(at(j, i+1, highSlice))) {
+                            if(isOutside(at(j, i+1, highSlice))) {
                                 cubeIndex |= BIT_5;
                             }
 
                             // offset++; // = (j+1, i+1)
 
-                            if(IsIn(at(j+1, i+1, lowSlice))) {
+                            if(isOutside(at(j+1, i+1, lowSlice))) {
                                 cubeIndex |= BIT_2;
                             }
-                            if(IsIn(at(j+1, i+1, highSlice))) {
+                            if(isOutside(at(j+1, i+1, highSlice))) {
                                 cubeIndex |= BIT_6;
                             }
 
@@ -1029,12 +932,9 @@ namespace y60 {
             asl::Box3i _myVBox;
             asl::Vector3i _myDimBox;
             asl::Vector3f _myVoxelSize;
-            VoxelT _myDataValueOffset;
-            VoxelT _myThreshold;
+            asl::Vector2<VoxelT> _myThreshold;
 
-            // XXX these seem to be only bools
-            // TODO refactor 
-            int _myStartX, _myStartY, _myStartZ;
+            bool _myStartX, _myStartY, _myStartZ;
             // TODO change to std::vector ...
             std::vector<int> _myXEdge;
             std::vector<int> _myYEdge;
@@ -1078,6 +978,5 @@ namespace y60 {
 } // end of namespace y60
 
 // clean up our macros
-#undef IsIn
 
 #endif // Y60_MARCHING_CUBES_INCLUDED
