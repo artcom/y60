@@ -352,13 +352,17 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     if (_myBufferQueue.empty()) {
         if (_myState != PLAYBACK_DONE) {
-            if (_myStopWhenEmpty) {
+            if (_myStopWhenEmpty || _myState == STOPPING_FADE_OUT || 
+                    _myState == PAUSING_FADE_OUT) 
+            {
                 changeState(PLAYBACK_DONE);
                 AudioTimeSource::stop();
             } else {
                 _numUnderruns++;
                 if (_numUnderruns == 1) {
-                    AC_DEBUG << "Underrun for sample sink " << _myName;
+                    AC_WARNING << "Underrun for sample sink " << _myName;
+                } else {
+                    AC_TRACE << "Underrun for sample sink " << _myName;
                 }
             }
         }
