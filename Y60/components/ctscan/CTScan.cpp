@@ -211,7 +211,7 @@ CTScan::getValueRange() {
             return Vector2d(double( NumericTraits<unsigned char>::min()),
                             double( NumericTraits<unsigned char>::max()));
         case y60::GRAY16:
-            return Vector2d(double( NumericTraits<unsigned short>::min()),
+           return Vector2d(double( NumericTraits<unsigned short>::min()),
                             double( NumericTraits<unsigned short>::max()));
         case y60::GRAYS16:
             return Vector2d(double( NumericTraits<short>::min()),
@@ -237,6 +237,7 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox,
     MarchingCubes<VoxelT> myMarcher(theDownSampleRate, mySceneBuilder, this);
     myMarcher.setBox(theVoxelBox);
     myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
+    //myMarcher.setThreshold(VoxelT(theThresholdMax));
     myMarcher.calcNormals(theCreateNormalsFlag);
     myMarcher.estimate();
     dom::NodePtr myShapeNode = myMarcher.apply("polygonal_shape", myMaterialId);
@@ -259,6 +260,7 @@ CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox,
     MarchingCubes<VoxelT> myMarcher(theDownSampleRate, SceneBuilderPtr(0), this);
     myMarcher.setBox(theVoxelBox);
     myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
+    //myMarcher.setThreshold(VoxelT(theThresholdMax));
     myMarcher.calcNormals(false);
     myMarcher.estimate(&theVertexCount, &theTriangleCount);
 }
