@@ -111,7 +111,8 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
                                              (window.height - myBoxOverlay.height) / 2);
         myBoxOverlay.visible = true;
 
-        myBoxOverlay.color = new Vector4f(0,0,0,0.6);
+        var myColor = 0.3;
+        myBoxOverlay.color = new Vector4f(myColor,myColor,myColor,0.75);
         return myBoxOverlay;
     }
 }

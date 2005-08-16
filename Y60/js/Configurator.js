@@ -192,13 +192,13 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
     var _myCurrentSetting   = null;
     var _myListeners        = [];
 
-    var myHostSettingsFile = "settings-" + hostname() + ".xml";
-    if (fileExists(myHostSettingsFile)) {
-        print("### Using host-specific settings from '" + myHostSettingsFile + "'");
-        theSettingsFile = myHostSettingsFile;
+    var mySettingsFile = "settings-" + hostname() + ".xml";
+    if (fileExists(mySettingsFile)) {
+        Logger.warning("Using host-specific settings from '" + mySettingsFile + "'");
+        theSettingsFile = mySettingsFile;
     }
     if (fileExists(theSettingsFile)) {
-        print("Parsing Settingsfile: " + theSettingsFile);
+        Logger.info("Parsing settings from '" + theSettingsFile + "'");
         var mySettingsDom = new Node();
         mySettingsDom.parseFile(theSettingsFile);
         _mySettings = mySettingsDom.firstChild;
@@ -211,7 +211,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         if (_mySettings) {
             return _mySettings;
         } else {
-            throw ("No settings.xml found (Configurator.js)");
+            throw ("No settings found (Configurator.js)");
         }
     }
 
