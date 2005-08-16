@@ -21,6 +21,7 @@
 #include <asl/string_functions.h>
 #include <asl/PlugInManager.h>
 #include <asl/Pump.h>
+#include <asl/proc_functions.h>
 
 #include <asl/Time.h>
 
@@ -414,26 +415,65 @@ class StressTest: public SoundTestBase {
         {  
         }
        
-        void run() {
+        virtual void run() {
             Time myStartTime;
             int i = 0;
-            while(double(Time())-myStartTime < _myDuration) { 
-                SoundPtr mySound = getMedia()->createSound
-                        ("../../testfiles/stereotest441.wav", false,
-                         "../../testfiles/stereotest441.wav "+asl::as_string(i));
-                mySound->setVolume(0.05f);
-                mySound->play();
-                double r1 = rand()/double(RAND_MAX);
-                unsigned myTime = unsigned(50*r1);
-                msleep(myTime);
+            while(double(Time())-myStartTime < _myDuration) {
+                doIteration(i);
                 ++i;
             }
             getMedia()->stopAll();
             SUCCESS("StressTest");
         }
 
-    private:
+    protected:
+        void doIteration(int i) {
+            SoundPtr mySound = getMedia()->createSound
+                ("../../testfiles/stereotest441.wav", false,
+                 "../../testfiles/stereotest441.wav "+asl::as_string(i));
+            mySound->setVolume(0.05f);
+            mySound->play();
+            double r1 = rand()/double(RAND_MAX);
+            unsigned myTime = unsigned(50*r1);
+            msleep(myTime);
+        }
+        
         double _myDuration;
+};
+
+class MemLeakStressTest: public StressTest {
+    public:
+        MemLeakStressTest(double myDuration) 
+            : StressTest(myDuration)
+        {
+        }
+       
+        void run() {
+            Time myStartTime;
+            Time myLastMemCheckTime = 0;
+            Time myLastMemIncreaseTime;
+            unsigned myMaxMemoryUsage = 0;
+            int i = 0;
+            while(double(Time())-myStartTime < _myDuration) {
+                doIteration(i);
+                ++i;
+                if (Time()-myLastMemCheckTime > 10) {
+                    myLastMemCheckTime = Time();
+                    unsigned myMemoryUsage = getProcessMemoryUsage();
+                    if (myMemoryUsage > myMaxMemoryUsage) {
+                        myMaxMemoryUsage = myMemoryUsage;
+                        myLastMemIncreaseTime = myLastMemCheckTime;
+                    }
+                }
+            }
+            getMedia()->stopAll();
+            ENSURE(Time()-myLastMemIncreaseTime > 60*60);
+            if (Time()-myLastMemIncreaseTime < 60*60) {
+                AC_PRINT << "Last memory usage maximum was " << 
+                    (Time()-myLastMemIncreaseTime)/60 << " min. ago.";
+                AC_PRINT << "Maximum memory used: " << myMaxMemoryUsage;
+            }
+        }
 };
 
 class SoundTestSuite : public UnitTestSuite {
@@ -464,7 +504,7 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new TestStop());
             addTest(new TestStopByItself());
             addTest(new TestPause());
-            addTest(new TestStopAll());            
+            addTest(new TestStopAll());           
             addTest(new TestLoop());
             addTest(new TestVolume());
             addTest(new TestSeek());
@@ -472,7 +512,7 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new StressTest(5));
 
             // 24 Hour test :-).
-//            addTest(new StressTest(60*60*24));
+//            addTest(new MemLeakStressTest(60*60*24));
         }
 
     private:
