@@ -36,8 +36,8 @@ namespace y60 {
      */
     class AsyncDecoder : public MovieDecoderBase {
     public:
-        AsyncDecoder() :
-          _myReadEOF(false), _myAudioStartTime(0), _myMovieTime(0),
+          AsyncDecoder() :
+              _myReadEOF(false), _myAudioStartTime(0), _myMovieTime(0),
               _myAudioBufferedSource(0), _myPauseStartTime(0), _myState(IDLE)
           {}
 
@@ -48,6 +48,14 @@ namespace y60 {
            * @return if the movie has audio, the audio-time that audio is currently 
            *         played back, else theSystemTime
            */
+
+          /**
+           * @return true, if the file currently decoded has audio
+           */
+          virtual bool hasAudio() const {
+              return false;
+          }
+
           double getMovieTime(double theSystemTime) {
               if (!hasAudio()) {
                   //AC_TRACE << "No Audio";
@@ -55,7 +63,7 @@ namespace y60 {
               } else {
                   if (_myAudioBufferedSource->isRunning()) {
                       double myAudioTime = AudioApp::AudioController::get().getCurrentTime() - _myAudioStartTime;
-                      double myMovieTime = myAudioTime + getAVDelay();
+                      double myMovieTime = myAudioTime + getMovie()->get<AVDelayTag>();
                       _myMovieTime = myMovieTime;
                   } 
                   return _myMovieTime;

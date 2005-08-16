@@ -76,7 +76,6 @@ namespace y60 {
         virtual asl::Ptr<MovieDecoderBase> instance() const;
         std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
 
-        bool hasVideo() const;  /// @retval true, if this stream contains video
         bool hasAudio() const;  /// @retval true, if this stream contains audio
 
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);

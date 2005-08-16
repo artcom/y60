@@ -83,12 +83,6 @@ namespace y60 {
         }
     }
 
-
-    bool
-    FFMpegDecoder2::hasVideo() const {
-        return (_myVStream ? true : false);
-    }
-
     bool
     FFMpegDecoder2::hasAudio() const {
         return (_myAStream ? true : false);
@@ -277,14 +271,14 @@ namespace y60 {
                 _myAStream = _myFormatContext->streams[i];
             }
         }
-        if (hasVideo()) {
+        if (_myVStream) {
             setupVideo(theFilename);
         } else {
             AC_INFO << "FFMpegDecoder2::load " << theFilename << " no video stream found";
             _myVStream = 0;
             _myVStreamIndex = -1;
         }
-        if (hasAudio() && getAudioFlag()) {
+        if (_myAStream && getAudioFlag()) {
             setupAudio(theFilename);
         } else {
             AC_INFO << "FFMpegDecoder2::load " << theFilename << " no audio stream found or disabled";
@@ -354,7 +348,7 @@ namespace y60 {
                 memset(theTargetRaster->pixels().begin(), 0, theTargetRaster->pixels().size());
             }
             AC_TRACE << "Readframe ending.";
-            setCacheSize(_myFrameCache.size());
+            getMovie()->set<CacheSizeTag>(_myFrameCache.size());
 
 			AC_TRACE << "readFrame (2) release lock";
         } catch (asl::ThreadSemaphore::ClosedException &) {
@@ -512,7 +506,7 @@ namespace y60 {
                     unsigned myLastFrame = asl::round((_myEOFVideoTimestamp - _myStartTimestamp) * myFrameRate / AV_TIME_BASE);
                     AC_TRACE << "EOF in Decoder, StartTimeStamp: " << _myStartTimestamp << ", EOFTimestamp: " << _myEOFVideoTimestamp << ", Lastframe: " << myLastFrame;
                     if (getFrameCount() == INT_MAX) {                        
-                        setFrameCount(myLastFrame + 1);
+                        getMovie()->set<FrameCountTag>(myLastFrame + 1);
                         AC_INFO << "FFMpegDecoder::readFrame set framecount=" << getFrameCount();
                     }
 					lock();
@@ -530,7 +524,7 @@ namespace y60 {
 			AC_TRACE << "start audio?";
             // Start playback?
             double myStartTime = (FRAME_CACHE_SIZE/2) / myFrameRate;
-            if (hasAudio() && getAudioFlag() && _myCachingFlag &&
+            if (_myAStream && getAudioFlag() && _myCachingFlag &&
                 (_myFrameCache.size() >= FRAME_CACHE_SIZE/2 /*|| _myLastAudioTimeStamp >= myStartTime*/))
             {
                 AC_INFO << "Start Audio. Cache: " << _myFrameCache.size();
@@ -578,9 +572,10 @@ namespace y60 {
             throw FFMpegDecoder2Exception(std::string("Unable to open video codec: ") + theFilename, PLUS_FILE_LINE);
         }
 
-        setPixelFormat(y60::BGR);
-        setFrameWidth(_myVStream->codec.width);
-        setFrameHeight(_myVStream->codec.height);
+        Movie * myMovie = getMovie();
+        myMovie->setPixelEncoding(y60::BGR);
+        myMovie->set<ImageWidthTag>(_myVStream->codec.width);
+        myMovie->set<ImageHeightTag>(_myVStream->codec.height);
 
         // Setup size and image matrix
         float myXResize = float(_myVStream->codec.width) / asl::nextPowerOfTwo(_myVStream->codec.width);
@@ -588,7 +583,7 @@ namespace y60 {
 
         asl::Matrix4f myMatrix;
         myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
-        setImageMatrix(myMatrix);
+        myMovie->set<ImageMatrixTag>(myMatrix);
 
         /*
          * hack to correct wrong frame rates that seem to be generated
@@ -601,7 +596,7 @@ namespace y60 {
         if (myFPS > 1000.0f) {
             myFPS /= 1000.0f;
         }
-        setFrameRate(myFPS);
+        myMovie->set<FrameRateTag>(myFPS);
 
         if (_myVStream->duration == AV_NOPTS_VALUE) {
             AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " has no valid duration";
@@ -609,9 +604,9 @@ namespace y60 {
         if (_myVStream->duration == AV_NOPTS_VALUE 
 	   || int(myFPS * (_myVStream->duration / (double) AV_TIME_BASE)) <= 0) {
             AC_WARNING << "FFMpegDecoder::load '" << theFilename << "' contains no valid duration";
-            setFrameCount(INT_MAX);
+            myMovie->set<FrameCountTag>(INT_MAX);
         } else {
-	    setFrameCount(int(myFPS * (_myVStream->duration / (double) AV_TIME_BASE)));
+	        myMovie->set<FrameCountTag>(int(myFPS * (_myVStream->duration / (double) AV_TIME_BASE)));
         }
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps=" << getFrameRate() << " framecount=" << getFrameCount();
 
@@ -675,7 +670,7 @@ namespace y60 {
                     unsigned myLastFrame = asl::round((_myEOFVideoTimestamp - _myStartTimestamp) * getFrameRate() / AV_TIME_BASE);
                     AC_INFO << "EOF in Decoder, StartTimeStamp: " << _myStartTimestamp << ", EOFTimestamp: " << _myEOFVideoTimestamp << ", Lastframe: " << myLastFrame;
                     if (getFrameCount() == INT_MAX) {                        
-                        setFrameCount(myLastFrame + 1);
+                        getMovie()->set<FrameCountTag>(myLastFrame + 1);
                         AC_INFO << "FFMpegDecoder::readFrame set framecount=" << getFrameCount();
                     }
                     _myReadEOF = true;

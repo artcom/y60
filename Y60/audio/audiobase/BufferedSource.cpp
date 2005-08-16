@@ -323,6 +323,11 @@ namespace AudioBase {
         _myTmpBufFill    = 0;
     }
 
+    double 
+    BufferedSource::getCacheFillLevelInSecs() const {
+        return double(getCacheFillLevel() * AudioBuffer::getNumSamples()) / SoundCardManager::get().getCard(0)->getSampleRate();
+    }
+
     unsigned
     BufferedSource::getCacheSize() const {
         return _myAudioCache.size();

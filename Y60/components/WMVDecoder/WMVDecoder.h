@@ -105,8 +105,6 @@ namespace y60 {
         //
         // Methods of MovieDecoderBase
         //
-        bool hasVideo() const;
-        bool hasAudio() const;
         double getAudioVideoDelay() const;
         std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
 

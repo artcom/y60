@@ -153,16 +153,6 @@ namespace y60 {
 #endif
     }
 
-    bool
-    WMVDecoder::hasVideo() const {
-        return _myVideoOutputId >= 0;
-    }
-
-    bool
-    WMVDecoder::hasAudio() const {
-        return _myAudioOutputId >= 0;
-    }
-
     double
     WMVDecoder::getAudioVideoDelay() const {
         return _myAudioVideoDelay;
@@ -207,8 +197,6 @@ namespace y60 {
         setupVideoAndAudio(theUrl);
         AC_DEBUG << "+++ Open succeeded url=" << theUrl;
 
-        // Set AV delay for WMV
-        setAVDelay(-0.35);
     }
 
     double
@@ -243,7 +231,7 @@ namespace y60 {
         }
 
         asl::AutoLocker<WMVDecoder> myLocker(*this); // protect shared vars (_myFrameCache, ...)
-		setCacheSize(_myFrameCache.size()); // purely informational, sets value in DOM 
+		getMovie()->set<CacheSizeTag>(_myFrameCache.size()); // purely informational, sets value in DOM 
 
         if (_myFirstFrameDelivered == false) {
             // Clear raster
@@ -517,6 +505,7 @@ namespace y60 {
     }
 
     void WMVDecoder::setupVideoAndAudio(const std::string & theUrl) {
+        Movie * myMovie = getMovie();
         _myFrameRate = 25.0;
         unsigned myVideoWidth  = 0;
         unsigned myVideoHeight = 0;
@@ -574,9 +563,9 @@ namespace y60 {
                 // Setup pixel format
                 GUID mySubType = myMediaType->subtype;
                 if (mySubType == WMMEDIASUBTYPE_RGB24) {
-                    setPixelFormat(BGR);
+                    myMovie->setPixelEncoding(BGR);            
                 } else if (mySubType == WMMEDIASUBTYPE_RGB32) {
-                    setPixelFormat(BGRA);
+                    myMovie->setPixelEncoding(BGRA);            
                 } else {
                     throw WindowsMediaException("Unsupported pixel format", PLUS_FILE_LINE);
                 }
@@ -620,23 +609,24 @@ namespace y60 {
 
         // Setup video frame count and frame rate/1
         if (myDuration > 0) {
-            setFrameCount(unsigned((myDuration / 10000000.f) * _myFrameRate));
+            myMovie->set<FrameCountTag>(unsigned((myDuration / 10000000.f) * _myFrameRate));
         } else {
             // For streaming media
-            setFrameCount(UINT_MAX);
+            myMovie->set<FrameCountTag>(UINT_MAX);
         }
-        setFrameRate(_myFrameRate);
+        
+        myMovie->set<FrameRateTag>(_myFrameRate);
 
         // Setup video size and image matrix
-        setFrameWidth(myVideoWidth);
-        setFrameHeight(myVideoHeight);
+        myMovie->set<ImageWidthTag>(myVideoWidth);
+        myMovie->set<ImageHeightTag>(myVideoHeight);
         float myXResize = float(myVideoWidth) / asl::nextPowerOfTwo(myVideoWidth);
         float myYResize = float(myVideoHeight) / asl::nextPowerOfTwo(myVideoHeight);
 
         asl::Matrix4f myMatrix;
         myMatrix.makeScaling(asl::Vector3f(myXResize, - myYResize, 1.0f));
         myMatrix.translate(asl::Vector3f(0, myYResize, 0));
-        setImageMatrix(myMatrix);
+        myMovie->set<ImageMatrixTag>(myMatrix);
 
         AC_DEBUG << "Video: frame=" << myVideoWidth << "x" << myVideoHeight << " pixelFormat=" << asl::getStringFromEnum(getPixelFormat(), y60::PixelEncodingString);
         AC_DEBUG << "       fps=" << _myFrameRate << " duration=" << myDuration / 10000000.f << " s" << " frameCount=" << getFrameCount();
@@ -668,6 +658,10 @@ namespace y60 {
         } else {
             AC_INFO << "Movie '" << theUrl << "' does not contain audio.";
         }
+
+        // Set AV delay for WMV
+        myMovie->set<AVDelayTag>(-0.35);
+
     }
 
     HRESULT STDMETHODCALLTYPE

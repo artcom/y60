@@ -117,6 +117,8 @@ namespace AudioBase {
             return (_myReadPosition == _myWritePosition);
         }
 
+        double getCacheFillLevelInSecs() const; 
+
         unsigned getCacheSize() const;
         int getCacheFillLevel() const;
 

@@ -100,16 +100,6 @@ namespace y60 {
         _myFormatContext = 0;
     }
 
-    bool
-    FFMpegDecoder::hasVideo() const {
-        return (_myVStream ? true : false);
-    }
-
-    bool
-    FFMpegDecoder::hasAudio() const {
-        return false;
-    }
-
     void
     FFMpegDecoder::load(const std::string & theFilename) {
         asl::Time myLoadStartTime;
@@ -162,9 +152,10 @@ namespace y60 {
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
 
-        setPixelFormat(y60::BGR);
-        setFrameWidth(_myVStream->codec.width);
-        setFrameHeight(_myVStream->codec.height);
+        Movie * myMovie = getMovie();
+        myMovie->setPixelEncoding(y60::BGR);
+        myMovie->set<ImageWidthTag>(_myVStream->codec.width);
+        myMovie->set<ImageHeightTag>(_myVStream->codec.height);
 
         // Setup size and image matrix
         float myXResize = float(_myVStream->codec.width) / asl::nextPowerOfTwo(_myVStream->codec.width);
@@ -172,7 +163,7 @@ namespace y60 {
 
         asl::Matrix4f myMatrix;
         myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
-        setImageMatrix(myMatrix);
+        myMovie->set<ImageMatrixTag>(myMatrix);
 
         /*
          * hack to correct wrong frame rates that seem to be generated
@@ -185,13 +176,13 @@ namespace y60 {
         if (myFPS > 1000.0f) {
             myFPS /= 1000.0f;
         }
-        setFrameRate(myFPS);
+        myMovie->set<FrameRateTag>(myFPS);
         if (_myVStream->duration == AV_NOPTS_VALUE || 
             int(myFPS * (_myVStream->duration / (double) AV_TIME_BASE)) <= 0) {
             AC_WARNING << "url='" << theFilename << "' contains no valid duration";
-            setFrameCount(INT_MAX);
+            myMovie->set<FrameCountTag>(INT_MAX);
         } else {
-            setFrameCount(int(myFPS * (_myVStream->duration / (float) AV_TIME_BASE)));
+            myMovie->set<FrameCountTag>(int(myFPS * (_myVStream->duration / (float) AV_TIME_BASE)));
         }
         AC_DEBUG << "url='" << theFilename << "' fps=" << myFPS << " framecount=" << getFrameCount();
 
@@ -281,7 +272,7 @@ namespace y60 {
             AC_DEBUG << "EOF reached for timestamp=" << myFrameTimestamp;
             if (getFrameCount() == INT_MAX) {
                 unsigned myLastFrame = asl::round((_myEOFVideoTimestamp - _myStartTimestamp) * getFrameRate() / AV_TIME_BASE);
-                setFrameCount(myLastFrame + 1);
+                getMovie()->set<FrameCountTag>(myLastFrame + 1);
                 AC_DEBUG << "Set framecount=" << getFrameCount();
             }
             setEOF(true);

@@ -74,6 +74,9 @@ namespace y60 {
             setNode(mySceneNode);
         } else {
             _myDocument->appendChild(getNode());
+            if (asl::ourRevision.empty()) {
+                asl::ourRevision = "0";
+            }
             getNode()->appendAttribute(REVISION_ATTRIB, asl::ourRevision);
         }
 

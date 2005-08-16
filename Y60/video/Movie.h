@@ -111,6 +111,15 @@ namespace y60 {
                 return _myPlayMode;
             }
 
+            void setPixelEncoding(const PixelEncoding thePixelEncoding) {
+                set<ImagePixelFormatTag>(asl::getStringFromEnum(thePixelEncoding, PixelEncodingString));
+            }
+
+            
+            PixelEncoding getPixelEncoding() {
+                return PixelEncoding(asl::getEnumFromString(get<ImagePixelFormatTag>(), PixelEncodingString));
+            }
+
         private:
             Movie();
 

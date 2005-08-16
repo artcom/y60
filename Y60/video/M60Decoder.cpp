@@ -78,11 +78,12 @@ namespace y60 {
         }
         _myEncoding = MovieEncoding(myHeader.compression);
 
-        setFrameCount(myHeader.framecount);
-        setFrameWidth(myHeader.framewidth);
-        setFrameHeight(myHeader.frameheight);
-        setPixelFormat(PixelEncoding(myHeader.pixelformat));
-        setFrameRate(myHeader.fps);
+        Movie * myMovie = getMovie();
+        myMovie->set<FrameCountTag>(myHeader.framecount);
+        myMovie->set<ImageWidthTag>(myHeader.framewidth);
+        myMovie->set<ImageHeightTag>(myHeader.frameheight);
+        myMovie->setPixelEncoding(PixelEncoding(myHeader.pixelformat));
+        myMovie->set<FrameRateTag>(myHeader.fps);
 
         // Setup size and image matrix
         float myXResize = float(myHeader.width) / myHeader.framewidth;
@@ -90,7 +91,7 @@ namespace y60 {
 
         asl::Matrix4f myMatrix;
         myMatrix.makeScaling(Vector3f(myXResize, myYResize, 1.0f));
-        setImageMatrix(myMatrix);
+        myMovie->set<ImageMatrixTag>(myMatrix);
 
         _myMovieHeaderSize = myHeader.headersize;
         _myFilePos         = _myMovieHeaderSize;

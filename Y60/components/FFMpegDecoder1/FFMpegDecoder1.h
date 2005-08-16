@@ -82,9 +82,6 @@ namespace y60 {
         FFMpegDecoder(asl::DLHandle theDLHandle);
         virtual ~FFMpegDecoder();
 
-        bool hasVideo() const;
-        bool hasAudio() const;
-
         /**
          * loads a movie from the file given by theFilename
          * @param theFilename file to load into the decoder

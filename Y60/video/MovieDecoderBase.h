@@ -56,18 +56,7 @@ namespace y60 {
             virtual std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0) {
                 return "";
             }
-            /**
-             * @return true, if the file currently decoded has video
-             */
-            virtual bool hasVideo() const {
-                return true;
-            }
-            /**
-             * @return true, if the file currently decoded has audio
-             */
-            virtual bool hasAudio() const {
-                return false;
-            }
+
             /**
              * @return the time that audio is behind video in seconds
              */
@@ -117,7 +106,9 @@ namespace y60 {
              * loads a movie from the stream given by theSource
              * @param theFilename file to identify theSource
              */
-            virtual void load(asl::Ptr<asl::ReadableStream> theSource, const std::string & theFilename) = 0;
+            virtual void load(asl::Ptr<asl::ReadableStream> theSource, const std::string & theFilename)  {
+                throw NotYetImplemented(JUST_FILE_LINE);
+            }
 
             PixelEncoding getPixelFormat() const {
                 return PixelEncoding(asl::getEnumFromString(_myMovie->get<ImagePixelFormatTag>(), PixelEncodingString));
@@ -184,34 +175,6 @@ namespace y60 {
             }
 
         protected:
-            void setFrameWidth(unsigned theFrameWidth) {
-                _myMovie->set<ImageWidthTag>(theFrameWidth);
-            }
-            void setFrameHeight(unsigned theFrameHeight) {
-                _myMovie->set<ImageHeightTag>(theFrameHeight);
-            }
-            void setFrameCount(unsigned theFrameCount) {
-                _myMovie->set<FrameCountTag>(theFrameCount);
-            }
-            void setFrameRate(double theFrameRate) {
-                _myMovie->set<FrameRateTag>(theFrameRate);
-            }
-            void setPixelFormat(const PixelEncoding thePixelFormat) {
-                _myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(thePixelFormat, PixelEncodingString));
-            }
-            void setImageMatrix(const asl::Matrix4f & theMatrix) {
-                _myMovie->set<ImageMatrixTag>(theMatrix);
-            }
-            void setCacheSize(const unsigned theCacheSize) {
-                _myMovie->set<CacheSizeTag>(theCacheSize);
-            }
-            void setAVDelay(double theDelay) {
-                _myMovie->set<AVDelayTag>(theDelay);
-            }
-            double getAVDelay() const {
-                return _myMovie->get<AVDelayTag>();
-            }
-
             const Movie * getMovie() const {
                 return _myMovie;
             }
