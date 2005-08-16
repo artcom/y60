@@ -311,6 +311,7 @@ bool Sound::decode() {
                     &myBytesDecoded, myData, myDataLen);
             if (myLen > 0 && myBytesDecoded > 0) {
                 int numSamples = myBytesDecoded/(getBytesPerSample(SF_S16)*_myNumChannels);
+                AC_TRACE << "Sound::decode(): Samples per buffer= " << numSamples;
                 AudioBufferPtr myBuffer;
                 if (_myResampleContext) {
                     numSamples = audio_resample(_myResampleContext, 

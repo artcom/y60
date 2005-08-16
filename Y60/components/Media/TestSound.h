@@ -463,12 +463,13 @@ class MemLeakStressTest: public StressTest {
                     if (myMemoryUsage > myMaxMemoryUsage) {
                         myMaxMemoryUsage = myMemoryUsage;
                         myLastMemIncreaseTime = myLastMemCheckTime;
+                        AC_WARNING << "Max memory usage increased: " << myMaxMemoryUsage;
                     }
                 }
             }
             getMedia()->stopAll();
-            ENSURE(Time()-myLastMemIncreaseTime > 60*60);
-            if (Time()-myLastMemIncreaseTime < 60*60) {
+            ENSURE(Time()-myLastMemIncreaseTime > 10*60);
+            if (Time()-myLastMemIncreaseTime < 10*60) {
                 AC_PRINT << "Last memory usage maximum was " << 
                     (Time()-myLastMemIncreaseTime)/60 << " min. ago.";
                 AC_PRINT << "Maximum memory used: " << myMaxMemoryUsage;
@@ -511,8 +512,7 @@ class SoundTestSuite : public UnitTestSuite {
           
             addTest(new StressTest(5));
 
-            // 24 Hour test :-).
-//            addTest(new MemLeakStressTest(60*60*24));
+//            addTest(new MemLeakStressTest(60*60));
         }
 
     private:
