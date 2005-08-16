@@ -498,7 +498,7 @@ namespace y60 {
 				}
             }
 
-            inline const asl::Vector2<VoxelT> &
+            inline const asl::Vector2<VoxelT> 
             getVoxelThreshold(int x, int y, int z) const {
                 if (x > 30) {
                     return _myThreshold;
