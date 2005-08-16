@@ -500,7 +500,11 @@ namespace y60 {
 
             inline const asl::Vector2<VoxelT> &
             getVoxelThreshold(int x, int y, int z) const {
-                return _myThreshold;
+                if (x > 30) {
+                    return _myThreshold;
+                } else {
+                    return asl::Vector2<VoxelT>(200, 255);
+                }
             }
 
             inline bool
@@ -528,20 +532,20 @@ namespace y60 {
                 }
             }
 
-
             void calcVoxelIntersect(int n, int iMarch, int jMarch, int kMarch, 
                     asl::Point3f & theVertexPosition, asl::Vector3f & theVertexNormal) 
             {
                 float li;
                 asl::Vector3f g0, g1, g2, g3, g4, g5, g6, g7;
                 int myThresholdIndex = 0;
+                asl::Vector2<VoxelT> myThreshold = _myThreshold;
 
                 switch(n) {
                     case 0:
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[0], _myCurrent[1]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[1] - _myCurrent[0]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[1] - _myCurrent[0]);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
 
                         if (_myVertexNormalFlag){
@@ -555,7 +559,7 @@ namespace y60 {
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[1], _myCurrent[2]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[1]) / (float)(_myCurrent[2] - _myCurrent[1]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[1]) / (float)(_myCurrent[2] - _myCurrent[1]);
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if (_myVertexNormalFlag) {
@@ -569,7 +573,7 @@ namespace y60 {
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[2], _myCurrent[3]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[3]) / (float)(_myCurrent[2] - _myCurrent[3]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[3]) / (float)(_myCurrent[2] - _myCurrent[3]);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
 
                         if(_myVertexNormalFlag){
@@ -583,7 +587,7 @@ namespace y60 {
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[0], _myCurrent[3]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[3] - _myCurrent[0]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[3] - _myCurrent[0]);
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if(_myVertexNormalFlag) {
@@ -597,7 +601,7 @@ namespace y60 {
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[4], _myCurrent[5]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[4]) / (float)(_myCurrent[5] - _myCurrent[4]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[4]) / (float)(_myCurrent[5] - _myCurrent[4]);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
 
                         if(_myVertexNormalFlag) {
@@ -611,7 +615,7 @@ namespace y60 {
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[5], _myCurrent[6]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[5]) / (float)(_myCurrent[6] - _myCurrent[5]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[5]) / (float)(_myCurrent[6] - _myCurrent[5]);
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if(_myVertexNormalFlag) {
@@ -625,7 +629,7 @@ namespace y60 {
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[6], _myCurrent[7]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[7]) / (float)(_myCurrent[6] - _myCurrent[7]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[7]) / (float)(_myCurrent[6] - _myCurrent[7]);
                         theVertexPosition[0] = ((float)iMarch+ li) * _myVoxelSize[0];
 
                         if(_myVertexNormalFlag) {
@@ -639,7 +643,7 @@ namespace y60 {
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[4], _myCurrent[7]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[4]) / (float)(_myCurrent[7] - _myCurrent[4]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[4]) / (float)(_myCurrent[7] - _myCurrent[4]);
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if(_myVertexNormalFlag) {
@@ -653,7 +657,7 @@ namespace y60 {
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[0], _myCurrent[4]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[4] - _myCurrent[0]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[4] - _myCurrent[0]);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
@@ -667,7 +671,7 @@ namespace y60 {
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[1], _myCurrent[5]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[1]) / (float)(_myCurrent[5] - _myCurrent[1]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[1]) / (float)(_myCurrent[5] - _myCurrent[1]);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
@@ -681,7 +685,7 @@ namespace y60 {
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[2], _myCurrent[6]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[2]) / (float)(_myCurrent[6] - _myCurrent[2]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[2]) / (float)(_myCurrent[6] - _myCurrent[2]);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
@@ -696,7 +700,7 @@ namespace y60 {
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         myThresholdIndex = findThresholdBoundary(_myCurrent[3], _myCurrent[7]);
-                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[3]) / (float)(_myCurrent[7] - _myCurrent[3]);
+                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[3]) / (float)(_myCurrent[7] - _myCurrent[3]);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
@@ -760,6 +764,31 @@ namespace y60 {
                 }
             }
 
+            inline VoxelT
+            getThresholdByCubeCorner(int iMarch, int jMarch, int kMarch, int theCubeCorner) {
+                switch (theCubeCorner) {
+                case 0:
+                    return getVoxelThreshold(jMarch, iMarch, kMarch);
+                case 1:
+                    return getVoxelThreshold(jMarch, iMarch+1, kMarch);
+                case 2:
+                    return getVoxelThreshold(jMarch+1, iMarch+1, kMarch);
+                case 3:
+                    return getVoxelThreshold(jMarch+1, iMarch, kMarch);
+                case 4:
+                    return getVoxelThreshold(jMarch, iMarch, kMarch+1);
+                case 5:
+                    return getVoxelThreshold(jMarch, iMarch+1, kMarch+1);
+                case 6:
+                    return getVoxelThreshold(jMarch+1, iMarch+1, kMarch+1);
+                case 7:
+                    return getVoxelThreshold(jMarch+1, iMarch, kMarch+1);
+                default:
+                    throw MarchingCubesException(std::string("Illegal CubeIndex: ") + as_string(theCubeCorner), PLUS_FILE_LINE);
+                }
+            }
+
+
             inline void
             fillVoxelCube(int iMarch, int jMarch, int kMarch, std::vector<VoxelT> & theVoxelCube) {
                 theVoxelCube.clear();
@@ -818,41 +847,30 @@ namespace y60 {
                         for(j = yStart; j < yEnd; j++) {
                             _myStartY = (j == yStart);
 
-                            // offset = _myDimensions[1] * i + j;
                             cubeIndex = 0;
-
                             if(isOutside(j, i, lowSlice)) {
                                 cubeIndex |= BIT_0;
+                            }
+                            if(isOutside(j, i+1, lowSlice)) {
+                                cubeIndex |= BIT_1;
+                            }
+                            if(isOutside(j+1, i+1, lowSlice)) {
+                                cubeIndex |= BIT_2;
+                            }
+                            if(isOutside(j+1, i, lowSlice)) {
+                                cubeIndex |= BIT_3;
                             }
                             if(isOutside(j, i, highSlice)) {
                                 cubeIndex |= BIT_4;
                             }
-
-                            // offset++;
-
-                            if(isOutside(j+1, i, lowSlice)) {
-                                cubeIndex |= BIT_3;
-                            }
-                            if(isOutside(j+1, i, highSlice)) {
-                                cubeIndex |= BIT_7;
-                            }
-
-                            // offset = _myDimensions[1] * (i + 1) + j;
-
-                            if(isOutside(j, i+1, lowSlice)) {
-                                cubeIndex |= BIT_1;
-                            }
                             if(isOutside(j, i+1, highSlice)) {
                                 cubeIndex |= BIT_5;
                             }
-
-                            // offset++; // = (j+1, i+1)
-
-                            if(isOutside(j+1, i+1, lowSlice)) {
-                                cubeIndex |= BIT_2;
-                            }
                             if(isOutside(j+1, i+1, highSlice)) {
                                 cubeIndex |= BIT_6;
+                            }
+                            if(isOutside(j+1, i, highSlice)) {
+                                cubeIndex |= BIT_7;
                             }
 
                             if((cubeIndex > 0) && (cubeIndex < 255)) {
@@ -974,15 +992,6 @@ namespace y60 {
             std::vector<int> _myZEdge;
             int   _myOld6Pt, _myOld10Pt, _myOld11Pt, _myOld2Pt; // old vertex indices in j order
             std::vector<VoxelT> _myCurrent;
-            /*
-            std::vector<VoxelT> _myLowerI;
-            std::vector<VoxelT> _myHigherI;
-            std::vector<VoxelT> _myLowerJ;
-            std::vector<VoxelT> _myHigherJ;
-            std::vector<VoxelT> _myLowerK;
-            std::vector<VoxelT> _myHigherK;
-            //VoxelT _myCurrent[0], _myCurrent[1], _myCurrent[2], _myCurrent[3], _myCurrent[4], _myCurrent[5], _myCurrent[6], _myCurrent[7];
-            */
             VoxelT _myIPost0Val, _myJPost0Val, _myKPost0Val, _myIPre1Val, _myJPost1Val, _myKPost1Val;
             VoxelT _myIPre2Val, _myJPre2Val, _myKPost2Val, _myIPost3Val, _myJPre3Val, _myKPost3Val;
             VoxelT _myIPost4Val, _myJPost4Val, _myKPre4Val, _myIPre5Val, _myJPost5Val,_myKPre5Val;
