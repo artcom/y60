@@ -138,6 +138,13 @@ namespace y60 {
         Table myTable;
         setupTable(myTable);
 
+        cerr << "Video Stream: " << endl;
+        cerr << "    starttime: " << _myVStream->start_time << endl;
+
+        int64_t mySeekTimestamp = _myVStream->start_time;
+        cerr << "seek to: " << mySeekTimestamp << endl;
+        av_seek_frame(_myFormatContext, -1, mySeekTimestamp, 0);        
+
         AVPacket myPacket;
         AVFrame * myFrame = avcodec_alloc_frame();
 

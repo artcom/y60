@@ -39,6 +39,7 @@ function FFMpegTest(theArguments) {
         //"c:/TEST_MOVIES/MPEG/mpeg2_1280_960_20000.m2v",
         //"c:/TEST_MOVIES/MPEG/aichi.m2v",
         //"c:/TEST_MOVIES/MPEG/linetest.m2v",
+        //"c:/Dev/pro60/testmodels/movies/testmovie.m2v"
     ];
 
     var _myMovies       = [];
@@ -53,6 +54,40 @@ function FFMpegTest(theArguments) {
         //window.fixedFrameTime = 0.04;
         setupMovies();
     }
+
+    Base.onKey = Public.onKey;
+    Public.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
+        var myCurrentMovie = _myMovies[0].movie;
+
+        if (theCtrlFlag) {
+            Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
+            return;
+        }
+
+        if (theShiftFlag) {
+            theKey = theKey.toUpperCase();
+        }
+        if (theState) {
+            switch (theKey) {
+                case "p":
+                    if (myCurrentMovie.playmode == "pause") {
+                        myCurrentMovie.playmode = "play";
+                    } else {
+                        myCurrentMovie.playmode = "pause";
+                    }
+                    break;
+                case "b":
+                    myCurrentMovie.playmode = "pause";
+                    myCurrentMovie.currentframe = myCurrentMovie.currentframe - 25;
+                    break;
+                case "f":
+                    myCurrentMovie.playmode = "pause";
+                    myCurrentMovie.currentframe = myCurrentMovie.currentframe +125;
+                    break;
+            }
+        }
+    }
+
 
 /*
     Base.onIdle = _myShow.onIdle;

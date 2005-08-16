@@ -44,6 +44,7 @@ namespace y60 {
             ~DecoderContext();
 
             FrameType decode(AVFrame * theVideoFrame, AudioFrame * theAudioFrame);
+            void seekToTime(double theTime);
 
             AVStream * getVideoStream() {
                 return _myVideoStream;
@@ -60,7 +61,8 @@ namespace y60 {
             unsigned getWidth(); 
             unsigned getHeight();
 
-            PixelFormat getPixelFormat(); 
+            PixelFormat getPixelFormat();             
+            double getFrameRate();
 
         private:
             AVFormatContext * _myFormatContext;           

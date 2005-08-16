@@ -24,6 +24,7 @@
 
 #include <asl/Logger.h>
 #include <asl/os_functions.h>
+#include <asl/console_functions.h>
 
 #ifdef WIN32
 #pragma warning( disable : 4244 ) // Disable ffmpeg warning
@@ -37,6 +38,8 @@
 
 using namespace std;
 using namespace asl;
+
+#define DB(x) x
 
 namespace y60 {
 
@@ -84,6 +87,12 @@ namespace y60 {
             throw FFMpegDecoderException(std::string("Unable to open codec: ") + theFilename, PLUS_FILE_LINE);
         }
 
+        // Hack to correct wrong frame rates that seem to be generated
+        // by some codecs
+        if (_myVideoStream->codec.frame_rate > 1000 && _myVideoStream->codec.frame_rate_base == 1) {
+            _myVideoStream->codec.frame_rate_base = 1000;
+        }
+
         string myFrameAnalyserString;
         if (asl::get_environment_var("Y60_FRAME_ANALYSER", myFrameAnalyserString)) {            
             FrameAnalyser myFrameAnalyser(_myFormatContext, _myVideoStream, _myVideoStreamIndex);
@@ -128,6 +137,11 @@ namespace y60 {
         AVPacket myPacket;
         memset(&myPacket, 0, sizeof(myPacket));
         
+        int64_t myStartTime = 0;
+        if (_myVideoStream->start_time != AV_NOPTS_VALUE) {
+            myStartTime = _myVideoStream->start_time;
+        } 
+
         // Read until complete frame read or end of file reached
         while (bool myValidFilePosition = (av_read_frame(_myFormatContext, &myPacket) >= 0)) {
             if (myPacket.stream_index == _myVideoStreamIndex) {
@@ -139,7 +153,7 @@ namespace y60 {
                 } else if (myLen < myPacket.size) {
                     AC_ERROR << "av_decode_video: Could not decode video in one step";
                 }
-                theVideoFrame->pts = myPacket.dts;
+                theVideoFrame->pts = myPacket.dts - myStartTime;
 
                 if (myFrameCompleteFlag) { 
                     myFrameType = FrameTypeVideo;
@@ -148,7 +162,7 @@ namespace y60 {
             } else if (myPacket.stream_index == _myAudioStreamIndex && theAudioFrame) {
                 int myLen = avcodec_decode_audio(&_myAudioStream->codec, (int16_t*)theAudioFrame->getSamples(), (int *)&theAudioFrame->_mySampleSize,
                     myPacket.data, myPacket.size);
-                theAudioFrame->_myTimestamp = myPacket.dts / (double)AV_TIME_BASE;
+                theAudioFrame->_myTimestamp = (myPacket.dts - myStartTime) / (double)AV_TIME_BASE;
 
                 if (myLen < 0) {
                     AC_ERROR << "avcodec_decode_audio error";
@@ -163,5 +177,78 @@ namespace y60 {
         
         av_free_packet(&myPacket);                  
         return myFrameType;
+    }
+/*
+00366 bool
+00367 vidl_ffmpeg_codec::seek( unsigned frame ) const
+00368 {
+00369   int64_t half_frame = int64_t(AV_TIME_BASE) * vid_str_->r_frame_rate_base / vid_str_->r_frame_rate / 2;
+00370   int64_t req_timestamp = int64_t(frame)*AV_TIME_BASE * vid_str_->r_frame_rate_base / vid_str_->r_frame_rate + vid_str_->start_time;
+00371 
+00372   if ( req_timestamp > half_frame )
+00373     req_timestamp -= half_frame;
+00374   else
+00375     req_timestamp = 0;
+00376   
+00377   // newer releases of ffmpeg may require a 4th argument to av_seek_frame
+00378 #if LIBAVFORMAT_BUILD <= 4616
+00379   int seek = av_seek_frame( fmt_cxt_, vid_index_, frame );
+00380 #else
+00381   int seek = av_seek_frame( fmt_cxt_, vid_index_, frame, 0 );
+00382 #endif
+00383   if ( seek < 0 )
+00384     return false;
+00385 
+00386   // We got to a key frame. Forward until we get to the frame we want.
+00387   while ( true )
+00388   {
+00389     if ( ! advance() ) {
+00390       return false;
+00391     }
+00392     if ( last_dts >= req_timestamp ) {
+00393       if ( last_dts >= req_timestamp + 2*half_frame ) {
+00394         vcl_cerr << "Warning: seek went into the future!\n";
+00395         return false;
+00396       }
+00397       return true;
+00398     }
+00399   }
+00400 }
+00401 
+*/
+    void
+    DecoderContext::seekToTime(double theTime) {        
+        int64_t mySeekTimestamp = (int64_t)(theTime * AV_TIME_BASE) + _myVideoStream->start_time;
+        DB(cerr << TTYYELLOW << "Seeking to " << theTime << ENDCOLOR << endl;);
+/*
+            int64_t mySeekTimestamp;
+            if (theTimestamp < _myLowerCacheTimestamp) {
+                mySeekTimestamp = theTimestamp - (myTimePerFrame*2);
+                if (mySeekTimestamp < _myStartTimestamp) {
+                    mySeekTimestamp = 0;
+                }
+                avcodec_flush_buffers(&_myVStream->codec);
+            } else {
+                mySeekTimestamp = theTimestamp;
+            }
+            DB(AC_TRACE << "timestamp=" << theTimestamp << " seeking to=" << mySeekTimestamp);
+*/
+        //avcodec_flush_buffers(&_myVideoStream->codec);
+        int myResult = av_seek_frame(_myFormatContext, -1, mySeekTimestamp, 0);
+        if (myResult < 0) {
+            AC_ERROR << "Could not seek to timestamp " << mySeekTimestamp;
+        }
+
+        DB(cerr << TTYYELLOW << "seeking done " << ENDCOLOR << endl;);
+    }
+
+    double
+    DecoderContext::getFrameRate() {
+        double myFPS = _myVideoStream->codec.frame_rate / (double) _myVideoStream->codec.frame_rate_base;
+        if (myFPS > 1000.0f) {
+            myFPS /= 1000.0f;
+        }
+
+        return myFPS;
     }
 }

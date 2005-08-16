@@ -45,12 +45,14 @@ namespace y60 {
             ~FrameConveyor();
 
             void load(asl::Ptr<DecoderContext> theContext, AudioBase::BufferedSource * theAudioBufferedSource); 
-
-            bool getFrame(double theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
+            double getFrame(double theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
+            void updateCache(double theTimestamp);
 
         private:
-            /// Decode frame at theTimestamp into theTargetRaster. Returns true if EOF was met.
-            bool decodeFrame(double theTimestamp);
+            /** Decode frame at theTimestamp into theTargetRaster. 
+             *  Returns the timestamp of the decoded frame or -1 if EOF was met.
+             **/
+            double decodeFrame();
 
             /// Convert frame vom YUV to RGB
             void convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer);
@@ -58,15 +60,19 @@ namespace y60 {
             /// Copy raster to raster
             void copyFrame(unsigned char * theSourceBuffer, dom::ResizeableRasterPtr theTargetRaster);
 
-            void fillCache(double theStartTimestamp);
-            void updateCache(double theTimestamp);
+            void fillCache(double theStartTime, double theEndTime);            
+            void trimCache(double theTargetStart, double theTargetEnd);
 
             void setupAudio();
+
+            void printCacheInfo(double theTargetStart, double theTargetEnd);
 
             asl::Ptr<DecoderContext>    _myContext;
             AVFrame *                   _myVideoFrame;
             AudioFrame                  _myAudioFrame;
             AudioBase::BufferedSource * _myAudioBufferedSource;
+
+            double _myCacheSizeInSecs;
 
             typedef std::map<double, asl::Ptr<VideoFrame> > FrameCache;
             FrameCache _myFrameCache;

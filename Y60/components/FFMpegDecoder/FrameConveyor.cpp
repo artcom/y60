@@ -26,8 +26,12 @@
 #include <audio/BufferedSource.h>
 #include <asl/Logger.h>
 #include <asl/Block.h>
+#include <asl/console_functions.h>
+#include <math.h>
 
-#define DB(x) // x
+#define DB(x) x
+#define DB2(x) //x
+
 
 using namespace std;
 using namespace asl;
@@ -39,8 +43,11 @@ namespace y60 {
 
     FrameConveyor::FrameConveyor() :
         _myVideoFrame(0),        
-        _myAudioFrame(AVCODEC_MAX_AUDIO_FRAME_SIZE)
-    {}
+        _myAudioFrame(AVCODEC_MAX_AUDIO_FRAME_SIZE),
+        _myCacheSizeInSecs(2)
+    {
+        _myVideoFrame = avcodec_alloc_frame();
+    }
 
     FrameConveyor::~FrameConveyor() {
         if (_myVideoFrame) {
@@ -53,15 +60,14 @@ namespace y60 {
     FrameConveyor::load(DecoderContextPtr theContext, AudioBase::BufferedSource * theAudioBufferedSource) {
         _myContext = theContext;
         _myAudioBufferedSource = theAudioBufferedSource;
-        _myVideoFrame = avcodec_alloc_frame();
         if (theAudioBufferedSource) {
             setupAudio();
         }
-        fillCache(0);
     }
 
+/*
     void
-    FrameConveyor::fillCache(double theStartTimestamp) {
+    FrameConveyor::XXXfillCache(double theStartTimestamp) {
         AC_TRACE << "Fill audio/video-cache...";
         _myFrameCache.clear();
 
@@ -86,17 +92,129 @@ namespace y60 {
             }
         )
     }
+*/
+
+    void
+    FrameConveyor::printCacheInfo(double theTargetStart, double theTargetEnd) {
+        double myCacheStart = -1; 
+        double myCacheEnd = -1;
+        if (! _myFrameCache.empty()) {
+            myCacheStart = _myFrameCache.begin()->first;
+            myCacheEnd = (--_myFrameCache.end())->first; 
+        }
+
+        double myMin = std::min(myCacheStart, theTargetStart);
+        myMin = std::max(0.0, myMin);
+
+        cerr << "|";
+        for (unsigned i = 0; i < 40; ++i) {
+            double myCharTime = myMin + double(i) * _myCacheSizeInSecs / 40;
+            if ((myCharTime >= myCacheStart && myCharTime <= myCacheEnd) &&
+                (myCharTime >= theTargetStart && myCharTime <= theTargetEnd)) 
+            {
+                cerr << TTYGREEN << "X" << ENDCOLOR;
+            } else if (myCharTime >= myCacheStart && myCharTime <= myCacheEnd) {
+                cerr << TTYYELLOW << "C" << ENDCOLOR;
+            } else if (myCharTime >= theTargetStart && myCharTime <= theTargetEnd) {
+                cerr << TTYRED << "T" << ENDCOLOR;
+            } else {
+                cerr << " ";
+            }
+        }
+        cerr << "|";
+
+        DB(cerr <<TTYRED << " [" << theTargetStart << "; " << theTargetEnd << "]" << TTYGREEN << " [" << myCacheStart << "; " << myCacheEnd << "]" << ENDCOLOR << endl;)
+    }
 
     void
     FrameConveyor::updateCache(double theTimestamp) {
+        DB(cerr << "updateCache " << theTimestamp << endl);
+        double myCacheStart = -1; 
+        double myCacheEnd = -1;
+        if (! _myFrameCache.empty()) {
+            myCacheStart = _myFrameCache.begin()->first;
+            myCacheEnd = (--_myFrameCache.end())->first; 
+        }
+
+        double myTargetStart = asl::maximum(0.0, theTimestamp - 0.5 * _myCacheSizeInSecs);
+        double myTargetEnd   = theTimestamp + 0.5 * _myCacheSizeInSecs;
+
+        //printCacheInfo(myTargetStart, myTargetEnd);
+
+        if (myTargetStart >= myCacheEnd ||  /* |CCCCCCCCCC| |TTTTTTTTTT| */    
+            myTargetEnd <= myCacheStart ||  /* |TTTTTTTTTT| |CCCCCCCCCC| */    
+            (myTargetStart < myCacheStart && myTargetEnd > myCacheEnd) ) /* |TTTT|XX|TTTT| */
+        {
+            cerr << TTYRED << "   case 3,4,5" << ENDCOLOR << endl;
+            _myFrameCache.clear();
+            fillCache(myTargetStart, myTargetEnd);
+            myTargetStart = _myFrameCache.begin()->first;
+            myTargetEnd = _myFrameCache.rbegin()->first;
+        } else if (myTargetEnd > myCacheEnd) {    /* |CCCCCC|XX|TTTTTT| */    
+            cerr << TTYGREEN << "   case 1" << ENDCOLOR << endl;
+            fillCache(myCacheEnd, myTargetEnd);
+            myTargetEnd = _myFrameCache.rbegin()->first;
+        } else if (myTargetStart < myCacheStart) { /* |TTTTTT|XX|CCCCCC| */    
+            cerr << TTYRED << "   case 2" << ENDCOLOR << endl;
+            fillCache(myTargetStart, myCacheStart);
+            myTargetStart = _myFrameCache.begin()->first;
+        } else { /* |CCCCC|XX|CCCC| */
+            cerr << TTYRED << "   case 6" << ENDCOLOR << endl;
+            ; //nothing
+        }
+
+        trimCache(myTargetStart, myTargetEnd);
+        printCacheInfo(myTargetStart, myTargetEnd);
     }
 
-    bool
+    void FrameConveyor::trimCache(double theTargetStart, double theTargetEnd) {
+        DB2(cerr << " trimming to " << theTargetStart << " - " << theTargetEnd << endl;);
+        FrameCache::iterator myIt = _myFrameCache.begin();
+        while (myIt != _myFrameCache.end() && myIt->first < theTargetStart) {
+            DB2(cerr << " erasing at " << myIt->first << endl;);
+            myIt = _myFrameCache.erase(myIt);
+        }
+        myIt = _myFrameCache.end();
+        while (--myIt != _myFrameCache.begin() && myIt->first > theTargetEnd) {
+            DB2(cerr << " erasing at " << myIt->first << endl;);
+            _myFrameCache.erase(myIt);
+            myIt = _myFrameCache.end();
+        }
+    }
+
+    void FrameConveyor::fillCache(double theStartTime, double theEndTime) {
+        theStartTime = asl::maximum(0.0, theStartTime);
+        theEndTime   = asl::maximum(theStartTime, theEndTime);
+
+        //maybe seek to theStartTime
+        // seek if timestamp is outside these boundaries
+        double myTimePerFrame = 1.0 / _myContext->getFrameRate();
+        double myLastDecodedTime = _myVideoFrame->pts / (double)AV_TIME_BASE;
+
+        cerr << "fillCache [" << theStartTime << "; " << theEndTime << "]" << endl;
+        cerr << " last decoded " << myLastDecodedTime << " tolerance " << myTimePerFrame * 2 << endl;
+        //if (theStartTime < _myLowerCacheTimestamp || theTimestamp > (_myUpperCacheTimestamp + myTimePerFrame*2)) {
+        if (fabs(theStartTime - myLastDecodedTime) >= myTimePerFrame * 2) {
+            _myContext->seekToTime(theStartTime);
+        }
+
+        double myCurrentTime = theStartTime;
+        while(myCurrentTime >= 0 && myCurrentTime < theEndTime) {
+
+            myCurrentTime = decodeFrame();
+
+            DB2(cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
+               cerr << "  current time: " << myCurrentTime << endl;
+               cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;);
+        }
+    }
+
+    double
     FrameConveyor::getFrame(double theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
         updateCache(theTimestamp);
         if (_myFrameCache.empty() ) {
             AC_ERROR << "FrameConveyor:: No frames to deliver because framecache is empty.";
-            return true; // Not end of file
+            return theTimestamp; 
         }
 
         // Find frame in cache that is closest to the requested timestamp
@@ -117,15 +235,15 @@ namespace y60 {
         } else {
             myFrame = myPreviousFrameIt->second;
         }
-
+/*
         DB(
             cerr << "getFrame: " << theTimestamp << "the system time " << asl::Time() << endl;
             cerr << "    previous/next:     " << myPreviousFrameIt->first << " / " << myNextFrameIt->first << endl;
             cerr << "   using frame: " << myFrame->getTimestamp() << endl;
         )
-
+*/
         copyFrame(myFrame->getData()->begin(), theTargetRaster);
-        return true;
+        return myFrame->getTimestamp();
     }
 
     void
@@ -144,17 +262,13 @@ namespace y60 {
         }
     }
 
-    bool
-    FrameConveyor::decodeFrame(double theTimestamp) {
-        int64_t myFrameTimestamp = (int64_t)asl::round(theTimestamp * AV_TIME_BASE);
-        AC_TRACE << "decodeFrame: time=" << theTimestamp << " timestamp=" << myFrameTimestamp;
-
+    double
+    FrameConveyor::decodeFrame() {
+        double myCurrentTime = -1; //EOF
         if (!_myContext) {
             throw FrameConveyorException(std::string("No decoding context set, yet."), PLUS_FILE_LINE);
         }
 
-        bool myValidFilePosition = true;
- 
         DecoderContext::FrameType myFrameType;
         if (_myAudioBufferedSource) {
             myFrameType = _myContext->decode(_myVideoFrame, &_myAudioFrame);
@@ -171,11 +285,13 @@ namespace y60 {
                 convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
                 myNewFrame->setTimestamp(_myVideoFrame->pts / (double)AV_TIME_BASE);
                 _myFrameCache[myNewFrame->getTimestamp()] = myNewFrame;
+                myCurrentTime = myNewFrame->getTimestamp();
                 break;
             }
             case DecoderContext::FrameTypeAudio:
                 _myAudioBufferedSource->addBuffer(_myAudioFrame.getTimestamp(), _myAudioFrame.getSamples(), 
                                                   _myAudioFrame.getSampleSize());
+                myCurrentTime = _myAudioFrame.getTimestamp();
                 break;
             case DecoderContext::FrameTypeEOF:
                 break;
@@ -183,7 +299,7 @@ namespace y60 {
                 throw FrameConveyorException(std::string("Unknown frame type: ") + as_string(myFrameType), PLUS_FILE_LINE);
         }
 
-        return (myFrameType != DecoderContext::FrameTypeEOF);
+        return myCurrentTime;
     }
 
     void 

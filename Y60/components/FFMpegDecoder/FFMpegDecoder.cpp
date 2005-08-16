@@ -62,6 +62,34 @@ namespace y60 {
         }
     }
 
+    void 
+    FFMpegDecoder::startMovie(double theStartTime) {
+        MovieDecoderBase::startMovie(theStartTime);
+
+        //_myFrameConveyor.updateCache(theStartTime);
+        if (_myAudioBufferedSource) {
+            // if start from pause:
+            //_myAudioBufferedSource->clear();
+          //  _myAudioBufferedSource->setRunning(true);
+        }
+    }
+
+    void 
+    FFMpegDecoder::stopMovie() {
+        MovieDecoderBase::stopMovie();
+        if (_myAudioBufferedSource) {
+            _myAudioBufferedSource->setRunning(false);
+        }        
+    }
+
+    void 
+    FFMpegDecoder::pauseMovie() {
+        MovieDecoderBase::pauseMovie();
+        if (_myAudioBufferedSource) {
+            _myAudioBufferedSource->setRunning(false);            
+        }        
+    }
+
     void
     FFMpegDecoder::load(const std::string & theFilename) {        
         DecoderContextPtr myContext = DecoderContextPtr(new DecoderContext(theFilename));
@@ -85,17 +113,8 @@ namespace y60 {
 
             asl::Matrix4f myMatrix;
             myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
-            myMovie->set<ImageMatrixTag>(myMatrix);
-
-            // Hack to correct wrong frame rates that seem to be generated
-            // by some codecs
-            if (myVideoStream->codec.frame_rate > 1000 && myVideoStream->codec.frame_rate_base == 1) {
-                myVideoStream->codec.frame_rate_base = 1000;
-            }
-            float myFPS = myVideoStream->codec.frame_rate / (float) myVideoStream->codec.frame_rate_base;
-            if (myFPS > 1000.0f) {
-                myFPS /= 1000.0f;
-            }
+            myMovie->set<ImageMatrixTag>(myMatrix); 
+            double myFPS = theContext->getFrameRate();
             myMovie->set<FrameRateTag>(myFPS);
 
             if (myVideoStream->duration == AV_NOPTS_VALUE ||
@@ -137,21 +156,18 @@ namespace y60 {
     double
     FFMpegDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {       
     //cerr << "getFrame ast : " << theTime << "the system time " << asl::Time() << endl;
-       if (!_myFrameConveyor.getFrame(theTime, theTargetRaster)) {
+        double myDecodedFrameTime = _myFrameConveyor.getFrame(theTime, theTargetRaster);
+        if (myDecodedFrameTime < 0) {
             AC_PRINT << "EOF reached!";
             setEOF(true);
-            _myAudioBufferedSource->setRunning(false);
-
         } else {
-            if (!_myAudioBufferedSource->isRunning()) {
-                _myAudioBufferedSource->setRunning(true);
+            if (_myAudioBufferedSource) {
+                float myVolume = getMovie()->get<VolumeTag>();
+                if (!asl::almostEqual(_myAudioBufferedSource->getVolume(), myVolume)) {
+                    _myAudioBufferedSource->setVolume(myVolume);
+                } 
             }
-        
-            float myVolume = getMovie()->get<VolumeTag>();
-            if (!asl::almostEqual(_myAudioBufferedSource->getVolume(), myVolume)) {
-                _myAudioBufferedSource->setVolume(myVolume);
-            } 
         }
-        return theTime;
+        return myDecodedFrameTime;
     }
 }

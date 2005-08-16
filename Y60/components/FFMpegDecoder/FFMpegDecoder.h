@@ -46,6 +46,10 @@ namespace y60 {
             * @param theFilename file to load into the decoder
             */
             void load(const std::string & theFilename);
+            void startMovie(double theStartTime);
+            void stopMovie();
+            void pauseMovie();
+            void startMovie();            
         
             virtual asl::Ptr<MovieDecoderBase> instance() const;
             std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
@@ -58,7 +62,6 @@ namespace y60 {
             * @return timestamp of the frame delivered in theTargetRaster
             */
             double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
-
         private:
             void setupMovie(asl::Ptr<DecoderContext> theContext);
             void setupAudio(asl::Ptr<DecoderContext> theContext);
