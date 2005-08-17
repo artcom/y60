@@ -166,22 +166,22 @@ namespace y60 {
         int myNextFrame;
         double myMovieTime;
         switch (_myPlayMode) {
-        case PLAY_MODE_PAUSE:
-            // next frame from SOM
-            myNextFrame = get<CurrentFrameTag>();
-            while (myNextFrame < 0) {
-                myNextFrame += get<FrameCountTag>();
-            }
-            myMovieTime = getTimeFromFrame(myNextFrame);
-            break;
-        case PLAY_MODE_PLAY:
-            myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
-            myNextFrame = (int)getFrameFromTime(myMovieTime);
-            break;
-        case PLAY_MODE_STOP:
-            //AC_DEBUG << "PLAY_MODE_STOP";
-            myNextFrame = _myLastDecodedFrame;
-            return;
+            case PLAY_MODE_PAUSE:
+                // next frame from currentframe attribute in movie node
+                myNextFrame = get<CurrentFrameTag>();
+                while (myNextFrame < 0) {
+                    myNextFrame += get<FrameCountTag>();
+                }
+                myMovieTime = getTimeFromFrame(myNextFrame);
+                break;
+            case PLAY_MODE_PLAY:
+                myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
+                myNextFrame = (int)getFrameFromTime(myMovieTime);
+                break;
+            case PLAY_MODE_STOP:
+                //AC_DEBUG << "PLAY_MODE_STOP";
+                myNextFrame = _myLastDecodedFrame;
+                return;
         }
 
         if (myNextFrame < 0) {
@@ -190,9 +190,9 @@ namespace y60 {
         //AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;
         if (myNextFrame != _myLastDecodedFrame) {
             double myDecodedTime = decodeFrame(myMovieTime, myNextFrame);
-            if (!asl::almostEqual(myDecodedTime, myMovieTime, 0.04)) {
+            /*if (!asl::almostEqual(myDecodedTime, myMovieTime, 0.04)) {
                 AC_WARNING << "Decoded Time=" << myDecodedTime << " differs from Movie Time=" << myMovieTime << ". Delta=" << myMovieTime-myDecodedTime;
-            }
+            }*/
         }
 
         // check for eof in the decoder
