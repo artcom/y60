@@ -44,7 +44,12 @@ namespace y60 {
             void setTiling(asl::Vector2i theTiling);
             void setDepth(unsigned int theDepth);
             const std::string & getName() const;
+			void setInternalFormat(const std::string & theType);
+
+		protected:
+            ImageBuilder(const std::string & theNodeName, const std::string & theName, bool theCreateMipmapFlag);
         private:
+			void init(const std::string & theName, bool theCreateMipmapFlag);
     };
 
     typedef asl::Ptr<ImageBuilder, dom::ThreadingModel>  ImageBuilderPtr;

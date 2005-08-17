@@ -180,7 +180,6 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
 {
     LONG myMaterialCount       = theMaterialList.size();
     LONG myUVSetCount          = theUVTagList.size();
-
     std::string myName = getString(theNode->GetName() + "_" + theSelection->GetName());
 
     PolygonObject * myPolygon = ToPoly(thePolygonNode);
@@ -236,6 +235,7 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
         }
     }
 
+	map<string,bool> myCreatedUVBins;
     // create uvsets 
 	for (LONG myUVSetIndex = 0; myUVSetIndex < myUVSetCount; ++myUVSetIndex) {
 		if (myMaterialInfo._myTexureMapping.size() > myUVSetIndex && 
@@ -244,6 +244,7 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
 			GePrint(String(myName.c_str()) + ": Creating bin=" + String(myBinName.c_str()));
 			myShapeBuilder.createVertexDataBin<Vector2f>(myBinName, 1);
             myElementBuilder.createIndex(myBinName, getTextureRole(myUVSetIndex), 1);
+			myCreatedUVBins[myBinName] = true;
 			GePrint(String(myName.c_str()) + ": Creating index bin=" + String(myBinName.c_str()) + " myUVTagIndex=" + LongToString(myUVSetIndex));
 		}
     }
@@ -286,10 +287,11 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
 
     // Create UV indices sets
 	for (LONG myTextureIndex = 0; myTextureIndex < myY60TextureCount; ++myTextureIndex) {
+		std::string myBinName = std::string("UVCoords_") + asl::as_string(myTextureIndex);
 		if (myMaterialInfo._myTexureMapping.size() > myUVSetIndex && 
-			myMaterialInfo._myTexureMapping[myTextureIndex] == UV_MAP) {
-
-			std::string myBinName = std::string("UVCoords_") + asl::as_string(myTextureIndex);
+			myMaterialInfo._myTexureMapping[myTextureIndex] == UV_MAP &&
+			myCreatedUVBins.find(myBinName) == myCreatedUVBins.end()) {
+	
 
 			// do we have enough uvsets for our Y60 textures, if not,take the first uv set
 			if (myUVSetCount < myY60TextureCount) {
@@ -298,6 +300,8 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
 			GePrint(String(myName.c_str()) + ": Creating index bin=" + String(myBinName.c_str()) + 
 											" myTexIndex=" + LongToString(myTextureIndex));
 			myElementBuilder.createIndex(myBinName, getTextureRole(myTextureIndex), 1);
+			myCreatedUVBins[myBinName] = true;
+
 		}
 	}
 	

@@ -356,12 +356,13 @@ namespace y60 {
         if (theMaterialBuilder.isMovie(theTextureFilename)) {
             unsigned myLoopCount = 0;
             myImageId = theMaterialBuilder.createMovie(theSceneBuilder, myTexName,
-                                                       theTextureFilename, myLoopCount);
+                                                       theTextureFilename, myLoopCount,
+                                                       "");
         } else {
             myImageId = theMaterialBuilder.createImage(theSceneBuilder, myTexName,
                                                        theTextureFilename, myUsage,
                                                        myCreateMipmapFlag, myColorScale,
-                                                       myColorBias, SINGLE, theDepth);
+                                                       myColorBias, SINGLE, "", theDepth);
         }
 
         theMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode, myUVMappingMode,

@@ -60,7 +60,8 @@ namespace y60 {
         const std::string & createMovie(SceneBuilder & theSceneBuilder,
                                         const std::string & theName,
                                         const std::string & theFileName,
-                                        unsigned theLoopCount);
+                                        unsigned theLoopCount,
+										const std::string & theInternalFormat);
 
         const std::string & createImage(SceneBuilder & theSceneBuilder,
                                         const std::string & theName,
@@ -69,7 +70,8 @@ namespace y60 {
                                         bool  theCreateMipmapsFlag,
                                         const asl::Vector4f theColorScale,
                                         const asl::Vector4f theColorBias,
-                                        ImageType theType,
+                                        ImageType theType,										
+										const std::string & theInternalFormat,
                                         unsigned theDepth = 1);
 
 /*

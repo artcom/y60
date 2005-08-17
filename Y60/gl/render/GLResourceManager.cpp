@@ -190,6 +190,7 @@ namespace y60 {
             unsigned int myTexDepth = nextPowerOfTwo(myDepth);
             AC_DEBUG << "image " << myWidth << "x" << myHeight << endl;
             AC_DEBUG << "tex " << myTexWidth << "x" << myTexHeight << endl;
+            
             if (myDepth == 1) {
                 // Two step initialization
                 // First allocate the texture with power of two dimensions

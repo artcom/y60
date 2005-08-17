@@ -80,11 +80,14 @@ MaterialExporter::createDefaultMaterial() {
 }
 
 bool
-MaterialExporter::exportTexture(const String & theMaterialName, y60::MaterialBuilderPtr theMaterialBuilder, 
+MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr theMaterialBuilder, 
                                 y60::SceneBuilder & theSceneBuilder,BaseContainer * theContainer, 
                                 const std::string & theUsage, TextureTag * theTextureTag, 
-                                const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord)
+                                const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord,
+								bool isAlphaChannel)
 {
+
+	String myMaterialName = theMaterial->GetName();
     if (!theContainer) {
         throw ExportException(std::string("Export texture with undefined cinema container"),
                                             "MaterialExporter::writeMaterial()");
@@ -101,7 +104,7 @@ MaterialExporter::exportTexture(const String & theMaterialName, y60::MaterialBui
                 myApplyMode = y60::TEXTURE_APPLY_MODULATE;
                 break;
             case MATERIAL_TEXTUREMIXING_MULTIPLY:
-                GePrint(theMaterialName + ": Texture mixmode MULTIPLY not implemented; using MODULATE");
+                GePrint(myMaterialName + ": Texture mixmode MULTIPLY not implemented; using MODULATE");
                 myApplyMode = y60::TEXTURE_APPLY_MODULATE;
                 myDiffuseColorFlag = true;
                 break;
@@ -109,7 +112,7 @@ MaterialExporter::exportTexture(const String & theMaterialName, y60::MaterialBui
                 myApplyMode = y60::TEXTURE_APPLY_ADD;
                 break;
             case MATERIAL_TEXTUREMIXING_SUBTRACT:
-                GePrint(theMaterialName + ": Texture mixmode SUBTRACT not implemented; using DECAL");
+                GePrint(myMaterialName + ": Texture mixmode SUBTRACT not implemented; using DECAL");
                 break;
             default:
                 throw ExportException(std::string("Unsupported texture mix mode: ") + asl::as_string(myMixMode),
@@ -123,8 +126,13 @@ MaterialExporter::exportTexture(const String & theMaterialName, y60::MaterialBui
     std::string myTextureFilename = getTexturePath(_myDocumentPath, myTextureName);
     Real myAlpha = theContainer->GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
 
+	string myInternalFormat("");
+
     std::string myImageId;
     if (theMaterialBuilder->isMovie(myTextureFilename)) {
+		if (isAlphaChannel) {
+			myInternalFormat = TEXTURE_INTERNAL_FORMAT_INTENSITY;
+		}
         LONG myTimeMode = theContainer->GetLong(BASECHANNEL_TIME_MODE);
         unsigned myLoopCount = 0;
 #if API_VERSION >= 8500
@@ -141,15 +149,20 @@ MaterialExporter::exportTexture(const String & theMaterialName, y60::MaterialBui
                 break;
         }
 #endif
-        myImageId = theMaterialBuilder->createMovie(theSceneBuilder, getString(myTextureName), myTextureFilename, myLoopCount);
+        myImageId = theMaterialBuilder->createMovie(theSceneBuilder, getString(myTextureName), myTextureFilename, 
+			                                        myLoopCount, myInternalFormat);
     } else {
+		if ( isAlphaChannel) {
+			myInternalFormat = TEXTURE_INTERNAL_FORMAT_ALPHA;
+		}
         bool myCreateMipmapFlag = (theUsage == TEXTURE_USAGE_PAINT);
         myImageId = theMaterialBuilder->createImage(theSceneBuilder,
                                                     getString(myTextureName), myTextureFilename,
                                                     theUsage, myCreateMipmapFlag,
                                                     asl::Vector4f(1,1,1,myAlpha),
                                                     asl::Vector4f(0,0,0,0),
-                                                    SINGLE);
+                                                    SINGLE,
+													myInternalFormat);
     }
     // export mapping
     GeData myData;
@@ -278,7 +291,8 @@ MaterialExporter::exportShader(PluginShader * theShader,
                              BaseContainer * theColorContainer,
                              TextureTag * theTextureTag, 
                              const asl::Vector3f & theMinCoord,
-                             const asl::Vector3f & theMaxCoord) {
+                             const asl::Vector3f & theMaxCoord,
+							 bool isAlphaChannel) {
     // iterate over all shaders of the material
     // supported shaders are: 
     //                       Layer (multitexture) Sorry, attributes are not available via api, dismissed
@@ -300,19 +314,21 @@ MaterialExporter::exportShader(PluginShader * theShader,
             case Xbitmap:{
                     BaseContainer *  myColorContainer = theColorContainer ? 
                                                theColorContainer : theShader->GetDataInstance();
-                    myDiffuseColorFlag = exportTexture(theMaterial->GetName(), 
-                                                    theMaterialBuilder, 
+                    myDiffuseColorFlag = exportTexture(theMaterial,
+													theMaterialBuilder, 
                                                     theSceneBuilder, myColorContainer, 
                                                     y60::TEXTURE_USAGE_PAINT,
                                                     theTextureTag,
                                                     theMinCoord,
-                                                    theMaxCoord);
+                                                    theMaxCoord,isAlphaChannel);
                 }
                 break;
             case Xlayer:
             case Xgradient:
             case Xfilter:
             case Xnoise:
+			case Xfusion:
+			case Xnormaldirection:
                 GePrint("Ignoring Shader: " + theShader->GetName());
                 break;
             default:
@@ -380,8 +396,24 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
                     }
                 }
             }
-        }
-    }
+		  }
+          if (myMaterial->GetChannelState(CHANNEL_ALPHA)) {
+            BaseChannel * myAlphaChannel = myMaterial->GetChannel(CHANNEL_ALPHA);
+            if (myAlphaChannel) {
+				PluginShader  * myShader = myAlphaChannel->GetShader();
+				if (myShader) {
+					LONG myShaderType = myShader->GetType();
+					if ( myShaderType == Xbitmap) {
+						GeData myData;
+						myTextureTag->GetParameter(DescID(TEXTURETAG_PROJECTION), myData, 0);
+						LONG myCinemaxTexCoordMode = myData.GetLong();
+						myExportedMaterialInfo._myTexureMapping.push_back(myCinemaxTexCoordMode);
+						myExportedMaterialInfo._myTextureCount++;
+					}
+				}
+			}
+		}
+	}
     return myExportedMaterialInfo;
 }
 
@@ -441,7 +473,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                         myDiffuseColorFlag = exportShader(myShader, _myMaterialBuilder, 
                                                           myMaterial,theSceneBuilder,
                                                           &myColorContainer, myTextureTag,
-                                                          theMinCoord, theMaxCoord);
+                                                          theMinCoord, theMaxCoord, false);
                         // export materials base color
                         Vector4f myColor(1, 1, 1, 1);
                         if (myDiffuseColorFlag) {
@@ -458,7 +490,22 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
             }
 
             // Transparency / Alpha
-            myMaterialAlphaFlag = myMaterialAlphaFlag | (myMaterial->GetChannelState(CHANNEL_ALPHA)==TRUE);
+            if (myMaterial->GetChannelState(CHANNEL_ALPHA)) {
+                  BaseChannel * myAlphaChannel = myMaterial->GetChannel(CHANNEL_ALPHA);
+                  if (myAlphaChannel) {
+						// Export texture
+						BaseContainer myColorContainer = myAlphaChannel->GetData();
+						String myTextureName = myColorContainer.GetString(BASECHANNEL_TEXTURE);
+						String myTextureShaderid = myColorContainer.GetString(BASECHANNEL_SHADERID);
+						GePrint("Texture name: " + myTextureName + " Shaderid: " + myTextureShaderid);
+	                    PluginShader  * myShader = myAlphaChannel->GetShader();
+                        exportShader(myShader, _myMaterialBuilder, myMaterial,theSceneBuilder,
+                                     &myColorContainer, myTextureTag, theMinCoord, theMaxCoord, true);
+
+				  }
+			}
+
+			myMaterialAlphaFlag = myMaterialAlphaFlag | (myMaterial->GetChannelState(CHANNEL_ALPHA)==TRUE);
                // Export specular color
             Vector4f mySpecularColor(0, 0, 0, 1);
             if (myMaterial->GetChannelState(CHANNEL_SPECULARCOLOR)) {
@@ -496,7 +543,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     BaseContainer myBumpContainer = myBumpChannel->GetData();
                     String myBumpMapName = "";//myBumpContainer.GetString(BASECHANNEL_TEXTURE);
                     if (myBumpMapName.GetLength() ) {
-                        exportTexture(myMaterial->GetName(), _myMaterialBuilder, theSceneBuilder, &myBumpContainer, y60::TEXTURE_USAGE_BUMP, myTextureTag, theMinCoord, theMaxCoord);
+                        exportTexture(myMaterial, _myMaterialBuilder, theSceneBuilder, &myBumpContainer, y60::TEXTURE_USAGE_BUMP, myTextureTag, theMinCoord, theMaxCoord, false);
                         _myMaterialBuilder->needTextureFallback(true);
                     }
                 }

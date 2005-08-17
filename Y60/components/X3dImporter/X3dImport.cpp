@@ -556,7 +556,7 @@ namespace y60 {
                                            y60::TEXTURE_USAGE_PAINT, false,
                                            asl::Vector4f(1,1,1,1),
                                            asl::Vector4f(0,0,0,0),
-                                           y60::SINGLE);
+                                           y60::SINGLE, "");
 
         std::string myApplyMode = y60::TEXTURE_APPLY_MODULATE;
 

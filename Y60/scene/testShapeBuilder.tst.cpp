@@ -120,14 +120,14 @@ class ShapeBuilderUnitTest : public UnitTest {
 
             {
                 string myImageId = myMaterialBuilder.createImage(mySceneBuilder, "testTexture1", "tex\\testtexture.jpg", TEXTURE_USAGE_PAINT, false,
-                                                                 asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE);
+                                                                 asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE,"");
                 myMaterialBuilder.createTextureNode(myImageId, "SOME_APPLY_MODE", TEXTURE_USAGE_PAINT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, Matrix4f::Identity(), 100, false, 60);
 
                 myImageId = myMaterialBuilder.createImage(mySceneBuilder, "testTexture2", "glossypattern.jpg", TEXTURE_USAGE_PAINT, false,
-                                                          asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE);
+                                                          asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE,"");
                 myMaterialBuilder.createTextureNode(myImageId, "OTHER_APPLY_MODE", TEXTURE_USAGE_PAINT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
 
-                string myMovieId = myMaterialBuilder.createMovie(mySceneBuilder, "testTexture3", "mymovie.mpg", 0);
+                string myMovieId = myMaterialBuilder.createMovie(mySceneBuilder, "testTexture3", "mymovie.mpg", 0,"");
                 myMaterialBuilder.createTextureNode(myMovieId, "OTHER_APPLY_MODE", TEXTURE_USAGE_PAINT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
             }
 

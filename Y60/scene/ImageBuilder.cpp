@@ -34,8 +34,22 @@ namespace y60 {
     ImageBuilder::ImageBuilder(const std::string & theName, bool theCreateMipmapFlag)
         : BuilderBase(IMAGE_NODE_NAME)
     {
+		init(theName, theCreateMipmapFlag);
+
+    }
+	ImageBuilder::ImageBuilder(const std::string & theNodeName, 
+		                       const std::string & theName, 
+							   bool theCreateMipmapFlag) : BuilderBase(theNodeName) 
+	{
+		init(theName, theCreateMipmapFlag);
+	}
+
+    ImageBuilder::~ImageBuilder() {
+    }
+
+	void
+    ImageBuilder::init(const std::string & theName, bool theCreateMipmapFlag) {
         dom::NodePtr myNode = getNode();
-        
         if (!myNode->hasFacade()) {
             //TODO: the follwoing attributes are all appended as text and not as type
             // because there is no schema available at this time
@@ -46,12 +60,11 @@ namespace y60 {
             myNode->appendAttribute(IMAGE_COLOR_SCALE_ATTRIB, asl::Vector4f(1.0f,1.0f,1.0f,1.0f));
             myNode->appendAttribute(IMAGE_COLOR_BIAS_ATTRIB, asl::Vector4f(0.0f,0.0f,0.0f,0.0f));
             myNode->appendAttribute(IMAGE_TILE_ATTRIB, asl::Vector2i(1,1));
-        }   
-
-    }
-
-    ImageBuilder::~ImageBuilder() {
-    }
+            myNode->appendAttribute(IMAGE_INTERNAL_FORMAT_ATTRIB, "");
+		} else {
+            myNode->getFacade<Image>()->set<NameTag>(theName);
+		}
+	}
 
     const std::string &
     ImageBuilder::getName() const {
@@ -83,6 +96,11 @@ namespace y60 {
     void
     ImageBuilder::setType(ImageType theType) {
         getNode()->getAttribute(IMAGE_TYPE_ATTRIB)->nodeValue(asl::getStringFromEnum(theType, ImageTypeStrings));
+    }
+
+    void
+    ImageBuilder::setInternalFormat(const std::string & theType) {		
+        getNode()->getAttribute(IMAGE_INTERNAL_FORMAT_ATTRIB)->nodeValue(theType);
     }
 
     void

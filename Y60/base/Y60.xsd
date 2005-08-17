@@ -226,6 +226,17 @@ Example:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="RasterOfALPHA">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with 8 bit alpha pixel encoding.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded.
+
+Example:
+[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE (...)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:simpleType name="RasterOfGRAY">
         <xs:annotation>
             <xs:documentation>Type for a 2-dimensional array of pixels with 8 bit greylevel pixel encoding.
@@ -359,6 +370,20 @@ Example:
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="RasterOfBGRA"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofalpha">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has monocrome 8-bit pixel values.
+
+Example:
+&lt;rasterofgray&gt;[256,256]FF00010000FF00010000FF0000010001ECC7C702E1A5A5BE3F3F2 ... &lt;/rasterofgray&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfALPHA"/>
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
@@ -2058,6 +2083,11 @@ Usefull to animate texture coordinates, or to tweak texture repeat and position.
             <xs:element ref="rasterofabgr">
                 <xs:annotation>
                     <xs:documentation>Contains runlength encoded pixel data of type abgr</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofalpha">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type alpha</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element ref="rasterofgray">

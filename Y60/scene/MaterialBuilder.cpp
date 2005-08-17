@@ -241,7 +241,8 @@ namespace y60 {
                                  bool  theCreateMipmapsFlag,
                                  asl::Vector4f theColorScale,
                                  asl::Vector4f theColorBias,
-                                 ImageType theType,
+                                 ImageType theType,										
+								 const std::string & theInternalFormat,
                                  unsigned theDepth)
     {
         std::string myFileName(theFileName);
@@ -278,6 +279,7 @@ namespace y60 {
             } else {
                 myImageBuilder.createFileReference(myFileName);
             }
+			myImageBuilder.setInternalFormat(theInternalFormat);
 
             return myId;
         }
@@ -287,7 +289,8 @@ namespace y60 {
     MaterialBuilder::createMovie(SceneBuilder & theSceneBuilder,
                                  const std::string & theName,
                                  const std::string & theFileName,
-                                 unsigned theLoopCount)
+                                 unsigned theLoopCount,										
+								 const std::string & theInternalFormat)
     {
         std::string myFileName(theFileName);
         asl::findAndReplace(myFileName, "\\","/");
@@ -300,7 +303,7 @@ namespace y60 {
             MovieBuilder myMovieBuilder(theName, myFileName);
             const string & myId = theSceneBuilder.appendMovie(myMovieBuilder);
             myMovieBuilder.setLoopCount(theLoopCount);
-
+			myMovieBuilder.setInternalFormat(theInternalFormat);
             return myId;
         }
     }
@@ -343,7 +346,8 @@ namespace y60 {
             + theTopFileName + "|" + theBottomFileName;
 
         const string & myId = createImage(theSceneBuilder, theName, myFileName, TEXTURE_USAGE_ENVIRONMENT, false,
-                                          theColorScale, asl::Vector4f(0.0f,0.0f,0.0f,0.0f), CUBEMAP);
+                                          theColorScale, asl::Vector4f(0.0f,0.0f,0.0f,0.0f), CUBEMAP,
+										  "");
 		// default applay mode: TEXTURE_APPLY_DECAL
         createTextureNode(myId, theApplyMode, TEXTURE_USAGE_ENVIRONMENT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, 
 						  Matrix4f::Identity(), 10.0f, false, 0.0f, false);

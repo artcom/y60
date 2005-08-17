@@ -55,6 +55,7 @@ namespace y60 {
     typedef asl::raster<asl::BGR>              RasterOfBGR;
     typedef asl::raster<asl::BGRA>             RasterOfBGRA;
     typedef asl::raster<asl::ABGR>             RasterOfABGR;
+    typedef asl::raster<asl::ALPHA>            RasterOfALPHA;
     typedef asl::raster<asl::GRAY>             RasterOfGRAY;
     typedef asl::raster<asl::GRAY16>           RasterOfGRAY16;
     typedef asl::raster<asl::GRAYS16>          RasterOfGRAYS16;

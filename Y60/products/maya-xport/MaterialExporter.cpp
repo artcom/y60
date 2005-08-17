@@ -183,7 +183,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
     string myImageId = theBuilder.createImage(theSceneBuilder,
         MFnDependencyNode(theTextureNode).name().asChar(),
         myStrippedFileName, myUsage, myCreateMipmapsFlag,
-        theColorScale, theColorBias, SINGLE);
+        theColorScale, theColorBias, SINGLE,"");
 
     // wrap
     std::string myWrapMode = y60::TEXTURE_WRAP_REPEAT;
@@ -418,7 +418,7 @@ MaterialExporter::exportBumpTexture(const MObject & theBumpNode,
     string myImageId = theBuilder.createImage(theSceneBuilder,
         MFnDependencyNode(theBumpNode).name().asChar(),
         myStrippedFileName, myUsage, false, asl::Vector4f(1.0f,1.0f,1.0f,1.0f),
-        asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE);
+        asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE, "");
 
     theBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode, TEXCOORD_UV_MAP, asl::Matrix4f::Identity(), 100, false, 0);
     theBuilder.needTextureFallback(true);

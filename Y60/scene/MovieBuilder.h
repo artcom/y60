@@ -23,12 +23,13 @@
 #ifndef _ac_MovieBuilder_h_
 #define _ac_MovieBuilder_h_
 
-#include "BuilderBase.h"
+//#include "BuilderBase.h"
+#include "ImageBuilder.h"
 #include <asl/Ptr.h>
 
 namespace y60 {
 
-    class MovieBuilder : public BuilderBase {
+    class MovieBuilder : public ImageBuilder {
         public:
             DEFINE_EXCEPTION(MovieBuilderException, asl::Exception);
 
@@ -37,7 +38,7 @@ namespace y60 {
             virtual ~MovieBuilder();
 
             void setLoopCount(unsigned theLoopCount);
-            const std::string & getName() const;
+            //const std::string & getName() const;
         private:
     };
 

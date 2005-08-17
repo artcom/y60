@@ -18,6 +18,7 @@ namespace y60 {
     PixelEncodingInfo
     getDefaultGLTextureParams(PixelEncoding theEncoding) {
         switch (theEncoding) {
+            case y60::ALPHA: return PixelEncodingInfo(GL_ALPHA, 1, false, GL_ALPHA); 
             case y60::GRAY: return PixelEncodingInfo(GL_LUMINANCE8, 1, false, GL_LUMINANCE); // maybe we have to put GL_LUMINANCE or GL_ALPHA here
             case y60::GRAY16: return PixelEncodingInfo(GL_LUMINANCE16, 2, false, GL_LUMINANCE, GL_UNSIGNED_SHORT);
             case y60::GRAYS16:return PixelEncodingInfo(GL_LUMINANCE16, 2, false, GL_LUMINANCE, GL_SHORT);
