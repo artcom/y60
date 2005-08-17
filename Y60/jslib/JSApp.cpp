@@ -265,16 +265,17 @@ File(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 FileLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns line and filename of the current scriptfile separated by colon");
+    DOC_BEGIN("Returns line and filename of the current scriptfile as properties of an object");
     DOC_RVAL("", DOC_TYPE_STRING);
     DOC_END;
     try {
         const char * myFile;
         int myLine;
         if (getFileLine(cx,obj,argc,argv,myFile,myLine)) {
-            string myResult = asl::getBaseName(myFile) + ":" + asl::as_string(myLine);
-            JSString * myString = JS_NewStringCopyN(cx,myResult.c_str(),myResult.size());
-            *rval = STRING_TO_JSVAL(myString);
+            JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+            if (!JS_DefineProperty(cx, myReturnObject, "file",  as_jsval(cx, asl::getBaseName(myFile)), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "line", as_jsval(cx, myLine), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            *rval = OBJECT_TO_JSVAL(myReturnObject);
             return JS_TRUE;
         }
         return JS_FALSE;
