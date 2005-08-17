@@ -25,6 +25,9 @@ use("Playlist.js");
 
 const MINZOOMFACTOR = 0.001;
 const FRAME_RATE    = 100;
+const LINUX = 0;
+const WINDOWS = 1;
+const OS = LINUX;
 
 function ImageViewerApp(theArguments) {
     this.Constructor(this, theArguments);
@@ -55,6 +58,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myWMVPlugged       = false;
     var _myWMAPlugged       = false;
     var _myMPEGPlugged      = false;
+    var _myQTPlugged        = false;
     var _myVFWCapturePlugged= false;
     var _myDShowCapturePlugged = false;
 
@@ -286,11 +290,23 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
         if (!_myMPEGPlugged && (myFilename.search(/\.mpg$/i)  != -1 ||
                                 myFilename.search(/\.m2v$/i)  != -1 ||
-                                myFilename.search(/\.mpeg$/i) != -1 ||
+                                myFilename.search(/\.mpeg$/i) != -1 
                                 //myFilename.search(/\.ra$/i)   != -1 ||
-                                myFilename.search(/\.mov$/i)  != -1)) {
+                                /*|| myFilename.search(/\.mov$/i)  != -1)*/
+                                )) {
             plug("y60FFMpegDecoder2");
             _myMPEGPlugged = true;
+        }
+        if ( myFilename.search(/\.mov$/i) != -1) {
+            if (OS == LINUX && !_myMPEGPlugged) {
+                plug("y60FFMpegDecoder2");
+                _myMPEGPlugged = true;  
+                print("y60FFMpegDecoder2")              
+            } else if (OS == WINDOWS && !_myQTPlugged){
+                plug("y60QuicktimeDecoder");
+                _myQTPlugged = true;
+                print("y60QuicktimeDecoder")              
+            }
         }
         if (!_myWMVPlugged && myFilename.search(/\.wmv$/i) != -1) {
             plug("y60WMVDecoder");

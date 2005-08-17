@@ -44,6 +44,7 @@ use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 
 //plug("y60FFMpegDecoder1");
+//plug("y60QuicktimeDecoder"); // turn on for windows and better mov decoder support
 
 // Global window object (similar to html window)
 var window   = null;
