@@ -19,29 +19,51 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-
-function Exception(what,where,name) {
+// Use fileline() function to create location object
+// theName is optional.
+function Exception(theMessage, theLocation, theName) {
     var self = this; // inner function this bug workaround
-    var _what = what;
-    var _where = where;
-    var _name = name || "Exception";
+    self.message    = theMessage;
+    self.fileName   = theLocation.file;
+    self.lineNumber = theLocation.line;
+    self.name       = theName || "Exception";
 
     this.what = function() {
-        return self._what;
-    };
+        return self.message;
+    }
     this.where = function() {
-        return self._where;
-    };
-    this.name = function() {
-        return self._name;
-    };   
+        return "[" + self.fileName + ":" + self.lineNumber + "]";
+    }
     this.toString = function() {
-        return _name + " in " + _where + ": " + _what;
-    }    
-         
-    this.set = function(what, where, name) {
-        self._what = what;
-        self._where = where;
-        self._name = name;
-    };
-};
+        return self.name + " in " + self.where() + ": " + self.message;
+    }
+
+    this.set = function(theMessage, theLocation, theName) {
+        self.message = theMessage;
+        self.fileName   = theLocation.file;
+        self.lineNumber = theLocation.line;
+        self.name    = theName;
+    }
+}
+
+// This functions works for c++ and for JavaScript exceptions
+function reportException(theException) {
+    var myMessage = "";
+    if (typeof(theException) == "object" && "message" in theException) {
+        if (theException.name != "Error") {
+            myMessage += theException.name + ": ";
+        }
+        myMessage += trim(theException.message);
+
+        if ("fileName" in theException) {
+            myMessage += " [" + basename(theException.fileName);
+        }
+
+        if ("lineNumber" in theException) {
+            myMessage += ":" + theException.lineNumber + "]";
+        }
+    } else {
+        myMessage = "ERROR: " + String(theException);
+    }
+    print("### " + myMessage);
+}

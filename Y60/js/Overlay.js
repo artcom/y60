@@ -209,13 +209,21 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.image getter = function() {
-        return Protected.myImages[0];
+        if (Protected.myImages.length) {
+            return Protected.myImages[0];
+        } else {
+            return null;
+        }
     }
     Public.image setter = function(theImage) {
         Protected.myImages[0] = theImage;
-        _myTextures.childNodes[0].image = theImage.id;
+        if (_myTextures) {
+            _myTextures.childNodes[0].image = theImage.id;
+        } else {
+           Protected.addTexture(theImage.id);
+        }
     }
-    
+
     Public.images setter = function(theImages) {
         for (var i = 0; i < theImages.length; ++i) {
             if (i < _myTextures.childNodes.length) {
@@ -231,7 +239,7 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
         addTextureRequirements(_myTextures.childNodesLength());
         Protected.myImages = theImages;
     }
-    
+
     Public.images getter = function() {
         /*
         var myImages = [];
@@ -246,7 +254,7 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
     }
 
     Public.textures setter = function(theTextures) {
-        for(var i = 0; i < theTextures.length; ++i) {
+        for (var i = 0; i < theTextures.length; ++i) {
             if (i < _myTextures.childNodes.length) {
                 _myTextures.replaceChild(theTextures[i], _myTextures.childNodes[i]);
             } else {
@@ -259,11 +267,11 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
         }
         Protected.onTextureChange();
     }
-    
+
     Public.texture getter = function() {
         return _myTextures.childNodes[0];
     }
-    
+
     Public.texture setter = function(theTexture) {
         _myTextures.replaceChild(theTexture, _myTextures.firstChild);
         Protected.onTextureChange();
@@ -361,13 +369,13 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
                 myRequiresNode.appendChild(myTexcoordFeatures);
             }
             myTexcoordFeatures.values = createTexcoordFeatureString(theTextureCount);
-            
+
         } else {
             throw new Exception("TextureOverlay material has no requires node.", fileline());
         }
     }
 
-    var _myTextures        = null;
+    var _myTextures = null;
 }
 
 // Pure virtual base class
@@ -381,41 +389,43 @@ function ImageOverlayBase(Public, Protected, theManager, theSource, thePosition,
 
     function addImage(theSource) {
         var myImage = null;
-        if (typeof(theSource) == "string") { // detect strings
+        if (typeof(theSource) == "string") {
+            // theSource is a string
             myImage = Node.createElement("image");
             theManager.images.appendChild(myImage);
             myImage.src  = theSource;
             myImage.name = theSource;
             myImage.resize = "pad";
-            
-        } else if (typeof(theSource) == "object" 
-                && "previousSibling" in theSource) { // detect nodes
-            myImage = theSource;
 
+        } else if (typeof(theSource) == "object" && "previousSibling" in theSource) {
+            // theSource is a node
+            myImage = theSource;
         } else {
-            print("### ERROR: Invalid type of source argument in addImage: " 
+            print("### ERROR: Invalid type of source argument in addImage: "
                 + typeof(theSource) + " " + fileline());
             return;
         }
-        
+
         Protected.addTexture(myImage.id);
         Protected.myImages.push(myImage);
     }
 
     function setup() {
-        //detect array
-        if (typeof(theSource) == "object" && "splice" in theSource) {
-            for (var i = 0; i < theSource.length; ++i) {
-                addImage(theSource[i]);
+        if (theSource) {
+            if (typeof(theSource) == "object" && "splice" in theSource) {
+                // theSource is an array
+                for (var i = 0; i < theSource.length; ++i) {
+                    addImage(theSource[i]);
+                }
+            } else {
+                addImage(theSource);
             }
-        } else {
-            addImage(theSource);
-        }
-        theManager.scene.update(Renderer.IMAGES);
+            theManager.scene.update(Scene.IMAGES);
 
-        var mySize    = getImageSize(Protected.myImages[0]);
-        Public.width  = mySize.x;
-        Public.height = mySize.y;
+            var mySize    = getImageSize(Protected.myImages[0]);
+            Public.width  = mySize.x;
+            Public.height = mySize.y;
+        }
     }
 
     setup();

@@ -36,12 +36,11 @@
 var ourFontCache = [];
 
 function LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theStyle) {
+    
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Inheritance
     ///////////////////////////////////////////////////////////////////////////////////////////
-
-    var myImageNode = theSceneViewer.getImageManager().getImageNode(createUniqueId());
-    ImageOverlayBase(Public, Protected, theSceneViewer.getOverlayManager(), myImageNode, thePosition);
+    ImageOverlayBase(Public, Protected, theSceneViewer.getOverlayManager(), null, thePosition);
     
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -68,6 +67,7 @@ function LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theS
             ourFontCache[myFontName] = true;
         }
 
+        ensureImage();
         var mySize = window.renderTextAsImage(Public.image, theText, myFontName, Public.width, Public.height);
 
         Public.srcsize.x = mySize[0] / Public.image.width;
@@ -75,9 +75,11 @@ function LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theS
         window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
         window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
         window.setTextPadding(0,0,0,0);
+        Public.texture.applymode = "decal";
     }
 
     Public.setImage = function(theSource) {
+        ensureImage();
         Public.image.src = theSource;
         window.scene.update(Scene.IMAGES);
         var mySize = getImageSize(Public.image);
@@ -105,9 +107,15 @@ function LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theS
         Public.height = theSize[1];
         Public.position.x = thePosition[0];
         Public.position.y = thePosition[1];
-        Public.texture.applymode = "decal";
     }
 
+
+    function ensureImage() {
+        if (Public.image == null) {
+            Public.image = theSceneViewer.getImageManager().getImageNode(createUniqueId());
+        }
+    }
+    
     setup();
 }
 

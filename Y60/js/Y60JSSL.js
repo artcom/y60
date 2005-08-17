@@ -103,6 +103,14 @@ function stringToArray(s) {
     return s.substring(1, s.length - 1).split(",");
 }
 
+function stringToByteArray(theString) {
+    var myResult = [];
+    for (var i = 0; i < theString.length; ++i) {
+        myResult.push(theString.charCodeAt(i));
+    }
+    return myResult;
+}
+
 // Expects theDateString to be in the format "2000-1-31"
 function parseDate(theDateString) {
     var myDate = theDateString.split("-");
@@ -588,12 +596,4 @@ function trim(theString) {
         backIndex--;
     }
     return theString.substring(frontIndex, (backIndex + 1));
-}
-
-function reportException(theException) {
-    var myName = "";
-    if (theException.name != "Error") {
-        myName = theException.name + ": ";
-    }
-    print("### " + myName + trim(theException.message) + " [" + basename(theException.fileName) + ":" + theException.lineNumber + "]");
 }

@@ -44,6 +44,9 @@ use("Label.js");
 
 var ourButtonCounter = 0;
 
+const MOUSE_UP   = 0;
+const MOUSE_DOWN = 1;
+
 function ButtonBase(Public, Protected, theSceneViewer, theId, theSize, thePosition, theStyle) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -60,22 +63,50 @@ function ButtonBase(Public, Protected, theSceneViewer, theId, theSize, thePositi
         print ("Clicked " + Public.name + " - Override me!");
     }
 
+    Public.isPressed = function(theButton) {
+        return _isPressed;
+    }
+
+    Public.setPressed = function(theFlag) {
+        if (theFlag) {
+            Public.color = Protected.myStyle.selectedColor;
+        } else {
+            Public.color = Protected.myStyle.color;
+        }
+        _isPressed = theFlag;
+    }    
+
     Public.getId = function() {
         return Protected.id;
     }
 
     Public.onMouseButton = function(theState, theX, theY) {
-        if (Public.enabled && Public.visible && Public.touches(theX, theY)) {
-            if (theState == 0 && _isPressed) {
-                setPressed(false);
+        if (Public.enabled && Public.visible) {
+            if (theState == MOUSE_UP && _isPressed) {
+                Public.setPressed(false);
                 Public.onClick(this);
-            } else if (theState == 1 && !_isPressed) {
-                setPressed(true);
+            } else if (theState == MOUSE_DOWN && !_isPressed && Public.touches(theX, theY)) {
+                Public.setPressed(true);
             }
         }
     }
 
     Public.enabled = true;
+
+    Public.setToggleGroup = function(theButtons) {
+        // Replace the onMouseButton function with something more advanced
+        Public.onMouseButton = function(theState, theX, theY) {
+            if (Public.enabled && Public.visible && theState == MOUSE_DOWN && !_isPressed && Public.touches(theX, theY)) {
+                for (var i = 0; i < theButtons.length; ++i) {
+                    if (theButtons[i].isPressed()) {
+                        theButtons[i].setPressed(false);
+                    }
+                }
+                Public.setPressed(true);
+                Public.onClick(this);
+            }
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Protected
@@ -87,16 +118,7 @@ function ButtonBase(Public, Protected, theSceneViewer, theId, theSize, thePositi
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var _isPressed = false;
-
-    function setPressed(theFlag) {
-        if (theFlag) {
-            Public.color = Protected.myStyle.selectedColor;
-        } else {
-            Public.color = Protected.myStyle.color;
-        }
-        _isPressed = theFlag;
-    }
+    var _isPressed     = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -127,4 +149,24 @@ function ImageButton(theSceneViewer, theId, theSource, thePosition, theStyle) {
     var Protected = {}
     ButtonBase(Public, Protected, theSceneViewer, theId, [1,1], thePosition, theStyle);
     Public.setImage(theSource);
+}
+
+function DualImageButton(theSceneViewer, theId, theSources, thePosition, theStyle) {
+    var Base      = {};
+    var Public    = this;
+    var Protected = {};
+    ButtonBase(Public, Protected, theSceneViewer, theId, [1,1], thePosition, theStyle);
+    Public.setImage(theSources[0]);
+
+    Base.setPressed = Public.setPressed;
+    Public.setPressed = function(theFlag) {
+        if (theFlag) {
+            Public.color = Protected.myStyle.selectedColor;
+            Public.setImage(theSources[1]);
+        } else {
+            Public.color = Protected.myStyle.color;
+            Public.setImage(theSources[0]);
+        }
+        Base.setPressed(theFlag);
+    }
 }
