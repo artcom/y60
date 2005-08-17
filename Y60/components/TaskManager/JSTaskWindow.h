@@ -30,18 +30,19 @@ namespace jslib {
             typedef y60::TaskWindow NATIVE;
             typedef asl::Ptr<NATIVE> OWNERPTR;
             typedef JSWrapper<NATIVE,OWNERPTR, StaticAccessProtocol> Base;
-    
+
             JSTaskWindow(OWNERPTR theOwner, NATIVE * theNative)
                 : Base(theOwner, theNative)
             {}
-    
+
             ~JSTaskWindow() {};
-            
+
             static const char * ClassName() {
                 return "TaskWindow";
             }
             static JSFunctionSpec * Functions();
-    
+            static JSFunctionSpec * StaticFunctions();
+
             enum PropertyNumbers {
                 PROP_windowName = -100,
                 PROP_visible,
@@ -49,35 +50,35 @@ namespace jslib {
             };
 
             static JSPropertySpec * Properties();
-    
+
             virtual unsigned long length() const {
                 return 1;
             }
-    
+
             virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
             virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-    
+
             static JSBool
             Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-    
+
             static
             JSObject * Construct(JSContext *cx, OWNERPTR theOwner, NATIVE * theNative) {
                 return Base::Construct(cx, theOwner, theNative);
-            }        
-    
+            }
+
             static JSConstIntPropertySpec * ConstIntProperties();
             static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
-    
+
             static JSTaskWindow & getObject(JSContext *cx, JSObject * obj) {
                 return dynamic_cast<JSTaskWindow &>(JSTaskWindow::getJSWrapper(cx,obj));
             }
     };
-    
+
     jsval as_jsval(JSContext *cx, JSTaskWindow::OWNERPTR theOwner);
     jsval as_jsval(JSContext *cx, JSTaskWindow::OWNERPTR theOwner, JSTaskWindow::NATIVE * theNative);
 
     template <>
-    struct JSClassTraits<JSTaskWindow::NATIVE> 
+    struct JSClassTraits<JSTaskWindow::NATIVE>
         : public JSClassTraitsWrapper<JSTaskWindow::NATIVE, JSTaskWindow> {};
 }
 

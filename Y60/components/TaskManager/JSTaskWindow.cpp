@@ -91,6 +91,37 @@ namespace jslib {
         return Method<JSTaskWindow::NATIVE>::call(&JSTaskWindow::NATIVE::hideDecoration,cx,obj,argc,argv,rval);
     }
 
+    static JSBool
+    windowExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("Checks if a window with the given title exists.");
+        DOC_PARAM("theWindowTitle", DOC_TYPE_STRING);
+        DOC_END;
+        try {
+            string myWindowTitle;
+            if (argc == 1) {
+                if (!convertFrom(cx, argv[0], myWindowTitle)) {
+                    JS_ReportError(cx, "JSTaskWindow::windowExists: argument #1 must be a string");
+                    return JS_FALSE;
+                }
+            } else {
+                JS_ReportError(cx, "JSTaskWindow::windowExists: need one argument");
+                return JS_FALSE;
+            }
+            *rval = as_jsval(cx, TaskWindow::windowExists(myWindowTitle));
+            return JS_TRUE;
+        } HANDLE_CPP_EXCEPTION;
+    }
+
+    JSFunctionSpec *
+    JSTaskWindow::StaticFunctions() {
+        static JSFunctionSpec myFunctions[] = {
+            // name                  native          nargs
+            {"exists",               windowExists,     1},
+            {0}
+        };
+        return myFunctions;
+    }
+
     JSFunctionSpec *
     JSTaskWindow::Functions() {
         static JSFunctionSpec myFunctions[] = {
@@ -162,37 +193,39 @@ namespace jslib {
 
     JSBool
     JSTaskWindow::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        if (JSA_GetClass(cx,obj) != Class()) {
-            JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
-            return JS_FALSE;
-        }
-        
-        OWNERPTR myNewNative;
-
-        if (argc == 0) {
-            // Construct empty TaskWindow that will be filled by copy Construct()
-            myNewNative = OWNERPTR(new TaskWindow());
-        } else if (argc == 1) {
-            string myWindowName;
-            if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myWindowName)) {
-                JS_ReportError(cx, "JSTaskWindow::Constructor takes window name as argument");
+        try {
+            if (JSA_GetClass(cx,obj) != Class()) {
+                JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
                 return JS_FALSE;
             }
-            myNewNative = OWNERPTR(new TaskWindow(myWindowName));
-        } else {
-            JS_ReportError(cx, "JSTaskWindow::Constructor takes only one argument (window name)");
-            return JS_FALSE;
-        }
 
-        JSTaskWindow * myNewObject = new JSTaskWindow(myNewNative, &*myNewNative);
+            OWNERPTR myNewNative;
 
-        if (!myNewObject) {
-            JS_ReportError(cx, "JSTaskWindow::Constructor: bad parameters");
-            return JS_FALSE;
-        }
+            if (argc == 0) {
+                // Construct empty TaskWindow that will be filled by copy Construct()
+                myNewNative = OWNERPTR(new TaskWindow());
+            } else if (argc == 1) {
+                string myWindowName;
+                if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myWindowName)) {
+                    JS_ReportError(cx, "JSTaskWindow::Constructor takes window name as argument");
+                    return JS_FALSE;
+                }
+                myNewNative = OWNERPTR(new TaskWindow(myWindowName));
+            } else {
+                JS_ReportError(cx, "JSTaskWindow::Constructor takes only one argument (window name)");
+                return JS_FALSE;
+            }
 
-        JS_SetPrivate(cx, obj, myNewObject);
-        return JS_TRUE;
+            JSTaskWindow * myNewObject = new JSTaskWindow(myNewNative, &*myNewNative);
+
+            if (!myNewObject) {
+                JS_ReportError(cx, "JSTaskWindow::Constructor: bad parameters");
+                return JS_FALSE;
+            }
+
+            JS_SetPrivate(cx, obj, myNewObject);
+            return JS_TRUE;
+        } HANDLE_CPP_EXCEPTION;
     }
 
     JSConstIntPropertySpec *
@@ -203,7 +236,7 @@ namespace jslib {
 
     JSObject *
     JSTaskWindow::initClass(JSContext *cx, JSObject *theGlobalObject) {
-        return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+        return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties(), 0, StaticFunctions());
     }
 
     jsval as_jsval(JSContext *cx, JSTaskWindow::OWNERPTR theOwner) {

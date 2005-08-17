@@ -35,19 +35,19 @@ namespace y60 {
 
     TaskWindow::TaskWindow(HWND theHandle) : _myHandle(theHandle) {
     }
-    
+
     TaskWindow::TaskWindow(std::string theWindowTitle) {
         _myHandle = FindWindow(0, theWindowTitle.c_str());
         if (!_myHandle) {
             throw asl::Exception(string("Could not find window: ") + theWindowTitle, PLUS_FILE_LINE);
         }
-        
+
     }
-    
+
     TaskWindow::~TaskWindow() {
     }
 
-    string 
+    string
     TaskWindow::getName() const {
         char myWindowName[1024];
         GetWindowText(_myHandle, myWindowName, 1024);
@@ -72,25 +72,25 @@ namespace y60 {
     TaskWindow::setAlwaysOnTop() {
         SetWindowPos(_myHandle, HWND_TOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW);
     }
-    
-    void 
+
+    void
     TaskWindow::validateRect() {
         ValidateRect(_myHandle, 0);
     }
 
-    void 
+    void
     TaskWindow::hideDecoration() {
         SetWindowLong(_myHandle, GWL_STYLE, WS_POPUP | WS_VISIBLE);
     }
 
     void
     TaskWindow::enable() {
-        EnableWindow(_myHandle, true); 
+        EnableWindow(_myHandle, true);
     }
-    
+
     void
     TaskWindow::disable() {
-        EnableWindow(_myHandle, false); 
+        EnableWindow(_myHandle, false);
     }
 
     void
@@ -102,21 +102,21 @@ namespace y60 {
     TaskWindow::destroy() {
         SendMessage(_myHandle, WM_DESTROY, 0, 0);
     }
-    
+
     void
     TaskWindow::activate() {
         SetForegroundWindow(_myHandle);
     }
-        
-    void 
+
+    void
     TaskWindow::capture(std::string theFilename) {
         DB(cerr << "capture: " << getWindowName(_myHandle) << " to " << theFilename << endl;)
-        activate();          
+        activate();
         RECT myWindowRectangle;
         GetWindowRect(_myHandle, &myWindowRectangle);
         unsigned myWindowSizeX = myWindowRectangle.right  - myWindowRectangle.left;
         unsigned myWindowSizeY = myWindowRectangle.bottom - myWindowRectangle.top;
-        
+
         HDC myWindowDC = GetWindowDC(_myHandle);
         HDC myMemoryDC = CreateCompatibleDC(myWindowDC);
         HBITMAP myBitmapHandle = CreateCompatibleBitmap(myWindowDC, myWindowSizeX, myWindowSizeY);
@@ -130,12 +130,12 @@ namespace y60 {
         myPlBitmap.CreateFromHBitmap(myBitmapHandle);
         myPlBitmap.ApplyFilter(PLFilterFlipRGB());
         PLPNGEncoder myEncoder;
-        myEncoder.MakeFileFromBmp(theFilename.c_str(), &myPlBitmap);            
+        myEncoder.MakeFileFromBmp(theFilename.c_str(), &myPlBitmap);
 	    DeleteDC(myMemoryDC);
 	    DeleteObject(myBitmapHandle);
-	    ReleaseDC(_myHandle, myWindowDC);     
-    }        
-  
+	    ReleaseDC(_myHandle, myWindowDC);
+    }
+
     void
     TaskWindow::resize(int theX, int theY) {
         if (isVisible()) {
@@ -147,21 +147,21 @@ namespace y60 {
     TaskWindow::setPosition(const asl::Vector2i & thePosition) {
         RECT myWindowRectangle;
         GetWindowRect(_myHandle, &myWindowRectangle);
-        MoveWindow(_myHandle, thePosition[0], thePosition[1],  
+        MoveWindow(_myHandle, thePosition[0], thePosition[1],
                    myWindowRectangle.right - myWindowRectangle.left,
-                   myWindowRectangle.bottom - myWindowRectangle.top, TRUE);            
+                   myWindowRectangle.bottom - myWindowRectangle.top, TRUE);
     }
 
     asl::Vector2i
     TaskWindow::getPosition() const {
         WINDOWPLACEMENT myPlacement;
         myPlacement.length = sizeof(WINDOWPLACEMENT);
-        GetWindowPlacement(_myHandle, &myPlacement);       
+        GetWindowPlacement(_myHandle, &myPlacement);
         return asl::Vector2i(myPlacement.rcNormalPosition.left, myPlacement.rcNormalPosition.top);
     }
 
     void
-    TaskWindow::maximize() {   
+    TaskWindow::maximize() {
         ShowWindow(_myHandle, SW_SHOWMAXIMIZED);
     }
 
@@ -171,7 +171,7 @@ namespace y60 {
             ShowWindow(_myHandle, SW_SHOWMINIMIZED);
         }
     }
-    
+
     void
     TaskWindow::restore() {
         ShowWindow(_myHandle, SW_RESTORE);

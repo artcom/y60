@@ -27,7 +27,7 @@
 #include <string>
 
 namespace y60 {
-            
+
     class TaskWindow {
         public:
             TaskWindow();
@@ -37,40 +37,40 @@ namespace y60 {
 
             /// Window will stay on top
             void setAlwaysOnTop();
-            
+
             /// Enable function enables or disables mouse and keyboard input to the specified window
-            void enable();     
-            void disable();     
+            void enable();
+            void disable();
 
             /// Shows/Hides the window completely
             void setVisible(bool theShowFlag);
 
             /// send window a message that the region of a window is uptodate
             void validateRect();
-            
+
             /// Closes the window gracefully (ask user to save data, etc.)
             /// Does not work with all applicaitons (e.g. Internet Explorer)
-            void close();     
-            
+            void close();
+
             /// Destroy the window non-gracefully
             /// Does not work properly with some applications (e.g. Firefox)
-            void destroy();                          
+            void destroy();
 
             /// Same as windows buttons on the top right
             void maximize();
             void minimize();
             void restore();
-            
+
             /// Brings the window to the foreground and sets the focus
-            void activate(); 
-            
+            void activate();
+
             /// Takes a screenshot
-            void capture(std::string theFilename); 
+            void capture(std::string theFilename);
 
             /// Moves/Resizes the window
             void setPosition(const asl::Vector2i & thePosition);
             asl::Vector2i getPosition() const;
-            void resize(int theX, int theY);            
+            void resize(int theX, int theY);
 
             /// Sets the alpha of the window
             /// Does not work with OpenGL contexts
@@ -87,6 +87,10 @@ namespace y60 {
 
             /// Returns true, if window is visible
             bool isVisible() const;
+
+            static bool windowExists(std::string theWindowTitle) {
+                return FindWindow(0, theWindowTitle.c_str());
+            }
 
         private:
             HWND _myHandle;
