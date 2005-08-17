@@ -125,6 +125,8 @@ namespace y60 {
         Rect movieBounds;
         GetMovieBox(_myMovie, &movieBounds);
 
+        PixelEncoding myPixelEncoding = getPixelFormat();
+        QTNewGWorld(&_myOffScreenWorld, k32RGBAPixelFormat, &movieBounds, 0, 0, 0);
         setPixelFormat(PixelEncoding(RGBA));
         setFrameRate(25);
         setFrameWidth(movieBounds.right);
@@ -132,7 +134,7 @@ namespace y60 {
         double myDurationInSeconds = float(GetMovieDuration(_myMovie)) / GetMovieTimeScale(_myMovie);
         setFrameCount(long(myDurationInSeconds * 25));
         
-        QTNewGWorld(&_myOffScreenWorld, k32RGBAPixelFormat, &movieBounds, 0, 0, 0);
+        
         SetGWorld(_myOffScreenWorld, NULL);
         SetMovieGWorld(_myMovie, _myOffScreenWorld, NULL);
         
@@ -193,7 +195,7 @@ namespace y60 {
         Ptr baseAddr = GetPixBaseAddr(GetGWorldPixMap(_myOffScreenWorld)); 
         QTGetPixMapHandleRowBytes(GetGWorldPixMap(_myOffScreenWorld));    
         memcpy(theTargetRaster->pixels().begin(), baseAddr, theTargetRaster->pixels().size());
-             
+
         _myLastDecodedFrame = theFrameNumber;
 
     }    
