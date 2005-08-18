@@ -53,6 +53,8 @@ function OverlayBase(Public, Protected, theManager, thePosition, theParent) {
     // Delegation of all overlay node attributes
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    Public.node getter = function() { return _myNode; }
+
     Public.name getter = function() { return _myNode.name; }
     Public.name setter = function(theArgument) { _myNode.name = theArgument; }
 
@@ -161,7 +163,7 @@ function OverlayBase(Public, Protected, theManager, thePosition, theParent) {
         theManager.materials.appendChild(_myMaterial);
         _myColor = getDescendantByName(_myMaterial, "surfacecolor", true).firstChild;
 
-        var myParent = theParent ? theParent : theManager.overlays;
+        var myParent = theParent ? theParent.node : theManager.overlays;
         var myOverlayString = '<overlay name="' + myName + '" material="' + _myMaterial.id + '"/>';
         var myNode = new Node(myOverlayString);
         _myNode = myParent.appendChild(myNode.firstChild);
