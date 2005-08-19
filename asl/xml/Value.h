@@ -834,7 +834,8 @@ namespace dom {
         virtual asl::Vector4<float> getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const {
             const T & myNativeRaster = _myRasterValue.getValue();
             PIXEL myPixel = myNativeRaster(x,y);
-            asl::Vector4<float> myColor(asl::getRedValue(myPixel), asl::getGreenValue(myPixel), asl::getBlueValue(myPixel), asl::getAlphaValue(myPixel));
+            asl::Vector4<float> myColor(float(asl::getRedValue(myPixel)), float(asl::getGreenValue(myPixel)), 
+                                        float(asl::getBlueValue(myPixel)), float(asl::getAlphaValue(myPixel)));
             return myColor;
         }
         virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, float r, float g, float b, float a) {

@@ -42,6 +42,8 @@ typedef BGRA_t<pchar> BGRA;
 typedef gray<pchar> GRAY;
 typedef gray<unsigned short> GRAY16;
 typedef gray<signed short> GRAYS16;
+typedef gray<unsigned> GRAY32;
+
 typedef alpha<pchar> ALPHA;
 typedef red<pchar> RED;
 typedef green<pchar> GREEN;
