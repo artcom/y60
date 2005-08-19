@@ -69,7 +69,7 @@ namespace y60 {
         }
 
     private:
-        void copyTextureToImage(asl::Ptr<Image, dom::ThreadingModel> theImage);
+        void copyFrameBufferToImage(asl::Ptr<Image, dom::ThreadingModel> theImage);
         void copyFrameBufferToTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
         void bindTexture(asl::Ptr<Image, dom::ThreadingModel> theTexture);
         void bindOffScreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture);

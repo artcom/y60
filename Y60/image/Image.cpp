@@ -125,6 +125,7 @@ namespace y60 {
     void
     Image::createRaster(PixelEncoding theEncoding) {
         dom::DOMString myRasterName = RasterElementNames[theEncoding];
+
         if (getNode().childNodes().size()) {
             getNode().childNodes().clear();
         }

@@ -55,6 +55,8 @@ namespace y60 {
         S3TC_DXT5,
         GRAYS16,
         ALPHA,
+        DEPTH,
+        GRAY32
     };
 
     static const char * PixelEncodingString[] = {
@@ -76,6 +78,8 @@ namespace y60 {
         "S3TC_DXT5",
         "GRAYS16",
         "ALPHA",
+        "DEPTH",
+        "GRAY32",
         0
     };
     static const char * RasterEncodingString[] = {
@@ -96,7 +100,9 @@ namespace y60 {
         "RasterOfDXT3",
         "RasterOfDXT5",
         "RasterOfGRAYS16",
-        "RasterOfALPHA",
+        "RasterOfGRAY",
+        "RasterOfGRAY32",
+        "RasterOfGRAY32",
         0
     };
    static const char * RasterElementNames[] = {
@@ -117,7 +123,9 @@ namespace y60 {
         "rasterofdxt3",
         "rasterofdxt5",
         "rasterofgrays16",
-        "rasterofalpha",
+        "rasterofgray",
+        "rasterofgray32",
+        "rasterofgray32",
         0
     };
 
@@ -170,6 +178,8 @@ namespace y60 {
             case BGR:
                 myBytesPerPixel = 3;
                 break;
+            case GRAY32:
+            case DEPTH:
             case RGBA:
             case BGRA:
                 myBytesPerPixel = 4;

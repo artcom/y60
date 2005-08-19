@@ -40,6 +40,9 @@ bool mapPixelEncodingToFormat(const PixelEncoding & theEncoding,
         case GRAYS16:
             theFormat = PLPixelFormat::L16S;
             break;
+        case GRAY32:
+            theFormat = PLPixelFormat::A8R8G8B8;
+            break;
         case RGB:
 		    theFormat = PLPixelFormat::B8G8R8; // PLPixelFormats are backwards
             break;

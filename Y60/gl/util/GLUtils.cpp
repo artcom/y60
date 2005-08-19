@@ -174,6 +174,7 @@ namespace y60 {
 
     GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat) {
         switch(theFormat) {
+            case TEXTURE_IFMT_DEPTH: return GL_DEPTH;
             case TEXTURE_IFMT_ALPHA: return GL_ALPHA;
             case TEXTURE_IFMT_ALPHA4: return GL_ALPHA4;
             case TEXTURE_IFMT_ALPHA8: return GL_ALPHA8;

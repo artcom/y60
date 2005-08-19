@@ -6,7 +6,13 @@
 #include <y60/Image.h>
 #include <asl/Logger.h>
 
-
+//#define DUMP_BUFFER
+#ifdef DUMP_BUFFER
+#include <string>
+#include <paintlib/plpngenc.h>
+#include <paintlib/pltiffenc.h>
+#include <paintlib/planybmp.h>
+#endif
 using namespace dom;
 
 namespace y60 {
@@ -37,12 +43,13 @@ void OffScreenBuffer::postOffScreenRender( ImagePtr theTexture, bool theCopyToIm
     }
 
     if (theCopyToImageFlag) {
-        copyTextureToImage(theTexture);
+        copyFrameBufferToImage(theTexture);
     }
+
 }
 
-void OffScreenBuffer::copyTextureToImage(ImagePtr theImage) {
-    AC_TRACE << "OffScreenBuffer::copyTextureToImage ";
+void OffScreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
+    AC_TRACE << "OffScreenBuffer::copyFrameBufferToImage ";
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseGLFramebufferObject) {
@@ -51,12 +58,60 @@ void OffScreenBuffer::copyTextureToImage(ImagePtr theImage) {
 #endif
 
     PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(theImage->getEncoding());
+    std::cout <<"RGB: " << (myPixelEncodingInfo.externalformat==GL_RGB) << std::endl;
+    std::cout <<"DEPTH: " << (myPixelEncodingInfo.externalformat==GL_DEPTH_COMPONENT) << std::endl;
+    std::cout <<"RGBA: " << (myPixelEncodingInfo.externalformat==GL_RGBA) << std::endl;
+    std::cout <<"bytes per pixel: " << myPixelEncodingInfo.bytesPerPixel << std::endl;
+    std::cout <<"GLFLOAT: " << (myPixelEncodingInfo.pixeltype==GL_FLOAT) << std::endl;
 
     glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
                 theImage->getRasterPtr()->pixels().begin());
+#ifdef DUMP_BUFFER
+float myTestBuffer[512*512];
+/*unsigned short * myDest = &myTestBuffer[0];
+unsigned long * myStartPtr = (unsigned long*)theImage->getRasterPtr()->pixels().begin();
 
-    theImage->getRasterValueNode()->bumpVersion();
+for (int x = 0 ; x < theImage->get<ImageWidthTag>(); x++) {
+    for (int y = 0 ; y < theImage->get<ImageHeightTag>(); y++) {        
+        unsigned long myValue= *myStartPtr;
+        *myDest = (myValue>>16);
+        myStartPtr++;
+        myDest++;
+    }
+}
+*/
+//FILE * myFd = fopen("buffer.raw", "w");
+//fwrite(theImage->getRasterPtr()->pixels().begin(), theImage->get<ImageWidthTag>() * theImage->get<ImageHeightTag>() * 4 ,1, myFd);
+//fwrite(&myTestBuffer[0], theImage->get<ImageWidthTag>() * theImage->get<ImageHeightTag>() * 4,1, myFd);
+//fclose(myFd);
+    PixelEncoding myEncoding;
+    switch(long(myPixelEncodingInfo.bytesPerPixel)) {
+      case 1:
+          myEncoding = GRAY;
+          break;
+      case 3:
+          myEncoding = RGB;
+          break;
+      case 4:
+          myEncoding = RGBA;
+          break;
+    }
+
+    PLPixelFormat pf;
+    mapPixelEncodingToFormat(myEncoding, pf);
+
+    std::string myFilename("buffer.png");
+    PLAnyBmp myBmp;    
+    myBmp.Create( theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(), pf, 
+                  theImage->getRasterPtr()->pixels().begin(),
+                  theImage->get<ImageWidthTag>() * myPixelEncodingInfo.bytesPerPixel);
+    PLPNGEncoder myEncoder;
+    myEncoder.MakeFileFromBmp(myFilename.c_str(), &myBmp);               
+
+#endif
+// texture is already uploaded, either by bindTexture(..) or by copyFrameBufferToTexture(..) VS/UH
+    //theImage->getRasterValueNode()->bumpVersion(); 
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseGLFramebufferObject) {
