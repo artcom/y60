@@ -907,6 +907,12 @@ When you move around in the scene, you can see that only a part of the scene is 
 Debug culling is disabled by default.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="drawnormals" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns rendering of normals on/off. With normal rendering
+                    enabled, a small line is draw for each vertex to visualize its normal.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
                 <xs:element ref="overlays">
                     <xs:annotation>

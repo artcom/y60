@@ -29,7 +29,8 @@ namespace y60 {
                 _myLightingFlag(true),
                 _myBackfaceCullingFlag(false),
                 _myFlatShadingFlag(false),
-                _myTexturingFlag(true)
+                _myTexturingFlag(true),
+                _myDrawNormalsFlag(false)
             {
                 init();
             }
@@ -82,6 +83,14 @@ namespace y60 {
                 }
             }
 
+            void setDrawNormals(bool theFlag) {
+                _myDrawNormalsFlag = theFlag;
+            }
+
+            bool getDrawNormals() const {
+                return _myDrawNormalsFlag;
+            }
+
         private:
             void commitWireframe(bool theFlag);
             void commitLighting(bool theFlag);
@@ -94,6 +103,7 @@ namespace y60 {
             bool _myBackfaceCullingFlag;
             bool _myFlatShadingFlag;
             bool _myTexturingFlag;
+            bool _myDrawNormalsFlag;
     };
 }
 

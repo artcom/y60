@@ -155,6 +155,7 @@ namespace y60 {
             void enableVisibleLights();
             void enableLight(y60::LightPtr & theLight, int theActiveLightIndex);
             void renderSkyBox(y60::CameraPtr theCamera);
+            void drawNormals(const Primitive & thePrimitive, float theNormalScale);
 
             double getBillboardRotation(const asl::Matrix4f & theBillboardMatrix,
                                         const asl::Matrix4f & theCameraMatrix);

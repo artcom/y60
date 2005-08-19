@@ -59,6 +59,7 @@ class JSAbstractRenderWindowBase : public JSWrapper<AbstractRenderWindow,
             PROP_camera,
             PROP_projectionmatrix,
             PROP_wireframe,
+            PROP_drawnormals,
             PROP_lighting,
             PROP_flatshading,
             PROP_texturing,
@@ -451,6 +452,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 {"fixedFrameTime",  PROP_fixedFrameTime,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // unsined int
                 {"frameRate",       PROP_frameRate,         JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // double
                 {"wireframe",       PROP_wireframe,         JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+                {"drawnormals",     PROP_drawnormals,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
                 {"lighting",        PROP_lighting,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
                 {"flatshading",     PROP_flatshading,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
                 {"texturing",       PROP_texturing,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
@@ -504,6 +506,9 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                     return JS_TRUE;
                 case PROP_wireframe:
                     *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportWireframeTag>());
+                    return JS_TRUE;
+                case PROP_drawnormals:
+                    *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportDrawNormalsTag>());
                     return JS_TRUE;
                 case PROP_backfaceCulling:
                     *vp = as_jsval(cx, theNative.getSingleViewport()->y60::Viewport::get<y60::ViewportBackfaceCullingTag>());
@@ -592,6 +597,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                     return setViewportAttribute<y60::ViewportDebugCullingTag>(theNative, cx, vp);
                 case PROP_wireframe:
                     return setViewportAttribute<y60::ViewportWireframeTag>(theNative, cx, vp);
+                case PROP_drawnormals:
+                    return setViewportAttribute<y60::ViewportDrawNormalsTag>(theNative, cx, vp);
                 case PROP_texturing:
                     return setViewportAttribute<y60::ViewportTexturingTag>(theNative, cx, vp);
                 case PROP_backgroundColor:

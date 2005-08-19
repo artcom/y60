@@ -51,6 +51,7 @@
 #include <y60/Primitive.h>
 
 #include <y60/Viewport.h>
+#include <y60/VertexDataRoles.h>
 
 #include "GLResourceManager.h"
 
@@ -317,6 +318,7 @@ namespace y60 {
         MAKE_SCOPE_TIMER(renderBodyPart);
         CHECK_OGL_ERROR;
         y60::BodyPtr myBody = theBodyPart.getBody();
+        y60::ShapePtr myShape = myBody->getShape();
         bool myBodyHasChanged = _myPreviousBody != &(*myBody);
         if (myBodyHasChanged) {
             MAKE_SCOPE_TIMER(update_bodymatrix);
@@ -325,7 +327,7 @@ namespace y60 {
 
             // draw body bounding-box
             if (_myBoundingVolumeMode & BV_BODY) {
-                const asl::Box3f & myBoundingBox = myBody->get<BoundingBoxTag>();
+                const Box3f & myBoundingBox = myBody->get<BoundingBoxTag>();
                 renderBoundingBox(myBoundingBox);
                 CHECK_OGL_ERROR;
             }
@@ -342,6 +344,15 @@ namespace y60 {
         }
 
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
+        if (_myState.getDrawNormals()) {
+            glPushAttrib(GL_ALL_ATTRIB_BITS);
+            glDisable(GL_LIGHTING);
+            const Box3f & myBoundingBox = myShape->get<BoundingBoxTag>();
+            float myDiameter = magnitude(myBoundingBox[Box3f::MAX] - myBoundingBox[Box3f::MIN]);
+            drawNormals(myPrimitive, myDiameter / 64.0f);
+            glPopAttrib();
+        }
+
         unsigned myMaterialIndex = myPrimitive.getMaterialIndex();
         bool     myMaterialHasChanged = (myMaterialIndex != _myPreviousMaterialIndex);
 
@@ -357,7 +368,7 @@ namespace y60 {
 
         bool isRendered = false;
 
-        const std::vector<RenderStyleType> & myRenderStyles = myBody->getShape()->getRenderStyles();
+        const std::vector<RenderStyleType> & myRenderStyles = myShape->getRenderStyles();
 
         bool myIgnoreDepthFlag = (std::find(myRenderStyles.begin(), myRenderStyles.end(),
                                             IGNORE_DEPTH) !=  myRenderStyles.end());
@@ -395,6 +406,28 @@ namespace y60 {
             const asl::Box3f & myBoundingBox = myShapeNode->getFacade<Shape>()->get<BoundingBoxTag>();
             renderBoundingBox(myBoundingBox);
             CHECK_OGL_ERROR;
+        }
+    }
+
+    void
+    Renderer::drawNormals(const Primitive & thePrimitive, float theNormalScale) {
+        if (thePrimitive.hasVertexData(NORMALS)) {
+            glPushAttrib(GL_ALL_ATTRIB_BITS);
+            glColor3f(1.0f, .5f, 0);
+
+            Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = thePrimitive.getConstLockingPositionsAccessor();
+            Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = thePrimitive.getConstLockingNormalsAccessor();
+            const VertexData3f & myPositions = myPositionAccessor->get();
+            const VertexData3f & myNormals = myNormalsAccessor->get();
+            Vector3f myNormalTip;
+            glBegin(GL_LINES);
+            for (int i = 0; i < myPositions.size(); ++i) {
+                glVertex3fv(myPositions[i].begin());
+                myNormalTip = myPositions[i] + (myNormals[i] * theNormalScale);
+                glVertex3fv(myNormalTip.begin());
+            }
+            glEnd();
+            glPopAttrib();
         }
     }
 
@@ -776,7 +809,7 @@ namespace y60 {
         _myState.setLighting(theViewport->get<ViewportLightingTag>());
         _myState.setBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
         _myState.setTexturing(theViewport->get<ViewportTexturingTag>());
-
+        _myState.setDrawNormals(theViewport->get<ViewportDrawNormalsTag>()); 
         CHECK_OGL_ERROR;
     }
 

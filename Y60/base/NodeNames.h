@@ -189,6 +189,7 @@ namespace y60 {
     static const char * VIEWPORT_TOP_ATTRIB         = "top";    // in pixels
     static const char * VIEWPORT_BACKFACECULLING_ATTRIB = "backfaceculling";
     static const char * VIEWPORT_WIREFRAME_ATTRIB   = "wireframe";
+    static const char * VIEWPORT_DRAWNORMALS_ATTRIB = "drawnormals";
     static const char * VIEWPORT_LIGHTING_ATTRIB    = "lighting";
     static const char * VIEWPORT_FLATSHADING_ATTRIB = "flatshading";
     static const char * VIEWPORT_TEXTURING_ATTRIB   = "texturing";
