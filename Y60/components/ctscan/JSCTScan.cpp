@@ -188,8 +188,8 @@ countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
         convertFrom(cx, argv[3], myDownSampleRate);
 
         CTScan & myCTScan = myObj.getNative();
-        int myTriangleCount = myCTScan.countTriangles(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate);
-        *rval = as_jsval(cx, myTriangleCount);
+        asl::Vector2i myCount = myCTScan.countTriangles(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate);
+        *rval = as_jsval(cx, myCount);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -198,7 +198,7 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
 
-        ensureParamCount(argc, 5);
+        ensureParamCount(argc, 5, 7);
 
         // have to convert a Box3f into a Box3i because Box3i isn't available in JS
         asl::Box3f myFloatBox;
@@ -220,9 +220,17 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         bool myCreateNormalsFlag;
         convertFrom(cx, argv[4], myCreateNormalsFlag);
 
+        unsigned myNumVertices = 0;
+        if (argc > 5) {
+            convertFrom(cx, argv[5], myNumVertices);
+        }
+        unsigned myNumTriangles = 0;
+        if (argc > 6) {
+            convertFrom(cx, argv[6], myNumTriangles);
+        }
         CTScan & myCTScan = myObj.getNative();
         ScenePtr myScene = myCTScan.polygonize(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,  
-            myCreateNormalsFlag, JSApp::getPackageManager());
+            myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles);
         *rval = as_jsval(cx, myScene);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -262,7 +270,7 @@ JSCTScan::Functions() {
         {"getVoxelSize",         getVoxelSize,            0},
         {"getVoxelDimensions",   getVoxelDimensions,      0},
         {"getValueRange",        getValueRange,           0},
-        {"polygonize",           polygonize,              5},
+        {"polygonize",           polygonize,              7},
         {"countTriangles",       countTriangles,          4},
         {"create3DTexture",      create3DTexture,         2},
         {"computeHistogram",     computeHistogram,        1},

@@ -110,10 +110,6 @@ namespace y60 {
                                      theBox.getMax()[0]/_myDownSampleRate,
                                      theBox.getMax()[1]/_myDownSampleRate,
                                      theBox.getMax()[2]/_myDownSampleRate);
-                /*
-                std::swap( myTempBox[asl::Box3i::MIN][0], myTempBox[asl::Box3i::MIN][1]);
-                std::swap( myTempBox[asl::Box3i::MAX][0], myTempBox[asl::Box3i::MAX][1]);
-                */
                 checkBox(myTempBox);
                 _myVBox = myTempBox;
                 asl::Vector3i mySize = _myVBox.getSize();
@@ -167,6 +163,10 @@ namespace y60 {
                     *theTriangleCount = _myHalfEdgeCount/3;
                 }
             }
+            void reserveBuffers(unsigned int theVertexCount, unsigned int theTriangleCount) {
+                _myVertexCount = theVertexCount;
+                _myHalfEdgeCount = theTriangleCount*3;
+            }
 
             dom::NodePtr apply(const std::string & theShapeName, const std::string & theMaterialId) {
                 dom::NodePtr myShapeNode = prepareShapeBuilder(theShapeName, theMaterialId);
@@ -209,7 +209,6 @@ namespace y60 {
                 _myShapeBuilder->appendElements( * _myElementBuilder );
 
                 // UH: the ShapeBuilder:: prefix is necessary for gcc to work
-                // TODO find a better way to speed up things ....
                 _myVertexNode = _myShapeBuilder->ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE);
                 _myVertices = _myVertexNode->dom::Node::nodeValuePtrOpen<std::vector<asl::Vector3f> >();
                 _myIndexNode = _myElementBuilder->createIndex(POSITION_ROLE, POSITIONS);
@@ -563,8 +562,8 @@ namespace y60 {
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
 
                         if (_myVertexNormalFlag){
-                            calcGradient(float(_myCurrent[3]) - _myJPost0Val, float(_myCurrent[1]) - _myIPost0Val, float(_myCurrent[4]) - _myKPost0Val, g0);
-                            calcGradient(float(_myCurrent[2]) - _myJPost1Val, float(_myIPre1Val) - _myCurrent[0], float(_myCurrent[5]) - _myKPost1Val, g1);
+                            calcGradient(float(_myCurrent[3]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch)), float(_myCurrent[1]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch)), float(_myCurrent[4]) - clampedAt(asl::Vector3i(iMarch, jMarch, kMarch-1)), g0);
+                            calcGradient(float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch))) - _myCurrent[0], float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch-1)), g1);
                             theVertexNormal = -1.0 * (g0 + li * (g1 - g0));
                         }
                         break;
@@ -576,8 +575,8 @@ namespace y60 {
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
 
                         if (_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[2]) - _myJPost1Val, float(_myIPre1Val) - _myCurrent[0], float(_myCurrent[5]) - _myKPost1Val, g1);
-                            calcGradient(float(_myJPre2Val) - _myCurrent[1], float(_myIPre2Val) - _myCurrent[3], float(_myCurrent[6]) - _myKPost2Val, g2);
+                            calcGradient(float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch))) - _myCurrent[0], float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch-1)), g1);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch))) - _myCurrent[1], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch))) - _myCurrent[3], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch-1)), g2);
                             theVertexNormal = -1.0 * (g1 + li * (g2 - g1));
                         }
                         break;
@@ -589,8 +588,8 @@ namespace y60 {
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag){
-                            calcGradient(float(_myJPre2Val) - _myCurrent[1], float(_myIPre2Val) - _myCurrent[3], float(_myCurrent[6]) - _myKPost2Val, g2);
-                            calcGradient(float(_myJPre3Val) - _myCurrent[0], float(_myCurrent[2]) - _myIPost3Val, float(_myCurrent[7]) - _myKPost3Val, g3);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch))) - _myCurrent[1], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch))) - _myCurrent[3], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch-1)), g2);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch))) - _myCurrent[0], float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch)), float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch-1)), g3);
                             theVertexNormal = -1.0 * (g3 + li * (g2 - g3));
                         }
                         break;
@@ -602,8 +601,8 @@ namespace y60 {
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[3]) - _myJPost0Val, float(_myCurrent[1]) - _myIPost0Val, float(_myCurrent[4]) - _myKPost0Val, g0);
-                            calcGradient(float(_myJPre3Val) - _myCurrent[0], float(_myCurrent[2]) - _myIPost3Val, float(_myCurrent[7]) - _myKPost3Val, g3);
+                            calcGradient(float(_myCurrent[3]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch)), float(_myCurrent[1]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch)), float(_myCurrent[4]) - clampedAt(asl::Vector3i(iMarch, jMarch, kMarch-1)), g0);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch))) - _myCurrent[0], float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch)), float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch-1)), g3);
                             theVertexNormal = -1.0 * (g0 + li * (g3 - g0));
                         }
                         break;
@@ -615,8 +614,8 @@ namespace y60 {
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[7]) - _myJPost4Val, float(_myCurrent[5]) - _myIPost4Val, float(_myKPre4Val) - _myCurrent[0], g4);
-                            calcGradient(float(_myCurrent[6]) - _myJPost5Val, float(_myIPre5Val) - _myCurrent[4], float(_myKPre5Val) - _myCurrent[1], g5);
+                            calcGradient(float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch+1)), float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch, kMarch+2))) - _myCurrent[0], g4);
+                            calcGradient(float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch+1))) - _myCurrent[4], float(clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch+2))) - _myCurrent[1], g5);
                             theVertexNormal = -1.0 * (g4 + li * (g5 - g4));
                         }
                         break;
@@ -628,8 +627,8 @@ namespace y60 {
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[6]) - _myJPost5Val, float(_myIPre5Val) - _myCurrent[4], float(_myKPre5Val) - _myCurrent[1], g5);
-                            calcGradient(float(_myJPre6Val) - _myCurrent[5], float(_myIPre6Val) - _myCurrent[7], float(_myKPre6Val) - _myCurrent[2], g6);
+                            calcGradient(float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch+1))) - _myCurrent[4], float(clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch+2))) - _myCurrent[1], g5);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch+1))) - _myCurrent[5], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch+1))) - _myCurrent[7], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch+2))) - _myCurrent[2], g6);
                             theVertexNormal = -1.0 * (g5 + li * (g6 - g5));
                         }
                         break;
@@ -641,8 +640,8 @@ namespace y60 {
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myJPre6Val) - _myCurrent[5], float(_myIPre6Val) - float(_myCurrent[7]), float(_myKPre6Val) - _myCurrent[2], g6);
-                            calcGradient(float(_myJPre7Val) - _myCurrent[4], float(_myCurrent[6]) - _myIPost7Val, float(_myKPre7Val) - _myCurrent[3], g7);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch+1))) - _myCurrent[5], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch+1))) - float(_myCurrent[7]), float(clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch+2))) - _myCurrent[2], g6);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch+1))) - _myCurrent[4], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch+2))) - _myCurrent[3], g7);
                             theVertexNormal = -1.0 * (g7 + li * (g6 - g7));
                         }
                         break;
@@ -654,8 +653,8 @@ namespace y60 {
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[7]) - _myJPost4Val, float(_myCurrent[5]) - _myIPost4Val, float(_myKPre4Val) - _myCurrent[0], g4);
-                            calcGradient(float(_myJPre7Val) - _myCurrent[4], float(_myCurrent[6]) - _myIPost7Val, float(_myKPre7Val) - _myCurrent[3], g7);
+                            calcGradient(float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch+1)), float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch, kMarch+2))) - _myCurrent[0], g4);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch+1))) - _myCurrent[4], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch+2))) - _myCurrent[3], g7);
                             theVertexNormal = -1.0 * (g4 + li * (g7 - g4));
                         }
                         break;
@@ -667,8 +666,8 @@ namespace y60 {
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[3]) - _myJPost0Val, float(_myCurrent[1]) - _myIPost0Val, float(_myCurrent[4]) - _myKPost0Val, g0);
-                            calcGradient(float(_myCurrent[7]) - _myJPost4Val, float(_myCurrent[5]) - _myIPost4Val, float(_myKPre4Val) - _myCurrent[0], g4);
+                            calcGradient(float(_myCurrent[3]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch)), float(_myCurrent[1]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch)), float(_myCurrent[4]) - clampedAt(asl::Vector3i(iMarch, jMarch, kMarch-1)), g0);
+                            calcGradient(float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch+1)), float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch, kMarch+2))) - _myCurrent[0], g4);
                             theVertexNormal = -1.0 * (g0 + li * (g4 - g0));
                         }
                         break;
@@ -680,8 +679,8 @@ namespace y60 {
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[2]) - _myJPost1Val, float(_myIPre1Val) - _myCurrent[0], float(_myCurrent[5]) - _myKPost1Val, g1);
-                            calcGradient(float(_myCurrent[6]) - _myJPost5Val, float(_myIPre5Val) - _myCurrent[4], float(_myKPre5Val) - _myCurrent[1], g5);
+                            calcGradient(float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch))) - _myCurrent[0], float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch-1)), g1);
+                            calcGradient(float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch+1))) - _myCurrent[4], float(clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch+2))) - _myCurrent[1], g5);
                             theVertexNormal = -1.0 * (g1 + li * (g5 - g1));
                         }
                         break;
@@ -693,8 +692,8 @@ namespace y60 {
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myJPre2Val) - _myCurrent[1], float(_myIPre2Val) - _myCurrent[3], float(_myCurrent[6]) - _myKPost2Val, g2);
-                            calcGradient(float(_myJPre6Val) - _myCurrent[5], float(_myIPre6Val) - _myCurrent[7], float(_myKPre6Val) - _myCurrent[2], g6);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch))) - _myCurrent[1], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch))) - _myCurrent[3], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch-1)), g2);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch+1))) - _myCurrent[5], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch+1))) - _myCurrent[7], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch+2))) - _myCurrent[2], g6);
                             theVertexNormal = -1.0 * (g2 + li * (g6 - g2));
                         }
 
@@ -707,8 +706,8 @@ namespace y60 {
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myJPre3Val) - _myCurrent[0], float(_myCurrent[2]) - _myIPost3Val, float(_myCurrent[7]) - _myKPost3Val, g3);
-                            calcGradient(float(_myJPre7Val) - _myCurrent[4], float(_myCurrent[6]) - _myIPost7Val, float(_myKPre7Val) - _myCurrent[3], g7);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch))) - _myCurrent[0], float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch)), float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch-1)), g3);
+                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch+1))) - _myCurrent[4], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch+2))) - _myCurrent[3], g7);
                             theVertexNormal = -1.0 * (g3 + li * (g7 - g3));
                         }
                         break;
@@ -742,7 +741,6 @@ namespace y60 {
 
             /**
              * Gets a (downsampled) value from the Voxel data. 
-             * @warn x is j, y is i and z is k
              */
             inline
             const VoxelT &
@@ -750,19 +748,30 @@ namespace y60 {
                 return _mySlices[z*_myDownSampleRate][_myLineStride*y*_myDownSampleRate + x*_myDownSampleRate];
             }
 
+            /**
+             * Gets a (downsampled) value from the Voxel data. 
+             */
             inline
             const VoxelT &
-            clippedAt(const asl::Vector3i & thePosition) const {
+            at(const asl::Vector3i & thePosition) const {
+                asl::Vector3i mySampledPosition = thePosition * _myDownSampleRate;
+                return _mySlices[mySampledPosition[2]][mySampledPosition[1]*_myLineStride + mySampledPosition[0]];
+            }
+
+
+            inline
+            const VoxelT &
+            clampedAt(const asl::Vector3i & thePosition) const {
                 asl::Vector3i myClippedPosition = thePosition;
                 for (int i = 0; i < 3; ++i) {
-                    if (thePosition[i] < 0) {
-                        myClippedPosition[i] = 0;
+                    if (thePosition[i] < _myVBox[asl::Box3i::MIN][i]) {
+                        myClippedPosition[i] = _myVBox[asl::Box3i::MIN][i];
                     }
                     if (thePosition[i] >= _myVBox[asl::Box3i::MAX][i]) {
                         myClippedPosition[i] = _myVBox[asl::Box3i::MAX][i]-1;
                     }
                 }
-                return at(myClippedPosition[1], myClippedPosition[0], myClippedPosition[2]);
+                return at(myClippedPosition);
             }
 
             inline VoxelT
@@ -847,18 +856,6 @@ namespace y60 {
                 _myTopYEdge.resize(_myDimensions[0], -1);
                 _myZEdge.resize(_myDimensions[0], -1);
 
-                int postSlice, lowSlice, highSlice, preSlice;
-                // asl::Ptr<VoxelSampler<VoxelT> > postSlice, lowSlice, highSlice, preSlice;
-                if (kBoxStart > 0) {
-                    postSlice = kBoxStart - 1;
-                }
-                lowSlice = kBoxStart;
-                if(kBoxStart == 0) {
-                    postSlice = lowSlice;
-                }
-                highSlice = kBoxStart+1;
-                preSlice = kBoxStart+2;
-
                 for(k = kBoxStart; k < kBoxEnd; k++) {
                     _myVoxelData->notifyProgress(double(k - kBoxStart) / double(kBoxEnd - kBoxStart),
                             theDryRun ? "estimating" : "polygonizing");
@@ -868,94 +865,36 @@ namespace y60 {
                         for(i = iBoxStart; i < iBoxEnd; i++) {
 
                             cubeIndex = 0;
-                            if(isOutside(i, j, lowSlice)) {
+                            if(isOutside(i, j, k)) {
                                 cubeIndex |= BIT_0;
                             }
-                            if(isOutside(i, j+1, lowSlice)) {
+                            if(isOutside(i, j+1, k)) {
                                 cubeIndex |= BIT_1;
                             }
-                            if(isOutside(i+1, j+1, lowSlice)) {
+                            if(isOutside(i+1, j+1, k)) {
                                 cubeIndex |= BIT_2;
                             }
-                            if(isOutside(i+1, j, lowSlice)) {
+                            if(isOutside(i+1, j, k)) {
                                 cubeIndex |= BIT_3;
                             }
-                            if(isOutside(i, j, highSlice)) {
+                            if(isOutside(i, j, k+1)) {
                                 cubeIndex |= BIT_4;
                             }
-                            if(isOutside(i, j+1, highSlice)) {
+                            if(isOutside(i, j+1, k+1)) {
                                 cubeIndex |= BIT_5;
                             }
-                            if(isOutside(i+1, j+1, highSlice)) {
+                            if(isOutside(i+1, j+1, k+1)) {
                                 cubeIndex |= BIT_6;
                             }
-                            if(isOutside(i+1, j, highSlice)) {
+                            if(isOutside(i+1, j, k+1)) {
                                 cubeIndex |= BIT_7;
                             }
 
                             if((cubeIndex > 0) && (cubeIndex < 255)) {
-                                fillVoxelCube(i, j, k, _myCurrent);                                
-                                _myIPost0Val = j > jBoxStart ? 
-                                    at(i,j-1,lowSlice) : _myCurrent[0];
-                                _myJPost0Val = i > iBoxStart ?
-                                    at(i-1,j,lowSlice) : _myCurrent[0];
-                                _myKPost0Val = at(i,j,postSlice);
-
-                                _myIPost3Val = j > jBoxStart ? 
-                                    at(i+1,j-1,lowSlice) : _myCurrent[3];
-                                _myJPre3Val = i < iBoxEnd - 1 ? 
-                                    at(i+2,j,lowSlice) : _myCurrent[3];
-                                _myKPost3Val = at(i+1,j,postSlice);
-
-                                _myIPre1Val = j < jBoxEnd - 1 ? 
-                                    at(i,j+2,lowSlice) : _myCurrent[1];
-                                _myJPost1Val = i > iBoxStart ? 
-                                    at(i-1,j+1,lowSlice) : _myCurrent[1];
-                                _myKPost1Val = at(i,j+1,postSlice);
-                                
-                                _myIPost4Val = j > jBoxStart ? 
-                                    at(i,j-1,highSlice) : _myCurrent[4];
-                                _myJPost4Val = i > iBoxStart ? 
-                                    at(i-1,j,highSlice) : _myCurrent[4];
-                                _myKPre4Val = at(i,j,preSlice);
-
-                                _myJPre6Val  = i < iBoxEnd - 1 ? 
-                                    at(i+2,j+1,highSlice) : _myCurrent[6];
-                                _myIPre6Val  = j < jBoxEnd - 1 ? 
-                                    at(i+1,j+2,highSlice) : _myCurrent[6];
-                                _myKPre6Val = at(i+1,j+1,preSlice);
-
-                                _myJPost5Val = i > iBoxStart ? 
-                                    at(i-1,j+1,highSlice) : _myCurrent[5];
-                                _myIPre5Val  = j < jBoxEnd - 1 ? 
-                                    at(i,j+2,highSlice) : _myCurrent[5];
-                                _myKPre5Val = at(i,j+1,preSlice);
-
-                                _myIPost7Val = j > jBoxStart ? 
-                                    at(i+1,j-1,highSlice) : _myCurrent[7];
-                                _myJPre7Val  = i < iBoxEnd - 1 ? 
-                                    at(i+2,j,highSlice) : _myCurrent[7];
-                                _myKPre7Val = at(i+1,j,preSlice);
-
-                                _myIPre2Val  = j < jBoxEnd - 1 ? 
-                                    at(i+1,j+2,lowSlice) : _myCurrent[2];
-                                _myJPre2Val  = i < iBoxEnd - 1 ? 
-                                    at(i+2,j+1,lowSlice) : _myCurrent[2];
-                                _myKPost2Val = at(i+1,j+1,postSlice);
+                                fillVoxelCube(i, j, k, _myCurrent);
                                 triangulateVoxel(cubeIndex, i, j, k, theDryRun);
                             }
                         }
-                    }
-                    postSlice = lowSlice;
-                    lowSlice = highSlice;
-                    highSlice = preSlice;
-
-                    if(k < kBoxEnd - 2) {
-                        preSlice = k+3;
-                    } else if (k < kBoxEnd - 1) {
-                        preSlice = k+2;
-                    } else if (k < kBoxEnd) {
-                        preSlice = k+1;
                     }
                 }
 
@@ -1007,12 +946,8 @@ namespace y60 {
             std::vector<int> _myYEdge;
             std::vector<int> _myTopYEdge;
             std::vector<int> _myZEdge;
-            int   _myOld6Pt, _myOld10Pt, _myOld11Pt, _myOld2Pt; // old vertex indices in j order
+            int   _myOld6Pt, _myOld10Pt, _myOld11Pt, _myOld2Pt; // old vertex indices in i order
             std::vector<VoxelT> _myCurrent;
-            VoxelT _myIPost0Val, _myJPost0Val, _myKPost0Val, _myIPre1Val, _myJPost1Val, _myKPost1Val;
-            VoxelT _myIPre2Val, _myJPre2Val, _myKPost2Val, _myIPost3Val, _myJPre3Val, _myKPost3Val;
-            VoxelT _myIPost4Val, _myJPost4Val, _myKPre4Val, _myIPre5Val, _myJPost5Val,_myKPre5Val;
-            VoxelT _myIPre6Val, _myJPre6Val, _myKPre6Val, _myIPost7Val, _myJPre7Val, _myKPre7Val;
             int  _myMarchSegment[numSegments];
             bool _myVertexNormalFlag;
             bool _myInvertNormalsFlag;

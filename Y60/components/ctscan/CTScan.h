@@ -81,12 +81,13 @@ class CTScan {
         /** Returns the minimum/maximum voxel value possible in the dataset */
         asl::Vector2d getValueRange();
 
-        unsigned int countTriangles(const asl::Box3i & theVoxelBox, 
+        asl::Vector2i countTriangles(const asl::Box3i & theVoxelBox, 
             double theThresholdMin, double theThresholdMax, int theDownSampleRate);
 
         /** Create an isosurface from the voxel dataset */
         ScenePtr polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
-            int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager);
+            int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
+            unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
 
         /** Create a downscaled 3D texture from the dataset */
         void create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize);
@@ -136,7 +137,7 @@ class CTScan {
         applyMarchingCubes(const asl::Box3i & theVoxelBox, 
                              double theThresholdMin, double theThresholdMax, int theDownSampleRate,
                              bool theCreateNormalsFlag, 
-                             ScenePtr theScene);
+                             ScenePtr theScene, unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
         template <class VoxelT>
         void
         countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram);

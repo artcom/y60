@@ -228,7 +228,7 @@ template <class VoxelT>
 void
 CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox,
                              double theThresholdMin, double theThresholdMax, int theDownSampleRate,
-                             bool theCreateNormalsFlag, ScenePtr theScene)
+                             bool theCreateNormalsFlag, ScenePtr theScene, unsigned int theNumVertices, unsigned int theNumTriangles)
 {
     SceneBuilderPtr mySceneBuilder = theScene->getSceneBuilder();
     std::string myMaterialId = setupMaterial( mySceneBuilder, theCreateNormalsFlag);
@@ -239,7 +239,11 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox,
     myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
     //myMarcher.setThreshold(VoxelT(theThresholdMax));
     myMarcher.calcNormals(theCreateNormalsFlag);
-    myMarcher.estimate();
+    if (theNumVertices == 0 || theNumTriangles == 0) {
+        myMarcher.estimate();
+    } else {
+        myMarcher.reserveBuffers(theNumVertices, theNumTriangles);
+    }
     dom::NodePtr myShapeNode = myMarcher.apply("polygonal_shape", myMaterialId);
 
     setupScene(theScene, myShapeNode->getAttributeString("id"));
@@ -265,7 +269,7 @@ CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox,
     myMarcher.estimate(&theVertexCount, &theTriangleCount);
 }
 
-unsigned int
+asl::Vector2i
 CTScan::countTriangles(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, int theDownSampleRate)
 {
     unsigned int myVertexCount;
@@ -284,11 +288,11 @@ CTScan::countTriangles(const asl::Box3i & theVoxelBox, double theThresholdMin, d
         default:
             throw CTScanException("Unhandled voxel type in CTScan::countTriangles()", PLUS_FILE_LINE);
     }
-    return myTriangleCount;
+    return asl::Vector2i(myVertexCount, myTriangleCount);
 }
 ScenePtr
 CTScan::polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, int theDownSampleRate, 
-                   bool theCreateNormalsFlag, PackageManagerPtr thePackageManager)
+                   bool theCreateNormalsFlag, PackageManagerPtr thePackageManager, unsigned int theNumVertices, unsigned int theNumTriangles)
 {
     asl::Time myStartTime;
 
@@ -296,13 +300,13 @@ CTScan::polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, doubl
     myScene->createStubs(thePackageManager);    
     switch (_myEncoding) {
         case y60::GRAY:
-            applyMarchingCubes<unsigned char>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, theCreateNormalsFlag, myScene);
+            applyMarchingCubes<unsigned char>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, theCreateNormalsFlag, myScene, theNumVertices, theNumTriangles);
             break;
         case y60::GRAY16:
-            applyMarchingCubes<unsigned short>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, theCreateNormalsFlag, myScene);
+            applyMarchingCubes<unsigned short>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, theCreateNormalsFlag, myScene, theNumVertices, theNumTriangles);
             break;
         case y60::GRAYS16:
-            applyMarchingCubes<short>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, theCreateNormalsFlag, myScene);
+            applyMarchingCubes<short>(theVoxelBox, theThresholdMin, theThresholdMax, theDownSampleRate, theCreateNormalsFlag, myScene, theNumVertices, theNumTriangles);
             break;
         default:
             throw CTScanException("Unhandled voxel type in CTScan::polygonize()", PLUS_FILE_LINE);
