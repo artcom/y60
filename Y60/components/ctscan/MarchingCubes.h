@@ -76,8 +76,8 @@ namespace y60 {
 
                 _myLineStride = theVoxelData->getVoxelDimensions()[0];
                 
-                _myDimensions[0] = theVoxelData->getVoxelDimensions()[1] / _myDownSampleRate;
-                _myDimensions[1] = theVoxelData->getVoxelDimensions()[0] / _myDownSampleRate;
+                _myDimensions[0] = theVoxelData->getVoxelDimensions()[0] / _myDownSampleRate;
+                _myDimensions[1] = theVoxelData->getVoxelDimensions()[1] / _myDownSampleRate;
                 _myDimensions[2] = theVoxelData->getVoxelDimensions()[2] / _myDownSampleRate;
                 
                 _myVoxelSize = theVoxelData->getVoxelAspect()*_myDownSampleRate;
@@ -110,10 +110,10 @@ namespace y60 {
                                      theBox.getMax()[0]/_myDownSampleRate,
                                      theBox.getMax()[1]/_myDownSampleRate,
                                      theBox.getMax()[2]/_myDownSampleRate);
-
+                /*
                 std::swap( myTempBox[asl::Box3i::MIN][0], myTempBox[asl::Box3i::MIN][1]);
                 std::swap( myTempBox[asl::Box3i::MAX][0], myTempBox[asl::Box3i::MAX][1]);
-
+                */
                 checkBox(myTempBox);
                 _myVBox = myTempBox;
                 asl::Vector3i mySize = _myVBox.getSize();
@@ -229,7 +229,6 @@ namespace y60 {
                     _myNormalNode = _myShapeBuilder->ShapeBuilder::createVertexDataBin<asl::Vector3f>(NORMAL_ROLE);
                     _myNormals = _myNormalNode->dom::Node::nodeValuePtrOpen<std::vector<asl::Vector3f> >();
 					_myNormals->reserve(_myVertexCount);
-                    //_myElemen   tBuilder->createIndex(NORMAL_ROLE, NORMALS);
                 } else {
                     _myNormals = 0;
                 }
@@ -256,10 +255,10 @@ namespace y60 {
                 asl::Vector3f myVertexNormal;
                 calcVoxelIntersect(n, iMarch, jMarch, kMarch, myVertexPosition, myVertexNormal);
 
-                asl::Vector3f myVertex(myVertexPosition[1], - myVertexPosition[0], myVertexPosition[2]);
+                asl::Vector3f myVertex(myVertexPosition[0], - myVertexPosition[1], myVertexPosition[2]);
                 _myVertices->push_back(myVertex);
                 if (_myVertexNormalFlag) {
-                    _myNormals->push_back(normalized(asl::Vector3f(myVertexNormal[1], - myVertexNormal[0], myVertexNormal[2])));
+                    _myNormals->push_back(normalized(asl::Vector3f(myVertexNormal[0], - myVertexNormal[1], myVertexNormal[2])));
                 }
                 return _myVertices->size()-1;
             }
@@ -295,82 +294,90 @@ namespace y60 {
 				int (MarchingCubes<VoxelT>::*myOnVertex)(int n, int iMarch, int jMarch, int kMarch) = 0;
 
                 const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[cubeIndex]; 
+                const int iBoxStart = _myVBox[asl::Box3i::MIN][0];
+                const int iBoxEnd   = _myVBox[asl::Box3i::MAX][0];
+                const int jBoxStart = _myVBox[asl::Box3i::MIN][1];
+                const int jBoxEnd   = _myVBox[asl::Box3i::MAX][1];
+                const int kBoxStart = _myVBox[asl::Box3i::MIN][2];
+                const int kBoxEnd   = _myVBox[asl::Box3i::MAX][2];
 
 				if (theDryRun) { 
 					myOnVertex = &MarchingCubes<VoxelT>::countVertex;
 				} else {
 					myOnVertex = &MarchingCubes<VoxelT>::outputVertex;
 				}
-                AC_TRACE << "triangulateVoxel(" << cubeIndex << ", " << iMarch << "," << jMarch << "," << kMarch << ")";
+                AC_TRACE << "triangulateVoxel(" << cubeIndex << ", " << jMarch << "," << iMarch << "," << kMarch << ")";
                 const std::vector<int> & myEdges = myCubeCase.edges;
                 int myEdgeCount = myEdges.size();
                 for (int i = 0; i < myEdgeCount; ++i) {
                     edge = myEdges[i];
                     AC_TRACE << "     edge case :" << edge;
-
+#if 0
+                    vertOffset = (this->*myOnVertex)  (edge, iMarch, jMarch, kMarch);
+#else
                     switch (edge) {
                         case 0:
-                            if(_myStartZ) {
-                                if (_myStartY) {
+                            if(kMarch == kBoxStart) {
+                                if (iMarch == iBoxStart) {
                                     vertOffset = (this->*myOnVertex) (0, iMarch, jMarch, kMarch);
                                 } else {
                                     vertOffset = _myOld2Pt;
                                 }
                             } else {
-                                offset = _myDimensions[1] * iMarch + jMarch;
+                                offset = _myDimensions[0] * jMarch + iMarch;
                                 vertOffset = _myXEdge[offset];
                             }
                             break;
 
                         case 1:
-                            if (_myStartZ) {
+                            if (kMarch == kBoxStart) {
                                 vertOffset = (this->*myOnVertex)  (1, iMarch, jMarch, kMarch);
                             } else {
-                                offset = _myDimensions[1] * (iMarch + 1) + jMarch;
+                                offset = _myDimensions[0] * (jMarch + 1) + iMarch;
                                 vertOffset = _myYEdge[offset];
                             }
-                            if (_myStartZ) {
-                                offset = _myDimensions[1] * (iMarch + 1) + jMarch;
+                            if (kMarch == kBoxStart) {
+                                offset = _myDimensions[0] * (jMarch + 1) + iMarch;
                                 _myYEdge[offset] = vertOffset;
                             }
                             break;
 
                         case 2:
-                            if (_myStartZ) {
+                            if (kMarch == kBoxStart) {
                                 vertOffset = (this->*myOnVertex)  (2, iMarch, jMarch, kMarch);
                             } else {
-                                offset = _myDimensions[1] * iMarch + jMarch + 1;
+                                offset = _myDimensions[0] * jMarch + iMarch + 1;
                                 vertOffset = _myXEdge[offset];
                             }
                             break;
 
                         case 3:
-                            if(_myStartZ && _myStartX) { 
+                            if((kMarch == kBoxStart) && (jMarch == jBoxStart)) { 
                                 vertOffset = (this->*myOnVertex)  (3, iMarch, jMarch, kMarch);
                             } else {
-                                offset = _myDimensions[1] * iMarch + jMarch;
+                                offset = _myDimensions[0] * jMarch + iMarch;
                                 vertOffset = _myYEdge[offset];
                             }
                             break;
 
                         case 4:
-                            if(_myStartY) {
+                            if(iMarch == iBoxStart) {
                                 vertOffset = (this->*myOnVertex)  (4, iMarch, jMarch, kMarch);
                             } else {
                                 vertOffset = _myOld6Pt;
                             }
-                            offset = _myDimensions[1] * iMarch + jMarch;
+                            offset = _myDimensions[0] * jMarch + iMarch;
                             _myXEdge[offset] = vertOffset;
                             break;
 
                         case 5:
                             vertOffset = (this->*myOnVertex)  (5, iMarch, jMarch, kMarch);
-                            _myTopYEdge[jMarch] = vertOffset;
+                            _myTopYEdge[iMarch] = vertOffset;
                             // Only write to _myYEdge for the last voxel because otherwise it
                             // has already been / will be written by 7. We shouldn't write here
                             // because we want to keep the old value as long as possible
-                            if(iMarch == _myVBox[asl::Box3i::MAX][0] - 1) {
-                                offset = _myDimensions[1] * _myVBox[asl::Box3i::MAX][0] + jMarch;
+                            if(jMarch == jBoxEnd - 1) {
+                                offset = _myDimensions[0] * jMarch + iMarch;
                                 _myYEdge[offset] = vertOffset;
                             } 
                             break;
@@ -378,62 +385,63 @@ namespace y60 {
                         case 6:
                             vertOffset = (this->*myOnVertex)  (6, iMarch, jMarch, kMarch);
 
-                            if(jMarch == _myVBox[asl::Box3i::MAX][1] - 1) {
-                                offset = _myDimensions[1] * iMarch + _myVBox[asl::Box3i::MAX][1];
+                            if(iMarch == iBoxEnd - 1) {
+                                offset = _myDimensions[0] * jMarch + iBoxEnd;
                                 _myXEdge[offset] = vertOffset;
                             }
                             break;
 
                         case 7:
-                            if(_myStartX) {
+                            if(jMarch == jBoxStart) {
                                 vertOffset = (this->*myOnVertex)  (7, iMarch, jMarch, kMarch);
                             } else {
-                                vertOffset = _myTopYEdge[jMarch];
+                                vertOffset = _myTopYEdge[iMarch];
                             }
-                            offset = _myDimensions[1] * iMarch + jMarch;
+                            offset = _myDimensions[0] * jMarch + iMarch;
                             _myYEdge[offset] = vertOffset;
                             break;
 
                         case 8:
-                            if(_myStartX) {
-                                if (_myStartY) {
+                            if(jMarch == jBoxStart) {
+                                if (iMarch == iBoxStart) {
                                     vertOffset = (this->*myOnVertex)  (8, iMarch, jMarch, kMarch);
                                 } else {
                                     vertOffset = _myOld11Pt;
                                 }
                             } else {
-                                vertOffset = _myZEdge[jMarch];
+                                vertOffset = _myZEdge[iMarch];
                             }
                             break;
 
                         case 9:
-                            if(_myStartY) {
+                            if(iMarch == iBoxStart) {
                                 vertOffset = (this->*myOnVertex)  (9, iMarch, jMarch, kMarch);
                             } else {
                                 vertOffset = _myOld10Pt;
                             }
-                            _myZEdge[jMarch] = vertOffset;
+                            _myZEdge[iMarch] = vertOffset;
                             break;
 
                         case 10:
                             vertOffset = (this->*myOnVertex)  (10, iMarch, jMarch, kMarch);
 
-                            if(jMarch == _myVBox[asl::Box3i::MAX][1] - 1) {
-                                _myZEdge[_myVBox[asl::Box3i::MAX][1]] = vertOffset;
+                            if(iMarch == iBoxEnd - 1) {
+                                _myZEdge[iBoxEnd] = vertOffset;
                             }
                             break;
 
                         case 11:
-                            if(_myStartX) {
+                            if(jMarch == jBoxStart) {
                                 vertOffset = (this->*myOnVertex)  (11, iMarch, jMarch, kMarch);
                             } else {
-                                vertOffset = _myZEdge[jMarch + 1];
+                                vertOffset = _myZEdge[iMarch + 1];
                             }
                             break;
 
                         default:
                             break;
                     }
+#endif
                     edgeTable[edge] = vertOffset;
                 }
                 // update old stuff
@@ -477,8 +485,8 @@ namespace y60 {
 								EdgeId myKey(myNextIndex, myIndex);
 								EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
 								if (_myHalfEdgeCache.end() == iter) {
-									if (!_myStartZ && !_myStartY && !_myStartX) {
-										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << edge << " iMarch: " << iMarch << ", jMarch: " << jMarch << ", kMarch: " << kMarch << " Dumping cache.";
+									if (!(kMarch == kBoxStart) && !(iMarch == jBoxStart) && !(jMarch == iBoxStart)) {
+										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << edge << " jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch << " Dumping cache.";
 										//throw MarchingCubesException("Not found in cache.", PLUS_FILE_LINE);                                    
 									}
 								} else {
@@ -501,6 +509,12 @@ namespace y60 {
             inline const asl::Vector2<VoxelT> &
             getVoxelThreshold(int x, int y, int z) const {
                 return _myThreshold;
+                //static asl::Vector2<VoxelT> ourOtherThreshold(VoxelT(100), VoxelT(150));
+                //if (x > 64) {
+                //    return _myThreshold;
+                //} else {
+                //    return ourOtherThreshold;
+                //}
             }
 
             inline bool
@@ -531,120 +545,104 @@ namespace y60 {
             void calcVoxelIntersect(int n, int iMarch, int jMarch, int kMarch, 
                     asl::Point3f & theVertexPosition, asl::Vector3f & theVertexNormal) 
             {
-                float li;
+                float li = 0.5f;
                 asl::Vector3f g0, g1, g2, g3, g4, g5, g6, g7;
                 int myThresholdIndex = 0;
                 asl::Vector2<VoxelT> myThreshold = _myThreshold;
 
                 switch(n) {
                     case 0:
-                        theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
+                        theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
+                        theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[0], _myCurrent[1]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[1] - _myCurrent[0]);
-                        theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
 
                         if (_myVertexNormalFlag){
-                            calcGradient(float(_myCurrent[1]) - _myIPost0Val, float(_myCurrent[3]) - _myJPost0Val, float(_myCurrent[4]) - _myKPost0Val, g0);
-                            calcGradient(float(_myIPre1Val) - _myCurrent[0], float(_myCurrent[2]) - _myJPost1Val, float(_myCurrent[5]) - _myKPost1Val, g1);
+                            calcGradient(float(_myCurrent[3]) - _myJPost0Val, float(_myCurrent[1]) - _myIPost0Val, float(_myCurrent[4]) - _myKPost0Val, g0);
+                            calcGradient(float(_myCurrent[2]) - _myJPost1Val, float(_myIPre1Val) - _myCurrent[0], float(_myCurrent[5]) - _myKPost1Val, g1);
                             theVertexNormal = -1.0 * (g0 + li * (g1 - g0));
                         }
                         break;
 
                     case 1:
-                        theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
+                        theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
+                        theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[1], _myCurrent[2]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[1]) / (float)(_myCurrent[2] - _myCurrent[1]);
-                        theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if (_myVertexNormalFlag) {
-                            calcGradient(float(_myIPre1Val) - _myCurrent[0], float(_myCurrent[2]) - _myJPost1Val, float(_myCurrent[5]) - _myKPost1Val, g1);
-                            calcGradient(float(_myIPre2Val) - _myCurrent[3], float(_myJPre2Val) - _myCurrent[1], float(_myCurrent[6]) - _myKPost2Val, g2);
+                            calcGradient(float(_myCurrent[2]) - _myJPost1Val, float(_myIPre1Val) - _myCurrent[0], float(_myCurrent[5]) - _myKPost1Val, g1);
+                            calcGradient(float(_myJPre2Val) - _myCurrent[1], float(_myIPre2Val) - _myCurrent[3], float(_myCurrent[6]) - _myKPost2Val, g2);
                             theVertexNormal = -1.0 * (g1 + li * (g2 - g1));
                         }
                         break;
 
                     case 2:
-                        theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
+                        theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
+                        theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[2], _myCurrent[3]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[3]) / (float)(_myCurrent[2] - _myCurrent[3]);
-                        theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
 
                         if(_myVertexNormalFlag){
-                            calcGradient(float(_myIPre2Val) - _myCurrent[3], float(_myJPre2Val) - _myCurrent[1], float(_myCurrent[6]) - _myKPost2Val, g2);
-                            calcGradient(float(_myCurrent[2]) - _myIPost3Val, float(_myJPre3Val) - _myCurrent[0], float(_myCurrent[7]) - _myKPost3Val, g3);
+                            calcGradient(float(_myJPre2Val) - _myCurrent[1], float(_myIPre2Val) - _myCurrent[3], float(_myCurrent[6]) - _myKPost2Val, g2);
+                            calcGradient(float(_myJPre3Val) - _myCurrent[0], float(_myCurrent[2]) - _myIPost3Val, float(_myCurrent[7]) - _myKPost3Val, g3);
                             theVertexNormal = -1.0 * (g3 + li * (g2 - g3));
                         }
                         break;
 
                     case 3:
-                        theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
+                        theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
+                        theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[0], _myCurrent[3]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[3] - _myCurrent[0]);
-                        theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[1]) - _myIPost0Val, float(_myCurrent[3]) - _myJPost0Val, float(_myCurrent[4]) - _myKPost0Val, g0);
-                            calcGradient(float(_myCurrent[2]) - _myIPost3Val, float(_myJPre3Val) - _myCurrent[0], float(_myCurrent[7]) - _myKPost3Val, g3);
+                            calcGradient(float(_myCurrent[3]) - _myJPost0Val, float(_myCurrent[1]) - _myIPost0Val, float(_myCurrent[4]) - _myKPost0Val, g0);
+                            calcGradient(float(_myJPre3Val) - _myCurrent[0], float(_myCurrent[2]) - _myIPost3Val, float(_myCurrent[7]) - _myKPost3Val, g3);
                             theVertexNormal = -1.0 * (g0 + li * (g3 - g0));
                         }
                         break;
 
                     case 4:
-                        theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
+                        theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
+                        theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[4], _myCurrent[5]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[4]) / (float)(_myCurrent[5] - _myCurrent[4]);
-                        theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[5]) - _myIPost4Val, float(_myCurrent[7]) - _myJPost4Val, float(_myKPre4Val) - _myCurrent[0], g4);
-                            calcGradient(float(_myIPre5Val) - _myCurrent[4], float(_myCurrent[6]) - _myJPost5Val, float(_myKPre5Val) - _myCurrent[1], g5);
+                            calcGradient(float(_myCurrent[7]) - _myJPost4Val, float(_myCurrent[5]) - _myIPost4Val, float(_myKPre4Val) - _myCurrent[0], g4);
+                            calcGradient(float(_myCurrent[6]) - _myJPost5Val, float(_myIPre5Val) - _myCurrent[4], float(_myKPre5Val) - _myCurrent[1], g5);
                             theVertexNormal = -1.0 * (g4 + li * (g5 - g4));
                         }
                         break;
 
                     case 5:
-                        theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
+                        theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
+                        theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[5], _myCurrent[6]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[5]) / (float)(_myCurrent[6] - _myCurrent[5]);
-                        theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myIPre5Val) - _myCurrent[4], float(_myCurrent[6]) - _myJPost5Val, float(_myKPre5Val) - _myCurrent[1], g5);
-                            calcGradient(float(_myIPre6Val) - _myCurrent[7], float(_myJPre6Val) - _myCurrent[5], float(_myKPre6Val) - _myCurrent[2], g6);
+                            calcGradient(float(_myCurrent[6]) - _myJPost5Val, float(_myIPre5Val) - _myCurrent[4], float(_myKPre5Val) - _myCurrent[1], g5);
+                            calcGradient(float(_myJPre6Val) - _myCurrent[5], float(_myIPre6Val) - _myCurrent[7], float(_myKPre6Val) - _myCurrent[2], g6);
                             theVertexNormal = -1.0 * (g5 + li * (g6 - g5));
                         }
                         break;
 
                     case 6:
-                        theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
+                        theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
+                        theVertexPosition[1] = ((float)jMarch+ li) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[6], _myCurrent[7]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[7]) / (float)(_myCurrent[6] - _myCurrent[7]);
-                        theVertexPosition[0] = ((float)iMarch+ li) * _myVoxelSize[0];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myIPre6Val) - float(_myCurrent[7]), float(_myJPre6Val) - _myCurrent[5], float(_myKPre6Val) - _myCurrent[2], g6);
-                            calcGradient(float(_myCurrent[6]) - _myIPost7Val, float(_myJPre7Val) - _myCurrent[4], float(_myKPre7Val) - _myCurrent[3], g7);
+                            calcGradient(float(_myJPre6Val) - _myCurrent[5], float(_myIPre6Val) - float(_myCurrent[7]), float(_myKPre6Val) - _myCurrent[2], g6);
+                            calcGradient(float(_myJPre7Val) - _myCurrent[4], float(_myCurrent[6]) - _myIPost7Val, float(_myKPre7Val) - _myCurrent[3], g7);
                             theVertexNormal = -1.0 * (g7 + li * (g6 - g7));
                         }
                         break;
 
                     case 7:
-                        theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
+                        theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
+                        theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[4], _myCurrent[7]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[4]) / (float)(_myCurrent[7] - _myCurrent[4]);
-                        theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[5]) - _myIPost4Val, float(_myCurrent[7]) - _myJPost4Val, float(_myKPre4Val) - _myCurrent[0], g4);
-                            calcGradient(float(_myCurrent[6]) - _myIPost7Val, float(_myJPre7Val) - _myCurrent[4], float(_myKPre7Val) - _myCurrent[3], g7);
+                            calcGradient(float(_myCurrent[7]) - _myJPost4Val, float(_myCurrent[5]) - _myIPost4Val, float(_myKPre4Val) - _myCurrent[0], g4);
+                            calcGradient(float(_myJPre7Val) - _myCurrent[4], float(_myCurrent[6]) - _myIPost7Val, float(_myKPre7Val) - _myCurrent[3], g7);
                             theVertexNormal = -1.0 * (g4 + li * (g7 - g4));
                         }
                         break;
@@ -652,27 +650,23 @@ namespace y60 {
                     case 8:
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[0], _myCurrent[4]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[4] - _myCurrent[0]);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[1]) - _myIPost0Val, float(_myCurrent[3]) - _myJPost0Val, float(_myCurrent[4]) - _myKPost0Val, g0);
-                            calcGradient(float(_myCurrent[5]) - _myIPost4Val, float(_myCurrent[7]) - _myJPost4Val, float(_myKPre4Val) - _myCurrent[0], g4);
+                            calcGradient(float(_myCurrent[3]) - _myJPost0Val, float(_myCurrent[1]) - _myIPost0Val, float(_myCurrent[4]) - _myKPost0Val, g0);
+                            calcGradient(float(_myCurrent[7]) - _myJPost4Val, float(_myCurrent[5]) - _myIPost4Val, float(_myKPre4Val) - _myCurrent[0], g4);
                             theVertexNormal = -1.0 * (g0 + li * (g4 - g0));
                         }
                         break;
 
                     case 9:
-                        theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
-                        theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[1], _myCurrent[5]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[1]) / (float)(_myCurrent[5] - _myCurrent[1]);
+                        theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
+                        theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myIPre1Val) - _myCurrent[0], float(_myCurrent[2]) - _myJPost1Val, float(_myCurrent[5]) - _myKPost1Val, g1);
-                            calcGradient(float(_myIPre5Val) - _myCurrent[4], float(_myCurrent[6]) - _myJPost5Val, float(_myKPre5Val) - _myCurrent[1], g5);
+                            calcGradient(float(_myCurrent[2]) - _myJPost1Val, float(_myIPre1Val) - _myCurrent[0], float(_myCurrent[5]) - _myKPost1Val, g1);
+                            calcGradient(float(_myCurrent[6]) - _myJPost5Val, float(_myIPre5Val) - _myCurrent[4], float(_myKPre5Val) - _myCurrent[1], g5);
                             theVertexNormal = -1.0 * (g1 + li * (g5 - g1));
                         }
                         break;
@@ -680,28 +674,24 @@ namespace y60 {
                     case 10:
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[2], _myCurrent[6]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[2]) / (float)(_myCurrent[6] - _myCurrent[2]);
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myIPre2Val) - _myCurrent[3], float(_myJPre2Val) - _myCurrent[1], float(_myCurrent[6]) - _myKPost2Val, g2);
-                            calcGradient(float(_myIPre6Val) - _myCurrent[7], float(_myJPre6Val) - _myCurrent[5], float(_myKPre6Val) - _myCurrent[2], g6);
+                            calcGradient(float(_myJPre2Val) - _myCurrent[1], float(_myIPre2Val) - _myCurrent[3], float(_myCurrent[6]) - _myKPost2Val, g2);
+                            calcGradient(float(_myJPre6Val) - _myCurrent[5], float(_myIPre6Val) - _myCurrent[7], float(_myKPre6Val) - _myCurrent[2], g6);
                             theVertexNormal = -1.0 * (g2 + li * (g6 - g2));
                         }
 
                         break;
 
                     case 11:
-                        theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
-                        theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
-                        myThresholdIndex = findThresholdBoundary(_myCurrent[3], _myCurrent[7]);
-                        li = (float)(myThreshold[myThresholdIndex] - _myCurrent[3]) / (float)(_myCurrent[7] - _myCurrent[3]);
+                        theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
+                        theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(_myVertexNormalFlag) {
-                            calcGradient(float(_myCurrent[2]) - _myIPost3Val, float(_myJPre3Val) - _myCurrent[0], float(_myCurrent[7]) - _myKPost3Val, g3);
-                            calcGradient(float(_myCurrent[6]) - _myIPost7Val, float(_myJPre7Val) - _myCurrent[4], float(_myKPre7Val) - _myCurrent[3], g7);
+                            calcGradient(float(_myJPre3Val) - _myCurrent[0], float(_myCurrent[2]) - _myIPost3Val, float(_myCurrent[7]) - _myKPost3Val, g3);
+                            calcGradient(float(_myJPre7Val) - _myCurrent[4], float(_myCurrent[6]) - _myIPost7Val, float(_myKPre7Val) - _myCurrent[3], g7);
                             theVertexNormal = -1.0 * (g3 + li * (g7 - g3));
                         }
                         break;
@@ -716,6 +706,13 @@ namespace y60 {
                 if (_myInvertNormalsFlag) {
                     theVertexNormal = -theVertexNormal;
                 }
+            }
+
+            
+
+            asl::Vector3f gradientAt(int iMarch, int jMarch, int kMarch) {
+                asl::Vector3f myResult;
+
             }
 
             void calcGradient(float dx, float dy, float dz, asl::Vector3f & g) {
@@ -736,25 +733,40 @@ namespace y60 {
                 return _mySlices[z*_myDownSampleRate][_myLineStride*y*_myDownSampleRate + x*_myDownSampleRate];
             }
 
+            inline
+            const VoxelT &
+            clippedAt(const asl::Vector3i & thePosition) const {
+                asl::Vector3i myClippedPosition = thePosition;
+                for (int i = 0; i < 3; ++i) {
+                    if (thePosition[i] < 0) {
+                        myClippedPosition[i] = 0;
+                    }
+                    if (thePosition[i] >= _myVBox[asl::Box3i::MAX][i]) {
+                        myClippedPosition[i] = _myVBox[asl::Box3i::MAX][i]-1;
+                    }
+                }
+                return at(myClippedPosition[1], myClippedPosition[0], myClippedPosition[2]);
+            }
+
             inline VoxelT
             getValueByCubeCorner(int iMarch, int jMarch, int kMarch, int theCubeCorner) {
                 switch (theCubeCorner) {
                 case 0:
-                    return at(jMarch, iMarch, kMarch);
+                    return at(iMarch, jMarch, kMarch);
                 case 1:
-                    return at(jMarch, iMarch+1, kMarch);
+                    return at(iMarch, jMarch+1, kMarch);
                 case 2:
-                    return at(jMarch+1, iMarch+1, kMarch);
+                    return at(iMarch+1, jMarch+1, kMarch);
                 case 3:
-                    return at(jMarch+1, iMarch, kMarch);
+                    return at(iMarch+1, jMarch, kMarch);
                 case 4:
-                    return at(jMarch, iMarch, kMarch+1);
+                    return at(iMarch, jMarch, kMarch+1);
                 case 5:
-                    return at(jMarch, iMarch+1, kMarch+1);
+                    return at(iMarch, jMarch+1, kMarch+1);
                 case 6:
-                    return at(jMarch+1, iMarch+1, kMarch+1);
+                    return at(iMarch+1, jMarch+1, kMarch+1);
                 case 7:
-                    return at(jMarch+1, iMarch, kMarch+1);
+                    return at(iMarch+1, jMarch, kMarch+1);
                 default:
                     throw MarchingCubesException(std::string("Illegal CubeIndex: ") + as_string(theCubeCorner), PLUS_FILE_LINE);
                 }
@@ -764,21 +776,21 @@ namespace y60 {
             getThresholdByCubeCorner(int iMarch, int jMarch, int kMarch, int theCubeCorner) {
                 switch (theCubeCorner) {
                 case 0:
-                    return getVoxelThreshold(jMarch, iMarch, kMarch);
+                    return getVoxelThreshold(iMarch, _jMarch, kMarch);
                 case 1:
-                    return getVoxelThreshold(jMarch, iMarch+1, kMarch);
+                    return getVoxelThreshold(iMarch, _jMarch+1, kMarch);
                 case 2:
-                    return getVoxelThreshold(jMarch+1, iMarch+1, kMarch);
+                    return getVoxelThreshold(iMarch+1, _jMarch+1, kMarch);
                 case 3:
-                    return getVoxelThreshold(jMarch+1, iMarch, kMarch);
+                    return getVoxelThreshold(iMarch+1, _jMarch, kMarch);
                 case 4:
-                    return getVoxelThreshold(jMarch, iMarch, kMarch+1);
+                    return getVoxelThreshold(iMarch, _jMarch, kMarch+1);
                 case 5:
-                    return getVoxelThreshold(jMarch, iMarch+1, kMarch+1);
+                    return getVoxelThreshold(iMarch, _jMarch+1, kMarch+1);
                 case 6:
-                    return getVoxelThreshold(jMarch+1, iMarch+1, kMarch+1);
+                    return getVoxelThreshold(iMarch+1, _jMarch+1, kMarch+1);
                 case 7:
-                    return getVoxelThreshold(jMarch+1, iMarch, kMarch+1);
+                    return getVoxelThreshold(iMarch+1, _jMarch, kMarch+1);
                 default:
                     throw MarchingCubesException(std::string("Illegal CubeIndex: ") + as_string(theCubeCorner), PLUS_FILE_LINE);
                 }
@@ -796,128 +808,123 @@ namespace y60 {
 
             void march(bool theDryRun) {
                 AC_TRACE << "MarchingCubes::march()";
-                int i, j, k;
+                int j, i, k;
                 int cubeIndex;
-                // int offset;
-                int xStart, xEnd, yStart, yEnd, zStart, zEnd;
-                xStart = _myVBox[asl::Box3i::MIN][0];
-                xEnd   = _myVBox[asl::Box3i::MAX][0];
-                yStart = _myVBox[asl::Box3i::MIN][1];
-                yEnd   = _myVBox[asl::Box3i::MAX][1];
-                zStart = _myVBox[asl::Box3i::MIN][2];
-                zEnd   = _myVBox[asl::Box3i::MAX][2];
+                const int iBoxStart = _myVBox[asl::Box3i::MIN][0];
+                const int iBoxEnd   = _myVBox[asl::Box3i::MAX][0];
+                const int jBoxStart = _myVBox[asl::Box3i::MIN][1];
+                const int jBoxEnd   = _myVBox[asl::Box3i::MAX][1];
+                const int kBoxStart = _myVBox[asl::Box3i::MIN][2];
+                const int kBoxEnd   = _myVBox[asl::Box3i::MAX][2];
 
                 AC_TRACE << "Data dimension: X(" << _myDimensions[0] << "), Y(" 
                     << _myDimensions[1] << "), Z(" << _myDimensions[2] << ")\n";
                 AC_TRACE << "Box dimension : X(" << _myDimBox[0] << "), Y(" 
                     << _myDimBox[1] << "), Z(" << _myDimBox[2] << ")\n";
-                AC_TRACE << "Box           : X[" << xStart << ", " 
-                    << xEnd << "], Y[" << yStart;
-                AC_TRACE << ", " << yEnd << "], Z[" << zStart << ", " << zEnd << "]\n";
+                AC_TRACE << "Box           : X[" << iBoxStart << ", " 
+                    << iBoxEnd << "], Y[" << jBoxStart;
+                AC_TRACE << ", " << jBoxEnd << "], Z[" << kBoxStart << ", " << kBoxEnd << "]\n";
 
                 _myXEdge.resize(_myDimensions[0] * _myDimensions[1], -1);
                 _myYEdge.resize(_myDimensions[0] * _myDimensions[1], -1);
-                _myTopYEdge.resize(_myDimensions[1], -1);
-                _myZEdge.resize(_myDimensions[1], -1);
+                _myTopYEdge.resize(_myDimensions[0], -1);
+                _myZEdge.resize(_myDimensions[0], -1);
 
                 int postSlice, lowSlice, highSlice, preSlice;
                 // asl::Ptr<VoxelSampler<VoxelT> > postSlice, lowSlice, highSlice, preSlice;
-                if (zStart > 0) {
-                    postSlice = zStart - 1;
+                if (kBoxStart > 0) {
+                    postSlice = kBoxStart - 1;
                 }
-                lowSlice = zStart;
-                if(zStart == 0) {
+                lowSlice = kBoxStart;
+                if(kBoxStart == 0) {
                     postSlice = lowSlice;
                 }
-                highSlice = zStart+1;
-                preSlice = zStart+2;
-                _myStartZ = true;
+                highSlice = kBoxStart+1;
+                preSlice = kBoxStart+2;
 
-                for(k = zStart; k < zEnd; k++) {
-                    _myVoxelData->notifyProgress(double(k - zStart) / double(zEnd - zStart),
+                for(k = kBoxStart; k < kBoxEnd; k++) {
+                    _myVoxelData->notifyProgress(double(k - kBoxStart) / double(kBoxEnd - kBoxStart),
                             theDryRun ? "estimating" : "polygonizing");
 
-                    for(i = xStart; i < xEnd; i++) {
-                        _myStartX = (i == xStart);
+                    for(j = jBoxStart; j < jBoxEnd; j++) {
                         _myOld2Pt = _myOld6Pt = _myOld11Pt = _myOld10Pt = -1;
-                        for(j = yStart; j < yEnd; j++) {
-                            _myStartY = (j == yStart);
+                        for(i = iBoxStart; i < iBoxEnd; i++) {
 
                             cubeIndex = 0;
-                            if(isOutside(j, i, lowSlice)) {
+                            if(isOutside(i, j, lowSlice)) {
                                 cubeIndex |= BIT_0;
                             }
-                            if(isOutside(j, i+1, lowSlice)) {
+                            if(isOutside(i, j+1, lowSlice)) {
                                 cubeIndex |= BIT_1;
                             }
-                            if(isOutside(j+1, i+1, lowSlice)) {
+                            if(isOutside(i+1, j+1, lowSlice)) {
                                 cubeIndex |= BIT_2;
                             }
-                            if(isOutside(j+1, i, lowSlice)) {
+                            if(isOutside(i+1, j, lowSlice)) {
                                 cubeIndex |= BIT_3;
                             }
-                            if(isOutside(j, i, highSlice)) {
+                            if(isOutside(i, j, highSlice)) {
                                 cubeIndex |= BIT_4;
                             }
-                            if(isOutside(j, i+1, highSlice)) {
+                            if(isOutside(i, j+1, highSlice)) {
                                 cubeIndex |= BIT_5;
                             }
-                            if(isOutside(j+1, i+1, highSlice)) {
+                            if(isOutside(i+1, j+1, highSlice)) {
                                 cubeIndex |= BIT_6;
                             }
-                            if(isOutside(j+1, i, highSlice)) {
+                            if(isOutside(i+1, j, highSlice)) {
                                 cubeIndex |= BIT_7;
                             }
 
                             if((cubeIndex > 0) && (cubeIndex < 255)) {
                                 fillVoxelCube(i, j, k, _myCurrent);                                
-                                _myIPost0Val = i > xStart ? 
-                                    at(j,i-1,lowSlice) : _myCurrent[0];
-                                _myJPost0Val = j > yStart ?
-                                    at(j-1,i,lowSlice) : _myCurrent[0];
-                                _myKPost0Val = at(j,i,postSlice);
+                                _myIPost0Val = j > jBoxStart ? 
+                                    at(i,j-1,lowSlice) : _myCurrent[0];
+                                _myJPost0Val = i > iBoxStart ?
+                                    at(i-1,j,lowSlice) : _myCurrent[0];
+                                _myKPost0Val = at(i,j,postSlice);
 
-                                _myIPost3Val = i > xStart ? 
-                                    at(j+1,i-1,lowSlice) : _myCurrent[3];
-                                _myJPre3Val = j < yEnd - 1 ? 
-                                    at(j+2,i,lowSlice) : _myCurrent[3];
-                                _myKPost3Val = at(j+1,i,postSlice);
+                                _myIPost3Val = j > jBoxStart ? 
+                                    at(i+1,j-1,lowSlice) : _myCurrent[3];
+                                _myJPre3Val = i < iBoxEnd - 1 ? 
+                                    at(i+2,j,lowSlice) : _myCurrent[3];
+                                _myKPost3Val = at(i+1,j,postSlice);
 
-                                _myIPre1Val = i < xEnd - 1 ? 
-                                    at(j,i+2,lowSlice) : _myCurrent[1];
-                                _myJPost1Val = j > yStart ? 
-                                    at(j-1,i+1,lowSlice) : _myCurrent[1];
-                                _myKPost1Val = at(j,i+1,postSlice);
+                                _myIPre1Val = j < jBoxEnd - 1 ? 
+                                    at(i,j+2,lowSlice) : _myCurrent[1];
+                                _myJPost1Val = i > iBoxStart ? 
+                                    at(i-1,j+1,lowSlice) : _myCurrent[1];
+                                _myKPost1Val = at(i,j+1,postSlice);
                                 
-                                _myIPost4Val = i > xStart ? 
-                                    at(j,i-1,highSlice) : _myCurrent[4];
-                                _myJPost4Val = j > yStart ? 
-                                    at(j-1,i,highSlice) : _myCurrent[4];
-                                _myKPre4Val = at(j,i,preSlice);
+                                _myIPost4Val = j > jBoxStart ? 
+                                    at(i,j-1,highSlice) : _myCurrent[4];
+                                _myJPost4Val = i > iBoxStart ? 
+                                    at(i-1,j,highSlice) : _myCurrent[4];
+                                _myKPre4Val = at(i,j,preSlice);
 
-                                _myJPre6Val  = j < yEnd - 1 ? 
-                                    at(j+2,i+1,highSlice) : _myCurrent[6];
-                                _myIPre6Val  = i < xEnd - 1 ? 
-                                    at(j+1,i+2,highSlice) : _myCurrent[6];
-                                _myKPre6Val = at(j+1,i+1,preSlice);
+                                _myJPre6Val  = i < iBoxEnd - 1 ? 
+                                    at(i+2,j+1,highSlice) : _myCurrent[6];
+                                _myIPre6Val  = j < jBoxEnd - 1 ? 
+                                    at(i+1,j+2,highSlice) : _myCurrent[6];
+                                _myKPre6Val = at(i+1,j+1,preSlice);
 
-                                _myJPost5Val = j > yStart ? 
-                                    at(j-1,i+1,highSlice) : _myCurrent[5];
-                                _myIPre5Val  = i < xEnd - 1 ? 
-                                    at(j,i+2,highSlice) : _myCurrent[5];
-                                _myKPre5Val = at(j,i+1,preSlice);
+                                _myJPost5Val = i > iBoxStart ? 
+                                    at(i-1,j+1,highSlice) : _myCurrent[5];
+                                _myIPre5Val  = j < jBoxEnd - 1 ? 
+                                    at(i,j+2,highSlice) : _myCurrent[5];
+                                _myKPre5Val = at(i,j+1,preSlice);
 
-                                _myIPost7Val = i > xStart ? 
-                                    at(j+1,i-1,highSlice) : _myCurrent[7];
-                                _myJPre7Val  = j < yEnd - 1 ? 
-                                    at(j+2,i,highSlice) : _myCurrent[7];
-                                _myKPre7Val = at(j+1,i,preSlice);
+                                _myIPost7Val = j > jBoxStart ? 
+                                    at(i+1,j-1,highSlice) : _myCurrent[7];
+                                _myJPre7Val  = i < iBoxEnd - 1 ? 
+                                    at(i+2,j,highSlice) : _myCurrent[7];
+                                _myKPre7Val = at(i+1,j,preSlice);
 
-                                _myIPre2Val  = i < xEnd - 1 ? 
-                                    at(j+1,i+2,lowSlice) : _myCurrent[2];
-                                _myJPre2Val  = j < yEnd - 1 ? 
-                                    at(j+2,i+1,lowSlice) : _myCurrent[2];
-                                _myKPost2Val = at(j+1,i+1,postSlice);
+                                _myIPre2Val  = j < jBoxEnd - 1 ? 
+                                    at(i+1,j+2,lowSlice) : _myCurrent[2];
+                                _myJPre2Val  = i < iBoxEnd - 1 ? 
+                                    at(i+2,j+1,lowSlice) : _myCurrent[2];
+                                _myKPost2Val = at(i+1,j+1,postSlice);
                                 triangulateVoxel(cubeIndex, i, j, k, theDryRun);
                             }
                         }
@@ -926,15 +933,13 @@ namespace y60 {
                     lowSlice = highSlice;
                     highSlice = preSlice;
 
-                    if(k < zEnd - 2) {
+                    if(k < kBoxEnd - 2) {
                         preSlice = k+3;
-                    } else if (k < zEnd - 1) {
+                    } else if (k < kBoxEnd - 1) {
                         preSlice = k+2;
-                    } else if (k < zEnd) {
+                    } else if (k < kBoxEnd) {
                         preSlice = k+1;
                     }
-
-                    _myStartZ = false;
                 }
 
                 AC_INFO << _myHalfEdgeCount/3 << " triangles, " 
@@ -980,7 +985,6 @@ namespace y60 {
             asl::Vector3f _myVoxelSize;
             asl::Vector2<VoxelT> _myThreshold;
 
-            bool _myStartX, _myStartY, _myStartZ;
             // TODO change to std::vector ...
             std::vector<int> _myXEdge;
             std::vector<int> _myYEdge;
