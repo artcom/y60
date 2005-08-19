@@ -132,6 +132,7 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::ABGR, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::GRAY, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::GRAY16, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(asl::GRAY32, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::GRAYS16, SimpleValue);
 
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::DXT1, SimpleValue);
@@ -144,9 +145,9 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfBGR, ComplexValue, dom::MakeResizeableRaster);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfBGRA, ComplexValue, dom::MakeResizeableRaster);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfABGR, ComplexValue, dom::MakeResizeableRaster);
-    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfALPHA, ComplexValue, dom::MakeResizeableRaster);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfGRAY, ComplexValue, dom::MakeResizeableRaster);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfGRAY16, ComplexValue, dom::MakeResizeableRaster);
+    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfGRAY32, ComplexValue, dom::MakeResizeableRaster);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfGRAYS16, ComplexValue, dom::MakeResizeableRaster);
     
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfDXT1, ComplexValue, dom::MakeResizeableRaster);

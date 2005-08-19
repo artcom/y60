@@ -110,6 +110,7 @@ namespace y60 {
     };
 
     //=== Texture Internal Formats ============================================
+    static const char * TEXTURE_INTERNAL_FORMAT_DEPTH               = "DEPTH";
     static const char * TEXTURE_INTERNAL_FORMAT_ALPHA               = "ALPHA";
     static const char * TEXTURE_INTERNAL_FORMAT_ALPHA4              = "ALPHA4";
     static const char * TEXTURE_INTERNAL_FORMAT_ALPHA8              = "ALPHA8";
@@ -150,6 +151,7 @@ namespace y60 {
     static const char * TEXTURE_INTERNAL_FORMAT_RGBA16              = "RGBA16";
 
     enum TextureInternalFormat {
+        TEXTURE_IFMT_DEPTH,
         TEXTURE_IFMT_ALPHA,
         TEXTURE_IFMT_ALPHA4,
         TEXTURE_IFMT_ALPHA8,
@@ -191,6 +193,7 @@ namespace y60 {
     };
 
     static const char * TextureInternalFormatStrings[] = {
+        TEXTURE_INTERNAL_FORMAT_DEPTH,
         TEXTURE_INTERNAL_FORMAT_ALPHA,
         TEXTURE_INTERNAL_FORMAT_ALPHA4,
         TEXTURE_INTERNAL_FORMAT_ALPHA8,

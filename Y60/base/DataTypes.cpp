@@ -39,8 +39,12 @@ namespace y60 {
             dom::ValuePtr(new dom::ComplexValue<RasterOfGRAY,dom::MakeResizeableRaster>(RasterOfGRAY(0,0,0),0)));
         theFactory.registerPrototype("RasterOfALPHA",
             dom::ValuePtr(new dom::ComplexValue<RasterOfGRAY,dom::MakeResizeableRaster>(RasterOfGRAY(0,0,0),0)));
+        theFactory.registerPrototype("RasterOfDEPTH",
+            dom::ValuePtr(new dom::ComplexValue<RasterOfGRAY,dom::MakeResizeableRaster>(RasterOfGRAY(0,0,0),0)));
         theFactory.registerPrototype("RasterOfGRAY16",
             dom::ValuePtr(new dom::ComplexValue<RasterOfGRAY16,dom::MakeResizeableRaster>(RasterOfGRAY16(0,0,0),0)));
+        theFactory.registerPrototype("RasterOfGRAY32",
+            dom::ValuePtr(new dom::ComplexValue<RasterOfGRAY32,dom::MakeResizeableRaster>(RasterOfGRAY32(0,0,0),0)));
   
         theFactory.registerPrototype("RasterOfGRAYS16",
             dom::ValuePtr(new dom::ComplexValue<RasterOfGRAYS16,dom::MakeResizeableRaster>(RasterOfGRAYS16(0,0,0),0)));
