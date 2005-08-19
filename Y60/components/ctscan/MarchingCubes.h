@@ -474,12 +474,17 @@ namespace y60 {
                                 myNeighbor.type == MCLookup::MAX_Y ||
                                 myNeighbor.type == MCLookup::MAX_Z) 
                             {
-								// Add to the map
-								EdgeId myKey(myIndex, myNextIndex);
-								int myValue = _myHalfEdges->size();
-								EdgeCache::value_type myItem(myKey, myValue);
-								_myHalfEdgeCache.insert(myItem);
-								AC_TRACE << "Inserting: (" << myKey.first << ", " << myKey.second << ")";
+                                if (((myNeighbor.type == MCLookup::MAX_X) && (iMarch < iBoxEnd-1)) ||
+                                    ((myNeighbor.type == MCLookup::MAX_Y) && (jMarch < jBoxEnd-1)) ||
+                                    ((myNeighbor.type == MCLookup::MAX_Z) && (kMarch < kBoxEnd-1))) 
+                                { 
+                                    // Add to the map
+                                    EdgeId myKey(myIndex, myNextIndex);
+                                    int myValue = _myHalfEdges->size();
+                                    EdgeCache::value_type myItem(myKey, myValue);
+                                    _myHalfEdgeCache.insert(myItem);
+                                    AC_TRACE << "Inserting: (" << myKey.first << ", " << myKey.second << ")";
+                                }
 							} else {
 								// Remove from map
 								EdgeId myKey(myNextIndex, myIndex);
@@ -552,6 +557,7 @@ namespace y60 {
 
                 switch(n) {
                     case 0:
+                        li = (float)(_myThreshold[0] - _myCurrent[0]) / (float)(_myCurrent[1] - _myCurrent[0]);
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -564,6 +570,7 @@ namespace y60 {
                         break;
 
                     case 1:
+                        li = (float)(_myThreshold[0] - _myCurrent[1]) / (float)(_myCurrent[2] - _myCurrent[1]);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -576,6 +583,7 @@ namespace y60 {
                         break;
 
                     case 2:
+                        li = (float)(_myThreshold[0] - _myCurrent[3]) / (float)(_myCurrent[2] - _myCurrent[3]);
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -588,6 +596,7 @@ namespace y60 {
                         break;
 
                     case 3:
+                        li = (float)(_myThreshold[0] - _myCurrent[0]) / (float)(_myCurrent[3] - _myCurrent[0]);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -600,6 +609,7 @@ namespace y60 {
                         break;
 
                     case 4:
+                        li = (float)(_myThreshold[0] - _myCurrent[4]) / (float)(_myCurrent[5] - _myCurrent[4]);
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -612,6 +622,7 @@ namespace y60 {
                         break;
 
                     case 5:
+                        li = (float)(_myThreshold[0] - _myCurrent[5]) / (float)(_myCurrent[6] - _myCurrent[5]);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -624,6 +635,7 @@ namespace y60 {
                         break;
 
                     case 6:
+                        li = (float)(_myThreshold[0] - _myCurrent[7]) / (float)(_myCurrent[6] - _myCurrent[7]);
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[1] = ((float)jMarch+ li) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -636,6 +648,7 @@ namespace y60 {
                         break;
 
                     case 7:
+                        li = (float)(_myThreshold[0] - _myCurrent[4]) / (float)(_myCurrent[7] - _myCurrent[4]);
                         theVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -648,6 +661,7 @@ namespace y60 {
                         break;
 
                     case 8:
+                        li = (float)(_myThreshold[0] - _myCurrent[0]) / (float)(_myCurrent[4] - _myCurrent[0]);
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -660,6 +674,7 @@ namespace y60 {
                         break;
 
                     case 9:
+                        li = (float)(_myThreshold[0] - _myCurrent[1]) / (float)(_myCurrent[5] - _myCurrent[1]);
                         theVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -672,6 +687,7 @@ namespace y60 {
                         break;
 
                     case 10:
+                        li = (float)(_myThreshold[0] - _myCurrent[2]) / (float)(_myCurrent[6] - _myCurrent[2]);
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -685,6 +701,7 @@ namespace y60 {
                         break;
 
                     case 11:
+                        li = (float)(_myThreshold[0] - _myCurrent[3]) / (float)(_myCurrent[7] - _myCurrent[3]);
                         theVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         theVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         theVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];

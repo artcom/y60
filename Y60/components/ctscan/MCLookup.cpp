@@ -202,10 +202,10 @@ MCLookup::intInArray(int theValue, const int * theArray) {
 
 MCLookup::HalfEdgeType
 MCLookup::classifyEdge(int theCurEdge, int theNextEdge) {
-    const int MIN_X_EDGES[] = {8,3,11,7};
-    const int MAX_X_EDGES[] = {9,1,10,5};
-    const int MIN_Y_EDGES[] = {0,9,4,8};
-    const int MAX_Y_EDGES[] = {2,10,6,11};
+    const int MIN_X_EDGES[] = {0,9,4,8};
+    const int MAX_X_EDGES[] = {2,10,6,11};
+    const int MIN_Y_EDGES[] = {8,3,11,7};
+    const int MAX_Y_EDGES[] = {9,1,10,5};
     const int MIN_Z_EDGES[] = {0,1,2,3};
     const int MAX_Z_EDGES[] = {4,5,6,7};
    
