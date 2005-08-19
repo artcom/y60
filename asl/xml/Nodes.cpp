@@ -1945,7 +1945,13 @@ NodePtr
 dom::Node::appendAttribute(NodePtr theNewAttribute) {
     checkName(theNewAttribute->nodeName(),theNewAttribute->nodeType());
     if (attributesLength(theNewAttribute->nodeName())) {
-        throw DomException(JUST_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
+        throw DomException(string("Can't append attribute name " +
+                    theNewAttribute->nodeName() +
+                    " to node type ") +
+                NodeTypeName[nodeType()]+
+                ", name = " + nodeName() +
+                " because attribute with this name already exists.",
+                PLUS_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
     }
     if (_myType != ELEMENT_NODE) {
         throw DomException(string("Can't append attribute name " +
