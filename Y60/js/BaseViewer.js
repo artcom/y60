@@ -108,7 +108,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
    self.setScene = function(theScene, theCanvas) {
        var myStatus = _myRenderWindow.setScene(theScene);
        if (!myStatus) {
-           throw new Exception("Could not load model", "SceneViewer::run()");
+           throw new Exception("Could not load model", fileline());
        }
        if (!theScene) {
            Logger.debug("setScene(null)");
@@ -444,18 +444,18 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
 
         if (!_myShaderLibrary) {
-            throw new Exception("Missing shaderlibrary argument", "BaseViewer::parseArguments()");
+            throw new Exception("Missing shaderlibrary argument", fileline());
         }
 
         return myArgumentMap;
     }
 
    self.prepareScene = function (theScene, theCanvas) {
-   
+
         if (!theScene) {
             Logger.debug("No Scene found.");
         }
-        
+
         if (theScene) {
             // Cache main scene nodes for fast access
             var myWorlds    = getDescendantByTagName(theScene.dom, "worlds", false);
@@ -468,7 +468,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             _myImages       = getDescendantByTagName(theScene.dom, "images", false);
 
             if (!_myWorld || !_myMaterials || !_myLightSources || !_myCharacters || !_myAnimations || !_myShapes) {
-                throw new Exception("Could not find world, materials, lightsources or shapes node", "SceneViewer::run()");
+                throw new Exception("Could not find world, materials, lightsources or shapes node", fileline());
             }
             _myLightManager = new LightManager(theScene, _myWorld);
             if (theCanvas) {

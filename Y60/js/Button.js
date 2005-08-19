@@ -98,7 +98,7 @@ function ButtonBase(Public, Protected, theSceneViewer, theId, theSize, thePositi
         Public.onMouseButton = function(theState, theX, theY) {
             if (Public.enabled && Public.visible && theState == MOUSE_DOWN && !_isPressed && Public.touches(theX, theY)) {
                 for (var i = 0; i < theButtons.length; ++i) {
-                    if (theButtons[i].isPressed()) {
+                    if (theButtons[i].enabled && theButtons[i].isPressed()) {
                         theButtons[i].setPressed(false);
                     }
                 }

@@ -34,7 +34,7 @@ Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer
 
     var _myAnimationNode = getDescendantByName(_mySceneViewer.getAnimations(), theAnimationName, true);
     if (!_myAnimationNode) {
-        throw new Exception("Could not find animation: " + theAnimationName);
+        throw new Exception("Could not find animation: " + theAnimationName, fileline());
     }
     obj.getName = function() {
         return _myName;

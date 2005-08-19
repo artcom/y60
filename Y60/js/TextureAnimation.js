@@ -18,15 +18,15 @@
 
 use("Y60JSSL.js");
 
-function TextureAnimation(theImageNode, theImageIndex) {    
+function TextureAnimation(theImageNode, theImageIndex) {
     this.Constructor(this, theImageNode, theImageIndex);
 }
 
 TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageIndex) {
-    
+
     // private member
-    var _myLoops          = -1; // -1 endless, otherwise n-times 
-    var _myPingPong       = false; // true = loop alternating forward / backward 
+    var _myLoops          = -1; // -1 endless, otherwise n-times
+    var _myPingPong       = false; // true = loop alternating forward / backward
     var _myPingPongDir    = true;  // true = forward, false = backwards
     var _myCurrentFrame   = 0;
     //var _myTextureManager = window.getTextureManager();
@@ -38,11 +38,11 @@ TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageInd
     if (theImageIndex) {
         _myImageIndex = theImageIndex;
     }
-    
+
     obj.addFrame    = function(theFilename) {
         _myFrames.push(theFilename);
     }
- 
+
     // use like this: _myTextureAnimation.loadByBaseName("texanim/ripple_????.jpg", 60);
     obj.addFramesByBaseName = function(theBaseName, theCount) {
         var myRegExpr = new RegExp("\?+");
@@ -56,10 +56,10 @@ TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageInd
                 }
             }
             var myFileName = String(theBaseName).replace(myRegExpr, myPlaceholder + i);
-            obj.addFrame(myFileName);    
+            obj.addFrame(myFileName);
         }
     }
-    
+
     obj.setDuration = function(theDuration) {
         _myDuration = theDuration;
     }
@@ -77,9 +77,9 @@ TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageInd
         if (theFrameNum < _myFrames.length) {
             _myCurrentFrame = theFrameNum;
         } else {
-            throw new Exception("Request for frame " + theFrameNum + 
+            throw new Exception("Request for frame " + theFrameNum +
                         " but animation only has " + _myFrames.length + " frames.",
-                        "TextureAnimation::setStartFrame()");
+                        fileline());
         }
     }
 
@@ -88,18 +88,18 @@ TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageInd
             if (_myLoops > 0 ) {
                 _myLoops--;
             }
-            
+
             return true;
         } else {
             return false;
-        } 
+        }
     }
 
     obj.updatePerFrame = function() {
         // calc new currentFrame
         if (_myPingPongDir) {
             _myCurrentFrame++;
-            if (_myCurrentFrame > _myFrames.length - 1) {    
+            if (_myCurrentFrame > _myFrames.length - 1) {
                 if (checkLoops()) {
                     // Start next loop
                     if (_myPingPong) {
@@ -107,16 +107,16 @@ TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageInd
                         _myCurrentFrame = _myFrames.length - 1;
                         _myPingPongDir = !_myPingPongDir;
                     } else {
-                        _myCurrentFrame = 0;                    
+                        _myCurrentFrame = 0;
                     }
                 } else {
                     // Stop looping
-                    _myCurrentFrame = _myFrames.length - 1;    
+                    _myCurrentFrame = _myFrames.length - 1;
                 }
             }
         } else {
             _myCurrentFrame--;
-            if (_myCurrentFrame < 0) {    
+            if (_myCurrentFrame < 0) {
                 if (checkLoops()) {
                     // Start next loop
                     if (_myPingPong) {
@@ -124,18 +124,18 @@ TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageInd
                         _myCurrentFrame = 0;
                         _myPingPongDir = !_myPingPongDir;
                     } else {
-                        _myCurrentFrame = _myFrames.length - 1;    
+                        _myCurrentFrame = _myFrames.length - 1;
                     }
                 } else {
                     // Stop looping
-                    _myCurrentFrame = 0;                    
+                    _myCurrentFrame = 0;
                 }
             }
         }
-        
-        update();    
+
+        update();
     }
-    
+
     // does not work with ping pong, yet
     var _myLoopTime = 0;
     obj.updatePerTime = function(theTime) {
@@ -149,17 +149,17 @@ TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageInd
                 }
             } else {
                 myTime = _myDuration;
-            } 
+            }
         }
         // calc new currentFrame
         if (_myDuration != 0) {
             _myCurrentFrame = Math.floor((myTime / _myDuration) * (_myFrames.length-1));
         } else {
-            _myCurrentFrame = 0; 
+            _myCurrentFrame = 0;
         }
-        update();    
+        update();
     }
-    
+
     // private methods
     var update = function() {
         //print ("TextAnim:" + _myImageNode);
@@ -172,5 +172,5 @@ TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageInd
     }
 }
 
-    
+
 

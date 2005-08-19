@@ -665,7 +665,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         }
 
         if (!_myShaderLibrary) {
-            throw new Exception("Missing shaderlibrary argument", "FlightRecorder::parseArguments()");
+            throw new Exception("Missing shaderlibrary argument", fileline());
         }
     }
 

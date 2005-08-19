@@ -19,8 +19,7 @@ sub runLocalMakedist($) {
     }
 
     # Install dependencies
-    depends("Y60/js", "Y60/shader", "Y60/components", "Y60/products/GenCompressedTex", "Y60/products/GenMovie",
-            "Y60/products/watchdog/app");
+    depends("Y60/js", "Y60/shader", "Y60/products/watchdog/app");
 
 }
 

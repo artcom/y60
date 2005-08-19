@@ -112,7 +112,7 @@ function OverlayManager(theScene, theViewport) {
 
         if (myOverlay && !myOverlayMaterial) {
             throw new Exception("Overlay " + theName + " does not have a corresponding material node " + theName + "M.",
-                "OverlayManager::get()");
+                fileline());
         }
 
         return myOverlay;
@@ -186,8 +186,8 @@ function OverlayManager(theScene, theViewport) {
             }
         }
         myPaintNodeString += ']]"/>';
-        myTexCoordNodeString += ']]"/>';   
-             
+        myTexCoordNodeString += ']]"/>';
+
         return myPaintNodeString + '\n' + myTexCoordNodeString;
     }
 
@@ -199,7 +199,7 @@ function OverlayManager(theScene, theViewport) {
         var myOldOverlay = getDescendantByName(myParent, theName, false);
 
         if (!theOverwriteFlag && myOldOverlay) {
-            throw new Exception("Overlay " + theName + " already in use", "OverlayManager::create()");
+            throw new Exception("Overlay " + theName + " already in use", fileline());
         }
 
         var myOverlayString = '<overlay name="' + theName + '" material="' + theMaterialId + '"/>';
