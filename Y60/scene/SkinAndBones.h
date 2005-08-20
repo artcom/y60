@@ -45,7 +45,7 @@ namespace y60 {
 
         private:
             dom::NodePtr                 _myBoneMatrixPropertyNode;
-            std::vector<const JointFacadePtr> _myJoints;
+            std::vector<JointFacadePtr>  _myJoints;
             std::vector<asl::Matrix4f>   _myJointSpaceTransforms;    
             dom::NodePtr                 _myBoundingBoxNode;
             
