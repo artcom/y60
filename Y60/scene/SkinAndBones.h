@@ -21,6 +21,7 @@
 #define _ac_scene_SkinAndBones_h_
 
 #include "MaterialBase.h"
+#include "Facades.h"
 
 
 #include <dom/Nodes.h>
@@ -44,9 +45,10 @@ namespace y60 {
 
         private:
             dom::NodePtr                 _myBoneMatrixPropertyNode;
-            std::vector<const asl::Matrix4f *> _myJointMatrices;
+            std::vector<const JointFacadePtr> _myJoints;
             std::vector<asl::Matrix4f>   _myJointSpaceTransforms;    
             dom::NodePtr                 _myBoundingBoxNode;
+            
      };
 }   
 

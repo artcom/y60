@@ -214,7 +214,7 @@ updateGlobalMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
     DOC_BEGIN("DEPRECATED! Don't use this! Its all magic now.");
     DOC_END;
     try {
-        AC_WARNING << "UpdateGlobal Matrix is depricated. You should not need to use it anymore" << endl;
+        AC_WARNING << "updateGlobalMatrix() is deprecated and has no effect any more. Remove it." << endl;
 /*
         ensureParamCount(argc, 1, 2);
         dom::NodePtr myBody;

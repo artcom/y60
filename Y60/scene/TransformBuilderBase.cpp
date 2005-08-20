@@ -67,7 +67,8 @@ namespace y60 {
         std::string myType = "";
         if (theSensorType == SENSOR_APPROXIMATION) {
             myType = "approximation";
-            getNode()->appendAttribute(SENSOR_RADIUS_ATTRIB, theSensorRadius);
+//            getNode()->appendAttribute(SENSOR_RADIUS_ATTRIB, theSensorRadius);
+            getNode()->getAttribute(SENSOR_RADIUS_ATTRIB)->nodeValue(asl::as_string(theSensorRadius));
         } else {
             return;
         }

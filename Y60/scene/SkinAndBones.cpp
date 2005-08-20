@@ -98,15 +98,16 @@ namespace y60 {
                 throw SkinAndBonesException(std::string("Skeleton node points to unknown joint: ") + myJointIds[i] + "\n"
                     +asl::as_string(*mySkeletons[0]), PLUS_FILE_LINE);
             }
+            
+            // Cache Joint Facade
+            const JointFacadePtr myJointFacade = myJoint->getFacade<JointFacade>();
+            _myJoints.push_back(myJointFacade);
 
-            const asl::Matrix4f * myGlobalMatrix = &myJoint->getFacade<TransformHierarchyFacade>()->get<GlobalMatrixTag>();
-            _myJointMatrices.push_back(myGlobalMatrix);
-
-            Matrix4f myInitialMatrix(*myGlobalMatrix);
-            _myJointSpaceTransforms.push_back(asl::inverse(myInitialMatrix));
+            // get matrix for bind pose
+            _myJointSpaceTransforms.push_back(myJointFacade->get<InverseGlobalMatrixTag>());
         }
 
-        _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>()->resize(_myJointMatrices.size() * 3);
+        _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>()->resize(_myJoints.size() * 3);
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
     }
 
@@ -122,15 +123,15 @@ namespace y60 {
         Box3f * myBoundingBox = _myBoundingBoxNode->nodeValuePtrOpen<Box3f>();
         myBoundingBox->makeEmpty();
 
-        for (unsigned i = 0; i < _myJointMatrices.size(); ++i) {
+        for (unsigned i = 0; i < _myJoints.size(); ++i) {
             Matrix4f myMatrix(_myJointSpaceTransforms[i]);
-            myMatrix.postMultiply(*_myJointMatrices[i]);
+            myMatrix.postMultiply(_myJoints[i]->get<GlobalMatrixTag>());
 
             myBoneMatrixProperty->at(i * 3 + 0) = myMatrix.getColumn(0);
             myBoneMatrixProperty->at(i * 3 + 1) = myMatrix.getColumn(1);
             myBoneMatrixProperty->at(i * 3 + 2) = myMatrix.getColumn(2);
 
-            myBoundingBox->extendBy(asPoint(_myJointMatrices[i]->getTranslation()));
+            myBoundingBox->extendBy(asPoint(_myJoints[i]->get<GlobalMatrixTag>().getTranslation()));
         }
 
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
