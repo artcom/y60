@@ -33,7 +33,7 @@ class HWSampleSink;
 // Use this pointer as smart pointer to HWSampleSinks. If you use the default Ptr,
 // you'll get thread-specific free lists. Since lots of buffer pointers are allocated 
 // in one thread and deleted in another, that will cause memory leaks. The 
-// MutexPtrFreeListAllocator used here is slower but works.
+// PtrHeapAllocator used here is slower but works.
 typedef Ptr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkPtr;
 typedef WeakPtr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkWeakPtr;
     
@@ -118,7 +118,7 @@ class HWSampleSink: public AudioTimeSource
 
         Unsigned64 _myFrameCount;  // This allows for streams lasting about 13 million years 
                                    // if I didn't miscalculate :-).
-        Ptr<VolumeFader> _myVolumeFader;
+        VolumeFaderPtr _myVolumeFader;
         float _myVolume;
         bool _myStopWhenEmpty;
 };

@@ -16,6 +16,7 @@
 #include "Effect.h"
 
 #include <asl/settings.h>
+#include <asl/Ptr.h>
 
 namespace asl {
 
@@ -75,7 +76,7 @@ private:
     Unsigned64 _myFadeBeginFrame, _myFadeEndFrame;
 };
 
-
+typedef Ptr<VolumeFader, MultiProcessor, PtrHeapAllocator<MultiProcessor> > VolumeFaderPtr;
     
 } // namespace
 

@@ -41,7 +41,7 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
 
     _myFrameCount = 0;
     _myVolume = 1;
-    _myVolumeFader = Ptr<VolumeFader>(new VolumeFader(_mySampleFormat));
+    _myVolumeFader = VolumeFaderPtr(new VolumeFader(_mySampleFormat));
     _numChannels = numChannels;
     _myBackupBuffer = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 32, 
                 _numChannels, _mySampleRate));
@@ -50,7 +50,7 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
 }
 
 HWSampleSink::~HWSampleSink() {
-    AC_DEBUG << "~HWSampleSink (" << _myName << ")";
+    AC_DEBUG << "~HWSampleSink (" << _myName << ", ref count=" << _mySelf.getRefCount() << ")";
     if (_myState != STOPPED) {
         AC_WARNING << "Deleting SampleSink that's still running!";
     }
