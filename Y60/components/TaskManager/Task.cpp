@@ -74,13 +74,10 @@ namespace y60 {
             0, NULL, NULL, NULL, NULL
         };
 
-        if (thePath.size()) {
-            _chdir(thePath.c_str());
-        }
         bool myResult = CreateProcess(
             NULL, &theCommand[0],
             NULL, NULL, TRUE, 0,
-            NULL, NULL, &myStartupInfo,
+            NULL, thePath.c_str(), &myStartupInfo,
             &_myProcessInfo);
 
         // Error handling
