@@ -65,9 +65,12 @@ namespace y60 {
             double getFrameRate();
 
         private:
+            long long advance() const;
+
             AVFormatContext * _myFormatContext;           
             AVStream *        _myVideoStream;
             AVStream *        _myAudioStream;
+            AVFrame *         _myAdvanceFrame;
             int               _myVideoStreamIndex;
             int               _myAudioStreamIndex;
             std::string       _myFilename;

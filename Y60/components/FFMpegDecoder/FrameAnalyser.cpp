@@ -30,6 +30,8 @@
 #endif
 
 #include <asl/string_functions.h>
+#include <asl/numeric_functions.h>
+#include <asl/os_functions.h>
 #include <asl/Dashboard.h>
 
 #define DB(x) //x
@@ -112,7 +114,10 @@ namespace y60 {
     void
     FrameAnalyser::printTableRow(Table & theTable, AVPacket & thePacket, AVFrame & theFrame) {
         theTable.addRow();
-        theTable.setField("frame",as_string(ourFrameCounter++));
+
+        ourFrameCounter++;
+        int myFrameIndex = asl::round(double(thePacket.dts - _myVStream->start_time) / AV_TIME_BASE * _myVStream->r_frame_rate / _myVStream->r_frame_rate_base);
+        theTable.setField("frame", as_string(myFrameIndex));        
 
         switch (theFrame.pict_type) {
             case FF_I_TYPE:
@@ -133,6 +138,93 @@ namespace y60 {
         theTable.setField("streamposition", as_string(theFrame.coded_picture_number));
     }
 
+    long long
+    FrameAnalyser::advance() const {
+        int64_t   myLastDTS;
+        AVPacket  myPacket;
+        AVFrame * myFrame = avcodec_alloc_frame();
+        int myFoundPictureFlag = 0;
+
+        while (myFoundPictureFlag == 0) {
+            if (av_read_frame(_myFormatContext, &myPacket) < 0) {
+                break;
+            }
+            myLastDTS = myPacket.dts;
+    
+            // Make sure that the packet is from the actual video stream.
+            if (myPacket.stream_index == _myVStreamIndex) {
+                avcodec_decode_video(&_myVStream->codec,
+                    myFrame, &myFoundPictureFlag,
+                    myPacket.data, myPacket.size);
+            }
+            av_free_packet(&myPacket);
+        }
+
+        // From ffmpeg apiexample.c: some codecs, such as MPEG, transmit the
+        // I and P frame with a latency of one frame. You must do the
+        // following to have a chance to get the last frame of the video.
+        if (!myFoundPictureFlag) {
+            avcodec_decode_video(&_myVStream->codec,
+                                 myFrame, &myFoundPictureFlag,
+                                 0, 0);
+            myLastDTS += AV_TIME_BASE * _myVStream->r_frame_rate_base / _myVStream->r_frame_rate;
+        }
+        if (!myFoundPictureFlag) {
+            myLastDTS = UINT_MAX;
+        }
+
+        av_free(myFrame);
+        return myLastDTS;
+    }
+
+    void
+    FrameAnalyser::seekToFrame(unsigned theFrame) const {
+        if (theFrame != 0) {
+            theFrame--;
+        } else {
+            av_seek_frame(_myFormatContext, _myVStreamIndex, 0, 0);
+            return;
+        }
+        int64_t myHalfFrame = int64_t(AV_TIME_BASE) * _myVStream->r_frame_rate_base / _myVStream->r_frame_rate / 2;        
+        int64_t myTimestamp = int64_t(theFrame) * AV_TIME_BASE * _myVStream->r_frame_rate_base / _myVStream->r_frame_rate + _myVStream->start_time;
+
+        if (myTimestamp > myHalfFrame) {
+            myTimestamp -= myHalfFrame;
+        } else {
+            myTimestamp = 0;
+        }
+        
+        // newer releases of ffmpeg may require a 4th argument to av_seek_frame
+        #if LIBAVFORMAT_BUILD <= 4616
+            int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, theFrame);
+        #else
+            int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, theFrame, 0);
+        #endif
+
+        if (myResult < 0) {
+            cerr << "### ERROR: seek error!!!" << endl;
+            return;
+        }
+
+        // We got to a key frame. Forward until we get to the frame we want.
+        while (true) {
+            long long myLastDTS = advance();
+
+            if (myLastDTS == UINT_MAX) {
+                cerr << "### WARNING: seek reached end of file" << endl;
+                return;
+            }
+
+            if (myLastDTS >= myTimestamp) {
+                if (myLastDTS >= myTimestamp + 2 * myHalfFrame) {
+                    cerr << "### WARNING: seek went into the future!" << endl;
+                    return;
+                }
+                return;
+            }
+        }
+    }
+
     void 
     FrameAnalyser::run(unsigned theNumberOfFrames) {
         Table myTable;
@@ -142,8 +234,16 @@ namespace y60 {
         cerr << "    starttime: " << _myVStream->start_time << endl;
 
         int64_t mySeekTimestamp = _myVStream->start_time;
-        cerr << "seek to: " << mySeekTimestamp << endl;
-        av_seek_frame(_myFormatContext, -1, mySeekTimestamp, 0);        
+
+        string mySeekToFrameString;
+        if (asl::get_environment_var("Y60_SEEK_TO_FRAME", mySeekToFrameString)) {                       
+            mySeekTimestamp = (int64_t)(ourTimeBase * asl::as<unsigned>(mySeekToFrameString));
+            cerr << "seek to frame: " << mySeekToFrameString << endl;
+            seekToFrame(10);
+            seekToFrame(20);
+            seekToFrame(5);
+            seekToFrame(asl::as<unsigned>(mySeekToFrameString));            
+        }
 
         AVPacket myPacket;
         AVFrame * myFrame = avcodec_alloc_frame();
@@ -161,12 +261,12 @@ namespace y60 {
             if (myPacket.stream_index == _myVStreamIndex) {                
                 printPacketInfo(myPacket);
                 int myFrameCompleteFlag = 0;
-                int myLen = avcodec_decode_video(&_myVStream->codec, myFrame, &myFrameCompleteFlag,
+                int myLength = avcodec_decode_video(&_myVStream->codec, myFrame, &myFrameCompleteFlag,
                                                  myPacket.data, myPacket.size);
 
-                if (myLen < 0) {
+                if (myLength < 0) {
                     AC_ERROR << "av_decode_video error";
-                } else if (myLen < myPacket.size) {
+                } else if (myLength < myPacket.size) {
                     AC_ERROR << "av_decode_video: Could not decode video in one step";
                 }
 

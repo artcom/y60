@@ -65,12 +65,14 @@ namespace y60 {
     void 
     FFMpegDecoder::startMovie(double theStartTime) {
         MovieDecoderBase::startMovie(theStartTime);
-
-        //_myFrameConveyor.updateCache(theStartTime);
         if (_myAudioBufferedSource) {
             // if start from pause:
-            //_myAudioBufferedSource->clear();
-          //  _myAudioBufferedSource->setRunning(true);
+            _myAudioBufferedSource->clear();
+        }
+
+        _myFrameConveyor.preload(theStartTime);
+        if (_myAudioBufferedSource) {
+            _myAudioBufferedSource->setRunning(true);
         }
     }
 

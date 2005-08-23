@@ -29,7 +29,7 @@
 #include <asl/console_functions.h>
 #include <math.h>
 
-#define DB(x) x
+#define DB(x) //x
 #define DB2(x) //x
 
 
@@ -44,7 +44,7 @@ namespace y60 {
     FrameConveyor::FrameConveyor() :
         _myVideoFrame(0),        
         _myAudioFrame(AVCODEC_MAX_AUDIO_FRAME_SIZE),
-        _myCacheSizeInSecs(2)
+        _myCacheSizeInSecs(10)
     {
         _myVideoFrame = avcodec_alloc_frame();
     }
@@ -62,37 +62,33 @@ namespace y60 {
         _myAudioBufferedSource = theAudioBufferedSource;
         if (theAudioBufferedSource) {
             setupAudio();
-        }
+        }        
     }
 
-/*
+    // TODO: Merge with seeking, with no audio
     void
-    FrameConveyor::XXXfillCache(double theStartTimestamp) {
-        AC_TRACE << "Fill audio/video-cache...";
-        _myFrameCache.clear();
+    FrameConveyor::preload(double theInitialTimestamp) {
+        cerr << "Fill audio/video-cache..." << endl;
+        if (_myAudioBufferedSource) {
+            while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE &&
+                  _myAudioBufferedSource->getCacheFillLevelInSecs() < STARTUP_AUDIO_CACHE_TIME) 
+            {
+                updateCache(theInitialTimestamp);
+                _myCacheSizeInSecs += (1 / _myContext->getFrameRate());
+                DB(cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
+                   cerr << "  A-Buffersize: " << _myAudioBufferedSource->getCacheFillLevel() << " of: " << _myAudioBufferedSource->getCacheSize() << endl;
+                   cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;);
+            }            
 
-        bool myValidFilePosition = true;
-        while(myValidFilePosition && 
-              _myFrameCache.size() < MAX_FRAME_CACHE_SIZE &&
-              _myAudioBufferedSource->getCacheFillLevelInSecs() < STARTUP_AUDIO_CACHE_TIME) 
-        {
-            myValidFilePosition = decodeFrame(0);
-            DB(cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
-               cerr << "  A-Buffersize: " << _myAudioBufferedSource->getCacheFillLevel() << " of: " << _myAudioBufferedSource->getCacheSize() << endl;
-               cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;);
-        }
-
-        DB(
-            if (!myValidFilePosition) {
-                cerr << "   until end of file" << endl;
-            } else if (_myFrameCache.size() > MAX_FRAME_CACHE_SIZE) {
-                cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE << endl;
+            if (_myFrameCache.size() > MAX_FRAME_CACHE_SIZE) {
+                cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE << " frames " << endl;
             } else if (_myAudioBufferedSource->getCacheFillLevelInSecs() >= STARTUP_AUDIO_CACHE_TIME) {
-                cerr << "   until audio cache size larger than " << STARTUP_AUDIO_CACHE_TIME << endl;
+                cerr << "   until audio cache size larger than " << STARTUP_AUDIO_CACHE_TIME << " sec." << endl;
             }
-        )
+        } else {
+            updateCache(theInitialTimestamp);
+        }
     }
-*/
 
     void
     FrameConveyor::printCacheInfo(double theTargetStart, double theTargetEnd) {
@@ -108,7 +104,7 @@ namespace y60 {
 
         cerr << "|";
         for (unsigned i = 0; i < 40; ++i) {
-            double myCharTime = myMin + double(i) * _myCacheSizeInSecs / 40;
+            double myCharTime = myMin + double(i) * _myCacheSizeInSecs / 38;
             if ((myCharTime >= myCacheStart && myCharTime <= myCacheEnd) &&
                 (myCharTime >= theTargetStart && myCharTime <= theTargetEnd)) 
             {
@@ -128,16 +124,17 @@ namespace y60 {
 
     void
     FrameConveyor::updateCache(double theTimestamp) {
-        DB(cerr << "updateCache " << theTimestamp << endl);
+        DB(cerr << "updateCache at ts: " << theTimestamp << endl);
         double myCacheStart = -1; 
         double myCacheEnd = -1;
         if (! _myFrameCache.empty()) {
             myCacheStart = _myFrameCache.begin()->first;
             myCacheEnd = (--_myFrameCache.end())->first; 
         }
-
+        
         double myTargetStart = asl::maximum(0.0, theTimestamp - 0.5 * _myCacheSizeInSecs);
         double myTargetEnd   = theTimestamp + 0.5 * _myCacheSizeInSecs;
+        //cerr << "ts: " << theTimestamp << ", start: " << myTargetStart << ", end: " << myTargetEnd << endl;
 
         //printCacheInfo(myTargetStart, myTargetEnd);
 
@@ -145,30 +142,38 @@ namespace y60 {
             myTargetEnd <= myCacheStart ||  /* |TTTTTTTTTT| |CCCCCCCCCC| */    
             (myTargetStart < myCacheStart && myTargetEnd > myCacheEnd) ) /* |TTTT|XX|TTTT| */
         {
-            cerr << TTYRED << "   case 3,4,5" << ENDCOLOR << endl;
+            DB(cerr << TTYRED << "   case 3,4,5" << ENDCOLOR << endl;)
             _myFrameCache.clear();
             fillCache(myTargetStart, myTargetEnd);
             myTargetStart = _myFrameCache.begin()->first;
             myTargetEnd = _myFrameCache.rbegin()->first;
-        } else if (myTargetEnd > myCacheEnd) {    /* |CCCCCC|XX|TTTTTT| */    
-            cerr << TTYGREEN << "   case 1" << ENDCOLOR << endl;
+        } else if (myTargetEnd > myCacheEnd) {    
+            // |CCCCCC|XX|TTTTTT| 
+            DB(cerr << TTYGREEN << "   case 1" << ENDCOLOR << endl;)
             fillCache(myCacheEnd, myTargetEnd);
             myTargetEnd = _myFrameCache.rbegin()->first;
-        } else if (myTargetStart < myCacheStart) { /* |TTTTTT|XX|CCCCCC| */    
-            cerr << TTYRED << "   case 2" << ENDCOLOR << endl;
+        } else if (myTargetStart < myCacheStart) { 
+            // |TTTTTT|XX|CCCCCC| 
+            DB(cerr << TTYRED << "   case 2" << ENDCOLOR << endl;)
             fillCache(myTargetStart, myCacheStart);
             myTargetStart = _myFrameCache.begin()->first;
-        } else { /* |CCCCC|XX|CCCC| */
-            cerr << TTYRED << "   case 6" << ENDCOLOR << endl;
-            ; //nothing
+        } else { 
+            // |CCCCC|XX|CCCC| 
+            DB(cerr << TTYRED << "   case 6" << ENDCOLOR << endl;)
         }
 
+        //printCacheInfo(myTargetStart, myTargetEnd);
         trimCache(myTargetStart, myTargetEnd);
-        printCacheInfo(myTargetStart, myTargetEnd);
+        //printCacheInfo(myTargetStart, myTargetEnd);
     }
 
     void FrameConveyor::trimCache(double theTargetStart, double theTargetEnd) {
         DB2(cerr << " trimming to " << theTargetStart << " - " << theTargetEnd << endl;);
+
+        // Leave one frame at the beginning and end to avoid cutting just at the edge
+        double myTimePerFrame = 1.0 / _myContext->getFrameRate();
+        theTargetStart -= myTimePerFrame;
+        theTargetEnd   += myTimePerFrame;
         FrameCache::iterator myIt = _myFrameCache.begin();
         while (myIt != _myFrameCache.end() && myIt->first < theTargetStart) {
             DB2(cerr << " erasing at " << myIt->first << endl;);
@@ -186,26 +191,23 @@ namespace y60 {
         theStartTime = asl::maximum(0.0, theStartTime);
         theEndTime   = asl::maximum(theStartTime, theEndTime);
 
-        //maybe seek to theStartTime
         // seek if timestamp is outside these boundaries
         double myTimePerFrame = 1.0 / _myContext->getFrameRate();
         double myLastDecodedTime = _myVideoFrame->pts / (double)AV_TIME_BASE;
 
-        cerr << "fillCache [" << theStartTime << "; " << theEndTime << "]" << endl;
-        cerr << " last decoded " << myLastDecodedTime << " tolerance " << myTimePerFrame * 2 << endl;
-        //if (theStartTime < _myLowerCacheTimestamp || theTimestamp > (_myUpperCacheTimestamp + myTimePerFrame*2)) {
+        DB(cerr << "fillCache [" << theStartTime << " to " << theEndTime << "]" << endl;)
+        DB(cerr << " last decoded " << myLastDecodedTime << endl;)
         if (fabs(theStartTime - myLastDecodedTime) >= myTimePerFrame * 2) {
             _myContext->seekToTime(theStartTime);
         }
 
         double myCurrentTime = theStartTime;
         while(myCurrentTime >= 0 && myCurrentTime < theEndTime) {
-
             myCurrentTime = decodeFrame();
 
             DB2(cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
-               cerr << "  current time: " << myCurrentTime << endl;
-               cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;);
+                cerr << "  current time: " << myCurrentTime << endl;
+                cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;);
         }
     }
 

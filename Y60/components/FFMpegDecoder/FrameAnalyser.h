@@ -40,6 +40,8 @@ namespace y60 {
             void run(unsigned theNumberOfFrames);
 
         private:
+            long long advance() const;
+            void seekToFrame(unsigned theFrame) const;
             void setupTable(asl::Table & theTable);
             void printTableRow(asl::Table & theTable, AVPacket & thePacket, AVFrame & theFrame);
 

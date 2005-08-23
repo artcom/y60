@@ -44,9 +44,14 @@ namespace y60 {
             FrameConveyor();
             ~FrameConveyor();
 
+            /// Sets up video and audio for decoding
             void load(asl::Ptr<DecoderContext> theContext, AudioBase::BufferedSource * theAudioBufferedSource); 
+
+            /// Copies the frame with theTimestamp from the cache into theTargetRaster
             double getFrame(double theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
-            void updateCache(double theTimestamp);
+
+            /// Preloads enought frames into the cache to allow audio-playback without underruns
+            void preload(double theInitialTimestamp);
 
         private:
             /** Decode frame at theTimestamp into theTargetRaster. 
@@ -60,11 +65,19 @@ namespace y60 {
             /// Copy raster to raster
             void copyFrame(unsigned char * theSourceBuffer, dom::ResizeableRasterPtr theTargetRaster);
 
+            /// Fills the cache from start to end time
             void fillCache(double theStartTime, double theEndTime);            
+
+            /// Deletes all frames from cache that are before start or after end time
             void trimCache(double theTargetStart, double theTargetEnd);
 
+            /// Rearranges the cache relative to theTimestamp
+            void updateCache(double theTimestamp);
+
+            /// Initial setup of audio buffered source
             void setupAudio();
 
+            /// Visualizes the current fill level of the video cache
             void printCacheInfo(double theTargetStart, double theTargetEnd);
 
             asl::Ptr<DecoderContext>    _myContext;
@@ -72,7 +85,7 @@ namespace y60 {
             AudioFrame                  _myAudioFrame;
             AudioBase::BufferedSource * _myAudioBufferedSource;
 
-            double _myCacheSizeInSecs;
+            double                      _myCacheSizeInSecs;
 
             typedef std::map<double, asl::Ptr<VideoFrame> > FrameCache;
             FrameCache _myFrameCache;
