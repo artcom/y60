@@ -529,15 +529,11 @@ namespace y60 {
                 for (int i = 0; i < myEdgeCount; ++i) {
                     AC_TRACE << "     edge case :" << myEdges[i];
                     myPositionIndex = -1;
-#ifdef MC_DONT_SHARE_VERTICES
-                    myPositionIndex = (this->*myOnVertex)  (myEdges[i], theMarchPos);
-#else
+#ifndef MC_DONT_SHARE_VERTICES
                     switch (myEdges[i]) {
                         case 0:
-                            if(kMarch == kBoxStart) {
-                                if (iMarch != iBoxStart) {
-                                    myPositionIndex = _myOld2Pt;
-                                }
+                            if (_myOld2Pt >= 0) {
+                                myPositionIndex = _myOld2Pt;
                             } else {
                                 myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch];
                             }
@@ -566,16 +562,12 @@ namespace y60 {
                             break;
 
                         case 7:
-                            if(jMarch != jBoxStart) {
-                                myPositionIndex = _myTopIEdge[iMarch];
-                            }
+                            myPositionIndex = _myTopIEdge[iMarch];
                             break;
 
                         case 8:
-                            if(jMarch == jBoxStart) {
-                                if (iMarch != iBoxStart) {
-                                    myPositionIndex = _myOld11Pt;
-                                }
+                            if (_myOld11Pt >= 0) {
+                                myPositionIndex = _myOld11Pt;
                             } else {
                                 myPositionIndex = _myKEdge[iMarch];
                             }
@@ -589,11 +581,8 @@ namespace y60 {
                             break;
 
                         case 11:
-                            if(jMarch != jBoxStart) {
-                                myPositionIndex = _myKEdge[iMarch + 1];
-                            }
+                            myPositionIndex = _myKEdge[iMarch + 1];
                             break;
-
                         default:
                             break;
                     }
@@ -604,7 +593,9 @@ namespace y60 {
                     myEdgeTable[myEdges[i]] = myPositionIndex;
                 }
                 _myOld11Pt = myEdgeTable[11];
-                _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myEdgeTable[1];
+                if (myEdgeTable[1] >= 0) {
+                    _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myEdgeTable[1];
+                }
                 _myOld2Pt = myEdgeTable[2];
                 _myJEdge[_myDimensions[0] * jMarch + iMarch] = myEdgeTable[4];
                 _myOld6Pt = myEdgeTable[6];
@@ -630,13 +621,11 @@ namespace y60 {
 					}
 				} else {
 					int myFirstFaceIndex = _myHalfEdges->size();
-                    // AC_INFO << "-------------";
 					for (int i = 0; i < myCubeCase.faces.size(); ++i) {
 						int myCornerIndex = myCubeCase.faces[i];
 						int myNextCornerIndex = myCubeCase.faces[i - (i % 3) + ((i+1) % 3)];
 						int myIndex = myEdgeTable[myCornerIndex];
 						int myNextIndex = myEdgeTable[myNextCornerIndex];
-						// int myTwin = ourHalfEdgeData[cubeIndex][i];
                         const MCLookup::HalfEdgeNeighbor & myNeighbor = myCubeCase.neighbors[i];
 						int myHalfEdge = -1;
 						if (myNeighbor.type == MCLookup::INTERNAL) {
@@ -646,9 +635,9 @@ namespace y60 {
 							if (myNeighbor.type == MCLookup::MAX_X ||
                                 myNeighbor.type == MCLookup::MAX_Y ||
                                 myNeighbor.type == MCLookup::MAX_Z)                             {
-                                if (((myNeighbor.type == MCLookup::MAX_X) && (iMarch < iBoxEnd-1)) ||
-                                    ((myNeighbor.type == MCLookup::MAX_Y) && (jMarch < jBoxEnd-1)) ||
-                                    ((myNeighbor.type == MCLookup::MAX_Z) && (kMarch < kBoxEnd-1))) 
+                                if (((myNeighbor.type == MCLookup::MAX_X) && (iMarch+1 < iBoxEnd)) ||
+                                    ((myNeighbor.type == MCLookup::MAX_Y) && (jMarch+1 < jBoxEnd)) ||
+                                    ((myNeighbor.type == MCLookup::MAX_Z) && (kMarch+1 < kBoxEnd))) 
                                 { 
                                     // Add to the map
                                     EdgeId myKey(myIndex, myNextIndex);
@@ -829,7 +818,10 @@ namespace y60 {
                 for(k = kBoxStart; k < kBoxEnd; k++) {
                     _myVoxelData->notifyProgress(double(k - kBoxStart) / double(kBoxEnd - kBoxStart),
                             theDryRun ? "estimating" : "polygonizing");
-
+                    _myTopIEdge.clear();
+                    _myTopIEdge.resize(_myDimensions[0], -1);
+                    _myKEdge.clear();
+                    _myKEdge.resize(_myDimensions[0], -1);
                     for(j = jBoxStart; j < jBoxEnd; j++) {
                         _myOld2Pt = _myOld6Pt = _myOld11Pt = _myOld10Pt = -1;
                         for(i = iBoxStart; i < iBoxEnd; i++) {

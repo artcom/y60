@@ -238,7 +238,7 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox,
     // here we go ...
     MarchingCubes<VoxelT> myMarcher(theDownSampleRate, mySceneBuilder, this);
 
-    myMarcher.setBox(theVoxelBox);//, theSegmentationBitmap);
+    myMarcher.setBox(theVoxelBox, theSegmentationBitmap);
     myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
     //myMarcher.setThreshold(VoxelT(theThresholdMax));
     myMarcher.calcNormals(theCreateNormalsFlag);
@@ -267,7 +267,7 @@ CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox,
     // here we go ...
     MarchingCubes<VoxelT> myMarcher(theDownSampleRate, SceneBuilderPtr(0), this);
 
-    myMarcher.setBox(theVoxelBox);//, theSegmentationBitmap);
+    myMarcher.setBox(theVoxelBox, theSegmentationBitmap);
     myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
     //myMarcher.setThreshold(VoxelT(theThresholdMax));
     myMarcher.calcNormals(false);
