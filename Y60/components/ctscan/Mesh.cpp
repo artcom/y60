@@ -128,6 +128,20 @@ Mesh::colorizeError(float theMaximumError, unsigned theColor) {
     return myCount;
 }
 
+unsigned
+Mesh::colorizeDisconnected(unsigned theColor) {
+    lockWrite();
+    unsigned myCount = 0;
+    for (unsigned i = 0; i < _myPositions->size(); ++i) {
+        if (_myHalfEdges->at(i) == -1) {
+            (*_myColors)[i] = theColor;
+            ++myCount;
+        } 
+    }
+    unlockWrite();
+    return myCount;
+}
+
 #if 1
 float
 Mesh::calcEdgeError(unsigned theIndex) {

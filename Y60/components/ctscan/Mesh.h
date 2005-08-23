@@ -30,6 +30,7 @@ class Mesh {
 public:
     Mesh(dom::NodePtr theShapeNode);
     unsigned colorize(unsigned int theStartIndex, unsigned int theColorIndex);
+    unsigned colorizeDisconnected(unsigned int theColorIndex);
     bool edgeCollapse(unsigned theIndex);
     unsigned deleteIndicesByColor(unsigned int theColor);
     unsigned deleteDanglingVertices();

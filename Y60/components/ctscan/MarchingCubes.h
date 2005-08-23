@@ -533,16 +533,6 @@ namespace y60 {
 #else
                     switch (myEdges[i]) {
                         case 0:
-                            if (isInSegmentationVolume(iMarch, jMarch, kMarch-1)) {
-                                myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch];
-                            }
-                            else if (isInSegmentationVolume(iMarch - 1, jMarch, kMarch)) {
-                                myPositionIndex = _myOld2Pt;
-                            }
-                            else {
-                                myPositionIndex = (this->*myOnVertex) (0, theMarchPos);
-                            }
-                            /*
                             if(kMarch == kBoxStart) {
                                 if (iMarch == iBoxStart) {
                                     myPositionIndex = (this->*myOnVertex) (0, theMarchPos);
@@ -552,38 +542,23 @@ namespace y60 {
                             } else {
                                 myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch];
                             }
-                            */
                             break;
 
                         case 1:
-                            if (isInSegmentationVolume(iMarch, jMarch+1, kMarch-1)) {
-                                myPositionIndex = _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch];
-                            } else {
-                                myPositionIndex = (this->*myOnVertex)  (1, theMarchPos);
-                            }
-                            /*
                             if (kMarch == kBoxStart) {
                                 myPositionIndex = (this->*myOnVertex)  (1, theMarchPos);
-                                //_myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
+                                _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
                             } else {
                                 myPositionIndex = _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch];
                             }
-                            */
                             break;
 
                         case 2:
-                            if (isInSegmentationVolume(iMarch + 1, jMarch, kMarch - 1)) {
-                                myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch + 1];
-                            } else {
-                                myPositionIndex = (this->*myOnVertex)  (2, theMarchPos);
-                            }
-                            /*
                             if (kMarch == kBoxStart) {
                                 myPositionIndex = (this->*myOnVertex)  (2, theMarchPos);
                             } else {
                                 myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch + 1];
                             }
-                            */
                             break;
 
                         case 3:
@@ -600,7 +575,7 @@ namespace y60 {
                             } else {
                                 myPositionIndex = _myOld6Pt;
                             }
-                            //_myJEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
+                            _myJEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
                             break;
 
                         case 5:
@@ -610,9 +585,9 @@ namespace y60 {
                             // for j+1 on the last voxels 1-case (in next slice)
                             // we also cant write directly since the old value normally
                             // is still needed by the 3 case of this voxel
-                            //if(jMarch + 1 == jBoxEnd) {
-                            //    _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
-                            //}
+                            if(jMarch + 1 == jBoxEnd) {
+                                _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
+                            }
                             break;
 
                         case 6:
@@ -620,9 +595,9 @@ namespace y60 {
 
                             // [TS] This is done since the _myOld6Pt will not work for i+1 on the
                             // last voxels 2-case
-                            //if(iMarch + 1 == iBoxEnd) {
-                            //    _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myPositionIndex;
-                            //} 
+                            if(iMarch + 1 == iBoxEnd) {
+                                _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myPositionIndex;
+                            } 
                             break;
 
                         case 7:
@@ -631,7 +606,7 @@ namespace y60 {
                             } else {
                                 myPositionIndex = _myTopIEdge[iMarch];
                             }
-                            //_myIEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
+                            _myIEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
                             break;
 
                         case 8:
@@ -652,7 +627,7 @@ namespace y60 {
                             } else {
                                 myPositionIndex = _myOld10Pt;
                             }
-                            //_myKEdge[iMarch] = myPositionIndex;
+                            _myKEdge[iMarch] = myPositionIndex;
                             break;
 
                         case 10:
@@ -663,9 +638,9 @@ namespace y60 {
                             // some weird duping of the last voxel-value in one row or just
                             // a way to make 11 work without another special handler for box
                             // ends?
-                            //if(iMarch + 1 == iBoxEnd) {
-                            //    _myKEdge[iMarch + 1] = myPositionIndex;
-                            //}
+                            if(iMarch + 1 == iBoxEnd) {
+                                _myKEdge[iMarch + 1] = myPositionIndex;
+                            }
                             break;
 
                         case 11:
@@ -682,19 +657,16 @@ namespace y60 {
 #endif
                     myEdgeTable[myEdges[i]] = myPositionIndex;
                 }
-                // update old stuff
                 _myOld11Pt = myEdgeTable[11];
                 _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myEdgeTable[1];
                 _myOld2Pt = myEdgeTable[2];
                 _myJEdge[_myDimensions[0] * jMarch + iMarch] = myEdgeTable[4];
                 _myOld6Pt = myEdgeTable[6];
-                //if (!isInSegmentationVolume(iMarch + 1, jMarch, kMarch + 1)) {
                 if (iMarch + 1 == iBoxEnd) {
                     _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myEdgeTable[6];
                 }
                 _myIEdge[_myDimensions[0] * jMarch + iMarch] = myEdgeTable[7];
                 _myTopIEdge[iMarch] = myEdgeTable[5];
-                //if (!isInSegmentationVolume(iMarch, jMarch + 1, kMarch + 1)) {
                 if (jMarch + 1 == jBoxEnd) {
                     _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myEdgeTable[5];
                 }

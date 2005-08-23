@@ -82,6 +82,21 @@ colorizeError(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
     } HANDLE_CPP_EXCEPTION;
 }
 
+
+static JSBool
+colorizeDisconnected(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        ensureParamCount(argc, 1);
+        unsigned myColorIndex;
+        convertFrom(cx, argv[0], myColorIndex);
+        JSClassTraits<Mesh>::ScopedNativeRef myObj(cx, obj);
+        Mesh & myMesh = myObj.getNative();
+        unsigned myNumVertices = myMesh.colorizeDisconnected(myColorIndex);
+        *rval = as_jsval(cx, myNumVertices);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 static JSBool
 computeError(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
@@ -237,6 +252,7 @@ JSMesh::Functions() {
         {"edgeCollapse",            edgeCollapse,               1},
         {"collapseByError",         collapseByError,            1},
         {"colorizeError",           colorizeError,              2},
+        {"colorizeDisconnected",    colorizeDisconnected,       1},
         {"computeError",            computeError,               0},
         {"setColor",                setColor,                   1},
         {0}
