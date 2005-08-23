@@ -547,7 +547,7 @@ namespace y60 {
                         case 1:
                             if (kMarch == kBoxStart) {
                                 myPositionIndex = (this->*myOnVertex)  (1, theMarchPos);
-                                _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
+                                //_myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
                             } else {
                                 myPositionIndex = _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch];
                             }
@@ -575,29 +575,29 @@ namespace y60 {
                             } else {
                                 myPositionIndex = _myOld6Pt;
                             }
-                            _myJEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
+                            //_myJEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
                             break;
 
                         case 5:
                             myPositionIndex = (this->*myOnVertex)  (5, theMarchPos);
-                            _myTopIEdge[iMarch] = myPositionIndex;
-                            // [TS] This is done since that one will not be written by a 7
-                            // for j+1 on the last voxels 1-case (in next slice)
-                            // we also cant write directly since the old value normally
-                            // is still needed by the 3 case of this voxel
-                            if(jMarch + 1 == jBoxEnd) {
-                                _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
-                            }
+                            //_myTopIEdge[iMarch] = myPositionIndex;
+                            //// [TS] This is done since that one will not be written by a 7
+                            //// for j+1 on the last voxels 1-case (in next slice)
+                            //// we also cant write directly since the old value normally
+                            //// is still needed by the 3 case of this voxel
+                            //if(jMarch + 1 == jBoxEnd) {
+                            //    _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
+                            //}
                             break;
 
                         case 6:
                             myPositionIndex = (this->*myOnVertex)  (6, theMarchPos);
 
-                            // [TS] This is done since the _myOld6Pt will not work for i+1 on the
-                            // last voxels 2-case
-                            if(iMarch + 1 == iBoxEnd) {
-                                _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myPositionIndex;
-                            } 
+                            //// [TS] This is done since the _myOld6Pt will not work for i+1 on the
+                            //// last voxels 2-case
+                            //if(iMarch + 1 == iBoxEnd) {
+                            //    _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myPositionIndex;
+                            //} 
                             break;
 
                         case 7:
@@ -606,7 +606,7 @@ namespace y60 {
                             } else {
                                 myPositionIndex = _myTopIEdge[iMarch];
                             }
-                            _myIEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
+                            //_myIEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
                             break;
 
                         case 8:
@@ -627,20 +627,20 @@ namespace y60 {
                             } else {
                                 myPositionIndex = _myOld10Pt;
                             }
-                            _myKEdge[iMarch] = myPositionIndex;
+                            //_myKEdge[iMarch] = myPositionIndex;
                             break;
 
                         case 10:
                             myPositionIndex = (this->*myOnVertex)  (10, theMarchPos);
 
-                            // Write the last one here so the 11 case of _this_ cube can read
-                            // it. [TS] I'm not completely aware why this is done... Maybe
-                            // some weird duping of the last voxel-value in one row or just
-                            // a way to make 11 work without another special handler for box
-                            // ends?
-                            if(iMarch + 1 == iBoxEnd) {
-                                _myKEdge[iMarch + 1] = myPositionIndex;
-                            }
+                            //// Write the last one here so the 11 case of _this_ cube can read
+                            //// it. [TS] I'm not completely aware why this is done... Maybe
+                            //// some weird duping of the last voxel-value in one row or just
+                            //// a way to make 11 work without another special handler for box
+                            //// ends?
+                            //if(iMarch + 1 == iBoxEnd) {
+                            //    _myKEdge[iMarch + 1] = myPositionIndex;
+                            //}
                             break;
 
                         case 11:
