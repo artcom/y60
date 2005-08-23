@@ -528,15 +528,14 @@ namespace y60 {
                 int myEdgeCount = myEdges.size();
                 for (int i = 0; i < myEdgeCount; ++i) {
                     AC_TRACE << "     edge case :" << myEdges[i];
+                    myPositionIndex = -1;
 #ifdef MC_DONT_SHARE_VERTICES
                     myPositionIndex = (this->*myOnVertex)  (myEdges[i], theMarchPos);
 #else
                     switch (myEdges[i]) {
                         case 0:
                             if(kMarch == kBoxStart) {
-                                if (iMarch == iBoxStart) {
-                                    myPositionIndex = (this->*myOnVertex) (0, theMarchPos);
-                                } else {
+                                if (iMarch != iBoxStart) {
                                     myPositionIndex = _myOld2Pt;
                                 }
                             } else {
@@ -545,75 +544,36 @@ namespace y60 {
                             break;
 
                         case 1:
-                            if (kMarch == kBoxStart) {
-                                myPositionIndex = (this->*myOnVertex)  (1, theMarchPos);
-                                //_myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
-                            } else {
-                                myPositionIndex = _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch];
-                            }
+                            myPositionIndex = _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch];
                             break;
 
                         case 2:
-                            if (kMarch == kBoxStart) {
-                                myPositionIndex = (this->*myOnVertex)  (2, theMarchPos);
-                            } else {
-                                myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch + 1];
-                            }
+                            myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch + 1];
                             break;
 
                         case 3:
-                            if((kMarch == kBoxStart) && (jMarch == jBoxStart)) { 
-                                myPositionIndex = (this->*myOnVertex)  (3, theMarchPos);
-                            } else {
-                                myPositionIndex = _myIEdge[_myDimensions[0] * jMarch + iMarch];
-                            }
+                            myPositionIndex = _myIEdge[_myDimensions[0] * jMarch + iMarch];
                             break;
 
                         case 4:
-                            if(iMarch == iBoxStart) {
-                                myPositionIndex = (this->*myOnVertex)  (4, theMarchPos);
-                            } else {
-                                myPositionIndex = _myOld6Pt;
-                            }
-                            //_myJEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
+                            myPositionIndex = _myOld6Pt;
                             break;
 
                         case 5:
-                            myPositionIndex = (this->*myOnVertex)  (5, theMarchPos);
-                            //_myTopIEdge[iMarch] = myPositionIndex;
-                            //// [TS] This is done since that one will not be written by a 7
-                            //// for j+1 on the last voxels 1-case (in next slice)
-                            //// we also cant write directly since the old value normally
-                            //// is still needed by the 3 case of this voxel
-                            //if(jMarch + 1 == jBoxEnd) {
-                            //    _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
-                            //}
                             break;
 
                         case 6:
-                            myPositionIndex = (this->*myOnVertex)  (6, theMarchPos);
-
-                            //// [TS] This is done since the _myOld6Pt will not work for i+1 on the
-                            //// last voxels 2-case
-                            //if(iMarch + 1 == iBoxEnd) {
-                            //    _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myPositionIndex;
-                            //} 
                             break;
 
                         case 7:
-                            if(jMarch == jBoxStart) {
-                                myPositionIndex = (this->*myOnVertex)  (7, theMarchPos);
-                            } else {
+                            if(jMarch != jBoxStart) {
                                 myPositionIndex = _myTopIEdge[iMarch];
                             }
-                            //_myIEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
                             break;
 
                         case 8:
                             if(jMarch == jBoxStart) {
-                                if (iMarch == iBoxStart) {
-                                    myPositionIndex = (this->*myOnVertex)  (8, theMarchPos);
-                                } else {
+                                if (iMarch != iBoxStart) {
                                     myPositionIndex = _myOld11Pt;
                                 }
                             } else {
@@ -622,31 +582,14 @@ namespace y60 {
                             break;
 
                         case 9:
-                            if(iMarch == iBoxStart) {
-                                myPositionIndex = (this->*myOnVertex)  (9, theMarchPos);
-                            } else {
-                                myPositionIndex = _myOld10Pt;
-                            }
-                            //_myKEdge[iMarch] = myPositionIndex;
+                            myPositionIndex = _myOld10Pt;
                             break;
 
                         case 10:
-                            myPositionIndex = (this->*myOnVertex)  (10, theMarchPos);
-
-                            //// Write the last one here so the 11 case of _this_ cube can read
-                            //// it. [TS] I'm not completely aware why this is done... Maybe
-                            //// some weird duping of the last voxel-value in one row or just
-                            //// a way to make 11 work without another special handler for box
-                            //// ends?
-                            //if(iMarch + 1 == iBoxEnd) {
-                            //    _myKEdge[iMarch + 1] = myPositionIndex;
-                            //}
                             break;
 
                         case 11:
-                            if(jMarch == jBoxStart) {
-                                myPositionIndex = (this->*myOnVertex)  (11, theMarchPos);
-                            } else  {
+                            if(jMarch != jBoxStart) {
                                 myPositionIndex = _myKEdge[iMarch + 1];
                             }
                             break;
@@ -655,6 +598,9 @@ namespace y60 {
                             break;
                     }
 #endif
+                    if (myPositionIndex < 0) {
+                        myPositionIndex = (this->*myOnVertex) (myEdges[i], theMarchPos);
+                    }
                     myEdgeTable[myEdges[i]] = myPositionIndex;
                 }
                 _myOld11Pt = myEdgeTable[11];
