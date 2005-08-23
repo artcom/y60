@@ -38,7 +38,9 @@ namespace asl {
 namespace y60 {
 
 DEFINE_EXCEPTION(CTScanException, asl::Exception);
-    
+
+typedef std::vector<std::vector<bool> > SegmentationBitmap;
+
 class CTScan {
     public:
         enum ScanState {
@@ -82,12 +84,14 @@ class CTScan {
         asl::Vector2d getValueRange();
 
         asl::Vector2i countTriangles(const asl::Box3i & theVoxelBox, 
-            double theThresholdMin, double theThresholdMax, int theDownSampleRate);
+            double theThresholdMin, double theThresholdMax, int theDownSampleRate,
+            const SegmentationBitmap * theSegmentationBitmap);
 
         /** Create an isosurface from the voxel dataset */
         ScenePtr polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
             int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
-            unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
+            unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0, 
+            const SegmentationBitmap * theSegmentationBitmap = 0);
 
         /** Create a downscaled 3D texture from the dataset */
         void create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize);
@@ -131,13 +135,16 @@ class CTScan {
         void
         countMarchingCubes(const asl::Box3i & theVoxelBox,
                              double theThresholdMin, double theThresholdMax, int theDownSampleRate,
-                             unsigned int & theVertexCount, unsigned int & theTriangleCount );
+                             unsigned int & theVertexCount, unsigned int & theTriangleCount,
+                             const SegmentationBitmap * theSegmentationBitmap = 0);
         template <class VoxelT> 
         void
         applyMarchingCubes(const asl::Box3i & theVoxelBox, 
                              double theThresholdMin, double theThresholdMax, int theDownSampleRate,
                              bool theCreateNormalsFlag, 
-                             ScenePtr theScene, unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
+                             ScenePtr theScene, unsigned int theNumVertices = 0, 
+                             unsigned int theNumTriangles = 0,
+                             const SegmentationBitmap * theSegmentationBitmap = 0);
         template <class VoxelT>
         void
         countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram);

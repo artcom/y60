@@ -187,8 +187,18 @@ countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
         int myDownSampleRate;
         convertFrom(cx, argv[3], myDownSampleRate);
 
+        asl::Vector3i myBoxSize = myVoxelBox.getSize();
+        std::vector<bool> mySegmentationBitmapSlice;
+        std::vector<bool> mySegmentationBitmapSliceFalse;
+        mySegmentationBitmapSlice.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), true);
+        mySegmentationBitmapSliceFalse.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), false);
+        // XXX put this on the heap
+        SegmentationBitmap mySegmentationBitmap;
+//        mySegmentationBitmap.resize((myBoxSize[2]+1) / 2, mySegmentationBitmapSliceFalse);
+        mySegmentationBitmap.resize(myBoxSize[2]+1, mySegmentationBitmapSlice);
+
         CTScan & myCTScan = myObj.getNative();
-        asl::Vector2i myCount = myCTScan.countTriangles(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate);
+        asl::Vector2i myCount = myCTScan.countTriangles(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate, &mySegmentationBitmap);
         *rval = as_jsval(cx, myCount);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -229,8 +239,19 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             convertFrom(cx, argv[6], myNumTriangles);
         }
         CTScan & myCTScan = myObj.getNative();
+
+        asl::Vector3i myBoxSize = myVoxelBox.getSize();
+        std::vector<bool> mySegmentationBitmapSlice;
+        std::vector<bool> mySegmentationBitmapSliceFalse;
+        mySegmentationBitmapSlice.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), true);
+        mySegmentationBitmapSliceFalse.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), false);
+        // XXX put this on the heap
+        SegmentationBitmap mySegmentationBitmap;
+        //mySegmentationBitmap.resize((myBoxSize[2]+1) / 2, mySegmentationBitmapSliceFalse);
+        mySegmentationBitmap.resize(myBoxSize[2]+1, mySegmentationBitmapSlice);
+
         ScenePtr myScene = myCTScan.polygonize(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,  
-            myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles);
+            myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles, &mySegmentationBitmap);
         *rval = as_jsval(cx, myScene);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

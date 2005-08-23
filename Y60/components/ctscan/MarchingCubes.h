@@ -31,6 +31,9 @@
 
 #include <algorithm>
 #include <stdio.h>
+#include <asl/Assure.h>
+
+//#define MC_DONT_SHARE_VERTICES
 
 //#define DEBUG_INDEXTABLES
 //#define DUPECHECKER
@@ -68,7 +71,8 @@ namespace y60 {
 				_myHalfEdgeCount(0),
                 _myDownSampleRate(theDownSampleRate),
                 _myLineStride(0),
-                _myMCLookup()
+                _myMCLookup(),
+                _mySegmentationBitmap(0)
             {
                 if ( ! _myVoxelData) {
                     throw MarchingCubesException("CTScan ptr is zero.", PLUS_FILE_LINE);
@@ -103,7 +107,7 @@ namespace y60 {
                 return _myThreshold;
             }
 
-            void setBox(const asl::Box3i & theBox) {
+            void setBox(const asl::Box3i & theBox, const SegmentationBitmap * theSegmentationBitmap = 0) {
                 asl::Box3i myTempBox(theBox.getMin()[0]/_myDownSampleRate,
                                      theBox.getMin()[1]/_myDownSampleRate,
                                      theBox.getMin()[2]/_myDownSampleRate,
@@ -116,9 +120,46 @@ namespace y60 {
                 _myDimBox[0]= mySize[0] + 1;
                 _myDimBox[1]= mySize[1] + 1;
                 _myDimBox[2]= mySize[2] + 1;
+                if (theSegmentationBitmap) {
+                    if (theSegmentationBitmap->size() != _myDimBox[2]) {
+                        throw MarchingCubesException(std::string("SegmentationBitmap has wrong Z-Dimension. Box is: ") 
+                                                     + as_string(_myDimBox[2]) + " but Bitmap is: " +
+                                                     as_string(theSegmentationBitmap->size()), PLUS_FILE_LINE);
+                    }
+                    int mySliceSize = _myDimBox[0] * _myDimBox[1];
+                    for (int i = 0; i < theSegmentationBitmap->size(); ++i) {
+                        if ((*theSegmentationBitmap)[i].size() != mySliceSize) {
+                            throw MarchingCubesException(std::string("SegmentationBitmap has wrong slice size. Box is: ") +
+                                as_string(_myDimBox[0] * _myDimBox[1]) + " but Bitmap is: " +
+                                as_string((*theSegmentationBitmap)[i].size()), PLUS_FILE_LINE);
+                        }
+                    }
+                    _mySegmentationBitmap = theSegmentationBitmap;
+                } else {
+                    _mySegmentationBitmap = 0;
+                }
             }
+
             const asl::Box3i & getBox() const {
                 return _myVBox;
+            }
+
+            bool isInSegmentationVolume(int i, int j, int k) const {
+                if (i < _myVBox[asl::Box3i::MIN][0] || i >= _myVBox[asl::Box3i::MAX][0]) { 
+                    return false;
+                }
+                if (j < _myVBox[asl::Box3i::MIN][1] || j >= _myVBox[asl::Box3i::MAX][1]) { 
+                    return false;
+                }
+                if (k < _myVBox[asl::Box3i::MIN][2] || k >= _myVBox[asl::Box3i::MAX][2]) { 
+                    return false;
+                }
+                if (!_mySegmentationBitmap) {
+                    return true;
+                }
+                int mySlice = k - _myVBox[asl::Box3i::MIN][2];
+                int myOffset = (j - _myVBox[asl::Box3i::MIN][1]) * _myDimBox[0] + (i - _myVBox[asl::Box3i::MIN][0]);
+                return (*_mySegmentationBitmap)[mySlice][myOffset];
             }
 
             // 1: calc vertex normals using gradients, 0: no normals (flat shading)
@@ -148,7 +189,7 @@ namespace y60 {
             }
             const asl::Vector3f & getVoxelSize() const {
                 return _myVoxelSize;
-            }
+            }            
             void estimate(unsigned int * theVertexCount=0, unsigned int * theTriangleCount=0) {
                 _myHalfEdgeCount = 0;
 				_myVertexCount = 0;
@@ -460,12 +501,13 @@ namespace y60 {
             }
 
             inline void triangulateVoxel(int cubeIndex, const asl::Vector3i & theMarchPos, bool theDryRun) {
-                int edgeTable[12], edge;
+                std::vector<int> myEdgeTable;
+                myEdgeTable.resize(12, -1);
+                myEdgeTable[1] = -2;
                 int iMarch = theMarchPos[0];
                 int jMarch = theMarchPos[1];
                 int kMarch = theMarchPos[2];
-                int vertOffset;
-                int offset;
+                int myPositionIndex;
                 int (MarchingCubes<VoxelT>::*myOnVertex)(int n, const asl::Vector3i & theMarchPos) = 0;
 
                 const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[cubeIndex]; 
@@ -485,131 +527,152 @@ namespace y60 {
                 const std::vector<int> & myEdges = myCubeCase.edges;
                 int myEdgeCount = myEdges.size();
                 for (int i = 0; i < myEdgeCount; ++i) {
-                    edge = myEdges[i];
-                    AC_TRACE << "     edge case :" << edge;
-#if 0
-                    vertOffset = (this->*myOnVertex)  (edge, theMarchPos);
+                    AC_TRACE << "     edge case :" << myEdges[i];
+#ifdef MC_DONT_SHARE_VERTICES
+                    myPositionIndex = (this->*myOnVertex)  (myEdges[i], theMarchPos);
 #else
-                    switch (edge) {
+                    switch (myEdges[i]) {
                         case 0:
+                            if (isInSegmentationVolume(iMarch, jMarch, kMarch-1)) {
+                                myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch];
+                            }
+                            else if (isInSegmentationVolume(iMarch - 1, jMarch, kMarch)) {
+                                myPositionIndex = _myOld2Pt;
+                            }
+                            else {
+                                myPositionIndex = (this->*myOnVertex) (0, theMarchPos);
+                            }
+                            /*
                             if(kMarch == kBoxStart) {
                                 if (iMarch == iBoxStart) {
-                                    vertOffset = (this->*myOnVertex) (0, theMarchPos);
+                                    myPositionIndex = (this->*myOnVertex) (0, theMarchPos);
                                 } else {
-                                    vertOffset = _myOld2Pt;
+                                    myPositionIndex = _myOld2Pt;
                                 }
                             } else {
-                                offset = _myDimensions[0] * jMarch + iMarch;
-                                vertOffset = _myXEdge[offset];
+                                myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch];
                             }
+                            */
                             break;
 
                         case 1:
-                            if (kMarch == kBoxStart) {
-                                vertOffset = (this->*myOnVertex)  (1, theMarchPos);
+                            if (isInSegmentationVolume(iMarch, jMarch+1, kMarch-1)) {
+                                myPositionIndex = _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch];
                             } else {
-                                offset = _myDimensions[0] * (jMarch + 1) + iMarch;
-                                vertOffset = _myYEdge[offset];
+                                myPositionIndex = (this->*myOnVertex)  (1, theMarchPos);
                             }
+                            /*
                             if (kMarch == kBoxStart) {
-                                offset = _myDimensions[0] * (jMarch + 1) + iMarch;
-                                _myYEdge[offset] = vertOffset;
+                                myPositionIndex = (this->*myOnVertex)  (1, theMarchPos);
+                                //_myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
+                            } else {
+                                myPositionIndex = _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch];
                             }
+                            */
                             break;
 
                         case 2:
-                            if (kMarch == kBoxStart) {
-                                vertOffset = (this->*myOnVertex)  (2, theMarchPos);
+                            if (isInSegmentationVolume(iMarch + 1, jMarch, kMarch - 1)) {
+                                myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch + 1];
                             } else {
-                                offset = _myDimensions[0] * jMarch + iMarch + 1;
-                                vertOffset = _myXEdge[offset];
+                                myPositionIndex = (this->*myOnVertex)  (2, theMarchPos);
                             }
+                            /*
+                            if (kMarch == kBoxStart) {
+                                myPositionIndex = (this->*myOnVertex)  (2, theMarchPos);
+                            } else {
+                                myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch + 1];
+                            }
+                            */
                             break;
 
                         case 3:
                             if((kMarch == kBoxStart) && (jMarch == jBoxStart)) { 
-                                vertOffset = (this->*myOnVertex)  (3, theMarchPos);
+                                myPositionIndex = (this->*myOnVertex)  (3, theMarchPos);
                             } else {
-                                offset = _myDimensions[0] * jMarch + iMarch;
-                                vertOffset = _myYEdge[offset];
+                                myPositionIndex = _myIEdge[_myDimensions[0] * jMarch + iMarch];
                             }
                             break;
 
                         case 4:
                             if(iMarch == iBoxStart) {
-                                vertOffset = (this->*myOnVertex)  (4, theMarchPos);
+                                myPositionIndex = (this->*myOnVertex)  (4, theMarchPos);
                             } else {
-                                vertOffset = _myOld6Pt;
+                                myPositionIndex = _myOld6Pt;
                             }
-                            offset = _myDimensions[0] * jMarch + iMarch;
-                            _myXEdge[offset] = vertOffset;
+                            //_myJEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
                             break;
 
                         case 5:
-                            vertOffset = (this->*myOnVertex)  (5, theMarchPos);
-                            _myTopYEdge[iMarch] = vertOffset;
-                            // Only write to _myYEdge for the last voxel because otherwise it
-                            // has already been / will be written by 7. We shouldn't write here
-                            // because we want to keep the old value as long as possible
-                            if(jMarch == jBoxEnd - 1) {
-                                offset = _myDimensions[0] * jMarch + iMarch;
-                                _myYEdge[offset] = vertOffset;
-                            } 
+                            myPositionIndex = (this->*myOnVertex)  (5, theMarchPos);
+                            _myTopIEdge[iMarch] = myPositionIndex;
+                            // [TS] This is done since that one will not be written by a 7
+                            // for j+1 on the last voxels 1-case (in next slice)
+                            // we also cant write directly since the old value normally
+                            // is still needed by the 3 case of this voxel
+                            //if(jMarch + 1 == jBoxEnd) {
+                            //    _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myPositionIndex;
+                            //}
                             break;
 
                         case 6:
-                            vertOffset = (this->*myOnVertex)  (6, theMarchPos);
+                            myPositionIndex = (this->*myOnVertex)  (6, theMarchPos);
 
-                            if(iMarch == iBoxEnd - 1) {
-                                offset = _myDimensions[0] * jMarch + iBoxEnd;
-                                _myXEdge[offset] = vertOffset;
-                            }
+                            // [TS] This is done since the _myOld6Pt will not work for i+1 on the
+                            // last voxels 2-case
+                            //if(iMarch + 1 == iBoxEnd) {
+                            //    _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myPositionIndex;
+                            //} 
                             break;
 
                         case 7:
                             if(jMarch == jBoxStart) {
-                                vertOffset = (this->*myOnVertex)  (7, theMarchPos);
+                                myPositionIndex = (this->*myOnVertex)  (7, theMarchPos);
                             } else {
-                                vertOffset = _myTopYEdge[iMarch];
+                                myPositionIndex = _myTopIEdge[iMarch];
                             }
-                            offset = _myDimensions[0] * jMarch + iMarch;
-                            _myYEdge[offset] = vertOffset;
+                            //_myIEdge[_myDimensions[0] * jMarch + iMarch] = myPositionIndex;
                             break;
 
                         case 8:
                             if(jMarch == jBoxStart) {
                                 if (iMarch == iBoxStart) {
-                                    vertOffset = (this->*myOnVertex)  (8, theMarchPos);
+                                    myPositionIndex = (this->*myOnVertex)  (8, theMarchPos);
                                 } else {
-                                    vertOffset = _myOld11Pt;
+                                    myPositionIndex = _myOld11Pt;
                                 }
                             } else {
-                                vertOffset = _myZEdge[iMarch];
+                                myPositionIndex = _myKEdge[iMarch];
                             }
                             break;
 
                         case 9:
                             if(iMarch == iBoxStart) {
-                                vertOffset = (this->*myOnVertex)  (9, theMarchPos);
+                                myPositionIndex = (this->*myOnVertex)  (9, theMarchPos);
                             } else {
-                                vertOffset = _myOld10Pt;
+                                myPositionIndex = _myOld10Pt;
                             }
-                            _myZEdge[iMarch] = vertOffset;
+                            //_myKEdge[iMarch] = myPositionIndex;
                             break;
 
                         case 10:
-                            vertOffset = (this->*myOnVertex)  (10, theMarchPos);
+                            myPositionIndex = (this->*myOnVertex)  (10, theMarchPos);
 
-                            if(iMarch == iBoxEnd - 1) {
-                                _myZEdge[iBoxEnd] = vertOffset;
-                            }
+                            // Write the last one here so the 11 case of _this_ cube can read
+                            // it. [TS] I'm not completely aware why this is done... Maybe
+                            // some weird duping of the last voxel-value in one row or just
+                            // a way to make 11 work without another special handler for box
+                            // ends?
+                            //if(iMarch + 1 == iBoxEnd) {
+                            //    _myKEdge[iMarch + 1] = myPositionIndex;
+                            //}
                             break;
 
                         case 11:
                             if(jMarch == jBoxStart) {
-                                vertOffset = (this->*myOnVertex)  (11, theMarchPos);
-                            } else {
-                                vertOffset = _myZEdge[iMarch + 1];
+                                myPositionIndex = (this->*myOnVertex)  (11, theMarchPos);
+                            } else  {
+                                myPositionIndex = _myKEdge[iMarch + 1];
                             }
                             break;
 
@@ -617,13 +680,30 @@ namespace y60 {
                             break;
                     }
 #endif
-                    edgeTable[edge] = vertOffset;
+                    myEdgeTable[myEdges[i]] = myPositionIndex;
                 }
                 // update old stuff
-                _myOld11Pt = edgeTable[11];
-                _myOld2Pt = edgeTable[2];
-                _myOld6Pt = edgeTable[6];
-                _myOld10Pt = edgeTable[10];
+                _myOld11Pt = myEdgeTable[11];
+                _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myEdgeTable[1];
+                _myOld2Pt = myEdgeTable[2];
+                _myJEdge[_myDimensions[0] * jMarch + iMarch] = myEdgeTable[4];
+                _myOld6Pt = myEdgeTable[6];
+                //if (!isInSegmentationVolume(iMarch + 1, jMarch, kMarch + 1)) {
+                if (iMarch + 1 == iBoxEnd) {
+                    _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myEdgeTable[6];
+                }
+                _myIEdge[_myDimensions[0] * jMarch + iMarch] = myEdgeTable[7];
+                _myTopIEdge[iMarch] = myEdgeTable[5];
+                //if (!isInSegmentationVolume(iMarch, jMarch + 1, kMarch + 1)) {
+                if (jMarch + 1 == jBoxEnd) {
+                    _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myEdgeTable[5];
+                }
+                _myKEdge[iMarch] = myEdgeTable[9];
+                _myOld10Pt = myEdgeTable[10];
+                if (iMarch + 1 == iBoxEnd) {
+                    _myKEdge[iMarch+1] = myEdgeTable[10];
+                }
+
 				if (theDryRun) {
                     int myFaceCount = myCubeCase.faces.size();
 					for (int i = 0; i < myFaceCount; ++i) {
@@ -636,8 +716,8 @@ namespace y60 {
 					for (int i = 0; i < myCubeCase.faces.size(); ++i) {
 						int myCornerIndex = myCubeCase.faces[i];
 						int myNextCornerIndex = myCubeCase.faces[i - (i % 3) + ((i+1) % 3)];
-						int myIndex = edgeTable[myCornerIndex];
-						int myNextIndex = edgeTable[myNextCornerIndex];
+						int myIndex = myEdgeTable[myCornerIndex];
+						int myNextIndex = myEdgeTable[myNextCornerIndex];
 						// int myTwin = ourHalfEdgeData[cubeIndex][i];
                         const MCLookup::HalfEdgeNeighbor & myNeighbor = myCubeCase.neighbors[i];
 						int myHalfEdge = -1;
@@ -647,8 +727,7 @@ namespace y60 {
 							// external twin
 							if (myNeighbor.type == MCLookup::MAX_X ||
                                 myNeighbor.type == MCLookup::MAX_Y ||
-                                myNeighbor.type == MCLookup::MAX_Z) 
-                            {
+                                myNeighbor.type == MCLookup::MAX_Z)                             {
                                 if (((myNeighbor.type == MCLookup::MAX_X) && (iMarch < iBoxEnd-1)) ||
                                     ((myNeighbor.type == MCLookup::MAX_Y) && (jMarch < jBoxEnd-1)) ||
                                     ((myNeighbor.type == MCLookup::MAX_Z) && (kMarch < kBoxEnd-1))) 
@@ -665,8 +744,8 @@ namespace y60 {
 								EdgeId myKey(myNextIndex, myIndex);
 								EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
 								if (_myHalfEdgeCache.end() == iter) {
-									if (!(kMarch == kBoxStart) && !(iMarch == jBoxStart) && !(jMarch == iBoxStart)) {
-										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << edge << " jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch << " Dumping cache.";
+									if (!(kMarch == kBoxStart) && !(iMarch == iBoxStart) && !(jMarch == jBoxStart)) {
+										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << myEdges[i] << " jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch;
 										//throw MarchingCubesException("Not found in cache.", PLUS_FILE_LINE);                                    
 									}
 								} else {
@@ -770,6 +849,7 @@ namespace y60 {
                 return at(myClippedPosition);
             }
 
+            // XXX inline me
             inline VoxelT
             getValueByCubeCorner(int iMarch, int jMarch, int kMarch, int theCubeCorner) {
                 switch (theCubeCorner) {
@@ -793,31 +873,6 @@ namespace y60 {
                     throw MarchingCubesException(std::string("Illegal CubeIndex: ") + as_string(theCubeCorner), PLUS_FILE_LINE);
                 }
             }
-
-            inline VoxelT
-            getThresholdByCubeCorner(int iMarch, int jMarch, int kMarch, int theCubeCorner) {
-                switch (theCubeCorner) {
-                case 0:
-                    return getVoxelThreshold(iMarch, jMarch, kMarch);
-                case 1:
-                    return getVoxelThreshold(iMarch, jMarch+1, kMarch);
-                case 2:
-                    return getVoxelThreshold(iMarch+1, jMarch+1, kMarch);
-                case 3:
-                    return getVoxelThreshold(iMarch+1, jMarch, kMarch);
-                case 4:
-                    return getVoxelThreshold(iMarch, jMarch, kMarch+1);
-                case 5:
-                    return getVoxelThreshold(iMarch, jMarch+1, kMarch+1);
-                case 6:
-                    return getVoxelThreshold(iMarch+1, jMarch+1, kMarch+1);
-                case 7:
-                    return getVoxelThreshold(iMarch+1, jMarch, kMarch+1);
-                default:
-                    throw MarchingCubesException(std::string("Illegal CubeIndex: ") + as_string(theCubeCorner), PLUS_FILE_LINE);
-                }
-            }
-
 
             inline void
             fillVoxelCube(int iMarch, int jMarch, int kMarch, std::vector<VoxelT> & theVoxelCube) {
@@ -847,10 +902,11 @@ namespace y60 {
                     << iBoxEnd << "], Y[" << jBoxStart;
                 AC_TRACE << ", " << jBoxEnd << "], Z[" << kBoxStart << ", " << kBoxEnd << "]\n";
 
-                _myXEdge.resize(_myDimensions[0] * _myDimensions[1], -1);
-                _myYEdge.resize(_myDimensions[0] * _myDimensions[1], -1);
-                _myTopYEdge.resize(_myDimensions[0], -1);
-                _myZEdge.resize(_myDimensions[0], -1);
+                int myVoxelsPerSlize = _myDimensions[0] * _myDimensions[1];
+                _myJEdge.resize(myVoxelsPerSlize, -1);
+                _myIEdge.resize(myVoxelsPerSlize, -1);
+                _myTopIEdge.resize(_myDimensions[0], -1);
+                _myKEdge.resize(_myDimensions[0], -1);
 
                 for(k = kBoxStart; k < kBoxEnd; k++) {
                     _myVoxelData->notifyProgress(double(k - kBoxStart) / double(kBoxEnd - kBoxStart),
@@ -859,37 +915,38 @@ namespace y60 {
                     for(j = jBoxStart; j < jBoxEnd; j++) {
                         _myOld2Pt = _myOld6Pt = _myOld11Pt = _myOld10Pt = -1;
                         for(i = iBoxStart; i < iBoxEnd; i++) {
+                            if (isInSegmentationVolume(i, j, k)) {
+                                cubeIndex = 0;
+                                if(isOutside(i, j, k)) {
+                                    cubeIndex |= BIT_0;
+                                }
+                                if(isOutside(i, j+1, k)) {
+                                    cubeIndex |= BIT_1;
+                                }
+                                if(isOutside(i+1, j+1, k)) {
+                                    cubeIndex |= BIT_2;
+                                }
+                                if(isOutside(i+1, j, k)) {
+                                    cubeIndex |= BIT_3;
+                                }
+                                if(isOutside(i, j, k+1)) {
+                                    cubeIndex |= BIT_4;
+                                }
+                                if(isOutside(i, j+1, k+1)) {
+                                    cubeIndex |= BIT_5;
+                                }
+                                if(isOutside(i+1, j+1, k+1)) {
+                                    cubeIndex |= BIT_6;
+                                }
+                                if(isOutside(i+1, j, k+1)) {
+                                    cubeIndex |= BIT_7;
+                                }
 
-                            cubeIndex = 0;
-                            if(isOutside(i, j, k)) {
-                                cubeIndex |= BIT_0;
-                            }
-                            if(isOutside(i, j+1, k)) {
-                                cubeIndex |= BIT_1;
-                            }
-                            if(isOutside(i+1, j+1, k)) {
-                                cubeIndex |= BIT_2;
-                            }
-                            if(isOutside(i+1, j, k)) {
-                                cubeIndex |= BIT_3;
-                            }
-                            if(isOutside(i, j, k+1)) {
-                                cubeIndex |= BIT_4;
-                            }
-                            if(isOutside(i, j+1, k+1)) {
-                                cubeIndex |= BIT_5;
-                            }
-                            if(isOutside(i+1, j+1, k+1)) {
-                                cubeIndex |= BIT_6;
-                            }
-                            if(isOutside(i+1, j, k+1)) {
-                                cubeIndex |= BIT_7;
-                            }
-
-                            if((cubeIndex > 0) && (cubeIndex < 255)) {
-                                fillVoxelCube(i, j, k, _myCurrent);
-                                asl::Vector3i myVoxel(i, j, k);
-                                triangulateVoxel(cubeIndex, myVoxel, theDryRun);
+                                if((cubeIndex > 0) && (cubeIndex < 255)) {
+                                    fillVoxelCube(i, j, k, _myCurrent);
+                                    asl::Vector3i myVoxel(i, j, k);
+                                    triangulateVoxel(cubeIndex, myVoxel, theDryRun);
+                                }
                             }
                         }
                     }
@@ -899,10 +956,10 @@ namespace y60 {
                         << _myVertexCount << " vertices, "
                         << _myHalfEdgeCache.size() << " halfedges remaining in cache";
                 _myHalfEdgeCache.clear();
-                _myXEdge.resize(0);
-                _myYEdge.resize(0);
-                _myTopYEdge.resize(0);
-                _myZEdge.resize(0);
+                _myJEdge.clear();
+                _myIEdge.clear();
+                _myTopIEdge.clear();
+                _myKEdge.clear();
             }
 
             void
@@ -939,10 +996,10 @@ namespace y60 {
             asl::Vector2<VoxelT> _myThreshold;
 
             // TODO change to std::vector ...
-            std::vector<int> _myXEdge;
-            std::vector<int> _myYEdge;
-            std::vector<int> _myTopYEdge;
-            std::vector<int> _myZEdge;
+            std::vector<int> _myJEdge;
+            std::vector<int> _myIEdge;
+            std::vector<int> _myTopIEdge;
+            std::vector<int> _myKEdge;
             int   _myOld6Pt, _myOld10Pt, _myOld11Pt, _myOld2Pt; // old vertex indices in i order
             std::vector<VoxelT> _myCurrent;
             int  _myMarchSegment[numSegments];
@@ -970,7 +1027,8 @@ namespace y60 {
             std::vector<asl::Vector3f> * _myVertices;
             std::vector<signed int>    * _myHalfEdges;
             std::vector<asl::Vector3f> * _myNormals;            
-            std::vector<unsigned int>  * _myIndices;            
+            std::vector<unsigned int>  * _myIndices;
+            const SegmentationBitmap   * _mySegmentationBitmap;
             EdgeCache                    _myHalfEdgeCache;
     };
 
