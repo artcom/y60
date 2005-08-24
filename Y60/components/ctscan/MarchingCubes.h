@@ -509,14 +509,7 @@ namespace y60 {
                 int kMarch = theMarchPos[2];
                 int myPositionIndex;
                 int (MarchingCubes<VoxelT>::*myOnVertex)(int n, const asl::Vector3i & theMarchPos) = 0;
-
                 const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[cubeIndex]; 
-                const int iBoxStart = _myVBox[asl::Box3i::MIN][0];
-                const int iBoxEnd   = _myVBox[asl::Box3i::MAX][0];
-                const int jBoxStart = _myVBox[asl::Box3i::MIN][1];
-                const int jBoxEnd   = _myVBox[asl::Box3i::MAX][1];
-                const int kBoxStart = _myVBox[asl::Box3i::MIN][2];
-                const int kBoxEnd   = _myVBox[asl::Box3i::MAX][2];
 
 				if (theDryRun) { 
 					myOnVertex = &MarchingCubes<VoxelT>::countVertex;
@@ -599,17 +592,20 @@ namespace y60 {
                 _myOld2Pt = myEdgeTable[2];
                 _myJEdge[_myDimensions[0] * jMarch + iMarch] = myEdgeTable[4];
                 _myOld6Pt = myEdgeTable[6];
-                if (iMarch + 1 == iBoxEnd) {
+                if (!isInSegmentationVolume(iMarch + 1, jMarch, kMarch)) {
+                //if (iMarch + 1 == iBoxEnd) {
                     _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myEdgeTable[6];
                 }
                 _myIEdge[_myDimensions[0] * jMarch + iMarch] = myEdgeTable[7];
                 _myTopIEdge[iMarch] = myEdgeTable[5];
-                if (jMarch + 1 == jBoxEnd) {
+                if (!isInSegmentationVolume(iMarch, jMarch + 1, kMarch)) {
+                //if (jMarch + 1 == jBoxEnd) {
                     _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myEdgeTable[5];
                 }
                 _myKEdge[iMarch] = myEdgeTable[9];
                 _myOld10Pt = myEdgeTable[10];
-                if (iMarch + 1 == iBoxEnd) {
+                if (!isInSegmentationVolume(iMarch + 1, jMarch, kMarch)) {
+                //if (iMarch + 1 == iBoxEnd) {
                     _myKEdge[iMarch+1] = myEdgeTable[10];
                 }
 
@@ -635,9 +631,9 @@ namespace y60 {
 							if (myNeighbor.type == MCLookup::MAX_X ||
                                 myNeighbor.type == MCLookup::MAX_Y ||
                                 myNeighbor.type == MCLookup::MAX_Z)                             {
-                                if (((myNeighbor.type == MCLookup::MAX_X) && (iMarch+1 < iBoxEnd)) ||
-                                    ((myNeighbor.type == MCLookup::MAX_Y) && (jMarch+1 < jBoxEnd)) ||
-                                    ((myNeighbor.type == MCLookup::MAX_Z) && (kMarch+1 < kBoxEnd))) 
+                                if (((myNeighbor.type == MCLookup::MAX_X) && (iMarch+1 < _myVBox[asl::Box3i::MAX][0])) ||
+                                    ((myNeighbor.type == MCLookup::MAX_Y) && (jMarch+1 < _myVBox[asl::Box3i::MAX][1])) ||
+                                    ((myNeighbor.type == MCLookup::MAX_Z) && (kMarch+1 < _myVBox[asl::Box3i::MAX][2]))) 
                                 { 
                                     // Add to the map
                                     EdgeId myKey(myIndex, myNextIndex);
@@ -651,8 +647,8 @@ namespace y60 {
 								EdgeId myKey(myNextIndex, myIndex);
 								EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
 								if (_myHalfEdgeCache.end() == iter) {
-									if (!(kMarch == kBoxStart) && !(iMarch == iBoxStart) && !(jMarch == jBoxStart)) {
-										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") " << myEdges[i] << " jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch;
+									if (!(kMarch == _myVBox[asl::Box3i::MIN][2]) && !(iMarch == _myVBox[asl::Box3i::MIN][0]) && !(jMarch == _myVBox[asl::Box3i::MIN][1])) {
+										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") = (" << myCornerIndex << ", " << myNextCornerIndex << ") jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch;
 										//throw MarchingCubesException("Not found in cache.", PLUS_FILE_LINE);                                    
 									}
 								} else {
@@ -825,7 +821,10 @@ namespace y60 {
                     for(j = jBoxStart; j < jBoxEnd; j++) {
                         _myOld2Pt = _myOld6Pt = _myOld11Pt = _myOld10Pt = -1;
                         for(i = iBoxStart; i < iBoxEnd; i++) {
-                            if (isInSegmentationVolume(i, j, k)) {
+                            // XXX this is basically wrong because we are comparing apples
+                            // and peas here. i, j, k is not a voxel in this context but
+                            // it is the coordinates of one of the 8 voxels considered
+                            //if (isInSegmentationVolume(i, j, k)) {
                                 cubeIndex = 0;
                                 if(isOutside(i, j, k)) {
                                     cubeIndex |= BIT_0;
@@ -857,7 +856,7 @@ namespace y60 {
                                     asl::Vector3i myVoxel(i, j, k);
                                     triangulateVoxel(cubeIndex, myVoxel, theDryRun);
                                 }
-                            }
+                            //}
                         }
                     }
                 }

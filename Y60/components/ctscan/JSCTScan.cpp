@@ -194,8 +194,10 @@ countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
         mySegmentationBitmapSliceFalse.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), false);
         // XXX put this on the heap
         SegmentationBitmap mySegmentationBitmap;
-//        mySegmentationBitmap.resize((myBoxSize[2]+1) / 2, mySegmentationBitmapSliceFalse);
-        mySegmentationBitmap.resize(myBoxSize[2]+1, mySegmentationBitmapSlice);
+        mySegmentationBitmap.resize(myBoxSize[2]+1);
+        for (int i = 0; i < mySegmentationBitmap.size(); ++i) {
+            mySegmentationBitmap[i] = mySegmentationBitmapSlice;
+        }
 
         CTScan & myCTScan = myObj.getNative();
         asl::Vector2i myCount = myCTScan.countTriangles(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate, &mySegmentationBitmap);
@@ -247,8 +249,10 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         mySegmentationBitmapSliceFalse.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), false);
         // XXX put this on the heap
         SegmentationBitmap mySegmentationBitmap;
-        //mySegmentationBitmap.resize((myBoxSize[2]+1) / 2, mySegmentationBitmapSliceFalse);
-        mySegmentationBitmap.resize(myBoxSize[2]+1, mySegmentationBitmapSlice);
+        mySegmentationBitmap.resize(myBoxSize[2]+1);
+        for (int i = 0; i < mySegmentationBitmap.size(); ++i) {
+            mySegmentationBitmap[i] = mySegmentationBitmapSlice;
+        }
 
         ScenePtr myScene = myCTScan.polygonize(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,  
             myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles, &mySegmentationBitmap);
