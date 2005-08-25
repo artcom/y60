@@ -295,7 +295,6 @@ AudioScheduler::run() {
         } catch (...) {
             AC_ERROR << "AudioScheduler::run: Exception during exception handling.";
         }
-        throw;
     }
 }
 
