@@ -197,11 +197,11 @@ countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
         asl::Vector3i myBoxSize = myVoxelBox.getSize();
         std::vector<bool> mySegmentationBitmapSlice;
         std::vector<bool> mySegmentationBitmapSliceFalse;
-        mySegmentationBitmapSlice.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), true);
-        mySegmentationBitmapSliceFalse.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), false);
+        mySegmentationBitmapSlice.resize(((myBoxSize[0] / myDownSampleRate)+1) * ((myBoxSize[1] / myDownSampleRate)+1), true);
+        mySegmentationBitmapSliceFalse.resize(((myBoxSize[0] / myDownSampleRate)+1) * ((myBoxSize[1] / myDownSampleRate)+1), false);
         // XXX put this on the heap
         SegmentationBitmap mySegmentationBitmap;
-        mySegmentationBitmap.resize(myBoxSize[2]+1);
+        mySegmentationBitmap.resize(myBoxSize[2] / myDownSampleRate + 1);
         for (int i = 0; i < mySegmentationBitmap.size(); ++i) {
             mySegmentationBitmap[i] = mySegmentationBitmapSlice;
         }
@@ -252,11 +252,11 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         asl::Vector3i myBoxSize = myVoxelBox.getSize();
         std::vector<bool> mySegmentationBitmapSlice;
         std::vector<bool> mySegmentationBitmapSliceFalse;
-        mySegmentationBitmapSlice.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), true);
-        mySegmentationBitmapSliceFalse.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), false);
+        mySegmentationBitmapSlice.resize(((myBoxSize[0] / myDownSampleRate)+1) * ((myBoxSize[1] / myDownSampleRate)+1), true);
+        mySegmentationBitmapSliceFalse.resize(((myBoxSize[0] / myDownSampleRate)+1) * ((myBoxSize[1] / myDownSampleRate)+1), false);
         // XXX put this on the heap
         SegmentationBitmap mySegmentationBitmap;
-        mySegmentationBitmap.resize(myBoxSize[2]+1);
+        mySegmentationBitmap.resize((myBoxSize[2] / myDownSampleRate)+1);
         for (int i = 0; i < mySegmentationBitmap.size(); ++i) {
             mySegmentationBitmap[i] = mySegmentationBitmapSlice;
         }
