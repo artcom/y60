@@ -121,7 +121,7 @@ namespace y60 {
                 _myDimBox[1]= mySize[1] + 1;
                 _myDimBox[2]= mySize[2] + 1;
                 if (theSegmentationBitmap) {
-                    if (theSegmentationBitmap->size() != _myDimBox[2]) {
+                    if (theSegmentationBitmap->size() * _myDownSampleRate != _myDimBox[2]) {
                         throw MarchingCubesException(std::string("SegmentationBitmap has wrong Z-Dimension. Box is: ") 
                                                      + as_string(_myDimBox[2]) + " but Bitmap is: " +
                                                      as_string(theSegmentationBitmap->size()), PLUS_FILE_LINE);
