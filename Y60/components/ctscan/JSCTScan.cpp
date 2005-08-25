@@ -66,7 +66,14 @@ loadSlices(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         string myPackage;
         convertFrom(cx, argv[1], myPackage);
         CTScan & myCTScan = myObj.getNative();
-        int slicesLoaded = myCTScan.loadSlices(*JSApp::getPackageManager(), mySubDir, myPackage);
+
+        // [TS] Couldn't make it work in acxpshell without this... 
+        PackageManager myPackageManager;   
+        myPackageManager.add(*JSApp::getPackageManager());   
+        myPackageManager.add(myPackage); 
+
+        //int slicesLoaded = myCTScan.loadSlices(*JSApp::getPackageManager(), mySubDir, myPackage);
+        int slicesLoaded = myCTScan.loadSlices(myPackageManager, mySubDir, myPackage);
         *rval = as_jsval(cx, slicesLoaded);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
