@@ -39,12 +39,12 @@ using namespace asl;
 namespace y60 {
 
     const unsigned MAX_FRAME_CACHE_SIZE = 1000;
-    const double STARTUP_AUDIO_CACHE_TIME = 2;
+    const double PRELOAD_CACHE_TIME = 2;    
 
     FrameConveyor::FrameConveyor() :
         _myVideoFrame(0),        
         _myAudioFrame(AVCODEC_MAX_AUDIO_FRAME_SIZE),
-        _myCacheSizeInSecs(10)
+        _myCacheSizeInSecs(PRELOAD_CACHE_TIME)
     {
         _myVideoFrame = avcodec_alloc_frame();
     }
@@ -65,13 +65,12 @@ namespace y60 {
         }        
     }
 
-    // TODO: Merge with seeking, with no audio
     void
     FrameConveyor::preload(double theInitialTimestamp) {
         cerr << "Fill audio/video-cache..." << endl;
         if (_myAudioBufferedSource) {
             while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE &&
-                  _myAudioBufferedSource->getCacheFillLevelInSecs() < STARTUP_AUDIO_CACHE_TIME) 
+                  _myAudioBufferedSource->getCacheFillLevelInSecs() < PRELOAD_CACHE_TIME) 
             {
                 updateCache(theInitialTimestamp);
                 _myCacheSizeInSecs += (1 / _myContext->getFrameRate());
@@ -82,11 +81,12 @@ namespace y60 {
 
             if (_myFrameCache.size() > MAX_FRAME_CACHE_SIZE) {
                 cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE << " frames " << endl;
-            } else if (_myAudioBufferedSource->getCacheFillLevelInSecs() >= STARTUP_AUDIO_CACHE_TIME) {
-                cerr << "   until audio cache size larger than " << STARTUP_AUDIO_CACHE_TIME << " sec." << endl;
+            } else if (_myAudioBufferedSource->getCacheFillLevelInSecs() >= PRELOAD_CACHE_TIME) {
+                cerr << "   until audio cache size larger than " << PRELOAD_CACHE_TIME << " sec." << endl;
             }
         } else {
             updateCache(theInitialTimestamp);
+            _myCacheSizeInSecs = PRELOAD_CACHE_TIME;
         }
     }
 
