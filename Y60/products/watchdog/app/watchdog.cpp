@@ -483,3 +483,11 @@ main(int argc, char* argv[] ) {
     }
     exit(-1);
 }
+
+#ifdef WIN32
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+            LPSTR lpCmdLine, int nCmdShow)
+{
+    return main(__argc, __argv);
+}
+#endif
