@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include <asl/Assure.h>
+#include "VertexCache.h"
 
 //#define MC_DONT_SHARE_VERTICES
 
@@ -57,6 +58,7 @@ namespace y60 {
                 _myVertexNormalFlag(false),
                 _myVertexColorFlag(true),
                 _myInvertNormalsFlag(false),
+                _myHalfEdgeFlag(true),
                 _mySceneBuilder(theSceneBuilder),
                 _myVoxelData(theVoxelData),
                 _myVertexNode(0),
@@ -166,6 +168,7 @@ namespace y60 {
             void calcNormals(bool theFlag) { _myVertexNormalFlag = theFlag; }
             void invertNormal(bool theFlag) { _myInvertNormalsFlag = theFlag; }
             void setColors(bool theFlag) { _myVertexColorFlag = theFlag; }
+            void genHalfEdges(bool theFlag) { _myHalfEdgeFlag = theFlag; }
 
             void marchAllSegments () {
                 for (int i = 0; i < numSegments; ++i) {
@@ -500,7 +503,7 @@ namespace y60 {
                 }
             }
 
-            inline void triangulateVoxel(int cubeIndex, const asl::Vector3i & theMarchPos, bool theDryRun) {
+            inline void triangulateVoxel(int cubeIndex, const asl::Vector3i & theMarchPos, bool theDryRun, IJCache & theLowerCache, IJCache & theUpperCache, KCache & theKCache) {
                 std::vector<int> myEdgeTable;
                 myEdgeTable.resize(12, -1);
                 myEdgeTable[1] = -2;
@@ -523,29 +526,27 @@ namespace y60 {
                     AC_TRACE << "     edge case :" << myEdges[i];
                     myPositionIndex = -1;
 #ifndef MC_DONT_SHARE_VERTICES
+//                    int myReference;
+//                    int myNewCache;
                     switch (myEdges[i]) {
                         case 0:
-                            if (_myOld2Pt >= 0) {
-                                myPositionIndex = _myOld2Pt;
-                            } else {
-                                myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch];
-                            }
+                            myPositionIndex = theLowerCache.get(iMarch, jMarch).j;
                             break;
 
                         case 1:
-                            myPositionIndex = _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch];
+                            myPositionIndex = theLowerCache.get(iMarch, jMarch+1).i;
                             break;
 
                         case 2:
-                            myPositionIndex = _myJEdge[_myDimensions[0] * jMarch + iMarch + 1];
+                            myPositionIndex = theLowerCache.get(iMarch+1, jMarch).j;
                             break;
 
                         case 3:
-                            myPositionIndex = _myIEdge[_myDimensions[0] * jMarch + iMarch];
+                            myPositionIndex = theLowerCache.get(iMarch, jMarch).i;
                             break;
 
                         case 4:
-                            myPositionIndex = _myOld6Pt;
+                            myPositionIndex = theUpperCache.get(iMarch, jMarch).j;
                             break;
 
                         case 5:
@@ -555,26 +556,22 @@ namespace y60 {
                             break;
 
                         case 7:
-                            myPositionIndex = _myTopIEdge[iMarch];
+                            myPositionIndex = theUpperCache.get(iMarch, jMarch).i;
                             break;
 
                         case 8:
-                            if (_myOld11Pt >= 0) {
-                                myPositionIndex = _myOld11Pt;
-                            } else {
-                                myPositionIndex = _myKEdge[iMarch];
-                            }
+                            myPositionIndex = theKCache.get(iMarch, jMarch);
                             break;
 
                         case 9:
-                            myPositionIndex = _myOld10Pt;
+                            myPositionIndex = theKCache.get(iMarch, jMarch+1);
                             break;
 
                         case 10:
                             break;
 
                         case 11:
-                            myPositionIndex = _myKEdge[iMarch + 1];
+                            myPositionIndex = theKCache.get(iMarch+1, jMarch);
                             break;
                         default:
                             break;
@@ -585,29 +582,15 @@ namespace y60 {
                     }
                     myEdgeTable[myEdges[i]] = myPositionIndex;
                 }
-                _myOld11Pt = myEdgeTable[11];
-                if (myEdgeTable[1] >= 0) {
-                    _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myEdgeTable[1];
-                }
-                _myOld2Pt = myEdgeTable[2];
-                _myJEdge[_myDimensions[0] * jMarch + iMarch] = myEdgeTable[4];
-                _myOld6Pt = myEdgeTable[6];
-                if (!isInSegmentationVolume(iMarch + 1, jMarch, kMarch)) {
-                //if (iMarch + 1 == iBoxEnd) {
-                    _myJEdge[_myDimensions[0] * jMarch + iMarch + 1] = myEdgeTable[6];
-                }
-                _myIEdge[_myDimensions[0] * jMarch + iMarch] = myEdgeTable[7];
-                _myTopIEdge[iMarch] = myEdgeTable[5];
-                if (!isInSegmentationVolume(iMarch, jMarch + 1, kMarch)) {
-                //if (jMarch + 1 == jBoxEnd) {
-                    _myIEdge[_myDimensions[0] * (jMarch + 1) + iMarch] = myEdgeTable[5];
-                }
-                _myKEdge[iMarch] = myEdgeTable[9];
-                _myOld10Pt = myEdgeTable[10];
-                if (!isInSegmentationVolume(iMarch + 1, jMarch, kMarch)) {
-                //if (iMarch + 1 == iBoxEnd) {
-                    _myKEdge[iMarch+1] = myEdgeTable[10];
-                }
+                theLowerCache.get(iMarch, jMarch+1).i = myEdgeTable[1];
+                theLowerCache.get(iMarch+1, jMarch).j = myEdgeTable[2];
+                theUpperCache.get(iMarch, jMarch).j = myEdgeTable[4];
+                theUpperCache.get(iMarch+1, jMarch).j = myEdgeTable[6];
+                theUpperCache.get(iMarch, jMarch).i = myEdgeTable[7];
+                theUpperCache.get(iMarch, jMarch+1).i = myEdgeTable[5];
+                theKCache.get(iMarch, jMarch+1) = myEdgeTable[9];
+                theKCache.get(iMarch+1, jMarch+1) = myEdgeTable[10];
+                theKCache.get(iMarch+1, jMarch) = myEdgeTable[11];
 
 				if (theDryRun) {
                     int myFaceCount = myCubeCase.faces.size();
@@ -616,52 +599,54 @@ namespace y60 {
 						++_myHalfEdgeCount;
 					}
 				} else {
-					int myFirstFaceIndex = _myHalfEdges->size();
+					int myFirstFaceIndex = _myIndices->size();
 					for (int i = 0; i < myCubeCase.faces.size(); ++i) {
 						int myCornerIndex = myCubeCase.faces[i];
 						int myNextCornerIndex = myCubeCase.faces[i - (i % 3) + ((i+1) % 3)];
 						int myIndex = myEdgeTable[myCornerIndex];
-						int myNextIndex = myEdgeTable[myNextCornerIndex];
-                        const MCLookup::HalfEdgeNeighbor & myNeighbor = myCubeCase.neighbors[i];
-						int myHalfEdge = -1;
-						if (myNeighbor.type == MCLookup::INTERNAL) {
-							myHalfEdge = myNeighbor.internal_index + myFirstFaceIndex;
-						} else {
-							// external twin
-							if (myNeighbor.type == MCLookup::MAX_X ||
-                                myNeighbor.type == MCLookup::MAX_Y ||
-                                myNeighbor.type == MCLookup::MAX_Z)                             {
-                                if (((myNeighbor.type == MCLookup::MAX_X) && (iMarch+1 < _myVBox[asl::Box3i::MAX][0])) ||
-                                    ((myNeighbor.type == MCLookup::MAX_Y) && (jMarch+1 < _myVBox[asl::Box3i::MAX][1])) ||
-                                    ((myNeighbor.type == MCLookup::MAX_Z) && (kMarch+1 < _myVBox[asl::Box3i::MAX][2]))) 
-                                { 
-                                    // Add to the map
-                                    EdgeId myKey(myIndex, myNextIndex);
-                                    int myValue = _myHalfEdges->size();
-                                    EdgeCache::value_type myItem(myKey, myValue);
-                                    _myHalfEdgeCache.insert(myItem);
-                                    AC_TRACE << "Inserting: (" << myKey.first << ", " << myKey.second << ")";
-                                }
-							} else {
-								// Remove from map
-								EdgeId myKey(myNextIndex, myIndex);
-								EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
-								if (_myHalfEdgeCache.end() == iter) {
-									if (!(kMarch == _myVBox[asl::Box3i::MIN][2]) && !(iMarch == _myVBox[asl::Box3i::MIN][0]) && !(jMarch == _myVBox[asl::Box3i::MIN][1])) {
-										AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") = (" << myCornerIndex << ", " << myNextCornerIndex << ") jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch;
-										//throw MarchingCubesException("Not found in cache.", PLUS_FILE_LINE);                                    
-									}
-								} else {
-									myHalfEdge = (*iter).second;
-									_myHalfEdgeCache.erase(iter);
-									AC_TRACE << "Removing: (" << myKey.first << ", " << myKey.second << ")";
-									_myHalfEdges->at(myHalfEdge) = _myHalfEdges->size(); // we will push the other edge soon
-								}
-							}
-						}
-						AC_TRACE << "added HalfEdge " << myHalfEdge << " as element#" << _myHalfEdges->size();
-						_myHalfEdges->push_back(myHalfEdge); // push the other edge
-						AC_TRACE << "   size is now " << _myHalfEdges->size();
+                        if (_myHalfEdgeFlag) {
+						    int myNextIndex = myEdgeTable[myNextCornerIndex];
+                            const MCLookup::HalfEdgeNeighbor & myNeighbor = myCubeCase.neighbors[i];
+						    int myHalfEdge = -1;
+						    if (myNeighbor.type == MCLookup::INTERNAL) {
+							    myHalfEdge = myNeighbor.internal_index + myFirstFaceIndex;
+						    } else {
+							    // external twin
+							    if (myNeighbor.type == MCLookup::MAX_X ||
+                                    myNeighbor.type == MCLookup::MAX_Y ||
+                                    myNeighbor.type == MCLookup::MAX_Z)                             {
+                                    if (((myNeighbor.type == MCLookup::MAX_X) && (iMarch+1 < _myVBox[asl::Box3i::MAX][0])) ||
+                                        ((myNeighbor.type == MCLookup::MAX_Y) && (jMarch+1 < _myVBox[asl::Box3i::MAX][1])) ||
+                                        ((myNeighbor.type == MCLookup::MAX_Z) && (kMarch+1 < _myVBox[asl::Box3i::MAX][2]))) 
+                                    { 
+                                        // Add to the map
+                                        EdgeId myKey(myIndex, myNextIndex);
+                                        int myValue = _myHalfEdges->size();
+                                        EdgeCache::value_type myItem(myKey, myValue);
+                                        _myHalfEdgeCache.insert(myItem);
+                                        AC_TRACE << "Inserting: (" << myKey.first << ", " << myKey.second << ")";
+                                    }
+							    } else {
+								    // Remove from map
+								    EdgeId myKey(myNextIndex, myIndex);
+								    EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
+								    if (_myHalfEdgeCache.end() == iter) {
+									    if (!(kMarch == _myVBox[asl::Box3i::MIN][2]) && !(iMarch == _myVBox[asl::Box3i::MIN][0]) && !(jMarch == _myVBox[asl::Box3i::MIN][1])) {
+										    AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") = (" << myCornerIndex << ", " << myNextCornerIndex << ") jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch;
+										    //throw MarchingCubesException("Not found in cache.", PLUS_FILE_LINE);                                    
+									    }
+								    } else {
+									    myHalfEdge = (*iter).second;
+									    _myHalfEdgeCache.erase(iter);
+									    AC_TRACE << "Removing: (" << myKey.first << ", " << myKey.second << ")";
+									    _myHalfEdges->at(myHalfEdge) = _myHalfEdges->size(); // we will push the other edge soon
+								    }
+							    }
+						    }
+						    AC_TRACE << "added HalfEdge " << myHalfEdge << " as element#" << _myHalfEdges->size();
+						    _myHalfEdges->push_back(myHalfEdge); // push the other edge
+						    AC_TRACE << "   size is now " << _myHalfEdges->size();
+                        }
 						_myIndices->push_back(myIndex);
                         AC_TRACE << myIndex << (*_myVertices)[myIndex]; 
 					}
@@ -790,6 +775,7 @@ namespace y60 {
                 AC_TRACE << "MarchingCubes::march()";
                 int j, i, k;
                 int cubeIndex;
+                int myWriteCacheIndex = 0;  // will be switched on first iteration
                 const int iBoxStart = _myVBox[asl::Box3i::MIN][0];
                 const int iBoxEnd   = _myVBox[asl::Box3i::MAX][0];
                 const int jBoxStart = _myVBox[asl::Box3i::MIN][1];
@@ -806,20 +792,18 @@ namespace y60 {
                 AC_TRACE << ", " << jBoxEnd << "], Z[" << kBoxStart << ", " << kBoxEnd << "]\n";
 
                 int myVoxelsPerSlize = _myDimensions[0] * _myDimensions[1];
-                _myJEdge.resize(myVoxelsPerSlize, -1);
-                _myIEdge.resize(myVoxelsPerSlize, -1);
-                _myTopIEdge.resize(_myDimensions[0], -1);
-                _myKEdge.resize(_myDimensions[0], -1);
+                _myCache[0] = IJCachePtr(new IJCache(_myDimensions[0], _myDimensions[1]));
+                _myCache[1] = IJCachePtr(new IJCache(_myDimensions[0], _myDimensions[1]));
+                _myKCache = KCachePtr(new KCache(_myDimensions[0], _myDimensions[1]));
 
                 for(k = kBoxStart; k < kBoxEnd; k++) {
                     _myVoxelData->notifyProgress(double(k - kBoxStart) / double(kBoxEnd - kBoxStart),
                             theDryRun ? "estimating" : "polygonizing");
-                    _myTopIEdge.clear();
-                    _myTopIEdge.resize(_myDimensions[0], -1);
-                    _myKEdge.clear();
-                    _myKEdge.resize(_myDimensions[0], -1);
+                    // switch cache
+                    myWriteCacheIndex = 1 - myWriteCacheIndex;
+                    _myCache[myWriteCacheIndex]->reset();
+                    _myKCache->reset(-1);
                     for(j = jBoxStart; j < jBoxEnd; j++) {
-                        _myOld2Pt = _myOld6Pt = _myOld11Pt = _myOld10Pt = -1;
                         for(i = iBoxStart; i < iBoxEnd; i++) {
                             // XXX this is basically wrong because we are comparing apples
                             // and peas here. i, j, k is not a voxel in this context but
@@ -854,7 +838,7 @@ namespace y60 {
                                 if((cubeIndex > 0) && (cubeIndex < 255)) {
                                     fillVoxelCube(i, j, k, _myCurrent);
                                     asl::Vector3i myVoxel(i, j, k);
-                                    triangulateVoxel(cubeIndex, myVoxel, theDryRun);
+                                    triangulateVoxel(cubeIndex, myVoxel, theDryRun, *_myCache[1-myWriteCacheIndex], *_myCache[myWriteCacheIndex], *_myKCache);
                                 }
                             //}
                         }
@@ -865,10 +849,6 @@ namespace y60 {
                         << _myVertexCount << " vertices, "
                         << _myHalfEdgeCache.size() << " halfedges remaining in cache";
                 _myHalfEdgeCache.clear();
-                _myJEdge.clear();
-                _myIEdge.clear();
-                _myTopIEdge.clear();
-                _myKEdge.clear();
             }
 
             void
@@ -904,15 +884,12 @@ namespace y60 {
             asl::Vector3f _myVoxelSize;
             asl::Vector2<VoxelT> _myThreshold;
 
-            // TODO change to std::vector ...
-            std::vector<int> _myJEdge;
-            std::vector<int> _myIEdge;
-            std::vector<int> _myTopIEdge;
-            std::vector<int> _myKEdge;
-            int   _myOld6Pt, _myOld10Pt, _myOld11Pt, _myOld2Pt; // old vertex indices in i order
+            IJCachePtr   _myCache[2];
+            KCachePtr    _myKCache;
             std::vector<VoxelT> _myCurrent;
             int  _myMarchSegment[numSegments];
             bool _myVertexNormalFlag;
+            bool _myHalfEdgeFlag;
             bool _myInvertNormalsFlag;
             bool _myVertexColorFlag;
             int  _myHalfEdgeCount;

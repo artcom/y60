@@ -203,6 +203,11 @@ countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
         SegmentationBitmap mySegmentationBitmap;
         mySegmentationBitmap.resize(myBoxSize[2] + 1);
         for (int i = 0; i < mySegmentationBitmap.size(); ++i) {
+            //if (i % 4 == 0) {
+            //    mySegmentationBitmap[i] = mySegmentationBitmapSliceFalse;
+            //} else {
+            //    mySegmentationBitmap[i] = mySegmentationBitmapSlice;
+            //}
             mySegmentationBitmap[i] = mySegmentationBitmapSlice;
         }
 
@@ -258,6 +263,11 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         SegmentationBitmap mySegmentationBitmap;
         mySegmentationBitmap.resize(myBoxSize[2] + 1);
         for (int i = 0; i < mySegmentationBitmap.size(); ++i) {
+            //if (i % 4 == 0) {
+            //    mySegmentationBitmap[i] = mySegmentationBitmapSliceFalse;
+            //} else {
+            //    mySegmentationBitmap[i] = mySegmentationBitmapSlice;
+            //}
             mySegmentationBitmap[i] = mySegmentationBitmapSlice;
         }
 
