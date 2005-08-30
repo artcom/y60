@@ -20,7 +20,7 @@
 #ifndef _ac_WMPPlayer_h_
 #define _ac_WMPPlayer_h_
 
-#include "wmp.h"
+#include <wmsdk/wmp.h>
 
 #include <atlbase.h>
 #include <atlcom.h>
@@ -84,7 +84,7 @@ namespace y60 {
 
             HWND                        _myParentWindow;
             CComModule                  _myModule;
-    
+
 		    CAxWindow                   _myWindow;
 		    CComPtr<IWMPPlayer>         _myWMPPlayer;
 			CComPtr<IWMPPlayer2>		_myWMPPlayer2;
@@ -93,13 +93,13 @@ namespace y60 {
 			CComPtr<IWMPMedia>          _myWMPMedia;
 			CComPtr<IWMPControls>       _myWMPControl;
 
-            
+
             CComPtr<IConnectionPoint>   _myConnectionPoint;
-            DWORD                       _myAdviseCookie;            
+            DWORD                       _myAdviseCookie;
 
             CComObject<EventListener>*  _myEventListener;
 
-    
+
     };
     typedef asl::Ptr<WMPPlayer> WMPPlayerPtr;
 }

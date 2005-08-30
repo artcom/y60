@@ -14,8 +14,8 @@ extern CComModule _Module;
 #include <atlctl.h>
 #include <afxres.h>
 
-#include "wmpids.h"
-#include "wmp.h"
+#include <wmsdk/wmpids.h>
+#include <wmsdk/wmp.h>
 #include <string>
 
 class EventListener:
@@ -31,15 +31,15 @@ public:
     END_COM_MAP()
 
     // IDispatch methods
-    STDMETHOD(GetIDsOfNames)( REFIID riid, 
+    STDMETHOD(GetIDsOfNames)( REFIID riid,
                               OLECHAR FAR *FAR *rgszNames,
-                              unsigned int cNames, 
-                              LCID lcid, 
+                              unsigned int cNames,
+                              LCID lcid,
                               DISPID FAR *rgDispId )
     { return( E_NOTIMPL ); }
 
-    STDMETHOD(GetTypeInfo)( unsigned int iTInfo, 
-                            LCID lcid, 
+    STDMETHOD(GetTypeInfo)( unsigned int iTInfo,
+                            LCID lcid,
                             ITypeInfo FAR *FAR *ppTInfo )
     { return( E_NOTIMPL ); }
 
@@ -48,13 +48,13 @@ public:
         return( E_NOTIMPL );
     }
 
-    STDMETHOD(Invoke)( DISPID  dispIdMember,      
-                       REFIID  riid,              
-                       LCID  lcid,                
-                       WORD  wFlags,              
-                       DISPPARAMS FAR*  pDispParams,  
-                       VARIANT FAR*  pVarResult,  
-                       EXCEPINFO FAR*  pExcepInfo,  
+    STDMETHOD(Invoke)( DISPID  dispIdMember,
+                       REFIID  riid,
+                       LCID  lcid,
+                       WORD  wFlags,
+                       DISPPARAMS FAR*  pDispParams,
+                       VARIANT FAR*  pVarResult,
+                       EXCEPINFO FAR*  pExcepInfo,
                        unsigned int FAR*  puArgErr );
 
     // IWMPEvents methods
@@ -110,6 +110,6 @@ public:
     private:
         bool _myLoadedFlag;
         bool _myErrorFlag;
-        
+
 };
 typedef CComObject<EventListener> CComEventListener;
