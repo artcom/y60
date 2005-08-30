@@ -18,10 +18,10 @@
 //=============================================================================
 
 #include "WMVDecoder.h"
-#include "ComSingleton.h"
 
 #include <audio/AudioController.h>
 #include <audio/BufferedSource.h>
+#include <asl/ComSingleton.h>
 #include <asl/Auto.h>
 #include <asl/Logger.h>
 #include <asl/os_functions.h>
@@ -54,7 +54,7 @@ namespace y60 {
 		if (hResultIsOk(hr, myWindowsMessage) == false) {
             AC_ERROR << "Error in WMVReader " << theMessage << theFileLine;
             return false;
-		} 
+		}
 		return true;
     }
 
@@ -231,7 +231,7 @@ namespace y60 {
         }
 
         asl::AutoLocker<WMVDecoder> myLocker(*this); // protect shared vars (_myFrameCache, ...)
-		getMovie()->set<CacheSizeTag>(_myFrameCache.size()); // purely informational, sets value in DOM 
+		getMovie()->set<CacheSizeTag>(_myFrameCache.size()); // purely informational, sets value in DOM
 
         if (_myFirstFrameDelivered == false) {
             // Clear raster
@@ -563,9 +563,9 @@ namespace y60 {
                 // Setup pixel format
                 GUID mySubType = myMediaType->subtype;
                 if (mySubType == WMMEDIASUBTYPE_RGB24) {
-                    myMovie->setPixelEncoding(BGR);            
+                    myMovie->setPixelEncoding(BGR);
                 } else if (mySubType == WMMEDIASUBTYPE_RGB32) {
-                    myMovie->setPixelEncoding(BGRA);            
+                    myMovie->setPixelEncoding(BGRA);
                 } else {
                     throw WindowsMediaException("Unsupported pixel format", PLUS_FILE_LINE);
                 }
@@ -614,7 +614,7 @@ namespace y60 {
             // For streaming media
             myMovie->set<FrameCountTag>(UINT_MAX);
         }
-        
+
         myMovie->set<FrameRateTag>(_myFrameRate);
 
         // Setup video size and image matrix
@@ -741,7 +741,7 @@ namespace y60 {
             //SetEvent(_myEvent);
         } else if (_myAudioBufferedSource && theOutputNumber == _myAudioOutputId) {
             //AC_TRACE << ">>> AudioSample arrived: " << myTimeStamp << "s";
- 
+
             BYTE * myBuffer;
             DWORD myBufferLength;
             HRESULT hr = theSample->GetBufferAndLength(&myBuffer, &myBufferLength);
