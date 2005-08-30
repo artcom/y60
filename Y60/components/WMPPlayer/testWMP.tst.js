@@ -21,7 +21,7 @@
 if (__main__ == undefined) var __main__ = "WMPlayer";
 
 use("SceneViewer.js");
-plug("jsWMPPlayer");
+plug("y60WMPPlayer");
 
 function WMPlayerTest(theArguments) {
     this.Constructor(this, theArguments);
