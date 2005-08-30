@@ -458,6 +458,12 @@ readConfigFile(dom::Document & theConfigDoc,  std::string theFileName) {
 
 int
 main(int argc, char* argv[] ) {
+#ifdef WIN32
+    // This will turn off uncaught exception handling
+    SetErrorMode(SEM_NOGPFAULTERRORBOX);
+#endif
+
+
     ourArguments.addAllowedOptions(ourAllowedOptions);
     if (!ourArguments.parse(argc, argv)) {
         return 0;
