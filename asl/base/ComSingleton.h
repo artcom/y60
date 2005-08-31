@@ -20,7 +20,7 @@
 #ifndef _ac_ComSingleton_h_
 #define _ac_ComSingleton_h_
 
-#include <asl/Singleton.h>
+#include "Singleton.h"
 
 namespace asl {
 
