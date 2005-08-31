@@ -11,7 +11,7 @@
 #include "ComSingleton.h"
 
 #include <objbase.h>
-#include <asl/Logger.h>
+#include "Logger.h"
 
 namespace asl {
 
