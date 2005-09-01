@@ -30,6 +30,8 @@
 
 #include <asl/PackageManager.h>
 #include <jsgtk/JSSignal2.h>
+#include <asl/raster.h>
+#include <y60/JSResizeableRaster.h>
 
 #include <iostream>
 
@@ -38,13 +40,14 @@ using namespace asl;
 using namespace y60;
 
 #define DB(x) // x
+#define SEGBITMAP_TEST
 
 namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     const CTScan & myNative = JSCTScan::getJSWrapper(cx,obj).getNative();
-    std::string myStringRep = string("CTScan ");
+    string myStringRep = string("CTScan ");
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
     *rval = STRING_TO_JSVAL(myString);
     return JS_TRUE;
@@ -117,16 +120,16 @@ computeHistogram(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
         ensureParamCount(argc, 1);
 
         // have to convert a Box3f into a Box3i because Box3i isn't available in JS
-        asl::Box3f myFloatBox;
+        Box3f myFloatBox;
         convertFrom(cx, argv[0], myFloatBox);
-        asl::Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
+        Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
                               static_cast<int>( myFloatBox[Box3f::MIN][1]),
                               static_cast<int>( myFloatBox[Box3f::MIN][2]),
                               static_cast<int>( myFloatBox[Box3f::MAX][0]),
                               static_cast<int>( myFloatBox[Box3f::MAX][1]),
                               static_cast<int>( myFloatBox[Box3f::MAX][2]));
 
-        std::vector<unsigned> myHistogram;
+        vector<unsigned> myHistogram;
         
         CTScan & myCTScan = myObj.getNative();
         myCTScan.computeHistogram(myVoxelBox, myHistogram);
@@ -175,13 +178,14 @@ static JSBool
 countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+        CTScan & myCTScan = myObj.getNative();
 
         ensureParamCount(argc, 4);
 
         // have to convert a Box3f into a Box3i because Box3i isn't available in JS
-        asl::Box3f myFloatBox;
+        Box3f myFloatBox;
         convertFrom(cx, argv[0], myFloatBox);
-        asl::Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
+        Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
                               static_cast<int>( myFloatBox[Box3f::MIN][1]),
                               static_cast<int>( myFloatBox[Box3f::MIN][2]),
                               static_cast<int>( myFloatBox[Box3f::MAX][0]),
@@ -194,25 +198,8 @@ countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
         int myDownSampleRate;
         convertFrom(cx, argv[3], myDownSampleRate);
 
-        asl::Vector3i myBoxSize = myVoxelBox.getSize();
-        std::vector<bool> mySegmentationBitmapSlice;
-        std::vector<bool> mySegmentationBitmapSliceFalse;
-        mySegmentationBitmapSlice.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), true);
-        mySegmentationBitmapSliceFalse.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), false);
-        // XXX put this on the heap
-        SegmentationBitmap mySegmentationBitmap;
-        mySegmentationBitmap.resize(myBoxSize[2] + 1);
-        for (int i = 0; i < mySegmentationBitmap.size(); ++i) {
-            //if (i % 4 == 0) {
-            //    mySegmentationBitmap[i] = mySegmentationBitmapSliceFalse;
-            //} else {
-            //    mySegmentationBitmap[i] = mySegmentationBitmapSlice;
-            //}
-            mySegmentationBitmap[i] = mySegmentationBitmapSlice;
-        }
-
-        CTScan & myCTScan = myObj.getNative();
-        asl::Vector2i myCount = myCTScan.countTriangles(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate, &mySegmentationBitmap);
+        Vector3i myBoxSize = myVoxelBox.getSize();        
+        Vector2i myCount = myCTScan.countTriangles(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate);
         *rval = as_jsval(cx, myCount);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -221,13 +208,14 @@ static JSBool
 polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+        CTScan & myCTScan = myObj.getNative();
 
         ensureParamCount(argc, 5, 7);
 
         // have to convert a Box3f into a Box3i because Box3i isn't available in JS
-        asl::Box3f myFloatBox;
+        Box3f myFloatBox;
         convertFrom(cx, argv[0], myFloatBox);
-        asl::Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
+        Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
                               static_cast<int>( myFloatBox[Box3f::MIN][1]),
                               static_cast<int>( myFloatBox[Box3f::MIN][2]),
                               static_cast<int>( myFloatBox[Box3f::MAX][0]),
@@ -252,31 +240,72 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         if (argc > 6) {
             convertFrom(cx, argv[6], myNumTriangles);
         }
-        CTScan & myCTScan = myObj.getNative();
 
-        asl::Vector3i myBoxSize = myVoxelBox.getSize();
-        std::vector<bool> mySegmentationBitmapSlice;
-        std::vector<bool> mySegmentationBitmapSliceFalse;
-        mySegmentationBitmapSlice.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), true);
-        mySegmentationBitmapSliceFalse.resize((myBoxSize[0]+1) * (myBoxSize[1]+1), false);
-        // XXX put this on the heap
-        SegmentationBitmap mySegmentationBitmap;
-        mySegmentationBitmap.resize(myBoxSize[2] + 1);
-        for (int i = 0; i < mySegmentationBitmap.size(); ++i) {
-            //if (i % 4 == 0) {
-            //    mySegmentationBitmap[i] = mySegmentationBitmapSliceFalse;
-            //} else {
-            //    mySegmentationBitmap[i] = mySegmentationBitmapSlice;
-            //}
-            mySegmentationBitmap[i] = mySegmentationBitmapSlice;
-        }
+        Vector3i myBoxSize = myVoxelBox.getSize();
 
         ScenePtr myScene = myCTScan.polygonize(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,  
-            myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles, &mySegmentationBitmap);
+            myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles);
         *rval = as_jsval(cx, myScene);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
+static JSBool
+getStencilRaster(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+        CTScan & myCTScan = myObj.getNative();
+
+        ensureParamCount(argc, 1);
+
+        int mySliceNumber;
+        convertFrom(cx, argv[0], mySliceNumber);
+        dom::ValuePtr myRaster = dynamic_cast_Ptr<dom::ValueBase>(myCTScan.getStencil()[mySliceNumber]);
+        dom::ResizeableRaster * myDummy = 0;
+        *rval = as_jsval(cx, myRaster, myDummy);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+appendStencil(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+        CTScan & myCTScan = myObj.getNative();
+
+        ensureParamCount(argc, 1);
+
+        dom::NodePtr myImage;
+        convertFrom(cx, argv[0], myImage);
+        myCTScan.appendStencil(myImage);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+createStencilImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+        CTScan & myCTScan = myObj.getNative();
+
+        ensureParamCount(argc, 3);
+        dom::NodePtr myImagesNode;
+        convertFrom(cx, argv[0], myImagesNode);
+        int myWidth;
+        convertFrom(cx, argv[1], myWidth);
+        int myHeight;
+        convertFrom(cx, argv[2], myHeight);
+        asl::Block myBlock(myWidth * myHeight, 255);
+        //dom::ValuePtr myValuePointer = createRasterValue(GRAY, myWidth, myHeight, myBlock);
+        //dom::ResizeableRasterPtr myRaster = dynamic_cast_Ptr<ResizeableRaster>(myValuePointer);
+        dom::NodePtr myImage(new dom::Element("image"));
+        myImagesNode->appendChild(myImage);
+        myImage->getFacade<Image>()->set(myWidth, myHeight, 1, y60::GRAY, myBlock);
+        *rval = as_jsval(cx, myImage);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
 
 static JSBool
 create3DTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -316,6 +345,9 @@ JSCTScan::Functions() {
         {"countTriangles",       countTriangles,          4},
         {"create3DTexture",      create3DTexture,         2},
         {"computeHistogram",     computeHistogram,        1},
+        {"getStencilRaster",     getStencilRaster,        1},
+        {"appendStencil",        appendStencil,           1},
+        {"createStencilImage",   createStencilImage,      3},
         {0}
     };
     return myFunctions;

@@ -131,13 +131,47 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
         _myVoxelSize = representativeFile->getVoxelSize(); 
         _myEncoding = representativeFile->getEncoding(); 
     }
+    //allocateStencils();
     
     return _mySlices.size();
+}
+
+void
+CTScan::appendStencil(dom::NodePtr theImage) {
+    dom::ResizeableRasterPtr myRaster = theImage->getFacade<Image>()->getRasterPtr();
+    // XXX Check size
+    if (myRaster) {
+        _myStencils.push_back(myRaster);
+    } else {
+        throw CTScanException(std::string("No raster for image ") + theImage->getFacade<Image>()->get<NameTag>(),
+            PLUS_FILE_LINE);
+    }            
+}
+
+void
+CTScan::allocateStencils() {
+    _myStencils.clear();
+    if (!_mySlices.empty()) {
+        int myHeight = _mySlices[0]->width();
+        int myWidth = _mySlices[0]->height();
+        asl::Block myBlock(myWidth * myHeight, 1);
+        _myStencils.reserve(_mySlices.size());
+        for (int i = 0; i < _mySlices.size(); ++i) {
+            dom::ValuePtr myValuePointer = createRasterValue(GRAY, myWidth, myHeight, myBlock);
+            dom::ResizeableRasterPtr myRaster = dynamic_cast_Ptr<ResizeableRaster>(myValuePointer);
+            if (myRaster) {
+                _myStencils.push_back(myRaster);
+            } else {
+                throw CTScanException(std::string("Couldn't cast raster for slice ") + as_string(i) , PLUS_FILE_LINE);
+            }            
+        }
+    }
 }
 
 int
 CTScan::setSlices(std::vector<dom::ResizeableRasterPtr> theSlices) {
     _mySlices = theSlices;
+    //allocateStencils();
     return _mySlices.size();
 }
 
@@ -229,8 +263,7 @@ void
 CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox, 
                              double theThresholdMin, double theThresholdMax, int theDownSampleRate,
                              bool theCreateNormalsFlag, ScenePtr theScene, 
-                             unsigned int theNumVertices, unsigned int theNumTriangles,
-                             const SegmentationBitmap * theSegmentationBitmap)
+                             unsigned int theNumVertices, unsigned int theNumTriangles)
 {
     SceneBuilderPtr mySceneBuilder = theScene->getSceneBuilder();
     std::string myMaterialId = setupMaterial( mySceneBuilder, theCreateNormalsFlag);
@@ -238,7 +271,7 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox,
     // here we go ...
     MarchingCubes<VoxelT> myMarcher(theDownSampleRate, mySceneBuilder, this);
 
-    myMarcher.setBox(theVoxelBox, theSegmentationBitmap);
+    myMarcher.setBox(theVoxelBox);
     myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
     //myMarcher.setThreshold(VoxelT(theThresholdMax));
     myMarcher.calcNormals(theCreateNormalsFlag);
@@ -261,13 +294,12 @@ template <class VoxelT>
 void
 CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox,
                              double theThresholdMin, double theThresholdMax, int theDownSampleRate,
-                             unsigned int & theVertexCount, unsigned int & theTriangleCount,
-                             const SegmentationBitmap * theSegmentationBitmap)
+                             unsigned int & theVertexCount, unsigned int & theTriangleCount)
 {
     // here we go ...
     MarchingCubes<VoxelT> myMarcher(theDownSampleRate, SceneBuilderPtr(0), this);
 
-    myMarcher.setBox(theVoxelBox, theSegmentationBitmap);
+    myMarcher.setBox(theVoxelBox);
     myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
     //myMarcher.setThreshold(VoxelT(theThresholdMax));
     myMarcher.calcNormals(false);
@@ -280,8 +312,7 @@ asl::Vector2i
 CTScan::countTriangles(const asl::Box3i & theVoxelBox, 
                        double theThresholdMin, 
                        double theThresholdMax, 
-                       int theDownSampleRate, 
-                       const SegmentationBitmap * theSegmentationBitmap)
+                       int theDownSampleRate)
 {
     unsigned int myVertexCount;
     unsigned int myTriangleCount;
@@ -290,15 +321,15 @@ CTScan::countTriangles(const asl::Box3i & theVoxelBox,
         case y60::GRAY:
             countMarchingCubes<unsigned char>(theVoxelBox, theThresholdMin, 
                 theThresholdMax, theDownSampleRate, myVertexCount, 
-                myTriangleCount, theSegmentationBitmap);
+                myTriangleCount);
             break;
         case y60::GRAY16:
             countMarchingCubes<unsigned short>(theVoxelBox, theThresholdMin, theThresholdMax, 
-                theDownSampleRate, myVertexCount, myTriangleCount, theSegmentationBitmap);
+                theDownSampleRate, myVertexCount, myTriangleCount);
             break;
         case y60::GRAYS16:
             countMarchingCubes<short>(theVoxelBox, theThresholdMin, theThresholdMax, 
-                theDownSampleRate, myVertexCount, myTriangleCount, theSegmentationBitmap);
+                theDownSampleRate, myVertexCount, myTriangleCount);
             break;
         default:
             throw CTScanException("Unhandled voxel type in CTScan::countTriangles()", PLUS_FILE_LINE);
@@ -308,8 +339,7 @@ CTScan::countTriangles(const asl::Box3i & theVoxelBox,
 ScenePtr
 CTScan::polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
                    int theDownSampleRate, bool theCreateNormalsFlag, PackageManagerPtr thePackageManager, 
-                   unsigned int theNumVertices, unsigned int theNumTriangles, 
-                   const SegmentationBitmap * theSegmentationBitmap)
+                   unsigned int theNumVertices, unsigned int theNumTriangles)
 {
     asl::Time myStartTime;
 
@@ -319,17 +349,16 @@ CTScan::polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, doubl
         case y60::GRAY:
             applyMarchingCubes<unsigned char>(theVoxelBox, theThresholdMin, theThresholdMax, 
                 theDownSampleRate, theCreateNormalsFlag, myScene, theNumVertices, 
-                theNumTriangles, theSegmentationBitmap);
+                theNumTriangles);
             break;
         case y60::GRAY16:
             applyMarchingCubes<unsigned short>(theVoxelBox, theThresholdMin, theThresholdMax, 
-                theDownSampleRate, theCreateNormalsFlag, myScene, theNumVertices, theNumTriangles, 
-                theSegmentationBitmap);
+                theDownSampleRate, theCreateNormalsFlag, myScene, theNumVertices, theNumTriangles);
             break;
         case y60::GRAYS16:
             applyMarchingCubes<short>(theVoxelBox, theThresholdMin, theThresholdMax, 
                 theDownSampleRate, theCreateNormalsFlag, myScene, theNumVertices, 
-                theNumTriangles, theSegmentationBitmap);
+                theNumTriangles);
             break;
         default:
             throw CTScanException("Unhandled voxel type in CTScan::polygonize()", PLUS_FILE_LINE);

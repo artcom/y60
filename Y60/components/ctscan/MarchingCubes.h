@@ -73,8 +73,7 @@ namespace y60 {
 				_myHalfEdgeCount(0),
                 _myDownSampleRate(theDownSampleRate),
                 _myLineStride(0),
-                _myMCLookup(),
-                _mySegmentationBitmap(0)
+                _myMCLookup()                
             {
                 if ( ! _myVoxelData) {
                     throw MarchingCubesException("CTScan ptr is zero.", PLUS_FILE_LINE);
@@ -97,6 +96,10 @@ namespace y60 {
                 for (int i=0; i < theVoxelData->getVoxelDimensions()[2]; ++i) {
                     _mySlices.push_back(theVoxelData->CTScan::getSlicePtr<VoxelT>(i));
                 }
+                const SegmentationBitmap & myStencils = theVoxelData->getStencil();
+                for (int i = 0; i < myStencils.size(); ++i) {
+                    _myStencils.push_back(myStencils[i]->pixels().begin());
+                }
                 marchAllSegments();
             }
             ~MarchingCubes() {}
@@ -109,7 +112,7 @@ namespace y60 {
                 return _myThreshold;
             }
 
-            void setBox(const asl::Box3i & theBox, const SegmentationBitmap * theSegmentationBitmap = 0) {
+            void setBox(const asl::Box3i & theBox) {
                 asl::Box3i myTempBox(theBox.getMin()[0]/_myDownSampleRate,
                                      theBox.getMin()[1]/_myDownSampleRate,
                                      theBox.getMin()[2]/_myDownSampleRate,
@@ -122,46 +125,10 @@ namespace y60 {
                 _myDimBox[0]= mySize[0] + 1;
                 _myDimBox[1]= mySize[1] + 1;
                 _myDimBox[2]= mySize[2] + 1;
-                if (theSegmentationBitmap) {
-                    if (theSegmentationBitmap->size() * _myDownSampleRate != _myDimBox[2]) {
-                        throw MarchingCubesException(std::string("SegmentationBitmap has wrong Z-Dimension. Box is: ") 
-                                                     + as_string(_myDimBox[2]) + " but Bitmap is: " +
-                                                     as_string(theSegmentationBitmap->size()), PLUS_FILE_LINE);
-                    }
-                    int mySliceSize = _myDimBox[0] * _myDimBox[1];
-                    for (int i = 0; i < theSegmentationBitmap->size(); ++i) {
-                        if ((*theSegmentationBitmap)[i].size() != mySliceSize) {
-                            throw MarchingCubesException(std::string("SegmentationBitmap has wrong slice size. Box is: ") +
-                                as_string(_myDimBox[0] * _myDimBox[1]) + " but Bitmap is: " +
-                                as_string((*theSegmentationBitmap)[i].size()), PLUS_FILE_LINE);
-                        }
-                    }
-                    _mySegmentationBitmap = theSegmentationBitmap;
-                } else {
-                    _mySegmentationBitmap = 0;
-                }
             }
 
             const asl::Box3i & getBox() const {
                 return _myVBox;
-            }
-
-            bool isInSegmentationVolume(int i, int j, int k) const {
-                if (i < _myVBox[asl::Box3i::MIN][0] || i >= _myVBox[asl::Box3i::MAX][0]) { 
-                    return false;
-                }
-                if (j < _myVBox[asl::Box3i::MIN][1] || j >= _myVBox[asl::Box3i::MAX][1]) { 
-                    return false;
-                }
-                if (k < _myVBox[asl::Box3i::MIN][2] || k >= _myVBox[asl::Box3i::MAX][2]) { 
-                    return false;
-                }
-                if (!_mySegmentationBitmap) {
-                    return true;
-                }
-                int mySlice = k - _myVBox[asl::Box3i::MIN][2];
-                int myOffset = (j - _myVBox[asl::Box3i::MIN][1]) * _myDimBox[0] + (i - _myVBox[asl::Box3i::MIN][0]);
-                return (*_mySegmentationBitmap)[mySlice][myOffset];
             }
 
             // 1: calc vertex normals using gradients, 0: no normals (flat shading)
@@ -293,10 +260,15 @@ namespace y60 {
                 return _myShapeBuilder->getNode();
             }
 
+            //inline bool
+            //isInInterval(const VoxelT & theValue, const asl::Vector2<VoxelT> & theInterval) {
+            //    return (theValue > theInterval[0]) && (theValue < theInterval[1]);
+            //}
+
             int 
             outputVertex(int n, const asl::Vector3i & theMarchPos) {
                 asl::Point3f myVertexPosition;
-                asl::Vector3f myVertexNormal;                
+                asl::Vector3f myVertexNormal;
 
                 int iMarch = theMarchPos[0];
                 int jMarch = theMarchPos[1];
@@ -304,11 +276,10 @@ namespace y60 {
                 float li = 0.5f;
                 asl::Vector3f g0, g1, g2, g3, g4, g5, g6, g7;
                 int myThresholdIndex = 0;
-                asl::Vector2<VoxelT> myThreshold;
                 switch(n) {
                     case 0:
-                        myThreshold = (getVoxelThreshold(iMarch, jMarch, kMarch) + getVoxelThreshold(iMarch, jMarch+1, kMarch))/2;
-                        li = (float)(myThreshold[0] - _myCurrent[0]) / (float)(_myCurrent[1] - _myCurrent[0]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[0], _myCurrent[1]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[1] - _myCurrent[0]);
                         myVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         myVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         myVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -320,7 +291,8 @@ namespace y60 {
                         break;
 
                     case 1:
-                        li = (float)(_myThreshold[0] - _myCurrent[1]) / (float)(_myCurrent[2] - _myCurrent[1]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[1], _myCurrent[2]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[1]) / (float)(_myCurrent[2] - _myCurrent[1]);
                         myVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         myVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         myVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -333,7 +305,8 @@ namespace y60 {
                         break;
 
                     case 2:
-                        li = (float)(_myThreshold[0] - _myCurrent[3]) / (float)(_myCurrent[2] - _myCurrent[3]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[3], _myCurrent[2]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[3]) / (float)(_myCurrent[2] - _myCurrent[3]);
                         myVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         myVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         myVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -346,7 +319,8 @@ namespace y60 {
                         break;
 
                     case 3:
-                        li = (float)(_myThreshold[0] - _myCurrent[0]) / (float)(_myCurrent[3] - _myCurrent[0]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[0], _myCurrent[3]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[3] - _myCurrent[0]);
                         myVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         myVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         myVertexPosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -359,7 +333,8 @@ namespace y60 {
                         break;
 
                     case 4:
-                        li = (float)(_myThreshold[0] - _myCurrent[4]) / (float)(_myCurrent[5] - _myCurrent[4]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[4], _myCurrent[5]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[4]) / (float)(_myCurrent[5] - _myCurrent[4]);
                         myVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         myVertexPosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         myVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -372,7 +347,8 @@ namespace y60 {
                         break;
 
                     case 5:
-                        li = (float)(_myThreshold[0] - _myCurrent[5]) / (float)(_myCurrent[6] - _myCurrent[5]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[5], _myCurrent[6]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[5]) / (float)(_myCurrent[6] - _myCurrent[5]);
                         myVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         myVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         myVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -385,7 +361,8 @@ namespace y60 {
                         break;
 
                     case 6:
-                        li = (float)(_myThreshold[0] - _myCurrent[7]) / (float)(_myCurrent[6] - _myCurrent[7]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[7], _myCurrent[6]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[7]) / (float)(_myCurrent[6] - _myCurrent[7]);
                         myVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         myVertexPosition[1] = ((float)jMarch+ li) * _myVoxelSize[1];
                         myVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -398,7 +375,8 @@ namespace y60 {
                         break;
 
                     case 7:
-                        li = (float)(_myThreshold[0] - _myCurrent[4]) / (float)(_myCurrent[7] - _myCurrent[4]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[4], _myCurrent[7]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[4]) / (float)(_myCurrent[7] - _myCurrent[4]);
                         myVertexPosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         myVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         myVertexPosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -411,7 +389,8 @@ namespace y60 {
                         break;
 
                     case 8:
-                        li = (float)(_myThreshold[0] - _myCurrent[0]) / (float)(_myCurrent[4] - _myCurrent[0]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[0], _myCurrent[4]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[0]) / (float)(_myCurrent[4] - _myCurrent[0]);
                         myVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         myVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         myVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -424,7 +403,8 @@ namespace y60 {
                         break;
 
                     case 9:
-                        li = (float)(_myThreshold[0] - _myCurrent[1]) / (float)(_myCurrent[5] - _myCurrent[1]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[1], _myCurrent[5]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[1]) / (float)(_myCurrent[5] - _myCurrent[1]);
                         myVertexPosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         myVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         myVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -437,7 +417,8 @@ namespace y60 {
                         break;
 
                     case 10:
-                        li = (float)(_myThreshold[0] - _myCurrent[2]) / (float)(_myCurrent[6] - _myCurrent[2]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[2], _myCurrent[6]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[2]) / (float)(_myCurrent[6] - _myCurrent[2]);
                         myVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         myVertexPosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         myVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -451,7 +432,8 @@ namespace y60 {
                         break;
 
                     case 11:
-                        li = (float)(_myThreshold[0] - _myCurrent[3]) / (float)(_myCurrent[7] - _myCurrent[3]);
+                        myThresholdIndex = findThresholdBoundary(_myCurrent[3], _myCurrent[7]);
+                        li = (float)(_myThreshold[myThresholdIndex] - _myCurrent[3]) / (float)(_myCurrent[7] - _myCurrent[3]);
                         myVertexPosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         myVertexPosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         myVertexPosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -503,7 +485,7 @@ namespace y60 {
                 }
             }
 
-            inline void triangulateVoxel(int cubeIndex, const asl::Vector3i & theMarchPos, bool theDryRun, IJCache & theLowerCache, IJCache & theUpperCache, KCache & theKCache) {
+            inline void triangulateVoxel(int theCubeIndex, const asl::Vector3i & theMarchPos, bool theDryRun, IJCache & theLowerCache, IJCache & theUpperCache, KCache & theKCache) {
                 std::vector<int> myEdgeTable;
                 myEdgeTable.resize(12, -1);
                 myEdgeTable[1] = -2;
@@ -512,14 +494,14 @@ namespace y60 {
                 int kMarch = theMarchPos[2];
                 int myPositionIndex;
                 int (MarchingCubes<VoxelT>::*myOnVertex)(int n, const asl::Vector3i & theMarchPos) = 0;
-                const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[cubeIndex]; 
+                const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[theCubeIndex]; 
 
 				if (theDryRun) { 
 					myOnVertex = &MarchingCubes<VoxelT>::countVertex;
 				} else {
 					myOnVertex = &MarchingCubes<VoxelT>::outputVertex;
 				}
-                AC_TRACE << "triangulateVoxel(" << cubeIndex << ", " << jMarch << "," << iMarch << "," << kMarch << ")";
+                AC_TRACE << "triangulateVoxel(" << theCubeIndex << ", " << jMarch << "," << iMarch << "," << kMarch << ")";
                 const std::vector<int> & myEdges = myCubeCase.edges;
                 int myEdgeCount = myEdges.size();
                 for (int i = 0; i < myEdgeCount; ++i) {
@@ -615,9 +597,12 @@ namespace y60 {
 							    if (myNeighbor.type == MCLookup::MAX_X ||
                                     myNeighbor.type == MCLookup::MAX_Y ||
                                     myNeighbor.type == MCLookup::MAX_Z)                             {
-                                    if (((myNeighbor.type == MCLookup::MAX_X) && (iMarch+1 < _myVBox[asl::Box3i::MAX][0])) ||
-                                        ((myNeighbor.type == MCLookup::MAX_Y) && (jMarch+1 < _myVBox[asl::Box3i::MAX][1])) ||
-                                        ((myNeighbor.type == MCLookup::MAX_Z) && (kMarch+1 < _myVBox[asl::Box3i::MAX][2]))) 
+                                        // XXX
+                                    if (1
+                                        /*((myNeighbor.type == MCLookup::MAX_X) && i != iboxend) ||
+                                        ((myNeighbor.type == MCLookup::MAX_Y) && j != jboxend) ||
+                                        ((myNeighbor.type == MCLookup::MAX_Z) && k != kboxend)*/
+                                        ) 
                                     { 
                                         // Add to the map
                                         EdgeId myKey(myIndex, myNextIndex);
@@ -631,10 +616,10 @@ namespace y60 {
 								    EdgeId myKey(myNextIndex, myIndex);
 								    EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
 								    if (_myHalfEdgeCache.end() == iter) {
-									    if (!(kMarch == _myVBox[asl::Box3i::MIN][2]) && !(iMarch == _myVBox[asl::Box3i::MIN][0]) && !(jMarch == _myVBox[asl::Box3i::MIN][1])) {
-										    AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") = (" << myCornerIndex << ", " << myNextCornerIndex << ") jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch;
-										    //throw MarchingCubesException("Not found in cache.", PLUS_FILE_LINE);                                    
-									    }
+                                        // [TS] Disabled for Segmentation
+									    //if (!(kMarch == _myVBox[asl::Box3i::MIN][2]) && !(iMarch == _myVBox[asl::Box3i::MIN][0]) && !(jMarch == _myVBox[asl::Box3i::MIN][1])) {
+										   // AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") = (" << myCornerIndex << ", " << myNextCornerIndex << ") jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch;
+									    //}
 								    } else {
 									    myHalfEdge = (*iter).second;
 									    _myHalfEdgeCache.erase(iter);
@@ -653,22 +638,10 @@ namespace y60 {
 				}
             }
 
-            inline const asl::Vector2<VoxelT> &
-            getVoxelThreshold(int x, int y, int z) const {
-                return _myThreshold;
-                //static asl::Vector2<VoxelT> ourOtherThreshold(VoxelT(100), VoxelT(150));
-                //if (x > 64) {
-                //    return _myThreshold;
-                //} else {
-                //    return ourOtherThreshold;
-                //}
-            }
-
             inline bool
             isOutside(int x, int y, int z) const {
                 const VoxelT & myValue = at(x, y, z);
-                const asl::Vector2<VoxelT> & myThreshold = getVoxelThreshold(x, y, z);
-                return myValue < myThreshold[0] || myValue > myThreshold[1];
+                return myValue < _myThreshold[0] || myValue > _myThreshold[1];
             }
 
             inline int findThresholdBoundary(const VoxelT theFirstValue, const VoxelT theSecondValue) const {
@@ -677,7 +650,6 @@ namespace y60 {
                 {
                     return 0;
                 } else {
-                    //throw MarchingCubesException("Threshold is neither crossed from top or bottom", PLUS_FILE_LINE);
                     if ((theFirstValue <= _myThreshold[1] && theSecondValue >= _myThreshold[1]) ||
                         (theFirstValue >= _myThreshold[1] && theSecondValue <= _myThreshold[1])) 
                     {
@@ -707,8 +679,8 @@ namespace y60 {
              */
             inline
             const VoxelT &
-            at(int x, int y, int z) const {
-                return _mySlices[z*_myDownSampleRate][_myLineStride*y*_myDownSampleRate + x*_myDownSampleRate];
+            at(const asl::Vector3i & thePosition) const {
+                return at(thePosition[0], thePosition[1], thePosition[2]);
             }
 
             /**
@@ -716,11 +688,18 @@ namespace y60 {
              */
             inline
             const VoxelT &
-            at(const asl::Vector3i & thePosition) const {
-                asl::Vector3i mySampledPosition = thePosition * _myDownSampleRate;
-                return _mySlices[mySampledPosition[2]][mySampledPosition[1]*_myLineStride + mySampledPosition[0]];
+            at(int x, int y, int z) const {
+                return at(asl::Vector2i((_myLineStride*y + x)*_myDownSampleRate, z*_myDownSampleRate));
             }
 
+            /**
+             * Gets a value from the Voxel data by the downsampled sliceindex and offset in the slice
+             */
+            inline
+            const VoxelT &
+            at(const asl::Vector2i & theOffset) const {
+                return _mySlices[theOffset[1]][theOffset[0]];
+            }
 
             inline
             const VoxelT &
@@ -737,7 +716,6 @@ namespace y60 {
                 return at(myClippedPosition);
             }
 
-            // XXX inline me
             inline VoxelT
             getValueByCubeCorner(int iMarch, int jMarch, int kMarch, int theCubeCorner) {
                 switch (theCubeCorner) {
@@ -763,19 +741,99 @@ namespace y60 {
             }
 
             inline void
-            fillVoxelCube(int iMarch, int jMarch, int kMarch, std::vector<VoxelT> & theVoxelCube) {
+            fillVoxelCube(int theI, int theJ, int theK, std::vector<VoxelT> & theVoxelCube) {
                 theVoxelCube.clear();
                 theVoxelCube.reserve(8);
+                int myDownSampledSlice = theK * _myDownSampleRate;
+                int myDownSampledPosition = (theJ * _myLineStride + theI) * _myDownSampleRate;
+                int mySlicePosition;
+                int mySliceOffset;
                 for (int i = 0; i < 8; ++i) {
-                    theVoxelCube.push_back(getValueByCubeCorner(iMarch, jMarch, kMarch, i));
+                    mySlicePosition = myDownSampledSlice+_myOffsetTable[i][1];
+                    mySliceOffset = myDownSampledPosition+_myOffsetTable[i][0];
+                    theVoxelCube.push_back(_mySlices[mySlicePosition][mySliceOffset]); 
+                    // This is a bit faster but less elegant:
+                    // theVoxelCube.push_back(getValueByCubeCorner(iMarch, jMarch, kMarch, i));
                 }
+            }
+
+            void
+            fillOffsetTable() {
+                _myOffsetTable[0] = asl::Vector2i(0,0);  // [0,0,0]
+                _myOffsetTable[1] = asl::Vector2i(_myLineStride * _myDownSampleRate, 0);  // [0,1,0]
+                _myOffsetTable[2] = asl::Vector2i((1+_myLineStride) * _myDownSampleRate, 0);  // [1,1,0]
+                _myOffsetTable[3] = asl::Vector2i(_myDownSampleRate, 0); // [1,0,0]
+                _myOffsetTable[4] = asl::Vector2i(0, _myDownSampleRate);  // [0,0,0]
+                _myOffsetTable[5] = asl::Vector2i(_myLineStride * _myDownSampleRate, _myDownSampleRate);  // [0,1,0]
+                _myOffsetTable[6] = asl::Vector2i((1+_myLineStride) * _myDownSampleRate, _myDownSampleRate);  // [1,1,0]
+                _myOffsetTable[7] = asl::Vector2i(_myDownSampleRate, _myDownSampleRate); // [1,0,0]
+                _myBitMaskTable[0] = BIT_0;
+                _myBitMaskTable[1] = BIT_1;
+                _myBitMaskTable[2] = BIT_2;
+                _myBitMaskTable[3] = BIT_3;
+                _myBitMaskTable[4] = BIT_4;
+                _myBitMaskTable[5] = BIT_5;
+                _myBitMaskTable[6] = BIT_6;
+                _myBitMaskTable[7] = BIT_7;
+            }
+
+            inline int 
+            getCubeIndex(int theI, int theJ, int theK) const {
+                unsigned int myBitMask = 0;
+#ifdef UNROLLED_CUBEINDEX_LOOP
+                if(isOutside(theI, theJ, theK)) {
+                    myBitMask |= BIT_0;
+                }
+                if(isOutside(theI, theJ+1, theK)) {
+                    myBitMask |= BIT_1;
+                }
+                if(isOutside(theI+1, theJ+1, theK)) {
+                    myBitMask |= BIT_2;
+                }
+                if(isOutside(theI+1, theJ, theK)) {
+                    myBitMask |= BIT_3;
+                }
+                if(isOutside(theI, theJ, theK+1)) {
+                    myBitMask |= BIT_4;
+                }
+                if(isOutside(theI, theJ+1, theK+1)) {
+                    myBitMask |= BIT_5;
+                }
+                if(isOutside(theI+1, theJ+1, theK+1)) {
+                    myBitMask |= BIT_6;
+                }
+                if(isOutside(theI+1, theJ, theK+1)) {
+                    myBitMask |= BIT_7;
+                }
+#else
+                asl::Vector2i myNeighbour;
+                VoxelT myValue;
+                int myDownSampledSlice = theK * _myDownSampleRate;
+                int myDownSampledPosition = (theJ * _myLineStride + theI) * _myDownSampleRate;
+                int mySlicePosition;
+                int mySliceOffset;
+                for (int i = 0; i < 8; ++i) {
+                    mySlicePosition = myDownSampledSlice+_myOffsetTable[i][1];
+                    mySliceOffset = myDownSampledPosition+_myOffsetTable[i][0];
+
+                    if (bool(_myStencils[mySlicePosition][mySliceOffset]) == false) {
+                        return -1;
+                    }
+                    myValue = _mySlices[mySlicePosition][mySliceOffset]; 
+                    if (myValue < _myThreshold[0] || myValue > _myThreshold[1]) {
+                        myBitMask |= _myBitMaskTable[i];
+                    }
+                }
+#endif
+                return myBitMask;
             }
 
             void march(bool theDryRun) {
                 AC_TRACE << "MarchingCubes::march()";
                 int j, i, k;
-                int cubeIndex;
-                int myWriteCacheIndex = 0;  // will be switched on first iteration
+                int myCubeIndex;
+                //int myCubeIndex;
+                int myUpperCacheIndex = 0;  // will be switched on first iteration
                 const int iBoxStart = _myVBox[asl::Box3i::MIN][0];
                 const int iBoxEnd   = _myVBox[asl::Box3i::MAX][0];
                 const int jBoxStart = _myVBox[asl::Box3i::MIN][1];
@@ -796,51 +854,28 @@ namespace y60 {
                 _myCache[1] = IJCachePtr(new IJCache(_myDimensions[0], _myDimensions[1]));
                 _myKCache = KCachePtr(new KCache(_myDimensions[0], _myDimensions[1]));
 
+                fillOffsetTable();
+
                 for(k = kBoxStart; k < kBoxEnd; k++) {
                     _myVoxelData->notifyProgress(double(k - kBoxStart) / double(kBoxEnd - kBoxStart),
                             theDryRun ? "estimating" : "polygonizing");
                     // switch cache
-                    myWriteCacheIndex = 1 - myWriteCacheIndex;
-                    _myCache[myWriteCacheIndex]->reset();
+                    myUpperCacheIndex = 1 - myUpperCacheIndex;
+                    _myCache[myUpperCacheIndex]->reset();
                     _myKCache->reset(-1);
                     for(j = jBoxStart; j < jBoxEnd; j++) {
                         for(i = iBoxStart; i < iBoxEnd; i++) {
-                            // XXX this is basically wrong because we are comparing apples
-                            // and peas here. i, j, k is not a voxel in this context but
-                            // it is the coordinates of one of the 8 voxels considered
-                            //if (isInSegmentationVolume(i, j, k)) {
-                                cubeIndex = 0;
-                                if(isOutside(i, j, k)) {
-                                    cubeIndex |= BIT_0;
-                                }
-                                if(isOutside(i, j+1, k)) {
-                                    cubeIndex |= BIT_1;
-                                }
-                                if(isOutside(i+1, j+1, k)) {
-                                    cubeIndex |= BIT_2;
-                                }
-                                if(isOutside(i+1, j, k)) {
-                                    cubeIndex |= BIT_3;
-                                }
-                                if(isOutside(i, j, k+1)) {
-                                    cubeIndex |= BIT_4;
-                                }
-                                if(isOutside(i, j+1, k+1)) {
-                                    cubeIndex |= BIT_5;
-                                }
-                                if(isOutside(i+1, j+1, k+1)) {
-                                    cubeIndex |= BIT_6;
-                                }
-                                if(isOutside(i+1, j, k+1)) {
-                                    cubeIndex |= BIT_7;
-                                }
-
-                                if((cubeIndex > 0) && (cubeIndex < 255)) {
-                                    fillVoxelCube(i, j, k, _myCurrent);
-                                    asl::Vector3i myVoxel(i, j, k);
-                                    triangulateVoxel(cubeIndex, myVoxel, theDryRun, *_myCache[1-myWriteCacheIndex], *_myCache[myWriteCacheIndex], *_myKCache);
-                                }
-                            //}
+                            // [TS] This makes MC behave different from before. But still I
+                            // believe it is more correct than before. We cant triangulate
+                            // the rightmost voxels. Visual results are kindof strange. We
+                            // could make it check against the myCubeIndex so we at least close
+                            // everything we can... but that would still be strange...
+                            myCubeIndex = getCubeIndex(i, j, k);
+                            if((myCubeIndex > 0) && (myCubeIndex < 255)) {
+                                fillVoxelCube(i, j, k, _myCurrent);
+                                asl::Vector3i myVoxel(i, j, k);
+                                triangulateVoxel(myCubeIndex, myVoxel, theDryRun, *_myCache[1-myUpperCacheIndex], *_myCache[myUpperCacheIndex], *_myKCache);
+                            }
                         }
                     }
                 }
@@ -899,6 +934,7 @@ namespace y60 {
 
             const int _myDownSampleRate;
             int _myLineStride;
+            int _mySliceOffset;
 
             SceneBuilderPtr   _mySceneBuilder;
             ShapeBuilderPtr   _myShapeBuilder;
@@ -910,12 +946,14 @@ namespace y60 {
             dom::NodePtr                 _myHalfEdgeNode;
             dom::NodePtr                 _myColorIndexNode;
             std::vector<const VoxelT*>   _mySlices;
+            std::vector<const unsigned char*> _myStencils;
             std::vector<asl::Vector3f> * _myVertices;
             std::vector<signed int>    * _myHalfEdges;
             std::vector<asl::Vector3f> * _myNormals;            
             std::vector<unsigned int>  * _myIndices;
-            const SegmentationBitmap   * _mySegmentationBitmap;
             EdgeCache                    _myHalfEdgeCache;
+            asl::Vector2i                _myOffsetTable[8];
+            unsigned                     _myBitMaskTable[8];
     };
 
 } // end of namespace y60

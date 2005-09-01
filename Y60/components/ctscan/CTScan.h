@@ -30,6 +30,8 @@
 #include <string>
 #include <sigc++/sigc++.h>
 #include <glibmm/ustring.h>
+#include <asl/raster.h>
+#include <y60/AcBool.h>
 
 namespace asl {
     class PackageManager;
@@ -39,7 +41,7 @@ namespace y60 {
 
 DEFINE_EXCEPTION(CTScanException, asl::Exception);
 
-typedef std::vector<std::vector<bool> > SegmentationBitmap;
+typedef std::vector<dom::ResizeableRasterPtr> SegmentationBitmap;
 
 class CTScan {
     public:
@@ -84,14 +86,12 @@ class CTScan {
         asl::Vector2d getValueRange();
 
         asl::Vector2i countTriangles(const asl::Box3i & theVoxelBox, 
-            double theThresholdMin, double theThresholdMax, int theDownSampleRate,
-            const SegmentationBitmap * theSegmentationBitmap);
+            double theThresholdMin, double theThresholdMax, int theDownSampleRate);
 
         /** Create an isosurface from the voxel dataset */
         ScenePtr polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
             int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
-            unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0, 
-            const SegmentationBitmap * theSegmentationBitmap = 0);
+            unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
 
         /** Create a downscaled 3D texture from the dataset */
         void create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize);
@@ -116,6 +116,12 @@ class CTScan {
             return reinterpret_cast<const VoxelT *>(_mySlices[theIndex]->pixels().begin());
         }
 
+        const SegmentationBitmap &
+        getStencil() const {
+            return _myStencils;
+        }
+        void appendStencil(dom::NodePtr theImage);
+
         // everything below this line is deprecated
         bool verifyCompleteness();
         void clear();
@@ -128,6 +134,7 @@ class CTScan {
         
         y60::PixelEncoding _myEncoding;
         std::vector<dom::ResizeableRasterPtr> _mySlices;
+        SegmentationBitmap _myStencils;
         asl::Vector2f _myDefaultWindow;
         asl::Vector3f _myVoxelSize;
         
@@ -135,16 +142,14 @@ class CTScan {
         void
         countMarchingCubes(const asl::Box3i & theVoxelBox,
                              double theThresholdMin, double theThresholdMax, int theDownSampleRate,
-                             unsigned int & theVertexCount, unsigned int & theTriangleCount,
-                             const SegmentationBitmap * theSegmentationBitmap = 0);
+                             unsigned int & theVertexCount, unsigned int & theTriangleCount);
         template <class VoxelT> 
         void
         applyMarchingCubes(const asl::Box3i & theVoxelBox, 
                              double theThresholdMin, double theThresholdMax, int theDownSampleRate,
                              bool theCreateNormalsFlag, 
                              ScenePtr theScene, unsigned int theNumVertices = 0, 
-                             unsigned int theNumTriangles = 0,
-                             const SegmentationBitmap * theSegmentationBitmap = 0);
+                             unsigned int theNumTriangles = 0);
         template <class VoxelT>
         void
         countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram);
@@ -156,6 +161,7 @@ class CTScan {
         std::string setupMaterial(y60::SceneBuilderPtr theSceneBuilder, bool theCreateNormalsFlag);
         void setupScene(y60::ScenePtr theScene, const std::string & theShapeId);
         void resetCamera(ScenePtr theScene, const asl::Box3f & theBox);
+        void allocateStencils();
 
         // everything below this line is deprecated
         int _myMinZ;  // min Z-Pos of decoded slices
