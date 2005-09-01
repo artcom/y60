@@ -295,11 +295,12 @@ createStencilImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
         int myHeight;
         convertFrom(cx, argv[2], myHeight);
         asl::Block myBlock(myWidth * myHeight, 255);
-        //dom::ValuePtr myValuePointer = createRasterValue(GRAY, myWidth, myHeight, myBlock);
-        //dom::ResizeableRasterPtr myRaster = dynamic_cast_Ptr<ResizeableRaster>(myValuePointer);
         dom::NodePtr myImage(new dom::Element("image"));
         myImagesNode->appendChild(myImage);
+        myImage->getFacade<Image>()->set<ImageMipmapTag>(false);
         myImage->getFacade<Image>()->set(myWidth, myHeight, 1, y60::GRAY, myBlock);
+        //myImage->getFacade<Image>()->set(myWidth, myHeight, 1, y60::GRAY);
+        //AC_INFO << "Width: " << myImage->getFacade<Image>()->get<ImageWidthTag>() << ", Height: " << myImage->getFacade<Image>()->get<ImageHeightTag>();
         *rval = as_jsval(cx, myImage);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

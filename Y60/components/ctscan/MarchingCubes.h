@@ -815,9 +815,10 @@ namespace y60 {
                 for (int i = 0; i < 8; ++i) {
                     mySlicePosition = myDownSampledSlice+_myOffsetTable[i][1];
                     mySliceOffset = myDownSampledPosition+_myOffsetTable[i][0];
-
-                    if (bool(_myStencils[mySlicePosition][mySliceOffset]) == false) {
-                        return -1;
+                    if (! _myStencils.empty()) {
+                        if (bool(_myStencils[mySlicePosition][mySliceOffset]) == false) {
+                            return -1;
+                        }
                     }
                     myValue = _mySlices[mySlicePosition][mySliceOffset]; 
                     if (myValue < _myThreshold[0] || myValue > _myThreshold[1]) {
