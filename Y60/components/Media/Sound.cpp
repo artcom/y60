@@ -100,6 +100,10 @@ double Sound::getVolume() const {
     return _mySampleSink->getVolume();
 }
 
+bool Sound::isLooping() const {
+    return _myIsLooping;
+}
+
 std::string Sound::getName() const {
     return _myURI;
 }
@@ -113,7 +117,7 @@ Time Sound::getDuration() const {
     }
 }
 
-Time Sound::getCurrentTime() {
+Time Sound::getCurrentTime() const {
     return _mySampleSink->getCurrentTime();
 }
 

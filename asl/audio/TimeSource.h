@@ -20,7 +20,7 @@ namespace asl {
  
 class TimeSource {
     public:
-        virtual Time getCurrentTime() = 0;
+        virtual Time getCurrentTime() const = 0;
 };
 
 

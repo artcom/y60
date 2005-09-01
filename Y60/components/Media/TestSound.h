@@ -34,8 +34,15 @@ class SoundTestBase: public UnitTest {
         SoundTestBase(const char * myName) 
             : UnitTest(myName)
         {  
-            PlugInBasePtr myPlugIn = PlugInManager::get().getPlugIn("y60Media");
-            _myMedia = dynamic_cast_Ptr<Media>(myPlugIn);
+            PlugInBasePtr myPlugIn = PlugInManager::get().getPlugIn("y60Media");            
+
+            typedef y60::Media * (*GetMediaFunctionPtr)();
+            GetMediaFunctionPtr myGetMediaFunction = (GetMediaFunctionPtr)PlugInManager::getFunction(myPlugIn->getDLHandle(), "createMedia");
+            if (myGetMediaFunction) {
+                _myMedia = MediaPtr((*myGetMediaFunction)());
+            } else {
+                cerr << "Could not get 'createMedia' fuction pointer from dll." << endl;
+            }
         }
 
     protected:
@@ -488,8 +495,18 @@ class SoundTestSuite : public UnitTestSuite {
             UnitTestSuite::setup();
 
             PlugInManager::get().setSearchPath("${PRO}/lib");
-            PlugInBasePtr myPlugIn = PlugInManager::get().getPlugIn("y60Media");
-            Ptr<Media> myMedia = dynamic_cast_Ptr<Media>(myPlugIn);
+
+            PlugInBasePtr myPlugIn = PlugInManager::get().getPlugIn("y60Media");            
+
+            typedef y60::Media * (*GetMediaFunctionPtr)();
+            y60::MediaPtr myMedia;
+            GetMediaFunctionPtr myGetMediaFunction = (GetMediaFunctionPtr)PlugInManager::getFunction(myPlugIn->getDLHandle(), "createMedia");
+            if (myGetMediaFunction) {
+                myMedia = y60::MediaPtr((*myGetMediaFunction)());
+            } else {
+                cerr << "Could not get 'createMedia' fuction pointer from dll." << endl;
+            }
+
             ENSURE(myMedia);
 #ifdef WIN32
             myMedia->setSysConfig(0.05, "");

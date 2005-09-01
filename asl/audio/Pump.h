@@ -35,9 +35,9 @@ class Pump : public AudioTimeSource, private PosixThread
 
         // Latency and Device name are system-specific (and should ideally be read from a 
         // configuration file), while the other parameters are all application-specific. 
-        static void setSysConfig(const Time& myLatency, const std::string& myDeviceName);
-        static void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels, 
-                bool useDummy);
+        static void setSysConfig(const Time& myLatency, const std::string& myDeviceName = "");
+        static void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels = 2, 
+                bool useDummy = false);
         static Pump& get();
         
         HWSampleSinkPtr createSampleSink 
@@ -56,6 +56,8 @@ class Pump : public AudioTimeSource, private PosixThread
         unsigned getNumClicks() const;
         virtual void dumpState() const;
 
+        bool isRunning() const;
+
         // Interface to HWSampleSink
         void lock();
         void unlock();
@@ -66,26 +68,24 @@ class Pump : public AudioTimeSource, private PosixThread
 
         HWSampleSinkPtr getSink(unsigned i);
         void addSink(HWSampleSinkPtr theSink);
-        
+
         void setDeviceName(const std::string& theName);
         const std::string& getDeviceName() const;
         
         void setCardName(const std::string& theName);
         const std::string& getCardName() const;
-        
-        bool isRunning() const;
-        
+            
         void addUnderrun();
         void mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver);
 
         // The following are used only as initializers - set by setConfig, read 
         // by Pump::Pump and derived constructors.
         // TODO: Anyone know of a better way to do this?
-        static double _myLatency_Init;
+        static double      _myLatency_Init;
         static std::string _myDeviceName_Init;
-        static unsigned _mySampleRate_Init;
-        static unsigned _numOutputChannels_Init;
-        static bool _useDummy_Init;
+        static unsigned    _mySampleRate_Init;
+        static unsigned    _numOutputChannels_Init;
+        static bool        _useDummy_Init;
 
     private:
         void run();
@@ -98,19 +98,19 @@ class Pump : public AudioTimeSource, private PosixThread
         Time _myLatency;
 
         SampleFormat _mySF;
-        unsigned _myNumUnderruns;
-        std::string _myDeviceName;
-        std::string _myCardName;
-        unsigned _numOutputChannels;
-        unsigned _mySampleRate;
+        unsigned     _myNumUnderruns;
+        std::string  _myDeviceName;
+        std::string  _myCardName;
+        unsigned     _numOutputChannels;
+        unsigned     _mySampleRate;
 
         AudioBufferPtr _myTempBuffer;
 
         VolumeFader _myVolumeFader;
-        unsigned _curFrame;
-        bool _doBritzelTest;
-        unsigned _numClicks;
-        float _myLastFrame;
+        unsigned    _curFrame;
+        bool        _doBritzelTest;
+        unsigned    _numClicks;
+        float       _myLastFrame;
 };
 
 }

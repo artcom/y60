@@ -27,27 +27,6 @@ using namespace asl;
 using namespace AudioApp;
 using namespace jslib;
 
-DEFINE_EXCEPTION(BadArgumentException, Exception);
-
-void
-checkForUndefinedArguments(const string & theMethodName, uintN argc, jsval *argv) {
-    for (unsigned i = 0; i < argc; ++i) {
-        if (JSVAL_IS_VOID(argv[i])) {
-            throw BadArgumentException(theMethodName + ": Argument " + as_string(i) + " is undefined.", PLUS_FILE_LINE);
-        }
-    }
-}
-
-void
-checkArguments(const string & theMethodName, uintN argc, jsval *argv, unsigned theRequiredArguments) {
-    if (argc != theRequiredArguments) {
-        throw BadArgumentException(theMethodName + ": Wrong number of arguments. Got " +
-            as_string(argc) + ", expected " + as_string(theRequiredArguments) + ".", PLUS_FILE_LINE);
-    }
-
-    checkForUndefinedArguments(theMethodName, argc, argv);
-}
-
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Prints 'JSAudio'. :)");

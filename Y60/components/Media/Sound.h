@@ -51,11 +51,12 @@ class Sound :
         virtual double getVolume () const;
         virtual std::string getName() const;
         virtual asl::Time getDuration() const;
-        virtual asl::Time getCurrentTime ();
+        virtual asl::Time getCurrentTime() const;
+        virtual bool isLooping() const;
         virtual void seek (asl::Time thePosition);
         virtual void seekRelative (asl::Time theAmount);
-        virtual asl::Time getBufferedTime () const;
-        virtual bool canSeek () const;
+        virtual asl::Time getBufferedTime() const;
+        virtual bool canSeek() const;
         virtual bool isPlaying() const;
         virtual unsigned getNumUnderruns() const;
 

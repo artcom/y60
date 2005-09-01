@@ -26,7 +26,7 @@ class AudioTimeSource {
         virtual ~AudioTimeSource();
       
         void setCurrentTime(asl::Time theTime);
-        virtual Time getCurrentTime();
+        virtual Time getCurrentTime() const;
 
     protected:
         void stop();
@@ -35,7 +35,7 @@ class AudioTimeSource {
         void addFramesToTime(unsigned numFrames);
     
     private:
-        asl::ThreadLock _myTimeLock;
+        mutable asl::ThreadLock _myTimeLock;
         Unsigned64 _mySentFrames;
         asl::Time _mySysTimeAtLastBuffer;
         unsigned _myInitialDelay;

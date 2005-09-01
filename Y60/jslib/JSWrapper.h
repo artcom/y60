@@ -989,6 +989,27 @@ struct JSClassTraitsWrapper {
     };
 };
 
+DEFINE_EXCEPTION(BadArgumentException, asl::Exception);
+
+inline void
+checkForUndefinedArguments(const std::string & theMethodName, uintN argc, jsval *argv) {
+    for (unsigned i = 0; i < argc; ++i) {
+        if (JSVAL_IS_VOID(argv[i])) {
+            throw BadArgumentException(theMethodName + ": Argument " + asl::as_string(i) + " is undefined.", PLUS_FILE_LINE);
+        }
+    }
+}
+
+inline void
+checkArguments(const std::string & theMethodName, uintN argc, jsval *argv, unsigned theRequiredArguments) {
+    if (argc != theRequiredArguments) {
+        throw BadArgumentException(theMethodName + ": Wrong number of arguments. Got " +
+            asl::as_string(argc) + ", expected " + asl::as_string(theRequiredArguments) + ".", PLUS_FILE_LINE);
+    }
+
+    checkForUndefinedArguments(theMethodName, argc, argv);
+}
+
 }
 #endif
 

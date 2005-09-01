@@ -49,12 +49,13 @@ public:
     Ptr<PlugInBase> getPlugIn(const std::string & theName);
     bool isLoaded(const std::string & theName) const;
     static std::string getPlugInFileName(const std::string & thePlugInName, const char * theVariant = 0);
+    static void* getFunction(DLHandle theHandle, const std::string & theName);
+
 protected:
     PlugInManager();
     friend class SingletonManager;
 
     Ptr<PlugInBase> loadPlugIn(const std::string & theName);
-    static void* getFunction(DLHandle theHandle, const std::string & theName);
     std::string lastError() const;
 
     typedef std::map< std::string, WeakPtr<PlugInBase> > PlugInCache;

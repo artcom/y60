@@ -10,8 +10,8 @@
 //
 //=============================================================================
 
-#ifndef INCL_VOLUMEFADER
-#define INCL_VOLUMEFADER
+#ifndef INCL_ASL_VOLUMEFADER_H
+#define INCL_ASL_VOLUMEFADER_H
 
 #include "Effect.h"
 

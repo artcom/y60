@@ -36,7 +36,7 @@ void AudioTimeSource::setCurrentTime(asl::Time theTime) {
     _mySysTimeAtLastBuffer = Time();
 }
 
-Time AudioTimeSource::getCurrentTime() {
+Time AudioTimeSource::getCurrentTime() const {
     if (_myRunning) {
         // If the time source was just constructed, we might need to wait until 
         // some data has been sent to the sound card to get sensible values.

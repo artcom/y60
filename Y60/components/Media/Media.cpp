@@ -18,17 +18,15 @@ using namespace std;
 using namespace asl;
 
 extern "C"
-EXPORT asl::PlugInBase * y60Media_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::Media(myDLHandle);
+EXPORT y60::Media * createMedia() {
+    return new y60::Media();
 }
 
 namespace y60 {
 
 const double myTimePerSlice = 0.05;
     
-Media::Media(asl::DLHandle theDLHandle)
-    : PlugInBase(theDLHandle)
-{
+Media::Media() {
     AC_DEBUG << "Media::Media";
     fork();
 }
@@ -65,14 +63,14 @@ SoundPtr Media::createSound(const string & theURI, bool theLoop,
     _mySounds.push_back(mySound);
     return mySound;
 }
-
+/*
 SoundPtr Media::createSound(const string & theURI, Ptr<ReadableStream> theStream, 
         bool theLoop)
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
     return SoundPtr(0);
 }
-
+*/
 void Media::setVolume(float theVolume) {
     Pump::get().setVolume(theVolume);
 }
@@ -88,6 +86,10 @@ float Media::getVolume() const {
 
 unsigned Media::getNumSounds() const {
     return Pump::get().getNumSinks();
+}
+
+bool Media::isRunning() const {
+    return Pump::get().isRunning();
 }
 
 void Media::stopAll() {

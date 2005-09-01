@@ -23,7 +23,7 @@ using namespace std;
 using namespace asl;
 
 HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat, 
-        unsigned mySampleRate, unsigned numChannels)
+                           unsigned mySampleRate, unsigned numChannels)
     : AudioTimeSource(0, mySampleRate),
       _myStopWhenEmpty(false),
       _numChannels(numChannels),
@@ -146,6 +146,9 @@ void HWSampleSink::fadeToVolume(float theVolume, float theTime) {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     _myVolume = theVolume;
     _myVolumeFader->setVolume(theVolume, unsigned(theTime*getSampleRate()));
+}
+bool HWSampleSink::isPlaying() const {
+    return getState() == RUNNING;
 }
 
 float HWSampleSink::getVolume() const {

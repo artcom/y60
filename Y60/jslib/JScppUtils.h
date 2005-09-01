@@ -320,6 +320,7 @@ bool convertFrom(JSContext *cx, jsval theValue, double & theDest) {
         theDest = double(myDoubleDest);
         return true;
     }
+    //theDest = asl::Time::double(theValue);
     return false;
 }
 
@@ -500,6 +501,17 @@ bool convertFrom(JSContext *cx, jsval theValue, std::vector<T> & theDest) {
                 return true;
             }
         }
+    }
+    return false;
+}
+
+inline
+bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest) {
+    jsdouble myDoubleDest = -1;
+    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) && !JSDOUBLE_IS_NaN(myDoubleDest) )
+    {
+        theDest = asl::Time(myDoubleDest);
+        return true;
     }
     return false;
 }

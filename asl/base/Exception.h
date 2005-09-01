@@ -103,7 +103,8 @@ namespace asl {
     #define DEFINE_NESTED_EXCEPTION(INSIDECLASS,CLASS,BASECLASS) DEFINE_NAMED_EXCEPTION(CLASS,INSIDECLASS::CLASS,BASECLASS)
 
     // Some generic exceptions
-    DEFINE_EXCEPTION(ParseException,Exception);
+    DEFINE_EXCEPTION(ParseException, Exception);
+    DEFINE_EXCEPTION(NotYetImplementedException, Exception)
 
 
     /* @} */
