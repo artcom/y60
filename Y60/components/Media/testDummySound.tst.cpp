@@ -11,7 +11,6 @@
 
 #include "TestSound.h"
 
-#include <asl/Pump.h>
 #include <asl/Dashboard.h>
 
 using namespace std;
