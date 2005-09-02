@@ -90,7 +90,7 @@ acMain(int argc, char **argv) {
 
         asl::StdOutputRedirector myRedirector(ourArguments);
 
-        AC_PRINT << ourArguments.getProgramName() << " Copyright (C) 2003-2005 ART+COM";
+        //AC_PRINT << ourArguments.getProgramName() << " Copyright (C) 2003-2005 ART+COM";
 
         GTKApp myApp;
 
