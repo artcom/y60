@@ -284,23 +284,20 @@ appendStencil(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 createStencilImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
-        CTScan & myCTScan = myObj.getNative();
-
-        ensureParamCount(argc, 3);
+        ensureParamCount(argc, 4);
         dom::NodePtr myImagesNode;
         convertFrom(cx, argv[0], myImagesNode);
         int myWidth;
         convertFrom(cx, argv[1], myWidth);
         int myHeight;
         convertFrom(cx, argv[2], myHeight);
-        asl::Block myBlock(myWidth * myHeight, 255);
+        unsigned char myValue;
+        convertFrom(cx, argv[3], myValue);
+        asl::Block myBlock(myWidth * myHeight, myValue);
         dom::NodePtr myImage(new dom::Element("image"));
         myImagesNode->appendChild(myImage);
         myImage->getFacade<Image>()->set<ImageMipmapTag>(false);
         myImage->getFacade<Image>()->set(myWidth, myHeight, 1, y60::GRAY, myBlock);
-        //myImage->getFacade<Image>()->set(myWidth, myHeight, 1, y60::GRAY);
-        //AC_INFO << "Width: " << myImage->getFacade<Image>()->get<ImageWidthTag>() << ", Height: " << myImage->getFacade<Image>()->get<ImageHeightTag>();
         *rval = as_jsval(cx, myImage);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -347,8 +344,7 @@ JSCTScan::Functions() {
         {"create3DTexture",      create3DTexture,         2},
         {"computeHistogram",     computeHistogram,        1},
         {"getStencilRaster",     getStencilRaster,        1},
-        {"appendStencil",        appendStencil,           1},
-        {"createStencilImage",   createStencilImage,      3},
+        {"appendStencil",        appendStencil,           1},        
         {0}
     };
     return myFunctions;
@@ -358,7 +354,7 @@ JSFunctionSpec *
 JSCTScan::StaticFunctions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
-        // name                  native                   nargs
+        {"createStencilImage",   createStencilImage,      4},
         {0}
     };
     return myFunctions;
