@@ -905,7 +905,7 @@ protected:
     {
     }
     JSWrapper()
-        : _myNative(0)
+        : _myNative(0), _myOwner(0)
     {
     }
     virtual ~JSWrapper() {
