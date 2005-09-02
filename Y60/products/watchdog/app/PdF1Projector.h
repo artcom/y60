@@ -29,6 +29,7 @@ public:
 
     virtual void power(bool thePowerFlag);
     virtual void selectInput(VideoSource theSource);
+    virtual void shutter(bool theShutterFlag) {};
 
 private:
     bool checkHeader(const unsigned char* packet) const;

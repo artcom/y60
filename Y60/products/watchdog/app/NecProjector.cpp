@@ -28,15 +28,17 @@
 
 #define DB(x) x
 
-const char NEC_POWER_UP[]     = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 };
-const char NEC_POWER_DOWN[]   = { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 };
-const char NEC_INPUT_SELECT[] = { 0x02, 0x03, 0x00, 0x00, 0x02, 0x01 };
-const char NEC_INPUT_RGB_1[]  = { 0x01, 0x09 };
-const char NEC_INPUT_RGB_2[]  = { 0x02, 0x0A };
-const char NEC_INPUT_VIDEO[]  = { 0x06, 0x0E };
-const char NEC_INPUT_SVIDEO[] = { 0x0B, 0x13 };
-const char NEC_INPUT_DVI[]    = { 0x1A, 0x22 };
-const char NEC_INPUT_VIEWER[] = { 0x1F, 0x27 };
+const char NEC_POWER_UP[]      = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 };
+const char NEC_POWER_DOWN[]    = { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 };
+const char NEC_INPUT_SELECT[]  = { 0x02, 0x03, 0x00, 0x00, 0x02, 0x01 };
+const char NEC_INPUT_RGB_1[]   = { 0x01, 0x09 };
+const char NEC_INPUT_RGB_2[]   = { 0x02, 0x0A };
+const char NEC_INPUT_VIDEO[]   = { 0x06, 0x0E };
+const char NEC_INPUT_SVIDEO[]  = { 0x0B, 0x13 };
+const char NEC_INPUT_DVI[]     = { 0x1A, 0x22 };
+const char NEC_INPUT_VIEWER[]  = { 0x1F, 0x27 };
+const char NEC_SHUTTER_OPEN[]  = { 0x02, 0x11, 0x00, 0x00, 0x00, 0x13 };
+const char NEC_SHUTTER_CLOSE[] = { 0x02, 0x10, 0x00, 0x00, 0x00, 0x12 };
 
 using namespace std;
 
@@ -80,7 +82,7 @@ NecProjector::selectInput(VideoSource theVideoSource) {
     if (!myDevice)
         return;
 
-    myDevice->write(NEC_INPUT_SELECT, 4);
+    myDevice->write(NEC_INPUT_SELECT, 6);
     switch (theVideoSource) {
     case RGB_1 :
         myDevice->write(NEC_INPUT_RGB_1, 2);
@@ -104,4 +106,18 @@ NecProjector::selectInput(VideoSource theVideoSource) {
         throw asl::Exception("Unknown projector input source.", PLUS_FILE_LINE);
     };
     DB(cout << "NecProjector::selectInput" << endl;)
+}
+
+
+void
+NecProjector::shutter(bool theShutterOpenFlag) {
+    asl::SerialDevice * myDevice = getDevice();
+    if (!myDevice)
+        return;
+
+    if (theShutterOpenFlag) {
+        myDevice->write(NEC_SHUTTER_OPEN, 6);
+    } else {
+        myDevice->write(NEC_SHUTTER_CLOSE, 6);
+    }
 }

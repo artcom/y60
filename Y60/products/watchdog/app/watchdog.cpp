@@ -261,6 +261,8 @@ WatchDog::init(dom::Document & theConfigDoc) {
 
             				if (myProjectorNode->getAttribute("input")) {
    								std::string myInput = myProjectorNode->getAttribute("input")->nodeValue();
+                                //FIXME: If one projector in the chain doesn't have an input specified,
+                                //       the vector is messed up
             					_myProjectorInput.push_back(myInput);
             				}
 

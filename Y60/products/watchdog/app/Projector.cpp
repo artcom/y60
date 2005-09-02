@@ -92,6 +92,13 @@ Projector::command(const std::string & theCommand)
     else if (theCommand == "projector_power_high") {
         lampPower(true);
     }
+    else if (theCommand.substr(0, 22) == "projector_input_select") {
+        int myIndex = theCommand.find("=", 0);
+        if (myIndex != std::string::npos) {
+            std::string mySource = theCommand.substr(myIndex+1);
+            selectInput(mySource);
+        }
+    }
     else {
         std::cerr << "Projector::command unknown '" << theCommand << "'" << std::endl;
         return false;

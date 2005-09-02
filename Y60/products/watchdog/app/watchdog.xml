@@ -4,23 +4,42 @@
           The only customizable strings for the <UdpControl> are the ones for <SystemHalt> and
           <RestartApplication>. The projector commands are handled internally by the Projector.cpp base class
           and are not customizable. The recognized commands are:
-          projector_on
-          projector_off
-          projector_shutter_open
-          projector_shutter_close
-          projector_power_low (lamp output)
-          projector_power_high
+
+                                            Panasonic     NEC
+          projector_on                          X          X
+          projector_off                         X          X
+          projector_shutter_open                X          X
+          projector_shutter_close               X          X
+          projector_power_low (lamp output)     X          O
+          projector_power_high                  X          O
+          projector_input_select=<input>        X          X
+
+          The UDP packets containing the commands can be send via cygwin as follows:
+            echo -n <command> | nc -w 1 -u <host> 2346
+          
           The commands are passed to all connected projectors and are observed by those projectors that
-          support the given command.
+          support the given command.          
+          
+          ProjectorControl:
+            <Projector type="nec(default)|(panasonic|pt-d5500)|pdf1" port="0" input="<input>">
+            
+          Inputs:
+            RGB_1
+            RGB_2
+            VIDEO
+            SVIDEO
+            DVI
+            VIEWER
+
           -->
     <UdpControl port="2346">
         <SystemHalt powerDownProjectors="true" command="halt"/>    
-        <SystemReboot powerDownProjectors="true" command="reboot"/>
+        <SystemReboot powerDownProjectors="false" command="reboot"/>
         <RestartApplication command="restart_app"/>
-		<ProjectorControl powerUpOnStartup="false">
-			<Projector type="panasonic" port="0">
+		<ProjectorControl powerUpOnStartup="true">
+			<Projector type="panasonic" port="0" input="RGB_1">
 				<FirstID>1</FirstID>
-				<NumProjectors>12</NumProjectors>
+				<NumProjectors>1</NumProjectors>
 			</Projector>
 		</ProjectorControl>
     </UdpControl>

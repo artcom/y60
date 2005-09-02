@@ -68,7 +68,7 @@ public:
     virtual void lampPower(bool thePowerHighFlag) {}
 
     /// Shutter mode.
-    virtual void shutter(bool theShutterOpenFlag) {}
+    virtual void shutter(bool theShutterOpenFlag) = 0;
 
     /// Handle command.
     void setCommandEnable(bool theEnableFlag) { _myCommandEnable = theEnableFlag; }
