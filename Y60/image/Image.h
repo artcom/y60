@@ -211,6 +211,8 @@ namespace y60 {
             ImageFilterParamsTag::TYPE   _myAppliedFilterParams;
             asl::Vector4f                _myAppliedColorScale;
             asl::Vector4f                _myAppliedColorBias;
+            std::string                  _myAppliedPixelFormat;
+            std::string                  _myAppliedInternalFormat;
 
         private:
             Image();

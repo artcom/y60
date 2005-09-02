@@ -81,6 +81,8 @@ namespace y60 {
             _myAppliedFilterParams = get<ImageFilterParamsTag>();
             _myAppliedColorBias    = get<ImageColorBiasTag>();
             _myAppliedColorScale   = get<ImageColorScaleTag>();
+            _myAppliedInternalFormat = get<ImageInternalFormatTag>();
+            _myAppliedPixelFormat  = get<ImagePixelFormatTag>();
         }
     }
 
@@ -200,6 +202,8 @@ namespace y60 {
         _myAppliedFilterParams = get<ImageFilterParamsTag>();
         _myAppliedColorBias    = get<ImageColorBiasTag>();
         _myAppliedColorScale   = get<ImageColorScaleTag>();
+        _myAppliedPixelFormat  = get<ImagePixelFormatTag>();
+        _myAppliedInternalFormat = get<ImageInternalFormatTag>();
 
         if (get<ImageSourceTag>() == "") {
             //throw ImageException(string("Image ") + get<NameTag>() + " has empty source attribute", PLUS_FILE_LINE);
@@ -288,7 +292,9 @@ namespace y60 {
                 _myAppliedFilter != get<ImageFilterTag>() ||
                 _myAppliedFilterParams != get<ImageFilterParamsTag>() ||
                 _myAppliedColorScale != get<ImageColorScaleTag>() ||
-                _myAppliedColorBias != get<ImageColorBiasTag>()
+                _myAppliedColorBias != get<ImageColorBiasTag>() ||
+                _myAppliedPixelFormat != get<ImagePixelFormatTag>() ||
+                _myAppliedInternalFormat != get<ImageInternalFormatTag>()
         );
     }
 
