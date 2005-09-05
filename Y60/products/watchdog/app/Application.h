@@ -29,6 +29,8 @@
 #include <windows.h>
 #endif
 
+#include <dom/Nodes.h>
+
 #include <vector>
 #include <string>
 
@@ -44,6 +46,13 @@ enum RestartMode {
     CHECKMEMORYTIME = 16,
     CHECKTIMEDMEMORYTHRESHOLD = 32
 };
+struct EnvironmentSetting {
+    EnvironmentSetting(std::string theVariable, std::string theValue) 
+        :  _myVariable(theVariable), _myValue(theValue) {}
+    std::string _myVariable;
+    std::string _myValue;
+};
+
 class Application {
     public:
         Application::Application(Logger & theLogger);
@@ -57,6 +66,7 @@ class Application {
 //        void restartPerUdp();
         void terminate(const std::string & theReason, bool theWMCloseAllowed);
         std::string runUntilNextCheck(int theWatchFrequency);
+        void setupEnvironment(const dom::NodePtr & theEnvironmentSettings);
 
     public:
         // TODO: Clean this mess up.
@@ -93,8 +103,11 @@ class Application {
         std::string         _myLastWeekday;
         bool                _myDayChanged;
         Logger &            _myLogger;
+
+        std::vector<EnvironmentSetting> _myEnvironmentVariables;
     private:
         void closeAllThreads();
+        void setEnvironmentVariables();
     
 };
 #endif // INCL_APPLICATION

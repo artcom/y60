@@ -106,6 +106,7 @@ WatchDog::watch() {
         if (_myEnableUDP) {
             cerr << "Watchdog - Starting udp halt listener thread" << endl;
             myUDPHaltListenerThread.fork();
+            asl::msleep(100);
         }
 
         if (_myStartDelay > 0) {
@@ -337,6 +338,9 @@ WatchDog::init(dom::Document & theConfigDoc) {
                 if (_myAppToWatch._myFileName.empty()){
                     cerr <<"### ERROR, no application binary to watch." << endl;
                     return false;
+                }
+                if (myApplicationNode->childNode("EnvironmentVariables")) {
+                    _myAppToWatch.setupEnvironment(myApplicationNode->childNode("EnvironmentVariables"));
                 }
                 if (myApplicationNode->childNode("Arguments")) {
                     const dom::NodePtr & myArguments = myApplicationNode->childNode("Arguments");

@@ -23,7 +23,6 @@
 
 #include <time.h>
 
-#include <dom/Nodes.h>
 #include <asl/MappedBlock.h>
 #include <asl/Exception.h>
 #include <asl/file_functions.h>
@@ -35,6 +34,7 @@
 #define DB(x) //x
 
 using namespace std;  // Manually included.
+using namespace dom;  // Manually included.
 
 const char * ourWeekdayMap[] = {
     "monday",
@@ -60,6 +60,37 @@ Application::Application(Logger & theLogger):
 Application::~Application() {
 }
 
+void 
+Application::setupEnvironment(const NodePtr & theEnvironmentSettings) {
+    for (int myEnvNr = 0; myEnvNr < theEnvironmentSettings->childNodesLength(); myEnvNr++) {
+        const dom::NodePtr & myEnvNode = theEnvironmentSettings->childNode(myEnvNr);
+        if (myEnvNode->nodeType() == dom::Node::ELEMENT_NODE) {
+            string myEnviromentVariable = myEnvNode->getAttributeString("name");
+            if (myEnviromentVariable != "" && myEnvNode->childNodesLength() == 0) {
+                string myEnvironmentValue = myEnvNode->firstChild()->nodeValue();
+                DB(cout <<"Environment variable : "<<myEnvNr << ": " << myEnviromentVariable 
+                        << " -> " << myEnvironmentValue << endl;)
+                _myEnvironmentVariables.push_back(EnvironmentSetting(myEnviromentVariable, myEnvironmentValue));
+            }
+        }
+    }
+
+}
+
+void 
+Application::setEnvironmentVariables() {
+    for (int myEnvIndex = 0 ; myEnvIndex != _myEnvironmentVariables.size(); myEnvIndex++) {
+        EnvironmentSetting & myEnvSetting = _myEnvironmentVariables[myEnvIndex];
+        string & myEnviromentVariable = _myEnvironmentVariables[myEnvIndex]._myVariable;
+        string & myEnvironmentValue = _myEnvironmentVariables[myEnvIndex]._myValue;
+        SetEnvironmentVariable(myEnviromentVariable.c_str(), myEnvironmentValue.c_str());
+        _myLogger.logToFile(string("Set environment variable: ") + myEnviromentVariable +
+                            "=" + myEnvironmentValue);
+        cerr << "Set environment variable: " << myEnviromentVariable <<
+                "=" << myEnvironmentValue << endl;
+
+    }
+}
 
 void
 Application::terminate(const std::string & theReason, bool theWMCloseAllowed){
@@ -119,6 +150,7 @@ Application::checkForRestart() {
 
 void
 Application::launch() {
+    setEnvironmentVariables();
     _myCommandLine = _myFileName + " " + _myArguments;
 
     STARTUPINFO StartupInfo = {
