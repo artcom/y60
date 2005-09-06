@@ -88,7 +88,7 @@ acMain(int argc, char **argv) {
             return 0;
         }
 
-        asl::StdOutputRedirector myRedirector(ourArguments);
+        asl::StdOutputRedirector::get().init(ourArguments);
 
         //AC_PRINT << ourArguments.getProgramName() << " Copyright (C) 2003-2005 ART+COM";
 

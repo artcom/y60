@@ -164,7 +164,7 @@ main(int argc, char **argv) {
             return 0;
         }
 
-        asl::StdOutputRedirector myRedirector(ourArguments);
+        asl::StdOutputRedirector::get().init(ourArguments);
 
         // look in AC_TEXTURE_DIR if set
         std::string myTextureDirs = asl::expandEnvironment("${AC_TEXTURE_DIR}");

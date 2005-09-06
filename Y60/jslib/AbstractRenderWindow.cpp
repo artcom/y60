@@ -37,6 +37,7 @@
 #include <asl/os_functions.h>
 #include <asl/PlugInManager.h>
 #include <asl/Ptr.h>
+#include <asl/StdOutputRedirector.h>
 #include <dom/Nodes.h>
 #include "GLContextRegistry.h"
 
@@ -278,6 +279,8 @@ namespace jslib {
         static double _myStartTime = asl::Time();
 
         MAKE_SCOPE_TIMER(onIdle);
+        asl::StdOutputRedirector::get().checkForFileWrapAround();
+        
         if (!_myPauseFlag) {
             if (_myFixedDeltaT == 0.0) {
                 _myElapsedTime = asl::Time() - _myStartTime - _myPauseTime;
