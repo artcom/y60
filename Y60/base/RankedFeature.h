@@ -58,8 +58,12 @@ namespace y60 {
 
     typedef std::vector<RankedFeature> VectorOfRankedFeature;
 
-    std::ostream & operator << (std::ostream & theStream, const RankedFeature & theRankedFeature);
-    std::istream & operator >> (std::istream & theStream, RankedFeature & theRankedFeature);
+}
+
+namespace asl {
+    
+    std::ostream & operator << (std::ostream & theStream, const y60::RankedFeature & theRankedFeature);
+    std::istream & operator >> (std::istream & theStream, y60::RankedFeature & theRankedFeature);
 }
 
 namespace dom {

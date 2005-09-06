@@ -39,8 +39,7 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
-#define DB(x)  // x
-#define DB2(x)  // x
+#define DB(x)  x
 
 namespace y60 {
 
@@ -127,7 +126,6 @@ namespace y60 {
 
             bool oneShaderCanHandleMaterial = false;
             bool myFeatureCanBedropped = false;
-            // TODO: for unknown reasons (probably namespace problems), the following line does not compile:
             DB(AC_DEBUG << "Class : " << myRequiredFeatureClass << " , requires: " << myRequiredFeature << endl);
             for (int j = 0; j < myRequiredFeature.size(); j++) {
                 const VectorOfString & myRequiredFeatureCombo = myRequiredFeature[j]._myFeature;
@@ -136,7 +134,6 @@ namespace y60 {
                     GLShaderPtr myGLShader = _myShaders[i];
 					GLShader::ShaderMatch myShaderMatchResult = myGLShader->matches(myRequiredFeatureClass, myRequiredFeatureCombo);
 					if (myShaderMatchResult != GLShader::NO_MATCH) {
-                        // TODO: for unknown reasons (probably namespace problems), the following line does not compile:
                         DB(AC_DEBUG << "Match: Shader '"<<myGLShader->getName()<<"' matches "<< myRequiredFeatureCombo << " in class '"<<myRequiredFeatureClass<<"'"<<endl);
                         myScoreBoard[i].featurehits++;
                         myScoreBoard[i].points += (myGLShader->getCosts()) == 0 ?
@@ -148,7 +145,6 @@ namespace y60 {
                         oneShaderCanHandleMaterial = true;
 
                     } else {
-                        // TODO: for unknown reasons (probably namespace problems), the following line does not compile:
                         DB(AC_DEBUG << "Shader '"<<myGLShader->getName()<<"' does not match "<< myRequiredFeatureCombo << " in class '"<<myRequiredFeatureClass<<"'"<<endl);
                         if ( myRequiredFeatureCombo.size() == 1 &&
                             myRequiredFeatureCombo[0] == FEATURE_DROPPED) {

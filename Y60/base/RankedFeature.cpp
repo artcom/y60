@@ -30,7 +30,9 @@
 #include <string>
 #include <vector>
 
-namespace y60 {
+using namespace y60;
+
+namespace asl {
 
     std::ostream &
     operator << (std::ostream & theStream, const RankedFeature & theRankedFeature) {
