@@ -219,12 +219,8 @@ void TestPump::testVolume() {
     myVolumeSampleSink->play();
     msleep(100);
     myVolumeSampleSink->setVolume(0.5);
-    // Setting volume doesn't take effect immediately
-    ENSURE(almostEqual(myVolumeSampleSink->getVolume(),1));
-    msleep(100);
     ENSURE(almostEqual(myVolumeSampleSink->getVolume(),0.5));
     myVolumeSampleSink->fadeToVolume(1, 0.2f);
-    ENSURE(almostEqual(myVolumeSampleSink->getVolume(),0.5));
     msleep(300);
     ENSURE(almostEqual(myVolumeSampleSink->getVolume(),1));
     myVolumeSampleSink->stop();

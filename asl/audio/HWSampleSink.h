@@ -99,15 +99,15 @@ class HWSampleSink: public AudioTimeSource
         // to process the buffers (volume, pan etc.) is changed.
         mutable asl::ThreadLock _myQueueLock;  
         std::list < AudioBufferPtr > _myBufferQueue;
-        unsigned       _myPosInInputBuffer;
+        unsigned _myPosInInputBuffer;
         AudioBufferPtr _myBackupBuffer; // Used when there is an underrun.
-        unsigned       _numUnderruns;
-        bool           _isUsingBackupBuffer;
+        unsigned _numUnderruns;
+        bool _isUsingBackupBuffer;
         
         std::string  _myName;
-        unsigned     _mySampleRate;
+        unsigned _mySampleRate;
         SampleFormat _mySampleFormat;
-        unsigned     _numChannels;
+        unsigned _numChannels;
 
         State _myState;
 
@@ -115,13 +115,13 @@ class HWSampleSink: public AudioTimeSource
         // pointer, so you can forget the object from the outside and it'll keep
         // playing until it's done and self-destruct afterwards.
         HWSampleSinkWeakPtr _mySelf;
-        HWSampleSinkPtr     _myLockedSelf;
+        HWSampleSinkPtr _myLockedSelf;
 
         Unsigned64 _myFrameCount;  // This allows for streams lasting about 13 million years 
                                    // if I didn't miscalculate :-).
         VolumeFaderPtr _myVolumeFader;
-        float          _myVolume;
-        bool           _myStopWhenEmpty;
+        float _myVolume;
+        bool _myStopWhenEmpty;
 };
 
 }

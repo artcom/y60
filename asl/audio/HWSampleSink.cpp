@@ -138,7 +138,12 @@ void HWSampleSink::setVolume(float theVolume) {
     ASSURE(theVolume <= 1.0);
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     _myVolume = theVolume;
-    _myVolumeFader->setVolume(theVolume);
+    if (_myState == STOPPED || _myState == PAUSED) {
+        // No fade, immediate volume change.
+        _myVolumeFader->setVolume(theVolume, 0);
+    } else {
+        _myVolumeFader->setVolume(theVolume);
+    }
 }
 
 void HWSampleSink::fadeToVolume(float theVolume, float theTime) {
@@ -147,12 +152,17 @@ void HWSampleSink::fadeToVolume(float theVolume, float theTime) {
     _myVolume = theVolume;
     _myVolumeFader->setVolume(theVolume, unsigned(theTime*getSampleRate()));
 }
+
 bool HWSampleSink::isPlaying() const {
     return getState() == RUNNING;
 }
 
 float HWSampleSink::getVolume() const {
-    return _myVolumeFader->getVolume();
+//    if (_myState == RUNNING) {
+//        return _myVolumeFader->getVolume();
+//    } else {
+        return _myVolume;
+//    }
 }
 
 AudioBufferPtr HWSampleSink::createBuffer(unsigned theNumFrames) {
