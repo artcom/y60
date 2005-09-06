@@ -437,10 +437,10 @@ class StressTest: public SoundTestBase {
             SoundPtr mySound = getMedia()->createSound
                 ("../../testfiles/stereotest441.wav", false,
                  "../../testfiles/stereotest441.wav "+asl::as_string(i));
-            mySound->setVolume(0.05f);
+            mySound->setVolume(0.02f);
             mySound->play();
             double r1 = rand()/double(RAND_MAX);
-            unsigned myTime = unsigned(50*r1);
+            unsigned myTime = unsigned(5*r1);
             msleep(myTime);
         }
         
@@ -528,7 +528,7 @@ class SoundTestSuite : public UnitTestSuite {
           
             addTest(new StressTest(5));
 
-//            addTest(new MemLeakStressTest(60*60));
+//            addTest(new MemLeakStressTest(60*60*24));
         }
 
     private:

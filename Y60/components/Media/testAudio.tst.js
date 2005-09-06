@@ -42,31 +42,17 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
 
         ENSURE("obj.myMedia.soundcount == 1");
         ENSURE("obj.mySound.time == 0");
-
-        print("### FIXME: Volume setting does not work!");
-/*        obj.mySound.volume = 1.0;
-        msleep(250);
+        obj.mySound.volume = 1.0;
+        msleep(2500);
         DPRINT("obj.mySound.volume");
         ENSURE("obj.mySound.volume == 1.0");        
-*/        
+        
         ENSURE("!obj.mySound.playing");        
         ENSURE("obj.mySound.src == '../../testfiles/aussentuer.mp3'");        
         ENSURE("obj.mySound.time == 0.0");
         ENSURE("obj.mySound.looping == false");
         ENSURE("obj.mySound.duration == 1.619499");
                 
-        print("### FIXME: Volume fading does not work!");
-/*        obj.mySound.fadeToVolume(0.5, 0.1);
-        msleep(250);
-        DPRINT("obj.mySound.volume");
-        ENSURE("obj.mySound.volume == 0.5");
-*/      
-        
-        print("### TODO: Change looping state.");
-/*        obj.mySound.looping = true;
-        ENSURE("obj.mySound.looping == true");
-*/
-        
         DTITLE("Playing sound...");
         obj.mySound.play();
         ENSURE("obj.mySound.playing");
@@ -82,7 +68,8 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.mySound.time > 0");
         DTITLE("Seek to second 1");
         obj.mySound.seek(1);
-        ENSURE("obj.mySound.time == 1");
+        ENSURE("Math.abs(obj.mySound.time - 1) < 0.1");
+        DPRINT("obj.mySound.time");
         DTITLE("Seek relative minus 0.5 seconds");
        
         print("### FIXME: Relative seeking does not work!");
@@ -90,22 +77,29 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         DPRINT("obj.mySound.time");
         ENSURE("obj.mySound.time == 0.5");
 */      
+        DTITLE("Volume fade...");
+        obj.mySound.fadeToVolume(0.5, 0.1);
+        msleep(250);
+        ENSURE("obj.mySound.volume == 0.5");
+        
         DTITLE("Stopping sound...");
         obj.mySound.stop();
         
         ENSURE("!obj.mySound.playing");
 
-        print("### FIXME: How do I ged rid of sounds ???");
-/*        delete obj.mySound;
+        delete obj.mySound;
         gc();
+        msleep(100);
         ENSURE("obj.myMedia.soundcount == 0");
 
         obj.mySound = obj.myMedia.createSound("../../testfiles/aussentuer.mp3");
+        obj.mySound.play();
         ENSURE("obj.myMedia.soundcount == 1");
         obj.myMedia.stopAll();
+        delete obj.mySound;
+        gc();
+        msleep(100);
         ENSURE("obj.myMedia.soundcount == 0");
-*/            
-        print("### FIXME: Strange error messages and warnings at the end!");
     }
 
     obj.run = function() {

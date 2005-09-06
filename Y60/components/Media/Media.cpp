@@ -32,8 +32,9 @@ Media::Media() {
 }
 
 Media::~Media() {
+    msleep(50);
     if (_mySounds.size() != 0) {
-        AC_WARNING << "Deleting Media, but " << _mySounds.size() << " sounds are still active.";
+        AC_DEBUG << "Deleting Media, but " << _mySounds.size() << " sounds are still active.";
         stopAll();
     }
     join();

@@ -209,7 +209,6 @@ void Sound::update(double theTimeSlice) {
                 AC_DEBUG << "Sound::update: DecodingComplete";
                 if (!_myIsLooping) {
                     _mySampleSink->stop(true);
-//                    _myLockedSelf = SoundPtr(0);
                 }
                 close();
             }
