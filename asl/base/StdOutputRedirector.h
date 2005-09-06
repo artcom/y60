@@ -17,20 +17,36 @@
 #include <fstream>
 #include <assert.h>
 
+#include <string>
+
+#include "Singleton.h"
+
 namespace asl {
     /*! \addtogroup aslbase */
     /* @{ */
 
     class Arguments;
-    class StdOutputRedirector {
+    class StdOutputRedirector : public Singleton<StdOutputRedirector> {
+        friend class SingletonManager;        
         public:
-            StdOutputRedirector(const Arguments & theArguments);
+            void init(const Arguments & theArguments);
             ~StdOutputRedirector();
+            void checkForFileWrapAround();
+        protected:
         private:
             StdOutputRedirector();
+            void redirect();
+            void removeoldArchives();
                         
             std::ofstream    _myOutputStreamOut;
             std::streambuf * _myOutFile;
+            long             _myMaximumFileSize;
+            std::string      _myOutputFilename;
+            std::string      _myOldArchiveFilename;
+            long long        _myStartTime;
+            bool             _myRemoveOldArchiveFlag; // always keep only one archive log and one current
+            bool             _myLogInOneFileFlag;     // create on file with multiple app starts
+            long long        _myFileSizeCheckFrequInSec;
     };    
     /* @} */
 }
