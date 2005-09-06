@@ -66,7 +66,7 @@ Application::setupEnvironment(const NodePtr & theEnvironmentSettings) {
         const dom::NodePtr & myEnvNode = theEnvironmentSettings->childNode(myEnvNr);
         if (myEnvNode->nodeType() == dom::Node::ELEMENT_NODE) {
             string myEnviromentVariable = myEnvNode->getAttributeString("name");
-            if (myEnviromentVariable != "" && myEnvNode->childNodesLength() == 0) {
+            if (myEnviromentVariable.size()>0 && myEnvNode->childNodesLength() == 1) {
                 string myEnvironmentValue = myEnvNode->firstChild()->nodeValue();
                 DB(cout <<"Environment variable : "<<myEnvNr << ": " << myEnviromentVariable 
                         << " -> " << myEnvironmentValue << endl;)
