@@ -44,7 +44,6 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.mySound.time == 0");
         obj.mySound.volume = 1.0;
         msleep(2500);
-        DPRINT("obj.mySound.volume");
         ENSURE("obj.mySound.volume == 1.0");        
         
         ENSURE("!obj.mySound.playing");        
@@ -69,14 +68,11 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         DTITLE("Seek to second 1");
         obj.mySound.seek(1);
         ENSURE("Math.abs(obj.mySound.time - 1) < 0.1");
-        DPRINT("obj.mySound.time");
+        
         DTITLE("Seek relative minus 0.5 seconds");
-       
-        print("### FIXME: Relative seeking does not work!");
-/*        obj.mySound.seekRelative(-0.5);
-        DPRINT("obj.mySound.time");
-        ENSURE("obj.mySound.time == 0.5");
-*/      
+        obj.mySound.seekRelative(-0.5);
+        ENSURE("Math.abs(obj.mySound.time - 0.5) < 0.1");
+      
         DTITLE("Volume fade...");
         obj.mySound.fadeToVolume(0.5, 0.1);
         msleep(250);

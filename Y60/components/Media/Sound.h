@@ -54,7 +54,7 @@ class Sound :
         virtual asl::Time getCurrentTime() const;
         virtual bool isLooping() const;
         virtual void seek (asl::Time thePosition);
-        virtual void seekRelative (asl::Time theAmount);
+        virtual void seekRelative (double theAmount);
         virtual asl::Time getBufferedTime() const;
         virtual bool canSeek() const;
         virtual bool isPlaying() const;

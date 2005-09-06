@@ -151,9 +151,14 @@ void Sound::seek (Time thePosition)
     }
 }
 
-void Sound::seekRelative (Time theAmount)
+void Sound::seekRelative (double theAmount)
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
+    double myDestPosition = double(_mySampleSink->getCurrentTime())+theAmount;
+    if (myDestPosition < 0.0) {
+        myDestPosition = 0;
+    }
+    seek (myDestPosition);
 }
 
 Time Sound::getBufferedTime () const
@@ -331,7 +336,13 @@ bool Sound::decode() {
                 myData += myLen;
                 myDataLen -= myLen;
             } else {
-                AC_WARNING << "Unable to avcodec_decode_audio";
+                if (myLen <= 0)  {
+                    AC_WARNING << "Unable to avcodec_decode_audio: myLen=" << myLen 
+                            << ", myBytesDecoded=" << myBytesDecoded;
+                } else {
+                    AC_DEBUG << "Unable to avcodec_decode_audio: myLen=" << myLen 
+                            << ", myBytesDecoded=" << myBytesDecoded;
+                }
                 break;
             }
         }
