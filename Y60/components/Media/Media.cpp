@@ -50,9 +50,20 @@ void Media::setAppConfig(unsigned mySampleRate, unsigned numOutputChannels,
     Pump::setAppConfig(mySampleRate, numOutputChannels, useDummy);
 }
 
+SoundPtr Media::createSound(const string & theURI) {
+    // Workaround function since the JS binding doesn't support default parameters.
+    return createSound(theURI, false, "");
+}
+
+SoundPtr Media::createSound(const string & theURI, bool theLoop) {
+    // Workaround function since the JS binding doesn't support default parameters.
+    return createSound(theURI, theLoop, "");
+}
+
 SoundPtr Media::createSound(const string & theURI, bool theLoop,
         const std::string & theName)
 {
+    // We need a factory function so we can set the Sound's mySelf pointer.
     AutoLocker<ThreadLock> myLocker(_myLock);
     string myName = theName;
     if (myName.empty()) {

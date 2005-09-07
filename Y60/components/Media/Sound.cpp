@@ -21,27 +21,25 @@ namespace y60 {
 Sound::Sound (string myURI, HWSampleSinkPtr mySampleSink, bool theLoop)
     : _myURI (myURI),
       _mySampleSink(mySampleSink),
-      _mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
-      _myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
-      _myFormatContext(0),
-      _myStreamIndex(-1),
       _myDecodingComplete(false),
       _myIsLooping(theLoop),
       _myTargetBufferedTime(1.0),
       _myMaxUpdateTime(0.2),
-      _myResampleContext(0)
+      _myDecoder(0)
 {
+    
     AC_DEBUG << "Sound::Sound";
     _myLockedSelf = SoundPtr(0);
-    open();
 }
 
+/*
 Sound::Sound (const string & myURI, Ptr < ReadableStream > myStream,
         HWSampleSinkPtr mySampleSink, bool theLoop)
 {
     AC_DEBUG << "Sound::Sound (" << _myURI << ")";
     _myLockedSelf = SoundPtr(0);
 }
+*/
 
 Sound::~Sound()
 {
@@ -53,6 +51,7 @@ Sound::~Sound()
 void Sound::setSelf(const SoundPtr& mySelf)
 {
     _mySelf = mySelf;
+    open();
     _myLockedSelf = SoundPtr(0);
 }
 
@@ -110,11 +109,7 @@ std::string Sound::getName() const {
 
 Time Sound::getDuration() const {
     AutoLocker<ThreadLock> myLocker(_myLock);
-    if (_myFormatContext) {
-        return (_myFormatContext->streams[_myStreamIndex]->duration/double(AV_TIME_BASE));
-    } else {
-        return 0;
-    }
+    return _myDecoder->getDuration();
 }
 
 Time Sound::getCurrentTime() const {
@@ -133,16 +128,8 @@ void Sound::seek (Time thePosition)
     if (!isOpen()) {
         open();
     }
-#if (LIBAVCODEC_BUILD < 4738)
-    int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE));
-#else
-    int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE), 
-            AVSEEK_FLAG_BACKWARD);
-#endif
-    if (ret < 0) {
-        AC_WARNING << "Unable to seek to timestamp=" << thePosition;
-        return;
-    }
+    _myDecoder->seek(thePosition);
+    
     _mySampleSink->setCurrentTime(thePosition);
     _myLockedSelf = _mySelf.lock();
     if (myIsPlaying) {
@@ -167,7 +154,7 @@ Time Sound::getBufferedTime () const
 }
 
 bool Sound::canSeek() const {
-    return false;
+    return _myDecoder->canSeek();
 }
 
 bool Sound::isPlaying() const {
@@ -207,7 +194,7 @@ void Sound::update(double theTimeSlice) {
         bool myEOF = false;
         if (isOpen()) {
             while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
-                myEOF = decode();
+                myEOF = _myDecoder->decode();
             }
             if (myEOF) {
                 _myDecodingComplete = true;
@@ -220,142 +207,31 @@ void Sound::update(double theTimeSlice) {
         }
     }
 }
+AudioBufferPtr Sound::createBuffer(unsigned theNumFrames) {
+    return _mySampleSink->createBuffer(theNumFrames);
+}
+
+void Sound::queueSamples(AudioBufferPtr& theBuffer) {
+    _mySampleSink->queueSamples(theBuffer);
+    if (_myIsLooping) {
+        _myBufferCache.push_back(theBuffer);
+    }
+}
 
 void Sound::open() {
     AC_DEBUG << "Sound::open (" << _myURI << ")" << _myURI;
-
-    // register all formats and codecs
-    static bool avRegistered = false;
-    if (!avRegistered) {
-        AC_DEBUG << "Sound::open: " << LIBAVCODEC_IDENT << endl;
-        //av_log_set_level(AV_LOG_ERROR);
-        av_register_all();
-        avRegistered = true;
-    }
-
-    int err;
-    if ((err = av_open_input_file(&_myFormatContext, _myURI.c_str(), 0, 0, 0)) < 0) {
-        throw SoundException(std::string("Unable to open input file, err=") + 
-                asl::as_string(err) + ": " + _myURI, PLUS_FILE_LINE);
-    }
-    if ((err = av_find_stream_info(_myFormatContext)) < 0) {
-        throw SoundException(std::string("Unable to find stream info, err=") + 
-                asl::as_string(err) + ": " + _myURI, PLUS_FILE_LINE);
-    }
-    // find first audio stream
-    _myStreamIndex = -1;
-    for (unsigned int i = 0; i < _myFormatContext->nb_streams; ++i) {
-        if (_myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO) {
-            _myStreamIndex = i;
-            break;
-        }
-    }
-    if (_myStreamIndex < 0) {
-        throw SoundException(std::string("No audio stream found: ") + _myURI, 
-                PLUS_FILE_LINE);
-    }
-
-    // open codec
-    AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
-    AVCodec * myCodec = avcodec_find_decoder(myCodecContext->codec_id);
-    if (!myCodec) {
-        throw SoundException(std::string("Unable to find decoder: ") + _myURI, PLUS_FILE_LINE);
-    }
-    if (avcodec_open(myCodecContext, myCodec) < 0 ) {
-        throw SoundException(std::string("Unable to open codec: ") + _myURI, PLUS_FILE_LINE);
-    }
-
-    _mySampleRate = myCodecContext->sample_rate;
-    _myNumChannels = myCodecContext->channels;
-    AC_INFO << "Number of channels: " << _myNumChannels << endl;
-    AC_INFO << "Sample rate: " << _mySampleRate << endl;
-
-    if (_mySampleRate != Pump::get().getNativeSampleRate()) {
-        _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,    
-                Pump::get().getNativeSampleRate(), _mySampleRate);
-    }
+    _myDecoder = new FFMpegDecoder(_myURI, _mySelf.lock());
 }
 
 void Sound::close() {
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_DEBUG << "Sound::close() (" << _myURI << ")";
-
-    if (_myFormatContext) {
-        if (_myResampleContext) {
-            audio_resample_close(_myResampleContext);
-            _myResampleContext = 0;
-        }
-        AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
-        if (myCodecContext) {
-            avcodec_close(myCodecContext);
-        }
-        av_close_input_file(_myFormatContext);
-        _myFormatContext = 0;
-        _myStreamIndex = -1;
-    }
+    delete _myDecoder;
+    _myDecoder = 0;
 }
 
 bool Sound::isOpen() const {
-    return (_myFormatContext != 0);
-}
-
-bool Sound::decode() {
-    ASSURE(_myFormatContext);
-    AVPacket myPacket;
-
-    AVCodecContext * myCodec = &(_myFormatContext->streams[_myStreamIndex]->codec);
-    
-    int err = av_read_frame(_myFormatContext, &myPacket);
-    if (err < 0) {
-        return true;
-    }
-    if (myPacket.stream_index == _myStreamIndex) {
-        int myBytesDecoded = 0; // decompressed data in BYTES
-        unsigned char* myData = myPacket.data;
-        int myDataLen = myPacket.size;
-        int myLen = 0;
-        while (myDataLen > 0) {
-            myLen = avcodec_decode_audio(myCodec, (int16_t*)_mySamples.begin(), 
-                    &myBytesDecoded, myData, myDataLen);
-            if (myLen > 0 && myBytesDecoded > 0) {
-                int numSamples = myBytesDecoded/(getBytesPerSample(SF_S16)*_myNumChannels);
-                AC_TRACE << "Sound::decode(): Samples per buffer= " << numSamples;
-                AudioBufferPtr myBuffer;
-                if (_myResampleContext) {
-                    numSamples = audio_resample(_myResampleContext, 
-                            (int16_t*)(_myResampledSamples.begin()),
-                            (int16_t*)(_mySamples.begin()), 
-                            numSamples);
-                    myBuffer = _mySampleSink->createBuffer(numSamples);
-                    myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
-                } else {
-                    myBuffer = _mySampleSink->createBuffer(numSamples);
-                    myBuffer->convert(_mySamples.begin(), SF_S16, _myNumChannels);
-                }
-                queueSamples(myBuffer);
-                myData += myLen;
-                myDataLen -= myLen;
-            } else {
-                if (myLen <= 0)  {
-                    AC_WARNING << "Unable to avcodec_decode_audio: myLen=" << myLen 
-                            << ", myBytesDecoded=" << myBytesDecoded;
-                } else {
-                    AC_DEBUG << "Unable to avcodec_decode_audio: myLen=" << myLen 
-                            << ", myBytesDecoded=" << myBytesDecoded;
-                }
-                break;
-            }
-        }
-    }
-    av_free_packet(&myPacket);
-    return false;
-}
-
-void Sound::queueSamples(AudioBufferPtr theBuffer) {
-    _mySampleSink->queueSamples(theBuffer);
-    if (_myIsLooping) {
-        _myBufferCache.push_back(theBuffer);
-    }
+    return (_myDecoder);
 }
 
 }

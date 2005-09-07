@@ -106,7 +106,7 @@ class TestBroken : public SoundTestBase {
                 while(mySound->isPlaying()) {
                     msleep(100);
                 }
-            } catch (SoundException&) {
+            } catch (DecoderException&) {
                 myException = true;
             }
             ENSURE(myException);
@@ -184,6 +184,8 @@ class TestStop: public SoundTestBase {
         void run() {
             runLoop(false);
             runLoop(true);
+            msleep(100);
+            ENSURE(getMedia()->getNumSounds() == 0);
         }
         
     private:
@@ -440,7 +442,7 @@ class StressTest: public SoundTestBase {
             mySound->setVolume(0.02f);
             mySound->play();
             double r1 = rand()/double(RAND_MAX);
-            unsigned myTime = unsigned(5*r1);
+            unsigned myTime = unsigned(3*r1);
             msleep(myTime);
         }
         
@@ -513,7 +515,7 @@ class SoundTestSuite : public UnitTestSuite {
             myMedia->setSysConfig(0.02, "");
 #endif
             myMedia->setAppConfig(44100, 2, _myUseDummyPump);
-
+            
             addTest(new TestPlay());
             addTest(new TestBroken());
             addTest(new TestFireAndForget());
