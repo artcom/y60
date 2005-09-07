@@ -13,6 +13,7 @@
 #ifndef INCL_HWSAMPLESINK
 #define INCL_HWSAMPLESINK
 
+#include "ISampleSink.h"
 #include "SampleFormat.h"
 #include "AudioBufferBase.h"
 #include "VolumeFader.h"
@@ -37,7 +38,7 @@ class HWSampleSink;
 typedef Ptr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkPtr;
 typedef WeakPtr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkWeakPtr;
     
-class HWSampleSink: public AudioTimeSource
+class HWSampleSink: public AudioTimeSource, public ISampleSink
 {
     public:
         enum State {STOPPED,            // No sound is playing.
