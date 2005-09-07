@@ -168,17 +168,17 @@ public:
             Ptr<int, ThreadingModel> mySmartPtr = Ptr<int, ThreadingModel>( new int(23));
             WeakPtr<int, ThreadingModel> myWeakPtr(mySmartPtr);
             ENSURE(myWeakPtr);
-            ENSURE( myWeakPtr.getWeakCount() == 1);
+            ENSURE( myWeakPtr.getWeakCount() == 2);
             ENSURE( myWeakPtr.lock());
             // test second weak pointer 
             WeakPtr<int, ThreadingModel> myOtherWeakPtr(mySmartPtr);
             ENSURE( myOtherWeakPtr );
-            ENSURE( myOtherWeakPtr.getWeakCount() == 2);
+            ENSURE( myOtherWeakPtr.getWeakCount() == 3);
             ENSURE( myOtherWeakPtr.lock());
             // test copy constructor 
             WeakPtr<int, ThreadingModel> myCopyWeakPtr(myWeakPtr);
             ENSURE( myCopyWeakPtr );
-            ENSURE( myCopyWeakPtr.getWeakCount() == 3);
+            ENSURE( myCopyWeakPtr.getWeakCount() == 4);
             ENSURE( myCopyWeakPtr.lock());
 
             WeakPtr<int, ThreadingModel> myAssignedPtr;
@@ -186,7 +186,7 @@ public:
             ENSURE( ! myAssignedPtr.lock() );
             myAssignedPtr = myWeakPtr;
             ENSURE( myAssignedPtr );
-            ENSURE( myCopyWeakPtr.getWeakCount() == 4);
+            ENSURE( myCopyWeakPtr.getWeakCount() == 5);
             ENSURE( myAssignedPtr.lock() );
 
             // test locking
@@ -234,12 +234,12 @@ public:
             Ptr<int, ThreadingModel> mySmartPtr2 = Ptr<int, ThreadingModel>( new int(23));
             WeakPtr<int, ThreadingModel> myWeakPtr(mySmartPtr);
             ENSURE(myWeakPtr);
-            ENSURE( myWeakPtr.getWeakCount() == 1);
+            ENSURE( myWeakPtr.getWeakCount() == 2);
             ENSURE( myWeakPtr.lock());
 
             WeakPtr<int, ThreadingModel> myWeakPtr2(mySmartPtr2);
             ENSURE(myWeakPtr2);
-            ENSURE(myWeakPtr2.getWeakCount() == 1);
+            ENSURE(myWeakPtr2.getWeakCount() == 2);
             ENSURE(myWeakPtr2.lock());
 
             ENSURE( mySmartPtr != mySmartPtr2);

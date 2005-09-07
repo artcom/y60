@@ -51,7 +51,7 @@ namespace asl {
 
     template <class ThreadingModel>
     struct ReferenceCounter {
-        ReferenceCounter(long theSmartCount = 1, long theWeakCount = 0) :
+        ReferenceCounter(long theSmartCount = 1, long theWeakCount = 1) :
             smartCount(theSmartCount),
             weakCount(theWeakCount)
         {}
@@ -66,7 +66,7 @@ namespace asl {
 
         inline void init() {
             smartCount.set(1);
-            weakCount.set(0);
+            weakCount.set(1);
         }
 
         //  ReferenceCounter<ThreadingModel> * next;
@@ -240,7 +240,7 @@ namespace asl {
                 }
             }
             inline static void free(ReferenceCounter<ThreadingModel> * anOldPtr) {
-            	int myIndex = _theIndex_.post_increment()&MASK;
+                int myIndex = _theIndex_.post_increment()&MASK;
                 anOldPtr->setNextPtr(_theFreeListHead_[myIndex]);
                 _theFreeListHead_[myIndex] = anOldPtr;
             }
@@ -372,7 +372,7 @@ namespace asl {
     class PtrAllocator<MultiProcessor> : public PtrHeapAllocator<MultiProcessor> {};
     
 
-   template <class T,
+    template <class T,
               class ThreadingModel=MultiProcessor,
               class Allocator=PtrAllocator<ThreadingModel> >
     class WeakPtr;
@@ -393,6 +393,7 @@ namespace asl {
                         _myRefCountPtr = reinterpret_cast<asl::ReferenceCounter<ThreadingModel>*>(Allocator::allocate());
                     }
                 }
+
                 explicit Ptr(C * nativePtr, ReferenceCounter<ThreadingModel> * refCountPtr)
                     : _myNativePtr(nativePtr), _myRefCountPtr(refCountPtr)
                 {
@@ -402,51 +403,44 @@ namespace asl {
                         _myRefCountPtr = 0;
                     }
                 }
+                
                 template <class D>
                 Ptr(const Ptr<D,ThreadingModel,Allocator> & otherType)
-#ifdef _SETTING_AUTO_DYNAMIC_CAST_PTR_
-                        : _myNativePtr(dynamic_cast<C *>(otherType.getNativePtr())),
-#else
-                        : _myNativePtr(otherType.getNativePtr()),
-#endif
-                         _myRefCountPtr(0)
-                    {
-
-                        if (_myNativePtr) {
-                            _myRefCountPtr = otherType.getRefCountPtr();
-                            reference();
-                        }
+                    : _myNativePtr(otherType.getNativePtr()),
+                      _myRefCountPtr(0)
+                {
+                    if (_myNativePtr) {
+                        _myRefCountPtr = otherType.getRefCountPtr();
+                        reference();
                     }
+                }
 
-                    Ptr(const Ptr & otherPtr)
+                Ptr(const Ptr & otherPtr)
                     : _myNativePtr(otherPtr._myNativePtr),
-                     _myRefCountPtr(otherPtr._myRefCountPtr)
+                      _myRefCountPtr(otherPtr._myRefCountPtr)
                 {
                     reference();
                 }
 
                 template<class D>
-                    const Ptr<C,ThreadingModel,Allocator> & operator=(const Ptr<D,ThreadingModel,Allocator> & otherType) {
-                        if (static_cast<const void *>(&otherType) != static_cast<const void*>(this)) {
-                            unreference();
-#ifdef _SETTING_AUTO_DYNAMIC_CAST_PTR_
-                            _myNativePtr = dynamic_cast<C *>(otherType.getNativePtr());
-#else
-                            _myNativePtr = otherType.getNativePtr();
-#endif
-                            if (_myNativePtr) {
-                                _myRefCountPtr = otherType.getRefCountPtr();
-                                if (!reference()) {
-                                    _myNativePtr = 0;
-                                    _myRefCountPtr = 0;
-                                }
-                            } else {
+                const Ptr<C,ThreadingModel,Allocator> & operator=(const Ptr<D,ThreadingModel,Allocator> & otherType) {
+                    if (static_cast<const void *>(&otherType) != static_cast<const void*>(this)) {
+                        unreference();
+                        _myNativePtr = otherType.getNativePtr();
+                        if (_myNativePtr) {
+                            _myRefCountPtr = otherType.getRefCountPtr();
+                            if (!reference()) {
+                                _myNativePtr = 0;
                                 _myRefCountPtr = 0;
                             }
+                        } else {
+                            _myRefCountPtr = 0;
                         }
-                        return *this;
                     }
-                    inline const Ptr& operator=(const Ptr & otherPtr) {
+                    return *this;
+                }
+                
+                inline const Ptr& operator=(const Ptr & otherPtr) {
                     if (&otherPtr != this) {
                         unreference();
                         _myNativePtr = otherPtr._myNativePtr;
@@ -509,7 +503,7 @@ namespace asl {
                 C *    _myNativePtr;
                 ReferenceCounter<ThreadingModel> * _myRefCountPtr;
 
-				inline bool reference() {
+                inline bool reference() {
                     DBP2(std::cerr<<"Ptr::reference _myRefCountPtr = "<<_myRefCountPtr<<std::endl);
                     if (_myNativePtr) {
                         if (!_myRefCountPtr || _myRefCountPtr->smartCount == 0) {
@@ -530,7 +524,7 @@ namespace asl {
                         DBP2(std::cerr<<"Ptr::unreference weakCount = "<<_myRefCountPtr->weakCount<<std::endl);
                         DBP2(std::cerr<<"Ptr::unreference smartCount = "<<_myRefCountPtr->smartCount<<std::endl);
                         if (_myRefCountPtr->smartCount.decrement_and_test()) {
-                            if (_myRefCountPtr->weakCount == 0) {
+                            if (_myRefCountPtr->weakCount.decrement_and_test()) {
                                 DBP2(std::cerr<<"Ptr: calling free _myRefCountPtr"<<std::endl);
                                 // play nice & thread-safe in case another thread will call
                                 // reference() while we are unreference
@@ -669,8 +663,8 @@ namespace asl {
                 if (_myNativePtr) {
                     DBP2(std::cerr<<"WeakPtr::unreference weakCount = "<<_myRefCountPtr->weakCount<<std::endl);
                     DBP2(std::cerr<<"WeakPtr::unreference smartCount = "<<_myRefCountPtr->smartCount<<std::endl);
-                    if (_myRefCountPtr->weakCount.decrement_and_test() &&
-                        _myRefCountPtr->smartCount == 0) {
+                    if (_myRefCountPtr->weakCount.decrement_and_test())
+                    {
                         DBP2(std::cerr<<"Ptr: WeakPtr calling free on _myRefCountPtr"<<std::endl);
                         Allocator::free(_myRefCountPtr);
                     }
