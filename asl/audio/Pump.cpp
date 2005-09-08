@@ -9,8 +9,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //
 //=============================================================================
-
-#define ASSURE_POLICY AssurePolicy::Abort
+  
+//#define ASSURE_POLICY AssurePolicy::Abort
 #include "Pump.h"
 #include "DummyPump.h"
 #include "AudioException.h"
