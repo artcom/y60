@@ -12,6 +12,7 @@
 #define _ac_y60_Media_h_
 
 #include "Sound.h"
+#include "IAudioDecoderFactory.h"
 
 #include <asl/PlugInBase.h>
 #include <asl/Stream.h>
@@ -33,6 +34,7 @@ namespace y60 {
         virtual void setSysConfig(const asl::Time& myLatency, const std::string& myDeviceName = "");
         virtual void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels = 2, 
                 bool useDummy = false);
+        void registerDecoderFactory(AudioDecoderFactoryPtr theFactory);
 
         virtual SoundPtr createSound(const std::string & theURI);
         virtual SoundPtr createSound(const std::string & theURI, bool theLoop);
@@ -51,9 +53,12 @@ namespace y60 {
         
     private:
         void run();
+        IAudioDecoder * createDecoder(const std::string & theURI);
         
         asl::ThreadLock _myLock;
         std::vector < SoundWeakPtr > _mySounds;
+
+        std::vector < AudioDecoderFactoryPtr > _myDecoderFactories;
     };
 
     typedef asl::Ptr<Media> MediaPtr;

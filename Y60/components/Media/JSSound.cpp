@@ -184,8 +184,9 @@ namespace jslib {
                 // Construct empty Sound that will be filled by copy Construct()
                 myNewNative = OWNERPTR(0);
             } else {
-                HWSampleSinkPtr mySampleSink = Pump::get().createSampleSink(myURI); 
-                myNewNative = OWNERPTR(new y60::Sound(myURI, mySampleSink, myLoopFlag));
+//                HWSampleSinkPtr mySampleSink = Pump::get().createSampleSink(myURI);
+                cerr << "Huh?" << endl;
+                myNewNative = OWNERPTR(new y60::Sound(myURI, 0, myLoopFlag));
                 myNewNative->setSelf(myNewNative);
             }
 

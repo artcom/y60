@@ -12,6 +12,7 @@
 #define _FFMpegDecoder_H_
 
 #include "IAudioDecoder.h"
+#include "Media.h"
 
 #include <asl/ISampleSink.h>
 #include <asl/Block.h>
@@ -23,11 +24,11 @@ namespace y60 {
 class FFMpegDecoder: public IAudioDecoder
 {
     public:
-        FFMpegDecoder (std::string myURI, asl::ISampleSinkPtr mySampleSink);
+        FFMpegDecoder (std::string myURI);
 //        FFMpegDecoder (asl::Ptr < asl::ReadableStream > myStream, asl::HWSampleSinkPtr mySink);
         virtual ~FFMpegDecoder();
 
-        virtual bool decode();
+        virtual bool decode(asl::ISampleSink* mySampleSink);
         virtual unsigned getSampleRate();
         virtual unsigned getNumChannels();
         virtual void seek (asl::Time thePosition);
@@ -40,7 +41,6 @@ class FFMpegDecoder: public IAudioDecoder
         void close();
 
         std::string _myURI;
-        asl::ISampleSinkPtr _mySampleSink;
         AVFormatContext * _myFormatContext;
 
         int _myStreamIndex;
@@ -49,6 +49,13 @@ class FFMpegDecoder: public IAudioDecoder
         unsigned _mySampleRate;
         unsigned _myNumChannels;
         ReSampleContext * _myResampleContext;
+};
+
+class FFMpegDecoderFactory: public IAudioDecoderFactory
+{
+    public:
+        FFMpegDecoderFactory();
+        virtual IAudioDecoder* tryCreateDecoder(std::string myURI);
 };
 
 } // namespace

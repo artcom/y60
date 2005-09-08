@@ -18,9 +18,8 @@ using namespace asl;
 
 namespace y60 {
 
-FFMpegDecoder::FFMpegDecoder (string myURI, ISampleSinkPtr mySampleSink)
+FFMpegDecoder::FFMpegDecoder (string myURI)
     : _myURI (myURI),
-      _mySampleSink(mySampleSink),
       _mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
       _myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
       _myFormatContext(0),
@@ -69,7 +68,7 @@ bool FFMpegDecoder::canSeek() const {
 
 void FFMpegDecoder::open() {
     AC_DEBUG << "FFMpegDecoder::open (" << _myURI << ")" << _myURI;
-
+    
     // register all formats and codecs
     static bool avRegistered = false;
     if (!avRegistered) {
@@ -78,47 +77,52 @@ void FFMpegDecoder::open() {
         av_register_all();
         avRegistered = true;
     }
-
-    int err;
-    if ((err = av_open_input_file(&_myFormatContext, _myURI.c_str(), 0, 0, 0)) < 0) {
-        throw DecoderException(std::string("Unable to open input file, err=") + 
-                asl::as_string(err) + ": " + _myURI, PLUS_FILE_LINE);
-    }
-    if ((err = av_find_stream_info(_myFormatContext)) < 0) {
-        throw DecoderException(std::string("Unable to find stream info, err=") + 
-                asl::as_string(err) + ": " + _myURI, PLUS_FILE_LINE);
-    }
-    // find first audio stream
-    _myStreamIndex = -1;
-    for (unsigned int i = 0; i < _myFormatContext->nb_streams; ++i) {
-        if (_myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO) {
-            _myStreamIndex = i;
-            break;
+    
+    try {
+        int err;
+        if ((err = av_open_input_file(&_myFormatContext, _myURI.c_str(), 0, 0, 0)) < 0) {
+            throw FileNotFoundException(std::string("Unable to open input file, err=") + 
+                    asl::as_string(err) + ": " + _myURI, PLUS_FILE_LINE);
         }
-    }
-    if (_myStreamIndex < 0) {
-        throw DecoderException(std::string("No audio stream found: ") + _myURI, 
-                PLUS_FILE_LINE);
-    }
+        if ((err = av_find_stream_info(_myFormatContext)) < 0) {
+            throw DecoderException(std::string("Unable to find stream info, err=") + 
+                    asl::as_string(err) + ": " + _myURI, PLUS_FILE_LINE);
+        }
+        // find first audio stream
+        _myStreamIndex = -1;
+        for (unsigned int i = 0; i < _myFormatContext->nb_streams; ++i) {
+            if (_myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO) {
+                _myStreamIndex = i;
+                break;
+            }
+        }
+        if (_myStreamIndex < 0) {
+            throw DecoderException(std::string("No audio stream found: ") + _myURI, 
+                    PLUS_FILE_LINE);
+        }
 
-    // open codec
-    AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
-    AVCodec * myCodec = avcodec_find_decoder(myCodecContext->codec_id);
-    if (!myCodec) {
-        throw DecoderException(std::string("Unable to find decoder: ") + _myURI, PLUS_FILE_LINE);
-    }
-    if (avcodec_open(myCodecContext, myCodec) < 0 ) {
-        throw DecoderException(std::string("Unable to open codec: ") + _myURI, PLUS_FILE_LINE);
-    }
+        // open codec
+        AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
+        AVCodec * myCodec = avcodec_find_decoder(myCodecContext->codec_id);
+        if (!myCodec) {
+            throw DecoderException(std::string("Unable to find decoder: ") + _myURI, PLUS_FILE_LINE);
+        }
+        if (avcodec_open(myCodecContext, myCodec) < 0 ) {
+            throw DecoderException(std::string("Unable to open codec: ") + _myURI, PLUS_FILE_LINE);
+        }
 
-    _mySampleRate = myCodecContext->sample_rate;
-    _myNumChannels = myCodecContext->channels;
-    AC_INFO << "Number of channels: " << _myNumChannels << endl;
-    AC_INFO << "Sample rate: " << _mySampleRate << endl;
+        _mySampleRate = myCodecContext->sample_rate;
+        _myNumChannels = myCodecContext->channels;
+        AC_INFO << "Number of channels: " << _myNumChannels << endl;
+        AC_INFO << "Sample rate: " << _mySampleRate << endl;
 
-    if (_mySampleRate != Pump::get().getNativeSampleRate()) {
-        _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,    
-                Pump::get().getNativeSampleRate(), _mySampleRate);
+        if (_mySampleRate != Pump::get().getNativeSampleRate()) {
+            _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,    
+                    Pump::get().getNativeSampleRate(), _mySampleRate);
+        }
+    } catch (const DecoderException &) {
+        close();
+        throw;
     }
 }
 
@@ -140,7 +144,7 @@ void FFMpegDecoder::close() {
     }
 }
 
-bool FFMpegDecoder::decode() {
+bool FFMpegDecoder::decode(asl::ISampleSink* mySampleSink) {
     ASSURE(_myFormatContext);
     AVPacket myPacket;
 
@@ -167,13 +171,13 @@ bool FFMpegDecoder::decode() {
                             (int16_t*)(_myResampledSamples.begin()),
                             (int16_t*)(_mySamples.begin()), 
                             numFrames);
-                    myBuffer = _mySampleSink->createBuffer(numFrames);
+                    myBuffer = mySampleSink->createBuffer(numFrames);
                     myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
                 } else {
-                    myBuffer = _mySampleSink->createBuffer(numFrames);
+                    myBuffer = mySampleSink->createBuffer(numFrames);
                     myBuffer->convert(_mySamples.begin(), SF_S16, _myNumChannels);
                 }
-                _mySampleSink->queueSamples(myBuffer);
+                mySampleSink->queueSamples(myBuffer);
                 myData += myLen;
                 myDataLen -= myLen;
             } else {
@@ -198,6 +202,14 @@ unsigned FFMpegDecoder::getSampleRate() {
 
 unsigned FFMpegDecoder::getNumChannels() {
     return _myNumChannels;
+}
+
+FFMpegDecoderFactory::FFMpegDecoderFactory() {
+}
+
+IAudioDecoder* FFMpegDecoderFactory::tryCreateDecoder(std::string myURI) 
+{
+    return new FFMpegDecoder(myURI);
 }
 
 }

@@ -15,7 +15,7 @@
 #include <asl/Stream.h>
 #include <asl/ISampleSink.h>
 
-#include "FFMpegDecoder.h"
+#include "IAudioDecoder.h"
 
 namespace y60 {
 
@@ -30,9 +30,9 @@ class Sound :
     public asl::TimeSource, public asl::ISampleSink
 {
     public:
-        Sound (std::string myURI, asl::HWSampleSinkPtr mySampleSink, bool theLoop = false);
+        Sound (std::string myURI,  IAudioDecoder * myDecoder, bool theLoop = false);
 //        Sound (const std::string & myURI, asl::Ptr < asl::ReadableStream > myStream, 
-//                asl::HWSampleSinkPtr mySink, bool theLoop = false);
+//                bool theLoop = false);
         virtual ~Sound();
         void setSelf(const SoundPtr& mySelf);
         virtual void play ();
@@ -62,7 +62,6 @@ class Sound :
     private:
         void open();
         void close();
-        bool isOpen() const;
         bool decode();
         
         mutable asl::ThreadLock _myLock;

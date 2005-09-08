@@ -61,7 +61,7 @@ namespace jslib {
     
             static JSBool
             Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-    
+   
             static
             JSObject * Construct(JSContext *cx, OWNERPTR theOwner, NATIVE * theNative) {
                 return Base::Construct(cx, theOwner, theNative);

@@ -16,14 +16,12 @@
 
 namespace y60 {
 
-DEFINE_EXCEPTION(DecoderException, asl::Exception);
-
 class IAudioDecoder
 {
     public:
         virtual ~IAudioDecoder() {};
 
-        virtual bool decode() = 0;
+        virtual bool decode(asl::ISampleSink* mySampleSink) = 0;
         virtual unsigned getSampleRate() = 0;
         virtual unsigned getNumChannels() = 0;
         virtual void seek (asl::Time thePosition) {};

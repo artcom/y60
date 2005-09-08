@@ -50,6 +50,11 @@ void Media::setAppConfig(unsigned mySampleRate, unsigned numOutputChannels,
     Pump::setAppConfig(mySampleRate, numOutputChannels, useDummy);
 }
 
+void Media::registerDecoderFactory(AudioDecoderFactoryPtr theFactory)
+{
+    _myDecoderFactories.push_back(theFactory);
+}
+
 SoundPtr Media::createSound(const string & theURI) {
     // Workaround function since the JS binding doesn't support default parameters.
     return createSound(theURI, false, "");
@@ -63,14 +68,15 @@ SoundPtr Media::createSound(const string & theURI, bool theLoop) {
 SoundPtr Media::createSound(const string & theURI, bool theLoop,
         const std::string & theName)
 {
-    // We need a factory function so we can set the Sound's mySelf pointer.
+    // We need a factory function so we can set the Sound's mySelf pointer and so
+    // we can do some decoder creation magic.
     AutoLocker<ThreadLock> myLocker(_myLock);
     string myName = theName;
     if (myName.empty()) {
         myName = theURI;
     }
-    HWSampleSinkPtr mySampleSink = Pump::get().createSampleSink(myName); 
-    SoundPtr mySound = SoundPtr(new Sound(theURI, mySampleSink, theLoop));
+    IAudioDecoder * myDecoder = createDecoder(theURI);
+    SoundPtr mySound = SoundPtr(new Sound(theURI, myDecoder, theLoop));
     mySound->setSelf(mySound);
     _mySounds.push_back(mySound);
     return mySound;
@@ -158,6 +164,20 @@ void Media::run() {
         msleep(unsigned(myTimePerSlice*1000));
     }
     AC_DEBUG << "Media::run ended";
+}
+
+IAudioDecoder * Media::createDecoder(const std::string & theURI) {
+    IAudioDecoder * myDecoder = 0;
+    for (int i=0; i<_myDecoderFactories.size(); ++i) {
+        AudioDecoderFactoryPtr myCurrentFactory = _myDecoderFactories[i];
+        try {
+            myCurrentFactory->tryCreateDecoder(theURI);
+            break;
+        } catch (const DecoderException& e) {
+            AC_DEBUG << e;
+        }
+    }
+    return myDecoder;
 }
 
 } // namespace

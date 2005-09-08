@@ -18,14 +18,13 @@ using namespace asl;
 
 namespace y60 {
 
-Sound::Sound (string myURI, HWSampleSinkPtr mySampleSink, bool theLoop)
+Sound::Sound (string myURI, IAudioDecoder * myDecoder, bool theLoop)
     : _myURI (myURI),
-      _mySampleSink(mySampleSink),
       _myDecodingComplete(false),
       _myIsLooping(theLoop),
       _myTargetBufferedTime(1.0),
       _myMaxUpdateTime(0.2),
-      _myDecoder(0)
+      _myDecoder(myDecoder)
 {
     
     AC_DEBUG << "Sound::Sound";
@@ -34,7 +33,7 @@ Sound::Sound (string myURI, HWSampleSinkPtr mySampleSink, bool theLoop)
 
 /*
 Sound::Sound (const string & myURI, Ptr < ReadableStream > myStream,
-        HWSampleSinkPtr mySampleSink, bool theLoop)
+        bool theLoop)
 {
     AC_DEBUG << "Sound::Sound (" << _myURI << ")";
     _myLockedSelf = SoundPtr(0);
@@ -45,13 +44,13 @@ Sound::~Sound()
 {
     AC_DEBUG << "Sound::~Sound (" << _myURI << ")";
     _myBufferCache.clear();
-    close();
+    delete _myDecoder;
+    _myDecoder = 0;
 }
 
 void Sound::setSelf(const SoundPtr& mySelf)
 {
     _mySelf = mySelf;
-    open();
     _myLockedSelf = SoundPtr(0);
 }
 
@@ -59,9 +58,6 @@ void Sound::play ()
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_DEBUG << "Sound::play (" << _myURI << ")";
-    if (!isOpen()) {
-        open();
-    }
     _myLockedSelf = _mySelf.lock();
     update(0.1);
     _mySampleSink->play();
@@ -125,9 +121,6 @@ void Sound::seek (Time thePosition)
     _myBufferCache.clear();
     // Forget the old sample sink. It'll fade out and then destroy itself.
     _mySampleSink = Pump::get().createSampleSink(_myURI);
-    if (!isOpen()) {
-        open();
-    }
     _myDecoder->seek(thePosition);
     
     _mySampleSink->setCurrentTime(thePosition);
@@ -192,18 +185,16 @@ void Sound::update(double theTimeSlice) {
     }
     if (!_myDecodingComplete) {
         bool myEOF = false;
-        if (isOpen()) {
-            while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
-                myEOF = _myDecoder->decode();
+        while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
+            myEOF = _myDecoder->decode(this);
+        }
+        if (myEOF) {
+            _myDecodingComplete = true;
+            AC_DEBUG << "Sound::update: DecodingComplete";
+            if (!_myIsLooping) {
+                _mySampleSink->stop(true);
             }
-            if (myEOF) {
-                _myDecodingComplete = true;
-                AC_DEBUG << "Sound::update: DecodingComplete";
-                if (!_myIsLooping) {
-                    _mySampleSink->stop(true);
-                }
-                close();
-            }
+            close();
         }
     }
 }
@@ -218,20 +209,10 @@ void Sound::queueSamples(AudioBufferPtr& theBuffer) {
     }
 }
 
-void Sound::open() {
-    AC_DEBUG << "Sound::open (" << _myURI << ")" << _myURI;
-    _myDecoder = new FFMpegDecoder(_myURI, _mySelf.lock());
-}
-
 void Sound::close() {
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_DEBUG << "Sound::close() (" << _myURI << ")";
-    delete _myDecoder;
-    _myDecoder = 0;
-}
-
-bool Sound::isOpen() const {
-    return (_myDecoder);
+    _myDecoder->seek(0);
 }
 
 }
