@@ -49,15 +49,15 @@ private:
     int              _myPort;
 
     bool             _myPowerDownProjectors;
+    bool             _myShutterCloseProjectors;
     bool             _myEnableUDP;
     std::string      _mySystemHaltCommand;   
     std::string      _myProjectorCommandDown;
     std::string      _myProjectorCommandUp;
     std::string      _myRestartAppCommand;
     std::string      _mySystemRebootCommand;
-    
-    unsigned         _myStartDelay;
-    unsigned         _myRestartDelay;
+    std::string      _myStopAppCommand;
+    std::string      _myStartAppCommand;
     
     std::vector<Projector *> _myProjectors;
     bool             _myPowerUpProjectorsOnStartup;
@@ -67,6 +67,8 @@ private:
     void             checkForReboot();
     void             checkForHalt();
     long             _myRebootTimeInSecondsToday;
-	long             _myHaltTimeInSecondsToday;
+    long             _myHaltTimeInSecondsToday;
+    
+    bool             _myApplicationPaused;
 
 };

@@ -31,17 +31,19 @@
             DVI
             VIEWER
 
-          -->
+    -->
     <UdpControl port="2346">
         <SystemHalt powerDownProjectors="true" command="halt"/>    
-        <SystemReboot powerDownProjectors="false" command="reboot"/>
+        <SystemReboot powerDownProjectors="true" command="reboot"/>
         <RestartApplication command="restart_app"/>
-		<ProjectorControl powerUpOnStartup="true">
-			<Projector type="panasonic" port="0" input="RGB_1">
-				<FirstID>1</FirstID>
-				<NumProjectors>1</NumProjectors>
-			</Projector>
-		</ProjectorControl>
+        <StopApplication shutterCloseProjectors="true" command="firealarm_on"/>
+        <StartApplication command="firealarm_off"/>
+        <ProjectorControl powerUpOnStartup="true">
+            <Projector type="panasonic" port="0" input="RGB_1">
+                <FirstID>1</FirstID>
+                <NumProjectors>1</NumProjectors>
+            </Projector>
+        </ProjectorControl>
     </UdpControl>
     <!--<RebootTime>15:30</RebootTime>-->
     <!--<HaltTime>16:10</HaltTime>-->

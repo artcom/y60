@@ -44,17 +44,37 @@ using namespace std;
 UDPHaltListenerThread::UDPHaltListenerThread(std::vector<Projector *> theProjectors, int thePort, 
                                              Application & theApplication,
                                              bool thePowerDownProjectorsOnHalt,
-											 const string & theSystemhaltCommand,
-											 const string & theRestartAppCommand,
-											 const string & theSystemRebootCommand):
+                                             bool theShutterCloseProjectorsOnStop,
+                                             const string & theSystemhaltCommand,
+                                             const string & theSystemRebootCommand,
+                                             const string & theRestartAppCommand,
+                                             const string & theStopAppCommand,
+                                             const string & theStartAppCommand):
     _myProjectors(theProjectors), _myPort(thePort), 
     _myApplication(theApplication),
     _myPowerDownProjectorsOnHalt(thePowerDownProjectorsOnHalt),
+    _myShutterCloseProjectorsOnStop(theShutterCloseProjectorsOnStop),
     _mySystemHaltCommand(theSystemhaltCommand), 
-	_myRestartAppCommand(theRestartAppCommand), 
-	_mySystemRebootCommand(theSystemRebootCommand)
-//    _mySystemHaltCommand("halt"), _myRestartAppCommand("app_restart"), _mySystemRebootCommand("reboot")
+    _mySystemRebootCommand(theSystemRebootCommand),
+    _myRestartAppCommand(theRestartAppCommand), 
+    _myStopAppCommand(theStopAppCommand), 
+    _myStartAppCommand(theStartAppCommand)
 {
+    if (_mySystemHaltCommand == "") {
+        _mySystemHaltCommand = "halt";
+    }
+    if (_mySystemRebootCommand == "") {
+        _mySystemRebootCommand = "reboot";
+    }
+    if (_myRestartAppCommand == "") {
+        _myRestartAppCommand = "restart_app";
+    }
+    if (_myStopAppCommand == "") {
+        _myStopAppCommand = "stop_app";
+    }
+    if (_myStartAppCommand == "") {
+        _myStartAppCommand = "start_app";
+    }
     if (_myProjectors.size() > 0 ) {
         cout << "Projectors: " << endl;    
         for (int i = 0; i < _myProjectors.size(); i++) {
@@ -68,17 +88,27 @@ UDPHaltListenerThread::~UDPHaltListenerThread() {
 
 void 
 UDPHaltListenerThread::setSystemHaltCommand(const string & theSystemhaltCommand) {
-	_mySystemHaltCommand = theSystemhaltCommand;
+    _mySystemHaltCommand = theSystemhaltCommand;
 }
 
 void 
 UDPHaltListenerThread::setRestartAppCommand(const string & theRestartAppCommand) {
-	_myRestartAppCommand = theRestartAppCommand;
+    _myRestartAppCommand = theRestartAppCommand;
+}
+
+void 
+UDPHaltListenerThread::setStopAppCommand(const string & theStopAppCommand) {
+    _myStopAppCommand = theStopAppCommand;
+}
+
+void 
+UDPHaltListenerThread::setStartAppCommand(const string & theStartAppCommand) {
+    _myStartAppCommand = theStartAppCommand;
 }
 
 void 
 UDPHaltListenerThread::setSystemRebootCommand(const string & theSystemRebootCommand) {
-	_mySystemRebootCommand = theSystemRebootCommand;
+    _mySystemRebootCommand = theSystemRebootCommand;
 }
 
 bool 
@@ -120,11 +150,13 @@ UDPHaltListenerThread::initiateReboot() {
 void
 UDPHaltListenerThread::run() {
     cout << "Halt listener activated." << endl;
-	cout << "* UDP Listener on port: " << _myPort << endl;
+    cout << "* UDP Listener on port: " << _myPort << endl;
     cout << "* Commands:" << endl;
     cout << "      System Halt  : " << _mySystemHaltCommand << endl;
     cout << "      System Reboot: " << _mySystemRebootCommand << endl;
     cout << "Application restart: " << _myRestartAppCommand << endl;
+    cout << "Application stop   : " << _myStopAppCommand << endl;
+    cout << "Application start  : " << _myStartAppCommand << endl;
 
 
     try {
@@ -146,6 +178,22 @@ UDPHaltListenerThread::run() {
             } else if (_myRestartAppCommand != "" && !strcmp(myInputBuffer, _myRestartAppCommand.c_str())) {
                 cerr << "Client received restart application packet" << endl;
                 _myApplication.terminate(string("Restart from Network"), true);
+                _myApplication.setPaused(false);
+            } else if (_myStopAppCommand != "" && !strcmp(myInputBuffer, _myStopAppCommand.c_str())) {
+                cerr << "Client received stop application packet" << endl;
+                if (_myShutterCloseProjectorsOnStop) {
+                    // close shutter on all connected projectors
+                    controlProjector("projector_shutter_close");
+                }
+                _myApplication.setPaused(true);
+                _myApplication.terminate(string("Stop from Network"), true);
+            } else if (_myStartAppCommand != "" && !strcmp(myInputBuffer, _myStartAppCommand.c_str())) {
+                cerr << "Client received start application packet" << endl;
+                _myApplication.setPaused(false);
+                if (_myShutterCloseProjectorsOnStop) {
+                    // open shutter on all connected projectors
+                    controlProjector("projector_shutter_open");
+                }
             } else if (controlProjector(std::string(myInputBuffer)) == true) {
                 // pass
             } else {

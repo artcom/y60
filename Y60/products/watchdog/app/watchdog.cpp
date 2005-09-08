@@ -57,9 +57,14 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
 
 
 WatchDog::WatchDog()
-    : _myPort(2342), _myEnableUDP(false), _myPowerDownProjectors(false), _mySystemHaltCommand(""), _myWatchFrequency(30),
-      _myAppToWatch(_myLogger), _myRestartDelay(10), _myStartDelay(0), _myProjectorCommandUp(""), _myProjectorCommandDown(""),
-      _myRebootTimeInSecondsToday(-1), _myHaltTimeInSecondsToday(-1), _myPowerUpProjectorsOnStartup(true)
+    : _myPort(2342), _myEnableUDP(false), _myPowerDownProjectors(false),
+      _myShutterCloseProjectors(false), _myWatchFrequency(30),
+      _myAppToWatch(_myLogger),
+      _myProjectorCommandUp(""), _myProjectorCommandDown(""),
+      _myRebootTimeInSecondsToday(-1), _myHaltTimeInSecondsToday(-1),
+      _myPowerUpProjectorsOnStartup(true), _mySystemRebootCommand(""),
+      _mySystemHaltCommand(""), _myRestartAppCommand(""),
+      _myStopAppCommand(""), _myStartAppCommand("")
 {}
 
 void
@@ -83,15 +88,14 @@ WatchDog::arm() {
         }
     }
 
-    if (_myAppToWatch._myPerformECG) {
-        _myLogger.logToFile(std::string("Monitoring heartbeat file: ") + _myAppToWatch._myHeartbeatFile);
+    if (_myAppToWatch.performECG()) {
+        _myLogger.logToFile(std::string("Monitoring heartbeat file: ") + _myAppToWatch.getHeartbeatFile());
     }
 
-    if (getElapsedSecondsToday() > _myAppToWatch._myRestartTimeInSecondsToday) {
-        _myAppToWatch._myRestartedToday = true;
+    if (getElapsedSecondsToday() > _myAppToWatch.getRestartTimeInSecondsToday()) {
+        _myAppToWatch.setRestartedToday(true);
     }
 }
-
 
 bool
 WatchDog::watch() {
@@ -100,18 +104,22 @@ WatchDog::watch() {
         UDPHaltListenerThread myUDPHaltListenerThread(_myProjectors, _myPort,
                                                       _myAppToWatch,
                                                       _myPowerDownProjectors,
-													  _mySystemHaltCommand,
-													  _myRestartAppCommand,
-													  _mySystemRebootCommand);
+                                                      _myShutterCloseProjectors,
+                                                      _mySystemHaltCommand,
+                                                      _mySystemRebootCommand,
+                                                      _myRestartAppCommand,
+                                                      _myStopAppCommand,
+                                                      _myStartAppCommand);
         if (_myEnableUDP) {
             cerr << "Watchdog - Starting udp halt listener thread" << endl;
             myUDPHaltListenerThread.fork();
             asl::msleep(100);
         }
 
-        if (_myStartDelay > 0) {
-            cerr << "Watchdog - Application will start in " << _myStartDelay << " seconds." << endl;
-            for (unsigned i = 0; i < _myStartDelay * 2; ++i) {
+        unsigned myStartDelay = _myAppToWatch.getStartDelay();
+        if (myStartDelay > 0) {
+            cerr << "Watchdog - Application will start in " << myStartDelay << " seconds." << endl;
+            for (unsigned i = 0; i < myStartDelay * 2; ++i) {
                 cerr << ".";
                 asl::msleep(500);
             }
@@ -120,10 +128,15 @@ WatchDog::watch() {
         // Main loop
         while (true) {
             bool myRestarted = false;
-            std::string myReturnString("Internal quit.");
-            _myAppToWatch.launch();
-
-            while (myRestarted == false && _myAppToWatch._myProcessResult == WAIT_TIMEOUT) {
+            std::string myReturnString;
+            if (!_myAppToWatch.paused()) {
+                myReturnString = "Internal quit.";
+                _myAppToWatch.launch();
+            } else {
+                myReturnString = "Application paused.";
+            }
+            
+            while (myRestarted == false && _myAppToWatch.getProcessResult() == WAIT_TIMEOUT) {
 
                 // update projector state
                 for (unsigned i = 0; i < _myProjectors.size(); ++i) {
@@ -137,26 +150,34 @@ WatchDog::watch() {
                 myRestarted = _myAppToWatch.checkForRestart();
 
                 // system halt & reboot
-				checkForHalt();
+                checkForHalt();
                 checkForReboot();
             }
 
             _myAppToWatch.shutdown();
-            _myLogger.logToFile(_myAppToWatch._myFileName + string(" exited: ") + myReturnString + "\nRestarting application.");
+            _myLogger.logToFile(_myAppToWatch.getFilename() + string(" exited: ") + myReturnString + "\nRestarting application.");
 
-            cerr << "Watchdog - Restarting application in " << _myRestartDelay << " seconds" << endl;
-            for (unsigned i = 0; i < _myRestartDelay * 2; ++i) {
-                cerr << ".";
-                asl::msleep(500);
+            unsigned myRestartDelay = _myAppToWatch.getRestartDelay();
+            if (!_myAppToWatch.paused()) {
+                cerr << "Watchdog - Restarting application in " << myRestartDelay << " seconds" << endl;
+                for (unsigned i = 0; i < myRestartDelay * 2; ++i) {
+                    cerr << ".";
+                    asl::msleep(500);
+                }
+                cerr << endl;
+            } else {
+                cerr << "Watchdog - Application is currently paused" << endl;
+                while (_myAppToWatch.paused()) {
+                    asl::msleep(1000);
+                }
             }
-            cerr << endl;
         }
     } catch (const asl::Exception & ex) {
         cerr << "### Exception: " << ex << endl;
         _myLogger.logToFile(string("### Exception: " + ex.what()));
     } catch (...) {
-        cerr << "### Error while starting:\n\n" + _myAppToWatch._myFileName + " " + _myAppToWatch._myArguments << endl;
-        _myLogger.logToFile(string("### Error while starting:\n\n" + _myAppToWatch._myFileName + " " + _myAppToWatch._myArguments));
+        cerr << "### Error while starting:\n\n" + _myAppToWatch.getFilename() + " " + _myAppToWatch.getArguments() << endl;
+        _myLogger.logToFile(string("### Error while starting:\n\n" + _myAppToWatch.getFilename() + " " + _myAppToWatch.getArguments()));
         exit(-1);
     }
 
@@ -248,44 +269,44 @@ WatchDog::init(dom::Document & theConfigDoc) {
                     _myPort = asl::as<int>(myUdpControlNode->getAttribute("port")->nodeValue());
                     DB(cout <<"_myPort: " << _myPort<<endl;)
                 }
-				// Setup projector control
-				if (myUdpControlNode->childNode("ProjectorControl")) {
-					const dom::NodePtr & myProjectors = myUdpControlNode->childNode("ProjectorControl");
-					_myPowerUpProjectorsOnStartup = asl::as<bool>(myProjectors->getAttribute("powerUpOnStartup")->nodeValue());
-					for (unsigned i = 0; i < myProjectors->childNodesLength(); ++i) {
-						const dom::NodePtr & myProjectorNode = myProjectors->childNode(i);
-						if (myProjectorNode->nodeType() == dom::Node::ELEMENT_NODE) {
-							std::string myType = "";
-							if (myProjectorNode->getAttribute("type")) {
-								myType = myProjectorNode->getAttribute("type")->nodeValue();
-							}
+                // Setup projector control
+                if (myUdpControlNode->childNode("ProjectorControl")) {
+                    const dom::NodePtr & myProjectors = myUdpControlNode->childNode("ProjectorControl");
+                    _myPowerUpProjectorsOnStartup = asl::as<bool>(myProjectors->getAttribute("powerUpOnStartup")->nodeValue());
+                    for (unsigned i = 0; i < myProjectors->childNodesLength(); ++i) {
+                        const dom::NodePtr & myProjectorNode = myProjectors->childNode(i);
+                        if (myProjectorNode->nodeType() == dom::Node::ELEMENT_NODE) {
+                            std::string myType = "";
+                            if (myProjectorNode->getAttribute("type")) {
+                                myType = myProjectorNode->getAttribute("type")->nodeValue();
+                            }
 
-            				if (myProjectorNode->getAttribute("input")) {
-   								std::string myInput = myProjectorNode->getAttribute("input")->nodeValue();
+                            if (myProjectorNode->getAttribute("input")) {
+                                   std::string myInput = myProjectorNode->getAttribute("input")->nodeValue();
                                 //FIXME: If one projector in the chain doesn't have an input specified,
                                 //       the vector is messed up
-            					_myProjectorInput.push_back(myInput);
-            				}
+                                _myProjectorInput.push_back(myInput);
+                            }
 
-							int myPort = -1;
-							if (myProjectorNode->getAttribute("port")) {
-								myPort = asl::as<int>(myProjectorNode->getAttribute("port")->nodeValue());
-							}
+                            int myPort = -1;
+                            if (myProjectorNode->getAttribute("port")) {
+                                myPort = asl::as<int>(myProjectorNode->getAttribute("port")->nodeValue());
+                            }
 
-							if (myPort != -1) {
-            					Projector* myProjector = Projector::getProjector(myType, myPort);
-            					myProjector->setLogger(&_myLogger);
-								myProjector->configure(myProjectorNode);
-								_myProjectors.push_back(myProjector);
-							}
-						}
-					}
-					DB(cout <<"Found " << _myProjectors.size() << " projectors" << endl;)
-				}
+                            if (myPort != -1) {
+                                Projector* myProjector = Projector::getProjector(myType, myPort);
+                                myProjector->setLogger(&_myLogger);
+                                myProjector->configure(myProjectorNode);
+                                _myProjectors.push_back(myProjector);
+                            }
+                        }
+                    }
+                    DB(cout <<"Found " << _myProjectors.size() << " projectors" << endl;)
+                }
 
 
 
-                // check for system halt
+                // check for system halt command configuration
                 if (myUdpControlNode->childNode("SystemHalt")) {
                     const dom::NodePtr & mySystemHaltNode = myUdpControlNode->childNode("SystemHalt");
                     _myPowerDownProjectors  = asl::as<bool>(mySystemHaltNode->getAttribute("powerDownProjectors")->nodeValue());
@@ -294,6 +315,7 @@ WatchDog::init(dom::Document & theConfigDoc) {
                     DB(cout <<"_myEnableUDP: " << _myEnableUDP<<endl;)
                     DB(cout <<"_myPowerDownProjectors: " << _myPowerDownProjectors<<endl;)
                 }
+                // check for system reboot command configuration
                 if (myUdpControlNode->childNode("SystemReboot")) {
                     const dom::NodePtr & mySystemHaltNode = myUdpControlNode->childNode("SystemReboot");
                     _myPowerDownProjectors  = asl::as<bool>(mySystemHaltNode->getAttribute("powerDownProjectors")->nodeValue());
@@ -302,13 +324,28 @@ WatchDog::init(dom::Document & theConfigDoc) {
                     DB(cout <<"_myEnableUDP: " << _myEnableUDP<<endl;)
                     DB(cout <<"_myPowerDownProjectors: " << _myPowerDownProjectors<<endl;)
                 }
+                // check for application restart command configuration
                 if (myUdpControlNode->childNode("RestartApplication")) {
                     const dom::NodePtr & myRestartAppNode = myUdpControlNode->childNode("RestartApplication");
                     _myRestartAppCommand = myRestartAppNode->getAttributeString("command");
                     DB(cout <<"_myRestartAppCommand: " << _myRestartAppCommand<<endl;)
                 }
+                // check for application stop command configuration
+                if (myUdpControlNode->childNode("StopApplication")) {
+                    const dom::NodePtr & myStopAppNode = myUdpControlNode->childNode("StopApplication");
+                    _myShutterCloseProjectors  = asl::as<bool>(myStopAppNode->getAttribute("shutterCloseProjectors")->nodeValue());
+                    _myStopAppCommand = myStopAppNode->getAttributeString("command");
+                    DB(cout <<"_myStopAppCommand: " << _myStopAppCommand<<endl;)
+                }
+                // check for application start command configuration
+                if (myUdpControlNode->childNode("StartApplication")) {
+                    const dom::NodePtr & myStartAppNode = myUdpControlNode->childNode("StartApplication");
+                    _myStartAppCommand = myStartAppNode->getAttributeString("command");
+                    DB(cout <<"_myStartAppCommand: " << _myStartAppCommand<<endl;)
+                }
             }
 
+                // check for system reboot time command configuration
             if (myConfigNode->childNode("RebootTime")) {
                 std::string myRebootTime = (*myConfigNode->childNode("RebootTime"))("#text").nodeValue();
                 std::string myHours = myRebootTime.substr(0, myRebootTime.find_first_of(':'));
@@ -328,102 +365,9 @@ WatchDog::init(dom::Document & theConfigDoc) {
             }
 
             // Setup application
-            if (myConfigNode->childNode("Application")) {
-                const dom::NodePtr & myApplicationNode = myConfigNode->childNode("Application");
-                _myAppToWatch._myFileName = asl::expandEnvironment(myApplicationNode->getAttribute("binary")->nodeValue());
-                if (myApplicationNode->getAttribute("windowtitle")) {
-                    _myAppToWatch._myWindowTitle = myApplicationNode->getAttribute("windowtitle")->nodeValue();
-                }
-                DB(cout <<"_myFileName: " << _myAppToWatch._myFileName<<endl;)
-                if (_myAppToWatch._myFileName.empty()){
-                    cerr <<"### ERROR, no application binary to watch." << endl;
+            if (myConfigNode->childNode("Application")) {            
+                if (!_myAppToWatch.setup(myConfigNode->childNode("Application"))) {
                     return false;
-                }
-                if (myApplicationNode->childNode("EnvironmentVariables")) {
-                    _myAppToWatch.setupEnvironment(myApplicationNode->childNode("EnvironmentVariables"));
-                }
-                if (myApplicationNode->childNode("Arguments")) {
-                    const dom::NodePtr & myArguments = myApplicationNode->childNode("Arguments");
-                    for (int myArgumentNr = 0; myArgumentNr < myArguments->childNodesLength(); myArgumentNr++) {
-                        const dom::NodePtr & myArgumentNode = myArguments->childNode(myArgumentNr);
-                        if (myArgumentNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                            _myAppToWatch._myArguments += (*myArgumentNode)("#text").nodeValue();
-                            _myAppToWatch._myArguments += " ";
-                        }
-                        _myAppToWatch._myArguments = asl::expandEnvironment(_myAppToWatch._myArguments);
-                        DB(cout <<"Argument : "<<myArgumentNr << ": " << _myAppToWatch._myArguments << endl;)
-                    }
-                }
-                if (myApplicationNode->childNode("RestartDay")) {
-                    _myAppToWatch._myRestartCheck = true;
-                    _myAppToWatch._myRestartDay = (*myApplicationNode->childNode("RestartDay"))("#text").nodeValue();
-                    _myAppToWatch._myRestartMode |= RESTARTDAY;
-                    std::transform(_myAppToWatch._myRestartDay.begin(), _myAppToWatch._myRestartDay.end(), _myAppToWatch._myRestartDay.begin(), toupper);
-                    DB(cout <<"_myRestartDay : " << _myAppToWatch._myRestartDay<< endl;)
-                }
-                if (myApplicationNode->childNode("RestartTime")) {
-                    _myAppToWatch._myRestartCheck = true;
-                    std::string myRestartTime = (*myApplicationNode->childNode("RestartTime"))("#text").nodeValue();
-                    std::string myHours = myRestartTime.substr(0, myRestartTime.find_first_of(':'));
-                    std::string myMinutes = myRestartTime.substr(myRestartTime.find_first_of(':')+1, myRestartTime.length());
-                    _myAppToWatch._myRestartTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
-                    _myAppToWatch._myRestartTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
-                    _myAppToWatch._myRestartMode |= RESTARTTIME;
-                    DB(cout <<"_myRestartTimeInSecondsToday : " << _myAppToWatch._myRestartTimeInSecondsToday<< endl;)
-                }
-                if (myApplicationNode->childNode("CheckMemoryTime")) {
-                    _myAppToWatch._myRestartCheck = true;
-                    std::string myCheckMemoryTime = (*myApplicationNode->childNode("CheckMemoryTime"))("#text").nodeValue();
-                    std::string myHours = myCheckMemoryTime.substr(0, myCheckMemoryTime.find_first_of(':'));
-                    std::string myMinutes = myCheckMemoryTime.substr(myCheckMemoryTime.find_first_of(':')+1, myCheckMemoryTime.length());
-                    _myAppToWatch._myCheckMemoryTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
-                    _myAppToWatch._myCheckMemoryTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
-                    _myAppToWatch._myRestartMode |= CHECKMEMORYTIME;
-                    DB(cout <<"_myCheckMemoryTimeInSecondsToday : " << _myAppToWatch._myCheckMemoryTimeInSecondsToday<< endl;)
-                }
-                if (myApplicationNode->childNode("CheckTimedMemoryThreshold")) {
-                    _myAppToWatch._myRestartCheck = true;
-                    _myAppToWatch._myMemoryThresholdTimed = asl::as<int>((*myApplicationNode->childNode("CheckTimedMemoryThreshold"))("#text").nodeValue());
-                    _myAppToWatch._myRestartMode |= CHECKTIMEDMEMORYTHRESHOLD;
-                    DB(cout <<"_myMemoryThresholdTimed : " << _myAppToWatch._myMemoryThresholdTimed<< endl;)
-                }
-                if (myApplicationNode->childNode("Memory_Threshold")) {
-                    _myAppToWatch._myRestartCheck = true;
-                    _myAppToWatch._myRestartMemoryThreshold = asl::as<int>((*myApplicationNode->childNode("Memory_Threshold"))("#text").nodeValue());
-                    _myAppToWatch._myRestartMode |= MEMTHRESHOLD;
-                    DB(cout <<"_myRestartMemoryThreshold : " << _myAppToWatch._myRestartMemoryThreshold<< endl;)
-                }
-                if (myApplicationNode->childNode("WaitDuringStartup")) {
-                    _myStartDelay = asl::as<unsigned>((*myApplicationNode->childNode("WaitDuringStartup"))("#text").nodeValue());
-                    DB(cout <<"_myStartDelay: " << _myStartDelay << endl;)
-                }
-                if (myApplicationNode->childNode("WaitDuringRestart")) {
-                    _myRestartDelay = asl::as<unsigned>((*myApplicationNode->childNode("WaitDuringRestart"))("#text").nodeValue());
-                    DB(cout <<"_myRestartDelay: " << _myRestartDelay << endl;)
-                }
-
-                if (myApplicationNode->childNode("Heartbeat")) {
-                    const dom::NodePtr & myHeartbeatNode = myApplicationNode->childNode("Heartbeat");
-                    if (myHeartbeatNode->childNode("Heartbeat_File")) {
-                        _myAppToWatch._myHeartbeatFile = asl::expandEnvironment((*myHeartbeatNode->childNode("Heartbeat_File"))("#text").nodeValue());
-                        DB(cout <<"_myHeartbeatFile : " << _myAppToWatch._myHeartbeatFile << endl;)
-                    }
-                    if (myHeartbeatNode->childNode("Allow_Missing_Heartbeats")) {
-                        _myAppToWatch._myAllowMissingHeartbeats = asl::as<int>((*myHeartbeatNode->childNode("Allow_Missing_Heartbeats"))("#text").nodeValue());
-                        DB(cout <<"_myAllowMissingHeartbeats : " << _myAppToWatch._myAllowMissingHeartbeats << endl;)
-                    }
-                    if (myHeartbeatNode->childNode("Heartbeat_Frequency")) {
-                        _myAppToWatch._myHeartbeatFrequency = asl::as<int>((*myHeartbeatNode->childNode("Heartbeat_Frequency"))("#text").nodeValue());
-                        DB(cout <<"_myHeartbeatFrequency : " << _myAppToWatch._myHeartbeatFrequency << endl;)
-                    }
-                    _myAppToWatch._myPerformECG = true;
-                    if ((_myAppToWatch._myHeartbeatFrequency == 0) || (_myAppToWatch._myHeartbeatFile.empty())) {
-                        _myAppToWatch._myPerformECG = false;
-                    }
-                    if (myHeartbeatNode->childNode("FirstHeartBeatDelay")) {
-                        _myAppToWatch._myAppStartTimeInSeconds = asl::as<int>((*myHeartbeatNode->childNode("FirstHeartBeatDelay"))("#text").nodeValue());
-                        DB(cout <<"_myAppStartTimeInSeconds : " << _myAppToWatch._myAppStartTimeInSeconds<< endl;)
-                    }
                 }
             }
         }

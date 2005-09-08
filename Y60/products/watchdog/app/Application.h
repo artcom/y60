@@ -34,6 +34,8 @@
 #include <vector>
 #include <string>
 
+#include <dom/Nodes.h>
+
 long getElapsedSecondsToday();
 
 class Logger;
@@ -58,6 +60,7 @@ class Application {
         Application::Application(Logger & theLogger);
         virtual ~Application();
 
+        bool setup(const dom::NodePtr & theAppNode);
         bool checkForRestart();
         void launch();
         void shutdown();
@@ -66,10 +69,30 @@ class Application {
 //        void restartPerUdp();
         void terminate(const std::string & theReason, bool theWMCloseAllowed);
         std::string runUntilNextCheck(int theWatchFrequency);
+       
+        unsigned getRestartDelay() const;
+        unsigned getStartDelay() const;
+        bool     paused() const;
+        bool     performECG() const;
+        bool     restartedToday() const;
+        std::string getHeartbeatFile() const;
+        long     getRestartTimeInSecondsToday() const;
+        DWORD    getProcessResult() const;
+        std::string getFilename() const;
+        std::string getArguments() const; 
+        
+        void setPaused(bool thePausedFlag);
+        void setRestartedToday(bool theRestartedTodayFlag);       
+
         void setupEnvironment(const dom::NodePtr & theEnvironmentSettings);
 
-    public:
-        // TODO: Clean this mess up.
+
+    private:
+        void closeAllThreads();
+        void setEnvironmentVariables();
+
+        std::vector<EnvironmentSetting> _myEnvironmentVariables;
+
         std::string      _myFileName;
         std::string      _myArguments;
         std::string      _myWindowTitle;
@@ -83,7 +106,7 @@ class Application {
 
         int              _myRestartMemoryThreshold;
 
-	    std::string      _myRestartDay;
+        std::string      _myRestartDay;
         long             _myRestartTimeInSecondsToday;
 
         long             _myCheckMemoryTimeInSecondsToday;
@@ -92,8 +115,9 @@ class Application {
         // state
         int              _myRestartMode;
         bool             _myRestartCheck;
+        bool             _myApplicationPaused;
         bool             _myCheckedMemoryToday;
-	    bool             _myRestartedToday;
+        bool             _myRestartedToday;
         bool             _myMemoryIsFull;
         bool             _myItIsTimeToRestart;
         bool             _myHeartIsBroken;
@@ -103,11 +127,9 @@ class Application {
         std::string         _myLastWeekday;
         bool                _myDayChanged;
         Logger &            _myLogger;
+        
+        unsigned         _myStartDelay;
+        unsigned         _myRestartDelay;
 
-        std::vector<EnvironmentSetting> _myEnvironmentVariables;
-    private:
-        void closeAllThreads();
-        void setEnvironmentVariables();
-    
 };
 #endif // INCL_APPLICATION

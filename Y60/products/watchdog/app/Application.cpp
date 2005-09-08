@@ -26,6 +26,7 @@
 #include <asl/MappedBlock.h>
 #include <asl/Exception.h>
 #include <asl/file_functions.h>
+#include <asl/os_functions.h>
 #include <asl/proc_functions.h>
 
 
@@ -54,7 +55,9 @@ Application::Application(Logger & theLogger):
     _myAppStartTimeInSeconds(0), _myRestartMode(UNSET),_myCheckedMemoryToday(false),
     _myRestartCheck(false), _myMemoryThresholdTimed(0),_myStartTimeInSeconds(0),
     _myMemoryIsFull(false), _myItIsTimeToRestart(false), _myHeartIsBroken(false),
-    _myDayChanged(false), _myLogger(theLogger), _myWindowTitle("")  {
+    _myDayChanged(false), _myLogger(theLogger), _myWindowTitle(""), _myApplicationPaused(false),
+    _myRestartDelay(10), _myStartDelay(0)
+{
 }
 
 Application::~Application() {
@@ -74,7 +77,105 @@ Application::setupEnvironment(const NodePtr & theEnvironmentSettings) {
             }
         }
     }
+}
 
+bool Application::setup(const dom::NodePtr & theAppNode) {
+    _myFileName = asl::expandEnvironment(theAppNode->getAttribute("binary")->nodeValue());
+    if (theAppNode->getAttribute("windowtitle")) {
+        _myWindowTitle = theAppNode->getAttribute("windowtitle")->nodeValue();
+    }
+    DB(cout <<"_myFileName: " << _myFileName<<endl;)
+    if (_myFileName.empty()){
+        cerr <<"### ERROR, no application binary to watch." << endl;
+        return false;
+    }
+    if (theAppNode->childNode("EnvironmentVariables")) {
+        setupEnvironment(theAppNode->childNode("EnvironmentVariables"));
+    }
+    if (theAppNode->childNode("Arguments")) {
+        const dom::NodePtr & myArguments = theAppNode->childNode("Arguments");
+        for (int myArgumentNr = 0; myArgumentNr < myArguments->childNodesLength(); myArgumentNr++) {
+            const dom::NodePtr & myArgumentNode = myArguments->childNode(myArgumentNr);
+            if (myArgumentNode->nodeType() == dom::Node::ELEMENT_NODE) {
+                _myArguments += (*myArgumentNode)("#text").nodeValue();
+                _myArguments += " ";
+            }
+            _myArguments = asl::expandEnvironment(_myArguments);
+            DB(cout <<"Argument : "<<myArgumentNr << ": " << _myArguments << endl;)
+        }
+    }
+    if (theAppNode->childNode("RestartDay")) {
+        _myRestartCheck = true;
+        _myRestartDay = (*theAppNode->childNode("RestartDay"))("#text").nodeValue();
+        _myRestartMode |= RESTARTDAY;
+        std::transform(_myRestartDay.begin(), _myRestartDay.end(), _myRestartDay.begin(), toupper);
+        DB(cout <<"_myRestartDay : " << _myRestartDay<< endl;)
+    }
+    if (theAppNode->childNode("RestartTime")) {
+        _myRestartCheck = true;
+        std::string myRestartTime = (*theAppNode->childNode("RestartTime"))("#text").nodeValue();
+        std::string myHours = myRestartTime.substr(0, myRestartTime.find_first_of(':'));
+        std::string myMinutes = myRestartTime.substr(myRestartTime.find_first_of(':')+1, myRestartTime.length());
+        _myRestartTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
+        _myRestartTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
+        _myRestartMode |= RESTARTTIME;
+        DB(cout <<"_myRestartTimeInSecondsToday : " << _myRestartTimeInSecondsToday<< endl;)
+    }
+    if (theAppNode->childNode("CheckMemoryTime")) {
+        _myRestartCheck = true;
+        std::string myCheckMemoryTime = (*theAppNode->childNode("CheckMemoryTime"))("#text").nodeValue();
+        std::string myHours = myCheckMemoryTime.substr(0, myCheckMemoryTime.find_first_of(':'));
+        std::string myMinutes = myCheckMemoryTime.substr(myCheckMemoryTime.find_first_of(':')+1, myCheckMemoryTime.length());
+        _myCheckMemoryTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
+        _myCheckMemoryTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
+        _myRestartMode |= CHECKMEMORYTIME;
+        DB(cout <<"_myCheckMemoryTimeInSecondsToday : " << _myCheckMemoryTimeInSecondsToday<< endl;)
+    }
+    if (theAppNode->childNode("CheckTimedMemoryThreshold")) {
+        _myRestartCheck = true;
+        _myMemoryThresholdTimed = asl::as<int>((*theAppNode->childNode("CheckTimedMemoryThreshold"))("#text").nodeValue());
+        _myRestartMode |= CHECKTIMEDMEMORYTHRESHOLD;
+        DB(cout <<"_myMemoryThresholdTimed : " << _myMemoryThresholdTimed<< endl;)
+    }
+    if (theAppNode->childNode("Memory_Threshold")) {
+        _myRestartCheck = true;
+        _myRestartMemoryThreshold = asl::as<int>((*theAppNode->childNode("Memory_Threshold"))("#text").nodeValue());
+        _myRestartMode |= MEMTHRESHOLD;
+        DB(cout <<"_myRestartMemoryThreshold : " << _myRestartMemoryThreshold<< endl;)
+    }
+    if (theAppNode->childNode("WaitDuringStartup")) {
+        _myStartDelay = asl::as<unsigned>((*theAppNode->childNode("WaitDuringStartup"))("#text").nodeValue());
+        DB(cout <<"_myStartDelay: " << _myStartDelay << endl;)
+    }
+    if (theAppNode->childNode("WaitDuringRestart")) {
+        _myRestartDelay = asl::as<unsigned>((*theAppNode->childNode("WaitDuringRestart"))("#text").nodeValue());
+        DB(cout <<"_myRestartDelay: " << _myRestartDelay << endl;)
+    }
+
+    if (theAppNode->childNode("Heartbeat")) {
+        const dom::NodePtr & myHeartbeatNode = theAppNode->childNode("Heartbeat");
+        if (myHeartbeatNode->childNode("Heartbeat_File")) {
+            _myHeartbeatFile = asl::expandEnvironment((*myHeartbeatNode->childNode("Heartbeat_File"))("#text").nodeValue());
+            DB(cout <<"_myHeartbeatFile : " << _myHeartbeatFile << endl;)
+        }
+        if (myHeartbeatNode->childNode("Allow_Missing_Heartbeats")) {
+            _myAllowMissingHeartbeats = asl::as<int>((*myHeartbeatNode->childNode("Allow_Missing_Heartbeats"))("#text").nodeValue());
+            DB(cout <<"_myAllowMissingHeartbeats : " << _myAllowMissingHeartbeats << endl;)
+        }
+        if (myHeartbeatNode->childNode("Heartbeat_Frequency")) {
+            _myHeartbeatFrequency = asl::as<int>((*myHeartbeatNode->childNode("Heartbeat_Frequency"))("#text").nodeValue());
+            DB(cout <<"_myHeartbeatFrequency : " << _myHeartbeatFrequency << endl;)
+        }
+        _myPerformECG = true;
+        if ((_myHeartbeatFrequency == 0) || (_myHeartbeatFile.empty())) {
+            _myPerformECG = false;
+        }
+        if (myHeartbeatNode->childNode("FirstHeartBeatDelay")) {
+            _myAppStartTimeInSeconds = asl::as<int>((*myHeartbeatNode->childNode("FirstHeartBeatDelay"))("#text").nodeValue());
+            DB(cout <<"_myAppStartTimeInSeconds : " << _myAppStartTimeInSeconds<< endl;)
+        }
+    }
+    return true;
 }
 
 void 
@@ -130,22 +231,25 @@ Application::terminate(const std::string & theReason, bool theWMCloseAllowed){
 
 bool
 Application::checkForRestart() {
-	if (_myMemoryIsFull || _myItIsTimeToRestart || _myHeartIsBroken) {
-		string myMessage;
-	    if (_myMemoryIsFull) {
-		    myMessage = "Memory threshold reached.";
-	    }
-	    if (_myItIsTimeToRestart) {
-		    myMessage = "Time to restart reached.";
-	    }
-	    if (_myHeartIsBroken) {
-		    myMessage = "Failed to detect heartbeat.";
-	    }
+    if (_myMemoryIsFull || _myItIsTimeToRestart || _myHeartIsBroken) {
+        string myMessage;
+        if (_myMemoryIsFull) {
+            myMessage = "Memory threshold reached.";
+        }
+        if (_myItIsTimeToRestart) {
+            myMessage = "Time to restart reached.";
+        }
+        if (_myHeartIsBroken) {
+            myMessage = "Failed to detect heartbeat.";
+        }
+        if (_myApplicationPaused) {
+            myMessage = "Application was intentionally stopped.";
+        }
         terminate(myMessage, true);
-		return true;
-	} else {
-	    return false;
-	}
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void
@@ -237,20 +341,20 @@ Application::closeAllThreads() {
     THREADENTRY32  myThreadInfo;
     myThreadInfo.dwSize = sizeof( THREADENTRY32 );
     HANDLE hProcessSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD,0);//TH32CS_SNAPPROCESS, 0 );
-	int myThreadNum = 0;
-	if( hProcessSnap == INVALID_HANDLE_VALUE ) {
+    int myThreadNum = 0;
+    if( hProcessSnap == INVALID_HANDLE_VALUE ) {
         cerr <<"Application::closeAllThreads() failed " << endl;
     } else {
-    	if (Thread32First(hProcessSnap, &myThreadInfo)){
-    		do {
-                if( myThreadInfo.th32OwnerProcessID == _myProcessInfo.dwProcessId )	{
-        		    myThreadNum++;
-        			DB(cerr << "### found a running thread with id:" << myThreadInfo.th32ThreadID << ", terminate..." << endl);
-        			HANDLE myChildThreadHandle = OpenThread(THREAD_ALL_ACCESS, FALSE, myThreadInfo.th32ThreadID);
-        			CloseHandle(myChildThreadHandle);
-        		}
-    		} while(Thread32Next(hProcessSnap, &myThreadInfo));
-    	} else {
+        if (Thread32First(hProcessSnap, &myThreadInfo)){
+            do {
+                if( myThreadInfo.th32OwnerProcessID == _myProcessInfo.dwProcessId )    {
+                    myThreadNum++;
+                    DB(cerr << "### found a running thread with id:" << myThreadInfo.th32ThreadID << ", terminate..." << endl);
+                    HANDLE myChildThreadHandle = OpenThread(THREAD_ALL_ACCESS, FALSE, myThreadInfo.th32ThreadID);
+                    CloseHandle(myChildThreadHandle);
+                }
+            } while(Thread32Next(hProcessSnap, &myThreadInfo));
+        } else {
             dumpWinError( "Thread32First" );  // Show cause of failure
         }
         CloseHandle(hProcessSnap);
@@ -272,23 +376,23 @@ Application::shutdown() {
 
 std::string
 Application::runUntilNextCheck(int theWatchFrequency) {
-	// Wait until child process exits.
-	_myProcessResult = WaitForSingleObject( _myProcessInfo.hProcess, 1000 * theWatchFrequency );
+    // Wait until child process exits.
+    _myProcessResult = WaitForSingleObject( _myProcessInfo.hProcess, 1000 * theWatchFrequency );
 
     if (_myProcessResult == WAIT_FAILED) {
         LPVOID lpMsgBuf;
         FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                        FORMAT_MESSAGE_FROM_SYSTEM |
-                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                        NULL,
-                        GetLastError(),
-                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                        (LPTSTR) &lpMsgBuf,
-                        0,
-                        NULL );
-        std::string myProzessOutputString  = ((LPCTSTR)lpMsgBuf);
+                       FORMAT_MESSAGE_FROM_SYSTEM |
+                       FORMAT_MESSAGE_IGNORE_INSERTS,
+                       NULL,
+                       GetLastError(),
+                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                       (LPTSTR) &lpMsgBuf,
+                       0,
+                       NULL );
+        std::string myProcessOutputString  = ((LPCTSTR)lpMsgBuf);
         LocalFree( lpMsgBuf );
-        return string("Return code of prozess: ") + myProzessOutputString;
+        return string("Return code of process: ") + myProcessOutputString;
     }
     return string("Internal quit.");
 }
@@ -296,8 +400,8 @@ Application::runUntilNextCheck(int theWatchFrequency) {
 void
 Application::checkState() {
 
-	if (_myRestartCheck) {
-		// get memory available/free
+    if (_myRestartCheck) {
+        // get memory available/free
         unsigned myAvailMem = 0;
 #if 1 
         myAvailMem = asl::getFreeMemory() / 1024;
@@ -306,28 +410,28 @@ Application::checkState() {
         GlobalMemoryStatus (&myMemoryStatus);
         myAvailMem = myMemoryStatus.dwAvail / 1024; 
 #endif
-		_myMemoryIsFull = (myAvailMem <= _myRestartMemoryThreshold);
+        _myMemoryIsFull = (myAvailMem <= _myRestartMemoryThreshold);
         if (_myMemoryIsFull) {
             _myLogger.logToFile(std::string("Avail. phy. mem.: ") + asl::as_string(myAvailMem));
         }
 
         long myElapsedSecondsToday = getElapsedSecondsToday();
 
-		// get the day of the week
+        // get the day of the week
         time_t myTime;
         time(&myTime);
         struct tm * myPrintableTime = localtime(&myTime);
-		std::string myWeekday = ourWeekdayMap[myPrintableTime->tm_wday];
+        std::string myWeekday = ourWeekdayMap[myPrintableTime->tm_wday];
         if (myWeekday != _myLastWeekday) {
-			if ( ! _myLastWeekday.empty()) {
-				_myDayChanged = true;
-			}
+            if ( ! _myLastWeekday.empty()) {
+                _myDayChanged = true;
+            }
             _myLastWeekday = myWeekday;
         } else {
             _myDayChanged = false;
         }
 
-		std::transform(myWeekday.begin(), myWeekday.end(), myWeekday.begin(), toupper);
+        std::transform(myWeekday.begin(), myWeekday.end(), myWeekday.begin(), toupper);
 
         // time check
         if (_myRestartMode & RESTARTTIME) {
@@ -335,11 +439,11 @@ Application::checkState() {
                 if (myElapsedSecondsToday > _myRestartTimeInSecondsToday) {
                     if ( _myRestartMode & RESTARTDAY) {
                         if (myWeekday == _myRestartDay) {
-					        _myItIsTimeToRestart = true;
+                            _myItIsTimeToRestart = true;
                             _myRestartedToday = true;
                         }
                     } else {
-				        _myItIsTimeToRestart = true;
+                        _myItIsTimeToRestart = true;
                         _myRestartedToday = true;
                     }
                 }
@@ -349,28 +453,76 @@ Application::checkState() {
         // day check
         if ( _myDayChanged ) {
             _myRestartedToday = false;
-			_myCheckedMemoryToday = false;
+            _myCheckedMemoryToday = false;
             if (!(_myRestartMode & RESTARTTIME)) {
                 if ( _myRestartMode & RESTARTDAY) {
                     if (myWeekday == _myRestartDay) {
-				        _myItIsTimeToRestart = true;
+                        _myItIsTimeToRestart = true;
                     }
                 }
             }
         }
 
-		// yellow section
+        // yellow section
         if ((_myRestartMode & CHECKMEMORYTIME) && (_myRestartMode & CHECKTIMEDMEMORYTHRESHOLD)) {
             if (!_myCheckedMemoryToday) {
                 if (myElapsedSecondsToday > _myCheckMemoryTimeInSecondsToday) {
-					_myMemoryIsFull = myAvailMem <= _myMemoryThresholdTimed;
+                    _myMemoryIsFull = myAvailMem <= _myMemoryThresholdTimed;
                     _myCheckedMemoryToday = true;
                 }
             }
-	    }
+        }
     }
 }
 
+unsigned Application::getRestartDelay() const {
+    return _myRestartDelay;
+}
+
+unsigned Application::getStartDelay() const {
+    return _myStartDelay;
+}
+
+bool Application::paused() const {
+    return _myApplicationPaused;
+}
+
+bool Application::performECG() const {
+    return _myPerformECG;
+}
+
+bool Application::restartedToday() const {
+    return _myRestartedToday;
+}
+
+std::string Application::getHeartbeatFile() const {
+    return _myHeartbeatFile;
+}
+
+long Application::getRestartTimeInSecondsToday() const {
+    return _myRestartTimeInSecondsToday;
+}
+
+DWORD Application::getProcessResult() const {
+    return _myProcessResult;
+}
+
+std::string Application::getFilename() const {
+    return _myFileName;
+}
+
+std::string Application::getArguments() const {
+    return _myArguments;
+}
+
+void Application::setPaused(bool thePausedFlag) {
+    _myApplicationPaused = thePausedFlag;
+}
+
+void Application::setRestartedToday(bool theRestartedTodayFlag) {
+    _myRestartedToday = theRestartedTodayFlag;
+}
+       
 long getElapsedSecondsToday() {
     __time64_t ltime;
     struct tm *newtime;
@@ -379,5 +531,5 @@ long getElapsedSecondsToday() {
     long myElapsedSecondsToday = newtime->tm_hour * 3600;
     myElapsedSecondsToday += newtime->tm_min * 60;
     myElapsedSecondsToday += newtime->tm_sec;
-	return myElapsedSecondsToday;
+    return myElapsedSecondsToday;
 }

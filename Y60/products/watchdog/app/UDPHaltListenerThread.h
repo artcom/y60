@@ -37,14 +37,19 @@ class UDPHaltListenerThread : public PosixThread {
         UDPHaltListenerThread(std::vector<Projector *> theProjectors, int thePort, 
                               Application & theApplication,
                               bool thePowerDownProjectorsOnHalt,
-							  const std::string & theSystemhaltCommand,
-							  const std::string & theRestartAppCommand,
-							  const std::string & theSystemRebootCommand);
+                              bool theShutterCloseProjectorsOnStop,
+                              const std::string & theSystemhaltCommand,
+                              const std::string & theSystemRebootCommand,
+                              const std::string & theRestartAppCommand,
+                              const std::string & theStopAppCommand,
+                              const std::string & theStartAppCommand);
         virtual ~UDPHaltListenerThread();
 
-		void setSystemHaltCommand(const std::string & theSystemhaltCommand);
-		void setRestartAppCommand(const std::string & theRestartAppCommand);
-		void setSystemRebootCommand(const std::string & theSystemRebootCommand);
+        void setSystemHaltCommand(const std::string & theSystemhaltCommand);
+        void setRestartAppCommand(const std::string & theRestartAppCommand);
+        void setSystemRebootCommand(const std::string & theSystemRebootCommand);
+        void setStopAppCommand(const std::string & theStopAppCommand);
+        void setStartAppCommand(const std::string & theStartAppCommand);
     private:
         void run();
         bool controlProjector(const std::string & theCommand);
@@ -56,9 +61,12 @@ class UDPHaltListenerThread : public PosixThread {
         int                     _myPort;
         Application &           _myApplication;
         bool                    _myPowerDownProjectorsOnHalt;
+        bool                    _myShutterCloseProjectorsOnStop;
         std::string             _mySystemHaltCommand;
         std::string             _myRestartAppCommand;
         std::string             _mySystemRebootCommand;
+        std::string             _myStopAppCommand;
+        std::string             _myStartAppCommand;
 };
 
 #endif
