@@ -83,6 +83,24 @@ Present(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) 
     } HANDLE_CPP_EXCEPTION
 }
 
+static JSBool
+SetTransientFor(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        Gtk::Window * myNative(0);
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        Gtk::Window * myParent(0);
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myParent);
+
+        myNative->set_transient_for( * myParent);
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION
+}
+
 JSFunctionSpec *
 JSWindow::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -92,6 +110,7 @@ JSWindow::Functions() {
         {"resize",               Resize,                  2},
         {"raise",                Raise,                   0},
         {"present",              Present,                 0},
+        {"set_transient_for",    SetTransientFor,         1},
         {0}
     };
     return myFunctions;
