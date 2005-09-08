@@ -128,6 +128,12 @@ class CTScan {
         int getSliceCount() const { return _myMaxZ - _myMinZ + 1; }
 
         void notifyProgress(double theProgress, const std::string & theMessage = "");
+
+
+        /* Some functions that are TNT but not ctscan specific */
+
+        static dom::NodePtr createGrayImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
+        
     private:
         CTScan(const CTScan&); // hide copy constructor
         sigc::signal<void, double, Glib::ustring> _myProgressSignal;

@@ -282,7 +282,7 @@ appendStencil(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 }
 
 static JSBool
-createStencilImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+createRGBAImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         ensureParamCount(argc, 4);
         dom::NodePtr myImagesNode;
@@ -293,16 +293,102 @@ createStencilImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
         convertFrom(cx, argv[2], myHeight);
         unsigned char myValue;
         convertFrom(cx, argv[3], myValue);
-        asl::Block myBlock(myWidth * myHeight, myValue);
+        asl::Block myBlock(myWidth * myHeight * 4, myValue);
         dom::NodePtr myImage(new dom::Element("image"));
         myImagesNode->appendChild(myImage);
         myImage->getFacade<Image>()->set<ImageMipmapTag>(false);
-        myImage->getFacade<Image>()->set(myWidth, myHeight, 1, y60::GRAY, myBlock);
+        myImage->getFacade<Image>()->set(myWidth, myHeight, 1, y60::RGBA, myBlock);
         *rval = as_jsval(cx, myImage);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+createGrayImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        ensureParamCount(argc, 4);
+        dom::NodePtr myImagesNode;
+        convertFrom(cx, argv[0], myImagesNode);
+        int myWidth;
+        convertFrom(cx, argv[1], myWidth);
+        int myHeight;
+        convertFrom(cx, argv[2], myHeight);
+        unsigned char myValue;
+        convertFrom(cx, argv[3], myValue);
+
+        CTScan::createGrayImage(myImagesNode, myWidth, myHeight, myValue);
+/*        
+        asl::Block myBlock(myWidth * myHeight, myValue);
+        dom::NodePtr myImage(new dom::Element("image"));
+        myImagesNode->appendChild(myImage);
+        myImage->getFacade<Image>()->set<ImageMipmapTag>(false);
+        myImage->getFacade<Image>()->set(myWidth, myHeight, 1, y60::GRAY, myBlock);        
+        *rval = as_jsval(cx, myImage);
+*/        
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+resizeVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        ensureParamCount(argc, 2);
+        dom::NodePtr myVoxelVolume;
+        convertFrom(cx, argv[0], myVoxelVolume);
+        if ( ! myVoxelVolume) {
+            JS_ReportError(cx, "Argument 0 must be a Node");
+            return JS_FALSE;
+        } 
+
+        Box3f myDirtyBox;
+        convertFrom(cx, argv[1], myDirtyBox);
+
+        const Box3f & myOldBox = myVoxelVolume->getAttributeValue<Box3f>("boundingbox");
+
+        Box3f myNewBox = myOldBox;
+        myNewBox.extendBy( myDirtyBox );
+
+        if (myNewBox == myOldBox) {
+            AC_INFO << "Raster box didn't change.";
+            return JS_TRUE;
+        }
+        
+        const Vector3f & mySize = myNewBox.getSize() + Vector3f(1.0, 1.0, 1.0);
+
+        int myTargetWidth  = int( mySize[0] );
+        int myTargetHeight = int( mySize[1] );
+        AC_INFO << "target width = " << myTargetWidth << " target height = " << myTargetHeight;
+        int myNewRasterCount  = int( mySize[2] );
+       
+        int myNewBoxBegin = int( myNewBox[Box3f::MIN][2] );
+        int myNewBoxEnd   = int( myNewBox[Box3f::MAX][2] );
+
+        int myOldBoxBegin = int( myOldBox[Box3f::MIN][2] );
+        int myOldBoxEnd   = int( myOldBox[Box3f::MAX][2] );
+       
+        dom::NodePtr myRasters = myVoxelVolume->childNode("rasters");
+        dom::NodePtr myOldRaster;
+        dom::NodePtr myNewRaster;
+        for(int i = myNewBoxBegin;i < myNewBoxEnd; ++i) {
+            if (i >= myOldBoxBegin && i < myOldBoxEnd) {
+                myOldRaster = myRasters->childNode(0);
+                AC_INFO << "Replacing " << i;
+            } else {
+                AC_INFO << "Creating new " << i;
+            }
+            myNewRaster = CTScan::createGrayImage(myRasters, myTargetWidth, myTargetHeight, 0);
+            if (i >= myOldBoxBegin && i < myOldBoxEnd) {
+                // TODO copy from old to new ...
+                myRasters->removeChild(myOldRaster);
+            }
+        }
+
+        myVoxelVolume->getAttribute("boundingbox")->nodeValueAssign(myNewBox);
+
+        
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
 
 
 static JSBool
@@ -354,7 +440,9 @@ JSFunctionSpec *
 JSCTScan::StaticFunctions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
-        {"createStencilImage",   createStencilImage,      4},
+        {"createRGBAImage",   createRGBAImage,      4},
+        {"createGrayImage",   createGrayImage,      4},
+        {"resizeVoxelVolume", resizeVoxelVolume,    2},
         {0}
     };
     return myFunctions;

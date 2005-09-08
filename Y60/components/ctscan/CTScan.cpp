@@ -690,6 +690,19 @@ CTScan::notifyProgress(double theProgress, const std::string & theMessage) {
     _myProgressSignal.emit(theProgress, Glib::ustring(theMessage));
 }
 
+NodePtr
+CTScan::createGrayImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue) {
+    NodePtr myRasterNode = theParent->appendChild(NodePtr(new Element("rasterofgray")));
+    myRasterNode->appendChild(NodePtr(new Text()));
+
+    ResizeableRasterPtr myRaster
+        = dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
+
+    Block myBlock(theWidth * theHeight, theValue);
+    myRaster->assign(theWidth, theHeight, myBlock);
+    AC_PRINT << "created raster of " << myRaster->width() << "x" << myRaster->height();
+    return myRasterNode;
+}
 
 }
 
