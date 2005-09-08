@@ -17,6 +17,9 @@
 #include <asl/ISampleSink.h>
 #include <asl/Block.h>
 
+#ifdef WIN32
+#define EMULATE_INTTYPES
+#endif
 #include <ffmpeg/avformat.h>
 
 namespace y60 {

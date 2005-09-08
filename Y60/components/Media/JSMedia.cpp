@@ -41,19 +41,19 @@ namespace jslib {
         switch(argc) {
             case 1: {
                     typedef y60::SoundPtr (y60::Media::*MyMethod)(const std::string & theURI);
-                    return Method<JSMedia::NATIVE>::call
-                            ((MyMethod)&JSMedia::NATIVE::createSound,cx,obj,argc,argv,rval);
+                    return Method<y60::Media>::call
+                            ((MyMethod)&y60::Media::createSound,cx,obj,argc,argv,rval);
                 }
             case 2: {
                     typedef y60::SoundPtr (y60::Media::*MyMethod)(const std::string & theURI, bool theLoop);
-                    return Method<JSMedia::NATIVE>::call
-                            ((MyMethod)&JSMedia::NATIVE::createSound,cx,obj,argc,argv,rval);
+                    return Method<y60::Media>::call
+                            ((MyMethod)&y60::Media::createSound,cx,obj,argc,argv,rval);
                 }
             default: {
                     typedef y60::SoundPtr (y60::Media::*MyMethod)(const std::string & theURI, bool theLoop, 
                             const std::string & theName);
-                    return Method<JSMedia::NATIVE>::call
-                            ((MyMethod)&JSMedia::NATIVE::createSound,cx,obj,argc,argv,rval);
+                    return Method<y60::Media>::call
+                            ((MyMethod)&y60::Media::createSound,cx,obj,argc,argv,rval);
                 }
         }
     }
