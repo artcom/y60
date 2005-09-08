@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "Media.h"
+#include "FFMpegDecoder.h"
 
 #include <asl/Logger.h>
 #include <asl/Pump.h>
@@ -28,6 +29,7 @@ const double myTimePerSlice = 0.05;
     
 Media::Media() {
     AC_DEBUG << "Media::Media";
+    registerDecoderFactory(AudioDecoderFactoryPtr(new FFMpegDecoderFactory));
     fork();
 }
 
@@ -171,11 +173,15 @@ IAudioDecoder * Media::createDecoder(const std::string & theURI) {
     for (int i=0; i<_myDecoderFactories.size(); ++i) {
         AudioDecoderFactoryPtr myCurrentFactory = _myDecoderFactories[i];
         try {
-            myCurrentFactory->tryCreateDecoder(theURI);
+            myDecoder = myCurrentFactory->tryCreateDecoder(theURI);
             break;
         } catch (const DecoderException& e) {
             AC_DEBUG << e;
         }
+    }
+    if (myDecoder == 0) {
+        throw DecoderException(std::string("No suitable decoder for ")+theURI+" found.", 
+                PLUS_FILE_LINE);
     }
     return myDecoder;
 }

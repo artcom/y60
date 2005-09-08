@@ -209,6 +209,7 @@ FFMpegDecoderFactory::FFMpegDecoderFactory() {
 
 IAudioDecoder* FFMpegDecoderFactory::tryCreateDecoder(std::string myURI) 
 {
+    AC_DEBUG << "tryCreateDecoder (" << myURI << ")";
     return new FFMpegDecoder(myURI);
 }
 

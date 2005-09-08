@@ -106,7 +106,7 @@ class TestBroken : public SoundTestBase {
                 while(mySound->isPlaying()) {
                     msleep(100);
                 }
-            } catch (DecoderException&) {
+            } catch (asl::Exception&) {
                 myException = true;
             }
             ENSURE(myException);

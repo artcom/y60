@@ -26,9 +26,9 @@ Sound::Sound (string myURI, IAudioDecoder * myDecoder, bool theLoop)
       _myMaxUpdateTime(0.2),
       _myDecoder(myDecoder)
 {
-    
     AC_DEBUG << "Sound::Sound";
     _myLockedSelf = SoundPtr(0);
+    _mySampleSink = Pump::get().createSampleSink(myURI);
 }
 
 /*
@@ -160,7 +160,6 @@ unsigned Sound::getNumUnderruns() const {
 
 void Sound::update(double theTimeSlice) {
     AutoLocker<ThreadLock> myLocker(_myLock);
-
     double myBuffersFilledRatio = double(_mySampleSink->getBufferedTime())/
             _myTargetBufferedTime;
     double myTimeToBuffer = double(_mySampleSink->getBufferedTime())+
