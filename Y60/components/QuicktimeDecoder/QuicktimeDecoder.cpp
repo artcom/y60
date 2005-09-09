@@ -127,12 +127,16 @@ namespace y60 {
 
         PixelEncoding myPixelEncoding = getPixelFormat();
         QTNewGWorld(&_myOffScreenWorld, k32RGBAPixelFormat, &movieBounds, 0, 0, 0);
-        setPixelFormat(PixelEncoding(RGBA));
-        setFrameRate(25);
-        setFrameWidth(movieBounds.right);
-        setFrameHeight(movieBounds.bottom);
+//   setPixelFormat(PixelEncoding(RGBA));
+        
+        Movie * myMovie = getMovie();
+        myMovie->setPixelEncoding(PixelEncoding(RGBA));
+        myMovie->set<FrameRateTag>(25);
+        myMovie->set<ImageWidthTag>(movieBounds.right);
+        myMovie->set<ImageHeightTag>(movieBounds.bottom);
+
         double myDurationInSeconds = float(GetMovieDuration(_myMovie)) / GetMovieTimeScale(_myMovie);
-        setFrameCount(long(myDurationInSeconds * 25));
+        myMovie->set<FrameCountTag>(long(myDurationInSeconds * 25));
         
         
         SetGWorld(_myOffScreenWorld, NULL);
