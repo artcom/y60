@@ -87,7 +87,7 @@ PdF1Projector::power(bool thePowerFlag)
 void
 PdF1Projector::selectInput(VideoSource theVideoSource)
 {
-    std::cerr << "PdF1Projector::selectInput " << theVideoSource << std::endl;
+    std::cerr << "PdF1Projector::selectInput " << getStringFromEnum(theVideoSource) << std::endl;
 
     unsigned char packet[PACKET_SIZE];
     memset(packet, 0, sizeof(packet));

@@ -22,11 +22,10 @@
 #include <asl/SerialDevice.h>
 #include <asl/Exception.h>
 #include <asl/Time.h>
+#include <asl/Logger.h>
 #include <asl/string_functions.h>
 
 #include <iostream>
-
-#define DB(x) x
 
 const char NEC_POWER_UP[]      = { 0x02, 0x00, 0x00, 0x00, 0x00, 0x02 };
 const char NEC_POWER_DOWN[]    = { 0x02, 0x01, 0x00, 0x00, 0x00, 0x03 };
@@ -60,18 +59,18 @@ NecProjector::power(bool thePowerFlag) {
         return;
 
     if (thePowerFlag) {
-        DB(cout << "NecProjector::powerUp - 1" << endl;)
+        AC_DEBUG << "NecProjector::powerUp - 1" ;
         myDevice->write(NEC_POWER_UP, 6);
         asl::msleep(1000);
         myDevice->close();
         myDevice->open(9600, 8, asl::SerialDevice::NO_PARITY, 1);
         asl::msleep(1000);
-        DB(cout << "NecProjector::powerUp - 2" << endl;)
+        AC_DEBUG << "NecProjector::powerUp - 2" ;
         myDevice->write(NEC_POWER_UP, 6);
     }
     else {
         myDevice->write(NEC_POWER_DOWN, 6);
-        DB(cout << "NecProjector::powerDown" << endl;)
+        AC_DEBUG << "NecProjector::powerDown" ;
     }
 }
 
@@ -81,6 +80,8 @@ NecProjector::selectInput(VideoSource theVideoSource) {
     asl::SerialDevice * myDevice = getDevice();
     if (!myDevice)
         return;
+
+    std::cerr << "NecProjector::selectInput " << getStringFromEnum(theVideoSource) << std::endl;
 
     myDevice->write(NEC_INPUT_SELECT, 6);
     switch (theVideoSource) {
@@ -105,7 +106,7 @@ NecProjector::selectInput(VideoSource theVideoSource) {
     default:
         throw asl::Exception("Unknown projector input source.", PLUS_FILE_LINE);
     };
-    DB(cout << "NecProjector::selectInput" << endl;)
+    AC_DEBUG << "NecProjector::selectInput" ;
 }
 
 

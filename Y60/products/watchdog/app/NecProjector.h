@@ -29,6 +29,13 @@ public:
 
     virtual void power(bool thePowerFlag);
     virtual void selectInput(VideoSource theSource);
+    
+    /**
+     * Open/Close the shutter
+     * \note For NEC projectors do not have a shutter
+     *       this enables/disables the PICTURE MUTE
+     * \param theShutterFlag 
+     */                  
     virtual void shutter(bool theShutterFlag);
 };
 

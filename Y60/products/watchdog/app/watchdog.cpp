@@ -21,7 +21,6 @@
 //=============================================================================
 
 #include "watchdog.h"
-#include "UDPHaltListenerThread.h"
 #include "system_functions.h"
 
 #include "Projector.h"
@@ -43,8 +42,6 @@
 #include <fstream>
 #include <algorithm>
 
-#define DB(x) //x
-
 using namespace std;
 
 const string ourDefaultConfigFile = "watchdog.xml";
@@ -57,14 +54,12 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
 
 
 WatchDog::WatchDog()
-    : _myPort(2342), _myEnableUDP(false), _myPowerDownProjectors(false),
-      _myShutterCloseProjectors(false), _myWatchFrequency(30),
+    : _myWatchFrequency(30),
       _myAppToWatch(_myLogger),
-      _myProjectorCommandUp(""), _myProjectorCommandDown(""),
-      _myRebootTimeInSecondsToday(-1), _myHaltTimeInSecondsToday(-1),
-      _myPowerUpProjectorsOnStartup(true), _mySystemRebootCommand(""),
-      _mySystemHaltCommand(""), _myRestartAppCommand(""),
-      _myStopAppCommand(""), _myStartAppCommand("")
+      _myPowerUpProjectorsOnStartup(true),
+      _myRebootTimeInSecondsToday(-1),
+      _myHaltTimeInSecondsToday(-1),
+      _myUDPCommandListenerThread(0)
 {}
 
 void
@@ -82,9 +77,10 @@ WatchDog::arm() {
             _myProjectors[i]->powerUp();
         }
 
-        cerr << "Watchdog - Setting projector input" << endl;
-        for (unsigned i = 0; i < _myProjectorInput.size(); ++i) {
-            _myProjectors[i]->selectInput(_myProjectorInput[i]);
+        cerr << "Watchdog - Setting all projectors' inputs" << endl;
+        for (unsigned i = 0; i < _myProjectors.size(); ++i) {
+            // set projector's input to the configured one
+            _myProjectors[i]->selectInput();
         }
     }
 
@@ -100,19 +96,10 @@ WatchDog::arm() {
 bool
 WatchDog::watch() {
     try {
-        // Setup udp halt lister
-        UDPHaltListenerThread myUDPHaltListenerThread(_myProjectors, _myPort,
-                                                      _myAppToWatch,
-                                                      _myPowerDownProjectors,
-                                                      _myShutterCloseProjectors,
-                                                      _mySystemHaltCommand,
-                                                      _mySystemRebootCommand,
-                                                      _myRestartAppCommand,
-                                                      _myStopAppCommand,
-                                                      _myStartAppCommand);
-        if (_myEnableUDP) {
-            cerr << "Watchdog - Starting udp halt listener thread" << endl;
-            myUDPHaltListenerThread.fork();
+        // Run UDP command listener thread
+        if (_myUDPCommandListenerThread) {
+            cerr << "Watchdog - Starting udp command listener thread" << endl;
+            _myUDPCommandListenerThread->fork();
             asl::msleep(100);
         }
 
@@ -148,7 +135,7 @@ WatchDog::watch() {
                 _myAppToWatch.checkHeartbeat();
                 _myAppToWatch.checkState();
                 myRestarted = _myAppToWatch.checkForRestart();
-
+                
                 // system halt & reboot
                 checkForHalt();
                 checkForReboot();
@@ -247,121 +234,57 @@ WatchDog::init(dom::Document & theConfigDoc) {
                 char myTmpBuf[128];
                 strftime(myTmpBuf, sizeof(myTmpBuf), "%Y_%m_%d_%H_%M", today);
                 _myLogFilename = _myLogFilename.substr(0, myDotPos) + "_" + myTmpBuf + _myLogFilename.substr(myDotPos, _myLogFilename.size());
-                DB(cout <<"_myLogFilename: " << _myLogFilename<<endl;)
+                AC_DEBUG <<"_myLogFilename: " << _myLogFilename;
                 _myLogger.openLogFile(_myLogFilename);
             }
 
             // Setup watch frequency
             {
                 _myWatchFrequency = asl::as<int>(myConfigNode->getAttribute("watchFrequency")->nodeValue());
-                DB(cout << "_myWatchFrequency: " << _myWatchFrequency << endl;)
+                AC_DEBUG << "_myWatchFrequency: " << _myWatchFrequency ;
                 if (_myWatchFrequency < 1){
                     cerr <<"### ERROR: WatchFrequency must have a value greater then 0 sec." << endl;
                     return false;
                 }
             }
 
-            // Setup power down
+            // Setup UDP control
             if (myConfigNode->childNode("UdpControl")) {
-                _myEnableUDP = true;
                 const dom::NodePtr & myUdpControlNode = myConfigNode->childNode("UdpControl");
-                if (myUdpControlNode->getAttribute("port")) {
-                    _myPort = asl::as<int>(myUdpControlNode->getAttribute("port")->nodeValue());
-                    DB(cout <<"_myPort: " << _myPort<<endl;)
-                }
                 // Setup projector control
                 if (myUdpControlNode->childNode("ProjectorControl")) {
-                    const dom::NodePtr & myProjectors = myUdpControlNode->childNode("ProjectorControl");
-                    _myPowerUpProjectorsOnStartup = asl::as<bool>(myProjectors->getAttribute("powerUpOnStartup")->nodeValue());
-                    for (unsigned i = 0; i < myProjectors->childNodesLength(); ++i) {
-                        const dom::NodePtr & myProjectorNode = myProjectors->childNode(i);
-                        if (myProjectorNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                            std::string myType = "";
-                            if (myProjectorNode->getAttribute("type")) {
-                                myType = myProjectorNode->getAttribute("type")->nodeValue();
-                            }
-
-                            if (myProjectorNode->getAttribute("input")) {
-                                   std::string myInput = myProjectorNode->getAttribute("input")->nodeValue();
-                                //FIXME: If one projector in the chain doesn't have an input specified,
-                                //       the vector is messed up
-                                _myProjectorInput.push_back(myInput);
-                            }
-
-                            int myPort = -1;
-                            if (myProjectorNode->getAttribute("port")) {
-                                myPort = asl::as<int>(myProjectorNode->getAttribute("port")->nodeValue());
-                            }
-
-                            if (myPort != -1) {
-                                Projector* myProjector = Projector::getProjector(myType, myPort);
-                                myProjector->setLogger(&_myLogger);
-                                myProjector->configure(myProjectorNode);
-                                _myProjectors.push_back(myProjector);
-                            }
+                    const dom::NodePtr & myProjectorsNode = myUdpControlNode->childNode("ProjectorControl");
+                    _myPowerUpProjectorsOnStartup = asl::as<bool>(myProjectorsNode->getAttribute("powerUpOnStartup")->nodeValue());
+                    for (unsigned i = 0; i < myProjectorsNode->childNodesLength(); ++i) {
+                        Projector* myProjector = Projector::getProjector(myProjectorsNode->childNode(i), &_myLogger);
+                        if (myProjector) {
+                            _myProjectors.push_back(myProjector);
                         }
                     }
-                    DB(cout <<"Found " << _myProjectors.size() << " projectors" << endl;)
+                    AC_DEBUG <<"Found " << _myProjectors.size() << " projectors";
                 }
-
-
-
-                // check for system halt command configuration
-                if (myUdpControlNode->childNode("SystemHalt")) {
-                    const dom::NodePtr & mySystemHaltNode = myUdpControlNode->childNode("SystemHalt");
-                    _myPowerDownProjectors  = asl::as<bool>(mySystemHaltNode->getAttribute("powerDownProjectors")->nodeValue());
-                    _mySystemHaltCommand = mySystemHaltNode->getAttributeString("command");
-                    DB(cout <<"_mySystemHaltCommand: " << _mySystemHaltCommand<<endl;)
-                    DB(cout <<"_myEnableUDP: " << _myEnableUDP<<endl;)
-                    DB(cout <<"_myPowerDownProjectors: " << _myPowerDownProjectors<<endl;)
-                }
-                // check for system reboot command configuration
-                if (myUdpControlNode->childNode("SystemReboot")) {
-                    const dom::NodePtr & mySystemHaltNode = myUdpControlNode->childNode("SystemReboot");
-                    _myPowerDownProjectors  = asl::as<bool>(mySystemHaltNode->getAttribute("powerDownProjectors")->nodeValue());
-                    _mySystemRebootCommand = mySystemHaltNode->getAttributeString("command");
-                    DB(cout <<"_mySystemRebootCommand: " << _mySystemRebootCommand<<endl;)
-                    DB(cout <<"_myEnableUDP: " << _myEnableUDP<<endl;)
-                    DB(cout <<"_myPowerDownProjectors: " << _myPowerDownProjectors<<endl;)
-                }
-                // check for application restart command configuration
-                if (myUdpControlNode->childNode("RestartApplication")) {
-                    const dom::NodePtr & myRestartAppNode = myUdpControlNode->childNode("RestartApplication");
-                    _myRestartAppCommand = myRestartAppNode->getAttributeString("command");
-                    DB(cout <<"_myRestartAppCommand: " << _myRestartAppCommand<<endl;)
-                }
-                // check for application stop command configuration
-                if (myUdpControlNode->childNode("StopApplication")) {
-                    const dom::NodePtr & myStopAppNode = myUdpControlNode->childNode("StopApplication");
-                    _myShutterCloseProjectors  = asl::as<bool>(myStopAppNode->getAttribute("shutterCloseProjectors")->nodeValue());
-                    _myStopAppCommand = myStopAppNode->getAttributeString("command");
-                    DB(cout <<"_myStopAppCommand: " << _myStopAppCommand<<endl;)
-                }
-                // check for application start command configuration
-                if (myUdpControlNode->childNode("StartApplication")) {
-                    const dom::NodePtr & myStartAppNode = myUdpControlNode->childNode("StartApplication");
-                    _myStartAppCommand = myStartAppNode->getAttributeString("command");
-                    DB(cout <<"_myStartAppCommand: " << _myStartAppCommand<<endl;)
-                }
+                
+                _myUDPCommandListenerThread = new UDPCommandListenerThread(_myProjectors, _myAppToWatch, myUdpControlNode);
             }
 
-                // check for system reboot time command configuration
+            // check for system reboot time command configuration
             if (myConfigNode->childNode("RebootTime")) {
                 std::string myRebootTime = (*myConfigNode->childNode("RebootTime"))("#text").nodeValue();
                 std::string myHours = myRebootTime.substr(0, myRebootTime.find_first_of(':'));
                 std::string myMinutes = myRebootTime.substr(myRebootTime.find_first_of(':')+1, myRebootTime.length());
                 _myRebootTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
                 _myRebootTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
-                DB(cout <<"_myRebootTimeInSecondsToday : " << _myRebootTimeInSecondsToday<< endl;)
+                AC_DEBUG <<"_myRebootTimeInSecondsToday : " << _myRebootTimeInSecondsToday;
             }
 
+            // check for system halt time command configuration
             if (myConfigNode->childNode("HaltTime")) {
                 std::string myHaltTime = (*myConfigNode->childNode("HaltTime"))("#text").nodeValue();
                 std::string myHours = myHaltTime.substr(0, myHaltTime.find_first_of(':'));
                 std::string myMinutes = myHaltTime.substr(myHaltTime.find_first_of(':')+1, myHaltTime.length());
                 _myHaltTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
                 _myHaltTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
-                DB(cout <<"_myHaltTimeInSecondsToday : " << _myHaltTimeInSecondsToday<< endl;)
+                AC_DEBUG <<"_myHaltTimeInSecondsToday : " << _myHaltTimeInSecondsToday;
             }
 
             // Setup application
@@ -391,7 +314,7 @@ printUsage() {
 
 void
 readConfigFile(dom::Document & theConfigDoc,  std::string theFileName) {
-    DB(cout << "Loading configuration data..." << endl;)
+    AC_DEBUG << "Loading configuration data..." ;
     std::string myFileStr = asl::getWholeFile(theFileName);
     if (myFileStr.empty()) {
         cerr << "Watchdog::readConfigFile: Can't open configuration file "

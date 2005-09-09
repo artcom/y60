@@ -37,7 +37,7 @@ public:
         unsigned long inHostAddress = getHostAddress("localhost");
 
         try {
-            myUDPClient.sendTo(inHostAddress, serverPort, "halt",5);
+            myUDPClient.sendTo(inHostAddress, serverPort, "halt", 5);
             SUCCESS("sent UDP packet");
         } catch (SocketException & se) {
             cerr << se.what() << endl;

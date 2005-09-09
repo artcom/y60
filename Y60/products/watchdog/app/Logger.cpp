@@ -23,7 +23,6 @@
 
 #include <time.h>
 #include <iostream>
-#define DB(x) // x
 
 using namespace std;
 

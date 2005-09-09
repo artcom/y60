@@ -28,7 +28,6 @@
 #include <asl/Exception.h>
 #include <dom/Nodes.h>
 
-
 Projector* Projector::getProjector(const std::string& theType, int thePortNum)
 {
     Projector* projector = 0;
@@ -49,10 +48,51 @@ Projector* Projector::getProjector(const std::string& theType, int thePortNum)
     return projector;
 }
 
+Projector* Projector::getProjector(const dom::NodePtr & theProjectorNode, Logger* theLogger)
+{
+    Projector*  projector = 0;
+    std::string myType  = "";
+    int         myPort = -1;
+
+    if (theProjectorNode->nodeType() == dom::Node::ELEMENT_NODE) {
+        if (theProjectorNode->getAttribute("type")) {
+            myType = theProjectorNode->getAttribute("type")->nodeValue();
+        }
+
+        if (theProjectorNode->getAttribute("port")) {
+            myPort = asl::as<int>(theProjectorNode->getAttribute("port")->nodeValue());
+        }
+
+        if (myPort != -1) {
+            if (myType.size() == 0 || myType == "nec") {
+                projector = new NecProjector(myPort);
+            }
+            else if (myType == "pdf1") {
+                projector = new PdF1Projector(myPort);
+            }
+            else if (myType == "panasonic" || myType == "pt-d5500") {
+                projector = new PanasonicProjector(myPort);
+            }
+            else {
+                throw asl::Exception(std::string("Unknown projector type: ") + myType);
+            }
+            projector->setLogger(theLogger);
+            projector->configure(theProjectorNode);
+        }
+    }
+
+    return projector;
+}
+
 void
 Projector::configure(const dom::NodePtr & theConfigNode)
 {
     std::cerr << "Projector::configure " << *theConfigNode << std::endl;
+    
+    if (theConfigNode->getAttribute("input")) {
+        _myInitialInputSource = getEnumFromString(theConfigNode->getAttribute("input")->nodeValue());
+        AC_DEBUG << "_myInitialInputSource: " << getStringFromEnum(_myInitialInputSource) << std::endl;
+    }
 }
 
 void
@@ -110,7 +150,9 @@ Projector::command(const std::string & theCommand)
 /*
  * Private
  */
-Projector::Projector(int thePortNum) : _mySerialDevice(0), _myLogger(0), _myCommandEnable(true)
+Projector::Projector(int thePortNum) :
+    _mySerialDevice(0), _myLogger(0), _myCommandEnable(true),
+    _myInitialInputSource(NONE)
 {
     if (thePortNum != -1) {
         _mySerialDevice = asl::getSerialDevice(thePortNum);
@@ -132,7 +174,7 @@ Projector::~Projector()
 
 
 Projector::VideoSource
-Projector::getEnumFromString(const std::string& theSource) const
+Projector::getEnumFromString(const std::string& theSource)
 {
     if (theSource == "RGB_1") {
         return RGB_1;
@@ -153,4 +195,28 @@ Projector::getEnumFromString(const std::string& theSource) const
         return VIEWER;
     }
     return NONE;
+}
+
+std::string
+Projector::getStringFromEnum(const Projector::VideoSource theSource)
+{
+    if (theSource == RGB_1) {
+        return "RGB_1";
+    }
+    if (theSource == RGB_2) {
+        return "RGB_2";
+    }
+    if (theSource == VIDEO) {
+        return "VIDEO";
+    }
+    if (theSource == SVIDEO) {
+        return "SVIDEO";
+    }
+    if (theSource == DVI) {
+        return "DVI";
+    }
+    if (theSource == VIEWER) {
+        return "VIEWER";
+    }
+    return "NONE";
 }

@@ -32,8 +32,6 @@
 
 #include <Tlhelp32.h>
 
-#define DB(x) //x
-
 using namespace std;  // Manually included.
 using namespace dom;  // Manually included.
 
@@ -71,8 +69,8 @@ Application::setupEnvironment(const NodePtr & theEnvironmentSettings) {
             string myEnviromentVariable = myEnvNode->getAttributeString("name");
             if (myEnviromentVariable.size()>0 && myEnvNode->childNodesLength() == 1) {
                 string myEnvironmentValue = myEnvNode->firstChild()->nodeValue();
-                DB(cout <<"Environment variable : "<<myEnvNr << ": " << myEnviromentVariable 
-                        << " -> " << myEnvironmentValue << endl;)
+                AC_DEBUG <<"Environment variable : "<<myEnvNr << ": " << myEnviromentVariable 
+                        << " -> " << myEnvironmentValue ;
                 _myEnvironmentVariables.push_back(EnvironmentSetting(myEnviromentVariable, myEnvironmentValue));
             }
         }
@@ -84,7 +82,7 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
     if (theAppNode->getAttribute("windowtitle")) {
         _myWindowTitle = theAppNode->getAttribute("windowtitle")->nodeValue();
     }
-    DB(cout <<"_myFileName: " << _myFileName<<endl;)
+    AC_DEBUG <<"_myFileName: " << _myFileName;
     if (_myFileName.empty()){
         cerr <<"### ERROR, no application binary to watch." << endl;
         return false;
@@ -101,7 +99,7 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
                 _myArguments += " ";
             }
             _myArguments = asl::expandEnvironment(_myArguments);
-            DB(cout <<"Argument : "<<myArgumentNr << ": " << _myArguments << endl;)
+            AC_DEBUG <<"Argument : "<<myArgumentNr << ": " << _myArguments ;
         }
     }
     if (theAppNode->childNode("RestartDay")) {
@@ -109,7 +107,7 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
         _myRestartDay = (*theAppNode->childNode("RestartDay"))("#text").nodeValue();
         _myRestartMode |= RESTARTDAY;
         std::transform(_myRestartDay.begin(), _myRestartDay.end(), _myRestartDay.begin(), toupper);
-        DB(cout <<"_myRestartDay : " << _myRestartDay<< endl;)
+        AC_DEBUG <<"_myRestartDay : " << _myRestartDay;
     }
     if (theAppNode->childNode("RestartTime")) {
         _myRestartCheck = true;
@@ -119,7 +117,7 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
         _myRestartTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
         _myRestartTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
         _myRestartMode |= RESTARTTIME;
-        DB(cout <<"_myRestartTimeInSecondsToday : " << _myRestartTimeInSecondsToday<< endl;)
+        AC_DEBUG <<"_myRestartTimeInSecondsToday : " << _myRestartTimeInSecondsToday;
     }
     if (theAppNode->childNode("CheckMemoryTime")) {
         _myRestartCheck = true;
@@ -129,42 +127,42 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
         _myCheckMemoryTimeInSecondsToday = atoi(myHours.c_str()) * 3600;
         _myCheckMemoryTimeInSecondsToday += atoi(myMinutes.c_str()) * 60;
         _myRestartMode |= CHECKMEMORYTIME;
-        DB(cout <<"_myCheckMemoryTimeInSecondsToday : " << _myCheckMemoryTimeInSecondsToday<< endl;)
+        AC_DEBUG <<"_myCheckMemoryTimeInSecondsToday : " << _myCheckMemoryTimeInSecondsToday;
     }
     if (theAppNode->childNode("CheckTimedMemoryThreshold")) {
         _myRestartCheck = true;
         _myMemoryThresholdTimed = asl::as<int>((*theAppNode->childNode("CheckTimedMemoryThreshold"))("#text").nodeValue());
         _myRestartMode |= CHECKTIMEDMEMORYTHRESHOLD;
-        DB(cout <<"_myMemoryThresholdTimed : " << _myMemoryThresholdTimed<< endl;)
+        AC_DEBUG <<"_myMemoryThresholdTimed : " << _myMemoryThresholdTimed;
     }
     if (theAppNode->childNode("Memory_Threshold")) {
         _myRestartCheck = true;
         _myRestartMemoryThreshold = asl::as<int>((*theAppNode->childNode("Memory_Threshold"))("#text").nodeValue());
         _myRestartMode |= MEMTHRESHOLD;
-        DB(cout <<"_myRestartMemoryThreshold : " << _myRestartMemoryThreshold<< endl;)
+        AC_DEBUG <<"_myRestartMemoryThreshold : " << _myRestartMemoryThreshold;
     }
     if (theAppNode->childNode("WaitDuringStartup")) {
         _myStartDelay = asl::as<unsigned>((*theAppNode->childNode("WaitDuringStartup"))("#text").nodeValue());
-        DB(cout <<"_myStartDelay: " << _myStartDelay << endl;)
+        AC_DEBUG <<"_myStartDelay: " << _myStartDelay ;
     }
     if (theAppNode->childNode("WaitDuringRestart")) {
         _myRestartDelay = asl::as<unsigned>((*theAppNode->childNode("WaitDuringRestart"))("#text").nodeValue());
-        DB(cout <<"_myRestartDelay: " << _myRestartDelay << endl;)
+        AC_DEBUG <<"_myRestartDelay: " << _myRestartDelay ;
     }
 
     if (theAppNode->childNode("Heartbeat")) {
         const dom::NodePtr & myHeartbeatNode = theAppNode->childNode("Heartbeat");
         if (myHeartbeatNode->childNode("Heartbeat_File")) {
             _myHeartbeatFile = asl::expandEnvironment((*myHeartbeatNode->childNode("Heartbeat_File"))("#text").nodeValue());
-            DB(cout <<"_myHeartbeatFile : " << _myHeartbeatFile << endl;)
+            AC_DEBUG <<"_myHeartbeatFile : " << _myHeartbeatFile ;
         }
         if (myHeartbeatNode->childNode("Allow_Missing_Heartbeats")) {
             _myAllowMissingHeartbeats = asl::as<int>((*myHeartbeatNode->childNode("Allow_Missing_Heartbeats"))("#text").nodeValue());
-            DB(cout <<"_myAllowMissingHeartbeats : " << _myAllowMissingHeartbeats << endl;)
+            AC_DEBUG <<"_myAllowMissingHeartbeats : " << _myAllowMissingHeartbeats ;
         }
         if (myHeartbeatNode->childNode("Heartbeat_Frequency")) {
             _myHeartbeatFrequency = asl::as<int>((*myHeartbeatNode->childNode("Heartbeat_Frequency"))("#text").nodeValue());
-            DB(cout <<"_myHeartbeatFrequency : " << _myHeartbeatFrequency << endl;)
+            AC_DEBUG <<"_myHeartbeatFrequency : " << _myHeartbeatFrequency ;
         }
         _myPerformECG = true;
         if ((_myHeartbeatFrequency == 0) || (_myHeartbeatFile.empty())) {
@@ -172,7 +170,7 @@ bool Application::setup(const dom::NodePtr & theAppNode) {
         }
         if (myHeartbeatNode->childNode("FirstHeartBeatDelay")) {
             _myAppStartTimeInSeconds = asl::as<int>((*myHeartbeatNode->childNode("FirstHeartBeatDelay"))("#text").nodeValue());
-            DB(cout <<"_myAppStartTimeInSeconds : " << _myAppStartTimeInSeconds<< endl;)
+            AC_DEBUG <<"_myAppStartTimeInSeconds : " << _myAppStartTimeInSeconds;
         }
     }
     return true;
@@ -321,9 +319,9 @@ Application::checkHeartbeat() {
         _time64( &myCurrentSecondsSince_1_1_1970 );
 
         long long myLastHeartbeatAge =  myCurrentSecondsSince_1_1_1970 - (_atoi64(mySecondsSince1970Str.c_str()) / 1000);
-        DB(cout <<" myCurrentSecondsSince_1_1_1970 : " << myCurrentSecondsSince_1_1_1970 << endl;)
-        DB(cout <<" last heartbeat sec since 1.1.70: "<<  (_atoi64(mySecondsSince1970Str.c_str())/ 1000) << endl;)
-        DB(cout <<" last age : " << myLastHeartbeatAge << endl;)
+        AC_DEBUG <<" myCurrentSecondsSince_1_1_1970 : " << myCurrentSecondsSince_1_1_1970 ;
+        AC_DEBUG <<" last heartbeat sec since 1.1.70: "<<  (_atoi64(mySecondsSince1970Str.c_str())/ 1000) ;
+        AC_DEBUG <<" last age : " << myLastHeartbeatAge ;
         if ( myLastHeartbeatAge > _myHeartbeatFrequency * _myAllowMissingHeartbeats) {
             _myHeartIsBroken = true;
         } else {
@@ -337,7 +335,7 @@ Application::checkHeartbeat() {
 void
 Application::closeAllThreads() {
     // clean up the application: collect all threads and kill em
-    DB(cerr << "clean up the application: collect all threads and kill em " << endl);
+    AC_DEBUG << "clean up the application: collect all threads and kill em ";
     THREADENTRY32  myThreadInfo;
     myThreadInfo.dwSize = sizeof( THREADENTRY32 );
     HANDLE hProcessSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD,0);//TH32CS_SNAPPROCESS, 0 );
@@ -349,7 +347,7 @@ Application::closeAllThreads() {
             do {
                 if( myThreadInfo.th32OwnerProcessID == _myProcessInfo.dwProcessId )    {
                     myThreadNum++;
-                    DB(cerr << "### found a running thread with id:" << myThreadInfo.th32ThreadID << ", terminate..." << endl);
+                    AC_DEBUG << "### found a running thread with id:" << myThreadInfo.th32ThreadID << ", terminate...";
                     HANDLE myChildThreadHandle = OpenThread(THREAD_ALL_ACCESS, FALSE, myThreadInfo.th32ThreadID);
                     CloseHandle(myChildThreadHandle);
                 }

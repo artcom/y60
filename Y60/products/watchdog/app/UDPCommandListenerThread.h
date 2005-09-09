@@ -10,7 +10,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//    $RCSfile: UDPHaltListenerThread.h,v $
+//    $RCSfile: UDPCommandListenerThread.h,v $
 //
 //     $Author: valentin $
 //
@@ -20,30 +20,25 @@
 //
 //============================================================================
 
-#ifndef INCL_UDPHALTLISTENERTHREAD
-#define INCL_UDPHALTLISTENERTHREAD
+#ifndef INCL_UDPCOMMANDLISTENERTHREAD_H
+#define INCL_UDPCOMMANDLISTENERTHREAD_H
 
 
 class Projector;
 
 #include <asl/PosixThread.h>
+#include <dom/Nodes.h>
 
 #include <string>
 #include <vector>
 
 class Application;
-class UDPHaltListenerThread : public PosixThread {
+class UDPCommandListenerThread : public PosixThread {
     public:
-        UDPHaltListenerThread(std::vector<Projector *> theProjectors, int thePort, 
-                              Application & theApplication,
-                              bool thePowerDownProjectorsOnHalt,
-                              bool theShutterCloseProjectorsOnStop,
-                              const std::string & theSystemhaltCommand,
-                              const std::string & theSystemRebootCommand,
-                              const std::string & theRestartAppCommand,
-                              const std::string & theStopAppCommand,
-                              const std::string & theStartAppCommand);
-        virtual ~UDPHaltListenerThread();
+        UDPCommandListenerThread(std::vector<Projector *> theProjectors,
+                                 Application & theApplication,
+                                 const dom::NodePtr & theConfigNode);
+        virtual ~UDPCommandListenerThread();
 
         void setSystemHaltCommand(const std::string & theSystemhaltCommand);
         void setRestartAppCommand(const std::string & theRestartAppCommand);
@@ -58,7 +53,7 @@ class UDPHaltListenerThread : public PosixThread {
         void initiateReboot();
 
         std::vector<Projector*> _myProjectors;
-        int                     _myPort;
+        int                     _myUDPPort;
         Application &           _myApplication;
         bool                    _myPowerDownProjectorsOnHalt;
         bool                    _myShutterCloseProjectorsOnStop;

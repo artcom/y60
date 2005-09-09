@@ -10,7 +10,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//    $RCSfile: UDPHaltListenerThread.cpp,v $
+//    $RCSfile: UDPCommandListenerThread.cpp,v $
 //
 //     $Author: valentin $
 //
@@ -20,7 +20,7 @@
 //
 //============================================================================
 
-#include "UDPHaltListenerThread.h"
+#include "UDPCommandListenerThread.h"
 #include "system_functions.h"
 
 #include "Projector.h"
@@ -41,40 +41,60 @@
 using namespace inet;
 using namespace std;
 
-UDPHaltListenerThread::UDPHaltListenerThread(std::vector<Projector *> theProjectors, int thePort, 
-                                             Application & theApplication,
-                                             bool thePowerDownProjectorsOnHalt,
-                                             bool theShutterCloseProjectorsOnStop,
-                                             const string & theSystemhaltCommand,
-                                             const string & theSystemRebootCommand,
-                                             const string & theRestartAppCommand,
-                                             const string & theStopAppCommand,
-                                             const string & theStartAppCommand):
-    _myProjectors(theProjectors), _myPort(thePort), 
+UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theProjectors,
+                                                   Application & theApplication,
+                                                   const dom::NodePtr & theConfigNode) :
+    _myProjectors(theProjectors),
     _myApplication(theApplication),
-    _myPowerDownProjectorsOnHalt(thePowerDownProjectorsOnHalt),
-    _myShutterCloseProjectorsOnStop(theShutterCloseProjectorsOnStop),
-    _mySystemHaltCommand(theSystemhaltCommand), 
-    _mySystemRebootCommand(theSystemRebootCommand),
-    _myRestartAppCommand(theRestartAppCommand), 
-    _myStopAppCommand(theStopAppCommand), 
-    _myStartAppCommand(theStartAppCommand)
+    _myUDPPort(2342),
+    _myPowerDownProjectorsOnHalt(false),
+    _myShutterCloseProjectorsOnStop(false),
+    _mySystemHaltCommand(""), 
+    _mySystemRebootCommand(""),
+    _myRestartAppCommand(""), 
+    _myStopAppCommand(""), 
+    _myStartAppCommand("")    
 {
-    if (_mySystemHaltCommand == "") {
-        _mySystemHaltCommand = "halt";
+    // check for UDP port
+    if (theConfigNode->getAttribute("port")) {
+        _myUDPPort = asl::as<int>(theConfigNode->getAttribute("port")->nodeValue());
+        AC_DEBUG << "_myPort: " << _myUDPPort;
     }
-    if (_mySystemRebootCommand == "") {
-        _mySystemRebootCommand = "reboot";
+    // check for system halt command configuration
+    if (theConfigNode->childNode("SystemHalt")) {
+        const dom::NodePtr & mySystemHaltNode = theConfigNode->childNode("SystemHalt");
+        _myPowerDownProjectorsOnHalt = asl::as<bool>(mySystemHaltNode->getAttribute("powerDownProjectors")->nodeValue());
+        _mySystemHaltCommand = mySystemHaltNode->getAttributeString("command");
+        AC_DEBUG <<"_mySystemHaltCommand: " << _mySystemHaltCommand;
     }
-    if (_myRestartAppCommand == "") {
-        _myRestartAppCommand = "restart_app";
+    // check for system reboot command configuration
+    if (theConfigNode->childNode("SystemReboot")) {
+        const dom::NodePtr & mySystemHaltNode = theConfigNode->childNode("SystemReboot");
+        _myPowerDownProjectorsOnHalt = asl::as<bool>(mySystemHaltNode->getAttribute("powerDownProjectors")->nodeValue());
+        _mySystemRebootCommand = mySystemHaltNode->getAttributeString("command");
+        AC_DEBUG <<"_mySystemRebootCommand: " << _mySystemRebootCommand;
+        AC_DEBUG <<"_myPowerDownProjectorsOnHalt: " << _myPowerDownProjectorsOnHalt;
     }
-    if (_myStopAppCommand == "") {
-        _myStopAppCommand = "stop_app";
+    // check for application restart command configuration
+    if (theConfigNode->childNode("RestartApplication")) {
+        const dom::NodePtr & myRestartAppNode = theConfigNode->childNode("RestartApplication");
+        _myRestartAppCommand = myRestartAppNode->getAttributeString("command");
+        AC_DEBUG <<"_myRestartAppCommand: " << _myRestartAppCommand;
     }
-    if (_myStartAppCommand == "") {
-        _myStartAppCommand = "start_app";
+    // check for application stop command configuration
+    if (theConfigNode->childNode("StopApplication")) {
+        const dom::NodePtr & myStopAppNode = theConfigNode->childNode("StopApplication");
+        _myShutterCloseProjectorsOnStop = asl::as<bool>(myStopAppNode->getAttribute("shutterCloseProjectors")->nodeValue());
+        _myStopAppCommand = myStopAppNode->getAttributeString("command");
+        AC_DEBUG <<"_myStopAppCommand: " << _myStopAppCommand;
     }
+    // check for application start command configuration
+    if (theConfigNode->childNode("StartApplication")) {
+        const dom::NodePtr & myStartAppNode = theConfigNode->childNode("StartApplication");
+        _myStartAppCommand = myStartAppNode->getAttributeString("command");
+        AC_DEBUG <<"_myStartAppCommand: " << _myStartAppCommand;
+    }
+
     if (_myProjectors.size() > 0 ) {
         cout << "Projectors: " << endl;    
         for (int i = 0; i < _myProjectors.size(); i++) {
@@ -83,36 +103,36 @@ UDPHaltListenerThread::UDPHaltListenerThread(std::vector<Projector *> theProject
     }
 }
 
-UDPHaltListenerThread::~UDPHaltListenerThread() {
+UDPCommandListenerThread::~UDPCommandListenerThread() {
 }
 
 void 
-UDPHaltListenerThread::setSystemHaltCommand(const string & theSystemhaltCommand) {
+UDPCommandListenerThread::setSystemHaltCommand(const string & theSystemhaltCommand) {
     _mySystemHaltCommand = theSystemhaltCommand;
 }
 
 void 
-UDPHaltListenerThread::setRestartAppCommand(const string & theRestartAppCommand) {
+UDPCommandListenerThread::setRestartAppCommand(const string & theRestartAppCommand) {
     _myRestartAppCommand = theRestartAppCommand;
 }
 
 void 
-UDPHaltListenerThread::setStopAppCommand(const string & theStopAppCommand) {
+UDPCommandListenerThread::setStopAppCommand(const string & theStopAppCommand) {
     _myStopAppCommand = theStopAppCommand;
 }
 
 void 
-UDPHaltListenerThread::setStartAppCommand(const string & theStartAppCommand) {
+UDPCommandListenerThread::setStartAppCommand(const string & theStartAppCommand) {
     _myStartAppCommand = theStartAppCommand;
 }
 
 void 
-UDPHaltListenerThread::setSystemRebootCommand(const string & theSystemRebootCommand) {
+UDPCommandListenerThread::setSystemRebootCommand(const string & theSystemRebootCommand) {
     _mySystemRebootCommand = theSystemRebootCommand;
 }
 
 bool 
-UDPHaltListenerThread::controlProjector(const std::string & theCommand)
+UDPCommandListenerThread::controlProjector(const std::string & theCommand)
 {
     if (_myProjectors.size() == 0) {
         cerr << "No projectors configured, ignoring '" << theCommand << "'" << endl;
@@ -128,7 +148,7 @@ UDPHaltListenerThread::controlProjector(const std::string & theCommand)
 }
 
 void
-UDPHaltListenerThread::initiateShutdown() {
+UDPCommandListenerThread::initiateShutdown() {
     
     if (_myPowerDownProjectorsOnHalt) {
         // shutdown all connected projectors
@@ -138,7 +158,7 @@ UDPHaltListenerThread::initiateShutdown() {
 }
 
 void
-UDPHaltListenerThread::initiateReboot() {
+UDPCommandListenerThread::initiateReboot() {
     
     if (_myPowerDownProjectorsOnHalt) {
         // shutdown all connected projectors
@@ -148,9 +168,9 @@ UDPHaltListenerThread::initiateReboot() {
 }
 
 void
-UDPHaltListenerThread::run() {
+UDPCommandListenerThread::run() {
     cout << "Halt listener activated." << endl;
-    cout << "* UDP Listener on port: " << _myPort << endl;
+    cout << "* UDP Listener on port: " << _myUDPPort << endl;
     cout << "* Commands:" << endl;
     cout << "      System Halt  : " << _mySystemHaltCommand << endl;
     cout << "      System Reboot: " << _mySystemRebootCommand << endl;
@@ -161,7 +181,7 @@ UDPHaltListenerThread::run() {
 
     try {
         initSockets();
-        UDPSocket myUDPServer(INADDR_ANY, _myPort);
+        UDPSocket myUDPServer(INADDR_ANY, _myUDPPort);
 
         while (true) {
             char myInputBuffer[2048];

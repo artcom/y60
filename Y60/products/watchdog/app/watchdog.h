@@ -22,6 +22,7 @@
 
 #include "Logger.h"
 #include "Application.h"
+#include "UDPCommandListenerThread.h"
 
 #include <vector>
 #include <string>
@@ -30,8 +31,8 @@
 namespace dom {
     class Document;
 };
-class Projector;
 
+class Projector;
 
 class WatchDog {
 public:
@@ -46,22 +47,11 @@ private:
     int              _myWatchFrequency;
 
     Application      _myAppToWatch;
-    int              _myPort;
 
-    bool             _myPowerDownProjectors;
-    bool             _myShutterCloseProjectors;
-    bool             _myEnableUDP;
-    std::string      _mySystemHaltCommand;   
-    std::string      _myProjectorCommandDown;
-    std::string      _myProjectorCommandUp;
-    std::string      _myRestartAppCommand;
-    std::string      _mySystemRebootCommand;
-    std::string      _myStopAppCommand;
-    std::string      _myStartAppCommand;
+    UDPCommandListenerThread * _myUDPCommandListenerThread;
     
     std::vector<Projector *> _myProjectors;
     bool             _myPowerUpProjectorsOnStartup;
-    std::vector<std::string> _myProjectorInput;
 
     void             dumpWinError(const std::string& theErrorLocation);
     void             checkForReboot();
@@ -70,5 +60,4 @@ private:
     long             _myHaltTimeInSecondsToday;
     
     bool             _myApplicationPaused;
-
 };

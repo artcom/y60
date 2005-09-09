@@ -123,10 +123,10 @@ class Application {
         bool             _myHeartIsBroken;
         long             _myStartTimeInSeconds;
         PROCESS_INFORMATION _myProcessInfo;
-        DWORD               _myProcessResult;
-        std::string         _myLastWeekday;
-        bool                _myDayChanged;
-        Logger &            _myLogger;
+        DWORD            _myProcessResult;
+        std::string      _myLastWeekday;
+        bool             _myDayChanged;
+        Logger &         _myLogger;
         
         unsigned         _myStartDelay;
         unsigned         _myRestartDelay;

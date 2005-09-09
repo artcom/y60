@@ -49,6 +49,7 @@ PanasonicProjector::PanasonicProjector(int thePortNum) : Projector(thePortNum),
 void
 PanasonicProjector::configure(const dom::NodePtr & theConfigNode)
 {
+    Projector::configure(theConfigNode);
     //cerr << "PanasonicProjector::configure " << *theConfigNode << endl;
 
     dom::NodePtr myNode;
@@ -91,7 +92,7 @@ PanasonicProjector::power(bool thePowerFlag)
 void
 PanasonicProjector::selectInput(VideoSource theVideoSource)
 {
-    cerr << "PanasonicProjector::selectInput " << theVideoSource << endl;
+    cerr << "PanasonicProjector::selectInput " << getStringFromEnum(theVideoSource) << endl;
     std::string myParams;
     switch (theVideoSource) {
     case RGB_1:

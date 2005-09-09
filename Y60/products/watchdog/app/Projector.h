@@ -31,8 +31,21 @@ class Logger;
 
 class Projector {
 public:
-    /// Factory.
+    /**
+     * Factory method to get a projector
+     * \note DEPRECATED! Only still used by the tests.
+     * \param theType Type string i.e. nec, panasonic
+     * \param thePort UDP-port
+     * \return 
+     */                            
     static Projector* getProjector(const std::string& theType, int thePort);
+    /**
+     * Factory method to get a projector
+     * \param theProjectorNode XML-Node from the config file
+     * \param theLogger 
+     * \return 
+     */                            
+    static Projector* getProjector(const dom::NodePtr & theProjectorNode, Logger* theLogger);
 
     explicit Projector(int thePortNumber);
     virtual ~Projector();
@@ -55,13 +68,35 @@ public:
     /// Input sources.
     enum VideoSource {
         NONE = 0,
-        RGB_1, RGB_2, VIDEO, SVIDEO, DVI, VIEWER
+        RGB_1,
+        RGB_2,
+        VIDEO,
+        SVIDEO,
+        DVI,
+        VIEWER
     };
+    
+    /**
+     * Select the projector's input source
+     * \param theSource A video source
+     */                  
     void selectInput(const std::string& theSource);
 
+    /**
+     * Set input to initial value
+     */         
+    virtual void selectInput() {
+        if (_myInitialInputSource != NONE) {
+            selectInput(_myInitialInputSource);
+        }
+    };
+    
     virtual void selectInput(VideoSource theSource) = 0;
 
-    /// Lamp mode.
+    /**
+     * Set the lamps mode
+     * \param theLampsMask 
+     */                  
     virtual void lamps(unsigned theLampsMask) {}
 
     /// Lamp power.
@@ -73,11 +108,13 @@ public:
     /// Handle command.
     void setCommandEnable(bool theEnableFlag) { _myCommandEnable = theEnableFlag; }
     bool getCommandEnable() const { return _myCommandEnable; }
-
+    void setInitialInputSource(const VideoSource theInput) { _myInitialInputSource = theInput; }
+    
     virtual bool command(const std::string & theCommand);
 
     /// Projector status update.
     virtual void update() {}
+    
 
 protected:
     std::string _myDescription;
@@ -86,12 +123,14 @@ protected:
         return _mySerialDevice;
     }
 
-    VideoSource getEnumFromString(const std::string& theSource) const;
-
+    VideoSource getEnumFromString(const std::string& theSource);
+    std::string getStringFromEnum(const Projector::VideoSource theSource);
+    
 private:
     asl::SerialDevice * _mySerialDevice;
     Logger *            _myLogger;
     bool                _myCommandEnable;
+    VideoSource         _myInitialInputSource;
 
     //Projector();
 };
