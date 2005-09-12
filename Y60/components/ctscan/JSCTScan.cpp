@@ -387,7 +387,7 @@ resizeVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
                 ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
                         myNewRaster->childNode(0)->nodeValueWrapperPtr());
                 ValuePtr mySourceRaster = myOldRaster->childNode(0)->nodeValueWrapperPtr();
-                myTargetRaster->blit(myXOrigin, myYOrigin, * mySourceRaster); 
+                myTargetRaster->pasteRaster(myXOrigin, myYOrigin, * mySourceRaster); 
                 myRasters->removeChild(myOldRaster);
             }
         }
@@ -493,6 +493,42 @@ copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+copyVoxelVolumeToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    /*
+    try {
+       ensureParamCount(argc, 5);
+
+        dom::NodePtr myMeasurement;
+        convertFrom(cx, argv[0], myMeasurement);
+
+        dom::NodePtr myCanvas;
+        convertFrom(cx, argv[1], myCanvas);
+
+        unsigned mySliceIndex;
+        convertFrom(cx, argv[2], mySliceIndex);
+
+        unsigned mySliceOrientationInt;
+        convertFrom(cx, argv[3], mySliceOrientationInt);
+        CTScan::Orientation myOrientation = static_cast<CTScan::Orientation>( mySliceOrientationInt );
+
+        dom::NodePtr myPaletteNode;
+        convertFrom(cx, argv[4], myPaletteNode);
+
+        std::vector<Vector3i> myPalette(255, Vector3i( -1, -1, -1));
+        unsigned myIndex;
+        Vector3i myColor;
+        for (unsigned i = 0; i < myPaletteNode.childNodesLength(); ++i) {
+            myIndex = myPaletteNode.childNode(i).getAttributeValue<unsigned>("index");
+            myColor = myPaletteNode.childNode(i).getAttributeValue<Vector3i>("color");
+            myPalette[myIndex] = myColor;
+        }
+
+        
+    } HANDLE_CPP_EXCEPTION;
+    */
+    return JS_FALSE;
+}
 
 static JSBool
 create3DTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
