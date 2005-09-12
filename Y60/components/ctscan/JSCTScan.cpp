@@ -466,7 +466,7 @@ copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
                             myFloatPixel = myCanvas->getPixel(x, y);
                             myPixel = Vector3i(int( myFloatPixel[0]), int( myFloatPixel[1]), int( myFloatPixel[2]));
                             // XXX: argh! map.find() in inner loop... any ideas? [DS]
-                            std::map<Vector3i, unsigned char>::iterator myIt = myColorMap.find(myPixel);
+                            ColorMap::iterator myIt = myColorMap.find(myPixel);
                             if (myIt == myColorMap.end()) {
                                 throw asl::Exception("Unknown color in canvas image", PLUS_FILE_LINE);
                             }
