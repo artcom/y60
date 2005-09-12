@@ -38,6 +38,7 @@
 using namespace std;
 using namespace asl;
 using namespace y60;
+using namespace dom;
 
 #define DB(x) // x
 #define SEGBITMAP_TEST
@@ -353,7 +354,7 @@ resizeVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
             return JS_TRUE;
         }
         
-        const Vector3f & mySize = myNewBox.getSize() + Vector3f(1.0, 1.0, 1.0);
+        const Vector3f & mySize = myNewBox.getSize();
 
         int myTargetWidth  = int( mySize[0] );
         int myTargetHeight = int( mySize[1] );
@@ -369,6 +370,11 @@ resizeVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
         dom::NodePtr myRasters = myVoxelVolume->childNode("rasters");
         dom::NodePtr myOldRaster;
         dom::NodePtr myNewRaster;
+
+        unsigned myXOrigin = unsigned( myOldBox[Box3f::MIN][0] - myNewBox[Box3f::MIN][0]);
+        unsigned myYOrigin = unsigned( myOldBox[Box3f::MIN][1] - myNewBox[Box3f::MIN][1]);
+        AC_INFO << "blitting to " << myXOrigin << "x" << myYOrigin;
+
         for(int i = myNewBoxBegin;i < myNewBoxEnd; ++i) {
             if (i >= myOldBoxBegin && i < myOldBoxEnd) {
                 myOldRaster = myRasters->childNode(0);
@@ -378,13 +384,110 @@ resizeVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
             }
             myNewRaster = CTScan::createGrayImage(myRasters, myTargetWidth, myTargetHeight, 0);
             if (i >= myOldBoxBegin && i < myOldBoxEnd) {
-                // TODO copy from old to new ...
+                ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
+                        myNewRaster->childNode(0)->nodeValueWrapperPtr());
+                ValuePtr mySourceRaster = myOldRaster->childNode(0)->nodeValueWrapperPtr();
+                myTargetRaster->blit(myXOrigin, myYOrigin, * mySourceRaster); 
                 myRasters->removeChild(myOldRaster);
             }
         }
 
         myVoxelVolume->getAttribute("boundingbox")->nodeValueAssign(myNewBox);
 
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+struct Vector3iCmp {
+    bool operator() (const Vector3i & a, const Vector3i & b) const {
+            return a[0] < b[0] || a[1] < b[1] || a[2] < b[2];
+    }
+};
+
+typedef std::map<Vector3i, unsigned char, Vector3iCmp> ColorMap;
+
+static JSBool
+copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        ensureParamCount(argc, 4);
+
+        dom::NodePtr myMeasurement;
+        convertFrom(cx, argv[0], myMeasurement);
+
+        dom::NodePtr myCanvasImage;
+        convertFrom(cx, argv[1], myCanvasImage);
+
+        Box3f myDirtyBox;
+        convertFrom(cx, argv[2], myDirtyBox);
+        
+        int mySliceOrientationInt;
+        convertFrom(cx, argv[3], mySliceOrientationInt);
+        CTScan::Orientation myOrientation = static_cast<CTScan::Orientation>( mySliceOrientationInt );
+
+        dom::NodePtr myPaletteNode;
+        convertFrom(cx, argv[4], myPaletteNode);
+
+       
+        ColorMap myColorMap;
+        Vector3i myColor;
+        unsigned char myIndex;
+        for (unsigned i = 0; i < myPaletteNode->childNodesLength(); ++i) {
+            dom::NodePtr myItem = myPaletteNode->childNode(i);
+            myColor = myItem->getAttributeValue<Vector3i>("color");
+            myIndex = (unsigned char)(myItem->getAttributeValue<int>("index"));
+            myColorMap[myColor] = myIndex;
+        }
+        
+        ResizeableRasterPtr myCanvas = dynamic_cast_Ptr<ResizeableRaster>(
+                    myCanvasImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
+        
+        Box3f myMeasurementBox = myMeasurement->getAttributeValue<Box3f>("boundingbox");
+        
+        switch (myOrientation) {
+            case CTScan::IDENTITY:
+                {
+                    Vector4f myFloatPixel;
+                    Vector3i myPixel;
+                    unsigned myAffectedSlice = unsigned( myDirtyBox[Box3f::MIN][2] - myMeasurementBox[Box3f::MIN][2]);
+                    unsigned myXStart = unsigned(myDirtyBox[Box3f::MIN][0]);
+                    unsigned myXEnd   = unsigned(myDirtyBox[Box3f::MAX][0]);
+                    unsigned myYStart = unsigned(myDirtyBox[Box3f::MIN][1]);
+                    unsigned myYEnd   = unsigned(myDirtyBox[Box3f::MAX][1]);
+                    cerr << "affected slice = " << myAffectedSlice << endl;
+                    dom::NodePtr myRasterNode = myMeasurement->childNode("rasters")->childNode(myAffectedSlice);
+                    if ( ! myRasterNode) {
+                        throw asl::Exception("Failed to get affected raster.");
+                    }
+                    ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
+                            myRasterNode->childNode(0)->nodeValueWrapperPtr());
+
+                    for (unsigned y = myYStart; y < myYEnd; ++y) {
+                        for (unsigned x = myXStart; x < myXEnd; ++x) {
+                            myFloatPixel = myCanvas->getPixel(x, y);
+                            myPixel = Vector3i(int( myFloatPixel[0]), int( myFloatPixel[1]), int( myFloatPixel[2]));
+                            // XXX: argh! map.find() in inner loop... any ideas? [DS]
+                            std::map<Vector3i, unsigned char>::iterator myIt = myColorMap.find(myPixel);
+                            if (myIt == myColorMap.end()) {
+                                throw asl::Exception("Unknown color in canvas image", PLUS_FILE_LINE);
+                            }
+                            //cerr << int(myIt->second) << " ";
+                            float myValue = float( myIt->second);
+                            myTargetRaster->setPixel( x - myXStart, y - myYStart, myValue, myValue, myValue, myValue);
+                        }
+                        //cerr << endl;
+                    }
+                }
+                break;
+            case CTScan::Y2Z:
+                AC_WARNING << "copyCanvasToVoxelVolume() Y2Z not implemented.";
+                break;
+            case CTScan::X2Z:
+                AC_WARNING << "copyCanvasToVoxelVolume() X2Z not implemented.";
+                break;
+            default:
+                break;
+
+        }
         
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -440,9 +543,10 @@ JSFunctionSpec *
 JSCTScan::StaticFunctions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
-        {"createRGBAImage",   createRGBAImage,      4},
-        {"createGrayImage",   createGrayImage,      4},
-        {"resizeVoxelVolume", resizeVoxelVolume,    2},
+        {"createRGBAImage",         createRGBAImage,         4},
+        {"createGrayImage",         createGrayImage,         4},
+        {"resizeVoxelVolume",       resizeVoxelVolume,       2},
+        {"copyCanvasToVoxelVolume", copyCanvasToVoxelVolume, 4},
         {0}
     };
     return myFunctions;
