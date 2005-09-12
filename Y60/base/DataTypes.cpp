@@ -64,6 +64,7 @@ namespace y60 {
 		theFactory.registerPrototype("Vector2f", dom::ValuePtr(new dom::VectorValue<asl::Vector2f>(asl::Vector2f(0.0,0.0),0)));
 		theFactory.registerPrototype("Vector2d", dom::ValuePtr(new dom::VectorValue<asl::Vector2d>(asl::Vector2d(0.0,0.0),0)));
 
+		theFactory.registerPrototype("Vector3i", dom::ValuePtr(new dom::VectorValue<asl::Vector3i>(asl::Vector3i(0,0,0),0)));
 		theFactory.registerPrototype("Vector3f", dom::ValuePtr(new dom::VectorValue<asl::Vector3f>(asl::Vector3f(0,0,0),0)));
 		theFactory.registerPrototype("Vector3d", dom::ValuePtr(new dom::VectorValue<asl::Vector3d>(asl::Vector3d(0,0,0),0)));
 
