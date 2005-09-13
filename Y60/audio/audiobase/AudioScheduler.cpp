@@ -228,6 +228,15 @@ void AudioScheduler::process() {
         _myRunnable.pop_front();
     }
     _curSample += AudioBuffer::getNumSamples();
+
+    /* DK testing unhandled exception
+    static int i = 0;
+    if (++i == 99) {
+        int *ptr = 0;
+        AC_ERROR << " causing null ptr exceptzio...should exit";
+        *ptr = i;
+    }
+    */
 }
 
 void
@@ -284,16 +293,20 @@ AudioScheduler::run() {
         while(_myRunning) {
             process();
         }
+    
     } catch (const asl::Exception & e) {
-        AC_ERROR << "AudioScheduler::run: Unhandled exception.";
         AC_ERROR << e;
+        AC_ERROR << "AudioScheduler::run: Unhandled exception. NEWNEWNEW exiting!!!";
         dumpState();
+        exit(-7);
     } catch (...) {
         try {
-            AC_ERROR << "AudioScheduler::run: Unhandled exception.";
+            AC_ERROR << "AudioScheduler::run: Unhandled unknown exception. exiting!!!";
             dumpState();
+            exit(-8);
         } catch (...) {
-            AC_ERROR << "AudioScheduler::run: Exception during exception handling.";
+            AC_ERROR << "AudioScheduler::run: Exception during exception handling. exiting!!!";
+            exit(-9);
         }
     }
 }
