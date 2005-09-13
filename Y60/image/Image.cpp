@@ -145,8 +145,12 @@ namespace y60 {
         set<ImageHeightTag>(theNewHeight);
         set<ImageDepthTag>(theNewDepth);
         set<ImagePixelFormatTag>(getStringFromEnum(theEncoding, PixelEncodingString));
+        
         set<ImageBytesPerPixelTag>(float(getBytesRequired(4, theEncoding))/4.0f);
         createRaster(theEncoding);
+
+        //update applied members
+        _myAppliedPixelFormat  = get<ImagePixelFormatTag>();
     }
 
     void
@@ -273,19 +277,8 @@ namespace y60 {
 
     bool
     Image::reloadRequired() const {
-		/*	want to check what condition the condition is in ? 	Ask theDude or try this
-		bool b1 = getRasterValue();
-		bool b2 = getRasterPtr();
-		bool b3 = getRasterPtr()->pixels().size();
-		const string s1 = get<ImageSourceTag>();
-		bool b4 = _myLoadedFilename != get<ImageSourceTag>();
-		bool b5 = _myAppliedFilterParams != get<ImageFilterParamsTag>();
-		bool b6 = _myAppliedColorScale != get<ImageColorScaleTag>();
-		bool b7 =_myAppliedColorBias != get<ImageColorBiasTag>();
-		bool b8 =getGraphicsId() == 0; 
-		*/
 
-        return (!getRasterValue() ||
+        bool myReloadRequired = (!getRasterValue() ||
                 !getRasterPtr() ||
                 !getRasterPtr()->pixels().size() ||
                 _myLoadedFilename != get<ImageSourceTag>() ||
@@ -296,6 +289,43 @@ namespace y60 {
                 _myAppliedPixelFormat != get<ImagePixelFormatTag>() ||
                 _myAppliedInternalFormat != get<ImageInternalFormatTag>()
         );
+
+		/*
+         * want to check what condition the condition is in ? 	
+         *	Ask theDude or try this:
+         
+if (myReloadRequired) {
+
+		bool b1 = getRasterValue();
+		bool b2 = getRasterPtr();
+		bool b3 = getRasterPtr() && getRasterPtr()->pixels().size();
+		const string s1 = get<ImageSourceTag>();
+		bool b4 = _myLoadedFilename != get<ImageSourceTag>();
+		bool b5 = _myAppliedFilterParams != get<ImageFilterParamsTag>();
+		bool b6 = _myAppliedColorScale != get<ImageColorScaleTag>();
+		bool b7 =_myAppliedColorBias != get<ImageColorBiasTag>();
+		bool b8 =getGraphicsId() == 0; 
+        bool b9 = _myAppliedPixelFormat != get<ImagePixelFormatTag>();
+        bool b10= _myAppliedInternalFormat != get<ImageInternalFormatTag>();
+
+        
+        AC_PRINT 
+<< "b1 = " << b1 << " " 
+<< "b2 = " << b2 << " " 
+<< "b3 = " << b3 << " " 
+<< "b4 = " << b4 << " " 
+<< "b5 = " << b5 << " " 
+<< "b6 = " << b6 << " " 
+<< "b7 = " << b7 << " " 
+<< "b8 = " << b8 << " " 
+<< "b9 = " << b9 << " " 
+<< "b10 = " << b10 << " " 
+<< "s1 = " << s1;
+
+}
+        */		
+
+        return myReloadRequired;
     }
 
     bool
