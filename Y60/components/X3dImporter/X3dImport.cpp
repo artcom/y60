@@ -671,18 +671,22 @@ namespace y60 {
                 = myShapeBuilder.getNode()->childNode(y60::PRIMITIVE_LIST_NAME)->childNode(0);
             const y60::VectorOfUnsignedInt & myPositionIndices
                 = myElementNode->childNode("indices")->childNode("#text")->nodeValueRef<y60::VectorOfUnsignedInt>();
-
+            
             for(int i = 0, p = 0;i < myFaceCount; ++i) {
-                asl::Vector3f myNormal
-                    = asl::generateFaceNormal<float>(myPositions[myPositionIndices[p++]],
-                                                     myPositions[myPositionIndices[p++]],
-                                                     myPositions[myPositionIndices[p++]]);
+                const asl::Vector3f & myPositionA(myPositions[myPositionIndices[p++]]);
+                const asl::Vector3f & myPositionB(myPositions[myPositionIndices[p++]]);
+                const asl::Vector3f & myPositionC(myPositions[myPositionIndices[p++]]);
+                
+                // AC_DEBUG << "positions are " << myPositionA << "," << myPositionB << ","  << myPositionC; 
+                asl::Vector3f myNormal(asl::generateFaceNormal<float>(myPositionA, myPositionC, myPositionB));
+                // AC_DEBUG << "added normal #"  << i << " = " << myNormal;
                 myShapeBuilder.appendVertexData(y60::NORMAL_ROLE, myNormal);
 
                 myElementBuilder.appendIndex(y60::NORMALS, i);
                 myElementBuilder.appendIndex(y60::NORMALS, i);
                 myElementBuilder.appendIndex(y60::NORMALS, i);
             }
+            // AC_INFO << *(myShapeBuilder.getNode());
         }
 
         /*
