@@ -74,8 +74,8 @@ namespace asl {
     
     StdOutputRedirector::StdOutputRedirector() : _myOutFile(0), _myMaximumFileSize(0), 
                                                  _myOutputFilename(""), _myStartTime(-1),
-                                                 _myOldArchiveFilename(""), _myRemoveOldArchiveFlag(true),
-                                                 _myLogInOneFileFlag(true), _myFileSizeCheckFrequInSec(10)
+                                                 _myOldArchiveFilename(""), _myRemoveOldArchiveFlag(false),
+                                                 _myLogInOneFileFlag(false), _myFileSizeCheckFrequInSec(10)
     {}
 
     StdOutputRedirector::~StdOutputRedirector()  {
