@@ -16,7 +16,7 @@ for FILE in $FILES; do
     fi
     
     APPLICATION=acxpshellOPT
-    if [ "$DEBUG" == "1" ] ; then
+    if [ "$DEBUG" == "DBG" ] ; then
         mkdir -p o.ANT.${PLATFORM}.DBG/tests
         cd o.ANT.${PLATFORM}.DBG/tests
         APPLICATION=acxpshellDBG

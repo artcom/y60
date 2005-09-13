@@ -85,6 +85,62 @@ static __inline__ int atomic_post_inc(atomic_t *v)
     return result;
 }
 
+inline int atomic_conditional_increment(atomic_t * pw )
+{
+    // int rv = *pw;
+    // if( rv != 0 ) ++*pw;
+    // return rv;
+
+    int rv, tmp;
+
+    __asm__
+    (
+        "movl %0, %%eax\n\t"
+        "0:\n\t"
+        "test %%eax, %%eax\n\t"
+        "je 1f\n\t"
+        "movl %%eax, %2\n\t"
+        "incl %2\n\t"
+        "lock\n\t"
+        "cmpxchgl %2, %0\n\t"
+        "jne 0b\n\t"
+        "1:":
+        "=m"( *pw ), "=&a"( rv ), "=&r"( tmp ): // outputs (%0, %1, %2)
+        "m"( *pw ): // input (%3)
+        "cc" // clobbers
+    );
+
+    return rv;
+}
+
+inline int atomic_conditional_decrement(atomic_t * pw )
+{
+    // int rv = *pw;
+    // if( rv != 0 ) --*pw;
+    // return rv == 1;
+
+    int rv, tmp;
+
+    __asm__
+    (
+        "movl %0, %%eax\n\t"
+        "0:\n\t"
+        "test %%eax, %%eax\n\t"
+        "je 1f\n\t"
+        "movl %%eax, %2\n\t"
+        "decl %2\n\t"
+        "lock\n\t"
+        "cmpxchgl %2, %0\n\t"
+        "jne 0b\n\t"
+        "1:":
+        "=m"( *pw ), "=&a"( rv ), "=&r"( tmp ): // outputs (%0, %1, %2)
+        "m"( *pw ): // input (%3)
+        "cc" // clobbers
+    );
+
+    return rv==1;
+}
+
 static __inline__ int atomic_dec_and_test_SingleProcessor(atomic_t *v)
 {
 	unsigned char c;
@@ -114,6 +170,61 @@ static __inline__ int atomic_post_inc_SingleProcessor(atomic_t *v)
             : "memory" );
     return result;
 }
+
+inline int atomic_conditional_increment_SingleProcessor(atomic_t * pw )
+{
+    // int rv = *pw;
+    // if( rv != 0 ) ++*pw;
+    // return rv;
+
+    int rv, tmp;
+
+    __asm__
+    (
+        "movl %0, %%eax\n\t"
+        "0:\n\t"
+        "test %%eax, %%eax\n\t"
+        "je 1f\n\t"
+        "movl %%eax, %2\n\t"
+        "incl %2\n\t"
+        "cmpxchgl %2, %0\n\t"
+        "jne 0b\n\t"
+        "1:":
+        "=m"( *pw ), "=&a"( rv ), "=&r"( tmp ): // outputs (%0, %1, %2)
+        "m"( *pw ): // input (%3)
+        "cc" // clobbers
+    );
+
+    return rv;
+}
+
+inline int atomic_conditional_decrement_SingleProcessor(atomic_t * pw )
+{
+    // int rv = *pw;
+    // if( rv != 0 ) --*pw;
+    // return rv == 1;
+
+    int rv, tmp;
+
+    __asm__
+    (
+        "movl %0, %%eax\n\t"
+        "0:\n\t"
+        "test %%eax, %%eax\n\t"
+        "je 1f\n\t"
+        "movl %%eax, %2\n\t"
+        "decl %2\n\t"
+        "cmpxchgl %2, %0\n\t"
+        "jne 0b\n\t"
+        "1:":
+        "=m"( *pw ), "=&a"( rv ), "=&r"( tmp ): // outputs (%0, %1, %2)
+        "m"( *pw ): // input (%3)
+        "cc" // clobbers
+    );
+
+    return rv==1;
+}
+
 #endif
 
 #ifdef OSX
@@ -152,11 +263,112 @@ atomic_dec( int *p) {
     return( tmp);
 }
 
+// Taken from boost/detail/sp_counted_base_gcc_ppc.hpp.
+// This hasn't even been compiled, much less tested!
+
+inline long atomic_conditional_increment( long * pw )
+{
+    // if( *pw != 0 ) ++*pw;
+    // return *pw;
+
+    long rv;
+    __asm__
+    (
+        "0:\n\t"
+        "lwarx %1, 0, %2\n\t"
+        "cmpwi %1, 0\n\t"
+        "beq 1f\n\t"
+        "addi %1, %1, 1\n\t"
+        "1:\n\t"
+        "stwcx. %1, 0, %2\n\t"
+        "bne- 0b":
+
+        "=m"( *pw ), "=&b"( rv ):
+        "r"( pw ):
+        "cc"
+    );
+
+    return rv;
+}
+
+inline int __declspec(fastcall) atomic_conditional_decrement(atomic_t * pw )
+{
+    // int rv = *pw;
+    // if( rv != 0 ) --*pw;
+    // return rv == 1;
+
+    int rv, tmp;
+
+    __asm
+    {
+        "movl %0, %%eax\n\t"
+        "0:\n\t"
+        "test %%eax, %%eax\n\t"
+        "je 1f\n\t"
+        "movl %%eax, %2\n\t"
+        "decl %2\n\t"
+        "lock\n\t"
+        "cmpxchgl %2, %0\n\t"
+        "jne 0b\n\t"
+        "1:":
+        "=m"( *pw ), "=&a"( rv ), "=&r"( tmp ): // outputs (%0, %1, %2)
+        "m"( *pw ): // input (%3)
+        "cc" // clobbers
+    };
+
+    return rv!=1;
+}
+
 #endif
 
 #ifdef WIN32
 extern "C" __declspec(dllimport) long __stdcall InterlockedIncrement(long volatile *);
 extern "C" __declspec(dllimport) long __stdcall InterlockedDecrement(long volatile *);
+extern "C" __declspec(dllimport) long __stdcall 
+        InterlockedCompareExchange( long volatile *, long, long );
+        
+inline int atomic_conditional_increment(long volatile * pw )
+{
+    // int rv = *pw;
+    // if( rv != 0 ) ++*pw;
+    // return rv;
+
+    for( ;; ) {
+        long tmp = *pw;
+        if (tmp == 0) {
+            return 0;
+        }
+        if (InterlockedCompareExchange(pw, tmp + 1, tmp) == tmp) {
+            return tmp;
+        }
+    }
+}
+
+inline int atomic_conditional_decrement(long volatile* pw )
+{
+    // int rv = *pw;
+    // if( rv != 0 ) --*pw;
+    // return rv == 1;
+
+    for(;;) {
+        long tmp = *pw;
+        if (tmp == 0) {
+            return 0;
+        }
+        if (InterlockedCompareExchange(pw, tmp-1, tmp) == tmp) {
+            return tmp == 1;
+        }
+    }
+}
+
+inline int atomic_conditional_decrement_SingleProcessor(long volatile* pw) {
+    return atomic_conditional_decrement(pw);
+}
+
+inline int atomic_conditional_increment_SingleProcessor(long volatile* pw) {
+    return atomic_conditional_increment(pw);
+}
+
 #endif
 
 namespace asl
@@ -177,6 +389,21 @@ namespace asl
 	    	void increment() {
                 ++value;
 	    	}
+            inline
+            long conditional_increment() {
+                if (value) {
+                    ++value;
+                }
+                return value;
+            }
+            inline
+            long conditional_decrement() {
+                int oldValue = value;
+                if (value) {
+                    --value;
+                }
+                return oldValue == 1;
+            }
             inline
             long post_increment() {
                 return value++;
@@ -229,6 +456,17 @@ namespace asl
                 atomic_inc( & value);
 #endif
 	    	}
+            
+            inline
+            long conditional_increment() {
+                return atomic_conditional_increment_SingleProcessor(&value);
+            }
+            
+            inline
+            long conditional_decrement() {
+                return atomic_conditional_decrement_SingleProcessor(&value);
+            }
+            
             inline
             long post_increment() {
 #ifdef LINUX
@@ -321,6 +559,16 @@ namespace asl
                	atomic_inc(&value);
 #endif
 	    	}
+
+            inline
+            long conditional_increment() {
+                return atomic_conditional_increment(&value);
+            }
+            
+            inline
+            long conditional_decrement() {
+                return atomic_conditional_decrement(&value);
+            }
 
             inline
             long post_increment() {
