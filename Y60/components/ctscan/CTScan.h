@@ -41,7 +41,7 @@ namespace y60 {
 
 DEFINE_EXCEPTION(CTScanException, asl::Exception);
 
-typedef std::vector<dom::ResizeableRasterPtr> SegmentationBitmap;
+//typedef std::vector<dom::ResizeableRasterPtr> SegmentationBitmap;
 
 class CTScan {
     public:
@@ -116,11 +116,13 @@ class CTScan {
             return reinterpret_cast<const VoxelT *>(_mySlices[theIndex]->pixels().begin());
         }
 
+        /*
         const SegmentationBitmap &
         getStencil() const {
             return _myStencils;
         }
         void appendStencil(dom::NodePtr theImage);
+*/
 
         // everything below this line is deprecated
         bool verifyCompleteness();
@@ -140,7 +142,7 @@ class CTScan {
         
         y60::PixelEncoding _myEncoding;
         std::vector<dom::ResizeableRasterPtr> _mySlices;
-        SegmentationBitmap _myStencils;
+        //SegmentationBitmap _myStencils;
         asl::Vector2f _myDefaultWindow;
         asl::Vector3f _myVoxelSize;
         

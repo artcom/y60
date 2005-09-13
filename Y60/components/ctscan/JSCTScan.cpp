@@ -250,6 +250,7 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
+/*
 static JSBool
 getStencilRaster(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
@@ -281,7 +282,7 @@ appendStencil(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
-
+*/
 static JSBool
 createRGBAImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
@@ -472,7 +473,9 @@ copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
                             }
                             //cerr << int(myIt->second) << " ";
                             float myValue = float( myIt->second);
-                            myTargetRaster->setPixel( x - myXStart, y - myYStart, myValue, myValue, myValue, myValue);
+                            myTargetRaster->setPixel( x - int(myMeasurementBox[Box3f::MIN][0]),
+                                                      y - int(myMeasurementBox[Box3f::MIN][1]),
+                                                      myValue, myValue, myValue, myValue);
                         }
                         //cerr << endl;
                     }
@@ -495,7 +498,6 @@ copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 
 static JSBool
 copyVoxelVolumeToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    /*
     try {
        ensureParamCount(argc, 5);
 
@@ -518,15 +520,53 @@ copyVoxelVolumeToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         std::vector<Vector3i> myPalette(255, Vector3i( -1, -1, -1));
         unsigned myIndex;
         Vector3i myColor;
-        for (unsigned i = 0; i < myPaletteNode.childNodesLength(); ++i) {
-            myIndex = myPaletteNode.childNode(i).getAttributeValue<unsigned>("index");
-            myColor = myPaletteNode.childNode(i).getAttributeValue<Vector3i>("color");
+        for (unsigned i = 0; i < myPaletteNode->childNodesLength(); ++i) {
+            myIndex = myPaletteNode->childNode(i)->getAttributeValue<unsigned>("index");
+            myColor = myPaletteNode->childNode(i)->getAttributeValue<Vector3i>("color");
             myPalette[myIndex] = myColor;
         }
 
+        Box3f myBoundingBox = myMeasurement->getAttributeValue<Box3f>("boundingbox");
+
+        ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>( 
+                    myCanvas->childNode(0)->childNode(0)->nodeValueWrapperPtr());
+
+        switch ( myOrientation) {
+            case CTScan::IDENTITY:
+                //cerr << "index = " << mySliceIndex << " bbox = " << myBoundingBox[Box3f::MIN][2] << endl;
+                if (mySliceIndex >= myBoundingBox[Box3f::MIN][2] && mySliceIndex < myBoundingBox[Box3f::MAX][2]) {
+                    dom::NodePtr myRasterNode = myMeasurement->childNode(0)->childNode(int( mySliceIndex - myBoundingBox[Box3f::MIN][2]));
+                    ResizeableRasterPtr mySourceRaster =
+                            dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
+                    unsigned myXStart = unsigned(myBoundingBox[Box3f::MIN][0]);
+                    unsigned myXEnd = unsigned(myBoundingBox[Box3f::MAX][0]);
+                    unsigned myYStart = unsigned(myBoundingBox[Box3f::MIN][1]);
+                    unsigned myYEnd = unsigned(myBoundingBox[Box3f::MAX][1]);
+                    Vector4f myFloatPixel;
+                    for (unsigned y = myYStart; y < myYEnd; ++y) {
+                        for (unsigned x = myXStart; x < myXEnd; ++x) {
+                            myFloatPixel = mySourceRaster->getPixel(x - myXStart, y - myYStart);
+                            myIndex = (unsigned char)(myFloatPixel[0]);
+                            myColor = myPalette[myIndex];
+                            //cerr << "setPixel x = " << x << " y = " << y << endl;
+                            myTargetRaster->setPixel(x, y, float(myColor[0]), float(myColor[1]), float(myColor[2]),
+                                (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
+                        }
+                    }
+                    //cerr << "done" << endl;
+                }
+                break;
+            case CTScan::Y2Z:
+                AC_WARNING << "copyVoxelVolumeToCanvas() Y2Z not implemented.";
+                break;
+            case CTScan::X2Z:
+                AC_WARNING << "copyVoxelVolumeToCanvas() X2Z not implemented.";
+                break;
+        }
+
+        return JS_TRUE;
         
     } HANDLE_CPP_EXCEPTION;
-    */
     return JS_FALSE;
 }
 
@@ -568,8 +608,8 @@ JSCTScan::Functions() {
         {"countTriangles",       countTriangles,          4},
         {"create3DTexture",      create3DTexture,         2},
         {"computeHistogram",     computeHistogram,        1},
-        {"getStencilRaster",     getStencilRaster,        1},
-        {"appendStencil",        appendStencil,           1},        
+        //{"getStencilRaster",     getStencilRaster,        1},
+        //{"appendStencil",        appendStencil,           1},        
         {0}
     };
     return myFunctions;
@@ -583,6 +623,7 @@ JSCTScan::StaticFunctions() {
         {"createGrayImage",         createGrayImage,         4},
         {"resizeVoxelVolume",       resizeVoxelVolume,       2},
         {"copyCanvasToVoxelVolume", copyCanvasToVoxelVolume, 4},
+        {"copyVoxelVolumeToCanvas", copyVoxelVolumeToCanvas, 5},
         {0}
     };
     return myFunctions;

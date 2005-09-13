@@ -136,6 +136,7 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
     return _mySlices.size();
 }
 
+/*
 void
 CTScan::appendStencil(dom::NodePtr theImage) {
     dom::ResizeableRasterPtr myRaster = theImage->getFacade<Image>()->getRasterPtr();
@@ -167,11 +168,10 @@ CTScan::allocateStencils() {
         }
     }
 }
-
+*/
 int
 CTScan::setSlices(std::vector<dom::ResizeableRasterPtr> theSlices) {
     _mySlices = theSlices;
-    //allocateStencils();
     return _mySlices.size();
 }
 
@@ -265,24 +265,24 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox,
                              bool theCreateNormalsFlag, ScenePtr theScene, 
                              unsigned int theNumVertices, unsigned int theNumTriangles)
 {
+    if (theNumVertices == 0 || theNumTriangles == 0) {
+        // estimation not done yet - force it
+        countMarchingCubes<VoxelT>(theVoxelBox, theThresholdMin, theThresholdMax,theDownSampleRate, theNumVertices, theNumTriangles); 
+    }
+    
     SceneBuilderPtr mySceneBuilder = theScene->getSceneBuilder();
     std::string myMaterialId = setupMaterial( mySceneBuilder, theCreateNormalsFlag);
+    ExportShapePolicy<VoxelT> myVertexStore(mySceneBuilder, "polygonal_shape", myMaterialId,
+                                    theNumVertices, theNumTriangles, theCreateNormalsFlag);
     
     // here we go ...
-    MarchingCubes<VoxelT> myMarcher(theDownSampleRate, mySceneBuilder, this);
+    MarchingCubes<VoxelT, ExportShapePolicy<VoxelT> > myMarcher(theDownSampleRate, myVertexStore, this);
 
     myMarcher.setBox(theVoxelBox);
     myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
-    //myMarcher.setThreshold(VoxelT(theThresholdMax));
-    myMarcher.calcNormals(theCreateNormalsFlag);
-    if (theNumVertices == 0 || theNumTriangles == 0) {
-        myMarcher.estimate();
-    } else {
-        myMarcher.reserveBuffers(theNumVertices, theNumTriangles);
-    }
-    dom::NodePtr myShapeNode = myMarcher.apply("polygonal_shape", myMaterialId);
+    myMarcher.march();
 
-    setupScene(theScene, myShapeNode->getAttributeString("id"));
+    setupScene(theScene, myVertexStore.getShapeNode()->getAttributeString("id"));
     asl::Box3f myBox;
     for (int i = 0; i < 6; ++i) {
         myBox[i/3][i%3] = float(theVoxelBox[i/3][i%3]) * _myVoxelSize[i%3];        
@@ -297,13 +297,17 @@ CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox,
                              unsigned int & theVertexCount, unsigned int & theTriangleCount)
 {
     // here we go ...
-    MarchingCubes<VoxelT> myMarcher(theDownSampleRate, SceneBuilderPtr(0), this);
+    CountPolygonPolicy<VoxelT> myPolygonCounter;
+    MarchingCubes<VoxelT, CountPolygonPolicy<VoxelT> > myMarcher(theDownSampleRate, myPolygonCounter, this);
 
     myMarcher.setBox(theVoxelBox);
     myMarcher.setThreshold(asl::Vector2<VoxelT>(VoxelT(theThresholdMin), VoxelT(theThresholdMax)));
     //myMarcher.setThreshold(VoxelT(theThresholdMax));
-    myMarcher.calcNormals(false);
-    myMarcher.estimate(&theVertexCount, &theTriangleCount);
+    AC_INFO << "starting dry run";
+    myMarcher.march();
+    // myMarcher.estimate(&theVertexCount, &theTriangleCount);
+    theVertexCount = myPolygonCounter.getVertexCount();
+    theTriangleCount = myPolygonCounter.getTriangleCount();
 }
 /**
  * @return a Vector of which x is VertexCount and y is TriangleCount
@@ -492,16 +496,8 @@ CTScan::setupMaterial(SceneBuilderPtr theSceneBuilder, bool theCreateNormalsFlag
         setPropertyValue<asl::Vector4f>(myMaterialBuilder.getNode(), "vector4f",
                 SURFACE_COLOR_PROPERTY, Vector4f(0.8f, 0.8f, 0.8f, 1.0f));
     }
-/*
-    VectorOfRankedFeature myVertexparamsFeature;
-    RankedFeature myVertexParam;
-    myVertexParam._myFeature.push_back(getStringFromEnum(i, LightingModelString));
-    myVertexParam._myRanking = 10.f;
-
-    myVertexParamsFeature.push_back(myVertexParam);
-    */
+    
     myMaterialBuilder.addFeature("vertexparams", "[10[color]]");
-
 
     string myBlendFunction = "[src_alpha, one_minus_src_alpha]";
     setPropertyValue<VectorOfString>(myMaterialBuilder.getNode(), "vectorofstring",
