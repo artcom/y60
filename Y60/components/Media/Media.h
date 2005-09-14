@@ -34,7 +34,8 @@ namespace y60 {
         virtual void setSysConfig(const asl::Time& myLatency, const std::string& myDeviceName = "");
         virtual void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels = 2, 
                 bool useDummy = false);
-        void registerDecoderFactory(AudioDecoderFactoryPtr theFactory);
+        void registerDecoderFactory(IAudioDecoderFactory* theFactory);
+        void unregisterDecoderFactory(IAudioDecoderFactory* theFactory);
 
         virtual SoundPtr createSound(const std::string & theURI);
         virtual SoundPtr createSound(const std::string & theURI, bool theLoop);
@@ -58,7 +59,8 @@ namespace y60 {
         asl::ThreadLock _myLock;
         std::vector < SoundWeakPtr > _mySounds;
 
-        std::vector < AudioDecoderFactoryPtr > _myDecoderFactories;
+        std::vector < IAudioDecoderFactory* > _myDecoderFactories;
+        IAudioDecoderFactory* _myFFMpegDecoderFactory;
     };
 
     typedef asl::Ptr<Media> MediaPtr;

@@ -29,8 +29,6 @@ class IAudioDecoderFactory
         virtual IAudioDecoder* tryCreateDecoder(std::string myURI) = 0;
 };
 
-typedef asl::Ptr<IAudioDecoderFactory> AudioDecoderFactoryPtr;
-
 } // namespace
 
 #endif 

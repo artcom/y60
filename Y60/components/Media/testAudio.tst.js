@@ -24,7 +24,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.runNewAudioLibTest = function() {
         obj.myMedia = new MediaController();
-/*        
+        
         obj.myMedia.volume == 1.0;
         msleep(250);
         ENSURE("obj.myMedia.running == true");
@@ -36,9 +36,9 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myMedia.fadeToVolume(1.0, 0.1);        
         msleep(150);
         ENSURE("obj.myMedia.volume == 1.0");
-*/
+
         obj.mySound = obj.myMedia.createSound("../../testfiles/aussentuer.mp3");
-/*
+
         ENSURE("obj.myMedia.soundcount == 1");
         ENSURE("obj.mySound.time == 0");
         obj.mySound.volume = 1.0;
@@ -50,7 +50,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.mySound.time == 0.0");
         ENSURE("obj.mySound.looping == false");
         ENSURE("obj.mySound.duration == 1.619499");
-  */              
+                
         DTITLE("Playing sound...");
         obj.mySound.play();
         ENSURE("obj.mySound.playing");

@@ -29,7 +29,8 @@ const double myTimePerSlice = 0.05;
     
 Media::Media() {
     AC_DEBUG << "Media::Media";
-    registerDecoderFactory(AudioDecoderFactoryPtr(new FFMpegDecoderFactory));
+    _myFFMpegDecoderFactory = new FFMpegDecoderFactory;
+    registerDecoderFactory(_myFFMpegDecoderFactory);
     fork();
 }
 
@@ -40,6 +41,11 @@ Media::~Media() {
         stopAll();
     }
     join();
+    unregisterDecoderFactory(_myFFMpegDecoderFactory);
+    delete _myFFMpegDecoderFactory;
+    if (_myDecoderFactories.size()) {
+        AC_WARNING << _myDecoderFactories.size() << " decoder factories still registered.";
+    }
 }
 
 void Media::setSysConfig(const Time& myLatency, const string& myDeviceName) {
@@ -52,9 +58,21 @@ void Media::setAppConfig(unsigned mySampleRate, unsigned numOutputChannels,
     Pump::setAppConfig(mySampleRate, numOutputChannels, useDummy);
 }
 
-void Media::registerDecoderFactory(AudioDecoderFactoryPtr theFactory)
-{
+void Media::registerDecoderFactory(IAudioDecoderFactory* theFactory) {
     _myDecoderFactories.push_back(theFactory);
+}
+
+void Media::unregisterDecoderFactory(IAudioDecoderFactory* theFactory) {
+    std::vector <IAudioDecoderFactory*>::iterator it;
+    
+    for (it=_myDecoderFactories.begin(); it != _myDecoderFactories.end(); ++it) {
+        if (*it == theFactory) {
+            _myDecoderFactories.erase(it);
+            return;
+        }
+    }
+    AC_WARNING << "unregisterDecoderFactory: Factory at " << (void *)theFactory << 
+            " not registered.";
 }
 
 SoundPtr Media::createSound(const string & theURI) {
@@ -123,9 +141,13 @@ void Media::stopAll() {
         // while we're iterating through it.
         for (int i = _mySounds.size()-1; i >= 0; --i) {
             AutoLocker<ThreadLock> myLocker(_myLock);
+            cerr << "0";
             if (i >= _mySounds.size()) {
                 // This can happen if sounds have been deleted in the meantime.
                 i = _mySounds.size()-1;
+                if (i<0) {
+                    break;
+                }
             }
             SoundPtr curSound = _mySounds[i].lock();
             if (curSound) {
@@ -171,7 +193,7 @@ void Media::run() {
 IAudioDecoder * Media::createDecoder(const std::string & theURI) {
     IAudioDecoder * myDecoder = 0;
     for (int i=0; i<_myDecoderFactories.size(); ++i) {
-        AudioDecoderFactoryPtr myCurrentFactory = _myDecoderFactories[i];
+        IAudioDecoderFactory* myCurrentFactory = _myDecoderFactories[i];
         try {
             myDecoder = myCurrentFactory->tryCreateDecoder(theURI);
             break;

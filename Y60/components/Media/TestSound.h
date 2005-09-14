@@ -30,18 +30,10 @@ using namespace y60;
 
 class SoundTestBase: public UnitTest {
     public:
-        SoundTestBase(const char * myName) 
-            : UnitTest(myName)
+        SoundTestBase(Ptr<Media> myMedia, const char * myName) 
+            : UnitTest(myName),
+              _myMedia(myMedia)
         {  
-            PlugInBasePtr myPlugIn = PlugInManager::get().getPlugIn("y60Media");            
-
-            typedef y60::Media * (*GetMediaFunctionPtr)();
-            GetMediaFunctionPtr myGetMediaFunction = (GetMediaFunctionPtr)PlugInManager::getFunction(myPlugIn->getDLHandle(), "createMedia");
-            if (myGetMediaFunction) {
-                _myMedia = MediaPtr((*myGetMediaFunction)());
-            } else {
-                cerr << "Could not get 'createMedia' fuction pointer from dll." << endl;
-            }
         }
 
     protected:
@@ -63,8 +55,8 @@ class SoundTestBase: public UnitTest {
 
 class TestPlay : public SoundTestBase {
     public:
-        TestPlay() 
-            : SoundTestBase("TestPlay")
+        TestPlay(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestPlay")
         {  
         }
 
@@ -87,8 +79,8 @@ class TestPlay : public SoundTestBase {
 
 class TestBroken : public SoundTestBase {
     public:
-        TestBroken() 
-            : SoundTestBase("TestBroken")
+        TestBroken(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestBroken")
         {  
         }
 
@@ -115,8 +107,8 @@ class TestBroken : public SoundTestBase {
 
 class TestFireAndForget: public SoundTestBase {
     public:
-        TestFireAndForget() 
-            : SoundTestBase("TestFireAndForget")
+        TestFireAndForget(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestFireAndForget")
         {  
         }
 
@@ -136,8 +128,8 @@ class TestFireAndForget: public SoundTestBase {
 
 class TestTwoSounds: public SoundTestBase {
     public:
-        TestTwoSounds() 
-            : SoundTestBase("TestTwoSounds")
+        TestTwoSounds(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestTwoSounds")
         {  
         }
 
@@ -155,8 +147,8 @@ class TestTwoSounds: public SoundTestBase {
 
 class TestStopAll: public SoundTestBase {
     public:
-        TestStopAll() 
-            : SoundTestBase("TestStopAll")
+        TestStopAll(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestStopAll")
         {  
         }
 
@@ -176,8 +168,8 @@ class TestStopAll: public SoundTestBase {
 
 class TestStop: public SoundTestBase {
     public:
-        TestStop() 
-            : SoundTestBase("TestStop")
+        TestStop(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestStop")
         {  
         }
 
@@ -214,8 +206,8 @@ class TestStop: public SoundTestBase {
 
 class TestStopByItself: public SoundTestBase {
     public:
-        TestStopByItself() 
-            : SoundTestBase("TestStopByItself")
+        TestStopByItself(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestStopByItself")
         {  
         }
 
@@ -252,8 +244,8 @@ class TestStopByItself: public SoundTestBase {
 
 class TestPause: public SoundTestBase {
     public:
-        TestPause() 
-            : SoundTestBase("TestPause")
+        TestPause(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestPause")
         {  
         }
        
@@ -310,8 +302,8 @@ class TestPause: public SoundTestBase {
 
 class TestLoop: public SoundTestBase {
     public:
-        TestLoop() 
-            : SoundTestBase("TestLoop")
+        TestLoop(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestLoop")
         {  
         }
        
@@ -335,8 +327,8 @@ class TestLoop: public SoundTestBase {
 
 class TestVolume: public SoundTestBase {
     public:
-        TestVolume() 
-            : SoundTestBase("TestVolume")
+        TestVolume(Ptr<Media> myMedia) 
+            : SoundTestBase(myMedia, "TestVolume")
         {  
         }
        
@@ -373,8 +365,8 @@ class TestVolume: public SoundTestBase {
 
 class TestSeek: public SoundTestBase {
     public:
-        TestSeek()
-            : SoundTestBase("TestSeek")
+        TestSeek(Ptr<Media> myMedia)
+            : SoundTestBase(myMedia, "TestSeek")
         {
         }
 
@@ -417,8 +409,8 @@ class TestSeek: public SoundTestBase {
 
 class StressTest: public SoundTestBase {
     public:
-        StressTest(double myDuration) 
-            : SoundTestBase("StressTest"),
+        StressTest(Ptr<Media> myMedia, double myDuration) 
+            : SoundTestBase(myMedia, "StressTest"),
               _myDuration(myDuration)
         {  
         }
@@ -451,8 +443,8 @@ class StressTest: public SoundTestBase {
 
 class MemLeakStressTest: public StressTest {
     public:
-        MemLeakStressTest(double myDuration) 
-            : StressTest(myDuration)
+        MemLeakStressTest(Ptr<Media> myMedia, double myDuration) 
+            : StressTest(myMedia, myDuration)
         {
         }
        
@@ -516,21 +508,21 @@ class SoundTestSuite : public UnitTestSuite {
 #endif
             myMedia->setAppConfig(44100, 2, _myUseDummyPump);
             
-            addTest(new TestPlay());
-            addTest(new TestBroken());
-            addTest(new TestFireAndForget());
-            addTest(new TestTwoSounds());
-            addTest(new TestStop());
-            addTest(new TestStopByItself());
-            addTest(new TestPause());
-            addTest(new TestStopAll());           
-            addTest(new TestLoop());
-            addTest(new TestVolume());
-            addTest(new TestSeek());
+            addTest(new TestPlay(myMedia));
+            addTest(new TestBroken(myMedia));
+            addTest(new TestFireAndForget(myMedia));
+            addTest(new TestTwoSounds(myMedia));
+            addTest(new TestStop(myMedia));
+            addTest(new TestStopByItself(myMedia));
+            addTest(new TestPause(myMedia));
+            addTest(new TestStopAll(myMedia));           
+            addTest(new TestLoop(myMedia));
+            addTest(new TestVolume(myMedia));
+            addTest(new TestSeek(myMedia));
           
-            addTest(new StressTest(5));
+//            addTest(new StressTest(myMedia, 5));
 
-//            addTest(new MemLeakStressTest(60*60*24));
+//            addTest(new MemLeakStressTest(myMedia, 60*60*24));
         }
 
     private:
