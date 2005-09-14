@@ -21,7 +21,7 @@ if [ ! -z "$DEBUG" -a "$DEBUG" != "0" ]; then
     SHELL="acxpshellDBG"
 fi
 
-APP="$APP_DIR/testWMP.tst.js"
+APP="$APP_DIR/testWMP.js"
 CMD="$SHELL -I $Y60_DIR/js;$PLUGIN_DIR $APP $SHADERLIB $*"
 
 echo "### $CMD"
