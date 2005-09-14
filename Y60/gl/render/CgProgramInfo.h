@@ -47,7 +47,7 @@ namespace y60 {
         OBJECTWORLD,OBJECTWORLD_I,OBJECTWORLD_T,OBJECTWORLD_IT,
         CAMERA_POSITION, CAMERA_I, CAMERA_T, VIEWPROJECTION,
         POSITIONAL_LIGHTS, DIRECTIONAL_LIGHTS,
-        POSITIONAL_LIGHT_COLORS, DIRECTIONAL_LIGHT_COLORS,
+        POSITIONAL_LIGHTS_DIFFUSE_COLOR, DIRECTIONAL_LIGHTS_DIFFUSE_COLOR,
         AMBIENT_LIGHT_COLOR, MAX_AUTO_PARAMETER
     };
     static const char * CGAutoParamterString[] = {
@@ -61,8 +61,8 @@ namespace y60 {
         "AC_VIEWPROJECTION",
         "AC_POSITIONAL_LIGHTS",
         "AC_DIRECTIONAL_LIGHTS",
-        "AC_POSITIONAL_LIGHT_COLORS",
-        "AC_DIRECTIONAL_LIGHT_COLORS",
+        "AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR",
+        "AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR",
         "AC_AMBIENT_LIGHT_COLOR",
         0
     };
@@ -79,19 +79,33 @@ namespace y60 {
             virtual ~CgProgramInfo();
             void load();
             CGprogram getCgProgramID() { return _myCgProgramID; }
+            
             void enableProfile();
             void disableProfile();
             void enableTextures();
             void disableTextures();
+            static CGprofile asCgProfile(const ShaderDescription & theShader);
+
+            void bindMaterialParams(const MaterialBase & theMaterial);
+            void bindBodyParams(const y60::LightVector & theLightInstances,
+                        const Viewport & theViewport,
+                        const y60::Body & theBody,
+                        const y60::Camera & theCamera);
+            
+            void bind();
+            bool reloadIfRequired(const y60::LightVector & theLightInstances,
+                        const MaterialBase & theMaterial);
+        private:
+            static void setCgMaterialParameter(CGparameter & theCgParameter, 
+                    const dom::NodePtr & theNode, const MaterialBase & theMaterial);
+
+            void reloadProgram();
             void setCGGLParameters();
             void setAutoParameters(const y60::LightVector & theLightInstances,
                         const Viewport & theViewport,
                         const y60::Body & theBody,
                         const y60::Camera & theCamera);
-            void bind();
-            static CGprofile asCgProfile(const ShaderDescription & theShader);
 
-        private:
             struct CgProgramGlParam {
                 CgProgramGlParam(const std::string & myParamName,
                                  CGparameter myParameter,
@@ -109,6 +123,7 @@ namespace y60 {
             };
             typedef std::vector<CgProgramGlParam> CgProgramGlParamVector;
             struct CgProgramAutoParam {
+                CgProgramAutoParam() {}
                 CgProgramAutoParam(const std::string & myName,
                                  CGparameter myParameter,
                                  CgAutoParameterID myID,
@@ -123,7 +138,8 @@ namespace y60 {
                 CgAutoParameterID   _myID;
                 CGtype              _myType;
             };
-            typedef std::vector<CgProgramAutoParam> CgProgramAutoParamVector;
+            typedef std::map<int,CgProgramAutoParam> CgProgramAutoParams;
+            
 
             struct CgProgramTextureParam {
                 CgProgramTextureParam(const std::string & myParamName,
@@ -145,14 +161,25 @@ namespace y60 {
             void setCgMatrixParameter(const CgProgramAutoParam & theParam, const asl::Matrix4f & theValue);
             void setCgArrayVector3fParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector3f> & theValue);
             void setCgArrayVector4fParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector4f> & theValue);
+            void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, 
+                const std::vector<asl::Vector3f> & theValue);
+            void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, 
+                const std::vector<asl::Vector4f> & theValue);
+
+
 
             ShaderDescription _myShader;
             CGprogram _myCgProgramID;
             CGcontext _myContext;
             std::string _myPathName;
             CgProgramGlParamVector      _myGlParams;  // GL-State to CG parameters
-            CgProgramAutoParamVector    _myAutoParams;// other automatic CG parameters (e.g. CameraPosition)
+            CgProgramAutoParams    _myAutoParams;// other automatic CG parameters (e.g. CameraPosition)
             CgProgramTextureParamVector    _myTextureParams;// Texture parameters
+
+            std::map<int,int> _myUnsizedArrayAutoParamSizes;
+            
+            std::vector<const char *> _myCachedCompilerArgs;
+            std::string _myCgProgramString;
     };
 
     typedef asl::Ptr<CgProgramInfo> CgProgramInfoPtr;

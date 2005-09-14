@@ -21,15 +21,7 @@
 #define FRESNEL_SCALE  1.0
 #define FRESNEL_BIAS   0.0
 
-#ifdef DIRLIGHT
 #define LIGHTING
-#endif
-#ifdef POSLIGHT
-#ifndef LIGHTING
-#define LIGHTING
-#endif
-#endif
-
 
 struct app2vert {
     float4 Position         : POSITION;
@@ -58,12 +50,10 @@ vert2frag mainVertex(
             uniform float4x4 AC_OBJECTWORLD_IT,
             uniform float4x4 AC_OBJECTWORLD,
             uniform float3 AC_CAMERA_POSITION,
-#ifdef DIRLIGHT
-            uniform float3 AC_DIRECTIONAL_LIGHTS[1],
-#endif
-#ifdef POSLIGHT
-            uniform float3 AC_POSITIONAL_LIGHTS[1],
-#endif
+            uniform float3 AC_DIRECTIONAL_LIGHTS[],
+            uniform float4 AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
+            uniform float3 AC_POSITIONAL_LIGHTS[],
+            uniform float4 AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
             uniform float4 diffuse,
             uniform float4 specular,
             uniform float  shininess
@@ -83,7 +73,8 @@ vert2frag mainVertex(
     OUT.reflectionFactor = FRESNEL_BIAS + FRESNEL_SCALE *
             pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER);
 #endif
-    OUT.primColor = diffuse;
+    //OUT.primColor = diffuse;
+    OUT.primColor = float4(0,0,0,0);
     
 #ifdef PAINT
     OUT.texCoord0 = IN.texCoord;
@@ -93,33 +84,50 @@ vert2frag mainVertex(
 #endif
 
 // lighting
-#ifdef DIRLIGHT
-    {
-        float3 dirLightVec = normalize(AC_DIRECTIONAL_LIGHTS[0]);
-        float  diffuseLight = dot(myWorldNormal, dirLightVec);
+OUT.lighting = float4(0,0,0,0);
+OUT.specColor = float4(0,0,0,0);
         
-        float3 halfVec = normalize(dirLightVec+myViewVector);
-        float specularLight = dot(myWorldNormal,halfVec);
+        float3 dirLightVec;
+        float  diffuseLight;
         
-        OUT.lighting = lit(diffuseLight, specularLight, 12);
-        OUT.specColor = specular * IN.lighting.z;
-    }
-#else
-    OUT.lighting = float4(0,0,0,0);
-#endif
-#ifdef POSLIGHT
-    {
-        float3 dirLightVec = normalize(AC_POSITIONAL_LIGHTS[0]-myWorldPosition);
-        float  diffuseLight = dot(myWorldNormal, dirLightVec);
-        
-        float3 halfVec = normalize(dirLightVec - myViewVector);
-        float specularLight = dot(myWorldNormal,halfVec);
-                
-        OUT.lighting += lit(diffuseLight, specularLight, 3*shininess);
-        OUT.specColor = specular * OUT.lighting.z;
-    }
+        float3 halfVec;
+        float specularLight;
+        for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
+            dirLightVec = normalize(AC_DIRECTIONAL_LIGHTS[i]);
+            halfVec = normalize(dirLightVec+myViewVector);
+            
+            diffuseLight = dot(myWorldNormal, dirLightVec);
+            specularLight = dot(myWorldNormal,halfVec);
 
-#endif
+            float4 lighting = lit(diffuseLight, specularLight, 12);
+            OUT.lighting += lighting;
+            
+            // lit() returns a vector containing these values:
+            //     result.x = 1.0;  
+            //     result.y = max(diffuse, 0);
+            //     result.z = if (result.y > 0.0) then pow(specular, 32) else 0.0
+            //     result.w = 1.0;
+
+
+            OUT.primColor += AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[i] * lighting.y;        
+        }
+        OUT.specColor += specular * OUT.lighting.z;
+        
+        for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
+        
+            dirLightVec = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
+            diffuseLight = dot(myWorldNormal, dirLightVec);
+
+            halfVec = normalize(dirLightVec - myViewVector);
+            specularLight = dot(myWorldNormal,halfVec);
+
+            float4 lighting = lit(diffuseLight, specularLight, 3*shininess);
+            
+            OUT.primColor += AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i] * lighting.y;        
+            OUT.lighting += lighting;
+        }
+        OUT.primColor *= diffuse;
+        OUT.specColor += specular * OUT.lighting.z;
     return OUT;
 }
 
@@ -169,4 +177,5 @@ float4 mainFragment(vert2frag   IN,
     float4 myColor = float4(lerp(myOuterColor, myBlendedColor, myBlendFactor), myOuterTexel.a) + mySpecColor;
     
     return myColor;
+    //return IN.primColor;
 }

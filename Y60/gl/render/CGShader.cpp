@@ -215,87 +215,6 @@ namespace y60 {
     }
 
     void
-    CGShader::setCgParameter(CGparameter & theCgParameter, const dom::NodePtr & theNode,
-                             const MaterialBase & theMaterial)
-    {
-        const string & thePropertyName = theNode->getAttributeString("name");
-        AC_TRACE << "setting " << theNode->nodeName() <<" property " << thePropertyName << endl;
-        switch(TypeId(asl::getEnumFromString(theNode->nodeName(), TypeIdStrings)))
-        {
-            case FLOAT:
-                {
-                    float myValue = (*theNode)("#text").dom::Node::nodeValueAs<float>();
-                    cgGLSetParameter1f(theCgParameter, myValue);
-                    checkCgError();
-                    break;
-                }
-            case VECTOR2F:
-                {
-                    Vector2f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<Vector2f>();
-                    float * myValue = myValueV.begin();
-                    cgGLSetParameter2fv(theCgParameter, myValue);
-                    checkCgError();
-                    break;
-                }
-            case VECTOR3F:
-                {
-                    Vector3f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<Vector3f>();
-                    float * myValue = myValueV.begin();
-                    cgGLSetParameter3fv(theCgParameter, myValue);
-                    checkCgError();
-                    break;
-                }
-            case VECTOR4F:
-                {
-                    Vector4f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<Vector4f>();
-                    float * myValue = myValueV.begin();
-                    cgGLSetParameter4fv(theCgParameter, myValue);
-                    checkCgError();
-                    break;
-                }
-             case VECTOR_OF_VECTOR2F:
-                {
-                    VectorOfVector2f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<VectorOfVector2f>();
-                    float * myValue = myValueV.begin()->begin();
-                    cgGLSetParameterArray2f(theCgParameter, 0, myValueV.size(), myValue);
-                    checkCgError();
-                    break;
-                }
-             case VECTOR_OF_VECTOR4F:
-                {
-                    VectorOfVector4f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<VectorOfVector4f>();
-                    float * myValue = myValueV.begin()->begin();
-                    cgGLSetParameterArray4f(theCgParameter, 0, myValueV.size(), myValue);
-                    checkCgError();
-                    break;
-                }
-            case SAMPLER2D:
-            case SAMPLERCUBE:
-                {
-                    unsigned myTextureIndex = (*theNode)("#text").dom::Node::nodeValueAs<unsigned>();
-                    if (myTextureIndex  < theMaterial.getTextureCount()) {
-                        const Texture & myTexture = theMaterial.getTexture(myTextureIndex);
-                        cgGLSetTextureParameter( theCgParameter, myTexture.getId());
-                        DB(AC_TRACE << "cgGLSetTextureParameter: Texture index: "<< as_string(myTextureIndex)
-                                << " , glid : " << myTexture.getId()
-                                << " , property : " << thePropertyName
-                                << " to parameter : "<< cgGetParameterName(theCgParameter) << endl;)
-                        checkCgError();
-                    } else {
-                        throw ShaderException(string("Texture Index ") + as_string(myTextureIndex) +
-                                " not found. Material has " + as_string(theMaterial.getTextureCount()) + " texture(s)",
-                                "CGShader::setCgParameter()");
-                    }
-                    break;
-                }
-            default:
-                throw ShaderException(string("Unknown CgParameter type in property '")+thePropertyName+"'",
-                        "CGShader::setCgParameter()");
-        }
-
-    }
-
-    void
     CGShader::checkCgError() const {
         CGerror myCgError = cgGetError();
         if (myCgError != CG_NO_ERROR) {
@@ -314,18 +233,15 @@ namespace y60 {
         GLShader::bindBodyParams(theMaterial, theViewport, theLights, theBody, theCamera);
 
         if (_myFragmentProgram) {
-            _myFragmentProgram->setCGGLParameters();
-            _myFragmentProgram->setAutoParameters(theLights, theViewport, theBody, theCamera);
+            bool b = _myFragmentProgram->reloadIfRequired(theLights, theMaterial);
+            _myFragmentProgram->bindBodyParams(theLights, theViewport, theBody, theCamera);
+
+            _myFragmentProgram->bind();
         }
 
         if (_myVertexProgram) {
-            _myVertexProgram->setCGGLParameters();
-            _myVertexProgram->setAutoParameters(theLights, theViewport, theBody, theCamera);
-        }
-        if (_myFragmentProgram) {
-            _myFragmentProgram->bind();
-        }
-        if (_myVertexProgram) {
+            bool b = _myVertexProgram->reloadIfRequired(theLights, theMaterial);
+            _myVertexProgram->bindBodyParams(theLights, theViewport, theBody, theCamera);
             _myVertexProgram->bind();
         }
     }
@@ -333,22 +249,11 @@ namespace y60 {
     void
     CGShader::bindMaterialParams(const MaterialBase & theMaterial) {
         this->checkCgError();
-        dom::NodePtr myPropertyList = theMaterial.getProperties();
-        unsigned myPropertyCount = myPropertyList->childNodesLength();
-        for (unsigned i = 0; i < myPropertyCount; ++i) {
-            const string & myPropertyName = myPropertyList->childNode(i)->getAttributeString("name");
-            if (_myFragmentProgram) {
-                CGparameter myCgParameter = cgGetNamedParameter(_myFragmentProgram->getCgProgramID(), myPropertyName.c_str());
-                if (myCgParameter) {
-                    setCgParameter(myCgParameter, myPropertyList->childNode(i), theMaterial);
-                }
-            }
-            if (_myVertexProgram) {
-                CGparameter myCgParameter = cgGetNamedParameter(_myVertexProgram->getCgProgramID(), myPropertyName.c_str());
-                if (myCgParameter) {
-                    setCgParameter(myCgParameter, myPropertyList->childNode(i), theMaterial);
-                }
-            }
+        if (_myFragmentProgram) {
+            _myFragmentProgram->bindMaterialParams(theMaterial);
+        }
+        if (_myVertexProgram) {
+            _myVertexProgram->bindMaterialParams(theMaterial);
         }
     }
 

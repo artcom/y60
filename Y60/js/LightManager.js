@@ -28,6 +28,9 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     var _myWorld        = theWorld;
     var _myLightSources = getDescendantByTagName(theScene.dom,'lightsources', false);
 
+    var _myLights = getDescendantsByTagName(theWorld,'light', true);
+    var _myLightCursor = 0;
+    
     var _myViewportHeadlights    = [];
     var _myViewportHeadlightsEnabled = [];
 
@@ -91,9 +94,9 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             // obj.setupHeadlight(myViewport);
         }
         var activeLightsFound = false;
-        var myLights = getDescendantsByTagName(_myWorld, "light", true);
-        for (var i=0; i < myLights.length; ++i) {
-            if (myLights[i].visible) {
+        _myLights = getDescendantsByTagName(_myWorld, "light", true);
+        for (var i=0; i < _myLights.length; ++i) {
+            if (_myLights[i].visible) {
                 activeLightsFound = true;
                 break;
             }
@@ -180,6 +183,20 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
                     print("Headlight : " + (_myHeadLightFlag? "on" : "off"));
                 }
 
+                break;
+            case 'j':
+                if (theShiftFlag) {
+                    //cycle through scene lights
+                    _myLightCursor = ++_myLightCursor % _myLights.length;
+                } else {
+                    //toggle current scene light
+                    if (_myLightCursor < _myLights.length) {
+                        _myLights[_myLightCursor].visible 
+                            = ! _myLights[_myLightCursor].visible;
+                       print ('light # ' + _myLights[_myLightCursor].name + ' now visible ' 
+                                + _myLights[_myLightCursor].visible);
+                    }
+                }
                 break;
             case 'h':
                 printHelp();

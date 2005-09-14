@@ -50,6 +50,55 @@ namespace y60 {
         }
     }
 
+    void CgProgramInfo::reloadProgram() {
+        AC_DEBUG << "reloadProgram " << _myPathName.c_str();
+
+        
+        if (_myCgProgramString.empty()) {
+            AC_DEBUG << "loading from file ";
+            
+            // create null terminated array of null terminated strings
+            for (int i=0; i < _myShader._myCompilerArgs.size(); ++i) {
+                AC_DEBUG << "Using arg " << _myShader._myCompilerArgs[i].c_str() << endl;
+                _myCachedCompilerArgs.push_back(_myShader._myCompilerArgs[i].c_str());
+            }
+            _myCachedCompilerArgs.push_back(0);
+            _myCgProgramID = cgCreateProgramFromFile(_myContext, CG_SOURCE,
+                    _myPathName.c_str(),
+                    asCgProfile(_myShader),
+                    _myShader._myEntryFunction.c_str(),
+                    &(*_myCachedCompilerArgs.begin()));
+
+            assertCg("CgProgramInfo::reloadProgram - createProgram");
+
+            //DK: we cannot keep a compiled version 
+            //    because unsized arrays of size 0 are completely gone after compilation
+            _myCgProgramString = cgGetProgramString(_myCgProgramID, CG_PROGRAM_SOURCE);
+
+        } else {
+            AC_DEBUG << "destroying and reloading from string "; // << _myCgProgramString;
+
+            cgDestroyProgram(_myCgProgramID);
+            _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
+                                asCgProfile(_myShader), _myShader._myEntryFunction.c_str(), 
+                                &(*_myCachedCompilerArgs.begin()));
+            
+        }
+
+        CGerror myCgError = cgGetError();
+        if (myCgError != CG_NO_ERROR) {
+            std::string myErrorMessage = "Cg error loading '" + _myShader._myEntryFunction +
+                   "' from " + _myPathName + ": " + cgGetErrorString(myCgError);
+            if (myCgError == CG_COMPILER_ERROR) {
+                myErrorMessage += "\n" + std::string(cgGetLastListing(_myContext));
+            }
+            throw RendererException(myErrorMessage, "CgProgramInfo::CgProgramInfo()");
+        }
+        processParameters();
+        cgCompileProgram(_myCgProgramID);
+        cgGLLoadProgram(_myCgProgramID);
+    }
+    
     CgProgramInfo::CgProgramInfo(const ShaderDescription & myShader,
                                  const CGcontext theCgContext,
                                  const std::string & theShaderDir)
@@ -57,31 +106,17 @@ namespace y60 {
     {
         assertCg("before constr");
         _myPathName = theShaderDir + myShader._myFilename;
-        CGprofile myCgProfile = asCgProfile(myShader);
-        // create null terminated array of null terminated strings
-        vector<const char *> myC_StrArgs;
-        for (int i=0; i < myShader._myCompilerArgs.size(); ++i) {
-            AC_DEBUG << "Using arg " << myShader._myCompilerArgs[i].c_str() << endl;
-            myC_StrArgs.push_back(myShader._myCompilerArgs[i].c_str());
-        }
-        myC_StrArgs.push_back(0);
 
-        _myCgProgramID = cgCreateProgramFromFile(theCgContext, CG_SOURCE,
-                                                            _myPathName.c_str(),
-                                                            myCgProfile,
-                                                            myShader._myEntryFunction.c_str(),
-                                                            &(*myC_StrArgs.begin()));
-        CGerror myCgError = cgGetError();
-        if (myCgError != CG_NO_ERROR) {
-            std::string myErrorMessage = "Cg error loading '" + myShader._myEntryFunction +
-                   "' from " + _myPathName + ": " + cgGetErrorString(myCgError);
-            if (myCgError == CG_COMPILER_ERROR) {
-                myErrorMessage += "\n" + std::string(cgGetLastListing(theCgContext));
-            }
-            throw RendererException(myErrorMessage, "CgProgramInfo::CgProgramInfo()");
-        }
-        assertCg("CgProgramInfo::CgProgramInfo()");
-        processParameters();
+        _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = 0;
+        _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
+        _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = 0;
+        _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
+
+        //VS: 100 punkte
+        cgSetAutoCompile(_myContext, CG_COMPILE_MANUAL);
+        
+        reloadProgram();
+
         DB(AC_TRACE << "CgProgramInfo::CgProgramInfo(" << _myCgProgramID << ")" << endl;);
     }
 
@@ -103,14 +138,23 @@ namespace y60 {
 
     void
     CgProgramInfo::processParameters() {
+        AC_DEBUG << "processParameters";
         // CGparameter myParam = cgGetFirstParameter(_myCgProgramID, CG_PROGRAM);
         // while (myParam != 0) {
+        //
+        _myGlParams.clear();
+        _myAutoParams.clear();
+        _myTextureParams.clear();
+        
         for (CGparameter myParam = cgGetFirstParameter(_myCgProgramID, CG_PROGRAM);
                 myParam != 0;  myParam = cgGetNextParameter(myParam))
         {
             string myParamName(cgGetParameterName(myParam));
-            CGenum myParamVariability = cgGetParameterVariability(myParam);
+            //XXX cgGetParameterVariability crashes on unsized arrays
+            //CGenum myParamVariability = cgGetParameterVariability(myParam);
+            CGenum myParamVariability = CG_UNIFORM;
             CGtype myParameterType    = cgGetParameterType(myParam);
+            AC_DEBUG << "processing " << myParamName;
 
             assertCg("CgProgramInfo::processParameters() - 1");
 
@@ -168,11 +212,47 @@ namespace y60 {
                             ": CG Auto Parameter " + myParamName + " unknown.",
                             "CgProgramInfo::processParameters()");
                 }
+                
+                
+                if (myParameterType == CG_ARRAY && cgGetArraySize(myParam, 0) == 0) {
+                    
+
+                    int myArraySize = _myUnsizedArrayAutoParamSizes[myParamID];
+                    if (myArraySize > 0) {
+
+                        AC_PRINT << "setting array " << myParamName 
+                                 << " to size " << myArraySize;
+                        
+                        CGtype myArrayType = cgGetArrayType(myParam);
+                        CGparameter myArray 
+                            = cgCreateParameterArray(_myContext, myArrayType, myArraySize);
+
+                        for(int i = 0; i <  myArraySize; ++i) {
+
+                            CGparameter myArrayElement 
+                                = cgCreateParameter(_myContext, myArrayType);
+                            cgConnectParameter(myArrayElement, cgGetArrayParameter(myArray, i));
+                        }
+
+                        cgConnectParameter(myArray, myParam);
+                        assertCg("CgProgramInfo::processParameters() unsized array");
+                        AC_DEBUG << "done. created unsized array of size " << myArraySize;
+                    }
+                }
+
+                if (myParameterType == CG_ARRAY) {
+                    AC_INFO << "array " << myParamName << " size " << cgGetArraySize(myParam, 0);
+                }
+                
                 if (myParameterType == CG_ARRAY || cgIsParameterReferenced(myParam)) {
+                    
                     AC_DEBUG << "adding auto param " << myParamName << ":" << myParamID << endl;
-                    _myAutoParams.push_back(CgProgramAutoParam(myParamName, myParam, myParamID, myParameterType));
+                    _myAutoParams[myParamID]
+                        = CgProgramAutoParam(myParamName, myParam, myParamID, myParameterType);
+
                 } else {
-                    AC_WARNING << "skipping non-referenced AC-CG parameter " << myParamName << endl;
+                    AC_WARNING << "skipping non-referenced AC-CG parameter " 
+                               << myParamName << endl;
                 }
             }
             // scan for sampler params
@@ -185,6 +265,7 @@ namespace y60 {
             assertCg("CgProgramInfo::processParameters() - 2");
         }
         assertCg("CgProgramInfo::processParameters()");
+        AC_DEBUG << "DONE processParameters";
     }
 
     void
@@ -211,6 +292,98 @@ namespace y60 {
             assertCg("CgProgramInfo::setCGGLParameters()");
         }
     }
+    
+    bool
+    CgProgramInfo::reloadIfRequired(
+            const LightVector & theLightInstances,
+            const MaterialBase & theMaterial) 
+    {
+        AC_DEBUG << "reloadIfRequired";
+        //look at the number of lights to see if reload is req.
+        unsigned myPositionalLightCount = 0;
+        unsigned myDirectionalLightCount = 0;
+        for (unsigned i = 0; i < theLightInstances.size(); ++i) {
+            LightPtr myLight = theLightInstances[i];
+            if ( ! myLight->get<VisibleTag>()) {
+                continue;
+            }
+            LightSourcePtr myLightSource = myLight->getLightSource();
+            switch (myLightSource->getType()) {
+                case POSITIONAL :
+                    ++myPositionalLightCount;
+                    break;
+                case DIRECTIONAL :
+                    ++myDirectionalLightCount;
+                    break;
+               case AMBIENT :
+                    //??
+                    break;
+               default :
+                    AC_INFO << "unknown light type for " << myLightSource->get<IdTag>();
+            }
+        }
+
+        bool myReload = false;
+
+        int myLightType = POSITIONAL_LIGHTS;
+        if (  _myAutoParams.find(myLightType) != _myAutoParams.end()
+           && cgGetArraySize(_myAutoParams[myLightType]._myParameter,0) != myPositionalLightCount) 
+        {
+            myReload = true;
+        }
+        
+        myLightType = DIRECTIONAL_LIGHTS;
+        if (  _myAutoParams.find(myLightType) != _myAutoParams.end()
+           && cgGetArraySize(_myAutoParams[myLightType]._myParameter,0) != myDirectionalLightCount) 
+        {
+            myReload = true;
+        }
+        
+        if (myReload) {
+            //change unsized array sizes here
+            _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = myPositionalLightCount;
+            _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = myPositionalLightCount;
+            _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = myDirectionalLightCount;
+            _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = myDirectionalLightCount;
+            
+            reloadProgram();
+
+            enableProfile();
+            bindMaterialParams(theMaterial);
+            enableTextures();
+        }
+
+        return myReload;
+
+    }
+            
+    void
+    CgProgramInfo::bindBodyParams(
+            const LightVector & theLightInstances,
+            const Viewport & theViewport,
+            const Body & theBody,
+            const Camera & theCamera)
+    {
+        setCGGLParameters();
+        setAutoParameters(theLightInstances, theViewport, theBody, theCamera);
+    }
+    
+    void
+    CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
+        dom::NodePtr myPropertyList = theMaterial.getProperties();
+        unsigned myPropertyCount = myPropertyList->childNodesLength();
+        for (unsigned i = 0; i < myPropertyCount; ++i) {
+            const string & myPropertyName 
+                = myPropertyList->childNode(i)->getAttributeString("name");
+
+            CGparameter myCgParameter 
+                = cgGetNamedParameter(_myCgProgramID, myPropertyName.c_str());
+            
+            if (myCgParameter) {
+                setCgMaterialParameter(myCgParameter, myPropertyList->childNode(i), theMaterial);
+            }
+        }
+    }
 
     void
     CgProgramInfo::setAutoParameters(
@@ -219,6 +392,9 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
+
+        AC_DEBUG << "setAutoParameters";
+        
         int myPositionalLightCount = 0;
         int myDirectionalLightCount = 0;
         std::vector<Vector3f> myPositionalLights(8,Vector3f(0,0,0));
@@ -256,17 +432,19 @@ namespace y60 {
                     myAmbientLightColor = myLightSource->get<AmbientTag>();
                     break;
                default :
-                   throw RendererException(string("Unknown Light Source type: '")+myLightSource->get<IdTag>()+"'",
-                                PLUS_FILE_LINE);
+                    AC_INFO << "unknown light type " << myLightSource->get<IdTag>();
             }
         }
 
 
         // set parameter values
-        for (int i=0; i < _myAutoParams.size(); ++i) {
+        for (CgProgramAutoParams::iterator myIter = _myAutoParams.begin(); 
+                myIter != _myAutoParams.end(); ++myIter) 
+        {
             bool myParamValueFoundFlag = false;
 
-            CgProgramAutoParam curParam = _myAutoParams[i];
+            CgProgramAutoParam curParam = myIter->second;
+            AC_DEBUG << "setting parameter " << curParam._myName;
 
             switch (curParam._myID) {
                 case CAMERA_POSITION :
@@ -274,19 +452,23 @@ namespace y60 {
                     myParamValueFoundFlag = true;
                     break;
                 case POSITIONAL_LIGHTS :
-                    setCgArrayVector3fParameter(curParam, myPositionalLights);
+            AC_DEBUG << "setting POSITIONAL_LIGHTS to " << myPositionalLights;
+                    setCgUnsizedArrayParameter(curParam, myPositionalLights);
                     myParamValueFoundFlag = true;
                     break;
-                case POSITIONAL_LIGHT_COLORS :
-                    setCgArrayVector4fParameter(curParam, myPositionalLightColors);
+                case POSITIONAL_LIGHTS_DIFFUSE_COLOR :
+                    setCgUnsizedArrayParameter(curParam, myPositionalLightColors);
+                    //setCgArrayVector4fParameter(curParam, myPositionalLightColors);
                     myParamValueFoundFlag = true;
                     break;
                 case DIRECTIONAL_LIGHTS :
-                    setCgArrayVector3fParameter(curParam, myDirectionalLights);
+            AC_DEBUG << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;
+                    setCgUnsizedArrayParameter(curParam, myDirectionalLights);
                     myParamValueFoundFlag = true;
                     break;
-                case DIRECTIONAL_LIGHT_COLORS :
-                    setCgArrayVector4fParameter(curParam, myDirectionalLightColors);
+                case DIRECTIONAL_LIGHTS_DIFFUSE_COLOR :
+                    setCgUnsizedArrayParameter(curParam, myDirectionalLightColors);
+                    //setCgArrayVector4fParameter(curParam, myDirectionalLightColors);
                     myParamValueFoundFlag = true;
                     break;
                 case AMBIENT_LIGHT_COLOR :
@@ -346,6 +528,82 @@ namespace y60 {
     }
 
     void
+    CgProgramInfo::setCgMaterialParameter(CGparameter & theCgParameter, 
+            const dom::NodePtr & theNode, const MaterialBase & theMaterial)
+    {
+        const string & thePropertyName = theNode->getAttributeString("name");
+        AC_TRACE << "setting " << theNode->nodeName() <<" property " << thePropertyName << endl;
+        switch(TypeId(asl::getEnumFromString(theNode->nodeName(), TypeIdStrings)))
+        {
+            case FLOAT:
+                {
+                    float myValue = (*theNode)("#text").dom::Node::nodeValueAs<float>();
+                    cgGLSetParameter1f(theCgParameter, myValue);
+                    break;
+                }
+            case VECTOR2F:
+                {
+                    Vector2f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<Vector2f>();
+                    float * myValue = myValueV.begin();
+                    cgGLSetParameter2fv(theCgParameter, myValue);
+                    break;
+                }
+            case VECTOR3F:
+                {
+                    Vector3f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<Vector3f>();
+                    float * myValue = myValueV.begin();
+                    cgGLSetParameter3fv(theCgParameter, myValue);
+                    break;
+                }
+            case VECTOR4F:
+                {
+                    Vector4f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<Vector4f>();
+                    float * myValue = myValueV.begin();
+                    cgGLSetParameter4fv(theCgParameter, myValue);
+                    break;
+                }
+             case VECTOR_OF_VECTOR2F:
+                {
+                    VectorOfVector2f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<VectorOfVector2f>();
+                    float * myValue = myValueV.begin()->begin();
+                    cgGLSetParameterArray2f(theCgParameter, 0, myValueV.size(), myValue);
+                    break;
+                }
+             case VECTOR_OF_VECTOR4F:
+                {
+                    VectorOfVector4f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<VectorOfVector4f>();
+                    float * myValue = myValueV.begin()->begin();
+                    cgGLSetParameterArray4f(theCgParameter, 0, myValueV.size(), myValue);
+                    break;
+                }
+            case SAMPLER2D:
+            case SAMPLERCUBE:
+                {
+                    unsigned myTextureIndex = (*theNode)("#text").dom::Node::nodeValueAs<unsigned>();
+                    if (myTextureIndex  < theMaterial.getTextureCount()) {
+                        const Texture & myTexture = theMaterial.getTexture(myTextureIndex);
+                        cgGLSetTextureParameter( theCgParameter, myTexture.getId());
+                        DB(AC_TRACE << "cgGLSetTextureParameter: Texture index: "<< as_string(myTextureIndex)
+                                << " , glid : " << myTexture.getId()
+                                << " , property : " << thePropertyName
+                                << " to parameter : "<< cgGetParameterName(theCgParameter) << endl;)
+                    } else {
+                        throw ShaderException(string("Texture Index ") + as_string(myTextureIndex) +
+                                " not found. Material has " + as_string(theMaterial.getTextureCount()) + " texture(s)",
+                                "CGShader::setCgParameter()");
+                    }
+                    break;
+                }
+            default:
+                throw ShaderException(string("Unknown CgParameter type in property '")+thePropertyName+"'",
+                        "CGShader::setCgParameter()");
+        }
+
+        assertCg("setCgMaterialParameter");
+
+    }
+
+    void
     CgProgramInfo::setCgVectorParameter(const CgProgramAutoParam & theParam, const asl::Vector3f & theValue) {
         switch (theParam._myType) {
             case CG_FLOAT3:
@@ -394,6 +652,7 @@ namespace y60 {
     CgProgramInfo::setCgArrayVector3fParameter(const CgProgramAutoParam & theParam, const vector<asl::Vector3f> & theValue) {
         if (theParam._myType == CG_ARRAY) {
             int mySize = cgGetArraySize(theParam._myParameter, 0);
+            AC_DEBUG << "setting array 3f size " << mySize;
             if (mySize) {
                 cgGLSetParameterArray3f(theParam._myParameter, 0,
                         mySize, theValue.begin()->begin());
@@ -416,6 +675,34 @@ namespace y60 {
         } else {
             throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                     + " should be FLOAT4[].", "CgProgramInfo::setCgArrayVector4fParameter()");
+        }
+        assertCg(string("setting auto parameter ") + theParam._myName);
+    }
+    
+    void
+    CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, 
+            const vector<asl::Vector3f> & theValue) {
+
+        
+        int mySize = cgGetArraySize(theParam._myParameter, 0);
+        for(int i = 0; i < mySize; ++i) {
+            CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
+            AC_DEBUG << "setting component " << i << " to " << theValue[i];
+            cgSetParameter3f(myElement, theValue[i][0], theValue[i][1], theValue[i][2]);
+        }
+        assertCg(string("setting auto parameter ") + theParam._myName);
+    }
+
+    void
+    CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, 
+            const vector<asl::Vector4f> & theValue) {
+
+        
+        int mySize = cgGetArraySize(theParam._myParameter, 0);
+        for(int i = 0; i < mySize; ++i) {
+            CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
+            AC_DEBUG << "setting component " << i << " to " << theValue[i];
+            cgSetParameter4f(myElement, theValue[i][0], theValue[i][1], theValue[i][2], theValue[i][3]);
         }
         assertCg(string("setting auto parameter ") + theParam._myName);
     }
