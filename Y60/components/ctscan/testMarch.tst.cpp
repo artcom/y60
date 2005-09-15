@@ -92,7 +92,7 @@ class MarchTest : public UnitTest {
 
             // for (int i = 0; i < 256; ++i) {
                 int i = 170;
-                ScenePtr myScene = myCTScan->polygonize(myBox, float(i), 255, 1, true, myPackageManager); 
+                ScenePtr myScene = myCTScan->polygonizeGlobal(myBox, float(i), 255, 1, true, myPackageManager); 
                 dom::NodePtr myShape = myScene->getShapesRoot()->childNode(0);
                 ENSURE(myShape);
                 Mesh myMesh(myShape);
@@ -115,7 +115,7 @@ class MarchTest : public UnitTest {
             Box3i myBox(Point3i(0,0,0), Point3i(mySize,mySize,mySize));
 
             for (int i = 0; i < 256; ++i) {
-                ScenePtr myScene = myCTScan->polygonize(myBox, float(i), 255, 1, true, myPackageManager); 
+                ScenePtr myScene = myCTScan->polygonizeGlobal(myBox, float(i), 255, 1, true, myPackageManager); 
                 dom::NodePtr myShape = myScene->getShapesRoot()->childNode(0);
                 ENSURE(myShape);
                 Mesh myMesh(myShape);
