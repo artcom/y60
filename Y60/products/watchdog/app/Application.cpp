@@ -219,7 +219,9 @@ Application::terminate(const std::string & theReason, bool theWMCloseAllowed){
     }
     else {
         // Terminate process
+        _myLogger.logToFile("Try to terminate application.");
         TerminateProcess(_myProcessInfo.hProcess, 0);
+        _myLogger.logToFile("O.k., terminated.");
     }
 
     _myProcessResult = WAIT_OBJECT_0;
@@ -336,6 +338,7 @@ void
 Application::closeAllThreads() {
     // clean up the application: collect all threads and kill em
     AC_DEBUG << "clean up the application: collect all threads and kill em ";
+    _myLogger.logToFile("Clean up the application: collect all threads and kill em");
     THREADENTRY32  myThreadInfo;
     myThreadInfo.dwSize = sizeof( THREADENTRY32 );
     HANDLE hProcessSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD,0);//TH32CS_SNAPPROCESS, 0 );
@@ -345,6 +348,7 @@ Application::closeAllThreads() {
     } else {
         if (Thread32First(hProcessSnap, &myThreadInfo)){
             do {
+                _myLogger.logToFile(string("### found a running thread with id: ") + asl::as_string(myThreadInfo.th32ThreadID));
                 if( myThreadInfo.th32OwnerProcessID == _myProcessInfo.dwProcessId )    {
                     myThreadNum++;
                     AC_DEBUG << "### found a running thread with id:" << myThreadInfo.th32ThreadID << ", terminate...";
@@ -360,6 +364,7 @@ Application::closeAllThreads() {
     if (myThreadNum > 0) {
         cerr <<"Process had still " << myThreadNum << " threads, terminated them" << endl << endl;
     }
+    _myLogger.logToFile(string("Closed all threads: ") + asl::as_string(myThreadNum));
 }
 
 void
