@@ -14,7 +14,7 @@
                  <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
-        <vertexshader profile="VP30" file="phongBump.cg" entryfunction="mainVertex">
+        <vertexshader profile="VP20" file="phongBump.cg" entryfunction="mainVertex">
             <properties>
             </properties>
             <vertexparameters>
@@ -438,7 +438,7 @@
             <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT=2 -DTEXGEN0={texcoord[0]}">
+        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT=2, -DTEXGEN0={texcoord[0]}">
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
                 <sampler2d name="emmisiveTex">1</sampler2d>
@@ -446,7 +446,7 @@
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT=2 -DPOSLIGHT ,-DDIRLIGHT">
+        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT=2">
             <properties>
                  <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                  <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
@@ -614,14 +614,14 @@
             <feature class="texcoord" values="[uv_map,uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT -DPOSLIGHT ,-DDIRLIGHT">
+        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT -DPOSLIGHT ,-DDIRLIGHT">
+        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
             <properties>
                  <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                  <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>

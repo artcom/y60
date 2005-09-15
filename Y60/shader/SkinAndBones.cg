@@ -44,9 +44,9 @@ vert2frag mainVertex(app2vert IN,
                      uniform float4x4 AC_OBJECTWORLD,
                      uniform float4x4 AC_OBJECTWORLD_IT,
                      uniform float3   AC_DIRECTIONAL_LIGHTS[DIRECTIONAL_LIGHT_COUNT],
-                     uniform float4   AC_DIRECTIONAL_LIGHT_COLORS[DIRECTIONAL_LIGHT_COUNT],
+                     uniform float4   AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[DIRECTIONAL_LIGHT_COUNT],
                      uniform float3   AC_POSITIONAL_LIGHTS[POSITIONAL_LIGHT_COUNT],
-                     uniform float4   AC_POSITIONAL_LIGHT_COLORS[POSITIONAL_LIGHT_COUNT],
+                     uniform float4   AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[POSITIONAL_LIGHT_COUNT],
                      uniform float4   AC_AMBIENT_LIGHT_COLOR
                      )
 {
@@ -95,12 +95,12 @@ vert2frag mainVertex(app2vert IN,
     float4 myDiffuse = float4(0,0,0,1);
 
     for (i = 0; i < DIRECTIONAL_LIGHT_COUNT; ++i) {
-        myDiffuse  += max(0, dot(AC_DIRECTIONAL_LIGHTS[i], myWorldNormal)) * AC_DIRECTIONAL_LIGHT_COLORS[i];
+        myDiffuse  += max(0, dot(AC_DIRECTIONAL_LIGHTS[i], myWorldNormal)) * AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[i];
     }
 
     for (i = 0; i < POSITIONAL_LIGHT_COUNT; ++i) {
         float3 posLightDirection = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
-        myDiffuse  += max(0, dot(myWorldNormal, posLightDirection)) * AC_POSITIONAL_LIGHT_COLORS[i];
+        myDiffuse  += max(0, dot(myWorldNormal, posLightDirection)) * AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i];
     }
 
     OUT.primColor = myDiffuse*diffuse + AC_AMBIENT_LIGHT_COLOR*ambient;

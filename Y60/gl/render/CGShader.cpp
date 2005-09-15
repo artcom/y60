@@ -24,7 +24,7 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
-#define DB(x) // x
+#define DB(x)  //x
 
 namespace y60 {
 
@@ -59,7 +59,7 @@ namespace y60 {
             throw ShaderException("CGShader::compile() - Dynamic cast of IShaderLibrary failed",
                                   PLUS_FILE_LINE);
         }
-
+        checkCgError();
         // compile fragment shader
         if (!_myFragmentProgram) {
             DB(AC_TRACE << "CGShader::loadShader(): Loading fragment shader from file '"
@@ -67,7 +67,6 @@ namespace y60 {
             _myFragmentProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myFragmentShader,
                     myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
         }
-
         // compile vertex shader
         if (!_myVertexProgram) {
             DB(AC_TRACE << "CGShader::loadShader(): Loading vertex shader from file '"
@@ -75,6 +74,8 @@ namespace y60 {
             _myVertexProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myVertexShader,
                     myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
         }
+
+        AC_DEBUG << "compile done.";
     }
 
     void CGShader::load(IShaderLibrary & theShaderLibrary) {

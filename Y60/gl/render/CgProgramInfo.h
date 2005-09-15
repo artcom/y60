@@ -99,7 +99,8 @@ namespace y60 {
             static void setCgMaterialParameter(CGparameter & theCgParameter, 
                     const dom::NodePtr & theNode, const MaterialBase & theMaterial);
 
-            void reloadProgram();
+            void createAndCompileProgram();
+
             void setCGGLParameters();
             void setAutoParameters(const y60::LightVector & theLightInstances,
                         const Viewport & theViewport,

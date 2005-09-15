@@ -339,7 +339,6 @@ namespace y60 {
 								   const std::string & theApplyMode,
 								   const asl::Vector4f theColorScale)
     {
-        // UH: I believe this is broken, cubemaps are specified differently now
         checkState();
         string myFileName = theFrontFileName + "|" + theRightFileName + "|"
             + theBackFileName + "|" + theLeftFileName + "|"

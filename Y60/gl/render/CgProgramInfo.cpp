@@ -50,7 +50,7 @@ namespace y60 {
         }
     }
 
-    void CgProgramInfo::reloadProgram() {
+    void CgProgramInfo::createAndCompileProgram() {
         AC_DEBUG << "reloadProgram " << _myPathName.c_str();
 
         
@@ -96,7 +96,6 @@ namespace y60 {
         }
         processParameters();
         cgCompileProgram(_myCgProgramID);
-        cgGLLoadProgram(_myCgProgramID);
     }
     
     CgProgramInfo::CgProgramInfo(const ShaderDescription & myShader,
@@ -115,7 +114,7 @@ namespace y60 {
         //VS: 100 punkte
         cgSetAutoCompile(_myContext, CG_COMPILE_MANUAL);
         
-        reloadProgram();
+        createAndCompileProgram();
 
         DB(AC_TRACE << "CgProgramInfo::CgProgramInfo(" << _myCgProgramID << ")" << endl;);
     }
@@ -346,7 +345,8 @@ namespace y60 {
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = myDirectionalLightCount;
             
-            reloadProgram();
+            createAndCompileProgram();
+            cgGLLoadProgram(_myCgProgramID);
 
             enableProfile();
             bindMaterialParams(theMaterial);
