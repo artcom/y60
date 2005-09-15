@@ -12,7 +12,7 @@
 #define _FFMpegDecoder_H_
 
 #include "IAudioDecoder.h"
-#include "Media.h"
+#include "SoundManager.h"
 
 #include <asl/ISampleSink.h>
 #include <asl/Block.h>

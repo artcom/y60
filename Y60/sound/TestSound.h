@@ -15,7 +15,7 @@
 
 #include <asl/UnitTest.h>
 
-#include "Media.h"
+#include "SoundManager.h"
 
 #include <asl/numeric_functions.h>
 #include <asl/string_functions.h>
@@ -30,15 +30,15 @@ using namespace y60;
 
 class SoundTestBase: public UnitTest {
     public:
-        SoundTestBase(Media& myMedia, const char * myName) 
+        SoundTestBase(SoundManager& mySoundManager, const char * myName) 
             : UnitTest(myName),
-              _myMedia(myMedia)
+              _mySoundManager(mySoundManager)
         {  
         }
 
     protected:
-        Media& getMedia() {
-            return _myMedia;
+        SoundManager& getSoundManager() {
+            return _mySoundManager;
         }
        
         void checkTime(SoundPtr theSound, asl::Time theTime) {
@@ -50,13 +50,13 @@ class SoundTestBase: public UnitTest {
         }
         
     private:
-        Media& _myMedia;
+        SoundManager& _mySoundManager;
 };
 
 class TestPlay : public SoundTestBase {
     public:
-        TestPlay(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestPlay")
+        TestPlay(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestPlay")
         {  
         }
 
@@ -69,7 +69,7 @@ class TestPlay : public SoundTestBase {
 
     private:
         void play(const std::string & theURI) {
-            SoundPtr mySound = getMedia().createSound(theURI);
+            SoundPtr mySound = getSoundManager().createSound(theURI);
             mySound->play();
             while(mySound->isPlaying()) {
                 msleep(100);
@@ -79,8 +79,8 @@ class TestPlay : public SoundTestBase {
 
 class TestBroken : public SoundTestBase {
     public:
-        TestBroken(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestBroken")
+        TestBroken(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestBroken")
         {  
         }
 
@@ -93,7 +93,7 @@ class TestBroken : public SoundTestBase {
         void play(const std::string & theURI) {
             bool myException = false;
             try {
-                SoundPtr mySound = getMedia().createSound(theURI);
+                SoundPtr mySound = getSoundManager().createSound(theURI);
                 mySound->play();
                 while(mySound->isPlaying()) {
                     msleep(100);
@@ -107,8 +107,8 @@ class TestBroken : public SoundTestBase {
 
 class TestFireAndForget: public SoundTestBase {
     public:
-        TestFireAndForget(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestFireAndForget")
+        TestFireAndForget(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestFireAndForget")
         {  
         }
 
@@ -116,29 +116,29 @@ class TestFireAndForget: public SoundTestBase {
             Time myDuration;
             {
                 SoundPtr mySound = 
-                        getMedia().createSound("../../testfiles/stereotest441.wav");
+                        getSoundManager().createSound("../../testfiles/stereotest441.wav");
                 mySound->play();
                 myDuration = mySound->getDuration();
             }
             msleep(unsigned(myDuration*1000)+200);
-            ENSURE(getMedia().getNumSounds() == 0);
+            ENSURE(getSoundManager().getNumSounds() == 0);
         }
 };
 
 
 class TestTwoSounds: public SoundTestBase {
     public:
-        TestTwoSounds(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestTwoSounds")
+        TestTwoSounds(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestTwoSounds")
         {  
         }
 
         void run() {
             Time myDuration;
-            SoundPtr mySound = getMedia().createSound("../../testfiles/aussentuer.mp3");
+            SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3");
             mySound->play();
             myDuration = mySound->getDuration();
-            mySound = getMedia().createSound("../../testfiles/stereotest441.wav");
+            mySound = getSoundManager().createSound("../../testfiles/stereotest441.wav");
             mySound->play();
             myDuration = maximum(myDuration, mySound->getDuration());
             msleep(unsigned(myDuration*1000));
@@ -147,29 +147,29 @@ class TestTwoSounds: public SoundTestBase {
 
 class TestStopAll: public SoundTestBase {
     public:
-        TestStopAll(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestStopAll")
+        TestStopAll(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestStopAll")
         {  
         }
 
         void run() {
-            ENSURE(getMedia().getNumSounds() == 0);
+            ENSURE(getSoundManager().getNumSounds() == 0);
             {
-                SoundPtr mySound = getMedia().createSound("../../testfiles/aussentuer.mp3");
+                SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3");
                 mySound->play();
-                mySound = getMedia().createSound("../../testfiles/stereotest441.wav");
+                mySound = getSoundManager().createSound("../../testfiles/stereotest441.wav");
                 mySound->play();
             }
             msleep(700);
-            getMedia().stopAll();
-            ENSURE(getMedia().getNumSounds() == 0);
+            getSoundManager().stopAll();
+            ENSURE(getSoundManager().getNumSounds() == 0);
         }
 };
 
 class TestStop: public SoundTestBase {
     public:
-        TestStop(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestStop")
+        TestStop(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestStop")
         {  
         }
 
@@ -177,12 +177,12 @@ class TestStop: public SoundTestBase {
             runLoop(false);
             runLoop(true);
             msleep(100);
-            ENSURE(getMedia().getNumSounds() == 0);
+            ENSURE(getSoundManager().getNumSounds() == 0);
         }
         
     private:
         void runLoop(bool theLoop) {
-            SoundPtr mySound = getMedia().createSound("../../testfiles/aussentuer.mp3", theLoop);
+            SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3", theLoop);
             mySound->play();
             msleep(200);
             checkTime(mySound, 0.2);
@@ -206,14 +206,14 @@ class TestStop: public SoundTestBase {
 
 class TestStopByItself: public SoundTestBase {
     public:
-        TestStopByItself(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestStopByItself")
+        TestStopByItself(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestStopByItself")
         {  
         }
 
         void run() {
             {
-                SoundPtr mySound = getMedia().createSound("../../testfiles/aussentuer.mp3");
+                SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3");
                 mySound->play();
                 while(mySound->isPlaying()) {
                     msleep(100);
@@ -222,10 +222,10 @@ class TestStopByItself: public SoundTestBase {
                 ENSURE(mySound->getNumUnderruns() == 0);
             }
             msleep(100);
-            ENSURE(getMedia().getNumSounds() == 0);
+            ENSURE(getSoundManager().getNumSounds() == 0);
 
             {
-                SoundPtr mySound = getMedia().createSound("../../testfiles/aussentuer.mp3");
+                SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3");
                 mySound->play();
                 while(mySound->isPlaying()) {
                     msleep(100);
@@ -237,21 +237,21 @@ class TestStopByItself: public SoundTestBase {
                 ENSURE(mySound->getNumUnderruns() == 0);
             }
             msleep(100);
-            ENSURE(getMedia().getNumSounds() == 0);
+            ENSURE(getSoundManager().getNumSounds() == 0);
         }
 
 };
 
 class TestPause: public SoundTestBase {
     public:
-        TestPause(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestPause")
+        TestPause(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestPause")
         {  
         }
        
         void run() {
             {
-                SoundPtr mySound = getMedia().createSound("../../testfiles/aussentuer.mp3");
+                SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3");
                 mySound->play();
                 msleep(200);
                 checkTime(mySound, 0.2);
@@ -272,7 +272,7 @@ class TestPause: public SoundTestBase {
     private:
         void runLoop(bool theLoop) {
             {
-                SoundPtr mySound = getMedia().createSound
+                SoundPtr mySound = getSoundManager().createSound
                         ("../../testfiles/aussentuer.mp3", theLoop);
                 mySound->play();
                 msleep(200);
@@ -296,19 +296,19 @@ class TestPause: public SoundTestBase {
                 ENSURE(mySound->getNumUnderruns() == 0);
             }
             msleep(100);
-            ENSURE(getMedia().getNumSounds() == 0);
+            ENSURE(getSoundManager().getNumSounds() == 0);
         }
 };
 
 class TestLoop: public SoundTestBase {
     public:
-        TestLoop(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestLoop")
+        TestLoop(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestLoop")
         {  
         }
        
         void run() {
-            SoundPtr mySound = getMedia().createSound("../../testfiles/aussentuer.mp3", true);
+            SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3", true);
             mySound->play();
             msleep(3000);
             double myTime = mySound->getCurrentTime();
@@ -327,14 +327,14 @@ class TestLoop: public SoundTestBase {
 
 class TestVolume: public SoundTestBase {
     public:
-        TestVolume(Media& myMedia) 
-            : SoundTestBase(myMedia, "TestVolume")
+        TestVolume(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestVolume")
         {  
         }
        
         void run() {
             {   // Sound volume 
-                SoundPtr mySound = getMedia().createSound("../../testfiles/aussentuer.mp3");
+                SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3");
                 mySound->setVolume(0.2f);
                 mySound->play();
                 msleep(200);
@@ -347,16 +347,16 @@ class TestVolume: public SoundTestBase {
                 mySound->stop();
             }
             {   // Global volume
-                SoundPtr mySound = getMedia().createSound("../../testfiles/aussentuer.mp3");
-                getMedia().setVolume(0.2f);
+                SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3");
+                getSoundManager().setVolume(0.2f);
                 mySound->play();
                 msleep(200);
-                getMedia().setVolume(0.5f);
+                getSoundManager().setVolume(0.5f);
                 msleep(200);
-                ENSURE(almostEqual(getMedia().getVolume(), 0.5));
-                getMedia().fadeToVolume(1, 0.3f);
+                ENSURE(almostEqual(getSoundManager().getVolume(), 0.5));
+                getSoundManager().fadeToVolume(1, 0.3f);
                 msleep(400);
-                ENSURE(almostEqual(getMedia().getVolume(), 1));
+                ENSURE(almostEqual(getSoundManager().getVolume(), 1));
                 mySound->stop();
             }
             
@@ -365,13 +365,13 @@ class TestVolume: public SoundTestBase {
 
 class TestSeek: public SoundTestBase {
     public:
-        TestSeek(Media& myMedia)
-            : SoundTestBase(myMedia, "TestSeek")
+        TestSeek(SoundManager& mySoundManager)
+            : SoundTestBase(mySoundManager, "TestSeek")
         {
         }
 
         void run() {
-            SoundPtr mySound = getMedia().createSound
+            SoundPtr mySound = getSoundManager().createSound
                     ("../../testfiles/sz5-1_c-beam Warnung_Time_1.WAV");
             // Seek at start
             mySound->seek(0.5);
@@ -409,8 +409,8 @@ class TestSeek: public SoundTestBase {
 
 class StressTest: public SoundTestBase {
     public:
-        StressTest(Media& myMedia, double myDuration) 
-            : SoundTestBase(myMedia, "StressTest"),
+        StressTest(SoundManager& mySoundManager, double myDuration) 
+            : SoundTestBase(mySoundManager, "StressTest"),
               _myDuration(myDuration)
         {  
         }
@@ -422,13 +422,13 @@ class StressTest: public SoundTestBase {
                 doIteration(i);
                 ++i;
             }
-            getMedia().stopAll();
+            getSoundManager().stopAll();
             SUCCESS("StressTest");
         }
 
     protected:
         void doIteration(int i) {
-            SoundPtr mySound = getMedia().createSound
+            SoundPtr mySound = getSoundManager().createSound
                 ("../../testfiles/stereotest441.wav", false,
                  "../../testfiles/stereotest441.wav "+asl::as_string(i));
             mySound->setVolume(0.02f);
@@ -443,8 +443,8 @@ class StressTest: public SoundTestBase {
 
 class MemLeakStressTest: public StressTest {
     public:
-        MemLeakStressTest(Media& myMedia, double myDuration) 
-            : StressTest(myMedia, myDuration)
+        MemLeakStressTest(SoundManager& mySoundManager, double myDuration) 
+            : StressTest(mySoundManager, myDuration)
         {
         }
        
@@ -467,7 +467,7 @@ class MemLeakStressTest: public StressTest {
                     }
                 }
             }
-            getMedia().stopAll();
+            getSoundManager().stopAll();
             ENSURE(Time()-myLastMemIncreaseTime > 10*60);
             if (Time()-myLastMemIncreaseTime < 10*60) {
                 AC_PRINT << "Last memory usage maximum was " << 
@@ -487,30 +487,30 @@ class SoundTestSuite : public UnitTestSuite {
         void setup() {
             UnitTestSuite::setup();
 
-            y60::Media& myMedia = Singleton<Media>::get();
+            y60::SoundManager& mySoundManager = Singleton<SoundManager>::get();
 
 #ifdef WIN32
-            myMedia.setSysConfig(0.05, "");
+            mySoundManager.setSysConfig(0.05, "");
 #else
-            myMedia.setSysConfig(0.02, "");
+            mySoundManager.setSysConfig(0.02, "");
 #endif
-            myMedia.setAppConfig(44100, 2, _myUseDummyPump);
+            mySoundManager.setAppConfig(44100, 2, _myUseDummyPump);
             
-            addTest(new TestPlay(myMedia));
-            addTest(new TestBroken(myMedia));
-            addTest(new TestFireAndForget(myMedia));
-            addTest(new TestTwoSounds(myMedia));
-            addTest(new TestStop(myMedia));
-            addTest(new TestStopByItself(myMedia));
-            addTest(new TestPause(myMedia));
-            addTest(new TestStopAll(myMedia));           
-            addTest(new TestLoop(myMedia));
-            addTest(new TestVolume(myMedia));
-            addTest(new TestSeek(myMedia));
+            addTest(new TestPlay(mySoundManager));
+            addTest(new TestBroken(mySoundManager));
+            addTest(new TestFireAndForget(mySoundManager));
+            addTest(new TestTwoSounds(mySoundManager));
+            addTest(new TestStop(mySoundManager));
+            addTest(new TestStopByItself(mySoundManager));
+            addTest(new TestPause(mySoundManager));
+            addTest(new TestStopAll(mySoundManager));           
+            addTest(new TestLoop(mySoundManager));
+            addTest(new TestVolume(mySoundManager));
+            addTest(new TestSeek(mySoundManager));
           
-//            addTest(new StressTest(myMedia, 5));
+            addTest(new StressTest(mySoundManager, 5));
 
-//            addTest(new MemLeakStressTest(myMedia, 60*60*24));
+//            addTest(new MemLeakStressTest(mySoundManager, 60*60*24));
         }
 
     private:

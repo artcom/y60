@@ -8,19 +8,20 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSMedia.h"
+#include "JSSoundManager.h"
 #include "JSSound.h"
 #include <y60/JScppUtils.h>
 
 using namespace std;
 using namespace asl;
+using namespace y60;
 
 namespace jslib {
 
     static JSBool
     stopAll(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Stop playing the sound."); DOC_END;
-        return Method<JSMedia::NATIVE>::call(&JSMedia::NATIVE::stopAll,cx,obj,argc,argv,rval);
+        return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::stopAll,cx,obj,argc,argv,rval);
     }
     static JSBool
     fadeToVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -28,7 +29,7 @@ namespace jslib {
         DOC_PARAM("volume", DOC_TYPE_FLOAT);
         DOC_PARAM("duration", DOC_TYPE_FLOAT);
         DOC_END;
-        return Method<JSMedia::NATIVE>::call(&JSMedia::NATIVE::fadeToVolume,cx,obj,argc,argv,rval);
+        return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::fadeToVolume,cx,obj,argc,argv,rval);
     }
     static JSBool
     createSound(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -40,26 +41,26 @@ namespace jslib {
         DOC_END;
         switch(argc) {
             case 1: {
-                    typedef y60::SoundPtr (y60::Media::*MyMethod)(const std::string & theURI);
-                    return Method<y60::Media>::call
-                            ((MyMethod)&y60::Media::createSound,cx,obj,argc,argv,rval);
+                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI);
+                    return Method<SoundManager>::call
+                            ((MyMethod)&SoundManager::createSound,cx,obj,argc,argv,rval);
                 }
             case 2: {
-                    typedef y60::SoundPtr (y60::Media::*MyMethod)(const std::string & theURI, bool theLoop);
-                    return Method<y60::Media>::call
-                            ((MyMethod)&y60::Media::createSound,cx,obj,argc,argv,rval);
+                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI, bool theLoop);
+                    return Method<SoundManager>::call
+                            ((MyMethod)&SoundManager::createSound,cx,obj,argc,argv,rval);
                 }
             default: {
-                    typedef y60::SoundPtr (y60::Media::*MyMethod)(const std::string & theURI, bool theLoop, 
+                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI, bool theLoop, 
                             const std::string & theName);
-                    return Method<y60::Media>::call
-                            ((MyMethod)&y60::Media::createSound,cx,obj,argc,argv,rval);
+                    return Method<SoundManager>::call
+                            ((MyMethod)&SoundManager::createSound,cx,obj,argc,argv,rval);
                 }
         }
     }
 
     JSFunctionSpec *
-    JSMedia::Functions() {
+    JSSoundManager::Functions() {
         static JSFunctionSpec myFunctions[] = {
             // name                  native            nargs
             {"stopAll",              stopAll,           0},
@@ -71,7 +72,7 @@ namespace jslib {
     }
 
     JSPropertySpec *
-    JSMedia::Properties() {
+    JSSoundManager::Properties() {
         static JSPropertySpec myProperties[] = {
             {"volume",       PROP_volume, JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"running",      PROP_running,      JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
@@ -83,7 +84,7 @@ namespace jslib {
 
     // getproperty handling
     JSBool
-    JSMedia::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    JSSoundManager::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         switch (theID) {
             case PROP_volume:
                 *vp = as_jsval(cx, getNative().getVolume());
@@ -95,26 +96,26 @@ namespace jslib {
                 *vp = as_jsval(cx, getNative().getNumSounds());
                 return JS_TRUE;
             default:
-                JS_ReportError(cx,"JSMedia::getProperty: index %d out of range", theID);
+                JS_ReportError(cx,"JSSoundManager::getProperty: index %d out of range", theID);
                 return JS_FALSE;
         }
     }
 
     // setproperty handling
     JSBool
-    JSMedia::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    JSSoundManager::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         jsval dummy;
         switch (theID) {
             case PROP_volume:                
                 return Method<NATIVE>::call(&NATIVE::setVolume, cx, obj, 1, vp, &dummy);
             default:
-                JS_ReportError(cx,"JSMedia::setPropertySwitch: index %d out of range", theID);
+                JS_ReportError(cx,"JSSoundManager::setPropertySwitch: index %d out of range", theID);
         }
         return JS_FALSE;
     }
 
     JSBool
-    JSMedia::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    JSSoundManager::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Create a Sound from URI.");
         DOC_PARAM_OPT("Samplerate", DOC_TYPE_INTEGER, 44100);
         DOC_PARAM_OPT("OutputChannels", DOC_TYPE_INTEGER, 2);    
@@ -128,18 +129,18 @@ namespace jslib {
                     as_string(argc) + ", expected between none and two.", PLUS_FILE_LINE);
             }
 
-            OWNERPTR myNewNative = OWNERPTR(new y60::Media());
+            OWNERPTR myNewNative = &(Singleton<SoundManager>::get());
             int mySampleRate = 0;
             if (argc > 0) {
                 if (!convertFrom(cx, argv[0], mySampleRate)) {
-                    JS_ReportError(cx, "JSMedia::Constructor(): argument #1 must be an integer (Samplerate)");
+                    JS_ReportError(cx, "JSSoundManager::Constructor(): argument #1 must be an integer (Samplerate)");
                     return JS_FALSE;
                 }
 
                 if (argc > 1) {
                     int myNumOutputChannels = 0;
                     if (!convertFrom(cx, argv[1], myNumOutputChannels)) {
-                        JS_ReportError(cx, "JSMedia::Constructor(): argument #1 must be an integer (NumOutputChannels)");
+                        JS_ReportError(cx, "JSSoundManager::Constructor(): argument #1 must be an integer (NumOutputChannels)");
                         return JS_FALSE;
                     }
                     myNewNative->setAppConfig(mySampleRate, myNumOutputChannels);        
@@ -151,19 +152,19 @@ namespace jslib {
             double myLatency = -1.0;
             if (argc == 3) {
                 if (!convertFrom(cx, argv[2], myLatency)) {
-                    JS_ReportError(cx, "JSMedia::Constructor(): argument #2 must be a double (Latency)");
+                    JS_ReportError(cx, "JSSoundManager::Constructor(): argument #2 must be a double (Latency)");
                     return JS_FALSE;
                 }
                 myNewNative->setSysConfig(myLatency);
             }
 
 
-            JSMedia * myNewObject = new JSMedia(myNewNative, &*myNewNative);
+            JSSoundManager * myNewObject = new JSSoundManager(myNewNative, &*myNewNative);
             if (myNewObject) {
                 JS_SetPrivate(cx, obj, myNewObject);
                 return JS_TRUE;
             } else  {
-                JS_ReportError(cx,"JSMedia::Constructor: bad parameters");
+                JS_ReportError(cx,"JSSoundManager::Constructor: bad parameters");
                 return JS_FALSE;
             }
             return JS_TRUE;
@@ -173,23 +174,23 @@ namespace jslib {
     }
 
     JSConstIntPropertySpec *
-    JSMedia::ConstIntProperties() {
+    JSSoundManager::ConstIntProperties() {
         static JSConstIntPropertySpec myProperties[] = {{0}};
         return myProperties;
     }
 
     JSObject *
-    JSMedia::initClass(JSContext *cx, JSObject *theGlobalObject) {
+    JSSoundManager::initClass(JSContext *cx, JSObject *theGlobalObject) {
         return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
     }
 
-    jsval as_jsval(JSContext *cx, JSMedia::OWNERPTR theOwner) {
-        JSObject * myReturnObject = JSMedia::Construct(cx, theOwner, &(*theOwner));
+    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner) {
+        JSObject * myReturnObject = JSSoundManager::Construct(cx, theOwner, &(*theOwner));
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 
-    jsval as_jsval(JSContext *cx, JSMedia::OWNERPTR theOwner, JSMedia::NATIVE * theNative) {
-        JSObject * myObject = JSMedia::Construct(cx, theOwner, theNative);
+    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner, JSSoundManager::NATIVE * theNative) {
+        JSObject * myObject = JSSoundManager::Construct(cx, theOwner, theNative);
         return OBJECT_TO_JSVAL(myObject);
     }
 }

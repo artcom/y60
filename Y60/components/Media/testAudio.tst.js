@@ -11,7 +11,6 @@
 */
 
 use("UnitTest.js");
-
 plug("y60Media");
 
 function SoundUnitTest() {
@@ -23,7 +22,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
 
 
     obj.runNewAudioLibTest = function() {
-        obj.myMedia = new MediaController();
+        obj.myMedia = new SoundManager();
         
         obj.myMedia.volume == 1.0;
         msleep(250);
@@ -37,7 +36,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         msleep(150);
         ENSURE("obj.myMedia.volume == 1.0");
 
-        obj.mySound = obj.myMedia.createSound("../../testfiles/aussentuer.mp3");
+        obj.mySound = obj.myMedia.createSound("../../../../sound/testfiles/aussentuer.mp3");
 
         ENSURE("obj.myMedia.soundcount == 1");
         ENSURE("obj.mySound.time == 0");
@@ -46,7 +45,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.mySound.volume == 1.0");        
         
         ENSURE("!obj.mySound.playing");        
-        ENSURE("obj.mySound.src == '../../testfiles/aussentuer.mp3'");        
+        ENSURE("obj.mySound.src == '../../../../sound/testfiles/aussentuer.mp3'");        
         ENSURE("obj.mySound.time == 0.0");
         ENSURE("obj.mySound.looping == false");
         ENSURE("obj.mySound.duration == 1.619499");
@@ -87,7 +86,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.myMedia.soundcount == 0");
         DPRINT("obj.myMedia.soundcount");
 
-        obj.mySound = obj.myMedia.createSound("../../testfiles/aussentuer.mp3");
+        obj.mySound = obj.myMedia.createSound("../../../../sound/testfiles/aussentuer.mp3");
         obj.mySound.play();
         ENSURE("obj.myMedia.soundcount == 1");
         obj.myMedia.stopAll();
@@ -99,11 +98,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
     }
 
     obj.run = function() {
-        try {
-            this.runNewAudioLibTest();
-        } catch (ex) {
-            print("An exception occured: " + ex + "\n");
-        }
+        this.runNewAudioLibTest();
     }
 }
 
@@ -119,7 +114,8 @@ function main() {
     return mySuite.returnStatus();
 }
 
-if (main() != 0) {
+rc = main();
+if (rc != 0) {
     exit(5);
 };
 

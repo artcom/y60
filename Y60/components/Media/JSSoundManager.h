@@ -8,29 +8,31 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef _ac_y60_JSMedia_h_
-#define _ac_y60_JSMedia_h_
+#ifndef _ac_y60_JSSoundManager_h_
+#define _ac_y60_JSSoundManager_h_
 
-#include "Media.h"
+#include <y60/SoundManager.h>
 #include <y60/JSWrapper.h>
 
 namespace jslib {
 
-    class JSMedia : public jslib::JSWrapper<y60::Media, asl::Ptr<y60::Media>, jslib::StaticAccessProtocol> {
-            JSMedia() {}
+    class JSSoundManager : public jslib::JSWrapper<y60::SoundManager, 
+                                  y60::SoundManager *, jslib::StaticAccessProtocol> 
+    {
+            JSSoundManager() {}
         public:
-            typedef y60::Media NATIVE;
-            typedef asl::Ptr<y60::Media> OWNERPTR;
+            typedef y60::SoundManager NATIVE;
+            typedef y60::SoundManager * OWNERPTR;
             typedef jslib::JSWrapper<NATIVE, OWNERPTR, jslib::StaticAccessProtocol> Base;
     
-            JSMedia(OWNERPTR theOwner, NATIVE * theNative)
+            JSSoundManager(OWNERPTR theOwner, NATIVE * theNative)
                 : Base(theOwner, theNative)
             {}
     
-            ~JSMedia() {};
+            ~JSSoundManager() {};
             
             static const char * ClassName() {
-                return "MediaController";
+                return "SoundManager";
             }
             static JSFunctionSpec * Functions();
     
@@ -46,8 +48,10 @@ namespace jslib {
                 return 1;
             }
     
-            virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-            virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+            virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, 
+                    JSObject *obj, jsval id, jsval *vp);
+            virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, 
+                    JSObject *obj, jsval id, jsval *vp);
     
             static JSBool
             Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
@@ -60,17 +64,18 @@ namespace jslib {
             static jslib::JSConstIntPropertySpec * ConstIntProperties();
             static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
     
-            static JSMedia & getObject(JSContext *cx, JSObject * obj) {
-                return dynamic_cast<JSMedia &>(JSMedia::getJSWrapper(cx,obj));
+            static JSSoundManager & getObject(JSContext *cx, JSObject * obj) {
+                return dynamic_cast<JSSoundManager &>(JSSoundManager::getJSWrapper(cx,obj));
             }
     };
 
-    jsval as_jsval(JSContext *cx, JSMedia::OWNERPTR theOwner);
-    jsval as_jsval(JSContext *cx, JSMedia::OWNERPTR theOwner, JSMedia::NATIVE * theNative);
+    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner);
+    jsval as_jsval(JSContext *cx, JSSoundManager::OWNERPTR theOwner, 
+            JSSoundManager::NATIVE * theNative);
 
     template <>
-    struct JSClassTraits<JSMedia::NATIVE> 
-        : public JSClassTraitsWrapper<JSMedia::NATIVE, JSMedia> {};
+    struct JSClassTraits<JSSoundManager::NATIVE> 
+        : public JSClassTraitsWrapper<JSSoundManager::NATIVE, JSSoundManager> {};
 
 }
 

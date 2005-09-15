@@ -11,9 +11,9 @@
 #ifndef _ac_y60_JSSound_h_
 #define _ac_y60_JSSound_h_
 
-#include "Sound.h"
-#include "JSMedia.h"
+#include "JSSoundManager.h"
 
+#include <y60/Sound.h>
 #include <y60/JSWrapper.h>
 #include <y60/IScriptablePlugin.h>
 
@@ -93,7 +93,7 @@ namespace y60 {
     			JSObject *theGlobalObject) 
             {
                 jslib::JSSound::initClass(theContext, theGlobalObject);
-                jslib::JSMedia::initClass(theContext, theGlobalObject);
+                jslib::JSSoundManager::initClass(theContext, theGlobalObject);
     		}
 
     		const char * ClassName() {

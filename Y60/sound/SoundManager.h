@@ -8,8 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef _ac_y60_Media_h_
-#define _ac_y60_Media_h_
+#ifndef _ac_y60_SoundManager_h_
+#define _ac_y60_SoundManager_h_
 
 #include "Sound.h"
 #include "IAudioDecoderFactory.h"
@@ -24,12 +24,10 @@
 
 namespace y60 {
 
-    DEFINE_EXCEPTION(MediaException, asl::Exception);
-
-    class Media : public asl::Singleton<Media>, private PosixThread {
+    class SoundManager : public asl::Singleton<SoundManager>, private PosixThread {
         friend class asl::SingletonManager;
     public:
-        virtual ~Media();
+        virtual ~SoundManager();
 
         virtual void setSysConfig(const asl::Time& myLatency, const std::string& myDeviceName = "");
         virtual void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels = 2, 
@@ -55,7 +53,7 @@ namespace y60 {
         virtual void update();
         
     private:
-        Media();
+        SoundManager();
         void run();
         IAudioDecoder * createDecoder(const std::string & theURI);
         
@@ -66,8 +64,6 @@ namespace y60 {
         std::vector < IAudioDecoderFactory* > _myDecoderFactories; 
         IAudioDecoderFactory* _myFFMpegDecoderFactory;
     };
-
-    typedef asl::Ptr<Media> MediaPtr;
 }
 
 #endif

@@ -30,11 +30,11 @@ class IAudioDecoderFactory
         virtual int getPriority() = 0;
 
     private:
-        friend operator <(const IAudioDecoderFactory& a, const IAudioDecoderFactory& b);
+        friend bool operator <(const IAudioDecoderFactory& a, const IAudioDecoderFactory& b);
         int _myPriority;
 };
 
-inline operator < (const IAudioDecoderFactory& a, const IAudioDecoderFactory& b) {
+inline bool operator < (const IAudioDecoderFactory& a, const IAudioDecoderFactory& b) {
     return a._myPriority < b._myPriority;
 }
 

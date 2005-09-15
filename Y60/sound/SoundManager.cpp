@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "Media.h"
+#include "SoundManager.h"
 #include "FFMpegDecoder.h"
 
 #include <asl/Logger.h>
@@ -22,17 +22,18 @@ namespace y60 {
 
 const double myTimePerSlice = 0.05;
     
-Media::Media() {
-    AC_DEBUG << "Media::Media";
+SoundManager::SoundManager() {
+    AC_DEBUG << "SoundManager::SoundManager";
     _myFFMpegDecoderFactory = new FFMpegDecoderFactory;
     registerDecoderFactory(_myFFMpegDecoderFactory);
     fork();
 }
 
-Media::~Media() {
+SoundManager::~SoundManager() {
+    AC_DEBUG << "SoundManager::~SoundManager";
     msleep(50);
     if (_mySounds.size() != 0) {
-        AC_DEBUG << "Deleting Media, but " << _mySounds.size() << " sounds are still active.";
+        AC_DEBUG << "Deleting SoundManager, but " << _mySounds.size() << " sounds are still active.";
         stopAll();
     }
     join();
@@ -43,24 +44,25 @@ Media::~Media() {
     }
 }
 
-void Media::setSysConfig(const Time& myLatency, const string& myDeviceName) {
+void SoundManager::setSysConfig(const Time& myLatency, const string& myDeviceName) {
     Pump::setSysConfig(myLatency, myDeviceName);
 }
 
-void Media::setAppConfig(unsigned mySampleRate, unsigned numOutputChannels, 
+void SoundManager::setAppConfig(unsigned mySampleRate, unsigned numOutputChannels, 
         bool useDummy)
 {
     Pump::setAppConfig(mySampleRate, numOutputChannels, useDummy);
 }
 
-void Media::registerDecoderFactory(IAudioDecoderFactory* theFactory) {
+void SoundManager::registerDecoderFactory(IAudioDecoderFactory* theFactory) {
     AC_DEBUG << "Registering decoder factory " << theFactory;
     _myDecoderFactories.insert(
-            upper_bound(_myDecoderFactories.begin(), _myDecoderFactories.end(),theFactory),
+            lower_bound(_myDecoderFactories.begin(), _myDecoderFactories.end(), theFactory),
             theFactory);
+    
 }
 
-void Media::unregisterDecoderFactory(IAudioDecoderFactory* theFactory) {
+void SoundManager::unregisterDecoderFactory(IAudioDecoderFactory* theFactory) {
     std::vector <IAudioDecoderFactory*>::iterator it;
     
     for (it=_myDecoderFactories.begin(); it != _myDecoderFactories.end(); ++it) {
@@ -73,17 +75,17 @@ void Media::unregisterDecoderFactory(IAudioDecoderFactory* theFactory) {
             " not registered.";
 }
 
-SoundPtr Media::createSound(const string & theURI) {
+SoundPtr SoundManager::createSound(const string & theURI) {
     // Workaround function since the JS binding doesn't support default parameters.
     return createSound(theURI, false, "");
 }
 
-SoundPtr Media::createSound(const string & theURI, bool theLoop) {
+SoundPtr SoundManager::createSound(const string & theURI, bool theLoop) {
     // Workaround function since the JS binding doesn't support default parameters.
     return createSound(theURI, theLoop, "");
 }
 
-SoundPtr Media::createSound(const string & theURI, bool theLoop,
+SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
         const std::string & theName)
 {
     // We need a factory function so we can set the Sound's mySelf pointer and so
@@ -100,37 +102,37 @@ SoundPtr Media::createSound(const string & theURI, bool theLoop,
     return mySound;
 }
 /*
-SoundPtr Media::createSound(const string & theURI, Ptr<ReadableStream> theStream, 
+SoundPtr SoundManager::createSound(const string & theURI, Ptr<ReadableStream> theStream, 
         bool theLoop)
 {
     AutoLocker<ThreadLock> myLocker(_myLock);
     return SoundPtr(0);
 }
 */
-void Media::setVolume(float theVolume) {
+void SoundManager::setVolume(float theVolume) {
     Pump::get().setVolume(theVolume);
 }
 
-void Media::fadeToVolume(float theVolume, float theTime) {
+void SoundManager::fadeToVolume(float theVolume, float theTime) {
     Pump::get().fadeToVolume(theVolume, theTime);
 }
 
 
-float Media::getVolume() const {
+float SoundManager::getVolume() const {
     return Pump::get().getVolume();
 }
 
-unsigned Media::getNumSounds() const {
+unsigned SoundManager::getNumSounds() const {
     return Pump::get().getNumSinks();
 }
 
-bool Media::isRunning() const {
+bool SoundManager::isRunning() const {
     return Pump::get().isRunning();
 }
 
-void Media::stopAll() {
+void SoundManager::stopAll() {
     {
-        AC_DEBUG << "Media::stopAll";
+        AC_DEBUG << "SoundManager::stopAll";
         std::vector < SoundWeakPtr >::iterator it;
         unsigned myNumSoundsStopped = 0;
         // Here, we'd like to just lock the Sounds, iterate through the sounds and
@@ -162,10 +164,10 @@ void Media::stopAll() {
     msleep(100);
 
     update();
-    AC_DEBUG << "Media::stopAll end";
+    AC_DEBUG << "SoundManager::stopAll end";
 }
 
-void Media::update() {
+void SoundManager::update() {
     AutoLocker<ThreadLock> myLocker(_myLock);
     std::vector < SoundWeakPtr >::iterator it;
     for (it = _mySounds.begin(); it != _mySounds.end();) {
@@ -179,18 +181,18 @@ void Media::update() {
     }
 }
 
-void Media::run() {
-    AC_DEBUG << "Media::run started";
+void SoundManager::run() {
+    AC_DEBUG << "SoundManager::run started";
     while (!shouldTerminate()) {
         update();
         msleep(unsigned(myTimePerSlice*1000));
     }
-    AC_DEBUG << "Media::run ended";
+    AC_DEBUG << "SoundManager::run ended";
 }
 
-IAudioDecoder * Media::createDecoder(const std::string & theURI) {
+IAudioDecoder * SoundManager::createDecoder(const std::string & theURI) {
     IAudioDecoder * myDecoder = 0;
-    for (int i=_myDecoderFactories.size(); i>=0; --i) {
+    for (int i=_myDecoderFactories.size()-1; i>=0; --i) {
         IAudioDecoderFactory* myCurrentFactory = _myDecoderFactories[i];
         try {
             myDecoder = myCurrentFactory->tryCreateDecoder(theURI);
