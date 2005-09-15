@@ -34,7 +34,9 @@ namespace y60 {
         TextureApplyModeTag::Plug(theNode),
         TextureWrapModeTag::Plug(theNode),
         TextureSpriteTag::Plug(theNode),
-		TextureMatrixTag::Plug(theNode)
+		TextureMatrixTag::Plug(theNode),
+        TextureMinFilterTag::Plug(theNode),
+        TextureMagFilterTag::Plug(theNode)
     {
     }
 
@@ -91,6 +93,16 @@ namespace y60 {
         return TextureWrapMode(getEnumFromString( get<TextureWrapModeTag>(), TextureWrapModeStrings));
     }
 
+    TextureSampleFilter
+    Texture::getMinFilter() const {
+        return TextureSampleFilter(getEnumFromString( get<TextureMinFilterTag>(), TextureSampleFilterStrings));
+    }
+    
+    TextureSampleFilter
+    Texture::getMagFilter() const {
+        return TextureSampleFilter(getEnumFromString( get<TextureMagFilterTag>(), TextureSampleFilterStrings));
+    }
+    
     ImagePtr
     Texture::getImage() const {
         AC_TRACE << "Texture::getImage";

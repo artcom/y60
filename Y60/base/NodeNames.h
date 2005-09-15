@@ -128,6 +128,8 @@ namespace y60 {
     static const char * AUTOTEXCOORDPARAMS_ATTRIB   = "coordgenparams"; 
     static const char * TEXTURE_APPLYMODE_ATTRIB    = "applymode";
     static const char * TEXTURE_WRAPMODE_ATTRIB     = "wrapmode";
+    static const char * TEXTURE_MIN_FILTER_ATTRIB   = "min_filter";
+    static const char * TEXTURE_MAG_FILTER_ATTRIB   = "mag_filter";
     static const char * TEXTURE_IMAGE_ATTRIB        = "image";
     static const char * TEXTURE_SPRITE_ATTRIB       = "sprite";
     static const char * TEXTURE_MATRIX_ATTRIB       = "matrix";

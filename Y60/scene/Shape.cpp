@@ -43,3 +43,4 @@ namespace y60 {
         return myResult;
     }
 }
+

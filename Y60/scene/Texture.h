@@ -40,6 +40,8 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(TextureImageTag,     std::string,   TEXTURE_IMAGE_ATTRIB,      "");
     DEFINE_ATTRIBUT_TAG(TextureApplyModeTag, std::string,   TEXTURE_APPLYMODE_ATTRIB,  "modulate");
     DEFINE_ATTRIBUT_TAG(TextureWrapModeTag,  std::string,   TEXTURE_WRAPMODE_ATTRIB,   "clamp");
+    DEFINE_ATTRIBUT_TAG(TextureMinFilterTag, std::string,   TEXTURE_MIN_FILTER_ATTRIB, "linear");
+    DEFINE_ATTRIBUT_TAG(TextureMagFilterTag, std::string,   TEXTURE_MAG_FILTER_ATTRIB, "linear");
     DEFINE_ATTRIBUT_TAG(TextureSpriteTag,    bool,          TEXTURE_SPRITE_ATTRIB,     false);
     DEFINE_ATTRIBUT_TAG(TextureMatrixTag,    asl::Matrix4f, TEXTURE_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
 
@@ -51,6 +53,8 @@ namespace y60 {
         public TextureApplyModeTag::Plug,
         public TextureWrapModeTag::Plug,
         public TextureSpriteTag::Plug,
+		public TextureMinFilterTag::Plug, 
+		public TextureMagFilterTag::Plug, 
 		public TextureMatrixTag::Plug 
 	{
         public:
@@ -66,6 +70,8 @@ namespace y60 {
 
 			TextureApplyMode  getApplyMode() const;
             TextureWrapMode   getWrapMode() const;
+            TextureSampleFilter  getMinFilter() const;
+            TextureSampleFilter  getMagFilter() const;
             bool getSpriteMode() const;
 
 			unsigned      getId() const;

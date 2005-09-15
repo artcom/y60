@@ -164,31 +164,15 @@ namespace y60 {
 
                 glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
                         GLfloat(asGLTextureFunc(myTexture.getApplyMode())));
-                if (myTexture.getImage()->get<ImageDepthTag>()==1) {
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                            asGLTextureWrapmode(myTexture.getWrapMode()));
-                    CHECK_OGL_ERROR;
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                            asGLTextureWrapmode(myTexture.getWrapMode()));
-                    CHECK_OGL_ERROR;
-                } else {
-                    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S,
-                            asGLTextureWrapmode(myTexture.getWrapMode()));
-                    CHECK_OGL_ERROR;
-                    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T,
-                            asGLTextureWrapmode(myTexture.getWrapMode()));
-                    CHECK_OGL_ERROR;
-                    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R,
-                            asGLTextureWrapmode(myTexture.getWrapMode()));
-                    CHECK_OGL_ERROR;
-                }
             }
         }
         glMatrixMode(GL_MODELVIEW);
+        GLShader::enableTextures(theMaterial);
     }
 
     void
     FFShader::disableTextures(const y60::MaterialBase & theMaterial) {
+        GLShader::disableTextures(theMaterial);
         unsigned myTextureCount = theMaterial.getTextureCount();
         // AC_TRACE << "current texcount:" << myMaterial->getTextureCount() << ", prev:" << myPreviousTextureCount << endl;
         for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {

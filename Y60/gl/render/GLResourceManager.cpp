@@ -93,8 +93,8 @@ namespace y60 {
             CHECK_OGL_ERROR;
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T , GL_REPEAT);
             CHECK_OGL_ERROR;
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER , GL_LINEAR);
-            CHECK_OGL_ERROR;
+            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER , GL_LINEAR);
+            //CHECK_OGL_ERROR;
         } else {
             // 3D-Texture
             glBindTexture(GL_TEXTURE_3D, myId);
@@ -105,8 +105,8 @@ namespace y60 {
             CHECK_OGL_ERROR;
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R , GL_REPEAT);
             CHECK_OGL_ERROR;
-            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER , GL_LINEAR);
-            CHECK_OGL_ERROR;
+            //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER , GL_LINEAR);
+            //CHECK_OGL_ERROR;
         }
 
         unsigned int myTopLevelTextureSize = theImage->getMemUsed();
@@ -135,8 +135,8 @@ namespace y60 {
                 glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
 #endif
                 // 2D-Texture
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                CHECK_OGL_ERROR;
+                // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                //CHECK_OGL_ERROR;
                 gluBuild2DMipmaps(GL_TEXTURE_2D, myPixelEncoding.internalformat,
                     myWidth, myHeight,
                     myPixelEncoding.externalformat, myPixelEncoding.pixeltype,
@@ -145,8 +145,8 @@ namespace y60 {
             } else {
 #if HAS_3D_MIPMAPS
                 // 3D-Texture
-                glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                CHECK_OGL_ERROR;
+                // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                // CHECK_OGL_ERROR;
                 gluBuild3DMipmaps(GL_TEXTURE_3D, myPixelEncoding.internalformat,
                     myWidth, myHeight, myDepth,
                     myPixelEncoding.externalformat, myPixelEncoding.pixeltype,
@@ -162,13 +162,13 @@ namespace y60 {
                 // XXX check extension
                 glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
 #endif
-                // 2D-Texture
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                CHECK_OGL_ERROR;
+                // 2D-Texture - moved to FFShader
+                // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                // CHECK_OGL_ERROR;
             } else {
                 // 3D-Texture
-                glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                CHECK_OGL_ERROR;
+                //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                //CHECK_OGL_ERROR;
             }
         }
         if (myPixelEncoding.compressedFlag) {
@@ -241,9 +241,8 @@ namespace y60 {
         unsigned int myId = theImage->getGraphicsId();
         glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, myId);
         CHECK_OGL_ERROR;
-
         glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
-                        GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                         GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
                         GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         CHECK_OGL_ERROR;

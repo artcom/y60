@@ -2040,6 +2040,24 @@ Possible values are:
 'clamp_to_edge'  - The last pixel at the border, but not the border itself is repeated</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="min_filter" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>The interpolation filter used for minification.
+
+Possible values are:
+'linear' (default) - bilinear interpolation
+'nearest'          - nearest neighbor</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="mag_filter" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>The interpolation filter used for magnification.
+
+Possible values are:
+'linear' (default) - bilinear interpolation
+'nearest'          - nearest neighbor</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="sprite" type="xs:boolean">
                 <xs:annotation>
                     <xs:documentation>Set this flag, to render the texture as point sprite.

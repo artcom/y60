@@ -52,6 +52,9 @@ namespace y60 {
             virtual void activate(y60::MaterialBase & theMaterial);
             virtual void deactivate(const y60::MaterialBase & theMaterial);
             
+            virtual void enableTextures(const y60::MaterialBase & theMaterial);
+            virtual void disableTextures(const y60::MaterialBase & theMaterial);
+            
             // called on body change
             virtual void bindBodyParams(const y60::MaterialBase & theMaterial,
                     const Viewport & theViewport,

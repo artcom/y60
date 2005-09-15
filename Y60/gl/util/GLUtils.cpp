@@ -150,6 +150,21 @@ namespace y60 {
         return myTexWrapMode;
     }
     
+    GLenum
+    asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag) {
+        GLenum myTexSampleFilter;
+        switch(theSampleFilter) {
+            case LINEAR:
+               myTexSampleFilter = theMipmapsFlag ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+               break;
+            case NEAREST:
+               myTexSampleFilter = theMipmapsFlag ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
+               break;
+            default:
+               throw GlTextureFunctionException("Unknown texture mag filter mode.", PLUS_FILE_LINE);
+        }
+        return myTexSampleFilter;
+    }
 
     GLenum
     asGLTextureFunc(TextureApplyMode theApplyMode) {

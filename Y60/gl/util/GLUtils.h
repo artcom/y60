@@ -227,6 +227,7 @@ namespace y60 {
     GLenum asGLLightEnum(unsigned theLightNum);
     GLenum asGLTextureFunc(TextureApplyMode theApplyMode);
     GLenum asGLTextureWrapmode(TextureWrapMode theWrapMode);
+    GLenum asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag=false);
     GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
     GLenum asGLTexCoordMode(TexCoordMode theMode);
 

@@ -197,6 +197,7 @@ namespace y60 {
 
     void
     CGShader::enableTextures(const MaterialBase & theMaterial) {
+        GLShader::enableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->enableTextures();
         }
@@ -207,6 +208,7 @@ namespace y60 {
 
     void
     CGShader::disableTextures(const MaterialBase & theMaterial) {
+        GLShader::disableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->disableTextures();
         }

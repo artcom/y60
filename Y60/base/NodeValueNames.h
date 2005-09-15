@@ -91,6 +91,20 @@ namespace y60 {
         0
     };
 
+    //=== Texture magnification filters =====================================================
+    static const char * TEXTURE_SAMPLE_FILTER_NEAREST       = "nearest";
+    static const char * TEXTURE_SAMPLE_FILTER_LINEAR        = "linear";
+
+    enum TextureSampleFilter {
+        NEAREST,
+        LINEAR
+    };
+
+    static const char * TextureSampleFilterStrings[] = {
+        TEXTURE_SAMPLE_FILTER_NEAREST,
+        TEXTURE_SAMPLE_FILTER_LINEAR,
+        0
+    };
     //=== Texture repeat modes =====================================================
     static const char * TEXTURE_WRAP_CLAMP           = "clamp";
     static const char * TEXTURE_WRAP_CLAMP_TO_EDGE   = "clamp_to_edge";
