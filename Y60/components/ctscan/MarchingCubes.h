@@ -12,6 +12,16 @@
 #ifndef Y60_MARCHING_CUBES_INCLUDED
 #define Y60_MARCHING_CUBES_INCLUDED
 
+// Disable logging in inner loop for performance reasons.
+// This also affects logging in MCPolicies
+#define DISABLE_LOGGING
+
+#ifdef DISABLE_LOGGING
+#   define DB(x) // x
+#else
+#   define DB(x) x
+#endif
+
 #include "MCLookup.h"
 #include "MCPolicies.h"
 #include "CTScan.h"
@@ -34,18 +44,20 @@ namespace y60 {
     
     const int numSegments = 16;
 
-    template <class VoxelT, class OutputPolicy>
+    template <class VoxelT, class OutputPolicy, class SegmentationPolicy>
     class MarchingCubes {
-        friend class CountPolygonPolicy<VoxelT>;
-        friend class ExportShapePolicy<VoxelT>;
+        friend class CountPolygonPolicy<VoxelT, SegmentationPolicy>;
+        friend class ExportShapePolicy<VoxelT, SegmentationPolicy>;
         public:
 
-            MarchingCubes(int theDownSampleRate, OutputPolicy & theOutputPolicy, CTScan * theVoxelData) :
+            MarchingCubes(int theDownSampleRate, OutputPolicy & theOutputPolicy,
+                          SegmentationPolicy & theSegmentizer, CTScan * theVoxelData) :
                 _myOutputPolicy(theOutputPolicy),
                 _myVoxelData(theVoxelData),
                 _myDownSampleRate(theDownSampleRate),
                 _myLineStride(0),
-                _myMCLookup()                
+                _myMCLookup(),
+                _mySegmentizer( theSegmentizer )
             {
                 if ( ! _myVoxelData) {
                     throw MarchingCubesException("CTScan ptr is zero.", PLUS_FILE_LINE);
@@ -66,19 +78,9 @@ namespace y60 {
                 for (int i=0; i < theVoxelData->getVoxelDimensions()[2]; ++i) {
                     _mySlices.push_back(theVoxelData->CTScan::getSlicePtr<VoxelT>(i));
                 }
-                /*
-                const SegmentationBitmap & myStencils = theVoxelData->getStencil();
-                for (int i = 0; i < myStencils.size(); ++i) {
-                    _myStencils.push_back(myStencils[i]->pixels().begin());
-                }
-                */
                 marchAllSegments();
             }
             ~MarchingCubes() {}
-
-            void setThreshold(asl::Vector2<VoxelT> theThreshold) {
-                _myCurrentThresholds.resize(8, theThreshold);
-            }
 
             void setBox(const asl::Box3i & theBox) {
                 asl::Box3i myTempBox(theBox.getMin()[0]/_myDownSampleRate,
@@ -122,6 +124,9 @@ namespace y60 {
             
             void march() {
                 AC_TRACE << "MarchingCubes::march()";
+#ifdef DISABLE_LOGGING
+                AC_WARNING << "MarchingCubes: Logging disabled at compile time. See MarchingCubes.h";
+#endif
                 int j, i, k;
                 int myCubeIndex;
                 int myUpperCacheIndex = 0;  // will be switched on first iteration
@@ -163,6 +168,7 @@ namespace y60 {
                             // everything we can... but that would still be strange...
                             myCubeIndex = getCubeIndex(i, j, k);
                             if((myCubeIndex > 0) && (myCubeIndex < 255)) {
+                                _mySegmentizer.fillThresholdCube(i, j, k);
                                 fillVoxelCube(i, j, k, _myCurrent);
                                 asl::Vector3i myVoxel(i, j, k);
                                 triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex], *_myCache[myUpperCacheIndex], *_myKCache);
@@ -213,11 +219,11 @@ namespace y60 {
                 int myPositionIndex;
                 const MCLookup::CubeCase & myCubeCase = _myMCLookup.cubeCases[theCubeIndex]; 
 
-                AC_TRACE << "triangulateVoxel(" << theCubeIndex << ", " << jMarch << "," << iMarch << "," << kMarch << ")";
+                DB(AC_TRACE << "triangulateVoxel(" << theCubeIndex << ", " << jMarch << "," << iMarch << "," << kMarch << ")");
                 const std::vector<int> & myEdges = myCubeCase.edges;
                 int myEdgeCount = myEdges.size();
                 for (int i = 0; i < myEdgeCount; ++i) {
-                    AC_TRACE << "     edge case :" << myEdges[i];
+                    DB(AC_TRACE << "     edge case :" << myEdges[i]);
                     myPositionIndex = -1;
 #ifndef MC_DONT_SHARE_VERTICES
 //                    int myReference;
@@ -297,34 +303,6 @@ namespace y60 {
                 g.normalize();
             }
 
-            inline float interpolatePosition(int theFirstIndex, int theSecondIndex, 
-                        bool & theInsideOutFlag) const 
-            {
-                const VoxelT & firstValue = _myCurrent[theFirstIndex];
-                const VoxelT & secondValue = _myCurrent[theSecondIndex];
-                const asl::Vector2<VoxelT> & firstThreshold = _myCurrentThresholds[theFirstIndex];
-                const asl::Vector2<VoxelT> & secondThreshold = _myCurrentThresholds[theSecondIndex];
-                
-                // XXX: TODO: interpolate between thresholds
-                float li = (float)(firstThreshold[0] - firstValue) / (float)(secondValue - firstValue);
-
-                if ((firstValue <= firstThreshold[0] && secondValue >= secondThreshold[0]) ||
-                    (firstValue >= firstThreshold[0] && secondValue <= secondThreshold[0])) 
-                {
-                    theInsideOutFlag = false;
-                    return li;
-                } else {
-                    if ((firstValue <= firstThreshold[1] && secondValue >= secondThreshold[1]) ||
-                        (firstValue >= firstThreshold[1] && secondValue <= secondThreshold[1])) 
-                    {
-                        theInsideOutFlag = true;
-                        return li;
-                    } else {
-                        throw MarchingCubesException(std::string("Threshold is neither crossed from top or bottom with first: " ) + 
-                            as_string(int(firstValue)) + " and second: " + as_string(int(secondValue)), PLUS_FILE_LINE);
-                    }
-                }
-            }            
             inline void computeVertexPosition (int n, const asl::Vector3i & theMarchPos, 
                             asl::Point3f & thePosition, asl::Vector3f * theNormal = 0) const 
             {
@@ -336,7 +314,7 @@ namespace y60 {
                 bool myInsideOutFlag;
                 switch(n) {
                     case 0:
-                        li = interpolatePosition(0,1, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 0,1, myInsideOutFlag);
                         
                         thePosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         thePosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
@@ -349,7 +327,7 @@ namespace y60 {
                         break;
 
                     case 1:
-                        li = interpolatePosition(1,2, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 1,2, myInsideOutFlag);
                         
                         thePosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         thePosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
@@ -363,7 +341,7 @@ namespace y60 {
                         break;
 
                     case 2:
-                        li = interpolatePosition(3,2, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 3,2, myInsideOutFlag);
                         thePosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         thePosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         thePosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -376,7 +354,7 @@ namespace y60 {
                         break;
 
                     case 3:
-                        li = interpolatePosition(0,3, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 0,3, myInsideOutFlag);
                         thePosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         thePosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         thePosition[2] = (float)(kMarch) * _myVoxelSize[2];
@@ -389,7 +367,7 @@ namespace y60 {
                         break;
 
                     case 4:
-                        li = interpolatePosition(4,5, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 4,5, myInsideOutFlag);
                         thePosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         thePosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         thePosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -402,7 +380,7 @@ namespace y60 {
                         break;
 
                     case 5:
-                        li = interpolatePosition(5,6, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 5,6, myInsideOutFlag);
                         thePosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         thePosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         thePosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -415,7 +393,7 @@ namespace y60 {
                         break;
 
                     case 6:
-                        li = interpolatePosition(7,6, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 7,6, myInsideOutFlag);
                         thePosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         thePosition[1] = ((float)jMarch+ li) * _myVoxelSize[1];
                         thePosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -428,7 +406,7 @@ namespace y60 {
                         break;
 
                     case 7:
-                        li = interpolatePosition(4,7, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 4,7, myInsideOutFlag);
                         thePosition[0] = ((float)iMarch + li) * _myVoxelSize[0];
                         thePosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         thePosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
@@ -441,7 +419,7 @@ namespace y60 {
                         break;
 
                     case 8:
-                        li = interpolatePosition(0,4, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 0,4, myInsideOutFlag);
                         thePosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         thePosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         thePosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -454,7 +432,7 @@ namespace y60 {
                         break;
 
                     case 9:
-                        li = interpolatePosition(1,5, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 1,5, myInsideOutFlag);
                         thePosition[0] = (float)(iMarch) * _myVoxelSize[0];
                         thePosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         thePosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -467,7 +445,7 @@ namespace y60 {
                         break;
 
                     case 10:
-                        li = interpolatePosition(2,6, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 2,6, myInsideOutFlag);
                         thePosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         thePosition[1] = (float)(jMarch + 1) * _myVoxelSize[1];
                         thePosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -481,7 +459,7 @@ namespace y60 {
                         break;
 
                     case 11:
-                        li = interpolatePosition(3,7, myInsideOutFlag);
+                        li = _mySegmentizer.interpolatePosition(_myCurrent, 3,7, myInsideOutFlag);
                         thePosition[0] = (float)(iMarch + 1) * _myVoxelSize[0];
                         thePosition[1] = (float)(jMarch) * _myVoxelSize[1];
                         thePosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
@@ -501,29 +479,6 @@ namespace y60 {
                 }
 
             }
-
-            inline bool
-            isOutside(int x, int y, int z) const {
-                const VoxelT & myValue = at(x, y, z);
-                return myValue < _myCurrentThresholds[0][0] || myValue > _myCurrentThresholds[0][1];
-            }
-
-            inline int findThresholdBoundary(const VoxelT theFirstValue, const VoxelT theSecondValue) const {
-                if ((theFirstValue <= _myThreshold[0] && theSecondValue >= _myThreshold[0]) ||
-                    (theFirstValue >= _myThreshold[0] && theSecondValue <= _myThreshold[0])) 
-                {
-                    return 0;
-                } else {
-                    if ((theFirstValue <= _myThreshold[1] && theSecondValue >= _myThreshold[1]) ||
-                        (theFirstValue >= _myThreshold[1] && theSecondValue <= _myThreshold[1])) 
-                    {
-                        return 1;
-                    } else {
-                        throw MarchingCubesException(std::string("Threshold is neither crossed from top or bottom with first: " ) + 
-                            as_string(int(theFirstValue)) + " and second: " + as_string(int(theSecondValue)), PLUS_FILE_LINE);
-                    }
-                }
-            }            
 
             /**
              * Gets a (downsampled) value from the Voxel data. 
@@ -610,14 +565,16 @@ namespace y60 {
 
             void
             fillOffsetTable() {
+                // 1st component : byte offset within slice (i.e. x+y*stride),
+                // 2nd component : slice offset within slice-stack
                 _myOffsetTable[0] = asl::Vector2i(0,0);  // [0,0,0]
                 _myOffsetTable[1] = asl::Vector2i(_myLineStride * _myDownSampleRate, 0);  // [0,1,0]
                 _myOffsetTable[2] = asl::Vector2i((1+_myLineStride) * _myDownSampleRate, 0);  // [1,1,0]
                 _myOffsetTable[3] = asl::Vector2i(_myDownSampleRate, 0); // [1,0,0]
-                _myOffsetTable[4] = asl::Vector2i(0, _myDownSampleRate);  // [0,0,0]
-                _myOffsetTable[5] = asl::Vector2i(_myLineStride * _myDownSampleRate, _myDownSampleRate);  // [0,1,0]
-                _myOffsetTable[6] = asl::Vector2i((1+_myLineStride) * _myDownSampleRate, _myDownSampleRate);  // [1,1,0]
-                _myOffsetTable[7] = asl::Vector2i(_myDownSampleRate, _myDownSampleRate); // [1,0,0]
+                _myOffsetTable[4] = asl::Vector2i(0, _myDownSampleRate);  // [0,0,1]
+                _myOffsetTable[5] = asl::Vector2i(_myLineStride * _myDownSampleRate, _myDownSampleRate);  // [0,1,1]
+                _myOffsetTable[6] = asl::Vector2i((1+_myLineStride) * _myDownSampleRate, _myDownSampleRate);  // [1,1,1]
+                _myOffsetTable[7] = asl::Vector2i(_myDownSampleRate, _myDownSampleRate); // [1,0,1]
                 _myBitMaskTable[0] = BIT_0;
                 _myBitMaskTable[1] = BIT_1;
                 _myBitMaskTable[2] = BIT_2;
@@ -631,51 +588,34 @@ namespace y60 {
             inline int 
             getCubeIndex(int theI, int theJ, int theK) const {
                 unsigned int myBitMask = 0;
-                if(isOutside(theI, theJ, theK)) {
+
+
+                //const VoxelT & myValue = at(x, y, z);
+
+                if(_mySegmentizer.isOutside(theI, theJ, theK, at(theI, theJ, theK))) {
                     myBitMask |= BIT_0;
                 }
-                if(isOutside(theI, theJ+1, theK)) {
+                if(_mySegmentizer.isOutside(theI, theJ+1, theK, at(theI, theJ+1, theK))) {
                     myBitMask |= BIT_1;
                 }
-                if(isOutside(theI+1, theJ+1, theK)) {
+                if(_mySegmentizer.isOutside(theI+1, theJ+1, theK, at(theI+1, theJ+1, theK))) {
                     myBitMask |= BIT_2;
                 }
-                if(isOutside(theI+1, theJ, theK)) {
+                if(_mySegmentizer.isOutside(theI+1, theJ, theK, at(theI+1, theJ, theK))) {
                     myBitMask |= BIT_3;
                 }
-                if(isOutside(theI, theJ, theK+1)) {
+                if(_mySegmentizer.isOutside(theI, theJ, theK+1, at(theI, theJ, theK+1))) {
                     myBitMask |= BIT_4;
                 }
-                if(isOutside(theI, theJ+1, theK+1)) {
+                if(_mySegmentizer.isOutside(theI, theJ+1, theK+1, at(theI, theJ+1, theK+1))) {
                     myBitMask |= BIT_5;
                 }
-                if(isOutside(theI+1, theJ+1, theK+1)) {
+                if(_mySegmentizer.isOutside(theI+1, theJ+1, theK+1, at(theI+1, theJ+1, theK+1))) {
                     myBitMask |= BIT_6;
                 }
-                if(isOutside(theI+1, theJ, theK+1)) {
+                if(_mySegmentizer.isOutside(theI+1, theJ, theK+1, at(theI+1, theJ, theK+1))) {
                     myBitMask |= BIT_7;
                 }
-#if 0
-                asl::Vector2i myNeighbour;
-                VoxelT myValue;
-                int myDownSampledSlice = theK * _myDownSampleRate;
-                int myDownSampledPosition = (theJ * _myLineStride + theI) * _myDownSampleRate;
-                int mySlicePosition;
-                int mySliceOffset;
-                for (int i = 0; i < 8; ++i) {
-                    mySlicePosition = myDownSampledSlice+_myOffsetTable[i][1];
-                    mySliceOffset = myDownSampledPosition+_myOffsetTable[i][0];
-                    if (! _myStencils.empty()) {
-                        if (bool(_myStencils[mySlicePosition][mySliceOffset]) == false) {
-                            return -1;
-                        }
-                    }
-                    myValue = _mySlices[mySlicePosition][mySliceOffset]; 
-                    if (myValue < _myThreshold[0] || myValue > _myThreshold[1]) {
-                        myBitMask |= _myBitMaskTable[i];
-                    }
-                }
-#endif
                 return myBitMask;
             }
 
@@ -689,12 +629,10 @@ namespace y60 {
             asl::Vector3f _myVoxelSize;
             asl::Box3i _myVBox;
             asl::Vector3i _myDimBox;
-            // asl::Vector2<VoxelT> _myThreshold;
 
             IJCachePtr   _myCache[2];
             KCachePtr    _myKCache;
             std::vector<VoxelT> _myCurrent;
-            std::vector<asl::Vector2<VoxelT> > _myCurrentThresholds;
             int  _myMarchSegment[numSegments];
             MCLookup _myMCLookup;
 
@@ -702,7 +640,8 @@ namespace y60 {
             int _myLineStride;
             int _mySliceOffset;
 
-            OutputPolicy & _myOutputPolicy;
+            OutputPolicy       & _myOutputPolicy;
+            SegmentationPolicy & _mySegmentizer;
 
             std::vector<const VoxelT*>   _mySlices;
             std::vector<const unsigned char*> _myStencils;
@@ -711,5 +650,9 @@ namespace y60 {
     };
 
 } // end of namespace y60
+
+// cleanup defines
+#undef DB
+#undef DISABLE_LOGGING
 
 #endif // Y60_MARCHING_CUBES_INCLUDED

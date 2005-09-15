@@ -176,7 +176,7 @@ reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
 }
 
 static JSBool
-countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+countTrianglesGlobal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
         CTScan & myCTScan = myObj.getNative();
@@ -199,14 +199,35 @@ countTriangles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
         int myDownSampleRate;
         convertFrom(cx, argv[3], myDownSampleRate);
 
-        Vector3i myBoxSize = myVoxelBox.getSize();        
-        Vector2i myCount = myCTScan.countTriangles(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate);
+        Vector2i myCount = myCTScan.countTrianglesGlobal(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate);
         *rval = as_jsval(cx, myCount);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
 static JSBool
-polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+countTrianglesInVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+        CTScan & myCTScan = myObj.getNative();
+
+        ensureParamCount(argc, 3);
+
+        dom::NodePtr myThresholdPalette;
+        convertFrom(cx, argv[0], myThresholdPalette);
+
+        dom::NodePtr myMeasurementNode;
+        convertFrom(cx, argv[1], myMeasurementNode);
+
+        int myDownSampleRate;
+        convertFrom(cx, argv[2], myDownSampleRate);
+
+        Vector2i myCount = myCTScan.countTrianglesInVolumeMeasurement(myMeasurementNode, myThresholdPalette, myDownSampleRate);
+        *rval = as_jsval(cx, myCount);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+static JSBool
+polygonizeGlobal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
         CTScan & myCTScan = myObj.getNative();
@@ -242,10 +263,44 @@ polygonize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             convertFrom(cx, argv[6], myNumTriangles);
         }
 
-        Vector3i myBoxSize = myVoxelBox.getSize();
-
-        ScenePtr myScene = myCTScan.polygonize(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,  
+        ScenePtr myScene = myCTScan.polygonizeGlobal(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,  
             myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles);
+        *rval = as_jsval(cx, myScene);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+static JSBool
+polygonizeVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+        CTScan & myCTScan = myObj.getNative();
+
+        ensureParamCount(argc, 5, 7);
+
+        dom::NodePtr myThresholdPalette;
+        convertFrom(cx, argv[0], myThresholdPalette);
+
+        dom::NodePtr myMeasurementNode;
+        convertFrom(cx, argv[1], myMeasurementNode);
+
+        int myDownSampleRate;
+        convertFrom(cx, argv[3], myDownSampleRate);
+
+        bool myCreateNormalsFlag;
+        convertFrom(cx, argv[4], myCreateNormalsFlag);
+
+        unsigned myNumVertices = 0;
+        if (argc > 5) {
+            convertFrom(cx, argv[5], myNumVertices);
+        }
+        unsigned myNumTriangles = 0;
+        if (argc > 6) {
+            convertFrom(cx, argv[6], myNumTriangles);
+        }
+
+        ScenePtr myScene = myCTScan.polygonizeVolumeMeasurement(myMeasurementNode, myThresholdPalette,
+                myDownSampleRate,  myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices,
+                myNumTriangles);
         *rval = as_jsval(cx, myScene);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -454,7 +509,7 @@ copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
                     unsigned myXEnd   = unsigned(myDirtyBox[Box3f::MAX][0]);
                     unsigned myYStart = unsigned(myDirtyBox[Box3f::MIN][1]);
                     unsigned myYEnd   = unsigned(myDirtyBox[Box3f::MAX][1]);
-                    cerr << "affected slice = " << myAffectedSlice << endl;
+                    AC_DEBUG << "affected slice = " << myAffectedSlice;
                     dom::NodePtr myRasterNode = myMeasurement->childNode("rasters")->childNode(myAffectedSlice);
                     if ( ! myRasterNode) {
                         throw asl::Exception("Failed to get affected raster.");
@@ -604,8 +659,10 @@ JSCTScan::Functions() {
         {"getVoxelSize",         getVoxelSize,            0},
         {"getVoxelDimensions",   getVoxelDimensions,      0},
         {"getValueRange",        getValueRange,           0},
-        {"polygonize",           polygonize,              7},
-        {"countTriangles",       countTriangles,          4},
+        {"polygonizeGlobal",     polygonizeGlobal,        7},
+        {"polygonizeVolumeMeasurement", polygonizeVolumeMeasurement,        7},
+        {"countTrianglesGlobal", countTrianglesGlobal,    4},
+        {"countTrianglesInVolumeMeasurement", countTrianglesInVolumeMeasurement,    4},
         {"create3DTexture",      create3DTexture,         2},
         {"computeHistogram",     computeHistogram,        1},
         //{"getStencilRaster",     getStencilRaster,        1},

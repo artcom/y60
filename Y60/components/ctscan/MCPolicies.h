@@ -12,17 +12,23 @@
 #ifndef Y60_CTSCAN_MCPOLICIES_INCLUDED
 #define Y60_CTSCAN_MCPOLICIES_INCLUDED
 
+#include <asl/Vector234.h>
+#include <dom/Value.h>
 #include <y60/Scene.h>
 #include <y60/ShapeBuilder.h>
 #include <y60/ElementBuilder.h>
 
+#include <vector>
+
 namespace y60 {
 
-    template <class VoxelT, class OutputPolicy> class MarchingCubes;
+    template <class VoxelT, class OutputPolicy, class SegmentationPolicy> class MarchingCubes;
 
-    template <class VoxelT>
+    template <class VoxelT, class SegmentationPolicy>
     class CountPolygonPolicy {
-        typedef MarchingCubes<VoxelT, CountPolygonPolicy<VoxelT> > MyMarcher;
+        typedef MarchingCubes<VoxelT,
+                              CountPolygonPolicy<VoxelT, SegmentationPolicy>,
+                              SegmentationPolicy > MyMarcher;
         public:
             CountPolygonPolicy() : _myVertexCount(0), _myHalfEdgeCount(0) {};
 
@@ -59,11 +65,13 @@ namespace y60 {
             unsigned int _myHalfEdgeCount;
     };
 
-    template <class VoxelT>
+    template <class VoxelT, class SegmentationPolicy>
     class ExportShapePolicy {
         typedef std::pair<int, int> EdgeId;
         typedef std::map<EdgeId, int> EdgeCache;
-        typedef MarchingCubes<VoxelT, ExportShapePolicy<VoxelT> > MyMarcher;
+        typedef MarchingCubes<VoxelT,
+                              ExportShapePolicy<VoxelT, SegmentationPolicy>,
+                              SegmentationPolicy > MyMarcher;
         public:
             ExportShapePolicy(SceneBuilderPtr theSceneBuilder, 
                               const std::string & theShapeName,
@@ -95,13 +103,13 @@ namespace y60 {
                     myVertexNormal = -myVertexNormal;
                 }
                 asl::Vector3f myVertex(myVertexPosition[0], - myVertexPosition[1], myVertexPosition[2]);
-                AC_TRACE << "added vertex position " << myVertex;
+                DB(AC_TRACE << "added vertex position " << myVertex);
                 _myVertices->push_back(myVertex);
                 if (_myVertexNormalFlag) {
-                    AC_TRACE << "added vertex normal " << myVertexNormal;
+                    DB(AC_TRACE << "added vertex normal " << myVertexNormal);
                     _myNormals->push_back(normalized(asl::Vector3f(myVertexNormal[0], - myVertexNormal[1], myVertexNormal[2])));
                 }
-                AC_TRACE << "new size " << _myVertices->size();
+                DB(AC_TRACE << "new size " << _myVertices->size());
                 return _myVertices->size()-1;
             }
             bool ignoreHalfEdges() const { 
@@ -151,7 +159,7 @@ namespace y60 {
                                     int myValue = getHalfEdgeCount();
                                     EdgeCache::value_type myItem(myKey, myValue);
                                     _myHalfEdgeCache.insert(myItem);
-                                    AC_TRACE << "Inserting: (" << myKey.first << ", " << myKey.second << ")";
+                                    DB(AC_TRACE << "Inserting: (" << myKey.first << ", " << myKey.second << ")");
                                 }
                             } else {
                                 // Remove from map
@@ -165,17 +173,17 @@ namespace y60 {
                                 } else {
                                     myHalfEdge = (*iter).second;
                                     _myHalfEdgeCache.erase(iter);
-                                    AC_TRACE << "Removing: (" << myKey.first << ", " << myKey.second << ")";
+                                    DB(AC_TRACE << "Removing: (" << myKey.first << ", " << myKey.second << ")");
                                     _myHalfEdges->at(myHalfEdge) = _myHalfEdges->size(); // we will push the other edge soon
                                 }
                             }
                         }
-                        AC_TRACE << "added HalfEdge " << myHalfEdge << " as element#" << _myHalfEdges->size();
+                        DB(AC_TRACE << "added HalfEdge " << myHalfEdge << " as element#" << _myHalfEdges->size());
                         _myHalfEdges->push_back(myHalfEdge); // push the other edge
-                        AC_TRACE << "   size is now " << _myHalfEdges->size();
+                        DB(AC_TRACE << "   size is now " << _myHalfEdges->size());
                     }
                     _myIndices->push_back(myIndex);
-                    AC_TRACE << myIndex << (*_myVertices)[myIndex]; 
+                    DB(AC_TRACE << myIndex << (*_myVertices)[myIndex]); 
                 }
             }
             dom::NodePtr getShapeNode() const {
@@ -237,8 +245,8 @@ namespace y60 {
                 if (_myVertexColorFlag) {
                     _myColorIndexNode = _myElementBuilder->createIndex(COLOR_ROLE, COLORS);
                 }
-                AC_INFO << "reserving Vertex  :" << _myVertexCount;
-                AC_INFO << "reserving HalfEdge:" << _myHalfEdgeCount;
+                DB(AC_INFO << "reserving Vertex  :" << _myVertexCount);
+                DB(AC_INFO << "reserving HalfEdge:" << _myHalfEdgeCount);
 				_myVertices->reserve(_myVertexCount);
                 _myHalfEdges->reserve(_myHalfEdgeCount);
                 _myIndices->reserve(_myHalfEdgeCount);
@@ -289,6 +297,158 @@ namespace y60 {
             }
 
     };
+
+    DEFINE_EXCEPTION(MCPolicyException, asl::Exception);
+
+    template <class VoxelT>
+    class GlobalThresholdSegmentationPolicy {
+        public:
+            GlobalThresholdSegmentationPolicy(const VoxelT & theLower, const VoxelT & theUpper) :
+                _myThresholds( theLower, theUpper ) {}
+        
+            GlobalThresholdSegmentationPolicy(const asl::Vector2<VoxelT> & theThresholds) :
+                _myThresholds( theThresholds ) {}
+        
+            inline bool
+            isOutside(int x, int y, int z, VoxelT theValue) const {
+                return theValue < _myThresholds[0] || theValue > _myThresholds[1];
+            }
+
+            inline float interpolatePosition(const std::vector<VoxelT> & theVoxelCube,
+                         int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const 
+            {
+                const VoxelT & firstValue = theVoxelCube[theFirstIndex];
+                const VoxelT & secondValue = theVoxelCube[theSecondIndex];
+                
+
+                if ((firstValue <= _myThresholds[0] && secondValue >= _myThresholds[0]) ||
+                    (firstValue >= _myThresholds[0] && secondValue <= _myThresholds[0])) 
+                {
+                    float li = (float)(_myThresholds[0] - firstValue) / (float)(secondValue - firstValue);
+                    theInsideOutFlag = false;
+                    return li;
+                } else {
+                    if ((firstValue <= _myThresholds[1] && secondValue >= _myThresholds[1]) ||
+                        (firstValue >= _myThresholds[1] && secondValue <= _myThresholds[1])) 
+                    {
+                        float li = (float)(_myThresholds[1] - firstValue) / (float)(secondValue - firstValue);
+                        theInsideOutFlag = true;
+                        return li;
+                    } else {
+                        throw MCPolicyException(std::string("Threshold is neither crossed from top or bottom with first: " ) + 
+                            as_string(int(firstValue)) + " and second: " + as_string(int(secondValue)), PLUS_FILE_LINE);
+                    }
+                }
+            }            
+
+            inline void fillThresholdCube(int theI, int theJ, int theK) {
+            }
+        private:
+            asl::Vector2<VoxelT> _myThresholds;
+    };
+
+    template <class VoxelT>
+    class PerVoxelThresholdSegmentationPolicy {
+        public:
+            PerVoxelThresholdSegmentationPolicy(dom::NodePtr thePaletteNode, dom::NodePtr theMeasurement,
+                                                int theDownsampleRate) : 
+                _myThresholdCube(8),
+                _myThresholdPalette(256),
+                _myDownSampleRate( theDownsampleRate)
+            
+            {
+                for (unsigned i = 0; i < thePaletteNode->childNodesLength("thresholdcolor"); ++i) {
+                    dom::NodePtr myPaletteItem = thePaletteNode->childNode("thresholdcolor", i);
+                    unsigned char myIndex = static_cast<unsigned char>(
+                            myPaletteItem->dom::Node::getAttributeValue<int>("index"));
+                    asl::Vector2f myThresholds = myPaletteItem->dom::Node::getAttributeValue<asl::Vector2f>("threshold");
+                    _myThresholdPalette[myIndex] = asl::Vector2<VoxelT>( VoxelT(myThresholds[0]), VoxelT(myThresholds[1]));
+                }
+                dom::NodePtr myRasterList = theMeasurement->childNode("rasters", 0);
+                for (unsigned i = 0; i < myRasterList->childNodesLength("rasterofgray"); ++i) {
+                    dom::NodePtr myRasterNode = myRasterList->childNode("rasterofgray", i)->childNode(0);
+                    _mySegmentationBitmaps.push_back(dynamic_cast_Ptr<dom::ResizeableRaster>(myRasterNode->nodeValueWrapperPtr()));
+                }
+                asl::Box3f myBoundingBox = theMeasurement->dom::Node::getAttributeValue<asl::Box3f>("boundingbox");
+                _myBoundingBox[asl::Box3i::MIN][0] = int( myBoundingBox[asl::Box3f::MIN][0] );
+                _myBoundingBox[asl::Box3i::MIN][1] = int( myBoundingBox[asl::Box3f::MIN][1] );
+                _myBoundingBox[asl::Box3i::MIN][2] = int( myBoundingBox[asl::Box3f::MIN][2] );
+                _myBoundingBox[asl::Box3i::MAX][0] = int( myBoundingBox[asl::Box3f::MAX][0] );
+                _myBoundingBox[asl::Box3i::MAX][1] = int( myBoundingBox[asl::Box3f::MAX][1] );
+                _myBoundingBox[asl::Box3i::MAX][2] = int( myBoundingBox[asl::Box3f::MAX][2] );
+            }
+            inline bool
+            isOutside(int x, int y, int z, VoxelT theValue) const {
+                const asl::Vector2<VoxelT> & myThreshold = getThreshold(x, y, z);
+                return theValue < myThreshold[0] || theValue > myThreshold[1];
+            }
+            inline float interpolatePosition(const std::vector<VoxelT> & theVoxelCube,
+                         int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const 
+            {
+                const VoxelT & firstValue = theVoxelCube[theFirstIndex];
+                const VoxelT & secondValue = theVoxelCube[theSecondIndex];
+                
+                const asl::Vector2<VoxelT> & firstThreshold  = _myThresholdCube[theFirstIndex];
+                const asl::Vector2<VoxelT> & secondThreshold = _myThresholdCube[theSecondIndex];
+                
+
+                if ((firstValue <= firstThreshold[0] && secondValue >= secondThreshold[0]) ||
+                    (firstValue >= firstThreshold[0] && secondValue <= secondThreshold[0])) 
+                {
+                    float li = (float)(firstValue-firstThreshold[0]) / 
+                            (float)((secondThreshold[0]- firstThreshold[0]) - (secondValue - firstValue));
+                    theInsideOutFlag = false;
+                    return li;
+                } else {
+                    if ((firstValue <= firstThreshold[1] && secondValue >= secondThreshold[1]) ||
+                        (firstValue >= firstThreshold[1] && secondValue <= secondThreshold[1])) 
+                    {
+                        float li = (float)(firstValue-firstThreshold[1]) / 
+                            (float)((secondThreshold[1]- firstThreshold[1]) - (secondValue - firstValue));
+                        theInsideOutFlag = true;
+                        return li;
+                    } else {
+                        throw MCPolicyException(std::string("Threshold is neither crossed from top or bottom with first: " ) + 
+                            as_string(int(firstValue)) + " and second: " + as_string(int(secondValue)), PLUS_FILE_LINE);
+                    }
+                }
+            }
+   
+            inline void fillThresholdCube(int theI, int theJ, int theK) {
+                _myThresholdCube.clear();
+                _myThresholdCube.reserve(8);
+
+                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 0, theK + 0)); 
+                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 1, theK + 0)); 
+                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 1, theK + 0)); 
+                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 0, theK + 0)); 
+                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 0, theK + 1)); 
+                _myThresholdCube.push_back( getThreshold(theI + 0, theJ + 1, theK + 1)); 
+                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 1, theK + 1)); 
+                _myThresholdCube.push_back( getThreshold(theI + 1, theJ + 0, theK + 1)); 
+            }
+        private:
+            inline
+            const asl::Vector2<VoxelT> &
+            getThreshold(int theX, int theY, int theZ) const {
+                int x = theX * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][0]; 
+                int y = theY * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][1]; 
+                int z = theZ * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][2]; 
+                x = std::min(x, _myBoundingBox[asl::Box3i::MAX][0] - _myBoundingBox[asl::Box3i::MIN][0]-1); 
+                y = std::min(y, _myBoundingBox[asl::Box3i::MAX][1] - _myBoundingBox[asl::Box3i::MIN][1]-1); 
+                z = std::min(z, _myBoundingBox[asl::Box3i::MAX][2] - _myBoundingBox[asl::Box3i::MIN][2]-1);
+                asl::Vector4f myPixel =  _mySegmentationBitmaps[z]->getPixel(x,y); 
+                unsigned char myIndex = (VoxelT) myPixel[0];
+                return _myThresholdPalette[myIndex]; 
+            }
+
+            std::vector<asl::Vector2<VoxelT> >    _myThresholdPalette;
+            std::vector<dom::ResizeableRasterPtr> _mySegmentationBitmaps;
+            std::vector<asl::Vector2<VoxelT> >    _myThresholdCube;
+            asl::Box3i                            _myBoundingBox;
+            int                                   _myDownSampleRate;
+    };
 }
+
 
 #endif

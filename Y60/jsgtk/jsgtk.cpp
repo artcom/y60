@@ -26,6 +26,7 @@
 #include "JSHistogram.h"
 #include "JSGrayScale.h"
 #include "JSTNTMeasurementList.h"
+#include "JSTNTThresholdList.h"
 
 // standard Gtk widgets
 #include "JSFrame.h"
@@ -76,6 +77,7 @@
 #include "JSRange.h"
 #include "JSMenu.h"
 #include "JSNotebook.h"
+#include "JSColorSelection.h"
 
 #include "JSCellRenderer.h"
 #include "JSCellRendererText.h"
@@ -131,6 +133,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSTNTMeasurementList::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSTNTThresholdList::initClass(cx, theGlobalObject)) {
         return false;
     }
     // === Standard Gtk Widgets =======================================
@@ -281,6 +286,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSHSeparator::initClass(cx, theGlobalObject)) {
         return false;
     }
+    if (!JSColorSelection::initClass(cx, theGlobalObject)) {
+        return false;
+    }
 
     // === GLib::SignalProxy Stuff =======================================
     // don't forget to add a class trait in JSSignalProxies.h
@@ -390,7 +398,9 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(acgtk::EmbeddedToggle);
     TRY_DYNAMIC_CAST(acgtk::EmbeddedButton);
     TRY_DYNAMIC_CAST(acgtk::TNTMeasurementList);
+    TRY_DYNAMIC_CAST(acgtk::TNTThresholdList);
 
+    TRY_DYNAMIC_CAST(Gtk::ColorSelection);
     TRY_DYNAMIC_CAST(Gtk::Frame);
     TRY_DYNAMIC_CAST(Gtk::DrawingArea);
     TRY_DYNAMIC_CAST(Gtk::FileChooserDialog);
@@ -499,7 +509,11 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
                 return true;
             } else if (castFrom<acgtk::EmbeddedButton>(cx, myArgument, theTarget)) {
                 return true;
+            } else if (castFrom<acgtk::TNTThresholdList>(cx, myArgument, theTarget)) {
+                return true;
             } else if (castFrom<acgtk::TNTMeasurementList>(cx, myArgument, theTarget)) {
+                return true;
+            } else if (castFrom<Gtk::ColorSelection>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::Frame>(cx, myArgument, theTarget)) {
                 return true;
@@ -628,7 +642,9 @@ CONVERT_FROM_GLIB_OBJECT(acgtk::EmbeddedToggle);
 CONVERT_FROM_GLIB_OBJECT(acgtk::EmbeddedButton);
 CONVERT_FROM_GLIB_OBJECT(acgtk::RenderArea);
 CONVERT_FROM_GLIB_OBJECT(acgtk::TNTMeasurementList);
+CONVERT_FROM_GLIB_OBJECT(acgtk::TNTThresholdList);
 
+CONVERT_FROM_GLIB_OBJECT(Gtk::ColorSelection);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Frame);
 CONVERT_FROM_GLIB_OBJECT(Gtk::DrawingArea);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Widget);

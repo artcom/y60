@@ -85,11 +85,18 @@ class CTScan {
         /** Returns the minimum/maximum voxel value possible in the dataset */
         asl::Vector2d getValueRange();
 
-        asl::Vector2i countTriangles(const asl::Box3i & theVoxelBox, 
+        asl::Vector2i countTrianglesGlobal(const asl::Box3i & theVoxelBox, 
             double theThresholdMin, double theThresholdMax, int theDownSampleRate);
 
+        asl::Vector2i countTrianglesInVolumeMeasurement(dom::NodePtr theVolumeNode,
+                    dom::NodePtr theThresholdPalette, int theDownSampleRate);
+
         /** Create an isosurface from the voxel dataset */
-        ScenePtr polygonize(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
+        ScenePtr polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
+            int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
+            unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
+
+        ScenePtr polygonizeVolumeMeasurement(dom::NodePtr theVolumeNode, dom::NodePtr theThresholdPalette, 
             int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
             unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
 
@@ -146,18 +153,17 @@ class CTScan {
         asl::Vector2f _myDefaultWindow;
         asl::Vector3f _myVoxelSize;
         
-        template <class VoxelT>
+        template <class VoxelT, class SegmentationPolicy>
         void
-        countMarchingCubes(const asl::Box3i & theVoxelBox,
-                             double theThresholdMin, double theThresholdMax, int theDownSampleRate,
-                             unsigned int & theVertexCount, unsigned int & theTriangleCount);
-        template <class VoxelT> 
+        countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
+                           SegmentationPolicy & theSegmentizer,
+                           unsigned int & theVertexCount, unsigned int & theTriangleCount);
+        template <class VoxelT, class SegmentationPolicy> 
         void
-        applyMarchingCubes(const asl::Box3i & theVoxelBox, 
-                             double theThresholdMin, double theThresholdMax, int theDownSampleRate,
-                             bool theCreateNormalsFlag, 
-                             ScenePtr theScene, unsigned int theNumVertices = 0, 
-                             unsigned int theNumTriangles = 0);
+        applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
+                             bool theCreateNormalsFlag, ScenePtr theScene,
+                             SegmentationPolicy & theSegmentizer,
+                             unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
         template <class VoxelT>
         void
         countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram);
