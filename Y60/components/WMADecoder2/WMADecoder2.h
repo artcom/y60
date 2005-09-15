@@ -1,0 +1,76 @@
+//=============================================================================
+// Copyright (C) 2003, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+#ifndef _WMADecoder2_H_
+#define _WMADecoder2_H_
+
+#include <y60/IAudioDecoder.h>
+#include <y60/SoundManager.h>
+
+#include <asl/ISampleSink.h>
+#include <asl/Block.h>
+
+#include <wmsdk/wmsdk.h>
+
+namespace y60 {
+
+class WMADecoder2: public IAudioDecoder, public IWMReaderCallback
+{
+	    static const MAX_TIMEOUT_FOR_EVENT = 15000;
+    public:
+        WMADecoder2 (std::string myURI);
+        virtual ~WMADecoder2();
+
+        virtual bool decode(asl::ISampleSink* mySampleSink);
+        virtual unsigned getSampleRate();
+        virtual unsigned getNumChannels();
+        virtual void seek (asl::Time thePosition);
+        virtual asl::Time getDuration() const;
+        std::string getName() const;
+
+        //
+        // Methods of IUnknown
+        //
+/*
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void __RPC_FAR *__RPC_FAR *ppvObject);
+        ULONG STDMETHODCALLTYPE AddRef();
+        ULONG STDMETHODCALLTYPE Release();
+*/
+        //
+        // Methods of IWMReaderCallback
+        //
+        HRESULT STDMETHODCALLTYPE OnSample(DWORD theOutputNumber,
+                QWORD theSampleTime,
+                QWORD theSampleDuration,
+                DWORD theFlags,
+                INSSBuffer __RPC_FAR *theSample,
+                void __RPC_FAR *theContext);
+
+        HRESULT STDMETHODCALLTYPE OnStatus(WMT_STATUS theStatus,
+                HRESULT hr,
+                WMT_ATTR_DATATYPE theType,
+                BYTE __RPC_FAR *theValue,
+                void __RPC_FAR *theContext);
+
+    private:
+        void open();
+        void close();
+        bool waitForEvent(unsigned theWaitTime = MAX_TIMEOUT_FOR_EVENT);
+
+        std::string _myURI;
+        IWMReader * _myReader;
+        HANDLE _myEvent;
+        HRESULT _myEventResult;
+        unsigned _myMaxChannels;
+};
+
+} // namespace
+
+#endif 
