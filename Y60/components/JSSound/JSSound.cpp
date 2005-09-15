@@ -224,6 +224,6 @@ namespace jslib {
 }
 
 extern "C"
-EXPORT asl::PlugInBase * y60Media_instantiatePlugIn(asl::DLHandle myDLHandle) {
+EXPORT asl::PlugInBase * y60JSSound_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::JSSoundPlugIn(myDLHandle);
 }

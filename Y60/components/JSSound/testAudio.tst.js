@@ -11,7 +11,7 @@
 */
 
 use("UnitTest.js");
-plug("y60Media");
+plug("y60JSSound");
 
 function SoundUnitTest() {
     this.Constructor(this, "SoundUnitTest");
