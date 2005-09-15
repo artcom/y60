@@ -43,6 +43,7 @@
 #include <maya/MFnAttribute.h>
 #include <maya/MItDependencyGraph.h>
 #include <maya/MFnPhongShader.h>
+#include <maya/MFn.h>
 #include <maya/MFnBlinnShader.h>
 #include <maya/MFnMesh.h>
 #include <maya/MFnTransform.h>
@@ -738,6 +739,17 @@ MaterialExporter::exportReflectiveFeatures(const MFnMesh * theMesh, const MObjec
 }
 
 void
+MaterialExporter::exportPhongEFeatures(const MFnMesh * theMesh, const MObject & theShaderNode,
+                                        y60::MaterialBuilder & theBuilder,
+                                        y60::SceneBuilder & theSceneBuilder)
+{
+    exportReflectiveFeatures(theMesh, theShaderNode, theBuilder, theSceneBuilder);
+    MStatus myStatus;
+    float myDefaultShininess = 5.0; // fix this for a phong E support, this is a guess
+    setPropertyValue<float>(theBuilder.getNode(), "float", y60::SHININESS_PROPERTY, myDefaultShininess);
+}
+
+void
 MaterialExporter::exportPhongFeatures(const MFnMesh * theMesh, const MObject & theShaderNode,
                                         y60::MaterialBuilder & theBuilder,
                                         y60::SceneBuilder & theSceneBuilder)
@@ -823,6 +835,12 @@ MaterialExporter::exportShader(const MFnMesh * theMesh, const MObject & theShade
         case MFn::kSurfaceShader: {
             createLightingFeature(theLightingFeature, y60::UNLIT);
             exportUnlitFeatures(theMesh, theShaderNode, theMaterialBuilder, theSceneBuilder);
+            break;
+        }
+        case MFn::kPhongExplorer: {
+            createLightingFeature(theLightingFeature, y60::PHONG);
+            exportLambertFeatures(theMesh, theShaderNode, theMaterialBuilder, theSceneBuilder);
+            exportPhongEFeatures(theMesh, theShaderNode, theMaterialBuilder, theSceneBuilder);
             break;
         }
         case MFn::kPhong: {
@@ -989,6 +1007,7 @@ MaterialExporter::checkTransparency(const MObject & theShaderNode) {
     switch (theShaderNode.apiType()) {
         case MFn::kLambert:
         case MFn::kBlinn:
+        case MFn::kPhongExplorer:
         case MFn::kPhong: {
             if (checkAlphaTexture(theShaderNode, "transparency")) {
                 myTransparencyFlag = true;
