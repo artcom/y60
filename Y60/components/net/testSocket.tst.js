@@ -11,7 +11,7 @@
 //
 //    $RCSfile: testSocket.tst.js,v $
 //
-//   $Revision: 1.3 $
+//   $Revision: 1.4 $
 //
 // Description: Utility Classes and Macros for easy unit testing
 //
@@ -23,7 +23,7 @@ use("UnitTest.js");
 plug("jsnet");
 
 function SocketUnitTest() {
-    this.Constructor(this, "TestUnitTest");
+    this.Constructor(this, "SocketUnitTest");
 };
 
 SocketUnitTest.prototype.Constructor = function(obj, theName) {
@@ -70,24 +70,14 @@ SocketUnitTest.prototype.Constructor = function(obj, theName) {
         obj.mySocket1.close();
         obj.mySocket2.close();
         obj.mySocket3.close();
-        
-        obj.myTCPServer = new TCPServer("localhost", 1001);
-
     }
 };
 
-function main() {
-    var myTestName = "testSocket.tst.js";
-    var mySuite = new UnitTestSuite(myTestName);
+var myTestName = "testSocket.tst.js";
+var mySuite = new UnitTestSuite(myTestName);
 
-    mySuite.addTest(new SocketUnitTest());
-    mySuite.run();
+mySuite.addTest(new SocketUnitTest());
+mySuite.run();
 
-    print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
-    return mySuite.returnStatus();
-}
-
-if (main() != 0) {
-    ERROR;
-};
-
+print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+exit(mySuite.returnStatus());
