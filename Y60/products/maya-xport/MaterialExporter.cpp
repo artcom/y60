@@ -33,6 +33,7 @@
 #include <y60/property_functions.h>
 
 #include <asl/string_functions.h>
+#include <asl/numeric_functions.h>
 #include <asl/Dashboard.h>
 #include <asl/Matrix4.h>
 
@@ -43,7 +44,8 @@
 #include <maya/MFnAttribute.h>
 #include <maya/MItDependencyGraph.h>
 #include <maya/MFnPhongShader.h>
-#include <maya/MFn.h>
+#include <maya/MFnPhongEShader.h>
+//#include <maya/MFn.h>
 #include <maya/MFnBlinnShader.h>
 #include <maya/MFnMesh.h>
 #include <maya/MFnTransform.h>
@@ -745,8 +747,10 @@ MaterialExporter::exportPhongEFeatures(const MFnMesh * theMesh, const MObject & 
 {
     exportReflectiveFeatures(theMesh, theShaderNode, theBuilder, theSceneBuilder);
     MStatus myStatus;
-    float myDefaultShininess = 5.0; // fix this for a phong E support, this is a guess
-    setPropertyValue<float>(theBuilder.getNode(), "float", y60::SHININESS_PROPERTY, myDefaultShininess);
+    float myHightlightSize = MFnPhongEShader(theShaderNode).highlightSize(& myStatus);
+    
+    float myShininess = asl::maximum(0.0f, 128.0f - (myHightlightSize * 100.0f)); // experimental
+    setPropertyValue<float>(theBuilder.getNode(), "float", y60::SHININESS_PROPERTY, myShininess);
 }
 
 void
