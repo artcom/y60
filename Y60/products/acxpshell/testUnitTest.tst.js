@@ -55,7 +55,8 @@ TestUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('true');
         obj.setSilentSuccess(false);
         ENSURE_EXCEPTION("throw 'ex'","ex");
-        ENSURE_EXCEPTION("throw Exception('MyWhat','MyWhere')",Exception());
+        ENSURE_EXCEPTION("throw Exception('MyWhat','MyWhere')",
+                        Exception('MyMessage', {file:'MyFile', line:0}, 'MyName'));
     } 
 };
 
@@ -78,4 +79,6 @@ if (mySuite.getPassedCount() != 0 && mySuite.getFailedCount() == 3) {
     print("## Test were not completed successfully");
 
 }
+
 print(">> Finished test suite '"+myTestName+"', return status = " + returnStatus + "");
+exit(returnStatus);
