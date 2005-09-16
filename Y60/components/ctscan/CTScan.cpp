@@ -704,7 +704,7 @@ CTScan::create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize) {
     }
     for (int z = 0; z < myTextureSize[2]-2; ++z) {
         int mySlice = int(floor(float(z*mySliceCount)/myTextureSize[2]));
-        AC_WARNING << " adding slice " << mySlice; 
+        AC_TRACE << " adding slice " << mySlice; 
         CTScan::appendTo3DTexture(mySlice, my3DTexture, myTextureSize[0], myTextureSize[1]);
     }
     if (myTextureSize[2] > 1) {
