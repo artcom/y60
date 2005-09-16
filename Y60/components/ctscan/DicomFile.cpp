@@ -41,7 +41,7 @@ namespace y60 {
 DicomFile::DicomFile(Ptr<ReadableBlock> theInputBlock, const std::string & theFilename)
     : _myDicomFile(0), CTFile(), _myFrameCount(1)
 {
-
+    DicomImageClass::setDebugLevel(DicomImageClass::DL_Errors);
     if (!dcmDataDict.isDictionaryLoaded()) {
         throw CTException("No DCTMK data dictionary loaded", PLUS_FILE_LINE);
     }
@@ -96,7 +96,8 @@ y60::PixelEncoding
 DicomFile::getEncoding() const {
     E_TransferSyntax xfer = _myDicomFile->getDataset()->getOriginalXfer();
     // unsigned long opt_compatibilityMode = CIF_MayDetachPixelData | CIF_TakeOverExternalDataset;
-    DicomImage myDicomImage(_myDicomFile, xfer, 0lu, 0lu, 1lu);
+    unsigned long opt_compatibilityMode = 0;
+    DicomImage myDicomImage(_myDicomFile, xfer, opt_compatibilityMode, 0lu, 1lu);
 
     if (myDicomImage.getStatus() != EIS_Normal) {
         throw CTException(myDicomImage.getString(myDicomImage.getStatus()), PLUS_FILE_LINE);
@@ -105,10 +106,13 @@ DicomFile::getEncoding() const {
     const DiPixel * myPixelData = myDicomImage.getInterData();
     switch (myPixelData->getRepresentation()) {
         case EPR_Uint8:
+            AC_TRACE << "dicom file is gray-8";
             return y60::GRAY;
         case EPR_Uint16:
+            AC_TRACE << "dicom file is gray-U16";
             return y60::GRAY16;
         case EPR_Sint16:
+            AC_TRACE << "dicom file is gray-S16";
             return y60::GRAYS16;
         default:
             throw CTException("unsupported dctk pixel format", PLUS_FILE_LINE);
@@ -130,7 +134,7 @@ DicomFile::getRaster(int theFrame) {
     const unsigned char * myRawData = reinterpret_cast<const unsigned char*>(myPixelData->getData());
 
     asl::ReadableBlockAdapter myRawBlock(myRawData, myRawData + getBytesRequired(myPixelData->getCount(), myEncoding)); 
-
+    AC_TRACE << "creating frame " << theFrame << ", " << myDicomImage.getWidth() << "x" << myDicomImage.getHeight();
     return dynamic_cast_Ptr<dom::ResizeableRaster>(
             createRasterValue(myEncoding, myDicomImage.getWidth(), myDicomImage.getHeight(), myRawBlock));
 }

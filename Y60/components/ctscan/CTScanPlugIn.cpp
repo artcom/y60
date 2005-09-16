@@ -26,6 +26,8 @@
 #include <y60/IScriptablePlugin.h>
 #include <asl/PlugInBase.h>
 
+#include <dicom/dcmjpeg/djdecode.h>
+
 namespace y60 {
 	class CTScanPlugIn :
 		public asl::PlugInBase,
@@ -33,6 +35,8 @@ namespace y60 {
 	{
 	public:
 		CTScanPlugIn (asl::DLHandle theDLHandle);
+		virtual ~CTScanPlugIn();
+
    		void initClasses(JSContext * theContext, JSObject *theGlobalObject);
         const char * ClassName() {
             static const char * myClassName = "CTScanPlugIn";
@@ -51,7 +55,13 @@ using namespace y60;
 
 CTScanPlugIn :: CTScanPlugIn(DLHandle theDLHandle) :
 			PlugInBase(theDLHandle)
-{}
+{
+    DJDecoderRegistration::registerCodecs();
+}
+
+CTScanPlugIn :: ~CTScanPlugIn() {
+    DJDecoderRegistration::cleanup();
+}
 
 void 
 CTScanPlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) {

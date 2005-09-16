@@ -670,6 +670,7 @@ CTScan::appendEmptySlices(asl::Block & the3DTexture, unsigned theSliceCount, int
     std::vector<PIXEL> myEmptySlice(mySamplesPerSlice, NumericTraits<PIXEL>::min());
 
     for (unsigned i = 0; i < theSliceCount; ++i) {
+        AC_TRACE << "appending empty slice with " << theBytesPerSlice << " bytes";
         the3DTexture.append(static_cast<void*>(&(*myEmptySlice.begin())), theBytesPerSlice);
     }
 }
@@ -683,11 +684,12 @@ CTScan::create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize) {
             myTextureSize[i] = theMaxTextureSize;
         }
     }
-    AC_DEBUG << "creating 3D texture, size=" << myTextureSize;
     
     asl::Block my3DTexture;
     int mySliceCount = getSliceCount();
     int myBytesPerSlice = getBytesRequired(myTextureSize[0]*myTextureSize[1], _myEncoding);
+    AC_DEBUG << "creating 3D texture, size=" << myTextureSize << ", slice count=" 
+        << mySliceCount << ", bytes/slice=" << myBytesPerSlice;
 
     switch (_myEncoding) {
         case GRAY:
@@ -700,25 +702,27 @@ CTScan::create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize) {
             appendEmptySlices<signed short>(my3DTexture, 1, myBytesPerSlice);
             break;
     }
-    for (unsigned z = 0; z < myTextureSize[2]-2; ++z) {
+    for (int z = 0; z < myTextureSize[2]-2; ++z) {
         int mySlice = int(floor(float(z*mySliceCount)/myTextureSize[2]));
-        AC_TRACE << " adding slice " << mySlice; 
+        AC_WARNING << " adding slice " << mySlice; 
         CTScan::appendTo3DTexture(mySlice, my3DTexture, myTextureSize[0], myTextureSize[1]);
     }
-    switch (_myEncoding) {
-        case GRAY:
-            appendEmptySlices<unsigned char>(my3DTexture, 1, myBytesPerSlice);
-            break;
-        case GRAY16:
-            appendEmptySlices<unsigned short>(my3DTexture, 1, myBytesPerSlice);
-            break;
-        case GRAYS16:
-            appendEmptySlices<signed short>(my3DTexture, 1, myBytesPerSlice);
-            break;
+    if (myTextureSize[2] > 1) {
+        switch (_myEncoding) {
+            case GRAY:
+                appendEmptySlices<unsigned char>(my3DTexture, 1, myBytesPerSlice);
+                break;
+            case GRAY16:
+                appendEmptySlices<unsigned short>(my3DTexture, 1, myBytesPerSlice);
+                break;
+            case GRAYS16:
+                appendEmptySlices<signed short>(my3DTexture, 1, myBytesPerSlice);
+                break;
+        }
     }
-
     y60::ImagePtr myImage = theImageNode->getFacade<y60::Image>();
     myImage->set(myTextureSize[0], myTextureSize[1], myTextureSize[2], _myEncoding, my3DTexture);
+    AC_DEBUG << "done creating 3d texture" << endl;
 }
 
 template <class VoxelT>
