@@ -23,7 +23,7 @@ use("UnitTest.js");
 plug("jsnet");
 
 function SocketUnitTest() {
-    this.Constructor(this, "TestUnitTest");
+    this.Constructor(this, "SocketUnitTest");
 };
 
 SocketUnitTest.prototype.Constructor = function(obj, theName) {
@@ -73,18 +73,11 @@ SocketUnitTest.prototype.Constructor = function(obj, theName) {
     }
 };
 
-function main() {
-    var myTestName = "testSocket.tst.js";
-    var mySuite = new UnitTestSuite(myTestName);
+var myTestName = "testSocket.tst.js";
+var mySuite = new UnitTestSuite(myTestName);
 
-    mySuite.addTest(new SocketUnitTest());
-    mySuite.run();
+mySuite.addTest(new SocketUnitTest());
+mySuite.run();
 
-    print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
-    return mySuite.returnStatus();
-}
-
-if (main() != 0) {
-    ERROR;
-};
-
+print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+exit(mySuite.returnStatus());
