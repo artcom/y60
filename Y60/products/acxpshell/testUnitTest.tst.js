@@ -38,7 +38,7 @@ TestUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('0 == 0');
         ENSURE('obj.getPassedCount() == 4');
         ENSURE('obj.getFailedCount() == 0');
-        ENSURE('1 == 0');
+        ENSURE('1 == 0', "this is expected to fail");
         ENSURE('obj.getPassedCount() == 6');
         ENSURE('obj.getFailedCount() == 1');
         obj.setFailedCount(obj.getFailedCount()+1);
@@ -55,7 +55,7 @@ TestUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('true');
         obj.setSilentSuccess(false);
         ENSURE_EXCEPTION("throw 'ex'","ex");
-        ENSURE_EXCEPTION("throw Exception('MyWhat','MyWhere')",
+        ENSURE_EXCEPTION("throw Exception('MyMessage', {file:'MyFile', line:0}, 'MyName')",
                         Exception('MyMessage', {file:'MyFile', line:0}, 'MyName'));
     } 
 };
