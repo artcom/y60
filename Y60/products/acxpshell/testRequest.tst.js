@@ -63,7 +63,8 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myManager.performRequest(obj.myBadRequest);
 
         obj.myTimeoutRequest = new Request("http://himmel/~valentin/timeout.php");
-        obj.myTimeoutRequest.timeout = 25;
+        obj.myTimeout = 25.0;
+        obj.myTimeoutRequest.setTimeoutParams(10, obj.myTimeout);
         obj.myTimeoutRequest.onError = function(theErrorCode) {
             obj.myErrorCode = theErrorCode;
             //print ("onError called with code: " + theErrorCode);
@@ -79,14 +80,15 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
         while (obj.myManager.activeCount) {
             obj.myManager.handleRequests();
         }
-        myDiffTime = (new Date() - myTime) / 1000;
-        print("diff time: "+myDiffTime, obj.myTimeoutRequest.timeout);
+        obj.myDiffTime = (new Date() - myTime) / 1000;
+        print("diff time: "+obj.myDiffTime, obj.myTimeout);
         // check if tests needs at least the timeout and max 100 seconds
-        ENSURE("myDiffTime >= obj.myTimeoutRequest.timeout");
-        ENSURE("myDiffTime < 100");
+        ENSURE("obj.myDiffTime >= obj.myTimeout");
+        ENSURE("obj.myDiffTime < 100");
          
         ENSURE("obj.myManager.activeCount==0");
         ENSURE("obj.myRequest.responseCode==200");
+        print("obj.myTimeoutRequest.responseCode: " + obj.myTimeoutRequest.responseCode);
         ENSURE("obj.myTimeoutRequest.responseCode==0");
         ENSURE("obj.myErrorCode==28");
         print (obj.myBadRequest.errorString);

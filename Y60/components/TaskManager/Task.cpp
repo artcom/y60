@@ -27,7 +27,7 @@
 #include <winuser.h>
 using namespace std;
 
-#define DB(x) // x
+#define DB(x) //x
 
 // This allows windows to be set to foreground by other processes
 BOOL a = SystemParametersInfo(SPI_SETFOREGROUNDLOCKTIMEOUT, 0, (LPVOID)0, SPIF_SENDWININICHANGE | SPIF_UPDATEINIFILE);
@@ -73,11 +73,14 @@ namespace y60 {
             0, STARTF_USESHOWWINDOW, (theShowFlag ? SW_SHOWDEFAULT : SW_MINIMIZE),
             0, NULL, NULL, NULL, NULL
         };
-
+        string myCWD(".");
+        if (thePath.size() > 0) {
+            myCWD = thePath;
+        }
         bool myResult = CreateProcess(
             NULL, &theCommand[0],
             NULL, NULL, TRUE, 0,
-            NULL, thePath.c_str(), &myStartupInfo,
+            NULL, myCWD.c_str(), &myStartupInfo,
             &_myProcessInfo);
 
         // Error handling

@@ -36,8 +36,8 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         print(">>>  Test Application: '" + theApplication);
         print("Open tasks");
         obj.myTask  = new Task(theApplication);
-        obj.myTask1 = new Task("C:/WINDOWS/notepad.exe", "", false);
-        obj.myTask2 = new Task("C:/WINDOWS/notepad.exe", "", false);
+        obj.myTask1 = new Task("C:/WINDOWS/notepad.exe", "C:/WINDOWS", false);
+        obj.myTask2 = new Task("C:/WINDOWS/notepad.exe", "C:/WINDOWS", false);
         msleep(TEST_SPEED);
 
         ENSURE('obj.myTask.windows.length == ' + theWindowCount);
@@ -85,7 +85,7 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         msleep(TEST_SPEED);
 
         print("Capture task");
-        obj.myTaskWindow.capture("test.png");
+        obj.myTaskWindow.capture("pruefimage.png");
         msleep(TEST_SPEED);
 
         print("Minimize task");
@@ -169,4 +169,8 @@ function main() {
     return mySuite.returnStatus();
 }
 
-main();
+if (main() != 0) {
+    exit(5);
+} else {
+    exit(0);
+}

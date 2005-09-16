@@ -114,7 +114,7 @@ function main() {
     return mySuite.returnStatus();
 }
 
-rc = main();
+var rc = main();
 if (rc != 0) {
     exit(5);
 };

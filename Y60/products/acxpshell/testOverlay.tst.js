@@ -195,7 +195,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         ///////////////////////////////////////////////////////////////////////////////////////
 
 
-        var mySources = ["../../testfiles/black.rgb", "../../DiffuseRamp.png"];
+        var mySources = ["../../testfiles/black.rgb", "../../testfiles/DiffuseRamp.png"];
         obj.myMultiOverlay = new ImageOverlay(myOverlayManager, mySources);
         ENSURE('obj.myMultiOverlay.images.length == 2');
 
