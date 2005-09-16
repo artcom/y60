@@ -362,12 +362,12 @@ Matrix4fUnitTest.prototype.Constructor = function(obj, theName) {
             // Test setRow / setColumn
             var myRowMatrix = new Matrix4f();
             var myColMatrix = new Matrix4f();
-            for (var i = 0; i < 4; ++i) {
-                var myVector = new Vector4f(i*1, i*2, i*3, i*4);
-                myRowMatrix.setRow(i, myVector);
-                ENSURE(almostEqual(myVector, myRowMatrix.getRow(i)), "Testing getRow()");
-                myColMatrix.setColumn(i, myVector);
-                ENSURE(almostEqual(myVector, myColMatrix.getColumn(i)), "Testing getColumn()");
+            for (var j = 0; j < 4; ++j) {
+                var myVector = new Vector4f(j*1, j*2, j*3, j*4);
+                myRowMatrix.setRow(j, myVector);
+                ENSURE(almostEqual(myVector, myRowMatrix.getRow(j)), "Testing getRow()");
+                myColMatrix.setColumn(j, myVector);
+                ENSURE(almostEqual(myVector, myColMatrix.getColumn(j)), "Testing getColumn()");
             }
         }
     }
