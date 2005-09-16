@@ -22,7 +22,7 @@
 use("UnitTest.js");
 
 function MyClassUnitTest() {
-    this.Constructor(this, "TestUnitTest");
+    this.Constructor(this, "MyClassUnitTest");
 };
 
 
@@ -37,20 +37,12 @@ MyClassUnitTest.prototype.Constructor = function(obj, theName) {
     }
 };
 
-function main() {
-    var myTestName = "testMyClass.tst.js";
-    var mySuite = new UnitTestSuite(myTestName);
+var myTestName = "testMyClass.tst.js";
+var mySuite = new UnitTestSuite(myTestName);
 
-    mySuite.addTest(new MyClassUnitTest());
-    mySuite.addTest(new MyClassUnitTest());
-    mySuite.run();
+mySuite.addTest(new MyClassUnitTest());
+mySuite.addTest(new MyClassUnitTest());
+mySuite.run();
 
-    print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
-    return mySuite.returnStatus();
-}
-
-if (main() != 0) {
-    ERROR;
-};
-
-
+print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
+exit(mySuite.returnStatus());
