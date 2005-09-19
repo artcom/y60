@@ -85,7 +85,7 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         msleep(TEST_SPEED);
 
         print("Capture task");
-        obj.myTaskWindow.capture("pruefimage.png");
+        obj.myTaskWindow.capture("test.png");
         msleep(TEST_SPEED);
 
         print("Minimize task");
