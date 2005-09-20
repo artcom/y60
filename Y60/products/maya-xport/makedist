@@ -7,7 +7,7 @@ CODENAME=$PLUGIN_NAME
 
 ############################# linux setup #############################################
 
-Y60_LINUX_LIBS="aslbase aslxml y60som"
+Y60_LINUX_LIBS="aslbase domxml y60base y60scene"
 
 ############################# windows setup ###########################################
 
@@ -24,7 +24,7 @@ collectLinuxLibs() {
     echo "  Installing linux libraries"
     for LIB in $Y60_LINUX_LIBS; do
         LIBNAME=lib${LIB}OPT.so
-        copyFile $DIST_LIB_DIR/${LIBNAME} ${DIST_LIB_DIR};
+        copyFile ${PRO}/lib/${LIBNAME} ${DIST_LIB_DIR};
         strip $DIST_LIB_DIR/${LIBNAME}
     done
 }
@@ -32,7 +32,7 @@ collectLinuxLibs() {
 makedistLinux() {
     echo "Building linux distribution";
     PACKAGENAME=${PLUGIN_NAME}-linux.tar.bz2
-    DIST_BIN_DIR=${DIST_DIR}/${CODENAME}/maya/5.0
+    DIST_BIN_DIR=${DIST_DIR}/${CODENAME}/maya/${MAYA_VERSION}
     DIST_LIB_DIR=${DIST_DIR}/${CODENAME}/lib
 
     removeDistribution
