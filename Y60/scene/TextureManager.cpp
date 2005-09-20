@@ -88,16 +88,20 @@ namespace y60 {
                 ImagePtr myImage = myImageNode->getFacade<Image>();
                 AC_TRACE << "TextureManager::update() checking image '" << myImage->get<NameTag>() << "'" << endl;
                 myImage->setTextureManager(*this);
-                bool imageReloadRequired = myImage->reloadRequired();
-                if (imageReloadRequired) {
+
+                bool reloadRequired = myImage->reloadRequired();
+                if (reloadRequired) {
                     myImage->load(*_myPackageManager);
                 }
-                bool imageUploadRequired = (myImage->getGraphicsId() == 0);
 
-                if (imageReloadRequired || imageUploadRequired || myImage->isImageNewerThanTexture()) {
+                bool textureUploadRequired = myImage->textureUploadRequired() ||
+                                             myImage->isImageNewerThanTexture();
+                AC_DEBUG << myImage->get<NameTag>() << " reload=" << reloadRequired << " upload=" << textureUploadRequired;
+
+                if (reloadRequired || textureUploadRequired) {
                     uploadTexture(myImage);
                 } else {
-                    AC_TRACE << "Texture not uploaded. It is already there.";
+                    AC_TRACE << "Texture not uploaded.";
                 }
             }
         }
@@ -112,17 +116,15 @@ namespace y60 {
             MAKE_SCOPE_TIMER(TextureManager_updatingImageData);
             updateImageData(theImage);
         } else {
-            AC_TRACE << "replacing texture." << endl;
+            AC_TRACE << "Replacing texture." << endl;
             MAKE_SCOPE_TIMER(TextureManager_replacingTexture);
             if (theImage->getGraphicsId()) {
                 // In order to prevent a texture leak, we need to unbind
                 // the texture before setupImage()
                 unbindTexture(&*theImage);
             }
-            AC_TRACE << "setting up image" << endl;
             setupImage(theImage);
         }
-
     }
 
     int 

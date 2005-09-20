@@ -70,9 +70,7 @@ namespace y60 {
         _myRefCount(0),
         _myTexId(0),
         _myLoadedFilename(""),
-        _myAppliedFilter(""),
         _myTextureImageVersion(0),
-        _myAppliedFilterParams(),
         _myTextureWidth(0), _myTextureHeight(0), _myTextureDepth(0)
     {
         if (theNode) {
@@ -83,6 +81,7 @@ namespace y60 {
             _myAppliedColorScale   = get<ImageColorScaleTag>();
             _myAppliedInternalFormat = get<ImageInternalFormatTag>();
             _myAppliedPixelFormat  = get<ImagePixelFormatTag>();
+            _myAppliedMipmap       = get<ImageMipmapTag>();
         }
     }
 
@@ -99,10 +98,9 @@ namespace y60 {
 
     void
     Image::registerTexture() {
-        DB(cerr << "registerTexture " << _myLoadedFilename << " refcount: " << _myRefCount << endl);
+        AC_TRACE << "registerTexture " << _myLoadedFilename << " refcount: " << _myRefCount;
         if (_myRefCount == 0) {
-            DB(cerr << "first use of " << _myLoadedFilename << endl);
-
+            AC_TRACE << "first use of " << _myLoadedFilename;
             if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
                 myTextureManager->setPriority(this, TEXTURE_PRIORITY_IN_USE);
             }
@@ -112,10 +110,10 @@ namespace y60 {
 
     void
     Image::deregisterTexture() {
-        DB(cerr << "deregisterTexture " << _myLoadedFilename << " refcount: " << _myRefCount << endl);
+        AC_TRACE << "deregisterTexture " << _myLoadedFilename << " refcount: " << _myRefCount;
         --_myRefCount;
         if (_myRefCount==0) {
-            DB(cerr << "last use of " << _myLoadedFilename << endl;)
+            AC_TRACE << "last use of " << _myLoadedFilename;
             if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
                 myTextureManager->setPriority(this, TEXTURE_PRIORITY_IDLE);
             }
@@ -199,6 +197,7 @@ namespace y60 {
         myPackageManager.add(theImagePath);
         loadFromFile(myPackageManager);
     }
+
     void
     Image::loadFromFile(asl::PackageManager & thePackageManager) {
         _myLoadedFilename      = get<ImageSourceTag>();
@@ -208,11 +207,12 @@ namespace y60 {
         _myAppliedColorScale   = get<ImageColorScaleTag>();
         _myAppliedPixelFormat  = get<ImagePixelFormatTag>();
         _myAppliedInternalFormat = get<ImageInternalFormatTag>();
+        _myAppliedMipmap       = get<ImageMipmapTag>();
 
         if (get<ImageSourceTag>() == "") {
             //throw ImageException(string("Image ") + get<NameTag>() + " has empty source attribute", PLUS_FILE_LINE);
             //TODO: we need clarify the image loading concept here:
-            DB(cerr << "#INFO:  Image name '" << get<NameTag>() << " has not been loaded because of empty source attribute"<<endl);
+            AC_INFO << "Image '" << get<NameTag>() << " has not been loaded because of empty source attribute";
             return;
         }
 
@@ -221,26 +221,26 @@ namespace y60 {
 
         string myFilter = get<ImageFilterTag>();
         if (!myFilter.empty()) {
-            DB(cerr << "Image::loadFromFile() filter=" << myFilter << endl);
+            AC_DEBUG << "Image::loadFromFile() filter=" << myFilter;
             VectorOfFloat myFilterParams = get<ImageFilterParamsTag>();
             myImageLoader.applyCustomFilter(myFilter, myFilterParams);
-            DB(cerr << "Image::loadFromFile() custom filter applied" << myFilter << endl);
         }
 
         // ImageTileTag only relevant for getType() == CUBEMAP
         myImageLoader.ensurePowerOfTwo(get<ImageResizeTag>(), getType(), myDepth, &(get<ImageTileTag>()));
 
+        // Drop alpha channel if unused
         const asl::Vector4f & myColorScale = get<ImageColorScaleTag>();
         if (!asl::almostEqual(myColorScale[3], 1)) {
             if (!myImageLoader.HasAlpha()) {
 				// the real alpha scaling is done with glPixeltransfer routines with opengl,
-				// so here we asure that the image has a alpha channel filled with 1.0 (vs/dk)
+				// so here we assure that the image has a alpha channel filled with 1.0 (vs/dk)
                 myImageLoader.setFixedAlpha(1);
             }
         } else {
-            // if we have a 32-bit bitmap with an invalid alpha channel, get rid of it
             myImageLoader.removeUnusedAlpha();
         }
+
         set(myImageLoader.GetWidth(),
             myImageLoader.GetHeight()/myDepth, myDepth,
             myImageLoader.getEncoding(),
@@ -254,7 +254,7 @@ namespace y60 {
         int myHeight = get<ImageHeightTag>();
         // save 3d textures as one long stripe
         if (get<ImageDepthTag>() > 1) {
-            DB(cerr << "Saving 3D image" << endl);
+            AC_TRACE << "Saving 3D image " << theImagePath;
             myHeight *= get<ImageDepthTag>();
         }
 		PLPixelFormat myPixelFormat;
@@ -275,20 +275,15 @@ namespace y60 {
 		myPNGEncoder.MakeFileFromBmp(theImagePath.c_str(), &myBmp);
 	}
 
+    /// Reload *from file* required?
     bool
     Image::reloadRequired() const {
 
-        bool myReloadRequired = (!getRasterValue() ||
-                !getRasterPtr() ||
-                !getRasterPtr()->pixels().size() ||
-                _myLoadedFilename != get<ImageSourceTag>() ||
-                _myAppliedFilter != get<ImageFilterTag>() ||
-                _myAppliedFilterParams != get<ImageFilterParamsTag>() ||
-                _myAppliedColorScale != get<ImageColorScaleTag>() ||
-                _myAppliedColorBias != get<ImageColorBiasTag>() ||
-                _myAppliedPixelFormat != get<ImagePixelFormatTag>() ||
-                _myAppliedInternalFormat != get<ImageInternalFormatTag>()
-        );
+        bool myReloadRequired = !getRasterValue() ||
+            !getRasterPtr() || !getRasterPtr()->pixels().size() ||
+            _myLoadedFilename != get<ImageSourceTag>() ||
+            _myAppliedFilter != get<ImageFilterTag>() ||
+            _myAppliedFilterParams != get<ImageFilterParamsTag>();
 
 		/*
          * want to check what condition the condition is in ? 	
@@ -328,13 +323,39 @@ if (myReloadRequired) {
         return myReloadRequired;
     }
 
+    /// Texture upload required?
+    bool
+    Image::textureUploadRequired() const {
+
+        if (_myAppliedColorScale != get<ImageColorScaleTag>() ||
+            _myAppliedColorBias != get<ImageColorBiasTag>()) {
+
+            const asl::Vector4f & myColorScale = get<ImageColorScaleTag>();
+            if (!asl::almostEqual(myColorScale[3], 1.0f)) {
+                const std::string & myExternalFormat = get<ImagePixelFormatTag>();
+                if (myExternalFormat == "RGB" || myExternalFormat == "BGR") {
+                    const_cast<Image*>(this)->set<ImageInternalFormatTag>("RGBA");
+                    AC_TRACE << "Using internalFormat '" << get<ImageInternalFormatTag>() << "'";
+                }
+            }
+        }
+
+        return getGraphicsId() == 0 ||
+            _myAppliedColorScale != get<ImageColorScaleTag>() ||
+            _myAppliedColorBias != get<ImageColorBiasTag>() ||
+            _myAppliedPixelFormat != get<ImagePixelFormatTag>() ||
+            !canReuseTexture();
+    }
+
+    /// Applied texture parameters are compatible with DOM values.
     bool
     Image::canReuseTexture() const {
-        return (_myTextureWidth == get<ImageWidthTag>() &&
-                _myTextureHeight == get<ImageHeightTag>() &&
-                _myTextureDepth == get<ImageDepthTag>() &&
-                _myTexturePixelFormat == get<ImagePixelFormatTag>() && 
-                getGraphicsId() != 0);
+        return getGraphicsId() != 0 &&
+            _myTextureWidth == get<ImageWidthTag>() &&
+            _myTextureHeight == get<ImageHeightTag>() &&
+            _myTextureDepth == get<ImageDepthTag>() &&
+            _myTexturePixelFormat == get<ImagePixelFormatTag>() &&
+            _myAppliedInternalFormat == get<ImageInternalFormatTag>() &&
+            _myAppliedMipmap == get<ImageMipmapTag>();
     }
 }
-

@@ -18,6 +18,7 @@
 
 #include "GLResourceManager.h"
 #include <y60/Image.h>
+#include <y60/PixelEncoding.h>
 #include <GL/glext.h>
 
 using namespace std;
@@ -131,12 +132,11 @@ namespace y60 {
             // mipmap
             if (myDepth == 1) {
 #ifdef GL_SGIS_generate_mipmap
-                // XXX check extension
-                glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+                if (queryOGLExtension("GL_SGIS_generate_mipmap")) {
+                    //glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+                }
 #endif
                 // 2D-Texture
-                // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                //CHECK_OGL_ERROR;
                 gluBuild2DMipmaps(GL_TEXTURE_2D, myPixelEncoding.internalformat,
                     myWidth, myHeight,
                     myPixelEncoding.externalformat, myPixelEncoding.pixeltype,
@@ -145,8 +145,6 @@ namespace y60 {
             } else {
 #if HAS_3D_MIPMAPS
                 // 3D-Texture
-                // glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                // CHECK_OGL_ERROR;
                 gluBuild3DMipmaps(GL_TEXTURE_3D, myPixelEncoding.internalformat,
                     myWidth, myHeight, myDepth,
                     myPixelEncoding.externalformat, myPixelEncoding.pixeltype,
@@ -159,18 +157,13 @@ namespace y60 {
             // no mipmapping
             if (myDepth == 1) {
 #ifdef GL_SGIS_generate_mipmap
-                // XXX check extension
-                glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
+                if (queryOGLExtension("GL_SGIS_generate_mipmap")) {
+                    //glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
+                }
 #endif
-                // 2D-Texture - moved to FFShader
-                // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                // CHECK_OGL_ERROR;
-            } else {
-                // 3D-Texture
-                //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                //CHECK_OGL_ERROR;
             }
         }
+
         if (myPixelEncoding.compressedFlag) {
             if (myDepth == 1) {
                 glCompressedTexImage2DARB(GL_TEXTURE_2D, 0,
@@ -192,6 +185,7 @@ namespace y60 {
             AC_DEBUG << "tex " << myTexWidth << "x" << myTexHeight << endl;
             
             if (myDepth == 1) {
+                AC_TRACE << "setupSingle internalFormat=" << hex << myPixelEncoding.internalformat << dec;
                 // Two step initialization
                 // First allocate the texture with power of two dimensions
                 glTexImage2D(GL_TEXTURE_2D, 0,
@@ -220,7 +214,7 @@ namespace y60 {
                 CHECK_OGL_ERROR;
             }
 
-            myTopLevelTextureSize =  getBytesRequired(myTexWidth * myTexHeight * myTexDepth, theImage->getEncoding());
+            myTopLevelTextureSize = getBytesRequired(myTexWidth * myTexHeight * myTexDepth, theImage->getEncoding());
 
             CHECK_OGL_ERROR;
             _myTextureMemUsage +=  myTopLevelTextureSize;
@@ -481,7 +475,7 @@ namespace y60 {
                 }
             } else {
                 if (myDepth == 1) {
-                    DB(AC_TRACE << "subloading 2D " << myWidth << "x" << myHeight);
+                    AC_TRACE << "subloading 2D " << myWidth << "x" << myHeight << " internalFormat=" << hex << myPixelEncoding.internalformat << dec;
                     glTexSubImage2D(GL_TEXTURE_2D, 0,
                                     0, 0, myWidth, myHeight,
                                     myPixelEncoding.externalformat,
@@ -517,13 +511,16 @@ namespace y60 {
 
     PixelEncodingInfo
     GLResourceManager::getInternalTextureFormat(ImagePtr theImage) {
-        PixelEncodingInfo myEncodingInfo = getDefaultGLTextureParams(theImage->getEncoding());
-        const std::string & myFormatString = theImage->get<ImageInternalFormatTag>();
-        if ( ! myFormatString.empty()) {
+        PixelEncoding myEncoding = theImage->getEncoding();
+        PixelEncodingInfo myEncodingInfo = getDefaultGLTextureParams(myEncoding);
+
+        std::string myFormatString = theImage->get<ImageInternalFormatTag>();
+        if (! myFormatString.empty()) {
             TextureInternalFormat myFormat = TextureInternalFormat(
                 getEnumFromString(myFormatString, TextureInternalFormatStrings));
             myEncodingInfo.internalformat = asGLTextureInternalFormat(myFormat);
         }
+
         return myEncodingInfo;
     }
 

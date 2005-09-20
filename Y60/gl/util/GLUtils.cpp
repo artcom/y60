@@ -234,6 +234,53 @@ namespace y60 {
         return GLenum(0);
     };
 
+    TextureInternalFormat fromGLTextureInternalFormat(GLenum theFormat) {
+        switch(theFormat) {
+            case GL_DEPTH: return TEXTURE_IFMT_DEPTH;
+            case GL_ALPHA: return TEXTURE_IFMT_ALPHA;
+            case GL_ALPHA4: return TEXTURE_IFMT_ALPHA4;
+            case GL_ALPHA8: return TEXTURE_IFMT_ALPHA8;
+            case GL_ALPHA12: return TEXTURE_IFMT_ALPHA12;
+            case GL_ALPHA16: return TEXTURE_IFMT_ALPHA16;
+            case GL_LUMINANCE: return TEXTURE_IFMT_LUMINANCE;
+            case GL_LUMINANCE4: return TEXTURE_IFMT_LUMINANCE4;
+            case GL_LUMINANCE8: return TEXTURE_IFMT_LUMINANCE8;
+            case GL_LUMINANCE12: return TEXTURE_IFMT_LUMINANCE12;
+            case GL_LUMINANCE16: return TEXTURE_IFMT_LUMINANCE16;
+            case GL_LUMINANCE_ALPHA: return TEXTURE_IFMT_LUMINANCE_ALPHA;
+            case GL_LUMINANCE4_ALPHA4: return TEXTURE_IFMT_LUMINANCE4_ALPHA4;
+            case GL_LUMINANCE6_ALPHA2: return TEXTURE_IFMT_LUMINANCE6_ALPHA2;
+            case GL_LUMINANCE8_ALPHA8: return TEXTURE_IFMT_LUMINANCE8_ALPHA8;
+            case GL_LUMINANCE12_ALPHA4: return TEXTURE_IFMT_LUMINANCE12_ALPHA4;
+            case GL_LUMINANCE12_ALPHA12: return TEXTURE_IFMT_LUMINANCE12_ALPHA12;
+            case GL_LUMINANCE16_ALPHA16: return TEXTURE_IFMT_LUMINANCE16_ALPHA16;
+            case GL_INTENSITY: return TEXTURE_IFMT_INTENSITY;
+            case GL_INTENSITY4: return TEXTURE_IFMT_INTENSITY4;
+            case GL_INTENSITY8: return TEXTURE_IFMT_INTENSITY8;
+            case GL_INTENSITY12: return TEXTURE_IFMT_INTENSITY12;
+            case GL_INTENSITY16: return TEXTURE_IFMT_INTENSITY16;
+            case GL_RGB: return TEXTURE_IFMT_RGB;
+            case GL_R3_G3_B2: return TEXTURE_IFMT_R3_G3_B2;
+            case GL_RGB4: return TEXTURE_IFMT_RGB4;
+            case GL_RGB5: return TEXTURE_IFMT_RGB5;
+            case GL_RGB8: return TEXTURE_IFMT_RGB8;
+            case GL_RGB10: return TEXTURE_IFMT_RGB10;
+            case GL_RGB12: return TEXTURE_IFMT_RGB12;
+            case GL_RGB16: return TEXTURE_IFMT_RGB16;
+            case GL_RGBA: return TEXTURE_IFMT_RGBA;
+            case GL_RGBA2: return TEXTURE_IFMT_RGBA2;
+            case GL_RGBA4: return TEXTURE_IFMT_RGBA4;
+            case GL_RGB5_A1: return TEXTURE_IFMT_RGB5_A1;
+            case GL_RGBA8: return TEXTURE_IFMT_RGBA8;
+            case GL_RGB10_A2: return TEXTURE_IFMT_RGB10_A2;
+            case GL_RGBA12: return TEXTURE_IFMT_RGBA12;
+            case GL_RGBA16: return TEXTURE_IFMT_RGBA16;
+            default:
+               throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
+        }
+        return TextureInternalFormat(0);
+    };
+
     DEFINE_EXCEPTION(GLBlendFunctionOutOfRangeException, asl::Exception);
     
     GLenum

@@ -83,6 +83,8 @@ namespace y60 {
                 _myTextureHeight = get<ImageHeightTag>();
                 _myTextureDepth = get<ImageDepthTag>();
                 _myTexturePixelFormat = get<ImagePixelFormatTag>();
+                _myAppliedPixelFormat = get<ImagePixelFormatTag>(); 
+                _myAppliedInternalFormat = get<ImageInternalFormatTag>();
             }
 
             void setGraphicsId(unsigned theId) {
@@ -136,17 +138,24 @@ namespace y60 {
             void deleteData();
 
             /**
-             * Checks if a reload into the hardware is required.
+             * Checks if a reload from the source is required.
              * @retval true if a reload to the ResourceManager is required.
-             * @retval false if a reload is not required since the image still is
-             *               on the resource and has not changed since it was put
-             *               there
              */
             virtual bool reloadRequired() const;
+
             /**
-             * Checks if the image can be reused since it is already on the resource
-             * @retval true if the image can be safely reused.
-             * @retval false if the image cannot be reused.
+             * Check if a texture upload is required since relevant
+             * Image node values have changed.
+             * @return true if an upload is required, else false.
+             */
+            virtual bool textureUploadRequired() const;
+
+            /**
+             * Checks if the applied texture and current Image node
+             * parameters are compatible so that the texture can be
+             * reused.
+             * @retval true if the texture can be safely reused.
+             * @retval false if the texture cannot be reused.
              */
             bool canReuseTexture() const;
             bool isImageNewerThanTexture() const {
@@ -213,6 +222,7 @@ namespace y60 {
             asl::Vector4f                _myAppliedColorBias;
             std::string                  _myAppliedPixelFormat;
             std::string                  _myAppliedInternalFormat;
+            bool                         _myAppliedMipmap;
 
         private:
             Image();
@@ -225,7 +235,7 @@ namespace y60 {
             unsigned long long            _myTextureImageVersion;
 
             // used to detect texture size changes
-            std::string                   _myTexturePixelFormat;
+            std::string                   _myTexturePixelFormat; // XXX how's this different from _myAppliedPixelFormat?!?!
             unsigned                      _myTextureWidth;
             unsigned                      _myTextureHeight;
             unsigned                      _myTextureDepth;
