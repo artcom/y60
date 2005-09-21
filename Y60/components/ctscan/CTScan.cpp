@@ -535,9 +535,10 @@ CTScan::reconstructToImage(Orientation theOrientation, int theSliceIndex,
 
                 int myLineStride = getBytesRequired(myPoTWidth, _myEncoding);
                 int myLineWidth = getBytesRequired(myWidth, _myEncoding);
-                for (int y=0; y < myHeight; ++y) {
-                    const unsigned char * mySource = _mySlices[y]->pixels().begin();
-                    memcpy(myTarget->begin()+myLineStride*y,
+                for (int ySrc=0; ySrc < myHeight; ++ySrc) {
+                    int yTarget = myHeight-ySrc-1;
+                    const unsigned char * mySource = _mySlices[ySrc]->pixels().begin();
+                    memcpy(myTarget->begin()+myLineStride*yTarget,
                            mySource+myLineWidth*theSliceIndex,
                            myLineWidth);
                 }
@@ -558,8 +559,9 @@ CTScan::reconstructToImage(Orientation theOrientation, int theSliceIndex,
                 int mySliceCount = getSliceCount();
                 for (int x=0; x < myWidth; ++x) {
                     const unsigned char * mySource = _mySlices[mySliceCount-x-1]->pixels().begin();
+                    int xTarget = myWidth-x-1;
                     for (int y=0; y < myHeight; ++y) {
-                        memcpy(myTarget->begin()+myTargetLineStride*y+myBpp*x, 
+                        memcpy(myTarget->begin()+myTargetLineStride*y+myBpp*xTarget, 
                                 mySource+mySourceLineStride*y+mySourceLineOffset, myBpp);
                     }
                 }
@@ -819,6 +821,289 @@ CTScan::createGrayImage(dom::NodePtr theParent, int theWidth, int theHeight, int
     myRaster->assign(theWidth, theHeight, myBlock);
     AC_DEBUG << "created raster of " << myRaster->width() << "x" << myRaster->height();
     return myRasterNode;
+}
+
+dom::NodePtr
+CTScan::createRGBAImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue) {
+    asl::Block myBlock(theWidth * theHeight * 4, theValue);
+    dom::NodePtr myImage(new dom::Element("image"));
+    theParent->appendChild(myImage);
+    myImage->getFacade<Image>()->set<ImageMipmapTag>(false);
+    myImage->getFacade<Image>()->set(theWidth, theHeight, 1, y60::RGBA, myBlock);
+    return myImage;
+}
+
+void 
+CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirtyBox) {
+    const Box3f & myOldBox = theVoxelVolume->getAttributeValue<Box3f>("boundingbox");
+
+    Box3f myNewBox = myOldBox;
+    myNewBox.extendBy( theDirtyBox );
+
+    if (myNewBox == myOldBox) {
+        AC_INFO << "Raster box didn't change.";
+        return;
+    }
+
+    const Vector3f & mySize = myNewBox.getSize();
+
+    int myTargetWidth  = int( mySize[0] );
+    int myTargetHeight = int( mySize[1] );
+    AC_INFO << "target width = " << myTargetWidth << " target height = " << myTargetHeight;
+    int myNewRasterCount  = int( mySize[2] );
+
+    int myNewBoxBegin = int( myNewBox[Box3f::MIN][2] );
+    int myNewBoxEnd   = int( myNewBox[Box3f::MAX][2] );
+
+    int myOldBoxBegin = int( myOldBox[Box3f::MIN][2] );
+    int myOldBoxEnd   = int( myOldBox[Box3f::MAX][2] );
+
+    dom::NodePtr myRasters = theVoxelVolume->childNode("rasters");
+    dom::NodePtr myOldRaster;
+    dom::NodePtr myNewRaster;
+
+    unsigned myXOrigin = unsigned( myOldBox[Box3f::MIN][0] - myNewBox[Box3f::MIN][0]);
+    unsigned myYOrigin = unsigned( myOldBox[Box3f::MIN][1] - myNewBox[Box3f::MIN][1]);
+    AC_INFO << "blitting to " << myXOrigin << "x" << myYOrigin;
+
+    for(int i = myNewBoxBegin;i < myNewBoxEnd; ++i) {
+        if (i >= myOldBoxBegin && i < myOldBoxEnd) {
+            myOldRaster = myRasters->childNode(0);
+            AC_INFO << "Replacing " << i;
+        } else {
+            AC_INFO << "Creating new " << i;
+        }
+        myNewRaster = CTScan::createGrayImage(myRasters, myTargetWidth, myTargetHeight, 0);
+        if (i >= myOldBoxBegin && i < myOldBoxEnd) {
+            ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
+                    myNewRaster->childNode(0)->nodeValueWrapperPtr());
+            ValuePtr mySourceRaster = myOldRaster->childNode(0)->nodeValueWrapperPtr();
+            myTargetRaster->pasteRaster(myXOrigin, myYOrigin, * mySourceRaster); 
+            myRasters->removeChild(myOldRaster);
+        }
+    }
+
+    theVoxelVolume->getAttribute("boundingbox")->nodeValueAssign(myNewBox);
+}
+
+
+// comparator for Vector3i
+struct Vector3iCmp {
+    bool operator() (const Vector3i & a, const Vector3i & b) const {
+            return a[0] < b[0] || a[1] < b[1] || a[2] < b[2];
+    }
+};
+
+typedef std::map<Vector3i, unsigned char, Vector3iCmp> ColorMap;
+
+
+void 
+CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCanvasImage,
+                                const asl::Box3f & theDirtyBox, Orientation theOrientation,
+                                dom::NodePtr thePaletteNode)
+{
+    ColorMap myColorMap;
+    Vector3i myColor;
+    unsigned char myIndex;
+    for (unsigned i = 0; i < thePaletteNode->childNodesLength(); ++i) {
+        dom::NodePtr myItem = thePaletteNode->childNode(i);
+        myColor = myItem->getAttributeValue<Vector3i>("color");
+        myIndex = (unsigned char)(myItem->getAttributeValue<int>("index"));
+        myColorMap[myColor] = myIndex;
+    }
+
+    ResizeableRasterPtr myCanvas = dynamic_cast_Ptr<ResizeableRaster>(
+            theCanvasImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
+
+    Box3f myMeasurementBox = theMeasurement->getAttributeValue<Box3f>("boundingbox");
+
+    switch (theOrientation) {
+        case CTScan::IDENTITY:
+            {
+                Vector4f myFloatPixel;
+                Vector3i myPixel;
+                unsigned myAffectedSlice = unsigned( theDirtyBox[Box3f::MIN][2] - myMeasurementBox[Box3f::MIN][2]);
+                unsigned myXStart = unsigned(theDirtyBox[Box3f::MIN][0]);
+                unsigned myXEnd   = unsigned(theDirtyBox[Box3f::MAX][0]);
+                unsigned myYStart = unsigned(theDirtyBox[Box3f::MIN][1]);
+                unsigned myYEnd   = unsigned(theDirtyBox[Box3f::MAX][1]);
+                AC_DEBUG << "affected slice = " << myAffectedSlice;
+                dom::NodePtr myRasterNode = theMeasurement->childNode("rasters")->childNode(myAffectedSlice);
+                if ( ! myRasterNode) {
+                    throw asl::Exception("Failed to get affected raster.");
+                }
+                ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
+                        myRasterNode->childNode(0)->nodeValueWrapperPtr());
+
+                for (unsigned y = myYStart; y < myYEnd; ++y) {
+                    for (unsigned x = myXStart; x < myXEnd; ++x) {
+                        myFloatPixel = myCanvas->getPixel(x, y);
+                        myPixel = Vector3i(int( myFloatPixel[0]), int( myFloatPixel[1]), int( myFloatPixel[2]));
+                        // XXX: argh! map.find() in inner loop... any ideas? [DS]
+                        ColorMap::iterator myIt = myColorMap.find(myPixel);
+                        if (myIt == myColorMap.end()) {
+                            throw asl::Exception(string("Unknown color in canvas image: ") + as_string(myPixel),
+                                                 PLUS_FILE_LINE);
+                        }
+                        float myValue = float( myIt->second);
+                        myTargetRaster->setPixel( x - int(myMeasurementBox[Box3f::MIN][0]),
+                                y - int(myMeasurementBox[Box3f::MIN][1]),
+                                myValue, myValue, myValue, myValue);
+                    }
+                }
+            }
+            break;
+        case CTScan::Y2Z: // top
+            {
+                Vector4f myFloatPixel;
+                Vector3i myPixel;
+                cerr << "dirty box = " << theDirtyBox << endl;
+                cerr << "measurement box = " << myMeasurementBox << endl;
+                unsigned myAffectedY = unsigned( theDirtyBox[Box3f::MIN][1] - myMeasurementBox[Box3f::MIN][1]);
+                unsigned myXStart = unsigned(theDirtyBox[Box3f::MIN][0]);
+                unsigned myXEnd   = unsigned(theDirtyBox[Box3f::MAX][0]);
+                unsigned myZStart = unsigned(theDirtyBox[Box3f::MIN][2]);
+                unsigned myZEnd   = unsigned(theDirtyBox[Box3f::MAX][2]);
+                unsigned myCanvasHeight = theCanvasImage->getAttributeValue<unsigned>("height");
+                AC_DEBUG << "affected y = " << myAffectedY;
+                for (unsigned z = myZStart; z < myZEnd; ++z) {
+                    unsigned myCurrentSlice = z - unsigned(myMeasurementBox[Box3f::MIN][2]);
+                    cerr << "current slice = " << myCurrentSlice << endl;
+                    dom::NodePtr myRasterNode = theMeasurement->childNode("rasters")->childNode(myCurrentSlice);
+                    if ( ! myRasterNode) {
+                        throw asl::Exception("Failed to get affected raster.");
+                    }
+                    ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
+                            myRasterNode->childNode(0)->nodeValueWrapperPtr());
+
+                    for (unsigned x = myXStart; x < myXEnd; ++x) {
+                        unsigned mySourceY = myCanvasHeight + unsigned(myMeasurementBox[Box3f::MIN][2]) - z - 1;
+                        cerr << "getPixel(" << x << ", " << mySourceY << ")" << endl;
+                        myFloatPixel = myCanvas->getPixel(x, mySourceY);
+                        myPixel = Vector3i(int( myFloatPixel[0]), int( myFloatPixel[1]), int( myFloatPixel[2]));
+                        // XXX: argh! map.find() in inner loop... any ideas? [DS]
+                        ColorMap::iterator myIt = myColorMap.find(myPixel);
+                        if (myIt == myColorMap.end()) {
+                            throw asl::Exception(string("Unknown color in canvas image: ") + as_string(myPixel),
+                                                 PLUS_FILE_LINE);
+                        }
+                        float myValue = float( myIt->second);
+                        cerr << "myValue = " << myValue << endl;
+                        cerr << "setPixel(" << x - myMeasurementBox[Box3f::MIN][0] << ", " 
+                             << myAffectedY << ") on slice " << myCurrentSlice << endl;
+                        myTargetRaster->setPixel( x - int(myMeasurementBox[Box3f::MIN][0]), myAffectedY,
+                                myValue, myValue, myValue, myValue);
+                    }
+                }
+            }
+            break;
+        case CTScan::X2Z:
+            AC_WARNING << "copyCanvasToVoxelVolume() X2Z not implemented.";
+            break;
+        default:
+            break;
+
+    }
+}
+
+void 
+CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, unsigned theSliceIndex,
+        Orientation theOrientation, dom::NodePtr thePaletteNode)
+{
+
+    std::vector<Vector3i> myPalette(255, Vector3i( -1, -1, -1));
+    unsigned myIndex;
+    Vector3i myColor;
+    for (unsigned i = 0; i < thePaletteNode->childNodesLength(); ++i) {
+        myIndex = thePaletteNode->childNode(i)->getAttributeValue<unsigned>("index");
+        myColor = thePaletteNode->childNode(i)->getAttributeValue<Vector3i>("color");
+        myPalette[myIndex] = myColor;
+    }
+
+    Box3f myBoundingBox = theMeasurement->getAttributeValue<Box3f>("boundingbox");
+
+    ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>( 
+            theCanvas->childNode(0)->childNode(0)->nodeValueWrapperPtr());
+    unsigned myCanvasWidth = theCanvas->getAttributeValue<unsigned>("width");
+    unsigned myCanvasHeight = theCanvas->getAttributeValue<unsigned>("height");
+
+    switch ( theOrientation) {
+        case CTScan::IDENTITY: // front
+            //cerr << "index = " << theSliceIndex << " bbox = " << myBoundingBox[Box3f::MIN][2] << endl;
+            if (theSliceIndex >= myBoundingBox[Box3f::MIN][2] && theSliceIndex < myBoundingBox[Box3f::MAX][2]) {
+                dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(int( theSliceIndex - myBoundingBox[Box3f::MIN][2]));
+                ResizeableRasterPtr mySourceRaster =
+                    dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
+                unsigned myXStart = unsigned(myBoundingBox[Box3f::MIN][0]);
+                unsigned myXEnd = unsigned(myBoundingBox[Box3f::MAX][0]);
+                unsigned myYStart = unsigned(myBoundingBox[Box3f::MIN][1]);
+                unsigned myYEnd = unsigned(myBoundingBox[Box3f::MAX][1]);
+                Vector4f myFloatPixel;
+                for (unsigned y = myYStart; y < myYEnd; ++y) {
+                    for (unsigned x = myXStart; x < myXEnd; ++x) {
+                        myFloatPixel = mySourceRaster->getPixel(x - myXStart, y - myYStart);
+                        myIndex = (unsigned char)(myFloatPixel[0]);
+                        myColor = myPalette[myIndex];
+                        myTargetRaster->setPixel(x, y, float(myColor[0]), float(myColor[1]), float(myColor[2]),
+                                (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
+                    }
+                }
+                //cerr << "done" << endl;
+            }
+            break;
+        case CTScan::Y2Z: // top
+            if (theSliceIndex >= myBoundingBox[Box3f::MIN][1] && theSliceIndex < myBoundingBox[Box3f::MAX][1]) {
+                unsigned mySourceY = unsigned( theSliceIndex - myBoundingBox[Box3f::MIN][1]);
+                unsigned myZStart = unsigned( myBoundingBox[Box3f::MIN][2]);
+                unsigned myZEnd = unsigned( myBoundingBox[Box3f::MAX][2]);
+                unsigned myXStart = unsigned(myBoundingBox[Box3f::MIN][0]);
+                unsigned myXEnd = unsigned(myBoundingBox[Box3f::MAX][0]);
+                Vector4f myFloatPixel;
+                for (unsigned z = myZStart; z < myZEnd; ++z) {
+                    unsigned myCurrentSliceIndex = z - myZStart;
+                    dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(myCurrentSliceIndex);
+                    ResizeableRasterPtr mySourceRaster =
+                        dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
+                    for (unsigned x = myXStart; x < myXEnd; ++x) {
+                        //cerr << "getPixel(" << x - myXStart << ", " << mySourceY << ")" << endl;
+                        myFloatPixel = mySourceRaster->getPixel(x - myXStart, mySourceY);
+                        myIndex = (unsigned char)(myFloatPixel[0]);
+                        myColor = myPalette[myIndex];
+                        //cerr << "setPixel x = " << x << " z = " << myCanvasHeight - z - 1 << " index = " << myIndex << endl;
+                        myTargetRaster->setPixel(x, myCanvasHeight - z - 1, float(myColor[0]), float(myColor[1]), float(myColor[2]),
+                                (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
+                        
+                    }
+                }
+            }
+            break;
+        case CTScan::X2Z: // side
+            if (theSliceIndex >= myBoundingBox[Box3f::MIN][0] && theSliceIndex < myBoundingBox[Box3f::MAX][0]) {
+                unsigned mySourceX = unsigned( theSliceIndex - myBoundingBox[Box3f::MIN][0]);
+                unsigned myZStart = unsigned( myBoundingBox[Box3f::MIN][2]);
+                unsigned myZEnd = unsigned( myBoundingBox[Box3f::MAX][2]);
+                unsigned myYStart = unsigned(myBoundingBox[Box3f::MIN][1]);
+                unsigned myYEnd = unsigned(myBoundingBox[Box3f::MAX][1]);
+                Vector4f myFloatPixel;
+                for (unsigned z = myZStart; z < myZEnd; ++z) {
+                    unsigned myCurrentSliceIndex = z - myZStart;
+                    dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(myCurrentSliceIndex);
+                    ResizeableRasterPtr mySourceRaster =
+                        dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
+                    for (unsigned y = myYStart; y < myYEnd; ++y) {
+                        // cerr << "getPixel(" << mySourceX << ", " << y - myYStart << ")" << endl;
+                        myFloatPixel = mySourceRaster->getPixel(mySourceX, y - myYStart);
+                        myIndex = (unsigned char)(myFloatPixel[0]);
+                        myColor = myPalette[myIndex];
+                        // cerr << "setPixel z = " << z << " y = " << y << endl;
+                        myTargetRaster->setPixel(z, y, float(myColor[0]), float(myColor[1]), float(myColor[2]),
+                                (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
+                        
+                    }
+                }
+            }
+            break;
+    }
 }
 
 }

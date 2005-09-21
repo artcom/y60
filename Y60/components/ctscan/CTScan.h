@@ -123,14 +123,15 @@ class CTScan {
             return reinterpret_cast<const VoxelT *>(_mySlices[theIndex]->pixels().begin());
         }
 
-        /*
-        const SegmentationBitmap &
-        getStencil() const {
-            return _myStencils;
-        }
-        void appendStencil(dom::NodePtr theImage);
-*/
-
+        /* Some functions that are TNT but not ctscan specific */
+        static dom::NodePtr createGrayImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
+        static dom::NodePtr createRGBAImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
+        static void resizeVoxelVolume(dom::NodePtr theVoxelVolumeNode, const asl::Box3f theDirtyBox);
+        static void copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCanvasImage,
+                                            const asl::Box3f & theDirtyBox, Orientation theOrientation,
+                                            dom::NodePtr thePaletteNode);
+        static void copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, unsigned theSliceIndex,
+                                            Orientation theOrientation, dom::NodePtr thePaletteNode);
         // everything below this line is deprecated
         bool verifyCompleteness();
         void clear();
@@ -138,11 +139,6 @@ class CTScan {
 
         void notifyProgress(double theProgress, const std::string & theMessage = "");
 
-
-        /* Some functions that are TNT but not ctscan specific */
-
-        static dom::NodePtr createGrayImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
-        
     private:
         CTScan(const CTScan&); // hide copy constructor
         sigc::signal<void, double, Glib::ustring> _myProgressSignal;

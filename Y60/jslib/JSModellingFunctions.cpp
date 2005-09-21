@@ -39,11 +39,13 @@ CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
     try {
         DOC_BEGIN("");
         DOC_END;
-
         ensureParamCount(argc, 1);
 
         dom::NodePtr  myParentNode(0);
-        convertFrom(cx, argv[0], myParentNode);
+        if (!convertFrom(cx, argv[0], myParentNode)) {
+            JS_ReportError(cx,"CreateTransform: argument 1 is not a node");
+            return JS_FALSE;
+        }
 
         dom::NodePtr myResult = createTransform(myParentNode);
         *rval = as_jsval(cx, myResult);

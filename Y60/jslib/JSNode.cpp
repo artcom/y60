@@ -1241,12 +1241,16 @@ jsval as_jsval(JSContext *cx, dom::NodePtr theNode) {
         JSObject * myReturnObject = JSNode::Construct(cx, theNode);
         return OBJECT_TO_JSVAL(myReturnObject);
     } else {
-        return JSVAL_VOID;
+        return JSVAL_NULL;
     }
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, dom::NodePtr & thePtr) {
-    if (JSVAL_IS_OBJECT(theValue)) {
+    if (JSVAL_IS_NULL(theValue)) {
+        thePtr = dom::NodePtr(0);
+        return true;
+    }
+    if ( JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<dom::Node>::Class()) {
@@ -1259,6 +1263,9 @@ bool convertFrom(JSContext *cx, jsval theValue, dom::NodePtr & thePtr) {
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, dom::Node & theNode) {
+    if (JSVAL_IS_NULL(theValue)) {
+        return false;
+    }
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {

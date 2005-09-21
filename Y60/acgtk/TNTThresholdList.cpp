@@ -16,9 +16,10 @@ TNTThresholdList::TNTThresholdList() :
     set_model(_myListModel);
 
     Gtk::CellRendererText * myCellRenderer = Gtk::manage( new Gtk::CellRendererText());
+    myCellRenderer->property_cell_background_set() = true;
     int myColumnCount = append_column("Color", * myCellRenderer );
     Gtk::TreeViewColumn * myColumn = get_column( myColumnCount - 1);
-    myColumn->add_attribute(myCellRenderer->property_background_gdk(), _myColumns.color);
+    myColumn->add_attribute(myCellRenderer->property_cell_background_gdk(), _myColumns.color);
 
     append_column( "Name",  _myColumns.name );
     append_column( "Lower", _myColumns.lowerThreshold );
