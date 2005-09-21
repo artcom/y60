@@ -15,6 +15,7 @@
 //
 //  Description: environment mapping shader
 //=============================================================================
+
 #define FRESNEL // experimental
 
 #define FRESNEL_POWER  1.0
@@ -22,6 +23,9 @@
 #define FRESNEL_BIAS   0.0
 
 #define LIGHTING
+
+//#define PHONG_SPECULAR // use Phong instead of Blinn specular term
+
 
 struct app2vert {
     float4 Position         : POSITION;
@@ -35,147 +39,211 @@ struct vert2frag {
     float4 homPosition   : POSITION;
     float2 texCoord0     : TEXCOORD0;
     float2 texCoord1     : TEXCOORD1;
-    float4 worldPosition : TEXCOORD2;
-    float3 reflectVector : TEXCOORD3;
-    float3 refractVector : TEXCOORD4;
-    float4 lighting      : TEXCOORD5;
-    float4 specColor     : TEXCOORD6;
-    float4 primColor     : COLOR0;
+    float3 worldPosition : TEXCOORD2;
+    float3 worldNormal   : TEXCOORD3;
+    float3 reflectVector : TEXCOORD4;
+    float3 refractVector : TEXCOORD5;
+    float4 lighting      : TEXCOORD6;
+    float4 primaryColor    : COLOR0;
     float reflectionFactor : COLOR1;
 };
 
-vert2frag mainVertex(
-            app2vert IN,
-            uniform float4x4 GL_MODELVIEW_PROJECTION,
-            uniform float4x4 AC_OBJECTWORLD_IT,
-            uniform float4x4 AC_OBJECTWORLD,
-            uniform float3 AC_CAMERA_POSITION,
-            uniform float3 AC_DIRECTIONAL_LIGHTS[],
-            uniform float4 AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
-            uniform float3 AC_POSITIONAL_LIGHTS[],
-            uniform float4 AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
-            uniform float4 diffuse,
-            uniform float4 specular,
-            uniform float  shininess
-            )
+vert2frag mainVertex(app2vert IN,
+        uniform float4x4 GL_MODELVIEW_PROJECTION,
+        uniform float4x4 AC_OBJECTWORLD_IT,
+        uniform float4x4 AC_OBJECTWORLD,
+        uniform float3 AC_CAMERA_POSITION,
+#if 0
+        uniform float3 AC_DIRECTIONAL_LIGHTS[],
+        uniform float4 AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
+        uniform float3 AC_POSITIONAL_LIGHTS[],
+        uniform float4 AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
+        uniform float4 diffuse,
+#endif
+        uniform float  shininess
+        )
 {
     vert2frag OUT;
 
     OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, IN.Position);
-    float3 myWorldNormal = normalize(mul(AC_OBJECTWORLD_IT, IN.Normal).xyz);
-    float3 myWorldPosition = mul(AC_OBJECTWORLD, IN.Position).xyz;
-    float3 myViewVector = normalize(myWorldPosition-AC_CAMERA_POSITION);
-    OUT.reflectVector = reflect(myViewVector,myWorldNormal);
-    // inside-out transformation
-    OUT.reflectVector.z = -OUT.reflectVector.z;
 
-#ifdef FRESNEL
-    OUT.reflectionFactor = FRESNEL_BIAS + FRESNEL_SCALE *
-            pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER);
-#endif
-    //OUT.primColor = diffuse;
-    OUT.primColor = float4(0,0,0,0);
-    
+    float3 myWorldPosition = mul(AC_OBJECTWORLD, IN.Position).xyz;
+    float3 myWorldNormal = normalize(mul(AC_OBJECTWORLD_IT, IN.Normal).xyz);
+    float3 myViewVector = normalize(myWorldPosition - AC_CAMERA_POSITION);
+
+    OUT.worldPosition = myWorldPosition.xyz;
+    OUT.worldNormal = myWorldNormal;
+    OUT.reflectVector = reflect(myViewVector, myWorldNormal);
+    OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
+
 #ifdef PAINT
     OUT.texCoord0 = IN.texCoord;
 #if PAINT==2
     OUT.texCoord1 = IN.texCoord1;
+#ifdef FRESNEL
+    OUT.reflectionFactor = FRESNEL_BIAS + FRESNEL_SCALE *
+        pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER);
+#endif // FRESNEL
 #endif
+#endif // PAINT
+
+#ifdef LIGHTING
+    OUT.primaryColor = float4(1,1,1,1);
+#else
+    OUT.primaryColor = float4(0,0,0,0); // should be vertex color
 #endif
 
-// lighting
-OUT.lighting = float4(0,0,0,0);
-OUT.specColor = float4(0,0,0,0);
-        
-        float3 dirLightVec;
-        float  diffuseLight;
-        
-        float3 halfVec;
-        float specularLight;
-        for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
-            dirLightVec = normalize(AC_DIRECTIONAL_LIGHTS[i]);
-            halfVec = normalize(dirLightVec+myViewVector);
-            
-            diffuseLight = dot(myWorldNormal, dirLightVec);
-            specularLight = dot(myWorldNormal,halfVec);
+#if 0
+    // lighting
+    OUT.lighting = float4(0,0,0,0);
+    float3 dirLightVec;
+    float  diffuseTerm;
 
-            float4 lighting = lit(diffuseLight, specularLight, 12);
-            OUT.lighting += lighting;
-            
-            // lit() returns a vector containing these values:
-            //     result.x = 1.0;  
-            //     result.y = max(diffuse, 0);
-            //     result.z = if (result.y > 0.0) then pow(specular, 32) else 0.0
-            //     result.w = 1.0;
+    float3 halfVec;
+    float specularTerm;
+    for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
+        dirLightVec = normalize(AC_DIRECTIONAL_LIGHTS[i]);
+        halfVec = normalize(dirLightVec+myViewVector);
 
+        diffuseTerm = dot(myWorldNormal, dirLightVec);
+        specularTerm = dot(myWorldNormal,halfVec);
 
-            OUT.primColor += AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[i] * lighting.y;        
-        }
-        OUT.specColor += specular * OUT.lighting.z;
-        
-        for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
-        
-            dirLightVec = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
-            diffuseLight = dot(myWorldNormal, dirLightVec);
+        float4 lighting = lit(diffuseTerm, specularTerm, 12);
+        OUT.lighting += lighting;
 
-            halfVec = normalize(dirLightVec - myViewVector);
-            specularLight = dot(myWorldNormal,halfVec);
+        // lit() returns a vector containing these values:
+        //     result.x = 1.0;  
+        //     result.y = max(diffuse, 0);
+        //     result.z = if (result.y > 0.0) then pow(specular, 32) else 0.0
+        //     result.w = 1.0;
 
-            float4 lighting = lit(diffuseLight, specularLight, 3*shininess);
-            
-            OUT.primColor += AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i] * lighting.y;        
-            OUT.lighting += lighting;
-        }
-        OUT.primColor *= diffuse;
-        OUT.specColor += specular * OUT.lighting.z;
+        OUT.primColor += AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[i] * lighting.y;
+    }
+    for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
+
+        dirLightVec = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
+        diffuseTerm = dot(myWorldNormal, dirLightVec);
+
+        halfVec = normalize(dirLightVec - myViewVector);
+        specularTerm = dot(myWorldNormal,halfVec);
+
+        float4 lighting = lit(diffuseTerm, specularTerm, 3*shininess);
+
+        OUT.primColor += AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i] * lighting.y;        
+        OUT.lighting += lighting;
+    }
+    OUT.primColor *= diffuse;
+#endif
+
     return OUT;
 }
 
 
 float4 mainFragment(vert2frag   IN,
-                    uniform samplerCUBE envTex,
+        uniform samplerCUBE envTex,
 #ifdef PAINT
-                    uniform sampler2D decalTex,
+        uniform sampler2D decalTex,
 #if PAINT==2
-                    uniform sampler2D emmisiveTex,
+        uniform sampler2D emissiveTex,
 #endif
 #endif
-                    uniform float4 ambient
-                    ): COLOR
+        uniform float3 AC_CAMERA_POSITION,
+        uniform float3 AC_DIRECTIONAL_LIGHTS[],
+        uniform float4 AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[],
+        uniform float3 AC_POSITIONAL_LIGHTS[],
+        uniform float4 AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[],
+        uniform float4 ambient,
+        uniform float4 diffuse,
+        uniform float4 specular,
+        uniform float shininess
+        ): COLOR
 {
-    float4 myReflectedColor = texCUBE(envTex, IN.reflectVector);
-
+    float4 myEnvTexel = texCUBE(envTex, IN.reflectVector);
 #ifdef PAINT
-    float4 myOuterTexel = tex2D(decalTex, IN.texCoord0) * IN.primColor;
-  #if PAINT==2
-    float4 myEmmisiveColor = tex2D(emmisiveTex, IN.texCoord1);
-    #ifdef FRESNEL
-        float3 myInnerColor = lerp(myEmmisiveColor.rgb, myReflectedColor.rgb, (1-myEmmisiveColor.a)*IN.reflectionFactor);
-        // float3 myInnerColor = lerp(myEmmisiveColor.rgb, myReflectedColor.rgb, IN.reflectionFactor);
-    #else
-        float3 myInnerColor = lerp(myReflectedColor.rgb, myEmmisiveColor.rgb, myEmmisiveColor.a);
-    #endif
-  #else
-    float3 myInnerColor = myReflectedColor.rgb;
-  #endif
+    float4 myDecalTexel = tex2D(decalTex, IN.texCoord0);
+#if PAINT==2
+    float4 myEmissiveTexel = tex2D(emissiveTex, IN.texCoord1);
+#ifdef FRESNEL
+    myEnvTexel.rgb = lerp(myEmissiveTexel.rgb, myEnvTexel.rgb, (1-myEmissiveTexel.a)*IN.reflectionFactor);
 #else
-    float4 myOuterTexel = IN.primColor;
-    float3 myInnerColor = myReflectedColor.rgb;
+    myEnvTexel.rgb = lerp(myEnvTexel.rgb, myEmissiveTexel.rgb, myEmissiveTexel.a);
+#endif // FRESNEL
 #endif
+#else
+    float4 myDecalTexel = IN.primaryColor;
+#endif // PAINT
 
 #ifdef LIGHTING
-   float3 myOuterColor = myOuterTexel.rgb*IN.lighting.y+myOuterTexel.rgb*ambient;
-   float4 mySpecColor = IN.specColor;
-#else
-   float3 myOuterColor = myOuterTexel.rgb;
-   float4 mySpecColor = float4(0,0,0,0);
-#endif
+    float4 myDiffuseColor = float4(0,0,0,0);
+    float4 mySpecColor = float4(0,0,0,0);
 
-    float myEnvIntensity = (myReflectedColor.r + myReflectedColor.g + myReflectedColor.b) / 3.0;
-    float myBlendFactor = myReflectedColor.a;
-    float3 myBlendedColor = lerp(myOuterColor, myInnerColor, myEnvIntensity);
-    float4 myColor = float4(lerp(myOuterColor, myBlendedColor, myBlendFactor), myOuterTexel.a) + mySpecColor;
-    
+    float3 P = IN.worldPosition;
+    float3 N = normalize(IN.worldNormal);
+    float3 V = normalize(AC_CAMERA_POSITION - P);
+
+    for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
+
+        float3 L = normalize(AC_DIRECTIONAL_LIGHTS[i]);
+ 
+        // diffuse term
+        float diffuseTerm = max(dot(N,L),0);
+        myDiffuseColor += AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;  
+
+        // specular term
+#ifdef LIGHTING_TWOSIDED
+        {
+#else
+        if (diffuseTerm > 0.0) {
+#endif
+#ifdef PHONG_SPECULAR
+            float3 R = 2 * dot(N, L) * N - L;
+            float specularTerm = pow(max(dot(R, V), 0), shininess);
+#else
+            float3 H = normalize(L + V);
+            float specularTerm = pow(max(dot(N, H), 0), shininess);
+#endif
+            mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i];
+        }
+    }
+    for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
+
+        float3 L = normalize(AC_POSITIONAL_LIGHTS[i] - P);
+
+        // diffuse term
+        float diffuseTerm = max(dot(N,L),0);
+        myDiffuseColor += AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;  
+
+        // specular term
+#ifdef LIGHTING_TWOSIDED
+        {
+#else
+        if (diffuseTerm > 0.0) {
+#endif
+#ifdef PHONG_SPECULAR
+            float3 R = 2 * dot(N, L) * N - L;
+            float specularTerm = pow(max(dot(R, V), 0), shininess);
+#else
+            float3 H = normalize(L + V);
+            float specularTerm = pow(max(dot(N, H), 0), shininess);
+#endif
+            mySpecColor += specularTerm * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i];
+        }
+    }
+
+    myDiffuseColor *= diffuse * myDecalTexel;
+    mySpecColor *= specular;
+
+    float4 myBaseColor = ambient + myDiffuseColor;
+#else
+    float4 myBaseColor = myDecalTexel;
+#endif // LIGHTING
+ 
+    //myBaseColor = float4(abs(N), 1); // visualize normals
+
+    // blend with environment intensity
+    float myEnvIntensity = (myEnvTexel.r + myEnvTexel.g + myEnvTexel.b) / 3.0;
+    float4 myBlendedColor = lerp(myBaseColor, myEnvTexel, myEnvIntensity);
+    float4 myColor = float4(lerp(myBaseColor, myBlendedColor, myEnvTexel.a).rgb, myDecalTexel.a) + mySpecColor;
+
     return myColor;
-    //return IN.primColor;
 }

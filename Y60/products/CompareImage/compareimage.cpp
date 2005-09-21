@@ -55,7 +55,6 @@ printHelp() {
 }
 
 int main( int argc, char *argv[])  {
-    cout << getBaseName(argv[0]) << " copyright (c) 2001-2004 ART+COM AG" << endl;
     string myArgDesc = string("image1 image2\nSee '") + string(getBaseName(argv[0])) +
                               " --help' for more information.";
     myArguments.setArgumentDescription(myArgDesc.c_str());

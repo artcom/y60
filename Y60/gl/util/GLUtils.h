@@ -231,6 +231,8 @@ namespace y60 {
     GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
     GLenum asGLTexCoordMode(TexCoordMode theMode);
 
+    TextureInternalFormat fromGLTextureInternalFormat(GLenum theFormat);
+
     enum GL_EXTENSION_ENUM {
         CUBEMAP_SUPPORT            = (1<<0),
         TEXTURECOMPRESSION_SUPPORT = (1<<1),

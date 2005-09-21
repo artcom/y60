@@ -108,8 +108,11 @@ namespace y60 {
 
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = 0;
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
+        _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_SPECULAR_COLOR] = 0;
+
         _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = 0;
         _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
+        _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = 0;
 
         //VS: 100 punkte
         cgSetAutoCompile(_myContext, CG_COMPILE_MANUAL);
@@ -342,8 +345,11 @@ namespace y60 {
             //change unsized array sizes here
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = myPositionalLightCount;
+            _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_SPECULAR_COLOR] = myPositionalLightCount;
+
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = myDirectionalLightCount;
+            _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = myDirectionalLightCount;
             
             createAndCompileProgram();
             cgGLLoadProgram(_myCgProgramID);
@@ -392,15 +398,16 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-
         AC_DEBUG << "setAutoParameters";
         
-        int myPositionalLightCount = 0;
-        int myDirectionalLightCount = 0;
-        std::vector<Vector3f> myPositionalLights(8,Vector3f(0,0,0));
-        std::vector<Vector3f> myDirectionalLights(8,Vector3f(0,0,0));
-        std::vector<Vector4f> myPositionalLightColors(8,Vector4f(0,0,0,1));
-        std::vector<Vector4f> myDirectionalLightColors(8,Vector4f(0,0,0,1));
+        std::vector<Vector3f> myPositionalLights;
+        std::vector<Vector4f> myPositionalLightDiffuseColors;
+        std::vector<Vector4f> myPositionalLightSpecularColors;
+
+        std::vector<Vector3f> myDirectionalLights;
+        std::vector<Vector4f> myDirectionalLightDiffuseColors;
+        std::vector<Vector4f> myDirectionalLightSpecularColors;
+
         Vector4f myAmbientLightColor(0,0,0,1);
 
         // Collect light information
@@ -412,20 +419,17 @@ namespace y60 {
             LightSourcePtr myLightSource = myLight->getLightSource();
             switch (myLightSource->getType()) {
                 case POSITIONAL :
-                    myPositionalLights[myPositionalLightCount] =
-                        myLight->get<GlobalMatrixTag>().getTranslation();
-                    myPositionalLightColors[myPositionalLightCount] =
-                        myLightSource->get<DiffuseTag>();
-                    ++myPositionalLightCount;
+                    myPositionalLights.push_back(myLight->get<GlobalMatrixTag>().getTranslation());
+                    myPositionalLightDiffuseColors.push_back(myLightSource->get<DiffuseTag>());
+                    myPositionalLightSpecularColors.push_back(myLightSource->get<SpecularTag>());
                     break;
                 case DIRECTIONAL :
                     {
                         const Vector4f & myTranslation = myLight->get<GlobalMatrixTag>().getRow(2);
-                        myDirectionalLights[myDirectionalLightCount] = Vector3f(myTranslation[0],
-                                            myTranslation[1],myTranslation[2]);
-                        myDirectionalLightColors[myDirectionalLightCount] =
-                                            myLightSource->get<DiffuseTag>();
-                        ++myDirectionalLightCount;
+                        myDirectionalLights.push_back(Vector3f(myTranslation[0],
+                                            myTranslation[1],myTranslation[2]));
+                        myDirectionalLightDiffuseColors.push_back(myLightSource->get<DiffuseTag>());
+                        myDirectionalLightSpecularColors.push_back(myLightSource->get<SpecularTag>());
                         break;
                     }
                case AMBIENT :
@@ -441,7 +445,7 @@ namespace y60 {
         for (CgProgramAutoParams::iterator myIter = _myAutoParams.begin(); 
                 myIter != _myAutoParams.end(); ++myIter) 
         {
-            bool myParamValueFoundFlag = false;
+            bool myParamValueFoundFlag = true;
 
             CgProgramAutoParam curParam = myIter->second;
             AC_DEBUG << "setting parameter " << curParam._myName;
@@ -449,42 +453,38 @@ namespace y60 {
             switch (curParam._myID) {
                 case CAMERA_POSITION :
                     setCgVectorParameter(curParam, theCamera.get<GlobalMatrixTag>().getTranslation());
-                    myParamValueFoundFlag = true;
                     break;
                 case POSITIONAL_LIGHTS :
-            AC_DEBUG << "setting POSITIONAL_LIGHTS to " << myPositionalLights;
+                    AC_DEBUG << "setting POSITIONAL_LIGHTS to " << myPositionalLights;
                     setCgUnsizedArrayParameter(curParam, myPositionalLights);
-                    myParamValueFoundFlag = true;
                     break;
                 case POSITIONAL_LIGHTS_DIFFUSE_COLOR :
-                    setCgUnsizedArrayParameter(curParam, myPositionalLightColors);
-                    //setCgArrayVector4fParameter(curParam, myPositionalLightColors);
-                    myParamValueFoundFlag = true;
+                    setCgUnsizedArrayParameter(curParam, myPositionalLightDiffuseColors);
+                    break;
+                case POSITIONAL_LIGHTS_SPECULAR_COLOR :
+                    setCgUnsizedArrayParameter(curParam, myPositionalLightSpecularColors);
                     break;
                 case DIRECTIONAL_LIGHTS :
-            AC_DEBUG << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;
+                    AC_DEBUG << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;
                     setCgUnsizedArrayParameter(curParam, myDirectionalLights);
-                    myParamValueFoundFlag = true;
                     break;
                 case DIRECTIONAL_LIGHTS_DIFFUSE_COLOR :
-                    setCgUnsizedArrayParameter(curParam, myDirectionalLightColors);
-                    //setCgArrayVector4fParameter(curParam, myDirectionalLightColors);
-                    myParamValueFoundFlag = true;
+                    setCgUnsizedArrayParameter(curParam, myDirectionalLightDiffuseColors);
+                    break;
+                case DIRECTIONAL_LIGHTS_SPECULAR_COLOR :
+                    setCgUnsizedArrayParameter(curParam, myDirectionalLightSpecularColors);
                     break;
                 case AMBIENT_LIGHT_COLOR :
                     setCgVectorParameter(curParam, myAmbientLightColor);
-                    myParamValueFoundFlag = true;
                     break;
                 case CAMERA_I:
                     setCgMatrixParameter(curParam, theCamera.get<InverseGlobalMatrixTag>());
-                    myParamValueFoundFlag = true;
                     break;
                 case CAMERA_T:
                     {
                         Matrix4f myTransposedMatrix = theCamera.get<GlobalMatrixTag>();
                         myTransposedMatrix.transpose();
                         setCgMatrixParameter(curParam, myTransposedMatrix);
-                        myParamValueFoundFlag = true;
                         break;
                     }
                 case VIEWPROJECTION:
@@ -492,23 +492,19 @@ namespace y60 {
                         Matrix4f myMatrix = theCamera.get<InverseGlobalMatrixTag>();
                         myMatrix.postMultiply(theViewport.get<ProjectionMatrixTag>());
                         setCgMatrixParameter(curParam, myMatrix);
-                        myParamValueFoundFlag = true;
                         break;
                     }
                 case OBJECTWORLD:
                     setCgMatrixParameter(curParam, theBody.get<GlobalMatrixTag>());
-                    myParamValueFoundFlag = true;
                     break;
                 case OBJECTWORLD_I:
                     setCgMatrixParameter(curParam, theBody.get<InverseGlobalMatrixTag>());
-                    myParamValueFoundFlag = true;
                     break;
                 case OBJECTWORLD_T:
                     {
                         Matrix4f myTransposedMatrix = theBody.get<GlobalMatrixTag>();
                         myTransposedMatrix.transpose();
                         setCgMatrixParameter(curParam, myTransposedMatrix);
-                        myParamValueFoundFlag = true;
                         break;
                     }
                 case OBJECTWORLD_IT:
@@ -516,15 +512,16 @@ namespace y60 {
                         Matrix4f myTransposedMatrix = theBody.get<InverseGlobalMatrixTag>();
                         myTransposedMatrix.transpose();
                         setCgMatrixParameter(curParam, myTransposedMatrix);
-                        myParamValueFoundFlag = true;
                         break;
                     }
+                default:
+                    myParamValueFoundFlag = false;
+                    break;
             }
             if (!myParamValueFoundFlag) {
                 AC_WARNING << "no value for cg auto parameter " << curParam._myName << endl;
             }
         }
-
     }
 
     void
