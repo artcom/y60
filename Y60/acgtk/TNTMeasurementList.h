@@ -42,6 +42,7 @@ class TNTMeasurementList : public Gtk::TreeView {
 
         sigc::signal<void, Glib::ustring> signal_visible_toggled() const { return _myVisibilityToggledSignal; }
         sigc::signal<void, Glib::ustring> signal_editable_toggled() const { return _myLockedToggledSignal; }
+        sigc::signal<void> signal_right_click() const { return _myRightClickSignal; }
 
         enum ColumnNumbers {
             COL_IS_VISIBLE,
@@ -71,10 +72,10 @@ class TNTMeasurementList : public Gtk::TreeView {
                 Gtk::TreeModelColumn<Glib::ustring>               xml_id;
         };
         typedef std::map<std::string, Glib::RefPtr<Gdk::Pixbuf> > IconMap;
-
         void onVisibilityToggled(const Glib::ustring & thePathString);
         void onEditableToggled(const Glib::ustring & thePathString);
         void createDummyRows();
+        virtual bool on_button_press_event(GdkEventButton *ev); // override
 
         Glib::RefPtr<Gtk::ListStore> _myListModel;
         TNTMeasurementModelColumns   _myColumns;
@@ -85,6 +86,7 @@ class TNTMeasurementList : public Gtk::TreeView {
 
         sigc::signal<void, Glib::ustring> _myVisibilityToggledSignal;
         sigc::signal<void, Glib::ustring> _myLockedToggledSignal;
+        sigc::signal<void> _myRightClickSignal;
 };
 
 } // end of namespace

@@ -150,4 +150,16 @@ TNTMeasurementList::onEditableToggled(const Glib::ustring & thePathString) {
     _myLockedToggledSignal.emit(myRow[_myColumns.xml_id]);
 }
 
+bool 
+TNTMeasurementList::on_button_press_event(GdkEventButton* event) {
+    //Call base class, to allow normal handling,
+    //such as allowing the row to be selected by the right-click:
+    bool return_value = TreeView::on_button_press_event(event);
+
+    //Then do our custom stuff:
+    if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
+        _myRightClickSignal.emit(); 
+    }
+    return return_value;
+}
 } // end of namespace

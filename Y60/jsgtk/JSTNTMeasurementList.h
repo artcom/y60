@@ -46,6 +46,7 @@ class JSTNTMeasurementList : public JSWrapper<acgtk::TNTMeasurementList, asl::Pt
         enum PropertyNumbers {
             PROP_signal_visible_toggled = JSBASE::PROP_END,
             PROP_signal_editable_toggled,
+            PROP_signal_right_click,
             PROP_END
         };
 
