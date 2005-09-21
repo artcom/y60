@@ -175,7 +175,6 @@ appendFrame(const string & theSourceFile, asl::WriteableStream & theTargetBlock,
 }
 
 int main( int argc, char *argv[])  {
-    cout << getBaseName(argv[0]) << " copyright (c) 2001-2004 ART+COM AG" << endl;
     string myArgDesc = string("[image ... ]\nSee '") + string(getBaseName(argv[0])) +
                               " --help' for more information.";
     myArguments.setArgumentDescription(myArgDesc.c_str());

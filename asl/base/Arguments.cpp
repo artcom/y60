@@ -32,11 +32,10 @@ using namespace std;
 #define DB(x) // x
 
 namespace asl {
-    Arguments::Arguments(){
-}
-
-Arguments::Arguments(const AllowedOption * allowedOptions)  {
-    addAllowedOptions(allowedOptions);
+Arguments::Arguments(const AllowedOption * allowedOptions) {
+    if (allowedOptions) {
+        addAllowedOptions(allowedOptions);
+    }
 }
 
 void
@@ -154,6 +153,7 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
                 string::size_type myRealNameStart = _programName.rfind(theDirectorySeparator);
                 _programName = _programName.substr(++myRealNameStart);
                 printCopyright();
+                printVersion();
             }
         }
 
@@ -173,8 +173,7 @@ Arguments::printRevision() const {
 
 void
 Arguments::printVersion() const {
-    AC_PRINT << "build on " << __DATE__ << " at " << __TIME__
-             << " (Rev: " << asl::ourRevision << ")";
+    AC_PRINT << "Build on " << __DATE__ << " at " << __TIME__ << " (Rev: " << asl::ourRevision << ")";
 }
 
 void

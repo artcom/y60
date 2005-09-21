@@ -34,10 +34,9 @@ public:
         OPTION_START_CHAR = '-',
         IgnoreErrors = 0,
         BailOnUnknownOptions = 1,
-        };
+    };
 
-    Arguments();
-    Arguments(const AllowedOption * allowedOptions);
+    Arguments(const AllowedOption * allowedOptions = 0);
 
     void addAllowedOptions(const AllowedOption * allowedOptions);
     const std::string & getOptionArgument(const std::string & option) const;
