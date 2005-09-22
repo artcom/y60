@@ -312,6 +312,7 @@ class TestLoop: public SoundTestBase {
             mySound->play();
             msleep(3000);
             double myTime = mySound->getCurrentTime();
+            AC_PRINT << "myTime: " << myTime;
             ENSURE(myTime > 2.5 && myTime < 4.5);
             mySound->pause();
             msleep(500);
@@ -495,7 +496,7 @@ class SoundTestSuite : public UnitTestSuite {
             mySoundManager.setSysConfig(0.02, "");
 #endif
             mySoundManager.setAppConfig(44100, 2, _myUseDummyPump);
-            
+
             addTest(new TestPlay(mySoundManager));
             addTest(new TestBroken(mySoundManager));
             addTest(new TestFireAndForget(mySoundManager));
@@ -503,7 +504,7 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new TestStop(mySoundManager));
             addTest(new TestStopByItself(mySoundManager));
             addTest(new TestPause(mySoundManager));
-            addTest(new TestStopAll(mySoundManager));           
+            addTest(new TestStopAll(mySoundManager));
             addTest(new TestLoop(mySoundManager));
             addTest(new TestVolume(mySoundManager));
             addTest(new TestSeek(mySoundManager));

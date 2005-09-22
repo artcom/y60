@@ -141,7 +141,6 @@ void SoundManager::stopAll() {
         // while we're iterating through it.
         for (int i = _mySounds.size()-1; i >= 0; --i) {
             AutoLocker<ThreadLock> myLocker(_myLock);
-            cerr << "0";
             if (i >= _mySounds.size()) {
                 // This can happen if sounds have been deleted in the meantime.
                 i = _mySounds.size()-1;

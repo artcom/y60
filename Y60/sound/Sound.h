@@ -72,10 +72,9 @@ class Sound :
 
         SoundWeakPtr _mySelf;
         SoundPtr _myLockedSelf;
-        bool _myDecodingComplete;
 
+        bool _myDecodingComplete;
         bool _myIsLooping;
-        std::list<asl::AudioBufferPtr> _myBufferCache; // For looping sounds.
 
         asl::Time _myTargetBufferedTime;
         asl::Time _myMaxUpdateTime; // Max. time to prefetch per update.
