@@ -77,15 +77,7 @@ namespace y60 {
 
             virtual ~Image();
 
-            void storeTextureVersion() {
-                _myTextureImageVersion = getValueVersion();
-                _myTextureWidth = get<ImageWidthTag>();
-                _myTextureHeight = get<ImageHeightTag>();
-                _myTextureDepth = get<ImageDepthTag>();
-                _myTexturePixelFormat = get<ImagePixelFormatTag>();
-                _myAppliedPixelFormat = get<ImagePixelFormatTag>(); 
-                _myAppliedInternalFormat = get<ImageInternalFormatTag>();
-            }
+            void storeTextureVersion();
 
             void setGraphicsId(unsigned theId) {
                 _myTexId = theId;

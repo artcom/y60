@@ -275,6 +275,19 @@ namespace y60 {
 		myPNGEncoder.MakeFileFromBmp(theImagePath.c_str(), &myBmp);
 	}
 
+    void Image::storeTextureVersion()
+    {
+        _myTextureImageVersion = getValueVersion();
+        _myTextureWidth = get<ImageWidthTag>();
+        _myTextureHeight = get<ImageHeightTag>();
+        _myTextureDepth = get<ImageDepthTag>();
+        _myTexturePixelFormat = get<ImagePixelFormatTag>();
+        _myAppliedPixelFormat = get<ImagePixelFormatTag>(); // WTF?
+        _myAppliedInternalFormat = get<ImageInternalFormatTag>();
+        _myAppliedColorBias    = get<ImageColorBiasTag>();
+        _myAppliedColorScale   = get<ImageColorScaleTag>();
+    }
+
     /// Reload *from file* required?
     bool
     Image::reloadRequired() const {
