@@ -76,7 +76,6 @@ namespace jslib {
             {"looping",   PROP_looping,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"playing",   PROP_playing,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"src",       PROP_src,      JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
-            {"canseek",   PROP_canseek,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"duration",  PROP_duration, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {"time",      PROP_time,     JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {0}
@@ -99,9 +98,6 @@ namespace jslib {
                 return JS_TRUE;
             case PROP_src: 
                 *vp = as_jsval(cx, getNative().getName());
-                return JS_TRUE;
-            case PROP_canseek: 
-                *vp = as_jsval(cx, getNative().canSeek());
                 return JS_TRUE;
             case PROP_duration: 
                 *vp = as_jsval(cx, getNative().getDuration());
