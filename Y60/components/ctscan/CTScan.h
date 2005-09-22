@@ -110,6 +110,11 @@ class CTScan {
         void
         computeHistogram(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram);
 
+        // add a the grey value of a single voxel to the profile 
+        void computeProfile(const asl::Vector3i & thePoint, std::vector<unsigned> & theProfile);
+        // add the grey values of all voxels in the multiline defined by thePoints to theProfile  
+        void computeProfile(const std::vector<asl::Vector3i> & thePoints, std::vector<unsigned> & theProfile);
+
         /** Get a pointer to the first voxel of a slice */
         template <class VoxelT>
         VoxelT *
@@ -163,6 +168,16 @@ class CTScan {
         template <class VoxelT>
         void
         countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram);
+        
+        // computes the grey-scale profile of all voxels
+        // from [theStart, theEnd[  (without theEnd)
+        // Can be used in a loop to compute multilines,
+        // but don't forget to profile the very last voxel
+        // separatly.
+        void computeLineSegmentProfile(const asl::Vector3i & theStart, 
+                                       const asl::Vector3i & theEnd, 
+                                       std::vector<unsigned> & theProfile);
+        
         
         int appendTo3DTexture(int theSlice, asl::Block & the3dTexture, int theXSize, int theYSize);
         template<class PIXEL> 

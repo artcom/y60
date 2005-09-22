@@ -777,6 +777,59 @@ CTScan::computeHistogram(const Box3i & theVOI, std::vector<unsigned> & theHistog
     
 };
 
+void
+CTScan::computeProfile(const std::vector<asl::Vector3i> & thePoints, std::vector<unsigned> & theProfile) {
+    if (thePoints.empty()) {
+        return;
+    }
+    
+    // for each segment, add the profile from [i, i+1[ (half-open interval)
+    for (int i = 0; i+1 < thePoints.size(); ++i) {
+        computeLineSegmentProfile(thePoints[i], thePoints[i+1], theProfile);
+    }
+    // now add the last point
+    computeProfile(thePoints[thePoints.size()-1], theProfile);
+}
+
+void
+CTScan::computeProfile(const asl::Vector3i & thePosition, std::vector<unsigned> & theProfile) {
+    const unsigned char * myData = _mySlices[thePosition[2]]->pixels().begin();
+    myData += thePosition[0]+thePosition[1]*getBytesRequired(_mySlices[thePosition[2]]->width(), _myEncoding);
+    theProfile.push_back(*myData);
+}
+
+// computes the grey-scale profile of all voxels
+// from [theStart, theEnd[  (without theEnd)
+void
+CTScan::computeLineSegmentProfile(const asl::Vector3i & theStart, const asl::Vector3i & theEnd, std::vector<unsigned> & theProfile) {
+    // find the axis with the max delta
+    int maxDelta = 0;
+    int maxDeltaAxis = -1;
+    for (int i = 0; i < 3; ++i) {
+        int curDelta = abs(theStart[i] - theEnd[i]);
+        if (curDelta > maxDelta) {
+            maxDeltaAxis = i;
+            maxDelta = curDelta; 
+        }
+    }
+    if (maxDeltaAxis == -1) {
+        return;
+    }
+    Vector3i totalDelta(theEnd-theStart);
+    Vector3f myStep = Vector3f(float(totalDelta[0]) / maxDelta, 
+                               float(totalDelta[1]) / maxDelta, 
+                               float(totalDelta[2]) / maxDelta);
+
+    for (int i = 0; i < maxDelta; ++i) {
+        Vector3f curDelta(myStep*i);
+
+        asl::Vector3i curPoint(theStart + Vector3i(int(round(curDelta[0])), 
+                                                   int(round(curDelta[1])), 
+                                                   int(round(curDelta[2]))));
+        computeProfile(curPoint, theProfile);
+    }
+}
+
 int 
 CTScan::appendTo3DTexture(int theSlice, asl::Block & the3dTexture, int theXSize, int theYSize) {
     PLPixelFormat myFormat;

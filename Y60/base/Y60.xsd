@@ -2045,7 +2045,7 @@ Possible values are:
                     <xs:documentation>The interpolation filter used for minification.
 
 Possible values are:
-'linear' (default) - bilinear interpolation
+'linear' (default) - bilinear interpolation (trilinear when mipmaps are used)
 'nearest'          - nearest neighbor</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
@@ -2054,7 +2054,7 @@ Possible values are:
                     <xs:documentation>The interpolation filter used for magnification.
 
 Possible values are:
-'linear' (default) - bilinear interpolation
+'linear' (default) - bilinear interpolation  
 'nearest'          - nearest neighbor</xs:documentation>
                 </xs:annotation>
             </xs:attribute>

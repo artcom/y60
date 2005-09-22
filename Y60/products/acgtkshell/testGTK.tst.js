@@ -79,12 +79,6 @@ GCTest.prototype.Constructor = function(obj, theName) {
         gc();
         mySubject = null;
         gc();
-            
-
-        
-
-
-
     };
 };
 

@@ -1,10 +1,40 @@
 #include "Histogram.h"
 
+#include <asl/Logger.h>
+#include <paintlib/pldebug.h>
+#include <paintlib/Filter/pl2passscale.h>
+
 #include <iostream>
 
 using namespace std;
 
 namespace acgtk {
+
+
+class CData_UnsignedInt
+{
+public:
+  typedef unsigned int _DataType[1];
+  typedef _DataType* _RowType;
+  class _Accumulator {
+  public:
+      _Accumulator ()
+      {
+        val = 0;
+      };
+      void Accumulate (long long Weight, _DataType &value)
+      {
+        val += (Weight * (long long)(value[0]));
+          // AC_WARNING << "adding " << Weight << "x" << value[0] << " -> " << val;
+      };
+      void Store (_DataType &value)
+      {
+          // AC_WARNING << "storing val=" << val;
+        value [0] = (unsigned int) ((val + 128)/256);
+      };
+      long long val;
+  };
+};
 
 const static float MIN_WINDOW_WIDTH(10.0);
 
@@ -121,12 +151,25 @@ Histogram::rebuildBins() {
     if (myWidth < _mySampleData.size()) {
         _myBins.clear();
         _myBins.resize(myWidth);
+        
+        PLBilinearContribDef f(0.64);
+        C2PassScale <CData_UnsignedInt> sS(f);
+        // set up some pointers to simulate paintlib's linearray
+        unsigned int * mySrcLinePtr = (&_mySampleData[0]); 
+        unsigned int * myDestLinePtr = (&_myBins[0]); 
+        
+        sS.Scale( (CData_UnsignedInt::_RowType*)(&mySrcLinePtr), _mySampleData.size(), 1,
+                  (CData_UnsignedInt::_RowType*)(&myDestLinePtr), _myBins.size(), 1);
+        // AC_WARNING << "scaling from " << _mySampleData.size() << " to " << _myBins.size();
+        /*
         for (unsigned i = 0; i < _mySampleData.size(); ++i) {
             int myBin = i * myWidth / _mySampleData.size();
             //cerr << i << " belongs in bin: " << myBin << endl;
             _myBins[myBin] += _mySampleData[i];
         }
+        */
     } else {
+        // AC_WARNING << "copying from " << _mySampleData.size() << " to " << _myBins.size();
         _myBins = _mySampleData;
     }
     _myMaxCount = findMaxCount();

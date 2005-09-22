@@ -20,6 +20,7 @@
 #include "JSStockID.h"
 #include "JSSignalProxies.h"
 #include "jsgtk.h"
+#include "JSVBox.h"
 #include <y60/JScppUtils.h>
 #include <iostream>
 
@@ -107,6 +108,7 @@ JSPropertySpec *
 JSDialog::Properties() {
     static JSPropertySpec myProperties[] = {
         {"signal_response", PROP_signal_response, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"vbox", PROP_vbox, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -130,6 +132,11 @@ JSDialog::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
+        case PROP_vbox:
+            {
+                * vp = as_jsval(cx, Ptr<Gtk::VBox>(0), theNative.get_vbox());
+                return JS_TRUE;
+            }
         case PROP_signal_response:
             {
                 JSSignalProxy1<void, int>::OWNERPTR mySignal( new

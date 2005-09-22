@@ -139,6 +139,27 @@ computeHistogram(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+computeProfile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+
+        ensureParamCount(argc, 1);
+
+        std::vector<Vector3i> myVoxelPositions;
+
+        if (!convertFrom(cx, argv[0], myVoxelPositions)) {
+            JS_ReportError(cx, "JSCTScan::computeProfile(): 1 argument must be an array of positions ");
+            return JS_FALSE;
+        }
+        std::vector<unsigned> myProfile;
+        CTScan & myCTScan = myObj.getNative();
+        myCTScan.computeProfile(myVoxelPositions, myProfile);
+        
+        *rval = as_jsval(cx, myProfile);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
 
 static JSBool
 reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -492,6 +513,7 @@ JSCTScan::Functions() {
         {"countTrianglesInVolumeMeasurement", countTrianglesInVolumeMeasurement,    4},
         {"create3DTexture",      create3DTexture,         2},
         {"computeHistogram",     computeHistogram,        1},
+        {"computeProfile",       computeProfile,          1},
         //{"getStencilRaster",     getStencilRaster,        1},
         //{"appendStencil",        appendStencil,           1},        
         {0}
