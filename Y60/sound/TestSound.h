@@ -65,6 +65,8 @@ class TestPlay : public SoundTestBase {
             play("../../testfiles/sz5-1_c-beam Warnung_Time_1.WAV");
             play("../../testfiles/stereotest441.wav");
             play("../../testfiles/stereotest480.wav");
+            msleep(100);
+            ENSURE(getSoundManager().getNumSounds() == 0);
         }
 
     private:
@@ -498,11 +500,14 @@ class SoundTestSuite : public UnitTestSuite {
             mySoundManager.setAppConfig(44100, 2, _myUseDummyPump);
 
             addTest(new TestPlay(mySoundManager));
+            
             addTest(new TestBroken(mySoundManager));
             addTest(new TestFireAndForget(mySoundManager));
             addTest(new TestTwoSounds(mySoundManager));
             addTest(new TestStop(mySoundManager));
+            
             addTest(new TestStopByItself(mySoundManager));
+            
             addTest(new TestPause(mySoundManager));
             addTest(new TestStopAll(mySoundManager));
             addTest(new TestLoop(mySoundManager));

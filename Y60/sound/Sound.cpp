@@ -53,25 +53,23 @@ void Sound::setSelf(const SoundPtr& mySelf)
     _myLockedSelf = SoundPtr(0);
 }
 
-void Sound::play ()
-{
+void Sound::play() {
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_DEBUG << "Sound::play (" << _myURI << ")";
+    _myDecodingComplete = false;
     _myLockedSelf = _mySelf.lock();
     update(0.1);
     _mySampleSink->play();
 }
 
-void Sound::pause ()
-{
+void Sound::pause() {
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_DEBUG << "Sound::pause (" << _myURI << ")";
     _mySampleSink->pause();
     _myLockedSelf = SoundPtr(0);
 }
 
-void Sound::stop ()
-{
+void Sound::stop() {
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_DEBUG << "Sound::stop (" << _myURI << ")";
     _mySampleSink->stop();
@@ -79,13 +77,11 @@ void Sound::stop ()
     _myLockedSelf = SoundPtr(0);
 }
 
-void Sound::setVolume (float theVolume)
-{
+void Sound::setVolume(float theVolume) {
     _mySampleSink->setVolume(theVolume);
 }
 
-void Sound::fadeToVolume (float theVolume, Time theTime)
-{
+void Sound::fadeToVolume (float theVolume, Time theTime) {
     _mySampleSink->fadeToVolume(theVolume, float(theTime));
 }
 
@@ -162,13 +158,13 @@ void Sound::update(double theTimeSlice) {
     double myTimeToBuffer = double(_mySampleSink->getBufferedTime())+
             myBuffersFilledRatio*theTimeSlice+
             (1-myBuffersFilledRatio)*_myMaxUpdateTime;
-    bool myEOF = false;
     if (_myDecodingComplete && !isPlaying()) {
         AC_DEBUG << "Sound::update: Playback complete";
         _myDecodingComplete = false;
         _myLockedSelf = SoundPtr(0);
     }
     if (!_myDecodingComplete) {
+        bool myEOF = false;
         while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
             myEOF = _myDecoder->decode(this);
         }
