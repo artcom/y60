@@ -19,6 +19,7 @@
 #ifndef _PROPERTY_VALUE_INCLUDED
 #define _PROPERTY_VALUE_INCLUDED
 
+#include "JSNode.h"
 #include "JScppUtils.h"
 #include <js/jsapi.h>
 
@@ -27,8 +28,7 @@ namespace y60 {
 class PropertyValue {
 public:
     PropertyValue(JSContext *cx, jsval * theJSVal) :
-        _myCx(cx),
-        _myJsVal(theJSVal)
+        _myCx(cx), _myJsVal(theJSVal)
     {}
 
     template<class T>
@@ -47,6 +47,7 @@ public:
     void set(const T & theValue) {
         *_myJsVal = jslib::as_jsval(_myCx, theValue);
     }
+    
 private:
     PropertyValue() {}
     PropertyValue(const PropertyValue &) {}
