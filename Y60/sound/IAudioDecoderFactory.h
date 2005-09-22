@@ -26,17 +26,12 @@ class IAudioDecoderFactory
 {
     public:
         // Throws a decoder exception if not successful.
-        virtual IAudioDecoder* tryCreateDecoder(std::string myURI) = 0;
-        virtual int getPriority() = 0;
+        virtual IAudioDecoder* tryCreateDecoder(const std::string& myURI) = 0;
+        virtual int getPriority() const = 0; // Decoders with lower priority get checked first.
 
     private:
-        friend bool operator <(const IAudioDecoderFactory& a, const IAudioDecoderFactory& b);
-        int _myPriority;
+        friend bool lessFactory(const IAudioDecoderFactory* a, const IAudioDecoderFactory* b);
 };
-
-inline bool operator < (const IAudioDecoderFactory& a, const IAudioDecoderFactory& b) {
-    return a._myPriority < b._myPriority;
-}
 
 } // namespace
 

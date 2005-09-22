@@ -18,13 +18,14 @@ using namespace asl;
 
 namespace y60 {
 
-FFMpegDecoder::FFMpegDecoder (string myURI)
+FFMpegDecoder::FFMpegDecoder (const string& myURI)
     : _myURI (myURI),
       _mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
       _myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
       _myFormatContext(0),
       _myStreamIndex(-1),
-      _myResampleContext(0)
+      _myResampleContext(0),
+      _mySampleSink(0)
 {
     AC_DEBUG << "FFMpegDecoder::FFMpegDecoder";
     open();
@@ -38,6 +39,10 @@ FFMpegDecoder::~FFMpegDecoder()
 
 std::string FFMpegDecoder::getName() const {
     return _myURI;
+}
+
+void FFMpegDecoder::setSampleSink(asl::ISampleSink* mySampleSink) {
+    _mySampleSink = mySampleSink;
 }
 
 Time FFMpegDecoder::getDuration() const {
@@ -77,8 +82,12 @@ void FFMpegDecoder::open() {
     try {
         int err;
         if ((err = av_open_input_file(&_myFormatContext, _myURI.c_str(), 0, 0, 0)) < 0) {
-            throw FileNotFoundException(std::string("Unable to open input file, err=") + 
+            if (err == -6) {
+                throw DecoderException(std::string("Can't decode ")+_myURI, PLUS_FILE_LINE);
+            } else {
+                throw FileNotFoundException(std::string("Unable to open input file, err=") + 
                     asl::as_string(err) + ": " + _myURI, PLUS_FILE_LINE);
+            }
         }
         if ((err = av_find_stream_info(_myFormatContext)) < 0) {
             throw DecoderException(std::string("Unable to find stream info, err=") + 
@@ -140,7 +149,7 @@ void FFMpegDecoder::close() {
     }
 }
 
-bool FFMpegDecoder::decode(asl::ISampleSink* mySampleSink) {
+bool FFMpegDecoder::decode() {
     ASSURE(_myFormatContext);
     AVPacket myPacket;
 
@@ -167,13 +176,13 @@ bool FFMpegDecoder::decode(asl::ISampleSink* mySampleSink) {
                             (int16_t*)(_myResampledSamples.begin()),
                             (int16_t*)(_mySamples.begin()), 
                             numFrames);
-                    myBuffer = mySampleSink->createBuffer(numFrames);
+                    myBuffer = _mySampleSink->createBuffer(numFrames);
                     myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
                 } else {
-                    myBuffer = mySampleSink->createBuffer(numFrames);
+                    myBuffer = _mySampleSink->createBuffer(numFrames);
                     myBuffer->convert(_mySamples.begin(), SF_S16, _myNumChannels);
                 }
-                mySampleSink->queueSamples(myBuffer);
+                _mySampleSink->queueSamples(myBuffer);
                 myData += myLen;
                 myDataLen -= myLen;
             } else {
@@ -203,13 +212,13 @@ unsigned FFMpegDecoder::getNumChannels() {
 FFMpegDecoderFactory::FFMpegDecoderFactory() {
 }
 
-IAudioDecoder* FFMpegDecoderFactory::tryCreateDecoder(std::string myURI) 
+IAudioDecoder* FFMpegDecoderFactory::tryCreateDecoder(const std::string& myURI) 
 {
-    AC_DEBUG << "tryCreateDecoder (" << myURI << ")";
+    AC_DEBUG << "FFMpegDecoder::tryCreateDecoder (" << myURI << ")";
     return new FFMpegDecoder(myURI);
 }
 
-int FFMpegDecoderFactory::getPriority() {
+int FFMpegDecoderFactory::getPriority() const {
     return 1; 
 }
 

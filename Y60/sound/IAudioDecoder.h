@@ -21,13 +21,16 @@ class IAudioDecoder
     public:
         virtual ~IAudioDecoder() {};
 
-        virtual bool decode(asl::ISampleSink* mySampleSink) = 0;
+        virtual void play() {};
+        virtual void stop() {};
+        virtual void pause() {};
+        virtual void seek(asl::Time thePosition) = 0;
+        virtual bool decode() = 0;
         virtual unsigned getSampleRate() = 0;
         virtual unsigned getNumChannels() = 0;
-        virtual void seek (asl::Time thePosition) {};
-        virtual bool canSeek() const { return false;};
         virtual asl::Time getDuration() const = 0;
         virtual std::string getName() const = 0;
+        virtual void setSampleSink(asl::ISampleSink* mySampleSink) = 0;
 };
 
 } // namespace

@@ -29,6 +29,7 @@ Sound::Sound (string myURI, IAudioDecoder * myDecoder, bool theLoop)
     AC_DEBUG << "Sound::Sound(" << myURI << ", loop: " << theLoop << ")";
     _myLockedSelf = SoundPtr(0);
     _mySampleSink = Pump::get().createSampleSink(myURI);
+    _myDecoder->setSampleSink(this);
 }
 
 /*
@@ -139,10 +140,6 @@ Time Sound::getBufferedTime () const
     return _mySampleSink->getBufferedTime();
 }
 
-bool Sound::canSeek() const {
-    return _myDecoder->canSeek();
-}
-
 bool Sound::isPlaying() const {
     return (_mySampleSink->getState() == HWSampleSink::RUNNING);
 }
@@ -166,7 +163,7 @@ void Sound::update(double theTimeSlice) {
     if (!_myDecodingComplete) {
         bool myEOF = false;
         while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
-            myEOF = _myDecoder->decode(this);
+            myEOF = _myDecoder->decode();
         }
         if (myEOF) {
             if (!_myIsLooping) {

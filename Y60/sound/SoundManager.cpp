@@ -54,11 +54,16 @@ void SoundManager::setAppConfig(unsigned mySampleRate, unsigned numOutputChannel
     Pump::setAppConfig(mySampleRate, numOutputChannels, useDummy);
 }
 
+bool lessFactory(const IAudioDecoderFactory* a, const IAudioDecoderFactory* b) {
+    cerr << "less" << endl;
+    return a->getPriority() < b->getPriority();
+}
+
 void SoundManager::registerDecoderFactory(IAudioDecoderFactory* theFactory) {
     AC_DEBUG << "Registering decoder factory " << theFactory;
     _myDecoderFactories.insert(
-            lower_bound(_myDecoderFactories.begin(), _myDecoderFactories.end(), theFactory),
-            theFactory);
+            lower_bound(_myDecoderFactories.begin(), _myDecoderFactories.end(), theFactory, lessFactory),
+                    theFactory);
     
 }
 
@@ -191,7 +196,8 @@ void SoundManager::run() {
 
 IAudioDecoder * SoundManager::createDecoder(const std::string & theURI) {
     IAudioDecoder * myDecoder = 0;
-    for (int i=_myDecoderFactories.size()-1; i>=0; --i) {
+    AC_DEBUG << "createDecoder: " << _myDecoderFactories.size() << " factories registered.";
+    for (int i=0; i<_myDecoderFactories.size(); ++i) {
         IAudioDecoderFactory* myCurrentFactory = _myDecoderFactories[i];
         try {
             myDecoder = myCurrentFactory->tryCreateDecoder(theURI);

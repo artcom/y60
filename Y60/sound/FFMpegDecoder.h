@@ -27,16 +27,17 @@ namespace y60 {
 class FFMpegDecoder: public IAudioDecoder
 {
     public:
-        FFMpegDecoder (std::string myURI);
+        FFMpegDecoder (const std::string& myURI);
 //        FFMpegDecoder (asl::Ptr < asl::ReadableStream > myStream, asl::HWSampleSinkPtr mySink);
         virtual ~FFMpegDecoder();
 
-        virtual bool decode(asl::ISampleSink* mySampleSink);
+        virtual bool decode();
         virtual unsigned getSampleRate();
         virtual unsigned getNumChannels();
         virtual void seek (asl::Time thePosition);
         virtual asl::Time getDuration() const;
         std::string getName() const;
+        virtual void setSampleSink(asl::ISampleSink* mySampleSink);
 
     private:
         void open();
@@ -51,14 +52,15 @@ class FFMpegDecoder: public IAudioDecoder
         unsigned _mySampleRate;
         unsigned _myNumChannels;
         ReSampleContext * _myResampleContext;
+        asl::ISampleSink* _mySampleSink;
 };
 
 class FFMpegDecoderFactory: public IAudioDecoderFactory
 {
     public:
         FFMpegDecoderFactory();
-        virtual IAudioDecoder* tryCreateDecoder(std::string myURI);
-        virtual int getPriority(); 
+        virtual IAudioDecoder* tryCreateDecoder(const std::string& myURI);
+        virtual int getPriority() const; 
 };
 
 } // namespace

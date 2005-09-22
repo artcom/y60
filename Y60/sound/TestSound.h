@@ -280,7 +280,7 @@ class TestPause: public SoundTestBase {
                 msleep(200);
                 mySound->pause();
                 msleep(100);
-                checkTime(mySound, 0.3);
+                checkTime(mySound, 0.2);
                 mySound->stop();
                 checkTime(mySound, 0);
 
@@ -490,7 +490,7 @@ class SoundTestSuite : public UnitTestSuite {
         void setup() {
             UnitTestSuite::setup();
 
-            y60::SoundManager& mySoundManager = Singleton<SoundManager>::get();
+            SoundManager& mySoundManager = Singleton<SoundManager>::get();
 
 #ifdef WIN32
             mySoundManager.setSysConfig(0.05, "");
