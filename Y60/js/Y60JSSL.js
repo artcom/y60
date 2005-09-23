@@ -597,3 +597,10 @@ function trim(theString) {
     }
     return theString.substring(frontIndex, (backIndex + 1));
 }
+function nextPowerOfTwo(n) {
+    var myPowerOfTwo = 1;
+    while (myPowerOfTwo < n) {
+        myPowerOfTwo <<= 1;
+    }
+    return myPowerOfTwo;
+}
