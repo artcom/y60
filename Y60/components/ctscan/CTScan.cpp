@@ -1061,8 +1061,8 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
             {
                 Vector4f myFloatPixel;
                 Vector3i myPixel;
-                cerr << "dirty box = " << theDirtyBox << endl;
-                cerr << "measurement box = " << myMeasurementBox << endl;
+                //cerr << "dirty box = " << theDirtyBox << endl;
+                //cerr << "measurement box = " << myMeasurementBox << endl;
                 unsigned myAffectedX = unsigned( theDirtyBox[Box3f::MIN][0] - myMeasurementBox[Box3f::MIN][0]);
                 unsigned myYStart = unsigned(theDirtyBox[Box3f::MIN][1]);
                 unsigned myYEnd   = unsigned(theDirtyBox[Box3f::MAX][1]);
@@ -1072,7 +1072,7 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
                 AC_WARNING << "affected x = " << myAffectedX;
                 for (unsigned z = myZStart; z < myZEnd; ++z) {
                     unsigned myCurrentSlice = z - unsigned(myMeasurementBox[Box3f::MIN][2]);
-                    cerr << "current slice = " << myCurrentSlice << endl;
+                    //cerr << "current slice = " << myCurrentSlice << endl;
                     dom::NodePtr myRasterNode = theMeasurement->childNode("rasters")->childNode(myCurrentSlice);
                     if ( ! myRasterNode) {
                         throw asl::Exception("Failed to get affected raster.");
@@ -1081,7 +1081,7 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
                             myRasterNode->childNode(0)->nodeValueWrapperPtr());
 
                     for (unsigned y = myYStart; y < myYEnd; ++y) {
-                        cerr << "getPixel(" << z << ", " << y << ")" << endl;
+                        //cerr << "getPixel(" << z << ", " << y << ")" << endl;
                         myFloatPixel = myCanvas->getPixel(z, y);
                         myPixel = Vector3i(int( myFloatPixel[0]), int( myFloatPixel[1]), int( myFloatPixel[2]));
                         // XXX: argh! map.find() in inner loop... any ideas? [DS]
@@ -1091,9 +1091,9 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
                                                  PLUS_FILE_LINE);
                         }
                         float myValue = float( myIt->second);
-                        cerr << "myValue = " << myValue << endl;
-                        cerr << "setPixel(" << myAffectedX << ", " 
-                             << y - int(myMeasurementBox[Box3f::MIN][1]) << ") on slice " << myCurrentSlice << endl;
+                        //cerr << "myValue = " << myValue << endl;
+                        //cerr << "setPixel(" << myAffectedX << ", " 
+                        //     << y - int(myMeasurementBox[Box3f::MIN][1]) << ") on slice " << myCurrentSlice << endl;
                         myTargetRaster->setPixel( myAffectedX, y - int(myMeasurementBox[Box3f::MIN][1]),
                                 myValue, myValue, myValue, myValue);
                     }
