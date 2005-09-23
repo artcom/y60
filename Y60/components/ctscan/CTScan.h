@@ -137,6 +137,12 @@ class CTScan {
                                             dom::NodePtr thePaletteNode);
         static void copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, unsigned theSliceIndex,
                                             Orientation theOrientation, dom::NodePtr thePaletteNode);
+        
+
+        static void applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
+                               dom::NodePtr theBrushImage, const asl::Vector4f & theColor);
+
+
         // everything below this line is deprecated
         bool verifyCompleteness();
         void clear();

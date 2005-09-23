@@ -326,39 +326,6 @@ polygonizeVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
-/*
-static JSBool
-getStencilRaster(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    try {
-        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
-        CTScan & myCTScan = myObj.getNative();
-
-        ensureParamCount(argc, 1);
-
-        int mySliceNumber;
-        convertFrom(cx, argv[0], mySliceNumber);
-        dom::ValuePtr myRaster = dynamic_cast_Ptr<dom::ValueBase>(myCTScan.getStencil()[mySliceNumber]);
-        dom::ResizeableRaster * myDummy = 0;
-        *rval = as_jsval(cx, myRaster, myDummy);
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
-appendStencil(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    try {
-        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
-        CTScan & myCTScan = myObj.getNative();
-
-        ensureParamCount(argc, 1);
-
-        dom::NodePtr myImage;
-        convertFrom(cx, argv[0], myImage);
-        myCTScan.appendStencil(myImage);
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-*/
 static JSBool
 createRGBAImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
@@ -474,6 +441,31 @@ copyVoxelVolumeToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 }
 
 static JSBool
+applyBrush(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        ensureParamCount(argc, 5);
+        dom::NodePtr myCanvasImage;
+        convertFrom(cx, argv[0], myCanvasImage);
+
+        unsigned myXPos;
+        convertFrom(cx, argv[1], myXPos);
+
+        unsigned myYPos;
+        convertFrom(cx, argv[2], myYPos);
+
+        dom::NodePtr myBrushImage;
+        convertFrom(cx, argv[3], myBrushImage);
+
+        Vector4f myColor;
+        convertFrom(cx, argv[4], myColor);
+
+        CTScan::applyBrush(myCanvasImage, myXPos, myYPos, myBrushImage, myColor);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    return JS_FALSE;
+}
+
+static JSBool
 create3DTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<JSCTScan::NATIVE>::call(&JSCTScan::NATIVE::create3DTexture,cx,obj,argc,argv,rval);
 }
@@ -514,8 +506,6 @@ JSCTScan::Functions() {
         {"create3DTexture",      create3DTexture,         2},
         {"computeHistogram",     computeHistogram,        1},
         {"computeProfile",       computeProfile,          1},
-        //{"getStencilRaster",     getStencilRaster,        1},
-        //{"appendStencil",        appendStencil,           1},        
         {0}
     };
     return myFunctions;
@@ -530,6 +520,7 @@ JSCTScan::StaticFunctions() {
         {"resizeVoxelVolume",       resizeVoxelVolume,       2},
         {"copyCanvasToVoxelVolume", copyCanvasToVoxelVolume, 5},
         {"copyVoxelVolumeToCanvas", copyVoxelVolumeToCanvas, 6},
+        {"applyBrush",              applyBrush,              5},
         {0}
     };
     return myFunctions;

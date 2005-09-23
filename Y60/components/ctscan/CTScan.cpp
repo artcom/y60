@@ -939,6 +939,51 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirty
     theVoxelVolume->getAttribute("boundingbox")->nodeValueAssign(myNewBox);
 }
 
+void 
+CTScan::applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
+                   dom::NodePtr theBrushImage, const asl::Vector4f & theColor)
+{
+    ResizeableRasterPtr myCanvasRaster = dynamic_cast_Ptr<ResizeableRaster>(
+            theCanvasImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
+    ResizeableRasterPtr myBrushRaster = dynamic_cast_Ptr<ResizeableRaster>(
+            theBrushImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
+
+    int myXOffset = myBrushRaster->width() / 2;
+    int myYOffset = myBrushRaster->height() / 2;
+
+    int myXOrigin = int(theX) - myXOffset;
+    int myYOrigin = int(theY) - myYOffset;
+    int myXStart(0);
+    int myYStart(0);
+
+    if (myXOrigin < 0) {
+        myXStart = - myXOrigin;    
+    }
+    if (myYOrigin < 0) {
+        myYStart = - myYOrigin;
+    }
+
+    int myXEnd(myBrushRaster->width());
+    int myYEnd(myBrushRaster->height());
+
+    if (theX + myXOffset > myCanvasRaster->width()) {
+        myXEnd -= theX + myXOffset - myCanvasRaster->width();
+    }
+    if (theY + myYOffset > myCanvasRaster->height()) {
+        myYEnd -= theY + myYOffset - myCanvasRaster->height();
+    }
+
+    for (unsigned y = myYStart; y < myYEnd; ++y) {
+        for (unsigned x = myXStart; x < myXEnd; ++x) {
+            asl::Vector4f myBrushPixel = myBrushRaster->getPixel(x, y);
+            if (int(myBrushPixel[0]) == 255) {
+                myCanvasRaster->setPixel(myXOrigin + x, myYOrigin + y,
+                        theColor[0], theColor[1], theColor[2], theColor[3]);
+            }
+        }    
+    }
+}
+
 
 // comparator for Vector3i
 struct Vector3iCmp {
