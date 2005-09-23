@@ -111,10 +111,11 @@ ShapeExporter::extractGeometry() {
     if (MStatus::kFailure == _myMesh->getPoints(_myVertexArray, MSpace::kObject)) {
         throw ExportException("Could not get points", "ShapeExporter::extractGeometry()");
     }
-
-    if (MStatus::kFailure == _myMesh->getFaceVertexColors(_myColorArray)) {
+	// (VS) Maya7.0 does not export vertex colors or face vertexcolors (?), if none present
+	//      y60 must live withour them
+    /*if (MStatus::kFailure == _myMesh->getFaceVertexColors(_myColorArray)) {
         throw ExportException("Could not get vertex colors", "ShapeExporter::extractGeometry()");
-    }
+    } */
 
     if (MStatus::kFailure == _myMesh->getNormals(_myNormalArray, MSpace::kObject)) {
         throw ExportException("Could not get normals", "ShapeExporter::extractGeometry()");
@@ -444,9 +445,11 @@ void
 ShapeExporter::outputColors(y60::ShapeBuilder & theShape) {
     MAKE_SCOPE_TIMER(ShapeExporter_outputColors);
     unsigned myColorCount = _myColorArray.length();
-    if (myColorCount == 0) {
+	// (VS) Maya7.0 does not export vertex colors or face vertexcolors (?), if none present
+	//      y60 must live withour them
+    /* if (myColorCount == 0) {
         throw ExportException("Color count is zero", "ShapeExporter::outputColors()");
-    }
+    } */
 
     theShape.createVertexDataBin<Vector4f>(COLOR_ROLE, myColorCount);
 
