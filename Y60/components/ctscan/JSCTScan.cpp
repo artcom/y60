@@ -146,17 +146,28 @@ computeProfile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
         ensureParamCount(argc, 1);
 
-        std::vector<Vector3i> myVoxelPositions;
+        std::vector<Point3i> myVoxelPositions;
 
         if (!convertFrom(cx, argv[0], myVoxelPositions)) {
-            JS_ReportError(cx, "JSCTScan::computeProfile(): 1 argument must be an array of positions ");
+            JS_ReportError(cx, "JSCTScan::computeProfile(): 1 argument must be an array of Points");
             return JS_FALSE;
         }
         std::vector<unsigned> myProfile;
+        std::vector<asl::Point3i> mySampledPoints;
         CTScan & myCTScan = myObj.getNative();
-        myCTScan.computeProfile(myVoxelPositions, myProfile);
+        myCTScan.computeProfile(myVoxelPositions, myProfile, mySampledPoints);
+        // now return both arrays as a JS object with the properties .values and .points
+        JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+        if (!JS_DefineProperty(cx, myReturnObject, "points", as_jsval(cx, mySampledPoints), 0,0, JSPROP_ENUMERATE)) {
+            JS_ReportError(cx, "JSCTScan::computeProfile(): could not create 'points' property ");
+            return JS_FALSE;
+        }
+        if (!JS_DefineProperty(cx, myReturnObject, "values", as_jsval(cx, myProfile), 0,0, JSPROP_ENUMERATE)) {
+            JS_ReportError(cx, "JSCTScan::computeProfile(): could not create 'values' property ");
+            return JS_FALSE;
+        }
         
-        *rval = as_jsval(cx, myProfile);
+        *rval = OBJECT_TO_JSVAL(myReturnObject);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

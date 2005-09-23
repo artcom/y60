@@ -778,21 +778,25 @@ CTScan::computeHistogram(const Box3i & theVOI, std::vector<unsigned> & theHistog
 };
 
 void
-CTScan::computeProfile(const std::vector<asl::Vector3i> & thePoints, std::vector<unsigned> & theProfile) {
+CTScan::computeProfile(const std::vector<asl::Point3i> & thePoints, 
+        std::vector<unsigned> & theProfile, std::vector<asl::Point3i> & thePointsSampled)
+{
     if (thePoints.empty()) {
         return;
     }
     
     // for each segment, add the profile from [i, i+1[ (half-open interval)
     for (int i = 0; i+1 < thePoints.size(); ++i) {
-        computeLineSegmentProfile(thePoints[i], thePoints[i+1], theProfile);
+        computeLineSegmentProfile(thePoints[i], thePoints[i+1], theProfile, thePointsSampled);
     }
     // now add the last point
-    computeProfile(thePoints[thePoints.size()-1], theProfile);
+    const Point3i & myLastPoint = thePoints[thePoints.size()-1];
+    computeProfile(myLastPoint, theProfile);
+    thePointsSampled.push_back(myLastPoint);
 }
 
 void
-CTScan::computeProfile(const asl::Vector3i & thePosition, std::vector<unsigned> & theProfile) {
+CTScan::computeProfile(const asl::Point3i & thePosition, std::vector<unsigned> & theProfile) {
     const unsigned char * myData = _mySlices[thePosition[2]]->pixels().begin();
     myData += thePosition[0]+thePosition[1]*getBytesRequired(_mySlices[thePosition[2]]->width(), _myEncoding);
     theProfile.push_back(*myData);
@@ -801,7 +805,9 @@ CTScan::computeProfile(const asl::Vector3i & thePosition, std::vector<unsigned> 
 // computes the grey-scale profile of all voxels
 // from [theStart, theEnd[  (without theEnd)
 void
-CTScan::computeLineSegmentProfile(const asl::Vector3i & theStart, const asl::Vector3i & theEnd, std::vector<unsigned> & theProfile) {
+CTScan::computeLineSegmentProfile(const asl::Point3i & theStart, const asl::Point3i & theEnd, 
+        std::vector<unsigned> & theProfile, std::vector<Point3i> & thePointsSampled) 
+{
     // find the axis with the max delta
     int maxDelta = 0;
     int maxDeltaAxis = -1;
@@ -823,10 +829,11 @@ CTScan::computeLineSegmentProfile(const asl::Vector3i & theStart, const asl::Vec
     for (int i = 0; i < maxDelta; ++i) {
         Vector3f curDelta(myStep*i);
 
-        asl::Vector3i curPoint(theStart + Vector3i(int(round(curDelta[0])), 
+        asl::Point3i curPoint(theStart + Vector3i(int(round(curDelta[0])), 
                                                    int(round(curDelta[1])), 
                                                    int(round(curDelta[2]))));
         computeProfile(curPoint, theProfile);
+        thePointsSampled.push_back(curPoint);
     }
 }
 
