@@ -19,16 +19,20 @@ function LookAtCameraMover(theCamera, theLookAtPosition) {
     this.Constructor(this, theCamera, theLookAtPosition);
 }
 
-LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theLookAtPosition) {
+LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFollow) {
 
     const CAMERA_FRONT_DIRECTION = new Vector3f(0,0,1);;
     const CAMERA_UP_DIRECTION    = new Vector3f(0,1,0);
     const CAMERA_RIGHT_DIRECTION = cross(CAMERA_FRONT_DIRECTION, CAMERA_UP_DIRECTION);
     
-    var _myCamera = theCamera;
-    var _myLookAtPosition = theLookAtPosition;
-    var _myCameraDestinationPosition = new Vector3f(0,0,0);
-    var _myDestinationSpringStrength = 1;
+    var _myCamera       = theCamera;
+    var _myNodeToFollow = theNodeToFollow;
+
+    var _myLookAtPosition    = new Vector3f(0,0,0);
+    var _myLookAtOffset      = new Vector3f(0,0,0);
+    var _myEyePositionOffset = new Vector3f(10,2,0);
+    
+    var _mySpringStrength = 1;
      
     var _myLastTime = 0;
 
@@ -38,16 +42,16 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theLookAtPosi
     obj.reset = function() {
     }
 
-    obj.setDestinationPosition = function(theCameraDestinationPosition) {
-        _myCameraDestinationPosition = theCameraDestinationPosition;
+    obj.setEyePositionOffset = function(theOffset) {
+        _myEyePositionOffset = theOffset;
     }
 
-    obj.setLookAtPosition = function(theLookAtPosition) {
-        _myLookAtPosition = theLookAtPosition;
+    obj.setLookAtPositionOffset = function(theOffset) {
+        _myLookAtOffset = theOffset;
     }
 
-    obj.setSpringStrength = function(theDestinationSpringStrength) {
-        _myDestinationSpringStrength = theDestinationSpringStrength;
+    obj.setSpringStrength = function(theSpringStrength) {
+        _mySpringStrength = theSpringStrength;
     }
         
     obj.getCamera = function() {
@@ -61,12 +65,21 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theLookAtPosi
         }
         _myLastTime = theTime;
         
-        var myCameraMotionToDestination = difference(_myCameraDestinationPosition, _myCamera.position);
-        var myCameraMotionFactor = _myDestinationSpringStrength * myDeltaTime;
-        if (myCameraMotionFactor > 1) {
-            myCameraMotionFactor = 1;
+        var myMatrix = _myNodeToFollow.globalmatrix;
+        var myNodePosition = _myNodeToFollow.boundingbox.center;
+        var myRotationMatrix = new Matrix4f(_myNodeToFollow.orientation);
+        var myLookAtPosition = sum(myNodePosition, product(_myLookAtOffset, myRotationMatrix));
+        var myEyePosition    = sum(myNodePosition, product(_myEyePositionOffset, myRotationMatrix));
+        
+        var myMotionFactor = _mySpringStrength * myDeltaTime;
+        if (myMotionFactor > 1) {
+            myMotionFactor = 1;
         }
-        _myCamera.position = sum(_myCamera.position, product(myCameraMotionToDestination, myCameraMotionFactor));      
+        var myDistance = difference(myEyePosition, _myCamera.position);
+        _myCamera.position = sum(_myCamera.position, product(myDistance, myMotionFactor));      
+
+        myDistance = difference(myLookAtPosition, _myLookAtPosition);
+        _myLookAtPosition = sum(_myLookAtPosition, product(myDistance, myMotionFactor)); 
 
         // calc orientation
         var myViewVector = normalized(difference(_myLookAtPosition, _myCamera.position));
