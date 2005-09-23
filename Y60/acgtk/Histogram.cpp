@@ -50,13 +50,6 @@ Histogram::Histogram() :
     myFlags |= Gdk::BUTTON_PRESS_MASK;
     myFlags |= Gdk::BUTTON_RELEASE_MASK;
     set_events(myFlags);
-
-    // XXX
-    /*
-    for (unsigned i = 0; i < 1024; ++i) {
-        _mySampleData.push_back( 30 * (i + 1));
-    }
-    */
 }
 
 Histogram::~Histogram() {
@@ -152,24 +145,16 @@ Histogram::rebuildBins() {
         _myBins.clear();
         _myBins.resize(myWidth);
         
-        PLBilinearContribDef f(0.64);
-        C2PassScale <CData_UnsignedInt> sS(f);
         // set up some pointers to simulate paintlib's linearray
         unsigned int * mySrcLinePtr = (&_mySampleData[0]); 
         unsigned int * myDestLinePtr = (&_myBins[0]); 
-        
+        // set up the scaler
+        PLBilinearContribDef f(0.64);
+        C2PassScale <CData_UnsignedInt> sS(f);
+        // and start it 
         sS.Scale( (CData_UnsignedInt::_RowType*)(&mySrcLinePtr), _mySampleData.size(), 1,
                   (CData_UnsignedInt::_RowType*)(&myDestLinePtr), _myBins.size(), 1);
-        // AC_WARNING << "scaling from " << _mySampleData.size() << " to " << _myBins.size();
-        /*
-        for (unsigned i = 0; i < _mySampleData.size(); ++i) {
-            int myBin = i * myWidth / _mySampleData.size();
-            //cerr << i << " belongs in bin: " << myBin << endl;
-            _myBins[myBin] += _mySampleData[i];
-        }
-        */
     } else {
-        // AC_WARNING << "copying from " << _mySampleData.size() << " to " << _myBins.size();
         _myBins = _mySampleData;
     }
     _myMaxCount = findMaxCount();

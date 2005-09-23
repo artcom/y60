@@ -224,6 +224,8 @@ JSWidget::Properties() {
         DEFINE_RO_PROPERTY(is_mapped),
         DEFINE_RO_PROPERTY(focus),
         DEFINE_RO_PROPERTY(parent),
+        DEFINE_RO_PROPERTY(width),
+        DEFINE_RO_PROPERTY(height),
         DEFINE_PROPERTY(sensitive),
         DEFINE_RO_PROPERTY(signal_show),
         DEFINE_RO_PROPERTY(signal_hide),
@@ -369,6 +371,12 @@ JSWidget::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             }
         case PROP_parent:
             *vp = as_jsval(cx, theNative.get_parent());
+            return JS_TRUE;
+        case PROP_width:
+            *vp = as_jsval(cx, theNative.get_width());
+            return JS_TRUE;
+        case PROP_height:
+            *vp = as_jsval(cx, theNative.get_height());
             return JS_TRUE;
 
         default:
