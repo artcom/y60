@@ -55,18 +55,6 @@ setPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<NATIVE>::call((MyMethod)&NATIVE::setPixel,cx,obj,argc,argv,rval);
 }
 
-
-/*
-static JSBool
-blit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-
-    typedef void (NATIVE::*MyMethod)(unsigned long,unsigned long, const dom::ValueBase &);
-    return Method<NATIVE>::call((MyMethod)&NATIVE::blit,cx,obj,argc,argv,rval);
-}
-*/
-
 JSFunctionSpec *
 JSResizeableRaster::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -75,7 +63,6 @@ JSResizeableRaster::Functions() {
         {"getPixel",    getPixel,         2},
         {"setPixel",    setPixel,         6},
         {"fillRect",    fillRect,         8},
- //       {"blit",        blit,             3},
         {0}
     };
     return myFunctions;

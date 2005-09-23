@@ -900,6 +900,10 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirty
     Box3f myNewBox = myOldBox;
     myNewBox.extendBy( theDirtyBox );
 
+    AC_INFO << "theDirtyBox = " << theDirtyBox;
+    AC_INFO << "myOldBox = " << myOldBox;
+    AC_INFO << "myNewBox = " << myNewBox;
+
     if (myNewBox == myOldBox) {
         AC_INFO << "Raster box didn't change.";
         return;
@@ -907,39 +911,38 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirty
 
     const Vector3f & mySize = myNewBox.getSize();
 
-    int myTargetWidth  = int( mySize[0] );
-    int myTargetHeight = int( mySize[1] );
+    int myTargetWidth  = int( round(mySize[0]) );
+    int myTargetHeight = int( round(mySize[1]) );
     AC_INFO << "target width = " << myTargetWidth << " target height = " << myTargetHeight;
-    int myNewRasterCount  = int( mySize[2] );
+    int myNewRasterCount  = int( round(mySize[2]) );
 
-    int myNewBoxBegin = int( myNewBox[Box3f::MIN][2] );
-    int myNewBoxEnd   = int( myNewBox[Box3f::MAX][2] );
+    int myNewBoxBegin = int( round( myNewBox[Box3f::MIN][2] ));
+    int myNewBoxEnd   = int( round( myNewBox[Box3f::MAX][2] ));
+    AC_INFO << "myNewBoxBegin = " << myNewBoxBegin;
+    AC_INFO << "myNewBoxEnd = " << myNewBoxEnd;
 
-    int myOldBoxBegin = int( myOldBox[Box3f::MIN][2] );
-    int myOldBoxEnd   = int( myOldBox[Box3f::MAX][2] );
+    int myOldBoxBegin = int( round(myOldBox[Box3f::MIN][2]) );
+    int myOldBoxEnd   = int( round(myOldBox[Box3f::MAX][2]) );
 
     dom::NodePtr myRasters = theVoxelVolume->childNode("rasters");
     dom::NodePtr myOldRaster;
     dom::NodePtr myNewRaster;
 
-    unsigned myXOrigin = unsigned( myOldBox[Box3f::MIN][0] - myNewBox[Box3f::MIN][0]);
-    unsigned myYOrigin = unsigned( myOldBox[Box3f::MIN][1] - myNewBox[Box3f::MIN][1]);
-    AC_INFO << "blitting to " << myXOrigin << "x" << myYOrigin;
+    unsigned myXOrigin = unsigned( round(myOldBox[Box3f::MIN][0] - myNewBox[Box3f::MIN][0]));
+    unsigned myYOrigin = unsigned( round(myOldBox[Box3f::MIN][1] - myNewBox[Box3f::MIN][1]));
 
     for(int i = myNewBoxBegin;i < myNewBoxEnd; ++i) {
-        if (i >= myOldBoxBegin && i < myOldBoxEnd) {
-            myOldRaster = myRasters->childNode(0);
-            AC_INFO << "Replacing " << i;
-        } else {
-            AC_INFO << "Creating new " << i;
-        }
         myNewRaster = CTScan::createGrayImage(myRasters, myTargetWidth, myTargetHeight, 0);
         if (i >= myOldBoxBegin && i < myOldBoxEnd) {
+            AC_INFO << "blitting to " << myXOrigin << "x" << myYOrigin << "on " << i;
+            myOldRaster = myRasters->childNode(0);
             ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
                     myNewRaster->childNode(0)->nodeValueWrapperPtr());
             ValuePtr mySourceRaster = myOldRaster->childNode(0)->nodeValueWrapperPtr();
             myTargetRaster->pasteRaster(myXOrigin, myYOrigin, * mySourceRaster); 
             myRasters->removeChild(myOldRaster);
+        } else {
+            AC_INFO << "Creating new " << i;
         }
     }
 
@@ -969,7 +972,6 @@ CTScan::applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
     if (myYOrigin < 0) {
         myYStart = - myYOrigin;
     }
-
     int myXEnd(myBrushRaster->width());
     int myYEnd(myBrushRaster->height());
 
@@ -982,8 +984,10 @@ CTScan::applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
 
     for (unsigned y = myYStart; y < myYEnd; ++y) {
         for (unsigned x = myXStart; x < myXEnd; ++x) {
+            // AC_TRACE << "getPixel(" << x << "," << y << ")";
             asl::Vector4f myBrushPixel = myBrushRaster->getPixel(x, y);
             if (int(myBrushPixel[0]) == 255) {
+                // AC_TRACE << "setPixel(" << x +myXOrigin<< "," << y +myYOrigin<< ")";
                 myCanvasRaster->setPixel(myXOrigin + x, myYOrigin + y,
                         theColor[0], theColor[1], theColor[2], theColor[3]);
             }
@@ -1028,6 +1032,8 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
             theCanvasImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
 
     Box3f myMeasurementBox = theMeasurement->getAttributeValue<Box3f>("boundingbox");
+    //AC_WARNING << "theDirtyBox=" << theDirtyBox;
+    //AC_WARNING << "myMeasurementBox=" << myMeasurementBox;
 
     switch (theOrientation) {
         case CTScan::IDENTITY:
@@ -1039,16 +1045,16 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
                 unsigned myXEnd   = unsigned(theDirtyBox[Box3f::MAX][0]);
                 unsigned myYStart = unsigned(theDirtyBox[Box3f::MIN][1]);
                 unsigned myYEnd   = unsigned(theDirtyBox[Box3f::MAX][1]);
-                AC_DEBUG << "affected slice = " << myAffectedSlice;
+                //AC_WARNING << "affected slice = " << myAffectedSlice;
                 dom::NodePtr myRasterNode = theMeasurement->childNode("rasters")->childNode(myAffectedSlice);
                 if ( ! myRasterNode) {
                     throw asl::Exception("Failed to get affected raster.");
                 }
                 ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
                         myRasterNode->childNode(0)->nodeValueWrapperPtr());
-
                 for (unsigned y = myYStart; y < myYEnd; ++y) {
                     for (unsigned x = myXStart; x < myXEnd; ++x) {
+                        //AC_WARNING << "    getPixel(" << x << "," << y << ")"; 
                         myFloatPixel = myCanvas->getPixel(x, y);
                         myPixel = Vector3i(int( myFloatPixel[0]), int( myFloatPixel[1]), int( myFloatPixel[2]));
                         // XXX: argh! map.find() in inner loop... any ideas? [DS]
@@ -1058,6 +1064,7 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
                                                  PLUS_FILE_LINE);
                         }
                         float myValue = float( myIt->second);
+                        //AC_WARNING << "    setPixel(" << x- int(myMeasurementBox[Box3f::MIN][0]) << "," << y - int(myMeasurementBox[Box3f::MIN][1])<< ") to " << myValue; 
                         myTargetRaster->setPixel( x - int(myMeasurementBox[Box3f::MIN][0]),
                                 y - int(myMeasurementBox[Box3f::MIN][1]),
                                 myValue, myValue, myValue, myValue);
@@ -1090,7 +1097,7 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
 
                     for (unsigned x = myXStart; x < myXEnd; ++x) {
                         unsigned mySourceY = myCanvasHeight - z - 1;
-                        //cerr << "getPixel(" << x << ", " << mySourceY << ")" << endl;
+                        // cerr << "getPixel(" << x << ", " << mySourceY << ")" << endl;
                         myFloatPixel = myCanvas->getPixel(x, mySourceY);
                         myPixel = Vector3i(int( myFloatPixel[0]), int( myFloatPixel[1]), int( myFloatPixel[2]));
                         // XXX: argh! map.find() in inner loop... any ideas? [DS]
@@ -1102,7 +1109,7 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
                         float myValue = float( myIt->second);
                         //cerr << "myValue = " << myValue << endl;
                         //cerr << "setPixel(" << x - myMeasurementBox[Box3f::MIN][0] << ", " 
-                        //     << myAffectedY << ") on slice " << myCurrentSlice << endl;
+                        //      << myAffectedY << ") on slice " << myCurrentSlice << endl;
                         myTargetRaster->setPixel( x - int(myMeasurementBox[Box3f::MIN][0]), myAffectedY,
                                 myValue, myValue, myValue, myValue);
                     }
@@ -1121,7 +1128,7 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
                 unsigned myZStart = unsigned(theDirtyBox[Box3f::MIN][2]);
                 unsigned myZEnd   = unsigned(theDirtyBox[Box3f::MAX][2]);
                 unsigned myCanvasWidth = theCanvasImage->getAttributeValue<unsigned>("width");
-                AC_WARNING << "affected x = " << myAffectedX;
+                //AC_WARNING << "affected x = " << myAffectedX;
                 for (unsigned z = myZStart; z < myZEnd; ++z) {
                     unsigned myCurrentSlice = z - unsigned(myMeasurementBox[Box3f::MIN][2]);
                     //cerr << "current slice = " << myCurrentSlice << endl;
@@ -1173,6 +1180,12 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
     }
 
     Box3f myBoundingBox = theMeasurement->getAttributeValue<Box3f>("boundingbox");
+    Point3i myMin(round(myBoundingBox[Box3f::MIN][0]), 
+                  round(myBoundingBox[Box3f::MIN][1]), 
+                  round(myBoundingBox[Box3f::MIN][2]));
+    Point3i myMax(round(myBoundingBox[Box3f::MAX][0]), 
+                  round(myBoundingBox[Box3f::MAX][1]), 
+                  round(myBoundingBox[Box3f::MAX][2]));
 
     ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>( 
             theCanvas->childNode(0)->childNode(0)->nodeValueWrapperPtr());
@@ -1181,15 +1194,15 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
 
     switch ( theOrientation) {
         case CTScan::IDENTITY: // front
-            //cerr << "index = " << theSliceIndex << " bbox = " << myBoundingBox[Box3f::MIN][2] << endl;
-            if (theSliceIndex >= myBoundingBox[Box3f::MIN][2] && theSliceIndex < myBoundingBox[Box3f::MAX][2]) {
-                dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(int( theSliceIndex - myBoundingBox[Box3f::MIN][2]));
+            cerr << "index = " << theSliceIndex << " bbox = " << myBoundingBox << endl;
+            if (theSliceIndex >= myMin[2] && theSliceIndex < myMax[2]) {
+                dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(int( theSliceIndex - myMin[2]));
                 ResizeableRasterPtr mySourceRaster =
                     dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
-                unsigned myXStart = unsigned(myBoundingBox[Box3f::MIN][0]);
-                unsigned myXEnd = unsigned(myBoundingBox[Box3f::MAX][0]);
-                unsigned myYStart = unsigned(myBoundingBox[Box3f::MIN][1]);
-                unsigned myYEnd = unsigned(myBoundingBox[Box3f::MAX][1]);
+                unsigned myXStart = unsigned(myMin[0]);
+                unsigned myXEnd = unsigned(myMax[0]);
+                unsigned myYStart = unsigned(myMin[1]);
+                unsigned myYEnd = unsigned(myMax[1]);
                 Vector4f myFloatPixel;
                 for (unsigned y = myYStart; y < myYEnd; ++y) {
                     for (unsigned x = myXStart; x < myXEnd; ++x) {
@@ -1200,16 +1213,16 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
                                 (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
                     }
                 }
-                //cerr << "done" << endl;
+                cerr << "done" << endl;
             }
             break;
         case CTScan::Y2Z: // top
-            if (theSliceIndex >= myBoundingBox[Box3f::MIN][1] && theSliceIndex < myBoundingBox[Box3f::MAX][1]) {
-                unsigned mySourceY = unsigned( theSliceIndex - myBoundingBox[Box3f::MIN][1]);
-                unsigned myZStart = unsigned( myBoundingBox[Box3f::MIN][2]);
-                unsigned myZEnd = unsigned( myBoundingBox[Box3f::MAX][2]);
-                unsigned myXStart = unsigned(myBoundingBox[Box3f::MIN][0]);
-                unsigned myXEnd = unsigned(myBoundingBox[Box3f::MAX][0]);
+            if (theSliceIndex >= myMin[1] && theSliceIndex < myMax[1]) {
+                unsigned mySourceY = unsigned( theSliceIndex - myMin[1]);
+                unsigned myZStart = unsigned( myMin[2]);
+                unsigned myZEnd = unsigned( myMax[2]);
+                unsigned myXStart = unsigned(myMin[0]);
+                unsigned myXEnd = unsigned(myMax[0]);
                 Vector4f myFloatPixel;
                 for (unsigned z = myZStart; z < myZEnd; ++z) {
                     unsigned myCurrentSliceIndex = z - myZStart;
@@ -1230,12 +1243,12 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
             }
             break;
         case CTScan::X2Z: // side
-            if (theSliceIndex >= myBoundingBox[Box3f::MIN][0] && theSliceIndex < myBoundingBox[Box3f::MAX][0]) {
-                unsigned mySourceX = unsigned( theSliceIndex - myBoundingBox[Box3f::MIN][0]);
-                unsigned myZStart = unsigned( myBoundingBox[Box3f::MIN][2]);
-                unsigned myZEnd = unsigned( myBoundingBox[Box3f::MAX][2]);
-                unsigned myYStart = unsigned(myBoundingBox[Box3f::MIN][1]);
-                unsigned myYEnd = unsigned(myBoundingBox[Box3f::MAX][1]);
+            if (theSliceIndex >= myMin[0] && theSliceIndex < myMax[0]) {
+                unsigned mySourceX = unsigned( theSliceIndex - myMin[0]);
+                unsigned myZStart = unsigned( myMin[2]);
+                unsigned myZEnd = unsigned( myMax[2]);
+                unsigned myYStart = unsigned(myMin[1]);
+                unsigned myYEnd = unsigned(myMax[1]);
                 Vector4f myFloatPixel;
                 for (unsigned z = myZStart; z < myZEnd; ++z) {
                     unsigned myCurrentSliceIndex = z - myZStart;
