@@ -28,8 +28,20 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         obj.mySound = obj.myMedia.createSound("../../testfiles/music_cut_wm9.wma");
 
         DTITLE("Playing sound...");
-        obj.mySound.play();
+        obj.mySound.play();        
         ENSURE("obj.mySound.playing");
+        msleep(14000);
+        // Play to end.
+        ENSURE("!obj.mySound.playing");
+        obj.mySound.play();
+        msleep(1000);
+        obj.mySound.stop();
+        msleep(1000);
+        obj.mySound.play();
+        msleep(1000);
+        obj.mySound.pause();
+        msleep(1000);     
+/*
         msleep(1000);
         DTITLE("Pausing sound...");
         obj.mySound.pause();
@@ -52,7 +64,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         obj.mySound.stop();
         
         ENSURE("!obj.mySound.playing");
-
+*/
         delete obj.mySound;
         gc();
         msleep(100);

@@ -27,14 +27,14 @@ class WMADecoder2Factory: public IAudioDecoderFactory, public asl::PlugInBase
     public:
         WMADecoder2Factory(asl::DLHandle theDLHandle);
         virtual ~WMADecoder2Factory();
-        virtual IAudioDecoder* tryCreateDecoder(std::string myURI);
-        virtual int getPriority(); 
+        virtual IAudioDecoder* tryCreateDecoder(const std::string & myURI);
+        virtual int getPriority() const; 
 
     protected:
 	    void _initializeSingletonManager(asl::SingletonManager* theSingletonManager);
 
     private:
-        std::string canDecode(const std::string & theUrl) const;
+        bool canDecode(const std::string & theUrl) const;
 };
 
 } // namespace

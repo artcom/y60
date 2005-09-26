@@ -31,10 +31,13 @@ FFMpegDecoder::FFMpegDecoder (const string& myURI)
     open();
 }
 
-FFMpegDecoder::~FFMpegDecoder()
-{
+FFMpegDecoder::~FFMpegDecoder() {
     AC_DEBUG << "FFMpegDecoder::~FFMpegDecoder (" << _myURI << ")";
     close();
+}
+
+bool FFMpegDecoder::isSyncDecoder() const {
+    return true;
 }
 
 std::string FFMpegDecoder::getName() const {

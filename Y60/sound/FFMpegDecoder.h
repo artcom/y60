@@ -31,6 +31,7 @@ class FFMpegDecoder: public IAudioDecoder
 //        FFMpegDecoder (asl::Ptr < asl::ReadableStream > myStream, asl::HWSampleSinkPtr mySink);
         virtual ~FFMpegDecoder();
 
+        virtual bool isSyncDecoder() const;
         virtual bool decode();
         virtual unsigned getSampleRate();
         virtual unsigned getNumChannels();

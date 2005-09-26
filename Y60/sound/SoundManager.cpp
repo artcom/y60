@@ -33,7 +33,8 @@ SoundManager::~SoundManager() {
     AC_DEBUG << "SoundManager::~SoundManager";
     msleep(50);
     if (_mySounds.size() != 0) {
-        AC_DEBUG << "Deleting SoundManager, but " << _mySounds.size() << " sounds are still active.";
+        AC_DEBUG << "Deleting SoundManager, but " << _mySounds.size() << 
+                " sounds are still active.";
         stopAll();
     }
     join();
@@ -55,15 +56,15 @@ void SoundManager::setAppConfig(unsigned mySampleRate, unsigned numOutputChannel
 }
 
 bool lessFactory(const IAudioDecoderFactory* a, const IAudioDecoderFactory* b) {
-    cerr << "less" << endl;
     return a->getPriority() < b->getPriority();
 }
 
 void SoundManager::registerDecoderFactory(IAudioDecoderFactory* theFactory) {
     AC_DEBUG << "Registering decoder factory " << theFactory;
     _myDecoderFactories.insert(
-            lower_bound(_myDecoderFactories.begin(), _myDecoderFactories.end(), theFactory, lessFactory),
-                    theFactory);
+            lower_bound(_myDecoderFactories.begin(), _myDecoderFactories.end(),
+                    theFactory, lessFactory),
+            theFactory);
     
 }
 

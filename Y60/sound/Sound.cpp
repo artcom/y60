@@ -59,6 +59,7 @@ void Sound::play() {
     AC_DEBUG << "Sound::play (" << _myURI << ")";
     _myDecodingComplete = false;
     _myLockedSelf = _mySelf.lock();
+    _myDecoder->play();
     update(0.1);
     _mySampleSink->play();
 }
@@ -66,6 +67,7 @@ void Sound::play() {
 void Sound::pause() {
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_DEBUG << "Sound::pause (" << _myURI << ")";
+    _myDecoder->pause();
     _mySampleSink->pause();
     _myLockedSelf = SoundPtr(0);
 }
@@ -73,6 +75,7 @@ void Sound::pause() {
 void Sound::stop() {
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_DEBUG << "Sound::stop (" << _myURI << ")";
+    _myDecoder->stop();
     _mySampleSink->stop();
     close();
     _myLockedSelf = SoundPtr(0);
@@ -155,6 +158,7 @@ void Sound::update(double theTimeSlice) {
     double myTimeToBuffer = double(_mySampleSink->getBufferedTime())+
             myBuffersFilledRatio*theTimeSlice+
             (1-myBuffersFilledRatio)*_myMaxUpdateTime;
+    _myDecoder->setTime(getCurrentTime());
     if (_myDecodingComplete && !isPlaying()) {
         AC_DEBUG << "Sound::update: Playback complete";
         _myDecodingComplete = false;
@@ -162,22 +166,28 @@ void Sound::update(double theTimeSlice) {
     }
     if (!_myDecodingComplete) {
         bool myEOF = false;
-        while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
-            myEOF = _myDecoder->decode();
+        if (_myDecoder->isSyncDecoder()) {
+            while (double(_mySampleSink->getBufferedTime()) < myTimeToBuffer && !myEOF) {
+                myEOF = _myDecoder->decode();
+            }
+        } else {
+            if (_myDecoder->isEOF()) {
+                myEOF = true;
+            }
         }
         if (myEOF) {
-            if (!_myIsLooping) {
+            if (_myIsLooping) {
+                AC_DEBUG << "Sound::update: Loop";
+                _myDecoder->seek(0);
+                update(0.1);
+            } else {
                 AC_DEBUG << "Sound::update: DecodingComplete";
                 _myDecodingComplete = true;
                 _mySampleSink->stop(true);
                 close();
-            } else {
-                AC_DEBUG << "Sound::update: Loop";
-                _myDecoder->seek(0);
-                update(0.1);
             }
         }
-    }
+    } 
 }
 
 AudioBufferPtr Sound::createBuffer(unsigned theNumFrames) {

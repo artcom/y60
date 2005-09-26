@@ -25,24 +25,32 @@ class WMADecoder2: public IAudioDecoder, public IWMReaderCallback
 {
 	    static const MAX_TIMEOUT_FOR_EVENT = 15000;
     public:
-        WMADecoder2 (std::string myURI);
+    
+        WMADecoder2 (const std::string& myURI);
         virtual ~WMADecoder2();
 
-        virtual bool decode(asl::ISampleSink* mySampleSink);
+        virtual void play();
+        virtual void stop();
+        virtual void pause();
+        virtual bool isEOF() const;
+        virtual void seek (asl::Time thePosition);
         virtual unsigned getSampleRate();
         virtual unsigned getNumChannels();
-        virtual void seek (asl::Time thePosition);
         virtual asl::Time getDuration() const;
         std::string getName() const;
-
+        virtual void setSampleSink(asl::ISampleSink* mySampleSink);
+        virtual bool isSyncDecoder() const;
+        virtual void setTime(asl::Time myTime);
+        
         //
         // Methods of IUnknown
         //
-/*
-        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void __RPC_FAR *__RPC_FAR *ppvObject);
+
+        HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, 
+                void __RPC_FAR *__RPC_FAR *ppvObject);
         ULONG STDMETHODCALLTYPE AddRef();
         ULONG STDMETHODCALLTYPE Release();
-*/
+
         //
         // Methods of IWMReaderCallback
         //
@@ -62,13 +70,29 @@ class WMADecoder2: public IAudioDecoder, public IWMReaderCallback
     private:
         void open();
         void close();
+
+        void setupAudio();
+        void preroll(asl::Time thePosition);
+        void waitForSamples();
         bool waitForEvent(unsigned theWaitTime = MAX_TIMEOUT_FOR_EVENT);
 
         std::string _myURI;
         IWMReader * _myReader;
         HANDLE _myEvent;
+        HANDLE _mySampleEvent;
         HRESULT _myEventResult;
         unsigned _myMaxChannels;
+        WORD _myAudioOutputId;
+        unsigned _mySampleRate;
+        unsigned _myNumChannels;
+        asl::ISampleSink* _mySampleSink;
+        bool _myDecodingDone;
+        bool _myUseUserClock;
+        
+        enum State {STOPPED, PAUSED, PLAYING};
+        State _myState;
+
+        LONG _myReferenceCount; // For QueryInterface etc.
 };
 
 } // namespace

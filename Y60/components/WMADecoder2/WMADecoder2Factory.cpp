@@ -43,15 +43,18 @@ WMADecoder2Factory::~WMADecoder2Factory() {
     CoUninitialize();
 }
 
-IAudioDecoder* WMADecoder2Factory::tryCreateDecoder(std::string myURI) {
+IAudioDecoder* WMADecoder2Factory::tryCreateDecoder(const std::string& myURI) {
     AC_DEBUG << "WMADecoder2Factory::tryCreateDecoder (" << myURI << ")";
-    throw DecoderException(std::string("Kaputt") + myURI, 
-            PLUS_FILE_LINE);
-    return 0;
+    if (canDecode(myURI)) {
+        return new WMADecoder2(myURI);
+    } else {
+        throw DecoderException(std::string("Kaputt") + myURI, 
+                PLUS_FILE_LINE);
+    }
 }
 
-int WMADecoder2Factory::getPriority() {
-    return 2;
+int WMADecoder2Factory::getPriority() const {
+    return 0;
 }
 
 void WMADecoder2Factory::_initializeSingletonManager
@@ -65,7 +68,7 @@ void WMADecoder2Factory::_initializeSingletonManager
     mySoundManager.registerDecoderFactory(this);
 }
 
-std::string
+bool
 WMADecoder2Factory::canDecode(const std::string & theUrl) const {
     // TODO: real file format check using the library.
     std::string myExtension = asl::toLowerCase(asl::getExtension(theUrl));
@@ -73,13 +76,13 @@ WMADecoder2Factory::canDecode(const std::string & theUrl) const {
             (theUrl.find("mms://") == 0 && myExtension == "" ) ||
             (theUrl.find("http://") == 0 && myExtension == "" ))
     {
-        return MIME_TYPE_WMA;
+        return true;
     } else if (myExtension == "mp3" &&
             (theUrl.find("http://") == 0 || theUrl.find("mms://") == 0))
     {
-        return MIME_TYPE_MP3;
+        return true;
     } else {
-        return "";
+        return false;
     }
 }
 
