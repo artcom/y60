@@ -21,10 +21,16 @@ function WMADecoder2UnitTest() {
 WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
+    obj.playSound = function(myFileName) {
+        obj.mySound = obj.myMedia.createSound(myFileName);
+        obj.mySound.play();
+        msleep(2000);
+        obj.mySound.stop();
+    }
+
     obj.runWMADecoder2Test = function() {
         obj.myMedia = new SoundManager();
         
-//        obj.mySound = obj.myMedia.createSound("../../testWMADecoder2.tst.js");
         obj.mySound = obj.myMedia.createSound("../../testfiles/music_cut_wm9.wma");
 
         DTITLE("Playing sound...");
@@ -40,8 +46,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         obj.mySound.play();
         msleep(1000);
         obj.mySound.pause();
-        msleep(1000);     
-/*
+
         msleep(1000);
         DTITLE("Pausing sound...");
         obj.mySound.pause();
@@ -55,20 +60,38 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         DTITLE("Seek to second 1");
         obj.mySound.seek(1);
         ENSURE("Math.abs(obj.mySound.time - 1) < 0.1");
+        msleep(1000);
         
         DTITLE("Seek relative minus 0.5 seconds");
         obj.mySound.seekRelative(-0.5);
-        ENSURE("Math.abs(obj.mySound.time - 0.5) < 0.1");
+        ENSURE("Math.abs(obj.mySound.time - 1.5) < 0.2");
+        DPRINT(obj.mySound.time);
+        msleep(1000);
       
         DTITLE("Stopping sound...");
         obj.mySound.stop();
+        obj.playSound("http://himmel/testfiles/Leben.wma");
+        obj.playSound("http://himmel/testfiles/track2.mp3");
+        obj.playSound("http://himmel/testfiles/helsing.wma");
         
         ENSURE("!obj.mySound.playing");
-*/
+
         delete obj.mySound;
         gc();
         msleep(100);
         ENSURE("obj.myMedia.soundcount == 0");
+
+        ENSURE_EXCEPTION("obj.myMedia.createSound(\"../../testWMADecoder2.tst.js\")",
+                "*");
+/*        
+        var myOk = false;
+        try {
+            obj.mySound = obj.myMedia.createSound("../../testWMADecoder2.tst.js");
+        } catch (e) {
+            myOk = true;
+        }
+        ENSURE(myOk, "Invalid file causes exception.");
+*/
     }
 
     obj.run = function() {
@@ -91,6 +114,8 @@ function main() {
 rc = main();
 if (rc != 0) {
     exit(5);
-};
+} else {
+    exit(0);
+}
 
 

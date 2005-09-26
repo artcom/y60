@@ -48,7 +48,7 @@ IAudioDecoder* WMADecoder2Factory::tryCreateDecoder(const std::string& myURI) {
     if (canDecode(myURI)) {
         return new WMADecoder2(myURI);
     } else {
-        throw DecoderException(std::string("Kaputt") + myURI, 
+        throw DecoderException(std::string("Can't decode ") + myURI, 
                 PLUS_FILE_LINE);
     }
 }
