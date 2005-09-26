@@ -27,11 +27,15 @@ using namespace std;
 
 namespace asl {
 
-double      Pump::_myLatency_Init = 0.02;
+#ifdef WIN32
+double Pump::_myLatency_Init = 0.05;
+#else
+double Pump::_myLatency_Init = 0.02;
+#endif
 std::string Pump::_myDeviceName_Init = "";
-unsigned    Pump::_mySampleRate_Init = 44100;
-unsigned    Pump::_numOutputChannels_Init = 2;
-bool        Pump::_useDummy_Init = false;
+unsigned Pump::_mySampleRate_Init = 44100;
+unsigned Pump::_numOutputChannels_Init = 2;
+bool Pump::_useDummy_Init = false;
     
 Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay) 
     : AudioTimeSource(myTimeStartDelay, _mySampleRate_Init),

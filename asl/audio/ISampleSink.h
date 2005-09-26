@@ -27,7 +27,7 @@ class ISampleSink
         virtual void queueSamples(AudioBufferPtr& theBuffer) = 0;
 };
 
-typedef asl::Ptr<ISampleSink> ISampleSinkPtr;
+typedef Ptr<ISampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > ISampleSinkPtr;
 
 }
 

@@ -31,8 +31,9 @@ namespace asl {
 
 class Pump;
 class HWSampleSink;
+
 // Use this pointer as smart pointer to HWSampleSinks. If you use the default Ptr,
-// you'll get thread-specific free lists. Since lots of buffer pointers are allocated 
+// you'll get thread-specific free lists. Since lots of pointers are allocated 
 // in one thread and deleted in another, that will cause memory leaks. The 
 // PtrHeapAllocator used here is slower but works.
 typedef Ptr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkPtr;

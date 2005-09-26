@@ -62,7 +62,7 @@ Time DirectSoundPump::getCurrentTime() {
 }
 
 DirectSoundPump::DirectSoundPump () 
-    : Pump(SF_F32, 22000),
+    : Pump(SF_F32, 1),
       _myIsOutOpen(false),
       _myDS(NULL),
       _myPrimaryBuffer(NULL),
