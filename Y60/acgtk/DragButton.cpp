@@ -1,4 +1,9 @@
 #include "DragButton.h"
+#include <asl/Logger.h>
+
+#ifdef LINUX
+#   include <gdk/gdkx.h>
+#endif
 
 namespace acgtk {
 
@@ -47,6 +52,13 @@ DragButton::on_motion_notify_event(GdkEventMotion * theEvent) {
         _myDragSignal.emit(myDeltaX, myDeltaY);
         _myLastX = theEvent->x;
         _myLastY = theEvent->y;
+
+/* TODO: find a way to filter the events ... [DS]
+        GdkWindow * myGdkWindow = get_window()->gobj();
+        Display * myXDisplay = GDK_WINDOW_XDISPLAY( myGdkWindow );
+        XWarpPointer(myXDisplay, None, None, 0, 0, 0, 0,
+                     int(- myDeltaX), int(- myDeltaY));
+        */
     }
     return true;
 }
