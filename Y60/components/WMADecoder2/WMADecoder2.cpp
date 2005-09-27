@@ -61,15 +61,15 @@ WMADecoder2::~WMADecoder2()
 
 void WMADecoder2::play() {
     AC_DEBUG << "WMADecoder2::play";
-    // TODO: What do we do if paused or already playing?
-    _myState = PLAYING;
-    
-    HRESULT hr = _myReader->Start(QWORD(0), 0, 1, NULL);
-    checkForWMError(hr, "1+Could not start reader", PLUS_FILE_LINE);
-    waitForEvent();
-    checkForWMError(_myEventResult, "2+Could not start reader", PLUS_FILE_LINE);
-    _myDecodingDone = false;
-    waitForSamples();
+    if (_myState != PLAYING) {
+        _myState = PLAYING;
+        HRESULT hr = _myReader->Start(QWORD(0), 0, 1, NULL);
+        checkForWMError(hr, "1+Could not start reader", PLUS_FILE_LINE);
+        waitForEvent();
+        checkForWMError(_myEventResult, "2+Could not start reader", PLUS_FILE_LINE);
+        _myDecodingDone = false;
+        waitForSamples();
+    }
 }
 
 void WMADecoder2::stop() {
@@ -266,9 +266,9 @@ void WMADecoder2::open() {
 
     // Open file
     hr = _myReader->Open(myWideUrl.c_str(), this, 0);
-    checkForWMError(hr, string("1+Could not open file: ") + _myURI, PLUS_FILE_LINE);
+    checkForWMError(hr, string("Could not open file: ") + _myURI, PLUS_FILE_LINE);
     waitForEvent();
-    checkForWMError(_myEventResult, string("2+Could not open file: ") + _myURI, PLUS_FILE_LINE);
+    checkForWMError(_myEventResult, string("Could not open file: ") + _myURI, PLUS_FILE_LINE);
 /*
     if (_myMaxChannels > 2) {
         hr = setupMultiChannel();

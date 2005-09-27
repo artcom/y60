@@ -32,9 +32,6 @@ class WMADecoder2Factory: public IAudioDecoderFactory, public asl::PlugInBase
 
     protected:
 	    void _initializeSingletonManager(asl::SingletonManager* theSingletonManager);
-
-    private:
-        bool canDecode(const std::string & theUrl) const;
 };
 
 } // namespace

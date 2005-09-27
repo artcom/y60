@@ -36,7 +36,10 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         DTITLE("Playing sound...");
         obj.mySound.play();        
         ENSURE("obj.mySound.playing");
-        msleep(14000);
+        msleep(1000);
+        obj.mySound.seek(11);
+        ENSURE("obj.mySound.playing");
+        msleep(2000);
         // Play to end.
         ENSURE("!obj.mySound.playing");
         
