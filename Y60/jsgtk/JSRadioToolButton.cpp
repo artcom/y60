@@ -37,12 +37,31 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+set_group_from_button(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        Gtk::RadioToolButton * myNative(0);
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        Gtk::RadioToolButton * myOtherButton(0);
+        convertFrom(cx, argv[0], myOtherButton);
+
+        Gtk::RadioButtonGroup myGroup = myOtherButton->get_group();
+        myNative->set_group( myGroup);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    return JS_FALSE;
+}
+
 JSFunctionSpec *
 JSRadioToolButton::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"set_group_from_button",set_group_from_button,   1},
         {0}
     };
     return myFunctions;
@@ -51,6 +70,7 @@ JSRadioToolButton::Functions() {
 JSPropertySpec *
 JSRadioToolButton::Properties() {
     static JSPropertySpec myProperties[] = {
+        //{"group", PROP_group, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -105,11 +125,19 @@ JSRadioToolButton::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *
 
     if (argc == 0) {
         newNative = new Gtk::RadioToolButton();
-        myNewObject = new JSRadioToolButton(OWNERPTR(newNative), newNative);
+    } else if (argc == 2) {
+        Gtk::Widget * myWidget(0);
+        convertFrom(cx, argv[0], myWidget);
+
+        Glib::ustring myLabel;
+        convertFrom(cx, argv[1], myLabel);
+
+        newNative = new Gtk::RadioToolButton( * myWidget, myLabel);
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
+    myNewObject = new JSRadioToolButton(OWNERPTR(newNative), newNative);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);

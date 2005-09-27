@@ -60,4 +60,20 @@ TNTThresholdList::refresh(dom::NodePtr thePaletteNode) {
     }
 }
 
+void
+TNTThresholdList::select(dom::NodePtr theNode) {
+    int myIndex = theNode->getAttributeValue<int>("index");    
+    typedef Gtk::TreeModel::Children ChildrenT; //minimise code length.
+    ChildrenT myChildren = _myListModel->children();
+    for(ChildrenT::iterator it = myChildren.begin(); it != myChildren.end(); ++it) {
+        Gtk::TreeModel::Row myRow = *it;
+        if (myRow[_myColumns.index] == myIndex) {
+            get_selection()->select(myRow);
+            Gtk::TreePath myPath( it );
+            set_cursor( myPath );
+            return;
+        }
+    }
+}
+
 } // end of namespace

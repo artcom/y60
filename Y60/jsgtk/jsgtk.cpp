@@ -64,6 +64,7 @@
 #include "JSMessageDialog.h"
 #include "JSFileChooserDialog.h"
 #include "JSLabel.h"
+#include "JSImage.h"
 #include "JSStatusBar.h"
 #include "JSProgressBar.h"
 #include "JSVRuler.h"
@@ -230,6 +231,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSStockID::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSImage::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSLabel::initClass(cx, theGlobalObject)) {
@@ -431,6 +435,7 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::VPaned );
     TRY_DYNAMIC_CAST(Gtk::Toolbar );
     TRY_DYNAMIC_CAST(Gtk::Label );
+    TRY_DYNAMIC_CAST(Gtk::Image );
     TRY_DYNAMIC_CAST(Gtk::ProgressBar );
     TRY_DYNAMIC_CAST(Gtk::HRuler);
     TRY_DYNAMIC_CAST(Gtk::VRuler);
@@ -571,6 +576,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
                 return true;
             } else if (castFrom<Gtk::Toolbar>(cx, myArgument, theTarget)) {
                 return true;
+            } else if (castFrom<Gtk::Image>(cx, myArgument, theTarget)) {
+                return true;
             } else if (castFrom<Gtk::Label>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::Dialog>(cx, myArgument, theTarget)) {
@@ -681,6 +688,7 @@ CONVERT_FROM_GLIB_OBJECT(Gtk::HPaned);
 CONVERT_FROM_GLIB_OBJECT(Gtk::VPaned);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Paned);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Toolbar);
+CONVERT_FROM_GLIB_OBJECT(Gtk::Image);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Label);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Dialog);
 CONVERT_FROM_GLIB_OBJECT(Gtk::MessageDialog);

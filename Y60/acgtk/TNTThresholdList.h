@@ -20,6 +20,7 @@ class TNTThresholdList : public Gtk::TreeView {
         void clear();
 
         void refresh(dom::NodePtr thePaletteNode);
+        void select(dom::NodePtr thePaletteNode);
 
         enum ColumnNumbers {
             COL_INDEX,

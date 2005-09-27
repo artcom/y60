@@ -8,15 +8,15 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: JSToolbar.cpp,v $
+//   $RCSfile: JSImage.cpp,v $
 //   $Author: martin $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/21 16:25:03 $
+//   $Revision: 1.3 $
+//   $Date: 2005/04/21 16:25:02 $
 //
 //
 //=============================================================================
 
-#include "JSToolbar.h"
+#include "JSImage.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
 #include <iostream>
@@ -31,112 +31,69 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    std::string myStringRep = string("Gtk::Toolbar@") + as_string(obj);
+    std::string myStringRep = string("Gtk::Image@") + as_string(obj);
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
     *rval = STRING_TO_JSVAL(myString);
     return JS_TRUE;
 }
-
-static JSBool
-append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    try {
-        Gtk::Toolbar * myNative;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        
-        Gtk::ToolItem * myItem(0);
-        convertFrom(cx, argv[0], myItem);
-
-        myNative->append( * myItem);
-        return JS_TRUE;
-        
-    } HANDLE_CPP_EXCEPTION;
-    return JS_FALSE;
-}
-
 JSFunctionSpec *
-JSToolbar::Functions() {
+JSImage::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
-        {"append",               append,                  1},
         {0}
     };
     return myFunctions;
 }
 
+#define DEFINE_PROPERTY( NAME ) \
+    { #NAME, PROP_ ## NAME,  JSPROP_ENUMERATE|JSPROP_PERMANENT}
+
 JSPropertySpec *
-JSToolbar::Properties() {
+JSImage::Properties() {
     static JSPropertySpec myProperties[] = {
-        // {"position", PROP_position, JSPROP_ENUMERATE|JSPROP_PERMANENT},
-        {"toolbar_style", PROP_toolbar_style, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
 }
 
-// getproperty handling
+// property handling
 JSBool
-JSToolbar::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSImage::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSToolbar::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSImage::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return setPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSToolbar::getPropertySwitch(NATIVE & theNative, unsigned long theID,
+JSImage::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-    /*
-        case PROP_position:
-            *vp = as_jsval(cx, theNative.get_position());
-            return JS_TRUE;
-    */
-        case PROP_toolbar_style:
-            * vp = as_jsval(cx, static_cast<int>( theNative.get_toolbar_style()));
-            return JS_TRUE;
+        case 0:
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
-    return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
 }
 JSBool
-JSToolbar::setPropertySwitch(NATIVE & theNative, unsigned long theID,
+JSImage::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-    /*
-        case PROP_position:
-            try {
-                int thePosition;
-                convertFrom(cx, *vp, thePosition);
-                theNative.set_position(thePosition);
-                return JS_TRUE;
-            } HANDLE_CPP_EXCEPTION;
-    */
-        case PROP_toolbar_style:
-            try {
-                int myStyle;
-                convertFrom(cx, *vp, myStyle);
-                theNative.set_toolbar_style( static_cast<Gtk::ToolbarStyle>(myStyle));
-                return JS_TRUE;
-            } HANDLE_CPP_EXCEPTION;
+        case 0:
         default:
             return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
-    return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
 }
 
 JSBool
-JSToolbar::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSImage::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
@@ -146,35 +103,48 @@ JSToolbar::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 
     NATIVE * newNative = 0;
 
-    JSToolbar * myNewObject = 0;
+    JSImage * myNewObject = 0;
 
-    if (argc == 0) {
-        newNative = new NATIVE();
-        myNewObject = new JSToolbar(OWNERPTR(newNative), newNative);
-    } else {
+    switch (argc) {
+    case 0:
+        newNative = new NATIVE;
+        break;
+    case 1:
+        { 
+            // load image from file ctor
+            Glib::ustring myString;
+            if ( ! convertFrom(cx, argv[0], myString)) {
+                JS_ReportError(cx,"Constructor for %s: argument 0 must be a string", ClassName());
+                return JS_FALSE;
+            }
+            newNative = new NATIVE(myString);
+        }
+        break;
+    default:
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
+    myNewObject = new JSImage(OWNERPTR(newNative), newNative);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
         return JS_TRUE;
     }
-    JS_ReportError(cx,"JSToolbar::Constructor: bad parameters");
+    JS_ReportError(cx,"JSImage::Constructor: bad parameters");
     return JS_FALSE;
 }
 
 void
-JSToolbar::addClassProperties(JSContext * cx, JSObject * theClassProto) {
+JSImage::addClassProperties(JSContext * cx, JSObject * theClassProto) {
     JSBASE::addClassProperties(cx, theClassProto);
     JSA_AddFunctions(cx, theClassProto, Functions());
     JSA_AddProperties(cx, theClassProto, Properties());
-    createClassModuleDocumentation("gtk", ClassName(), Properties(), Functions(),
-            0, 0, 0, JSBASE::ClassName());
+    createClassModuleDocumentation("gtk", ClassName(), Properties(), Functions(), 0, 0, 0,
+                JSBASE::ClassName());
 }
 
 JSObject *
-JSToolbar::initClass(JSContext *cx, JSObject *theGlobalObject) {
+JSImage::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0,0);
     if (myClassObject) {
         addClassProperties(cx, myClassObject);
@@ -184,16 +154,14 @@ JSToolbar::initClass(JSContext *cx, JSObject *theGlobalObject) {
 //        JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
 //        JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
     } else {
-        cerr << "JSToolbar::initClass: constructor function object not found, could not initialize static members"<<endl;
+        cerr << "JSImage::initClass: constructor function object not found, could not initialize static members"<<endl;
     }
     return myClassObject;
 }
 
-jsval as_jsval(JSContext *cx, JSToolbar::OWNERPTR theOwner, JSToolbar::NATIVE * theNative) {
-    JSObject * myReturnObject = JSToolbar::Construct(cx, theOwner, theNative);
+jsval as_jsval(JSContext *cx, JSImage::OWNERPTR theOwner, JSImage::NATIVE * theNative) {
+    JSObject * myReturnObject = JSImage::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
 }
-
-

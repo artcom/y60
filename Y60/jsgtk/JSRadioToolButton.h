@@ -43,7 +43,8 @@ class JSRadioToolButton : public JSWrapper<Gtk::RadioToolButton, asl::Ptr<Gtk::R
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
-             PROP_END = JSBASE::PROP_END
+             PROP_group = JSBASE::PROP_END,
+             PROP_END
         };
         static JSPropertySpec * Properties();
 

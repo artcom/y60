@@ -65,6 +65,30 @@ refresh(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+select(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    
+    try {
+
+        ensureParamCount(argc, 1);
+
+        acgtk::TNTThresholdList * myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        dom::NodePtr myPaletteItem;
+        if ( ! convertFrom(cx, argv[0], myPaletteItem)) {
+            JS_ReportError(cx, "TNTThresholdList::refresh(): Argument 0 must be a xml node.");
+            return JS_FALSE;
+        }
+
+        myNative->select(myPaletteItem);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -88,6 +112,7 @@ JSTNTThresholdList::Functions() {
         // name                      native                    nargs
         {"toString",                 toString,                 0},
         {"refresh",                  refresh,                  1},
+        {"select",                   select,                   1},
         {"clear",                    clear,                    0},
         {0}
     };

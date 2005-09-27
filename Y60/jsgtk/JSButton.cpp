@@ -293,11 +293,16 @@ JSButton::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 
     if (argc == 0) {
         newNative = new Gtk::Button();
-        myNewObject = new JSButton(OWNERPTR(newNative), newNative);
+    } else if (argc == 1) {
+        Glib::ustring myLable;
+        convertFrom(cx, argv[0], myLable);
+
+        newNative = new Gtk::Button(myLable);
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
+    myNewObject = new JSButton(OWNERPTR(newNative), newNative);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);

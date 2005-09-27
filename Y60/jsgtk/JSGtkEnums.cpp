@@ -93,6 +93,11 @@ enum PropertyNumbers {
     PROP_BUTTONBOX_EDGE,
     PROP_BUTTONBOX_START,
     PROP_BUTTONBOX_END,
+    //Gtk::ButtonBoxStyle
+    PROP_TOOLBAR_ICONS,
+    PROP_TOOLBAR_TEXT,
+    PROP_TOOLBAR_BOTH,
+    PROP_TOOLBAR_BOTH_HORIZ,
     // === PROP_END =====
     PROP_END
 };
@@ -134,6 +139,11 @@ JSGtk::ConstIntProperties() {
         DEFINE_GTK_PROP(BUTTONBOX_EDGE),
         DEFINE_GTK_PROP(BUTTONBOX_START),
         DEFINE_GTK_PROP(BUTTONBOX_END),
+
+        DEFINE_GTK_PROP(TOOLBAR_ICONS),
+        DEFINE_GTK_PROP(TOOLBAR_TEXT),
+        DEFINE_GTK_PROP(TOOLBAR_BOTH),
+        DEFINE_GTK_PROP(TOOLBAR_BOTH_HORIZ),
        {0}
     };
     return myProperties;

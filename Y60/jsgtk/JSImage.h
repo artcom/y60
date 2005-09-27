@@ -8,45 +8,45 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: JSToolbar.h,v $
-//   $Author: martin $
-//   $Revision: 1.1 $
-//   $Date: 2004/11/27 16:22:00 $
+//   $RCSfile: JSImage.h,v $
+//   $Author: david $
+//   $Revision: 1.2 $
+//   $Date: 2005/02/07 18:17:21 $
 //
 //
 //=============================================================================
 
-#ifndef _Y60_ACGTKSHELL_JSTOOLBAR_INCLUDED_
-#define _Y60_ACGTKSHELL_JSTOOLBAR_INCLUDED_
+#ifndef _Y60_ACGTKSHELL_JSIMAGE_INCLUDED_
+#define _Y60_ACGTKSHELL_JSIMAGE_INCLUDED_
 
-#include "JSContainer.h"
-
-#include <y60/JSWrapper.h>
-#include <gtkmm/toolbar.h>
+#include "JSMisc.h"
 
 #include <asl/string_functions.h>
+#include <y60/JSWrapper.h>
+
+#include <gtkmm/image.h>
+
 
 namespace jslib {
 
-class JSToolbar : public JSWrapper<Gtk::Toolbar, asl::Ptr<Gtk::Toolbar>, StaticAccessProtocol> {
-        JSToolbar();  // hide default constructor
-        typedef JSContainer JSBASE;
+class JSImage : public JSWrapper<Gtk::Image, asl::Ptr<Gtk::Image>, StaticAccessProtocol> {
+    private:
+        JSImage();  // hide default constructor
+        typedef JSMisc JSBASE;
     public:
-        virtual ~JSToolbar() {
+        virtual ~JSImage() {
         }
-        typedef Gtk::Toolbar NATIVE;
-        typedef asl::Ptr<Gtk::Toolbar> OWNERPTR;
+        typedef Gtk::Image NATIVE;
+        typedef asl::Ptr<Gtk::Image> OWNERPTR;
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
         static const char * ClassName() {
-            return "Toolbar";
+            return "Image";
         };
-
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
-            PROP_toolbar_style = JSBASE::PROP_END,
-            PROP_END
+            PROP_END = JSBASE::PROP_END
         };
 
         static JSPropertySpec * Properties();
@@ -70,30 +70,28 @@ class JSToolbar : public JSWrapper<Gtk::Toolbar, asl::Ptr<Gtk::Toolbar>, StaticA
             return Base::Construct(cx, theOwner, theNative);
         }
 
-        JSToolbar(OWNERPTR theOwner, NATIVE * theNative)
+        JSImage(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
-        { }
+        {}
 
         static JSConstIntPropertySpec * ConstIntProperties();
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
         static void addClassProperties(JSContext * cx, JSObject * theClassProto);
 
-        static JSToolbar & getObject(JSContext *cx, JSObject * obj) {
-            return dynamic_cast<JSToolbar &>(JSToolbar::getJSWrapper(cx,obj));
+        static JSImage & getObject(JSContext *cx, JSObject * obj) {
+            return dynamic_cast<JSImage &>(JSImage::getJSWrapper(cx,obj));
         }
 
     private:
 };
 
 template <>
-struct JSClassTraits<JSToolbar::NATIVE>
-    : public JSClassTraitsWrapper<JSToolbar::NATIVE, JSToolbar> {};
+struct JSClassTraits<JSImage::NATIVE>
+    : public JSClassTraitsWrapper<JSImage::NATIVE, JSImage> {};
 
-jsval as_jsval(JSContext *cx, JSToolbar::OWNERPTR theOwner, JSToolbar::NATIVE * theBin);
+jsval as_jsval(JSContext *cx, JSImage::OWNERPTR theOwner, JSImage::NATIVE * theImage);
 
 } // namespace
 
 #endif
-
-
 

@@ -16,6 +16,7 @@
 //
 //=============================================================================
 
+#include "JSWindow.h"
 #include "JSDialog.h"
 #include "JSStockID.h"
 #include "JSSignalProxies.h"
@@ -178,6 +179,28 @@ JSDialog::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
         // newNative->set_events(Gdk::ALL_EVENTS_MASK);
 
         myNewObject = new JSDialog(OWNERPTR(newNative), newNative);
+    } else if (argc == 2 ) {
+        Glib::ustring myTitle;
+        if ( ! convertFrom(cx, argv[0], myTitle)) {
+            JS_ReportError(cx,"Constructor for %s: Argument 1 must be a string.",ClassName());
+            return JS_FALSE;
+        }
+
+        Gtk::Window * myParent(0);
+        if ( ! convertFrom(cx, argv[1], myParent)) {
+            JS_ReportError(cx,"Constructor for %s: Argument 2 must be Gtk::Window.",ClassName());
+            return JS_FALSE;
+        }
+        if ( ! myParent ) {
+            JS_ReportError(cx,"Constructor for %s: Failed to get parent window.",ClassName());
+            return JS_FALSE;
+        }
+        AC_WARNING << "Creating dialog with parent.";
+
+        newNative = new NATIVE(myTitle, *myParent);
+        myNewObject = new JSDialog(OWNERPTR(newNative), newNative);
+
+        
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;

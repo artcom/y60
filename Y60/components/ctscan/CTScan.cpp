@@ -879,7 +879,7 @@ CTScan::createGrayImage(dom::NodePtr theParent, int theWidth, int theHeight, int
 
     Block myBlock(theWidth * theHeight, theValue);
     myRaster->assign(theWidth, theHeight, myBlock);
-    AC_DEBUG << "created raster of " << myRaster->width() << "x" << myRaster->height();
+    //AC_DEBUG << "created raster of " << myRaster->width() << "x" << myRaster->height();
     return myRasterNode;
 }
 
@@ -900,12 +900,12 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirty
     Box3f myNewBox = myOldBox;
     myNewBox.extendBy( theDirtyBox );
 
-    AC_INFO << "theDirtyBox = " << theDirtyBox;
-    AC_INFO << "myOldBox = " << myOldBox;
-    AC_INFO << "myNewBox = " << myNewBox;
+    //AC_INFO << "theDirtyBox = " << theDirtyBox;
+    //AC_INFO << "myOldBox = " << myOldBox;
+    //AC_INFO << "myNewBox = " << myNewBox;
 
     if (myNewBox == myOldBox) {
-        AC_INFO << "Raster box didn't change.";
+        //AC_INFO << "Raster box didn't change.";
         return;
     }
 
@@ -913,13 +913,13 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirty
 
     int myTargetWidth  = int( round(mySize[0]) );
     int myTargetHeight = int( round(mySize[1]) );
-    AC_INFO << "target width = " << myTargetWidth << " target height = " << myTargetHeight;
+    //AC_INFO << "target width = " << myTargetWidth << " target height = " << myTargetHeight;
     int myNewRasterCount  = int( round(mySize[2]) );
 
     int myNewBoxBegin = int( round( myNewBox[Box3f::MIN][2] ));
     int myNewBoxEnd   = int( round( myNewBox[Box3f::MAX][2] ));
-    AC_INFO << "myNewBoxBegin = " << myNewBoxBegin;
-    AC_INFO << "myNewBoxEnd = " << myNewBoxEnd;
+    //AC_INFO << "myNewBoxBegin = " << myNewBoxBegin;
+    //AC_INFO << "myNewBoxEnd = " << myNewBoxEnd;
 
     int myOldBoxBegin = int( round(myOldBox[Box3f::MIN][2]) );
     int myOldBoxEnd   = int( round(myOldBox[Box3f::MAX][2]) );
@@ -934,7 +934,7 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirty
     for(int i = myNewBoxBegin;i < myNewBoxEnd; ++i) {
         myNewRaster = CTScan::createGrayImage(myRasters, myTargetWidth, myTargetHeight, 0);
         if (i >= myOldBoxBegin && i < myOldBoxEnd) {
-            AC_INFO << "blitting to " << myXOrigin << "x" << myYOrigin << "on " << i;
+            //AC_INFO << "blitting to " << myXOrigin << "x" << myYOrigin << "on " << i;
             myOldRaster = myRasters->childNode(0);
             ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
                     myNewRaster->childNode(0)->nodeValueWrapperPtr());
@@ -942,7 +942,7 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirty
             myTargetRaster->pasteRaster(myXOrigin, myYOrigin, * mySourceRaster); 
             myRasters->removeChild(myOldRaster);
         } else {
-            AC_INFO << "Creating new " << i;
+            //AC_INFO << "Creating new " << i;
         }
     }
 
@@ -1194,7 +1194,7 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
 
     switch ( theOrientation) {
         case CTScan::IDENTITY: // front
-            cerr << "index = " << theSliceIndex << " bbox = " << myBoundingBox << endl;
+            //cerr << "index = " << theSliceIndex << " bbox = " << myBoundingBox << endl;
             if (theSliceIndex >= myMin[2] && theSliceIndex < myMax[2]) {
                 dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(int( theSliceIndex - myMin[2]));
                 ResizeableRasterPtr mySourceRaster =
@@ -1213,7 +1213,7 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
                                 (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
                     }
                 }
-                cerr << "done" << endl;
+                //cerr << "done" << endl;
             }
             break;
         case CTScan::Y2Z: // top
