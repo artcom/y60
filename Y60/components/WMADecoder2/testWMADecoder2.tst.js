@@ -30,7 +30,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.runWMADecoder2Test = function() {
         obj.myMedia = new SoundManager();
-        
+       
         obj.mySound = obj.myMedia.createSound("../../testfiles/music_cut_wm9.wma");
 
         DTITLE("Playing sound...");
@@ -39,6 +39,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         msleep(14000);
         // Play to end.
         ENSURE("!obj.mySound.playing");
+        
         obj.mySound.play();
         msleep(1000);
         obj.mySound.stop();
@@ -67,9 +68,10 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("Math.abs(obj.mySound.time - 1.5) < 0.2");
         DPRINT(obj.mySound.time);
         msleep(1000);
-      
+
         DTITLE("Stopping sound...");
         obj.mySound.stop();
+
         obj.playSound("http://himmel/testfiles/Leben.wma");
         obj.playSound("http://himmel/testfiles/track2.mp3");
         obj.playSound("http://himmel/testfiles/helsing.wma");
@@ -83,15 +85,6 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
 
         ENSURE_EXCEPTION("obj.myMedia.createSound(\"../../testWMADecoder2.tst.js\")",
                 "*");
-/*        
-        var myOk = false;
-        try {
-            obj.mySound = obj.myMedia.createSound("../../testWMADecoder2.tst.js");
-        } catch (e) {
-            myOk = true;
-        }
-        ENSURE(myOk, "Invalid file causes exception.");
-*/
     }
 
     obj.run = function() {

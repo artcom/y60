@@ -73,15 +73,6 @@ void FFMpegDecoder::seek (Time thePosition)
 void FFMpegDecoder::open() {
     AC_DEBUG << "FFMpegDecoder::open (" << _myURI << ")" << _myURI;
     
-    // register all formats and codecs
-    static bool avRegistered = false;
-    if (!avRegistered) {
-        AC_DEBUG << "FFMpegDecoder::open: " << LIBAVCODEC_IDENT << endl;
-        //av_log_set_level(AV_LOG_ERROR);
-        av_register_all();
-        avRegistered = true;
-    }
-    
     try {
         int err;
         if ((err = av_open_input_file(&_myFormatContext, _myURI.c_str(), 0, 0, 0)) < 0) {
@@ -113,10 +104,12 @@ void FFMpegDecoder::open() {
         AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
         AVCodec * myCodec = avcodec_find_decoder(myCodecContext->codec_id);
         if (!myCodec) {
-            throw DecoderException(std::string("Unable to find decoder: ") + _myURI, PLUS_FILE_LINE);
+            throw DecoderException(std::string("Unable to find decoder: ") + _myURI, 
+                    PLUS_FILE_LINE);
         }
         if (avcodec_open(myCodecContext, myCodec) < 0 ) {
-            throw DecoderException(std::string("Unable to open codec: ") + _myURI, PLUS_FILE_LINE);
+            throw DecoderException(std::string("Unable to open codec: ") + _myURI, 
+                    PLUS_FILE_LINE);
         }
 
         _mySampleRate = myCodecContext->sample_rate;

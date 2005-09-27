@@ -31,6 +31,8 @@ WMADecoder2::WMADecoder2 (const string& myURI)
       _mySampleSink(0),
       _myReader(0),
       _myDecodingDone(false),
+      _myResampleContext(0),
+      _myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
       _myState(STOPPED)
 {
     AC_DEBUG << "WMADecoder2::WMADecoder2";
@@ -170,13 +172,11 @@ WMADecoder2::Release() {
 }
 
 HRESULT STDMETHODCALLTYPE WMADecoder2::OnSample(DWORD theOutputNumber,
-        QWORD theSampleTime,
-        QWORD theSampleDuration,
-        DWORD theFlags,
-        INSSBuffer __RPC_FAR *theSample,
-        void __RPC_FAR *theContext)
+        QWORD theSampleTime, QWORD theSampleDuration, DWORD theFlags,
+        INSSBuffer __RPC_FAR *theSample, void __RPC_FAR *theContext)
 {
     if (theOutputNumber == _myAudioOutputId) {
+// TODO: Check locking
 //        asl::AutoLocker<BufferedSource> myLocker(*this);
         BYTE * myBuffer;
         DWORD myBufferLength;
@@ -184,8 +184,18 @@ HRESULT STDMETHODCALLTYPE WMADecoder2::OnSample(DWORD theOutputNumber,
         checkForWMError(hr, "Could not get buffer from sample", PLUS_FILE_LINE);
         AudioBufferPtr myAudioBuffer;
         int numFrames = myBufferLength/(_myNumChannels*2);  // Assumes BitsPerSample is 16!
-        myAudioBuffer = _mySampleSink->createBuffer(numFrames);
-        myAudioBuffer->convert(myBuffer, SF_S16, _myNumChannels);
+        if (_myResampleContext) {
+            numFrames = audio_resample(_myResampleContext, 
+                    (int16_t*)(_myResampledSamples.begin()),
+                    (int16_t*)(myBuffer), 
+                    numFrames);
+            myAudioBuffer = _mySampleSink->createBuffer(numFrames);
+            myAudioBuffer->convert(_myResampledSamples.begin(), SF_S16, 
+                    _myNumChannels);
+        } else {
+            myAudioBuffer = _mySampleSink->createBuffer(numFrames);
+            myAudioBuffer->convert(myBuffer, SF_S16, _myNumChannels);
+        }
         _mySampleSink->queueSamples(myAudioBuffer);
         SetEvent(_mySampleEvent);
         AC_DEBUG << "OnSample, BufferLength: " << myBufferLength;
@@ -209,19 +219,16 @@ HRESULT STDMETHODCALLTYPE WMADecoder2::OnStatus(WMT_STATUS theStatus,
             DB(cerr << ">>> Started. " << (void*)this << endl;)
             _myEventResult = hr;
             SetEvent(_myEvent);
-//            setRunning(true);
             break;
         case WMT_STOPPED:
             DB(cerr << ">>> Stopped. " << (void*)this << endl;)
             _myEventResult = hr;
             SetEvent(_myEvent);
-//            BufferedSource::stop();
             break;
         case WMT_CLOSED:
             DB(cerr << ">>> Closed the file. " << (void*)this << endl;)
             _myEventResult = hr;
             SetEvent(_myEvent);
-//            BufferedSource::stop();
             break;
         case WMT_END_OF_STREAMING:
             DB(cerr << ">>> End of file." << endl;)
@@ -265,7 +272,8 @@ void WMADecoder2::open() {
 /*
     if (_myMaxChannels > 2) {
         hr = setupMultiChannel();
-        checkForWMError(hr, string("2+Could not setup Multichannel for file: ") + _myURI, PLUS_FILE_LINE);
+        checkForWMError(hr, string("2+Could not setup Multichannel for file: ") 
+                + _myURI, PLUS_FILE_LINE);
     }
 */
     IWMReaderAdvanced * myAdvReader; 
@@ -294,8 +302,11 @@ void WMADecoder2::close() {
         _myReader->Release();
         _myReader = NULL;
     }
+    if (_myResampleContext) {
+        audio_resample_close(_myResampleContext);
+        _myResampleContext = 0;
+    }
 }
-
 
 void
 WMADecoder2::setupAudio() {
@@ -340,7 +351,7 @@ WMADecoder2::setupAudio() {
     
         if (myMediaType->formattype == WMFORMAT_WaveFormatEx) {
             WAVEFORMATEX * myAudioInfo = (WAVEFORMATEX *)myMediaType->pbFormat;
-        if (myAudioInfo->cbSize == 22) {
+            if (myAudioInfo->cbSize == 22) {
                 cout << "extension" << endl;
             }
             _myNumChannels  = myAudioInfo->nChannels ;
@@ -349,11 +360,15 @@ WMADecoder2::setupAudio() {
                 throw DecoderException(_myURI+" has unsupported bits per sample "+
                         asl::as_string(myAudioInfo->wBitsPerSample), PLUS_FILE_LINE);
             }
+            if (_mySampleRate != Pump::get().getNativeSampleRate()) {
+                _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,    
+                        Pump::get().getNativeSampleRate(), _mySampleRate);
+            }
         }
 
         if (myMediaType) {
             delete[] myMediaType;
-    }
+        }
 
         if (myOutputProperties) {
             myOutputProperties->Release();

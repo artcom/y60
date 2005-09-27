@@ -24,6 +24,12 @@ const double myTimePerSlice = 0.05;
     
 SoundManager::SoundManager() {
     AC_DEBUG << "SoundManager::SoundManager";
+    
+    // Initialize ffmpeg 
+    AC_DEBUG << "Soundmanager: using " << LIBAVCODEC_IDENT << endl;
+    //av_log_set_level(AV_LOG_ERROR);
+    av_register_all();
+    
     _myFFMpegDecoderFactory = new FFMpegDecoderFactory;
     registerDecoderFactory(_myFFMpegDecoderFactory);
     fork();

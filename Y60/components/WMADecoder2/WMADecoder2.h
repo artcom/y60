@@ -19,6 +19,11 @@
 
 #include <wmsdk/wmsdk.h>
 
+#ifdef WIN32
+#define EMULATE_INTTYPES
+#endif
+#include <ffmpeg/avformat.h> // For resampling
+
 namespace y60 {
 
 class WMADecoder2: public IAudioDecoder, public IWMReaderCallback
@@ -88,6 +93,8 @@ class WMADecoder2: public IAudioDecoder, public IWMReaderCallback
         asl::ISampleSink* _mySampleSink;
         bool _myDecodingDone;
         bool _myUseUserClock;
+        ReSampleContext * _myResampleContext;
+        asl::Block _myResampledSamples;
         
         enum State {STOPPED, PAUSED, PLAYING};
         State _myState;
