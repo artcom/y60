@@ -195,8 +195,6 @@ JSDialog::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
             JS_ReportError(cx,"Constructor for %s: Failed to get parent window.",ClassName());
             return JS_FALSE;
         }
-        AC_WARNING << "Creating dialog with parent.";
-
         newNative = new NATIVE(myTitle, *myParent);
         myNewObject = new JSDialog(OWNERPTR(newNative), newNative);
 
