@@ -88,6 +88,17 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
 
         ENSURE_EXCEPTION("obj.myMedia.createSound(\"../../testWMADecoder2.tst.js\")",
                 "*");
+
+        // Stress test - runs for hours :-)
+        // Starts 5 sounds per second.
+/*        
+        for (var i=0; i<5*60*60*8; ++i) {
+            var mySound = obj.myMedia.createSound("../../testfiles/music_cut_wm9.wma");
+            mySound.play();
+            msleep(200);
+            gc();
+        }
+*/
     }
 
     obj.run = function() {

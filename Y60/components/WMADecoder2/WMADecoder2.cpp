@@ -33,18 +33,35 @@ WMADecoder2::WMADecoder2 (const string& myURI)
       _myDecodingDone(false),
       _myResampleContext(0),
       _myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
-      _myState(STOPPED)
+      _myState(STOPPED),
+      _myEvent(0),
+      _mySampleEvent(0)
 {
-    AC_DEBUG << "WMADecoder2::WMADecoder2";
-    _myEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (!_myEvent) {
-        throw DecoderException("Create Event failed", PLUS_FILE_LINE);
+    try {
+        AC_DEBUG << "WMADecoder2::WMADecoder2";
+        _myEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+        if (!_myEvent) {
+            throw DecoderException("Create Event failed", PLUS_FILE_LINE);
+        }
+        _mySampleEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+        if (!_mySampleEvent) {
+            throw DecoderException("Create Event failed", PLUS_FILE_LINE);
+        }
+        open();
+    } catch (...) {
+        cerr << "exeception in constructor" << endl;
+        if (_myEvent) {
+            CloseHandle(_myEvent);
+        }
+        cerr << "1" << endl;
+        if (_mySampleEvent) {
+            CloseHandle(_mySampleEvent);
+        }
+        cerr << "2" << endl;
+        close();
+        cerr << "3" << endl;
+        throw;
     }
-    _mySampleEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (!_mySampleEvent) {
-        throw DecoderException("Create Event failed", PLUS_FILE_LINE);
-    }
-    open();
 }
 
 WMADecoder2::~WMADecoder2()
@@ -140,6 +157,7 @@ void WMADecoder2::setTime(asl::Time myTime) {
         hr = myAdvReader->DeliverTime(QWORD((myTime+1.0)*1000*1000*10));
         checkForWMError(hr, string("DeliverTime failed for ") + _myURI,
                 PLUS_FILE_LINE);
+        myAdvReader->Release();
     }
 }
 
@@ -198,7 +216,7 @@ HRESULT STDMETHODCALLTYPE WMADecoder2::OnSample(DWORD theOutputNumber,
         }
         _mySampleSink->queueSamples(myAudioBuffer);
         SetEvent(_mySampleEvent);
-        AC_DEBUG << "OnSample, BufferLength: " << myBufferLength;
+//        AC_DEBUG << "OnSample, BufferLength: " << myBufferLength;
     }
     return S_OK;
 }
@@ -281,6 +299,7 @@ void WMADecoder2::open() {
     checkForWMError(hr, string("QueryInterface(IWMReaderAdvanced) failed for ") + _myURI,
             PLUS_FILE_LINE);
     hr = myAdvReader->SetUserProvidedClock(true);
+    myAdvReader->Release();
     if (hr == NS_E_INVALID_REQUEST) {
         AC_WARNING << "WMADecoder2::open: Stream does not support user-provided clock.";
         _myUseUserClock = false;
@@ -391,6 +410,7 @@ void WMADecoder2::preroll(asl::Time thePosition) {
     checkForWMError(hr, string("QueryInterface(IWMReaderAdvanced2) failed for ") + _myURI,
             PLUS_FILE_LINE);
     myAdvReader->Preroll(QWORD((double)thePosition*1000*1000*10), 0, 1);
+    myAdvReader->Release();
 }
 
 void WMADecoder2::waitForSamples() {
