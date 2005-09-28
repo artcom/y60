@@ -125,6 +125,7 @@ void TestPump::testMix() {
     msleep(100);
     mySampleSink1 = HWSampleSinkPtr(0);
     mySampleSink2 = HWSampleSinkPtr(0);
+    msleep(100);
     ENSURE(myPump.getNumSinks() == 0);
 }
 
