@@ -1213,7 +1213,7 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
                                 (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
                     }
                 }
-                //cerr << "done" << endl;
+                // cerr << "done" << endl;
             }
             break;
         case CTScan::Y2Z: // top

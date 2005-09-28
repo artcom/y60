@@ -54,6 +54,7 @@ namespace inet {
             void setVerbose(bool theVerboseFlag);
             void setSSLCertificate(const std::string & theCertificateFilename);
             void setCookie(const std::string & theCookie);
+            void setResume(long theResumeOffset);
 
             // request-method type methods
             size_t post(const std::string & thePostData);

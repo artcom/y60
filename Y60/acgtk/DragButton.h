@@ -39,8 +39,8 @@ class DragButton : public EmbeddedButton {
         bool on_leave_notify_event(GdkEventCrossing * theEvent);
     private:
         bool _myDragInProgressFlag;
-        double _myLastX;
-        double _myLastY;
+        int _myLastX;
+        int _myLastY;
     
         sigc::signal<void, double, double> _myDragStartSignal;
         sigc::signal<void, double, double> _myDragSignal;

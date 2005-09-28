@@ -102,6 +102,13 @@ namespace inet {
         return _myURL;
     }
 
+    void 
+    Request::setResume(long theResumeOffset) {
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_RESUME_FROM, theResumeOffset);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    }
+
+
     long
     Request::getResponseCode() const {
         long myResponseCode = 0;
