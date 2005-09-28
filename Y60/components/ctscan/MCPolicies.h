@@ -339,7 +339,17 @@ namespace y60 {
                             as_string(int(firstValue)) + " and second: " + as_string(int(secondValue)), PLUS_FILE_LINE);
                     }
                 }
-            }            
+            }       
+            inline float interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
+                const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
+            //inline float interpolateNormal(const VoxelT & theFirstValue, const VoxelT & theSecondValue, int theIndex, bool theUpperFlag)
+            {
+                if (!theUpperFlag) {
+                    return float((_myThresholds[0] - theFirstValue) - (_myThresholds[0] - theSecondValue));
+                } else {
+                    return float((_myThresholds[1] - theFirstValue) - (_myThresholds[1] - theSecondValue));
+                }
+            }
 
             inline void fillThresholdCube(int theI, int theJ, int theK) {
             }
@@ -377,21 +387,37 @@ namespace y60 {
                 _myBoundingBox[asl::Box3i::MAX][1] = int( myBoundingBox[asl::Box3f::MAX][1] );
                 _myBoundingBox[asl::Box3i::MAX][2] = int( myBoundingBox[asl::Box3f::MAX][2] );
             }
+
             inline bool
             isOutside(int x, int y, int z, VoxelT theValue) const {
                 const asl::Vector2<VoxelT> & myThreshold = getThreshold(x, y, z);
                 return theValue < myThreshold[0] || theValue > myThreshold[1];
             }
-            inline float interpolatePosition(const std::vector<VoxelT> & theVoxelCube,
-                         int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const 
+
+            inline float 
+            interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
+                const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
+            {
+                const asl::Vector2<VoxelT> & myFirstThreshold  = _myThresholdCube[theFirstIndex];
+                const asl::Vector2<VoxelT> & mySecondThreshold = getThreshold(theSecondPosition[0], theSecondPosition[1], theSecondPosition[2]);
+                if (theUpperFlag) {
+                    return float((theFirstValue - myFirstThreshold[0]) - (theSecondValue - mySecondThreshold[0]));
+                    //return float((myFirstThreshold[0] - theFirstValue) - (mySecondThreshold[0] - theSecondValue));
+                    //return float((myFirstThreshold[0] - theFirstValue) - (mySecondThreshold[0] - theSecondValue));
+                } else {
+                    return float((theFirstValue - myFirstThreshold[1]) - (theSecondValue - mySecondThreshold[1]));
+                }
+            }
+
+            inline float 
+            interpolatePosition(const std::vector<VoxelT> & theVoxelCube,
+                int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const 
             {
                 const VoxelT & firstValue = theVoxelCube[theFirstIndex];
                 const VoxelT & secondValue = theVoxelCube[theSecondIndex];
                 
                 const asl::Vector2<VoxelT> & firstThreshold  = _myThresholdCube[theFirstIndex];
                 const asl::Vector2<VoxelT> & secondThreshold = _myThresholdCube[theSecondIndex];
-                
-
                 if ((firstValue <= firstThreshold[0] && secondValue >= secondThreshold[0]) ||
                     (firstValue >= firstThreshold[0] && secondValue <= secondThreshold[0])) 
                 {
@@ -413,7 +439,7 @@ namespace y60 {
                     }
                 }
             }
-   
+
             inline void fillThresholdCube(int theI, int theJ, int theK) {
                 _myThresholdCube.clear();
                 _myThresholdCube.reserve(8);
@@ -431,14 +457,14 @@ namespace y60 {
             inline
             const asl::Vector2<VoxelT> &
             getThreshold(int theX, int theY, int theZ) const {
-                int x = theX * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][0]; 
-                int y = theY * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][1]; 
-                int z = theZ * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][2]; 
-                x = std::min(x, _myBoundingBox[asl::Box3i::MAX][0] - _myBoundingBox[asl::Box3i::MIN][0]-1); 
-                y = std::min(y, _myBoundingBox[asl::Box3i::MAX][1] - _myBoundingBox[asl::Box3i::MIN][1]-1); 
-                z = std::min(z, _myBoundingBox[asl::Box3i::MAX][2] - _myBoundingBox[asl::Box3i::MIN][2]-1);
+                unsigned int x = theX * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][0]; 
+                unsigned int y = theY * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][1]; 
+                unsigned int z = theZ * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][2]; 
+                x = std::min(x, unsigned(_myBoundingBox[asl::Box3i::MAX][0] - _myBoundingBox[asl::Box3i::MIN][0]-1)); 
+                y = std::min(y, unsigned(_myBoundingBox[asl::Box3i::MAX][1] - _myBoundingBox[asl::Box3i::MIN][1]-1)); 
+                z = std::min(z, unsigned(_myBoundingBox[asl::Box3i::MAX][2] - _myBoundingBox[asl::Box3i::MIN][2]-1));
                 asl::Vector4f myPixel =  _mySegmentationBitmaps[z]->getPixel(x,y); 
-                unsigned char myIndex = (VoxelT) myPixel[0];
+                unsigned char myIndex = (unsigned char) myPixel[0];
                 return _myThresholdPalette[myIndex]; 
             }
 

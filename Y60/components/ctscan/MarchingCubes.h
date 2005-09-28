@@ -34,6 +34,14 @@
 #include <algorithm>
 #include <stdio.h>
 
+
+#ifdef ASSURE_POLICY
+#undef ASSURE_POLICY
+#endif
+#define ASSURE_POLICY AssurePolicy::Throw
+
+#include <asl/Assure.h>
+
 //#define MC_DONT_SHARE_VERTICES
 
 typedef unsigned char VmDataValue;
@@ -191,6 +199,8 @@ namespace y60 {
                 BIT_7 = 128
             };
 
+
+
             void checkBox(asl::Box3i & theBox) {
                 std::string myBoxIsBrokenMsg(std::string("MarchingCubes::CheckBox: Wrong box size! ") +
                                 "(Dimension: min: 2x2x2, max: " + asl::as_string(_myDimensions[0]) + "x" +
@@ -226,8 +236,6 @@ namespace y60 {
                     DB(AC_TRACE << "     edge case :" << myEdges[i]);
                     myPositionIndex = -1;
 #ifndef MC_DONT_SHARE_VERTICES
-//                    int myReference;
-//                    int myNewCache;
                     switch (myEdges[i]) {
                         case 0:
                             myPositionIndex = theLowerCache.get(iMarch, jMarch).j;
@@ -295,12 +303,27 @@ namespace y60 {
                 _myOutputPolicy.onHalfEdges(myCubeCase, myEdgeTable);
             }
 
-            inline void calcGradient(float dx, float dy, float dz, asl::Vector3f & g) const {
-                g[0] = dx / _myVoxelSize[0];
-                g[1] = dy / _myVoxelSize[1];
-                g[2] = dz / _myVoxelSize[2];
+            inline void computeGradient(unsigned theCubeIndex, const asl::Vector3i & thePosition, asl::Vector3f & theGradient, bool theUpperFlag) const {
+                asl::Vector3i myDoublePos = 2*_myCubeTable[theCubeIndex];
+                //VoxelT myFirstValue, mySecondValue;
 
-                g.normalize();
+                for (int i = 0; i < 3; ++i) {
+                    int myIndex = _myAdjacents[theCubeIndex][i];
+                    asl::Vector3i myOffset = myDoublePos - _myCubeTable[myIndex];
+                    //if (_myCubeTable[myIndex][i]) {
+                    //    myFirstValue = _myCurrent[myIndex];
+                    //    mySecondValue = clampedAt(thePosition + myOffset);
+                    //} else {
+                    //    myFirstValue = clampedAt(thePosition + myOffset);
+                    //    mySecondValue = _myCurrent[myIndex];
+                    //}
+                    //theGradient[i] = _mySegmentizer.interpolateNormal(myFirstValue, mySecondValue, theCubeIndex, theUpperFlag) / _myVoxelSize[i];
+                    theGradient[i] = _mySegmentizer.interpolateNormal(_myCurrent[myIndex], myIndex, clampedAt(thePosition + myOffset), thePosition + myOffset, theUpperFlag) / _myVoxelSize[i];
+                    if (_myCubeTable[myIndex][i]) {
+                        theGradient[i] = -theGradient[i];
+                    }
+                }
+                theGradient.normalize();
             }
 
             inline void computeVertexPosition (int n, const asl::Vector3i & theMarchPos, 
@@ -310,8 +333,9 @@ namespace y60 {
                 int jMarch = theMarchPos[1];
                 int kMarch = theMarchPos[2];
                 float li = 0.5f;
-                asl::Vector3f g0, g1, g2, g3, g4, g5, g6, g7;
+                asl::Vector3f myGradient1, myGradient2;
                 bool myInsideOutFlag;
+                //int CUBEPAIRS[][] = {{0,1}, {1,2}, {3,2}, {0,3}, {4,5}, {5,6}, {7,6}, {4,7}, {0,4}, {1,5}, {2,6}, {3,7}};
                 switch(n) {
                     case 0:
                         li = _mySegmentizer.interpolatePosition(_myCurrent, 0,1, myInsideOutFlag);
@@ -320,9 +344,8 @@ namespace y60 {
                         thePosition[1] = ((float)jMarch + li) * _myVoxelSize[1];
                         thePosition[2] = (float)(kMarch) * _myVoxelSize[2];
                         if (theNormal){
-                            calcGradient(float(_myCurrent[3]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch)), float(_myCurrent[1]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch)), float(_myCurrent[4]) - clampedAt(asl::Vector3i(iMarch, jMarch, kMarch-1)), g0);
-                            calcGradient(float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch))) - _myCurrent[0], float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch-1)), g1);
-                            *theNormal = -1.0 * (g0 + li * (g1 - g0));
+                            computeGradient(0, theMarchPos, myGradient1, myInsideOutFlag);
+                            computeGradient(1, theMarchPos, myGradient2, myInsideOutFlag);
                         }
                         break;
 
@@ -334,9 +357,8 @@ namespace y60 {
                         thePosition[2] = (float)(kMarch) * _myVoxelSize[2];
 
                         if (theNormal) {
-                            calcGradient(float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch))) - _myCurrent[0], float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch-1)), g1);
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch))) - _myCurrent[1], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch))) - _myCurrent[3], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch-1)), g2);
-                            *theNormal = -1.0 * (g1 + li * (g2 - g1));
+                            computeGradient(1, theMarchPos, myGradient1, myInsideOutFlag);
+                            computeGradient(2, theMarchPos, myGradient2, myInsideOutFlag);
                         }
                         break;
 
@@ -347,9 +369,8 @@ namespace y60 {
                         thePosition[2] = (float)(kMarch) * _myVoxelSize[2];
 
                         if(theNormal){
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch))) - _myCurrent[1], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch))) - _myCurrent[3], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch-1)), g2);
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch))) - _myCurrent[0], float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch)), float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch-1)), g3);
-                            *theNormal = -1.0 * (g3 + li * (g2 - g3));
+                            computeGradient(3, theMarchPos, myGradient1, myInsideOutFlag);
+                            computeGradient(2, theMarchPos, myGradient2, myInsideOutFlag);
                         }
                         break;
 
@@ -360,9 +381,8 @@ namespace y60 {
                         thePosition[2] = (float)(kMarch) * _myVoxelSize[2];
 
                         if(theNormal) {
-                            calcGradient(float(_myCurrent[3]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch)), float(_myCurrent[1]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch)), float(_myCurrent[4]) - clampedAt(asl::Vector3i(iMarch, jMarch, kMarch-1)), g0);
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch))) - _myCurrent[0], float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch)), float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch-1)), g3);
-                            *theNormal = -1.0 * (g0 + li * (g3 - g0));
+                            computeGradient(3, theMarchPos, myGradient2, myInsideOutFlag);
+                            computeGradient(0, theMarchPos, myGradient1, myInsideOutFlag);
                         }
                         break;
 
@@ -373,9 +393,8 @@ namespace y60 {
                         thePosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
 
                         if(theNormal) {
-                            calcGradient(float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch+1)), float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch, kMarch+2))) - _myCurrent[0], g4);
-                            calcGradient(float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch+1))) - _myCurrent[4], float(clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch+2))) - _myCurrent[1], g5);
-                            *theNormal = -1.0 * (g4 + li * (g5 - g4));
+                            computeGradient(5, theMarchPos, myGradient2, myInsideOutFlag);
+                            computeGradient(4, theMarchPos, myGradient1, myInsideOutFlag);
                         }
                         break;
 
@@ -386,9 +405,8 @@ namespace y60 {
                         thePosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
 
                         if(theNormal) {
-                            calcGradient(float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch+1))) - _myCurrent[4], float(clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch+2))) - _myCurrent[1], g5);
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch+1))) - _myCurrent[5], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch+1))) - _myCurrent[7], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch+2))) - _myCurrent[2], g6);
-                            *theNormal = -1.0 * (g5 + li * (g6 - g5));
+                            computeGradient(6, theMarchPos, myGradient2, myInsideOutFlag);
+                            computeGradient(5, theMarchPos, myGradient1, myInsideOutFlag);
                         }
                         break;
 
@@ -399,9 +417,8 @@ namespace y60 {
                         thePosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
 
                         if(theNormal) {
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch+1))) - _myCurrent[5], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch+1))) - float(_myCurrent[7]), float(clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch+2))) - _myCurrent[2], g6);
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch+1))) - _myCurrent[4], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch+2))) - _myCurrent[3], g7);
-                            *theNormal = -1.0 * (g7 + li * (g6 - g7));
+                            computeGradient(6, theMarchPos, myGradient2, myInsideOutFlag);
+                            computeGradient(7, theMarchPos, myGradient1, myInsideOutFlag);
                         }
                         break;
 
@@ -412,9 +429,8 @@ namespace y60 {
                         thePosition[2] = (float)(kMarch + 1) * _myVoxelSize[2];
 
                         if(theNormal) {
-                            calcGradient(float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch+1)), float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch, kMarch+2))) - _myCurrent[0], g4);
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch+1))) - _myCurrent[4], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch+2))) - _myCurrent[3], g7);
-                            *theNormal = -1.0 * (g4 + li * (g7 - g4));
+                            computeGradient(4, theMarchPos, myGradient1, myInsideOutFlag);
+                            computeGradient(7, theMarchPos, myGradient2, myInsideOutFlag);
                         }
                         break;
 
@@ -425,9 +441,8 @@ namespace y60 {
                         thePosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(theNormal) {
-                            calcGradient(float(_myCurrent[3]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch)), float(_myCurrent[1]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch)), float(_myCurrent[4]) - clampedAt(asl::Vector3i(iMarch, jMarch, kMarch-1)), g0);
-                            calcGradient(float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch-1, jMarch, kMarch+1)), float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch, kMarch+2))) - _myCurrent[0], g4);
-                            *theNormal = -1.0 * (g0 + li * (g4 - g0));
+                            computeGradient(4, theMarchPos, myGradient2, myInsideOutFlag);
+                            computeGradient(0, theMarchPos, myGradient1, myInsideOutFlag);
                         }
                         break;
 
@@ -438,9 +453,8 @@ namespace y60 {
                         thePosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(theNormal) {
-                            calcGradient(float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch))) - _myCurrent[0], float(_myCurrent[5]) - clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch-1)), g1);
-                            calcGradient(float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch-1, jMarch+1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch, jMarch+2, kMarch+1))) - _myCurrent[4], float(clampedAt(asl::Vector3i(iMarch, jMarch+1, kMarch+2))) - _myCurrent[1], g5);
-                            *theNormal = -1.0 * (g1 + li * (g5 - g1));
+                            computeGradient(5, theMarchPos, myGradient2, myInsideOutFlag);
+                            computeGradient(1, theMarchPos, myGradient1, myInsideOutFlag);
                         }
                         break;
 
@@ -451,9 +465,8 @@ namespace y60 {
                         thePosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(theNormal) {
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch))) - _myCurrent[1], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch))) - _myCurrent[3], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch-1)), g2);
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch+1, kMarch+1))) - _myCurrent[5], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+2, kMarch+1))) - _myCurrent[7], float(clampedAt(asl::Vector3i(iMarch+1, jMarch+1, kMarch+2))) - _myCurrent[2], g6);
-                            *theNormal = -1.0 * (g2 + li * (g6 - g2));
+                            computeGradient(6, theMarchPos, myGradient2, myInsideOutFlag);
+                            computeGradient(2, theMarchPos, myGradient1, myInsideOutFlag);
                         }
 
                         break;
@@ -465,19 +478,21 @@ namespace y60 {
                         thePosition[2] = ((float)kMarch + li) * _myVoxelSize[2];
 
                         if(theNormal) {
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch))) - _myCurrent[0], float(_myCurrent[2]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch)), float(_myCurrent[7]) - clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch-1)), g3);
-                            calcGradient(float(clampedAt(asl::Vector3i(iMarch+2, jMarch, kMarch+1))) - _myCurrent[4], float(_myCurrent[6]) - clampedAt(asl::Vector3i(iMarch+1, jMarch-1, kMarch+1)), float(clampedAt(asl::Vector3i(iMarch+1, jMarch, kMarch+2))) - _myCurrent[3], g7);
-                            *theNormal = -1.0 * (g3 + li * (g7 - g3));
+                            computeGradient(7, theMarchPos, myGradient2, myInsideOutFlag);
+                            computeGradient(3, theMarchPos, myGradient1, myInsideOutFlag);
                         }
                         break;
 
                     default:
                         break;
                 }
-                if (myInsideOutFlag && theNormal) {
-                    *theNormal = -(*theNormal);
+                if (theNormal) {
+                    if (myInsideOutFlag) {
+                        *theNormal = (myGradient1 + li * (myGradient2 - myGradient1));
+                    } else {
+                        *theNormal = -1.0 * (myGradient1 + li * (myGradient2 - myGradient1));
+                    }
                 }
-
             }
 
             /**
@@ -522,6 +537,7 @@ namespace y60 {
                 return at(myClippedPosition);
             }
 
+            // Fast but ugly method. Deprecate this if possible.
             inline VoxelT
             getValueByCubeCorner(int iMarch, int jMarch, int kMarch, int theCubeCorner) {
                 switch (theCubeCorner) {
@@ -575,6 +591,14 @@ namespace y60 {
                 _myOffsetTable[5] = asl::Vector2i(_myLineStride * _myDownSampleRate, _myDownSampleRate);  // [0,1,1]
                 _myOffsetTable[6] = asl::Vector2i((1+_myLineStride) * _myDownSampleRate, _myDownSampleRate);  // [1,1,1]
                 _myOffsetTable[7] = asl::Vector2i(_myDownSampleRate, _myDownSampleRate); // [1,0,1]
+                _myCubeTable[0] = asl::Vector3i(0,0,0);
+                _myCubeTable[1] = asl::Vector3i(0,1,0);
+                _myCubeTable[2] = asl::Vector3i(1,1,0);
+                _myCubeTable[3] = asl::Vector3i(1,0,0);
+                _myCubeTable[4] = asl::Vector3i(0,0,1);
+                _myCubeTable[5] = asl::Vector3i(0,1,1);
+                _myCubeTable[6] = asl::Vector3i(1,1,1);
+                _myCubeTable[7] = asl::Vector3i(1,0,1);
                 _myBitMaskTable[0] = BIT_0;
                 _myBitMaskTable[1] = BIT_1;
                 _myBitMaskTable[2] = BIT_2;
@@ -582,7 +606,11 @@ namespace y60 {
                 _myBitMaskTable[4] = BIT_4;
                 _myBitMaskTable[5] = BIT_5;
                 _myBitMaskTable[6] = BIT_6;
-                _myBitMaskTable[7] = BIT_7;
+                _myBitMaskTable[7] = BIT_7;                
+                unsigned int ADJACENTS[8][3] = {{3, 1, 4}, {2, 0, 5}, {1, 3, 6}, {0, 2, 7}, {7, 5, 0}, {6, 4, 1}, {5, 7, 2}, {4, 6, 3}};
+                for (int i = 0; i < 8 * 3; ++i) {
+                    _myAdjacents[i/3][i%3] = ADJACENTS[i/3][i%3];
+                }
             }
 
             inline int 
@@ -647,6 +675,13 @@ namespace y60 {
             std::vector<const unsigned char*> _myStencils;
             asl::Vector2i                _myOffsetTable[8];
             unsigned                     _myBitMaskTable[8];
+            asl::Vector3i                _myCubeTable[8];
+            /// stores adjacency information for each of the 8 voxels in the cube
+            /// first coordinate is the voxel id in the cube, the second coordiate
+            /// is the axis (i,j,k).
+            /// i.E.: _myAdjacents[3][1] tells us the neighbor voxel of voxel 3 in j direction
+            unsigned int                 _myAdjacents[8][3]; 
+
     };
 
 } // end of namespace y60
