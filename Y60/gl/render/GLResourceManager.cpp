@@ -137,7 +137,7 @@ namespace y60 {
             if (myDepth == 1) {
 #ifdef GL_SGIS_generate_mipmap
                 if (SGIS_generate_mipmap) {
-                    glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+                    //glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
                 }
 #endif
                 // 2D-Texture
@@ -162,7 +162,7 @@ namespace y60 {
             if (myDepth == 1) {
 #ifdef GL_SGIS_generate_mipmap
                 if (SGIS_generate_mipmap) {
-                    glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
+                    //glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
                 }
 #endif
             }
