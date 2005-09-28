@@ -78,7 +78,7 @@ namespace y60 {
         unsigned int myHeight = theImage->get<ImageHeightTag>();
         unsigned int myDepth = theImage->get<ImageDepthTag>();
 
-        AC_INFO << "setupSingleTexture: name='"<<theImage->get<NameTag>()<<"',id='" <<
+        AC_DEBUG << "setupSingleTexture: name='"<<theImage->get<NameTag>()<<"',id='" <<
             theImage->get<IdTag>()<<"',gfxid='" << theImage->getGraphicsId() << "',size=" <<
             myWidth << "x" << myHeight << "x" << myDepth << endl;
 
@@ -124,16 +124,20 @@ namespace y60 {
 
         // disable mipmap for compressed textures
         if (myPixelEncoding.compressedFlag && theImage->get<ImageMipmapTag>()) {
-            AC_INFO << "disabling mipmap for compressed texture: " << theImage->get<NameTag>() << endl;
+            AC_DEBUG << "disabling mipmap for compressed texture: " << theImage->get<NameTag>() << endl;
             theImage->set<ImageMipmapTag>(false);
         }
+
+#ifdef GL_SGIS_generate_mipmap
+        static bool SGIS_generate_mipmap = queryOGLExtension("GL_SGIS_generate_mipmap");
+#endif
 
         if (theImage->get<ImageMipmapTag>() && myDepth == 1 /* no 3D-Mipmaps yet */) {
             // mipmap
             if (myDepth == 1) {
 #ifdef GL_SGIS_generate_mipmap
-                if (queryOGLExtension("GL_SGIS_generate_mipmap")) {
-                    //glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+                if (SGIS_generate_mipmap) {
+                    glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
                 }
 #endif
                 // 2D-Texture
@@ -157,8 +161,8 @@ namespace y60 {
             // no mipmapping
             if (myDepth == 1) {
 #ifdef GL_SGIS_generate_mipmap
-                if (queryOGLExtension("GL_SGIS_generate_mipmap")) {
-                    //glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
+                if (SGIS_generate_mipmap) {
+                    glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
                 }
 #endif
             }
@@ -221,7 +225,7 @@ namespace y60 {
         }
         theImage->storeTextureVersion();
         glPopAttrib();
-        AC_INFO << "texmem usage="<< _myTextureMemUsage / (1024.0*1024.0) <<" MB" << endl;
+        AC_DEBUG << "texmem usage="<< _myTextureMemUsage / (1024.0*1024.0) <<" MB" << endl;
 
         return myId;
     }
