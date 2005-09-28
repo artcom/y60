@@ -1210,7 +1210,7 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
                         myIndex = (unsigned char)(myFloatPixel[0]);
                         myColor = myPalette[myIndex];
                         myTargetRaster->setPixel(x, y, float(myColor[0]), float(myColor[1]), float(myColor[2]),
-                                (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
+                                (myIndex == 0 ? 0.0f : 255.0f)); // index zero is our erase color
                     }
                 }
                 // cerr << "done" << endl;
@@ -1236,7 +1236,7 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
                         myColor = myPalette[myIndex];
                         //cerr << "setPixel x = " << x << " z = " << myCanvasHeight - z - 1 << " index = " << myIndex << endl;
                         myTargetRaster->setPixel(x, myCanvasHeight - z - 1, float(myColor[0]), float(myColor[1]), float(myColor[2]),
-                                (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
+                                (myIndex == 0 ? 0.0f : 255.0f)); // index zero is our erase color
                         
                     }
                 }
@@ -1262,7 +1262,7 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
                         myColor = myPalette[myIndex];
                         // cerr << "setPixel z = " << z << " y = " << y << endl;
                         myTargetRaster->setPixel(z, y, float(myColor[0]), float(myColor[1]), float(myColor[2]),
-                                (myIndex == 0 ? 0.0 : 255.0)); // index zero is our erase color
+                                (myIndex == 0 ? 0.0f : 255.0f)); // index zero is our erase color
                         
                     }
                 }
