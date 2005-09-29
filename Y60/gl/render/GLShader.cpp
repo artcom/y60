@@ -147,7 +147,7 @@ namespace y60 {
 
     void
     GLShader::activate(MaterialBase & theMaterial) {
-        //AC_DEBUG << "activate " << theMaterial.getName();
+        //AC_DEBUG << "GLShader::activate " << theMaterial.getName();
 
         dom::NodePtr myLineWidthProp = theMaterial.findPropertyNode(LINEWIDTH_PROPERTY);
         if (myLineWidthProp) {
@@ -196,12 +196,17 @@ namespace y60 {
     void 
     GLShader::enableTextures(const y60::MaterialBase & theMaterial) {
         unsigned myTextureCount = theMaterial.getTextureCount();
-        for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {
-            const y60::Texture & myTexture = theMaterial.getTexture(myTextureCounter);
-            glActiveTextureARB(asGLTextureRegister(myTextureCounter));
+        AC_DEBUG << "GLShader::enableTextures " << theMaterial.getName() << " count=" << myTextureCount;
+        for (unsigned i = 0; i < myTextureCount; ++i) {
+
+            const y60::Texture & myTexture = theMaterial.getTexture(i);
             bool hasMipMaps = myTexture.getImage()->get<ImageMipmapTag>();
 
+            GLenum myTexUnit = asGLTextureRegister(i);
+            glActiveTextureARB(myTexUnit);
+
             if (myTexture.getImage()->get<ImageDepthTag>()==1) {
+                //AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.getName() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId() << " wrap=" << myTexture.getWrapMode();
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
                         asGLTextureWrapmode(myTexture.getWrapMode()));
                 CHECK_OGL_ERROR;
@@ -211,7 +216,7 @@ namespace y60 {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                         asGLTextureSampleFilter(myTexture.getMagFilter(), false));
                 CHECK_OGL_ERROR;
-                // only minifaction can use mipmaps
+                // only minification can use mipmaps
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                         asGLTextureSampleFilter(myTexture.getMinFilter(), hasMipMaps));
                 CHECK_OGL_ERROR;
@@ -228,7 +233,7 @@ namespace y60 {
                 glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER,
                         asGLTextureSampleFilter(myTexture.getMagFilter(), false));
                 CHECK_OGL_ERROR;
-                // only minifaction can use mipmaps
+                // only minification can use mipmaps
                 glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER,
                         asGLTextureSampleFilter(myTexture.getMinFilter(), hasMipMaps));
                 CHECK_OGL_ERROR;
@@ -320,7 +325,7 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        AC_DEBUG << "bindBodyParams " << theMaterial.getName();
+        AC_DEBUG << "GLShader::bindBodyParams " << theMaterial.getName();
         if (theMaterial.hasTexGen()) {
 
             bool mustRestoreMatrix = false;

@@ -201,6 +201,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                    print (self.getWorld().childNode("body").rootNode);
                     break;
                 */
+                case 'n':
+                    window.drawnormals = !window.drawnormals;
+                    print("Normals: " + (window.drawnormals ? "on" : "off"));
+                    break;
                 case 'm':
                     self.nextMover();
                     break;

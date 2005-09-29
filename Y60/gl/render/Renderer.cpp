@@ -435,61 +435,60 @@ namespace y60 {
     Renderer::renderPrimitives(const BodyPart & theBodyPart, MaterialBasePtr theMaterial) {
         MAKE_SCOPE_TIMER(renderPrimitives);
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
-        DB2(AC_TRACE << "------ renderPrimitives for BodyPart of Body id='"
-            << theBodyPart.getBody()->get<IdTag>()<<"'"
-            << ", name='"<<theBodyPart.getBody()->get<NameTag>()<<"'"<<endl);
+        AC_TRACE << "------ renderPrimitives for BodyPart of Body id='"
+                << theBodyPart.getBody()->get<IdTag>()<<"'"
+                << ", name='"<<theBodyPart.getBody()->get<NameTag>()<<"'";
 
         COUNT_N(Vertices, myPrimitive.size());
         const MaterialParameterVectorPtr myMaterialParameters = theMaterial->getVertexParameters();
 
         for (unsigned i = 0; i < myMaterialParameters->size(); ++i) {
-            const MaterialParameter & myParameter = myMaterialParameters->at(i);
 
+            const MaterialParameter & myParameter = myMaterialParameters->at(i);
             GLRegister myRegister = myParameter.getRegister();
 
-			if ( myPrimitive.hasVertexData(myParameter.getRole())) {
-				const VertexDataBase & myData = myPrimitive.getVertexData(myParameter.getRole());
-				DB2(AC_TRACE << "-- Parameter " << i << " role " << getStringFromEnum(myParameter.getRole(), VertexDataRoleString)
-						<< ", data=" << myData.getDataPtr() << endl);
-				switch (myRegister) {
-						case POSITION_REGISTER:
-							myData.useAsPosition();
-							break;
-						case NORMAL_REGISTER:
-							myData.useAsNormal();
-							break;
-						case COLORS_REGISTER:
-							myData.useAsColor();
-							CHECK_OGL_ERROR;
-							break;
-						default:
-							GLenum myGlRegister = asGLTextureRegister(myRegister);
-							glActiveTextureARB(myGlRegister);
-							CHECK_OGL_ERROR;
-							glClientActiveTextureARB(myGlRegister);
-							CHECK_OGL_ERROR;
-							myData.useAsTexCoord();
-							break;
-				}
-			}
+            if ( myPrimitive.hasVertexData(myParameter.getRole())) {
+                const VertexDataBase & myData = myPrimitive.getVertexData(myParameter.getRole());
+                AC_TRACE << "-- Parameter " << i << " role " << getStringFromEnum(myParameter.getRole(), VertexDataRoleString) << ", data=" << myData.getDataPtr();
+                switch (myRegister) {
+                    case POSITION_REGISTER:
+                        myData.useAsPosition();
+                        break;
+                    case NORMAL_REGISTER:
+                        myData.useAsNormal();
+                        break;
+                    case COLORS_REGISTER:
+                        myData.useAsColor();
+                        CHECK_OGL_ERROR;
+                        break;
+                    default:
+                        GLenum myGlRegister = asGLTextureRegister(myRegister);
+                        glActiveTextureARB(myGlRegister);
+                        CHECK_OGL_ERROR;
+                        glClientActiveTextureARB(myGlRegister);
+                        CHECK_OGL_ERROR;
+                        myData.useAsTexCoord();
+                        break;
+                }
+            }
         }
         CHECK_OGL_ERROR;
-        DB2(AC_TRACE << "glDrawArrays size: " << myPrimitive.size() << endl;
-            unsigned long myPrimitiveCount = myPrimitive.size();
-            AC_TRACE << "Primitive count: " << myPrimitiveCount << endl;
-            AC_TRACE << "Primitive Type: " << myPrimitive.getType() << endl;
-            AC_TRACE << "Primitive GLType: " << getPrimitiveGLType(myPrimitive.getType()) << endl;
-            static unsigned long myMaxPrimitiveCount = 0;
-            if (myPrimitiveCount > myMaxPrimitiveCount) {
-                myMaxPrimitiveCount = myPrimitiveCount;
-            }
-            AC_TRACE << "Primitive maxsize: " << myMaxPrimitiveCount << endl;
-        );
+
+#ifdef DBP
+        unsigned long myPrimitiveCount = myPrimitive.size();
+        AC_TRACE << "glDrawArrays size=" << myPrimitive.size() << " primCount=" << myPrimitiveCount << " primType=" << myPrimitive.getType() << " GLtype=" << getPrimitiveGLType(myPrimitive.getType());
+        static unsigned long myMaxPrimitiveCount = 0;
+        if (myPrimitiveCount > myMaxPrimitiveCount) {
+            myMaxPrimitiveCount = myPrimitiveCount;
+        }
+        AC_TRACE << "Primitive maxsize: " << myMaxPrimitiveCount;
+#endif
+
         DBP(static asl::NanoTime lastTime;
-            asl::NanoTime switchTime = asl::NanoTime() - lastTime;
-            AC_TRACE << "switch time = " << switchTime.micros() << " us" << endl;
-            asl::NanoTime startTime;
-        );
+                asl::NanoTime switchTime = asl::NanoTime() - lastTime;
+                AC_TRACE << "switch time = " << switchTime.micros() << " us" << endl;
+                asl::NanoTime startTime;
+           );
 
         COUNT(VertexArrays);
         MAKE_SCOPE_TIMER(glDrawArrays);
@@ -955,11 +954,13 @@ namespace y60 {
 
     void
     Renderer::bindViewMatrix(CameraPtr theCamera) {
+#if 0
         if (AC_TRACE_ON) {
-            AC_PRINT << "binding view matrix to inverse global matrix of camera "<< theCamera->getNode();
+            //AC_DEBUG << "binding view matrix to inverse global matrix of camera "<< theCamera->getNode();
             theCamera->debug<InverseGlobalMatrixTag>();
             theCamera->debug<PositionTag>();
         }
+#endif
         glLoadMatrixf(static_cast<const GLfloat *>(theCamera->get<InverseGlobalMatrixTag>().getData()));
     }
 

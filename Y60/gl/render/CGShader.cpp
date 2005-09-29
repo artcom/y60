@@ -28,8 +28,7 @@ using namespace y60;
 
 namespace y60 {
 
-    CGShader::CGShader(const dom::NodePtr theNode) :
-        GLShader(theNode)
+    CGShader::CGShader(const dom::NodePtr theNode) : GLShader(theNode)
     {
         _myType = CG_MATERIAL;
         dom::NodePtr myShaderNode = theNode->childNode(VERTEX_SHADER_NODE_NAME);
@@ -60,22 +59,26 @@ namespace y60 {
                                   PLUS_FILE_LINE);
         }
         checkCgError();
+ 
         // compile fragment shader
         if (!_myFragmentProgram) {
             DB(AC_TRACE << "CGShader::loadShader(): Loading fragment shader from file '"
                     << _myFragmentShader._myFilename << "'" << endl;);
             _myFragmentProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myFragmentShader,
                     myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
+            checkCgError();
         }
+
         // compile vertex shader
         if (!_myVertexProgram) {
             DB(AC_TRACE << "CGShader::loadShader(): Loading vertex shader from file '"
                     << _myVertexShader._myFilename << "'" << endl;);
             _myVertexProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myVertexShader,
                     myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
+            checkCgError();
         }
 
-        AC_DEBUG << "compile done.";
+        AC_DEBUG << "Successfully compiled '" << getName() << "'";
     }
 
     void CGShader::load(IShaderLibrary & theShaderLibrary) {
@@ -120,14 +123,14 @@ namespace y60 {
         string::size_type posEnd;
 
         while ((posEnd = myRestArgString.find(',', posStart)) != string::npos) {
-            DB(AC_TRACE << "added arg " << trim(myRestArgString.substr(posStart, posEnd-posStart)) << endl;)
+            DB(AC_TRACE << "added arg " << trim(myRestArgString.substr(posStart, posEnd-posStart)));
             theArgs.push_back(trim(myRestArgString.substr(posStart, posEnd-posStart)));
             posStart = posEnd +1;
         }
 
         myRestArgString = trim(myRestArgString.substr(posStart));
         if (myRestArgString.length() > 0 ) {
-            DB(AC_TRACE << "added arg " << myRestArgString << endl;);
+            DB(AC_TRACE << "added arg " << myRestArgString);
             theArgs.push_back (myRestArgString);
         }
     }
@@ -175,6 +178,7 @@ namespace y60 {
 
     void
     CGShader::activate(MaterialBase & theMaterial) {
+        //AC_DEBUG << "CGShader::activate " << theMaterial.getName() << " " << hex << (void*)this << dec;
         GLShader::activate(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->enableProfile();
@@ -186,7 +190,8 @@ namespace y60 {
     }
 
     void
-    CGShader::deactivate(const MaterialBase &) {
+    CGShader::deactivate(const MaterialBase & theMaterial) {
+        //AC_DEBUG << "CGShader::deactivate " << theMaterial.getName() << " " << hex << (void*)this << dec;
         if (_myVertexProgram) {
             _myVertexProgram->disableProfile();
         }
@@ -197,6 +202,7 @@ namespace y60 {
 
     void
     CGShader::enableTextures(const MaterialBase & theMaterial) {
+        //AC_DEBUG << "CGShader::enableTextures " << theMaterial.getName() << " " << hex << (void*)this << dec;
         GLShader::enableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->enableTextures();
@@ -208,6 +214,7 @@ namespace y60 {
 
     void
     CGShader::disableTextures(const MaterialBase & theMaterial) {
+        //AC_DEBUG << "CGShader::disableTextures " << theMaterial.getName() << " " << hex << (void*)this << dec;
         GLShader::disableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->disableTextures();
@@ -233,32 +240,30 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
+        //AC_DEBUG << "CGShader::bindBodyParams " << theMaterial.getName();
         GLShader::bindBodyParams(theMaterial, theViewport, theLights, theBody, theCamera);
-
-        if (_myFragmentProgram) {
-            bool b = _myFragmentProgram->reloadIfRequired(theLights, theMaterial);
-            _myFragmentProgram->bindBodyParams(theLights, theViewport, theBody, theCamera);
-
-            _myFragmentProgram->bind();
-        }
 
         if (_myVertexProgram) {
             bool b = _myVertexProgram->reloadIfRequired(theLights, theMaterial);
             _myVertexProgram->bindBodyParams(theLights, theViewport, theBody, theCamera);
             _myVertexProgram->bind();
         }
+        if (_myFragmentProgram) {
+            bool b = _myFragmentProgram->reloadIfRequired(theLights, theMaterial);
+            _myFragmentProgram->bindBodyParams(theLights, theViewport, theBody, theCamera);
+            _myFragmentProgram->bind();
+        }
     }
 
     void
     CGShader::bindMaterialParams(const MaterialBase & theMaterial) {
-        this->checkCgError();
-        if (_myFragmentProgram) {
-            _myFragmentProgram->bindMaterialParams(theMaterial);
-        }
+        //AC_DEBUG << "CGShader::bindMaterialParams " << theMaterial.getName();
         if (_myVertexProgram) {
             _myVertexProgram->bindMaterialParams(theMaterial);
+        }
+        if (_myFragmentProgram) {
+            _myFragmentProgram->bindMaterialParams(theMaterial);
         }
     }
 
 } // namespace y60
-

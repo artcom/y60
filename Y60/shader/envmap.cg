@@ -140,13 +140,13 @@ vert2frag mainVertex(app2vert IN,
 
 
 float4 mainFragment(vert2frag   IN,
-        uniform samplerCUBE envTex,
 #ifdef PAINT
         uniform sampler2D decalTex,
 #if PAINT==2
         uniform sampler2D emissiveTex,
 #endif
 #endif
+        uniform samplerCUBE envTex,
         uniform float3 AC_CAMERA_POSITION,
         uniform float3 AC_DIRECTIONAL_LIGHTS[],
         uniform float4 AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[],
