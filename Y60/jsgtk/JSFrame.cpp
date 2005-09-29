@@ -50,9 +50,13 @@ JSFrame::Functions() {
     return myFunctions;
 }
 
+#define DEFINE_PROPERTY( NAME ) \
+    { #NAME, PROP_ ## NAME,  JSPROP_ENUMERATE|JSPROP_PERMANENT}
+
 JSPropertySpec *
 JSFrame::Properties() {
     static JSPropertySpec myProperties[] = {
+        DEFINE_PROPERTY(label),
         {0}
     };
     return myProperties;
@@ -76,7 +80,9 @@ JSFrame::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        case 0:
+        case PROP_label:
+            *vp = as_jsval(cx, theNative.get_label());
+            return JS_TRUE;
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
@@ -86,7 +92,13 @@ JSFrame::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        case 0:
+        case PROP_label:
+            try {
+                Glib::ustring myLabel;
+                convertFrom(cx, *vp, myLabel);
+                theNative.set_label(myLabel);
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
         default:
             return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
