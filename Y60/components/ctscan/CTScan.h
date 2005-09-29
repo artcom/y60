@@ -33,6 +33,8 @@
 #include <asl/raster.h>
 #include <y60/AcBool.h>
 
+#include <map>
+
 namespace asl {
     class PackageManager;
 }
@@ -136,13 +138,18 @@ class CTScan {
         static void copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCanvasImage,
                                             const asl::Box3f & theDirtyBox, Orientation theOrientation,
                                             dom::NodePtr thePaletteNode);
-        static void copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, unsigned theSliceIndex,
-                                            Orientation theOrientation, dom::NodePtr thePaletteNode);
+        template <class VoxelT>
+        static void copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, 
+            dom::NodePtr theReconstructedImage,unsigned theSliceIndex,
+            Orientation theOrientation, dom::NodePtr thePaletteNode);
+
+        static void copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, 
+            dom::NodePtr theReconstructedImage,unsigned theSliceIndex,
+            Orientation theOrientation, dom::NodePtr thePaletteNode);
         
 
         static void applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
                                dom::NodePtr theBrushImage, const asl::Vector4f & theColor);
-
 
         // everything below this line is deprecated
         bool verifyCompleteness();
@@ -196,6 +203,52 @@ class CTScan {
         void resetCamera(ScenePtr theScene, const asl::Box3f & theBox);
         void allocateStencils();
 
+        // comparator for Vector3i
+        struct Vector3iCmp {
+            bool operator() (const asl::Vector3i & a, const asl::Vector3i & b) const {
+                if ( a[0] < b[0] ||
+                    (a[0] == b[0] && a[1] < b[1]) ||
+                    (a[0] == b[0] && a[1] == b[1] && a[2] < b[2]))
+                {
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        typedef std::map<asl::Vector3i, unsigned char, Vector3iCmp> ColorMap;
+
+        template <class VoxelT>
+        struct PaletteInfo {
+            asl::Vector2<VoxelT> thresholds;
+            unsigned char index;
+            PaletteInfo() {};
+            PaletteInfo(asl::Vector2<VoxelT> theThreshold, unsigned char theIndex) : 
+                thresholds(theThreshold), index(theIndex) {}
+        };
+
+        template <class VoxelT>
+        struct PaletteItem {
+            asl::Vector2<VoxelT> thresholds;
+            asl::Vector3i color;
+            PaletteItem() {};
+            PaletteItem(const asl::Vector2<VoxelT> & theThreshold, const asl::Vector3i & theColor) : 
+                thresholds(theThreshold), color(theColor) {}
+        };
+
+        template <class VoxelT> 
+        class PaletteTable : public std::vector<PaletteItem<VoxelT> >             
+        {
+            typedef std::vector<PaletteItem<VoxelT> > Base;
+        public: 
+            PaletteTable(size_t theSize, const PaletteItem<VoxelT> & theItem) : Base(theSize, theItem) {}
+        };
+
+        template <class VoxelT>
+        static unsigned char
+        getSegmentationAlpha(unsigned theIndex, VoxelT theVoxel, const PaletteTable<VoxelT> & thePalette, unsigned char theAlpha);
+
+        static void fillColorMap(dom::NodePtr thePaletteNode, ColorMap & theColorMap);
         // everything below this line is deprecated
         int _myMinZ;  // min Z-Pos of decoded slices
         int _myMaxZ;  // max Z-Pos of decoded slices

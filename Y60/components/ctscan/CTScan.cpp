@@ -57,6 +57,7 @@ using namespace y60;
 
 namespace y60 {
 
+
 CTScan::CTScan() : _myEncoding(y60::GRAY), _myDefaultWindow(128.0f, 256.0f), _myVoxelSize(0,0,0) {
 }
 
@@ -562,7 +563,7 @@ CTScan::reconstructToImage(Orientation theOrientation, int theSliceIndex,
                     int xTarget = myWidth-x-1;
                     for (int y=0; y < myHeight; ++y) {
                         memcpy(myTarget->begin()+myTargetLineStride*y+myBpp*xTarget, 
-                                mySource+mySourceLineStride*y+mySourceLineOffset, myBpp);
+                            mySource+mySourceLineStride*y+mySourceLineOffset, myBpp);
                     }
                 }
                 myPixelData = myTarget; 
@@ -949,6 +950,19 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirty
     theVoxelVolume->getAttribute("boundingbox")->nodeValueAssign(myNewBox);
 }
 
+void
+CTScan::fillColorMap(dom::NodePtr thePaletteNode, ColorMap & theColorMap) {
+    Vector3i myColor;
+    unsigned char myIndex;
+    for (unsigned i = 0; i < thePaletteNode->childNodesLength(); ++i) {
+        dom::NodePtr myItem = thePaletteNode->childNode(i);
+        myColor = myItem->getAttributeValue<Vector3i>("color");
+        myIndex = (unsigned char)(myItem->getAttributeValue<int>("index"));
+        theColorMap[myColor] = myIndex;
+        //cerr << "index = " << int(myIndex) << " color = " << myColor << endl;
+    }
+}
+
 void 
 CTScan::applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
                    dom::NodePtr theBrushImage, const asl::Vector4f & theColor)
@@ -996,37 +1010,13 @@ CTScan::applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
 }
 
 
-// comparator for Vector3i
-struct Vector3iCmp {
-    bool operator() (const Vector3i & a, const Vector3i & b) const {
-        if ( a[0] < b[0] ||
-            (a[0] == b[0] && a[1] < b[1]) ||
-            (a[0] == b[0] && a[1] == b[1] && a[2] < b[2]))
-        {
-            return true;
-        }
-        return false;
-    }
-};
-
-typedef std::map<Vector3i, unsigned char, Vector3iCmp> ColorMap;
-
-
 void 
 CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCanvasImage,
                                 const asl::Box3f & theDirtyBox, Orientation theOrientation,
                                 dom::NodePtr thePaletteNode)
 {
     ColorMap myColorMap;
-    Vector3i myColor;
-    unsigned char myIndex;
-    for (unsigned i = 0; i < thePaletteNode->childNodesLength(); ++i) {
-        dom::NodePtr myItem = thePaletteNode->childNode(i);
-        myColor = myItem->getAttributeValue<Vector3i>("color");
-        myIndex = (unsigned char)(myItem->getAttributeValue<int>("index"));
-        myColorMap[myColor] = myIndex;
-        //cerr << "index = " << int(myIndex) << " color = " << myColor << endl;
-    }
+    fillColorMap(thePaletteNode, myColorMap);
 
     ResizeableRasterPtr myCanvas = dynamic_cast_Ptr<ResizeableRaster>(
             theCanvasImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
@@ -1164,18 +1154,82 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
     }
 }
 
-void 
-CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, unsigned theSliceIndex,
-        Orientation theOrientation, dom::NodePtr thePaletteNode)
+void
+CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, dom::NodePtr theReconstructedImage, unsigned theSliceIndex,
+                                    Orientation theOrientation, dom::NodePtr thePaletteNode) 
 {
+    y60::PixelEncoding myEncoding;
+    myEncoding = theReconstructedImage->getFacade<Image>()->getEncoding();
+    switch (myEncoding) {
+        case y60::GRAY:
+            {
+                typedef unsigned char VoxelT;
+                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage, theSliceIndex, theOrientation, thePaletteNode);            
+            }
+            break;
+        case y60::GRAY16:
+            {
+                typedef unsigned short VoxelT;
+                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage, theSliceIndex, theOrientation, thePaletteNode);
+            }
+            break;
+        case y60::GRAYS16:
+            {
+                typedef short VoxelT;
+                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage, theSliceIndex, theOrientation, thePaletteNode);
+            }
+            break;
+        default:
+            throw CTScanException("Unhandled voxel type", PLUS_FILE_LINE);   
+    }
+}
 
-    std::vector<Vector3i> myPalette(255, Vector3i( -1, -1, -1));
+template <class VoxelT>
+unsigned char
+CTScan::getSegmentationAlpha(unsigned theIndex, VoxelT theVoxel, const PaletteTable<VoxelT> & thePalette, unsigned char theAlpha) {
+    if (theIndex == 0) {
+        return 0;
+    } else if (theVoxel < thePalette[theIndex].thresholds[0] || 
+               theVoxel > thePalette[theIndex].thresholds[1]) 
+    {
+        return theAlpha;
+    } else {
+        return 255;
+    }
+}
+
+template <class VoxelT>
+void 
+CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, 
+                                    dom::NodePtr theReconstructedImage, unsigned theSliceIndex,
+                                    Orientation theOrientation, dom::NodePtr thePaletteNode)
+{
+    ResizeableRasterPtr myReconstructedRaster = dynamic_cast_Ptr<ResizeableRaster>(
+            theReconstructedImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
+
+    y60::PixelEncoding myEncoding;
+    myEncoding = theReconstructedImage->getFacade<Image>()->getEncoding();
+    unsigned myRIHeight = myReconstructedRaster->height();
+    unsigned myRIStride = getBytesRequired(myReconstructedRaster->width(), myEncoding);
+    unsigned myRIBPP    = getBytesRequired(1, myEncoding);
+    const unsigned char * myRIPixels = myReconstructedRaster->pixels().begin();
+
+    PaletteTable<VoxelT> myPalette(255, PaletteItem<VoxelT>(Vector2<VoxelT>(-1, -1), Vector3i( -1, -1, -1)));
     unsigned myIndex;
+    Vector2f myThresholdsFloat;
     Vector3i myColor;
+    unsigned char myAlpha = 255;
+    if (thePaletteNode->getAttributeValue<bool>("livesegmentation")) {
+        float myFloatingAlpha = thePaletteNode->getAttributeValue<float>("livesegmentationalpha");
+        myAlpha = static_cast<unsigned char>(myFloatingAlpha * 255.0);
+    } 
     for (unsigned i = 0; i < thePaletteNode->childNodesLength(); ++i) {
         myIndex = thePaletteNode->childNode(i)->getAttributeValue<unsigned>("index");
-        myColor = thePaletteNode->childNode(i)->getAttributeValue<Vector3i>("color");
-        myPalette[myIndex] = myColor;
+        PaletteItem<VoxelT> myItem;
+        myItem.color = thePaletteNode->childNode(i)->getAttributeValue<Vector3i>("color");
+        myThresholdsFloat = thePaletteNode->childNode(i)->getAttributeValue<Vector2f>("threshold");
+        myItem.thresholds = Vector2<VoxelT>(VoxelT(myThresholdsFloat[0]), VoxelT(myThresholdsFloat[1]));
+        myPalette[myIndex] = myItem;
     }
 
     Box3f myBoundingBox = theMeasurement->getAttributeValue<Box3f>("boundingbox");
@@ -1209,15 +1263,19 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
                 unsigned myXEnd = unsigned(myMax[0]);
                 unsigned myYStart = unsigned(myMin[1]);
                 unsigned myYEnd = unsigned(myMax[1]);
+                Vector3i myColor;
+                VoxelT myVoxel;
                 for (unsigned y = myYStart; y < myYEnd; ++y) {
                     for (unsigned x = myXStart; x < myXEnd; ++x) {
                         myIndex = mySourcePixels[(y - myYStart) * mySourceLineStride + (x - myXStart)];
-                        myColor = myPalette[myIndex];
+                        myColor = myPalette[myIndex].color;
+
+                        myVoxel = *reinterpret_cast<const VoxelT*>(&(myRIPixels[y * myRIStride + x * myRIBPP]));
                         myPixelIndex =  y * myTargetLineStride + x * myBytesPerPixel;
                         myTargetPixels[myPixelIndex]     = myColor[0];
                         myTargetPixels[myPixelIndex + 1] = myColor[1];
                         myTargetPixels[myPixelIndex + 2] = myColor[2];
-                        myTargetPixels[myPixelIndex + 3] = (myIndex == 0 ? 0 : 255);
+                        myTargetPixels[myPixelIndex + 3] = getSegmentationAlpha(myIndex, myVoxel, myPalette, myAlpha);
                     }
                 }
             }
@@ -1229,6 +1287,8 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
                 unsigned myZEnd = unsigned( myMax[2]);
                 unsigned myXStart = unsigned(myMin[0]);
                 unsigned myXEnd = unsigned(myMax[0]);
+                Vector3i myColor;
+                VoxelT myVoxel;
                 for (unsigned z = myZStart; z < myZEnd; ++z) {
                     unsigned myCurrentSliceIndex = z - myZStart;
                     dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(myCurrentSliceIndex);
@@ -1240,12 +1300,14 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
 
                     for (unsigned x = myXStart; x < myXEnd; ++x) {
                         myIndex = mySourcePixels[mySourceY * mySourceLineStride + (x - myXStart)];
-                        myColor = myPalette[myIndex];
+                        myColor = myPalette[myIndex].color;
+                        myPixelIndex = (myRIHeight - z - 1) * myRIStride + x * myRIBPP;
+                        myVoxel = *reinterpret_cast<const VoxelT*>(&(myRIPixels[myPixelIndex]));
                         myPixelIndex = (myCanvasHeight - z - 1) * myTargetLineStride + x * myBytesPerPixel;
                         myTargetPixels[myPixelIndex] = myColor[0];
                         myTargetPixels[myPixelIndex + 1] = myColor[1];
                         myTargetPixels[myPixelIndex + 2] = myColor[2];
-                        myTargetPixels[myPixelIndex + 3] = (myIndex == 0 ? 0 : 255);
+                        myTargetPixels[myPixelIndex + 3] = getSegmentationAlpha(myIndex, myVoxel, myPalette, myAlpha);
                     }
                 }
             }
@@ -1257,6 +1319,8 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
                 unsigned myZEnd = unsigned( myMax[2]);
                 unsigned myYStart = unsigned(myMin[1]);
                 unsigned myYEnd = unsigned(myMax[1]);
+                Vector3i myColor;
+                VoxelT myVoxel;
                 for (unsigned z = myZStart; z < myZEnd; ++z) {
                     unsigned myCurrentSliceIndex = z - myZStart;
                     dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(myCurrentSliceIndex);
@@ -1268,13 +1332,13 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
 
                     for (unsigned y = myYStart; y < myYEnd; ++y) {
                         myIndex = mySourcePixels[(y - myYStart) * mySourceLineStride + mySourceX];
-                        myColor = myPalette[myIndex];
+                        myColor = myPalette[myIndex].color;
+                        myVoxel = *reinterpret_cast<const VoxelT*>(&(myRIPixels[y * myRIStride + z * myRIBPP]));
                         myPixelIndex = y * myTargetLineStride + z * myBytesPerPixel;
                         myTargetPixels[myPixelIndex] = myColor[0];
                         myTargetPixels[myPixelIndex + 1] = myColor[1];
                         myTargetPixels[myPixelIndex + 2] = myColor[2];
-                        myTargetPixels[myPixelIndex + 3] = (myIndex == 0 ? 0 : 255);
-                        
+                        myTargetPixels[myPixelIndex + 3] = getSegmentationAlpha(myIndex, myVoxel, myPalette, myAlpha);                        
                     }
                 }
             }

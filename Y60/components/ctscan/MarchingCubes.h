@@ -303,21 +303,15 @@ namespace y60 {
                 _myOutputPolicy.onHalfEdges(myCubeCase, myEdgeTable);
             }
 
-            inline void computeGradient(unsigned theCubeIndex, const asl::Vector3i & thePosition, asl::Vector3f & theGradient, bool theUpperFlag) const {
+            inline void 
+            computeGradient(unsigned theCubeIndex, const asl::Vector3i & thePosition, 
+                asl::Vector3f & theGradient, bool theUpperFlag) const 
+            {
                 asl::Vector3i myDoublePos = 2*_myCubeTable[theCubeIndex];
-                //VoxelT myFirstValue, mySecondValue;
 
                 for (int i = 0; i < 3; ++i) {
                     int myIndex = _myAdjacents[theCubeIndex][i];
                     asl::Vector3i myOffset = myDoublePos - _myCubeTable[myIndex];
-                    //if (_myCubeTable[myIndex][i]) {
-                    //    myFirstValue = _myCurrent[myIndex];
-                    //    mySecondValue = clampedAt(thePosition + myOffset);
-                    //} else {
-                    //    myFirstValue = clampedAt(thePosition + myOffset);
-                    //    mySecondValue = _myCurrent[myIndex];
-                    //}
-                    //theGradient[i] = _mySegmentizer.interpolateNormal(myFirstValue, mySecondValue, theCubeIndex, theUpperFlag) / _myVoxelSize[i];
                     theGradient[i] = _mySegmentizer.interpolateNormal(_myCurrent[myIndex], myIndex, clampedAt(thePosition + myOffset), thePosition + myOffset, theUpperFlag) / _myVoxelSize[i];
                     if (_myCubeTable[myIndex][i]) {
                         theGradient[i] = -theGradient[i];

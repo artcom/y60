@@ -425,7 +425,7 @@ copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 static JSBool
 copyVoxelVolumeToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-       ensureParamCount(argc, 5);
+       ensureParamCount(argc, 6);
 
         dom::NodePtr myMeasurement;
         convertFrom(cx, argv[0], myMeasurement);
@@ -433,17 +433,20 @@ copyVoxelVolumeToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         dom::NodePtr myCanvas;
         convertFrom(cx, argv[1], myCanvas);
 
+        dom::NodePtr myReconstructedImage;
+        convertFrom(cx, argv[2], myReconstructedImage);
+
         unsigned mySliceIndex;
-        convertFrom(cx, argv[2], mySliceIndex);
+        convertFrom(cx, argv[3], mySliceIndex);
 
         unsigned mySliceOrientationInt;
-        convertFrom(cx, argv[3], mySliceOrientationInt);
+        convertFrom(cx, argv[4], mySliceOrientationInt);
         CTScan::Orientation myOrientation = static_cast<CTScan::Orientation>( mySliceOrientationInt );
 
         dom::NodePtr myPaletteNode;
-        convertFrom(cx, argv[4], myPaletteNode);
+        convertFrom(cx, argv[5], myPaletteNode);
 
-        CTScan::copyVoxelVolumeToCanvas(myMeasurement, myCanvas, mySliceIndex, myOrientation, myPaletteNode);
+        CTScan::copyVoxelVolumeToCanvas(myMeasurement, myCanvas, myReconstructedImage, mySliceIndex, myOrientation, myPaletteNode);
 
         return JS_TRUE;
         
