@@ -307,7 +307,7 @@ polygonizeVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
         CTScan & myCTScan = myObj.getNative();
 
-        ensureParamCount(argc, 5, 7);
+        ensureParamCount(argc, 4, 6);
 
         dom::NodePtr myThresholdPalette;
         convertFrom(cx, argv[0], myThresholdPalette);
@@ -316,18 +316,18 @@ polygonizeVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         convertFrom(cx, argv[1], myMeasurementNode);
 
         int myDownSampleRate;
-        convertFrom(cx, argv[3], myDownSampleRate);
+        convertFrom(cx, argv[2], myDownSampleRate);
 
         bool myCreateNormalsFlag;
-        convertFrom(cx, argv[4], myCreateNormalsFlag);
+        convertFrom(cx, argv[3], myCreateNormalsFlag);
 
         unsigned myNumVertices = 0;
-        if (argc > 4) {
-            convertFrom(cx, argv[5], myNumVertices);
+        if (argc > 3) {
+            convertFrom(cx, argv[4], myNumVertices);
         }
         unsigned myNumTriangles = 0;
-        if (argc > 5) {
-            convertFrom(cx, argv[6], myNumTriangles);
+        if (argc > 4) {
+            convertFrom(cx, argv[5], myNumTriangles);
         }
 
         ScenePtr myScene = myCTScan.polygonizeVolumeMeasurement(myMeasurementNode, myThresholdPalette,
@@ -514,7 +514,7 @@ JSCTScan::Functions() {
         {"getVoxelDimensions",   getVoxelDimensions,      0},
         {"getValueRange",        getValueRange,           0},
         {"polygonizeGlobal",     polygonizeGlobal,        7},
-        {"polygonizeVolumeMeasurement", polygonizeVolumeMeasurement,        7},
+        {"polygonizeVolumeMeasurement", polygonizeVolumeMeasurement,        6},
         {"countTrianglesGlobal", countTrianglesGlobal,    4},
         {"countTrianglesInVolumeMeasurement", countTrianglesInVolumeMeasurement,    4},
         {"create3DTexture",      create3DTexture,         2},

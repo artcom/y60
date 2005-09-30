@@ -57,7 +57,6 @@ using namespace y60;
 
 namespace y60 {
 
-
 CTScan::CTScan() : _myEncoding(y60::GRAY), _myDefaultWindow(128.0f, 256.0f), _myVoxelSize(0,0,0) {
 }
 
@@ -137,39 +136,6 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
     return _mySlices.size();
 }
 
-/*
-void
-CTScan::appendStencil(dom::NodePtr theImage) {
-    dom::ResizeableRasterPtr myRaster = theImage->getFacade<Image>()->getRasterPtr();
-    // XXX Check size
-    if (myRaster) {
-        _myStencils.push_back(myRaster);
-    } else {
-        throw CTScanException(std::string("No raster for image ") + theImage->getFacade<Image>()->get<NameTag>(),
-            PLUS_FILE_LINE);
-    }            
-}
-
-void
-CTScan::allocateStencils() {
-    _myStencils.clear();
-    if (!_mySlices.empty()) {
-        int myHeight = _mySlices[0]->width();
-        int myWidth = _mySlices[0]->height();
-        asl::Block myBlock(myWidth * myHeight, 1);
-        _myStencils.reserve(_mySlices.size());
-        for (int i = 0; i < _mySlices.size(); ++i) {
-            dom::ValuePtr myValuePointer = createRasterValue(GRAY, myWidth, myHeight, myBlock);
-            dom::ResizeableRasterPtr myRaster = dynamic_cast_Ptr<ResizeableRaster>(myValuePointer);
-            if (myRaster) {
-                _myStencils.push_back(myRaster);
-            } else {
-                throw CTScanException(std::string("Couldn't cast raster for slice ") + as_string(i) , PLUS_FILE_LINE);
-            }            
-        }
-    }
-}
-*/
 int
 CTScan::setSlices(std::vector<dom::ResizeableRasterPtr> theSlices) {
     _mySlices = theSlices;

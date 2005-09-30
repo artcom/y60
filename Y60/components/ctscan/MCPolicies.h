@@ -403,8 +403,8 @@ namespace y60 {
                 if (!theUpperFlag) {
                     return float((theSecondValue - mySecondThreshold[0]) - (theFirstValue - myFirstThreshold[0]));
                 } else {
-                    return float((theSecondValue - mySecondThreshold[0]) - (theFirstValue - myFirstThreshold[0]));
-                    //return float((theFirstValue - myFirstThreshold[0]) - (theSecondValue - mySecondThreshold[0]));
+                    return float((theSecondValue - mySecondThreshold[1]) - (theFirstValue - myFirstThreshold[1]));
+                    //return float((myFirstThreshold[1] - theFirstValue) - (mySecondThreshold[0] - theSecondValue));
                 }
             }
 /*
