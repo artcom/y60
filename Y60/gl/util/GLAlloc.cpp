@@ -28,6 +28,30 @@
 
 using namespace std;
 
+#ifdef LINUX
+// hack to allow old glx header without the prototypes as well as new ones
+extern "C" {   
+#ifndef PFNGLXALLOCATEMEMORYNVPROC
+typedef void * ( * PFNGLXALLOCATEMEMORYNVPROC) (int size, float readfreq, float writefreq, float priority);
+#endif
+
+#ifndef PFNGLXFREEMEMORYNVPROC
+typedef void ( * PFNGLXFREEMEMORYNVPROC) (GLvoid *pointer);
+#endif
+
+
+PFNGLXALLOCATEMEMORYNVPROC _ac_glXAllocateMemoryNV = 
+    (PFNGLXALLOCATEMEMORYNVPROC) glXGetProcAddressARB((const GLubyte *) "glXAllocateMemoryNV");
+#define glXAllocateMemoryNV _ac_glXAllocateMemoryNV
+
+PFNGLXFREEMEMORYNVPROC _ac_glXFreeMemoryNV = 
+    (PFNGLXFREEMEMORYNVPROC) glXGetProcAddressARB((const GLubyte *) "glXFreeMemoryNV");
+#define glXFreeMemoryNV _ac_glXFreeMemoryNV
+
+}
+
+#endif
+
 namespace asl
 {    
     bool tryInitializeGLMemoryExtensions() {
