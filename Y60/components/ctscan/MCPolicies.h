@@ -401,9 +401,9 @@ namespace y60 {
                 const asl::Vector2<VoxelT> & myFirstThreshold  = _myThresholdCube[theFirstIndex];
                 const asl::Vector2<VoxelT> & mySecondThreshold = getThreshold(theSecondPosition[0], theSecondPosition[1], theSecondPosition[2]);
                 if (!theUpperFlag) {
-                    return float((theSecondValue - mySecondThreshold[0]) - (theFirstValue - myFirstThreshold[0]));
+                    return float(theSecondValue)/float(mySecondThreshold[0]) - float(theFirstValue)/float(myFirstThreshold[0]);
                 } else {
-                    return float((theSecondValue - mySecondThreshold[1]) - (theFirstValue - myFirstThreshold[1]));
+                    return float(theSecondValue)/float(mySecondThreshold[1]) - float(theFirstValue)/float(myFirstThreshold[1]);
                     //return float((myFirstThreshold[1] - theFirstValue) - (mySecondThreshold[0] - theSecondValue));
                 }
             }
@@ -471,6 +471,14 @@ namespace y60 {
             inline
             const asl::Vector2<VoxelT> &
             getThreshold(int theX, int theY, int theZ) const {
+                asl::Point3i myPoint(theX*_myDownSampleRate-1, theY*_myDownSampleRate-1, theZ*_myDownSampleRate-1);
+                unsigned char myIndex = 0;
+                if (_myBoundingBox.contains(myPoint)) {
+                    asl::Vector3i myPosition = myPoint -_myBoundingBox[asl::Box3i::MIN];
+                    asl::Vector4f myPixel =  _mySegmentationBitmaps[myPosition[2]]->getPixel(myPosition[0], myPosition[1]); 
+                    myIndex = (unsigned char) myPixel[0];
+                } 
+/*
                 unsigned int x = theX * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][0]; 
                 unsigned int y = theY * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][1]; 
                 unsigned int z = theZ * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][2]; 
@@ -479,6 +487,7 @@ namespace y60 {
                 z = std::min(z, unsigned(_myBoundingBox[asl::Box3i::MAX][2] - _myBoundingBox[asl::Box3i::MIN][2]-1));
                 asl::Vector4f myPixel =  _mySegmentationBitmaps[z]->getPixel(x,y); 
                 unsigned char myIndex = (unsigned char) myPixel[0];
+                */
                 return _myThresholdPalette[myIndex]; 
             }
 

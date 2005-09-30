@@ -517,18 +517,14 @@ namespace y60 {
             }
 
             inline
-            const VoxelT &
+            const VoxelT 
             clampedAt(const asl::Vector3i & thePosition) const {
-                asl::Vector3i myClippedPosition = thePosition;
-                for (int i = 0; i < 3; ++i) {
-                    if (thePosition[i] < _myVBox[asl::Box3i::MIN][i]) {
-                        myClippedPosition[i] = _myVBox[asl::Box3i::MIN][i];
-                    }
-                    if (thePosition[i] >= _myVBox[asl::Box3i::MAX][i]) {
-                        myClippedPosition[i] = _myVBox[asl::Box3i::MAX][i]-1;
-                    }
+                asl::Point3i myClippedPosition = thePosition;
+                if (_myVBox.contains(myClippedPosition)) {
+                    return at(myClippedPosition);
+                } else {
+                    return 0;
                 }
-                return at(myClippedPosition);
             }
 
             // Fast but ugly method. Deprecate this if possible.
