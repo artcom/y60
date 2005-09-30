@@ -394,6 +394,17 @@ namespace y60 {
                 return theValue < myThreshold[0] || theValue > myThreshold[1];
             }
 
+            inline float interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
+                const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
+            //inline float interpolateNormal(const VoxelT & theFirstValue, const VoxelT & theSecondValue, int theIndex, bool theUpperFlag)
+            {
+                if (!theUpperFlag) {
+                    return float((theSecondValue) - (theFirstValue));
+                } else {
+                    return float((theFirstValue) - (theSecondValue));
+                }
+            }
+/*
             inline float 
             interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
                 const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
@@ -408,7 +419,7 @@ namespace y60 {
                     return float((theFirstValue - myFirstThreshold[1]) - (theSecondValue - mySecondThreshold[1]));
                 }
             }
-
+*/
             inline float 
             interpolatePosition(const std::vector<VoxelT> & theVoxelCube,
                 int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const 
