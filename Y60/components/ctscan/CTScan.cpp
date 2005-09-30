@@ -1208,7 +1208,7 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
             theReconstructedImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
 
     y60::PixelEncoding myEncoding;
-    myEncoding = theReconstructedImage->getFacade<Image>()->getEncoding();
+    myEncoding = theReconstructedImage->dom::Node::getFacade<y60::Image>()->getEncoding();
     unsigned myRIHeight = myReconstructedRaster->height();
     unsigned myRIStride = getBytesRequired(myReconstructedRaster->width(), myEncoding);
     unsigned myRIBPP    = getBytesRequired(1, myEncoding);
@@ -1219,20 +1219,20 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
     Vector2f myThresholdsFloat;
     Vector3i myColor;
     unsigned char myAlpha = 255;
-    if (thePaletteNode->getAttributeValue<bool>("livesegmentation")) {
-        float myFloatingAlpha = thePaletteNode->getAttributeValue<float>("livesegmentationalpha");
+    if (thePaletteNode->dom::Node::getAttributeValue<bool>("livesegmentation")) {
+        float myFloatingAlpha = thePaletteNode->dom::Node::getAttributeValue<float>("livesegmentationalpha");
         myAlpha = static_cast<unsigned char>(myFloatingAlpha * 255.0);
     } 
     for (unsigned i = 0; i < thePaletteNode->childNodesLength(); ++i) {
-        myIndex = thePaletteNode->childNode(i)->getAttributeValue<unsigned>("index");
+        myIndex = thePaletteNode->childNode(i)->dom::Node::getAttributeValue<unsigned>("index");
         PaletteItem<VoxelT> myItem;
-        myItem.color = thePaletteNode->childNode(i)->getAttributeValue<Vector3i>("color");
-        myThresholdsFloat = thePaletteNode->childNode(i)->getAttributeValue<Vector2f>("threshold");
+        myItem.color = thePaletteNode->childNode(i)->dom::Node::getAttributeValue<Vector3i>("color");
+        myThresholdsFloat = thePaletteNode->childNode(i)->dom::Node::getAttributeValue<Vector2f>("threshold");
         myItem.thresholds = Vector2<VoxelT>(VoxelT(myThresholdsFloat[0]), VoxelT(myThresholdsFloat[1]));
         myPalette[myIndex] = myItem;
     }
 
-    Box3f myBoundingBox = theMeasurement->getAttributeValue<Box3f>("boundingbox");
+    Box3f myBoundingBox = theMeasurement->dom::Node::getAttributeValue<Box3f>("boundingbox");
     Point3i myMin(round(myBoundingBox[Box3f::MIN][0]), 
                   round(myBoundingBox[Box3f::MIN][1]), 
                   round(myBoundingBox[Box3f::MIN][2]));
@@ -1242,8 +1242,8 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
 
     ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>( 
             theCanvas->childNode(0)->childNode(0)->nodeValueWrapperPtr());
-    unsigned myCanvasWidth = theCanvas->getAttributeValue<unsigned>("width");
-    unsigned myCanvasHeight = theCanvas->getAttributeValue<unsigned>("height");
+    unsigned myCanvasWidth = theCanvas->dom::Node::getAttributeValue<unsigned>("width");
+    unsigned myCanvasHeight = theCanvas->dom::Node::getAttributeValue<unsigned>("height");
 
     unsigned myTargetLineStride = getBytesRequired(myCanvasWidth, y60::RGBA);
     unsigned myBytesPerPixel = getBytesRequired(1, y60::RGBA);
