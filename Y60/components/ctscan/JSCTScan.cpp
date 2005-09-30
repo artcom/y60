@@ -322,11 +322,11 @@ polygonizeVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         convertFrom(cx, argv[4], myCreateNormalsFlag);
 
         unsigned myNumVertices = 0;
-        if (argc > 5) {
+        if (argc > 4) {
             convertFrom(cx, argv[5], myNumVertices);
         }
         unsigned myNumTriangles = 0;
-        if (argc > 6) {
+        if (argc > 5) {
             convertFrom(cx, argv[6], myNumTriangles);
         }
 

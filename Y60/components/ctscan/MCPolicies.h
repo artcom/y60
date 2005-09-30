@@ -398,10 +398,13 @@ namespace y60 {
                 const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
             //inline float interpolateNormal(const VoxelT & theFirstValue, const VoxelT & theSecondValue, int theIndex, bool theUpperFlag)
             {
+                const asl::Vector2<VoxelT> & myFirstThreshold  = _myThresholdCube[theFirstIndex];
+                const asl::Vector2<VoxelT> & mySecondThreshold = getThreshold(theSecondPosition[0], theSecondPosition[1], theSecondPosition[2]);
                 if (!theUpperFlag) {
-                    return float((theSecondValue) - (theFirstValue));
+                    return float((theSecondValue - mySecondThreshold[0]) - (theFirstValue - myFirstThreshold[0]));
                 } else {
-                    return float((theFirstValue) - (theSecondValue));
+                    return float((theSecondValue - mySecondThreshold[0]) - (theFirstValue - myFirstThreshold[0]));
+                    //return float((theFirstValue - myFirstThreshold[0]) - (theSecondValue - mySecondThreshold[0]));
                 }
             }
 /*
