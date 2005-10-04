@@ -55,11 +55,16 @@ class JSCWRuler : public JSWrapper<acgtk::CWRuler, asl::Ptr<acgtk::CWRuler>,
             PROP_value_range = JSBASE::PROP_END,
             PROP_window_center,
             PROP_window_width,
+            PROP_lower,
+            PROP_upper,
             PROP_mode,
             PROP_signal_center_changed,
             PROP_signal_width_changed,
+            PROP_signal_lower_changed,
+            PROP_signal_upper_changed,
             PROP_MODE_THRESHOLD,
             PROP_MODE_CENTER_WIDTH,
+            PROP_MODE_LOWER_UPPER,
             PROP_END
         };
         

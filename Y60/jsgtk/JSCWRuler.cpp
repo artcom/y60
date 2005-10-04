@@ -63,9 +63,13 @@ JSCWRuler::Properties() {
         DEFINE_PROPERTY(value_range),
         DEFINE_PROPERTY(window_center),
         DEFINE_PROPERTY(window_width),
+        DEFINE_PROPERTY(lower),
+        DEFINE_PROPERTY(upper),
         DEFINE_PROPERTY(mode),
         DEFINE_RO_PROPERTY(signal_center_changed),
         DEFINE_RO_PROPERTY(signal_width_changed),
+        DEFINE_RO_PROPERTY(signal_lower_changed),
+        DEFINE_RO_PROPERTY(signal_upper_changed),
         {0}
     };
     return myProperties;
@@ -98,6 +102,12 @@ JSCWRuler::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         case PROP_window_width:
             *vp = jslib::as_jsval(cx, theNative.getWindowWidth());
             return JS_TRUE;
+        case PROP_lower:
+            *vp = jslib::as_jsval(cx, theNative.getLower());
+            return JS_TRUE;
+        case PROP_upper:
+            *vp = jslib::as_jsval(cx, theNative.getUpper());
+            return JS_TRUE;
         case PROP_mode:
             *vp = jslib::as_jsval(cx, static_cast<int>(theNative.getMode()));
             return JS_TRUE;
@@ -112,6 +122,20 @@ JSCWRuler::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             {
                 JSSignal1<void,float>::OWNERPTR mySignal( new
                         JSSignal1<void,float>::NATIVE(theNative.signal_width_changed()));
+                *vp = jslib::as_jsval(cx, mySignal);
+                return JS_TRUE;
+            }
+        case PROP_signal_lower_changed:
+            {
+                JSSignal1<void,float>::OWNERPTR mySignal( new
+                        JSSignal1<void,float>::NATIVE(theNative.signal_lower_changed()));
+                *vp = jslib::as_jsval(cx, mySignal);
+                return JS_TRUE;
+            }
+        case PROP_signal_upper_changed:
+            {
+                JSSignal1<void,float>::OWNERPTR mySignal( new
+                        JSSignal1<void,float>::NATIVE(theNative.signal_upper_changed()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }
@@ -143,6 +167,20 @@ JSCWRuler::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                 float myWindowWidth;
                 convertFrom(cx, *vp, myWindowWidth);
                 theNative.setWindowWidth(myWindowWidth);
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
+        case PROP_lower:
+            try {
+                float myLower;
+                convertFrom(cx, *vp, myLower);
+                theNative.setLower(myLower);
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
+        case PROP_upper:
+            try {
+                float myUpper;
+                convertFrom(cx, *vp, myUpper);
+                theNative.setUpper(myUpper);
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         case PROP_mode:
@@ -196,6 +234,7 @@ JSCWRuler::ConstIntProperties() {
     static JSConstIntPropertySpec myProperties[] = {
             "MODE_THRESHOLD",    PROP_MODE_THRESHOLD, acgtk::CWRuler::MODE_THRESHOLD,
             "MODE_CENTER_WIDTH", PROP_MODE_CENTER_WIDTH, acgtk::CWRuler::MODE_CENTER_WIDTH,
+            "MODE_LOWER_UPPER",  PROP_MODE_LOWER_UPPER, acgtk::CWRuler::MODE_LOWER_UPPER,
         {0}
     };
     return myProperties;

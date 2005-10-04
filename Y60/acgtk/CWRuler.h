@@ -28,8 +28,9 @@ namespace acgtk {
 class CWRuler : public Gtk::DrawingArea {
     public:
         enum Mode {
-            MODE_THRESHOLD,
-            MODE_CENTER_WIDTH
+            MODE_THRESHOLD, // [DS] ... think this is deprecated
+            MODE_CENTER_WIDTH,
+            MODE_LOWER_UPPER
         };
         CWRuler(Mode theMode = MODE_CENTER_WIDTH);
         virtual ~CWRuler();
@@ -43,11 +44,19 @@ class CWRuler : public Gtk::DrawingArea {
         void setWindowWidth(float theWidth);
         float getWindowWidth() const;
 
+        void setLower(float theLower);
+        float getLower() const;
+
+        void setUpper(float theUpper);
+        float getUpper() const;
+
         void setMode(Mode theMode);
         Mode getMode() const;
 
         sigc::signal<void, float> signal_center_changed() const { return _myCenterChangedSignal;}
         sigc::signal<void, float> signal_width_changed() const { return _myWidthChangedSignal;}
+        sigc::signal<void, float> signal_lower_changed() const { return _myLowerChangedSignal;}
+        sigc::signal<void, float> signal_upper_changed() const { return _myUpperChangedSignal;}
 
     protected:
         virtual bool on_expose_event(GdkEventExpose * theEvent);
@@ -73,10 +82,14 @@ class CWRuler : public Gtk::DrawingArea {
         asl::Vector2f _myValueRange;
         float        _myWindowCenter;
         float        _myWindowWidth;
+        float        _myLower;
+        float        _myUpper;
         
         Glib::RefPtr<Gdk::Window>  _myWindow;
         sigc::signal<void, float> _myCenterChangedSignal;
         sigc::signal<void, float> _myWidthChangedSignal;
+        sigc::signal<void, float> _myLowerChangedSignal;
+        sigc::signal<void, float> _myUpperChangedSignal;
 };
 
 }

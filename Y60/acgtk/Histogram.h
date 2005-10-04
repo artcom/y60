@@ -30,6 +30,11 @@ class Histogram : public Gtk::DrawingArea {
         Histogram();
         virtual ~Histogram();
 
+        enum Mode {
+            MODE_CENTER_WIDTH,
+            MODE_LOWER_UPPER
+        };
+
         void setHistogram(const std::vector<unsigned> theSamples);
 
         void setShowWindow(bool theFlag);
@@ -41,11 +46,21 @@ class Histogram : public Gtk::DrawingArea {
         void setWindowCenter(float theValue);
         void setWindowWidth(float theValue);
 
+        void setLower(float theValue);
+        void setUpper(float theValue);
+
         void setValueRange(const asl::Vector2f & theRange);
         const asl::Vector2f & getValueRange() const;
 
         void setLogarithmicScale(bool theFlag);
         bool getLogarithmicScale() const;
+
+        void setMode(Mode theMode) {
+            _myMode = theMode;
+        }
+        Mode getMode() const {
+            return _myMode;
+        }
 
     protected:
         virtual bool on_configure_event(GdkEventConfigure * theEvent);
@@ -63,6 +78,7 @@ class Histogram : public Gtk::DrawingArea {
         int convertValueToScreenPos(const float & theValue);
         void rebuildBins();
         
+        Mode                      _myMode;
         Glib::RefPtr<Gdk::Window> _myWindow;
         std::vector<unsigned>     _mySampleData;
         std::vector<unsigned>     _myBins;
@@ -71,6 +87,8 @@ class Histogram : public Gtk::DrawingArea {
 
         float                    _myWindowCenter;
         float                    _myWindowWidth;
+        float                    _myLower;
+        float                    _myUpper;
         bool                      _myDrawCenterFlag;
         bool                      _myDrawWindowFlag;
 

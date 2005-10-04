@@ -40,11 +40,12 @@ const static float MIN_WINDOW_WIDTH(10.0);
 
 Histogram::Histogram() :
     Gtk::DrawingArea(),
+    _myMode(MODE_CENTER_WIDTH),
     _myLogarithmicScaleFlag(true),
     _myDrawWindowFlag(false),
     _myDrawCenterFlag(false)
 {
-    set_size_request(256, 64);
+    set_size_request(100, 50);
     Gdk::EventMask myFlags = get_events();
     myFlags |= Gdk::POINTER_MOTION_MASK;
     myFlags |= Gdk::BUTTON_PRESS_MASK;
@@ -118,8 +119,15 @@ Histogram::on_expose_event(GdkEventExpose * theEvent) {
     }
 
     if (_myDrawWindowFlag) {
-        int myXStart = convertValueToScreenPos(_myWindowCenter - (0.5 * _myWindowWidth));
-        int myXEnd   = convertValueToScreenPos(_myWindowCenter + (0.5 * _myWindowWidth));
+        int myXStart;
+        int myXEnd;
+        if (_myMode == MODE_CENTER_WIDTH) {
+            myXStart = convertValueToScreenPos(_myWindowCenter - (0.5 * _myWindowWidth));
+            myXEnd   = convertValueToScreenPos(_myWindowCenter + (0.5 * _myWindowWidth));
+        } else {
+            myXStart = convertValueToScreenPos(_myLower);
+            myXEnd   = convertValueToScreenPos(_myUpper);
+        }
 
         myGC = get_style()->get_dark_gc(get_state()),
              myGC->set_function(Gdk::XOR);
@@ -127,7 +135,7 @@ Histogram::on_expose_event(GdkEventExpose * theEvent) {
         myGC->set_function(Gdk::COPY);
     }
 
-    if (_myDrawCenterFlag) {
+    if (_myDrawCenterFlag && _myMode == MODE_CENTER_WIDTH) {
         int myXPos = convertValueToScreenPos(_myWindowCenter);
         myGC = get_style()->get_white_gc();
         myGC->set_function(Gdk::XOR);
@@ -218,6 +226,18 @@ Histogram::setWindowCenter(float theValue) {
 void 
 Histogram::setWindowWidth(float theValue) {
     _myWindowWidth = theValue;
+    queue_draw();
+}
+
+void 
+Histogram::setLower(float theValue) {
+    _myLower = theValue;
+    queue_draw();
+}
+
+void 
+Histogram::setUpper(float theValue) {
+    _myUpper = theValue;
     queue_draw();
 }
 

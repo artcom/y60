@@ -56,6 +56,9 @@ class JSHistogram : public JSWrapper<acgtk::Histogram, asl::Ptr<acgtk::Histogram
             PROP_show_window_center,
             PROP_value_range,
             PROP_logarithmic_scale,
+            PROP_mode,
+            PROP_MODE_CENTER_WIDTH,
+            PROP_MODE_LOWER_UPPER,
             PROP_END
         };
         

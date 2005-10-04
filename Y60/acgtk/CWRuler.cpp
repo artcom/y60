@@ -20,6 +20,7 @@
 #include "TNTMeasurementList.h"
 
 #include <asl/string_functions.h>
+#include <asl/Logger.h>
 
 #include <iostream>
 #include <gtkmm/main.h>
@@ -39,7 +40,9 @@ CWRuler::CWRuler(Mode theMode) :
     _myState(IDLE),
     _myValueRange(0.0, 1.0),
     _myWindowWidth(0.0),
-    _myWindowCenter(0.0)
+    _myWindowCenter(0.0),
+    _myLower(0.0),
+    _myUpper(0.0)
 {
     set_size_request(256, 10);
     Gdk::EventMask myFlags = get_events();
@@ -69,11 +72,11 @@ CWRuler::on_button_press_event(GdkEventButton * theEvent) {
 
     float myHWindowWidth = 0.5 * _myWindowWidth;
 
-    int myCenterMarkerPos = convertValueToScreenPos(_myWindowCenter);
-    int myLeftMarkerPos = convertValueToScreenPos(_myWindowCenter - myHWindowWidth);
-    int myRightMarkerPos = convertValueToScreenPos(_myWindowCenter + myHWindowWidth);
 
     if (_myMode == MODE_CENTER_WIDTH) {
+        int myCenterMarkerPos = convertValueToScreenPos(_myWindowCenter);
+        int myLeftMarkerPos = convertValueToScreenPos(_myWindowCenter - myHWindowWidth);
+        int myRightMarkerPos = convertValueToScreenPos(_myWindowCenter + myHWindowWidth);
         if (intersectWithMarker(theEvent, myCenterMarkerPos)) {
             _myState = CHANGE_CENTER;
         } else if (intersectWithMarker(theEvent, myLeftMarkerPos)) {
@@ -81,9 +84,20 @@ CWRuler::on_button_press_event(GdkEventButton * theEvent) {
         } else if (intersectWithMarker(theEvent, myRightMarkerPos)) {
             _myState = CHANGE_WIDTH_RIGHT;
         }
-    } else {
+    } else if (_myMode == MODE_THRESHOLD) {
+        int myCenterMarkerPos = convertValueToScreenPos(_myWindowCenter);
         if (intersectWithMarker(theEvent, myCenterMarkerPos)) {
             _myState = CHANGE_CENTER;
+        }
+    } else if (_myMode == MODE_LOWER_UPPER) {
+        int myLeftMarkerPos = convertValueToScreenPos(_myLower);
+        int myRightMarkerPos = convertValueToScreenPos(_myUpper);
+        if (intersectWithMarker(theEvent, myLeftMarkerPos)) {
+            AC_WARNING << "button press lower";
+            _myState = CHANGE_WIDTH_LEFT;
+        } else if (intersectWithMarker(theEvent, myRightMarkerPos)) {
+            AC_WARNING << "button press upper";
+            _myState = CHANGE_WIDTH_RIGHT;
         }
     }
     return true;
@@ -100,21 +114,36 @@ bool
 CWRuler::on_motion_notify_event(GdkEventMotion * theEvent) {
     if ( _myState != IDLE) {
         float myValue = convertScreenPosToValue(int(theEvent->x));
-        switch (_myState) {
-            case CHANGE_CENTER:
-                _myWindowCenter = min(max(myValue, _myValueRange[0]), _myValueRange[1]);
-                _myCenterChangedSignal.emit(_myWindowCenter);
-                break;
-            case CHANGE_WIDTH_LEFT:
-                _myWindowWidth = max(min(2.0f * (_myWindowCenter - myValue),
-                        2.0f * (_myWindowCenter - _myValueRange[0])), MIN_WINDOW_WIDTH);
-                _myWidthChangedSignal.emit(_myWindowWidth);
-                break;
-            case CHANGE_WIDTH_RIGHT:
-                _myWindowWidth = max(min(2.0f * (myValue - _myWindowCenter),
-                        2.0f *(_myValueRange[1] - _myWindowCenter)), MIN_WINDOW_WIDTH);
-                _myWidthChangedSignal.emit(_myWindowWidth);
-                break;
+        if (_myMode == MODE_LOWER_UPPER) {
+            switch (_myState) {
+                case CHANGE_WIDTH_LEFT:
+                    AC_WARNING << "motion lower";
+                    _myLower = myValue;
+                    _myLowerChangedSignal.emit(_myLower);
+                    break;
+                case CHANGE_WIDTH_RIGHT:
+                    AC_WARNING << "motion upper";
+                    _myUpper = myValue;
+                    _myUpperChangedSignal.emit(_myUpper);
+                    break;
+            }
+        } else {
+            switch (_myState) {
+                case CHANGE_CENTER:
+                    _myWindowCenter = min(max(myValue, _myValueRange[0]), _myValueRange[1]);
+                    _myCenterChangedSignal.emit(_myWindowCenter);
+                    break;
+                case CHANGE_WIDTH_LEFT:
+                    _myWindowWidth = max(min(2.0f * (_myWindowCenter - myValue),
+                                2.0f * (_myWindowCenter - _myValueRange[0])), MIN_WINDOW_WIDTH);
+                    _myWidthChangedSignal.emit(_myWindowWidth);
+                    break;
+                case CHANGE_WIDTH_RIGHT:
+                    _myWindowWidth = max(min(2.0f * (myValue - _myWindowCenter),
+                                2.0f *(_myValueRange[1] - _myWindowCenter)), MIN_WINDOW_WIDTH);
+                    _myWidthChangedSignal.emit(_myWindowWidth);
+                    break;
+            }
         }
         queue_draw();
     }
@@ -139,9 +168,20 @@ CWRuler::on_expose_event(GdkEventExpose * theEvent) {
 
         drawMarker(_myWindowCenter + myHWindowWidth, get_style()->get_white_gc());
         drawMarker(_myWindowCenter - myHWindowWidth, get_style()->get_white_gc());
+        drawMarker(_myWindowCenter, get_style()->get_black_gc());
+    } else if (_myMode == MODE_LOWER_UPPER) {
+        int myXStart = convertValueToScreenPos(_myLower);
+        int myXEnd = convertValueToScreenPos(_myUpper);
 
+        _myWindow->draw_rectangle(get_style()->get_dark_gc(get_state()), true, myXStart, 0, 
+                myXEnd - myXStart, get_allocation().get_height());
+
+        drawMarker(_myLower, get_style()->get_white_gc());
+        drawMarker(_myUpper, get_style()->get_white_gc());
+
+    } else if (_myMode == MODE_THRESHOLD) {
+        drawMarker(_myWindowCenter, get_style()->get_black_gc());
     }
-    drawMarker(_myWindowCenter, get_style()->get_black_gc());
 
     return true;
 }
@@ -196,9 +236,8 @@ CWRuler::getValueRange() const {
 
 void 
 CWRuler::setWindowCenter(float theCenter) {
-    float myOldValue = _myWindowCenter;
-    _myWindowCenter = theCenter;
-    if (myOldValue != _myWindowCenter) {
+    if (theCenter != _myWindowCenter) {
+        _myWindowCenter = theCenter;
         _myCenterChangedSignal.emit(_myWindowCenter);
     }
     queue_draw();
@@ -211,9 +250,8 @@ CWRuler::getWindowCenter() const {
 
 void 
 CWRuler::setWindowWidth(float theWidth) {
-    float myOldValue = _myWindowWidth;
-    _myWindowWidth = theWidth;
-    if (myOldValue != _myWindowWidth) {
+    if (theWidth != _myWindowWidth) {
+        _myWindowWidth = theWidth;
         _myWidthChangedSignal.emit(_myWindowWidth);
     }
     queue_draw();
@@ -222,6 +260,34 @@ CWRuler::setWindowWidth(float theWidth) {
 float 
 CWRuler::getWindowWidth() const {
     return _myWindowWidth;
+}
+
+void 
+CWRuler::setLower(float theLower) {
+    if (theLower != _myLower) {
+        _myLower = theLower;
+        _myLowerChangedSignal.emit(_myLower);
+    }
+    queue_draw();
+}
+
+float 
+CWRuler::getLower() const {
+    return _myLower;
+}
+
+void 
+CWRuler::setUpper(float theUpper) {
+    if (theUpper != _myUpper) {
+        _myUpper = theUpper;
+        _myUpperChangedSignal.emit(_myUpper);
+    }
+    queue_draw();
+}
+
+float 
+CWRuler::getUpper() const {
+    return _myUpper;
 }
 
 void 

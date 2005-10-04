@@ -58,6 +58,22 @@ SetWindowWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 }
 
 static JSBool
+SetLower(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    return Method<NATIVE>::call(&NATIVE::setLower,cx,obj,argc,argv,rval);
+
+}
+
+static JSBool
+SetUpper(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    return Method<NATIVE>::call(&NATIVE::setUpper,cx,obj,argc,argv,rval);
+
+}
+
+static JSBool
 SetHistogram(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -73,6 +89,8 @@ JSHistogram::Functions() {
         {"toString",             toString,                0},
         {"setWindowCenter",      SetWindowCenter,         1},
         {"setWindowWidth",       SetWindowWidth,          1},
+        {"setLower",             SetLower,                1},
+        {"setUpper",             SetUpper,                1},
         {"setHistogram",         SetHistogram,            1},
         {0}
     };
@@ -92,6 +110,7 @@ JSHistogram::Properties() {
         DEFINE_PROPERTY(show_window_center),
         DEFINE_PROPERTY(value_range),
         DEFINE_PROPERTY(logarithmic_scale),
+        DEFINE_PROPERTY(mode),
         {0}
     };
     return myProperties;
@@ -126,6 +145,9 @@ JSHistogram::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             return JS_TRUE;
         case PROP_logarithmic_scale:
             *vp = as_jsval(cx, theNative.getLogarithmicScale());
+            return JS_TRUE;
+        case PROP_mode:
+            *vp = as_jsval(cx, theNative.getMode());
             return JS_TRUE;
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
@@ -164,6 +186,13 @@ JSHistogram::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                 theNative.setLogarithmicScale(myFlag);
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
+        case PROP_mode:
+            try {
+                int myMode;
+                convertFrom(cx, *vp, myMode);
+                theNative.setMode(static_cast<Histogram::Mode>(myMode));
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
         default:
             return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
@@ -198,16 +227,16 @@ JSHistogram::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
     return JS_FALSE;
 }
 
-/*
 JSConstIntPropertySpec *
 JSHistogram::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
+        "MODE_CENTER_WIDTH",   PROP_MODE_CENTER_WIDTH, acgtk::Histogram::MODE_CENTER_WIDTH,
+        "MODE_LOWER_UPPER",    PROP_MODE_LOWER_UPPER, acgtk::Histogram::MODE_LOWER_UPPER,
         {0}
     };
     return myProperties;
 };
-*/
 
 void
 JSHistogram::addClassProperties(JSContext * cx, JSObject * theClassProto) {
@@ -229,7 +258,7 @@ JSHistogram::initClass(JSContext *cx, JSObject *theGlobalObject) {
     jsval myConstructorFuncObjVal;
     if (JS_GetProperty(cx, theGlobalObject, ClassName(), &myConstructorFuncObjVal)) {
         JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
-        //JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
+        JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
     } else {
         cerr << "JSHistogram::initClass: constructor function object not found, could not initialize static members"<<endl;
     }
