@@ -17,7 +17,7 @@
 //=============================================================================
 
 
-function getFilenameDialog(theTitle, theAction, thePatterns, theShortcuts) {
+function getFilenameDialog(theTitle, theAction, thePatterns, theShortcuts, theAdditionalWidget) {
 
     var myFileChooserDialog = new FileChooserDialog(theTitle, theAction);
 
@@ -34,6 +34,9 @@ function getFilenameDialog(theTitle, theAction, thePatterns, theShortcuts) {
         }
     }
 
+    if (theAdditionalWidget) {
+        myFileChooserDialog.vbox.pack_start(theAdditionalWidget, Gtk.PACK_SHRINK);
+    }
     myFileChooserDialog.add_button(StockID.CANCEL,Dialog.RESPONSE_CANCEL);
     myFileChooserDialog.add_button(StockID.OK,Dialog.RESPONSE_OK);
 
@@ -50,11 +53,11 @@ function getFilenameDialog(theTitle, theAction, thePatterns, theShortcuts) {
 }
 
 
-function askUserForFilename(theTitle, theSuffix) {
+function askUserForFilename(theTitle, theSuffix, theAdditionalWidget) {
     var myWriteItFlag = false;
     while ( true ) {
-        var myFilename = getFilenameDialog(theTitle, FileChooserDialog.ACTION_SAVE, null, null);
-        if (myFilename.length > 0) {
+        var myFilename = getFilenameDialog(theTitle, FileChooserDialog.ACTION_SAVE, null, null, theAdditionalWidget);
+        if (myFilename && myFilename.length > 0) {
             if (theSuffix) {
                 var myFilenameString = new String( basename( myFilename ));
                 if (myFilenameString.lastIndexOf('.') == -1) {
