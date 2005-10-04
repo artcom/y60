@@ -76,6 +76,73 @@ add2(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
+static JSBool
+pack1(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc,3);
+
+        Gtk::Paned * mySelf = 0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+        
+        Gtk::Widget * myWidgetToAdd;
+        if (!convertFrom(cx, argv[0], myWidgetToAdd)) {
+            JS_ReportError(cx, "JSPaned::pack1(): argument #1 must be a widget");
+            return JS_FALSE;
+        }
+        
+        bool myResizeFlag;
+        if (!convertFrom(cx, argv[1], myResizeFlag)) {
+            JS_ReportError(cx, "JSPaned::pack1(): argument #2 must be a bool");
+            return JS_FALSE;
+        }
+        
+        bool myShrinkFlag;
+        if (!convertFrom(cx, argv[1], myShrinkFlag)) {
+            JS_ReportError(cx, "JSPaned::pack1(): argument #3 must be a bool");
+            return JS_FALSE;
+        }
+        
+        mySelf->pack1(*myWidgetToAdd, myResizeFlag, myShrinkFlag);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    return JS_FALSE;
+}
+
+static JSBool
+pack2(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc,3);
+
+        Gtk::Paned * mySelf = 0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+        
+        Gtk::Widget * myWidgetToAdd;
+        if (!convertFrom(cx, argv[0], myWidgetToAdd)) {
+            JS_ReportError(cx, "JSPaned::pack1(): argument #1 must be a widget");
+            return JS_FALSE;
+        }
+        
+        bool myResizeFlag;
+        if (!convertFrom(cx, argv[1], myResizeFlag)) {
+            JS_ReportError(cx, "JSPaned::pack1(): argument #2 must be a bool");
+            return JS_FALSE;
+        }
+        
+        bool myShrinkFlag;
+        if (!convertFrom(cx, argv[1], myShrinkFlag)) {
+            JS_ReportError(cx, "JSPaned::pack1(): argument #3 must be a bool");
+            return JS_FALSE;
+        }
+        
+        mySelf->pack2(*myWidgetToAdd, myResizeFlag, myShrinkFlag);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    return JS_FALSE;
+}
 
 JSFunctionSpec *
 JSPaned::Functions() {
@@ -85,6 +152,8 @@ JSPaned::Functions() {
         {"toString",             toString,                0},
         {"add1",                 add1,                    1},
         {"add2",                 add2,                    1},
+        {"pack1",                pack1,                   3},
+        {"pack2",                pack2,                   3},
         {0}
     };
     return myFunctions;

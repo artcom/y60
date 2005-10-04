@@ -44,6 +44,8 @@ class JSFrame : public JSWrapper<Gtk::Frame, asl::Ptr<Gtk::Frame>, StaticAccessP
 
         enum PropertyNumbers {            
             PROP_label = JSBASE::PROP_END,
+            PROP_label_widget,
+            PROP_shadow_type,
             PROP_END
         };
         static JSPropertySpec * Properties();

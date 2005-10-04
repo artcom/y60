@@ -18,6 +18,7 @@
 
 #include "JSSignalProxies.h"
 #include "JSFrame.h"
+#include "JSWidget.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
 #include <y60/JSVector.h>
@@ -53,10 +54,15 @@ JSFrame::Functions() {
 #define DEFINE_PROPERTY( NAME ) \
     { #NAME, PROP_ ## NAME,  JSPROP_ENUMERATE|JSPROP_PERMANENT}
 
+#define DEFINE_RO_PROPERTY( NAME ) \
+    { #NAME, PROP_ ## NAME,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT}
+
 JSPropertySpec *
 JSFrame::Properties() {
     static JSPropertySpec myProperties[] = {
         DEFINE_PROPERTY(label),
+        DEFINE_PROPERTY(shadow_type),
+        DEFINE_RO_PROPERTY(label_widget),
         {0}
     };
     return myProperties;
@@ -83,6 +89,12 @@ JSFrame::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         case PROP_label:
             *vp = as_jsval(cx, theNative.get_label());
             return JS_TRUE;
+        case PROP_label_widget:
+            *vp = gtk_jsval(cx, theNative.get_label_widget());
+            return JS_TRUE;
+        case PROP_shadow_type:
+            *vp = as_jsval(cx, static_cast<int>(theNative.get_shadow_type()));
+            return JS_TRUE;
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
@@ -97,6 +109,13 @@ JSFrame::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                 Glib::ustring myLabel;
                 convertFrom(cx, *vp, myLabel);
                 theNative.set_label(myLabel);
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
+        case PROP_shadow_type:
+            try {
+                int myType;
+                convertFrom(cx, *vp, myType);
+                theNative.set_shadow_type(static_cast<Gtk::ShadowType>(myType));
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         default:
@@ -119,11 +138,16 @@ JSFrame::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 
     if (argc == 0) {
         newNative = new Gtk::Frame();
-        myNewObject = new JSFrame(OWNERPTR(newNative), newNative);
+    } else if (argc == 1) {
+        Glib::ustring myLabel;
+        convertFrom(cx, argv[0], myLabel);
+        newNative = new Gtk::Frame( myLabel );
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
+
+    myNewObject = new JSFrame(OWNERPTR(newNative), newNative);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);

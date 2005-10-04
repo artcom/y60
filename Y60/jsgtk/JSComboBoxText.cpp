@@ -49,7 +49,7 @@ append_text(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_END;
     try {
         if (argc != 1) {
-            JS_ReportError(cx, "JSComboBoxText::add_item(): Wrong number of arguments, 1 expected.");
+            JS_ReportError(cx, "JSComboBoxText::append_text(): Wrong number of arguments, 1 expected.");
             return JS_FALSE;
         }
 

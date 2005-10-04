@@ -167,12 +167,12 @@ JSSpinButton::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     JSSpinButton * myNewObject = 0;
 
     if (argc == 0) {
-        newNative = 0; // Abstract
-        myNewObject = new JSSpinButton(OWNERPTR(newNative), newNative);
+        newNative = new Gtk::SpinButton(); // Abstract
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
+    myNewObject = new JSSpinButton(OWNERPTR(newNative), newNative);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);

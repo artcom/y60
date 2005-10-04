@@ -244,23 +244,45 @@ JSLabel::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     JSLabel * myNewObject = 0;
 
     switch (argc) {
-    case 0:
-        newNative = new NATIVE;
-        break;
-    case 1:
-        { 
+        case 0:
+            newNative = new NATIVE;
+            break;
+        case 1:
+            { 
 
-            Glib::ustring myString;
-            if ( ! convertFrom(cx, argv[0], myString)) {
-                JS_ReportError(cx,"Constructor for %s: argument 0 must be a string", ClassName());
-                return JS_FALSE;
+                Glib::ustring myString;
+                if ( ! convertFrom(cx, argv[0], myString)) {
+                    JS_ReportError(cx,"Constructor for %s: argument 0 must be a string (label)", ClassName());
+                    return JS_FALSE;
+                }
+                newNative = new NATIVE(myString);
             }
-            newNative = new NATIVE(myString);
-        }
-        break;
-    default:
-        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
-        return JS_FALSE;
+            break;
+        case 3:
+            { 
+
+                Glib::ustring myString;
+                if ( ! convertFrom(cx, argv[0], myString)) {
+                    JS_ReportError(cx,"Constructor for %s: argument 0 must be a string (label)", ClassName());
+                    return JS_FALSE;
+                }
+                float myXAlign;
+                if ( ! convertFrom(cx, argv[1], myXAlign)) {
+                    JS_ReportError(cx,"Constructor for %s: argument 1 must be a float (xalign)", ClassName());
+                    return JS_FALSE;
+                }
+                float myYAlign;
+                if ( ! convertFrom(cx, argv[2], myYAlign)) {
+                    JS_ReportError(cx,"Constructor for %s: argument 2 must be a float (yalign)", ClassName());
+                    return JS_FALSE;
+                }
+                newNative = new NATIVE(myString, myXAlign, myYAlign);
+            }
+            break;
+
+        default:
+            JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
+            return JS_FALSE;
     }
     myNewObject = new JSLabel(OWNERPTR(newNative), newNative);
 
