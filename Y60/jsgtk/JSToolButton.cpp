@@ -113,11 +113,19 @@ JSToolButton::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
     if (argc == 0) {
         newNative = new Gtk::ToolButton();
-        myNewObject = new JSToolButton(OWNERPTR(newNative), newNative);
+    } else if (argc == 2) {
+        Gtk::Widget * myWidget(0);
+        convertFrom(cx, argv[0], myWidget);
+
+        Glib::ustring myLabel;
+        convertFrom(cx, argv[1], myLabel);
+
+        newNative = new Gtk::ToolButton(* myWidget, myLabel);
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
+    myNewObject = new JSToolButton(OWNERPTR(newNative), newNative);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
