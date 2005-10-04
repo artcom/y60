@@ -513,7 +513,9 @@ childNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 childNodesLength(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the number of child nodes of this node");
+    DOC_BEGIN("Returns the number of child nodes of this node. A child node name can be given.");
+    DOC_RESET;
+    DOC_PARAM("Child node name", DOC_TYPE_STRING);
     DOC_END;
     if (argc == 0) {
         typedef int (dom::Node::*MyMethod)() const;
