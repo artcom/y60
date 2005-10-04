@@ -331,7 +331,7 @@ polygonizeVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         }
 
         ScenePtr myScene = myCTScan.polygonizeVolumeMeasurement(myMeasurementNode, myThresholdPalette,
-                myDownSampleRate,  myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices,
+                myDownSampleRate, myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices,
                 myNumTriangles);
         *rval = as_jsval(cx, myScene);
         return JS_TRUE;

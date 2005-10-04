@@ -413,12 +413,13 @@ CTScan::polygonizeVolumeMeasurement(dom::NodePtr theVolumeNode, dom::NodePtr the
 
     Box3f myFloatBox = theVolumeNode->getAttributeValue<Box3f>("boundingbox");
     Box3i myBoundingBox;
-    myBoundingBox[asl::Box3i::MIN][0] = int( myFloatBox[asl::Box3f::MIN][0] );
-    myBoundingBox[asl::Box3i::MIN][1] = int( myFloatBox[asl::Box3f::MIN][1] );
-    myBoundingBox[asl::Box3i::MIN][2] = int( myFloatBox[asl::Box3f::MIN][2] );
-    myBoundingBox[asl::Box3i::MAX][0] = int( myFloatBox[asl::Box3f::MAX][0] );
-    myBoundingBox[asl::Box3i::MAX][1] = int( myFloatBox[asl::Box3f::MAX][1] );
-    myBoundingBox[asl::Box3i::MAX][2] = int( myFloatBox[asl::Box3f::MAX][2] );
+    
+    myBoundingBox[asl::Box3i::MIN][0] = asl::maximum(int(myFloatBox[asl::Box3f::MIN][0])-1, 0);
+    myBoundingBox[asl::Box3i::MIN][1] = asl::maximum(int(myFloatBox[asl::Box3f::MIN][1])-1, 0);
+    myBoundingBox[asl::Box3i::MIN][2] = asl::maximum(int(myFloatBox[asl::Box3f::MIN][2])-1, 0);
+    myBoundingBox[asl::Box3i::MAX][0] = asl::minimum(int(myFloatBox[asl::Box3f::MAX][0])+1, getVoxelDimensions()[0]);
+    myBoundingBox[asl::Box3i::MAX][1] = asl::minimum(int(myFloatBox[asl::Box3f::MAX][1])+1, getVoxelDimensions()[1]);
+    myBoundingBox[asl::Box3i::MAX][2] = asl::minimum(int(myFloatBox[asl::Box3f::MAX][2])+1, getVoxelDimensions()[2]);
 
 
     ScenePtr myScene(new Scene);
@@ -861,11 +862,14 @@ CTScan::createRGBAImage(dom::NodePtr theParent, int theWidth, int theHeight, int
 }
 
 void 
-CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f theDirtyBox) {
+CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f & theDirtyBox) {
     const Box3f & myOldBox = theVoxelVolume->getAttributeValue<Box3f>("boundingbox");
 
     Box3f myNewBox = myOldBox;
-    myNewBox.extendBy( theDirtyBox );
+    //Box3f myDirtyBox(theDirtyBox.getMin()[0]-1, theDirtyBox.getMin()[1]-1, theDirtyBox.getMin()[2]-1,
+    //    theDirtyBox.getMax()[0]+1, theDirtyBox.getMax()[1]+1, theDirtyBox.getMax()[2]+1);
+    Box3f myDirtyBox(theDirtyBox);
+    myNewBox.extendBy( myDirtyBox );
 
     //AC_INFO << "theDirtyBox = " << theDirtyBox;
     //AC_INFO << "myOldBox = " << myOldBox;

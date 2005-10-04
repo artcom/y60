@@ -134,7 +134,7 @@ class CTScan {
         /* Some functions that are TNT but not ctscan specific */
         static dom::NodePtr createGrayImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
         static dom::NodePtr createRGBAImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
-        static void resizeVoxelVolume(dom::NodePtr theVoxelVolumeNode, const asl::Box3f theDirtyBox);
+        static void resizeVoxelVolume(dom::NodePtr theVoxelVolumeNode, const asl::Box3f & theDirtyBox);
         static void copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCanvasImage,
                                             const asl::Box3f & theDirtyBox, Orientation theOrientation,
                                             dom::NodePtr thePaletteNode);
