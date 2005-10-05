@@ -93,10 +93,8 @@ CWRuler::on_button_press_event(GdkEventButton * theEvent) {
         int myLeftMarkerPos = convertValueToScreenPos(_myLower);
         int myRightMarkerPos = convertValueToScreenPos(_myUpper);
         if (intersectWithMarker(theEvent, myLeftMarkerPos)) {
-            AC_WARNING << "button press lower";
             _myState = CHANGE_WIDTH_LEFT;
         } else if (intersectWithMarker(theEvent, myRightMarkerPos)) {
-            AC_WARNING << "button press upper";
             _myState = CHANGE_WIDTH_RIGHT;
         }
     }
@@ -117,12 +115,10 @@ CWRuler::on_motion_notify_event(GdkEventMotion * theEvent) {
         if (_myMode == MODE_LOWER_UPPER) {
             switch (_myState) {
                 case CHANGE_WIDTH_LEFT:
-                    AC_WARNING << "motion lower";
                     _myLower = myValue;
                     _myLowerChangedSignal.emit(_myLower);
                     break;
                 case CHANGE_WIDTH_RIGHT:
-                    AC_WARNING << "motion upper";
                     _myUpper = myValue;
                     _myUpperChangedSignal.emit(_myUpper);
                     break;
