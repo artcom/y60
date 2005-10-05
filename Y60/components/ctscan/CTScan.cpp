@@ -320,21 +320,14 @@ CTScan::countTrianglesGlobal(const asl::Box3i & theVoxelBox,
 }
 
 asl::Vector2i
-CTScan::countTrianglesInVolumeMeasurement(dom::NodePtr theVolumeNode,
-        dom::NodePtr theThresholdPalette, int theDownSampleRate)
+CTScan::countTrianglesInVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode,
+                                          dom::NodePtr theThresholdPalette, int theDownSampleRate)
 {
     unsigned int myVertexCount;
     unsigned int myTriangleCount;
 
-    Box3f myFloatBox = theVolumeNode->getAttributeValue<Box3f>("boundingbox");
-    Box3i myBoundingBox;
-    myBoundingBox[asl::Box3i::MIN][0] = int( myFloatBox[asl::Box3f::MIN][0] );
-    myBoundingBox[asl::Box3i::MIN][1] = int( myFloatBox[asl::Box3f::MIN][1] );
-    myBoundingBox[asl::Box3i::MIN][2] = int( myFloatBox[asl::Box3f::MIN][2] );
-    myBoundingBox[asl::Box3i::MAX][0] = int( myFloatBox[asl::Box3f::MAX][0] );
-    myBoundingBox[asl::Box3i::MAX][1] = int( myFloatBox[asl::Box3f::MAX][1] );
-    myBoundingBox[asl::Box3i::MAX][2] = int( myFloatBox[asl::Box3f::MAX][2] );
-
+    Box3i myBoundingBox = theVoxelBox;
+    prepareBox(myBoundingBox); 
 
     switch (_myEncoding) {
         case y60::GRAY:
@@ -405,23 +398,23 @@ CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin,
     return myScene;
 }
 
+void CTScan::prepareBox(asl::Box3i & theVoxelBox) {
+    theVoxelBox[asl::Box3i::MIN][0] = asl::maximum(int(theVoxelBox[asl::Box3i::MIN][0])-1, 0);
+    theVoxelBox[asl::Box3i::MIN][1] = asl::maximum(int(theVoxelBox[asl::Box3i::MIN][1])-1, 0);
+    theVoxelBox[asl::Box3i::MIN][2] = asl::maximum(int(theVoxelBox[asl::Box3i::MIN][2])-1, 0);
+    theVoxelBox[asl::Box3i::MAX][0] = asl::minimum(int(theVoxelBox[asl::Box3i::MAX][0])+1, getVoxelDimensions()[0]);
+    theVoxelBox[asl::Box3i::MAX][1] = asl::minimum(int(theVoxelBox[asl::Box3i::MAX][1])+1, getVoxelDimensions()[1]);
+    theVoxelBox[asl::Box3i::MAX][2] = asl::minimum(int(theVoxelBox[asl::Box3i::MAX][2])+1, getVoxelDimensions()[2]);
+}
+
 ScenePtr
-CTScan::polygonizeVolumeMeasurement(dom::NodePtr theVolumeNode, dom::NodePtr theThresholdPalette, 
+CTScan::polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode, dom::NodePtr theThresholdPalette, 
                    int theDownSampleRate, bool theCreateNormalsFlag, PackageManagerPtr thePackageManager, 
                    unsigned int theNumVertices, unsigned int theNumTriangles)
 {
     asl::Time myStartTime;
-
-    Box3f myFloatBox = theVolumeNode->getAttributeValue<Box3f>("boundingbox");
-    Box3i myBoundingBox;
-    
-    myBoundingBox[asl::Box3i::MIN][0] = asl::maximum(int(myFloatBox[asl::Box3f::MIN][0])-1, 0);
-    myBoundingBox[asl::Box3i::MIN][1] = asl::maximum(int(myFloatBox[asl::Box3f::MIN][1])-1, 0);
-    myBoundingBox[asl::Box3i::MIN][2] = asl::maximum(int(myFloatBox[asl::Box3f::MIN][2])-1, 0);
-    myBoundingBox[asl::Box3i::MAX][0] = asl::minimum(int(myFloatBox[asl::Box3f::MAX][0])+1, getVoxelDimensions()[0]);
-    myBoundingBox[asl::Box3i::MAX][1] = asl::minimum(int(myFloatBox[asl::Box3f::MAX][1])+1, getVoxelDimensions()[1]);
-    myBoundingBox[asl::Box3i::MAX][2] = asl::minimum(int(myFloatBox[asl::Box3f::MAX][2])+1, getVoxelDimensions()[2]);
-
+    asl::Box3i myBoundingBox = theVoxelBox;
+    prepareBox(myBoundingBox);
 
     ScenePtr myScene(new Scene);
     myScene->createStubs(thePackageManager);    

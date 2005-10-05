@@ -90,7 +90,7 @@ class CTScan {
         asl::Vector2i countTrianglesGlobal(const asl::Box3i & theVoxelBox, 
             double theThresholdMin, double theThresholdMax, int theDownSampleRate);
 
-        asl::Vector2i countTrianglesInVolumeMeasurement(dom::NodePtr theVolumeNode,
+        asl::Vector2i countTrianglesInVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode,
                     dom::NodePtr theThresholdPalette, int theDownSampleRate);
 
         /** Create an isosurface from the voxel dataset */
@@ -98,7 +98,7 @@ class CTScan {
             int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
             unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
 
-        ScenePtr polygonizeVolumeMeasurement(dom::NodePtr theVolumeNode, dom::NodePtr theThresholdPalette, 
+        ScenePtr polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode, dom::NodePtr theThresholdPalette, 
             int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
             unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
 
@@ -161,6 +161,7 @@ class CTScan {
     private:
         CTScan(const CTScan&); // hide copy constructor
         sigc::signal<void, double, Glib::ustring> _myProgressSignal;
+        void prepareBox(asl::Box3i & theVoxelBox);
         
         y60::PixelEncoding _myEncoding;
         std::vector<dom::ResizeableRasterPtr> _mySlices;

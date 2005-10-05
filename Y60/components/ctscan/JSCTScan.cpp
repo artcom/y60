@@ -242,18 +242,28 @@ countTrianglesInVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsva
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
         CTScan & myCTScan = myObj.getNative();
 
-        ensureParamCount(argc, 3);
+        ensureParamCount(argc, 4);
+
+        // have to convert a Box3f into a Box3i because Box3i isn't available in JS
+        Box3f myFloatBox;
+        convertFrom(cx, argv[0], myFloatBox);
+        Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
+                         static_cast<int>( myFloatBox[Box3f::MIN][1]),
+                         static_cast<int>( myFloatBox[Box3f::MIN][2]),
+                         static_cast<int>( myFloatBox[Box3f::MAX][0]),
+                         static_cast<int>( myFloatBox[Box3f::MAX][1]),
+                         static_cast<int>( myFloatBox[Box3f::MAX][2]));
 
         dom::NodePtr myThresholdPalette;
-        convertFrom(cx, argv[0], myThresholdPalette);
+        convertFrom(cx, argv[1], myThresholdPalette);
 
         dom::NodePtr myMeasurementNode;
-        convertFrom(cx, argv[1], myMeasurementNode);
+        convertFrom(cx, argv[2], myMeasurementNode);
 
         int myDownSampleRate;
-        convertFrom(cx, argv[2], myDownSampleRate);
+        convertFrom(cx, argv[3], myDownSampleRate);
 
-        Vector2i myCount = myCTScan.countTrianglesInVolumeMeasurement(myMeasurementNode, myThresholdPalette, myDownSampleRate);
+        Vector2i myCount = myCTScan.countTrianglesInVolumeMeasurement(myVoxelBox, myMeasurementNode, myThresholdPalette, myDownSampleRate);
         *rval = as_jsval(cx, myCount);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -307,30 +317,40 @@ polygonizeVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
         CTScan & myCTScan = myObj.getNative();
 
-        ensureParamCount(argc, 4, 6);
+        ensureParamCount(argc, 5, 7);
+
+        // have to convert a Box3f into a Box3i because Box3i isn't available in JS
+        Box3f myFloatBox;
+        convertFrom(cx, argv[0], myFloatBox);
+        Box3i myVoxelBox(static_cast<int>( myFloatBox[Box3f::MIN][0]),
+                         static_cast<int>( myFloatBox[Box3f::MIN][1]),
+                         static_cast<int>( myFloatBox[Box3f::MIN][2]),
+                         static_cast<int>( myFloatBox[Box3f::MAX][0]),
+                         static_cast<int>( myFloatBox[Box3f::MAX][1]),
+                         static_cast<int>( myFloatBox[Box3f::MAX][2]));
 
         dom::NodePtr myThresholdPalette;
-        convertFrom(cx, argv[0], myThresholdPalette);
+        convertFrom(cx, argv[1], myThresholdPalette);
 
         dom::NodePtr myMeasurementNode;
-        convertFrom(cx, argv[1], myMeasurementNode);
+        convertFrom(cx, argv[2], myMeasurementNode);
 
         int myDownSampleRate;
-        convertFrom(cx, argv[2], myDownSampleRate);
+        convertFrom(cx, argv[3], myDownSampleRate);
 
         bool myCreateNormalsFlag;
-        convertFrom(cx, argv[3], myCreateNormalsFlag);
+        convertFrom(cx, argv[4], myCreateNormalsFlag);
 
         unsigned myNumVertices = 0;
         if (argc > 3) {
-            convertFrom(cx, argv[4], myNumVertices);
+            convertFrom(cx, argv[5], myNumVertices);
         }
         unsigned myNumTriangles = 0;
         if (argc > 4) {
-            convertFrom(cx, argv[5], myNumTriangles);
+            convertFrom(cx, argv[6], myNumTriangles);
         }
 
-        ScenePtr myScene = myCTScan.polygonizeVolumeMeasurement(myMeasurementNode, myThresholdPalette,
+        ScenePtr myScene = myCTScan.polygonizeVolumeMeasurement(myVoxelBox, myMeasurementNode, myThresholdPalette,
                 myDownSampleRate, myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices,
                 myNumTriangles);
         *rval = as_jsval(cx, myScene);
@@ -514,7 +534,7 @@ JSCTScan::Functions() {
         {"getVoxelDimensions",   getVoxelDimensions,      0},
         {"getValueRange",        getValueRange,           0},
         {"polygonizeGlobal",     polygonizeGlobal,        7},
-        {"polygonizeVolumeMeasurement", polygonizeVolumeMeasurement,        6},
+        {"polygonizeVolumeMeasurement", polygonizeVolumeMeasurement,        7},
         {"countTrianglesGlobal", countTrianglesGlobal,    4},
         {"countTrianglesInVolumeMeasurement", countTrianglesInVolumeMeasurement,    4},
         {"create3DTexture",      create3DTexture,         2},
