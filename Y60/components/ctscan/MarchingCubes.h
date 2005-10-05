@@ -99,10 +99,6 @@ namespace y60 {
                                      theBox.getMax()[2]/_myDownSampleRate);
                 checkBox(myTempBox);
                 _myVBox = myTempBox;
-                asl::Vector3i mySize = _myVBox.getSize();
-                _myDimBox[0]= mySize[0] + 1;
-                _myDimBox[1]= mySize[1] + 1;
-                _myDimBox[2]= mySize[2] + 1;
             }
 
             const asl::Box3i & getBox() const {
@@ -126,9 +122,6 @@ namespace y60 {
             const asl::Vector3i & getDataDimension() const {
                 return _myDimensions;
             }
-            const asl::Vector3i & getBoxDimension() const {
-                return _myDimBox;
-            }
             
             void march() {
                 AC_TRACE << "MarchingCubes::march()";
@@ -147,8 +140,6 @@ namespace y60 {
 
                 AC_TRACE << "Data dimension: X(" << _myDimensions[0] << "), Y(" 
                     << _myDimensions[1] << "), Z(" << _myDimensions[2] << ")\n";
-                AC_TRACE << "Box dimension : X(" << _myDimBox[0] << "), Y(" 
-                    << _myDimBox[1] << "), Z(" << _myDimBox[2] << ")\n";
                 AC_TRACE << "Box           : X[" << iBoxStart << ", " 
                     << iBoxEnd << "], Y[" << jBoxStart;
                 AC_TRACE << ", " << jBoxEnd << "], Z[" << kBoxStart << ", " << kBoxEnd << "]\n";
@@ -646,7 +637,6 @@ namespace y60 {
             asl::Vector3i _myDimensions;
             asl::Vector3f _myVoxelSize;
             asl::Box3i _myVBox;
-            asl::Vector3i _myDimBox;
 
             IJCachePtr   _myCache[2];
             KCachePtr    _myKCache;
