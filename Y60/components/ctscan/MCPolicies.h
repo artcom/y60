@@ -471,23 +471,21 @@ namespace y60 {
             inline
             const asl::Vector2<VoxelT> &
             getThreshold(int theX, int theY, int theZ) const {
-                asl::Point3i myPoint(theX*_myDownSampleRate-1, theY*_myDownSampleRate-1, theZ*_myDownSampleRate-1);
                 unsigned char myIndex = 0;
-                if (_myBoundingBox.contains(myPoint)) {
-                    asl::Vector3i myPosition = myPoint -_myBoundingBox[asl::Box3i::MIN];
-                    asl::Vector4f myPixel =  _mySegmentationBitmaps[myPosition[2]]->getPixel(myPosition[0], myPosition[1]); 
+                int x = theX * _myDownSampleRate;
+                int y = theY * _myDownSampleRate;
+                int z = theZ * _myDownSampleRate;
+                
+                if ( ( x >= _myBoundingBox[asl::Box3i::MIN][0] ) &&  ( x < _myBoundingBox[asl::Box3i::MAX][0]) &&
+                     ( y >= _myBoundingBox[asl::Box3i::MIN][1] ) &&  ( y < _myBoundingBox[asl::Box3i::MAX][1]) &&
+                     ( z >= _myBoundingBox[asl::Box3i::MIN][2] ) &&  ( z < _myBoundingBox[asl::Box3i::MAX][2]) )
+                {
+                    x -= _myBoundingBox[asl::Box3i::MIN][0];
+                    y -= _myBoundingBox[asl::Box3i::MIN][1];
+                    z -= _myBoundingBox[asl::Box3i::MIN][2];
+                    asl::Vector4f myPixel =  _mySegmentationBitmaps[z]->getPixel(x,y); 
                     myIndex = (unsigned char) myPixel[0];
-                } 
-/*
-                unsigned int x = theX * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][0]; 
-                unsigned int y = theY * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][1]; 
-                unsigned int z = theZ * _myDownSampleRate - _myBoundingBox[asl::Box3i::MIN][2]; 
-                x = std::min(x, unsigned(_myBoundingBox[asl::Box3i::MAX][0] - _myBoundingBox[asl::Box3i::MIN][0]-1)); 
-                y = std::min(y, unsigned(_myBoundingBox[asl::Box3i::MAX][1] - _myBoundingBox[asl::Box3i::MIN][1]-1)); 
-                z = std::min(z, unsigned(_myBoundingBox[asl::Box3i::MAX][2] - _myBoundingBox[asl::Box3i::MIN][2]-1));
-                asl::Vector4f myPixel =  _mySegmentationBitmaps[z]->getPixel(x,y); 
-                unsigned char myIndex = (unsigned char) myPixel[0];
-                */
+                }
                 return _myThresholdPalette[myIndex]; 
             }
 

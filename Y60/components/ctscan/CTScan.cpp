@@ -277,6 +277,7 @@ CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate
     myMarcher.march();
     theVertexCount = myPolygonCounter.getVertexCount();
     theTriangleCount = myPolygonCounter.getTriangleCount();
+    // AC_WARNING << "Triangles:"  << theTriangleCount << " Vertices:" << theVertexCount;
 }
 /**
  * @return a Vector of which x is VertexCount and y is TriangleCount
