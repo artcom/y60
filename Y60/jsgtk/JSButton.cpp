@@ -113,6 +113,7 @@ JSButton::Properties() {
         {"use_stock",       PROP_use_stock,       JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"focus_on_click",  PROP_focus_on_click,  JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"alignment",       PROP_alignment,       JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        // use add instead
         //{"image",           PROP_image,           JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"signal_pressed",  PROP_signal_pressed,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"signal_released", PROP_signal_released, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},

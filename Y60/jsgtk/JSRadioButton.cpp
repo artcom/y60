@@ -37,12 +37,32 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+set_group_from_button(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        Gtk::RadioButton * myNative(0);
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        Gtk::RadioButton * myOtherButton(0);
+        convertFrom(cx, argv[0], myOtherButton);
+
+        Gtk::RadioButtonGroup myGroup = myOtherButton->get_group();
+        myNative->set_group( myGroup);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    return JS_FALSE;
+}
+
+
 JSFunctionSpec *
 JSRadioButton::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"set_group_from_button",set_group_from_button,   1},
         {0}
     };
     return myFunctions;
@@ -107,7 +127,7 @@ JSRadioButton::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
         newNative = new Gtk::RadioButton();
         myNewObject = new JSRadioButton(OWNERPTR(newNative), newNative);
     } else {
-        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
+        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none (got %d)",ClassName(), argc);
         return JS_FALSE;
     }
 
