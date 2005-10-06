@@ -21,8 +21,6 @@ function Animation(theAnimationName, theSceneViewer) {
 }
 
 Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer) {
-    const ANIMATION_FRAMES_PER_SECOND = 25;
-
     var _mySceneViewer   = theSceneViewer;
     var _myName  = theAnimationName;
 
@@ -70,6 +68,7 @@ function AnimationManager(theSceneViewer) {
 }
 
 AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
+    const ANIMATION_FRAMES_PER_SECOND = 25;
 
     var _mySceneViewer       = theSceneViewer;
     var _myAnimationTime     = 0;
