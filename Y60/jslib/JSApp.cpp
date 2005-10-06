@@ -94,8 +94,8 @@ MappedBlockMap ourHeartbeatBlocks;
 typedef std::list<asl::PlugInBasePtr> PlugInList;
 static PlugInList ourLoadedPlugIns;
 
-typedef std::map<std::string, bool> IncludeGuardMap;
-IncludeGuardMap ourIncludeGuard;
+typedef std::vector<std::string> IncludeGuardVector;
+IncludeGuardVector ourIncludeGuard;
 
 asl::PackageManagerPtr
 JSApp::getPackageManager() {
@@ -615,6 +615,28 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
+JS_STATIC_DLL_CALLBACK(JSBool)
+Reuse(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Recomiles all included (used) files.");
+    DOC_END;
+    try {
+        for (unsigned i = 0; i < ourIncludeGuard.size(); ++i) {
+            JSScript * script = JS_CompileFile(cx, obj, ourIncludeGuard[i].c_str());
+            if (!script) {
+                return JS_FALSE;
+            } else {
+                jsval result;
+                JSBool ok = JS_ExecuteScript(cx, obj, script, &result);
+                JS_DestroyScript(cx, script);
+                if (!ok) {
+                    return JS_FALSE;
+                }
+            }
+        }
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -659,10 +681,10 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 return JS_FALSE;
             } else {
                 // Only include files once
-                IncludeGuardMap::const_iterator it = ourIncludeGuard.find(myIncludeFileWithPath);
+                IncludeGuardVector::const_iterator it = find(ourIncludeGuard.begin(), ourIncludeGuard.end(), myIncludeFileWithPath);
                 if (it == ourIncludeGuard.end()) {
                     script = JS_CompileFile(cx, obj, myIncludeFileWithPath.c_str());
-                    ourIncludeGuard[myIncludeFileWithPath] = true;
+                    ourIncludeGuard.push_back(myIncludeFileWithPath);
                 } else {
                     return JS_TRUE;
                 }
@@ -1338,6 +1360,7 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSFunctionSpec glob_functions[] = {
     {"print",           Print,          0},
     {"use",             Use,            1},
+    {"reuse",           Reuse,          0},
     {"parseArguments",  ParseArguments, 2},
     {"plug",            Plug,           1},
     {"saveImage",       SaveImage,		2},
