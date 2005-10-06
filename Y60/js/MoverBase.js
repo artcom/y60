@@ -15,12 +15,12 @@
 //
 //=============================================================================
 
-const LEFT_BUTTON   = 1;
-const MIDDLE_BUTTON = 3;
-const RIGHT_BUTTON  = 2;
+var LEFT_BUTTON   = 1;
+var MIDDLE_BUTTON = 3;
+var RIGHT_BUTTON  = 2;
 
-const BUTTON_UP     = 0;
-const BUTTON_DOWN   = 1;
+var BUTTON_UP     = 0;
+var BUTTON_DOWN   = 1;
 
 function MoverBase(theViewport) {
     this.Constructor(this, theViewport);

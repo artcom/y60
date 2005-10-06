@@ -25,17 +25,18 @@ function setCursor(theImageString, theSize) {
 }
 
 function resetCursor() {
-    window.resetCursor();    
+    window.resetCursor();
 }
 
 //      Paint instructions:
 //      the Cursorimage must have dimensions dividable by 8
-//    
+//
 //      Paint the image as follows:
 //      'X' = black
 //      ' ' = transparent
-//      '.' = white 
-const myArrowImage =    "X                               "+
+//      '.' = white
+
+var myArrowImage =      "X                               "+
                         "XX                              "+
                         "X.X                             "+
                         "X..X                            "+
@@ -66,4 +67,4 @@ const myArrowImage =    "X                               "+
                         "                                "+
                         "                                "+
                         "                                "+
-                        "                                ";  
+                        "                                ";

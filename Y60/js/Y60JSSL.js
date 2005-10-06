@@ -22,10 +22,10 @@
 //     - JavaScript helper functions
 //==============================================================================
 
-const PI_2 = Math.PI / 2;
-const PI_4 = Math.PI / 4;
-const PI_180 = Math.PI / 180;
-const TWO_PI = Math.PI * 2.0;
+var PI_2 = Math.PI / 2;
+var PI_4 = Math.PI / 4;
+var PI_180 = Math.PI / 180;
+var TWO_PI = Math.PI * 2.0;
 
 function clone(theObject) {
     var myNewObject = [];

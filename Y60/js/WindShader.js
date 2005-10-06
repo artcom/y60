@@ -73,7 +73,6 @@ WindShader.prototype.Constructor = function(obj, theWind, theBodyNames, theWorld
                 var myBody = _myBodys[i];
                 // clear local heading
                 myBody.orientation.y = 0;
-                window.updateGlobalMatrix(myBody);
 
                 // get global heading in rad
                 var tempVec = myBody.globalmatrix.getRow(0);

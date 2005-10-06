@@ -17,20 +17,20 @@
 
 use("AnimationManager.js");
 
-const SHUTTER_OVERLAY = "shadertex/black.rgb";
-const CUSTOM_SHUTTER_OVERLAY = "shadertex/custom_shutter.png";
-
-const LEFT_SHUTTER    = 0;
-const RIGHT_SHUTTER   = 1;
-const TOP_SHUTTER     = 2;
-const BOTTOM_SHUTTER  = 3;
-const DEFAULT_SHUTTER_SIZE   = 0;
-
 function Shutter(theSceneViewer, theSize, theCustomShutterFile) {
     this.Constructor(this, theSceneViewer, theSize, theCustomShutterFile);
 }
 
 Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCustomShutterFile) {
+    const SHUTTER_OVERLAY = "shadertex/black.rgb";
+    const CUSTOM_SHUTTER_OVERLAY = "shadertex/custom_shutter.png";
+
+    const LEFT_SHUTTER    = 0;
+    const RIGHT_SHUTTER   = 1;
+    const TOP_SHUTTER     = 2;
+    const BOTTOM_SHUTTER  = 3;
+    const DEFAULT_SHUTTER_SIZE   = 0;
+
     var _myShutterXmlFileName = "";
     var _mySceneViewer           = theSceneViewer;
     var _myLeftOverlay           = null;

@@ -20,19 +20,6 @@ use("MoverBase.js");
 use("picking_functions.js");
 use("intersection_functions.js");
 
-
-const MODEL_FRONT_DIRECTION    = new Vector3f(0,0,1);
-const MODEL_UP_DIRECTION       = new Vector3f(0,1,0);
-const MODEL_RIGHT_DIRECTION    = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
-const INITIAL_WALK_SPEED       = 0.1; // percentage of world size per second
-const INITIAL_EYEHEIGHT        = 2.0;
-const ROTATE_SPEED             = 1.0;
-const GRAVITY                  = 9.81;
-const PERSON_MASS              = 100;
-const GRAVITY_DIRECTION        = new Vector3f(0, -1, 0);
-const GRAVITY_ACCELERATION     = product(GRAVITY_DIRECTION, GRAVITY);
-const PERSON_WEIGHT_FORCE      = product(GRAVITY_ACCELERATION, PERSON_MASS);
-
 function WalkMover() {
     this.Constructor(this);
 }
@@ -40,6 +27,20 @@ function WalkMover() {
 WalkMover.prototype.Constructor = function(self) {
     MoverBase.prototype.Constructor(self);
     self.Mover = [];
+
+    //////////////////////////////////////////////////////////////////////
+
+    const MODEL_FRONT_DIRECTION    = new Vector3f(0,0,1);
+    const MODEL_UP_DIRECTION       = new Vector3f(0,1,0);
+    const MODEL_RIGHT_DIRECTION    = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
+    const INITIAL_WALK_SPEED       = 0.1; // percentage of world size per second
+    const INITIAL_EYEHEIGHT        = 2.0;
+    const ROTATE_SPEED             = 1.0;
+    const GRAVITY                  = 9.81;
+    const PERSON_MASS              = 100;
+    const GRAVITY_DIRECTION        = new Vector3f(0, -1, 0);
+    const GRAVITY_ACCELERATION     = product(GRAVITY_DIRECTION, GRAVITY);
+    const PERSON_WEIGHT_FORCE      = product(GRAVITY_ACCELERATION, PERSON_MASS);
 
     //////////////////////////////////////////////////////////////////////
 
@@ -78,7 +79,6 @@ WalkMover.prototype.Constructor = function(self) {
         self.Mover.reset();
 
         var myCamera          = self.getMoverObject();
-        Scene.updateGlobalMatrix(myCamera);
 
         _myPosition          = myCamera.globalmatrix.getTranslation();
         _myVelocity          = new Vector3f(0,0,0);
@@ -88,7 +88,7 @@ WalkMover.prototype.Constructor = function(self) {
         _myGroundContactFlag = false;
         _myGroundNormal      = null;
         _myGroundPlane       = null;
-        _myEyeHeight         = INITIAL_EYEHEIGHT;        
+        _myEyeHeight         = INITIAL_EYEHEIGHT;
     }
 
     self.onIdle = function(theTime) {
@@ -120,9 +120,9 @@ WalkMover.prototype.Constructor = function(self) {
                     _myEyeHeight -= 0.1;
                     _myEyeHeight = Math.max(_myEyeHeight,0);
                 break;
-                   
-            }            
-        } else {            
+
+            }
+        } else {
             _myPressedKeys[theKey] = theKeyState;
         }
         self.Mover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
@@ -166,7 +166,6 @@ WalkMover.prototype.Constructor = function(self) {
 
     function simulate(theDeltaTime) {
         var myCamera = self.getMoverObject();
-        Scene.updateGlobalMatrix(myCamera);
 
         // Get current orientation
         var myOrientationMatrix = new Matrix4f;

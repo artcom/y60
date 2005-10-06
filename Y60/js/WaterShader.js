@@ -122,8 +122,7 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
             // since the floating objects (may) have moved, we have to
             // recalc the world matrixes
             var myCamera = window.camera;
-            
-            window.updateGlobalMatrix(window.camera);
+
             var myInverseProjectionMatrix = renderer.projectionmatrix;
             myInverseProjectionMatrix.invert();
             var myCameraWorldMatrix = window.camera.globalmatrix;
@@ -146,7 +145,7 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
             print("renderer.width=" +renderer.width);
             print("renderer.height=" +renderer.height);
 			*/
-			
+
             var myAspect = renderer.width / renderer.height;
             var myVerticalFOV = renderer.horizontalfov/myAspect;
             //print("Aspect" + myAspect);

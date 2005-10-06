@@ -16,8 +16,6 @@
 //
 //=============================================================================
 
-const ENABLE_TIMING = true;
-
 // This timer automatically times the lapsed time between two adds
 // Sample usage:
 //
@@ -31,6 +29,8 @@ const ENABLE_TIMING = true;
 // }
 
 function AutoTimer(theName) {
+    const ENABLE_TIMING = true;
+
     var _myName       = theName;
     var _myTimes      = [];
     var _myTimerNames = [];

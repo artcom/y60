@@ -40,17 +40,15 @@ use("Timer.js");
 use("Configurator.js");
 use("shutter.js");
 use("OnScreenDisplay.js");
-
 use("MemoryMeter.js");
 
-//plug("y60FFMpegDecoder1");
 //plug("y60QuicktimeDecoder"); // turn on for windows and better mov decoder support
 
 // Global window object (similar to html window)
-var window   = null;
-var renderer = null; // initialized at loadScene
+if (window == undefined) var window   = null;
+if (renderer == undefined) var renderer = null;
 
-const SETTINGS_FILE_NAME = "settings.xml"
+var SETTINGS_FILE_NAME = "settings.xml";
 
 function SceneViewer(theArguments) {
     this.Constructor(this, theArguments);
@@ -327,6 +325,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     self.prevCamera();
                     print("Active camera: " + window.camera.name);
                     break;
+                case "e":
+                    reuse();
+                    print("All includes re-evaluated.");
+                    break;
                 default:
                     break;
             }
@@ -493,6 +495,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
          print("    q    quits the application");
          print("    X    dumps scene on console");
          print("    u    toggle used memory display");
+         print("    e    re-evaluate all include-files");
          print("    +    increase zoom factor");
          print("    -    decrease zoom factor");
          print("    ,    switch to previous camera");

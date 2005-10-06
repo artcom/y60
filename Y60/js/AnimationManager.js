@@ -16,19 +16,13 @@
 //
 //=============================================================================
 
-const ANIMATION_FRAMES_PER_SECOND = 25;
-
-
-//=============================================================================
-//
-// A simple animation class
-//
-//=============================================================================
-
 function Animation(theAnimationName, theSceneViewer) {
     this.Constructor(this, theAnimationName, theSceneViewer);
 }
+
 Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer) {
+    const ANIMATION_FRAMES_PER_SECOND = 25;
+
     var _mySceneViewer   = theSceneViewer;
     var _myName  = theAnimationName;
 
