@@ -70,6 +70,7 @@ class JSWidget : public JSWrapper<Gtk::Widget, asl::Ptr<Gtk::Widget>, StaticAcce
             PROP_signal_enter_notify_event,
             PROP_signal_leave_notify_event,
             PROP_signal_delete_event,
+            PROP_flags,
             PROP_END,
         };
         static JSPropertySpec * Properties();

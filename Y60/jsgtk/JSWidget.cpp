@@ -241,6 +241,7 @@ JSWidget::Properties() {
         DEFINE_RO_PROPERTY(signal_enter_notify_event),
         DEFINE_RO_PROPERTY(signal_leave_notify_event),
         DEFINE_RO_PROPERTY(signal_delete_event),
+        DEFINE_PROPERTY(flags),
         {0}
     };
     return myProperties;
@@ -265,6 +266,9 @@ JSWidget::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             return JS_TRUE;
         case PROP_sensitive:
             *vp = as_jsval(cx, theNative.sensitive());
+            return JS_TRUE;
+        case PROP_flags:
+            *vp = as_jsval(cx, static_cast<int>(theNative.get_flags()));
             return JS_TRUE;
         case PROP_focus:
             *vp = as_jsval(cx, theNative.has_focus());
@@ -409,6 +413,13 @@ JSWidget::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                 bool mySensitivityFlag;
                 convertFrom(cx, *vp, mySensitivityFlag);
                 theNative.set_sensitive(mySensitivityFlag);
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
+        case PROP_flags:
+            try {
+                int myFlags;
+                convertFrom(cx, *vp, myFlags);
+                theNative.set_flags(static_cast<Gtk::WidgetFlags>(myFlags));
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         default:

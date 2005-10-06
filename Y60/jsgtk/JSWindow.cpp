@@ -124,6 +124,7 @@ JSWindow::Properties() {
         {"screenSize",      PROP_screenSize,       JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"position",        PROP_position,         JSPROP_ENUMERATE|JSPROP_PERMANENT}, // Vector2i
         {"size",            PROP_size,             JSPROP_ENUMERATE|JSPROP_PERMANENT}, // Vector2i
+        {"type_hint",       PROP_type_hint,        JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -172,6 +173,9 @@ JSWindow::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         case PROP_screenSize:
             *vp = as_jsval(cx, Vector2i(Gdk::screen_width(), Gdk::screen_height()));
             return JS_TRUE;
+        case PROP_type_hint:
+            *vp = as_jsval(cx, static_cast<int>(theNative.get_type_hint()));
+            return JS_TRUE;
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
@@ -208,6 +212,13 @@ JSWindow::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                     Vector2i theSize;
                     convertFrom(cx, *vp, theSize);
                     theNative.resize(theSize[0], theSize[1]);
+                    return JS_TRUE;
+                }
+            case PROP_type_hint:
+                {
+                    int myTypeHint;
+                    convertFrom(cx, *vp, myTypeHint);
+                    theNative.set_type_hint(static_cast<Gdk::WindowTypeHint>(myTypeHint));
                     return JS_TRUE;
                 }
             default:

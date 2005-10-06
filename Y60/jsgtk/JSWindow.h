@@ -49,6 +49,7 @@ class JSWindow : public JSWrapper<Gtk::Window, asl::Ptr<Gtk::Window>, StaticAcce
             PROP_position,
             PROP_size,
             PROP_screenSize,
+            PROP_type_hint,
             PROP_END
         };
         static JSPropertySpec * Properties();

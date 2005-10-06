@@ -179,7 +179,7 @@ JSDialog::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
         // newNative->set_events(Gdk::ALL_EVENTS_MASK);
 
         myNewObject = new JSDialog(OWNERPTR(newNative), newNative);
-    } else if (argc == 2 ) {
+    } else if (argc >= 2 ) {
         Glib::ustring myTitle;
         if ( ! convertFrom(cx, argv[0], myTitle)) {
             JS_ReportError(cx,"Constructor for %s: Argument 1 must be a string.",ClassName());
@@ -195,9 +195,15 @@ JSDialog::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
             JS_ReportError(cx,"Constructor for %s: Failed to get parent window.",ClassName());
             return JS_FALSE;
         }
-        newNative = new NATIVE(myTitle, *myParent);
+        bool myModal = false;
+        if (argc >= 3) {            
+            if ( ! convertFrom(cx, argv[2], myModal)) {
+                JS_ReportError(cx,"Constructor for %s: Argument 3 must be bool",ClassName());
+                return JS_FALSE;
+            }
+        }
+        newNative = new NATIVE(myTitle, *myParent, myModal);
         myNewObject = new JSDialog(OWNERPTR(newNative), newNative);
-
         
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
