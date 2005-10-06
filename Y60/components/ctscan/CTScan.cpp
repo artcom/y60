@@ -399,12 +399,12 @@ CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin,
 }
 
 void CTScan::prepareBox(asl::Box3i & theVoxelBox) {
-    theVoxelBox[asl::Box3i::MIN][0] = asl::maximum(int(theVoxelBox[asl::Box3i::MIN][0])-1, 0);
-    theVoxelBox[asl::Box3i::MIN][1] = asl::maximum(int(theVoxelBox[asl::Box3i::MIN][1])-1, 0);
-    theVoxelBox[asl::Box3i::MIN][2] = asl::maximum(int(theVoxelBox[asl::Box3i::MIN][2])-1, 0);
-    theVoxelBox[asl::Box3i::MAX][0] = asl::minimum(int(theVoxelBox[asl::Box3i::MAX][0])+1, getVoxelDimensions()[0]);
-    theVoxelBox[asl::Box3i::MAX][1] = asl::minimum(int(theVoxelBox[asl::Box3i::MAX][1])+1, getVoxelDimensions()[1]);
-    theVoxelBox[asl::Box3i::MAX][2] = asl::minimum(int(theVoxelBox[asl::Box3i::MAX][2])+1, getVoxelDimensions()[2]);
+    theVoxelBox[asl::Box3i::MIN][0] = asl::maximum(int(theVoxelBox[asl::Box3i::MIN][0]), 0);
+    theVoxelBox[asl::Box3i::MIN][1] = asl::maximum(int(theVoxelBox[asl::Box3i::MIN][1]), 0);
+    theVoxelBox[asl::Box3i::MIN][2] = asl::maximum(int(theVoxelBox[asl::Box3i::MIN][2]), 0);
+    theVoxelBox[asl::Box3i::MAX][0] = asl::minimum(int(theVoxelBox[asl::Box3i::MAX][0]), getVoxelDimensions()[0]);
+    theVoxelBox[asl::Box3i::MAX][1] = asl::minimum(int(theVoxelBox[asl::Box3i::MAX][1]), getVoxelDimensions()[1]);
+    theVoxelBox[asl::Box3i::MAX][2] = asl::minimum(int(theVoxelBox[asl::Box3i::MAX][2]), getVoxelDimensions()[2]);
 }
 
 ScenePtr
