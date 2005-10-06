@@ -146,31 +146,19 @@ namespace y60 {
                             // external twin
                             if (myNeighbor.type == MCLookup::MAX_X ||
                                     myNeighbor.type == MCLookup::MAX_Y ||
-                                    myNeighbor.type == MCLookup::MAX_Z)                             {
-                                // XXX
-                                if (1
-                                        /*((myNeighbor.type == MCLookup::MAX_X) && i != iboxend) ||
-                                          ((myNeighbor.type == MCLookup::MAX_Y) && j != jboxend) ||
-                                          ((myNeighbor.type == MCLookup::MAX_Z) && k != kboxend)*/
-                                   ) 
-                                { 
-                                    // Add to the map
-                                    EdgeId myKey(myIndex, myNextIndex);
-                                    int myValue = getHalfEdgeCount();
-                                    EdgeCache::value_type myItem(myKey, myValue);
-                                    _myHalfEdgeCache.insert(myItem);
-                                    DB(AC_TRACE << "Inserting: (" << myKey.first << ", " << myKey.second << ")");
-                                }
+                                    myNeighbor.type == MCLookup::MAX_Z)
+                            {
+                                // Add to the map
+                                EdgeId myKey(myIndex, myNextIndex);
+                                int myValue = getHalfEdgeCount();
+                                EdgeCache::value_type myItem(myKey, myValue);
+                                _myHalfEdgeCache.insert(myItem);
+                                DB(AC_TRACE << "Inserting: (" << myKey.first << ", " << myKey.second << ")");
                             } else {
                                 // Remove from map
                                 EdgeId myKey(myNextIndex, myIndex);
                                 EdgeCache::iterator iter = _myHalfEdgeCache.find(myKey);
-                                if (_myHalfEdgeCache.end() == iter) {
-                                    // [TS] Disabled for Segmentation
-                                    //if (!(kMarch == _myVBox[asl::Box3i::MIN][2]) && !(iMarch == _myVBox[asl::Box3i::MIN][0]) && !(jMarch == _myVBox[asl::Box3i::MIN][1])) {
-                                    // AC_WARNING << "Not Found in Cache: (" << myKey.first << ", " << myKey.second << ") = (" << myCornerIndex << ", " << myNextCornerIndex << ") jMarch: " << jMarch << ", iMarch: " << iMarch << ", kMarch: " << kMarch;
-                                    //}
-                                } else {
+                                if (_myHalfEdgeCache.end() != iter) {
                                     myHalfEdge = (*iter).second;
                                     _myHalfEdgeCache.erase(iter);
                                     DB(AC_TRACE << "Removing: (" << myKey.first << ", " << myKey.second << ")");
@@ -342,7 +330,6 @@ namespace y60 {
             }       
             inline float interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
                 const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
-            //inline float interpolateNormal(const VoxelT & theFirstValue, const VoxelT & theSecondValue, int theIndex, bool theUpperFlag)
             {
                 if (!theUpperFlag) {
                     return float((_myThresholds[0] - theFirstValue) - (_myThresholds[0] - theSecondValue));
@@ -396,7 +383,6 @@ namespace y60 {
 
             inline float interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
                 const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
-            //inline float interpolateNormal(const VoxelT & theFirstValue, const VoxelT & theSecondValue, int theIndex, bool theUpperFlag)
             {
                 const asl::Vector2<VoxelT> & myFirstThreshold  = _myThresholdCube[theFirstIndex];
                 const asl::Vector2<VoxelT> & mySecondThreshold = getThreshold(theSecondPosition[0], theSecondPosition[1], theSecondPosition[2]);
@@ -404,25 +390,9 @@ namespace y60 {
                     return float(theSecondValue)/float(mySecondThreshold[0]) - float(theFirstValue)/float(myFirstThreshold[0]);
                 } else {
                     return float(theSecondValue)/float(mySecondThreshold[1]) - float(theFirstValue)/float(myFirstThreshold[1]);
-                    //return float((myFirstThreshold[1] - theFirstValue) - (mySecondThreshold[0] - theSecondValue));
                 }
             }
-/*
-            inline float 
-            interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
-                const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
-            {
-                const asl::Vector2<VoxelT> & myFirstThreshold  = _myThresholdCube[theFirstIndex];
-                const asl::Vector2<VoxelT> & mySecondThreshold = getThreshold(theSecondPosition[0], theSecondPosition[1], theSecondPosition[2]);
-                if (theUpperFlag) {
-                    return float((theFirstValue - myFirstThreshold[0]) - (theSecondValue - mySecondThreshold[0]));
-                    //return float((myFirstThreshold[0] - theFirstValue) - (mySecondThreshold[0] - theSecondValue));
-                    //return float((myFirstThreshold[0] - theFirstValue) - (mySecondThreshold[0] - theSecondValue));
-                } else {
-                    return float((theFirstValue - myFirstThreshold[1]) - (theSecondValue - mySecondThreshold[1]));
-                }
-            }
-*/
+
             inline float 
             interpolatePosition(const std::vector<VoxelT> & theVoxelCube,
                 int theFirstIndex, int theSecondIndex, bool & theInsideOutFlag) const 

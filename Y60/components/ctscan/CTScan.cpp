@@ -1168,16 +1168,6 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
                                     dom::NodePtr theReconstructedImage, unsigned theSliceIndex,
                                     Orientation theOrientation, dom::NodePtr thePaletteNode)
 {
-    ResizeableRasterPtr myReconstructedRaster = dynamic_cast_Ptr<ResizeableRaster>(
-            theReconstructedImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
-
-    y60::PixelEncoding myEncoding;
-    myEncoding = theReconstructedImage->dom::Node::getFacade<y60::Image>()->getEncoding();
-    unsigned myRIHeight = myReconstructedRaster->height();
-    unsigned myRIStride = getBytesRequired(myReconstructedRaster->width(), myEncoding);
-    unsigned myRIBPP    = getBytesRequired(1, myEncoding);
-    const unsigned char * myRIPixels = myReconstructedRaster->pixels().begin();
-
     PaletteTable<VoxelT> myPalette(255, PaletteItem<VoxelT>(Vector2<VoxelT>(-1, -1), Vector3i( -1, -1, -1)));
     unsigned myIndex;
     Vector2f myThresholdsFloat;
@@ -1208,6 +1198,16 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
             theCanvas->childNode(0)->childNode(0)->nodeValueWrapperPtr());
     unsigned myCanvasWidth = theCanvas->dom::Node::getAttributeValue<unsigned>("width");
     unsigned myCanvasHeight = theCanvas->dom::Node::getAttributeValue<unsigned>("height");
+
+    ResizeableRasterPtr myReconstructedRaster = dynamic_cast_Ptr<ResizeableRaster>(
+            theReconstructedImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
+
+    y60::PixelEncoding myEncoding = theReconstructedImage->dom::Node::getFacade<y60::Image>()->getEncoding();
+    unsigned myRIHeight = myCanvasHeight; // use non power of two size from dom 
+    unsigned myRIStride = getBytesRequired(myReconstructedRaster->width(), myEncoding);
+    unsigned myRIBPP    = getBytesRequired(1, myEncoding);
+    const unsigned char * myRIPixels = myReconstructedRaster->pixels().begin();
+
 
     unsigned myTargetLineStride = getBytesRequired(myCanvasWidth, y60::RGBA);
     unsigned myBytesPerPixel = getBytesRequired(1, y60::RGBA);
