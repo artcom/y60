@@ -115,29 +115,44 @@ CWRuler::on_motion_notify_event(GdkEventMotion * theEvent) {
         if (_myMode == MODE_LOWER_UPPER) {
             switch (_myState) {
                 case CHANGE_WIDTH_LEFT:
-                    _myLower = myValue;
-                    _myLowerChangedSignal.emit(_myLower);
+                    myValue = min(max(myValue, _myValueRange[0]), _myUpper - MIN_WINDOW_WIDTH);
+                    if (myValue != _myLower) {
+                        _myLower = myValue;
+                        _myLowerChangedSignal.emit(_myLower);
+                    }
                     break;
                 case CHANGE_WIDTH_RIGHT:
-                    _myUpper = myValue;
-                    _myUpperChangedSignal.emit(_myUpper);
+                    myValue = max(min(myValue, _myValueRange[1]), _myLower + MIN_WINDOW_WIDTH);
+                    if (myValue != _myUpper) {
+                        _myUpper = myValue;
+                        _myUpperChangedSignal.emit(_myUpper);
+                    }
                     break;
             }
         } else {
             switch (_myState) {
                 case CHANGE_CENTER:
-                    _myWindowCenter = min(max(myValue, _myValueRange[0]), _myValueRange[1]);
-                    _myCenterChangedSignal.emit(_myWindowCenter);
+                    myValue = min(max(myValue, _myValueRange[0]), _myValueRange[1]);
+                    if (myValue != _myWindowCenter) {
+                        _myWindowCenter = myValue;
+                        _myCenterChangedSignal.emit(_myWindowCenter);
+                    }
                     break;
                 case CHANGE_WIDTH_LEFT:
-                    _myWindowWidth = max(min(2.0f * (_myWindowCenter - myValue),
+                    myValue = max(min(2.0f * (_myWindowCenter - myValue),
                                 2.0f * (_myWindowCenter - _myValueRange[0])), MIN_WINDOW_WIDTH);
-                    _myWidthChangedSignal.emit(_myWindowWidth);
+                    if (myValue != _myWindowWidth) {
+                        _myWindowWidth = myValue;
+                        _myWidthChangedSignal.emit(_myWindowWidth);
+                    }
                     break;
                 case CHANGE_WIDTH_RIGHT:
-                    _myWindowWidth = max(min(2.0f * (myValue - _myWindowCenter),
+                    myValue = max(min(2.0f * (myValue - _myWindowCenter),
                                 2.0f *(_myValueRange[1] - _myWindowCenter)), MIN_WINDOW_WIDTH);
-                    _myWidthChangedSignal.emit(_myWindowWidth);
+                    if (myValue != _myWindowWidth) {
+                        _myWindowWidth = myValue;
+                        _myWidthChangedSignal.emit(_myWindowWidth);
+                    }
                     break;
             }
         }
