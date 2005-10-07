@@ -157,8 +157,16 @@ FixedVectorUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('almostEqual(normalized(new Vector2f(0,9)),new Vector2f(0,1))');
         obj.myLen = Math.sqrt(1*1+2*2);
         ENSURE('almostEqual(normalized(new Vector2f(1,2)),new Vector2f(1/obj.myLen,2/obj.myLen))');
-    };
-};
+
+        // String constructor
+        obj.myVector = new Vector2f("[2,3]");
+        ENSURE('almostEqual(obj.myVector, new Vector2f(2,3))');
+        obj.myVector = new Vector3f("[2,3,4]");
+        ENSURE('almostEqual(obj.myVector, new Vector3f(2,3,4))');
+        obj.myVector = new Vector4f("[2,3,4,5]");
+        ENSURE('almostEqual(obj.myVector, new Vector4f(2,3,4,5))');
+    }
+}
 
 
 function Matrix4fUnitTest() {

@@ -816,7 +816,7 @@ struct JSVector  {
         };
         return myFunctions;
     }
-    
+
     static JSPropertySpec * Properties() {
         static JSPropertySpec myProperties[] = {
             {"length",   PROP_LENGTH,      JSPROP_ENUMERATE},
@@ -993,8 +993,16 @@ struct JSVector  {
 private:
     static JSBool
     Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Constructs a JSVector from a provided array, a given size or constructs an empty one.");
-    DOC_END;
+        DOC_BEGIN("Constructs a JSVector from the provided parameters or constructs an empty one.");
+        DOC_PARAM("theArray", DOC_TYPE_ARRAY);
+        DOC_RESET;
+        DOC_PARAM("theVectorString", DOC_TYPE_STRING);
+        DOC_RESET;
+        DOC_PARAM("theFirstNumber", DOC_TYPE_FLOAT);
+        DOC_PARAM("theSecondNumber", DOC_TYPE_FLOAT);
+        DOC_PARAM("...", DOC_TYPE_FLOAT);
+        DOC_END;
+
         IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << std::endl);
         if (JSA_GetClass(cx,obj) != Class()) {
             JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
@@ -1002,9 +1010,11 @@ private:
         }
         JSVector * myNewObject = 0;
         if (argc == 0) {
+            // Default constructor
             myNewObject=new JSVector();
         } else {
             if (argc == SIZE) {
+                // Constructor with numbers
                 asl::FixedVector<SIZE,jsdouble> myArgs;
                 for (int i = 0; i < SIZE;++i) {
                     if (!JS_ValueToNumber(cx, argv[i], &myArgs[i])) {
@@ -1021,12 +1031,21 @@ private:
                     return JS_FALSE;
                 }
                 if (JSA_GetClass(cx,myArgument) == Class()) {
-                    myNewObject=new JSVector(getNativeRef(cx, myArgument));
+                    // Copy constructor
+                    myNewObject = new JSVector(getNativeRef(cx, myArgument));
+                } else if (JSVAL_IS_STRING(argv[0])) {
+                    // Construct from String
+                    std::string myString;
+                    if (!convertFrom(cx, argv[0], myString)) {
+                        JS_ReportError(cx, "JSVector<%s>::Constructor: argument must be a vector or array or string", ClassName());
+                        return JS_FALSE;
+                    }
+                    myNewObject = new JSVector(asl::as<asl::FixedVector<SIZE,jsdouble> >(myString));
                 } else {
-                    // try to get values from array
+                    // Construct from Array
                     jsuint myArrayLength = 0;
                     if (!JS_HasArrayLength(cx,myArgument,&myArrayLength)) {
-                        JS_ReportError(cx,"JSVector<%s>::Constructor: argument must be a vector or array",ClassName());
+                        JS_ReportError(cx,"JSVector<%s>::Constructor: argument must be a vector or array or string",ClassName());
                         return JS_FALSE;
                     }
 
@@ -1035,9 +1054,10 @@ private:
                             ClassName(),SIZE, myArrayLength);
                         return JS_FALSE;
                     }
+
                     asl::FixedVector<SIZE,jsval> myArgElems;
                     asl::FixedVector<SIZE,jsdouble> myNumbers;
-                    NATIVE_VECTOR myVector;
+
                     for (int i = 0; i < SIZE;++i) {
     #ifdef USE_SLOW_PROPERTY_LOOKUP
                         if (!JS_GetProperty(cx,myArgument,as_cstring(i),&myArgElems[i])) {
@@ -1055,7 +1075,6 @@ private:
                             JS_ReportError(cx,"JSVector<%s>::Constructor: argument %d is not a number",ClassName(),i);
                             return JS_FALSE;
                         }
-                        myVector[i] = ELEM(myNumbers[i]);
                     }
                     IF_NOISY2(AC_TRACE << "Constructor myNumbers =" << myNumbers << std::endl);
                     myNewObject = new JSVector(myNumbers);
@@ -1129,8 +1148,8 @@ DEFINE_VECTOR_CLASS_TRAITS(asl::Point4i)
 
 template <class VECTOR_NF>
 template <template <class> class VECTOR, class NUMBER>
-bool Converter<VECTOR_NF>::convertFromVN(JSContext *cx, jsval theValue, 
-    VECTOR<NUMBER> & theVector) 
+bool Converter<VECTOR_NF>::convertFromVN(JSContext *cx, jsval theValue,
+    VECTOR<NUMBER> & theVector)
 {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myValObj = JSVAL_TO_OBJECT(theValue);
