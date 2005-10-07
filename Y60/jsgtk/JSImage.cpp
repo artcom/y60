@@ -117,7 +117,8 @@ JSImage::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
                 JS_ReportError(cx,"Constructor for %s: argument 0 must be a string", ClassName());
                 return JS_FALSE;
             }
-            newNative = new NATIVE(myString);
+            std::string myImageWithPath = searchFileRelativeToJSInclude(cx, obj, argc, argv, myString);
+            newNative = new NATIVE(myImageWithPath);
         }
         break;
     default:
