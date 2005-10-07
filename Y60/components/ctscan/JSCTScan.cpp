@@ -152,7 +152,7 @@ computeProfile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
             JS_ReportError(cx, "JSCTScan::computeProfile(): 1 argument must be an array of Points");
             return JS_FALSE;
         }
-        std::vector<unsigned> myProfile;
+        std::vector<Signed16> myProfile;
         std::vector<asl::Point3i> mySampledPoints;
         CTScan & myCTScan = myObj.getNative();
         myCTScan.computeProfile(myVoxelPositions, myProfile, mySampledPoints);

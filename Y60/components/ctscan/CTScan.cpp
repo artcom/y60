@@ -741,7 +741,7 @@ CTScan::computeHistogram(const Box3i & theVOI, std::vector<unsigned> & theHistog
 
 void
 CTScan::computeProfile(const std::vector<asl::Point3i> & thePoints, 
-        std::vector<unsigned> & theProfile, std::vector<asl::Point3i> & thePointsSampled)
+        std::vector<Signed16> & theProfile, std::vector<asl::Point3i> & thePointsSampled)
 {
     if (thePoints.empty()) {
         return;
@@ -758,17 +758,30 @@ CTScan::computeProfile(const std::vector<asl::Point3i> & thePoints,
 }
 
 void
-CTScan::computeProfile(const asl::Point3i & thePosition, std::vector<unsigned> & theProfile) {
+CTScan::computeProfile(const asl::Point3i & thePosition, std::vector<Signed16> & theProfile) {
     const unsigned char * myData = _mySlices[thePosition[2]]->pixels().begin();
-    myData += thePosition[0]+thePosition[1]*getBytesRequired(_mySlices[thePosition[2]]->width(), _myEncoding);
-    theProfile.push_back(*myData);
+    myData += getBytesRequired(thePosition[0], _myEncoding)
+              +thePosition[1]*getBytesRequired(_mySlices[thePosition[2]]->width(), _myEncoding);
+    switch (_myEncoding) {
+        case y60::GRAY:
+            theProfile.push_back(*myData);
+            break;
+        case y60::GRAY16:
+            theProfile.push_back(*reinterpret_cast<const Unsigned16*>(myData));
+            break;
+        case y60::GRAYS16:
+            theProfile.push_back(*reinterpret_cast<const Signed16*>(myData));
+            break;
+        default:
+            throw CTScanException("Unhandled voxel type in CTScan::computeProfile()", PLUS_FILE_LINE);
+    }
 }
 
 // computes the grey-scale profile of all voxels
 // from [theStart, theEnd[  (without theEnd)
 void
 CTScan::computeLineSegmentProfile(const asl::Point3i & theStart, const asl::Point3i & theEnd, 
-        std::vector<unsigned> & theProfile, std::vector<Point3i> & thePointsSampled) 
+        std::vector<Signed16> & theProfile, std::vector<Point3i> & thePointsSampled) 
 {
     // find the axis with the max delta
     int maxDelta = 0;
