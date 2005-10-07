@@ -21,49 +21,48 @@
 #define _ac_dom_PropertyPlug_h_
 
 #include <dom/Nodes.h>
+#include "AttributePlug.h"
 
 namespace dom {
 
-    static const char * PROPERTY_LIST_NAME = "properties";
-    static const char * NAME_ATTRIB        = "name";
 
-#define DEFINE_PROPERTY_TAG(theTagName, theType, theNodeName, thePropertyName, theDefault) \
+#define DEFINE_PROPERTY_TAG(theTagName, theFacade, theType, theNodeName, thePropertyName, \
+        thePropertyListName, theAttributeName, theDefault) \
+    class theFacade; \
     struct theTagName { \
         typedef theType TYPE; \
-        typedef dom::PropertyPlug<theTagName> Plug; \
+        typedef dom::PropertyPlug<theTagName, theFacade> Plug; \
         static const char * getNodeName() { return theNodeName; } \
         static const char * getName() { return thePropertyName; } \
+        static const char * getListName() { return thePropertyListName; } \
+        static const char * getAttributeName() { return theAttributeName; } \
 		static const TYPE getDefault() { return theDefault; } \
-    };
+    }; 
+    
 
-    template<class TAG>
+    template<class TAG, class FACADE>
     class PropertyPlug {
         public:
             typedef typename TAG::TYPE VALUE;
             typedef typename ValueWrapper<VALUE>::Type WRAPPER;
 
-            PropertyPlug(const Node & theNode) : _myTextChild(0) {
+            PropertyPlug(FACADE * theFacade) : _myTextChild(0), _myPropertyNode(0), _myFacade(theFacade)
+            {
+                ensureTextChild(theFacade->getNode());
             }
 
             const VALUE & getValue(const Node & theNode) const {
-                if (!_myTextChild) {
-                    ensureTextChild(theNode);
-                }
+                ensureTextChild(theNode);
                 return ValueHelper<VALUE, WRAPPER>::getValue(_myTextChild->nodeValueWrapperPtr());
             }
 
             const VALUE & setValue(Node & theNode, const VALUE & theValue) {
-                if (!_myTextChild) {
-                    return ensureTextChild(theNode, theValue);
-                } else {
-                    return ValueHelper<VALUE, WRAPPER>::setValue(_myTextChild->nodeValueWrapperPtr(), theValue);
-                }
+                ensureTextChild(theNode, theValue);
+                return ValueHelper<VALUE, WRAPPER>::setValue(_myTextChild->nodeValueWrapperPtr(), theValue);
             }
 
             unsigned long long getVersion(const Node & theNode) const {
-                if (!_myTextChild) {
-                    ensureTextChild(theNode);
-                }
+                ensureTextChild(theNode);
                 return _myTextChild->nodeVersion();
             }
             bool hasOutdatedDependencies() const {
@@ -79,46 +78,52 @@ namespace dom {
             }
     protected:
             ValuePtr getValuePtr(const Node & theNode, const VALUE & theValue) {
-                if (!_myTextChild) {
-                    ensureTextChild(theNode, theValue);
-                }
+                ensureTextChild(theNode, theValue);
                 return _myTextChild->nodeValueWrapperPtr();
             }
             const ValuePtr getValuePtr(const Node & theNode, const VALUE & theValue) const {
-                if (!_myTextChild) {
-                    ensureTextChild(theNode, theValue);
-                }
+                ensureTextChild(theNode, theValue);
                 return _myTextChild->nodeValueWrapperPtr();
             }
         private:
             PropertyPlug() {};
 
-            const VALUE & ensureTextChild(const Node & theNode) const {
-                return ensureTextChild(theNode, TAG::getDefault());
+            void ensureTextChild(const Node & theNode) const {
+                // to allow factory nodes
+                if (theNode) {
+                    ensureTextChild(theNode, TAG::getDefault());
+                }
             }
 
-            const VALUE & ensureTextChild(const Node & theNode, const VALUE & theValue) const {
-                dom::NodePtr myPropertyListNode = theNode.childNode(dom::PROPERTY_LIST_NAME);
-                if (!myPropertyListNode) {
-                    myPropertyListNode = const_cast<Node&>(theNode).appendChild(NodePtr(new Element(dom::PROPERTY_LIST_NAME)));
+            void ensureTextChild(const Node & theNode, const VALUE & theValue) const {
+
+				if (_myTextChild && _myPropertyNode && 
+					_myTextChild->parentNode() && _myTextChild->parentNode()->parentNode() == _myPropertyNode->parentNode()) {
+					// alles super && alles beim alten
+					return;
+				}
+                dom::Node & myPropertyListNode = const_cast<Node&>(theNode);
+                _myPropertyNode = myPropertyListNode.childNodeByAttribute(TAG::getNodeName(), TAG::getAttributeName(), TAG::getName());
+                if (!_myPropertyNode) {
+                    _myPropertyNode = myPropertyListNode.appendChild(NodePtr(new Element(TAG::getNodeName())));
+                    _myPropertyNode->appendAttribute(TAG::getAttributeName(), TAG::getName());
                 }
 
-                NodePtr myPropertyNode = myPropertyListNode->childNodeByAttribute(TAG::getNodeName(), dom::NAME_ATTRIB, TAG::getName());
-                if (!myPropertyNode) {
-                    myPropertyNode = myPropertyListNode->appendChild(NodePtr(new Element(TAG::getNodeName())));
-                    myPropertyNode->appendAttribute(dom::NAME_ATTRIB, TAG::getName());
-                }
-
-                _myTextChild = myPropertyNode->childNode("#text");
+                _myTextChild = _myPropertyNode->childNode("#text");
                 if (!_myTextChild) {
-                    _myTextChild = myPropertyNode->appendChild(dom::Text());
-                    return ValueHelper<VALUE, WRAPPER>::setValue(_myTextChild->nodeValueWrapperPtr(), theValue);
-                } else {
-                    return ValueHelper<VALUE, WRAPPER>::getValue(_myTextChild->nodeValueWrapperPtr());
+                    _myTextChild = _myPropertyNode->appendChild(dom::Text());
+                    ValueHelper<VALUE, WRAPPER>::setValue(_myTextChild->nodeValueWrapperPtr(), theValue);
                 }
-            }
- 
+				if (!_myFacade->getEnsuredPropertyList().getNamedItem(TAG::getName())) {
+					if (_myPropertyNode->getAttribute("name")) {
+						_myFacade->getEnsuredPropertyList().append(_myPropertyNode);
+					}
+				}
+			}
             mutable dom::NodePtr _myTextChild;
+            mutable dom::NodePtr _myPropertyNode;
+			FACADE * _myFacade;
+
     };
 }
 

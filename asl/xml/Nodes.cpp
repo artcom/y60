@@ -2731,6 +2731,10 @@ Node::hasFacade() const {
         FacadeFactoryPtr myFactory = getFacadeFactory();
         if (myFactory) {
             _myFacade = FacadePtr(myFactory->createFacade(nodeName(), *const_cast<Node*>(this)));
+			if (!_myFacade) {
+				_myFacade = FacadePtr(myFactory->createFacade(nodeName(), 
+					                  *const_cast<Node*>(this), parentNode()->nodeName()));
+			}
         }
         if (_myFacade) {
             _myFacade->setSelf(_myFacade);
@@ -2744,6 +2748,7 @@ Node::hasFacade() const {
 FacadePtr
 Node::getFacade() {
     if (hasFacade()) {
+        AC_DEBUG << "returning facade for node " << nodeName();
         return _myFacade;
     } else {
         throw Facade::Exception(string("No facade registered for node type ") + nodeName(), PLUS_FILE_LINE);

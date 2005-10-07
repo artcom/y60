@@ -28,7 +28,8 @@ using namespace std;
 namespace dom {
 
     Facade::Facade(Node & theNode) 
-        : TypedNamedNodeMap(dom::Node::ATTRIBUTE_NODE, 0), _myNode(theNode)
+        : TypedNamedNodeMap(dom::Node::ATTRIBUTE_NODE, 0), _myNode(theNode), _myChildren(0), 
+		  _myPropertyNodes(0)
         //, _hasRegisteredDependencies(false), _hasOutdatedDependencies(false)
     {}
     
@@ -62,27 +63,43 @@ namespace dom {
             item(i)->nodeValueWrapperPtr()->markPrecursorDependenciesOutdated();
         }
     }
-                
+
+	void 
+	Facade::appendChild(NodePtr theChild) {
+		if (!_myChildren.getNamedItem(theChild->nodeName())) {
+			_myChildren.append(theChild);
+		}
+	}
+
+	dom::NodePtr 
+	Facade::getChild(const std::string & theName) {
+		return _myChildren.getNamedItem(theName);
+	}
+
     Facade *
-    FacadeFactory::createFacade(const DOMString & theType, Node & theNode) const {
-    	FacadePtr myPrototype = findPrototype(theType); 
+    FacadeFactory::createFacade(const DOMString & theType, Node & theNode, 
+	                            const DOMString & theParentNodeName) const {
+    	FacadePtr myPrototype = findPrototype(FacadeKey(theType, theParentNodeName)); 
     	if (myPrototype) {
-    		DB(AC_TRACE << "FacadeFactory::createValue('"<<theType<<"') returns value"<<endl;)
+    		DB(AC_TRACE << "FacadeFactory::createValue('" << theType << ", " 
+				        << theParentNodeName<<"') returns value"<<endl;)
             return myPrototype->createNew(theNode);
     	}
     	DB(AC_TRACE << "FacadeFactory::createValue('"<<theType<<"',) returns 0"<<endl;)
     	return 0;
     }	
-    
+
 	void
-	FacadeFactory::registerPrototype(const DOMString & theType, FacadePtr thePrototype) {
-    	DB(AC_TRACE << "FacadeFactory::registerPrototype('" << theType << "')" << endl;)
-            _myPrototypes[theType] = FacadePtr(thePrototype->createNew(Node::Prototype));	    
+	FacadeFactory::registerPrototype(const DOMString & theType, FacadePtr thePrototype,
+									 const DOMString & theParentNodeName) {
+    	DB(AC_TRACE << "FacadeFactory::registerPrototype('" << theType << ", " 
+			        << theParentNodeName<<"')" << endl;)
+            _myPrototypes[FacadeKey(theType,theParentNodeName)] = FacadePtr(thePrototype->createNew(Node::Prototype));	    
 	}
 	
     const FacadePtr
-    FacadeFactory::findPrototype(const DOMString & theType) const {
-    	ProtoMap::const_iterator myPrototype = _myPrototypes.find(theType);
+    FacadeFactory::findPrototype(const FacadeKey & thePrototypeKey) const {
+    	ProtoMap::const_iterator myPrototype = _myPrototypes.find(thePrototypeKey);
     	if (myPrototype != _myPrototypes.end()) {
     		return myPrototype->second;
     	}

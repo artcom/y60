@@ -57,7 +57,9 @@ namespace dom {
             const Node & getNode() const {
                 return _myNode;
             }
-
+			const NodePtr getChildNode(const std::string& theChildName) {
+				return _myChildren.getNamedItem(theChildName);
+			}
             virtual void setSelf(FacadePtr theSelf);
             virtual FacadePtr getSelf() {
                 return _mySelf.lock();
@@ -65,14 +67,30 @@ namespace dom {
             virtual int registerDependencies() {return 0;}
             virtual void registerDependenciesRegistrators() {}
 
+            NameAttributeNodeMap & getEnsuredPropertyList() 
+			{ 
+				ensurePropertyList(); 
+				return _myPropertyNodes; 
+			}
+
             void markPrecursorDependenciesOutdated();
             void markAllDirty();
-        protected:
+
+		public:
+			void appendChild(NodePtr theChild);
+			dom::NodePtr getChild(const std::string & theName);
+
+		protected:
             Facade(Node & theNode);
+			virtual void ensurePropertyList() {};
+			NameAttributeNodeMap & getPropertyList() { return _myPropertyNodes; } 
         private:
             Node & _myNode;
             FacadeWeakPtr _mySelf;
-    };    
+		
+			NamedNodeMap _myChildren; 
+			NameAttributeNodeMap _myPropertyNodes; 
+    }; 
 
 #define IMPLEMENT_FACADE(CLASS) \
     dom::Facade * \
@@ -103,6 +121,19 @@ namespace dom {
         return TAG::Plug::setValue(getNode(), theValue); \
     }
 
+#define IMPLEMENT_CHILD_FACADE(CLASS) \
+	IMPLEMENT_FACADE(CLASS) \
+    template <class TAG> \
+    const asl::Ptr< typename TAG::CHILDFACADE, dom::ThreadingModel> getFacade() const{ \
+        TAG::Plug::ensureDependencies(); \
+		return TAG::Plug::getChildNode(getNode())->getFacade<typename TAG::CHILDFACADE>(); \
+    } \
+    template <class TAG> \
+    asl::Ptr< typename TAG::CHILDFACADE, dom::ThreadingModel> getFacade(){ \
+        TAG::Plug::ensureDependencies(); \
+		return TAG::Plug::getChildNode(getNode())->getFacade<typename TAG::CHILDFACADE>(); \
+    }
+
 #define IMPLEMENT_DYNAMIC_FACADE(CLASS) \
     IMPLEMENT_FACADE(CLASS) \
     virtual dom::NodePtr getNamedItem(const dom::DOMString & name) { \
@@ -116,15 +147,29 @@ namespace dom {
         return myAttributeNode; \
     }
 
+	struct FacadeKey {
+		DOMString _myNodeName;
+		DOMString _myParentName;
+		FacadeKey(const DOMString & theType, const DOMString & theParentNodeName = "") 
+			: _myNodeName(theType), _myParentName(theParentNodeName){}
+		bool operator<(const FacadeKey & second) const {
+			return (this->_myNodeName < second._myNodeName ||  
+				    (this->_myNodeName == second._myNodeName && 
+					 this->_myParentName < second._myParentName) );
+		}
+	};
     class FacadeFactory {
         public:
             FacadeFactory() {};
-            Facade * createFacade(const DOMString & theType, Node & theNode) const;
-        	void registerPrototype(const DOMString & theType, FacadePtr thePrototype);
-        	const FacadePtr findPrototype(const DOMString & theType) const;
-            bool isChildDependentFacade(const DOMString & theType) const;
+            Facade * createFacade(const DOMString & theType, Node & theNode,
+				                  const DOMString & theParentNodeName = "") const;
+        	void registerPrototype(const DOMString & theType, FacadePtr thePrototype,
+				                   const DOMString & theParentNodeName = "");
+        	const FacadePtr findPrototype(const FacadeKey & thePrototypeKey) const;
+            //bool isChildDependentFacade(const DOMString & theType) const;
+            
         private:
-            typedef std::map<DOMString, FacadePtr> ProtoMap;
+            typedef std::map<FacadeKey, FacadePtr> ProtoMap;
         	ProtoMap _myPrototypes;
 	};
 

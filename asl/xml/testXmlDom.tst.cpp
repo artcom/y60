@@ -89,8 +89,18 @@ class XmlDomUnitTest : public UnitTest {
                     ENSURE(!myElement->removeChild(myChild));
                     myParsedDocument = dom::NodePtr(0);
                     ENSURE(myElement->parentNode() == 0);
+
+                    dom::NameAttributeNodeMap myNameAttribNodeMap(0);
+                    myElement->childNode(0)->appendAttribute("name" ,"child0");
+                    myElement->appendChild(dom::Element("bla"));
+                    myElement->childNode(1)->appendAttribute("name" ,"child1");
+                    myNameAttribNodeMap.append(myElement->childNode(0));
+                    myNameAttribNodeMap.append(myElement->childNode(1));
+                    ENSURE(myNameAttribNodeMap.getNamedItem("child1") == myElement->childNode(1));
+                    ENSURE(myNameAttribNodeMap.getNamedItem("child0") == myElement->childNode(0));
                 }
 
+            
                 dom::NamedNodeMap myNodeMap(0);
                 dom::NodePtr myAttribNodePtr(new dom::Attribute("attribute","value"));
                 myNodeMap.setNamedItem(myAttribNodePtr);

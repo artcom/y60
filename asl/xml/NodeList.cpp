@@ -284,6 +284,8 @@ dom::NodeList::reparent(Node * theNewParent, Node * theTopNewParent) {
     }
 }
 
+
+
 NamedNodeMap::NamedNodeMap(Node * theShell) : NodeList(theShell) {}
 NamedNodeMap::NamedNodeMap(const NamedNodeMap & other, Node * theShell) : NodeList(other, theShell) {}
 Node & NamedNodeMap::operator[](int i) {
@@ -397,6 +399,126 @@ void dom::NamedNodeMap::insert(int theIndex, NodePtr theNewItem) {
 	}
     NodeList::insert(theIndex, theNewItem);
 }
+
+
+
+NameAttributeNodeMap::NameAttributeNodeMap(Node * theShell) 
+      : NodeList(theShell) {}
+NameAttributeNodeMap::NameAttributeNodeMap(const NameAttributeNodeMap & other, Node * theShell) : NodeList(other, theShell) {}
+Node & NameAttributeNodeMap::operator[](int i) {
+    return NodeList::operator[](i);
+}
+const Node & NameAttributeNodeMap::operator[](int i) const {
+    return NodeList::operator[](i);
+}
+Node & NameAttributeNodeMap::operator[](const DOMString & name) {
+    DB(AC_TRACE << "operator[" << name << "]" << std::endl);
+    return *getNamedItem(name);
+}
+const Node & NameAttributeNodeMap::operator[](const DOMString & name) const {
+    return *getNamedItem(name);
+}
+NodePtr NameAttributeNodeMap::getNamedItem(const DOMString & name) {
+	int i = findNthNodeNamed(name,0,*this);
+	if (i<size()) return item(i);
+	return NodePtr(0);
+}
+const NodePtr NameAttributeNodeMap::getNamedItem(const DOMString & name) const {
+	int i = findNthNodeNamed(name,0,*this);
+	if (i<size()) return item(i);
+	return NodePtr(0);
+}
+
+NodePtr NameAttributeNodeMap::setNamedItem(NodePtr node) {
+	int i = findNthNodeNamed(node->getAttributeString("name"),0,*this);
+	if (i<size()) {
+		setItem(i, node);
+	} else {
+		append(node);
+	}
+	return node;
+}
+
+int
+dom::NameAttributeNodeMap::countNodesNamed(const String& name, const dom::NodeList & nodes) {
+    int counter = 0;
+    for (int i = 0; i < nodes.size(); ++i) {
+		if (name == nodes[i].getAttributeString("name") && nodes[i].nodeType() != dom::Node::DOCUMENT_TYPE_NODE) {
+            ++counter;
+        }
+    }
+    return counter;
+}
+
+int
+dom::NameAttributeNodeMap::findNthNodeNamed(const String& name, int n, const dom::NodeList & nodes)
+{
+    int counter = 0;
+    for (int i = 0; i < nodes.size(); ++i) {
+        if (name == nodes[i].getAttributeString("name") && nodes[i].nodeType() != dom::Node::DOCUMENT_TYPE_NODE) {
+            if (counter == n) {
+                return i;
+            }
+            ++counter;
+        }
+    }
+    return nodes.size();
+}
+
+
+
+NodePtr
+dom::NameAttributeNodeMap::append(NodePtr theNewNode) {
+	int i = findNthNodeNamed(theNewNode->getAttributeString("name"),0,*this);
+	if (i<size()) {
+		std::string errorMessage;
+		errorMessage += "attribute with name '";
+		errorMessage += theNewNode->getAttributeString("name");
+		errorMessage += "' is already used in this map";
+		throw DomException(errorMessage,PLUS_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
+	}
+    return NodeList::append(theNewNode);
+}
+
+NodePtr
+dom::NameAttributeNodeMap::appendWhileParsing(NodePtr theNewNode) {
+	int i = findNthNodeNamed(theNewNode->getAttributeString("name"),0,*this);
+	if (i<size()) {
+		std::string errorMessage;
+		errorMessage += "attribute with name '";
+		errorMessage += theNewNode->getAttributeString("name");
+		errorMessage += "' is already used in this map";
+		throw DomException(errorMessage,PLUS_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
+	}
+    return NodeList::appendWhileParsing(theNewNode);
+}
+
+void dom::NameAttributeNodeMap::setItem(int theIndex, NodePtr theNewItem) {
+	int i = findNthNodeNamed(theNewItem->getAttributeString("name"),0,*this);
+	if (i<size() && i != theIndex) {
+		std::string errorMessage;
+		errorMessage += "attribute with name '";
+		errorMessage += theNewItem->getAttributeString("name");
+		errorMessage += "' is already used in this map";
+		throw DomException(errorMessage,PLUS_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
+	}
+    NodeList::setItem(theIndex, theNewItem);
+}
+
+void dom::NameAttributeNodeMap::insert(int theIndex, NodePtr theNewItem) {
+	int i = findNthNodeNamed(theNewItem->getAttributeString("name"),0,*this);
+	if (i<size() && i != theIndex) {
+		std::string errorMessage;
+		errorMessage += "attribute with name '";
+		errorMessage += theNewItem->getAttributeString("name");
+		errorMessage += "' is already used in this map";
+		throw DomException(errorMessage,PLUS_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
+	}
+    NodeList::insert(theIndex, theNewItem);
+}
+
+
+
 
 void dom::TypedNamedNodeMap::checkType(NodePtr theNewNode) {
 	if (allowedType && theNewNode->nodeType()!= allowedType) {
