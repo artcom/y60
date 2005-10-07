@@ -29,6 +29,7 @@
 #include <asl/Block.h>
 #include <asl/Ptr.h>
 #include <asl/Singleton.h>
+#include <asl/Logger.h>
 
 #include "GLUtils.h"
 
@@ -135,13 +136,14 @@ namespace asl {
                         myDefaultCapacity = DISABLED;
                     }
                 } else {
-                    std::cerr << "Y60_AGP_VERTEX_MEMORY not set - guessing hardware..";
+                    AC_INFO << "Y60_AGP_VERTEX_MEMORY not set - guessing hardware..";
                     std::string myHardwareString(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+                    AC_INFO << "found '" << myHardwareString << "'";
                     if (myHardwareString.find("/AGP") == std::string::npos) {
-                        std::cerr << "no AGP found, using main memory." << std::endl;
+                        AC_INFO << "no AGP found, using main memory." << std::endl;
                         myDefaultCapacity = DISABLED;
                     } else {
-                        std::cerr << "AGP found." << std::endl;
+                        AC_INFO << "AGP found." << std::endl;
                         myDefaultCapacity = 64 * 1024 * 1024;
                     }
                 }

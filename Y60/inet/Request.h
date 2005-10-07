@@ -83,7 +83,7 @@ namespace inet {
             virtual bool onProgress(double theDownloadTotal, double theCurrentDownload,
                 double theUploadTotal, double theCurrentUpload);  // return false to abort transfer
             virtual void onDone();
-            virtual void onResponseHeader(const std::string & theHeader);
+            virtual bool onResponseHeader(const std::string & theHeader);
         private:
 
             // static callback hooks

@@ -271,7 +271,7 @@ namespace inet {
         return theReceivedByteCount;
     }
 
-    void
+    bool
     Request::onResponseHeader(const string & theHeader) {
         // divide into key/value pairs
         string::size_type myColon = theHeader.find(":");
@@ -284,6 +284,7 @@ namespace inet {
             DB(AC_TRACE << "adding '" << theHeader << "'" << endl);
             _myResponseHeaders.insert(make_pair(theHeader, ""));
         }
+        return true;
     }
 
     void
@@ -339,7 +340,9 @@ namespace inet {
             myHeader.erase(myEndOfLine);
         }
         if (myHeader.size()) {
-            myRequest->onResponseHeader(myHeader);
+            if (myRequest->onResponseHeader(myHeader) == false) {
+                return -1; // abort transfer
+            }
         }
         return theBlockCount*theBlockSize;
     }
