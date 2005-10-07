@@ -331,11 +331,14 @@ namespace y60 {
             inline float interpolateNormal(const VoxelT & theFirstValue, int theFirstIndex, const VoxelT & theSecondValue, 
                 const asl::Vector3i & theSecondPosition, bool theUpperFlag) const
             {
-                if (!theUpperFlag) {
-                    return float((_myThresholds[0] - theFirstValue) - (_myThresholds[0] - theSecondValue));
-                } else {
-                    return float((_myThresholds[1] - theFirstValue) - (_myThresholds[1] - theSecondValue));
-                }
+                return float(theSecondValue - theFirstValue);
+                //if (!theUpperFlag) {
+                //    return float(theSecondValue - theFirstValue);
+                //    //return float((_myThresholds[0] - theFirstValue) - (_myThresholds[0] - theSecondValue));
+                //} else {
+                //    return float(theSecondValue - theFirstValue);
+                //    //return float((_myThresholds[1] - theFirstValue) - (_myThresholds[1] - theSecondValue));
+                //}
             }
 
             inline void fillThresholdCube(int theI, int theJ, int theK) {
@@ -387,9 +390,9 @@ namespace y60 {
                 const asl::Vector2<VoxelT> & myFirstThreshold  = _myThresholdCube[theFirstIndex];
                 const asl::Vector2<VoxelT> & mySecondThreshold = getThreshold(theSecondPosition[0], theSecondPosition[1], theSecondPosition[2]);
                 if (!theUpperFlag) {
-                    return float(theSecondValue)/float(mySecondThreshold[0]) - float(theFirstValue)/float(myFirstThreshold[0]);
+                    return float((theSecondValue - mySecondThreshold[0]) - (theFirstValue - myFirstThreshold[0]));
                 } else {
-                    return float(theSecondValue)/float(mySecondThreshold[1]) - float(theFirstValue)/float(myFirstThreshold[1]);
+                    return float((theSecondValue - mySecondThreshold[1]) - (theFirstValue - myFirstThreshold[1]));
                 }
             }
 
@@ -453,6 +456,7 @@ namespace y60 {
                     x -= _myBoundingBox[asl::Box3i::MIN][0];
                     y -= _myBoundingBox[asl::Box3i::MIN][1];
                     z -= _myBoundingBox[asl::Box3i::MIN][2];
+                    // XXX Make this beautiful and fast
                     asl::Vector4f myPixel =  _mySegmentationBitmaps[z]->getPixel(x,y); 
                     myIndex = (unsigned char) myPixel[0];
                 }
