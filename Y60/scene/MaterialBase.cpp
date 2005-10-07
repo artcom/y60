@@ -230,7 +230,7 @@ namespace y60 {
 		NodePtr myMappingRequirement = myRequirementMap.getNamedItem(MAPPING_FEATURE);
         if (myMappingRequirement) {
 
-            const VectorOfRankedFeature & myTexCoordFeatures = (*myMappingRequirement)("#text").dom::Node::nodeValueAs<VectorOfRankedFeature>();
+            VectorOfRankedFeature myTexCoordFeatures = (*myMappingRequirement)("#text").dom::Node::nodeValueAs<VectorOfRankedFeature>();
             if (myTexCoordFeatures.size() > 0) {
  
                 // assume it's on until told otherwise
