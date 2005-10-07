@@ -132,7 +132,7 @@ namespace y60 {
         for (unsigned myReqIndex = 0; myReqIndex != myRequirementMap.length(); ++myReqIndex) {
 			const Node & myRequirementNode = myRequirementMap[myReqIndex];
             const std::string & myRequiredFeatureClass = myRequirementNode.getAttributeString(NAME_ATTRIB);
-            const VectorOfRankedFeature & myRequiredFeature = myRequirementNode("#text").dom::Node::nodeValueAs<VectorOfRankedFeature>();
+            VectorOfRankedFeature myRequiredFeature = myRequirementNode("#text").dom::Node::nodeValueAs<VectorOfRankedFeature>();
             bool oneShaderCanHandleMaterial = false;
             bool myFeatureCanBedropped = false;
             DB(AC_DEBUG << "Class : " << myRequiredFeatureClass << " , requires: " << myRequiredFeature << endl);

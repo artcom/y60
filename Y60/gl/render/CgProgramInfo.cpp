@@ -380,7 +380,7 @@ namespace y60 {
         AC_DEBUG << "CgProgramInfo::bindMaterialParams this=" << hex << (void*)this << dec 
 			     << " material=" << theMaterial.get<NameTag>();
 
-		MaterialPropertiesFacadePtr & myPropFacade = theMaterial.getFacade<MaterialPropertiesTag>();
+		MaterialPropertiesFacadePtr myPropFacade = theMaterial.getFacade<MaterialPropertiesTag>();
 		const NameAttributeNodeMap & myPropMap = myPropFacade->getEnsuredPropertyList();
 
 		for (unsigned myPropIndex = 0; myPropIndex != myPropMap.length(); ++myPropIndex) {
