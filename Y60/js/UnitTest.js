@@ -24,7 +24,6 @@ use("Exception.js");
 use("Y60JSSL.js");
 
 function tail(thePath) {
-    print(thePath);
     var myPath = new String(thePath);
     var myMatch = myPath.lastIndexOf("/");
     if (myMatch >= 0) {
@@ -35,7 +34,7 @@ function tail(thePath) {
 
 function UnitTest(theName) {
     this.Constructor(this, theName);
-};
+}
 
 
 UnitTest.prototype.Constructor = function(obj, theName) {
@@ -50,49 +49,58 @@ UnitTest.prototype.Constructor = function(obj, theName) {
     // privileged member function
     obj.getFailedCount = function() {
         return _failedCount;
-    };
+    }
+
     obj.getPassedCount = function() {
         return _passedCount;
-    };
+    }
+
     obj.getMyName = function() {
         return _myName;
-    };
+    }
+
     obj.setMyName = function(theName) {
         _myName = theName;
-    };
+    }
+
     obj.incrementFailedCount = function() {
         ++_failedCount;
-    };
+    }
+
     obj.incrementPassedCount = function() {
         ++_passedCount;
-    };
+    }
+
     obj.incrementFailedCount = function() {
         ++_failedCount;
-    };
+    }
+
     obj.incrementPassedCount = function() {
         ++_passedCount;
-    };
+    }
+
     obj.setSilentSuccess = function(makeSilent) {
         if (makeSilent == undefined) {
             _silentSuccess = true;
         } else {
             _silentSuccess = makeSilent;
         }
-    };
+    }
+
     obj.setAbortOnFailure = function(makeAbort) {
         if (makeAbort == undefined) {
             _abortOnFailure = true;
         } else {
             _abortOnFailure = makeAbort;
         }
-    };
+    }
     obj.returnStatus = function() {
         if (_passedCount != 0 && _failedCount == 0) {
             return 0;
         } else {
             return -1;
         }
-    };
+    }
     obj.ensure=function(/*bool*/ myExpressionResult,
             /*string*/ myExpression,
             /*string*/ mySourceLine)
@@ -112,34 +120,34 @@ UnitTest.prototype.Constructor = function(obj, theName) {
             print("UnitTest::ensure: Execution aborted");
             abort();
         }
-    };
+    }
     obj.run = function() {};
 
     obj.getTracePrefix = function() {
         return ">>>>>> ";
-    };
+    }
     obj.setup = function() {
         print(">>>> Launching Test Unit '" + _myName + "'");
-    };
+    }
     obj.teardown = function() {
         print(">>>> Completed Test Unit '" + _myName + "'"
                 + ", " + obj.getFailedCount() + " tests failed"
                 + ", " + obj.getPassedCount() + " tests passed");
-    };
+    }
     obj.setFailedCount = function(failedTests) {
         _failedCount = failedTests;
-    };
+    }
     obj.setPassedCount = function(passedTests) {
         _passedCount = passedTests;
-    };
+    }
     obj.ensureWith = function(theWithObj) {
         ourWithObj = theWithObj;
-    };
-};
+    }
+}
 
 function UnitTestSuite(theName) {
     this.Constructor(this, theName);
-};
+}
 
 UnitTestSuite.prototype.Constructor = function(obj, theName) {
 
@@ -231,27 +239,27 @@ UnitTestSuite.prototype.Constructor = function(obj, theName) {
             _myTests.pop();
         }
     }
-};
+}
 
 function DTITLE(TITLE) {
     print(ourCurrentTest.getTracePrefix() + TITLE + ":");
-};
+}
 
-var ourCurrentTest = null;
-var ourWithObj = [];
+if (ourCurrentTest == undefined) var ourCurrentTest = null;
+if (ourWithObj == undefined)     var ourWithObj = [];
 
 function DPRINT(theVariable) {
     var myExpression = "with (ourWithObj) {var obj = ourCurrentTest; with (obj) { "+theVariable+ "} } ";
     //var myExpression = "var obj = ourCurrentTest;"+theVariable;
     var myResult = eval(myExpression);
     print(ourCurrentTest.getTracePrefix() + "      "+ theVariable + " = " + myResult);
-};
+}
 
 function DPRINT2(theMessage, theVariable) {
     var myExpression = "var obj = ourCurrentTest;"+theVariable;
     var myResult = eval(myExpression);
     print(ourCurrentTest.getTracePrefix() +"      "+ theMessage + ": " + theVariable + " = " + myResult);
-};
+}
 
 function ENSURE(theExpression, theMessage) {
     var myExpression = "with (ourWithObj) {var obj = ourCurrentTest; with (obj) { "+theExpression+ "} } ";
@@ -268,22 +276,23 @@ function ENSURE(theExpression, theMessage) {
     }
     ourCurrentTest.ensure(myResult,theExpression,__LINE__(2),theMessage);
     return myResult;
-};
+}
 
 function FAILURE(MSG) {
     ourCurrentTest.ensure(false, MSG, __LINE__(2));
-};
+}
+
 function SUCCESS(MSG) {
     ourCurrentTest.ensure(true, MSG, __LINE__(2));
-};
+}
 
 function FAILURE2(MSG) {
     ourCurrentTest.ensure(false, MSG, __LINE__(3));
-};
+}
+
 function SUCCESS2(MSG) {
     ourCurrentTest.ensure(true, MSG, __LINE__(3));
-};
-
+}
 
 function ENSURE_EXCEPTION(theTest, theException) {
     try {
@@ -297,5 +306,5 @@ function ENSURE_EXCEPTION(theTest, theException) {
             FAILURE2("EXCEPTION("+theTest+")");
         }
     }
-};
+}
 

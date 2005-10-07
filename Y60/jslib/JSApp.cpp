@@ -911,41 +911,6 @@ MSleep(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
-GetWholeFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Loads a text file into a string using the package manager");
-    DOC_PARAM("theRelativeFilename", DOC_TYPE_STRING);
-    DOC_PARAM("thePackagePath", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1, 2);
-        string myFilename;
-        string myPackage;
-        if ( ! convertFrom(cx, argv[0], myFilename)) {
-            JS_ReportError(cx, "getWholeFile(): argument #1 must be a string (relative filename)");
-            return JS_FALSE;
-        }
-        Ptr<ReadableBlock> myBlock;
-        if (argc == 1) {
-            myBlock = JSApp::getPackageManager()->openFile(myFilename);
-        } else {
-            if ( ! convertFrom(cx, argv[1], myPackage)) {
-                JS_ReportError(cx, "getWholeFile(): argument #2 must be a string (package path)");
-                return JS_FALSE;
-            }
-            myBlock = JSApp::getPackageManager()->openFile(myFilename, myPackage);
-        }
-        if (myBlock) {
-            string myContent(myBlock->strbegin(), myBlock->strend());
-            *rval = as_jsval(cx, myContent);
-        } else {
-            *rval = JSVAL_NULL;
-        }
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-
-JS_STATIC_DLL_CALLBACK(JSBool)
 ExpandEnvironment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the value of a given embedded environment variable '${MYENVVAR}' if any.");
     DOC_PARAM("theString", DOC_TYPE_STRING);
@@ -1389,7 +1354,6 @@ static JSFunctionSpec glob_functions[] = {
     {"includePath",     IncludePath,    1},
     {"removePath",      RemovePath,    1},
     {"listFiles",       listFiles,      2},
-    {"getWholeFile",    GetWholeFile,   1},
     {"getDocumentation", getDocumentation, 0},
     {"createUniqueId",   createUniqueId, 0},
 

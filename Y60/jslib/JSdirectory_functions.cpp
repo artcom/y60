@@ -154,36 +154,6 @@ MakeDir(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
-static JSBool
-Basename(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the filename without its directory");
-    DOC_PARAM("thePath", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1);
-        std::string myPath;
-        convertFrom(cx, argv[0], myPath);
-        *rval = as_jsval(cx, asl::getBaseName((myPath)));
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-
-}
-
-static JSBool
-getLastModified(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the modification time for the given file");
-    DOC_PARAM("theFilename", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1);
-        std::string myPath;
-        convertFrom(cx, argv[0], myPath);
-        *rval = as_jsval(cx, asl::getLastModified((myPath)));
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-
-}
-
 JSFunctionSpec *
 JSDirectoryFunctions::Functions() {
     static JSFunctionSpec myFunctions[] = {
@@ -193,8 +163,6 @@ JSDirectoryFunctions::Functions() {
         {"getAppDataDirectory", getAppDataDirectory, 1},
         {"getTempDirectory",    getTempDirectory,    0},
         {"makeDir",             MakeDir,             1},
-        {"basename",            Basename,            1},
-        {"getLastModified",     getLastModified,     1},
         {0},
     };
     return myFunctions;

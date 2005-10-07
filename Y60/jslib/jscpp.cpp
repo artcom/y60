@@ -41,6 +41,7 @@
 #include "JSModellingFunctions.h"
 #include "JSLogger.h"
 #include "JSdirectory_functions.h"
+#include "JSfile_functions.h"
 #include "JSScene.h"
 #include "JSFrustum.h"
 #include "JSGLResourceManager.h"
@@ -204,9 +205,14 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     }
     createFunctionDocumentation("DirectoryFunctions", JSDirectoryFunctions::Functions());
 
+    if (!JS_DefineFunctions(cx,theGlobalObject, JSFileFunctions::Functions())) {
+        return false;
+    }
+    createFunctionDocumentation("FileFunctions", JSFileFunctions::Functions());
+
 
 //    createFunctionDocumentation("ProcFunctions", JSProcFunctions::Functions());
-    
+
     return true;
 }
 
