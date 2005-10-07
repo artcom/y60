@@ -55,55 +55,71 @@ function OverlayManager(theScene, theViewport) {
     }
 
     Public.createMultitextured = function(theName, theImageIds, theOverwriteFlag, theParent) {
-        var myMaterialString =
-            '<material name="' + theName + 'M" id="'+ createUniqueId() + '" transparent="1" >\n' +
-            '    <properties>\n' +
-            '        <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>\n' +
-            '    </properties>\n' +
-            '    <textures>\n';
-
+        var myMaterial = Node.createElement('material');
+        var myOldOverlayMaterial = getDescendantByName(Public.materials, theMaterialNode.name,  false);
+        if (myOldOverlayMaterial) {                
+            Public.materials.materials.replaceChild(myMaterial, myOldOverlayMaterial);        
+        } else {
+            Public.materials.materials.appendChild(myMaterial);
+        }
+        
+        myMaterial.id = myMaterialId;
+        myMaterial.name = theName + "M";
+        myMaterial.transparent = 1;
+        myMaterial.properties.surfacecolor = "[1,1,1,1]";
+        var myTexturesString = "";
         for (var i = 0; i < theImageIds.length; ++i) {
             var myApplymode = "decal";
             if (i == 0) {
                 myApplymode = "modulate";
             }
-            myMaterialString +=
+            myTexturesString +=
             '        <texture image="' + theImageIds[i] + '" applymode="' + myApplymode + '" wrapmode="repeat"/>\n';
         }
+        var myTexturesDoc = new Node(myTexturesString);
+        var myTexturesNode = myTexturesDoc.firstChild;
+        myMaterialNode.appendChild(myTexturesNode);
+        myMaterialNode.requires.lighting = "[10[unlit]]";
 
-        myMaterialString +=
-            '    </textures>\n' +
-            '    <requires>\n' +
-            createTextureFeatureString(theImageIds.length)+
-            '        <feature class="lighting" values="[10[unlit]]"/>\n' +
-            '    </requires>\n' +
-            '</material>';
-        var myMaterialDoc = new Node(myMaterialString);
-        var myMaterialNode = insertMaterial(myMaterialDoc.childNodes[0]);
+        var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
+        myMaterialNode.requires.appendChild(myTextureFeatures);
+        myMaterialNode.requires.textures = createTextureFeatureString(theImageIds.length);
 
         return commonCreate(theName, myMaterialNode.id, theOverwriteFlag, theParent);
     }
 
     Public.createOverlayMaterial = function(theName, theImageId) {
         var myMaterialId = createUniqueId();
-        var myMaterialString =
-            '<material name="' + theName + 'M" id="' + myMaterialId + '" transparent="1" >\n' +
-            '    <properties>\n' +
-            '        <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>\n' +
-            '    </properties>\n' +
-            '    <textures>\n' +
-            '        <texture image="' + theImageId + '" applymode="modulate" wrapmode="repeat"/>\n' +
-            '    </textures>\n' +
-            '    <requires>\n' +
-            '        <feature class="textures" values="[100[paint]]"/>\n' +
-            '        <feature class="texcoord" values="[100[uv_map]]"/>\n' +
-            '        <feature class="lighting" values="[10[unlit]]"/>\n' +
-            '    </requires>\n' +
-            '</material>';
 
-        var myMaterialDoc = new Node(myMaterialString);
-        var myMaterialNode = myMaterialDoc.childNodes[0];
-        return insertMaterial(myMaterialNode);
+        var myMaterial = Node.createElement('material');
+        var myOldOverlayMaterial = getDescendantByName(Public.materials, theMaterialNode.name,  false);
+        if (myOldOverlayMaterial) {                
+            Public.materials.materials.replaceChild(myMaterial, myOldOverlayMaterial);        
+        } else {
+            Public.materials.materials.appendChild(myMaterial);
+        }
+        myMaterial.id = myMaterialId;
+        myMaterial.name = theName + "M";
+        myMaterial.transparent = 1;
+        myMaterial.properties.surfacecolor = "[1,1,1,1]";
+       // add textures
+        var myTexturesString =
+            '<textures>\n' +
+            '    <texture image="' + theImageId + '" wrapmode="repeat" applymode="modulate"/>\n' + 
+            '</textures>';
+        var myTexturesDoc = new Node(myTexturesString);
+        var myTexturesNode = myTexturesDoc.firstChild;
+        myMaterial.appendChild(myTexturesNode);
+        // add requirements
+        myMaterialNode.requires.lighting = "[10[unlit]]";
+
+        var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
+        myMaterialNode.requires.appendChild(myTextureFeatures);
+        myMaterialNode.requires.textures = "[100[paint]]";
+
+        var myTexCoordFeatures = new Node('<feature name="texcoord">[10[]]</feature>\n').firstChild;
+        myMaterialNode.requires.appendChild(myTexCoordFeatures);
+        myMaterialNode.requires.texcoord = "[100[uv_map]]";                
     }
 
     Public.get = function(theName) {
@@ -124,7 +140,7 @@ function OverlayManager(theScene, theViewport) {
         var myTextures = getDescendantByTagName(myOverlayMaterial, "textures", false);
         if (theImageIds.length != myTextures.childNodes.length) {
             var myRequiresNode = getDescendantByTagName(myOverlayMaterial, "requires", false);
-            var myTextureFeaturesNode = getDescendantByAttribute(myRequiresNode, "class", "textures");
+            var myTextureFeaturesNode = getDescendantByAttribute(myRequiresNode, "name", "textures");
             var myTempDoc = new Node(createTextureFeatureString(theImageIds.length));
             myRequiresNode.replaceChild(myTempDoc.childNodes[0], myTextureFeaturesNode);
         }
@@ -174,8 +190,8 @@ function OverlayManager(theScene, theViewport) {
     //////////////////////////////////////////////////////////////////////////////////////////
 
     function createTextureFeatureString(theTextureCount) {
-        var myPaintNodeString = '<feature class="textures" values="[100[';
-        var myTexCoordNodeString = '<feature class="texcoord" values="[100[';
+        var myPaintNodeString = '<feature name="textures"> [100[';
+        var myTexCoordNodeString = '<feature name="texcoord">[100[';
 
         for (var i = 0; i < theTextureCount; ++i) {
             myPaintNodeString += "paint";
@@ -185,8 +201,8 @@ function OverlayManager(theScene, theViewport) {
                 myTexCoordNodeString += ",";
             }
         }
-        myPaintNodeString += ']]"/>';
-        myTexCoordNodeString += ']]"/>';
+        myPaintNodeString += ']]/feature>';
+        myTexCoordNodeString += ']]/feature>';
 
         return myPaintNodeString + '\n' + myTexCoordNodeString;
     }

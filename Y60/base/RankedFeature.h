@@ -56,7 +56,18 @@ namespace y60 {
         return !(l == r);
     }
 
-    typedef std::vector<RankedFeature> VectorOfRankedFeature;
+    //typedef std::vector<RankedFeature> VectorOfRankedFeature;
+    class VectorOfRankedFeature : public std::vector<RankedFeature> {
+        public:
+        VectorOfRankedFeature() {}
+        VectorOfRankedFeature(float theRanking, const std::string & theFeatures)
+        {
+            RankedFeature myFeature;
+            myFeature._myRanking = theRanking;
+            myFeature._myFeature = asl::splitString(theFeatures, ",");
+            push_back(myFeature);
+        }
+    };
 
 }
 

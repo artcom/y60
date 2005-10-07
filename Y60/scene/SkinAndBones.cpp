@@ -22,6 +22,7 @@
 
 #include <y60/DataTypes.h>
 #include <y60/NodeNames.h>
+#include <dom/Nodes.h>
 
 #include <asl/Box.h>
 #include <asl/Logger.h>
@@ -33,15 +34,18 @@ using namespace dom;
 namespace y60 {
 
     DEFINE_EXCEPTION(SkinAndBonesException, asl::Exception);
-
     void
     SkinAndBones::setup(NodePtr theSceneNode) {
-        // Cache BoneMatrix material property
-        NodePtr myBoneMatrixProp = findPropertyNode("BoneMatrix");
-        if (myBoneMatrixProp) {
-            _myBoneMatrixPropertyNode = myBoneMatrixProp->childNode(0);
-        } else {
-            throw SkinAndBonesException(std::string("Could not find BoneMatrix property in material: ") + getId(),
+		dom::NodePtr myProperties = getNode().childNode(PROPERTY_LIST_NAME);
+        unsigned myChildCount = myProperties->childNodesLength();
+        for (unsigned i = 0; i < myChildCount; ++i) {
+            if (myProperties->childNode(i)->getAttributeString("name") == "BoneMatrix") {
+	            _myBoneMatrixPropertyNode = myProperties->childNode(i)->childNode(0);
+				break;
+            }
+        }
+        if (!_myBoneMatrixPropertyNode) {
+            throw SkinAndBonesException(std::string("Could not find BoneMatrix property in material: ") + get<IdTag>(),
                     PLUS_FILE_LINE);
         }
 
@@ -54,7 +58,7 @@ namespace y60 {
         }
 
         vector<NodePtr> myElements;
-        myShapesNode->getNodesByAttribute(ELEMENTS_NODE_NAME, MATERIAL_REF_ATTRIB, getId(), myElements);
+        myShapesNode->getNodesByAttribute(ELEMENTS_NODE_NAME, MATERIAL_REF_ATTRIB, get<IdTag>(), myElements);
 
         Node * myShape;
         string myShapeId;
@@ -106,7 +110,6 @@ namespace y60 {
             // get matrix for bind pose
             _myJointSpaceTransforms.push_back(myJointFacade->get<InverseGlobalMatrixTag>());
         }
-
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>()->resize(_myJoints.size() * 3);
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
     }
@@ -115,7 +118,7 @@ namespace y60 {
     SkinAndBones::update(TextureManager & theTextureManager, const dom::NodePtr theImages) {
         MaterialBase::update(theTextureManager, theImages);
 
-        VectorOfVector4f * myBoneMatrixProperty = _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>();
+		VectorOfVector4f * myBoneMatrixProperty = _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>();
         if (!myBoneMatrixProperty) {
             throw SkinAndBonesException("SkinAndBones shader update has been called before setup", PLUS_FILE_LINE);
         }
@@ -133,8 +136,8 @@ namespace y60 {
 
             myBoundingBox->extendBy(asPoint(_myJoints[i]->get<GlobalMatrixTag>().getTranslation()));
         }
-
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
         _myBoundingBoxNode->nodeValuePtrClose<Box3f>();        
+
    }
 }

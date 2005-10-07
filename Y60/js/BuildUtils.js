@@ -62,7 +62,8 @@ function buildBillboardNode(theBodyName, theShapeId, theType) {
 }
 
 // build a <material> node
-function buildMaterialNode(theName,
+function buildMaterialNode(theMaterialParent,
+                           theName,
                            theDiffuseColor, theAmbientColor,
                            theTextureFeatures, theLightingFeatures,
                            theWrapmode)
@@ -71,40 +72,36 @@ function buildMaterialNode(theName,
     if (theWrapmode != undefined) {
         myWrapMode = theWrapmode;
     }
-    var myMaterial = "";
-    myMaterial += "<material name=\"" + theName + "\" id=\"m" + theName + "\" transparent=\"0\">";
-    myMaterial += "<properties>";
-    if (theDiffuseColor != undefined && theDiffuseColor != null) {
-        myMaterial += "<vector4f name=\"diffuse\">" + theDiffuseColor + "</vector4f>";
+    var myMaterialNode = Node.createElement('material');
+    myMaterialNode.id = "m" + theName;
+    myMaterialNode.name = theName;
+    theMaterialParent.appendChild(myMaterialNode);
+    if (theDiffuseColor != undefined) {
+        myMaterialNode.properties.diffuse = theDiffuseColor;
     }
-    if (theAmbientColor != undefined && theAmbientColor != null) {
-        myMaterial += "<vector4f name=\"ambient\">" + theAmbientColor + "</vector4f>";
+    if (theAmbientColor != undefined) {
+        myMaterialNode.properties.ambient = theAmbientColor;
     }
-    myMaterial += "</properties>\n";
-
-    // textures
+    // add textures
     if (theTextureFeatures != undefined && theTextureFeatures != null) {
-        myMaterial += "<textures>";
-        myMaterial += "<texture image=\"i" + theName + "\" wrapmode=\"" + theWrapmode + "\" applymode=\"modulate\"/>";
-        myMaterial += "</textures>\n";
+        var myTexturesString =
+            '<textures>\n' +
+            '    <texture image="i' + theName + '" wrapmode="' + myWrapMode + '" applymode="modulate"/>\n' + 
+            '</textures>';
+        var myTexturesDoc = new Node(myTexturesString);
+        var myTexturesNode = myTexturesDoc.firstChild;
+        myMaterialNode.appendChild(myTexturesNode);
     }
-    else {
-        myMaterial += "<textures/>\n";
-    }
-
-    // requires / features
-    myMaterial += "<requires>";
+    // add requirements
     if (theLightingFeatures != undefined && theLightingFeatures != null) {
-        myMaterial += "<feature class=\"lighting\" values=\"" + theLightingFeatures + "\"/>";
+        myMaterialNode.requires.lighting = theLightingFeatures;
     }
-    if (theTextureFeatures != undefined && theTextureFeatures != null) {
-        myMaterial += "<feature class=\"textures\" values=\"" + theTextureFeatures + "\"/>";
+    if (theTextureFeatures != undefined && theTextureFeatures != null) {        
+        var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
+        myMaterialNode.requires.appendChild(myTextureFeatures);
+        myMaterialNode.requires.textures = theTextureFeatures;
     }
-    myMaterial += "</requires>\n";
-    myMaterial += "</material>";
-
-    var myMaterialDoc = new Node(myMaterial);
-    return myMaterialDoc.childNodes[0];
+    return myMaterialNode;
 }
 
 function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
@@ -116,26 +113,34 @@ function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
         myWrapMode = theWrapMode;
     }
 
-    var myMaterial = '<material name="' + theName + '" id="m' + theName + '" transparent="0">\n';
-    myMaterial += '<properties/>\n';
+    var myMaterialNode = Node.createElement('material');
+    myMaterialNode.id = "m" + theName;
+    myMaterialNode.nyme = theName;    
+    theMaterialParent.appendChild(myMaterialNode);
+    // add textures
+    var myTexturesString =
+        '<textures>\n' +
+        '    <texture image="' + theImageId  + '" wrapmode="' + myWrapMode + '" applymode="modulate"/>\n' + 
+        '</textures>';
+    var myTexturesDoc = new Node(myTexturesString);
+    var myTexturesNode = myTexturesDoc.firstChild;
+    myMaterialNode.appendChild(myTexturesNode);
 
-    // textures
-    myMaterial += '<textures>\n';
-    myMaterial += '    <texture image="' + theImageId + '" wrapmode="' + myWrapMode + '" applymode="modulate"/>\n';
-    myMaterial += '</textures>\n';
+    // add requirements
+    myMaterialNode.requires.lighting = "[10[unlit]]";
 
-    // requires / features
-    myMaterial += '<requires>\n';
-    myMaterial += '    <feature class="lighting" values="[10[unlit]]"/>\n';
-    myMaterial += '    <feature class="textures" values="[100[paint]]"/>\n';
-    myMaterial += '    <feature class="texcoord" values="[100[uv_map]]"/>\n';
-    myMaterial += '</requires>\n';
-    myMaterial += '</material>\n';
+    var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
+    myMaterialNode.requires.appendChild(myTextureFeatures);
+    myMaterialNode.requires.textures = "[100[paint]]";
 
-    var myMaterialDoc = new Node(myMaterial);
-    return myMaterialDoc.childNodes[0];
+    var myTexCoordFeatures = new Node('<feature name="texcoord">[10[]]</feature>\n').firstChild;
+    myMaterialNode.requires.appendChild(myTexCoordFeatures);
+    myMaterialNode.requires.texcoord = "[100[uv_map]]";
+
+    return myMaterialNode;
+
 }
-
+/*
 function addMaterialProperty(theMaterialNode, thePropertyType, theProperty, theValue) {
     var myPropertyString = "<" + thePropertyType +" name='" + theProperty + "'>" + theValue + "</" + thePropertyType + ">";
     var myPropertyDoc = new Node(myPropertyString);
@@ -152,7 +157,7 @@ function addMaterialProperty(theMaterialNode, thePropertyType, theProperty, theV
 }
 
 function addMaterialRequirement(theMaterialNode, theRequirementClass, theRequirementValue) {
-    var myRequirementString = "<feature class='" + theRequirementClass + "' values=\"" + theRequirementValue + "\"/>";
+    var myRequirementString = "<feature name='" + theRequirementClass + "'>" + theRequirementValue + "</feature>";
     var myRequirementDoc = new Node(myRequirementString);
     var myRequirementNode = myRequirementDoc.childNodes[0];
     var myRequiresDocNode = getDescendantByTagName(theMaterialNode, "requires", false);
@@ -164,7 +169,7 @@ function addMaterialRequirement(theMaterialNode, theRequirementClass, theRequire
     }
     myRequiresDocNode.appendChild(myRequirementNode);
 }
-
+*/
 // build an <image> node
 function buildImageNode(theName, theFilename, theMipMapFlag)
 {

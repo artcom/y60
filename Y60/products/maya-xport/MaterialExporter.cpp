@@ -806,12 +806,13 @@ MaterialExporter::createMaterial(const MFnMesh * theMesh, const MObject & theSha
     MString myPhysics = "";
     if (getCustomAttribute(theShaderNode, "ac_physics", myPhysics)) {
         cerr << "Found physics in " << myMaterialName << " with value: " << myPhysics.asChar() << endl;
-        myMaterialBuilder.addFeature("physics", myPhysics.asChar());
+        myMaterialBuilder.addFeature("physics", VectorOfRankedFeature(100, myPhysics.asChar()));
     }
 
     // Add special features collected in shape exporter
     for (unsigned i = 0; i < theSpecialFeatures.size(); ++i) {
-        myMaterialBuilder.addFeature(theSpecialFeatures[i].classname, theSpecialFeatures[i].values);
+        myMaterialBuilder.addFeature(theSpecialFeatures[i].classname, 
+               VectorOfRankedFeature(100, theSpecialFeatures[i].values) );
     }
 
     VectorOfRankedFeature myLightingFeature;

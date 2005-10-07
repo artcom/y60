@@ -21,7 +21,6 @@
 #define AC_Y60_SHADER_INTERFACE_INCLUDED
 
 #include "MaterialParameter.h"
-#include "MaterialRequirementList.h"
 #include <y60/DataTypes.h>
 
 #include <asl/Ptr.h>
@@ -32,6 +31,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(ShaderException, asl::Exception);
     class MaterialBase;
+    typedef asl::Ptr<MaterialBase>       MaterialBasePtr;
     class IShaderLibrary;
     class Viewport;
     class Body;
@@ -59,7 +59,7 @@ namespace y60 {
             virtual bool isCGShader() { return false; }
 
             // called on body change
-            virtual void bindBodyParams(const y60::MaterialBase & theMaterial,
+            virtual void bindBodyParams(y60::MaterialBase & theMaterial,
                                         const Viewport & theViewport,
                                         const LightVector & theLights,
                                         const Body & theBody, 
@@ -70,8 +70,7 @@ namespace y60 {
 
     class IShaderLibrary {
     public:
-        virtual IShaderPtr findShader(const std::string & theMaterialName,
-                MaterialRequirementList theRequirementList) = 0;
+        virtual IShaderPtr findShader(MaterialBasePtr theMaterial) = 0;
     };
     typedef asl::Ptr<IShaderLibrary>   IShaderLibraryPtr;
 

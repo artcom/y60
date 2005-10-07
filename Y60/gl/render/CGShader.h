@@ -47,7 +47,7 @@ namespace y60 {
             virtual void disableTextures(const MaterialBase & theMaterial);
             virtual bool isCGShader() { return true; }
 
-            void bindBodyParams(const MaterialBase & theMaterial,
+            void bindBodyParams(MaterialBase & theMaterial,
                     const Viewport & theViewport,
                     const LightVector & theLights,
                     const Body & theBody,
@@ -60,7 +60,7 @@ namespace y60 {
         private:
   		    void checkCgError() const;
             void processCompilerArgs(std::vector<std::string> & theArgs, const std::string & theArgList);
-            void bindMaterialParams(const y60::MaterialBase & theMaterial);
+            void bindMaterialParams(y60::MaterialBase & theMaterial);
             void setCgParameter(CGparameter & theCgParameter, const dom::NodePtr & theNode,
                              const y60::MaterialBase & theMaterial);
 

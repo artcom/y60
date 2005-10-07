@@ -30,8 +30,6 @@
 #include <asl/string_functions.h>
 
 namespace y60 {
-#define DEFINE_Y60_PROPERTY_TAG(theTagName, theType, thePropertyName, theDefault) \
-    DEFINE_PROPERTY_TAG(theTagName, theType, y60::getTypeName<theType>(), thePropertyName, theDefault)
 
     //                  theTagName       theType        theAttributeName      theDefault
     DEFINE_ATTRIBUT_TAG(NameTag,         std::string,   NAME_ATTRIB,     "JohnDoe");

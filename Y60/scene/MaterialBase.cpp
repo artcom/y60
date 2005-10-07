@@ -37,13 +37,16 @@ using namespace dom;
 
 namespace y60 {
 
-    MaterialBase::MaterialBase(MaterialRequirementList & theMaterialRequirement) :
-        _myId(""),
-        _myName(""),
+    MaterialBase::MaterialBase(dom::Node & theNode): 
+        
+        IdTag::Plug(theNode),
+        NameTag::Plug(theNode),
+		TransparencyTag::Plug(theNode),
+		MaterialPropertiesTag::Plug(this),
+		MaterialRequirementTag::Plug(this),      
+        Facade(theNode),
         _myShader(0),
-        _myProperties(0),
         _myLightingModel(LAMBERT),
-        _myMaterialRequirement(theMaterialRequirement),
         _myTexGenFlag(false), _myMaterialVersion(0)
     {
     }
@@ -60,13 +63,9 @@ namespace y60 {
     }
 
     void
-    MaterialBase::load(const dom::NodePtr theMaterialNode, TextureManager & theTextureManager) {
-        _myMaterialNode = theMaterialNode;
-        _myId   = theMaterialNode->getAttributeString(ID_ATTRIB);
-        _myName = theMaterialNode->getAttributeString(NAME_ATTRIB);
+    MaterialBase::load(TextureManager & theTextureManager) {
 
-        mergeProperties(theMaterialNode->childNode("properties"));
-        addTextures(theMaterialNode->childNode(TEXTURE_LIST_NAME), theTextureManager);
+        addTextures(getNode().childNode(TEXTURE_LIST_NAME), theTextureManager);
 
         if (_myShader) {
             const VectorOfString * myLightingFeature = _myShader->getFeatures(LIGHTING_FEATURE);
@@ -87,50 +86,29 @@ namespace y60 {
     MaterialBase::setShader(IShaderPtr theShader) {
         _myShader = theShader;
     }
-
-    const dom::NodePtr &
-    MaterialBase::getProperties() const {
-        return _myProperties;
-    }
-
-	MaterialRequirementList & 
-	MaterialBase::getMaterialRequirements() {
-		return _myMaterialRequirement; 
-	}
-
     void
-    MaterialBase::mergeProperties(const dom::NodePtr & thePropertyNode) {
-        if ( ! thePropertyNode) {
+    MaterialBase::mergeProperties(const dom::NodePtr & theShaderPropertyNode) {
+        if ( ! theShaderPropertyNode) {
             AC_WARNING << "No properties found!" << endl;
             return;
         }
 
-
-        if ( ! _myProperties ) {
-            _myProperties = thePropertyNode;
-        }
-
-        vector<string> myPropertyNames;
-        for (unsigned i = 0; i < _myProperties->childNodesLength(); ++i) {
-            myPropertyNames.push_back(_myProperties->childNode(i)->getAttributeString("name"));
-        }
-
-
-        unsigned myPropertyCount = thePropertyNode->childNodesLength();
-
-        for (unsigned i = 0; i < myPropertyCount; ++i) {
-            dom::NodePtr myPropertyNode  = thePropertyNode->childNode(i);
-            const string & myNodeNameStr = myPropertyNode->getAttributeString("name");
-            DB(AC_TRACE << "testing shader property with name = "  <<
-                       myPropertyNode->getAttributeString("name") << " ... ");
-            if ( find(myPropertyNames.begin(), myPropertyNames.end(), myNodeNameStr) ==  myPropertyNames.end()) {
-                DB(AC_TRACE << "added" << endl);
-                _myProperties->appendChild(*myPropertyNode);
-                myPropertyNames.push_back(myNodeNameStr);
-            } else {
-                DB(AC_TRACE << "already in list" << endl);
-            }
-        }
+		MaterialPropertiesFacadePtr myReqFacade = getFacade<MaterialPropertiesTag>();
+		const NameAttributeNodeMap & myPropertyMap = myReqFacade->getEnsuredPropertyList();
+		
+		dom::NodePtr myMaterialPropNode = myPropertyMap.getNamedItem(
+			                                  theShaderPropertyNode->getAttributeString(NAME_ATTRIB));
+		if (!myMaterialPropNode) {
+			// the shader has properties not in the material liste, add'em
+			if (theShaderPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
+				theShaderPropertyNode->nodeName() != "#comment") {
+				NodePtr myChild = getNode().childNode(PROPERTY_LIST_NAME)->appendChild(
+						        theShaderPropertyNode->cloneNode(Node::DEEP));
+				}
+		} else {
+			// set the value of the material with the shaders value
+            (*myMaterialPropNode)("#text").nodeValue((*theShaderPropertyNode)("#text").nodeValue());
+		}
     }
 
     TextureUsage MaterialBase::getTextureUsage(unsigned theTextureSlot) const {
@@ -138,7 +116,7 @@ namespace y60 {
         if (!myFeatures || theTextureSlot >= myFeatures->size()) {
             throw ShaderException(string("Shader '" + _myShader->getName() 
                         + "' cannot handle " + asl::as_string(theTextureSlot) + " textures\n")
-                    + "Material:\n" + as_string(*_myMaterialNode) + "\nShader Features: "
+                    //+ "Material:\n" + as_string(*_myMaterialNode) + "\nShader Features: "
                     + as_string(*myFeatures), PLUS_FILE_LINE);
         }
         return TextureUsage(getEnumFromString((*myFeatures)[theTextureSlot], TextureUsageStrings));
@@ -199,19 +177,10 @@ namespace y60 {
                  << asl::as_string(myMaxUnits) << " texture units, "
                  << endl << "              ignoring: "
                  << theTextureNode->getAttributeString(TEXTURE_IMAGE_ATTRIB)
-                 << " of material " << _myName << endl;
+                 << " of material " << get<NameTag>() << endl;
         }
     }
 
-    const string &
-    MaterialBase::getId() const {
-        return _myId;
-    }
-
-    const string &
-    MaterialBase::getName() const {
-        return _myName;
-    }
 
     unsigned
     MaterialBase::getTextureCount() const {
@@ -230,38 +199,38 @@ namespace y60 {
 
     bool
     MaterialBase::writesDepthBuffer() const {
-        if (_myMaterialNode->getAttribute(WRITE_DEPTH_BUFFER_ATTRIB)) {
-            return _myMaterialNode->getAttributeValue<bool>(WRITE_DEPTH_BUFFER_ATTRIB);
+        if (getNode().getAttribute(WRITE_DEPTH_BUFFER_ATTRIB)) {
+            return getNode().getAttributeValue<bool>(WRITE_DEPTH_BUFFER_ATTRIB);
         }
         return true;
     }
 
-    bool
+/*    bool
     MaterialBase::hasTransparency() const {
-        if (_myMaterialNode->getAttribute(TRANSPARENCY_ATTRIB)) {
-            return _myMaterialNode->getAttributeValue<bool>(TRANSPARENCY_ATTRIB);
-        }
-        return false;
+		return get<TransparencyTag>();
     }
-
+*/
     void
     MaterialBase::updateParams() {
 
         // check node version if update is necessary
-        if (!_myMaterialNode || _myMaterialNode->nodeVersion() == _myMaterialVersion) {
+        if (!getNode() || getNode().nodeVersion() == _myMaterialVersion) {
             return;
         }
-        _myMaterialVersion = _myMaterialNode->nodeVersion();
-        AC_DEBUG << "Updating params for material " << getName();
+
+        _myMaterialVersion = getNode().nodeVersion();
+        AC_DEBUG << "Updating params for material " << get<NameTag>();
 
         _myTexGenModes.clear();
         _myTexGenParams.clear();
         _myTexGenFlag = false;
 
-        RequirementMap & myRequirements = getMaterialRequirements().getRequirements();
-        if (myRequirements.find(TEXCOORD_FEATURE) != myRequirements.end()) {
+		MaterialRequirementFacadePtr myReqFacade = getFacade<MaterialRequirementTag>();
+		const NameAttributeNodeMap & myRequirementMap = myReqFacade->getEnsuredPropertyList();
+		NodePtr myMappingRequirement = myRequirementMap.getNamedItem(MAPPING_FEATURE);
+        if (myMappingRequirement) {
 
-            VectorOfRankedFeature & myTexCoordFeatures = myRequirements[TEXCOORD_FEATURE];
+            VectorOfRankedFeature & myTexCoordFeatures = (*myMappingRequirement)("#text").dom::Node::nodeValueAs<VectorOfRankedFeature>();;
             if (myTexCoordFeatures.size() > 0) {
  
                 // assume it's on until told otherwise
@@ -311,19 +280,22 @@ namespace y60 {
                             break;
                         case PERSPECTIVE_PROJECTION:
                         default:
-                            throw ShaderException(string("Invalid texgenmode '") + myTexCoordFeature[myTexUnit] + "' in material " + getName(), PLUS_FILE_LINE);
+                            throw ShaderException(string("Invalid texgenmode '") + myTexCoordFeature[myTexUnit] + "' in material " + get<NameTag>(), PLUS_FILE_LINE);
                     }
 
                     // fetch texgen params
+					MaterialPropertiesFacadePtr myPropertyFacade = getFacade<MaterialPropertiesTag>();
+					const NameAttributeNodeMap & myPropertyMap = myPropertyFacade->getEnsuredPropertyList();
+
                     string myTexGenParamName = string("texgenparam") + asl::as_string(myTexUnit);
-                    dom::NodePtr myTexCoordParamsProp = findPropertyNode(myTexGenParamName);
-                    if (myTexCoordParamsProp) {
-                        VectorOfVector4f myTexGenParamsVec = getPropertyValue<VectorOfVector4f>(myTexGenParamName);
+					NodePtr myTexGenProperty = myPropertyMap.getNamedItem(myTexGenParamName);
+                    if (myTexGenProperty) {
+						VectorOfVector4f myTexGenParamsVec = (*myTexGenProperty)("#text").dom::Node::nodeValueAs<VectorOfVector4f>();
                         for (unsigned i = 0; i < myTexGenParamsVec.size(); ++i) {
                             myTexGenParams.push_back(myTexGenParamsVec[i]);
                         }
                     } else {
-                        AC_DEBUG << "No such property: " << myTexGenParamName <<" in material " << getName();
+                        AC_DEBUG << "No such property: " << myTexGenParamName <<" in material " << get<NameTag>();
                     }
 
                     _myTexGenModes.push_back(myTexGenModes);
@@ -331,10 +303,10 @@ namespace y60 {
                 }
             }
             if (_myTexGenFlag) {
-                AC_DEBUG << "TexGen enabled for material " << getName();
+                AC_DEBUG << "TexGen enabled for material " << get<NameTag>();
             }
         } else {
-            AC_DEBUG << "No such feature '" << TEXCOORD_FEATURE << "' for material " << getName();
+            AC_DEBUG << "No such feature '" << MAPPING_FEATURE << "' for material " << get<NameTag>();
         }
     }
 }

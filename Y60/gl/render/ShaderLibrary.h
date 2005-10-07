@@ -18,7 +18,6 @@
 
 #include <string>
 namespace y60 {
-    class MaterialRequirementList;
 
     struct ShaderScore {
         ShaderScore() : featurehits(0), points(0) {};
@@ -35,13 +34,12 @@ namespace y60 {
             void load(const std::string & theLibraryFileName);
             void load(const dom::NodePtr theNode);
             void reload();
-            virtual y60::IShaderPtr findShader(const std::string & theMaterialName,
-                    y60::MaterialRequirementList theRequirementList);
+            virtual y60::IShaderPtr findShader(MaterialBasePtr theMaterial);
 
             const std::string & getShaderDir() const { return _myShaderDirectory; };
             void setShaderDir(const std::string & theShaderDir) { _myShaderDirectory = theShaderDir; };
             const GLShaderVector & getShaders() const { return _myShaders; };
-            CGcontext getCgContext() const { return _myCgContext; };
+            CGcontext getCgContext();
          private:
             void loadAllShaders();
             GLShaderVector  _myShaders;

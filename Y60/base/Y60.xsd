@@ -1699,30 +1699,33 @@ The material requirements are used to find the best matching shader in the shade
 All shaders in the shaderlibrary will be checked against this feature to determin the best
 matching shader.</xs:documentation>
         </xs:annotation>
+
         <xs:complexType>
-            <xs:attribute name="class" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>Type of the feature. Possible types are 'textures', 'lighting', 'vertexparams' and 'physics'</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="values" type="VectorOfRankedFeature">
-                <xs:annotation>
-                    <xs:documentation>A ranked list of feature values.
-Typical format of the ranked list is:
-    &lt;feature class='lighting' values='[30[lambert],20[flat],10[unlit]]'/&gt;
-which means that the lighting should be applied with a lambert-shader, if that is not
-possible a flat-shader should be used and as last ressort the unlit-shader could be taken.
-
-The following values are possible for the different classes:
-lighting:       phong, lambert, flat, unlit, toon
-textures:       paint, bump, environment, skybox
-vertexparams:   color
-physics:        skin, waves, wind, wave_2d, wave_1d, hexwisp
-
-If multitexturing should be used the texture-attribute should contain a list of texture usages, such as:
-[paint,paint,bump]</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfRankedFeature">
+                    <xs:annotation>
+                        <xs:documentation>A ranked list of feature values.
+    Typical format of the ranked list is:
+        &lt;feature name='lighting' values='[30[lambert],20[flat],10[unlit]]'/&gt;
+    which means that the lighting should be applied with a lambert-shader, if that is not
+    possible a flat-shader should be used and as last ressort the unlit-shader could be taken.
+    
+    The following values are possible for the different names:
+    lighting:       phong, lambert, flat, unlit, toon
+    textures:       paint, bump, environment, skybox
+    vertexparams:   color
+    physics:        skin, waves, wind, wave_2d, wave_1d, hexwisp
+    
+    If multitexturing should be used the texture-attribute should contain a list of texture usages, such as:
+    [paint,paint,bump]</xs:documentation>
+                    </xs:annotation>
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Type of the feature. Possible types are 'textures', 'lighting', 'vertexparams' and 'physics'</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
         </xs:complexType>
     </xs:element>
     <xs:element name="properties">

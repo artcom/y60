@@ -266,7 +266,7 @@ ShapeExporter::outputPrimitives(y60::ShapeBuilder & theShapeBuilder,
 
     SpecialFeatures mySpecialFeatures;
     if (theHasSkinAndBonesFlag) {
-        mySpecialFeatures.push_back(MaterialFeature("physics", "[100[skin]]"));
+        mySpecialFeatures.push_back(MaterialFeature("physics", "skin"));
     }
 
     try {

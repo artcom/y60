@@ -28,6 +28,7 @@
 namespace y60 {
 
     //=== Standard property names =================================================
+    static const char * BONE_MATRIX_PROPERTY       = "BoneMatrix";
     static const char * AMBIENT_PROPERTY           = "ambient";
     static const char * SURFACE_COLOR_PROPERTY     = "surfacecolor";
     static const char * DIFFUSE_PROPERTY           = "diffuse";

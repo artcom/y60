@@ -35,18 +35,17 @@ function OverlayBase(Public, Protected, theManager, thePosition, theParent) {
     Public.material setter = function(theMaterial) {
         _myNode.material = theMaterial.id;
         _myMaterial      = theMaterial;
-        _myColor         = getDescendantByName(_myMaterial, "surfacecolor", true).firstChild;
 
         // Notify derived classes
         Protected.onMaterialChange();
     }
 
     Public.color getter = function() {
-        return _myColor.nodeValue;
+        return _myMaterial.properties.surfacecolor;
     }
 
     Public.color setter = function(theColor) {
-        _myColor.nodeValue = theColor;
+        _myMaterial.properties.surfacecolor = theColor;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -152,17 +151,15 @@ function OverlayBase(Public, Protected, theManager, thePosition, theParent) {
     /// Create an untextured overlay
     function setup() {
         var myName = "Overlay_" + ourOverlayCounter++;
-
         var myMaterialId = createUniqueId();
-        var myMaterialString =
-        '<material name="' + myName + 'M" id="' + myMaterialId + '" transparent="1" >\n' +
-        '    <properties><vector4f name="surfacecolor">[1,1,1,1]</vector4f></properties>\n' +
-        '    <requires><feature class="lighting" values="[10[unlit]]"/></requires>\n' +
-        '</material>';
-        _myMaterial = new Node(myMaterialString).firstChild;
-        theManager.materials.appendChild(_myMaterial);
-        _myColor = getDescendantByName(_myMaterial, "surfacecolor", true).firstChild;
 
+        _myMaterial = Node.createElement('material');
+        theManager.materials.appendChild(_myMaterial);        
+        
+        _myMaterial.id = myMaterialId;
+        _myMaterial.name = myName + "M";
+        _myMaterial.transparent = 1;
+        _myMaterial.properties.surfacecolor = "[1,1,1,1]";
         var myParent = theParent ? theParent : theManager.overlays;
         var myOverlayString = '<overlay name="' + myName + '" material="' + _myMaterial.id + '"/>';
         var myNode = new Node(myOverlayString);
@@ -176,7 +173,6 @@ function OverlayBase(Public, Protected, theManager, thePosition, theParent) {
 
     var _myNode     = null;
     var _myMaterial = null;
-    var _myColor    = null;
 
     setup();
 }
@@ -314,6 +310,7 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
     }
 
     Protected.addTexture = function(theImageId) {
+        
         _myTextures = getDescendantByTagName(Public.material, "textures", false);
         if (!_myTextures) {
             _myTextures = Public.material.appendChild(Node.createElement("textures"));
@@ -355,26 +352,20 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
         return myString;
     }
 
-    function addTextureRequirements(theTextureCount) {
-        var myRequiresNode = getDescendantByTagName(Public.material, "requires", false);
-        if (myRequiresNode) {
-            var myTextureFeatures = getDescendantByAttribute(myRequiresNode, "class", "textures", false);
-            if (myTextureFeatures == null) {
-                myTextureFeatures = new Node('<feature class="textures"/>').firstChild;
-                myRequiresNode.appendChild(myTextureFeatures);
-            }
-            myTextureFeatures.values = createTextureFeatureString(theTextureCount);
-
-            var myTexcoordFeatures = getDescendantByAttribute(myRequiresNode, "class", "texcoord", false);
-            if (myTexcoordFeatures == null) {
-                myTexcoordFeatures = new Node('<feature class="texcoord"/>').firstChild;
-                myRequiresNode.appendChild(myTexcoordFeatures);
-            }
-            myTexcoordFeatures.values = createTexcoordFeatureString(theTextureCount);
-
-        } else {
-            throw new Exception("TextureOverlay material has no requires node.", fileline());
+    function addTextureRequirements(theTextureCount) {        
+        var myTextureFeatures = getDescendantByAttribute(Public.material.requires, "name", "textures", false);
+        if (myTextureFeatures == null) {
+            myTextureFeatures = new Node('<feature name="textures">[10[sds]]</feature>\n').firstChild;
+            Public.material.requires.appendChild(myTextureFeatures);
         }
+        myTextureFeatures = getDescendantByAttribute(Public.material.requires, "name", "texcoord", false);
+        if (myTextureFeatures == null) {
+            myTextureFeatures = new Node('<feature name="texcoord">[10[sds]]</feature>\n').firstChild;
+            Public.material.requires.appendChild(myTextureFeatures);
+        }
+        Public.material.requires.textures = createTextureFeatureString(theTextureCount);
+        Public.material.requires.texcoord = createTexcoordFeatureString(theTextureCount);
+                
     }
 
     var _myTextures = null;

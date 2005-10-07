@@ -69,18 +69,19 @@ namespace y60 {
     void
     FFShader::activate(y60::MaterialBase & theMaterial) {
         GLShader::activate(theMaterial);
+		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getFacade<MaterialPropertiesTag>();
         if (theMaterial.getLightingModel() != UNLIT) {
-            glMaterialfv(GL_FRONT, GL_DIFFUSE,  theMaterial.getPropertyValue<Vector4f>(DIFFUSE_PROPERTY).begin());
+            glMaterialfv(GL_FRONT, GL_DIFFUSE,  myMaterialPropFacade->get<MaterialDiffuseTag>().begin());
 
             // Vertexcolor always goes into the ambient color for lit materials
             if (!_myFixedFunctionShader._myVertexRegisterFlags[COLORS_REGISTER]) {
-                glMaterialfv(GL_FRONT, GL_AMBIENT,  theMaterial.getPropertyValue<Vector4f>(AMBIENT_PROPERTY).begin());
+                glMaterialfv(GL_FRONT, GL_AMBIENT,  myMaterialPropFacade->get<MaterialAmbientTag>().begin());
             }
-            glMaterialfv(GL_FRONT, GL_SPECULAR, theMaterial.getPropertyValue<Vector4f>(SPECULAR_PROPERTY).begin());
-            glMaterialf(GL_FRONT, GL_SHININESS, theMaterial.getPropertyValue<float>(SHININESS_PROPERTY));
-            glMaterialfv(GL_FRONT, GL_EMISSION, theMaterial.getPropertyValue<Vector4f>(EMISSIVE_PROPERTY).begin());
+            glMaterialfv(GL_FRONT, GL_SPECULAR, myMaterialPropFacade->get<MaterialSpecularTag>().begin());
+            glMaterialf(GL_FRONT, GL_SHININESS, myMaterialPropFacade->get<ShininessTag>());
+            glMaterialfv(GL_FRONT, GL_EMISSION, myMaterialPropFacade->get<MaterialEmissiveTag>().begin());
         } else {
-            glColor4fv(theMaterial.getPropertyValue<Vector4f>(SURFACE_COLOR_PROPERTY).begin());
+            glColor4fv(myMaterialPropFacade->get<SurfaceColorTag>().begin());
         }
     }
 
@@ -95,7 +96,7 @@ namespace y60 {
     void
     FFShader::enableTextures(const y60::MaterialBase & theMaterial) {
         unsigned myTextureCount = theMaterial.getTextureCount();
-        DB(AC_TRACE << "FFShader::enableTextures: Material " << theMaterial.getName() << " has " << myTextureCount << " textures." << endl);
+        DB(AC_TRACE << "FFShader::enableTextures: Material " << theMaterial.get<NameTag>() << " has " << myTextureCount << " textures." << endl);
         glMatrixMode(GL_TEXTURE);
 
         bool alreadyHasSpriteTexture = false;

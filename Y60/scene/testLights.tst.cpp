@@ -60,47 +60,52 @@ public:
             // Test directional light
             {
                 LightSourcePtr myLight = myDocument.getElementById("light0")->getFacade<Light>()->getLightSource();
+    			LightPropertiesFacadePtr myLightPropFacade = myLight->getFacade<LightPropertiesTag>();
+                
                 ENSURE(myLight);
                 ENSURE(myLight->getType() == DIRECTIONAL);
                 ENSURE(myLight->get<IdTag>() == "l0" );
-                ENSURE(myLight->get<AmbientTag>() == Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
-                ENSURE(myLight->get<DiffuseTag>() == Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
-                ENSURE(myLight->get<SpecularTag>() == Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+                ENSURE(myLightPropFacade->get<LightAmbientTag>() == Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+                ENSURE(myLightPropFacade->get<LightDiffuseTag>() == Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+                ENSURE(myLightPropFacade->get<LightSpecularTag>() == Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
             }
 
             // Test empty light with defaults
             {
                 LightSourcePtr myLight = myDocument.getChildElementById("light1", "id")->getFacade<Light>()->getLightSource();;
+    			LightPropertiesFacadePtr myLightPropFacade = myLight->getFacade<LightPropertiesTag>();
                 ENSURE(myLight);
                 ENSURE(myLight->getType() == UNSUPPORTED);
                 ENSURE(myLight->get<IdTag>() == "l1" );
-                ENSURE(myLight->get<AmbientTag>() == Vector4f(0.2f, 0.2f, 0.2f, 1.0f));
-                ENSURE(myLight->get<DiffuseTag>() == Vector4f(0.8f, 0.8f, 0.8f, 1.0f));
-                ENSURE(myLight->get<SpecularTag>() == Vector4f(0,0,0,1));
-                ENSURE(myLight->get<AttenuationTag>() == 0);
-                ENSURE(myLight->get<CutOffTag>() == 180);
-                ENSURE(myLight->get<ExponentTag>() == 0);
+                ENSURE(myLightPropFacade->get<LightAmbientTag>() == Vector4f(0.2f, 0.2f, 0.2f, 1.0f));
+                ENSURE(myLightPropFacade->get<LightDiffuseTag>() == Vector4f(0.8f, 0.8f, 0.8f, 1.0f));
+                ENSURE(myLightPropFacade->get<LightSpecularTag>() == Vector4f(0,0,0,1));
+                ENSURE(myLightPropFacade->get<AttenuationTag>() == 0);
+                ENSURE(myLightPropFacade->get<CutOffTag>() == 180);
+                ENSURE(myLightPropFacade->get<ExponentTag>() == 0);
             }
 
             // Test positional light
             {
                 LightSourcePtr myPositionalLight = myDocument.getElementById("light4")->getFacade<Light>()->getLightSource();
+    			LightPropertiesFacadePtr myLightPropFacade = myPositionalLight->getFacade<LightPropertiesTag>();
                 ENSURE(myPositionalLight);
                 ENSURE(myPositionalLight->getType() == POSITIONAL);
                 ENSURE(myPositionalLight->get<IdTag>() == "l4" );
-                ENSURE(myPositionalLight->get<AttenuationTag>() == 0.475f);
+                ENSURE(myLightPropFacade->get<AttenuationTag>() == 0.475f);
             }
 
             LightSourcePtr mySpotLight = myDocument.getElementById("light2")->getFacade<Light>()->getLightSource();
+			LightPropertiesFacadePtr myLightPropFacade = mySpotLight->getFacade<LightPropertiesTag>();
             ENSURE(mySpotLight);
             ENSURE(mySpotLight->getType() == POSITIONAL);
             ENSURE(mySpotLight->get<IdTag>() == "l2" );
-            ENSURE(mySpotLight->get<AmbientTag>() == Vector4f(0.0f, 1.0f, 1.0f, 1.0f));
-            ENSURE(mySpotLight->get<DiffuseTag>() == Vector4f(1.0f, 0.0f, 1.0f, 1.0f));
-            ENSURE(mySpotLight->get<SpecularTag>() == Vector4f(1.0f, 1.0f, 0.0f, 1.0f));
-            ENSURE(mySpotLight->get<AttenuationTag>() == 0.275f);
-            ENSURE(mySpotLight->get<CutOffTag>() == 45.0);
-            ENSURE(mySpotLight->get<ExponentTag>() == 0.25f);
+            ENSURE(myLightPropFacade->get<LightAmbientTag>() == Vector4f(0.0f, 1.0f, 1.0f, 1.0f));
+            ENSURE(myLightPropFacade->get<LightDiffuseTag>() == Vector4f(1.0f, 0.0f, 1.0f, 1.0f));
+            ENSURE(myLightPropFacade->get<LightSpecularTag>() == Vector4f(1.0f, 1.0f, 0.0f, 1.0f));
+            ENSURE(myLightPropFacade->get<AttenuationTag>() == 0.275f);
+            ENSURE(myLightPropFacade->get<CutOffTag>() == 45.0);
+            ENSURE(myLightPropFacade->get<ExponentTag>() == 0.25f);
     }
 };
 

@@ -36,15 +36,15 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
             var myAmbientColor = new Vector4f(0.5,0.5,0.5,1);
             var myLightingFeatures = "[10[unlit]]";
 
-            _myMaterial = buildMaterialNode("CoordinateSystem",
+            _myMaterial = buildMaterialNode(_mySceneViewer.getMaterials(),
+                                            "CoordinateSystem",
                                             myDiffuseColor,
                                             myAmbientColor,
                                             null,
                                             myLightingFeatures);
-
-            var myRequirements = getDescendantByTagName(_myMaterial, "requires", false);
-            myRequirements.appendChild(new Node('<feature class="vertexparams" values="[100[color]]"/>').firstChild);
-            _mySceneViewer.getMaterials().appendChild(_myMaterial);
+            var myVertexparamsFeatures = new Node('<feature name="vertexparams">[0[]]</feature>\n').firstChild;
+            _myMaterial.requires.appendChild(myVertexparamsFeatures);
+            myMaterialNode.requires.vertexparams = "[100[color]]";
 
             var myShapeBuilder = new ShapeBuilder("s_CoordinateSystem");
             myShapeBuilder.appendNormal([0,0,0]);

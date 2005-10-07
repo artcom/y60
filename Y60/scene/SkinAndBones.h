@@ -22,7 +22,7 @@
 
 #include "MaterialBase.h"
 #include "Facades.h"
-
+#include <y60/PropertyNames.h>
 
 #include <dom/Nodes.h>
 #include <asl/Matrix4.h>
@@ -31,11 +31,30 @@
 
 namespace y60 {
     class TextureManager;
+    
+    DEFINE_PROPERTY_TAG(BoneMatrixTag, SkinAndBonesPropertiesFacade, y60::VectorOfVector4f, y60::VectorTypeNameTrait<asl::Vector4f>::name(), BONE_MATRIX_PROPERTY, "properties", "name", VectorOfVector4f());
+	class SkinAndBonesPropertiesFacade :
+		public dom::Facade,
+		public BoneMatrixTag::Plug
+	{
+		public:
+			SkinAndBonesPropertiesFacade(dom::Node & theNode) :
+				Facade(theNode),
+				BoneMatrixTag::Plug(this)
+			{}
+			IMPLEMENT_FACADE(SkinAndBonesPropertiesFacade);
 
-    class SkinAndBones : public MaterialBase {
+	};
+	typedef asl::Ptr<SkinAndBonesPropertiesFacade, dom::ThreadingModel> SkinAndBonesPropertiesFacadePtr;
+
+	DEFINE_CHILDNODE_TAG(SkinAndBonesPropertiesTag, SkinAndBones, SkinAndBonesPropertiesFacade, REQUIRES_LIST_NAME);
+    class SkinAndBones : public MaterialBase
+    {
         public:
-            SkinAndBones(MaterialRequirementList theMaterialRequirement) : 
-			  MaterialBase(theMaterialRequirement), _myBoundingBoxNode(0), _myBoneMatrixPropertyNode(0) {}
+            SkinAndBones(dom::Node & theNode) : 
+			  MaterialBase(theNode), _myBoundingBoxNode(0)
+              {}
+            IMPLEMENT_CHILD_FACADE(SkinAndBones);
 
             virtual ~SkinAndBones() {}
 
@@ -44,7 +63,7 @@ namespace y60 {
             void update(TextureManager & theTextureManager, const dom::NodePtr theImages);
 
         private:
-            dom::NodePtr                 _myBoneMatrixPropertyNode;
+			dom::NodePtr                 _myBoneMatrixPropertyNode;
             std::vector<JointFacadePtr>  _myJoints;
             std::vector<asl::Matrix4f>   _myJointSpaceTransforms;    
             dom::NodePtr                 _myBoundingBoxNode;

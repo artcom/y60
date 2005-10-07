@@ -267,58 +267,71 @@ namespace y60 {
 
     void
     Scene::loadMaterial(NodePtr theMaterialNode) {
-        string myName = theMaterialNode->getAttributeString(NAME_ATTRIB);
+			map<string, bool> myPropertyNames;
+			NodePtr myPropertiesNode = theMaterialNode->childNode(PROPERTY_LIST_NAME);
+			if (myPropertiesNode) {
+				for (unsigned i = 0; i < myPropertiesNode->childNodesLength(); ++i) {
+					myPropertyNames[myPropertiesNode->childNode(i)->getAttributeString("name")] = false;
+					const std::string & myProp = myPropertiesNode->childNode(i)->getAttributeString("name");
 
-        // 1. get material requirements
-        MaterialRequirementList myMaterialRequirement;
-        myMaterialRequirement.load(theMaterialNode->childNode("requires"));
+				}
+			}
+	                
+			MaterialBasePtr myMaterial = MaterialBasePtr(new MaterialBase(*theMaterialNode));
 
-        IShaderPtr myShader;
-        MaterialBasePtr myMaterial;
-        if (getShaderLibrary()) {
-            // 2. ask shaderlib for shaderdefinition
-            myShader = getShaderLibrary()->findShader(myName, myMaterialRequirement);
-            if (!myShader) {
-                throw SceneException(string("No shader defintion found for Material: ") +
-                    myName, PLUS_FILE_LINE);
-            }
-            myShader->load(*getShaderLibrary());
+			IShaderPtr myShader;
+			if (getShaderLibrary()) {
+				// 2. ask shaderlib for shaderdefinition
+				myShader = getShaderLibrary()->findShader(myMaterial);
+				if (!myShader) {
+					throw SceneException(string("No shader defintion found for Material: ") +
+						myMaterial->get<NameTag>(), PLUS_FILE_LINE);
+				}
+				myShader->load(*getShaderLibrary());
 
-            // 3. decide which material to build
-            // 4. load material from node
-            // 5. give material the found shaderdefinition
-            const VectorOfString * myPhysicsFeatures = myShader->getFeatures("physics");
+				// 3. decide which material to build
+				// 4. load material from node
+				// 5. give material the found shaderdefinition
+				const VectorOfString * myPhysicsFeatures = myShader->getFeatures("physics");
 
-            if (myPhysicsFeatures && myShader->isCGShader() &&
-                std::find(myPhysicsFeatures->begin(), myPhysicsFeatures->end(), "skin") !=  myPhysicsFeatures->end())
-            {
-                 myMaterial = MaterialBasePtr(new SkinAndBones(myMaterialRequirement));
-            } else {
+				if (myPhysicsFeatures && myShader->isCGShader() &&
+					std::find(myPhysicsFeatures->begin(), myPhysicsFeatures->end(), "skin") !=  myPhysicsFeatures->end())
+				{
+					myMaterial = MaterialBasePtr(new SkinAndBones(*theMaterialNode));
+				} 
+			}
 
-                myMaterial = MaterialBasePtr(new MaterialBase(myMaterialRequirement));
-            }
-        } else {
-            myMaterial = MaterialBasePtr(new MaterialBase(myMaterialRequirement));
-        }
+			myMaterial->setShader(myShader);
 
-        myMaterial->setShader(myShader);
+			DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
+				endl << " with shader: " << (myShader ? myShader->getName() : "NULL") << endl);
+			myMaterial->load(*_myTextureManager);
+			if (myShader) {
+				for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
+					// default the material property with the shader default, only if the material 
+					// does not have a property
+					unsigned myPropertyCount = myShader->getPropertyNode(i)->childNodesLength();        
+					for (unsigned myPropertyIndex = 0; myPropertyIndex < myPropertyCount; ++myPropertyIndex) {
+						dom::NodePtr myPropertyNode  = myShader->getPropertyNode(i)->childNode(myPropertyIndex);								if (myPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
+							myPropertyNode->nodeName() != "#comment") {
 
-        DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
-            endl << " with shader: " << (myShader ? myShader->getName() : "NULL") << endl);
-        myMaterial->load(theMaterialNode, *_myTextureManager);
-        if (myShader) {
-            for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
-                myMaterial->mergeProperties(myShader->getPropertyNode(i));
-            }
-        }
+							const std::string & myProp = myPropertyNode->getAttributeString("name");
+							if (myPropertyNames.find(myPropertyNode->getAttributeString("name")) ==
+								myPropertyNames.end()) {
+								myMaterial->mergeProperties(myPropertyNode);
+							}
+						}
+					}
+				}
+			}
 
-        AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->getId()
-                 << ", name: " << myMaterial->getName();
+        AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
+                 << ", name: " << myMaterial->get<NameTag>();
 
         _myMaterials.push_back(myMaterial);
-        DB(AC_TRACE << "mapping material " << myMaterial->getId() << endl;)
+        DB(AC_TRACE << "mapping material " << myMaterial->get<IdTag>() << endl;)
 
-        _myMaterialIdMap[myMaterial->getId()] = _myMaterials.size() - 1;
+        _myMaterialIdMap[myMaterial->get<IdTag>()] = _myMaterials.size() - 1;
     }
 
     NodePtr

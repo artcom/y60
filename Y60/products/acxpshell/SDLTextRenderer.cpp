@@ -36,6 +36,13 @@
 #define DB(x) //x
 #define DB2(x) //x
 
+//#define DUMP_TEXT_AS_PNG
+#ifdef DUMP_TEXT_AS_PNG
+#include <paintlib/plpngenc.h>
+#include <paintlib/pltiffenc.h>
+#include <paintlib/planybmp.h>
+#endif
+
 using namespace std;
 using namespace asl;
 
@@ -174,6 +181,14 @@ namespace y60 {
             // resize glTexture
             theTextureManager.rebind(myImage);
         }
+
+ #ifdef DUMP_TEXT_AS_PNG
+       PLAnyBmp myBmp;
+        myBmp.Create( _myTextureSurface->w, _myTextureSurface->h, PLPixelFormat::A8B8G8R8, 
+                      (unsigned char*)_myTextureSurface->pixels, _myTextureSurface->w*4);
+        PLPNGEncoder myEncoder;
+        myEncoder.MakeFileFromBmp("test.png", &myBmp);               
+#endif
 
         return myTextSize;
     }
@@ -603,7 +618,6 @@ namespace y60 {
         MAKE_SCOPE_TIMER(SDLTextRenderer_createTextSurface);
         unsigned mySurfaceWidth  = 0;
         unsigned mySurfaceHeight = 0;
-
         DB2(
             AC_TRACE << "----------------------------------" << endl;
             AC_TRACE << "Rendering text: " << theText << endl;

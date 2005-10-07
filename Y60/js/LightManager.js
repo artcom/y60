@@ -238,15 +238,14 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    function createLightSource(theLightSourceName, theType) {
+    function createLightSource(theLightSourceName, theType) {        
         var myLightSourceNode = Node.createElement('lightsource');
         myLightSourceNode.id = createUniqueId();
+        _myLightSources.appendChild(myLightSourceNode);
+                
         myLightSourceNode.type = theType;
         Logger.trace("Creating new Lightsource node: " + theLightSourceName+" = "+myLightSourceNode.id);
-        _myLightSources.appendChild(myLightSourceNode);
-        myLightSourceNode.name = theLightSourceName;
-        var myPropertiesNode = Node.createElement('properties');
-        myLightSourceNode.appendChild(myPropertiesNode);
+        myLightSourceNode.name = theLightSourceName;                
         return myLightSourceNode;
     }
 
@@ -254,11 +253,10 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         var myLightSourceNode = getDescendantByName(_myLightSources, "HeadLightSource");
         if (!myLightSourceNode) {
             myLightSourceNode = createLightSource("HeadLightSource", "positional");
-            var myPropertiesNode = myLightSourceNode.childNode('properties');
-            setPropertyValue(myPropertiesNode, 'float', 'attenuation', 0);
-            setPropertyValue(myPropertiesNode, 'vector4f', 'ambient', '[0.1,0.1,0.1,1]');
-            setPropertyValue(myPropertiesNode, 'vector4f', 'diffuse', '[1,1,1,1]');
-            setPropertyValue(myPropertiesNode, 'vector4f', 'specular', '[1,1,1,1]');
+            myLightSourceNode.properties.ambient = "[0.1,0.1,0.1,1]";
+            myLightSourceNode.properties.diffuse = "[1,1,1,1]";
+            myLightSourceNode.properties.specular = "[1,1,1,1]";
+            myLightSourceNode.properties.attenuation = 0;
         }
         return myLightSourceNode;
     }
@@ -267,11 +265,10 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         var myLightSourceNode = getDescendantByName(_myLightSources, "SunLightSource");
         if (!myLightSourceNode) {
             myLightSourceNode = createLightSource("SunLightSource", "directional");
-            var myPropertiesNode = myLightSourceNode.childNode('properties');
-            setPropertyValue(myPropertiesNode, 'float', 'attenuation', 0);
-            setPropertyValue(myPropertiesNode, 'vector4f', 'ambient', '[0.1,0.1,0.1,1]');
-            setPropertyValue(myPropertiesNode, 'vector4f', 'diffuse', '[0.5,0.5,0.5,1]');
-            setPropertyValue(myPropertiesNode, 'vector4f', 'specular', '[0.5,0.5,0.5,1]');
+            myLightSourceNode.properties.ambient = "[0.1,0.1,0.1,1]";
+            myLightSourceNode.properties.diffuse = "[0.5,0.5,0.5,1]";
+            myLightSourceNode.properties.specular = "[0.5,0.5,0.5,1]";
+            myLightSourceNode.properties.attenuation = 0;
         }
         return myLightSourceNode;
     }

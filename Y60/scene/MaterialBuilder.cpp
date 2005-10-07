@@ -28,6 +28,7 @@
 #include "Texture.h"
 #include <y60/NodeNames.h>
 #include <y60/iostream_functions.h>
+#include <y60/property_functions.h>
 
 #include <dom/Nodes.h>
 #include <dom/Value.h>
@@ -95,8 +96,6 @@ namespace y60 {
 
         // texture feature
         if (!_myTextureRequirements.empty()) {
-            dom::NodePtr myFeatureNode = dom::NodePtr(new dom::Element(FEATURE_NODE_NAME));
-            myFeatureNode->appendAttribute(CLASS_ATTRIB, TEXTURE_FEATURE);
             if (!_needTextureFallback && (_myTextureRequirements.size() > 1)) {
                 VectorOfRankedFeature::iterator it = _myTextureRequirements.begin() + 1;
                 _myTextureRequirements.erase(it);
@@ -107,14 +106,11 @@ namespace y60 {
                 myFallbackFeature._myRanking = 0.0f;
                 _myTextureRequirements.push_back(myFallbackFeature);
             }
-            myFeatureNode->appendAttribute(VALUES_ATTRIB, _myTextureRequirements);
-            myFeatureListNode->appendChild(myFeatureNode);
+	        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, TEXTURE_FEATURE, _myTextureRequirements, REQUIRES_LIST_NAME);
         }
 
 		// Mapping feature
         if (!_myMappingRequirements.empty()) {
-            dom::NodePtr myFeatureNode = dom::NodePtr(new dom::Element(FEATURE_NODE_NAME));
-            myFeatureNode->appendAttribute(CLASS_ATTRIB, MAPPING_FEATURE);
             if (!_needTextureFallback && (_myMappingRequirements.size() > 1)) {
                 VectorOfRankedFeature::iterator it = _myMappingRequirements.begin() + 1;
                 _myMappingRequirements.erase(it);
@@ -125,17 +121,13 @@ namespace y60 {
                 myFallbackFeature._myRanking = 0.0f;
                 _myMappingRequirements.push_back(myFallbackFeature);
             }
-            myFeatureNode->appendAttribute(VALUES_ATTRIB, _myMappingRequirements);
-            myFeatureListNode->appendChild(myFeatureNode);
+	        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, MAPPING_FEATURE, _myMappingRequirements, REQUIRES_LIST_NAME);
         }
 
 		
         // lighting feature
         if (!_myLightingRequirements.empty()) {
-            dom::NodePtr myFeatureNode = dom::NodePtr(new dom::Element(FEATURE_NODE_NAME));
-            myFeatureNode->appendAttribute(CLASS_ATTRIB, LIGHTING_FEATURE);
-            myFeatureNode->appendAttribute(VALUES_ATTRIB, _myLightingRequirements);
-            myFeatureListNode->appendChild(myFeatureNode);
+	        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, LIGHTING_FEATURE, _myLightingRequirements, REQUIRES_LIST_NAME);
         }
 
         _myRequirementsAdded = true;
@@ -143,15 +135,17 @@ namespace y60 {
     }
 
     void
-    MaterialBuilder::addFeature(const std::string & theClass, const std::string & theValue) {
-        dom::NodePtr myFeatureListNode = getNode()->childNode(REQUIRES_LIST_NAME);
-        dom::NodePtr myFeatureNode = dom::NodePtr(new dom::Element(FEATURE_NODE_NAME));
-        myFeatureNode->appendAttribute(CLASS_ATTRIB, theClass);
-        myFeatureNode->appendAttribute(VALUES_ATTRIB, theValue);
-        myFeatureListNode->appendChild(myFeatureNode);
+    MaterialBuilder::addFeature(const std::string & theClass, const VectorOfRankedFeature & theValue) {
+	    setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, theClass.c_str(),									theValue, REQUIRES_LIST_NAME);
     }
+/*
+		dom::NodePtr myFeatureListNode = getNode()->childNode(REQUIRES_LIST_NAME);
+        dom::NodePtr myFeatureNode = dom::NodePtr(new dom::Element(FEATURE_NODE_NAME));
+        myFeatureNode->appendAttribute(NAME_ATTRIB, theClass);
+        myFeatureNode->appendAttribute(VALUES_ATTRIB, theValue);
+        myFeatureListNode->appendChild(myFeatureNode);*/
 
-    void
+	void
     MaterialBuilder::checkState() {
         if (_myRequirementsAdded) {
             throw MaterialBuilderException("Material is already added to dom. Further additions not allowed",

@@ -28,13 +28,8 @@ namespace y60 {
     LightSource::LightSource(dom::Node & theNode) : 
         IdTag::Plug(theNode),
         NameTag::Plug(theNode),
+		LightPropertiesTag::Plug(this),
         LightSourceTypeTag::Plug(theNode),
-        AmbientTag::Plug(theNode),
-        DiffuseTag::Plug(theNode),
-        SpecularTag::Plug(theNode),
-        AttenuationTag::Plug(theNode),
-        CutOffTag::Plug(theNode),
-        ExponentTag::Plug(theNode),
         Facade(theNode)
     {}
     

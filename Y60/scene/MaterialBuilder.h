@@ -44,7 +44,7 @@ namespace y60 {
         unsigned getTextureCount();
         bool isBumpMap(int theTextureIndex) const;
 
-        void addFeature(const std::string & theClass, const std::string & theValue);
+        void addFeature(const std::string & theClass, const VectorOfRankedFeature & theValue);
 
         dom::NodePtr createTextureNode(const std::string & theImageId,
                                        const std::string & theApplyMode,

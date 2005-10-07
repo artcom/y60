@@ -58,7 +58,7 @@ namespace y60 {
                 y60::Scene * theScene)
     {
         unsigned short myKey = 0;
-        if (theMaterial->hasTransparency()) {
+        if (theMaterial->get<TransparencyTag>()) {
             const asl::Box3f & myBoundingBox = theBody->getShape()->getXmlNode()->getFacade<y60::Shape>()->get<BoundingBoxTag>();
             float myZIndicator = (- 1.0 *  (myBoundingBox.getCenter() * theEyeSpaceTransform))[2];
             if (myZIndicator > theFar) {

@@ -148,12 +148,17 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         fadeSplashScreen(theTime);
 
         if (_myStatisticCycle != 0) {
-            window.printStatistics(RenderWindow.RENDERED_STATISTIC, _myStatisticCycle);
+            window.setTextColor(new Vector4f(1,0,0,1), new Vector4f(1,0,1,1));
+             window.printStatistics(RenderWindow.RENDERED_STATISTIC, _myStatisticCycle);
         }
    }
 
     self.BaseViewer.onPreRender = self.onPreRender;
     self.onPreRender = function() {
+        var myImagesCount = self.getImages().childNodesLength();
+        if (myImagesCount > 0) {
+            var myImage = self.getImages().childNodes[0];
+        }
         self.BaseViewer.onPreRender();
     }
 
@@ -385,6 +390,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         window.renderingCaps = window.renderingCaps & (~theCapability);
     }
     self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene) {
+    print(theWindowWidth + " x " + theWindowHeight + " full " + theFullscreen);
         if (window == null) {
             window = new RenderWindow();
         }
@@ -408,6 +414,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         self.setScene(myScene, myCanvas);
         renderer = window.getRenderer();
 
+        print("SCENE SET\n");
         // standard movers
         self.registerMover(TrackballMover);
         self.registerMover(ClassicTrackballMover);
@@ -431,6 +438,8 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (theWindowTitle != null) {
             window.title = theWindowTitle;
         }
+
+        //exit(1);
     }
 
     self.createShutter = function() {

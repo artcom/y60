@@ -33,11 +33,13 @@
 
 #include <y60/NodeValueNames.h>
 #include <asl/string_functions.h>
+#include <dom/Nodes.h>
 
 #define DB(x) // x
 
 using namespace std;
 using namespace asl;
+using namespace dom;
 
 namespace y60 {
 
@@ -294,7 +296,7 @@ namespace y60 {
     bool
     CgProgramInfo::reloadIfRequired(
             const LightVector & theLightInstances,
-            const MaterialBase & theMaterial) 
+            MaterialBase & theMaterial) 
     {
         //AC_DEBUG << "reloadIfRequired";
 
@@ -374,19 +376,23 @@ namespace y60 {
     }
     
     void
-    CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
-        AC_DEBUG << "CgProgramInfo::bindMaterialParams this=" << hex << (void*)this << dec << " material=" << theMaterial.getName();
-        dom::NodePtr myPropertyList = theMaterial.getProperties();
-        unsigned myPropertyCount = myPropertyList->childNodesLength();
-        for (unsigned i = 0; i < myPropertyCount; ++i) {
+    CgProgramInfo::bindMaterialParams(MaterialBase & theMaterial) {
+        AC_DEBUG << "CgProgramInfo::bindMaterialParams this=" << hex << (void*)this << dec 
+			     << " material=" << theMaterial.get<NameTag>();
+
+		MaterialPropertiesFacadePtr & myPropFacade = theMaterial.getFacade<MaterialPropertiesTag>();
+		const NameAttributeNodeMap & myPropMap = myPropFacade->getEnsuredPropertyList();
+
+		for (unsigned myPropIndex = 0; myPropIndex != myPropMap.length(); ++myPropIndex) {
+			const Node & myPropertyNode = myPropMap[myPropIndex];
             const string & myPropertyName 
-                = myPropertyList->childNode(i)->getAttributeString("name");
+                = myPropertyNode.getAttributeString("name");
 
             CGparameter myCgParameter 
                 = cgGetNamedParameter(_myCgProgramID, myPropertyName.c_str());
 
             if (myCgParameter) {
-                setCgMaterialParameter(myCgParameter, myPropertyList->childNode(i), theMaterial);
+                setCgMaterialParameter(myCgParameter, myPropertyNode, theMaterial);
             }
         }
     }
@@ -417,23 +423,24 @@ namespace y60 {
                 continue;
             }
             LightSourcePtr myLightSource = myLight->getLightSource();
+			LightPropertiesFacadePtr myLightPropFacade = myLightSource->getFacade<LightPropertiesTag>();
             switch (myLightSource->getType()) {
                 case POSITIONAL :
                     myPositionalLights.push_back(myLight->get<GlobalMatrixTag>().getTranslation());
-                    myPositionalLightDiffuseColors.push_back(myLightSource->get<DiffuseTag>());
-                    myPositionalLightSpecularColors.push_back(myLightSource->get<SpecularTag>());
+                    myPositionalLightDiffuseColors.push_back(myLightPropFacade->get<LightDiffuseTag>());
+                    myPositionalLightSpecularColors.push_back(myLightPropFacade->get<LightSpecularTag>());
                     break;
                 case DIRECTIONAL :
                     {
                         const Vector4f & myTranslation = myLight->get<GlobalMatrixTag>().getRow(2);
                         myDirectionalLights.push_back(Vector3f(myTranslation[0],
                                     myTranslation[1],myTranslation[2]));
-                        myDirectionalLightDiffuseColors.push_back(myLightSource->get<DiffuseTag>());
-                        myDirectionalLightSpecularColors.push_back(myLightSource->get<SpecularTag>());
+                        myDirectionalLightDiffuseColors.push_back(myLightPropFacade->get<LightDiffuseTag>());
+                        myDirectionalLightSpecularColors.push_back(myLightPropFacade->get<LightSpecularTag>());
                         break;
                     }
                 case AMBIENT :
-                    myAmbientLightColor = myLightSource->get<AmbientTag>();
+                    myAmbientLightColor = myLightPropFacade->get<LightAmbientTag>();
                     break;
                 default :
                     AC_INFO << "unknown light type " << myLightSource->get<IdTag>();
@@ -526,50 +533,50 @@ namespace y60 {
 
     void
     CgProgramInfo::setCgMaterialParameter(CGparameter & theCgParameter, 
-                                          const dom::NodePtr & theNode,
+                                          const dom::Node & theNode,
                                           const MaterialBase & theMaterial)
     {
-        const string & thePropertyName = theNode->getAttributeString("name");
-        AC_DEBUG << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode->nodeName() <<" property=" << thePropertyName << " material=" << theMaterial.getName();
+        const string & thePropertyName = theNode.getAttributeString("name");
+        AC_DEBUG << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode.nodeName() <<" property=" << thePropertyName << " material=" << theMaterial.get<NameTag>();
 
-        switch(TypeId(asl::getEnumFromString(theNode->nodeName(), TypeIdStrings))) {
+        switch(TypeId(asl::getEnumFromString(theNode.nodeName(), TypeIdStrings))) {
             case FLOAT:
                 {
-                    float myValue = (*theNode)("#text").dom::Node::nodeValueAs<float>();
+                    float myValue = theNode("#text").dom::Node::nodeValueAs<float>();
                     cgGLSetParameter1f(theCgParameter, myValue);
                     break;
                 }
             case VECTOR2F:
                 {
-                    Vector2f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<Vector2f>();
+                    Vector2f myValueV = theNode("#text").dom::Node::nodeValueAs<Vector2f>();
                     float * myValue = myValueV.begin();
                     cgGLSetParameter2fv(theCgParameter, myValue);
                     break;
                 }
             case VECTOR3F:
                 {
-                    Vector3f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<Vector3f>();
+                    Vector3f myValueV = theNode("#text").dom::Node::nodeValueAs<Vector3f>();
                     float * myValue = myValueV.begin();
                     cgGLSetParameter3fv(theCgParameter, myValue);
                     break;
                 }
             case VECTOR4F:
                 {
-                    Vector4f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<Vector4f>();
+                    Vector4f myValueV = theNode("#text").dom::Node::nodeValueAs<Vector4f>();
                     float * myValue = myValueV.begin();
                     cgGLSetParameter4fv(theCgParameter, myValue);
                     break;
                 }
             case VECTOR_OF_VECTOR2F:
                 {
-                    VectorOfVector2f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<VectorOfVector2f>();
+                    VectorOfVector2f myValueV = theNode("#text").dom::Node::nodeValueAs<VectorOfVector2f>();
                     float * myValue = myValueV.begin()->begin();
                     cgGLSetParameterArray2f(theCgParameter, 0, myValueV.size(), myValue);
                     break;
                 }
             case VECTOR_OF_VECTOR4F:
                 {
-                    VectorOfVector4f myValueV = (*theNode)("#text").dom::Node::nodeValueAs<VectorOfVector4f>();
+                    VectorOfVector4f myValueV = theNode("#text").dom::Node::nodeValueAs<VectorOfVector4f>();
                     float * myValue = myValueV.begin()->begin();
                     cgGLSetParameterArray4f(theCgParameter, 0, myValueV.size(), myValue);
                     break;
@@ -577,7 +584,7 @@ namespace y60 {
             case SAMPLER2D:
             case SAMPLERCUBE:
                 {
-                    unsigned myTextureIndex = (*theNode)("#text").dom::Node::nodeValueAs<unsigned>();
+                    unsigned myTextureIndex = theNode("#text").dom::Node::nodeValueAs<unsigned>();
                     if (myTextureIndex  < theMaterial.getTextureCount()) {
                         const Texture & myTexture = theMaterial.getTexture(myTextureIndex);
                         //AC_DEBUG << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTexture.getId();

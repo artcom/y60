@@ -233,25 +233,23 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.addSkyBoxFromImage = function(theImageNode) {
         var myMaterialId = createUniqueId();
-        var mySkyboxString =
-            '<material name="background" id="' + myMaterialId + '">\n' +
-            '    <properties>\n' +
-            '        <vector4f name="diffuse">[1,1,1,1]</vector4f>\n' +
-            '        <vector4f name="ambient">[0,0,0,1]</vector4f>\n' +
-            '    </properties>\n' +
-            '    <textures>\n' +
-            '        <texture image="' + theImageNode.id + '" applymode="decal" wrapmode="repeat" />\n' +
-            '    </textures>\n' +
-            '    <requires>\n' +
-            '    <feature class="lighting" values="[10[unlit]]"/>\n' +
-            '        <feature class="textures" values="[100[skybox]]"/>\n' +
-            '    </requires>\n' +
-            '</material>';
-
-
-        var mySkyboxDoc = new Node(mySkyboxString);
-        _mySkyboxMaterial = mySkyboxDoc.firstChild;
+        _mySkyboxMaterial = Node.createElement('material');
+        _mySkyboxMaterial.id = myMaterialId;
         self.getMaterials().appendChild(_mySkyboxMaterial);
+        
+        // add textures
+        var myTexturesString =
+            '<textures>\n' +
+            '    <texture image="' + theImageNode.id + '" applymode="decal" wrapmode="repeat" />\n' +
+            '</textures>';
+        var myTexturesDoc = new Node(myTexturesString);
+        var myTexturesNode = myTexturesDoc.firstChild;
+        _mySkyboxMaterial.appendChild(myTexturesNode);
+
+        // add texture requirement
+        var myTextureFeatures = new Node('<feature name="textures">[100[skybox]]</feature>\n').firstChild;
+        _mySkyboxMaterial.requires.appendChild(myTextureFeatures);
+        
         self.getWorld().skyboxmaterial = myMaterialId;
         self.getScene().update(Scene.IMAGES);
     }

@@ -146,7 +146,7 @@ namespace y60 {
             GLShaderPtr myShader = dynamic_cast_Ptr<GLShader>(myMaterial->getShader());
             if (myShader) {
                 myShader->load(*getShaderLibrary());
-                AC_INFO << "Renderer::preloadShader(): using shader '" << myShader->getName() << "' for material '"<<myMaterial->getName()<<"'" << endl;
+                AC_INFO << "Renderer::preloadShader(): using shader '" << myShader->getName() << "' for material '"<<myMaterial->get<NameTag>()<<"'" << endl;
             }
         }
     }
@@ -358,7 +358,7 @@ namespace y60 {
 
         switchMaterial(myMaterialIndex);
 
-        const MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialIndex);
+        MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialIndex);
         IShaderPtr myShader = myMaterial->getShader();
 
         if (myShader && (myBodyHasChanged || myMaterialHasChanged)) {
@@ -768,7 +768,7 @@ namespace y60 {
                                                        &*_myScene);
                 unsigned long long myKey = makeBodyPartKey(myMaterialIndex, & ( * myBody), myBodyKey);
 
-                if (myMaterial->hasTransparency()) {
+                if (myMaterial->get<TransparencyTag>()) {
                     COUNT(TransparentPrimitives);
                 } else {
                     COUNT(OpaquePrimitives);
@@ -989,14 +989,16 @@ namespace y60 {
     void
     Renderer::enableLight(y60::LightPtr & theLight, int theActiveLightIndex) {
         LightSourcePtr myLightSource = theLight->getLightSource();
+		LightPropertiesFacadePtr myLightPropFacade = myLightSource->getFacade<LightPropertiesTag>();
+
         LightSourceType myType = myLightSource->getType();
         switch (myType) {
             case DIRECTIONAL:
             case POSITIONAL:
             case SPOT:
                 break;
-            case AMBIENT:
-                glLightModelfv(GL_LIGHT_MODEL_AMBIENT, &(*myLightSource->get<AmbientTag>().begin()));
+			case AMBIENT: 
+				glLightModelfv(GL_LIGHT_MODEL_AMBIENT, myLightPropFacade->get<LightAmbientTag>().begin());
                 return;
             case UNSUPPORTED:
                 return;
@@ -1026,13 +1028,13 @@ namespace y60 {
                 // GL positional lights: xyz = light position, w=1.0
                 asl::Vector3f myLightTranslation = theLight->get<GlobalMatrixTag>().getTranslation();
                 myGLLightPos = asl::Vector4f(myLightTranslation[0], myLightTranslation[1], myLightTranslation[2],1.0f);
-                glLightf(gl_lightid, GL_LINEAR_ATTENUATION, myLightSource->get<AttenuationTag>());
+                glLightf(gl_lightid, GL_LINEAR_ATTENUATION, myLightPropFacade->get<AttenuationTag>());
                 break;
             }
             case SPOT:
             {
-                glLightf(gl_lightid, GL_SPOT_CUTOFF, myLightSource->get<CutOffTag>());
-                glLightf(gl_lightid, GL_SPOT_EXPONENT, myLightSource->get<ExponentTag>());
+                glLightf(gl_lightid, GL_SPOT_CUTOFF, myLightPropFacade->get<CutOffTag>());
+                glLightf(gl_lightid, GL_SPOT_EXPONENT, myLightPropFacade->get<ExponentTag>());
 
                 // get the Z-Axis to set the light direction
                 asl::QuadrupleOf<float> myTmpVec = theLight->get<GlobalMatrixTag>().getRow(2); // Z-axis
@@ -1043,9 +1045,9 @@ namespace y60 {
         }
 
         glLightfv(gl_lightid, GL_POSITION, &(*myGLLightPos.begin()));
-        glLightfv(gl_lightid, GL_AMBIENT,  &(*myLightSource->get<AmbientTag>().begin()));
-        glLightfv(gl_lightid, GL_DIFFUSE,  &(*myLightSource->get<DiffuseTag>().begin()));
-        glLightfv(gl_lightid, GL_SPECULAR, &(*myLightSource->get<SpecularTag>().begin()));
+        glLightfv(gl_lightid, GL_AMBIENT,  myLightPropFacade->get<LightAmbientTag>().begin());
+        glLightfv(gl_lightid, GL_DIFFUSE,  myLightPropFacade->get<LightDiffuseTag>().begin());
+		glLightfv(gl_lightid, GL_SPECULAR, myLightPropFacade->get<LightSpecularTag>().begin());
 
         glEnable(gl_lightid);
     }
@@ -1328,8 +1330,9 @@ namespace y60 {
 
             switchMaterial(myMaterialIndex);
             MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialIndex);
+			MaterialPropertiesFacadePtr myPropFacade = myMaterial->getFacade<MaterialPropertiesTag>();
 
-            const asl::Vector4f & myColor = myMaterial->getPropertyValue<Vector4f>(SURFACE_COLOR_PROPERTY);
+            const asl::Vector4f & myColor = myPropFacade->get<SurfaceColorTag>();
             glColor4f(myColor[0], myColor[1], myColor[2], myColor[3]*myAlpha);
 
             const asl::Vector2f & mySourceOrigin = myOverlay.get<SrcOriginTag>();

@@ -938,30 +938,43 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
         } else {
             JSString *myJSStr = JS_ValueToString(cx, id);
             std::string myProperty = JS_GetStringBytes(myJSStr);
-            IF_NOISY(
-                AC_TRACE << "JSNode::getProperty:" << myProperty << endl;
-                AC_TRACE << "JSNode::getProperty: nodeName = " <<myNode->nodeName() << endl;
-                AC_TRACE << "JSNode::getProperty: myNode = " <<*myNode << endl;
-            )
+            AC_TRACE << "JSNode::getProperty:" << myProperty << endl;
+            AC_TRACE << "JSNode::getProperty: nodeName = " <<myNode->nodeName() << endl;
+            AC_TRACE << "JSNode::getProperty: myNode = " <<*myNode << endl;
 
             // First: Check if property exists as attribute
             dom::NodePtr myAttrNode = myNode->attributes().getNamedItem(myProperty);
             if (myAttrNode) {
-                IF_NOISY(AC_TRACE << "JSNode::getProperty: myAttrNode = " <<*myAttrNode << endl);
+                AC_TRACE << "JSNode::getProperty: myAttrNode = " <<*myAttrNode;
                 *vp = as_jsval(cx, myAttrNode->nodeValueWrapperPtr());
                 return JS_TRUE;
             }
 
-            // Second: Check if there are dynamic plug attributes in the facade
+            // Second: Check if there are dynamic or property plug attributes in the facade
             if (myNode->hasFacade()) {
                 dom::FacadePtr myFacade = myNode->getFacade();
                 if (myFacade) {
+                    AC_TRACE << "JSNode::hasFacade " << myProperty << endl;
                     dom::NodePtr myAttrNode = myFacade->getNamedItem(myProperty);
                     if (myAttrNode) {
-                        IF_NOISY(AC_TRACE << "JSNode::getProperty: myAttrNode-Facade = " <<*myAttrNode << endl);
+                        AC_TRACE << "JSNode::getProperty: myAttrNode-Facade = " <<*myAttrNode;
                         *vp = as_jsval(cx, myAttrNode->nodeValueWrapperPtr());
                         return JS_TRUE;
-                    }
+                    }                    
+		            // 2.5: Check for children
+                    dom::NodePtr myChildNode = myFacade->getChildNode(myProperty);
+                    if (myChildNode) {
+                        AC_TRACE << "JSNode::getProperty: myAttrNode-Facade = " <<*myChildNode;
+                        *vp = as_jsval(cx, myChildNode);
+                        return JS_TRUE;
+                    }                    				
+					// ask the facades propertylist (features, properties, etc)
+					myAttrNode = myFacade->getEnsuredPropertyList().getNamedItem(myProperty);
+                    if (myAttrNode) {
+                        *vp = as_jsval(cx, myAttrNode->childNode("#text")->nodeValueWrapperPtr());
+                        return JS_TRUE;
+					}
+
                 }
             }
 
@@ -1023,8 +1036,15 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                             return JS_TRUE;
 #endif
                         }
+						// ask the facades propertylist (features, properties, etc)
+						myAttrNode = myFacade->getEnsuredPropertyList().getNamedItem(myProperty);
+                        if (myAttrNode) {
+                            myAttrNode->childNode("#text")->nodeValue(as_string(cx,*vp));
+                            return JS_TRUE;
+						}
                     }
                 }
+
             }
             // retry to check for attrribute again; it may have been created by the facade
             myAttrNode = myNode->attributes().getNamedItem(myProperty);

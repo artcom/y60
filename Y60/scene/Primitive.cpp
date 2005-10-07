@@ -200,7 +200,7 @@ namespace y60 {
                 getStringFromEnum(theRole, VertexDataRoleString) +
                 "' not found in shape " + _myShapeId + ", primitive type: " +
                 getStringFromEnum(_myType, PrimitiveTypeString) + ", material: " +
-                _myMaterial->getId(), PLUS_FILE_LINE);
+                _myMaterial->get<IdTag>(), PLUS_FILE_LINE);
         }
 
         return *myDataBin;
@@ -215,7 +215,7 @@ namespace y60 {
                 getStringFromEnum(theRole, VertexDataRoleString) +
                 "' not found in shape " + _myShapeId + ", primitive type: " +
                 getStringFromEnum(_myType, PrimitiveTypeString) + ", material: " +
-                _myMaterial->getId(), PLUS_FILE_LINE);
+                _myMaterial->get<IdTag>(), PLUS_FILE_LINE);
         }
 
         return *myDataBin;
@@ -291,12 +291,12 @@ namespace y60 {
         VertexDataRole myRole = VertexDataRole(TEXCOORD0 + myBumpmapIndex);
 
         if (myBumpmapIndex == myTextureCount) {
-            throw MaterialFault( std::string("missing Bumpmap in Material ")+_myMaterial->getName(),
+            throw MaterialFault( std::string("missing Bumpmap in Material ")+_myMaterial->get<NameTag>(),
                                   PLUS_FILE_LINE );
         }
 
         if (_myVertexData[myRole]->getType() != VECTOR2F) {
-            throw MaterialFault( std::string("UV Set is not a Vector2f! in Material ")+_myMaterial->getName(),
+            throw MaterialFault( std::string("UV Set is not a Vector2f! in Material ")+_myMaterial->get<NameTag>(),
                                   PLUS_FILE_LINE );
         }
 

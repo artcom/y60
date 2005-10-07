@@ -27,6 +27,7 @@
 #include "LodFacade.h"
 #include "Camera.h"
 #include "Body.h"
+#include "MaterialBase.h"
 #include "Light.h"
 #include "LightSource.h"
 #include "Canvas.h"
@@ -140,6 +141,7 @@ namespace y60 {
         theFactory->registerPrototype("lod", dom::FacadePtr(new LodFacade(dom::Node::Prototype)));
         theFactory->registerPrototype("light", dom::FacadePtr(new Light(dom::Node::Prototype)));
         theFactory->registerPrototype("lightsource", dom::FacadePtr(new LightSource(dom::Node::Prototype)));
+        theFactory->registerPrototype("properties", dom::FacadePtr(new LightPropertiesFacade(dom::Node::Prototype)), "lightsource");
         theFactory->registerPrototype("camera", dom::FacadePtr(new Camera(dom::Node::Prototype)));
         theFactory->registerPrototype("joint", dom::FacadePtr(new JointFacade(dom::Node::Prototype)));
         theFactory->registerPrototype("canvas", dom::FacadePtr(new Canvas(dom::Node::Prototype)));
@@ -150,6 +152,9 @@ namespace y60 {
         theFactory->registerPrototype("capture", dom::FacadePtr(new Capture(dom::Node::Prototype)));
         theFactory->registerPrototype("shape", dom::FacadePtr(new Shape(dom::Node::Prototype)));
         theFactory->registerPrototype("include", dom::FacadePtr(new IncludeFacade(dom::Node::Prototype)));
+        theFactory->registerPrototype("material", dom::FacadePtr(new MaterialBase(dom::Node::Prototype)));
+        theFactory->registerPrototype("properties", dom::FacadePtr(new MaterialPropertiesFacade(dom::Node::Prototype)), "material");
+        theFactory->registerPrototype("requires", dom::FacadePtr(new MaterialRequirementFacade(dom::Node::Prototype)), "material");
     }
 
 /*

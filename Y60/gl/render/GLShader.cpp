@@ -36,7 +36,6 @@
 
 #include <dom/Nodes.h>
 
-#include <y60/MaterialRequirementList.h>
 #include <y60/NodeNames.h>
 #include <y60/PropertyNames.h>
 #include <y60/DataTypes.h>
@@ -53,6 +52,7 @@
 
 using namespace std;
 using namespace asl;
+using namespace dom;
 
 #define DB(x) // x
 
@@ -103,6 +103,10 @@ namespace y60 {
             if ((*myFeaturesLeft == theRequirementList)) {
                 return FULL_MATCH;
             }
+			// ignore requirement => WILDCARD_MATCH
+			//if (theRequirementList.size() == 0) {
+	        //    return WILDCARD_MATCH;
+			//}
             if (myFeaturesLeft->size() != theRequirementList.size() ) {
                 return NO_MATCH;
             }
@@ -148,36 +152,38 @@ namespace y60 {
     void
     GLShader::activate(MaterialBase & theMaterial) {
         //AC_DEBUG << "GLShader::activate " << theMaterial.getName();
+		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getFacade<MaterialPropertiesTag>();
+		const NameAttributeNodeMap & myPropertyMap = myMaterialPropFacade->getEnsuredPropertyList();
 
-        dom::NodePtr myLineWidthProp = theMaterial.findPropertyNode(LINEWIDTH_PROPERTY);
+        dom::NodePtr myLineWidthProp = myPropertyMap.getNamedItem(LINEWIDTH_PROPERTY);
         if (myLineWidthProp) {
             glEnable(GL_LINE_SMOOTH);
-            glLineWidth(theMaterial.getPropertyValue<float>(myLineWidthProp));
+            glLineWidth((*myLineWidthProp)("#text").dom::Node::nodeValueAs<float>());
         }
 
-        dom::NodePtr myLineStippleProp = theMaterial.findPropertyNode(LINESTIPPLE_PROPERTY);
+        dom::NodePtr myLineStippleProp = myPropertyMap.getNamedItem(LINESTIPPLE_PROPERTY);
         if (myLineStippleProp) {
             glEnable(GL_LINE_STIPPLE);
             glEnable(GL_LINE_SMOOTH);
-            glLineStipple(1, theMaterial.getPropertyValue<unsigned int>(myLineStippleProp));    
+            glLineStipple(1, (*myLineStippleProp)("#text").dom::Node::nodeValueAs<unsigned int>());    
         }
 
-        dom::NodePtr myPointSizeProp = theMaterial.findPropertyNode(POINTSIZE_PROPERTY);
+        dom::NodePtr myPointSizeProp = myPropertyMap.getNamedItem(POINTSIZE_PROPERTY);
         if (myPointSizeProp) {
-            const asl::Vector3f & myPointSizeParams = theMaterial.getPropertyValue<asl::Vector3f>(myPointSizeProp);
+            const asl::Vector3f & myPointSizeParams = (*myPointSizeProp)("#text").dom::Node::nodeValueAs<asl::Vector3f>();
             glPointSize(myPointSizeParams[0]);
 
             glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, myPointSizeParams[1]);
             glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
         }
 
-        dom::NodePtr myPointAttenuationProp = theMaterial.findPropertyNode(POINTATTENUATION_PROPERTY);
+        dom::NodePtr myPointAttenuationProp =  myPropertyMap.getNamedItem(POINTATTENUATION_PROPERTY);
         if (myPointAttenuationProp) {
             glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,
-                                  theMaterial.getPropertyValue<Vector3f>(POINTATTENUATION_PROPERTY).begin());
+								  (*myPointAttenuationProp)("#text").dom::Node::nodeValueAs<asl::Vector3f>().begin());
         }
 
-        const VectorOfString & myBlendFunction = theMaterial.getPropertyValue<VectorOfString>(BLENDFUNCTION_PROPERTY);
+		const VectorOfString & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
         if (myBlendFunction.size() == 2) {
             BlendFunction mySrcFunc = BlendFunction( asl::getEnumFromString(myBlendFunction[0],
                                                                             BlendFunctionStrings));
@@ -186,7 +192,7 @@ namespace y60 {
 
             glBlendFunc(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc));
         } else {
-            throw ShaderException(string("Blendfunction for material '") + theMaterial.getName() + " has "
+            throw ShaderException(string("Blendfunction for material '") + theMaterial.get<NameTag>() + " has "
                     + asl::as_string(myBlendFunction.size()) + " elements. Expected two.", PLUS_FILE_LINE);
         }
 
@@ -196,7 +202,7 @@ namespace y60 {
     void 
     GLShader::enableTextures(const y60::MaterialBase & theMaterial) {
         unsigned myTextureCount = theMaterial.getTextureCount();
-        AC_DEBUG << "GLShader::enableTextures " << theMaterial.getName() << " count=" << myTextureCount;
+        AC_DEBUG << "GLShader::enableTextures " << theMaterial.get<NameTag>() << " count=" << myTextureCount;
         for (unsigned i = 0; i < myTextureCount; ++i) {
 
             const y60::Texture & myTexture = theMaterial.getTexture(i);
@@ -319,13 +325,13 @@ namespace y60 {
     }
 
     void
-    GLShader::bindBodyParams(const MaterialBase & theMaterial,
+    GLShader::bindBodyParams(MaterialBase & theMaterial,
             const Viewport & theViewport,
             const LightVector & theLights,
             const Body & theBody,
             const Camera & theCamera)
     {
-        AC_DEBUG << "GLShader::bindBodyParams " << theMaterial.getName();
+        AC_DEBUG << "bindBodyParams " << theMaterial.get<NameTag>();
         if (theMaterial.hasTexGen()) {
 
             bool mustRestoreMatrix = false;
