@@ -249,20 +249,22 @@ public:
         {
             MappedBlock myBlock(testFileName);
             myBlock.append(myData1.c_str(), myData1.size());
-            myBlock.reserve(myBlock.size()); // this should not be necessary 
+            //myBlock.reserve(myBlock.size()); // this should not be necessary
+            
             // if we don't call reserve, the file size is wrong.
             // this is bad if e.g. while downloading the program is interrupted
             // with CTRL-C since there will then be garbage behind the data.
+            // reserve seems to be very expensive on win32 with large files
             ENSURE(getFileSize(testFileName) == myData1.size());   
         }
         // after closing the size is ok.
         ENSURE(getFileSize(testFileName) == myData1.size());   
         {
-            // MappedBlock myBlock(testFileName); // this should work
-            MappedBlock myBlock(testFileName, myData1.size()); // but we need this
+            MappedBlock myBlock(testFileName); // this should work
+            // MappedBlock myBlock(testFileName, myData1.size()); // but we need this
             DPRINT(myBlock.size());
             myBlock.append(myData2.c_str(), myData2.size());
-            myBlock.reserve(myBlock.size()); // this should not be necessary 
+            // myBlock.reserve(myBlock.size()); // this should not be necessary 
             ENSURE(getFileSize(testFileName) == totalSize);   
         }
         DPRINT(totalSize);
