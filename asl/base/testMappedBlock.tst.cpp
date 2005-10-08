@@ -225,12 +225,59 @@ public:
 	}
 };
 
+class AppendMappedBlockTest : public UnitTest {
+public:
+	AppendMappedBlockTest() : UnitTest("AppendMappedBlockTest") {  }
+
+    string createData(int begin, int end) {
+        string myData;
+        for (int i = begin; i < end; ++i) {
+            myData += as_string(i) + ",";
+        }
+        return myData;
+    }
+    
+	void run() {
+		const string testFileName = "AppendMappedBlockTest.testoutput";
+        
+        string myData1 = createData(1,1000);
+        string myData2 = createData(1000,2000);
+        DPRINT(myData1.size());
+        DPRINT(myData2.size());
+        int totalSize = myData1.size()+myData2.size();
+
+        {
+            MappedBlock myBlock(testFileName);
+            myBlock.append(myData1.c_str(), myData1.size());
+            myBlock.reserve(myBlock.size()); // this should not be necessary 
+            // if we don't call reserve, the file size is wrong.
+            // this is bad if e.g. while downloading the program is interrupted
+            // with CTRL-C since there will then be garbage behind the data.
+            ENSURE(getFileSize(testFileName) == myData1.size());   
+        }
+        // after closing the size is ok.
+        ENSURE(getFileSize(testFileName) == myData1.size());   
+        {
+            // MappedBlock myBlock(testFileName); // this should work
+            MappedBlock myBlock(testFileName, myData1.size()); // but we need this
+            DPRINT(myBlock.size());
+            myBlock.append(myData2.c_str(), myData2.size());
+            myBlock.reserve(myBlock.size()); // this should not be necessary 
+            ENSURE(getFileSize(testFileName) == totalSize);   
+        }
+        DPRINT(totalSize);
+        DPRINT(getFileSize(testFileName));
+        ENSURE(getFileSize(testFileName) == totalSize);   
+        ENSURE(getWholeFile(testFileName) == myData1+myData2);
+    }
+};
 
 class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
+        // addTest(new AppendMappedBlockTest);
         addTest(new MappedBlockUnitTest);
         addTest(new ResizeableMappedBlockUnitTest);
     }
