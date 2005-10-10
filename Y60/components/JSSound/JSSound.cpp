@@ -128,8 +128,8 @@ namespace jslib {
     JSSound::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Create a Sound from URI.");
         DOC_PARAM("URI", DOC_TYPE_STRING);
-        DOC_PARAM_OPT("Volume", DOC_TYPE_FLOAT, 1.0);
-        DOC_PARAM_OPT("Seektime", DOC_TYPE_FLOAT, 0.0);
+//        DOC_PARAM_OPT("Volume", DOC_TYPE_FLOAT, 1.0);
+//        DOC_PARAM_OPT("Seektime", DOC_TYPE_FLOAT, 0.0);
         DOC_PARAM_OPT("Loopflag", DOC_TYPE_BOOLEAN, false);
         DOC_END;
         try {
