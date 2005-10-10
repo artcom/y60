@@ -12,6 +12,7 @@
 #define _ac_y60_SoundManager_h_
 
 #include "Sound.h"
+#include "SoundCacheItem.h"
 #include "IAudioDecoderFactory.h"
 
 #include <asl/Singleton.h>
@@ -40,7 +41,7 @@ namespace y60 {
         virtual SoundPtr createSound(const std::string & theURI);
         virtual SoundPtr createSound(const std::string & theURI, bool theLoop);
         virtual SoundPtr createSound(const std::string & theURI, bool theLoop,
-                const std::string & theName);
+                bool theUseCache);
         //virtual SoundPtr createSound(const std::string & theURI, 
         //        asl::Ptr < asl::ReadableStream > theStream, bool theLoop = false);
         virtual void setVolume(float theVolume);
@@ -49,6 +50,10 @@ namespace y60 {
         virtual unsigned getNumSounds() const;
         virtual void stopAll();
         virtual bool isRunning() const;
+
+        // Caching stuff
+        void preloadSound(const std::string& theURI);
+        void deleteCacheItem(const std::string& theURI);
         
         virtual void update();
         
@@ -56,6 +61,9 @@ namespace y60 {
         SoundManager();
         void run();
         IAudioDecoder * createDecoder(const std::string & theURI);
+
+        void addCacheItem(SoundCacheItemPtr theItem);
+        SoundCacheItemPtr getCacheItem(const std::string & theURI) const;
         
         asl::ThreadLock _myLock;
         std::vector < SoundWeakPtr > _mySounds;
@@ -63,6 +71,10 @@ namespace y60 {
         // Sorted according to decoder priority.
         std::vector < IAudioDecoderFactory* > _myDecoderFactories; 
         IAudioDecoderFactory* _myFFMpegDecoderFactory;
+
+        // Cached sounds indexed by uri.
+        typedef map<std::string, SoundCacheItemPtr> CacheMap;
+        CacheMap _myCache;
     };
 }
 

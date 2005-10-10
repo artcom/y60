@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "Sound.h"
+#include "CacheReader.h"
 
 #include <asl/Auto.h>
 #include <asl/Pump.h>
@@ -18,28 +19,22 @@ using namespace asl;
 
 namespace y60 {
 
-Sound::Sound (string myURI, IAudioDecoder * myDecoder, bool theLoop)
+Sound::Sound (string myURI, IAudioDecoder * myDecoder, SoundCacheItemPtr myCacheItem, 
+        bool theLoop)
     : _myURI (myURI),
       _myIsLooping(theLoop),
       _myTargetBufferedTime(1.0),
       _myMaxUpdateTime(0.2),
       _myDecoder(myDecoder),
-      _myDecodingComplete(false)
+      _myDecodingComplete(false),
+      _myCurFrame(0),
+      _myCacheItem(myCacheItem)
 {
     AC_DEBUG << "Sound::Sound(" << myURI << ", loop: " << theLoop << ")";
     _myLockedSelf = SoundPtr(0);
     _mySampleSink = Pump::get().createSampleSink(myURI);
     _myDecoder->setSampleSink(this);
 }
-
-/*
-Sound::Sound (const string & myURI, Ptr < ReadableStream > myStream,
-        bool theLoop)
-{
-    AC_DEBUG << "Sound::Sound (" << _myURI << ")";
-    _myLockedSelf = SoundPtr(0);
-}
-*/
 
 Sound::~Sound()
 {
@@ -77,6 +72,12 @@ void Sound::stop() {
     AC_DEBUG << "Sound::stop (" << _myURI << ")";
     _myDecoder->stop();
     _mySampleSink->stop();
+    if (_myCacheItem) {
+        _myCacheItem->doneCaching();
+        if (!_myCacheItem->isFull()) {
+            _myCacheItem = SoundCacheItemPtr(0);
+        }
+    }
     close();
     _myLockedSelf = SoundPtr(0);
 }
@@ -118,6 +119,13 @@ void Sound::seek (Time thePosition)
     _mySampleSink->stop();
     // Forget the old sample sink. It'll fade out and then destroy itself.
     _mySampleSink = Pump::get().createSampleSink(_myURI);
+
+    // Throw away cache.
+    if (_myCacheItem) {
+        _myCacheItem->doneCaching();
+        _myCacheItem = SoundCacheItemPtr(0);
+    }
+    
     _myDecoder->seek(thePosition);
     
     _mySampleSink->setCurrentTime(thePosition);
@@ -176,8 +184,19 @@ void Sound::update(double theTimeSlice) {
             }
         }
         if (myEOF) {
+            if (_myCacheItem && !_myCacheItem->isFull()) {
+                _myCacheItem->doneCaching(_myCurFrame);
+            }
             if (_myIsLooping) {
                 AC_DEBUG << "Sound::update: Loop";
+                if (_myCacheItem && _myCacheItem->isFull() && 
+                        !dynamic_cast<CacheReader *>(_myDecoder)) 
+                {
+                    AC_DEBUG << " ----> Reading from cache.";
+                    delete _myDecoder;
+                    _myDecoder = new CacheReader(_myCacheItem);
+                    _myDecoder->setSampleSink(this);
+                }
                 _myDecoder->seek(0);
                 update(0.1);
             } else {
@@ -195,6 +214,12 @@ AudioBufferPtr Sound::createBuffer(unsigned theNumFrames) {
 }
 
 void Sound::queueSamples(AudioBufferPtr& theBuffer) {
+    // TODO: Code review: Is locking ok here?
+    if (_myCacheItem && !_myCacheItem->isFull()) {
+        theBuffer->setStartFrame(_myCurFrame);
+        _myCurFrame += theBuffer->getNumFrames();
+        _myCacheItem->addBuffer(theBuffer);
+    }
     _mySampleSink->queueSamples(theBuffer);
 }
 

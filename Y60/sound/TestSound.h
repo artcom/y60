@@ -310,7 +310,7 @@ class TestLoop: public SoundTestBase {
         }
        
         void run() {
-            SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3", true);
+            SoundPtr mySound = getSoundManager().createSound("../../testfiles/crash.wav", true);
             mySound->play();
             msleep(3000);
             double myTime = mySound->getCurrentTime();
@@ -432,8 +432,7 @@ class StressTest: public SoundTestBase {
     protected:
         void doIteration(int i) {
             SoundPtr mySound = getSoundManager().createSound
-                ("../../testfiles/stereotest441.wav", false,
-                 "../../testfiles/stereotest441.wav "+asl::as_string(i));
+                ("../../testfiles/stereotest441.wav", false);
             mySound->setVolume(0.02f);
             mySound->play();
             double r1 = rand()/double(RAND_MAX);
@@ -500,19 +499,19 @@ class SoundTestSuite : public UnitTestSuite {
             mySoundManager.setAppConfig(44100, 2, _myUseDummyPump);
 
             addTest(new TestPlay(mySoundManager));
+            addTest(new TestStop(mySoundManager));
             
             addTest(new TestBroken(mySoundManager));
             addTest(new TestFireAndForget(mySoundManager));
             addTest(new TestTwoSounds(mySoundManager));
-            addTest(new TestStop(mySoundManager));
             
             addTest(new TestStopByItself(mySoundManager));
-            
             addTest(new TestPause(mySoundManager));
             addTest(new TestStopAll(mySoundManager));
+            addTest(new TestSeek(mySoundManager));
+            
             addTest(new TestLoop(mySoundManager));
             addTest(new TestVolume(mySoundManager));
-            addTest(new TestSeek(mySoundManager));
           
             addTest(new StressTest(mySoundManager, 5));
 

@@ -10,6 +10,7 @@
 
 #include "SoundManager.h"
 #include "FFMpegDecoder.h"
+#include "CacheReader.h"
 
 #include <asl/Logger.h>
 #include <asl/Pump.h>
@@ -48,6 +49,11 @@ SoundManager::~SoundManager() {
     delete _myFFMpegDecoderFactory;
     if (_myDecoderFactories.size()) {
         AC_WARNING << _myDecoderFactories.size() << " decoder factories still registered.";
+    }
+    if (AudioBufferBase::getNumBuffersAllocated() > 1) {
+        AC_WARNING << "SoundManager being deleted, but " << 
+                AudioBufferBase::getNumBuffersAllocated()-1 << 
+                " buffers are still allocated.";
     }
 }
 
@@ -89,30 +95,48 @@ void SoundManager::unregisterDecoderFactory(IAudioDecoderFactory* theFactory) {
 
 SoundPtr SoundManager::createSound(const string & theURI) {
     // Workaround function since the JS binding doesn't support default parameters.
-    return createSound(theURI, false, "");
+    return createSound(theURI, false, true);
 }
 
 SoundPtr SoundManager::createSound(const string & theURI, bool theLoop) {
     // Workaround function since the JS binding doesn't support default parameters.
-    return createSound(theURI, theLoop, "");
+    return createSound(theURI, theLoop, true);
 }
 
 SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
-        const std::string & theName)
+        bool theUseCache)
 {
-    // We need a factory function so we can set the Sound's mySelf pointer and so
-    // we can do some decoder creation magic.
+    // We need a factory function so we can set the Sound's mySelf pointer and
+    // do some decoder creation and cache management magic.
     AutoLocker<ThreadLock> myLocker(_myLock);
-    string myName = theName;
-    if (myName.empty()) {
-        myName = theURI;
+    IAudioDecoder * myDecoder;
+    SoundCacheItemPtr myCacheItem = SoundCacheItemPtr(0);
+    if (theUseCache) {
+        myCacheItem = getCacheItem(theURI);
+        if (myCacheItem == SoundCacheItemPtr(0)) {
+            // This sound hasn't been played before.
+            myCacheItem = SoundCacheItemPtr(new SoundCacheItem(theURI));
+            addCacheItem(myCacheItem);
+            myDecoder = createDecoder(theURI);
+        } else {
+            if (myCacheItem->isFull()) {
+                // The sound is cached completely.
+                myDecoder = new CacheReader(myCacheItem);
+            } else {
+                // The sound is currently being cached. Ignore the cache.
+                myDecoder = createDecoder(theURI);
+                myCacheItem = SoundCacheItemPtr(0);
+            }
+        }
+    } else {
+        myDecoder = createDecoder(theURI);
     }
-    IAudioDecoder * myDecoder = createDecoder(theURI);
-    SoundPtr mySound = SoundPtr(new Sound(theURI, myDecoder, theLoop));
+    SoundPtr mySound = SoundPtr(new Sound(theURI, myDecoder, myCacheItem, theLoop));
     mySound->setSelf(mySound);
     _mySounds.push_back(mySound);
     return mySound;
 }
+
 /*
 SoundPtr SoundManager::createSound(const string & theURI, Ptr<ReadableStream> theStream, 
         bool theLoop)
@@ -140,6 +164,18 @@ unsigned SoundManager::getNumSounds() const {
 
 bool SoundManager::isRunning() const {
     return Pump::get().isRunning();
+}
+
+void SoundManager::preloadSound(const std::string& theURI) {
+    // TODO
+}
+
+void SoundManager::deleteCacheItem(const std::string& theURI) {
+    CacheMap::iterator it;
+    it = _myCache.find(theURI);
+    if (it != _myCache.end()) {
+        _myCache.erase(it);
+    }
 }
 
 void SoundManager::stopAll() {
@@ -218,6 +254,21 @@ IAudioDecoder * SoundManager::createDecoder(const std::string & theURI) {
                 PLUS_FILE_LINE);
     }
     return myDecoder;
+}
+        
+void SoundManager::addCacheItem(SoundCacheItemPtr theItem) {
+    string myURI = theItem->getURI();
+    CacheMap::iterator it;
+    it = _myCache.find(myURI);
+    if (it != _myCache.end()) {
+        AC_WARNING << "Ignoring attempt to add cache item with duplicate key " << myURI;
+        return;
+    }
+    _myCache[myURI] = theItem;
+}
+
+SoundCacheItemPtr SoundManager::getCacheItem(const std::string & theURI) const {
+    return (*(_myCache.find(theURI))).second;
 }
 
 } // namespace

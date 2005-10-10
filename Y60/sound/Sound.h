@@ -16,6 +16,7 @@
 #include <asl/ISampleSink.h>
 
 #include "IAudioDecoder.h"
+#include "SoundCacheItem.h"
 
 namespace y60 {
 
@@ -30,9 +31,8 @@ class Sound :
     public asl::TimeSource, public asl::ISampleSink
 {
     public:
-        Sound (std::string myURI,  IAudioDecoder * myDecoder, bool theLoop = false);
-//        Sound (const std::string & myURI, asl::Ptr < asl::ReadableStream > myStream, 
-//                bool theLoop = false);
+        Sound (std::string myURI,  IAudioDecoder * myDecoder, SoundCacheItemPtr myCacheItem, 
+                bool myLoop = false);
         virtual ~Sound();
         void setSelf(const SoundPtr& mySelf);
         virtual void play ();
@@ -77,6 +77,9 @@ class Sound :
 
         asl::Time _myTargetBufferedTime;
         asl::Time _myMaxUpdateTime; // Max. time to prefetch per update.
+
+        int _myCurFrame;
+        SoundCacheItemPtr _myCacheItem; // This is 0 if we're not caching.
 };
 
 } // namespace
