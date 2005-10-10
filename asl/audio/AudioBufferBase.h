@@ -33,6 +33,8 @@ class AudioBufferBase {
         virtual void resize(unsigned numFrames) = 0;
         virtual void clear() = 0;
         virtual AudioBufferBase* clone() const = 0;
+        virtual AudioBufferBase* partialClone(unsigned startFrame, unsigned endFrame) 
+                const = 0;
 
         virtual unsigned getNumFrames() const = 0;
         virtual unsigned getNumChannels() const = 0;
@@ -57,13 +59,20 @@ class AudioBufferBase {
         virtual bool almostEqual(const AudioBufferBase& theBuffer, double theEpsilon) const = 0;
         virtual float getSampleAsFloat(unsigned theFrame, unsigned theChannel) const = 0;
 
-        static int getNumBuffersAllocated();
         virtual void setMarker(float theValue) = 0;
         virtual bool hasClicks(float theFirstSample) = 0;
+        
+        // For timed buffers.
+        void setStartFrame(int myStartFrame);
+        int getStartFrame() const;
+        int getEndFrame() const;
+
+        static int getNumBuffersAllocated();
 
     private:
         static asl::ThreadLock _myBuffersAllocatedLock;
         static int _myNumBuffersAllocated;
+        int _myStartFrame;
 };
 
 std::ostream & operator<<(std::ostream & s, const AudioBufferBase& theBuffer);

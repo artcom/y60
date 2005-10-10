@@ -13,6 +13,7 @@
 #include "AudioBufferBase.h"
 
 #include <asl/Auto.h>
+#include <asl/Assure.h>
 
 namespace asl {
 
@@ -30,8 +31,22 @@ AudioBufferBase::~AudioBufferBase() {
     _myNumBuffersAllocated--;
 }
 
+void AudioBufferBase::setStartFrame(int myStartFrame) {
+    _myStartFrame = myStartFrame;
+}
+
+int AudioBufferBase::getStartFrame() const {
+    ASSURE_MSG(_myStartFrame != -1, "Start frame not set in getStartFrame(). Call init()!");
+    return _myStartFrame;
+}
+
+int AudioBufferBase::getEndFrame() const {
+    ASSURE_MSG(_myStartFrame != -1, "Start frame not set in getEndFrame(). Call init()!");
+    return _myStartFrame+getNumFrames()-1;
+}
+
 int AudioBufferBase::getNumBuffersAllocated() {
-        return _myNumBuffersAllocated;
+    return _myNumBuffersAllocated;
 }
 
 std::ostream & operator<<(std::ostream & s, const AudioBufferBase& theBuffer) {

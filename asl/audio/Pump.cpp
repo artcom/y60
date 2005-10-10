@@ -74,11 +74,6 @@ Pump::~Pump() {
         }
     }
     // Check if there are buffers other than _myTempBuffer allocated
-    if (AudioBufferBase::getNumBuffersAllocated() > 1) {
-        AC_WARNING << "Audio Pump being deleted, but " << 
-                AudioBufferBase::getNumBuffersAllocated()-1 << 
-                " buffers are still allocated.";
-    }
     if (_numClicks > 0) {
         AC_WARNING << "Audio pump: " << _numClicks << " buffers with clicks detected.";
     }

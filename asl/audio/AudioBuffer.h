@@ -42,23 +42,18 @@ class AudioBuffer: public AudioBufferBase {
             _mySampleRate = 0;
         }
 
-        AudioBuffer(unsigned numFrames, unsigned numChannels, unsigned mySampleRate) {
+        AudioBuffer(unsigned numFrames, unsigned numChannels, unsigned mySampleRate) 
+        {
 //            AC_TRACE << "AudioBuffer::AudioBuffer(" << this << ")";
-            _numFrames = numFrames;
-            _numChannels = numChannels;
-            _mySampleRate = mySampleRate;
-            _myBlock.resize(getSizeInBytes());
+            init (numFrames, numChannels, mySampleRate);
         }
 
         virtual ~AudioBuffer() {
 //            AC_TRACE << "AudioBuffer::~AudioBuffer(" << this << ")";
         }
 
-        void init(unsigned numFrames, unsigned numChannels, unsigned mySampleRate) {
-            if (_numFrames != 0) {
-                AC_ERROR << "AudioBuffer::init called twice. Second call ignored.";
-                return;
-            }
+        void init(unsigned numFrames, unsigned numChannels, unsigned mySampleRate) 
+        {
             _numFrames = numFrames;
             _numChannels = numChannels;
             _mySampleRate = mySampleRate;
@@ -83,6 +78,18 @@ class AudioBuffer: public AudioBufferBase {
             newBuffer = new AudioBuffer<SAMPLE>(_numFrames, _numChannels, _mySampleRate);
             newBuffer->_myBlock = _myBlock;
             return newBuffer;
+        }
+
+        AudioBufferBase* partialClone(unsigned startFrame, unsigned endFrame) 
+                const 
+        {
+            AudioBuffer<SAMPLE>* newBuffer;
+            unsigned numFrames = endFrame-startFrame;
+            newBuffer = new AudioBuffer<SAMPLE>(numFrames, _numChannels, _mySampleRate);
+            SAMPLE * _mySrcStartFrame = ((SAMPLE*)_myBlock.begin())+(startFrame*_numChannels);
+            memcpy(newBuffer->begin(), _mySrcStartFrame, numFrames*getBytesPerFrame());
+            return newBuffer;
+
         }
         
         const SAMPLE * begin() const {
@@ -316,10 +323,10 @@ class AudioBuffer: public AudioBufferBase {
             return myBuffer;
         }
 
-        Block        _myBlock;
-        unsigned    _numFrames;
-        unsigned    _numChannels;
-        unsigned    _mySampleRate;
+        Block _myBlock;
+        unsigned _numFrames;
+        unsigned _numChannels;
+        unsigned _mySampleRate;
 };
 
 AudioBufferBase * createAudioBuffer(SampleFormat mySampleFormat, unsigned numFrames,
