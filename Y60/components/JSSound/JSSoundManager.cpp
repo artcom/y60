@@ -38,6 +38,7 @@ namespace jslib {
 //        DOC_PARAM_OPT("Volume", DOC_TYPE_FLOAT, 1.0);
 //        DOC_PARAM_OPT("Seektime", DOC_TYPE_FLOAT, 0.0);
         DOC_PARAM_OPT("Loopflag", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("UseCacheFlag", DOC_TYPE_BOOLEAN, false);
         DOC_END;
         switch(argc) {
             case 1: {
@@ -46,13 +47,14 @@ namespace jslib {
                             ((MyMethod)&SoundManager::createSound,cx,obj,argc,argv,rval);
                 }
             case 2: {
-                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI, bool theLoop);
+                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI, 
+                            bool theLoop);
                     return Method<SoundManager>::call
                             ((MyMethod)&SoundManager::createSound,cx,obj,argc,argv,rval);
                 }
             default: {
-                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI, bool theLoop, 
-                            const std::string & theName);
+                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI, 
+                            bool theLoop, bool theUseCache);
                     return Method<SoundManager>::call
                             ((MyMethod)&SoundManager::createSound,cx,obj,argc,argv,rval);
                 }

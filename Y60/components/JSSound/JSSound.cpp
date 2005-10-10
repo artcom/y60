@@ -126,12 +126,10 @@ namespace jslib {
 
     JSBool
     JSSound::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Create a Sound from URI.");
-        DOC_PARAM("URI", DOC_TYPE_STRING);
-//        DOC_PARAM_OPT("Volume", DOC_TYPE_FLOAT, 1.0);
-//        DOC_PARAM_OPT("Seektime", DOC_TYPE_FLOAT, 0.0);
-        DOC_PARAM_OPT("Loopflag", DOC_TYPE_BOOLEAN, false);
+        DOC_BEGIN("Don't call this.");
         DOC_END;
+        return JS_FALSE;
+/*        
         try {
             if (JSA_GetClass(cx,obj) != Class()) {
                 JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
@@ -181,7 +179,6 @@ namespace jslib {
                 myNewNative = OWNERPTR(0);
             } else {
 //                HWSampleSinkPtr mySampleSink = Pump::get().createSampleSink(myURI);
-                cerr << "Huh?" << endl;
                 myNewNative = OWNERPTR(new y60::Sound(myURI, 0, myLoopFlag));
                 myNewNative->setSelf(myNewNative);
             }
@@ -195,6 +192,7 @@ namespace jslib {
                 return JS_FALSE;
             }
         } HANDLE_CPP_EXCEPTION;
+*/        
     }
 
     JSConstIntPropertySpec *
