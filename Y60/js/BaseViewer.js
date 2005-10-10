@@ -120,6 +120,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
    }
 
     self.setMover = function(theMoverFactory, theViewport) {
+        if (!theMoverFactory || theMoverFactory == undefined) {
+            theMoverFactory = MoverBase;
+        }
         var myNewMover = new theMoverFactory(theViewport);
         var myViewportId = getViewportIndex(theViewport);
         _myViewportMovers[myViewportId] = myNewMover;
