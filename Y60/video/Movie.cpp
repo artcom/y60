@@ -134,8 +134,7 @@ namespace y60 {
     }
 
     double Movie::getTimeFromFrame(unsigned theFrame) const {
-        AC_TRACE << "getTimeFromFrame count " << get<FrameCountTag>()
-                 << " framerate " << get<FrameRateTag>();
+        DB(AC_TRACE << "getTimeFromFrame count " << get<FrameCountTag>() << " framerate " << get<FrameRateTag>();)
         return (double)(theFrame % get<FrameCountTag>()) / get<FrameRateTag>();
     }
 
@@ -179,7 +178,6 @@ namespace y60 {
                 myNextFrame = (int)getFrameFromTime(myMovieTime);
                 break;
             case PLAY_MODE_STOP:
-                //AC_DEBUG << "PLAY_MODE_STOP";
                 myNextFrame = _myLastDecodedFrame;
                 return;
         }
@@ -187,7 +185,8 @@ namespace y60 {
         if (myNextFrame < 0) {
             setPlayMode(PLAY_MODE_STOP);
         }
-        //AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;
+        
+        DB(AC_TRACE << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
         if (myNextFrame != _myLastDecodedFrame) {
             double myDecodedTime = decodeFrame(myMovieTime, myNextFrame);
             /*if (!asl::almostEqual(myDecodedTime, myMovieTime, 0.04)) {

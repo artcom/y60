@@ -29,8 +29,8 @@
 #include <asl/console_functions.h>
 #include <math.h>
 
-#define DB(x) //x
-#define DB2(x) //x
+#define DB(x) // x
+#define DB2(x) // x
 
 
 using namespace std;
@@ -66,25 +66,27 @@ namespace y60 {
     }
 
     void
-    FrameConveyor::preload(double theInitialTimestamp) {
-        cerr << "Fill audio/video-cache..." << endl;
+    FrameConveyor::preload(double theInitialTimestamp) {        
         if (_myAudioBufferedSource) {
+            cerr << "Fill audio/video-cache...";
             while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE &&
                   _myAudioBufferedSource->getCacheFillLevelInSecs() < PRELOAD_CACHE_TIME) 
             {
                 updateCache(theInitialTimestamp);
                 _myCacheSizeInSecs += (1 / _myContext->getFrameRate());
                 DB(cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
-                   cerr << "  A-Buffersize: " << _myAudioBufferedSource->getCacheFillLevel() << " of: " << _myAudioBufferedSource->getCacheSize() << endl;
+                   cerr << "  A-Buffersize: " << _myAudioBufferedSource->getCacheFillLevel() << " max: " << _myAudioBufferedSource->getCacheSize() << endl;
                    cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;);
             }            
 
+            cerr << " " << _myFrameCache.size() << " frames." << endl;
             if (_myFrameCache.size() > MAX_FRAME_CACHE_SIZE) {
                 cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE << " frames " << endl;
             } else if (_myAudioBufferedSource->getCacheFillLevelInSecs() >= PRELOAD_CACHE_TIME) {
                 cerr << "   until audio cache size larger than " << PRELOAD_CACHE_TIME << " sec." << endl;
             }
         } else {
+            cerr << "Fill video-cache..." << endl;
             updateCache(theInitialTimestamp);
             _myCacheSizeInSecs = PRELOAD_CACHE_TIME;
         }
@@ -119,7 +121,7 @@ namespace y60 {
         }
         cerr << "|";
 
-        DB(cerr <<TTYRED << " [" << theTargetStart << "; " << theTargetEnd << "]" << TTYGREEN << " [" << myCacheStart << "; " << myCacheEnd << "]" << ENDCOLOR << endl;)
+        cerr <<TTYRED << " [" << theTargetStart << "; " << theTargetEnd << "]" << TTYGREEN << " [" << myCacheStart << "; " << myCacheEnd << "]" << ENDCOLOR << endl;
     }
 
     void
@@ -134,9 +136,9 @@ namespace y60 {
         
         double myTargetStart = asl::maximum(0.0, theTimestamp - 0.5 * _myCacheSizeInSecs);
         double myTargetEnd   = theTimestamp + 0.5 * _myCacheSizeInSecs;
-        //cerr << "ts: " << theTimestamp << ", start: " << myTargetStart << ", end: " << myTargetEnd << endl;
 
-        //printCacheInfo(myTargetStart, myTargetEnd);
+        //cerr << "ts: " << theTimestamp << ", start: " << myTargetStart << ", end: " << myTargetEnd << endl;
+        printCacheInfo(myTargetStart, myTargetEnd);
 
         if (myTargetStart >= myCacheEnd ||  /* |CCCCCCCCCC| |TTTTTTTTTT| */    
             myTargetEnd <= myCacheStart ||  /* |TTTTTTTTTT| |CCCCCCCCCC| */    
@@ -190,6 +192,7 @@ namespace y60 {
     void FrameConveyor::fillCache(double theStartTime, double theEndTime) {
         theStartTime = asl::maximum(0.0, theStartTime);
         theEndTime   = asl::maximum(theStartTime, theEndTime);
+        theEndTime   = asl::minimum(_myContext->getEndOfFileTimestamp(), theEndTime);
 
         // seek if timestamp is outside these boundaries
         double myTimePerFrame = 1.0 / _myContext->getFrameRate();
@@ -202,12 +205,24 @@ namespace y60 {
         }
 
         double myCurrentTime = theStartTime;
-        while(myCurrentTime >= 0 && myCurrentTime < theEndTime) {
-            myCurrentTime = decodeFrame();
-
-            DB2(cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
+        bool   myEndOfFileFlag = false;
+        while (!myEndOfFileFlag && myCurrentTime < theEndTime) {
+            decodeFrame(myCurrentTime, myEndOfFileFlag);
+            if (myEndOfFileFlag) {
+                if (_myContext->getEndOfFileTimestamp() < DBL_MAX) {
+                    cerr << "EOF time again: " << myCurrentTime << endl;
+                } else {
+                    cerr << "EOF" << endl;
+                }
+                _myContext->setEndOfFileTimestamp(myCurrentTime);  
+            }
+            DB2(
+                cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
                 cerr << "  current time: " << myCurrentTime << endl;
-                cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;);
+                if (_myContext->getAudioStream()) {
+                    cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;
+                }
+            )
         }
     }
 
@@ -264,9 +279,9 @@ namespace y60 {
         }
     }
 
-    double
-    FrameConveyor::decodeFrame() {
-        double myCurrentTime = -1; //EOF
+    void
+    FrameConveyor::decodeFrame(double & theCurrentTime, bool & theEndOfFileFlag) {
+        theEndOfFileFlag = false;
         if (!_myContext) {
             throw FrameConveyorException(std::string("No decoding context set, yet."), PLUS_FILE_LINE);
         }
@@ -287,21 +302,22 @@ namespace y60 {
                 convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
                 myNewFrame->setTimestamp(_myVideoFrame->pts / (double)AV_TIME_BASE);
                 _myFrameCache[myNewFrame->getTimestamp()] = myNewFrame;
-                myCurrentTime = myNewFrame->getTimestamp();
+                theCurrentTime = myNewFrame->getTimestamp();
                 break;
             }
             case DecoderContext::FrameTypeAudio:
-                _myAudioBufferedSource->addBuffer(_myAudioFrame.getTimestamp(), _myAudioFrame.getSamples(), 
-                                                  _myAudioFrame.getSampleSize());
-                myCurrentTime = _myAudioFrame.getTimestamp();
+                if (_myAudioBufferedSource->isRunning()) {
+                    _myAudioBufferedSource->addBuffer(_myAudioFrame.getTimestamp(), _myAudioFrame.getSamples(), 
+                                                    _myAudioFrame.getSampleSize());
+                    theCurrentTime = _myAudioFrame.getTimestamp();
+                }
                 break;
             case DecoderContext::FrameTypeEOF:
+                theEndOfFileFlag = true;
                 break;
             default:
                 throw FrameConveyorException(std::string("Unknown frame type: ") + as_string(myFrameType), PLUS_FILE_LINE);
         }
-
-        return myCurrentTime;
     }
 
     void 
@@ -339,5 +355,10 @@ namespace y60 {
         // of copy raster
         theTargetRaster->resize(_myContext->getWidth(), _myContext->getHeight());
         memcpy(theTargetRaster->pixels().begin(), theSourceBuffer, theTargetRaster->pixels().size());
+    }
+
+    double 
+    FrameConveyor::getEndOfFileTimestamp() const {
+        return _myContext->getEndOfFileTimestamp();
     }
 }

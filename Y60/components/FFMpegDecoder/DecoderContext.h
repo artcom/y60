@@ -58,6 +58,13 @@ namespace y60 {
                 return _myFilename;
             }
 
+            double getEndOfFileTimestamp() const {
+                return _myEndOfFileTimestamp;
+            }
+            void setEndOfFileTimestamp(double theTime) {
+                _myEndOfFileTimestamp = theTime;
+            }
+
             unsigned getWidth(); 
             unsigned getHeight();
 
@@ -74,6 +81,7 @@ namespace y60 {
             int               _myVideoStreamIndex;
             int               _myAudioStreamIndex;
             std::string       _myFilename;
+            double            _myEndOfFileTimestamp;
     };
 
     typedef asl::Ptr<DecoderContext> DecoderContextPtr;

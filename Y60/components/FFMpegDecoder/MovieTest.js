@@ -28,7 +28,6 @@ function FFMpegTest(theArguments) {
 
     const _myMovieSources = [
         //"testfiles/mpeg2_pal.m2v",
-        //"testfiles/testmovie.m2v",
         //"c:/TEST_MOVIES/AVI/enterprise.avi",
         //"c:/TEST_MOVIES/MPEG/MPEG_4_1280_1024.wmv",
         //"c:/TEST_MOVIES/MPEG/MPEG_4_LORES.wmv",
@@ -58,32 +57,65 @@ function FFMpegTest(theArguments) {
 
     Base.onKey = Public.onKey;
     Public.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
-        var myCurrentMovie = _myMovies[0].movie;
+        var myMovie = _myMovies[0];
 
         if (theCtrlFlag) {
             Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
             return;
         }
 
-        if (theShiftFlag) {
-            theKey = theKey.toUpperCase();
-        }
         if (theState) {
             switch (theKey) {
                 case "p":
-                    if (myCurrentMovie.playmode == "pause") {
-                        myCurrentMovie.playmode = "play";
+                    if (myMovie.playmode == "pause") {
+                        myMovie.playmode = "play";
                     } else {
-                        myCurrentMovie.playmode = "pause";
+                        myMovie.playmode = "pause";
                     }
                     break;
+                case "s":
+                    myMovie.playmode = "stop";
+                    break;
+                case "left":
+                    var myDelta = theShiftFlag ? myMovie.fps : 1;
+                    myMovie.playmode = "pause";
+                    if (myMovie.currentframe == 0) {
+                        myMovie.currentframe = myMovie.framecount - myDelta;
+                    } else {
+                        myMovie.currentframe -= myDelta;
+                    }
+                    break;
+                case "right":
+                    myDelta = theShiftFlag ? myMovie.fps : 1;
+                    myMovie.playmode = "pause";
+                    myMovie.currentframe += myDelta;
+                    break;
                 case "b":
-                    myCurrentMovie.playmode = "pause";
-                    myCurrentMovie.currentframe = myCurrentMovie.currentframe - 25;
+                    myMovie.playmode = "pause";
+                    myMovie.currentframe = myMovie.currentframe - 25;
                     break;
                 case "f":
-                    myCurrentMovie.playmode = "pause";
-                    myCurrentMovie.currentframe = myCurrentMovie.currentframe +125;
+                    myMovie.playmode = "pause";
+                    myMovie.currentframe = myMovie.currentframe +125;
+                    break;
+                case "[0]":
+                case "[1]":
+                case "[2]":
+                case "[3]":
+                case "[4]":
+                case "[5]":
+                case "[6]":
+                case "[7]":
+                case "[8]":
+                case "[9]":
+                    myMovie.playmode = "pause";
+                    myMovie.currentframe = Number(theKey.substring(1,2));
+                    break;
+                case "[+]":
+                    myMovie.playspeed++;
+                    break;
+                case "[-]":
+                    myMovie.playspeed--;
                     break;
             }
         }
@@ -146,8 +178,8 @@ function FFMpegTest(theArguments) {
             myPos += 20;
             for (var j = 0; j < _myMovieSources.length; ++j) {
                 var myMovie = _myMovies[i * _myMovieSources.length + j];
-                window.renderText([10 / window.width, myPos / window.height], myMovie.movie.src, "Screen15");
-                window.renderText([800 / window.width, myPos / window.height], myMovie.movie.currentframe, "Screen15");
+                var myText  = basename(myMovie.src) + " " + myMovie.playmode + " " + myMovie.currentframe + "/" + myMovie.framecount;
+                window.renderText([10 / window.width, myPos / window.height], myText, "Screen15");
                 myPos += 20;
             }
             myPos += 10;
@@ -160,12 +192,17 @@ function FFMpegTest(theArguments) {
     function addTest(theName, theStartFrame, thePlaySpeed, thePlayMode) {
         _myTests.push(theName);
         for (var i = 0; i < _myMovieSources.length; ++i) {
-            var myMovie = new MovieOverlay(Public.getOverlayManager(), _myMovieSources[i], new Vector2f(300, _myPos));
-            myMovie.movie.playspeed = thePlaySpeed;
-            myMovie.movie.playmode  = thePlayMode;
-            myMovie.width  = 400;
-            myMovie.height = 300;
-            //myMovie.movie.startime  = theStartTime;
+            var myMovie = new MovieOverlay(Public.getOverlayManager(), _myMovieSources[i], new Vector2f(300, _myPos), null, false);
+            myMovie.playspeed = 1;
+            myMovie.playmode  = thePlayMode;
+            myMovie.loopcount = 4;
+            //myMovie.startime  = theStartTime;
+
+            if (myMovie.width > 480) {
+                var myAspect = myMovie.width / myMovie.height;
+                myMovie.width  = 480;
+                myMovie.height = myMovie.width / myAspect;
+            }
             _myMovies.push(myMovie);
             _myPos += 20;
         }
@@ -175,7 +212,7 @@ function FFMpegTest(theArguments) {
     function setupMovies() {
         var myOverlay = new ImageOverlay(ourShow.getOverlayManager(), "testfiles/reference.png", [300, _myPos]);
         _myPos += 40;
-        addTest("Simple Tests", 0,  1, "play");
+        addTest("Simple Tests", 0,  1, "pause");
     }
 }
 

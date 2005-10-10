@@ -390,7 +390,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         window.renderingCaps = window.renderingCaps & (~theCapability);
     }
     self.setup = function(theWindowWidth, theWindowHeight, theFullscreen, theWindowTitle, theScene) {
-    print(theWindowWidth + " x " + theWindowHeight + " full " + theFullscreen);
+        //print(theWindowWidth + " x " + theWindowHeight + " fullscreen: " + theFullscreen);
         if (window == null) {
             window = new RenderWindow();
         }
@@ -414,7 +414,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         self.setScene(myScene, myCanvas);
         renderer = window.getRenderer();
 
-        print("SCENE SET\n");
         // standard movers
         self.registerMover(TrackballMover);
         self.registerMover(ClassicTrackballMover);
@@ -438,8 +437,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (theWindowTitle != null) {
             window.title = theWindowTitle;
         }
-
-        //exit(1);
     }
 
     self.createShutter = function() {

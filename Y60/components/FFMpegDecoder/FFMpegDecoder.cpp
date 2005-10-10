@@ -17,6 +17,35 @@
 //
 //=============================================================================
 
+/*
+    This decoder tries to combine the advantages of FFMpegDecoder1 and FFMpegDecoder2.    
+    Basically that is support for audio combined with seeking support.
+
+    Seeking includes the following sub-problems:
+        - Pause, resume and stop                (ok)
+        - Jumping to frames                     (ok)
+        - Different playspeeds                  (ok)
+        - Playing backwards                     (ok)        
+        - Precise looping                       (ok)
+
+    Audiosupport includes the following sub-problems:
+        - Lipsync between audio and video       (ca. 0,2 - 0,5 seconds off)
+        - Compatible to all the seeking features above (not yet)
+        - Support for videos without audio      (ok)
+    
+    Other things to be accomplished are:
+        - Try to avoid multi-threading          (ok)
+        - Intelligent caching                   (ok)
+        - Robustness against strange mpeg-files (no)
+
+    As visible above the main problems to solve are:        
+        - Better sync between video and audio, the code of FFMpegDecoder2 has to be adapted for that.
+        - Seeking does not work in combination with audio, yet. The easiest thing would be to just flush
+          audio and video buffers and recache it, if the playback starts after a seek. 
+        - Most MPEG files seem to have wrong or no durations set. The decoder should not rely on this
+          field, or calculate the duration on startup by seeking all the way to the end.
+*/
+
 #include "FFMpegDecoder.h"
 #include "FFMpegPixelEncoding.h"
 #include "DecoderContext.h"
@@ -67,7 +96,7 @@ namespace y60 {
         MovieDecoderBase::startMovie(theStartTime);
         if (_myAudioBufferedSource) {
             // if start from pause:
-            _myAudioBufferedSource->clear();
+            //_myAudioBufferedSource->clear();
         }
 
         _myFrameConveyor.preload(theStartTime);
@@ -157,18 +186,18 @@ namespace y60 {
 
     double
     FFMpegDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {       
-    //cerr << "getFrame ast : " << theTime << "the system time " << asl::Time() << endl;
-        double myDecodedFrameTime = _myFrameConveyor.getFrame(theTime, theTargetRaster);
-        if (myDecodedFrameTime < 0) {
-            AC_PRINT << "EOF reached!";
+        //cerr << "readFrame at : " << theTime << " system time " << asl::Time() << endl;
+        if (theTime >= _myFrameConveyor.getEndOfFileTimestamp()) {
             setEOF(true);
-        } else {
-            if (_myAudioBufferedSource) {
-                float myVolume = getMovie()->get<VolumeTag>();
-                if (!asl::almostEqual(_myAudioBufferedSource->getVolume(), myVolume)) {
-                    _myAudioBufferedSource->setVolume(myVolume);
-                } 
-            }
+            return theTime;
+        }
+
+        double myDecodedFrameTime = _myFrameConveyor.getFrame(theTime, theTargetRaster);
+        if (_myAudioBufferedSource) {
+            float myVolume = getMovie()->get<VolumeTag>();
+            if (!asl::almostEqual(_myAudioBufferedSource->getVolume(), myVolume)) {
+                _myAudioBufferedSource->setVolume(myVolume);
+            } 
         }
         return myDecodedFrameTime;
     }

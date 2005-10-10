@@ -143,25 +143,31 @@ namespace y60 {
             }
 
             /**
-             * Starts the movie playback at theStartTime if .
+             * Starts the movie playback at theStartTime.
              * @param theStartTime start time of the movie. Defaults to 0.0
              */
             virtual void startMovie(double theStartTime = 0.0) {
-                if (getPlayMode() != PLAY_MODE_PAUSE) {
-                    _myMovieTime = theStartTime;
-                }
+                _myMovieTime      = theStartTime;
                 _myLastSystemTime = -1.0;
             }
+
             /**
              * Stops the movie playback. Future calls of startMovie will start from the beginning
              * of the movie.
              */
-            virtual void stopMovie() {_myMovieTime = 0.0; _myLastSystemTime = -1.0;}
+            virtual void stopMovie() {
+                _myMovieTime = 0.0; 
+                _myLastSystemTime = -1.0;
+            }
+            
             /**
              * Pauses the current movie. Playback will continue at the current position after startMovie
              * is called.
              */
-            virtual void pauseMovie() {_myLastSystemTime = -1.0;}
+            virtual void pauseMovie() {
+                _myLastSystemTime = -1.0;
+            }
+            
             /**
              * Closes the current movie and releases all internal data.
              */

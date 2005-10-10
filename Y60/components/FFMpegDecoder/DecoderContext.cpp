@@ -48,6 +48,7 @@ namespace y60 {
         _myAudioStream(0),
         _myVideoStreamIndex(-1),
         _myAudioStreamIndex(-1),
+        _myEndOfFileTimestamp(DBL_MAX),
         _myFilename(theFilename)        
     {
         // register all formats and codecs
@@ -145,22 +146,24 @@ namespace y60 {
         } 
 
         // Read until complete frame read or end of file reached
-        while (bool myValidFilePosition = (av_read_frame(_myFormatContext, &myPacket) >= 0)) {
+        bool myEndOfFileFlag = false;
+        while (!(myEndOfFileFlag = (av_read_frame(_myFormatContext, &myPacket) < 0))) {
             if (myPacket.stream_index == _myVideoStreamIndex) {
                 int myFrameCompleteFlag = 0;
                 int myLen = avcodec_decode_video(&_myVideoStream->codec, theVideoFrame, &myFrameCompleteFlag,
                                                  myPacket.data, myPacket.size);
+
                 if (myLen < 0) {
                     AC_ERROR << "av_decode_video error";
                 } else if (myLen < myPacket.size) {
                     AC_ERROR << "av_decode_video: Could not decode video in one step";
-                }
-                theVideoFrame->pts = myPacket.dts - myStartTime;
+                }                
 
                 if (myFrameCompleteFlag) { 
+                    theVideoFrame->pts = myPacket.dts - myStartTime;
                     myFrameType = FrameTypeVideo;
                     break;
-                } 
+                }                 
             } else if (myPacket.stream_index == _myAudioStreamIndex && theAudioFrame) {
                 int myLen = avcodec_decode_audio(&_myAudioStream->codec, (int16_t*)theAudioFrame->getSamples(), (int *)&theAudioFrame->_mySampleSize,
                     myPacket.data, myPacket.size);
@@ -175,9 +178,11 @@ namespace y60 {
                 myFrameType = FrameTypeAudio;
                 break;
             } 
+        }        
+
+        if (!myEndOfFileFlag) {
+            av_free_packet(&myPacket);
         }
-        
-        av_free_packet(&myPacket);                  
         return myFrameType;
     }
 

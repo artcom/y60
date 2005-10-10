@@ -53,11 +53,13 @@ namespace y60 {
             /// Preloads enought frames into the cache to allow audio-playback without underruns
             void preload(double theInitialTimestamp);
 
+            double getEndOfFileTimestamp() const;
+
         private:
             /** Decode frame at theTimestamp into theTargetRaster. 
              *  Returns the timestamp of the decoded frame or -1 if EOF was met.
              **/
-            double decodeFrame();
+            void decodeFrame(double & theCurrentTime, bool & theEndOfFileFlag);
 
             /// Convert frame vom YUV to RGB
             void convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer);

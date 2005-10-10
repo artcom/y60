@@ -154,8 +154,8 @@ function OverlayBase(Public, Protected, theManager, thePosition, theParent) {
         var myMaterialId = createUniqueId();
 
         _myMaterial = Node.createElement('material');
-        theManager.materials.appendChild(_myMaterial);        
-        
+        theManager.materials.appendChild(_myMaterial);
+
         _myMaterial.id = myMaterialId;
         _myMaterial.name = myName + "M";
         _myMaterial.transparent = 1;
@@ -205,6 +205,9 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
     ///////////////////////////////////////////////////////////////////////////////////////////
+
+    Public.src getter = function() { return Public.image.src; }
+    Public.src setter = function(theArgument) { Public.image.src = theArgument; }
 
     Public.image getter = function() {
         if (Protected.myImages.length) {
@@ -310,7 +313,7 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
     }
 
     Protected.addTexture = function(theImageId) {
-        
+
         _myTextures = getDescendantByTagName(Public.material, "textures", false);
         if (!_myTextures) {
             _myTextures = Public.material.appendChild(Node.createElement("textures"));
@@ -352,7 +355,7 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
         return myString;
     }
 
-    function addTextureRequirements(theTextureCount) {        
+    function addTextureRequirements(theTextureCount) {
         var myTextureFeatures = getDescendantByAttribute(Public.material.requires, "name", "textures", false);
         if (myTextureFeatures == null) {
             myTextureFeatures = new Node('<feature name="textures">[10[sds]]</feature>\n').firstChild;
@@ -365,7 +368,7 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
         }
         Public.material.requires.textures = createTextureFeatureString(theTextureCount);
         Public.material.requires.texcoord = createTexcoordFeatureString(theTextureCount);
-                
+
     }
 
     var _myTextures = null;
@@ -462,6 +465,39 @@ function MovieOverlayBase(Public, Protected, theManager, theSource, thePosition,
     Public.movie setter = function(theMovie) {
         Public.image = theMovie;
     }
+
+    Public.loopcount getter = function() { return Public.image.loopcount; }
+    Public.loopcount setter = function(theArgument) { Public.image.loopcount = theArgument; }
+
+    Public.playspeed getter = function() { return Public.image.playspeed; }
+    Public.playspeed setter = function(theArgument) { Public.image.playspeed = theArgument; }
+
+    Public.playmode getter = function() { return Public.image.playmode; }
+    Public.playmode setter = function(theArgument) { Public.image.playmode = theArgument; }
+
+    Public.startime getter = function() { return Public.image.startime; }
+    Public.startime setter = function(theArgument) { Public.image.startime = theArgument; }
+
+    Public.audio getter = function() { return Public.image.audio; }
+    Public.audio setter = function(theArgument) { Public.image.audio = theArgument; }
+
+    Public.avdelay getter = function() { return Public.image.avdelay; }
+    Public.avdelay setter = function(theArgument) { Public.image.avdelay = theArgument; }
+
+    Public.cachesize getter = function() { return Public.image.cachesize; }
+    Public.cachesize setter = function(theArgument) { Public.image.cachesize = theArgument; }
+
+    Public.fps getter = function() { return Public.image.fps; }
+    Public.fps setter = function(theArgument) { print("### ERROR: Cannot set movie fps"); }
+
+    Public.framecount getter = function() { return Public.image.framecount; }
+    Public.framecount setter = function(theArgument) { print("### ERROR: Cannot set movie framecount"); }
+
+    Public.volume getter = function() { return Public.image.volume; }
+    Public.volume setter = function(theArgument) { Public.image.volume = theArgument; }
+
+    Public.currentframe getter = function() { return Public.image.currentframe; }
+    Public.currentframe setter = function(theArgument) { Public.image.currentframe = theArgument; }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
