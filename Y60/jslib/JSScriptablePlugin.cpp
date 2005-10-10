@@ -36,7 +36,7 @@ namespace jslib {
 
     static JSBool
     toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Printd 'JSScriptablePlugin'");
+        DOC_BEGIN("Prints 'JSScriptablePlugin'");
         DOC_END;
         std::string myStringRep = "JSScriptablePlugin";
         JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -124,8 +124,8 @@ namespace jslib {
     getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         try {
             if (JSVAL_IS_INT(id)) {
-                //int myIndex = JSVAL_TO_INT(id);
-                AC_WARNING << "Unsupported: getProperty called with index";
+                int myIndex = JSVAL_TO_INT(id);
+                AC_WARNING << "Unsupported: getProperty called with index=" << myIndex;
             } else {
                 JSString * myJSStr = JS_ValueToString(cx, id);
                 std::string myProperty = JS_GetStringBytes(myJSStr);
@@ -140,8 +140,8 @@ namespace jslib {
     setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         try {
             if (JSVAL_IS_INT(id)) {
-                //int myIndex = JSVAL_TO_INT(id);
-                AC_WARNING << "Unsupported: setProperty called with index";
+                int myIndex = JSVAL_TO_INT(id);
+                AC_WARNING << "Unsupported: setProperty called with index=" << myIndex;
             } else {
                 JSString * myJSStr = JS_ValueToString(cx, id);
                 std::string myProperty = JS_GetStringBytes(myJSStr);

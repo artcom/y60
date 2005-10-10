@@ -606,13 +606,28 @@ namespace y60 {
         glMultMatrixf(theTransformation.getData());
         glColor4fv(theColor.begin());
 
-        const float myResolution = float(asl::PI)*2 / ( theSphere.radius / float(asl::PI_4) );
+        const float TwoPI = asl::PI * 2.0f;
+        const unsigned mySegments = 32;
+        const float myResolution = TwoPI / (float)mySegments;
+        float myPos[mySegments][2];
+
         glTranslatef(theSphere.center[0], theSphere.center[1], theSphere.center[2]);
         glBegin(GL_LINE_LOOP);
-        for (float i = 0; i< float(PI)*2; i += myResolution){
-            glVertex3f(sin(i) * theSphere.radius,
-                       cos(i) * theSphere.radius,
-                       0);
+        for (unsigned i = 0.0f; i < mySegments; ++i) {
+            float r = i * myResolution;
+            myPos[i][0] = sin(r) * theSphere.radius;
+            myPos[i][1] = cos(r) * theSphere.radius;
+            glVertex3f(myPos[i][0], myPos[i][1], 0.0f);
+        }
+        glEnd();
+        glBegin(GL_LINE_LOOP);
+        for (unsigned i = 0.0f; i < mySegments; ++i) {
+            glVertex3f(0.0f, myPos[i][0], myPos[i][1]);
+        }
+        glEnd();
+        glBegin(GL_LINE_LOOP);
+        for (unsigned i = 0.0f; i < mySegments; ++i) {
+            glVertex3f(myPos[i][0], 0.0f, myPos[i][1]);
         }
         glEnd();
 

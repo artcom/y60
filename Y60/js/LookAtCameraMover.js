@@ -33,13 +33,16 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
     var _myEyePositionOffset = new Vector3f(10,2,0);
     
     var _mySpringStrength = 1;
-     
-    var _myLastTime = 0;
+    var _myLastTime = null;
 
     obj.setup = function() {      
         obj.reset();
     }
     obj.reset = function() {
+    }
+
+    obj.setNodeToFollow = function(theNode) {
+        _myNodeToFollow = theNode;
     }
 
     obj.setEyePositionOffset = function(theOffset) {
@@ -59,25 +62,27 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
     }
     
     obj.update = function(theTime) {
-        var myDeltaTime = theTime - _myLastTime;
-        if (!_myCamera || myDeltaTime == 0) {
-            return;
+
+        if (_myLastTime == null) {
+            _myLastTime = theTime;
         }
+        var myDeltaTime = theTime - _myLastTime;
         _myLastTime = theTime;
         
         var myMatrix = _myNodeToFollow.globalmatrix;
-        var myNodePosition = _myNodeToFollow.boundingbox.center;
         var myRotationMatrix = new Matrix4f(_myNodeToFollow.orientation);
-        var myLookAtPosition = sum(myNodePosition, product(_myLookAtOffset, myRotationMatrix));
-        var myEyePosition    = sum(myNodePosition, product(_myEyePositionOffset, myRotationMatrix));
-        
+        var myNodePosition = _myNodeToFollow.boundingbox.center;
+ 
         var myMotionFactor = _mySpringStrength * myDeltaTime;
         if (myMotionFactor > 1) {
             myMotionFactor = 1;
         }
+
+        var myEyePosition    = sum(myNodePosition, product(_myEyePositionOffset, myRotationMatrix));
         var myDistance = difference(myEyePosition, _myCamera.position);
         _myCamera.position = sum(_myCamera.position, product(myDistance, myMotionFactor));      
 
+        var myLookAtPosition = sum(myNodePosition, product(_myLookAtOffset, myRotationMatrix));
         myDistance = difference(myLookAtPosition, _myLookAtPosition);
         _myLookAtPosition = sum(_myLookAtPosition, product(myDistance, myMotionFactor)); 
 

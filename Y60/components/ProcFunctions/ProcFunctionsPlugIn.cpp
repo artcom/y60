@@ -27,23 +27,23 @@
 namespace y60 {
     class ProcFunctionsPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
         public:
-        	ProcFunctionsPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
-        
-        	virtual void initClasses(JSContext * theContext,
-        		JSObject *theGlobalObject) {
-                    JS_DefineFunctions(theContext, theGlobalObject, jslib::JSProcFunctions::Functions());
-        	}
-        
-        	const char * ClassName() {
-        	    static const char * myClassName = "ProcFunctions";
-        	    return myClassName;
-        	}
+            ProcFunctionsPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+
+            virtual void initClasses(JSContext * theContext,
+                    JSObject *theGlobalObject) {
+                JS_DefineFunctions(theContext, theGlobalObject, jslib::JSProcFunctions::Functions());
+            }
+
+            const char * ClassName() {
+                static const char * myClassName = "ProcFunctions";
+                return myClassName;
+            }
     };
 }
 
 extern "C"
 EXPORT asl::PlugInBase * ProcFunctions_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::ProcFunctionsPlugIn(myDLHandle);
+    return new y60::ProcFunctionsPlugIn(myDLHandle);
 }
 
 
