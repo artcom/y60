@@ -520,14 +520,12 @@ namespace y60 {
     {
         AC_DEBUG  << "processing Material node";
 
-        //TODO just copied this from StlImporter...
+        asl::Vector4f myOpaqueWhite(1.0, 1.0, 1.0, 1.0);
         y60::setPropertyValue<asl::Vector4f>(theMaterialBuilder.getNode(),
-              "vector4f", y60::AMBIENT_PROPERTY,
-              asl::Vector4f(189.0f/255.0f,191.0f/255.0f,136.0f/255.0f,1.0f));
+              "vector4f", y60::AMBIENT_PROPERTY, myOpaqueWhite);
 
         y60::setPropertyValue<asl::Vector4f>(theMaterialBuilder.getNode(),
-              "vector4f", y60::DIFFUSE_PROPERTY,
-              asl::Vector4f(156.0f/255.0f,158.0f/255.0f,113.0f/255.0f,1.0f));
+              "vector4f", y60::DIFFUSE_PROPERTY, myOpaqueWhite);
 
         y60::VectorOfRankedFeature myLighting;
         y60::createLightingFeature(myLighting, y60::LAMBERT);

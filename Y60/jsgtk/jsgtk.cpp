@@ -63,6 +63,7 @@
 #include "JSDialog.h"
 #include "JSMessageDialog.h"
 #include "JSFileChooserDialog.h"
+#include "JSColorSelectionDialog.h"
 #include "JSLabel.h"
 #include "JSImage.h"
 #include "JSStatusBar.h"
@@ -228,6 +229,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSFileChooserDialog::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSColorSelectionDialog::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSStockID::initClass(cx, theGlobalObject)) {
@@ -407,7 +411,9 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::ColorSelection);
     TRY_DYNAMIC_CAST(Gtk::Frame);
     TRY_DYNAMIC_CAST(Gtk::DrawingArea);
+    TRY_DYNAMIC_CAST(Gtk::ColorSelectionDialog);
     TRY_DYNAMIC_CAST(Gtk::FileChooserDialog);
+    TRY_DYNAMIC_CAST(Gtk::MessageDialog);
     TRY_DYNAMIC_CAST(Gtk::Dialog );
     TRY_DYNAMIC_CAST(Gtk::Window );
     TRY_DYNAMIC_CAST(Gtk::ScrolledWindow );
@@ -586,6 +592,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
                 return true;
             } else if (castFrom<Gtk::FileChooserDialog>(cx, myArgument, theTarget)) {
                 return true;
+            } else if (castFrom<Gtk::ColorSelectionDialog>(cx, myArgument, theTarget)) {
+                return true;
             } else if (castFrom<Gtk::ProgressBar>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::HRuler>(cx, myArgument, theTarget)) {
@@ -693,6 +701,7 @@ CONVERT_FROM_GLIB_OBJECT(Gtk::Label);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Dialog);
 CONVERT_FROM_GLIB_OBJECT(Gtk::MessageDialog);
 CONVERT_FROM_GLIB_OBJECT(Gtk::FileChooserDialog);
+CONVERT_FROM_GLIB_OBJECT(Gtk::ColorSelectionDialog);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Ruler);
 CONVERT_FROM_GLIB_OBJECT(Gtk::HRuler);
 CONVERT_FROM_GLIB_OBJECT(Gtk::VRuler);

@@ -95,7 +95,7 @@ namespace y60 {
         SceneBuilder sceneBuilder(theScene);
 
         // material
-        dom::NodePtr material = setupMaterial("stl", sceneBuilder);
+        dom::NodePtr material = setupMaterial("mSTL", sceneBuilder);
         const std::string& materialId = material->getAttribute("id")->nodeValue();
 
         // import
@@ -284,13 +284,12 @@ namespace y60 {
     {
         MaterialBuilder materialBuilder(basename);
 
+        asl::Vector4f myOpaqueWhite(1.0, 1.0, 1.0, 1.0);
         setPropertyValue<asl::Vector4f>(materialBuilder.getNode(),
-              "vector4f", AMBIENT_PROPERTY,
-              asl::Vector4f(189.0f/255.0f,191.0f/255.0f,136.0f/255.0f,1.0f));
+              "vector4f", AMBIENT_PROPERTY, myOpaqueWhite);
 
         setPropertyValue<asl::Vector4f>(materialBuilder.getNode(),
-              "vector4f", DIFFUSE_PROPERTY,
-              asl::Vector4f(156.0f/255.0f,158.0f/255.0f,113.0f/255.0f,1.0f));
+              "vector4f", DIFFUSE_PROPERTY, myOpaqueWhite);
 
         VectorOfRankedFeature feature;
         createLightingFeature(feature, LAMBERT);
