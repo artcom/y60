@@ -359,42 +359,36 @@ namespace y60 {
             return theTime;
         }
         return theTime;
-    }
+    }    
 
     void FFMpegDecoder2::startMovie(double theStartTime) {
         AC_DEBUG << "startMovie, time: " << theStartTime << ". Resetting locks";
         _myNextPacketTimestamp = 0;
 
         asl::AutoLocker<FFMpegDecoder2> myLock(*this);
-        if (_myState != PAUSE) {
-            _myFrameCache.clear();
-            createCache();
-            // XXX unblock locked ffmpeg-thread.
-            _myReadEOF = false;
-            if (_myAudioBufferedSource) {
-                _myAudioBufferedSource->clear();
-                _myAudioBufferedSource->setRunning(false);
-            }
-            _myCachingFlag = true;
-            _mySeekTimestamp = AV_NOPTS_VALUE;
-            _myLastSeekTimestamp = AV_NOPTS_VALUE;
-            _myEOFVideoTimestamp = INT_MIN;
-            _myLastAudioTimeStamp = 0;
-            _myNextPacketTimestamp = 0;
-
-            // seek to start
-#if (LIBAVCODEC_BUILD < 4738)
-            int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp);
-#else
-            int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp, AVSEEK_FLAG_BACKWARD);
-#endif
-            avcodec_flush_buffers(&_myVStream->codec);
-            updateCache();
-        } else {
-            // resume
-            resumeMovie();
+        _myFrameCache.clear();
+        createCache();
+        // XXX unblock locked ffmpeg-thread.
+        _myReadEOF = false;
+        if (_myAudioBufferedSource) {
+            _myAudioBufferedSource->clear();
+            _myAudioBufferedSource->setRunning(false);
         }
-        // start thread
+        _myCachingFlag = true;
+        _mySeekTimestamp = AV_NOPTS_VALUE;
+        _myLastSeekTimestamp = AV_NOPTS_VALUE;
+        _myEOFVideoTimestamp = INT_MIN;
+        _myLastAudioTimeStamp = 0;
+        _myNextPacketTimestamp = 0;
+
+        // seek to start
+#if (LIBAVCODEC_BUILD < 4738)
+        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp);
+#else
+        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp, AVSEEK_FLAG_BACKWARD);
+#endif
+        avcodec_flush_buffers(&_myVStream->codec);
+        updateCache();
 
         _myState = RUN;
         if (!isActive()) {
@@ -405,6 +399,21 @@ namespace y60 {
         }
         AC_DEBUG << "Movie starting. _myStartTimestamp is " << _myStartTimestamp;
         AsyncDecoder::startMovie(theStartTime);
+    }
+
+    void FFMpegDecoder2::resumeMovie(double theStartTime) {
+        AC_DEBUG << "resumeMovie, time: " << theStartTime << ". Resetting locks";
+        asl::AutoLocker<FFMpegDecoder2> myLock(*this);
+        _myNextPacketTimestamp = 0;
+        _myState = RUN;
+        if (!isActive()) {
+            AC_TRACE << "Forking FFMpegDecoder Thread";
+            PosixThread::fork();
+        } else {
+            AC_INFO << "Thread already running. No forking.";
+        }
+        AC_DEBUG << "Movie resuming. _myStartTimestamp is " << _myStartTimestamp;
+        AsyncDecoder::resumeMovie(theStartTime);
     }
 
     void FFMpegDecoder2::stopMovie() {

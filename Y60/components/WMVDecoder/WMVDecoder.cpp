@@ -312,39 +312,42 @@ namespace y60 {
     }
 
     void
+    WMVDecoder::resumeMovie(double theStartTime) {
+        AC_INFO << "WMVDecoder::resumeMovie " << (void*)this << " time=" << theStartTime;
+        if (_myReader) {
+            resetEvent();
+            asl::AutoLocker<WMVDecoder> myLocker(*this);
+            double myPauseTime = AudioApp::AudioController::get().getCurrentTime() - _myPauseStartTime;
+            _myPauseStartTime = -1;
+            _myAudioStartTime += myPauseTime;
+            if (_myAudioBufferedSource) {
+                _myAudioBufferedSource->setRunning(true);
+            }
+            HRESULT hr = _myReader->Resume();
+            checkForError(hr, "Could not resume WMVDecoder", PLUS_FILE_LINE);
+        }
+        MovieDecoderBase::resumeMovie(theStartTime);
+    }
+
+    void
     WMVDecoder::startMovie(double theStartTime) {
         AC_INFO << "WMVDecoder::startMovie " << (void*)this << " time=" << theStartTime;
         if (_myReader) {
             resetEvent();
-            HRESULT hr;
-            if (getPlayMode() == PLAY_MODE_PAUSE) {
-                // resume audio/video
-                asl::AutoLocker<WMVDecoder> myLocker(*this);
-                double myPauseTime = AudioApp::AudioController::get().getCurrentTime() - _myPauseStartTime;
-                _myPauseStartTime = -1;
-                _myAudioStartTime += myPauseTime;
-                if (_myAudioBufferedSource) {
-                    _myAudioBufferedSource->setRunning(true);
-                }
-                hr = _myReader->Resume();
-                checkForError(hr, "Could not resume WMVDecoder", PLUS_FILE_LINE);
-            } else {
-                // start audio/video at given time
-                _myCurrentPlaySpeed = getMovie()->get<PlaySpeedTag>();
-                hr = _myReader->Start(QWORD(theStartTime * 10000000.0), 0, float(_myCurrentPlaySpeed), NULL);
-                checkForError(hr, "Could not start WMVDecoder", PLUS_FILE_LINE);
-                waitForEvent();
-                checkForError(_myEventResult, "Starting playback failed.", PLUS_FILE_LINE);
+            _myCurrentPlaySpeed = getMovie()->get<PlaySpeedTag>();
+            HRESULT hr = _myReader->Start(QWORD(theStartTime * 10000000.0), 0, float(_myCurrentPlaySpeed), NULL);
+            checkForError(hr, "Could not start WMVDecoder", PLUS_FILE_LINE);
+            waitForEvent();
+            checkForError(_myEventResult, "Starting playback failed.", PLUS_FILE_LINE);
 
-                asl::AutoLocker<WMVDecoder> myLocker(*this);
-                if (_myAudioBufferedSource) {
-                    // flush AudioBuffer
-                    _myAudioBufferedSource->clear();
-                    _myAudioBufferedSource->setRunning(false);
-                    _myCachingFlag = true;
-                } else {
-                    _myCachingFlag = false;
-                }
+            asl::AutoLocker<WMVDecoder> myLocker(*this);
+            if (_myAudioBufferedSource) {
+                // flush AudioBuffer
+                _myAudioBufferedSource->clear();
+                _myAudioBufferedSource->setRunning(false);
+                _myCachingFlag = true;
+            } else {
+                _myCachingFlag = false;
             }
         }
         MovieDecoderBase::startMovie(theStartTime);

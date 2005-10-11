@@ -38,7 +38,7 @@ using namespace asl;
 
 namespace y60 {
 
-    const unsigned MAX_FRAME_CACHE_SIZE = 1000;
+    const unsigned MAX_FRAME_CACHE_SIZE = 500;
     const double PRELOAD_CACHE_TIME = 2;    
 
     FrameConveyor::FrameConveyor() :
@@ -65,21 +65,30 @@ namespace y60 {
         }        
     }
 
+    void 
+    FrameConveyor::clear() {
+        _myCacheSizeInSecs = PRELOAD_CACHE_TIME;
+        _myFrameCache.clear();
+        if (_myAudioBufferedSource) {
+            _myAudioBufferedSource->clear();
+        }        
+    }
+
     void
     FrameConveyor::preload(double theInitialTimestamp) {        
         if (_myAudioBufferedSource) {
-            cerr << "Fill audio/video-cache...";
+            // To re-read audio packets we have to start caching with a clear cache.
+            clear();
+
+            cerr << "Fill audio/video-cache..." << endl;
             while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE &&
                   _myAudioBufferedSource->getCacheFillLevelInSecs() < PRELOAD_CACHE_TIME) 
             {
                 updateCache(theInitialTimestamp);
                 _myCacheSizeInSecs += (1 / _myContext->getFrameRate());
-                DB(cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
-                   cerr << "  A-Buffersize: " << _myAudioBufferedSource->getCacheFillLevel() << " max: " << _myAudioBufferedSource->getCacheSize() << endl;
-                   cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;);
+                DB(cerr << "  A/V-Buffersize: " << _myAudioBufferedSource->getCacheFillLevel() << "/" << _myFrameCache.size() << endl;)
             }            
 
-            cerr << " " << _myFrameCache.size() << " frames." << endl;
             if (_myFrameCache.size() > MAX_FRAME_CACHE_SIZE) {
                 cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE << " frames " << endl;
             } else if (_myAudioBufferedSource->getCacheFillLevelInSecs() >= PRELOAD_CACHE_TIME) {
@@ -138,7 +147,7 @@ namespace y60 {
         double myTargetEnd   = theTimestamp + 0.5 * _myCacheSizeInSecs;
 
         //cerr << "ts: " << theTimestamp << ", start: " << myTargetStart << ", end: " << myTargetEnd << endl;
-        printCacheInfo(myTargetStart, myTargetEnd);
+        DB(printCacheInfo(myTargetStart, myTargetEnd);)
 
         if (myTargetStart >= myCacheEnd ||  /* |CCCCCCCCCC| |TTTTTTTTTT| */    
             myTargetEnd <= myCacheStart ||  /* |TTTTTTTTTT| |CCCCCCCCCC| */    
@@ -198,8 +207,8 @@ namespace y60 {
         double myTimePerFrame = 1.0 / _myContext->getFrameRate();
         double myLastDecodedTime = _myVideoFrame->pts / (double)AV_TIME_BASE;
 
-        DB(cerr << "fillCache [" << theStartTime << " to " << theEndTime << "]" << endl;)
-        DB(cerr << " last decoded " << myLastDecodedTime << endl;)
+        DB2(cerr << "fillCache [" << theStartTime << " to " << theEndTime << "]" << endl;)
+        DB2(cerr << " last decoded " << myLastDecodedTime << endl;)
         if (fabs(theStartTime - myLastDecodedTime) >= myTimePerFrame * 2) {
             _myContext->seekToTime(theStartTime);
         }
@@ -306,11 +315,9 @@ namespace y60 {
                 break;
             }
             case DecoderContext::FrameTypeAudio:
-                if (_myAudioBufferedSource->isRunning()) {
-                    _myAudioBufferedSource->addBuffer(_myAudioFrame.getTimestamp(), _myAudioFrame.getSamples(), 
-                                                    _myAudioFrame.getSampleSize());
-                    theCurrentTime = _myAudioFrame.getTimestamp();
-                }
+                _myAudioBufferedSource->addBuffer(_myAudioFrame.getTimestamp(), _myAudioFrame.getSamples(), 
+                                                _myAudioFrame.getSampleSize());
+                theCurrentTime = _myAudioFrame.getTimestamp();
                 break;
             case DecoderContext::FrameTypeEOF:
                 theEndOfFileFlag = true;

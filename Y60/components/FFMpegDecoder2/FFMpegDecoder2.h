@@ -99,6 +99,9 @@ namespace y60 {
          * @param theStartTime movie-time to start decoding at.
          */
         void startMovie(double theStartTime = 0.0f);
+
+        void resumeMovie(double theStartTime = 0.0f);
+
         /**
          * Called to stop the decoding.
          */

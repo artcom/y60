@@ -479,7 +479,7 @@ function MovieOverlayBase(Public, Protected, theManager, theSource, thePosition,
     Public.startime setter = function(theArgument) { Public.image.startime = theArgument; }
 
     Public.audio getter = function() { return Public.image.audio; }
-    Public.audio setter = function(theArgument) { Public.image.audio = theArgument; }
+    Public.audio setter = function(theArgument) { print("### ERROR: Cannot set audio flag after construction"); }
 
     Public.avdelay getter = function() { return Public.image.avdelay; }
     Public.avdelay setter = function(theArgument) { Public.image.avdelay = theArgument; }

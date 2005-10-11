@@ -152,6 +152,14 @@ namespace y60 {
             }
 
             /**
+             * Is called before start movie, if a movie was paused before.
+             */
+            virtual void resumeMovie(double theStartTime = 0.0) {
+                _myMovieTime      = theStartTime;
+                _myLastSystemTime = -1.0;
+            }
+
+            /**
              * Stops the movie playback. Future calls of startMovie will start from the beginning
              * of the movie.
              */

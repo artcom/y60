@@ -279,7 +279,10 @@ namespace y60 {
                 if (ourFrameCounter >= theNumberOfFrames) {
                     break;
                 }
-            } 
+            } else {
+                cerr << "*** Audio Packet *** " << endl;
+                printPacketInfo(myPacket);
+            }
         }
         myTable.print(cerr);
         av_free(myFrame);

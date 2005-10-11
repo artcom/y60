@@ -22,28 +22,31 @@
     Basically that is support for audio combined with seeking support.
 
     Seeking includes the following sub-problems:
-        - Pause, resume and stop                (ok)
-        - Jumping to frames                     (ok)
-        - Different playspeeds                  (ok)
-        - Playing backwards                     (ok)        
-        - Precise looping                       (ok)
+        - Pause, resume and stop                    (ok)
+        - Jumping to frames                         (ok)
+        - Different playspeeds                      (ok)
+        - Playing backwards                         (ok)        
+        - Precise looping                           (ok)
 
     Audiosupport includes the following sub-problems:
-        - Lipsync between audio and video       (ca. 0,2 - 0,5 seconds off)
-        - Compatible to all the seeking features above (not yet)
-        - Support for videos without audio      (ok)
+        - Lipsync between audio and video           (ok)
+        - Compatible to all the seeking features above (partial)
+        - Support for videos without audio          (ok)
     
     Other things to be accomplished are:
-        - Try to avoid multi-threading          (ok)
-        - Intelligent caching                   (ok)
-        - Robustness against strange mpeg-files (no)
+        - Jitterless playback                       (ok without audio)
+        - Try to avoid multi-threading              (ok)
+        - Intelligent caching                       (ok)
+        - Robustness against strange mpeg-files     (partial)
+             - Invalid or wrong duration            (ok)
+             - First/Lastframe with wrong timestamp (no)
 
-    As visible above the main problems to solve are:        
-        - Better sync between video and audio, the code of FFMpegDecoder2 has to be adapted for that.
-        - Seeking does not work in combination with audio, yet. The easiest thing would be to just flush
-          audio and video buffers and recache it, if the playback starts after a seek. 
-        - Most MPEG files seem to have wrong or no durations set. The decoder should not rely on this
-          field, or calculate the duration on startup by seeking all the way to the end.
+    The main problems to solve are:
+        - Integrate the new audio library.
+        - Sometimes the AV-Sync is off after seeking. This should be solved, when the new audio-
+          library is integrated.
+        - With audio there is some jitter in the frame-rate, which probably only can be solved with a 
+          dedicated decoding task.
 */
 
 #include "FFMpegDecoder.h"
@@ -73,7 +76,9 @@ namespace y60 {
     }
 
     FFMpegDecoder::FFMpegDecoder(asl::DLHandle theDLHandle) :
-        PlugInBase(theDLHandle)
+        PlugInBase(theDLHandle),
+        _myAudioStartTime(0), 
+        _myPauseStartTime(0)
     {}
 
     FFMpegDecoder::~FFMpegDecoder() {
@@ -91,25 +96,46 @@ namespace y60 {
         }
     }
 
+    double 
+    FFMpegDecoder::getMovieTime(double theSystemTime) {
+        if (_myAudioBufferedSource && _myAudioBufferedSource->isRunning()) {
+            return AudioApp::AudioController::get().getCurrentTime() +
+                getMovie()->get<AVDelayTag>() - _myAudioStartTime;
+        } else {
+            return MovieDecoderBase::getMovieTime(theSystemTime);
+        }
+    }
+
+    void 
+    FFMpegDecoder::resumeMovie(double theStartTime) {
+        MovieDecoderBase::resumeMovie(theStartTime);        
+        _myFrameConveyor.preload(theStartTime);
+              
+        if (_myAudioBufferedSource) {            
+            _myAudioStartTime += AudioApp::AudioController::get().getCurrentTime() - _myPauseStartTime;
+            _myAudioBufferedSource->setRunning(true);
+        }        
+    }
+
     void 
     FFMpegDecoder::startMovie(double theStartTime) {
         MovieDecoderBase::startMovie(theStartTime);
-        if (_myAudioBufferedSource) {
-            // if start from pause:
-            //_myAudioBufferedSource->clear();
-        }
-
         _myFrameConveyor.preload(theStartTime);
+
         if (_myAudioBufferedSource) {
             _myAudioBufferedSource->setRunning(true);
+            _myAudioStartTime = AudioApp::AudioController::get().getCurrentTime();
         }
     }
 
     void 
     FFMpegDecoder::stopMovie() {
-        MovieDecoderBase::stopMovie();
-        if (_myAudioBufferedSource) {
+        MovieDecoderBase::stopMovie();        
+        if (_myAudioBufferedSource) {            
             _myAudioBufferedSource->setRunning(false);
+            _myAudioBufferedSource->clear();
+            _myAudioStartTime = 0;
+            _myPauseStartTime = 0; 
         }        
     }
 
@@ -117,7 +143,9 @@ namespace y60 {
     FFMpegDecoder::pauseMovie() {
         MovieDecoderBase::pauseMovie();
         if (_myAudioBufferedSource) {
-            _myAudioBufferedSource->setRunning(false);            
+            _myAudioBufferedSource->setRunning(false);  
+            _myAudioBufferedSource->clear();
+            _myPauseStartTime = AudioApp::AudioController::get().getCurrentTime();
         }        
     }
 
@@ -148,14 +176,8 @@ namespace y60 {
             double myFPS = theContext->getFrameRate();
             myMovie->set<FrameRateTag>(myFPS);
 
-            if (myVideoStream->duration == AV_NOPTS_VALUE ||
-                int(myFPS * (myVideoStream->duration / (double) AV_TIME_BASE)) <= 0)
-            {
-                AC_WARNING << "url='" << getMovie()->get<ImageSourceTag>() << "' contains no valid duration";
-                myMovie->set<FrameCountTag>(INT_MAX);
-            } else {
-                myMovie->set<FrameCountTag>(int(myFPS * (myVideoStream->duration / (float) AV_TIME_BASE)));
-            }
+            // Durations are mostly wrong in mpeg files, so we just do not use them to avoid looping errors
+            myMovie->set<FrameCountTag>(INT_MAX);
 
             AC_INFO << "url='" << getMovie()->get<ImageSourceTag>() << "' fps=" << myFPS << " framecount=" << getFrameCount();            
         } else {
@@ -198,6 +220,11 @@ namespace y60 {
             if (!asl::almostEqual(_myAudioBufferedSource->getVolume(), myVolume)) {
                 _myAudioBufferedSource->setVolume(myVolume);
             } 
+        }
+
+        // In case we reached the end of file while decoding we can now correctly set the frame rate
+        if (_myFrameConveyor.getEndOfFileTimestamp() != DBL_MAX) {
+            getMovie()->set<FrameCountTag>((unsigned)(_myFrameConveyor.getEndOfFileTimestamp() * getMovie()->get<FrameRateTag>()));
         }
         return myDecodedFrameTime;
     }

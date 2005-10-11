@@ -56,6 +56,9 @@ namespace y60 {
             double getEndOfFileTimestamp() const;
 
         private:
+            /// Clears the frame and audio cache
+            void clear();
+
             /** Decode frame at theTimestamp into theTargetRaster. 
              *  Returns the timestamp of the decoded frame or -1 if EOF was met.
              **/

@@ -89,7 +89,7 @@ namespace y60 {
           /**
            * Resumes from pause
            */
-          void resumeMovie() {
+          void resumeMovie(double theStartTime) {
               AC_DEBUG << "resumeMovie";
               double myPauseTime = 0.0;
               if (_myAudioBufferedSource) {

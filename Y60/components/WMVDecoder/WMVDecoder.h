@@ -128,6 +128,7 @@ namespace y60 {
         double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
 
         void startMovie(double theStartTime = 0.0f);
+        void resumeMovie(double theStartTime = 0.0f);
         void stopMovie();
         void pauseMovie();
         void closeMovie();

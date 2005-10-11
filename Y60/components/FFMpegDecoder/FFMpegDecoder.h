@@ -47,12 +47,14 @@ namespace y60 {
             */
             void load(const std::string & theFilename);
             void startMovie(double theStartTime);
+            void resumeMovie(double theStartTime);
             void stopMovie();
-            void pauseMovie();
-            void startMovie();            
+            void pauseMovie();                
         
             virtual asl::Ptr<MovieDecoderBase> instance() const;
             std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
+
+            double getMovieTime(double theSystemTime);
 
             /**
             * Reads a frame.
@@ -68,6 +70,9 @@ namespace y60 {
 
             FrameConveyor               _myFrameConveyor;
             AudioBase::BufferedSource * _myAudioBufferedSource;
+
+            double _myPauseStartTime;
+            double _myAudioStartTime;
     };
 
     typedef asl::Ptr<FFMpegDecoder> FFMpegDecoderPtr;
