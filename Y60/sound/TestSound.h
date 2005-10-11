@@ -516,7 +516,7 @@ class SoundTestSuite : public UnitTestSuite {
           
             addTest(new StressTest(mySoundManager, 5));
 
-            addTest(new MemLeakStressTest(mySoundManager, 5*60));
+//            addTest(new MemLeakStressTest(mySoundManager, 5*60));
         }
 
     private:
