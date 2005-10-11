@@ -431,8 +431,9 @@ class StressTest: public SoundTestBase {
 
     protected:
         void doIteration(int i) {
+            // No caching.
             SoundPtr mySound = getSoundManager().createSound
-                ("../../testfiles/stereotest441.wav", false);
+                ("../../testfiles/stereotest441.wav", false, false);
             mySound->setVolume(0.02f);
             mySound->play();
             double r1 = rand()/double(RAND_MAX);
@@ -515,7 +516,7 @@ class SoundTestSuite : public UnitTestSuite {
           
             addTest(new StressTest(mySoundManager, 5));
 
-//            addTest(new MemLeakStressTest(mySoundManager, 60*60*24));
+            addTest(new MemLeakStressTest(mySoundManager, 5*60));
         }
 
     private:
