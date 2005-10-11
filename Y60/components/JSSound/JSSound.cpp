@@ -128,8 +128,6 @@ namespace jslib {
     JSSound::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Don't call this.");
         DOC_END;
-        return JS_FALSE;
-/*        
         try {
             if (JSA_GetClass(cx,obj) != Class()) {
                 JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
@@ -178,9 +176,10 @@ namespace jslib {
                 // Construct empty Sound that will be filled by copy Construct()
                 myNewNative = OWNERPTR(0);
             } else {
+                cerr << "foo" << endl;
 //                HWSampleSinkPtr mySampleSink = Pump::get().createSampleSink(myURI);
-                myNewNative = OWNERPTR(new y60::Sound(myURI, 0, myLoopFlag));
-                myNewNative->setSelf(myNewNative);
+//                myNewNative = OWNERPTR(new y60::Sound(myURI, 0, myLoopFlag));
+//                myNewNative->setSelf(myNewNative);
             }
 
             JSSound * myNewObject = new JSSound(myNewNative, &(*myNewNative));
@@ -192,7 +191,6 @@ namespace jslib {
                 return JS_FALSE;
             }
         } HANDLE_CPP_EXCEPTION;
-*/        
     }
 
     JSConstIntPropertySpec *

@@ -108,12 +108,15 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
 {
     // We need a factory function so we can set the Sound's mySelf pointer and
     // do some decoder creation and cache management magic.
+    AC_DEBUG << "SoundManager::createSound " << theURI << ", loop: " << theLoop 
+            << ", use cache: " << theUseCache;
     AutoLocker<ThreadLock> myLocker(_myLock);
     IAudioDecoder * myDecoder;
     SoundCacheItemPtr myCacheItem = SoundCacheItemPtr(0);
     if (theUseCache) {
         myCacheItem = getCacheItem(theURI);
         if (myCacheItem == SoundCacheItemPtr(0)) {
+            AC_DEBUG << "    --> Sound not cached.";
             // This sound hasn't been played before.
             myCacheItem = SoundCacheItemPtr(new SoundCacheItem(theURI));
             addCacheItem(myCacheItem);
@@ -121,9 +124,11 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
         } else {
             if (myCacheItem->isFull()) {
                 // The sound is cached completely.
+                AC_DEBUG << "    --> Usable sound cache item exists.";
                 myDecoder = new CacheReader(myCacheItem);
             } else {
                 // The sound is currently being cached. Ignore the cache.
+                AC_DEBUG << "    --> Sound cache item exists, but isn't complete.";
                 myDecoder = createDecoder(theURI);
                 myCacheItem = SoundCacheItemPtr(0);
             }
@@ -268,7 +273,13 @@ void SoundManager::addCacheItem(SoundCacheItemPtr theItem) {
 }
 
 SoundCacheItemPtr SoundManager::getCacheItem(const std::string & theURI) const {
-    return (*(_myCache.find(theURI))).second;
+    CacheMap::const_iterator it;
+    it = _myCache.find(theURI);
+    if (it == _myCache.end()) {
+        return SoundCacheItemPtr(0);
+    } else {
+        return it->second;
+    }
 }
 
 } // namespace

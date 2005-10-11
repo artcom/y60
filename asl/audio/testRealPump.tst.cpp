@@ -20,7 +20,7 @@
 
 #include <asl/UnitTest.h>
 #include <asl/Time.h>
-#include <asl/Dashboard.h>
+//#include <asl/Dashboard.h>
 #include <asl/string_functions.h>
 
 #include <math.h>
@@ -44,7 +44,7 @@ private:
 
 
 int main( int argc, char *argv[] ) {
-    Dashboard::get();  // Make sure the dashboard gets deleted after the pumps.
+//    Dashboard::get();  // Make sure the dashboard gets deleted after the pumps.
 
     // For use in MSDev, where we can't set the environment prior to starting the
     // program.

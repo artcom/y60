@@ -15,7 +15,7 @@
 
 #include <asl/Auto.h>
 #include <asl/Logger.h>
-#include <asl/Dashboard.h>
+// #include <asl/Dashboard.h>
 
 namespace asl {
 
@@ -234,7 +234,7 @@ void HWSampleSink::dumpState() {
 
 void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    MAKE_SCOPE_TIMER(Deliver_Data);
+//    MAKE_SCOPE_TIMER(Deliver_Data);
 
     AC_TRACE << "HWSampleSink::deliverData";
 //    dumpState();
@@ -284,7 +284,7 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
     }
 
     {
-        MAKE_SCOPE_TIMER(Volume_Fader);
+//        MAKE_SCOPE_TIMER(Volume_Fader);
         _myVolumeFader->apply(theBuffer, _myFrameCount);
     }
     _myFrameCount += theBuffer.getNumFrames();
@@ -309,7 +309,7 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
     if ((_myState == STOPPING_FADE_OUT && almostEqual(_myVolumeFader->getVolume(), 0.0)) ||
             _myState == PLAYBACK_DONE)
     {
-        MAKE_SCOPE_TIMER(Stop_Sink);
+//        MAKE_SCOPE_TIMER(Stop_Sink);
         changeState(STOPPED);
         AC_TRACE << "_myBufferQueue.clear();";
         _myBufferQueue.clear();

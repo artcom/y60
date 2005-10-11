@@ -35,21 +35,23 @@ class Sound :
                 bool myLoop = false);
         virtual ~Sound();
         void setSelf(const SoundPtr& mySelf);
-        virtual void play ();
-        virtual void pause ();
-        virtual void stop ();
-        virtual void setVolume (float theVolume);
-        virtual void fadeToVolume (float Volume, asl::Time theTime);
-        virtual double getVolume () const;
-        virtual std::string getName() const;
-        virtual asl::Time getDuration() const;
-        virtual asl::Time getCurrentTime() const;
-        virtual bool isLooping() const;
-        virtual void seek (asl::Time thePosition);
-        virtual void seekRelative (double theAmount);
-        virtual asl::Time getBufferedTime() const;
-        virtual bool isPlaying() const;
-        virtual unsigned getNumUnderruns() const;
+        void play ();
+        void pause ();
+        void stop ();
+        void setVolume (float theVolume);
+        void fadeToVolume (float Volume, asl::Time theTime);
+        double getVolume () const;
+        std::string getName() const;
+        asl::Time getDuration() const;
+        asl::Time getCurrentTime() const;
+        bool isLooping() const;
+        void seek (asl::Time thePosition);
+        void seekRelative (double theAmount);
+        asl::Time getBufferedTime() const;
+        bool isPlaying() const;
+        unsigned getNumUnderruns() const;
+        enum CacheState {CACHING, CACHED, NOCACHE};
+        CacheState getCacheState() const;
 
         // Interface to Media.
         void update(double theTimeSlice);

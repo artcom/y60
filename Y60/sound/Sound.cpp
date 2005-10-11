@@ -159,6 +159,18 @@ unsigned Sound::getNumUnderruns() const {
     return _mySampleSink->getNumUnderruns();
 }
 
+Sound::CacheState Sound::getCacheState() const {
+    if (dynamic_cast<CacheReader*>(_myDecoder)) {
+        return CACHED;
+    } else {
+        if (_myCacheItem) {
+            return CACHING;
+        } else {
+            return NOCACHE;
+        }
+    }
+}
+
 void Sound::update(double theTimeSlice) {
     AutoLocker<ThreadLock> myLocker(_myLock);
     double myBuffersFilledRatio = double(_mySampleSink->getBufferedTime())/

@@ -19,7 +19,7 @@
 #include <asl/numeric_functions.h>
 #include <asl/Assure.h>
 #include <asl/Auto.h>
-#include <asl/Dashboard.h>
+//#include <asl/Dashboard.h>
 
 #include <exception>
 #include <sstream>
@@ -95,8 +95,8 @@ DirectSoundPump::openOutput() {
     theRetVal = DirectSoundCreate8(NULL, &_myDS, NULL);
     checkDSRetVal(theRetVal, PLUS_FILE_LINE);
 
-    // Determine window. This stuff is mostly bullshit because SetCooperativeLevel really doesn't
-    // do anything for WDM sound cards.
+    // Determine window. This stuff is mostly bullshit because SetCooperativeLevel 
+    // really doesn't do anything for WDM sound cards.
     HWND myWindow = NULL;
     myWindow = ::GetForegroundWindow();
     if (!myWindow) {
@@ -325,10 +325,13 @@ void DirectSoundPump::writeToDS() {
     if (myPlayCursor > _myWriteCursor) {
         numBytesToDeliver = myPlayCursor-_myWriteCursor;
     } else {
-        numBytesToDeliver = myPlayCursor+(_myFramesPerBuffer*getOutputBytesPerFrame())-_myWriteCursor;
+        numBytesToDeliver = myPlayCursor+(_myFramesPerBuffer*getOutputBytesPerFrame())
+                -_myWriteCursor;
     }
-    AC_TRACE << "_myWriteCursor: " << _myWriteCursor << ", numBytesToDeliver: " << numBytesToDeliver << endl;
-    AC_TRACE << "Before mix: DS PlayCursor: " << myPlayCursor << ", DS Write Cursor: " << myWriteCursor << endl;
+    AC_TRACE << "_myWriteCursor: " << _myWriteCursor << ", numBytesToDeliver: " 
+            << numBytesToDeliver << endl;
+    AC_TRACE << "Before mix: DS PlayCursor: " << myPlayCursor 
+            << ", DS Write Cursor: " << myWriteCursor << endl;
     unsigned oldWriteCursor = _myWriteCursor;
 
     unsigned numFramesToDeliver = numBytesToDeliver/getOutputBytesPerFrame();
@@ -343,9 +346,10 @@ void DirectSoundPump::writeToDS() {
 
     hr = _myDSBuffer->GetCurrentPosition(&myPlayCursor, &myWriteCursor);
     checkDSRetVal(hr, PLUS_FILE_LINE);
-    AC_TRACE << "After mix: DS PlayCursor: " << myPlayCursor << ", DS Write Cursor: " << myWriteCursor << endl;
+    AC_TRACE << "After mix: DS PlayCursor: " << myPlayCursor 
+            << ", DS Write Cursor: " << myWriteCursor << endl;
 
-    MAKE_SCOPE_TIMER(DSBufferLock);
+//    MAKE_SCOPE_TIMER(DSBufferLock);
     hr = _myDSBuffer->Lock(_myWriteCursor, numBytesToDeliver, &myWritePtr1, 
             &myWriteBytes1, &myWritePtr2, &myWriteBytes2, 0);     
     // If the buffer was lost, restore and retry lock. 

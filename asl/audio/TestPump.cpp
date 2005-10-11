@@ -15,7 +15,7 @@
 #include "Pump.h"
 
 #include <asl/proc_functions.h>
-#include <asl/Dashboard.h>
+// #include <asl/Dashboard.h>
 
 using namespace asl;
 
@@ -63,7 +63,7 @@ void TestPump::runWithPump(bool useDummyPump) {
         AC_DEBUG << "Allocated buffers: " << AudioBufferBase::getNumBuffersAllocated() 
                  << endl;
 
-        Dashboard::get().print(cerr);
+//        Dashboard::get().print(cerr);
     }
 
 void TestPump::testBufferAlloc() {

@@ -18,7 +18,7 @@
 #include <asl/numeric_functions.h>
 #include <asl/Assure.h>
 #include <asl/Auto.h>
-#include <asl/Dashboard.h>
+// #include <asl/Dashboard.h>
 
 #include <exception>
 #include <sstream>
@@ -217,7 +217,7 @@ void ALSAPump::pump()
 {
     int myRetVal = snd_pcm_wait(_myOutputDevice, 1000);
 
-    MAKE_SCOPE_TIMER(Pump);
+//    MAKE_SCOPE_TIMER(Pump);
     handleUnderrun(myRetVal);
 
     /* find out how much space is available for playback data */
@@ -235,7 +235,7 @@ void ALSAPump::pump()
     AC_TRACE << "ALSAPump::pump called with " << numFramesToDeliver << " frames";
 
     {
-        MAKE_SCOPE_TIMER(Write_to_Card);
+//        MAKE_SCOPE_TIMER(Write_to_Card);
         myRetVal = snd_pcm_writei(_myOutputDevice, _myOutputBuffer.begin(), 
                 numFramesToDeliver);
         handleUnderrun(myRetVal);
