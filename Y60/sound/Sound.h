@@ -11,12 +11,13 @@
 #ifndef _Sound_H_
 #define _Sound_H_
 
+#include "IAudioDecoder.h"
+#include "SoundCacheItem.h"
+
 #include <asl/HWSampleSink.h>
 #include <asl/Stream.h>
 #include <asl/ISampleSink.h>
-
-#include "IAudioDecoder.h"
-#include "SoundCacheItem.h"
+#include <asl/ThreadLock.h>
 
 namespace y60 {
 
@@ -60,6 +61,8 @@ class Sound :
         asl::AudioBufferPtr createBuffer(unsigned theNumFrames);
         void queueSamples(asl::AudioBufferPtr& theBuffer);
         
+        static int getNumSoundsAllocated();
+        
     private:
         void open();
         void close();
@@ -82,6 +85,9 @@ class Sound :
 
         int _myCurFrame;
         SoundCacheItemPtr _myCacheItem; // This is 0 if we're not caching.
+
+        static asl::ThreadLock _mySoundsAllocatedLock;
+        static int _myNumSoundsAllocated;
 };
 
 } // namespace

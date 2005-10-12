@@ -15,6 +15,7 @@
 #include <asl/Logger.h>
 #include <asl/Pump.h>
 #include <asl/Auto.h>
+#include <asl/proc_functions.h>
 
 using namespace std;
 using namespace asl;
@@ -54,6 +55,11 @@ SoundManager::~SoundManager() {
         AC_WARNING << "SoundManager being deleted, but " << 
                 AudioBufferBase::getNumBuffersAllocated()-1 << 
                 " buffers are still allocated.";
+    }
+    if (Sound::getNumSoundsAllocated() > 0) {
+        AC_WARNING << "SoundManager being deleted, but " << 
+                Sound::getNumSoundsAllocated() << 
+                " Sounds are still allocated.";
     }
 }
 
@@ -181,6 +187,19 @@ void SoundManager::deleteCacheItem(const std::string& theURI) {
     if (it != _myCache.end()) {
         _myCache.erase(it);
     }
+}
+
+unsigned SoundManager::getCacheMemUsed() const {
+    CacheMap::const_iterator it;
+    unsigned myMemUsed = 0;
+    for (it=_myCache.begin(); it != _myCache.end(); ++it) {
+        myMemUsed += it->second->getMemUsed();
+    }
+    return myMemUsed;
+}
+
+unsigned SoundManager::getNumItemsInCache() const {
+    return _myCache.size();
 }
 
 void SoundManager::stopAll() {

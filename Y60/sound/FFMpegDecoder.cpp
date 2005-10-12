@@ -18,10 +18,11 @@ using namespace asl;
 
 namespace y60 {
 
+asl::Block FFMpegDecoder::_mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+asl::Block FFMpegDecoder::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+
 FFMpegDecoder::FFMpegDecoder (const string& myURI)
     : _myURI (myURI),
-      _mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
-      _myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
       _myFormatContext(0),
       _myStreamIndex(-1),
       _myResampleContext(0),
@@ -37,6 +38,8 @@ FFMpegDecoder::~FFMpegDecoder() {
 }
 
 bool FFMpegDecoder::isSyncDecoder() const {
+    // Note that if this is ever changed - i.e. if several decoders run in different 
+    // threads, _mySamples and _myResampledSamples can't be static variables anymore!
     return true;
 }
 

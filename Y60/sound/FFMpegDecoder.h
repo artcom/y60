@@ -48,8 +48,8 @@ class FFMpegDecoder: public IAudioDecoder
         AVFormatContext * _myFormatContext;
 
         int _myStreamIndex;
-        asl::Block _mySamples;
-        asl::Block _myResampledSamples;
+        static asl::Block _mySamples;
+        static asl::Block _myResampledSamples;
         unsigned _mySampleRate;
         unsigned _myNumChannels;
         ReSampleContext * _myResampleContext;

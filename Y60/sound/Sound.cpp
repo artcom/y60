@@ -19,6 +19,10 @@ using namespace asl;
 
 namespace y60 {
 
+asl::ThreadLock Sound::_mySoundsAllocatedLock;  
+
+int Sound::_myNumSoundsAllocated = 0;
+
 Sound::Sound (string myURI, IAudioDecoder * myDecoder, SoundCacheItemPtr myCacheItem, 
         bool theLoop)
     : _myURI (myURI),
@@ -34,6 +38,8 @@ Sound::Sound (string myURI, IAudioDecoder * myDecoder, SoundCacheItemPtr myCache
     _myLockedSelf = SoundPtr(0);
     _mySampleSink = Pump::get().createSampleSink(myURI);
     _myDecoder->setSampleSink(this);
+    AutoLocker<ThreadLock> myLocker(_mySoundsAllocatedLock);
+    _myNumSoundsAllocated++;
 }
 
 Sound::~Sound()
@@ -41,6 +47,8 @@ Sound::~Sound()
     AC_DEBUG << "Sound::~Sound (" << _myURI << ")";
     delete _myDecoder;
     _myDecoder = 0;
+    AutoLocker<ThreadLock> myLocker(_mySoundsAllocatedLock);
+    _myNumSoundsAllocated--;
 }
 
 void Sound::setSelf(const SoundPtr& mySelf)
@@ -240,6 +248,10 @@ void Sound::close() {
     AutoLocker<ThreadLock> myLocker(_myLock);
     AC_DEBUG << "Sound::close() (" << _myURI << ")";
     _myDecoder->seek(0);
+}
+
+int Sound::getNumSoundsAllocated() {
+    return _myNumSoundsAllocated;
 }
 
 }

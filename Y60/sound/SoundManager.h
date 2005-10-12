@@ -54,6 +54,8 @@ namespace y60 {
         // Caching stuff
         void preloadSound(const std::string& theURI);
         void deleteCacheItem(const std::string& theURI);
+        unsigned getCacheMemUsed() const;
+        unsigned getNumItemsInCache() const;
         
         virtual void update();
         
