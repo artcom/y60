@@ -72,11 +72,7 @@ void HWSampleSink::play() {
     if (_myState != RUNNING) {
         _myLockedSelf = _mySelf.lock();
         _myVolumeFader->setVolume(_myVolume);
-        if (_myBufferQueue.empty()) {
-            AC_WARNING << "HWSampleSink: Play called, but no buffers are queued.";
-        }
         changeState(RUNNING);
-        _myStopWhenEmpty = false;
         AudioTimeSource::run();
     } else {
         AC_DEBUG << "HWSampleSink::play: Play received when alredy playing. Ignored.";
@@ -100,12 +96,7 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
     AC_DEBUG << "HWSampleSink::stop (" << _myName << ")";
     if (theRunUntilEmpty) {
 //        cerr << "RunUntilEmpty" << endl;
-        if (_myState == RUNNING) {
-            _myStopWhenEmpty = true;
-        } else {
-            AC_DEBUG << "HWSampleSink::stop: stop(RunUntilEmpty) received in state " << 
-                    stateToString(getState()) << ". Ignored.";
-        }
+        _myStopWhenEmpty = true;
     } else {
 //        cerr << "!RunUntilEmpty" << endl;
         switch(_myState) {
@@ -368,6 +359,7 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
             if (_myStopWhenEmpty || _myState == STOPPING_FADE_OUT || 
                     _myState == PAUSING_FADE_OUT) 
             {
+                _myStopWhenEmpty = false;
                 changeState(PLAYBACK_DONE);
                 AudioTimeSource::stop();
             } else {
