@@ -864,7 +864,11 @@ CTScan::appendTo3DTexture(int theSlice, asl::Block & the3dTexture, int theXSize,
 bool 
 CTScan::notifyProgress(double theProgress, const std::string & theMessage) {
     //cerr << "progress = " << theProgress << endl;
-    return _myProgressSignal.emit(theProgress, Glib::ustring(theMessage));
+    if (_myProgressSignal.empty() ) {
+        return true;
+    } else {
+        return _myProgressSignal.emit(theProgress, Glib::ustring(theMessage));
+    }
 }
 
 NodePtr
