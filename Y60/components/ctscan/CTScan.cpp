@@ -545,7 +545,7 @@ std::string
 CTScan::setupMaterial(SceneBuilderPtr theSceneBuilder, bool theCreateNormalsFlag) {
     // instead of using a modelling function we roll our own material here,
     // beacuse we don't have a Scene object ...
-    std::string myMaterialName = "PolygonMaterial";
+    std::string myMaterialName = "mSTL"; // XXX [DS] this name should not be changed
     MaterialBuilder myMaterialBuilder(myMaterialName, false);
     theSceneBuilder->appendMaterial(myMaterialBuilder);
     myMaterialBuilder.setTransparencyFlag(false);
