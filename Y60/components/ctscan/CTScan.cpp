@@ -226,7 +226,7 @@ CTScan::getValueRange() {
 }
 
 template <class VoxelT, class SegmentationPolicy>
-void
+bool
 CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
                              bool theCreateNormalsFlag, ScenePtr theScene, 
                              SegmentationPolicy & theSegmentizer,
@@ -248,7 +248,7 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate
            myMarcher(theDownSampleRate, myVertexStore, theSegmentizer, this);
 
     myMarcher.setBox(theVoxelBox);
-    myMarcher.march();
+    bool isDone = myMarcher.march();
 
     setupScene(theScene, myVertexStore.getShapeNode()->getAttributeString("id"));
     asl::Box3f myBox;
@@ -256,10 +256,11 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate
         myBox[i/3][i%3] = float(theVoxelBox[i/3][i%3]) * _myVoxelSize[i%3];        
     }
     resetCamera(theScene, myBox);
+    return isDone;
 }
 
 template <class VoxelT, class SegmentationPolicy>
-void
+bool
 CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
                            SegmentationPolicy & theSegmentizer,
                            unsigned int & theVertexCount, unsigned int & theTriangleCount)
@@ -274,13 +275,16 @@ CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate
 
     myMarcher.setBox(theVoxelBox);
     AC_INFO << "starting dry run";
-    myMarcher.march();
+    bool isDone = myMarcher.march();
     theVertexCount = myPolygonCounter.getVertexCount();
     theTriangleCount = myPolygonCounter.getTriangleCount();
     // AC_WARNING << "Triangles:"  << theTriangleCount << " Vertices:" << theVertexCount;
+    return isDone;
 }
-/**
- * @return a Vector of which x is VertexCount and y is TriangleCount
+/** Counts triangles and vertices that would be produced in a real run.
+ *
+ * @return a Vector of which x is VertexCount and y is TriangleCount or (-1, -1) 
+           if the operation was aborted by the user
  */
 asl::Vector2i
 CTScan::countTrianglesGlobal(const asl::Box3i & theVoxelBox, 
@@ -290,33 +294,37 @@ CTScan::countTrianglesGlobal(const asl::Box3i & theVoxelBox,
 {
     unsigned int myVertexCount;
     unsigned int myTriangleCount;
-
+    bool isDone;
     switch (_myEncoding) {
         case y60::GRAY:
             {
                 typedef unsigned char Voxel;
                 GlobalThresholdSegmentationPolicy<Voxel> mySegmentizer((Voxel)theThresholdMin, (Voxel)theThresholdMax);
-                countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                isDone = countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         case y60::GRAY16:
             {
                 typedef unsigned short Voxel;
                 GlobalThresholdSegmentationPolicy<Voxel> mySegmentizer((Voxel)theThresholdMin, (Voxel)theThresholdMax);
-                countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                isDone = countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         case y60::GRAYS16:
             {
                 typedef short Voxel;
                 GlobalThresholdSegmentationPolicy<Voxel> mySegmentizer((Voxel)theThresholdMin, (Voxel)theThresholdMax);
-                countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                isDone = countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         default:
             throw CTScanException("Unhandled voxel type in CTScan::countTriangles()", PLUS_FILE_LINE);
     }
-    return asl::Vector2i(myVertexCount, myTriangleCount);
+    if (isDone) {
+        return asl::Vector2i(myVertexCount, myTriangleCount);
+    } else {
+        return asl::Vector2i(-1, -1);
+    }
 }
 
 asl::Vector2i
@@ -329,32 +337,37 @@ CTScan::countTrianglesInVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::N
     Box3i myBoundingBox = theVoxelBox;
     prepareBox(myBoundingBox); 
 
+    bool isDone;
     switch (_myEncoding) {
         case y60::GRAY:
             {
                 typedef unsigned char Voxel;
                 PerVoxelThresholdSegmentationPolicy<Voxel> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                isDone = countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         case y60::GRAY16:
             {
                 typedef unsigned short Voxel;
                 PerVoxelThresholdSegmentationPolicy<Voxel> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                isDone = countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         case y60::GRAYS16:
             {
                 typedef short Voxel;
                 PerVoxelThresholdSegmentationPolicy<Voxel> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                isDone = countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         default:
             throw CTScanException("Unhandled voxel type in CTScan::countTriangles()", PLUS_FILE_LINE);
     }
-    return asl::Vector2i(myVertexCount, myTriangleCount);
+    if (isDone) {
+        return asl::Vector2i(myVertexCount, myTriangleCount);
+    } else {
+        return asl::Vector2i(-1, -1);
+    }
 }
 ScenePtr
 CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
@@ -364,13 +377,14 @@ CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin,
     asl::Time myStartTime;
 
     ScenePtr myScene(new Scene);
-    myScene->createStubs(thePackageManager);    
+    myScene->createStubs(thePackageManager);
+    bool isDone;
     switch (_myEncoding) {
         case y60::GRAY:
             {
                 typedef unsigned char VoxelT;
                 GlobalThresholdSegmentationPolicy<VoxelT> mySegmentizer( (VoxelT)theThresholdMin, (VoxelT)theThresholdMax);
-                applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCreateNormalsFlag, myScene,
+                isDone = applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCreateNormalsFlag, myScene,
                             mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
@@ -378,7 +392,7 @@ CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin,
             {
                 typedef unsigned short VoxelT;
                 GlobalThresholdSegmentationPolicy<VoxelT> mySegmentizer( (VoxelT)theThresholdMin, (VoxelT)theThresholdMax);
-                applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCreateNormalsFlag, myScene,
+                isDone = applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCreateNormalsFlag, myScene,
                             mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
@@ -386,7 +400,7 @@ CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin,
             {
                 typedef short VoxelT;
                 GlobalThresholdSegmentationPolicy<VoxelT> mySegmentizer( (VoxelT)theThresholdMin, (VoxelT)theThresholdMax);
-                applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCreateNormalsFlag, myScene,
+                isDone = applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCreateNormalsFlag, myScene,
                             mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
@@ -395,7 +409,11 @@ CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin,
     }
     asl::Time myEndTime;
     AC_INFO << "===> Marching Cubes took " << myEndTime - myStartTime << " seconds.";
-    return myScene;
+    if ( isDone ) {
+        return myScene;
+    } else {
+        return ScenePtr(0);
+    }
 }
 
 void CTScan::prepareBox(asl::Box3i & theVoxelBox) {
@@ -418,12 +436,13 @@ CTScan::polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr
 
     ScenePtr myScene(new Scene);
     myScene->createStubs(thePackageManager);    
+    bool isDone;
     switch (_myEncoding) {
         case y60::GRAY:
             {
                 typedef unsigned char VoxelT;
                 PerVoxelThresholdSegmentationPolicy<VoxelT> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCreateNormalsFlag, myScene,
+                isDone = applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCreateNormalsFlag, myScene,
                             mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
@@ -431,7 +450,7 @@ CTScan::polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr
             {
                 typedef unsigned short VoxelT;
                 PerVoxelThresholdSegmentationPolicy<VoxelT> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCreateNormalsFlag, myScene,
+                isDone = applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCreateNormalsFlag, myScene,
                             mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
@@ -439,7 +458,7 @@ CTScan::polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr
             {
                 typedef short VoxelT;
                 PerVoxelThresholdSegmentationPolicy<VoxelT> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCreateNormalsFlag, myScene,
+                isDone = applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCreateNormalsFlag, myScene,
                             mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
@@ -448,7 +467,11 @@ CTScan::polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr
     }
     asl::Time myEndTime;
     AC_INFO << "===> Marching Cubes took " << myEndTime - myStartTime << " seconds.";
-    return myScene;
+    if ( isDone ) {
+        return myScene;
+    } else {
+        return ScenePtr(0);
+    }
 }
 
 void 
@@ -838,10 +861,10 @@ CTScan::appendTo3DTexture(int theSlice, asl::Block & the3dTexture, int theXSize,
     return myAdapter.size();
 }
 
-void 
+bool 
 CTScan::notifyProgress(double theProgress, const std::string & theMessage) {
     //cerr << "progress = " << theProgress << endl;
-    _myProgressSignal.emit(theProgress, Glib::ustring(theMessage));
+    return _myProgressSignal.emit(theProgress, Glib::ustring(theMessage));
 }
 
 NodePtr

@@ -103,7 +103,7 @@ computeError(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         ensureParamCount(argc, 0);
         JSClassTraits<Mesh>::ScopedNativeRef myObj(cx, obj);
         Mesh & myMesh = myObj.getNative();
-        myMesh.computeError();
+        *rval = as_jsval(cx, myMesh.computeError());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -289,8 +289,8 @@ JSMesh::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsv
     switch (theID) {
     case PROP_signal_progress:
     {
-        JSSignal2<void,double,Glib::ustring>::OWNERPTR mySignal( new
-            JSSignal2<void,double,Glib::ustring>::NATIVE(getNative().signal_progress()));
+        JSSignal2<bool,double,Glib::ustring>::OWNERPTR mySignal( new
+            JSSignal2<bool,double,Glib::ustring>::NATIVE(getNative().signal_progress()));
         *vp = jslib::as_jsval(cx, mySignal);
         return JS_TRUE;
     }

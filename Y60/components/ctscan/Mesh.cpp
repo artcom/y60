@@ -11,6 +11,8 @@
 using namespace asl;
 using namespace std;
 
+#define DB(x) // x;
+
 namespace y60 {
 
 Mesh::Mesh(dom::NodePtr theShapeNode) : _myShapeNode(theShapeNode), _myPositions(0), _myNormals(0), _myColors(0), _myHalfEdges(0), _myWriteLockCount(0), _myEdgeList(0), _myMaxError(0.0), _mySimplifyMode(false), _myNormalVerticesNode(0)  {
@@ -234,21 +236,26 @@ Mesh::calcEdgeError(unsigned theIndex) {
 }
 #endif
 
-void
+bool
 Mesh::computeError() {
     MAKE_SCOPE_TIMER(computeError);
     lockWrite();
     _myErrorMap.clear();
     _myErrorMap.resize(_myPositions->size());
 
+    bool myContinueFlag;
     for (int i = 0; i < _myPositions->size(); ++i) {
         _myErrorMap.insert(i,calcEdgeError(i));
         int myPositionsSize = _myPositions->size();
         if (i % (myPositionsSize / 100 + 1) == 0) {
-            notifyProgress(i / double(_myPositions->size()), "computing costs");
+            myContinueFlag = notifyProgress(i / double(_myPositions->size()), "computing costs");
+            if ( ! myContinueFlag) {
+                break;
+            }
         }
     }
     unlockWrite();
+    return myContinueFlag;
 }
 
 bool
@@ -534,27 +541,28 @@ Mesh::collapseByError(float theMaxError) {
     getDashboard().reset();
     _mySimplifyMode = true;
     try {
-        computeError();
-        notifyProgress(0.0, "");
-        unsigned myInitialErrors = _myErrorMap.setMaxError(theMaxError);
-        AC_INFO << "Going to delete about " << myInitialErrors << " edges";
+        if ( computeError() ) {
+            notifyProgress(0.0, "");
+            unsigned myInitialErrors = _myErrorMap.setMaxError(theMaxError);
+            AC_INFO << "Going to delete about " << myInitialErrors << " edges";
 
-        while (!_myErrorMap.empty() && _mySimplifyMode) {
-            int myEdge = _myErrorMap.front();
-            AC_TRACE << "Collapsing edge: " << myEdge;
-            AC_TRACE << "         error = " << _myErrorMap.at(myEdge); 
-            AC_TRACE << "         count = " << _myErrorMap.getErrorCount();
-            if (edgeCollapse(myEdge)) {
-                ++myNumModified;
-            } else {
-                // Something went wrong with this one. So lets for now remove it from our map
-                _myErrorMap.updateError(myEdge, NumericTraits<float>::max());
-                AC_INFO << "aborted edge " << myEdge;
-            }
-            if ((_myErrorMap.getErrorCount() % (myInitialErrors / 1000 + 1)) == 0) {
-                double myProgress = min(1.0, 1.0 - (double(_myErrorMap.getErrorCount()) / double(myInitialErrors)));
-                notifyProgress(myProgress, "collapsing");
-                AC_TRACE << "Progress: " << myProgress * 100;
+            while (!_myErrorMap.empty() && _mySimplifyMode) {
+                int myEdge = _myErrorMap.front();
+                AC_TRACE << "Collapsing edge: " << myEdge;
+                AC_TRACE << "         error = " << _myErrorMap.at(myEdge); 
+                AC_TRACE << "         count = " << _myErrorMap.getErrorCount();
+                if (edgeCollapse(myEdge)) {
+                    ++myNumModified;
+                } else {
+                    // Something went wrong with this one. So lets for now remove it from our map
+                    _myErrorMap.updateError(myEdge, NumericTraits<float>::max());
+                    AC_INFO << "aborted edge " << myEdge;
+                }
+                if ((_myErrorMap.getErrorCount() % (myInitialErrors / 1000 + 1)) == 0) {
+                    double myProgress = min(1.0, 1.0 - (double(_myErrorMap.getErrorCount()) / double(myInitialErrors)));
+                    _mySimplifyMode = notifyProgress(myProgress, "collapsing");
+                    AC_TRACE << "Progress: " << myProgress * 100;
+                }
             }
         }
     } catch (InconsistencyException e) {
@@ -564,8 +572,8 @@ Mesh::collapseByError(float theMaxError) {
     }
     _myErrorMap.clear();
     unlockWrite(true);
-    getDashboard().print(std::cerr);
-    getDashboard().cycle();
+    DB(getDashboard().print(std::cerr));
+    DB(getDashboard().cycle());
     AC_INFO << "done simplification";
     return myNumModified;
 }
@@ -710,9 +718,9 @@ Mesh::colorSweptSphere(const asl::Sphere<float> & theSphere,
 }
 
 
-void 
+bool 
 Mesh::notifyProgress(double theProgress, const std::string & theMessage) {
-    _myProgressSignal.emit(theProgress, Glib::ustring(theMessage));
+    return _myProgressSignal.emit(theProgress, Glib::ustring(theMessage));
 }
 
 

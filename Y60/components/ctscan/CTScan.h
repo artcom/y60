@@ -106,7 +106,7 @@ class CTScan {
         void create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize);
 
         /** Progress signal for loading */
-        sigc::signal<void, double, Glib::ustring> signal_progress() const { return _myProgressSignal; }
+        sigc::signal<bool, double, Glib::ustring> signal_progress() const { return _myProgressSignal; }
         
         /** Computes the histogram of a given volume of interest */
         void
@@ -156,26 +156,25 @@ class CTScan {
         void clear();
         int getSliceCount() const { return _myMaxZ - _myMinZ + 1; }
 
-        void notifyProgress(double theProgress, const std::string & theMessage = "");
+        bool notifyProgress(double theProgress, const std::string & theMessage = "");
 
     private:
         CTScan(const CTScan&); // hide copy constructor
-        sigc::signal<void, double, Glib::ustring> _myProgressSignal;
+        sigc::signal<bool, double, Glib::ustring> _myProgressSignal;
         void prepareBox(asl::Box3i & theVoxelBox);
         
         y60::PixelEncoding _myEncoding;
         std::vector<dom::ResizeableRasterPtr> _mySlices;
-        //SegmentationBitmap _myStencils;
         asl::Vector2f _myDefaultWindow;
         asl::Vector3f _myVoxelSize;
         
         template <class VoxelT, class SegmentationPolicy>
-        void
+        bool
         countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
                            SegmentationPolicy & theSegmentizer,
                            unsigned int & theVertexCount, unsigned int & theTriangleCount);
         template <class VoxelT, class SegmentationPolicy> 
-        void
+        bool
         applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
                              bool theCreateNormalsFlag, ScenePtr theScene,
                              SegmentationPolicy & theSegmentizer,

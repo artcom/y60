@@ -584,8 +584,8 @@ JSCTScan::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
             return JS_TRUE;
         case PROP_signal_progress:
             {
-                JSSignal2<void,double,Glib::ustring>::OWNERPTR mySignal( new
-                        JSSignal2<void,double,Glib::ustring>::NATIVE(getNative().signal_progress()));
+                JSSignal2<bool,double,Glib::ustring>::OWNERPTR mySignal( new
+                        JSSignal2<bool,double,Glib::ustring>::NATIVE(getNative().signal_progress()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }

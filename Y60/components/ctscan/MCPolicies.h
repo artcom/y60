@@ -45,7 +45,7 @@ namespace y60 {
                 _myHalfEdgeCount += theCubeCase.faces.size();
             }
             std::string getDescription() const {
-                return std::string("estimating");
+                return std::string("Estimating...");
             }
             unsigned getTriangleCount() const {
                 return _myHalfEdgeCount / 3;
@@ -119,7 +119,7 @@ namespace y60 {
                 _myHalfEdgeFlag = theFlag; 
             }
             std::string getDescription() const {
-                return std::string("polygonizing");
+                return std::string("Polygonizing...");
             }
             // 1: calc vertex normals using gradients, 0: no normals (flat shading)
             void invertNormal(bool theFlag) { _myInvertNormalsFlag = theFlag; }

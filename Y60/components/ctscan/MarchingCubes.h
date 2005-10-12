@@ -123,7 +123,7 @@ namespace y60 {
                 return _myDimensions;
             }
             
-            void march() {
+            bool march() {
                 AC_TRACE << "MarchingCubes::march()";
 #ifdef DISABLE_LOGGING
                 AC_WARNING << "MarchingCubes: Logging disabled at compile time. See MarchingCubes.h";
@@ -151,9 +151,14 @@ namespace y60 {
 
                 fillOffsetTable();
 
+                bool myContinueFlag;
+                float myProgress;
                 for(k = kBoxStart; k < kBoxEnd; k++) {
-                    _myVoxelData->notifyProgress(double(k - kBoxStart) / double(kBoxEnd - kBoxStart),
-                            _myOutputPolicy.getDescription());
+                    myProgress = double(k - kBoxStart) / double(kBoxEnd - kBoxStart);
+                    myContinueFlag = _myVoxelData->notifyProgress(myProgress, _myOutputPolicy.getDescription());
+                    if ( ! myContinueFlag ) {
+                        break;
+                    }
                     // switch cache
                     myUpperCacheIndex = 1 - myUpperCacheIndex;
                     _myCache[myUpperCacheIndex]->reset();
@@ -175,7 +180,11 @@ namespace y60 {
                         }
                     }
                 }
+                if ( myContinueFlag ) {
+                    _myVoxelData->notifyProgress(1.0, "Setting up model...");
+                }
                 _myOutputPolicy.done();
+                return myContinueFlag;
             }
 
         private:

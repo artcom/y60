@@ -437,8 +437,11 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Scene> & theScene)
 }
 
 jsval as_jsval(JSContext *cx, asl::Ptr<y60::Scene> theScene) {
-    JSObject * myReturnObject = JSScene::Construct(cx, theScene, &(*theScene));
-    return OBJECT_TO_JSVAL(myReturnObject);
+    if (theScene) {
+        JSObject * myReturnObject = JSScene::Construct(cx, theScene, &(*theScene));
+        return OBJECT_TO_JSVAL(myReturnObject);
+    }
+    return JSVAL_NULL;
 }
 
 JSBool

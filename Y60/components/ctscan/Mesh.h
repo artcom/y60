@@ -38,7 +38,7 @@ public:
     bool isClosed() const;
     void lockWrite();
     void unlockWrite(bool theForceFlag = false);
-    void computeError();
+    bool computeError();
     unsigned colorizeError(float theMaximumError, unsigned theColor);
     unsigned collapseByError(float theMaxError);
     static bool test(dom::NodePtr theShapeNode);
@@ -47,9 +47,9 @@ public:
     static unsigned colorSweptSphere(const asl::Sphere<float> & theSphere, 
         const asl::Vector3f & theMotion, 
         const dom::NodePtr & theTransformationRoot, unsigned int theColor);
-    void notifyProgress(double theProgress, const std::string & theMessage);
+    bool notifyProgress(double theProgress, const std::string & theMessage);
     /** Progress signal for simplification */
-    sigc::signal<void, double, Glib::ustring> signal_progress() const { return _myProgressSignal; }
+    sigc::signal<bool, double, Glib::ustring> signal_progress() const { return _myProgressSignal; }
     void setSimplifyProceed(bool theSimplifySwitch) { _mySimplifyMode = theSimplifySwitch; }
     bool getSimplifyProceed() const { return _mySimplifyMode; }
 private:
@@ -86,7 +86,7 @@ private:
     ErrorMap                        _myErrorMap;
     float                           _myMaxError;
     // unsigned                        _myErrors;
-    sigc::signal<void, double, Glib::ustring>  _myProgressSignal;
+    sigc::signal<bool, double, Glib::ustring>  _myProgressSignal;
     bool                            _mySimplifyMode;
 };
 
