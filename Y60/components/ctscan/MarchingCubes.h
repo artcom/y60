@@ -154,7 +154,7 @@ namespace y60 {
                 bool myContinueFlag;
                 float myProgress;
                 for(k = kBoxStart; k < kBoxEnd; k++) {
-                    myProgress = double(k - kBoxStart) / double(kBoxEnd - kBoxStart);
+                    myProgress = float(k - kBoxStart) / float(kBoxEnd - kBoxStart);
                     myContinueFlag = _myVoxelData->notifyProgress(myProgress, _myOutputPolicy.getDescription());
                     if ( ! myContinueFlag ) {
                         break;
@@ -523,7 +523,7 @@ namespace y60 {
                 if (_myVBox.contains(myClippedPosition)) {
                     return at(myClippedPosition);
                 } else {
-                    return 0;
+                    return NumericTraits<VoxelT>::min();
                 }
             }
 
