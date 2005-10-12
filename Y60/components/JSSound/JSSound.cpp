@@ -69,6 +69,12 @@ namespace jslib {
         return myFunctions;
     }
 
+    JSConstIntPropertySpec *
+    JSSound::ConstIntProperties() {
+        static JSConstIntPropertySpec myProperties[] = {{0}};
+        return myProperties;
+    }
+
     JSPropertySpec *
     JSSound::Properties() {
         static JSPropertySpec myProperties[] = {
@@ -126,7 +132,10 @@ namespace jslib {
 
     JSBool
     JSSound::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Don't call this.");
+        DOC_BEGIN("Creates a Sound from URI. Does not start playback.");
+        DOC_PARAM("URI", DOC_TYPE_STRING);
+        DOC_PARAM_OPT("Loopflag", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("UseCacheFlag", DOC_TYPE_BOOLEAN, true);
         DOC_END;
         try {
             if (JSA_GetClass(cx,obj) != Class()) {
@@ -147,26 +156,18 @@ namespace jslib {
                 }
             }
 
-            float myVolume = 1.0;
-            if (argc > 1) {
-                if (!convertFrom(cx, argv[1], myVolume)) {
-                    JS_ReportError(cx, "JSSound::Constructor(): argument #2 must be a double (Volume)");
-                    return JS_FALSE;
-                }
-            }
-
-            double mySeekTime = 0.0;
-            if (argc > 2) {
-                if (!convertFrom(cx, argv[2], mySeekTime)) {
-                    JS_ReportError(cx, "JSSound::Constructor(): argument #3 must be a double (Seek Time)");
-                    return JS_FALSE;
-                }
-            }
-
             bool myLoopFlag = false;
-            if (argc > 3) {
-                if (!convertFrom(cx, argv[3], myLoopFlag)) {
-                    JS_ReportError(cx, "JSSound::Constructor(): argument #4 must be a boolean (Loop Flag)");
+            if (argc > 1) {
+                if (!convertFrom(cx, argv[1], myLoopFlag)) {
+                    JS_ReportError(cx, "JSSound::Constructor(): argument #2 must be a boolean (Loop Flag)");
+                    return JS_FALSE;
+                }
+            }
+
+            bool myCacheFlag = true;
+            if (argc > 2) {
+                if (!convertFrom(cx, argv[2], myCacheFlag)) {
+                    JS_ReportError(cx, "JSSound::Constructor(): argument #3 must be a boolean (Cache Flag)");
                     return JS_FALSE;
                 }
             }
@@ -174,12 +175,11 @@ namespace jslib {
             OWNERPTR myNewNative;
             if (argc == 0) {
                 // Construct empty Sound that will be filled by copy Construct()
+                //AC_PRINT << "JSSound::Constructor: empty";
                 myNewNative = OWNERPTR(0);
             } else {
-                cerr << "foo" << endl;
-//                HWSampleSinkPtr mySampleSink = Pump::get().createSampleSink(myURI);
-//                myNewNative = OWNERPTR(new y60::Sound(myURI, 0, myLoopFlag));
-//                myNewNative->setSelf(myNewNative);
+                //AC_PRINT << "JSSound::Constructor: " << myURI;
+                myNewNative = y60::SoundManager::get().createSound(myURI, myLoopFlag, myCacheFlag);
             }
 
             JSSound * myNewObject = new JSSound(myNewNative, &(*myNewNative));
@@ -193,23 +193,19 @@ namespace jslib {
         } HANDLE_CPP_EXCEPTION;
     }
 
-    JSConstIntPropertySpec *
-    JSSound::ConstIntProperties() {
-        static JSConstIntPropertySpec myProperties[] = {{0}};
-        return myProperties;
-    }
-
     JSObject *
     JSSound::initClass(JSContext *cx, JSObject *theGlobalObject) {
         return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
     }
 
     jsval as_jsval(JSContext *cx, JSSound::OWNERPTR theOwner) {
+        //AC_PRINT << "JSSound::as_jsval";
         JSObject * myReturnObject = JSSound::Construct(cx, theOwner, &(*theOwner));
         return OBJECT_TO_JSVAL(myReturnObject);
     }
 
     jsval as_jsval(JSContext *cx, JSSound::OWNERPTR theOwner, JSSound::NATIVE * theNative) {
+        //AC_PRINT << "JSSound::as_jsval with Native";
         JSObject * myObject = JSSound::Construct(cx, theOwner, theNative);
         return OBJECT_TO_JSVAL(myObject);
     }

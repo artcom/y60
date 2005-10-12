@@ -12,6 +12,7 @@
 
 use("UnitTest.js");
 plug("y60JSSound");
+plug("ProcFunctions");
 
 function SoundUnitTest() {
     this.Constructor(this, "SoundUnitTest");
@@ -20,25 +21,23 @@ function SoundUnitTest() {
 SoundUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
-
     obj.runNewAudioLibTest = function() {
-        obj.myMedia = new SoundManager();
         
-        obj.myMedia.volume == 1.0;
+        obj.mySoundManager.volume == 1.0;
         msleep(250);
-        ENSURE("obj.myMedia.running == true");
-        ENSURE("obj.myMedia.soundcount == 0");
-        ENSURE("obj.myMedia.volume == 1.0");
-        obj.myMedia.volume = 0.5;        
+        ENSURE("obj.mySoundManager.running == true");
+        ENSURE("obj.mySoundManager.soundcount == 0");
+        ENSURE("obj.mySoundManager.volume == 1.0");
+        obj.mySoundManager.volume = 0.5;        
         msleep(250);
-        ENSURE("obj.myMedia.volume == 0.5");
-        obj.myMedia.fadeToVolume(1.0, 0.1);        
+        ENSURE("obj.mySoundManager.volume == 0.5");
+        obj.mySoundManager.fadeToVolume(1.0, 0.1);        
         msleep(150);
-        ENSURE("obj.myMedia.volume == 1.0");
+        ENSURE("obj.mySoundManager.volume == 1.0");
 
-        obj.mySound = obj.myMedia.createSound("../../../../sound/testfiles/aussentuer.mp3");
+        obj.mySound = obj.mySoundManager.createSound("../../../../sound/testfiles/aussentuer.mp3");
 
-        ENSURE("obj.myMedia.soundcount == 1");
+        ENSURE("obj.mySoundManager.soundcount == 1");
         ENSURE("obj.mySound.time == 0");
         obj.mySound.volume = 1.0;
         msleep(2500);
@@ -83,22 +82,67 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         delete obj.mySound;
         gc();
         msleep(100);
-        ENSURE("obj.myMedia.soundcount == 0");
-        DPRINT("obj.myMedia.soundcount");
+        ENSURE("obj.mySoundManager.soundcount == 0");
+        DPRINT("obj.mySoundManager.soundcount");
 
-        obj.mySound = obj.myMedia.createSound("../../../../sound/testfiles/aussentuer.mp3");
+        obj.mySound = obj.mySoundManager.createSound("../../../../sound/testfiles/aussentuer.mp3");
         obj.mySound.play();
-        ENSURE("obj.myMedia.soundcount == 1");
-        obj.myMedia.stopAll();
+        ENSURE("obj.mySoundManager.soundcount == 1");
+        obj.mySoundManager.stopAll();
         delete obj.mySound;
         gc();
         msleep(100);
-        ENSURE("obj.myMedia.soundcount == 0");
-        DPRINT("obj.myMedia.soundcount");
+        ENSURE("obj.mySoundManager.soundcount == 0");
+        DPRINT("obj.mySoundManager.soundcount");
+    }
+
+    obj.runLeakTest = function() {
+
+        print("### INITIAL USAGE:" + getProcessMemoryUsage());
+
+        obj.mySoundManager.volume == 1.0;
+
+        const mySoundFile = "../../../../sound/testfiles/Plopp_2a.wav"
+        var mySound = null;
+
+        for (var i = 0; i < 20; ++i) {
+            mySound = obj.mySoundManager.createSound(mySoundFile, false, false);
+            //mySound = new Sound(mySoundFile, false, false);
+            mySound.play();
+            //while (mySound.playing) {
+                //msleep(100);
+            //}
+            mySound = null;
+
+            var myUsage = getProcessMemoryUsage();
+            if (i == 0) {
+                obj.myStartUsage = myUsage;
+                print("### START USAGE:" + obj.myStartUsage);
+            }
+            obj.myDiff = myUsage - obj.myStartUsage;
+            print("### TEST " + i + " USAGE:" + myUsage + " DIFF:" + obj.myDiff + " SOUNDCOUNT:" + obj.mySoundManager.soundcount);
+        }
+        mySound = null;
+
+        var myFiniUsage = getProcessMemoryUsage();
+        obj.myDiff = myFiniUsage - obj.myStartUsage;
+        print("### FINI USAGE:" + myFiniUsage + " DIFF:" + obj.myDiff + " SOUNDCOUNT:" + obj.mySoundManager.soundcount);
+
+        msleep(1000);
+        gc();
+        msleep(1000);
+        ENSURE("obj.mySoundManager.soundcount == 0");
+
+        var myGCUsage = getProcessMemoryUsage();
+        obj.myDiff = myGCUsage - obj.myStartUsage;
+        print("### GC USAGE: " + myGCUsage + " DIFF:" + obj.myDiff);
+        ENSURE("obj.myDiff < (obj.myStartUsage * 0.2)");
     }
 
     obj.run = function() {
+        obj.mySoundManager = new SoundManager();
         this.runNewAudioLibTest();
+        //this.runLeakTest();
     }
 }
 
@@ -118,5 +162,3 @@ var rc = main();
 if (rc != 0) {
     exit(5);
 };
-
-

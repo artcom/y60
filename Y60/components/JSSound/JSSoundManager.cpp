@@ -35,8 +35,6 @@ namespace jslib {
     createSound(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Creates a Sound from URI. Does not start playback.");
         DOC_PARAM("URI", DOC_TYPE_STRING);
-//        DOC_PARAM_OPT("Volume", DOC_TYPE_FLOAT, 1.0);
-//        DOC_PARAM_OPT("Seektime", DOC_TYPE_FLOAT, 0.0);
         DOC_PARAM_OPT("Loopflag", DOC_TYPE_BOOLEAN, false);
         DOC_PARAM_OPT("UseCacheFlag", DOC_TYPE_BOOLEAN, false);
         DOC_END;
@@ -67,7 +65,7 @@ namespace jslib {
             // name                  native            nargs
             {"stopAll",              stopAll,           0},
             {"fadeToVolume",         fadeToVolume,      2},
-            {"createSound" ,         createSound,       4},
+            {"createSound" ,         createSound,       3},
             {0}
         };
         return myFunctions;
@@ -118,16 +116,16 @@ namespace jslib {
 
     JSBool
     JSSoundManager::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Create a Sound from URI.");
+        DOC_BEGIN("Create a SoundManager.");
         DOC_PARAM_OPT("Samplerate", DOC_TYPE_INTEGER, 44100);
         DOC_PARAM_OPT("OutputChannels", DOC_TYPE_INTEGER, 2);    
         DOC_PARAM_OPT("Latency", DOC_TYPE_FLOAT, 0.2);    
         DOC_END;
         try {
-            checkForUndefinedArguments("JSAudio2::init()", argc, argv);
+            checkForUndefinedArguments("JSSoundManager::Constructor()", argc, argv);
 
             if (argc > 3) {
-                throw BadArgumentException(string("JSAudio2::init(): Wrong number of arguments. Got ") +
+                throw BadArgumentException(string("JSSoundManager::Constructor(): Wrong number of arguments. Got ") +
                     as_string(argc) + ", expected between none and two.", PLUS_FILE_LINE);
             }
 

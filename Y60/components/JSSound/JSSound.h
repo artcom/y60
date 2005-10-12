@@ -50,6 +50,7 @@ namespace jslib {
                 PROP_src
             };
 
+            static jslib::JSConstIntPropertySpec * ConstIntProperties();
             static JSPropertySpec * Properties();
     
             virtual unsigned long length() const {
@@ -67,7 +68,6 @@ namespace jslib {
                 return Base::Construct(cx, theOwner, theNative);
             }        
     
-            static jslib::JSConstIntPropertySpec * ConstIntProperties();
             static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
     
             static JSSound & getObject(JSContext *cx, JSObject * obj) {
@@ -104,4 +104,3 @@ namespace y60 {
 }
 
 #endif
-

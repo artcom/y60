@@ -53,6 +53,57 @@ class SoundTestBase: public UnitTest {
         SoundManager& _mySoundManager;
 };
 
+class TestLeak : public SoundTestBase {
+    public:
+        TestLeak(SoundManager & theSoundManager)
+            : SoundTestBase(theSoundManager, "TestLeak")
+        {
+        }
+
+        void run() {
+
+            AC_PRINT << "### INITIAL USAGE:" << getProcessMemoryUsage();
+            unsigned myStartUsage = 0;
+
+            const char * mySoundFile = "../../testfiles/Plopp_2a.wav";
+            unsigned myDiff;
+
+            std::vector<SoundPtr> mySounds;
+            for (unsigned i = 0; i < 20; ++i) {
+                SoundPtr mySound = getSoundManager().createSound(mySoundFile, false, false);
+                mySounds.push_back(mySound);
+                mySound->play();
+#if 0
+                while (mySound->isPlaying()) {
+                    asl::msleep(100);
+                }
+#endif
+
+                unsigned myUsage = getProcessMemoryUsage();
+                if (i == 0) {
+                    myStartUsage = myUsage;
+                    AC_PRINT << "### START USAGE: " << myStartUsage;
+                }
+                myDiff = myUsage - myStartUsage;
+                AC_PRINT << "### TEST " << i << " USAGE:" << myUsage << " DIFF:" << myDiff << " SOUNDCOUNT:" << getSoundManager().getNumSounds();
+            }
+
+            asl::msleep(1000);
+
+            unsigned myFiniUsage = getProcessMemoryUsage();
+            myDiff = myFiniUsage - myStartUsage;
+            AC_PRINT << "### FINI USAGE:" << myFiniUsage << " DIFF:" << myDiff << " SOUNDCOUNT:" << getSoundManager().getNumSounds();
+            ENSURE(getSoundManager().getNumSounds() == 0);
+
+            mySounds.clear();
+            asl::msleep(1000);
+
+            unsigned myGCUsage = getProcessMemoryUsage();
+            myDiff = myGCUsage - myStartUsage;
+            AC_PRINT << "### GC USAGE: " << myGCUsage << " DIFF:" << myDiff;
+        }
+};
+
 class TestPlay : public SoundTestBase {
     public:
         TestPlay(SoundManager& mySoundManager) 
@@ -498,6 +549,8 @@ class SoundTestSuite : public UnitTestSuite {
             mySoundManager.setSysConfig(0.02, "");
 #endif
             mySoundManager.setAppConfig(44100, 2, _myUseDummyPump);
+
+            //addTest(new TestLeak(mySoundManager));
 
             addTest(new TestPlay(mySoundManager));
             addTest(new TestStop(mySoundManager));
