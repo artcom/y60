@@ -134,7 +134,7 @@ namespace asl {
         fclose(fp);
 
         unsigned myMemInfo = 0;
-        myMemInfo = myMemPhysical + myMemData + myMemStack + myMemExe;
+        myMemInfo = myMemData + myMemStack + myMemExe;
         return myMemInfo;
     }
 #endif
