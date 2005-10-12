@@ -93,9 +93,30 @@ SetTransientFor(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval 
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
         Gtk::Window * myParent(0);
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myParent);
+        convertFrom(cx, argv[0], myParent);
 
         myNative->set_transient_for( * myParent);
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION
+}
+
+static JSBool
+SetDefaultSize(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        Gtk::Window * myNative(0);
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        int myWidth;
+        convertFrom(cx, argv[0], myWidth);
+
+        int myHeight;
+        convertFrom(cx, argv[1], myHeight);
+
+        myNative->set_default_size( myWidth, myHeight);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION
@@ -111,6 +132,7 @@ JSWindow::Functions() {
         {"raise",                Raise,                   0},
         {"present",              Present,                 0},
         {"set_transient_for",    SetTransientFor,         1},
+        {"set_default_size",     SetDefaultSize,          2},
         {0}
     };
     return myFunctions;
