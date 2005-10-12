@@ -24,10 +24,9 @@
 #include "error_functions.h"
 #include "string_functions.h"
 
-using namespace asl;
-using namespace std;
+namespace asl {
 
-const char * asl::SeverityName[] = {"PRINT","FATAL", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE", "DISABLED", 0};
+const char * SeverityName[] = {"PRINT","FATAL", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE", "DISABLED", 0};
 
 /// Environment variable name for per-module verbosities
 const char * LOG_MODULE_VERBOSITY_ENV = "AC_LOG_MODULE_VERBOSITY";
@@ -43,7 +42,7 @@ const char * LOG_FILE_NAME_ENV   = "AC_LOG_FILE_NAME";
 const char * LOG_FILE_FORMAT_ENV = "AC_LOG_FILE_FORMAT";
 const char * LOG_FILE_FILTER_ENV = "AC_LOG_FILE_FILTER";
 
-Ptr<LogMessageFormatter> createFormatter(const string theFormatterName, vector<string> & theTriedNames) {
+Ptr<LogMessageFormatter> createFormatter(const std::string theFormatterName, std::vector<std::string> & theTriedNames) {
     if (theFormatterName == FullLogMessageFormatter::name()) {
         return Ptr<LogMessageFormatter>(new FullLogMessageFormatter);
     }
@@ -65,39 +64,46 @@ Ptr<LogMessageFormatter> createFormatter(const string theFormatterName, vector<s
 Ptr<LogMessageFormatter>
 createFormatter(const char * theFormatterNameVar, const char * theDefaultFormatterName, const char * theSinkName) {
     const char * myEnv = getenv(theFormatterNameVar);
-    vector<string> myTriedNames;
+    std::vector<std::string> myTriedNames;
     Ptr<LogMessageFormatter> myFormatter(0);
     if (myEnv) {
         myFormatter = createFormatter(myEnv, myTriedNames);
     }
     if (!myFormatter) {
         if (myEnv) {
-            cerr << "### WARNING: createFormatter: could not find formatter '"<< myEnv <<"' (defined in environment variable "
+            std::cerr << "### WARNING: createFormatter: could not find formatter '"<< myEnv <<"' (defined in environment variable "
                  << theFormatterNameVar << ") for sink "
                  <<theSinkName<<"', using formatter '"<<theDefaultFormatterName<<"'"
                  << ", valid formatters are: ";
             for (int i=0; i < myTriedNames.size(); ++i) {
-                cerr << "'"<<myTriedNames[i]<<"' ";
+                std::cerr << "'"<<myTriedNames[i]<<"' ";
             }
-            cerr <<endl;
+            std::cerr << std::endl;
         }
         myFormatter = createFormatter(theDefaultFormatterName, myTriedNames);
     }
     return myFormatter;
 }
 
-asl::Severity
-getSeverity(const char * theSeverityVarName, asl::Severity theDefaultValue) {
+static Severity getSeverityFromString(const std::string & theSeverityString,
+                                      Severity theDefaultValue)
+{
+    try {            
+        Severity mySeverity = (Severity) getEnumFromString(theSeverityString, SeverityName);
+        return mySeverity;
+    }
+    catch (ParseException &) {
+        std::cerr << "### WARNING: getSeverityFromString: Unknown severity '"<< theSeverityString <<"' using default value " << SeverityName[theDefaultValue]<< std::endl;
+    }
+    return theDefaultValue;
+}
+
+static Severity getSeverityFromEnv(const char * theSeverityVarName,
+                                   Severity theDefaultValue)
+{
     const char * myEnv = getenv(theSeverityVarName);
     if (myEnv) {
-        try {            
-            asl::Severity mySeverity = (asl::Severity) asl::getEnumFromString(std::string(myEnv), asl::SeverityName);
-            return mySeverity;
-        }
-        catch (asl::ParseException &) {
-            cerr << "### WARNING: getSeverity: could not find formatter '"<< myEnv <<"' (defined in environment variable "
-                 << theSeverityVarName <<", using default value " << asl::SeverityName[theDefaultValue]<< endl;
-        }
+        return getSeverityFromString(myEnv, theDefaultValue);
     }
     return theDefaultValue;
 }
@@ -107,20 +113,20 @@ Logger::Logger() :
     _myGlobalVerbosity(SEV_WARNING)
 {
     Ptr<LogMessageFormatter> myConsoleFormatter = createFormatter(LOG_CONSOLE_FORMAT_ENV, TerseLogMessageFormatter::name(), "console");
-    asl::Severity myConsoleSeverity = getSeverity(LOG_CONSOLE_FILTER_ENV, SEV_WARNING);
+    Severity myConsoleSeverity = getSeverityFromEnv(LOG_CONSOLE_FILTER_ENV, SEV_WARNING);
     if (myConsoleSeverity != SEV_DISABLED) {  
         addMessageSink(Ptr<MessageSink>(new StreamPrinter(std::cerr)), myConsoleFormatter, myConsoleSeverity);
     }
 
 #ifdef WIN32
     Ptr<LogMessageFormatter> myVisualStudioFormatter = createFormatter(LOG_VISUAL_STUDIO_FORMAT_ENV, VisualStudioLogMessageFormatter::name(), "console");
-    asl::Severity myVisualStudioSeverity = getSeverity(LOG_VISUAL_STUDIO_FILTER_ENV, SEV_DISABLED);
+    Severity myVisualStudioSeverity = getSeverityFromEnv(LOG_VISUAL_STUDIO_FILTER_ENV, SEV_DISABLED);
     if (myVisualStudioSeverity != SEV_DISABLED) {  
         addMessageSink(Ptr<MessageSink>(new OutputWindowPrinter), myVisualStudioFormatter, myVisualStudioSeverity);
     }
 #endif
     Ptr<LogMessageFormatter> myFileFormatter = createFormatter(LOG_FILE_FORMAT_ENV, FullLogMessageFormatter::name(), "console");
-    asl::Severity myFileSeverity = getSeverity(LOG_FILE_FILTER_ENV, SEV_DISABLED);
+    Severity myFileSeverity = getSeverityFromEnv(LOG_FILE_FILTER_ENV, SEV_DISABLED);
     if (myFileSeverity != SEV_DISABLED) { 
         char * myLogFileName = getenv(LOG_FILE_NAME_ENV);
         if (!myLogFileName) {
@@ -130,22 +136,19 @@ Logger::Logger() :
         if (_myLogFile) {
             addMessageSink(Ptr<MessageSink>(new StreamPrinter(_myLogFile)), myFileFormatter, myFileSeverity);
         } else {
-            cerr << "### WARNING: Logger: could not open formatter '"<< myLogFileName <<"' (may be defined in environment variable "
-                 << LOG_FILE_NAME_ENV <<")"<< endl;
+            std::cerr << "### WARNING: Logger: could not open formatter '"<< myLogFileName <<"' (may be defined in environment variable "
+                 << LOG_FILE_NAME_ENV <<")"<< std::endl;
         }
     }
 
 
-    const char * myEnv = getenv(LOG_GLOBAL_VERBOSITY_ENV);
-    if (myEnv) {
-        setVerbosity((asl::Severity) asl::getEnumFromString(std::string(myEnv), asl::SeverityName));
-    }
+    setVerbosity(getSeverityFromEnv(LOG_GLOBAL_VERBOSITY_ENV, SEV_WARNING));
 
-    myEnv = getenv(LOG_MODULE_VERBOSITY_ENV);
-    if (myEnv) {
+    const char * myEnv = getenv(LOG_MODULE_VERBOSITY_ENV);
+    if (myEnv && strlen(myEnv) > 0) {
         std::string myLogLevelString(myEnv);
         std::string::size_type myColon;
-        while ((myColon = myLogLevelString.find(":")) != std::string::npos) {
+        while ((myColon = myLogLevelString.find_first_of(":;")) != std::string::npos) {
             setModuleVerbosity(myLogLevelString.substr(0, myColon));
             myLogLevelString = myLogLevelString.substr(myColon+1);
         }
@@ -196,7 +199,7 @@ Logger::IfLog(Severity theSeverity, const char * theModule, int theId) {
 }
 
 void
-Logger::log(asl::Time theTime, Severity theSeverity, const char * theModule, int theId, const std::string & theText) {
+Logger::log(Time theTime, Severity theSeverity, const char * theModule, int theId, const std::string & theText) {
     std::string myMessage;
     LAST_ERROR_TYPE myError = lastError(); // do not affect error state by
     if (theSeverity > SEV_PRINT) {
@@ -259,6 +262,7 @@ Logger::setModuleVerbosity(Severity theVerbosity,
 
 void
 Logger::setModuleVerbosity(const std::string & theVerbosityString) {
+
     std::string myVerbosityString = theVerbosityString;
     std::vector<std::string> mySubStrings;
 
@@ -279,14 +283,14 @@ Logger::setModuleVerbosity(const std::string & theVerbosityString) {
         return;
     }
 
-    Severity mySeverity = Severity(getEnumFromString(mySubStrings[0], asl::SeverityName));
+    Severity mySeverity = getSeverityFromString(mySubStrings[0], SEV_DEBUG);
     std::string myModule = mySubStrings[1];
     int myMinId = 0, myMaxId = std::numeric_limits<int>::max();
     if (mySubStrings.size() > 2 && mySubStrings[2].size()) {
-        myMinId = asl::as_int(mySubStrings[2]);
+        myMinId = as_int(mySubStrings[2]);
     }
     if (mySubStrings.size() > 3 && mySubStrings[3].size()) {
-        myMaxId = asl::as_int(mySubStrings[3]);
+        myMaxId = as_int(mySubStrings[3]);
     }
     setModuleVerbosity(mySeverity, myModule, myMinId, myMaxId);
 }
@@ -314,3 +318,5 @@ Logger::setMessageFormatter(Ptr<MessageSink> theSink, Ptr<LogMessageFormatter> t
     }
     throw UnknownSinkExeption(JUST_FILE_LINE);
 }
+
+} // namespace
