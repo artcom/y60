@@ -55,6 +55,7 @@ namespace inet {
             void setSSLCertificate(const std::string & theCertificateFilename);
             void setCookie(const std::string & theCookie);
             void setResume(long theResumeOffset);
+            void setProxy(const std::string & theProxyServer, bool theTunnelFlag = false);
 
             // request-method type methods
             size_t post(const std::string & thePostData);

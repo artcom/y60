@@ -108,6 +108,13 @@ namespace inet {
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
+    void 
+    Request::setProxy(const std::string & theProxyServer, bool theTunnelFlag) {
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PROXY, theProxyServer);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_HTTPPROXYTUNNEL, theTunnelFlag);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    }
 
     long
     Request::getResponseCode() const {
