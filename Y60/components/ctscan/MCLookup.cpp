@@ -10,7 +10,20 @@ using namespace asl;
 
 struct Pattern {
     Unsigned8 cubeCase;
-    const int faces[15];
+    int face(int i) {
+        switch (i % 3) {
+            case 0:
+                return _myFaces[i+2];
+            case 1:
+                return _myFaces[i];
+            case 2:
+                return _myFaces[i-2];
+            default:
+                throw Exception("modulo is broken",PLUS_FILE_LINE);
+        }
+    }
+    const int _myFaces[15];
+    
 };
 Pattern ourPatterns[] = {
 // these are the base 15 pattern from Lorensen and Cline, (Sharman,1998)
@@ -86,10 +99,10 @@ MCLookup::addPattern(int thePatternIndex, map<int,int> & theMatchedMap) {
     vector<int> myFaces;
 
     for (int i = 0; i < 15; ++i) {
-        if (ourPatterns[thePatternIndex].faces[i] == -1) {
+        if (ourPatterns[thePatternIndex].face(i) == -1) {
             break;
         }
-        myFaces.push_back(ourPatterns[thePatternIndex].faces[i] );
+        myFaces.push_back(ourPatterns[thePatternIndex].face(i) );
     }
 
     for (int i = 0; i < 4; ++i) {

@@ -102,12 +102,12 @@ namespace y60 {
                 if (_myInvertNormalsFlag) {
                     myVertexNormal = -myVertexNormal;
                 }
-                asl::Vector3f myVertex(myVertexPosition[0], - myVertexPosition[1], myVertexPosition[2]);
+                asl::Vector3f myVertex(myVertexPosition[0], myVertexPosition[1], myVertexPosition[2]);
                 DB(AC_TRACE << "added vertex position " << myVertex);
                 _myVertices->push_back(myVertex);
                 if (_myVertexNormalFlag) {
                     DB(AC_TRACE << "added vertex normal " << myVertexNormal);
-                    _myNormals->push_back(normalized(asl::Vector3f(myVertexNormal[0], - myVertexNormal[1], myVertexNormal[2])));
+                    _myNormals->push_back(normalized(asl::Vector3f(myVertexNormal[0], myVertexNormal[1], myVertexNormal[2])));
                 }
                 DB(AC_TRACE << "new size " << _myVertices->size());
                 return _myVertices->size()-1;
