@@ -119,6 +119,7 @@ class TestPlay : public SoundTestBase {
             play("../../testfiles/sz5-1_c-beam Warnung_Time_1.WAV");
             play("../../testfiles/stereotest441.wav");
             play("../../testfiles/stereotest480.wav");
+            play("../../testfiles/Plopp_2a.wav");
             msleep(100);
             ENSURE(getSoundManager().getNumSounds() == 0);
         }

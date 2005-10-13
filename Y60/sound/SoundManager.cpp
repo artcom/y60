@@ -142,7 +142,7 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
         checkCacheSize();
         myCacheItem = getCacheItem(theURI);
         if (myCacheItem == SoundCacheItemPtr(0)) {
-            AC_DEBUG << "    --> Sound not cached.";
+            AC_DEBUG << "    --> Sound not cached yet.";
             // This sound hasn't been played before.
             myCacheItem = SoundCacheItemPtr(new SoundCacheItem(theURI));
             addCacheItem(myCacheItem);

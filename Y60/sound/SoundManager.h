@@ -45,8 +45,6 @@ namespace y60 {
         virtual SoundPtr createSound(const std::string & theURI, bool theLoop);
         virtual SoundPtr createSound(const std::string & theURI, bool theLoop,
                 bool theUseCache);
-        //virtual SoundPtr createSound(const std::string & theURI, 
-        //        asl::Ptr < asl::ReadableStream > theStream, bool theLoop = false);
         virtual void setVolume(float theVolume);
         virtual void fadeToVolume(float theVolume, float theTime);
         virtual float getVolume() const; 
