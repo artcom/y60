@@ -260,6 +260,42 @@ class TestStop: public SoundTestBase {
         }
 };
 
+class TestCache: public SoundTestBase {
+    public:
+        TestCache(SoundManager& mySoundManager) 
+            : SoundTestBase(mySoundManager, "TestCache")
+        {  
+        }
+
+        void run() {
+            getSoundManager().setCacheSize(0,24*1024*1024);
+            ENSURE(getSoundManager().getCacheMemUsed() == 0);
+            ENSURE(getSoundManager().getMaxCacheSize() == 0);
+            {
+                play("../../testfiles/aussentuer.mp3");
+                play("../../testfiles/stereotest441.wav");
+            }
+            // We'll have one cached item anyway because the check for cache size
+            // limits is done when a new sound is played, not before.
+            ENSURE(getSoundManager().getNumItemsInCache() == 1);
+            getSoundManager().deleteCacheItem("../../testfiles/stereotest441.wav");
+            ENSURE(getSoundManager().getNumItemsInCache() == 0);
+            getSoundManager().setCacheSize(0,0);
+            play("../../testfiles/aussentuer.mp3");
+            ENSURE(getSoundManager().getNumItemsInCache() == 0);
+            getSoundManager().setCacheSize(128*1024*1024, 24*1024*1024);
+        }
+        
+    private:
+        void play(const std::string & theURI) {
+            SoundPtr mySound = getSoundManager().createSound(theURI);
+            mySound->play();
+            while(mySound->isPlaying()) {
+                msleep(100);
+            }
+        }
+};
+
 class TestStopByItself: public SoundTestBase {
     public:
         TestStopByItself(SoundManager& mySoundManager) 
@@ -555,7 +591,8 @@ class SoundTestSuite : public UnitTestSuite {
 
             addTest(new TestPlay(mySoundManager));
             addTest(new TestStop(mySoundManager));
-            
+            addTest(new TestCache(mySoundManager));
+
             addTest(new TestBroken(mySoundManager));
             addTest(new TestFireAndForget(mySoundManager));
             addTest(new TestTwoSounds(mySoundManager));

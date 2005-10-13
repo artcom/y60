@@ -33,6 +33,9 @@ namespace y60 {
         virtual void setSysConfig(const asl::Time& myLatency, const std::string& myDeviceName = "");
         virtual void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels = 2, 
                 bool useDummy = false);
+        virtual void setCacheSize(unsigned myTotalSize, unsigned myItemSize);
+        virtual unsigned getMaxCacheSize() const;
+        virtual unsigned getMaxCacheItemSize() const;
 
         // Virtual so they can be called from outside the plugin.
         virtual void registerDecoderFactory(IAudioDecoderFactory* theFactory);
@@ -66,6 +69,7 @@ namespace y60 {
 
         void addCacheItem(SoundCacheItemPtr theItem);
         SoundCacheItemPtr getCacheItem(const std::string & theURI) const;
+        void checkCacheSize();
         
         asl::ThreadLock _myLock;
         std::vector < SoundWeakPtr > _mySounds;
@@ -74,8 +78,10 @@ namespace y60 {
         std::vector < IAudioDecoderFactory* > _myDecoderFactories; 
         IAudioDecoderFactory* _myFFMpegDecoderFactory;
 
-        // Cached sounds indexed by uri.
-        typedef map<std::string, SoundCacheItemPtr> CacheMap;
+        // Cache stuff.
+        unsigned _myMaxCacheSize; // In bytes.
+        unsigned _myMaxCacheItemSize;
+        typedef map<std::string, SoundCacheItemPtr> CacheMap; // Cached sounds indexed by uri.
         CacheMap _myCache;
     };
 }

@@ -28,10 +28,12 @@ CacheReader::CacheReader (SoundCacheItemPtr myCacheItem)
     AC_DEBUG << "CacheReader::CacheReader";
     // We assume that the cache item is ready for playback.
     ASSURE(_myCacheItem->isFull());
+    _myCacheItem->incInUseCount();
 }
 
 CacheReader::~CacheReader() {
     AC_DEBUG << "CacheReader::~CacheReader (" << _myURI << ")";
+    _myCacheItem->decInUseCount();
 }
 
 bool CacheReader::isSyncDecoder() const {

@@ -239,7 +239,10 @@ void Sound::queueSamples(AudioBufferPtr& theBuffer) {
     if (_myCacheItem && !_myCacheItem->isFull()) {
         theBuffer->setStartFrame(_myCurFrame);
         _myCurFrame += theBuffer->getNumFrames();
-        _myCacheItem->addBuffer(theBuffer);
+        bool myCacheItemIsFull = !_myCacheItem->addBuffer(theBuffer);
+        if (myCacheItemIsFull) {
+            _myCacheItem = SoundCacheItemPtr(0);
+        }
     }
     _mySampleSink->queueSamples(theBuffer);
 }

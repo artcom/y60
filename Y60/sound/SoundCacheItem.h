@@ -13,6 +13,7 @@
 
 #include <asl/Ptr.h>
 #include <asl/AudioBufferBase.h>
+#include <asl/Time.h>
 
 #include <string>
 #include <map>
@@ -25,7 +26,7 @@ class SoundCacheItem
         SoundCacheItem(const std::string& myURI);
         virtual ~SoundCacheItem();
         std::string getURI() const;
-        void addBuffer(asl::AudioBufferPtr theBuffer);
+        bool addBuffer(asl::AudioBufferPtr theBuffer);
         unsigned getMemUsed() const;
         bool isFull() const;
         void doneCaching(int theTotalFrames = -1);
@@ -34,6 +35,10 @@ class SoundCacheItem
         int getNumFrames() const;
         unsigned getSampleRate() const;
         unsigned getNumChannels() const;
+        asl::Time getLastUsedTime() const;
+        void incInUseCount();
+        void decInUseCount();
+        bool isInUse() const;
 
     private:
         std::string _myURI;
@@ -42,6 +47,9 @@ class SoundCacheItem
         int _myTotalFrames;
         typedef std::map<int, asl::AudioBufferPtr> BufferMap;
         BufferMap _myBuffers;
+
+        asl::Time _myLastUseTime;
+        int _myInUseCount;
         
 };
 

@@ -21,7 +21,8 @@ namespace y60 {
 SoundCacheItem::SoundCacheItem (const string& myURI)
     : _myURI (myURI),
       _myFramesDecoded(0),
-      _myTotalFrames(-1)
+      _myTotalFrames(-1),
+      _myInUseCount(0)
 {
     AC_DEBUG << "SoundCacheItem::SoundCacheItem";
 }
@@ -34,7 +35,7 @@ std::string SoundCacheItem::getURI() const {
     return _myURI;
 }
 
-void SoundCacheItem::addBuffer(AudioBufferPtr theBuffer) {
+bool SoundCacheItem::addBuffer(AudioBufferPtr theBuffer) {
     AC_TRACE << "SoundCacheItem::addBuffer (frame " << theBuffer->getStartFrame() << ")";
     if (!_myBuffers.empty()) {
         BufferMap::iterator it = _myBuffers.end();
@@ -48,6 +49,17 @@ void SoundCacheItem::addBuffer(AudioBufferPtr theBuffer) {
     // Actually append the buffer.
     _myBuffers[theBuffer->getStartFrame()] = theBuffer;
     _myFramesDecoded += theBuffer->getNumFrames();
+
+    if (getMemUsed() > SoundManager::get().getMaxCacheItemSize()) {
+        AC_WARNING << "SoundCacheItem::addBuffer: Max. memory usage per cache item exceeded.";
+        AC_WARNING << "    Sound: " << _myURI << ", Max. mem: " 
+                << SoundManager::get().getMaxCacheItemSize();
+        AC_WARNING << "    Disabling cache for this item.";
+        SoundManager::get().deleteCacheItem(_myURI);
+        return false;
+    } else {
+        return true;
+    }
 }
 
 unsigned SoundCacheItem::getMemUsed() const {
@@ -106,6 +118,26 @@ unsigned SoundCacheItem::getSampleRate() const {
 
 unsigned SoundCacheItem::getNumChannels() const {
     return _myBuffers.find(0)->second->getNumChannels();
+}
+
+asl::Time SoundCacheItem::getLastUsedTime() const {
+    return _myLastUseTime;
+}
+
+void SoundCacheItem::incInUseCount() {
+    _myInUseCount++;
+}
+
+void SoundCacheItem::decInUseCount() {
+    _myInUseCount--;
+    if (_myInUseCount == 0) {
+        _myLastUseTime = Time();
+    }
+    ASSURE(_myInUseCount >= 0);
+}
+
+bool SoundCacheItem::isInUse() const {
+    return _myInUseCount > 0;
 }
 
 }

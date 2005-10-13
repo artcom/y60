@@ -24,7 +24,11 @@ namespace y60 {
 
 const double myTimePerSlice = 0.05;
     
-SoundManager::SoundManager() {
+SoundManager::SoundManager()
+    : _myMaxCacheSize (128*1024*1024), // 128 MB Cache
+      _myMaxCacheItemSize (60*2*sizeof(float)*48000) 
+                // One minute stereo float samples = 22 MB per sound.
+{
     AC_DEBUG << "SoundManager::SoundManager";
     
     // Initialize ffmpeg 
@@ -48,6 +52,7 @@ SoundManager::~SoundManager() {
     join();
     unregisterDecoderFactory(_myFFMpegDecoderFactory);
     delete _myFFMpegDecoderFactory;
+    _myCache.clear();
     if (_myDecoderFactories.size()) {
         AC_WARNING << _myDecoderFactories.size() << " decoder factories still registered.";
     }
@@ -71,6 +76,20 @@ void SoundManager::setAppConfig(unsigned mySampleRate, unsigned numOutputChannel
         bool useDummy)
 {
     Pump::setAppConfig(mySampleRate, numOutputChannels, useDummy);
+}
+
+void SoundManager::setCacheSize(unsigned myTotalSize, unsigned myItemSize) {
+    _myMaxCacheSize = myTotalSize;
+    _myMaxCacheItemSize = myItemSize;
+    checkCacheSize();
+}
+
+unsigned SoundManager::getMaxCacheSize() const {
+    return _myMaxCacheSize;
+}
+
+unsigned SoundManager::getMaxCacheItemSize() const {
+    return _myMaxCacheItemSize;
 }
 
 bool lessFactory(const IAudioDecoderFactory* a, const IAudioDecoderFactory* b) {
@@ -120,6 +139,7 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
     IAudioDecoder * myDecoder;
     SoundCacheItemPtr myCacheItem = SoundCacheItemPtr(0);
     if (theUseCache) {
+        checkCacheSize();
         myCacheItem = getCacheItem(theURI);
         if (myCacheItem == SoundCacheItemPtr(0)) {
             AC_DEBUG << "    --> Sound not cached.";
@@ -298,6 +318,37 @@ SoundCacheItemPtr SoundManager::getCacheItem(const std::string & theURI) const {
         return SoundCacheItemPtr(0);
     } else {
         return it->second;
+    }
+}
+
+void SoundManager::checkCacheSize() {
+    AC_DEBUG << "SoundManager::checkCacheSize: " << getCacheMemUsed();
+    if (getCacheMemUsed() > _myMaxCacheSize) {
+        AC_DEBUG << "SoundManager: removing excess items from cache.";
+    }
+    
+    // TODO: Check if searching linearly is a performance hit and change if needed.
+    // -> Maybe also move the cache to a separate class when that's nessesary.
+    int myIteration = 0;
+    while (getCacheMemUsed() > _myMaxCacheSize) {
+        AC_DEBUG << "    " << myIteration << ": " << getCacheMemUsed();
+        CacheMap::iterator it;
+        CacheMap::iterator myOldestItem = _myCache.begin();
+        for (it=_myCache.begin(); it != _myCache.end(); ++it) {
+            SoundCacheItemPtr myItem = it->second;
+            if (!myItem->isInUse() &&
+                myItem->isFull() &&
+                myItem->getLastUsedTime() < myOldestItem->second->getLastUsedTime()) 
+            {
+                myOldestItem = it;
+            }
+        }
+        if (myOldestItem == _myCache.end()) {
+            AC_WARNING << "SoundManager: Can't find item to remove from cache since all are in use.";
+            break;
+        }
+        _myCache.erase(myOldestItem);
+        myIteration++;
     }
 }
 
