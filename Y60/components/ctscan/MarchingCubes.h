@@ -523,7 +523,7 @@ namespace y60 {
                 if (_myVBox.contains(myClippedPosition)) {
                     return at(myClippedPosition);
                 } else {
-                    return NumericTraits<VoxelT>::min();
+                    return asl::NumericTraits<VoxelT>::min();
                 }
             }
 
