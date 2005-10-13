@@ -36,7 +36,7 @@ namespace jslib {
         DOC_BEGIN("Creates a Sound from URI. Does not start playback.");
         DOC_PARAM("URI", DOC_TYPE_STRING);
         DOC_PARAM_OPT("Loopflag", DOC_TYPE_BOOLEAN, false);
-        DOC_PARAM_OPT("UseCacheFlag", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("UseCacheFlag", DOC_TYPE_BOOLEAN, true);
         DOC_END;
         switch(argc) {
             case 1: {
