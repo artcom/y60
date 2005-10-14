@@ -631,11 +631,12 @@ class FacadeUnitTest : public UnitTest {
                         ENSURE(myChild5Facade);
                         ENSURE(myChild5Facade->get<DoubleParentFloatTag>() == 8);
                         ENSURE(myChild2Facade->set<FloatTag>(4) == 4);
+                        AC_PRINT << "For setDirty: " << *myChild5;
                         ENSURE(myChild5Facade->isDirty<DoubleParentFloatTag>());
+                        AC_PRINT << "-Nach setDirty: " << *myChild5;
                         ENSURE(myChild5Facade->get<DoubleParentFloatTag>() == 16);
                         myChild4->removeChild(myChild5);
                     }
-
                     // Add child, with dependency registered by parent
                     {
                         ENSURE(myChild4Facade->get<ChildFloatSumTag>() == 0);

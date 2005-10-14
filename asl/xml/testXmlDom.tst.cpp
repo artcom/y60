@@ -90,7 +90,7 @@ class XmlDomUnitTest : public UnitTest {
                     myParsedDocument = dom::NodePtr(0);
                     ENSURE(myElement->parentNode() == 0);
 
-                    dom::NameAttributeNodeMap myNameAttribNodeMap(0);
+                    dom::NameAttributeNodeMap myNameAttribNodeMap;
                     myElement->childNode(0)->appendAttribute("name" ,"child0");
                     myElement->appendChild(dom::Element("bla"));
                     myElement->childNode(1)->appendAttribute("name" ,"child1");

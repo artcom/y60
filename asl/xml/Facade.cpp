@@ -28,8 +28,7 @@ using namespace std;
 namespace dom {
 
     Facade::Facade(Node & theNode) 
-        : TypedNamedNodeMap(dom::Node::ATTRIBUTE_NODE, 0), _myNode(theNode), _myChildren(0), 
-		  _myPropertyNodes(0)
+        : TypedNamedNodeMap(dom::Node::ATTRIBUTE_NODE, 0), _myNode(theNode)
         //, _hasRegisteredDependencies(false), _hasOutdatedDependencies(false)
     {}
     
@@ -66,14 +65,25 @@ namespace dom {
 
 	void 
 	Facade::appendChild(NodePtr theChild) {
-		if (!_myChildren.getNamedItem(theChild->nodeName())) {
-			_myChildren.append(theChild);
+		if (_myChildren.find(theChild->nodeName()) == _myChildren.end()) {
+			_myChildren[theChild->nodeName()] = theChild;
 		}
 	}
 
-	dom::NodePtr 
+	/*dom::NodePtr 
 	Facade::getChild(const std::string & theName) {
 		return _myChildren.getNamedItem(theName);
+	}
+*/
+	const NodePtr 
+    Facade::getChildNode(const std::string& theChildName) {
+        std::map<std::string, NodePtr>::const_iterator myIter = _myChildren.find(theChildName);
+        if (myIter != _myChildren.end()) {
+            return myIter->second;
+        } else {
+    	    return NodePtr(0);
+        }
+
 	}
 
     Facade *

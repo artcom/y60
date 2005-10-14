@@ -102,31 +102,16 @@ namespace dom {
         NodePtr appendWhileParsing(NodePtr theNewNode);
 	};
 
-	class NameAttributeNodeMap : public NodeList {
-	public:
-		friend class Node;
-
-        NameAttributeNodeMap(Node * theShell);
-		NameAttributeNodeMap(const NameAttributeNodeMap & other, Node * theShell);
-		virtual Node & operator[](int i);
-		virtual const Node & operator[](int i) const;
-		virtual Node & operator[](const DOMString & name);
-		virtual const Node & operator[](const DOMString & name) const;
-		virtual NodePtr getNamedItem(const DOMString & name);
-		virtual const NodePtr getNamedItem(const DOMString & name) const;
-		virtual NodePtr setNamedItem(NodePtr node);
-
-        virtual NodePtr append(NodePtr theNewNode);
-        virtual void setItem(int theIndex, NodePtr theNewItem);
-        virtual void insert(int theIndex, NodePtr theNewNode);
-
-        static int countNodesNamed(const DOMString & name, const NodeList & nodes);
-        static int findNthNodeNamed(const DOMString & name, int n, const NodeList & nodes);
-    protected:
-        NodePtr appendWhileParsing(NodePtr theNewNode);
-	private:
+    typedef std::map<std::string, NodePtr> NameAttributeStdMap;
+	class NameAttributeNodeMap : public  NameAttributeStdMap{
+	    public:
+            NameAttributeNodeMap() {}
+		    NameAttributeNodeMap(const NameAttributeNodeMap & other);
+            NodePtr append(NodePtr theNewNode);
+		    NodePtr getNamedItem(const DOMString & name);
+		    const NodePtr getNamedItem(const DOMString & name) const;
+            void removeItem(NodePtr theNode);
 	};
-
 
 	class TypedNamedNodeMap : public NamedNodeMap {
 	public:

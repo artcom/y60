@@ -57,9 +57,7 @@ namespace dom {
             const Node & getNode() const {
                 return _myNode;
             }
-			const NodePtr getChildNode(const std::string& theChildName) {
-				return _myChildren.getNamedItem(theChildName);
-			}
+			const NodePtr getChildNode(const std::string& theChildName);
             virtual void setSelf(FacadePtr theSelf);
             virtual FacadePtr getSelf() {
                 return _mySelf.lock();
@@ -78,7 +76,7 @@ namespace dom {
 
 		public:
 			void appendChild(NodePtr theChild);
-			dom::NodePtr getChild(const std::string & theName);
+			//dom::NodePtr getChild(const std::string & theName);
 
 		protected:
             Facade(Node & theNode);
@@ -88,7 +86,8 @@ namespace dom {
             Node & _myNode;
             FacadeWeakPtr _mySelf;
 		
-			NamedNodeMap _myChildren; 
+//			NamedNodeMap _myChildren; 
+            std::map<std::string, NodePtr> _myChildren; 
 			NameAttributeNodeMap _myPropertyNodes; 
     }; 
 
