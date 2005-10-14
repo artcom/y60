@@ -383,16 +383,17 @@ namespace y60 {
 		MaterialPropertiesFacadePtr myPropFacade = theMaterial.getFacade<MaterialPropertiesTag>();
 		const NameAttributeNodeMap & myPropMap = myPropFacade->getEnsuredPropertyList();
 
-		for (unsigned myPropIndex = 0; myPropIndex != myPropMap.length(); ++myPropIndex) {
-			const Node & myPropertyNode = myPropMap[myPropIndex];
+        NameAttributeNodeMap::const_iterator myIter = myPropMap.begin();
+        for (; myIter != myPropMap.end(); myIter++) {
+			const NodePtr myPropertyNode = myIter->second;
             const string & myPropertyName 
-                = myPropertyNode.getAttributeString("name");
+                = myPropertyNode->getAttributeString("name");
 
             CGparameter myCgParameter 
                 = cgGetNamedParameter(_myCgProgramID, myPropertyName.c_str());
 
             if (myCgParameter) {
-                setCgMaterialParameter(myCgParameter, myPropertyNode, theMaterial);
+                setCgMaterialParameter(myCgParameter, *myPropertyNode, theMaterial);
             }
         }
     }

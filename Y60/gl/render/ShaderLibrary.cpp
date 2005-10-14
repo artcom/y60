@@ -122,17 +122,17 @@ namespace y60 {
 		// we need to copy all values to tmp RequirementMap, cause we want to drop req temporarly
 
 		MaterialRequirementFacadePtr myReqFacade = theMaterial->getFacade<MaterialRequirementTag>();
-		NameAttributeNodeMap  myRequirementMap = myReqFacade->getEnsuredPropertyList();
+		NameAttributeNodeMap  myRequirementMap(myReqFacade->getEnsuredPropertyList());
         vector<ShaderScore> myScoreBoard(_myShaders.size());
 
         // iterate over all features, that the material wants to have
         vector<string> myDropRequirements;
 
-
-        for (unsigned myReqIndex = 0; myReqIndex != myRequirementMap.length(); ++myReqIndex) {
-			const Node & myRequirementNode = myRequirementMap[myReqIndex];
-            const std::string & myRequiredFeatureClass = myRequirementNode.getAttributeString(NAME_ATTRIB);
-            VectorOfRankedFeature myRequiredFeature = myRequirementNode("#text").dom::Node::nodeValueAs<VectorOfRankedFeature>();
+        NameAttributeNodeMap::iterator myIter = myRequirementMap.begin();
+        for (; myIter != myRequirementMap.end(); myIter++) {
+			const NodePtr myRequirementNode = myIter->second;
+            const std::string & myRequiredFeatureClass = myRequirementNode->getAttributeString(NAME_ATTRIB);
+            VectorOfRankedFeature myRequiredFeature = (*myRequirementNode)("#text").dom::Node::nodeValueAs<VectorOfRankedFeature>();
             bool oneShaderCanHandleMaterial = false;
             bool myFeatureCanBedropped = false;
             DB(AC_DEBUG << "Class : " << myRequiredFeatureClass << " , requires: " << myRequiredFeature << endl);
@@ -181,7 +181,7 @@ namespace y60 {
 			if (myRequirementNodeToRemove) {
                 AC_WARNING << "### WARNING Dropping feature: " <<  myFeatureToDrop
                     << " of material: " << theMaterial->get<NameTag>() << endl;
-				myRequirementMap.removeItem(myRequirementMap.findIndex(&(*myRequirementNodeToRemove)));
+				myRequirementMap.removeItem(myRequirementNodeToRemove);
 			}
         }
         // find the shader that supports all features required (the score equals the feature count)
@@ -191,7 +191,7 @@ namespace y60 {
             for (int i = 0; i <myScoreBoard.size(); i++ )
             {
                 const ShaderFeatureSet & myShaderFeatureSet = _myShaders[i]->getFeatureSet();
-                bool allShaderFeatureUsed = myShaderFeatureSet.getFeatureCount() == myRequirementMap.length();
+                bool allShaderFeatureUsed = myShaderFeatureSet.getFeatureCount() == myRequirementMap.size();
                 AC_DEBUG << "Shader: " << _myShaders[i]->getName() << " scored: "
                     << myScoreBoard[i].featurehits << " features"
                     << " and " << myScoreBoard[i].points << " points";
@@ -208,17 +208,17 @@ namespace y60 {
         for (int i = 0; i < myScoreBoard.size(); i++ ) {
             const ShaderFeatureSet & myShaderFeatureSet = _myShaders[i]->getFeatureSet();
             // all material requirements must be matched with the shaders feature
-            bool matchAllMaterialRequirements = myScoreBoard[i].featurehits == myRequirementMap.length();
+            bool matchAllMaterialRequirements = myScoreBoard[i].featurehits == myRequirementMap.size();
             // get the shader with points higher than the leading shader
             bool shaderHasHigherScore = myScoreBoard[i].points > myMaxPoints;
             // shader must not be oversized, all its features must be required
-            bool allShaderFeatureUsed = myShaderFeatureSet.getFeatureCount() == myRequirementMap.length();
+            bool allShaderFeatureUsed = myShaderFeatureSet.getFeatureCount() == myRequirementMap.size();
 
             DB(
                 AC_DEBUG << endl;
                 AC_DEBUG << "Shader: " << _myShaders[i]->getName() << " scored: " <<endl;
-                AC_DEBUG << myScoreBoard[i].featurehits << " features of" << " of " << myRequirementMap.length() <<" requirements"<<endl;
-                AC_DEBUG << myShaderFeatureSet.getFeatureCount() << " shader features" << " of " << myRequirementMap.length() <<" requirements"<<endl;
+                AC_DEBUG << myScoreBoard[i].featurehits << " features of" << " of " << myRequirementMap.size() <<" requirements"<<endl;
+                AC_DEBUG << myShaderFeatureSet.getFeatureCount() << " shader features" << " of " << myRequirementMap.size() <<" requirements"<<endl;
                 AC_DEBUG<< " Points: " << myScoreBoard[i].points << " points"<<", best = "<<myMaxPoints<<endl;
                 if (allShaderFeatureUsed) {
                     AC_DEBUG << " and all its features could be used." << endl;
