@@ -27,7 +27,7 @@ namespace y60 {
         // Append 80 chars of entity name
         std::string myEntityName;
         myEntityName.assign(theName, 0, theName.length() > HEADER_SIZE ? HEADER_SIZE : theName.length());
-        myEntityName.append(HEADER_SIZE-myEntityName.length(), ' ');
+        myEntityName.append(HEADER_SIZE-myEntityName.length(), '\0');
         ASSURE(myEntityName.length() == HEADER_SIZE);
         theStream.appendString(myEntityName);
         // Append number of facets
@@ -44,7 +44,7 @@ namespace y60 {
             theStream.appendFloat32(theFacet.vertex[i][1]);
             theStream.appendFloat32(theFacet.vertex[i][2]);
         }
-        theStream.appendString(std::string("  "));
+        theStream.appendSigned16(0);
     }
 
     template <class AC_BYTE_ORDER_LOCAL> void 
