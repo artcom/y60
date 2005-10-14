@@ -136,6 +136,34 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
     return _mySlices.size();
 }
 
+int 
+CTScan::loadSphere(int size) {
+    for (int i = 0; i < size; ++i) {
+        ResizeableRasterPtr myRaster = 
+            dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::GRAY, size, size));
+
+        Unsigned8 * myPixels = myRaster->pixels().begin();
+        Point3f myCenter(float(size)/2.0f, float(size)/2.0f, float(size)/2.0f);
+        for (int y = 0; y < size; ++y) {
+            for (int x = 0; x < size; ++x) {
+                float myDist = asl::distance(myCenter, Point3f(float(x),float(y),float(i))) / (size/2);
+                if (myDist > 1.0f) {
+                    myPixels[x+y*size] = 0;
+                } else {
+                    myPixels[x+y*size] = Unsigned8((1.f - myDist) * 255.0f); 
+                }
+            }
+        }
+        
+        _mySlices.push_back(myRaster); 
+    }
+    _myDefaultWindow = Vector2f(0,255);
+    _myVoxelSize = Vector3f(0.001f,0.001f,0.001f);
+    _myEncoding = y60::GRAY; 
+    return _mySlices.size();
+}
+
+    
 int
 CTScan::setSlices(std::vector<dom::ResizeableRasterPtr> theSlices) {
     _mySlices = theSlices;

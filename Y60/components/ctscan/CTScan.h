@@ -62,6 +62,7 @@ class CTScan {
         virtual ~CTScan();
        
         int loadSlices(asl::PackageManager & thePackageManager, const std::string & theSubDir, const std::string& thePackage);
+        int loadSphere(int size);
         int setSlices(std::vector<dom::ResizeableRasterPtr> theSlices);
 
         void reconstructToImage(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);

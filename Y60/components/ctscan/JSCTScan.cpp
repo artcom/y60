@@ -55,6 +55,26 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+loadSphere(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+        if (argc != 1) {
+            JS_ReportError(cx, "JSCTScan::loadSphere(): Wrong number of arguments, "
+                               "expected 1 (theSize), got %d.", argc);
+            return JS_FALSE;
+        }
+        int mySlices;
+        if (!JSVAL_IS_NULL(argv[0])) {
+            convertFrom(cx, argv[0], mySlices);
+        }
+        CTScan & myCTScan = myObj.getNative();
+        int slicesLoaded = myCTScan.loadSphere(mySlices);
+        *rval = as_jsval(cx, slicesLoaded);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 loadSlices(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
@@ -525,6 +545,7 @@ JSCTScan::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"loadSlices",           loadSlices,              0},
+        {"loadSphere",           loadSphere,              0},
 //        {"renderToImage",        renderToImage,           2},
         {"reconstructToImage",   reconstructToImage,      3},
         {"clear",                clear,                   0},
