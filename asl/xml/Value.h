@@ -1350,6 +1350,7 @@ namespace dom {
         }
         virtual void setString(const DOMString & theValue) {
             _myValue = Value<T>::asT(theValue);
+            this->bumpVersion();
             setNewValue();
             this->onSetValue();
         }
