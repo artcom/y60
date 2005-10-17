@@ -164,7 +164,7 @@ namespace jslib {
                 }
             }
 
-            bool myCacheFlag = true;
+            bool myCacheFlag = false;
             if (argc > 2) {
                 if (!convertFrom(cx, argv[2], myCacheFlag)) {
                     JS_ReportError(cx, "JSSound::Constructor(): argument #3 must be a boolean (Cache Flag)");
@@ -175,10 +175,10 @@ namespace jslib {
             OWNERPTR myNewNative;
             if (argc == 0) {
                 // Construct empty Sound that will be filled by copy Construct()
-                //AC_PRINT << "JSSound::Constructor: empty";
+//                AC_PRINT << "JSSound::Constructor: empty";
                 myNewNative = OWNERPTR(0);
             } else {
-                //AC_PRINT << "JSSound::Constructor: " << myURI;
+//                AC_PRINT << "JSSound::Constructor: " << myURI;
                 myNewNative = y60::SoundManager::get().createSound(myURI, myLoopFlag, myCacheFlag);
             }
 

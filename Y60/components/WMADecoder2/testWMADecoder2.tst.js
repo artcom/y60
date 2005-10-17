@@ -13,6 +13,7 @@
 use("UnitTest.js");
 plug("y60JSSound");
 plug("y60WMADecoder2");
+plug("ProcFunctions");
 
 function WMADecoder2UnitTest() {
     this.Constructor(this, "WMADecoder2UnitTest");
@@ -22,16 +23,15 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.playSound = function(myFileName) {
-        obj.mySound = obj.myMedia.createSound(myFileName);
+        obj.mySound = obj.mySoundManager.createSound(myFileName);
         obj.mySound.play();
         msleep(2000);
         obj.mySound.stop();
     }
 
     obj.runWMADecoder2Test = function() {
-        obj.myMedia = new SoundManager();
-       
-        obj.mySound = obj.myMedia.createSound("../../testfiles/music_cut_wm9.wma");
+        obj.mySoundManager.preloadSound("../../testfiles/music_cut_wm9.wma");
+        obj.mySound = obj.mySoundManager.createSound("../../testfiles/music_cut_wm9.wma");
 
         DTITLE("Playing sound...");
         obj.mySound.play();        
@@ -84,28 +84,74 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         delete obj.mySound;
         gc();
         msleep(100);
-        ENSURE("obj.myMedia.soundcount == 0");
+        ENSURE("obj.mySoundManager.soundcount == 0");
 
-        ENSURE_EXCEPTION("obj.myMedia.createSound(\"../../testWMADecoder2.tst.js\")",
+        ENSURE_EXCEPTION("obj.mySoundManager.createSound(\"../../testWMADecoder2.tst.js\")",
                 "*");
 
         // Stress test - runs for hours :-)
         // Starts 5 sounds per second.
 /*        
         for (var i=0; i<5*60*60*8; ++i) {
-            var mySound = obj.myMedia.createSound("../../testfiles/music_cut_wm9.wma");
+            var mySound = obj.mySoundManager.createSound("../../testfiles/music_cut_wm9.wma");
             mySound.play();
             msleep(200);
             gc();
         }
 */
     }
+    
+    obj.runLeakTest = function() {
+
+        print("### INITIAL USAGE:" + getProcessMemoryUsage());
+
+        obj.mySoundManager.volume == 1.0;
+
+//        const mySoundFile = "../../../../sound/testfiles/Plopp_2a.wav"
+        const mySoundFile = "../../testfiles/music_cut_wm9.wma"
+        var mySound = null;
+
+        for (var i = 0; i < 20; ++i) {
+            // mySound = obj.mySoundManager.createSound(mySoundFile, false, false);
+            mySound = new Sound(mySoundFile, false, false);
+            mySound.play();
+            while (mySound.playing) {
+                msleep(100);
+            }
+            mySound = null;
+
+            var myUsage = getProcessMemoryUsage();
+            if (i == 0) {
+                obj.myStartUsage = myUsage;
+                print("### START USAGE:" + obj.myStartUsage);
+            }
+            obj.myDiff = myUsage - obj.myStartUsage;
+            print("### TEST " + i + " USAGE:" + myUsage + " DIFF:" + obj.myDiff + " SOUNDCOUNT:" + obj.mySoundManager.soundcount);
+        }
+        mySound = null;
+
+        var myFiniUsage = getProcessMemoryUsage();
+        obj.myDiff = myFiniUsage - obj.myStartUsage;
+        print("### FINI USAGE:" + myFiniUsage + " DIFF:" + obj.myDiff + " SOUNDCOUNT:" + obj.mySoundManager.soundcount);
+
+        msleep(1000);
+        gc();
+        msleep(1000);
+        ENSURE("obj.mySoundManager.soundcount == 0");
+
+        var myGCUsage = getProcessMemoryUsage();
+        obj.myDiff = myGCUsage - obj.myStartUsage;
+        print("### GC USAGE: " + myGCUsage + " DIFF:" + obj.myDiff);
+        ENSURE("obj.myDiff < (obj.myStartUsage * 0.2)");
+    }
 
     obj.run = function() {
+        obj.mySoundManager = new SoundManager();
         this.runWMADecoder2Test();
+//        this.runLeakTest();
     }
 }
-
+ 
 function main() {
     var myTestName = "testAudio.tst.js";
     var mySuite = new UnitTestSuite(myTestName);

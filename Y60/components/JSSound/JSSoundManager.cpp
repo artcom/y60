@@ -21,16 +21,29 @@ namespace jslib {
     static JSBool
     stopAll(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Stop playing the sound."); DOC_END;
-        return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::stopAll,cx,obj,argc,argv,rval);
+        return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::stopAll,
+                cx,obj,argc,argv,rval);
     }
+    
     static JSBool
     fadeToVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Fading to a specified volume over a given duration.");
         DOC_PARAM("volume", DOC_TYPE_FLOAT);
         DOC_PARAM("duration", DOC_TYPE_FLOAT);
         DOC_END;
-        return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::fadeToVolume,cx,obj,argc,argv,rval);
+        return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::fadeToVolume,
+                cx,obj,argc,argv,rval);
     }
+    
+    static JSBool
+    preloadSound(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("Loads and decodes the sound given and stores it in the cache. Invalid for streams.");
+        DOC_PARAM("URI", DOC_TYPE_STRING);
+        DOC_END;
+        return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::preloadSound,
+                cx,obj,argc,argv,rval);
+    }
+    
     static JSBool
     createSound(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Creates a Sound from URI. Does not start playback.");
@@ -65,6 +78,7 @@ namespace jslib {
             // name                  native            nargs
             {"stopAll",              stopAll,           0},
             {"fadeToVolume",         fadeToVolume,      2},
+            {"preloadSound",         preloadSound,      1},
             {"createSound" ,         createSound,       3},
             {0}
         };

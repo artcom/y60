@@ -30,14 +30,15 @@ namespace y60 {
     public:
         virtual ~SoundManager();
 
-        virtual void setSysConfig(const asl::Time& myLatency, const std::string& myDeviceName = "");
+        virtual void setSysConfig(const asl::Time& myLatency, 
+                const std::string& myDeviceName = "");
         virtual void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels = 2, 
                 bool useDummy = false);
         virtual void setCacheSize(unsigned myTotalSize, unsigned myItemSize);
         virtual unsigned getMaxCacheSize() const;
         virtual unsigned getMaxCacheItemSize() const;
 
-        // Virtual so they can be called from outside the plugin.
+        // These are virtual so they can be called from outside the plugin.
         virtual void registerDecoderFactory(IAudioDecoderFactory* theFactory);
         virtual void unregisterDecoderFactory(IAudioDecoderFactory* theFactory);
 
@@ -53,10 +54,10 @@ namespace y60 {
         virtual bool isRunning() const;
 
         // Caching stuff
-        void preloadSound(const std::string& theURI);
-        void deleteCacheItem(const std::string& theURI);
-        unsigned getCacheMemUsed() const;
-        unsigned getNumItemsInCache() const;
+        virtual void preloadSound(const std::string& theURI);
+        virtual void deleteCacheItem(const std::string& theURI);
+        virtual unsigned getCacheMemUsed() const;
+        virtual unsigned getNumItemsInCache() const;
         
         virtual void update();
         

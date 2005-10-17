@@ -28,7 +28,6 @@ class FFMpegDecoder: public IAudioDecoder
 {
     public:
         FFMpegDecoder (const std::string& myURI);
-//        FFMpegDecoder (asl::Ptr < asl::ReadableStream > myStream, asl::HWSampleSinkPtr mySink);
         virtual ~FFMpegDecoder();
 
         virtual unsigned getSampleRate();

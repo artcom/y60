@@ -47,6 +47,9 @@ class WMADecoder2: public IAudioDecoder, public IWMReaderCallback
         virtual bool isSyncDecoder() const;
         virtual void setTime(asl::Time myTime);
         
+        virtual unsigned getCurFrame() const; 
+        virtual void decodeEverything();
+        
         //
         // Methods of IUnknown
         //
@@ -100,6 +103,8 @@ class WMADecoder2: public IAudioDecoder, public IWMReaderCallback
         State _myState;
 
         LONG _myReferenceCount; // For QueryInterface etc.
+
+        unsigned _myCurFrame;
 };
 
 } // namespace

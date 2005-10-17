@@ -35,7 +35,8 @@ WMADecoder2::WMADecoder2 (const string& myURI)
       _myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE),
       _myState(STOPPED),
       _myEvent(0),
-      _mySampleEvent(0)
+      _mySampleEvent(0),
+      _myCurFrame(0)
 {
     try {
         AC_DEBUG << "WMADecoder2::WMADecoder2";
@@ -49,17 +50,14 @@ WMADecoder2::WMADecoder2 (const string& myURI)
         }
         open();
     } catch (...) {
-        cerr << "exeception in constructor" << endl;
+        AC_DEBUG << "WMADecoder2::WMADecoder2: Exception";
         if (_myEvent) {
             CloseHandle(_myEvent);
         }
-        cerr << "1" << endl;
         if (_mySampleEvent) {
             CloseHandle(_mySampleEvent);
         }
-        cerr << "2" << endl;
         close();
-        cerr << "3" << endl;
         throw;
     }
 }
@@ -142,6 +140,24 @@ void WMADecoder2::setSampleSink(asl::ISampleSink* mySampleSink) {
     _mySampleSink = mySampleSink;
 }
 
+unsigned WMADecoder2::getCurFrame() const {
+    return _myCurFrame;
+}
+
+void WMADecoder2::decodeEverything() {
+    AC_DEBUG << "WMADecoder2::decodeEverything";
+    _myState = PLAYING;
+    HRESULT hr = _myReader->Start(QWORD(0), 0, 1, NULL);
+    checkForWMError(hr, "decodeEverything: Could not start reader", PLUS_FILE_LINE);
+
+    // Decode at most 1 Hour of data, that's 700MB at 16 bit, 48kHz, stereo :-).
+    setTime(QWORD(60)*60*1000*1000*10);
+    while (_myState != STOPPED) {
+        waitForEvent();
+    }
+    AC_DEBUG << "WMADecoder2::decodeEverything end";
+}
+
 bool WMADecoder2::isSyncDecoder() const {
     return false;
 }
@@ -207,13 +223,15 @@ HRESULT STDMETHODCALLTYPE WMADecoder2::OnSample(DWORD theOutputNumber,
                     (int16_t*)(_myResampledSamples.begin()),
                     (int16_t*)(myBuffer), 
                     numFrames);
-            myAudioBuffer = _mySampleSink->createBuffer(numFrames);
+            myAudioBuffer = Pump::get().createBuffer(numFrames);
             myAudioBuffer->convert(_myResampledSamples.begin(), SF_S16, 
                     _myNumChannels);
         } else {
-            myAudioBuffer = _mySampleSink->createBuffer(numFrames);
+            myAudioBuffer = Pump::get().createBuffer(numFrames);
             myAudioBuffer->convert(myBuffer, SF_S16, _myNumChannels);
         }
+        myAudioBuffer->setStartFrame(_myCurFrame);
+        _myCurFrame += myAudioBuffer->getNumFrames();
         _mySampleSink->queueSamples(myAudioBuffer);
         SetEvent(_mySampleEvent);
 //        AC_DEBUG << "OnSample, BufferLength: " << myBufferLength;
