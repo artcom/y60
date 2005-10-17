@@ -45,7 +45,8 @@ class SoundTestBase: public UnitTest {
             double myTime = theSound->getCurrentTime();
             ENSURE(myTime > theTime-0.1 && myTime < theTime+0.2);
             if (myTime <= theTime-0.1 || myTime >= theTime+0.2) {
-                AC_WARNING << "Time measured: " << myTime << ", time expected: " << theTime;
+                AC_WARNING << "Time measured: " << myTime << ", time expected: " 
+                        << theTime;
             }
         }
         
@@ -593,10 +594,10 @@ class SoundTestSuite : public UnitTestSuite {
 #endif
             mySoundManager.setAppConfig(44100, 2, _myUseDummyPump);
 
-//            addTest(new TestPlay(mySoundManager));
-//            addTest(new TestStop(mySoundManager));
+            addTest(new TestPlay(mySoundManager));
+            addTest(new TestStop(mySoundManager));
             addTest(new TestCache(mySoundManager));
-/*
+
             addTest(new TestBroken(mySoundManager));
             addTest(new TestFireAndForget(mySoundManager));
             addTest(new TestTwoSounds(mySoundManager));
@@ -610,7 +611,7 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new TestVolume(mySoundManager));
           
             addTest(new StressTest(mySoundManager, 5));
-*/
+
 //            addTest(new TestLeak(mySoundManager));
 //            addTest(new MemLeakStressTest(mySoundManager, 5*60));
         }

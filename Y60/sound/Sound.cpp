@@ -186,7 +186,7 @@ void Sound::update(double theTimeSlice) {
             myBuffersFilledRatio*theTimeSlice+
             (1-myBuffersFilledRatio)*_myMaxUpdateTime;
     _myDecoder->setTime(getCurrentTime());
-    //AC_DEBUG << "Sound::update: " << hex << (void*)this << dec << " playing=" << isPlaying() << " decodingComplete=" << _myDecodingComplete;
+    AC_DEBUG << "Sound::update: " << hex << (void*)this << dec << " playing=" << isPlaying() << " decodingComplete=" << _myDecodingComplete;
     if (_myDecodingComplete && !isPlaying()) {
         AC_DEBUG << "Sound::update: Playback complete";
         _myDecodingComplete = false;
