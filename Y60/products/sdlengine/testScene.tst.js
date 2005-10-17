@@ -31,7 +31,7 @@ MyClassUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-        obj.myScene = new Scene();
+        obj.myScene = new Scene(null);
 
         // Test convinience scene access properties
         ENSURE('obj.myScene.dom.nodeName == "scene"');
