@@ -39,6 +39,10 @@ function clone(theObject) {
     return myNewObject;
 }
 
+// WTF?
+function getFocalLength(theHfov) {
+    return (35 / (2 * Math.tan(theHfov * Math.PI / 360)));
+}
 
 function getHPR(theMatrix) {
     // From "3D Engine Design", page 19
@@ -233,8 +237,20 @@ function dumpElement(E,theSpace,theMaxDepth) {
     }
 }
 
-//searches for a descendant of theNode (must be in DOM below theNode)
+// Adjust Node.id (and it's descendants) to be unique
+function adjustNodeId(theNode, theDeepAdjustFlag) {
+    theNode.id = createUniqueId();
+    if (theDeepAdjustFlag == undefined) {
+        theDeepAdjustFlag = false;
+    }
+    if (theDeepAdjustFlag) {
+        for (var i = 0; i < theNode.childNodes.length; ++i) {
+            adjustNodeId(theNode.childNodes[i], theDeepAdjustFlag);
+        }
+    }
+}
 
+//searches for a descendant of theNode (must be in DOM below theNode)
 function getDescendantById(theNode, theId, doDeepSearch) {
     return getDescendantByAttribute(theNode, "id", theId, doDeepSearch);
 }
@@ -541,10 +557,6 @@ function padStringFront(theString, thePaddingChar, theLength) {
         theString = thePaddingChar + theString;
     }
     return theString;
-}
-
-function getFocalLength(theHfov) {
-    return (35 / (2 * Math.tan(theHfov * Math.PI / 360)));
 }
 
 function padStringBack(theString, thePaddingChar, theLength) {
