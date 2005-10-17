@@ -70,6 +70,13 @@ namespace jslib {
          * @warn Currently, theScene may not be Ptr(0)!
          */
         bool AbstractRenderWindow::setScene(const y60::ScenePtr & theScene);
+
+        /**
+         * Creates the renderer and opens the renderwindow, if this has not been 
+         * done by a setScene() call, before.
+         */
+        virtual void go();
+
         float getWorldSize(dom::NodePtr theCamera);
 
         JSObject * getEventListener() const;
@@ -94,7 +101,7 @@ namespace jslib {
         bool printStatistics(unsigned int theOnScreenFlag, unsigned int theStatisticFlags);
         double getFrameRate() const;
         // Scene methods
-        //asl::Matrix4f getLocalMatrix(dom::NodePtr theNode);
+
         y60::ImagePtr getImage(const std::string & theFileName);
         void loadMovieFrame(dom::NodePtr theMovieNode);
         void loadCaptureFrame(dom::NodePtr theCaptureNode);
@@ -142,21 +149,23 @@ namespace jslib {
 
         const y60::RendererPtr getRenderer() const;
         y60::RendererPtr getRenderer();
-        const y60::ScenePtr & getCurrentScene() const { return _myScene; };
-        y60::ScenePtr & getCurrentScene() { return _myScene; };
+
+        const y60::ScenePtr & getCurrentScene() const;
+        y60::ScenePtr & getCurrentScene();
 
         asl::Ptr<y60::TextureManager> getTextureManager() {
             return _myScene->getTextureManager();
         }
 
         void addExtension(y60::IRendererExtensionPtr theExtension);
+
         /// saves (frame-)buffer to file
         void saveBuffer(const std::string & theBuffer, const std::string & theFilename);
 
-        void setJSContext(JSContext * cx);
-        /// returns the viewport when in single viewport mode.
+        void setJSContext(JSContext * cx);        
 
         /**
+         * returns the viewport when in single viewport mode.   
          * @throws an exception if more than one viewport exists in the canvas.
         */
         y60::ViewportPtr getSingleViewport() const;

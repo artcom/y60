@@ -606,14 +606,14 @@ namespace y60 {
         glMultMatrixf(theTransformation.getData());
         glColor4fv(theColor.begin());
 
-        const float TwoPI = asl::PI * 2.0f;
+        const float TwoPI = float(asl::PI) * 2.0f;
         const unsigned mySegments = 32;
         const float myResolution = TwoPI / (float)mySegments;
         float myPos[mySegments][2];
 
         glTranslatef(theSphere.center[0], theSphere.center[1], theSphere.center[2]);
         glBegin(GL_LINE_LOOP);
-        for (unsigned i = 0.0f; i < mySegments; ++i) {
+        for (unsigned i = 0; i < mySegments; ++i) {
             float r = i * myResolution;
             myPos[i][0] = sin(r) * theSphere.radius;
             myPos[i][1] = cos(r) * theSphere.radius;
@@ -621,12 +621,12 @@ namespace y60 {
         }
         glEnd();
         glBegin(GL_LINE_LOOP);
-        for (unsigned i = 0.0f; i < mySegments; ++i) {
+        for (unsigned i = 0; i < mySegments; ++i) {
             glVertex3f(0.0f, myPos[i][0], myPos[i][1]);
         }
         glEnd();
         glBegin(GL_LINE_LOOP);
-        for (unsigned i = 0.0f; i < mySegments; ++i) {
+        for (unsigned i = 0; i < mySegments; ++i) {
             glVertex3f(myPos[i][0], 0.0f, myPos[i][1]);
         }
         glEnd();
@@ -823,7 +823,7 @@ namespace y60 {
         _myState.setLighting(theViewport->get<ViewportLightingTag>());
         _myState.setBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
         _myState.setTexturing(theViewport->get<ViewportTexturingTag>());
-        _myState.setDrawNormals(theViewport->get<ViewportDrawNormalsTag>()); 
+        _myState.setDrawNormals(theViewport->get<ViewportDrawNormalsTag>());
         CHECK_OGL_ERROR;
     }
 
@@ -1012,7 +1012,7 @@ namespace y60 {
             case POSITIONAL:
             case SPOT:
                 break;
-			case AMBIENT: 
+			case AMBIENT:
 				glLightModelfv(GL_LIGHT_MODEL_AMBIENT, myLightPropFacade->get<LightAmbientTag>().begin());
                 return;
             case UNSUPPORTED:

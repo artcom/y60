@@ -215,7 +215,7 @@ void
 SDLWindow::initDisplay() {
     ensureSDLSubsystem();
     _myWindowInitFlag = true;
-
+    
     setVideoMode(_myInitialWidth, _myInitialHeight, _myFullscreenFlag);
     setWindowTitle("Y60 Renderer");
 
@@ -611,7 +611,7 @@ SDLWindow::go() {
         return;
     }
     try {
-        //AbstractRenderWindow::go();
+        AbstractRenderWindow::go();
         mainLoop();
     } catch (const asl::Exception & ex) {
         AC_ERROR << "Exception caught in SDLWindow::go(): " << ex << endl;

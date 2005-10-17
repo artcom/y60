@@ -71,6 +71,29 @@ namespace jslib {
         GLContextRegistry::get().unregisterContext(_mySelf);
     }
 
+    y60::ScenePtr &
+    AbstractRenderWindow::getCurrentScene() { 
+        if (!_myScene) {
+            // Add an empty default scene.
+            // The defaultscene can be overwritten with setScene.
+            // It is created without an OpenGL context and therefore the scene data
+            // is not added to the graphics-memory. 
+            // To startup the renderer and copy the scene data into the gl-memory 
+            // you must call go()
+            _myScene = y60::ScenePtr(new y60::Scene());
+            _myScene->createStubs(JSApp::getPackageManager());
+        }
+        return _myScene; 
+    }
+
+    const y60::ScenePtr &
+    AbstractRenderWindow::getCurrentScene() const {
+        if (!_myScene) {
+            AC_WARNING << "AbstractRenderWindow::getCurrentScene(): Scene not set.";
+        }
+        return _myScene; 
+    }
+
     // TODO: do something with the extensions
     bool
     AbstractRenderWindow::setScene(const y60::ScenePtr & theScene) {
@@ -122,6 +145,22 @@ namespace jslib {
             return false;
         }
         return true;
+    }
+
+    void
+    AbstractRenderWindow::go() {
+        // If the renderer has not been created by setScene(), yet, because everything
+        // was added using the initial default scene, do so now.
+        if (!_myRenderer) {    
+            y60::ScopedGLContext myGLContext(this);
+            initDisplay();
+
+            _myRenderer = RendererPtr(new Renderer(_myRenderingCaps));
+            _myRenderer->getTextManager().setTTFRenderer(createTTFRenderer());
+            _myRenderer->setCurrentScene(_myScene);
+
+            setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
+        }
     }
 
     float
