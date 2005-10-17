@@ -104,6 +104,17 @@ class QuaternionTest : public TemplateUnitTest {
                 myRotateMatrix.rotateXYZ(myRotation);
                 ENSURE(almostEqual(myRotateMatrix, myQuatMatrix));
             }
+            {
+                // test construction by two vectors
+                Vector3<T> myFirstVector(1,0,0);
+                Vector3<T> mySecondVector(0,1,0);
+                Quaternion<T> myQuaternion(myFirstVector, mySecondVector);
+                Matrix4<T> myProjection(myQuaternion);
+                Matrix4<T> myInverse(myQuaternion);
+                Point3<T> myPoint = product(Point3<T>(mySecondVector), myProjection);
+                Vector3<T> myResult(myPoint);
+                ENSURE(almostEqual(myResult, myFirstVector));
+            }
             
             {   // test quaternion calculus
                 

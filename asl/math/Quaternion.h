@@ -89,6 +89,19 @@ namespace asl {
                 this->val[3] = Number(cos(theAngle * 0.5));
             }
 
+            /**
+             * Given two normalized Vectors, compute the quaternion between them
+             */
+            Quaternion(const Vector3<Number> & theSourceVector, const Vector3<Number> & theTargetVector) {
+                Vector3<Number> myCross = cross(theSourceVector, theTargetVector);
+                this->val[0] = myCross[0];
+                this->val[1] = myCross[1];
+                this->val[2] = myCross[2];
+                this->val[3] = magnitude(theSourceVector)*magnitude(theTargetVector) + 
+                    dot(theSourceVector, theTargetVector);
+                this->normalize();
+            }
+
             /** Given a XYZRotation, compute quaternion.
              */
             void assignFromEuler(const asl::Vector3<Number> & theEulerAngles) {
