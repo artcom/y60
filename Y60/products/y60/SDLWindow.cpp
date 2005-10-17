@@ -602,17 +602,17 @@ SDLWindow::mainLoop() {
     }
 }
 
-int SDLWindow::go() {
-    int myRetValue = -1;
+void 
+SDLWindow::go() {
     AC_DEBUG << "SDLWindow::Go" << endl;
-
+    
     if (!_myJSContext) {
         AC_WARNING << "SDLWindow::Go() - No js context found, please assign an eventHandler to window before calling go" << endl;
-        return myRetValue;
+        return;
     }
     try {
+        //AbstractRenderWindow::go();
         mainLoop();
-        myRetValue = 0;
     } catch (const asl::Exception & ex) {
         AC_ERROR << "Exception caught in SDLWindow::go(): " << ex << endl;
     } catch (const exception & ex) {
@@ -622,7 +622,6 @@ int SDLWindow::go() {
     }
     // release mouse capture
     setCaptureMouseCursor(false);
-    return myRetValue;
 }
 
 bool SDLWindow::getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter,

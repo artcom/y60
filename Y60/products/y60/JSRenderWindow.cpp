@@ -383,13 +383,6 @@ JSRenderWindow::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         // Set the JavaScript RenderWindow object as default event listener for the new window
         myNewWindow->setEventListener(obj);
         myNewWindow->setJSContext(cx);
-
-        // Add an empty default scene
-        /*
-        ScenePtr myEmptyScene = ScenePtr(new y60::Scene());
-        myEmptyScene->createStubs(JSApp::getPackageManager());
-        myNewWindow->setScene(myEmptyScene);
-        */
         return JS_TRUE;
     }
     JS_ReportError(cx,"JSRenderWindow::Constructor: new JSRenderWindow failed");

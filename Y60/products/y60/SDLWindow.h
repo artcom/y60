@@ -124,32 +124,9 @@ public:
     virtual void handle(y60::EventPtr theEvent);
     void onKey(y60::Event & theEvent);
     void mainLoop();
-    int go();
-    // void setViewport(float theMinX, float theMinY, float theMaxX, float theMaxY);
+    void go();
 
-// DTM legacy code
-#if 0
-    struct Anchor {
-        Anchor(const asl::Point3f & thePosition) : localPosition(thePosition),
-            globalPosition(0,0,0), myVelocity(0), waveHeight(0) {};
-        asl::Point3f  localPosition;
-        asl::Point3f  globalPosition;
-        float         myVelocity;
-        float         waveHeight;
-    };
-
-    void calcWavePosition(float deltaT, Anchor & theAnchor, float theTime,
-        const asl::Vector3f & theWave1Direction, float theWave1Frequency, float theWave1Amplitude, float theWave1Speed,
-        const asl::Vector3f & theWave2Direction, float theWave2Frequency, float theWave2Amplitude, float theWave2Speed);
-
-    bool floatBody(float theTime,
-        float theIntensity,
-        dom::NodePtr theBody,
-        JSObject * theFloatProperties,
-        JSObject * theWave1Properties,
-        JSObject * theWave2Properties);
-#endif
-    // ////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter,
                          asl::Box2f & theGlyphBox, double & theAdvance);
@@ -201,7 +178,6 @@ private:
     bool        _myAppQuitFlag;
     bool        _myAutoPauseFlag;
 
-    // KeyMap      _myPressedKeyMap;
     SDL_Surface * _myScreen;
 };
 
