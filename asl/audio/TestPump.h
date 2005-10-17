@@ -20,6 +20,7 @@
 
 #include "HWSampleSink.h"
 #include "AudioBuffer.h"
+#include "Pump.h"
 
 #include <string>
 #include <asl/UnitTest.h>
@@ -68,13 +69,15 @@ class TestPump: public UnitTest{
                     curSample++;
                 }
                 if (curSample == mySamples+numFramesPerBuffer*numChannels) {
-                    asl::AudioBufferPtr myBuffer = mySampleSink->createBuffer(numFramesPerBuffer);
+                    asl::AudioBufferPtr myBuffer = asl::Pump::get().
+                            createBuffer(numFramesPerBuffer);
                     myBuffer->convert(mySamples, mySF, numChannels);
                     mySampleSink->queueSamples(myBuffer);
                     curSample = mySamples;
                 }
             }
-            asl::AudioBufferPtr myBuffer = mySampleSink->createBuffer((curSample-mySamples)/numChannels);
+            asl::AudioBufferPtr myBuffer = asl::Pump::get().createBuffer(
+                    (curSample-mySamples)/numChannels);
             myBuffer->convert(mySamples, mySF, numChannels);
             mySampleSink->queueSamples(myBuffer);
         };

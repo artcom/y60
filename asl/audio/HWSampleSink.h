@@ -71,8 +71,7 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
         virtual void fadeToVolume(float theVolume, float theTime);
         virtual float getVolume() const;
         bool isPlaying() const;
-        AudioBufferPtr createBuffer(unsigned theNumFrames);
-        void queueSamples(AudioBufferPtr& theBuffer);
+        bool queueSamples(AudioBufferPtr& theBuffer);
         asl::Time getBufferedTime() const;
         std::string getName() const;
         State getState() const;

@@ -88,6 +88,11 @@ HWSampleSinkPtr Pump::createSampleSink (const string & theName)
     return mySink;
 }
 
+AudioBufferPtr Pump::createBuffer(unsigned theNumFrames)
+{
+    return AudioBufferPtr(createAudioBuffer(getNativeSampleFormat(), theNumFrames, 
+            getNumOutputChannels(), getNativeSampleRate()));
+}
 
 void Pump::setSysConfig(const Time& myLatency, const std::string& myDeviceName)
 {

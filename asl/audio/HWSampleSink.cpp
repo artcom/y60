@@ -156,15 +156,11 @@ float HWSampleSink::getVolume() const {
 //    }
 }
 
-AudioBufferPtr HWSampleSink::createBuffer(unsigned theNumFrames) {
-    return AudioBufferPtr(createAudioBuffer(getSampleFormat(), theNumFrames, 
-                getNumChannels(), getSampleRate()));
-}
-
-void HWSampleSink::queueSamples(AudioBufferPtr& theBuffer) {
+bool HWSampleSink::queueSamples(AudioBufferPtr& theBuffer) {
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
     AC_TRACE << "queueSamples: " << *theBuffer << endl;
     _myBufferQueue.push_back(theBuffer);
+    return true;
 }
 
 asl::Time HWSampleSink::getBufferedTime() const {

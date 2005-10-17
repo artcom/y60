@@ -40,8 +40,8 @@ class Pump : public AudioTimeSource, private PosixThread
                 bool useDummy = false);
         static Pump& get();
         
-        HWSampleSinkPtr createSampleSink 
-                (const std::string & theName);
+        HWSampleSinkPtr createSampleSink(const std::string & theName);
+        AudioBufferPtr createBuffer(unsigned theNumFrames);
         void setVolume(float theVolume);
         void fadeToVolume(float theVolume, float theTime);
         float getVolume() const;

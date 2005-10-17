@@ -23,8 +23,7 @@ class ISampleSink
 {
     public:
         virtual ~ISampleSink() {};
-        virtual AudioBufferPtr createBuffer(unsigned theNumFrames) = 0;
-        virtual void queueSamples(AudioBufferPtr& theBuffer) = 0;
+        virtual bool queueSamples(AudioBufferPtr& theBuffer) = 0; // Return false on error.
 };
 
 typedef Ptr<ISampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > ISampleSinkPtr;
