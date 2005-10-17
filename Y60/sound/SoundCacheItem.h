@@ -12,21 +12,21 @@
 #define _SoundCacheItem_H_
 
 #include <asl/Ptr.h>
-#include <asl/AudioBufferBase.h>
 #include <asl/Time.h>
+#include <asl/AudioBufferBase.h>
+#include <asl/ISampleSink.h>
 
 #include <string>
 #include <map>
 
 namespace y60 {
 
-class SoundCacheItem 
+class SoundCacheItem: public asl::ISampleSink
 {
     public:
         SoundCacheItem(const std::string& myURI);
         virtual ~SoundCacheItem();
         std::string getURI() const;
-        bool addBuffer(asl::AudioBufferPtr theBuffer);
         unsigned getMemUsed() const;
         bool isFull() const;
         void doneCaching(int theTotalFrames = -1);
@@ -40,6 +40,9 @@ class SoundCacheItem
         void decInUseCount();
         bool isInUse() const;
 
+        // ISampleSink interface
+        bool queueSamples(asl::AudioBufferPtr& theBuffer);
+        
     private:
         std::string _myURI;
         // An int has room for 12 hours of samples at 48000 samples/sec.

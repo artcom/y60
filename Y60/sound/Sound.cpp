@@ -31,7 +31,6 @@ Sound::Sound (string myURI, IAudioDecoder * myDecoder, SoundCacheItemPtr myCache
       _myMaxUpdateTime(0.2),
       _myDecoder(myDecoder),
       _myDecodingComplete(false),
-      _myCurFrame(0),
       _myCacheItem(myCacheItem)
 {
     AC_DEBUG << "Sound::Sound(" << myURI << ", loop: " << theLoop << ")";
@@ -206,7 +205,7 @@ void Sound::update(double theTimeSlice) {
         }
         if (myEOF) {
             if (_myCacheItem && !_myCacheItem->isFull()) {
-                _myCacheItem->doneCaching(_myCurFrame);
+                _myCacheItem->doneCaching(_myDecoder->getCurFrame());
             }
             if (_myIsLooping) {
                 AC_DEBUG << "Sound::update: Loop";
@@ -230,21 +229,16 @@ void Sound::update(double theTimeSlice) {
     } 
 }
 
-AudioBufferPtr Sound::createBuffer(unsigned theNumFrames) {
-    return _mySampleSink->createBuffer(theNumFrames);
-}
-
-void Sound::queueSamples(AudioBufferPtr& theBuffer) {
+bool Sound::queueSamples(AudioBufferPtr& theBuffer) {
     // TODO: Code review: Is locking ok here?
     if (_myCacheItem && !_myCacheItem->isFull()) {
-        theBuffer->setStartFrame(_myCurFrame);
-        _myCurFrame += theBuffer->getNumFrames();
-        bool myCacheItemIsFull = !_myCacheItem->addBuffer(theBuffer);
+        bool myCacheItemIsFull = !_myCacheItem->queueSamples(theBuffer);
         if (myCacheItemIsFull) {
             _myCacheItem = SoundCacheItemPtr(0);
         }
     }
     _mySampleSink->queueSamples(theBuffer);
+    return true;
 }
 
 void Sound::close() {

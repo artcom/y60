@@ -58,8 +58,7 @@ class Sound :
         void update(double theTimeSlice);
     
         // ISampleSink interface (to Decoder)
-        asl::AudioBufferPtr createBuffer(unsigned theNumFrames);
-        void queueSamples(asl::AudioBufferPtr& theBuffer);
+        bool queueSamples(asl::AudioBufferPtr& theBuffer);
         
         static int getNumSoundsAllocated();
         
@@ -83,7 +82,6 @@ class Sound :
         asl::Time _myTargetBufferedTime;
         asl::Time _myMaxUpdateTime; // Max. time to prefetch per update.
 
-        int _myCurFrame;
         SoundCacheItemPtr _myCacheItem; // This is 0 if we're not caching.
 
         static asl::ThreadLock _mySoundsAllocatedLock;

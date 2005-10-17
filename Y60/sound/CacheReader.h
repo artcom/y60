@@ -32,6 +32,8 @@ class CacheReader: public IAudioDecoder
         virtual asl::Time getDuration() const;
         std::string getName() const;
         virtual void setSampleSink(asl::ISampleSink* mySampleSink);
+        virtual unsigned getCurFrame() const; 
+        virtual void decodeEverything();
 
     private:
         std::string _myURI;

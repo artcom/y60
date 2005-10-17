@@ -35,33 +35,6 @@ std::string SoundCacheItem::getURI() const {
     return _myURI;
 }
 
-bool SoundCacheItem::addBuffer(AudioBufferPtr theBuffer) {
-    AC_TRACE << "SoundCacheItem::addBuffer (frame " << theBuffer->getStartFrame() << ")";
-    if (!_myBuffers.empty()) {
-        BufferMap::iterator it = _myBuffers.end();
-        --it;
-        AudioBufferPtr myLastBuffer = it->second;
-        int myLastFrame = myLastBuffer->getEndFrame();
-        ASSURE_MSG(theBuffer->getStartFrame() == myLastBuffer->getEndFrame()+1, 
-                "Adding buffer to SoundCacheItem that doesn't fit to end of current buffer list.");
-    }
-    
-    // Actually append the buffer.
-    _myBuffers[theBuffer->getStartFrame()] = theBuffer;
-    _myFramesDecoded += theBuffer->getNumFrames();
-
-    if (getMemUsed() > SoundManager::get().getMaxCacheItemSize()) {
-        AC_WARNING << "SoundCacheItem::addBuffer: Max. memory usage per cache item exceeded.";
-        AC_WARNING << "    Sound: " << _myURI << ", Max. mem: " 
-                << SoundManager::get().getMaxCacheItemSize();
-        AC_WARNING << "    Disabling cache for this item.";
-        SoundManager::get().deleteCacheItem(_myURI);
-        return false;
-    } else {
-        return true;
-    }
-}
-
 unsigned SoundCacheItem::getMemUsed() const {
     if (_myFramesDecoded == 0) {
         return 0;
@@ -80,11 +53,14 @@ bool SoundCacheItem::isFull() const {
 void SoundCacheItem::doneCaching(int theTotalFrames) {
     if (theTotalFrames != -1) {
         _myTotalFrames = theTotalFrames;
+        if (_myTotalFrames < _myFramesDecoded) {
+            AC_WARNING << "Decoded frames > total frames. That doesn't make sense.";
+            AC_WARNING << "_myTotalFrames = " << _myTotalFrames << 
+                ", _myFramesDecoded = " << _myFramesDecoded;
+        }
     }
     AC_DEBUG << "SoundCacheItem::doneCaching: _myTotalFrames= " << _myTotalFrames 
             << ", _myFramesDecoded= " << _myFramesDecoded;
-    ASSURE_MSG(_myTotalFrames >= _myFramesDecoded,
-            "Decoded frames > total frames. That doesn't make sense.");
     if (!isFull()) {
         SoundManager::get().deleteCacheItem(_myURI);
     }
@@ -138,6 +114,33 @@ void SoundCacheItem::decInUseCount() {
 
 bool SoundCacheItem::isInUse() const {
     return _myInUseCount > 0;
+}
+
+bool SoundCacheItem::queueSamples(asl::AudioBufferPtr& theBuffer) {
+    AC_TRACE << "SoundCacheItem::addBuffer (frame " << theBuffer->getStartFrame() << ")";
+    if (!_myBuffers.empty()) {
+        BufferMap::iterator it = _myBuffers.end();
+        --it;
+        AudioBufferPtr myLastBuffer = it->second;
+        int myLastFrame = myLastBuffer->getEndFrame();
+        ASSURE_MSG(theBuffer->getStartFrame() == myLastBuffer->getEndFrame()+1, 
+                "Adding buffer to SoundCacheItem that doesn't fit to end of current buffer list.");
+    }
+    
+    // Actually append the buffer.
+    _myBuffers[theBuffer->getStartFrame()] = theBuffer;
+    _myFramesDecoded += theBuffer->getNumFrames();
+
+    if (getMemUsed() > SoundManager::get().getMaxCacheItemSize()) {
+        AC_WARNING << "SoundCacheItem::addBuffer: Max. memory usage per cache item exceeded.";
+        AC_WARNING << "    Sound: " << _myURI << ", Max. mem: " 
+                << SoundManager::get().getMaxCacheItemSize();
+        AC_WARNING << "    Disabling cache for this item.";
+        SoundManager::get().deleteCacheItem(_myURI);
+        return false;
+    } else {
+        return true;
+    }
 }
 
 }

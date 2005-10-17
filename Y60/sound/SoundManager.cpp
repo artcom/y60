@@ -168,14 +168,6 @@ SoundPtr SoundManager::createSound(const string & theURI, bool theLoop,
     return mySound;
 }
 
-/*
-SoundPtr SoundManager::createSound(const string & theURI, Ptr<ReadableStream> theStream, 
-        bool theLoop)
-{
-    AutoLocker<ThreadLock> myLocker(_myLock);
-    return SoundPtr(0);
-}
-*/
 void SoundManager::setVolume(float theVolume) {
     Pump::get().setVolume(theVolume);
 }
@@ -198,7 +190,19 @@ bool SoundManager::isRunning() const {
 }
 
 void SoundManager::preloadSound(const std::string& theURI) {
-    // TODO
+    AC_DEBUG << "SoundManager::preloadSound(" << theURI << ")";
+    if (_myCache.find(theURI) != _myCache.end()) {
+        AC_DEBUG << "    --> Already in cache. Ignoring.";
+        return;
+    }
+    checkCacheSize();
+    SoundCacheItemPtr myCacheItem = SoundCacheItemPtr(new SoundCacheItem(theURI));
+    addCacheItem(myCacheItem);
+    IAudioDecoder * myDecoder = createDecoder(theURI);
+    myDecoder->setSampleSink(&(*myCacheItem));
+    myDecoder->decodeEverything();
+    myCacheItem->doneCaching(myDecoder->getCurFrame());
+    delete myDecoder;
 }
 
 void SoundManager::deleteCacheItem(const std::string& theURI) {

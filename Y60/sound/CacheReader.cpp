@@ -73,5 +73,13 @@ unsigned CacheReader::getNumChannels() {
     return _myCacheItem->getNumChannels();
 }
 
+unsigned CacheReader::getCurFrame() const {
+    return _myCurFrame;
+}
+
+void CacheReader::decodeEverything() {
+    AC_WARNING << "CacheReader::decodeEverything was called.";
+}
+
 }
 

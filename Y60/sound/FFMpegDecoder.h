@@ -31,14 +31,17 @@ class FFMpegDecoder: public IAudioDecoder
 //        FFMpegDecoder (asl::Ptr < asl::ReadableStream > myStream, asl::HWSampleSinkPtr mySink);
         virtual ~FFMpegDecoder();
 
-        virtual bool isSyncDecoder() const;
-        virtual bool decode();
         virtual unsigned getSampleRate();
         virtual unsigned getNumChannels();
         virtual void seek (asl::Time thePosition);
         virtual asl::Time getDuration() const;
         std::string getName() const;
         virtual void setSampleSink(asl::ISampleSink* mySampleSink);
+        virtual unsigned getCurFrame() const; 
+        virtual void decodeEverything();
+
+        virtual bool isSyncDecoder() const;
+        virtual bool decode();
 
     private:
         void open();
@@ -54,6 +57,8 @@ class FFMpegDecoder: public IAudioDecoder
         unsigned _myNumChannels;
         ReSampleContext * _myResampleContext;
         asl::ISampleSink* _mySampleSink;
+        
+        unsigned _myCurFrame;
 };
 
 class FFMpegDecoderFactory: public IAudioDecoderFactory

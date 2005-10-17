@@ -26,7 +26,8 @@ FFMpegDecoder::FFMpegDecoder (const string& myURI)
       _myFormatContext(0),
       _myStreamIndex(-1),
       _myResampleContext(0),
-      _mySampleSink(0)
+      _mySampleSink(0),
+      _myCurFrame(0)
 {
     AC_DEBUG << "FFMpegDecoder::FFMpegDecoder";
     open();
@@ -49,6 +50,17 @@ std::string FFMpegDecoder::getName() const {
 
 void FFMpegDecoder::setSampleSink(asl::ISampleSink* mySampleSink) {
     _mySampleSink = mySampleSink;
+}
+
+unsigned FFMpegDecoder::getCurFrame() const {
+    return _myCurFrame;
+}
+
+void FFMpegDecoder::decodeEverything() {
+    bool isDone = false;
+    while (!isDone) {
+        isDone = decode();
+    }
 }
 
 Time FFMpegDecoder::getDuration() const {
@@ -175,12 +187,14 @@ bool FFMpegDecoder::decode() {
                             (int16_t*)(_myResampledSamples.begin()),
                             (int16_t*)(_mySamples.begin()), 
                             numFrames);
-                    myBuffer = _mySampleSink->createBuffer(numFrames);
+                    myBuffer = Pump::get().createBuffer(numFrames);
                     myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
                 } else {
-                    myBuffer = _mySampleSink->createBuffer(numFrames);
+                    myBuffer = Pump::get().createBuffer(numFrames);
                     myBuffer->convert(_mySamples.begin(), SF_S16, _myNumChannels);
                 }
+                myBuffer->setStartFrame(_myCurFrame);
+                _myCurFrame += myBuffer->getNumFrames();
                 _mySampleSink->queueSamples(myBuffer);
                 myData += myLen;
                 myDataLen -= myLen;

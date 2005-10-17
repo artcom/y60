@@ -285,6 +285,9 @@ class TestCache: public SoundTestBase {
             play("../../testfiles/aussentuer.mp3");
             ENSURE(getSoundManager().getNumItemsInCache() == 0);
             getSoundManager().setCacheSize(128*1024*1024, 24*1024*1024);
+            getSoundManager().preloadSound("../../testfiles/stereotest441.wav");
+            ENSURE(getSoundManager().getNumItemsInCache() == 1);
+            play("../../testfiles/stereotest441.wav");
         }
         
     private:
@@ -590,10 +593,10 @@ class SoundTestSuite : public UnitTestSuite {
 #endif
             mySoundManager.setAppConfig(44100, 2, _myUseDummyPump);
 
-            addTest(new TestPlay(mySoundManager));
-            addTest(new TestStop(mySoundManager));
+//            addTest(new TestPlay(mySoundManager));
+//            addTest(new TestStop(mySoundManager));
             addTest(new TestCache(mySoundManager));
-
+/*
             addTest(new TestBroken(mySoundManager));
             addTest(new TestFireAndForget(mySoundManager));
             addTest(new TestTwoSounds(mySoundManager));
@@ -607,7 +610,7 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new TestVolume(mySoundManager));
           
             addTest(new StressTest(mySoundManager, 5));
-
+*/
 //            addTest(new TestLeak(mySoundManager));
 //            addTest(new MemLeakStressTest(mySoundManager, 5*60));
         }

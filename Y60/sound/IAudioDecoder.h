@@ -28,12 +28,15 @@ class IAudioDecoder
         virtual std::string getName() const = 0;
         virtual void setSampleSink(asl::ISampleSink* mySampleSink) = 0;
         virtual void setTime(asl::Time myTime) {};
+        virtual unsigned getCurFrame() const = 0; // This is the total number of frames that 
+                                 // have been decoded. It doesn't take into account seeks etc.
+        virtual void decodeEverything() = 0;
        
         // There are two types of decoders. Sync decoders don't have their own
         // decoding thread. Buffering is handled externally - the Decoder client
         // calls decode() until enough data has been buffered.
         // Async decoders have an internal thread that decodes the data and do their
-        // own buffering, so they need to know when the playback is running.
+        // own buffering, so they need to know when playback is running.
         virtual bool isSyncDecoder() const = 0;
         
         // Sync decoder methods
