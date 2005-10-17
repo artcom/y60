@@ -34,13 +34,13 @@ function FFMpegTest(theArguments) {
         //"c:/TEST_MOVIES/MPEG/bmw_aichi_windkanal_1280.mpg",
         //"c:/TEST_MOVIES/MPEG/bmw_aichi_windkanal_pal.m2v",
         //"c:/TEST_MOVIES/MPEG/counter_768.mpg",
-        //"c:/TEST_MOVIES/MPEG/counter.mpg",
+        "c:/TEST_MOVIES/MPEG/counter.mpg",
         //"c:/TEST_MOVIES/MPEG/mpeg2_1024_768_15000bps.m2v",
         //"c:/TEST_MOVIES/MPEG/mpeg2_1280_960_20000.m2v",
         //"c:/TEST_MOVIES/MPEG/aichi.m2v",
         //"c:/TEST_MOVIES/MPEG/linetest.m2v",
         //"c:/TEST_MOVIES/MPEG/10.mpg",
-        "c:/TEST_MOVIES/MPEG/ADTEC.MPG",
+        //"c:/TEST_MOVIES/MPEG/ADTEC.MPG",
         //"c:/Dev/pro60/testmodels/movies/testmovie.m2v"
     ];
 

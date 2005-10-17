@@ -1,4 +1,4 @@
-APP=acxpshellOPT.exe
+APP=y60.exe
 if [ "$DEBUG" = "1" ] ; then
     APP=$PRO/bin/acxpshellDBG.exe
 fi
