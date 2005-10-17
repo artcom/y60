@@ -134,6 +134,11 @@ getValueRange(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 }
 
 static JSBool
+getOccurringValueRange(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    return Method<JSCTScan::NATIVE>::call(&JSCTScan::NATIVE::getOccurringValueRange,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 computeHistogram(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
@@ -554,6 +559,7 @@ JSCTScan::Functions() {
         {"getVoxelSize",         getVoxelSize,            0},
         {"getVoxelDimensions",   getVoxelDimensions,      0},
         {"getValueRange",        getValueRange,           0},
+        {"getOccurringValueRange", getOccurringValueRange,0},
         {"polygonizeGlobal",     polygonizeGlobal,        7},
         {"polygonizeVolumeMeasurement", polygonizeVolumeMeasurement,        7},
         {"countTrianglesGlobal", countTrianglesGlobal,    4},

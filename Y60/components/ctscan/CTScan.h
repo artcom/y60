@@ -88,6 +88,9 @@ class CTScan {
         /** Returns the minimum/maximum voxel value possible in the dataset */
         asl::Vector2d getValueRange();
 
+        /** Returns the minimum/maximum voxel value that actually occurs in the dataset */
+        asl::Vector2d getOccurringValueRange();
+
         asl::Vector2i countTrianglesGlobal(const asl::Box3i & theVoxelBox, 
             double theThresholdMin, double theThresholdMax, int theDownSampleRate);
 
@@ -111,7 +114,8 @@ class CTScan {
         
         /** Computes the histogram of a given volume of interest */
         void
-        computeHistogram(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram);
+        computeHistogram(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram,
+                         bool useOccurringRange = true);
 
         // add a the grey value of a single voxel to the profile 
         void computeProfile(const asl::Point3i & thePoint, std::vector<asl::Signed16> & theProfile);
@@ -163,11 +167,13 @@ class CTScan {
         CTScan(const CTScan&); // hide copy constructor
         sigc::signal<bool, double, Glib::ustring> _myProgressSignal;
         void prepareBox(asl::Box3i & theVoxelBox);
+        void findOccurringValueRange();
         
         y60::PixelEncoding _myEncoding;
         std::vector<dom::ResizeableRasterPtr> _mySlices;
         asl::Vector2f _myDefaultWindow;
         asl::Vector3f _myVoxelSize;
+        asl::Vector2d _myOccurringValueRange;
         
         template <class VoxelT, class SegmentationPolicy>
         bool
@@ -182,7 +188,8 @@ class CTScan {
                              unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
         template <class VoxelT>
         void
-        countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram);
+        countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram,
+                         bool useOccurringRange);
         
         // computes the grey-scale profile of all voxels
         // from [theStart, theEnd[  (without theEnd)

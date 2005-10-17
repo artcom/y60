@@ -35,7 +35,7 @@ class Histogram : public Gtk::DrawingArea {
             MODE_LOWER_UPPER
         };
 
-        void setHistogram(const std::vector<unsigned> theSamples);
+        void setHistogram(const std::vector<unsigned> & theSamples);
 
         void setShowWindow(bool theFlag);
         bool getShowWindow() const;
@@ -89,10 +89,10 @@ class Histogram : public Gtk::DrawingArea {
         float                    _myWindowWidth;
         float                    _myLower;
         float                    _myUpper;
-        bool                      _myDrawCenterFlag;
-        bool                      _myDrawWindowFlag;
+        bool                     _myDrawCenterFlag;
+        bool                     _myDrawWindowFlag;
 
-        asl::Vector2f             _myValueRange;
+        asl::Vector2f            _myValueRange;
 };
 
 }

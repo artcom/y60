@@ -190,7 +190,7 @@ Histogram::convertSampleCountToScreenPos(int theSampleCount, int theMaxSampleCou
 }
 
 void 
-Histogram::setHistogram(const std::vector<unsigned> theSamples) {
+Histogram::setHistogram(const std::vector<unsigned> & theSamples) {
     _mySampleData = theSamples;
     rebuildBins();
     queue_draw();

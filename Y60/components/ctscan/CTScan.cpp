@@ -47,6 +47,7 @@
 #include <paintlib/plpngenc.h>
 #include <asl/Assure.h>
 #include <fstream>
+#include <algorithm>
 
 using namespace asl;
 using namespace std;
@@ -132,6 +133,8 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
         _myEncoding = representativeFile->getEncoding(); 
     }
     //allocateStencils();
+    
+    findOccurringValueRange();
     
     return _mySlices.size();
 }
@@ -231,6 +234,43 @@ CTScan::getVoxelAspect() const {
 void 
 CTScan::setVoxelSize(const Vector3f & theSize) {
     _myVoxelSize = theSize;
+}
+
+void 
+CTScan::findOccurringValueRange() {
+    std::vector<unsigned> myHistogram;
+    asl::Box3i myBox;
+    myBox.makeEmpty();
+    myBox.extendBy(Vector3i(0, 0, 0));
+    myBox.extendBy(getVoxelDimensions());
+    computeHistogram(myBox, myHistogram, false);
+
+    std::vector<unsigned>::iterator myMinIt = find_if( myHistogram.begin(), myHistogram.end(), 
+                                            std::bind2nd( std::not_equal_to<unsigned>(), 0) );
+    if (myMinIt == myHistogram.end()) {
+        throw CTScanException("All values occur zero times.", PLUS_FILE_LINE);
+    }
+
+    unsigned myMinIndex = distance( myHistogram.begin(), myMinIt);
+    Vector2d myValueRange = getValueRange();
+    _myOccurringValueRange[0] = myValueRange[0] + myMinIndex;
+
+    std::vector<unsigned>::reverse_iterator myMaxIt = find_if( myHistogram.rbegin(), myHistogram.rend(), 
+                                            bind2nd( not_equal_to<unsigned>(), 0) );
+    if (myMaxIt == myHistogram.rend()) {
+        throw CTScanException("All values occur zero times.", PLUS_FILE_LINE);
+    }
+
+    unsigned myMaxIndex = distance(myMaxIt, myHistogram.rend());
+    myMaxIndex -= 1; // should be ok to subtract one here ... otherwise the above exception would have
+                     // been thrown
+    _myOccurringValueRange[1] = myValueRange[0] + myMaxIndex;
+    AC_WARNING << "occurring value range: " << _myOccurringValueRange;
+}
+
+asl::Vector2d
+CTScan::getOccurringValueRange() {
+    return _myOccurringValueRange;
 }
 
 asl::Vector2d
@@ -742,8 +782,14 @@ CTScan::create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize) {
 
 template <class VoxelT>
 void
-CTScan::countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram) {
-    Vector2d myValueRange = getValueRange();
+CTScan::countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theHistogram,
+                         bool useOccurringRange) {
+    Vector2d myValueRange;
+    if (useOccurringRange) {
+        myValueRange = getOccurringValueRange();
+    } else {
+        myValueRange = getValueRange();
+    }
     int myValueCount = int(myValueRange[1] - myValueRange[0]) + 1;
     int myXStart = theVOI[Box3i::MIN][0];
     int myYStart = theVOI[Box3i::MIN][1];
@@ -773,16 +819,18 @@ CTScan::countVoxelValues(const asl::Box3i & theVOI, std::vector<unsigned> & theH
 }
 
 void
-CTScan::computeHistogram(const Box3i & theVOI, std::vector<unsigned> & theHistogram) {
+CTScan::computeHistogram(const Box3i & theVOI, std::vector<unsigned> & theHistogram,
+                         bool useOccurringRange)
+{
     switch (_myEncoding) {
         case y60::GRAY:
-            countVoxelValues<unsigned char>(theVOI, theHistogram);
+            countVoxelValues<unsigned char>(theVOI, theHistogram, useOccurringRange);
             break;
         case y60::GRAY16:
-            countVoxelValues<unsigned short>(theVOI, theHistogram);
+            countVoxelValues<unsigned short>(theVOI, theHistogram, useOccurringRange);
             break;
         case y60::GRAYS16:
-            countVoxelValues<short>(theVOI, theHistogram);
+            countVoxelValues<short>(theVOI, theHistogram, useOccurringRange);
             break;
         default:
             throw CTScanException("Unhandled voxel type in CTScan::computeHistogram()", PLUS_FILE_LINE);
