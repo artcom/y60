@@ -27,7 +27,7 @@ fi
 #
 # debug or release mode
 #
-SHELL="acgtkshellOPT"
+SHELL="acgtkshell"
 if [ ! -z "$DEBUG" -a "$DEBUG" != "0" ]; then
     SHELL="acgtkshellDBG"
 fi

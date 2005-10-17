@@ -13,7 +13,7 @@ if [ $UNAME == "Cygwin" ]; then
     PLATFORM=WIN
 fi
 
-APPLICATION=acgtkshellOPT
+APPLICATION=acgtkshell
 if [ "$DEBUG" == "1" ] ; then
     mkdir -p o.ANT.${PLATFORM}.DBG/tests
     cd o.ANT.${PLATFORM}.DBG/tests
