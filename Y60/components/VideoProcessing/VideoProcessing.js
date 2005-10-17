@@ -38,7 +38,7 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
     var Base = [];
     var _myVideoProcessingExtension = new VideoProcessingExtension();
     var _myOverlay = null;
-    var _myPalette = null;    
+    var _myPalette = null;
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -51,7 +51,7 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
     self.setup = function(theWidth, theHeight, theTitle) {
         Base.setup(theWidth, theHeight, false, theTitle);
         window.addExtension(_myVideoProcessingExtension);
-        
+
         createOverlay();
 
         _myVideoProcessingExtension.algorithm = "shot_detection";
@@ -69,7 +69,7 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
                 case "t":
                     //self.getMovieNode().playmode = "pause";
                     print(_myVideoProcessingExtension.result);
-                
+
                     break;
                 default:
                     Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
@@ -78,21 +78,21 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
     }
 
     var _myShotLength = 0;
-    Base.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
+    Base.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
         var myResult = _myVideoProcessingExtension.result;
         var myLength = myResult.childNodes.length;
-        
+
         if (myLength > _myShotLength) {
             showHistogram();
             showShotInfo();
             _myShotLength = myLength;
-        } 
-        Base.onIdle(theTime);
-        
+        }
+        Base.onFrame(theTime);
+
     }
 
-    
+
     ////////////// private members ////////////
 
     function createPalette(nbins) {
@@ -111,7 +111,7 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
     function showShotInfo() {
         var myResult = _myVideoProcessingExtension.result;
         var myLast = myResult.childNodes.length - 1;
-        
+
         var myString = "";
         myString += "Total Shots " + myResult.childNodes.length + "\n";
         myString += "Current shot begin : " + myResult.childNode(myLast).start + "\n";
@@ -120,19 +120,19 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
         }
         self.setMessage(myString);
     }
-    
-    function showHistogram() {        
+
+    function showHistogram() {
 
         var myResult = _myVideoProcessingExtension.result;
         var myLast = myResult.childNodes.length - 1;
 
         var myNode = myResult.childNode(myLast).childNode("histogram").childNode(0);
         var myHistogram = stringToArray(myNode.nodeValue);
-        
+
         if (_myPalette == null) {
             createPalette(myHistogram.length);
         }
-        
+
         var myImage = self.getImageManager().getImageNode("histogram");
         var myRasterData = myImage.childNode(0).childNode(0).nodeValue;
 
@@ -152,8 +152,8 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
             var i = Math.floor(k / myCellsPerLine);
             var x = 10 + j*(myCellWidth+5);
             var y = 10 + i*(myCellHeight+5);
-            
-            var myColor = _myPalette[k];            
+
+            var myColor = _myPalette[k];
             var myAlpha = Math.log(myHistogram[k]) / Math.log(myMaximum);
             if (myAlpha < 0) {
                 myAlpha = 0;
@@ -161,12 +161,12 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
             //print(" k " + k  + " max " + myMaximum + "hist " + myHistogram[k] + " alhpa " + myAlpha);
             myRasterData.fillRect(x,y,x+myCellWidth,y+myCellHeight,
                                   255*myColor[0],255*myColor[1],255*myColor[2],255*myAlpha);
-                
+
         }
 
-        _myOverlay.visible = true;    
+        _myOverlay.visible = true;
     }
-    function createOverlay() {        
+    function createOverlay() {
 
         var myImage = self.getImageManager().getImageNode("histogram");
         myImage.src = "overlay.png";
@@ -177,8 +177,8 @@ VideoProcessingExtensionApp.prototype.Constructor = function(self, theArguments)
         _myOverlay.width  = myImage.width;
         _myOverlay.height = myImage.height;
         _myOverlay.color = new Vector4f(1,1,1,1.0);
-        _myOverlay.visible = false;    
-        
+        _myOverlay.visible = false;
+
     }
 
 }

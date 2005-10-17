@@ -49,6 +49,7 @@ public:
             y60::ScenePtr myScene;//(new y60::Scene);
 
             dom::NodePtr myMaterial = y60::createUnlitTexturedMaterial(myScene, "myTexture.jpg", "myMaterial");
+            dom::NodePtr myColorMaterial = y60::createColorMaterial(myScene, asl::Vector4f(1,0,1,0));
 
             dom::NodePtr myShape = createPlane(
                   myScene, 4, 3,

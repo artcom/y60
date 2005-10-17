@@ -39,7 +39,7 @@ function StatusBar(theGladeStatusBar) {
         }
     }
 
-    this.onIdle = function() {
+    this.onFrame = function() {
         if (_myStatisticsFlag) {
             _myLabel.text = window.frameRate.toFixed(0) + " fps";
         }

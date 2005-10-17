@@ -120,6 +120,7 @@ function generateJSLibDocumentation(theDocFile) {
         "functions"  : getDocumentation("GlobalFunctions"),
         "math functions"  : getDocumentation("MathFunctions"),
         "directory functions"  : getDocumentation("DirectoryFunctions"),
+        "file functions"  : getDocumentation("FileFunctions"),
         "proc functions"  : getDocumentation("ProcFunctions"),
         "gtk"    : getDocumentation("gtk")
     };

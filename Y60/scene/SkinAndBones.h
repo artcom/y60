@@ -13,7 +13,7 @@
 //   $Revision: 1.7 $
 //   $Date: 2005/03/24 23:36:03 $
 //
-//   Description: 
+//   Description:
 //
 //=============================================================================
 
@@ -31,8 +31,8 @@
 
 namespace y60 {
     class TextureManager;
-    
-    DEFINE_PROPERTY_TAG(BoneMatrixTag, SkinAndBonesPropertiesFacade, y60::VectorOfVector4f, y60::VectorTypeNameTrait<asl::Vector4f>::name(), BONE_MATRIX_PROPERTY, "properties", "name", VectorOfVector4f());
+
+    DEFINE_PROPERTY_TAG(BoneMatrixTag, SkinAndBonesPropertiesFacade, y60::VectorOfVector4f, y60::VectorTypeNameTrait<asl::Vector4f>::name(), BONE_MATRIX_PROPERTY, "properties", VectorOfVector4f());
 	class SkinAndBonesPropertiesFacade :
 		public dom::Facade,
 		public BoneMatrixTag::Plug
@@ -51,7 +51,7 @@ namespace y60 {
     class SkinAndBones : public MaterialBase
     {
         public:
-            SkinAndBones(dom::Node & theNode) : 
+            SkinAndBones(dom::Node & theNode) :
 			  MaterialBase(theNode), _myBoundingBoxNode(0)
               {}
             IMPLEMENT_CHILD_FACADE(SkinAndBones);
@@ -65,11 +65,11 @@ namespace y60 {
         private:
 			dom::NodePtr                 _myBoneMatrixPropertyNode;
             std::vector<JointFacadePtr>  _myJoints;
-            std::vector<asl::Matrix4f>   _myJointSpaceTransforms;    
+            std::vector<asl::Matrix4f>   _myJointSpaceTransforms;
             dom::NodePtr                 _myBoundingBoxNode;
-            
+
      };
-}   
+}
 
 #endif
 

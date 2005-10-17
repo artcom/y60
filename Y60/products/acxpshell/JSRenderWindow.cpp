@@ -1,3 +1,20 @@
+//=============================================================================
+// Copyright (C) 2003, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+//    $RCSfile: AbstractRenderWindow.cpp,v $
+//     $Author: jens $
+//   $Revision: 1.34 $
+//       $Date: 2005/04/26 19:55:59 $
+//
+//=============================================================================
+
 #include <asl/settings.h>
 
 #include <iostream>
@@ -99,12 +116,7 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
 
         JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
-/*
-        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), )) {
-            JS_ReportError(cx, "Renderer::loadTTF(): Invalid object");
-            return JS_FALSE;
-        }
-*/
+
         if (!convertFrom(cx, argv[0], myName)) {
             JS_ReportError(cx, "Renderer::loadTTF(): Argument #1 must be a font name");
             return JS_FALSE;
@@ -131,12 +143,7 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         return JS_TRUE;
    } HANDLE_CPP_EXCEPTION;
 }
-/*
-static JSBool
-setViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return Method<SDLWindow>::call(&SDLWindow::setViewport,cx,obj,argc,argv,rval);
-}
-*/
+
 static JSBool
 setMousePosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set the mouse cursor position.");
@@ -145,13 +152,6 @@ setMousePosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::setMousePosition,cx,obj,argc,argv,rval);
 }
-// DTM legacy code ... scheduled for removal
-#if 0
-static JSBool
-floatBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return Method<SDLWindow>::call(&SDLWindow::floatBody,cx,obj,argc,argv,rval);
-}
-#endif
 
 static JSBool
 draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -251,7 +251,6 @@ JSRenderWindow::Functions() {
     return myFunctions;
 }
 
-
 enum PropertyNumbers {
     PROP_windeco = JSBASE::PROP_END,
     PROP_showMouseCursor,
@@ -325,10 +324,11 @@ JSRenderWindow::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
         default:
             return JSBASE::getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
     }
-};
+}
+
 JSBool JSRenderWindow::getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     return JS_TRUE;
-};
+}
 
 // setproperty handling
 JSBool
@@ -354,13 +354,12 @@ JSRenderWindow::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
         default:
             return JSBASE::setPropertySwitch(myObj.getNative(),theID, cx, obj, id, vp);
     }
-};
+}
 
 JSBool
 JSRenderWindow::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     return JS_TRUE;
-};
-
+}
 
 JSBool
 JSRenderWindow::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -371,23 +370,26 @@ JSRenderWindow::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
         return JS_FALSE;
     }
-    bool myAntiAliasing = false;
-    if (argc == 1) {
-        if (!convertFrom(cx,argv[0],myAntiAliasing)) {
-            JS_ReportError(cx,"JSRenderWindow::Constructor: parameter 0 must be a bool");
-            return JS_FALSE;
-        }
-    } else {
-        if (argc != 0) {
-            JS_ReportError(cx,"JSRenderWindow::Constructor: bad number of arguments, must be either 0 or 1");
-            return JS_FALSE;
-        }
+    if (argc != 0) {
+        JS_ReportError(cx,"JSRenderWindow::Constructor: bad number of arguments, must be 0");
+        return JS_FALSE;
     }
 
     OWNERPTR myNewWindow = NATIVE::create();
-    JSRenderWindow * myNewObject=new JSRenderWindow(myNewWindow, &(*myNewWindow));
+    JSRenderWindow * myNewObject = new JSRenderWindow(myNewWindow, &(*myNewWindow));
     if (myNewObject) {
-        JS_SetPrivate(cx,obj,myNewObject);
+        JS_SetPrivate(cx, obj, myNewObject);
+
+        // Set the JavaScript RenderWindow object as default event listener for the new window
+        myNewWindow->setEventListener(obj);
+        myNewWindow->setJSContext(cx);
+
+        // Add an empty default scene
+        /*
+        ScenePtr myEmptyScene = ScenePtr(new y60::Scene());
+        myEmptyScene->createStubs(JSApp::getPackageManager());
+        myNewWindow->setScene(myEmptyScene);
+        */
         return JS_TRUE;
     }
     JS_ReportError(cx,"JSRenderWindow::Constructor: new JSRenderWindow failed");
@@ -439,37 +441,9 @@ bool convertFrom(JSContext *cx, jsval theValue, SDLWindow *& theRenderWindow) {
     return false;
 }
 
-#if 0
-bool convertFrom(JSContext *cx, jsval theValue, AbstractRenderWindow *& theRenderWindow) {
-    if (JSVAL_IS_OBJECT(theValue)) {
-        JSObject * myArgument;
-        if (JS_ValueToObject(cx, theValue, &myArgument)) {
-
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSAbstractRenderWindow::NATIVE>::Class()) {
-                theRenderWindow = &(*JSClassTraits<JSAbstractRenderWindow::NATIVE>::getNativeOwner(cx,myArgument));
-                return true;
-            }
-                /*
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSRenderWindow::NATIVE>::Class()) {
-                theRenderWindow = &(*JSClassTraits<JSRenderWindow::NATIVE>::getNativeOwner(cx,myArgument));
-                return true;
-            }
-            */
-        }
-    }
-    return false;
-}
-#endif
-
 jsval as_jsval(JSContext *cx, asl::Ptr<SDLWindow> theOwner) {
     JSObject * myReturnObject = JSRenderWindow::Construct(cx, theOwner, &(*theOwner));
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
 }
-/*
-jsval as_jsval(JSContext *cx, asl::Ptr<y60::Renderer> theOwner, y60::Renderer * theRenderer) {
-    JSObject * myObject = JSRenderWindow::Construct(cx, theOwner, theRenderer);
-    return OBJECT_TO_JSVAL(myObject);
-}
-*/

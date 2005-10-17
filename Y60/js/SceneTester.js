@@ -77,11 +77,11 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
                 }
             }
 
-            obj.onFrame(obj.myFrameCount);
+            obj.onFrameDone(obj.myFrameCount);
         }
     }
 
-    obj.onFrame = function(theFrameCount) {
+    obj.onFrameDone = function(theFrameCount) {
         if (_myOutputImageName) {
             if (theFrameCount == _myTestDurationInFrames) {
                 obj.saveTestImage();

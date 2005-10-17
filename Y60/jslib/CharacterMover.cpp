@@ -140,7 +140,7 @@ namespace jslib {
     }
 
     CharacterMover::State
-    CharacterMover::onIdle(double theDeltaTime, Vector4f * theColors,
+    CharacterMover::onFrame(double theDeltaTime, Vector4f * theColors,
         Vector3f * thePositions, Box3f & theBoundingBox)
     {
         _myStateDuration += theDeltaTime;
@@ -300,7 +300,7 @@ namespace jslib {
     }
 
     void
-    StringMover::onIdle(double theTime) {
+    StringMover::onFrame(double theTime) {
         double myDeltaTime = theTime - _myLastIdleTime;
         _myLastIdleTime = theTime;
 
@@ -331,7 +331,7 @@ namespace jslib {
                 for (unsigned j = 0; j < myPrimitveCount; ++j) {
                     unsigned myIndex = j + myOffset;
 
-                    CharacterMover::State myState = _myCharacters[myIndex].onIdle(
+                    CharacterMover::State myState = _myCharacters[myIndex].onFrame(
                             myDeltaTime, &(*myColors)[j * 4],
                             &(*myPositions)[j * 4], myBoundingBox);
 

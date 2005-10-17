@@ -124,27 +124,27 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-    self.BaseViewer.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
-        self.BaseViewer.onIdle(theTime);
+    self.BaseViewer.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
+        self.BaseViewer.onFrame(theTime);
         _myCurrentTime = theTime;
         if (_myShutter) {
-            _myShutter.onIdle(theTime);
+            _myShutter.onFrame(theTime);
         }
         var myCanvas = self.getRenderWindow().canvas;
         if (myCanvas) {
             for (var i=0; i < myCanvas.childNodesLength('viewport'); ++i) {
                 var myMover = self.getMover(myCanvas.childNode('viewport'));
                 if (myMover) {
-                    myMover.onIdle(theTime);
+                    myMover.onFrame(theTime);
                 }
             }
         }
         if (_myAnimationManager) {
-            _myAnimationManager.onIdle(theTime);
+            _myAnimationManager.onFrame(theTime);
         }
 
-        _myOnScreenDisplay.onIdle(theTime);
+        _myOnScreenDisplay.onFrame(theTime);
         fadeSplashScreen(theTime);
 
         if (_myStatisticCycle != 0) {

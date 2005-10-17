@@ -153,7 +153,6 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
                 string::size_type myRealNameStart = _programName.rfind(theDirectorySeparator);
                 _programName = _programName.substr(++myRealNameStart);
                 printCopyright();
-                printVersion();
             }
         }
 
@@ -163,7 +162,7 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
 
 void
 Arguments::printCopyright() const {
-    AC_PRINT << _programName << " Copyright (C) 2003-2005 ART+COM";
+    AC_PRINT << _programName << " Copyright (C) 2003-2006 ART+COM";
 }
 
 void

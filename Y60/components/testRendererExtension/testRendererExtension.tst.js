@@ -49,15 +49,15 @@ RendererExtensionTestApp.prototype.Constructor = function(self, theArguments) {
 
     // setup
     Base.setup = self.setup;
-    self.setup = function(theWidth, theHeight, theTitle) {        
-        Base.setup(theWidth, theHeight, false, theTitle);            
+    self.setup = function(theWidth, theHeight, theTitle) {
+        Base.setup(theWidth, theHeight, false, theTitle);
     }
 
-    Base.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
-        Base.onIdle(theTime);        
+    Base.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
+        Base.onFrame(theTime);
         if (--_myCountDown == 0) {
-            print("Test failed becausse the Extension did not call exit(0) within 30 frames"); 
+            print("Test failed becausse the Extension did not call exit(0) within 30 frames");
             exit(1);
         }
     }

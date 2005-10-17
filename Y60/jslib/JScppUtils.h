@@ -120,6 +120,9 @@ JSBool JSA_reportUncaughtException(JSContext *cx);
 JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int argc, jsval argv[], jsval* rval);
 
+JSBool
+JSA_hasFunction(JSContext * cx, JSObject * obj, const char * theName);
+
 struct JSConstIntPropertySpec {
     const char      *name;
     int8            tinyid;

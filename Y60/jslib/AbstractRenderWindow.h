@@ -183,7 +183,7 @@ namespace jslib {
         virtual void postViewport(const dom::NodePtr & theViewport);
         virtual void postRender();
         virtual void handle(y60::EventPtr theEvent);
-        virtual void onIdle();
+        virtual void onFrame();
         virtual void onKey(y60::Event & theEvent);
         virtual void onMouseButton(y60::Event & theEvent);
         virtual void onMouseWheel(y60::Event & theEvent);

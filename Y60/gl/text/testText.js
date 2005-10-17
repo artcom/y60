@@ -51,9 +51,9 @@ testTextApp.prototype.Constructor = function(obj, theSceneFile, theShaderLib) {
     obj.onPostRender = function () {
     }
 
-    obj.SceneViewer.onIdle = obj.onIdle;
-    obj.onIdle = function (theTime) {
-        obj.SceneViewer.onIdle(theTime);
+    obj.SceneViewer.onFrame = obj.onFrame;
+    obj.onFrame = function (theTime) {
+        obj.SceneViewer.onFrame(theTime);
 
         window.setTextStyle(Renderer.SOLID_TEXT);
         window.setTextColor(new Vector4f(1,0,0,1), new Vector4f(0,0,0,1));

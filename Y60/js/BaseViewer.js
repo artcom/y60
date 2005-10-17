@@ -239,7 +239,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _mySkyboxMaterial = Node.createElement('material');
         _mySkyboxMaterial.id = myMaterialId;
         self.getMaterials().appendChild(_mySkyboxMaterial);
-        
+
         // add textures
         var myTexturesString =
             '<textures>\n' +
@@ -252,7 +252,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         // add texture requirement
         var myTextureFeatures = new Node('<feature name="textures">[100[skybox]]</feature>\n').firstChild;
         _mySkyboxMaterial.requires.appendChild(myTextureFeatures);
-        
+
         self.getWorld().skyboxmaterial = myMaterialId;
         self.getScene().update(Scene.IMAGES);
     }
@@ -321,9 +321,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.onResize = function() {
     }
 
-    self.onIdle = function(theTime) {
+    self.onFrame = function(theTime) {
         _myHeartbeatThrober.throb(theTime);
-        _myLightManager.onIdle(theTime);
+        _myLightManager.onFrame(theTime);
     }
 
     self.onMouseMotion = function(theX, theY) {

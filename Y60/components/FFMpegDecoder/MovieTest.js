@@ -129,9 +129,9 @@ function FFMpegTest(theArguments) {
 
 
 /*
-    Base.onIdle = _myShow.onIdle;
-    _myShow.onIdle = function(theTime) {
-        Base.onIdle(theTime);
+    Base.onFrame = _myShow.onFrame;
+    _myShow.onFrame = function(theTime) {
+        Base.onFrame(theTime);
 
         for (var i = 0; i < _myMovies.length; ++i) {
             var myMovieNode = _myMovies[i].node;

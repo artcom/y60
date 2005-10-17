@@ -59,9 +59,9 @@ DemoRendererExtensionApp.prototype.Constructor = function(self, theArguments) {
         Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
     }
 
-    Base.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
-        Base.onIdle(theTime);
+    Base.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
+        Base.onFrame(theTime);
     }
 
     Base.onMouseMotion = self.onMouseMotion;

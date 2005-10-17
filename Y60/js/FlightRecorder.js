@@ -130,9 +130,9 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         }
         obj.SceneViewer.onMouseMotion(theX, theY);
     }
-    obj.onIdle = function(theTime) {
-        _myFrameRateLimiter.onIdle(theTime);
-        obj.SceneViewer.onIdle(theTime);
+    obj.onFrame = function(theTime) {
+        _myFrameRateLimiter.onFrame(theTime);
+        obj.SceneViewer.onFrame(theTime);
         if (_myFlightToggleWidget.active) {
             if (_myCurrentAnimationTime == -1) {
                 _myCurrentAnimationTime = theTime;
@@ -253,8 +253,8 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         obj.SceneViewer.onMouseMotion = obj._mySceneViewer.onMouseMotion;
         obj._mySceneViewer.onMouseMotion = obj.onMouseMotion;
 
-        obj.SceneViewer.onIdle = obj._mySceneViewer.onIdle;
-        obj._mySceneViewer.onIdle = obj.onIdle;
+        obj.SceneViewer.onFrame = obj._mySceneViewer.onFrame;
+        obj._mySceneViewer.onFrame = obj.onFrame;
 
         obj.SceneViewer.onPostRender = obj._mySceneViewer.onPostRender;
         obj._mySceneViewer.onPostRender = obj.onPostRender;

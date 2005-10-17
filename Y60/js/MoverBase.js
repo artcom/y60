@@ -164,7 +164,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         }
     }
 
-    obj.onIdle = function(theTime) { // 'pure virtual'
+    obj.onFrame = function(theTime) { // 'pure virtual'
     }
 
     var _myLastButtonTime = 0;

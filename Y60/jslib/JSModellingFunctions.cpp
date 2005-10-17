@@ -97,7 +97,11 @@ CreateBody(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Creates a quad");
+        DOC_PARAM("theScene", DOC_TYPE_OBJECT);
+        DOC_PARAM("theMaterialId", DOC_TYPE_STRING);
+        DOC_PARAM("theTopLeftCorner", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("theBottomRightCorner", DOC_TYPE_VECTOR3F);
         DOC_END;
 
         ensureParamCount(argc, 4);

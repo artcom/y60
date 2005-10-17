@@ -30,7 +30,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
 
     var _myLights = getDescendantsByTagName(theWorld,'light', true);
     var _myLightCursor = 0;
-    
+
     var _myViewportHeadlights    = [];
     var _myViewportHeadlightsEnabled = [];
 
@@ -114,7 +114,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         var myHeadlight = null;
         if (theViewport.id in _myViewportHeadlights) {
             myHeadlight = _myViewportHeadlights[theViewport.id];
-        }              
+        }
         _myViewportHeadlights[theViewport.id] = attachHeadlightToCamera(myCamera, myHeadlight);
         _myViewportHeadlightsEnabled[theViewport.id] = true;
         if (myHeadlight == null) {
@@ -133,7 +133,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         _myScene.update(Scene.WORLD);
     }
 
-    obj.onIdle = function(theTime) {
+    obj.onFrame = function(theTime) {
         if (_myLastSunUpdate) {
             var deltaTime = theTime - _myLastSunUpdate;
 
@@ -191,9 +191,9 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
                 } else {
                     //toggle current scene light
                     if (_myLightCursor < _myLights.length) {
-                        _myLights[_myLightCursor].visible 
+                        _myLights[_myLightCursor].visible
                             = ! _myLights[_myLightCursor].visible;
-                       print ('light # ' + _myLights[_myLightCursor].name + ' now visible ' 
+                       print ('light # ' + _myLights[_myLightCursor].name + ' now visible '
                                 + _myLights[_myLightCursor].visible);
                     }
                 }
@@ -204,10 +204,10 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         }
     }
 
-    obj.onPreViewport = function(theViewport) {    
+    obj.onPreViewport = function(theViewport) {
         if (_myHeadLightFlag && theViewport.id in _myViewportHeadlights) {
              //print ("activatng light "+_myViewportHeadlights[theViewport.id].id+" for VP "+theViewport.id);
-            _myViewportHeadlights[theViewport.id].visible = _myViewportHeadlightsEnabled[theViewport.id];            
+            _myViewportHeadlights[theViewport.id].visible = _myViewportHeadlightsEnabled[theViewport.id];
         }
     }
     obj.onPostViewport = function(theViewport) {
@@ -238,14 +238,14 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    function createLightSource(theLightSourceName, theType) {        
+    function createLightSource(theLightSourceName, theType) {
         var myLightSourceNode = Node.createElement('lightsource');
         myLightSourceNode.id = createUniqueId();
         _myLightSources.appendChild(myLightSourceNode);
-                
+
         myLightSourceNode.type = theType;
         Logger.trace("Creating new Lightsource node: " + theLightSourceName+" = "+myLightSourceNode.id);
-        myLightSourceNode.name = theLightSourceName;                
+        myLightSourceNode.name = theLightSourceName;
         return myLightSourceNode;
     }
 

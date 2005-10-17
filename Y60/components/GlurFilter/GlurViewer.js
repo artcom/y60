@@ -29,7 +29,7 @@ function ImageViewerApp(theArguments) {
 
 ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myTextOverlay = null;
-    var _myMovieNode   = null;   
+    var _myMovieNode   = null;
     var _myGlowNode = null;
     var _myGlowOverlay = null;
     var _myMovieOverlay = null;
@@ -63,7 +63,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     // setup
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theTitle) {
-        Base.setup(theWidth, theHeight, theTitle);    
+        Base.setup(theWidth, theHeight, theTitle);
         for(var i=1; i<theArguments.length; ++i) {
             switch(theArguments[i]) {
             case "recursive":
@@ -71,21 +71,21 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 break;
             default:
                 print(">"+theArguments[i]+"<");
-                var files = buildFileList(theArguments[i]);        
-                _myFileList = _myFileList.concat(files);        
+                var files = buildFileList(theArguments[i]);
+                _myFileList = _myFileList.concat(files);
             }
         }
         print("Files to show: " + _myFileList);
-        if (_myFileList.length==0) {        
+        if (_myFileList.length==0) {
             print("Nothing to show!")
             exit(0);
-        } 
-    
+        }
+
         createTextOverlay();
         updateFileView();
     }
 
-    Base.onKey = self.onKey;        
+    Base.onKey = self.onKey;
     self.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
         if (theKey == "left ctrl") {
             _myZoomWheelMode = theState;
@@ -95,15 +95,15 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         } else if (theState && theKey == "right") {
             nextFile();
         } else if (theState && theKey == "left") {
-            previousFile();            
+            previousFile();
         } else {
             Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
         }
     }
-    
-    Base.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
-        Base.onIdle(theTime);
+
+    Base.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
+        Base.onFrame(theTime);
         if (_isPlayingMovie) {
             _myMovieNode.currentframe++;
             if (_myMovieNode.currentframe >= _myMovieNode.framecount) {
@@ -112,7 +112,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             window.loadMovieFrame(_myMovieNode);
         }
     }
-    
+
     Base.onMouseMotion = self.onMouseMotion;
     self.onMouseMotion = function(theX, theY) {
 
@@ -139,7 +139,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     self.onMouseButton = function(theButton, theState, theX, theY) {
         if (theButton == RIGHT_BUTTON) {
             if (theState == BUTTON_DOWN) {
-                _myDragStart = new Vector2f(theX, theY);            
+                _myDragStart = new Vector2f(theX, theY);
             } else {
                 _myDragStart = null;
             }
@@ -148,18 +148,18 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             Base.onMouseButton(theButton, theState, theX, theY);
         }
     }
-        
+
     Base.onMouseWheel = self.onMouseWheel;
     self.onMouseWheel = function(theDeltaX, theDeltaY) {
         if (_myZoomWheelMode) {
             //print(theDeltaX, theDeltaY);
-            _myZoomFactor += (-theDeltaY) * 0.05; 
+            _myZoomFactor += (-theDeltaY) * 0.05;
             //print(_myZoomFactor);
             if (_myZoomFactor < MINZOOMFACTOR) {
                 _myZoomFactor = MINZOOMFACTOR;
             }
 
-            _myPanning.x = _myZoomCenter.image.x  * _myZoomFactor - _myZoomCenter.screen.x;                
+            _myPanning.x = _myZoomCenter.image.x  * _myZoomFactor - _myZoomCenter.screen.x;
             _myPanning.y = _myZoomCenter.image.y  * _myZoomFactor - _myZoomCenter.screen.y;
 
             applyViewport();
@@ -178,7 +178,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             Base.onMouseWheel(theDeltaX, theDeltaY);
         }
     }
-                        
+
     self.showFile = function (filename) {
         print("Now showing "+filename);
         if (filename.search(/\.m60/) != -1) {
@@ -186,7 +186,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             updateOverlay(_myMovieNode);
             _isPlayingMovie = true;
             if (_myGlowOverlay) {
-               _myGlowOverlay.visible = false;        
+               _myGlowOverlay.visible = false;
             }
             _myMovieOverlay.visible = true;
         } else {
@@ -198,14 +198,14 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 _myMovieOverlay.visible = false;
             }
         }
-    }    
+    }
     self.setFilter = function (filter, filter_params) {
         _myGlowNode.filter = filter;
         _myGlowNode.filter_params = filter_params;
     }
-    
+
     ////////////// private members ////////////
-        
+
     function createTextOverlay() {
         window.loadTTF("Arial", "${PRO}/src/Y60/gl/text/fonts/arial.ttf", 18);
         window.setTextPadding(10,10,10,10);
@@ -223,10 +223,10 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         _myTextOverlay.srcsize.y = myTextSize.y / myTextImage.height;
 
         _myTextOverlay.position = new Vector2f(10, 30);
-        _myTextOverlay.visible = true;    
-    }    
+        _myTextOverlay.visible = true;
+    }
 
-    function updateOverlay(theImage) {        
+    function updateOverlay(theImage) {
         var myString = ""
         if (theImage.nodeName == "movie") {
             myString += "Movie: ";
@@ -249,7 +249,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         self.getOverlayManager().moveToTop(_myTextOverlay);
     }
 
-    function showMovie(theFilename) {    
+    function showMovie(theFilename) {
         if (!_myMovieNode) {
             _myMovieNode = Node.createElement("movie");
             self.getImages().appendChild(_myMovieNode);
@@ -258,7 +258,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieOverlay = self.getOverlayManager().create("IVMovieOverlay", _myMovieNode.id, true);
         }
 
-        _myMovieNode.src = theFilename;    
+        _myMovieNode.src = theFilename;
         window.loadMovieFrame(_myMovieNode);
 
         _myMovieOverlay.width  = _myMovieNode.width;
@@ -271,18 +271,18 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieOverlay.height = 768;
         }
 
-        //window.resizeTo(_myMovieOverlay.width, _myMovieOverlay.height);        
+        //window.resizeTo(_myMovieOverlay.width, _myMovieOverlay.height);
     }
 
-    function showImage(theFilename) {    
+    function showImage(theFilename) {
         if (!_myGlowNode) {
             _myGlowNode = self.getImageManager().getImageNode("IVGlowNode");
-            _myGlowOverlay = self.getOverlayManager().create("IVGlowOverlay", _myGlowNode.id, true);            
-        } 
+            _myGlowOverlay = self.getOverlayManager().create("IVGlowOverlay", _myGlowNode.id, true);
+        }
         _myGlowNode.src = theFilename;
-        
+
         _myGlowNode.filter = "glur";
-        
+
         print("Calculating gaussian curve");
         // taken from http://www.cazabon.com/pyCMS/PIL_usm.html
         var a = [];
@@ -295,7 +295,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             print(y);
             if (x+1>radius/2) { // second half (including center value) is used only
                 a.push( y );
-            }    
+            }
         }
 
         // make sure, all values sum up to 1.0 (play with this value!)
@@ -304,15 +304,15 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         for (x = 0; x < a.length; x++) {
             sum += a[x];
         }
-        
+
         for (x = 0; x < a.length; x++) {
-            a[x] *= (1.0/sum); 
+            a[x] *= (1.0/sum);
         }
- 
+
         s = "[0.5,1.0,0.5,0.0," + a + "]";
         print(s);
         _myGlowNode.filter_params = s;
-        
+
         //window.updateScene(Renderer.IMAGES);
 
         applyViewport();
@@ -325,7 +325,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             if (myDirList.length > 0) {
                 print("ignoring: "+theFilename);
                 print(myDirList.length);
-                return false;            
+                return false;
             }
             return true;
         } else {
@@ -335,16 +335,16 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     }
 
     function buildFileList(theArgument) {
-        var myList = [] 
+        var myList = []
         // find out if the argument is a directory
         // if so, add all files to the list
         var myDirList = getDirList(theArgument);
         print(myDirList);
-        if (myDirList.length!=0) {        
+        if (myDirList.length!=0) {
             for(var i=0; i<myDirList.length; ++i) {
                 if (_myRecursiveFlag) {
                     myList = myList.concat(buildFileList(myDirList[i]));
-                } else {                        
+                } else {
                     if (filterFilename(myDirList[i])) {
                         myList.push(myDirList[i]);
                     }
@@ -363,13 +363,13 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     }
 
     function updateFileView() {
-        self.showFile(_myFileList[_myFileIndex]);    
+        self.showFile(_myFileList[_myFileIndex]);
     }
 
     function applyViewport() {
-        var myImageSize  = getImageSize(_myGlowNode);    
-        var myGlowSize  = getImageSize(_myGlowNode);    
-                
+        var myImageSize  = getImageSize(_myGlowNode);
+        var myGlowSize  = getImageSize(_myGlowNode);
+
         _myGlowOverlay.width  = myGlowSize.x * _myZoomFactor;
         _myGlowOverlay.height = myGlowSize.y * _myZoomFactor;
         _myGlowOverlay.position.x = -_myPanning.x;
@@ -380,7 +380,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         --_myFileIndex;
         if (_myFileIndex<0) {
             _myFileIndex = 0;
-        }           
+        }
         updateFileView();
     }
 

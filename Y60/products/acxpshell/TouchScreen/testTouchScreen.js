@@ -102,14 +102,14 @@ TouchScreenTest.prototype.Constructor = function(obj, theSceneFile, theShaderLib
         print("onMouseMotion() x: " + theX + " y: " + theY);
     }
 
-    obj.SceneViewer.onIdle = obj.onIdle;
-    obj.onIdle = function (theTime) {
-        obj.SceneViewer.onIdle(theTime);
+    obj.SceneViewer.onFrame = obj.onFrame;
+    obj.onFrame = function (theTime) {
+        obj.SceneViewer.onFrame(theTime);
 
         window.setTextColor([0.4,0.4,1,1], [1,1,1,1]);
         window.renderText([0.15, 0.05], "---  F1 : Toggle Calibration Mode  |  F2 : Toggle Follow Mode  ---", "SyntaxBold18");
 
-        _myTouchScreen.onIdle(theTime);
+        _myTouchScreen.onFrame(theTime);
     }
 }
 

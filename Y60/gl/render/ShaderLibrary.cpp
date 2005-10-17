@@ -55,8 +55,7 @@ namespace y60 {
     }
 
     CGcontext 
-	ShaderLibrary::getCgContext() 
-	{
+	ShaderLibrary::getCgContext() {
 		return _myCgContext; 
 	}
 
@@ -115,10 +114,8 @@ namespace y60 {
         }
     }
 
-
     IShaderPtr
-    ShaderLibrary::findShader(MaterialBasePtr theMaterial )
-    {
+    ShaderLibrary::findShader(MaterialBasePtr theMaterial) {
 		// we need to copy all values to tmp RequirementMap, cause we want to drop req temporarly
 
 		MaterialRequirementFacadePtr myReqFacade = theMaterial->getFacade<MaterialRequirementTag>();
@@ -246,6 +243,5 @@ namespace y60 {
             +  theMaterial->get<NameTag>() + "', requirement = " + as_string(myReqFacade->getNode()),
                                      PLUS_FILE_LINE);
     }
-
-} // namespace y60
+}
 

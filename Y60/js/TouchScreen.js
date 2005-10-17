@@ -317,7 +317,7 @@ TouchScreen.prototype.Constructor = function(obj, theEventReceiver, theComPort, 
         _myCrossHair.position.y = _myCalibration[_myCalibrationStep].crossY;
     }
 
-    obj.onIdle = function(theTime) {
+    obj.onFrame = function(theTime) {
         while (_mySerialPort.peek() > 4) {
             var myStatusByte = _mySerialPort.read(1).charCodeAt(0);
             if (myStatusByte & 0x80) {

@@ -35,7 +35,7 @@ void
 PackageManager::add(IPackagePtr thePackage) {
     for (PackageList::iterator it=_myPackages.begin(); it!=_myPackages.end(); ++it) {
         if ((*it)->getPath() == thePackage->getPath()) {
-            AC_WARNING << "Package '" << thePackage->getPath() << "' has already been added.";
+            AC_DEBUG << "Package '" << thePackage->getPath() << "' has already been added.";
             return;
         }
     }
@@ -44,7 +44,7 @@ PackageManager::add(IPackagePtr thePackage) {
     _myPackages.push_front(thePackage);
 }
 
-bool 
+bool
 PackageManager::remove(IPackagePtr thePackage) {
     for (PackageList::iterator it=_myPackages.begin(); it!=_myPackages.end(); ++it) {
         if ((*it)->getPath() == thePackage->getPath()) {
@@ -56,7 +56,7 @@ PackageManager::remove(IPackagePtr thePackage) {
     return false;
 }
 
-bool 
+bool
 PackageManager::remove(const std::string & thePackageName) {
     for (PackageList::iterator it=_myPackages.begin(); it!=_myPackages.end(); ++it) {
         if ((*it)->getPath() == thePackageName) {
@@ -141,7 +141,6 @@ PackageManager::searchFile(const std::string & theRelativePath) {
             return myAbsolutePath;
         }
     }
-    AC_WARNING << "Unable to find '" << theRelativePath << "'";
     return "";
 }
 
@@ -178,7 +177,7 @@ PackageManager::listFiles(const std::string & theRelativePath,
     return myFileList;
 }
 
-std::string 
+std::string
 PackageManager::getSearchPath() const {
     std::string mySearchPath;
     PackageList::const_iterator it = _myPackages.begin();

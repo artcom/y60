@@ -109,8 +109,6 @@ DemoRendererExtension :: onFrame(AbstractRenderWindow * theWindow , double t) {
     AC_DEBUG << "onFrame...";
     Quaternionf myOrientation(Vector3f(0, 1, 0), (float)((t / myPeriod) * asl::PI));
     _myCubeBody->set<OrientationTag>(myOrientation);
-
-    //theWindow->getRenderer()->getCurrentScene()->updateGlobalMatrix(&*_myCube);
     AC_DEBUG << "...onFrame";
 }
 

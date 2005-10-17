@@ -20,17 +20,17 @@ function VideoRecoder(theDirectory, theFrameRate) {
 }
 
 VideoRecoder.prototype.Constructor = function(obj, theDirectory, theFrameRate) {
-        
+
     var _myDirectory = theDirectory;
     var _myFrameTime = 1 / theFrameRate;
     var _myEnabled   = false;
     var _myTime      = 0;
     var _myScreenShotCounter = 0;
-    
-    obj.onIdle = function(theTime) {                     
+
+    obj.onFrame = function(theTime) {
         if (_myEnabled) {
             _myTime += _myFrameTime;
-            
+
             var myFileName = _myDirectory + "/";
             if (_myScreenShotCounter < 10) {
                 myFileName += "000";
@@ -39,25 +39,25 @@ VideoRecoder.prototype.Constructor = function(obj, theDirectory, theFrameRate) {
             } else if (_myScreenShotCounter < 1000) {
                 myFileName += "0";
             }
-            
+
             myFileName += _myScreenShotCounter++ + ".png";
-                        
-            window.saveBuffer(FRAMEBUFFER, myFileName);        
+
+            window.saveBuffer(FRAMEBUFFER, myFileName);
         } else {
             _myTime = theTime;
         }
-        
-        return _myTime;                                 
+
+        return _myTime;
     }
-    
+
     obj.onKey = function(theKey, theState, theX, theY, theShiftFlag) {
         if (theState) {
             switch (theKey) {
             case 'R':
                 print((_myEnabled ? "Disable" : "Enable") + " video recording.");
-                _myEnabled = !_myEnabled;                
+                _myEnabled = !_myEnabled;
                 break;
             }
-        }            
+        }
     }
 }

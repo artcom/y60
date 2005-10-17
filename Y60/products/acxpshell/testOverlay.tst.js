@@ -171,11 +171,11 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
     }
 
     obj.run = function() {
+        GLResourceManager.loadShaderLibrary("../../../../shader/shaderlibrary.xml");
         // Create empty scene
         window = new RenderWindow();
-        window.setScene(new Scene(null));        
+        window.setScene(new Scene(null));
 
-        //window.loadScene(null, "${PRO}/src/Y60/shader/shaderlibrary.xml");
         obj.myScene = window.scene.dom;
         var myViewport = getDescendantByTagName(obj.myScene, "viewport", true);
         var myOverlayManager = new OverlayManager(window.scene, myViewport);
@@ -187,7 +187,7 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myOverlay = new ImageOverlay(myOverlayManager, "../../testfiles/DiffuseRamp.png", [30, 40]);
         obj.myImageId = getDescendantByTagName(obj.myScene, "images").lastChild.id;
         //testCommonProperties([30,40], [32,1], [1,1,1,1]);
-        
+
         ///////////////////////////////////////////////////////////////////////////////////////
         //
         // Test multiple image support
@@ -200,10 +200,10 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.myMultiOverlay.images.length == 2');
 
         obj.myMultiOverlay.position = new Vector2f(300,300);
-        
+
         var myImages = obj.myMultiOverlay.images;
         myImages.push( obj.myMultiOverlay.images[0].cloneNode(true) );
-        // the following wont work, we modified images in place 
+        // the following wont work, we modified images in place
         // ENSURE('obj.myMultiOverlay.images.length == 2');
         obj.myMultiOverlay.images = myImages;
         ENSURE('obj.myMultiOverlay.images.length == 3');

@@ -40,7 +40,7 @@
 
 namespace y60 {
     class TextureManager;
-   
+
     DEFINE_EXCEPTION(MaterialBaseException, asl::Exception);
 	static y60::VectorOfString getDefaultBlendFunction() {
 		y60::VectorOfString myResult;
@@ -50,7 +50,7 @@ namespace y60 {
 	}
 
 #define DEFINE_MATERIAL_PROPERTY_TAG(theTagName, theType, thePropertyName, theDefault) \
-	DEFINE_PROPERTY_TAG(theTagName,  MaterialPropertiesFacade, theType, y60::getTypeName<theType>(), thePropertyName,  PROPERTY_LIST_NAME, NAME_ATTRIB, theDefault);
+	DEFINE_PROPERTY_TAG(theTagName,  MaterialPropertiesFacade, theType, y60::getTypeName<theType>(), thePropertyName,  PROPERTY_LIST_NAME, theDefault);
 
     DEFINE_MATERIAL_PROPERTY_TAG(MaterialAmbientTag, asl::Vector4f, AMBIENT_PROPERTY, asl::Vector4f(0.0f,0.0f,0.0f,1));
     DEFINE_MATERIAL_PROPERTY_TAG(MaterialDiffuseTag, asl::Vector4f, DIFFUSE_PROPERTY, asl::Vector4f(1.0f,1.0f,1.0f,1));
@@ -59,10 +59,10 @@ namespace y60 {
 	DEFINE_MATERIAL_PROPERTY_TAG(SurfaceColorTag, asl::Vector4f, SURFACE_COLOR_PROPERTY, asl::Vector4f(0.0f,0.0f,0.0f,1));
     DEFINE_MATERIAL_PROPERTY_TAG(ShininessTag, float, SHININESS_PROPERTY, float(1.0));
 	DEFINE_PROPERTY_TAG(BlendFunctionTag, MaterialPropertiesFacade, y60::VectorOfString, SOM_VECTOR_STRING_NAME,
-		                BLENDFUNCTION_PROPERTY, PROPERTY_LIST_NAME, NAME_ATTRIB,  getDefaultBlendFunction());
+		                BLENDFUNCTION_PROPERTY, PROPERTY_LIST_NAME, getDefaultBlendFunction());
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,
-		                LIGHTING_FEATURE, REQUIRES_LIST_NAME, NAME_ATTRIB,  y60::VectorOfRankedFeature(100,"unlit"));
+		                LIGHTING_FEATURE, REQUIRES_LIST_NAME, y60::VectorOfRankedFeature(100,"unlit"));
 
 	class MaterialPropertiesFacade :
 		public PropertyListFacade,

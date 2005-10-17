@@ -47,10 +47,10 @@ DEFINE_ATTRIBUT_TAG(HalfFloatTag,  float,          "halffloat",      0.5);
 DEFINE_ATTRIBUT_TAG(DoubleParentFloatTag,  float,  "doubleparentfloat", 2);
 DEFINE_ATTRIBUT_TAG(ChildFloatSumTag,  float,      "childfloatsumtag", 0);
 
-DEFINE_PROPERTY_TAG(FloatPropTag,  TestPropertiesFacade, float, "float", "floatproperty",  "properties", "name", 0.5);
+DEFINE_PROPERTY_TAG(FloatPropTag,  TestPropertiesFacade, float, "float", "floatproperty",  "properties", 0.5);
 
-DEFINE_PROPERTY_TAG(ReqTexturesTag,  RequirementsFacade, std::string, "feature", "textures", "requires", "class", "[100[paint]]");
-DEFINE_PROPERTY_TAG(ReqTexcoordTag, RequirementsFacade, std::string, "feature", "texcoord", "requires", "class",  "");
+DEFINE_PROPERTY_TAG(ReqTexturesTag,  RequirementsFacade, std::string, "feature", "textures", "requires", "[100[paint]]");
+DEFINE_PROPERTY_TAG(ReqTexcoordTag, RequirementsFacade, std::string, "feature", "texcoord", "requires", "");
 
 class IdFacade :
     public Facade,
@@ -68,13 +68,13 @@ class IdFacade :
 class RequirementsFacade :
 	public Facade,
     public ReqTexturesTag::Plug,
-    public ReqTexcoordTag::Plug 
+    public ReqTexcoordTag::Plug
 {
 	public:
         RequirementsFacade(Node & theNode) :
             Facade(theNode),
             ReqTexturesTag::Plug(this),
-            ReqTexcoordTag::Plug(this) 
+            ReqTexcoordTag::Plug(this)
 		{}
         IMPLEMENT_FACADE(RequirementsFacade);
 };
@@ -139,10 +139,12 @@ class ChildFacade :
             FacadeAttributePlug<HalfFloatTag>(this),
             FacadeAttributePlug<DoubleParentFloatTag>(this),
             FacadeAttributePlug<ChildFloatSumTag>(this)
-        {AC_PRINT << "ChildFacade Ctor "; }
+        {
+            AC_PRINT << "ChildFacade Ctor ";
+        }
 
         void registerDependenciesForHalfFloat() {
-            AC_TRACE << "ChildFacade::registerDependencies: this ="<<(void*)this; 
+            AC_TRACE << "ChildFacade::registerDependencies: this ="<<(void*)this;
             Node & myNode = getNode();
             if (myNode) {
                 HalfFloatTag::Plug::dependsOn<FloatTag>(*this);
@@ -152,16 +154,16 @@ class ChildFacade :
          }
 
          void registerDependenciesForDoubleParentFloat() {
-            AC_TRACE << "ChildFacade::registerDependenciesForDoubleParentFloat: this ="<<(void*)this; 
+            AC_TRACE << "ChildFacade::registerDependenciesForDoubleParentFloat: this ="<<(void*)this;
             Node & myNode = getNode();
             if (myNode) {
                 Ptr<ChildFacade, dom::ThreadingModel> mySelf = dynamic_cast_Ptr<ChildFacade>(getSelf());
                 if (myNode.parentNode() && myNode.parentNode()->nodeName() != "root") {
-                    Ptr<ChildFacade, dom::ThreadingModel> myParent = myNode.parentNode()->getFacade<ChildFacade>();                
-                    DoubleParentFloatTag::Plug::dependsOn<DoubleParentFloatTag>(*myParent);                  
+                    Ptr<ChildFacade, dom::ThreadingModel> myParent = myNode.parentNode()->getFacade<ChildFacade>();
+                    DoubleParentFloatTag::Plug::dependsOn<DoubleParentFloatTag>(*myParent);
                     DoubleParentFloatTag::Plug::setCalculatorFunction(&ChildFacade::recalculateDoubleParentFloat);
                 } else {
-                    DoubleParentFloatTag::Plug::dependsOn<FloatTag>(*this);                  
+                    DoubleParentFloatTag::Plug::dependsOn<FloatTag>(*this);
                     DoubleParentFloatTag::Plug::setCalculatorFunction(&ChildFacade::copyOwnFloat);
                 }
 
@@ -170,9 +172,9 @@ class ChildFacade :
          }
 
          void registerDependenciesForChildFloatSum() {
-            AC_TRACE << "ChildFacade::registerDependenciesForChildFloatSum: this ="<<(void*)this; 
+            AC_TRACE << "ChildFacade::registerDependenciesForChildFloatSum: this ="<<(void*)this;
             Node & myNode = getNode();
-            if (myNode) {                
+            if (myNode) {
 #ifdef OLD_PARENT_DEPENDENCY_UPDATE
                 sdfgsdfg
                 // for uptree dependencies, we have to register both directions
@@ -188,9 +190,9 @@ class ChildFacade :
                 for (unsigned i = 0; i < myNode.childNodesLength(); ++i) {
                     NodePtr myChildNode = myNode.childNode(i);
                     if (myChildNode->nodeName() == "child") {
-                        ChildFacadePtr myChild = myChildNode->getFacade<ChildFacade>();                
+                        ChildFacadePtr myChild = myChildNode->getFacade<ChildFacade>();
                         //if (!ChildFloatSumTag::Plug::alreadyDependsOn<FloatTag>(*myChild)) {
-                            ChildFloatSumTag::Plug::dependsOn<FloatTag>(*myChild);  
+                            ChildFloatSumTag::Plug::dependsOn<FloatTag>(*myChild);
                         //}
                     }
                 }
@@ -199,33 +201,33 @@ class ChildFacade :
         }
 
        void registerDependenciesRegistrators() {
-            AC_TRACE << "ChildFacade::registerDependencyCallbacks: this ="<<(void*)this; 
+            AC_TRACE << "ChildFacade::registerDependencyCallbacks: this ="<<(void*)this;
             HalfFloatTag::Plug::setReconnectFunction(&ChildFacade::registerDependenciesForHalfFloat);
             DoubleParentFloatTag::Plug::setReconnectFunction(&ChildFacade::registerDependenciesForDoubleParentFloat);
             ChildFloatSumTag::Plug::setReconnectFunction(&ChildFacade::registerDependenciesForChildFloatSum);
         }
 
         void recalculateHalfFloat() {
-            AC_TRACE << "recalculateHalfFloat: this="<<(void*)this <<",node=" << getNode() << endl; 
+            AC_TRACE << "recalculateHalfFloat: this="<<(void*)this <<",node=" << getNode() << endl;
             set<HalfFloatTag>(get<FloatTag>() / 2);
-            AC_TRACE << "result(HalfFloatTag) =" << get<HalfFloatTag>() << endl; 
+            AC_TRACE << "result(HalfFloatTag) =" << get<HalfFloatTag>() << endl;
         }
         void recalculateDoubleParentFloat() {
-            AC_TRACE << "recalculateDoubleParentFloat: this="<<(void*)this <<",node=" << getNode() << endl; 
+            AC_TRACE << "recalculateDoubleParentFloat: this="<<(void*)this <<",node=" << getNode() << endl;
             Ptr<ChildFacade, dom::ThreadingModel> myParent = getNode().parentNode()->getFacade<ChildFacade>();
             if (myParent) {
-                AC_TRACE << "recalculateDoubleParentFloat: parent="<<(void*)&(*myParent) <<",node=" << getNode() << endl; 
+                AC_TRACE << "recalculateDoubleParentFloat: parent="<<(void*)&(*myParent) <<",node=" << getNode() << endl;
                 float myValue = myParent->get<DoubleParentFloatTag>();
-                AC_TRACE << "recalculateDoubleParentFloat: parent value="<<myValue<<endl; 
+                AC_TRACE << "recalculateDoubleParentFloat: parent value="<<myValue<<endl;
                 set<DoubleParentFloatTag>(myParent->get<DoubleParentFloatTag>() * 2);
-                AC_TRACE << "result(DoubleParentFloatTag) =" << get<DoubleParentFloatTag>() << endl; 
-            }   
+                AC_TRACE << "result(DoubleParentFloatTag) =" << get<DoubleParentFloatTag>() << endl;
+            }
         }
 
         void copyOwnFloat() {
-            AC_TRACE << "copyOwnFloat: this="<<(void*)this <<",node=" << getNode() << endl; 
+            AC_TRACE << "copyOwnFloat: this="<<(void*)this <<",node=" << getNode() << endl;
             set<DoubleParentFloatTag>(get<FloatTag>());
-            AC_TRACE << "result(DoubleParentFloatTag) =" << get<DoubleParentFloatTag>() << endl; 
+            AC_TRACE << "result(DoubleParentFloatTag) =" << get<DoubleParentFloatTag>() << endl;
         }
 
         void calculateChildFloatSum() {
@@ -233,7 +235,7 @@ class ChildFacade :
             for (unsigned i = 0; i < getNode().childNodesLength(); ++i) {
                 NodePtr myChildNode = getNode().childNode(i);
                 if (myChildNode->nodeName() == "child") {
-                    ChildFacadePtr myChild = myChildNode->getFacade<ChildFacade>();                
+                    ChildFacadePtr myChild = myChildNode->getFacade<ChildFacade>();
                     mySum += myChild->get<FloatTag>();
                 }
             }
@@ -303,7 +305,7 @@ class FacadeUnitTest : public UnitTest {
                     "   </child>\n"
                     "   <child id='c5'/>\n"
                     "   <requires>\n"
-					"           <feature class='textures'>b0rken</feature>\n"
+					"           <feature name='textures'>b0rken</feature>\n"
                     "   </requires>\n"
                     "</root>";
 
@@ -352,7 +354,7 @@ class FacadeUnitTest : public UnitTest {
                     "       <xs:complexType>\n"
                     "           <xs:simpleContent>\n"
                     "               <xs:extension base='xs:string'>\n"
-                    "                   <xs:attribute name='class' type='xs:string'/>\n"
+                    "                   <xs:attribute name='name' type='xs:string'/>\n"
                     "               </xs:extension>\n"
                     "           </xs:simpleContent>\n"
                     "       </xs:complexType>\n"
@@ -567,7 +569,7 @@ class FacadeUnitTest : public UnitTest {
 
                     NodePtr myChild4 = myRoot->getElementById("ccc4");
                     ENSURE(myChild4);
-                    
+
                     ChildFacadePtr myChild4Facade = myChild4->getFacade<ChildFacade>();
                     ENSURE(myChild4Facade);
                     DPRINT(myChild4Facade->get<DoubleParentFloatTag>());
@@ -580,13 +582,13 @@ class FacadeUnitTest : public UnitTest {
                     ENSURE(myChild3->parentNode()->removeChild(myChild3));
 
                     ENSURE(myChild2->appendChild(myChild4) == myChild4);
-                    
+
                     myChild4Facade->getNamedItem("doubleparentfloat")->nodeValueWrapperPtr()->printPrecursorGraph();
                     (*myChild2)["float"].nodeValueWrapperPtr()->printDependendGraph();
 
                     ENSURE(myChild4Facade->get<DoubleParentFloatTag>() == 6);
                     DPRINT(myChild4Facade->get<DoubleParentFloatTag>());
-                    
+
                     myChild4Facade->getNamedItem("doubleparentfloat")->nodeValueWrapperPtr()->printPrecursorGraph();
                     (*myChild2)["float"].nodeValueWrapperPtr()->printDependendGraph();
 
@@ -605,7 +607,7 @@ class FacadeUnitTest : public UnitTest {
                     ENSURE(myChild2Facade->get<DoubleParentFloatTag>() == 4);
                     ENSURE(myChild4Facade->get<DoubleParentFloatTag>() == 8);
                     DPRINT(myChild4Facade->get<DoubleParentFloatTag>());
-                    
+
                     // Add new child at runtime
                     {
                         NodePtr myChild5 = NodePtr(new dom::Element("child"));
@@ -642,11 +644,11 @@ class FacadeUnitTest : public UnitTest {
                         ENSURE(myChild4Facade->get<ChildFloatSumTag>() == 0);
                         NodePtr myChild6 = NodePtr(new dom::Element("child"));
                         myChild6->appendAttribute("id", "cc6");
-                        ENSURE(myChild4->appendChild(myChild6) == myChild6);                                                
+                        ENSURE(myChild4->appendChild(myChild6) == myChild6);
                         ENSURE(myChild4Facade->isDirty<ChildFloatSumTag>());
                         ENSURE(myChild4Facade->get<ChildFloatSumTag>() == 1);
                         ChildFacadePtr myChild6Facade = myChild6->getFacade<ChildFacade>();
-                        ENSURE(myChild6Facade);                        
+                        ENSURE(myChild6Facade);
                         ENSURE(myChild6Facade->set<FloatTag>(2) == 2);
                         ENSURE(myChild4Facade->get<ChildFloatSumTag>() == 2);
                     }

@@ -1,3 +1,1 @@
-@echo off
-del /F o.ANT.WIN.OPT\tests\*.succeeded
-exit 0
+@bash.exe ./build.sh

@@ -149,6 +149,13 @@ namespace y60 {
         //cerr << "ts: " << theTimestamp << ", start: " << myTargetStart << ", end: " << myTargetEnd << endl;
         DB(printCacheInfo(myTargetStart, myTargetEnd);)
 
+        /*            
+            |CCC| = Currently cached frames, that are not needed any more
+            |TTT| = Target frames, that are not cached, yet.
+            |XXX| = Target frames, that are already in the cache.
+            |   | = Frames that are not in the cache and no target frames
+        */
+
         if (myTargetStart >= myCacheEnd ||  /* |CCCCCCCCCC| |TTTTTTTTTT| */    
             myTargetEnd <= myCacheStart ||  /* |TTTTTTTTTT| |CCCCCCCCCC| */    
             (myTargetStart < myCacheStart && myTargetEnd > myCacheEnd) ) /* |TTTT|XX|TTTT| */
@@ -218,11 +225,6 @@ namespace y60 {
         while (!myEndOfFileFlag && myCurrentTime < theEndTime) {
             decodeFrame(myCurrentTime, myEndOfFileFlag);
             if (myEndOfFileFlag) {
-                if (_myContext->getEndOfFileTimestamp() < DBL_MAX) {
-                    cerr << "EOF time again: " << myCurrentTime << endl;
-                } else {
-                    cerr << "EOF" << endl;
-                }
                 _myContext->setEndOfFileTimestamp(myCurrentTime);  
             }
             DB2(

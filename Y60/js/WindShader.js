@@ -61,7 +61,7 @@ WindShader.prototype.Constructor = function(obj, theWind, theBodyNames, theWorld
         _myWind.direction = radFromDeg(theDirection);
     }
 
-    obj.onIdle = function(theTime) {
+    obj.onFrame = function(theTime) {
         // set Cg Paramaters
         for (var i = 0; i < _myParameterNodes.length; i++) {
              _myWind.setMaterialParam(_myParameterNodes[i], theTime);

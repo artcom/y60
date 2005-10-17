@@ -180,15 +180,15 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-    Base.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
-        Base.onIdle(theTime);
+    Base.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
+        Base.onFrame(theTime);
         if (_myMovieNode && _myMovieOverlay && _myMovieOverlay.visible) {
-            //_myFrameRateLimiter.onIdle(theTime);
+            //_myFrameRateLimiter.onFrame(theTime);
             window.loadMovieFrame(_myMovieNode);
         }
         if (_myCaptureNode && _myMovieOverlay && _myMovieOverlay.visible) {
-            //_myFrameRateLimiter.onIdle(theTime);
+            //_myFrameRateLimiter.onFrame(theTime);
             window.loadCaptureFrame(_myCaptureNode);
         }
         if (_mySoundId != -1 && !isPlaying(_mySoundId)) {
@@ -290,7 +290,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
         if (!_myMPEGPlugged && (myFilename.search(/\.mpg$/i)  != -1 ||
                                 myFilename.search(/\.m2v$/i)  != -1 ||
-                                myFilename.search(/\.mpeg$/i) != -1 
+                                myFilename.search(/\.mpeg$/i) != -1
                                 //myFilename.search(/\.ra$/i)   != -1 ||
                                 /*|| myFilename.search(/\.mov$/i)  != -1)*/
                                 )) {
@@ -300,12 +300,12 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         if ( myFilename.search(/\.mov$/i) != -1) {
             if (OS == LINUX && !_myMPEGPlugged) {
                 plug("y60FFMpegDecoder2");
-                _myMPEGPlugged = true;  
-                print("y60FFMpegDecoder2")              
+                _myMPEGPlugged = true;
+                print("y60FFMpegDecoder2")
             } else if (OS == WINDOWS && !_myQTPlugged){
                 plug("y60QuicktimeDecoder");
                 _myQTPlugged = true;
-                print("y60QuicktimeDecoder")              
+                print("y60QuicktimeDecoder")
             }
         }
         if (!_myWMVPlugged && myFilename.search(/\.wmv$/i) != -1) {

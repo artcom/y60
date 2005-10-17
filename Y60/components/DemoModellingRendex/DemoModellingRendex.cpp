@@ -195,8 +195,6 @@ DEFINE_EXCEPTION(NoShapeFacade, asl::Exception)
 	Quaternionf myOrientation = Quaternionf::createFromEuler(Vector3f(0, (float)((t / myPeriod) * asl::PI), 0));
 	_myCubeBody->set<OrientationTag>(myOrientation);
 
-	//theWindow->getRenderer()->getCurrentScene()->updateGlobalMatrix(&*_myCube);
-
 	if (_myParticleShape) {
 	    ShapePtr myShape = _myParticleShape->getFacade<Shape>();
 	    if (!myShape) {

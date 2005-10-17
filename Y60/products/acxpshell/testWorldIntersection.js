@@ -112,9 +112,9 @@ try {
 		ourShow = new SceneViewer(arguments[0], arguments[1]);
 	}
 
-    SceneViewer.onIdle = ourShow.onIdle;
-    ourShow.onIdle = function (theTime) {
-        SceneViewer.onIdle(theTime);
+    SceneViewer.onFrame = ourShow.onFrame;
+    ourShow.onFrame = function (theTime) {
+        SceneViewer.onFrame(theTime);
     }
 
 	SceneViewer.onMouseMotion = ourShow.onMouseMotion;

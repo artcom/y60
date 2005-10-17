@@ -236,6 +236,38 @@ namespace y60 {
         setup();
     }
 
+    IShaderLibraryPtr 
+    Scene::getShaderLibrary() const {
+        if (_myTextureManager->getResourceManager()) {
+            return _myTextureManager->getResourceManager()->getShaderLibrary();
+        } else {
+            return IShaderLibraryPtr(0);
+        }
+    }
+
+    void 
+    Scene::setupShaderLibrary() {
+        if (_myTextureManager->getResourceManager()) {   
+            if (!_myTextureManager->getResourceManager()->getShaderLibrary()) {
+                // If no shaderlibrary has been set, yet, add a default library.
+                asl::PackageManagerPtr myPackageManager = _myTextureManager->getPackageManager();
+                string myPath = myPackageManager->searchFile("shaderlibrary.xml");
+                if (myPath.empty()) {
+                    myPath = myPackageManager->searchFile("shader/shaderlibrary.xml");
+                }
+                if (myPath.empty()) {
+                    AC_WARNING << "Scene::getShaderLibrary(): Could not find 'shaderlibrary.xml' in search path " 
+                        << myPackageManager->getSearchPath();
+                } else {
+                    _myTextureManager->getResourceManager()->loadShaderLibrary(myPath);
+                    _myTextureManager->getPackageManager()->add(asl::getDirName(myPath));    
+                }
+            }
+        } else {
+            AC_WARNING << "Scene::setupShaderLibrary(): No resource manager found.";
+        }
+    }
+
     void
     Scene::setup() {
         asl::Time setupStart;
@@ -243,8 +275,10 @@ namespace y60 {
         _myTextureManager->setImageList(getImagesRoot());
         update(IMAGES);
 
-        AC_INFO << "Loading materials..." << endl;
-        _myMaterials.clear();
+        setupShaderLibrary();
+
+        AC_INFO << "Loading materials..." << endl;        
+        _myMaterials.clear();        
         NodePtr myMaterialList = _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
         for (unsigned i = 0; i < myMaterialCount; ++i) {
@@ -267,63 +301,62 @@ namespace y60 {
 
     void
     Scene::loadMaterial(NodePtr theMaterialNode) {
-			map<string, bool> myPropertyNames;
-			NodePtr myPropertiesNode = theMaterialNode->childNode(PROPERTY_LIST_NAME);
-			if (myPropertiesNode) {
-				for (unsigned i = 0; i < myPropertiesNode->childNodesLength(); ++i) {
-					myPropertyNames[myPropertiesNode->childNode(i)->getAttributeString("name")] = false;
-					const std::string & myProp = myPropertiesNode->childNode(i)->getAttributeString("name");
-
-				}
+		map<string, bool> myPropertyNames;
+		NodePtr myPropertiesNode = theMaterialNode->childNode(PROPERTY_LIST_NAME);
+		if (myPropertiesNode) {
+			for (unsigned i = 0; i < myPropertiesNode->childNodesLength(); ++i) {
+				myPropertyNames[myPropertiesNode->childNode(i)->getAttributeString("name")] = false;
+				const std::string & myProp = myPropertiesNode->childNode(i)->getAttributeString("name");
 			}
-	                
-			MaterialBasePtr myMaterial = MaterialBasePtr(new MaterialBase(*theMaterialNode));
+		}
+	            
+		MaterialBasePtr myMaterial = MaterialBasePtr(new MaterialBase(*theMaterialNode));
 
-			IShaderPtr myShader;
-			if (getShaderLibrary()) {
-				// 2. ask shaderlib for shaderdefinition
-				myShader = getShaderLibrary()->findShader(myMaterial);
-				if (!myShader) {
-					throw SceneException(string("No shader defintion found for Material: ") +
-						myMaterial->get<NameTag>(), PLUS_FILE_LINE);
-				}
-				myShader->load(*getShaderLibrary());
-
-				// 3. decide which material to build
-				// 4. load material from node
-				// 5. give material the found shaderdefinition
-				const VectorOfString * myPhysicsFeatures = myShader->getFeatures("physics");
-
-				if (myPhysicsFeatures && myShader->isCGShader() &&
-					std::find(myPhysicsFeatures->begin(), myPhysicsFeatures->end(), "skin") !=  myPhysicsFeatures->end())
-				{
-					myMaterial = MaterialBasePtr(new SkinAndBones(*theMaterialNode));
-				} 
+		IShaderPtr myShader;
+		if (getShaderLibrary()) {
+			// 2. ask shaderlib for shaderdefinition
+			myShader = getShaderLibrary()->findShader(myMaterial);
+			if (!myShader) {
+				throw SceneException(string("No shader defintion found for Material: ") +
+					myMaterial->get<NameTag>(), PLUS_FILE_LINE);
 			}
+			myShader->load(*getShaderLibrary());
 
-			myMaterial->setShader(myShader);
+			// 3. decide which material to build
+			// 4. load material from node
+			// 5. give material the found shaderdefinition
+			const VectorOfString * myPhysicsFeatures = myShader->getFeatures("physics");
 
-			DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
-				endl << " with shader: " << (myShader ? myShader->getName() : "NULL") << endl);
-			myMaterial->load(*_myTextureManager);
-			if (myShader) {
-				for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
-					// default the material property with the shader default, only if the material 
-					// does not have a property
-					unsigned myPropertyCount = myShader->getPropertyNode(i)->childNodesLength();        
-					for (unsigned myPropertyIndex = 0; myPropertyIndex < myPropertyCount; ++myPropertyIndex) {
-						dom::NodePtr myPropertyNode  = myShader->getPropertyNode(i)->childNode(myPropertyIndex);								if (myPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
-							myPropertyNode->nodeName() != "#comment") {
+			if (myPhysicsFeatures && myShader->isCGShader() &&
+				std::find(myPhysicsFeatures->begin(), myPhysicsFeatures->end(), "skin") !=  myPhysicsFeatures->end())
+			{
+				myMaterial = MaterialBasePtr(new SkinAndBones(*theMaterialNode));
+			} 
+		}
 
-							const std::string & myProp = myPropertyNode->getAttributeString("name");
-							if (myPropertyNames.find(myPropertyNode->getAttributeString("name")) ==
-								myPropertyNames.end()) {
-								myMaterial->mergeProperties(myPropertyNode);
-							}
+		myMaterial->setShader(myShader);
+
+		DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
+			endl << " with shader: " << (myShader ? myShader->getName() : "NULL") << endl);
+		myMaterial->load(*_myTextureManager);
+		if (myShader) {
+			for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
+				// default the material property with the shader default, only if the material 
+				// does not have a property
+				unsigned myPropertyCount = myShader->getPropertyNode(i)->childNodesLength();        
+				for (unsigned myPropertyIndex = 0; myPropertyIndex < myPropertyCount; ++myPropertyIndex) {
+					dom::NodePtr myPropertyNode  = myShader->getPropertyNode(i)->childNode(myPropertyIndex);								if (myPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
+						myPropertyNode->nodeName() != "#comment") {
+
+						const std::string & myProp = myPropertyNode->getAttributeString("name");
+						if (myPropertyNames.find(myPropertyNode->getAttributeString("name")) ==
+							myPropertyNames.end()) {
+							myMaterial->mergeProperties(myPropertyNode);
 						}
 					}
 				}
 			}
+		}
 
         AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
                  << ", name: " << myMaterial->get<NameTag>();
@@ -749,105 +782,8 @@ namespace y60 {
         return asl::distance(myWorldBox[0], myWorldBox[1]);
     }
 
-#ifdef DUMB_TRANSFORM_HIERACHY_UPDATE
-    const asl::Matrix4f &
-    Scene::updateGlobalMatrix(Node * theNode, const asl::Matrix4f * theParentMatrix) {
-        TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
-
-        Matrix4f myGlobalMatrix;
-        myFacade->getLocalMatrix(myGlobalMatrix);
-
-        if (theParentMatrix) {
-            myGlobalMatrix.postMultiply(*theParentMatrix);
-        } else {
-            Node * myParentNode = theNode->parentNode();
-            if (myParentNode && myParentNode->nodeName() != WORLD_NODE_NAME) {
-                myGlobalMatrix.postMultiply(updateGlobalMatrix(myParentNode, 0));
-            }
-        }
-        myFacade->setDirty(true);
-        return myFacade->set<GlobalMatrixTag>(myGlobalMatrix);
-    }
-
-    const asl::Box3f &
+    void
     Scene::updateTransformHierachy(NodePtr theNode, const asl::Matrix4f & theParentMatrix,
-        bool theIgnoreStaticNodes)
-    {
-        TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
-        DB(AC_TRACE << "updateTransformHierachy for Node " << myFacade->get<IdTag>();)
-        bool isLightNode   = (theNode->nodeName() == LIGHT_NODE_NAME);
-        bool isIncludeNode = (theNode->nodeName() == INCLUDE_NODE_NAME);
-
-        // break travsersal if:
-        // not visible and not a light (always continue for lights, since
-        // lights can be turned on/off at any time, e.g. per viewport pass)
-        // Also break at frozen (static) nodes if IgnoreStaticNodes is on.
-        if ((myFacade->get<VisibleTag>() == false && !isLightNode) ||
-            (myFacade->get<FrozenTag>() && theIgnoreStaticNodes))
-        {
-            return myFacade->get<BoundingBoxTag>();
-        }
-
-        COUNT(DynamicWorldNodes);
-
-        const Matrix4f & myGlobalMatrix = updateGlobalMatrix(&(*theNode), &theParentMatrix);
-
-        if (isLightNode) {
-            LightPtr myLight = theNode->getFacade<Light>();
-            _myLights.push_back(myLight);
-        } else if (isIncludeNode) {
-            // If this is an include node, we reload the included dom, if necessary
-            IncludeFacadePtr myInclude = theNode->getFacade<IncludeFacade>();
-
-            // Check if src has a new revision
-            if (!myInclude->isUpToDate()) {
-                myInclude->setUpToDate();
-                if (theNode->childNodesLength()) {
-                    while (theNode->childNodesLength()) {
-                        theNode->removeChild(theNode->firstChild());
-                    }
-                    collectGarbage();
-                }
-                if (myInclude->get<IncludeSrcTag>() != "") {
-                    import(myInclude->get<IncludeSrcTag>(), _myTextureManager->getPackageManager(), theNode);
-                }
-            }
-        }
-
-        // Get bounding box
-        asl::Box3f myBoundingBox;
-        myBoundingBox.makeEmpty();
-
-        // Set to shape bounding box
-        if (theNode->getAttribute(BODY_SHAPE_ATTRIB)) {
-            COUNT(DynamicBodyNodes);
-
-            BodyPtr myBody = dynamic_cast_Ptr<Body>(myFacade);
-            if (!myBody) {
-                throw SceneException(std::string("Node with shape attribute is no body: ") +
-                    myFacade->get<IdTag>(), PLUS_FILE_LINE);
-            }
-
-            const ShapePtr myShape = myBody->getShape();
-            const asl::Box3f & myShapeBoundingBox = myShape->get<BoundingBoxTag>();
-
-            // Multiply with global matrix to transform shape bb into world coordinates
-            myBoundingBox = myShapeBoundingBox * myGlobalMatrix;
-        }
-
-        // Extend by child bounding boxes
-        for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
-            if (theNode->childNode(i) == Node::ELEMENT_NODE) {
-                const asl::Box3f & myChildBox = updateTransformHierachy(theNode->childNode(i),
-                    myGlobalMatrix, theIgnoreStaticNodes);
-                myBoundingBox.extendBy(myChildBox);
-            }
-        }
-        return myFacade->set<BoundingBoxTag>(myBoundingBox);
-    }
-#else
-void
-Scene::updateTransformHierachy(NodePtr theNode, const asl::Matrix4f & theParentMatrix,
         bool theIgnoreStaticNodes)
     {
         TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
@@ -895,8 +831,6 @@ Scene::updateTransformHierachy(NodePtr theNode, const asl::Matrix4f & theParentM
             }
         }
     }
-
-#endif
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Camera handling

@@ -64,6 +64,13 @@ dom::NodePtr createUnlitTexturedMaterial(y60::ScenePtr theScene,
                                  unsigned theDepth = 1,
                                  const asl::Vector4f & theColor = asl::Vector4f(1.0, 1.0, 1.0, 1.0));
 
+dom::NodePtr createLambertMaterial(y60::ScenePtr theScene,
+                                   const asl::Vector4f & theDiffuseColor = asl::Vector4f(1.0, 1.0, 1.0, 1.0),
+                                   const asl::Vector4f & theAmbientColor = asl::Vector4f(0.0, 0.0, 0.0, 1.0));
+
+dom::NodePtr createColorMaterial(y60::ScenePtr theScene,
+                                 const asl::Vector4f & theColor = asl::Vector4f(1.0, 1.0, 1.0, 1.0));
+
 dom::NodePtr createTransform(dom::NodePtr theParentNode);
 dom::NodePtr createBody(dom::NodePtr theParentNode, const std::string & theShapeId);
 

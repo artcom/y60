@@ -44,11 +44,11 @@ TextAnimationTestApp.prototype.Constructor = function(obj, theSceneFile, theShad
         //_myTextureAnimation.setDuration(1);// set duration for per time update to 5 secs
     }
 
-    obj.SceneViewer.onIdle = obj.onIdle;
-    obj.onIdle = function (theTime) {
+    obj.SceneViewer.onFrame = obj.onFrame;
+    obj.onFrame = function (theTime) {
         _myTextureAnimation.updatePerFrame();
         //_myTextureAnimation.updatePerTime(theTime);
-        return obj.SceneViewer.onIdle(theTime);
+        return obj.SceneViewer.onFrame(theTime);
     }
 
     obj.SceneViewer.onKey = obj.onKey;

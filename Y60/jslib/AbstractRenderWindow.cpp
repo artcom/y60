@@ -98,46 +98,31 @@ namespace jslib {
             _myScene = theScene;
             _myRenderer->setCurrentScene(_myScene);
 
+            setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
+
             for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
                 std::string myName = (*it)->getName() + "::onSceneLoaded";
                 try {
                     MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
                     (*it)->onSceneLoaded(this);
                 } catch (const asl::Exception & ex) {
-                    AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
+                    AC_ERROR << "Exception while calling " << myName << ": " << ex;
                 } catch (...) {
-                    AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
+                    AC_ERROR << "Unknown exception while calling " << myName;
                 }
             }
         } catch (const asl::Exception & ex) {
-            AC_ERROR << "Exception caught in AbstractRenderWindow::setScene(): " << ex << endl;
+            AC_ERROR << "Exception caught in AbstractRenderWindow::setScene(): " << ex;
             return false;
         } catch (const exception & ex) {
-            AC_ERROR << "Exception caught in AbstractRenderWindow::setScene(): " << ex.what() << endl;
+            AC_ERROR << "Exception caught in AbstractRenderWindow::setScene(): " << ex.what();
             return false;
         } catch (...) {
-            AC_ERROR << "Unknown exception in AbstractRenderWindow::setScene()" << endl;
+            AC_ERROR << "Unknown exception in AbstractRenderWindow::setScene()";
             return false;
         }
         return true;
     }
-
-    //bool
-    //AbstractRenderWindow::saveScene(const string & theSceneFile, bool isSceneFileBinary) {
-    //    try {
-    //        _myScene->save(theSceneFile, isSceneFileBinary);
-    //    } catch (const asl::Exception & ex) {
-    //        AC_ERROR << "Exception caught in AbstractRenderWindow::saveScene(): " << ex << endl;
-    //        return false;
-    //    } catch (const exception & ex) {
-    //        AC_ERROR << "Exception caught in AbstractRenderWindow::saveScene(): " << ex.what() << endl;
-    //        return false;
-    //    } catch (...) {
-    //        AC_ERROR << "Unknown exception in AbstractRenderWindow::saveScene()" << endl;
-    //        return false;
-    //    }
-    //    return false;
-    //}
 
     float
     AbstractRenderWindow::getWorldSize(dom::NodePtr theCamera) {
@@ -170,14 +155,18 @@ namespace jslib {
 
     bool
     AbstractRenderWindow::setCanvas(const dom::NodePtr & theCanvas) {
-        unsetCanvas();
-        CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
-        if (myCanvas->setFrameBuffer(_mySelf.lock())) {
-            _myCanvas = theCanvas;
-            return true;
+        if (theCanvas) {
+            unsetCanvas();
+            CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
+            if (myCanvas->setFrameBuffer(_mySelf.lock())) {
+                _myCanvas = theCanvas;
+                return true;
+            } else {
+                AC_WARNING << "Framebuffer is already set. Ignoring setCanvas";
+                return false;
+            }
         } else {
-            AC_WARNING << "Framebuffer is already set. Ignoring setCanvas";
-            return false;
+            throw asl::Exception("AbstractRenderWindow::setCanvas(): Canvas node is invalid.", PLUS_FILE_LINE);
         }
     }
 
@@ -200,6 +189,7 @@ namespace jslib {
     AbstractRenderWindow::getEventListener() const {
         return _myEventListener;
     }
+
     void
     AbstractRenderWindow::setEventListener(JSObject * theListener) {
         _myEventListener = theListener;
@@ -275,19 +265,16 @@ namespace jslib {
     }
 
     void
-    AbstractRenderWindow::onIdle() {
+    AbstractRenderWindow::onFrame() {
         static double _myStartTime = asl::Time();
 
-        MAKE_SCOPE_TIMER(onIdle);
+        MAKE_SCOPE_TIMER(onFrame);
         asl::StdOutputRedirector::get().checkForFileWrapAround();
         
         if (!_myPauseFlag) {
             if (_myFixedDeltaT == 0.0) {
                 _myElapsedTime = asl::Time() - _myStartTime - _myPauseTime;
-            } else {
-                // UH: don't modify _myElapsedTime now so that the first timestamp is 0.0
-                //_myElapsedTime += _myFixedDeltaT;
-            }
+            } 
 
             // Check for timeouts
             {
@@ -300,14 +287,14 @@ namespace jslib {
                         myShowCommand.c_str(), myShowCommand.size(), __FILE__, __LINE__);
 
                     if (!myScript) {
-                        AC_ERROR << "Timeout failed during compile: '" << myShowCommand << "'" << endl;
+                        AC_ERROR << "Timeout failed during compile: '" << myShowCommand << "'";
                     } else {
                         jsval myResult;
                         JSBool ok = JS_ExecuteScript(_myJSContext, myTimeout->getJSObject(), myScript, &myResult);
                         JS_DestroyScript(_myJSContext, myScript);
 
                         if (!ok) {
-                            AC_ERROR << "Timeout failed during execution: " << myShowCommand << "'" << endl;
+                            AC_ERROR << "Timeout failed during execution: " << myShowCommand << "'";
                         }
                     }
                 }
@@ -326,11 +313,11 @@ namespace jslib {
                 }
             }
 
-            if (_myEventListener) {
+            if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onFrame")) {
                 MAKE_SCOPE_TIMER(IdleJS);
                 jsval argv[1], rval;
                 argv[0] = as_jsval(_myJSContext, _myElapsedTime);
-                JSA_CallFunctionName(_myJSContext, _myEventListener, "onIdle", 1, argv, &rval);
+                JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 1, argv, &rval);
             }
             for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
                 string myName = (*i)->getName() + "::onFrame";
@@ -338,10 +325,9 @@ namespace jslib {
                     MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
                     (*i)->onFrame(this, _myElapsedTime);
                 } catch (const asl::Exception & ex) {
-                    AC_ERROR << "EXCEPTION while calling " << myName
-                        << ": " << ex << endl;
+                    AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
                 } catch (...) {
-                    AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName << endl;
+                    AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
                 }
             }
             if (_myFixedDeltaT != 0.0) {
@@ -355,9 +341,8 @@ namespace jslib {
         try {
             MAKE_SCOPE_TIMER(onPreRender);
 
-            if (_myEventListener) {
+            if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPreRender")) {
                 jsval argv[1], rval;
-                // call JS onPreRender
                 MAKE_SCOPE_TIMER(onPreRender_JSCallback);
                 jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onPreRender", 0, argv, &rval);
             }
@@ -368,23 +353,19 @@ namespace jslib {
                     MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
                     (*i)->onPreRender(this);
                 } catch (const asl::Exception & ex) {
-                    AC_ERROR << "EXCEPTION while calling " << myName
-                        << ": " << ex << endl;
+                    AC_ERROR << "Exception while calling " << myName << ": " << ex;
                 } catch (...) {
-                    AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName << endl;
+                    AC_ERROR << "Unknown exception while calling " << myName;
                 }
             }
             _myRenderer->preRender(_myCanvas->getFacade<Canvas>());
 
         } catch (const asl::Exception & ex) {
-            AC_FATAL << "ASL exception caught in AbstractRenderWindow::preRender(): " << ex << std::endl;
-            exit(2);//TODO: why do we have to exit here?
+            AC_ERROR << "ASL exception caught in AbstractRenderWindow::preRender(): " << ex;
         } catch (const std::exception & ex) {
-            AC_FATAL << "std::exception caught in AbstractRenderWindow::preRender(): " << ex.what() << std::endl;
-            exit(2);//TODO: why do we have to exit here?
+            AC_ERROR << "std::exception caught in AbstractRenderWindow::preRender(): " << ex.what();
         } catch (...) {
-            AC_FATAL << "Unknown exception in AbstractRenderWindow::preRender()" << std::endl;
-            exit(2);//TODO: why do we have to exit here?
+            AC_ERROR << "Unknown exception in AbstractRenderWindow::preRender()";
         }
     }
 
@@ -392,22 +373,17 @@ namespace jslib {
     AbstractRenderWindow::preViewport(const dom::NodePtr & theViewport) {
         try {
             MAKE_SCOPE_TIMER(onPreViewport);
-
-            if (_myEventListener) {
+            if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPreViewport")) {
                 jsval argv[1], rval;
-                // call JS onPreViewport
                 argv[0] = as_jsval(_myJSContext, theViewport);
                 jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onPreViewport", 1, argv, &rval);
             }
         } catch (const asl::Exception & ex) {
-            AC_FATAL << "ASL exception caught in Y60Render::preViewport(): " << ex << std::endl;
-            exit(2); //TODO: why do we have to exit here?
+            AC_ERROR << "ASL exception caught in Y60Render::preViewport(): " << ex;
         } catch (const std::exception & ex) {
-            AC_FATAL << "std::exception caught in Y60Render::preViewport(): " << ex.what() << std::endl;
-            exit(2); //TODO: why do we have to exit here?
+            AC_ERROR << "std::exception caught in Y60Render::preViewport(): " << ex.what();
         } catch (...) {
-            AC_FATAL << "Unknown exception in Y60Render::preViewport()" << std::endl;
-            exit(2); //TODO: why do we have to exit here?
+            AC_ERROR << "Unknown exception in Y60Render::preViewport()";
         }
     }
     void
@@ -426,24 +402,17 @@ namespace jslib {
         try {
             MAKE_SCOPE_TIMER(onPostViewport);
 
-            if (_myEventListener) {
+            if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPostViewport")) {
                 jsval argv[1], rval;
-                // call JS onPostViewport
                 argv[0] = as_jsval(_myJSContext, theViewport);
                 jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onPostViewport", 1, argv, &rval);
             }
         } catch (const asl::Exception & ex) {
-            AC_FATAL << "ASL exception caught in AbstractRenderWindow::postViewport(): "
-                      << ex << std::endl;
-            exit(2); //TODO: why do we have to exit here?
+            AC_ERROR << "ASL exception caught in AbstractRenderWindow::postViewport(): " << ex;
         } catch (const std::exception & ex) {
-            AC_FATAL << "std::exception caught in AbstractRenderWindow::postViewport(): "
-                      << ex.what() << std::endl;
-            exit(2);//TODO: why do we have to exit here?
+            AC_ERROR << "std::exception caught in AbstractRenderWindow::postViewport(): " << ex.what();
         } catch (...) {
-            AC_FATAL << "Unknown exception in AbstractRenderWindow::postViewport()"
-                      << std::endl;
-            exit(2);//TODO: why do we have to exit here?
+            AC_ERROR << "Unknown exception in AbstractRenderWindow::postViewport()";
         }
     }
     void
@@ -457,14 +426,13 @@ namespace jslib {
                     MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
                     (*i)->onPostRender(this);
                 } catch (const asl::Exception & ex) {
-                    AC_ERROR << "EXCEPTION while calling " << myName
-                        << ": " << ex << endl;
+                    AC_ERROR << "Exception while calling " << myName << ": " << ex;
                 } catch (...) {
-                    AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName << endl;
+                    AC_ERROR << "Unknown exception while calling " << myName;
                 }
             }
 
-            if (_myEventListener) {
+            if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPostRender")) {
                 MAKE_SCOPE_TIMER(onPostRender);
                 jsval argv[1], rval;
                 JSA_CallFunctionName(_myJSContext, _myEventListener, "onPostRender", 0, argv, &rval);
@@ -475,14 +443,11 @@ namespace jslib {
                 JS_GC(_myJSContext);
             }
         } catch (const asl::Exception & ex) {
-            AC_FATAL << "ASL exception caught in Y60Render::postRender(): " << ex << std::endl;
-            exit(2); //TODO: Why?
+            AC_ERROR << "ASL exception caught in Y60Render::postRender(): " << ex;
         } catch (const exception & ex) {
-            AC_FATAL << "std::exception caught in Y60Render::postRender(): " << ex.what() << std::endl;
-            exit(2);//TODO: Why?
+            AC_ERROR << "std::exception caught in Y60Render::postRender(): " << ex.what();
         } catch (...) {
-            AC_FATAL << "Unknown exception in Y60Render::postRender()" << std::endl;
-            exit(2); //TODO: Why?
+            AC_ERROR << "Unknown exception in Y60Render::postRender()";
         }
     }
 
@@ -495,10 +460,9 @@ namespace jslib {
                 MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
                 (*i)->handle(this, theEvent);
             } catch (const asl::Exception & ex) {
-                AC_ERROR << "EXCEPTION while calling " << myName
-                    << ": " << ex << endl;
+                AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
             } catch (...) {
-                AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName << endl;
+                AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
             }
         }
 
@@ -537,10 +501,10 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onKey(y60::Event & theEvent) {
-        y60::KeyEvent & myKeyEvent = dynamic_cast<y60::KeyEvent&>(theEvent);
+        if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onKey")) {
+            y60::KeyEvent & myKeyEvent = dynamic_cast<y60::KeyEvent&>(theEvent);
 
-        try {
-            if (_myEventListener) {
+            try {
                 jsval argv[7], rval;
                 argv[0] = as_jsval(_myJSContext, myKeyEvent.keyString);
                 argv[1] = as_jsval(_myJSContext, myKeyEvent.type == y60::Event::KEY_DOWN);
@@ -550,23 +514,20 @@ namespace jslib {
                 argv[5] = as_jsval(_myJSContext, ((myKeyEvent.modifiers & y60::KEYMOD_CTRL) !=0));
                 argv[6] = as_jsval(_myJSContext, ((myKeyEvent.modifiers & y60::KEYMOD_ALT) !=0));
                 JSA_CallFunctionName(_myJSContext, _myEventListener, "onKey", 7, argv, &rval);
+            } catch (const asl::Exception & ex) {
+                AC_ERROR << "ASL exception caught in AbstractRenderWindow::onKey(): " << ex;
+            } catch (const exception & ex) {
+                AC_ERROR << "std::exception caught in AbstractRenderWindow::onKey(): " << ex.what();
+            } catch (...) {
+                AC_ERROR << "Unknown exception in AbstractRenderWindow::onKey()";
             }
-        } catch (const asl::Exception & ex) {
-            AC_FATAL << "ASL exception caught in AbstractRenderWindow::onKey(): " << ex << endl;
-            exit(1);
-        } catch (const exception & ex) {
-            AC_FATAL << "std::exception caught in AbstractRenderWindow::onKey(): " << ex.what() << endl;
-            exit(1);
-        } catch (...) {
-            AC_FATAL << "Unknown exception in AbstractRenderWindow::onKey()" << endl;
-            exit(1);
         }
     }
 
     void
-    AbstractRenderWindow::onMouseButton(y60::Event & theEvent) {
-        y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
-        if (_myEventListener) {
+    AbstractRenderWindow::onMouseButton(y60::Event & theEvent) {        
+        if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onMouseButton")) {
+            y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
             jsval argv[4], rval;
             argv[0] = as_jsval(_myJSContext, myMouseEvent.button);
             if (myMouseEvent.type == y60::Event::MOUSE_BUTTON_UP) {
@@ -588,8 +549,8 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onMouseMotion(y60::Event & theEvent) {
-        y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
-        if (_myEventListener && _myScene) {
+        if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onMouseMotion")) {
+            y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
             jsval argv[2], rval;
             if (getOrientation() == PORTRAIT_ORIENTATION) {
                 argv[0] = as_jsval(_myJSContext, myMouseEvent.yPosition);
@@ -605,8 +566,8 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onMouseWheel(y60::Event & theEvent) {
-        y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
-        if (_myEventListener) {
+        if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onMouseWheel")) {
+            y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
             jsval argv[2], rval;
 
             argv[0] = as_jsval(_myJSContext, myMouseEvent.xDelta);
@@ -618,8 +579,8 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onAxis(y60::Event & theEvent) {
-        y60::AxisEvent & myAxisEvent = dynamic_cast<y60::AxisEvent&>(theEvent);
-        if (_myEventListener) {
+        if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onAxis")) {
+            y60::AxisEvent & myAxisEvent = dynamic_cast<y60::AxisEvent&>(theEvent);
             jsval argv[3], rval;
             argv[0] = as_jsval(_myJSContext, myAxisEvent.device);
             argv[1] = as_jsval(_myJSContext, myAxisEvent.axis);
@@ -630,9 +591,9 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onTouch(y60::Event & theEvent) {
-        y60::TouchEvent & myEvent = dynamic_cast<y60::TouchEvent&>(theEvent);
+        if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onTouch")) {
+            y60::TouchEvent & myEvent = dynamic_cast<y60::TouchEvent&>(theEvent);
 
-        if (_myEventListener) {
             jsval argv[5], rval;
             int nargs = 0;
             argv[nargs++] = as_jsval(_myJSContext, myEvent.device);
@@ -647,8 +608,8 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onResize(y60::Event & theEvent) {
-        y60::WindowEvent & myWindowEvent = dynamic_cast<y60::WindowEvent&>(theEvent);
-        if (_myEventListener) {
+        if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onResize")) {
+            y60::WindowEvent & myWindowEvent = dynamic_cast<y60::WindowEvent&>(theEvent);
             jsval argv[2], rval;
             argv[0] = as_jsval(_myJSContext, myWindowEvent.width);
             argv[1] = as_jsval(_myJSContext, myWindowEvent.height);
@@ -658,9 +619,8 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onButton(y60::Event & theEvent) {
-        y60::ButtonEvent & myButtonEvent = dynamic_cast<y60::ButtonEvent&>(theEvent);
-
-        if (_myEventListener) {
+        if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onButton")) {
+            y60::ButtonEvent & myButtonEvent = dynamic_cast<y60::ButtonEvent&>(theEvent);
             jsval argv[3], rval;
             argv[0] = as_jsval(_myJSContext, myButtonEvent.device);
             argv[1] = as_jsval(_myJSContext, myButtonEvent.button);
@@ -719,18 +679,7 @@ namespace jslib {
     AbstractRenderWindow::getFrameRate() const {
         return asl::getDashboard().getFrameRate();
     }
-/*
-    asl::Matrix4f
-    AbstractRenderWindow::getLocalMatrix(dom::NodePtr theNode) {
-        asl::Matrix4f myLocalMatrix;
-        if (theNode) {
-            theNode->getFacade<y60::TransformHierarchyFacade>()->getLocalMatrix(myLocalMatrix);
-        } else {
-            AC_ERROR << "AbstractRenderWindow::getLocalMatrix: parameter is null" << endl;
-        }
-        return myLocalMatrix;
-    }
-*/
+
     // =======================================================================
     //  Scene methods
     // =======================================================================
@@ -752,11 +701,11 @@ namespace jslib {
 				_myScene->getTextureManager()->loadMovieFrame(theMovieNode->getFacade<Movie>(), _myElapsedTime);
             }
         } catch(const exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::loadMovieFrame: Exception caught: " << ex.what() << endl;
+            AC_ERROR << "AbstractRenderWindow::loadMovieFrame: Exception caught: " << ex.what();
 			throw(ex);
         }
         catch(const asl::Exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::loadMovieFrame: Exception caught: " << ex << endl;
+            AC_ERROR << "AbstractRenderWindow::loadMovieFrame: Exception caught: " << ex;
 			throw(ex);
         }
     }
@@ -767,15 +716,14 @@ namespace jslib {
 				_myScene->getTextureManager()->loadCaptureFrame(theCaptureNode->getFacade<Capture>());
             }
         } catch(const exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::loadCaptureFrame: Exception caught: " << ex.what() << endl;
+            AC_ERROR << "AbstractRenderWindow::loadCaptureFrame: Exception caught: " << ex.what();
 			throw(ex);
         }
         catch(const asl::Exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::loadCaptureFrame: Exception caught: " << ex << endl;
+            AC_ERROR << "AbstractRenderWindow::loadCaptureFrame: Exception caught: " << ex;
 			throw(ex);
         }
     }
-
 
     // TODO: adapt for other 1 and 3 byte pixel formats
     asl::Vector4i
@@ -792,9 +740,9 @@ namespace jslib {
                 }
             }
         } catch(const exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::getImagePixel: Exception caught: " << ex.what() << endl;
+            AC_ERROR << "AbstractRenderWindow::getImagePixel: Exception caught: " << ex.what();
         } catch(const asl::Exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::getImagePixel: Exception caught: " << ex << endl;
+            AC_ERROR << "AbstractRenderWindow::getImagePixel: Exception caught: " << ex;
         }
         return asl::Vector4i(0,0,0,0);
     }
@@ -817,9 +765,9 @@ namespace jslib {
                 }
             }
         } catch(const exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::setImagePixel: Exception caught: " << ex.what() << endl;
+            AC_ERROR << "AbstractRenderWindow::setImagePixel: Exception caught: " << ex.what();
         } catch(const asl::Exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::setImagePixel: Exception caught: " << ex << endl;
+            AC_ERROR << "AbstractRenderWindow::setImagePixel: Exception caught: " << ex;
         }
         return false;
     }
@@ -885,21 +833,24 @@ namespace jslib {
     }
     void AbstractRenderWindow::playClip(float theTime,
                   const std::string & theCharacterName,
-                  const std::string & theClipName) {
+                  const std::string & theClipName) 
+    {
         if (_myScene) {
             _myScene->getAnimationManager().playClip(theTime, theCharacterName, theClipName);
         }
     }
     void AbstractRenderWindow::setClipLoops(const std::string & theCharacterName,
                       const std::string & theClipName,
-                      unsigned int theLoops) {
+                      unsigned int theLoops) 
+    {
         if (_myScene) {
             _myScene->getAnimationManager().setClipLoops(theCharacterName, theClipName, theLoops);
         }
     }
     void AbstractRenderWindow::setClipForwardDirection(const std::string & theCharacterName,
                       const std::string & theClipName,
-                      bool theDirection) {
+                      bool theDirection) 
+    {
         if (_myScene) {
             _myScene->getAnimationManager().setClipForwardDirection(theCharacterName, theClipName, theDirection);
         }
@@ -931,7 +882,6 @@ namespace jslib {
             _myScene->getAnimationManager().stop(theCharacterName);
         }
     }
-
 
     void
     AbstractRenderWindow::setFixedDeltaT(const float & theDeltaT) {

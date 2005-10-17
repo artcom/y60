@@ -40,7 +40,6 @@ namespace jslib {
     class JSApp {
         public:
             JSApp();
-            static void setIncludePath(const std::string & theIncludePath);
             static asl::PackageManagerPtr getPackageManager();
             static void setReportWarnings(bool theEnableFlag);
             static void setQuitFlag(bool theQuitFlag);
@@ -57,17 +56,23 @@ namespace jslib {
             void shutdown();
             static void ShellErrorReporter(JSContext *cx, const char *message,
                     JSErrorReport *report);
+            
             int run(const std::string & theScriptFilename,
+                    const std::string & theIncludePath,
                     const std::vector<std::string> & theScriptArgs);
+
             static JSObject * copyArguments(JSContext * theContext,
                  const std::vector<std::string> & theScriptArgs );
         protected:
             virtual bool initClasses(JSContext * theContext, JSObject * theGlobalObject);
         private:
             void Process(JSContext *cx, JSObject *obj, const char *filename);
+            
+            void setupPath(const std::string & theIncludePath);
             int processArguments(JSContext * theContext, JSObject * theObject,
                 const std::string & theScriptFilename,
-                const std::vector<std::string> & theScriptArgs );
+                const std::string & theIncludePath,
+                const std::vector<std::string> & theScriptArgs);
 
             bool   ourStrictFlag;
             int    ourJSVersion;

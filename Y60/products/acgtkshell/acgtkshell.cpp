@@ -17,8 +17,6 @@
 //
 //=============================================================================
 
-// Commit Tests (acbuild) foo
-
 #include <jsgtk/GTKApp.h>
 
 #include <y60/jssettings.h>
@@ -89,20 +87,7 @@ acMain(int argc, char **argv) {
         }
 
         asl::StdOutputRedirector::get().init(ourArguments);
-
-        //AC_PRINT << ourArguments.getProgramName() << " Copyright (C) 2003-2005 ART+COM";
-
         GTKApp myApp;
-
-        if (ourArguments.haveOption("-I")) {
-            myApp.setIncludePath(ourArguments.getOptionArgument("-I"));
-        }
-        std::string myTextureDirs = asl::expandEnvironment("${AC_TEXTURE_DIR}");
-        if (myTextureDirs.length() == 0) {
-            myTextureDirs = "./";
-        }
-        JSApp::getPackageManager()->add(myTextureDirs);
-
 
         if (ourArguments.haveOption("--no-jswarnings")) {
             myApp.setReportWarnings(false);
@@ -112,6 +97,11 @@ acMain(int argc, char **argv) {
 
         if (ourArguments.haveOption("--jsversion")) {
             myApp.setJSVersion(asl::as<int>(ourArguments.getOptionArgument("--jsversion")));
+        }
+
+        string myIncludePath;
+        if (ourArguments.haveOption("-I")) {
+            myIncludePath = ourArguments.getOptionArgument("-I");
         }
 
         if (ourArguments.getCount() < 1) {
@@ -126,7 +116,7 @@ acMain(int argc, char **argv) {
                 myScriptArgs.push_back(ourArguments.getArgument(i));
             }
             myApp.setProgramName(ourArguments.getProgramName());
-            rv = myApp.run(myFilename, myScriptArgs);
+            rv = myApp.run(myFilename, myIncludePath, myScriptArgs);
         }
     } catch (asl::Exception & ex) {
         rv = 1;

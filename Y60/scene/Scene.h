@@ -261,10 +261,6 @@ namespace y60 {
                                   const asl::Vector3<float> & theMotion,
                                   CollisionInfo & theCollision);
 
-#if 0
-            static const asl::Matrix4f & Scene::updateGlobalMatrix(dom::Node * theNode,
-                                                const asl::Matrix4f * theParentMatrix = 0);
-#endif
             static bool intersectBodies(dom::NodePtr theRootNode,
                                  const asl::LineSegment<float> & theStick,
                                  IntersectionInfoVector & theIntersections);
@@ -326,11 +322,6 @@ namespace y60 {
 
             void calculateShapeBoundingBox(ShapePtr myShape);
 
-#if 0
-            const asl::Box3f & updateTransformHierachy(dom::NodePtr theNode,
-                                                       const asl::Matrix4f & theParentMatrix,
-                                                       bool theIgnoreStaticNodes = false);
-#endif
             void updateTransformHierachy(dom::NodePtr theNode,
                                                        const asl::Matrix4f & theParentMatrix,
                                                        bool theIgnoreStaticNodes = false);
@@ -347,16 +338,11 @@ namespace y60 {
             dom::NodePtr getVertexDataNode(dom::NodePtr theShapeNode, const std::string & theDataName);
 
             unsigned findMaxIndexSize(dom::NodePtr theElementsNode);
-            IShaderLibraryPtr getShaderLibrary() const {
-                if (_myTextureManager->getResourceManager()) {
-                    return _myTextureManager->getResourceManager()->getShaderLibrary();
-                } else {
-                    return IShaderLibraryPtr(0);
-                }
-            }
+            
+            IShaderLibraryPtr getShaderLibrary() const;
+            void setupShaderLibrary();
 
-            SceneBuilderPtr     _mySceneBuilder;
-
+            SceneBuilderPtr          _mySceneBuilder;
             asl::Ptr<TextureManager> _myTextureManager;
             AnimationManager         _myAnimationManager;
 

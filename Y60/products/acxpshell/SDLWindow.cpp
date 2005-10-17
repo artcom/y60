@@ -144,28 +144,6 @@ SDLWindow::onResize(y60::Event & theEvent) {
     AbstractRenderWindow::onResize(theEvent);
 }
 
-
-/*
-    void SDLWindow::resizeTo(unsigned theWidth, unsigned theHeight) {
-        if (_myWindowInitFlag && _myRenderer) {
-            setVideoMode(theWidth, theHeight);
-        }
-        _myWindowWidth  = theWidth;
-        _myWindowHeight = theHeight;
-    }
-
-    void SDLWindow::setFullScreen(bool theFullscreenFlag) {
-        if (_myWindowInitFlag && (theFullscreenFlag != _myFullscreenFlag)) {
-            _myFullscreenFlag = theFullscreenFlag;
-            if (SDL_WM_ToggleFullScreen(_myScreen) == 0) {
-                setVideoMode();
-            }
-        } else {
-            _myFullscreenFlag = theFullscreenFlag;
-        }
-    }
-*/
-
 void
 SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
                         bool theFullscreenFlag)
@@ -568,7 +546,7 @@ void
 SDLWindow::mainLoop() {
     _myAppQuitFlag = false;
     // do one update before entering the mainloop. This ensures everything
-    // is up to date during first onIdle
+    // is up to date during first onFrame
     if (_myRenderer) {
         _myRenderer->getCurrentScene()->updateAllModified();
     }
@@ -588,7 +566,7 @@ SDLWindow::mainLoop() {
         asl::getDashboard().cycle();
         START_TIMER(frames);
 
-        onIdle();
+        onFrame();
 
         START_TIMER(dispatchEvents);
          y60::EventDispatcher::get().dispatch();
@@ -619,7 +597,9 @@ SDLWindow::mainLoop() {
     }
 
     jsval argv[1], rval;
-    jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onExit", 0, argv, &rval);
+    if (jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onExit")) {
+        jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onExit", 0, argv, &rval);
+    }
 }
 
 int SDLWindow::go() {
@@ -644,164 +624,6 @@ int SDLWindow::go() {
     setCaptureMouseCursor(false);
     return myRetValue;
 }
-
-/*
-void SDLWindow::setViewport(float theMinX, float theMinY, float theMaxX, float theMaxY) {
-        asl::Box2f myBox(theMinX, theMinY, theMaxX, theMaxY);
-    if (_myRenderer) {
-        _myRenderer->setViewport(myBox);
-    }
-}
-*/
-
-// DS: DTM legacy code .... think we should (re-) move this ...
-#if 0
-template <class T>
-bool getProperty(JSContext * cx, JSObject * obj, const char * thePropertyName, T & theValue) {
-    jsval myVal;
-    IF_NOISY(AC_TRACE << "getProperty:" << thePropertyName << endl);
-    if (!JS_GetProperty(cx,obj,thePropertyName,&myVal)) {
-        JS_ReportError(cx,"getProperty: not found expected property with name '%s'", thePropertyName);
-        return false;
-    }
-    if (!convertFrom(cx, myVal, theValue)) {
-        JS_ReportError(cx,"getProperty: property with name '%s' has bad type", thePropertyName);
-        return false;
-    }
-    IF_NOISY(AC_TRACE << "getProperty ok:" << thePropertyName << endl);
-    return true;
-}
-
-void SDLWindow::calcWavePosition(float deltaT, Anchor & theAnchor, float theTime,
-        const asl::Vector3f & theWave1Direction, float theWave1Frequency, float theWave1Amplitude, float theWave1Speed,
-        const asl::Vector3f & theWave2Direction, float theWave2Frequency, float theWave2Amplitude, float theWave2Speed)
-{
-    theAnchor.waveHeight = 0;
-
-    float d = dot(asVector(theAnchor.globalPosition),theWave1Direction);
-    d = d * theWave1Frequency + fmod(theTime * theWave1Frequency * theWave1Speed, float(2*asl::PI));
-    theAnchor.waveHeight += theWave1Amplitude * sin(d);
-
-    d = dot(asVector(theAnchor.globalPosition),theWave2Direction);
-    d = d * theWave2Frequency + fmod(theTime * theWave2Frequency * theWave2Speed, float(2*asl::PI));
-    theAnchor.waveHeight += theWave2Amplitude * sin(d);
-
-    theAnchor.globalPosition[1] = theAnchor.waveHeight;
-}
-
-bool SDLWindow::floatBody(float theTime,
-    float theIntensity,
-    dom::NodePtr theBody,
-    JSObject * theFloatProperties,
-    JSObject * theWave1Properties,
-    JSObject * theWave2Properties) {
-
-    const float SIMULATION_INTERVAL = 0.03f;
-
-    JSContext * cx = _myJSContext;
-
-    // get the float properties first
-    float myWeightFactor = 1.0;
-    getProperty(cx,theFloatProperties,"myWeightFactor",myWeightFactor);
-    float myPitchFactor = 1.0;
-    getProperty(cx,theFloatProperties,"myPitchFactor",myPitchFactor);
-    float myRollFactor = 1.0;
-    getProperty(cx,theFloatProperties,"myRollFactor",myRollFactor);
-    asl::Vector3f myAnchor1(-1,0,0);
-    getProperty(cx,theFloatProperties,"myAnchor1",myAnchor1);
-    asl::Vector3f myAnchor2(0,0,1);
-    getProperty(cx,theFloatProperties,"myAnchor2",myAnchor2);
-    asl::Vector3f myAnchor3(0,0,-1);
-    getProperty(cx,theFloatProperties,"myAnchor3",myAnchor3);
-    std::vector<Anchor> myAnchors;
-    myAnchors.push_back(Anchor(myAnchor1));
-    myAnchors.push_back(Anchor(myAnchor2));
-    myAnchors.push_back(Anchor(myAnchor3));
-
-    // now the Wave Properties
-    asl::Vector3f myWave1Direction(1,0,0);
-    getProperty(cx,theWave1Properties,"direction",myWave1Direction);
-    float myWave1Frequency = 1;
-    getProperty(cx,theWave1Properties,"frequency",myWave1Frequency);
-    float myWave1Amplitude = 1;
-    getProperty(cx,theWave1Properties,"amplitude",myWave1Amplitude);
-    float myWave1Speed = 1;
-    getProperty(cx,theWave1Properties,"waveSpeed",myWave1Speed);
-
-    asl::Vector3f myWave2Direction(1,0,0);
-    getProperty(cx,theWave2Properties,"direction",myWave2Direction);
-    float myWave2Frequency = 1;
-    getProperty(cx,theWave2Properties,"frequency",myWave2Frequency);
-    float myWave2Amplitude = 1;
-    getProperty(cx,theWave2Properties,"amplitude",myWave2Amplitude);
-    float myWave2Speed = 1;
-    getProperty(cx,theWave2Properties,"waveSpeed",myWave2Speed);
-
-    // now lets simulate
-
-    // reset roll and pitch, but keep heading
-    dom::NodePtr myOrientationAttrib = theBody->getAttribute(y60::ORIENTATION_ATTRIB);
-    asl::Vector3f & myOrientationRef = myOrientationAttrib->nodeValueRefOpen<asl::Vector3f>();
-    myOrientationRef[0] = 0;
-    myOrientationRef[2] = 0;
-    // theBody->setAttributeValue<Vector3f>(y60::ORIENTATION_ATTRIB, myOrientation);
-    _myRenderer->getCurrentScene()->updateGlobalMatrix(&(*theBody));
-
-    //const asl::Matrix4f & myShipMatrix(theBody->getAttributeValue<asl::Matrix4f>(y60::GLOBAL_MATRIX_ATTRIB));
-    y60::BodyPtr myBody = theBody->getFacade<Body>();
-    const asl::Matrix4f & myShipMatrix = myBody->get<GlobalMatrixTag>();
-    for (int i = 0; i < myAnchors.size(); ++i) {
-        float myLastHeight = myAnchors[i].globalPosition[1];
-        myAnchors[i].globalPosition = product(myAnchors[i].localPosition, myShipMatrix);
-        myAnchors[i].globalPosition[1] = myLastHeight;
-    }
-
-    for (int i = 0; i < myAnchors.size(); ++i) {
-        calcWavePosition(SIMULATION_INTERVAL, myAnchors[i], theTime,
-            myWave1Direction,
-            myWave1Frequency, myWave1Amplitude, myWave1Speed,
-            myWave2Direction,
-            myWave2Frequency, myWave2Amplitude, myWave2Speed);
-    }
-
-    // Interpolate height from anchor point positions
-    float myHeight = (myAnchors[1].globalPosition[1] + myAnchors[2].globalPosition[1]) / 2;
-    myHeight = (myHeight + myAnchors[0].globalPosition[1]) / 2;
-
-    // Set ship height
-    dom::NodePtr myShipPositionAttrib = theBody->getAttribute(y60::POSITION_ATTRIB);
-    {
-        asl::Vector3f & myShipPositionRef = myShipPositionAttrib->nodeValueRefOpen<asl::Vector3f>();
-        myShipPositionRef[1] = myHeight;
-        myShipPositionAttrib->nodeValueRefClose<asl::Vector3f>();
-    }
-    // Calculate pitch and roll from anchor points
-    //asl::Matrix4f myInvertedShipMatrix = theBody->getAttributeValue<asl::Matrix4f>(y60::GLOBAL_MATRIX_ATTRIB);
-    asl::Matrix4f myInvertedShipMatrix = myBody->getInvertedGlobalMatrix();
-
-    std::vector<asl::Point3f> myLocalAnchorPoints;
-
-    myLocalAnchorPoints.push_back(product(myAnchors[0].globalPosition, myInvertedShipMatrix));
-    myLocalAnchorPoints.push_back(product(myAnchors[1].globalPosition, myInvertedShipMatrix));
-    myLocalAnchorPoints.push_back(product(myAnchors[2].globalPosition, myInvertedShipMatrix));
-
-    asl::Vector3f myNormal(asl::generateFaceNormal<float>(asVector(myLocalAnchorPoints[0]),
-        asVector(myLocalAnchorPoints[1]), asVector(myLocalAnchorPoints[2])));
-    asl::Vector3f myNormal_XY = normalized(asl::Vector3f(myNormal[0], myNormal[1], 0));
-    asl::Vector3f myNormal_YZ = normalized(asl::Vector3f(0, myNormal[1], myNormal[2]));
-
-    float myPitch = asin(myNormal_XY[0]);
-    float myRoll  = asin(myNormal_YZ[2]);
-
-    // myOrientation = theBody->getAttributeValue<Vector3f>(y60::ORIENTATION_ATTRIB);
-    myOrientationRef[0] = myRoll * theIntensity * myRollFactor;
-    myOrientationRef[2] = myPitch * theIntensity * myPitchFactor;
-    myOrientationAttrib->nodeValueRefClose<asl::Vector3f>();
-    // AC_TRACE << "setting orientation to " << myOrientationRef << endl;
-    // theBody->setAttributeValue<Vector3f>(y60::ORIENTATION_ATTRIB, myOrientation);
-    return true;
-}
-#endif // DTM legacy code
 
 bool SDLWindow::getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter,
                          asl::Box2f & theGlyphBox, double & theAdvance)

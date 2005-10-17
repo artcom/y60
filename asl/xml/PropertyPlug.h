@@ -27,7 +27,7 @@ namespace dom {
 
 
 #define DEFINE_PROPERTY_TAG(theTagName, theFacade, theType, theNodeName, thePropertyName, \
-        thePropertyListName, theAttributeName, theDefault) \
+        thePropertyListName, theDefault) \
     class theFacade; \
     struct theTagName { \
         typedef theType TYPE; \
@@ -35,10 +35,9 @@ namespace dom {
         static const char * getNodeName() { return theNodeName; } \
         static const char * getName() { return thePropertyName; } \
         static const char * getListName() { return thePropertyListName; } \
-        static const char * getAttributeName() { return theAttributeName; } \
 		static const TYPE getDefault() { return theDefault; } \
-    }; 
-    
+    };
+
 
     template<class TAG, class FACADE>
     class PropertyPlug {
@@ -97,16 +96,16 @@ namespace dom {
 
             void ensureTextChild(const Node & theNode, const VALUE & theValue) const {
 
-				if (_myTextChild && _myPropertyNode && 
+				if (_myTextChild && _myPropertyNode &&
 					_myTextChild->parentNode() && _myTextChild->parentNode()->parentNode() == _myPropertyNode->parentNode()) {
 					// alles super && alles beim alten
 					return;
 				}
                 dom::Node & myPropertyListNode = const_cast<Node&>(theNode);
-                _myPropertyNode = myPropertyListNode.childNodeByAttribute(TAG::getNodeName(), TAG::getAttributeName(), TAG::getName());
+                _myPropertyNode = myPropertyListNode.childNodeByAttribute(TAG::getNodeName(), "name", TAG::getName());
                 if (!_myPropertyNode) {
                     _myPropertyNode = myPropertyListNode.appendChild(NodePtr(new Element(TAG::getNodeName())));
-                    _myPropertyNode->appendAttribute(TAG::getAttributeName(), TAG::getName());
+                    _myPropertyNode->appendAttribute("name", TAG::getName());
                 }
 
                 _myTextChild = _myPropertyNode->childNode("#text");

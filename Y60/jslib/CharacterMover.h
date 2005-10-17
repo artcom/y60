@@ -42,7 +42,7 @@ class CharacterMover {
                        const asl::Vector3f & theFinalPosition,
                        const asl::Vector3f & theFinalPositionOffset = asl::Vector3f(0.f, 0.f, 0.f));
 
-        State onIdle(double theDeltaTime, asl::Vector4f * theColors,
+        State onFrame(double theDeltaTime, asl::Vector4f * theColors,
             asl::Vector3f * thePositions, asl::Box3f & theBoundingBox);
 
         bool isInside(asl::Vector2f theCenter, float theRadius);
@@ -115,7 +115,7 @@ class StringMover {
         int getState() const {
             return int(_myState);
         }
-        void onIdle(double theTime);
+        void onFrame(double theTime);
         void addCharacter(const asl::Vector3f & theFinalPosition);
         void onMouseButton(asl::Vector2f theMousePosition);
 

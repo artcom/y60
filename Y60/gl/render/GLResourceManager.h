@@ -139,8 +139,8 @@ namespace y60 {
          * @throws TextureException Unknown type of texture or corrupt image provided
          */
         virtual unsigned setupTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
-        virtual IShaderLibraryPtr getShaderLibrary() const;
 
+        virtual IShaderLibraryPtr getShaderLibrary() const;
         void loadShaderLibrary(const std::string & theShaderLibraryFile);
     private:
         static PixelEncodingInfo getInternalTextureFormat(ImagePtr theImage);
@@ -166,10 +166,8 @@ namespace y60 {
          */
         void setupPixelTransfer(ImagePtr theImage);
         unsigned long _myTextureMemUsage;
-        ShaderLibraryPtr _myShaderLibrary;
-        
+        ShaderLibraryPtr _myShaderLibrary;        
     };
-
 }
 
 

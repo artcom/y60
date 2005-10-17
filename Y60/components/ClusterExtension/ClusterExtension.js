@@ -29,7 +29,7 @@ for (var i = 0; i < arguments.length; ++i) {
         slave = true;
     } if (myArgument == "+master") {
         master = true;
-    } 
+    }
 }
 
 if (!master && !slave) {
@@ -82,19 +82,19 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
 
     // setup
     Base.setup = self.setup;
-    self.setup = function(theWidth, theHeight, theTitle) {        
+    self.setup = function(theWidth, theHeight, theTitle) {
 
         if (master) {
             Base.setup(theWidth, theHeight, theTitle);
-            createTextOverlay();       
-            self.registerSettingsListener(_myDemoRenderExtension, "ClusterExtension");       
+            createTextOverlay();
+            self.registerSettingsListener(_myDemoRenderExtension, "ClusterExtension");
         } else {
             // register our event listener
             window.eventListener = self;
-            
+
             // set the window behavior while sleeping
             window.renderWhileSleep = false;
-            
+
             if (theWidth != null && theHeight != null) {
                 //window.resizeTo(theWidth, theHeight);
                 window.setVideoMode(theWidth, theHeight, ourFullScreenFlag);
@@ -107,7 +107,7 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
             // load a scene
             print("Loading " + (_myModelName ? "scene '" + _myModelName + "'" : "empty scene") +
                 " with '" + _myShaderLibrary.substr(_myShaderLibrary.lastIndexOf("/") + 1) + "'");
-                    
+
             var myStatus = window.loadScene(_myModelName, _myShaderLibrary);
             if (!myStatus) {
                 throw new Exception("Could not load model", "SceneViewer::run()");
@@ -116,12 +116,12 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
             //myTimer.add("setup load scene");
             //window.saveScene("loaded_scene.x60", false);
 
-            //window.setViewport(_myRenderArea[0], _myRenderArea[1], _myRenderArea[2], _myRenderArea[3]);  
-            self.setActiveCamera(0);            
-        }     
+            //window.setViewport(_myRenderArea[0], _myRenderArea[1], _myRenderArea[2], _myRenderArea[3]);
+            self.setActiveCamera(0);
+        }
     }
 
-    Base.onKey = self.onKey;        
+    Base.onKey = self.onKey;
     self.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
         if (master) {
             Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
@@ -136,7 +136,7 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
                 theKey = theKey.toUpperCase();
             }
 
-            switch (theKey) {   
+            switch (theKey) {
                 case 'F':
                     renderer.flatshading = !renderer.flatshading;
                     print("Flatshading: " + (renderer.flatshading ? "on" : "off"));
@@ -274,17 +274,17 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
             default:
                     break;
             }
-            return true; 
+            return true;
         }
     }
-    
-    Base.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
+
+    Base.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
         if (master) {
-            Base.onIdle(theTime);
-        }    
+            Base.onFrame(theTime);
+        }
     }
-    
+
     Base.onMouseMotion = self.onMouseMotion;
     self.onMouseMotion = function(theX, theY) {
         if (master) {
@@ -302,7 +302,7 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
              }
         }
     }
-        
+
     Base.onMouseWheel = self.onMouseWheel;
     self.onMouseWheel = function(theDeltaX, theDeltaY) {
         if (master) {
@@ -311,16 +311,16 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
             }
         }
     }
-         
+
     self.go = function() {
         window.go();
     }
-    
+
     if (!master) {
         self.onRender = function() {
         }
         self.onPreRender = function() {
-        }                 
+        }
         self.onPostRender = function() {
         }
         self.setActiveCamera = function(theCamera) {
@@ -346,9 +346,9 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
 
             print("Switch to camera: " + _myCamera.name);
         }
-    }                 
+    }
     ////////////// private members ////////////
-        
+
     function createTextOverlay() {
         window.loadTTF("Arial", "${PRO}/src/Y60/gl/text/fonts/arial.ttf", 18);
         window.setTextPadding(10,10,10,10);
@@ -366,9 +366,9 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
         _myTextOverlay.srcsize.y = myTextSize.y / myTextImage.height;
 
         _myTextOverlay.position = new Vector2f(10, 30);
-        _myTextOverlay.visible = true;    
-    }  
-      
+        _myTextOverlay.visible = true;
+    }
+
     function parseArguments(theArguments) {
         for (var i = 0; i < theArguments.length; ++i) {
             var myArgument = theArguments[i];
@@ -388,7 +388,7 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
             throw new Exception("Missing shaderlibrary argument", "SceneViewer::parseArguments()");
         }
     }
-    
+
     if (!master) {
         var _myModelName             = null;
         var _myShaderLibrary         = null;

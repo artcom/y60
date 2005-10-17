@@ -201,7 +201,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
         _myEnabled = theEnable;
     }
 
-    obj.onIdle = function(theTime) {
+    obj.onFrame = function(theTime) {
         if (_myLastTime == null) {
             _myLastTime = theTime;
         }

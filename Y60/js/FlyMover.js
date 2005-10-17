@@ -53,7 +53,7 @@ FlyMover.prototype.Constructor = function(self) {
         _myCurrentStartSpeed = 1;
     }
 
-    self.onIdle = function(theTime) {
+    self.onFrame = function(theTime) {
         if (!_myLastIdleTime) {
             _myLastIdleTime = theTime;
             return;

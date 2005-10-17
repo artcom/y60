@@ -96,7 +96,7 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
         return _myWaves;
     }
 
-    obj.onIdle = function(theTime) {
+    obj.onFrame = function(theTime) {
         _myTimer.add("start");
         if (_myActive) {
             for (var i = 0; i < _myWaves.length; ++i) {

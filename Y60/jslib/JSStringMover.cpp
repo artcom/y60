@@ -29,10 +29,10 @@ using namespace asl;
 namespace jslib {
 
 static JSBool
-onIdle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+onFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    return Method<JSStringMover::NATIVE>::call(&JSStringMover::NATIVE::onIdle,cx,obj,argc,argv,rval);
+    return Method<JSStringMover::NATIVE>::call(&JSStringMover::NATIVE::onFrame,cx,obj,argc,argv,rval);
 }
 
 static JSBool
@@ -60,7 +60,7 @@ JSFunctionSpec *
 JSStringMover::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
-        {"onIdle",               onIdle,                  1},
+        {"onFrame",              onFrame,                 1},
         {"addCharacter",         addCharacter,            2},
         {"resetPositions",       resetPositions,          2},
         {"onMouseButton",        onMouseButton,           1},

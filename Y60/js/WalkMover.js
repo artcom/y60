@@ -91,7 +91,7 @@ WalkMover.prototype.Constructor = function(self) {
         _myEyeHeight         = INITIAL_EYEHEIGHT;
     }
 
-    self.onIdle = function(theTime) {
+    self.onFrame = function(theTime) {
         if (_myLastTime == null) {
             _myLastTime = theTime;
             return;

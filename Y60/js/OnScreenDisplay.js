@@ -51,7 +51,7 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
         _myDisplayStartTime = theSceneViewer.getCurrentTime();
     }
 
-    self.onIdle = function(theTime) {
+    self.onFrame = function(theTime) {
         if (_myOverlay && _myDisplayStartTime) {
             var myDisplayDuration = theTime - _myDisplayStartTime;
             if (myDisplayDuration <= DISPLAY_DURATION) {

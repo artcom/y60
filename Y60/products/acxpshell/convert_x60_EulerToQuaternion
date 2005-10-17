@@ -1,9 +1,9 @@
 #! /bin/bash
 
-APPLICATION=acxpshellOPT
+APPLICATION=y60
 
 if [ "$DEBUG" == "1" ] ; then
-    APPLICATION=acxpshellDBG
+    APPLICATION=y60DBG
 fi
 
 #

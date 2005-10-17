@@ -22,7 +22,7 @@ function FrameRateLimiter(theFrameRate) {
     var _myMissedFrames      = 0;
     var _myLastOverTime      = 0;
 
-    this.onIdle = function(theTime) {
+    this.onFrame = function(theTime) {
         var mySleepTime = 0;
         if (_myLastPlayTime) {
             var myCurrentFrameTime = theTime - _myLastPlayTime;

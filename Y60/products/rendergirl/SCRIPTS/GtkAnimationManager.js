@@ -66,10 +66,10 @@ GtkAnimationManager.prototype.Constructor = function(self, theViewer) {
         }
     }
 
-    Base.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
+    Base.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
         if (_myActive) {
-            Base.onIdle(theTime);
+            Base.onFrame(theTime);
             var myAnimationTime = self.getTime() % (_mySlider.length + 1 / ANIMATION_FRAMES_PER_SECOND);
 
             _mySlider.setValue(myAnimationTime);

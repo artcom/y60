@@ -26,23 +26,23 @@ sub runLocalMakedist($) {
 sub runLocalMakeInstaller() {
     addShortcut("rendergirl",
                 "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/sv.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "acxpshell.exe");
+                "y60.exe");
 
     addFileType("rendergirl model", "x60",
                 "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/sv.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "acxpshell.exe");
+                "y60.exe");
 
     addFileType("rendergirl binary model", "b60",
                 "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/sv.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "acxpshell.exe");
+                "y60.exe");
 
     addFileType("rendergirl movie", "m60",
                 "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/ImageViewer.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "acxpshell.exe");
+                "y60.exe");
 
     addFileType("rendergirl image", "i60",
                 "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/ImageViewer.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "acxpshell.exe");
+                "y60.exe");
 }
 
 1;

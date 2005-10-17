@@ -29,6 +29,7 @@
 #include <asl/string_functions.h>
 #include <asl/file_functions.h>
 #include <asl/directory_functions.h>
+#include <asl/DirectoryPackage.h>
 #include <asl/os_functions.h>
 #include <asl/Time.h>
 #include <asl/MappedBlock.h>
@@ -79,7 +80,6 @@ int ourExitCode = 0;
 FILE * gOutFile = NULL;
 FILE * gErrFile = NULL;
 JSBool reportWarnings = JS_TRUE;
-std::string ourIncludePath;
 std::string ourTopScriptFilename;
 
 std::string JSApp::_myProgramName;
@@ -100,13 +100,6 @@ IncludeGuardVector ourIncludeGuard;
 asl::PackageManagerPtr
 JSApp::getPackageManager() {
     return AppPackageManager::get().getPtr();
-}
-
-void
-JSApp::setIncludePath(const std::string & theIncludePath) {
-    ourIncludePath = theIncludePath;
-    PlugInManager::get().setSearchPath(ourIncludePath);
-    JSApp::getPackageManager()->add(ourIncludePath);
 }
 
 void
@@ -374,8 +367,9 @@ IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_PARAM("theIncludePath", DOC_TYPE_STRING);
     DOC_END;
     try {
-        if (!argc)
+        if (!argc) {
             return JS_TRUE;
+        }
 
         string myIncludePath;
         if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myIncludePath)) {
@@ -383,6 +377,7 @@ IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
             return JS_FALSE;
         }
         JSApp::getPackageManager()->add(myIncludePath);
+        PlugInManager::get().setSearchPath(JSApp::getPackageManager()->getSearchPath());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -393,8 +388,9 @@ RemovePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("thePath", DOC_TYPE_STRING);
     DOC_END;
     try {
-        if (!argc)
+        if (!argc) {
             return JS_TRUE;
+        }
 
         string myIncludePath;
         if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myIncludePath)) {
@@ -402,6 +398,17 @@ RemovePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
         JSApp::getPackageManager()->remove(myIncludePath);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+GetPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns the search path for includes, plugins, and shaderlibrary.");
+    DOC_RVAL("thePath", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        *rval = as_jsval(cx, JSApp::getPackageManager()->getSearchPath());
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -442,9 +449,9 @@ JS_STATIC_DLL_CALLBACK(JSBool)
 ParseArguments(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns an arguments object (array-of-string) of valid arguments after \
 being handed input arguments and comparing them with a list of allowed arguments.");
-    DOC_PARAM("(array-of-string) theArgs", DOC_TYPE_STRING);
-    DOC_PARAM("(array-of-(array-of-string)) theAllowedOptions", DOC_TYPE_STRING);
-    DOC_RVAL("(array-of-string) arguments object", DOC_TYPE_STRING);
+    DOC_PARAM("(array-of-string) theArgs", DOC_TYPE_ARRAY);
+    DOC_PARAM("(array-of-(array-of-string)) theAllowedOptions", DOC_TYPE_ARRAY);
+    DOC_RVAL("(array-of-string) arguments object", DOC_TYPE_ARRAY);
     DOC_END;
     try {
         if (argc != 2 ) {
@@ -460,7 +467,6 @@ being handed input arguments and comparing them with a list of allowed arguments
 
         JSObject * myValidOptions = JSVAL_TO_OBJECT(argv[1]);
         JSIdArray * myPropIds = JS_Enumerate(cx, myValidOptions);
-        DB(AC_TRACE << "found " << myPropIds->length << " prop ids" << endl);
 
         for (int i = 0; i < myPropIds->length; ++i) {
             jsval myIdVal;
@@ -667,17 +673,16 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             if (!getFileLine(cx, obj, argc, argv, myCurrentFile, myLine)) {
                 return JS_FALSE;
             }
-            std::string myIncludePath = asl::getDirName(myCurrentFile);
-            if (!myIncludePath.empty()) {
-                myIncludePath += ";";
-            }
-            myIncludePath += ourIncludePath;
 
-            // Add current directory to include file;
+            std::string myIncludePath = asl::getDirName(myCurrentFile);
             std::string myIncludeFileWithPath = asl::searchFile(myIncludeFile, myIncludePath);
 
             if (myIncludeFileWithPath.empty()) {
-                AC_ERROR << "File '" << myIncludeFile << "' not found in " << myIncludePath << std::endl;
+                // Try looking in the package manager:
+                myIncludeFileWithPath = JSApp::getPackageManager()->searchFile(myIncludeFile);
+            }
+            if (myIncludeFileWithPath.empty()) {
+                AC_ERROR << "File '" << myIncludeFile << "' not found in " << myIncludePath << ";" << JSApp::getPackageManager()->getSearchPath() << std::endl;
                 return JS_FALSE;
             } else {
                 // Only include files once
@@ -807,7 +812,7 @@ a filename can be given to dump the GC heap for debugging reasons.");
 JS_STATIC_DLL_CALLBACK(JSBool)
 Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Clears a given object.");
-    DOC_PARAM("theObject", DOC_TYPE_STRING); //XXX: DOC_TYPE_OBJECT
+    DOC_PARAM("theObject", DOC_TYPE_OBJECT);
     DOC_END;
     try {
         if (argc > 0 && !JSVAL_IS_PRIMITIVE(argv[0])) {
@@ -828,66 +833,6 @@ MilliSec(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         asl::NanoTime myTime = asl::NanoTime();
         jsdouble z = myTime.millis();
-        return JS_NewDoubleValue(cx, z, rval);
-    } HANDLE_CPP_EXCEPTION;
-}
-
-JS_STATIC_DLL_CALLBACK(JSBool)
-DebugMilliSec(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the time since acxpshell/acgtkshell start in milliseconds \
-and prints further information about timing to stderr.");
-    DOC_PARAM("secondsbase", DOC_TYPE_INTEGER); //XXX: DOC_TYPE_UNSIGNED
-    DOC_PARAM("factor", DOC_TYPE_INTEGER); //XXX: DOC_TYPE_UNSIGNED
-    DOC_RVAL("", DOC_TYPE_FLOAT); //XXX: DOC_TYPE_DOUBLE
-    DOC_END;
-    try {
-        unsigned mySecondsBase;
-        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], mySecondsBase)) {
-            JS_ReportError(cx, "DebugMilliSec(): argument #1 must be a unsigned. (secondsbase)");
-            return JS_FALSE;
-        }
-        unsigned myFactor;
-        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myFactor)) {
-            JS_ReportError(cx, "DebugMilliSec(): argument #2 must be a unsigned. (factor)");
-            return JS_FALSE;
-        }
-
-        unsigned long long mySeconds = (unsigned long long)mySecondsBase * myFactor;
-
-#ifdef BAD_OLD_TIMER
-        unsigned long long perSecond = 2992540000;
-        unsigned long long myTicks   = perSecond * mySeconds;
-        unsigned long long myMicros  = myTicks * 1000000L / perSecond;
-#endif
-
-#ifdef SUPER_FUTURE_TIMER
-        //unsigned long double perSecond = 2992540000;
-        unsigned long double perSecond = 4000000000000; // 4 THz
-        unsigned long double myTicks   = perSecond * mySeconds;
-        unsigned long double myMicros  = myTicks * 1000000L / perSecond;
-#else // if GOOD_NEW_TIMER
-        unsigned long long perSecond = asl::NanoTime::perSecond();
-        unsigned long long myTicks   = perSecond * mySeconds;
-        asl::NanoTime myTime = asl::NanoTime(myTicks);
-        //unsigned long double myTicks   = myTime.ticks();
-        double myMicros  = myTime.micros();
-#endif
-
-        unsigned long long myYears   = (unsigned long long) (mySeconds / (3600 * 24 * 365));
-        unsigned long long myDays    = (unsigned long long) (mySeconds / (3600 * 24)) % 365;
-        unsigned long long myHours   = (unsigned long long) (mySeconds / 3600) % 24;
-        unsigned long long myMinutes = (unsigned long long) (mySeconds / 60) % 60;
-
-        cerr << "---  DebugMilliSec  ---" << endl;
-        cerr << "  factor:    " << myFactor << endl;
-        cerr << "  seconds:   " << mySeconds << endl;
-        cerr << "  time:      " << myYears << "y " << myDays <<"d " << myHours
-             << "h " << myMinutes << "m " << (mySeconds % 60) << "s" << endl;
-        cerr << "  perSecond: " << perSecond << endl;
-        cerr << "  ticks:     " << myTicks << endl;
-        cerr << "  micros:    " << myMicros << endl;
-
-        jsdouble z = double(myMicros)/1000.0;
         return JS_NewDoubleValue(cx, z, rval);
     } HANDLE_CPP_EXCEPTION;
 }
@@ -1329,8 +1274,6 @@ static JSFunctionSpec glob_functions[] = {
     {"parseArguments",  ParseArguments, 2},
     {"plug",            Plug,           1},
     {"saveImage",       SaveImage,		2},
-	//{"unplug",          Unplug,         1},
-    //{"isPlugged",       IsPlugged,      1},
     {"exit",            Exit,           0},
     {"version",         Version,        1},
     {"build",           BuildDate,      0},
@@ -1343,7 +1286,6 @@ static JSFunctionSpec glob_functions[] = {
     {"fileline",        FileLine,       0},
     {"dumpstack",       DumpStack,      0},
     {"millisec",        MilliSec,       1},
-    {"debugmillisec",   DebugMilliSec,  1},
     {"msleep",          MSleep,         1},
     {"fileExists",      FileExists,     1},
     {"getBaseName",     GetBaseName,    1},
@@ -1352,17 +1294,18 @@ static JSFunctionSpec glob_functions[] = {
     {"hostname",        HostName,       1},
     {"expandEnvironment", ExpandEnvironment, 1},
     {"includePath",     IncludePath,    1},
-    {"removePath",      RemovePath,    1},
+    {"removePath",      RemovePath,     1},
+    {"getPath",         GetPath,        0},
     {"listFiles",       listFiles,      2},
     {"getDocumentation", getDocumentation, 0},
-    {"createUniqueId",   createUniqueId, 0},
+    {"createUniqueId",  createUniqueId, 0},
 
-    {"fromHexString", fromHexString,   1},
-    {"asHexString",   asHexString,     1},
-    {"urlEncode", urlEncode, 1},
-    {"urlDecode", urlDecode, 1},
+    {"fromHexString",   fromHexString,   1},
+    {"asHexString",     asHexString,     1},
+    {"urlEncode",       urlEncode,       1},
+    {"urlDecode",       urlDecode,       1},
 
-    {"exec", execute, 2},
+    {"exec",            execute,         2},
     {"operatingSystem", operatingSystem, 0},
     {0}
 };
@@ -1393,10 +1336,37 @@ usage(void) {
     return 2;
 }
 
+void
+JSApp::setupPath(const std::string & theIncludePath) {
+    asl::PackageManagerPtr myPacketManager = getPackageManager();
+
+    // Notice: Pathes are searched in reverse order as they are added!
+
+    // Add the current working directory
+    myPacketManager->add(asl::IPackagePtr(new asl::DirectoryPackage("")));
+
+    // Add the application directory (the directoy y60.exe is located)
+    myPacketManager->add(asl::getAppDirectory());
+
+    // Add the Y60_PATH if set
+    std::string myY60Path = asl::expandEnvironment("${Y60_PATH}");
+    if (!myY60Path.empty()) {
+        myPacketManager->add(myY60Path);
+    }
+
+    // Add the "-I" path    
+    if (!theIncludePath.empty()) {
+        myPacketManager->add(theIncludePath);
+    }
+
+    PlugInManager::get().setSearchPath(myPacketManager->getSearchPath());
+}
+
 int
 JSApp::processArguments(JSContext * theContext, JSObject * theGlobalObject,
-                 const std::string & theScriptFilename,
-                 const std::vector<std::string> & theScriptArgs )
+                        const std::string & theScriptFilename,
+                        const std::string & theIncludePath,
+                        const std::vector<std::string> & theScriptArgs)
 {
     if (ourJSVersion > 0) {
         JS_SetVersion(theContext, JSVersion(ourJSVersion));
@@ -1413,24 +1383,19 @@ JSApp::processArguments(JSContext * theContext, JSObject * theGlobalObject,
         return 1;
     }
 
-    if ( ! JS_SetProperty(theContext, theGlobalObject, "arguments", &myArgumentsValue))
-    {
+    if (!JS_SetProperty(theContext, theGlobalObject, "arguments", &myArgumentsValue)) {
         return 1;
     }
 
-    std::string mySearchPath = asl::getAppDirectory();
-    if (!mySearchPath.empty()) {
-        mySearchPath += ";";
-    }
-    mySearchPath += ourIncludePath;
-    string myScriptPath = asl::searchFile(theScriptFilename, mySearchPath);
+    setupPath(theIncludePath);
+    string myScriptFile = getPackageManager()->searchFile(theScriptFilename);
 
-    if (myScriptPath.empty()) {
-        AC_ERROR << "File '" << theScriptFilename << "' not found in " << mySearchPath << std::endl;
+    if (myScriptFile.empty()) {
+        AC_ERROR << "File '" << theScriptFilename << "' not found in " << getPackageManager()->getSearchPath() << std::endl;
         return 1;
     }
 
-    Process(theContext, theGlobalObject, myScriptPath.c_str());
+    Process(theContext, theGlobalObject, myScriptFile.c_str());
     return ourExitCode;
 }
 
@@ -1447,9 +1412,12 @@ JSApp::initClasses(JSContext * theContext, JSObject * theGlobalObject) {
 }
 
 int
-JSApp::run(const std::string & theScriptFilename, const std::vector<std::string> & theScriptArgs) {
+JSApp::run(const std::string & theScriptFilename, 
+           const std::string & theIncludePath,
+           const std::vector<std::string> & theScriptArgs) 
+{
     JSObject *glob;
-    JSRuntime * rt = JS_NewRuntime(1024 * 1024*128 /* Bytes allocated before garbage collection */);
+    JSRuntime * rt = JS_NewRuntime(1024 * 1024 * 128); // Bytes allocated before garbage collection
     int result;
 
     gErrFile = stderr;
@@ -1457,14 +1425,13 @@ JSApp::run(const std::string & theScriptFilename, const std::vector<std::string>
 
     ourJSContext = JS_NewContext(rt, 8192);
     if (!ourJSContext) {
-        printf("JS_NewContext failed!\n");
+        AC_FATAL << "JS_NewContext failed!";
         return 1;
     }
 
     ourIncludeGuard.clear();
 
     JS_SetErrorReporter(ourJSContext, ShellErrorReporter);
-
 
     glob = JS_NewObject(ourJSContext, &global_class, NULL, NULL);
     if (!glob)
@@ -1481,7 +1448,7 @@ JSApp::run(const std::string & theScriptFilename, const std::vector<std::string>
     createFunctionDocumentation("GlobalFunctions", glob_functions);
 
     ourTopScriptFilename = theScriptFilename;
-    result = processArguments(ourJSContext, glob, ourTopScriptFilename, theScriptArgs);
+    result = processArguments(ourJSContext, glob, ourTopScriptFilename, theIncludePath, theScriptArgs);
 
     ourLoadedPlugIns.clear();
 
@@ -1491,4 +1458,4 @@ JSApp::run(const std::string & theScriptFilename, const std::vector<std::string>
     return result;
 }
 
-} // namespace acxp
+} 

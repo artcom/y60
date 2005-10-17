@@ -142,7 +142,7 @@ RenderArea::on_expose_event (GdkEventExpose *event) {
             asl::getDashboard().cycle();
             START_TIMER(frames);
 
-            onIdle();
+            onFrame();
 
             //START_TIMER(dispatchEvents);
             //y60::EventDispatcher::get().dispatch();

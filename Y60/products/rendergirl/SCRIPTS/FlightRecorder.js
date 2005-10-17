@@ -32,7 +32,7 @@ CameraKeyframe.prototype.Constructor = function(obj, theId, theSceneViewer, theC
     var _mySceneViewer = theSceneViewer;
     var _myCameraNode  = null;
     var _myWidgetRow   = null;
-    
+
     // public methods
     obj.getNode = function()  {
         return _myCameraNode;
@@ -65,7 +65,7 @@ function GTKFlightRecorder(theArguments) {
 GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
 
     const FILE_EXTENSION = ".f60";
-    
+
     var _myKeyframes = new Array();
     var _myHandler = {};
     var _mySceneViewer = null;
@@ -83,10 +83,10 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
     var _myEditFrameTextWidget = null;
     var _myListScheme = new ACColumnRecord(3);
     var _myListStore = new ListStore(_myListScheme);
-    
+
     var _myFlyTimeField = null;
     var _myUniqueCounter = 0;
-    
+
     var _myCurrentRow             = 0;
     var _myCurrentKeyFrameRuntime = 0;
     var _myCurrentAnimationTime   = -1;
@@ -99,7 +99,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
     var _myEndOrientation       = null;
     var _myRenderFrame            = 0;
     var _myLastImageStripFrame    = 1000;
-    var _myFlightDuration         = 0;  
+    var _myFlightDuration         = 0;
     var _myImageStripPrefix       = "";
     var _myImageStripOverwriteFlag = true;
     var _myFps                     = 25;
@@ -111,29 +111,29 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
 
     parseArguments(theArguments);
     obj.SceneViewer = [];
-    
+
     obj.onResize = function(theNewWidth, theNewHeight) {
         obj.SceneViewer.onResize(theNewWidth, theNewHeight);
-    }    
+    }
 
 
     obj.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
         obj.SceneViewer.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
-    }    
+    }
     obj.onMouseMotion = function(theX, theY) {
         if (_myTreeView && _myEditToggleWidget.active){
             var myRow = _myTreeView.selected_row;
             if (myRow) {
-                var myKeyFrame = findKeyFrameByName(myRow.get_value(1)).keyframe;                
+                var myKeyFrame = findKeyFrameByName(myRow.get_value(1)).keyframe;
                 myKeyFrame.getNode().position = window.camera.position;
                 myKeyFrame.getNode().orientation = window.camera.orientation;
-            }        
+            }
         }
         obj.SceneViewer.onMouseMotion(theX, theY);
     }
-    obj.onIdle = function(theTime) {
-        _myFrameRateLimiter.onIdle(theTime);        
-        obj.SceneViewer.onIdle(theTime);
+    obj.onFrame = function(theTime) {
+        _myFrameRateLimiter.onFrame(theTime);
+        obj.SceneViewer.onFrame(theTime);
         if (_myFlightToggleWidget.active) {
             if (_myCurrentAnimationTime == -1) {
                 _myCurrentAnimationTime = theTime;
@@ -146,13 +146,13 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             _myRenderFrame++;
         }
     }
-    
+
     obj.run = function() {
 
         var myGlade = new Glade(GLADE_FILE, "mainWindow");
         _myMainWindow = new Window();
         _myMainWindow.resize(1025,643);
-        
+
         myGlade.reparent_widget("Outerbox", _myMainWindow);
 
         myGlade.autoconnect(_myHandler, _myMainWindow);
@@ -172,13 +172,13 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         _myDurationWidget = myGlade.get_widget("Duration");
         _myFlightIdWidget.text = "flight";
         GtkMain.run(_myMainWindow);
-        
+
     };
 
     obj.onPostRender = function() {
         obj.SceneViewer.onPostRender();
         if (_mySaveToDiskToggleWidget.active && _myFlightToggleWidget.active) {
-            saveImage();    
+            saveImage();
         }
     }
 
@@ -195,7 +195,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         _myImageStripPrefix = _myFlightIdWidget.text + "\\frame";
         // does the directory exist ?
         if (getDirList(_myFlightIdWidget.text)== null) {
-            makeDir(_myFlightIdWidget.text);            
+            makeDir(_myFlightIdWidget.text);
         }
     }
 
@@ -205,22 +205,22 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
 /*    _myHandler.on_pbInterpolation_toggled = function() {
         _myInterpolationTextWidget.text = (_myLinearInterpolationToggleWidget.active ? "Spline" : "Linear");
     }*/
-    
+
     _myHandler.on_new_activate = function() {
         _myKeyframes = [];
         _myUniqueCounter = 0;
-        _myListStore.clear();        
+        _myListStore.clear();
     }
-    
+
     _myHandler.on_load_scene1_activate = function() {
-        
+
         var myFileChooserDialog = new FileChooserDialog("lade Scene");
-    
+
         myFileChooserDialog.add_button(StockID.CANCEL,Dialog.RESPONSE_CANCEL);
         myFileChooserDialog.add_button(StockID.OK,Dialog.RESPONSE_OK);
         var myRetVal = myFileChooserDialog.run();
         myFileChooserDialog.hide();
-    
+
         var myFilename = null;
         if (myRetVal == Dialog.RESPONSE_OK) {
             myFilename = myFileChooserDialog.get_filename();
@@ -228,20 +228,20 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             return;
         }
 
-        // set up View 
+        // set up View
         _myTreeView.set_model(_myListStore);
         _myTreeView.append_column("ID", _myListScheme, 0);
         _myTreeView.append_column_editable("Watchpoint", _myListScheme, 1);
         _myTreeView.append_column("Timestamp", _myListScheme, 2);
-        // start Renderer    
+        // start Renderer
         window = new RenderArea();
         window.show();
         _myMainBox.add(window);
         _myMainBox.position = 300;
-        
+
 
         obj._mySceneViewer = new SceneViewer([myFilename, _myShaderLibrary]);
-                
+
         obj._mySceneViewer.setup();
         obj._mySceneViewer.setMover(ClassicTrackballMover);
 
@@ -256,35 +256,35 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         obj.SceneViewer.onMouseMotion = obj._mySceneViewer.onMouseMotion;
         obj._mySceneViewer.onMouseMotion = obj.onMouseMotion;
 
-        obj.SceneViewer.onIdle = obj._mySceneViewer.onIdle;
-        obj._mySceneViewer.onIdle = obj.onIdle;
+        obj.SceneViewer.onFrame = obj._mySceneViewer.onFrame;
+        obj._mySceneViewer.onFrame = obj.onFrame;
 
         obj.SceneViewer.onPostRender = obj._mySceneViewer.onPostRender;
         obj._mySceneViewer.onPostRender = obj.onPostRender;
-        
+
         window.setIdle(true);
         window.fixedDeltaT = 1.0/_myFps;
         calcDuration();
     }
     _myHandler.on_savescene2_activate = function(theMenu) {
-        window.saveScene("saved_scene.x60", false);        
+        window.saveScene("saved_scene.x60", false);
     }
-    
+
     _myHandler.on_open1_activate = function(theMenu) {
         var myFileChooserDialog = new FileChooserDialog("lade Scene");
-    
+
         myFileChooserDialog.add_button(StockID.CANCEL,Dialog.RESPONSE_CANCEL);
         myFileChooserDialog.add_button(StockID.OK,Dialog.RESPONSE_OK);
         var myRetVal = myFileChooserDialog.run();
         myFileChooserDialog.hide();
-    
+
         var myFilename = null;
         if (myRetVal == Dialog.RESPONSE_OK) {
             myFilename = myFileChooserDialog.get_filename();
         } else {
             return;
         }
-        
+
         _myKeyframes = [];
         _myUniqueCounter = 0;
         _myListStore.clear();
@@ -301,25 +301,25 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
                 myNewRow.set_value(2, myKeyframeNode.flyTime);
                 var myKeyframe = new CameraKeyframe(_myUniqueCounter , obj._mySceneViewer, myCameraNode);
                 myKeyframe.setRow(myNewRow);
-                _myKeyframes.push(myKeyframe);    
+                _myKeyframes.push(myKeyframe);
                 _myUniqueCounter++;
             }
             calcDuration();
-            print("Loaded flight: " + myFilename + " with " + _myKeyframes.length + 
+            print("Loaded flight: " + myFilename + " with " + _myKeyframes.length +
                   " frames, duration: " + _myFlightDuration + " total frames " + _myLastImageStripFrame);
         } else {
             print("Sorry, could not load flight: " + _myFlightIdWidget.text+ FILE_EXTENSION);
-        }       
+        }
     }
-    
+
     _myHandler.on_save1_activate = function(theMenu) {
         var myFileChooserDialog = new FileChooserDialog("save Scene", FileChooserDialog.ACTION_SAVE);
-    
+
         myFileChooserDialog.add_button(StockID.CANCEL,Dialog.RESPONSE_CANCEL);
         myFileChooserDialog.add_button(StockID.OK,Dialog.RESPONSE_OK);
         var myRetVal = myFileChooserDialog.run();
         myFileChooserDialog.hide();
-    
+
         var myFilename = null;
         if (myRetVal == Dialog.RESPONSE_OK) {
             myFilename = myFileChooserDialog.get_filename();
@@ -328,7 +328,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         }
         if (fileExists(myFilename)) {
             var myDialog = new MessageDialog("<b>File exists.</b>\nDo you want to overwrite it?",
-                                             true, MessageDialog.MESSAGE_QUESTION, 
+                                             true, MessageDialog.MESSAGE_QUESTION,
                                              MessageDialog.BUTTONS_YES_NO, true);
             var myResponse = myDialog.run();
             // :-( otherwise dialog won't close before mainwindow gets focus
@@ -338,17 +338,17 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
                 return;
             }
         }
-        
+
         var myFlight = '<Flight name="MyCurrentFlight"/>';
         var myFlightDoc = new Node(myFlight);
         for(var i = 0; i < _myKeyframes.length; i++) {
             var myCameraNode = _myKeyframes[i].getNode().cloneNode();
-            var myKeyFrame     = _myKeyframes[i];            
+            var myKeyFrame     = _myKeyframes[i];
             var myKeyframeNodeStr = '<Keyframe/>';
             var myKeyframeDoc = new Node(myKeyframeNodeStr);
-            var myKeyframeNode = myKeyframeDoc.childNodes[0];            
+            var myKeyframeNode = myKeyframeDoc.childNodes[0];
             myKeyframeNode.flyTime = myKeyFrame.getRow().get_value(2);
-            
+
             myKeyframeNode.appendChild(myCameraNode)
             myFlightDoc.childNodes[0].appendChild(myKeyframeNode);
         }
@@ -364,7 +364,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         myFlightDoc.saveFile(myFilename);
         print("Saved Keyframes: " + myFilename);
     }
-    
+
     _myHandler.on_treeview_cursor_changed = function(theTreeWidget) {
         _myEditToggleWidget.active = false;
 
@@ -381,25 +381,25 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             setKeyFrame(myKeyFrame);
         }
         _myLastSelectedRowIndex = myKeyFrameIndex;
-        calcDuration();        
+        calcDuration();
     }
-    
-    _myHandler.on_quit_activate = function() { 
+
+    _myHandler.on_quit_activate = function() {
         GtkMain.quit();
     }
-    
-    _myHandler.on_wireframe_activate = function(theSource) { 
-        renderer.wireframe = theSource.active; 
+
+    _myHandler.on_wireframe_activate = function(theSource) {
+        renderer.wireframe = theSource.active;
     }
-    
-    _myHandler.on_backfaceculling_activate = function(theSource) { 
-        renderer.backfaceCulling = theSource.active; 
+
+    _myHandler.on_backfaceculling_activate = function(theSource) {
+        renderer.backfaceCulling = theSource.active;
     }
-    
-    _myHandler.on_lighting_activate = function(theSource) { 
-        renderer.lighting = theSource.active; 
+
+    _myHandler.on_lighting_activate = function(theSource) {
+        renderer.lighting = theSource.active;
     }
-    
+
     _myHandler.on_sbFlyTime_changed = function(theSource) {
         var myRow = _myTreeView.selected_row;
         if (myRow) {
@@ -407,7 +407,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             calcDuration();
         }
     }
-    
+
     _myHandler.on_pbAdd_clicked = function(theSource) {
 
         var myKeyframe = new CameraKeyframe(_myUniqueCounter , obj._mySceneViewer);
@@ -415,9 +415,9 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         var myNewRow = null;
         if (mySelectedRow) {
             var myKeyFrameIndex = findKeyFrameByName(mySelectedRow.get_value(1)).index;
-            _myKeyframes.splice(myKeyFrameIndex+1,0, myKeyframe);            
+            _myKeyframes.splice(myKeyFrameIndex+1,0, myKeyframe);
             myNewRow = _myListStore.insert_after(mySelectedRow);
-            _myTreeView.selected_row = myNewRow;            
+            _myTreeView.selected_row = myNewRow;
         } else {
             myNewRow = _myListStore.append();
             _myKeyframes.push(myKeyframe);
@@ -432,11 +432,11 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
                 myNewRow.set_value(2,1.0);
             }
         }
-        myKeyframe.setRow(myNewRow);        
+        myKeyframe.setRow(myNewRow);
         _myUniqueCounter++;
         calcDuration();
     }
-    
+
     _myHandler.on_pbRemove_clicked = function(theSource) {
         var mySelectedRow = _myTreeView.selected_row;
         if (mySelectedRow) {
@@ -444,12 +444,12 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             _myListStore.erase(mySelectedRow);
             _myKeyframes.splice(myKeyFrameIndex, 1)
        }
-        calcDuration();       
+        calcDuration();
     }
-    
+
     _myHandler.on_FlightId_changed = function(theTextEntry) {}
     _myHandler.on_treeview_columns_changed = function(theTextEntry) {}
-    
+
     _myHandler.on_pbPlay_toggled = function(theSource) {
         if (_myFlightToggleWidget.active) {
             calcDuration();
@@ -457,10 +457,10 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
                 _myFlightToggleWidget.active = false;
                 return;
             }
-            _myRenderFrame = -1;                        
+            _myRenderFrame = -1;
             _myCurrentRow = _myTreeView.selected_row;
             var myKeyFrame = 0;
-            if (_myCurrentRow) {            
+            if (_myCurrentRow) {
                 myKeyFrame = findKeyFrameByName(_myCurrentRow.get_value(1));
                 setKeyFrame(myKeyFrame.keyframe);
                 _myCurrentKeyFrameindex = myKeyFrame.index;
@@ -485,27 +485,27 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             var myTime = 0;
             var myCameraKeyFrame = 0;
             for(i = 0; i < _myCurrentKeyFrameindex+1; i++) {
-                myCameraKeyFrame = _myKeyframes[i];  
+                myCameraKeyFrame = _myKeyframes[i];
                 myTime = Number(myCameraKeyFrame.getRow().get_value(2));
                 _myCurrentKeyFrameRuntime += myTime;
-            }            
+            }
             print("time: " + _myCurrentKeyFrameRuntime);
             for(i = _myCurrentKeyFrameindex; i < _myKeyframes.length; i++) {
-                myCameraKeyFrame = _myKeyframes[i];  
+                myCameraKeyFrame = _myKeyframes[i];
                 myTime = Number(myCameraKeyFrame.getRow().get_value(2));
                 if (myCameraKeyFrame.getNode().position.value == undefined ) {
                     var myPos = new Vector3f(stringToArray(myCameraKeyFrame.getNode().position));
                     var myOrient = new Vector3f(stringToArray(myCameraKeyFrame.getNode().orientation));
-                    myKeyframes.push(new Keyframe(myPos, myOrient, myTime, 1.0)); 
+                    myKeyframes.push(new Keyframe(myPos, myOrient, myTime, 1.0));
                 } else {
-                    myKeyframes.push(new Keyframe(myCameraKeyFrame.getNode().position, myCameraKeyFrame.getNode().orientation, myTime, 1.0)); 
+                    myKeyframes.push(new Keyframe(myCameraKeyFrame.getNode().position, myCameraKeyFrame.getNode().orientation, myTime, 1.0));
                 }
             }
             _myCoordSpline  = new CoordSpline(myKeyframes);
-            //_myCoordSpline.print();           
-        }        
+            //_myCoordSpline.print();
+        }
     }
-    
+
     function setKeyFrame(theKeyframe) {
         if (theKeyframe) {
             window.camera.position    = theKeyframe.getNode().position;
@@ -514,7 +514,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             window.queue_draw();
         }
     }
-            
+
     function blendKeyFrame( theKeyframe0, theKeyframe1, theBlendFactor) {
         if (!_myBlendingStarted) {
             var myFrame0 = _myKeyframes[theKeyframe0];
@@ -543,7 +543,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
                 _myPosDiff                = difference(myEndPos, _myStartPos);
 
                 //print("Nachher: " +_myStartOrientation, _myEndOrientation, _myOrienDiff);
-                _myBlendingStarted        = true; 
+                _myBlendingStarted        = true;
             }
         }
         if (_myBlendingStarted) {
@@ -557,7 +557,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
 			window.camera.orientation = Quaternionf.slerp(_myStartOrientation, _myEndOrientation, theBlendFactor);
             window.queue_draw();
         }
-    }                
+    }
 
     function resetAnimation() {
         _myCurrentAnimationTime   = -1;
@@ -566,7 +566,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         _myFlightToggleWidget.active = false;
         _myTreeView.selected_row = _myKeyframes[_myKeyframes.length-1].getRow();
         print("Flight is done");
-        
+
     }
     function handleState() {
         if (true) {//!_myLinearInterpolationToggleWidget.active) {
@@ -581,7 +581,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
                 // the keyframe is done
                 blendKeyFrame(_myCurrentKeyFrameindex, _myCurrentKeyFrameindex+1, 1.0);
                 _myCurrentKeyFrameindex++;
-                _myTreeView.selected_row = _myKeyframes[_myCurrentKeyFrameindex].getRow();                                            
+                _myTreeView.selected_row = _myKeyframes[_myCurrentKeyFrameindex].getRow();
                 _myCurrentAnimationTime   = -1;
                 _myCurrentKeyFrameRuntime = 0;
                 _myBlendingStarted = false;
@@ -591,7 +591,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
                 // blend
                 if (myFlyTime != 0) {
                     var myBlendFactor = (_myCurrentKeyFrameRuntime) / myFlyTime;
-                    blendKeyFrame( _myCurrentKeyFrameindex, _myCurrentKeyFrameindex+1, myBlendFactor);                
+                    blendKeyFrame( _myCurrentKeyFrameindex, _myCurrentKeyFrameindex+1, myBlendFactor);
                 }
             }
         } else {
@@ -607,33 +607,33 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             window.camera.orientation = Quaternionf.createFromEuler(myOrientation);
             window.camera.position    = _myCoordSpline.position(myCorrectedTimeStamp);
             window.queue_draw();
-            
+
         }
     }
     function calcDuration() {
         _myFlightDuration = 0;
         for(var i = 0; i < _myKeyframes.length; i++) {
-            var myKeyFrame = _myKeyframes[i];  
-            _myFlightDuration+= Number(myKeyFrame.getRow().get_value(2));           
-        }        
+            var myKeyFrame = _myKeyframes[i];
+            _myFlightDuration+= Number(myKeyFrame.getRow().get_value(2));
+        }
         _myLastImageStripFrame = _myFlightDuration * _myFps;
-        _myDurationWidget.text = _myFlightDuration + " sec.";        
+        _myDurationWidget.text = _myFlightDuration + " sec.";
     }
-    
+
     function saveImage() {
         var myDigits = Math.ceil(Math.log(_myLastImageStripFrame+1)/Math.LN10);
         if (_myRenderFrame > 0) {
             for(var i = 1; i < myDigits+1; i++) {
-                var myBase = Math.pow(10,i);                
+                var myBase = Math.pow(10,i);
                 if (_myRenderFrame < myBase) {
                     myDigits = myDigits-i;
                     break;
                 }
             }
-        } 
+        }
         var myCounter = "";
         for(i = 0; i < myDigits; i++) {
-            myCounter = myCounter + "0";                
+            myCounter = myCounter + "0";
         }
         if (_myRenderFrame >0) {
             myCounter += _myRenderFrame;
@@ -645,14 +645,14 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         } else {
             print("Sorry, " + myFilename + ", does exist and no overwrite flag is set: do nothing!");
         }
-        
+
     }
     function findKeyFrameByName(theName) {
         for(var i = 0; i < _myKeyframes.length; i++) {
-            var myKeyFrame = _myKeyframes[i];  
+            var myKeyFrame = _myKeyframes[i];
             if (myKeyFrame.getNode().name == theName) {
                 return {keyframe:myKeyFrame, index:i};
-            } 
+            }
         }
         return 0;
     }
@@ -674,7 +674,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
             throw new Exception("Missing shaderlibrary argument", "FlightRecorder::parseArguments()");
         }
     }
-    
+
 };
 
 var ourShow = new GTKFlightRecorder(arguments);

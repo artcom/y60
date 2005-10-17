@@ -29,8 +29,10 @@
 
 #include <y60/IProgressNotifier.h>
 #include <y60/Body.h>
+#include <y60/modelling_functions.h>
 #include <asl/Logger.h>
 
+using namespace y60;
 using namespace asl;
 using namespace std;
 
@@ -195,6 +197,113 @@ bodyVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates an untextured lambert shaded materail.");
+    DOC_PARAM_OPT("theDiffuseColor", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
+    DOC_PARAM_OPT("theAmbientColor", DOC_TYPE_VECTOR4F, "[0,0,0,1]");
+    DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0, 2);
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+        dom::NodePtr myResult;
+        if (argc == 0) {
+            myResult = y60::createLambertMaterial(myNative);
+        } else {
+            asl::Vector4f myDiffuseColor;
+            convertFrom(cx, argv[0], myDiffuseColor);
+            if (argc == 1) {
+                myResult = y60::createLambertMaterial(myNative, myDiffuseColor);
+            } else {
+                asl::Vector4f myAmbientColor;
+                convertFrom(cx, argv[1], myAmbientColor);
+                myResult = y60::createLambertMaterial(myNative, myDiffuseColor, myAmbientColor);
+            }
+        }
+
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+CreateColorMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates an untextured and unlit colored materail.");
+    DOC_PARAM_OPT("theColor", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
+    DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0, 1);
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+        dom::NodePtr myResult;
+        if (argc == 0) {
+            myResult = y60::createColorMaterial(myNative);
+        } else {
+            asl::Vector4f myColor;
+            convertFrom(cx, argv[0], myColor);
+            myResult = y60::createColorMaterial(myNative, myColor);
+        }
+
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+CreateQuadShape(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates a single quad.");
+    DOC_PARAM("theMaterial", DOC_TYPE_NODE);
+    DOC_PARAM("theTopLeftCorner", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theBottomRightCorner", DOC_TYPE_VECTOR3F);
+    DOC_RVAL("theQuadShape", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        ensureParamCount(argc, 3, 3);
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+        dom::NodePtr myMaterial;
+        convertFrom(cx, argv[0], myMaterial);
+        asl::Vector3f myTopLeftCorner;
+        convertFrom(cx, argv[1], myTopLeftCorner);
+        asl::Vector3f myBottomRightCorner;
+        convertFrom(cx, argv[2], myBottomRightCorner);
+        dom::NodePtr myResult = y60::createQuad(myNative, myMaterial->getAttributeString("id"), myTopLeftCorner, myBottomRightCorner);
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+CreateBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates a body");
+    DOC_PARAM("theShape", DOC_TYPE_NODE);
+    DOC_PARAM_OPT("theParent", DOC_TYPE_NODE, "toplevel node");
+    DOC_RVAL("theBody", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1, 2);
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+        dom::NodePtr myShape;
+        convertFrom(cx, argv[0], myShape);            
+        dom::NodePtr myParent = myNative->getWorldRoot();
+        if (argc == 2) {
+            convertFrom(cx, argv[1], myParent);            
+        } 
+
+        dom::NodePtr myResult = y60::createBody(myParent, myShape->getAttributeString("id"));
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 getWorldSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the world's size including camera position.");
     DOC_RVAL("Distance", DOC_TYPE_FLOAT)
@@ -207,30 +316,6 @@ clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Empties the scene.");
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::clear,cx,obj,argc,argv,rval);
-}
-
-static JSBool
-updateGlobalMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("DEPRECATED! Don't use this! Its all magic now.");
-    DOC_END;
-    try {
-        AC_WARNING << "updateGlobalMatrix() is deprecated and has no effect any more. Remove it." << endl;
-/*
-        ensureParamCount(argc, 1, 2);
-        dom::NodePtr myBody;
-        convertFrom(cx, argv[0], myBody);
-        asl::Matrix4f myNewMatrix;
-        if (argc == 2) {
-            asl::Matrix4f myParentMatrix;
-            convertFrom(cx, argv[1], myParentMatrix);
-            myNewMatrix = y60::Scene::updateGlobalMatrix(&(*myBody), & myParentMatrix);
-        } else {
-            myNewMatrix = y60::Scene::updateGlobalMatrix(&(*myBody));
-        }
-        *rval = as_jsval(cx, myNewMatrix);
-*/
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
@@ -251,6 +336,14 @@ enum PropertyNumbers {
     PROP_dom = -100,
     PROP_cameras,
     PROP_world,
+    PROP_canvases,     
+    PROP_canvas,       
+    PROP_materials,    
+    PROP_lightsources, 
+    PROP_animations,   
+    PROP_characters,   
+    PROP_shapes,       
+    PROP_images,       
     PROP_MATERIALS,
     PROP_SHAPES,
     PROP_ANIMATIONS,
@@ -270,7 +363,6 @@ JSScene::StaticFunctions() {
     AC_DEBUG << "Accessing Static Functions to Class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                    native          nargs
-        {"updateGlobalMatrix",     updateGlobalMatrix,     1},
         {"intersectBodies",        intersectBodies,        2},
         {"collideWithBodies",      collideWithBodies,      3},
         {"collideWithBodiesOnce",  collideWithBodiesOnce,  3},
@@ -282,12 +374,16 @@ JSFunctionSpec *
 JSScene::Functions() {
     AC_DEBUG << "Accessing functions for class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
-        /* name                native          nargs    */
-        {"update",             update,         1},
-        {"clear",              clear,          0},
-        {"bodyVolume",         bodyVolume,     1},
-        {"save",               save,           2},
-        {"createStubs",        createStubs,    0},
+        /* name                 native               nargs    */
+        {"update",              update,              1},
+        {"clear",               clear,               0},
+        {"bodyVolume",          bodyVolume,          1},
+        {"save",                save,                2},
+        {"createStubs",         createStubs,         0},
+        {"createLambertMaterial", CreateLambertMaterial, 2},
+        {"createColorMaterial",   CreateColorMaterial,   1},
+        {"createBody",            CreateBody,            2},
+        {"createQuadShape",       CreateQuadShape,       3},
         {0}
     };
     return myFunctions;
@@ -314,9 +410,17 @@ JSScene::ConstIntProperties() {
 JSPropertySpec *
 JSScene::Properties() {
     static JSPropertySpec myProperties[] = {
-        {"dom",     PROP_dom,      JSPROP_ENUMERATE | JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
-        {"cameras", PROP_cameras,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
-        {"world",   PROP_world,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"dom",          PROP_dom,          JSPROP_ENUMERATE | JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"cameras",      PROP_cameras,      JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"world",        PROP_world,        JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},        
+        {"canvases",     PROP_canvases,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"canvas",       PROP_canvas,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"materials",    PROP_materials,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"lightsources", PROP_lightsources, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"animations",   PROP_animations,   JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"characters",   PROP_characters,   JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"shapes",       PROP_shapes,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"images",       PROP_images,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {0}
     };
     return myProperties;
@@ -332,9 +436,6 @@ JSScene::StaticProperties() {
 JSBool
 JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
-        case PROP_dom:
-            *vp = as_jsval(cx, getNative().getSceneDom()->childNode(0));
-            return JS_TRUE;
         case PROP_cameras:
             {
                 dom::NodePtr myNode = dom::NodePtr(new dom::Node());
@@ -343,11 +444,36 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
                 *vp = as_jsval(cx, myNode, &myNode->childNodes());
                 return JS_TRUE;
             }
+        case PROP_dom:
+            *vp = as_jsval(cx, getNative().getSceneDom()->childNode(SCENE_ROOT_NAME));
+            return JS_TRUE;
         case PROP_world:
-            {
-                *vp = as_jsval(cx, getNative().getWorldRoot());
-                return JS_TRUE;
-            }
+            *vp = as_jsval(cx, getNative().getWorldRoot());
+            return JS_TRUE;
+        case PROP_canvases:
+            *vp = as_jsval(cx, getNative().getCanvasRoot());
+            return JS_TRUE;
+        case PROP_canvas:
+            *vp = as_jsval(cx, getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME));
+            return JS_TRUE;
+        case PROP_materials:
+            *vp = as_jsval(cx, getNative().getSceneDom()->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME));
+            return JS_TRUE;
+        case PROP_lightsources:
+            *vp = as_jsval(cx, getNative().getSceneDom()->childNode(SCENE_ROOT_NAME)->childNode(LIGHTSOURCE_LIST_NAME));
+            return JS_TRUE;
+        case PROP_animations:
+            *vp = as_jsval(cx, getNative().getSceneDom()->childNode(SCENE_ROOT_NAME)->childNode(ANIMATION_LIST_NAME));
+            return JS_TRUE;
+        case PROP_characters:
+            *vp = as_jsval(cx, getNative().getSceneDom()->childNode(SCENE_ROOT_NAME)->childNode(CHARACTER_LIST_NAME));
+            return JS_TRUE;
+        case PROP_shapes:
+            *vp = as_jsval(cx, getNative().getShapesRoot());
+            return JS_TRUE;
+        case PROP_images:
+            *vp = as_jsval(cx, getNative().getImagesRoot());
+            return JS_TRUE;
         default:
             JS_ReportError(cx,"JSScene::getProperty: index %d out of range", theID);
             return JS_FALSE;
@@ -368,19 +494,20 @@ JSScene::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
 JSBool
 JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a scene from the given file or an empty scene if no file is given.");
+    DOC_RESET;
     DOC_PARAM("Filename", DOC_TYPE_STRING);
     DOC_RESET;
     DOC_PARAM("Filename", DOC_TYPE_STRING);
     DOC_PARAM("Target for ProgressCallback", DOC_TYPE_STRING);
+    DOC_PARAM("Progress callback function name", DOC_TYPE_STRING);
     DOC_END;
-    IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
         return JS_FALSE;
     }
     OWNERPTR myNewPtr = OWNERPTR(new y60::Scene());
     JSScene * myNewObject=new JSScene(myNewPtr, &(*myNewPtr));
-	AC_DEBUG << "JSScene CTOR " << myNewObject << endl;
+
     try {
         Ptr<ProgressCallback> myCallback; 
         if (argc >= 3) {
@@ -389,20 +516,19 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             convertFrom(cx, argv[2], myHandler);
             myCallback = Ptr<ProgressCallback>(new ProgressCallback(cx, myTarget, myHandler));
         }
-        
-        if (argc >= 1) {
-            if (argv[0] == JSVAL_NULL) {
-                AC_INFO << "no filename, creating scene stubs";
-                PackageManagerPtr myPackageManager = JSApp::getPackageManager();
-                myNewPtr->createStubs(myPackageManager);
-            } else {
-                std::string myFilename = as_string(cx, argv[0]);
-                PackageManagerPtr myPackageManager = JSApp::getPackageManager();
-                AC_INFO << "Loading Scene " << myFilename;
-                myPackageManager->add(asl::getDirName(myFilename));
-                myNewPtr->load(getBaseName(myFilename), myPackageManager, myCallback);
-            }
+
+        if (argc == 0 || argv[0] == JSVAL_NULL) {
+            AC_INFO << "no filename, creating scene stubs";
+            PackageManagerPtr myPackageManager = JSApp::getPackageManager();
+            myNewPtr->createStubs(myPackageManager);
+        } else {
+            std::string myFilename = as_string(cx, argv[0]);
+            PackageManagerPtr myPackageManager = JSApp::getPackageManager();
+            AC_INFO << "Loading Scene " << myFilename;
+            myPackageManager->add(asl::getDirName(myFilename));
+            myNewPtr->load(getBaseName(myFilename), myPackageManager, myCallback);
         }
+
         if (myNewObject) {
             JS_SetPrivate(cx,obj,myNewObject);
             return JS_TRUE;

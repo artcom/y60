@@ -34,7 +34,7 @@
 #include "PropertyListFacade.h"
 
 #define DEFINE_LIGHT_PROPERTY_TAG(theTagName, theType, thePropertyName, theDefault) \
-	DEFINE_PROPERTY_TAG(theTagName,  LightPropertiesFacade, theType, y60::getTypeName<theType>(), thePropertyName,  "properties", "name", theDefault);
+	DEFINE_PROPERTY_TAG(theTagName,  LightPropertiesFacade, theType, y60::getTypeName<theType>(), thePropertyName,  "properties", theDefault);
 
 namespace y60 {
 

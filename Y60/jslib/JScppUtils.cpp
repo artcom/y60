@@ -447,6 +447,23 @@ JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int a
 }
 
 JSBool
+JSA_hasFunction(JSContext * cx, JSObject * obj, const char * theName) {
+    try {
+        jsval myVal;
+        JSBool ok = JS_GetProperty(cx, obj, theName, &myVal);
+        if  (ok == JS_TRUE && myVal != JSVAL_VOID) {
+            if (JS_ValueToFunction(cx, myVal) != NULL) {
+                return JS_TRUE;
+            } else {
+                AC_ERROR << "Property '" << theName << "' is not a function." << endl;
+                JSA_reportUncaughtException(cx, cx->errorReporter);
+            }
+        }
+        return JS_FALSE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JSBool
 JSA_charArrayToString(JSContext *cx, jsval *argv, string & theResult) {
     // try to convert first argument into an object
     JSObject * myArgument;

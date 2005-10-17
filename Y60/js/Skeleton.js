@@ -49,9 +49,9 @@ Skeleton.prototype.Constructor = function(self, theArguments) {
     }
 
     //  Will be called first in renderloop, has the time since application start
-    Base.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
-        Base.onIdle(theTime);
+    Base.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
+        Base.onFrame(theTime);
     }
 
     // Will be called before rendering the frame

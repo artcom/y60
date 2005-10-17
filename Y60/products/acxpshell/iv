@@ -5,11 +5,11 @@ else
 	SHADERLIB=$PRO/src/Y60/shader/shaderlibrary_nocg.xml
 fi
 
-APPLICATION=acxpshellOPT
+APPLICATION=y60
 ARGS="-I $PRO/src/Y60/js;$PRO/lib $PRO/src/Y60/js/ImageViewer.js $SHADERLIB $*"
 
 if [ "$DEBUG" == "1" ] ; then
-    APPLICATION=acxpshellDBG
+    APPLICATION=y60DBG
 fi
 
 #
@@ -24,7 +24,7 @@ fi
 if [ "$DEBUG" = "vc" ]; then
     echo Visual Studio Debuger Setup
     echo --------------------------------------------------------------------------------------
-    echo $PRO/bin/acxpshellDBG.exe
+    echo $PRO/bin/y60DBG.exe
     echo $ARGS
     echo `cmd /C cd`
     echo --------------------------------------------------------------------------------------

@@ -427,7 +427,6 @@ namespace y60 {
         appendTexture(*(theScene->getSceneBuilder()), theScene, myMaterialBuilder, theTextureFilename, theSpriteFlag, theDepth);
 
         myMaterialBuilder.computeRequirements();
-        //theScene->update(Scene::MATERIALS);
         return myMaterialBuilder.getNode();
     }
 
@@ -446,7 +445,6 @@ namespace y60 {
         }
         myMaterialBuilder.addFeature("vertexparams", VectorOfRankedFeature(100,"color"));
         myMaterialBuilder.computeRequirements();
-        //theScene->update(Scene::MATERIALS);
         return myMaterialBuilder.getNode();
     }
 
@@ -467,6 +465,36 @@ namespace y60 {
                             theTextureFilename, theSpriteFlag, theDepth);
         }
 
+        myMaterialBuilder.computeRequirements();
+        return myMaterialBuilder.getNode();
+    }
+
+    dom::NodePtr 
+    createLambertMaterial(y60::ScenePtr theScene,
+                        const asl::Vector4f & theDiffuseColor,
+                        const asl::Vector4f & theAmbientColor) 
+    {
+        MaterialBuilder myMaterialBuilder("myMaterial", false);
+        string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
+        VectorOfRankedFeature myLightingFeature;
+        createLightingFeature(myLightingFeature, LAMBERT);
+        myMaterialBuilder.setType(myLightingFeature);
+
+        setPropertyValue<asl::Vector4f>(myMaterialBuilder.getNode(), "vector4f",
+                DIFFUSE_PROPERTY, theDiffuseColor);
+        setPropertyValue<asl::Vector4f>(myMaterialBuilder.getNode(), "vector4f",
+                AMBIENT_PROPERTY, theAmbientColor);
+        myMaterialBuilder.computeRequirements();
+        return myMaterialBuilder.getNode();
+    }
+
+    dom::NodePtr 
+    createColorMaterial(y60::ScenePtr theScene,
+                        const asl::Vector4f & theColor) 
+    {
+        MaterialBuilder myMaterialBuilder("myMaterial", false);
+        theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
+        appendUnlitProperties(myMaterialBuilder, theColor);
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();
     }

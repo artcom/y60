@@ -14,16 +14,16 @@ fi
 shift
 shift
 
-APPLICATION=acxpshellOPT
+APPLICATION=y60
 
 if [ "$DEBUG" == "VG" ]; then
     if [ -x `which valgrind` ]; then
-        APPLICATION="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes acxpshellDBG"
+        APPLICATION="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes y60DBG"
     else
-        APPLICATION="acxpshellDBG"
+        APPLICATION="y60DBG"
     fi
 elif [ "$DEBUG" == "1" ] ; then
-    APPLICATION="acxpshellDBG"
+    APPLICATION="y60DBG"
 fi
 
 #
@@ -47,7 +47,7 @@ ARGS="-I $PRO/src/Y60/js;$PRO/lib $SCRIPT $MODELNAME $SHADERLIB $*"
 if [ "$DEBUG" = "vc" ]; then
     echo Visual Studio Debuger Setup
     echo --------------------------------------------------------------------------------------
-    echo $PRO/bin/acxpshellDBG.exe
+    echo $PRO/bin/y60DBG.exe
     echo $ARGS
     echo `cmd /C cd`
     echo --------------------------------------------------------------------------------------

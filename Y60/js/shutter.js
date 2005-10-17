@@ -170,7 +170,7 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
         refresh();
     }
 
-    self.onIdle = function(theTime) {
+    self.onFrame = function(theTime) {
 
         if (_myEnabledFlag && _myInteractiveFlag) {
 

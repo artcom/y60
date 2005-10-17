@@ -528,8 +528,9 @@ namespace y60 {
         return myEncodingInfo;
     }
 
-    IShaderLibraryPtr GLResourceManager::getShaderLibrary() const {
-        return _myShaderLibrary ;
+    IShaderLibraryPtr 
+    GLResourceManager::getShaderLibrary() const {
+        return _myShaderLibrary;
     }
 
     void GLResourceManager::loadShaderLibrary(const std::string & theShaderLibraryFile) {

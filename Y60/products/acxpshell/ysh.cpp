@@ -24,7 +24,6 @@
 
 #include <asl/Arguments.h>
 #include <asl/StdOutputRedirector.h>
-#include <asl/DirectoryPackage.h>
 #include <asl/string_functions.h>
 #include <asl/os_functions.h>
 
@@ -153,10 +152,9 @@ int
 main(int argc, char **argv) {
 
 #ifdef WIN32    
-    //SetErrorMode(SEM_NOGPFAULTERRORBOX); // This will turn off uncaught exception handling
-
     SetUnhandledExceptionFilter(&AcUnhandledExceptionFilter);
 #endif
+
     int rv = 1;
     try {
         ourArguments.addAllowedOptions(ourAllowedOptions);
@@ -166,21 +164,7 @@ main(int argc, char **argv) {
 
         asl::StdOutputRedirector::get().init(ourArguments);
 
-        // look in AC_TEXTURE_DIR if set
-        std::string myTextureDirs = asl::expandEnvironment("${AC_TEXTURE_DIR}");
-        if (myTextureDirs.empty() != 0) {
-            JSApp::getPackageManager()->add(myTextureDirs);
-        }
-
-        // *always* look in the current working directory
-        JSApp::getPackageManager()->add(asl::IPackagePtr(new asl::DirectoryPackage("")));
-
         SDLApp myApp;
-
-        if (ourArguments.haveOption("-I")) {
-            myApp.setIncludePath(ourArguments.getOptionArgument("-I"));
-        }
-
         if (ourArguments.haveOption("--no-jswarnings")) {
             myApp.setReportWarnings(false);
         }
@@ -201,6 +185,11 @@ main(int argc, char **argv) {
             return 1;
         }
 
+        string myIncludePath;
+        if (ourArguments.haveOption("-I")) {
+            myIncludePath = ourArguments.getOptionArgument("-I");
+        }
+
         std::string myFilename = ourArguments.getArgument(0);
         std::vector<std::string> myScriptArgs;
 
@@ -214,7 +203,7 @@ main(int argc, char **argv) {
             rv = 1;
         } else {
             myApp.setProgramName(ourArguments.getProgramName());
-            rv = myApp.run(myFilename, myScriptArgs);
+            rv = myApp.run(myFilename, myIncludePath, myScriptArgs);
             SDL_Quit();
         }
     } catch (asl::Exception & ex) {

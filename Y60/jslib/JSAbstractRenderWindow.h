@@ -83,45 +83,44 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
         static JSBool setTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setTimeout,cx,obj,argc,argv,rval);
         }
 
         static JSBool setInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setInterval,cx,obj,argc,argv,rval);
         }
 
         static JSBool setObjectTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setObjectTimeout,cx,obj,argc,argv,rval);
         }
 
         static JSBool setObjectInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setObjectInterval,cx,obj,argc,argv,rval);
         }
 
         static JSBool clearTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::clearTimeout,cx,obj,argc,argv,rval);
         }
 
         static JSBool clearInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::clearInterval,cx,obj,argc,argv,rval);
         }
 
-
         static JSBool setScene(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets the scene object to be rendered by this window.");
-    DOC_END;
+            DOC_BEGIN("Sets the scene object to be rendered by this window.");
+            DOC_END;
             try {
                 DERIVED * mySelf;
                 convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
@@ -142,21 +141,21 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
 
         static JSBool
         getWorldSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::getWorldSize,cx,obj,argc,argv,rval);
         }
 
         static JSBool
         saveBuffer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::saveBuffer,cx,obj,argc,argv,rval);
         }
         static JSBool
         getRenderer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             try {
                 DERIVED * mySelf;
                 convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
@@ -168,27 +167,27 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         }
         static JSBool
         hasCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::hasCap,cx,obj,argc,argv,rval);
         }
         static JSBool
         hasCapAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::hasCapAsString,cx,obj,argc,argv,rval);
         }
 
         static JSBool
         printStatistics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::printStatistics,cx,obj,argc,argv,rval);
         }
         static JSBool
         loadMovieFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             try {
                 bool mySuccess = Method<NATIVE>::call(&NATIVE::loadMovieFrame,cx,obj,argc,argv,rval);
                 if (mySuccess) {
@@ -204,8 +203,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         }
         static JSBool
         loadCaptureFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             try {
                 bool mySuccess = Method<NATIVE>::call(&NATIVE::loadCaptureFrame,cx,obj,argc,argv,rval);
                 if (mySuccess) {
@@ -221,21 +220,21 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         }
         static JSBool
         getImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::getImagePixel,cx,obj,argc,argv,rval);
         }
         static JSBool
         setImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setImagePixel,cx,obj,argc,argv,rval);
         }
 
         static JSBool
         performRequest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             if (argc == 1) {
                 if (!JSRequestWrapper::matchesClassOf(cx, argv[0])) {
                     JS_ReportError(cx,"JSRenderWindow::performRequest: bad argument type #0");
@@ -250,8 +249,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
 
         static JSBool
         addExtension(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             try {
                 if (argc == 1) {
                     IScriptablePluginPtr myScriptablePlugin;
@@ -276,105 +275,105 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
 
         static JSBool
         renderText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::renderText,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setTextColor,cx,obj,argc,argv,rval);
         }
         static JSBool
         renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::renderTextAsImage,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTextStyle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setTextStyle,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setTextPadding,cx,obj,argc,argv,rval);
         }
         static JSBool
         setHTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setHTextAlignment,cx,obj,argc,argv,rval);
         }
         static JSBool
         setVTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setVTextAlignment,cx,obj,argc,argv,rval);
         }
         static JSBool
         setLineHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setLineHeight,cx,obj,argc,argv,rval);
         }
         static JSBool
         setParagraph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setParagraph,cx,obj,argc,argv,rval);
         }
 
         static JSBool
         playClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::playClip,cx,obj,argc,argv,rval);
         }
         static JSBool
         setClipLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setClipLoops,cx,obj,argc,argv,rval);
         }
         static JSBool
         setClipForwardDirection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::setClipForwardDirection,cx,obj,argc,argv,rval);
         }
         static JSBool
         getLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::getLoops,cx,obj,argc,argv,rval);
         }
         static JSBool
         runAnimations(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::runAnimations,cx,obj,argc,argv,rval);
         }
         static JSBool
         isClipActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::isClipActive,cx,obj,argc,argv,rval);
         }
         static JSBool
         isCharacterActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::isCharacterActive,cx,obj,argc,argv,rval);
         }
         static JSBool
         stopCharacter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             return Method<NATIVE>::call(&NATIVE::stopCharacter,cx,obj,argc,argv,rval);
         }
         static JSFunctionSpec * BaseStaticFunctions() {
@@ -622,9 +621,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                     return JS_FALSE;
             }
         }
-};
-
-
+    };
 }
 
 #endif

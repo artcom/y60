@@ -22,7 +22,7 @@ var ENABLE_TIMING = true;
 // Sample usage:
 //
 // var _myTimer = new AutoTimer("foo");
-// function onIdle() {
+// function onFrame() {
 //      _myTimer.add("start");
 //      foo1();
 //      _myTimer.add("foo1");

@@ -58,7 +58,10 @@ class ResourceManager {
          */
         virtual void unbindTexture(Image * theImage) = 0;
         virtual unsigned setupTexture(ImagePtr theImage) = 0;
+
         virtual IShaderLibraryPtr getShaderLibrary() const { return IShaderLibraryPtr(0); }
+        virtual void loadShaderLibrary(const std::string & theShaderLibraryFile) {};
+
         VertexDataFactory1f & getVertexDataFactory1f() { return _myVertexDataFactory1f; }
         VertexDataFactory2f & getVertexDataFactory2f() { return _myVertexDataFactory2f; }
         VertexDataFactory3f & getVertexDataFactory3f() { return _myVertexDataFactory3f; }

@@ -59,7 +59,7 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
         }
     }
 
-    obj.onIdle = function() {
+    obj.onFrame = function() {
         if (!_myAnimationManager.isCharacterActive(_myCharacterName)) {
             setNextState();
         }

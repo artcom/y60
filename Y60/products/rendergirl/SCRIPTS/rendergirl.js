@@ -405,14 +405,14 @@ Viewer.prototype.Constructor = function(self, theArguments) {
     BaseViewer.prototype.Constructor(self, theArguments);
     self.BaseViewer = [];
 
-    self.onIdle = function(theTime) {
-        ourStatusBar.onIdle();
+    self.onFrame = function(theTime) {
+        ourStatusBar.onFrame();
 
         var myMover = self.getMover();
         if (myMover) {
-            myMover.onIdle(theTime);
+            myMover.onFrame(theTime);
         }
-        ourAnimationManager.onIdle(theTime);
+        ourAnimationManager.onFrame(theTime);
 
         window.queue_draw();
     }

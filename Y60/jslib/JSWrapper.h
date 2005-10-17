@@ -684,11 +684,11 @@ public:
         }
         return *myJSWrapper;
     }
-    static void finalizeImpl(JSContext *cx, JSObject *obj)
-    {
-        IF_NOISY_F(std::cerr << "finalize "<<ClassName() << (void*)obj << std::endl);
-        JSWrapper * myImpl = static_cast<JSWrapper*>(JS_GetPrivate(cx,obj));
-        delete myImpl;
+    static void finalizeImpl(JSContext *cx, JSObject *obj) {
+        if (JS_GetPrivate(cx,obj) != Class()) {
+            JSWrapper * myImpl = static_cast<JSWrapper*>(JS_GetPrivate(cx,obj));
+            delete myImpl;
+        }
     }
 
     virtual unsigned long length() const {
@@ -798,16 +798,19 @@ public:
     setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
     {
         try {
-            IF_NOISY(printParams("JSWrapper::getProperty",cx,obj,id,vp));
-            JSWrapper & myJSWrapper = getJSWrapper(cx,obj);
-            if (JSVAL_IS_INT(id)) {
-                int myIndex = JSVAL_TO_INT(id);
-                return myJSWrapper.setPropertyByNumericId(myIndex, cx, obj, id, vp);
-            } else {
-                JSString * myJSStr = JS_ValueToString(cx, id);
-                std::string myProperty = JS_GetStringBytes(myJSStr);
-                return myJSWrapper.setPropertyByLiteralId(myProperty, cx, obj, id, vp);
+            if (JS_GetPrivate(cx, obj) != Class()) {
+                IF_NOISY(printParams("JSWrapper::getProperty",cx,obj,id,vp));
+                JSWrapper & myJSWrapper = getJSWrapper(cx,obj);
+                if (JSVAL_IS_INT(id)) {
+                    int myIndex = JSVAL_TO_INT(id);
+                    return myJSWrapper.setPropertyByNumericId(myIndex, cx, obj, id, vp);
+                } else {
+                    JSString * myJSStr = JS_ValueToString(cx, id);
+                    std::string myProperty = JS_GetStringBytes(myJSStr);
+                    return myJSWrapper.setPropertyByLiteralId(myProperty, cx, obj, id, vp);
+                }
             }
+            return JS_TRUE;
         } HANDLE_CPP_EXCEPTION;
     }
     static JSBool
@@ -934,7 +937,7 @@ protected:
                 /* class constructor properties and methods */
                 //static_props, static_methods
                 theStaticProperties, theStaticFunctions
-                );
+                );        
 
         if (theConstIntProperties) {
             jsval myConstructorFuncObjVal;
@@ -945,6 +948,9 @@ protected:
                 AC_ERROR << "initClass: constructor function object not found, could not initialize static members"<<std::endl;
             }
         }
+
+        // Initialize the private pointer to class pointer to mark this class as prototype
+        JS_SetPrivate(cx, myProtoObj, Class(theClassName));
 
         return myProtoObj;
     }

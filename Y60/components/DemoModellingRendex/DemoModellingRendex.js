@@ -54,21 +54,21 @@ DemoModellingRendexApp.prototype.Constructor = function(self, theArguments) {
 
     // setup
     Base.setup = self.setup;
-    self.setup = function(theWidth, theHeight, theTitle) {        
-        Base.setup(theWidth, theHeight, theTitle);    
-        createTextOverlay();       
+    self.setup = function(theWidth, theHeight, theTitle) {
+        Base.setup(theWidth, theHeight, theTitle);
+        createTextOverlay();
     }
 
-    Base.onKey = self.onKey;        
+    Base.onKey = self.onKey;
     self.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
         Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
     }
-    
-    Base.onIdle = self.onIdle;
-    self.onIdle = function(theTime) {
-        Base.onIdle(theTime);        
+
+    Base.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
+        Base.onFrame(theTime);
     }
-    
+
     Base.onMouseMotion = self.onMouseMotion;
     self.onMouseMotion = function(theX, theY) {
         if (Base.onMouseMotion) {
@@ -82,16 +82,16 @@ DemoModellingRendexApp.prototype.Constructor = function(self, theArguments) {
             Base.onMouseButton(theButton, theState, theX, theY);
         }
     }
-        
+
     Base.onMouseWheel = self.onMouseWheel;
     self.onMouseWheel = function(theDeltaX, theDeltaY) {
         if (Base.onMouseWheel) {
             Base.onMouseWheel(theDeltaX, theDeltaY);
         }
     }
-                        
+
     ////////////// private members ////////////
-        
+
     function createTextOverlay() {
         window.loadTTF("Arial", "${PRO}/src/Y60/gl/text/fonts/arial.ttf", 18);
         window.setTextPadding(10,10,10,10);
@@ -109,8 +109,8 @@ DemoModellingRendexApp.prototype.Constructor = function(self, theArguments) {
         _myTextOverlay.srcsize.y = myTextSize.y / myTextImage.height;
 
         _myTextOverlay.position = new Vector2f(10, 30);
-        _myTextOverlay.visible = true;    
-    }    
+        _myTextOverlay.visible = true;
+    }
 
 }
 
