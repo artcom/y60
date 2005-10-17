@@ -517,16 +517,18 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             myCallback = Ptr<ProgressCallback>(new ProgressCallback(cx, myTarget, myHandler));
         }
 
-        if (argc == 0 || argv[0] == JSVAL_NULL) {
-            AC_INFO << "no filename, creating scene stubs";
-            PackageManagerPtr myPackageManager = JSApp::getPackageManager();
-            myNewPtr->createStubs(myPackageManager);
-        } else {
-            std::string myFilename = as_string(cx, argv[0]);
-            PackageManagerPtr myPackageManager = JSApp::getPackageManager();
-            AC_INFO << "Loading Scene " << myFilename;
-            myPackageManager->add(asl::getDirName(myFilename));
-            myNewPtr->load(getBaseName(myFilename), myPackageManager, myCallback);
+        if (argc >= 1) {             
+            if (argv[0] == JSVAL_NULL) {
+                AC_INFO << "no filename, creating scene stubs";
+                PackageManagerPtr myPackageManager = JSApp::getPackageManager();
+                myNewPtr->createStubs(myPackageManager);
+            } else {
+                std::string myFilename = as_string(cx, argv[0]);
+                PackageManagerPtr myPackageManager = JSApp::getPackageManager();
+                AC_INFO << "Loading Scene " << myFilename;
+                myPackageManager->add(asl::getDirName(myFilename));
+                myNewPtr->load(getBaseName(myFilename), myPackageManager, myCallback);
+            }
         }
 
         if (myNewObject) {
