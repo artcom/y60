@@ -37,7 +37,7 @@ namespace y60 {
     }
 
     void
-    CameraBuilder::setHFov(const double theViewingAngle) {
+    CameraBuilder::setHFov(const float theViewingAngle) {
         if (getNode()->hasFacade()) {
             getNode()->getFacade<Camera>()->set<HfovTag>(theViewingAngle);
         } else {

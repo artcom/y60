@@ -10,8 +10,8 @@ namespace y60 {
             CameraBuilder(const std::string & theName);
             virtual ~CameraBuilder();
 
-            void setHFov(const double theViewingAngle);
-        private:            
+            void setHFov(const float theViewingAngle);
+        private:
     };
 
     typedef asl::Ptr<CameraBuilder>    CameraBuilderPtr;
