@@ -48,8 +48,8 @@
 #define FT_OPEN_STREAM ft_open_stream
 #endif
 
-#include "SDL.h"
-#include "SDL_endian.h"
+#include <SDL/SDL.h>
+#include <SDL/SDL_endian.h>
 #include "SDL_ttf.h"
 
 #define DB(x) // x
