@@ -609,7 +609,7 @@ class SoundTestSuite : public UnitTestSuite {
             
             addTest(new TestLoop(mySoundManager));
             addTest(new TestVolume(mySoundManager));
-          
+
             addTest(new StressTest(mySoundManager, 5));
 
 //            addTest(new TestLeak(mySoundManager));

@@ -11,19 +11,25 @@
   
 #include "TestSound.h"
 
-//#include <asl/Dashboard.h>
+#ifdef USE_DASHBOARD
+#include <asl/Dashboard.h>
+#endif
 
 using namespace std;
 using namespace asl;
 
 int main(int argc, char *argv[])
 {
-//    Dashboard::get();  // Make sure the dashboard gets deleted after the pumps.
+#ifdef USE_DASHBOARD
+    Dashboard::get();  // Make sure the dashboard gets deleted after the pumps.
+#endif
     SoundTestSuite mySuite(argv[0], true);
 
     try {
         mySuite.run();
-//        Dashboard::get().print(cerr);
+#ifdef USE_DASHBOARD
+        Dashboard::get().print(cerr);
+#endif
     } catch (const asl::Exception & ex) {
         cerr << "Exception during test execution: " << ex << endl;
         return -1;
