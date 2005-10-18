@@ -141,6 +141,7 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
 
 int 
 CTScan::loadSphere(int size) {
+    clear();
     for (int i = 0; i < size; ++i) {
         ResizeableRasterPtr myRaster = 
             dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::GRAY, size, size));
@@ -210,7 +211,7 @@ CTScan::verifyCompleteness() {
 }
 
 asl::Vector3i
-CTScan::getVoxelDimensions() {
+CTScan::getVoxelDimensions() const {
     if (!_mySlices.empty()) {
         return Vector3i( _mySlices[0]->width(),
                          _mySlices[0]->height(),
@@ -265,7 +266,7 @@ CTScan::findOccurringValueRange() {
     myMaxIndex -= 1; // should be ok to subtract one here ... otherwise the above exception would have
                      // been thrown
     _myOccurringValueRange[1] = myValueRange[0] + myMaxIndex;
-    AC_WARNING << "occurring value range: " << _myOccurringValueRange;
+    AC_TRACE << "occurring value range: " << _myOccurringValueRange;
 }
 
 asl::Vector2d
@@ -542,8 +543,168 @@ CTScan::polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr
     }
 }
 
+Vector3i
+CTScan::getReconstructionDimensions(const Vector3f & theOrientationVector) const {
+    if (_myState != COMPLETE) {
+        throw CTScanException("cannot reconstruct image when loading not complete!", PLUS_FILE_LINE);
+    }
+    Vector3i mySize = getVoxelDimensions();
+    Orientation myOrientation;
+    Vector3i myResult;
+
+    if (asl::almostEqual(theOrientationVector, Vector3f(0,0,1))) {
+        myOrientation = CTScan::IDENTITY;
+    } else if (asl::almostEqual(theOrientationVector, Vector3f(1,0,0))) {
+        myOrientation = CTScan::Y2Z;
+    } else if (asl::almostEqual(theOrientationVector, Vector3f(0,1,0))) {
+        myOrientation = CTScan::X2Z;
+    } else {
+        myOrientation = CTScan::ARBITRARY;
+    }
+    switch (myOrientation) {
+        case IDENTITY:
+            myResult = mySize;
+            break;
+        case Y2Z:
+            myResult = Vector3i(mySize[0], mySize[2], mySize[1]);
+            break;
+        case X2Z:
+            myResult = Vector3i(mySize[2], mySize[1], mySize[0]);
+            break;
+        default:
+            {
+                Box3f myBounds;
+                Vector3f myInitialVector(0,0,1.0f);
+                Vector3f myOrientationVector = theOrientationVector;
+                Quaternionf myRotationQuaternion(myOrientationVector, myInitialVector);
+                Matrix4f myScreenToVoxelProjection(myRotationQuaternion);
+
+                Vector3f myScale, myShear, myOrientation, myPosition;
+                myScreenToVoxelProjection.decompose(myScale, myShear, myOrientation, myPosition);
+
+                Vector3i myVoxelSize = getVoxelDimensions();
+                Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
+                myVoxelToScreenProjection.invert();
+                myBounds = computeProjectionBounds(myVoxelToScreenProjection);
+                Vector3f myFloatSize = myBounds.getSize();
+                myResult = Vector3i(int(ceil(myFloatSize[0])), int(ceil(myFloatSize[1])), int(ceil(myFloatSize[2])));
+            }
+            break;
+    }
+    return myResult;
+}
+
+template <class VoxelT>
+VoxelT
+CTScan::interpolatedValueAt(const Vector3f & thePosition) {
+    Vector3i theFloorPos(int(floor(thePosition[0])), int(floor(thePosition[1])), int(floor(thePosition[2])));
+    Vector3i theCeilPos = theFloorPos + Vector3i(1,1,1);
+    float myValueA, myValueB;
+    VoxelT myFloorValue, myCeilValue;
+    float myFloorResult, myCeilResult;
+    Vector3i mySize = getVoxelDimensions();
+    const unsigned char * mySource;
+
+    int myLineStride = getBytesRequired(mySize[0], _myEncoding);
+    unsigned myBpp = getBytesRequired(1, _myEncoding);
+    if (theFloorPos[2] >= 0 && theFloorPos[2] < _mySlices.size()) {
+        myFloorValue = NumericTraits<VoxelT>::min();
+        myCeilValue = NumericTraits<VoxelT>::min();
+        mySource = _mySlices[int(theFloorPos[2])]->pixels().begin();
+        if (isInside(theFloorPos[0], theFloorPos[1], theFloorPos[2])) {
+            memcpy(&myFloorValue,
+                mySource+myLineStride*theFloorPos[1] + theFloorPos[0],
+                myBpp);
+        }
+        if (isInside(theCeilPos[0], theFloorPos[1], theFloorPos[2])) {
+            memcpy(&myCeilValue,
+                mySource+myLineStride*theFloorPos[1] + theCeilPos[0],
+                myBpp);
+        }
+        myValueA = linearInterpolate(myFloorValue, myCeilValue,
+            theFloorPos[0], theCeilPos[0], thePosition[0]);
+        if (isInside(theFloorPos[0], theCeilPos[1], theFloorPos[2])) {
+            memcpy(&myFloorValue,
+                mySource+myLineStride*theCeilPos[1] + theFloorPos[0],
+                myBpp);
+        }
+        if (isInside(theCeilPos[0], theCeilPos[1], theFloorPos[2])) {
+            memcpy(&myCeilValue,
+                mySource+myLineStride*theCeilPos[1] + theCeilPos[0],
+                myBpp);
+        }
+        myValueB = linearInterpolate(myFloorValue, myCeilValue,
+            theFloorPos[0], theCeilPos[0], thePosition[0]);
+
+        myFloorResult = linearInterpolate(myValueA, myValueB, theFloorPos[1], theCeilPos[1], thePosition[1]);            
+    } else {
+        myFloorResult = NumericTraits<VoxelT>::min();
+    }
+    if (theCeilPos[2] >= 0 && theCeilPos[2] < _mySlices.size()) {
+        mySource = _mySlices[int(theCeilPos[2])]->pixels().begin();
+        myFloorValue = NumericTraits<VoxelT>::min();
+        myCeilValue = NumericTraits<VoxelT>::min();
+        if (isInside(theFloorPos[0], theFloorPos[1], theCeilPos[2])) {
+            memcpy(&myFloorValue,
+                mySource+myLineStride*theFloorPos[1] + theFloorPos[0],
+                myBpp);
+        }
+        if (isInside(theCeilPos[0], theFloorPos[1], theCeilPos[2])) {
+            memcpy(&myCeilValue,
+                mySource+myLineStride*theFloorPos[1] + theCeilPos[0],
+                myBpp);
+        }
+        myValueA = linearInterpolate(myFloorValue, myCeilValue,
+            int(theFloorPos[0]), int(theCeilPos[0]), thePosition[0]);
+        if (isInside(theFloorPos[0], theCeilPos[1], theCeilPos[2])) {
+            memcpy(&myFloorValue,
+                mySource+myLineStride*theCeilPos[1] + theFloorPos[0],
+                myBpp);
+        }
+        if (isInside(theCeilPos[0], theCeilPos[1], theCeilPos[2])) {
+            memcpy(&myCeilValue,
+                mySource+myLineStride*theCeilPos[1] + theCeilPos[0],
+                myBpp);
+        }
+        myValueB = linearInterpolate(myFloorValue, myCeilValue,
+            int(theFloorPos[0]), int(theCeilPos[0]), thePosition[0]);
+        myCeilResult = linearInterpolate(myValueA, myValueB, theFloorPos[1], theCeilPos[1], thePosition[1]);
+    } else {
+        myCeilResult = NumericTraits<VoxelT>::min();
+    }
+    return VoxelT(linearInterpolate(myFloorResult, myCeilResult, theFloorPos[2], theCeilPos[2], thePosition[2]));
+}
+
 void 
-CTScan::reconstructToImage(Orientation theOrientation, int theSliceIndex, 
+CTScan::reconstructToImage(const Vector3f & theOrientationVector, int theSliceIndex, 
+        dom::NodePtr & theImageNode) {
+    switch (_myEncoding) {
+        case y60::GRAY:
+            {
+                typedef unsigned char VoxelT;
+                reconstructToImageImpl<VoxelT>(theOrientationVector, theSliceIndex, theImageNode);
+            }
+            break;
+        case y60::GRAY16:
+            {
+                typedef unsigned short VoxelT;
+                reconstructToImageImpl<VoxelT>(theOrientationVector, theSliceIndex, theImageNode);
+            }
+            break;
+        case y60::GRAYS16:
+            {
+                typedef short VoxelT;
+                reconstructToImageImpl<VoxelT>(theOrientationVector, theSliceIndex, theImageNode);
+            }
+            break;
+        default:
+            throw CTScanException("Unhandled voxel type", PLUS_FILE_LINE);   
+    }
+}
+
+template <class VoxelT>
+void 
+CTScan::reconstructToImageImpl(const Vector3f & theOrientationVector, int theSliceIndex, 
         dom::NodePtr & theImageNode) 
 {
     if (_myState != COMPLETE) {
@@ -556,8 +717,18 @@ CTScan::reconstructToImage(Orientation theOrientation, int theSliceIndex,
     int myPoTWidth;
     int myPoTHeight;
     Ptr<ReadableBlock> myPixelData;
+    Orientation myOrientation;
+    if (asl::almostEqual(theOrientationVector, Vector3f(0,0,1))) {
+        myOrientation = CTScan::IDENTITY;
+    } else if (asl::almostEqual(theOrientationVector, Vector3f(1,0,0))) {
+        myOrientation = CTScan::Y2Z;
+    } else if (asl::almostEqual(theOrientationVector, Vector3f(0,1,0))) {
+        myOrientation = CTScan::X2Z;
+    } else {
+        myOrientation = CTScan::ARBITRARY;
+    }
 
-    switch (theOrientation) {
+    switch (myOrientation) {        
         case IDENTITY:
             {
                 myWidth = mySize[0];
@@ -621,6 +792,50 @@ CTScan::reconstructToImage(Orientation theOrientation, int theSliceIndex,
                 myPixelData = myTarget; 
                 break;
             }
+        case ARBITRARY:
+            {                
+                Box3f myBounds;
+                Vector3f myInitialVector(0,0,1.0f);
+                Vector3f myOrientationVector = theOrientationVector;
+                Quaternionf myRotationQuaternion(myOrientationVector, myInitialVector);
+                Matrix4f myScreenToVoxelProjection(myRotationQuaternion);
+
+                Vector3f myScale, myShear, myOrientation, myPosition;
+                myScreenToVoxelProjection.decompose(myScale, myShear, myOrientation, myPosition);
+
+                Vector3i myVoxelSize = getVoxelDimensions();
+                Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
+                myVoxelToScreenProjection.invert();
+                myBounds = computeProjectionBounds(myVoxelToScreenProjection);
+                Vector3f mySize = myBounds.getSize();
+                myWidth = int(ceil(mySize[0]));
+                myHeight = int(ceil(mySize[1]));
+                myPoTWidth = nextPowerOfTwo(myWidth);
+                myPoTHeight = nextPowerOfTwo(myHeight);
+                Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));                
+                unsigned myBpp = getBytesRequired(1, _myEncoding);
+                int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
+                
+                float mySlicePosition = float(theSliceIndex) + myBounds[Box3f::MIN][2];
+                Vector3f myLinePos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition), myScreenToVoxelProjection);
+                Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition), myScreenToVoxelProjection) - myLinePos) / float(myWidth);
+                Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition), myScreenToVoxelProjection) - myLinePos) / float(myHeight);
+                AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", LinePos: " << myLinePos << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
+
+                for (int v = 0; v < myHeight; ++v) {
+                    Vector3f mySourcePos = myLinePos;
+                    unsigned char* myAddress = myTarget->begin()+myTargetLineStride*v;
+                    for (int u = 0; u < myWidth; ++u) {                        
+                        VoxelT myValue = interpolatedValueAt<VoxelT>(mySourcePos);
+                        memcpy(myAddress, &myValue, myBpp);
+                        mySourcePos += mySourceDeltaU;
+                        myAddress += myBpp;
+                    }
+                    myLinePos += mySourceDeltaV;
+                }
+                myPixelData = myTarget; 
+            }
+            break;
     }
     // set the image data
     theImageNode->getFacade<Image>()->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
@@ -631,6 +846,30 @@ CTScan::reconstructToImage(Orientation theOrientation, int theSliceIndex,
     theImageNode->getFacade<y60::Image>()->set<y60::ImageMatrixTag>(myScale); 
 }
 
+Box3f
+CTScan::computeProjectionBounds(const Matrix4f & theInvertedProjection) const {
+    vector<Point3f> myCorners;
+    Vector3i mySize = getVoxelDimensions();
+    float myZMin = 0;
+    float myZMax = float(mySize[2]);
+    Box3f myBox;
+    myBox.makeEmpty();
+
+    //theBox[Box3f::MIN] = product(Point3f(0,0,myZMin), theInvertedProjection);
+    //theBox[Box3f::MAX] = product(Point3f(0,0,myZMin), theInvertedProjection);
+
+    // convert the 8 corners into the inverted projection space
+    myBox.extendBy(product(Point3f(0,0,0), theInvertedProjection));
+    myBox.extendBy(product(Point3f(float(mySize[0]),0,0), theInvertedProjection));
+    myBox.extendBy(product(Point3f(0,float(mySize[1]),0), theInvertedProjection));
+    myBox.extendBy(product(Point3f(float(mySize[0]),float(mySize[1]),0), theInvertedProjection));
+
+    myBox.extendBy(product(Point3f(0,0,float(mySize[2])), theInvertedProjection));
+    myBox.extendBy(product(Point3f(float(mySize[0]),0,float(mySize[2])), theInvertedProjection));
+    myBox.extendBy(product(Point3f(0,float(mySize[1]),float(mySize[2])), theInvertedProjection));
+    myBox.extendBy(product(Point3f(float(mySize[0]),float(mySize[1]),float(mySize[2])), theInvertedProjection));
+    return myBox;
+}
 
 std::string
 CTScan::setupMaterial(SceneBuilderPtr theSceneBuilder, bool theCreateNormalsFlag) {

@@ -48,6 +48,7 @@ class JSCTScan : public jslib::JSWrapper<y60::CTScan, asl::Ptr<y60::CTScan> , js
             PROP_length,
             PROP_signal_progress,
             PROP_IDENTITY,
+            PROP_ARBITRARY,
             PROP_Y2Z,
             PROP_X2Z
         };

@@ -55,7 +55,8 @@ class CTScan {
         enum Orientation {
             IDENTITY,
             Y2Z,
-            X2Z
+            X2Z, 
+            ARBITRARY
         };
         CTScan();
         // CTScan(const std::string & theInputSpec, asl::PackageManager & thePackageManager);
@@ -65,13 +66,13 @@ class CTScan {
         int loadSphere(int size);
         int setSlices(std::vector<dom::ResizeableRasterPtr> theSlices);
 
-        void reconstructToImage(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
+        void reconstructToImage(const asl::Vector3f & theOrientationVector, int theSliceIndex, dom::NodePtr & theImageNode);
 
         /** Returns the default window center/width */
         const asl::Vector2f & getDefaultWindow() const;
 
         /** Returns the number of voxels in x/y/z direction */
-        asl::Vector3i getVoxelDimensions();
+        asl::Vector3i getVoxelDimensions() const;
 
         /** Returns the size of a single voxel (in meters) in x/y/z direction. 
          *  Any component may be 0 = unknown. */
@@ -163,6 +164,9 @@ class CTScan {
 
         bool notifyProgress(double theProgress, const std::string & theMessage = "");
 
+        asl::Vector3i
+        getReconstructionDimensions(const asl::Vector3f & theOrientationVector) const;
+
     private:
         CTScan(const CTScan&); // hide copy constructor
         sigc::signal<bool, double, Glib::ustring> _myProgressSignal;
@@ -173,6 +177,38 @@ class CTScan {
         std::vector<dom::ResizeableRasterPtr> _mySlices;
         asl::Vector2f _myDefaultWindow;
         asl::Vector3f _myVoxelSize;
+
+        inline bool 
+        isInside(int x, int y, int z) {
+            if ((z < 0 || z >= _mySlices.size()) ||
+                (y < 0 || y >= _mySlices[0]->height()) ||
+                (x < 0 || x >= _mySlices[0]->width()))
+            {
+                return false;
+            } else {
+                return true;
+            }                
+        }
+
+        asl::Box3f computeProjectionBounds(const asl::Matrix4f & theProjection) const;
+
+        template <class VoxelT>
+        inline float
+        linearInterpolate(VoxelT theFloorValue, VoxelT theCeilValue, int theFloor, int theCeil, float thePos) {
+            float myWeight = thePos - float(theFloor);
+            return (1.0f-myWeight) * theFloorValue + myWeight * theCeilValue;
+        }
+
+        /**
+         * trillinear interpolated voxel value at thePosition
+         */
+        template <class VoxelT>
+        VoxelT
+        interpolatedValueAt(const asl::Vector3f & thePosition);
+
+        template <class VoxelT>
+        void reconstructToImageImpl(const asl::Vector3f & theOrientationVector, int theSliceIndex, dom::NodePtr & theImageNode);
+
         asl::Vector2d _myOccurringValueRange;
         
         template <class VoxelT, class SegmentationPolicy>

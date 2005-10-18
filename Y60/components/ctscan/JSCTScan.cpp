@@ -218,16 +218,39 @@ reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
             JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #2 is undefined");
             return JS_FALSE;
         }
-        int myOrientation = 0;
-        convertFrom(cx, argv[0], myOrientation);
+        Vector3f myOrientationVector;
+        convertFrom(cx, argv[0], myOrientationVector);
         int mySlice = 0;
         convertFrom(cx, argv[1], mySlice);
         dom::NodePtr myImageNode;
         convertFrom(cx, argv[2], myImageNode);
 
         CTScan & myCTScan = myObj.getNative();
-        myCTScan.reconstructToImage(CTScan::Orientation(myOrientation), mySlice, myImageNode);
+        myCTScan.reconstructToImage(myOrientationVector, mySlice, myImageNode);
 
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+getReconstructionDimensions(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
+        if (argc != 1) {
+            JS_ReportError(cx, "JSCTScan::getReconstructionDimensions(): Wrong number of arguments, "
+                               "expected 1 (Orientation), got %d.", argc);
+            return JS_FALSE;
+        }
+        if (JSVAL_IS_VOID(argv[0])) {
+            JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #0 is undefined");
+            return JS_FALSE;
+        }
+        Vector3f myOrientationVector;
+        convertFrom(cx, argv[0], myOrientationVector);
+
+        CTScan & myCTScan = myObj.getNative();
+        Vector3i myDimensions = myCTScan.getReconstructionDimensions(myOrientationVector);
+        *rval = as_jsval(cx, Vector3f(float(myDimensions[0]), float(myDimensions[1]), float(myDimensions[2])));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -506,10 +529,10 @@ applyBrush(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         dom::NodePtr myCanvasImage;
         convertFrom(cx, argv[0], myCanvasImage);
 
-        unsigned myXPos;
+        int myXPos;
         convertFrom(cx, argv[1], myXPos);
 
-        unsigned myYPos;
+        int myYPos;
         convertFrom(cx, argv[2], myYPos);
 
         dom::NodePtr myBrushImage;
@@ -538,6 +561,7 @@ JSCTScan::ConstIntProperties() {
         DEFINE_ORIENTATION_PROP(IDENTITY),
         DEFINE_ORIENTATION_PROP(Y2Z),
         DEFINE_ORIENTATION_PROP(X2Z),
+        DEFINE_ORIENTATION_PROP(ARBITRARY),
         {0}
     };
     return myProperties;
@@ -567,6 +591,7 @@ JSCTScan::Functions() {
         {"create3DTexture",      create3DTexture,         2},
         {"computeHistogram",     computeHistogram,        1},
         {"computeProfile",       computeProfile,          1},
+        {"getReconstructionDimensions", getReconstructionDimensions, 1},
         {0}
     };
     return myFunctions;
