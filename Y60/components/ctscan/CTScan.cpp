@@ -595,7 +595,7 @@ CTScan::getReconstructionDimensions(const Vector3f & theOrientationVector) const
 }
 
 template <class VoxelT>
-VoxelT
+typename VoxelT
 CTScan::interpolatedValueAt(const Vector3f & thePosition) {
     Vector3i theFloorPos(int(floor(thePosition[0])), int(floor(thePosition[1])), int(floor(thePosition[2])));
     Vector3i theCeilPos = theFloorPos + Vector3i(1,1,1);

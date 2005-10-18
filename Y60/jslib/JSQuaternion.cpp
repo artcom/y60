@@ -357,8 +357,14 @@ JSQuaternion::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
                 // construct from axis and angle
                 myNewQuaternion = asl::Quaternion<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject), Number(myNumber));
             } else {
-                JS_ReportError(cx,"JSQuaternion::Constructor: argument #2 must be a float");
-                return JS_FALSE;
+                JSObject * mySecondObject = JSVector<asl::Vector3<Number> >::Construct(cx, argv[1]);
+                if (mySecondObject) {
+                    // construct from axis and angle
+                    myNewQuaternion = asl::Quaternion<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject), JSVector<asl::Vector3<Number> >::getNativeRef(cx,mySecondObject));
+                } else {
+                    JS_ReportError(cx,"JSQuaternion::Constructor: argument #2 must be a float or a Vector3f");
+                    return JS_FALSE;
+                }
             }
             myNewObject = new JSQuaternion(myNewValue);
         } else if (argc == 1) {
