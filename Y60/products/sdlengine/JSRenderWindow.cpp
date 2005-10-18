@@ -440,3 +440,4 @@ jsval as_jsval(JSContext *cx, asl::Ptr<SDLWindow> theOwner) {
 }
 
 }
+
