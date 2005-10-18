@@ -19,7 +19,10 @@
 #include <asl/numeric_functions.h>
 #include <asl/Assure.h>
 #include <asl/Auto.h>
-//#include <asl/Dashboard.h>
+
+#ifdef USE_DASHBOARD
+#include <asl/Dashboard.h>
+#endif
 
 #include <exception>
 #include <sstream>
@@ -349,7 +352,9 @@ void DirectSoundPump::writeToDS() {
     AC_TRACE << "After mix: DS PlayCursor: " << myPlayCursor 
             << ", DS Write Cursor: " << myWriteCursor << endl;
 
-//    MAKE_SCOPE_TIMER(DSBufferLock);
+#ifdef USE_DASHBOARD
+    MAKE_SCOPE_TIMER(DSBufferLock);
+#endif
     hr = _myDSBuffer->Lock(_myWriteCursor, numBytesToDeliver, &myWritePtr1, 
             &myWriteBytes1, &myWritePtr2, &myWriteBytes2, 0);     
     // If the buffer was lost, restore and retry lock. 

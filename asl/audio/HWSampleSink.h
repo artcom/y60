@@ -29,6 +29,8 @@
 
 namespace asl {
 
+// #define USE_DASHBOARD
+    
 class Pump;
 class HWSampleSink;
 
@@ -47,7 +49,7 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
                     STOPPING_FADE_OUT,  // Client has sent stop cmd, fadeout in progress.
                     PAUSING_FADE_OUT,   // Client has sent pause cmd, fadeout in progress.
                     PAUSED,             // Sound is paused.
-                    PLAYBACK_DONE       // All buffers have been played, __myStopWhenEmpty
+                    PLAYBACK_DONE       // All buffers have been played, _myStopWhenEmpty
                                         // is set.
         };
 

@@ -20,8 +20,11 @@
 
 #include <asl/UnitTest.h>
 #include <asl/Time.h>
-//#include <asl/Dashboard.h>
 #include <asl/string_functions.h>
+
+#ifdef USE_DASHBOARD
+#include <asl/Dashboard.h>
+#endif
 
 #include <math.h>
 #include <stdlib.h>
@@ -44,8 +47,10 @@ private:
 
 
 int main( int argc, char *argv[] ) {
-//    Dashboard::get();  // Make sure the dashboard gets deleted after the pumps.
-
+#ifdef USE_DASHBOARD
+    Dashboard::get();  // Make sure the dashboard gets deleted after the pumps.
+#endif
+    
     // For use in MSDev, where we can't set the environment prior to starting the
     // program.
     //Logger::get().setVerbosity(SEV_DEBUG);

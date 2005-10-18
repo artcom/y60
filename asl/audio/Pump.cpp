@@ -21,7 +21,10 @@
 #endif
 
 #include <asl/Auto.h>
-// #include <asl/Dashboard.h>
+
+#ifdef USE_DASHBOARD
+#include <asl/Dashboard.h>
+#endif
 
 using namespace std;
 
@@ -303,13 +306,17 @@ Pump::run() {
 }
 
 void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
-//    MAKE_SCOPE_TIMER(Mix);
+#ifdef USE_DASHBOARD
+    MAKE_SCOPE_TIMER(Mix);
+#endif
     theOutputBuffer.resize(numFramesToDeliver);
     theOutputBuffer.clear();
     _myTempBuffer->resize(numFramesToDeliver);
     {
         AutoLocker<Pump> myLocker(*this);
-//        MAKE_SCOPE_TIMER(Mix_Pump_Lock);
+#ifdef USE_DASHBOARD
+        MAKE_SCOPE_TIMER(Mix_Pump_Lock);
+#endif        
         std::vector <HWSampleSinkWeakPtr >::iterator it;
         removeDeadSinks();
         for (it = _mySampleSinks.begin(); it != _mySampleSinks.end();) {
@@ -321,7 +328,9 @@ void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
                 {
                     curSampleSink->deliverData(*_myTempBuffer);
                     {
-//                        MAKE_SCOPE_TIMER(Add_Buffers);
+#ifdef USE_DASHBOARD
+                        MAKE_SCOPE_TIMER(Add_Buffers);
+#endif
                         theOutputBuffer += *_myTempBuffer;
                     }
                 }
@@ -330,7 +339,9 @@ void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
         }
         
         {
-//            MAKE_SCOPE_TIMER(Pump_Volume_Fader);
+#ifdef USE_DASHBOARD
+            MAKE_SCOPE_TIMER(Pump_Volume_Fader);
+#endif
             _myVolumeFader.apply(theOutputBuffer, _curFrame);
         }
 //        theOutputBuffer.setMarker(1);

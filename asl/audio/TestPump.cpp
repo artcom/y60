@@ -15,7 +15,10 @@
 #include "Pump.h"
 
 #include <asl/proc_functions.h>
-// #include <asl/Dashboard.h>
+
+#ifdef USE_DASHBOARD
+#include <asl/Dashboard.h>
+#endif
 
 using namespace asl;
 
@@ -33,7 +36,7 @@ void TestPump::runWithPump(bool useDummyPump) {
         Pump::get().setBritzelTest(true);
         
         testBufferAlloc();
-
+/*
         // Test different buffer sizes.
 //        playSingleSound(32768);
         playSingleSound(8);            
@@ -51,8 +54,8 @@ void TestPump::runWithPump(bool useDummyPump) {
         testSimultaneousPlay();
         testConversions();
         testRunUntilEmpty();
-        
-        stressTest(3);
+*/
+        stressTest(20);
 
         ENSURE(Pump::get().getNumClicks() == 0);
 
@@ -63,7 +66,9 @@ void TestPump::runWithPump(bool useDummyPump) {
         AC_DEBUG << "Allocated buffers: " << AudioBufferBase::getNumBuffersAllocated() 
                  << endl;
 
-//        Dashboard::get().print(cerr);
+#ifdef USE_DASHBOARD
+        Dashboard::get().print(cerr);
+#endif
     }
 
 void TestPump::testBufferAlloc() {
