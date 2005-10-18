@@ -750,7 +750,7 @@ namespace y60 {
         // Check for lodding
         if (theNode->nodeName() == LOD_NODE_NAME) {
             createRenderList(getActiveLodChild(theNode, theCamera), theBodyParts, theCamera, theEyeSpaceTransform,
-                    theViewport, theOverlapFrustumFlag);
+                    theViewport, theOverlapFrustumFlag, theClippingPlanes);
             return;
         }
 
@@ -803,7 +803,7 @@ namespace y60 {
 
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
             createRenderList(theNode->childNode(i), theBodyParts, theCamera, theEyeSpaceTransform,
-                    theViewport, myOverlapFrustumFlag);
+                    theViewport, myOverlapFrustumFlag, theClippingPlanes);
         }
     }
 
@@ -883,7 +883,7 @@ namespace y60 {
             MAKE_SCOPE_TIMER(createRenderList_lod_cull);
             Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
             createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera, myEyeSpaceTransform,
-                    theViewport, true);
+                    theViewport, true, std::vector<asl::Planef>());
             resetModelView();
             CHECK_OGL_ERROR;
         }

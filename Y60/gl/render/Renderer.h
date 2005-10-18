@@ -131,7 +131,7 @@ namespace y60 {
                                   const asl::Matrix4f & theEyeSpaceTransform,
                                   ViewportPtr theViewport,
                                   bool theOverlapFrustumFlag,
-                                  std::vector<asl::Planef> theClippingPlanes = std::vector<asl::Planef>());
+                                  std::vector<asl::Planef> theClippingPlanes);
             void renderBodyPart(const BodyPart & theBodyPart,
                                 const Viewport & theViewport,
                                 const Camera & theCamera);
