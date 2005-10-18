@@ -41,7 +41,7 @@ class const_subraster;
 template <class RASTER>
 class subraster_base_iterator
     : public std::iterator<
-            typename std::random_access_iterator_tag,
+            std::random_access_iterator_tag,
 			typename RASTER::value_type,
 			typename RASTER::difference_type,
 			typename RASTER::pointer,
