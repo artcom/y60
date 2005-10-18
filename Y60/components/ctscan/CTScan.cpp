@@ -842,7 +842,7 @@ CTScan::reconstructToImageImpl(const Vector3f & theOrientationVector, int theSli
             break;
     }
     // set the image data
-    theImageNode->getFacade<Image>()->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
+    theImageNode->getFacade<y60::Image>()->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
     // set the matrix to make up for the padded image
     asl::Matrix4f myScale;
     myScale.makeIdentity();
