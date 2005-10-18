@@ -149,7 +149,7 @@ class ConduitAcceptor {
             pthread_cleanup_pop(1);
             pthread_setcancelstate(myOldCancelState,0);
             DB(AC_TRACE << "ACCEPTOR: Exiting normally" << std::endl);
-            return (void*)myResult;
+            return (void*)static_cast<ptrdiff_t>(myResult);
         }
         
         static void onThreadDone(void * theThisPointer) {

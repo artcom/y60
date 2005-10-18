@@ -24,6 +24,7 @@
 
 #include <asl/UnitTest.h>
 #include <asl/settings.h>
+#include <asl/Time.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -33,9 +34,6 @@
 #include <sys/resource.h>
 #endif
 
-#ifdef LINUX
-#include <asm/timex.h>
-#endif
 #include <iostream>
 
 using namespace std;  
@@ -81,23 +79,21 @@ public:
     inline Cycles() {
         set();
     }
-    volatile LONGLONG value;
+    volatile cycles_t value;
     inline void set() {
         value = get_cycles();
     }
-    operator LONGLONG () {
+    operator cycles_t () {
         return value;
     }
-    static LONGLONG per_second;
 };
 
-LONGLONG Cycles::per_second = 1000000000LL;
 #endif
 
 int main(int argc, char *argv[]) {
 #if 0
     const int sz = 1000;
-    vector<LONGLONG> vec(sz);
+    vector<cycles_t> vec(sz);
 
     for (int i = 0; i < sz;++i) {
         vec[i]=get_cycles();
@@ -121,8 +117,8 @@ int main(int argc, char *argv[]) {
     stop.set();
     cerr << "delta = " << stop - start << endl;
 
-    LONGLONG lstart = get_cycles();
-    LONGLONG lstop = get_cycles();
+    cycles_t lstart = get_cycles();
+    cycles_t lstop = get_cycles();
     cerr << "delta1 = " << lstop - lstart << endl;
     lstart = get_cycles();
     lstop = get_cycles();

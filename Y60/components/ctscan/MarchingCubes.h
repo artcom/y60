@@ -30,6 +30,7 @@
 #include <asl/Box.h>
 #include <asl/Logger.h>
 #include <asl/Assure.h>
+#include <asl/string_functions.h>
 
 #include <algorithm>
 #include <stdio.h>
@@ -548,7 +549,7 @@ namespace y60 {
                 case 7:
                     return at(iMarch+1, jMarch, kMarch+1);
                 default:
-                    throw MarchingCubesException(std::string("Illegal CubeIndex: ") + as_string(theCubeCorner), PLUS_FILE_LINE);
+                    throw MarchingCubesException(std::string("Illegal CubeIndex: ") + asl::as_string(theCubeCorner), PLUS_FILE_LINE);
                 }
             }
 

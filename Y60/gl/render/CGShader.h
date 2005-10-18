@@ -58,7 +58,6 @@ namespace y60 {
                                       ShaderDescription & theShader);
 
         private:
-  		    void checkCgError() const;
             void processCompilerArgs(std::vector<std::string> & theArgs, const std::string & theArgList);
             void bindMaterialParams(y60::MaterialBase & theMaterial);
             void setCgParameter(CGparameter & theCgParameter, const dom::NodePtr & theNode,

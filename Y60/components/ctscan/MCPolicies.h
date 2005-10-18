@@ -13,6 +13,7 @@
 #define Y60_CTSCAN_MCPOLICIES_INCLUDED
 
 #include <asl/Vector234.h>
+#include <asl/string_functions.h>
 #include <dom/Value.h>
 #include <y60/Scene.h>
 #include <y60/ShapeBuilder.h>
@@ -324,7 +325,7 @@ namespace y60 {
                         return li;
                     } else {
                         throw MCPolicyException(std::string("Threshold is neither crossed from top or bottom with first: " ) + 
-                            as_string(int(firstValue)) + " and second: " + as_string(int(secondValue)), PLUS_FILE_LINE);
+                            asl::as_string(int(firstValue)) + " and second: " + asl::as_string(int(secondValue)), PLUS_FILE_LINE);
                     }
                 }
             }       
@@ -422,7 +423,7 @@ namespace y60 {
                         return li;
                     } else {
                         throw MCPolicyException(std::string("Threshold is neither crossed from top or bottom with first: " ) + 
-                            as_string(int(firstValue)) + " and second: " + as_string(int(secondValue)), PLUS_FILE_LINE);
+                            asl::as_string(int(firstValue)) + " and second: " + asl::as_string(int(secondValue)), PLUS_FILE_LINE);
                     }
                 }
             }

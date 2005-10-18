@@ -103,7 +103,7 @@ virtual bool processData() {
             }
             pthread_cleanup_pop(1);
             pthread_setcancelstate(myOldCancelState,0);
-            return (void*)myResult;
+            return (void*)static_cast<ptrdiff_t>(myResult);
         }
         static void onThreadDone(void * theThisPointer) {
         }

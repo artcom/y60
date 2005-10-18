@@ -555,7 +555,7 @@
             <feature class="physics" values="[skin]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <vertexshader profile="VP30" file="SkinAndBones.cg" entryfunction="mainVertex" compilerargs="">
+        <vertexshader profile="VP40" file="SkinAndBones.cg" entryfunction="mainVertex" compilerargs="">
             <properties>
                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
@@ -574,7 +574,7 @@
                  <vector4f name="joint_indices_1" register="texcoord4"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="SkinAndBones.cg" entryfunction="mainFragment" compilerargs="">
+        <fragmentshader profile="FP40" file="SkinAndBones.cg" entryfunction="mainFragment" compilerargs="">
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
             </properties>

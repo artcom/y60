@@ -95,8 +95,8 @@ namespace y60 {
             }
             throw RendererException(myErrorMessage, "CgProgramInfo::CgProgramInfo()");
         }
-        processParameters();
         cgCompileProgram(_myCgProgramID);
+        processParameters();
     }
 
     CgProgramInfo::CgProgramInfo(const ShaderDescription & myShader,
@@ -191,6 +191,8 @@ namespace y60 {
                             ": CGGL Parameter base " + myParamBase + " unknown.",
                             "CgProgramInfo::processParameters()");
                 }
+                AC_DEBUG << "isReferenced:" << cgIsParameterReferenced(myParam);
+                AC_DEBUG << "CG Error:" << cgGetError();
                 if (myParameterType == CG_ARRAY || cgIsParameterReferenced(myParam) ) {
                     _myGlParams.push_back(
                             CgProgramGlParam(myParamName, myParam, myParamType, myParamTransform));
@@ -244,7 +246,7 @@ namespace y60 {
                     AC_INFO << "array " << myParamName << " size " << cgGetArraySize(myParam, 0);
                 }
 
-                if (myParameterType == CG_ARRAY || cgIsParameterReferenced(myParam)) {
+                if (true || myParameterType == CG_ARRAY || cgIsParameterReferenced(myParam)) {
 
                     AC_DEBUG << "adding auto param " << myParamName << ":" << myParamID << endl;
                     _myAutoParams[myParamID]
@@ -770,6 +772,12 @@ namespace y60 {
             case ARBFP1 :
                 myResult = CG_PROFILE_ARBFP1;
                 break;
+            case  VP40:
+                myResult = CG_PROFILE_VP40;
+                break;
+            case  FP40:
+                myResult = CG_PROFILE_FP40;
+                break;
             case  VP30:
                 myResult = CG_PROFILE_VP30;
                 break;
@@ -785,7 +793,7 @@ namespace y60 {
             default:
                 throw RendererException(string("Unknown shaderprofile : ") +
                         getStringFromEnum(theShader._myProfile, ShaderProfileStrings),
-                        "CgProgramInfo::asCgProfile()");
+                        PLUS_FILE_LINE);
         };
         return myResult;
     }

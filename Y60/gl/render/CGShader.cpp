@@ -28,6 +28,15 @@ using namespace y60;
 
 namespace y60 {
 
+#define checkCgError() { \
+    CGerror myCgError = cgGetError(); \
+    if (myCgError != CG_NO_ERROR) { \
+        throw ShaderException(std::string("Cg error: ") + cgGetErrorString(myCgError), \
+                PLUS_FILE_LINE); \
+    } \
+} 
+
+
     CGShader::CGShader(const dom::NodePtr theNode) : GLShader(theNode)
     {
         _myType = CG_MATERIAL;
@@ -224,14 +233,6 @@ namespace y60 {
         }
     }
 
-    void
-    CGShader::checkCgError() const {
-        CGerror myCgError = cgGetError();
-        if (myCgError != CG_NO_ERROR) {
-            throw ShaderException(std::string("Cg error: ") + cgGetErrorString(myCgError),
-                                    "CGShader::checkCgError()");
-        }
-    }
 
     void
     CGShader::bindBodyParams(MaterialBase & theMaterial,
