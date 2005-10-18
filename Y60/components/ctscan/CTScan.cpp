@@ -597,11 +597,10 @@ CTScan::getReconstructionDimensions(const Vector3f & theOrientationVector) const
 template <class VoxelT>
 VoxelT
 CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
-    Vector3f myHelper(floor(thePosition[0]), floor(thePosition[1]), floor(thePosition[2]));
-    //asl::Vector3i theFloorPos(int(floor(thePosition[0])), 
-    //    int(floor(thePosition[1])), int(floor(thePosition[2])));
-    Vector3i theFloorPos(int(myHelper[0]), int(myHelper[1]), int(myHelper[2]));
-    asl::Vector3i theCeilPos = theFloorPos + Vector3i(1,1,1);
+    Vector3i myFloorPos(static_cast<int>(floor(thePosition[0])), 
+        static_cast<int>(floor(thePosition[1])), 
+        static_cast<int>(floor(thePosition[2])));
+    asl::Vector3i theCeilPos = myFloorPos + Vector3i(1,1,1);
     float myValueA, myValueB;
     VoxelT myFloorValue, myCeilValue;
     float myFloorResult, myCeilResult;
@@ -610,36 +609,36 @@ CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
 
     int myLineStride = getBytesRequired(mySize[0], _myEncoding);
     unsigned myBpp = getBytesRequired(1, _myEncoding);
-    if (theFloorPos[2] >= 0 && theFloorPos[2] < _mySlices.size()) {
+    if (myFloorPos[2] >= 0 && myFloorPos[2] < _mySlices.size()) {
         myFloorValue = NumericTraits<VoxelT>::min();
         myCeilValue = NumericTraits<VoxelT>::min();
-        mySource = _mySlices[int(theFloorPos[2])]->pixels().begin();
-        if (isInside(theFloorPos[0], theFloorPos[1], theFloorPos[2])) {
+        mySource = _mySlices[int(myFloorPos[2])]->pixels().begin();
+        if (isInside(myFloorPos[0], myFloorPos[1], myFloorPos[2])) {
             memcpy(&myFloorValue,
-                mySource+myLineStride*theFloorPos[1] + theFloorPos[0],
+                mySource+myLineStride*myFloorPos[1] + myFloorPos[0],
                 myBpp);
         }
-        if (isInside(theCeilPos[0], theFloorPos[1], theFloorPos[2])) {
+        if (isInside(theCeilPos[0], myFloorPos[1], myFloorPos[2])) {
             memcpy(&myCeilValue,
-                mySource+myLineStride*theFloorPos[1] + theCeilPos[0],
+                mySource+myLineStride*myFloorPos[1] + theCeilPos[0],
                 myBpp);
         }
         myValueA = linearInterpolate(myFloorValue, myCeilValue,
-            theFloorPos[0], theCeilPos[0], thePosition[0]);
-        if (isInside(theFloorPos[0], theCeilPos[1], theFloorPos[2])) {
+            myFloorPos[0], theCeilPos[0], thePosition[0]);
+        if (isInside(myFloorPos[0], theCeilPos[1], myFloorPos[2])) {
             memcpy(&myFloorValue,
-                mySource+myLineStride*theCeilPos[1] + theFloorPos[0],
+                mySource+myLineStride*theCeilPos[1] + myFloorPos[0],
                 myBpp);
         }
-        if (isInside(theCeilPos[0], theCeilPos[1], theFloorPos[2])) {
+        if (isInside(theCeilPos[0], theCeilPos[1], myFloorPos[2])) {
             memcpy(&myCeilValue,
                 mySource+myLineStride*theCeilPos[1] + theCeilPos[0],
                 myBpp);
         }
         myValueB = linearInterpolate(myFloorValue, myCeilValue,
-            theFloorPos[0], theCeilPos[0], thePosition[0]);
+            myFloorPos[0], theCeilPos[0], thePosition[0]);
 
-        myFloorResult = linearInterpolate(myValueA, myValueB, theFloorPos[1], theCeilPos[1], thePosition[1]);            
+        myFloorResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], theCeilPos[1], thePosition[1]);            
     } else {
         myFloorResult = NumericTraits<VoxelT>::min();
     }
@@ -647,21 +646,21 @@ CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
         mySource = _mySlices[int(theCeilPos[2])]->pixels().begin();
         myFloorValue = NumericTraits<VoxelT>::min();
         myCeilValue = NumericTraits<VoxelT>::min();
-        if (isInside(theFloorPos[0], theFloorPos[1], theCeilPos[2])) {
+        if (isInside(myFloorPos[0], myFloorPos[1], theCeilPos[2])) {
             memcpy(&myFloorValue,
-                mySource+myLineStride*theFloorPos[1] + theFloorPos[0],
+                mySource+myLineStride*myFloorPos[1] + myFloorPos[0],
                 myBpp);
         }
-        if (isInside(theCeilPos[0], theFloorPos[1], theCeilPos[2])) {
+        if (isInside(theCeilPos[0], myFloorPos[1], theCeilPos[2])) {
             memcpy(&myCeilValue,
-                mySource+myLineStride*theFloorPos[1] + theCeilPos[0],
+                mySource+myLineStride*myFloorPos[1] + theCeilPos[0],
                 myBpp);
         }
         myValueA = linearInterpolate(myFloorValue, myCeilValue,
-            int(theFloorPos[0]), int(theCeilPos[0]), thePosition[0]);
-        if (isInside(theFloorPos[0], theCeilPos[1], theCeilPos[2])) {
+            int(myFloorPos[0]), int(theCeilPos[0]), thePosition[0]);
+        if (isInside(myFloorPos[0], theCeilPos[1], theCeilPos[2])) {
             memcpy(&myFloorValue,
-                mySource+myLineStride*theCeilPos[1] + theFloorPos[0],
+                mySource+myLineStride*theCeilPos[1] + myFloorPos[0],
                 myBpp);
         }
         if (isInside(theCeilPos[0], theCeilPos[1], theCeilPos[2])) {
@@ -670,13 +669,13 @@ CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
                 myBpp);
         }
         myValueB = linearInterpolate(myFloorValue, myCeilValue,
-            int(theFloorPos[0]), int(theCeilPos[0]), thePosition[0]);
-        myCeilResult = linearInterpolate(myValueA, myValueB, theFloorPos[1], theCeilPos[1], thePosition[1]);
+            int(myFloorPos[0]), int(theCeilPos[0]), thePosition[0]);
+        myCeilResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], theCeilPos[1], thePosition[1]);
     } else {
         myCeilResult = NumericTraits<VoxelT>::min();
     }
     return VoxelT(linearInterpolate(myFloorResult, myCeilResult, 
-        theFloorPos[2], theCeilPos[2], thePosition[2]));
+        myFloorPos[2], theCeilPos[2], thePosition[2]));
 }
 
 void 
