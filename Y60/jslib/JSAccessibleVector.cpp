@@ -35,15 +35,6 @@ item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(int);
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getElement,cx,obj,argc,argv,rval);
 }
-/*
-static JSBool
-appendItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(int);
-    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::append,cx,obj,argc,argv,rval);
-}
-*/
 JSFunctionSpec *
 JSAccessibleVector::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;

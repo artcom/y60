@@ -1042,6 +1042,7 @@ namespace dom {
             _myVectorValue.openWriteableValue().resize(newSize);
             _myVectorValue.closeWriteableValue();
         }
+
        bool append(const ValueBase & theValue) {
            const ELEM * myElem = dynamic_cast_Value<ELEM>(&theValue);
             if (myElem) {

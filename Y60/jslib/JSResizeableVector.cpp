@@ -38,12 +38,39 @@ item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getElement,cx,obj,argc,argv,rval);
 }
 static JSBool
-appendItem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(int);
+    typedef void (NATIVE_VECTOR::*MyMethod)(int);
+    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::resize,cx,obj,argc,argv,rval);
+}
+
+/* TODO
+static JSBool
+append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    typedef bool (NATIVE_VECTOR::*MyMethod)(const dom::ValueBase &);
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::append,cx,obj,argc,argv,rval);
 }
+*/
+static JSBool
+erase(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    typedef bool (NATIVE_VECTOR::*MyMethod)(int);
+    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::erase,cx,obj,argc,argv,rval);
+}
+
+/* TODO
+static JSBool
+insertBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    typedef bool (NATIVE_VECTOR::*MyMethod)(int, const ValueBase &);
+    return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::insertBefore,cx,obj,argc,argv,rval);
+}
+*/
 
 JSFunctionSpec *
 JSResizeableVector::Functions() {
@@ -51,6 +78,10 @@ JSResizeableVector::Functions() {
     static JSFunctionSpec myFunctions[] = {
         /* name         native          nargs    */
         {"item",             item,            1},
+        {"resize",           resize,          1},
+// TODO   {"append",           append,          1},
+        {"erase",            erase,           1},
+// TODO   {"insertBefore",     insertBefore,    2},
         {0}
     };
     return myFunctions;

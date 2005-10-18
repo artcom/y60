@@ -223,8 +223,9 @@ jsval as_jsval(JSContext *cx, dom::ValuePtr theValue) {
     }
 
     // following are not registered (they are able to dispatch multiple types...)
-    JSVAL_FROM_VECTORVALUE(dom::AccessibleVector);
+    // Attention: put derived classes before their bases [DS]
     JSVAL_FROM_VECTORVALUE(dom::ResizeableVector);
+    JSVAL_FROM_VECTORVALUE(dom::AccessibleVector);
     JSVAL_FROM_VECTORVALUE(dom::ResizeableRaster);
 
     AC_WARNING << " as_jsval:: using string conversion for type " << theValue->getTypeInfo().name()
