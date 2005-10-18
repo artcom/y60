@@ -20,6 +20,8 @@
 #ifndef _ac_y60_RendererState_h_
 #define _ac_y60_RendererState_h_
 
+#include <asl/Plane.h>
+
 namespace y60 {
 
     class RenderState {
@@ -30,7 +32,8 @@ namespace y60 {
                 _myBackfaceCullingFlag(false),
                 _myFlatShadingFlag(false),
                 _myTexturingFlag(true),
-                _myDrawNormalsFlag(false)
+                _myDrawNormalsFlag(false),
+                _myEnabledClippingPlanes(0)
             {
                 init();
             }
@@ -91,6 +94,8 @@ namespace y60 {
                 return _myDrawNormalsFlag;
             }
 
+            void setClippingPlanes(const std::vector<asl::Planef> & thePlanes);
+
         private:
             void commitWireframe(bool theFlag);
             void commitLighting(bool theFlag);
@@ -104,6 +109,7 @@ namespace y60 {
             bool _myFlatShadingFlag;
             bool _myTexturingFlag;
             bool _myDrawNormalsFlag;
+            int  _myEnabledClippingPlanes;
     };
 }
 

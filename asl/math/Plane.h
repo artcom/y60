@@ -65,6 +65,13 @@ namespace asl {
             }
             return * this;
         }
+
+        template<class T>
+        Vector4<T>
+        getCoefficients() const {
+            return Vector4<T>(normal[0], normal[1], normal[2], - offset);
+        }
+        
     public:
 		Vector3<Number> normal; // a vector perpendicular to the plane
 		Number offset;  // distance from the origin

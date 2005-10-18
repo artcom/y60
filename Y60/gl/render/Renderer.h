@@ -130,7 +130,8 @@ namespace y60 {
                                   const y60::CameraPtr theCamera,
                                   const asl::Matrix4f & theEyeSpaceTransform,
                                   ViewportPtr theViewport,
-                                  bool theOverlapFrustumFlag);
+                                  bool theOverlapFrustumFlag,
+                                  std::vector<asl::Planef> theClippingPlanes = std::vector<asl::Planef>());
             void renderBodyPart(const BodyPart & theBodyPart,
                                 const Viewport & theViewport,
                                 const Camera & theCamera);
@@ -159,6 +160,8 @@ namespace y60 {
 
             double getBillboardRotation(const asl::Matrix4f & theBillboardMatrix,
                                         const asl::Matrix4f & theCameraMatrix);
+
+            void collectClippingPlanes(dom::NodePtr theNode, std::vector<asl::Planef> & theClippingPlanes);
             // renderer members
             TextRendererManager     _myTextRendererManager;
             unsigned int            _myRenderingCaps;

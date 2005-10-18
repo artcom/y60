@@ -52,6 +52,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(SensorTag,           std::string,      SENSOR_ATTRIB,            "");
     DEFINE_ATTRIBUT_TAG(SensorRadiusTag,     float,            SENSOR_RADIUS_ATTRIB,     0);
     DEFINE_ATTRIBUT_TAG(CullableTag,         bool,             CULLABLE_ATTRIB,          true);
+    DEFINE_ATTRIBUT_TAG(ClippingPlanesTag,   VectorOfString,   CLIPPING_PLANES_ATTRIB,   VectorOfString());
 
     class TransformHierarchyFacade :
         public dom::Facade,
@@ -70,6 +71,7 @@ namespace y60 {
         public SensorTag::Plug,
         public SensorRadiusTag::Plug,
         public CullableTag::Plug,
+        public ClippingPlanesTag::Plug,
         public dom::FacadeAttributePlug<BoundingBoxTag>,
         public dom::FacadeAttributePlug<GlobalMatrixTag>,
         public dom::FacadeAttributePlug<LocalMatrixTag>,

@@ -86,6 +86,7 @@ namespace y60 {
     static const char * CANVAS_LIST_NAME          = "canvases";
     static const char * CANVAS_NODE_NAME          = "canvas";
     static const char * VIEWPORT_NODE_NAME        = "viewport";
+    static const char * GEOMETRY_NODE_NAME        = "geometry";
 
     //=== Attribute names ============================================================
     static const char * ID_ATTRIB                   = "id";
@@ -169,6 +170,7 @@ namespace y60 {
     static const char * INSENSIBLE_ATTRIB           = "insensible";
     static const char * SKELETON_ATTRIB             = "skeleton";
     static const char * PIVOT_TRANSLATION_ATTRIB    = "pivottranslation";
+    static const char * CLIPPING_PLANES_ATTRIB      = "clippingplanes";
 
     static const char * ANIM_ENABLED_ATTRIB         = "enabled";
     static const char * ANIM_ATTRIBUTE_ATTRIB       = "attribute";
@@ -243,6 +245,9 @@ namespace y60 {
     static const char * CAPTURE_NODE_NAME           = "capture";
     static const char * CAPTURE_NORM_ATTRIB         = "norm";
     static const char * CAPTURE_DEVICE_ATTRIB       = "device";
+
+    static const char * GEOMETRY_PLANE_ATTRIB       = "plane";
+    static const char * GEOMETRY_GLOBAL_PLANE_ATTRIB = "globalplane";
 
     //=== Attribute constants ============================================================
     static const char * POSITION_ROLE               = "position";

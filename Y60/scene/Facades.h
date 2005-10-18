@@ -35,6 +35,7 @@
 #include "Overlay.h"
 #include "Shape.h"
 #include "IncludeFacade.h"
+#include "Geometry.h"
 
 #include <y60/Image.h>
 #include <y60/Movie.h>
@@ -155,6 +156,7 @@ namespace y60 {
         theFactory->registerPrototype("material", dom::FacadePtr(new MaterialBase(dom::Node::Prototype)));
         theFactory->registerPrototype("properties", dom::FacadePtr(new MaterialPropertiesFacade(dom::Node::Prototype)), "material");
         theFactory->registerPrototype("requires", dom::FacadePtr(new MaterialRequirementFacade(dom::Node::Prototype)), "material");
+        theFactory->registerPrototype("geometry", dom::FacadePtr(new Geometry(dom::Node::Prototype)));
     }
 
 /*

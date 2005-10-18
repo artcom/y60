@@ -37,7 +37,7 @@ public:
     typedef JSWrapper<asl::Plane<PlaneNumber> > Base;
 
     static const char * ClassName() {
-        return "Plane";
+        return "Planef";
     }
     static JSFunctionSpec * Functions();
 
@@ -89,7 +89,8 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Plane<PlaneNumber>  & thePl
 
 jsval as_jsval(JSContext *cx, const asl::Plane<PlaneNumber>  & theValue);
 
-jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Plane<PlaneNumber>  * thePlane);
+jsval as_jsval(JSContext *cx, JSPlane::NativeValuePtr theValue);
+// NOT IMPLEMENTED jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Plane<PlaneNumber>  * thePlane);
 
 }
 

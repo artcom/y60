@@ -53,6 +53,7 @@ namespace y60 {
         SensorTag::Plug(theNode),
         SensorRadiusTag::Plug(theNode),
         CullableTag::Plug(theNode),
+        ClippingPlanesTag::Plug(theNode),
         dom::FacadeAttributePlug<BoundingBoxTag>(this),
         dom::FacadeAttributePlug<GlobalMatrixTag>(this),
         dom::FacadeAttributePlug<LocalMatrixTag>(this),

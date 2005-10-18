@@ -323,6 +323,9 @@ namespace y60 {
         if (myBodyHasChanged) {
             MAKE_SCOPE_TIMER(update_bodymatrix);
             glPopMatrix();
+
+            _myState.setClippingPlanes(theBodyPart.getClippingPlanes());
+            
             glPushMatrix();
 
             // draw body bounding-box
@@ -717,7 +720,8 @@ namespace y60 {
                                const CameraPtr theCamera,
                                const Matrix4f & theEyeSpaceTransform,
                                ViewportPtr theViewport,
-                               bool theOverlapFrustumFlag)
+                               bool theOverlapFrustumFlag,
+                               std::vector<asl::Planef> theClippingPlanes)
     {
         // Skip undefined nodes
         if (!theNode) {
@@ -740,6 +744,8 @@ namespace y60 {
         if (!(myFacade->get<VisibleTag>())) {
             return;
         }
+
+        collectClippingPlanes(theNode, theClippingPlanes);
 
         // Check for lodding
         if (theNode->nodeName() == LOD_NODE_NAME) {
@@ -789,7 +795,7 @@ namespace y60 {
                     COUNT(OpaquePrimitives);
                 }
 
-                theBodyParts.insert(std::make_pair(myKey, BodyPart(myBody, myPrimitive)));
+                theBodyParts.insert(std::make_pair(myKey, BodyPart(myBody, myPrimitive, theClippingPlanes)));
             }
 
             COUNT(RenderedBodies);
@@ -798,6 +804,22 @@ namespace y60 {
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
             createRenderList(theNode->childNode(i), theBodyParts, theCamera, theEyeSpaceTransform,
                     theViewport, myOverlapFrustumFlag);
+        }
+    }
+
+    void 
+    Renderer::collectClippingPlanes(dom::NodePtr theNode,
+                                    std::vector<asl::Planef> & theClippingPlanes)
+    {
+        TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
+
+        const VectorOfString & myPlaneIds = myFacade->get<ClippingPlanesTag>();
+        dom::NodePtr myGeometryNode;
+        for (unsigned i = 0; i < myPlaneIds.size(); ++i) {
+            AC_TRACE << "found plane: " << myPlaneIds[i];
+            myGeometryNode = theNode->getElementById( myPlaneIds[i] );
+            GeometryPtr myGeometry = myGeometryNode->getFacade<Geometry>();
+            theClippingPlanes.push_back( myGeometry->get<GeometryGlobalPlaneTag>());
         }
     }
 

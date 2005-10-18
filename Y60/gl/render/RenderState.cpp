@@ -17,6 +17,7 @@
 
 #include "RenderState.h"
 
+#include <y60/GLUtils.h>
 
 #ifdef WIN32
 #   include <GL/glh_extensions.h>
@@ -85,4 +86,18 @@ namespace y60 {
         }
         _myTexturingFlag = theFlag;
     }
+
+    void 
+    RenderState::setClippingPlanes(const std::vector<asl::Planef> & thePlanes) {
+        for (int i = 0; i < thePlanes.size(); ++i) {
+            GLenum myGLPlaneId = asGLClippingPlaneId(i);
+            glEnable(myGLPlaneId);
+            glClipPlane(myGLPlaneId, thePlanes[i].getCoefficients<double>().begin());
+        }
+        for (int i = thePlanes.size(); i < _myEnabledClippingPlanes; ++i) {
+            glDisable(asGLClippingPlaneId(i));
+        }
+        _myEnabledClippingPlanes = thePlanes.size();
+    }
+
 }

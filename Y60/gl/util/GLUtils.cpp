@@ -372,6 +372,29 @@ namespace y60 {
 #endif
     }
 
+    DEFINE_EXCEPTION(GlPlaneOutOfRangeException, asl::Exception);
+    GLenum 
+    asGLClippingPlaneId(unsigned thePlaneNum) {
+        switch (thePlaneNum) {
+            case 0 :
+                return GL_CLIP_PLANE0;
+            case 1 :
+                return GL_CLIP_PLANE1;
+            case 2 :
+                return GL_CLIP_PLANE2;
+            case 3 :
+                return GL_CLIP_PLANE3;
+            case 4 :
+                return GL_CLIP_PLANE4;
+            case 5 :
+                return GL_CLIP_PLANE5;
+            default :
+                throw GlPlaneOutOfRangeException(
+                        std::string("too many Clipping Planes, max index = 5, got ") +
+                        asl::as_string(thePlaneNum), PLUS_FILE_LINE);
+        }
+    }
+
     DEFINE_EXCEPTION(GlTextureOutOfRangeException, asl::Exception);
 
     GLenum

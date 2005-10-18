@@ -20,6 +20,12 @@ Example:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="Planef">
+        <xs:annotation>
+            <xs:documentation>Simple plane type.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:simpleType name="Vector2f">
         <xs:annotation>
             <xs:documentation>Type for simple 2-dimensional vectors with float values.
@@ -2513,6 +2519,12 @@ You can set the static part of very large scenes (e.g. houses, landscape) frozen
 Useful for cameras and lights.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="clippingplanes" type="VectorOfString">
+            <xs:annotation>
+                <xs:documentation>A list of ids, that reference geometry/plane nodes.
+The planes specified by these nodes are used as additional clipping planes.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
     <xs:element name="body" substitutionGroup="SceneGraphNode">
         <xs:annotation>
@@ -2680,4 +2692,25 @@ Joints are exported from maya and usually will not be edited by hand.</xs:docume
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:element name="geometry" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Node for abstract analytic geometry, like planes, spheres, boxes and points.
+Currently it only implements a plane which can be used to specify clipping planes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType">
+                    <xs:attribute name="plane" type="Planef">
+                        <xs:annotation>
+                            <xs:documentation>Special orientation exported from maya for correct animation and rotiation of joints.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+
+
+
 </xs:schema>

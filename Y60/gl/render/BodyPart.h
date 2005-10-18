@@ -34,8 +34,9 @@ namespace y60 {
 
     class BodyPart {
         public:
-            BodyPart(y60::BodyPtr theBodyPtr, const y60::Primitive & thePrimitive) :
-                _myBody(theBodyPtr), _myPrimitive(thePrimitive)
+            BodyPart(y60::BodyPtr theBodyPtr, const y60::Primitive & thePrimitive,
+                     const std::vector<asl::Planef> & theClippingPlanes) :
+                _myBody(theBodyPtr), _myPrimitive(thePrimitive), _myClippingPlanes(theClippingPlanes)
             {}
 
             y60::BodyPtr getBody() const {
@@ -46,9 +47,13 @@ namespace y60 {
                 return _myPrimitive;
             }
 
+            const std::vector<asl::Planef> & getClippingPlanes() const {
+                return _myClippingPlanes;
+            }
         private:
-            y60::BodyPtr _myBody;
-            const y60::Primitive & _myPrimitive;
+            y60::BodyPtr             _myBody;
+            const y60::Primitive &   _myPrimitive;
+            std::vector<asl::Planef> _myClippingPlanes;
     };
 
     inline

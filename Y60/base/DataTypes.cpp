@@ -87,6 +87,8 @@ namespace y60 {
         theFactory.registerPrototype("Quaternionf", dom::ValuePtr(new dom::SimpleValue<asl::Quaternionf>(asl::Quaternionf(),0)));
         theFactory.registerPrototype("Frustum", dom::ValuePtr(new dom::SimpleValue<asl::Frustum>(asl::Frustum(),0)));
 
+        theFactory.registerPrototype("Planef", dom::ValuePtr(new dom::SimpleValue<asl::Planef>(asl::Planef(),0)));
+
 		theFactory.registerPrototype("Box2i", dom::ValuePtr(new dom::SimpleValue<asl::Box2i>(asl::Box2i(),0)));
 		theFactory.registerPrototype("Box2f", dom::ValuePtr(new dom::SimpleValue<asl::Box2f>(asl::Box2f(),0)));
 		theFactory.registerPrototype("Box2d", dom::ValuePtr(new dom::SimpleValue<asl::Box2d>(asl::Box2d(),0)));
