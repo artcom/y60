@@ -34,11 +34,8 @@ namespace y60 {
 
     class BodyPart {
         public:
-#ifdef __LP64__
             typedef std::pair<asl::Unsigned32, Body*> Key; 
-#else
-            typedef asl::Unsigned64 Key; 
-#endif            
+            
             BodyPart(y60::BodyPtr theBodyPtr, const y60::Primitive & thePrimitive,
                      const std::vector<asl::Planef> & theClippingPlanes) :
                 _myBody(theBodyPtr), _myPrimitive(thePrimitive), _myClippingPlanes(theClippingPlanes)
@@ -85,9 +82,9 @@ namespace y60 {
         return myKey;
     }
 
-    // key structure
-    //
-    // bits    | 1  |     15     |         16           |                  32                    |
+    // key structure (std::pair<Unsigned32, Body*>)
+    // ----------------- first -------------------------| ------------ second --------------------  
+    // bits    | 1  |     15     |         16           |                  32 or 64              |
     // purpose | tr |     zd     |         mid          |                 bodyPtr                |
     //
     // tr      = transparency bit
@@ -96,49 +93,27 @@ namespace y60 {
     // bodyPtr = the body pointer
 
     inline
-    BodyPart::Key makeBodyPartKey(asl::Unsigned32 theMaterialID,
+    BodyPart::Key makeBodyPartKey(asl::Unsigned16 theMaterialID,
                                        y60::Body * theBody,
                                        asl::Signed16 theTransparencyHint)
     {
-    // bits    | 1  |     15     |         16           |                  32                    |
-    // purpose | tr |     zd     |         mid          |                 bodyPtr                |
-
-#ifdef __LP64__
         return std::make_pair((asl::Unsigned32)theTransparencyHint << 16
                             |(asl::Unsigned32)theMaterialID,
                             theBody);
-#else        
-        return ((asl::Unsigned64)(theTransparencyHint)   << 48
-              | (asl::Unsigned64)((asl::Unsigned16)(theMaterialID)) << 32
-              | (asl::Unsigned64)((asl::Unsigned32)(theBody)));
-#endif        
     }
 
     inline
-    asl::Unsigned32 getMaterialIDFromKey(const BodyPart::Key & theKey) {
-#ifdef __LP64__
-        return (asl::Unsigned32)(theKey.first) & 0x0000ffff;
-#else        
-        return (asl::Unsigned32)(theKey >> 32) & 0x0000ffff;
-#endif        
+    asl::Unsigned16 getMaterialIDFromKey(const BodyPart::Key & theKey) {
+        return (asl::Unsigned16)(theKey.first & 0x0000ffff);
     }
     inline
     bool getTransparencyBitFromKey(const BodyPart::Key & theKey) {
-#ifdef __LP64__
         return (theKey.first >> 31);
-#else        
-        return (theKey >> 63);
-#endif        
-
     }
     
     inline
     y60::Body * getBodyPtrFromKey(const BodyPart::Key & theKey) {
-#ifdef __LP64__        
         return theKey.second;
-#else        
-        return (y60::Body *)(asl::Unsigned32)(theKey & 0xffffffff);
-#endif        
     }
 
     // Body Parts sorted by material key
