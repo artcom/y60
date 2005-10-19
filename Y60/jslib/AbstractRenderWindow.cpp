@@ -114,7 +114,6 @@ namespace jslib {
             y60::ScopedGLContext myGLContext(this);
             initDisplay();
 
-            asl::Time myLoadStart;
             _myRenderer = RendererPtr(new Renderer(_myRenderingCaps));
             _myRenderer->getTextManager().setTTFRenderer(createTTFRenderer());
 
@@ -157,7 +156,7 @@ namespace jslib {
 
             _myRenderer = RendererPtr(new Renderer(_myRenderingCaps));
             _myRenderer->getTextManager().setTTFRenderer(createTTFRenderer());
-            _myRenderer->setCurrentScene(_myScene);
+            _myRenderer->setCurrentScene(getCurrentScene());
 
             setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
         }
@@ -236,11 +235,12 @@ namespace jslib {
 
     void
     AbstractRenderWindow::setPause(bool aPause) {
+        asl::NanoTime myTime = asl::NanoTime();
         static double _myPauseStart;
         if (aPause) {
-            _myPauseStart = asl::Time();
+            _myPauseStart = myTime.seconds();
         } else {
-            _myPauseTime += (asl::Time() - _myPauseStart);
+            _myPauseTime += (myTime.seconds() - _myPauseStart);
         }
         _myPauseFlag = aPause;
     }
@@ -305,14 +305,15 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onFrame() {
-        static double _myStartTime = asl::Time();
+        asl::NanoTime myTime = asl::NanoTime();
+        static double _myStartTime = myTime.seconds();
 
         MAKE_SCOPE_TIMER(onFrame);
         asl::StdOutputRedirector::get().checkForFileWrapAround();
         
         if (!_myPauseFlag) {
             if (_myFixedDeltaT == 0.0) {
-                _myElapsedTime = asl::Time() - _myStartTime - _myPauseTime;
+                _myElapsedTime = myTime.seconds() - _myStartTime - _myPauseTime;
             } 
 
             // Check for timeouts

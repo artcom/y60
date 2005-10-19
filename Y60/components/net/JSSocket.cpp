@@ -24,6 +24,7 @@
 #include <asl/TCPClientSocket.h>
 #include <asl/os_functions.h>
 #include <asl/net_functions.h>
+#include <y60/JSBlock.h>
 
 #include <iostream>
 
@@ -93,27 +94,37 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        string myString;
-        if (JSVAL_IS_STRING(argv[0])) {
-            if (!convertFrom(cx, argv[0], myString)) {
-                JS_ReportError(cx, "JSSocket::write(): Argument #1 must be an string or an array of unsigned char (Bytes to write)");
-                return JS_FALSE;
-            }
+        unsigned myBytesWritten = 0;
+        if (JSBlock::matchesClassOf(cx, argv[0])) {
+            asl::Block myBlock;
+            convertFrom(cx, argv[0], myBlock);
+            myBytesWritten = JSSocket::getJSWrapper(cx,obj).openNative().send(myBlock.begin(), myBlock.size());
+            JSSocket::getJSWrapper(cx,obj).closeNative();                       
         } else {
-            if (JSA_charArrayToString(cx, argv, myString) == JS_FALSE) {
-                return JS_FALSE;
+            string myString;
+            if (JSVAL_IS_STRING(argv[0])) {
+                if (!convertFrom(cx, argv[0], myString)) {
+                    JS_ReportError(cx, "JSSocket::write(): Argument #1 must be an string or block or an array of unsigned char (Bytes to write)");
+                    return JS_FALSE;
+                }
+            } else {
+                if (JSA_charArrayToString(cx, argv, myString) == JS_FALSE) {
+                    return JS_FALSE;
+                }
+
+                if (myString.empty()) {
+                    JS_ReportError(cx, "JSSocket::write(): Argument #1 must be an string or "
+                        "an array of unsigned char or block (Bytes to write)");
+                    return JS_FALSE;
+                }
             }
 
-            if (myString.empty()) {
-                JS_ReportError(cx, "JSSocket::write(): Argument #1 must be an string or "
-                    "an array of unsigned char (Bytes to write)");
-                return JS_FALSE;
-            }
+            myBytesWritten = JSSocket::getJSWrapper(cx,obj).openNative().send(myString.c_str(), myString.size());
+            JSSocket::getJSWrapper(cx,obj).closeNative();           
         }
 
-        unsigned myBytesWritten = JSSocket::getJSWrapper(cx,obj).openNative().send(myString.c_str(), myString.size());
-        JSSocket::getJSWrapper(cx,obj).closeNative();
         *rval = as_jsval(cx, myBytesWritten);
+        
         return JS_TRUE;
     } catch(inet::SocketException &) {
         // TODO, must be reworked once we can throw exception into javascript

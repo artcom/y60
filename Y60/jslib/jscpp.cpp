@@ -46,6 +46,7 @@
 #include "JSFrustum.h"
 #include "JSGLResourceManager.h"
 #include "JSOffScreenRenderArea.h"
+#include "JSBlock.h"
 
 #include "jscpp.h"
 
@@ -197,6 +198,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSOffScreenRenderArea::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSBlock::initClass(cx, theGlobalObject)) {
         return false;
     }
 
