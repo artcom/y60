@@ -297,6 +297,8 @@ class AudioBuffer: public AudioBufferBase {
             // TODO: This only tests the first channel.
             const float MaxDiff = 0.1f;
             if (fabs(sampleToFloat(*begin())-theFirstSample)>MaxDiff) {
+                AC_TRACE << "Click at buffer start: " << sampleToFloat(*begin()) << " -- "
+                    << theFirstSample;
                 return true;
             }
             for (const SAMPLE * mySample = begin()+_numChannels; mySample != end(); 
@@ -305,6 +307,8 @@ class AudioBuffer: public AudioBufferBase {
                 if (fabs(sampleToFloat(*mySample)-sampleToFloat(*(mySample-_numChannels))) 
                         > MaxDiff) 
                 {
+                    AC_TRACE << "Click at buffer start: " <<  sampleToFloat(*mySample) << " -- " << 
+                            sampleToFloat(*(mySample-_numChannels));
                     return true;
                 }
             }

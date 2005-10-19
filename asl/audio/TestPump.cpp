@@ -36,10 +36,11 @@ void TestPump::runWithPump(bool useDummyPump) {
         Pump::get().setBritzelTest(true);
         
         testBufferAlloc();
-/*
+
         // Test different buffer sizes.
 //        playSingleSound(32768);
-        playSingleSound(8);            
+        playSingleSound(8); 
+        
         playSingleSound(19);   
         playSingleSound(256);  
         playSingleSound(1024); 
@@ -54,9 +55,10 @@ void TestPump::runWithPump(bool useDummyPump) {
         testSimultaneousPlay();
         testConversions();
         testRunUntilEmpty();
-*/
-        stressTest(20);
+        testDelayed();
 
+        stressTest(5);
+        
         ENSURE(Pump::get().getNumClicks() == 0);
 
 //        testUnderrun();
@@ -216,6 +218,50 @@ void TestPump::testRunUntilEmpty() {
     ENSURE(mySink->getState() == HWSampleSink::RUNNING);
     msleep(500);
     ENSURE(mySink->getState() == HWSampleSink::STOPPED);
+}
+
+void TestPump::testDelayed() {
+    Pump & myPump = Pump::get();
+    Time curTime; 
+
+    HWSampleSinkPtr mySink = 
+        createSampleSink("TestDelayedSink", 44100, 2);
+    queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.4, 1);
+    mySink->delayedPlay(0.4);
+    ENSURE(mySink->getState() == HWSampleSink::RUNNING);
+    msleep(600);
+    curTime = mySink->getCurrentTime();
+    ENSURE(double(curTime) > 0.4 && double(curTime) < 0.8);
+    ENSURE(mySink->getState() == HWSampleSink::RUNNING);
+    mySink->stop(true);
+    msleep(400);
+    ENSURE(mySink->getState() == HWSampleSink::STOPPED);
+
+    queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.4, 1);
+    mySink->delayedPlay(0.4);
+    msleep(200);
+    mySink->stop();
+    msleep(200);
+    curTime = mySink->getCurrentTime();
+    ENSURE(double(curTime) == 0.0);
+    mySink->play();
+    mySink->stop(true);
+    msleep(600);
+    ENSURE(mySink->getState() == HWSampleSink::STOPPED);
+    
+    queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.4, 1);
+    mySink->delayedPlay(0.4);
+    msleep(200);
+    mySink->pause();
+    msleep(200);
+    mySink->play();
+    curTime = mySink->getCurrentTime();
+    ENSURE(double(curTime) > 0.1 && double(curTime) < 0.4);
+    ENSURE(mySink->getState() == HWSampleSink::RUNNING);
+    msleep(400);
+    ENSURE(mySink->getState() == HWSampleSink::RUNNING);
+    mySink->stop();
+    
 }
 
 void TestPump::testVolume() {

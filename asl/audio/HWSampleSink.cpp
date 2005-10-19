@@ -30,7 +30,8 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
     : AudioTimeSource(0, mySampleRate),
       _myStopWhenEmpty(false),
       _numChannels(numChannels),
-      _myState(STOPPED)
+      _myState(STOPPED),
+      _isDelayingPlay(false)
 {
     AC_DEBUG << "HWSampleSink::HWSampleSink (" << _myName << ")";
     _myName = myName;
@@ -128,6 +129,19 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
     }
 }
 
+void HWSampleSink::delayedPlay(asl::Time theTimeToStart) {
+    AC_DEBUG << "HWSampleSink::delayedPlay (" << _myName << ")";
+    AutoLocker<ThreadLock> myLocker(_myQueueLock);
+    // Theoretically, STOPPING_FADE_OUT could happen too.
+    ASSURE(_myState == STOPPED); 
+    _myTimeToStart = theTimeToStart;
+    _myLockedSelf = _mySelf.lock();
+    _myVolumeFader->setVolume(_myVolume);
+    _isDelayingPlay = true;
+    changeState(RUNNING);
+    AudioTimeSource::run();
+}
+
 void HWSampleSink::setVolume(float theVolume) {
     ASSURE(theVolume <= 1.0);
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
@@ -152,11 +166,7 @@ bool HWSampleSink::isPlaying() const {
 }
 
 float HWSampleSink::getVolume() const {
-//    if (_myState == RUNNING) {
-//        return _myVolumeFader->getVolume();
-//    } else {
-        return _myVolume;
-//    }
+    return _myVolume;
 }
 
 bool HWSampleSink::queueSamples(AudioBufferPtr& theBuffer) {
@@ -233,16 +243,11 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
     unsigned curOutputFrame = 0;
     AudioBufferBase* mySourceBuffer = getNextBuffer();
     unsigned myFramesInBuffer = mySourceBuffer->getNumFrames()-_myPosInInputBuffer;
-//    AC_TRACE << "  _myPosInInputBuffer: " << _myPosInInputBuffer;
     unsigned numFramesToCopy = min(theBuffer.getNumFrames(), myFramesInBuffer);
-//    AC_TRACE << "copyFrames - 1 (0, " << _myPosInInputBuffer << ", " << numFramesToCopy << ")";
-//    AC_TRACE << "mySourceBuffer: " << *mySourceBuffer;
-//    AC_TRACE << "theBuffer: " << theBuffer;
     theBuffer.copyFrames(0, *mySourceBuffer, _myPosInInputBuffer, numFramesToCopy);
     curOutputFrame += numFramesToCopy;
     if (curOutputFrame == theBuffer.getNumFrames()) {
         _myPosInInputBuffer += numFramesToCopy;
-//        AC_TRACE << "_myPosInInputBuffer 1: " << _myPosInInputBuffer << endl;
     } else {
         _myPosInInputBuffer = 0;
         while (curOutputFrame < theBuffer.getNumFrames()) {
@@ -252,8 +257,6 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
             mySourceBuffer = getNextBuffer();
             myFramesInBuffer = mySourceBuffer->getNumFrames();
             numFramesToCopy = min(theBuffer.getNumFrames()-curOutputFrame, myFramesInBuffer);
-//            AC_TRACE << "copyFrames - 2 (" << curOutputFrame << ", 0, " << numFramesToCopy << ")";
-//            AC_TRACE << "mySourceBuffer: " << *mySourceBuffer;
             theBuffer.copyFrames(curOutputFrame, *mySourceBuffer, 0, numFramesToCopy);
             curOutputFrame += numFramesToCopy;
         }
@@ -261,18 +264,15 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
             AC_ERROR << "Internal error in HWSampleSink::deliverData()";
         }
         _myPosInInputBuffer = numFramesToCopy;
-//        AC_TRACE << "_myPosInInputBuffer 2: " << _myPosInInputBuffer << endl;
     }
     if (_isUsingBackupBuffer) {
         _myPosInInputBuffer = 0;
-//        AC_TRACE << "_myPosInInputBuffer 3: " << _myPosInInputBuffer << endl;
     }
     if (_myPosInInputBuffer == mySourceBuffer->getNumFrames()) {
         _myPosInInputBuffer = 0;
         if (!_isUsingBackupBuffer) {
             _myBufferQueue.pop_front();
         }
-//        AC_TRACE << "_myPosInInputBuffer 4: " << _myPosInInputBuffer << endl;
     }
 
     {
@@ -306,6 +306,7 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
 #ifdef USE_DASHBOARD
         MAKE_SCOPE_TIMER(Stop_Sink);
 #endif
+        _isDelayingPlay = false;
         changeState(STOPPED);
         AC_TRACE << "_myBufferQueue.clear();";
         _myBufferQueue.clear();
@@ -317,6 +318,10 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
         changeState(PAUSED);
         _myLockedSelf = HWSampleSinkPtr(0);
         AudioTimeSource::pause();
+    }
+    if (_isDelayingPlay && _myTimeToStart <= getCurrentTime()) {
+        // Delay is finished, audio data available.
+        _isDelayingPlay = false;
     }
     AC_TRACE << "HWSampleSink::~deliverData";
 }
@@ -351,7 +356,7 @@ void HWSampleSink::unlock() {
         
 void HWSampleSink::changeState(State newState) {
     AC_DEBUG << "HWSampleSink ( " << _myName <<"): " << stateToString(_myState) << " -> "
-        << stateToString(newState);
+        << stateToString(newState) << ", " << _isDelayingPlay;
     _myState = newState;
 }
 
@@ -359,8 +364,8 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
     ASSURE_MSG(getState() != STOPPED,
             "HWSampleSink::getNextBuffer() should not be called when the sink isn't active.");
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    if (_myBufferQueue.empty()) {
-        if (_myState != PLAYBACK_DONE) {
+    if (_myBufferQueue.empty() || _isDelayingPlay) {
+        if (_myState != PLAYBACK_DONE && !_isDelayingPlay) {
             if (_myStopWhenEmpty || _myState == STOPPING_FADE_OUT || 
                     _myState == PAUSING_FADE_OUT) 
             {

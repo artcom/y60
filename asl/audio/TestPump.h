@@ -46,6 +46,7 @@ class TestPump: public UnitTest{
         void testVolume();
         void testPumpTimer();
         void testSinkTimer();
+        void testDelayed();
         asl::HWSampleSinkPtr createSampleSink (const std::string & theName, 
                 unsigned theSampleRate, unsigned NumChannels);
         
@@ -54,14 +55,18 @@ class TestPump: public UnitTest{
                 unsigned mySampleRate, double myDuration, double myVolume=1.0);
 
         template<class SAMPLE>
-        void queueSineBuffers(asl::HWSampleSinkPtr& mySampleSink, asl::SampleFormat mySF,                 
+        void queueSineBuffers(asl::HWSampleSinkPtr& mySampleSink, asl::SampleFormat mySF,
                 unsigned numFramesPerBuffer, unsigned numChannels, unsigned myFrequency,
                 unsigned mySampleRate, double myDuration, double myVolume=1.0)
         {
             unsigned numFrames = unsigned(myDuration*mySampleRate);
+
+            // The next two lines make sure the sound ends at a zero crossing.
+            // This avoids a click when played to the end.
+            float numFramesPerSine = float(mySampleRate)/myFrequency;
+            numFrames = unsigned(numFramesPerSine*round(numFrames/numFramesPerSine))+1;
             SAMPLE * mySamples = new SAMPLE[numFramesPerBuffer*numChannels];
             SAMPLE * curSample = mySamples;
-//                dynamic_cast<asl::AudioBuffer<SAMPLE>*>(&(*myBuffer))->begin();
             for (unsigned i=0; i<numFrames; ++i) {
                 for (unsigned curChannel=0; curChannel<numChannels; ++curChannel) {
                     *curSample = asl::AudioBuffer<SAMPLE>::floatToSample

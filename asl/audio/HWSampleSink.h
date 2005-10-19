@@ -49,18 +49,20 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
                     STOPPING_FADE_OUT,  // Client has sent stop cmd, fadeout in progress.
                     PAUSING_FADE_OUT,   // Client has sent pause cmd, fadeout in progress.
                     PAUSED,             // Sound is paused.
-                    PLAYBACK_DONE       // All buffers have been played, _myStopWhenEmpty
+                    PLAYBACK_DONE,      // All buffers have been played, _myStopWhenEmpty
                                         // is set.
+                    DELAYING_PLAY       // delayedPlay has been called, i.e. time is running
+                                        // but playback hasn't started yet.
         };
 
         // Possible state transitions:
         // Source State       Command    
-        //                    play()    stop()              pause()
-        // STOPPED            RUNNING   ignored             ignored
-        // RUNNING            ignored   STOPPING_FADE_OUT   PAUSING_FADE_OUT
-        // STOPPING_FADE_OUT  RUNNING   ignored             ignored
-        // PAUSING_FADE_OUT   RUNNING   STOPPING_FADE_OUT   ignored
-        // PAUSED             RUNNING   STOPPED             ignored
+        //                    play()    stop()              pause()          delayedPlay()
+        // STOPPED            RUNNING   ignored             ignored          RUNNING
+        // RUNNING            ignored   STOPPING_FADE_OUT   PAUSING_FADE_OUT illegal
+        // STOPPING_FADE_OUT  RUNNING   ignored             ignored          not implemented   
+        // PAUSING_FADE_OUT   RUNNING   STOPPING_FADE_OUT   ignored          illegal
+        // PAUSED             RUNNING   STOPPED             ignored          illegal
 
         HWSampleSink(const std::string & myName, SampleFormat mySampleFormat, 
                 unsigned mySampleRate, unsigned numChannels);
@@ -69,6 +71,7 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
         virtual void play();
         virtual void pause();
         virtual void stop(bool theRunUntilEmpty = false);
+        virtual void delayedPlay(asl::Time theTimeToStart);
         virtual void setVolume(float theVolume);
         virtual void fadeToVolume(float theVolume, float theTime);
         virtual float getVolume() const;
@@ -125,6 +128,9 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
         VolumeFaderPtr _myVolumeFader;
         float _myVolume;
         bool _myStopWhenEmpty;
+
+        bool _isDelayingPlay;
+        asl::Time _myTimeToStart;  // Used for delayedPlay().
 };
 
 }
