@@ -353,6 +353,26 @@ namespace asl {
         return true;
     }
 
+    template <class Number>
+    bool intersection(const Plane<Number> & p1,
+                      const Plane<Number> & p2,
+                      Line<Number> & theResult) 
+    {
+        Vector3<Number> myDirection = cross(p1.normal, p2.normal);
+        if (almostEqual(dot(myDirection, myDirection), 0)) {
+            return false;
+        }
+        theResult.direction = myDirection;
+        Plane<Number> p3(myDirection, 0);
+        return intersection(p1, p2, p3, theResult.origin);
+        //for (int i = 0; i < 3; ++i) {
+        //    if (!almostEqual(myDirection[i], 0)) {
+        //        return true;
+        //    }        
+        //}
+        //return false;
+    }
+
     // return index of largest element
     template<class Number>
     unsigned maxindex(const Point3<Number> & v) {

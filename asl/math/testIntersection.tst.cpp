@@ -123,8 +123,25 @@ class IntersectionTest : public UnitTest {
             bool intersectFlag = intersection(mySegment1,mySegment2,myIntersectionPoint,t,s); 
             ENSURE(intersectFlag == false);
             }
-            
-            
+            // Plane / Plane intersection
+            {
+                typedef Line<float> Linef;
+                Planef myPlane1(Vector3f(1,0,0), 0.0f);
+                Planef myPlane2(Vector3f(0,1,0), 100.0f);
+                Planef myCoplanarPlane1(Vector3f(1,0,0), 100.0f);
+                Planef myCoplanarPlane2(Vector3f(0,-1,0), 100.0f);
+                Linef myResult;
+                ENSURE(intersection(myPlane1, myPlane2, myResult));
+                ENSURE(almostEqual(myResult.direction[0], 0));
+                ENSURE(almostEqual(myResult.direction[1], 0));
+                ENSURE(almostEqual(abs(myResult.direction[2]), 1));
+                ENSURE(almostEqual(distance(myPlane1, myResult.origin), 0));
+                ENSURE(almostEqual(distance(myPlane2, myResult.origin), 0));
+                ENSURE(!intersection(myPlane1, myPlane1, myResult));
+                ENSURE(!intersection(myPlane1, myCoplanarPlane1, myResult));
+                ENSURE(!intersection(myPlane2, myPlane2, myResult));
+                ENSURE(!intersection(myPlane2, myCoplanarPlane2, myResult));
+            }
         }
 };
 

@@ -18,6 +18,8 @@
 
 #include "JSVector.h"
 #include "JSPlane.h"
+#include "JSLine.h"
+#include <asl/intersection.h>
 #include <iostream>
 
 using namespace std;
@@ -29,7 +31,7 @@ typedef asl::Plane<Number> NATIVE;
 
 static JSBool
 normalize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Normailzes the plane.");
+    DOC_BEGIN("Normalizes the plane.");
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::normalize,cx,obj,argc,argv,rval);
 }
@@ -44,6 +46,25 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+intersect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Computes the line of intersection between this plane and the plane given. "
+        "Returns null if no single line of intersection can be found.");
+    DOC_END;
+    NATIVE myNative;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+    NATIVE myPlane;
+    convertFrom(cx, argv[0], myPlane);
+    asl::Line<Number> myResult;
+    bool hasIntersection = asl::intersection(myNative, myPlane, myResult);
+    if (hasIntersection) {
+        *rval = as_jsval(cx, myResult);
+    } else {
+        *rval = JSVAL_NULL;
+    }
+    return JS_TRUE;
+}
+
 JSFunctionSpec *
 JSPlane::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -51,6 +72,7 @@ JSPlane::Functions() {
         /* name                native          nargs    */
         {"normalize",          normalize,               0},
         {"toString",           toString,                0},
+        {"intersect",          intersect,               1},
         {0}
     };
     return myFunctions;
