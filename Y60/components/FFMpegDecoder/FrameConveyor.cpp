@@ -192,10 +192,10 @@ namespace y60 {
         double myTimePerFrame = 1.0 / _myContext->getFrameRate();
         theTargetStart -= myTimePerFrame;
         theTargetEnd   += myTimePerFrame;
-        FrameCache::iterator myIt = _myFrameCache.begin();
+        FrameCacheIterator myIt = _myFrameCache.begin();
         while (myIt != _myFrameCache.end() && myIt->first < theTargetStart) {
             DB2(cerr << " erasing at " << myIt->first << endl;);
-            myIt = _myFrameCache.erase(myIt);
+            _myFrameCache.erase(myIt++);
         }
         myIt = _myFrameCache.end();
         while (--myIt != _myFrameCache.begin() && myIt->first > theTargetEnd) {
@@ -348,7 +348,7 @@ namespace y60 {
 
         // convert to RGB
         int myDestFmt;
-        if (_myContext->getPixelFormat() == y60::RGB) {
+        if (_myContext->getPixelFormat() == PIX_FMT_RGB24) {
             myDestFmt = PIX_FMT_RGB24;
         } else {
             myDestFmt = PIX_FMT_BGR24;

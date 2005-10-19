@@ -58,6 +58,7 @@
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
 #include <iostream>
+#include <float.h>
 
 #define DB(x) //x
 
@@ -229,3 +230,4 @@ namespace y60 {
         return myDecodedFrameTime;
     }
 }
+

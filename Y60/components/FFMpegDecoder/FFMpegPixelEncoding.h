@@ -94,10 +94,12 @@ namespace y60 {
                 return "PIX_FMT_XVMC_MPEG2_MC: XVideo Motion Acceleration via common packet passing(xvmc_render.h).";
             case PIX_FMT_XVMC_MPEG2_IDCT:
                 return "PIX_FMT_XVMC_MPEG2_IDCT";
+#if LIBAVCODEC_BUILD > 4754
             case PIX_FMT_UYVY422:
                 return "PIX_FMT_UYVY422: Packed pixel, Cb Y0 Cr Y1.";
             case PIX_FMT_UYVY411:
                 return "PIX_FMT_UYVY411: Packed pixel, Cb Y0 Y1 Cr Y2 Y3.";
+#endif                
             case PIX_FMT_NB:
                 return "PIX_FMT_NB";
             default:
@@ -105,5 +107,6 @@ namespace y60 {
         }
     }
 }
+
 
 #endif

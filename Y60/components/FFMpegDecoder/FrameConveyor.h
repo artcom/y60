@@ -93,6 +93,7 @@ namespace y60 {
             double                      _myCacheSizeInSecs;
 
             typedef std::map<double, asl::Ptr<VideoFrame> > FrameCache;
+            typedef FrameCache::iterator FrameCacheIterator;
             FrameCache _myFrameCache;
     };
 }

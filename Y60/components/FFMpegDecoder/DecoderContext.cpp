@@ -36,6 +36,8 @@
 #pragma warning( default : 4244 ) // Renable ffmpeg warning
 #endif
 
+#include <float.h>
+
 using namespace std;
 using namespace asl;
 

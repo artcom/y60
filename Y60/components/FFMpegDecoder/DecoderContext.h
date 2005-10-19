@@ -20,16 +20,13 @@
 #ifndef _ac_y60_DecoderContext_h_
 #define _ac_y60_DecoderContext_h_
 
+#include "FFMpegPixelEncoding.h"
+
 #include <asl/Ptr.h>
 #include <string>
 
-struct AVFrame;
-struct AVStream;
-struct AVFormatContext;
-enum PixelFormat;
-
 namespace y60 {
-
+    
     class AudioFrame;
     
     class DecoderContext {
@@ -88,3 +85,4 @@ namespace y60 {
 }
 
 #endif
+

@@ -182,11 +182,18 @@ namespace y60 {
         if (theFrame != 0) {
             theFrame--;
         } else {
+#if LIBAVFORMAT_BUILD <= 4616
+            av_seek_frame(_myFormatContext, _myVStreamIndex, 0);
+#else
             av_seek_frame(_myFormatContext, _myVStreamIndex, 0, 0);
+#endif              
             return;
         }
-        int64_t myHalfFrame = int64_t(AV_TIME_BASE) * _myVStream->r_frame_rate_base / _myVStream->r_frame_rate / 2;        
-        int64_t myTimestamp = int64_t(theFrame) * AV_TIME_BASE * _myVStream->r_frame_rate_base / _myVStream->r_frame_rate + _myVStream->start_time;
+        int64_t myHalfFrame = int64_t(AV_TIME_BASE) * _myVStream->r_frame_rate_base / 
+                _myVStream->r_frame_rate / 2;        
+        int64_t myTimestamp = int64_t(theFrame) * AV_TIME_BASE * 
+                _myVStream->r_frame_rate_base / _myVStream->r_frame_rate + 
+                _myVStream->start_time;
 
         if (myTimestamp > myHalfFrame) {
             myTimestamp -= myHalfFrame;
@@ -195,11 +202,11 @@ namespace y60 {
         }
         
         // newer releases of ffmpeg may require a 4th argument to av_seek_frame
-        #if LIBAVFORMAT_BUILD <= 4616
-            int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, theFrame);
-        #else
-            int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, theFrame, 0);
-        #endif
+#if LIBAVFORMAT_BUILD <= 4616
+        int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, theFrame);
+#else
+        int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, theFrame, 0);
+#endif
 
         if (myResult < 0) {
             cerr << "### ERROR: seek error!!!" << endl;
