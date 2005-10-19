@@ -240,6 +240,8 @@ JSWidget::Properties() {
         DEFINE_RO_PROPERTY(signal_key_release_event),
         DEFINE_RO_PROPERTY(signal_enter_notify_event),
         DEFINE_RO_PROPERTY(signal_leave_notify_event),
+        DEFINE_RO_PROPERTY(signal_focus_in_event),
+        DEFINE_RO_PROPERTY(signal_focus_out_event),
         DEFINE_RO_PROPERTY(signal_delete_event),
         DEFINE_PROPERTY(flags),
         {0}
@@ -363,6 +365,20 @@ JSWidget::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             {
                 JSSignalProxy1<bool, GdkEventCrossing*>::OWNERPTR mySignal( new
                         JSSignalProxy1<bool, GdkEventCrossing*>::NATIVE(theNative.signal_leave_notify_event()));
+                *vp = jslib::as_jsval(cx, mySignal);
+                return JS_TRUE;
+            }
+        case PROP_signal_focus_in_event:
+            {
+                JSSignalProxy1<bool, GdkEventFocus*>::OWNERPTR mySignal( new
+                        JSSignalProxy1<bool, GdkEventFocus*>::NATIVE(theNative.signal_focus_in_event()));
+                *vp = jslib::as_jsval(cx, mySignal);
+                return JS_TRUE;
+            }
+        case PROP_signal_focus_out_event:
+            {
+                JSSignalProxy1<bool, GdkEventFocus*>::OWNERPTR mySignal( new
+                        JSSignalProxy1<bool, GdkEventFocus*>::NATIVE(theNative.signal_focus_out_event()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }

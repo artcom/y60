@@ -58,6 +58,28 @@ Run(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+Set_response_sensitive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        // native method call
+        Gtk::Dialog * myNative=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        int myResponseId;
+        convertFrom(cx, argv[0], myResponseId);
+        bool isSensitive;
+        convertFrom(cx, argv[1], isSensitive);
+
+        myNative->set_response_sensitive(myResponseId, isSensitive);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+    return JS_FALSE;
+}
+
+static JSBool
 Add_button(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -100,6 +122,7 @@ JSDialog::Functions() {
         {"toString",             toString,                0},
         {"run",                  Run,                     0},
         {"add_button",           Add_button,              2},
+        {"set_response_sensitive",Set_response_sensitive, 2},
         {0}
     };
     return myFunctions;

@@ -80,6 +80,7 @@
 #include "JSMenu.h"
 #include "JSNotebook.h"
 #include "JSColorSelection.h"
+#include "JSTextView.h"
 
 #include "JSCellRenderer.h"
 #include "JSCellRendererText.h"
@@ -294,6 +295,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSHSeparator::initClass(cx, theGlobalObject)) {
         return false;
     }
+    if (!JSTextView::initClass(cx, theGlobalObject)) {
+        return false;
+    }
     if (!JSColorSelection::initClass(cx, theGlobalObject)) {
         return false;
     }
@@ -309,6 +313,7 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
     INIT_SIGNALPROXY1(bool, GdkEventMotion*);
     INIT_SIGNALPROXY1(bool, GdkEventKey*);
     INIT_SIGNALPROXY1(bool, GdkEventCrossing*);
+    INIT_SIGNALPROXY1(bool, GdkEventFocus*);
     INIT_SIGNALPROXY1(bool, GdkEventAny*);
     INIT_SIGNALPROXY2(void, const Glib::ustring &, const Glib::ustring &);
     INIT_SIGNALPROXY2(void, guint, const Glib::ustring &);
@@ -439,6 +444,7 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::Entry );
     TRY_DYNAMIC_CAST(Gtk::HPaned );
     TRY_DYNAMIC_CAST(Gtk::VPaned );
+    TRY_DYNAMIC_CAST(Gtk::TextView );
     TRY_DYNAMIC_CAST(Gtk::Toolbar );
     TRY_DYNAMIC_CAST(Gtk::Label );
     TRY_DYNAMIC_CAST(Gtk::Image );
@@ -579,6 +585,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
             } else if (castFrom<Gtk::HPaned>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::VPaned>(cx, myArgument, theTarget)) {
+                return true;
+            } else if (castFrom<Gtk::TextView>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::Toolbar>(cx, myArgument, theTarget)) {
                 return true;

@@ -285,4 +285,8 @@ jsval as_jsval(JSContext *cx, GdkEventAny * theNative) {
     return as_jsval(cx, reinterpret_cast<GdkEvent*>(theNative));
 }
 
+jsval as_jsval(JSContext *cx, GdkEventFocus * theNative) {
+    return as_jsval(cx, reinterpret_cast<GdkEvent*>(theNative));
+}
+
 }

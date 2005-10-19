@@ -66,6 +66,7 @@ DEFINE_SIGNALPROXY1_CLASS_TRAIT(bool, GdkEventButton*)
 DEFINE_SIGNALPROXY1_CLASS_TRAIT(bool, GdkEventMotion*)
 DEFINE_SIGNALPROXY1_CLASS_TRAIT(bool, GdkEventKey*)
 DEFINE_SIGNALPROXY1_CLASS_TRAIT(bool, GdkEventCrossing*)
+DEFINE_SIGNALPROXY1_CLASS_TRAIT(bool, GdkEventFocus*)
 DEFINE_SIGNALPROXY1_CLASS_TRAIT(bool, GdkEventAny*)
 
 //=====================================================

@@ -69,6 +69,8 @@ class JSWidget : public JSWrapper<Gtk::Widget, asl::Ptr<Gtk::Widget>, StaticAcce
             PROP_signal_key_release_event,
             PROP_signal_enter_notify_event,
             PROP_signal_leave_notify_event,
+            PROP_signal_focus_in_event,
+            PROP_signal_focus_out_event,
             PROP_signal_delete_event,
             PROP_flags,
             PROP_END,

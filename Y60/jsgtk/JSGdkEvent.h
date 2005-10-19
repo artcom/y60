@@ -78,6 +78,7 @@ jsval as_jsval(JSContext *cx, GdkEvent * theNative);
 jsval as_jsval(JSContext *cx, GdkEventButton * theNative);
 jsval as_jsval(JSContext *cx, GdkEventMotion * theNative);
 jsval as_jsval(JSContext *cx, GdkEventKey * theNative);
+jsval as_jsval(JSContext *cx, GdkEventFocus * theNative);
 
 } // namespace
 
