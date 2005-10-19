@@ -841,12 +841,13 @@ CTScan::reconstructToImageImpl(const Vector3f & theOrientationVector, int theSli
             break;
     }
     // set the image data
-    theImageNode->getFacade<y60::Image>()->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
+    y60::ImagePtr myFacade = theImageNode->dom::Node::getFacade<y60::Image>();
+    myFacade->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
     // set the matrix to make up for the padded image
     asl::Matrix4f myScale;
     myScale.makeIdentity();
     myScale.scale(Vector3f(float(myWidth)/myPoTWidth, float(myHeight)/myPoTHeight, 1.0f)); 
-    theImageNode->getFacade<y60::Image>()->set<y60::ImageMatrixTag>(myScale); 
+    myFacade->y60::Image::set<y60::ImageMatrixTag>(myScale); 
 }
 
 Box3f
