@@ -19,7 +19,7 @@
 
 #include "DecoderContext.h"
 #include "FFMpegDecoder.h"
-#include "AudioFrame.h"
+#include "AudioPacket.h"
 #include "FrameAnalyser.h"
 
 #include <asl/Logger.h>
@@ -137,7 +137,7 @@ namespace y60 {
     }
 
     DecoderContext::FrameType
-    DecoderContext::decode(AVFrame * theVideoFrame, AudioFrame * theAudioFrame) {
+    DecoderContext::decode(AVFrame * theVideoFrame, AudioPacket * theAudioPacket) {
         DecoderContext::FrameType myFrameType = FrameTypeEOF;
         AVPacket myPacket;
         //memset(&myPacket, 0, sizeof(myPacket));
@@ -166,10 +166,10 @@ namespace y60 {
                     myFrameType = FrameTypeVideo;
                     break;
                 }                 
-            } else if (myPacket.stream_index == _myAudioStreamIndex && theAudioFrame) {
-                int myLen = avcodec_decode_audio(&_myAudioStream->codec, (int16_t*)theAudioFrame->getSamples(), (int *)&theAudioFrame->_mySampleSize,
+            } else if (myPacket.stream_index == _myAudioStreamIndex && theAudioPacket) {
+                int myLen = avcodec_decode_audio(&_myAudioStream->codec, (int16_t*)theAudioPacket->getSamples(), (int *)&theAudioPacket->_mySampleSize,
                     myPacket.data, myPacket.size);
-                theAudioFrame->_myTimestamp = (myPacket.dts - myStartTime) / (double)AV_TIME_BASE;
+                theAudioPacket->_myTimestamp = (myPacket.dts - myStartTime) / (double)AV_TIME_BASE;
 
                 if (myLen < 0) {
                     AC_ERROR << "avcodec_decode_audio error";
@@ -279,5 +279,13 @@ namespace y60 {
         }
 
         return myFPS;
+    }
+
+    unsigned DecoderContext::getNumAudioChannels() const {
+        if (_myAudioStream) {
+            return _myAudioStream->codec.channels;
+        } else {
+            return 0;
+        }
     }
 }

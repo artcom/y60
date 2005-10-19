@@ -34,7 +34,7 @@ function FFMpegTest(theArguments) {
         //"c:/TEST_MOVIES/MPEG/bmw_aichi_windkanal_1280.mpg",
         //"c:/TEST_MOVIES/MPEG/bmw_aichi_windkanal_pal.m2v",
         //"c:/TEST_MOVIES/MPEG/counter_768.mpg",
-        "c:/TEST_MOVIES/MPEG/counter.mpg",
+        //"c:/TEST_MOVIES/MPEG/counter.mpg",
         //"c:/TEST_MOVIES/MPEG/mpeg2_1024_768_15000bps.m2v",
         //"c:/TEST_MOVIES/MPEG/mpeg2_1280_960_20000.m2v",
         //"c:/TEST_MOVIES/MPEG/aichi.m2v",
@@ -42,6 +42,7 @@ function FFMpegTest(theArguments) {
         //"c:/TEST_MOVIES/MPEG/10.mpg",
         //"c:/TEST_MOVIES/MPEG/ADTEC.MPG",
         //"c:/Dev/pro60/testmodels/movies/testmovie.m2v"
+        "/tmp/counter.mpg"
     ];
 
     var _myMovies       = [];
@@ -202,7 +203,7 @@ function FFMpegTest(theArguments) {
             myMovie.playspeed = 1;
             myMovie.playmode  = thePlayMode;
             myMovie.loopcount = 0;
-            myMovie.avdelay   = -0.1;
+            myMovie.avdelay   = 0;
             //myMovie.startime  = theStartTime;
 
             if (myMovie.width > 480) {
@@ -217,7 +218,7 @@ function FFMpegTest(theArguments) {
     }
 
     function setupMovies() {
-        var myOverlay = new ImageOverlay(ourShow.getOverlayManager(), "testfiles/reference.png", [300, _myPos]);
+//        var myOverlay = new ImageOverlay(ourShow.getOverlayManager(), "testfiles/reference.png", [300, _myPos]);
         _myPos += 40;
         addTest("Simple Tests", 0,  1, "play");
     }

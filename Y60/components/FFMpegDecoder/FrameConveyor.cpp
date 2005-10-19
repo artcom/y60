@@ -22,11 +22,10 @@
 #include "FFMpegPixelEncoding.h"
 #include "DecoderContext.h"
 
-#include <audio/AudioController.h>
-#include <audio/BufferedSource.h>
 #include <asl/Logger.h>
 #include <asl/Block.h>
 #include <asl/console_functions.h>
+#include <asl/Pump.h>
 #include <math.h>
 
 #define DB(x) // x
@@ -43,7 +42,7 @@ namespace y60 {
 
     FrameConveyor::FrameConveyor() :
         _myVideoFrame(0),        
-        _myAudioFrame(AVCODEC_MAX_AUDIO_FRAME_SIZE),
+        _myAudioPacket(AVCODEC_MAX_AUDIO_FRAME_SIZE),
         _myCacheSizeInSecs(PRELOAD_CACHE_TIME)
     {
         _myVideoFrame = avcodec_alloc_frame();
@@ -57,10 +56,10 @@ namespace y60 {
     }
     
     void 
-    FrameConveyor::load(DecoderContextPtr theContext, AudioBase::BufferedSource * theAudioBufferedSource) {
+    FrameConveyor::load(DecoderContextPtr theContext, asl::HWSampleSinkPtr theAudioSink) {
         _myContext = theContext;
-        _myAudioBufferedSource = theAudioBufferedSource;
-        if (theAudioBufferedSource) {
+        _myAudioSink = theAudioSink;
+        if (theAudioSink) {
             setupAudio();
         }        
     }
@@ -69,30 +68,32 @@ namespace y60 {
     FrameConveyor::clear() {
         _myCacheSizeInSecs = PRELOAD_CACHE_TIME;
         _myFrameCache.clear();
-        if (_myAudioBufferedSource) {
-            _myAudioBufferedSource->clear();
-        }        
+        // TODO: Audio::stop()?
     }
 
     void
     FrameConveyor::preload(double theInitialTimestamp) {        
-        if (_myAudioBufferedSource) {
+        if (_myAudioSink) {
             // To re-read audio packets we have to start caching with a clear cache.
             clear();
 
             cerr << "Fill audio/video-cache..." << endl;
             while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE &&
-                  _myAudioBufferedSource->getCacheFillLevelInSecs() < PRELOAD_CACHE_TIME) 
+                  double(_myAudioSink->getBufferedTime()) < PRELOAD_CACHE_TIME) 
             {
                 updateCache(theInitialTimestamp);
                 _myCacheSizeInSecs += (1 / _myContext->getFrameRate());
-                DB(cerr << "  A/V-Buffersize: " << _myAudioBufferedSource->getCacheFillLevel() << "/" << _myFrameCache.size() << endl;)
+                DB(cerr << "  A/V-Buffersize: " << _myAudioSink->getBufferedTime() << "secs "
+                        << "/" << _myFrameCache.size() << endl;)
             }            
 
             if (_myFrameCache.size() > MAX_FRAME_CACHE_SIZE) {
-                cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE << " frames " << endl;
-            } else if (_myAudioBufferedSource->getCacheFillLevelInSecs() >= PRELOAD_CACHE_TIME) {
-                cerr << "   until audio cache size larger than " << PRELOAD_CACHE_TIME << " sec." << endl;
+                cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE <<
+                        " frames " << endl;
+            } else if (double(_myAudioSink->getBufferedTime()) >= PRELOAD_CACHE_TIME)
+            {
+                cerr << "   until audio cache size larger than " << PRELOAD_CACHE_TIME << 
+                        " sec." << endl;
             }
         } else {
             cerr << "Fill video-cache..." << endl;
@@ -150,9 +151,9 @@ namespace y60 {
         DB(printCacheInfo(myTargetStart, myTargetEnd);)
 
         /*            
-            |CCC| = Currently cached frames, that are not needed any more
-            |TTT| = Target frames, that are not cached, yet.
-            |XXX| = Target frames, that are already in the cache.
+            |CCC| = Currently cached frames that are not needed any more
+            |TTT| = Target frames that are not cached yet.
+            |XXX| = Target frames that are already in the cache.
             |   | = Frames that are not in the cache and no target frames
         */
 
@@ -231,7 +232,8 @@ namespace y60 {
                 cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
                 cerr << "  current time: " << myCurrentTime << endl;
                 if (_myContext->getAudioStream()) {
-                    cerr << "  A-Buffersize in secs: " << (_myAudioBufferedSource->getCacheFillLevelInSecs()) <<endl;
+                    cerr << "  A-Buffersize in secs: " << (_myAudioSink->getBufferedTime())
+                            <<endl;
                 }
             )
         }
@@ -276,6 +278,7 @@ namespace y60 {
 
     void
     FrameConveyor::setupAudio() {
+        // TODO: setup sample rate conversion.
         AVStream * myAudioStream = _myContext->getAudioStream();
         if (myAudioStream) {
             AVCodec * myCodec = avcodec_find_decoder(myAudioStream->codec.codec_id);
@@ -294,12 +297,13 @@ namespace y60 {
     FrameConveyor::decodeFrame(double & theCurrentTime, bool & theEndOfFileFlag) {
         theEndOfFileFlag = false;
         if (!_myContext) {
-            throw FrameConveyorException(std::string("No decoding context set, yet."), PLUS_FILE_LINE);
+            throw FrameConveyorException(std::string("No decoding context set, yet."),
+                    PLUS_FILE_LINE);
         }
 
         DecoderContext::FrameType myFrameType;
-        if (_myAudioBufferedSource) {
-            myFrameType = _myContext->decode(_myVideoFrame, &_myAudioFrame);
+        if (_myAudioSink) {
+            myFrameType = _myContext->decode(_myVideoFrame, &_myAudioPacket);
         } else {
             myFrameType = _myContext->decode(_myVideoFrame, 0);
         }
@@ -317,15 +321,32 @@ namespace y60 {
                 break;
             }
             case DecoderContext::FrameTypeAudio:
-                _myAudioBufferedSource->addBuffer(_myAudioFrame.getTimestamp(), _myAudioFrame.getSamples(), 
-                                                _myAudioFrame.getSampleSize());
-                theCurrentTime = _myAudioFrame.getTimestamp();
+            {
+                AudioBufferPtr myBuffer;
+/*
+                if (_myResampleContext) {
+                    numFrames = audio_resample(_myResampleContext, 
+                            (int16_t*)(_myResampledSamples.begin()),
+                            (int16_t*)(_mySamples.begin()), 
+                            numFrames);
+                    myBuffer = Pump::get().createBuffer(numFrames);
+                    myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
+                } else {
+*/                
+                myBuffer = Pump::get().createBuffer(_myAudioPacket.getSampleSize() / 
+                        (2 * _myContext->getNumAudioChannels()));
+                myBuffer->convert(_myAudioPacket.getSamples(), SF_S16, 
+                        _myContext->getNumAudioChannels());
+                _myAudioSink->queueSamples(myBuffer);
+                theCurrentTime = _myAudioPacket.getTimestamp();
                 break;
+            }
             case DecoderContext::FrameTypeEOF:
                 theEndOfFileFlag = true;
                 break;
             default:
-                throw FrameConveyorException(std::string("Unknown frame type: ") + as_string(myFrameType), PLUS_FILE_LINE);
+                throw FrameConveyorException(std::string("Unknown frame type: ") 
+                        + as_string(myFrameType), PLUS_FILE_LINE);
         }
     }
 
@@ -336,7 +357,8 @@ namespace y60 {
             return;
         }
 
-        unsigned int myLineSizeBytes = getBytesRequired(_myContext->getWidth(), getPixelEncoding(_myContext->getVideoStream()));
+        unsigned int myLineSizeBytes = getBytesRequired(_myContext->getWidth(), 
+                getPixelEncoding(_myContext->getVideoStream()));
         AVPicture myDestPict;
         myDestPict.data[0] = theTargetBuffer;
         myDestPict.data[1] = theTargetBuffer + 1;

@@ -20,15 +20,13 @@
 #ifndef _ac_y60_FrameConveyor_h_
 #define _ac_y60_FrameConveyor_h_
 
-#include "AudioFrame.h"
+#include "AudioPacket.h"
+
+#include <asl/HWSampleSink.h>
 
 #include <asl/Ptr.h>
 #include <dom/Value.h>
 #include <map>
-
-namespace AudioBase {
-    class BufferedSource;
-}
 
 struct AVFrame;
 
@@ -45,7 +43,7 @@ namespace y60 {
             ~FrameConveyor();
 
             /// Sets up video and audio for decoding
-            void load(asl::Ptr<DecoderContext> theContext, AudioBase::BufferedSource * theAudioBufferedSource); 
+            void load(asl::Ptr<DecoderContext> theContext, asl::HWSampleSinkPtr theAudioSink); 
 
             /// Copies the frame with theTimestamp from the cache into theTargetRaster
             double getFrame(double theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
@@ -68,7 +66,8 @@ namespace y60 {
             void convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer);
 
             /// Copy raster to raster
-            void copyFrame(unsigned char * theSourceBuffer, dom::ResizeableRasterPtr theTargetRaster);
+            void copyFrame(unsigned char * theSourceBuffer, 
+                    dom::ResizeableRasterPtr theTargetRaster);
 
             /// Fills the cache from start to end time
             void fillCache(double theStartTime, double theEndTime);            
@@ -87,8 +86,8 @@ namespace y60 {
 
             asl::Ptr<DecoderContext>    _myContext;
             AVFrame *                   _myVideoFrame;
-            AudioFrame                  _myAudioFrame;
-            AudioBase::BufferedSource * _myAudioBufferedSource;
+            AudioPacket                 _myAudioPacket;
+            asl::HWSampleSinkPtr        _myAudioSink;
 
             double                      _myCacheSizeInSecs;
 

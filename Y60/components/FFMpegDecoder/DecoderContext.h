@@ -27,7 +27,7 @@
 
 namespace y60 {
     
-    class AudioFrame;
+    class AudioPacket;
     
     class DecoderContext {
         public:
@@ -40,7 +40,7 @@ namespace y60 {
             DecoderContext(const std::string & theFilename);
             ~DecoderContext();
 
-            FrameType decode(AVFrame * theVideoFrame, AudioFrame * theAudioFrame);
+            FrameType decode(AVFrame * theVideoFrame, AudioPacket * theAudioPacket);
             void seekToTime(double theTime);
 
             AVStream * getVideoStream() {
@@ -68,6 +68,8 @@ namespace y60 {
             PixelFormat getPixelFormat();             
             double getFrameRate();
 
+            unsigned getNumAudioChannels() const;
+            
         private:
             long long advance() const;
 

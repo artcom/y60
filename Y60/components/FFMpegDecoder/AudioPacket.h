@@ -8,31 +8,29 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: AudioFrame.h,v $
+//   $RCSfile: AudioPacket.h,v $
 //   $Author: ulrich $
 //   $Revision: 1.4 $
 //   $Date: 2005/04/01 10:12:21 $
 //
-//  ffmpeg movie decoder.
-//
 //=============================================================================
 
-#ifndef _ac_y60_AudioFrame_h_
-#define _ac_y60_AudioFrame_h_
+#ifndef _ac_y60_AudioPacket_h_
+#define _ac_y60_AudioPacket_h_
 
 #include <asl/Ptr.h>
 
 namespace y60 {
 
-    class AudioFrame {
+    class AudioPacket {
         friend class DecoderContext;
 
         public:
-            AudioFrame::AudioFrame(unsigned theFrameSize) : _myTimestamp(0), _mySampleSize(0) {
+            AudioPacket::AudioPacket(unsigned theFrameSize) : _myTimestamp(0), _mySampleSize(0) {
                 _myBuffer = new unsigned char[theFrameSize];
             }
 
-            AudioFrame::~AudioFrame() {
+            AudioPacket::~AudioPacket() {
                 if (_myBuffer) {
                     delete[] _myBuffer;
                     _myBuffer = 0;
@@ -56,7 +54,7 @@ namespace y60 {
             unsigned char * _myBuffer;
             unsigned        _mySampleSize;
     };
-    typedef asl::Ptr<AudioFrame> AudioFramePtr;
+    typedef asl::Ptr<AudioPacket> AudioPacketPtr;
 }
 
 #endif

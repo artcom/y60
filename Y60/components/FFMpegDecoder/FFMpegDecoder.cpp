@@ -53,10 +53,10 @@
 #include "FFMpegPixelEncoding.h"
 #include "DecoderContext.h"
 
-#include <audio/AudioController.h>
-#include <audio/BufferedSource.h>
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
+#include <asl/Pump.h>
+
 #include <iostream>
 #include <float.h>
 
@@ -77,9 +77,7 @@ namespace y60 {
     }
 
     FFMpegDecoder::FFMpegDecoder(asl::DLHandle theDLHandle) :
-        PlugInBase(theDLHandle),
-        _myAudioStartTime(0), 
-        _myPauseStartTime(0)
+        PlugInBase(theDLHandle)
     {}
 
     FFMpegDecoder::~FFMpegDecoder() {
@@ -99,9 +97,9 @@ namespace y60 {
 
     double 
     FFMpegDecoder::getMovieTime(double theSystemTime) {
-        if (_myAudioBufferedSource && _myAudioBufferedSource->isRunning()) {
-            return AudioApp::AudioController::get().getCurrentTime() +
-                getMovie()->get<AVDelayTag>() - _myAudioStartTime;
+        if (_myAudioSink) {
+            return _myAudioSink->getCurrentTime() +
+                getMovie()->get<AVDelayTag>();
         } else {
             return MovieDecoderBase::getMovieTime(theSystemTime);
         }
@@ -112,9 +110,8 @@ namespace y60 {
         MovieDecoderBase::resumeMovie(theStartTime);        
         _myFrameConveyor.preload(theStartTime);
               
-        if (_myAudioBufferedSource) {            
-            _myAudioStartTime += AudioApp::AudioController::get().getCurrentTime() - _myPauseStartTime;
-            _myAudioBufferedSource->setRunning(true);
+        if (_myAudioSink) {            
+            _myAudioSink->play();
         }        
     }
 
@@ -123,30 +120,24 @@ namespace y60 {
         MovieDecoderBase::startMovie(theStartTime);
         _myFrameConveyor.preload(theStartTime);
 
-        if (_myAudioBufferedSource) {
-            _myAudioBufferedSource->setRunning(true);
-            _myAudioStartTime = AudioApp::AudioController::get().getCurrentTime();
+        if (_myAudioSink) {
+            _myAudioSink->play();
         }
     }
 
     void 
     FFMpegDecoder::stopMovie() {
         MovieDecoderBase::stopMovie();        
-        if (_myAudioBufferedSource) {            
-            _myAudioBufferedSource->setRunning(false);
-            _myAudioBufferedSource->clear();
-            _myAudioStartTime = 0;
-            _myPauseStartTime = 0; 
+        if (_myAudioSink) {            
+            _myAudioSink->stop();
         }        
     }
 
     void 
     FFMpegDecoder::pauseMovie() {
         MovieDecoderBase::pauseMovie();
-        if (_myAudioBufferedSource) {
-            _myAudioBufferedSource->setRunning(false);  
-            _myAudioBufferedSource->clear();
-            _myPauseStartTime = AudioApp::AudioController::get().getCurrentTime();
+        if (_myAudioSink) {
+            _myAudioSink->pause(); 
         }        
     }
 
@@ -155,7 +146,7 @@ namespace y60 {
         DecoderContextPtr myContext = DecoderContextPtr(new DecoderContext(theFilename));
         setupMovie(myContext);
         setupAudio(myContext);                    
-        _myFrameConveyor.load(myContext, _myAudioBufferedSource);
+        _myFrameConveyor.load(myContext, _myAudioSink);
     }
 
     void
@@ -168,8 +159,10 @@ namespace y60 {
             myMovie->set<ImageHeightTag>(myVideoStream->codec.height);
 
             // Setup size and image matrix
-            float myXResize = float(myVideoStream->codec.width) / asl::nextPowerOfTwo(myVideoStream->codec.width);
-            float myYResize = float(myVideoStream->codec.height) / asl::nextPowerOfTwo(myVideoStream->codec.height);
+            float myXResize = float(myVideoStream->codec.width) 
+                    / asl::nextPowerOfTwo(myVideoStream->codec.width);
+            float myYResize = float(myVideoStream->codec.height) 
+                    / asl::nextPowerOfTwo(myVideoStream->codec.height);
 
             asl::Matrix4f myMatrix;
             myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
@@ -190,25 +183,26 @@ namespace y60 {
     FFMpegDecoder::setupAudio(DecoderContextPtr theContext) {
         AVStream * myAudioStream = theContext->getAudioStream();
         if (getMovie()->get<AudioTag>() && myAudioStream) {
-            AudioApp::AudioController & myAudioController = AudioApp::AudioController::get();
-            std::string myURL = theContext->getFilename();
-            if (!myAudioController.isRunning()) {
-                myAudioController.init(asl::maximum((unsigned)myAudioStream->codec.sample_rate, (unsigned) 44100));
-            }
+            Pump & myAudioPump = Pump::get();
+            string myURL = theContext->getFilename();
+//            if (!myAudioController.isRunning()) {
+//                myAudioController.init(asl::maximum
+//                      ((unsigned)myAudioStream->codec.sample_rate, (unsigned) 44100));
+//            }
 
-            std::string myId = myAudioController.createReader(myURL, "Mixer", myAudioStream->codec.sample_rate, myAudioStream->codec.channels);
-            _myAudioBufferedSource = dynamic_cast<AudioBase::BufferedSource *>(myAudioController.getFileReaderFromID(myId));
-            _myAudioBufferedSource->setVolume(getMovie()->get<VolumeTag>());
-            _myAudioBufferedSource->setSampleBits(16);
+            _myAudioSink = myAudioPump.createSampleSink(myURL);
+            // TODO: Sample rate conversion
+            _myAudioSink->setVolume(getMovie()->get<VolumeTag>());
             AC_INFO << "Audio: channels=" << myAudioStream->codec.channels << ", samplerate=" 
-                    << myAudioStream->codec.sample_rate << ", samplebits=" << 16;
+                    << myAudioStream->codec.sample_rate;
         } else {
-            _myAudioBufferedSource = 0;
+            _myAudioSink = HWSampleSinkPtr(0);
         }
     }
 
     double
-    FFMpegDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {       
+    FFMpegDecoder::readFrame(double theTime, unsigned theFrame,
+            dom::ResizeableRasterPtr theTargetRaster) {
         //cerr << "readFrame at : " << theTime << " system time " << asl::Time() << endl;
         if (theTime >= _myFrameConveyor.getEndOfFileTimestamp()) {
             setEOF(true);
@@ -216,16 +210,18 @@ namespace y60 {
         }
 
         double myDecodedFrameTime = _myFrameConveyor.getFrame(theTime, theTargetRaster);
-        if (_myAudioBufferedSource) {
+        if (_myAudioSink) {
             float myVolume = getMovie()->get<VolumeTag>();
-            if (!asl::almostEqual(_myAudioBufferedSource->getVolume(), myVolume)) {
-                _myAudioBufferedSource->setVolume(myVolume);
+            if (!asl::almostEqual(_myAudioSink->getVolume(), myVolume)) {
+                _myAudioSink->setVolume(myVolume);
             } 
         }
 
-        // In case we reached the end of file while decoding we can now correctly set the frame rate
+        // In case we reached the end of file while decoding we can now correctly set the 
+        // frame rate
         if (_myFrameConveyor.getEndOfFileTimestamp() != DBL_MAX) {
-            getMovie()->set<FrameCountTag>((unsigned)(_myFrameConveyor.getEndOfFileTimestamp() * getMovie()->get<FrameRateTag>()));
+            getMovie()->set<FrameCountTag>((unsigned)(_myFrameConveyor.getEndOfFileTimestamp() 
+                        * getMovie()->get<FrameRateTag>()));
         }
         return myDecodedFrameTime;
     }

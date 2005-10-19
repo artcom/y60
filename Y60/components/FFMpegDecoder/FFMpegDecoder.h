@@ -23,6 +23,7 @@
 #include "FrameConveyor.h"
 #include <y60/MovieDecoderBase.h>
 #include <asl/PlugInBase.h>
+#include <asl/HWSampleSink.h>
 #include <string>
 
 namespace y60 {
@@ -63,16 +64,14 @@ namespace y60 {
             * @param theTargetRaster image raster to render the frame into
             * @return timestamp of the frame delivered in theTargetRaster
             */
-            double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
+            double readFrame(double theTime, unsigned theFrame, 
+                    dom::ResizeableRasterPtr theTargetRaster);
         private:
             void setupMovie(asl::Ptr<DecoderContext> theContext);
             void setupAudio(asl::Ptr<DecoderContext> theContext);
 
             FrameConveyor               _myFrameConveyor;
-            AudioBase::BufferedSource * _myAudioBufferedSource;
-
-            double _myPauseStartTime;
-            double _myAudioStartTime;
+            asl::HWSampleSinkPtr        _myAudioSink;
     };
 
     typedef asl::Ptr<FFMpegDecoder> FFMpegDecoderPtr;
