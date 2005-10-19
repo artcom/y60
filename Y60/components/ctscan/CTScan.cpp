@@ -820,10 +820,14 @@ CTScan::reconstructToImageImpl(const Vector3f & theOrientationVector, int theSli
                 int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
                 
                 float mySlicePosition = float(theSliceIndex) + myBounds[Box3f::MIN][2];
-                Vector3f myLinePos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition), myScreenToVoxelProjection);
-                Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition), myScreenToVoxelProjection) - myLinePos) / float(myWidth);
-                Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition), myScreenToVoxelProjection) - myLinePos) / float(myHeight);
-                AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", LinePos: " << myLinePos << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
+                Vector3f myLinePos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
+                                             myScreenToVoxelProjection);
+                Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition),
+                                           myScreenToVoxelProjection) - myLinePos) / float(myWidth);
+                Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
+                                           myScreenToVoxelProjection) - myLinePos) / float(myHeight);
+                AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", LinePos: " << myLinePos
+                         << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
 
                 for (int v = 0; v < myHeight; ++v) {
                     Vector3f mySourcePos = myLinePos;
@@ -1382,8 +1386,9 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
                             throw asl::Exception(string("Unknown color in canvas image: ") + as_string(myPixel),
                                                  PLUS_FILE_LINE);
                         }
-                        unsigned char * myTargetPixel = & myTargetPixels[(y - int(myMeasurementBox[Box3f::MIN][1])) * myTargetLineStride + 
-                                        x - int(myMeasurementBox[Box3f::MIN][0])];
+                        unsigned myIndex = (y - int(myMeasurementBox[Box3f::MIN][1])) * myTargetLineStride + 
+                                            x - int(myMeasurementBox[Box3f::MIN][0]);
+                        unsigned char * myTargetPixel = & myTargetPixels[myIndex];
                         * myTargetPixel = myIt->second;
                     }
                 }
@@ -1463,9 +1468,9 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
                             throw asl::Exception(string("Unknown color in canvas image: ") + as_string(myPixel),
                                                  PLUS_FILE_LINE);
                         }
-                        
-                        unsigned char * myTargetPixel = & myTargetPixels[(y - int(myMeasurementBox[Box3f::MIN][1])) * myTargetLineStride +
-                                                        myAffectedX];
+                        unsigned myIndex = (y - int(myMeasurementBox[Box3f::MIN][1])) * myTargetLineStride +
+                                            myAffectedX;
+                        unsigned char * myTargetPixel = & myTargetPixels[myIndex];
                         * myTargetPixel = myIt->second;
                     }
                 }
@@ -1478,8 +1483,9 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
 }
 
 void
-CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, dom::NodePtr theReconstructedImage, unsigned theSliceIndex,
-                                    Orientation theOrientation, dom::NodePtr thePaletteNode) 
+CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas,
+                                dom::NodePtr theReconstructedImage, unsigned theSliceIndex,
+                                Orientation theOrientation, dom::NodePtr thePaletteNode) 
 {
     y60::PixelEncoding myEncoding;
     myEncoding = theReconstructedImage->getFacade<Image>()->getEncoding();
@@ -1487,19 +1493,22 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
         case y60::GRAY:
             {
                 typedef unsigned char VoxelT;
-                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage, theSliceIndex, theOrientation, thePaletteNode);            
+                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage,
+                                                    theSliceIndex, theOrientation, thePaletteNode);            
             }
             break;
         case y60::GRAY16:
             {
                 typedef unsigned short VoxelT;
-                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage, theSliceIndex, theOrientation, thePaletteNode);
+                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage,
+                                                    theSliceIndex, theOrientation, thePaletteNode);
             }
             break;
         case y60::GRAYS16:
             {
                 typedef short VoxelT;
-                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage, theSliceIndex, theOrientation, thePaletteNode);
+                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage,
+                                                    theSliceIndex, theOrientation, thePaletteNode);
             }
             break;
         default:
@@ -1509,7 +1518,9 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
 
 template <class VoxelT>
 unsigned char
-CTScan::getSegmentationAlpha(unsigned theIndex, VoxelT theVoxel, const PaletteTable<VoxelT> & thePalette, unsigned char theAlpha) {
+CTScan::getSegmentationAlpha(unsigned theIndex, VoxelT theVoxel, const PaletteTable<VoxelT> & thePalette,
+                             unsigned char theAlpha)
+{
     if (theIndex == 0) {
         return 0;
     } else if (theVoxel < thePalette[theIndex].thresholds[0] || 
