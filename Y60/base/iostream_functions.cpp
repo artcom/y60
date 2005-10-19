@@ -77,6 +77,9 @@ namespace asl {
         return theStream;
     }
 
+    /**
+     * @error Bugzilla 91
+     */
     std::istream &
     operator >> (std::istream & theStream, std::vector<std::string> & theStringVector) {
             char myChar;
@@ -86,7 +89,6 @@ namespace asl {
                 theStream.setstate(std::ios::failbit);
                 return theStream;
             }
-
 
             std::string myElement;
             do {

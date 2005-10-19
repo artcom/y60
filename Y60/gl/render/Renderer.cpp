@@ -816,6 +816,7 @@ namespace y60 {
         const VectorOfString & myPlaneIds = myFacade->get<ClippingPlanesTag>();
         dom::NodePtr myGeometryNode;
         for (unsigned i = 0; i < myPlaneIds.size(); ++i) {
+            // XXX Workaround for Bug 91 
             if ( ! myPlaneIds[i].empty()) {
                 myGeometryNode = theNode->getElementById( myPlaneIds[i] );
                 if (!myGeometryNode) {
