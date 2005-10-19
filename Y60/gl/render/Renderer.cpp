@@ -816,10 +816,16 @@ namespace y60 {
         const VectorOfString & myPlaneIds = myFacade->get<ClippingPlanesTag>();
         dom::NodePtr myGeometryNode;
         for (unsigned i = 0; i < myPlaneIds.size(); ++i) {
-            AC_TRACE << "found plane: " << myPlaneIds[i];
-            myGeometryNode = theNode->getElementById( myPlaneIds[i] );
-            GeometryPtr myGeometry = myGeometryNode->getFacade<Geometry>();
-            theClippingPlanes.push_back( myGeometry->get<GeometryGlobalPlaneTag>());
+            if ( ! myPlaneIds[i].empty()) {
+                myGeometryNode = theNode->getElementById( myPlaneIds[i] );
+                if (!myGeometryNode) {
+                    throw RendererException(string("Can not find geometry '")+myPlaneIds[i]+
+                        "' for node " + theNode->nodeName() + " with id '" + 
+                        theNode->getAttributeString(ID_ATTRIB)+"'!", PLUS_FILE_LINE);
+                }
+                GeometryPtr myGeometry = myGeometryNode->getFacade<Geometry>();
+                theClippingPlanes.push_back( myGeometry->get<GeometryGlobalPlaneTag>());
+            }
         }
     }
 
