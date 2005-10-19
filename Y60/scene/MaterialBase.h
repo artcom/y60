@@ -176,7 +176,7 @@ namespace y60 {
             std::vector<TexturePtr> _myTextures;
             LightingModel           _myLightingModel;
 
-            unsigned long     _myMaterialVersion;
+            asl::Unsigned64   _myMaterialVersion;
             bool              _myTexGenFlag;
 			TexGenModeList    _myTexGenModes;
 			TexGenParamsList  _myTexGenParams;

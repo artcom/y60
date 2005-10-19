@@ -95,8 +95,8 @@ namespace y60 {
             }
             throw RendererException(myErrorMessage, "CgProgramInfo::CgProgramInfo()");
         }
-        cgCompileProgram(_myCgProgramID);
         processParameters();
+        cgCompileProgram(_myCgProgramID);
     }
 
     CgProgramInfo::CgProgramInfo(const ShaderDescription & myShader,
@@ -191,14 +191,8 @@ namespace y60 {
                             ": CGGL Parameter base " + myParamBase + " unknown.",
                             "CgProgramInfo::processParameters()");
                 }
-                AC_DEBUG << "isReferenced:" << cgIsParameterReferenced(myParam);
-                AC_DEBUG << "CG Error:" << cgGetError();
-                if (myParameterType == CG_ARRAY || cgIsParameterReferenced(myParam) ) {
-                    _myGlParams.push_back(
-                            CgProgramGlParam(myParamName, myParam, myParamType, myParamTransform));
-                } else {
-                    AC_WARNING << "skipping non-referenced CG-GL parameter " << myParamName << endl;
-                }
+                _myGlParams.push_back(
+                        CgProgramGlParam(myParamName, myParam, myParamType, myParamTransform));
             }
             // scan for reserved AC_ prefix
             if (myParamName.compare(0, 3, "AC_") == 0) {
@@ -228,6 +222,7 @@ namespace y60 {
                         CGtype myArrayType = cgGetArrayType(myParam);
                         CGparameter myArray 
                             = cgCreateParameterArray(_myContext, myArrayType, myArraySize);
+                        assertCg(PLUS_FILE_LINE);
 
                         for(int i = 0; i <  myArraySize; ++i) {
 
@@ -740,7 +735,7 @@ namespace y60 {
             GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
             glActiveTextureARB(myTexUnit);
 
-            //AC_DEBUG << "CgProgramInfo::enableTextures paramName=" << _myTextureParams[i]._myParamName << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
+            // AC_DEBUG << "CgProgramInfo::enableTextures paramName=" << _myTextureParams[i]._myParamName << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
             cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
             glEnable(GL_TEXTURE_2D);
             CHECK_OGL_ERROR;

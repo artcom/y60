@@ -787,7 +787,7 @@ namespace y60 {
                                                        myNearPlane,
                                                        myFarPlane,
                                                        &*_myScene);
-                unsigned long long myKey = makeBodyPartKey(myMaterialIndex, & ( * myBody), myBodyKey);
+                BodyPart::Key myKey = makeBodyPartKey(myMaterialIndex, & ( * myBody), myBodyKey);
 
                 if (myMaterial->get<TransparencyTag>()) {
                     COUNT(TransparentPrimitives);
@@ -927,7 +927,7 @@ namespace y60 {
 
             CHECK_OGL_ERROR;
             while (it != myBodyParts.end()) {
-                if ( ! currentMaterialHasAlpha && (it->first >> 63)) {
+                if ( ! currentMaterialHasAlpha && getTransparencyBitFromKey(it->first)) {
                     glEnable(GL_ALPHA_TEST);
                     currentMaterialHasAlpha = true;
                 }
