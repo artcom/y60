@@ -2748,7 +2748,7 @@ Node::hasFacade() const {
 FacadePtr
 Node::getFacade() {
     if (hasFacade()) {
-        AC_DEBUG << "returning facade for node " << nodeName();
+        DB(AC_DEBUG << "returning facade for node " << nodeName());
         return _myFacade;
     } else {
         throw Facade::Exception(string("No facade registered for node type ") + nodeName(), PLUS_FILE_LINE);
