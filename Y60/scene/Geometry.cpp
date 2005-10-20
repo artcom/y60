@@ -64,6 +64,7 @@ namespace y60 {
     void
     Geometry::registerDependenciesForGlobalPlane() {        
         if (getNode()) {
+            GeometryGlobalPlaneTag::Plug::dependsOn<GeometryPlaneTag>(*this);
             GeometryGlobalPlaneTag::Plug::dependsOn<GlobalMatrixTag>(*this);
             GeometryPtr mySelf = dynamic_cast_Ptr<Geometry>(getSelf());
             GeometryGlobalPlaneTag::Plug::getValuePtr()->setCalculatorFunction( mySelf, & Geometry::recalculateGlobalPlane);
