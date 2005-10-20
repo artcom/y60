@@ -887,7 +887,7 @@ PlaneUnitTest.prototype.Constructor = function(obj, theName) {
 		obj.myNormal = new Vector3f(0,0,1);
 
 		obj.myPlane0 = new Planef();
-		obj.myPlane = new Planef(obj.myNormal,0);
+		obj.myPlane = new Planef(0, obj.myNormal);
 		DPRINT('obj.myPlane');
 		ENSURE('almostEqual(obj.myPlane.normal, obj.myNormal)');
 		ENSURE('almostEqual(obj.myPlane.offset, 0)');
@@ -1034,14 +1034,14 @@ IntersectionUnitTest.prototype.Constructor = function(obj, theName) {
     obj.run = function() {
           // test line <-> plane intersection
 		obj.myLine = new Line(new Point3f(0,0,0), new Vector3f(1,0,0));
-        obj.myPlane2 = new Planef(new Vector3d(0,1,0), 1.0);
+        obj.myPlane2 = new Planef(1.0, new Vector3f(0,1,0));
 
         obj.myIntersection = intersection(obj.myLine, obj.myPlane2);
         ENSURE('obj.myIntersection == undefined', "Line parallel to plane should not intersect.");
 
         obj.myLine2 = new Line(new Point3f(0,0,0), new Vector3f(0,1,0) );
         DPRINT('obj.myLine2');
-        obj.myPlane7 = new Planef(new Vector3f(0,1,0), -1.0);
+        obj.myPlane7 = new Planef(-1.0, new Vector3f(0,1,0));
         DPRINT('obj.myPlane7');
         obj.myIntersection = intersection(obj.myLine2, obj.myPlane7);
         ENSURE('obj.myIntersection != undefined', "Line <-> Plane should intersect.");
@@ -1049,7 +1049,7 @@ IntersectionUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('almostEqual(obj.myIntersection, new Point3f(0, 1, 0))');
 
         obj.myLine3 = new Line(new Point3f(1,0,0), new Vector3f(0,1,0) );
-        obj.myPlane8 = new Planef(new Vector3f(0,1,0), 0.0);
+        obj.myPlane8 = new Planef(0.0, new Vector3f(0,1,0));
         obj.myIntersection = intersection(obj.myLine3, obj.myPlane8);
         ENSURE('obj.myIntersection != undefined', "Line <-> Plane should intersect.");
         DPRINT ('obj.myIntersection');
@@ -1072,14 +1072,14 @@ IntersectionUnitTest.prototype.Constructor = function(obj, theName) {
 
         // test ray <-> plane intersection
 		obj.myRay = new Ray(new Point3f(0,0,0), new Vector3f(1,0,0));
-        obj.myPlane2 = new Planef(new Vector3d(0,1,0), 1.0);
+        obj.myPlane2 = new Planef(1.0, new Vector3d(0,1,0));
 
         obj.myIntersection = intersection(obj.myRay, obj.myPlane2);
         ENSURE('obj.myIntersection == undefined', "Ray parallel to plane should not intersect.");
 
         obj.myRay2 = new Ray(new Point3f(0,0,0), new Vector3f(0,1,0) );
         DPRINT('obj.myRay2');
-        obj.myPlane7 = new Planef(new Vector3f(0,1,0), -1.0);
+        obj.myPlane7 = new Planef(-1.0, new Vector3f(0,1,0));
         DPRINT('obj.myPlane7');
         obj.myIntersection = intersection(obj.myRay2, obj.myPlane7);
         ENSURE('obj.myIntersection != undefined', "Ray <-> Plane should intersect.");
@@ -1087,7 +1087,7 @@ IntersectionUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('almostEqual(obj.myIntersection, new Point3f(0, 1, 0))');
 
         obj.myRay3 = new Ray(new Point3f(1,0,0), new Vector3f(0,1,0) );
-        obj.myPlane8 = new Planef(new Vector3f(0,1,0), 0.0);
+        obj.myPlane8 = new Planef(0.0, new Vector3f(0,1,0));
         obj.myIntersection = intersection(obj.myRay3, obj.myPlane8);
         ENSURE('obj.myIntersection != undefined', "Ray <-> Plane should intersect.");
         DPRINT ('obj.myIntersection');
@@ -1098,14 +1098,14 @@ IntersectionUnitTest.prototype.Constructor = function(obj, theName) {
 
         // test LineSegment <-> plane intersection
 		obj.myLineSegment = new LineSegment(new Point3f(0,0,0), new Vector3f(1,0,0));
-        obj.myPlane2 = new Planef(new Vector3d(0,1,0), 1.0);
+        obj.myPlane2 = new Planef(1.0, new Vector3d(0,1,0));
 
         obj.myIntersection = intersection(obj.myLineSegment, obj.myPlane2);
         ENSURE('obj.myIntersection == undefined', "LineSegment parallel to plane should not intersect.");
 
         obj.myLineSegment2 = new LineSegment(new Point3f(0,0,0), new Vector3f(0,1,0) );
         DPRINT('obj.myLineSegment2');
-        obj.myPlane7 = new Planef(new Vector3f(0,1,0), -1.0);
+        obj.myPlane7 = new Planef(-1.0, new Vector3f(0,1,0));
         DPRINT('obj.myPlane7');
         obj.myIntersection = intersection(obj.myLineSegment2, obj.myPlane7);
         ENSURE('obj.myIntersection != undefined', "LineSegment <-> Plane should intersect.");
@@ -1113,7 +1113,7 @@ IntersectionUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('almostEqual(obj.myIntersection, new Point3f(0, 1, 0))');
 
         obj.myLineSegment3 = new LineSegment(new Point3f(1,0,0), new Vector3f(0,1,0) );
-        obj.myPlane8 = new Planef(new Vector3f(0,1,0), 0.0);
+        obj.myPlane8 = new Planef(0.0, new Vector3f(0,1,0));
         obj.myIntersection = intersection(obj.myLineSegment3, obj.myPlane8);
         ENSURE('obj.myIntersection != undefined', "LineSegment <-> Plane should intersect.");
         DPRINT ('obj.myIntersection');
