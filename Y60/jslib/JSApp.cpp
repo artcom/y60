@@ -1231,9 +1231,9 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     }
     int myRetVal;
 #ifdef WIN32
-    cerr << "cmd = '" << myCommand << "' args = '" << myArgs << "'"  << endl;
+    // We usually do not want a shell window to show up.
     myRetVal = (int) ShellExecute(NULL, "open", myCommand.c_str(),
-        ( myArgs.empty() ? NULL : myArgs.c_str()), NULL, SW_SHOWNORMAL);
+        ( myArgs.empty() ? NULL : myArgs.c_str()), NULL, SW_HIDE);
     if (myRetVal > 32) {
         myRetVal = 0;
     }

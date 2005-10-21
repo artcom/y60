@@ -616,3 +616,14 @@ function nextPowerOfTwo(n) {
     }
     return myPowerOfTwo;
 }
+
+
+function parseXML(theFilename) {
+    if (!fileExists(theFilename)) {
+        print("### ERROR: parseXML(): File " + theFilename + " does not exist.");
+        return null;
+    }
+    var myDocument = new Node();
+    myDocument.parseFile(theFilename);
+    return myDocument.firstChild;
+}
