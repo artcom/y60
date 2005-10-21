@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy Protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: OverlayManager.js,v $
-//   $Author: martin $
-//   $Revision: 1.43 $
-//   $Date: 2005/04/29 13:37:56 $
-//
-//
 //=============================================================================
 
 var ourOverlayCounter = 0;
@@ -397,8 +389,7 @@ function ImageOverlayBase(Public, Protected, theManager, theSource, thePosition,
             // theSource is a node
             myImage = theSource;
         } else {
-            print("### ERROR: Invalid type of source argument in addImage: "
-                + typeof(theSource) + " " + fileline());
+            Logger.error("Invalid type of source argument in addImage");
             return;
         }
 
@@ -479,7 +470,7 @@ function MovieOverlayBase(Public, Protected, theManager, theSource, thePosition,
     Public.startime setter = function(theArgument) { Public.image.startime = theArgument; }
 
     Public.audio getter = function() { return Public.image.audio; }
-    Public.audio setter = function(theArgument) { print("### ERROR: Cannot set audio flag after construction"); }
+    Public.audio setter = function(theArgument) { Logger.error("Cannot set audio flag after construction"); }
 
     Public.avdelay getter = function() { return Public.image.avdelay; }
     Public.avdelay setter = function(theArgument) { Public.image.avdelay = theArgument; }
@@ -488,10 +479,10 @@ function MovieOverlayBase(Public, Protected, theManager, theSource, thePosition,
     Public.cachesize setter = function(theArgument) { Public.image.cachesize = theArgument; }
 
     Public.fps getter = function() { return Public.image.fps; }
-    Public.fps setter = function(theArgument) { print("### ERROR: Cannot set movie fps"); }
+    Public.fps setter = function(theArgument) { Logger.error("Cannot set movie fps"); }
 
     Public.framecount getter = function() { return Public.image.framecount; }
-    Public.framecount setter = function(theArgument) { print("### ERROR: Cannot set movie framecount"); }
+    Public.framecount setter = function(theArgument) { Logger.error("Cannot set movie framecount"); }
 
     Public.volume getter = function() { return Public.image.volume; }
     Public.volume setter = function(theArgument) { Public.image.volume = theArgument; }
@@ -517,7 +508,7 @@ function MovieOverlayBase(Public, Protected, theManager, theSource, thePosition,
                 theAudioFlag = true;
             }
             myImage.audio = theAudioFlag;
-            window.loadMovieFrame(myImage);
+            window.scene.loadMovieFrame(myImage);
         }
 
         var mySize = null;

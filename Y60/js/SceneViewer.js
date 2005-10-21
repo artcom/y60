@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2003-2004, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -43,6 +43,7 @@ use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 
 //plug("y60QuicktimeDecoder"); // turn on for windows and better mov decoder support
+//plug("y60FFMpegDecoder"); // turn on for windows and better mov decoder support
 
 // Global window object (similar to html window)
 if (window == undefined) var window   = null;
@@ -155,10 +156,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
     self.BaseViewer.onPreRender = self.onPreRender;
     self.onPreRender = function() {
-        var myImagesCount = self.getImages().childNodesLength();
-        if (myImagesCount > 0) {
-            var myImage = self.getImages().childNodes[0];
-        }
+        //var myImagesCount = self.getImages().childNodesLength();
+        //if (myImagesCount > 0) {
+            //var myImage = self.getImages().childNodes[0];
+        //}
         self.BaseViewer.onPreRender();
     }
 

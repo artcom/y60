@@ -452,7 +452,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
    self.prepareScene = function (theScene, theCanvas) {
-
         if (!theScene) {
             Logger.debug("No Scene found.");
         }

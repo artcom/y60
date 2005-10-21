@@ -185,11 +185,11 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         Base.onFrame(theTime);
         if (_myMovieNode && _myMovieOverlay && _myMovieOverlay.visible) {
             //_myFrameRateLimiter.onFrame(theTime);
-            window.loadMovieFrame(_myMovieNode);
+            window.scene.loadMovieFrame(_myMovieNode, theTime);
         }
         if (_myCaptureNode && _myMovieOverlay && _myMovieOverlay.visible) {
             //_myFrameRateLimiter.onFrame(theTime);
-            window.loadCaptureFrame(_myCaptureNode);
+            window.scene.loadCaptureFrame(_myCaptureNode);
         }
         if (_mySoundId != -1 && !isPlaying(_mySoundId)) {
 			nextFile();
@@ -544,7 +544,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         }
 
         _myCaptureNode.src = theURL;
-        if (!window.loadCaptureFrame(_myCaptureNode)) {
+        if (!window.scene.loadCaptureFrame(_myCaptureNode)) {
             self.getImages().removeChild(_myCaptureNode);
             exit(0);
         }
@@ -574,7 +574,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         }
 
         _myMovieNode.src = theFilename;
-        if (!window.loadMovieFrame(_myMovieNode)) {
+        if (!window.scene.loadMovieFrame(_myMovieNode)) {
             self.getImages().removeChild(_myMovieNode);
             exit(0);
         }
