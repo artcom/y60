@@ -27,10 +27,13 @@
 #include "JSApp.h"
 #include <iostream>
 
-#include <y60/IProgressNotifier.h>
-#include <y60/Body.h>
-#include <y60/modelling_functions.h>
 #include <asl/Logger.h>
+#include <y60/IProgressNotifier.h>
+#include <y60/modelling_functions.h>
+#include <y60/TextureManager.h>
+#include <y60/Body.h>
+#include <y60/Movie.h>
+#include <y60/Capture.h>
 
 using namespace y60;
 using namespace asl;
@@ -73,13 +76,57 @@ class ProgressCallback : public y60::IProgressNotifier {
 typedef y60::Scene NATIVE;
 
 JSBool
-toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns a string representation of the Scene's DOM.");
+toString(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("returns a string representation of the scene's dom.");
     DOC_END;
     std::string myStringRep = asl::as_string(JSScene::getJSWrapper(cx,obj).getNative().getSceneDom());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
     *rval = STRING_TO_JSVAL(myString);
     return JS_TRUE;
+}
+
+JSBool
+loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Updates a movie node.");
+    DOC_PARAM("movie", DOC_TYPE_NODE);
+    DOC_END;
+    try {
+        if (argc < 1) {
+            throw asl::Exception(string("Not enough arguments"));
+        }
+
+        dom::NodePtr myNode;
+        convertFrom(cx, argv[0], myNode);
+
+        float myTime = 0.0f;
+        if (argc > 1) {
+            convertFrom(cx, argv[1], myTime);
+        }
+
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>(), myTime);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JSBool
+loadCaptureFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Updates a capture node.");
+    DOC_PARAM("capture", DOC_TYPE_NODE);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        dom::NodePtr myNode;
+        convertFrom(cx, argv[0], myNode);
+
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        myNative->getTextureManager()->loadCaptureFrame(myNode->getFacade<Capture>());
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
@@ -384,6 +431,8 @@ JSScene::Functions() {
         {"createColorMaterial",   CreateColorMaterial,   1},
         {"createBody",            CreateBody,            2},
         {"createQuadShape",       CreateQuadShape,       3},
+        {"loadMovieFrame",        loadMovieFrame,        1},
+        {"loadCaptureFrame",      loadCaptureFrame,      1},
         {0}
     };
     return myFunctions;

@@ -30,7 +30,6 @@
 #include <y60/Image.h>
 #include <y60/Movie.h>
 #include <y60/Capture.h>
-//#include <y60/GLResourceManager.h>
 #include <y60/GLBufferAdapter.h>
 
 #include <asl/file_functions.h>
@@ -344,11 +343,14 @@ namespace jslib {
                 dom::NodePtr myImages = _myScene->getImagesRoot();
                 for (unsigned i = 0; i < myImages->childNodesLength(); ++i) {
                     dom::NodePtr myImage = myImages->childNode(i);
-                    if (myImage->nodeType() == dom::Node::ELEMENT_NODE && myImage->nodeName() == MOVIE_NODE_NAME) {
-                        loadMovieFrame(myImage);
+                    if (myImage->nodeType() != dom::Node::ELEMENT_NODE) {
+                        continue;
                     }
-                    else if (myImage->nodeType() == dom::Node::ELEMENT_NODE && myImage->nodeName() == CAPTURE_NODE_NAME) {
-                        loadCaptureFrame(myImage);
+                    if (myImage->nodeName() == MOVIE_NODE_NAME) {
+                        _myScene->getTextureManager()->loadMovieFrame(myImage->getFacade<Movie>(), _myElapsedTime);
+                    }
+                    else if (myImage->nodeName() == CAPTURE_NODE_NAME) {
+                        _myScene->getTextureManager()->loadCaptureFrame(myImage->getFacade<Capture>());
                     }
                 }
             }
@@ -732,37 +734,6 @@ namespace jslib {
             }
         }
         return ImagePtr(0);
-    }
-
-    void
-    AbstractRenderWindow::loadMovieFrame(dom::NodePtr theMovieNode) {
-        try {
-            if (_myScene) {
-				_myScene->getTextureManager()->loadMovieFrame(theMovieNode->getFacade<Movie>(), _myElapsedTime);
-            }
-        } catch(const exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::loadMovieFrame: Exception caught: " << ex.what();
-			throw(ex);
-        }
-        catch(const asl::Exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::loadMovieFrame: Exception caught: " << ex;
-			throw(ex);
-        }
-    }
-    void
-    AbstractRenderWindow::loadCaptureFrame(dom::NodePtr theCaptureNode) {
-        try {
-            if (_myScene) {
-				_myScene->getTextureManager()->loadCaptureFrame(theCaptureNode->getFacade<Capture>());
-            }
-        } catch(const exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::loadCaptureFrame: Exception caught: " << ex.what();
-			throw(ex);
-        }
-        catch(const asl::Exception & ex) {
-            AC_ERROR << "AbstractRenderWindow::loadCaptureFrame: Exception caught: " << ex;
-			throw(ex);
-        }
     }
 
     // TODO: adapt for other 1 and 3 byte pixel formats

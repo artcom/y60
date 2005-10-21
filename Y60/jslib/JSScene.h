@@ -81,5 +81,3 @@ jsval as_jsval(JSContext *cx, JSScene::OWNERPTR theScene);
 }
 
 #endif
-
-

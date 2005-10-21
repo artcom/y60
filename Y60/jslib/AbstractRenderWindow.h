@@ -100,11 +100,10 @@ namespace jslib {
         unsigned int getRenderingCaps();
         bool printStatistics(unsigned int theOnScreenFlag, unsigned int theStatisticFlags);
         double getFrameRate() const;
+ 
         // Scene methods
-
         y60::ImagePtr getImage(const std::string & theFileName);
-        void loadMovieFrame(dom::NodePtr theMovieNode);
-        void loadCaptureFrame(dom::NodePtr theCaptureNode);
+ 
         // TODO: adapt for other 1 and 3 byte pixel formats
         asl::Vector4i getImagePixel(dom::NodePtr theImageNode,
             unsigned long theX, unsigned long theY);

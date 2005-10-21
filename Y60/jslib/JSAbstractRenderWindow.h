@@ -185,40 +185,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             return Method<NATIVE>::call(&NATIVE::printStatistics,cx,obj,argc,argv,rval);
         }
         static JSBool
-        loadMovieFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
-            DOC_END;
-            try {
-                bool mySuccess = Method<NATIVE>::call(&NATIVE::loadMovieFrame,cx,obj,argc,argv,rval);
-                if (mySuccess) {
-                    *rval = as_jsval(cx, true);
-                } else {
-                    *rval = as_jsval(cx, false);
-                }
-            } catch(...) {
-                *rval = as_jsval(cx, false);
-            }
-            return JS_TRUE;
-
-        }
-        static JSBool
-        loadCaptureFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
-            DOC_END;
-            try {
-                bool mySuccess = Method<NATIVE>::call(&NATIVE::loadCaptureFrame,cx,obj,argc,argv,rval);
-                if (mySuccess) {
-                    *rval = as_jsval(cx, true);
-                } else {
-                    *rval = as_jsval(cx, false);
-                }
-            } catch(...) {
-                *rval = as_jsval(cx, false);
-            }
-            return JS_TRUE;
-
-        }
-        static JSBool
         getImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("");
             DOC_END;
@@ -401,8 +367,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 {"hasCap",             hasCap,                   1},
                 {"hasCapAsString",     hasCapAsString,           1},
                 {"printStatistics",    printStatistics,          2}, // base class
-                {"loadMovieFrame",     loadMovieFrame,           1},
-                {"loadCaptureFrame",   loadCaptureFrame,         1},
                 {"getImagePixel",      getImagePixel,            3},
                 {"setImagePixel",      setImagePixel,            4},
                 {"performRequest",     performRequest,           1},
