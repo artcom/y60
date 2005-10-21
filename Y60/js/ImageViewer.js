@@ -204,6 +204,10 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         return _myCaptureNode;
     }
 
+    self.getMovieOverlay = function() {
+        return _myMovieOverlay;
+    }
+
     Base.onPostRender = self.onPostRender;
     self.onPostRender = function() {
         Base.onPostRender();
@@ -294,7 +298,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                                 //myFilename.search(/\.ra$/i)   != -1 ||
                                 /*|| myFilename.search(/\.mov$/i)  != -1)*/
                                 )) {
-            plug("y60FFMpegDecoder2");
+            plug("y60FFMpegDecoder1");
             _myMPEGPlugged = true;
         }
         if ( myFilename.search(/\.mov$/i) != -1) {
@@ -574,9 +578,13 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         }
 
         _myMovieNode.src = theFilename;
-        if (!window.scene.loadMovieFrame(_myMovieNode)) {
+        try {
+            window.scene.loadMovieFrame(_myMovieNode);
+        } catch (ex) {
             self.getImages().removeChild(_myMovieNode);
-            exit(0);
+            print(ex);
+            print("### ERROR: loadMovieFrame faild for file: " + theFilename);
+            return;
         }
 
         _myMovieNode.playmode = "play";

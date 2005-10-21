@@ -443,11 +443,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 myArgumentMap[myArgument[0]] = null;
             }
         }
-
+/*
         if (!_myShaderLibrary) {
             throw new Exception("Missing shaderlibrary argument", fileline());
         }
-
+*/
         return myArgumentMap;
     }
 
