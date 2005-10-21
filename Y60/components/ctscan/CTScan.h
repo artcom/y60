@@ -206,6 +206,13 @@ class CTScan {
         VoxelT
         interpolatedValueAt(const asl::Vector3f & thePosition);
 
+        /**
+         * non interpolated voxel value at thePosition
+         */
+        template <class VoxelT>
+        VoxelT
+        fastValueAt(const asl::Vector3f & thePosition);
+
         template <class VoxelT>
         void reconstructToImageImpl(const asl::Vector3f & theOrientationVector, int theSliceIndex, dom::NodePtr & theImageNode);
 

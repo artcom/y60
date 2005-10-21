@@ -35,6 +35,7 @@
 #include <asl/Logger.h>
 #include <asl/PackageManager.h>
 #include <asl/Box.h>
+#include <asl/Line.h>
 
 #include <y60/property_functions.h>
 #include <y60/PropertyNames.h>
@@ -596,6 +597,23 @@ CTScan::getReconstructionDimensions(const Vector3f & theOrientationVector) const
 
 template <class VoxelT>
 VoxelT
+CTScan::fastValueAt(const asl::Vector3f & thePosition) {
+    Vector3i myFloorPos(static_cast<int>(floor(thePosition[0])), 
+        static_cast<int>(floor(thePosition[1])), 
+        static_cast<int>(floor(thePosition[2])));
+    //VoxelT myValue; = NumericTraits<VoxelT>::min();
+    dom::ResizeableRasterPtr & mySlice = _mySlices[int(myFloorPos[2])];
+    int myLineStride = getBytesRequired(mySlice->width(), _myEncoding);
+
+    //if (isInside(myFloorPos[0], myFloorPos[1], myFloorPos[2])) {
+        const VoxelT * mySource = reinterpret_cast<const VoxelT*>(mySlice->pixels().begin()+myLineStride*myFloorPos[1]);
+        return mySource[myFloorPos[0]];
+    //}
+    //return myValue;
+}
+
+template <class VoxelT>
+VoxelT
 CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
     Vector3i myFloorPos(static_cast<int>(floor(thePosition[0])), 
         static_cast<int>(floor(thePosition[1])), 
@@ -803,12 +821,13 @@ CTScan::reconstructToImageImpl(const Vector3f & theOrientationVector, int theSli
                 Quaternionf myRotationQuaternion(myOrientationVector, myInitialVector);
                 Matrix4f myScreenToVoxelProjection(myRotationQuaternion);
 
-                Vector3f myScale, myShear, myOrientation, myPosition;
-                myScreenToVoxelProjection.decompose(myScale, myShear, myOrientation, myPosition);
-
                 Vector3i myVoxelSize = getVoxelDimensions();
                 Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
-                myVoxelToScreenProjection.invert();
+                bool myInversionDone = myVoxelToScreenProjection.invert();
+                if (!myInversionDone) {
+                    AC_WARNING << "Can't invert matrix for orientation: " << theOrientationVector;
+                    break;
+                }
                 myBounds = computeProjectionBounds(myVoxelToScreenProjection);
                 Vector3f mySize = myBounds.getSize();
                 myWidth = int(ceil(mySize[0]));
@@ -829,14 +848,29 @@ CTScan::reconstructToImageImpl(const Vector3f & theOrientationVector, int theSli
                 AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", LinePos: " << myLinePos
                          << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
 
+                Box3f myVoxelBox(Point3f(0.0f, 0.0f, 0.0f), 
+                    Point3f(float(myVoxelSize[0]), float(myVoxelSize[1]), float(myVoxelSize[2])));
+                typedef Line<float> Linef;
+
                 for (int v = 0; v < myHeight; ++v) {
-                    Vector3f mySourcePos = myLinePos;
-                    unsigned char* myAddress = myTarget->begin()+myTargetLineStride*v;
-                    for (int u = 0; u < myWidth; ++u) {                        
-                        VoxelT myValue = interpolatedValueAt<VoxelT>(mySourcePos);
-                        memcpy(myAddress, &myValue, myBpp);
-                        mySourcePos += mySourceDeltaU;
-                        myAddress += myBpp;
+                    // XXX TODO:
+                    // 1. Compute min/max for the line (myLinePos, mySourceDeltaU) when its
+                    //    crossing the box (0,0,0)(getDimensions()) 
+                    // 2. set start and end values for loop accordingly
+                    // 3. compute mySourcePos by multiplying loopstart with mySourceDeltaU
+                    Linef myScanLine(myLinePos, mySourceDeltaU);
+                    float myMinValue, myMaxValue;
+                    if (intersection(myVoxelBox, myScanLine, myMinValue, myMaxValue)) {
+                        int myStart = int(ceil(myMinValue));
+                        int myEnd = int(floor(myMaxValue));
+                        Vector3f mySourcePos = myLinePos + (ceil(myMinValue) * mySourceDeltaU);
+                        VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+myTargetLineStride*v+myStart);
+                        for (int u = myStart; u < myEnd; ++u) {
+                            //VoxelT myValue = interpolatedValueAt<VoxelT>(mySourcePos);
+                            *myAddress = fastValueAt<VoxelT>(mySourcePos);
+                            mySourcePos += mySourceDeltaU;
+                            myAddress ++;
+                        }
                     }
                     myLinePos += mySourceDeltaV;
                 }

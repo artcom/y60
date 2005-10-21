@@ -137,6 +137,7 @@ class IntersectionTest : public UnitTest {
                 ENSURE(almostEqual(abs(myResult.direction[2]), 1));
                 ENSURE(almostEqual(distance(myPlane1, myResult.origin), 0));
                 ENSURE(almostEqual(distance(myPlane2, myResult.origin), 0));
+                ENSURE(almostEqual(myResult.origin[1], -100.0f));
                 ENSURE(!intersection(myPlane1, myPlane1, myResult));
                 ENSURE(!intersection(myPlane1, myCoplanarPlane1, myResult));
                 ENSURE(!intersection(myPlane2, myPlane2, myResult));
