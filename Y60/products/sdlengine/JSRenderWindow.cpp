@@ -94,6 +94,12 @@ resetCursor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     return Method<SDLWindow>::call(&SDLWindow::resetCursor,cx,obj,argc,argv,rval);
 }
 static JSBool
+stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    return Method<SDLWindow>::call(&SDLWindow::stop,cx,obj,argc,argv,rval);
+}
+static JSBool
 go(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -241,6 +247,7 @@ JSRenderWindow::Functions() {
         {"resetCursor",        resetCursor,              0},
         {"createCursor",       createCursor,             1},
         {"go",                 go,                       0},
+        {"stop",               stop,                     0},
         {"loadTTF",            loadTTF,                  4},
         {"setMousePosition",   setMousePosition,         2},
         {"draw",               draw,                     1},

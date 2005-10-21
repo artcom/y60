@@ -125,6 +125,7 @@ public:
     void onKey(y60::Event & theEvent);
     void mainLoop();
     void go();
+    void stop();
 
     //////////////////////////////////////////////////////////////////////////
 

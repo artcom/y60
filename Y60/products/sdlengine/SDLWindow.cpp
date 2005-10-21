@@ -603,6 +603,12 @@ SDLWindow::mainLoop() {
 }
 
 void 
+SDLWindow::stop() {
+    AC_DEBUG << "SDLWindow::stop" << endl;
+    _myAppQuitFlag = true;
+}
+
+void 
 SDLWindow::go() {
     AC_DEBUG << "SDLWindow::Go" << endl;
     
