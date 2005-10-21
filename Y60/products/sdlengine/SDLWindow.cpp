@@ -595,6 +595,7 @@ SDLWindow::mainLoop() {
             _myAppQuitFlag = true;
         }
     }
+    SDL_Quit();
 
     jsval argv[1], rval;
     if (jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onExit")) {
