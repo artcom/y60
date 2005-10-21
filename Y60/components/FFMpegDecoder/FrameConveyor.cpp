@@ -59,9 +59,6 @@ namespace y60 {
     FrameConveyor::load(DecoderContextPtr theContext, asl::HWSampleSinkPtr theAudioSink) {
         _myContext = theContext;
         _myAudioSink = theAudioSink;
-        if (theAudioSink) {
-            setupAudio();
-        }        
     }
 
     void 
@@ -231,7 +228,7 @@ namespace y60 {
             DB2(
                 cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
                 cerr << "  current time: " << myCurrentTime << endl;
-                if (_myContext->getAudioStream()) {
+                if (_myAudioSink) {
                     cerr << "  A-Buffersize in secs: " << (_myAudioSink->getBufferedTime())
                             <<endl;
                 }
@@ -277,23 +274,6 @@ namespace y60 {
     }
 
     void
-    FrameConveyor::setupAudio() {
-        // TODO: setup sample rate conversion.
-        AVStream * myAudioStream = _myContext->getAudioStream();
-        if (myAudioStream) {
-            AVCodec * myCodec = avcodec_find_decoder(myAudioStream->codec.codec_id);
-            if (!myCodec) {
-                throw FrameConveyorException(std::string("Unable to find audio decoder: ") + _myContext->getFilename(), PLUS_FILE_LINE);
-            }
-            if (avcodec_open(&myAudioStream->codec, myCodec) < 0 ) {
-                throw FrameConveyorException(std::string("Unable to open audio codec: ") + _myContext->getFilename(), PLUS_FILE_LINE);
-            }
-        } else {
-            AC_INFO << _myContext->getFilename() << ": No audio stream found.";
-        }
-    }
-
-    void
     FrameConveyor::decodeFrame(double & theCurrentTime, bool & theEndOfFileFlag) {
         theEndOfFileFlag = false;
         if (!_myContext) {
@@ -322,23 +302,25 @@ namespace y60 {
             }
             case DecoderContext::FrameTypeAudio:
             {
-                AudioBufferPtr myBuffer;
+                if (_myAudioSink) {
+                    AudioBufferPtr myBuffer;
 /*
-                if (_myResampleContext) {
-                    numFrames = audio_resample(_myResampleContext, 
-                            (int16_t*)(_myResampledSamples.begin()),
-                            (int16_t*)(_mySamples.begin()), 
-                            numFrames);
-                    myBuffer = Pump::get().createBuffer(numFrames);
-                    myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
-                } else {
+                    if (_myResampleContext) {
+                        numFrames = audio_resample(_myResampleContext, 
+                                (int16_t*)(_myResampledSamples.begin()),
+                                (int16_t*)(_mySamples.begin()), 
+                                numFrames);
+                        myBuffer = Pump::get().createBuffer(numFrames);
+                        myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
+                    } else {
 */                
-                myBuffer = Pump::get().createBuffer(_myAudioPacket.getSampleSize() / 
-                        (2 * _myContext->getNumAudioChannels()));
-                myBuffer->convert(_myAudioPacket.getSamples(), SF_S16, 
-                        _myContext->getNumAudioChannels());
-                _myAudioSink->queueSamples(myBuffer);
-                theCurrentTime = _myAudioPacket.getTimestamp();
+                    myBuffer = Pump::get().createBuffer(_myAudioPacket.getSampleSize() / 
+                            (2 * _myContext->getNumAudioChannels()));
+                    myBuffer->convert(_myAudioPacket.getSamples(), SF_S16, 
+                            _myContext->getNumAudioChannels());
+                    _myAudioSink->queueSamples(myBuffer);
+                    theCurrentTime = _myAudioPacket.getTimestamp();
+                }
                 break;
             }
             case DecoderContext::FrameTypeEOF:

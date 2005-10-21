@@ -183,14 +183,25 @@ namespace y60 {
     FFMpegDecoder::setupAudio(DecoderContextPtr theContext) {
         AVStream * myAudioStream = theContext->getAudioStream();
         if (getMovie()->get<AudioTag>() && myAudioStream) {
+            AVCodec * myCodec = avcodec_find_decoder(myAudioStream->codec.codec_id);
+            if (!myCodec) {
+                AC_WARNING << "Unable to find audio decoder: " << theContext->getFilename();
+                 _myAudioSink = HWSampleSinkPtr(0);
+                 return;
+            }
+            if (avcodec_open(&myAudioStream->codec, myCodec) < 0 ) {
+                AC_WARNING << "Unable to find audio decoder: " << theContext->getFilename();
+                _myAudioSink = HWSampleSinkPtr(0);
+                return;
+            }
+
             Pump & myAudioPump = Pump::get();
-            string myURL = theContext->getFilename();
 //            if (!myAudioController.isRunning()) {
 //                myAudioController.init(asl::maximum
 //                      ((unsigned)myAudioStream->codec.sample_rate, (unsigned) 44100));
 //            }
 
-            _myAudioSink = myAudioPump.createSampleSink(myURL);
+            _myAudioSink = myAudioPump.createSampleSink(theContext->getFilename());
             // TODO: Sample rate conversion
             _myAudioSink->setVolume(getMovie()->get<VolumeTag>());
             AC_INFO << "Audio: channels=" << myAudioStream->codec.channels << ", samplerate=" 

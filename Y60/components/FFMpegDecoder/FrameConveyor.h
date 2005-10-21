@@ -78,9 +78,6 @@ namespace y60 {
             /// Rearranges the cache relative to theTimestamp
             void updateCache(double theTimestamp);
 
-            /// Initial setup of audio buffered source
-            void setupAudio();
-
             /// Visualizes the current fill level of the video cache
             void printCacheInfo(double theTargetStart, double theTargetEnd);
 
