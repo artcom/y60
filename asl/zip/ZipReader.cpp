@@ -9,14 +9,14 @@
 // specific, prior written permission of ART+COM GmbH Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: ZipFile.cpp,v $
+//    $RCSfile: ZipReader.cpp,v $
 //
 //   $Revision: 1.9 $
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "ZipFile.h"
+#include "ZipReader.h"
 #include "unzip.h"
 #include "zlib.h"
 #include "ioapi.h"
@@ -33,7 +33,7 @@ namespace asl {
 #define CHECK_UNZIP(x) int myRetVal(x); if (myRetVal != UNZ_OK) \
     throw ZipFileException(string("UNZIP Error: ")+as_string(myRetVal), PLUS_FILE_LINE)
     
-ZipFile::ZipFile(const char *  theInputFileName) : _myInputStream(0)
+ZipReader::ZipReader(const char *  theInputFileName) : _myInputStream(0)
 {
     _myInputStream = unzOpen(theInputFileName);
     AC_DEBUG << "opening " << theInputFileName;
@@ -44,20 +44,20 @@ ZipFile::ZipFile(const char *  theInputFileName) : _myInputStream(0)
     readDirectory();
 }
 
-ZipFile::~ZipFile() {
+ZipReader::~ZipReader() {
     if (_myInputStream) {
         int retVal = unzClose(_myInputStream);
         AC_DEBUG << "closing zip file returns " << retVal;
     }
 }
 
-const ZipFile::Directory &
-ZipFile::getDirectory() const {
+const ZipReader::Directory &
+ZipReader::getDirectory() const {
     return _myDirectory;
 }
 
 void
-ZipFile::readDirectory() {    
+ZipReader::readDirectory() {    
     unz_global_info globalInfo;
     CHECK_UNZIP(unzGetGlobalInfo (_myInputStream, &globalInfo));
     
@@ -104,12 +104,12 @@ ZipFile::readDirectory() {
 }
 
 Ptr<ReadableBlock> 
-ZipFile::getFile(int theFileIndex) {
+ZipReader::getFile(int theFileIndex) {
     return getFile(_myDirectory[theFileIndex]);
 }
 
 Ptr<ReadableBlock> 
-ZipFile::getFile(const std::string & theFilePath) {
+ZipReader::getFile(const std::string & theFilePath) {
     for (int i = 0; i < _myDirectory.size(); ++i) {
         DB(AC_TRACE << "cmp:" << _myDirectory[i].filename << "==" << theFilePath << endl);
         if (theFilePath == _myDirectory[i].filename) {
@@ -121,7 +121,7 @@ ZipFile::getFile(const std::string & theFilePath) {
 }
 
 Ptr<ReadableBlock> 
-ZipFile::getFile(const Entry & theEntry) {
+ZipReader::getFile(const Entry & theEntry) {
     DB(AC_TRACE << "unzipping '" << theEntry.filename << "', size=" << theEntry.size << endl);
     unz_file_pos myFilePos;
     myFilePos.pos_in_zip_directory = theEntry.directory_pos;

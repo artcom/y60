@@ -13,7 +13,7 @@
 //
 //   $Revision: 1.4 $
 //
-// Description: unit test template file - change ZipFile to whatever
+// Description: unit test template file - change ZipReader to whatever
 //              you want to test and add the apprpriate tests.
 //
 //
@@ -24,20 +24,20 @@
 #define __asl__ZipPackage_h_included__
 
 #include "IPackage.h"
-#include "ZipFile.h"
+#include "ZipReader.h"
 
 namespace asl {
 
 class ZipPackage : public IPackage {
     public:
-        ZipPackage(const std::string & theZipFile);
+        ZipPackage(const std::string & theZipReader);
         const std::string & getPath() const { return _myZipFilename; };
         FileList getFileList(const std::string & theSubDir);
         std::string findFile(const std::string & theRelativePath);
         Ptr<ReadableBlock> getFile(const std::string & theRelativePath);
 
     private:
-        ZipFile _myZipFile;
+        ZipReader _myZipReader;
         std::string _myZipFilename;
         FileList _myFileList;
 };

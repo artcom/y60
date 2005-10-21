@@ -31,7 +31,7 @@ namespace asl {
 
 DEFINE_EXCEPTION(ZipFileException, asl::Exception);
     
-class ZipFile {
+class ZipReader {
     public:
         struct Entry {
             std::string filename;
@@ -40,22 +40,22 @@ class ZipFile {
             size_t file_index;
         };
         typedef std::vector<Entry> Directory; 
-        ZipFile(const char * theInputFileName);
-        virtual ~ZipFile();
+        ZipReader(const char * theInputFileName);
+        virtual ~ZipReader();
         const Directory & getDirectory() const;
         Ptr<ReadableBlock> getFile(const Entry & theEntry);
         Ptr<ReadableBlock> getFile(int theFileIndex);
         Ptr<ReadableBlock> getFile(const std::string & theFilePath);
     private:
-        ZipFile();
-        ZipFile(const ZipFile &);
-        ZipFile & operator=(const ZipFile &);
+        ZipReader();
+        ZipReader(const ZipReader &);
+        ZipReader & operator=(const ZipReader &);
         void readDirectory();
         Directory _myDirectory;
         void * _myInputStream;
 };
 
-typedef Ptr<ZipFile> ZipFilePtr;
+typedef Ptr<ZipReader> ZipReaderPtr;
 
 }
 

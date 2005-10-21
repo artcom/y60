@@ -13,7 +13,7 @@
 //
 //   $Revision: 1.3 $
 //
-// Description: unit test template file - change ZipFile to whatever
+// Description: unit test template file - change ZipReader to whatever
 //              you want to test and add the apprpriate tests.
 //
 //
@@ -29,11 +29,11 @@ using namespace std;
 
 namespace asl {
 
-ZipPackage::ZipPackage(const std::string & theZipFile) :
-    _myZipFile(theZipFile.c_str()), _myZipFilename(theZipFile)
+ZipPackage::ZipPackage(const std::string & theZipFilename) :
+    _myZipReader(theZipFilename.c_str()), _myZipFilename(theZipFilename)
 {
-    const ZipFile::Directory & myDirectory = _myZipFile.getDirectory();
-    ZipFile::Directory::const_iterator it;
+    const ZipReader::Directory & myDirectory = _myZipReader.getDirectory();
+    ZipReader::Directory::const_iterator it;
     for (it = myDirectory.begin(); it != myDirectory.end(); ++it) {
         _myFileList.push_back(it->filename);
     }
@@ -69,7 +69,7 @@ ZipPackage::findFile(const std::string & theRelativePath) {
 
 Ptr<ReadableBlock> 
 ZipPackage::getFile(const std::string & theRelativePath) {
-    return _myZipFile.getFile(theRelativePath);
+    return _myZipReader.getFile(theRelativePath);
 }
 
 }

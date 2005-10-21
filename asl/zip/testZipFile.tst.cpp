@@ -9,18 +9,19 @@
 // specific, prior written permission of ART+COM GmbH Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: testZipFile.tst.cpp,v $
+//    $RCSfile: testZipReader.tst.cpp,v $
 //
 //   $Revision: 1.2 $
 //
-// Description: unit test template file - change ZipFile to whatever
+// Description: unit test template file - change ZipReader to whatever
 //              you want to test and add the apprpriate tests.
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "ZipFile.h"
+#include "ZipReader.h"
+#include "ZipWriter.h"
 #include <asl/MappedBlock.h>
 #include <asl/UnitTest.h>
 
@@ -30,19 +31,17 @@
 using namespace std; 
 using namespace asl; 
 
-class ZipFileUnitTest : public UnitTest {
+class ZipReaderUnitTest : public UnitTest {
     public:
-        ZipFileUnitTest() : UnitTest("ZipFileUnitTest") {  }
+        ZipReaderUnitTest() : UnitTest("ZipReaderUnitTest") {  }
         void run() {
-            ZipFile myZipFile("../../testfiles/test.zip");
-//            ConstMappedBlock myZippedBlock("../../testfiles/ALongFileName.zip");
-//            ZipFile myZipFile(myZippedBlock);
-            ZipFile::Directory myDirectory = myZipFile.getDirectory();
+            ZipReader myZipReader("../../testfiles/test.zip");
+            ZipReader::Directory myDirectory = myZipReader.getDirectory();
             ENSURE(myDirectory.size() == 4);
             DPRINT(myDirectory[0].filename);
             ENSURE(myDirectory[0].filename == "File One.txt");
 
-            Ptr<ReadableBlock> myFile(myZipFile.getFile(myDirectory[0]));
+            Ptr<ReadableBlock> myFile(myZipReader.getFile(myDirectory[0]));
             string myExpectedString = "Hello World One!";
             string myTestString;
             myFile->readString(myTestString, myExpectedString.size(),0);
@@ -52,12 +51,35 @@ class ZipFileUnitTest : public UnitTest {
         }
 };
 
+class ZipWriterUnitTest : public UnitTest {
+    public:
+        ZipWriterUnitTest() : UnitTest("ZipWriterUnitTest") {  }
+        void run() {
+            const char * myTestZip = "testdata.zip.testoutput";
+            const char * myTestFileInZip = "subdir/foo.txt";
+            string myData("my test data string");
+            Block myTestBlock;
+            myTestBlock.append(myData.c_str(), myData.size());
+             
+            ZipWriter myZipWriter(myTestZip);
+            myZipWriter.append(myTestBlock, myTestFileInZip);
+            myZipWriter.close();
+            
+            ZipReader myReader(myTestZip);
+            Ptr<ReadableBlock> myBlockRead = myReader.getFile(myTestFileInZip);
+
+            ENSURE(*myBlockRead == myTestBlock);
+
+        }
+};
+
 class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        addTest(new ZipFileUnitTest);
+        addTest(new ZipReaderUnitTest);
+        addTest(new ZipWriterUnitTest);
     }
 
 };
