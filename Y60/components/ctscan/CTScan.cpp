@@ -545,24 +545,14 @@ CTScan::polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr
 }
 
 Vector3i
-CTScan::getReconstructionDimensions(const Vector3f & theOrientationVector) const {
+CTScan::getReconstructionDimensions(CTScan::Orientation theOrientation) const {
     if (_myState != COMPLETE) {
         throw CTScanException("cannot reconstruct image when loading not complete!", PLUS_FILE_LINE);
     }
     Vector3i mySize = getVoxelDimensions();
-    Orientation myOrientation;
     Vector3i myResult;
 
-    if (asl::almostEqual(theOrientationVector, Vector3f(0,0,1))) {
-        myOrientation = CTScan::IDENTITY;
-    } else if (asl::almostEqual(theOrientationVector, Vector3f(1,0,0))) {
-        myOrientation = CTScan::Y2Z;
-    } else if (asl::almostEqual(theOrientationVector, Vector3f(0,1,0))) {
-        myOrientation = CTScan::X2Z;
-    } else {
-        myOrientation = CTScan::ARBITRARY;
-    }
-    switch (myOrientation) {
+    switch (theOrientation) {
         case IDENTITY:
             myResult = mySize;
             break;
@@ -573,27 +563,29 @@ CTScan::getReconstructionDimensions(const Vector3f & theOrientationVector) const
             myResult = Vector3i(mySize[2], mySize[1], mySize[0]);
             break;
         default:
-            {
-                Box3f myBounds;
-                Vector3f myInitialVector(0,0,1.0f);
-                Vector3f myOrientationVector = theOrientationVector;
-                Quaternionf myRotationQuaternion(myOrientationVector, myInitialVector);
-                Matrix4f myScreenToVoxelProjection(myRotationQuaternion);
-
-                Vector3f myScale, myShear, myOrientation, myPosition;
-                myScreenToVoxelProjection.decompose(myScale, myShear, myOrientation, myPosition);
-
-                Vector3i myVoxelSize = getVoxelDimensions();
-                Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
-                myVoxelToScreenProjection.invert();
-                myBounds = computeProjectionBounds(myVoxelToScreenProjection);
-                Vector3f myFloatSize = myBounds.getSize();
-                myResult = Vector3i(int(ceil(myFloatSize[0])), int(ceil(myFloatSize[1])), int(ceil(myFloatSize[2])));
-            }
+            throw CTScanException("Illegal Orientation", PLUS_FILE_LINE);
             break;
     }
     return myResult;
 }
+
+Vector3i
+CTScan::getReconstructionDimensions(const Quaternionf & theOrientation) const {
+    if (_myState != COMPLETE) {
+        throw CTScanException("cannot reconstruct image when loading not complete!", PLUS_FILE_LINE);
+    }
+    Vector3i mySize = getVoxelDimensions();
+    Vector3i myResult;
+    Matrix4f myScreenToVoxelProjection(theOrientation);
+    Vector3i myVoxelSize = getVoxelDimensions();
+    Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
+    myVoxelToScreenProjection.invert();
+    Box3f myBounds = computeProjectionBounds(myVoxelToScreenProjection);
+    Vector3f myFloatSize = myBounds.getSize();
+    myResult = Vector3i(int(ceil(myFloatSize[0])), int(ceil(myFloatSize[1])), int(ceil(myFloatSize[2])));
+    return myResult;
+}
+
 
 template <class VoxelT>
 VoxelT
@@ -697,25 +689,25 @@ CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
 }
 
 void 
-CTScan::reconstructToImage(const Vector3f & theOrientationVector, int theSliceIndex, 
+CTScan::reconstructToImage(const Quaternionf & theOrientation, int theSliceIndex, 
         dom::NodePtr & theImageNode) {
     switch (_myEncoding) {
         case y60::GRAY:
             {
                 typedef unsigned char VoxelT;
-                reconstructToImageImpl<VoxelT>(theOrientationVector, theSliceIndex, theImageNode);
+                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode);
             }
             break;
         case y60::GRAY16:
             {
                 typedef unsigned short VoxelT;
-                reconstructToImageImpl<VoxelT>(theOrientationVector, theSliceIndex, theImageNode);
+                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode);
             }
             break;
         case y60::GRAYS16:
             {
                 typedef short VoxelT;
-                reconstructToImageImpl<VoxelT>(theOrientationVector, theSliceIndex, theImageNode);
+                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode);
             }
             break;
         default:
@@ -723,9 +715,37 @@ CTScan::reconstructToImage(const Vector3f & theOrientationVector, int theSliceIn
     }
 }
 
+void 
+CTScan::reconstructToImage(CTScan::Orientation theOrientation, int theSliceIndex, 
+        dom::NodePtr & theImageNode) {
+    switch (_myEncoding) {
+        case y60::GRAY:
+            {
+                typedef unsigned char VoxelT;
+                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode);
+            }
+            break;
+        case y60::GRAY16:
+            {
+                typedef unsigned short VoxelT;
+                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode);
+            }
+            break;
+        case y60::GRAYS16:
+            {
+                typedef short VoxelT;
+                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode);
+            }
+            break;
+        default:
+            throw CTScanException("Unhandled voxel type", PLUS_FILE_LINE);   
+    }
+}
+
+
 template <class VoxelT>
 void 
-CTScan::reconstructToImageImpl(const Vector3f & theOrientationVector, int theSliceIndex, 
+CTScan::reconstructToImageImpl(CTScan::Orientation theOrientation, int theSliceIndex, 
         dom::NodePtr & theImageNode) 
 {
     if (_myState != COMPLETE) {
@@ -738,18 +758,8 @@ CTScan::reconstructToImageImpl(const Vector3f & theOrientationVector, int theSli
     int myPoTWidth;
     int myPoTHeight;
     Ptr<ReadableBlock> myPixelData;
-    Orientation myOrientation;
-    if (asl::almostEqual(theOrientationVector, Vector3f(0,0,1))) {
-        myOrientation = CTScan::IDENTITY;
-    } else if (asl::almostEqual(theOrientationVector, Vector3f(1,0,0))) {
-        myOrientation = CTScan::Y2Z;
-    } else if (asl::almostEqual(theOrientationVector, Vector3f(0,1,0))) {
-        myOrientation = CTScan::X2Z;
-    } else {
-        myOrientation = CTScan::ARBITRARY;
-    }
 
-    switch (myOrientation) {        
+    switch (theOrientation) {        
         case IDENTITY:
             {
                 myWidth = mySize[0];
@@ -813,71 +823,84 @@ CTScan::reconstructToImageImpl(const Vector3f & theOrientationVector, int theSli
                 myPixelData = myTarget; 
                 break;
             }
-        case ARBITRARY:
-            {                
-                Box3f myBounds;
-                Vector3f myInitialVector(0,0,1.0f);
-                Vector3f myOrientationVector = theOrientationVector;
-                Quaternionf myRotationQuaternion(myOrientationVector, myInitialVector);
-                Matrix4f myScreenToVoxelProjection(myRotationQuaternion);
-
-                Vector3i myVoxelSize = getVoxelDimensions();
-                Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
-                bool myInversionDone = myVoxelToScreenProjection.invert();
-                if (!myInversionDone) {
-                    AC_WARNING << "Can't invert matrix for orientation: " << theOrientationVector;
-                    break;
-                }
-                myBounds = computeProjectionBounds(myVoxelToScreenProjection);
-                Vector3f mySize = myBounds.getSize();
-                myWidth = int(ceil(mySize[0]));
-                myHeight = int(ceil(mySize[1]));
-                myPoTWidth = nextPowerOfTwo(myWidth);
-                myPoTHeight = nextPowerOfTwo(myHeight);
-                Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));                
-                unsigned myBpp = getBytesRequired(1, _myEncoding);
-                int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
-                
-                float mySlicePosition = float(theSliceIndex) + myBounds[Box3f::MIN][2];
-                Vector3f myLinePos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
-                                             myScreenToVoxelProjection);
-                Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition),
-                                           myScreenToVoxelProjection) - myLinePos) / float(myWidth);
-                Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
-                                           myScreenToVoxelProjection) - myLinePos) / float(myHeight);
-                AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", LinePos: " << myLinePos
-                         << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
-
-                Box3f myVoxelBox(Point3f(0.0f, 0.0f, 0.0f), 
-                    Point3f(float(myVoxelSize[0]), float(myVoxelSize[1]), float(myVoxelSize[2])));
-                typedef Line<float> Linef;
-
-                for (int v = 0; v < myHeight; ++v) {
-                    // XXX TODO:
-                    // 1. Compute min/max for the line (myLinePos, mySourceDeltaU) when its
-                    //    crossing the box (0,0,0)(getDimensions()) 
-                    // 2. set start and end values for loop accordingly
-                    // 3. compute mySourcePos by multiplying loopstart with mySourceDeltaU
-                    Linef myScanLine(myLinePos, mySourceDeltaU);
-                    float myMinValue, myMaxValue;
-                    if (intersection(myVoxelBox, myScanLine, myMinValue, myMaxValue)) {
-                        int myStart = int(ceil(myMinValue));
-                        int myEnd = int(floor(myMaxValue));
-                        Vector3f mySourcePos = myLinePos + (ceil(myMinValue) * mySourceDeltaU);
-                        VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+myTargetLineStride*v+myStart);
-                        for (int u = myStart; u < myEnd; ++u) {
-                            //VoxelT myValue = interpolatedValueAt<VoxelT>(mySourcePos);
-                            *myAddress = fastValueAt<VoxelT>(mySourcePos);
-                            mySourcePos += mySourceDeltaU;
-                            myAddress ++;
-                        }
-                    }
-                    myLinePos += mySourceDeltaV;
-                }
-                myPixelData = myTarget; 
-            }
-            break;
+        default:
+            throw CTScanException("Illegal Orientation", PLUS_FILE_LINE);
     }
+    // set the image data
+    y60::ImagePtr myFacade = theImageNode->dom::Node::getFacade<y60::Image>();
+    myFacade->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
+    // set the matrix to make up for the padded image
+    asl::Matrix4f myScale;
+    myScale.makeIdentity();
+    myScale.scale(Vector3f(float(myWidth)/myPoTWidth, float(myHeight)/myPoTHeight, 1.0f)); 
+    myFacade->y60::Image::set<y60::ImageMatrixTag>(myScale); 
+}
+
+template <class VoxelT>
+void 
+CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceIndex, 
+        dom::NodePtr & theImageNode) 
+{
+    if (_myState != COMPLETE) {
+        throw CTScanException("cannot reconstruct image when loading not complete!", PLUS_FILE_LINE);
+    }
+
+    int myWidth;
+    int myHeight;
+    int myPoTWidth;
+    int myPoTHeight;
+    Ptr<ReadableBlock> myPixelData;
+    Box3f myBounds;
+    Vector3i myVoxelSize = getVoxelDimensions();
+
+    Matrix4f myScreenToVoxelProjection(theOrientation);
+    Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
+    bool myInversionDone = myVoxelToScreenProjection.invert();
+    if (!myInversionDone) {
+        throw CTScanException("Coundn't invert rotation matrix", PLUS_FILE_LINE);
+    }
+    myBounds = computeProjectionBounds(myVoxelToScreenProjection);
+    Vector3f mySize = myBounds.getSize();
+    myWidth = int(ceil(mySize[0]));
+    myHeight = int(ceil(mySize[1]));
+    myPoTWidth = nextPowerOfTwo(myWidth);
+    myPoTHeight = nextPowerOfTwo(myHeight);
+    Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));                
+    unsigned myBpp = getBytesRequired(1, _myEncoding);
+    int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
+
+    float mySlicePosition = float(theSliceIndex) + myBounds[Box3f::MIN][2];
+    Vector3f myLinePos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
+        myScreenToVoxelProjection);
+    Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition),
+        myScreenToVoxelProjection) - myLinePos) / float(myWidth);
+    Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
+        myScreenToVoxelProjection) - myLinePos) / float(myHeight);
+    AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", LinePos: " << myLinePos
+        << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
+
+    Box3f myVoxelBox(Point3f(0.0f, 0.0f, 0.0f), 
+        Point3f(float(myVoxelSize[0]), float(myVoxelSize[1]), float(myVoxelSize[2])));
+    typedef Line<float> Linef;
+
+    for (int v = 0; v < myHeight; ++v) {
+        Linef myScanLine(myLinePos, mySourceDeltaU);
+        float myMinValue, myMaxValue;
+        if (intersection(myVoxelBox, myScanLine, myMinValue, myMaxValue)) {
+            int myStart = int(ceil(myMinValue));
+            int myEnd = int(floor(myMaxValue));
+            Vector3f mySourcePos = myLinePos + (ceil(myMinValue) * mySourceDeltaU);
+            VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+myTargetLineStride*v+myStart);
+            for (int u = myStart; u < myEnd; ++u) {
+                //VoxelT myValue = interpolatedValueAt<VoxelT>(mySourcePos);
+                *myAddress = fastValueAt<VoxelT>(mySourcePos);
+                mySourcePos += mySourceDeltaU;
+                myAddress ++;
+            }
+        }
+        myLinePos += mySourceDeltaV;
+    }
+    myPixelData = myTarget; 
     // set the image data
     y60::ImagePtr myFacade = theImageNode->dom::Node::getFacade<y60::Image>();
     myFacade->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);

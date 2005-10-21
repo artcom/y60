@@ -66,7 +66,8 @@ class CTScan {
         int loadSphere(int size);
         int setSlices(std::vector<dom::ResizeableRasterPtr> theSlices);
 
-        void reconstructToImage(const asl::Vector3f & theOrientationVector, int theSliceIndex, dom::NodePtr & theImageNode);
+        void reconstructToImage(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
+        void reconstructToImage(const asl::Quaternionf & theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
 
         /** Returns the default window center/width */
         const asl::Vector2f & getDefaultWindow() const;
@@ -165,7 +166,10 @@ class CTScan {
         bool notifyProgress(double theProgress, const std::string & theMessage = "");
 
         asl::Vector3i
-        getReconstructionDimensions(const asl::Vector3f & theOrientationVector) const;
+        getReconstructionDimensions(Orientation theOrientation) const;
+
+        asl::Vector3i
+        getReconstructionDimensions(const asl::Quaternionf & theOrientation) const;
 
     private:
         CTScan(const CTScan&); // hide copy constructor
@@ -214,7 +218,10 @@ class CTScan {
         fastValueAt(const asl::Vector3f & thePosition);
 
         template <class VoxelT>
-        void reconstructToImageImpl(const asl::Vector3f & theOrientationVector, int theSliceIndex, dom::NodePtr & theImageNode);
+        void reconstructToImageImpl(const asl::Quaternionf & theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
+
+        template <class VoxelT>
+        void reconstructToImageImpl(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
 
         asl::Vector2d _myOccurringValueRange;
         

@@ -26,6 +26,7 @@
 #include <y60/JSScene.h>
 #include <y60/JSSphere.h>
 #include <y60/JSVector.h>
+#include <y60/JSQuaternion.h>
 #include <dom/Nodes.h>
 
 #include <asl/PackageManager.h>
@@ -218,16 +219,24 @@ reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
             JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #2 is undefined");
             return JS_FALSE;
         }
-        Vector3f myOrientationVector;
-        convertFrom(cx, argv[0], myOrientationVector);
+
         int mySlice = 0;
         convertFrom(cx, argv[1], mySlice);
         dom::NodePtr myImageNode;
         convertFrom(cx, argv[2], myImageNode);
-
         CTScan & myCTScan = myObj.getNative();
-        myCTScan.reconstructToImage(myOrientationVector, mySlice, myImageNode);
 
+        int myOrientationEnum;
+        asl::Quaternionf myOrientationQuaternion;
+        if (!convertFrom(cx, argv[0], myOrientationEnum)) {
+            if (!convertFrom(cx, argv[0], myOrientationQuaternion)) {
+                JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #0 must be an Orientation or a Quaternion");
+                return JS_FALSE;
+            }
+            myCTScan.reconstructToImage(myOrientationQuaternion, mySlice, myImageNode);
+        } else {
+            myCTScan.reconstructToImage(static_cast<CTScan::Orientation>(myOrientationEnum), mySlice, myImageNode);
+        }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -242,14 +251,23 @@ getReconstructionDimensions(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
             return JS_FALSE;
         }
         if (JSVAL_IS_VOID(argv[0])) {
-            JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #0 is undefined");
+            JS_ReportError(cx, "JSCTScan::getReconstructionDimensions(): Argument #0 is undefined");
             return JS_FALSE;
         }
-        Vector3f myOrientationVector;
-        convertFrom(cx, argv[0], myOrientationVector);
-
         CTScan & myCTScan = myObj.getNative();
-        Vector3i myDimensions = myCTScan.getReconstructionDimensions(myOrientationVector);
+        Vector3i myDimensions;
+
+        int myOrientationEnum;
+        asl::Quaternionf myOrientationQuaternion;
+        if (!convertFrom(cx, argv[0], myOrientationEnum)) {
+            if (!convertFrom(cx, argv[0], myOrientationQuaternion)) {
+                JS_ReportError(cx, "JSCTScan::getReconstructionDimensions(): Argument #0 must be an Orientation or a Quaternion");
+                return JS_FALSE;
+            }
+            myDimensions = myCTScan.getReconstructionDimensions(myOrientationQuaternion);
+        } else {
+            myDimensions = myCTScan.getReconstructionDimensions(static_cast<CTScan::Orientation>(myOrientationEnum));
+        }
         *rval = as_jsval(cx, Vector3f(float(myDimensions[0]), float(myDimensions[1]), float(myDimensions[2])));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
