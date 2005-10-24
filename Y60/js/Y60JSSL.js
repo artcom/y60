@@ -627,3 +627,27 @@ function parseXML(theFilename) {
     myDocument.parseFile(theFilename);
     return myDocument.firstChild;
 }
+
+function formatTimecode(theTimestamp) {
+    var myHours   = 0;
+    var myMinutes = 0;
+    var mySeconds = 0;
+
+    if (theTimestamp >= 3600) {
+        myHours = (theTimestamp - theTimestamp % 3600) / 3600;
+        theTimestamp = theTimestamp % 3600;
+    }
+
+    if (theTimestamp >= 60) {
+        myMinutes = (theTimestamp - theTimestamp % 60) / 60;
+        theTimestamp = theTimestamp % 60;
+    }
+
+    mySeconds = theTimestamp.toFixed(0);
+
+    var myTC  = (myHours < 10 ? "0" + myHours : myHours) + ":";
+    myTC += (myMinutes < 10 ? "0" + myMinutes : myMinutes) + ":";
+    myTC += (mySeconds < 10 ? "0" + mySeconds : mySeconds);
+
+    return myTC;
+}
