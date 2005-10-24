@@ -41,7 +41,7 @@
 using namespace std;
 using namespace asl;
 
-#define DB(x) //x
+#define DB(x) // x
 
 namespace y60 {
 
@@ -205,7 +205,8 @@ namespace y60 {
     }
 
     void
-    DecoderContext::seekToTime(double theTimestamp) {        
+    DecoderContext::seekToTime(double theTimestamp) {
+        clearPacketCache();
         int myFrameIndex = int(theTimestamp * _myVideoStream->r_frame_rate / _myVideoStream->r_frame_rate_base);        
         double myFrameTime = double(_myVideoStream->r_frame_rate_base) / _myVideoStream->r_frame_rate;
 
@@ -349,11 +350,11 @@ namespace y60 {
     
     void DecoderContext::clearPacketCache() {
         list<AVPacket*>::iterator it;
-        for (it=_myVideoPackets.begin(); it != _myVideoPackets.end(); ) {
+        for (it=_myVideoPackets.begin(); it != _myVideoPackets.end(); ++it) {
             av_free_packet(*it);
         }
         _myVideoPackets.clear();
-        for (it=_myAudioPackets.begin(); it != _myAudioPackets.end(); ) {
+        for (it=_myAudioPackets.begin(); it != _myAudioPackets.end(); ++it) {
             av_free_packet(*it);
         }
         _myAudioPackets.clear();

@@ -28,8 +28,8 @@
 #include <asl/Pump.h>
 #include <math.h>
 
-#define DB(x) //x
-#define DB2(x) // x
+#define DB(x) // x
+#define DB2(x)  // x
 
 
 using namespace std;
@@ -65,7 +65,7 @@ namespace y60 {
     FrameConveyor::clear() {
         _myCacheSizeInSecs = PRELOAD_CACHE_TIME;
         _myFrameCache.clear();
-        // TODO: Audio::stop()?
+        _myAudioSink->stop();
     }
 
     void
