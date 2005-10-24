@@ -160,33 +160,27 @@ JSPlane::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         myNewObject=new JSPlane(myNewValue);
     } else {
         if (argc == 2) {
+            // construct from three points
+            JSObject * myObject = JSVector<asl::Vector3<Number> >::Construct(cx, argv[0]);
+            if (!myObject) {
+                JS_ReportError(cx,"JSPlane::Constructor: first argument must be a normal vector of size 3",ClassName());
+                return JS_FALSE;
+            }
             jsdouble myNumber;
-            if (JS_ValueToNumber(cx,argv[0],&myNumber) && !JSDOUBLE_IS_NaN(myNumber)) {
+            if (JS_ValueToNumber(cx,argv[1],&myNumber) && !JSDOUBLE_IS_NaN(myNumber)) {
                 // use normal/distance construction
-                JSObject * myDirection = JSVector<asl::Vector3<Number> >::Construct(cx, argv[1]);
-                if (!myDirection) {
-                    JS_ReportError(cx,"JSPlane::Constructor: second argument must be a vector if first is the distance");
-                    return JS_FALSE;
-                }
-                myNewPlane = asl::Plane<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx, myDirection), 
-                    Number(myNumber));
+                myNewPlane = asl::Plane<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject), Number(myNumber));
                 myNewPlane.normalize();
             } else {
-                // normal / point on plane construction
-                JSObject * myDirection = JSVector<asl::Vector3<Number> >::Construct(cx, argv[0]);
-                if (!myDirection) {
-                    JS_ReportError(cx,"JSPlane::Constructor: first argument must be a vector or a number");
+                JSObject * myObject2 = JSVector<asl::Vector3<Number> >::Construct(cx, argv[1]);
+                if (!myObject2) {
+                    JS_ReportError(cx,"JSPlane::Constructor: second argument must be a distance number or point on the plane of size 3");
                     return JS_FALSE;
                 }
-                JSObject * myPoint = JSVector<asl::Vector3<Number> >::Construct(cx, argv[1]);
-                if (!myDirection) {
-                    JS_ReportError(cx,"JSPlane::Constructor: second argument must be a vector");
-                    return JS_FALSE;
-                }
-                myNewPlane = asl::Plane<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myDirection),
-                                                JSVector<asl::Vector3<Number> >::getNativeRef(cx,myPoint));
+                myNewPlane = asl::Plane<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject),
+                                                JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject2));
                 myNewPlane.normalize();
-            }
+           }
             myNewObject=new JSPlane(myNewValue);
         } else if (argc == 1) {
             // construct from one Plane
