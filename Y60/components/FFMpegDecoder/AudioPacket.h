@@ -23,7 +23,7 @@
 namespace y60 {
 
     class AudioPacket {
-        friend class DecoderContext;
+//        friend class DecoderContext;
 
         public:
             AudioPacket::AudioPacket(unsigned theFrameSize) : _myTimestamp(0), _mySampleSize(0) {
@@ -37,12 +37,20 @@ namespace y60 {
                 }
             }
 
+            void setTimestamp(double theTimestamp) {
+                _myTimestamp = theTimestamp;
+            }
+            
             double getTimestamp() const {
                 return _myTimestamp;
             }
             
             unsigned char * getSamples() {
                 return _myBuffer;
+            }
+
+            void setSampleSize(unsigned theSampleSize) {
+                _mySampleSize = theSampleSize;
             }
 
             unsigned getSampleSize() const {

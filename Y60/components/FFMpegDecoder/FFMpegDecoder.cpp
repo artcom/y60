@@ -108,9 +108,12 @@ namespace y60 {
     void 
     FFMpegDecoder::resumeMovie(double theStartTime) {
         MovieDecoderBase::resumeMovie(theStartTime);        
-        _myFrameConveyor.preload(theStartTime);
               
         if (_myAudioSink) {            
+            if (_myAudioSink->getState() == HWSampleSink::STOPPED) {
+                _myFrameConveyor.preload(theStartTime);
+                _myAudioSink->setCurrentTime(theStartTime);
+            }
             _myAudioSink->play();
         }        
     }
@@ -118,10 +121,10 @@ namespace y60 {
     void 
     FFMpegDecoder::startMovie(double theStartTime) {
         MovieDecoderBase::startMovie(theStartTime);
-        _myFrameConveyor.preload(theStartTime);
 
         if (_myAudioSink) {
-            _myAudioSink->play();
+            _myFrameConveyor.preload(theStartTime);
+            _myAudioSink->play();            
         }
     }
 

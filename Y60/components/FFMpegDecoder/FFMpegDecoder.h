@@ -72,6 +72,7 @@ namespace y60 {
 
             FrameConveyor               _myFrameConveyor;
             asl::HWSampleSinkPtr        _myAudioSink;
+
     };
 
     typedef asl::Ptr<FFMpegDecoder> FFMpegDecoderPtr;

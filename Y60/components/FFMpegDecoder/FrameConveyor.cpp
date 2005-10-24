@@ -28,7 +28,7 @@
 #include <asl/Pump.h>
 #include <math.h>
 
-#define DB(x) // x
+#define DB(x) //x
 #define DB2(x) // x
 
 
@@ -37,7 +37,7 @@ using namespace asl;
 
 namespace y60 {
 
-    const unsigned MAX_FRAME_CACHE_SIZE = 500;
+    const unsigned MAX_FRAME_CACHE_SIZE = 50;
     const double PRELOAD_CACHE_TIME = 2;    
 
     FrameConveyor::FrameConveyor() :
@@ -75,8 +75,9 @@ namespace y60 {
             clear();
 
             cerr << "Fill audio/video-cache..." << endl;
-            while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE &&
-                  double(_myAudioSink->getBufferedTime()) < PRELOAD_CACHE_TIME) 
+            
+            while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE /*&&
+                  double(_myAudioSink->getBufferedTime()) < PRELOAD_CACHE_TIME*/) 
             {
                 updateCache(theInitialTimestamp);
                 _myCacheSizeInSecs += (1 / _myContext->getFrameRate());
@@ -214,26 +215,58 @@ namespace y60 {
 
         DB2(cerr << "fillCache [" << theStartTime << " to " << theEndTime << "]" << endl;)
         DB2(cerr << " last decoded " << myLastDecodedTime << endl;)
-        if (fabs(theStartTime - myLastDecodedTime) >= myTimePerFrame * 2) {
+        if (fabs(theStartTime - myLastDecodedTime) >= myTimePerFrame * 1.5) {
             _myContext->seekToTime(theStartTime);
+            if (_myAudioSink->getState() != HWSampleSink::STOPPED) {
+                cerr << "Seek: " << fabs(theStartTime - myLastDecodedTime) << endl;
+                _myAudioSink->stop();
+            }
         }
 
-        double myCurrentTime = theStartTime;
+        double myLastDecodedVideoTime = theStartTime;
         bool   myEndOfFileFlag = false;
-        while (!myEndOfFileFlag && myCurrentTime < theEndTime) {
-            decodeFrame(myCurrentTime, myEndOfFileFlag);
-            if (myEndOfFileFlag) {
-                _myContext->setEndOfFileTimestamp(myCurrentTime);  
-            }
-            DB2(
-                cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
-                cerr << "  current time: " << myCurrentTime << endl;
-                if (_myAudioSink) {
-                    cerr << "  A-Buffersize in secs: " << (_myAudioSink->getBufferedTime())
-                            <<endl;
-                }
-            )
+        while (!myEndOfFileFlag && myLastDecodedVideoTime < theEndTime ) {
+            decodeFrame(myLastDecodedVideoTime, myEndOfFileFlag);
         }
+        
+        myEndOfFileFlag = false;
+        if (_myAudioSink) {
+            double myLastDecodedAudioTime = theStartTime;
+            while (!myEndOfFileFlag && myLastDecodedAudioTime < theEndTime ) {
+                myEndOfFileFlag = _myContext->decodeAudio(&_myAudioPacket);
+                if (!myEndOfFileFlag) {
+                    AudioBufferPtr myBuffer;
+                    /*
+                       if (_myResampleContext) {
+                       numFrames = audio_resample(_myResampleContext, 
+                       (int16_t*)(_myResampledSamples.begin()),
+                       (int16_t*)(_mySamples.begin()), 
+                       numFrames);
+                       myBuffer = Pump::get().createBuffer(numFrames);
+                       myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
+                       }
+                       */
+                    myBuffer = Pump::get().createBuffer(_myAudioPacket.getSampleSize() / 
+                            (2 * _myContext->getNumAudioChannels()));
+                    myBuffer->convert(_myAudioPacket.getSamples(), SF_S16, 
+                            _myContext->getNumAudioChannels());
+                    _myAudioSink->queueSamples(myBuffer);
+                    myLastDecodedAudioTime = _myAudioPacket.getTimestamp();
+                }
+            }
+            
+        }
+        if (myEndOfFileFlag) {
+            _myContext->setEndOfFileTimestamp(myLastDecodedVideoTime);  
+        }
+        DB2(
+                cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
+                cerr << "  current time: " << myLastDecodedVideoTime << endl;
+                if (_myAudioSink) {
+                cerr << "  A-Buffersize in secs: " << (_myAudioSink->getBufferedTime())
+                <<endl;
+                }
+           )
     }
 
     double
@@ -274,33 +307,24 @@ namespace y60 {
     }
 
     void
-    FrameConveyor::decodeFrame(double & theCurrentTime, bool & theEndOfFileFlag) {
-        theEndOfFileFlag = false;
+    FrameConveyor::decodeFrame(double & theLastDecodedVideoTime, bool & theEndOfFileFlag) 
+    {
         if (!_myContext) {
             throw FrameConveyorException(std::string("No decoding context set, yet."),
                     PLUS_FILE_LINE);
         }
 
-        DecoderContext::FrameType myFrameType;
-        if (_myAudioSink) {
-            myFrameType = _myContext->decode(_myVideoFrame, &_myAudioPacket);
-        } else {
-            myFrameType = _myContext->decode(_myVideoFrame, 0);
-        }
+        theEndOfFileFlag = _myContext->decodeVideo(_myVideoFrame);
+        unsigned myBPP = getBytesRequired(1, getPixelEncoding(_myContext->getVideoStream()));
+        VideoFramePtr myNewFrame = VideoFramePtr(new VideoFrame(_myContext->getWidth(),
+                _myContext->getHeight(), myBPP));
 
-        switch (myFrameType) {
-            case DecoderContext::FrameTypeVideo:
-            {
-                unsigned myBPP = getBytesRequired(1, getPixelEncoding(_myContext->getVideoStream()));
-                VideoFramePtr myNewFrame = VideoFramePtr(new VideoFrame(_myContext->getWidth(), _myContext->getHeight(), myBPP));
-
-                convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
-                myNewFrame->setTimestamp(_myVideoFrame->pts / (double)AV_TIME_BASE);
-                _myFrameCache[myNewFrame->getTimestamp()] = myNewFrame;
-                theCurrentTime = myNewFrame->getTimestamp();
-                break;
-            }
-            case DecoderContext::FrameTypeAudio:
+        convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
+        myNewFrame->setTimestamp(_myVideoFrame->pts / (double)AV_TIME_BASE);
+        _myFrameCache[myNewFrame->getTimestamp()] = myNewFrame;
+        theLastDecodedVideoTime = myNewFrame->getTimestamp();
+#if 0
+        case DecoderContext::FrameTypeAudio:
             {
                 if (_myAudioSink) {
                     AudioBufferPtr myBuffer;
@@ -319,17 +343,12 @@ namespace y60 {
                     myBuffer->convert(_myAudioPacket.getSamples(), SF_S16, 
                             _myContext->getNumAudioChannels());
                     _myAudioSink->queueSamples(myBuffer);
-                    theCurrentTime = _myAudioPacket.getTimestamp();
+                    theLastDecodedAudioTime = _myAudioPacket.getTimestamp();
+                    cerr << "Audio Frame Time: " << theLastDecodedAudioTime << endl;
                 }
                 break;
             }
-            case DecoderContext::FrameTypeEOF:
-                theEndOfFileFlag = true;
-                break;
-            default:
-                throw FrameConveyorException(std::string("Unknown frame type: ") 
-                        + as_string(myFrameType), PLUS_FILE_LINE);
-        }
+#endif                
     }
 
     void 

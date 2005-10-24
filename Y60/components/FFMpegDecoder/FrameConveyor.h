@@ -60,7 +60,7 @@ namespace y60 {
             /** Decode frame at theTimestamp into theTargetRaster. 
              *  Returns the timestamp of the decoded frame or -1 if EOF was met.
              **/
-            void decodeFrame(double & theCurrentTime, bool & theEndOfFileFlag);
+            void decodeFrame(double & theLastDecodedVideoTime, bool & theEndOfFileFlag);
 
             /// Convert frame vom YUV to RGB
             void convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer);

@@ -24,6 +24,7 @@
 
 #include <asl/Ptr.h>
 #include <string>
+#include <map>
 
 namespace y60 {
     
@@ -31,16 +32,11 @@ namespace y60 {
     
     class DecoderContext {
         public:
-            enum FrameType {
-                FrameTypeVideo,
-                FrameTypeAudio,
-                FrameTypeEOF
-            };
-
             DecoderContext(const std::string & theFilename);
             ~DecoderContext();
 
-            FrameType decode(AVFrame * theVideoFrame, AudioPacket * theAudioPacket);
+            bool decodeVideo(AVFrame * theVideoFrame);
+            bool decodeAudio(AudioPacket * theAudioPacket);
             void seekToTime(double theTime);
 
             AVStream * getVideoStream() {
@@ -81,6 +77,14 @@ namespace y60 {
             int               _myAudioStreamIndex;
             std::string       _myFilename;
             double            _myEndOfFileTimestamp;
+
+            // Demuxing and packet-level buffering support.
+            AVPacket* getPacket(bool theGetVideo);
+            void clearPacketCache();
+            
+            typedef std::list<AVPacket *> PacketList;
+            PacketList _myAudioPackets;
+            PacketList _myVideoPackets;
     };
 
     typedef asl::Ptr<DecoderContext> DecoderContextPtr;

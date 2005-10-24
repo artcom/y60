@@ -115,24 +115,31 @@ namespace y60 {
     FrameAnalyser::printTableRow(Table & theTable, AVPacket & thePacket, AVFrame & theFrame) {
         theTable.addRow();
 
-        ourFrameCounter++;
-        int myFrameIndex = asl::round(double(thePacket.dts - _myVStream->start_time) / AV_TIME_BASE * _myVStream->r_frame_rate / _myVStream->r_frame_rate_base);
-        theTable.setField("frame", as_string(myFrameIndex));        
 
-        switch (theFrame.pict_type) {
-            case FF_I_TYPE:
-                theTable.setField("type","*I*");
-                break;
-            case FF_P_TYPE:
-                theTable.setField("type","P");
-                break;
-            case FF_B_TYPE:
-                theTable.setField("type","B");
-                break;
-            default:
-                theTable.setField("type","Unknown");
-                break;
+        if (thePacket.stream_index == _myVStreamIndex) {
+            ourFrameCounter++;
+            int myFrameIndex = asl::round(double(thePacket.dts - _myVStream->start_time) 
+                    / AV_TIME_BASE * _myVStream->r_frame_rate / _myVStream->r_frame_rate_base);
+            theTable.setField("frame", as_string(myFrameIndex));        
+            switch (theFrame.pict_type) {
+                case FF_I_TYPE:
+                    theTable.setField("type","*I*");
+                    break;
+                case FF_P_TYPE:
+                    theTable.setField("type","P");
+                    break;
+                case FF_B_TYPE:
+                    theTable.setField("type","B");
+                    break;
+                default:
+                    theTable.setField("type","Unknown");
+                    break;
+            }
+        } else {
+            theTable.setField("frame", "--");
+            theTable.setField("type", "-A-");
         }
+        
         theTable.setField("dts", as_string(thePacket.dts / ourTimeBase));
         theTable.setField("pts", as_string(theFrame.pts / ourTimeBase));
         theTable.setField("streamposition", as_string(theFrame.coded_picture_number));
@@ -289,6 +296,7 @@ namespace y60 {
             } else {
                 cerr << "*** Audio Packet *** " << endl;
                 printPacketInfo(myPacket);
+                printTableRow(myTable, myPacket, *myFrame);
             }
         }
         myTable.print(cerr);

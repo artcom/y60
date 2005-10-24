@@ -136,56 +136,72 @@ namespace y60 {
         return _myVideoStream->codec.height;
     }
 
-    DecoderContext::FrameType
-    DecoderContext::decode(AVFrame * theVideoFrame, AudioPacket * theAudioPacket) {
-        DecoderContext::FrameType myFrameType = FrameTypeEOF;
-        AVPacket myPacket;
+    bool
+    DecoderContext::decodeVideo(AVFrame * theVideoFrame) {
+        AVPacket * myPacket;
         //memset(&myPacket, 0, sizeof(myPacket));
-        
+ 
         int64_t myStartTime = 0;
         if (_myVideoStream->start_time != AV_NOPTS_VALUE) {
             myStartTime = _myVideoStream->start_time;
         } 
 
-        // Read until complete frame read or end of file reached
+        // Read until complete video frame read or end of file reached
         bool myEndOfFileFlag = false;
-        while (!(myEndOfFileFlag = (av_read_frame(_myFormatContext, &myPacket) < 0))) {
-            if (myPacket.stream_index == _myVideoStreamIndex) {
+        while (!myEndOfFileFlag) {
+            myPacket = getPacket(true);
+            if (myPacket == 0) {
+                myEndOfFileFlag = true;
+            } else {
                 int myFrameCompleteFlag = 0;
-                int myLen = avcodec_decode_video(&_myVideoStream->codec, theVideoFrame, &myFrameCompleteFlag,
-                                                 myPacket.data, myPacket.size);
+                int myLen = avcodec_decode_video(&_myVideoStream->codec, theVideoFrame, 
+                        &myFrameCompleteFlag, myPacket->data, myPacket->size);
 
                 if (myLen < 0) {
                     AC_ERROR << "av_decode_video error";
-                } else if (myLen < myPacket.size) {
+                } else if (myLen < myPacket->size) {
                     AC_ERROR << "av_decode_video: Could not decode video in one step";
                 }                
 
-                if (myFrameCompleteFlag) { 
-                    theVideoFrame->pts = myPacket.dts - myStartTime;
-                    myFrameType = FrameTypeVideo;
+                if (myFrameCompleteFlag) {
+                    /// XXX is it ok to just copy a dts to a pts? - uz
+                    theVideoFrame->pts = myPacket->dts - myStartTime;
                     break;
                 }                 
-            } else if (myPacket.stream_index == _myAudioStreamIndex && theAudioPacket) {
-                int myLen = avcodec_decode_audio(&_myAudioStream->codec, (int16_t*)theAudioPacket->getSamples(), (int *)&theAudioPacket->_mySampleSize,
-                    myPacket.data, myPacket.size);
-                theAudioPacket->_myTimestamp = (myPacket.dts - myStartTime) / (double)AV_TIME_BASE;
-
-                if (myLen < 0) {
-                    AC_ERROR << "avcodec_decode_audio error";
-                } else if (myLen < myPacket.size) {
-                    AC_ERROR << "avcodec_decode_audio: Could not decode video in one step";
-                }
-
-                myFrameType = FrameTypeAudio;
-                break;
-            } 
-        }        
-
-        if (!myEndOfFileFlag) {
-            av_free_packet(&myPacket);
+            }
         }
-        return myFrameType;
+        if (myPacket) {
+            av_free_packet(myPacket);
+            delete myPacket;
+        }
+        return myEndOfFileFlag;
+    }
+
+    bool 
+    DecoderContext::decodeAudio(AudioPacket * theAudioPacket) {
+        AVPacket * myPacket = getPacket(false);
+        if (myPacket) {
+            int64_t myStartTime = 0;
+            if (_myVideoStream->start_time != AV_NOPTS_VALUE) {
+                myStartTime = _myVideoStream->start_time;
+            } 
+            unsigned mySampleSize;
+            int myLen = avcodec_decode_audio(&_myAudioStream->codec, 
+                    (int16_t*)theAudioPacket->getSamples(), 
+                    (int *)&mySampleSize,
+                    myPacket->data, myPacket->size);
+            theAudioPacket->setSampleSize(mySampleSize);
+            theAudioPacket->setTimestamp((myPacket->dts - myStartTime) / (double)AV_TIME_BASE);
+
+            if (myLen < 0) {
+                AC_ERROR << "avcodec_decode_audio error";
+            } else if (myLen < myPacket->size) {
+                AC_ERROR << "avcodec_decode_audio: Could not decode video in one step";
+            }
+            return false;
+        } else {
+            return true;
+        }
     }
 
     void
@@ -288,4 +304,59 @@ namespace y60 {
             return 0;
         }
     }
+
+    AVPacket* DecoderContext::getPacket(bool theGetVideo) 
+    {
+        int myStreamIndex;
+        int myOtherStreamIndex;
+        PacketList* myPacketList;
+        PacketList* myOtherPacketList;
+        if (theGetVideo) {
+            myStreamIndex = _myVideoStreamIndex;
+            myOtherStreamIndex = _myAudioStreamIndex;
+            myPacketList = &_myVideoPackets;
+            myOtherPacketList = &_myAudioPackets;
+        } else {
+            myStreamIndex = _myAudioStreamIndex;
+            myOtherStreamIndex = _myVideoStreamIndex;
+            myPacketList = &_myAudioPackets;
+            myOtherPacketList = &_myVideoPackets;
+        }
+
+        if (!myPacketList->empty()) {
+            AVPacket * myPacket = myPacketList->front();
+            myPacketList->pop_front();
+            return myPacket;
+        } else {
+            AVPacket * myPacket;
+            bool myEndOfFileFlag;
+            do {
+                myPacket = new AVPacket;
+                myEndOfFileFlag = (av_read_frame(_myFormatContext, myPacket) < 0);
+                if (myEndOfFileFlag) {
+                    break;
+                }
+                // Without av_dup_packet, ffmpeg reuses myPacket->data at first opportunity 
+                // and trashes our memory.
+                av_dup_packet(myPacket);
+                if (myPacket->stream_index == myOtherStreamIndex) {
+                    myOtherPacketList->push_back(myPacket);
+                }
+            } while (myPacket->stream_index != myStreamIndex);
+            return myPacket; 
+        }
+    }
+    
+    void DecoderContext::clearPacketCache() {
+        list<AVPacket*>::iterator it;
+        for (it=_myVideoPackets.begin(); it != _myVideoPackets.end(); ) {
+            av_free_packet(*it);
+        }
+        _myVideoPackets.clear();
+        for (it=_myAudioPackets.begin(); it != _myAudioPackets.end(); ) {
+            av_free_packet(*it);
+        }
+        _myAudioPackets.clear();
+    }
 }
+

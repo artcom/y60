@@ -4,7 +4,7 @@ if [ "$DEBUG" = "1" ] ; then
 fi
 
 
-export AC_LOG_MODULE_VERBOSITY=TRACE/FFMpegDecoder.cpp
+#export AC_LOG_MODULE_VERBOSITY=TRACE/FFMpegDecoder.cpp
 #Y60_FRAME_ANALYSER=5
 
 ARGS="-I $PRO/lib;$PRO/src/Y60/js MovieTest.js $PRO/src/Y60/shader/shaderlibrary.xml"
