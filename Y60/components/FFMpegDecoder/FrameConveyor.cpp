@@ -352,10 +352,10 @@ namespace y60 {
 
         // convert to RGB
         int myDestFmt;
-        if (_myContext->getPixelFormat() == PIX_FMT_RGB24) {
-            myDestFmt = PIX_FMT_RGB24;
-        } else {
+        if (_myContext->getPixelFormat() == PIX_FMT_BGR24) {
             myDestFmt = PIX_FMT_BGR24;
+        } else {
+            myDestFmt = PIX_FMT_RGB24;
         }
 
         img_convert(&myDestPict, myDestFmt, (AVPicture*)theFrame, _myContext->getPixelFormat(),
