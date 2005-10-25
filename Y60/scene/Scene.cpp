@@ -439,6 +439,17 @@ namespace y60 {
 		}
 	}
 
+    void
+    Scene::parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles ) {
+        if (theNode->getAttribute(RENDER_STYLE_ATTRIB)) {
+            const VectorOfString myRenderStyles = theNode->getAttributeValue<VectorOfString>(RENDER_STYLE_ATTRIB);
+            for (int i = 0; i< myRenderStyles.size(); i++) {
+                RenderStyleType myRenderType = (RenderStyleType)getEnumFromString(myRenderStyles[i],RenderStylesSL);
+                theRenderStyles.push_back(myRenderType);
+            }
+        }
+    }
+
 	void
 	Scene::buildShape(ShapePtr theShape) {
 		NodePtr myShapeNode = theShape->getXmlNode();
@@ -481,6 +492,9 @@ namespace y60 {
                     Primitive & myPrimitive = theShape->createPrimitive(myPrimitiveType,
                         &(*_myMaterials[myMaterialIndex]), myMaterialIndex, myBegin);
 
+
+                    // collect renderstyles for this element
+                    parseRenderStyles( myElementsNode, myPrimitive.getRenderStyles());
                     unsigned myIndicesCount = myElementsNode->childNodesLength(VERTEX_INDICES_NAME);
                     for (unsigned k = 0; k < myIndicesCount; ++k) {
                         NodePtr myIndicesNode = myElementsNode->childNode(VERTEX_INDICES_NAME, k);
@@ -505,14 +519,8 @@ namespace y60 {
                                     myShapeId, PLUS_FILE_LINE);
         }
 
-        // collect renderstyles
-        if (myShapeNode->getAttribute(RENDER_STYLE_ATTRIB)) {
-            const VectorOfString myRenderStyles = myShapeNode->getAttributeValue<VectorOfString>(RENDER_STYLE_ATTRIB);
-            for (int i = 0; i< myRenderStyles.size(); i++) {
-                RenderStyleType myRenderType = (RenderStyleType)getEnumFromString(myRenderStyles[i],RenderStylesSL);
-                theShape->getRenderStyles().push_back(myRenderType);
-            }
-        }
+        // collect per shape renderstyles 
+        parseRenderStyles(myShapeNode, theShape->getRenderStyles());
 
         // Set vertex count
         theShape->setVertexCount(myShapeVertexCount);

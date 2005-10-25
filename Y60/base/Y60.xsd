@@ -1247,6 +1247,14 @@ See also the indices-node (shape-&gt;primitives-&gt;elemements-&gt;indices) for 
                     <xs:documentation>The id of a material that will be used to render the list of elements.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="renderstyle" type="VectorOfString">
+                <xs:annotation>
+                    <xs:documentation>A list of optional renderstyle strings. If set this overrides the
+renderstyles specified for the grand-parent shape element. See shape documentation for a list of valid
+values</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+
             <xs:attribute name="type" type="xs:string">
                 <xs:annotation>
                     <xs:documentation>The type of elements, which are referenced in the indices-node.

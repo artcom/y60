@@ -328,6 +328,7 @@ namespace y60 {
 
             Primitive & createPrimitive(int theMaterialNumber,
                                         const std::string & theShapeId, unsigned int theDomIndex);
+            void parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles );
 
             void collectCameras(dom::NodeList & theCameras, dom::NodePtr theNode) const;
 

@@ -156,7 +156,8 @@ namespace y60 {
             unsigned int getDomIndex() const { return _myDomIndex; }
            
             /**
-             * Loads a Primitive from the Indexnode theIndicesNode and the data node theDataNode.
+             * Loads a Primitive from the indexnode @p theIndicesNode and the data node
+             * @p theDataNode.
              * @param theResourceManager ResourceManager for creation of the VertexData
              * @param theIndicesNode Node of indices
              * @param theDataNode Node of data
@@ -224,6 +225,12 @@ namespace y60 {
             const std::vector<VertexDataBasePtr> & getVertexData() const {
                 return _myVertexData;
             }
+            const std::vector<RenderStyleType> & getRenderStyles() const { 
+                return _myRenderStyles; 
+            }
+            std::vector<RenderStyleType> & getRenderStyles() { 
+                return _myRenderStyles; 
+            }
        private:
             // hide default, copy ctor and assignment
             Primitive(); 
@@ -266,6 +273,7 @@ namespace y60 {
             MaterialBase *                 _myMaterial;
             unsigned                       _myMaterialIndex;
             std::vector<VertexDataBasePtr> _myVertexData;
+            std::vector<RenderStyleType>   _myRenderStyles;
             unsigned int                   _myDomIndex;
             mutable BoundingBoxTreePtr     _myBoundingBoxTree;
 #ifdef OLD

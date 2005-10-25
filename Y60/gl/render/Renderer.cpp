@@ -372,10 +372,15 @@ namespace y60 {
 
         bool isRendered = false;
 
-        const std::vector<RenderStyleType> & myRenderStyles = myShape->getRenderStyles();
+        // get renderstyles for this primitive
+        const std::vector<RenderStyleType> * myRenderStyles = & myPrimitive.getRenderStyles();
+        if (myRenderStyles->empty()) {
+            // if there arn't any use the per shape styles
+            myRenderStyles = & myShape->getRenderStyles();
+        }
 
-        bool myIgnoreDepthFlag = (std::find(myRenderStyles.begin(), myRenderStyles.end(),
-                                            IGNORE_DEPTH) !=  myRenderStyles.end());
+        bool myIgnoreDepthFlag = (std::find(myRenderStyles->begin(), myRenderStyles->end(),
+                                            IGNORE_DEPTH) !=  myRenderStyles->end());
         if (myIgnoreDepthFlag) {
             glDepthFunc(GL_ALWAYS);
             glEnable(GL_POLYGON_OFFSET_POINT);
@@ -383,14 +388,14 @@ namespace y60 {
             glEnable(GL_POLYGON_OFFSET_FILL);
             glPolygonOffset(0.0, -1.0);
         }
-        if (std::find(myRenderStyles.begin(), myRenderStyles.end(), BACK) !=  myRenderStyles.end()) {
+        if (std::find(myRenderStyles->begin(), myRenderStyles->end(), BACK) !=  myRenderStyles->end()) {
             glCullFace(GL_FRONT);
             renderPrimitives(theBodyPart, myMaterial);
             isRendered = true;
             CHECK_OGL_ERROR;
         }
 
-        if (!isRendered || std::find(myRenderStyles.begin(), myRenderStyles.end(), FRONT) !=  myRenderStyles.end()) {
+        if (!isRendered || std::find(myRenderStyles->begin(), myRenderStyles->end(), FRONT) !=  myRenderStyles->end()) {
             glCullFace(GL_BACK);
             renderPrimitives(theBodyPart, myMaterial);
             CHECK_OGL_ERROR;
@@ -403,7 +408,7 @@ namespace y60 {
             glDisable(GL_POLYGON_OFFSET_FILL);
         }
 
-        if (std::find(myRenderStyles.begin(), myRenderStyles.end(), BOUNDING_VOLUME) !=  myRenderStyles.end() ||
+        if (std::find(myRenderStyles->begin(), myRenderStyles->end(), BOUNDING_VOLUME) !=  myRenderStyles->end() ||
             (_myBoundingVolumeMode & BV_SHAPE))
         {
             dom::NodePtr myShapeNode = myBody->getShape()->getXmlNode();
