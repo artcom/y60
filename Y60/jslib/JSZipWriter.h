@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: JSBlock.h,v $
+//   $RCSfile: JSZipWriter.h,v $
 //   $Author: ulrich $
 //   $Revision: 1.5 $
 //   $Date: 2005/04/22 14:58:47 $
@@ -16,31 +16,30 @@
 //
 //=============================================================================
 
-#ifndef _Y60_ACXPSHELL_JSBLOCK_INCLUDED_
-#define _Y60_ACXPSHELL_JSBLOCK_INCLUDED_
+#ifndef _Y60_ACXPSHELL_JSZIPWRITER_INCLUDED_
+#define _Y60_ACXPSHELL_JSZIPWRITER_INCLUDED_
 
 #include "JSWrapper.h"
 
-#include <asl/Block.h>
+#include <asl/ZipWriter.h>
 
 namespace jslib {
 
-class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, StaticAccessProtocol>
+class JSZipWriter : public JSWrapper<asl::ZipWriter, asl::Ptr<asl::ZipWriter>, StaticAccessProtocol>
 {
-        JSBlock() {}
+        JSZipWriter() {}
     public:
-        typedef asl::Block NATIVE;
+        typedef asl::ZipWriter NATIVE;
         typedef asl::Ptr<NATIVE> OWNERPTR;
         typedef JSWrapper<NATIVE,OWNERPTR,StaticAccessProtocol> Base;
 
         static const char * ClassName() {
-            return "Block";
+            return "ZipWriter";
         }
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
-            PROP_size = -100,
-            PROP_capacity
+            PROP_END = -100,
         };
 
         static JSPropertySpec * Properties();
@@ -48,7 +47,7 @@ class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, StaticAccessP
         static JSPropertySpec * StaticProperties();
 
         virtual unsigned long length() const {
-            return getNative().size();
+            return 1;
         }
 
         virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
@@ -62,7 +61,7 @@ class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, StaticAccessP
             return Base::Construct(cx, theOwner, theNative);
         }
 
-        JSBlock(OWNERPTR theOwner, NATIVE * theNative)
+        JSZipWriter(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
         {}
 
@@ -70,18 +69,18 @@ class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, StaticAccessP
 
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
 
-        static JSBlock & getObject(JSContext *cx, JSObject * obj) {
-            return dynamic_cast<JSBlock &>(JSBlock::getJSWrapper(cx,obj));
+        static JSZipWriter & getObject(JSContext *cx, JSObject * obj) {
+            return dynamic_cast<JSZipWriter &>(JSZipWriter::getJSWrapper(cx,obj));
         }
 };
 
 template <>
-struct JSClassTraits<asl::Block> : public JSClassTraitsWrapper<asl::Block, JSBlock> {};
+struct JSClassTraits<asl::ZipWriter> : public JSClassTraitsWrapper<asl::ZipWriter, JSZipWriter> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, JSBlock::NATIVE *& theBlock);
+bool convertFrom(JSContext *cx, jsval theValue, JSZipWriter::NATIVE *& theZipWriter);
 
-jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner, JSBlock::NATIVE * theBlock);
+jsval as_jsval(JSContext *cx, JSZipWriter::OWNERPTR theOwner);
+jsval as_jsval(JSContext *cx, JSZipWriter::OWNERPTR theOwner, JSZipWriter::NATIVE * theZipWriter);
 
 }
 

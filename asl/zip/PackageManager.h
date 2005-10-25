@@ -94,7 +94,8 @@ class PackageManager {
             @returns the list as a std::vector<std::string> or an empty vector if not found.
         */
         IPackage::FileList listFiles(const std::string & theRelativePath = "",
-                                     const std::string & thePackageName = "");
+                                     const std::string & thePackageName = "",
+                                     bool doRecursiveSearch = false);
 
         /// searches for a file.
         /**
@@ -120,7 +121,8 @@ class PackageManager {
         PackageList _myPackages;
 
         IPackage::FileList listPackageFiles(IPackagePtr thePackage,
-                                            const std::string & theRelativePath);
+                                            const std::string & theRelativePath, 
+                                            bool doRecursiveSearch);
         IPackagePtr findPackage(const std::string & theRelativePath, const std::string & thePackage);   
 };
 

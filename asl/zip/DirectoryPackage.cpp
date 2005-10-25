@@ -19,6 +19,8 @@
 #include <asl/directory_functions.h>
 #include <asl/MappedBlock.h>
 
+using namespace std;
+
 namespace asl {
 
 DirectoryPackage::DirectoryPackage(const std::string & theDirectory,
@@ -56,7 +58,7 @@ DirectoryPackage::getAbsolutePath(const std::string & theRelativePath) const
 }
 
 DirectoryPackage::FileList
-DirectoryPackage::getFileList(const std::string & theSubDir) {
+DirectoryPackage::getFileList(const std::string & theSubDir, bool theRecurseFlag) {
     AC_DEBUG << "getFileList dir='" << _myDirectory << "' path='" << theSubDir << "'";
     std::string myDirToSearch = getAbsolutePath(theSubDir);
     FileList myDirList = getDirList(myDirToSearch);
@@ -66,13 +68,17 @@ DirectoryPackage::getFileList(const std::string & theSubDir) {
             continue;
         }
         std::string myAbsolutePath = myDirToSearch + "/" + myDirList[i];
+        string mySubPath = theSubDir.empty() ? myDirList[i] : theSubDir + "/" + myDirList[i];
         if (isDirectory(myAbsolutePath) == false) {
-            if (theSubDir.empty()) {
-                myFileList.push_back(myDirList[i]);
-            } else {
-                myFileList.push_back(theSubDir+"/"+myDirList[i]);
+            myFileList.push_back(mySubPath);
+        } else if (theRecurseFlag) {
+            // recurse into directory
+            std::vector<string> mySubdirList = getFileList(mySubPath, theRecurseFlag);
+            for (int i = 0; i < mySubdirList.size(); ++i) {
+                myFileList.push_back(mySubdirList[i]);
             }
         }
+        
     }
     return myFileList;
 }

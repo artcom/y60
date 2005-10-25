@@ -77,6 +77,24 @@ GetLastModified(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 }
 
 static JSBool
+MoveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Moves the given file");
+    DOC_PARAM("theSource", DOC_TYPE_STRING);
+    DOC_PARAM("theTarget", DOC_TYPE_STRING);
+    DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        std::string mySource;
+        std::string myTarget;
+        convertFrom(cx, argv[0], mySource);
+        convertFrom(cx, argv[1], myTarget);
+        *rval = as_jsval(cx, asl::moveFile(mySource, myTarget));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 DeleteFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Deletes the given file");
     DOC_PARAM("theFilename", DOC_TYPE_STRING);
@@ -123,13 +141,29 @@ Basename(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+Dirname(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("extracts the directory from a path");
+    DOC_PARAM("thePath", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        std::string myPath;
+        convertFrom(cx, argv[0], myPath);
+        *rval = as_jsval(cx, asl::getDirName((myPath)));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JSFunctionSpec *
 JSFileFunctions::Functions() {
     static JSFunctionSpec myFunctions[] = {
         {"getWholeFile",       GetWholeFile,      1},
         {"getLastModified",    GetLastModified,   1},
         {"basename",           Basename,          1},
+        {"dirname",            Dirname,           1},
         {"deleteFile",         DeleteFile,        1},
+        {"moveFile",           MoveFile,          2},
         {"putWholeFile",       PutWholeFile,      2},
         {0},
     };

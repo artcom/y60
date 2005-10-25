@@ -23,7 +23,6 @@
 #ifndef __asl_zipwriter_included_
 #define __asl_zipwriter_included_
 
-#include "zip.h"
 #include <asl/Stream.h>
 #include <asl/Block.h>
 #include <string>
@@ -45,7 +44,7 @@ class ZipWriter {
         ZipWriter();
         ZipWriter(const ZipWriter &);
         ZipWriter & operator=(const ZipWriter &);
-        zipFile _myZipFile;
+        void* _myZipFile;
 };
 
 typedef Ptr<ZipWriter> ZipWriterPtr;

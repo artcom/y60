@@ -146,11 +146,12 @@ PackageManager::searchFile(const std::string & theRelativePath) {
 
 IPackage::FileList
 PackageManager::listPackageFiles(IPackagePtr thePackage,
-                                 const std::string & theRelativePath)
+                                 const std::string & theRelativePath,
+                                 bool doRecursiveSearch)
 {
     IPackage::FileList myFileList;
     if (thePackage && thePackage->findFile(theRelativePath).empty() == false) {
-        myFileList = thePackage->getFileList(theRelativePath);
+        myFileList = thePackage->getFileList(theRelativePath, doRecursiveSearch);
     }
 
     return myFileList;
@@ -158,17 +159,18 @@ PackageManager::listPackageFiles(IPackagePtr thePackage,
 
 IPackage::FileList
 PackageManager::listFiles(const std::string & theRelativePath,
-                          const std::string & thePackage)
+                          const std::string & thePackage, 
+                          bool doRecursiveSearch /*= false */)
 {
     AC_TRACE << "listFiles pkg='" << thePackage << "' path='" << theRelativePath << "'";
     IPackage::FileList myFileList;
     if (thePackage.empty() == false) {
         IPackagePtr myPackage = findPackage("", thePackage);
-        myFileList = listPackageFiles(myPackage, theRelativePath);
+        myFileList = listPackageFiles(myPackage, theRelativePath, doRecursiveSearch);
     } else {
         for (PackageList::iterator iter = _myPackages.begin();
              iter != _myPackages.end(); ++iter) {
-            IPackage::FileList myTmpFileList = listPackageFiles((*iter), theRelativePath);
+            IPackage::FileList myTmpFileList = listPackageFiles((*iter), theRelativePath, doRecursiveSearch);
             for (unsigned i = 0; i < myTmpFileList.size(); ++i) {
                 myFileList.push_back(myTmpFileList[i]);
             }

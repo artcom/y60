@@ -96,9 +96,9 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
         unsigned myBytesWritten = 0;
         if (JSBlock::matchesClassOf(cx, argv[0])) {
-            asl::Block myBlock;
+            asl::Block * myBlock;
             convertFrom(cx, argv[0], myBlock);
-            myBytesWritten = JSSocket::getJSWrapper(cx,obj).openNative().send(myBlock.begin(), myBlock.size());
+            myBytesWritten = JSSocket::getJSWrapper(cx,obj).openNative().send(myBlock->begin(), myBlock->size());
             JSSocket::getJSWrapper(cx,obj).closeNative();                       
         } else {
             string myString;

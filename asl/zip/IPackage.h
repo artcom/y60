@@ -45,7 +45,7 @@ class IPackage {
         virtual const std::string & getPath() const = 0;
 
         /// returns a list of contained files. 
-        virtual FileList getFileList(const std::string & theSubDir = "") = 0;
+        virtual FileList getFileList(const std::string & theSubDir = "", bool theRecursiveFlag = false) = 0;
 
         /// returns absolute path to contained file or empty.
         virtual std::string findFile(const std::string & theRelativePath) = 0;

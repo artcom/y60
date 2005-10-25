@@ -40,7 +40,7 @@ ZipPackage::ZipPackage(const std::string & theZipFilename) :
 }
 
 ZipPackage::FileList
-ZipPackage::getFileList(const std::string & theSubDir) {
+ZipPackage::getFileList(const std::string & theSubDir, bool theRecurseFlag) {
     AC_DEBUG << "getFileList path='" << theSubDir << "'";
     if (theSubDir.empty()) {
         return _myFileList;

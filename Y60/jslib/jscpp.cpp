@@ -47,6 +47,7 @@
 #include "JSGLResourceManager.h"
 #include "JSOffScreenRenderArea.h"
 #include "JSBlock.h"
+#include "JSZipWriter.h"
 
 #include "jscpp.h"
 
@@ -201,6 +202,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSBlock::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSZipWriter::initClass(cx, theGlobalObject)) {
         return false;
     }
 

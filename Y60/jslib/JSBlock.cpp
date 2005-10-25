@@ -99,7 +99,10 @@ JSBlock::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 
     JSBlock * myNewObject = 0;
 
-    if (argc == 1) {
+    if (argc == 0) {
+        OWNERPTR myNewBlock = OWNERPTR(new asl::Block());
+        myNewObject = new JSBlock(myNewBlock, &(*myNewBlock));
+    } else if (argc == 1) {
         if (JSVAL_IS_VOID(argv[0])) {
             JS_ReportError(cx,"JSBlock::Constructor: bad argument #1 (undefined)");
             return JS_FALSE;
@@ -157,12 +160,14 @@ JSBlock::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return myClass;
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, JSBlock::NATIVE & theBlock) {
+bool convertFrom(JSContext *cx, jsval theValue, JSBlock::NATIVE *& theBlock) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSBlock::NATIVE >::Class()) {
-                theBlock = JSClassTraits<JSBlock::NATIVE>::getNativeRef(cx,myArgument);
+                typedef JSClassTraits<JSBlock::NATIVE>::ScopedNativeRef NativeRef;
+                NativeRef myObj(cx, myArgument);
+                theBlock = &myObj.getNative();
                 return true;
             }
         }

@@ -21,6 +21,7 @@
 #include "jscpp.h"
 #include "JScppUtils.h"
 #include "JSNode.h"
+#include "JSBlock.h"
 #include "IScriptablePlugin.h"
 #include "IFactoryPlugin.h"
 #include "QuitFlagSingleton.h"
@@ -414,6 +415,49 @@ GetPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+OpenFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages \
+and open the file located at theRelativePath if found. \
+theRelativePath is the path to the file requested, \
+it is relative and must be defined inside a package. \
+thePackageName is the name of a package, \
+package names are stored just as you enter them by calling includePath. \
+@returns the opened file as a asl::ReadableBlock or null if not found.");
+    DOC_PARAM("theRelativePath", DOC_TYPE_STRING);
+    DOC_PARAM("thePackageName", DOC_TYPE_STRING);
+    DOC_RVAL("theBlock", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        if (argc == 0 || argc > 2 ) {
+            JS_ReportError(cx, "openFile(): expects one or two string arguments, (theRelativePath, [optional] package)");
+            return JS_FALSE;
+        }
+        string myRelativePath = "";
+        convertFrom(cx, argv[0], myRelativePath);
+
+        string myPackageName;
+        if (argc > 1) {
+            convertFrom(cx, argv[1], myPackageName);
+        }
+        // since we don't have a wrapped ReadableBlock,
+        // we have to make a copy
+        asl::Ptr<asl::Block> myBlock(new asl::Block);
+        if (argc == 1) {
+            *myBlock = *(JSApp::getPackageManager()->openFile(myRelativePath));
+        } else {
+            *myBlock = *(JSApp::getPackageManager()->openFile(myRelativePath, myPackageName));
+        }
+
+        if (myBlock) {
+            *rval = as_jsval(cx, myBlock, &(*myBlock) );
+        } else {
+            *rval = JSVAL_NULL;
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
 listFiles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages \
 and returns all files in theRelativePath. If theRelativePath is a file it returns theRelativePath.");
@@ -422,11 +466,12 @@ and returns all files in theRelativePath. If theRelativePath is a file it return
     DOC_RESET;
     DOC_PARAM("theRelativePath", DOC_TYPE_STRING);
     DOC_PARAM("thePackageName", DOC_TYPE_STRING);
+    DOC_PARAM("theRecurseFlag", DOC_TYPE_STRING);
     DOC_RVAL("array-of-string", DOC_TYPE_STRING);
     DOC_END;
     try {
-        if (argc > 2 ) {
-            JS_ReportError(cx, "listFiles(): expects at most two string arguments, (path, package)");
+        if (argc > 3 ) {
+            JS_ReportError(cx, "listFiles(): expects at most three string arguments, (path, package, theRecurseFlag)");
             return JS_FALSE;
         }
         string myRelativePath = "";
@@ -437,8 +482,14 @@ and returns all files in theRelativePath. If theRelativePath is a file it return
         if (argc > 1) {
             convertFrom(cx, argv[1], myPackageName);
         }
-        vector<string> myFiles
-            = JSApp::getPackageManager()->listFiles(myRelativePath, myPackageName);
+        vector<string> myFiles;
+        if (argc == 3) {
+            bool myRecurseFlag;
+            myRecurseFlag = convertFrom(cx, argv[2], myRecurseFlag);
+            myFiles = JSApp::getPackageManager()->listFiles(myRelativePath, myPackageName, myRecurseFlag);
+        } else {
+            myFiles = JSApp::getPackageManager()->listFiles(myRelativePath, myPackageName);
+        }
 
         *rval = as_jsval(cx, myFiles);
         return JS_TRUE;
@@ -1304,6 +1355,7 @@ static JSFunctionSpec glob_functions[] = {
     {"removePath",      RemovePath,     1},
     {"getPath",         GetPath,        0},
     {"listFiles",       listFiles,      2},
+    {"openFile",        OpenFile,       2},
     {"getDocumentation", getDocumentation, 0},
     {"createUniqueId",  createUniqueId, 0},
 
