@@ -74,6 +74,7 @@
 #define DB(x)  //x
 #define DB2(x) //x
 #define DBP(x) // x
+#define DBP2(x) // x
 
 using namespace std;
 using namespace asl;
@@ -173,7 +174,7 @@ namespace y60 {
     Renderer::deactivatePreviousMaterial() const  {
         // clean up previous material
         if (_myPreviousMaterialIndex != UINT_MAX) {
-            MAKE_SCOPE_TIMER(deactivatePreviousMaterial);
+            DBP(MAKE_SCOPE_TIMER(deactivatePreviousMaterial));
 
             const MaterialBasePtr myPrevMaterial = _myScene->getMaterial(_myPreviousMaterialIndex);
 
@@ -195,8 +196,8 @@ namespace y60 {
             _myLastVertexRegisterFlags.reset();
         }
 
-        MAKE_SCOPE_TIMER(switchMaterial);
-        COUNT(materialChange);
+        DBP(MAKE_SCOPE_TIMER(switchMaterial));
+        DBP(COUNT(materialChange));
 
         MaterialBasePtr myMaterial = _myScene->getMaterial(theMaterialIndex);
         IShaderPtr myShader = myMaterial->getShader();
@@ -204,7 +205,7 @@ namespace y60 {
 
         {
             // activate new material
-            MAKE_SCOPE_TIMER(activateShader);
+            DBP(MAKE_SCOPE_TIMER(activateShader));
 
             if (myMaterial->getLightingModel() == UNLIT) {
                 glDisable(GL_LIGHTING);
@@ -315,13 +316,13 @@ namespace y60 {
 
     void
     Renderer::renderBodyPart(const BodyPart & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
-        MAKE_SCOPE_TIMER(renderBodyPart);
+        DBP(MAKE_SCOPE_TIMER(renderBodyPart));
         CHECK_OGL_ERROR;
         y60::BodyPtr myBody = theBodyPart.getBody();
         y60::ShapePtr myShape = myBody->getShape();
         bool myBodyHasChanged = _myPreviousBody != &(*myBody);
         if (myBodyHasChanged) {
-            MAKE_SCOPE_TIMER(update_bodymatrix);
+            DBP(MAKE_SCOPE_TIMER(update_bodymatrix));
             glPopMatrix();
 
             _myState.setClippingPlanes(theBodyPart.getClippingPlanes());
@@ -436,65 +437,75 @@ namespace y60 {
 
     void
     Renderer::renderPrimitives(const BodyPart & theBodyPart, MaterialBasePtr theMaterial) {
-        MAKE_SCOPE_TIMER(renderPrimitives);
+        DBP(MAKE_SCOPE_TIMER(renderPrimitives));
+        DBP(START_TIMER(getPrimitive));
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
-        AC_TRACE << "------ renderPrimitives for BodyPart of Body id='"
-                << theBodyPart.getBody()->get<IdTag>()<<"'"
-                << ", name='"<<theBodyPart.getBody()->get<NameTag>()<<"'";
-
+        DBP(STOP_TIMER(getPrimitive));
+        DBP2(
+            AC_TRACE << "------ renderPrimitives for BodyPart of Body id='"
+                    << theBodyPart.getBody()->get<IdTag>()<<"'"
+                    << ", name='"<<theBodyPart.getBody()->get<NameTag>()<<"'";
+        )
         COUNT_N(Vertices, myPrimitive.size());
+
+        DBP(START_TIMER(getVertexParameters));
         const MaterialParameterVectorPtr myMaterialParameters = theMaterial->getVertexParameters();
+        DBP(STOP_TIMER(getVertexParameters));
 
-        for (unsigned i = 0; i < myMaterialParameters->size(); ++i) {
+        {
+            DBP(MAKE_SCOPE_TIMER(setRegisters));
 
-            const MaterialParameter & myParameter = myMaterialParameters->at(i);
-            GLRegister myRegister = myParameter.getRegister();
+            for (unsigned i = 0; i < myMaterialParameters->size(); ++i) {
 
-            if ( myPrimitive.hasVertexData(myParameter.getRole())) {
-                const VertexDataBase & myData = myPrimitive.getVertexData(myParameter.getRole());
-                AC_TRACE << "-- Parameter " << i << " role " << getStringFromEnum(myParameter.getRole(), VertexDataRoleString) << ", data=" << myData.getDataPtr();
-                switch (myRegister) {
-                    case POSITION_REGISTER:
-                        myData.useAsPosition();
-                        break;
-                    case NORMAL_REGISTER:
-                        myData.useAsNormal();
-                        break;
-                    case COLORS_REGISTER:
-                        myData.useAsColor();
-                        CHECK_OGL_ERROR;
-                        break;
-                    default:
-                        GLenum myGlRegister = asGLTextureRegister(myRegister);
-                        glActiveTextureARB(myGlRegister);
-                        CHECK_OGL_ERROR;
-                        glClientActiveTextureARB(myGlRegister);
-                        CHECK_OGL_ERROR;
-                        myData.useAsTexCoord();
-                        break;
+                const MaterialParameter & myParameter = myMaterialParameters->at(i);
+                GLRegister myRegister = myParameter.getRegister();
+
+                if ( myPrimitive.hasVertexData(myParameter.getRole())) {
+                    const VertexDataBase & myData = myPrimitive.getVertexData(myParameter.getRole());
+                    DBP(AC_TRACE << "-- Parameter " << i << " role " << getStringFromEnum(myParameter.getRole(), VertexDataRoleString) << ", data=" << myData.getDataPtr());
+                    switch (myRegister) {
+                        case POSITION_REGISTER:
+                            myData.useAsPosition();
+                            break;
+                        case NORMAL_REGISTER:
+                            myData.useAsNormal();
+                            break;
+                        case COLORS_REGISTER:
+                            myData.useAsColor();
+                            CHECK_OGL_ERROR;
+                            break;
+                        default:
+                            GLenum myGlRegister = asGLTextureRegister(myRegister);
+                            glActiveTextureARB(myGlRegister);
+                            CHECK_OGL_ERROR;
+                            glClientActiveTextureARB(myGlRegister);
+                            CHECK_OGL_ERROR;
+                            myData.useAsTexCoord();
+                            break;
+                    }
                 }
             }
+            CHECK_OGL_ERROR;
         }
-        CHECK_OGL_ERROR;
 
-#ifdef DBP
-        unsigned long myPrimitiveCount = myPrimitive.size();
-        AC_TRACE << "glDrawArrays size=" << myPrimitive.size() << " primCount=" << myPrimitiveCount << " primType=" << myPrimitive.getType() << " GLtype=" << getPrimitiveGLType(myPrimitive.getType());
-        static unsigned long myMaxPrimitiveCount = 0;
-        if (myPrimitiveCount > myMaxPrimitiveCount) {
-            myMaxPrimitiveCount = myPrimitiveCount;
-        }
-        AC_TRACE << "Primitive maxsize: " << myMaxPrimitiveCount;
-#endif
+        DBP2(
+            unsigned long myPrimitiveCount = myPrimitive.size();
+            AC_TRACE << "glDrawArrays size=" << myPrimitive.size() << " primCount=" << myPrimitiveCount << " primType=" << myPrimitive.getType() << " GLtype=" << getPrimitiveGLType(myPrimitive.getType());
+            static unsigned long myMaxPrimitiveCount = 0;
+            if (myPrimitiveCount > myMaxPrimitiveCount) {
+                myMaxPrimitiveCount = myPrimitiveCount;
+            }
+            AC_TRACE << "Primitive maxsize: " << myMaxPrimitiveCount;
+        )
 
-        DBP(static asl::NanoTime lastTime;
+        DBP2(static asl::NanoTime lastTime;
                 asl::NanoTime switchTime = asl::NanoTime() - lastTime;
                 AC_TRACE << "switch time = " << switchTime.micros() << " us" << endl;
                 asl::NanoTime startTime;
            );
 
-        COUNT(VertexArrays);
-        MAKE_SCOPE_TIMER(glDrawArrays);
+        DBP(COUNT(VertexArrays));
+        DBP(MAKE_SCOPE_TIMER(glDrawArrays));
 
         glDrawArrays(getPrimitiveGLType(myPrimitive.getType()), 0, myPrimitive.size());
         CHECK_OGL_ERROR;

@@ -668,6 +668,7 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             }
             argv[i] = STRING_TO_JSVAL(str);
             myIncludeFile = JS_GetStringBytes(str);
+            AC_DEBUG << "use: myIncludeFile=" << myIncludeFile;
 
             // Compute file path relative to file in which the use() statement was called
             if (!getFileLine(cx, obj, argc, argv, myCurrentFile, myLine)) {
@@ -675,12 +676,14 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             }
 
             std::string myIncludePath = asl::getDirName(myCurrentFile);
+            AC_DEBUG << "use: myIncludePath=" << myIncludePath;
             std::string myIncludeFileWithPath = asl::searchFile(myIncludeFile, myIncludePath);
 
             if (myIncludeFileWithPath.empty()) {
                 // Try looking in the package manager:
                 myIncludeFileWithPath = JSApp::getPackageManager()->searchFile(myIncludeFile);
             }
+            AC_DEBUG << "use myIncludeFileWithPath=" << myIncludeFileWithPath;
             if (myIncludeFileWithPath.empty()) {
                 AC_ERROR << "File '" << myIncludeFile << "' not found in " << myIncludePath << ";" << JSApp::getPackageManager()->getSearchPath() << std::endl;
                 return JS_FALSE;
@@ -690,15 +693,19 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 if (it == ourIncludeGuard.end()) {
                     script = JS_CompileFile(cx, obj, myIncludeFileWithPath.c_str());
                     ourIncludeGuard.push_back(myIncludeFileWithPath);
+                    AC_DEBUG << "use: compiled: " << myIncludeFileWithPath;
                 } else {
+                    AC_DEBUG << "use: has been already included: " << myIncludeFileWithPath;
                     return JS_TRUE;
                 }
             }
 
             if (!script) {
+                AC_WARNING << "use: compilation of " << myIncludeFileWithPath << " failed.";
                 ok = JS_FALSE;
             } else {
                 ok = JS_ExecuteScript(cx, obj, script, &result);
+                AC_DEBUG << "use: executed: " << myIncludeFileWithPath <<", status = "<<ok;
                 JS_DestroyScript(cx, script);
             }
 
