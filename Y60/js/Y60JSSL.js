@@ -189,7 +189,7 @@ function formatVector2f(theVector, thePrecision) {
 // NOTE: normalized vectors required
 function getOrientationFromDirection(theViewVector, theUpVector) {
     var myMatrix = new Matrix4f();
-    var myUpVector = normalized(projection(theUpVector, new Plane(theViewVector, [0,0,0])));
+    var myUpVector = normalized(projection(theUpVector, new Planef(theViewVector, [0,0,0])));
 
     var myRightVector = cross(theViewVector, myUpVector);
     myMatrix.setRow(0, new Vector4f(myRightVector[0], myRightVector[1], myRightVector[2], 0));
@@ -582,13 +582,15 @@ function countNodes(theNode) {
     return myCount;
 }
 
-function asMemoryString(theKiloBytes) {
-    if (theKiloBytes < 1024) {
-        return theKiloBytes + " K";
-    } else if (theKiloBytes < 1048576) {
-        return (theKiloBytes / 1024).toFixed(1) + " M";
-    } else if (theKiloBytes < 1073741824) {
-        return (theKiloBytes / 1048576).toFixed(1) + " G";
+function asMemoryString(theBytes) {
+    if (theBytes < 1024) {
+        return theBytes;
+    } else if (theBytes < 1048576) {
+        return (theBytes / 1024).toFixed(1) + " K";
+    } else if (theBytes < 1073741824) {
+        return (theBytes / 1048576).toFixed(1) + " M";
+    } else if (theBytes < 1073741824 * 1024) {
+        return (theBytes / (1048576 * 1024)).toFixed(1) + " G";
     }
 }
 

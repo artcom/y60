@@ -18,6 +18,7 @@
 
 use("ImageManager.js");
 use("Overlay.js");
+use("Y60JSSL.js");
 
 function OverlayManager(theScene, theViewport) {
     var Public = this;
@@ -57,12 +58,12 @@ function OverlayManager(theScene, theViewport) {
     Public.createMultitextured = function(theName, theImageIds, theOverwriteFlag, theParent) {
         var myMaterial = Node.createElement('material');
         var myOldOverlayMaterial = getDescendantByName(Public.materials, theMaterialNode.name,  false);
-        if (myOldOverlayMaterial) {                
-            Public.materials.materials.replaceChild(myMaterial, myOldOverlayMaterial);        
+        if (myOldOverlayMaterial) {
+            Public.materials.materials.replaceChild(myMaterial, myOldOverlayMaterial);
         } else {
             Public.materials.materials.appendChild(myMaterial);
         }
-        
+
         myMaterial.id = myMaterialId;
         myMaterial.name = theName + "M";
         myMaterial.transparent = 1;
@@ -93,8 +94,8 @@ function OverlayManager(theScene, theViewport) {
 
         var myMaterial = Node.createElement('material');
         var myOldOverlayMaterial = getDescendantByName(Public.materials, theMaterialNode.name,  false);
-        if (myOldOverlayMaterial) {                
-            Public.materials.materials.replaceChild(myMaterial, myOldOverlayMaterial);        
+        if (myOldOverlayMaterial) {
+            Public.materials.materials.replaceChild(myMaterial, myOldOverlayMaterial);
         } else {
             Public.materials.materials.appendChild(myMaterial);
         }
@@ -105,7 +106,7 @@ function OverlayManager(theScene, theViewport) {
        // add textures
         var myTexturesString =
             '<textures>\n' +
-            '    <texture image="' + theImageId + '" wrapmode="repeat" applymode="modulate"/>\n' + 
+            '    <texture image="' + theImageId + '" wrapmode="repeat" applymode="modulate"/>\n' +
             '</textures>';
         var myTexturesDoc = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
@@ -119,7 +120,7 @@ function OverlayManager(theScene, theViewport) {
 
         var myTexCoordFeatures = new Node('<feature name="texcoord">[10[]]</feature>\n').firstChild;
         myMaterialNode.requires.appendChild(myTexCoordFeatures);
-        myMaterialNode.requires.texcoord = "[100[uv_map]]";                
+        myMaterialNode.requires.texcoord = "[100[uv_map]]";
     }
 
     Public.get = function(theName) {

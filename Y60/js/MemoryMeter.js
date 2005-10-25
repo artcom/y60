@@ -27,7 +27,7 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
     var _myMaxMemoryUsage       = 0;
     var _myMaxMemoryTime        = 0;
     var _myProcFunctionsPlugged = false;
-    
+
     self.toggleEnableFlag = function() {
         if (!_myProcFunctionsPlugged) {
             plug("ProcFunctions");
@@ -46,7 +46,7 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
             _myMaxMemoryTime  = _mySceneViewer.getCurrentTime();
             _myMaxMemoryUsage = myUsedMemory;
         }
- 
+
         if (self.enabled) {
             var myBackgroundColor = window.backgroundColor;
             var myBrightness = (myBackgroundColor[0] + myBackgroundColor[1] + myBackgroundColor[2]) / 3;
@@ -67,12 +67,12 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
             if (myAge > MAX_MEMORY_GREEN_TIME) {
                 myRed = 1 - (myAge - MAX_MEMORY_GREEN_TIME) / MAX_MEMORY_GREEN_TIME;
             }
-               
+
             window.setTextColor([myRed,myGreen,0,1], [1,1,1,1]);
             window.renderText(new Vector2f(10 / window.width, 20  / window.height), asMemoryString(_myMaxMemoryUsage), "Screen8");
-            
+
             window.setTextColor(myTextColor, [1,1,1,1]);
             window.renderText(new Vector2f(10 / window.width, 30  / window.height), asMemoryString(getFreeMemory()), "Screen8");
         }
-    }    
+    }
 }

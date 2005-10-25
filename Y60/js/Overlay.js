@@ -11,7 +11,7 @@
 var ourOverlayCounter = 0;
 
 // Pure virtual base class
-function OverlayBase(Public, Protected, theManager, thePosition, theParent) {
+function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Convenience access to referenced nodes
@@ -146,13 +146,13 @@ function OverlayBase(Public, Protected, theManager, thePosition, theParent) {
         var myMaterialId = createUniqueId();
 
         _myMaterial = Node.createElement('material');
-        theManager.materials.appendChild(_myMaterial);
+        theScene.materials.appendChild(_myMaterial);
 
         _myMaterial.id = myMaterialId;
         _myMaterial.name = myName + "M";
         _myMaterial.transparent = 1;
         _myMaterial.properties.surfacecolor = "[1,1,1,1]";
-        var myParent = theParent ? theParent : theManager.overlays;
+        var myParent = theParent ? theParent : theScene.overlays;
         var myOverlayString = '<overlay name="' + myName + '" material="' + _myMaterial.id + '"/>';
         var myNode = new Node(myOverlayString);
         _myNode = myParent.appendChild(myNode.firstChild);
@@ -170,15 +170,15 @@ function OverlayBase(Public, Protected, theManager, thePosition, theParent) {
 }
 
 /// Creates a uniform colored overlay
-// @param theManager   Object    The overlay manager for the used viewport
+// @param theScene     Scene     The scene the overlay should be appended to
 // @param theColor     Vector4f  Color of the overlay
 // @param thePosition  Vector2f  Pixelposition of the overlay (optional, default is [0,0])
 // @param theSize      Vector2f  Size of the overlay (optional, default is [1,1]
 // @param theParent    Node      Parent overlay node (optional, optional default is toplevel)
-function Overlay(theManager, theColor, thePosition, theSize, theParent) {
+function Overlay(theScene, theColor, thePosition, theSize, theParent) {
     var Public    = this;
     var Protected = {};
-    OverlayBase(Public, Protected, theManager, thePosition, theParent);
+    OverlayBase(Public, Protected, theScene, thePosition, theParent);
     if (theSize) {
         Public.width  = theSize[0];
         Public.height = theSize[1];
@@ -190,9 +190,9 @@ function Overlay(theManager, theColor, thePosition, theSize, theParent) {
 }
 
 // Pure virtual base class
-function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
+function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
     var Base = {}
-    OverlayBase(Public, Protected, theManager, thePosition, theParent);
+    OverlayBase(Public, Protected, theScene, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -367,9 +367,9 @@ function TextureOverlay(Public, Protected, theManager, thePosition, theParent) {
 }
 
 // Pure virtual base class
-function ImageOverlayBase(Public, Protected, theManager, theSource, thePosition, theParent) {
+function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent) {
 
-    TextureOverlay(Public, Protected, theManager, thePosition, theParent);
+    TextureOverlay(Public, Protected, theScene, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
@@ -380,7 +380,7 @@ function ImageOverlayBase(Public, Protected, theManager, theSource, thePosition,
         if (typeof(theSource) == "string") {
             // theSource is a string
             myImage = Node.createElement("image");
-            theManager.images.appendChild(myImage);
+            theScene.images.appendChild(myImage);
             myImage.src  = theSource;
             myImage.name = theSource;
             myImage.resize = "pad";
@@ -407,7 +407,7 @@ function ImageOverlayBase(Public, Protected, theManager, theSource, thePosition,
             } else {
                 addImage(theSource);
             }
-            theManager.scene.update(Scene.IMAGES);
+            theScene.scene.update(Scene.IMAGES);
 
             var mySize    = getImageSize(Protected.myImages[0]);
             Public.width  = mySize.x;
@@ -419,32 +419,32 @@ function ImageOverlayBase(Public, Protected, theManager, theSource, thePosition,
 }
 
 /// Creates an overlay and with an image as content
-//  @param theManager   Object       The overlay manager for the used viewport
+//  @param theScene     Scene        The scene the overlay should be appended to
 //  @param theSource    String/Node  Image file name or image node or array thereof
 //  @param thePosition  Vector2f     Pixelposition of the overlay (optional, default is [0,0])
 //  @param theParent    Node         Parent overlay node (optional, default is toplevel)
-function ImageOverlay(theManager, theSource, thePosition, theParent) {
+function ImageOverlay(theScene, theSource, thePosition, theParent) {
     var Public    = this;
     var Protected = {};
-    ImageOverlayBase(Public, Protected, theManager, theSource, thePosition, theParent);
+    ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent);
 }
 
 /// Creates an overlay and with a movie as content
-//  @param theManager    Object       The overlay manager for the used viewport
+//  @param theScene      Scene        The scene the overlay should be appended to
 //  @param theSource     String/Node  Movie file name or movie node
 //  @param thePosition   Vector2f     Pixelposition of the overlay (optional, default is [0,0])
 //  @param theParent     Node         Parent overlay node (optional, default is toplevel)
 //  @param theAudioFlag  Boolean      Play audio with the movie (optional, default is true)
-function MovieOverlay(theManager, theSource, thePosition, theParent, theAudioFlag) {
+function MovieOverlay(theScene, theSource, thePosition, theParent, theAudioFlag) {
     var Public    = this;
     var Protected = {};
-    MovieOverlayBase(Public, Protected, theManager, theSource, thePosition, theParent, theAudioFlag);
+    MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent, theAudioFlag);
 }
 
 // pure virtual base class
-function MovieOverlayBase(Public, Protected, theManager, theSource, thePosition, theParent, theAudioFlag) {
+function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent, theAudioFlag) {
 
-    TextureOverlay(Public, Protected, theManager, thePosition, theParent);
+    TextureOverlay(Public, Protected, theScene, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -500,7 +500,7 @@ function MovieOverlayBase(Public, Protected, theManager, theSource, thePosition,
             myImage = theSource;
         } else {
             myImage = Node.createElement("movie");
-            theManager.images.appendChild(myImage);
+            theScene.images.appendChild(myImage);
             myImage.src  = theSource;
             myImage.name = theSource;
             myImage.resize = "pad";
