@@ -162,6 +162,13 @@ int main( int argc, char *argv[])  {
     return 0;
 }
 
+#ifdef WIN32
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+            LPSTR lpCmdLine, int nCmdShow)
+{
+    return main(__argc, __argv);
+}
+#endif
 
 void
 printVersion() {
