@@ -582,7 +582,13 @@ CTScan::getReconstructionDimensions(const Quaternionf & theOrientation) const {
     myVoxelToScreenProjection.invert();
     Box3f myBounds = computeProjectionBounds(myVoxelToScreenProjection);
     Vector3f myFloatSize = myBounds.getSize();
-    myResult = Vector3i(int(ceil(myFloatSize[0])), int(ceil(myFloatSize[1])), int(ceil(myFloatSize[2])));
+    for (int i = 0; i < 3; ++i) {
+        if (!almostEqual(myFloatSize[i], floor(myFloatSize[i]))) {
+            myFloatSize[i] = ceil(myFloatSize[i]);
+        }
+        myResult[i] = int(myFloatSize[i]);
+    }
+    //myResult = Vector3i(int(ceil(myFloatSize[0])), int(ceil(myFloatSize[1])), int(ceil(myFloatSize[2])));
     return myResult;
 }
 
@@ -841,6 +847,7 @@ void
 CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceIndex, 
         dom::NodePtr & theImageNode) 
 {
+    try {
     if (_myState != COMPLETE) {
         throw CTScanException("cannot reconstruct image when loading not complete!", PLUS_FILE_LINE);
     }
@@ -861,28 +868,33 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
     }
     myBounds = computeProjectionBounds(myVoxelToScreenProjection);
     Vector3f mySize = myBounds.getSize();
-    myWidth = int(ceil(mySize[0]));
-    myHeight = int(ceil(mySize[1]));
+    if (!almostEqual(mySize[0], floor(mySize[0]))) {
+        myWidth = int(ceil(mySize[0]));
+    } else {
+        myWidth = int(mySize[0]);
+    }
+    if (!almostEqual(mySize[1], floor(mySize[1]))) {
+        myHeight = int(ceil(mySize[1]));
+    } else {
+        myHeight = int(mySize[1]);
+    }
     myPoTWidth = nextPowerOfTwo(myWidth);
     myPoTHeight = nextPowerOfTwo(myHeight);
-    Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));                
-    unsigned myBpp = getBytesRequired(1, _myEncoding);
+    Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));
     int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
 
     float mySlicePosition = float(theSliceIndex) + myBounds[Box3f::MIN][2];
     Vector3f myLinePos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
         myScreenToVoxelProjection);
     Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition),
-        myScreenToVoxelProjection) - myLinePos) / float(myWidth);
+        myScreenToVoxelProjection) - myLinePos) / mySize[0];
     Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
-        myScreenToVoxelProjection) - myLinePos) / float(myHeight);
+        myScreenToVoxelProjection) - myLinePos) / mySize[1];
     AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", LinePos: " << myLinePos
         << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
-
+    typedef Line<float> Linef;
     Box3f myVoxelBox(Point3f(0.0f, 0.0f, 0.0f), 
         Point3f(float(myVoxelSize[0]), float(myVoxelSize[1]), float(myVoxelSize[2])));
-    typedef Line<float> Linef;
-
     for (int v = 0; v < myHeight; ++v) {
         Linef myScanLine(myLinePos, mySourceDeltaU);
         float myMinValue, myMaxValue;
@@ -892,8 +904,11 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
             Vector3f mySourcePos = myLinePos + (ceil(myMinValue) * mySourceDeltaU);
             VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+myTargetLineStride*v+myStart);
             for (int u = myStart; u < myEnd; ++u) {
-                //VoxelT myValue = interpolatedValueAt<VoxelT>(mySourcePos);
-                *myAddress = fastValueAt<VoxelT>(mySourcePos);
+                // Unfortunately we have to check the position here. Because of
+                // float inaccuracies we sometimes run beyond our borders otherwise :(
+                if (isInside(mySourcePos[0], mySourcePos[1], mySourcePos[2])) {
+                    *myAddress = fastValueAt<VoxelT>(mySourcePos);
+                }
                 mySourcePos += mySourceDeltaU;
                 myAddress ++;
             }
@@ -904,24 +919,23 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
     // set the image data
     y60::ImagePtr myFacade = theImageNode->dom::Node::getFacade<y60::Image>();
     myFacade->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
+    // AC_INFO << "Image: " << myFacade->get<ImageWidthTag>() << " x " << myFacade->get<ImageHeightTag>();
     // set the matrix to make up for the padded image
     asl::Matrix4f myScale;
     myScale.makeIdentity();
     myScale.scale(Vector3f(float(myWidth)/myPoTWidth, float(myHeight)/myPoTHeight, 1.0f)); 
-    myFacade->y60::Image::set<y60::ImageMatrixTag>(myScale); 
+    myFacade->y60::Image::set<y60::ImageMatrixTag>(myScale);
+    } catch (...) {
+        AC_ERROR << "Exception in ReconstructToImage.";
+    }
 }
 
 Box3f
 CTScan::computeProjectionBounds(const Matrix4f & theInvertedProjection) const {
     vector<Point3f> myCorners;
     Vector3i mySize = getVoxelDimensions();
-    float myZMin = 0;
-    float myZMax = float(mySize[2]);
     Box3f myBox;
     myBox.makeEmpty();
-
-    //theBox[Box3f::MIN] = product(Point3f(0,0,myZMin), theInvertedProjection);
-    //theBox[Box3f::MAX] = product(Point3f(0,0,myZMin), theInvertedProjection);
 
     // convert the 8 corners into the inverted projection space
     myBox.extendBy(product(Point3f(0,0,0), theInvertedProjection));
