@@ -238,7 +238,7 @@ namespace y60 {
                 }
 
                 if (myParameterType == CG_ARRAY) {
-                    AC_INFO << "array " << myParamName << " size " << cgGetArraySize(myParam, 0);
+                    AC_DEBUG << "array " << myParamName << " size " << cgGetArraySize(myParam, 0);
                 }
 
                 if (true || myParameterType == CG_ARRAY || cgIsParameterReferenced(myParam)) {
@@ -441,7 +441,7 @@ namespace y60 {
                     myAmbientLightColor = myLightPropFacade->get<LightAmbientTag>();
                     break;
                 default :
-                    AC_INFO << "unknown light type " << myLightSource->get<IdTag>();
+                    AC_WARNING << "unknown light type " << myLightSource->get<IdTag>();
             }
         }
 
