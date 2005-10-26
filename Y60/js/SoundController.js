@@ -129,7 +129,7 @@ function playSound(theFilename, theVolume, theLoopFlag) {
     }
 
     try {
-        var mySound = ourSoundController.createSound(theFilename, theLoopFlag);
+        var mySound = new Sound(theFilename, theLoopFlag);
         mySound.volume = theVolume;
         mySound.play();
         return mySound;

@@ -44,34 +44,6 @@ namespace jslib {
                 cx,obj,argc,argv,rval);
     }
     
-    static JSBool
-    createSound(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Creates a Sound from URI. Does not start playback.");
-        DOC_PARAM("URI", DOC_TYPE_STRING);
-        DOC_PARAM_OPT("Loopflag", DOC_TYPE_BOOLEAN, false);
-        DOC_PARAM_OPT("UseCacheFlag", DOC_TYPE_BOOLEAN, true);
-        DOC_END;
-        switch(argc) {
-            case 1: {
-                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI);
-                    return Method<SoundManager>::call
-                            ((MyMethod)&SoundManager::createSound,cx,obj,argc,argv,rval);
-                }
-            case 2: {
-                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI, 
-                            bool theLoop);
-                    return Method<SoundManager>::call
-                            ((MyMethod)&SoundManager::createSound,cx,obj,argc,argv,rval);
-                }
-            default: {
-                    typedef SoundPtr (SoundManager::*MyMethod)(const std::string & theURI, 
-                            bool theLoop, bool theUseCache);
-                    return Method<SoundManager>::call
-                            ((MyMethod)&SoundManager::createSound,cx,obj,argc,argv,rval);
-                }
-        }
-    }
-
     JSFunctionSpec *
     JSSoundManager::Functions() {
         static JSFunctionSpec myFunctions[] = {
@@ -79,7 +51,6 @@ namespace jslib {
             {"stopAll",              stopAll,           0},
             {"fadeToVolume",         fadeToVolume,      2},
             {"preloadSound",         preloadSound,      1},
-            {"createSound" ,         createSound,       3},
             {0}
         };
         return myFunctions;
@@ -140,7 +111,7 @@ namespace jslib {
 
             if (argc > 3) {
                 throw BadArgumentException(string("JSSoundManager::Constructor(): Wrong number of arguments. Got ") +
-                    as_string(argc) + ", expected between none and two.", PLUS_FILE_LINE);
+                    as_string(argc) + ", expected between none and three.", PLUS_FILE_LINE);
             }
 
             OWNERPTR myNewNative = &(Singleton<SoundManager>::get());
