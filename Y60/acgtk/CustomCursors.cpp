@@ -20,6 +20,15 @@
 #include "cursors/cursor_add_point.xbm"
 #include "cursors/cursor_add_point_mask.xbm"
 
+#include "cursors/cursor_angle1.xbm"
+#include "cursors/cursor_angle1_mask.xbm"
+#include "cursors/cursor_angle2.xbm"
+#include "cursors/cursor_angle2_mask.xbm"
+#include "cursors/cursor_angle3.xbm"
+#include "cursors/cursor_angle3_mask.xbm"
+#include "cursors/cursor_angle4.xbm"
+#include "cursors/cursor_angle4_mask.xbm"
+
 namespace acgtk {
 #define INIT_CURSOR(theName, theXBM) \
     theName = createCustomCursor(theXBM ## _bits, theXBM ## _mask_bits, \
@@ -27,10 +36,18 @@ namespace acgtk {
                     theXBM ## _x_hot, theXBM ## _y_hot);
 
 Gdk::Cursor CustomCursors::AC_ADD_POINT;
+Gdk::Cursor CustomCursors::AC_EDIT_ANGLE;
+Gdk::Cursor CustomCursors::AC_EDIT_ANGLE1;
+Gdk::Cursor CustomCursors::AC_EDIT_ANGLE2;
+Gdk::Cursor CustomCursors::AC_EDIT_ANGLE3;
 
 void
 CustomCursors::init() {
     INIT_CURSOR(AC_ADD_POINT, cursor_add_point);
+    INIT_CURSOR(AC_EDIT_ANGLE, cursor_angle1);
+    INIT_CURSOR(AC_EDIT_ANGLE1, cursor_angle2);
+    INIT_CURSOR(AC_EDIT_ANGLE2, cursor_angle3);
+    INIT_CURSOR(AC_EDIT_ANGLE3, cursor_angle4);
 }
 
 

@@ -27,6 +27,10 @@ class CustomCursors {
         static void init();
 
         static Gdk::Cursor AC_ADD_POINT; 
+        static Gdk::Cursor AC_EDIT_ANGLE; 
+        static Gdk::Cursor AC_EDIT_ANGLE1; 
+        static Gdk::Cursor AC_EDIT_ANGLE2; 
+        static Gdk::Cursor AC_EDIT_ANGLE3; 
 
     private:
 };

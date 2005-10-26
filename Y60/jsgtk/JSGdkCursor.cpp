@@ -168,7 +168,11 @@ enum PropertyNumbers {
 };
 
 enum StaticPropertyNumbers {
-    PROP_AC_ADD_POINT
+    PROP_AC_ADD_POINT,
+    PROP_AC_EDIT_ANGLE,
+    PROP_AC_EDIT_ANGLE1,
+    PROP_AC_EDIT_ANGLE2,
+    PROP_AC_EDIT_ANGLE3
 };
 
 JSPropertySpec *
@@ -268,13 +272,21 @@ JSGdkCursor::ConstIntProperties() {
     return myProperties;
 };
 
+#define DISPATCH_CURSOR( theName ) \
+    case PROP_ ## theName : \
+        *vp = as_jsval(cx, JSGdkCursor::OWNERPTR(0), & acgtk::CustomCursors::theName); \
+        return JS_TRUE;
+
+
 static JSBool
 getStaticProperty(JSContext *cx, JSObject * obj, jsval id, jsval * vp) {
     int myID = JSVAL_TO_INT(id);
     switch (myID) {
-        case PROP_AC_ADD_POINT:
-            *vp = as_jsval(cx, JSGdkCursor::OWNERPTR(0), & acgtk::CustomCursors::AC_ADD_POINT);
-            return JS_TRUE;
+        DISPATCH_CURSOR( AC_ADD_POINT );
+        DISPATCH_CURSOR( AC_EDIT_ANGLE );
+        DISPATCH_CURSOR( AC_EDIT_ANGLE1 );
+        DISPATCH_CURSOR( AC_EDIT_ANGLE2 );
+        DISPATCH_CURSOR( AC_EDIT_ANGLE3 );
         default:
             JS_ReportError(cx,"JSGdkCursor::getStaticProperty: index %d out of range", myID);
             return JS_FALSE;
@@ -302,6 +314,10 @@ JSPropertySpec *
 JSGdkCursor::StaticProperties() {
     static JSPropertySpec myProperties[] = {
         DEFINE_STATIC_PROP(AC_ADD_POINT),
+        DEFINE_STATIC_PROP(AC_EDIT_ANGLE),
+        DEFINE_STATIC_PROP(AC_EDIT_ANGLE1),
+        DEFINE_STATIC_PROP(AC_EDIT_ANGLE2),
+        DEFINE_STATIC_PROP(AC_EDIT_ANGLE3),
         {0}
     };
     return myProperties;
