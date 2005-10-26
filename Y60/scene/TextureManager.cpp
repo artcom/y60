@@ -166,7 +166,7 @@ namespace y60 {
 
     void
     TextureManager::loadCaptureFrame(CapturePtr theCapture) {
-        MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame);
+        MAKE_SCOPE_TIMER(TextureManager_loadCaptureFrame);
 
         // First time load, or source has changed
         if (theCapture->reloadRequired()) {
@@ -182,13 +182,13 @@ namespace y60 {
         theCapture->readFrame();
 
         // load/subload texture
-        ImagePtr myMovieImage = dynamic_cast_Ptr<Image>(theCapture);
+        ImagePtr myCaptureImage = dynamic_cast_Ptr<Image>(theCapture);
         if (theCapture->getGraphicsId()) {
             if (theCapture->isImageNewerThanTexture()) {
-                updateImageData(myMovieImage);
+                updateImageData(myCaptureImage);
             }
         } else {
-            setupImage(myMovieImage);
+            setupImage(myCaptureImage);
         }
     }
 

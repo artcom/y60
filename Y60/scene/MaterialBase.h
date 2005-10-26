@@ -138,6 +138,8 @@ namespace y60 {
 
             virtual void update(TextureManager & theTextureManager, const dom::NodePtr theImages);
 
+            virtual bool reloadRequired() /*const*/;
+
             const MaterialParameterVectorPtr getVertexParameters() const;
 
             void setShader(IShaderPtr theShader);
@@ -177,6 +179,8 @@ namespace y60 {
             LightingModel           _myLightingModel;
 
             asl::Unsigned64   _myMaterialVersion;
+            unsigned long     _myRequiresVersion;
+
             bool              _myTexGenFlag;
 			TexGenModeList    _myTexGenModes;
 			TexGenParamsList  _myTexGenParams;

@@ -109,9 +109,9 @@ ThreadSem::unlock() {
 // two wait for two semaphores
 int
 ThreadSem::lock(ThreadSem & other) {
-    
+ 
     assert(_mySemaphoreSetId == other._mySemaphoreSetId);
-    
+
     struct sembuf semop_P[2] = { {_mySemaphoreSetIndex, -1, SEM_UNDO },
                                  {other._mySemaphoreSetIndex, -1, SEM_UNDO }};
 
@@ -134,8 +134,8 @@ ThreadSem::unlock(ThreadSem & other) {
     
     assert(_mySemaphoreSetId == other._mySemaphoreSetId);
     
-    struct sembuf semop_V[2] = { {_mySemaphoreSetIndex, -1, SEM_UNDO },
-                                 {other._mySemaphoreSetIndex, -1, SEM_UNDO }};
+    struct sembuf semop_V[2] = { {_mySemaphoreSetIndex, 1, SEM_UNDO },
+                                 {other._mySemaphoreSetIndex, 1, SEM_UNDO }};
 
     if ( semop( _mySemaphoreSetId, semop_V, 2) == -1 ) {
         cerr << "ERROR: unlock (V) on two semaphores failed: " << strerror( errno ) << endl;

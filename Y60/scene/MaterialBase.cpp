@@ -47,7 +47,7 @@ namespace y60 {
         Facade(theNode),
         _myShader(0),
         _myLightingModel(LAMBERT),
-        _myTexGenFlag(false), _myMaterialVersion(0)
+        _myTexGenFlag(false), _myMaterialVersion(0), _myRequiresVersion(0)
     {
     }
 
@@ -57,9 +57,19 @@ namespace y60 {
 
     void
     MaterialBase::update(TextureManager & theTextureManager, const dom::NodePtr theImages) {
-        for (int i = 0 ; i <_myTextures.size(); i++) {
+        for (unsigned i = 0 ; i <_myTextures.size(); ++i) {
             _myTextures[i]->update(theTextureManager);
         }
+    }
+
+    bool
+    MaterialBase::reloadRequired() /*const*/ {
+		MaterialRequirementFacadePtr myReqFacade = getFacade<MaterialRequirementTag>();
+        //AC_DEBUG << "Material " << get<NameTag>() << " version:" << myReqFacade->getNode().nodeVersion() << " stored:" << _myRequiresVersion << " theNode.version:" << getNode().nodeVersion();
+        if (myReqFacade->getNode().nodeVersion() != _myRequiresVersion) {
+            return true;
+        }
+        return false;
     }
 
     void
@@ -214,18 +224,20 @@ namespace y60 {
     MaterialBase::updateParams() {
 
         // check node version if update is necessary
-        if (!getNode() || getNode().nodeVersion() == _myMaterialVersion) {
+		MaterialRequirementFacadePtr myReqFacade = getFacade<MaterialRequirementTag>();
+        if (!getNode() ||
+            (getNode().nodeVersion() == _myMaterialVersion && myReqFacade->getNode().nodeVersion() == _myRequiresVersion)) {
             return;
         }
 
         _myMaterialVersion = getNode().nodeVersion();
-        AC_DEBUG << "Updating params for material " << get<NameTag>();
+        _myRequiresVersion = myReqFacade->getNode().nodeVersion();
+        AC_DEBUG << "Updating params for material " << get<NameTag>() << " materialVersion:" << _myMaterialVersion << " requiresVersion:" << _myRequiresVersion;
 
         _myTexGenModes.clear();
         _myTexGenParams.clear();
         _myTexGenFlag = false;
 
-		MaterialRequirementFacadePtr myReqFacade = getFacade<MaterialRequirementTag>();
 		const NameAttributeNodeMap & myRequirementMap = myReqFacade->getEnsuredPropertyList();
 		NodePtr myMappingRequirement = myRequirementMap.getNamedItem(MAPPING_FEATURE);
         if (myMappingRequirement) {

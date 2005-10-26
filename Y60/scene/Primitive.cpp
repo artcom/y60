@@ -31,6 +31,8 @@
 using namespace asl;
 using namespace std;
 
+#define DB(x) //x
+
 namespace y60 {
 
     DEFINE_EXCEPTION(PrimitiveException, asl::Exception);
@@ -76,7 +78,7 @@ namespace y60 {
         TypeId myTypeId = TypeId(getEnumFromString(theDataNode->nodeName(), TypeIdStrings));
         VertexDataBasePtr myVertexData = createVertexDataBin(theResourceManager, myTypeId, myRole);
         if (myVertexData) {
-            AC_TRACE << "uploading Vertex Data";
+            DB(AC_TRACE << "uploading Vertex Data role=" << myRole);
             myVertexData->load(myIndices, myDataNode, theBeginIndex, theEndIndex);
         }
     }

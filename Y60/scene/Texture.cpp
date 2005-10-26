@@ -61,11 +61,8 @@ namespace y60 {
         //DO THIS WITH DPEENDENCIES ON set/get TextureImageTag
         
 		// TODO better dirty detection
-        AC_TRACE << "getting dom image ";
         ImagePtr myImageInDom = theTextureManager.findImage(get<TextureImageTag>());
 
-        AC_TRACE << "getImage().getNativePtr() is " << getImage().getNativePtr();
-        AC_TRACE << "myImageInDom.getNativePtr() is " << myImageInDom.getNativePtr();
         if (!_myImage || getImage().getNativePtr() != myImageInDom.getNativePtr()) {
             AC_TRACE << "Textureimage has changed from ";
 
@@ -77,7 +74,6 @@ namespace y60 {
             myImageInDom->registerTexture();
             _myImage = ImageWeakPtr(myImageInDom);
             return true;
-
         } else {
             return false;
         }

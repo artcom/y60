@@ -31,7 +31,8 @@ namespace y60 {
 			PropertyListFacade(dom::Node & theNode) : dom::Facade(theNode), _myNodeVersion(0) {}
 			void ensurePropertyList() {
 				if (getNode().nodeVersion() != _myNodeVersion) {
-					for (int i = 0; i < getNode().childNodesLength();++i) {
+                    getPropertyList().clear();
+					for (unsigned i = 0; i < getNode().childNodesLength();++i) {
 						dom::NodePtr myNode = getNode().childNode(i); 
 						if (myNode->nodeType() == dom::Node::ELEMENT_NODE &&
 							myNode->nodeName() != "#comment") {
@@ -46,6 +47,7 @@ namespace y60 {
 					_myNodeVersion = getNode().nodeVersion();
 				}
 			}
+
 		private:
 			unsigned long long _myNodeVersion;
 	};

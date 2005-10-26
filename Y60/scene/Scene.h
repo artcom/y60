@@ -184,7 +184,8 @@ namespace y60 {
                             int theSchemaIndex,
                             bool theBinaryFlag);
             bool getMaterialIndex(const std::string & theMaterialId, unsigned & theMaterialIndex);
-            const MaterialBasePtr getMaterial(unsigned theMaterialIndex) const;
+            const MaterialBasePtr & getMaterial(unsigned theMaterialIndex) const;
+
             LightVector & getLights() {
                 return _myLights;
             }
@@ -309,7 +310,7 @@ namespace y60 {
 
             void buildShape(ShapePtr theShape);
             void updateShapes();
-            void loadMaterial(dom::NodePtr theMaterialNode);
+            void loadMaterial(dom::NodePtr theMaterialNode, int theIndex = -1);
             void loadAnimations();
             void updateMaterials();
             void clearShapes();

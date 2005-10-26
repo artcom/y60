@@ -39,7 +39,7 @@ using namespace asl;
 using namespace y60;
 using namespace dom;
 
-#define DB(x)  x
+#define DB(x) //x
 
 namespace y60 {
 
@@ -116,10 +116,11 @@ namespace y60 {
 
     IShaderPtr
     ShaderLibrary::findShader(MaterialBasePtr theMaterial) {
+        DB(AC_DEBUG << "ShaderLibrary::findShader for material: " << theMaterial->getNode());
 		// we need to copy all values to tmp RequirementMap, cause we want to drop req temporarly
 
-		MaterialRequirementFacadePtr myReqFacade = theMaterial->getFacade<MaterialRequirementTag>();
-		NameAttributeNodeMap  myRequirementMap(myReqFacade->getEnsuredPropertyList());
+        MaterialRequirementFacadePtr myReqFacade = theMaterial->getFacade<MaterialRequirementTag>();
+        NameAttributeNodeMap myRequirementMap(myReqFacade->getEnsuredPropertyList());
         vector<ShaderScore> myScoreBoard(_myShaders.size());
 
         // iterate over all features, that the material wants to have

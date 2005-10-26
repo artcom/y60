@@ -43,7 +43,8 @@ namespace y60 {
             void setImageList(dom::NodePtr theImageListNode);
 
             void setupTextures();
-            void loadMovieFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie, double theCurrentTime);
+            void loadMovieFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie,
+                                double theCurrentTime = 0.0);
             void loadCaptureFrame(asl::Ptr<Capture, dom::ThreadingModel> theCapture);
             asl::Ptr<Image, dom::ThreadingModel> getImage(const std::string & theImageId) const;
             asl::Ptr<Image, dom::ThreadingModel> findImage(const std::string & theImageId) const;

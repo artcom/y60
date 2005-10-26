@@ -236,7 +236,7 @@ namespace y60 {
         setup();
     }
 
-    IShaderLibraryPtr 
+    IShaderLibraryPtr
     Scene::getShaderLibrary() const {
         if (_myTextureManager->getResourceManager()) {
             return _myTextureManager->getResourceManager()->getShaderLibrary();
@@ -300,7 +300,8 @@ namespace y60 {
     }
 
     void
-    Scene::loadMaterial(NodePtr theMaterialNode) {
+    Scene::loadMaterial(NodePtr theMaterialNode, int theIndex) {
+        DB(AC_TRACE << "Scene::loadMaterial " << *theMaterialNode);
 		map<string, bool> myPropertyNames;
 		NodePtr myPropertiesNode = theMaterialNode->childNode(PROPERTY_LIST_NAME);
 		if (myPropertiesNode) {
@@ -311,7 +312,6 @@ namespace y60 {
 		}
 	            
 		MaterialBasePtr myMaterial = MaterialBasePtr(new MaterialBase(*theMaterialNode));
-
 		IShaderPtr myShader;
 		if (getShaderLibrary()) {
 			// 2. ask shaderlib for shaderdefinition
@@ -320,24 +320,21 @@ namespace y60 {
 				throw SceneException(string("No shader defintion found for Material: ") +
 					myMaterial->get<NameTag>(), PLUS_FILE_LINE);
 			}
+            DB(AC_TRACE << "load shader");
 			myShader->load(*getShaderLibrary());
-
 			// 3. decide which material to build
 			// 4. load material from node
 			// 5. give material the found shaderdefinition
 			const VectorOfString * myPhysicsFeatures = myShader->getFeatures("physics");
-
 			if (myPhysicsFeatures && myShader->isCGShader() &&
 				std::find(myPhysicsFeatures->begin(), myPhysicsFeatures->end(), "skin") !=  myPhysicsFeatures->end())
 			{
 				myMaterial = MaterialBasePtr(new SkinAndBones(*theMaterialNode));
 			} 
 		}
-
 		myMaterial->setShader(myShader);
-
 		DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
-			endl << " with shader: " << (myShader ? myShader->getName() : "NULL") << endl);
+			endl << " with shader: " << (myShader ? myShader->getName() : "NULL"));
 		myMaterial->load(*_myTextureManager);
 		if (myShader) {
 			for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
@@ -347,7 +344,6 @@ namespace y60 {
 				for (unsigned myPropertyIndex = 0; myPropertyIndex < myPropertyCount; ++myPropertyIndex) {
 					dom::NodePtr myPropertyNode  = myShader->getPropertyNode(i)->childNode(myPropertyIndex);								if (myPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
 						myPropertyNode->nodeName() != "#comment") {
-
 						const std::string & myProp = myPropertyNode->getAttributeString("name");
 						if (myPropertyNames.find(myPropertyNode->getAttributeString("name")) ==
 							myPropertyNames.end()) {
@@ -356,15 +352,19 @@ namespace y60 {
 					}
 				}
 			}
-		}
+        }
 
-        AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
-                 << ", name: " << myMaterial->get<NameTag>();
-
-        _myMaterials.push_back(myMaterial);
-        DB(AC_TRACE << "mapping material " << myMaterial->get<IdTag>() << endl;)
-
-        _myMaterialIdMap[myMaterial->get<IdTag>()] = _myMaterials.size() - 1;
+        DB(AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
+                    << ", name: " << myMaterial->get<NameTag>());
+        if (theIndex < 0) {
+            // append to material list
+            theIndex = _myMaterials.size();
+            _myMaterials.push_back(myMaterial);
+        } else {
+            // store in existing slot in materials list
+            _myMaterials[theIndex] = myMaterial;
+        }
+        _myMaterialIdMap[myMaterial->get<IdTag>()] = theIndex;
     }
 
     NodePtr
@@ -417,27 +417,27 @@ namespace y60 {
 
     void
     Scene::clearShapes() {
-		NodePtr myShapeListNode = getShapesRoot();
-		unsigned myShapeCount = myShapeListNode->childNodesLength();
-		for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-			NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
-			ShapePtr myShape = myShapeNode->getFacade<Shape>();
+        NodePtr myShapeListNode = getShapesRoot();
+        unsigned myShapeCount = myShapeListNode->childNodesLength();
+        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
+            NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
+            ShapePtr myShape = myShapeNode->getFacade<Shape>();
             myShape->clear();
-		}
+        }
     }
 
-	void
-	Scene::updateShapes() {
-		NodePtr myShapeListNode = getShapesRoot();
-		unsigned myShapeCount = myShapeListNode->childNodesLength();
-		for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-			NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
-			ShapePtr myShape = myShapeNode->getFacade<Shape>();
-			if (myShapeNode->nodeVersion() > myShape->getLastRenderVersion()) {
-				buildShape(myShape);
-			}
-		}
-	}
+    void
+    Scene::updateShapes() {
+        NodePtr myShapeListNode = getShapesRoot();
+        unsigned myShapeCount = myShapeListNode->childNodesLength();
+        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
+            NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
+            ShapePtr myShape = myShapeNode->getFacade<Shape>();
+            if (myShapeNode->nodeVersion() > myShape->getLastRenderVersion()) {
+                buildShape(myShape);
+            }
+        }
+    }
 
     void
     Scene::parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles ) {
@@ -453,10 +453,11 @@ namespace y60 {
 	void
 	Scene::buildShape(ShapePtr theShape) {
 		NodePtr myShapeNode = theShape->getXmlNode();
+        theShape->clear();
 
-		theShape->clear();
         unsigned long myShapeVertexCount = 0;
         const std::string & myShapeId = myShapeNode->getAttributeString("id");
+        AC_DEBUG << "Scene::buildShape " << myShapeId;
 
         // Iterate over all indices and find the corresponding data
         NodePtr myPrimitiveListNode = myShapeNode->childNode(PRIMITIVE_LIST_NAME);
@@ -528,26 +529,26 @@ namespace y60 {
         DB(AC_TRACE << "shape: " << myShapeId << " has " << theShape->getPrimitives().size() << " materials" << endl;)
 
         calculateShapeBoundingBox(theShape);
-		//theShape->setDirty(false);
-		theShape->setLastRenderVersion(myShapeNode->nodeVersion()+1);
-	}
-
-	void
-	Scene::reverseUpdateShapes() {
-		NodePtr myShapeListNode = getShapesRoot();
-		unsigned myShapeCount = myShapeListNode->childNodesLength();
-		for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
-			NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
-			ShapePtr myShape = myShapeNode->getFacade<Shape>();
-			if (myShapeNode->nodeVersion() < myShape->getLastRenderVersion()) {
-				reverseUpdateShape(myShape);
-			}
-		}
-	}
+        //theShape->setDirty(false);
+        theShape->setLastRenderVersion(myShapeNode->nodeVersion()+1);
+    }
 
     void
-	Scene::reverseUpdateShape(ShapePtr theShape) {
-		NodePtr myShapeNode = theShape->getXmlNode();
+    Scene::reverseUpdateShapes() {
+        NodePtr myShapeListNode = getShapesRoot();
+        unsigned myShapeCount = myShapeListNode->childNodesLength();
+        for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
+            NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
+            ShapePtr myShape = myShapeNode->getFacade<Shape>();
+            if (myShapeNode->nodeVersion() < myShape->getLastRenderVersion()) {
+                reverseUpdateShape(myShape);
+            }
+        }
+    }
+
+    void
+    Scene::reverseUpdateShape(ShapePtr theShape) {
+        NodePtr myShapeNode = theShape->getXmlNode();
 
         unsigned long myShapeVertexCount = 0;
         const std::string & myShapeId = myShapeNode->getAttributeString("id");
@@ -584,7 +585,7 @@ namespace y60 {
         calculateShapeBoundingBox(theShape);
         myShapeNode->bumpVersion();
         theShape->setLastRenderVersion(myShapeNode->nodeVersion()+1);
-	}
+    }
 
     void
     Scene::loadAnimations() {
@@ -695,7 +696,7 @@ namespace y60 {
         NodePtr myMaterialList = _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
 
-        AC_TRACE << "Scene::updateMaterials() - material count: " << myMaterialCount;
+        AC_DEBUG << "Scene::updateMaterials() - material count: " << myMaterialCount;
 
         for (unsigned i = 0; i < myMaterialCount; ++i) {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
@@ -703,11 +704,21 @@ namespace y60 {
             MaterialIdMap::iterator myIt = _myMaterialIdMap.find(myMaterialId);
 
             if (myIt == _myMaterialIdMap.end()) {
-                DB(AC_TRACE << "could not find material " << myMaterialId << ", loading" << endl);
+                AC_TRACE << "could not find material " << myMaterialId << ", loading" << endl;
                 loadMaterial(myMaterialNode);
             } else {
                 MaterialBasePtr myMaterial = _myMaterials[myIt->second];
-                myMaterial->update(*_myTextureManager, getImagesRoot());
+                if (myMaterial->reloadRequired()) {
+                    AC_DEBUG << "Material " << myMaterialId << " requires reload";
+                    // reload modified material into it's existing slot
+                    // TODO: adapt when material index handling refactoring is done
+                    // VS/UH
+                    //_myMaterials[myIt->second] = MaterialBasePtr(0);
+                    //_myMaterialIdMap.erase(myIt);
+                    loadMaterial(myMaterialNode, myIt->second);
+                } else {
+                    myMaterial->update(*_myTextureManager, getImagesRoot());
+                }
             }
         }
     }
@@ -769,10 +780,14 @@ namespace y60 {
         }
     }
 
-    const MaterialBasePtr
+    const MaterialBasePtr &
     Scene::getMaterial(unsigned theMaterialIndex) const {
         if (theMaterialIndex < _myMaterials.size() ) {
-            return _myMaterials[theMaterialIndex];
+            const MaterialBasePtr myMaterial = _myMaterials[theMaterialIndex];
+            if (!myMaterial) {
+                AC_ERROR << "Material index " << theMaterialIndex << " is NULL";
+            }
+            return myMaterial;
         } else {
             throw SceneException(std::string("Material index does not exist: ") + as_string(theMaterialIndex), "Scene::getMaterial()");
         }
@@ -965,7 +980,7 @@ namespace y60 {
             if (theNode->nodeName() == BODY_NODE_NAME) {
                 // prepare check for intersection with body geometry
                 y60::ShapePtr myShape;
-				dom::NodePtr myShapeNode = theNode->getElementById(theNode->Node::getFacade<Body>()->Body::get<ShapeTag>());
+                dom::NodePtr myShapeNode = theNode->getElementById(theNode->Node::getFacade<Body>()->Body::get<ShapeTag>());
                 if (myShapeNode) {
                     myShape = myShapeNode->Node::getFacade<Shape>();
                 }
@@ -1334,6 +1349,7 @@ namespace y60 {
 
     void 
     Scene::deregisterResourceManager() {
+        AC_DEBUG << "deregisterResourceManager";
         if (_myTextureManager->registerResourceManager(0) == 0) {
             // XXX ?
             clearShapes();

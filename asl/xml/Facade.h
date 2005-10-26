@@ -46,7 +46,7 @@ namespace dom {
             DEFINE_NESTED_EXCEPTION(Facade, Exception, asl::Exception);
             DEFINE_NESTED_EXCEPTION(Facade, InvalidNullPointerPassed, Exception);
 
-            virtual ~Facade() {};
+            virtual ~Facade() {}
 
             virtual Facade * createNew(Node & theNode) const = 0;
 
@@ -80,8 +80,15 @@ namespace dom {
 
 		protected:
             Facade(Node & theNode);
-			virtual void ensurePropertyList() {};
-			NameAttributeNodeMap & getPropertyList() { return _myPropertyNodes; } 
+			virtual void ensurePropertyList() {}
+
+			NameAttributeNodeMap & getPropertyList() {
+                return _myPropertyNodes;
+            } 
+			const NameAttributeNodeMap & getPropertyList() const {
+                return _myPropertyNodes;
+            } 
+
         private:
             Node & _myNode;
             FacadeWeakPtr _mySelf;
