@@ -1368,7 +1368,7 @@ namespace y60 {
         MAKE_SCOPE_TIMER(renderOverlay);
 
         const std::string & myMaterialId = myOverlay.get<MaterialTag>();
-        const asl::Vector2f myPosition = thePosition + myOverlay.get<Position2DTag>();
+        const asl::Vector2f myPosition = myOverlay.get<Position2DTag>(); // child inherits parent's matrix
         float myWidth  = myOverlay.get<WidthTag>();
         float myHeight = myOverlay.get<HeightTag>();
 
@@ -1377,6 +1377,20 @@ namespace y60 {
         }
 
         float myAlpha  = theAlpha * myOverlay.get<AlphaTag>();
+		
+        // do the transformation
+        glPushMatrix();
+        glTranslatef(myPosition[0], myPosition[1], 0);
+
+        float myOverlayRotation2d = myOverlay.get<Rotation2DTag>();
+        if (!asl::almostEqual(myOverlayRotation2d, 0.0) ) { 
+            // overlays rotate around the upper-left corner
+            // uncomment this code for  rotation around center(vs/uh)
+            //asl::Vector3f myPivotTranslation(myWidth / -2.0f, myHeight / -2.0f, 0.0);
+            //glTranslatef(-myPivotTranslation[0], -myPivotTranslation[1], myPivotTranslation[2]);
+            glRotatef(float(degFromRad(myOverlayRotation2d)), 0.0f,0.0f,1.0f);
+            //glTranslatef(myPivotTranslation[0], myPivotTranslation[1], myPivotTranslation[2]);
+        }
 
         if (!myMaterialId.empty()) {
             unsigned myMaterialIndex = 0;
@@ -1412,38 +1426,38 @@ namespace y60 {
             if (myTextureCount == 1) {
                 glBegin(GL_QUADS);
                     glTexCoord2f(mySourceOrigin[0],mySourceOrigin[1]);
-                    glVertex2f(myPosition[0], myPosition[1]);
+                    glVertex2f(0, 0);
 
                     glTexCoord2f(mySourceOrigin[0],mySourceOrigin[1]+mySourceSize[1]);
-                    glVertex2f(myPosition[0], myPosition[1] + myHeight);
+                    glVertex2f(0, myHeight);
 
                     glTexCoord2f(mySourceOrigin[0]+mySourceSize[0],mySourceOrigin[1]+mySourceSize[1]);
-                    glVertex2f(myPosition[0] + myWidth, myPosition[1] + myHeight);
+                    glVertex2f(myWidth, myHeight);
 
                     glTexCoord2f(mySourceOrigin[0]+mySourceSize[0],mySourceOrigin[1]);
-                    glVertex2f(myPosition[0] + myWidth, myPosition[1]);
+                    glVertex2f(myWidth, 0);
                 glEnd();
             } else {
                 glBegin(GL_QUADS);
                     for (unsigned i = 0; i < myTextureCount; ++i) {
                         glMultiTexCoord2fARB(asGLTextureRegister(i), mySourceOrigin[0],mySourceOrigin[1]);
                     }
-                    glVertex2f(myPosition[0], myPosition[1]);
+                    glVertex2f(0,0);
 
                     for (unsigned i = 0; i < myTextureCount; ++i) {
                         glMultiTexCoord2fARB(asGLTextureRegister(i), mySourceOrigin[0],mySourceOrigin[1]+mySourceSize[1]);
                     }
-                    glVertex2f(myPosition[0], myPosition[1] + myHeight);
+                    glVertex2f(0, myHeight);
 
                     for (unsigned i = 0; i < myTextureCount; ++i) {
                         glMultiTexCoord2fARB(asGLTextureRegister(i), mySourceOrigin[0]+mySourceSize[0],mySourceOrigin[1]+mySourceSize[1]);
                     }
-                    glVertex2f(myPosition[0] + myWidth, myPosition[1] + myHeight);
+                    glVertex2f(myWidth, myHeight);
 
                     for (unsigned i = 0; i < myTextureCount; ++i) {
                         glMultiTexCoord2fARB(asGLTextureRegister(i), mySourceOrigin[0]+mySourceSize[0],mySourceOrigin[1]);
                     }
-                    glVertex2f(myPosition[0] + myWidth, myPosition[1]);
+                    glVertex2f(myWidth, 0);
                 glEnd();
             }
         }
@@ -1463,20 +1477,20 @@ namespace y60 {
             glLineWidth(myOverlay.get<BorderWidthTag>());
             glBegin(GL_LINES);
             if (hasTopBorder) {
-                glVertex2f(myPosition[0], myPosition[1]);
-                glVertex2f(myPosition[0] + myWidth, myPosition[1]);
+                glVertex2f(0,0);
+                glVertex2f(myWidth, 0);
             }
             if (hasBottomBorder) {
-                glVertex2f(myPosition[0], myPosition[1] + myHeight);
-                glVertex2f(myPosition[0] + myWidth, myPosition[1] + myHeight);
+                glVertex2f(0, myHeight);
+                glVertex2f(myWidth, myHeight);
             }
             if (hasLeftBorder) {
-                glVertex2f(myPosition[0], myPosition[1]);
-                glVertex2f(myPosition[0], myPosition[1] + myHeight);
+                glVertex2f(0,0);
+                glVertex2f(0, myHeight);
             }
             if (hasRightBorder) {
-                glVertex2f(myPosition[0] + myWidth, myPosition[1]);
-                glVertex2f(myPosition[0] + myWidth, myPosition[1] + myHeight);
+                glVertex2f(myWidth,0);
+                glVertex2f(myWidth, myHeight);
             }
             glEnd();
 
@@ -1490,6 +1504,7 @@ namespace y60 {
         for (unsigned i = 0; i < myOverlayCount; ++i) {
              renderOverlay(theOverlayNode->childNode(i), myPosition, myAlpha);
         }
+        glPopMatrix();
     }
 
 }

@@ -55,6 +55,9 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     Public.position getter = function() { return _myNode.position; }
     Public.position setter = function(theArgument) { _myNode.position = theArgument; }
 
+    Public.rotation getter = function() { return _myNode.rotation; }
+    Public.rotation setter = function(theArgument) { _myNode.rotation = theArgument; }
+
     Public.srcorigin getter = function() { return _myNode.srcorigin; }
     Public.srcorigin setter = function(theArgument) { _myNode.srcorigin = theArgument; }
 
@@ -152,7 +155,16 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
         _myMaterial.name = myName + "M";
         _myMaterial.transparent = 1;
         _myMaterial.properties.surfacecolor = "[1,1,1,1]";
-        var myParent = theParent ? theParent : theScene.overlays;
+        var myParent = null;
+        if (theParent != undefined) {
+            if (typeof(theParent) == "object") {
+                myParent = theParent.node;
+            } else {
+                myParent  =theParent;
+            }
+        } else {
+            myParent = theScene.overlays;
+        }
         var myOverlayString = '<overlay name="' + myName + '" material="' + _myMaterial.id + '"/>';
         var myNode = new Node(myOverlayString);
         _myNode = myParent.appendChild(myNode.firstChild);

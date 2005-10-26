@@ -20,7 +20,8 @@ if (__main__ == undefined) var __main__ = "ImageViewer";
 
 use("SceneViewer.js");
 use("FrameRateLimiter.js");
-use("AudioController.js");
+//use("AudioController.js");
+use("SoundController.js");
 use("Playlist.js");
 
 const MINZOOMFACTOR = 0.001;
@@ -291,6 +292,13 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         _myCurrentMediaType = myEntry.mediaType;
         print("Now showing " + myFilename);
 
+        if (myFilename.search(/^video:\/\//i) != -1) {
+            plug("y60VFWCapture");
+            print("VideoForWindows dshow");
+        } else if (myFilename.search(/^dshow:\/\//i) != -1) {
+            plug("y60DShowCapture");
+            print("plugged dshow");
+        }
 
         if (!_myMPEGPlugged && (myFilename.search(/\.mpg$/i)  != -1 ||
                                 myFilename.search(/\.m2v$/i)  != -1 ||

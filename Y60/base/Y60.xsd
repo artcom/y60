@@ -1573,6 +1573,11 @@ Usually 'o' plus a number, such as 'o0'.</xs:documentation>
                     <xs:documentation>The position of the upper-left corner of the overlay on the screen in pixels.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="rotation" type="xs:float">
+                <xs:annotation>
+                    <xs:documentation>The rotation of the overlay around the center of the overlay in radiant .</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="srcorigin" type="Vector2f">
                 <xs:annotation>
                     <xs:documentation>The crop position in the source image. Values must be between zero and one.
