@@ -16,7 +16,7 @@
 #include "AudioBufferBase.h"
 #include "SampleFormat.h"
 
-// #define ASSURE_POLICY AssurePolicy::Exit
+#define ASSURE_POLICY AssurePolicy::Exit
 #include <asl/Block.h>
 #include <asl/Logger.h>
 #include <asl/Assure.h>
@@ -180,6 +180,7 @@ class AudioBuffer: public AudioBufferBase {
                 memcpy(((char*)begin()), theReadPtr, getNumFrames()*getBytesPerFrame());
             } else {
                 ASSURE(getNumChannels() == 2);
+                ASSURE(theSrcNumChannels <= 2);
                 if (getSampleFormat() == SF_F32 && theSrcSampleFormat == SF_S16)
                 {
                     // Conversion from S16 to float.

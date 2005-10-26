@@ -224,6 +224,7 @@ void TestPump::testDelayed() {
     Pump & myPump = Pump::get();
     Time curTime; 
 
+    // Simple version.
     HWSampleSinkPtr mySink = 
         createSampleSink("TestDelayedSink", 44100, 2);
     queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.4, 1);
@@ -237,6 +238,8 @@ void TestPump::testDelayed() {
     msleep(400);
     ENSURE(mySink->getState() == HWSampleSink::STOPPED);
 
+    // Delay doesn't continue after a stop()
+    mySink = createSampleSink("TestDelayedSink", 44100, 2);
     queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.4, 1);
     mySink->delayedPlay(0.4);
     msleep(200);
@@ -249,6 +252,8 @@ void TestPump::testDelayed() {
     msleep(600);
     ENSURE(mySink->getState() == HWSampleSink::STOPPED);
     
+    // Delay continues after a pause()
+    mySink = createSampleSink("TestDelayedSink", 44100, 2);
     queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.4, 1);
     mySink->delayedPlay(0.4);
     msleep(200);
@@ -262,6 +267,20 @@ void TestPump::testDelayed() {
     ENSURE(mySink->getState() == HWSampleSink::RUNNING);
     mySink->stop();
     
+    // delayedPlay() after pause...
+    mySink = createSampleSink("TestDelayedSink", 44100, 2);
+    queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.6, 1);
+    mySink->play();
+    msleep(200);
+    mySink->pause();
+    msleep(200);
+    mySink->delayedPlay(0.6);
+    msleep(600);
+    curTime = mySink->getCurrentTime();
+    AC_PRINT << "curTime: " << curTime;
+    ENSURE(double(curTime) > 0.6 && double(curTime) < 1.0);
+    ENSURE(mySink->getState() == HWSampleSink::RUNNING);
+    mySink->stop();
 }
 
 void TestPump::testVolume() {

@@ -132,8 +132,8 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
 void HWSampleSink::delayedPlay(asl::Time theTimeToStart) {
     AC_DEBUG << "HWSampleSink::delayedPlay (" << _myName << ")";
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    // Theoretically, STOPPING_FADE_OUT could happen too.
-    ASSURE(_myState == STOPPED); 
+    // Theoretically, STOPPING_FADE_OUT or PAUSING_FADE_OUT could happen too.
+    ASSURE(_myState == STOPPED || _myState == PAUSED); 
     _myTimeToStart = theTimeToStart;
     _myLockedSelf = _mySelf.lock();
     _myVolumeFader->setVolume(_myVolume);
@@ -144,13 +144,15 @@ void HWSampleSink::delayedPlay(asl::Time theTimeToStart) {
 
 void HWSampleSink::setVolume(float theVolume) {
     ASSURE(theVolume <= 1.0);
-    AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    _myVolume = theVolume;
-    if (_myState == STOPPED || _myState == PAUSED) {
-        // No fade, immediate volume change.
-        _myVolumeFader->setVolume(theVolume, 0);
-    } else {
-        _myVolumeFader->setVolume(theVolume);
+    if (!asl::almostEqual(theVolume, _myVolume)) {
+        AutoLocker<ThreadLock> myLocker(_myQueueLock);
+        _myVolume = theVolume;
+        if (_myState == STOPPED || _myState == PAUSED) {
+            // No fade, immediate volume change.
+            _myVolumeFader->setVolume(theVolume, 0);
+        } else {
+            _myVolumeFader->setVolume(theVolume);
+        }
     }
 }
 
@@ -364,8 +366,12 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
     ASSURE_MSG(getState() != STOPPED,
             "HWSampleSink::getNextBuffer() should not be called when the sink isn't active.");
     AutoLocker<ThreadLock> myLocker(_myQueueLock);
-    if (_myBufferQueue.empty() || _isDelayingPlay) {
-        if (_myState != PLAYBACK_DONE && !_isDelayingPlay) {
+    if (_isDelayingPlay) {
+        _isUsingBackupBuffer = true;
+        return &(*_myBackupBuffer);
+    }
+    if (_myBufferQueue.empty()) {
+        if (_myState != PLAYBACK_DONE) {
             if (_myStopWhenEmpty || _myState == STOPPING_FADE_OUT || 
                     _myState == PAUSING_FADE_OUT) 
             {
