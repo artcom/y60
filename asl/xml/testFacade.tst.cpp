@@ -92,10 +92,9 @@ class RootFacade :
             IdFacade(theNode),
             FloatTag::Plug(theNode),
 			ChildNodePlug<RequirementsTag,RootFacade>(this)
-        {
-		}
+        {}
 
-        IMPLEMENT_CHILD_FACADE(RootFacade);
+        IMPLEMENT_PARENT_FACADE(RootFacade);
 
 };
 
@@ -242,7 +241,7 @@ class ChildFacade :
             set<ChildFloatSumTag>(mySum);
         }
 
-        IMPLEMENT_CHILD_FACADE(ChildFacade);
+        IMPLEMENT_PARENT_FACADE(ChildFacade);
 };
 
 
@@ -398,7 +397,7 @@ class FacadeUnitTest : public UnitTest {
                AC_PRINT << "start req facade testing...";
                 RootFacadePtr myFacade = myRoot->getFacade<RootFacade>();
 
-				RequirementsFacadePtr myReqFacade = myFacade->getFacade<RequirementsTag>();
+				RequirementsFacadePtr myReqFacade = myFacade->getChild<RequirementsTag>();
 
 				AC_PRINT << "1";
 				ENSURE(myFacade);
@@ -497,21 +496,21 @@ class FacadeUnitTest : public UnitTest {
                 // Test property facades
                 {
                     ChildFacadePtr myChildFacade = myRoot->childNode("child", 0)->getFacade<ChildFacade>();
-					TestPropertiesFacadePtr myPropFacade = myChildFacade->getFacade<PropertiesTag>();
+					TestPropertiesFacadePtr myPropFacade = myChildFacade->getChild<PropertiesTag>();
                     ENSURE(myPropFacade->get<FloatPropTag>() == 0.5);
                     myPropFacade->set<FloatPropTag>(2.5);
                     ENSURE(myPropFacade->get<FloatPropTag>() == 2.5);
                 }
                 {
                     ChildFacadePtr myChildFacade = myRoot->childNode("child", 1)->getFacade<ChildFacade>();
-					TestPropertiesFacadePtr myPropFacade = myChildFacade->getFacade<PropertiesTag>();
+					TestPropertiesFacadePtr myPropFacade = myChildFacade->getChild<PropertiesTag>();
                     ENSURE(myPropFacade->get<FloatPropTag>() == 1.5);
                     ENSURE(myPropFacade->set<FloatPropTag>(2.5) == 2.5);
                     ENSURE(myPropFacade->get<FloatPropTag>() == 2.5);
                 }
                 {
                     ChildFacadePtr myChildFacade = myRoot->childNode("child", 1)->getFacade<ChildFacade>();
-					TestPropertiesFacadePtr myPropFacade = myChildFacade->getFacade<PropertiesTag>();
+					TestPropertiesFacadePtr myPropFacade = myChildFacade->getChild<PropertiesTag>();
                     ENSURE(myPropFacade->set<FloatPropTag>(3.5) == 3.5);
                     ENSURE(myPropFacade->get<FloatPropTag>() == 3.5);
                 }

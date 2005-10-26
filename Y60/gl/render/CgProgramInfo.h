@@ -89,7 +89,7 @@ namespace y60 {
             void disableTextures();
             static CGprofile asCgProfile(const ShaderDescription & theShader);
 
-            void bindMaterialParams(MaterialBase & theMaterial);
+            void bindMaterialParams(const MaterialBase & theMaterial);
             void bindBodyParams(const y60::LightVector & theLightInstances,
                         const Viewport & theViewport,
                         const y60::Body & theBody,
@@ -97,10 +97,11 @@ namespace y60 {
             
             void bind();
             bool reloadIfRequired(const y60::LightVector & theLightInstances,
-                        MaterialBase & theMaterial);
+                                  const MaterialBase & theMaterial);
         private:
             static void setCgMaterialParameter(CGparameter & theCgParameter, 
-                    const dom::Node & theNode, const MaterialBase & theMaterial);
+                    const dom::Node & theNode, const std::string & thePropertyName,
+                    const MaterialBase & theMaterial);
 
             void createAndCompileProgram();
 

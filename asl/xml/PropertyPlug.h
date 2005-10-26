@@ -75,7 +75,7 @@ namespace dom {
                     _myTextChild->nodeValueWrapperPtr()->ensureDependencies();
                 }
             }
-    protected:
+        protected:
             ValuePtr getValuePtr(const Node & theNode, const VALUE & theValue) {
                 ensureTextChild(theNode, theValue);
                 return _myTextChild->nodeValueWrapperPtr();
@@ -95,9 +95,10 @@ namespace dom {
             }
 
             void ensureTextChild(const Node & theNode, const VALUE & theValue) const {
-
 				if (_myTextChild && _myPropertyNode &&
-					_myTextChild->parentNode() && _myTextChild->parentNode()->parentNode() == _myPropertyNode->parentNode()) {
+					_myTextChild->parentNode() && 
+                    _myTextChild->parentNode()->parentNode() == _myPropertyNode->parentNode()) 
+                {
 					// alles super && alles beim alten
 					return;
 				}
@@ -113,9 +114,10 @@ namespace dom {
                     _myTextChild = _myPropertyNode->appendChild(dom::Text());
                     ValueHelper<VALUE, WRAPPER>::setValue(_myTextChild->nodeValueWrapperPtr(), theValue);
                 }
-				if (!_myFacade->getEnsuredPropertyList().getNamedItem(TAG::getName())) {
-					if (_myPropertyNode->getAttribute("name")) {
-						_myFacade->getEnsuredPropertyList().append(_myPropertyNode);
+				if (!_myFacade->getProperty(TAG::getName())) {
+                    NodePtr myName = _myPropertyNode->getAttribute("name");
+					if (myName) {
+                        _myFacade->getProperties()[myName->nodeValue()] = _myPropertyNode->childNode("#text");
 					}
 				}
 			}

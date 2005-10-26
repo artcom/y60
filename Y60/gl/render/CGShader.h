@@ -38,7 +38,7 @@ namespace y60 {
             bool hasShader(const ShaderType &theShadertype) const;
             const ShaderDescription & getShader(const ShaderType & theShadertype) const;
 
-            virtual const MaterialParameterVectorPtr getVertexParameter() const;
+            virtual const MaterialParameterVector & getVertexParameters() const;
             virtual const VertexRegisterFlags & getVertexRegisterFlags() const;
 
             virtual void activate(MaterialBase & theMaterial);
@@ -47,7 +47,7 @@ namespace y60 {
             virtual void disableTextures(const MaterialBase & theMaterial);
             virtual bool isCGShader() { return true; }
 
-            void bindBodyParams(MaterialBase & theMaterial,
+            void bindBodyParams(const MaterialBase & theMaterial,
                     const Viewport & theViewport,
                     const LightVector & theLights,
                     const Body & theBody,
@@ -59,9 +59,9 @@ namespace y60 {
 
         private:
             void processCompilerArgs(std::vector<std::string> & theArgs, const std::string & theArgList);
-            void bindMaterialParams(y60::MaterialBase & theMaterial);
+            void bindMaterialParams(const MaterialBase & theMaterial);
             void setCgParameter(CGparameter & theCgParameter, const dom::NodePtr & theNode,
-                             const y60::MaterialBase & theMaterial);
+                                const MaterialBase & theMaterial);
 
             ShaderDescription     _myVertexShader;
             ShaderDescription     _myFragmentShader;

@@ -972,9 +972,9 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                         return JS_TRUE;
                     }                    				
 					// ask the facades propertylist (features, properties, etc)
-					myAttrNode = myFacade->getEnsuredPropertyList().getNamedItem(myProperty);
-                    if (myAttrNode) {
-                        *vp = as_jsval(cx, myAttrNode->childNode("#text")->nodeValueWrapperPtr());
+                    dom::NodePtr myPropertyNode = myFacade->getProperty(myProperty);
+                    if (myPropertyNode) {
+                        *vp = as_jsval(cx, myPropertyNode->nodeValueWrapperPtr());
                         return JS_TRUE;
 					}
 
@@ -1040,9 +1040,9 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 #endif
                         }
 						// ask the facades propertylist (features, properties, etc)
-						myAttrNode = myFacade->getEnsuredPropertyList().getNamedItem(myProperty);
-                        if (myAttrNode) {
-                            myAttrNode->childNode("#text")->nodeValue(as_string(cx,*vp));
+                        dom::NodePtr myPropertyNode = myFacade->getProperty(myProperty);
+                        if (myPropertyNode) {
+                            myPropertyNode->nodeValue(as_string(cx,*vp));
                             return JS_TRUE;
 						}
                     }

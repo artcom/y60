@@ -49,14 +49,14 @@ namespace y60 {
             virtual const VectorOfString * getFeatures(const std::string & theFeatureClass) const;
             virtual bool hasFeature(const std::string & theFeatureClass) const;
             
-            virtual void activate(y60::MaterialBase & theMaterial);
-            virtual void deactivate(const y60::MaterialBase & theMaterial);
+            virtual void activate(MaterialBase & theMaterial);
+            virtual void deactivate(const MaterialBase & theMaterial);
             
-            virtual void enableTextures(const y60::MaterialBase & theMaterial);
-            virtual void disableTextures(const y60::MaterialBase & theMaterial);
+            virtual void enableTextures(const MaterialBase & theMaterial);
+            virtual void disableTextures(const MaterialBase & theMaterial);
             
             // called on body change
-            virtual void bindBodyParams(y60::MaterialBase & theMaterial,
+            virtual void bindBodyParams(const MaterialBase & theMaterial,
                     const Viewport & theViewport,
                     const LightVector & theLights,
                     const Body & theBody, 

@@ -117,11 +117,11 @@ namespace y60 {
             void bindViewMatrix(y60::CameraPtr theCamera);
             void setProjection(ViewportPtr theViewport);
             bool activateViewport(const ViewportPtr & theViewport);
-            void rotateBillboard(y60::BodyPtr theBody, const Camera & theCamera);
+            void rotateBillboard(const Body & theBody, const Camera & theCamera);
 
-            GLenum getPrimitiveGLType(y60::PrimitiveType theType);
+            GLenum getPrimitiveGLType(PrimitiveType theType);
 
-            void switchMaterial(int theMaterialIndex);
+            bool switchMaterial(const MaterialBase & theMaterial);
             void deactivatePreviousMaterial() const;
 
             dom::NodePtr getActiveLodChild(dom::NodePtr theNode, const y60::CameraPtr theCamera);
@@ -136,7 +136,7 @@ namespace y60 {
                                 const Viewport & theViewport,
                                 const Camera & theCamera);
             void renderPrimitives(const BodyPart & theBodyPart,
-                                  y60::MaterialBasePtr theMaterial);
+                                  const MaterialBase & theMaterial);
 
             void renderBoundingBox(const asl::Box3f & theBox);
             void renderBoundingBoxHierarchy(dom::NodePtr theNode);
@@ -169,13 +169,12 @@ namespace y60 {
 
             // OpenGl state chache
             RenderState             _myState;
-
             unsigned short          _myBoundingVolumeMode;
 
             // transient state (valid during one render pass)
-            y60::VertexRegisterFlags _myLastVertexRegisterFlags;
-            unsigned                _myPreviousMaterialIndex;
-            y60::Body *             _myPreviousBody;
+            VertexRegisterFlags  _myLastVertexRegisterFlags;
+            const MaterialBase * _myPreviousMaterial;
+            Body const *         _myPreviousBody;
 };
 
     typedef asl::Ptr<Renderer> RendererPtr;

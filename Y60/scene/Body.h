@@ -46,8 +46,8 @@ namespace y60 {
             static BodyPtr create(dom::NodePtr theParent, const std::string & theShapeId);
 
             void registerDependenciesRegistrators();
-            ShapePtr getShape();           
-            const ShapePtr getShape() const;
+            Shape & getShape();           
+            const Shape & getShape() const;
             double calculateVolume(const Scene & theScene) const;
 
         protected:

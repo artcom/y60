@@ -43,10 +43,10 @@ namespace jslib {
 
 class ProgressCallback : public y60::IProgressNotifier {
     public:
-        ProgressCallback(JSContext * theContext, JSObject * theTarget, const string & theHandler) 
-            : _jsContext(theContext), _jsTarget(theTarget), _handlerName(theHandler) 
+        ProgressCallback(JSContext * theContext, JSObject * theTarget, const string & theHandler)
+            : _jsContext(theContext), _jsTarget(theTarget), _handlerName(theHandler)
         {};
-        
+
         virtual void onProgress(float theProgress, const std::string & theMessage="") {
             jsval myVal;
             JSBool bOK = JS_GetProperty(_jsContext, _jsTarget, _handlerName.c_str(), &myVal);
@@ -72,7 +72,7 @@ class ProgressCallback : public y60::IProgressNotifier {
         string _handlerName;
 };
 
-    
+
 typedef y60::Scene NATIVE;
 
 JSBool
@@ -337,11 +337,11 @@ CreateBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         JSScene::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         dom::NodePtr myShape;
-        convertFrom(cx, argv[0], myShape);            
+        convertFrom(cx, argv[0], myShape);
         dom::NodePtr myParent = myNative->getWorldRoot();
         if (argc == 2) {
-            convertFrom(cx, argv[1], myParent);            
-        } 
+            convertFrom(cx, argv[1], myParent);
+        }
 
         dom::NodePtr myResult = y60::createBody(myParent, myShape->getAttributeString("id"));
         *rval = as_jsval(cx, myResult);
@@ -383,14 +383,16 @@ enum PropertyNumbers {
     PROP_dom = -100,
     PROP_cameras,
     PROP_world,
-    PROP_canvases,     
-    PROP_canvas,       
-    PROP_materials,    
-    PROP_lightsources, 
-    PROP_animations,   
-    PROP_characters,   
-    PROP_shapes,       
-    PROP_images,       
+    PROP_canvases,
+    PROP_canvas,
+    PROP_viewport,
+    PROP_overlays,
+    PROP_materials,
+    PROP_lightsources,
+    PROP_animations,
+    PROP_characters,
+    PROP_shapes,
+    PROP_images,
     PROP_MATERIALS,
     PROP_SHAPES,
     PROP_ANIMATIONS,
@@ -402,7 +404,7 @@ enum PropertyNumbers {
 };
 
 JSScene::~JSScene() {
-    AC_TRACE << "JSScene DTOR " << this << endl; 
+    AC_TRACE << "JSScene DTOR " << this << endl;
 }
 
 JSFunctionSpec *
@@ -461,9 +463,11 @@ JSScene::Properties() {
     static JSPropertySpec myProperties[] = {
         {"dom",          PROP_dom,          JSPROP_ENUMERATE | JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"cameras",      PROP_cameras,      JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
-        {"world",        PROP_world,        JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},        
+        {"world",        PROP_world,        JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"canvases",     PROP_canvases,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"canvas",       PROP_canvas,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"viewport",     PROP_viewport,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"overlays",     PROP_overlays,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"materials",    PROP_materials,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"lightsources", PROP_lightsources, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"animations",   PROP_animations,   JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
@@ -504,6 +508,12 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             return JS_TRUE;
         case PROP_canvas:
             *vp = as_jsval(cx, getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME));
+            return JS_TRUE;
+        case PROP_viewport:
+            *vp = as_jsval(cx, getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME)->childNode(VIEWPORT_NODE_NAME));
+            return JS_TRUE;
+        case PROP_overlays:
+            *vp = as_jsval(cx, getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME)->childNode(VIEWPORT_NODE_NAME)->childNode(OVERLAY_LIST_NAME));
             return JS_TRUE;
         case PROP_materials:
             *vp = as_jsval(cx, getNative().getSceneDom()->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME));
@@ -558,7 +568,7 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     JSScene * myNewObject=new JSScene(myNewPtr, &(*myNewPtr));
 
     try {
-        Ptr<ProgressCallback> myCallback; 
+        Ptr<ProgressCallback> myCallback;
         if (argc >= 3) {
             JSObject * myTarget = JSVAL_TO_OBJECT(argv[1]);
             string myHandler;
@@ -566,7 +576,7 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             myCallback = Ptr<ProgressCallback>(new ProgressCallback(cx, myTarget, myHandler));
         }
 
-        if (argc >= 1) {             
+        if (argc >= 1) {
             if (argv[0] == JSVAL_NULL) {
                 AC_INFO << "no filename, creating scene stubs";
                 PackageManagerPtr myPackageManager = JSApp::getPackageManager();

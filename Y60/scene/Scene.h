@@ -52,8 +52,6 @@ namespace y60 {
     DEFINE_EXCEPTION(SomError, asl::Exception);
     DEFINE_EXCEPTION(NotYetImplemented, SceneException);
 
-    typedef std::map<std::string, unsigned> MaterialIdMap;
-
     struct BodyInfo {
         dom::NodePtr _myBody;
         y60::ShapePtr _myShape;
@@ -79,6 +77,8 @@ namespace y60 {
      */
     class Scene {
         public:
+            typedef std::map<std::string, MaterialBasePtr> MaterialIdMap;
+
             DEFINE_NESTED_EXCEPTION(Scene,Exception,asl::Exception);
             DEFINE_NESTED_EXCEPTION(Scene,IOError,Exception);
             DEFINE_NESTED_EXCEPTION(Scene,OpenFailed,IOError);
@@ -183,8 +183,11 @@ namespace y60 {
             void saveSchema(const std::string & theFilename,
                             int theSchemaIndex,
                             bool theBinaryFlag);
-            bool getMaterialIndex(const std::string & theMaterialId, unsigned & theMaterialIndex);
-            const MaterialBasePtr & getMaterial(unsigned theMaterialIndex) const;
+
+            const MaterialBasePtr getMaterial(const std::string & theMaterialId) const;
+            const MaterialIdMap & getMaterials() const {
+                return _myMaterials;
+            }
 
             LightVector & getLights() {
                 return _myLights;
@@ -349,9 +352,9 @@ namespace y60 {
             AnimationManager         _myAnimationManager;
 
             LightVector              _myLights;
-            MaterialBasePtrVector    _myMaterials;
             dom::DocumentPtr         _mySceneDom;
-            MaterialIdMap            _myMaterialIdMap;
+            
+            MaterialIdMap            _myMaterials;
 
             unsigned long _myPrimitiveCount;
             unsigned long _myMaximumPrimitiveSize;

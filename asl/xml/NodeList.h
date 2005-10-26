@@ -102,17 +102,6 @@ namespace dom {
         NodePtr appendWhileParsing(NodePtr theNewNode);
 	};
 
-    typedef std::map<std::string, NodePtr> NameAttributeStdMap;
-	class NameAttributeNodeMap : public  NameAttributeStdMap{
-	    public:
-            NameAttributeNodeMap() {}
-		    NameAttributeNodeMap(const NameAttributeNodeMap & other);
-            NodePtr append(NodePtr theNewNode);
-		    NodePtr getNamedItem(const DOMString & name);
-		    const NodePtr getNamedItem(const DOMString & name) const;
-            void removeItem(NodePtr theNode);
-	};
-
 	class TypedNamedNodeMap : public NamedNodeMap {
 	public:
 		friend class Node;

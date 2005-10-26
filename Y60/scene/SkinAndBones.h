@@ -52,9 +52,9 @@ namespace y60 {
     {
         public:
             SkinAndBones(dom::Node & theNode) :
-			  MaterialBase(theNode), _myBoundingBoxNode(0)
-              {}
-            IMPLEMENT_CHILD_FACADE(SkinAndBones);
+			MaterialBase(theNode), _myBoundingBoxNode(0) {}
+            
+            IMPLEMENT_PARENT_FACADE(SkinAndBones);
 
             virtual ~SkinAndBones() {}
 

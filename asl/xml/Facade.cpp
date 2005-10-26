@@ -63,32 +63,10 @@ namespace dom {
         }
     }
 
-	void 
-	Facade::appendChild(NodePtr theChild) {
-		if (_myChildren.find(theChild->nodeName()) == _myChildren.end()) {
-			_myChildren[theChild->nodeName()] = theChild;
-		}
-	}
-
-	/*dom::NodePtr 
-	Facade::getChild(const std::string & theName) {
-		return _myChildren.getNamedItem(theName);
-	}
-*/
-	const NodePtr 
-    Facade::getChildNode(const std::string& theChildName) {
-        std::map<std::string, NodePtr>::const_iterator myIter = _myChildren.find(theChildName);
-        if (myIter != _myChildren.end()) {
-            return myIter->second;
-        } else {
-    	    return NodePtr(0);
-        }
-
-	}
-
     Facade *
     FacadeFactory::createFacade(const DOMString & theType, Node & theNode, 
-	                            const DOMString & theParentNodeName) const {
+	                            const DOMString & theParentNodeName) const 
+    {
     	FacadePtr myPrototype = findPrototype(FacadeKey(theType, theParentNodeName)); 
     	if (myPrototype) {
     		DB(AC_TRACE << "FacadeFactory::createValue('" << theType << ", " 
@@ -101,7 +79,8 @@ namespace dom {
 
 	void
 	FacadeFactory::registerPrototype(const DOMString & theType, FacadePtr thePrototype,
-									 const DOMString & theParentNodeName) {
+									 const DOMString & theParentNodeName) 
+    {
     	DB(AC_TRACE << "FacadeFactory::registerPrototype('" << theType << ", " 
 			        << theParentNodeName<<"')" << endl;)
             _myPrototypes[FacadeKey(theType,theParentNodeName)] = FacadePtr(thePrototype->createNew(Node::Prototype));	    
@@ -115,4 +94,43 @@ namespace dom {
     	}
     	return FacadePtr(0);
     }	
+
+    /******************************************************************
+    * Parent Facade
+    \*****************************************************************/
+
+	void 
+	Facade::appendChild(NodePtr theChild) {
+		if (_myChildren.find(theChild->nodeName()) == _myChildren.end()) {
+			_myChildren[theChild->nodeName()] = theChild;
+		}
+	}
+
+	const NodePtr 
+    Facade::getChildNode(const std::string& theChildName) const {
+        std::map<std::string, NodePtr>::const_iterator myIter = _myChildren.find(theChildName);
+        if (myIter != _myChildren.end()) {
+            return myIter->second;
+        } else {
+    	    return NodePtr(0);
+        }
+	}
+
+    Facade::PropertyMap & 
+    Facade::getProperties() const {
+		ensureProperties(); 
+		return _myPropertyNodes;                 
+    }
+    
+    NodePtr 
+    Facade::getProperty(const std::string & theName) const {
+		ensureProperties(); 
+        PropertyMap::iterator it = _myPropertyNodes.find(theName);
+        if (it != _myPropertyNodes.end()) {
+			return it->second; 
+        } else {
+            return NodePtr(0);
+        }
+	}
+
 }

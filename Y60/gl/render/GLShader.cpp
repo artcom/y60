@@ -152,35 +152,34 @@ namespace y60 {
     void
     GLShader::activate(MaterialBase & theMaterial) {
         //AC_DEBUG << "GLShader::activate " << theMaterial.getName();
-		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getFacade<MaterialPropertiesTag>();
-		const NameAttributeNodeMap & myPropertyMap = myMaterialPropFacade->getEnsuredPropertyList();
+		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
-        dom::NodePtr myLineWidthProp = myPropertyMap.getNamedItem(LINEWIDTH_PROPERTY);
+        dom::NodePtr myLineWidthProp = myMaterialPropFacade->getProperty(LINEWIDTH_PROPERTY);
         if (myLineWidthProp) {
             glEnable(GL_LINE_SMOOTH);
-            glLineWidth((*myLineWidthProp)("#text").dom::Node::nodeValueAs<float>());
+            glLineWidth(myLineWidthProp->nodeValueAs<float>());
         }
 
-        dom::NodePtr myLineStippleProp = myPropertyMap.getNamedItem(LINESTIPPLE_PROPERTY);
+        dom::NodePtr myLineStippleProp = myMaterialPropFacade->getProperty(LINESTIPPLE_PROPERTY);
         if (myLineStippleProp) {
             glEnable(GL_LINE_STIPPLE);
             glEnable(GL_LINE_SMOOTH);
-            glLineStipple(1, (*myLineStippleProp)("#text").dom::Node::nodeValueAs<unsigned int>());    
+            glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());    
         }
 
-        dom::NodePtr myPointSizeProp = myPropertyMap.getNamedItem(POINTSIZE_PROPERTY);
+        dom::NodePtr myPointSizeProp = myMaterialPropFacade->getProperty(POINTSIZE_PROPERTY);
         if (myPointSizeProp) {
-            const asl::Vector3f & myPointSizeParams = (*myPointSizeProp)("#text").dom::Node::nodeValueAs<asl::Vector3f>();
+            const asl::Vector3f & myPointSizeParams = myPointSizeProp->nodeValueAs<asl::Vector3f>();
             glPointSize(myPointSizeParams[0]);
 
             glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, myPointSizeParams[1]);
             glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
         }
 
-        dom::NodePtr myPointAttenuationProp =  myPropertyMap.getNamedItem(POINTATTENUATION_PROPERTY);
+        dom::NodePtr myPointAttenuationProp = myMaterialPropFacade->getProperty(POINTATTENUATION_PROPERTY);
         if (myPointAttenuationProp) {
             glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,
-								  (*myPointAttenuationProp)("#text").dom::Node::nodeValueAs<asl::Vector3f>().begin());
+								  myPointAttenuationProp->nodeValueAs<asl::Vector3f>().begin());
         }
 
 		const VectorOfString & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
@@ -277,11 +276,7 @@ namespace y60 {
 
     void
     GLShader::loadParameters(const dom::NodePtr theParameterListNode, ShaderDescription & theShader) {
-        if (!theShader._myVertexParameters) {
-            theShader._myVertexParameters = MaterialParameterVectorPtr(new MaterialParameterVector);
-        } else {
-            theShader._myVertexParameters->clear();
-        }
+        theShader._myVertexParameters.clear();
 
         dom::NodePtr myParameterListNode = theParameterListNode->childNode(PARAMETER_LIST_NAME);
         int myParameterCount = myParameterListNode->childNodesLength();
@@ -316,7 +311,7 @@ namespace y60 {
                 if (myTextNode) {
                     myDefaultValue = myTextNode->nodeValue();
                 }
-                theShader._myVertexParameters->push_back(MaterialParameter(myPropertyName, myPropertyRole, myRegister,
+                theShader._myVertexParameters.push_back(MaterialParameter(myPropertyName, myPropertyRole, myRegister,
                                                                            myPropertyType, myParameterFunction,
                                                                            myDefaultValue));
                 theShader._myVertexRegisterFlags.set(myRegister);
@@ -325,7 +320,7 @@ namespace y60 {
     }
 
     void
-    GLShader::bindBodyParams(MaterialBase & theMaterial,
+    GLShader::bindBodyParams(const MaterialBase & theMaterial,
             const Viewport & theViewport,
             const LightVector & theLights,
             const Body & theBody,

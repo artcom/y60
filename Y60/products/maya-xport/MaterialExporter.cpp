@@ -1014,6 +1014,7 @@ MaterialExporter::checkTransparency(const MObject & theShaderNode) {
         case MFn::kBlinn:
         case MFn::kPhongExplorer:
         case MFn::kPhong: {
+            // TODO: This does not work if a layerd shader is connected to the color plug (as in material_test.x60)
             if (checkAlphaTexture(theShaderNode, "transparency")) {
                 myTransparencyFlag = true;
             } else {
@@ -1027,6 +1028,7 @@ MaterialExporter::checkTransparency(const MObject & theShaderNode) {
         }
 
         case MFn::kSurfaceShader: {
+            // TODO: This does not work if a layerd shader is connected to the color plug (as in material_test.x60)
             if (checkAlphaTexture(theShaderNode, "outTransparency")) {
                 myTransparencyFlag = true;
             } else {

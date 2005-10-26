@@ -29,13 +29,13 @@ namespace y60 {
             FFShader(const dom::NodePtr theNode);
             virtual ~FFShader();
 
-            virtual const y60::MaterialParameterVectorPtr getVertexParameter() const;
+            virtual const y60::MaterialParameterVector & getVertexParameters() const;
             virtual const y60::VertexRegisterFlags & getVertexRegisterFlags() const;
 
-            virtual void activate(y60::MaterialBase & theMaterial);
-            virtual void deactivate(const y60::MaterialBase & theMaterial);
-            virtual void enableTextures(const y60::MaterialBase & theMaterial);
-            virtual void disableTextures(const y60::MaterialBase & theMaterial);
+            virtual void activate(MaterialBase & theMaterial);
+            virtual void deactivate(const MaterialBase & theMaterial);
+            virtual void enableTextures(const MaterialBase & theMaterial);
+            virtual void disableTextures(const MaterialBase & theMaterial);
         private:
             ShaderDescription _myFixedFunctionShader;
     };

@@ -53,8 +53,8 @@ namespace y60 {
         }
     }
 
-    const MaterialParameterVectorPtr
-    FFShader::getVertexParameter() const {
+    const MaterialParameterVector &
+    FFShader::getVertexParameters() const {
         return _myFixedFunctionShader._myVertexParameters;
     }
 
@@ -67,9 +67,9 @@ namespace y60 {
     }
 
     void
-    FFShader::activate(y60::MaterialBase & theMaterial) {
+    FFShader::activate(MaterialBase & theMaterial) {
         GLShader::activate(theMaterial);
-		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getFacade<MaterialPropertiesTag>();
+		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         if (theMaterial.getLightingModel() != UNLIT) {
             glMaterialfv(GL_FRONT, GL_DIFFUSE,  myMaterialPropFacade->get<MaterialDiffuseTag>().begin());
 

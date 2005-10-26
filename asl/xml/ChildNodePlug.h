@@ -62,7 +62,7 @@ namespace dom {
 			}
 			void ensureDependencies() const {}
 
-			NodePtr getChildNode(const Node & theNode) { 
+			const NodePtr getChildNode(const Node & theNode) const { 
                 if (!_myChild) {
                     ensureChild(theNode);
                 }

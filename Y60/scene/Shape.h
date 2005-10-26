@@ -56,11 +56,10 @@ namespace y60 {
             IMPLEMENT_FACADE(Shape);
 
             Primitive & createPrimitive(PrimitiveType theType, 
-                                        MaterialBase * theMaterial, 
-                                        unsigned theMaterialIndex, unsigned int theDomIndex) 
+                                        MaterialBasePtr theMaterial, unsigned int theDomIndex) 
             {    
-                _myPrimitives.push_back(PrimitivePtr( new Primitive(theType, theMaterial, 
-                    theMaterialIndex, getNode().getAttributeString("id"), theDomIndex)));    
+                _myPrimitives.push_back(PrimitivePtr(new Primitive(theType, theMaterial, 
+                    getNode().getAttributeString("id"), theDomIndex)));    
                 return *_myPrimitives.back();
             }
 

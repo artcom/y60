@@ -83,7 +83,7 @@ namespace y60 {
     {
         public:
             LightSource(dom::Node & theNode);
-            IMPLEMENT_CHILD_FACADE(LightSource);
+            IMPLEMENT_PARENT_FACADE(LightSource);
             const LightSourceType getType();
         private:
             LightSource();

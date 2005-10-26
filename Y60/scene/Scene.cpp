@@ -291,8 +291,8 @@ namespace y60 {
 
         // The skin and bones shader needs to know some things about the world
         NodePtr mySceneNode = _mySceneDom->firstChild();
-        for (unsigned i = 0; i < _myMaterials.size(); ++i) {
-            _myMaterials[i]->setup(mySceneNode);
+        for (MaterialIdMap::iterator it = _myMaterials.begin(); it != _myMaterials.end(); ++it) {
+            it->second->setup(mySceneNode);
         }
 
         asl::Time setupEnd;
@@ -356,6 +356,7 @@ namespace y60 {
 
         DB(AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
                     << ", name: " << myMaterial->get<NameTag>());
+/*
         if (theIndex < 0) {
             // append to material list
             theIndex = _myMaterials.size();
@@ -365,6 +366,9 @@ namespace y60 {
             _myMaterials[theIndex] = myMaterial;
         }
         _myMaterialIdMap[myMaterial->get<IdTag>()] = theIndex;
+*/
+        // Add new material to material id map
+        _myMaterials[myMaterial->get<IdTag>()] = myMaterial;
     }
 
     NodePtr
@@ -468,8 +472,8 @@ namespace y60 {
                 std::string myMaterialId =
                     myElementsNode->getAttributeString(MATERIAL_REF_ATTRIB);
                 PrimitiveType myPrimitiveType = Primitive::getTypeFromNode(myElementsNode);
-                unsigned myMaterialIndex = 0;
-                if (!getMaterialIndex(myMaterialId, myMaterialIndex)) {
+                MaterialBasePtr myMaterial = getMaterial(myMaterialId);
+                if (!myMaterial) {
                     throw SceneException(std::string("Could not find material with id: ") +
                                             myMaterialId, PLUS_FILE_LINE);
                 }
@@ -491,7 +495,7 @@ namespace y60 {
                     }
 
                     Primitive & myPrimitive = theShape->createPrimitive(myPrimitiveType,
-                        &(*_myMaterials[myMaterialIndex]), myMaterialIndex, myBegin);
+                        myMaterial, myBegin);
 
 
                     // collect renderstyles for this element
@@ -529,7 +533,6 @@ namespace y60 {
         DB(AC_TRACE << "shape: " << myShapeId << " has " << theShape->getPrimitives().size() << " materials" << endl;)
 
         calculateShapeBoundingBox(theShape);
-        //theShape->setDirty(false);
         theShape->setLastRenderVersion(myShapeNode->nodeVersion()+1);
     }
 
@@ -640,11 +643,12 @@ namespace y60 {
 
             // TODO: Create material-facades and update skin-and-bones materials only,
             // if the attached joint-globalmatrices have changend.
-            for (unsigned i = 0; i < _myMaterials.size(); ++i) {
-                if (dynamic_cast_Ptr<SkinAndBones>(_myMaterials[i])) {
-                    _myMaterials[i]->update(*_myTextureManager, getImagesRoot());
+            for (MaterialIdMap::iterator it = _myMaterials.begin(); it != _myMaterials.end(); ++it) {
+                if (dynamic_cast_Ptr<SkinAndBones>(it->second)) {
+                    it->second->update(*_myTextureManager, getImagesRoot());
                 }
             }
+
             _myPreviousDomVersion = _mySceneDom->nodeVersion();
         }
     }
@@ -701,13 +705,8 @@ namespace y60 {
         for (unsigned i = 0; i < myMaterialCount; ++i) {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
             const std::string myMaterialId = myMaterialNode->getAttributeString("id");
-            MaterialIdMap::iterator myIt = _myMaterialIdMap.find(myMaterialId);
-
-            if (myIt == _myMaterialIdMap.end()) {
-                AC_TRACE << "could not find material " << myMaterialId << ", loading" << endl;
-                loadMaterial(myMaterialNode);
-            } else {
-                MaterialBasePtr myMaterial = _myMaterials[myIt->second];
+            MaterialBasePtr myMaterial = getMaterial(myMaterialId);
+            if (myMaterial) {
                 if (myMaterial->reloadRequired()) {
                     AC_DEBUG << "Material " << myMaterialId << " requires reload";
                     // reload modified material into it's existing slot
@@ -715,10 +714,13 @@ namespace y60 {
                     // VS/UH
                     //_myMaterials[myIt->second] = MaterialBasePtr(0);
                     //_myMaterialIdMap.erase(myIt);
-                    loadMaterial(myMaterialNode, myIt->second);
+                    loadMaterial(myMaterialNode);
                 } else {
                     myMaterial->update(*_myTextureManager, getImagesRoot());
                 }
+            } else {
+                AC_TRACE << "could not find material " << myMaterialId << ", loading" << endl;
+                loadMaterial(myMaterialNode);
             }
         }
     }
@@ -769,27 +771,13 @@ namespace y60 {
         return _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(CANVAS_LIST_NAME);
     }
 
-    bool
-    Scene::getMaterialIndex(const std::string & theMaterialId, unsigned & theMaterialIndex) {
-        MaterialIdMap::iterator it = _myMaterialIdMap.find(theMaterialId);
-        if (it != _myMaterialIdMap.end()) {
-            theMaterialIndex = it->second;
-            return true;
+    const MaterialBasePtr 
+    Scene::getMaterial(const std::string & theMaterialId) const {
+        MaterialIdMap::const_iterator myIt = _myMaterials.find(theMaterialId);
+        if (myIt == _myMaterials.end()) {
+            return MaterialBasePtr(0);
         } else {
-            return false;
-        }
-    }
-
-    const MaterialBasePtr &
-    Scene::getMaterial(unsigned theMaterialIndex) const {
-        if (theMaterialIndex < _myMaterials.size() ) {
-            const MaterialBasePtr myMaterial = _myMaterials[theMaterialIndex];
-            if (!myMaterial) {
-                AC_ERROR << "Material index " << theMaterialIndex << " is NULL";
-            }
-            return myMaterial;
-        } else {
-            throw SceneException(std::string("Material index does not exist: ") + as_string(theMaterialIndex), "Scene::getMaterial()");
+            return myIt->second;
         }
     }
 

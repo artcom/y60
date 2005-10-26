@@ -215,7 +215,7 @@ void
 SDLWindow::initDisplay() {
     ensureSDLSubsystem();
     _myWindowInitFlag = true;
-    
+
     setVideoMode(_myInitialWidth, _myInitialHeight, _myFullscreenFlag);
     setWindowTitle("Y60 Renderer");
 
@@ -603,16 +603,16 @@ SDLWindow::mainLoop() {
     }
 }
 
-void 
+void
 SDLWindow::stop() {
     AC_DEBUG << "SDLWindow::stop" << endl;
     _myAppQuitFlag = true;
 }
 
-void 
+void
 SDLWindow::go() {
     AC_DEBUG << "SDLWindow::Go" << endl;
-    
+
     if (!_myJSContext) {
         AC_WARNING << "SDLWindow::Go() - No js context found, please assign an eventHandler to window before calling go" << endl;
         return;

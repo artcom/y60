@@ -38,20 +38,13 @@ namespace y60 {
     DEFINE_EXCEPTION(PrimitiveException, asl::Exception);
     DEFINE_EXCEPTION(UnknownPrimitiveType, PrimitiveException);
 
-    Primitive::Primitive(PrimitiveType theType, MaterialBase * theMaterial,
-                         unsigned theMaterialIndex, const std::string & theShapeId, unsigned int theDomIndex)
+    Primitive::Primitive(PrimitiveType theType, MaterialBasePtr theMaterial,
+                         const std::string & theShapeId, unsigned int theDomIndex)
         : _myType(theType),
-          _myMaterialIndex(theMaterialIndex),
           _myShapeId(theShapeId),
           _myMaterial(theMaterial),
           _myVertexData(MAX_VERTEX_DATA_ROLE, VertexDataBasePtr(0)),
           _myDomIndex(theDomIndex)
-#ifdef OLD
-          ,
-          _myPositions(0),
-          _myNormals(0),
-          _myColors(0)
-#endif
     {}
 
     Primitive::~Primitive() {

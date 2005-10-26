@@ -46,7 +46,7 @@ namespace y60 {
             virtual const dom::NodePtr getDefaultTextures()=0;
             virtual const VectorOfString * getFeatures(const std::string & theFeatureClass) const = 0;
             virtual bool hasFeature(const std::string & theFeatureClass) const = 0;
-            virtual const MaterialParameterVectorPtr getVertexParameter() const = 0;
+            virtual const MaterialParameterVector & getVertexParameters() const = 0;
             virtual const VertexRegisterFlags & getVertexRegisterFlags() const = 0;
 
             virtual void load(IShaderLibrary & theShaderLibrary) = 0;
@@ -59,7 +59,7 @@ namespace y60 {
             virtual bool isCGShader() { return false; }
 
             // called on body change
-            virtual void bindBodyParams(y60::MaterialBase & theMaterial,
+            virtual void bindBodyParams(const y60::MaterialBase & theMaterial,
                                         const Viewport & theViewport,
                                         const LightVector & theLights,
                                         const Body & theBody, 

@@ -119,18 +119,18 @@ namespace y60 {
         DB(AC_DEBUG << "ShaderLibrary::findShader for material: " << theMaterial->getNode());
 		// we need to copy all values to tmp RequirementMap, cause we want to drop req temporarly
 
-        MaterialRequirementFacadePtr myReqFacade = theMaterial->getFacade<MaterialRequirementTag>();
-        NameAttributeNodeMap myRequirementMap(myReqFacade->getEnsuredPropertyList());
+		MaterialRequirementFacadePtr myReqFacade = theMaterial->getChild<MaterialRequirementTag>();
+        Facade::PropertyMap & myRequirementMap = myReqFacade->getProperties();
         vector<ShaderScore> myScoreBoard(_myShaders.size());
 
         // iterate over all features, that the material wants to have
         vector<string> myDropRequirements;
 
-        NameAttributeNodeMap::iterator myIter = myRequirementMap.begin();
+        Facade::PropertyMap::iterator myIter = myRequirementMap.begin();
         for (; myIter != myRequirementMap.end(); myIter++) {
 			const NodePtr myRequirementNode = myIter->second;
-            const std::string & myRequiredFeatureClass = myRequirementNode->getAttributeString(NAME_ATTRIB);
-            VectorOfRankedFeature myRequiredFeature = (*myRequirementNode)("#text").dom::Node::nodeValueAs<VectorOfRankedFeature>();
+            const std::string & myRequiredFeatureClass = myIter->first;
+            VectorOfRankedFeature myRequiredFeature = myRequirementNode->nodeValueAs<VectorOfRankedFeature>();
             bool oneShaderCanHandleMaterial = false;
             bool myFeatureCanBedropped = false;
             DB(AC_DEBUG << "Class : " << myRequiredFeatureClass << " , requires: " << myRequiredFeature << endl);
@@ -175,11 +175,11 @@ namespace y60 {
         // remove all the dropped features
         for (int i = 0; i <  myDropRequirements.size(); i++ ) {
             const string & myFeatureToDrop = myDropRequirements[i];
-			NodePtr myRequirementNodeToRemove = myRequirementMap.getNamedItem(myFeatureToDrop);
-			if (myRequirementNodeToRemove) {
+            Facade::PropertyMap::iterator it = myRequirementMap.find(myFeatureToDrop);
+			if (it != myRequirementMap.end()) {
                 AC_WARNING << "### WARNING Dropping feature: " <<  myFeatureToDrop
                     << " of material: " << theMaterial->get<NameTag>() << endl;
-				myRequirementMap.removeItem(myRequirementNodeToRemove);
+				myRequirementMap.erase(it);
 			}
         }
         // find the shader that supports all features required (the score equals the feature count)

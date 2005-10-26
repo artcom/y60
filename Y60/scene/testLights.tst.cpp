@@ -60,7 +60,7 @@ public:
             // Test directional light
             {
                 LightSourcePtr myLight = myDocument.getElementById("light0")->getFacade<Light>()->getLightSource();
-    			LightPropertiesFacadePtr myLightPropFacade = myLight->getFacade<LightPropertiesTag>();
+    			LightPropertiesFacadePtr myLightPropFacade = myLight->getChild<LightPropertiesTag>();
                 
                 ENSURE(myLight);
                 ENSURE(myLight->getType() == DIRECTIONAL);
@@ -73,7 +73,7 @@ public:
             // Test empty light with defaults
             {
                 LightSourcePtr myLight = myDocument.getChildElementById("light1", "id")->getFacade<Light>()->getLightSource();;
-    			LightPropertiesFacadePtr myLightPropFacade = myLight->getFacade<LightPropertiesTag>();
+    			LightPropertiesFacadePtr myLightPropFacade = myLight->getChild<LightPropertiesTag>();
                 ENSURE(myLight);
                 ENSURE(myLight->getType() == UNSUPPORTED);
                 ENSURE(myLight->get<IdTag>() == "l1" );
@@ -88,7 +88,7 @@ public:
             // Test positional light
             {
                 LightSourcePtr myPositionalLight = myDocument.getElementById("light4")->getFacade<Light>()->getLightSource();
-    			LightPropertiesFacadePtr myLightPropFacade = myPositionalLight->getFacade<LightPropertiesTag>();
+    			LightPropertiesFacadePtr myLightPropFacade = myPositionalLight->getChild<LightPropertiesTag>();
                 ENSURE(myPositionalLight);
                 ENSURE(myPositionalLight->getType() == POSITIONAL);
                 ENSURE(myPositionalLight->get<IdTag>() == "l4" );
@@ -96,7 +96,7 @@ public:
             }
 
             LightSourcePtr mySpotLight = myDocument.getElementById("light2")->getFacade<Light>()->getLightSource();
-			LightPropertiesFacadePtr myLightPropFacade = mySpotLight->getFacade<LightPropertiesTag>();
+			LightPropertiesFacadePtr myLightPropFacade = mySpotLight->getChild<LightPropertiesTag>();
             ENSURE(mySpotLight);
             ENSURE(mySpotLight->getType() == POSITIONAL);
             ENSURE(mySpotLight->get<IdTag>() == "l2" );

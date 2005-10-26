@@ -112,8 +112,8 @@ namespace y60 {
         _myVertexProgram = CgProgramInfoPtr(0);
     }
 
-    const MaterialParameterVectorPtr
-    CGShader::getVertexParameter() const {
+    const MaterialParameterVector &
+    CGShader::getVertexParameters() const {
         return _myVertexShader._myVertexParameters;
     }
 
@@ -235,7 +235,7 @@ namespace y60 {
 
 
     void
-    CGShader::bindBodyParams(MaterialBase & theMaterial,
+    CGShader::bindBodyParams(const MaterialBase & theMaterial,
             const Viewport & theViewport,
             const LightVector & theLights,
             const Body & theBody,
@@ -257,7 +257,7 @@ namespace y60 {
     }
 
     void
-    CGShader::bindMaterialParams(MaterialBase & theMaterial) {
+    CGShader::bindMaterialParams(const MaterialBase & theMaterial) {
         //AC_DEBUG << "CGShader::bindMaterialParams " << theMaterial.getName();
         if (_myVertexProgram) {
             _myVertexProgram->bindMaterialParams(theMaterial);

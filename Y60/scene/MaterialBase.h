@@ -123,7 +123,7 @@ namespace y60 {
             typedef std::vector<TexGenParams>  TexGenParamsList;
 
             MaterialBase(dom::Node & theNode);
-            IMPLEMENT_CHILD_FACADE(MaterialBase);
+            IMPLEMENT_PARENT_FACADE(MaterialBase);
 
             virtual ~MaterialBase();
 
@@ -138,9 +138,8 @@ namespace y60 {
 
             virtual void update(TextureManager & theTextureManager, const dom::NodePtr theImages);
 
-            virtual bool reloadRequired() /*const*/;
-
-            const MaterialParameterVectorPtr getVertexParameters() const;
+            const MaterialParameterVector & getVertexParameters() const;
+            virtual bool reloadRequired() const;
 
             void setShader(IShaderPtr theShader);
             const IShaderPtr getShader() const { return _myShader; };
@@ -150,7 +149,6 @@ namespace y60 {
             const LightingModel getLightingModel() const { return _myLightingModel; }
 
             TextureUsage MaterialBase::getTextureUsage(unsigned theTextureSlot) const;
-            //bool hasTransparency() const;
             bool writesDepthBuffer() const;
 
             // texgen parameters

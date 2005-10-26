@@ -147,13 +147,15 @@ namespace y60 {
             typedef std::vector<Primitive::Intersection> IntersectionList;
             typedef std::vector<Primitive::SphereContacts> SphereContactsList;
     
-            Primitive(PrimitiveType theType, y60::MaterialBase * theMaterial, 
-                      unsigned theMaterialIndex, const std::string & theShapeId,
+            Primitive(PrimitiveType theType, y60::MaterialBasePtr theMaterial, 
+                      const std::string & theShapeId,
                       unsigned int theDomIndex = 0);
             
             ~Primitive();
 
-            unsigned int getDomIndex() const { return _myDomIndex; }
+            unsigned int getDomIndex() const { 
+                return _myDomIndex; 
+            }
            
             /**
              * Loads a Primitive from the indexnode @p theIndicesNode and the data node
@@ -181,22 +183,17 @@ namespace y60 {
             const VertexDataBasePtr getVertexDataPtr(VertexDataRole theRole) const;
             static PrimitiveType
             getTypeFromNode(dom::NodePtr thePrimitiveNode);
-            
-            unsigned getMaterialIndex() const {
-                return _myMaterialIndex;
+
+            MaterialBase & getMaterial() {
+                return *(_myMaterial);
+            }
+            const MaterialBase & getMaterial() const {
+                return *(_myMaterial);
             }
             PrimitiveType getType() const {
                 return _myType;
             }
-#ifdef OLD
-            VertexData3f::VertexDataVector * getPositions();
-            VertexData3f::VertexDataVector * getNormals();
-            VertexData4f::VertexDataVector * getColors();
 
-            VertexData1f::VertexDataVector * getTexCoords1f(unsigned theSlot);
-            VertexData2f::VertexDataVector * getTexCoords2f(unsigned theSlot);
-            VertexData3f::VertexDataVector * getTexCoords3f(unsigned theSlot);
-#else 
             //TODO: make complete
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingPositionsAccessor();
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingNormalsAccessor();
@@ -209,7 +206,6 @@ namespace y60 {
             asl::Ptr<VertexDataAccessor<float> >         getLockingTexCoord1fAccessor(unsigned theSlot);
             asl::Ptr<VertexDataAccessor<asl::Vector2f> > getLockingTexCoord2fAccessor(unsigned theSlot);
             asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingTexCoord3fAccessor(unsigned theSlot);
-#endif
 
             bool intersect(const asl::LineSegment<float> & theStick,  IntersectionList & theIntersectionInfo);
             bool intersect(const asl::Ray<float> & theStick,  IntersectionList & theIntersectionInfo);
@@ -236,7 +232,6 @@ namespace y60 {
             Primitive(); 
             Primitive(const Primitive &); 
             Primitive & operator= (const Primitive &); 
-            //void updateNormalPositionColorPointers() const;
 
             template <class DETECTOR>
             bool scanElements(DETECTOR & theDetector,
@@ -270,17 +265,11 @@ namespace y60 {
 
             std::string                    _myShapeId;
             PrimitiveType                  _myType;
-            MaterialBase *                 _myMaterial;
-            unsigned                       _myMaterialIndex;
+            MaterialBasePtr                _myMaterial;
             std::vector<VertexDataBasePtr> _myVertexData;
             std::vector<RenderStyleType>   _myRenderStyles;
             unsigned int                   _myDomIndex;
             mutable BoundingBoxTreePtr     _myBoundingBoxTree;
-#ifdef OLD
-            mutable VertexData3f::VertexDataVector * _myPositions;
-            mutable VertexData3f::VertexDataVector * _myNormals;
-            mutable VertexData4f::VertexDataVector * _myColors;
-#endif            
     };
     typedef asl::Ptr<Primitive> PrimitivePtr;
     typedef std::vector<PrimitivePtr> PrimitiveVector;        

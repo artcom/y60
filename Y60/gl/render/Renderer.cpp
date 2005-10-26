@@ -84,7 +84,7 @@ namespace y60 {
     Renderer::Renderer(unsigned int theRenderingCaps) :
         _myScene(0),
         _myBoundingVolumeMode(BV_NONE),
-        _myPreviousMaterialIndex(UINT_MAX),
+        _myPreviousMaterial(0),
         _myRenderingCaps(theRenderingCaps)
     {
         _myLastVertexRegisterFlags.reset();
@@ -140,14 +140,13 @@ namespace y60 {
 
     void
     Renderer::preloadShader() {
-        unsigned int myMaterialCount = _myScene->getMaterialCount();
-        AC_INFO << "Renderer::preloadShader(): preloading " << myMaterialCount << " shaders" << endl;
-        for (int i = 0; i < myMaterialCount; i++) {
-            MaterialBasePtr myMaterial = _myScene->getMaterial(i);
-            GLShaderPtr myShader = dynamic_cast_Ptr<GLShader>(myMaterial->getShader());
+        const Scene::MaterialIdMap & myMaterials = _myScene->getMaterials();
+        AC_INFO << "Renderer::preloadShader(): preloading " << myMaterials.size() << " shaders" << endl;
+        for (Scene::MaterialIdMap::const_iterator it = myMaterials.begin(); it != myMaterials.end(); ++it) {
+            GLShaderPtr myShader = dynamic_cast_Ptr<GLShader>(it->second->getShader());
             if (myShader) {
                 myShader->load(*getShaderLibrary());
-                AC_INFO << "Renderer::preloadShader(): using shader '" << myShader->getName() << "' for material '"<<myMaterial->get<NameTag>()<<"'" << endl;
+                AC_INFO << "Renderer::preloadShader(): using shader '" << myShader->getName() << "' for material '"<<it->second->get<NameTag>()<<"'" << endl;
             }
         }
     }
@@ -173,54 +172,52 @@ namespace y60 {
     void
     Renderer::deactivatePreviousMaterial() const  {
         // clean up previous material
-        if (_myPreviousMaterialIndex != UINT_MAX) {
+        if (_myPreviousMaterial) {
             DBP(MAKE_SCOPE_TIMER(deactivatePreviousMaterial));
-
-            const MaterialBasePtr myPrevMaterial = _myScene->getMaterial(_myPreviousMaterialIndex);
-
-            IShaderPtr prevShader = myPrevMaterial->getShader();
-            prevShader->disableTextures(*myPrevMaterial);
+            IShaderPtr myPreviousShader = _myPreviousMaterial->getShader();
+            myPreviousShader->disableTextures(*_myPreviousMaterial);
             CHECK_OGL_ERROR;
-            prevShader->deactivate(*myPrevMaterial);
+            myPreviousShader->deactivate(*_myPreviousMaterial);
             CHECK_OGL_ERROR;
         }
-
     }
 
-    void
-    Renderer::switchMaterial(int theMaterialIndex) {
-
-        if (_myPreviousMaterialIndex == theMaterialIndex) {
-            return;
-        } else if (_myPreviousMaterialIndex == UINT_MAX) {
+    bool
+    Renderer::switchMaterial(const MaterialBase & theMaterial) {
+        if (_myPreviousMaterial == &theMaterial) {
+            return false;
+        } else if (_myPreviousMaterial == 0) {
             _myLastVertexRegisterFlags.reset();
         }
 
         DBP(MAKE_SCOPE_TIMER(switchMaterial));
         DBP(COUNT(materialChange));
 
-        MaterialBasePtr myMaterial = _myScene->getMaterial(theMaterialIndex);
-        IShaderPtr myShader = myMaterial->getShader();
+        IShaderPtr myShader = theMaterial.getShader();
         deactivatePreviousMaterial();
 
         {
             // activate new material
             DBP(MAKE_SCOPE_TIMER(activateShader));
 
-            if (myMaterial->getLightingModel() == UNLIT) {
+            if (theMaterial.getLightingModel() == UNLIT) {
                 glDisable(GL_LIGHTING);
             } else if (_myState.getLighting()) {
                 glEnable(GL_LIGHTING);
             }
             CHECK_OGL_ERROR;
 
-            if (myMaterial->writesDepthBuffer()) {
+            if (theMaterial.writesDepthBuffer()) {
                 glDepthMask(GL_TRUE);
             } else {
                 glDepthMask(GL_FALSE);
             }
 
-            myShader->activate(*myMaterial);
+            // [CH] TODO: Material should const. 
+            // The renderer should just take the scene information and render it as it is.
+            // Right now in Shader.activate() the material representation is updated. 
+            // The scene should be responsible for that.
+            myShader->activate(const_cast<MaterialBase &>(theMaterial));
             CHECK_OGL_ERROR;
         }
 
@@ -276,28 +273,29 @@ namespace y60 {
         CHECK_OGL_ERROR;
 
         if (_myState.getTexturing()) {
-            myShader->enableTextures(*myMaterial);
+            myShader->enableTextures(theMaterial);
         }
         CHECK_OGL_ERROR;
 
-        _myPreviousMaterialIndex   = theMaterialIndex;
+        _myPreviousMaterial        = &theMaterial;
         _myLastVertexRegisterFlags = myVertexRegisterFlags;
+
+        return true;
     }
 
     void
-    Renderer::rotateBillboard(BodyPtr theBody, const Camera & theCamera) {
-        const Vector3f & myPivot = theBody->get<PivotTag>();
+    Renderer::rotateBillboard(const Body & theBody, const Camera & theCamera) {
+        const Vector3f & myPivot = theBody.get<PivotTag>();
         glTranslatef(myPivot[0], myPivot[1], myPivot[2]);
-        if (theBody->get<BillboardTag>() == AXIS_BILLBOARD) {
+        if (theBody.get<BillboardTag>() == AXIS_BILLBOARD) {
             MAKE_SCOPE_TIMER(update_billboards);
-            Matrix4f myBillboardTransform = theBody->get<GlobalMatrixTag>();
-            myBillboardTransform.translate( theBody->get<PivotTag>());
+            Matrix4f myBillboardTransform = theBody.get<GlobalMatrixTag>();
+            myBillboardTransform.translate(theBody.get<PivotTag>());
             double myRotation = getBillboardRotation(myBillboardTransform,
                     theCamera.get<GlobalMatrixTag>());
             glRotated((myRotation * 180 / asl::PI), 0, 1, 0);
 
-        } else if (theBody->get<BillboardTag>() == POINT_BILLBOARD) {
-
+        } else if (theBody.get<BillboardTag>() == POINT_BILLBOARD) {
             asl::Vector4f myCamUpVector    = theCamera.get<GlobalMatrixTag>().getRow(1);
             asl::Vector3f myCamUpVector3(myCamUpVector[0], myCamUpVector[1], myCamUpVector[2]);
             asl::Vector4f myCamViewVector  = theCamera.get<GlobalMatrixTag>().getRow(2);
@@ -318,9 +316,9 @@ namespace y60 {
     Renderer::renderBodyPart(const BodyPart & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
         DBP(MAKE_SCOPE_TIMER(renderBodyPart));
         CHECK_OGL_ERROR;
-        y60::BodyPtr myBody = theBodyPart.getBody();
-        y60::ShapePtr myShape = myBody->getShape();
-        bool myBodyHasChanged = _myPreviousBody != &(*myBody);
+        const y60::Body & myBody = theBodyPart.getBody();
+        const y60::Shape & myShape = theBodyPart.getShape();
+        bool myBodyHasChanged = (_myPreviousBody != &myBody);
         if (myBodyHasChanged) {
             DBP(MAKE_SCOPE_TIMER(update_bodymatrix));
             glPopMatrix();
@@ -331,56 +329,52 @@ namespace y60 {
 
             // draw body bounding-box
             if (_myBoundingVolumeMode & BV_BODY) {
-                const Box3f & myBoundingBox = myBody->get<BoundingBoxTag>();
+                const Box3f & myBoundingBox = myBody.get<BoundingBoxTag>();
                 renderBoundingBox(myBoundingBox);
                 CHECK_OGL_ERROR;
             }
 
-            glMultMatrixf((myBody->get<GlobalMatrixTag>().getData()));
+            glMultMatrixf((myBody.get<GlobalMatrixTag>().getData()));
 
             // XXX update TexGen here
-            if (myBody->get<BillboardTag>() != "") {
+            if (!myBody.get<BillboardTag>().empty()) {
                 rotateBillboard(myBody, theCamera);
             }
 
-            _myPreviousBody = &(*myBody);
+            _myPreviousBody = &myBody;
             CHECK_OGL_ERROR;
         }
-
+        
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
         if (_myState.getDrawNormals()) {
             glPushAttrib(GL_ALL_ATTRIB_BITS);
             glDisable(GL_LIGHTING);
-            const Box3f & myBoundingBox = myShape->get<BoundingBoxTag>();
+            const Box3f & myBoundingBox = myShape.get<BoundingBoxTag>();
             float myDiameter = magnitude(myBoundingBox[Box3f::MAX] - myBoundingBox[Box3f::MIN]);
             drawNormals(myPrimitive, myDiameter / 64.0f);
             glPopAttrib();
         }
 
-        unsigned myMaterialIndex = myPrimitive.getMaterialIndex();
-        bool     myMaterialHasChanged = (myMaterialIndex != _myPreviousMaterialIndex);
+        const MaterialBase & myMaterial = myPrimitive.getMaterial();
+        bool  myMaterialHasChanged = switchMaterial(myMaterial);
 
-        switchMaterial(myMaterialIndex);
-
-        MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialIndex);
-        IShaderPtr myShader = myMaterial->getShader();
-
-        if (myShader && (myBodyHasChanged || myMaterialHasChanged)) {
-            myShader->bindBodyParams(*myMaterial, theViewport, _myScene->getLights(), *myBody, theCamera);
-            CHECK_OGL_ERROR;
+        if (myBodyHasChanged || myMaterialHasChanged) {
+            IShaderPtr myShader = myMaterial.getShader();
+            if (myShader) {
+                myShader->bindBodyParams(myMaterial, theViewport, _myScene->getLights(), myBody, theCamera);
+                CHECK_OGL_ERROR;
+            }
         }
 
         bool isRendered = false;
 
         // get renderstyles for this primitive
-        const std::vector<RenderStyleType> * myRenderStyles = & myPrimitive.getRenderStyles();
-        if (myRenderStyles->empty()) {
-            // if there arn't any use the per shape styles
-            myRenderStyles = & myShape->getRenderStyles();
-        }
+        const std::vector<RenderStyleType> & myPrimitveStyle = myPrimitive.getRenderStyles(); 
+        const std::vector<RenderStyleType> & myShapeStyle    = myShape.getRenderStyles();
+        const std::vector<RenderStyleType> & myRenderStyles  = myPrimitveStyle.empty() ? myShapeStyle : myPrimitveStyle;
 
-        bool myIgnoreDepthFlag = (std::find(myRenderStyles->begin(), myRenderStyles->end(),
-                                            IGNORE_DEPTH) !=  myRenderStyles->end());
+        bool myIgnoreDepthFlag = (std::find(myRenderStyles.begin(), myRenderStyles.end(),
+                                            IGNORE_DEPTH) !=  myRenderStyles.end());
         if (myIgnoreDepthFlag) {
             glDepthFunc(GL_ALWAYS);
             glEnable(GL_POLYGON_OFFSET_POINT);
@@ -388,14 +382,15 @@ namespace y60 {
             glEnable(GL_POLYGON_OFFSET_FILL);
             glPolygonOffset(0.0, -1.0);
         }
-        if (std::find(myRenderStyles->begin(), myRenderStyles->end(), BACK) !=  myRenderStyles->end()) {
+
+        if (std::find(myRenderStyles.begin(), myRenderStyles.end(), BACK) !=  myRenderStyles.end()) {
             glCullFace(GL_FRONT);
             renderPrimitives(theBodyPart, myMaterial);
             isRendered = true;
             CHECK_OGL_ERROR;
         }
 
-        if (!isRendered || std::find(myRenderStyles->begin(), myRenderStyles->end(), FRONT) !=  myRenderStyles->end()) {
+        if (!isRendered || std::find(myRenderStyles.begin(), myRenderStyles.end(), FRONT) !=  myRenderStyles.end()) {
             glCullFace(GL_BACK);
             renderPrimitives(theBodyPart, myMaterial);
             CHECK_OGL_ERROR;
@@ -408,11 +403,10 @@ namespace y60 {
             glDisable(GL_POLYGON_OFFSET_FILL);
         }
 
-        if (std::find(myRenderStyles->begin(), myRenderStyles->end(), BOUNDING_VOLUME) !=  myRenderStyles->end() ||
+        if (std::find(myRenderStyles.begin(), myRenderStyles.end(), BOUNDING_VOLUME) !=  myRenderStyles.end() ||
             (_myBoundingVolumeMode & BV_SHAPE))
         {
-            dom::NodePtr myShapeNode = myBody->getShape()->getXmlNode();
-            const asl::Box3f & myBoundingBox = myShapeNode->getFacade<Shape>()->get<BoundingBoxTag>();
+            const asl::Box3f & myBoundingBox = myShape.get<BoundingBoxTag>();
             renderBoundingBox(myBoundingBox);
             CHECK_OGL_ERROR;
         }
@@ -441,7 +435,7 @@ namespace y60 {
     }
 
     void
-    Renderer::renderPrimitives(const BodyPart & theBodyPart, MaterialBasePtr theMaterial) {
+    Renderer::renderPrimitives(const BodyPart & theBodyPart, const MaterialBase & theMaterial) {
         DBP(MAKE_SCOPE_TIMER(renderPrimitives));
         DBP(START_TIMER(getPrimitive));
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
@@ -453,41 +447,33 @@ namespace y60 {
         )
         COUNT_N(Vertices, myPrimitive.size());
 
-        DBP(START_TIMER(getVertexParameters));
-        const MaterialParameterVectorPtr myMaterialParameters = theMaterial->getVertexParameters();
-        DBP(STOP_TIMER(getVertexParameters));
-
-        {
-            DBP(MAKE_SCOPE_TIMER(setRegisters));
-
-            for (unsigned i = 0; i < myMaterialParameters->size(); ++i) {
-
-                const MaterialParameter & myParameter = myMaterialParameters->at(i);
+        const MaterialParameterVector & myMaterialParameters = theMaterial.getVertexParameters();
+        unsigned myVertexParamSize = myMaterialParameters.size();
+        for (unsigned i = 0; i < myVertexParamSize; ++i) {
+            const MaterialParameter & myParameter = myMaterialParameters[i];
+            if (myPrimitive.hasVertexData(myParameter.getRole())) {
+                const VertexDataBase & myData = myPrimitive.getVertexData(myParameter.getRole());
+                DB(AC_TRACE << "-- Parameter " << i << " role " << getStringFromEnum(myParameter.getRole(), VertexDataRoleString) << ", data=" << myData.getDataPtr());
                 GLRegister myRegister = myParameter.getRegister();
-
-                if ( myPrimitive.hasVertexData(myParameter.getRole())) {
-                    const VertexDataBase & myData = myPrimitive.getVertexData(myParameter.getRole());
-                    DBP(AC_TRACE << "-- Parameter " << i << " role " << getStringFromEnum(myParameter.getRole(), VertexDataRoleString) << ", data=" << myData.getDataPtr());
-                    switch (myRegister) {
-                        case POSITION_REGISTER:
-                            myData.useAsPosition();
-                            break;
-                        case NORMAL_REGISTER:
-                            myData.useAsNormal();
-                            break;
-                        case COLORS_REGISTER:
-                            myData.useAsColor();
-                            CHECK_OGL_ERROR;
-                            break;
-                        default:
-                            GLenum myGlRegister = asGLTextureRegister(myRegister);
-                            glActiveTextureARB(myGlRegister);
-                            CHECK_OGL_ERROR;
-                            glClientActiveTextureARB(myGlRegister);
-                            CHECK_OGL_ERROR;
-                            myData.useAsTexCoord();
-                            break;
-                    }
+                switch (myRegister) {
+                    case POSITION_REGISTER:
+                        myData.useAsPosition();
+                        break;
+                    case NORMAL_REGISTER:
+                        myData.useAsNormal();
+                        break;
+                    case COLORS_REGISTER:
+                        myData.useAsColor();
+                        CHECK_OGL_ERROR;
+                        break;
+                    default:
+                        GLenum myGlRegister = asGLTextureRegister(myRegister);
+                        glActiveTextureARB(myGlRegister);
+                        CHECK_OGL_ERROR;
+                        glClientActiveTextureARB(myGlRegister);
+                        CHECK_OGL_ERROR;
+                        myData.useAsTexCoord();
+                        break;
                 }
             }
             CHECK_OGL_ERROR;
@@ -781,37 +767,34 @@ namespace y60 {
 
         // Add remaining bodies to render list
         if (theNode->nodeName() == BODY_NODE_NAME) {
-            BodyPtr myBody = dynamic_cast_Ptr<Body>(myFacade);
+            const Body & myBody = *(dynamic_cast_Ptr<Body>(myFacade));
+
             // Split the body in bodyparts to make material sorted rendering possible
-            const y60::PrimitiveVector & myPrimitives = myBody->getShape()->getPrimitives();
-            Matrix4f myTransform = myBody->get<GlobalMatrixTag>();
+            const Shape & myShape = myBody.getShape();
+            const y60::PrimitiveVector & myPrimitives = myShape.getPrimitives();            
+            Matrix4f myTransform = myBody.get<GlobalMatrixTag>();
             myTransform.postMultiply(theEyeSpaceTransform);
-
-             // AC_TRACE << "Adding body: " << myBody->get<NameTag>() << " with " << myPrimitives.size() <<
-             //       " primitives to renderlist" << endl;
-
             double myFarPlane = myFrustum.getFar();
             double myNearPlane = myFrustum.getNear();
-            for (unsigned i = 0; i < myPrimitives.size(); ++i) {
 
-                const y60::Primitive & myPrimitive = (*myPrimitives[i]);
-				unsigned myMaterialIndex = myPrimitive.getMaterialIndex();
-                y60::MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialIndex);
-                unsigned short myBodyKey = makeBodyKey(myMaterial,
-                                                       myBody,
-                                                       myTransform,
-                                                       myNearPlane,
-                                                       myFarPlane,
-                                                       &*_myScene);
-                BodyPart::Key myKey = makeBodyPartKey(myMaterialIndex, & ( * myBody), myBodyKey);
+            unsigned mySize = myPrimitives.size();
+            for (unsigned i = 0; i < mySize; ++i) {
+                const Primitive & myPrimitive = (*myPrimitives[i]);
+                const MaterialBase & myMaterial = myPrimitive.getMaterial();
+                asl::Unsigned16 myBodyKey = makeBodyKey(myMaterial,                                                        
+                                                        myShape,
+                                                        myTransform,
+                                                        myNearPlane,
+                                                        myFarPlane);
+                BodyPart::Key myKey(&myMaterial, &myBody, myBodyKey);
 
-                if (myMaterial->get<TransparencyTag>()) {
+                if (myMaterial.get<TransparencyTag>()) {
                     COUNT(TransparentPrimitives);
                 } else {
                     COUNT(OpaquePrimitives);
                 }
 
-                theBodyParts.insert(std::make_pair(myKey, BodyPart(myBody, myPrimitive, theClippingPlanes)));
+                theBodyParts.insert(std::make_pair(myKey, BodyPart(myBody, myShape, myPrimitive, theClippingPlanes)));
             }
 
             COUNT(RenderedBodies);
@@ -935,21 +918,19 @@ namespace y60 {
 
         // (7) render bodies
         {
-            MAKE_SCOPE_TIMER(renderBodyParts);
-            BodyPartMap::const_iterator it = myBodyParts.begin();
+            MAKE_SCOPE_TIMER(renderBodyParts);            
             _myPreviousBody = 0;
             glPushMatrix();
             glDisable(GL_ALPHA_TEST);
-            bool currentMaterialHasAlpha = false;
-
             CHECK_OGL_ERROR;
-            while (it != myBodyParts.end()) {
-                if ( ! currentMaterialHasAlpha && getTransparencyBitFromKey(it->first)) {
+
+            bool currentMaterialHasAlpha = false;
+            for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
+                if (!currentMaterialHasAlpha && it->first.getTransparencyFlag()) {
                     glEnable(GL_ALPHA_TEST);
                     currentMaterialHasAlpha = true;
                 }
                 renderBodyPart(it->second, *theViewport, *myCamera);
-                it++;
             }
             glPopMatrix();
         }
@@ -973,7 +954,7 @@ namespace y60 {
         }
         // Set renderer into known state for drawing calls from js
         deactivatePreviousMaterial();
-        _myPreviousMaterialIndex = UINT_MAX;
+        _myPreviousMaterial = 0;
     }
 
     void
@@ -1049,7 +1030,7 @@ namespace y60 {
     void
     Renderer::enableLight(y60::LightPtr & theLight, int theActiveLightIndex) {
         LightSourcePtr myLightSource = theLight->getLightSource();
-		LightPropertiesFacadePtr myLightPropFacade = myLightSource->getFacade<LightPropertiesTag>();
+		LightPropertiesFacadePtr myLightPropFacade = myLightSource->getChild<LightPropertiesTag>();
 
         LightSourceType myType = myLightSource->getType();
         switch (myType) {
@@ -1108,7 +1089,6 @@ namespace y60 {
         glLightfv(gl_lightid, GL_AMBIENT,  myLightPropFacade->get<LightAmbientTag>().begin());
         glLightfv(gl_lightid, GL_DIFFUSE,  myLightPropFacade->get<LightDiffuseTag>().begin());
 		glLightfv(gl_lightid, GL_SPECULAR, myLightPropFacade->get<LightSpecularTag>().begin());
-
         glEnable(gl_lightid);
     }
 
@@ -1210,8 +1190,8 @@ namespace y60 {
         }
 
         std::string myMaterialId = myWorld->get<SkyBoxMaterialTag>();
-        unsigned myMaterialIndex = 0;
-        if (!_myScene->getMaterialIndex(myMaterialId, myMaterialIndex)) {
+        MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
+        if (!myMaterial) {
             AC_ERROR << "Could not find SkyBox material: " << myMaterialId << endl;
             return;
         }
@@ -1224,7 +1204,7 @@ namespace y60 {
         glPushMatrix();
         glLoadMatrixf(static_cast<const GLfloat *>(myModelView.getData()));
 
-        switchMaterial(myMaterialIndex);
+        switchMaterial(*myMaterial);
 
         // We'll just index into the cube map directly to render the cubic panorama
         GLfloat rgba[4] = { 1.0, 1.0, 1.0, 1.0 };
@@ -1393,18 +1373,17 @@ namespace y60 {
         }
 
         if (!myMaterialId.empty()) {
-            unsigned myMaterialIndex = 0;
+            MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
             DB(AC_TRACE << "Rendering Overlay " << myOverlay.get<NameTag>() << " with material " << myMaterialId << endl);
-            if (!_myScene->getMaterialIndex(myMaterialId, myMaterialIndex)) {
+            if (!myMaterial) {
                 AC_WARNING << "renderOverlay() material:" << myMaterialId << " not found." << endl;
                 return;
             }
 
             COUNT(Overlays);
 
-            switchMaterial(myMaterialIndex);
-            MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialIndex);
-			MaterialPropertiesFacadePtr myPropFacade = myMaterial->getFacade<MaterialPropertiesTag>();
+            switchMaterial(*myMaterial);
+			MaterialPropertiesFacadePtr myPropFacade = myMaterial->getChild<MaterialPropertiesTag>();
 
             const asl::Vector4f & myColor = myPropFacade->get<SurfaceColorTag>();
             glColor4f(myColor[0], myColor[1], myColor[2], myColor[3]*myAlpha);

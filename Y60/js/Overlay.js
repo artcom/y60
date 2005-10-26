@@ -156,17 +156,19 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
         _myMaterial.transparent = 1;
         _myMaterial.properties.surfacecolor = "[1,1,1,1]";
         var myParent = null;
+
         if (theParent != undefined) {
-            if (typeof(theParent) == "object") {
+            if ("node" in theParent) {
                 myParent = theParent.node;
             } else {
-                myParent  =theParent;
+                myParent = theParent;
             }
         } else {
             myParent = theScene.overlays;
         }
         var myOverlayString = '<overlay name="' + myName + '" material="' + _myMaterial.id + '"/>';
         var myNode = new Node(myOverlayString);
+
         _myNode = myParent.appendChild(myNode.firstChild);
 
         if (thePosition) {

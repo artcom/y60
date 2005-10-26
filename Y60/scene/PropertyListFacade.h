@@ -29,18 +29,18 @@ namespace y60 {
 	class PropertyListFacade : public dom::Facade {
 		public:
 			PropertyListFacade(dom::Node & theNode) : dom::Facade(theNode), _myNodeVersion(0) {}
-			void ensurePropertyList() {
+			void ensureProperties() const {
 				if (getNode().nodeVersion() != _myNodeVersion) {
-                    getPropertyList().clear();
-					for (unsigned i = 0; i < getNode().childNodesLength();++i) {
+                    _myPropertyNodes.clear();
+                    unsigned mySize = getNode().childNodesLength();
+					for (unsigned i = 0; i < mySize; ++i) {
 						dom::NodePtr myNode = getNode().childNode(i); 
 						if (myNode->nodeType() == dom::Node::ELEMENT_NODE &&
-							myNode->nodeName() != "#comment") {
-							// register node in property name map of facade
-							dom::NodePtr myValueNode = getPropertyList().
-								getNamedItem(myNode->getAttributeString(NAME_ATTRIB));
-							if(!myValueNode) {
-								getPropertyList().append(myNode);
+                            myNode->nodeName() != "#comment") 
+                        {
+                            std::string myName = myNode->getAttributeString(NAME_ATTRIB);
+							if (_myPropertyNodes.find(myName) == _myPropertyNodes.end()) {
+								_myPropertyNodes[myName] = myNode->childNode("#text");
 							}
 						}
 					}
@@ -49,7 +49,7 @@ namespace y60 {
 			}
 
 		private:
-			unsigned long long _myNodeVersion;
+			mutable unsigned long long _myNodeVersion;
 	};
 }
 

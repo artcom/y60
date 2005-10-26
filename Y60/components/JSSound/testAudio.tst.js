@@ -22,33 +22,33 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.runNewAudioLibTest = function() {
-        
+
         obj.mySoundManager.volume == 1.0;
         msleep(250);
         ENSURE("obj.mySoundManager.running == true");
         ENSURE("obj.mySoundManager.soundcount == 0");
         ENSURE("obj.mySoundManager.volume == 1.0");
-        obj.mySoundManager.volume = 0.5;        
+        obj.mySoundManager.volume = 0.5;
         msleep(250);
         ENSURE("obj.mySoundManager.volume == 0.5");
-        obj.mySoundManager.fadeToVolume(1.0, 0.1);        
+        obj.mySoundManager.fadeToVolume(1.0, 0.1);
         msleep(150);
         ENSURE("obj.mySoundManager.volume == 1.0");
 
-        obj.mySound = obj.mySoundManager.createSound("../../../../sound/testfiles/aussentuer.mp3");
+        obj.mySound = new Sound("../../../../sound/testfiles/aussentuer.mp3");
 
         ENSURE("obj.mySoundManager.soundcount == 1");
         ENSURE("obj.mySound.time == 0");
         obj.mySound.volume = 1.0;
         msleep(2500);
-        ENSURE("obj.mySound.volume == 1.0");        
-        
-        ENSURE("!obj.mySound.playing");        
-        ENSURE("obj.mySound.src == '../../../../sound/testfiles/aussentuer.mp3'");        
+        ENSURE("obj.mySound.volume == 1.0");
+
+        ENSURE("!obj.mySound.playing");
+        ENSURE("obj.mySound.src == '../../../../sound/testfiles/aussentuer.mp3'");
         ENSURE("obj.mySound.time == 0.0");
         ENSURE("obj.mySound.looping == false");
         ENSURE("obj.mySound.duration == 1.619499");
-                
+
         DTITLE("Playing sound...");
         obj.mySound.play();
         ENSURE("obj.mySound.playing");
@@ -65,18 +65,18 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         DTITLE("Seek to second 1");
         obj.mySound.seek(1);
         ENSURE("Math.abs(obj.mySound.time - 1) < 0.1");
-        
+
         DTITLE("Seek relative minus 0.5 seconds");
         obj.mySound.seekRelative(-0.5);
         ENSURE("Math.abs(obj.mySound.time - 0.5) < 0.1");
-      
+
         DTITLE("Volume fade...");
         obj.mySound.fadeToVolume(0.5, 0.1);
         msleep(250);
         ENSURE("obj.mySound.volume == 0.5");
         DTITLE("Stopping sound...");
         obj.mySound.stop();
-        
+
         ENSURE("!obj.mySound.playing");
 
         delete obj.mySound;
@@ -85,7 +85,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.mySoundManager.soundcount == 0");
         DPRINT("obj.mySoundManager.soundcount");
 
-        obj.mySound = obj.mySoundManager.createSound("../../../../sound/testfiles/aussentuer.mp3");
+        obj.mySound = new Sound("../../../../sound/testfiles/aussentuer.mp3");
         obj.mySound.play();
         ENSURE("obj.mySoundManager.soundcount == 1");
         obj.mySoundManager.stopAll();
@@ -106,7 +106,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         var mySound = null;
 
         for (var i = 0; i < 20; ++i) {
-            mySound = obj.mySoundManager.createSound(mySoundFile, false, false);
+            mySound = new Sound(mySoundFile, false, false);
             //mySound = new Sound(mySoundFile, false, false);
             mySound.play();
             //while (mySound.playing) {

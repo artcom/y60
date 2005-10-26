@@ -400,51 +400,6 @@ void dom::NamedNodeMap::insert(int theIndex, NodePtr theNewItem) {
     NodeList::insert(theIndex, theNewItem);
 }
 
-
-
-NameAttributeNodeMap::NameAttributeNodeMap(const NameAttributeNodeMap & other) : NameAttributeStdMap(other){}
-
-NodePtr
-dom::NameAttributeNodeMap::append(NodePtr theNewNode) {
-    if (theNewNode->getAttribute("name")) {
-        if (find(theNewNode->getAttributeString("name")) == end()) {
-            (*this)[theNewNode->getAttributeString("name")] = theNewNode;
-        } else {
-		    std::string errorMessage;
-		    errorMessage += "attribute with name '";
-		    errorMessage += theNewNode->getAttributeString("name");
-		    errorMessage += "' is already used in this map";
-		    throw DomException(errorMessage,PLUS_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
-        }
-    } else {
-            std::string errorMessage("Node does not have an attribute 'name':");
-		    throw DomException(errorMessage,PLUS_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
-    }
-    return theNewNode;
-}
-
-NodePtr NameAttributeNodeMap::getNamedItem(const DOMString & name) {
-    if (find(name) != end()) {
-        return (*this)[name];
-    } else {
-    	return NodePtr(0);
-    }
-}
-const NodePtr NameAttributeNodeMap::getNamedItem(const DOMString & name) const {
-    NameAttributeStdMap::const_iterator myIter = find(name);
-    if (myIter != end()) {
-        return myIter->second;
-    } else {
-    	return NodePtr(0);
-    }
-}
-void NameAttributeNodeMap::removeItem(NodePtr theNode) {
-    NameAttributeStdMap::iterator myIter = find(theNode->getAttributeString("name"));
-    if (myIter != end()) {
-        erase(myIter);
-    }
-}
-
 void dom::TypedNamedNodeMap::checkType(NodePtr theNewNode) {
 	if (allowedType && theNewNode->nodeType()!= allowedType) {
 		std::string errorMessage;
