@@ -255,9 +255,15 @@ Logger::setModuleVerbosity(Severity theVerbosity,
                            const std::string & theModule,
                            int theMinId, int theMaxId)
 {
+#if defined(WIN32) && defined(DEBUG_VARIANT)
+    // For whatever reason, __FILE__ is lowercase in debug mode...
+    std::string myModule = asl::toLowerCase(theModule);
+#else
+    const std::string & myModule = theModule;
+#endif
     // TODO: remove item when there is an exact match
     _myVerbositySettings.insert(std::pair<const std::string, ModuleVerbosity>(
-       file_string(theModule.c_str()), ModuleVerbosity(theVerbosity, theMinId, theMaxId)));
+                                file_string(myModule.c_str()), ModuleVerbosity(theVerbosity, theMinId, theMaxId)));
 }
 
 void

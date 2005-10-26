@@ -27,7 +27,7 @@ using namespace std;
 
 string
 asl::file_string(const char* file_name) {
-    std::string myFilename(asl::toLowerCase(file_name));
+    std::string myFilename(file_name); //asl::toLowerCase(file_name));
     std::string::size_type mySlash = myFilename.find_last_of("/\\");
     if (mySlash != std::string::npos) {
         myFilename = myFilename.substr(mySlash+1);
