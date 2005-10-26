@@ -599,15 +599,15 @@ CTScan::fastValueAt(const asl::Vector3f & thePosition) {
     Vector3i myFloorPos(static_cast<int>(floor(thePosition[0])), 
         static_cast<int>(floor(thePosition[1])), 
         static_cast<int>(floor(thePosition[2])));
-    //VoxelT myValue; = NumericTraits<VoxelT>::min();
     dom::ResizeableRasterPtr & mySlice = _mySlices[int(myFloorPos[2])];
     int myLineStride = getBytesRequired(mySlice->width(), _myEncoding);
 
-    //if (isInside(myFloorPos[0], myFloorPos[1], myFloorPos[2])) {
+    if (isInside(myFloorPos[0], myFloorPos[1], myFloorPos[2])) {
         const VoxelT * mySource = reinterpret_cast<const VoxelT*>(mySlice->pixels().begin()+myLineStride*myFloorPos[1]);
         return mySource[myFloorPos[0]];
-    //}
-    //return myValue;
+    } else {
+        return NumericTraits<VoxelT>::min();
+    }
 }
 
 template <class VoxelT>
@@ -616,82 +616,74 @@ CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
     Vector3i myFloorPos(static_cast<int>(floor(thePosition[0])), 
         static_cast<int>(floor(thePosition[1])), 
         static_cast<int>(floor(thePosition[2])));
-    asl::Vector3i theCeilPos = myFloorPos + Vector3i(1,1,1);
+    asl::Vector3i myCeilPos = myFloorPos + Vector3i(1,1,1);
     float myValueA, myValueB;
     VoxelT myFloorValue, myCeilValue;
     float myFloorResult, myCeilResult;
     asl::Vector3i mySize = getVoxelDimensions();
-    const unsigned char * mySource;
+    const VoxelT * mySource;
 
     int myLineStride = getBytesRequired(mySize[0], _myEncoding);
     unsigned myBpp = getBytesRequired(1, _myEncoding);
     if (myFloorPos[2] >= 0 && myFloorPos[2] < _mySlices.size()) {
         myFloorValue = NumericTraits<VoxelT>::min();
         myCeilValue = NumericTraits<VoxelT>::min();
-        mySource = _mySlices[int(myFloorPos[2])]->pixels().begin();
+        mySource = reinterpret_cast<const VoxelT*>(_mySlices[int(myFloorPos[2])]->pixels().begin() + myLineStride * myFloorPos[1]);
         if (isInside(myFloorPos[0], myFloorPos[1], myFloorPos[2])) {
-            memcpy(&myFloorValue,
-                mySource+myLineStride*myFloorPos[1] + myFloorPos[0],
-                myBpp);
+            myFloorValue = mySource[myFloorPos[0]];
         }
-        if (isInside(theCeilPos[0], myFloorPos[1], myFloorPos[2])) {
-            memcpy(&myCeilValue,
-                mySource+myLineStride*myFloorPos[1] + theCeilPos[0],
-                myBpp);
+        if (isInside(myCeilPos[0], myFloorPos[1], myFloorPos[2])) {
+            myCeilValue = mySource[myCeilPos[0]];
         }
         myValueA = linearInterpolate(myFloorValue, myCeilValue,
-            myFloorPos[0], theCeilPos[0], thePosition[0]);
-        if (isInside(myFloorPos[0], theCeilPos[1], myFloorPos[2])) {
-            memcpy(&myFloorValue,
-                mySource+myLineStride*theCeilPos[1] + myFloorPos[0],
-                myBpp);
+            myFloorPos[0], myCeilPos[0], thePosition[0]);
+
+        myFloorValue = NumericTraits<VoxelT>::min();
+        myCeilValue = NumericTraits<VoxelT>::min();
+        mySource = reinterpret_cast<const VoxelT*>(_mySlices[int(myFloorPos[2])]->pixels().begin() + myLineStride * myCeilPos[1]);
+        if (isInside(myFloorPos[0], myCeilPos[1], myFloorPos[2])) {
+            myFloorValue = mySource[myFloorPos[0]];
         }
-        if (isInside(theCeilPos[0], theCeilPos[1], myFloorPos[2])) {
-            memcpy(&myCeilValue,
-                mySource+myLineStride*theCeilPos[1] + theCeilPos[0],
-                myBpp);
+        if (isInside(myCeilPos[0], myCeilPos[1], myFloorPos[2])) {
+            myCeilValue = mySource[myCeilPos[0]];
         }
         myValueB = linearInterpolate(myFloorValue, myCeilValue,
-            myFloorPos[0], theCeilPos[0], thePosition[0]);
+            myFloorPos[0], myCeilPos[0], thePosition[0]);
 
-        myFloorResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], theCeilPos[1], thePosition[1]);            
+        myFloorResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], myCeilPos[1], thePosition[1]);            
     } else {
         myFloorResult = NumericTraits<VoxelT>::min();
     }
-    if (theCeilPos[2] >= 0 && theCeilPos[2] < _mySlices.size()) {
-        mySource = _mySlices[int(theCeilPos[2])]->pixels().begin();
+    if (myCeilPos[2] >= 0 && myCeilPos[2] < _mySlices.size()) {
         myFloorValue = NumericTraits<VoxelT>::min();
         myCeilValue = NumericTraits<VoxelT>::min();
-        if (isInside(myFloorPos[0], myFloorPos[1], theCeilPos[2])) {
-            memcpy(&myFloorValue,
-                mySource+myLineStride*myFloorPos[1] + myFloorPos[0],
-                myBpp);
+        mySource = reinterpret_cast<const VoxelT*>(_mySlices[int(myCeilPos[2])]->pixels().begin() + myLineStride*myFloorPos[1]);
+        if (isInside(myFloorPos[0], myFloorPos[1], myCeilPos[2])) {
+            myFloorValue = mySource[myFloorPos[0]];
         }
-        if (isInside(theCeilPos[0], myFloorPos[1], theCeilPos[2])) {
-            memcpy(&myCeilValue,
-                mySource+myLineStride*myFloorPos[1] + theCeilPos[0],
-                myBpp);
+        if (isInside(myCeilPos[0], myFloorPos[1], myCeilPos[2])) {
+            myCeilValue = mySource[myCeilPos[0]];
         }
         myValueA = linearInterpolate(myFloorValue, myCeilValue,
-            int(myFloorPos[0]), int(theCeilPos[0]), thePosition[0]);
-        if (isInside(myFloorPos[0], theCeilPos[1], theCeilPos[2])) {
-            memcpy(&myFloorValue,
-                mySource+myLineStride*theCeilPos[1] + myFloorPos[0],
-                myBpp);
+            int(myFloorPos[0]), int(myCeilPos[0]), thePosition[0]);
+
+        myFloorValue = NumericTraits<VoxelT>::min();
+        myCeilValue = NumericTraits<VoxelT>::min();
+        mySource = reinterpret_cast<const VoxelT*>(_mySlices[int(myCeilPos[2])]->pixels().begin() + myLineStride*myCeilPos[1]);
+        if (isInside(myFloorPos[0], myCeilPos[1], myCeilPos[2])) {
+            myFloorValue = mySource[myFloorPos[0]];
         }
-        if (isInside(theCeilPos[0], theCeilPos[1], theCeilPos[2])) {
-            memcpy(&myCeilValue,
-                mySource+myLineStride*theCeilPos[1] + theCeilPos[0],
-                myBpp);
+        if (isInside(myCeilPos[0], myCeilPos[1], myCeilPos[2])) {
+            myCeilValue = mySource[myCeilPos[0]];
         }
         myValueB = linearInterpolate(myFloorValue, myCeilValue,
-            int(myFloorPos[0]), int(theCeilPos[0]), thePosition[0]);
-        myCeilResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], theCeilPos[1], thePosition[1]);
+            int(myFloorPos[0]), int(myCeilPos[0]), thePosition[0]);
+        myCeilResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], myCeilPos[1], thePosition[1]);
     } else {
         myCeilResult = NumericTraits<VoxelT>::min();
     }
     return VoxelT(linearInterpolate(myFloorResult, myCeilResult, 
-        myFloorPos[2], theCeilPos[2], thePosition[2]));
+        myFloorPos[2], myCeilPos[2], thePosition[2]));
 }
 
 void 
@@ -848,83 +840,81 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
         dom::NodePtr & theImageNode) 
 {
     try {
-    if (_myState != COMPLETE) {
-        throw CTScanException("cannot reconstruct image when loading not complete!", PLUS_FILE_LINE);
-    }
+        if (_myState != COMPLETE) {
+            throw CTScanException("cannot reconstruct image when loading not complete!", PLUS_FILE_LINE);
+        }
 
-    int myWidth;
-    int myHeight;
-    int myPoTWidth;
-    int myPoTHeight;
-    Ptr<ReadableBlock> myPixelData;
-    Box3f myBounds;
-    Vector3i myVoxelSize = getVoxelDimensions();
+        int myWidth;
+        int myHeight;
+        int myPoTWidth;
+        int myPoTHeight;
+        Ptr<ReadableBlock> myPixelData;
+        Box3f myBounds;
+        Vector3i myVoxelSize = getVoxelDimensions();
 
-    Matrix4f myScreenToVoxelProjection(theOrientation);
-    Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
-    bool myInversionDone = myVoxelToScreenProjection.invert();
-    if (!myInversionDone) {
-        throw CTScanException("Coundn't invert rotation matrix", PLUS_FILE_LINE);
-    }
-    myBounds = computeProjectionBounds(myVoxelToScreenProjection);
-    Vector3f mySize = myBounds.getSize();
-    if (!almostEqual(mySize[0], floor(mySize[0]))) {
-        myWidth = int(ceil(mySize[0]));
-    } else {
-        myWidth = int(mySize[0]);
-    }
-    if (!almostEqual(mySize[1], floor(mySize[1]))) {
-        myHeight = int(ceil(mySize[1]));
-    } else {
-        myHeight = int(mySize[1]);
-    }
-    myPoTWidth = nextPowerOfTwo(myWidth);
-    myPoTHeight = nextPowerOfTwo(myHeight);
-    Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));
-    int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
+        Matrix4f myScreenToVoxelProjection(theOrientation);
+        Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
+        bool myInversionDone = myVoxelToScreenProjection.invert();
+        if (!myInversionDone) {
+            throw CTScanException("Coundn't invert rotation matrix", PLUS_FILE_LINE);
+        }
+        myBounds = computeProjectionBounds(myVoxelToScreenProjection);
+        Vector3f mySize = myBounds.getSize();
+        if (!almostEqual(mySize[0], floor(mySize[0]))) {
+            myWidth = int(ceil(mySize[0]));
+        } else {
+            myWidth = int(mySize[0]);
+        }
+        if (!almostEqual(mySize[1], floor(mySize[1]))) {
+            myHeight = int(ceil(mySize[1]));
+        } else {
+            myHeight = int(mySize[1]);
+        }
+        myPoTWidth = nextPowerOfTwo(myWidth);
+        myPoTHeight = nextPowerOfTwo(myHeight);
+        // Fill with white
+        //Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding), 255));    
+        Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));    
+        int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
 
-    float mySlicePosition = float(theSliceIndex) + myBounds[Box3f::MIN][2];
-    Vector3f myLinePos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
-        myScreenToVoxelProjection);
-    Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition),
-        myScreenToVoxelProjection) - myLinePos) / mySize[0];
-    Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
-        myScreenToVoxelProjection) - myLinePos) / mySize[1];
-    AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", LinePos: " << myLinePos
-        << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
-    typedef Line<float> Linef;
-    Box3f myVoxelBox(Point3f(0.0f, 0.0f, 0.0f), 
-        Point3f(float(myVoxelSize[0]), float(myVoxelSize[1]), float(myVoxelSize[2])));
-    for (int v = 0; v < myHeight; ++v) {
-        Linef myScanLine(myLinePos, mySourceDeltaU);
-        float myMinValue, myMaxValue;
-        if (intersection(myVoxelBox, myScanLine, myMinValue, myMaxValue)) {
-            int myStart = int(ceil(myMinValue));
-            int myEnd = int(floor(myMaxValue));
-            Vector3f mySourcePos = myLinePos + (ceil(myMinValue) * mySourceDeltaU);
-            VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+myTargetLineStride*v+myStart);
-            for (int u = myStart; u < myEnd; ++u) {
-                // Unfortunately we have to check the position here. Because of
-                // float inaccuracies we sometimes run beyond our borders otherwise :(
-                if (isInside(mySourcePos[0], mySourcePos[1], mySourcePos[2])) {
-                    *myAddress = fastValueAt<VoxelT>(mySourcePos);
+        float mySlicePosition = float(theSliceIndex) + myBounds[Box3f::MIN][2];
+        Vector3f myStartPos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
+            myScreenToVoxelProjection);
+        Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition),
+            myScreenToVoxelProjection) - myStartPos) / mySize[0];
+        Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
+            myScreenToVoxelProjection) - myStartPos) / mySize[1];
+        AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", myStartPos: " << myStartPos
+            << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
+        typedef Line<float> Linef;
+        Box3f myVoxelBox(Point3f(0.0f, 0.0f, 0.0f), 
+            Point3f(float(myVoxelSize[0]), float(myVoxelSize[1]), float(myVoxelSize[2])));
+        for (int v = 0; v < myHeight; ++v) {
+            Vector3f myLinePos = myStartPos + (float(v) * mySourceDeltaV);
+            Linef myScanLine(myLinePos, mySourceDeltaU);
+            float myMinValue, myMaxValue;
+            if (intersection(myVoxelBox, myScanLine, myMinValue, myMaxValue)) {
+                int myStart = int(ceil(myMinValue));
+                int myEnd = int(floor(myMaxValue));
+                VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+myTargetLineStride*v+myStart);
+                for (int u = myStart; u < myEnd; ++u) {
+                    Vector3f mySourcePos = myLinePos + (float(u) * mySourceDeltaU);
+                    //*myAddress = fastValueAt<VoxelT>(mySourcePos);
+                    *myAddress = interpolatedValueAt<VoxelT>(mySourcePos);
+                    myAddress ++;
                 }
-                mySourcePos += mySourceDeltaU;
-                myAddress ++;
             }
         }
-        myLinePos += mySourceDeltaV;
-    }
-    myPixelData = myTarget; 
-    // set the image data
-    y60::ImagePtr myFacade = theImageNode->dom::Node::getFacade<y60::Image>();
-    myFacade->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
-    // AC_INFO << "Image: " << myFacade->get<ImageWidthTag>() << " x " << myFacade->get<ImageHeightTag>();
-    // set the matrix to make up for the padded image
-    asl::Matrix4f myScale;
-    myScale.makeIdentity();
-    myScale.scale(Vector3f(float(myWidth)/myPoTWidth, float(myHeight)/myPoTHeight, 1.0f)); 
-    myFacade->y60::Image::set<y60::ImageMatrixTag>(myScale);
+        myPixelData = myTarget; 
+        // set the image data
+        y60::ImagePtr myFacade = theImageNode->dom::Node::getFacade<y60::Image>();
+        myFacade->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
+        // AC_INFO << "Image: " << myFacade->get<ImageWidthTag>() << " x " << myFacade->get<ImageHeightTag>();
+        // set the matrix to make up for the padded image
+        asl::Matrix4f myScale;
+        myScale.makeIdentity();
+        myScale.scale(Vector3f(float(myWidth)/myPoTWidth, float(myHeight)/myPoTHeight, 1.0f)); 
+        myFacade->y60::Image::set<y60::ImageMatrixTag>(myScale);
     } catch (...) {
         AC_ERROR << "Exception in ReconstructToImage.";
     }
