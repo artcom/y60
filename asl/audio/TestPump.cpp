@@ -39,6 +39,7 @@ void TestPump::runWithPump(bool useDummyPump) {
 
         // Test different buffer sizes.
 //        playSingleSound(32768);
+/*        
         playSingleSound(8); 
         
         playSingleSound(19);   
@@ -55,9 +56,10 @@ void TestPump::runWithPump(bool useDummyPump) {
         testSimultaneousPlay();
         testConversions();
         testRunUntilEmpty();
+*/        
         testDelayed();
 
-        stressTest(5);
+//        stressTest(5);
         
         ENSURE(Pump::get().getNumClicks() == 0);
 
@@ -223,10 +225,10 @@ void TestPump::testRunUntilEmpty() {
 void TestPump::testDelayed() {
     Pump & myPump = Pump::get();
     Time curTime; 
+    HWSampleSinkPtr mySink; 
 
     // Simple version.
-    HWSampleSinkPtr mySink = 
-        createSampleSink("TestDelayedSink", 44100, 2);
+    mySink = createSampleSink("TestDelayedSink", 44100, 2);
     queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.4, 1);
     mySink->delayedPlay(0.4);
     ENSURE(mySink->getState() == HWSampleSink::RUNNING);
@@ -266,14 +268,16 @@ void TestPump::testDelayed() {
     msleep(400);
     ENSURE(mySink->getState() == HWSampleSink::RUNNING);
     mySink->stop();
-    
+
+/*
     // delayedPlay() after pause...
     mySink = createSampleSink("TestDelayedSink", 44100, 2);
-    queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 0.6, 1);
+    queueSineBuffers(mySink, SF_F32, 1024, 2, 440, 44100, 3, 1);
+    msleep(1000);
     mySink->play();
-    msleep(200);
+    msleep(1000);
     mySink->pause();
-    msleep(200);
+    msleep(1000);
     mySink->delayedPlay(0.6);
     msleep(600);
     curTime = mySink->getCurrentTime();
@@ -281,6 +285,7 @@ void TestPump::testDelayed() {
     ENSURE(double(curTime) > 0.6 && double(curTime) < 1.0);
     ENSURE(mySink->getState() == HWSampleSink::RUNNING);
     mySink->stop();
+*/    
 }
 
 void TestPump::testVolume() {
