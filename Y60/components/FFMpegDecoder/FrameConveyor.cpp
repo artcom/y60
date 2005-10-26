@@ -29,7 +29,7 @@
 #include <math.h>
 
 #define DB(x) // x
-#define DB2(x)  // x
+#define DB2(x) // x
 
 
 using namespace std;
@@ -37,13 +37,16 @@ using namespace asl;
 
 namespace y60 {
 
+    asl::Block FrameConveyor::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+
     const unsigned MAX_FRAME_CACHE_SIZE = 50;
     const double PRELOAD_CACHE_TIME = 2;    
 
     FrameConveyor::FrameConveyor() :
         _myVideoFrame(0),        
-        _myAudioPacket(AVCODEC_MAX_AUDIO_FRAME_SIZE),
-        _myCacheSizeInSecs(PRELOAD_CACHE_TIME)
+        _myAudioFrame(AVCODEC_MAX_AUDIO_FRAME_SIZE),
+        _myCacheSizeInSecs(PRELOAD_CACHE_TIME),
+        _myResampleContext(0)
     {
         _myVideoFrame = avcodec_alloc_frame();
     }
@@ -53,6 +56,11 @@ namespace y60 {
             av_free(_myVideoFrame);
             _myVideoFrame = 0;
         }
+        if (_myResampleContext) {
+            audio_resample_close(_myResampleContext);
+            _myResampleContext = 0;
+        }
+        
     }
     
     void 
@@ -74,7 +82,7 @@ namespace y60 {
             // To re-read audio packets we have to start caching with a clear cache.
             clear();
 
-            cerr << "Fill audio/video-cache..." << endl;
+            DB(cerr << "Fill audio/video-cache..." << endl;)
             
             while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE /*&&
                   double(_myAudioSink->getBufferedTime()) < PRELOAD_CACHE_TIME*/) 
@@ -94,7 +102,7 @@ namespace y60 {
                         " sec." << endl;
             }
         } else {
-            cerr << "Fill video-cache..." << endl;
+            DB(cerr << "Fill video-cache..." << endl;)
             updateCache(theInitialTimestamp);
             _myCacheSizeInSecs = PRELOAD_CACHE_TIME;
         }
@@ -134,7 +142,7 @@ namespace y60 {
 
     void
     FrameConveyor::updateCache(double theTimestamp) {
-        DB(cerr << "updateCache at ts: " << theTimestamp << endl);
+        DB(cerr << "updateCache at timestamp: " << theTimestamp << endl);
         double myCacheStart = -1; 
         double myCacheEnd = -1;
         if (! _myFrameCache.empty()) {
@@ -144,6 +152,7 @@ namespace y60 {
         
         double myTargetStart = asl::maximum(0.0, theTimestamp - 0.5 * _myCacheSizeInSecs);
         double myTargetEnd   = theTimestamp + 0.5 * _myCacheSizeInSecs;
+        DB(cerr << " target " << myTargetStart << " - " <<  myTargetEnd << endl);
 
         //cerr << "ts: " << theTimestamp << ", start: " << myTargetStart << ", end: " << myTargetEnd << endl;
         DB(printCacheInfo(myTargetStart, myTargetEnd);)
@@ -217,9 +226,11 @@ namespace y60 {
         DB2(cerr << " last decoded " << myLastDecodedTime << endl;)
         if (fabs(theStartTime - myLastDecodedTime) >= myTimePerFrame * 1.5) {
             _myContext->seekToTime(theStartTime);
-            if (_myAudioSink->getState() != HWSampleSink::STOPPED) {
-                cerr << "Seek: " << fabs(theStartTime - myLastDecodedTime) << endl;
-                _myAudioSink->stop();
+            if (_myAudioSink && _myAudioSink->getState() != HWSampleSink::STOPPED) {
+                DB(cerr << "Seek: " << fabs(theStartTime - myLastDecodedTime) << endl;)
+                //dk + uz : seeking in movie w/ audio -> turn off audio
+                _myAudioSink = HWSampleSinkPtr(0); 
+                //_myAudioSink->stop();
             }
         }
 
@@ -229,29 +240,33 @@ namespace y60 {
             decodeFrame(myLastDecodedVideoTime, myEndOfFileFlag);
         }
         
-        myEndOfFileFlag = false;
         if (_myAudioSink) {
+            myEndOfFileFlag = false;
             double myLastDecodedAudioTime = theStartTime;
             while (!myEndOfFileFlag && myLastDecodedAudioTime < theEndTime ) {
-                myEndOfFileFlag = _myContext->decodeAudio(&_myAudioPacket);
+                myEndOfFileFlag = _myContext->decodeAudio(&_myAudioFrame);
                 if (!myEndOfFileFlag) {
+                    int numFrames = _myAudioFrame.getSizeInBytes()
+                            /(getBytesPerSample(SF_S16)*_myContext->getNumAudioChannels());
                     AudioBufferPtr myBuffer;
-                    /*
-                       if (_myResampleContext) {
-                       numFrames = audio_resample(_myResampleContext, 
-                       (int16_t*)(_myResampledSamples.begin()),
-                       (int16_t*)(_mySamples.begin()), 
-                       numFrames);
-                       myBuffer = Pump::get().createBuffer(numFrames);
-                       myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
-                       }
-                       */
-                    myBuffer = Pump::get().createBuffer(_myAudioPacket.getSampleSize() / 
-                            (2 * _myContext->getNumAudioChannels()));
-                    myBuffer->convert(_myAudioPacket.getSamples(), SF_S16, 
+                    if (_myResampleContext) {
+                        DB2(cerr << "Resampling" << endl;)
+                        numFrames = audio_resample(_myResampleContext, 
+                            (int16_t*)(_myResampledSamples.begin()),
+                            (int16_t*)(_myAudioFrame.getSamples()), 
+                            numFrames);
+                        myBuffer = Pump::get().createBuffer(numFrames);
+                        myBuffer->convert(_myResampledSamples.begin(), SF_S16, 
+                                _myContext->getNumAudioChannels());
+                    } else {   
+                        myBuffer = Pump::get().createBuffer(numFrames);
+                        myBuffer->convert(_myAudioFrame.getSamples(), SF_S16, 
                             _myContext->getNumAudioChannels());
+                    }
                     _myAudioSink->queueSamples(myBuffer);
-                    myLastDecodedAudioTime = _myAudioPacket.getTimestamp();
+                    myLastDecodedAudioTime = _myAudioFrame.getTimestamp();
+                } else {
+                    DB(cerr << "FrameConveyor::fillCache: eof" << endl;)
                 }
             }
             
@@ -271,6 +286,7 @@ namespace y60 {
 
     double
     FrameConveyor::getFrame(double theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
+        DB(cerr << "getFrame at ts: " << theTimestamp << endl);
         updateCache(theTimestamp);
         if (_myFrameCache.empty() ) {
             AC_ERROR << "FrameConveyor:: No frames to deliver because framecache is empty.";
@@ -309,47 +325,51 @@ namespace y60 {
     void
     FrameConveyor::decodeFrame(double & theLastDecodedVideoTime, bool & theEndOfFileFlag) 
     {
+        DB2(cerr << "decodeFrame" << endl;)
         if (!_myContext) {
             throw FrameConveyorException(std::string("No decoding context set, yet."),
                     PLUS_FILE_LINE);
         }
 
         theEndOfFileFlag = _myContext->decodeVideo(_myVideoFrame);
-        unsigned myBPP = getBytesRequired(1, getPixelEncoding(_myContext->getVideoStream()));
-        VideoFramePtr myNewFrame = VideoFramePtr(new VideoFrame(_myContext->getWidth(),
-                _myContext->getHeight(), myBPP));
+        if ( ! theEndOfFileFlag) {
+            unsigned myBPP = getBytesRequired(1, getPixelEncoding(_myContext->getVideoStream()));
+            VideoFramePtr myNewFrame = VideoFramePtr(new VideoFrame(_myContext->getWidth(),
+                    _myContext->getHeight(), myBPP));
 
-        convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
-        myNewFrame->setTimestamp(_myVideoFrame->pts / (double)AV_TIME_BASE);
-        _myFrameCache[myNewFrame->getTimestamp()] = myNewFrame;
-        theLastDecodedVideoTime = myNewFrame->getTimestamp();
+            convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
+            myNewFrame->setTimestamp(_myVideoFrame->pts / (double)AV_TIME_BASE);
+            _myFrameCache[myNewFrame->getTimestamp()] = myNewFrame;
+            theLastDecodedVideoTime = myNewFrame->getTimestamp();
+        }
+        DB2(cerr << "decodeFrame decoded " << theLastDecodedVideoTime << endl;)
 #if 0
         case DecoderContext::FrameTypeAudio:
-            {
-                if (_myAudioSink) {
-                    AudioBufferPtr myBuffer;
-/*
-                    if (_myResampleContext) {
-                        numFrames = audio_resample(_myResampleContext, 
-                                (int16_t*)(_myResampledSamples.begin()),
-                                (int16_t*)(_mySamples.begin()), 
-                                numFrames);
-                        myBuffer = Pump::get().createBuffer(numFrames);
-                        myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
-                    } else {
-*/                
-                    myBuffer = Pump::get().createBuffer(_myAudioPacket.getSampleSize() / 
-                            (2 * _myContext->getNumAudioChannels()));
-                    myBuffer->convert(_myAudioPacket.getSamples(), SF_S16, 
-                            _myContext->getNumAudioChannels());
-                    _myAudioSink->queueSamples(myBuffer);
-                    theLastDecodedAudioTime = _myAudioPacket.getTimestamp();
-                    cerr << "Audio Frame Time: " << theLastDecodedAudioTime << endl;
-                }
-                break;
+        {
+            if (_myAudioSink) {
+                AudioBufferPtr myBuffer;
+                /*
+                   if (_myResampleContext) {
+                   numFrames = audio_resample(_myResampleContext, 
+                   (int16_t*)(_myResampledSamples.begin()),
+                   (int16_t*)(_mySamples.begin()), 
+                   numFrames);
+                   myBuffer = Pump::get().createBuffer(numFrames);
+                   myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
+                   } else {
+                   */                
+                myBuffer = Pump::get().createBuffer(_myAudioFrame.getSampleSize() / 
+                        (2 * _myContext->getNumAudioChannels()));
+                myBuffer->convert(_myAudioFrame.getSamples(), SF_S16, 
+                        _myContext->getNumAudioChannels());
+                _myAudioSink->queueSamples(myBuffer);
+                theLastDecodedAudioTime = _myAudioFrame.getTimestamp();
+                cerr << "Audio Frame Time: " << theLastDecodedAudioTime << endl;
+            }
+            break;
             }
 #endif                
-    }
+        }
 
     void 
     FrameConveyor::convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer) {
@@ -393,4 +413,13 @@ namespace y60 {
     FrameConveyor::getEndOfFileTimestamp() const {
         return _myContext->getEndOfFileTimestamp();
     }
+     
+    void FrameConveyor::initResample(int theNumInputChannels, int theInputSampleRate) {
+        // TODO: Convert num. of channels here?
+        if (theInputSampleRate != Pump::get().getNativeSampleRate()) {
+            _myResampleContext = audio_resample_init(theNumInputChannels, theNumInputChannels,
+                    Pump::get().getNativeSampleRate(), theInputSampleRate);
+        }
+    }
+    
 }

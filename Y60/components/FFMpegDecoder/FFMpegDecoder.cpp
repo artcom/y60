@@ -60,7 +60,7 @@
 #include <iostream>
 #include <float.h>
 
-#define DB(x) //x
+#define DB(x)  // x
 
 using namespace std;
 using namespace asl;
@@ -101,6 +101,7 @@ namespace y60 {
             return _myAudioSink->getCurrentTime() +
                 getMovie()->get<AVDelayTag>();
         } else {
+            DB(cerr << "sys: " << theSystemTime << " mov " << MovieDecoderBase::getMovieTime(theSystemTime) << endl;)
             return MovieDecoderBase::getMovieTime(theSystemTime);
         }
     }
@@ -111,6 +112,8 @@ namespace y60 {
               
         if (_myAudioSink) {            
             if (_myAudioSink->getState() == HWSampleSink::STOPPED) {
+                cerr << "don't SEEK with sound " << endl;
+                
                 _myFrameConveyor.preload(theStartTime);
                 _myAudioSink->setCurrentTime(theStartTime);
             }
@@ -120,10 +123,12 @@ namespace y60 {
 
     void 
     FFMpegDecoder::startMovie(double theStartTime) {
+        DB(cerr << "FFMpegDecoder::startMovie " << endl;)
         MovieDecoderBase::startMovie(theStartTime);
 
         if (_myAudioSink) {
             _myFrameConveyor.preload(theStartTime);
+            cerr << "start playing audio .................." << endl;
             _myAudioSink->play();            
         }
     }
@@ -146,6 +151,7 @@ namespace y60 {
 
     void
     FFMpegDecoder::load(const std::string & theFilename) {        
+        DB(cerr << "FFMpegDecoder::load " << theFilename << endl;)
         DecoderContextPtr myContext = DecoderContextPtr(new DecoderContext(theFilename));
         setupMovie(myContext);
         setupAudio(myContext);                    
@@ -209,6 +215,8 @@ namespace y60 {
             _myAudioSink->setVolume(getMovie()->get<VolumeTag>());
             AC_INFO << "Audio: channels=" << myAudioStream->codec.channels << ", samplerate=" 
                     << myAudioStream->codec.sample_rate;
+            _myFrameConveyor.initResample(myAudioStream->codec.channels,
+                    myAudioStream->codec.sample_rate);
         } else {
             _myAudioSink = HWSampleSinkPtr(0);
         }
@@ -217,7 +225,7 @@ namespace y60 {
     double
     FFMpegDecoder::readFrame(double theTime, unsigned theFrame,
             dom::ResizeableRasterPtr theTargetRaster) {
-        //cerr << "readFrame at : " << theTime << " system time " << asl::Time() << endl;
+        DB(cerr << "readFrame at : " << theTime << " system time " << asl::Time() << endl);
         if (theTime >= _myFrameConveyor.getEndOfFileTimestamp()) {
             setEOF(true);
             return theTime;

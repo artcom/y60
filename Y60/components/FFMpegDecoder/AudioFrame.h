@@ -8,29 +8,27 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: AudioPacket.h,v $
+//   $RCSfile: AudioFrame.h,v $
 //   $Author: ulrich $
 //   $Revision: 1.4 $
 //   $Date: 2005/04/01 10:12:21 $
 //
 //=============================================================================
 
-#ifndef _ac_y60_AudioPacket_h_
-#define _ac_y60_AudioPacket_h_
+#ifndef _ac_y60_AudioFrame_h_
+#define _ac_y60_AudioFrame_h_
 
 #include <asl/Ptr.h>
 
 namespace y60 {
 
-    class AudioPacket {
-//        friend class DecoderContext;
-
+    class AudioFrame {
         public:
-            AudioPacket::AudioPacket(unsigned theFrameSize) : _myTimestamp(0), _mySampleSize(0) {
+            AudioFrame::AudioFrame(unsigned theFrameSize) : _myTimestamp(0), _mySizeInBytes(0) {
                 _myBuffer = new unsigned char[theFrameSize];
             }
 
-            AudioPacket::~AudioPacket() {
+            AudioFrame::~AudioFrame() {
                 if (_myBuffer) {
                     delete[] _myBuffer;
                     _myBuffer = 0;
@@ -49,20 +47,20 @@ namespace y60 {
                 return _myBuffer;
             }
 
-            void setSampleSize(unsigned theSampleSize) {
-                _mySampleSize = theSampleSize;
+            void setSizeInBytes(unsigned theSizeInBytes) {
+                _mySizeInBytes = theSizeInBytes;
             }
 
-            unsigned getSampleSize() const {
-                return _mySampleSize;
+            unsigned getSizeInBytes() const {
+                return _mySizeInBytes;
             }
 
         private:
             double          _myTimestamp;
             unsigned char * _myBuffer;
-            unsigned        _mySampleSize;
+            unsigned        _mySizeInBytes;
     };
-    typedef asl::Ptr<AudioPacket> AudioPacketPtr;
+    typedef asl::Ptr<AudioFrame> AudioFramePtr;
 }
 
 #endif

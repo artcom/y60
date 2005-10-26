@@ -27,8 +27,8 @@
 #include <map>
 
 namespace y60 {
-    
-    class AudioPacket;
+   
+    class AudioFrame;
     
     class DecoderContext {
         public:
@@ -36,7 +36,7 @@ namespace y60 {
             ~DecoderContext();
 
             bool decodeVideo(AVFrame * theVideoFrame);
-            bool decodeAudio(AudioPacket * theAudioPacket);
+            bool decodeAudio(AudioFrame * theAudioFrame);
             void seekToTime(double theTime);
 
             AVStream * getVideoStream() {
@@ -85,6 +85,9 @@ namespace y60 {
             typedef std::list<AVPacket *> PacketList;
             PacketList _myAudioPackets;
             PacketList _myVideoPackets;
+
+            AVPacket * _myCurAudioPacket;
+            int _myCurPosInAudioPacket;
     };
 
     typedef asl::Ptr<DecoderContext> DecoderContextPtr;

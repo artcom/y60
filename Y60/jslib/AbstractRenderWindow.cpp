@@ -44,6 +44,8 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
+#define DB(x) // x
+
 namespace jslib {
 
     AbstractRenderWindow::AbstractRenderWindow(const JSErrorReporter & theErrorReporter) :
@@ -313,8 +315,12 @@ namespace jslib {
         if (!_myPauseFlag) {
             if (_myFixedDeltaT == 0.0) {
                 _myElapsedTime = myTime.seconds() - _myStartTime - _myPauseTime;
+                //dk + uz sometimes it *is* negative
+                if (_myElapsedTime < 0) {
+                    _myElapsedTime = 0;
+                }
             } 
-
+            DB(cerr << "st: " << _myStartTime << " pt " << _myPauseTime << " et " << _myElapsedTime << endl;)
             // Check for timeouts
             {
                 MAKE_SCOPE_TIMER(Timeouts);

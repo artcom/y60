@@ -73,6 +73,7 @@ namespace y60 {
     FFMpegDecoder2::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
         if (asl::toLowerCase(asl::getExtension(theUrl)) == "mpg" || 
             asl::toLowerCase(asl::getExtension(theUrl)) == "m2v" || 
+            asl::toLowerCase(asl::getExtension(theUrl)) == "avi" || 
             asl::toLowerCase(asl::getExtension(theUrl)) == "mov" || 
             asl::toLowerCase(asl::getExtension(theUrl)) == "mpeg") {
             AC_INFO << "FFMpegDecoder2 can decode :" << theUrl << endl;

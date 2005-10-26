@@ -20,13 +20,15 @@
 #ifndef _ac_y60_FrameConveyor_h_
 #define _ac_y60_FrameConveyor_h_
 
-#include "AudioPacket.h"
+#include "AudioFrame.h"
 
 #include <asl/HWSampleSink.h>
-
 #include <asl/Ptr.h>
 #include <dom/Value.h>
+
 #include <map>
+
+#include <ffmpeg/avformat.h>
 
 struct AVFrame;
 
@@ -52,6 +54,8 @@ namespace y60 {
             void preload(double theInitialTimestamp);
 
             double getEndOfFileTimestamp() const;
+
+            void initResample(int theNumInputChannels, int theInputSampleRate);
 
         private:
             /// Clears the frame and audio cache
@@ -83,7 +87,7 @@ namespace y60 {
 
             asl::Ptr<DecoderContext>    _myContext;
             AVFrame *                   _myVideoFrame;
-            AudioPacket                 _myAudioPacket;
+            AudioFrame                  _myAudioFrame;
             asl::HWSampleSinkPtr        _myAudioSink;
 
             double                      _myCacheSizeInSecs;
@@ -91,6 +95,9 @@ namespace y60 {
             typedef std::map<double, asl::Ptr<VideoFrame> > FrameCache;
             typedef FrameCache::iterator FrameCacheIterator;
             FrameCache _myFrameCache;
+            ReSampleContext * _myResampleContext;
+
+            static asl::Block _myResampledSamples;
     };
 }
 

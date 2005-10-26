@@ -42,7 +42,9 @@ function FFMpegTest(theArguments) {
         //"c:/TEST_MOVIES/MPEG/10.mpg",
         //"c:/TEST_MOVIES/MPEG/ADTEC.MPG",
         //"c:/Dev/pro60/testmodels/movies/testmovie.m2v"
-        "/tmp/counter.mpg"
+        "/tmp/suesstod.avi"
+        //"/vol/tmp/movies/JamesBond-CasinoRoyale-1967.avi"
+        //"/tmp/counter.mpg"
     ];
 
     var _myMovies       = [];
@@ -201,7 +203,6 @@ function FFMpegTest(theArguments) {
         for (var i = 0; i < _myMovieSources.length; ++i) {
             var myMovie = new MovieOverlay(Public.getOverlayManager(), _myMovieSources[i], new Vector2f(300, _myPos), null, true);
             myMovie.playspeed = 1;
-            myMovie.playmode  = thePlayMode;
             myMovie.loopcount = 0;
             myMovie.avdelay   = 0;
             //myMovie.startime  = theStartTime;
@@ -220,7 +221,7 @@ function FFMpegTest(theArguments) {
     function setupMovies() {
 //        var myOverlay = new ImageOverlay(ourShow.getOverlayManager(), "testfiles/reference.png", [300, _myPos]);
         _myPos += 40;
-        addTest("Simple Tests", 0,  1, "play");
+        addTest("Simple Tests", 100,  1, "play");
     }
 }
 

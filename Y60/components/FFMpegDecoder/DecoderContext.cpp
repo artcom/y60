@@ -19,7 +19,7 @@
 
 #include "DecoderContext.h"
 #include "FFMpegDecoder.h"
-#include "AudioPacket.h"
+#include "AudioFrame.h"
 #include "FrameAnalyser.h"
 
 #include <asl/Logger.h>
@@ -51,7 +51,9 @@ namespace y60 {
         _myVideoStreamIndex(-1),
         _myAudioStreamIndex(-1),
         _myEndOfFileTimestamp(DBL_MAX),
-        _myFilename(theFilename)        
+        _myFilename(theFilename),
+        _myCurAudioPacket(0),
+        _myCurPosInAudioPacket(0)
     {
         // register all formats and codecs
         static bool avRegistered = false;
@@ -138,6 +140,7 @@ namespace y60 {
 
     bool
     DecoderContext::decodeVideo(AVFrame * theVideoFrame) {
+        DB(cerr << "decodeVideo" << endl;)
         AVPacket * myPacket;
         //memset(&myPacket, 0, sizeof(myPacket));
  
@@ -152,6 +155,7 @@ namespace y60 {
             myPacket = getPacket(true);
             if (myPacket == 0) {
                 myEndOfFileFlag = true;
+                DB(cerr << "Video: eof" << endl;)
             } else {
                 int myFrameCompleteFlag = 0;
                 int myLen = avcodec_decode_video(&_myVideoStream->codec, theVideoFrame, 
@@ -178,30 +182,47 @@ namespace y60 {
     }
 
     bool 
-    DecoderContext::decodeAudio(AudioPacket * theAudioPacket) {
-        AVPacket * myPacket = getPacket(false);
-        if (myPacket) {
-            int64_t myStartTime = 0;
-            if (_myVideoStream->start_time != AV_NOPTS_VALUE) {
-                myStartTime = _myVideoStream->start_time;
-            } 
-            unsigned mySampleSize;
-            int myLen = avcodec_decode_audio(&_myAudioStream->codec, 
-                    (int16_t*)theAudioPacket->getSamples(), 
-                    (int *)&mySampleSize,
-                    myPacket->data, myPacket->size);
-            theAudioPacket->setSampleSize(mySampleSize);
-            theAudioPacket->setTimestamp((myPacket->dts - myStartTime) / (double)AV_TIME_BASE);
-
-            if (myLen < 0) {
-                AC_ERROR << "avcodec_decode_audio error";
-            } else if (myLen < myPacket->size) {
-                AC_ERROR << "avcodec_decode_audio: Could not decode video in one step";
-            }
-            return false;
-        } else {
+    DecoderContext::decodeAudio(AudioFrame * theAudioFrame) {
+        DB(cerr << "decodeAudio" << endl;)
+        int64_t myStartTime = 0;
+        if (_myVideoStream->start_time != AV_NOPTS_VALUE) {
+            myStartTime = _myVideoStream->start_time;
+        } 
+        if (!_myCurAudioPacket) {
+            _myCurAudioPacket = getPacket(false);
+        }
+        if (!_myCurAudioPacket) {
+            DB(cerr << "Audio: eof" << endl;)
             return true;
         }
+        bool myFrameDecoded = false;
+        int myFrameSize = -1;
+        int64_t myPacketTime;
+        while (myFrameSize < 0) {
+            uint8_t* myCurReadPtr = _myCurAudioPacket->data+_myCurPosInAudioPacket;
+            int myDataLeftInPacket = _myCurAudioPacket->size-_myCurPosInAudioPacket;
+            int myBytesDecoded = avcodec_decode_audio(&_myAudioStream->codec,
+                    (int16_t*)(theAudioFrame->getSamples()), &myFrameSize,
+                    myCurReadPtr, myDataLeftInPacket);
+            myPacketTime = _myCurAudioPacket->dts;
+            if (myBytesDecoded < 0) {
+                AC_WARNING << "av_decode_audio error";
+            }
+            _myCurPosInAudioPacket += myBytesDecoded;
+            if (myBytesDecoded < 0 || _myCurPosInAudioPacket >= _myCurAudioPacket->size) {
+                av_free_packet(_myCurAudioPacket);
+                delete _myCurAudioPacket;
+                _myCurAudioPacket = getPacket(false);
+                if (!_myCurAudioPacket) {
+                    DB(cerr << "Audio: eof" << endl;)
+                        return true;
+                }
+                _myCurPosInAudioPacket = 0;
+            }
+        }
+        theAudioFrame->setSizeInBytes(myFrameSize);
+        theAudioFrame->setTimestamp((myPacketTime - myStartTime) / (double)AV_TIME_BASE);
+        return false;
     }
 
     void
@@ -335,6 +356,8 @@ namespace y60 {
                 myPacket = new AVPacket;
                 myEndOfFileFlag = (av_read_frame(_myFormatContext, myPacket) < 0);
                 if (myEndOfFileFlag) {
+                    delete myPacket;
+                    myPacket = 0;
                     break;
                 }
                 // Without av_dup_packet, ffmpeg reuses myPacket->data at first opportunity 
@@ -352,12 +375,20 @@ namespace y60 {
         list<AVPacket*>::iterator it;
         for (it=_myVideoPackets.begin(); it != _myVideoPackets.end(); ++it) {
             av_free_packet(*it);
+            delete *it;
         }
         _myVideoPackets.clear();
         for (it=_myAudioPackets.begin(); it != _myAudioPackets.end(); ++it) {
             av_free_packet(*it);
+            delete *it;
         }
         _myAudioPackets.clear();
+        if (_myCurAudioPacket) {
+            av_free_packet(_myCurAudioPacket);
+            delete _myCurAudioPacket;
+            _myCurAudioPacket = 0;
+            _myCurPosInAudioPacket = 0;
+        }
     }
 }
 
