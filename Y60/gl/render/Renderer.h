@@ -143,7 +143,7 @@ namespace y60 {
 
             void renderFrustum(const ViewportPtr & theViewport);
             void renderOverlays(ViewportPtr theViewport);
-            void renderOverlay(dom::NodePtr theOverlayNode, const asl::Vector2f thePosition = asl::Vector2f(0.0f, 0.0f), float theAlpha = 1);
+            void renderOverlay(dom::NodePtr theOverlayNode, float theAlpha = 1);
             void renderTextSnippets(ViewportPtr theViewport);
 
             void renderBox(const asl::Point3f & theLTF, const asl::Point3f & theRBF,

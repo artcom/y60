@@ -1357,7 +1357,7 @@ namespace y60 {
     }
 
     void
-    Renderer::renderOverlay(dom::NodePtr theOverlayNode, const asl::Vector2f thePosition, float theAlpha) {
+    Renderer::renderOverlay(dom::NodePtr theOverlayNode, float theAlpha) {
         if (theOverlayNode->nodeType() != dom::Node::ELEMENT_NODE) {
             return;
         }
@@ -1502,7 +1502,7 @@ namespace y60 {
         // Render child overlays
         unsigned myOverlayCount = theOverlayNode->childNodesLength();
         for (unsigned i = 0; i < myOverlayCount; ++i) {
-             renderOverlay(theOverlayNode->childNode(i), myPosition, myAlpha);
+             renderOverlay(theOverlayNode->childNode(i), myAlpha);
         }
         glPopMatrix();
     }
