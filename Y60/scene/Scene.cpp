@@ -277,7 +277,9 @@ namespace y60 {
 
         setupShaderLibrary();
 
-        AC_INFO << "Loading materials..." << endl;        
+        AC_INFO << "Loading materials..." << endl;   
+        updateMaterials();
+/*
         _myMaterials.clear();        
         NodePtr myMaterialList = _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
@@ -285,7 +287,7 @@ namespace y60 {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
             loadMaterial(myMaterialNode);
         }
-
+*/
         AC_INFO << "Loading world..." << endl;
         update(ANIMATIONS_LOAD|SHAPES|WORLD);
 
@@ -715,20 +717,33 @@ namespace y60 {
 
         AC_DEBUG << "Scene::updateMaterials() - material count: " << myMaterialCount;
 
+        // Collect current materials
+        set<string> myMaterialIds;
+        for (MaterialIdMap::iterator it = _myMaterials.begin(); it != _myMaterials.end(); ++it) {
+            myMaterialIds.insert(it->first);
+        }
+
         for (unsigned i = 0; i < myMaterialCount; ++i) {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
             const std::string myMaterialId = myMaterialNode->getAttributeString("id");
             MaterialBasePtr myMaterial = getMaterial(myMaterialId);
+            
             if (myMaterial) {
+                myMaterialIds.erase(myMaterialId);
                 if (myMaterial->reloadRequired()) {
                     reloadMaterial(myMaterialNode, myMaterial);
                 } else {
-                    myMaterial->update(*_myTextureManager, getImagesRoot());
-                }
+                    myMaterial->update(*_myTextureManager, getImagesRoot());                    
+                }                
             } else {
                 AC_TRACE << "could not find material " << myMaterialId << ", loading" << endl;
                 loadMaterial(myMaterialNode);
             }
+        }
+
+        // Remove materials from cache that have been removed from dom
+        for (set<string>::iterator it = myMaterialIds.begin(); it != myMaterialIds.end(); ++it) {
+            _myMaterials.erase(*it);
         }
     }
 
