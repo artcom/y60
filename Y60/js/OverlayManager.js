@@ -55,6 +55,10 @@ function OverlayManager(theScene, theViewport) {
         return commonCreate(theName, "", false, theParent);
     }
 
+    Public.update = function() {
+        Public.scene.update();
+    }
+
     Public.createMultitextured = function(theName, theImageIds, theOverwriteFlag, theParent) {
         var myMaterial = Node.createElement('material');
         var myOldOverlayMaterial = getDescendantByName(Public.materials, theMaterialNode.name,  false);

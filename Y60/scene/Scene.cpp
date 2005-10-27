@@ -278,8 +278,6 @@ namespace y60 {
         setupShaderLibrary();
 
         AC_INFO << "Loading materials..." << endl;   
-        updateMaterials();
-/*
         _myMaterials.clear();        
         NodePtr myMaterialList = _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
@@ -287,7 +285,7 @@ namespace y60 {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
             loadMaterial(myMaterialNode);
         }
-*/
+
         AC_INFO << "Loading world..." << endl;
         update(ANIMATIONS_LOAD|SHAPES|WORLD);
 

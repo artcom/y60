@@ -421,7 +421,7 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             } else {
                 addImage(theSource);
             }
-            theScene.scene.update(Scene.IMAGES);
+            theScene.update(Scene.IMAGES);
 
             var mySize    = getImageSize(Protected.myImages[0]);
             Public.width  = mySize.x;
