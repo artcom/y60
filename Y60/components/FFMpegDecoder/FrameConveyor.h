@@ -28,7 +28,15 @@
 
 #include <map>
 
+#ifdef WIN32
+#pragma warning( disable : 4244 ) // Disable ffmpeg warning
+#define EMULATE_INTTYPES
+#endif
+#include <ffmpeg/avcodec.h>
 #include <ffmpeg/avformat.h>
+#ifdef WIN32
+#pragma warning( default : 4244 ) // Renable ffmpeg warning
+#endif
 
 struct AVFrame;
 
