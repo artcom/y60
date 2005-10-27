@@ -55,8 +55,8 @@ function OverlayManager(theScene, theViewport) {
         return commonCreate(theName, "", false, theParent);
     }
 
-    Public.update = function() {
-        Public.scene.update();
+    Public.update = function(theFlags) {
+        Public.scene.update(theFlags);
     }
 
     Public.createMultitextured = function(theName, theImageIds, theOverwriteFlag, theParent) {
