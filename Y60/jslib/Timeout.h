@@ -27,6 +27,7 @@
 #include <string>
 #include <map>
 #include <queue>
+#include <iostream>
 
 namespace jslib {
 
@@ -43,7 +44,8 @@ class Timeout {
             _myDuration(theDuration),
             _isInterval(theIsInterval),
             _myActivationTime(theCurrentTime + theDuration / 1000.0)
-        {}
+        {
+        }
 
         virtual ~Timeout() {}
 
@@ -60,7 +62,7 @@ class Timeout {
         }
 
         void resetInterval() {
-            _myActivationTime = asl::Time() + double(_myDuration) / 1000.0;
+            _myActivationTime += double(_myDuration) / 1000.0;
         }
 
         JSObject * getJSObject() const {
@@ -86,7 +88,8 @@ class TimeoutQueue {
         unsigned long addTimeout(JSObject * theObject, const std::string & theCommand,
                 asl::Time theCurrentTime, double theDuration, bool isInterval = false)
         {
-            TimeoutPtr myTimeout(new Timeout(theObject, theCommand, theDuration, isInterval));
+            TimeoutPtr myTimeout(new Timeout(theObject, theCommand, theDuration, 
+                        theCurrentTime, isInterval));
             _myTimeoutMap[ourNextTimeoutId] = myTimeout;
             _myTimeoutQueue.insert(std::pair<double, unsigned long>(myTimeout->getActivationTime(),
                 ourNextTimeoutId));
