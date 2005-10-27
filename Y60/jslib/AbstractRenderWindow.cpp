@@ -335,7 +335,29 @@ namespace jslib {
                 while (_myTimeoutQueue.isShowTime(_myElapsedTime)) {
                     TimeoutPtr myTimeout = _myTimeoutQueue.popTimeout();
 
-                    const std::string & myShowCommand = myTimeout->getCommand();
+                    const std::string & myTimeoutCommand = myTimeout->getCommand();
+                    try {
+                        MAKE_SCOPE_TIMER(onPostViewport);
+
+                        if (JSA_hasFunction(_myJSContext, myTimeout->getJSObject(), 
+                                    myTimeoutCommand.c_str()))
+                        {
+                            jsval argv[0], rval;
+                            jslib::JSA_CallFunctionName(_myJSContext, myTimeout->getJSObject(), 
+                                    myTimeoutCommand.c_str(), 0, argv, &rval);
+                        } else {
+                            AC_ERROR << "Timeout: Function " << myTimeoutCommand 
+                                    << " does not exist." << endl;
+                        }
+                    } catch (const asl::Exception & ex) {
+                        AC_ERROR << "asl exception caught in AbstractRenderWindow::onFrame(), (timeout " << myTimeoutCommand << "): " << ex;
+                    } 
+                    catch (const std::exception & ex) {
+                        AC_ERROR << "std::exception caught in AbstractRenderWindow::onFrame(), (timeout " << myTimeoutCommand << "): " << ex.what();
+                    } catch (...) {
+                        AC_ERROR << "Unknown exception in AbstractRenderWindow::onFrame(), (timeout " << myTimeoutCommand << ") ";
+                    }
+/*                    
                     JSScript * myScript = JS_CompileScript(_myJSContext, myTimeout->getJSObject(),
                         myShowCommand.c_str(), myShowCommand.size(), __FILE__, __LINE__);
 
@@ -350,6 +372,7 @@ namespace jslib {
                             AC_ERROR << "Timeout failed during execution: " << myShowCommand << "'";
                         }
                     }
+*/                    
                 }
             }
 
