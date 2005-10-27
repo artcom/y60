@@ -184,6 +184,9 @@ namespace y60 {
             static PrimitiveType
             getTypeFromNode(dom::NodePtr thePrimitiveNode);
 
+            void setMaterial(MaterialBasePtr theMaterial) {
+                _myMaterial = theMaterial;
+            }
             MaterialBase & getMaterial() {
                 return *(_myMaterial);
             }

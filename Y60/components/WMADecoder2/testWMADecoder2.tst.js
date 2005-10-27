@@ -23,7 +23,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.playSound = function(myFileName) {
-        obj.mySound = obj.mySoundManager.createSound(myFileName);
+        obj.mySound = new Sound(myFileName);
         obj.mySound.play();
         msleep(2000);
         obj.mySound.stop();
@@ -31,10 +31,10 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.runWMADecoder2Test = function() {
         obj.mySoundManager.preloadSound("../../testfiles/music_cut_wm9.wma");
-        obj.mySound = obj.mySoundManager.createSound("../../testfiles/music_cut_wm9.wma");
+        obj.mySound = new Sound("../../testfiles/music_cut_wm9.wma");
 
         DTITLE("Playing sound...");
-        obj.mySound.play();        
+        obj.mySound.play();
         ENSURE("obj.mySound.playing");
         msleep(1000);
         obj.mySound.seek(11);
@@ -42,7 +42,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         msleep(2000);
         // Play to end.
         ENSURE("!obj.mySound.playing");
-        
+
         obj.mySound.play();
         msleep(1000);
         obj.mySound.stop();
@@ -65,7 +65,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         obj.mySound.seek(1);
         ENSURE("Math.abs(obj.mySound.time - 1) < 0.1");
         msleep(1000);
-        
+
         DTITLE("Seek relative minus 0.5 seconds");
         obj.mySound.seekRelative(-0.5);
         ENSURE("Math.abs(obj.mySound.time - 1.5) < 0.2");
@@ -78,7 +78,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         obj.playSound("http://himmel/testfiles/Leben.wma");
         obj.playSound("http://himmel/testfiles/track2.mp3");
         obj.playSound("http://himmel/testfiles/helsing.wma");
-        
+
         ENSURE("!obj.mySound.playing");
 
         delete obj.mySound;
@@ -86,21 +86,21 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         msleep(100);
         ENSURE("obj.mySoundManager.soundcount == 0");
 
-        ENSURE_EXCEPTION("obj.mySoundManager.createSound(\"../../testWMADecoder2.tst.js\")",
+        ENSURE_EXCEPTION("new Sound(\"../../testWMADecoder2.tst.js\")",
                 "*");
 
         // Stress test - runs for hours :-)
         // Starts 5 sounds per second.
-/*        
+/*
         for (var i=0; i<5*60*60*8; ++i) {
-            var mySound = obj.mySoundManager.createSound("../../testfiles/music_cut_wm9.wma");
+            var mySound = new Sound("../../testfiles/music_cut_wm9.wma");
             mySound.play();
             msleep(200);
             gc();
         }
 */
     }
-    
+
     obj.runLeakTest = function() {
 
         print("### INITIAL USAGE:" + getProcessMemoryUsage());
@@ -112,7 +112,6 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
         var mySound = null;
 
         for (var i = 0; i < 20; ++i) {
-            // mySound = obj.mySoundManager.createSound(mySoundFile, false, false);
             mySound = new Sound(mySoundFile, false, false);
             mySound.play();
             while (mySound.playing) {
@@ -151,7 +150,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
 //        this.runLeakTest();
     }
 }
- 
+
 function main() {
     var myTestName = "testAudio.tst.js";
     var mySuite = new UnitTestSuite(myTestName);

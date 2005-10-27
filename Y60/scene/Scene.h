@@ -313,7 +313,8 @@ namespace y60 {
 
             void buildShape(ShapePtr theShape);
             void updateShapes();
-            void loadMaterial(dom::NodePtr theMaterialNode, int theIndex = -1);
+            void loadMaterial(dom::NodePtr theMaterialNode);
+            void reloadMaterial(dom::NodePtr theMaterialNode, MaterialBasePtr theMaterial);
             void loadAnimations();
             void updateMaterials();
             void clearShapes();

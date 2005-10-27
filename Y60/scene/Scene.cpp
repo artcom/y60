@@ -300,7 +300,7 @@ namespace y60 {
     }
 
     void
-    Scene::loadMaterial(NodePtr theMaterialNode, int theIndex) {
+    Scene::loadMaterial(NodePtr theMaterialNode) {
         DB(AC_TRACE << "Scene::loadMaterial " << *theMaterialNode);
 		map<string, bool> myPropertyNames;
 		NodePtr myPropertiesNode = theMaterialNode->childNode(PROPERTY_LIST_NAME);
@@ -356,19 +356,32 @@ namespace y60 {
 
         DB(AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
                     << ", name: " << myMaterial->get<NameTag>());
-/*
-        if (theIndex < 0) {
-            // append to material list
-            theIndex = _myMaterials.size();
-            _myMaterials.push_back(myMaterial);
-        } else {
-            // store in existing slot in materials list
-            _myMaterials[theIndex] = myMaterial;
-        }
-        _myMaterialIdMap[myMaterial->get<IdTag>()] = theIndex;
-*/
-        // Add new material to material id map
         _myMaterials[myMaterial->get<IdTag>()] = myMaterial;
+    }
+
+    void
+    Scene::reloadMaterial(NodePtr theMaterialNode, MaterialBasePtr theMaterial) {
+        // Find all primitives that reference the material
+        MaterialBase * myMaterial = &*theMaterial;
+        PrimitiveVector myAffectedPrimitives;
+        NodePtr myShapeListNode = getShapesRoot();
+        unsigned myShapeCount = myShapeListNode->childNodesLength();
+        for (unsigned i = 0; i < myShapeCount; ++i) {
+            NodePtr myShapeNode = myShapeListNode->childNode(i);
+            ShapePtr myShape = myShapeNode->getFacade<Shape>();
+            const PrimitiveVector & myPrimitives = myShape->getPrimitives();
+            for (unsigned j = 0; j < myPrimitives.size(); ++j) {
+                if (&(myPrimitives[j]->getMaterial()) == myMaterial) {
+                    myAffectedPrimitives.push_back(myPrimitives[j]);
+                }
+            }
+        }
+        
+        loadMaterial(theMaterialNode);
+        MaterialBasePtr myNewMaterial = _myMaterials[theMaterial->get<IdTag>()];
+        for (unsigned i = 0; i < myAffectedPrimitives.size(); ++i) {
+            myAffectedPrimitives[i]->setMaterial(myNewMaterial);
+        }
     }
 
     NodePtr
@@ -708,13 +721,7 @@ namespace y60 {
             MaterialBasePtr myMaterial = getMaterial(myMaterialId);
             if (myMaterial) {
                 if (myMaterial->reloadRequired()) {
-                    AC_DEBUG << "Material " << myMaterialId << " requires reload";
-                    // reload modified material into it's existing slot
-                    // TODO: adapt when material index handling refactoring is done
-                    // VS/UH
-                    //_myMaterials[myIt->second] = MaterialBasePtr(0);
-                    //_myMaterialIdMap.erase(myIt);
-                    loadMaterial(myMaterialNode);
+                    reloadMaterial(myMaterialNode, myMaterial);
                 } else {
                     myMaterial->update(*_myTextureManager, getImagesRoot());
                 }
