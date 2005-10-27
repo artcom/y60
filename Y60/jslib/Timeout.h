@@ -37,12 +37,12 @@ class Timeout {
         Timeout() {}
 
         Timeout(JSObject * theObject, const std::string & theCommand, double theDuration,
-                        bool theIsInterval = false) :
+                        asl::Time theCurrentTime, bool theIsInterval = false) :
             _myJSObject(theObject),
             _myCommand(theCommand),
             _myDuration(theDuration),
             _isInterval(theIsInterval),
-            _myActivationTime(asl::Time() + theDuration / 1000.0)
+            _myActivationTime(theCurrentTime + theDuration / 1000.0)
         {}
 
         virtual ~Timeout() {}
@@ -83,8 +83,8 @@ class TimeoutQueue {
     public:
         TimeoutQueue() {}
 
-        unsigned long addTimeout(JSObject * theObject, const std::string & theCommand, double theDuration,
-            bool isInterval = false)
+        unsigned long addTimeout(JSObject * theObject, const std::string & theCommand,
+                asl::Time theCurrentTime, double theDuration, bool isInterval = false)
         {
             TimeoutPtr myTimeout(new Timeout(theObject, theCommand, theDuration, isInterval));
             _myTimeoutMap[ourNextTimeoutId] = myTimeout;

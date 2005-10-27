@@ -252,19 +252,25 @@ namespace jslib {
     }
 
     long
-    AbstractRenderWindow::setObjectTimeout(JSObject *theObject, const std::string & myCommand, float myMilliseconds) {
-        return _myTimeoutQueue.addTimeout(theObject, myCommand, myMilliseconds);
+    AbstractRenderWindow::setObjectTimeout(JSObject *theObject, const std::string & myCommand, 
+            float myMilliseconds)
+    {
+        return _myTimeoutQueue.addTimeout(theObject, myCommand, _myElapsedTime, myMilliseconds);
     }
 
     long
-    AbstractRenderWindow::setObjectInterval(JSObject *theObject, const std::string & myCommand, float myMilliseconds) {
-        return _myTimeoutQueue.addTimeout(theObject, myCommand, myMilliseconds, true /* isInterval */);
+    AbstractRenderWindow::setObjectInterval(JSObject *theObject, const std::string & myCommand,
+            float myMilliseconds) 
+    {
+        return _myTimeoutQueue.addTimeout(theObject, myCommand, _myElapsedTime, 
+                myMilliseconds, true /* isInterval */);
     }
 
     long
     AbstractRenderWindow::setTimeout(const std::string & myCommand, float myMilliseconds) {
         JSObject * myGlobalObject = JS_GetGlobalObject(_myJSContext);
-        return _myTimeoutQueue.addTimeout(myGlobalObject, myCommand, myMilliseconds);
+        return _myTimeoutQueue.addTimeout(myGlobalObject, myCommand, _myElapsedTime,
+                myMilliseconds);
     }
     void
     AbstractRenderWindow::clearTimeout(long myTimeoutId) {
@@ -273,7 +279,8 @@ namespace jslib {
     long
     AbstractRenderWindow::setInterval(const std::string & myCommand, float myMilliseconds) {
         JSObject * myGlobalObject = JS_GetGlobalObject(_myJSContext);
-        return _myTimeoutQueue.addTimeout(myGlobalObject, myCommand, myMilliseconds, true /* isInterval */);
+        return _myTimeoutQueue.addTimeout(myGlobalObject, myCommand, _myElapsedTime,
+                myMilliseconds, true /* isInterval */);
     }
     void
     AbstractRenderWindow::clearInterval(long myIntervalId) {
@@ -315,7 +322,8 @@ namespace jslib {
         if (!_myPauseFlag) {
             if (_myFixedDeltaT == 0.0) {
                 _myElapsedTime = myTime.seconds() - _myStartTime - _myPauseTime;
-                //dk + uz sometimes it *is* negative
+                // dk + uz: sometimes myTime.seconds() - _myStartTime *is* negative
+                // on the first frame.
                 if (_myElapsedTime < 0) {
                     _myElapsedTime = 0;
                 }
