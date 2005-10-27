@@ -45,6 +45,16 @@ MyClassUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.myScene.shapes.nodeName == "shapes"');
         ENSURE('obj.myScene.images.nodeName == "images"');
         ENSURE('obj.myScene.cameras[0].nodeName == "camera"');
+
+        // Test array assignment to vector nodes        
+        obj.myScene.world.position = new Vector3f(1,1,1);
+        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1,1,1))');
+        obj.myScene.world.position = [2,3,4];
+        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(2,3,4))');
+        obj.myScene.world.position = [1.1,2.2,3.3];
+        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1.1,2.2,3.3))');
+        obj.myScene.world.position = ["1","2","3"];
+        ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1,2,3))');
     }
 }
 

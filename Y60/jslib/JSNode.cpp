@@ -1021,7 +1021,12 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             dom::NodePtr myAttrNode = myNode->attributes().getNamedItem(myProperty);
             if (myAttrNode) {
                 IF_NOISY(AC_TRACE << "JSNode::setProperty: myAttrNode = " <<*myAttrNode << endl);
-                myAttrNode->nodeValue(as_string(cx,*vp));
+                // Try to convert array to strings
+                std::string myResult;
+                if (!JSA_ArrayToString(cx, vp, myResult)) {
+                    myResult = as_string(cx,*vp);
+                }
+                myAttrNode->nodeValue(myResult);
                 return JS_TRUE;
             } else {
                 if (myNode->hasFacade()) {

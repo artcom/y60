@@ -496,6 +496,48 @@ JSA_charArrayToString(JSContext *cx, jsval *argv, string & theResult) {
     return JS_TRUE;
 }
 
+JSBool
+JSA_ArrayToString(JSContext * cx, jsval * vp, string & theResult) {
+    // try to convert first argument into an object
+    JSObject * myJSArray;
+    if (!JS_ValueToObject(cx, *vp, &myJSArray)) {
+        return JS_FALSE;
+    }
+
+    if (!JS_IsArrayObject(cx, myJSArray)) {
+        return JS_FALSE;
+    }
+
+    // try to get values from array
+    jsuint myArrayLength = 0;
+    if (!JS_GetArrayLength(cx, myJSArray, &myArrayLength)) {
+        return JS_FALSE;
+    }
+
+    theResult += "[";
+    for (unsigned i = 0; i < myArrayLength; ++i) {
+        jsval myArrayElement;
+        if (!JS_GetElement(cx, myJSArray, i, &myArrayElement)) {
+            JS_ReportError(cx, "JSA_ArrayToString: array element %d does not exist.", i);
+            return JS_FALSE;
+        }
+
+        string myString;
+        if (!convertFrom(cx, myArrayElement, myString)) {
+            JS_ReportError(cx, "JSA_ArrayToString: Could not convert array element #%d to string.", i);
+            return JS_FALSE;
+        }
+
+        theResult += myString;
+        if (i < myArrayLength - 1) {
+            theResult += ",";
+        }
+    }
+    theResult += "]";
+
+    return JS_TRUE;
+}
+
 
 std::string
 searchFileRelativeToJSInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, const std::string & theFile) {

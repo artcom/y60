@@ -521,6 +521,9 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest) {
 
 JSBool JSA_charArrayToString(JSContext *cx, jsval *argv, std::string & theResult);
 
+// Converts an array into a string, if argv is not an array it returns false.
+JSBool JSA_ArrayToString(JSContext *cx, jsval *argv, std::string & theResult);
+
 std::string
 searchFileRelativeToJSInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
                               const std::string & theFile);
