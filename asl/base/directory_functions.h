@@ -31,6 +31,7 @@ namespace asl {
     std::string getAppDataDirectory(const std::string & theAppName);
     std::string getAppDirectory();
     bool isDirectory(const std::string & theDirectory);
+    std::string stripTrailingSlashes(const std::string & theDirectory);
 /* @} */
 }
 

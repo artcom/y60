@@ -25,24 +25,9 @@ namespace asl {
 
 DirectoryPackage::DirectoryPackage(const std::string & theDirectory,
                                    bool theIgnoreDotFiles) :
-    _myDirectory(theDirectory), _myIgnoreDotFiles(theIgnoreDotFiles)
+    _myIgnoreDotFiles(theIgnoreDotFiles)
 {
-    // strip trailing '/' or '\'
-    while (true) {
-        size_t myLen = _myDirectory.size();
-        if (myLen == 0) {
-            break;
-        }
-        if (_myDirectory[myLen-1] == '/') {
-            _myDirectory = _myDirectory.substr(0, myLen-1);
-#ifdef WIN32
-        } else if (_myDirectory[_myDirectory.size()-1] == '\\') {
-            _myDirectory = _myDirectory.substr(0, myLen-1);
-#endif
-        } else {
-            break;
-        }
-    } 
+    _myDirectory = stripTrailingSlashes(theDirectory);
 }
 
 std::string

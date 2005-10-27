@@ -106,9 +106,10 @@ PackageManager::findPackage(const std::string & theRelativePath,
                             const std::string & thePackage)
 {
     AC_TRACE << "findPackage pkg='" << thePackage << "' path='" << theRelativePath << "'";
+    std::string myPackage = stripTrailingSlashes(thePackage);
     for (PackageList::iterator iter = _myPackages.begin();
          iter != _myPackages.end(); ++iter) {
-        if ((thePackage != "" && (*iter)->getPath() != thePackage)) {
+        if ((myPackage != "" && (*iter)->getPath() != myPackage)) {
             continue;
         }
         if ((*iter)->findFile(theRelativePath) != "") {

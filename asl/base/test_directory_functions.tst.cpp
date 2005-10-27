@@ -70,6 +70,7 @@ public:
         std::cerr << getAppDataDirectory("TEST") << std::endl;
 
         ENSURE(isDirectory("."));
+        ENSURE(isDirectory("../../testdir/"));
         ENSURE(!isDirectory("nonexistingdir"));
         ENSURE(!isDirectory("../../testdir/a"));
 //        ENSURE(isDirectory("../../testdir/.svn"));

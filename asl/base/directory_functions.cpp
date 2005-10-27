@@ -102,6 +102,29 @@ std::string getAppDirectory() {
     return strAppDirectory;
 }
 
+
+// TODO: deal with degenerate cases like "C:\" or "/" (root)
+std::string 
+stripTrailingSlashes(const std::string & theDirectory) { 
+    std::string myDirectory(theDirectory);
+    while (true) { // strip all trailing slashes
+        size_t myLen = myDirectory.size();
+        if (myLen == 0) {
+            break;
+        }
+        if (myDirectory[myLen-1] == '/') {
+            myDirectory = myDirectory.substr(0, myLen-1);
+#ifdef WIN32
+        } else if (myDirectory[myDirectory.size()-1] == '\\') {
+            myDirectory = myDirectory.substr(0, myLen-1);
+#endif
+        } else {
+            break;
+        }
+    }
+    return myDirectory;    
+}
+
 bool isDirectory(const std::string & theDirectory) {
     DIR * myDirHandle = opendir(theDirectory.c_str());
     if (myDirHandle) {
