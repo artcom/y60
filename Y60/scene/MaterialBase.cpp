@@ -228,7 +228,7 @@ namespace y60 {
         _myTexGenModes.clear();
         _myTexGenParams.clear();
         _myTexGenFlag = false;
-
+        
         NodePtr myMappingRequirement = myReqFacade->getProperty(MAPPING_FEATURE);
         if (myMappingRequirement) {
 
@@ -290,7 +290,7 @@ namespace y60 {
                     string myTexGenParamName = string("texgenparam") + asl::as_string(myTexUnit);
 					NodePtr myTexGenProperty = myPropertyFacade->getProperty(myTexGenParamName);
                     if (myTexGenProperty) {
-						VectorOfVector4f myTexGenParamsVec = (*myTexGenProperty)("#text").dom::Node::nodeValueAs<VectorOfVector4f>();
+						VectorOfVector4f myTexGenParamsVec = myTexGenProperty->nodeValueAs<VectorOfVector4f>();
                         for (unsigned i = 0; i < myTexGenParamsVec.size(); ++i) {
                             myTexGenParams.push_back(myTexGenParamsVec[i]);
                         }
