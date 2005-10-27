@@ -1,29 +1,40 @@
 #! /bin/bash
 
+if [ $# -lt 1 ]; then
+    echo "Usage: `basename $0` <modelname> [<shaderlibrary>] [<arguments> ...]"
+    exit 1
+fi
 MODELNAME="$1"
-if [ "$2" == "" ] ; then
-    if [ "$USE_CG" == "1" ] ; then
-        SHADERLIB=$PRO/src/Y60/shader/shaderlibrary.xml
-    else
-    	SHADERLIB=$PRO/src/Y60/shader/shaderlibrary_nocg.xml
-    fi
+shift
+
+# determine shader library
+if [ "$USE_CG" == "1" ] ; then
+    SHADERLIB="$PRO/src/Y60/shader/shaderlibrary.xml"
 else
-    SHADERLIB="$2"
+    SHADERLIB="$PRO/src/Y60/shader/shaderlibrary_nocg.xml"
+fi
+if [ ! -f "$SHADERLIB" ]; then
+    echo "Shaderlibrary '$SHADERLIB' not found"
+    exit 1
 fi
 
-shift
-shift
-
-APPLICATION=y60
-
+APPLICATION="$PRO/bin/y60"
 if [ "$DEBUG" == "VG" ]; then
     if [ -x `which valgrind` ]; then
-        APPLICATION="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes y60DBG"
+        APPLICATION="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes ${APPLICATION}DBG"
     else
-        APPLICATION="y60DBG"
+        APPLICATION="${APPLICATION}DBG"
     fi
+elif [ "$DEBUG" == "vc" ]; then
+    echo Visual Studio Debuger Setup
+    echo --------------------------------------------------------------------------------------
+    echo $PRO/bin/y60DBG.exe
+    echo $ARGS
+    echo `cmd /C cd`
+    echo --------------------------------------------------------------------------------------
+    exit 0
 elif [ "$DEBUG" == "1" ] ; then
-    APPLICATION="y60DBG"
+    APPLICATION="${APPLICATION}DBG"
 fi
 
 #
@@ -35,26 +46,15 @@ if uname -r | grep -q "^2.6" ; then
     echo "setting LD_ASSUME_KERNEL=2.4.99"
 fi
 
-SCRIPT=$PRO/src/Y60/js/sv.js
-
+SCRIPT="$PRO/src/Y60/js/sv.js"
 BASENAME="${MODELNAME%.*}"
 if [ -e ${BASENAME}.js ]; then
     SCRIPT=${BASENAME}.js
 fi
 
-ARGS="-I $PRO/src/Y60/js;$PRO/lib $SCRIPT $MODELNAME $SHADERLIB $*"
-
-if [ "$DEBUG" = "vc" ]; then
-    echo Visual Studio Debuger Setup
-    echo --------------------------------------------------------------------------------------
-    echo $PRO/bin/y60DBG.exe
-    echo $ARGS
-    echo `cmd /C cd`
-    echo --------------------------------------------------------------------------------------
-    exit 0
-fi
-
+ARGS="-I $PRO/lib;$PRO/src/Y60/js;$PRO/src/Y60/shader $SCRIPT $MODELNAME $SHADERLIB $*"
 COMMAND="$APPLICATION $ARGS"
+
 echo $COMMAND
 $COMMAND
 exit $?

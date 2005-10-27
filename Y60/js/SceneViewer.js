@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: SceneViewer.js,v $
-//   $Author: valentin $
-//   $Revision: 1.231 $
-//   $Date: 2005/04/25 14:59:10 $
-//
-//
-//=============================================================================
 
 // use this idiom in each level of inheritance and
 // you'll know if you are the outermost .js file.
@@ -340,6 +332,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             }
         }
     }
+
     self.BaseViewer.onMouseMotion = self.onMouseMotion;
     self.onMouseMotion = function(theX, theY) {
         self.BaseViewer.onMouseMotion(theX, theY);
@@ -371,7 +364,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
+    self.BaseViewer.onExit = self.onExit;
     self.onExit = function() {
+        self.BaseViewer.onExit();
     }
 
     // Must be called before setup

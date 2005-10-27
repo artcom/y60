@@ -36,16 +36,19 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.getReleaseMode = function() {
         return _myReleaseMode;
     }
+    self.getProfileMode = function() {
+        return _myProfileMode;
+    }
+
     self.getShaderLibrary = function() {
         return _myShaderLibrary;
     }
 
-    self.getModelName = function() {
-        return _myModelName;
-    }
-
     self.setModelName = function(theModelName) {
         _myModelName = theModelName;
+    }
+    self.getModelName = function() {
+        return _myModelName;
     }
 
     // Use these functions for fast access to the scene graph
@@ -87,7 +90,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _myRenderWindow = theRenderWindow;
         // register our event listener
         _myRenderWindow.eventListener = self;
-        self._myPicking = new Picking(_myRenderWindow);
+        _myPicking = new Picking(_myRenderWindow);
     }
 
     self.setupWindow = function(theRenderWindow, theSetDefaultRenderingCap) {
@@ -111,7 +114,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
            throw new Exception("Could not load model", fileline());
        }
        if (!theScene) {
-           Logger.debug("setScene(null)");
            self.prepareScene(null, null);
        } else {
            var myCanvas = theCanvas ? theCanvas : getDescendantByTagName(theScene.dom, 'canvas', true);
@@ -288,6 +290,16 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    self.onExit = function() {
+        if (_myProfileMode) {
+            Logger.warning("Profiling: model='" + self.getModelName() + " FPS.max=" + _myProfileMaxFPS);
+            var myProfileInfo = "<profile model='" + self.getModelName() + "' date='" + Date() + "'>\n";
+            myProfileInfo += "<fps max='" + _myProfileMaxFPS + "'/>\n";
+            myProfileInfo += "</profile>\n";
+            putWholeFile(_myProfileFilename, myProfileInfo);
+        }
+    }
+
     self.onPreRender = function() {
     }
 
@@ -322,12 +334,23 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.onFrame = function(theTime) {
-        _myHeartbeatThrober.throb(theTime);
+        if (_myProfileMode) {
+            if (_myRenderWindow.frameRate > _myProfileMaxFPS) {
+                _myProfileMaxFPS = _myRenderWindow.frameRate;
+                _myProfileTime = theTime;
+            } else if ((theTime - _myProfileTime) > PROFILE_TIME) {
+                // MaxFPS unchanged for PROFILE_TIME, done
+                exit(0);
+            }
+        }
+        if (_myHeartbeatThrober != null) {
+            _myHeartbeatThrober.throb(theTime);
+        }
         _myLightManager.onFrame(theTime);
     }
 
     self.onMouseMotion = function(theX, theY) {
-        var myViewportUnderMouse = self._myPicking.getViewportAt(theX, theY);
+        var myViewportUnderMouse = _myPicking.getViewportAt(theX, theY);
         if (myViewportUnderMouse && myViewportUnderMouse != _myClickedViewport && self.getMover(myViewportUnderMouse)) {
             self.getMover(myViewportUnderMouse).onMouseMotion(theX, theY);
         }
@@ -335,14 +358,15 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             self.getMover(_myClickedViewport).onMouseMotion(theX, theY);
         }
     }
+
     self.onMouseButton = function(theButton, theState, theX, theY) {
         var myMover = null;
         if (theState) {
-            var myViewport = self._myPicking.getViewportAt(theX, theY);
+            var myViewport = _myPicking.getViewportAt(theX, theY);
             myMover = self.getMover(myViewport);
             _myClickedViewport = myViewport;
         } else {
-            var myViewportUnderMouse = self._myPicking.getViewportAt(theX, theY);
+            var myViewportUnderMouse = _myPicking.getViewportAt(theX, theY);
             if (myViewportUnderMouse) {
                 if (_myClickedViewport) {
                     if (myViewportUnderMouse.id != _myClickedViewport.id) {
@@ -367,6 +391,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.enableHeartbeat = function(theFrequency, theHeartbeatfile) {
+        if (_myHeartbeatThrober == null) {
+            _myHeartbeatThrober = new HeartbeatThrober(false, 10, "${TEMP}/heartbeat.xml");
+        }
         _myHeartbeatThrober.use(true, theFrequency, theHeartbeatfile);
     }
 
@@ -382,6 +409,13 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myShaderLibrary         = null;
     var _myReleaseMode           = true;
     var _myLightManager          = null;
+
+    const PROFILE_FILENAME = "profile.xml"; 
+    const PROFILE_TIME     = 5.0; // fps must not rise for this time
+    var _myProfileMode     = false;
+    var _myProfileFilename = null;
+    var _myProfileMaxFPS   = 0.0;
+    var _myProfileTime     = 0.0; // time of sample MaxFPS sample
 
     // Camera movers
     var _myMoverFactories        = [];  // Array of mover constructors
@@ -401,8 +435,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myImages                = null;
 
     var _mySkyboxMaterial        = null;
-    var _myHeartbeatThrober      = new HeartbeatThrober(false, 10, "${TEMP}/heartbeat.xml");
-    self._myPicking               = null;
+    var _myHeartbeatThrober      = null;
+    var _myPicking               = null;
 
     function getSingleViewport() {
         if (_myRenderWindow.canvas.childNodesLength("viewport") == 1) {
@@ -424,16 +458,13 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         var myArgumentMap = [];
         for (var i = 0; i < theArguments.length; ++i) {
             var myArgument = theArguments[i];
-            if (!_myShaderLibrary && myArgument.search(/xml/) != -1) {
+            if (!_myShaderLibrary && myArgument.search(/shaderlib.*\.xml$/) != -1) {
                 // Take the first xml-file as shader library
                 _myShaderLibrary = myArgument;
             } else if (myArgument.search(/\.[xb]60$/) != -1 ||
                        myArgument.search(/\.st.$/) != -1 ||
-                       myArgument.search(/\.x3d$/) != -1)
-            {
+                       myArgument.search(/\.x3d$/) != -1) {
                 _myModelName = myArgument;
-            } else if (myArgument == "rehearsal") {
-                _myReleaseMode = false;
             }
 
             myArgument = myArgument.split("=");
@@ -443,29 +474,34 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 myArgumentMap[myArgument[0]] = null;
             }
         }
-/*
-        if (!_myShaderLibrary) {
-            throw new Exception("Missing shaderlibrary argument", fileline());
+
+        if ("rehearsal" in myArgumentMap) {
+            _myReleaseMode = false;
         }
-*/
+        if ("profile" in myArgumentMap) {
+            _myProfileMode = true;
+            _myProfileFilename = myArgumentMap["profile"];
+            if (_myProfileFilename == null) {
+                _myProfileFilename = PROFILE_FILENAME;
+            }
+            Logger.warning("Profiling enabled, filename=" + _myProfileFilename);
+        }
+
         return myArgumentMap;
     }
 
    self.prepareScene = function (theScene, theCanvas) {
-        if (!theScene) {
-            Logger.debug("No Scene found.");
-        }
 
         if (theScene) {
             // Cache main scene nodes for fast access
             var myWorlds    = getDescendantByTagName(theScene.dom, "worlds", false);
-            _myWorld        = getDescendantByTagName(myWorlds,     "world", false);
-            _myMaterials    = getDescendantByTagName(theScene.dom, "materials", false);
-            _myLightSources = getDescendantByTagName(theScene.dom, "lightsources", false);
-            _myAnimations   = getDescendantByTagName(theScene.dom, "animations", false);
-            _myCharacters   = getDescendantByTagName(theScene.dom, "characters", false);
-            _myShapes       = getDescendantByTagName(theScene.dom, "shapes", false);
-            _myImages       = getDescendantByTagName(theScene.dom, "images", false);
+            _myWorld        = theScene.world; //getDescendantByTagName(myWorlds,     "world", false);
+            _myMaterials    = theScene.materials; //getDescendantByTagName(theScene.dom, "materials", false);
+            _myLightSources = theScene.lightsources; //getDescendantByTagName(theScene.dom, "lightsources", false);
+            _myAnimations   = theScene.animations; //getDescendantByTagName(theScene.dom, "animations", false);
+            _myCharacters   = theScene.characters; //getDescendantByTagName(theScene.dom, "characters", false);
+            _myShapes       = theScene.shapes; //getDescendantByTagName(theScene.dom, "shapes", false);
+            _myImages       = theScene.images; //getDescendantByTagName(theScene.dom, "images", false);
 
             if (!_myWorld || !_myMaterials || !_myLightSources || !_myCharacters || !_myAnimations || !_myShapes) {
                 throw new Exception("Could not find world, materials, lightsources or shapes node", fileline());

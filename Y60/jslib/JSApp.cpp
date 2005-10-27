@@ -201,7 +201,6 @@ JSApp::ShellErrorReporter(JSContext *cx, const char * message, JSErrorReport * r
     }
 */
 
-
     if (!JSREPORT_IS_WARNING(report->flags)) {
         ourExitCode = EXITCODE_RUNTIME_ERROR;
 
@@ -1386,13 +1385,6 @@ JSApp::Process(JSContext *cx, JSObject *obj, const char *filename) {
         JS_DestroyScript(cx, script);
     }
     DoEndRequest(cx);
-}
-
-static int
-usage(void) {
-    AC_PRINT << JS_GetImplementationVersion() << endl;
-    AC_PRINT << "usage: acxpshell [--jsversion VERSION] [--no-jswarnings] scriptfile" << endl;
-    return 2;
 }
 
 void
