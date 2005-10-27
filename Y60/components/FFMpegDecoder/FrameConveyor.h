@@ -52,8 +52,7 @@ namespace y60 {
             FrameConveyor();
             ~FrameConveyor();
 
-            /// Sets up video and audio for decoding
-            void load(asl::Ptr<DecoderContext> theContext, asl::HWSampleSinkPtr theAudioSink); 
+            void setContext(asl::Ptr<DecoderContext> theContext); 
 
             /// Copies the frame with theTimestamp from the cache into theTargetRaster
             double getFrame(double theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
@@ -63,7 +62,18 @@ namespace y60 {
 
             double getEndOfFileTimestamp() const;
 
-            void initResample(int theNumInputChannels, int theInputSampleRate);
+
+            void setupAudio(bool theUseAudioFlag);
+            void playAudio();
+            void stopAudio();
+            void pauseAudio();
+            void setVolume(double theVolume);
+            bool hasAudio() const {
+                return _myAudioSink != 0;
+            }
+            double getAudioTime() const {
+                return _myAudioSink ? double(_myAudioSink->getCurrentTime()) : 0;
+            }
 
         private:
             /// Clears the frame and audio cache
@@ -92,6 +102,9 @@ namespace y60 {
 
             /// Visualizes the current fill level of the video cache
             void printCacheInfo(double theTargetStart, double theTargetEnd);
+
+            /// Resample Audio acording to theInputSampleRate vs. Pump::getNativeSampleRate
+            void initResample(int theNumInputChannels, int theInputSampleRate);
 
             asl::Ptr<DecoderContext>    _myContext;
             AVFrame *                   _myVideoFrame;

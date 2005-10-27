@@ -64,9 +64,8 @@ namespace y60 {
     }
     
     void 
-    FrameConveyor::load(DecoderContextPtr theContext, asl::HWSampleSinkPtr theAudioSink) {
+    FrameConveyor::setContext(DecoderContextPtr theContext) {
         _myContext = theContext;
-        _myAudioSink = theAudioSink;
     }
 
     void 
@@ -84,22 +83,21 @@ namespace y60 {
 
             DB(cerr << "Fill audio/video-cache..." << endl;)
             
-            while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE /*&&
-                  double(_myAudioSink->getBufferedTime()) < PRELOAD_CACHE_TIME*/) 
+            while(_myFrameCache.size() < MAX_FRAME_CACHE_SIZE) 
             {
                 updateCache(theInitialTimestamp);
                 _myCacheSizeInSecs += (1 / _myContext->getFrameRate());
-                DB(cerr << "  A/V-Buffersize: " << _myAudioSink->getBufferedTime() << "secs "
-                        << "/" << _myFrameCache.size() << endl;)
-            }            
-
-            if (_myFrameCache.size() > MAX_FRAME_CACHE_SIZE) {
-                cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE <<
+                DB(cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;)
+            } 
+            if (_myAudioSink) {
+                if (_myFrameCache.size() > MAX_FRAME_CACHE_SIZE) {
+                    cerr << "   until frame cache size bigger than " << MAX_FRAME_CACHE_SIZE <<
                         " frames " << endl;
-            } else if (double(_myAudioSink->getBufferedTime()) >= PRELOAD_CACHE_TIME)
-            {
-                cerr << "   until audio cache size larger than " << PRELOAD_CACHE_TIME << 
+                } else if (double(_myAudioSink->getBufferedTime()) >= PRELOAD_CACHE_TIME)
+                {
+                    cerr << "   until audio cache size larger than " << PRELOAD_CACHE_TIME << 
                         " sec." << endl;
+                }
             }
         } else {
             DB(cerr << "Fill video-cache..." << endl;)
@@ -225,12 +223,15 @@ namespace y60 {
         DB2(cerr << "fillCache [" << theStartTime << " to " << theEndTime << "]" << endl;)
         DB2(cerr << " last decoded " << myLastDecodedTime << endl;)
         if (fabs(theStartTime - myLastDecodedTime) >= myTimePerFrame * 1.5) {
+            AC_WARNING << " Seek: " << fabs(theStartTime - myLastDecodedTime);
             _myContext->seekToTime(theStartTime);
             if (_myAudioSink && _myAudioSink->getState() != HWSampleSink::STOPPED) {
-                DB(cerr << "Seek: " << fabs(theStartTime - myLastDecodedTime) << endl;)
                 //dk + uz : seeking in movie w/ audio -> turn off audio
-                _myAudioSink = HWSampleSinkPtr(0); 
-                //_myAudioSink->stop();
+                if (_myAudioSink) {
+                    AC_WARNING << "Turning off audio due to seek.";
+                    _myAudioSink->stop();
+                    _myAudioSink = HWSampleSinkPtr(0);
+                }
             }
         }
 
@@ -413,7 +414,60 @@ namespace y60 {
     FrameConveyor::getEndOfFileTimestamp() const {
         return _myContext->getEndOfFileTimestamp();
     }
-     
+    
+    void FrameConveyor::setupAudio(bool theUseAudioFlag) {
+        AVStream * myAudioStream = _myContext->getAudioStream();
+        if (myAudioStream && theUseAudioFlag) {
+            AVCodec * myCodec = avcodec_find_decoder(myAudioStream->codec.codec_id);
+            if (!myCodec) {
+                AC_WARNING << "Unable to find audio decoder: " << _myContext->getFilename();
+                 _myAudioSink = HWSampleSinkPtr(0);
+                 return;
+            }
+            if (avcodec_open(&myAudioStream->codec, myCodec) < 0 ) {
+                AC_WARNING << "Unable to find audio decoder: " << _myContext->getFilename();
+                _myAudioSink = HWSampleSinkPtr(0);
+                return;
+            }
+
+            Pump & myAudioPump = Pump::get();
+//            if (!myAudioController.isRunning()) {
+//                myAudioController.init(asl::maximum
+//                      ((unsigned)myAudioStream->codec.sample_rate, (unsigned) 44100));
+//            }
+
+            _myAudioSink = myAudioPump.createSampleSink(_myContext->getFilename());
+            //_myAudioSink->setVolume(getMovie()->get<VolumeTag>());
+            AC_INFO << "Audio: channels=" << myAudioStream->codec.channels << ", samplerate=" 
+                    << myAudioStream->codec.sample_rate;
+            initResample(myAudioStream->codec.channels, myAudioStream->codec.sample_rate);
+        } else {
+            _myAudioSink = HWSampleSinkPtr(0);
+        }
+        
+    }
+    
+    void FrameConveyor::playAudio() {
+        if (_myAudioSink) {            
+            _myAudioSink->play();
+        }        
+    }
+    void FrameConveyor::stopAudio() {
+        if (_myAudioSink) {            
+            _myAudioSink->stop();
+        }        
+    }
+    void FrameConveyor::pauseAudio() {
+        if (_myAudioSink) {            
+            _myAudioSink->pause();
+        }        
+    }
+    void FrameConveyor::setVolume(double theVolume) {
+        if (_myAudioSink) {
+            _myAudioSink->setVolume(theVolume);
+        }
+    }
+            
     void FrameConveyor::initResample(int theNumInputChannels, int theInputSampleRate) {
         // TODO: Convert num. of channels here?
         if (theInputSampleRate != Pump::get().getNativeSampleRate()) {

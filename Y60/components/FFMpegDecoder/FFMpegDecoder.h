@@ -23,7 +23,6 @@
 #include "FrameConveyor.h"
 #include <y60/MovieDecoderBase.h>
 #include <asl/PlugInBase.h>
-#include <asl/HWSampleSink.h>
 #include <string>
 
 namespace y60 {
@@ -68,10 +67,8 @@ namespace y60 {
                     dom::ResizeableRasterPtr theTargetRaster);
         private:
             void setupMovie(asl::Ptr<DecoderContext> theContext);
-            void setupAudio(asl::Ptr<DecoderContext> theContext);
 
             FrameConveyor               _myFrameConveyor;
-            asl::HWSampleSinkPtr        _myAudioSink;
 
     };
 
