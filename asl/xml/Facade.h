@@ -125,12 +125,12 @@ namespace dom {
     template <class TAG> \
     const asl::Ptr< typename TAG::CHILDFACADE, dom::ThreadingModel> getChild() const{ \
         TAG::Plug::ensureDependencies(); \
-		return TAG::Plug::getChildNode(getNode())->getFacade<typename TAG::CHILDFACADE>(); \
+		return TAG::Plug::getChildNode(getNode())->dom::Node::getFacade<typename TAG::CHILDFACADE>(); \
     } \
     template <class TAG> \
     asl::Ptr< typename TAG::CHILDFACADE, dom::ThreadingModel> getChild() { \
         TAG::Plug::ensureDependencies(); \
-		return TAG::Plug::getChildNode(getNode())->getFacade<typename TAG::CHILDFACADE>(); \
+		return TAG::Plug::getChildNode(getNode())->dom::Node::getFacade<typename TAG::CHILDFACADE>(); \
     }
 
 #define IMPLEMENT_DYNAMIC_FACADE(CLASS) \
