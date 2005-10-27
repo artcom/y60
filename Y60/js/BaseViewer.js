@@ -415,7 +415,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myProfileMode     = false;
     var _myProfileFilename = null;
     var _myProfileMaxFPS   = 0.0;
-    var _myProfileTime     = 0.0; // time of sample MaxFPS sample
+    var _myProfileTime     = 0.0; // time of MaxFPS sample
 
     // Camera movers
     var _myMoverFactories        = [];  // Array of mover constructors
