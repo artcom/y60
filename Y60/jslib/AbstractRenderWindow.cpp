@@ -342,9 +342,9 @@ namespace jslib {
                         if (JSA_hasFunction(_myJSContext, myTimeout->getJSObject(), 
                                     myTimeoutCommand.c_str()))
                         {
-                            jsval argv[0], rval;
+                            jsval rval;
                             jslib::JSA_CallFunctionName(_myJSContext, myTimeout->getJSObject(), 
-                                    myTimeoutCommand.c_str(), 0, argv, &rval);
+                                    myTimeoutCommand.c_str(), 0, 0, &rval);
                         } else {
                             AC_ERROR << "Timeout: Function " << myTimeoutCommand 
                                     << " does not exist." << endl;
