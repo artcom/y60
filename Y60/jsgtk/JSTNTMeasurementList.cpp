@@ -269,7 +269,8 @@ enum ColumnProps {
     PROP_COL_NAME,
     PROP_COL_VALUE,
     PROP_COL_IS_EDITABLE,
-    PROP_COL_XML_ID
+    PROP_COL_XML_ID,
+    PROP_COL_TYPE
 };
 
 #define DEFINE_COL_PROP(theName) \
@@ -284,6 +285,7 @@ JSTNTMeasurementList::ConstIntProperties() {
         DEFINE_COL_PROP(VALUE),
         DEFINE_COL_PROP(IS_EDITABLE),
         DEFINE_COL_PROP(XML_ID),
+        DEFINE_COL_PROP(TYPE),
         {0}
     };
     return myProperties;

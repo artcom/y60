@@ -29,6 +29,7 @@ TNTMeasurementList::TNTMeasurementList( const std::string & theVisibleIcon,
 {
     _myListModel = Gtk::ListStore::create(_myColumns);
     set_model(_myListModel);
+    set_headers_clickable(true);
 
     //createDummyRows();
 
@@ -48,18 +49,24 @@ TNTMeasurementList::TNTMeasurementList( const std::string & theVisibleIcon,
     _myVisibilityHeaderIcon.show();
     append_column( * myColumn);
 
-    //=== type / name ===================================
-    myColumn = Gtk::manage( new Gtk::TreeView::Column("Name") );
-    myColumn->set_spacing(3);
-    myColumn->pack_start(_myColumns.type_icon, false);
-    myColumn->pack_start(_myColumns.name);
-    myColumn->set_expand(true);
-    append_column( * myColumn);
+    //=== type ===================================
+    _myTypeColumn = Gtk::manage( new Gtk::TreeView::Column("T") );
+    _myTypeColumn->pack_start(_myColumns.type_icon);
+    _myTypeColumn->set_clickable(true);
+    _myTypeColumn->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+    _myTypeColumn->set_fixed_width(33);
+    _myTypeColumn->signal_clicked().connect( sigc::mem_fun( *this, & TNTMeasurementList::onSortByType ));
+    append_column( * _myTypeColumn);
+
+    //=== name ===================================
+    int myColCount = append_column_editable("Name", _myColumns.name);
+    _myNameColumn = get_column( myColCount - 1);
+    _myNameColumn->set_expand(true);
+    _myNameColumn->set_clickable(true);
+    _myNameColumn->signal_clicked().connect( sigc::mem_fun( *this, & TNTMeasurementList::onSortByName ));
 
     //=== value ===================================
-    myColumn = Gtk::manage( new Gtk::TreeView::Column("Value") );
-    myColumn->pack_start(_myColumns.value);
-    append_column( * myColumn);
+    append_column( "Value", _myColumns.value);
 
     //=== editability ===================================
     myCellRenderer = Gtk::manage( new acgtk::CellRendererPixbufToggle);
@@ -76,6 +83,9 @@ TNTMeasurementList::TNTMeasurementList( const std::string & theVisibleIcon,
     myColumn->set_widget( _myEditableHeaderIcon );
     _myEditableHeaderIcon.show();
     append_column( * myColumn);
+
+    // setup default sorting
+    onSortByName();
 }
 
 TNTMeasurementList::~TNTMeasurementList() {
@@ -103,6 +113,7 @@ TNTMeasurementList::append(dom::NodePtr theMeasurementNode, const Glib::ustring 
     
     myRow[_myColumns.is_visible] = theMeasurementNode->getAttribute("visible")->nodeValueRef<bool>();
     myRow[_myColumns.type_icon] = myIt->second;
+    myRow[_myColumns.type] = myType;
     myRow[_myColumns.name] = theMeasurementNode->getAttributeString("name");
     myRow[_myColumns.value] = theDisplayValue;
     myRow[_myColumns.is_editable] = theMeasurementNode->getAttribute("editable")->nodeValueRef<bool>();
@@ -162,4 +173,43 @@ TNTMeasurementList::on_button_press_event(GdkEventButton* event) {
     }
     return return_value;
 }
+
+void
+TNTMeasurementList::onSortByName() {
+    AC_WARNING << "sorting by name";
+    if ( ! _myNameColumn->get_sort_indicator()) {
+        _myTypeColumn->set_sort_indicator(false);
+        _myNameColumn->set_sort_indicator(true);
+        _myNameColumn->set_sort_order(Gtk::SORT_ASCENDING);
+        _myListModel->set_sort_column( _myColumns.name, Gtk::SORT_ASCENDING );
+    } else {
+        if (_myNameColumn->get_sort_order() == Gtk::SORT_ASCENDING) {
+            _myNameColumn->set_sort_order(Gtk::SORT_DESCENDING);
+            _myListModel->set_sort_column( _myColumns.name, Gtk::SORT_DESCENDING );
+        } else {
+            _myNameColumn->set_sort_order(Gtk::SORT_ASCENDING);
+            _myListModel->set_sort_column( _myColumns.name, Gtk::SORT_ASCENDING );
+        }
+    }
+}
+
+void
+TNTMeasurementList::onSortByType() {
+    AC_WARNING << "sorting by type";
+    if ( ! _myTypeColumn->get_sort_indicator()) {
+        _myNameColumn->set_sort_indicator(false);
+        _myTypeColumn->set_sort_indicator(true);
+        _myTypeColumn->set_sort_order(Gtk::SORT_ASCENDING);
+        _myListModel->set_sort_column( _myColumns.type, Gtk::SORT_ASCENDING );
+    } else {
+        if (_myTypeColumn->get_sort_order() == Gtk::SORT_ASCENDING) {
+            _myTypeColumn->set_sort_order(Gtk::SORT_DESCENDING);
+            _myListModel->set_sort_column( _myColumns.type, Gtk::SORT_DESCENDING );
+        } else {
+            _myTypeColumn->set_sort_order(Gtk::SORT_ASCENDING);
+            _myListModel->set_sort_column( _myColumns.type, Gtk::SORT_ASCENDING );
+        }
+    }
+}
+
 } // end of namespace

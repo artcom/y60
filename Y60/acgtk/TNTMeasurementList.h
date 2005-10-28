@@ -50,7 +50,8 @@ class TNTMeasurementList : public Gtk::TreeView {
             COL_NAME,
             COL_VALUE,
             COL_IS_EDITABLE,
-            COL_XML_ID
+            COL_XML_ID,
+            COL_TYPE
         };
             
     private:
@@ -63,6 +64,7 @@ class TNTMeasurementList : public Gtk::TreeView {
                     add(value);
                     add(is_editable);
                     add(xml_id);
+                    add(type);
                 }
                 Gtk::TreeModelColumn<bool>                        is_visible;
                 Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf> >  type_icon;
@@ -70,17 +72,24 @@ class TNTMeasurementList : public Gtk::TreeView {
                 Gtk::TreeModelColumn<Glib::ustring>               value; // is a string because it contains the unit name (like mm)
                 Gtk::TreeModelColumn<bool>                        is_editable;
                 Gtk::TreeModelColumn<Glib::ustring>               xml_id;
+                Gtk::TreeModelColumn<Glib::ustring>               type; // used to sort by type
         };
         typedef std::map<std::string, Glib::RefPtr<Gdk::Pixbuf> > IconMap;
         void onVisibilityToggled(const Glib::ustring & thePathString);
         void onEditableToggled(const Glib::ustring & thePathString);
         void createDummyRows();
         virtual bool on_button_press_event(GdkEventButton *ev); // override
+        void onSortByName();
+        void onSortByType();
 
         Glib::RefPtr<Gtk::ListStore> _myListModel;
         TNTMeasurementModelColumns   _myColumns;
         Gtk::Image                   _myVisibilityHeaderIcon;
         Gtk::Image                   _myEditableHeaderIcon;
+
+        Gtk::TreeViewColumn * _myNameColumn;
+        Gtk::TreeViewColumn * _myTypeColumn;
+
 
         IconMap                      _myTypeIcons;
 

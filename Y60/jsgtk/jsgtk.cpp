@@ -42,6 +42,7 @@
 #include "JSWindow.h"
 #include "JSScrolledWindow.h"
 #include "JSMenuItem.h"
+#include "JSSeparatorMenuItem.h"
 #include "JSCheckMenuItem.h"
 #include "JSEntry.h"
 #include "JSSpinButton.h"
@@ -170,6 +171,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSCheckMenuItem::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSSeparatorMenuItem::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSMenuItem::initClass(cx, theGlobalObject)) {
@@ -427,6 +431,7 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::VBox );
     TRY_DYNAMIC_CAST(Gtk::HButtonBox );
     TRY_DYNAMIC_CAST(Gtk::VButtonBox );
+    TRY_DYNAMIC_CAST(Gtk::SeparatorMenuItem );
     TRY_DYNAMIC_CAST(Gtk::CheckMenuItem );
     TRY_DYNAMIC_CAST(Gtk::MenuItem );
     TRY_DYNAMIC_CAST(Gtk::EventBox );
@@ -510,6 +515,10 @@ template <class TARGET>
 bool
 ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget) {
     if (JSVAL_IS_OBJECT(theValue)) {
+        if (theValue == JSVAL_NULL) {
+            theTarget = 0;
+            return true; 
+        }
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (castFrom<acgtk::RenderArea>(cx, myArgument, theTarget)) {
@@ -551,6 +560,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
             } else if (castFrom<Gtk::HButtonBox>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::VButtonBox>(cx, myArgument, theTarget)) {
+                return true;
+            } else if (castFrom<Gtk::SeparatorMenuItem>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::CheckMenuItem>(cx, myArgument, theTarget)) {
                 return true;
@@ -686,6 +697,7 @@ CONVERT_FROM_GLIB_OBJECT(Gtk::VBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ButtonBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::HButtonBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::VButtonBox);
+CONVERT_FROM_GLIB_OBJECT(Gtk::SeparatorMenuItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::CheckMenuItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::MenuItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::SpinButton);
