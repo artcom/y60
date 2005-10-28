@@ -59,6 +59,7 @@ JSEntry::Properties() {
         {"width_chars", PROP_width_chars,     JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"text", PROP_text,     JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"signal_changed",  PROP_signal_changed,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"signal_activate", PROP_signal_activate,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"signal_editing_done",  PROP_signal_editing_done,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
@@ -105,6 +106,13 @@ JSEntry::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             {
                 JSSignalProxy0<void>::OWNERPTR mySignal( new
                         JSSignalProxy0<void>::NATIVE(theNative.signal_changed()));
+                *vp = jslib::as_jsval(cx, mySignal);
+                return JS_TRUE;
+            }
+        case PROP_signal_activate:
+            {
+                JSSignalProxy0<void>::OWNERPTR mySignal( new
+                        JSSignalProxy0<void>::NATIVE(theNative.signal_activate()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }

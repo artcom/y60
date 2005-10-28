@@ -282,7 +282,8 @@ namespace y60 {
                             break;
                         case PERSPECTIVE_PROJECTION:
                         default:
-                            throw ShaderException(string("Invalid texgenmode '") + myTexCoordFeature[myTexUnit] + "' in material " + get<NameTag>(), PLUS_FILE_LINE);
+                            throw ShaderException(string("Invalid texgenmode '") + myTexCoordFeature[myTexUnit] + 
+                                    "' in material " + get<NameTag>(), PLUS_FILE_LINE);
                     }
 
                     // fetch texgen params

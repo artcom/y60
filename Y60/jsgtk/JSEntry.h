@@ -50,6 +50,7 @@ class JSEntry : public JSWrapper<Gtk::Entry, asl::Ptr<Gtk::Entry>, StaticAccessP
             PROP_width_chars,
             PROP_text,
             PROP_signal_changed,
+            PROP_signal_activate,
             PROP_signal_editing_done,
             PROP_END
         };
