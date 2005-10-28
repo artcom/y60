@@ -2947,6 +2947,7 @@ dom::Node::dispatchEvent(EventPtr evt) {
 void
 dom::Node::callListeners(EventListenerMap & theListeners, EventPtr evt) {
     evt->currentTarget(self().lock());
+    DOMString type = evt->type();
     EventListenerMap::iterator myEventListeners = theListeners.find(evt->type());
     if (myEventListeners != theListeners.end()) {
         for (EventListenerSet::iterator

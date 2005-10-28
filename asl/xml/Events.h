@@ -44,6 +44,7 @@ namespace dom {
                         AT_TARGET                      = 2,
                         BUBBLING_PHASE                 = 3
         };
+        virtual ~Event() {};
 
         virtual const DOMString & type() const = 0;
         virtual EventTargetPtr target() const = 0;
@@ -90,6 +91,7 @@ namespace dom {
     // Introduced in DOM Level 2:
     class EventTarget {
     public:
+        virtual ~EventTarget() {}
         virtual void addEventListener(const DOMString & type, 
                                         EventListenerPtr listener, 
                                         bool useCapture) = 0;
@@ -122,12 +124,14 @@ namespace dom {
     // Introduced in DOM Level 2:
     class EventListener {
     public:
+        virtual ~EventListener() {}
         virtual void handleEvent(EventPtr evt) = 0;
     };
 
     // Introduced in DOM Level 2:
     class DocumentEvent {
     public:
+        virtual ~DocumentEvent() {}
         virtual EventPtr createEvent(const DOMString & eventType) = 0; //raises(DOMException);
         /*
         // Introduced in DOM Level 3:
@@ -154,7 +158,7 @@ namespace dom {
         _myDefaultPrevented(false),
         _myPayload(thePayload)
         {}
-
+        ~GenericEvent() {}
         virtual const DOMString & type() const {
             return _myType;
         }
