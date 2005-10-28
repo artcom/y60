@@ -51,33 +51,33 @@ namespace y60 {
      */
     class WMPPlayer
     {
-    public:
-        WMPPlayer();
-        virtual ~WMPPlayer();
-        void WMPPlayer::setup();
+        public:
+            WMPPlayer();
+            virtual ~WMPPlayer();
+            void WMPPlayer::setup();
 
-        bool load(const std::string & theUrl);
+            bool load(const std::string & theUrl);
 
-        void setCanvasPosition(const asl::Vector2i & thePosition);
-        void setCanvasSize(const asl::Vector2i & theSize);
-        void setVisible(bool theFlag);
-        void setVolume(double theVolume);
-        void setLoopCount(unsigned theLoopCount); //0 == indefinite, 1 or more
+            void setCanvasPosition(const asl::Vector2i & thePosition);
+            void setCanvasSize(const asl::Vector2i & theSize);
+            void setVisible(bool theFlag);
+            void setVolume(double theVolume);
+            void setLoopCount(unsigned theLoopCount); //0 == indefinite, 1 or more
 
-        void play();
-        void stop();
-        void pause();
+            void play(double theStartPosition = DBL_MAX);
+            void stop();
+            void pause();
 
-        asl::Vector2i getSize() const;
-        asl::Vector2i getCanvasPosition() const;
-        asl::Vector2i getCanvasSize() const;
-        double getDuration() const;
-        double getVolume() const;
-        bool isVisible() const;
-        unsigned getLoopCount() const;
-        std::string getPlayState() const;
+            asl::Vector2i getSize() const;
+            asl::Vector2i getCanvasPosition() const;
+            asl::Vector2i getCanvasSize() const;
+            double getDuration() const;
+            double getVolume() const;
+            bool isVisible() const;
+            unsigned getLoopCount() const;
+            std::string getPlayState() const;
 
-    private:
+        private:
         	HRESULT createWMP(HWND theRenderGirlWindow);
         	HRESULT destroyWMP();
             HRESULT setupEventListener();
@@ -93,12 +93,10 @@ namespace y60 {
 			CComPtr<IWMPMedia>          _myWMPMedia;
 			CComPtr<IWMPControls>       _myWMPControl;
 
-
             CComPtr<IConnectionPoint>   _myConnectionPoint;
             DWORD                       _myAdviseCookie;
 
             CComObject<EventListener>*  _myEventListener;
-
 
     };
     typedef asl::Ptr<WMPPlayer> WMPPlayerPtr;

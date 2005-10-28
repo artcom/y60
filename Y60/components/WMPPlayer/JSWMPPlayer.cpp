@@ -51,7 +51,24 @@ setup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 play(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return Method<JSWMPPlayer::NATIVE>::call(&JSWMPPlayer::NATIVE::play,cx,obj,argc,argv,rval);
+    DOC_BEGIN("Starts playback of the movie at a given position" \
+              "If no position is given, it starts at the current position");
+    DOC_PARAM("theStartPosition in Seconds", DOC_TYPE_FLOAT);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0, 1);
+
+        JSWMPPlayer::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+        if (argc == 0) {
+            myNative->play();
+        } else {
+            float myStartPosition;
+            convertFrom(cx, argv[0], myStartPosition);
+            myNative->play(myStartPosition);
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
@@ -137,7 +154,7 @@ JSWMPPlayer::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj
             string myState = getNative().getPlayState();
             *vp = as_jsval(cx, myState);
             return JS_TRUE;
-        }            
+        }
         case PROP_volume:
             *vp = as_jsval(cx, getNative().getVolume());
             return JS_TRUE;

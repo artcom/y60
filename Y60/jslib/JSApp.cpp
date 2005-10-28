@@ -1501,11 +1501,10 @@ JSApp::run(const std::string & theScriptFilename,
     ourTopScriptFilename = theScriptFilename;
     result = processArguments(ourJSContext, glob, ourTopScriptFilename, theIncludePath, theScriptArgs);
 
-    ourLoadedPlugIns.clear();
-
     JS_ClearScope(ourJSContext, glob);
     JS_GC(ourJSContext);
     JS_DestroyContext(ourJSContext);
+    ourLoadedPlugIns.clear();
     return result;
 }
 

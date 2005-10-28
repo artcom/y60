@@ -24,22 +24,24 @@
 
 #include <y60/IScriptablePlugin.h>
 #include <asl/PlugInBase.h>
+#include <asl/ComSingleton.h>
 
 namespace y60 {
 	class WMPPlayerPlugIn :
 		public asl::PlugInBase,
         public jslib::IScriptablePlugin
 	{
-	public:
-		WMPPlayerPlugIn (asl::DLHandle theDLHandle);
-   		void initClasses(JSContext * theContext, JSObject *theGlobalObject);
-        const char * ClassName() {
-            static const char * myClassName = "WMPPlayerPlugIn";
-            return myClassName;
-        }
+	    public:
+		    WMPPlayerPlugIn (asl::DLHandle theDLHandle);
+            ~WMPPlayerPlugIn();
 
+   		    void initClasses(JSContext * theContext, JSObject *theGlobalObject);
+            
+            const char * ClassName() {
+                static const char * myClassName = "WMPPlayerPlugIn";
+                return myClassName;
+            }
 	};
-
 }
 
 #include <iostream>
@@ -48,9 +50,15 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
-WMPPlayerPlugIn :: WMPPlayerPlugIn(DLHandle theDLHandle) :
+WMPPlayerPlugIn::WMPPlayerPlugIn(DLHandle theDLHandle) :
 			PlugInBase(theDLHandle)
-{}
+{
+    asl::ComSingleton::get().ref();
+}
+
+WMPPlayerPlugIn::~WMPPlayerPlugIn() {
+    asl::ComSingleton::get().unref();
+}
 
 void
 WMPPlayerPlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) {

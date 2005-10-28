@@ -22,7 +22,6 @@
 
 #include <asl/Logger.h>
 #include <asl/os_functions.h>
-#include <asl/ComSingleton.h>
 #include <asl/Time.h>
 
 
@@ -41,24 +40,16 @@ namespace y60 {
 
     HWND getActiveWindow();
 
-
-    /*
-     * WMPPlayer plug-in
-     */
-    WMPPlayer::WMPPlayer()
-    {
-        AC_DEBUG << "WMPPlayer::WMPPlayer " << (void*)this;
-		_myModule.Init( NULL, NULL, &LIBID_ATLLib );
-        asl::ComSingleton::get().ref();
+    WMPPlayer::WMPPlayer() {        
+		_myModule.Init(NULL, NULL, &LIBID_ATLLib);
     }
 
     WMPPlayer::~WMPPlayer() {
     	_myModule.Term();
-        AC_DEBUG << "WMPPlayer::~WMPPlayer " << (void*)this;
-        asl::ComSingleton::get().unref();
     }
 
-    void WMPPlayer::setup() {
+    void 
+    WMPPlayer::setup() {
         _myParentWindow = getActiveWindow();
         HRESULT hr = createWMP(_myParentWindow);
     }
@@ -83,7 +74,7 @@ namespace y60 {
     	    GetMessage(&msg, 0, 0, 0);
     			TranslateMessage(&msg);
     			DispatchMessage(&msg);
-    			
+
     	    myErrorFlag = _myEventListener->gotError();
     	    if (_myEventListener->isLoaded() || myErrorFlag) {
     	        break;
@@ -101,11 +92,12 @@ namespace y60 {
         }
     	hr = _myWMPCore->get_currentMedia(&_myWMPMedia);
         hr = _myWMPControl->stop();
-                        
+
         return hr == S_OK;
     }
-    
-    void WMPPlayer::setLoopCount(unsigned theLoopCount) {
+
+    void 
+    WMPPlayer::setLoopCount(unsigned theLoopCount) {
         HRESULT hr;
 		CComBSTR myMode(_T("loop"));
 		switch (theLoopCount) {
@@ -123,7 +115,8 @@ namespace y60 {
 		}
     }
 
-    unsigned WMPPlayer::getLoopCount() const {
+    unsigned 
+    WMPPlayer::getLoopCount() const {
         HRESULT hr;
 		CComBSTR myMode(_T("loop"));
 		VARIANT_BOOL myValue;
@@ -137,46 +130,53 @@ namespace y60 {
 		}
     }
 
-    void WMPPlayer::setCanvasPosition(const Vector2i &thePosition) {
+    void 
+    WMPPlayer::setCanvasPosition(const Vector2i &thePosition) {
 		RECT myRect;
-        GetClientRect(_myWindow, &myRect);	
+        GetClientRect(_myWindow, &myRect);
         _myWindow.MoveWindow(thePosition[0], thePosition[1], myRect.right, myRect.bottom);
     }
 
-    void WMPPlayer::setCanvasSize(const Vector2i &theSize) {
+    void 
+    WMPPlayer::setCanvasSize(const Vector2i &theSize) {
 		RECT myRect;
 		POINT myPoint;
-        GetWindowRect(_myWindow, &myRect);	
+        GetWindowRect(_myWindow, &myRect);
         myPoint.x = myRect.left;
         myPoint.y = myRect.top;
         ScreenToClient(_myParentWindow, &myPoint);
-        _myWindow.MoveWindow(myPoint.x, myPoint.y, theSize[0], theSize[1]);        	
+        _myWindow.MoveWindow(myPoint.x, myPoint.y, theSize[0], theSize[1]);
     }
 
-    void WMPPlayer::setVisible(bool theFlag) {
+    void 
+    WMPPlayer::setVisible(bool theFlag) {
         ShowWindow(_myWindow.m_hWnd, theFlag ? SW_SHOW:SW_HIDE);
     }
 
-    bool WMPPlayer::isVisible() const {
+    bool 
+    WMPPlayer::isVisible() const {
         return IsWindowVisible(_myWindow.m_hWnd);
     }
 
-    Vector2i WMPPlayer::getCanvasPosition() const {
+    Vector2i 
+    WMPPlayer::getCanvasPosition() const {
 		RECT myRect;
 		POINT myPoint;
-        GetWindowRect(_myWindow, &myRect);	
+        GetWindowRect(_myWindow, &myRect);
         myPoint.x = myRect.left;
         myPoint.y = myRect.top;
         ScreenToClient(_myParentWindow, &myPoint);
         return Vector2i(myPoint.x, myPoint.y);
-    }    
-    Vector2i WMPPlayer::getCanvasSize() const {
+    }
+    Vector2i 
+    WMPPlayer::getCanvasSize() const {
 		RECT myRect;
-        GetClientRect(_myWindow, &myRect);	
+        GetClientRect(_myWindow, &myRect);
         return Vector2i(myRect.right, myRect.bottom);
     }
-            
-    Vector2i WMPPlayer::getSize() const {
+
+    Vector2i 
+    WMPPlayer::getSize() const {
         if ( ! _myWMPMedia) {
             AC_WARNING << "no media available";
             return Vector2i(0,0);
@@ -187,7 +187,8 @@ namespace y60 {
 		return Vector2i(int(myWidth), int(myHeight));
     }
 
-    double WMPPlayer::getDuration() const {
+    double 
+    WMPPlayer::getDuration() const {
         if ( ! _myWMPMedia) {
             AC_WARNING << "no media available";
             return 0;
@@ -197,7 +198,7 @@ namespace y60 {
 		return myDuration;
 	}
 
-    double 
+    double
     WMPPlayer::getVolume() const {
         long myVolume = 0;
         HRESULT hr;
@@ -211,12 +212,15 @@ namespace y60 {
         HRESULT hr;
         hr = _myWMPSettings->put_volume(myVolume);
     }
-    
+
     void
-    WMPPlayer::play() {
-        AC_INFO << "WMPPlayer::startMovie " << (void*)this;
+    WMPPlayer::play(double theStartPosition) {
+        AC_INFO << "WMPPlayer::startMovie at position" << theStartPosition;
         setVisible(true);
-        _myWMPControl->play();        
+        if (theStartPosition != DBL_MAX) {
+            _myWMPControl->put_currentPosition(theStartPosition);
+        }
+        _myWMPControl->play();
     }
 
     void
@@ -228,14 +232,14 @@ namespace y60 {
     void
     WMPPlayer::pause() {
         AC_INFO << "WMPPlayer::pauseMovie";
-        _myWMPControl->pause();        
+        _myWMPControl->pause();
     }
 
     string
     WMPPlayer::getPlayState() const {
         AC_INFO << "WMPPlayer::getPlayState";
         WMPPlayState myState;
-        HRESULT hr = _myWMPCore->get_playState(&myState);        
+        HRESULT hr = _myWMPCore->get_playState(&myState);
         switch (myState) {
             case wmppsStopped:
                 return "stopped";
@@ -247,15 +251,15 @@ namespace y60 {
                 return "unknown";
         }
     }
-  
+
 	HRESULT
 	WMPPlayer::destroyWMP() {
 		_myWMPCore->close();
 		_myWMPPlayer.Release();
 		_myWindow.DestroyWindow();
 		return S_OK;
-	}    
-	
+	}
+
 	HRESULT
 	WMPPlayer::createWMP(HWND theParent) {
         AtlAxWinInit();
@@ -263,15 +267,15 @@ namespace y60 {
 		HRESULT                             hr;
 		RECT                                myRect;
 
-        GetClientRect(theParent, &myRect);	
+        GetClientRect(theParent, &myRect);
 
-		_myWindow.Create(theParent, myRect, NULL, 
+		_myWindow.Create(theParent, myRect, NULL,
 			             WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN);
-			             
+
 		if (NULL == _myWindow.m_hWnd) {
 			return E_POINTER;
 		}
-		
+
 		// query interfaces
 		JIF(_myWindow.QueryHost(&spHost));
 		JIF(spHost->CreateControl(CComBSTR(_T("{6BF52A52-394A-11d3-B153-00C04F79FAA6}")), _myWindow, 0));
@@ -284,13 +288,13 @@ namespace y60 {
 		// settings
         JIF(_myWMPPlayer->put_uiMode(CComBSTR(_T("none"))));
         JIF(_myWMPPlayer2->put_stretchToFit(VARIANT_TRUE));
-        
+
 		JIF(_myWMPSettings->put_autoStart(VARIANT_TRUE)); // we really need it, do not ever set this to false
-		
+
         JIF(setupEventListener());
         return S_OK;
-	 }    
-	
+	 }
+
      HRESULT
      WMPPlayer::setupEventListener() {
         HRESULT hr;
@@ -298,15 +302,14 @@ namespace y60 {
         CComPtr<IConnectionPointContainer>  myConnectionContainer;
 
        // start listening to events
-    
+
         JIF(CComEventListener::CreateInstance(&_myEventListener));
         myWMPEventListener = _myEventListener;
-    
+
         JIF(_myWMPPlayer->QueryInterface(&myConnectionContainer));
-    
+
         // See if OCX supports the IWMPEvents interface
-        
-        JIF(myConnectionContainer->FindConnectionPoint(__uuidof(IWMPEvents), &_myConnectionPoint));    
+        JIF(myConnectionContainer->FindConnectionPoint(__uuidof(IWMPEvents), &_myConnectionPoint));
         JIF(_myConnectionPoint->Advise(myWMPEventListener, &_myAdviseCookie));
 
         _myEventListener->init();
@@ -319,8 +322,8 @@ namespace y60 {
 
         GUITHREADINFO myGuiThreadInfo;
         myGuiThreadInfo.cbSize = sizeof(GUITHREADINFO);
-        GetGUIThreadInfo(myProcessInfo.dwThreadId, &myGuiThreadInfo);                        
-        
+        GetGUIThreadInfo(myProcessInfo.dwThreadId, &myGuiThreadInfo);
+
         HWND myActiveWindow = myGuiThreadInfo.hwndActive;
         if (myActiveWindow == NULL) {
             throw asl::Exception("### ERROR: Could not get an active window", PLUS_FILE_LINE);

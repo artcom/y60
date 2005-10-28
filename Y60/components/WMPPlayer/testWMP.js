@@ -22,14 +22,14 @@
 plug("y60WMPPlayer");
 
 var window = new RenderWindow();
-window.decorations = false;
+//window.decorations = false;
 window.position = new Vector2i(10, 10);
 window.setScene(new Scene(null));
 
 var ourWMPPlayer = new WMPPlayer();
 ourWMPPlayer.setup();
 ourWMPPlayer.load(arguments[0]);
-ourWMPPlayer.play();
+ourWMPPlayer.play(5);
 
 window.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
     if (theState) {
@@ -40,7 +40,11 @@ window.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag,
                 ourWMPPlayer.play();
                 break;
             case "s":
-                print("width: " + ourWMPPlayer.width + " height: " + ourWMPPlayer.height);
+                if (theShiftFlag) {
+                    print("width: " + ourWMPPlayer.width + " height: " + ourWMPPlayer.height);
+                } else {
+                    ourWMPPlayer.stop();
+                }
                 break;
             case "p":
                 if (ourWMPPlayer.state == "playing") {
@@ -52,9 +56,16 @@ window.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag,
                 }
                 break
             case "v":
-                ourWMPPlayer.volume = theShiftFlag ? ourWMPPlayer.volume - 0.1 : ourWMPPlayer.volume + 0.1;
-                print("volume " + ourWMPPlayer.volume);
+                ourWMPPlayer.volume = theShiftFlag ? ourWMPPlayer.volume + 0.1 : ourWMPPlayer.volume - 0.1;
+                print("volume " + ourWMPPlayer.volume.toFixed(1));
                 break;
+            case "h":
+                print("WMPlayer help:");
+                print("  p   - play/pause");
+                print("  s   - stop");
+                print("  V   - increase volume");
+                print("  v   - decrease volume");
+                print("  S   - print player size");
         }
     }
 }
