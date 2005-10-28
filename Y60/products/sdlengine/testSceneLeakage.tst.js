@@ -48,7 +48,7 @@ window.onFrame = function(theTime) {
         ourInitialMemory = getProcessMemoryUsage();
     }
 
-    if (theTime > 5 || ourExitFlag) {
+    if (theTime > 1 || ourExitFlag) {
         var myMemory = getProcessMemoryUsage();
         removeObjects();
         print("Objects created: " + ourCounter);
