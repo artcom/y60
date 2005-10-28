@@ -122,8 +122,8 @@ struct JSEventListener : public dom::EventListener {
         asl::Ptr<GenericJSEvent, dom::ThreadingModel> myGenericEvent = dynamic_cast_Ptr<GenericJSEvent>(theEvent);
         if (myGenericEvent) {
             jsval argv[1], rval;
-            argv[0] = myGenericEvent->getPayload();
-            JSBool ok = JSA_CallFunctionName(_myJSContext, _myEventListener, _myMethodName.c_str(), 0, argv, &rval);
+            argv[0] = as_jsval(_myJSContext, theEvent);
+            JSBool ok = JSA_CallFunctionName(_myJSContext, _myEventListener, _myMethodName.c_str(), 1, argv, &rval);
         } else {
             AC_ERROR << "JSEventListener::handleEvent: not a js listener" << std::endl;
         }

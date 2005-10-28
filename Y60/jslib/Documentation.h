@@ -87,6 +87,7 @@ namespace jslib {
         DOC_TYPE_FRUSTUM,
         DOC_TYPE_NODE,
         DOC_TYPE_NODELIST,
+        DOC_TYPE_REQUEST,
         DOC_TYPE_OBJECT
     };
 
@@ -95,7 +96,7 @@ namespace jslib {
         "String", "Integer", "Float", "Boolean", "Enumeration", "Array",
         "Vector2i", "Vector2f", "Vector3f", "Vector4f", "Point", "Quaternion", "Matrix", "Box",
         "Line", "Ray", "LineSegment", "Plane", "Triangle", "Sphere", "Frustum",
-        "Node", "NodeList", "Object"
+        "Node", "NodeList", "Request", "Object"
     };
 
 

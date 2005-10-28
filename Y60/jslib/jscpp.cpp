@@ -35,6 +35,7 @@
 #include "JSStringMover.h"
 #include "JSRequestWrapper.h"
 #include "JSRequestManager.h"
+#include "JSEvent.h"
 #include "JSRenderer.h"
 #include "JSKeyframe.h"
 #include "JSCoordSpline.h"
@@ -168,6 +169,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     }
     createFunctionDocumentation("MathFunctions", Global::Functions());
 
+    if (!JSEvent::initClass(cx, theGlobalObject)) {
+        return false;
+    }
     if (!JSRequestWrapper::initClass(cx, theGlobalObject)) {
         return false;
     }

@@ -37,31 +37,33 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 get(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Request a HTTP-GET.");
     DOC_END;
-  //  return Method<JSRequestWrapper::NATIVE>::call(&JSRequestWrapper::NATIVE::get,cx,obj,argc,argv,rval);
     return Method<inet::Request>::call(&inet::Request::get,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 post(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Post a string as one block of data.");
+    DOC_PARAM("theString", DOC_TYPE_STRING);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::post,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 postFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Post a file as one block of data.");
+    DOC_PARAM("theFilename", DOC_TYPE_STRING);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::postFile,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 addHttpHeader(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Adds a entry to the HTTP header");
+    DOC_PARAM("theKey", DOC_TYPE_STRING);
+    DOC_PARAM("theValue", DOC_TYPE_STRING);
     DOC_END;
-    //return Method<inet::Request>::callAllConstRef(&inet::Request::addHttpHeader,cx,obj,argc,argv,rval);
     return Method<inet::Request>::call(&inet::Request::addHttpHeader,cx,obj,argc,argv,rval);
 }
 
