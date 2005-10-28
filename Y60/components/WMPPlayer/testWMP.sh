@@ -5,24 +5,15 @@ APP_DIR=`dirname $0`
 PLUGIN_DIR="$PRO/lib"
 
 #
-# shaderlib
-#
-if [ "$USE_CG" == "1" ]; then
-SHADERLIB="$Y60_DIR/shader/shaderlibrary.xml"
-else
-SHADERLIB="$Y60_DIR/shader/shaderlibrary_nocg.xml"
-fi
-
-#
 # debug or release mode
 #
-SHELL="acxpshellOPT"
+SHELL="y60"
 if [ ! -z "$DEBUG" -a "$DEBUG" != "0" ]; then
-    SHELL="acxpshellDBG"
+    SHELL="y60DBG"
 fi
 
 APP="$APP_DIR/testWMP.js"
-CMD="$SHELL -I $Y60_DIR/js;$PLUGIN_DIR $APP $SHADERLIB $*"
+CMD="$SHELL -I $Y60_DIR/js;$PLUGIN_DIR $APP $*"
 
 echo "### $CMD"
 $CMD

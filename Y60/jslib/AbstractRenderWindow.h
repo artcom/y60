@@ -41,17 +41,12 @@ namespace jslib {
     /**
      * @ingroup y60jslib
      * Base class for RenderWindows. RenderWindows are used to render
-     * scenes. 
+     * scenes.
      */
     class AbstractRenderWindow : public y60::IEventSink,
                                  public y60::IFrameBuffer,
                                  public y60::IGLContextManager {
     public:
-        enum StatisticType {
-            TEXT_STATISTIC     = 1,
-            RENDERED_STATISTIC
-        };
-
         ~AbstractRenderWindow();
         /**
          * Sets the weak self pointer of the RenderWindow. Each RenderWindow
@@ -72,12 +67,10 @@ namespace jslib {
         bool AbstractRenderWindow::setScene(const y60::ScenePtr & theScene);
 
         /**
-         * Creates the renderer and opens the renderwindow, if this has not been 
+         * Creates the renderer and opens the renderwindow, if this has not been
          * done by a setScene() call, before.
          */
         virtual void go();
-
-        float getWorldSize(dom::NodePtr theCamera);
 
         JSObject * getEventListener() const;
         void setEventListener(JSObject * theListener);
@@ -98,19 +91,19 @@ namespace jslib {
         bool hasCapAsString(const std::string & theCapStr);
         virtual void setRenderingCaps(unsigned int theRenderingCaps);
         unsigned int getRenderingCaps();
-        bool printStatistics(unsigned int theOnScreenFlag, unsigned int theStatisticFlags);
+        void printStatistics();
         double getFrameRate() const;
- 
+
         // Scene methods
         y60::ImagePtr getImage(const std::string & theFileName);
- 
+
         // TODO: adapt for other 1 and 3 byte pixel formats
         asl::Vector4i getImagePixel(dom::NodePtr theImageNode,
             unsigned long theX, unsigned long theY);
         bool setImagePixel(dom::NodePtr theImageNode, unsigned long theX,
             unsigned long theY, const asl::Vector4i & theColor);
         // Text Manager Methods
-        void renderText(const asl::Vector2f & thePos, const std::string & theString,
+        void renderText(const asl::Vector2f & thePixelPosition, const std::string & theString,
                 const std::string & theFont);
         void setTextColor(const asl::Vector4f & theTextColor, const asl::Vector4f & theBackColor);
         asl::Vector2i renderTextAsImage(dom::NodePtr theImageNode,
@@ -158,13 +151,13 @@ namespace jslib {
 
         void addExtension(y60::IRendererExtensionPtr theExtension);
 
-        /// saves (frame-)buffer to file
-        void saveBuffer(const std::string & theBuffer, const std::string & theFilename);
+        /// saves framebuffer to file
+        void saveBuffer(const std::string & theFilename);
 
-        void setJSContext(JSContext * cx);        
+        void setJSContext(JSContext * cx);
 
         /**
-         * returns the viewport when in single viewport mode.   
+         * returns the viewport when in single viewport mode.
          * @throws an exception if more than one viewport exists in the canvas.
         */
         y60::ViewportPtr getSingleViewport() const;
@@ -180,8 +173,8 @@ namespace jslib {
         const float & getFixedDeltaT() const;
 
         inline std::string getOrientation() {
-            return y60::LANDSCAPE_ORIENTATION; 
-        } 
+            return y60::LANDSCAPE_ORIENTATION;
+        }
 
     protected:
         AbstractRenderWindow(const JSErrorReporter & theErrorReporter);

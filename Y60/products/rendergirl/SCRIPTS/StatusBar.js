@@ -41,7 +41,7 @@ function StatusBar(theGladeStatusBar) {
 
     this.onFrame = function() {
         if (_myStatisticsFlag) {
-            _myLabel.text = window.frameRate.toFixed(0) + " fps";
+            _myLabel.text = window.fps.toFixed(0) + " fps";
         }
 
         if (_myStartTime) {

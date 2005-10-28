@@ -59,7 +59,7 @@ namespace jslib {
         _myErrorReporter(theErrorReporter),
         _myFixedDeltaT(0.0),
         _myElapsedTime(0.0)
-        {            
+        {
         }
 
     void
@@ -73,18 +73,18 @@ namespace jslib {
     }
 
     y60::ScenePtr &
-    AbstractRenderWindow::getCurrentScene() { 
+    AbstractRenderWindow::getCurrentScene() {
         if (!_myScene) {
             // Add an empty default scene.
             // The defaultscene can be overwritten with setScene.
             // It is created without an OpenGL context and therefore the scene data
-            // is not added to the graphics-memory. 
-            // To startup the renderer and copy the scene data into the gl-memory 
+            // is not added to the graphics-memory.
+            // To startup the renderer and copy the scene data into the gl-memory
             // you must call go()
             _myScene = y60::ScenePtr(new y60::Scene());
             _myScene->createStubs(JSApp::getPackageManager());
         }
-        return _myScene; 
+        return _myScene;
     }
 
     const y60::ScenePtr &
@@ -92,7 +92,7 @@ namespace jslib {
         if (!_myScene) {
             AC_WARNING << "AbstractRenderWindow::getCurrentScene(): Scene not set.";
         }
-        return _myScene; 
+        return _myScene;
     }
 
     // TODO: do something with the extensions
@@ -151,7 +151,7 @@ namespace jslib {
     AbstractRenderWindow::go() {
         // If the renderer has not been created by setScene(), yet, because everything
         // was added using the initial default scene, do so now.
-        if (!_myRenderer) {    
+        if (!_myRenderer) {
             y60::ScopedGLContext myGLContext(this);
             initDisplay();
 
@@ -163,14 +163,6 @@ namespace jslib {
         }
     }
 
-    float
-    AbstractRenderWindow::getWorldSize(dom::NodePtr theCamera) {
-        if (_myScene) {
-            return _myScene->getWorldSize(*theCamera);
-        }
-        return 0;
-    }
-
     ViewportPtr
     AbstractRenderWindow::getSingleViewport() const {
         if (_myCanvas->childNodesLength(VIEWPORT_NODE_NAME) != 1) {
@@ -180,7 +172,7 @@ namespace jslib {
         return _myCanvas->childNode(VIEWPORT_NODE_NAME)->getFacade<Viewport>();
     }
 
-    void 
+    void
     AbstractRenderWindow::unsetCanvas() {
         if (_myCanvas) {
             CanvasPtr myCanvas = _myCanvas->getFacade<Canvas>();
@@ -210,7 +202,7 @@ namespace jslib {
     }
 
     void
-    AbstractRenderWindow::saveBuffer(const std::string & theBuffer, const std::string & theFilename) {
+    AbstractRenderWindow::saveBuffer(const std::string & theFilename) {
         BufferToFile myBufferWriter( _myCanvas->getFacade<Canvas>()->getWidth(),
                 _myCanvas->getFacade<Canvas>()->getHeight(), 4);
         myBufferWriter.performAction(FRAME_BUFFER);
@@ -252,7 +244,7 @@ namespace jslib {
     }
 
     long
-    AbstractRenderWindow::setObjectTimeout(JSObject *theObject, const std::string & myCommand, 
+    AbstractRenderWindow::setObjectTimeout(JSObject *theObject, const std::string & myCommand,
             float myMilliseconds)
     {
         return _myTimeoutQueue.addTimeout(theObject, myCommand, _myElapsedTime, myMilliseconds);
@@ -260,9 +252,9 @@ namespace jslib {
 
     long
     AbstractRenderWindow::setObjectInterval(JSObject *theObject, const std::string & myCommand,
-            float myMilliseconds) 
+            float myMilliseconds)
     {
-        return _myTimeoutQueue.addTimeout(theObject, myCommand, _myElapsedTime, 
+        return _myTimeoutQueue.addTimeout(theObject, myCommand, _myElapsedTime,
                 myMilliseconds, true /* isInterval */);
     }
 
@@ -318,7 +310,7 @@ namespace jslib {
 
         MAKE_SCOPE_TIMER(onFrame);
         asl::StdOutputRedirector::get().checkForFileWrapAround();
-        
+
         if (!_myPauseFlag) {
             if (_myFixedDeltaT == 0.0) {
                 _myElapsedTime = myTime.seconds() - _myStartTime - _myPauseTime;
@@ -327,7 +319,7 @@ namespace jslib {
                 if (_myElapsedTime < 0) {
                     _myElapsedTime = 0;
                 }
-            } 
+            }
             DB(cerr << "st: " << _myStartTime << " pt " << _myPauseTime << " et " << _myElapsedTime << endl;)
             // Check for timeouts
             {
@@ -339,25 +331,25 @@ namespace jslib {
                     try {
                         MAKE_SCOPE_TIMER(onPostViewport);
 
-                        if (JSA_hasFunction(_myJSContext, myTimeout->getJSObject(), 
+                        if (JSA_hasFunction(_myJSContext, myTimeout->getJSObject(),
                                     myTimeoutCommand.c_str()))
                         {
                             jsval rval;
-                            jslib::JSA_CallFunctionName(_myJSContext, myTimeout->getJSObject(), 
+                            jslib::JSA_CallFunctionName(_myJSContext, myTimeout->getJSObject(),
                                     myTimeoutCommand.c_str(), 0, 0, &rval);
                         } else {
-                            AC_ERROR << "Timeout: Function " << myTimeoutCommand 
+                            AC_ERROR << "Timeout: Function " << myTimeoutCommand
                                     << " does not exist." << endl;
                         }
                     } catch (const asl::Exception & ex) {
                         AC_ERROR << "asl exception caught in AbstractRenderWindow::onFrame(), (timeout " << myTimeoutCommand << "): " << ex;
-                    } 
+                    }
                     catch (const std::exception & ex) {
                         AC_ERROR << "std::exception caught in AbstractRenderWindow::onFrame(), (timeout " << myTimeoutCommand << "): " << ex.what();
                     } catch (...) {
                         AC_ERROR << "Unknown exception in AbstractRenderWindow::onFrame(), (timeout " << myTimeoutCommand << ") ";
                     }
-/*                    
+/*
                     JSScript * myScript = JS_CompileScript(_myJSContext, myTimeout->getJSObject(),
                         myShowCommand.c_str(), myShowCommand.size(), __FILE__, __LINE__);
 
@@ -372,7 +364,7 @@ namespace jslib {
                             AC_ERROR << "Timeout failed during execution: " << myShowCommand << "'";
                         }
                     }
-*/                    
+*/
                 }
             }
 
@@ -604,7 +596,7 @@ namespace jslib {
     }
 
     void
-    AbstractRenderWindow::onMouseButton(y60::Event & theEvent) {        
+    AbstractRenderWindow::onMouseButton(y60::Event & theEvent) {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onMouseButton")) {
             y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
             jsval argv[4], rval;
@@ -732,7 +724,7 @@ namespace jslib {
             }
         }
         _myExtensions.push_back(theExtension);
-        
+
         AC_INFO << " added extension " << theExtension->getName();
         theExtension->onStartup(this);
         if (getCurrentScene()) {
@@ -740,19 +732,11 @@ namespace jslib {
         }
     }
 
-    bool
-    AbstractRenderWindow::printStatistics(unsigned int theOnScreenFlag, unsigned int theStatisticFlags) {
-        bool myReturnValue = true;
-        if (theOnScreenFlag & RENDERED_STATISTIC) {
-            myReturnValue = renderStatistic(*_myRenderer, theStatisticFlags);
-        }
-        if (theOnScreenFlag & TEXT_STATISTIC) {
-            asl::getDashboard().print(std::cerr);
-            asl::getDashboard().reset();
-        }
-        return myReturnValue;
+    void
+    AbstractRenderWindow::printStatistics() {
+        asl::getDashboard().print(std::cerr);
+        asl::getDashboard().reset();
     }
-
 
     double
     AbstractRenderWindow::getFrameRate() const {
@@ -828,10 +812,11 @@ namespace jslib {
     // =======================================================================
     //  Text Manager
     // =======================================================================
-    void AbstractRenderWindow::renderText(const asl::Vector2f & thePos, const std::string & theString,
+    void AbstractRenderWindow::renderText(const asl::Vector2f & thePixelPosition, const std::string & theString,
                     const std::string & theFont)
     {
-        _myRenderer->getTextManager().addText(thePos, theString, theFont);
+        asl::Vector2f myRelativePosition(thePixelPosition[0] / getWidth(), thePixelPosition[1] / getHeight());
+        _myRenderer->getTextManager().addText(myRelativePosition, theString, theFont);
     }
 
     void AbstractRenderWindow::setTextColor(const asl::Vector4f & theTextColor, const asl::Vector4f & theBackColor)
@@ -881,7 +866,7 @@ namespace jslib {
     }
     void AbstractRenderWindow::playClip(float theTime,
                   const std::string & theCharacterName,
-                  const std::string & theClipName) 
+                  const std::string & theClipName)
     {
         if (_myScene) {
             _myScene->getAnimationManager().playClip(theTime, theCharacterName, theClipName);
@@ -889,7 +874,7 @@ namespace jslib {
     }
     void AbstractRenderWindow::setClipLoops(const std::string & theCharacterName,
                       const std::string & theClipName,
-                      unsigned int theLoops) 
+                      unsigned int theLoops)
     {
         if (_myScene) {
             _myScene->getAnimationManager().setClipLoops(theCharacterName, theClipName, theLoops);
@@ -897,7 +882,7 @@ namespace jslib {
     }
     void AbstractRenderWindow::setClipForwardDirection(const std::string & theCharacterName,
                       const std::string & theClipName,
-                      bool theDirection) 
+                      bool theDirection)
     {
         if (_myScene) {
             _myScene->getAnimationManager().setClipForwardDirection(theCharacterName, theClipName, theDirection);

@@ -57,18 +57,18 @@ testTextApp.prototype.Constructor = function(obj, theSceneFile, theShaderLib) {
 
         window.setTextStyle(Renderer.SOLID_TEXT);
         window.setTextColor(new Vector4f(1,0,0,1), new Vector4f(0,0,0,1));
-        window.renderText([0.1,0.1], "AVA Arial SOLID", "Arial");
+        window.renderText([20,20], "AVA Arial SOLID", "Arial");
         window.setTextStyle(Renderer.SHADED_TEXT);
         window.setTextColor(new Vector4f(0,1,0,1), new Vector4f(1,1,1,1));
-        window.renderText([0.1,0.3], "AVA Arial SHADED", "Arial");
+        window.renderText([20,50], "AVA Arial SHADED", "Arial");
         window.setTextStyle(Renderer.BLENDED_TEXT);
         window.setTextColor(new Vector4f(0,0,1,1), new Vector4f(0,0,0,1));
-        window.renderText([0.1,0.5], "AVA Arial BLENDED", "Arial");
+        window.renderText([20,80], "AVA Arial BLENDED", "Arial");
 
         window.setTextColor(new Vector4f(0,0,1,1), new Vector4f(0,0,0,1));
 
         var myTestString = String.fromCharCode(231, 172, 172);
-        window.renderText([0.1,0.8], "Nachtschwärmer" + myTestString, "Times12");
+        window.renderText([20,110], "Nachtschwärmer" + myTestString, "Times12");
 
         window.setTextColor(new Vector4f(1,1,1,1), new Vector4f(0,0,0,1));
     }

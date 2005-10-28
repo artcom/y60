@@ -114,7 +114,7 @@ ourHandler.on_open_activate = function() {
 ourHandler.on_save_screenshot_activate = function() {
     var myFilename = askUserForFilename("Save screenshot");
     if (myFilename) {
-        window.saveBuffer("FRAMEBUFFER", myFilename);
+        window.saveBuffer(myFilename);
         ourStatusBar.set("Saved screenshot: " + myFilename);
     }
 }
@@ -348,7 +348,7 @@ ourHandler.on_statistics_activate = function(theMenuItem) {
     ourStatusBar.set("Statistics " + (theMenuItem.active ? "on" : "off"));
     ourStatusBar.enableStatistics(theMenuItem.active);
     if (theMenuItem.active) {
-        window.printStatistics(RenderArea.TEXT_STATISTIC, 1);
+        window.printStatistics();
     }
     window.queue_draw();
 }

@@ -38,7 +38,7 @@ function FrameRateLimiter(theFrameRate) {
         _myLastPlayTime = theTime + mySleepTime;
 
         if (_myStatisticsFlag) {
-            window.renderText([0.04, 0.06], "Missed frames: " + _myMissedFrames +
+            window.renderText([24, 24], "Missed frames: " + _myMissedFrames +
                     "  -  Last overtime: " + _myLastOverTime.toFixed(2), "SyntaxBold18");
         }
     }

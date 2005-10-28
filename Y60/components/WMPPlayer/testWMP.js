@@ -18,75 +18,45 @@
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-if (__main__ == undefined) var __main__ = "WMPlayer";
 
-use("SceneViewer.js");
 plug("y60WMPPlayer");
 
-function WMPlayerTest(theArguments) {
-    this.Constructor(this, theArguments);
-}
+var window = new RenderWindow();
+window.decorations = false;
+window.position = new Vector2i(10, 10);
+window.setScene(new Scene(null));
 
-WMPlayerTest.prototype.Constructor = function(self, theArguments) {
+var ourWMPPlayer = new WMPPlayer();
+ourWMPPlayer.setup();
+ourWMPPlayer.load(arguments[0]);
+ourWMPPlayer.play();
 
-
-    SceneViewer.prototype.Constructor(self, theArguments);
-    var Base = [];
-    var _myWMPPlayer = new WMPPlayer();
-
-    // setup
-    Base.setup = self.setup;
-    self.setup = function(theWidth, theHeight, theTitle) {
-        window = new RenderWindow();
-        window.decorations = false;
-        window.position = new Vector2i(10, 10);
-        Base.setup(theWidth, theHeight, false, theTitle);
-
-        _myWMPPlayer.setup(); //parent window must be constructed
-        print("Loading: " + theArguments[1]);
-        _myWMPPlayer.load(theArguments[1]);
-        _myWMPPlayer.play();
-        _myWMPPlayer.canvasposition = [100, 100];
-        _myWMPPlayer.canvassize = [100, 100];
-    }
-
-    Base.onKey = self.onKey;
-    self.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
-        if (theKey == 'l' && theState) {
-            _myWMPPlayer.load("http://bacon/media/movies/emil.wmv");
-        } else if (theKey == 's' && theState) {
-            print("width: " + _myWMPPlayer.width + " height: " + _myWMPPlayer.height);
-        } else if (theKey == 'p' && theState) {
-            print("play/pause now " + _myWMPPlayer.state);
-            if (_myWMPPlayer.state == "playing") {
-                _myWMPPlayer.pause();
-            } else {
-                _myWMPPlayer.play();
-            }
-        } else if (theKey == 'v' && theState) {
-            print("volume " + _myWMPPlayer.volume);
-            _myWMPPlayer.volume = theShiftFlag ? _myWMPPlayer.volume - 0.1 : _myWMPPlayer.volume + 0.1;
+window.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
+    if (theState) {
+        switch (theKey) {
+            case "l":
+                print("Loading: http://bacon/media/movies/emil.wmv");
+                ourWMPPlayer.load("http://bacon/media/movies/emil.wmv");
+                ourWMPPlayer.play();
+                break;
+            case "s":
+                print("width: " + ourWMPPlayer.width + " height: " + ourWMPPlayer.height);
+                break;
+            case "p":
+                if (ourWMPPlayer.state == "playing") {
+                    print("Pause movie");
+                    ourWMPPlayer.pause();
+                } else {
+                    print("Play movie");
+                    ourWMPPlayer.play();
+                }
+                break
+            case "v":
+                ourWMPPlayer.volume = theShiftFlag ? ourWMPPlayer.volume - 0.1 : ourWMPPlayer.volume + 0.1;
+                print("volume " + ourWMPPlayer.volume);
+                break;
         }
-
-        Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
     }
 }
 
-//
-// main
-//
-
-if (__main__ == "WMPlayer") {
-    print("WMPlayer");
-    try {
-        var ourWMPlayerTest = new WMPlayerTest(arguments);
-
-        ourWMPlayerTest.setup(800, 600, "WMPlayer");
-        ourWMPlayerTest.go();
-    } catch (ex) {
-        print("-------------------------------------------------------------------------------");
-        print("### Error: " + ex);
-        print("-------------------------------------------------------------------------------");
-        exit(1);
-    }
-}
+window.go();

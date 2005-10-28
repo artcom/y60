@@ -54,7 +54,7 @@ class JSAbstractRenderWindowBase : public JSWrapper<AbstractRenderWindow,
             PROP_height,
             PROP_renderingCaps,
             PROP_fixedFrameTime,
-            PROP_frameRate,
+            PROP_fps,
             // convenience attributes when in single-viewport mode
             PROP_camera,
             PROP_projectionmatrix,
@@ -66,10 +66,6 @@ class JSAbstractRenderWindowBase : public JSWrapper<AbstractRenderWindow,
             PROP_backfaceCulling,
             PROP_culling,
             PROP_debugCulling,
-            // static properties
-            PROP_TEXT_STATISTIC,
-            PROP_RENDERED_STATISTIC,
-            //
             PROP_END
         };
 };
@@ -83,43 +79,61 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
         static JSBool setTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets a javascript line to be executed after a certain time");
+            DOC_PARAM("theJavaScriptCommand", DOC_TYPE_STRING);
+            DOC_PARAM("theMilliseconds", DOC_TYPE_FLOAT);
+            DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setTimeout,cx,obj,argc,argv,rval);
         }
 
         static JSBool setInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets a javascript line to be executed in a certain interval until clearInterval() is called.");
+            DOC_PARAM("theJavaScriptCommand", DOC_TYPE_STRING);
+            DOC_PARAM("theMilliseconds", DOC_TYPE_FLOAT);
+            DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setInterval,cx,obj,argc,argv,rval);
         }
 
         static JSBool setObjectTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets a javascript line to be executed after a certain time within the context of a given JavaScript object");
+            DOC_PARAM("theJavaScriptObject", DOC_TYPE_OBJECT);
+            DOC_PARAM("theJavaScriptCommand", DOC_TYPE_STRING);
+            DOC_PARAM("theMilliseconds", DOC_TYPE_FLOAT);
+            DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setObjectTimeout,cx,obj,argc,argv,rval);
         }
 
         static JSBool setObjectInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets a javascript line to be executed in a certain interval within the context of a given JavaScript object");
+            DOC_PARAM("theJavaScriptObject", DOC_TYPE_OBJECT);
+            DOC_PARAM("theJavaScriptCommand", DOC_TYPE_STRING);
+            DOC_PARAM("theMilliseconds", DOC_TYPE_FLOAT);
+            DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setObjectInterval,cx,obj,argc,argv,rval);
         }
 
         static JSBool clearTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Stops a timeout from beeing executed");
+            DOC_PARAM("theTimeoutId", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::clearTimeout,cx,obj,argc,argv,rval);
         }
 
         static JSBool clearInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Stops an interval from beeing executed");
+            DOC_PARAM("theTimeoutId", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::clearInterval,cx,obj,argc,argv,rval);
         }
 
         static JSBool setScene(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("Sets the scene object to be rendered by this window.");
+            DOC_BEGIN("Sets the scene object to be rendered by this window, the current scene will be thrown away.");
+            DOC_PARAM("theScene", DOC_TYPE_OBJECT);
+            DOC_RVAL("theSucceededFlag", DOC_TYPE_BOOLEAN);
             DOC_END;
             try {
                 DERIVED * mySelf;
@@ -131,7 +145,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                         throw JSArgMismatch("Failed to convert argument 0 to type y60::Scene", PLUS_FILE_LINE);
                     }
                 }
-                //ENSURE_ARG(y60::ScenePtr, myScene, 0);
 
                 bool myRetVal = mySelf->setScene(myScene);
                 *rval = as_jsval(cx, myRetVal);
@@ -140,21 +153,16 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         }
 
         static JSBool
-        getWorldSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
-            DOC_END;
-            return Method<NATIVE>::call(&NATIVE::getWorldSize,cx,obj,argc,argv,rval);
-        }
-
-        static JSBool
         saveBuffer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Saves a screenshot to a given file");
+            DOC_PARAM("theFilename", DOC_TYPE_STRING);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::saveBuffer,cx,obj,argc,argv,rval);
         }
         static JSBool
         getRenderer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Returns the renderer currently attached to this window");
+            DOC_RVAL("theRenderer", DOC_TYPE_OBJECT);
             DOC_END;
             try {
                 DERIVED * mySelf;
@@ -163,43 +171,58 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 *rval = as_jsval(cx, myRetVal);
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
-            //return Method<NATIVE>::call(&NATIVE::getRenderer,cx,obj,argc,argv,rval);
         }
         static JSBool
         hasCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Checks if the renderer has a certain capability." \
+                      "Possible Capability constants are static properties of the Renderer object");
+            DOC_PARAM("theCapability", DOC_TYPE_ENUMERATION);
+            DOC_RVAL("theResult", DOC_TYPE_BOOLEAN);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::hasCap,cx,obj,argc,argv,rval);
         }
         static JSBool
         hasCapAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Checks if the renderer has a certain capability." \
+                      "Use OpenGL queryOGLExtension command is called with the capability string.");
+            DOC_PARAM("theCapability", DOC_TYPE_STRING);
+            DOC_RVAL("theResult", DOC_TYPE_BOOLEAN);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::hasCapAsString,cx,obj,argc,argv,rval);
         }
 
         static JSBool
         printStatistics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("prints render statistics and profiling information to the console");
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::printStatistics,cx,obj,argc,argv,rval);
         }
         static JSBool
         getImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Returns the color of a pixel at position x, y of an image");
+            DOC_PARAM("theImageNode", DOC_TYPE_NODE);
+            DOC_PARAM("theXPosition", DOC_TYPE_INTEGER);
+            DOC_PARAM("theYPosition", DOC_TYPE_INTEGER);
+            DOC_RVAL("theColor", DOC_TYPE_VECTOR4F);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::getImagePixel,cx,obj,argc,argv,rval);
         }
         static JSBool
         setImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets the color of a pixel at position x, y in an image");
+            DOC_PARAM("theImageNode", DOC_TYPE_NODE);
+            DOC_PARAM("theXPosition", DOC_TYPE_INTEGER);
+            DOC_PARAM("theYPosition", DOC_TYPE_INTEGER);
+            DOC_PARAM("theColor", DOC_TYPE_VECTOR4F);
+            DOC_RVAL("theSuccess", DOC_TYPE_BOOLEAN);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setImagePixel,cx,obj,argc,argv,rval);
         }
 
         static JSBool
         performRequest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("performs an http request");
+            DOC_PARAM("theRequest", DOC_TYPE_OBJECT);
             DOC_END;
             if (argc == 1) {
                 if (!JSRequestWrapper::matchesClassOf(cx, argv[0])) {
@@ -215,7 +238,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
 
         static JSBool
         addExtension(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Adds a renderextension object to the window");
+            DOC_PARAM("theRenderExtension", DOC_TYPE_OBJECT);
             DOC_END;
             try {
                 if (argc == 1) {
@@ -241,104 +265,147 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
 
         static JSBool
         renderText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Renders a text onto the screen");
+            DOC_PARAM("thePosition in Pixel", DOC_TYPE_VECTOR2F);
+            DOC_PARAM("theTextString", DOC_TYPE_STRING);
+            DOC_PARAM("theFontName", DOC_TYPE_STRING);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::renderText,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets the text foreground and background color");
+            DOC_PARAM("theTextColor", DOC_TYPE_VECTOR4F);
+            DOC_PARAM("theBackGroundColor", DOC_TYPE_VECTOR4F);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setTextColor,cx,obj,argc,argv,rval);
         }
         static JSBool
         renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Renders a text into a target image node");
+            DOC_PARAM("theImageNode", DOC_TYPE_NODE);
+            DOC_PARAM("theTextString", DOC_TYPE_STRING);
+            DOC_PARAM("theFontName", DOC_TYPE_STRING);
+            DOC_PARAM("theTextBoxWidth", DOC_TYPE_INTEGER);
+            DOC_PARAM("theTextBoxHeight", DOC_TYPE_INTEGER);
+            DOC_RVAL("theFilledTextBoxSize", DOC_TYPE_VECTOR2I);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::renderTextAsImage,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTextStyle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets style for text paragraphs (normal, bold, italic, bolditalic)" \
+                      "See Renderer static properties for possible constants");
+            DOC_PARAM("theHorizontalAlignment", DOC_TYPE_ENUMERATION);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setTextStyle,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets padding in pixels around text paragraphs");
+            DOC_PARAM("theTopPadding", DOC_TYPE_INTEGER);
+            DOC_PARAM("theBottomPadding", DOC_TYPE_INTEGER);
+            DOC_PARAM("theLeftPadding", DOC_TYPE_INTEGER);
+            DOC_PARAM("theRightPadding", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setTextPadding,cx,obj,argc,argv,rval);
         }
         static JSBool
         setHTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets horizontal alignment for text paragraphs" \
+                      "See Renderer static properties for possible constants");
+            DOC_PARAM("theHorizontalAlignment", DOC_TYPE_ENUMERATION);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setHTextAlignment,cx,obj,argc,argv,rval);
         }
         static JSBool
         setVTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets vertical alignment for text paragraphs" \
+                      "See Renderer static properties for possible constants");
+            DOC_PARAM("theVerticalAlignment", DOC_TYPE_ENUMERATION);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setVTextAlignment,cx,obj,argc,argv,rval);
         }
         static JSBool
         setLineHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets line height in pixel for text paragraphs");
+            DOC_PARAM("theLineHeight", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setLineHeight,cx,obj,argc,argv,rval);
         }
         static JSBool
         setParagraph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets top and bottom margins in pixel for text paragraphs");
+            DOC_PARAM("theTopMargin", DOC_TYPE_INTEGER);
+            DOC_PARAM("theBottomMargin", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setParagraph,cx,obj,argc,argv,rval);
         }
 
         static JSBool
         playClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Plays an animation clip within character at a given time");
+            DOC_PARAM("thePlayTime", DOC_TYPE_FLOAT);
+            DOC_PARAM("theCharacterName", DOC_TYPE_STRING);
+            DOC_PARAM("theClipName", DOC_TYPE_STRING);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::playClip,cx,obj,argc,argv,rval);
         }
         static JSBool
         setClipLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets the number of loops of a clip within character");
+            DOC_PARAM("theCharacterName", DOC_TYPE_STRING);
+            DOC_PARAM("theClipName", DOC_TYPE_STRING);
+            DOC_PARAM("theNumberOfLoops", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setClipLoops,cx,obj,argc,argv,rval);
         }
         static JSBool
         setClipForwardDirection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Sets the direction of a clip within character");
+            DOC_PARAM("theCharacterName", DOC_TYPE_STRING);
+            DOC_PARAM("theClipName", DOC_TYPE_STRING);
+            DOC_PARAM("theDirection", DOC_TYPE_BOOLEAN);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setClipForwardDirection,cx,obj,argc,argv,rval);
         }
         static JSBool
         getLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Returns the number of loops of a clip within character");
+            DOC_PARAM("theCharacterName", DOC_TYPE_STRING);
+            DOC_PARAM("theClipName", DOC_TYPE_STRING);
+            DOC_RVAL("numberOfLoops", DOC_TYPE_INTEGER);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::getLoops,cx,obj,argc,argv,rval);
         }
         static JSBool
         runAnimations(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Runs all global animations with a given time.");
+            DOC_PARAM("theTime", DOC_TYPE_FLOAT);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::runAnimations,cx,obj,argc,argv,rval);
         }
         static JSBool
         isClipActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Returns if a clip within character with a given name is active");
+            DOC_PARAM("theCharacterName", DOC_TYPE_STRING);
+            DOC_PARAM("theClipName", DOC_TYPE_STRING);
+            DOC_RVAL("isActive", DOC_TYPE_BOOLEAN);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::isClipActive,cx,obj,argc,argv,rval);
         }
         static JSBool
         isCharacterActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Returns if a character with a given name is active");
+            DOC_PARAM("theCharacterName", DOC_TYPE_STRING);
+            DOC_RVAL("isActive", DOC_TYPE_BOOLEAN);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::isCharacterActive,cx,obj,argc,argv,rval);
         }
         static JSBool
         stopCharacter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Stops an animated character with a given name");
+            DOC_PARAM("theCharacterName", DOC_TYPE_STRING);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::stopCharacter,cx,obj,argc,argv,rval);
         }
@@ -360,7 +427,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 {"clearTimeout",       clearTimeout,             1},
                 {"clearInterval",      clearInterval,            1},
                 {"setScene",           setScene,                 1},
-                {"getWorldSize",       getWorldSize,             1},
                 {"saveBuffer",         saveBuffer,               2},
                 {"getRenderer",        getRenderer,              0},
                 {"addExtension",       addExtension,             1},
@@ -394,8 +460,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
 
         static JSConstIntPropertySpec * ConstIntProperties() {
             static JSConstIntPropertySpec myProperties[] = {
-                "TEXT_STATISTIC",    PROP_TEXT_STATISTIC,     NATIVE::TEXT_STATISTIC,
-                "RENDERED_STATISTIC",PROP_RENDERED_STATISTIC, NATIVE::RENDERED_STATISTIC,
                 {0}
             };
             return myProperties;
@@ -413,7 +477,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 {"projectionmatrix",PROP_projectionmatrix,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_READONLY|JSPROP_SHARED},
                 {"renderingCaps",   PROP_renderingCaps,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // unsined int
                 {"fixedFrameTime",  PROP_fixedFrameTime,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // unsined int
-                {"frameRate",       PROP_frameRate,         JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // double
+                {"fps",             PROP_fps,               JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // double
                 {"wireframe",       PROP_wireframe,         JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
                 {"drawnormals",     PROP_drawnormals,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
                 {"lighting",        PROP_lighting,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
@@ -500,7 +564,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 case PROP_fixedFrameTime:
                     *vp = as_jsval(cx, theNative.getFixedDeltaT());
                     return JS_TRUE;
-                case PROP_frameRate:
+                case PROP_fps:
                     *vp = as_jsval(cx, theNative.getFrameRate());
                     return JS_TRUE;
                 default:

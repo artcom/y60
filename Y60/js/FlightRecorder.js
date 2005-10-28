@@ -634,7 +634,7 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
         }
         var myFilename = _myImageStripPrefix + "_" + myCounter + ".png";
         if (fileExists(myFilename) == false || _myImageStripOverwriteFlag) {
-            window.saveBuffer(FRAMEBUFFER, myFilename);
+            window.saveBuffer(myFilename);
             print("saved Image:" + myFilename);
         } else {
             print("Sorry, " + myFilename + ", does exist and no overwrite flag is set: do nothing!");

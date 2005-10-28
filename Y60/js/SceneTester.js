@@ -61,7 +61,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
             myImageFilename = _myOutputImageName + _myOutputSuffix;
         }
         print("Writing test image to file: " + myImageFilename);
-        window.saveBuffer("FRAMEBUFFER", myImageFilename);
+        window.saveBuffer(myImageFilename);
         obj.myImageCount++;
     }
 

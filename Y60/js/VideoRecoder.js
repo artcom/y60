@@ -42,7 +42,7 @@ VideoRecoder.prototype.Constructor = function(obj, theDirectory, theFrameRate) {
 
             myFileName += _myScreenShotCounter++ + ".png";
 
-            window.saveBuffer(FRAMEBUFFER, myFileName);
+            window.saveBuffer(myFileName);
         } else {
             _myTime = theTime;
         }

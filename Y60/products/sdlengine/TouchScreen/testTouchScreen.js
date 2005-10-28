@@ -107,7 +107,7 @@ TouchScreenTest.prototype.Constructor = function(obj, theSceneFile, theShaderLib
         obj.SceneViewer.onFrame(theTime);
 
         window.setTextColor([0.4,0.4,1,1], [1,1,1,1]);
-        window.renderText([0.15, 0.05], "---  F1 : Toggle Calibration Mode  |  F2 : Toggle Follow Mode  ---", "SyntaxBold18");
+        window.renderText([20, 20], "---  F1 : Toggle Calibration Mode  |  F2 : Toggle Follow Mode  ---", "SyntaxBold18");
 
         _myTouchScreen.onFrame(theTime);
     }

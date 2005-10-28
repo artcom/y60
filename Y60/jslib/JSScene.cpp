@@ -353,7 +353,8 @@ CreateBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 getWorldSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the world's size including camera position.");
-    DOC_RVAL("Distance", DOC_TYPE_FLOAT)
+    DOC_PARAM("theCamera", DOC_TYPE_OBJECT);
+    DOC_RVAL("theSize", DOC_TYPE_FLOAT)
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::getWorldSize,cx,obj,argc,argv,rval);
 }
@@ -435,6 +436,7 @@ JSScene::Functions() {
         {"createQuadShape",       CreateQuadShape,       3},
         {"loadMovieFrame",        loadMovieFrame,        1},
         {"loadCaptureFrame",      loadCaptureFrame,      1},
+        {"getWorldSize",          getWorldSize,          1},
         {0}
     };
     return myFunctions;

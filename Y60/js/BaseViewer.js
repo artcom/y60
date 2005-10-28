@@ -305,7 +305,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.onPreViewport = function(theViewport) {
         var myCamera = theViewport.getElementById(theViewport.camera);
     	// calculate near/far planes from world size and distance camera-world
-    	var myWorldSize = _myRenderWindow.getWorldSize(myCamera);
+    	var myWorldSize = _myRenderWindow.scene.getWorldSize(myCamera);
     	if (self.getMover(theViewport)) {
             self.getMover(theViewport).setWorldSize(myWorldSize);
         }
@@ -334,8 +334,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.onFrame = function(theTime) {
         if (_myProfileMode) {
-            if (_myRenderWindow.frameRate > _myProfileMaxFPS) {
-                _myProfileMaxFPS = _myRenderWindow.frameRate;
+            if (_myRenderWindow.fps > _myProfileMaxFPS) {
+                _myProfileMaxFPS = _myRenderWindow.fps;
                 _myProfileTime = theTime;
             } else if ((theTime - _myProfileTime) > PROFILE_TIME) {
                 // MaxFPS unchanged for PROFILE_TIME, done
@@ -409,7 +409,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myReleaseMode           = true;
     var _myLightManager          = null;
 
-    const PROFILE_FILENAME = "profile.xml"; 
+    const PROFILE_FILENAME = "profile.xml";
     const PROFILE_TIME     = 5.0; // fps must not rise for this time
     var _myProfileMode     = false;
     var _myProfileFilename = null;

@@ -47,19 +47,19 @@ function FFMpegTest(theArguments) {
         Base.onPostRender();
         var myPos = 42;
         window.setTextColor([1,1,1,1], [1,1,1,1]);
-        window.renderText([10 / window.width, myPos / window.height], _myTestName, "Screen15");
+        window.renderText([10, myPos], _myTestName, "Screen15");
         window.setTextColor([1,1,1,1], [1,1,1,1]);
         myPos += 20;
-        var myText  = basename(_myMovie.src) + " " + _myMovie.playmode + " " + 
+        var myText  = basename(_myMovie.src) + " " + _myMovie.playmode + " " +
                 _myMovie.currentframe + "/" + _myMovie.framecount;
-        window.renderText([10 / window.width, myPos / window.height], myText, "Screen15");
+        window.renderText([10, myPos], myText, "Screen15");
         myPos += 10;
     }
 
     function setupTest(theName, theFile) {
         _myTestName = theName;
         print ("Starting test: "+theName);
-        var myMovie = new MovieOverlay(Public.getOverlayManager(), theFile, 
+        var myMovie = new MovieOverlay(Public.getOverlayManager(), theFile,
                 new Vector2f(300, 70), null, true);
         myMovie.playspeed = 1;
         myMovie.loopcount = 1;
@@ -90,12 +90,12 @@ function FFMpegTest(theArguments) {
     }
 
     testPlaying = function() {
-        assure_msg(_myMovie.playmode == "play", 
+        assure_msg(_myMovie.playmode == "play",
                 "Movie is still playing.");
     }
-    
+
     testStopped = function() {
-        assure_msg(_myMovie.playmode == "stop", 
+        assure_msg(_myMovie.playmode == "stop",
                 "Movie has stopped.");
     }
 
@@ -103,12 +103,12 @@ function FFMpegTest(theArguments) {
         print("Starting playback.");
         _myMovie.playmode = "play";
     }
-    
+
     stop = function() {
         print("Stopping playback.");
         _myMovie.playmode = "stop";
     }
-    
+
     function setupPlayTest() {
         setupTest("Play to End", "testfiles/counter_short.mpg");
         window.setObjectTimeout(this, "testPlaying", 6000);

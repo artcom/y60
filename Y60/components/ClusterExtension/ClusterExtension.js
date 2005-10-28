@@ -172,14 +172,10 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
                     //printHelp();
                     break;
                 case 's':
-                    _myStatisticCycle++;
                     // check if statisticCycle triggers a valid statistic rendering
                     // print text statistic anyway
-                    var myIsValidStatisticLevel = window.printStatistics(RenderWindow.RENDERED_STATISTIC | RenderWindow.TEXT_STATISTIC, _myStatisticCycle);
-                    if (!myIsValidStatisticLevel) {
-                        _myStatisticCycle = 0;
-                    }
-                    print("  Scene size     " + window.getWorldSize(_myCamera).toFixed(1) + "m");
+                    window.printStatistics();
+                    print("  Scene size     " + window.scene.getWorldSize(_myCamera).toFixed(1) + "m");
                     _myTimer.print();
                     break;
                 case 'S':
@@ -226,7 +222,7 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
                     var myDate = new Date();
                     print("save screenshot as: " + "screenshot_" + myDate.getDate() + "." +
                         (myDate.getMonth()+1) + "_" + _myScreenShotCounter + ".png");
-                    window.saveBuffer(FRAMEBUFFER, "screenshot_" + myDate.getDate() + "." +
+                    window.saveBuffer("screenshot_" + myDate.getDate() + "." +
                                     (myDate.getMonth()+1) + "_" + _myScreenShotCounter + ".png");
                     _myScreenShotCounter++;
                     break;

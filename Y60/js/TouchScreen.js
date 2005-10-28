@@ -335,8 +335,8 @@ TouchScreen.prototype.Constructor = function(obj, theEventReceiver, theComPort, 
 
         if (_myCalibrationModeFlag || _myFollowMode) {
             window.setTextColor([0.4,0.4,1,1], [1,1,1,1]);
-            window.renderText([0.3, 0.4], _myMessageTop, "SyntaxBold18");
-            window.renderText([0.3, 0.5], _myMessageBottom, "SyntaxBold18");
+            window.renderText([50, 50], _myMessageTop, "SyntaxBold18");
+            window.renderText([50, 100], _myMessageBottom, "SyntaxBold18");
             return true;
         } else {
             return false;

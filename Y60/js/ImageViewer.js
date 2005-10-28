@@ -217,7 +217,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             var myText  = getDisplayText();
             var myWidth = 400;
             for (var i = 0; i < myText.length; ++i) {
-                window.renderText([30 / window.width, (40 + i * 20) / window.height], myText[i], "Screen15");
+                window.renderText([30, (40 + i * 20)], myText[i], "Screen15");
                 myWidth = Math.max(myWidth, myText[i].length * 10);
             }
             _myTextOverlay.width  = myWidth;

@@ -251,8 +251,8 @@ JSRenderer::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
 
 JSBool
 JSRenderer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("NOTE: Do not create a renderer with new! Access existing \
-renderers by accessing the RenderWindow's renderer property.");
+    DOC_BEGIN("NOTE: Do not create a renderer with new! Access existing" \
+              "renderers by accessing the RenderWindow's renderer property.");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Base::Class()) {

@@ -139,19 +139,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
         _myOnScreenDisplay.onFrame(theTime);
         fadeSplashScreen(theTime);
-
-        if (_myStatisticCycle != 0) {
-            window.setTextColor(new Vector4f(1,0,0,1), new Vector4f(1,0,1,1));
-             window.printStatistics(RenderWindow.RENDERED_STATISTIC, _myStatisticCycle);
-        }
-   }
+    }
 
     self.BaseViewer.onPreRender = self.onPreRender;
     self.onPreRender = function() {
-        //var myImagesCount = self.getImages().childNodesLength();
-        //if (myImagesCount > 0) {
-            //var myImage = self.getImages().childNodes[0];
-        //}
         self.BaseViewer.onPreRender();
     }
 
@@ -163,6 +154,13 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
         _myOnScreenDisplay.onPostRender();
         _myMemoryMeter.onPostRender();
+        if (_myOnScreenStatistics) {
+            var myFPS = window.fps.toFixed(1);
+            window.setTextColor([0.1,0.1,0.1,1], [1,1,1,1]);
+            window.renderText([window.width - 51, 18], myFPS, "Screen15");
+            window.setTextColor([0.9,0.9,0.9,1], [1,1,1,1]);
+            window.renderText([window.width - 50, 20], myFPS, "Screen15");
+        }
     }
 
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
@@ -240,14 +238,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     printHelp();
                     break;
                 case 's':
-                    _myStatisticCycle++;
-                    // check if statisticCycle triggers a valid statistic rendering
-                    // print text statistic anyway
-                    var myIsValidStatisticLevel = window.printStatistics(RenderWindow.RENDERED_STATISTIC | RenderWindow.TEXT_STATISTIC, _myStatisticCycle);
-                    if (!myIsValidStatisticLevel) {
-                        _myStatisticCycle = 0;
-                    }
-                    print("  Scene size     " + window.getWorldSize(window.camera).toFixed(1) + "m");
+                    _myOnScreenStatistics = !_myOnScreenStatistics;
+                    window.printStatistics();
+                    print("  Scene size     " + window.scene.getWorldSize(window.camera).toFixed(1) + "m");
                     break;
                 case 'S':
                     self.getScene().save("saved_scene.x60", false);
@@ -267,7 +260,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     var myDate = new Date();
                     print("save screenshot as: " + "screenshot_" + myDate.getDate() + "." +
                         (myDate.getMonth()+1) + "_" + _myScreenShotCounter + ".png");
-                    window.saveBuffer("FRAMEBUFFER", "screenshot_" + myDate.getDate() + "." +
+                    window.saveBuffer("screenshot_" + myDate.getDate() + "." +
                                     (myDate.getMonth()+1) + "_" + _myScreenShotCounter + ".png");
                     _myScreenShotCounter++;
                     break;
@@ -521,7 +514,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myPBufferHeight         = 0;
     var _myPBufferWidth          = 0;
     var _myCurrentTime           = 0;
-    var _myStatisticCycle        = 0;
     var _myTimer                 = new AutoTimer("SceneViewer Timer");
     var _mySplashScreen          = false; // self.getReleaseMode();
     var _mySplashScreenOverlay   = null;
@@ -529,4 +521,5 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myOnScreenDisplay       = new OnScreenDisplay(self);
     var _mySetDefaultRenderingCap= true;
     var _myMemoryMeter           = new MemoryMeter(self);
+    var _myOnScreenStatistics    = false;
 }
