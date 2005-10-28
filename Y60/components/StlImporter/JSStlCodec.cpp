@@ -29,6 +29,13 @@ exportShape(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 }
 
 static JSBool
+exportShapes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    return Method<JSStlCodec::NATIVE>::call(&JSStlCodec::NATIVE::exportShapes,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -42,6 +49,7 @@ JSStlCodec::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"exportShape",          exportShape,             1},
+        {"exportShapes",         exportShapes,            2},
         {"close",                close,                   0},
         {0}
     };

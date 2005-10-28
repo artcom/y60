@@ -51,10 +51,11 @@ public:
     StlCodec(std::string theFilename, bool theBigEndianFlag);
     virtual ~StlCodec();
     void exportShape(const dom::NodePtr theNode);
+    void exportShapes(const dom::NodePtr theNode, const std::vector<std::string> & theIds);
     void close();
 private:
     template <class AC_BYTE_ORDER_LOCAL>
-    void exportShapeToStream(const y60::ShapePtr theShape, asl::WriteableArrangedStream<AC_BYTE_ORDER_LOCAL> & theStream);
+    void exportShapeToStream(const y60::ShapePtr theShape, asl::WriteableArrangedStream<AC_BYTE_ORDER_LOCAL> & theStream, bool theWriteHeadersFlag = true);
     template <class AC_BYTE_ORDER_LOCAL>
     void exportHeader(const std::string & theName, unsigned theNumShapes, asl::WriteableArrangedStream<AC_BYTE_ORDER_LOCAL> & theStream);
     template <class AC_BYTE_ORDER_LOCAL>

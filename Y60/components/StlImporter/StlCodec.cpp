@@ -48,7 +48,7 @@ namespace y60 {
     }
 
     template <class AC_BYTE_ORDER_LOCAL> void 
-    StlCodec::exportShapeToStream(const ShapePtr theShape, WriteableArrangedStream<AC_BYTE_ORDER_LOCAL> & theStream) {
+    StlCodec::exportShapeToStream(const ShapePtr theShape, WriteableArrangedStream<AC_BYTE_ORDER_LOCAL> & theStream, bool theWriteHeadersFlag) {
         const PrimitiveVector & myPrimitiveVector = theShape->getPrimitives();        
         std::string myName = theShape->getNode().nodeName();
         for (unsigned i = 0; i < myPrimitiveVector.size(); ++i) {
@@ -65,7 +65,10 @@ namespace y60 {
                 ASSURE(myVSize % 3 == 0);
                 ASSURE(myNSize == myVSize);
                 unsigned myNumFaces = myVSize / 3;
-                exportHeader(myName + "_" + as_string(i), myNumFaces, theStream);
+                if (theWriteHeadersFlag) {
+                    AC_TRACE << "Exporting header";
+                    exportHeader(myName + "_" + as_string(i), myNumFaces, theStream);
+                }
                 AC_TRACE << "Exporting triangles";
                 for (unsigned myFaceIndex = 0; myFaceIndex < myNumFaces; ++myFaceIndex) {
                     StlFacet myFacet;
@@ -136,7 +139,64 @@ namespace y60 {
             }
         }
     }
-    
+
+    void 
+    StlCodec::exportShapes(const dom::NodePtr theNode, const std::vector<std::string> & theIds) {
+        int myNumChildren = theNode->childNodesLength();
+        int myNumFaces = 0;
+        // First get the total amount of triangles
+        for (int i = 0; i < myNumChildren; ++i) {
+            dom::NodePtr myNode = theNode->childNode(i);
+            ShapePtr myShape = myNode->getFacade<Shape>();
+            const PrimitiveVector & myPrimitiveVector = myShape->getPrimitives();        
+            for (unsigned i = 0; i < myPrimitiveVector.size(); ++i) {
+                const Primitive & myPrimitive = (*myPrimitiveVector[i]);
+                const PrimitiveType & myType = myPrimitive.getType();
+                Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
+                Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
+                const VertexData3f & myVertexData = myPositionAccessor->get();
+                int myVSize = myVertexData.size();
+                switch (myType) {
+                case GL_TRIANGLES:
+                    myNumFaces += myVSize / 3;
+                    break;
+                case GL_QUADS: 
+                    myNumFaces += myVSize / 2;
+                    break;
+                default:
+                    AC_WARNING << "Can't STL-Export Primitives of different types than GL_TRIANGLES and GL_QUADS";
+                    break;
+                }
+            }
+        }
+        std::string myName("EXPORT");
+        // Export a header
+        if (_myBigEndianFlag) {
+            if (_myBigStream) {
+                exportHeader(myName, myNumFaces, *_myBigStream);
+                for (int i = 0; i < myNumChildren; ++i) {
+                    dom::NodePtr myNode = theNode->childNode(i);
+                    ShapePtr myShape = myNode->getFacade<Shape>();
+                    exportShapeToStream(myShape, *_myBigStream, false);
+                }
+            } else {
+                AC_ERROR << "Not a filename while exporting.";
+            }
+        } else {
+            if (_myLittleStream) {
+                exportHeader(myName, myNumFaces, *_myLittleStream);
+                for (int i = 0; i < myNumChildren; ++i) {
+                    dom::NodePtr myNode = theNode->childNode(i);
+                    ShapePtr myShape = myNode->getFacade<Shape>();
+                    exportShapeToStream(myShape, *_myLittleStream, false);
+                }
+            } else {
+                AC_ERROR << "Not a filename while exporting.";
+            }
+        }
+    }
+
+
     void
     StlCodec::close() {
         _myLittleStream = asl::Ptr<WriteableArrangedFile<PowerPCByteOrder> >(0);
