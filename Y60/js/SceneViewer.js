@@ -154,13 +154,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
         _myOnScreenDisplay.onPostRender();
         _myMemoryMeter.onPostRender();
-        if (_myOnScreenStatistics) {
-            var myFPS = window.fps.toFixed(1);
-            window.setTextColor([0.1,0.1,0.1,1], [1,1,1,1]);
-            window.renderText([window.width - 51, 18], myFPS, "Screen15");
-            window.setTextColor([0.9,0.9,0.9,1], [1,1,1,1]);
-            window.renderText([window.width - 50, 20], myFPS, "Screen15");
-        }
+        showStatistics();
     }
 
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
@@ -238,7 +232,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     printHelp();
                     break;
                 case 's':
-                    _myOnScreenStatistics = !_myOnScreenStatistics;
+                    _myOnScreenStatistics++;
+                    if (_myOnScreenStatistics > 2) {
+                        _myOnScreenStatistics = 0;
+                    }
                     window.printStatistics();
                     print("  Scene size     " + window.scene.getWorldSize(window.camera).toFixed(1) + "m");
                     break;
@@ -454,7 +451,32 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-     function cycleBoundingVolumeMode() {
+    function showStatistics() {
+        if (_myOnScreenStatistics > 0) {
+            var myText = [];
+            myText.push(window.fps.toFixed(1));
+
+            if (_myOnScreenStatistics > 1) {
+                var myStatistics = window.scene.statistics;
+                myText.push("Vertices:   " + myStatistics.renderedVertices + "/" + myStatistics.vertices);
+                myText.push("Primitives: " + myStatistics.renderedPrimitives + "/" + myStatistics.primitives);
+                myText.push("Worldnodes: " + myStatistics.worldNodes);
+                myText.push("Bodies:     " + myStatistics.bodies);
+                myText.push("Lights:     " + myStatistics.activeLights + "/" + myStatistics.lights);
+                myText.push("Overlays:   " + myStatistics.overlays);
+                myText.push("Materials:  " + myStatistics.materials);
+            }
+
+            for (var i = 0; i < myText.length; ++i) {
+                window.setTextColor([0.1,0.1,0.1,1], [1,1,1,1]);
+                window.renderText([window.width - 141, 19 + (i * 15)], myText[i], "Screen8");
+                window.setTextColor([0.9,0.9,0.9,1], [1,1,1,1]);
+                window.renderText([window.width - 140, 20 + (i * 15)], myText[i], "Screen8");
+            }
+        }
+    }
+
+    function cycleBoundingVolumeMode() {
         if (renderer.boundingVolumeMode == Renderer.BV_NONE) {
             renderer.boundingVolumeMode = Renderer.BV_BODY;
             print("Bounding volume mode: per body");
@@ -521,5 +543,5 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myOnScreenDisplay       = new OnScreenDisplay(self);
     var _mySetDefaultRenderingCap= true;
     var _myMemoryMeter           = new MemoryMeter(self);
-    var _myOnScreenStatistics    = false;
+    var _myOnScreenStatistics    = 0;
 }

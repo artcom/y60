@@ -19,6 +19,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
+use("Y60JSSL.js");
+
 // Use fileline() function to create location object
 // theName is optional.
 function Exception(theMessage, theLocation, theName) {

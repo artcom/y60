@@ -77,6 +77,14 @@ namespace y60 {
      */
     class Scene {
         public:
+            struct Statistics {
+                Statistics();
+                unsigned long primitiveCount;
+                unsigned long vertexCount;
+                unsigned long materialCount;
+                unsigned long lightCount;
+            };
+
             typedef std::map<std::string, MaterialBasePtr> MaterialIdMap;
 
             DEFINE_NESTED_EXCEPTION(Scene,Exception,asl::Exception);
@@ -92,7 +100,6 @@ namespace y60 {
              */
             Scene();
             virtual ~Scene();
-
 
             /**
              * Loads the file given in theFilename into the scene. It tries all available decoders
@@ -192,19 +199,8 @@ namespace y60 {
             LightVector & getLights() {
                 return _myLights;
             }
-            unsigned getMaterialCount() const {
-                return _myMaterials.size();
-            }
 
-            unsigned long getVertexCount() const {
-                return _myVertexCount;
-            }
-            unsigned long getPrimitiveCount() const {
-                return _myPrimitiveCount;
-            }
-            unsigned long getMaximumPrimitveSize() const {
-                return _myMaximumPrimitiveSize;
-            }
+            const Statistics getStatistics() const;
 
             void collectCameras(dom::NodeList & theCameras) const;
 
@@ -327,9 +323,8 @@ namespace y60 {
 
             void calculateShapeBoundingBox(ShapePtr myShape);
 
-            void updateTransformHierachy(dom::NodePtr theNode,
-                                                       const asl::Matrix4f & theParentMatrix,
-                                                       bool theIgnoreStaticNodes = false);
+            void updateTransformHierachy(dom::NodePtr theNode, 
+                                         const asl::Matrix4f & theParentMatrix);
 
             Primitive & createPrimitive(int theMaterialNumber,
                                         const std::string & theShapeId, unsigned int theDomIndex);
@@ -353,14 +348,11 @@ namespace y60 {
             AnimationManager         _myAnimationManager;
 
             LightVector              _myLights;
-            dom::DocumentPtr         _mySceneDom;
-            
+            dom::DocumentPtr         _mySceneDom;            
             MaterialIdMap            _myMaterials;
-
-            unsigned long _myPrimitiveCount;
-            unsigned long _myMaximumPrimitiveSize;
-            unsigned long _myVertexCount;
-            unsigned long long _myPreviousDomVersion;
+            Statistics               _myStatistics;
+            
+            unsigned long long       _myPreviousDomVersion;
     };
 
     typedef asl::Ptr<Scene> ScenePtr;

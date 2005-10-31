@@ -382,6 +382,7 @@ createStubs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 enum PropertyNumbers {
     PROP_dom = -100,
+    PROP_statistics,
     PROP_cameras,
     PROP_world,
     PROP_canvases,
@@ -463,6 +464,7 @@ JSScene::ConstIntProperties() {
 JSPropertySpec *
 JSScene::Properties() {
     static JSPropertySpec myProperties[] = {
+        {"statistics",   PROP_statistics,   JSPROP_ENUMERATE | JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"dom",          PROP_dom,          JSPROP_ENUMERATE | JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"cameras",      PROP_cameras,      JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"world",        PROP_world,        JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
@@ -487,10 +489,33 @@ JSScene::StaticProperties() {
     return myProperties;
 }
 
+JSBool
+JSScene::getStatistics(JSContext *cx, jsval *vp) {    
+    JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+    jsval rval = OBJECT_TO_JSVAL(myReturnObject);
+    Scene::Statistics myStatistics = getNative().getStatistics();
+    asl::Dashboard & myDashboard = getDashboard();
+    unsigned long myRenderedPrimitives = myDashboard.getCounterValue("TransparentPrimitives") + myDashboard.getCounterValue("OpaquePrimitives");
+    if (!JS_DefineProperty(cx, myReturnObject, "primitives", as_jsval(cx, myStatistics.primitiveCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+    if (!JS_DefineProperty(cx, myReturnObject, "renderedPrimitives", as_jsval(cx, myRenderedPrimitives),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+    if (!JS_DefineProperty(cx, myReturnObject, "vertices", as_jsval(cx, myStatistics.vertexCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;    
+    if (!JS_DefineProperty(cx, myReturnObject, "renderedVertices", as_jsval(cx, myDashboard.getCounterValue("Vertices")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;    
+    if (!JS_DefineProperty(cx, myReturnObject, "materials", as_jsval(cx, myStatistics.materialCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+    if (!JS_DefineProperty(cx, myReturnObject, "lights", as_jsval(cx, myStatistics.lightCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;    
+    if (!JS_DefineProperty(cx, myReturnObject, "activeLights", as_jsval(cx, myDashboard.getCounterValue("ActiveLights")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+    if (!JS_DefineProperty(cx, myReturnObject, "bodies", as_jsval(cx, myDashboard.getCounterValue("RenderedBodies")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+    if (!JS_DefineProperty(cx, myReturnObject, "worldNodes", as_jsval(cx, myDashboard.getCounterValue("WorldNodes")),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+    if (!JS_DefineProperty(cx, myReturnObject, "overlays", as_jsval(cx, myDashboard.getCounterValue("Overlays")),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;    
+    *vp = rval;
+    return JS_TRUE;
+}
+
 // getproperty handling
 JSBool
 JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
+        case PROP_statistics:
+            return getStatistics(cx, vp);
         case PROP_cameras:
             {
                 dom::NodePtr myNode = dom::NodePtr(new dom::Node());

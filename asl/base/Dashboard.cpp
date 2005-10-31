@@ -102,13 +102,10 @@ namespace asl {
 
     unsigned long
     Dashboard::getCounterValue(const std::string & theName) {
+        // [CH] An averaged count is often misleading. Therefore we reset the count
+        // after each cycle and return the last completed count.
         const asl::Counter & myCounter = _myCompleteCycleCounters[theName];
-        unsigned long myCycleCount = _myGroupCounters[myCounter.getGroup()].getCount();
-        if (myCycleCount > 1) {
-            return myCounter.getCount() / myCycleCount;
-        } else {
-            return myCounter.getCount();
-        }
+        return myCounter.getCount();
     }
 
     Dashboard & getDashboard() {
@@ -149,6 +146,7 @@ namespace asl {
                 theGroup == it->second->getGroup())
             {
                 _myCompleteCycleCounters[it->first] = *(it->second);
+                it->second->reset();
 		    }
         }
 

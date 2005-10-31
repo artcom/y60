@@ -18,6 +18,7 @@
 //=============================================================================
 
  try {
+    use("Exception.js");
     use("SceneViewer.js");
 
     var ourShow = new SceneViewer(arguments);

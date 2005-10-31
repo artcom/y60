@@ -562,10 +562,6 @@ SDLWindow::mainLoop() {
         }
         asl::Time myStartFrameTime;
 #endif
-        STOP_TIMER(frames);
-        asl::getDashboard().cycle();
-        START_TIMER(frames);
-
         onFrame();
 
         START_TIMER(dispatchEvents);
@@ -594,6 +590,9 @@ SDLWindow::mainLoop() {
         if (jslib::JSApp::getQuitFlag() == JS_TRUE) {
             _myAppQuitFlag = true;
         }
+        STOP_TIMER(frames);
+        asl::getDashboard().cycle();
+        START_TIMER(frames);
     }
     SDL_Quit();
 

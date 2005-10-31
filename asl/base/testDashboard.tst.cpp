@@ -37,10 +37,15 @@ public:
     DashboardUnitTest() : UnitTest("DashboardUnitTest") {}
     void run() {
         for (int f = 0; f < 4; ++f) {
+            if (f == 0) {
+                ENSURE(getDashboard().getCounterValue("run") == 0);
+            } else {
+                ENSURE(getDashboard().getCounterValue("run") == 5);
+            }
             TimerPtr runTimer = getDashboard().getTimer("run");
             CounterPtr runCounter = getDashboard().getCounter("run");
             runTimer->start();
-            ENSURE(runCounter->getCount() == f * 5);
+            ENSURE(runCounter->getCount() == 0);
             NanoTime myTime = runTimer->getElapsed();
             for (int i = 0; i < 5; ++i) {
                 msleep(1);
@@ -50,7 +55,7 @@ public:
                 myTime = myNewTime;
                 runCounter->count();
             }
-            ENSURE(runCounter->getCount() == 5 * (f+1));
+            ENSURE(runCounter->getCount() == 5);
             runTimer->stop();
             myTime = runTimer->getElapsed();
             for (int i = 0; i < 5; ++i) {
@@ -74,7 +79,7 @@ public:
                 for (int i = 0; i<1000;++i) {
                     {
                         MAKE_SCOPE_TIMER(level5b);
-                    }       
+                    }
                     {
                         MAKE_SCOPE_TIMER(level5c);
                     }

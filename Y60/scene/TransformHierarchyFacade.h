@@ -59,7 +59,6 @@ namespace y60 {
         public IdTag::Plug,
         public NameTag::Plug,
         public VisibleTag::Plug,
-        public FrozenTag::Plug,
         public InsensibleTag::Plug,
         public PositionTag::Plug,
         public OrientationTag::Plug,

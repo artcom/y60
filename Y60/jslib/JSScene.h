@@ -68,6 +68,9 @@ public:
     static JSBool
     save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
+private:
+    JSBool JSScene::getStatistics(JSContext *cx, jsval *vp);
+
 };
 
 template <>

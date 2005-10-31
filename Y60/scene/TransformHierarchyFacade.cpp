@@ -41,7 +41,6 @@ namespace y60 {
         IdTag::Plug(theNode),
         NameTag::Plug(theNode),
         VisibleTag::Plug(theNode),
-        FrozenTag::Plug(theNode),
         InsensibleTag::Plug(theNode),
         PositionTag::Plug(theNode),
         OrientationTag::Plug(theNode),

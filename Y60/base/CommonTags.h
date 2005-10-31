@@ -34,7 +34,6 @@ namespace y60 {
     //                  theTagName       theType        theAttributeName      theDefault
     DEFINE_ATTRIBUT_TAG(NameTag,         std::string,   NAME_ATTRIB,     "JohnDoe");
     DEFINE_ATTRIBUT_TAG(VisibleTag,      bool,          VISIBLE_ATTRIB,  true);
-    DEFINE_ATTRIBUT_TAG(FrozenTag,       bool,          FROZEN_ATTRIB,   false);
     DEFINE_ATTRIBUT_TAG(Position2DTag,   asl::Vector2f, POSITION_ATTRIB, asl::Vector2f(0.f,0.f));
 
     struct IdTag : public asl::Singleton<IdTag> {

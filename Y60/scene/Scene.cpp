@@ -59,8 +59,6 @@ namespace y60 {
 
     Scene::Scene() :
         _myTextureManager(TextureManager::create()),
-        _myPrimitiveCount(0),
-        _myVertexCount(0),
         _mySceneDom(new Document()),
         _myPreviousDomVersion(0)
     {
@@ -141,8 +139,8 @@ namespace y60 {
     void
     Scene::clear() {
         _mySceneDom = dom::DocumentPtr(new dom::Document());
-        _myPrimitiveCount = 0;
-        _myVertexCount = 0;
+        _myStatistics.primitiveCount = 0;
+        _myStatistics.vertexCount = 0;
         _myPreviousDomVersion = 0;
     }
 
@@ -447,12 +445,16 @@ namespace y60 {
     Scene::updateShapes() {
         NodePtr myShapeListNode = getShapesRoot();
         unsigned myShapeCount = myShapeListNode->childNodesLength();
+        _myStatistics.vertexCount = 0;
+        _myStatistics.primitiveCount = 0;
         for (int myShapeIndex = 0; myShapeIndex < myShapeCount; myShapeIndex++) {
             NodePtr myShapeNode = myShapeListNode->childNode(myShapeIndex);
             ShapePtr myShape = myShapeNode->getFacade<Shape>();
             if (myShapeNode->nodeVersion() > myShape->getLastRenderVersion()) {
                 buildShape(myShape);
             }
+            _myStatistics.vertexCount += myShape->getVertexCount();
+            _myStatistics.primitiveCount += myShape->getPrimitives().size();
         }
     }
 
@@ -523,11 +525,6 @@ namespace y60 {
                     }
 
                     myShapeVertexCount += myPrimitive.size();
-                    if (myPrimitive.size() > _myMaximumPrimitiveSize) {
-                        _myMaximumPrimitiveSize = myPrimitive.size();
-                    }
-                    _myPrimitiveCount++;
-
                     myBegin = myEnd;
                 } while (myEnd < myMaxIndexSize);
             }
@@ -541,8 +538,7 @@ namespace y60 {
         parseRenderStyles(myShapeNode, theShape->getRenderStyles());
 
         // Set vertex count
-        theShape->setVertexCount(myShapeVertexCount);
-        _myVertexCount += myShapeVertexCount;
+        theShape->setVertexCount(myShapeVertexCount);        
         DB(AC_TRACE << "shape: " << myShapeId << " has " << theShape->getPrimitives().size() << " materials" << endl;)
 
         calculateShapeBoundingBox(theShape);
@@ -703,11 +699,10 @@ namespace y60 {
             Matrix4f myInitialMatrix;
             myInitialMatrix.makeIdentity();
             _myLights.clear();
-            updateTransformHierachy(getWorldRoot(), myInitialMatrix, true);
+            updateTransformHierachy(getWorldRoot(), myInitialMatrix);
         }
     }
 
-    // updateMaterial offers basic update strategy (only properties and textures)
     void
     Scene::updateMaterials() {
         NodePtr myMaterialList = _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME);
@@ -814,9 +809,7 @@ namespace y60 {
     }
 
     void
-    Scene::updateTransformHierachy(NodePtr theNode, const asl::Matrix4f & theParentMatrix,
-        bool theIgnoreStaticNodes)
-    {
+    Scene::updateTransformHierachy(NodePtr theNode, const asl::Matrix4f & theParentMatrix) {
         TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
         DB(AC_TRACE << "updateTransformHierachy for Node " << myFacade->get<IdTag>();)
         bool isLightNode   = (theNode->nodeName() == LIGHT_NODE_NAME);
@@ -825,14 +818,12 @@ namespace y60 {
         // break travsersal if:
         // not visible and not a light (always continue for lights, since
         // lights can be turned on/off at any time, e.g. per viewport pass)
-        // Also break at frozen (static) nodes if IgnoreStaticNodes is on.
-        if ((myFacade->get<VisibleTag>() == false && !isLightNode) ||
-            (myFacade->get<FrozenTag>() && theIgnoreStaticNodes))
+        if (myFacade->get<VisibleTag>() == false && !isLightNode)
         {
             return;
         }
 
-        COUNT(DynamicWorldNodes);
+        COUNT(WorldNodes);
 
         if (isLightNode) {
             LightPtr myLight = theNode->getFacade<Light>();
@@ -858,7 +849,7 @@ namespace y60 {
 
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
             if (theNode->childNode(i) == Node::ELEMENT_NODE) {
-                updateTransformHierachy(theNode->childNode(i), theParentMatrix, theIgnoreStaticNodes);
+                updateTransformHierachy(theNode->childNode(i), theParentMatrix);
             }
         }
     }
@@ -1373,6 +1364,21 @@ namespace y60 {
     ResourceManager * 
     Scene::getResourceManager() {
         return _myTextureManager->getResourceManager();
+    }
+
+    Scene::Statistics::Statistics() : 
+        primitiveCount(0), 
+        vertexCount(0), 
+        materialCount(0),
+        lightCount(0)
+    {}
+
+    const Scene::Statistics
+    Scene::getStatistics() const {
+        Scene::Statistics myStatistics = _myStatistics;        
+        myStatistics.lightCount     = _myLights.size();
+        myStatistics.materialCount  = _myMaterials.size();
+        return myStatistics;
     }
 }
 

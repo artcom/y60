@@ -56,8 +56,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         }
 
         function isValidNode(theNode) {
-            return (theNode.nodeName != "#comment" &&
-                !("frozen" in theNode && theNode.frozen == "1"));
+            return (theNode.nodeName != "#comment");
         }
 
         function nextNode() {

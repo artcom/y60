@@ -1081,6 +1081,7 @@ namespace y60 {
                 myActiveLightCount++;
             }
         }
+        COUNT_N(ActiveLights, myActiveLightCount);
         AC_TRACE << "enabled " << myActiveLightCount << " lights" << endl;
     }
 

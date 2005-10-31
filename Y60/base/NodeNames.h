@@ -93,7 +93,6 @@ namespace y60 {
     static const char * REVISION_ATTRIB             = "revision";
     static const char * NAME_ATTRIB                 = "name";
     static const char * VISIBLE_ATTRIB              = "visible";
-    static const char * FROZEN_ATTRIB               = "frozen";
     static const char * WIDTH_ATTRIB                = "width";
     static const char * HEIGHT_ATTRIB               = "height";
     static const char * DEPTH_ATTRIB                = "depth";
