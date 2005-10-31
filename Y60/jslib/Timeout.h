@@ -22,12 +22,11 @@
 #include <asl/Time.h>
 #include <asl/Ptr.h>
 
+#include "jssettings.h"
 #include <js/jsapi.h>
 
 #include <string>
 #include <map>
-#include <queue>
-#include <iostream>
 
 namespace jslib {
 
@@ -35,41 +34,15 @@ static unsigned long ourNextTimeoutId = 0;
 
 class Timeout {
     public:
-        Timeout() {}
-
-        Timeout(JSObject * theObject, const std::string & theCommand, double theDuration,
-                        asl::Time theCurrentTime, bool theIsInterval = false) :
-            _myJSObject(theObject),
-            _myCommand(theCommand),
-            _myDuration(theDuration),
-            _isInterval(theIsInterval),
-            _myActivationTime(theCurrentTime + theDuration / 1000.0)
-        {
-        }
-
-        virtual ~Timeout() {}
-
-        const std::string & getCommand() const {
-            return _myCommand;
-        }
-
-        const double getActivationTime() const {
-            return _myActivationTime;
-        }
-
-        bool isInterval() const {
-            return _isInterval;
-        }
-
-        void resetInterval() {
-            _myActivationTime += double(_myDuration) / 1000.0;
-        }
-
-        JSObject * getJSObject() const {
-            return _myJSObject;
-        }
+        Timeout();
+        Timeout(const std::string & theCommand, double theDuration,
+                asl::Time theCurrentTime, bool theIsInterval = false);
+        virtual ~Timeout(); 
+        const std::string & getCommand() const; 
+        const double getActivationTime() const; 
+        bool isInterval() const; 
+        void resetInterval(); 
     private:
-        JSObject *       _myJSObject;
         std::string      _myCommand;
         double           _myDuration;
         double           _myActivationTime;
@@ -83,52 +56,13 @@ typedef std::map<unsigned long, TimeoutPtr>  TimeoutMap;
 
 class TimeoutQueue {
     public:
-        TimeoutQueue() {}
+        TimeoutQueue();
 
-        unsigned long addTimeout(JSObject * theObject, const std::string & theCommand,
-                asl::Time theCurrentTime, double theDuration, bool isInterval = false)
-        {
-            TimeoutPtr myTimeout(new Timeout(theObject, theCommand, theDuration, 
-                        theCurrentTime, isInterval));
-            _myTimeoutMap[ourNextTimeoutId] = myTimeout;
-            _myTimeoutQueue.insert(std::pair<double, unsigned long>(myTimeout->getActivationTime(),
-                ourNextTimeoutId));
-            return ourNextTimeoutId++;
-        }
-
-        void clearTimeout(unsigned long theId) {
-            _myTimeoutMap.erase(theId);
-
-            TimeoutMultiMap::iterator it;
-            for (it = _myTimeoutQueue.begin(); it != _myTimeoutQueue.end(); ++it) {
-                if (it->second == theId) {
-                    _myTimeoutQueue.erase(it);
-                    break;
-                }
-            }
-        }
-
-        bool isShowTime(double theTime) {
-            return (!_myTimeoutQueue.empty() &&
-                     theTime >= _myTimeoutQueue.begin()->first);
-        }
-
-        TimeoutPtr popTimeout() {
-            unsigned long myTimeoutId = (_myTimeoutQueue.begin())->second;
-            _myTimeoutQueue.erase(_myTimeoutQueue.begin());
-
-            TimeoutPtr myTimeout = _myTimeoutMap[myTimeoutId];
-
-            if (myTimeout->isInterval()) {
-                myTimeout->resetInterval();
-               _myTimeoutQueue.insert(std::pair<double, unsigned long>(
-                    myTimeout->getActivationTime(), myTimeoutId));
-            } else {
-                _myTimeoutMap.erase(myTimeoutId);
-            }
-
-            return myTimeout;
-        }
+        unsigned long addTimeout(const std::string & theCommand,
+                asl::Time theCurrentTime, double theDuration, bool isInterval = false);
+        void clearTimeout(unsigned long theId); 
+        bool isShowTime(double theTime); 
+        TimeoutPtr popTimeout(); 
 
     private:
         TimeoutMap      _myTimeoutMap;

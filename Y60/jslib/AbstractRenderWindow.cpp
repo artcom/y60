@@ -244,24 +244,8 @@ namespace jslib {
     }
 
     long
-    AbstractRenderWindow::setObjectTimeout(JSObject *theObject, const std::string & myCommand,
-            float myMilliseconds)
-    {
-        return _myTimeoutQueue.addTimeout(theObject, myCommand, _myElapsedTime, myMilliseconds);
-    }
-
-    long
-    AbstractRenderWindow::setObjectInterval(JSObject *theObject, const std::string & myCommand,
-            float myMilliseconds)
-    {
-        return _myTimeoutQueue.addTimeout(theObject, myCommand, _myElapsedTime,
-                myMilliseconds, true /* isInterval */);
-    }
-
-    long
     AbstractRenderWindow::setTimeout(const std::string & myCommand, float myMilliseconds) {
-        JSObject * myGlobalObject = JS_GetGlobalObject(_myJSContext);
-        return _myTimeoutQueue.addTimeout(myGlobalObject, myCommand, _myElapsedTime,
+        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime,
                 myMilliseconds);
     }
     void
@@ -270,8 +254,7 @@ namespace jslib {
     }
     long
     AbstractRenderWindow::setInterval(const std::string & myCommand, float myMilliseconds) {
-        JSObject * myGlobalObject = JS_GetGlobalObject(_myJSContext);
-        return _myTimeoutQueue.addTimeout(myGlobalObject, myCommand, _myElapsedTime,
+        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime,
                 myMilliseconds, true /* isInterval */);
     }
     void
@@ -331,40 +314,28 @@ namespace jslib {
                     try {
                         MAKE_SCOPE_TIMER(onPostViewport);
 
-                        if (JSA_hasFunction(_myJSContext, myTimeout->getJSObject(),
+                        if (JSA_hasFunction(_myJSContext, _myEventListener,
+//                        if (JSA_hasFunction(_myJSContext, myTimeout->getJSObject(),
                                     myTimeoutCommand.c_str()))
                         {
                             jsval rval;
-                            jslib::JSA_CallFunctionName(_myJSContext, myTimeout->getJSObject(),
+                            jslib::JSA_CallFunctionName(_myJSContext, _myEventListener,
+//                            jslib::JSA_CallFunctionName(_myJSContext, myTimeout->getJSObject(),
                                     myTimeoutCommand.c_str(), 0, 0, &rval);
                         } else {
                             AC_ERROR << "Timeout: Function " << myTimeoutCommand
                                     << " does not exist." << endl;
                         }
                     } catch (const asl::Exception & ex) {
-                        AC_ERROR << "asl exception caught in AbstractRenderWindow::onFrame(), (timeout " << myTimeoutCommand << "): " << ex;
-                    }
-                    catch (const std::exception & ex) {
-                        AC_ERROR << "std::exception caught in AbstractRenderWindow::onFrame(), (timeout " << myTimeoutCommand << "): " << ex.what();
+                        AC_ERROR << "asl exception caught in AbstractRenderWindow::onFrame(),"
+                                << " (timeout " << myTimeoutCommand << "): " << ex;
+                    } catch (const std::exception & ex) {
+                        AC_ERROR << "std::exception caught in AbstractRenderWindow::onFrame(),"
+                                << " (timeout " << myTimeoutCommand << "): " << ex.what();
                     } catch (...) {
-                        AC_ERROR << "Unknown exception in AbstractRenderWindow::onFrame(), (timeout " << myTimeoutCommand << ") ";
+                        AC_ERROR << "Unknown exception in AbstractRenderWindow::onFrame(),"
+                                << " (timeout " << myTimeoutCommand << ") ";
                     }
-/*
-                    JSScript * myScript = JS_CompileScript(_myJSContext, myTimeout->getJSObject(),
-                        myShowCommand.c_str(), myShowCommand.size(), __FILE__, __LINE__);
-
-                    if (!myScript) {
-                        AC_ERROR << "Timeout failed during compile: '" << myShowCommand << "'";
-                    } else {
-                        jsval myResult;
-                        JSBool ok = JS_ExecuteScript(_myJSContext, myTimeout->getJSObject(), myScript, &myResult);
-                        JS_DestroyScript(_myJSContext, myScript);
-
-                        if (!ok) {
-                            AC_ERROR << "Timeout failed during execution: " << myShowCommand << "'";
-                        }
-                    }
-*/
                 }
             }
 
