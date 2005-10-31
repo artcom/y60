@@ -180,9 +180,63 @@ public:
         ENSURE(myBlock == myTestData);
         ENSURE(myReadPos == theBlock.size());
 
-		theBlock.resize(2);
-
-		{
+        // this test should better go to testStream
+        theBlock.resize(0);
+        ENSURE(theBlock.size() == 0);
+        theBlock.appendUnsigned(0x23ULL);
+        ENSURE(theBlock.size() == 1);
+        theBlock.appendUnsigned(0xF0ULL);
+        ENSURE(theBlock.size() == 3);
+        theBlock.appendUnsigned(0x1234ULL);
+        ENSURE(theBlock.size() == 6);
+        theBlock.appendUnsigned(0x123456ULL);
+        ENSURE(theBlock.size() == 10);
+        theBlock.appendUnsigned(0x12345678ULL);
+        ENSURE(theBlock.size() == 15);
+        theBlock.appendUnsigned(0x123456789AULL);
+        ENSURE(theBlock.size() == 21);
+        theBlock.appendUnsigned(0x123456789ABCULL);
+        ENSURE(theBlock.size() == 28);
+        theBlock.appendUnsigned(0x123456789ABCDEULL);
+        ENSURE(theBlock.size() == 36);
+        theBlock.appendUnsigned(0x123456789ABCDEF0ULL);
+        ENSURE(theBlock.size() == 45);
+        
+        myReadPos = 0;
+        ENSURE(myReadPos == 0);
+        Unsigned64 myValue;
+        myReadPos = theBlock.readUnsigned(myValue, myReadPos);
+        ENSURE(myReadPos == 1);
+        ENSURE(myValue == 0x23ULL);
+        myReadPos = theBlock.readUnsigned(myValue, myReadPos);
+        ENSURE(myReadPos == 3);
+        ENSURE(myValue == 0xF0ULL);
+        myReadPos = theBlock.readUnsigned(myValue, myReadPos);
+        ENSURE(myReadPos == 6);
+        ENSURE(myValue == 0x1234ULL);
+        myReadPos = theBlock.readUnsigned(myValue, myReadPos);
+        ENSURE(myReadPos == 10);
+        ENSURE(myValue == 0x123456ULL);
+        myReadPos = theBlock.readUnsigned(myValue, myReadPos);
+        ENSURE(myReadPos == 15);
+        ENSURE(myValue == 0x12345678ULL);
+        myReadPos = theBlock.readUnsigned(myValue, myReadPos);
+        ENSURE(myReadPos == 21);
+        ENSURE(myValue == 0x123456789AULL);
+        myReadPos = theBlock.readUnsigned(myValue, myReadPos);
+        ENSURE(myReadPos == 28);
+        ENSURE(myValue == 0x123456789ABCULL);
+        myReadPos = theBlock.readUnsigned(myValue, myReadPos);
+        ENSURE(myReadPos == 36);
+        ENSURE(myValue == 0x123456789ABCDEULL);
+        myReadPos = theBlock.readUnsigned(myValue, myReadPos);
+        ENSURE(myReadPos == 45);
+        ENSURE(myValue == 0x123456789ABCDEF0ULL);
+        
+        theBlock.resize(0);
+        theBlock.appendUnsigned8('x');
+        theBlock.appendUnsigned8('y');
+ 		{
 			Block myBlock = theBlock;
 			ENSURE(myBlock[0] == 'x');
 			ENSURE(myBlock[1] == 'y');
@@ -343,8 +397,6 @@ public:
 		testEmptyWriteable(myCowBlock);
 		testResize(myCowBlock);
 		testResizeAbstract(myCowBlock);
-
-
     }
 };
 

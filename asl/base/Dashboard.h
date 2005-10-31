@@ -370,7 +370,7 @@ namespace asl {
             // calling with theGroup = 0 resets all timers/counters
             // regardless of object group id
 			void reset(unsigned int theGroup = 1);
-            void cycle(unsigned int theGroup = 1);
+            void cycle(unsigned int theGroup = 1, unsigned long theIncrement=1);
             double getFrameRate();
             TimerPtr findParent();
         private:
@@ -419,6 +419,10 @@ namespace asl {
     #define STOP_TIMER(NAME) \
     {static asl::TimerPtr myTimer ## NAME = asl::getDashboard().getTimer(#NAME);\
     myTimer ## NAME->stop(); }
+
+    #define STOP_TIMER_N(NAME, COUNT) \
+    {static asl::TimerPtr myTimer ## NAME = asl::getDashboard().getTimer(#NAME);\
+    myTimer ## NAME->stop(COUNT); }
 
     #define COUNT(NAME) \
     static asl::CounterPtr myCounter ## NAME = asl::getDashboard().getCounter(#NAME);\

@@ -46,6 +46,8 @@ namespace asl {
 	DEFINE_EXCEPTION(StreamPositionMismatch, Exception);
 	DEFINE_EXCEPTION(StreamReadFailed, Exception);
 	DEFINE_EXCEPTION(StreamWriteFailed, Exception);
+	DEFINE_EXCEPTION(StreamReadNumberTooLargeForVariable, Exception);
+	DEFINE_EXCEPTION(StreamWriteNumberTooLargeForVariable, Exception);
 
     template <class InternalFormat, class ExternalFormat>
     class BinaryArranger;
@@ -168,6 +170,7 @@ namespace asl {
         typedef SIZE_TYPE size_type;
         typedef OFFSET_TYPE offset_type;
         typedef BinaryArranger<AC_HOST_BYTE_ORDER, EXTERNAL_BYTE_ORDER> Arranger;
+        typedef BinaryArranger<AC_HOST_BYTE_ORDER, BigEndianByteOrder> CountArranger;
 
         /// returns the total number of bytes in the object
         virtual size_type size() const = 0;
@@ -188,12 +191,24 @@ namespace asl {
             return myResult;
         }
 
+        /// reads a theNumberSize-length big endian integer from stream
+        template <class TN>
+        size_type readPackedNumber(TN & theDest, size_type theReadOffset, size_type theNumberSize) const {
+            if (theNumberSize <= sizeof(theDest)) {
+                theDest = 0;
+                size_type myResult = readBytes((char*)(&theDest) + sizeof(theDest) - theNumberSize, theNumberSize, theReadOffset);
+                NumberReader<typename CountArranger::self, TN, sizeof(TN)>::swapBytes(theDest);
+                return myResult;
+            }
+            throw StreamReadNumberTooLargeForVariable(JUST_FILE_LINE);
+        }
+
         virtual size_type readBlock(WriteableBlock & theDest, size_type theReadOffset) const;
 
         size_type readSize(size_type & theDest, size_type theReadOffset) const {
             return readNumber(theDest, theReadOffset);	
         }
- 
+#if OLD_NUM
         size_type readUnsigned(size_type & theDest, size_type theReadOffset) const {
             unsigned char mySmallCount;
             theReadOffset = readUnsigned8(mySmallCount, theReadOffset);
@@ -217,6 +232,34 @@ namespace asl {
             theDest=mySmallCount;
             return theReadOffset;
         }
+#else
+        size_type readUnsigned(Unsigned64 & theDest, size_type theReadOffset) const {
+            unsigned char mySmallCount;
+            theReadOffset = readUnsigned8(mySmallCount, theReadOffset);
+            if (mySmallCount >= 0xF0) {
+                unsigned char myLen = mySmallCount - 0xEF;
+                theReadOffset = readPackedNumber(theDest, theReadOffset, myLen);
+            } else {
+                theDest = mySmallCount;
+            }
+            return theReadOffset;
+        }
+       size_type readUnsigned(Unsigned32 & theDest, size_type theReadOffset) const {
+            unsigned char mySmallCount;
+            theReadOffset = readUnsigned8(mySmallCount, theReadOffset);
+            if (mySmallCount >= 0xF0) {
+                unsigned char myLen = mySmallCount - 0xEF;
+                if (myLen <=4) {
+                    theReadOffset = readPackedNumber(theDest, theReadOffset, myLen);
+                } else {
+                    throw StreamReadNumberTooLargeForVariable(JUST_FILE_LINE);
+                }
+            } else {
+                theDest = mySmallCount;
+            }
+            return theReadOffset;
+        }
+#endif
         size_type readSigned(offset_type & theDest, size_type theReadOffset) const {
             signed char mySmallCount;
             theReadOffset = readSigned8(mySmallCount, theReadOffset);
@@ -353,6 +396,7 @@ namespace asl {
         typedef OFFSET_TYPE offset_type;
         typedef BinaryArranger<AC_HOST_BYTE_ORDER, EXTERNAL_BYTE_ORDER> Arranger;
         typedef WriteableArrangedStream<EXTERNAL_BYTE_ORDER, SIZE_TYPE, OFFSET_TYPE> WriteableStream;
+        typedef BinaryArranger<AC_HOST_BYTE_ORDER, BigEndianByteOrder> CountArranger;
 
         /// append theSize bytes from theMemory to the WriteableStream
         virtual WriteableStream & append(const void * theMemory, size_type theSize) = 0;
@@ -364,7 +408,17 @@ namespace asl {
         WriteableStream & appendData(const T & thePlainOldData) {
             return append(&thePlainOldData, sizeof(thePlainOldData));
         }
-        WriteableStream & appendUnsigned(size_type theCount) {
+        template <class TN>
+        WriteableStream & appendPackedNumber(TN theNumber, size_type theNumberSize) {
+            if (theNumberSize <= sizeof(theNumber)) {
+                NumberReader<typename CountArranger::self, TN, sizeof(TN)>::swapBytes(theNumber);
+                return append((char*)(&theNumber) + sizeof(theNumber) - theNumberSize, theNumberSize);
+            } else {
+                throw StreamWriteNumberTooLargeForVariable(JUST_FILE_LINE);
+            }
+        }
+#ifdef OLD_NUM
+         WriteableStream & appendUnsigned(size_type theCount) {
             if (theCount < 0xfd) {
                 return appendSigned8((unsigned char)theCount);
             }
@@ -379,6 +433,43 @@ namespace asl {
             appendUnsigned8(0xfd);
             return appendUnsigned64(theCount);
         }
+#else
+       WriteableStream & appendUnsigned(Unsigned64 theCount) {
+            if (theCount < size_type(0xF0ULL)) {
+                return appendUnsigned8((unsigned char)theCount);
+            }
+            if (theCount < size_type(0x100ULL)) {
+                appendUnsigned8(0xF0);
+                return appendUnsigned8((unsigned char)theCount);
+            }
+            if (theCount < size_type(0x10000ULL)) {
+                appendUnsigned8(0xF1);
+                return appendPackedNumber(theCount, 2);
+            }
+            if (theCount < size_type(0x1000000ULL)) {
+                appendUnsigned8(0xF2);
+                return appendPackedNumber(theCount, 3);
+            }
+            if (theCount < 0x100000000ULL) {
+                appendUnsigned8(0xF3);
+                return appendPackedNumber(theCount, 4);
+            }
+            if (theCount < 0x10000000000ULL) {
+                appendUnsigned8(0xF4);
+                return appendPackedNumber(theCount, 5);
+            }
+            if (theCount < 0x1000000000000ULL) {
+                appendUnsigned8(0xF5);
+                return appendPackedNumber(theCount, 6);
+            }
+            if (theCount < 0x100000000000000ULL) {
+                appendUnsigned8(0xF6);
+                return appendPackedNumber(theCount, 7);
+            }
+            appendUnsigned8(0xF7);
+            return appendPackedNumber(theCount, 8);
+        };
+#endif
         WriteableStream & appendSigned(offset_type theCount) {
             if (theCount < 127 && theCount > -127) {
                 return appendUnsigned8((signed char)theCount);

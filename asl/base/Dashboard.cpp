@@ -128,8 +128,8 @@ namespace asl {
 
     const double FRAME_AVERAGING_TIME = 3;
 
-    void Dashboard::cycle(unsigned int theGroup) {
-        _myGroupCounters[theGroup].count();
+    void Dashboard::cycle(unsigned int theGroup, unsigned long theIncrement) {
+        _myGroupCounters[theGroup].count(theIncrement);
         for (std::map<std::string,TimerPtr>::iterator it=_myTimers.begin();
 			it != _myTimers.end(); ++it)
 		{

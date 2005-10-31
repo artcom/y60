@@ -150,10 +150,12 @@ namespace dom {
                 }
                 return newValue;
              }
+#ifdef DEBUG
              void debug() const {
                  getValuePtr()->printPrecursorGraph();
                  getValuePtr()->printDependendGraph();
              }
+#endif
         protected:
             void dependsOn(ValuePtr theValue) {
                 _myAttribute->nodeValueWrapperPtr()->registerPrecursor(theValue);

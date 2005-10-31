@@ -177,7 +177,8 @@ namespace y60 {
             LightingModel           _myLightingModel;
 
             asl::Unsigned64   _myMaterialVersion;
-            unsigned long     _myRequiresVersion;
+            asl::Unsigned64   _myRequiresVersion;
+            //unsigned long     _myRequiresVersion;
 
             bool              _myTexGenFlag;
 			TexGenModeList    _myTexGenModes;

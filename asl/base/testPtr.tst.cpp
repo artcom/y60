@@ -23,6 +23,7 @@
 
 #include "Ptr.h"
 #include "Time.h"
+#include "DashBoard.h"
 
 #include "MultiThreadedUnitTest.h"
 
@@ -366,7 +367,59 @@ public:
         cerr << "Second Freeing    took " << myReFreeTime << ", " << myTestCount/myReFreeTime << " ptr/sec" << endl;
    }
 };
+template <int N, class ThreadingModel>
+class PtrUnitPerfTest : public TemplateUnitTest {
+public:
+    PtrUnitPerfTest() : TemplateUnitTest("PtrUnitPerfTest-",asl::as_string(N).c_str()) {  }
+    void run() {
+#if DEBUG_VARIANT        
+        const int repeatCount = 10000;
+#else        
+        const int repeatCount = 1000000;
+#endif        
+       for (int f = 0; f < 4; ++f) {
+           {
+               MAKE_SCOPE_TIMER(PtrUnitPerfTest);
+               ENSURE(TestClassBase<N>::_theInstanceCount_ == 0);
+               std::vector<Ptr<TestClassDerived<N>, ThreadingModel> > myVec;
+               for (int i = 0; i < repeatCount; ++i) {
+                   myVec.push_back(Ptr<TestClassDerived<N>, ThreadingModel>(new TestClassDerived<N> ));
+               }
+               ENSURE(TestClassBase<N>::_theInstanceCount_ == repeatCount);
 
+               START_TIMER(vector_copy1);
+               std::vector<Ptr<TestClassDerived<N>, ThreadingModel> > otherBaseVec;
+               otherBaseVec = myVec;
+               STOP_TIMER_N(vector_copy1,repeatCount);
+
+               std::vector<Ptr<TestClassBase<N>, ThreadingModel> > myBaseVec(repeatCount);
+
+               START_TIMER(vector_copy2);
+               std::copy(myVec.begin(),myVec.end(),myBaseVec.begin());
+               STOP_TIMER_N(vector_copy2,repeatCount);
+               ENSURE(equal(myBaseVec.begin(), myBaseVec.end(), otherBaseVec.begin()));
+
+               START_TIMER(vector_equal);
+               bool myEqual = equal(myBaseVec.begin(), myBaseVec.end(), otherBaseVec.begin());
+               STOP_TIMER_N(vector_equal,repeatCount);
+               ENSURE(myEqual);
+
+
+               ENSURE(TestClassBase<N>::_theInstanceCount_ == repeatCount);
+               START_TIMER(vector_clear);
+               myBaseVec.resize(0);
+               otherBaseVec.resize(0);
+
+               myVec.resize(0);
+               STOP_TIMER_N(vector_clear, repeatCount);
+               ENSURE(TestClassBase<N> ::_theInstanceCount_ == 0);
+           }
+           getDashboard().cycle();
+       }
+       getDashboard().print(std::cerr);
+       getDashboard().reset();
+    }
+};
 class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
@@ -376,11 +429,11 @@ public:
         addTest(new PtrUnitTest<0,SingleProcessor>);
         addTest(new PtrUnitTest<0,MultiProcessor>);
 
-// TODO: adapt all these nifty allocators to support the WeakPtr stuff
 #if 1
+        // TODO: adapt all these nifty allocators to support the WeakPtr stuff
         addTest(new AllocatorUnitTest<0,SingleThreaded,PtrFreeListAllocator>("PtrFreeListAllocator"));
         addTest(new AllocatorUnitTest<0,SingleThreaded,PtrFreeListChunkAllocator<SingleThreaded> >("PtrFreeListChunkAllocator"));
-#endif 
+
         // addTest(new AllocatorUnitTest<0,MultiProcessor,PtrHeapAllocator<MultiProcessor> >("PtrHeapAllocator"));
         addTest(new AllocatorUnitTest<0,MultiProcessor,MutexPtrFreeListAllocator>("MutexPtrFreeListAllocator"));
         //addTest(new AllocatorUnitTest<0,MultiProcessor,PtrThreadSpecificFreeListAllocator>("PtrThreadSpecificFreeListAllocator"));
@@ -388,6 +441,11 @@ public:
         addTest(new AllocatorUnitTest<0,MultiProcessor,PtrThreadSpecificFreeListChunkAllocator>("PtrThreadSpecificFreeListChunkAllocator"));
         addTest(new PtrUnitTest2<0>);
         addTest(new PtrMultiThreadTest);
+#endif 
+        
+        addTest(new PtrUnitPerfTest<0,SingleThreaded>);
+        addTest(new PtrUnitPerfTest<0,SingleProcessor>);
+        addTest(new PtrUnitPerfTest<0,MultiProcessor>);
     }
 };
 

@@ -27,15 +27,22 @@ using namespace std;
 using namespace asl;
 using namespace dom;
 
+
 namespace y60 {
  
 #if 1
-#define PRINTMESSAGE(theNode, theMessage, theColor)
-#else
-#define PRINTMESSAGE(theNode, theMessage, theColor) \
+    // do not print debug messages
+    #define PRINTMESSAGE(theNode, theMessage, theColor)
+    #define DB(x) // x
+#else   
+    // print debug messages
+    #define PRINTMESSAGE(theNode, theMessage, theColor) \
             if (AC_DEBUG_ON) cerr << theNode.nodeName() << " (" << theNode.getAttributeString("name") << "): "\
                 << theColor << theMessage << ENDCOLOR << endl;
+    #define DB(x) x
 #endif
+
+
  
     TransformHierarchyFacade::TransformHierarchyFacade(dom::Node & theNode) : dom::Facade(theNode),
         IdTag::Plug(theNode),
@@ -134,11 +141,11 @@ namespace y60 {
             InverseGlobalMatrixTag::Plug::dependsOn<GlobalMatrixTag>(*this);  
             InverseGlobalMatrixTag::Plug::setCalculatorFunction(&TransformHierarchyFacade::recalculateInverseGlobalMatrix);
 
-            if (AC_DEBUG_ON){
+            DB(if (AC_TRACE_ON){
                 PRINTMESSAGE (getNode(),"TransformHierarchyFacade::registerDependencies(): Dependencies of InverseGlobalMatrixTag of facade", TTYYELLOW);
                 InverseGlobalMatrixTag::Plug::getValuePtr()->printPrecursorGraph();
-                debug<GlobalMatrixTag>();
-            }
+                //debug<GlobalMatrixTag>();
+            })
         }
     }
    

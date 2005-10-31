@@ -73,8 +73,11 @@
 namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
-    class X86ByteOrder {};
-    class PowerPCByteOrder {};
+    class LittleEndianByteOrder{};
+    typedef LittleEndianByteOrder X86ByteOrder;
+
+    class BigEndianByteOrder {};
+    typedef BigEndianByteOrder PowerPCByteOrder;
 
 #ifdef _SETTING_LITTLE_ENDIAN_
     typedef X86ByteOrder AC_HOST_BYTE_ORDER;
@@ -165,8 +168,8 @@ namespace asl {
 } // namespace asl
 #endif
 
-#define PROFILING_LEVEL_NORMAL 1
-#define PROFILING_LEVEL_FULL 1
+//#define PROFILING_LEVEL_NORMAL 1
+//#define PROFILING_LEVEL_FULL 1
 
 namespace asl {
 	inline void initialize() {

@@ -87,9 +87,6 @@
 #define DBP2(x) // x
 #endif
 
-// more profiling
-#define DBP2(x)  x
-
 using namespace std;
 using namespace asl;
 
