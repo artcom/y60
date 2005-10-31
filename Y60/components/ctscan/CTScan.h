@@ -67,7 +67,7 @@ class CTScan {
         int setSlices(std::vector<dom::ResizeableRasterPtr> theSlices);
 
         void reconstructToImage(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
-        void reconstructToImage(const asl::Quaternionf & theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
+        void reconstructToImage(const asl::Quaternionf & theOrientation, int theSliceIndex, dom::NodePtr & theImageNode, bool theTrilliniarInterpolate = true);
 
         /** Returns the default window center/width */
         const asl::Vector2f & getDefaultWindow() const;
@@ -218,7 +218,7 @@ class CTScan {
         fastValueAt(const asl::Vector3f & thePosition);
 
         template <class VoxelT>
-        void reconstructToImageImpl(const asl::Quaternionf & theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
+        void reconstructToImageImpl(const asl::Quaternionf & theOrientation, int theSliceIndex, dom::NodePtr & theImageNode, bool theTrilliniarInterpolate = true);
 
         template <class VoxelT>
         void reconstructToImageImpl(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);

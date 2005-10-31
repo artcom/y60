@@ -202,9 +202,9 @@ static JSBool
 reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
-        if (argc != 3) {
+        if (argc < 3 || argc > 4) {
             JS_ReportError(cx, "JSCTScan::reconstructToImage(): Wrong number of arguments, "
-                               "expected 3 (Orientation, SliceIndex, Image Node), got %d.", argc);
+                               "expected 3-3 (Orientation, SliceIndex, Image Node, interpolate), got %d.", argc);
             return JS_FALSE;
         }
         if (JSVAL_IS_VOID(argv[0])) {
@@ -219,7 +219,7 @@ reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
             JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #2 is undefined");
             return JS_FALSE;
         }
-
+        
         int mySlice = 0;
         convertFrom(cx, argv[1], mySlice);
         dom::NodePtr myImageNode;
@@ -233,7 +233,11 @@ reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
                 JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #0 must be an Orientation or a Quaternion");
                 return JS_FALSE;
             }
-            myCTScan.reconstructToImage(myOrientationQuaternion, mySlice, myImageNode);
+            bool myInterpolateFlag = true;
+            if (! JSVAL_IS_VOID(argv[3])) {
+                convertFrom(cx, argv[3], myInterpolateFlag);
+            }
+            myCTScan.reconstructToImage(myOrientationQuaternion, mySlice, myImageNode, myInterpolateFlag);
         } else {
             myCTScan.reconstructToImage(static_cast<CTScan::Orientation>(myOrientationEnum), mySlice, myImageNode);
         }
@@ -594,7 +598,7 @@ JSCTScan::Functions() {
         {"loadSlices",           loadSlices,              0},
         {"loadSphere",           loadSphere,              0},
 //        {"renderToImage",        renderToImage,           2},
-        {"reconstructToImage",   reconstructToImage,      3},
+        {"reconstructToImage",   reconstructToImage,      4},
         {"clear",                clear,                   0},
         {"verifyCompleteness",   verifyCompleteness,      0},
         {"setVoxelSize",         setVoxelSize,            1},

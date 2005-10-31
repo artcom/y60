@@ -688,24 +688,24 @@ CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
 
 void 
 CTScan::reconstructToImage(const Quaternionf & theOrientation, int theSliceIndex, 
-        dom::NodePtr & theImageNode) {
+        dom::NodePtr & theImageNode, bool theTrilliniarInterpolate) {
     switch (_myEncoding) {
         case y60::GRAY:
             {
                 typedef unsigned char VoxelT;
-                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode);
+                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode, theTrilliniarInterpolate);
             }
             break;
         case y60::GRAY16:
             {
                 typedef unsigned short VoxelT;
-                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode);
+                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode, theTrilliniarInterpolate);
             }
             break;
         case y60::GRAYS16:
             {
                 typedef short VoxelT;
-                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode);
+                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode, theTrilliniarInterpolate);
             }
             break;
         default:
@@ -837,7 +837,7 @@ CTScan::reconstructToImageImpl(CTScan::Orientation theOrientation, int theSliceI
 template <class VoxelT>
 void 
 CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceIndex, 
-        dom::NodePtr & theImageNode) 
+        dom::NodePtr & theImageNode, bool theTrilliniarInterpolate) 
 {
     try {
         if (_myState != COMPLETE) {
@@ -899,8 +899,11 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
                 VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+myTargetLineStride*v+myStart);
                 for (int u = myStart; u < myEnd; ++u) {
                     Vector3f mySourcePos = myLinePos + (float(u) * mySourceDeltaU);
-                    //*myAddress = fastValueAt<VoxelT>(mySourcePos);
-                    *myAddress = interpolatedValueAt<VoxelT>(mySourcePos);
+                    if (theTrilliniarInterpolate) {
+                        *myAddress = interpolatedValueAt<VoxelT>(mySourcePos);
+                    } else {
+                        *myAddress = fastValueAt<VoxelT>(mySourcePos);
+                    }                    
                     myAddress ++;
                 }
             }
