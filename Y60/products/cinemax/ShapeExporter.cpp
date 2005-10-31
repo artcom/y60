@@ -310,9 +310,16 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
 
     BaseSelect * myBaseSelect = theSelection->GetBaseSelect();
     LONG myPolyFrom, myPolyTo;
-    for (LONG mySelectionIndex = 0; myBaseSelect->GetRange(mySelectionIndex, &myPolyFrom, &myPolyTo); ++mySelectionIndex) {
-        //GePrint(String(myName.c_str()) + " from=" + LongToString(myPolyFrom) + " to=" + LongToString(myPolyTo));
+    LONG mySelectionIndex = 0;
+    myBaseSelect->GetRange(mySelectionIndex, &myPolyFrom, &myPolyTo);
+    GePrint(String(myName.c_str()) + " from=" + LongToString(myPolyFrom) + " to=" + LongToString(myPolyTo));
+    if (String(myName.c_str()) == "b2 architektur_grafik") {
+        GePrint(String(myName.c_str()) + " from=" + LongToString(myPolyFrom) + " to=" + LongToString(myPolyTo));
+    }
+    bool myVerticesFound = false;
+    for (mySelectionIndex = 0; myBaseSelect->GetRange(mySelectionIndex, &myPolyFrom, &myPolyTo); ++mySelectionIndex) {
         for (LONG myPolyIndex = myPolyFrom; myPolyIndex <= myPolyTo; ++myPolyIndex) {
+            myVerticesFound = true;
 			if (theBaseSelection) {
 				// do not export polygons in baseobejct that are used in selections
 				theBaseSelection->GetBaseSelect()->Deselect(myPolyIndex);
@@ -442,6 +449,9 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
 		        appendVertexIndices(myElementBuilder, myVertexIndexC, myColorIndex, myNormalIndexC, myUVIndexC, myY60TextureCount);
             }
         }
+    }
+    if (!myVerticesFound) {
+        return "";
     }
 	_myMaterialExporter.writeMaterial(myMaterialInfo, thePolygonNode, 
 		                              theMaterialList, _mySceneBuilder, 

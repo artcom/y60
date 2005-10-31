@@ -59,9 +59,10 @@ MaterialExporter::getColor(BaseChannel * theColorChannel, Vector4f & theColor) {
 
 ExportedMaterialInfo
 MaterialExporter::createDefaultMaterial() {
-    if (_myDefaultMaterialInfo._myMaterialId == "") {
-        _myDefaultMaterialBuilder = MaterialBuilderPtr (new y60::MaterialBuilder("default_material"));
+    if (_myDefaultMaterialInfo._myMaterialName == "") {
+        _myDefaultMaterialBuilder = MaterialBuilderPtr (new y60::MaterialBuilder("default_material"));        
         _myDefaultMaterialInfo._myMaterialId = _mySceneBuilder->appendMaterial(*_myDefaultMaterialBuilder);
+        _myDefaultMaterialInfo._myMaterialName = "default_material";
         _myDefaultMaterialInfo._myTextureCount = 0;
         _myDefaultMaterialInfo._myTexureMapping.clear();
 
@@ -328,6 +329,7 @@ MaterialExporter::exportShader(PluginShader * theShader,
             case Xfilter:
             case Xnoise:
 			case Xfusion:
+            case Xbase:
 			case Xnormaldirection:
                 GePrint("Ignoring Shader: " + theShader->GetName());
                 break;
@@ -376,6 +378,7 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
 
     _myMaterialBuilder = y60::MaterialBuilderPtr(new y60::MaterialBuilder(myY60MaterialName, _myInlineTextures));
     myExportedMaterialInfo._myMaterialId = _mySceneBuilder->appendMaterial(*_myMaterialBuilder);
+    myExportedMaterialInfo._myMaterialName = myY60MaterialName;
 
     // count y60 textures that need uvmaps
     for (int myMaterialIndex = 0; myMaterialIndex < _myMaterials.size(); myMaterialIndex++) {
@@ -432,7 +435,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
         //myExportedMaterialInfo._myTextureCount = 0;
 
         // Check if material has alread been exported
-        if (_myMaterialMap.find(theMaterialInfo._myMaterialId) != _myMaterialMap.end()) {
+        if (_myMaterialMap.find(theMaterialInfo._myMaterialName) != _myMaterialMap.end()) {
             return;
         }
 
@@ -490,6 +493,21 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
             }
 
             // Transparency / Alpha
+            if (myMaterial->GetChannelState(CHANNEL_TRANSPARENCY)) {
+                BaseChannel * myTransparencyChannel = myMaterial->GetChannel(CHANNEL_TRANSPARENCY);
+                if (myTransparencyChannel) {
+                    BaseContainer myColorContainer = myTransparencyChannel->GetData();
+                    //getColor(myTransparencyChannel, myDiffuseColor); // we do not know what to do with this color value (vs)
+                    //Real myAlpha = myColorContainer.GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
+                    Real   myBrightness    = myColorContainer.GetReal(BASECHANNEL_BRIGHTNESS_EX);
+                    Vector4f myDiffuseColor(1, 1, 1, 1);
+                    if (hasPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY) ) {
+                        myDiffuseColor = getPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY);
+                    }
+                    myDiffuseColor[3] = myBrightness;
+                    setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
+                }
+            }
             if (myMaterial->GetChannelState(CHANNEL_ALPHA)) {
                   BaseChannel * myAlphaChannel = myMaterial->GetChannel(CHANNEL_ALPHA);
                   if (myAlphaChannel) {
@@ -505,7 +523,8 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 				  }
 			}
 
-			myMaterialAlphaFlag = myMaterialAlphaFlag | (myMaterial->GetChannelState(CHANNEL_ALPHA)==TRUE);
+			myMaterialAlphaFlag = myMaterialAlphaFlag | (myMaterial->GetChannelState(CHANNEL_ALPHA)==TRUE) |
+                                                        (myMaterial->GetChannelState(CHANNEL_TRANSPARENCY)==TRUE) ;
                // Export specular color
             Vector4f mySpecularColor(0, 0, 0, 1);
             if (myMaterial->GetChannelState(CHANNEL_SPECULARCOLOR)) {
@@ -557,9 +576,9 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 
         _myMaterialBuilder->setTransparencyFlag(myMaterialAlphaFlag);
         //myExportedMaterialInfo._myTextureCount = _myMaterialBuilder->getTextureCount();
-        _myMaterialMap[theMaterialInfo._myMaterialId] = theMaterialInfo;
+        _myMaterialMap[theMaterialInfo._myMaterialName] = theMaterialInfo;
         _myMaterialBuilder->computeRequirements();
-        GePrint("+++ Exported material '" + String(theMaterialInfo._myMaterialId.c_str()) + "'");
+        GePrint("+++ Exported material '" + String(theMaterialInfo._myMaterialName.c_str()) + "'");
 
         //return myExportedMaterialInfo;
         //return _myMaterialBuilder;

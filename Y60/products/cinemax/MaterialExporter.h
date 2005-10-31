@@ -32,10 +32,11 @@
 #include <map>
 
 struct ExportedMaterialInfo {
+    std::string _myMaterialName;
     std::string _myMaterialId;
     unsigned    _myTextureCount;
 	std::vector<LONG> _myTexureMapping;
-	ExportedMaterialInfo(): _myMaterialId(""),  _myTextureCount(0) {}
+	ExportedMaterialInfo(): _myMaterialName(""), _myMaterialId(""), _myTextureCount(0) {}
 };
 
 struct MaterialTextureTagCombo {
