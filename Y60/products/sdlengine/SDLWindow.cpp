@@ -201,10 +201,12 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
             // XXX is this necessary?
             ShaderLibraryPtr myShaderLibrary = dynamic_cast_Ptr<ShaderLibrary> (_myRenderer->getShaderLibrary());
             myShaderLibrary->reload();
-            asl::VertexMemory()->enableDMA();
+            //asl::VertexMemory()->enableDMA();
             //_myRenderer->reshape(getWidth(), getHeight());
         }
         if (_myScene) {
+            _myScene->clearShapes();
+            _myScene->setup();
             _myScene->getTextureManager()->setupTextures();
         }
     }

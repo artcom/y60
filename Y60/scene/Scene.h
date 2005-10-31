@@ -284,6 +284,8 @@ namespace y60 {
             void reverseUpdateShapes();
 
             void setup();
+            void clearShapes();
+
             /**
              * Register a ResourceManager with the scenes Texturemanager. The ResourceManager
              * is used to render Textures in the context it is created for. If the Scene does
@@ -313,7 +315,6 @@ namespace y60 {
             void reloadMaterial(dom::NodePtr theMaterialNode, MaterialBasePtr theMaterial);
             void loadAnimations();
             void updateMaterials();
-            void clearShapes();
 
             void collectGarbage();
             void collectReferences(dom::NodePtr theNode, std::set<std::string> & theReferences);
