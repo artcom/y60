@@ -33,8 +33,8 @@ WalkMover.prototype.Constructor = function(self) {
     const MODEL_FRONT_DIRECTION    = new Vector3f(0,0,1);
     const MODEL_UP_DIRECTION       = new Vector3f(0,1,0);
     const MODEL_RIGHT_DIRECTION    = cross(MODEL_FRONT_DIRECTION, MODEL_UP_DIRECTION);
-    const INITIAL_WALK_SPEED       = 0.1; // percentage of world size per second
-    const INITIAL_EYEHEIGHT        = 2.0;
+    const INITIAL_WALK_SPEED       = 0.01; // percentage of world size per second
+    const INITIAL_EYEHEIGHT        = 200.0;
     const ROTATE_SPEED             = 1.0;
     const GRAVITY                  = 9.81;
     const PERSON_MASS              = 100;
@@ -212,7 +212,7 @@ WalkMover.prototype.Constructor = function(self) {
         var myGroundIntersection = nearestIntersection(self.getWorld(), theProbe);
         //print("Find ground with ray: " + theProbe);
         if (myGroundIntersection) {
-            _myGroundPlane  = new Plane(_myUpVector, myGroundIntersection.position);
+            _myGroundPlane  = new Planef(_myUpVector, myGroundIntersection.position);
             _myGroundNormal = normalized(myGroundIntersection.normal);
             _myGroundContactFlag = true;
             var myNewPosition = new Vector3f(myGroundIntersection.position);
