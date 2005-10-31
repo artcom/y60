@@ -17,8 +17,6 @@
 //=============================================================================
 
 #define JOINT_VECTOR_COUNT 186
-#define DIRECTIONAL_LIGHT_COUNT 1
-#define POSITIONAL_LIGHT_COUNT 2
 
 struct app2vert {
     float3 Position  : POSITION;
@@ -43,10 +41,10 @@ vert2frag mainVertex(app2vert IN,
                      uniform float4x4 GL_MODELVIEW_PROJECTION,
                      uniform float4x4 AC_OBJECTWORLD,
                      uniform float4x4 AC_OBJECTWORLD_IT,
-                     uniform float3   AC_DIRECTIONAL_LIGHTS[DIRECTIONAL_LIGHT_COUNT],
-                     uniform float4   AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[DIRECTIONAL_LIGHT_COUNT],
-                     uniform float3   AC_POSITIONAL_LIGHTS[POSITIONAL_LIGHT_COUNT],
-                     uniform float4   AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[POSITIONAL_LIGHT_COUNT],
+                     uniform float3   AC_DIRECTIONAL_LIGHTS[],
+                     uniform float4   AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
+                     uniform float3   AC_POSITIONAL_LIGHTS[],
+                     uniform float4   AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
                      uniform float4   AC_AMBIENT_LIGHT_COLOR
                      )
 {
@@ -94,11 +92,11 @@ vert2frag mainVertex(app2vert IN,
 
     float4 myDiffuse = float4(0,0,0,1);
 
-    for (i = 0; i < DIRECTIONAL_LIGHT_COUNT; ++i) {
+    for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
         myDiffuse  += max(0, dot(AC_DIRECTIONAL_LIGHTS[i], myWorldNormal)) * AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[i];
     }
 
-    for (i = 0; i < POSITIONAL_LIGHT_COUNT; ++i) {
+    for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
         float3 posLightDirection = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
         myDiffuse  += max(0, dot(myWorldNormal, posLightDirection)) * AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i];
     }
