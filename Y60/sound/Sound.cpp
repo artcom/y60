@@ -186,7 +186,8 @@ void Sound::update(double theTimeSlice) {
             myBuffersFilledRatio*theTimeSlice+
             (1-myBuffersFilledRatio)*_myMaxUpdateTime;
     _myDecoder->setTime(getCurrentTime());
-    AC_DEBUG << "Sound::update: " << hex << (void*)this << dec << " playing=" << isPlaying() << " decodingComplete=" << _myDecodingComplete;
+    AC_DEBUG << "Sound::update: " << hex << (void*)this << dec << " playing=" << 
+            isPlaying() << " decodingComplete=" << _myDecodingComplete;
     if (_myDecodingComplete && !isPlaying()) {
         AC_DEBUG << "Sound::update: Playback complete";
         _myDecodingComplete = false;
@@ -207,8 +208,7 @@ void Sound::update(double theTimeSlice) {
             if (_myCacheItem && !_myCacheItem->isFull()) {
                 _myCacheItem->doneCaching(_myDecoder->getCurFrame());
             }
-            if (_myIsLooping) {
-                AC_DEBUG << "Sound::update: Loop";
+            if (_mySampleSink->getState() != HWSampleSink::STOPPED) {
                 if (_myCacheItem && _myCacheItem->isFull() && 
                         !dynamic_cast<CacheReader *>(_myDecoder)) 
                 {
@@ -217,13 +217,16 @@ void Sound::update(double theTimeSlice) {
                     _myDecoder = new CacheReader(_myCacheItem);
                     _myDecoder->setSampleSink(this);
                 }
-                _myDecoder->seek(0);
-                update(0.1);
-            } else {
-                AC_DEBUG << "Sound::update: DecodingComplete";
-                _myDecodingComplete = true;
-                _mySampleSink->stop(true);
-                close();
+                if (_myIsLooping) {
+                    AC_DEBUG << "Sound::update: Loop";
+                    _myDecoder->seek(0);
+                    update(0.1);
+                } else {
+                    AC_DEBUG << "Sound::update: DecodingComplete";
+                    _myDecodingComplete = true;
+                    _mySampleSink->stop(true);
+                    close();
+                }
             }
         }
     } 
