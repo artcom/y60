@@ -62,7 +62,7 @@ namespace y60 {
     T
     getPropertyValue(dom::NodePtr theParentNode, const char * theType, const char * thePropertyName,
 	                 const char * theListName = PROPERTY_LIST_NAME) {
-        getPropertyValue<T>(*theParentNode, theType, thePropertyName, theListName);
+        return getPropertyValue<T>(*theParentNode, theType, thePropertyName, theListName);
     }
 
     template <class T>
