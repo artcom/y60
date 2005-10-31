@@ -28,8 +28,8 @@
 #include <asl/Pump.h>
 #include <math.h>
 
-#define DB(x) // x
-#define DB2(x) // x
+#define DB(x)  x
+#define DB2(x)  x
 
 
 using namespace std;
@@ -219,6 +219,11 @@ namespace y60 {
         // seek if timestamp is outside these boundaries
         double myTimePerFrame = 1.0 / _myContext->getFrameRate();
         double myLastDecodedTime = _myVideoFrame->pts / (double)AV_TIME_BASE;
+        
+        // Special case: prevent seek due to inaccuracies in the cache size calculation.
+        if (theEndTime - theStartTime < myTimePerFrame/4) {
+            return;
+        }
 
         DB2(cerr << "fillCache [" << theStartTime << " to " << theEndTime << "]" << endl;)
         DB2(cerr << " last decoded " << myLastDecodedTime << endl;)
@@ -226,9 +231,11 @@ namespace y60 {
             AC_WARNING << " Seek: " << fabs(theStartTime - myLastDecodedTime);
             _myContext->seekToTime(theStartTime);
             if (_myAudioSink && _myAudioSink->getState() != HWSampleSink::STOPPED) {
-                //dk + uz : seeking in movie w/ audio -> turn off audio
                 if (_myAudioSink) {
-                    AC_WARNING << "Turning off audio due to seek.";
+                    AC_WARNING << "Turning off audio due to seek (theStartTime= "
+                        << theStartTime << ", theEndTime: " << theEndTime 
+                        << ", myLastDecodedTime= " << myLastDecodedTime << ").";
+                    exit(-1);
                     _myAudioSink->stop();
                     _myAudioSink = HWSampleSinkPtr(0);
                 }

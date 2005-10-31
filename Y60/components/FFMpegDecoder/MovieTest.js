@@ -34,7 +34,7 @@ function FFMpegTest(theArguments) {
     Public.setup = function() {
         Public.setSplashScreen(false);
         Base.setup(840, 500);
-        nextTest();
+        Public.nextTest();
     }
 
     Base.onFrame = Public.onFrame;
@@ -74,7 +74,7 @@ function FFMpegTest(theArguments) {
         _myMovie = myMovie;
     }
 
-    nextTest = function() {
+    Public.nextTest = function() {
         print ("Test finished: "+_myTestName);
         _myCurTestIndex++;
         switch(_myCurTestIndex) {
@@ -84,44 +84,52 @@ function FFMpegTest(theArguments) {
             case 1:
                 setupStopTest();
                 break;
-            case 2:
+            case 2:                
+                setupLongTest();
+                break;
+            case 3:
                 exit(0);
         }
     }
 
-    testPlaying = function() {
+    Public.testPlaying = function() {
         assure_msg(_myMovie.playmode == "play",
                 "Movie is still playing.");
     }
 
-    testStopped = function() {
+    Public.testStopped = function() {
         assure_msg(_myMovie.playmode == "stop",
                 "Movie has stopped.");
     }
 
-    play = function() {
+    Public.play = function() {
         print("Starting playback.");
         _myMovie.playmode = "play";
     }
 
-    stop = function() {
+    Public.stop = function() {
         print("Stopping playback.");
         _myMovie.playmode = "stop";
     }
 
     function setupPlayTest() {
         setupTest("Play to End", "testfiles/counter_short.mpg");
-        window.setObjectTimeout(this, "testPlaying", 6000);
-        window.setObjectTimeout(this, "testStopped", 10000);
-        window.setObjectTimeout(this, "nextTest", 10100);
+        window.setTimeout("testPlaying", 1000);
+        window.setTimeout("testStopped", 10000);
+        window.setTimeout("nextTest", 10100);
     }
 
     function setupStopTest() {
         setupTest("Play, Stop, Play again", "testfiles/counter_short.mpg");
-        window.setObjectTimeout(this, "stop", 1000);
-        window.setObjectTimeout(this, "play", 2000);
-        window.setObjectTimeout(this, "stop", 3000);
-        window.setObjectTimeout(this, "nextTest", 4000);
+        window.setTimeout("stop", 1000);
+        window.setTimeout("play", 2000);
+        window.setTimeout("stop", 3000);
+        window.setTimeout("nextTest", 4000);
+    }
+
+    function setupLongTest() {
+        setupTest("Almost Endless test", "/tmp/suesstod.avi");
+        _myMovie.loopcount = 10;
     }
 
     function assure_msg(theCondition, theMsg) {

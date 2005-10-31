@@ -13,7 +13,7 @@ COMMAND="$APP $ARGS"
 if [ "$DEBUG" = "vc" ]; then
     echo Visual Studio Debuger Setup
     echo --------------------------------------------------------------------------------------
-    echo $PRO/bin/acxpshellDBG.exe
+    echo $PRO/bin/y60DBG.exe
     echo $ARGS
     echo `cmd /C cd`
     echo --------------------------------------------------------------------------------------
