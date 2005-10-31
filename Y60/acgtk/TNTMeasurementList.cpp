@@ -176,7 +176,7 @@ TNTMeasurementList::on_button_press_event(GdkEventButton* event) {
 
 void
 TNTMeasurementList::onSortByName() {
-    AC_WARNING << "sorting by name";
+    //AC_WARNING << "sorting by name";
     if ( ! _myNameColumn->get_sort_indicator()) {
         _myTypeColumn->set_sort_indicator(false);
         _myNameColumn->set_sort_indicator(true);
@@ -195,7 +195,7 @@ TNTMeasurementList::onSortByName() {
 
 void
 TNTMeasurementList::onSortByType() {
-    AC_WARNING << "sorting by type";
+    //AC_WARNING << "sorting by type";
     if ( ! _myTypeColumn->get_sort_indicator()) {
         _myNameColumn->set_sort_indicator(false);
         _myTypeColumn->set_sort_indicator(true);
