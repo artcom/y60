@@ -420,6 +420,8 @@ namespace y60 {
         DBP2(START_TIMER(renderBodyPart_findRenderStyles1));
         bool myIgnoreDepthFlag = (std::find(myRenderStyles.begin(), myRenderStyles.end(),
                                             IGNORE_DEPTH) !=  myRenderStyles.end());
+        bool myPolygonOffsetFlag = (std::find(myRenderStyles.begin(), myRenderStyles.end(),
+                                            POLYGON_OFFSET) !=  myRenderStyles.end());
         DBP2(STOP_TIMER(renderBodyPart_findRenderStyles1));
         if (myIgnoreDepthFlag) {
             glDepthFunc(GL_ALWAYS);
@@ -427,6 +429,12 @@ namespace y60 {
             glEnable(GL_POLYGON_OFFSET_LINE);
             glEnable(GL_POLYGON_OFFSET_FILL);
             glPolygonOffset(0.0, -1.0);
+        }
+        if (myPolygonOffsetFlag) {
+            glEnable(GL_POLYGON_OFFSET_POINT);
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(1.0, 1.0);
         }
 
         DBP2(START_TIMER(renderBodyPart_findRenderStyles2));
@@ -451,6 +459,8 @@ namespace y60 {
 
         if (myIgnoreDepthFlag) {
             glDepthFunc(GL_LESS);
+        }
+        if (myPolygonOffsetFlag || myIgnoreDepthFlag) {
             glDisable(GL_POLYGON_OFFSET_POINT);
             glDisable(GL_POLYGON_OFFSET_LINE);
             glDisable(GL_POLYGON_OFFSET_FILL);

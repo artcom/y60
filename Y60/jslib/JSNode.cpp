@@ -813,7 +813,7 @@ JSNode::Properties() {
         {"nodeValue",       PROP_nodeValue,      JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},   //          attribute DOMString
         {"nodeType",        PROP_nodeType,       JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute unsigned short
         {"parentNode",      PROP_parentNode,     JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // acIDOMNode
-        {"rootNode",      PROP_rootNode,     JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // acIDOMNode
+        {"rootNode",        PROP_rootNode,       JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // acIDOMNode
         {"childNodes",      PROP_childNodes,     JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // acIDOMNodeList
         {"firstChild",      PROP_firstChild,     JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute acIDOMNode
         {"lastChild",       PROP_lastChild,      JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute acIDOMNode

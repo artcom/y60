@@ -1152,7 +1152,8 @@ Currently the following styles are supported:
 'backfacing'      - The backfaces of the shape are rendered
 'frontfacing'     - The frontfaces of the shape are rendered
 'bounding_volume' - The bounding volumes of the shape are rendered
-'ignore_depth'    - The shape is rendered without z-Buffer testing</xs:documentation>
+'ignore_depth'    - The shape is rendered without z-Buffer testing
+'polygon_offset'  - The shape is rendered with its polygons offset</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         </xs:complexType>

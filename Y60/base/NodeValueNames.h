@@ -378,9 +378,10 @@ namespace y60 {
     static const char * FRONTFACING_STYLE     = "frontfacing";
     static const char * BOUNDING_VOLUME_STYLE = "bounding_volume";
     static const char * IGNORE_DEPTH_STYLE    = "ignore_depth";
+    static const char * POLYGON_OFFSET_STYLE  = "polygon_offset";
 
     enum RenderStyleType {
-        FRONT, BACK, BOUNDING_VOLUME, IGNORE_DEPTH
+        FRONT, BACK, BOUNDING_VOLUME, IGNORE_DEPTH, POLYGON_OFFSET
     };
 
     static const char * RenderStylesSL[] = {
@@ -388,6 +389,7 @@ namespace y60 {
         BACKFACING_STYLE,
         BOUNDING_VOLUME_STYLE,
         IGNORE_DEPTH_STYLE,
+        POLYGON_OFFSET_STYLE,
         0
     };
 
