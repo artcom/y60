@@ -325,7 +325,7 @@ namespace y60 {
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 
         if (theImage->getGraphicsId()) {
-            AC_WARNING << "setupTexture('" << theImage->get<NameTag>() << "') called on an already setup texture" << endl;
+            AC_TRACE << "setupTexture('" << theImage->get<NameTag>() << "') called on an already setup texture" << endl;
             unbindTexture(&*theImage);
         }
 
