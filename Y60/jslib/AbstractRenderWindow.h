@@ -78,10 +78,6 @@ namespace jslib {
         void setPause(bool aPause);
         bool getPause() const;
 
-        long setObjectTimeout(JSObject *theObject, const std::string & myCommand,
-                              float myMilliseconds);
-        long setObjectInterval(JSObject *theObject, const std::string & myCommand,
-                               float myMilliseconds);
         long setTimeout(const std::string & myCommand, float myMilliseconds);
         void clearTimeout(long myTimeoutId);
         long setInterval(const std::string & myCommand, float myMilliseconds);

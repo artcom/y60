@@ -96,26 +96,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             return Method<NATIVE>::call(&NATIVE::setInterval,cx,obj,argc,argv,rval);
         }
 
-        static JSBool setObjectTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("Sets a javascript line to be executed after a certain time within the context of a given JavaScript object");
-            DOC_PARAM("theJavaScriptObject", DOC_TYPE_OBJECT);
-            DOC_PARAM("theJavaScriptCommand", DOC_TYPE_STRING);
-            DOC_PARAM("theMilliseconds", DOC_TYPE_FLOAT);
-            DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
-            DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setObjectTimeout,cx,obj,argc,argv,rval);
-        }
-
-        static JSBool setObjectInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("Sets a javascript line to be executed in a certain interval within the context of a given JavaScript object");
-            DOC_PARAM("theJavaScriptObject", DOC_TYPE_OBJECT);
-            DOC_PARAM("theJavaScriptCommand", DOC_TYPE_STRING);
-            DOC_PARAM("theMilliseconds", DOC_TYPE_FLOAT);
-            DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
-            DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setObjectInterval,cx,obj,argc,argv,rval);
-        }
-
         static JSBool clearTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Stops a timeout from beeing executed");
             DOC_PARAM("theTimeoutId", DOC_TYPE_INTEGER);
@@ -422,8 +402,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 // name                  native                   nargs
                 {"setTimeout",         setTimeout,               2},
                 {"setInterval",        setInterval,              2},
-                {"setObjectTimeout",   setObjectTimeout,         3},
-                {"setObjectInterval",  setObjectInterval,        3},
                 {"clearTimeout",       clearTimeout,             1},
                 {"clearInterval",      clearInterval,            1},
                 {"setScene",           setScene,                 1},
