@@ -61,10 +61,52 @@ MyClassUnitTest.prototype.Constructor = function(obj, theName) {
     }
 };
 
+function MyDomEventTest() {
+    this.Constructor(this, "DomEventTest");
+};
+
+MyDomEventTest.prototype.Constructor = function(obj, theName) {
+
+    UnitTest.prototype.Constructor(obj, theName);
+
+
+    obj.run = function() {
+    	obj.myDocument = Node.createDocument();
+    	obj.myDocument.parse('<test name="root">\
+    	                      <child1 name="child1">\
+    	                      <child2 name="child2">\
+    	                      <child3 name="child3"></child3></child2></child1>\
+    	                      </test>');
+    	var myChildNode1 = obj.myDocument.childNode(0).childNode(0);
+    	var myChildNode2 = myChildNode1.childNode(0);
+    	var myChildNode3 = myChildNode2.childNode(0);
+    	var myVector = new Vector3f(0,1,2);
+    	var myDomEvent = new JSEvent("testEvent", myVector, true, false, 0.0);
+    	//ENSURE = print;
+    	ENSURE(myDomEvent.stopPropagation());    	
+    	ENSURE(myDomEvent.preventDefault());
+    	ENSURE(myDomEvent.type == "testEvent");
+    	ENSURE(myDomEvent.eventPhase == 1);
+    	ENSURE(myDomEvent.bubbles == true);
+    	ENSURE(myDomEvent.cancelable == false);
+    	ENSURE(myDomEvent.isDefaultPrevented == true);
+    	
+    	myChildNode2.addEventListener("testEvent", obj, true);
+    	myChildNode3.dispatchEvent(myDomEvent);
+    	//print(myDomEvent.target);
+    	//print(myDomEvent.currentTarget);
+
+    }
+    obj.handleEvent = function(theEvent) {
+        print("eventListener: " + theEvent);
+    }
+};
 var myTestName = "testMyClass.tst.js";
 var mySuite = new UnitTestSuite(myTestName);
 
+mySuite.addTest(new MyDomEventTest());
 mySuite.addTest(new MyClassUnitTest());
+
 mySuite.run();
 
 print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
