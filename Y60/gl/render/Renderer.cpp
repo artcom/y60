@@ -73,8 +73,22 @@
 
 #define DB(x)  //x
 #define DB2(x) //x
+
+// profiling
+#ifdef PROFILING_LEVEL_NORMAL
+#define DBP(x)  x
+#else
 #define DBP(x) // x
+#endif
+
+#ifdef PROFILING_LEVEL_FULL
+#define DBP2(x)  x
+#else
 #define DBP2(x) // x
+#endif
+
+// more profiling
+#define DBP2(x)  x
 
 using namespace std;
 using namespace asl;
@@ -316,14 +330,18 @@ namespace y60 {
     Renderer::renderBodyPart(const BodyPart & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
         DBP(MAKE_SCOPE_TIMER(renderBodyPart));
         CHECK_OGL_ERROR;
+        DBP2(START_TIMER(renderBodyPart_pre));
         const y60::Body & myBody = theBodyPart.getBody();
         const y60::Shape & myShape = theBodyPart.getShape();
         bool myBodyHasChanged = (_myPreviousBody != &myBody);
+        DBP2(STOP_TIMER(renderBodyPart_pre));
+        DBP2(START_TIMER(renderBodyPart_bodyChanged));
         if (myBodyHasChanged) {
             DBP(MAKE_SCOPE_TIMER(update_bodymatrix));
             glPopMatrix();
 
             _myState.setClippingPlanes(theBodyPart.getClippingPlanes());
+            DBP2(MAKE_SCOPE_TIMER(renderBodyPart5));
             
             glPushMatrix();
 
@@ -333,19 +351,24 @@ namespace y60 {
                 renderBoundingBox(myBoundingBox);
                 CHECK_OGL_ERROR;
             }
+            DBP2(MAKE_SCOPE_TIMER(renderBodyPart6));
 
             glMultMatrixf((myBody.get<GlobalMatrixTag>().getData()));
+            DBP2(MAKE_SCOPE_TIMER(renderBodyPart7));
 
             // XXX update TexGen here
             if (!myBody.get<BillboardTag>().empty()) {
                 rotateBillboard(myBody, theCamera);
             }
+            DBP2(MAKE_SCOPE_TIMER(renderBodyPart8));
 
             _myPreviousBody = &myBody;
             CHECK_OGL_ERROR;
         }
+        DBP2(STOP_TIMER(renderBodyPart_bodyChanged));
         
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
+        DBP2(START_TIMER(renderBodyPart_getDrawNormals));
         if (_myState.getDrawNormals()) {
             glPushAttrib(GL_ALL_ATTRIB_BITS);
             glDisable(GL_LIGHTING);
@@ -354,27 +377,50 @@ namespace y60 {
             drawNormals(myPrimitive, myDiameter / 64.0f);
             glPopAttrib();
         }
+        DBP2(STOP_TIMER(renderBodyPart_getDrawNormals));
 
+        DBP2(START_TIMER(renderBodyPart_getMaterial));
         const MaterialBase & myMaterial = myPrimitive.getMaterial();
-        bool  myMaterialHasChanged = switchMaterial(myMaterial);
+        DBP2(STOP_TIMER(renderBodyPart_getMaterial));
 
+        DBP2(START_TIMER(renderBodyPart_switchMaterial));
+        bool  myMaterialHasChanged = switchMaterial(myMaterial);
+        DBP2(STOP_TIMER(renderBodyPart_switchMaterial));
+
+        DBP2(START_TIMER(renderBodyPart_bodyChanged));
         if (myBodyHasChanged || myMaterialHasChanged) {
+            DBP2(MAKE_SCOPE_TIMER(renderBodyPart20));
+            DBP2(START_TIMER(renderBodyPart_getShader));
             IShaderPtr myShader = myMaterial.getShader();
+            DBP2(STOP_TIMER(renderBodyPart_getShader));
             if (myShader) {
+                DBP2(MAKE_SCOPE_TIMER(renderBodyPart_bindBodyParams));
                 myShader->bindBodyParams(myMaterial, theViewport, _myScene->getLights(), myBody, theCamera);
                 CHECK_OGL_ERROR;
             }
         }
+        DBP2(STOP_TIMER(renderBodyPart_bodyChanged));
 
+        DBP2(START_TIMER(renderBodyPart_bodyChanged));
         bool isRendered = false;
 
         // get renderstyles for this primitive
+        DBP2(START_TIMER(renderBodyPart_prim_getRenderStyles));
         const std::vector<RenderStyleType> & myPrimitveStyle = myPrimitive.getRenderStyles(); 
-        const std::vector<RenderStyleType> & myShapeStyle    = myShape.getRenderStyles();
-        const std::vector<RenderStyleType> & myRenderStyles  = myPrimitveStyle.empty() ? myShapeStyle : myPrimitveStyle;
+        DBP2(STOP_TIMER(renderBodyPart_prim_getRenderStyles));
 
+        DBP2(START_TIMER(renderBodyPart_shape_getRenderStyles));
+        const std::vector<RenderStyleType> & myShapeStyle    = myShape.getRenderStyles();
+        DBP2(STOP_TIMER(renderBodyPart_shape_getRenderStyles));
+
+        DBP2(START_TIMER(renderBodyPart_getRenderStyles));
+        const std::vector<RenderStyleType> & myRenderStyles  = myPrimitveStyle.empty() ? myShapeStyle : myPrimitveStyle;
+        DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
+
+        DBP2(START_TIMER(renderBodyPart_findRenderStyles1));
         bool myIgnoreDepthFlag = (std::find(myRenderStyles.begin(), myRenderStyles.end(),
                                             IGNORE_DEPTH) !=  myRenderStyles.end());
+        DBP2(STOP_TIMER(renderBodyPart_findRenderStyles1));
         if (myIgnoreDepthFlag) {
             glDepthFunc(GL_ALWAYS);
             glEnable(GL_POLYGON_OFFSET_POINT);
@@ -383,18 +429,25 @@ namespace y60 {
             glPolygonOffset(0.0, -1.0);
         }
 
+        DBP2(START_TIMER(renderBodyPart_findRenderStyles2));
         if (std::find(myRenderStyles.begin(), myRenderStyles.end(), BACK) !=  myRenderStyles.end()) {
+            DBP2(MAKE_SCOPE_TIMER(renderBodyPart_renderPrimitivesS));
             glCullFace(GL_FRONT);
+            DBP2(START_TIMER(renderBodyPart_renderPrimitives));
             renderPrimitives(theBodyPart, myMaterial);
+            DBP2(STOP_TIMER(renderBodyPart_renderPrimitives));
             isRendered = true;
             CHECK_OGL_ERROR;
         }
+        DBP2(STOP_TIMER(renderBodyPart_findRenderStyles2));
 
+        DBP2(START_TIMER(renderBodyPart_findRenderStyles3));
         if (!isRendered || std::find(myRenderStyles.begin(), myRenderStyles.end(), FRONT) !=  myRenderStyles.end()) {
             glCullFace(GL_BACK);
             renderPrimitives(theBodyPart, myMaterial);
             CHECK_OGL_ERROR;
         }
+        DBP2(STOP_TIMER(renderBodyPart_findRenderStyles3));
 
         if (myIgnoreDepthFlag) {
             glDepthFunc(GL_LESS);
@@ -403,13 +456,17 @@ namespace y60 {
             glDisable(GL_POLYGON_OFFSET_FILL);
         }
 
+        DBP2(START_TIMER(renderBodyPart_findRenderStyles4));
         if (std::find(myRenderStyles.begin(), myRenderStyles.end(), BOUNDING_VOLUME) !=  myRenderStyles.end() ||
             (_myBoundingVolumeMode & BV_SHAPE))
         {
+            DBP2(START_TIMER(renderBodyPart_geBoundingBox));
             const asl::Box3f & myBoundingBox = myShape.get<BoundingBoxTag>();
+            DBP2(STOP_TIMER(renderBodyPart_geBoundingBox));
             renderBoundingBox(myBoundingBox);
             CHECK_OGL_ERROR;
         }
+        DBP2(STOP_TIMER(renderBodyPart_findRenderStyles4));
     }
 
     void
@@ -442,8 +499,8 @@ namespace y60 {
         DBP(STOP_TIMER(getPrimitive));
         DBP2(
             AC_TRACE << "------ renderPrimitives for BodyPart of Body id='"
-                    << theBodyPart.getBody()->get<IdTag>()<<"'"
-                    << ", name='"<<theBodyPart.getBody()->get<NameTag>()<<"'";
+                    << theBodyPart.getBody().get<IdTag>()<<"'"
+                    << ", name='"<<theBodyPart.getBody().get<NameTag>()<<"'";
         )
         COUNT_N(Vertices, myPrimitive.size());
 

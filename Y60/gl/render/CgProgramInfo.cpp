@@ -37,6 +37,20 @@
 
 #define DB(x) // x
 
+// profiling
+#ifdef PROFILING_LEVEL_NORMAL
+#define DBP(x)  x
+#else
+#define DBP(x) // x
+#endif
+
+// more profiling
+#ifdef PROFILING_LEVEL_FULL
+#define DBP2(x)  x
+#else
+#define DBP2(x) // x
+#endif
+
 using namespace std;
 using namespace asl;
 using namespace dom;
@@ -54,9 +68,11 @@ namespace y60 {
 
     void CgProgramInfo::createAndCompileProgram() {
         AC_DEBUG << "reloadProgram " << _myPathName.c_str();
+        DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_createAndCompileProgram));
 
         if (_myCgProgramString.empty()) {
             AC_DEBUG << "loading from file";
+            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_createAndCompileProgram));
 
             // create null terminated array of null terminated strings
             for (int i=0; i < _myShader._myCompilerArgs.size(); ++i) {
@@ -64,11 +80,13 @@ namespace y60 {
                 _myCachedCompilerArgs.push_back(_myShader._myCompilerArgs[i].c_str());
             }
             _myCachedCompilerArgs.push_back(0);
+            DBP2(START_TIMER(CgProgramInfo_cgCreateProgramFromFile));
             _myCgProgramID = cgCreateProgramFromFile(_myContext, CG_SOURCE,
                     _myPathName.c_str(),
                     asCgProfile(_myShader),
                     _myShader._myEntryFunction.c_str(),
                     &(*_myCachedCompilerArgs.begin()));
+            DBP2(STOP_TIMER(CgProgramInfo_cgCreateProgramFromFile));
 
             assertCg("CgProgramInfo::reloadProgram - createProgram");
 
@@ -78,6 +96,7 @@ namespace y60 {
 
         } else {
             AC_DEBUG << "destroying and reloading from string "; // << _myCgProgramString;
+            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_destroyReload));
 
             cgDestroyProgram(_myCgProgramID);
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
@@ -95,7 +114,10 @@ namespace y60 {
             }
             throw RendererException(myErrorMessage, "CgProgramInfo::CgProgramInfo()");
         }
+        DBP2(START_TIMER(CgProgramInfo_processParameters));
         processParameters();
+        DBP2(STOP_TIMER(CgProgramInfo_processParameters));
+        DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_compileProgram));
         cgCompileProgram(_myCgProgramID);
     }
 
@@ -295,11 +317,14 @@ namespace y60 {
             const LightVector & theLightInstances,
             const MaterialBase & theMaterial) 
     {
+        DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_reloadIfRequired));
         //AC_DEBUG << "reloadIfRequired";
 
+        DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_count_lights));
         //look at the number of lights to see if reload is req.
         unsigned myPositionalLightCount = 0;
         unsigned myDirectionalLightCount = 0;
+        DBP2(COUNT_N(CgProgramInfo_reloadIfRequired_lights, theLightInstances.size()));
         for (unsigned i = 0; i < theLightInstances.size(); ++i) {
             LightPtr myLight = theLightInstances[i];
             if ( ! myLight->get<VisibleTag>()) {
@@ -320,24 +345,38 @@ namespace y60 {
                     AC_WARNING << "Unknown light type for " << myLightSource->get<IdTag>();
             }
         }
+        DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_count_lights));
 
         bool myReload = false;
 
+        DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
         int myLightType = POSITIONAL_LIGHTS;
-        if (_myAutoParams.find(myLightType) != _myAutoParams.end() &&
-                cgGetArraySize(_myAutoParams[myLightType]._myParameter,0) != myPositionalLightCount) 
-        {
-            myReload = true;
+        if (_myAutoParams.find(myLightType) != _myAutoParams.end()) {
+            unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
+            if (myLastCount != myPositionalLightCount) {
+                DBP2(COUNT(CgProgramInfo_posLightCount_differ));
+                DBP2(COUNT_N(CgProgramInfo_posLightCountLast, myLastCount));
+                DBP2(COUNT_N(CgProgramInfo_posLightCountNew, myPositionalLightCount));
+                myReload = true;
+            }
         }
+        DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
 
+        DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
         myLightType = DIRECTIONAL_LIGHTS;
-        if (_myAutoParams.find(myLightType) != _myAutoParams.end() &&
-                cgGetArraySize(_myAutoParams[myLightType]._myParameter,0) != myDirectionalLightCount) 
-        {
-            myReload = true;
+        if (_myAutoParams.find(myLightType) != _myAutoParams.end()) {
+            unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
+            if (myLastCount != myDirectionalLightCount)  {
+                DBP2(COUNT(CgProgramInfo_dirLightCount_differ));
+                DBP2(COUNT_N(CgProgramInfo_dirLightCountLast, myLastCount));
+                DBP2(COUNT_N(CgProgramInfo_dirLightCountNew, myDirectionalLightCount));
+                myReload = true;
+            }
         }
+        DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
 
         if (myReload) {
+            DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_reloadIfRequired_reload));
             //change unsized array sizes here
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = myPositionalLightCount;
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = myPositionalLightCount;
@@ -347,13 +386,24 @@ namespace y60 {
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = myDirectionalLightCount;
 
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
             createAndCompileProgram();
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
+            
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_load));
             cgGLLoadProgram(_myCgProgramID);
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_load));
 
             AC_DEBUG << "reloaded Cg program";
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
             enableProfile();
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
             bindMaterialParams(theMaterial);
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_bindMaterialParams));
+            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
             enableTextures();
+            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_enableTextures));
         }
 
         return myReload;
@@ -368,6 +418,7 @@ namespace y60 {
             const Camera & theCamera)
     {
         //AC_DEBUG << "CgProgramInfo::bindBodyParams";
+        DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_bindBodyParams));
         setCGGLParameters();
         setAutoParameters(theLightInstances, theViewport, theBody, theCamera);
     }

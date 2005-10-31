@@ -165,6 +165,8 @@ namespace asl {
 } // namespace asl
 #endif
 
+#define PROFILING_LEVEL_NORMAL 1
+#define PROFILING_LEVEL_FULL 1
 
 namespace asl {
 	inline void initialize() {

@@ -55,6 +55,20 @@ using namespace asl;
 using namespace dom;
 
 #define DB(x) // x
+// profiling
+
+#ifdef PROFILING_LEVEL_NORMAL
+#define DBP(x)  x
+#else
+#define DBP(x) // x
+#endif
+
+// more profiling
+#ifdef PROFILING_LEVEL_FULL
+#define DBP2(x)  x
+#else
+#define DBP2(x) // x
+#endif
 
 namespace y60 {
 
@@ -327,6 +341,7 @@ namespace y60 {
             const Camera & theCamera)
     {
         AC_DEBUG << "bindBodyParams " << theMaterial.get<NameTag>();
+        DBP2(MAKE_SCOPE_TIMER(GLShader_bindBodyParams));
         if (theMaterial.hasTexGen()) {
 
             bool mustRestoreMatrix = false;
