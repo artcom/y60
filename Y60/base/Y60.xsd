@@ -1508,17 +1508,18 @@ Usually 'a' plus a number, such as 'a0'.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="direction" type="xs:string">
+              <xs:simpleType>
                 <xs:restriction base="xs:string">
                     <xs:pattern value="forward|reverse|pong"/>
                 </xs:restriction>
-                <xs:annotation>
-                    <xs:documentation>The direction of the animation.
-
+              </xs:simpleType>
+              <xs:annotation>
+                <xs:documentation>The direction of the animation.
 Allowed values are:
 'forward'  - Play forward
 'reverse'  - Play backward
 'pong'     - Play forward, then backward, than forward, ...</xs:documentation>
-                </xs:annotation>
+              </xs:annotation>
             </xs:attribute>
         </xs:complexType>
     </xs:element>
