@@ -23,7 +23,7 @@
 
 #include "Ptr.h"
 #include "Time.h"
-#include "DashBoard.h"
+#include "Dashboard.h"
 
 #include "MultiThreadedUnitTest.h"
 
@@ -171,12 +171,12 @@ public:
             ENSURE(myWeakPtr);
             ENSURE( myWeakPtr.getWeakCount() == 2);
             ENSURE( myWeakPtr.lock());
-            // test second weak pointer 
+            // test second weak pointer
             WeakPtr<int, ThreadingModel> myOtherWeakPtr(mySmartPtr);
             ENSURE( myOtherWeakPtr );
             ENSURE( myOtherWeakPtr.getWeakCount() == 3);
             ENSURE( myOtherWeakPtr.lock());
-            // test copy constructor 
+            // test copy constructor
             WeakPtr<int, ThreadingModel> myCopyWeakPtr(myWeakPtr);
             ENSURE( myCopyWeakPtr );
             ENSURE( myCopyWeakPtr.getWeakCount() == 4);
@@ -207,13 +207,13 @@ public:
             mySmartPtr = Ptr<int, ThreadingModel>(0);
             ENSURE( ! myWeakPtr);
             ENSURE( ! myWeakPtr.lock());
-            
+
             ENSURE( ! myCopyWeakPtr);
             ENSURE( ! myCopyWeakPtr.lock());
-            
+
             ENSURE( ! myOtherWeakPtr);
             ENSURE( ! myOtherWeakPtr.lock());
-            
+
             // check the weak refcount decreases (mySmartPtr is null)
             myAssignedPtr = WeakPtr<int, ThreadingModel>(mySmartPtr);
             ENSURE( myWeakPtr.getWeakCount() == 3);
@@ -268,7 +268,7 @@ public:
             ENSURE(weakBase == false);
             ENSURE(weakDerived == false);
         }
-#endif        
+#endif
     }
 };
 
@@ -325,11 +325,11 @@ public:
     AllocatorUnitTest(std::string theName) : TemplateUnitTest("AllocatorUnitTest-",std::string(theName+asl::as_string(N)).c_str()) {  }
     void run() {
 
-#if DEBUG_VARIANT        
+#if DEBUG_VARIANT
         const int myTestCount = 10000;
-#else        
+#else
         const int myTestCount = 1000000;
-#endif        
+#endif
         std::vector<int*> myNativePtrs(myTestCount);
         for (int i = 0; i < myTestCount; ++i) {
             myNativePtrs[i] = new int;
@@ -372,11 +372,11 @@ class PtrUnitPerfTest : public TemplateUnitTest {
 public:
     PtrUnitPerfTest() : TemplateUnitTest("PtrUnitPerfTest-",asl::as_string(N).c_str()) {  }
     void run() {
-#if DEBUG_VARIANT        
+#if DEBUG_VARIANT
         const int repeatCount = 10000;
-#else        
+#else
         const int repeatCount = 1000000;
-#endif        
+#endif
        for (int f = 0; f < 4; ++f) {
            {
                MAKE_SCOPE_TIMER(PtrUnitPerfTest);
@@ -441,8 +441,8 @@ public:
         addTest(new AllocatorUnitTest<0,MultiProcessor,PtrThreadSpecificFreeListChunkAllocator>("PtrThreadSpecificFreeListChunkAllocator"));
         addTest(new PtrUnitTest2<0>);
         addTest(new PtrMultiThreadTest);
-#endif 
-        
+#endif
+
         addTest(new PtrUnitPerfTest<0,SingleThreaded>);
         addTest(new PtrUnitPerfTest<0,SingleProcessor>);
         addTest(new PtrUnitPerfTest<0,MultiProcessor>);
