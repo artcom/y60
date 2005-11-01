@@ -170,9 +170,9 @@ namespace y60 {
     }
 
     void
-    Scene::load(const std::string & theFilename, PackageManagerPtr thePackageManager, 
+    Scene::load(const std::string & theFilename, PackageManagerPtr thePackageManager,
             const IProgressNotifierPtr & theNotifier,
-            bool useSchema) 
+            bool useSchema)
     {
         _myTextureManager->setPackageManager(thePackageManager);
         if (theFilename.empty() || theFilename == "null") {
@@ -192,9 +192,9 @@ namespace y60 {
     }
 
     void
-    Scene::load(asl::ReadableStream * theSource, const std::string & theFilename, 
+    Scene::load(asl::ReadableStream * theSource, const std::string & theFilename,
                const IProgressNotifierPtr & theNotifier,
-               bool useSchema) 
+               bool useSchema)
     {
         asl::Time loadStart;
 
@@ -243,9 +243,9 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     Scene::setupShaderLibrary() {
-        if (_myTextureManager->getResourceManager()) {   
+        if (_myTextureManager->getResourceManager()) {
             if (!_myTextureManager->getResourceManager()->getShaderLibrary()) {
                 // If no shaderlibrary has been set, yet, add a default library.
                 asl::PackageManagerPtr myPackageManager = _myTextureManager->getPackageManager();
@@ -254,11 +254,11 @@ namespace y60 {
                     myPath = myPackageManager->searchFile("shader/shaderlibrary.xml");
                 }
                 if (myPath.empty()) {
-                    AC_WARNING << "Scene::getShaderLibrary(): Could not find 'shaderlibrary.xml' in search path " 
+                    AC_WARNING << "Scene::getShaderLibrary(): Could not find 'shaderlibrary.xml' in search path "
                         << myPackageManager->getSearchPath();
                 } else {
                     _myTextureManager->getResourceManager()->loadShaderLibrary(myPath);
-                    _myTextureManager->getPackageManager()->add(asl::getDirName(myPath));    
+                    _myTextureManager->getPackageManager()->add(asl::getDirName(myPath));
                 }
             }
         } else {
@@ -275,8 +275,8 @@ namespace y60 {
 
         setupShaderLibrary();
 
-        AC_INFO << "Loading materials..." << endl;   
-        _myMaterials.clear();        
+        AC_INFO << "Loading materials..." << endl;
+        _myMaterials.clear();
         NodePtr myMaterialList = _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
         for (unsigned i = 0; i < myMaterialCount; ++i) {
@@ -308,7 +308,7 @@ namespace y60 {
 				const std::string & myProp = myPropertiesNode->childNode(i)->getAttributeString("name");
 			}
 		}
-	            
+
 		MaterialBasePtr myMaterial = MaterialBasePtr(new MaterialBase(*theMaterialNode));
 		IShaderPtr myShader;
 		if (getShaderLibrary()) {
@@ -328,7 +328,7 @@ namespace y60 {
 				std::find(myPhysicsFeatures->begin(), myPhysicsFeatures->end(), "skin") !=  myPhysicsFeatures->end())
 			{
 				myMaterial = MaterialBasePtr(new SkinAndBones(*theMaterialNode));
-			} 
+			}
 		}
 		myMaterial->setShader(myShader);
 		DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
@@ -336,9 +336,9 @@ namespace y60 {
 		myMaterial->load(*_myTextureManager);
 		if (myShader) {
 			for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
-				// default the material property with the shader default, only if the material 
+				// default the material property with the shader default, only if the material
 				// does not have a property
-				unsigned myPropertyCount = myShader->getPropertyNode(i)->childNodesLength();        
+				unsigned myPropertyCount = myShader->getPropertyNode(i)->childNodesLength();
 				for (unsigned myPropertyIndex = 0; myPropertyIndex < myPropertyCount; ++myPropertyIndex) {
 					dom::NodePtr myPropertyNode  = myShader->getPropertyNode(i)->childNode(myPropertyIndex);								if (myPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
 						myPropertyNode->nodeName() != "#comment") {
@@ -374,7 +374,7 @@ namespace y60 {
                 }
             }
         }
-        
+
         loadMaterial(theMaterialNode);
         MaterialBasePtr myNewMaterial = _myMaterials[theMaterial->get<IdTag>()];
         for (unsigned i = 0; i < myAffectedPrimitives.size(); ++i) {
@@ -534,11 +534,11 @@ namespace y60 {
                                     myShapeId, PLUS_FILE_LINE);
         }
 
-        // collect per shape renderstyles 
+        // collect per shape renderstyles
         parseRenderStyles(myShapeNode, theShape->getRenderStyles());
 
         // Set vertex count
-        theShape->setVertexCount(myShapeVertexCount);        
+        theShape->setVertexCount(myShapeVertexCount);
         DB(AC_TRACE << "shape: " << myShapeId << " has " << theShape->getPrimitives().size() << " materials" << endl;)
 
         calculateShapeBoundingBox(theShape);
@@ -623,25 +623,25 @@ namespace y60 {
             dom::NodePtr myAnimationsElement = mySceneElement->childNode(ANIMATION_LIST_NAME);
 
             short myUpdateFlags = 0;
-            DB(AC_TRACE <<"Updating:" << endl);
-            if (myWorldElement->nodeVersion() > _myPreviousDomVersion) {
-                myUpdateFlags|=Scene::WORLD;
-                DB(AC_TRACE << " WORLD");
-            }
             if (myImagesElement->nodeVersion() > _myPreviousDomVersion) {
                 myUpdateFlags|=Scene::IMAGES;
                 DB(AC_TRACE << " IMAGES");
+            }
+            if (myMaterialsElement->nodeVersion() > _myPreviousDomVersion) {
+                myUpdateFlags|=Scene::MATERIALS;
+                DB(AC_TRACE << " MATERIALS");
             }
             if (myShapesElement->nodeVersion() > _myPreviousDomVersion) {
                 myUpdateFlags|=Scene::SHAPES;
                 DB(AC_TRACE << " SHAPES");
             }
+            DB(AC_TRACE <<"Updating:" << endl);
+            if (myWorldElement->nodeVersion() > _myPreviousDomVersion) {
+                myUpdateFlags|=Scene::WORLD;
+                DB(AC_TRACE << " WORLD");
+            }
             if (myCanvasesElement->nodeVersion() > _myPreviousDomVersion) {
                 DB(AC_TRACE << " CANVASES");
-            }
-            if (myMaterialsElement->nodeVersion() > _myPreviousDomVersion) {
-                myUpdateFlags|=Scene::MATERIALS;
-                DB(AC_TRACE << " MATERIALS");
             }
             if (myAnimationsElement->nodeVersion() > _myPreviousDomVersion) {
                 myUpdateFlags|=Scene::ANIMATIONS_LOAD;
@@ -720,14 +720,14 @@ namespace y60 {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
             const std::string myMaterialId = myMaterialNode->getAttributeString("id");
             MaterialBasePtr myMaterial = getMaterial(myMaterialId);
-            
+
             if (myMaterial) {
                 myMaterialIds.erase(myMaterialId);
                 if (myMaterial->reloadRequired()) {
                     reloadMaterial(myMaterialNode, myMaterial);
                 } else {
-                    myMaterial->update(*_myTextureManager, getImagesRoot());                    
-                }                
+                    myMaterial->update(*_myTextureManager, getImagesRoot());
+                }
             } else {
                 AC_TRACE << "could not find material " << myMaterialId << ", loading" << endl;
                 loadMaterial(myMaterialNode);
@@ -786,7 +786,7 @@ namespace y60 {
         return _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(CANVAS_LIST_NAME);
     }
 
-    const MaterialBasePtr 
+    const MaterialBasePtr
     Scene::getMaterial(const std::string & theMaterialId) const {
         MaterialIdMap::const_iterator myIt = _myMaterials.find(theMaterialId);
         if (myIt == _myMaterials.end()) {
@@ -1170,7 +1170,7 @@ namespace y60 {
         // (2) Append all nodes from the new dom into the old dom
         NodePtr myOldScene = getSceneDom()->childNode(SCENE_ROOT_NAME);
         NodePtr myNewScene = mySceneDom->childNode(SCENE_ROOT_NAME);
-        
+
         for (unsigned i = 0; i < myOldScene->childNodesLength(); ++i) {
             NodePtr myOldChild = myOldScene->childNode(i);
             if (myOldChild->nodeType() == dom::Node::ELEMENT_NODE) {
@@ -1337,7 +1337,7 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     Scene::registerResourceManager(ResourceManager* theResourceManager) {
         // We only have to update the Scene if this is the first ResourceManager.
         if (1 == _myTextureManager->registerResourceManager(theResourceManager)) {
@@ -1346,7 +1346,7 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     Scene::deregisterResourceManager() {
         AC_DEBUG << "deregisterResourceManager";
         if (_myTextureManager->registerResourceManager(0) == 0) {
@@ -1356,26 +1356,26 @@ namespace y60 {
         }
     }
 
-    const ResourceManager * 
+    const ResourceManager *
     Scene::getResourceManager() const {
         return _myTextureManager->getResourceManager();
     }
 
-    ResourceManager * 
+    ResourceManager *
     Scene::getResourceManager() {
         return _myTextureManager->getResourceManager();
     }
 
-    Scene::Statistics::Statistics() : 
-        primitiveCount(0), 
-        vertexCount(0), 
+    Scene::Statistics::Statistics() :
+        primitiveCount(0),
+        vertexCount(0),
         materialCount(0),
         lightCount(0)
     {}
 
     const Scene::Statistics
     Scene::getStatistics() const {
-        Scene::Statistics myStatistics = _myStatistics;        
+        Scene::Statistics myStatistics = _myStatistics;
         myStatistics.lightCount     = _myLights.size();
         myStatistics.materialCount  = _myMaterials.size();
         return myStatistics;

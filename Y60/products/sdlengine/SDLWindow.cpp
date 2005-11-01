@@ -203,6 +203,7 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
         }
         if (_myScene) {
             _myScene->clearShapes();
+            _myScene->updateAllModified();
             _myScene->update(Scene::SHAPES);
             _myScene->getTextureManager()->setupTextures();
         }
