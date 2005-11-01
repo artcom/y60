@@ -748,5 +748,6 @@ asl::Ptr<T,ThreadingModel,Allocator> dynamic_cast_Ptr(asl::Ptr<U,ThreadingModel,
 
 
 #undef DB2
+#undef DBP2
 
 #endif
