@@ -83,7 +83,7 @@ WMADecoder2UnitTest.prototype.Constructor = function(obj, theName) {
 
         delete obj.mySound;
         gc();
-        msleep(100);
+        msleep(200);
         ENSURE("obj.mySoundManager.soundcount == 0");
 
         ENSURE_EXCEPTION("new Sound(\"../../testWMADecoder2.tst.js\")",
