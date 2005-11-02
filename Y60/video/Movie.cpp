@@ -31,8 +31,8 @@
 using namespace dom;
 using namespace std;
 
-#define DB(x) //x
-#define DB2(x) //x
+#define DB(x) x
+#define DB2(x) x
 
 
 namespace y60 {
@@ -180,7 +180,11 @@ namespace y60 {
                 myMovieTime = getTimeFromFrame(myNextFrame);
                 break;
             case PLAY_MODE_PLAY:
-                myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
+                if (theCurrentTime == 0) {
+                    myMovieTime = 0;
+                } else {
+                    myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
+                }                    
                 myNextFrame = (int)getFrameFromTime(myMovieTime);
                 break;
             case PLAY_MODE_STOP:

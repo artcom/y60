@@ -28,8 +28,8 @@
 #include <asl/Pump.h>
 #include <math.h>
 
-#define DB(x)  x
-#define DB2(x)  x
+#define DB(x) // x
+#define DB2(x) // x
 
 
 using namespace std;
@@ -48,10 +48,12 @@ namespace y60 {
         _myCacheSizeInSecs(PRELOAD_CACHE_TIME),
         _myResampleContext(0)
     {
+        AC_DEBUG << "FrameConveyor::FrameConveyor" << endl;
         _myVideoFrame = avcodec_alloc_frame();
     }
 
     FrameConveyor::~FrameConveyor() {
+        AC_DEBUG << "FrameConveyor::~FrameConveyor" << endl;
         if (_myVideoFrame) {
             av_free(_myVideoFrame);
             _myVideoFrame = 0;
@@ -72,7 +74,9 @@ namespace y60 {
     FrameConveyor::clear() {
         _myCacheSizeInSecs = PRELOAD_CACHE_TIME;
         _myFrameCache.clear();
-        _myAudioSink->stop();
+        if (_myAudioSink) {
+            _myAudioSink->stop();
+        }
     }
 
     void
@@ -228,17 +232,13 @@ namespace y60 {
         DB2(cerr << "fillCache [" << theStartTime << " to " << theEndTime << "]" << endl;)
         DB2(cerr << " last decoded " << myLastDecodedTime << endl;)
         if (fabs(theStartTime - myLastDecodedTime) >= myTimePerFrame * 1.5) {
-            AC_WARNING << " Seek: " << fabs(theStartTime - myLastDecodedTime);
             _myContext->seekToTime(theStartTime);
             if (_myAudioSink && _myAudioSink->getState() != HWSampleSink::STOPPED) {
-                if (_myAudioSink) {
-                    AC_WARNING << "Turning off audio due to seek (theStartTime= "
-                        << theStartTime << ", theEndTime: " << theEndTime 
-                        << ", myLastDecodedTime= " << myLastDecodedTime << ").";
-                    exit(-1);
-                    _myAudioSink->stop();
-                    _myAudioSink = HWSampleSinkPtr(0);
-                }
+                AC_WARNING << " Seek: " << fabs(theStartTime - myLastDecodedTime);
+//                _myAudioSink->stop();
+//                _myAudioSink = HWSampleSinkPtr(0);
+            } else {
+                AC_DEBUG << " Seek: " << fabs(theStartTime - myLastDecodedTime);
             }
         }
 
@@ -351,33 +351,7 @@ namespace y60 {
             theLastDecodedVideoTime = myNewFrame->getTimestamp();
         }
         DB2(cerr << "decodeFrame decoded " << theLastDecodedVideoTime << endl;)
-#if 0
-        case DecoderContext::FrameTypeAudio:
-        {
-            if (_myAudioSink) {
-                AudioBufferPtr myBuffer;
-                /*
-                   if (_myResampleContext) {
-                   numFrames = audio_resample(_myResampleContext, 
-                   (int16_t*)(_myResampledSamples.begin()),
-                   (int16_t*)(_mySamples.begin()), 
-                   numFrames);
-                   myBuffer = Pump::get().createBuffer(numFrames);
-                   myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
-                   } else {
-                   */                
-                myBuffer = Pump::get().createBuffer(_myAudioFrame.getSampleSize() / 
-                        (2 * _myContext->getNumAudioChannels()));
-                myBuffer->convert(_myAudioFrame.getSamples(), SF_S16, 
-                        _myContext->getNumAudioChannels());
-                _myAudioSink->queueSamples(myBuffer);
-                theLastDecodedAudioTime = _myAudioFrame.getTimestamp();
-                cerr << "Audio Frame Time: " << theLastDecodedAudioTime << endl;
-            }
-            break;
-            }
-#endif                
-        }
+    }
 
     void 
     FrameConveyor::convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer) {
@@ -450,6 +424,7 @@ namespace y60 {
             initResample(myAudioStream->codec.channels, myAudioStream->codec.sample_rate);
         } else {
             _myAudioSink = HWSampleSinkPtr(0);
+            _myContext->disableAudio();
         }
         
     }

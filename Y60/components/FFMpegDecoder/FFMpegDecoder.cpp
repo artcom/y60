@@ -60,7 +60,7 @@
 #include <iostream>
 #include <float.h>
 
-#define DB(x)  // x
+#define DB(x) // x
 
 using namespace std;
 using namespace asl;
@@ -78,9 +78,12 @@ namespace y60 {
 
     FFMpegDecoder::FFMpegDecoder(asl::DLHandle theDLHandle) :
         PlugInBase(theDLHandle)
-    {}
+    {
+        AC_DEBUG << "FFMpegDecoder::FFMpegDecoder";
+    }
 
     FFMpegDecoder::~FFMpegDecoder() {
+        AC_DEBUG << "FFMpegDecoder::~FFMpegDecoder";
     }
 
     std::string
@@ -101,7 +104,8 @@ namespace y60 {
             return _myFrameConveyor.getAudioTime() +
                 getMovie()->get<AVDelayTag>();
         } else {
-            DB(cerr << "sys: " << theSystemTime << " mov " << MovieDecoderBase::getMovieTime(theSystemTime) << endl;)
+            DB(cerr << "sys: " << theSystemTime << " mov " << 
+                    MovieDecoderBase::getMovieTime(theSystemTime) << endl;)
             return MovieDecoderBase::getMovieTime(theSystemTime);
         }
     }
@@ -176,7 +180,7 @@ namespace y60 {
     double
     FFMpegDecoder::readFrame(double theTime, unsigned theFrame,
             dom::ResizeableRasterPtr theTargetRaster) {
-        DB(cerr << "readFrame at : " << theTime << " system time " << asl::Time() << endl);
+        AC_TRACE << "readFrame at : " << theTime << " system time " << asl::Time();
         if (theTime >= _myFrameConveyor.getEndOfFileTimestamp()) {
             setEOF(true);
             return theTime;
@@ -191,6 +195,7 @@ namespace y60 {
             getMovie()->set<FrameCountTag>((unsigned)(_myFrameConveyor.getEndOfFileTimestamp() 
                         * getMovie()->get<FrameRateTag>()));
         }
+        AC_TRACE << "readFrame returns " << myDecodedFrameTime;
         return myDecodedFrameTime;
     }
 }

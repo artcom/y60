@@ -34,6 +34,7 @@ function FFMpegTest(theArguments) {
     Public.setup = function() {
         Public.setSplashScreen(false);
         Base.setup(840, 500);
+//        window.setTimeout("nextTest", 12000);
         Public.nextTest();
     }
 
@@ -49,22 +50,28 @@ function FFMpegTest(theArguments) {
         window.setTextColor([1,1,1,1], [1,1,1,1]);
         window.renderText([10, myPos], _myTestName, "Screen15");
         window.setTextColor([1,1,1,1], [1,1,1,1]);
-        myPos += 20;
-        var myText  = basename(_myMovie.src) + " " + _myMovie.playmode + " " +
-                _myMovie.currentframe + "/" + _myMovie.framecount;
-        window.renderText([10, myPos], myText, "Screen15");
-        myPos += 10;
+        if (_myMovie) {
+            myPos += 20;
+            var myText  = basename(_myMovie.src) + " " + _myMovie.playmode + " " +
+                    _myMovie.currentframe + "/" + _myMovie.framecount;
+            window.renderText([10, myPos], myText, "Screen15");
+            myPos += 10;
+        }            
     }
 
-    function setupTest(theName, theFile) {
+    function setupTest(theName, theFile, theUseSound) {
         _myTestName = theName;
+        if (_myMovie) {
+            _myMovie.removeFromScene();
+            delete _myMovie;
+            _myMovie = 0;
+        }            
         print ("Starting test: "+theName);
         var myMovie = new MovieOverlay(Public.getOverlayManager(), theFile,
-                new Vector2f(300, 70), null, true);
+                new Vector2f(300, 70), null, theUseSound);
         myMovie.playspeed = 1;
         myMovie.loopcount = 1;
         myMovie.avdelay   = 0;
-        //myMovie.startime  = theStartTime;
 
         if (myMovie.width > 480) {
             var myAspect = myMovie.width / myMovie.height;
@@ -74,21 +81,26 @@ function FFMpegTest(theArguments) {
         _myMovie = myMovie;
     }
 
+    _myTests = [
+                "setupPlayTest(true)", 
+                "setupStopTest(true)",
+                "setupPlayTest(false)",
+                "setupStopTest(false)",
+                "setupLoopTest(false)"
+//                "setupLongTest(true)"
+               ];
+    
     Public.nextTest = function() {
-        print ("Test finished: "+_myTestName);
+        if (_myTestName) {
+            print ("Test finished: "+_myTestName);
+        }
         _myCurTestIndex++;
-        switch(_myCurTestIndex) {
-            case 0:
-                setupPlayTest();
-                break;
-            case 1:
-                setupStopTest();
-                break;
-            case 2:                
-                setupLongTest();
-                break;
-            case 3:
-                exit(0);
+        if (_myCurTestIndex < _myTests.length) {
+            myTestFunc = _myTests[_myCurTestIndex];
+            print(myTestFunc);
+            eval(myTestFunc);
+        } else {
+            exit(0);
         }
     }
 
@@ -112,24 +124,33 @@ function FFMpegTest(theArguments) {
         _myMovie.playmode = "stop";
     }
 
-    function setupPlayTest() {
-        setupTest("Play to End", "testfiles/counter_short.mpg");
+    function setupPlayTest(theUseSound) {
+        setupTest("Play to End", "testfiles/counter_short.mpg", theUseSound);        
         window.setTimeout("testPlaying", 1000);
         window.setTimeout("testStopped", 10000);
         window.setTimeout("nextTest", 10100);
     }
 
-    function setupStopTest() {
-        setupTest("Play, Stop, Play again", "testfiles/counter_short.mpg");
+    function setupStopTest(theUseSound) {
+        setupTest("Play, Stop, Play again", "testfiles/counter_short.mpg", theUseSound);
         window.setTimeout("stop", 1000);
         window.setTimeout("play", 2000);
         window.setTimeout("stop", 3000);
         window.setTimeout("nextTest", 4000);
     }
 
-    function setupLongTest() {
+    function setupLoopTest(theUseSound) {
+        setupTest("Loop", "testfiles/counter_short.mpg", theUseSound);
+        _myMovie.loopcount = 0;
+        window.setTimeout("testPlaying", 1000);
+        window.setTimeout("testPlaying", 10000);
+        window.setTimeout("stop", 10050);
+        window.setTimeout("nextTest", 10100);
+    }
+    
+    function setupLongTest(theUseSound) {
         setupTest("Almost Endless test", "/tmp/suesstod.avi");
-        _myMovie.loopcount = 10;
+        _myMovie.loopcount = 0;
     }
 
     function assure_msg(theCondition, theMsg) {

@@ -65,6 +65,7 @@ namespace y60 {
             double getFrameRate();
 
             unsigned getNumAudioChannels() const;
+            void disableAudio();
             
         private:
             long long advance() const;
@@ -88,6 +89,8 @@ namespace y60 {
 
             AVPacket * _myCurAudioPacket;
             int _myCurPosInAudioPacket;
+
+            bool _myAudioEnabled;
     };
 
     typedef asl::Ptr<DecoderContext> DecoderContextPtr;

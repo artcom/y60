@@ -53,8 +53,10 @@ namespace y60 {
         _myEndOfFileTimestamp(DBL_MAX),
         _myFilename(theFilename),
         _myCurAudioPacket(0),
-        _myCurPosInAudioPacket(0)
+        _myCurPosInAudioPacket(0),
+        _myAudioEnabled(true)
     {
+        AC_DEBUG << "DecoderContext::DecoderContext";
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
@@ -74,11 +76,17 @@ namespace y60 {
 
         // find video/audio streams
         for (unsigned i = 0; i < _myFormatContext->nb_streams; ++i) {
-            if (_myVideoStreamIndex == -1 && _myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_VIDEO) {
+            if (_myVideoStreamIndex == -1 
+                    && _myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_VIDEO)
+            {
                 _myVideoStreamIndex = i;
+                AC_DEBUG << "found video stream, index " << _myVideoStreamIndex;
                 _myVideoStream = _myFormatContext->streams[i];
-            } else if (_myAudioStreamIndex == -1 && _myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO) {
+            } else if (_myAudioStreamIndex == -1 
+                    && _myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO)
+            {
                 _myAudioStreamIndex = i;
+                AC_DEBUG << "found audio stream, index " << _myAudioStreamIndex;
                 _myAudioStream = _myFormatContext->streams[i];
             }
         }    
@@ -108,15 +116,18 @@ namespace y60 {
     }
 
     DecoderContext::~DecoderContext() {
-        if (_myVideoStream) {
-            avcodec_close(&_myVideoStream->codec);
-            _myVideoStreamIndex = -1;
-            _myVideoStream = 0;
-        }
-        if (_myAudioStream) {
+        AC_DEBUG << "DecoderContext::~DecoderContext";
+        if (_myAudioStream && _myAudioEnabled) {
+            AC_DEBUG << "  Closing audio";
             avcodec_close(&_myAudioStream->codec);
             _myAudioStreamIndex = -1;
             _myAudioStream = 0;
+        }
+        if (_myVideoStream) {
+            AC_DEBUG << "  Closing video";
+            avcodec_close(&_myVideoStream->codec);
+            _myVideoStreamIndex = -1;
+            _myVideoStream = 0;
         }
         av_free(_myAdvanceFrame);
         av_close_input_file(_myFormatContext);
@@ -327,6 +338,10 @@ namespace y60 {
         }
     }
 
+    void DecoderContext::disableAudio() {
+        _myAudioEnabled = false;
+    }
+
     AVPacket* DecoderContext::getPacket(bool theGetVideo) 
     {
         int myStreamIndex;
@@ -363,7 +378,7 @@ namespace y60 {
                 // Without av_dup_packet, ffmpeg reuses myPacket->data at first opportunity 
                 // and trashes our memory.
                 av_dup_packet(myPacket);
-                if (myPacket->stream_index == myOtherStreamIndex) {
+                if (_myAudioEnabled && myPacket->stream_index == myOtherStreamIndex) {
                     myOtherPacketList->push_back(myPacket);
                 }
             } while (myPacket->stream_index != myStreamIndex);

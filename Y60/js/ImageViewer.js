@@ -307,6 +307,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                                 /*|| myFilename.search(/\.mov$/i)  != -1)*/
                                 )) {
             plug("y60FFMpegDecoder1");
+            print("plugged ffmpegdecoder1");
             _myMPEGPlugged = true;
         }
         if ( myFilename.search(/\.mov$/i) != -1) {

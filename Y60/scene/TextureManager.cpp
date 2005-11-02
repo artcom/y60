@@ -139,7 +139,8 @@ namespace y60 {
     void
     TextureManager::loadMovieFrame(MoviePtr theMovie, double theCurrentTime) {
         MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame);
-
+        AC_DEBUG << "loadMovieFrame: theCurrentTime = " << theCurrentTime;
+        
         // First time load, or source has changed
         if (theMovie->reloadRequired()) {
             try {
