@@ -183,7 +183,7 @@ JSFrustum::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 JSObject *
 JSFrustum::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-    createClassModuleDocumentation("math", ClassName(), Properties(), Functions(),
+    createClassModuleDocumentation("Math", ClassName(), Properties(), Functions(),
             ConstIntProperties(), 0, 0, 0);
     return myClass;
 

@@ -42,8 +42,8 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 init(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Initialize audiosystem.");
-    DOC_PARAM("Samplerate", DOC_TYPE_INTEGER);
-    DOC_PARAM_OPT("Latency", DOC_TYPE_FLOAT, 0.1);    
+    DOC_PARAM("theSamplerate", "", DOC_TYPE_INTEGER);
+    DOC_PARAM_OPT("theLatency", "", DOC_TYPE_FLOAT, 0.1);
     DOC_END;
     try {
         checkForUndefinedArguments("JSAudio::init()", argc, argv);
@@ -103,11 +103,11 @@ isRunning(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 play(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Play an audio file.");
-    DOC_PARAM("Filename", DOC_TYPE_STRING);
-    DOC_PARAM("Destination Module, 'Mixer'", DOC_TYPE_STRING);
-    DOC_PARAM("Volume", DOC_TYPE_FLOAT);
-    DOC_PARAM("Seektime", DOC_TYPE_FLOAT);
-    DOC_PARAM("Loopflag", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theModule", "Destination Module, 'Mixer'", DOC_TYPE_STRING);
+    DOC_PARAM("theVolume", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("theSeektime", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("theLoopflag", "", DOC_TYPE_BOOLEAN);
     DOC_RVAL("Id", DOC_TYPE_STRING);
     DOC_END;
     try {
@@ -160,7 +160,7 @@ play(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Stop an audio file.");
-    DOC_PARAM("id", DOC_TYPE_STRING);
+    DOC_PARAM("theId", "", DOC_TYPE_STRING);
     DOC_END;
     try {
         checkArguments("JSAudio::stop()", argc, argv, 1);
@@ -180,8 +180,8 @@ stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setSeekOffset(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set seektime");
-    DOC_PARAM("id", DOC_TYPE_STRING);
-    DOC_PARAM("seektime", DOC_TYPE_FLOAT);
+    DOC_PARAM("thId", "", DOC_TYPE_STRING);
+    DOC_PARAM("theSeektime", "", DOC_TYPE_FLOAT);
     DOC_END;
     try {
         checkArguments("JSAudio::stop()", argc, argv, 2);
@@ -207,7 +207,7 @@ setSeekOffset(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 pause(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Pauses an audio file.");
-    DOC_PARAM("id", DOC_TYPE_STRING);
+    DOC_PARAM("theId", "", DOC_TYPE_STRING);
     DOC_END;
     try {
         checkArguments("JSAudio::pause()", argc, argv, 1);
@@ -227,7 +227,7 @@ pause(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 isPlaying(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Check if an audio file is playing.");
-    DOC_PARAM("id", DOC_TYPE_STRING);
+    DOC_PARAM("theId", "", DOC_TYPE_STRING);
     DOC_RVAL("Result", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
@@ -263,8 +263,8 @@ stopAllSounds(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 setVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set volume for audio file");
-    DOC_PARAM("id", DOC_TYPE_STRING);
-    DOC_PARAM("volume", DOC_TYPE_FLOAT);
+    DOC_PARAM("theId", "", DOC_TYPE_STRING);
+    DOC_PARAM("theVolume", "", DOC_TYPE_FLOAT);
     DOC_END;
     try {
         checkArguments("JSAudio::setVolume()", argc, argv, 2);
@@ -291,8 +291,8 @@ setVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 getVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Get volume of audio file");
-    DOC_PARAM("id", DOC_TYPE_STRING);
-    DOC_RVAL("Volume", DOC_TYPE_FLOAT);    
+    DOC_PARAM("tehId", "", DOC_TYPE_STRING);
+    DOC_RVAL("Volume", DOC_TYPE_FLOAT);
     DOC_END;
     try {
         checkArguments("JSAudio::getVolume()", argc, argv, 1);
@@ -313,8 +313,8 @@ getVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 getDuration(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Get duration of audio file");
-    DOC_PARAM("id", DOC_TYPE_STRING);
-    DOC_RVAL("Duration", DOC_TYPE_FLOAT);    
+    DOC_PARAM("theId", "", DOC_TYPE_STRING);
+    DOC_RVAL("Duration", DOC_TYPE_FLOAT);
     DOC_END;
     try {
         checkArguments("JSAudio::getDuration()", argc, argv, 1);

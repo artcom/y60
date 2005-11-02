@@ -94,7 +94,7 @@ namespace jslib {
     static JSBool
     windowExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Checks if a window with the given title exists.");
-        DOC_PARAM("theWindowTitle", DOC_TYPE_STRING);
+        DOC_PARAM("theWindowTitle", "", DOC_TYPE_STRING);
         DOC_END;
         try {
             string myWindowTitle;

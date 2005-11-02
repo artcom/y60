@@ -424,7 +424,7 @@ JSBox3f::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 JSObject *
 JSBox3f::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
-    DOC_MODULE_CREATE("math", JSBox3f);
+    DOC_MODULE_CREATE("Math", JSBox3f);
     return myClass;
 }
 

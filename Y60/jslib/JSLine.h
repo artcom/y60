@@ -298,8 +298,7 @@ template <class NATIVE_LINE>
 JSObject *
 JSGenericLine<NATIVE_LINE>::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
-    DOC_MODULE_CREATE("math", JSGenericLine<NATIVE_LINE>);
-//    createClassModuleDocumentation("math", ClassName(), Properties(), Functions(), 0, 0, 0, 0);
+    DOC_MODULE_CREATE("Math", JSGenericLine<NATIVE_LINE>);
     return myClass;
 
 }

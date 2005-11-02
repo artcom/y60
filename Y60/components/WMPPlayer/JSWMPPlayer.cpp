@@ -53,7 +53,7 @@ static JSBool
 play(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Starts playback of the movie at a given position" \
               "If no position is given, it starts at the current position");
-    DOC_PARAM("theStartPosition in Seconds", DOC_TYPE_FLOAT);
+    DOC_PARAM("theStartPosition", "Start position in Seconds", DOC_TYPE_FLOAT);
     DOC_END;
     try {
         ensureParamCount(argc, 0, 1);

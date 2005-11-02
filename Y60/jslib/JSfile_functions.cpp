@@ -30,8 +30,8 @@ namespace jslib {
 JS_STATIC_DLL_CALLBACK(JSBool)
 GetWholeFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Loads a text file into a string using the package manager");
-    DOC_PARAM("theRelativeFilename", DOC_TYPE_STRING);
-    DOC_PARAM("thePackagePath", DOC_TYPE_STRING);
+    DOC_PARAM("theRelativeFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("thePackagePath", "", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1, 2);
@@ -65,7 +65,7 @@ GetWholeFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 GetLastModified(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the modification time for the given file");
-    DOC_PARAM("theFilename", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -79,8 +79,8 @@ GetLastModified(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSBool
 MoveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Moves the given file");
-    DOC_PARAM("theSource", DOC_TYPE_STRING);
-    DOC_PARAM("theTarget", DOC_TYPE_STRING);
+    DOC_PARAM("theSource", "", DOC_TYPE_STRING);
+    DOC_PARAM("theTarget", "", DOC_TYPE_STRING);
     DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
@@ -97,7 +97,7 @@ MoveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 DeleteFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Deletes the given file");
-    DOC_PARAM("theFilename", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
@@ -112,8 +112,8 @@ DeleteFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 PutWholeFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Writes a given string into a file");
-    DOC_PARAM("theFilename", DOC_TYPE_STRING);
-    DOC_PARAM("theString", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theString", "", DOC_TYPE_STRING);
     DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
@@ -130,7 +130,7 @@ PutWholeFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 Basename(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the filename without its directory");
-    DOC_PARAM("thePath", DOC_TYPE_STRING);
+    DOC_PARAM("thePath", "", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -144,7 +144,7 @@ Basename(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 Dirname(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("extracts the directory from a path");
-    DOC_PARAM("thePath", DOC_TYPE_STRING);
+    DOC_PARAM("thePath", "", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1);

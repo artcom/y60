@@ -430,7 +430,7 @@ JSMatrix::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 JSObject *
 JSMatrix::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-    DOC_MODULE_CREATE("math", JSMatrix);
+    DOC_MODULE_CREATE("Math", JSMatrix);
     return myClass;
 }
 

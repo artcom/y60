@@ -116,10 +116,10 @@ JSKeyframe::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
 JSBool
 JSKeyframe::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Construct a Keyframe");
-    DOC_PARAM("Position", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("Orientation", DOC_TYPE_QUATERNIONF);
-    DOC_PARAM("Timestamp", DOC_TYPE_FLOAT);
-    DOC_PARAM("Speed", DOC_TYPE_FLOAT);
+    DOC_PARAM("thePosition", "", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theOrientation", "", DOC_TYPE_QUATERNIONF);
+    DOC_PARAM("theTimestamp", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("theSpeed", "", DOC_TYPE_FLOAT);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());

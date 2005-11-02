@@ -130,13 +130,13 @@ JSTriangle::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *ob
 JSBool
 JSTriangle::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Constructs a triangle from three points, from a triangle or an empty one.");
-    DOC_PARAM("Point 1 as Vector3", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("Point 2 as Vector3", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("Point 3 as Vector3", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("thePoint", "Point 1 as Vector3", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("thePoint", "Point 2 as Vector3", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("thePoint", "Point 3 as Vector3", DOC_TYPE_VECTOR3F);
     DOC_RESET;
-    DOC_PARAM("Array[3] of Vector3", DOC_TYPE_ARRAY);
+    DOC_PARAM("thePoints", "Array[3] of Vector3", DOC_TYPE_ARRAY);
     DOC_RESET;
-    DOC_PARAM("Triangle", DOC_TYPE_TRIANGLE);
+    DOC_PARAM("theTriangle", "Triangle", DOC_TYPE_TRIANGLE);
     DOC_RESET;
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
@@ -196,7 +196,7 @@ JSTriangle::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 JSObject *
 JSTriangle::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
-    DOC_MODULE_CREATE("math", JSTriangle);
+    DOC_MODULE_CREATE("Math", JSTriangle);
     return myClass;
 }
 

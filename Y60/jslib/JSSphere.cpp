@@ -36,9 +36,9 @@ makeEmpty(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 extendBy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Extend Sphere by given object");
-    DOC_PARAM("theSphere", DOC_TYPE_SPHERE);
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
     DOC_RESET;
-    DOC_PARAM("thePoint", DOC_TYPE_POINT3F);
+    DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);
     DOC_END;
     if (argc == 1) {
         if (JSSphere::matchesClassOf(cx, argv[0])) {
@@ -55,9 +55,9 @@ extendBy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 contains(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Test if object is contained in Sphere (may touch boundary)");
-    DOC_PARAM("theSphere", DOC_TYPE_SPHERE);
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
     DOC_RESET;
-    DOC_PARAM("thePoint", DOC_TYPE_POINT3F);
+    DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);
     DOC_RVAL("true if object is contained in Sphere", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
@@ -76,9 +76,9 @@ contains(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 envelopes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Test if object is enveloped by Sphere (may not touch boundary)");
-    DOC_PARAM("theSphere", DOC_TYPE_SPHERE);
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
     DOC_RESET;
-    DOC_PARAM("thePoint", DOC_TYPE_POINT3F);
+    DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);
     DOC_RVAL("true if object is enveloped by Sphere", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
@@ -96,9 +96,9 @@ envelopes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 touches(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Test if object touches Sphere boundary");
-    DOC_PARAM("theSphere", DOC_TYPE_SPHERE);
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
     DOC_RESET;
-    DOC_PARAM("thePoint", DOC_TYPE_POINT3F);
+    DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);
     DOC_RVAL("true if object is enveloped by Sphere", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
@@ -116,7 +116,7 @@ touches(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 intersects(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Test if object intersects Sphere");
-    DOC_PARAM("theSphere", DOC_TYPE_SPHERE);
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
     DOC_RVAL("true if object intersects Sphere", DOC_TYPE_BOOLEAN);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::intersects,cx,obj,argc,argv,rval);
@@ -243,13 +243,13 @@ JSSphere::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
 JSBool
 JSSphere::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Constructs a sphere from center/radius, center/point on surface, from another sphere or an empty one.");
-    DOC_PARAM("a sphere", DOC_TYPE_SPHERE);
+    DOC_PARAM("a sphere", "", DOC_TYPE_SPHERE);
     DOC_RESET;
-    DOC_PARAM("center", DOC_TYPE_POINT3F);
-    DOC_PARAM("radius", DOC_TYPE_FLOAT);
+    DOC_PARAM("center", "", DOC_TYPE_POINT3F);
+    DOC_PARAM("radius", "", DOC_TYPE_FLOAT);
     DOC_RESET;
-    DOC_PARAM("center", DOC_TYPE_POINT3F);
-    DOC_PARAM("point on surface", DOC_TYPE_POINT3F);
+    DOC_PARAM("center", "", DOC_TYPE_POINT3F);
+    DOC_PARAM("point on surface", "", DOC_TYPE_POINT3F);
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {
@@ -317,7 +317,7 @@ JSSphere::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 JSObject *
 JSSphere::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
-    DOC_MODULE_CREATE("math",JSSphere);
+    DOC_MODULE_CREATE("Math",JSSphere);
     return myClass;
 }
 

@@ -332,8 +332,8 @@ JSNode::toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 static JSBool
 replaceChild(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Replaces the child node oldChild with newChild in the list of children, and returns the oldChild node.");
-    DOC_PARAM("newChild", DOC_TYPE_NODE);
-    DOC_PARAM("oldChild", DOC_TYPE_NODE);
+    DOC_PARAM("newChild", "", DOC_TYPE_NODE);
+    DOC_PARAM("oldChild", "", DOC_TYPE_NODE);
     DOC_RVAL("The node replaced", DOC_TYPE_NODE);
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::replaceChild, cx, obj, argc, argv, rval);
@@ -341,7 +341,7 @@ replaceChild(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 removeChild(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Removes the child node indicated by oldChild from the list of children, and returns it.");
-    DOC_PARAM("oldChild", DOC_TYPE_NODE);
+    DOC_PARAM("oldChild", "", DOC_TYPE_NODE);
     DOC_RVAL("The node removed.", DOC_TYPE_NODE);
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::removeChild, cx, obj, argc, argv, rval);
@@ -349,7 +349,7 @@ removeChild(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 static JSBool
 appendChild(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Adds the node newChild to the end of the list of children of this node.");
-    DOC_PARAM("newChild", DOC_TYPE_NODE);
+    DOC_PARAM("newChild", "", DOC_TYPE_NODE);
     DOC_RVAL("The node added", DOC_TYPE_NODE);
     DOC_END;
     typedef dom::NodePtr (dom::Node::*MyMethod)(dom::NodePtr);
@@ -365,7 +365,7 @@ hasChildNodes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 cloneNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns a duplicate of this node. If true, recursively clone the subtree under the specified node; if false, clone only the node itself (and its attributes, if it is an Element).");
-    DOC_PARAM("theDeepCopyFlag", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theDeepCopyFlag", "", DOC_TYPE_BOOLEAN);
     DOC_RVAL("The duplicate node.", DOC_TYPE_NODE);
     DOC_END;
     typedef dom::NodePtr (dom::Node::*MyMethod)(dom::Node::CloneDepth) const;
@@ -374,7 +374,7 @@ cloneNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 isSameNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns whether this node is the same node as the given one.");
-    DOC_PARAM("Other Node", DOC_TYPE_NODE);
+    DOC_PARAM("theOtherNode", "The node to compare this node with.", DOC_TYPE_NODE);
     DOC_RVAL("Returns true if the nodes are the same, false otherwise.", DOC_TYPE_BOOLEAN);
     DOC_END;
     typedef bool (dom::Node::*MyMethod)(const dom::NodePtr) const;
@@ -383,8 +383,8 @@ isSameNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 addSchema(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Adds a schema to this document.");
-    DOC_PARAM("Schema node", DOC_TYPE_NODE);
-    DOC_PARAM("Namespace Prefix", DOC_TYPE_STRING);
+    DOC_PARAM("Schema node", "", DOC_TYPE_NODE);
+    DOC_PARAM("Namespace Prefix", "", DOC_TYPE_STRING);
     DOC_END;
     typedef void (dom::Node::*MyMethod)(const dom::Node &, const dom::DOMString &);
     JSBool result = Method<dom::Node>::call((MyMethod)&dom::Node::addSchema, cx, obj, argc, argv, rval);
@@ -432,7 +432,7 @@ useFactories(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 parse(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Parses document from theXMLString.");
-    DOC_PARAM("theXMLString", DOC_TYPE_STRING);
+    DOC_PARAM("theXMLString", "", DOC_TYPE_STRING);
     DOC_RVAL("true if construction was valid", DOC_TYPE_BOOLEAN);
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::parseAll, cx, obj, argc, argv, rval);
@@ -440,7 +440,7 @@ parse(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 parseFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Parses a document from a file");
-    DOC_PARAM("Filename", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::parseFile, cx, obj, argc, argv, rval);
 }
@@ -448,7 +448,7 @@ parseFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 saveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Saves this document as file");
-    DOC_PARAM("Filename", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_END;
     try {
         if (argc != 1) {
@@ -489,12 +489,12 @@ saveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 childNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns a child node of this node");
-    DOC_PARAM("Child index", DOC_TYPE_INTEGER);
+    DOC_PARAM("theIndex", "Child index", DOC_TYPE_INTEGER);
     DOC_RESET;
-    DOC_PARAM("Child node name", DOC_TYPE_STRING);
+    DOC_PARAM("theNodeName", "Child node name", DOC_TYPE_STRING);
     DOC_RESET;
-    DOC_PARAM("Child node name", DOC_TYPE_STRING);
-    DOC_PARAM("Index of all children with a given node name", DOC_TYPE_INTEGER);
+    DOC_PARAM("theNodeName", "Child node name", DOC_TYPE_STRING);
+    DOC_PARAM("theIndex", "Index of all children with a given node name", DOC_TYPE_INTEGER);
     DOC_RVAL("Child node", DOC_TYPE_NODE);
     DOC_END;
     if (argc == 1) {
@@ -518,7 +518,7 @@ static JSBool
 childNodesLength(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the number of child nodes of this node. A child node name can be given.");
     DOC_RESET;
-    DOC_PARAM("Child node name", DOC_TYPE_STRING);
+    DOC_PARAM("theChildName", "Child node name", DOC_TYPE_STRING);
     DOC_END;
     if (argc == 0) {
         typedef int (dom::Node::*MyMethod)() const;
@@ -535,10 +535,10 @@ childNodesLength(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 static JSBool
 getElementById(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Finds a node in the whole document by its id.");
-    DOC_PARAM("Id Value", DOC_TYPE_STRING);
+    DOC_PARAM("Id Value", "", DOC_TYPE_STRING);
     DOC_RESET;
-    DOC_PARAM("Id value", DOC_TYPE_STRING);
-    DOC_PARAM("Id attribute name", DOC_TYPE_STRING);
+    DOC_PARAM("Id value", "", DOC_TYPE_STRING);
+    DOC_PARAM("Id attribute name", "", DOC_TYPE_STRING);
     DOC_RVAL("The found node, or null", DOC_TYPE_NODE);
     DOC_END;
     dom::DOMString myId;
@@ -562,7 +562,7 @@ getElementById(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 static JSBool
 getAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Retrieves an attribute value by name.");
-    DOC_PARAM("Name", DOC_TYPE_STRING);
+    DOC_PARAM("Name", "", DOC_TYPE_STRING);
     DOC_RVAL("The typed attribute value as typed js object.", DOC_TYPE_OBJECT);
     DOC_END;
     typedef dom::ValuePtr (dom::Node::*MyMethod)(const dom::DOMString &);
@@ -573,25 +573,25 @@ getAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 addEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Registers an event listener, depending on the useCapture parameter, on the capture phase of the DOM event flow or its target and bubbling phases");
-    DOC_PARAM("Eventtype", DOC_TYPE_STRING);
-    DOC_PARAM("Listener", DOC_TYPE_OBJECT);
-    DOC_PARAM("useCapture", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("Eventtype", "", DOC_TYPE_STRING);
+    DOC_PARAM("Listener", "", DOC_TYPE_OBJECT);
+    DOC_PARAM("useCapture", "", DOC_TYPE_BOOLEAN);
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::addEventListener, cx, obj, argc, argv, rval);
 }
 static JSBool
 removeEventListener(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Removes an event listeners from the default group");
-    DOC_PARAM("Eventtype", DOC_TYPE_STRING);
-    DOC_PARAM("Listener", DOC_TYPE_OBJECT);
-    DOC_PARAM("useCapture", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("Eventtype", "", DOC_TYPE_STRING);
+    DOC_PARAM("Listener", "", DOC_TYPE_OBJECT);
+    DOC_PARAM("useCapture", "", DOC_TYPE_BOOLEAN);
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::removeEventListener, cx, obj, argc, argv, rval);
 }
 static JSBool
 dispatchEvent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sends an event into the dom event model");
-    DOC_PARAM("The Event", DOC_TYPE_OBJECT);
+    DOC_PARAM("The Event", "", DOC_TYPE_OBJECT);
     DOC_END;
     return Method<dom::Node>::call(&dom::Node::dispatchEvent, cx, obj, argc, argv, rval);
 }
@@ -685,7 +685,7 @@ createNode(dom::Node::NodeType theNodeType, unsigned int theExpectedArgc,
 static JSBool
 createElement(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates an element node.");
-    DOC_PARAM("Node name", DOC_TYPE_STRING);
+    DOC_PARAM("theNodename", "", DOC_TYPE_STRING);
     DOC_RVAL("The new node", DOC_TYPE_NODE);
     DOC_END;
     return createNode(dom::Node::ELEMENT_NODE, 1, cx, obj, argc, argv, rval);
@@ -700,7 +700,7 @@ createDocumentFragment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 static JSBool
 createTextNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a text node.");
-    DOC_PARAM("The text", DOC_TYPE_STRING);
+    DOC_PARAM("theText", "", DOC_TYPE_STRING);
     DOC_RVAL("The new node", DOC_TYPE_NODE);
     DOC_END;
     return createNode(dom::Node::TEXT_NODE, 1, cx, obj, argc, argv, rval);
@@ -708,7 +708,7 @@ createTextNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 static JSBool
 createComment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a comment node.");
-    DOC_PARAM("The comment", DOC_TYPE_STRING);
+    DOC_PARAM("theComment", "The comment", DOC_TYPE_STRING);
     DOC_RVAL("The new node", DOC_TYPE_NODE);
     DOC_END;
     return createNode(dom::Node::COMMENT_NODE, 1, cx, obj, argc, argv, rval);
@@ -716,7 +716,7 @@ createComment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 createCDATASection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a CDATA section node.");
-    DOC_PARAM("The CDATA", DOC_TYPE_STRING);
+    DOC_PARAM("theData", "The CDATA", DOC_TYPE_STRING);
     DOC_RVAL("The new node", DOC_TYPE_NODE);
     DOC_END;
     return createNode(dom::Node::CDATA_SECTION_NODE, 1, cx, obj, argc, argv, rval);
@@ -724,8 +724,8 @@ createCDATASection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
 static JSBool
 createProcessingInstruction(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a processing instruction node.");
-    DOC_PARAM("The name", DOC_TYPE_STRING);
-    DOC_PARAM("The value", DOC_TYPE_STRING);
+    DOC_PARAM("theName", "", DOC_TYPE_STRING);
+    DOC_PARAM("theValue", "", DOC_TYPE_STRING);
     DOC_RVAL("The new node", DOC_TYPE_NODE);
     DOC_END;
     return createNode(dom::Node::PROCESSING_INSTRUCTION_NODE, 2, cx, obj, argc, argv, rval);
@@ -733,7 +733,7 @@ createProcessingInstruction(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 static JSBool
 createAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a attribute node.");
-    DOC_PARAM("The name", DOC_TYPE_STRING);
+    DOC_PARAM("theName", "", DOC_TYPE_STRING);
     DOC_RVAL("The new node", DOC_TYPE_NODE);
     DOC_END;
     return createNode(dom::Node::ATTRIBUTE_NODE, 1, cx, obj, argc, argv, rval);
@@ -741,7 +741,7 @@ createAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSBool
 createEntityReference(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a entitiy reference node.");
-    DOC_PARAM("The name", DOC_TYPE_STRING);
+    DOC_PARAM("theName", "", DOC_TYPE_STRING);
     DOC_RVAL("The new node", DOC_TYPE_NODE);
     DOC_END;
     return createNode(dom::Node::ENTITY_REFERENCE_NODE, 1, cx, obj, argc, argv, rval);

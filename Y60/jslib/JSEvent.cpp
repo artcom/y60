@@ -45,9 +45,9 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 initEvent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Initialize Event with id, bubble up flag and listener cancelable flag.");
-    DOC_PARAM("theEventIdentifier", DOC_TYPE_STRING);
-    DOC_PARAM("theCanBubbleFlag", DOC_TYPE_BOOLEAN);
-    DOC_PARAM("theCancelableFlag", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theEventIdentifier", "", DOC_TYPE_STRING);
+    DOC_PARAM("theCanBubbleFlag", "", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theCancelableFlag", "", DOC_TYPE_BOOLEAN);
     DOC_END;
     Method<dom::Event>::call(&dom::Event::initEvent, cx, obj, argc, argv, rval);
     *rval = as_jsval(cx, true);
@@ -181,11 +181,11 @@ JSEvent::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
 JSBool
 JSEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a dom event.");
-    DOC_PARAM("theEventIdentifier", DOC_TYPE_STRING);    
-    DOC_PARAM("thePayload", DOC_TYPE_OBJECT);    
-    DOC_PARAM("theCanBubbleFlag", DOC_TYPE_BOOLEAN);
-    DOC_PARAM("theCancelableFlag", DOC_TYPE_BOOLEAN);
-    DOC_PARAM("theTimeStamp", DOC_TYPE_OBJECT);    
+    DOC_PARAM("theEventIdentifier", "", DOC_TYPE_STRING);    
+    DOC_PARAM("thePayload", "", DOC_TYPE_OBJECT);    
+    DOC_PARAM("theCanBubbleFlag", "", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theCancelableFlag", "", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theTimeStamp", "", DOC_TYPE_OBJECT);    
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());

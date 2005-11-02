@@ -44,21 +44,21 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Draws a line segment, triangle, sphere or box in a given color and transformation matrix.");
-    DOC_PARAM("line segment", DOC_TYPE_LINESEGMENT);
-    DOC_PARAM("color", DOC_TYPE_VECTOR4F);
-    DOC_PARAM("transformation", DOC_TYPE_MATRIX4F);
+    DOC_PARAM("theLineSegment", "Line Segment to draw", DOC_TYPE_LINESEGMENT);
+    DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
     DOC_RESET;
-    DOC_PARAM("triangle", DOC_TYPE_TRIANGLE);
-    DOC_PARAM("color", DOC_TYPE_VECTOR4F);
-    DOC_PARAM("transformation", DOC_TYPE_MATRIX4F);
+    DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);
+    DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
     DOC_RESET;
-    DOC_PARAM("sphere", DOC_TYPE_SPHERE);
-    DOC_PARAM("color", DOC_TYPE_VECTOR4F);
-    DOC_PARAM("transformation", DOC_TYPE_MATRIX4F);
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
+    DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
     DOC_RESET;
-    DOC_PARAM("box", DOC_TYPE_BOX3F);
-    DOC_PARAM("color", DOC_TYPE_VECTOR4F);
-    DOC_PARAM("transformation", DOC_TYPE_MATRIX4F);
+    DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
+    DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
     DOC_RESET;
     DOC_END;
     if (argc == 3) {

@@ -154,7 +154,6 @@ main(int argc, char **argv) {
 #ifdef WIN32    
     SetUnhandledExceptionFilter(&AcUnhandledExceptionFilter);
 #endif
-
     int rv = 1;
     try {
         ourArguments.addAllowedOptions(ourAllowedOptions);

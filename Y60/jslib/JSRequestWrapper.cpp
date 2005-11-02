@@ -45,7 +45,7 @@ get(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 post(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Post a string as one block of data.");
-    DOC_PARAM("theString", DOC_TYPE_STRING);
+    DOC_PARAM("theData", "", DOC_TYPE_STRING);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::post,cx,obj,argc,argv,rval);
 }
@@ -53,7 +53,7 @@ post(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 postFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Post a file as one block of data.");
-    DOC_PARAM("theFilename", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::postFile,cx,obj,argc,argv,rval);
 }
@@ -61,8 +61,8 @@ postFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 addHttpHeader(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Adds a entry to the HTTP header");
-    DOC_PARAM("theKey", DOC_TYPE_STRING);
-    DOC_PARAM("theValue", DOC_TYPE_STRING);
+    DOC_PARAM("theKey", "", DOC_TYPE_STRING);
+    DOC_PARAM("theValue", "", DOC_TYPE_STRING);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::addHttpHeader,cx,obj,argc,argv,rval);
 }
@@ -70,7 +70,7 @@ addHttpHeader(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 getResponseHeader(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the HTTP Response header field with the name given by theHeader.");
-    DOC_PARAM("theHeader", DOC_TYPE_STRING);
+    DOC_PARAM("theHeader", "", DOC_TYPE_STRING);
     DOC_RVAL("", DOC_TYPE_STRING);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::getResponseHeader,cx,obj,argc,argv,rval);
@@ -79,8 +79,8 @@ getResponseHeader(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 static JSBool
 setTimeoutParams(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the LowSpeedLimit (Bytes/s) and LowSpeedTimeout (sec) to detect transfer timeouts.");
-    DOC_PARAM("theBytesPerSec", DOC_TYPE_INTEGER);
-    DOC_PARAM("theSeconds", DOC_TYPE_INTEGER);
+    DOC_PARAM("theBytesPerSec", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theSeconds", "", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::setTimeoutParams,cx,obj,argc,argv,rval);
 }

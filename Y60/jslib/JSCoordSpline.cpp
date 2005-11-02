@@ -33,16 +33,16 @@ typedef asl::CoordSpline NATIVE;
 
 static JSBool
 position(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("returns a position for a given timestamp");
-    DOC_PARAM("Timestamp", DOC_TYPE_FLOAT);
+    DOC_BEGIN("Returns a position for a given timestamp");
+    DOC_PARAM("theTimestamp", "", DOC_TYPE_FLOAT);
     DOC_RVAL("Position", DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<JSCoordSpline::NATIVE>::call(&JSCoordSpline::NATIVE::xyz,cx,obj,argc,argv,rval);
 }
 static JSBool
 orientation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("returns a orientation for a given timestamp");
-    DOC_PARAM("Timestamp", DOC_TYPE_FLOAT);
+    DOC_BEGIN("Returns a orientation for a given timestamp");
+    DOC_PARAM("theTimestamp", "", DOC_TYPE_FLOAT);
     DOC_RVAL("Orientation", DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<JSCoordSpline::NATIVE>::call(&JSCoordSpline::NATIVE::getHPR,cx,obj,argc,argv,rval);
@@ -117,7 +117,7 @@ JSCoordSpline::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *o
 JSBool
 JSCoordSpline::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Constructs a CoordSpline");
-    DOC_PARAM("Array of Keyframes", DOC_TYPE_ARRAY);
+    DOC_PARAM("theKeyframes", "Array of Keyframes", DOC_TYPE_ARRAY);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());

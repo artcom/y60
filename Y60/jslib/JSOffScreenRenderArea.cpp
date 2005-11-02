@@ -31,8 +31,8 @@ typedef JSAbstractRenderWindow<OffScreenRenderArea> JSBASE;
 static JSBool
 renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-    DOC_BEGIN("renders my current scene onto the texture given by the target attribute of my canvas. the underlying raster value is ignored or updated.");
-    DOC_PARAM_OPT("theCopyToImageFlag", DOC_TYPE_BOOLEAN, false);
+    DOC_BEGIN("Renders my current scene onto the texture given by the target attribute of my canvas. the underlying raster value is ignored or updated.");
+    DOC_PARAM_OPT("theCopyToImageFlag", "", DOC_TYPE_BOOLEAN, false);
     DOC_END;
     
     ensureParamCount(argc, 0, 1);

@@ -39,38 +39,38 @@ static JSBool log(asl::Severity theSeverity, JSContext *cx, JSObject *obj, uintN
 }
 
 static JSBool fatal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("log at fatal level");
-    DOC_PARAM("theMessage",DOC_TYPE_STRING);
+    DOC_BEGIN("Log at fatal level");
+    DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
     DOC_END;
     return log(asl::SEV_FATAL, cx, obj, argc, argv, rval);
 }
 static JSBool error(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("log at error level");
-    DOC_PARAM("theMessage",DOC_TYPE_STRING);
+    DOC_BEGIN("Log at error level");
+    DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
     DOC_END;
     return log(asl::SEV_ERROR, cx, obj, argc, argv, rval);
 }
 static JSBool warning(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("log at warning level");
-    DOC_PARAM("theMessage",DOC_TYPE_STRING);
+    DOC_BEGIN("Log at warning level");
+    DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
     DOC_END;
     return log(asl::SEV_WARNING, cx, obj, argc, argv, rval);
 }
 static JSBool trace(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("log at info level");
-    DOC_PARAM("theMessage",DOC_TYPE_STRING);
+    DOC_BEGIN("Log at info level");
+    DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
     DOC_END;
     return log(asl::SEV_TRACE, cx, obj, argc, argv, rval);
 }
 static JSBool info(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("log at info level");
-    DOC_PARAM("theMessage",DOC_TYPE_STRING);
+    DOC_BEGIN("Log at info level");
+    DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
     DOC_END;
     return log(asl::SEV_INFO, cx, obj, argc, argv, rval);
 }
 static JSBool debug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("log at debug level");
-    DOC_PARAM("theMessage",DOC_TYPE_STRING);
+    DOC_BEGIN("Log at debug level");
+    DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
     DOC_END;
     return log(asl::SEV_DEBUG, cx, obj, argc, argv, rval);
 }
@@ -78,8 +78,8 @@ static JSBool debug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
 
 static JSBool
 setVerbosity(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("set global Verbosity of Logger.");
-    DOC_PARAM("theVerbosity",DOC_TYPE_ENUMERATION);
+    DOC_BEGIN("Set global Verbosity of Logger.");
+    DOC_PARAM("theVerbosity", "", DOC_TYPE_ENUMERATION);
     DOC_END;
     try {
         int myVerbosity, myMinId, myMaxId;

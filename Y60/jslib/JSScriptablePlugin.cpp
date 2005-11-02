@@ -64,7 +64,7 @@ namespace jslib {
     static JSBool
     onUpdateSettings(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Define a callback to be called when a given settings node changes.");
-        DOC_PARAM("theConfigNode", DOC_TYPE_NODE);
+        DOC_PARAM("theConfigNode", "", DOC_TYPE_NODE);
         DOC_END;
         try {
             if (argc != 1) {
@@ -267,10 +267,10 @@ namespace jslib {
                 Constructor, 0, Properties(), Functions(), 0, 0);
          
         //document the plugin mechanism and not the plugin named theClassName itself...
-        createClassModuleDocumentation("global", "JSScriptablePlugin", Properties(),
+        createClassModuleDocumentation("Global", "JSScriptablePlugin", Properties(),
                                        Functions(), ConstIntProperties(), 
                                        StaticProperties(), StaticFunctions(), ""); 
-        documentConstructor("global", "JSScriptablePlugin", Constructor);
+        documentConstructor("Global", "JSScriptablePlugin", Constructor);
 
         jsval myConstructorFuncObjVal;
         if (JS_GetProperty(cx, theGlobalObject, theClassName, &myConstructorFuncObjVal)) {

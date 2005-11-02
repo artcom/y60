@@ -121,7 +121,7 @@ JSZipWriter::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj
 JSBool
 JSZipWriter::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a new ZipWriter from a file");
-    DOC_PARAM("theFileName", DOC_TYPE_STRING);
+    DOC_PARAM("theFileName", "", DOC_TYPE_STRING);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());

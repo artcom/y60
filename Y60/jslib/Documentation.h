@@ -31,18 +31,18 @@
     if ( ! cx) {\
         reinterpret_cast<FunctionDescription*>(obj)->description = DESCRIPTION;
 
-#define DOC_PARAM(NAME, TYPE) \
-        describeFunctionParameter(reinterpret_cast<FunctionDescription*>(obj), NAME, TYPE, "");
+#define DOC_PARAM(NAME, DESCRIPTION, TYPE) \
+        describeFunctionParameter(reinterpret_cast<FunctionDescription*>(obj), NAME, DESCRIPTION, TYPE, "");
 
-#define DOC_PARAM_OPT(NAME, TYPE, DEFAULT_VALUE) \
-        describeFunctionParameter(reinterpret_cast<FunctionDescription*>(obj), NAME, TYPE, asl::as_string(DEFAULT_VALUE));
+#define DOC_PARAM_OPT(NAME, DESCRIPTION, TYPE, DEFAULT_VALUE) \
+        describeFunctionParameter(reinterpret_cast<FunctionDescription*>(obj), NAME, DESCRIPTION, TYPE, asl::as_string(DEFAULT_VALUE));
 
 #define DOC_RVAL(DESCRIPTION, TYPE) \
         reinterpret_cast<FunctionDescription*>(obj)->return_value = DESCRIPTION; \
         reinterpret_cast<FunctionDescription*>(obj)->return_type = DocTypeDescription[TYPE];
 
 #define DOC_RESET \
-        describeFunctionParameter(reinterpret_cast<FunctionDescription*>(obj), "", DOC_TYPE_INTERN, "");
+        describeFunctionParameter(reinterpret_cast<FunctionDescription*>(obj), "", "", DOC_TYPE_INTERN, "");
 
 
 #define DOC_END \
@@ -51,7 +51,7 @@
 
 
 #define DOC_CREATE(CLASSNAME) \
-    DOC_MODULE_CREATE("global", CLASSNAME);
+    DOC_MODULE_CREATE("Global", CLASSNAME);
 
 #define DOC_MODULE_CREATE(MODULE, CLASSNAME) \
     createClassModuleDocumentation(MODULE, CLASSNAME::ClassName(), CLASSNAME::Properties(), \
@@ -93,16 +93,16 @@ namespace jslib {
 
     static const std::string DocTypeDescription[] = {
         "__intern__",
-        "String", "Integer", "Float", "Boolean", "Enumeration", "Array",
+        "string", "int", "float", "bool", "enum", "array",
         "Vector2i", "Vector2f", "Vector3f", "Vector4f", "Point", "Quaternion", "Matrix", "Box",
         "Line", "Ray", "LineSegment", "Plane", "Triangle", "Sphere", "Frustum",
-        "Node", "NodeList", "Request", "Object"
+        "Node", "NodeList", "Request", "object"
     };
-
 
     struct ParameterDescription {
         std::string name;
-        std::string type;
+        std::string description;
+        std::string type;        
         std::string default_value;
     };
 
@@ -131,7 +131,7 @@ namespace jslib {
         JSBool (*theConstructor)(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval));
 
     void describeFunctionParameter(FunctionDescription *myFunctionDescription,
-        const std::string & theName, const DocType & theType, const std::string & theDefaultValue);
+        const std::string & theName, const std::string & theDescription, const DocType & theType, const std::string & theDefaultValue);
 
 
     void

@@ -153,8 +153,8 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setMousePosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set the mouse cursor position.");
-    DOC_PARAM("theX", DOC_TYPE_INTEGER);
-    DOC_PARAM("theY", DOC_TYPE_INTEGER);
+    DOC_PARAM("theX", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theY", "", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::setMousePosition,cx,obj,argc,argv,rval);
 }

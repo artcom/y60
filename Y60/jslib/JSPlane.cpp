@@ -140,12 +140,12 @@ JSPlane::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
 JSBool
 JSPlane::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Construct a plane from normal/point, with normal/distance, from another plane or construct an empty one.");
-    DOC_PARAM("Vector3", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theVector3", "", DOC_TYPE_VECTOR3F);
     DOC_RESET;
-    DOC_PARAM("plane", DOC_TYPE_PLANE);
+    DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);
     DOC_RESET;
-    DOC_PARAM("distance", DOC_TYPE_FLOAT);
-    DOC_PARAM("normal", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theDistance", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("theNormal", "", DOC_TYPE_VECTOR3F);
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {
@@ -215,7 +215,7 @@ JSPlane::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 JSObject *
 JSPlane::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
-    DOC_MODULE_CREATE("math",JSPlane);
+    DOC_MODULE_CREATE("Math",JSPlane);
     return myClass;
 }
 

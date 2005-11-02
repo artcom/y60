@@ -223,7 +223,7 @@ JSApp::ShellErrorReporter(JSContext *cx, const char * message, JSErrorReport * r
 JS_STATIC_DLL_CALLBACK(JSBool)
 Line(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the linenumber in the script currently being executed.");
-    DOC_RVAL("", DOC_TYPE_INTEGER);
+    DOC_RVAL("Current linenumber", DOC_TYPE_INTEGER);
     DOC_END;
     try {
         const char * myFile;
@@ -241,7 +241,7 @@ Line(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JS_STATIC_DLL_CALLBACK(JSBool)
 File(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns filename of the current script.");
-    DOC_RVAL("", DOC_TYPE_STRING);
+    DOC_RVAL("Current filename", DOC_TYPE_STRING);
     DOC_END;
     try {
         const char * myFile;
@@ -315,7 +315,8 @@ DumpStack(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JS_STATIC_DLL_CALLBACK(JSBool)
 Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Tries string conversion on the given data and prints the result to stderr.");
-    DOC_PARAM("str", DOC_TYPE_STRING);
+    DOC_PARAM("theMessage", "Message to print to console", DOC_TYPE_STRING);
+    DOC_PARAM("...",  "Any number of parameters can be provided.", DOC_TYPE_STRING);
     DOC_END;
     try {
         uintN i, n;
@@ -326,12 +327,10 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             if (!str) {
                 return JS_FALSE;
             }
-            //fprintf(gOutFile, "%s%s", i ? " " : "", JS_GetStringBytes(str));
             cerr << (i ? " " : "") << JS_GetStringBytes(str) ;
         }
         n++;
         if (n) {
-            //fputc('\n', gOutFile);
             cerr << endl;
         }
         return JS_TRUE;
@@ -339,32 +338,9 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
-Dump(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Dumps the given string to stderr.");
-    DOC_PARAM("str", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        JSString *str;
-        if (!argc)
-            return JS_TRUE;
-
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str)
-            return JS_FALSE;
-
-        char *bytes = JS_GetStringBytes(str);
-
-        bytes = strdup(bytes);
-        fputs(bytes, gOutFile);
-        free(bytes);
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-JS_STATIC_DLL_CALLBACK(JSBool)
 IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Adds the given path as an include path.");
-    DOC_PARAM("theIncludePath", DOC_TYPE_STRING);
+    DOC_PARAM("theIncludePath", "A valid path", DOC_TYPE_STRING);
     DOC_END;
     try {
         if (!argc) {
@@ -384,8 +360,8 @@ IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 RemovePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("removes the given path from the include path.");
-    DOC_PARAM("thePath", DOC_TYPE_STRING);
+    DOC_BEGIN("Removes the given path from the include path.");
+    DOC_PARAM("thePath", "The path to remove", DOC_TYPE_STRING);
     DOC_END;
     try {
         if (!argc) {
@@ -415,16 +391,10 @@ GetPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 OpenFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages \
-and open the file located at theRelativePath if found. \
-theRelativePath is the path to the file requested, \
-it is relative and must be defined inside a package. \
-thePackageName is the name of a package, \
-package names are stored just as you enter them by calling includePath. \
-@returns the opened file as a asl::ReadableBlock or null if not found.");
-    DOC_PARAM("theRelativePath", DOC_TYPE_STRING);
-    DOC_PARAM("thePackageName", DOC_TYPE_STRING);
-    DOC_RVAL("theBlock", DOC_TYPE_STRING);
+    DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages and open the file located at theRelativePath if found.");
+    DOC_PARAM("theRelativePath", "The path to the file requested. It is relative and must be defined inside a package.", DOC_TYPE_STRING);
+    DOC_PARAM("thePackageName", "The name of a package, Package names are stored just as you enter them by calling includePath.", DOC_TYPE_STRING);
+    DOC_RVAL("The opened file as a asl::ReadableBlock or null if not found.", DOC_TYPE_STRING);
     DOC_END;
     try {
         if (argc == 0 || argc > 2 ) {
@@ -460,13 +430,13 @@ JS_STATIC_DLL_CALLBACK(JSBool)
 listFiles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages \
 and returns all files in theRelativePath. If theRelativePath is a file it returns theRelativePath.");
-    DOC_PARAM("theRelativePath", DOC_TYPE_STRING);
-    DOC_RVAL("array-of-string", DOC_TYPE_STRING);
+    DOC_PARAM("theRelativePath", "The path to search in. It is relative and must be defined inside a package", DOC_TYPE_STRING);
+    DOC_RVAL("All files in theRelativePath as array of strings", DOC_TYPE_ARRAY);
     DOC_RESET;
-    DOC_PARAM("theRelativePath", DOC_TYPE_STRING);
-    DOC_PARAM("thePackageName", DOC_TYPE_STRING);
-    DOC_PARAM("theRecurseFlag", DOC_TYPE_STRING);
-    DOC_RVAL("array-of-string", DOC_TYPE_STRING);
+    DOC_PARAM("theRelativePath", "The path to search in. It is relative and must be defined inside a package", DOC_TYPE_STRING);
+    DOC_PARAM("thePackageName", "The package to search in.", DOC_TYPE_STRING);
+    DOC_PARAM("theRecurseFlag", "Search recursivly, if true", DOC_TYPE_STRING);
+    DOC_RVAL("All files in theRelativePath as array of strings", DOC_TYPE_ARRAY);
     DOC_END;
     try {
         if (argc > 3 ) {
@@ -499,8 +469,8 @@ JS_STATIC_DLL_CALLBACK(JSBool)
 ParseArguments(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns an arguments object (array-of-string) of valid arguments after \
 being handed input arguments and comparing them with a list of allowed arguments.");
-    DOC_PARAM("(array-of-string) theArgs", DOC_TYPE_ARRAY);
-    DOC_PARAM("(array-of-(array-of-string)) theAllowedOptions", DOC_TYPE_ARRAY);
+    DOC_PARAM("theArguments", "Array of argument-strings to parse", DOC_TYPE_ARRAY);
+    DOC_PARAM("theAllowedOptions", "(array-of-(array-of-string))", DOC_TYPE_ARRAY);
     DOC_RVAL("(array-of-string) arguments object", DOC_TYPE_ARRAY);
     DOC_END;
     try {
@@ -578,12 +548,11 @@ being handed input arguments and comparing them with a list of allowed arguments
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 Plug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Plugs the component with the given name. \
-Optionally a node can be given that will be passed on to the plugged component.");
-    DOC_PARAM("thePluginName", DOC_TYPE_STRING);
+    DOC_BEGIN("Plugs the component with the given name.");
+    DOC_PARAM("thePluginName", "Specifies the name of the plugin. (e.g. 'y60FFMpegDecoder')", DOC_TYPE_STRING);
     DOC_RESET;
-    DOC_PARAM("thePluginName", DOC_TYPE_STRING);
-    DOC_PARAM("theNode", DOC_TYPE_NODE);
+    DOC_PARAM("thePluginName", "Specifies the name of the plugin. (e.g. 'y60FFMpegDecoder')", DOC_TYPE_STRING);
+    DOC_PARAM("theNode", "Optionally a node can be given that will be passed on to the plugged component", DOC_TYPE_NODE);
     DOC_END;
     try {
         if (argc < 1) {
@@ -643,8 +612,8 @@ Optionally a node can be given that will be passed on to the plugged component."
 JS_STATIC_DLL_CALLBACK(JSBool)
 SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Exports a specified image node into a file with the given filename.");
-    DOC_PARAM("theImageNode", DOC_TYPE_NODE);
-    DOC_PARAM("theFilename", DOC_TYPE_STRING);
+    DOC_PARAM("theImageNode", "A node in the scene that should be saved as file", DOC_TYPE_NODE);
+    DOC_PARAM("theFilename", "Filename and path where to save the image. The image format is automatically determined by the file-extension.", DOC_TYPE_STRING);
     DOC_END;
     try {
         if (argc != 2) {
@@ -698,8 +667,8 @@ JS_STATIC_DLL_CALLBACK(JSBool)
 Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Include directive for JavaScript. Includes a specified .js file to the current script. "\
               "Searches in the given include paths, including the current scripts path.");
-    DOC_PARAM("theFilename", DOC_TYPE_STRING);
-    DOC_PARAM("...", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "Path to a file to use. Relative to the search path set with the '-I' option", DOC_TYPE_STRING);
+    DOC_PARAM("...", "You can provide any number of files to use", DOC_TYPE_STRING);
     DOC_END;
     try {
         uintN i;
@@ -769,17 +738,11 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 Version(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Get/Set the JavaScript version.");
-    DOC_RVAL("", DOC_TYPE_INTEGER);
-    DOC_RESET;
-    DOC_PARAM("theVersion", DOC_TYPE_INTEGER);
+    DOC_BEGIN("Get the JavaScript version.");
+    DOC_RVAL("The current JavaScript version", DOC_TYPE_INTEGER);
     DOC_END;
     try {
-        if (argc > 0 && JSVAL_IS_INT(argv[0])) {
-            *rval = INT_TO_JSVAL(JS_SetVersion(cx, JSVersion(JSVAL_TO_INT(argv[0]))));
-        } else {
-            *rval = INT_TO_JSVAL(JS_GetVersion(cx));
-        }
+        *rval = INT_TO_JSVAL(JS_GetVersion(cx));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -789,7 +752,6 @@ BuildDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Prints the build date and time of acxpshell/acgtkshell.");
     DOC_END;
     try {
-        //fprintf(gOutFile, "built on %s at %s\n", __DATE__, __TIME__);
         AC_PRINT << "built on " << __DATE__<< " at " << __TIME__;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -797,7 +759,8 @@ BuildDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 Revision(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("returns the SVN revision number of pro60 at time of build.");
+    DOC_BEGIN("Get the SVN revision number of pro60 at time of build.");
+    DOC_RVAL("The SVN revision number", DOC_TYPE_STRING);
     DOC_END;
     try {
         *rval = as_jsval(cx, asl::ourRevision);
@@ -807,8 +770,8 @@ Revision(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 Exit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Stops the interpreter and exits with a given exit code (default is 0).");
-    DOC_PARAM_OPT("theExitCode", DOC_TYPE_INTEGER, 0);
+    DOC_BEGIN("Stops the interpreter and exits with a given exit code.");
+    DOC_PARAM_OPT("theExitCode", "Specifies the exit code (default is 0).", DOC_TYPE_INTEGER, 0);
     DOC_END;
     try {
         if (argc > 0) {
@@ -829,9 +792,8 @@ extern "C" JS_FRIEND_DATA(FILE *) js_DumpGCHeap;
 JS_STATIC_DLL_CALLBACK(JSBool)
 GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
-    DOC_BEGIN("Enforces garbage collection. If GC_MARK_DEBUG is defined \
-a filename can be given to dump the GC heap for debugging reasons.");
-    DOC_PARAM("theFileName", DOC_TYPE_STRING);
+    DOC_BEGIN("Enforces garbage collection.");
+    DOC_PARAM_OPT("theFileName", "If GC_MARK_DEBUG is defined a filename can be given to dump the GC heap for debugging reasons.", DOC_TYPE_STRING, "null");
     DOC_END;
     try {
         JSRuntime *rt;
@@ -869,7 +831,7 @@ a filename can be given to dump the GC heap for debugging reasons.");
 JS_STATIC_DLL_CALLBACK(JSBool)
 Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Clears a given object.");
-    DOC_PARAM("theObject", DOC_TYPE_OBJECT);
+    DOC_PARAM("theObject", "Specifies the object to clear", DOC_TYPE_OBJECT);
     DOC_END;
     try {
         if (argc > 0 && !JSVAL_IS_PRIMITIVE(argv[0])) {
@@ -885,7 +847,7 @@ Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JS_STATIC_DLL_CALLBACK(JSBool)
 MilliSec(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the time since acxpshell/acgtkshell start in milliseconds.");
-    DOC_RVAL("", DOC_TYPE_FLOAT); //XXX: DOC_TYPE_DOUBLE
+    DOC_RVAL("The time in milliseconds", DOC_TYPE_FLOAT); 
     DOC_END;
     try {
         asl::NanoTime myTime = asl::NanoTime();
@@ -896,8 +858,8 @@ MilliSec(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 MSleep(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sleeps for a given number of milliseconds.");
-    DOC_PARAM("theMilliSecs", DOC_TYPE_INTEGER);
+    DOC_BEGIN("Sleeps for a certain time.");
+    DOC_PARAM("theMilliSecs", "Specifies the number of milliseconds to sleep", DOC_TYPE_INTEGER);
     DOC_END;
     try {
         int32 myMilliSecs = 0;
@@ -914,9 +876,9 @@ MSleep(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 ExpandEnvironment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the value of a given embedded environment variable '${MYENVVAR}' if any.");
-    DOC_PARAM("theString", DOC_TYPE_STRING);
-    DOC_RVAL("", DOC_TYPE_STRING);
+    DOC_BEGIN("Expands embedded environment variable of the type '${MYENVVAR}' in a given string.");
+    DOC_PARAM("theString", "A string, that contains variables to expand", DOC_TYPE_STRING);
+    DOC_RVAL("The string with expanded environment variables.", DOC_TYPE_STRING);
     DOC_END;
     try {
         JSString   * str;
@@ -946,8 +908,8 @@ ExpandEnvironment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 JS_STATIC_DLL_CALLBACK(JSBool)
 FileExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Tests whether a given file exists.");
-    DOC_PARAM("theFileName", DOC_TYPE_STRING);
-    DOC_RVAL("", DOC_TYPE_INTEGER);
+    DOC_PARAM("theFileName", "Path and filename to test", DOC_TYPE_STRING);
+    DOC_RVAL("True if file exists", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
         JSString   * str;
@@ -966,7 +928,7 @@ FileExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
         myFileName = JS_GetStringBytes(str);
 
-        *rval = INT_TO_JSVAL(asl::fileExists(myFileName));
+        *rval = BOOLEAN_TO_JSVAL(asl::fileExists(myFileName));
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -974,9 +936,9 @@ FileExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 GetBaseName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the filename without its directory path.");
-    DOC_PARAM("theFileName", DOC_TYPE_STRING);
-    DOC_RVAL("", DOC_TYPE_STRING);
+    DOC_BEGIN("Strips the directory path from a filename.");
+    DOC_PARAM("theFileName", "Specifies filename with path to strip.", DOC_TYPE_STRING);
+    DOC_RVAL("The filename without its directory path", DOC_TYPE_STRING);
     DOC_END;
     try {
         JSString   * str;
@@ -1005,9 +967,9 @@ GetBaseName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 GetDirName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns only the drive name and directory path of a given filename.");
-    DOC_PARAM("theFileName", DOC_TYPE_STRING);
-    DOC_RVAL("", DOC_TYPE_STRING);
+    DOC_BEGIN("Strips filename from a path name (opposite of 'dirname()').");
+    DOC_PARAM("theFileName", "Specifies Filename and path to strip", DOC_TYPE_STRING);
+    DOC_RVAL("Drive name and directory path", DOC_TYPE_STRING);
     DOC_END;
     try {
         JSString   * str;
@@ -1038,7 +1000,7 @@ JS_STATIC_DLL_CALLBACK(JSBool)
 HostName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the fully qualified DNS name (NOTE: Only NetBIOS name will be returned under WIN9x \
 while all other Windows versions return the fully qualified DNS name).");
-    DOC_RVAL("", DOC_TYPE_STRING);
+    DOC_RVAL("The hostname", DOC_TYPE_STRING);
     DOC_END;
     try {
         if (argc != 0) {
@@ -1058,6 +1020,7 @@ jsval as_jsval(JSContext *cx, const ParameterDescription & theDocumentation) {
     JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
     jsval rval = OBJECT_TO_JSVAL(myReturnObject);
     if (!JS_DefineProperty(cx, myReturnObject, "name",  as_jsval(cx, theDocumentation.name), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+    if (!JS_DefineProperty(cx, myReturnObject, "description", as_jsval(cx, theDocumentation.description), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
     if (!JS_DefineProperty(cx, myReturnObject, "type", as_jsval(cx, theDocumentation.type), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
     if (!JS_DefineProperty(cx, myReturnObject, "default_value",  as_jsval(cx, theDocumentation.default_value), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
     return rval;
@@ -1091,21 +1054,46 @@ jsval as_jsval(JSContext *cx, const ObjectDocumentation & theDocumentation) {
 extern DocumentationMap ourDocumentation;
 
 JS_STATIC_DLL_CALLBACK(JSBool)
-getDocumentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Collects all documentation macros and returns a ");
+getDocumentedModules(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Collects all currently documented modules.");
+    DOC_RVAL("An array of modulenames.", DOC_TYPE_ARRAY);
     DOC_END;
     try {
-
-        std::string myModule;
-
-        if (argc == 1) {
-            convertFrom(cx, argv[0], myModule);
+        // First collect all module names in a set
+        set<string> myModules;
+        for (DocumentationMap::iterator it = ourDocumentation.begin(); it != ourDocumentation.end(); ++it) {
+            myModules.insert(it->first.first);
         }
+        
+        JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+        unsigned i = 0;
+        for (set<string>::iterator it = myModules.begin(); it != myModules.end(); ++it) {
+            jsval myValue = as_jsval(cx, *it);
+            if (!JS_SetElement(cx, myReturnObject, i, &myValue)) {
+                return JS_FALSE;
+            }
+            ++i;
+        }
+        *rval = OBJECT_TO_JSVAL(myReturnObject);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+getDocumentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Collects all documentation for a given module.");
+    DOC_PARAM("theModuleName", "Name of the Module to get the Documenation for.", DOC_TYPE_STRING);
+    DOC_RVAL("An array of classes and functions, contained in the module", DOC_TYPE_ARRAY);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        std::string myModule;
+        convertFrom(cx, argv[0], myModule);
 
         JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
 
         for (DocumentationMap::iterator it = ourDocumentation.begin(); it != ourDocumentation.end(); ++it) {
-            if (myModule.empty() || it->first.first == myModule) {
+            if (it->first.first == myModule) {
                 string myClassName = it->first.second;
                 if (!JS_DefineProperty(cx, myReturnObject, myClassName.c_str(),
                             as_jsval(cx, it->second), 0,0, JSPROP_ENUMERATE)) {
@@ -1121,7 +1109,8 @@ getDocumentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 
 static JSBool
 GetProgramName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("returns the name of the executable, e.g. acxpshellOPT.exe");
+    DOC_BEGIN("Returns the name of the executable, e.g. y60.exe");
+    DOC_RVAL("The Programmname", DOC_TYPE_STRING);
     DOC_END;
     *rval = as_jsval(cx, JSApp::getProgramName());
     return JS_TRUE;
@@ -1129,7 +1118,8 @@ GetProgramName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
 static JSBool
 createUniqueId(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns an almost universally unique node id");
+    DOC_BEGIN("Generates an almost universally unique id string, containing a timestamp and current process-id, encoded as base65 string");
+    DOC_RVAL("The unique id", DOC_TYPE_STRING);
     DOC_END;
     *rval = as_jsval(cx, IdTag::getDefault());
     return JS_TRUE;
@@ -1138,7 +1128,7 @@ createUniqueId(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 static JSBool
 fromHexString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Converts hex-characters into an integer. (e.g. 'FF' -> 255");
-    DOC_PARAM("A string of two hex-characters", DOC_TYPE_STRING);
+    DOC_PARAM("theHexValue", "A string of two hex-characters", DOC_TYPE_STRING);
     DOC_RVAL("An integer represented by thouse characters", DOC_TYPE_INTEGER);
     DOC_END;
     if (argc == 1) {
@@ -1169,7 +1159,7 @@ fromHexString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 asHexString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Converts a byte into a string of two hex-characters. (e.g. 255 -> 'FF'");
-    DOC_PARAM("A integer between zero and 255", DOC_TYPE_INTEGER);
+    DOC_PARAM("theNumber", "A integer between zero and 255", DOC_TYPE_INTEGER);
     DOC_RVAL("A string of two hex-characters representing the byte", DOC_TYPE_STRING);
     DOC_END;
     if (argc == 1) {
@@ -1198,7 +1188,7 @@ asHexString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 static JSBool
 urlEncode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Escapes URL strings (converts all letters consider illegal in URLs to their %XX versions).");
-    DOC_PARAM("The url string to encode", DOC_TYPE_STRING);
+    DOC_PARAM("theUrl", "The url string to encode", DOC_TYPE_STRING);
     DOC_RVAL("The encoded url string", DOC_TYPE_STRING);
     DOC_END;
     if (argc == 1) {
@@ -1225,7 +1215,7 @@ urlEncode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 urlDecode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Unescapes URL encoding in strings (converts all %XX codes to their 8bit versions)");
-    DOC_PARAM("The url string to decode", DOC_TYPE_STRING);
+    DOC_PARAM("theUrl", "The url string to decode", DOC_TYPE_STRING);
     DOC_RVAL("The decoded url string", DOC_TYPE_STRING);
     DOC_END;
     if (argc == 1) {
@@ -1252,7 +1242,7 @@ urlDecode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Executes a command on the system");
-    DOC_PARAM("The command to execute", DOC_TYPE_STRING);
+    DOC_PARAM("theCommand", "The command to execute", DOC_TYPE_STRING);
     DOC_RVAL("The return code of the command", DOC_TYPE_INTEGER);
     DOC_END;
     ensureParamCount(argc, 1, 2);
@@ -1335,7 +1325,6 @@ static JSFunctionSpec glob_functions[] = {
     {"version",         Version,        1},
     {"build",           BuildDate,      0},
     {"revision",        Revision,       0},
-    {"dump",            Dump,           1},
     {"gc",              GC,             0},
     {"clear",           Clear,          1},
     {"__FILE__",        File,           0},
@@ -1355,7 +1344,10 @@ static JSFunctionSpec glob_functions[] = {
     {"getPath",         GetPath,        0},
     {"listFiles",       listFiles,      2},
     {"openFile",        OpenFile,       2},
-    {"getDocumentation", getDocumentation, 0},
+    
+    {"getDocumentation",     getDocumentation, 1},
+    {"getDocumentedModules", getDocumentedModules, 0},
+
     {"createUniqueId",  createUniqueId, 0},
 
     {"fromHexString",   fromHexString,   1},

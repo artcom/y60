@@ -77,7 +77,7 @@ typedef y60::Scene NATIVE;
 
 JSBool
 toString(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("returns a string representation of the scene's dom.");
+    DOC_BEGIN("Returns a string representation of the scene's dom.");
     DOC_END;
     std::string myStringRep = asl::as_string(JSScene::getJSWrapper(cx,obj).getNative().getSceneDom());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -88,7 +88,7 @@ toString(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
 JSBool
 loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Updates a movie node.");
-    DOC_PARAM("movie", DOC_TYPE_NODE);
+    DOC_PARAM("theMovie", "", DOC_TYPE_NODE);
     DOC_END;
     try {
         if (argc < 1) {
@@ -114,7 +114,7 @@ loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rva
 JSBool
 loadCaptureFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Updates a capture node.");
-    DOC_PARAM("capture", DOC_TYPE_NODE);
+    DOC_PARAM("theCaptureNode", "Capture node to update", DOC_TYPE_NODE);
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -132,14 +132,14 @@ loadCaptureFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *r
 static JSBool
 intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the intersections of a body with a given line, line segment or ray.");
-    DOC_PARAM("Body", DOC_TYPE_NODE);
-    DOC_PARAM("Line", DOC_TYPE_LINE);
+    DOC_PARAM("theBody", "", DOC_TYPE_NODE);
+    DOC_PARAM("theLine", "", DOC_TYPE_LINE);
     DOC_RESET;
-    DOC_PARAM("Body", DOC_TYPE_NODE);
-    DOC_PARAM("LineSegment", DOC_TYPE_LINESEGMENT);
+    DOC_PARAM("theBody", "", DOC_TYPE_NODE);
+    DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT);
     DOC_RESET;
-    DOC_PARAM("Body", DOC_TYPE_NODE);
-    DOC_PARAM("Ray", DOC_TYPE_RAY);
+    DOC_PARAM("theBody", "", DOC_TYPE_NODE);
+    DOC_PARAM("theRay", "", DOC_TYPE_RAY);
     DOC_RVAL("IntersectionInfoVector", DOC_TYPE_ARRAY)
     DOC_END;
     try {
@@ -171,9 +171,9 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSBool
 collideWithBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the collisions detected by recursively testing a sphere with a given motion vector and a body node.");
-    DOC_PARAM("Body", DOC_TYPE_NODE);
-    DOC_PARAM("Sphere", DOC_TYPE_SPHERE);
-    DOC_PARAM("MotionVector", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theBody", "", DOC_TYPE_NODE);
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
+    DOC_PARAM("theMotionVector", "", DOC_TYPE_VECTOR3F);
     DOC_RVAL("CollisionInfoVector", DOC_TYPE_ARRAY)
     DOC_END;
     try {
@@ -194,9 +194,9 @@ collideWithBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 static JSBool
 collideWithBodiesOnce(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the first collision detected by recursively testing a sphere with a given motion vector and a body node.");
-    DOC_PARAM("Body", DOC_TYPE_NODE);
-    DOC_PARAM("Sphere", DOC_TYPE_SPHERE);
-    DOC_PARAM("MotionVector", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theBody", "", DOC_TYPE_NODE);
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
+    DOC_PARAM("theMotionVector", "", DOC_TYPE_VECTOR3F);
     DOC_RVAL("CollisionInfo", DOC_TYPE_OBJECT)
     DOC_END;
     try {
@@ -226,7 +226,7 @@ update(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 bodyVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Calculates the volume of a given body.");
-    DOC_PARAM("BodyNode", DOC_TYPE_NODE);
+    DOC_PARAM("theBody", "", DOC_TYPE_NODE);
     DOC_RVAL("Volume", DOC_TYPE_FLOAT)
     DOC_END;
     try {
@@ -246,8 +246,8 @@ bodyVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates an untextured lambert shaded materail.");
-    DOC_PARAM_OPT("theDiffuseColor", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
-    DOC_PARAM_OPT("theAmbientColor", DOC_TYPE_VECTOR4F, "[0,0,0,1]");
+    DOC_PARAM_OPT("theDiffuseColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
+    DOC_PARAM_OPT("theAmbientColor", "", DOC_TYPE_VECTOR4F, "[0,0,0,1]");
     DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
     DOC_END;
     try {
@@ -278,7 +278,7 @@ CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 static JSBool
 CreateColorMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates an untextured and unlit colored materail.");
-    DOC_PARAM_OPT("theColor", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
+    DOC_PARAM_OPT("theColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
     DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
     DOC_END;
     try {
@@ -303,9 +303,9 @@ CreateColorMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
 static JSBool
 CreateQuadShape(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a single quad.");
-    DOC_PARAM("theMaterial", DOC_TYPE_NODE);
-    DOC_PARAM("theTopLeftCorner", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("theBottomRightCorner", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theMaterial", "", DOC_TYPE_NODE);
+    DOC_PARAM("theTopLeftCorner", "", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theBottomRightCorner", "", DOC_TYPE_VECTOR3F);
     DOC_RVAL("theQuadShape", DOC_TYPE_NODE)
     DOC_END;
     try {
@@ -328,8 +328,8 @@ CreateQuadShape(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSBool
 CreateBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a body");
-    DOC_PARAM("theShape", DOC_TYPE_NODE);
-    DOC_PARAM_OPT("theParent", DOC_TYPE_NODE, "toplevel node");
+    DOC_PARAM("theShape", "", DOC_TYPE_NODE);
+    DOC_PARAM_OPT("theParent", "", DOC_TYPE_NODE, "toplevel node");
     DOC_RVAL("theBody", DOC_TYPE_NODE)
     DOC_END;
     try {
@@ -353,7 +353,7 @@ CreateBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 getWorldSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the world's size including camera position.");
-    DOC_PARAM("theCamera", DOC_TYPE_OBJECT);
+    DOC_PARAM("theCamera", "", DOC_TYPE_OBJECT);
     DOC_RVAL("theSize", DOC_TYPE_FLOAT)
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::getWorldSize,cx,obj,argc,argv,rval);
@@ -581,11 +581,11 @@ JSBool
 JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a scene from the given file or an empty scene if no file is given.");
     DOC_RESET;
-    DOC_PARAM("Filename", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_RESET;
-    DOC_PARAM("Filename", DOC_TYPE_STRING);
-    DOC_PARAM("Target for ProgressCallback", DOC_TYPE_STRING);
-    DOC_PARAM("Progress callback function name", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theTarget", "Target for ProgressCallback", DOC_TYPE_STRING);
+    DOC_PARAM("theFunction", "Progress callback function name", DOC_TYPE_STRING);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
@@ -661,8 +661,8 @@ jsval as_jsval(JSContext *cx, asl::Ptr<y60::Scene> theScene) {
 JSBool
 JSScene::save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Saves the scene to a file.");
-    DOC_PARAM("Filename", DOC_TYPE_STRING);
-    DOC_PARAM("BinaryFlag", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theBinaryFlag", "", DOC_TYPE_BOOLEAN);
     DOC_END;
     ensureParamCount(argc, 1, 2);
     return Method<JSScene::NATIVE>::call(&JSScene::NATIVE::save,cx,obj,argc,argv,rval);

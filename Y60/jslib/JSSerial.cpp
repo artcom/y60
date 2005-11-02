@@ -50,11 +50,11 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 open(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Opens the serial interface");
-    DOC_PARAM_OPT("Baud rate", DOC_TYPE_INTEGER, DEFAULT_BAUD_RATE);
-    DOC_PARAM_OPT("Data bits", DOC_TYPE_INTEGER, DEFAULT_BITS);
-    DOC_PARAM_OPT("Parity",    DOC_TYPE_ENUMERATION, DEFAULT_PARITY);
-    DOC_PARAM_OPT("Stop Bits", DOC_TYPE_INTEGER, DEFAULT_STOP_BITS);
-    DOC_PARAM_OPT("Hardware handshake", DOC_TYPE_BOOLEAN, DEFAULT_HW_HANDSHAKE);
+    DOC_PARAM_OPT("theBaudRate", "Baud rate", DOC_TYPE_INTEGER, DEFAULT_BAUD_RATE);
+    DOC_PARAM_OPT("theDataBits", "Data bits", DOC_TYPE_INTEGER, DEFAULT_BITS);
+    DOC_PARAM_OPT("theParity", "Parity",    DOC_TYPE_ENUMERATION, DEFAULT_PARITY);
+    DOC_PARAM_OPT("theStopBits", "Stop Bits", DOC_TYPE_INTEGER, DEFAULT_STOP_BITS);
+    DOC_PARAM_OPT("theHandshake", "Hardware handshake", DOC_TYPE_BOOLEAN, DEFAULT_HW_HANDSHAKE);
     DOC_END;
 
     try {
@@ -137,10 +137,10 @@ peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setPacketFormat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the format for packets send via the serial device");
-    DOC_PARAM("Start byte", DOC_TYPE_INTEGER);
-    DOC_PARAM("End byte", DOC_TYPE_INTEGER);
-    DOC_PARAM("Payload size (may be zero for variable sized payloads.)", DOC_TYPE_INTEGER);
-    DOC_PARAM("Error checking type", DOC_TYPE_ENUMERATION);
+    DOC_PARAM("theStartByte", "Start byte", DOC_TYPE_INTEGER);
+    DOC_PARAM("theEndByte", "End byte", DOC_TYPE_INTEGER);
+    DOC_PARAM("theSize", "Payload size (may be zero for variable sized payloads.)", DOC_TYPE_INTEGER);
+    DOC_PARAM("theErrorChecking", "Error checking type", DOC_TYPE_ENUMERATION);
     DOC_END;
     try {
         unsigned char myStartByte;
@@ -204,7 +204,7 @@ setPacketFormat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSBool
 read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Reads data from serial device");
-    DOC_PARAM_OPT("Bytes to read", DOC_TYPE_INTEGER, READ_BUFFER_SIZE);
+    DOC_PARAM_OPT("theSize", "Bytes to read", DOC_TYPE_INTEGER, READ_BUFFER_SIZE);
     DOC_RVAL("Bufferdata", DOC_TYPE_STRING);
     DOC_END;
     try {
@@ -241,9 +241,9 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Writes data to the serial device");
-    DOC_PARAM("Bytes to write", DOC_TYPE_STRING);
+    DOC_PARAM("theData", "Bytes to write", DOC_TYPE_STRING);
     DOC_RESET;
-    DOC_PARAM("Bytes to write (array of unsigned chars)", DOC_TYPE_ARRAY);
+    DOC_PARAM("theData", "Bytes to write (array of unsigned chars)", DOC_TYPE_ARRAY);
     DOC_END;
     try {
         if (argc != 1) {
@@ -308,9 +308,9 @@ receivePacket(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 sendPacket(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sends a string over the serial device which is packeted with the specified packet format.");
-    DOC_PARAM("String to send", DOC_TYPE_STRING);
+    DOC_PARAM("theData", "String to send", DOC_TYPE_STRING);
     DOC_RESET;
-    DOC_PARAM("Array of unsigned char to send", DOC_TYPE_ARRAY);
+    DOC_PARAM("theData", "Array of unsigned char to send", DOC_TYPE_ARRAY);
     DOC_END;
     try {
         if (argc != 1) {
@@ -348,7 +348,7 @@ sendPacket(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setNoisy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the serial device to noisy mode for debug purposes");
-    DOC_PARAM("Noisy Flag", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theNosiyFlag", "Noisy Flag", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
         if (argc > 1) {
@@ -483,9 +483,7 @@ JSSerial::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
 JSBool
 JSSerial::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a new serial device");
-    DOC_PARAM("Zero based com-port number", DOC_TYPE_INTEGER);
-    DOC_RESET;
-    DOC_PARAM("Use port '999' to create a debug loopback device", DOC_TYPE_INTEGER);
+    DOC_PARAM("thePort", "Zero based com-port number. Use port '999' to create a debug loopback device.", DOC_TYPE_INTEGER);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());

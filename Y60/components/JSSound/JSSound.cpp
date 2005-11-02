@@ -34,22 +34,22 @@ namespace jslib {
     static JSBool
     fadeToVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Fading to a specified volume over a given duration.");
-        DOC_PARAM("volume", DOC_TYPE_FLOAT);
-        DOC_PARAM("duration", DOC_TYPE_FLOAT);
+        DOC_PARAM("theVolume", "", DOC_TYPE_FLOAT);
+        DOC_PARAM("theDuration", "", DOC_TYPE_FLOAT);
         DOC_END;
         return Method<JSSound::NATIVE>::call(&JSSound::NATIVE::fadeToVolume,cx,obj,argc,argv,rval);
     }
     static JSBool
     seek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Seeking to a given position.");
-        DOC_PARAM("seek time", DOC_TYPE_FLOAT);
+        DOC_PARAM("theTime", "seek time", DOC_TYPE_FLOAT);
         DOC_END;
         return Method<JSSound::NATIVE>::call(&JSSound::NATIVE::seek,cx,obj,argc,argv,rval);
     }
     static JSBool
     seekRelative(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Seeking a timespan ahead of the current position.");
-        DOC_PARAM("seek time", DOC_TYPE_FLOAT);
+        DOC_PARAM("theTime", "seek time", DOC_TYPE_FLOAT);
         DOC_END;
         return Method<JSSound::NATIVE>::call(&JSSound::NATIVE::seekRelative,cx,obj,argc,argv,rval);
     }
@@ -96,19 +96,19 @@ namespace jslib {
             case PROP_volume:
                 *vp = as_jsval(cx, getNative().getVolume());
                 return JS_TRUE;
-            case PROP_looping: 
+            case PROP_looping:
                 *vp = as_jsval(cx, getNative().isLooping());
                 return JS_TRUE;
             case PROP_playing:
                 *vp = as_jsval(cx, getNative().isPlaying());
                 return JS_TRUE;
-            case PROP_src: 
+            case PROP_src:
                 *vp = as_jsval(cx, getNative().getName());
                 return JS_TRUE;
-            case PROP_duration: 
+            case PROP_duration:
                 *vp = as_jsval(cx, getNative().getDuration());
                 return JS_TRUE;
-            case PROP_time: 
+            case PROP_time:
                 *vp = as_jsval(cx, getNative().getCurrentTime());
                 return JS_TRUE;
             default:
@@ -122,7 +122,7 @@ namespace jslib {
     JSSound::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         jsval dummy;
         switch (theID) {
-            case PROP_volume:                
+            case PROP_volume:
                 return Method<NATIVE>::call(&NATIVE::setVolume, cx, obj, 1, vp, &dummy);
             default:
                 JS_ReportError(cx,"JSSound::setPropertySwitch: index %d out of range", theID);
@@ -133,16 +133,16 @@ namespace jslib {
     JSBool
     JSSound::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Creates a Sound from URI. Does not start playback.");
-        DOC_PARAM("URI", DOC_TYPE_STRING);
-        DOC_PARAM_OPT("Loopflag", DOC_TYPE_BOOLEAN, false);
-        DOC_PARAM_OPT("UseCacheFlag", DOC_TYPE_BOOLEAN, true);
+        DOC_PARAM("theURI", "", DOC_TYPE_STRING);
+        DOC_PARAM_OPT("theLoopflag", "", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("theUseCacheFlag", "", DOC_TYPE_BOOLEAN, true);
         DOC_END;
         try {
             if (JSA_GetClass(cx,obj) != Class()) {
                 JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
                 return JS_FALSE;
             }
-        
+
             if (argc > 4) {
                 throw BadArgumentException(string("JSSound::Constructor(): Wrong number of arguments. Got ") +
                     as_string(argc) + ", expected between one and four.", PLUS_FILE_LINE);

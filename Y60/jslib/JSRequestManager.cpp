@@ -39,7 +39,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 performRequest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Add HTTP-Request to request queue.");
-    DOC_PARAM("theRequest", DOC_TYPE_REQUEST);    
+    DOC_PARAM("theRequest", "", DOC_TYPE_REQUEST);    
     DOC_END;
     return Method<JSRequestManager::NATIVE>::call(&JSRequestManager::NATIVE::performRequest,cx,obj,argc,argv,rval);
 }

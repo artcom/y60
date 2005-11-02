@@ -785,20 +785,20 @@ ObjectObjectDualResultFunction(bool (*theFunction)(const NATIVE_A &,const NATIVE
 static JSBool
 intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Finds the intersections between two objects.");
-    DOC_PARAM("theLine", DOC_TYPE_LINE);               DOC_PARAM("thePlane", DOC_TYPE_PLANE);             DOC_RESET;
-    DOC_PARAM("thePlane", DOC_TYPE_PLANE);             DOC_PARAM("theLine", DOC_TYPE_LINE);               DOC_RESET;
-    DOC_PARAM("theLine", DOC_TYPE_LINE);               DOC_PARAM("theTriangle", DOC_TYPE_TRIANGLE);       DOC_RESET;
-    DOC_PARAM("theTriangle", DOC_TYPE_TRIANGLE);       DOC_PARAM("theLine", DOC_TYPE_LINE);               DOC_RESET;
-    DOC_PARAM("theSphere", DOC_TYPE_SPHERE);           DOC_PARAM("theLine", DOC_TYPE_LINE);               DOC_RESET;
-    DOC_PARAM("theRay", DOC_TYPE_RAY);                 DOC_PARAM("thePlane", DOC_TYPE_PLANE);             DOC_RESET;
-    DOC_PARAM("thePlane", DOC_TYPE_PLANE);             DOC_PARAM("theRay", DOC_TYPE_RAY);                 DOC_RESET;
-    DOC_PARAM("theRay", DOC_TYPE_RAY);                 DOC_PARAM("theTriangle", DOC_TYPE_TRIANGLE);       DOC_RESET;
-    DOC_PARAM("theTriangle", DOC_TYPE_TRIANGLE);       DOC_PARAM("theRay", DOC_TYPE_RAY);                 DOC_RESET;
-    DOC_PARAM("theLineSegment", DOC_TYPE_LINESEGMENT); DOC_PARAM("thePlane", DOC_TYPE_PLANE);             DOC_RESET;
-    DOC_PARAM("thePlane", DOC_TYPE_PLANE);             DOC_PARAM("theLineSegment", DOC_TYPE_LINESEGMENT); DOC_RESET;
-    DOC_PARAM("theLineSegment", DOC_TYPE_LINESEGMENT); DOC_PARAM("theTriangle", DOC_TYPE_TRIANGLE);       DOC_RESET;
-    DOC_PARAM("theTriangle", DOC_TYPE_TRIANGLE);       DOC_PARAM("theLineSegment", DOC_TYPE_LINESEGMENT); DOC_RESET;
-    DOC_PARAM("theBox", DOC_TYPE_BOX3F);               DOC_PARAM("theFrustum", DOC_TYPE_FRUSTUM);       DOC_RESET;
+    DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_RESET;
+    DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_RESET;
+    DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);       DOC_RESET;
+    DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);       DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_RESET;
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);           DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_RESET;
+    DOC_PARAM("theRay", "", DOC_TYPE_RAY);                 DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_RESET;
+    DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_PARAM("theRay", "", DOC_TYPE_RAY);                 DOC_RESET;
+    DOC_PARAM("theRay", "", DOC_TYPE_RAY);                 DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);       DOC_RESET;
+    DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);       DOC_PARAM("theRay", "", DOC_TYPE_RAY);                 DOC_RESET;
+    DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT); DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_RESET;
+    DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT); DOC_RESET;
+    DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT); DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);       DOC_RESET;
+    DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);       DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT); DOC_RESET;
+    DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);               DOC_PARAM("theFrustum", "", DOC_TYPE_FRUSTUM);       DOC_RESET;
     DOC_RVAL("Returns an array of intersection structures.", DOC_TYPE_ARRAY);
     DOC_END;
     if (argc == 2) {
@@ -884,11 +884,11 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 static JSBool
 projectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Projects an geometric object onto another object");
-    DOC_PARAM("theVector", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("thePlane", DOC_TYPE_PLANE);
+    DOC_PARAM("theVector", "", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);
     DOC_RESET;
-    DOC_PARAM("theVector", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("theVector", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theVector", "", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theVector", "", DOC_TYPE_VECTOR3F);
     DOC_RVAL("The projected vector", DOC_TYPE_VECTOR3F);
 
     DOC_END;
@@ -926,12 +926,12 @@ projectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 static JSBool
 nearestDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Finds the nearest point on a geometric object to a given point");
-    DOC_PARAM("thePoint", DOC_TYPE_POINT3F);   DOC_PARAM("thePlane", DOC_TYPE_PLANE);   DOC_RESET;
-    DOC_PARAM("thePlane", DOC_TYPE_PLANE);     DOC_PARAM("thePoint", DOC_TYPE_POINT3F); DOC_RESET;
-    DOC_PARAM("thePoint", DOC_TYPE_POINT3F);   DOC_PARAM("theLine", DOC_TYPE_LINE);     DOC_RESET;
-    DOC_PARAM("theLine", DOC_TYPE_LINE);       DOC_PARAM("thePoint", DOC_TYPE_POINT3F); DOC_RESET;
-    DOC_PARAM("thePoint", DOC_TYPE_POINT3F);   DOC_PARAM("theSphere", DOC_TYPE_SPHERE); DOC_RESET;
-    DOC_PARAM("theSphere", DOC_TYPE_SPHERE);   DOC_PARAM("thePoint", DOC_TYPE_POINT3F); DOC_RESET;
+    DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);   DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);   DOC_RESET;
+    DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);     DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F); DOC_RESET;
+    DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);   DOC_PARAM("theLine", "", DOC_TYPE_LINE);     DOC_RESET;
+    DOC_PARAM("theLine", "", DOC_TYPE_LINE);       DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F); DOC_RESET;
+    DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);   DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE); DOC_RESET;
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);   DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F); DOC_RESET;
     DOC_RVAL("The nearest point on the object", DOC_TYPE_POINT3F);
     DOC_END;
     if (argc == 2) {
@@ -983,8 +983,8 @@ nearestDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 static JSBool
 transformedNormalDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Transforms a normal with a given matrix");
-    DOC_PARAM("theNormal", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("theMatrix", DOC_TYPE_MATRIX4F);
+    DOC_PARAM("theNormal", "", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theMatrix", "", DOC_TYPE_MATRIX4F);
     DOC_RVAL("The transformed normal", DOC_TYPE_VECTOR3F);
     DOC_END;
     if (argc == 2) {
@@ -1016,7 +1016,7 @@ transformedNormalDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 static JSBool
 inverseDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Calculates the inverse matrix");
-    DOC_PARAM("theMatrix to invert", DOC_TYPE_MATRIX4F);
+    DOC_PARAM("theMatrix to invert", "", DOC_TYPE_MATRIX4F);
     DOC_RVAL("The inverted matrix", DOC_TYPE_MATRIX4F);
     DOC_END;
     if (argc == 2) {

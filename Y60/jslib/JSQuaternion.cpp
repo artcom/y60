@@ -31,7 +31,7 @@ typedef asl::Quaternion<Number> NATIVE;
 static JSBool
 assignFromEuler(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Computes the Quaternion from given Euler angles.");
-    DOC_PARAM("theEulerAngles", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theEulerAngles", "", DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::assignFromEuler,cx,obj,argc,argv,rval);
 }
@@ -57,7 +57,7 @@ getRealPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 static JSBool
 setImaginaryPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the imaginary part of the quaternion.");
-    DOC_PARAM("theImaginary", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theImaginary", "", DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::setImaginaryPart,cx,obj,argc,argv,rval);
 }
@@ -65,9 +65,9 @@ setImaginaryPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 static JSBool
 setRealPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the real part of the quaternion.");
-    DOC_PARAM("theReal", DOC_TYPE_FLOAT);
+    DOC_PARAM("theReal", "", DOC_TYPE_FLOAT);
     DOC_RESET;
-    DOC_PARAM("theReal", DOC_TYPE_INTEGER);
+    DOC_PARAM("theReal", "", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::setRealPart,cx,obj,argc,argv,rval);
 }
@@ -94,11 +94,11 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 multiply(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Multiply the Quaternion with a Scalar or another Quaternion.");
-    DOC_PARAM("otherReal", DOC_TYPE_INTEGER);
+    DOC_PARAM("otherReal", "", DOC_TYPE_INTEGER);
     DOC_RESET;
-    DOC_PARAM("otherReal", DOC_TYPE_FLOAT);
+    DOC_PARAM("otherReal", "", DOC_TYPE_FLOAT);
     DOC_RESET;
-    DOC_PARAM("theOther", DOC_TYPE_QUATERNIONF);
+    DOC_PARAM("theOther", "", DOC_TYPE_QUATERNIONF);
     DOC_END;
     try {
 
@@ -124,7 +124,7 @@ multiply(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 createFromEuler(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Computes and assigns the Quaternion from given Euler angles.");
-    DOC_PARAM("theRotation", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theRotation", "", DOC_TYPE_VECTOR3F);
     DOC_END;
     try {
 
@@ -148,9 +148,9 @@ createFromEuler(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSBool
 lerp(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
     DOC_BEGIN("Linear interpolation.");
-    DOC_PARAM("q", DOC_TYPE_QUATERNIONF);
-    DOC_PARAM("r", DOC_TYPE_QUATERNIONF);
-    DOC_PARAM("theT", DOC_TYPE_FLOAT);
+    DOC_PARAM("q", "", DOC_TYPE_QUATERNIONF);
+    DOC_PARAM("r", "", DOC_TYPE_QUATERNIONF);
+    DOC_PARAM("theT", "", DOC_TYPE_FLOAT);
     DOC_END;    
     try {
         ensureParamCount(argc, 3);
@@ -179,9 +179,9 @@ lerp(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
 static JSBool
 slerp(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
     DOC_BEGIN("Spherical linear interpolation.");
-    DOC_PARAM("q", DOC_TYPE_QUATERNIONF);
-    DOC_PARAM("r", DOC_TYPE_QUATERNIONF);
-    DOC_PARAM("theT", DOC_TYPE_FLOAT);
+    DOC_PARAM("q", "", DOC_TYPE_QUATERNIONF);
+    DOC_PARAM("r", "", DOC_TYPE_QUATERNIONF);
+    DOC_PARAM("theT", "", DOC_TYPE_FLOAT);
     DOC_END;    
     try {
         ensureParamCount(argc, 3);
@@ -319,20 +319,20 @@ JSBool
 JSQuaternion::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Constructor");
 // construct from one Quaternion
-    DOC_PARAM("theOther", DOC_TYPE_QUATERNIONF);
+    DOC_PARAM("theOther", "", DOC_TYPE_QUATERNIONF);
     DOC_RESET;
 // construct from axis and angle
-    DOC_PARAM("theAxis", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("theAngle", DOC_TYPE_INTEGER);
+    DOC_PARAM("theAxis", "", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theAngle", "", DOC_TYPE_INTEGER);
     DOC_RESET;
-    DOC_PARAM("theAxis", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("theAngle", DOC_TYPE_FLOAT);
+    DOC_PARAM("theAxis", "", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theAngle", "", DOC_TYPE_FLOAT);
     DOC_RESET;
 // Construct from explicit real and imaginary part.
-    DOC_PARAM("i", DOC_TYPE_FLOAT);
-    DOC_PARAM("j", DOC_TYPE_FLOAT);
-    DOC_PARAM("k", DOC_TYPE_FLOAT);
-    DOC_PARAM("w", DOC_TYPE_FLOAT);
+    DOC_PARAM("i", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("j", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("k", "", DOC_TYPE_FLOAT);
+    DOC_PARAM("w", "", DOC_TYPE_FLOAT);
     DOC_END;    
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {
@@ -412,7 +412,7 @@ JSObject *
 JSQuaternion::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor,
             Properties(), Functions(), 0, 0, StaticFunctions());
-    DOC_MODULE_CREATE("math", JSQuaternion);
+    DOC_MODULE_CREATE("Math", JSQuaternion);
     return myClass;
 }
 

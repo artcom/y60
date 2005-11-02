@@ -23,31 +23,31 @@
 using namespace std;
 
 namespace jslib {
-    
-    
+        
     map<pair<string,string>, ObjectDocumentation> ourDocumentation;
 
     void describeFunctionParameter(FunctionDescription *myFunctionDescription,
-            const string & theName, const DocType & theType, const string & theDefaultValue) {
+            const string & theName, const string & theDescription, const DocType & theType, const string & theDefaultValue) 
+    {
         ParameterDescription myDescription;
         myDescription.name = theName;
+        myDescription.description = theDescription;
         myDescription.type = DocTypeDescription[theType];
         myDescription.default_value = theDefaultValue;
         myFunctionDescription->parameters.push_back(myDescription);
     }
 
     
-     void documentConstructor(const char *theModule, const char *theClassName, 
+    void documentConstructor(const char *theModule, const char *theClassName, 
          JSBool (*theConstructor)(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)) 
-     {
+    {
         FunctionDescription myFunctionDocumentation;
         myFunctionDocumentation.name = theClassName;
         theConstructor(0, reinterpret_cast<JSObject*>(&myFunctionDocumentation),
                             0, 0, 0);
         ourDocumentation[make_pair(theModule,theClassName)].constructors.push_back(myFunctionDocumentation);
-        AC_DEBUG << "added doku-ctor for " << theClassName << " in module " << theModule << endl;
-     }
-
+        AC_TRACE << "added doku-ctor for " << theClassName << " in module " << theModule << endl;
+    }
 
     void
     document(ObjectDocumentation & theDocumentation,
@@ -62,8 +62,6 @@ namespace jslib {
               
         if (theFunctions) {
             while (theFunctions->name) {
-                //theDocumentation.functions.push_back(theFunctions->name + string("(") + asl::as_string((unsigned)theFunctions->nargs) + ")");
-
                 FunctionDescription myFunctionDocumentation;
                 myFunctionDocumentation.name = theFunctions->name;
                 theFunctions->call( 0, reinterpret_cast<JSObject*>(&myFunctionDocumentation),
@@ -72,7 +70,7 @@ namespace jslib {
                 ++theFunctions;
             }
         } else {
-            AC_DEBUG << "No functions defined for class " << theClassName << endl;
+            AC_TRACE << "No functions defined for class " << theClassName << endl;
         }
 
         if (theProperties) {
@@ -85,7 +83,7 @@ namespace jslib {
                 ++theProperties;
             }
         } else {
-            AC_DEBUG << "No properties defined for class " << theClassName << endl;
+            AC_TRACE << "No properties defined for class " << theClassName << endl;
         }
 
         if (theStaticFunctions) {
@@ -95,7 +93,6 @@ namespace jslib {
                 theStaticFunctions->call( 0, reinterpret_cast<JSObject*>(&myFunctionDocumentation),
                                           0, 0, 0);
                 theDocumentation.static_functions.push_back(myFunctionDocumentation);
-                //theDocumentation.static_functions.push_back(theStaticFunctions->name + string("(") + asl::as_string((unsigned)theStaticFunctions->nargs) + ")");
                 ++theStaticFunctions;
             }
         }
@@ -133,12 +130,12 @@ namespace jslib {
             const char * theBaseClassName)
     {
         ObjectDocumentation myDocumentation;
-        AC_DEBUG << "creating doku for " << theClassName << " in module " << theModule << endl;
+        AC_TRACE << "creating doku for " << theClassName << " in module " << theModule << endl;
         document(myDocumentation, theClassName, theProperties, theFunctions, theConstants,
                 theStaticProperties, theStaticFunctions, theBaseClassName);
 
         ourDocumentation[make_pair(theModule,theClassName)] = myDocumentation;
-        AC_DEBUG << "...created doku for " << theClassName << " in module " << theModule << endl;
+        AC_TRACE << "...created doku for " << theClassName << " in module " << theModule << endl;
     }
 
     void
@@ -150,14 +147,14 @@ namespace jslib {
             JSFunctionSpec * theStaticFunctions,
             const char * theBaseClassName)
     {
-        createClassModuleDocumentation("global", theClassName, theProperties, theFunctions,
+        createClassModuleDocumentation("Global", theClassName, theProperties, theFunctions,
                 theConstants, theStaticProperties, theStaticFunctions, theBaseClassName);
     }
 
     void
     createFunctionDocumentation(const char * theSection, JSFunctionSpec * theFunctions) {
         ObjectDocumentation & myDocumentation = ourDocumentation[make_pair(theSection,"")];
-        AC_DEBUG << "adding doku for free-functions in module " << theSection << endl;
+        AC_TRACE << "adding doku for free-functions in module " << theSection << endl;
 
         if (theFunctions) {
             while (theFunctions->name) {
@@ -165,15 +162,13 @@ namespace jslib {
                 myFunctionDocumentation.name = theFunctions->name;
                 theFunctions->call( 0, reinterpret_cast<JSObject*>(&myFunctionDocumentation),
                                     0, 0, 0);
-                AC_DEBUG << "called " << theFunctions->name;
+                AC_TRACE << "called " << theFunctions->name;
                 myDocumentation.functions.push_back(myFunctionDocumentation);
-                //myDocumentation.functions.push_back(theFunctions->name + string("(") + asl::as_string((unsigned)theFunctions->nargs) + ")");
                 ++theFunctions;
             }
         } else {
             AC_WARNING << "No functions defined for section " << theSection << endl;
         }
-        AC_DEBUG << "added doku for free-functions in module " << theSection << endl;
+        AC_TRACE << "added doku for free-functions in module " << theSection << endl;
     }
-
 }

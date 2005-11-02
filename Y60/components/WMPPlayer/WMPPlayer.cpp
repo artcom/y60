@@ -40,7 +40,7 @@ namespace y60 {
 
     HWND getActiveWindow();
 
-    WMPPlayer::WMPPlayer() {        
+    WMPPlayer::WMPPlayer() {
 		_myModule.Init(NULL, NULL, &LIBID_ATLLib);
     }
 
@@ -48,7 +48,7 @@ namespace y60 {
     	_myModule.Term();
     }
 
-    void 
+    void
     WMPPlayer::setup() {
         _myParentWindow = getActiveWindow();
         HRESULT hr = createWMP(_myParentWindow);
@@ -96,7 +96,7 @@ namespace y60 {
         return hr == S_OK;
     }
 
-    void 
+    void
     WMPPlayer::setLoopCount(unsigned theLoopCount) {
         HRESULT hr;
 		CComBSTR myMode(_T("loop"));
@@ -115,7 +115,7 @@ namespace y60 {
 		}
     }
 
-    unsigned 
+    unsigned
     WMPPlayer::getLoopCount() const {
         HRESULT hr;
 		CComBSTR myMode(_T("loop"));
@@ -130,14 +130,14 @@ namespace y60 {
 		}
     }
 
-    void 
+    void
     WMPPlayer::setCanvasPosition(const Vector2i &thePosition) {
 		RECT myRect;
         GetClientRect(_myWindow, &myRect);
         _myWindow.MoveWindow(thePosition[0], thePosition[1], myRect.right, myRect.bottom);
     }
 
-    void 
+    void
     WMPPlayer::setCanvasSize(const Vector2i &theSize) {
 		RECT myRect;
 		POINT myPoint;
@@ -148,17 +148,17 @@ namespace y60 {
         _myWindow.MoveWindow(myPoint.x, myPoint.y, theSize[0], theSize[1]);
     }
 
-    void 
+    void
     WMPPlayer::setVisible(bool theFlag) {
         ShowWindow(_myWindow.m_hWnd, theFlag ? SW_SHOW:SW_HIDE);
     }
 
-    bool 
+    bool
     WMPPlayer::isVisible() const {
         return IsWindowVisible(_myWindow.m_hWnd);
     }
 
-    Vector2i 
+    Vector2i
     WMPPlayer::getCanvasPosition() const {
 		RECT myRect;
 		POINT myPoint;
@@ -168,14 +168,14 @@ namespace y60 {
         ScreenToClient(_myParentWindow, &myPoint);
         return Vector2i(myPoint.x, myPoint.y);
     }
-    Vector2i 
+    Vector2i
     WMPPlayer::getCanvasSize() const {
 		RECT myRect;
         GetClientRect(_myWindow, &myRect);
         return Vector2i(myRect.right, myRect.bottom);
     }
 
-    Vector2i 
+    Vector2i
     WMPPlayer::getSize() const {
         if ( ! _myWMPMedia) {
             AC_WARNING << "no media available";
@@ -187,7 +187,7 @@ namespace y60 {
 		return Vector2i(int(myWidth), int(myHeight));
     }
 
-    double 
+    double
     WMPPlayer::getDuration() const {
         if ( ! _myWMPMedia) {
             AC_WARNING << "no media available";
@@ -268,7 +268,6 @@ namespace y60 {
 		RECT                                myRect;
 
         GetClientRect(theParent, &myRect);
-
 		_myWindow.Create(theParent, myRect, NULL,
 			             WS_CHILD | WS_DISABLED | WS_CLIPCHILDREN);
 

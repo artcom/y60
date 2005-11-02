@@ -503,44 +503,44 @@ struct JSVector  {
     static JSBool
     add(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Add another vector or a scalar.");
-    DOC_PARAM("Number", DOC_TYPE_INTEGER);
+    DOC_PARAM("Number", "", DOC_TYPE_INTEGER);
     DOC_RESET;
-    DOC_PARAM("Number", DOC_TYPE_FLOAT);
+    DOC_PARAM("Number", "", DOC_TYPE_FLOAT);
     DOC_RESET;
-    DOC_PARAM("Vector", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
         return callMethod(&NATIVE_VECTOR::add, cx, obj, argc, argv, rval);
     }
     static JSBool
     sub(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Subtract another vector or a scalar.");
-    DOC_PARAM("Number", DOC_TYPE_INTEGER);
+    DOC_PARAM("Number", "", DOC_TYPE_INTEGER);
     DOC_RESET;
-    DOC_PARAM("Number", DOC_TYPE_FLOAT);
+    DOC_PARAM("Number", "", DOC_TYPE_FLOAT);
     DOC_RESET;
-    DOC_PARAM("Vector", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
         return callMethod(&NATIVE_VECTOR::sub, cx, obj, argc, argv, rval);
     }
     static JSBool
     mult(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Multiply with another vector or a scalar.");
-    DOC_PARAM("Number", DOC_TYPE_INTEGER);
+    DOC_PARAM("Number", "", DOC_TYPE_INTEGER);
     DOC_RESET;
-    DOC_PARAM("Number", DOC_TYPE_FLOAT);
+    DOC_PARAM("Number", "", DOC_TYPE_FLOAT);
     DOC_RESET;
-    DOC_PARAM("Vector", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
         return callMethod(&NATIVE_VECTOR::mult, cx, obj, argc, argv, rval);
     }
     static JSBool
     div(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Divide by another vector or a scalar.");
-    DOC_PARAM("Number", DOC_TYPE_INTEGER);
+    DOC_PARAM("Number", "", DOC_TYPE_INTEGER);
     DOC_RESET;
-    DOC_PARAM("Number", DOC_TYPE_FLOAT);
+    DOC_PARAM("Number", "", DOC_TYPE_FLOAT);
     DOC_RESET;
-    DOC_PARAM("Vector", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("Vector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
         return callMethod(&NATIVE_VECTOR::div, cx, obj, argc, argv, rval);
     }
@@ -994,13 +994,13 @@ private:
     static JSBool
     Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Constructs a JSVector from the provided parameters or constructs an empty one.");
-        DOC_PARAM("theArray", DOC_TYPE_ARRAY);
+        DOC_PARAM("theArray", "", DOC_TYPE_ARRAY);
         DOC_RESET;
-        DOC_PARAM("theVectorString", DOC_TYPE_STRING);
+        DOC_PARAM("theVectorString", "", DOC_TYPE_STRING);
         DOC_RESET;
-        DOC_PARAM("theFirstNumber", DOC_TYPE_FLOAT);
-        DOC_PARAM("theSecondNumber", DOC_TYPE_FLOAT);
-        DOC_PARAM("...", DOC_TYPE_FLOAT);
+        DOC_PARAM("theFirstNumber", "", DOC_TYPE_FLOAT);
+        DOC_PARAM("theSecondNumber", "", DOC_TYPE_FLOAT);
+        DOC_PARAM("...", "", DOC_TYPE_FLOAT);
         DOC_END;
 
         IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << std::endl);
@@ -1092,7 +1092,7 @@ private:
 public:
 #if 1
     static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject) {
-        DOC_MODULE_CREATE("math",JSVector);
+        DOC_MODULE_CREATE("Math",JSVector);
         JSObject * myProtoObj = JS_InitClass(cx, theGlobalObject, NULL, Class(),
                 /* native constructor function and min arg count */
                 Constructor, 0,

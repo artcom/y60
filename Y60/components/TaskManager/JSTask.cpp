@@ -50,7 +50,7 @@ namespace jslib {
     static JSBool
     addExternalWindow(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Adds windows to this task, that have been created by other processes");
-        DOC_PARAM("theWindowName", DOC_TYPE_STRING);
+        DOC_PARAM("theWindowName", "", DOC_TYPE_STRING);
         DOC_END;
         return Method<JSTask::NATIVE>::call(&JSTask::NATIVE::addExternalWindow,cx,obj,argc,argv,rval);
     }
@@ -86,7 +86,7 @@ namespace jslib {
             case PROP_isActive:
                 *vp = as_jsval(cx, getNative().isActive());
                 return JS_TRUE;
-            case PROP_windows: 
+            case PROP_windows:
                 *vp = as_jsval(cx, getNative().getWindows());
                 return JS_TRUE;
             default:

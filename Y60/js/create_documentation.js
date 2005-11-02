@@ -16,188 +16,297 @@
 //
 //=============================================================================
 
-//use("TrackballMover.js");
-//use("BSpline.js");
-//use("DistanceMeasurement.js");
+use("Exception.js");
 
-//plug("ProcFunctions");
+const VALIDATE_HTML = true;
 
-var ourModuleDocumentation = {};
+if (!("0" in arguments)) {
+    print("Usage: create_documentation.js outputdir");
+    exit(1);
+}
+var ourDirectory = arguments[0];
 
+main();
 
-    if (!("0" in arguments)) {
-        print("Usage: create_documentation.js outputfile");
-        exit(1);
-    }
+function main() {
     try {
-        generateJSLibDocumentation(arguments[0]);
+        if (fileExists(ourDirectory) && !isDirectory(ourDirectory)) {
+            print("### ERROR: " + ourDirectory + " is a file, not a directory.");
+            exit(1);
+        }
 
+        generateJSLibDocumentation(ourDirectory);
+
+        print("Successfully created documentation in " + ourDirectory);
     } catch (ex) {
         print("-------------------------------------------------------------------------------");
         print("### Error: " + ex);
         print("-------------------------------------------------------------------------------");
         exit(1);
     }
+}
 
-    print("Successfully created " + arguments[0]);
+// This function makes sure, some well-known modules come first
+function getModuleNames() {
+    var myModuleNames = ["Global", "Math", "GlobalFunctions", "MathFunctions"];
+    var myModuleNames2 = getDocumentedModules();
+    for (var i = 0; i < myModuleNames2.length; ++i) {
+        var myNewModuleFlag = true;
+        for (var j = 0; j < myModuleNames.length; ++j) {
+            if (myModuleNames2[i] == myModuleNames[j]) {
+                myNewModuleFlag = false;
+            }
+        }
+        if (myNewModuleFlag) {
+            myModuleNames.push(myModuleNames2[i]);
+        }
+    }
+    return myModuleNames;
+}
 
+function generateJSLibDocumentation() {
+    var myModules = [];
+    var myModuleNames = getModuleNames();
+    for (var i = 0; i < myModuleNames.length; ++i) {
+        myModules[myModuleNames[i]] = getDocumentation(myModuleNames[i]);
+    }
 
-function createDocHeader() {
-    var myString = '<html><head>';
-    myString += '<link rel="StyleSheet" href="http://himmel/twiki/pub/TWiki/PatternSkin/style.css" type="text/css"/>';
-    myString += '<link rel="StyleSheet" href="http://himmel/twiki/pub/TWiki/PatternSkin/layout.css" type="text/css"/>';
-    myString += '</head><body>';
-    myString += '<div class="twikiTopBar"><div class="twikiTopBarContents"><div class="twikiLeft">' +
-        '<a href="http://himmel.artcom.de/"><img src="http://himmel/icons/ac_simple_trans.png" border="0" alt="Home"/></a>' +
-        '</div></div></div>';
-    myString += '<div class="twikiMiddleContainer"><div class="twikiLeftBar">';
-    myString += '<div class="twikiWebIndicator"><b>Y60 JavaScript Class Reference</b></div><div class="twikiLeftBarContents">';
+    createIndex(myModules);
 
+    for (var myModuleName in myModules) {
+        for (var myClassName in myModules[myModuleName]) {
+            if (myClassName == "") {
+                // Global functions
+                var myFunctions = myModules[myModuleName][""].functions;
+                createFunctionDocumentation(myModuleName, null, myFunctions);
+            } else {
+                // Classes
+                createClassDocumentation(myModules, myModuleName, myClassName);
+            }
+        }
+    }
+}
+
+function createIndex(theModules) {
+    var myString = "<table class='IndexTable'><tr><td class='IndexTable'>";
+    var myLineCount = 0;
+    for (var myModule in theModules) {
+        if (myLineCount > 10) {
+            myString += "</td><td class='IndexTable'>";
+            myLineCount = 0;
+        }
+        myString += "<p><b>" + myModule + "</b></p>\n";
+        for (myClass in theModules[myModule]) {
+            if (myClass != "") {
+                myString += "<a href='" + myModule + "/" + myClass + ".html'>" + myClass + "</a><br/>\n";
+                myLineCount++;
+            } else {
+                var theFunctions = theModules[myModule][myClass].functions;
+                for (var i = 0; i < theFunctions.length; ++i) {
+                    var myName = theFunctions[i].name;
+                    myString += "<a href='" + myModule + "/" + myName + ".html'>" + myName + "</a><br/>\n";
+                    myLineCount++;
+                }
+            }
+        }
+    }
+
+    myString += "</td></tr></table>";
+
+    writeHTML("index.html", myString);
+}
+
+function createFunctionDocumentation(theModuleName, theClassName, theFunctions) {
+    for (var i = 0; i < theFunctions.length; ++i) {
+        var myName = theFunctions[i].name;
+        writeHTML(theModuleName + "/" + theClassName + "_" + myName + ".html", documentFunction(theClassName, theFunctions[i]));
+    }
+}
+
+function createClassDocumentation(theModules, theModuleName, theClassName) {
+    print("Documenting class: " + theClassName);
+    var myClass = theModules[theModuleName][theClassName];
+
+    createFunctionDocumentation(theModuleName, theClassName, myClass.constructors);
+    createFunctionDocumentation(theModuleName, theClassName, myClass.functions);
+    createFunctionDocumentation(theModuleName, theClassName, myClass.static_functions);
+    createClassSummary(theModules, theModuleName, theClassName);
+}
+
+function createClassSummary(theModules, theModuleName, theClassName) {
+    var myString = "<h2>" + theClassName;
+    var myClass = theModules[theModuleName][theClassName];
+
+    if (myClass.base_class) {
+        var myBaseClass = myClass.base_class;
+        while (myBaseClass != "") {
+            myString += " [<a href='" + myBaseClass + ".html'>"
+                + myBaseClass + "</a>]";
+            myBaseClass = theModules[theModuleName][myBaseClass].base_class;
+        }
+    }
+    myString += '</h2>\n';
+    myString += "<table class='SummaryTable'>\n";
+
+    myString += summarizeFunctions(theClassName, "Constructors", myClass.constructors);
+    myString += summarizeFunctions(theClassName, "Functions", myClass.functions);
+    myString += summarizeFunctions(theClassName, "Static Functions", myClass.static_functions);
+
+    myString += summarizeProperties("Properties", myClass.properties);
+    myString += summarizeProperties("Static Properties", myClass.static_properties);
+    myString += summarizeProperties("Constants", myClass.constants);
+
+    myString += "</table>\n";
+
+    writeHTML(theModuleName + "/" + theClassName + ".html", myString);
+}
+
+function summarizeFunctions(theClassName, theFunctionsTitle, theFunctions) {
+    var myString = "";
+    if (theFunctions.length) {
+        myString += "<tr><td colspan='2' class='SummaryTableCell'><div class='SummeryHeader'>" + theFunctionsTitle + "</div></td></tr>\n";
+        for (var i = 0; i < theFunctions.length; ++i) {
+            var myFunction = theFunctions[i];
+            myString += "<tr><td class='SummaryTableCell'><a href='" + theClassName + "_" + myFunction.name + ".html'>" + myFunction.name + "</a></td>\n";
+            if (myFunction.description == "") {
+                myFunction.description = "not yet documented";
+            }
+            myString += "<td class='SummaryTableCell'>" + myFunction.description + '</td></tr>\n';
+        }
+    }
     return myString;
 }
 
-function documentFunctionCall(theName, theParameters) {
-
+function summarizeProperties(thePropertyTitle, theProperties) {
     var myString = "";
-    var i,j;
-    var myParameterOption, myAltParameters = [];
-    var jstart = 0;
-    for (j = 0;j < theParameters.length; ++j) {
-        if (theParameters[j].type == '__intern__') {
-            myParameterOption = theParameters.slice(jstart,j);
-            jstart = j+1;
+    if (theProperties.length) {
+        myString += "<tr><td colspan='2' class='SummaryTableCell'><div class='SummeryHeader'>" + thePropertyTitle + "</div></td></tr>\n";
+        for (var i = 0; i < theProperties.length; ++i) {
+            myString += "<tr><td class='SummaryTableCell'>" + theProperties[i] + "</td>\n";
+            myString += "<td class='SummaryTableCell'></td></tr>\n";
+        }
+    }
+    return myString;
+}
+
+function writeHTML(theFileName, theString) {
+    var myString = "<html><head>\n";
+    myString += "<title>Y60 JavaScript Class Reference</title>\n";
+    if (theFileName == "index.html") {
+        myString += "    <link rel='StyleSheet' href='jsdoc.css' type='text/css'/>\n";
+    } else {
+        myString += "    <link rel='StyleSheet' href='../jsdoc.css' type='text/css'/>\n";
+    }
+    myString += "</head>\n"
+    myString += "<body>\n";
+    myString += theString;
+    myString += "<div class='TimeStamp'>Created " + new Date() + " on " + hostname() + "</div>";
+    myString += "</body></html>";
+
+    if (VALIDATE_HTML) {
+        var myXmlDoc = new Node(myString);
+    }
+
+    var myPath = ourDirectory + "/" + theFileName;
+    var myDir  = dirname(myPath);
+
+    if (!isDirectory(myDir)) {
+        makeDir(myDir);
+    }
+
+    if (!putWholeFile(myPath, myString)) {
+        throw new Exception("Could not write file: " + myPath, fileline());
+    }
+}
+
+function documentSignature(theName, theParameters, theReturnType) {
+    var myString = "<div class='SectionHeader'>Syntax:</div>";
+    myString += "<div class='Indent'>";
+
+    var myReturnType = theReturnType ? theReturnType : "void";
+    var myParameterOption = [];
+    var myAltParameters   = [];
+    var myJStart          = 0;
+    for (var i = 0; i < theParameters.length; ++i) {
+        if (theParameters[i].type == '__intern__') {
+            myParameterOption = theParameters.slice(myJStart, i);
+            myJStart = i + 1;
             myAltParameters.push(myParameterOption);
         }
     }
-    myParameterOption = theParameters.slice(jstart,j);
+    myParameterOption = theParameters.slice(myJStart,i);
     myAltParameters.push(myParameterOption);
 
     for (i = 0; i < myAltParameters.length; ++i) {
-        myString += '<b>' + theName + '</b>(';
-        for (j = 0; j < myAltParameters[i].length; ++j) {
+        myString += "<span class='ParameterType'>" + myReturnType + "</span> <b>" + theName + "</b>(";
+        for (var j = 0; j < myAltParameters[i].length; ++j) {
             var myParameter = myAltParameters[i][j];
-            myString += myParameter.type + ' <b>' + myParameter.name + '</b>';
+            myString += "<span class='ParameterType'>" + myParameter.type + "</span> " + myParameter.name;
             if (myParameter.default_value) {
-                myString += ' = ' + myParameter.default_value;
+                myString += " = " + myParameter.default_value;
             }
             if (j < myAltParameters[i].length-1) {
                 myString += ", ";
             }
         }
-        myString += ')<br/>';
+        myString += ")<br/>";
     }
-    //print(myString);
+    myString += "</div>\n";
     return myString;
 }
 
-function documentFunctions(theFunctionsTitle, theFunctions) {
+function documentFunction(theClassName, theFunction) {
+    var myString = "";
+
+    // Description
+    var myTitle = theFunction.name;
+    var myClass = theClassName ? theClassName + "::" : "";
+    myString += "<h2>" + myClass + theFunction.name + "</h2>";
+    if (theFunction.description == "") {
+        theFunction.description = "Not yet documented.";
+    }
+    myString += "<div class='SectionHeader'>Description:</div>";
+    myString += "<div class='FunctionDescription'>" + theFunction.description + '</div>\n';
+
+    // Signature
+    myString += documentSignature(theFunction.name, theFunction.parameters, theFunction.return_type);
+
+    // Parameters
+    if (theFunction.parameters.length) {
+        myString += "<div class='SectionHeader'>Parameters:</div>";
+        myString += "<div class='Indent'><table class='ParameterTable'>";
+        for (var j = 0; j < theFunction.parameters.length; ++j) {
+            var myParameter = theFunction.parameters[j];
+            if (String(myParameter.type) != "__intern__") {
+                if (myParameter.description == "") {
+                    myParameter.description = "Not yet documented.";
+                }
+                myString += "<tr><td class='ParameterTableCell'>" + myParameter.name;
+                myString += "</td><td class='ParameterTableCell'>" + myParameter.description;
+                myString += "</td></tr>";
+            }
+        }
+        myString += "</table></div>"
+    }
+
+    // Return value
+    if (theFunction.return_value) {
+        myString += "<div class='SectionHeader'>Return Value:</div>";
+        myString += "<div class='Indent'>" + theFunction.return_value + "</div>";
+    }
+    return myString;
+}
+
+function documentFunctions(theClassName, theFunctionsTitle, theFunctions) {
     var myString = "";
     myString += "<h3>" + theFunctionsTitle + "</h3>\n";
     myString += "<ul>\n";
     for (var i = 0; i < theFunctions.length; ++i) {
-
-        var myFunc = theFunctions[i];
-        myString += '<li>';
-        myString += documentFunctionCall(myFunc.name, myFunc.parameters);
-
-        if (myFunc.description) {
-            myString += myFunc.description + '<br/>\n';
-        }
-        if (myFunc.return_value) {
-            myString += "<i>returns</i> " + '<b>' + myFunc.return_type + '</b> '
-                          + myFunc.return_value + "<br/>";
-        }
-        myString += "</li>";
+        myString += "<li>";
+        myString += documentFunction(theClassName, theFunctions[i]);
+        myString += "</li><br/>\n";
     }
     myString += "</ul>\n";
     return myString;
 }
-
-function generateJSLibDocumentation(theDocFile) {
-
-    var myDocumentation = {"global" : getDocumentation("global"),
-        "math" : getDocumentation("math"),
-        "functions"  : getDocumentation("GlobalFunctions"),
-        "math functions"  : getDocumentation("MathFunctions"),
-        "directory functions"  : getDocumentation("DirectoryFunctions"),
-        "file functions"  : getDocumentation("FileFunctions"),
-        "proc functions"  : getDocumentation("ProcFunctions"),
-        "gtk"    : getDocumentation("gtk")
-    };
-
-    var myDocuString = createDocHeader();
-
-    for (myModule in myDocumentation) {
-        myDocuString += '<p><b><a href="#' + myModule + '">' + myModule + '</a></b></p>\n';
-        for (myClass in myDocumentation[myModule]) {
-            if (myClass != "") {
-                myDocuString += '<a href="#' + myClass + '">' + myClass + '</a><br/>\n';
-            } else {
-                var myFuncs = myDocumentation[myModule][myClass].functions;
-                for (f in myFuncs) {
-                    myDocuString += '<a href="#' + myModule + '">' + myFuncs[f].name + "</a><br/>\n";
-                }
-            }
-        }
-    }
-    myDocuString += '</div></div><div class="twikiMain"><div class="twikiRevInfo" style="text-align:right"><span class="twikiGrayText">';
-    myDocuString += '<span class="twikiToolbarElem">' + new Date();
-    myDocuString += '</span></span></div><div class="twikiTopic">';
-    for (myModule in myDocumentation) {
-        var myModuleDocuString = '<a name="' + myModule + '"><div/></a><h1><br/>'
-                                             + myModule + '</h1>\n';
-        for (myClass in myDocumentation[myModule]) {
-            var myClassDocu = myDocumentation[myModule][myClass];
-            var myClassDocuString = '<a name="' + myClass + '"><div/></a><h2>' + myClass
-                if (myClassDocu.base_class) {
-                    var myBaseClass = myClassDocu.base_class;
-                    while (myBaseClass != "") {
-                        myClassDocuString += '<a href="#' + myBaseClass + '">[ '
-                            + myBaseClass + " ] </a>";
-                        myBaseClass = myDocumentation[myModule][myBaseClass].base_class;
-                    }
-                }
-            myClassDocuString += '</h2>\n';
-
-            if (myClassDocu.constructors.length) {
-                myClassDocuString += documentFunctions("Constructors", myClassDocu.constructors);
-            }
-            if (myClassDocu.functions.length) {
-                myClassDocuString += documentFunctions("Functions", myClassDocu.functions);
-            }
-
-            var i;
-            if (myClassDocu.properties.length) {
-                myClassDocuString += "<h3>Properties</h3><ul>\n";
-                for (i = 0; i < myClassDocu.properties.length; ++i) {
-                    myClassDocuString += '<li>' + myClassDocu.properties[i] + '</li>\n';
-                }
-                myClassDocuString += "</ul>"
-            }
-            if (myClassDocu.static_functions.length) {
-                myClassDocuString += documentFunctions("Static Functions", myClassDocu.static_functions);
-            }
-            if (myClassDocu.static_properties.length) {
-                myClassDocuString += "<h3>Static properties</h3><ul>\n";
-                for (i = 0; i < myClassDocu.static_properties.length; ++i) {
-                    myClassDocuString += '<li>' + myClassDocu.static_properties[i] + '</li>\n';
-                }
-                myClassDocuString += "</ul>"
-            }
-            if (myClassDocu.constants.length) {
-                myClassDocuString += "<h3>Constants</h3><ul>\n";
-                for (i = 0; i < myClassDocu.constants.length; ++i) {
-                    myClassDocuString += '<li>' + myClassDocu.constants[i] + '</li>\n';
-                }
-                myClassDocuString += "</ul>"
-            }
-            myModuleDocuString += myClassDocuString;
-        }
-        myDocuString += myModuleDocuString;
-    }
-    myDocuString += "</div></div></div></body></html>";
-    var myXmlDoc = new Node(myDocuString);
-    myXmlDoc.saveFile(theDocFile);
-}
-
 

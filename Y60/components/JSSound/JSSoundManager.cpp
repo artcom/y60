@@ -24,26 +24,26 @@ namespace jslib {
         return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::stopAll,
                 cx,obj,argc,argv,rval);
     }
-    
+
     static JSBool
     fadeToVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Fading to a specified volume over a given duration.");
-        DOC_PARAM("volume", DOC_TYPE_FLOAT);
-        DOC_PARAM("duration", DOC_TYPE_FLOAT);
+        DOC_PARAM("theVolume", "", DOC_TYPE_FLOAT);
+        DOC_PARAM("theDuration", "", DOC_TYPE_FLOAT);
         DOC_END;
         return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::fadeToVolume,
                 cx,obj,argc,argv,rval);
     }
-    
+
     static JSBool
     preloadSound(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Loads and decodes the sound given and stores it in the cache. Invalid for streams.");
-        DOC_PARAM("URI", DOC_TYPE_STRING);
+        DOC_PARAM("theURI", "", DOC_TYPE_STRING);
         DOC_END;
         return Method<JSSoundManager::NATIVE>::call(&JSSoundManager::NATIVE::preloadSound,
                 cx,obj,argc,argv,rval);
     }
-    
+
     JSFunctionSpec *
     JSSoundManager::Functions() {
         static JSFunctionSpec myFunctions[] = {
@@ -77,7 +77,7 @@ namespace jslib {
             case PROP_running:
                 *vp = as_jsval(cx, getNative().isRunning());
                 return JS_TRUE;
-            case PROP_soundcount: 
+            case PROP_soundcount:
                 *vp = as_jsval(cx, getNative().getNumSounds());
                 return JS_TRUE;
             default:
@@ -91,7 +91,7 @@ namespace jslib {
     JSSoundManager::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         jsval dummy;
         switch (theID) {
-            case PROP_volume:                
+            case PROP_volume:
                 return Method<NATIVE>::call(&NATIVE::setVolume, cx, obj, 1, vp, &dummy);
             default:
                 JS_ReportError(cx,"JSSoundManager::setPropertySwitch: index %d out of range", theID);
@@ -102,9 +102,9 @@ namespace jslib {
     JSBool
     JSSoundManager::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Create a SoundManager.");
-        DOC_PARAM_OPT("Samplerate", DOC_TYPE_INTEGER, 44100);
-        DOC_PARAM_OPT("OutputChannels", DOC_TYPE_INTEGER, 2);    
-        DOC_PARAM_OPT("Latency", DOC_TYPE_FLOAT, 0.2);    
+        DOC_PARAM_OPT("theSamplerate", "", DOC_TYPE_INTEGER, 44100);
+        DOC_PARAM_OPT("theOutputChannels", "", DOC_TYPE_INTEGER, 2);
+        DOC_PARAM_OPT("theLatency", "", DOC_TYPE_FLOAT, 0.2);
         DOC_END;
         try {
             checkForUndefinedArguments("JSSoundManager::Constructor()", argc, argv);
@@ -128,7 +128,7 @@ namespace jslib {
                         JS_ReportError(cx, "JSSoundManager::Constructor(): argument #1 must be an integer (NumOutputChannels)");
                         return JS_FALSE;
                     }
-                    myNewNative->setAppConfig(mySampleRate, myNumOutputChannels);        
+                    myNewNative->setAppConfig(mySampleRate, myNumOutputChannels);
                 } else {
                     myNewNative->setAppConfig(mySampleRate);
                 }
@@ -155,7 +155,7 @@ namespace jslib {
             return JS_TRUE;
 
         } HANDLE_CPP_EXCEPTION;
-    
+
     }
 
     JSConstIntPropertySpec *
