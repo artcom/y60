@@ -98,7 +98,6 @@ namespace asl {
     const Triangle<Number> & asTriangle(const Point3<Number> & theThreePoints) {
         return reinterpret_cast<const Triangle<Number>&>(theThreePoints);
     }
-
     /* @} */
 }
 #endif
