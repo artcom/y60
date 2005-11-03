@@ -596,15 +596,15 @@ CTScan::getReconstructionDimensions(const Quaternionf & theOrientation) const {
 template <class VoxelT>
 VoxelT
 CTScan::fastValueAt(const asl::Vector3f & thePosition) {
-    Vector3i myFloorPos(static_cast<int>(floor(thePosition[0])), 
-        static_cast<int>(floor(thePosition[1])), 
-        static_cast<int>(floor(thePosition[2])));
-    dom::ResizeableRasterPtr & mySlice = _mySlices[int(myFloorPos[2])];
+    Vector3i myDiscretePos(round(thePosition[0]), 
+        round(thePosition[1]), 
+        round(thePosition[2]));
+    dom::ResizeableRasterPtr & mySlice = _mySlices[int(myDiscretePos[2])];
     int myLineStride = getBytesRequired(mySlice->width(), _myEncoding);
 
-    if (isInside(myFloorPos[0], myFloorPos[1], myFloorPos[2])) {
-        const VoxelT * mySource = reinterpret_cast<const VoxelT*>(mySlice->pixels().begin()+myLineStride*myFloorPos[1]);
-        return mySource[myFloorPos[0]];
+    if (isInside(myDiscretePos[0], myDiscretePos[1], myDiscretePos[2])) {
+        const VoxelT * mySource = reinterpret_cast<const VoxelT*>(mySlice->pixels().begin()+myLineStride*myDiscretePos[1]);
+        return mySource[myDiscretePos[0]];
     } else {
         return NumericTraits<VoxelT>::min();
     }
@@ -852,6 +852,7 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
         Box3f myBounds;
         Vector3i myVoxelSize = getVoxelDimensions();
 
+        
         Matrix4f myScreenToVoxelProjection(theOrientation);
         Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
         bool myInversionDone = myVoxelToScreenProjection.invert();
@@ -878,34 +879,62 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
         int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
 
         float mySlicePosition = float(theSliceIndex) + myBounds[Box3f::MIN][2];
+        // [TS] Invert Slice
+        // float mySlicePosition = myBounds[Box3f::MAX][2] - float(theSliceIndex);
         Vector3f myStartPos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
             myScreenToVoxelProjection);
         Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition),
             myScreenToVoxelProjection) - myStartPos) / mySize[0];
         Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
             myScreenToVoxelProjection) - myStartPos) / mySize[1];
+        //Vector3f myStartPos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
+        //    myScreenToVoxelProjection);
+        //Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MAX][1], mySlicePosition),
+        //    myScreenToVoxelProjection) - myStartPos) / mySize[0];
+        //Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
+        //    myScreenToVoxelProjection) - myStartPos) / mySize[1];
         AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", myStartPos: " << myStartPos
             << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
         typedef Line<float> Linef;
         Box3f myVoxelBox(Point3f(0.0f, 0.0f, 0.0f), 
             Point3f(float(myVoxelSize[0]), float(myVoxelSize[1]), float(myVoxelSize[2])));
+        //for (int v = 0; v < myHeight; ++v) {
         for (int v = 0; v < myHeight; ++v) {
             Vector3f myLinePos = myStartPos + (float(v) * mySourceDeltaV);
             Linef myScanLine(myLinePos, mySourceDeltaU);
             float myMinValue, myMaxValue;
             if (intersection(myVoxelBox, myScanLine, myMinValue, myMaxValue)) {
+                if (myMinValue > myMaxValue) {
+                    float myHelper = myMinValue;
+                    myMinValue = myMaxValue;
+                    myMaxValue = myHelper;
+                    AC_WARNING << "Wrongly oriented intersection.";
+                }
                 int myStart = int(ceil(myMinValue));
                 int myEnd = int(floor(myMaxValue));
-                VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+myTargetLineStride*v+myStart);
+                VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+(myTargetLineStride*v)+myStart);
                 for (int u = myStart; u < myEnd; ++u) {
                     Vector3f mySourcePos = myLinePos + (float(u) * mySourceDeltaU);
+                    // Flip Y because of screen application and z because of ???
+                    //mySourcePos[0] = myVoxelSize[0]-mySourcePos[0];
+                    mySourcePos[1] = myVoxelSize[1]-mySourcePos[1];
+                    mySourcePos[2] = myVoxelSize[2]-mySourcePos[2];
                     if (theTrilliniarInterpolate) {
                         *myAddress = interpolatedValueAt<VoxelT>(mySourcePos);
                     } else {
                         *myAddress = fastValueAt<VoxelT>(mySourcePos);
-                    }                    
+                    }
                     myAddress ++;
                 }
+                //for (int u = myStart; u < myEnd; ++u) {
+                //    Vector3f mySourcePos = myLinePos + (myEnd * mySourceDeltaU) - (float(u) * mySourceDeltaU);
+                //    if (theTrilliniarInterpolate) {
+                //        *myAddress = interpolatedValueAt<VoxelT>(mySourcePos);
+                //    } else {
+                //        *myAddress = fastValueAt<VoxelT>(mySourcePos);
+                //    }
+                //    myAddress ++;
+                //}
             }
         }
         myPixelData = myTarget; 
