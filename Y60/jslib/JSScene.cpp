@@ -98,15 +98,15 @@ loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rva
         dom::NodePtr myNode;
         convertFrom(cx, argv[0], myNode);
 
-        float myTime = 0.0f;
-        if (argc > 1) {
-            convertFrom(cx, argv[1], myTime);
-        }
-
         JSScene::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-
-        myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>(), myTime);
+        if (argc == 1) {
+            myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>());
+        } else {
+            float myTime;
+            convertFrom(cx, argv[1], myTime);
+            myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>(), myTime);
+        }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

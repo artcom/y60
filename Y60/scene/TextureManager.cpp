@@ -152,7 +152,11 @@ namespace y60 {
                 throw ex;
             }
         }
-        theMovie->readFrame(theCurrentTime);
+        if (theCurrentTime == -1) {
+            theMovie->readFrame();
+        } else {
+            theMovie->readFrame(theCurrentTime);
+        }
 
         // load/subload texture
         ImagePtr myMovieImage = dynamic_cast_Ptr<Image>(theMovie);

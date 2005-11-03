@@ -44,7 +44,7 @@ namespace y60 {
 
             void setupTextures();
             void loadMovieFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie,
-                                double theCurrentTime = 0.0);
+                                double theCurrentTime = -1);
             void loadCaptureFrame(asl::Ptr<Capture, dom::ThreadingModel> theCapture);
             asl::Ptr<Image, dom::ThreadingModel> getImage(const std::string & theImageId) const;
             asl::Ptr<Image, dom::ThreadingModel> findImage(const std::string & theImageId) const;

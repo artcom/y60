@@ -85,7 +85,8 @@ namespace y60 {
              *
              * @param theCurrentTime time of the frame to retrieve
              */
-            void readFrame(double theCurrentTime);
+            void readFrame();
+            void readFrame(double theCurrentTime, bool theIgnoreCurrentTime=false);
             /**
              * loads a movie from thePackageManager
              * @param thePackageManager Package Manager to retrieve the movie from

@@ -31,8 +31,8 @@
 using namespace dom;
 using namespace std;
 
-#define DB(x) x
-#define DB2(x) x
+#define DB(x) // x
+#define DB2(x) // x
 
 
 namespace y60 {
@@ -153,7 +153,12 @@ namespace y60 {
     }
 
     void
-    Movie::readFrame(double theCurrentTime) {
+    Movie::readFrame() {
+        readFrame(0, true);
+    }
+    
+    void
+    Movie::readFrame(double theCurrentTime, bool theIgnoreCurrentTime) {
         DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime);
         _myLastCurrentTime = theCurrentTime;
 
@@ -180,7 +185,7 @@ namespace y60 {
                 myMovieTime = getTimeFromFrame(myNextFrame);
                 break;
             case PLAY_MODE_PLAY:
-                if (theCurrentTime == 0) {
+                if (theIgnoreCurrentTime) {
                     myMovieTime = 0;
                 } else {
                     myMovieTime = _myDecoder->getMovieTime(theCurrentTime);

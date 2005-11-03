@@ -86,7 +86,15 @@ function FFMpegTest(theArguments) {
                 "setupStopTest(true)",
                 "setupPlayTest(false)",
                 "setupStopTest(false)",
-                "setupLoopTest(false)"
+                "setupLoopTest(false)",
+                "setupPauseTest(true)",
+                "setupPauseTest(false)",
+                "setupSeekBackTest(false)",
+                "setupSeekFwdTest(false)",
+                "setupPauseStopTest(false)",
+                "setupPauseStopTest(true)",
+                "setupStopPauseTest(false)",
+                "setupStopPauseTest(true)"
 //                "setupLongTest(true)"
                ];
     
@@ -124,6 +132,21 @@ function FFMpegTest(theArguments) {
         _myMovie.playmode = "stop";
     }
 
+    Public.pause = function() {
+        print("Pausing playback.");
+        _myMovie.playmode = "pause";
+    }
+
+    var _mySeekDest;
+
+    Public.seek = function() {
+        print ("Seek to second " + _mySeekDest);
+        _myMovie.playmode = "pause";
+        _myMovie.currentframe = _mySeekDest*25;
+        window.scene.loadMovieFrame(_myMovie.movie);
+        _myMovie.playmode = "play";
+    }
+
     function setupPlayTest(theUseSound) {
         setupTest("Play to End", "testfiles/counter_short.mpg", theUseSound);        
         window.setTimeout("testPlaying", 1000);
@@ -139,6 +162,14 @@ function FFMpegTest(theArguments) {
         window.setTimeout("nextTest", 4000);
     }
 
+    function setupPauseTest(theUseSound) {
+        setupTest("Play, Pause, Play again", "testfiles/counter_short.mpg", theUseSound);
+        window.setTimeout("pause", 1000);
+        window.setTimeout("play", 2000);
+        window.setTimeout("stop", 3000);
+        window.setTimeout("nextTest", 4000);
+    }
+
     function setupLoopTest(theUseSound) {
         setupTest("Loop", "testfiles/counter_short.mpg", theUseSound);
         _myMovie.loopcount = 0;
@@ -146,6 +177,41 @@ function FFMpegTest(theArguments) {
         window.setTimeout("testPlaying", 10000);
         window.setTimeout("stop", 10050);
         window.setTimeout("nextTest", 10100);
+    }
+    
+    function setupSeekBackTest(theUseSound) {
+        setupTest("SeekBack", "testfiles/counter_short.mpg", theUseSound);
+        _myMovie.loopcount = 1;
+        _mySeekDest = 1;
+        window.setTimeout("seek", 2000);
+        window.setTimeout("seek", 6000);
+        window.setTimeout("nextTest", 8000);
+    }
+    
+    function setupSeekFwdTest(theUseSound) {
+        setupTest("SeekFwd", "testfiles/counter_short.mpg", theUseSound);
+        _myMovie.loopcount = 1;
+        _mySeekDest = 3;
+        window.setTimeout("seek", 1000);
+        window.setTimeout("nextTest", 2000);
+    }
+    
+    function setupPauseStopTest(theUseSound) {
+        setupTest("PauseStop", "testfiles/counter_short.mpg", theUseSound);
+        _myMovie.loopcount = 1;
+        window.setTimeout("pause", 1000);
+        window.setTimeout("stop", 1200);
+        window.setTimeout("play", 1400);
+        window.setTimeout("nextTest", 2000);
+    }
+    
+    function setupStopPauseTest(theUseSound) {
+        setupTest("PauseStop", "testfiles/counter_short.mpg", theUseSound);
+        _myMovie.loopcount = 1;
+        window.setTimeout("stop", 1000);
+        window.setTimeout("pause", 1200);
+        window.setTimeout("play", 1400);
+        window.setTimeout("nextTest", 2000);
     }
     
     function setupLongTest(theUseSound) {
