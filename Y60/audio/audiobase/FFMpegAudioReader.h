@@ -28,6 +28,7 @@
 
 #define EMULATE_INTTYPES
 #include <ffmpeg/avformat.h>
+#include <ffmpeg/avcodec.h>
 
 namespace AudioBase {
 

@@ -98,7 +98,11 @@ void FFMpegAudioReader::load(const std::string & theUrl) {
     // find first audio stream
     _myAStreamIndex = -1;
     for (unsigned int i = 0; i < _myFormatContext->nb_streams; ++i) {
+#if (LIBAVCODEC_BUILD >= 0x4910)
+        if (_myFormatContext->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO) {
+#else
         if (_myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO) {
+#endif
             _myAStreamIndex = i;
             break;
         }
@@ -108,7 +112,11 @@ void FFMpegAudioReader::load(const std::string & theUrl) {
     }
 
     // open codec
+#if (LIBAVCODEC_BUILD >= 0x4910)
+    _myCodecContext = _myFormatContext->streams[_myAStreamIndex]->codec;
+#else
     _myCodecContext = &_myFormatContext->streams[_myAStreamIndex]->codec;
+#endif
     AVCodec * myCodec = avcodec_find_decoder(_myCodecContext->codec_id);
     if (!myCodec) {
         throw FFMpegAudioReaderException(std::string("Unable to find decoder: ") + theUrl, PLUS_FILE_LINE);
@@ -207,13 +215,19 @@ FFMpegAudioReader::process() {
             if (myPacket.stream_index == _myAStreamIndex) {
 
                 int mySampleSize = 0; // decompressed sample size in BYTES
-                unsigned char* myData = myPacket.data;
+                uint8_t * myData = myPacket.data;
                 int myDataLen = myPacket.size;
 				int myLen = 0;
                 while (myDataLen > 0) {
-                    myLen = avcodec_decode_audio(&_myAStream->codec,
+#if (LIBAVCODEC_BUILD >= 0x4910)
+                    myLen = avcodec_decode_audio(_myAStream->codec,
                         (int16_t*)_mySamples, &mySampleSize,
                         myData, myDataLen);
+#else
+                    myLen = avcodec_decode_audio(&(_myAStream->codec),
+                        (int16_t*)_mySamples, &mySampleSize,
+                        myData, myDataLen);
+#endif
 
                     DB2(AC_TRACE << "myLen=" << myLen << " mySampleSize=" << mySampleSize << " myDataLen=" << myDataLen);
                     if (myLen > 0 && mySampleSize > 0) {
