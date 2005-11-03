@@ -33,6 +33,7 @@ class SDLEventSource : public y60::IEventSource {
         SDLEventSource();
         virtual void init();
         virtual std::vector<y60::EventPtr> poll();
+
     private:
         static std::vector<y60::KeyCode> myKeyCodeTranslationTable;
         y60::EventPtr createMouseMotionEvent(y60::Event::Type theType, const SDL_Event & theSDLEvent);

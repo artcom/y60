@@ -1,18 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//    $RCSfile: AbstractRenderWindow.cpp,v $
-//     $Author: jens $
-//   $Revision: 1.34 $
-//       $Date: 2005/04/26 19:55:59 $
-//
 //=============================================================================
 
 #include <asl/settings.h>
@@ -206,12 +199,12 @@ getGlyphMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     if (argc == 2) {
         std::string myFontName;
         if (!convertFrom(cx,argv[0],myFontName)) {
-            JS_ReportError(cx,"JSRenderWindow::Constructor: parameter 0 must be a string");
+            JS_ReportError(cx,"JSRenderWindow::getGlyphMetrics: parameter 0 must be a string");
             return JS_FALSE;
         }
         std::string myCharacter;
         if (!convertFrom(cx,argv[1],myCharacter)) {
-            JS_ReportError(cx,"JSRenderWindow::Constructor: parameter 1 must be a string");
+            JS_ReportError(cx,"JSRenderWindow::getGlyphMetrics: parameter 1 must be a string");
             return JS_FALSE;
         }
 
@@ -228,7 +221,7 @@ getGlyphMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
         return JS_TRUE;
     }
-    JS_ReportError(cx,"JSRenderWindow::intersectWorld: bad number of arguments, 2 expected");
+    JS_ReportError(cx,"JSRenderWindow::getGlyphMetrics: bad number of arguments, 2 expected");
     return JS_FALSE;
 }
 
@@ -237,6 +230,40 @@ getKerning(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::getKerning,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+setEventRecorderMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    if (argc == 1) {
+        unsigned myMode;
+        if (!convertFrom(cx,argv[0],myMode)) {
+            JS_ReportError(cx,"JSRenderWindow::setEventRecorderMode: parameter 0 must be an int");
+            return JS_FALSE;
+        }
+
+        JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
+        myObj.getNative().setEventRecorderMode((EventRecorder::Mode) myMode);
+
+        return JS_TRUE;
+    }
+    JS_ReportError(cx,"JSRenderWindow::setEventRecorderMode: bad number of arguments, 1 expected");
+    return JS_FALSE;
+}
+
+static JSBool
+loadEvents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    return Method<SDLWindow>::call(&SDLWindow::loadEvents,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+saveEvents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    return Method<SDLWindow>::call(&SDLWindow::saveEvents,cx,obj,argc,argv,rval);
 }
 
 JSFunctionSpec *
@@ -253,6 +280,9 @@ JSRenderWindow::Functions() {
         {"draw",               draw,                     1},
         {"getGlyphMetrics",    getGlyphMetrics,          7},
         {"getKerning",         getKerning,               3},
+        {"setEventRecorderMode", setEventRecorderMode,   1},
+        {"loadEvents",           loadEvents,             1},
+        {"saveEvents",           saveEvents,             1},
         {0}
     };
     return myFunctions;
@@ -266,17 +296,26 @@ enum PropertyNumbers {
     PROP_autoPause,
     PROP_title,
     PROP_position,
-    PROP_screenSize
+    PROP_screenSize,
+    // ConstInt
+    PROP_STOP,
+    PROP_PLAY,
+    PROP_RECORD
 };
 
 JSConstIntPropertySpec *
 JSRenderWindow::ConstIntProperties() {
 
+#if 0
     const unsigned short PROP_BOLD       = 1;
     const unsigned short PROP_ITALIC     = 2;
     const unsigned short PROP_BOLDITALIC = 3;
+#endif
 
     static JSConstIntPropertySpec myProperties[] = {
+        { "STOP", PROP_STOP, y60::EventRecorder::STOP }, 
+        { "PLAY", PROP_PLAY, y60::EventRecorder::PLAY }, 
+        { "RECORD", PROP_RECORD, y60::EventRecorder::RECORD }, 
         {0}
     };
     return myProperties;
@@ -447,4 +486,3 @@ jsval as_jsval(JSContext *cx, asl::Ptr<SDLWindow> theOwner) {
 }
 
 }
-

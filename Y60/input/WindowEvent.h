@@ -24,15 +24,19 @@
 namespace y60 {
 
     struct WindowEvent : public Event {
-           WindowEvent(Type theEventType,
-                      int theWidth,
-                      int theHeight);
-           WindowEvent(Type theEventType,
-                      bool theFullScreenFlag);
-            virtual ~WindowEvent();
-            const bool isFullScreen; 
-            const int width;
-            const int height;
+        WindowEvent(Type theEventType,
+                int theWidth,
+                int theHeight);
+        WindowEvent(Type theEventType,
+                bool theFullScreenFlag);
+        virtual ~WindowEvent();
+        const bool isFullScreen; 
+        const int width;
+        const int height;
+
+        virtual EventPtr copy() const {
+            return EventPtr(new WindowEvent(*this));
+        }
     };
     typedef asl::Ptr<WindowEvent> WindowEventPtr;
 }

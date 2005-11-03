@@ -20,11 +20,12 @@
 #include "CGShader.h"
 
 #include <y60/NodeNames.h>
+
 using namespace std;
 using namespace asl;
 using namespace y60;
 
-#define DB(x)  //x
+#define DB(x) //x
 
 // profiling
 #ifdef PROFILING_LEVEL_NORMAL
@@ -49,7 +50,6 @@ namespace y60 {
                 PLUS_FILE_LINE); \
     } \
 } 
-
 
     CGShader::CGShader(const dom::NodePtr theNode) : GLShader(theNode)
     {
@@ -86,7 +86,7 @@ namespace y60 {
         // compile fragment shader
         if (!_myFragmentProgram) {
             DB(AC_TRACE << "CGShader::loadShader(): Loading fragment shader from file '"
-                    << _myFragmentShader._myFilename << "'" << endl;);
+                    << _myFragmentShader._myFilename << "'");
             _myFragmentProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myFragmentShader,
                     myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
             checkCgError();
@@ -95,7 +95,7 @@ namespace y60 {
         // compile vertex shader
         if (!_myVertexProgram) {
             DB(AC_TRACE << "CGShader::loadShader(): Loading vertex shader from file '"
-                    << _myVertexShader._myFilename << "'" << endl;);
+                    << _myVertexShader._myFilename << "'");
             _myVertexProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myVertexShader,
                     myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
             checkCgError();
@@ -106,6 +106,7 @@ namespace y60 {
 
     void CGShader::load(IShaderLibrary & theShaderLibrary) {
         compile(theShaderLibrary);
+ 
         // load fragment shader
         if (_myFragmentProgram) {
             _myFragmentProgram->load();

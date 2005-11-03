@@ -112,6 +112,3 @@ float4 mainFragment(vert2frag   IN,
 {
     return tex2D(decalTex, IN.texCoord0) * IN.primColor;
 }
-
-
-

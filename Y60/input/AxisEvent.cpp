@@ -18,18 +18,34 @@
 
 #include "AxisEvent.h"
 
+#include <dom/Nodes.h>
+
 namespace y60 {
 
-    AxisEvent::AxisEvent(int myDevice,
-              int myAxis,
-              int myValue)
+    AxisEvent::AxisEvent(int myDevice, int myAxis, int myValue)
         : Event (AXIS),
-          device (myDevice),
-          axis (myAxis),
-          value (myValue)
+        device (myDevice),
+        axis (myAxis),
+        value (myValue)
     {}
+
+    AxisEvent::AxisEvent(const dom::NodePtr & theNode)
+        : Event(AXIS, theNode),
+        device(theNode->getAttributeValue<int>("device")),
+        axis(theNode->getAttributeValue<int>("axis")),
+        value(theNode->getAttributeValue<int>("value"))
+    {
+    }
 
     AxisEvent::~AxisEvent() {
     }
-}
 
+    dom::NodePtr AxisEvent::asNode() const {
+        dom::NodePtr myNode = Event::asNode();
+        myNode->appendAttribute("device", device);
+        myNode->appendAttribute("axis", axis);
+        myNode->appendAttribute("value", value);
+
+        return myNode;
+    }
+}

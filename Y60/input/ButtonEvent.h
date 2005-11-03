@@ -4,14 +4,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: ButtonEvent.h,v $
-//   $Author: janbo $
-//   $Revision: 1.2 $
-//   $Date: 2004/10/18 16:22:57 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_INPUT_BUTTONEVENT_INCLUDED_
 #define _Y60_INPUT_BUTTONEVENT_INCLUDED_
@@ -21,12 +13,21 @@
 namespace y60 {
 
     struct ButtonEvent : public Event {
-        ButtonEvent(Type theEventType,
-                  int myDevice,
-                  int myButton);
+        ButtonEvent(Type theEventType, int myDevice, int myButton);
+        ButtonEvent(const dom::NodePtr & theNode);
         virtual ~ButtonEvent();
+
         const int device;
         const int button;
+
+        virtual EventPtr copy() const {
+            return EventPtr(new ButtonEvent(*this));
+        }
+
+        virtual dom::NodePtr asNode() const;
+
+    private:
+        Type getType(int theState) const;
     };
     typedef asl::Ptr<ButtonEvent> ButtonEventPtr;
 }

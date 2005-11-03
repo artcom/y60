@@ -25,16 +25,27 @@
 namespace y60 {
 
     struct KeyEvent : public Event {
-           KeyEvent(Type theEventType,
-                    unsigned char theScanCode,
-                    KeyCode theKeyCode,
-                    const char * theKeyString,
-                    unsigned int theModifiers);
-            virtual ~KeyEvent();
-            const unsigned char scanCode; 
-            const KeyCode keyCode;
-            const std::string keyString;
-            const unsigned int modifiers;
+        KeyEvent(Type theEventType,
+                unsigned char theScanCode,
+                KeyCode theKeyCode,
+                const char * theKeyString,
+                unsigned int theModifiers);
+        KeyEvent(const dom::NodePtr & theNode);
+        virtual ~KeyEvent();
+
+        const unsigned char scanCode; 
+        const KeyCode keyCode;
+        const std::string keyString;
+        const unsigned int modifiers;
+
+        virtual EventPtr copy() const {
+            return EventPtr(new KeyEvent(*this));
+        }
+
+        virtual dom::NodePtr asNode() const;
+
+    private:
+        Type getType(int theState) const;
     };
     typedef asl::Ptr<KeyEvent> KeyEventPtr;
 }

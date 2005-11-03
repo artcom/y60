@@ -26,18 +26,18 @@ using namespace std;
 namespace y60 {
 
     EventDispatcher::EventDispatcher() {
-    };
+    }
 
     EventDispatcher::~EventDispatcher() {
-    };
+    }
 
     void
     EventDispatcher::dispatch() {
-        std::priority_queue<EventPtr,vector<EventPtr>,isEventAfter> sortedEvents;
+        std::priority_queue<EventPtr,EventPtrList,isEventAfter> sortedEvents;
 
-        for (int i = 0; i<_myEventSources.size(); ++i) {
-            vector<EventPtr> curEvents = _myEventSources[i]->poll();
-            for (int j= 0; j<curEvents.size(); j++) {
+        for (unsigned i = 0; i < _myEventSources.size(); ++i) {
+            EventPtrList curEvents = _myEventSources[i]->poll();
+            for (unsigned j = 0; j < curEvents.size(); ++j) {
                 curEvents[j]->source = &(*_myEventSources[i]);
                 sortedEvents.push(curEvents[j]);
             }
@@ -46,12 +46,11 @@ namespace y60 {
         while (!sortedEvents.empty()) {
             EventPtr curEvent = sortedEvents.top();
             sortedEvents.pop();
-            for (int i = 0; i < _myEventSinks.size(); ++i) {
+            for (unsigned i = 0; i < _myEventSinks.size(); ++i) {
                 _myEventSinks[i]->handle(curEvent);
             }
-
         }
-    };
+    }
 
     void
     EventDispatcher::addSource(IEventSource * theSource) {
@@ -75,4 +74,3 @@ namespace y60 {
                     _myEventSinks.end(), theSink));
     }
 }
-

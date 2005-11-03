@@ -7,13 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//    $RCSfile: SDLWindow.cpp,v $
-//     $Author: pavel $
-//   $Revision: 1.33 $
-//       $Date: 2005/04/24 00:41:20 $
-//
-//=============================================================================
 
 #include "SDLWindow.h"
 #include "SDLTextRenderer.h"
@@ -43,6 +36,7 @@
 #include <y60/JSApp.h>
 #include <y60/GLAlloc.h>
 #include <y60/ShaderLibrary.h>
+
 
 using namespace std;
 using namespace y60;
@@ -116,8 +110,8 @@ SDLWindow::postRender() {
 }
 
 void
-SDLWindow::onResize(y60::Event & theEvent) {
-    y60::WindowEvent & myWindowEvent = dynamic_cast<y60::WindowEvent&>(theEvent);
+SDLWindow::onResize(Event & theEvent) {
+    WindowEvent & myWindowEvent = dynamic_cast<WindowEvent&>(theEvent);
     AC_DEBUG << "Window Resize Event: " << myWindowEvent.width << "x" << myWindowEvent.height;
 #ifdef WIN32
     if (!_myWinDecoFlag) {
@@ -224,26 +218,32 @@ SDLWindow::initDisplay() {
     }
     //dumpSDLGLParams();
 
-    y60::EventDispatcher::get().addSource(&_mySDLEventSource);
-#if WIN32
-#if ENABLE_DINPUT
-    y60::EventDispatcher::get().addSource(&_myDIEventSource);
+    EventDispatcher::get().addSource(&_mySDLEventSource);
+#ifdef ENABLE_DINPUT
+    AC_INFO << "DIEventSource enabled";
+    EventDispatcher::get().addSource(&_myDIEventSource);
 #endif
+
+#ifdef ENABLE_EVENTRECORDER
+    AC_INFO << "EventRecorder enabled";
+    EventDispatcher::get().addSource(&_myEventRecorder);
+    EventDispatcher::get().addSink(&_myEventRecorder);
 #endif
+
     // Uncomment this to get output on the events that pass through the event queue.
-    // y60::EventDispatcher::get().addSink(&_myEventDumper);
-    y60::EventDispatcher::get().addSink(this);
+    // EventDispatcher::get().addSink(&_myEventDumper);
+    EventDispatcher::get().addSink(this);
 
 #ifdef LINUX
     if (getenv("__GL_SYNC_TO_VBLANK") == 0) {
-        AC_WARNING << "__GL_SYNC_TO_VBLANK not set." << endl;
+        AC_WARNING << "__GL_SYNC_TO_VBLANK not set.";
     }
 #endif
 
-    AC_INFO << "GL Version  : " << glGetString(GL_VERSION)<< endl;
-    AC_INFO << "   Vendor   : " << glGetString(GL_VENDOR)<< endl;
-    AC_INFO << "   Renderer : " << glGetString(GL_RENDERER)<< endl;
-    AC_DEBUG << "   Extensions : " << glGetString(GL_EXTENSIONS)<< endl;
+    AC_INFO  << "GL Version  : " << glGetString(GL_VERSION);
+    AC_INFO  << "   Vendor   : " << glGetString(GL_VENDOR);
+    AC_INFO  << "   Renderer : " << glGetString(GL_RENDERER);
+    AC_DEBUG << "   Extensions : " << glGetString(GL_EXTENSIONS);
 
     // retrieve standard cursor
     _myStandardCursor =  SDL_GetCursor();
@@ -518,10 +518,10 @@ SDLWindow::setAutoPause(bool theAutoPauseFlag) {
 }
 
 void
-SDLWindow::handle(y60::EventPtr theEvent) {
+SDLWindow::handle(EventPtr theEvent) {
     MAKE_SCOPE_TIMER(handleEvents);
     switch (theEvent->type) {
-        case y60::Event::QUIT:
+        case Event::QUIT:
             _myAppQuitFlag = true;
             break;
         default:
@@ -530,12 +530,12 @@ SDLWindow::handle(y60::EventPtr theEvent) {
 }
 
 void
-SDLWindow::onKey(y60::Event & theEvent) {
-    y60::KeyEvent & myKeyEvent = dynamic_cast<y60::KeyEvent&>(theEvent);
+SDLWindow::onKey(Event & theEvent) {
+    KeyEvent & myKeyEvent = dynamic_cast<KeyEvent&>(theEvent);
 
     // Hardcoded key event hanlder
-    if ((myKeyEvent.keyString == "q" && myKeyEvent.modifiers & y60::KEYMOD_CTRL) ||
-        (myKeyEvent.keyString == "f4" && myKeyEvent.modifiers & y60::KEYMOD_ALT)) {
+    if ((myKeyEvent.keyString == "q" && myKeyEvent.modifiers & KEYMOD_CTRL) ||
+        (myKeyEvent.keyString == "f4" && myKeyEvent.modifiers & KEYMOD_ALT)) {
         _myAppQuitFlag = true;
     }
 
@@ -565,7 +565,7 @@ SDLWindow::mainLoop() {
         onFrame();
 
         START_TIMER(dispatchEvents);
-         y60::EventDispatcher::get().dispatch();
+        EventDispatcher::get().dispatch();
         STOP_TIMER(dispatchEvents);
 
         START_TIMER(handleRequests);
@@ -639,6 +639,18 @@ bool SDLWindow::getGlyphMetrics(const std::string & theFontName, const std::stri
 double SDLWindow::getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter)
 {
     return _myRenderer->getTextManager().getKerning(theFontName, theFirstCharacter, theSecondCharacter);
+}
+
+void SDLWindow::setEventRecorderMode(EventRecorder::Mode theMode) {
+    _myEventRecorder.setMode(theMode);
+}
+
+void SDLWindow::loadEvents(const std::string & theFilename) {
+    _myEventRecorder.load(theFilename);
+}
+
+void SDLWindow::saveEvents(const std::string & theFilename) {
+    _myEventRecorder.save(theFilename);
 }
 
 void SDLWindow::draw(const asl::LineSegment<float> & theLine,

@@ -7,22 +7,13 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: DIEventSource.h,v $
-//   $Author: janbo $
-//   $Revision: 1.4 $
-//   $Date: 2004/10/22 10:48:01 $
-//
-//
-//=============================================================================
+
 #ifndef _Y60_INPUT_DIEVENTSOURCE_INCLUDED_
 #define _Y60_INPUT_DIEVENTSOURCE_INCLUDED_
 
-#ifdef WIN32
-#include "Event.h"
-#include "IEventSource.h"
-
 #include <asl/Ptr.h>
+#include <y60/Event.h>
+#include <y60/IEventSource.h>
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -60,5 +51,4 @@ namespace y60 {
 
     };
 }
-#endif
 #endif

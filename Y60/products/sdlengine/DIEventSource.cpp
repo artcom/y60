@@ -17,8 +17,10 @@
 //=============================================================================
 
 #include "DIEventSource.h"
-#include "AxisEvent.h"
-#include "ButtonEvent.h"
+
+#include <asl/Logger.h>
+#include <y60/AxisEvent.h>
+#include <y60/ButtonEvent.h>
 
 #include <iostream>
 
@@ -26,7 +28,7 @@
 
 using namespace std;
 
-#define DB(x) // x;
+#define DB(x) // x
 
 namespace y60 {
 
@@ -55,7 +57,7 @@ namespace y60 {
         hr = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION,
                                 IID_IDirectInput8, (void**)&_myDI, NULL );
         if (FAILED(hr)) {
-            cerr << "DIEventSource warning: DirectInput8Create() failed. Joysticks will not be available." << endl;
+            AC_WARNING << "DirectInput8Create() failed. Joysticks will not be available.";
             _myDI = 0;
             return;
         }
@@ -64,14 +66,14 @@ namespace y60 {
                                 EnumJoysticksCallback,
                                 this, DIEDFL_ATTACHEDONLY);  // DIEFL_ALLDEVICES?
         if (FAILED(hr)) {
-            cerr << "DIEventSource - DirectInput8::EnumDevices() failed. Joysticks will not be available." << endl;
+            AC_ERROR << "DirectInput8::EnumDevices() failed. Joysticks will not be available.";
             _myDI = 0;
             return;
         }
 
         // Make sure we got a joystick
         if(_myJoysticks.size() == 0) {
-            DB(cerr << "### WARNING: DIEventSource - No joysticks found." << endl;)
+            AC_WARNING << "### WARNING: DIEventSource - No joysticks found.";
             return;
         }
 
@@ -95,7 +97,7 @@ namespace y60 {
 
             hr = curJoystick->SetDataFormat(&c_dfDIJoystick2);
             if (FAILED(hr)) {
-                cerr << "### WARNING: DIEventSource - SetDataFormat() failed." << endl;
+                AC_ERROR << "SetDataFormat() failed.";
                 continue;
             }
 
@@ -103,13 +105,13 @@ namespace y60 {
 
             hr = curJoystick->SetCooperativeLevel(mainHWND, DISCL_EXCLUSIVE | DISCL_FOREGROUND );
             if (FAILED(hr)) {
-                cerr << "### WARNING: DIEventSource - SetCooperativeLevel() failed." << endl;
+                AC_ERROR << "SetCooperativeLevel() failed.";
                 continue;
             }
 
             hr = curJoystick->Acquire();
             if (FAILED(hr)) {
-                cerr << "### WARNING: DIEventSource - Acquire() failed." << endl;
+                AC_ERROR << "Acquire() failed.";
                 continue;
             }
         }
@@ -122,18 +124,18 @@ namespace y60 {
 
         hr = _myDI->CreateDevice( pdidInstance->guidInstance, &curJoystick, NULL );
         if (FAILED(hr)) {
-            cerr << "DIEventSource warning: joystick " << pdidInstance->tszInstanceName
+            AC_WARNING << "Joystick " << pdidInstance->tszInstanceName
                 << ", " << pdidInstance->tszProductName
-                << " found but CreateDevice failed. Ignoring." << endl;
+                << " found but CreateDevice failed. Ignoring.";
         } else {
             _myJoysticks.push_back(curJoystick);
-            cerr << "DIEventSource: added ";
+            AC_INFO << "Added ";
             if (!strcmp(pdidInstance->tszInstanceName, "?")) {
-                cerr << "Joystick " << _myJoysticks.size()-1;
+                AC_INFO << "Joystick " << _myJoysticks.size()-1;
             } else {
-                cerr << (char*)(pdidInstance->tszInstanceName);
+                AC_INFO << (char*)(pdidInstance->tszInstanceName);
             }
-            cerr << " as input source." << endl;
+            AC_INFO << " as input source.";
         }
     }
 
@@ -143,8 +145,7 @@ namespace y60 {
         SDL_VERSION(&myInfo.version);
         int rc = SDL_GetWMInfo(&myInfo);
         if (!rc) {
-            cerr << "DIEventSource warning: failed to locate main application window. "
-                << "Disabling DirectInput." << endl;
+            AC_WARNING << "Failed to locate main application window. Disabling DirectInput.";
             // TODO: release interface.
             _myDI = 0;
         }
@@ -177,12 +178,12 @@ namespace y60 {
                 hr = curJoystick->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), myBufferedJEvent, &myNumberOfInputs, 0);
 
                 if (SUCCEEDED(hr)) {
-                    DB(cerr << "DIEventSource::poll() - Number of inputs read: " << myNumberOfInputs << endl;)
+                    AC_DEBUG << "DIEventSource::poll() - Number of inputs read: " << myNumberOfInputs;
                     if (hr == DI_BUFFEROVERFLOW) {
-                        DB(cerr << "DIEventSource::poll() - WARNING: Buffer overflow" << endl;)
+                        AC_WARNING << "Buffer overflow";
                     }
                 } else {
-                    cerr << "### WARNING: DDIEventSource::poll() - GetDeviceState() failed." << endl;
+                    AC_WARNING << "GetDeviceState() failed.";
                     continue;
                 }
 
@@ -237,31 +238,31 @@ namespace y60 {
 
     void
     DIEventSource::printErrorState(const string & theCall, HRESULT hr) {
-        cerr << "### WARNING: DIEventSource - " << theCall << " failed, reason:" << endl;
+        AC_ERROR << theCall << " failed, reason:";
         switch (hr) {
             case DIERR_INPUTLOST:
-                cerr << "Access to the input device has been lost. It must be reacquired." << endl;
+                AC_ERROR << "Access to the input device has been lost. It must be reacquired.";
                 break;
             case DIERR_INVALIDPARAM:
-                cerr << "An invalid parameter was passed to the returning function, " << endl;
-                cerr << "or the object was not in a state that permitted the function to be called. " << endl;
-                cerr << "This value is equal to the E_INVALIDARG standard Component Object Model (COM) return value." << endl;
+                AC_ERROR << "An invalid parameter was passed to the returning function, ";
+                AC_ERROR << "or the object was not in a state that permitted the function to be called. ";
+                AC_ERROR << "This value is equal to the E_INVALIDARG standard Component Object Model (COM) return value.";
                 break;
             case DIERR_NOTACQUIRED:
-                cerr << "The operation cannot be performed unless the device is acquired." << endl;
+                AC_ERROR << "The operation cannot be performed unless the device is acquired.";
                 break;
             case DIERR_NOTBUFFERED:
-                cerr << "The device is not buffered. Set the DIPROP_BUFFERSIZE property to enable buffering." << endl;
+                AC_ERROR << "The device is not buffered. Set the DIPROP_BUFFERSIZE property to enable buffering.";
                 break;
             case DIERR_NOTINITIALIZED:
-                cerr << "The object has not been initialized." << endl;
+                AC_ERROR << "The object has not been initialized.";
                 break;
             case DIERR_OBJECTNOTFOUND:
-                cerr << "The requested object does not exist." << endl;
+                AC_ERROR << "The requested object does not exist.";
                 break;
             case DIERR_UNSUPPORTED:
-                cerr << "The function called is not supported at this time." << endl;
-                cerr << "This value is equal to the E_NOTIMPL standard COM return value." << endl;
+                AC_ERROR << "The function called is not supported at this time.";
+                AC_ERROR << "This value is equal to the E_NOTIMPL standard COM return value.";
                 break;
         }
     }

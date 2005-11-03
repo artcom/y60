@@ -24,10 +24,18 @@ namespace y60 {
         AxisEvent(int myDevice,
                   int myAxis,
                   int myValue);
+        AxisEvent(const dom::NodePtr & theNode);
         virtual ~AxisEvent();
+
         const int device;
         const int axis;
         const int value;   //Range: -32767 to 32767
+
+        virtual EventPtr copy() const {
+            return EventPtr(new AxisEvent(*this));
+        }
+
+        virtual dom::NodePtr asNode() const;
     };
     typedef asl::Ptr<AxisEvent> AxisEventPtr;
 }

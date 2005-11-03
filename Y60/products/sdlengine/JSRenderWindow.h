@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: JSRenderWindow.h,v $
-//   $Author: martin $
-//   $Revision: 1.1 $
-//   $Date: 2004/11/07 04:50:20 $
-//
-//
 //=============================================================================
 
 #ifndef _Y60_ACXPSHELL_JSRENDERER_INCLUDED_
@@ -36,10 +28,10 @@
 
 DEFINE_EXCEPTION(JSRendererWindowException, asl::Exception);
 
-class JSRenderWindow : public jslib::JSWrapper<SDLWindow,asl::Ptr<SDLWindow>, jslib::StaticAccessProtocol> {
+class JSRenderWindow : public jslib::JSWrapper<y60::SDLWindow,asl::Ptr<y60::SDLWindow>, jslib::StaticAccessProtocol> {
 public:
-    typedef SDLWindow NATIVE;
-    typedef asl::Ptr<SDLWindow> OWNERPTR;
+    typedef y60::SDLWindow NATIVE;
+    typedef asl::Ptr<y60::SDLWindow> OWNERPTR;
     typedef jslib::JSWrapper<NATIVE,OWNERPTR,jslib::StaticAccessProtocol> Base;
     typedef jslib::JSAbstractRenderWindow<NATIVE> JSBase;
 
@@ -64,10 +56,10 @@ public:
     Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
     static
-    JSObject * Construct(JSContext *cx, asl::Ptr<SDLWindow> theOwner, SDLWindow * theRenderer) {
+    JSObject * Construct(JSContext *cx, asl::Ptr<y60::SDLWindow> theOwner, y60::SDLWindow * theRenderer) {
         return Base::Construct(cx, theOwner, theRenderer);
     }
-    JSRenderWindow(asl::Ptr<SDLWindow> theOwner, SDLWindow * theRenderer)
+    JSRenderWindow(asl::Ptr<y60::SDLWindow> theOwner, y60::SDLWindow * theRenderer)
         : Base(theOwner, theRenderer)
     {}
 
@@ -83,22 +75,20 @@ public:
 };
 
 namespace jslib {
-    
 
 template <>
-struct JSClassTraits<SDLWindow> : public JSClassTraitsWrapper<SDLWindow, JSRenderWindow> {
+struct JSClassTraits<y60::SDLWindow> : public JSClassTraitsWrapper<y60::SDLWindow, JSRenderWindow> {
     static JSClass * Class() {
         return JSRenderWindow::Base::Class();
     }
 };
 
-bool convertFrom(JSContext *cx, jsval theValue, SDLWindow *& theRenderWindow);
+bool convertFrom(JSContext *cx, jsval theValue, y60::SDLWindow *& theRenderWindow);
 bool convertFrom(JSContext *cx, jsval theValue, jslib::AbstractRenderWindow *& theRenderWindow);
 
-jsval as_jsval(JSContext *cx, const SDLWindow & theValue);
-// jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, SDLWindow * theRenderer);
+jsval as_jsval(JSContext *cx, const y60::SDLWindow & theValue);
+// jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, y60::SDLWindow * theRenderer);
 
 }
 
 #endif
-

@@ -36,7 +36,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return _myReleaseMode;
     }
     self.getProfileMode = function() {
-        return _myProfileMode;
+        return (_myProfileNode != null);
     }
 
     self.getShaderLibrary = function() {
@@ -290,12 +290,48 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     self.onExit = function() {
-        if (_myProfileMode) {
-            Logger.warning("Profiling: model='" + self.getModelName() + " FPS.max=" + _myProfileMaxFPS);
-            var myProfileInfo = "<profile model='" + self.getModelName() + "' date='" + Date() + "'>\n";
-            myProfileInfo += "<fps max='" + _myProfileMaxFPS + "'/>\n";
-            myProfileInfo += "</profile>\n";
-            putWholeFile(_myProfileFilename, myProfileInfo);
+        if (_myProfileNode) {
+            //print("Profiling: current run FPS=" + _myProfileNode.current);
+            _myProfileNode.name = self.getModelName();
+            _myProfileNode.revision = revision();
+
+            // get or create profiles node
+            var myProfilesNode = null;
+            if (fileExists(_myProfileFilename)) {
+                //print("Profiling: found " + _myProfileFilename);
+                var myContent = getWholeFile(_myProfileFilename);
+                if (myContent) {
+                    myProfilesNode = new Node(myContent);
+                    if (myProfilesNode) {
+                        myProfilesNode = myProfilesNode.firstChild;
+                        //print("Profiling: existing " + myProfilesNode);
+                    } else {
+                        Logger.error("Unable to parse '" + _myProfileName + "'");
+                    }
+                } else {
+                    Logger.error("Unable to open '" + _myProfileName + "'");
+                }
+            } 
+            if (!myProfilesNode) {
+                myProfilesNode = new Node("<profiles/>").firstChild;
+            }
+
+            // find matching profile node
+            var myNode = getDescendantByName(myProfilesNode, _myProfileNode.name);
+            if (myNode) {
+                //print("Profiling: previous run FPS=" + myNode.current);
+                _myProfileNode.previous = myNode.current;
+                myProfilesNode.removeChild(myNode);
+            }
+            if (_myProfileNode.previous > 0.0) {
+                _myProfileNode.gain = 1.0 - (_myProfileNode.previous / _myProfileNode.current);
+            } else {
+                _myProfileNode.gain = 0.0;
+            }
+            myProfilesNode.appendChild(_myProfileNode);
+
+            // save
+            putWholeFile(_myProfileFilename, myProfilesNode);
         }
     }
 
@@ -333,9 +369,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.onFrame = function(theTime) {
-        if (_myProfileMode) {
-            if (_myRenderWindow.fps > _myProfileMaxFPS) {
-                _myProfileMaxFPS = _myRenderWindow.fps;
+        if (_myProfileNode) {
+            if (_myRenderWindow.fps > _myProfileNode.current) {
+                _myProfileNode.current = _myRenderWindow.fps;
                 _myProfileTime = theTime;
             } else if ((theTime - _myProfileTime) > PROFILE_TIME) {
                 // MaxFPS unchanged for PROFILE_TIME, done
@@ -411,9 +447,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     const PROFILE_FILENAME = "profile.xml";
     const PROFILE_TIME     = 5.0; // fps must not rise for this time
-    var _myProfileMode     = false;
     var _myProfileFilename = null;
-    var _myProfileMaxFPS   = 0.0;
+    var _myProfileNode     = null;
     var _myProfileTime     = 0.0; // time of MaxFPS sample
 
     // Camera movers
@@ -480,11 +515,11 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             _myReleaseMode = false;
         }
         if ("profile" in myArgumentMap) {
-            _myProfileMode = true;
             _myProfileFilename = myArgumentMap["profile"];
             if (_myProfileFilename == null) {
                 _myProfileFilename = PROFILE_FILENAME;
             }
+            _myProfileNode = new Node("<profile revision='0' name='' current='0' previous='0' gain='0'/>").firstChild;
             Logger.warning("Profiling enabled, filename=" + _myProfileFilename);
         }
 
@@ -496,13 +531,13 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (theScene) {
             // Cache main scene nodes for fast access
             var myWorlds    = getDescendantByTagName(theScene.dom, "worlds", false);
-            _myWorld        = theScene.world; //getDescendantByTagName(myWorlds,     "world", false);
-            _myMaterials    = theScene.materials; //getDescendantByTagName(theScene.dom, "materials", false);
-            _myLightSources = theScene.lightsources; //getDescendantByTagName(theScene.dom, "lightsources", false);
-            _myAnimations   = theScene.animations; //getDescendantByTagName(theScene.dom, "animations", false);
-            _myCharacters   = theScene.characters; //getDescendantByTagName(theScene.dom, "characters", false);
-            _myShapes       = theScene.shapes; //getDescendantByTagName(theScene.dom, "shapes", false);
-            _myImages       = theScene.images; //getDescendantByTagName(theScene.dom, "images", false);
+            _myWorld        = theScene.world;
+            _myMaterials    = theScene.materials;
+            _myLightSources = theScene.lightsources;
+            _myAnimations   = theScene.animations;
+            _myCharacters   = theScene.characters;
+            _myShapes       = theScene.shapes;
+            _myImages       = theScene.images;
 
             if (!_myWorld || !_myMaterials || !_myLightSources || !_myCharacters || !_myAnimations || !_myShapes) {
                 throw new Exception("Could not find world, materials, lightsources or shapes node", fileline());

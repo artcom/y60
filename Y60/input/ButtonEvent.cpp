@@ -18,6 +18,8 @@
 
 #include "ButtonEvent.h"
 
+#include <dom/Nodes.h>
+
 namespace y60 {
 
     ButtonEvent::ButtonEvent(Type theEventType,
@@ -28,7 +30,27 @@ namespace y60 {
           button (myButton)
     {}
 
+    ButtonEvent::ButtonEvent(const dom::NodePtr & theNode)
+        : Event(getType(theNode->getAttributeValue<int>("state")), theNode),
+        device(theNode->getAttributeValue<int>("device", 0)),
+        button(theNode->getAttributeValue<int>("button", 0))
+    {
+    }
+
     ButtonEvent::~ButtonEvent() {
+    }
+
+    dom::NodePtr ButtonEvent::asNode() const {
+        dom::NodePtr myNode = Event::asNode();
+        myNode->appendAttribute("device", device);
+        myNode->appendAttribute("button", button);
+        myNode->appendAttribute("state", (type == BUTTON_DOWN ? 1 : 0));
+
+        return myNode;
+    }
+
+    Event::Type ButtonEvent::getType(int theState) const {
+        return (theState ? BUTTON_DOWN : BUTTON_UP);
     }
 }
 

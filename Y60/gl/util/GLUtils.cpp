@@ -119,7 +119,7 @@ namespace y60 {
         while (p < end) {
             int n = strcspn(p, " ");
             if ((extNameLen == n) && (strncmp(extName, p, n) == 0)) {
-                AC_INFO << "Extension " << extName << " is supported";
+                AC_DEBUG << "Extension " << extName << " is supported";
                 return true;
             }
             p += (n + 1);

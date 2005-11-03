@@ -284,21 +284,20 @@ namespace y60 {
             assertCg("CgProgramInfo::processParameters() - 2");
         }
         assertCg("CgProgramInfo::processParameters()");
-        AC_DEBUG << "DONE processParameters";
     }
 
     void
     CgProgramInfo::enableProfile() {
         cgGLEnableProfile(asCgProfile(_myShader));
         assertCg("CgProgramInfo::enableProfile()");
-        AC_TRACE << "enabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
+        //AC_TRACE << "enabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
     }
 
     void
     CgProgramInfo::disableProfile() {
         cgGLDisableProfile(asCgProfile(_myShader));
-        assertCg("CgProgramInfo::disbaleProfile()");
-        AC_TRACE << "disabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
+        assertCg("CgProgramInfo::disableProfile()");
+        //AC_TRACE << "disabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
     }
 
     void CgProgramInfo::setCGGLParameters() {
@@ -743,7 +742,7 @@ namespace y60 {
         int mySize = cgGetArraySize(theParam._myParameter, 0);
         for(int i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
-            AC_DEBUG << "setting component " << i << " to " << theValue[i];
+            //AC_DEBUG << "setting component " << i << " to " << theValue[i];
             cgSetParameter3f(myElement, theValue[i][0], theValue[i][1], theValue[i][2]);
         }
         assertCg(string("setting auto parameter ") + theParam._myName);
@@ -756,7 +755,7 @@ namespace y60 {
         int mySize = cgGetArraySize(theParam._myParameter, 0);
         for(unsigned i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
-            AC_DEBUG << "setting component " << i << " to " << theValue[i];
+            //AC_DEBUG << "setting component " << i << " to " << theValue[i];
             cgSetParameter4f(myElement, theValue[i][0], theValue[i][1], theValue[i][2], theValue[i][3]);
         }
         assertCg(string("setting auto parameter ") + theParam._myName);

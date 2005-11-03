@@ -26,17 +26,19 @@ namespace y60 {
         TouchEvent(const std::string & theDevice,
                    const asl::Vector2f & thePosition,
                    const asl::Vector2i & theSize,
-                   float theIntensity) :
-            Event(Event::TOUCH),
-            device(theDevice),
-            position(thePosition),
-            size(theSize),
-            intensity(theIntensity)
-        {}
+                   float theIntensity);
+        TouchEvent(const dom::NodePtr & theNode);
+
         const std::string device;
         const asl::Vector2f position;
         const asl::Vector2i size;
         float intensity;
+
+        virtual EventPtr copy() const {
+            return EventPtr(new TouchEvent(*this));
+        }
+
+        virtual dom::NodePtr asNode() const;
     };
     typedef asl::Ptr<TouchEvent> TouchEventPtr;
 }
