@@ -248,17 +248,30 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_BEGIN("Renders a text onto the screen");
             DOC_PARAM("thePosition in Pixel", "", DOC_TYPE_VECTOR2F);
             DOC_PARAM("theTextString", "", DOC_TYPE_STRING);
-            DOC_PARAM("theFontName", "", DOC_TYPE_STRING);
+            DOC_PARAM_OPT("theFontName", "An OpenGL compiled font name", DOC_TYPE_STRING, "Screen15");
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::renderText,cx,obj,argc,argv,rval);
+
+            if (argc == 2) {
+                typedef void (NATIVE::*MyMethod)(const asl::Vector2f &, const std::string &);
+                return Method<NATIVE>::call((MyMethod)&NATIVE::renderText,cx,obj,argc,argv,rval);
+            } else {// argc == 3
+                typedef void (NATIVE::*MyMethod)(const asl::Vector2f &, const std::string &, const std::string &);
+                return Method<NATIVE>::call((MyMethod)&NATIVE::renderText,cx,obj,argc,argv,rval);
+            }
         }
         static JSBool
         setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Sets the text foreground and background color");
             DOC_PARAM("theTextColor", "", DOC_TYPE_VECTOR4F);
-            DOC_PARAM("theBackGroundColor", "", DOC_TYPE_VECTOR4F);
+            DOC_PARAM_OPT("theBackGroundColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setTextColor,cx,obj,argc,argv,rval);
+            if (argc == 1) {
+                typedef void (NATIVE::*MyMethod)(const asl::Vector4f &);
+                return Method<NATIVE>::call((MyMethod)&NATIVE::setTextColor,cx,obj,argc,argv,rval);
+            } else { // argc == 2
+                typedef void (NATIVE::*MyMethod)(const asl::Vector4f &, const asl::Vector4f &);
+                return Method<NATIVE>::call((MyMethod)&NATIVE::setTextColor,cx,obj,argc,argv,rval);
+            }
         }
         static JSBool
         renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

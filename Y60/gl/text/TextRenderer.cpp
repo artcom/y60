@@ -39,7 +39,7 @@ namespace y60 {
 
     TextRenderer::TextRenderer() :
         _myLineHeight(0),
-        _myCurrentTextColor(Vector4f(0.0, 0.0, 0.0, 1.0)),
+        _myCurrentTextColor(Vector4f(1.0, 1.0, 1.0, 1.0)),
         _myCurrentBackColor(Vector4f(1.0, 1.0, 1.0, 1.0)),
         _myHorizontalAlignment(LEFT_ALIGNMENT),
         _myVerticalAlignment(TOP_ALIGNMENT),
