@@ -197,19 +197,19 @@ namespace dom {
         */
         enum NodeType {
             X_NO_NODE = 0,
-                ELEMENT_NODE = 1,
-                ATTRIBUTE_NODE = 2,
-                TEXT_NODE = 3,
-                CDATA_SECTION_NODE = 4,
-                ENTITY_REFERENCE_NODE = 5,
-                ENTITY_NODE = 6,
-                PROCESSING_INSTRUCTION_NODE = 7,
-                COMMENT_NODE = 8,
-                DOCUMENT_NODE = 9,
-                DOCUMENT_TYPE_NODE = 10,
-                DOCUMENT_FRAGMENT_NODE = 11,
-                NOTATION_NODE = 12,
-                X_END_NODE = 15
+            ELEMENT_NODE = 1,
+            ATTRIBUTE_NODE = 2,
+            TEXT_NODE = 3,
+            CDATA_SECTION_NODE = 4,
+            ENTITY_REFERENCE_NODE = 5,
+            ENTITY_NODE = 6,
+            PROCESSING_INSTRUCTION_NODE = 7,
+            COMMENT_NODE = 8,
+            DOCUMENT_NODE = 9,
+            DOCUMENT_TYPE_NODE = 10,
+            DOCUMENT_FRAGMENT_NODE = 11,
+            NOTATION_NODE = 12,
+            X_END_NODE = 15
         };
 
         DEFINE_NESTED_EXCEPTION(Node,Exception,asl::Exception);
@@ -890,7 +890,10 @@ namespace dom {
             return NodePtr(0);
         }
 
-        /// returns a typed value of the attribute node value with this name
+        /**
+         * returns a typed value of the attribute node value with this name
+         * throws an exception if the attribute is not present.
+         */
         template <class T>
         T getAttributeValue(const DOMString & name) const {
             const NodePtr myAttribute = getAttribute(name);
@@ -898,6 +901,20 @@ namespace dom {
                 return myAttribute->nodeValueAs<T>();
             } else {
                 throw DomException(std::string("Attribute '") + name + "' not found.", PLUS_FILE_LINE, DomException::NOT_FOUND_ERR);
+            }
+        }
+
+        /**
+         * returns a typed value of the attribute node value with this name
+         * returns the given default value if the attribute is not present.
+         */
+        template <class T>
+        T getAttributeValue(const DOMString & name, const T & theDefault) const {
+            const NodePtr myAttribute = getAttribute(name);
+            if (myAttribute) {
+                return myAttribute->nodeValueAs<T>();
+            } else {
+                return theDefault;
             }
         }
 

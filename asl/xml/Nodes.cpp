@@ -1954,20 +1954,20 @@ dom::Node::appendAttribute(NodePtr theNewAttribute) {
                 PLUS_FILE_LINE,DomException::INUSE_ATTRIBUTE_ERR);
     }
     if (_myType != ELEMENT_NODE) {
-        throw DomException(string("Can't append attribute name " +
+        throw DomException(string("Can't append attribute name '" +
                     theNewAttribute->nodeName() +
-                    " to node type ") +
+                    "' to node type ") +
                 NodeTypeName[nodeType()]+
                 ", name = " + nodeName(),
                 PLUS_FILE_LINE,DomException::HIERARCHY_REQUEST_ERR);
     }
     if (theNewAttribute->nodeType()!=ATTRIBUTE_NODE) {
-        throw DomException(string("Can't append node of type") +
+        throw DomException(string("Can't append node of type '") +
                 NodeTypeName[theNewAttribute->nodeType()] +
-                ", name = " + theNewAttribute->nodeName() +
-                " as attribute to node type " +
+                "', name='" + theNewAttribute->nodeName() +
+                "' as attribute to node type '" +
                 NodeTypeName[nodeType()]+
-                ", name = " + nodeName(),
+                "', name='" + nodeName() + "'",
                 PLUS_FILE_LINE,DomException::HIERARCHY_REQUEST_ERR);
     }
     checkAndUpdateAttributeSchemaInfo(*theNewAttribute, this);
