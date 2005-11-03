@@ -572,17 +572,13 @@ namespace jslib {
             y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
             jsval argv[4], rval;
             argv[0] = as_jsval(_myJSContext, myMouseEvent.button);
-            if (myMouseEvent.type == y60::Event::MOUSE_BUTTON_UP) {
-                argv[1] = as_jsval(_myJSContext, 0);
-            } else {
-                argv[1] = as_jsval(_myJSContext, 1);
-            }
+            argv[1] = as_jsval(_myJSContext, myMouseEvent.type == y60::Event::MOUSE_BUTTON_DOWN);
             if (getOrientation() == PORTRAIT_ORIENTATION) {
-                argv[2] = as_jsval(_myJSContext, myMouseEvent.yPosition);
-                argv[3] = as_jsval(_myJSContext, getWidth() - myMouseEvent.xPosition);
+                argv[2] = as_jsval(_myJSContext, myMouseEvent.position[1]);
+                argv[3] = as_jsval(_myJSContext, getWidth() - myMouseEvent.position[0]);
             } else {
-                argv[2] = as_jsval(_myJSContext, myMouseEvent.xPosition);
-                argv[3] = as_jsval(_myJSContext, myMouseEvent.yPosition);
+                argv[2] = as_jsval(_myJSContext, myMouseEvent.position[0]);
+                argv[3] = as_jsval(_myJSContext, myMouseEvent.position[1]);
             }
 
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseButton", 4, argv, &rval);
@@ -595,11 +591,11 @@ namespace jslib {
             y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
             jsval argv[2], rval;
             if (getOrientation() == PORTRAIT_ORIENTATION) {
-                argv[0] = as_jsval(_myJSContext, myMouseEvent.yPosition);
-                argv[1] = as_jsval(_myJSContext, getWidth() - myMouseEvent.xPosition);
+                argv[0] = as_jsval(_myJSContext, myMouseEvent.position[1]);
+                argv[1] = as_jsval(_myJSContext, getWidth() - myMouseEvent.position[0]);
             } else {
-                argv[0] = as_jsval(_myJSContext, myMouseEvent.xPosition);
-                argv[1] = as_jsval(_myJSContext, myMouseEvent.yPosition);
+                argv[0] = as_jsval(_myJSContext, myMouseEvent.position[0]);
+                argv[1] = as_jsval(_myJSContext, myMouseEvent.position[1]);
             }
 
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseMotion", 2, argv, &rval);
@@ -612,8 +608,8 @@ namespace jslib {
             y60::MouseEvent & myMouseEvent = dynamic_cast<y60::MouseEvent&>(theEvent);
             jsval argv[2], rval;
 
-            argv[0] = as_jsval(_myJSContext, myMouseEvent.xDelta);
-            argv[1] = as_jsval(_myJSContext, myMouseEvent.yDelta);
+            argv[0] = as_jsval(_myJSContext, myMouseEvent.delta[0]);
+            argv[1] = as_jsval(_myJSContext, myMouseEvent.delta[1]);
 
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onMouseWheel", 2, argv, &rval);
         }
