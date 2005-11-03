@@ -114,7 +114,7 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
             }
             renderer = window.getRenderer();
             //myTimer.add("setup load scene");
-            //window.saveScene("loaded_scene.x60", false);
+            //window.scene.save("loaded_scene.x60", false);
 
             //window.setViewport(_myRenderArea[0], _myRenderArea[1], _myRenderArea[2], _myRenderArea[3]);
             self.setActiveCamera(0);
@@ -161,7 +161,7 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
                     cycleBoundingVolumeMode();
                     break;
                 case 'B':
-                    window.saveScene("saved_scene.b60", true);
+                    window.scene.save("saved_scene.b60", true);
                     break;
                 case 'p':
                     window.pause = !window.pause;
@@ -179,7 +179,7 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
                     _myTimer.print();
                     break;
                 case 'S':
-                    window.saveScene("saved_scene.x60", false);
+                    window.scene.save("saved_scene.x60", false);
                     break;
                 case 'f':
                     window.fullscreen = !window.fullscreen;
