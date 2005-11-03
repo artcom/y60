@@ -38,12 +38,32 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+
+// from Gtk::Editable 
+static JSBool
+select_region(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    Gtk::Entry * myNative(0);
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+    int myStartPos;
+    convertFrom(cx, argv[0], myStartPos);
+
+    int myEndPos;
+    convertFrom(cx, argv[1], myEndPos);
+
+    myNative->select_region(myStartPos, myEndPos);
+    return JS_TRUE;
+}
+
 JSFunctionSpec *
 JSEntry::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"select_region",        select_region,           2},
         {0}
     };
     return myFunctions;

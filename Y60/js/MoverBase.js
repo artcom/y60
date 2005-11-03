@@ -118,19 +118,28 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         return _myDoubleLeftButtonFlag;
     }
 
-    obj.update = function(theWorldTranslation, theWorldHeading) {
+    obj.rotateWithObject = function(theVector) {
+        var myWorldTranslation = new Vector4f(0,0,0,0);
+
+        var myGlobalMatrix = _myMoverObject.globalmatrix;
+        myWorldTranslation.add(product(myGlobalMatrix.getRow(0), theVector.x));
+        myWorldTranslation.add(product(myGlobalMatrix.getRow(1), theVector.y));
+        myWorldTranslation.add(product(myGlobalMatrix.getRow(2), theVector.z));
+        return myWorldTranslation;
+    }
+
+    obj.update = function(theScreenTranslation, theWorldHeading) {
         //Scene.updateGlobalMatrix(_myMoverObject);
         var myGlobalMatrix = new Matrix4f(_myMoverObject.globalmatrix);
-        var myTranslation  = myGlobalMatrix.getRow(3);
+        var myWorldPosition  = myGlobalMatrix.getRow(3);
 
         // Move the camera
-        myTranslation.add(product(myGlobalMatrix.getRow(0), theWorldTranslation.x));
-        myTranslation.add(product(myGlobalMatrix.getRow(1), theWorldTranslation.y));
-        myTranslation.add(product(myGlobalMatrix.getRow(2), theWorldTranslation.z));
+        var myWorldTranslation = obj.rotateWithObject(theScreenTranslation);
+        myWorldPosition.add(myWorldTranslation);
 
         // Rotate about the world up vector
         myGlobalMatrix.rotateY(theWorldHeading);
-        myGlobalMatrix.setRow(3, myTranslation);
+        myGlobalMatrix.setRow(3, myWorldPosition);
 
         var myParentMatrix = new Matrix4f(_myMoverObject.parentNode.globalmatrix);
         myParentMatrix.invert();
