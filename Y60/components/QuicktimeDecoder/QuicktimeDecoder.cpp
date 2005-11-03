@@ -135,6 +135,15 @@ namespace y60 {
         myMovie->set<ImageWidthTag>(movieBounds.right);
         myMovie->set<ImageHeightTag>(movieBounds.bottom);
 
+        // Setup video size and image matrix
+        float myXResize = float(movieBounds.right) / asl::nextPowerOfTwo(movieBounds.right);
+        float myYResize = float(movieBounds.bottom) / asl::nextPowerOfTwo(movieBounds.bottom);
+
+        asl::Matrix4f myMatrix;
+        myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
+        myMovie->set<ImageMatrixTag>(myMatrix);
+
+
         double myDurationInSeconds = float(GetMovieDuration(_myMovie)) / GetMovieTimeScale(_myMovie);
         myMovie->set<FrameCountTag>(long(myDurationInSeconds * 25));
         
