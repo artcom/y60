@@ -357,12 +357,14 @@ function createTutorialIndex() {
                 myTitle = myLongTitle[0].substr(7);
             }
             var myLinks = myFile.match(/@link .*/g);
-            for (var j = 0; j < myLinks.length; ++j) {
-                var myFunction = myLinks[j].substr(6);
-                if (!(myFunction in ourTutorialIndex)) {
-                    ourTutorialIndex[myFunction] = [];
+            if (myLinks) {
+                for (var j = 0; j < myLinks.length; ++j) {
+                    var myFunction = myLinks[j].substr(6);
+                    if (!(myFunction in ourTutorialIndex)) {
+                        ourTutorialIndex[myFunction] = [];
+                    }
+                    ourTutorialIndex[myFunction].push({title: myTitle, file: myTutorial});
                 }
-                ourTutorialIndex[myFunction].push({title: myTitle, file: myTutorial});
             }
         }
     }
