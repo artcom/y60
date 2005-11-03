@@ -135,11 +135,11 @@ void
 throwException(JSContext * cx, const char * theMessage, std::string theFilename, unsigned theLine) {
     //cerr << "Throw Exception: " << theMessage << ", file: " << theFilename << ", line: " << theLine << endl;
     JSString* jsstr;
-    
+
     // if we get errors during error reporting we report those
     if (((jsstr=JS_NewStringCopyZ(cx, theMessage))) && (JS_AddNamedRoot(cx, &jsstr, "jsstr"))) {
         jsval dummy;
-        
+
         // We can't use JS_EvaluateScript since the stack would be wrong
         JSFunction * func;
         JSObject   * fobj;
@@ -148,7 +148,7 @@ throwException(JSContext * cx, const char * theMessage, std::string theFilename,
         if ((func = JS_CompileFunction(cx, NULL, NULL, 3, argnames, fbody, strlen(fbody), NULL, 0))) {
             // root function
             if (((fobj = JS_GetFunctionObject(func))) && (JS_AddNamedRoot(cx, &fobj, "fobj"))) {
-                jsval args[] = {STRING_TO_JSVAL(jsstr), as_jsval(cx, theFilename), as_jsval(cx, theLine)};                
+                jsval args[] = {STRING_TO_JSVAL(jsstr), as_jsval(cx, theFilename), as_jsval(cx, theLine)};
                 JS_CallFunction(cx, NULL, func, 3, args, &dummy);
                 JS_RemoveRoot(cx, &fobj);
             }
@@ -339,7 +339,7 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Adds the given path as an include path.");
+    DOC_BEGIN("Adds the given path as search path to the packet manager.");
     DOC_PARAM("theIncludePath", "A valid path", DOC_TYPE_STRING);
     DOC_END;
     try {
@@ -847,7 +847,7 @@ Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JS_STATIC_DLL_CALLBACK(JSBool)
 MilliSec(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the time since acxpshell/acgtkshell start in milliseconds.");
-    DOC_RVAL("The time in milliseconds", DOC_TYPE_FLOAT); 
+    DOC_RVAL("The time in milliseconds", DOC_TYPE_FLOAT);
     DOC_END;
     try {
         asl::NanoTime myTime = asl::NanoTime();
@@ -1064,7 +1064,7 @@ getDocumentedModules(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         for (DocumentationMap::iterator it = ourDocumentation.begin(); it != ourDocumentation.end(); ++it) {
             myModules.insert(it->first.first);
         }
-        
+
         JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
         unsigned i = 0;
         for (set<string>::iterator it = myModules.begin(); it != myModules.end(); ++it) {
@@ -1344,7 +1344,7 @@ static JSFunctionSpec glob_functions[] = {
     {"getPath",         GetPath,        0},
     {"listFiles",       listFiles,      2},
     {"openFile",        OpenFile,       2},
-    
+
     {"getDocumentation",     getDocumentation, 1},
     {"getDocumentedModules", getDocumentedModules, 0},
 
@@ -1397,7 +1397,7 @@ JSApp::setupPath(const std::string & theIncludePath) {
         myPacketManager->add(myY60Path);
     }
 
-    // Add the "-I" path    
+    // Add the "-I" path
     if (!theIncludePath.empty()) {
         myPacketManager->add(theIncludePath);
     }
@@ -1455,9 +1455,9 @@ JSApp::initClasses(JSContext * theContext, JSObject * theGlobalObject) {
 }
 
 int
-JSApp::run(const std::string & theScriptFilename, 
+JSApp::run(const std::string & theScriptFilename,
            const std::string & theIncludePath,
-           const std::vector<std::string> & theScriptArgs) 
+           const std::vector<std::string> & theScriptArgs)
 {
     JSObject *glob;
     JSRuntime * rt = JS_NewRuntime(1024 * 1024 * 128); // Bytes allocated before garbage collection
@@ -1500,4 +1500,4 @@ JSApp::run(const std::string & theScriptFilename,
     return result;
 }
 
-} 
+}

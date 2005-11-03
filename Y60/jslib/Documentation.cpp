@@ -23,11 +23,11 @@
 using namespace std;
 
 namespace jslib {
-        
+
     map<pair<string,string>, ObjectDocumentation> ourDocumentation;
 
     void describeFunctionParameter(FunctionDescription *myFunctionDescription,
-            const string & theName, const string & theDescription, const DocType & theType, const string & theDefaultValue) 
+            const string & theName, const string & theDescription, const DocType & theType, const string & theDefaultValue)
     {
         ParameterDescription myDescription;
         myDescription.name = theName;
@@ -37,9 +37,9 @@ namespace jslib {
         myFunctionDescription->parameters.push_back(myDescription);
     }
 
-    
-    void documentConstructor(const char *theModule, const char *theClassName, 
-         JSBool (*theConstructor)(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)) 
+
+    void documentConstructor(const char *theModule, const char *theClassName,
+         JSBool (*theConstructor)(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval))
     {
         FunctionDescription myFunctionDocumentation;
         myFunctionDocumentation.name = theClassName;
@@ -59,7 +59,7 @@ namespace jslib {
         JSFunctionSpec * theStaticFunctions,
         const char * theBaseClassName)
     {
-              
+
         if (theFunctions) {
             while (theFunctions->name) {
                 FunctionDescription myFunctionDocumentation;
@@ -129,12 +129,12 @@ namespace jslib {
             JSFunctionSpec * theStaticFunctions,
             const char * theBaseClassName)
     {
-        ObjectDocumentation myDocumentation;
+        ObjectDocumentation & myDocumentation = ourDocumentation[make_pair(theModule, theClassName)];
         AC_TRACE << "creating doku for " << theClassName << " in module " << theModule << endl;
         document(myDocumentation, theClassName, theProperties, theFunctions, theConstants,
                 theStaticProperties, theStaticFunctions, theBaseClassName);
 
-        ourDocumentation[make_pair(theModule,theClassName)] = myDocumentation;
+        //ourDocumentation[make_pair(theModule,theClassName)] = myDocumentation;
         AC_TRACE << "...created doku for " << theClassName << " in module " << theModule << endl;
     }
 

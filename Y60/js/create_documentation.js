@@ -24,7 +24,9 @@ if (!("0" in arguments)) {
     print("Usage: create_documentation.js outputdir");
     exit(1);
 }
+
 var ourDirectory = arguments[0];
+var ourTutorialIndex     = [];
 
 main();
 
@@ -35,13 +37,12 @@ function main() {
             exit(1);
         }
 
+        createTutorialIndex();
         generateJSLibDocumentation(ourDirectory);
-
+        createStyleSheet();
         print("Successfully created documentation in " + ourDirectory);
     } catch (ex) {
-        print("-------------------------------------------------------------------------------");
-        print("### Error: " + ex);
-        print("-------------------------------------------------------------------------------");
+        reportException(ex);
         exit(1);
     }
 }
@@ -90,21 +91,22 @@ function generateJSLibDocumentation() {
 function createIndex(theModules) {
     var myString = "<table class='IndexTable'><tr><td class='IndexTable'>";
     var myLineCount = 0;
-    for (var myModule in theModules) {
+    for (var myModuleName in theModules) {
         if (myLineCount > 10) {
             myString += "</td><td class='IndexTable'>";
             myLineCount = 0;
         }
-        myString += "<p><b>" + myModule + "</b></p>\n";
-        for (myClass in theModules[myModule]) {
-            if (myClass != "") {
-                myString += "<a href='" + myModule + "/" + myClass + ".html'>" + myClass + "</a><br/>\n";
+        myString += "<p><b>" + myModuleName + "</b></p>\n";
+        for (myClassName in theModules[myModuleName]) {
+            if (myClassName != "") {
+                myString += "<a href='" + myModuleName + "/" + myClassName + ".html'>" + myClassName + "</a><br/>\n";
+                var myClass = theModules[myModuleName][myClassName];
                 myLineCount++;
             } else {
-                var theFunctions = theModules[myModule][myClass].functions;
+                var theFunctions = theModules[myModuleName][myClassName].functions;
                 for (var i = 0; i < theFunctions.length; ++i) {
                     var myName = theFunctions[i].name;
-                    myString += "<a href='" + myModule + "/" + myName + ".html'>" + myName + "</a><br/>\n";
+                    myString += "<a href='" + myModuleName + "/" + myName + ".html'>" + myName + "</a><br/>\n";
                     myLineCount++;
                 }
             }
@@ -119,7 +121,12 @@ function createIndex(theModules) {
 function createFunctionDocumentation(theModuleName, theClassName, theFunctions) {
     for (var i = 0; i < theFunctions.length; ++i) {
         var myName = theFunctions[i].name;
-        writeHTML(theModuleName + "/" + theClassName + "_" + myName + ".html", documentFunction(theClassName, theFunctions[i]));
+        var myPath = theModuleName + "/";
+        if (theClassName) {
+             myPath += theClassName + "_";
+        }
+        myPath += myName + ".html";
+        writeHTML(myPath, documentFunction(theClassName, theFunctions[i]));
     }
 }
 
@@ -205,6 +212,9 @@ function writeHTML(theFileName, theString) {
 
     if (VALIDATE_HTML) {
         var myXmlDoc = new Node(myString);
+        if (!myXmlDoc.firstChild) {
+            exit(1);
+        }
     }
 
     var myPath = ourDirectory + "/" + theFileName;
@@ -259,9 +269,10 @@ function documentFunction(theClassName, theFunction) {
     var myString = "";
 
     // Description
-    var myTitle = theFunction.name;
     var myClass = theClassName ? theClassName + "::" : "";
-    myString += "<h2>" + myClass + theFunction.name + "</h2>";
+    var myName  = myClass + theFunction.name;
+    myString += "<h2>" + myName + "</h2>";
+
     if (theFunction.description == "") {
         theFunction.description = "Not yet documented.";
     }
@@ -294,19 +305,65 @@ function documentFunction(theClassName, theFunction) {
         myString += "<div class='SectionHeader'>Return Value:</div>";
         myString += "<div class='Indent'>" + theFunction.return_value + "</div>";
     }
-    return myString;
-}
 
-function documentFunctions(theClassName, theFunctionsTitle, theFunctions) {
-    var myString = "";
-    myString += "<h3>" + theFunctionsTitle + "</h3>\n";
-    myString += "<ul>\n";
-    for (var i = 0; i < theFunctions.length; ++i) {
-        myString += "<li>";
-        myString += documentFunction(theClassName, theFunctions[i]);
-        myString += "</li><br/>\n";
+    // Tutorials
+    if (myName in ourTutorialIndex) {
+        var myPro = expandEnvironment("${PRO}");
+        var myTutorials = ourTutorialIndex[myName];
+        myString += "<div class='SectionHeader'>Tutorials:</div><div class='Indent'>";
+        for (var i = 0;  i < myTutorials.length; ++i) {
+            myString +="<a href='file://" + myPro + "/tutorials/" + myTutorials[i].file + "'>" + myTutorials[i].title + "</a><br/>";
+        }
+        myString += "</div>";
     }
-    myString += "</ul>\n";
     return myString;
 }
 
+function createStyleSheet() {
+    var myString = "";
+    myString += "body { padding-left: 20px; }";
+    myString += "a { text-decoration:none; color:darkblue; }";
+    myString += "a:hover { color:red; text-decoration:underline; }";
+    myString += "h2 { padding-top:30px; }";
+    myString += ".IndexTable { vertical-align:top; padding-right:30px; }";
+    myString += ".SectionHeader { padding-top:30px; font-style:italic; padding-bottom:10px; }";
+    myString += ".Indent { padding-left:50px; }";
+    myString += ".ParameterTable { border-collapse:collapse; }";
+    myString += ".ParameterTableCell { vertical-align:top; border: solid 1px #000000; padding-top: 2px; padding-bottom: 2px; padding-left: 5px; padding-right: 10px; }";
+    myString += ".ParameterType { font-family:Courier; }";
+    myString += ".TimeStamp { font-style:italic; padding-top:60px; font-size:10pt; }";
+    myString += ".SummaryTable { border-collapse:collapse; }";
+    myString += ".SummeryHeader { font-weight:bold; }";
+    myString += ".SummaryTableCell { vertical-align:top; border: solid 1px #000000; padding-top: 2px; padding-bottom: 2px; padding-left: 5px; padding-right: 10px; }";
+    myString += ".FunctionDescription {  padding-left:50px; }";
+
+    var myPath = ourDirectory + "/jsdoc.css";
+    if (!putWholeFile(myPath, myString)) {
+        throw new Exception("Could not write file: " + myPath, fileline());
+    }
+}
+
+function createTutorialIndex() {
+    var myTutorials = getDirList("${PRO}/tutorials");
+    includePath("${PRO}/tutorials");
+    for (var i = 0; i < myTutorials.length; ++i) {
+        var myTutorial = myTutorials[i];
+        var myDotIndex = myTutorial.lastIndexOf(".");
+        if (myDotIndex != -1 && myTutorial.substring(myDotIndex, myTutorial.length) == ".js") {
+            var myFile = getWholeFile(myTutorial);
+            var myTitle = myTutorial;
+            var myLongTitle = myFile.match(/@title .*/g);
+            if (myLongTitle) {
+                myTitle = myLongTitle[0].substr(7);
+            }
+            var myLinks = myFile.match(/@link .*/g);
+            for (var j = 0; j < myLinks.length; ++j) {
+                var myFunction = myLinks[j].substr(6);
+                if (!(myFunction in ourTutorialIndex)) {
+                    ourTutorialIndex[myFunction] = [];
+                }
+                ourTutorialIndex[myFunction].push({title: myTitle, file: myTutorial});
+            }
+        }
+    }
+}

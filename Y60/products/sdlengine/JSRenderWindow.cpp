@@ -409,7 +409,8 @@ JSRenderWindow::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject
 
 JSBool
 JSRenderWindow::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Creates a new SDL window. Call go() to open it.");
+    DOC_RVAL("theNewWindow", DOC_TYPE_OBJECT);
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Base::Class()) {
@@ -437,14 +438,12 @@ JSRenderWindow::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
 
 void
 JSRenderWindow::addClassProperties(JSContext * cx, JSObject * theClassProto) {
-    //JSY60BASE::addClassProperties(cx, theClassProto);
     JSA_AddFunctions(cx, theClassProto, JSBASE::BaseFunctions());
     JSA_AddProperties(cx, theClassProto, JSBASE::BaseProperties());
-    //JSA_AddFunctions(cx, theClassProto, Functions());
-    createClassDocumentation("AbstractRenderWindow", JSBASE::BaseProperties(),
+    createClassDocumentation(ClassName(), JSBASE::BaseProperties(),
             JSBASE::BaseFunctions(), 0, 0, 0);
-    createClassDocumentation(ClassName(), Properties(), Functions(),
-            ConstIntProperties(), 0, 0, "AbstractRenderWindow");
+    DOC_CREATE(JSRenderWindow);
+
 }
 
 JSObject *
@@ -463,6 +462,18 @@ JSRenderWindow::initClass(JSContext *cx, JSObject *theGlobalObject) {
         AC_ERROR << "JSRenderWindow::initClass: constructor function object not found, could not initialize static members"<<endl;
     }
     return myClassObject;
+}
+
+JSPropertySpec *
+JSRenderWindow::StaticProperties() {
+    static JSPropertySpec myProperties[] = {{0}};
+    return myProperties;
+}
+
+JSFunctionSpec *
+JSRenderWindow::StaticFunctions() {
+    static JSFunctionSpec myFunctions[] = {{0}};
+    return myFunctions;
 }
 
 namespace jslib {

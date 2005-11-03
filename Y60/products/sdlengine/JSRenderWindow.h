@@ -40,6 +40,8 @@ public:
     }
     static JSFunctionSpec * Functions();
     static JSPropertySpec * Properties();
+    static JSPropertySpec * StaticProperties();
+    static JSFunctionSpec * StaticFunctions();
 
     virtual unsigned long length() const {
         return 0;
@@ -75,6 +77,7 @@ public:
 };
 
 namespace jslib {
+
 
 template <>
 struct JSClassTraits<y60::SDLWindow> : public JSClassTraitsWrapper<y60::SDLWindow, JSRenderWindow> {
