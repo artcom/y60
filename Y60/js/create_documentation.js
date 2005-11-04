@@ -17,8 +17,9 @@
 //=============================================================================
 
 use("Exception.js");
+use("SyntaxHighlighter.js");
 
-const VALIDATE_HTML = true;
+const VALIDATE_HTML = false;
 
 if (!("0" in arguments)) {
     print("Usage: create_documentation.js outputdir");
@@ -27,6 +28,7 @@ if (!("0" in arguments)) {
 
 var ourDirectory = arguments[0];
 var ourTutorialIndex     = [];
+var ourSyntaxHighlighter = new SyntaxHighlighter();
 
 main();
 
@@ -37,7 +39,7 @@ function main() {
             exit(1);
         }
 
-        createTutorialIndex();
+        createTutorials();
         generateJSLibDocumentation(ourDirectory);
         createStyleSheet();
         print("Successfully created documentation in " + ourDirectory);
@@ -312,7 +314,7 @@ function documentFunction(theClassName, theFunction) {
         var myTutorials = ourTutorialIndex[myName];
         myString += "<div class='SectionHeader'>Tutorials:</div><div class='Indent'>";
         for (var i = 0;  i < myTutorials.length; ++i) {
-            myString +="<a href='file://" + myPro + "/tutorials/" + myTutorials[i].file + "'>" + myTutorials[i].title + "</a><br/>";
+            myString += "<a href='../tutorials/" + myTutorials[i].file + "'>" + myTutorials[i].title + "</a><br/>";
         }
         myString += "</div>";
     }
@@ -336,6 +338,12 @@ function createStyleSheet() {
     myString += ".SummeryHeader { font-weight:bold; }";
     myString += ".SummaryTableCell { vertical-align:top; border: solid 1px #000000; padding-top: 2px; padding-bottom: 2px; padding-left: 5px; padding-right: 10px; }";
     myString += ".FunctionDescription {  padding-left:50px; }";
+    myString += ".TutorialCode { font-family:Courier; }";
+    myString += ".TutorialText { color:black; }";
+    myString += ".comment { color: green; }";
+    myString += ".string { color: grey; }";
+    myString += ".keyword { color: blue; }";
+    myString += ".vars { color: #d00; }";
 
     var myPath = ourDirectory + "/jsdoc.css";
     if (!putWholeFile(myPath, myString)) {
@@ -343,29 +351,54 @@ function createStyleSheet() {
     }
 }
 
-function createTutorialIndex() {
+function createTutorials() {
     var myTutorials = getDirList("${PRO}/tutorials");
     includePath("${PRO}/tutorials");
     for (var i = 0; i < myTutorials.length; ++i) {
         var myTutorial = myTutorials[i];
         var myDotIndex = myTutorial.lastIndexOf(".");
         if (myDotIndex != -1 && myTutorial.substring(myDotIndex, myTutorial.length) == ".js") {
+            var myHtmlFileName = myTutorial.substr(0, myDotIndex) + ".html";
             var myFile = getWholeFile(myTutorial);
             var myTitle = myTutorial;
-            var myLongTitle = myFile.match(/@title .*/g);
-            if (myLongTitle) {
-                myTitle = myLongTitle[0].substr(7);
-            }
-            var myLinks = myFile.match(/@link .*/g);
-            if (myLinks) {
-                for (var j = 0; j < myLinks.length; ++j) {
-                    var myFunction = myLinks[j].substr(6);
-                    if (!(myFunction in ourTutorialIndex)) {
-                        ourTutorialIndex[myFunction] = [];
+            var myHTMLString = "";
+            var myLines = myFile.split("\n");
+            var myHeader = false;
+            for (var j = 0; j < myLines.length; ++j) {
+                var myLine = myLines[j];
+
+                if (myLine.search(/\/\*\*/) != -1) {
+                    myHeader = true;
+                    myHTMLString += "<div class='TutorialText'>";
+                }
+
+                if (myHeader) {
+                    if (myLine.search(/@title (.*)/) != -1) {
+                        myTitle = RegExp.$1;
+                    } else if (myLine.search(/@link (.*)/) != -1) {
+                        var myLink = RegExp.$1;
+                        if (!(myLink in ourTutorialIndex)) {
+                            ourTutorialIndex[myLink] = [];
+                        }
+                        ourTutorialIndex[myLink].push({title: myTitle, file: myHtmlFileName});
+                    } else {
+                        if (myLine.search(/^ \* /) != -1) {
+                            myHTMLString += myLine.substr(3) + "<br/>";
+                        }
                     }
-                    ourTutorialIndex[myFunction].push({title: myTitle, file: myTutorial});
+                } else {
+                    myHTMLString += ourSyntaxHighlighter.highlight(myLine) + "</br>";
+                }
+
+                if (myLine.search(/\*\//) != -1) {
+                    if (myHeader) {
+                        myHTMLString += "</div><div class='TutorialCode'>";
+                    }
+                    myHeader = false;
                 }
             }
+            myHTMLString = "<h1>" + myTitle + "</h1>" + myHTMLString + "</div>";
+            writeHTML("tutorials/" + myHtmlFileName, myHTMLString);
         }
     }
 }
