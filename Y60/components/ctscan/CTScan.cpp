@@ -599,10 +599,10 @@ CTScan::fastValueAt(const asl::Vector3f & thePosition) {
     Vector3i myDiscretePos(round(thePosition[0]), 
         round(thePosition[1]), 
         round(thePosition[2]));
-    dom::ResizeableRasterPtr & mySlice = _mySlices[int(myDiscretePos[2])];
-    int myLineStride = getBytesRequired(mySlice->width(), _myEncoding);
 
     if (isInside(myDiscretePos[0], myDiscretePos[1], myDiscretePos[2])) {
+        dom::ResizeableRasterPtr & mySlice = _mySlices[myDiscretePos[2]];
+        int myLineStride = getBytesRequired(mySlice->width(), _myEncoding);
         const VoxelT * mySource = reinterpret_cast<const VoxelT*>(mySlice->pixels().begin()+myLineStride*myDiscretePos[1]);
         return mySource[myDiscretePos[0]];
     } else {
@@ -775,7 +775,7 @@ CTScan::reconstructToImageImpl(CTScan::Orientation theOrientation, int theSliceI
                            mySource+myLineWidth*y,
                            myLineWidth);
                 }
-                myPixelData = myTarget; 
+                myPixelData = myTarget;
                 break;
             }
         case Y2Z:
@@ -811,10 +811,15 @@ CTScan::reconstructToImageImpl(CTScan::Orientation theOrientation, int theSliceI
                 int mySourceLineStride = getBytesRequired(mySize[0], _myEncoding);
                 int mySliceCount = getSliceCount();
                 for (int x=0; x < myWidth; ++x) {
-                    const unsigned char * mySource = _mySlices[mySliceCount-x-1]->pixels().begin();
-                    int xTarget = myWidth-x-1;
+                    //const unsigned char * mySource = _mySlices[mySliceCount-x-1]->pixels().begin();
+                    //int xTarget = myWidth-x-1;
+                    //for (int y=0; y < myHeight; ++y) {
+                    //    memcpy(myTarget->begin()+myTargetLineStride*y+myBpp*xTarget, 
+                    //        mySource+mySourceLineStride*y+mySourceLineOffset, myBpp);
+                    //}                    
+                    const unsigned char * mySource = _mySlices[x]->pixels().begin();
                     for (int y=0; y < myHeight; ++y) {
-                        memcpy(myTarget->begin()+myTargetLineStride*y+myBpp*xTarget, 
+                        memcpy(myTarget->begin()+myTargetLineStride*y+myBpp*x, 
                             mySource+mySourceLineStride*y+mySourceLineOffset, myBpp);
                     }
                 }
@@ -853,7 +858,9 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
         Vector3i myVoxelSize = getVoxelDimensions();
 
         
-        Matrix4f myScreenToVoxelProjection(theOrientation);
+        Matrix4f myScreenToVoxelProjection;
+        myScreenToVoxelProjection.makeXRotating(float(asl::PI));
+        myScreenToVoxelProjection.postMultiply(Matrix4f(theOrientation));
         Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
         bool myInversionDone = myVoxelToScreenProjection.invert();
         if (!myInversionDone) {
@@ -877,28 +884,29 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
         //Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding), 255));    
         Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));    
         int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
-
-        float mySlicePosition = float(theSliceIndex) + myBounds[Box3f::MIN][2];
-        // [TS] Invert Slice
-        // float mySlicePosition = myBounds[Box3f::MAX][2] - float(theSliceIndex);
+    
+        Vector3f myViewVector = product(Point3f(0,0,-1), myScreenToVoxelProjection);
+        float myZScale = dot(myViewVector, Vector3f(1,1,1));    // XXX Use Unit aspect instead of 1,1,1
+        
+        float mySlicePosition1 = myBounds[Box3f::MAX][2] - float(theSliceIndex);
+        float mySlicePosition2 = float(theSliceIndex) + myBounds[Box3f::MIN][2];
+        float mySlicePosition;
+        if (myZScale < 0.0f) {
+            mySlicePosition = mySlicePosition2;
+        } else {
+            mySlicePosition = mySlicePosition1;
+        }
         Vector3f myStartPos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
             myScreenToVoxelProjection);
         Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition),
             myScreenToVoxelProjection) - myStartPos) / mySize[0];
         Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
             myScreenToVoxelProjection) - myStartPos) / mySize[1];
-        //Vector3f myStartPos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
-        //    myScreenToVoxelProjection);
-        //Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MAX][1], mySlicePosition),
-        //    myScreenToVoxelProjection) - myStartPos) / mySize[0];
-        //Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
-        //    myScreenToVoxelProjection) - myStartPos) / mySize[1];
         AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", myStartPos: " << myStartPos
             << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
         typedef Line<float> Linef;
         Box3f myVoxelBox(Point3f(0.0f, 0.0f, 0.0f), 
             Point3f(float(myVoxelSize[0]), float(myVoxelSize[1]), float(myVoxelSize[2])));
-        //for (int v = 0; v < myHeight; ++v) {
         for (int v = 0; v < myHeight; ++v) {
             Vector3f myLinePos = myStartPos + (float(v) * mySourceDeltaV);
             Linef myScanLine(myLinePos, mySourceDeltaU);
@@ -915,33 +923,20 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
                 VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+(myTargetLineStride*v)+myStart);
                 for (int u = myStart; u < myEnd; ++u) {
                     Vector3f mySourcePos = myLinePos + (float(u) * mySourceDeltaU);
-                    // Flip Y because of screen application and z because of ???
-                    //mySourcePos[0] = myVoxelSize[0]-mySourcePos[0];
-                    mySourcePos[1] = myVoxelSize[1]-mySourcePos[1];
-                    mySourcePos[2] = myVoxelSize[2]-mySourcePos[2];
                     if (theTrilliniarInterpolate) {
                         *myAddress = interpolatedValueAt<VoxelT>(mySourcePos);
                     } else {
                         *myAddress = fastValueAt<VoxelT>(mySourcePos);
                     }
                     myAddress ++;
-                }
-                //for (int u = myStart; u < myEnd; ++u) {
-                //    Vector3f mySourcePos = myLinePos + (myEnd * mySourceDeltaU) - (float(u) * mySourceDeltaU);
-                //    if (theTrilliniarInterpolate) {
-                //        *myAddress = interpolatedValueAt<VoxelT>(mySourcePos);
-                //    } else {
-                //        *myAddress = fastValueAt<VoxelT>(mySourcePos);
-                //    }
-                //    myAddress ++;
-                //}
+                } 
             }
         }
         myPixelData = myTarget; 
         // set the image data
         y60::ImagePtr myFacade = theImageNode->dom::Node::getFacade<y60::Image>();
         myFacade->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
-        // AC_INFO << "Image: " << myFacade->get<ImageWidthTag>() << " x " << myFacade->get<ImageHeightTag>();
+        AC_TRACE << "Image: " << myFacade->get<ImageWidthTag>() << " x " << myFacade->get<ImageHeightTag>();
         // set the matrix to make up for the padded image
         asl::Matrix4f myScale;
         myScale.makeIdentity();
