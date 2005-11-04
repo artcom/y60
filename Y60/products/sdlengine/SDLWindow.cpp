@@ -219,11 +219,8 @@ SDLWindow::initDisplay() {
     //dumpSDLGLParams();
 
     EventDispatcher::get().addSource(&_mySDLEventSource);
-#ifdef ENABLE_EVENTRECORDER
-    AC_INFO << "EventRecorder enabled";
     EventDispatcher::get().addSource(&_myEventRecorder);
     EventDispatcher::get().addSink(&_myEventRecorder);
-#endif
 
     // Uncomment this to get output on the events that pass through the event queue.
     // EventDispatcher::get().addSink(&_myEventDumper);
@@ -636,8 +633,12 @@ double SDLWindow::getKerning(const std::string & theFontName, const std::string 
     return _myRenderer->getTextManager().getKerning(theFontName, theFirstCharacter, theSecondCharacter);
 }
 
-void SDLWindow::setEventRecorderMode(EventRecorder::Mode theMode) {
-    _myEventRecorder.setMode(theMode);
+void SDLWindow::setEventRecorderMode(EventRecorder::Mode theMode, bool theDiscardFlag) {
+    _myEventRecorder.setMode(theMode, theDiscardFlag);
+}
+
+EventRecorder::Mode SDLWindow::getEventRecorderMode() const {
+    return _myEventRecorder.getMode();
 }
 
 void SDLWindow::loadEvents(const std::string & theFilename) {

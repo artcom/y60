@@ -184,11 +184,6 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
         if (!theAltFlag) {
             switch (theKey) {
-                /*
-                case 'd':
-                   print (self.getWorld().childNode("body").rootNode);
-                    break;
-                */
                 case 'n':
                     window.drawnormals = !window.drawnormals;
                     print("Normals: " + (window.drawnormals ? "on" : "off"));

@@ -123,7 +123,8 @@ namespace y60 {
                               const std::string & theSecondCharacter);
 
             /// Set EventRecorder mode to STOP/PLAY/RECORD.
-            void setEventRecorderMode(EventRecorder::Mode theMode);
+            void setEventRecorderMode(EventRecorder::Mode theMode, bool theDiscardFlag);
+            EventRecorder::Mode getEventRecorderMode() const;
 
             /// Load events from file.
             void loadEvents(const std::string & theFilename);

@@ -33,18 +33,9 @@ EventRecorder::EventRecorder() {
 }
 
 EventRecorder::~EventRecorder() {
-    if (_myMode == RECORD) {
-        save("events.xml");
-    }
 }
 
 void EventRecorder::init() {
-#if 0
-    setMode(RECORD);
-#else
-    //load("events.xml");
-    //setMode(PLAY);
-#endif
 }
 
 EventPtrList EventRecorder::poll() {
@@ -55,7 +46,7 @@ EventPtrList EventRecorder::poll() {
         asl::Time myTime = asl::Time() - _myStartTime;
         while (_myEventIter != _myEvents.end() && (*_myEventIter)->when <= myTime) {
             EventPtr myEvent = *(_myEventIter++);
-            DB(AC_TRACE << "node=" << *(myEvent->asNode()));
+            DB(AC_TRACE << "poll node=" << *(myEvent->asNode()));
             myEvents.push_back(myEvent);
         }
 
@@ -73,6 +64,7 @@ void EventRecorder::handle(EventPtr theEvent) {
     if (_myMode == RECORD && filterEvent(theEvent) == false) {
         EventPtr myEvent = theEvent->copy();
         myEvent->when = asl::Time() - _myStartTime;
+        DB(AC_TRACE << "handle node=" << *myEvent->asNode());
         _myEvents.push_back(myEvent);
     }
 }

@@ -236,20 +236,33 @@ static JSBool
 setEventRecorderMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    if (argc == 1) {
+    if (argc >= 1) {
         unsigned myMode;
+        bool myDiscardFlag = false;
         if (!convertFrom(cx,argv[0],myMode)) {
             JS_ReportError(cx,"JSRenderWindow::setEventRecorderMode: parameter 0 must be an int");
             return JS_FALSE;
         }
 
+        if (argc > 1 && !convertFrom(cx,argv[1],myDiscardFlag)) {
+            JS_ReportError(cx,"jsrenderwindow::setEventRecorderMode: parameter 1 must be an bool");
+            return JS_FALSE;
+        }
+
         JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
-        myObj.getNative().setEventRecorderMode((EventRecorder::Mode) myMode);
+        myObj.getNative().setEventRecorderMode((EventRecorder::Mode) myMode, myDiscardFlag);
 
         return JS_TRUE;
     }
     JS_ReportError(cx,"JSRenderWindow::setEventRecorderMode: bad number of arguments, 1 expected");
     return JS_FALSE;
+}
+
+static JSBool
+getEventRecorderMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    return Method<SDLWindow>::call(&SDLWindow::getEventRecorderMode,cx,obj,argc,argv,rval);
 }
 
 static JSBool
@@ -281,6 +294,7 @@ JSRenderWindow::Functions() {
         {"getGlyphMetrics",    getGlyphMetrics,          7},
         {"getKerning",         getKerning,               3},
         {"setEventRecorderMode", setEventRecorderMode,   1},
+        {"getEventRecorderMode", getEventRecorderMode,   0},
         {"loadEvents",           loadEvents,             1},
         {"saveEvents",           saveEvents,             1},
         {0}
