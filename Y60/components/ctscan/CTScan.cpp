@@ -936,7 +936,6 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
         // set the image data
         y60::ImagePtr myFacade = theImageNode->dom::Node::getFacade<y60::Image>();
         myFacade->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
-        AC_TRACE << "Image: " << myFacade->get<ImageWidthTag>() << " x " << myFacade->get<ImageHeightTag>();
         // set the matrix to make up for the padded image
         asl::Matrix4f myScale;
         myScale.makeIdentity();
