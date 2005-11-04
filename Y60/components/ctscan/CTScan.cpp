@@ -580,7 +580,8 @@ CTScan::getReconstructionDimensions(const Quaternionf & theOrientation) const {
     Vector3i myVoxelSize = getVoxelDimensions();
     Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
     myVoxelToScreenProjection.invert();
-    Box3f myBounds = computeProjectionBounds(myVoxelToScreenProjection);
+    Box3f myBounds = Box3f(Vector3f(0,0,0), Vector3f(float(myVoxelSize[0]), float(myVoxelSize[1]), 
+        float(myVoxelSize[2]))) * myVoxelToScreenProjection;
     Vector3f myFloatSize = myBounds.getSize();
     for (int i = 0; i < 3; ++i) {
         if (!almostEqual(myFloatSize[i], floor(myFloatSize[i]))) {
@@ -854,7 +855,7 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
         int myPoTWidth;
         int myPoTHeight;
         Ptr<ReadableBlock> myPixelData;
-        Box3f myBounds;
+        //Box3f myBounds;
         Vector3i myVoxelSize = getVoxelDimensions();
 
         
@@ -866,7 +867,8 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
         if (!myInversionDone) {
             throw CTScanException("Coundn't invert rotation matrix", PLUS_FILE_LINE);
         }
-        myBounds = computeProjectionBounds(myVoxelToScreenProjection);
+        Box3f myBounds = Box3f(Vector3f(0,0,0), Vector3f(float(myVoxelSize[0]), 
+            float(myVoxelSize[1]), float(myVoxelSize[2]))) * myVoxelToScreenProjection;
         Vector3f mySize = myBounds.getSize();
         if (!almostEqual(mySize[0], floor(mySize[0]))) {
             myWidth = int(ceil(mySize[0]));
@@ -946,25 +948,6 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
     }
 }
 
-Box3f
-CTScan::computeProjectionBounds(const Matrix4f & theInvertedProjection) const {
-    vector<Point3f> myCorners;
-    Vector3i mySize = getVoxelDimensions();
-    Box3f myBox;
-    myBox.makeEmpty();
-
-    // convert the 8 corners into the inverted projection space
-    myBox.extendBy(product(Point3f(0,0,0), theInvertedProjection));
-    myBox.extendBy(product(Point3f(float(mySize[0]),0,0), theInvertedProjection));
-    myBox.extendBy(product(Point3f(0,float(mySize[1]),0), theInvertedProjection));
-    myBox.extendBy(product(Point3f(float(mySize[0]),float(mySize[1]),0), theInvertedProjection));
-
-    myBox.extendBy(product(Point3f(0,0,float(mySize[2])), theInvertedProjection));
-    myBox.extendBy(product(Point3f(float(mySize[0]),0,float(mySize[2])), theInvertedProjection));
-    myBox.extendBy(product(Point3f(0,float(mySize[1]),float(mySize[2])), theInvertedProjection));
-    myBox.extendBy(product(Point3f(float(mySize[0]),float(mySize[1]),float(mySize[2])), theInvertedProjection));
-    return myBox;
-}
 
 std::string
 CTScan::setupMaterial(SceneBuilderPtr theSceneBuilder, bool theCreateNormalsFlag) {
