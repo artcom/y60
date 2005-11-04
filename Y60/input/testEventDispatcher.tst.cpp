@@ -121,7 +121,7 @@ class EventDispatcherTest : public UnitTest, IEventSink {
 class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
-    void setup() {
+        void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new EventDispatcherTest);
     }
