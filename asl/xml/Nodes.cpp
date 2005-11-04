@@ -884,7 +884,7 @@ dom::Node::getSchema() const {
 }
 
 #if 1
-unsigned long long 
+asl::Unsigned64 
 dom::Node::bumpVersion() {
     if (_myParent) {
         _myVersion = _myParent->bumpVersion();
@@ -895,10 +895,10 @@ dom::Node::bumpVersion() {
 }
 #else
 // TODO: fix this faster, non recursive version which seems to have a bug
-unsigned long long 
+asl::Unsigned64 
 dom::Node::bumpVersion() {
     Node * myNode = this;
-    unsigned long long myVersion;
+    asl::Unsigned64 myVersion;
     Node * myParent = 0;
     do {
         myParent = myNode->parentNode();
@@ -2411,7 +2411,7 @@ void dumpType(unsigned short theType) {
 #define DB(x) // x
 
 void
-dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries * theDicts, unsigned long long theIncludeVersion) const {
+dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries * theDicts, asl::Unsigned64 theIncludeVersion) const {
     asl::Ptr<Dictionaries,ThreadingModel> myDicts;
     if (!theDicts) {
         myDicts = asl::Ptr<Dictionaries,ThreadingModel>(new Dictionaries);

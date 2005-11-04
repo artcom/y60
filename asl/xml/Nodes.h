@@ -343,10 +343,10 @@ namespace dom {
             ensureValue();
             return _myValue->getString();
         }
-        unsigned long long nodeVersion() const {
+        asl::Unsigned64 nodeVersion() const {
             return _myVersion;
         }
-        unsigned long long documentVersion() const {
+        asl::Unsigned64 documentVersion() const {
             const Node * topNode = this;
             while (topNode->parentNode()) {
                 topNode = topNode->parentNode();
@@ -354,12 +354,12 @@ namespace dom {
             return topNode->nodeVersion();
         }
 
-        unsigned long long nodeVersion(unsigned long long theVersion) {
+        asl::Unsigned64 nodeVersion(asl::Unsigned64 theVersion) {
             return _myVersion = theVersion;
         }
 
-        unsigned long long bumpVersion();
-        void setVersion(unsigned long long theVersion) {
+        asl::Unsigned64 bumpVersion();
+        void setVersion(asl::Unsigned64 theVersion) {
             _myVersion = theVersion;
             _myAttributes.setVersion(theVersion);
             _myChildren.setVersion(theVersion);
@@ -965,7 +965,7 @@ namespace dom {
         void binarize(asl::WriteableStream & theDest) const {
             binarize(theDest, 0, 0);
         }
-        void makePatch(asl::WriteableStream & thePatch, unsigned long long theOldVersion) const {
+        void makePatch(asl::WriteableStream & thePatch, asl::Unsigned64 theOldVersion) const {
             binarize(thePatch, 0, theOldVersion + 1);
         }
         /// return true if something has changed
@@ -976,7 +976,7 @@ namespace dom {
         }
 protected:
         asl::AC_SIZE_TYPE debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos, Dictionaries * theDict, bool thePatchFlag, bool & theUnmodifiedProxyFlag);
-        void binarize(asl::WriteableStream & theDest, Dictionaries * theDict, unsigned long long theIncludeVersion) const;
+        void binarize(asl::WriteableStream & theDest, Dictionaries * theDict, asl::Unsigned64 theIncludeVersion) const;
 public:
         void addSchema(const DOMString & theSchemaString, const DOMString & theNSPrefix);
         void addSchema(const dom::Node & theSchemaDoc, const DOMString & theNSPrefix);
@@ -1187,8 +1187,8 @@ Dependent on node type allowed children are:<p>
         EventListenerMap  _myEventListeners;
         EventListenerMap  _myCapturingEventListeners;
         static const Node X_NO_NODE_;
-        unsigned long long _myVersion;
-        UniqueId           _myUniqueId;
+        asl::Unsigned64   _myVersion;
+        UniqueId          _myUniqueId;
     public:
         static Node Prototype;
     };
