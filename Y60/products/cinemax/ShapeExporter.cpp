@@ -94,7 +94,7 @@ ShapeExporter::writeShape(BaseObject * theNode, BaseObject * thePolygonNode, boo
                 myMaterialList.push_back(std::pair<TextureTag*,UVWTag*>(myTextureTag, myUvTag));
             }
         }
-
+        
         // write selection
         std::string myShapeId = writeSelection(theNode, thePolygonNode,
                                                 mySelection, myBaseSelection, myMaterialList, myUVTagList,

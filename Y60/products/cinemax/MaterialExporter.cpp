@@ -415,8 +415,8 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
 					}
 				}
 			}
-		}
-	}
+          }
+    }
     return myExportedMaterialInfo;
 }
 
@@ -508,6 +508,22 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
                 }
             }
+            // Luminance
+            if (myMaterial->GetChannelState(CHANNEL_LUMINANCE)) {
+                BaseChannel * myLuminanceChannel = myMaterial->GetChannel(CHANNEL_LUMINANCE);
+                if (myLuminanceChannel) {
+                    Vector4f myEmissiveColor(1, 1, 1, 1);
+                    BaseContainer myColorContainer = myLuminanceChannel->GetData();
+                    // Brightness has already scaled luminance channel color
+                    getColor(myLuminanceChannel, myEmissiveColor);
+                    //Real   myBrightness    = myColorContainer.GetReal(BASECHANNEL_BRIGHTNESS_EX);
+                    //myEmissiveColor[0] *= myBrightness;
+                    //myEmissiveColor[1] *= myBrightness;
+                    //myEmissiveColor[2] *= myBrightness;
+                    setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::EMISSIVE_PROPERTY, myEmissiveColor);                    
+
+                }
+            }
             if (myMaterial->GetChannelState(CHANNEL_ALPHA)) {
                   BaseChannel * myAlphaChannel = myMaterial->GetChannel(CHANNEL_ALPHA);
                   if (myAlphaChannel) {
@@ -515,7 +531,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 						BaseContainer myColorContainer = myAlphaChannel->GetData();
 						String myTextureName = myColorContainer.GetString(BASECHANNEL_TEXTURE);
 						String myTextureShaderid = myColorContainer.GetString(BASECHANNEL_SHADERID);
-						GePrint("Texture name: " + myTextureName + " Shaderid: " + myTextureShaderid);
+                        GePrint("CHANNEL_ALPHA: Texture name: " + myTextureName + " Shaderid: " + myTextureShaderid);
 	                    PluginShader  * myShader = myAlphaChannel->GetShader();
                         exportShader(myShader, _myMaterialBuilder, myMaterial,theSceneBuilder,
                                      &myColorContainer, myTextureTag, theMinCoord, theMaxCoord, true);
@@ -525,13 +541,33 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 
 			myMaterialAlphaFlag = myMaterialAlphaFlag | (myMaterial->GetChannelState(CHANNEL_ALPHA)==TRUE) |
                                                         (myMaterial->GetChannelState(CHANNEL_TRANSPARENCY)==TRUE) ;
-               // Export specular color
+            // Export specular color
             Vector4f mySpecularColor(0, 0, 0, 1);
+            bool foundSpecularColor = false;
             if (myMaterial->GetChannelState(CHANNEL_SPECULARCOLOR)) {
                   BaseChannel * mySpecularColorChannel = myMaterial->GetChannel(CHANNEL_SPECULARCOLOR);
                   if (mySpecularColorChannel) {
                        myLightingType = y60::PHONG;
                     getColor(mySpecularColorChannel, mySpecularColor);
+                    foundSpecularColor = true;
+                }
+            }
+
+            // Export specular material tab
+            if (myMaterial->GetChannelState(CHANNEL_SPECULAR)) {
+                BaseChannel * mySpecularChannel = myMaterial->GetChannel(CHANNEL_SPECULAR);
+                if (mySpecularChannel) {
+                    BaseContainer * mySpecularContainer = myMaterial->GetDataInstance();
+                    LONG mySpecularMode = mySpecularContainer->GetLong(MATERIAL_SPECULAR_MODE);
+                    switch (mySpecularMode) {
+                        case MATERIAL_SPECULAR_MODE_PLASTIC:
+                        case MATERIAL_SPECULAR_MODE_METAL:
+                        case MATERIAL_SPECULAR_MODE_COLORED:
+                            if (!foundSpecularColor) {
+                                mySpecularColor = Vector4f(1, 1, 1, 1);
+                            }
+                            break;
+                    }
                 }
             }
 
@@ -539,7 +575,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
             if (myMaterial->GetChannelState(CHANNEL_SPECULAR)) {
                 BaseChannel * mySpecularChannel = myMaterial->GetChannel(CHANNEL_SPECULAR);
                 if (mySpecularChannel) {
-                       myLightingType = y60::PHONG;
+                    myLightingType = y60::PHONG;
                     BaseContainer * mySpecularContainer = myMaterial->GetDataInstance();
                     float mySpecularWidth      = mySpecularContainer->GetReal(MATERIAL_SPECULAR_WIDTH);
                     float mySpecularHeight     = mySpecularContainer->GetReal(MATERIAL_SPECULAR_HEIGHT);
