@@ -219,11 +219,6 @@ SDLWindow::initDisplay() {
     //dumpSDLGLParams();
 
     EventDispatcher::get().addSource(&_mySDLEventSource);
-#ifdef ENABLE_DINPUT
-    AC_INFO << "DIEventSource enabled";
-    EventDispatcher::get().addSource(&_myDIEventSource);
-#endif
-
 #ifdef ENABLE_EVENTRECORDER
     AC_INFO << "EventRecorder enabled";
     EventDispatcher::get().addSource(&_myEventRecorder);

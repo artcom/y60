@@ -73,7 +73,7 @@ namespace y60 {
 
         // Make sure we got a joystick
         if(_myJoysticks.size() == 0) {
-            AC_WARNING << "### WARNING: DIEventSource - No joysticks found.";
+            AC_WARNING << "DIEventSource - No joysticks found.";
             return;
         }
 

@@ -11,13 +11,6 @@
 #ifndef _Y60_ACXPSHELL_SDLWINDOW_INCLUDED_
 #define _Y60_ACXPSHELL_SDLWINDOW_INCLUDED_
 
-#ifdef WIN32
-//#define ENABLE_DINPUT
-#endif
-#ifdef ENABLE_DINPUT
-#include "DIEventSource.h"
-#endif
-
 #include "SDLEventSource.h"
 #include "SDLApp.h"
 
@@ -167,9 +160,6 @@ namespace y60 {
             SDLEventSource  _mySDLEventSource;
             DebugEventSink  _myEventDumper;
             EventRecorder   _myEventRecorder;
-#ifdef ENABLE_DINPUT
-            DIEventSource   _myDIEventSource;
-#endif
 
             std::string _myWindowTitle;
 
