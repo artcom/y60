@@ -83,6 +83,7 @@ namespace jslib {
             // you must call go()
             _myScene = y60::ScenePtr(new y60::Scene());
             _myScene->createStubs(JSApp::getPackageManager());
+            setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
         }
         return _myScene;
     }

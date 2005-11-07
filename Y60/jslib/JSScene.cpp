@@ -276,8 +276,28 @@ CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 }
 
 static JSBool
+CreateTexturedMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates a textured, unlit material.");
+    DOC_PARAM("theTextureFilename", "", DOC_TYPE_STRING);
+    DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1, 1);
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+        dom::NodePtr myResult;
+        string myTextureFilename;
+        convertFrom(cx, argv[0], myTextureFilename);
+        myResult = y60::createUnlitTexturedMaterial(myNative, myTextureFilename);
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 CreateColorMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates an untextured and unlit colored materail.");
+    DOC_BEGIN("Creates an untextured and unlit colored material.");
     DOC_PARAM_OPT("theColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
     DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
     DOC_END;
@@ -433,6 +453,7 @@ JSScene::Functions() {
         {"createStubs",         createStubs,         0},
         {"createLambertMaterial", CreateLambertMaterial, 2},
         {"createColorMaterial",   CreateColorMaterial,   1},
+        {"createTexturedMaterial",CreateTexturedMaterial,1},
         {"createBody",            CreateBody,            2},
         {"createQuadShape",       CreateQuadShape,       3},
         {"loadMovieFrame",        loadMovieFrame,        1},

@@ -439,6 +439,7 @@ namespace y60 {
         myMaterialBuilder.setTransparencyFlag(true);
         appendUnlitProperties(myMaterialBuilder, Vector4f(1.0, 1.0, 1.0, 1.0));
         appendBlendFunction(myMaterialBuilder);
+        
         if ( ! theTextureFilename.empty()) {
             appendTexture(*(theScene->getSceneBuilder()), theScene, myMaterialBuilder,
                             theTextureFilename, theSpriteFlag, theDepth);
@@ -456,7 +457,6 @@ namespace y60 {
         MaterialBuilder myMaterialBuilder(theName, false);
         string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
         myMaterialBuilder.setTransparencyFlag(theTransparencyFlag);
-
         appendUnlitProperties(myMaterialBuilder, theColor);
         appendBlendFunction(myMaterialBuilder);
 
@@ -464,7 +464,6 @@ namespace y60 {
             appendTexture(*(theScene->getSceneBuilder()), theScene, myMaterialBuilder,
                             theTextureFilename, theSpriteFlag, theDepth);
         }
-
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();
     }
