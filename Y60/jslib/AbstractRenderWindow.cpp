@@ -224,6 +224,9 @@ namespace jslib {
     void
     AbstractRenderWindow::setEventListener(JSObject * theListener) {
         _myEventListener = theListener;
+//        if (_myJSContext && _myEventListener) {
+//            dumpJSObj(_myJSContext, _myEventListener);
+//        }
     }
 
     void
@@ -313,7 +316,6 @@ namespace jslib {
                     const std::string & myTimeoutCommand = myTimeout->getCommand();
                     try {
                         MAKE_SCOPE_TIMER(onPostViewport);
-
                         if (JSA_hasFunction(_myJSContext, _myEventListener,
 //                        if (JSA_hasFunction(_myJSContext, myTimeout->getJSObject(),
                                     myTimeoutCommand.c_str()))

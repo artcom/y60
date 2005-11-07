@@ -446,11 +446,42 @@ JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int a
     } HANDLE_CPP_EXCEPTION;
 }
 
+void
+dumpJSObj(JSContext * cx, JSObject * obj) {
+    AC_PRINT << "obj = " << (void*)obj
+         << ", obj->classname = " << JSA_GetClass(cx,obj)->name;
+    AC_PRINT << "Properties: ";
+    JSIdArray * myIds = JS_Enumerate(cx, obj);
+    if (!myIds) {
+        AC_ERROR << "Could not enumerate children for js obj " << (void *)obj;
+        return;
+    }
+    AC_PRINT << "Number of properties: " << myIds->length;
+    for (int i=0; i< myIds->length; i++) {
+        jsid id = myIds->vector[i];
+        AC_PRINT << "  Property " << id << ": ";
+        jsval myIdVal;
+        if (JS_IdToValue(cx, id, &myIdVal)) {
+            string myPropName;
+            convertFrom(cx, myIdVal, myPropName);
+            AC_PRINT << "    " << myPropName;
+//                jsval myValue;
+//                JS_GetProperty(cx, myValidOptions, myPropName.c_str(), &myValue);
+//                string myValueString;
+//                if (myValue != JSVAL_NULL) {
+//                    convertFrom(cx, myValue, myValueString);
+//                }
+        }
+    }
+    JS_DestroyIdArray(cx, myIds);
+}
+
 JSBool
 JSA_hasFunction(JSContext * cx, JSObject * obj, const char * theName) {
     try {
         jsval myVal;
         JSBool ok = JS_GetProperty(cx, obj, theName, &myVal);
+//        dumpJSObj(cx, obj);
         if  (ok == JS_TRUE && myVal != JSVAL_VOID) {
             if (JS_ValueToFunction(cx, myVal) != NULL) {
                 return JS_TRUE;

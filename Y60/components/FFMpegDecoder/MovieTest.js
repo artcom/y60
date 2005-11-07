@@ -34,7 +34,7 @@ function FFMpegTest(theArguments) {
     Public.setup = function() {
         Public.setSplashScreen(false);
         Base.setup(840, 500);
-//        window.setTimeout("nextTest", 12000);
+        window.eventListener = Public;
         Public.nextTest();
     }
 
@@ -81,8 +81,8 @@ function FFMpegTest(theArguments) {
         _myMovie = myMovie;
     }
 
-    _myTests = [
-                "setupPlayTest(true)", 
+    var _myTests = [
+                "setupPlayTest(true)",
                 "setupStopTest(true)",
                 "setupPlayTest(false)",
                 "setupStopTest(false)",
@@ -104,10 +104,15 @@ function FFMpegTest(theArguments) {
         }
         _myCurTestIndex++;
         if (_myCurTestIndex < _myTests.length) {
-            myTestFunc = _myTests[_myCurTestIndex];
+            var myTestFunc = _myTests[_myCurTestIndex];
             print(myTestFunc);
             eval(myTestFunc);
         } else {
+            if (_myMovie) {
+                _myMovie.removeFromScene();
+                delete _myMovie;
+                _myMovie = 0;
+            } 
             exit(0);
         }
     }
@@ -202,6 +207,7 @@ function FFMpegTest(theArguments) {
         window.setTimeout("pause", 1000);
         window.setTimeout("stop", 1200);
         window.setTimeout("play", 1400);
+        window.setTimeout("stop", 1600);
         window.setTimeout("nextTest", 2000);
     }
     
@@ -211,6 +217,7 @@ function FFMpegTest(theArguments) {
         window.setTimeout("stop", 1000);
         window.setTimeout("pause", 1200);
         window.setTimeout("play", 1400);
+        window.setTimeout("stop", 1600);
         window.setTimeout("nextTest", 2000);
     }
     
@@ -232,3 +239,4 @@ function FFMpegTest(theArguments) {
 var ourShow = new FFMpegTest(arguments);
 ourShow.setup();
 ourShow.go();
+

@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Timeout.h,v $
-//   $Author: martin $
-//   $Revision: 1.2 $
-//   $Date: 2004/10/04 13:36:42 $
-//
-//
-//=============================================================================
 
 #ifndef __included_Timeout_h__
 #define __included_Timeout_h__
