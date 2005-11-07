@@ -7,7 +7,8 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-
+use("ImageManager.js");
+use("Y60JSSL.js");
 var ourOverlayCounter = 0;
 
 // Pure virtual base class
