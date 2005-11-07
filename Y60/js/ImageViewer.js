@@ -306,15 +306,15 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                                 //myFilename.search(/\.ra$/i)   != -1 ||
                                 /*|| myFilename.search(/\.mov$/i)  != -1)*/
                                 )) {
-            plug("y60FFMpegDecoder1");
-            print("plugged ffmpegdecoder1");
+            plug("y60FFMpegDecoder");
+            print("plugged ffmpegdecoder");
             _myMPEGPlugged = true;
         }
         if ( myFilename.search(/\.mov$/i) != -1) {
             if (OS == LINUX && !_myMPEGPlugged) {
-                plug("y60FFMpegDecoder2");
+                plug("y60FFMpegDecoder");
                 _myMPEGPlugged = true;
-                print("y60FFMpegDecoder2")
+                print("y60FFMpegDecoder")
             } else if (OS == WINDOWS && !_myQTPlugged){
                 plug("y60QuicktimeDecoder");
                 _myQTPlugged = true;
@@ -578,7 +578,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.id = createUniqueId();
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0; // indefinitively
-            _myMovieNode.audio = 0;
+            _myMovieNode.audio = 1;
             _myMovieOverlay = new MovieOverlay(self.getOverlayManager(), _myMovieNode);
         }
 

@@ -95,6 +95,7 @@ function FFMpegTest(theArguments) {
                 "setupPauseStopTest(true)",
                 "setupStopPauseTest(false)",
                 "setupStopPauseTest(true)"
+                
 //                "setupLongTest(true)"
                ];
     
@@ -222,7 +223,7 @@ function FFMpegTest(theArguments) {
     }
     
     function setupLongTest(theUseSound) {
-        setupTest("Almost Endless test", "/tmp/suesstod.avi");
+        setupTest("Almost Endless test", "/tmp/FantFour.mpg");
         _myMovie.loopcount = 0;
     }
 
