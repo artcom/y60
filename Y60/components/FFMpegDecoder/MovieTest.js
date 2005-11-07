@@ -19,6 +19,7 @@
 use("SceneViewer.js");
 
 plug("y60FFMpegDecoder");
+plug("y60JSSound");
 
 function FFMpegTest(theArguments) {
     var Public = this;
@@ -35,6 +36,11 @@ function FFMpegTest(theArguments) {
         Public.setSplashScreen(false);
         Base.setup(840, 500);
         window.eventListener = Public;
+        var myNoisyString = expandEnvironment("${Y60_NOISY_SOUND_TESTS}");
+        if (myNoisyString == "") {
+            var mySoundManager = new SoundManager();
+            mySoundManager.volume = 0.0;
+        }
         Public.nextTest();
     }
 
@@ -82,22 +88,22 @@ function FFMpegTest(theArguments) {
     }
 
     var _myTests = [
-                "setupPlayTest(true)",
-                "setupStopTest(true)",
-                "setupPlayTest(false)",
-                "setupStopTest(false)",
-                "setupLoopTest(false)",
-                "setupPauseTest(true)",
-                "setupPauseTest(false)",
-                "setupSeekBackTest(false)",
-                "setupSeekFwdTest(false)",
-                "setupPauseStopTest(false)",
-                "setupPauseStopTest(true)",
-                "setupStopPauseTest(false)",
-                "setupStopPauseTest(true)"
-                
-//                "setupLongTest(true)"
-               ];
+        "setupPlayTest(true)",
+        "setupStopTest(true)",
+        "setupPlayTest(false)",
+        "setupStopTest(false)",
+        "setupLoopTest(false)",
+        "setupPauseTest(true)",
+        "setupPauseTest(false)",
+        "setupSeekBackTest(false)",
+        "setupSeekFwdTest(false)",
+        "setupPauseStopTest(false)",
+        "setupPauseStopTest(true)",
+        "setupStopPauseTest(false)",
+        "setupStopPauseTest(true)"
+
+            //                "setupLongTest(true)"
+    ];
     
     Public.nextTest = function() {
         if (_myTestName) {

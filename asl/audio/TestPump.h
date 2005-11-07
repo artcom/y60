@@ -86,6 +86,8 @@ class TestPump: public UnitTest{
             myBuffer->convert(mySamples, mySF, numChannels);
             mySampleSink->queueSamples(myBuffer);
         };
+        
+        bool _myNoisy;
 };
 
 

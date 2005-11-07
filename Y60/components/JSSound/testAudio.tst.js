@@ -22,18 +22,21 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.runNewAudioLibTest = function() {
-
-        obj.mySoundManager.volume == 1.0;
+        var myNoisyString = expandEnvironment("${Y60_NOISY_SOUND_TESTS}");
         msleep(250);
         ENSURE("obj.mySoundManager.running == true");
         ENSURE("obj.mySoundManager.soundcount == 0");
-        ENSURE("obj.mySoundManager.volume == 1.0");
-        obj.mySoundManager.volume = 0.5;
-        msleep(250);
-        ENSURE("obj.mySoundManager.volume == 0.5");
-        obj.mySoundManager.fadeToVolume(1.0, 0.1);
-        msleep(150);
-        ENSURE("obj.mySoundManager.volume == 1.0");
+        if (myNoisyString != "") {
+            ENSURE("obj.mySoundManager.volume == 1.0");
+            obj.mySoundManager.volume = 0.5;
+            msleep(250);
+            ENSURE("obj.mySoundManager.volume == 0.5");
+            obj.mySoundManager.fadeToVolume(1.0, 0.1);
+            msleep(150);
+            ENSURE("obj.mySoundManager.volume == 1.0");
+        } else {
+            obj.mySoundManager.volume = 0;
+        }
 
         obj.mySound = new Sound("../../../../sound/testfiles/aussentuer.mp3");
 

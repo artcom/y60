@@ -21,6 +21,7 @@
 #include <asl/string_functions.h>
 #include <asl/PlugInManager.h>
 #include <asl/proc_functions.h>
+#include <asl/os_functions.h>
 
 #include <asl/Time.h>
 
@@ -460,7 +461,8 @@ class TestVolume: public SoundTestBase {
                 ENSURE(almostEqual(mySound->getVolume(), 1));
                 mySound->stop();
             }
-            {   // Global volume
+            {
+                // Global volume
                 SoundPtr mySound = getSoundManager().createSound
                         ("../../testfiles/aussentuer.mp3");
                 getSoundManager().setVolume(0.2f);
@@ -610,7 +612,16 @@ class SoundTestSuite : public UnitTestSuite {
             mySoundManager.setSysConfig(0.02, "");
 #endif
             mySoundManager.setAppConfig(44100, 2, _myUseDummyPump);
-
+            bool myNoisy;
+            string myVal;
+            if (!_myUseDummyPump && get_environment_var("Y60_NOISY_SOUND_TESTS", myVal)) {
+                myNoisy = true;
+                mySoundManager.setVolume(1);
+            } else {
+                myNoisy = false;
+                mySoundManager.setVolume(0);
+            }
+            
             addTest(new TestPlay(mySoundManager));
             addTest(new TestStop(mySoundManager));
             addTest(new TestCache(mySoundManager));
@@ -626,8 +637,9 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new TestSeek(mySoundManager));
           
             addTest(new TestLoop(mySoundManager));
-
-            addTest(new TestVolume(mySoundManager));
+            if (myNoisy) {
+                addTest(new TestVolume(mySoundManager));
+            }
 
             addTest(new StressTest(mySoundManager, 5));
 

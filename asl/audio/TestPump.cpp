@@ -15,6 +15,7 @@
 #include "Pump.h"
 
 #include <asl/proc_functions.h>
+#include <asl/os_functions.h>
 
 #ifdef USE_DASHBOARD
 #include <asl/Dashboard.h>
@@ -32,14 +33,21 @@ void TestPump::runWithPump(bool useDummyPump) {
         Pump::setSysConfig(0.02, "");
 #endif
         Pump::setAppConfig(44100, 2, useDummyPump);
-
+        string myVal;
+        if (!useDummyPump && get_environment_var("Y60_NOISY_SOUND_TESTS", myVal)) {
+            _myNoisy = true;
+            Pump::get().setVolume(1);
+        } else {
+            _myNoisy = false;
+            Pump::get().setVolume(0);
+        }
         Pump::get().setBritzelTest(true);
         
         testBufferAlloc();
 
         // Test different buffer sizes.
 //        playSingleSound(32768);
-/*        
+        
         playSingleSound(8); 
         
         playSingleSound(19);   
@@ -56,7 +64,6 @@ void TestPump::runWithPump(bool useDummyPump) {
         testSimultaneousPlay();
         testConversions();
         testRunUntilEmpty();
-*/        
         testDelayed();
 
 //        stressTest(5);
@@ -306,21 +313,22 @@ void TestPump::testVolume() {
     msleep(100);
 
     // Test global volume control.
-    myVolumeSampleSink = 
-        createSampleSink("TestVolumeSink2", 44100, 2);
-    queueSineBuffers(myVolumeSampleSink, SF_F32, 1024, 2, 440, 44100, 2, 1);
-    myVolumeSampleSink->play();
-    msleep(100);
-    myPump.setVolume(0.5);
-    // Setting volume doesn't take effect immediately
-    ENSURE(almostEqual(myPump.getVolume(),1));
-    msleep(100);
-    ENSURE(almostEqual(myPump.getVolume(),0.5));
-    myPump.fadeToVolume(1, 0.2f);
-    ENSURE(almostEqual(myPump.getVolume(),0.5));
-    msleep(300);
-    ENSURE(almostEqual(myPump.getVolume(),1));
-    myVolumeSampleSink->stop();
+    if (_myNoisy) {
+        myVolumeSampleSink = createSampleSink("TestVolumeSink2", 44100, 2);
+        queueSineBuffers(myVolumeSampleSink, SF_F32, 1024, 2, 440, 44100, 2, 1);
+        myVolumeSampleSink->play();
+        msleep(100);
+        myPump.setVolume(0.5);
+        // Setting volume doesn't take effect immediately
+        ENSURE(almostEqual(myPump.getVolume(),1));
+        msleep(100);
+        ENSURE(almostEqual(myPump.getVolume(),0.5));
+        myPump.fadeToVolume(1, 0.2f);
+        ENSURE(almostEqual(myPump.getVolume(),0.5));
+        msleep(300);
+        ENSURE(almostEqual(myPump.getVolume(),1));
+        myVolumeSampleSink->stop();
+    }
 }
 
 void TestPump::testPumpTimer() {
