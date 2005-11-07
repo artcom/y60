@@ -27,7 +27,6 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.mySoundManager.running == true");
         ENSURE("obj.mySoundManager.soundcount == 0");
         if (myNoisyString != "") {
-            ENSURE("obj.mySoundManager.volume == 1.0");
             obj.mySoundManager.volume = 0.5;
             msleep(250);
             ENSURE("obj.mySoundManager.volume == 0.5");
