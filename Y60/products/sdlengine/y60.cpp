@@ -44,6 +44,8 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
     {"--pause-on-error", ""},
     {"--std-logfile", "logfile base filename for stdout/stderr"},
     {"--help", ""},
+    {"--tutorial-screenshots", ""},
+     //y60 will quit automatically after some frames taking a screen shot.
     {"", ""}
 };
 
@@ -148,6 +150,9 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
     }
 #endif
 
+//in SDLWindow.cpp
+extern bool _ourGenerateTutorialMode;
+
 int
 main(int argc, char **argv) {
 
@@ -180,6 +185,7 @@ main(int argc, char **argv) {
             return 0;
         }
 
+        
         if (ourArguments.getCount() < 1) {
             ourArguments.printUsage();
             return 1;

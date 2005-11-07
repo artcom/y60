@@ -158,6 +158,8 @@ namespace y60 {
             SDLWindow(const SDLWindow &);
             SDLWindow & operator=(const SDLWindow &);
 
+            void onFrameWhenInTutorialMode();
+
             SDLEventSource  _mySDLEventSource;
             DebugEventSink  _myEventDumper;
             EventRecorder   _myEventRecorder;

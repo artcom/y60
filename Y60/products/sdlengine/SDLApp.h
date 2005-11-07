@@ -24,6 +24,7 @@
 class SDLApp : public jslib::JSApp {
     public:
         SDLApp();
+        static bool _myGenerateTutorialMode;
     protected:
         virtual bool initClasses(JSContext * theContext, JSObject * theGlobalObject);
 };

@@ -34,9 +34,9 @@
 #include <y60/JSNodeList.h>
 #include <y60/JSScriptablePlugin.h>
 #include <y60/JSApp.h>
+#include <y60/JScppUtils.h>
 #include <y60/GLAlloc.h>
 #include <y60/ShaderLibrary.h>
-
 
 using namespace std;
 using namespace y60;
@@ -582,6 +582,9 @@ SDLWindow::mainLoop() {
         if (jslib::JSApp::getQuitFlag() == JS_TRUE) {
             _myAppQuitFlag = true;
         }
+
+        onFrameWhenInTutorialMode();
+        
         STOP_TIMER(frames);
         asl::getDashboard().cycle();
         START_TIMER(frames);
@@ -592,6 +595,43 @@ SDLWindow::mainLoop() {
     if (jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onExit")) {
         jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onExit", 0, argv, &rval);
     }
+}
+
+#include <asl/Arguments.h>
+extern asl::Arguments ourArguments;
+
+void
+SDLWindow::onFrameWhenInTutorialMode() {
+    const unsigned OUR_TUTORIAL_FRAMECOUNT = 60; 
+    static unsigned myPersonalFrameCount = 0;
+
+    if (myPersonalFrameCount == OUR_TUTORIAL_FRAMECOUNT - 2
+        && ourArguments.haveOption("--tutorial-screenshots")) {
+        
+          const unsigned OUR_TUTORIAL_SCREENSHOT_WIDTH = 100;
+          const unsigned OUR_TUTORIAL_SCREENSHOT_HEIGHT = 100;
+
+          setVideoMode(OUR_TUTORIAL_SCREENSHOT_WIDTH, 
+                  OUR_TUTORIAL_SCREENSHOT_HEIGHT, false);
+        
+    } else if (myPersonalFrameCount == OUR_TUTORIAL_FRAMECOUNT
+            && ourArguments.haveOption("--tutorial-screenshots")) {
+        
+            int myLineNo;
+            const char * myScriptName;
+            bool myOK = jslib::getFileLine(_myJSContext, 0, 0, 0, myScriptName, myLineNo);
+            if (myOK) {
+                string myScreenshot(myScriptName);
+                if (myScreenshot.find(".js") != string::npos) {
+                    myScreenshot = myScreenshot.substr(0,myScreenshot.find(".js")) + ".png";
+                    saveBuffer(myScreenshot);
+                    exit(0);
+                }
+            } else {
+                AC_WARNING << "no javascript loaded.";
+            }
+    }
+    myPersonalFrameCount++;
 }
 
 void
