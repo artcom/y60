@@ -88,6 +88,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.attachWindow = function(theRenderWindow) {
         _myRenderWindow = theRenderWindow;
         // register our event listener
+        _myRenderWindow.eventListener = self;
         _myPicking = new Picking(_myRenderWindow);
     }
 

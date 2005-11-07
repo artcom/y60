@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: Button.js,v $
-//   $Author: christian $
-//   $Revision: 1.21 $
-//   $Date: 2004/07/28 09:16:54 $
-//
-//
 //=============================================================================
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -36,34 +28,38 @@
 var ourFontCache = [];
 
 function LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theStyle) {
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Inheritance
     ///////////////////////////////////////////////////////////////////////////////////////////
     ImageOverlayBase(Public, Protected, theSceneViewer.getOverlayManager(), null, thePosition);
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.setText = function(theText, theStyle) {
+
+        var myStyle = null;
         if (theStyle) {
-            Protected.myStyle = theStyle;
+            myStyle = theStyle;
+        } else {
+            myStyle = Protected.myStyle;
         }
 
-        var topPad    = "topPad"    in Protected.myStyle ? Protected.myStyle.topPad : 0;
-        var bottomPad = "bottomPad" in Protected.myStyle ? Protected.myStyle.bottomPad : 0;
-        var rightPad  = "rightPad"  in Protected.myStyle ? Protected.myStyle.rightPad : 0;
-        var leftPad   = "leftPad"   in Protected.myStyle ? Protected.myStyle.leftPad : 0;
+        var topPad    = "topPad"    in myStyle ? myStyle.topPad : 0;
+        var bottomPad = "bottomPad" in myStyle ? myStyle.bottomPad : 0;
+        var rightPad  = "rightPad"  in myStyle ? myStyle.rightPad : 0;
+        var leftPad   = "leftPad"   in myStyle ? myStyle.leftPad : 0;
         window.setTextStyle(Renderer.BLENDED_TEXT);
         window.setTextPadding(topPad, bottomPad, leftPad, rightPad);
-        window.setHTextAlignment(Protected.myStyle.HTextAlign);
-        window.setVTextAlignment(Protected.myStyle.VTextAlign);
-        window.setTextColor(Protected.myStyle.textColor, new Vector4f(1,1,1,1));
+        window.setHTextAlignment(myStyle.HTextAlign);
+        window.setVTextAlignment(myStyle.VTextAlign);
+        window.setTextColor(myStyle.textColor, new Vector4f(1,1,1,1));
 
-        var myFontName = Protected.myStyle.font + "_" + Protected.myStyle.fontsize;
+        var myFontName = myStyle.font + "_" + myStyle.fontsize;
         if (!(myFontName in ourFontCache)) {
-            window.loadTTF(myFontName, Protected.myStyle.font, Protected.myStyle.fontsize);
+            window.loadTTF(myFontName, myStyle.font, myStyle.fontsize);
             ourFontCache[myFontName] = true;
         }
 
@@ -109,13 +105,12 @@ function LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theS
         Public.position.y = thePosition[1];
     }
 
-
     function ensureImage() {
         if (Public.image == null) {
             Public.image = theSceneViewer.getImageManager().getImageNode(createUniqueId());
         }
     }
-    
+
     setup();
 }
 

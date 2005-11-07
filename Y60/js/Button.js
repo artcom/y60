@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: Button.js,v $
-//   $Author: christian $
-//   $Revision: 1.21 $
-//   $Date: 2004/07/28 09:16:54 $
-//
-//
 //=============================================================================
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +66,7 @@ function ButtonBase(Public, Protected, theSceneViewer, theId, theSize, thePositi
             Public.color = Protected.myStyle.color;
         }
         _isPressed = theFlag;
-    }    
+    }
 
     Public.getId = function() {
         return Protected.id;
