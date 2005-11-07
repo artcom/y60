@@ -151,7 +151,8 @@ const asl::Arguments::AllowedOption ourAllowedOptions[] = {
 int
 main(int argc, char **argv) {
 
-#ifdef WIN32    
+#ifdef WIN32
+    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
     SetUnhandledExceptionFilter(&AcUnhandledExceptionFilter);
 #endif
     int rv = 1;
