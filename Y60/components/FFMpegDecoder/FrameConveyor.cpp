@@ -62,7 +62,9 @@ namespace y60 {
             audio_resample_close(_myResampleContext);
             _myResampleContext = 0;
         }
-        
+        if (_myAudioSink) {            
+            _myAudioSink->stop();
+        }        
     }
     
     void 

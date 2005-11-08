@@ -112,6 +112,7 @@ namespace y60 {
 
     void 
     FFMpegDecoder::resumeMovie(double theStartTime) {
+        DB(cerr << "FFMpegDecoder::resumeMovie " << endl;)
         MovieDecoderBase::resumeMovie(theStartTime);        
         _myFrameConveyor.playAudio();
     }
@@ -128,12 +129,14 @@ namespace y60 {
 
     void 
     FFMpegDecoder::stopMovie() {
+        DB(cerr << "FFMpegDecoder::stopMovie " << endl;)
         MovieDecoderBase::stopMovie();        
         _myFrameConveyor.stopAudio();
     }
 
     void 
     FFMpegDecoder::pauseMovie() {
+        DB(cerr << "FFMpegDecoder::pauseMovie " << endl;)
         MovieDecoderBase::pauseMovie();
         _myFrameConveyor.pauseAudio();
     }

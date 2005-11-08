@@ -219,7 +219,7 @@ function FFMpegTest(theArguments) {
     }
     
     function setupStopPauseTest(theUseSound) {
-        setupTest("PauseStop", "testfiles/counter_short.mpg", theUseSound);
+        setupTest("StopPause", "testfiles/counter_short.mpg", theUseSound);
         _myMovie.loopcount = 1;
         window.setTimeout("stop", 1000);
         window.setTimeout("pause", 1200);
