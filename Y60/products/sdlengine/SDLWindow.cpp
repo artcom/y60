@@ -534,6 +534,16 @@ SDLWindow::onKey(Event & theEvent) {
     AbstractRenderWindow::onKey(theEvent);
 }
 
+namespace jslib {
+    //in JSRenderWindow
+    jsval as_jsval(JSContext *cx, asl::Ptr<SDLWindow> theOwner);
+
+    jsval as_jsval(JSContext *cx, asl::Ptr<AbstractRenderWindow> theOwner) {
+        return as_jsval(cx, dynamic_cast_Ptr<SDLWindow>( theOwner));
+    }
+
+}
+
 void
 SDLWindow::mainLoop() {
     _myAppQuitFlag = false;
@@ -555,6 +565,14 @@ SDLWindow::mainLoop() {
         asl::Time myStartFrameTime;
 #endif
         onFrame();
+
+        // call onProtoFrame with this window as first argument, 2nd arg is elapsed time
+        if (_myEventListener && jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
+            jsval argv[2], rval;
+            argv[0] = jslib::as_jsval(_myJSContext, _mySelf.lock());
+            argv[1] = jslib::as_jsval(_myJSContext, _myElapsedTime);
+            jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 2, argv, &rval);
+        }
 
         START_TIMER(dispatchEvents);
         EventDispatcher::get().dispatch();
@@ -583,8 +601,6 @@ SDLWindow::mainLoop() {
             _myAppQuitFlag = true;
         }
 
-        onFrameWhenInTutorialMode();
-        
         STOP_TIMER(frames);
         asl::getDashboard().cycle();
         START_TIMER(frames);
@@ -595,43 +611,6 @@ SDLWindow::mainLoop() {
     if (jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onExit")) {
         jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onExit", 0, argv, &rval);
     }
-}
-
-#include <asl/Arguments.h>
-extern asl::Arguments ourArguments;
-
-void
-SDLWindow::onFrameWhenInTutorialMode() {
-    const unsigned OUR_TUTORIAL_FRAMECOUNT = 60; 
-    static unsigned myPersonalFrameCount = 0;
-
-    if (myPersonalFrameCount == OUR_TUTORIAL_FRAMECOUNT - 2
-        && ourArguments.haveOption("--tutorial-screenshots")) {
-        
-          const unsigned OUR_TUTORIAL_SCREENSHOT_WIDTH = 100;
-          const unsigned OUR_TUTORIAL_SCREENSHOT_HEIGHT = 100;
-
-          setVideoMode(OUR_TUTORIAL_SCREENSHOT_WIDTH, 
-                  OUR_TUTORIAL_SCREENSHOT_HEIGHT, false);
-        
-    } else if (myPersonalFrameCount == OUR_TUTORIAL_FRAMECOUNT
-            && ourArguments.haveOption("--tutorial-screenshots")) {
-        
-            int myLineNo;
-            const char * myScriptName;
-            bool myOK = jslib::getFileLine(_myJSContext, 0, 0, 0, myScriptName, myLineNo);
-            if (myOK) {
-                string myScreenshot(myScriptName);
-                if (myScreenshot.find(".js") != string::npos) {
-                    myScreenshot = myScreenshot.substr(0,myScreenshot.find(".js")) + ".png";
-                    saveBuffer(myScreenshot);
-                    exit(0);
-                }
-            } else {
-                AC_WARNING << "no javascript loaded.";
-            }
-    }
-    myPersonalFrameCount++;
 }
 
 void

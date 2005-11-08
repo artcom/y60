@@ -221,14 +221,14 @@ namespace jslib {
         ExtensionList _myExtensions;
         JSErrorReporter _myErrorReporter;
         inet::RequestManager   _myRequestManager;
+        double                 _myElapsedTime;
+        asl::WeakPtr<AbstractRenderWindow> _mySelf;
     private:
         AbstractRenderWindow();
-        asl::WeakPtr<AbstractRenderWindow> _mySelf;
         TimeoutQueue           _myTimeoutQueue;
         float                  _myFixedDeltaT;
         double                 _myPauseTime;
         bool                   _myPauseFlag;
-        double                 _myElapsedTime;
     };
 }
 

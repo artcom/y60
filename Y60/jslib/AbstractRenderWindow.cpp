@@ -364,6 +364,8 @@ namespace jslib {
                 argv[0] = as_jsval(_myJSContext, _myElapsedTime);
                 JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 1, argv, &rval);
             }
+            
+
             for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
                 string myName = (*i)->getName() + "::onFrame";
                 try {

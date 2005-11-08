@@ -89,8 +89,7 @@ struct JSClassTraits<y60::SDLWindow> : public JSClassTraitsWrapper<y60::SDLWindo
 bool convertFrom(JSContext *cx, jsval theValue, y60::SDLWindow *& theRenderWindow);
 bool convertFrom(JSContext *cx, jsval theValue, jslib::AbstractRenderWindow *& theRenderWindow);
 
-jsval as_jsval(JSContext *cx, const y60::SDLWindow & theValue);
-// jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, y60::SDLWindow * theRenderer);
+jsval as_jsval(JSContext *cx, asl::Ptr<y60::SDLWindow> theOwner);
 
 }
 
