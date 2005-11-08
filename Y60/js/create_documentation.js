@@ -26,8 +26,9 @@ if (!("0" in arguments)) {
     exit(1);
 }
 
-var ourDirectory = arguments[0];
+var ourDirectory         = arguments[0];
 var ourTutorialIndex     = [];
+var ourModuleIndex       = [];
 var ourSyntaxHighlighter = new SyntaxHighlighter();
 
 main();
@@ -39,8 +40,15 @@ function main() {
             exit(1);
         }
 
+        var myModules = [];
+        var myModuleNames = getModuleNames();
+        for (var i = 0; i < myModuleNames.length; ++i) {
+            myModules[myModuleNames[i]] = getDocumentation(myModuleNames[i]);
+        }
+
+        createIndex(myModules);
         createTutorials();
-        generateJSLibDocumentation(ourDirectory);
+        generateJSLibDocumentation(myModules);
         createStyleSheet();
         print("Successfully created documentation in " + ourDirectory);
     } catch (ex) {
@@ -67,29 +75,6 @@ function getModuleNames() {
     return myModuleNames;
 }
 
-function generateJSLibDocumentation() {
-    var myModules = [];
-    var myModuleNames = getModuleNames();
-    for (var i = 0; i < myModuleNames.length; ++i) {
-        myModules[myModuleNames[i]] = getDocumentation(myModuleNames[i]);
-    }
-
-    createIndex(myModules);
-
-    for (var myModuleName in myModules) {
-        for (var myClassName in myModules[myModuleName]) {
-            if (myClassName == "") {
-                // Global functions
-                var myFunctions = myModules[myModuleName][""].functions;
-                createFunctionDocumentation(myModuleName, null, myFunctions);
-            } else {
-                // Classes
-                createClassDocumentation(myModules, myModuleName, myClassName);
-            }
-        }
-    }
-}
-
 function createIndex(theModules) {
     var myString = "<table class='IndexTable'><tr><td class='IndexTable'>";
     var myLineCount = 0;
@@ -100,17 +85,20 @@ function createIndex(theModules) {
         }
         myString += "<p><b>" + myModuleName + "</b></p>\n";
         for (myClassName in theModules[myModuleName]) {
-            if (myClassName != "") {
-                myString += "<a href='" + myModuleName + "/" + myClassName + ".html'>" + myClassName + "</a><br/>\n";
-                var myClass = theModules[myModuleName][myClassName];
-                myLineCount++;
-            } else {
+            if (myClassName == "") {
+                // Global functions
                 var theFunctions = theModules[myModuleName][myClassName].functions;
                 for (var i = 0; i < theFunctions.length; ++i) {
                     var myName = theFunctions[i].name;
-                    myString += "<a href='" + myModuleName + "/" + myName + ".html'>" + myName + "</a><br/>\n";
+                    ourModuleIndex[myName] = myModuleName;
+                    myString += "<a href='" + myModuleName + "/" + myName + ".html" + "'>" + myName + "</a><br/>\n";
                     myLineCount++;
                 }
+            } else {
+                // Classes
+                myString += "<a href='" + myModuleName + "/" + myClassName + ".html'>" + myClassName + "</a><br/>\n";
+                ourModuleIndex[myClassName] = myModuleName;
+                myLineCount++;
             }
         }
     }
@@ -118,6 +106,21 @@ function createIndex(theModules) {
     myString += "</td></tr></table>";
 
     writeHTML("index.html", myString);
+}
+
+function generateJSLibDocumentation(theModules) {
+    for (var myModuleName in theModules) {
+        for (var myClassName in theModules[myModuleName]) {
+            if (myClassName == "") {
+                // Global functions
+                var myFunctions = theModules[myModuleName][""].functions;
+                createFunctionDocumentation(myModuleName, null, myFunctions);
+            } else {
+                // Classes
+                createClassDocumentation(theModules, myModuleName, myClassName);
+            }
+        }
+    }
 }
 
 function createFunctionDocumentation(theModuleName, theClassName, theFunctions) {
@@ -323,27 +326,30 @@ function documentFunction(theClassName, theFunction) {
 
 function createStyleSheet() {
     var myString = "";
-    myString += "body { padding-left: 20px; }";
-    myString += "a { text-decoration:none; color:darkblue; }";
-    myString += "a:hover { color:red; text-decoration:underline; }";
-    myString += "h2 { padding-top:30px; }";
-    myString += ".IndexTable { vertical-align:top; padding-right:30px; }";
-    myString += ".SectionHeader { padding-top:30px; font-style:italic; padding-bottom:10px; }";
-    myString += ".Indent { padding-left:50px; }";
-    myString += ".ParameterTable { border-collapse:collapse; }";
-    myString += ".ParameterTableCell { vertical-align:top; border: solid 1px #000000; padding-top: 2px; padding-bottom: 2px; padding-left: 5px; padding-right: 10px; }";
-    myString += ".ParameterType { font-family:Courier; }";
-    myString += ".TimeStamp { font-style:italic; padding-top:60px; font-size:10pt; }";
-    myString += ".SummaryTable { border-collapse:collapse; }";
-    myString += ".SummeryHeader { font-weight:bold; }";
-    myString += ".SummaryTableCell { vertical-align:top; border: solid 1px #000000; padding-top: 2px; padding-bottom: 2px; padding-left: 5px; padding-right: 10px; }";
-    myString += ".FunctionDescription {  padding-left:50px; }";
-    myString += ".TutorialCode { font-family:Courier; }";
-    myString += ".TutorialText { color:black; }";
-    myString += ".comment { color: green; }";
-    myString += ".string { color: grey; }";
-    myString += ".keyword { color: blue; }";
-    myString += ".vars { color: #d00; }";
+    myString += "body { padding: 20px; }\n";
+    myString += "a { text-decoration:none; color:darkblue; }\n";
+    myString += "a:hover { color:red; text-decoration:underline; }\n";
+    myString += "h2 { padding-top:30px; }\n";
+    myString += ".IndexTable { vertical-align:top; padding-right:30px; }\n";
+    myString += ".SectionHeader { padding-top:30px; font-style:italic; padding-bottom:10px; }\n";
+    myString += ".Indent { padding-left:50px; }\n";
+    myString += ".ParameterTable { border-collapse:collapse; }\n";
+    myString += ".ParameterTableCell { vertical-align:top; border: solid 1px #000000; padding-top: 2px; padding-bottom: 2px; padding-left: 5px; padding-right: 10px; }\n";
+    myString += ".ParameterType { font-family:Courier; }\n";
+    myString += ".TimeStamp { font-style:italic; padding-top:60px; font-size:10pt; }\n";
+    myString += ".SummaryTable { border-collapse:collapse; }\n";
+    myString += ".SummeryHeader { font-weight:bold; }\n";
+    myString += ".SummaryTableCell { vertical-align:top; border: solid 1px #000000; padding-top: 2px; padding-bottom: 2px; padding-left: 5px; padding-right: 10px; }\n";
+    myString += ".FunctionDescription {  padding-left:50px; }\n";
+    myString += ".TutorialCode { font-family:Courier; background-color: #FFFFE0; padding-left: 20px; margin-top:20px }\n";
+    myString += ".TutorialText { color:black; }\n"
+    myString += ".TutorialTableCell { vertical-align:top; padding-right: 10px}\n";
+    myString += ".TutorialLinks { padding-left:50px }\n";
+    myString += ".comment { color: green; }\n";
+    myString += ".string { color: grey; }\n";
+    myString += ".keyword { color: blue; }\n";
+    myString += ".vars { color: #d00; }\n";
+    myString += ".number { color: red; }\n";
 
     var myPath = ourDirectory + "/jsdoc.css";
     if (!putWholeFile(myPath, myString)) {
@@ -351,9 +357,26 @@ function createStyleSheet() {
     }
 }
 
+function getLinkedFile(theLink) {
+    var mySplit  = theLink.split("::");
+    var myClass  = mySplit[0];
+    var myMethod = "";
+    if (mySplit.length > 1) {
+        myMethod = "_" + mySplit[1];
+    }
+    if (myClass in ourModuleIndex) {
+        var myModule = ourModuleIndex[myClass];
+        return "../" + myModule + "/" + myClass + myMethod + ".html";
+    } else {
+        return null;
+    }
+}
+
 function createTutorials() {
     var myTutorials = getDirList("${PRO}/tutorials");
+    var myTutorialIndex = "<h1>Tutorial Index</h1>";
     includePath("${PRO}/tutorials");
+
     for (var i = 0; i < myTutorials.length; ++i) {
         var myTutorial = myTutorials[i];
         var myDotIndex = myTutorial.lastIndexOf(".");
@@ -361,7 +384,10 @@ function createTutorials() {
             var myHtmlFileName = myTutorial.substr(0, myDotIndex) + ".html";
             var myFile = getWholeFile(myTutorial);
             var myTitle = myTutorial;
-            var myHTMLString = "";
+            var myTutorialExplanation = "";
+            var myTutorialCode = "";
+            var myTutorialLinks = "";
+
             var myLines = myFile.split("\n");
             var myHeader = false;
             for (var j = 0; j < myLines.length; ++j) {
@@ -369,7 +395,6 @@ function createTutorials() {
 
                 if (myLine.search(/\/\*\*/) != -1) {
                     myHeader = true;
-                    myHTMLString += "<div class='TutorialText'>";
                 }
 
                 if (myHeader) {
@@ -381,24 +406,48 @@ function createTutorials() {
                             ourTutorialIndex[myLink] = [];
                         }
                         ourTutorialIndex[myLink].push({title: myTitle, file: myHtmlFileName});
+                        var myLinkedFile = getLinkedFile(myLink);
+                        if (myLinkedFile) {
+                            myTutorialLinks += "<a href='" + myLinkedFile + "'>" + myLink + "</a></br>";
+                        }
                     } else {
-                        if (myLine.search(/^ \* /) != -1) {
-                            myHTMLString += myLine.substr(3) + "<br/>";
+                        if (myLine.search(/^ \*/) != -1) {
+                            myTutorialExplanation += myLine.substr(3) + "<br/>";
                         }
                     }
                 } else {
-                    myHTMLString += ourSyntaxHighlighter.highlight(myLine) + "</br>";
+                    myTutorialCode += ourSyntaxHighlighter.highlight(myLine) + "</br>";
                 }
 
                 if (myLine.search(/\*\//) != -1) {
-                    if (myHeader) {
-                        myHTMLString += "</div><div class='TutorialCode'>";
-                    }
                     myHeader = false;
                 }
             }
-            myHTMLString = "<h1>" + myTitle + "</h1>" + myHTMLString + "</div>";
+
+            var myScreenshotFileName = myTutorial.substr(0, myDotIndex) + ".png";
+
+            var myHTMLString = "";
+            myHTMLString += "<h1>" + myTitle + "</h1>";
+            myHTMLString += "<table><tr><td class='TutorialTableCell'>";
+            myHTMLString += "<div class='TutorialImage'><img src='" + myScreenshotFileName + "'></div>";
+            myHTMLString += "</td><td class='TutorialTableCell'><div class='TutorialText'>" + myTutorialExplanation + "</div></td></tr></table>";
+            myHTMLString += "<div class='TutorialCode'>" + myTutorialCode + "</div>";
+            if (myTutorialLinks) {
+                myHTMLString += "<div class='SectionHeader'>See also:</div><div class='TutorialLinks'>" + myTutorialLinks + "</div>";
+            }
+
             writeHTML("tutorials/" + myHtmlFileName, myHTMLString);
+
+            myTutorialIndex += "<a href='" + myHtmlFileName + "'>" + myTitle + "</a></br>";
+
+/*
+            // Create screenshot
+            var myPro = expandEnvironment("${PRO}");
+            var myCommand = "y60 " + myPro + "/src/Y60/js/createTutorialScreenshots.js " + myPro + "/tutorials/" + myTutorial + " " + ourDirectory + "/tutorials";
+            print(myCommand);
+            exec(myCommand);
+*/
         }
+        writeHTML("tutorials/index.html", myTutorialIndex);
     }
-}
+} 
