@@ -16,6 +16,7 @@
 //
 //=============================================================================
 
+use("Y60JSSL.js");
 use("Exception.js");
 use("SyntaxHighlighter.js");
 
@@ -40,12 +41,12 @@ function main() {
             exit(1);
         }
 
+        plugComponentsForDocumentation();
         var myModules = [];
         var myModuleNames = getModuleNames();
         for (var i = 0; i < myModuleNames.length; ++i) {
             myModules[myModuleNames[i]] = getDocumentation(myModuleNames[i]);
         }
-
         createIndex(myModules);
         createTutorials();
         generateJSLibDocumentation(myModules);
@@ -57,9 +58,27 @@ function main() {
     }
 }
 
+function plugComponentsForDocumentation() {
+    var myComponents = ["y60JSSound"];
+    if (operatingSystem() == "win32") {
+        myComponents = myComponents.concat(["y60WMPPlayer"]);
+    } else if (operatingSystem() == "Linux") {
+        myComponents = myComponents.concat([]);
+    }
+    
+    for(var i = 0;i < myComponents.length; ++i) { 
+        print("Plugging " + myComponents[i]);
+        try {
+            plug(myComponents[i]);
+        } catch(e) {
+            print ("### ERROR: plug failed " + myComponents[i]);
+        }
+    }
+}
+
 // This function makes sure, some well-known modules come first
 function getModuleNames() {
-    var myModuleNames = ["Global", "Math", "GlobalFunctions", "MathFunctions"];
+    var myModuleNames = ["Global", "Math", "GlobalFunctions", "MathFunctions", "components"];
     var myModuleNames2 = getDocumentedModules();
     for (var i = 0; i < myModuleNames2.length; ++i) {
         var myNewModuleFlag = true;

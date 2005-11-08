@@ -88,6 +88,18 @@ namespace jslib {
         };
         return myProperties;
     }
+JSPropertySpec *
+JSSound::StaticProperties() {
+    static JSPropertySpec myProperties[] = {{0}};
+    return myProperties;
+}
+
+JSFunctionSpec *
+JSSound::StaticFunctions() {
+    static JSFunctionSpec myFunctions[] = {{0}};
+    return myFunctions;
+}
+
 
     // getproperty handling
     JSBool
@@ -195,7 +207,9 @@ namespace jslib {
 
     JSObject *
     JSSound::initClass(JSContext *cx, JSObject *theGlobalObject) {
-        return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+        JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+        DOC_MODULE_CREATE("components", JSSound);
+        return myClass;
     }
 
     jsval as_jsval(JSContext *cx, JSSound::OWNERPTR theOwner) {
