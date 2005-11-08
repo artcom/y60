@@ -11,7 +11,8 @@ if (!fileExists(myTutorialPath) || !isDirectory(myTargetDirectory)) {
     exit(1);
 }
 
-RenderWindow.prototype.onProtoFrame = function(theWindow, theTime) {
+RenderWindow.prototype.onProtoFrame = function(theTime) {
+    this.fixedFrameTime = 0.04;
     if (myFrameCount == myFrameBreak - 5) {
         this.setVideoMode(myScreenshotSize[0], myScreenshotSize[1], false);
 
@@ -20,7 +21,7 @@ RenderWindow.prototype.onProtoFrame = function(theWindow, theTime) {
         var myDotIndex = myTutorial.lastIndexOf(".");
         if (myDotIndex != -1 && myTutorial.substring(myDotIndex, myTutorial.length) == ".js") {
             var myScreenshotFileName = myTutorial.substr(0, myDotIndex) + ".png";
-            print ("generating screenshot " + myScreenshotFileName + " in " + myTargetDirectory);
+            print ("Generating screenshot " + myTargetDirectory + "/" + myScreenshotFileName);
             this.saveBuffer(myTargetDirectory + "/" + myScreenshotFileName);
             exit(0);
         } else {

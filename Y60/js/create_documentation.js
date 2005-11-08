@@ -65,8 +65,8 @@ function plugComponentsForDocumentation() {
     } else if (operatingSystem() == "Linux") {
         myComponents = myComponents.concat([]);
     }
-    
-    for(var i = 0;i < myComponents.length; ++i) { 
+
+    for(var i = 0;i < myComponents.length; ++i) {
         print("Plugging " + myComponents[i]);
         try {
             plug(myComponents[i]);
@@ -406,6 +406,11 @@ function createTutorials() {
     }
     ourSyntaxHighlighter.addKeywords(myY60Keywords, "y60class");
 
+    var myDir = ourDirectory + "/tutorials"
+    if (!isDirectory(ourDirectory)) {
+        makeDir(ourDirectory);
+    }
+
     for (var i = 0; i < myTutorials.length; ++i) {
         var myTutorial = myTutorials[i];
         var myDotIndex = myTutorial.lastIndexOf(".");
@@ -469,17 +474,10 @@ function createTutorials() {
             writeHTML("tutorials/" + myHtmlFileName, myHTMLString);
 
             myTutorialIndex += "<a href='" + myHtmlFileName + "'>" + myTitle + "</a></br>";
-
-/*
-            // Create screenshot
-            var myPro = expandEnvironment("${PRO}");
-            var myCommand = "y60 " + myPro + "/src/Y60/js/createTutorialScreenshots.js " + myPro + "/tutorials/" + myTutorial + " " + ourDirectory + "/tutorials";
-            print(myCommand);
-            exec(myCommand);
-*/
+            exec("bash -c 'cp $PRO/tutorials/BaselineImages/*.png " + ourDirectory + "/tutorials/'");
         }
     }
     myTutorialIndex += "</div>";
     print("Create tutorial index");
     writeHTML("tutorials/index.html", myTutorialIndex);
-} 
+}
