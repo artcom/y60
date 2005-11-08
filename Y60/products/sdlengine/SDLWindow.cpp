@@ -566,12 +566,11 @@ SDLWindow::mainLoop() {
 #endif
         onFrame();
 
-        // call onProtoFrame with this window as first argument, 2nd arg is elapsed time
+        // Call onProtoFrame (a second on frame that can be used to automatically run tutorials)
         if (_myEventListener && jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
-            jsval argv[2], rval;
-            argv[0] = jslib::as_jsval(_myJSContext, _mySelf.lock());
-            argv[1] = jslib::as_jsval(_myJSContext, _myElapsedTime);
-            jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 2, argv, &rval);
+            jsval argv[1], rval;
+            argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
+            jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 1, argv, &rval);
         }
 
         START_TIMER(dispatchEvents);
