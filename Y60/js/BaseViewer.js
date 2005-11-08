@@ -291,20 +291,18 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.onExit = function() {
         if (_myProfileNode) {
-            //print("Profiling: current run FPS=" + _myProfileNode.current);
             _myProfileNode.name = self.getModelName();
             _myProfileNode.revision = revision();
+            _myProfileNode.current = _myProfileNode.maxfps;
 
             // get or create profiles node
             var myProfilesNode = null;
             if (fileExists(_myProfileFilename)) {
-                //print("Profiling: found " + _myProfileFilename);
                 var myContent = getWholeFile(_myProfileFilename);
                 if (myContent) {
                     myProfilesNode = new Node(myContent);
                     if (myProfilesNode) {
                         myProfilesNode = myProfilesNode.firstChild;
-                        //print("Profiling: existing " + myProfilesNode);
                     } else {
                         Logger.error("Unable to parse '" + _myProfileName + "'");
                     }
@@ -319,7 +317,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             // find matching profile node
             var myNode = getDescendantByName(myProfilesNode, _myProfileNode.name);
             if (myNode) {
-                //print("Profiling: previous run FPS=" + myNode.current);
                 _myProfileNode.previous = myNode.current;
                 myProfilesNode.removeChild(myNode);
             }
@@ -370,12 +367,16 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.onFrame = function(theTime) {
         if (_myProfileNode) {
-            if (_myRenderWindow.fps > _myProfileNode.current) {
-                _myProfileNode.current = _myRenderWindow.fps;
-                _myProfileTime = theTime;
-            } else if ((theTime - _myProfileTime) > PROFILE_TIME) {
-                // MaxFPS unchanged for PROFILE_TIME, done
-                exit(0);
+            var myFPS = _myRenderWindow.fps;
+            if (myFPS > _myProfileNode.maxfps) {
+                _myProfileNode.maxfps = myFPS;
+                _myProfileNode.time = theTime;
+                if (_myProfileNode.minfps <= 0.0) {
+                    _myProfileNode.minfps = myFPS;
+                }
+            } else if (myFPS < _myProfileNode.minfps) {
+                _myProfileNode.minfps = myFPS;
+                _myProfileNode.time = theTime;
             }
         }
         if (_myHeartbeatThrober != null) {
@@ -446,10 +447,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myLightManager          = null;
 
     const PROFILE_FILENAME = "profile.xml";
-    const PROFILE_TIME     = 5.0; // fps must not rise for this time
     var _myProfileFilename = null;
     var _myProfileNode     = null;
-    var _myProfileTime     = 0.0; // time of MaxFPS sample
 
     // Camera movers
     var _myMoverFactories        = [];  // Array of mover constructors
@@ -519,7 +518,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             if (_myProfileFilename == null) {
                 _myProfileFilename = PROFILE_FILENAME;
             }
-            _myProfileNode = new Node("<profile revision='0' name='' current='0' previous='0' gain='0'/>").firstChild;
+            _myProfileNode = new Node("<profile revision='0' name='' current='0' previous='0' gain='0' time='0' maxfps='0' minfps='0'/>").firstChild;
             Logger.warning("Profiling enabled, filename=" + _myProfileFilename);
         }
 
