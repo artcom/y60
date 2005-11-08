@@ -11,11 +11,11 @@ if (!fileExists(myTutorialPath) || !isDirectory(myTargetDirectory)) {
     exit(1);
 }
 
+
 RenderWindow.prototype.onProtoFrame = function(theTime) {
     this.fixedFrameTime = 0.04;
     if (myFrameCount == myFrameBreak - 5) {
         this.setVideoMode(myScreenshotSize[0], myScreenshotSize[1], false);
-
     } else if (myFrameCount == myFrameBreak) {
         var myTutorial = basename(myTutorialPath);
         var myDotIndex = myTutorial.lastIndexOf(".");

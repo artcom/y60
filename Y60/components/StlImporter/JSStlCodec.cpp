@@ -136,7 +136,7 @@ JSStlCodec::StaticFunctions() {
 JSObject *
 JSStlCodec::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-    DOC_MODULE_CREATE("components", JSStlCodec);
+    DOC_MODULE_CREATE("Components", JSStlCodec);
     return myClass;
 }
 

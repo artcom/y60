@@ -41,6 +41,7 @@ function main() {
             exit(1);
         }
 
+        includePath("${PRO}/lib");
         plugComponentsForDocumentation();
         var myModules = [];
         var myModuleNames = getModuleNames();
@@ -66,7 +67,7 @@ function plugComponentsForDocumentation() {
         myComponents = myComponents.concat([]);
     }
 
-    for(var i = 0;i < myComponents.length; ++i) {
+    for (var i = 0;i < myComponents.length; ++i) {
         print("Plugging " + myComponents[i]);
         try {
             plug(myComponents[i]);
@@ -78,7 +79,7 @@ function plugComponentsForDocumentation() {
 
 // This function makes sure, some well-known modules come first
 function getModuleNames() {
-    var myModuleNames = ["Global", "Math", "GlobalFunctions", "MathFunctions", "components"];
+    var myModuleNames = ["Global", "Math", "GlobalFunctions", "MathFunctions"];
     var myModuleNames2 = getDocumentedModules();
     for (var i = 0; i < myModuleNames2.length; ++i) {
         var myNewModuleFlag = true;
