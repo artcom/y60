@@ -33,7 +33,7 @@ namespace asl {
 #ifdef WIN32
 double Pump::_myLatency_Init = 0.05;
 #else
-double Pump::_myLatency_Init = 0.02;
+double Pump::_myLatency_Init = 0.04;
 #endif
 std::string Pump::_myDeviceName_Init = "";
 unsigned Pump::_mySampleRate_Init = 44100;
@@ -244,7 +244,7 @@ Pump::stop() {
         _myRunning = false;
         join();
         if (_myNumUnderruns > 0) {
-            AC_ERROR << "Pump::stop: Number of buffer underruns: " << _myNumUnderruns << endl;
+            AC_WARNING << "Pump::stop: Number of buffer underruns: " << _myNumUnderruns << endl;
         }
     }
 }

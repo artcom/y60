@@ -169,12 +169,10 @@ ALSAPump::setHWParams(snd_pcm_t * theDevice, int myNumChannels) {
                 + " not available: " + snd_strerror(myRetVal) + ". ").c_str(), PLUS_FILE_LINE);
 
     snd_pcm_uframes_t myBufferSize = nextPowerOfTwo(int(getLatency() * getNativeSampleRate()));
-    myRetVal = snd_pcm_hw_params_set_buffer_size_near
-            (theDevice, myHWParams, &myBufferSize);
-    _myFramesPerBuffer = myBufferSize;
-    
+    myRetVal = snd_pcm_hw_params_set_buffer_size_near(theDevice, myHWParams, &myBufferSize);
     checkRetVal (myRetVal,(string("Unable to set buffer size to ")+
                 as_string(myBufferSize)+".").c_str(), PLUS_FILE_LINE);
+    _myFramesPerBuffer = myBufferSize;
 
     myRetVal = snd_pcm_hw_params_set_periods
             (theDevice, myHWParams, 2, 0);
@@ -260,13 +258,13 @@ ALSAPump::handleUnderrun (int err) {
                 PLUS_FILE_LINE);
         if (err == -EPIPE) {
             if (getNumUnderruns() == 0) {
-                AC_ERROR << "ALSAPump::handleUnderrun(): Buffer underrun (EPIPE).";
+                AC_WARNING << "ALSAPump::handleUnderrun(): Buffer underrun (EPIPE).";
             } else {
                 AC_DEBUG << "ALSAPump::handleUnderrun(): Buffer underrun (EPIPE).";
             }
         } else {
             if (getNumUnderruns() == 0) {
-                AC_DEBUG << "ALSAPump::handleUnderrun(): Buffer underrun (EBADFD).";
+                AC_WARNING << "ALSAPump::handleUnderrun(): Buffer underrun (EBADFD).";
             } else {
                 AC_DEBUG << "ALSAPump::handleUnderrun(): Buffer underrun (EBADFD).";
             }
@@ -297,8 +295,10 @@ void outputHWParams (snd_pcm_t * theDevice) {
     snd_pcm_uframes_t mySize;
     myRetVal = snd_pcm_hw_params_get_period_size(myParams, & mySize, & myDir);
     AC_DEBUG << "  Period size: " << mySize;
-    
     checkRetVal (myRetVal, "Unable to get period size: ", PLUS_FILE_LINE);
+    myRetVal = snd_pcm_hw_params_get_buffer_size(myParams, &mySize);
+    checkRetVal (myRetVal, "get_buffer_size() failed", PLUS_FILE_LINE);
+    AC_DEBUG << "  Buffer size: " << mySize;
 
     if (snd_pcm_hw_params_is_double (myParams)) {
         AC_DEBUG << "  Double buffering is on.";
