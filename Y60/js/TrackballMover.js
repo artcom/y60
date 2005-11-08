@@ -200,7 +200,6 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
 
         var parentMatrixInv = obj.getMoverObject().parentNode.inverseglobalmatrix;
         myNewMatrix.postMultiply(parentMatrixInv);
-
         // now set the move object's values
         var myDecomposition = myNewMatrix.decompose();
 

@@ -61,13 +61,16 @@ namespace asl {
         _splitpath( theFileName.c_str(), drive, dir, fname, ext );
         std::string myBaseName = std::string(fname)+std::string(ext);
 #else
-        if (theFileName.at(theFileName.length()-1) == '/') {
-            return std::string("");
-        }
+        std::string myBaseName;
+        if ( ! theFileName.empty()) {
+            if (theFileName.at(theFileName.length()-1) == '/') { // Huh? what's that for??? [DS/MS]
+                return std::string("");
+            }
 
-        char * myBuffer = strdup(theFileName.c_str());
-        std::string myBaseName(basename(myBuffer));
-        free(myBuffer);
+            char * myBuffer = strdup(theFileName.c_str());
+            myBaseName = basename(myBuffer);
+            free(myBuffer);
+        }
 #endif
         return myBaseName;
     }

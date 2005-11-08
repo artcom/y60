@@ -126,7 +126,7 @@ class Enum {
 
         /** Parses the input stream @p is for a word consisting of characters and
          * digits (<i>a-z, A-Z, 0-9</i>) and underscores (<i>_</i>).
-         * The failbit of the strem is set if the word is not a valid identifier.
+         * The failbit of the stream is set if the word is not a valid identifier.
          */
         std::istream & parse(std::istream & is) {
             std::string myWord;
@@ -166,6 +166,7 @@ class Enum {
             return os << STRINGS[_myValue];
         }
         
+        /** Static helper function to iterate over valid identifiers. */
         static const char * getString(unsigned theIndex) {
             return STRINGS[theIndex];
         }
