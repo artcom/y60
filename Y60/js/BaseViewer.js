@@ -518,7 +518,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             if (_myProfileFilename == null) {
                 _myProfileFilename = PROFILE_FILENAME;
             }
-            _myProfileNode = new Node("<profile revision='0' name='' current='0' previous='0' gain='0' time='0' maxfps='0' minfps='0'/>").firstChild;
+            _myProfileNode = new Node("<profile revision='0' name='' description='Frames-per-Second' current='0' previous='0' gain='0' time='0' maxfps='0' minfps='0'/>").firstChild;
             Logger.warning("Profiling enabled, filename=" + _myProfileFilename);
         }
 
