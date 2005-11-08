@@ -55,13 +55,17 @@ SyntaxHighlighter.prototype.Constructor = function(Public) {
     	return myResult;
     }
 
+    Public.addKeywords = function(theKeywords, theStyle) {
+        myRegexList.push({ regex: new RegExp(getKeywords(theKeywords), 'gm'), css: theStyle });
+    }
+
 	const myKeywords = 'abstract boolean break byte case catch char class const continue debugger ' +
 					   'default delete do double else enum export extends false final finally float ' +
 					   'for function goto if implements import in instanceof int interface long native ' +
 					   'new null package private protected public return short static super switch ' +
 					   'synchronized this throw throws transient true try typeof var void volatile while with';
 
-	const myRegexList = [
+	var myRegexList = [
 		{ regex: new RegExp('//.*$', 'gm'),							css: 'comment' },			// one line comments
 		{ regex: new RegExp('/\\*[\\s\\S]*?\\*/', 'g'),				css: 'comment' },			// multiline comments
 		{ regex: new RegExp('"(?:[^"\n]|[\"])*?"', 'g'),			css: 'string' },			// double quoted strings
@@ -78,7 +82,8 @@ SyntaxHighlighter.prototype.Constructor = function(Public) {
     function getMatches(theCode, theRegex, theCss) {
     	var myMatch = null;
         var myResult = [];
-    	while((myMatch = theRegex.exec(theCode)) != null) {
+
+        while ((myMatch = theRegex.exec(theCode)) != null) {
     		myResult.push({value: myMatch[0], index: myMatch.index, css: theCss, length: myMatch[0].length });
     	}
     	return myResult;

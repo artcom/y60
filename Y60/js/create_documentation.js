@@ -350,6 +350,7 @@ function createStyleSheet() {
     myString += ".keyword { color: blue; }\n";
     myString += ".vars { color: #d00; }\n";
     myString += ".number { color: red; }\n";
+    myString += ".y60class { color: #FF8000 }\n"
 
     var myPath = ourDirectory + "/jsdoc.css";
     if (!putWholeFile(myPath, myString)) {
@@ -374,8 +375,17 @@ function getLinkedFile(theLink) {
 
 function createTutorials() {
     var myTutorials = getDirList("${PRO}/tutorials");
-    var myTutorialIndex = "<h1>Tutorial Index</h1>";
+    var myTutorialIndex = "<h1>Y60 Tutorials</h1><div class='Indent'>";
     includePath("${PRO}/tutorials");
+
+    var myY60Keywords = "";
+    for (var myWord in ourModuleIndex) {
+        if (myY60Keywords) {
+            myY60Keywords += " ";
+        }
+        myY60Keywords += myWord;
+    }
+    ourSyntaxHighlighter.addKeywords(myY60Keywords, "y60class");
 
     for (var i = 0; i < myTutorials.length; ++i) {
         var myTutorial = myTutorials[i];
@@ -436,6 +446,7 @@ function createTutorials() {
                 myHTMLString += "<div class='SectionHeader'>See also:</div><div class='TutorialLinks'>" + myTutorialLinks + "</div>";
             }
 
+            print("Create tutorial: " + myHtmlFileName);
             writeHTML("tutorials/" + myHtmlFileName, myHTMLString);
 
             myTutorialIndex += "<a href='" + myHtmlFileName + "'>" + myTitle + "</a></br>";
@@ -448,6 +459,8 @@ function createTutorials() {
             exec(myCommand);
 */
         }
-        writeHTML("tutorials/index.html", myTutorialIndex);
     }
+    myTutorialIndex += "</div>";
+    print("Create tutorial index");
+    writeHTML("tutorials/index.html", myTutorialIndex);
 } 
