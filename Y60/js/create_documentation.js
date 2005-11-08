@@ -395,6 +395,7 @@ function getLinkedFile(theLink) {
 
 function createTutorials() {
     var myTutorials = getDirList("${PRO}/tutorials");
+    myTutorials.sort();
     var myTutorialIndex = "<h1>Y60 Tutorials</h1><div class='Indent'>";
     includePath("${PRO}/tutorials");
 
