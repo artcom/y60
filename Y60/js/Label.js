@@ -74,6 +74,11 @@ function LabelBase(Public, Protected, theSceneViewer,
         window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
         window.setTextPadding(0,0,0,0);
         Public.texture.applymode = "decal";
+
+        if (theSize == null) {
+            Public.width = mySize[0];
+            Public.height = mySize[1];
+        }
     }
 
     Public.setImage = function(theSource) {
@@ -101,8 +106,10 @@ function LabelBase(Public, Protected, theSceneViewer,
 
     function setup() {
         Public.color = Protected.myStyle.color;
-        Public.width  = theSize[0];
-        Public.height = theSize[1];
+        if (theSize) {
+            Public.width  = theSize[0];
+            Public.height = theSize[1];
+        }
         Public.position.x = thePosition[0];
         Public.position.y = thePosition[1];
     }
