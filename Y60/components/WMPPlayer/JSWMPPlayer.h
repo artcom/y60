@@ -54,7 +54,8 @@ class JSWMPPlayer : public jslib::JSWrapper<y60::WMPPlayer, asl::Ptr<y60::WMPPla
             PROP_loopcount
         };
         static JSPropertySpec * Properties();
-
+        static JSPropertySpec * StaticProperties();
+        
         virtual unsigned long length() const {
             return 1;
         }

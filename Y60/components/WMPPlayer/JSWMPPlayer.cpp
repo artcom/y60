@@ -32,6 +32,8 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
     const WMPPlayer & myNative = JSWMPPlayer::getJSWrapper(cx,obj).getNative();
     std::string myStringRep = string("WMPPlayer");
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -41,11 +43,16 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Load a media file.");
+    DOC_PARAM("theURL", "", DOC_TYPE_STRING);
+    DOC_END;
     return Method<JSWMPPlayer::NATIVE>::call(&JSWMPPlayer::NATIVE::load,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 setup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Setup the player (e.g. window). Call this before any usage");
+    DOC_END;
     return Method<JSWMPPlayer::NATIVE>::call(&JSWMPPlayer::NATIVE::setup,cx,obj,argc,argv,rval);
 }
 
@@ -73,11 +80,15 @@ play(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Stops playback of the movie. Current movie position is lost.");
+    DOC_END;
     return Method<JSWMPPlayer::NATIVE>::call(&JSWMPPlayer::NATIVE::stop,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 pause(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Pauses playback of the movie. Current movie position is remembered.");
+    DOC_END;
     return Method<JSWMPPlayer::NATIVE>::call(&JSWMPPlayer::NATIVE::pause,cx,obj,argc,argv,rval);
 }
 
@@ -215,6 +226,14 @@ JSWMPPlayer::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj
     }
 }
 
+JSPropertySpec *
+JSWMPPlayer::StaticProperties() {
+    static JSPropertySpec myProperties[] = {
+        {0}
+    };
+    return myProperties;
+}
+    
 JSBool
 JSWMPPlayer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     if (JSA_GetClass(cx,obj) != Class()) {
@@ -240,7 +259,9 @@ JSWMPPlayer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
 
 JSObject *
 JSWMPPlayer::initClass(JSContext *cx, JSObject *theGlobalObject) {
-    return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
+    JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+    DOC_MODULE_CREATE("Components", JSWMPPlayer);
+    return myClass;
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, JSWMPPlayer::OWNERPTR & theWMPPlayer) {

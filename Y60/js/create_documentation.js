@@ -61,8 +61,8 @@ function main() {
 
 function plugComponentsForDocumentation() {
     var myComponents = ["jsnet", "y60JSSound", "ProcFunctions"];
-    if (operatingSystem() == "win32") {
-        myComponents = myComponents.concat(["y60WMPPlayer"]);
+    if (operatingSystem() == "Win32") {
+        myComponents = myComponents.concat(["TaskManager","y60WMPPlayer"]);
     } else if (operatingSystem() == "Linux") {
         myComponents = myComponents.concat([]);
     }

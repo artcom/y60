@@ -54,6 +54,9 @@ namespace jslib {
             };
 
             static JSPropertySpec * Properties();
+
+            static JSPropertySpec * StaticProperties();
+            static JSFunctionSpec * StaticFunctions();
     
             virtual unsigned long length() const {
                 return 1;

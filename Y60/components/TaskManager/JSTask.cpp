@@ -33,18 +33,26 @@ namespace jslib {
 
     static JSBool
     terminate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("");
+        DOC_END;
         return Method<JSTask::NATIVE>::call(&JSTask::NATIVE::terminate,cx,obj,argc,argv,rval);
     }
     static JSBool
     captureDesktop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("");
+        DOC_END;
         return Method<JSTask::NATIVE>::call(&JSTask::NATIVE::captureDesktop,cx,obj,argc,argv,rval);
     }
     static JSBool
     waitForInputIdle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("");
+        DOC_END;
         return Method<JSTask::NATIVE>::call(&JSTask::NATIVE::waitForInputIdle,cx,obj,argc,argv,rval);
     }
     static JSBool
     setPriority(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("");
+        DOC_END;
         return Method<JSTask::NATIVE>::call(&JSTask::NATIVE::setPriority,cx,obj,argc,argv,rval);
     }
     static JSBool
@@ -79,6 +87,22 @@ namespace jslib {
         return myProperties;
     }
 
+JSPropertySpec *
+JSTask::StaticProperties() {
+    static JSPropertySpec myProperties[] = {
+        {0}
+    };
+    return myProperties;
+}
+    
+JSFunctionSpec *
+JSTask::StaticFunctions() {
+    static JSFunctionSpec myFunctions[] = {
+        {0}
+    };
+    return myFunctions;
+}
+
     // getproperty handling
     JSBool
     JSTask::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
@@ -111,6 +135,13 @@ namespace jslib {
 
     JSBool
     JSTask::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("Creates a Task Object");
+        DOC_PARAM("theCommand", "", DOC_TYPE_STRING);
+        DOC_RESET;
+        DOC_PARAM("theRenderer", "", DOC_TYPE_OBJECT);
+        DOC_PARAM_OPT("thePath", "", DOC_TYPE_STRING, "");
+        DOC_PARAM_OPT("theShowFlag", "", DOC_TYPE_BOOLEAN, "true");
+        DOC_END;
         if (JSA_GetClass(cx,obj) != Class()) {
             JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
             return JS_FALSE;
@@ -183,7 +214,9 @@ namespace jslib {
 
     JSObject *
     JSTask::initClass(JSContext *cx, JSObject *theGlobalObject) {
-        return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+        JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+        DOC_MODULE_CREATE("Components", JSTask);
+        return myClass;
     }
 
     using namespace y60;
