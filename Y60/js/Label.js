@@ -27,12 +27,14 @@
 
 var ourFontCache = [];
 
-function LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theStyle) {
-
+function LabelBase(Public, Protected, theSceneViewer,
+                   theSize, thePosition, theStyle, theParent)
+{
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Inheritance
     ///////////////////////////////////////////////////////////////////////////////////////////
-    ImageOverlayBase(Public, Protected, theSceneViewer.getOverlayManager(), null, thePosition);
+    ImageOverlayBase(Public, Protected, theSceneViewer.getOverlayManager(), null,
+                     thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -114,9 +116,12 @@ function LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theS
     setup();
 }
 
-function Label(theSceneViewer, theText, theSize, thePosition, theStyle) {
+function Label(theSceneViewer, theText,
+               theSize, thePosition, theStyle, theParent)
+{
     var Public    = this;
     var Protected = {}
-    LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theStyle);
+    LabelBase(Public, Protected, theSceneViewer,
+              theSize, thePosition, theStyle, theParent);
     Public.setText(theText);
 }

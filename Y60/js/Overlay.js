@@ -383,7 +383,6 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
 
 // Pure virtual base class
 function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent) {
-
     TextureOverlay(Public, Protected, theScene, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////

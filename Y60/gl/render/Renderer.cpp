@@ -1403,6 +1403,7 @@ namespace y60 {
 
     void
     Renderer::renderOverlay(dom::NodePtr theOverlayNode, float theAlpha) {
+
         if (theOverlayNode->nodeType() != dom::Node::ELEMENT_NODE) {
             return;
         }
@@ -1412,63 +1413,65 @@ namespace y60 {
         }
         MAKE_SCOPE_TIMER(renderOverlay);
 
-        const std::string & myMaterialId = myOverlay.get<MaterialTag>();
-        const asl::Vector2f myPosition = myOverlay.get<Position2DTag>(); // child inherits parent's matrix
-        float myWidth  = myOverlay.get<WidthTag>();
-        float myHeight = myOverlay.get<HeightTag>();
-
-        if (myHeight == 0.0f || myWidth == 0.0f) {
-            return;
-        }
-
-        float myAlpha  = theAlpha * myOverlay.get<AlphaTag>();
-		
         // do the transformation
         glPushMatrix();
+
+        const asl::Vector2f myPosition = myOverlay.get<Position2DTag>();
         glTranslatef(myPosition[0], myPosition[1], 0);
 
         float myOverlayRotation2d = myOverlay.get<Rotation2DTag>();
         if (!asl::almostEqual(myOverlayRotation2d, 0.0) ) { 
+#if 1
             // overlays rotate around the upper-left corner
-            // uncomment this code for  rotation around center(vs/uh)
-            //asl::Vector3f myPivotTranslation(myWidth / -2.0f, myHeight / -2.0f, 0.0);
-            //glTranslatef(-myPivotTranslation[0], -myPivotTranslation[1], myPivotTranslation[2]);
             glRotatef(float(degFromRad(myOverlayRotation2d)), 0.0f,0.0f,1.0f);
-            //glTranslatef(myPivotTranslation[0], myPivotTranslation[1], myPivotTranslation[2]);
+#else
+            // rotation around center
+            asl::Vector3f myPivotTranslation(myWidth * -0.5f, myHeight * -0.5f, 0.0);
+            glTranslatef(-myPivotTranslation[0], -myPivotTranslation[1], myPivotTranslation[2]);
+            glRotatef(float(degFromRad(myOverlayRotation2d)), 0.0f,0.0f,1.0f);
+            glTranslatef(myPivotTranslation[0], myPivotTranslation[1], myPivotTranslation[2]);
+#endif
         }
 
-        if (!myMaterialId.empty()) {
-            MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
-            DB(AC_TRACE << "Rendering Overlay " << myOverlay.get<NameTag>() << " with material " << myMaterialId << endl);
-            if (!myMaterial) {
-                AC_WARNING << "renderOverlay() material:" << myMaterialId << " not found." << endl;
-                return;
-            }
+        float myWidth  = myOverlay.get<WidthTag>();
+        float myHeight = myOverlay.get<HeightTag>();
+        float myAlpha  = theAlpha * myOverlay.get<AlphaTag>();
 
-            COUNT(Overlays);
+        if (myWidth > 0.0f && myHeight > 0.0f && myAlpha > 0.0f) {
 
-            switchMaterial(*myMaterial);
-			MaterialPropertiesFacadePtr myPropFacade = myMaterial->getChild<MaterialPropertiesTag>();
+            const std::string & myMaterialId = myOverlay.get<MaterialTag>();
+            if (myMaterialId.empty() == false) { 
+                MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
+                AC_TRACE << "renderOverlay " << myOverlay.get<NameTag>() << " with material " << myMaterialId << endl;
+                if (!myMaterial) {
+                    AC_WARNING << "renderOverlay() material:" << myMaterialId << " not found." << endl;
+                    return;
+                }
 
-            const asl::Vector4f & myColor = myPropFacade->get<SurfaceColorTag>();
-            glColor4f(myColor[0], myColor[1], myColor[2], myColor[3]*myAlpha);
+                COUNT(Overlays);
 
-            const asl::Vector2f & mySourceOrigin = myOverlay.get<SrcOriginTag>();
-            const asl::Vector2f & mySourceSize   = myOverlay.get<SrcSizeTag>();
+                switchMaterial(*myMaterial);
+                MaterialPropertiesFacadePtr myPropFacade = myMaterial->getChild<MaterialPropertiesTag>();
 
-            unsigned myTextureCount = myMaterial->getTextureCount();
+                const asl::Vector4f & myColor = myPropFacade->get<SurfaceColorTag>();
+                glColor4f(myColor[0], myColor[1], myColor[2], myColor[3]*myAlpha);
 
-            // TODO: Workaround: switchMaterial enables vertex arrays for all vertex registers
-            // but overlays do not use arrays
-            for (unsigned i = 0; i < myTextureCount; ++i) {
-                glActiveTextureARB(asGLTextureRegister(i));
-                glClientActiveTextureARB(asGLTextureRegister(i));
-                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-                CHECK_OGL_ERROR;
-            }
+                const asl::Vector2f & mySourceOrigin = myOverlay.get<SrcOriginTag>();
+                const asl::Vector2f & mySourceSize   = myOverlay.get<SrcSizeTag>();
 
-            if (myTextureCount == 1) {
-                glBegin(GL_QUADS);
+                unsigned myTextureCount = myMaterial->getTextureCount();
+
+                // TODO: Workaround: switchMaterial enables vertex arrays for all vertex registers
+                // but overlays do not use arrays
+                for (unsigned i = 0; i < myTextureCount; ++i) {
+                    glActiveTextureARB(asGLTextureRegister(i));
+                    glClientActiveTextureARB(asGLTextureRegister(i));
+                    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+                    CHECK_OGL_ERROR;
+                }
+
+                if (myTextureCount == 1) {
+                    glBegin(GL_QUADS);
                     glTexCoord2f(mySourceOrigin[0],mySourceOrigin[1]);
                     glVertex2f(0, 0);
 
@@ -1480,9 +1483,9 @@ namespace y60 {
 
                     glTexCoord2f(mySourceOrigin[0]+mySourceSize[0],mySourceOrigin[1]);
                     glVertex2f(myWidth, 0);
-                glEnd();
-            } else {
-                glBegin(GL_QUADS);
+                    glEnd();
+                } else {
+                    glBegin(GL_QUADS);
                     for (unsigned i = 0; i < myTextureCount; ++i) {
                         glMultiTexCoord2fARB(asGLTextureRegister(i), mySourceOrigin[0],mySourceOrigin[1]);
                     }
@@ -1502,44 +1505,45 @@ namespace y60 {
                         glMultiTexCoord2fARB(asGLTextureRegister(i), mySourceOrigin[0]+mySourceSize[0],mySourceOrigin[1]);
                     }
                     glVertex2f(myWidth, 0);
+                    glEnd();
+                }
+            }
+
+            // Render borders
+            const bool & hasTopBorder    = myOverlay.get<TopBorderTag>();
+            const bool & hasBottomBorder = myOverlay.get<BottomBorderTag>();
+            const bool & hasLeftBorder   = myOverlay.get<LeftBorderTag>();
+            const bool & hasRightBorder  = myOverlay.get<RightBorderTag>();
+
+            if (hasTopBorder || hasBottomBorder || hasLeftBorder || hasRightBorder) {
+                Vector4f myBorderColor = myOverlay.get<BorderColorTag>();
+                myBorderColor[3] *= myAlpha;
+
+                glDisable(GL_TEXTURE_2D);
+                glColor4fv(myBorderColor.begin()); // border color
+                glLineWidth(myOverlay.get<BorderWidthTag>());
+                glBegin(GL_LINES);
+                if (hasTopBorder) {
+                    glVertex2f(0,0);
+                    glVertex2f(myWidth, 0);
+                }
+                if (hasBottomBorder) {
+                    glVertex2f(0, myHeight);
+                    glVertex2f(myWidth, myHeight);
+                }
+                if (hasLeftBorder) {
+                    glVertex2f(0,0);
+                    glVertex2f(0, myHeight);
+                }
+                if (hasRightBorder) {
+                    glVertex2f(myWidth,0);
+                    glVertex2f(myWidth, myHeight);
+                }
                 glEnd();
-            }
-        }
 
-        // Render borders
-        const bool & hasTopBorder    = myOverlay.get<TopBorderTag>();
-        const bool & hasBottomBorder = myOverlay.get<BottomBorderTag>();
-        const bool & hasLeftBorder   = myOverlay.get<LeftBorderTag>();
-        const bool & hasRightBorder  = myOverlay.get<RightBorderTag>();
-
-        if (hasTopBorder || hasBottomBorder || hasLeftBorder || hasRightBorder) {
-            Vector4f myBorderColor = myOverlay.get<BorderColorTag>();
-            myBorderColor[3] *= myAlpha;
-
-            glDisable(GL_TEXTURE_2D);
-            glColor4fv(myBorderColor.begin()); // border color
-            glLineWidth(myOverlay.get<BorderWidthTag>());
-            glBegin(GL_LINES);
-            if (hasTopBorder) {
-                glVertex2f(0,0);
-                glVertex2f(myWidth, 0);
-            }
-            if (hasBottomBorder) {
-                glVertex2f(0, myHeight);
-                glVertex2f(myWidth, myHeight);
-            }
-            if (hasLeftBorder) {
-                glVertex2f(0,0);
-                glVertex2f(0, myHeight);
-            }
-            if (hasRightBorder) {
-                glVertex2f(myWidth,0);
-                glVertex2f(myWidth, myHeight);
-            }
-            glEnd();
-
-            if (_myState.getTexturing()) {
-                glEnable(GL_TEXTURE_2D);
+                if (_myState.getTexturing()) {
+                    glEnable(GL_TEXTURE_2D);
+                }
             }
         }
 
@@ -1550,6 +1554,4 @@ namespace y60 {
         }
         glPopMatrix();
     }
-
 }
-

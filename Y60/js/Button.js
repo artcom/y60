@@ -39,13 +39,15 @@ var ourButtonCounter = 0;
 const MOUSE_UP   = 0;
 const MOUSE_DOWN = 1;
 
-function ButtonBase(Public, Protected, theSceneViewer, theId, theSize, thePosition, theStyle) {
-
+function ButtonBase(Public, Protected, theSceneViewer, theId,
+                    theSize, thePosition, theStyle, theParent)
+{
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Inheritance
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    LabelBase(Public, Protected, theSceneViewer, theSize, thePosition, theStyle);
+    LabelBase(Public, Protected, theSceneViewer,
+              theSize, thePosition, theStyle, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -119,14 +121,20 @@ function ButtonBase(Public, Protected, theSceneViewer, theId, theSize, thePositi
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-function TextButton(theSceneViewer, theId, theText, theSize, thePosition, theStyle) {
+function TextButton(theSceneViewer, theId, theText,
+                    theSize, thePosition, theStyle, theParent)
+{
     var Public    = this;
     var Protected = {}
-    TextButtonBase(Public, Protected, theSceneViewer, theId, theText, theSize, thePosition, theStyle);
+    TextButtonBase(Public, Protected, theSceneViewer, theId, theText,
+                   theSize, thePosition, theStyle, theParent);
 }
 
-function TextButtonBase(Public, Protected, theSceneViewer, theId, theText, theSize, thePosition, theStyle) {
-    ButtonBase(Public, Protected, theSceneViewer, theId, theSize, thePosition, theStyle);
+function TextButtonBase(Public, Protected, theSceneViewer, theId, theText,
+                        theSize, thePosition, theStyle, theParent)
+{
+    ButtonBase(Public, Protected, theSceneViewer, theId,
+               theSize, thePosition, theStyle, theParent);
     Public.setText(theText);
 }
 
@@ -136,18 +144,23 @@ function TextButtonBase(Public, Protected, theSceneViewer, theId, theText, theSi
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-function ImageButton(theSceneViewer, theId, theSource, thePosition, theStyle) {
+function ImageButton(theSceneViewer, theId, theSource,
+                     thePosition, theStyle, theParent)
+{
     var Public    = this;
     var Protected = {}
-    ButtonBase(Public, Protected, theSceneViewer, theId, [1,1], thePosition, theStyle);
+    ButtonBase(Public, Protected, theSceneViewer, theId,
+               [1,1], thePosition, theStyle, theParent);
     Public.setImage(theSource);
 }
 
-function DualImageButton(theSceneViewer, theId, theSources, thePosition, theStyle) {
+function DualImageButton(theSceneViewer, theId, theSources,
+                         thePosition, theStyle, theParent) {
     var Base      = {};
     var Public    = this;
     var Protected = {};
-    ButtonBase(Public, Protected, theSceneViewer, theId, [1,1], thePosition, theStyle);
+    ButtonBase(Public, Protected, theSceneViewer, theId,
+               [1,1], thePosition, theStyle, theParent);
     Public.setImage(theSources[0]);
 
     Base.setPressed = Public.setPressed;
