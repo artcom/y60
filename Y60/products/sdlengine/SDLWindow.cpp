@@ -70,6 +70,10 @@ SDLWindow::SDLWindow() :
 {
 }
 
+SDLWindow::~SDLWindow() {
+    SDL_Quit();
+}
+
 TTFTextRendererPtr
 SDLWindow::createTTFRenderer() {
     return TTFTextRendererPtr(new SDLTextRenderer());
@@ -193,7 +197,9 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
         if (_myRenderer) {
             _myRenderer->initGL();
             ShaderLibraryPtr myShaderLibrary = dynamic_cast_Ptr<ShaderLibrary> (_myRenderer->getShaderLibrary());
-            myShaderLibrary->reload();
+			if (myShaderLibrary) {
+				myShaderLibrary->reload();
+			}
         }
         if (_myScene) {
             _myScene->clearShapes();
