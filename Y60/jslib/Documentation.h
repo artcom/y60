@@ -102,7 +102,7 @@ namespace jslib {
     struct ParameterDescription {
         std::string name;
         std::string description;
-        std::string type;        
+        std::string type;
         std::string default_value;
     };
 
@@ -125,7 +125,25 @@ namespace jslib {
         std::string              base_class;
     };
 
-    typedef std::map<std::pair<std::string,std::string>, ObjectDocumentation> DocumentationMap;
+    typedef std::pair<std::string, std::string> DokumentationKey;
+    typedef std::map<DokumentationKey, ObjectDocumentation> DocumentationMap;
+
+    class DocumentationSingleton : public asl::Singleton<DocumentationSingleton> {
+        friend class asl::SingletonManager;
+        public:
+            ObjectDocumentation & operator[](const DokumentationKey & theKey) {
+                return _myDocumentation[theKey];
+            }
+            DocumentationMap::iterator begin() {
+                return _myDocumentation.begin();
+            }
+            DocumentationMap::iterator end() {
+                return _myDocumentation.end();
+            }
+
+        private:
+             DocumentationMap _myDocumentation;
+    };
 
     void documentConstructor(const char *theModule, const char *theClassName,
         JSBool (*theConstructor)(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval));

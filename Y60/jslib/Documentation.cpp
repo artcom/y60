@@ -24,8 +24,6 @@ using namespace std;
 
 namespace jslib {
 
-    map<pair<string,string>, ObjectDocumentation> ourDocumentation;
-
     void describeFunctionParameter(FunctionDescription *myFunctionDescription,
             const string & theName, const string & theDescription, const DocType & theType, const string & theDefaultValue)
     {
@@ -45,7 +43,7 @@ namespace jslib {
         myFunctionDocumentation.name = theClassName;
         theConstructor(0, reinterpret_cast<JSObject*>(&myFunctionDocumentation),
                             0, 0, 0);
-        ourDocumentation[make_pair(theModule,theClassName)].constructors.push_back(myFunctionDocumentation);
+        DocumentationSingleton::get()[make_pair(theModule,theClassName)].constructors.push_back(myFunctionDocumentation);
         AC_TRACE << "added doku-ctor for " << theClassName << " in module " << theModule << endl;
     }
 
@@ -129,12 +127,12 @@ namespace jslib {
             JSFunctionSpec * theStaticFunctions,
             const char * theBaseClassName)
     {
-        ObjectDocumentation & myDocumentation = ourDocumentation[make_pair(theModule, theClassName)];
+        ObjectDocumentation & myDocumentation = DocumentationSingleton::get()[make_pair(theModule, theClassName)];
         AC_TRACE << "creating doku for " << theClassName << " in module " << theModule << endl;
         document(myDocumentation, theClassName, theProperties, theFunctions, theConstants,
                 theStaticProperties, theStaticFunctions, theBaseClassName);
 
-        //ourDocumentation[make_pair(theModule,theClassName)] = myDocumentation;
+        //DocumentationSingleton::get()[make_pair(theModule,theClassName)] = myDocumentation;
         AC_TRACE << "...created doku for " << theClassName << " in module " << theModule << endl;
     }
 
@@ -153,7 +151,7 @@ namespace jslib {
 
     void
     createFunctionDocumentation(const char * theSection, JSFunctionSpec * theFunctions) {
-        ObjectDocumentation & myDocumentation = ourDocumentation[make_pair(theSection,"")];
+        ObjectDocumentation & myDocumentation = DocumentationSingleton::get()[make_pair(theSection,"")];
         AC_TRACE << "adding doku for free-functions in module " << theSection << endl;
 
         if (theFunctions) {

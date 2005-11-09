@@ -314,9 +314,9 @@ function documentFunction(theClassName, theFunction) {
         for (var j = 0; j < theFunction.parameters.length; ++j) {
             var myParameter = theFunction.parameters[j];
             if (String(myParameter.type) != "__intern__") {
-                if (myParameter.description == "") {
+                /*if (myParameter.description == "") {
                     myParameter.description = "Not yet documented.";
-                }
+                }*/
                 myString += "<tr><td class='ParameterTableCell'>" + myParameter.name;
                 myString += "</td><td class='ParameterTableCell'>" + myParameter.description;
                 myString += "</td></tr>";
@@ -388,6 +388,8 @@ function getLinkedFile(theLink) {
     if (myClass in ourModuleIndex) {
         var myModule = ourModuleIndex[myClass];
         return "../" + myModule + "/" + myClass + myMethod + ".html";
+    } else if (myClass == "DOM") {
+        return "http://himmel/doc60/schema/noNamespace/element/" + mySplit[1].toLowerCase() + ".html";
     } else {
         return null;
     }

@@ -1050,9 +1050,6 @@ jsval as_jsval(JSContext *cx, const ObjectDocumentation & theDocumentation) {
     return rval;
 }
 
-//defined in Documentation.cpp
-extern DocumentationMap ourDocumentation;
-
 JS_STATIC_DLL_CALLBACK(JSBool)
 getDocumentedModules(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Collects all currently documented modules.");
@@ -1061,7 +1058,7 @@ getDocumentedModules(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     try {
         // First collect all module names in a set
         set<string> myModules;
-        for (DocumentationMap::iterator it = ourDocumentation.begin(); it != ourDocumentation.end(); ++it) {
+        for (DocumentationMap::iterator it = DocumentationSingleton::get().begin(); it != DocumentationSingleton::get().end(); ++it) {
             myModules.insert(it->first.first);
         }
 
@@ -1092,7 +1089,7 @@ getDocumentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 
         JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
 
-        for (DocumentationMap::iterator it = ourDocumentation.begin(); it != ourDocumentation.end(); ++it) {
+        for (DocumentationMap::iterator it = DocumentationSingleton::get().begin(); it != DocumentationSingleton::get().end(); ++it) {
             if (it->first.first == myModule) {
                 string myClassName = it->first.second;
                 if (!JS_DefineProperty(cx, myReturnObject, myClassName.c_str(),
