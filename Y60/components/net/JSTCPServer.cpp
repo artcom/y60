@@ -36,6 +36,8 @@ using namespace jslib;
 
 static JSBool
 waitForConnection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("start server waiting for connections."); 
+    DOC_END;
     const inet::TCPServer & myServer = JSTCPServer::getJSWrapper(cx,obj).getNative();
     asl::Ptr<inet::Socket> mySocket(myServer.waitForConnection());
     *rval = as_jsval(cx, mySocket);
@@ -65,8 +67,29 @@ JSTCPServer::Properties() {
     return myProperties;
 }
 
+JSPropertySpec *
+JSTCPServer::StaticProperties() {
+    static JSPropertySpec myProperties[] = {
+        {0}
+    };
+    return myProperties;
+}
+    
+JSFunctionSpec *
+JSTCPServer::StaticFunctions() {
+    static JSFunctionSpec myFunctions[] = {
+        {0}
+    };
+    return myFunctions;
+}
+
 JSBool
 JSTCPServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates a TCP Server. Does not start the server.");
+    DOC_PARAM("theIPAddress", "", DOC_TYPE_STRING);
+    DOC_PARAM("thePort", "", DOC_TYPE_INTEGER);
+    DOC_PARAM_OPT("theReusePortFlag", "", DOC_TYPE_BOOLEAN, false);
+    DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
         return JS_FALSE;
@@ -120,7 +143,9 @@ JSTCPServer::ConstIntProperties() {
 
 JSObject *
 JSTCPServer::initClass(JSContext *cx, JSObject *theGlobalObject) {
-    return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+    JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+        DOC_MODULE_CREATE("Components", JSTCPServer);
+        return myClass;
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, JSTCPServer::NATIVE & theTCPServer) {

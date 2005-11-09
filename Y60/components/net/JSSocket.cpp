@@ -41,6 +41,7 @@ const unsigned READ_BUFFER_SIZE = 20000;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("returns information on socket connection."); DOC_END;
     const inet::Socket & mySocket = JSSocket::getJSWrapper(cx,obj).getNative();
     std::string myStringRep = string("Socket [local ip: ") +
         as_dotted_address(mySocket.getLocalAddress()) + ", port: " +
@@ -54,11 +55,16 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("close connection."); DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::close,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    string docStr = "read data from connected socket. (max. bytes " + asl::as_string(READ_BUFFER_SIZE) + ")";
+    DOC_BEGIN(docStr); 
+    DOC_RVAL("number of bytes read.", DOC_TYPE_INTEGER);
+    DOC_END;
     try {
         if (argc != 0) {
             JS_ReportError(cx, "JSSocket::read(): Wrong number of arguments, expected none, got %d.", argc);
@@ -83,6 +89,12 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("write data to connected socket."); 
+    DOC_PARAM("theBlock", "", DOC_TYPE_OBJECT);DOC_RESET;
+    DOC_PARAM("theString", "", DOC_TYPE_STRING);DOC_RESET;
+    DOC_PARAM("theArrayOfUnsignedByte", "", DOC_TYPE_ARRAY);
+    DOC_RVAL("number of bytes written.", DOC_TYPE_INTEGER);
+    DOC_END;
     try {
         if (argc != 1) {
             JS_ReportError(cx, "JSSocket::write(): Wrong number of arguments, "
@@ -135,11 +147,19 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("peek for available bytes at connected socket."); 
+    DOC_RVAL("number of bytes available.", DOC_TYPE_INTEGER);
+    DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::peek,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("connect to socket."); 
+    DOC_PARAM("theRemoteIPAddress", "", DOC_TYPE_STRING);
+    DOC_PARAM("theRemotePort", "", DOC_TYPE_INTEGER);
+    DOC_RVAL("true if succesful.", DOC_TYPE_BOOLEAN);
+    DOC_END;
 	try {
 		if (argc != 2) {
 			JS_ReportError(cx, "Socket::connect: bad number of arguments: expected 2 "
@@ -194,12 +214,16 @@ connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setNoisy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("not supported."); DOC_END;
     //return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::setNoisy,cx,obj,argc,argv,rval);
     return JS_TRUE;
 }
 
 static JSBool
 setBlockingMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("set blocking mode on connection."); 
+    DOC_PARAM("isBlocking", "", DOC_TYPE_BOOLEAN);
+    DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::setBlockingMode,cx,obj,argc,argv,rval);
 }
 
@@ -234,6 +258,22 @@ JSSocket::Properties() {
     return myProperties;
 }
 
+JSPropertySpec *
+JSSocket::StaticProperties() {
+    static JSPropertySpec myProperties[] = {
+        {0}
+    };
+    return myProperties;
+}
+    
+JSFunctionSpec *
+JSSocket::StaticFunctions() {
+    static JSFunctionSpec myFunctions[] = {
+        {0}
+    };
+    return myFunctions;
+}
+
 // getproperty handling
 JSBool
 JSSocket::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
@@ -263,6 +303,11 @@ JSSocket::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
 
 JSBool
 JSSocket::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates a Socket. No connection is established.");
+    DOC_PARAM("theSocketType", "UDP or TCPCLIENT", DOC_TYPE_STRING);
+    DOC_PARAM("thePort", "", DOC_TYPE_INTEGER);
+    DOC_PARAM_OPT("theLocalIPAddress", "", DOC_TYPE_STRING, asl::localhostname());
+    DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
         return JS_FALSE;
@@ -356,7 +401,9 @@ JSSocket::ConstIntProperties() {
 
 JSObject *
 JSSocket::initClass(JSContext *cx, JSObject *theGlobalObject) {
-    return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+    JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+    DOC_MODULE_CREATE("Components", JSSocket);
+    return myClass;
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theSerial) {
