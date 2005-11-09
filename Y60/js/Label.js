@@ -123,7 +123,6 @@ function LabelBase(Public, Protected, theSceneViewer,
     function ensureImage() {
         if (Public.image == null) {
             Public.image = theSceneViewer.getImageManager().getImageNode(createUniqueId());
-            print("ensureImage", Public.image.width, Public.image.height);
         }
     }
 
