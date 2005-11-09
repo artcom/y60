@@ -23,6 +23,7 @@
 #include <y60/IScriptablePlugin.h>
 #include <asl/PlugInBase.h>
 #include "JSproc_functions.h"
+#include <y60/Documentation.h>
 
 namespace y60 {
     class ProcFunctionsPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
@@ -32,6 +33,7 @@ namespace y60 {
             virtual void initClasses(JSContext * theContext,
                     JSObject *theGlobalObject) {
                 JS_DefineFunctions(theContext, theGlobalObject, jslib::JSProcFunctions::Functions());
+                jslib::createFunctionDocumentation("ProcFunctions", jslib::JSProcFunctions::Functions());
             }
 
             const char * ClassName() {

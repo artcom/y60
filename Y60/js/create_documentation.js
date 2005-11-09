@@ -60,7 +60,7 @@ function main() {
 }
 
 function plugComponentsForDocumentation() {
-    var myComponents = ["y60JSSound"];
+    var myComponents = ["jsnet", "y60JSSound", "ProcFunctions"];
     if (operatingSystem() == "win32") {
         myComponents = myComponents.concat(["y60WMPPlayer"]);
     } else if (operatingSystem() == "Linux") {
