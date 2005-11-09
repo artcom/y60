@@ -228,7 +228,7 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
         if (_myTextures) {
             _myTextures.childNodes[0].image = theImage.id;
         } else {
-           Protected.addTexture(theImage.id);
+            Protected.addTexture(theImage.id);
         }
     }
 

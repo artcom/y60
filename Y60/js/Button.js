@@ -75,7 +75,7 @@ function ButtonBase(Public, Protected, theSceneViewer, theId,
     }
 
     Public.onMouseButton = function(theState, theX, theY) {
-        if (Public.enabled && Public.visible) {
+        if (Public.enabled && isVisible(Public.node)) {
             if (theState == MOUSE_UP && _isPressed) {
                 Public.setPressed(false);
                 Public.onClick(this);
@@ -113,6 +113,14 @@ function ButtonBase(Public, Protected, theSceneViewer, theId,
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     var _isPressed     = false;
+
+    function isVisible(theNode) {
+        if (!theNode || theNode.nodeName != "overlay") {
+            return true;
+        } else {
+            return (theNode.visible ? isVisible(theNode.parentNode) : false);
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////

@@ -65,6 +65,12 @@ function LabelBase(Public, Protected, theSceneViewer,
             ourFontCache[myFontName] = true;
         }
 
+        if (theSize == null) {
+            // force recreation of image
+            Public.image = theSceneViewer.getImageManager().getImageNode(createUniqueId());
+            Public.width = 0;
+            Public.height = 0;
+        }
         ensureImage();
         var mySize = window.renderTextAsImage(Public.image, theText, myFontName, Public.width, Public.height);
 
@@ -117,6 +123,7 @@ function LabelBase(Public, Protected, theSceneViewer,
     function ensureImage() {
         if (Public.image == null) {
             Public.image = theSceneViewer.getImageManager().getImageNode(createUniqueId());
+            print("ensureImage", Public.image.width, Public.image.height);
         }
     }
 
