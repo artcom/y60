@@ -153,6 +153,8 @@ namespace y60 {
                       const asl::Vector4f & theColor,
                       const asl::Matrix4f & theTransformation);
 
+			~SDLWindow();
+
         private:
             SDLWindow();
             SDLWindow(const SDLWindow &);
