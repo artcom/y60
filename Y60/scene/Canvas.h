@@ -34,9 +34,9 @@ namespace y60 {
 
     class Image;
     class Scene;
-    
+
     //                  theTagName                theType        theAttributeName                    theDefault
-    DEFINE_ATTRIBUT_TAG(CanvasBackgroundColorTag, asl::Vector4f, CANVAS_BACKGROUNDCOLOR_ATTRIB, asl::Vector4f(0,0,0,0));
+    DEFINE_ATTRIBUT_TAG(CanvasBackgroundColorTag, asl::Vector3f, CANVAS_BACKGROUNDCOLOR_ATTRIB, asl::Vector3f(0,0,0));
     DEFINE_ATTRIBUT_TAG(CanvasTargetTag, std::string , CANVAS_TARGET_ATTRIB, "");
 
     class Canvas :
@@ -54,12 +54,12 @@ namespace y60 {
                   CanvasBackgroundColorTag::Plug(theNode),
                   CanvasTargetTag::Plug(theNode)
               {}
-            unsigned getWidth() const;                        
+            unsigned getWidth() const;
             unsigned getHeight() const;
             bool setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer);
-            
+
             asl::Ptr<Image, dom::ThreadingModel> getTarget(asl::Ptr<Scene> theScene);
-            
+
             IMPLEMENT_FACADE(Canvas);
         private:
             asl::WeakPtr<IFrameBuffer> _myFrameBuffer;

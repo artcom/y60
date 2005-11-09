@@ -79,7 +79,6 @@ function LabelBase(Public, Protected, theSceneViewer,
         window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
         window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
         window.setTextPadding(0,0,0,0);
-        Public.texture.applymode = "decal";
 
         if (theSize == null) {
             Public.width = mySize[0];
@@ -137,4 +136,5 @@ function Label(theSceneViewer, theText,
     LabelBase(Public, Protected, theSceneViewer,
               theSize, thePosition, theStyle, theParent);
     Public.setText(theText);
+    Public.texture.applymode = "decal";
 }

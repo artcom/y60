@@ -72,8 +72,8 @@ namespace jslib {
         GLContextRegistry::get().unregisterContext(_mySelf);
     }
 
-    y60::ScenePtr &
-    AbstractRenderWindow::getCurrentScene() {
+    void
+    AbstractRenderWindow::ensureScene() {
         if (!_myScene) {
             // Add an empty default scene.
             // The defaultscene can be overwritten with setScene.
@@ -85,6 +85,11 @@ namespace jslib {
             _myScene->createStubs(JSApp::getPackageManager());
             setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
         }
+    }
+
+    y60::ScenePtr &
+    AbstractRenderWindow::getCurrentScene() {
+        ensureScene();
         return _myScene;
     }
 
@@ -183,6 +188,23 @@ namespace jslib {
             }
             _myCanvas = dom::NodePtr(0);
         }
+    }
+
+    dom::NodePtr
+    AbstractRenderWindow::getCanvas() {
+        ensureScene();
+        if (!_myCanvas) {
+            AC_WARNING << "No canvas found in scene";
+        }
+        return _myCanvas;
+    }
+
+    dom::NodePtr
+    AbstractRenderWindow::getCanvas() const {
+        if (!_myCanvas) {
+            AC_WARNING << "No canvas found in scene";
+        }
+        return _myCanvas;
     }
 
     bool
@@ -364,7 +386,7 @@ namespace jslib {
                 argv[0] = as_jsval(_myJSContext, _myElapsedTime);
                 JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 1, argv, &rval);
             }
-            
+
 
             for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
                 string myName = (*i)->getName() + "::onFrame";

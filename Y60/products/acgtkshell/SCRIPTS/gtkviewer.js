@@ -36,12 +36,12 @@ var GLADE_FILE = "../glade/gtkviewer.glade";
 
 //=================================================
 //
-//  script command line parameters 
+//  script command line parameters
 //
 //=================================================
 
-var ourAllowedOptions = { 
-//    'unit-size': "%d" 
+var ourAllowedOptions = {
+//    'unit-size': "%d"
 };
 //=================================================
 //
@@ -94,7 +94,7 @@ ourHandler.on_quit1_activate = function() {
 //=================================================
 
 ourHandler.on_about1_activate = function(theMenuItem) {
-    ourAboutDialog.find_child("lblVersion").label = 
+    ourAboutDialog.find_child("lblVersion").label =
             "<span size=\"25000\">gtkviewer</span>\n" +
             "Version: " + VERSION_STRING;
     ourAboutDialog.show();
@@ -130,7 +130,7 @@ CanvasViewer.prototype.Constructor = function(self, theArguments) {
                 var myPicking = new Picking(self.getRenderWindow());
                 ourHandler.lastViewport = myPicking.getViewportAt(theX, theY);
                 ourHandler.lastViewer = self;
-                ourGlade.get_widget("wireframe").active = ourHandler.lastViewport.wireframe; 
+                ourGlade.get_widget("wireframe").active = ourHandler.lastViewport.wireframe;
                 ourViewportPopup.popup(theButton);
             }
         } else {
@@ -150,10 +150,10 @@ function toggleToolbar(theModelType,theVisibleFlag) {
         case SliceViewer.MODEL_TYPE_POLYGONAL:
             ourMainWindow.find_child("rbRotateMode").visible = theVisibleFlag;
             break;
-            
+
         case SliceViewer.MODEL_TYPE_6FACES:
             ourMainWindow.find_child("rbRotateMode").visible = theVisibleFlag;
-            
+
             break;
 
         case SliceViewer.MODEL_TYPE_CTSCAN:
@@ -186,14 +186,14 @@ function main(argv) {
     ourMainWindow.show();
     ourRightViewer = new CanvasViewer(ourHandler.arguments);
     ourRightViewer.setupWindow(myRightArea);
-    
+
     // start a second renderer
-    var myLeftArea = new RenderArea(myRightArea); // share textures with this context 
+    var myLeftArea = new RenderArea(myRightArea); // share textures with this context
     myLeftArea.show();
     ourGlade.get_widget("leftBox").add(myLeftArea);
     ourLeftViewer = new CanvasViewer(ourHandler.arguments);
     ourLeftViewer.setupWindow(myLeftArea);
-    // load scene in first viewer    
+    // load scene in first viewer
     var myScene = new Scene(ourRightViewer.getModelName());
     ourRightViewer.setScene(myScene);
     ourLeftViewer.setScene(myScene);
@@ -202,13 +202,13 @@ function main(argv) {
 
 /*
     var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
-    ourRightViewer.setCanvas(myCanvas);    
-    myRightArea.canvas.backgroundcolor = "[0.5,0.5,0.5,1]";
+    ourRightViewer.setCanvas(myCanvas);
+    myRightArea.canvas.backgroundcolor = [0.5,0.5,0.5];
     ourRightViewer.registerMover(TrackballMover);
     ourRightViewer.setMover(TrackballMover, myRightArea.canvas.childNode('viewport'));
 
     // and add it to the second viewer
-    
+
     // patch in a second canvas
     var mySceneDom = myRightArea.scene.dom;
     var myCanvasRoot = getDescendantByTagName(mySceneDom, "canvases", true);
@@ -231,12 +231,12 @@ function main(argv) {
         myLowerViewport.size = "[1,0.3]";
         myLeftCanvas.appendChild(myLowerViewport);
         getDescendantByTagName(mySceneDom, "canvases", false).appendChild(myLeftCanvas);
-        myLeftCanvas.backgroundcolor = "[1,1,0.5,0]";
+        myLeftCanvas.backgroundcolor = [1,1,0.5];
     }
     // attach the second viewer to the second canvas
     ourLeftViewer.setCanvas(myLeftCanvas);
     */
-    
+
     // Add a second Viewport
     var myCanvasRoot = getDescendantByTagName(myScene.dom, "canvases", true);
     var myLeftCanvas = myCanvasRoot.childNodes[1];
@@ -246,9 +246,9 @@ function main(argv) {
     myLowerViewport.position = "[0,0.7]";
     myLowerViewport.size = "[1,0.3]";
     myLeftCanvas.appendChild(myLowerViewport);
-        
+
     ourLeftViewer.registerMover(TrackballMover);
-    ourLeftViewer.setMover(TrackballMover, myUpperViewport); 
+    ourLeftViewer.setMover(TrackballMover, myUpperViewport);
     ourLeftViewer.setMover(TrackballMover, myLowerViewport);
     // now we're ready to run
     return GtkMain.run(ourMainWindow);

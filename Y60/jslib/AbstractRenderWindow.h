@@ -98,19 +98,19 @@ namespace jslib {
             unsigned long theX, unsigned long theY);
         bool setImagePixel(dom::NodePtr theImageNode, unsigned long theX,
             unsigned long theY, const asl::Vector4i & theColor);
-        
+
         // Text Manager Methods
         void renderText(const asl::Vector2f & thePixelPosition, const std::string & theString,
                 const std::string & theFont);
         void renderText(const asl::Vector2f & thePixelPosition, const std::string & theString) {
             return renderText(thePixelPosition, theString, getDefaultFont());
         }
-        
+
         void setTextColor(const asl::Vector4f & theTextColor, const asl::Vector4f & theBackColor);
         void setTextColor(const asl::Vector4f & theTextColor) {
             return setTextColor(theTextColor, asl::Vector4f(1,1,1,1));
         }
-        
+
         asl::Vector2i renderTextAsImage(dom::NodePtr theImageNode,
                 const std::string & theString, const std::string & theFont,
                 const unsigned int & theTargetWidth, const unsigned int & theTargetHeight);
@@ -167,7 +167,8 @@ namespace jslib {
         */
         y60::ViewportPtr getSingleViewport() const;
 
-        dom::NodePtr getCanvas() const { return _myCanvas; }
+        dom::NodePtr getCanvas();
+        dom::NodePtr getCanvas() const;
         virtual bool setCanvas(const dom::NodePtr & theCanvas);
         /**
          * Set the current canvas to null so there is no connection from scene to window.
@@ -225,6 +226,8 @@ namespace jslib {
         asl::WeakPtr<AbstractRenderWindow> _mySelf;
     private:
         AbstractRenderWindow();
+        void ensureScene();
+
         TimeoutQueue           _myTimeoutQueue;
         float                  _myFixedDeltaT;
         double                 _myPauseTime;

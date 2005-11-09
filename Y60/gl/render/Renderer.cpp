@@ -224,9 +224,9 @@ namespace y60 {
                 glDepthMask(GL_FALSE);
             }
 
-            // [CH] TODO: Material should const. 
+            // [CH] TODO: Material should const.
             // The renderer should just take the scene information and render it as it is.
-            // Right now in Shader.activate() the material representation is updated. 
+            // Right now in Shader.activate() the material representation is updated.
             // The scene should be responsible for that.
             myShader->activate(const_cast<MaterialBase &>(theMaterial));
             CHECK_OGL_ERROR;
@@ -339,7 +339,7 @@ namespace y60 {
 
             _myState.setClippingPlanes(theBodyPart.getClippingPlanes());
             DBP2(MAKE_SCOPE_TIMER(renderBodyPart5));
-            
+
             glPushMatrix();
 
             // draw body bounding-box
@@ -363,7 +363,7 @@ namespace y60 {
             CHECK_OGL_ERROR;
         }
         DBP2(STOP_TIMER(renderBodyPart_bodyChanged));
-        
+
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
         DBP2(START_TIMER(renderBodyPart_getDrawNormals));
         if (_myState.getDrawNormals()) {
@@ -403,7 +403,7 @@ namespace y60 {
 
         // get renderstyles for this primitive
         DBP2(START_TIMER(renderBodyPart_prim_getRenderStyles));
-        const std::vector<RenderStyleType> & myPrimitveStyle = myPrimitive.getRenderStyles(); 
+        const std::vector<RenderStyleType> & myPrimitveStyle = myPrimitive.getRenderStyles();
         DBP2(STOP_TIMER(renderBodyPart_prim_getRenderStyles));
 
         DBP2(START_TIMER(renderBodyPart_shape_getRenderStyles));
@@ -835,7 +835,7 @@ namespace y60 {
 
             // Split the body in bodyparts to make material sorted rendering possible
             const Shape & myShape = myBody.getShape();
-            const y60::PrimitiveVector & myPrimitives = myShape.getPrimitives();            
+            const y60::PrimitiveVector & myPrimitives = myShape.getPrimitives();
             Matrix4f myTransform = myBody.get<GlobalMatrixTag>();
             myTransform.postMultiply(theEyeSpaceTransform);
             double myFarPlane = myFrustum.getFar();
@@ -845,7 +845,7 @@ namespace y60 {
             for (unsigned i = 0; i < mySize; ++i) {
                 const Primitive & myPrimitive = (*myPrimitives[i]);
                 const MaterialBase & myMaterial = myPrimitive.getMaterial();
-                asl::Unsigned16 myBodyKey = makeBodyKey(myMaterial,                                                        
+                asl::Unsigned16 myBodyKey = makeBodyKey(myMaterial,
                                                         myShape,
                                                         myTransform,
                                                         myNearPlane,
@@ -870,7 +870,7 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     Renderer::collectClippingPlanes(dom::NodePtr theNode,
                                     std::vector<asl::Planef> & theClippingPlanes)
     {
@@ -879,12 +879,12 @@ namespace y60 {
         const VectorOfString & myPlaneIds = myFacade->get<ClippingPlanesTag>();
         dom::NodePtr myGeometryNode;
         for (unsigned i = 0; i < myPlaneIds.size(); ++i) {
-            // XXX Workaround for Bug 91 
+            // XXX Workaround for Bug 91
             if ( ! myPlaneIds[i].empty()) {
                 myGeometryNode = theNode->getElementById( myPlaneIds[i] );
                 if (!myGeometryNode) {
                     throw RendererException(string("Can not find geometry '")+myPlaneIds[i]+
-                        "' for node " + theNode->nodeName() + " with id '" + 
+                        "' for node " + theNode->nodeName() + " with id '" +
                         theNode->getAttributeString(ID_ATTRIB)+"'!", PLUS_FILE_LINE);
                 }
                 GeometryPtr myGeometry = myGeometryNode->getFacade<Geometry>();
@@ -897,8 +897,8 @@ namespace y60 {
     Renderer::preRender(const CanvasPtr & theCanvas) {
         MAKE_SCOPE_TIMER(Renderer_preRender);
         // called once per canvas per frame
-        const asl::Vector4f & backgroundColor = theCanvas->get<CanvasBackgroundColorTag>();
-        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
+        const asl::Vector3f & backgroundColor = theCanvas->get<CanvasBackgroundColorTag>();
+        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], 1);
         glColor4f(1,1,1,1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
@@ -982,7 +982,7 @@ namespace y60 {
 
         // (7) render bodies
         {
-            MAKE_SCOPE_TIMER(renderBodyParts);            
+            MAKE_SCOPE_TIMER(renderBodyParts);
             _myPreviousBody = 0;
             glPushMatrix();
             glDisable(GL_ALPHA_TEST);
@@ -1420,7 +1420,7 @@ namespace y60 {
         glTranslatef(myPosition[0], myPosition[1], 0);
 
         float myOverlayRotation2d = myOverlay.get<Rotation2DTag>();
-        if (!asl::almostEqual(myOverlayRotation2d, 0.0) ) { 
+        if (!asl::almostEqual(myOverlayRotation2d, 0.0) ) {
 #if 1
             // overlays rotate around the upper-left corner
             glRotatef(float(degFromRad(myOverlayRotation2d)), 0.0f,0.0f,1.0f);
@@ -1440,7 +1440,7 @@ namespace y60 {
         if (myWidth > 0.0f && myHeight > 0.0f && myAlpha > 0.0f) {
 
             const std::string & myMaterialId = myOverlay.get<MaterialTag>();
-            if (myMaterialId.empty() == false) { 
+            if (myMaterialId.empty() == false) {
                 MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
                 AC_TRACE << "renderOverlay " << myOverlay.get<NameTag>() << " with material " << myMaterialId << endl;
                 if (!myMaterial) {

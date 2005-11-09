@@ -118,7 +118,7 @@ try {
     ourApp.setup(APP_WIDTH, APP_HEIGHT, "TouchScreen Test");
 
     window.fullscreen = ourApp.getReleaseMode();
-    renderer.backgroundcolor = new Vector3f(1,1,1);
+    renderer.backgroundcolor = [1,1,1];
     ourApp.go();
 } catch (ex) {
     print("-----------------------------------------------------------------------------------------");

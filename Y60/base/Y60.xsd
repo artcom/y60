@@ -793,17 +793,17 @@ Usually 'cv' plus a number, such as 'cv0'.</xs:documentation>
                     <xs:documentation>Human readable name for this canvas.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="backgroundcolor" type="Vector4f">
+            <xs:attribute name="backgroundcolor" type="Vector3f">
                 <xs:annotation>
                     <xs:documentation>Sets the OpenGL clear color.
 
 Example:
-backgroundcolor='[1,0,0,0]' to set the backgroundcolor to red.</xs:documentation>
+backgroundcolor='[1,0,0]' to set the backgroundcolor to red.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="target" type="xs:IDREF">
                 <xs:annotation>
-                    <xs:documentation>Defines a rendering target (pbuffer). 
+                    <xs:documentation>Defines a rendering target (pbuffer).
 Must reference an existing image in scene if set.
 
 Note: The image should have mipmapping disabled since existing mipmap levels
@@ -1275,7 +1275,7 @@ Supported types are:
             </xs:attribute>
         </xs:complexType>
     </xs:element>
-    
+
     <xs:element name="halfedges">
         <xs:annotation>
             <xs:documentation>The halfedges Node contains mesh information [TS TODO]</xs:documentation>
@@ -1287,7 +1287,7 @@ Supported types are:
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
-    
+
     <xs:element name="indices">
         <xs:annotation>
             <xs:documentation>The indices node containts a list of indices to vertex data of the shape.
@@ -1730,13 +1730,13 @@ matching shader.</xs:documentation>
         &lt;feature name='lighting' values='[30[lambert],20[flat],10[unlit]]'/&gt;
     which means that the lighting should be applied with a lambert-shader, if that is not
     possible a flat-shader should be used and as last ressort the unlit-shader could be taken.
-    
+
     The following values are possible for the different names:
     lighting:       phong, lambert, flat, unlit, toon
     textures:       paint, bump, environment, skybox
     vertexparams:   color
     physics:        skin, waves, wind, wave_2d, wave_1d, hexwisp
-    
+
     If multitexturing should be used the texture-attribute should contain a list of texture usages, such as:
     [paint,paint,bump]</xs:documentation>
                     </xs:annotation>
@@ -2078,7 +2078,7 @@ Possible values are:
                     <xs:documentation>The interpolation filter used for magnification.
 
 Possible values are:
-'linear' (default) - bilinear interpolation  
+'linear' (default) - bilinear interpolation
 'nearest'          - nearest neighbor</xs:documentation>
                 </xs:annotation>
             </xs:attribute>

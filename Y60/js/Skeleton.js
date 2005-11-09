@@ -147,7 +147,7 @@ try {
     var myWindowHeight = 640;
     ourShow.setup(myWindowWidth, myWindowHeight, ourShow.getReleaseMode(), "Skeleton");
 
-    window.backgroundColor = [0, 0, 0, 1];
+    window.backgroundColor = [0, 0, 0];
     window.showMouseCursor = !ourShow.getReleaseMode();
     ourShow.go();
 } catch (ex) {

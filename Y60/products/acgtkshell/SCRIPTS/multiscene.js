@@ -38,12 +38,12 @@ var GLADE_FILE = "../glade/multiviewer.glade";
 
 //=================================================
 //
-//  script command line parameters 
+//  script command line parameters
 //
 //=================================================
 
-var ourAllowedOptions = { 
-//    'unit-size': "%d" 
+var ourAllowedOptions = {
+//    'unit-size': "%d"
 };
 //=================================================
 //
@@ -80,7 +80,7 @@ ourHandler.on_quit1_activate = function() {
 //=================================================
 
 ourHandler.on_about1_activate = function(theMenuItem) {
-    ourAboutDialog.find_child("lblVersion").label = 
+    ourAboutDialog.find_child("lblVersion").label =
             "<span size=\"25000\">gtkviewer</span>\n" +
             "Version: " + VERSION_STRING;
     ourAboutDialog.show();
@@ -127,10 +127,10 @@ function toggleToolbar(theModelType,theVisibleFlag) {
         case SliceViewer.MODEL_TYPE_POLYGONAL:
             ourMainWindow.find_child("rbRotateMode").visible = theVisibleFlag;
             break;
-            
+
         case SliceViewer.MODEL_TYPE_6FACES:
             ourMainWindow.find_child("rbRotateMode").visible = theVisibleFlag;
-            
+
             break;
 
         case SliceViewer.MODEL_TYPE_CTSCAN:
@@ -150,7 +150,7 @@ function toggleToolbar(theModelType,theVisibleFlag) {
                        myArgument.search(/\.x3d/) != -1)
             {
                 myFiles.push(myArgument);
-            } 
+            }
         }
         return myFiles;
     }
@@ -168,7 +168,7 @@ function main(argv) {
     ourHandler.isLoaded = false;
 
     var myList = ourGlade.get_widget("list");
-    
+
     for (var i = 0; i < ourHandler.files.length; ++i) {
         var myScene = new Scene(ourHandler.files[i]);
         ourScenes[i] = myScene;
@@ -184,23 +184,23 @@ function main(argv) {
         myList.homegeneous = true;
         myArea.show();
         var myViewer = new CanvasViewer(ourHandler.arguments);
-        myViewer.setupWindow(myArea);        
+        myViewer.setupWindow(myArea);
         myViewer.setScene(myScene);
         myViewer.setCanvasByIndex(0);
-        
+
         //var myDom = myArea.scene.dom;
         //var myCanvas = myDom.getElementById("cv0");
         myViewer.registerMover(TrackballMover);
         //myViewer.setMover(TrackballMover);
         Logger.info("Added Canvas for: " + ourHandler.files[i]);
     }
-        
+
     myList.show();
-/*   
+/*
     // load scene in first viewer
     ourRightViewer.setModelName(ourHandler.files[0]);
     ourRightViewer.loadScene();
-    myRightArea.canvas.backgroundcolor = "[0.5,0.5,0.5,1]";
+    myRightArea.canvas.backgroundcolor = [0.5,0.5,0.5];
     ourRightViewer.registerMover(TrackballMover);
     ourRightViewer.setMover(TrackballMover, myRightArea.canvas.childNode('viewport'));
 
@@ -209,7 +209,7 @@ function main(argv) {
     ourLeftViewer.loadScene();
     */
     ourMainWindow.show();
-        
+
     // patch in a second canvas
     /*if (!myLeftCanvas) {
         myLeftCanvas = mySceneDom.getElementById("cv0").cloneNode(true);
@@ -226,10 +226,10 @@ function main(argv) {
         myLowerViewport.size = "[1,0.3]";
         myLeftCanvas.appendChild(myLowerViewport);
         getDescendantByTagName(mySceneDom, "canvases", false).appendChild(myLeftCanvas);
-        myLeftCanvas.backgroundcolor = "[1,1,0.5,0]";
+        myLeftCanvas.backgroundcolor = [1,1,0.5];
     }*/
-    
-    //ourLeftViewer.setMover(TrackballMover, myUpperViewport); 
+
+    //ourLeftViewer.setMover(TrackballMover, myUpperViewport);
     //ourLeftViewer.setMover(TrackballMover, myLowerViewport);
     // ourLeftViewer.activateHeadlight(true);
 
