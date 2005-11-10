@@ -203,6 +203,23 @@ namespace asl {
             throw StreamReadNumberTooLargeForVariable(JUST_FILE_LINE);
         }
 
+        /// reads a theNumberSize-length big endian integer from stream
+        template <class TN>
+        size_type readPackedSignedNumber(TN & theDest, size_type theReadOffset, size_type theNumberSize) const {
+            if (theNumberSize <= sizeof(theDest)) {
+                theDest = 0;
+                char * myStartDestPos = (char*)(&theDest) + sizeof(theDest) - theNumberSize;
+                size_type myResult = readBytes(myStartDestPos, theNumberSize, theReadOffset);
+                if (*myStartDestPos & 0x80) {
+                    // extend negative bits
+                    std::fill((char *)(&theDest), myStartDestPos, 0xff);
+                }
+                NumberReader<typename CountArranger::self, TN, sizeof(TN)>::swapBytes(theDest);
+                return myResult;
+            }
+            throw StreamReadNumberTooLargeForVariable(JUST_FILE_LINE);
+        }
+
         virtual size_type readBlock(WriteableBlock & theDest, size_type theReadOffset) const;
 
         size_type readSize(size_type & theDest, size_type theReadOffset) const {
@@ -228,6 +245,15 @@ namespace asl {
                     theReadOffset = readUnsigned64(myLongLong, theReadOffset);
                     theDest = size_type(myLongLong); 
                     return theReadOffset;
+            }
+            theDest=mySmallCount;
+            return theReadOffset;
+        }
+       size_type readSigned(offset_type & theDest, size_type theReadOffset) const {
+            signed char mySmallCount;
+            theReadOffset = readSigned8(mySmallCount, theReadOffset);
+            if (mySmallCount == -128) {
+                return readSigned32(theDest, theReadOffset);
             }
             theDest=mySmallCount;
             return theReadOffset;
@@ -259,16 +285,34 @@ namespace asl {
             }
             return theReadOffset;
         }
-#endif
-        size_type readSigned(offset_type & theDest, size_type theReadOffset) const {
-            signed char mySmallCount;
-            theReadOffset = readSigned8(mySmallCount, theReadOffset);
-            if (mySmallCount == -128) {
-                return readSigned32(theDest, theReadOffset);
+        size_type readSigned(Signed64 & theDest, size_type theReadOffset) const {
+            signed char mySmallOffset;
+            theReadOffset = readSigned8(mySmallOffset, theReadOffset);
+            if (mySmallOffset >= 120 || mySmallOffset <= -121) {
+                unsigned char myLen = (unsigned char)mySmallOffset - 119;
+                theReadOffset = readPackedSignedNumber(theDest, theReadOffset, myLen);
+            } else {
+                theDest = mySmallOffset;
             }
-            theDest=mySmallCount;
             return theReadOffset;
         }
+        size_type readSigned(Signed32 & theDest, size_type theReadOffset) const {
+            signed char mySmallOffset;
+            theReadOffset = readSigned8(mySmallOffset, theReadOffset);
+            if (mySmallOffset >= 120 || mySmallOffset <= -121) {
+                unsigned char myLen = (unsigned char)mySmallOffset - 119;
+                if (myLen <=4) {
+                    theReadOffset = readPackedSignedNumber(theDest, theReadOffset, myLen);
+                } else {
+                    throw StreamReadNumberTooLargeForVariable(JUST_FILE_LINE);
+                }
+            } else {
+                theDest = mySmallOffset;
+            }
+            return theReadOffset;
+        }
+#endif
+ 
 
         size_type readSigned64(long long & theDest, size_type theReadOffset) const {
             return readNumber(theDest, theReadOffset);	
@@ -433,20 +477,27 @@ namespace asl {
             appendUnsigned8(0xfd);
             return appendUnsigned64(theCount);
         }
+        WriteableStream & appendSigned(offset_type theCount) {
+            if (theCount < 127 && theCount > -127) {
+                return appendUnsigned8((signed char)theCount);
+            }
+            appendUnsigned8(0x8f);
+            return appendSigned32((Signed32)theCount);
+        }
 #else
        WriteableStream & appendUnsigned(Unsigned64 theCount) {
-            if (theCount < size_type(0xF0ULL)) {
+            if (theCount < 0xF0ULL) {
                 return appendUnsigned8((unsigned char)theCount);
             }
-            if (theCount < size_type(0x100ULL)) {
+            if (theCount < 0x100ULL) {
                 appendUnsigned8(0xF0);
                 return appendUnsigned8((unsigned char)theCount);
             }
-            if (theCount < size_type(0x10000ULL)) {
+            if (theCount < 0x10000ULL) {
                 appendUnsigned8(0xF1);
                 return appendPackedNumber(theCount, 2);
             }
-            if (theCount < size_type(0x1000000ULL)) {
+            if (theCount < 0x1000000ULL) {
                 appendUnsigned8(0xF2);
                 return appendPackedNumber(theCount, 3);
             }
@@ -469,14 +520,44 @@ namespace asl {
             appendUnsigned8(0xF7);
             return appendPackedNumber(theCount, 8);
         };
-#endif
-        WriteableStream & appendSigned(offset_type theCount) {
-            if (theCount < 127 && theCount > -127) {
-                return appendUnsigned8((signed char)theCount);
+       WriteableStream & appendSigned(Signed64 theCount) {
+            if ((theCount < 120LL) && (theCount > -121LL)) {
+                return appendSigned8((signed char)theCount);
             }
-            appendUnsigned8(0x8f);
-            return appendSigned32((Signed32)theCount);
-        }
+            if ((theCount < 0x100LL) && (theCount >= 0xFFFFFFFFFFFFFF80LL)) {
+                appendSigned8(120);
+                return appendSigned8((signed char)theCount);
+            }
+            if ((theCount < 0x10000LL) && (theCount >= 0xFFFFFFFFFFFF8000LL)) {
+                appendSigned8(121);
+                return appendPackedNumber(theCount, 2);
+            }
+            if ((theCount < 0x1000000LL) && (theCount >= 0xFFFFFFFFFF800000LL)) {
+                appendSigned8(122);
+                return appendPackedNumber(theCount, 3);
+            }
+            if ((theCount < 0x100000000LL) && (theCount >= 0xFFFFFFFF80000000LL)) {
+                appendSigned8(123);
+                return appendPackedNumber(theCount, 4);
+            }
+            if ((theCount < 0x10000000000LL) && (theCount >= 0xFFFFFF8000000000LL)) {
+                appendSigned8(124);
+                return appendPackedNumber(theCount, 5);
+            }
+            if ((theCount < 0x1000000000000LL) && (theCount >= 0xFFFF800000000000LL)) {
+                appendSigned8(125);
+                return appendPackedNumber(theCount, 6);
+            }
+            if ((theCount < 0x100000000000000LL) && (theCount >= 0xFF80000000000000LL)) {
+                appendSigned8(126);
+                return appendPackedNumber(theCount, 7);
+            }
+            appendSigned8(127);
+            return appendPackedNumber(theCount, 8);
+        };
+
+#endif
+
         WriteableStream & appendSigned64(long long theCount) {
             return appendData(Arranger::get(theCount));
         }	

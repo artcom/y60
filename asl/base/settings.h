@@ -90,6 +90,7 @@ namespace asl {
 
     // the following typedefs may differ from arch to arch,
     // adapt as necessary
+    typedef bool Boolean;
     typedef char Signed8;
     typedef unsigned char Unsigned8;
     typedef short Signed16;
@@ -98,6 +99,9 @@ namespace asl {
     typedef unsigned int Unsigned32;
     typedef long long Signed64;
     typedef unsigned long long Unsigned64;
+    typedef float Float32;
+    typedef double Float64;
+    typedef long double Float128;
 
 #if 1    
     // 32-bit streams and blocks

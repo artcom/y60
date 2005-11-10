@@ -65,6 +65,39 @@ public:
             theOutputStream.appendString(as_string(i));            // 1
             theOutputStream.appendCountedString(as_string(i));     // 2
         }
+
+        // write unsigned integers
+        theOutputStream.appendUnsigned(0x23ULL);
+        theOutputStream.appendUnsigned(0xF0ULL);
+        theOutputStream.appendUnsigned(0x1234ULL);
+        theOutputStream.appendUnsigned(0x123456ULL);
+        theOutputStream.appendUnsigned(0x12345678ULL);
+        theOutputStream.appendUnsigned(0x123456789AULL);
+        theOutputStream.appendUnsigned(0x123456789ABCULL);
+        theOutputStream.appendUnsigned(0x123456789ABCDEULL);
+        theOutputStream.appendUnsigned(0x123456789ABCDEF0ULL);
+
+        // write negative signed integers
+        theOutputStream.appendSigned(-100LL);
+        theOutputStream.appendSigned(-128LL);
+        theOutputStream.appendSigned(-16000);
+        theOutputStream.appendSigned(-4096000LL);
+        theOutputStream.appendSigned(-1048576000LL);
+        theOutputStream.appendSigned(-268435456000LL);
+        theOutputStream.appendSigned(-68719476736000LL);
+        theOutputStream.appendSigned(-17592186044416000LL);
+        theOutputStream.appendSigned(-4503599627370496000LL);
+
+        // write signed integers
+        theOutputStream.appendSigned(100LL);
+        theOutputStream.appendSigned(127LL);
+        theOutputStream.appendSigned(16000);
+        theOutputStream.appendSigned(4096000LL);
+        theOutputStream.appendSigned(1048576000LL);
+        theOutputStream.appendSigned(268435456000LL);
+        theOutputStream.appendSigned(68719476736000LL);
+        theOutputStream.appendSigned(17592186044416000LL);
+        theOutputStream.appendSigned(4503599627370496000LL);
     }
     
     template <class AC_BYTE_ORDER, class SIZE_TYPE, class OFFSET_TYPE>
@@ -149,6 +182,127 @@ public:
             ENSURE(iistr == as_string(i));
             k = p;
         }
+
+        // verify unsigned integers
+        AC_SIZE_TYPE mySize = p;
+        Unsigned64 myResult;
+
+        p = theInputStream.readUnsigned(myResult, p);
+        ENSURE(myResult == 0x23ULL);
+        ENSURE(p == mySize + 1);
+
+        p = theInputStream.readUnsigned(myResult, p);
+        ENSURE(p == mySize + 3);
+        ENSURE(myResult == 0xF0ULL);
+
+        p = theInputStream.readUnsigned(myResult, p);
+        ENSURE(p == mySize + 6);
+        ENSURE(myResult == 0x1234ULL);
+
+        p = theInputStream.readUnsigned(myResult, p);
+        ENSURE(p == mySize + 10);
+        ENSURE(myResult == 0x123456ULL);
+
+        p = theInputStream.readUnsigned(myResult, p);
+        ENSURE(p == mySize + 15);
+        ENSURE(myResult == 0x12345678ULL);
+
+        p = theInputStream.readUnsigned(myResult, p);
+        ENSURE(p == mySize + 21);
+        ENSURE(myResult == 0x123456789AULL);
+
+        p = theInputStream.readUnsigned(myResult, p);
+        ENSURE(p == mySize + 28);
+        ENSURE(myResult == 0x123456789ABCULL);
+
+        p = theInputStream.readUnsigned(myResult, p);
+        ENSURE(p == mySize + 36);
+        ENSURE(myResult == 0x123456789ABCDEULL);
+
+        p = theInputStream.readUnsigned(myResult, p);
+        ENSURE(p == mySize + 45);
+        ENSURE(myResult == 0x123456789ABCDEF0ULL);
+
+        // test negative signed values
+        mySize = p;
+        Signed64 mySignedResult = 0;
+
+        ENSURE(p == mySize + 0);
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(mySignedResult == -100LL);
+        ENSURE(p == mySize + 1);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(mySignedResult == -128LL);
+        ENSURE(p == mySize + 3);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(mySignedResult == -16000);
+        ENSURE(p == mySize + 6);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(mySignedResult == -4096000LL);
+        ENSURE(p == mySize + 10);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(mySignedResult == -1048576000LL);
+        ENSURE(p == mySize + 15);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(mySignedResult == -268435456000LL);
+        ENSURE(p == mySize + 21);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(mySignedResult == -68719476736000LL);
+        ENSURE(p == mySize + 28);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(mySignedResult == -17592186044416000LL);
+        ENSURE(p == mySize + 36);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(mySignedResult == -4503599627370496000LL);
+        ENSURE(p == mySize + 45);
+
+        // test positive signed values
+        mySize = p;
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(p == mySize + 1);
+        ENSURE(mySignedResult == 100LL);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(p == mySize + 3);
+        ENSURE(mySignedResult == 127LL);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(p == mySize + 6);
+        ENSURE(mySignedResult == 16000);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(p == mySize + 10);
+        ENSURE(mySignedResult == 4096000LL);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(p == mySize + 15);
+        ENSURE(mySignedResult == 1048576000LL);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(p == mySize + 21);
+        ENSURE(mySignedResult == 268435456000LL);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(p == mySize + 28);
+        ENSURE(mySignedResult == 68719476736000LL);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(p == mySize + 36);
+        ENSURE(mySignedResult == 17592186044416000LL);
+
+        p = theInputStream.readSigned(mySignedResult, p);
+        ENSURE(p == mySize + 45);    
+        ENSURE(mySignedResult == 4503599627370496000LL);
+
     }
 
     void run() {
