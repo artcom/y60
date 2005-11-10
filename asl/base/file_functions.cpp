@@ -23,6 +23,7 @@
 #include "file_functions.h"
 #include "os_functions.h"
 #include "string_functions.h"
+#include "Logger.h"
 
 #include <string>
 #include <vector>
@@ -88,15 +89,18 @@ namespace asl {
             myDirName = "./";
         }
 #else
-        if (theFileName.at(theFileName.length()-1) == '/') {
-            return theFileName;
+        std::string myDirName;
+        if (! theFileName.empty() ) {
+            if (theFileName.at(theFileName.length()-1) == '/') {
+                return theFileName;
+            }
+
+            char * myBuffer = strdup(theFileName.c_str());
+            myDirName = dirname(myBuffer);
+            free(myBuffer);
+            myDirName += "/";
         }
 
-        char * myBuffer = strdup(theFileName.c_str());
-        std::string myDirName(dirname(myBuffer));
-        free(myBuffer);
-
-        myDirName += "/";
 #endif
         return myDirName;
     }
