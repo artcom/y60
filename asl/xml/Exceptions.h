@@ -123,6 +123,7 @@ namespace dom {
 
     DEFINE_PARSE_EXCEPTION(FormatCorrupted,ParseException);
     DEFINE_PARSE_EXCEPTION(PatchMismatch,ParseException);
+    DEFINE_PARSE_EXCEPTION(SyntaxError,ParseException);
 
   class EventException : public virtual asl::Exception {
     public:

@@ -164,6 +164,13 @@ class XmlDomUnitTest : public UnitTest {
                 dom::Document myGoodDocument4("<elem attrib = 'value' />");
                 ENSURE(myGoodDocument4);
 
+                dom::Document myBadDocument8("<bookmark orientation='[0] zoom='0'/>");
+                ENSURE(!myBadDocument8);
+
+                dom::Document myBadDocument7("<bookmark id='SixFaceFreeViewer' name='free' viewtype='free'"
+                                             "orientation='[0.11277,-0.376132,-0.305966,0.86729] zoom='0' position='[0,0,0]'/>");
+                ENSURE(!myBadDocument7);
+               
                 dom::Document myBadDocument1("bla");
                 ENSURE(!myBadDocument1);
 
@@ -182,6 +189,7 @@ class XmlDomUnitTest : public UnitTest {
                 dom::Document myBadDocument6("<");
                 ENSURE(!myBadDocument6);
 
+ 
                 dom::Element myElem;
                 myElem.appendAttribute("myattr","myval");
                 ENSURE(myElem["myattr"].nodeValue() == "myval");

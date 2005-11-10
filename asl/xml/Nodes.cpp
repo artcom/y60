@@ -2320,6 +2320,14 @@ dom::Node::parseAttributes(const String & is, int pos, int end_pos, const Node *
         pos = par_end;
         par_end = read_attribute(is, pos, myAttributeName, myAttributeValue);
     }
+    if (par_end != end_pos) {
+        int nw_pos = read_whitespace(is,pos);
+        if (nw_pos < end_pos) {
+            throw SyntaxError(
+                std::string("Element <")+_myName+"> contains extra unparseable characters '"+myAttributeName+"'",
+                "dom::Node::parseAttributes", par_end);
+        }
+    }
     return par_end;
 }
 
