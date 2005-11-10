@@ -192,7 +192,7 @@ namespace jslib {
 
     dom::NodePtr
     AbstractRenderWindow::getCanvas() {
-        ensureScene();
+        // ensureScene();
         if (!_myCanvas) {
             AC_WARNING << "No canvas found in scene";
         }
