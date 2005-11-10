@@ -897,8 +897,8 @@ namespace y60 {
     Renderer::preRender(const CanvasPtr & theCanvas) {
         MAKE_SCOPE_TIMER(Renderer_preRender);
         // called once per canvas per frame
-        const asl::Vector3f & backgroundColor = theCanvas->get<CanvasBackgroundColorTag>();
-        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], 1);
+        const asl::Vector4f & backgroundColor = theCanvas->get<CanvasBackgroundColorTag>();
+        glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
         glColor4f(1,1,1,1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }

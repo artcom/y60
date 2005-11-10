@@ -623,8 +623,15 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                     {
                         y60::CanvasBackgroundColorTag::TYPE theColor;
                         if (!convertFrom(cx, *vp, theColor)) {
-                            JS_ReportError(cx,"JSAbstractRenderWindow::set background color: could not convert rvalue to Vector3f.");
-                            return JS_FALSE;
+                            asl::Vector3f myColor;
+                            if (!convertFrom(cx, *vp, myColor)) {
+                                JS_ReportError(cx,"JSAbstractRenderWindow::set background color must be Vector3f or Vector4f.");
+                                return JS_FALSE;
+                            }
+                            theColor[0] = myColor[0];
+                            theColor[1] = myColor[1];
+                            theColor[2] = myColor[2];
+                            theColor[3] = 1;
                         }
                         theNative.getCanvas()->dom::Node::getFacade<y60::Canvas>()->y60::Canvas::set<y60::CanvasBackgroundColorTag>(theColor);
                         return JS_TRUE;

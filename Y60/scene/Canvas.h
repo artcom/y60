@@ -36,7 +36,7 @@ namespace y60 {
     class Scene;
 
     //                  theTagName                theType        theAttributeName                    theDefault
-    DEFINE_ATTRIBUT_TAG(CanvasBackgroundColorTag, asl::Vector3f, CANVAS_BACKGROUNDCOLOR_ATTRIB, asl::Vector3f(0,0,0));
+    DEFINE_ATTRIBUT_TAG(CanvasBackgroundColorTag, asl::Vector4f, CANVAS_BACKGROUNDCOLOR_ATTRIB, asl::Vector4f(0,0,0,1));
     DEFINE_ATTRIBUT_TAG(CanvasTargetTag, std::string , CANVAS_TARGET_ATTRIB, "");
 
     class Canvas :

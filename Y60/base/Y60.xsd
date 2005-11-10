@@ -793,7 +793,7 @@ Usually 'cv' plus a number, such as 'cv0'.</xs:documentation>
                     <xs:documentation>Human readable name for this canvas.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="backgroundcolor" type="Vector3f">
+            <xs:attribute name="backgroundcolor" type="Vector4f">
                 <xs:annotation>
                     <xs:documentation>Sets the OpenGL clear color.
 
