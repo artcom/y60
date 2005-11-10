@@ -8,15 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM GmbH Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-//    $RCSfile: MappedBlock.h,v $
-//
-//   $Revision: 1.20 $
-//
-// Description: file helper functions
-//
-//
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 #ifndef _included_asl_MappedBlock_
 #define _included_asl_MappedBlock_
@@ -34,7 +25,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#define DB(x) //  x
+#define DB(x) x
 
 
 /*! \addtogroup aslbase */
@@ -495,6 +486,7 @@ namespace asl {
 #endif
 
         static void openFileReadOnly(const char * theFileName, FD_t & fd) {
+            DB(AC_TRACE << "openFileReadOnly filename='" << theFileName << "'");
             fd = OPEN(theFileName, O_RDONLY, 0);
             if (fd == FD_INVALID) {
                 LAST_ERROR_TYPE err = lastError();
@@ -605,6 +597,7 @@ namespace asl {
             }
         }
         void init(const char * theFileName) {
+            DB(AC_TRACE << "MappedIO::init(theFileName='"<<theFileName);
             _myFileName = theFileName;
             _myOffset = 0;
             _mySize = 0;
@@ -618,7 +611,7 @@ namespace asl {
         }
 
         void init(const char * theFileName, OFF_T theSize, OFF_T theOffset = 0) {
-            DB(AC_TRACE << "MappedIO::init(theFileName='"<<theFileName<<"',theSize="<<theSize<<",theOffset="<<theOffset<<")"<<std::endl);
+            DB(AC_TRACE << "MappedIO::init(theFileName='"<<theFileName<<"',theSize="<<theSize<<",theOffset="<<theOffset<<")");
             _myFileName = theFileName;
             _myOffset = theOffset;
             _mySize = theSize;
