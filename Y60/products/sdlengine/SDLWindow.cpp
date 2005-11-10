@@ -610,7 +610,7 @@ SDLWindow::mainLoop() {
         asl::getDashboard().cycle();
         START_TIMER(frames);
     }
-    SDL_Quit();
+    //SDL_Quit();
 
     jsval argv[1], rval;
     if (jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onExit")) {
