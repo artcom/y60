@@ -110,7 +110,7 @@ namespace asl {
             if (_myLines.size() == 0) {
                 addRow();
             }
-            if (theLine = -1) {
+            if (theLine == -1) {
                 theLine = _myLines.size()-1;
             }
             if (_myLines.size()<theLine+1) {
