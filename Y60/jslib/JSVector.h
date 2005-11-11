@@ -1050,8 +1050,11 @@ private:
                     }
 
                     if (myArrayLength != SIZE) {
+                        // [CH] The caller should be responsible for error reporting, otherwise we cannot overload functions, properly
+                        /*
                         JS_ReportError(cx,"JSVector<%s>::Constructor: argument array length must be %d, but is %d",
                             ClassName(),SIZE, myArrayLength);
+                        */
                         return JS_FALSE;
                     }
 
@@ -1109,13 +1112,6 @@ public:
     }
 #endif
 private:
-    /*
-    asl::Ptr<NATIVE_VECTOR> _myNativeVectorOwner;//  smart pointer for holding reference to an owned native vector;
-                                                 // is zero when native vector is owned or inside a dom::Value
-    dom::ValuePtr _myNativeValueOwner; // alternative smart pointer for holding reference to a dom::Value;
-                                       // is zero when native vector is not inside a dom::Value
-    NATIVE_VECTOR * _myNativeVector;
-    */
     NativeValuePtr _myOwner;
 };
 #define DEFINE_VECTOR_CLASS_TRAITS(TYPE) \
@@ -1153,17 +1149,19 @@ bool Converter<VECTOR_NF>::convertFromVN(JSContext *cx, jsval theValue,
 {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myValObj = JSVAL_TO_OBJECT(theValue);
-        if (JSVector<VECTOR<NUMBER> >::Class() != JSA_GetClass(cx,myValObj)) {
+        if (JSVector<VECTOR<NUMBER> >::Class() != JSA_GetClass(cx, myValObj)) {
             myValObj = JSVector<VECTOR<NUMBER> >::Construct(cx, theValue);
         }
         if (myValObj) {
-            //VECTOR<NUMBER> & myNativeArg = JSVector<VECTOR<NUMBER> >::getNative(cx, myValObj);
             const VECTOR<NUMBER> & myNativeArg = JSVector<VECTOR<NUMBER> >::getJSWrapper(cx, myValObj).getNative();
             theVector = myNativeArg;
             return true;
         } else {
+            // [CH] The caller should be responsible for error reporting, otherwise we cannot overload functions, properly
+            /*
             JS_ReportError(cx,"convertFrom VECTOR<NUMBER>: bad argument type, Vector of size %d expected",
                     JValueTypeTraits<VECTOR<NUMBER> >::SIZE);
+            */
             return false;
         }
     }
