@@ -653,3 +653,11 @@ function formatTimecode(theTimestamp) {
 
     return myTC;
 }
+
+function randomBetween(theMin, theMax) {
+    return Math.random() * (theMax - theMin) + theMin;
+}
+
+Array.prototype.removeElement = function(theIndex) {
+    return this.slice(0, theIndex).concat(this.slice(theIndex + 1, this.length));
+}
