@@ -521,34 +521,36 @@ namespace asl {
             return appendPackedNumber(theCount, 8);
         };
        WriteableStream & appendSigned(Signed64 theCount) {
-            if ((theCount < 120LL) && (theCount > -121LL)) {
+            if ((theCount < Signed64(120LL)) && (theCount > Signed64(-121LL))) {
                 return appendSigned8((signed char)theCount);
             }
-            if ((theCount < 0x100LL) && (theCount >= 0xFFFFFFFFFFFFFF80LL)) {
+            // Note: relying on Signed64(0xFFFFFFFFFFFFFF80LL) to wrap-around to a negative number
+            //       is probably not a good idea. (MS)
+            if ((theCount < Signed64(0x100LL)) && (theCount >= Signed64(0xFFFFFFFFFFFFFF80LL))) {  
                 appendSigned8(120);
                 return appendSigned8((signed char)theCount);
             }
-            if ((theCount < 0x10000LL) && (theCount >= 0xFFFFFFFFFFFF8000LL)) {
+            if ((theCount < 0x10000LL) && (theCount >= Signed64(0xFFFFFFFFFFFF8000LL))) {
                 appendSigned8(121);
                 return appendPackedNumber(theCount, 2);
             }
-            if ((theCount < 0x1000000LL) && (theCount >= 0xFFFFFFFFFF800000LL)) {
+            if ((theCount < 0x1000000LL) && (theCount >= Signed64(0xFFFFFFFFFF800000LL))) {
                 appendSigned8(122);
                 return appendPackedNumber(theCount, 3);
             }
-            if ((theCount < 0x100000000LL) && (theCount >= 0xFFFFFFFF80000000LL)) {
+            if ((theCount < 0x100000000LL) && (theCount >= Signed64(0xFFFFFFFF80000000LL))) {
                 appendSigned8(123);
                 return appendPackedNumber(theCount, 4);
             }
-            if ((theCount < 0x10000000000LL) && (theCount >= 0xFFFFFF8000000000LL)) {
+            if ((theCount < 0x10000000000LL) && (theCount >= Signed64(0xFFFFFF8000000000LL))) {
                 appendSigned8(124);
                 return appendPackedNumber(theCount, 5);
             }
-            if ((theCount < 0x1000000000000LL) && (theCount >= 0xFFFF800000000000LL)) {
+            if ((theCount < 0x1000000000000LL) && (theCount >= Signed64(0xFFFF800000000000LL))) {
                 appendSigned8(125);
                 return appendPackedNumber(theCount, 6);
             }
-            if ((theCount < 0x100000000000000LL) && (theCount >= 0xFF80000000000000LL)) {
+            if ((theCount < 0x100000000000000LL) && (theCount >= Signed64(0xFF80000000000000LL))) {
                 appendSigned8(126);
                 return appendPackedNumber(theCount, 7);
             }
