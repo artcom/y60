@@ -39,6 +39,8 @@
 
 using namespace std;
 
+// #define SINGLE_CPU
+
 #define X_NEW_PTR
 
 template <int N>
@@ -426,7 +428,12 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new PtrUnitTest<0,SingleThreaded>);
-        addTest(new PtrUnitTest<0,SingleProcessor>);
+        PtrUnitTest<0,SingleProcessor> * mySingleProcessorTest = new PtrUnitTest<0,SingleProcessor>();
+#ifdef SINGLE_CPU
+        addTest(mySingleProcessorTest);
+#else
+        delete mySingleProcessorTest;
+#endif        
         addTest(new PtrUnitTest<0,MultiProcessor>);
 
 #if 1
@@ -444,7 +451,12 @@ public:
 #endif
 
         addTest(new PtrUnitPerfTest<0,SingleThreaded>);
-        addTest(new PtrUnitPerfTest<0,SingleProcessor>);
+        PtrUnitPerfTest<0,SingleProcessor> * mySingleProcessorPrefTest = new PtrUnitPerfTest<0,SingleProcessor>();
+#ifdef SINGLE_CPU
+        addTest(mySingleProcessorPrefTest);
+#else
+        delete mySingleProcessorPrefTest;
+#endif        
         addTest(new PtrUnitPerfTest<0,MultiProcessor>);
     }
 };
