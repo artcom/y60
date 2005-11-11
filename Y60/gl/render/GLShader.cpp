@@ -224,6 +224,10 @@ namespace y60 {
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTextureARB(myTexUnit);
 
+            // [DS] this isn't necessary. Filtering and wrapmode are stored
+            // as part of the texture object. Instead we should set it once
+            // at creation time to make the texture usable even if it is not
+            // rendered at all. Some kind of dirty notification would be necessary.
             if (myTexture.getImage()->get<ImageDepthTag>()==1) {
                 //AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.getName() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId() << " wrap=" << myTexture.getWrapMode();
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,

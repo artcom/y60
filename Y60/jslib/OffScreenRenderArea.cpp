@@ -88,7 +88,9 @@ void OffScreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
 
 bool OffScreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
-        ensureRaster(getImage());
+        if (getImage()) { // XXX
+            ensureRaster(getImage());
+        }
         return true;
     } else {
         return false;
@@ -117,6 +119,9 @@ int OffScreenRenderArea::getHeight() const {
 
 ResizeableRasterPtr
 OffScreenRenderArea::ensureRaster(ImagePtr theImage) {
+    if ( ! theImage ) {
+        throw OffscreenRendererException("No Image.", PLUS_FILE_LINE);
+    }
     ResizeableRasterPtr myRaster = theImage->getRasterPtr();
 
     if (!myRaster) {

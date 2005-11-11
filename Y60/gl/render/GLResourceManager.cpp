@@ -90,12 +90,10 @@ namespace y60 {
             // 2D-Texture
             glBindTexture(GL_TEXTURE_2D, myId);
             CHECK_OGL_ERROR;
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S , GL_REPEAT);
+            // [DS] the min filter defaults to GL_NEAREST_MIPMAP_LINEAR. This
+            // causes problems with offscreen rendering. 
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER , GL_NEAREST);
             CHECK_OGL_ERROR;
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T , GL_REPEAT);
-            CHECK_OGL_ERROR;
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER , GL_LINEAR);
-            //CHECK_OGL_ERROR;
         } else {
             // 3D-Texture
             glBindTexture(GL_TEXTURE_3D, myId);
@@ -197,7 +195,6 @@ namespace y60 {
             
             if (myDepth == 1) {
                 AC_TRACE << "setupSingle internalFormat=" << hex << myPixelEncoding.internalformat << dec;
-                AC_WARNING << "### Texture alloc.";
                 // Two step initialization
                 // First allocate the texture with power of two dimensions
                 glTexImage2D(GL_TEXTURE_2D, 0,
@@ -410,8 +407,6 @@ namespace y60 {
 
     void
     GLResourceManager::updateTextureData(ImagePtr theImage) {
-        AC_WARNING << "updateTextureData";
-        AC_WARNING << "GLResourceManager::updateTextureData " << theImage->get<NameTag>();
         PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
 
         theImage->storeTextureVersion();

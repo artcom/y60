@@ -122,7 +122,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 y60::ScenePtr myScene(0);
                 if (argv[0] != JSVAL_NULL && argv[0] != JSVAL_VOID) {
                     if ( ! convertFrom(cx, argv[0], myScene)) {
-                        throw JSArgMismatch("Failed to convert argument 0 to type y60::Scene", PLUS_FILE_LINE);
+                        throw JSArgMismatch("Failed to convert argument 0 to type y60::Scene",
+                                            PLUS_FILE_LINE);
                     }
                 }
 
