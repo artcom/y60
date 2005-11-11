@@ -370,14 +370,16 @@ JSSocket::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
         }
 
         unsigned long myLocalHostAddress = asl::hostaddress(myLocalHostAddressString);
-        if (mySocketType == SOCKET_TYPE_UDP) {
-            OWNERPTR myNewSocket = OWNERPTR(new inet::UDPConnection(myLocalHostAddress, myLocalPort));
-            myNewObject = new JSSocket(myNewSocket, &(*myNewSocket));
-        } else if (mySocketType == SOCKET_TYPE_TCPCLIENT) {
-            OWNERPTR myNewSocket = OWNERPTR(new inet::TCPClientSocket());
+        try {
+            if (mySocketType == SOCKET_TYPE_UDP) {
+                OWNERPTR myNewSocket = OWNERPTR(new inet::UDPConnection(myLocalHostAddress, myLocalPort));
+                myNewObject = new JSSocket(myNewSocket, &(*myNewSocket));
+            } else if (mySocketType == SOCKET_TYPE_TCPCLIENT) {
+                OWNERPTR myNewSocket = OWNERPTR(new inet::TCPClientSocket());
 
-            myNewObject = new JSSocket(myNewSocket, &(*myNewSocket));
-        }
+                myNewObject = new JSSocket(myNewSocket, &(*myNewSocket));
+            }
+        } HANDLE_CPP_EXCEPTION;
     }
 
     if (myNewObject) {
