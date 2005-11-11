@@ -9,10 +9,14 @@
 //#define DUMP_BUFFER
 #ifdef DUMP_BUFFER
 #include <string>
+#include <iostream>
+#include <sstream>
 #include <paintlib/plpngenc.h>
 #include <paintlib/pltiffenc.h>
 #include <paintlib/planybmp.h>
 #endif
+
+using namespace std;
 using namespace dom;
 
 namespace y60 {
@@ -155,18 +159,60 @@ void OffScreenBuffer::bindOffScreenFrameBuffer(ImagePtr theTexture) {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myOffScreenBuffer);
     }
 
-    GLenum status;
-    status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    switch(status) {
-        case GL_FRAMEBUFFER_COMPLETE_EXT:
+    GLenum myStatus;
+    myStatus = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+    bool isOK(true);
+    ostringstream os;
+    switch(myStatus) {                                          
+        case GL_FRAMEBUFFER_COMPLETE_EXT: // Everything's OK
+            isOK = true;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+            os << "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT" << endl;
+            isOK = false;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+            os << "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT" << endl;
+            isOK = false;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
+            os << "GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT" << endl;
+            isOK = false;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+            os << "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT" << endl;
+            isOK = false;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+            os << "GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT" << endl;
+            isOK = false;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+            os << "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT" << endl;
+            isOK = false;
+            break;
+        case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+            os << "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT" << endl;
+            isOK = false;
             break;
         case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-            /* choose different formats */
+            os << "GL_FRAMEBUFFER_UNSUPPORTED_EXT" << endl;
+            isOK = false;
             break;
+        /* [DS] not found in current headers
+        case GL_FRAMEBUFFER_STATUS_ERROR_EXT:
+            os << "GL_FRAMEBUFFER_STATUS_ERROR_EXT" << endl;
+            isOK = false;
+            break;
+        */
         default:
             /* programming error; will fail on all hardware */
             throw OpenGLException("GL_FRAMEBUFFER_EXT status broken, got "
-                        + asl::as_string(status), PLUS_FILE_LINE);
+                        + asl::as_string(myStatus), PLUS_FILE_LINE);
+    }
+
+    if (! isOK) {
+        throw OffscreenRendererException(os.str(), PLUS_FILE_LINE);
     }
 #else
     throw OpenGLException("GL_EXT_framebuffer_object support not compiled", PLUS_FILE_LINE);

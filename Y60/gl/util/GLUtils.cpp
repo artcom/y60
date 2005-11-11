@@ -29,10 +29,27 @@ namespace y60 {
     void checkOGLError(const std::string& theLocation) {
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) {
+            std::string myErrorString;
+            const char * myErrorCString = (const char*)(gluErrorString(err));
+            if (myErrorCString) {
+                myErrorString = myErrorCString;
+            } else {
+                // manually check for some errors not supported by gluErrorString
+                switch (err) {
+#ifdef GL_EXT_framebuffer_object
+                    case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
+                        myErrorString = "Invalid framebuffer operation (EXT_framebuffer_object)";
+                        break;
+#endif
+                    default:
+                        myErrorString = "no description found, but the number is valid";
+                        break;
+                };
+            }
             throw OpenGLException("OpenGL error: #(" + asl::as_string(err) + ") " +
-                (const char *)(gluErrorString(err)), theLocation);
+                myErrorString, theLocation);
             if (err != GL_INVALID_OPERATION) {  // XXX: Do we really need this?
-                checkOGLError(theLocation);
+                checkOGLError(theLocation);     // [DS] no, we don't get here anyway ... see throw above
             }
         }
     }
@@ -662,6 +679,13 @@ namespace y60 {
                     queryGLVersion(myVersionMajor, myVersionMinor, myVersionRelease);
                     myResult = ((myVersionMajor == 1 &&  myVersionMinor >= 2) || (myVersionMajor > 1));
                 }
+                break;
+            case FRAMEBUFFER_SUPPORT:
+#ifdef GL_FRAMEBUFFER_EXT
+                myResult = queryOGLExtension("GL_EXT_framebuffer_object");
+#else
+                myResult = false;
+#endif
                 break;
             default:
              throw OpenGLException(string("Sorry, unknown capability : ") + asl::as_string(theCap), PLUS_FILE_LINE);

@@ -112,11 +112,18 @@ namespace y60 {
 
         unsigned int myTopLevelTextureSize = theImage->getMemUsed();
 
+        //[DS] allow empty textures ...
+        const unsigned char * myReadonlyData = 0;
+        if (theImage->getRasterPtr()) {
+            myReadonlyData = theImage->getRasterPtr()->pixels().begin();
+        }
+        /* 
         if (!theImage->getRasterPtr()) {
             throw TextureException(string("setupSingleTexture: no raster value in image '")+
                 theImage->get<NameTag>()+"'!", PLUS_FILE_LINE);
         }
         const unsigned char * myReadonlyData = theImage->getRasterPtr()->pixels().begin();
+        */
         PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
 
         glPushAttrib(GL_PIXEL_MODE_BIT);
@@ -190,6 +197,7 @@ namespace y60 {
             
             if (myDepth == 1) {
                 AC_TRACE << "setupSingle internalFormat=" << hex << myPixelEncoding.internalformat << dec;
+                AC_WARNING << "### Texture alloc.";
                 // Two step initialization
                 // First allocate the texture with power of two dimensions
                 glTexImage2D(GL_TEXTURE_2D, 0,
@@ -199,10 +207,13 @@ namespace y60 {
                     0);
                 CHECK_OGL_ERROR;
                 // Then upload it. This way we can upload textures that are not power of two.
-                glTexSubImage2D(GL_TEXTURE_2D, 0,
-                    0, 0, myWidth, myHeight,
-                    myPixelEncoding.externalformat,
-                    myPixelEncoding.pixeltype, myReadonlyData);
+                // XXX Empty textures just remain empty. Usefull for render to texture... [DS]
+                if (myReadonlyData) {
+                    glTexSubImage2D(GL_TEXTURE_2D, 0,
+                            0, 0, myWidth, myHeight,
+                            myPixelEncoding.externalformat,
+                            myPixelEncoding.pixeltype, myReadonlyData);
+                }
                 CHECK_OGL_ERROR;
             } else {
                 // upload texture
@@ -399,7 +410,8 @@ namespace y60 {
 
     void
     GLResourceManager::updateTextureData(ImagePtr theImage) {
-        AC_TRACE << "GLResourceManager::updateTextureData " << theImage->get<NameTag>();
+        AC_WARNING << "updateTextureData";
+        AC_WARNING << "GLResourceManager::updateTextureData " << theImage->get<NameTag>();
         PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
 
         theImage->storeTextureVersion();

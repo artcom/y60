@@ -24,6 +24,7 @@
 #ifndef _ac_y60_OffScreenBuffer_h_
 #define _ac_y60_OffScreenBuffer_h_
 
+DEFINE_EXCEPTION( OffscreenRendererException, asl::Exception );
 
 namespace y60 {
     class Image;
