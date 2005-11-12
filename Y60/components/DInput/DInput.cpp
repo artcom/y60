@@ -25,7 +25,7 @@
 #include <y60/EventDispatcher.h>
 
 #ifdef WIN32
-#include <y60/DIEventSource.h>
+#include "DIEventSource.h"
 #endif
 
 class DInputExtension :
