@@ -8,24 +8,14 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM GmbH Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-//    $RCSnumeric: test_numeric_functions.tst.cpp,v $
-//
-//   $Revision: 1.6 $
-//
-// Description: Test for Request
-//
-//
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #include "RequestManager.h"
 #include "Request.h"
+#include "TestServer.h"
 
 #include <asl/Time.h>
 #include <asl/UnitTest.h>
-#include <asl/ConduitAcceptor.h>
-#include <asl/TCPPolicy.h>
 #include <asl/net.h>
 #include <iostream>
 #include <sstream>
@@ -34,8 +24,7 @@ using namespace inet;
 using namespace asl;
 using namespace std;
 
-#define DB(x) x
-
+#define DB(x) // x
 
 class TestRequest : public Request {
     public:
@@ -77,68 +66,6 @@ typedef asl::Ptr<TestRequest> TestRequestPtr;
 size_t eatWebsite(void* buffer, size_t size, size_t memb, void* userp) {
     return size*memb;
 }
-
-class TestServer : public ConduitServer<TCPPolicy> {
-    public:
-    static ConduitServer<TCPPolicy>::Ptr create(TCPPolicy::Handle theHandle) {
-            return ConduitServer<TCPPolicy>::Ptr(new TestServer(theHandle));
-        }
-    private:
-    TestServer(TCPPolicy::Handle theHandle) :
-        ConduitServer<TCPPolicy>(theHandle) {}; 
-
-    void sendSlowly(const std::string theData) {
-        this->sendData(theData.c_str(), theData.length());
-    }
-
-    void sendResponseHeader(int theResponseCode) {
-        std::stringstream myDate;
-        myDate << Time();
-        sendSlowly("HTTP/1.1 "+as_string(theResponseCode)+"\n");
-        sendSlowly("Date: "+myDate.str()+"\n");
-        sendSlowly("Server: ASL Conduit\n");
-        sendSlowly("Content-Type: text/plain\n");
-    }
-
-    void sendResponseBody(const std::string & theBody) {
-        sendSlowly("Content-Length: "+as_string(theBody.length())+"\n\n");
-        sendSlowly(theBody);
-    }
-
-    std::string getUrl(const std::string & theRequest) {
-        std::string::size_type getPos = theRequest.find("GET");
-        std::string::size_type httpPos = theRequest.find("HTTP");
-        std::string myUrl = theRequest.substr(getPos+5, httpPos-getPos-6);
-        return myUrl;
-    }
-    
-    virtual bool processData() {
-        CharBuffer myInputBuffer;
-        if (this->receiveData(myInputBuffer)) {
-            std::string s(&myInputBuffer[0], myInputBuffer.size());
-            std::string myURL = getUrl(s);
-            if (myURL == "ShortRequest") {
-                sendResponseHeader(200);
-                sendResponseBody("SHORT");
-            } else if (myURL == "LongRequest") {
-                sendResponseHeader(200);
-                sendResponseBody(string(65000,'L'));
-            } else if (myURL == "Timeout") {
-                asl::msleep(10*1000);
-                sendResponseHeader(200);
-                sendResponseBody("timeout");
-            } else {
-                sendResponseHeader(404);
-                sendResponseBody("not found");
-            }
-            return false;
-        }
-        return true;
-    }
-};
-
-
-
 
 class RequestTest : public UnitTest {
 

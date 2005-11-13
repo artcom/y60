@@ -36,7 +36,10 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
     obj.myManager = new RequestManager();
 
     obj.run = function() {
-        obj.myRequest = new Request("http://www.artcom.de");
+        obj.myTestServer = new TestServer("localhost",2345);
+        obj.myTestServer.start();
+
+        obj.myRequest = new Request("http://localhost:2345/ShortRequest");
 
        obj.myRequest.onDone = function() {
             print ("onDone called on "+this);
@@ -62,9 +65,9 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myBadRequest = new Request("http://www.server.invalid");
         obj.myManager.performRequest(obj.myBadRequest);
 
-        obj.myTimeoutRequest = new Request("http://himmel/~valentin/timeout.php");
-        obj.myTimeout = 25.0;
-        obj.myTimeoutRequest.setTimeoutParams(10, obj.myTimeout);
+        obj.myTimeoutRequest = new Request("http://localhost:2345/Timeout");
+        obj.myTimeout = 5;
+        obj.myTimeoutRequest.setTimeoutParams(1, obj.myTimeout);
         obj.myTimeoutRequest.onError = function(theErrorCode) {
             obj.myErrorCode = theErrorCode;
             //print ("onError called with code: " + theErrorCode);
@@ -93,6 +96,8 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.myErrorCode==28");
         print (obj.myBadRequest.errorString);
         print (obj.myRequest.responseString);
+
+        obj.myTestServer.stop();
     };
 };
 

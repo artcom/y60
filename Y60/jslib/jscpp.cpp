@@ -49,6 +49,7 @@
 #include "JSOffScreenRenderArea.h"
 #include "JSBlock.h"
 #include "JSZipWriter.h"
+#include "JSTestServer.h"
 
 #include "jscpp.h"
 
@@ -209,6 +210,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSZipWriter::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSTestServer::initClass(cx, theGlobalObject)) {
         return false;
     }
 
