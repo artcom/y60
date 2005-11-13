@@ -24,7 +24,11 @@
 
 #include <asl/Time.h>
 #include <asl/UnitTest.h>
+#include <asl/ConduitAcceptor.h>
+#include <asl/TCPPolicy.h>
+#include <asl/net.h>
 #include <iostream>
+#include <sstream>
 
 using namespace inet;
 using namespace asl;
@@ -56,9 +60,9 @@ class TestRequest : public Request {
         return true;
     };
     void onDone() {
-        cerr << "********************* RESPONSE **********************" << endl;
-        cerr << getResponseString() << endl;
-        cerr << "********************* RESPONSE END ******************" << endl;
+        // cerr << "********************* RESPONSE **********************" << endl;
+        // cerr << getResponseString() << endl;
+        // cerr << "********************* RESPONSE END ******************" << endl;
         _myDoneCalledFlag = true;
     }
     bool _myDoneCalledFlag;
@@ -74,6 +78,66 @@ size_t eatWebsite(void* buffer, size_t size, size_t memb, void* userp) {
     return size*memb;
 }
 
+class TestServer : public ConduitServer<TCPPolicy> {
+    public:
+    static ConduitServer<TCPPolicy>::Ptr create(TCPPolicy::Handle theHandle) {
+            return ConduitServer<TCPPolicy>::Ptr(new TestServer(theHandle));
+        }
+    private:
+    TestServer(TCPPolicy::Handle theHandle) :
+        ConduitServer<TCPPolicy>(theHandle) {}; 
+
+    void sendSlowly(const std::string theData) {
+        this->sendData(theData.c_str(), theData.length());
+    }
+
+    void sendResponseHeader(int theResponseCode) {
+        std::stringstream myDate;
+        myDate << Time();
+        sendSlowly("HTTP/1.1 "+as_string(theResponseCode)+"\n");
+        sendSlowly("Date: "+myDate.str()+"\n");
+        sendSlowly("Server: ASL Conduit\n");
+        sendSlowly("Content-Type: text/plain\n");
+    }
+
+    void sendResponseBody(const std::string & theBody) {
+        sendSlowly("Content-Length: "+as_string(theBody.length())+"\n\n");
+        sendSlowly(theBody);
+    }
+
+    std::string getUrl(const std::string & theRequest) {
+        std::string::size_type getPos = theRequest.find("GET");
+        std::string::size_type httpPos = theRequest.find("HTTP");
+        std::string myUrl = theRequest.substr(getPos+5, httpPos-getPos-6);
+        return myUrl;
+    }
+    
+    virtual bool processData() {
+        CharBuffer myInputBuffer;
+        if (this->receiveData(myInputBuffer)) {
+            std::string s(&myInputBuffer[0], myInputBuffer.size());
+            std::string myURL = getUrl(s);
+            if (myURL == "ShortRequest") {
+                sendResponseHeader(200);
+                sendResponseBody("SHORT");
+            } else if (myURL == "LongRequest") {
+                sendResponseHeader(200);
+                sendResponseBody(string(65000,'L'));
+            } else if (myURL == "Timeout") {
+                asl::msleep(10*1000);
+                sendResponseHeader(200);
+                sendResponseBody("timeout");
+            } else {
+                sendResponseHeader(404);
+                sendResponseBody("not found");
+            }
+            return false;
+        }
+        return true;
+    }
+};
+
+
 
 
 class RequestTest : public UnitTest {
@@ -83,20 +147,21 @@ class RequestTest : public UnitTest {
         RequestTest() : UnitTest("RequestTest") {};
         
         void run() {
+            const int PORT = 2346;
+            inet::initSockets();
+            ConduitAcceptor<TCPPolicy> myTestAcceptor(TCPPolicy::Endpoint("localhost",PORT), TestServer::create);
+            myTestAcceptor.start();
+            std::string myServer = "http://localhost:"+as_string(PORT);
+            
             DPRINT(curl_version());
-            if (!isInternetAvailable()) {
-                ENSURE(true);
-                cerr << "WARNING: no internet connectivity: skipping tests!!!" << endl;
-                return;
-            }
             RequestManager myRequestManager;
-            TestRequestPtr myLongRequest = TestRequestPtr(new TestRequest("http://www.artcom.de/"));
-            myLongRequest->setVerbose(true);
-            TestRequestPtr myShortRequest = TestRequestPtr(new TestRequest("http://www.artcom.de/"));
-            TestRequestPtr myPageNotFoundRequest = TestRequestPtr(new TestRequest("http://www.artcom.de/no-page.404"));
+            TestRequestPtr myLongRequest = TestRequestPtr(new TestRequest(myServer+"/LongRequest"));
+            myLongRequest->setVerbose(false);
+            TestRequestPtr myShortRequest = TestRequestPtr(new TestRequest(myServer+"/ShortRequest"));
+            TestRequestPtr myPageNotFoundRequest = TestRequestPtr(new TestRequest(myServer+"/404"));
             TestRequestPtr myNoServerRequest = TestRequestPtr(new TestRequest("http://server.invalid"));
-            TestRequestPtr myServerTimeoutRequest = TestRequestPtr(new TestRequest("http://himmel/~valentin/timeout.php"));
-            myServerTimeoutRequest->setTimeoutParams(1, 25); // apache on himmel does not allow script execution longer than 30 seconds
+            TestRequestPtr myServerTimeoutRequest = TestRequestPtr(new TestRequest(myServer+"/Timeout"));
+            myServerTimeoutRequest->setTimeoutParams(1, 5); // 5 sec timeout
 
             /*
             TestRequestPtr myPostRequest = TestRequestPtr(new TestRequest("http://himmel/~martin/upload.php"));
