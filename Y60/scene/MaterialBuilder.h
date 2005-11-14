@@ -105,7 +105,9 @@ namespace y60 {
 
         const std::string & getName() const;
         void computeRequirements();
+
         void setTransparencyFlag(bool theFlag);
+        bool getTransparencyFlag() const;
 
         bool isMovie(const std::string & theFileName);
     private:
@@ -121,7 +123,6 @@ namespace y60 {
         VectorOfRankedFeature _myLightingRequirements;
 
         static unsigned _myNextId;
-
     };
 
     typedef asl::Ptr<MaterialBuilder>  MaterialBuilderPtr;

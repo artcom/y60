@@ -62,6 +62,9 @@ namespace y60 {
         	    _myParagraphTopOffset    = theTopOffset;
         	    _myParagraphBottomOffset = theBottomOffset;
         	}
+            void setTracking(float theTracking) {
+                _myTracking = theTracking;
+            }
 
             const unsigned int & getWindowHeight() { return _myWindowHeight; }
             const unsigned int & getWindowWidth()  { return _myWindowWidth; }
@@ -77,6 +80,7 @@ namespace y60 {
             unsigned      _myLineHeight;
         	unsigned      _myParagraphTopOffset;
         	unsigned      _myParagraphBottomOffset;
+            float         _myTracking;
         private:
             unsigned int  _myWindowWidth;
             unsigned int  _myWindowHeight;

@@ -59,8 +59,8 @@
 #include <algorithm>
 #include <cctype> // needed for std::toupper
 
-#define DB(x) // x;
-#define DB_Y(x)  x
+#define DB(x) //x
+#define DB2(x)  x
 
 using namespace std;
 using namespace asl;
@@ -99,12 +99,12 @@ MPlug
 MaterialExporter::getPlug(const MObject & theShaderNode, const char * theName) {
     // Get the color plug
     MStatus myStatus;
-    MPlug myColorPlug = MFnDependencyNode(theShaderNode).findPlug(theName, &myStatus);
+    MPlug myPlug = MFnDependencyNode(theShaderNode).findPlug(theName, &myStatus);
     if (myStatus == MS::kFailure) {
         throw ExportException(std::string("No plug found with name'")+theName+"'", "MaterialExporter::getPlug()");
     }
 
-    return myColorPlug;
+    return myPlug;
 }
 
 
@@ -120,8 +120,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
 {
     MStatus myStatus;
 
-    AC_DEBUG << "textureNode name=" << MFnDependencyNode(theTextureNode).name().asChar();
-    //dumpAttributes(theTextureNode);
+    DB(dumpAttributes(theTextureNode));
 
     std::string myMaterialName = theBuilder.getName();
 
@@ -398,7 +397,7 @@ MaterialExporter::exportBumpTexture(const MObject & theBumpNode,
                                     y60::MaterialBuilder & theBuilder,
                                     y60::SceneBuilder & theSceneBuilder)
 {
-    DB_Y(cerr << "MaterialExporter::exportBumpTexture() - name: " << MFnDependencyNode(theBumpNode).name().asChar() << endl);
+    DB2(cerr << "MaterialExporter::exportBumpTexture() - name: " << MFnDependencyNode(theBumpNode).name().asChar() << endl);
     DB(dumpAttributes(theBumpNode));
     MPlug myBumpPlug = MFnDependencyNode(theBumpNode).findPlug("bumpValue");
     MObject myBumpFileNode;
@@ -637,11 +636,25 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
                         "MaterialExporter::exportMaps()");
         }
 
+        // check texture alpha, set material transparency if set
+        const MFnDependencyNode & myTextureDepNode = MFnDependencyNode(myTextureNode);
+        MObject myFileHasAlpha = MFnDependencyNode(myTextureNode).attribute("fileHasAlpha", &myStatus);
+        if (myStatus) {
+            MPlug myPlug = myTextureDepNode.findPlug(myFileHasAlpha, &myStatus);
+            if (myStatus) {
+                double myDoubleValue;
+                if (!myPlug.isArray() && myPlug.getValue(myDoubleValue)) {
+                    AC_DEBUG << thePlugName << " fileHasAlpha=" << myDoubleValue;
+                    theBuilder.setTransparencyFlag(myDoubleValue > 0.0);
+                }
+            }
+        }
     }
     DB(AC_TRACE << "MaterialExporter::exportMaps("<<thePlugName<<") ready");
 
     return hasTextures;
 }
+
 void
 MaterialExporter::exportUnlitFeatures(const MFnMesh * theMesh, const MObject & theShaderNode,
                                      y60::MaterialBuilder & theBuilder,
@@ -819,7 +832,10 @@ MaterialExporter::createMaterial(const MFnMesh * theMesh, const MObject & theSha
     exportShader(theMesh, theShaderNode, myMaterialBuilder, theSceneBuilder, myLightingFeature);
 
     myMaterialBuilder.setType(myLightingFeature);
-    myMaterialBuilder.setTransparencyFlag(checkTransparency(theShaderNode));
+    if (myMaterialBuilder.getTransparencyFlag() == false) {
+        // if no texture has set the transparency flag, do our checks
+        myMaterialBuilder.setTransparencyFlag(checkTransparency(theShaderNode));
+    }
     _myMaterialNameMap[myMaterialName] = myMaterialId;
 
     return myMaterialId;
@@ -1014,7 +1030,7 @@ MaterialExporter::checkTransparency(const MObject & theShaderNode) {
         case MFn::kBlinn:
         case MFn::kPhongExplorer:
         case MFn::kPhong: {
-            // TODO: This does not work if a layerd shader is connected to the color plug (as in material_test.x60)
+            // TODO: This does not work if a layered shader is connected to the color plug (as in material_test.x60)
             if (checkAlphaTexture(theShaderNode, "transparency")) {
                 myTransparencyFlag = true;
             } else {
@@ -1028,7 +1044,7 @@ MaterialExporter::checkTransparency(const MObject & theShaderNode) {
         }
 
         case MFn::kSurfaceShader: {
-            // TODO: This does not work if a layerd shader is connected to the color plug (as in material_test.x60)
+            // TODO: This does not work if a layered shader is connected to the color plug (as in material_test.x60)
             if (checkAlphaTexture(theShaderNode, "outTransparency")) {
                 myTransparencyFlag = true;
             } else {
@@ -1042,6 +1058,7 @@ MaterialExporter::checkTransparency(const MObject & theShaderNode) {
                 myTransparencyPlugG.getValue(myColorG);
                 myTransparencyPlugB.getValue(myColorB);
                 if (myColorR != 0 || myColorG != 0 || myColorB != 0) {
+                    AC_DEBUG << "outTransparencyRGB true";
                     myTransparencyFlag = true;
                 }
             }

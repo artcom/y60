@@ -38,20 +38,20 @@ namespace y60 {
     DEFINE_EXCEPTION(TTFTextRendererException, asl::Exception);
 
     class TTFTextRenderer : public TextRenderer {
-    	public:
+        public:
             virtual void setRenderStyle(Text::RENDERSTYLE theStyle) = 0;
             virtual void loadFont(const std::string & theName, const std::string & theFileName,
-                                  int theHeight, TTFFontInfo::FONTTYPE theFontType) = 0;
+                    int theHeight, TTFFontInfo::FONTTYPE theFontType) = 0;
             virtual TextPtr createText(const asl::Vector2f & thePos,
-                                                        const std::string & theString,
-                                                        const std::string & theFontName) = 0;
+                    const std::string & theString,
+                    const std::string & theFontName) = 0;
 
             virtual void renderText(TextPtr & theText) = 0;
             virtual bool haveFont(const std::string theFontName) = 0;
             virtual asl::Vector2i renderTextAsImage(TextureManager & theTextureManager,
-                                   dom::NodePtr theImageNode,
-                                   const std::string & theText, const std::string & theFontName,
-                                   unsigned int theTextureWidth = 0, unsigned int theTextureHeight = 0) = 0;
+                    dom::NodePtr theImageNode,
+                    const std::string & theText, const std::string & theFontName,
+                    unsigned int theTextureWidth = 0, unsigned int theTextureHeight = 0) = 0;
 
             virtual bool getGlyphMetrics(const std::string & theFontName,
                     const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const = 0;
@@ -59,8 +59,6 @@ namespace y60 {
                     const std::string & theFirstCharacter, const std::string & theSecondCharacter) const = 0;
     };
     typedef asl::Ptr<TTFTextRenderer> TTFTextRendererPtr;
-
-
 
 } // namespace y60
 

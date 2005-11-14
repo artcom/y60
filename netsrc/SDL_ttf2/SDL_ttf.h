@@ -85,6 +85,12 @@ extern DECLSPEC int SDLCALL TTF_Init(void);
 /* Turn font fitting on / off (default is on), should be called before TTF_OpenFont [ART+COM Patch] */
 extern DECLSPEC void TTF_SetFitting(int theFittingFlag);
 
+/* Get the kerning between two characters  [ART+COM Patch] */
+extern DECLSPEC double TTF_Kerning(TTF_Font * theFont, const Uint16 theFirstCharacter, const Uint16 theSecondCharacter);
+
+/* Get the kerning between two characters  [ART+COM Patch] */
+extern DECLSPEC void TTF_SetTracking(float theTracking);
+
 /* Open a font file and create a font of the specified point size.
  * Some .fon fonts will have several sizes embedded in the file, so the
  * point size becomes the index of choosing which size.  If the value
@@ -139,9 +145,6 @@ extern DECLSPEC char * SDLCALL TTF_FontFaceStyleName(TTF_Font *font);
 extern DECLSPEC int SDLCALL TTF_GlyphMetrics(TTF_Font *font, Uint16 ch,
 				     int *minx, int *maxx,
                      int *miny, int *maxy, int *advance);
-
-/* Get the kerning between two characters  [ART+COM Patch] */
-extern DECLSPEC double TTF_Kerning(TTF_Font * theFont, const Uint16 theFirstCharacter, const Uint16 theSecondCharacter);
 
 /* Get the dimensions of a rendered string of text */
 extern DECLSPEC int SDLCALL TTF_SizeText(TTF_Font *font, const char *text, int *w, int *h);

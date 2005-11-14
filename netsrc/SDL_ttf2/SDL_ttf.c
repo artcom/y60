@@ -52,7 +52,8 @@
 #include <SDL/SDL_endian.h>
 #include "SDL_ttf.h"
 
-#define DB(x) // x
+#define DB(x) //x
+#define DB2(x) //x
 
 /* FIXME: Right now we assume the gray-scale renderer Freetype is using
    supports 256 shades of gray, but we should instead key off of num_grays
@@ -132,6 +133,9 @@ static int TTF_fontfitting = 1;
    for pixel-perfect left alignment [ART+COM Patch] */
 static int TTF_current_line_minx = 0;
 
+/* Font tracking [ART+COM Patch] */
+static float TTF_tracking = 0.0f;
+
 static __inline__ int sdlround(double x)
 {
 	if (x - floor(x) > 0.5) {
@@ -187,15 +191,19 @@ void TTF_ByteSwappedUNICODE(int swapped)
 }
 
 /* This function tells the library whether text should be rendered fittet to
-   screen pixels or not. Should be called before TTF_LoadFong.
+   screen pixels or not. Should be called before TTF_LoadFont.
    [ART+COM Patch]
 */
 void TTF_SetFitting(int theFittingFlag) {
-    TTF_fontfitting = theFittingFlag;
+	TTF_fontfitting = theFittingFlag;
 }
 
 int SDLCALL TTF_CurrentLineMinX() {
-    return TTF_current_line_minx;
+	return TTF_current_line_minx;
+}
+
+void TTF_SetTracking(float theTracking) {
+	TTF_tracking = theTracking / 64.0f;
 }
 
 static void TTF_SetFTError(const char *msg, FT_Error error)
@@ -484,8 +492,6 @@ static FT_Error Load_Glyph( TTF_Font* font, Uint16 ch, c_glyph* cached, int want
 			cached->miny = cached->maxy - FT_CEIL(metrics->height);
 			/* cached->yoffset = font->ascent - cached->maxy; */
 			cached->yoffset = (int)floor(font->ascent - (metrics->horiBearingY / 64.0));
-			cached->advance = FT_CEIL(metrics->horiAdvance);
-			cached->advance_unfitted = (metrics->horiAdvance / 64.0);
 		} else {
 			/* Get the bounding box for non-scalable format.
 			 * Again, freetype2 fills in many of the font metrics
@@ -498,9 +504,9 @@ static FT_Error Load_Glyph( TTF_Font* font, Uint16 ch, c_glyph* cached, int want
 			cached->maxy = FT_FLOOR(metrics->horiBearingY);
 			cached->miny = cached->maxy - FT_CEIL(face->available_sizes[font->font_size_family].height);
 			cached->yoffset = 0;
-			cached->advance = FT_CEIL(metrics->horiAdvance);
-			cached->advance_unfitted = (metrics->horiAdvance / 64.0);
 		}
+		cached->advance = FT_CEIL(metrics->horiAdvance);
+		cached->advance_unfitted = (metrics->horiAdvance / 64.0);
 
 		/* Adjust for bold and italic text */
 		if( font->style & TTF_STYLE_BOLD ) {
@@ -814,11 +820,11 @@ int TTF_GlyphMetrics(TTF_Font *font, Uint16 ch,
 		*maxy = font->current->maxy;
 	}
 	if ( advance ) {
-        *advance = font->current->advance;
-
+		int advance0 = font->current->advance;
 		if( font->style & TTF_STYLE_BOLD ) {
-			*advance += font->glyph_overhang;
+			advance0 += font->glyph_overhang;
 		}
+        *advance = advance0;
 	}
 	return 0;
 }
@@ -873,18 +879,20 @@ int TTF_SizeUTF8(TTF_Font *font, const char *text, int *w, int *h)
 
 /* Get kerning between two glyphs by indices [ART+COM Patch] */
 double getKerning(TTF_Font * theFont, FT_UInt thePreviousIndex, FT_UInt theCurrentIndex) {
+	double kerning = 0.0;
+
     if (FT_HAS_KERNING( theFont->face ) && thePreviousIndex && theCurrentIndex ) {
         FT_Vector delta;
         if (TTF_fontfitting) {
             FT_Get_Kerning( theFont->face, thePreviousIndex, theCurrentIndex, ft_kerning_default, &delta );
-            return (delta.x >> 6);
+            kerning = (double)(delta.x >> 6);
         } else {
             FT_Get_Kerning( theFont->face, thePreviousIndex, theCurrentIndex, ft_kerning_unfitted, &delta );
-            return (delta.x / 64.0);
+            kerning = (delta.x / 64.0);
         }
     }
 
-    return 0.0;
+    return kerning;
 }
 
 int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h) {
@@ -972,6 +980,7 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h) {
 		if ( font->style & TTF_STYLE_BOLD ) {
 			xstart += font->glyph_overhang;
 		}
+        xstart += TTF_tracking;
 
         /* Calculate min/max height */
         if ( glyph->miny < miny ) {
@@ -981,10 +990,11 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h) {
 			maxy = glyph->maxy;
 		}
         
-        DB(
-            printf("char %c, gminx: %d, kerning: %f, start: %f, gmaxx: %d, advance: %f, maxx: %d\n",
-                   *ch, glyph->minx, getKerning(font, prev_index, glyph->index),
-                   xstart, glyph->maxx, glyph->advance_unfitted, maxx);
+        DB2(
+            printf("SizeUNICODE char %c, minx: %d, maxx: %d, kerning: %f, start: %f, advance_unf: %f\n",
+                   *ch, glyph->minx, glyph->maxx,
+				   getKerning(font, prev_index, glyph->index),
+                   xstart, glyph->advance_unfitted);
         )
         
         prev_index = glyph->index;                
@@ -1197,6 +1207,7 @@ SDL_Surface *TTF_RenderUNICODE_Solid(TTF_Font *font,
 		if ( font->style & TTF_STYLE_BOLD ) {
 			xstart += font->glyph_overhang;
 		}
+        xstart += TTF_tracking;
         prev_index = glyph->index;
 	}
 
@@ -1454,6 +1465,7 @@ SDL_Surface* TTF_RenderUNICODE_Shaded( TTF_Font* font,
 		if ( font->style & TTF_STYLE_BOLD ) {
 			xstart += font->glyph_overhang;
 		}
+        xstart += TTF_tracking;
         prev_index = glyph->index;
 	}
 
@@ -1695,14 +1707,6 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 			}
 		}
 
-        DB(
-            printf("char %c, minx: %d, kerning: %f, start: %f, sum: %d, advance: %f\n",
-                   *ch, glyph->minx, getKerning(font, prev_index, glyph->index),
-                   xstart, sdlround(xstart) + glyph->minx, glyph->advance_unfitted);
-            //printf("    width: %d, height: %d, yoffset: %d\n", width, glyph->pixmap.rows, glyph->yoffset);
-        )        
-
-
         if (TTF_fontfitting) {
 		    xstart += glyph->advance;
 		} else {
@@ -1712,6 +1716,16 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 		if ( font->style & TTF_STYLE_BOLD ) {
 			xstart += font->glyph_overhang;
 		}
+        xstart += TTF_tracking;
+
+        DB(
+            printf("RenderUNICODE_Blended char %c, minx: %d, maxx: %d, kerning: %f, start: %f, advance_unf: %f\n",
+                   *ch, glyph->minx, glyph->maxx,
+				   getKerning(font, prev_index, glyph->index),
+                   xstart, glyph->advance_unfitted);
+            //printf("    width: %d, height: %d, yoffset: %d\n", width, glyph->pixmap.rows, glyph->yoffset);
+        )        
+
         prev_index = glyph->index;
 	}
 

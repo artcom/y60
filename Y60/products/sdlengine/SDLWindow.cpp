@@ -646,17 +646,6 @@ SDLWindow::go() {
     setCaptureMouseCursor(false);
 }
 
-bool SDLWindow::getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter,
-                         asl::Box2f & theGlyphBox, double & theAdvance)
-{
-    return _myRenderer->getTextManager().getGlyphMetrics(theFontName, theCharacter, theGlyphBox, theAdvance);
-}
-
-double SDLWindow::getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter)
-{
-    return _myRenderer->getTextManager().getKerning(theFontName, theFirstCharacter, theSecondCharacter);
-}
-
 void SDLWindow::setEventRecorderMode(EventRecorder::Mode theMode, bool theDiscardFlag) {
     _myEventRecorder.setMode(theMode, theDiscardFlag);
 }

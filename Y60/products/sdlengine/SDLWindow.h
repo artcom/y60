@@ -114,14 +114,6 @@ namespace y60 {
 
             //////////////////////////////////////////////////////////////////////////
 
-            bool getGlyphMetrics(const std::string & theFontName,
-                                 const std::string & theCharacter,
-                                 asl::Box2f & theGlyphBox, double & theAdvance);
-
-            double getKerning(const std::string & theFontName,
-                              const std::string & theFirstCharacter,
-                              const std::string & theSecondCharacter);
-
             /// Set EventRecorder mode to STOP/PLAY/RECORD.
             void setEventRecorderMode(EventRecorder::Mode theMode, bool theDiscardFlag);
             EventRecorder::Mode getEventRecorderMode() const;

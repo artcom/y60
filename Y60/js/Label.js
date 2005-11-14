@@ -22,6 +22,7 @@
 //  int                 bottomPad     (optional)
 //  int                 rightPad      (optional)
 //  int                 leftPad       (optional)
+//  float               tracking      (optional, default 0)
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -53,11 +54,13 @@ function LabelBase(Public, Protected, theSceneViewer,
         var bottomPad = "bottomPad" in myStyle ? myStyle.bottomPad : 0;
         var rightPad  = "rightPad"  in myStyle ? myStyle.rightPad : 0;
         var leftPad   = "leftPad"   in myStyle ? myStyle.leftPad : 0;
+        var tracking  = "tracking"  in myStyle ? myStyle.tracking : 0;
         window.setTextStyle(Renderer.BLENDED_TEXT);
         window.setTextPadding(topPad, bottomPad, leftPad, rightPad);
         window.setHTextAlignment(myStyle.HTextAlign);
         window.setVTextAlignment(myStyle.VTextAlign);
         window.setTextColor(myStyle.textColor, new Vector4f(1,1,1,1));
+        window.setTracking(tracking);
 
         var myFontName = myStyle.font + "_" + myStyle.fontsize;
         if (!(myFontName in ourFontCache)) {
@@ -65,11 +68,15 @@ function LabelBase(Public, Protected, theSceneViewer,
             ourFontCache[myFontName] = true;
         }
 
-        if (theSize == null) {
+        if (theSize == null || theSize[0] == 0 || theSize[1] == 0) {
             // force recreation of image
             Public.image = theSceneViewer.getImageManager().getImageNode(createUniqueId());
-            Public.width = 0;
-            Public.height = 0;
+            if (theSize == null || theSize[0] == 0) {
+                Public.width = 0;
+            }
+            if (theSize == null || theSize[1] == 0) {
+                Public.height = 0;
+            }
         }
         ensureImage();
         var mySize = window.renderTextAsImage(Public.image, theText, myFontName, Public.width, Public.height);
@@ -82,6 +89,10 @@ function LabelBase(Public, Protected, theSceneViewer,
 
         if (theSize == null) {
             Public.width = mySize[0];
+            Public.height = mySize[1];
+        } else if (theSize[0] == 0) {
+            Public.width = mySize[0];
+        } else if (theSize[1] == 0) {
             Public.height = mySize[1];
         }
     }
@@ -122,6 +133,7 @@ function LabelBase(Public, Protected, theSceneViewer,
     function ensureImage() {
         if (Public.image == null) {
             Public.image = theSceneViewer.getImageManager().getImageNode(createUniqueId());
+            Public.texture.applymode = "decal";
         }
     }
 
@@ -136,5 +148,4 @@ function Label(theSceneViewer, theText,
     LabelBase(Public, Protected, theSceneViewer,
               theSize, thePosition, theStyle, theParent);
     Public.setText(theText);
-    Public.texture.applymode = "decal";
 }

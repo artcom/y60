@@ -123,6 +123,16 @@ namespace jslib {
         void setLineHeight(unsigned int theLineHeight);
         void setParagraph(unsigned int theTopMargin, unsigned int theBottomMargin);
 
+        bool getGlyphMetrics(const std::string & theFontName,
+                             const std::string & theCharacter,
+                             asl::Box2f & theGlyphBox, double & theAdvance);
+
+        double getKerning(const std::string & theFontName,
+                          const std::string & theFirstCharacter,
+                          const std::string & theSecondCharacter);
+
+        void setTracking(float theTracking);
+
         // Animation Manager
         void runAnimations(float theTime);
         void playClip(float theTime,

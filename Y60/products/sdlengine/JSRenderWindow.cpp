@@ -193,46 +193,6 @@ draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
-getGlyphMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    if (argc == 2) {
-        std::string myFontName;
-        if (!convertFrom(cx,argv[0],myFontName)) {
-            JS_ReportError(cx,"JSRenderWindow::getGlyphMetrics: parameter 0 must be a string");
-            return JS_FALSE;
-        }
-        std::string myCharacter;
-        if (!convertFrom(cx,argv[1],myCharacter)) {
-            JS_ReportError(cx,"JSRenderWindow::getGlyphMetrics: parameter 1 must be a string");
-            return JS_FALSE;
-        }
-
-        asl::Box2f myGlyphBox;
-        JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
-        double myAdvance;
-        myObj.getNative().getGlyphMetrics(myFontName, myCharacter, myGlyphBox, myAdvance);
-
-        JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
-        *rval = OBJECT_TO_JSVAL(myReturnObject);
-        if (!JS_DefineProperty(cx, myReturnObject, "min",    as_jsval(cx, myGlyphBox.getMin()), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-        if (!JS_DefineProperty(cx, myReturnObject, "max",    as_jsval(cx, myGlyphBox.getMax()), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-        if (!JS_DefineProperty(cx, myReturnObject, "advance", as_jsval(cx, myAdvance), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-
-        return JS_TRUE;
-    }
-    JS_ReportError(cx,"JSRenderWindow::getGlyphMetrics: bad number of arguments, 2 expected");
-    return JS_FALSE;
-}
-
-static JSBool
-getKerning(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    return Method<SDLWindow>::call(&SDLWindow::getKerning,cx,obj,argc,argv,rval);
-}
-
-static JSBool
 setEventRecorderMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -291,8 +251,6 @@ JSRenderWindow::Functions() {
         {"loadTTF",            loadTTF,                  4},
         {"setMousePosition",   setMousePosition,         2},
         {"draw",               draw,                     1},
-        {"getGlyphMetrics",    getGlyphMetrics,          7},
-        {"getKerning",         getKerning,               3},
         {"setEventRecorderMode", setEventRecorderMode,   1},
         {"getEventRecorderMode", getEventRecorderMode,   0},
         {"loadEvents",           loadEvents,             1},

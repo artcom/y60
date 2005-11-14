@@ -1,18 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//    $RCSfile: AbstractRenderWindow.cpp,v $
-//     $Author: jens $
-//   $Revision: 1.34 $
-//       $Date: 2005/04/26 19:55:59 $
-//
 //=============================================================================
 
 #include "AbstractRenderWindow.h"
@@ -847,6 +840,22 @@ namespace jslib {
     }
     void AbstractRenderWindow::setParagraph(unsigned int theTopMargin, unsigned int theBottomMargin) {
         _myRenderer->getTextManager().setParagraph(theTopMargin, theBottomMargin);
+    }
+
+    bool AbstractRenderWindow::getGlyphMetrics(const std::string & theFontName,
+                                               const std::string & theCharacter,
+                                               asl::Box2f & theGlyphBox, double & theAdvance) {
+        return _myRenderer->getTextManager().getGlyphMetrics(theFontName, theCharacter, theGlyphBox, theAdvance);
+    }
+
+    double AbstractRenderWindow::getKerning(const std::string & theFontName,
+                                            const std::string & theFirstCharacter,
+                                            const std::string & theSecondCharacter) {
+        return _myRenderer->getTextManager().getKerning(theFontName, theFirstCharacter, theSecondCharacter);
+    }
+
+    void AbstractRenderWindow::setTracking(float theTracking) {
+        _myRenderer->getTextManager().setTracking(theTracking);
     }
 
     // =======================================================================

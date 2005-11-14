@@ -48,7 +48,8 @@ namespace y60 {
         _myTopPadding(0),
         _myBottomPadding(0),
         _myRightPadding(0),
-        _myLeftPadding(0)
+        _myLeftPadding(0),
+        _myTracking(0.0f)
     {}
 
     TextRenderer::~TextRenderer() {}

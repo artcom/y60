@@ -13,7 +13,6 @@
 #include "plfilter3x3.h"
 
 #include <asl/Arguments.h>
-//#include <asl/numeric_functions.h>
 #include <asl/file_functions.h>
 #include <asl/directory_functions.h>
 #include <asl/Logger.h>
@@ -34,10 +33,10 @@ using namespace asl;
 void printVersion();
 
 asl::Arguments::AllowedOption myOptions[] = {
-                                             {"--tolerance",      "%s"},
+                                             {"--tolerance", "%f"},
                                              {"--threshold", "%s"},
-                                             {"--version",      ""  },
-                                             {"--help",         ""  },
+                                             {"--version",   ""  },
+                                             {"--help",      ""  },
                                              {"", ""}
                                             };
 asl::Arguments myArguments(myOptions);
@@ -90,11 +89,11 @@ int main( int argc, char *argv[])  {
         myDecoder.MakeBmpFromFile(myArguments.getArgument(1).c_str(), &mySecondBitmap, PLPixelFormat::A8R8G8B8);
 
         string myBaseName = asl::removeExtension(myArguments.getArgument(0));  
-        int myTolerance = 0;
+        float myTolerance = 0.0f;
         int myThreshold = 128;
 
         if ( myArguments.haveOption("--tolerance")) {
-            myTolerance = asl::as<int>(myArguments.getOptionArgument("--tolerance"));
+            myTolerance = asl::as<float>(myArguments.getOptionArgument("--tolerance"));
         }
 
         if ( myArguments.haveOption("--threshold")) {
@@ -134,17 +133,17 @@ int main( int argc, char *argv[])  {
             }
             AC_DEBUG << "H(" << i << ")=" << myHistogramm[i];
         }
-        AC_INFO << "Threshold: " << myThreshold << endl;
-        AC_INFO << "Tolerance: " << myTolerance << "%" << endl;
-        AC_INFO << "Bright Pixel Count: " << myBrightPixelCount << endl;
+        AC_INFO << "Threshold: " << myThreshold;
+        AC_INFO << "Tolerance: " << myTolerance << "%";
+        AC_INFO << "Bright Pixel Count: " << myBrightPixelCount;
         float myBrightPixelAverage = 100.0f * float(myBrightPixelCount) / (myFirstBitmap.GetHeight() * myFirstBitmap.GetWidth()) ;
-        AC_INFO << "Average Bright (%): " << myBrightPixelAverage << endl;
+        AC_INFO << "Average Bright: " << myBrightPixelAverage << "%";
 
         if ( myBrightPixelAverage <= myTolerance) {
-            AC_INFO << "images are almost equal" << endl;
+            AC_INFO << "Images are almost equal";
             return 0;
         }
-        AC_INFO << "images are too different" << endl;
+        AC_WARNING << "Images are too different Average Bright: " << myBrightPixelAverage << "%";
         return 1;
     }
     catch (asl::Exception & e) {

@@ -90,6 +90,7 @@ namespace y60 {
                               int theHeight, TTFFontInfo::FONTTYPE theFontType)
     {
         setFontFitting(theHeight);
+
         string myFontName = makeFontName(theName, theFontType);
         if (_myFonts.find(myFontName) != _myFonts.end()) {
             throw GLTextRendererException(string("Font: ") + myFontName + " already in fontlibrary", PLUS_FILE_LINE);
@@ -162,6 +163,8 @@ namespace y60 {
                                             unsigned int theTargetWidth,
                                             unsigned int theTargetHeight)
     {
+        TTF_SetTracking(_myTracking);
+
         Vector2i myTextSize = createTextSurface(theText, theFontName, _myRenderStyle,
             getTextColor(), getBackColor(),
             theTargetWidth, theTargetHeight);

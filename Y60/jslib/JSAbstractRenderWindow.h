@@ -157,7 +157,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         hasCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Checks if the renderer has a certain capability." \
                       "Possible Capability constants are static properties of the Renderer object");
-            DOC_PARAM("theCapability", "", DOC_TYPE_ENUMERATION);
+            DOC_PARAM("theCapability", "Capability to test for", DOC_TYPE_ENUMERATION);
             DOC_RVAL("theResult", DOC_TYPE_BOOLEAN);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::hasCap,cx,obj,argc,argv,rval);
@@ -166,7 +166,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         hasCapAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Checks if the renderer has a certain capability." \
                       "Use OpenGL queryOGLExtension command is called with the capability string.");
-            DOC_PARAM("theCapability", "", DOC_TYPE_STRING);
+            DOC_PARAM("theCapability", "Capability to test for", DOC_TYPE_STRING);
             DOC_RVAL("theResult", DOC_TYPE_BOOLEAN);
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::hasCapAsString,cx,obj,argc,argv,rval);
@@ -174,7 +174,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
 
         static JSBool
         printStatistics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("prints render statistics and profiling information to the console");
+            DOC_BEGIN("Prints render statistics and profiling information to the console");
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::printStatistics,cx,obj,argc,argv,rval);
         }
@@ -202,7 +202,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
 
         static JSBool
         performRequest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("performs an http request");
+            DOC_BEGIN("Performs an http request");
             DOC_PARAM("theRequest", "", DOC_TYPE_OBJECT);
             DOC_END;
             if (argc == 1) {
@@ -335,6 +335,61 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::setParagraph,cx,obj,argc,argv,rval);
         }
+        static JSBool
+        getGlyphMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Gets metrics of a glyph of the given font");
+            DOC_PARAM("theFont", "Font name", DOC_TYPE_STRING);
+            DOC_PARAM("theGlyph", "Glyph", DOC_TYPE_STRING);
+            DOC_END;
+            if (argc == 2) {
+                std::string myFontName;
+                if (!convertFrom(cx,argv[0],myFontName)) {
+                    JS_ReportError(cx,"JSRenderWindow::getGlyphMetrics: parameter 0 must be a string");
+                    return JS_FALSE;
+                }
+                std::string myCharacter;
+                if (!convertFrom(cx,argv[1],myCharacter)) {
+                    JS_ReportError(cx,"JSRenderWindow::getGlyphMetrics: parameter 1 must be a string");
+                    return JS_FALSE;
+                }
+
+                asl::Box2f myGlyphBox;
+                double myAdvance;
+#if 1
+                jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getGlyphMetrics(myFontName, myCharacter, myGlyphBox, myAdvance);
+                jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+#else
+                jslib::JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
+                myObj.getNative().getGlyphMetrics(myFontName, myCharacter, myGlyphBox, myAdvance);
+#endif
+
+                JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+                *rval = OBJECT_TO_JSVAL(myReturnObject);
+                if (!JS_DefineProperty(cx, myReturnObject, "min",    as_jsval(cx, myGlyphBox.getMin()), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+                if (!JS_DefineProperty(cx, myReturnObject, "max",    as_jsval(cx, myGlyphBox.getMax()), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+                if (!JS_DefineProperty(cx, myReturnObject, "advance", as_jsval(cx, myAdvance), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+
+                return JS_TRUE;
+            }
+            JS_ReportError(cx,"JSRenderWindow::getGlyphMetrics: bad number of arguments, 2 expected");
+            return JS_FALSE;
+        }
+        static JSBool
+        getKerning(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Get kerning for two glyphs of the given font");
+            DOC_PARAM("theFont", "Font name", DOC_TYPE_STRING);
+            DOC_PARAM("theGlyph0", "First glyph", DOC_TYPE_STRING);
+            DOC_PARAM("theGlyph1", "Second glyph", DOC_TYPE_STRING);
+            DOC_END;
+            return Method<NATIVE>::call(&NATIVE::getKerning,cx,obj,argc,argv,rval);
+        }
+        static JSBool
+        setTracking(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Set font tracking");
+            DOC_PARAM("theTracking", "Tracking value", DOC_TYPE_FLOAT);
+            DOC_END;
+            return Method<NATIVE>::call(&NATIVE::setTracking,cx,obj,argc,argv,rval);
+        }
 
         static JSBool
         playClip(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -428,6 +483,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 {"getImagePixel",      getImagePixel,            3},
                 {"setImagePixel",      setImagePixel,            4},
                 {"performRequest",     performRequest,           1},
+                // text rendering
                 {"renderText",         renderText,               3},
                 {"setTextColor",       setTextColor,             2},
                 {"renderTextAsImage",  renderTextAsImage,        5},
@@ -437,6 +493,10 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 {"setVTextAlignment",  setVTextAlignment,        1},
                 {"setLineHeight",      setLineHeight,            1},
                 {"setParagraph",       setParagraph,             2},
+                {"getGlyphMetrics",    getGlyphMetrics,          7},
+                {"getKerning",         getKerning,               3},
+                {"setTracking",        setTracking,              1},
+                // animations
                 {"runAnimations",      runAnimations,            1},
                 {"playClip",           playClip,                 3},
                 {"setClipLoops",       setClipLoops,             3},

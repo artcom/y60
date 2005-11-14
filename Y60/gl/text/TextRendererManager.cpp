@@ -83,13 +83,13 @@ namespace y60 {
         glDisable(GL_LIGHTING);
         DB(AC_TRACE << "TextRendererManager:: setup setup done" << endl);
 
-        for (int myTextIndex=0; myTextIndex!=_myTextSnippets.size(); myTextIndex++) {
+        for (unsigned myTextIndex=0; myTextIndex!=_myTextSnippets.size(); ++myTextIndex) {
             // TODO, refactor
             DB(AC_TRACE << "TextRendererManager:: rendering text #" << myTextIndex << endl);
             _myTextSnippets[myTextIndex]->_myRenderer->renderText(_myTextSnippets[myTextIndex]);
         }
-        DB(AC_TRACE << "TextRendererManager:: clearing " << endl);
 
+        DB(AC_TRACE << "TextRendererManager:: clearing " << endl);
         _myTextSnippets.clear();
 
         glPopMatrix();
@@ -98,17 +98,16 @@ namespace y60 {
 
         glPopAttrib();
         CHECK_OGL_ERROR;
-
     }
 
     void
     TextRendererManager::updateWindow(const unsigned int & theWindowWidth, const unsigned int & theWindowHeight) {
         _myWindowWidth  = theWindowWidth;
         _myWindowHeight = theWindowHeight;
+        _myBitmapRenderer.updateWindow(theWindowWidth, theWindowHeight);
         if (_myTTFRenderer) {
             _myTTFRenderer->updateWindow(theWindowWidth, theWindowHeight);
         }
-        _myBitmapRenderer.updateWindow(theWindowWidth, theWindowHeight);
     }
 
     TextRenderer &
@@ -210,4 +209,10 @@ namespace y60 {
     {
         return _myTTFRenderer->getKerning(theFontName, theFirstCharacter, theSecondCharacter);
     }
+
+    void
+    TextRendererManager::setTracking(float theTracking) {
+        _myTTFRenderer->setTracking(theTracking);
+    }
+
 }

@@ -372,9 +372,17 @@ namespace y60 {
         }
     }
 
-
     void
     MaterialBuilder::setTransparencyFlag(bool theFlag) {
-        getNode()->appendAttribute(TRANSPARENCY_ATTRIB, theFlag);
+        if (getNode()->getAttribute(TRANSPARENCY_ATTRIB)) {
+            (*getNode())[TRANSPARENCY_ATTRIB].nodeValueAssign<bool>(theFlag);
+        } else {
+            getNode()->appendAttribute(TRANSPARENCY_ATTRIB, theFlag);
+        }
+    }
+
+    bool
+    MaterialBuilder::getTransparencyFlag() const {
+        return getNode()->getAttributeValue(TRANSPARENCY_ATTRIB, false);
     }
 }
