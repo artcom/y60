@@ -174,7 +174,6 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         GLResourceManager.loadShaderLibrary("../../../../shader/shaderlibrary.xml");
         // Create empty scene
         window = new RenderWindow();
-        window.setScene(new Scene(null));
 
         obj.myScene = window.scene.dom;
         var myViewport = getDescendantByTagName(obj.myScene, "viewport", true);

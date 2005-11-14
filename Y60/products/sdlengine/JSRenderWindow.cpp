@@ -69,10 +69,26 @@ struct JSClassTraits<AbstractRenderWindow> : public JSClassTraitsWrapper<SDLWind
 
 // =============== Own Methods
 static JSBool
-setVideoMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Resizes the window. Optionally the video mode is set to fullscreen and the screen resolution is set so it fits the current window size best.");
+    DOC_PARAM("theWidth", "Target window width in pixel", DOC_TYPE_INTEGER);
+    DOC_PARAM("theHeight", "Target window height in pixel", DOC_TYPE_INTEGER);
+    DOC_PARAM_OPT("theFullscreenFlag", "If this flag is set to true, the video mode is set to fullscreen.", DOC_TYPE_INTEGER, false);
     DOC_END;
-    return Method<SDLWindow>::call(&SDLWindow::setVideoMode,cx,obj,argc,argv,rval);
+    ensureParamCount(argc, 2, 3);
+    if (argc == 2) {
+        unsigned myWidth;
+        unsigned myHeight;
+        if (!convertFrom(cx, argv[0], myWidth) || !convertFrom(cx, argv[1], myHeight)) {
+            JS_ReportError(cx, "Renderer::resize(): Argument one and two must be integers");
+            return JS_FALSE;
+        }
+        JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
+        myObj.getNative().setVideoMode(myWidth, myHeight);
+        return JS_TRUE;
+    } else { // argc == 3
+        return Method<NATIVE>::call(&NATIVE::setVideoMode,cx,obj,argc,argv,rval);
+    }
 }
 static JSBool
 createCursor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -88,13 +104,13 @@ resetCursor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 }
 static JSBool
 stop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Opens the window, if it is not alread open and starts the main renderloop.");
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::stop,cx,obj,argc,argv,rval);
 }
 static JSBool
 go(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Closes the window and stops the main renderloop");
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::go,cx,obj,argc,argv,rval);
 }
@@ -146,8 +162,8 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setMousePosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set the mouse cursor position.");
-    DOC_PARAM("theX", "", DOC_TYPE_INTEGER);
-    DOC_PARAM("theY", "", DOC_TYPE_INTEGER);
+    DOC_PARAM("theX", "X-Position in pixels", DOC_TYPE_INTEGER);
+    DOC_PARAM("theY", "Y-Position in pixels", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::setMousePosition,cx,obj,argc,argv,rval);
 }
@@ -243,7 +259,7 @@ JSFunctionSpec *
 JSRenderWindow::Functions() {
     static JSFunctionSpec myFunctions[] = {
         /* name                DERIVED::native          nargs    */
-        {"setVideoMode",       setVideoMode,             3},
+        {"resize",             resize,                   3},
         {"resetCursor",        resetCursor,              0},
         {"createCursor",       createCursor,             1},
         {"go",                 go,                       0},
@@ -285,9 +301,9 @@ JSRenderWindow::ConstIntProperties() {
 #endif
 
     static JSConstIntPropertySpec myProperties[] = {
-        { "STOP", PROP_STOP, y60::EventRecorder::STOP }, 
-        { "PLAY", PROP_PLAY, y60::EventRecorder::PLAY }, 
-        { "RECORD", PROP_RECORD, y60::EventRecorder::RECORD }, 
+        { "STOP", PROP_STOP, y60::EventRecorder::STOP },
+        { "PLAY", PROP_PLAY, y60::EventRecorder::PLAY },
+        { "RECORD", PROP_RECORD, y60::EventRecorder::RECORD },
         {0}
     };
     return myProperties;

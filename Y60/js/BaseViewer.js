@@ -108,7 +108,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
    }
 
    self.setScene = function(theScene, theCanvas) {
-       var myStatus = _myRenderWindow.setScene(theScene);
+       var myStatus = _myRenderWindow.scene = theScene;
        if (!myStatus) {
            throw new Exception("Could not load model", fileline());
        }
@@ -309,7 +309,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 } else {
                     Logger.error("Unable to open '" + _myProfileName + "'");
                 }
-            } 
+            }
             if (!myProfilesNode) {
                 myProfilesNode = new Node("<profiles/>").firstChild;
             }
@@ -470,8 +470,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _mySkyboxMaterial        = null;
     var _myHeartbeatThrober      = null;
     var _myPicking               = null;
-    
-    self.__defineGetter__('_myPicking', function(){ return _myPicking; }); 
+
+    self.__defineGetter__('_myPicking', function(){ return _myPicking; });
 
     function getSingleViewport() {
         if (_myRenderWindow.canvas.childNodesLength("viewport") == 1) {

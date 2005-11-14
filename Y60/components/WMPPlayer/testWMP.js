@@ -24,7 +24,6 @@ plug("y60WMPPlayer");
 var window = new RenderWindow();
 //window.decorations = false;
 window.position = new Vector2i(10, 10);
-window.setScene(new Scene(null));
 
 var ourWMPPlayer = new WMPPlayer();
 ourWMPPlayer.setup();

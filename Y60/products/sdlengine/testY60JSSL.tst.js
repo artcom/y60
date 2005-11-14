@@ -31,11 +31,11 @@ Y60JSSLUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     function testRemoveElement(theArray, theResult) {
-        obj.myArray = theArray;        
+        obj.myArray = theArray;
         obj.myResult = theResult;
         for (var i = 0; i < obj.myArray.length; ++i) {
             if (obj.myArray[i] == 0) {
-                obj.myArray = obj.myArray.removeElement(i);
+                obj.myArray = removeElement(obj.myArray, i);
                 i--;
             }
         }

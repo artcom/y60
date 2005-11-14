@@ -110,29 +110,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             return Method<NATIVE>::call(&NATIVE::clearInterval,cx,obj,argc,argv,rval);
         }
 
-        static JSBool setScene(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("Sets the scene object to be rendered by this window, the current scene will be thrown away.");
-            DOC_PARAM("theScene", "", DOC_TYPE_OBJECT);
-            DOC_RVAL("theSucceededFlag", DOC_TYPE_BOOLEAN);
-            DOC_END;
-            try {
-                DERIVED * mySelf;
-                convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
-
-                y60::ScenePtr myScene(0);
-                if (argv[0] != JSVAL_NULL && argv[0] != JSVAL_VOID) {
-                    if ( ! convertFrom(cx, argv[0], myScene)) {
-                        throw JSArgMismatch("Failed to convert argument 0 to type y60::Scene",
-                                            PLUS_FILE_LINE);
-                    }
-                }
-
-                bool myRetVal = mySelf->setScene(myScene);
-                *rval = as_jsval(cx, myRetVal);
-                return JS_TRUE;
-            } HANDLE_CPP_EXCEPTION;
-        }
-
         static JSBool
         saveBuffer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Saves a screenshot to a given file");
@@ -473,7 +450,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 {"setInterval",        setInterval,              2},
                 {"clearTimeout",       clearTimeout,             1},
                 {"clearInterval",      clearInterval,            1},
-                {"setScene",           setScene,                 1},
                 {"saveBuffer",         saveBuffer,               2},
                 {"getRenderer",        getRenderer,              0},
                 {"addExtension",       addExtension,             1},
@@ -519,7 +495,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
 
         static JSPropertySpec * BaseProperties() {
             static JSPropertySpec myProperties[] = {
-                {"scene",           PROP_scene,             JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // node
+                {"scene",           PROP_scene,             JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // node
                 {"width",           PROP_width,             JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
                 {"height",          PROP_height,            JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
                 {"pause",           PROP_pause,             JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // boolean
@@ -664,6 +640,17 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                         );
                         return JS_TRUE;
                     }
+                case PROP_scene: {
+                    y60::ScenePtr myScene(0);
+                    if (*vp == JSVAL_NULL || !convertFrom(cx, *vp, myScene)) {
+                        throw JSArgMismatch("Failed to convert argument to type y60::Scene", PLUS_FILE_LINE);
+                    }
+                    if (theNative.setScene(myScene)) {
+                        return JS_TRUE;
+                    } else {
+                        return JS_FALSE;
+                    }
+                }
                 case PROP_lighting:
                     return setViewportAttribute<y60::ViewportLightingTag>(theNative, cx, vp);
                 case PROP_flatshading:

@@ -240,7 +240,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     break;
                 case 'f':
                     _myFullscreen = !_myFullscreen;
-                    window.setVideoMode (0, 0, _myFullscreen);
+                    window.resize(0, 0, _myFullscreen);
                     print("Fullscreen: " + (_myFullscreen ? "on" : "off"));
                     break;
                 case 'X':
@@ -377,7 +377,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
 
         if (theWindowWidth != null && theWindowHeight != null) {
-            window.setVideoMode(theWindowWidth, theWindowHeight, theFullscreen);
+            window.resize(theWindowWidth, theWindowHeight, theFullscreen);
         }
 
         // set the window behavior while sleeping

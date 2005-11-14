@@ -96,9 +96,8 @@ ClusterExtensionApp.prototype.Constructor = function(self, theArguments) {
             window.renderWhileSleep = false;
 
             if (theWidth != null && theHeight != null) {
-                //window.resizeTo(theWidth, theHeight);
-                window.setVideoMode(theWidth, theHeight, ourFullScreenFlag);
-           }
+                window.resize(theWidth, theHeight, ourFullScreenFlag);
+            }
 
             // setting the pbuffer size must be done before loading (creating the rendering context)
             //window.setPBufferSize(_myPBufferWidth, _myPBufferHeight);

@@ -34,7 +34,7 @@ renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_BEGIN("Renders my current scene onto the texture given by the target attribute of my canvas. ");
     DOC_PARAM_OPT("theCopyToImageFlag", "if true the underlying image is updated.", DOC_TYPE_BOOLEAN, false);
     DOC_END;
-    
+
     ensureParamCount(argc, 0, 1);
 
     OffScreenRenderArea * myNative(0);
@@ -55,23 +55,22 @@ JSOffScreenRenderArea::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"renderToCanvas",      renderToCanvas,           1},
-        {"setScene",             JSBASE::setScene,          0},
         {0}
     };
     return myFunctions;
 }
 
 enum PropertyNumbers {
-    PROP_BEGIN = -128,
+    PROP_BEGIN = -128
 };
 
 JSPropertySpec *
 JSOffScreenRenderArea::Properties() {
     static JSPropertySpec myProperties[] = {
-        {"scene",           JSBASE::PROP_scene,             JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // node
+        {"scene",           JSBASE::PROP_scene,             JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // node
         {"width",           JSBASE::PROP_width,             JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"height",          JSBASE::PROP_height,            JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
-        
+
         {"canvas",          JSBASE::PROP_canvas,            JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // Node
         {"renderingCaps",   JSBASE::PROP_renderingCaps,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // Node
         {0}
@@ -96,12 +95,13 @@ JSOffScreenRenderArea::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 // getproperty handling
 JSBool
 JSOffScreenRenderArea::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     switch (theID) {
+        case JSBASE::PROP_scene:
         case JSBASE::PROP_renderingCaps:
         case JSBASE::PROP_canvas:
         case JSBASE::PROP_width:
@@ -114,21 +114,20 @@ JSOffScreenRenderArea::getPropertySwitch(unsigned long theID, JSContext *cx, JSO
 
 }
 
-
-/*
 template <>
 struct JSClassTraits<AbstractRenderWindow> : public JSClassTraitsWrapper<OffScreenRenderArea, JSOffScreenRenderArea> {
     static JSClass * Class() {
         return JSOffScreenRenderArea::Base::Class();
     }
 };
-*/
 
 // setproperty handling
 JSBool
 JSOffScreenRenderArea::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     switch (theID) {
+        case JSBASE::PROP_scene:
+            return JSBASE::setPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
         case JSBASE::PROP_canvas:
             AC_INFO << "setting canvas";
             try {
@@ -161,9 +160,9 @@ JSOffScreenRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsv
         return JS_FALSE;
     }
 
-    
+
     OWNERPTR myNewObject = NATIVE::create();
-    
+
     JSOffScreenRenderArea * myNewJSObject = new JSOffScreenRenderArea(myNewObject, &(*myNewObject));
 
     if (myNewJSObject) {
