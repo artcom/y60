@@ -15,7 +15,18 @@
 //
 //=============================================================================
 
-use("BuildUtils.js");
+use("ShapeBuilder.js");
+
+var ELEMENT_TYPE_POINTS          = "points";
+var ELEMENT_TYPE_LINES           = "lines";
+var ELEMENT_TYPE_LINE_STRIP      = "linestrip";
+var ELEMENT_TYPE_LINE_LOOP       = "lineloop";
+var ELEMENT_TYPE_TRIANGLES       = "triangles";
+var ELEMENT_TYPE_TRIANGLE_STRIP  = "trianglestrip";
+var ELEMENT_TYPE_TRIANGLE_FAN    = "trianglefan";
+var ELEMENT_TYPE_QUADS           = "quads";
+var ELEMENT_TYPE_QUAD_STRIP      = "quadstrip";
+var ELEMENT_TYPE_POLYGON         = "polygon";
 
 function Element(theType, theMaterial) {
     this.type      = theType;
@@ -26,14 +37,11 @@ function Element(theType, theMaterial) {
     this.texcoords = [];
 }
 
-function ShapeBuilder(theShapeId) {
-    this.Constructor(this, theShapeId);
+function ShapeBuilder() {
+    this.Constructor(this);
 }
 
-ShapeBuilder.prototype.Constructor = function(obj, theShapeId) {
-
-
-    var _myShapeId   = theShapeId;
+ShapeBuilder.prototype.Constructor = function(obj) {
     var _myElements  = [];
     var _myPositions = [];
     var _myNormals   = [];
@@ -41,8 +49,9 @@ ShapeBuilder.prototype.Constructor = function(obj, theShapeId) {
     var _myColors    = [];
 
     obj.buildNode = function() {
+
         var myShapeString =
-            '<shape id="' + _myShapeId + '">\n' +
+            '<shape>\n' +
             '    <vertexdata>\n' +
             '        <vectorofvector3f name="position">' + arrayToString(_myPositions) + '</vectorofvector3f>\n' +
             '        <vectorofvector3f name="normal">' +  arrayToString(_myNormals) + '</vectorofvector3f>\n';
@@ -54,6 +63,7 @@ ShapeBuilder.prototype.Constructor = function(obj, theShapeId) {
             }
             myShapeString += '    </vertexdata>\n' +
             '    <primitives>\n';
+
         for (var i = 0; i < _myElements.length; ++i) {
             var myElement = _myElements[i];
             myShapeString +=
@@ -112,7 +122,7 @@ ShapeBuilder.prototype.Constructor = function(obj, theShapeId) {
         theElement.colors.push(0);
     }
 
-    obj.appendQuad = function (theElement, thePosition, theSize, theDepth, theOffset) {
+    obj.appendQuad = function (theElement, thePosition, theSize, theDepth) {
         var myDepth = 0;
         if (theDepth != undefined) {
             myDepth = theDepth;
@@ -121,10 +131,10 @@ ShapeBuilder.prototype.Constructor = function(obj, theShapeId) {
         var myHalfWidth  = theSize[0] / 2;
         var myHalfHeight = theSize[1] / 2;
         var myPosIndex = _myPositions.length;
-        _myPositions.push([thePosition[0] - myHalfWidth, thePosition[1] - myHalfHeight, theDepth]);
-        _myPositions.push([thePosition[0] + myHalfWidth, thePosition[1] - myHalfHeight, theDepth]);
-        _myPositions.push([thePosition[0] + myHalfWidth, thePosition[1] + myHalfHeight, theDepth]);
-        _myPositions.push([thePosition[0] - myHalfWidth, thePosition[1] + myHalfHeight, theDepth]);
+        _myPositions.push([thePosition[0] - myHalfWidth, thePosition[1] - myHalfHeight, myDepth]);
+        _myPositions.push([thePosition[0] + myHalfWidth, thePosition[1] - myHalfHeight, myDepth]);
+        _myPositions.push([thePosition[0] + myHalfWidth, thePosition[1] + myHalfHeight, myDepth]);
+        _myPositions.push([thePosition[0] - myHalfWidth, thePosition[1] + myHalfHeight, myDepth]);
         // set element's position indices
         theElement.positions.push(myPosIndex,myPosIndex+1,myPosIndex+2,myPosIndex+3);
 
@@ -167,7 +177,7 @@ ShapeBuilder.prototype.Constructor = function(obj, theShapeId) {
         _myUVCoords.push([0,0]);
         theElement.texcoords.push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
     }
-    
+
     obj.appendQuadWithCustumTexCoords = function (theElement, thePosition, theSize, theUVOrigin, theUVSize) {
         // add positions to shape's vertex data
         var myHalfWidth  = theSize[0] / 2;
@@ -187,14 +197,14 @@ ShapeBuilder.prototype.Constructor = function(obj, theShapeId) {
 
         // uv coordintaes for the 4 vertices
         var myTexIndex = _myUVCoords.length;
-        
+
         _myUVCoords.push([theUVOrigin[0], theUVOrigin[1] + theUVSize[1]]);
         _myUVCoords.push([theUVOrigin[0] + theUVSize[0], theUVOrigin[1] + theUVSize[1]]);
         _myUVCoords.push([theUVOrigin[0] + theUVSize[0], theUVOrigin[1]]);
         _myUVCoords.push([theUVOrigin[0], theUVOrigin[1]]);
-        
+
         theElement.texcoords.push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
-    
+
         var myColorIndex = _myColors.length;
         _myColors.push([1,1,1,1]);
         theElement.colors.push(myColorIndex, myColorIndex, myColorIndex, myColorIndex);

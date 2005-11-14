@@ -137,7 +137,7 @@ function arrayToString(a) {
     var myString = "[";
     for (var i = 0; i < a.length; ++i) {
         var myElement = a[i];
-        if (a[i].constructor && a[i].constructor == Array) {
+        if (a[i] && a[i].constructor && a[i].constructor == Array) {
             myString += arrayToString(a[i]);
         } else {
             myString += a[i];
