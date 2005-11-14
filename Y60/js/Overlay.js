@@ -157,7 +157,6 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
         _myMaterial.transparent = 1;
         _myMaterial.properties.surfacecolor = "[1,1,1,1]";
         var myParent = null;
-
         if (theParent != undefined) {
             if ("node" in theParent) {
                 myParent = theParent.node;
@@ -479,6 +478,9 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
 
     Public.playmode getter = function() { return Public.image.playmode; }
     Public.playmode setter = function(theArgument) { Public.image.playmode = theArgument; }
+
+    Public.color_scale getter = function() { return Public.image.color_scale; }
+    Public.color_scale setter = function(theArgument) { Public.image.color_scale = theArgument; }
 
     Public.startime getter = function() { return Public.image.startime; }
     Public.startime setter = function(theArgument) { Public.image.startime = theArgument; }

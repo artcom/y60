@@ -52,7 +52,6 @@ function ButtonBase(Public, Protected, theSceneViewer, theId,
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
     ///////////////////////////////////////////////////////////////////////////////////////////
-
     Public.onClick = function(theButton) {
         print ("Clicked " + Public.name + " - Override me!");
     }
@@ -90,14 +89,15 @@ function ButtonBase(Public, Protected, theSceneViewer, theId,
     Public.setToggleGroup = function(theButtons) {
         // Replace the onMouseButton function with something more advanced
         Public.onMouseButton = function(theState, theX, theY) {
-            if (Public.enabled && Public.visible && theState == MOUSE_DOWN && !_isPressed && Public.touches(theX, theY)) {
+            if (Public.enabled && isVisible(Public.node) && theState == MOUSE_UP && _isPressed && Public.touches(theX, theY)) {
+                Public.onClick(this);
+            } else  if (Public.enabled && isVisible(Public.node) && theState == MOUSE_DOWN && !_isPressed && Public.touches(theX, theY)) {
                 for (var i = 0; i < theButtons.length; ++i) {
                     if (theButtons[i].enabled && theButtons[i].isPressed()) {
                         theButtons[i].setPressed(false);
                     }
                 }
                 Public.setPressed(true);
-                Public.onClick(this);
             }
         }
     }
