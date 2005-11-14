@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: jsgtk.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.29 $
-//   $Date: 2005/04/21 17:58:32 $
-//
-//
-//=============================================================================
 
 #include "jsgtk.h"
 
@@ -374,16 +366,6 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 namespace jslib {
-
-bool convertFrom(JSContext *cx, jsval theValue, Glib::ustring & theDest) {
-    JSString *myJSStr = JS_ValueToString(cx, theValue);
-    if (!myJSStr) {
-        return false;
-    }
-    theDest = JS_GetStringBytes(myJSStr);
-    return true;
-};
-
 
 template<class TARGET>
 bool try_to_cast(JSContext * cx, Gtk::Widget * theWidget, jsval & theTarget, bool takeOwnership) {

@@ -7,17 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: jsgtk.h,v $
-//   $Author: christian $
-//   $Revision: 1.23 $
-//   $Date: 2005/04/21 17:58:32 $
-//
-//
-//=============================================================================
 
 #ifndef __Y60_ACXPSHELL_GTKCPP_INCLUDED__
 #define __Y60_ACXPSHELL_GTKCPP_INCLUDED__
+
+#include "JSgtkutils.h"
 
 #include <y60/jssettings.h>
 #include <js/jsapi.h>
@@ -26,9 +20,6 @@
 extern bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject);
 
 namespace jslib {
-
-
-bool convertFrom(JSContext *cx, jsval theValue, Glib::ustring & theTarget);
 
 template<class TARGET>
 class ConvertFrom {
