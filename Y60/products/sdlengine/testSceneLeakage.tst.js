@@ -3,7 +3,7 @@ use("Y60JSSL.js");
 use("ImageManager.js");
 use("Overlay.js");
 
-const OBJECTS_PER_FRAME = 10;
+const OBJECTS_PER_FRAME = 30;
 
 function createObjects(theTime) {
     var myPos = Math.sin(theTime) * 3;
@@ -48,7 +48,9 @@ window.onFrame = function(theTime) {
         ourInitialMemory = getProcessMemoryUsage();
     }
 
-    if (theTime > 1 || ourExitFlag) {
+    var currentUsage = getProcessMemoryUsage();
+    print("intial = " + ourInitialMemory +" kb, current = " + currentUsage + ", delta = " + (currentUsage - ourInitialMemory) + ", ="+(currentUsage - ourInitialMemory)/1024 + " kb");
+    if (theTime > 10 || ourExitFlag) {
         var myMemory = getProcessMemoryUsage();
         removeObjects();
         print("Objects created: " + ourCounter);
