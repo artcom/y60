@@ -40,7 +40,7 @@ public:
     static JSFunctionSpec * Functions();
 
     enum PropertyNumbers {
-        PROP_left,
+        PROP_left = -100,
         PROP_right,
         PROP_top,
         PROP_bottom,

@@ -31,6 +31,7 @@
 #include <y60/IProgressNotifier.h>
 #include <y60/modelling_functions.h>
 #include <y60/TextureManager.h>
+#include <y60/ShapeBuilder.h>
 #include <y60/Body.h>
 #include <y60/Movie.h>
 #include <y60/Capture.h>
@@ -356,14 +357,17 @@ CreateBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         ensureParamCount(argc, 1, 2);
         JSScene::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        dom::NodePtr myShape;
-        convertFrom(cx, argv[0], myShape);
+        dom::NodePtr myShapeNode;
+        convertFrom(cx, argv[0], myShapeNode);
         dom::NodePtr myParent = myNative->getWorldRoot();
         if (argc == 2) {
             convertFrom(cx, argv[1], myParent);
         }
 
-        dom::NodePtr myResult = y60::createBody(myParent, myShape->getAttributeString("id"));
+        //using the facade we make sure we generate an ID if none was given
+        ShapePtr myShape = myShapeNode->getFacade<Shape>();
+
+        dom::NodePtr myResult = y60::createBody(myParent, myShape->get<IdTag>());
         *rval = as_jsval(cx, myResult);
         return JS_TRUE;
 
