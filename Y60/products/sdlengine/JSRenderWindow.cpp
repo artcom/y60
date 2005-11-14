@@ -116,7 +116,11 @@ go(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 static JSBool
 loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Load a TTF font");
+    DOC_PARAM("theName", "Symbolic font name", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "Filename to load the font from", DOC_TYPE_STRING);
+    DOC_PARAM("theHeight", "Font height", DOC_TYPE_INTEGER);
+    DOC_PARAM_OPT("theFontFace", "Font face", DOC_TYPE_INTEGER, SDLFontInfo::NORMAL);
     DOC_END;
     // Binding is implemented by hand to allow overloading
     try {
@@ -210,11 +214,13 @@ draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setEventRecorderMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Set the EventRecorder mode");
+    DOC_PARAM("theMode", "STOP, PLAY, or RECORD", DOC_TYPE_INTEGER);
+    DOC_PARAM_OPT("theDiscardFlag", "When theMODE==RECORD, discard previously recorded events", DOC_TYPE_INTEGER, true);
     DOC_END;
     if (argc >= 1) {
         unsigned myMode;
-        bool myDiscardFlag = false;
+        bool myDiscardFlag = true;
         if (!convertFrom(cx,argv[0],myMode)) {
             JS_ReportError(cx,"JSRenderWindow::setEventRecorderMode: parameter 0 must be an int");
             return JS_FALSE;
@@ -236,21 +242,24 @@ setEventRecorderMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 
 static JSBool
 getEventRecorderMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns current mode of the EventRecorder");
+    DOC_RVAL("theMode", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::getEventRecorderMode,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 loadEvents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Load events from file");
+    DOC_PARAM("theFilename", "Filename to load from", DOC_TYPE_STRING);
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::loadEvents,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 saveEvents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Save previously recorded events to file");
+    DOC_PARAM("theFilename", "Filename to save to", DOC_TYPE_STRING);
     DOC_END;
     return Method<SDLWindow>::call(&SDLWindow::saveEvents,cx,obj,argc,argv,rval);
 }
