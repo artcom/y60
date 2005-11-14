@@ -49,23 +49,23 @@ window.onFrame = function(theTime) {
     }
 
     var currentUsage = getProcessMemoryUsage();
-    print("intial = " + ourInitialMemory +" kb, current = " + currentUsage + ", delta = " + (currentUsage - ourInitialMemory) + ", ="+(currentUsage - ourInitialMemory)/1024 + " kb");
+    Logger.info("intial = " + ourInitialMemory +" kb, current = " + currentUsage + ", delta = " + (currentUsage - ourInitialMemory) + ", ="+(currentUsage - ourInitialMemory)/1024 + " kb");
     if (theTime > 10 || ourExitFlag) {
         var myMemory = getProcessMemoryUsage();
         removeObjects();
         print("Objects created: " + ourCounter);
         var myNodeCount = countNodes(window.scene.dom);
         if (myNodeCount != ourInitialNodeCount) {
-            print("### ERROR: Nodecount increased by: " + (myNodeCount - ourInitialNodeCount));
+            Logger.error("Nodecount increased by: " + (myNodeCount - ourInitialNodeCount));
             exit(1);
         }
         var myMemoryIncrease = (myMemory - ourInitialMemory) / 1024;
         if (myMemoryIncrease > 100) {
-            print("### ERROR: Memory usage increased by: " + myMemoryIncrease + " KB");
+            Logger.error("Memory usage increased by: " + myMemoryIncrease + " KB");
             exit(1);
         } else {
             Logger.trace(window.scene.dom);
-            print("Memory usage increased by: " + myMemoryIncrease + " KB");
+            Logger.info("Memory usage increased by: " + myMemoryIncrease + " KB");
         }
         exit(0);
     }
