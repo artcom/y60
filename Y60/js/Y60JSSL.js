@@ -658,6 +658,22 @@ function randomBetween(theMin, theMax) {
     return Math.random() * (theMax - theMin) + theMin;
 }
 
+function randomElement(theArray) {
+    return theArray[Math.floor(randomBetween(0, theArray.length-0.000001))];
+}
+
 function removeElement(theArray, theIndex) {
     return theArray.slice(0, theIndex).concat(theArray.slice(theIndex + 1, theArray.length));
 }
+
+function getFrustumFrame(theFrustum, theDepth) {
+    //TODO myFrame should be a Box2f
+    var myFrame = {};
+    //print (theFrustum + "," + theDepth);
+    myFrame.left = theDepth * theFrustum.left / theFrustum.near;
+    myFrame.right = theDepth * theFrustum.right / theFrustum.near;
+    myFrame.top = theDepth * theFrustum.top / theFrustum.near;
+    myFrame.bottom = theDepth * theFrustum.bottom / theFrustum.near;
+    return myFrame;
+}
+
