@@ -34,7 +34,9 @@ use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 
-//plug("y60QuicktimeDecoder"); // turn on for windows and better mov decoder support
+if (operatingSystem() == "Win32") {
+     plug("y60QuicktimeDecoder"); // turn on for windows and better mov decoder support
+}
 //plug("y60FFMpegDecoder"); // turn on for windows and better mov decoder support
 
 // Global window object (similar to html window)
