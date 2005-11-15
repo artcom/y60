@@ -412,7 +412,7 @@ namespace y60 {
         theImage->storeTextureVersion();
         GLsizei myWidth  = theImage->get<ImageWidthTag>();
         GLsizei myHeight = theImage->get<ImageHeightTag>();
-        glPushAttrib(GL_PIXEL_MODE_BIT);
+        glPushAttrib(GL_PIXEL_MODE_BIT | GL_TEXTURE_BIT);
         setupPixelTransfer(theImage);
 
         if (theImage->getType() == CUBEMAP) {
