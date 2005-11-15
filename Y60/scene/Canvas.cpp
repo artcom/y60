@@ -69,4 +69,8 @@ Canvas::getTarget(asl::Ptr<Scene> theScene) {
     return ImagePtr(0);
 }
 
+bool 
+Canvas::hasRenderTarget() const {
+    return ! get<CanvasTargetTag>().empty();
+}
 }

@@ -58,6 +58,7 @@ namespace y60 {
             unsigned getHeight() const;
             bool setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer);
 
+            bool hasRenderTarget() const;
             asl::Ptr<Image, dom::ThreadingModel> getTarget(asl::Ptr<Scene> theScene);
 
             IMPLEMENT_FACADE(Canvas);

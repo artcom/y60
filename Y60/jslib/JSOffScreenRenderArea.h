@@ -21,6 +21,7 @@
 #define _ac_jslib_JSOffScreenRenderArea_h_
 
 #include "OffScreenRenderArea.h"
+#include "JSAbstractRenderWindow.h"
 
 /**
  * 
@@ -28,11 +29,12 @@
  */ 
 namespace jslib {
 
-class JSOffScreenRenderArea : public JSWrapper<OffScreenRenderArea, asl::Ptr<OffScreenRenderArea>, StaticAccessProtocol> {
+class JSOffScreenRenderArea : public jslib::JSWrapper<jslib::OffScreenRenderArea, asl::Ptr<OffScreenRenderArea>, StaticAccessProtocol> {
     public:
-        typedef OffScreenRenderArea NATIVE;
+        typedef jslib::OffScreenRenderArea NATIVE;
         typedef asl::Ptr<NATIVE> OWNERPTR;
         typedef JSWrapper<NATIVE,OWNERPTR,StaticAccessProtocol> Base;
+        typedef JSAbstractRenderWindow<jslib::OffScreenRenderArea> JSBASE;
         
         static const char * ClassName() {
             return "OffScreenRenderArea";
@@ -43,12 +45,19 @@ class JSOffScreenRenderArea : public JSWrapper<OffScreenRenderArea, asl::Ptr<Off
         static JSPropertySpec * StaticProperties();
         static JSFunctionSpec * StaticFunctions();
         
+        static void addClassProperties(JSContext * cx, JSObject * theClassProto);
         virtual unsigned long length() const {
             return 1;
         }
 
-        virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-        virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+        static JSBool getPropertySwitch(NATIVE & theNative, unsigned long theID,
+                                        JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+        virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx,
+                                         JSObject *obj, jsval id, jsval *vp);
+        static JSBool setPropertySwitch(NATIVE & theNative, unsigned long theID,
+                                        JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+        virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
+                                         jsval id, jsval *vp);
 
         static JSBool
         Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);

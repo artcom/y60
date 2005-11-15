@@ -1085,6 +1085,7 @@ namespace y60 {
         for (unsigned i = 0; i < myLights.size(); ++i) {
             if (myLights[i]->get<VisibleTag>()) {
                 enableLight(myLights[i], myActiveLightCount);
+                AC_TRACE << myLights[i]->getNode();
                 myActiveLightCount++;
             }
         }

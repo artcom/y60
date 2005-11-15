@@ -454,6 +454,7 @@ namespace jslib {
         for (unsigned i = 0; i < _myCanvas->childNodesLength(VIEWPORT_NODE_NAME); ++i) {
             const dom::NodePtr & myViewport = _myCanvas->childNode(VIEWPORT_NODE_NAME, i);
             preViewport(myViewport);
+            //_myRenderer->render(myViewport->getFacade<Viewport>());
             _myRenderer->render(myViewport->getFacade<Viewport>());
             postViewport(myViewport);
         }

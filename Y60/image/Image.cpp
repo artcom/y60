@@ -34,6 +34,7 @@
 #include <paintlib/plpixelformat.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/plpngenc.h>
+#include <paintlib/Filter/plfilterflip.h>
 
 using namespace asl;
 using namespace std;
@@ -249,7 +250,7 @@ namespace y60 {
     }
 
 	void
-	Image::saveToFile(const string & theImagePath) {
+	Image::saveToFile(const string & theImagePath, bool theVerticalFlipFlag) {
 		int myWidth = get<ImageWidthTag>();
         int myHeight = get<ImageHeightTag>();
         // save 3d textures as one long stripe
@@ -271,6 +272,16 @@ namespace y60 {
 		for(int y=0; y<myHeight; ++y) {
 			memcpy(myLineArray[y], myData + myBytesPerLine * y, myBytesPerLine);
 		}
+
+        if (theVerticalFlipFlag) {
+            if (myBmp.GetBitsPerPixel() != 32) {
+                AC_ERROR << "Can not flip image. Only 32bpp supported.";
+            } else {
+                PLFilterFlip myFlipper; //... yeah ... like the dolphine
+                myBmp.ApplyFilter(myFlipper);
+            }
+        }
+        
 		PLPNGEncoder myPNGEncoder;
 		myPNGEncoder.MakeFileFromBmp(theImagePath.c_str(), &myBmp);
 	}

@@ -622,10 +622,13 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                     return Method<NATIVE>::call(&NATIVE::setPause, cx, obj, 1, vp, &dummy);
                 case PROP_eventListener:
                     {
-                        jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setJSContext(cx);
-                        JSBool myRetVal = Method<NATIVE>::call(&NATIVE::setEventListener, cx, obj, 1, vp, &dummy);
-                        jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
-                        return myRetVal;
+                        JSObject * myListener;
+                        if (convertFrom(cx, *vp, myListener)) {
+                            theNative.setJSContext(cx);
+                            theNative.setEventListener( myListener);
+                            return JS_TRUE;
+                        }
+                        return JS_FALSE;
                     }
                 case PROP_camera:
                     {
@@ -685,9 +688,23 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                         return JS_TRUE;
                     }
                 case PROP_canvas:
-                    return Method<NATIVE>::call(&NATIVE::setCanvas, cx, obj, 1, vp, &dummy);
+                    {
+                        dom::NodePtr myCanvasNode(0);
+                        if (convertFrom(cx, *vp, myCanvasNode)) {
+                            theNative.setCanvas(myCanvasNode);    
+                            return JS_TRUE;
+                        }
+                        return JS_FALSE;
+                    }
+                    //return Method<NATIVE>::call(&NATIVE::setCanvas, cx, obj, 1, vp, &dummy);
                 case PROP_renderingCaps:
-                    return Method<NATIVE>::call(&NATIVE::setRenderingCaps, cx, obj, 1, vp, &dummy);
+                    unsigned myFlags;
+                    if (convertFrom(cx, *vp, myFlags)) {
+                        theNative.setRenderingCaps( myFlags );
+                        return JS_TRUE;
+                    }
+                    return JS_FALSE;
+                    //return Method<NATIVE>::call(&NATIVE::setRenderingCaps, cx, obj, 1, vp, &dummy);
                 case PROP_fixedFrameTime:
                     return Method<NATIVE>::call(&NATIVE::setFixedDeltaT, cx, obj, 1, vp, &dummy);
                 default:

@@ -154,7 +154,11 @@ namespace y60 {
                 unsigned long long myNewVersion = getValueVersion();
                 return _myTextureImageVersion < myNewVersion;
             }
-            void saveToFile(const std::string & theImagePath);
+            /** Saves the image to disk using the PNG format. 
+             * @todo replace @p theVerticalFlipFlag by generic filter factory
+             * string
+             */
+            void saveToFile(const std::string & theImagePath, bool theVerticalFlipFlag = false);
 
             unsigned long long getValueVersion() const{
                 dom::NodePtr myValueNode = getRasterValueNode();

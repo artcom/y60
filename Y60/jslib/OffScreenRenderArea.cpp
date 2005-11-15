@@ -38,8 +38,10 @@ OffScreenRenderArea::create() {
     return newObject;
 }
 
-OffScreenRenderArea::OffScreenRenderArea()
-: AbstractRenderWindow(JSApp::ShellErrorReporter)
+OffScreenRenderArea::OffScreenRenderArea() :
+    AbstractRenderWindow(JSApp::ShellErrorReporter),
+    _myWidth(0),
+    _myHeight(0)
 {
     AC_TRACE << "OffScreenRenderArea::CTOR";
     setRenderingCaps(0);
@@ -63,13 +65,18 @@ void OffScreenRenderArea::deactivateGLContext() {
 void OffScreenRenderArea::initDisplay() {
 }
 
-void OffScreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
+void 
+OffScreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
     AC_TRACE << "OffScreenRenderArea::renderToCanvas ";
     ImagePtr myTexture = getImage();
     if ( ! myTexture) {
-        AC_ERROR << "OffScreenRenderArea::renderToCanvas has no canvas / image to render... igoring";
+        AC_ERROR << "OffScreenRenderArea::renderToCanvas has no canvas / image to render... ignoring";
         return;
     }
+    onFrame();
+
+    _myScene->updateAllModified();
+
     preOffScreenRender(myTexture);
 
     preRender();
@@ -79,17 +86,53 @@ void OffScreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
     postOffScreenRender(myTexture, theCopyToImageFlag);
 }    
 
+void 
+OffScreenRenderArea::downloadFromViewport(const dom::NodePtr & theImageNode) {
+    if ( ! theImageNode ) {
+        throw OffscreenRendererException("No Image.", PLUS_FILE_LINE);
+    }
+    ImagePtr myImage = theImageNode->getFacade<Image>();
+    ResizeableRasterPtr myRaster = myImage->getRasterPtr();
 
-void OffScreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
+    if (!myRaster) {
+        myImage->set(getWidth(), getHeight(), 1, myImage->getEncoding());
+        myRaster = myImage->getRasterPtr();
+    }
+    if (myImage->get<ImageWidthTag>() != myRaster->width() ||
+        myImage->get<ImageHeightTag>() != myRaster->height())
+    {
+        myRaster->resize(getWidth(), getHeight());
+    }
+
+    copyFrameBufferToImage( myImage );
+}
+
+void 
+OffScreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
     AbstractRenderWindow::setRenderingCaps(theRenderingCaps);
     OffScreenBuffer::setUseGLFramebufferObject(theRenderingCaps & y60::FRAMEBUFFER_SUPPORT);
 }
 
+void
+OffScreenRenderArea::setWidth(unsigned theWidth) {
+    // TODO: some kind of range checking vs. image size
+    _myWidth = theWidth;
+}
 
-bool OffScreenRenderArea::setCanvas(const NodePtr & theCanvas) {
+void
+OffScreenRenderArea::setHeight(unsigned theHeight) {
+    // TODO: some kind of range checking vs. image size
+    _myHeight = theHeight;
+}
+
+bool 
+OffScreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
-        if (getImage()) { // XXX
-            ensureRaster(getImage());
+        ImagePtr myImage = getImage();
+        if (myImage) { // XXX
+            ensureRaster(myImage);
+            _myWidth  = myImage->get<ImageWidthTag>();
+            _myHeight = myImage->get<ImageHeightTag>();
         }
         return true;
     } else {
@@ -97,24 +140,34 @@ bool OffScreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     }
 }
 
-const ImagePtr OffScreenRenderArea::getImage() const {
+const ImagePtr
+OffScreenRenderArea::getImage() const {
     return getCanvas() ?
         getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() ) : ImagePtr(0);
 }
 
-ImagePtr OffScreenRenderArea::getImage() {
+ImagePtr
+OffScreenRenderArea::getImage() {
     return getCanvas() ?
         getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() ) : ImagePtr(0);
 }
 
-int OffScreenRenderArea::getWidth() const {
+int
+OffScreenRenderArea::getWidth() const {
+    /*
     ImagePtr myImage = getImage();
     return myImage ? myImage->get<ImageWidthTag>() : 0;
+    */
+    return _myWidth;
 }
 
-int OffScreenRenderArea::getHeight() const {
+int
+OffScreenRenderArea::getHeight() const {
+    /*
     ImagePtr myImage = getImage();
     return myImage ? myImage->get<ImageHeightTag>() : 0;
+    */
+    return _myHeight;
 }
 
 ResizeableRasterPtr

@@ -108,6 +108,16 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         }
     }
 
+    obj.registerHeadlightWithViewport = function(theViewportNode, theLightNode) {
+        _myViewportHeadlights[theViewportNode.id] = theLightNode;
+        _myViewportHeadlightsEnabled[theViewportNode.id] = true;
+    }
+
+    obj.deregisterHeadlightFromViewport = function(theViewportNode) {
+        delete _myViewportHeadlights[theViewportNode.id];
+        delete _myViewportHeadlightsEnabled[theViewportNode.id];
+    }
+
     obj.setupHeadlight = function(theViewport) {
         var myCamera = theViewport.getElementById(theViewport.camera);
 
@@ -115,7 +125,8 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         if (theViewport.id in _myViewportHeadlights) {
             myHeadlight = _myViewportHeadlights[theViewport.id];
         }
-        _myViewportHeadlights[theViewport.id] = attachHeadlightToCamera(myCamera, myHeadlight);
+        obj.registerHeadlightWithViewport(theViewport, 
+                        attachHeadlightToCamera(myCamera, myHeadlight));
         _myViewportHeadlightsEnabled[theViewport.id] = true;
         if (myHeadlight == null) {
             // a new headlight has been created

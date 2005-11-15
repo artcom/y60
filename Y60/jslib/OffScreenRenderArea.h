@@ -66,6 +66,23 @@ class OffScreenRenderArea : public y60::OffScreenBuffer,
          */
         bool setCanvas(const dom::NodePtr & theCanvas);
         
+        /** Sets the width of the viewport in pixels. All other
+         * implementations of AbstractRenderWindow are resized by
+         * the window system. For OffScreenRenderArea the client is
+         * responseable to set these values.
+         */
+         void setWidth(unsigned theWidth);
+         /** Sets the height of the viewport in pixels.
+          * @see setWidth() */
+         void setHeight(unsigned theHeight);
+         
+         /** Downloads only those parts of the framebuffer that have been
+          * set by setWidth() and setHeight(). The texture used as a render
+          * traget has the usual power of two constrains. This function can
+          * be used to retrive a partial rectangle of arbitrary size.
+          */
+         void downloadFromViewport(const dom::NodePtr & theImageNode);
+
         // IFrameBuffer
         virtual int getWidth() const;
         virtual int getHeight() const;
@@ -94,6 +111,9 @@ class OffScreenRenderArea : public y60::OffScreenBuffer,
         dom::ResizeableRasterPtr ensureRaster(asl::Ptr<y60::Image, dom::ThreadingModel> theImage);
         const asl::Ptr<y60::Image, dom::ThreadingModel> getImage() const;
         asl::Ptr<y60::Image, dom::ThreadingModel> getImage();
+
+        unsigned _myWidth;
+        unsigned _myHeight;
 
 };
 

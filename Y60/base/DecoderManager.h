@@ -75,5 +75,6 @@ class DecoderManager : public asl::Singleton<DecoderManager> {
 
 }
 
+#undef DB
 
 #endif

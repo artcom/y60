@@ -409,6 +409,11 @@ namespace y60 {
     GLResourceManager::updateTextureData(ImagePtr theImage) {
         PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
 
+        if ( ! theImage->getRasterPtr()) {
+            AC_TRACE << "No raster in image";
+            return;
+        }
+
         theImage->storeTextureVersion();
         GLsizei myWidth  = theImage->get<ImageWidthTag>();
         GLsizei myHeight = theImage->get<ImageHeightTag>();
@@ -486,7 +491,8 @@ namespace y60 {
                 }
             } else {
                 if (myDepth == 1) {
-                    AC_TRACE << "subloading 2D " << myWidth << "x" << myHeight << " internalFormat=" << hex << myPixelEncoding.internalformat << dec;
+                    AC_TRACE << "subloading 2D " << myWidth << "x" << myHeight << " internalFormat="
+                             << hex << myPixelEncoding.internalformat << dec;
                     glTexSubImage2D(GL_TEXTURE_2D, 0,
                                     0, 0, myWidth, myHeight,
                                     myPixelEncoding.externalformat,

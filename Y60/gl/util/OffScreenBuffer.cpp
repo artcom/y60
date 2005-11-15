@@ -108,6 +108,10 @@ void OffScreenBuffer::postOffScreenRender( ImagePtr theTexture, bool theCopyToIm
     if (theCopyToImageFlag) {
         copyFrameBufferToImage(theTexture);
     }
+    // cleanly unbind the texture
+    if (_myUseGLFramebufferObject) {
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
 }
 
@@ -120,34 +124,19 @@ void OffScreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
     }
 #endif
 
+    
     PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(theImage->getEncoding());
-    std::cout <<"RGB: " << (myPixelEncodingInfo.externalformat==GL_RGB) << std::endl;
-    std::cout <<"DEPTH: " << (myPixelEncodingInfo.externalformat==GL_DEPTH_COMPONENT) << std::endl;
-    std::cout <<"RGBA: " << (myPixelEncodingInfo.externalformat==GL_RGBA) << std::endl;
-    std::cout <<"bytes per pixel: " << myPixelEncodingInfo.bytesPerPixel << std::endl;
-    std::cout <<"GLFLOAT: " << (myPixelEncodingInfo.pixeltype==GL_FLOAT) << std::endl;
+
+    AC_DEBUG << "RGB: " << (myPixelEncodingInfo.externalformat==GL_RGB);
+    AC_DEBUG << "DEPTH: " << (myPixelEncodingInfo.externalformat==GL_DEPTH_COMPONENT);
+    AC_DEBUG << "RGBA: " << (myPixelEncodingInfo.externalformat==GL_RGBA);
+    AC_DEBUG << "bytes per pixel: " << myPixelEncodingInfo.bytesPerPixel;
+    AC_DEBUG << "GLFLOAT: " << (myPixelEncodingInfo.pixeltype==GL_FLOAT);
 
     glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
                 theImage->getRasterPtr()->pixels().begin());
 #ifdef DUMP_BUFFER
-float myTestBuffer[512*512];
-/*unsigned short * myDest = &myTestBuffer[0];
-unsigned long * myStartPtr = (unsigned long*)theImage->getRasterPtr()->pixels().begin();
-
-for (int x = 0 ; x < theImage->get<ImageWidthTag>(); x++) {
-    for (int y = 0 ; y < theImage->get<ImageHeightTag>(); y++) {        
-        unsigned long myValue= *myStartPtr;
-        *myDest = (myValue>>16);
-        myStartPtr++;
-        myDest++;
-    }
-}
-*/
-//FILE * myFd = fopen("buffer.raw", "w");
-//fwrite(theImage->getRasterPtr()->pixels().begin(), theImage->get<ImageWidthTag>() * theImage->get<ImageHeightTag>() * 4 ,1, myFd);
-//fwrite(&myTestBuffer[0], theImage->get<ImageWidthTag>() * theImage->get<ImageHeightTag>() * 4,1, myFd);
-//fclose(myFd);
     PixelEncoding myEncoding;
     switch(long(myPixelEncodingInfo.bytesPerPixel)) {
       case 1:

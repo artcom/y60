@@ -616,8 +616,8 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theFilename", "Filename and path where to save the image. The image format is automatically determined by the file-extension.", DOC_TYPE_STRING);
     DOC_END;
     try {
-        if (argc != 2) {
-			JS_ReportError(cx, "saveImage(): expects two arguments : image node, file name");
+        if (argc < 2) {
+			JS_ReportError(cx, "saveImage(): expects at least two arguments : image node, file name, [vertical flip]");
             return JS_FALSE;
         }
 
@@ -633,8 +633,16 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
+        bool myVerticalFlipFlag = false;
+        if (argc == 3) {
+            if ( ! convertFrom(cx, argv[2], myVerticalFlipFlag)) {
+                JS_ReportError(cx, "saveImage(): argument #3 must be a bool. (theVerticalFlipFlag)");
+                return JS_FALSE;
+            }
+        }
+
 		ImagePtr myImage = myImageNode->getFacade<y60::Image>();
-		myImage->saveToFile(myFileName);
+		myImage->saveToFile(myFileName, myVerticalFlipFlag);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

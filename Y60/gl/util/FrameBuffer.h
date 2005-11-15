@@ -33,6 +33,11 @@
 #include <vector>
 #include <string>
 
+/* XXX Dead Code
+ * [DS] Why isn't this implemented anywhere? Do we need it? What is it for?
+ * And why is it here?
+ * ... and why does it have these strange include guards?
+ */
 namespace y60 {
     /// opengl framebuffer
     class FrameBuffer : public IFrameBuffer {
