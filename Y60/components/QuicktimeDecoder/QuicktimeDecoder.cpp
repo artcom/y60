@@ -36,6 +36,7 @@ EXPORT asl::PlugInBase * y60QuicktimeDecoder_instantiatePlugIn(asl::DLHandle myD
 Movie QTURL_NewMovieFromURL (char *theURL);
 
 namespace y60 {
+    #include <qt/MoviesFormat.h>
 
     // QuicktimeDecoder
     QuicktimeDecoder::QuicktimeDecoder(asl::DLHandle theDLHandle) :
@@ -127,11 +128,16 @@ namespace y60 {
 
         PixelEncoding myPixelEncoding = getPixelFormat();
         QTNewGWorld(&_myOffScreenWorld, k32RGBAPixelFormat, &movieBounds, 0, 0, 0);
-//   setPixelFormat(PixelEncoding(RGBA));
+
+        unsigned myFrameCount = getFramecount();
+        unsigned myDuration = getDurationInMilliseconds();
+        unsigned myFrameRate = floor(double(myFrameCount)/ double((myDuration/1000)));
+
+        //   setPixelFormat(PixelEncoding(RGBA));
         
         Movie * myMovie = getMovie();
         myMovie->setPixelEncoding(PixelEncoding(RGBA));
-        myMovie->set<FrameRateTag>(25);
+        myMovie->set<FrameRateTag>(myFrameRate);
         myMovie->set<ImageWidthTag>(movieBounds.right);
         myMovie->set<ImageHeightTag>(movieBounds.bottom);
 
@@ -145,7 +151,7 @@ namespace y60 {
 
 
         double myDurationInSeconds = float(GetMovieDuration(_myMovie)) / GetMovieTimeScale(_myMovie);
-        myMovie->set<FrameCountTag>(long(myDurationInSeconds * 25));
+        myMovie->set<FrameCountTag>(long(myDurationInSeconds * myFrameRate));
         
         
         SetGWorld(_myOffScreenWorld, NULL);
@@ -153,6 +159,40 @@ namespace y60 {
         
         asl::Time myLoadEndTime;
         AC_INFO << "Load file:" << theFilename << ", time " << (myLoadEndTime - myLoadStartTime) << "s";
+    }
+
+    unsigned int 
+    QuicktimeDecoder::getDurationInMilliseconds(){
+        TimeScale ts = GetMovieTimeScale(_myMovie);
+        return (GetMovieDuration(_myMovie)*1000)/ts;
+    }
+
+    unsigned int 
+    QuicktimeDecoder::getFramecount() {
+        int      frameCount = 0;
+        OSType      whichMediaType = VIDEO_TYPE;
+        unsigned int flags = nextTimeMediaSample + nextTimeEdgeOK;
+        TimeValue   duration;
+        TimeValue   theTime = 0;
+
+        while (theTime >= 0) {
+            frameCount++;
+            GetMovieNextInterestingTime(_myMovie,
+                                flags,
+                                1,
+                                &whichMediaType,
+                                theTime,
+                                0,
+                                &theTime,
+                                &duration);
+
+            // after the first interesting time, don't include the time we
+            //  are currently at.
+
+            flags = nextTimeMediaSample;
+        } // while
+        return frameCount;
+
     }
 
     double
