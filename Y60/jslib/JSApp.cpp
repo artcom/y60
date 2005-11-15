@@ -339,7 +339,7 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Adds the given path as search path to the packet manager.");
+    DOC_BEGIN("Adds the given path as search-path to the packet manager.");
     DOC_PARAM("theIncludePath", "A valid path", DOC_TYPE_STRING);
     DOC_END;
     try {
@@ -360,7 +360,7 @@ IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 RemovePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Removes the given path from the include path.");
+    DOC_BEGIN("Removes the given path from the include path of the package manager.");
     DOC_PARAM("thePath", "The path to remove", DOC_TYPE_STRING);
     DOC_END;
     try {
@@ -380,7 +380,7 @@ RemovePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 GetPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the search path for includes, plugins, and shaderlibrary.");
+    DOC_BEGIN("Returns the search-path of the package manager, which is used for includes, plugins, and shaderlibrary.");
     DOC_RVAL("thePath", DOC_TYPE_STRING);
     DOC_END;
     try {

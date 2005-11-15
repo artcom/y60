@@ -29,9 +29,10 @@ namespace jslib {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 GetWholeFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Loads a text file into a string using the package manager");
-    DOC_PARAM("theRelativeFilename", "", DOC_TYPE_STRING);
-    DOC_PARAM("thePackagePath", "", DOC_TYPE_STRING);
+    DOC_BEGIN("Loads a text file into a string using the package manager. A search-path has to be added to the package manager before with includePath.");
+    DOC_PARAM("theRelativeFilename", "The path to the file requested, it is relative to an search-path from the path-list in the package manager.", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("thePackagePath", "Restricts search for file to the given package.", "", DOC_TYPE_STRING);
+    DOC_RVAL("The file as string", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1, 2);
