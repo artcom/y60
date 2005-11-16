@@ -28,6 +28,8 @@
 #include <dom/AttributePlug.h>
 #include <dom/Facade.h>
 
+#include <paintlib/planybmp.h>
+
 namespace asl {
     class PackageManager;
 }
@@ -158,9 +160,12 @@ namespace y60 {
              * @todo replace @p theVerticalFlipFlag by generic filter factory
              * string
              */
-            void saveToFile(const std::string & theImagePath, bool theVerticalFlipFlag = false);
+            void saveToFile(const std::string & theImagePath);
 
-            unsigned long long getValueVersion() const{
+            void saveToFileFiltered(const std::string & theImagePath, const std::string & theFilter,
+                                    const VectorOfFloat & theFilterParams);
+
+            unsigned long long getValueVersion() const {
                 dom::NodePtr myValueNode = getRasterValueNode();
                 if (myValueNode) {
                     return myValueNode->nodeVersion();
@@ -223,6 +228,7 @@ namespace y60 {
         private:
             Image();
             void loadFromFile(asl::PackageManager & thePackageManager);
+            void convertToPLBmp(PLAnyBmp & theBitmap);
 
             unsigned                      _myTexId;
 

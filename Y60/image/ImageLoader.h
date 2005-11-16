@@ -44,6 +44,14 @@ namespace asl {
 
 namespace y60 {
 
+    /* Image filtering on save/load */
+    void applyCustomFilter(PLBmp & theBitmap, const std::string & theFilterName,
+                           const std::vector<float> & theFilterparams);
+
+    void applyCustomFilter(PLBmp & theBitmap, ImageFilter theFilter,
+                           const std::vector<float> & theFilterparams);
+
+
     DEFINE_EXCEPTION(ImageLoaderException, asl::Exception);
 
     class ImageLoader : public PLBmp {

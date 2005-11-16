@@ -32,7 +32,6 @@
 #include <asl/standard_pixel_types.h>
 
 #include <paintlib/plpixelformat.h>
-#include <paintlib/planybmp.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/Filter/plfilterflip.h>
 
@@ -234,8 +233,8 @@ namespace y60 {
         const asl::Vector4f & myColorScale = get<ImageColorScaleTag>();
         if (!asl::almostEqual(myColorScale[3], 1)) {
             if (!myImageLoader.HasAlpha()) {
-				// the real alpha scaling is done with glPixeltransfer routines with opengl,
-				// so here we assure that the image has a alpha channel filled with 1.0 (vs/dk)
+                // the real alpha scaling is done with glPixeltransfer routines with opengl,
+                // so here we assure that the image has a alpha channel filled with 1.0 (vs/dk)
                 myImageLoader.setFixedAlpha(1);
             }
         } else {
@@ -249,42 +248,51 @@ namespace y60 {
         set<ImageMatrixTag>(myImageLoader.getImageMatrix());
     }
 
-	void
-	Image::saveToFile(const string & theImagePath, bool theVerticalFlipFlag) {
-		int myWidth = get<ImageWidthTag>();
+    void 
+    Image::convertToPLBmp(PLAnyBmp & theBitmap) {
+        int myWidth = get<ImageWidthTag>();
         int myHeight = get<ImageHeightTag>();
         // save 3d textures as one long stripe
         if (get<ImageDepthTag>() > 1) {
-            AC_TRACE << "Saving 3D image " << theImagePath;
             myHeight *= get<ImageDepthTag>();
         }
-		PLPixelFormat myPixelFormat;
+        PLPixelFormat myPixelFormat;
         if (!mapPixelEncodingToFormat(getEncoding(), myPixelFormat)) {
               throw ImageException(std::string("Image::saveToFile(): Unsupported Encoding: ") +
                       asl::as_string(getEncoding()), PLUS_FILE_LINE);
         }
         AC_DEBUG << "Saving PNG as " << myPixelFormat.GetName();
-		PLAnyBmp myBmp;
-		myBmp.Create(myWidth, myHeight, myPixelFormat, NULL, 0, PLPoint(72, 72));
-		PLBYTE **myLineArray = myBmp.GetLineArray();
-		int myBytesPerLine = myPixelFormat.GetBitsPerPixel() * myWidth / 8;
-		const unsigned char *myData = getRasterPtr()->pixels().begin();
-		for(int y=0; y<myHeight; ++y) {
-			memcpy(myLineArray[y], myData + myBytesPerLine * y, myBytesPerLine);
-		}
-
-        if (theVerticalFlipFlag) {
-            if (myBmp.GetBitsPerPixel() != 32) {
-                AC_ERROR << "Can not flip image. Only 32bpp supported.";
-            } else {
-                PLFilterFlip myFlipper; //... yeah ... like the dolphine
-                myBmp.ApplyFilter(myFlipper);
-            }
+        theBitmap.Create(myWidth, myHeight, myPixelFormat, NULL, 0, PLPoint(72, 72));
+        PLBYTE **myLineArray = theBitmap.GetLineArray();
+        int myBytesPerLine = myPixelFormat.GetBitsPerPixel() * myWidth / 8;
+        const unsigned char *myData = getRasterPtr()->pixels().begin();
+        for(int y=0; y<myHeight; ++y) {
+            memcpy(myLineArray[y], myData + myBytesPerLine * y, myBytesPerLine);
         }
-        
-		PLPNGEncoder myPNGEncoder;
-		myPNGEncoder.MakeFileFromBmp(theImagePath.c_str(), &myBmp);
-	}
+
+    }
+
+    void 
+    Image::saveToFileFiltered(const std::string & theImagePath, const std::string & theFilter,
+                              const VectorOfFloat & theFilterParams)
+    {
+        PLAnyBmp myBmp;
+        convertToPLBmp( myBmp );
+
+        applyCustomFilter(myBmp, theFilter, theFilterParams);
+
+        PLPNGEncoder myPNGEncoder;
+        myPNGEncoder.MakeFileFromBmp(theImagePath.c_str(), &myBmp);
+    }
+
+    void
+    Image::saveToFile(const string & theImagePath) {
+        PLAnyBmp myBmp;
+        convertToPLBmp( myBmp );
+
+        PLPNGEncoder myPNGEncoder;
+        myPNGEncoder.MakeFileFromBmp(theImagePath.c_str(), &myBmp);
+    }
 
     void Image::storeTextureVersion()
     {
@@ -309,21 +317,21 @@ namespace y60 {
             _myAppliedFilter != get<ImageFilterTag>() ||
             _myAppliedFilterParams != get<ImageFilterParamsTag>();
 
-		/*
-         * want to check what condition the condition is in ? 	
-         *	Ask theDude or try this:
+        /*
+         * want to check what condition the condition is in ?   
+         *  Ask theDude or try this:
          
 if (myReloadRequired) {
 
-		bool b1 = getRasterValue();
-		bool b2 = getRasterPtr();
-		bool b3 = getRasterPtr() && getRasterPtr()->pixels().size();
-		const string s1 = get<ImageSourceTag>();
-		bool b4 = _myLoadedFilename != get<ImageSourceTag>();
-		bool b5 = _myAppliedFilterParams != get<ImageFilterParamsTag>();
-		bool b6 = _myAppliedColorScale != get<ImageColorScaleTag>();
-		bool b7 =_myAppliedColorBias != get<ImageColorBiasTag>();
-		bool b8 =getGraphicsId() == 0; 
+        bool b1 = getRasterValue();
+        bool b2 = getRasterPtr();
+        bool b3 = getRasterPtr() && getRasterPtr()->pixels().size();
+        const string s1 = get<ImageSourceTag>();
+        bool b4 = _myLoadedFilename != get<ImageSourceTag>();
+        bool b5 = _myAppliedFilterParams != get<ImageFilterParamsTag>();
+        bool b6 = _myAppliedColorScale != get<ImageColorScaleTag>();
+        bool b7 =_myAppliedColorBias != get<ImageColorBiasTag>();
+        bool b8 =getGraphicsId() == 0; 
         bool b9 = _myAppliedPixelFormat != get<ImagePixelFormatTag>();
         bool b10= _myAppliedInternalFormat != get<ImageInternalFormatTag>();
 
@@ -342,7 +350,7 @@ if (myReloadRequired) {
 << "s1 = " << s1;
 
 }
-        */		
+        */      
 
         return myReloadRequired;
     }

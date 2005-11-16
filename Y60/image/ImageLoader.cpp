@@ -40,6 +40,35 @@ using namespace std;
 using namespace asl;
 
 namespace y60 {
+
+    /* Image filtering on save/load */
+    void
+    applyCustomFilter(PLBmp & theBitmap, const std::string & theFilterName, const vector<float> & theFilterparams) {
+        asl::Ptr<PLFilter> myPaintLibFilter = y60::PaintLibFilterFactory::get().createFilter(theFilterName, theFilterparams);
+        if (myPaintLibFilter) {
+            theBitmap.ApplyFilter(*myPaintLibFilter);
+        } else {
+            ImageFilter myFilter = ImageFilter(getEnumFromString(theFilterName, ImageFilterStrings));
+            applyCustomFilter(theBitmap, myFilter, theFilterparams);
+        }
+    }
+
+    void
+    applyCustomFilter(PLBmp & theBitmap, ImageFilter theFilter, const vector<float> & theFilterparams) {
+        switch (theFilter) {
+           /* case WINDOW_CW: {
+                float myCenter = theFilterparams[0];
+                float myWidth = theFilterparams[1];
+                ApplyFilter(PLFilterWindowCW(myCenter, myWidth));
+                break; }*/
+            case HEIGHT_TO_NORMALMAP:
+                theBitmap.ApplyFilter(HeightToNormalMap());
+                break;
+            default:
+                break;
+        }
+    }
+
     ImageLoader::ImageLoader(const ITextureManagerPtr & theTextureManager) :
         PLBmp(),
         _myHeaderSize(0),
@@ -525,28 +554,12 @@ namespace y60 {
 
     void
     ImageLoader::applyCustomFilter(const std::string & theFilterName, const vector<float> & theFilterparams) {
-        asl::Ptr<PLFilter> myPaintLibFilter = y60::PaintLibFilterFactory::get().createFilter(theFilterName, theFilterparams);
-        if (myPaintLibFilter) {
-            ApplyFilter(*myPaintLibFilter);
-        } else {
-            ImageFilter myFilter = ImageFilter(getEnumFromString(theFilterName, ImageFilterStrings));
-            applyCustomFilter(myFilter, theFilterparams);
-        }
+        y60::applyCustomFilter((PLBmp&)*this, theFilterName, theFilterparams);
     }
 
     void
     ImageLoader::applyCustomFilter(ImageFilter theFilter, const vector<float> & theFilterparams) {
-        switch (theFilter) {
-           /* case WINDOW_CW: {
-                float myCenter = theFilterparams[0];
-                float myWidth = theFilterparams[1];
-                ApplyFilter(PLFilterWindowCW(myCenter, myWidth));
-                break; }*/
-            case HEIGHT_TO_NORMALMAP:
-                ApplyFilter(HeightToNormalMap());
-                break;
-            default:
-                break;
-        }
+        y60::applyCustomFilter(*this, theFilter, theFilterparams);
     }
+    
 }
