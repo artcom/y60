@@ -162,8 +162,8 @@ namespace y60 {
              */
             void saveToFile(const std::string & theImagePath);
 
-            void saveToFileFiltered(const std::string & theImagePath, const std::string & theFilter,
-                                    const VectorOfFloat & theFilterParams);
+            void saveToFileFiltered(const std::string & theImagePath, const VectorOfString & theFilter,
+                                    const VectorOfVectorOfFloat & theFilterParams);
 
             unsigned long long getValueVersion() const {
                 dom::NodePtr myValueNode = getRasterValueNode();

@@ -132,6 +132,9 @@ namespace y60 {
         theFactory.registerPrototype("VectorOfVectorOfString",
             dom::ValuePtr(new dom::ComplexValue<VectorOfVectorOfString,dom::MakeResizeableVector>(VectorOfVectorOfString(),0)));
 
+        theFactory.registerPrototype("VectorOfVectorOfFloat",
+            dom::ValuePtr(new dom::ComplexValue<VectorOfVectorOfFloat,dom::MakeResizeableVector>(VectorOfVectorOfFloat(),0)));
+
         theFactory.registerPrototype("VectorOfRankedFeature",
             dom::ValuePtr(new dom::ComplexValue<VectorOfRankedFeature,dom::MakeResizeableVector>(VectorOfRankedFeature(),0)));
     }

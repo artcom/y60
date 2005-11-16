@@ -273,12 +273,11 @@ namespace y60 {
     }
 
     void 
-    Image::saveToFileFiltered(const std::string & theImagePath, const std::string & theFilter,
-                              const VectorOfFloat & theFilterParams)
+    Image::saveToFileFiltered(const std::string & theImagePath, const VectorOfString & theFilter,
+                              const VectorOfVectorOfFloat & theFilterParams)
     {
         PLAnyBmp myBmp;
         convertToPLBmp( myBmp );
-
         applyCustomFilter(myBmp, theFilter, theFilterParams);
 
         PLPNGEncoder myPNGEncoder;

@@ -120,7 +120,8 @@ function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
     var myMaterialNode = Node.createElement('material');
     myMaterialNode.id = createUniqueId(); //"m" + theName;
     myMaterialNode.name = theName;    
-    theMaterialParent.appendChild(myMaterialNode);
+    var myMaterialParent = getDescendantByTagName(window.scene.dom, "materials", true);
+    myMaterialParent.appendChild(myMaterialNode);
     // add textures
     var myTexturesString =
         '<textures>\n' +

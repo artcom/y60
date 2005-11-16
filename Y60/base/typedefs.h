@@ -37,8 +37,6 @@
 
 namespace y60 {
 
-    typedef std::vector<std::string>           VectorOfString;
-    typedef std::vector<VectorOfString>        VectorOfVectorOfString;
 
     typedef std::vector<AcBool>                VectorOfBool;
     typedef std::vector<unsigned int>          VectorOfUnsignedInt;
@@ -49,6 +47,10 @@ namespace y60 {
     typedef std::vector<asl::Vector3f>         VectorOfVector3f;
     typedef std::vector<asl::Vector4f>         VectorOfVector4f;
     typedef std::vector<asl::Quaternionf>      VectorOfQuaternionf;
+
+    typedef std::vector<std::string>           VectorOfString;
+    typedef std::vector<VectorOfString>        VectorOfVectorOfString;
+    typedef std::vector<VectorOfFloat>         VectorOfVectorOfFloat;
 
     typedef asl::raster<asl::RGB>              RasterOfRGB;
     typedef asl::raster<asl::RGBA>             RasterOfRGBA;

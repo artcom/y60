@@ -663,15 +663,15 @@ SaveImageFiltered(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
             return JS_FALSE;
         }
 
-        string myFilterName;
+        VectorOfString myFilterName;
         if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myFilterName)) {
-            JS_ReportError(cx, "saveImageFiltered(): argument #3 must be a string. (theFilterName)");
+            JS_ReportError(cx, "saveImageFiltered(): argument #3 must be a vector of strings. (theFilterName)");
             return JS_FALSE;
         }
 
-        VectorOfFloat myFilterParams;
+        VectorOfVectorOfFloat myFilterParams;
         if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], myFilterParams)) {
-            JS_ReportError(cx, "saveImageFiltered(): argument #4 must be a VectorOfFloat. (theFilterParams)");
+            JS_ReportError(cx, "saveImageFiltered(): argument #4 must be a vector of VectorOfFloat. (theFilterParams)");
             return JS_FALSE;
         }
 

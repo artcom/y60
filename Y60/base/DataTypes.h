@@ -121,6 +121,7 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfQuaternionf, VectorValue, dom::MakeResizeableVector);
     DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::VectorOfString, ComplexValue, dom::MakeResizeableVector, StringValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfVectorOfString, ComplexValue, dom::MakeResizeableVector);
+    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfVectorOfFloat, ComplexValue, dom::MakeResizeableVector);
     
     DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RankedFeature, ComplexValue, dom::MakeOpaqueVector, void);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfRankedFeature, ComplexValue, dom::MakeResizeableVector);

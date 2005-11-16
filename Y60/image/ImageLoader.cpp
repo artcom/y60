@@ -43,8 +43,19 @@ namespace y60 {
 
     /* Image filtering on save/load */
     void
-    applyCustomFilter(PLBmp & theBitmap, const std::string & theFilterName, const vector<float> & theFilterparams) {
-        asl::Ptr<PLFilter> myPaintLibFilter = y60::PaintLibFilterFactory::get().createFilter(theFilterName, theFilterparams);
+    applyCustomFilter(PLBmp & theBitmap, const VectorOfString & theFilterName, const VectorOfVectorOfFloat & theFilterparams) {
+        if (theFilterName.size() != theFilterparams.size()) {
+            throw ImageLoaderException(std::string("Sorry, filter and params count do not match."), PLUS_FILE_LINE);
+        }
+        for (int myFilterIndex = 0; myFilterIndex < theFilterName.size(); myFilterIndex++) {
+            applyCustomFilter(theBitmap, theFilterName[myFilterIndex], theFilterparams[myFilterIndex]);
+        }
+    }
+
+    void
+    applyCustomFilter(PLBmp & theBitmap, const std::string & theFilterName, const VectorOfFloat & theFilterparams) {
+        asl::Ptr<PLFilter> myPaintLibFilter = y60::PaintLibFilterFactory::get().createFilter(theFilterName, 
+                                                                                             theFilterparams);
         if (myPaintLibFilter) {
             theBitmap.ApplyFilter(*myPaintLibFilter);
         } else {
@@ -54,7 +65,7 @@ namespace y60 {
     }
 
     void
-    applyCustomFilter(PLBmp & theBitmap, ImageFilter theFilter, const vector<float> & theFilterparams) {
+    applyCustomFilter(PLBmp & theBitmap, ImageFilter theFilter, const std::vector<float> &  theFilterparams) {
         switch (theFilter) {
            /* case WINDOW_CW: {
                 float myCenter = theFilterparams[0];
@@ -554,7 +565,7 @@ namespace y60 {
 
     void
     ImageLoader::applyCustomFilter(const std::string & theFilterName, const vector<float> & theFilterparams) {
-        y60::applyCustomFilter((PLBmp&)*this, theFilterName, theFilterparams);
+        y60::applyCustomFilter(*this, theFilterName, theFilterparams);
     }
 
     void
