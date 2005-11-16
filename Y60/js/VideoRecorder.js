@@ -21,10 +21,10 @@ function VideoRecoder(theDirectory, theFrameRate) {
 
 VideoRecoder.prototype.Constructor = function(obj, theDirectory, theFrameRate) {
 
-    var _myDirectory = theDirectory;
-    var _myFrameTime = 1 / theFrameRate;
-    var _myEnabled   = false;
-    var _myTime      = 0;
+    var _myDirectory         = theDirectory;
+    var _myFrameTime         = 1 / theFrameRate;
+    var _myEnabled           = false;
+    var _myTime              = 0;
     var _myScreenShotCounter = 0;
 
     obj.onFrame = function(theTime) {
@@ -50,13 +50,13 @@ VideoRecoder.prototype.Constructor = function(obj, theDirectory, theFrameRate) {
         return _myTime;
     }
 
-    obj.onKey = function(theKey, theState, theX, theY, theShiftFlag) {
+    obj.onKey = function(theKey, theState) {
         if (theState) {
             switch (theKey) {
-            case 'R':
-                print((_myEnabled ? "Disable" : "Enable") + " video recording.");
-                _myEnabled = !_myEnabled;
-                break;
+                case 'R':
+                    print((_myEnabled ? "Disable" : "Enable") + " video recording.");
+                    _myEnabled = !_myEnabled;
+                    break;
             }
         }
     }

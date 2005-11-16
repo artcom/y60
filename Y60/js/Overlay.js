@@ -187,7 +187,7 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
 // @param theScene     Scene     The scene the overlay should be appended to
 // @param theColor     Vector4f  Color of the overlay
 // @param thePosition  Vector2f  Pixelposition of the overlay (optional, default is [0,0])
-// @param theSize      Vector2f  Size of the overlay (optional, default is [1,1]
+// @param theSize      Vector2f  Size of the overlay (optional, default is [100,100]
 // @param theParent    Node      Parent overlay node (optional, optional default is toplevel)
 function Overlay(theScene, theColor, thePosition, theSize, theParent) {
     var Public    = this;
@@ -196,6 +196,9 @@ function Overlay(theScene, theColor, thePosition, theSize, theParent) {
     if (theSize) {
         Public.width  = theSize[0];
         Public.height = theSize[1];
+    } else {
+        Public.width  = 100;
+        Public.height = 100;
     }
 
     if (theColor) {
