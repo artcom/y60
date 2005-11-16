@@ -616,8 +616,8 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theFilename", "Filename and path where to save the image. The image format is automatically determined by the file-extension.", DOC_TYPE_STRING);
     DOC_END;
     try {
-        if (argc < 2) {
-			JS_ReportError(cx, "saveImage(): expects at least two arguments : image node, file name, [vertical flip]");
+        if (argc != 2) {
+			JS_ReportError(cx, "saveImage(): expects at least two arguments : image node, file name.");
             return JS_FALSE;
         }
 
@@ -633,16 +633,50 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        bool myVerticalFlipFlag = false;
-        if (argc == 3) {
-            if ( ! convertFrom(cx, argv[2], myVerticalFlipFlag)) {
-                JS_ReportError(cx, "saveImage(): argument #3 must be a bool. (theVerticalFlipFlag)");
-                return JS_FALSE;
-            }
+		ImagePtr myImage = myImageNode->getFacade<y60::Image>();
+		myImage->saveToFile(myFileName);
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+SaveImageFiltered(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        if (argc != 4) {
+			JS_ReportError(cx, "saveImageFiltered(): expects at least four arguments : image node,"
+                               "file name, filter name, filter params");
+            return JS_FALSE;
+        }
+
+		dom::NodePtr myImageNode;
+		if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
+            JS_ReportError(cx, "saveImageFiltered(): argument #1 must be an image node");
+            return JS_FALSE;
+        }
+
+        string myFileName;
+        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myFileName)) {
+            JS_ReportError(cx, "saveImageFiltered(): argument #2 must be a string. (theFilename)");
+            return JS_FALSE;
+        }
+
+        string myFilterName;
+        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myFilterName)) {
+            JS_ReportError(cx, "saveImageFiltered(): argument #3 must be a string. (theFilterName)");
+            return JS_FALSE;
+        }
+
+        VectorOfFloat myFilterParams;
+        if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], myFilterParams)) {
+            JS_ReportError(cx, "saveImageFiltered(): argument #4 must be a VectorOfFloat. (theFilterParams)");
+            return JS_FALSE;
         }
 
 		ImagePtr myImage = myImageNode->getFacade<y60::Image>();
-		myImage->saveToFile(myFileName, myVerticalFlipFlag);
+		myImage->saveToFileFiltered(myFileName, myFilterName, myFilterParams);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -1320,48 +1354,49 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 
 static JSFunctionSpec glob_functions[] = {
-    {"print",           Print,          0},
-    {"use",             Use,            1},
-    {"reuse",           Reuse,          0},
-    {"parseArguments",  ParseArguments, 2},
-    {"plug",            Plug,           1},
-    {"saveImage",       SaveImage,		2},
-    {"exit",            Exit,           0},
-    {"version",         Version,        1},
-    {"build",           BuildDate,      0},
-    {"revision",        Revision,       0},
-    {"gc",              GC,             0},
-    {"clear",           Clear,          1},
-    {"__FILE__",        File,           0},
-    {"__LINE__",        Line,           0},
-    {"fileline",        FileLine,       0},
-    {"dumpstack",       DumpStack,      0},
-    {"millisec",        MilliSec,       1},
-    {"msleep",          MSleep,         1},
-    {"fileExists",      FileExists,     1},
-    {"getBaseName",     GetBaseName,    1},
-    {"getDirName",      GetDirName,     1},
-    {"getProgramName",  GetProgramName, 0},
-    {"hostname",        HostName,       1},
-    {"expandEnvironment", ExpandEnvironment, 1},
-    {"includePath",     IncludePath,    1},
-    {"removePath",      RemovePath,     1},
-    {"getPath",         GetPath,        0},
-    {"listFiles",       listFiles,      2},
-    {"openFile",        OpenFile,       2},
+    {"print",                Print,          0},
+    {"use",                  Use,            1},
+    {"reuse",                Reuse,          0},
+    {"parseArguments",       ParseArguments, 2},
+    {"plug",                 Plug,           1},
+    {"saveImage",            SaveImage,		2},
+    {"saveImageFiltered",    SaveImageFiltered,	4},
+    {"exit",                 Exit,           0},
+    {"version",              Version,        1},
+    {"build",                BuildDate,      0},
+    {"revision",             Revision,       0},
+    {"gc",                   GC,             0},
+    {"clear",                Clear,          1},
+    {"__FILE__",             File,           0},
+    {"__LINE__",             Line,           0},
+    {"fileline",             FileLine,       0},
+    {"dumpstack",            DumpStack,      0},
+    {"millisec",             MilliSec,       1},
+    {"msleep",               MSleep,         1},
+    {"fileExists",           FileExists,     1},
+    {"getBaseName",          GetBaseName,    1},
+    {"getDirName",           GetDirName,     1},
+    {"getProgramName",       GetProgramName, 0},
+    {"hostname",             HostName,       1},
+    {"expandEnvironment",    ExpandEnvironment, 1},
+    {"includePath",          IncludePath,    1},
+    {"removePath",           RemovePath,     1},
+    {"getPath",              GetPath,        0},
+    {"listFiles",            listFiles,      2},
+    {"openFile",             OpenFile,       2},
 
     {"getDocumentation",     getDocumentation, 1},
     {"getDocumentedModules", getDocumentedModules, 0},
 
-    {"createUniqueId",  createUniqueId, 0},
+    {"createUniqueId",       createUniqueId, 0},
 
-    {"fromHexString",   fromHexString,   1},
-    {"asHexString",     asHexString,     1},
-    {"urlEncode",       urlEncode,       1},
-    {"urlDecode",       urlDecode,       1},
+    {"fromHexString",        fromHexString,   1},
+    {"asHexString",          asHexString,     1},
+    {"urlEncode",            urlEncode,       1},
+    {"urlDecode",            urlDecode,       1},
 
-    {"exec",            execute,         2},
-    {"operatingSystem", operatingSystem, 0},
+    {"exec",                 execute,         2},
+    {"operatingSystem",      operatingSystem, 0},
     {0}
 };
 
