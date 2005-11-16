@@ -408,7 +408,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         _myDebugVisual = new DebugVisual(self.getWorld(), self);
 
         _myAnimationManager = new AnimationManager(self);
-        _myImageManager = new ImageManager(self.getImages());
+        _myImageManager = new ImageManager(self);
         var myViewport = self.getRenderWindow().canvas.childNode("viewport");
         _myOverlayManager = new OverlayManager(self.getScene(), myViewport);
 

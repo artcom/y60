@@ -17,22 +17,21 @@
 //=============================================================================
 
 
-function ImageManager(theImagesNode, theScene) {
-    this.Constructor(this, theImagesNode, theScene);
+function ImageManager(theBaseViewer) {
+    this.Constructor(this, theBaseViewer);
 }
 
-ImageManager.prototype.Constructor = function(obj, theImagesNode, theScene) {
+ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
 
     // private members
-    var _myImagesNode = theImagesNode;
-    var _myScene = theScene ? theScene : window.scene;
+    var _myBaseViewer = theBaseViewer;
 
     // public methods
     obj.getImageNode = function(theImageName) {
-        var myImageNode = getDescendantByName(_myImagesNode, theImageName, false);
+        var myImageNode = getDescendantByName(_myBaseViewer.getImages(), theImageName, false);
         if (!myImageNode) {
             myImageNode = Node.createElement("image");
-            _myImagesNode.appendChild(myImageNode);
+            _myBaseViewer.getImages().appendChild(myImageNode);
             myImageNode.name = theImageName;
             myImageNode.resize = "pad";
         }
@@ -41,7 +40,7 @@ ImageManager.prototype.Constructor = function(obj, theImagesNode, theScene) {
 
     obj.createImage = function(theSource) {
         var myImageNode = Node.createElement("image");
-        _myImagesNode.appendChild(myImageNode);
+        _myBaseViewer.getImages().appendChild(myImageNode);
         myImageNode.name = theSource;
         myImageNode.src = theSource;
         myImageNode.resize = "pad";
@@ -50,7 +49,7 @@ ImageManager.prototype.Constructor = function(obj, theImagesNode, theScene) {
 
     obj.createMovie = function(theSource) {
         var myMovie = Node.createElement("movie");
-        _myImagesNode.appendChild(myMovie);
+        _myBaseViewer.getImages().appendChild(myMovie);
         myMovie.src = theSource;
         myMovie.name = theSource;
         window.loadMovieFrame(myMovie);

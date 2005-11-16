@@ -53,16 +53,21 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         _myTestDurationInFrames = theFrameCount;
     }
 
-    obj.saveTestImage = function() {
+    obj.getTestImageName = function() {
         var myImageFilename = "";
         if (obj.myImageCount > 0) {
             myImageFilename = _myOutputImageName + '.' + obj.myImageCount + _myOutputSuffix;
         } else {
             myImageFilename = _myOutputImageName + _myOutputSuffix;
         }
+        obj.myImageCount++;
+        return myImageFilename;
+    }
+
+    obj.saveTestImage = function() {
+        var myImageFilename = obj.getTestImageName();
         print("Writing test image to file: " + myImageFilename);
         window.saveBuffer(myImageFilename);
-        obj.myImageCount++;
     }
 
 

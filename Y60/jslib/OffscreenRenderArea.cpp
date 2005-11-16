@@ -142,14 +142,22 @@ OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
 
 const ImagePtr
 OffscreenRenderArea::getImage() const {
-    return getCanvas() ?
-        getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() ) : ImagePtr(0);
+    if (getCanvas()) {
+        return getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() );
+    } else {
+        AC_WARNING << "No canvas.";
+        return ImagePtr(0);
+    }
 }
 
 ImagePtr
 OffscreenRenderArea::getImage() {
-    return getCanvas() ?
-        getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() ) : ImagePtr(0);
+    if (getCanvas()) {
+        return getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() );
+    } else {
+        AC_WARNING << "No canvas.";
+        return ImagePtr(0);
+    }
 }
 
 int
