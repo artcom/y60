@@ -492,37 +492,38 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     function parseArguments(theArguments) {
         var myArgumentMap = [];
-        for (var i = 0; i < theArguments.length; ++i) {
-            var myArgument = theArguments[i];
-            if (!_myShaderLibrary && myArgument.search(/shaderlib.*\.xml$/) != -1) {
-                // Take the first xml-file as shader library
-                _myShaderLibrary = myArgument;
-            } else if (myArgument.search(/\.[xb]60$/) != -1 ||
-                       myArgument.search(/\.st.$/) != -1 ||
-                       myArgument.search(/\.x3d$/) != -1) {
-                _myModelName = myArgument;
+        if (theArguments) {
+            for (var i = 0; i < theArguments.length; ++i) {
+                var myArgument = theArguments[i];
+                if (!_myShaderLibrary && myArgument.search(/shaderlib.*\.xml$/) != -1) {
+                    // Take the first xml-file as shader library
+                    _myShaderLibrary = myArgument;
+                } else if (myArgument.search(/\.[xb]60$/) != -1 ||
+                           myArgument.search(/\.st.$/) != -1 ||
+                           myArgument.search(/\.x3d$/) != -1) {
+                    _myModelName = myArgument;
+                }
+
+                myArgument = myArgument.split("=");
+                if (myArgument.length > 1) {
+                    myArgumentMap[myArgument[0]] = myArgument[1];
+                } else {
+                    myArgumentMap[myArgument[0]] = null;
+                }
             }
 
-            myArgument = myArgument.split("=");
-            if (myArgument.length > 1) {
-                myArgumentMap[myArgument[0]] = myArgument[1];
-            } else {
-                myArgumentMap[myArgument[0]] = null;
+            if ("rehearsal" in myArgumentMap) {
+                _myReleaseMode = false;
+            }
+            if ("profile" in myArgumentMap) {
+                _myProfileFilename = myArgumentMap["profile"];
+                if (_myProfileFilename == null) {
+                    _myProfileFilename = PROFILE_FILENAME;
+                }
+                _myProfileNode = new Node("<profile revision='0' name='' description='Frames-per-Second' current='0' previous='0' gain='0' time='0' maxfps='0' minfps='0'/>").firstChild;
+                Logger.warning("Profiling enabled, filename=" + _myProfileFilename);
             }
         }
-
-        if ("rehearsal" in myArgumentMap) {
-            _myReleaseMode = false;
-        }
-        if ("profile" in myArgumentMap) {
-            _myProfileFilename = myArgumentMap["profile"];
-            if (_myProfileFilename == null) {
-                _myProfileFilename = PROFILE_FILENAME;
-            }
-            _myProfileNode = new Node("<profile revision='0' name='' description='Frames-per-Second' current='0' previous='0' gain='0' time='0' maxfps='0' minfps='0'/>").firstChild;
-            Logger.warning("Profiling enabled, filename=" + _myProfileFilename);
-        }
-
         return myArgumentMap;
     }
 
@@ -569,9 +570,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     // Constructor
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    if (theArguments != null) {
-        self.arguments = parseArguments(theArguments);
-    }
+
+    self.arguments = parseArguments(theArguments);
+
     var myShaderLibrary = self.getShaderLibrary();
     if (myShaderLibrary) {
         GLResourceManager.loadShaderLibrary(myShaderLibrary);

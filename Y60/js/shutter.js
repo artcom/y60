@@ -128,7 +128,7 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
 
     self.setBrush = function(theSize) {
         _myBrushSize = theSize;
-        print("Shutter Brush " + _myBrushSize);
+
         if (_myCursor) {
             _myCursor.width = theSize;
             _myCursor.height = theSize;
@@ -139,7 +139,6 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
     }
 
     self.enable = function(theFlag) {
-
         _myEnabledFlag = theFlag;
         print("Shutter " + (_myEnabledFlag ? "on" : "off"));
         if (_myEnabledFlag) {
