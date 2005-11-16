@@ -647,6 +647,13 @@ namespace y60 {
         glGenFramebuffersEXT( 1, &myTest);
         cerr << " test done. " << endl;
 #endif        
+
+#ifdef WIN32
+        if (queryWGLExtension("WGL_EXT_swap_control")) {
+            SET_PROC_ADDRESS( PFNWGLSWAPINTERVALEXTPROC, wglSwapIntervalEXT );
+            SET_PROC_ADDRESS( PFNWGLGETSWAPINTERVALEXTPROC, wglGetSwapIntervalEXT );
+        }
+#endif        
     }
 
     bool hasCap(const string & theCapStr) {        

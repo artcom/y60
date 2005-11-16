@@ -920,6 +920,11 @@ Debug culling is disabled by default.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="underlays">
+                    <xs:annotation>
+                        <xs:documentation>Contains overlay elements, that are rendered below the reset of the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element ref="overlays">
                     <xs:annotation>
                         <xs:documentation>Contains overlay elements, that are rendered on top of the scene</xs:documentation>
@@ -934,6 +939,24 @@ Debug culling is disabled by default.</xs:documentation>
 This element can include any number of overlay elements.
 Overlays are rectangles rendered on top of the scene with an ortographic projection.
 Overlays are useful for GUI elements and On-Screen-Displays.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="overlay">
+                    <xs:annotation>
+                        <xs:documentation>Defines an rectangular overlay element, that is rendered on top of the scene</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="underlays">
+        <xs:annotation>
+            <xs:documentation>Parent node for all underlays, that are renderd below the reset of the scene.
+This element can include any number of overlay elements.
+Underlays are the same as overlays, except that they are rendered before anything else.
+Overlays are rectangles rendered on top of the scene with an ortographic projection.
+Underlays are useful for Backgroundiamges.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">

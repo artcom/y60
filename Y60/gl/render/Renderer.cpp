@@ -194,7 +194,7 @@ namespace y60 {
     }
 
     bool
-    Renderer::switchMaterial(const MaterialBase & theMaterial) {
+    Renderer::switchMaterial(const MaterialBase & theMaterial, bool isOverlay) {
         if (_myPreviousMaterial == &theMaterial) {
             return false;
         } else if (_myPreviousMaterial == 0) {
@@ -224,7 +224,7 @@ namespace y60 {
                 glDepthMask(GL_FALSE);
             }
 
-            // [CH] TODO: Material should const.
+            // [CH] TODO: Material should be const.
             // The renderer should just take the scene information and render it as it is.
             // Right now in Shader.activate() the material representation is updated.
             // The scene should be responsible for that.
@@ -232,7 +232,13 @@ namespace y60 {
             CHECK_OGL_ERROR;
         }
 
-        const VertexRegisterFlags & myVertexRegisterFlags = myShader->getVertexRegisterFlags();
+        VertexRegisterFlags myVertexRegisterFlags;
+        if (isOverlay) {
+            myVertexRegisterFlags.reset();
+        } else {
+            myVertexRegisterFlags = myShader->getVertexRegisterFlags();
+        }
+
         for (unsigned myRegister = 0; myRegister < MAX_REGISTER; ++myRegister) {
             bool myEnable = false;
 
@@ -906,8 +912,9 @@ namespace y60 {
     void
     Renderer::setupViewport(ViewportPtr theViewport) {
         MAKE_SCOPE_TIMER(setupViewport);
-
-        activateViewport(theViewport);
+        AC_TRACE << "setting viewport to " << theViewport->get<ViewportWidthTag>() << "x" << theViewport->get<ViewportHeightTag>() << endl;
+        glViewport(theViewport->get<ViewportLeftTag>(), theViewport->getLower(),
+                   theViewport->get<ViewportWidthTag>(), theViewport->get<ViewportHeightTag>());
         CHECK_OGL_ERROR;
 
         _myState.setWireframe(theViewport->get<ViewportWireframeTag>());
@@ -923,10 +930,12 @@ namespace y60 {
     void
     Renderer::render(ViewportPtr theViewport) {
         MAKE_SCOPE_TIMER(render);
+
+        renderOverlays(theViewport, UNDERLAY_LIST_NAME);
+
         setupViewport(theViewport);
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
-        // we need to push the client state too
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
         dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
@@ -999,7 +1008,6 @@ namespace y60 {
             glPopMatrix();
         }
         glPopAttrib();
-        // we need to pop the client state too
         glPopClientAttrib();
 
         if (_myBoundingVolumeMode & BV_HIERARCHY) {
@@ -1008,7 +1016,7 @@ namespace y60 {
 
         {
             MAKE_SCOPE_TIMER(renderOverlays);
-            renderOverlays(theViewport);
+            renderOverlays(theViewport, OVERLAY_LIST_NAME);
         }
         {
             MAKE_SCOPE_TIMER(renderTextSnippets);
@@ -1031,14 +1039,6 @@ namespace y60 {
         DB(AC_TRACE << "setting proj matrix to " << theViewport->get<ProjectionMatrixTag>() << endl);
         glLoadMatrixf(static_cast<const GLfloat *>(theViewport->get<ProjectionMatrixTag>().getData()));
         glMatrixMode(GL_MODELVIEW);
-    }
-
-    bool
-    Renderer::activateViewport(const ViewportPtr & theViewport) {
-        AC_TRACE << "setting viewport to " << theViewport->get<ViewportWidthTag>() << "x" << theViewport->get<ViewportHeightTag>() << endl;
-        glViewport(theViewport->get<ViewportLeftTag>(), theViewport->getLower(),
-                   theViewport->get<ViewportWidthTag>(), theViewport->get<ViewportHeightTag>());
-    	return true;
     }
 
     void
@@ -1357,8 +1357,8 @@ namespace y60 {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     void
-    Renderer::renderOverlays(ViewportPtr theViewport) {
-        dom::NodePtr myOverlays = theViewport->getNode().childNode(OVERLAY_LIST_NAME);
+    Renderer::renderOverlays(const ViewportPtr & theViewport, std::string theRootNodeName) {
+        dom::NodePtr myOverlays = theViewport->getNode().childNode(theRootNodeName);
         if (!myOverlays) {
             return;
         }
@@ -1451,7 +1451,7 @@ namespace y60 {
 
                 COUNT(Overlays);
 
-                switchMaterial(*myMaterial);
+                switchMaterial(*myMaterial, true);
                 MaterialPropertiesFacadePtr myPropFacade = myMaterial->getChild<MaterialPropertiesTag>();
 
                 const asl::Vector4f & myColor = myPropFacade->get<SurfaceColorTag>();
@@ -1461,7 +1461,7 @@ namespace y60 {
                 const asl::Vector2f & mySourceSize   = myOverlay.get<SrcSizeTag>();
 
                 unsigned myTextureCount = myMaterial->getTextureCount();
-
+/*
                 // TODO: Workaround: switchMaterial enables vertex arrays for all vertex registers
                 // but overlays do not use arrays
                 for (unsigned i = 0; i < myTextureCount; ++i) {
@@ -1470,7 +1470,7 @@ namespace y60 {
                     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
                     CHECK_OGL_ERROR;
                 }
-
+*/
                 if (myTextureCount == 1) {
                     glBegin(GL_QUADS);
                     glTexCoord2f(mySourceOrigin[0],mySourceOrigin[1]);

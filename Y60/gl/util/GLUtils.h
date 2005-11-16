@@ -189,6 +189,12 @@ DEF_PROC_ADDRESS( PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC, glCheckFramebufferStatusEX
 #define glCheckFramebufferStatusEXT _ac_glCheckFramebufferStatusEXT 
 #endif
 
+// Swap interval
+DEF_PROC_ADDRESS( PFNWGLSWAPINTERVALEXTPROC, wglSwapIntervalEXT );
+#define wglSwapIntervalEXT _ac_wglSwapIntervalEXT 
+DEF_PROC_ADDRESS( PFNWGLGETSWAPINTERVALEXTPROC, wglGetSwapIntervalEXT );
+#define wglGetSwapIntervalEXT _ac_wglGetSwapIntervalEXT 
+
 } // extern C
 
 #endif

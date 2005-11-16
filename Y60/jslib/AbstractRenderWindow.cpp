@@ -374,7 +374,7 @@ namespace jslib {
             }
 
             if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onFrame")) {
-                MAKE_SCOPE_TIMER(IdleJS);
+                MAKE_SCOPE_TIMER(onFrame_JSCallback);
                 jsval argv[1], rval;
                 argv[0] = as_jsval(_myJSContext, _myElapsedTime);
                 JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 1, argv, &rval);
@@ -454,7 +454,6 @@ namespace jslib {
         for (unsigned i = 0; i < _myCanvas->childNodesLength(VIEWPORT_NODE_NAME); ++i) {
             const dom::NodePtr & myViewport = _myCanvas->childNode(VIEWPORT_NODE_NAME, i);
             preViewport(myViewport);
-            //_myRenderer->render(myViewport->getFacade<Viewport>());
             _myRenderer->render(myViewport->getFacade<Viewport>());
             postViewport(myViewport);
         }

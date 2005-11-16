@@ -267,19 +267,19 @@ saveEvents(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JSFunctionSpec *
 JSRenderWindow::Functions() {
     static JSFunctionSpec myFunctions[] = {
-        /* name                DERIVED::native          nargs    */
-        {"resize",             resize,                   3},
-        {"resetCursor",        resetCursor,              0},
-        {"createCursor",       createCursor,             1},
-        {"go",                 go,                       0},
-        {"stop",               stop,                     0},
-        {"loadTTF",            loadTTF,                  4},
-        {"setMousePosition",   setMousePosition,         2},
-        {"draw",               draw,                     1},
-        {"setEventRecorderMode", setEventRecorderMode,   1},
-        {"getEventRecorderMode", getEventRecorderMode,   0},
-        {"loadEvents",           loadEvents,             1},
-        {"saveEvents",           saveEvents,             1},
+        /* name                  DERIVED::native          nargs    */
+        {"resize",               resize,                   3},
+        {"resetCursor",          resetCursor,              0},
+        {"createCursor",         createCursor,             1},
+        {"go",                   go,                       0},
+        {"stop",                 stop,                     0},
+        {"loadTTF",              loadTTF,                  4},
+        {"setMousePosition",     setMousePosition,         2},
+        {"draw",                 draw,                     1},
+        {"setEventRecorderMode", setEventRecorderMode,     1},
+        {"getEventRecorderMode", getEventRecorderMode,     0},
+        {"loadEvents",           loadEvents,               1},
+        {"saveEvents",           saveEvents,               1},
         {0}
     };
     return myFunctions;
@@ -294,6 +294,7 @@ enum PropertyNumbers {
     PROP_title,
     PROP_position,
     PROP_screenSize,
+    PROP_swapInterval,
     // ConstInt
     PROP_STOP,
     PROP_PLAY,
@@ -329,6 +330,7 @@ JSRenderWindow::Properties() {
         {"title",              PROP_title,              JSPROP_ENUMERATE|JSPROP_PERMANENT}, // boolean
         {"screenSize",         PROP_screenSize,         JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"position",           PROP_position,           JSPROP_ENUMERATE|JSPROP_PERMANENT}, // Vector2i
+        {"swapInterval",       PROP_swapInterval,       JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -364,6 +366,9 @@ JSRenderWindow::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
         case PROP_screenSize:
             *vp = as_jsval(cx, myObj.getNative().getScreenSize());
             return JS_TRUE;
+        case PROP_swapInterval:
+            *vp = as_jsval(cx, myObj.getNative().getSwapInterval());
+            return JS_TRUE;
         default:
             return JSBASE::getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
     }
@@ -394,6 +399,8 @@ JSRenderWindow::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
             return Method<SDLWindow>::call(&SDLWindow::setWindowTitle, cx, obj, 1, vp, &dummy);
         case PROP_position:
             return Method<SDLWindow>::call(&SDLWindow::setPosition, cx, obj, 1, vp, &dummy);
+        case PROP_swapInterval:
+            return Method<SDLWindow>::call(&SDLWindow::setSwapInterval, cx, obj, 1, vp, &dummy);
         default:
             return JSBASE::setPropertySwitch(myObj.getNative(),theID, cx, obj, id, vp);
     }

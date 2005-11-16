@@ -50,6 +50,7 @@ namespace y60 {
     static const char * VERTEX_INDICES_NAME       = "indices";
     static const char * HALFEDGES_NODE_NAME       = "halfedges";
     static const char * OVERLAY_LIST_NAME         = "overlays";
+    static const char * UNDERLAY_LIST_NAME        = "underlays";
     static const char * OVERLAY_NODE_NAME         = "overlay";
     static const char * MATERIAL_LIST_NAME        = "materials";
     static const char * MATERIAL_NODE_NAME        = "material";

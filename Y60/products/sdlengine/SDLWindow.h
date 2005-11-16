@@ -112,6 +112,10 @@ namespace y60 {
             void go();
             void stop();
 
+            // Sets the number of screen-redraws per swap buffer
+            void setSwapInterval(unsigned theInterval);
+            int getSwapInterval();
+
             //////////////////////////////////////////////////////////////////////////
 
             /// Set EventRecorder mode to STOP/PLAY/RECORD.
@@ -144,6 +148,7 @@ namespace y60 {
             void draw(const asl::Triangle<float> & theTriangle,
                       const asl::Vector4f & theColor,
                       const asl::Matrix4f & theTransformation);
+
 
 			~SDLWindow();
 

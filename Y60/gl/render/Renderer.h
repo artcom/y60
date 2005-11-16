@@ -116,12 +116,11 @@ namespace y60 {
             void resetModelView();
             void bindViewMatrix(y60::CameraPtr theCamera);
             void setProjection(ViewportPtr theViewport);
-            bool activateViewport(const ViewportPtr & theViewport);
             void rotateBillboard(const Body & theBody, const Camera & theCamera);
 
             GLenum getPrimitiveGLType(PrimitiveType theType);
 
-            bool switchMaterial(const MaterialBase & theMaterial);
+            bool switchMaterial(const MaterialBase & theMaterial, bool isOverlay = false);
             void deactivatePreviousMaterial() const;
 
             dom::NodePtr getActiveLodChild(dom::NodePtr theNode, const y60::CameraPtr theCamera);
@@ -142,7 +141,7 @@ namespace y60 {
             void renderBoundingBoxHierarchy(dom::NodePtr theNode);
 
             void renderFrustum(const ViewportPtr & theViewport);
-            void renderOverlays(ViewportPtr theViewport);
+            void renderOverlays(const ViewportPtr & theViewport, std::string theRootNodeName);
             void renderOverlay(dom::NodePtr theOverlayNode, float theAlpha = 1);
             void renderTextSnippets(ViewportPtr theViewport);
 

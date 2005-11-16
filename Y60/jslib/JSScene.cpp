@@ -413,6 +413,7 @@ enum PropertyNumbers {
     PROP_canvas,
     PROP_viewport,
     PROP_overlays,
+    PROP_underlays,
     PROP_materials,
     PROP_lightsources,
     PROP_animations,
@@ -497,6 +498,7 @@ JSScene::Properties() {
         {"canvas",       PROP_canvas,       JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"viewport",     PROP_viewport,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"overlays",     PROP_overlays,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"underlays",    PROP_underlays,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"materials",    PROP_materials,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"lightsources", PROP_lightsources, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"animations",   PROP_animations,   JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
@@ -515,7 +517,7 @@ JSScene::StaticProperties() {
 }
 
 JSBool
-JSScene::getStatistics(JSContext *cx, jsval *vp) {    
+JSScene::getStatistics(JSContext *cx, jsval *vp) {
     JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
     jsval rval = OBJECT_TO_JSVAL(myReturnObject);
     Scene::Statistics myStatistics = getNative().getStatistics();
@@ -523,14 +525,14 @@ JSScene::getStatistics(JSContext *cx, jsval *vp) {
     unsigned long myRenderedPrimitives = myDashboard.getCounterValue("TransparentPrimitives") + myDashboard.getCounterValue("OpaquePrimitives");
     if (!JS_DefineProperty(cx, myReturnObject, "primitives", as_jsval(cx, myStatistics.primitiveCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "renderedPrimitives", as_jsval(cx, myRenderedPrimitives),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-    if (!JS_DefineProperty(cx, myReturnObject, "vertices", as_jsval(cx, myStatistics.vertexCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;    
-    if (!JS_DefineProperty(cx, myReturnObject, "renderedVertices", as_jsval(cx, myDashboard.getCounterValue("Vertices")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;    
+    if (!JS_DefineProperty(cx, myReturnObject, "vertices", as_jsval(cx, myStatistics.vertexCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+    if (!JS_DefineProperty(cx, myReturnObject, "renderedVertices", as_jsval(cx, myDashboard.getCounterValue("Vertices")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "materials", as_jsval(cx, myStatistics.materialCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-    if (!JS_DefineProperty(cx, myReturnObject, "lights", as_jsval(cx, myStatistics.lightCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;    
+    if (!JS_DefineProperty(cx, myReturnObject, "lights", as_jsval(cx, myStatistics.lightCount), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "activeLights", as_jsval(cx, myDashboard.getCounterValue("ActiveLights")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "bodies", as_jsval(cx, myDashboard.getCounterValue("RenderedBodies")), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     if (!JS_DefineProperty(cx, myReturnObject, "worldNodes", as_jsval(cx, myDashboard.getCounterValue("WorldNodes")),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
-    if (!JS_DefineProperty(cx, myReturnObject, "overlays", as_jsval(cx, myDashboard.getCounterValue("Overlays")),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;    
+    if (!JS_DefineProperty(cx, myReturnObject, "overlays", as_jsval(cx, myDashboard.getCounterValue("Overlays")),  0,0, JSPROP_ENUMERATE)) return JS_FALSE;
     *vp = rval;
     return JS_TRUE;
 }
@@ -564,6 +566,16 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
         case PROP_viewport:
             *vp = as_jsval(cx, getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME)->childNode(VIEWPORT_NODE_NAME));
             return JS_TRUE;
+        case PROP_underlays:
+        {
+            dom::NodePtr myViewPort = getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME)->childNode(VIEWPORT_NODE_NAME);
+            dom::NodePtr myUnderlays = myViewPort->childNode(UNDERLAY_LIST_NAME);
+            if (!myUnderlays) {
+                myUnderlays = myViewPort->appendChild(dom::Element(UNDERLAY_LIST_NAME));
+            }
+            *vp = as_jsval(cx, myUnderlays);
+            return JS_TRUE;
+        }
         case PROP_overlays:
             *vp = as_jsval(cx, getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME)->childNode(VIEWPORT_NODE_NAME)->childNode(OVERLAY_LIST_NAME));
             return JS_TRUE;

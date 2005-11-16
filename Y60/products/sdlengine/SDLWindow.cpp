@@ -685,3 +685,41 @@ void SDLWindow::draw(const asl::Triangle<float> & theTriangle,
 {
     _myRenderer->draw(theTriangle, theColor, theTransformation);
 }
+
+void 
+SDLWindow::setSwapInterval(unsigned theInterval) {
+    if (!_myRenderer) {
+        AC_WARNING << "Sorry, setting the swap interval will take no effect before the renderer is created!" << endl;
+        return;
+    }
+
+#ifdef WIN32
+    if (wglSwapIntervalEXT) {
+        wglSwapIntervalEXT(theInterval);
+    } else {
+        AC_WARNING << "setSwapInterval(): wglSwapInterval Extension not supported.";
+    }    
+#else
+    AC_WARNING << "setSwapInterval(): Not yet inplemented for Linux";
+#endif
+}
+
+int
+SDLWindow::getSwapInterval() {
+    if (!_myRenderer) {
+        AC_WARNING << "Sorry, getting the swap interval will no work before the renderer is created!" << endl;
+        return 0;
+    }
+
+#ifdef WIN32
+    if (wglGetSwapIntervalEXT) {
+        return wglGetSwapIntervalEXT();
+    } else {
+        AC_WARNING << "getSwapInterval(): wglSwapInterval Extension not supported.";
+        return 0;
+    }    
+#else
+    AC_WARNING << "getSwapInterval(): Not yet inplemented for Linux";
+    return 0;
+#endif
+}
