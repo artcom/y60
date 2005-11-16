@@ -216,7 +216,7 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.src getter = function() { return Public.image.src; }
-    Public.src setter = function(theArgument) { Public.image.src = theArgument; }
+    Public.src setter = function(theArgument) { Public.image.src = expandEnvironment(theArgument); }
 
     Public.image getter = function() {
         if (Protected.myImages.length) {
@@ -397,7 +397,7 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             // theSource is a string
             myImage = Node.createElement("image");
             theScene.images.appendChild(myImage);
-            myImage.src  = theSource;
+            myImage.src  = expandEnvironment(theSource);
             myImage.name = theSource;
             myImage.resize = "pad";
 
@@ -520,7 +520,7 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
         } else {
             myImage = Node.createElement("movie");
             theScene.images.appendChild(myImage);
-            myImage.src  = theSource;
+            myImage.src  = expandEnvironment(theSource);
             myImage.name = theSource;
             myImage.resize = "pad";
             if (theAudioFlag == undefined) {

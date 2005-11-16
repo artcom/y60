@@ -57,6 +57,8 @@ function main() {
         reportException(ex);
         exit(1);
     }
+
+    exit(0);
 }
 
 function plugComponentsForDocumentation() {
