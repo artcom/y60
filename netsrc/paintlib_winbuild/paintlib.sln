@@ -1,30 +1,11 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "..\..\..\extern\paintlib\win\libjpeg\libjpeg.vcproj", "{89C6E83C-39A7-4D56-A5EE-61A0FAF3E18D}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\..\..\extern\paintlib\win\libpng\libpng.vcproj", "{565C13F7-2A06-4135-8F49-02D1A9589145}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtiff", "..\..\..\extern\paintlib\win\libtiff\libtiff.vcproj", "{CCE99B0B-E57B-481A-A5A4-6ADE16913D10}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libungif", "..\..\..\extern\paintlib\win\libungif\libungif.vcproj", "{DAC29977-B3B7-4ABB-B4D7-38AC5B2F3075}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "paintlib", "paintlib.vcproj", "{BB992CF3-42B5-4108-A774-B96705C8BCC5}"
 	ProjectSection(ProjectDependencies) = postProject
-		{CCE99B0B-E57B-481A-A5A4-6ADE16913D10} = {CCE99B0B-E57B-481A-A5A4-6ADE16913D10}
-		{89C6E83C-39A7-4D56-A5EE-61A0FAF3E18D} = {89C6E83C-39A7-4D56-A5EE-61A0FAF3E18D}
-		{DAC29977-B3B7-4ABB-B4D7-38AC5B2F3075} = {DAC29977-B3B7-4ABB-B4D7-38AC5B2F3075}
-		{565C13F7-2A06-4135-8F49-02D1A9589145} = {565C13F7-2A06-4135-8F49-02D1A9589145}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "piclook", "PicLook.vcproj", "{556B8112-AF99-498D-A757-0B23E7123393}"
 	ProjectSection(ProjectDependencies) = postProject
+		{BB992CF3-42B5-4108-A774-B96705C8BCC5} = {BB992CF3-42B5-4108-A774-B96705C8BCC5}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test.vcproj", "{FBA11FD4-EBB4-4B60-BA71-274F53DF5124}"
@@ -32,39 +13,28 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test.vcproj", "{FBA
 		{BB992CF3-42B5-4108-A774-B96705C8BCC5} = {BB992CF3-42B5-4108-A774-B96705C8BCC5}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "..\..\..\extern\win\paintlib\win\libjpeg\libjpeg.vcproj", "{FE5CC6C5-BE53-4C84-980F-E63DA63D98CA}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\..\..\extern\win\paintlib\win\libpng\libpng.vcproj", "{15894C3C-BB67-41E4-BBE6-FFB91FD1D12D}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtiff", "..\..\..\extern\win\paintlib\win\libtiff\libtiff.vcproj", "{3CB563B3-9B69-498E-92EB-3B1E8D8E767A}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libungif", "..\..\..\extern\win\paintlib\win\libungif\libungif.vcproj", "{D429D599-004E-4CD2-9BC9-9BA6E08A21C2}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
-	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 2
-		SccProjectUniqueName0 = ..\\..\\..\\extern\\paintlib\\win\\libungif\\libungif.vcproj
-		SccProjectName0 = \u0022$/giflib-4.1.0/Lib\u0022,\u0020THCAAAAA
-		SccLocalPath0 = ..\\..\\..\\extern\\paintlib\\win\\libungif
-		SccProvider0 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
-		SccProjectUniqueName1 = paintlib.vcproj
-		SccProjectName1 = \u0022$/paintlib\u0022,\u0020CAAAAAAA
-		SccLocalPath1 = .
-		SccProvider1 = MSSCCI:Microsoft\u0020Visual\u0020SourceSafe
-	EndGlobalSection
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
 		Release = Release
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
-		{89C6E83C-39A7-4D56-A5EE-61A0FAF3E18D}.Debug.ActiveCfg = Debug|Win32
-		{89C6E83C-39A7-4D56-A5EE-61A0FAF3E18D}.Debug.Build.0 = Debug|Win32
-		{89C6E83C-39A7-4D56-A5EE-61A0FAF3E18D}.Release.ActiveCfg = Release|Win32
-		{89C6E83C-39A7-4D56-A5EE-61A0FAF3E18D}.Release.Build.0 = Release|Win32
-		{565C13F7-2A06-4135-8F49-02D1A9589145}.Debug.ActiveCfg = Debug|Win32
-		{565C13F7-2A06-4135-8F49-02D1A9589145}.Debug.Build.0 = Debug|Win32
-		{565C13F7-2A06-4135-8F49-02D1A9589145}.Release.ActiveCfg = Release|Win32
-		{565C13F7-2A06-4135-8F49-02D1A9589145}.Release.Build.0 = Release|Win32
-		{CCE99B0B-E57B-481A-A5A4-6ADE16913D10}.Debug.ActiveCfg = Debug|Win32
-		{CCE99B0B-E57B-481A-A5A4-6ADE16913D10}.Debug.Build.0 = Debug|Win32
-		{CCE99B0B-E57B-481A-A5A4-6ADE16913D10}.Release.ActiveCfg = Release|Win32
-		{CCE99B0B-E57B-481A-A5A4-6ADE16913D10}.Release.Build.0 = Release|Win32
-		{DAC29977-B3B7-4ABB-B4D7-38AC5B2F3075}.Debug.ActiveCfg = Debug|Win32
-		{DAC29977-B3B7-4ABB-B4D7-38AC5B2F3075}.Debug.Build.0 = Debug|Win32
-		{DAC29977-B3B7-4ABB-B4D7-38AC5B2F3075}.Release.ActiveCfg = Release|Win32
-		{DAC29977-B3B7-4ABB-B4D7-38AC5B2F3075}.Release.Build.0 = Release|Win32
 		{BB992CF3-42B5-4108-A774-B96705C8BCC5}.Debug.ActiveCfg = Debug|Win32
 		{BB992CF3-42B5-4108-A774-B96705C8BCC5}.Debug.Build.0 = Debug|Win32
 		{BB992CF3-42B5-4108-A774-B96705C8BCC5}.Release.ActiveCfg = Release|Win32
@@ -77,6 +47,22 @@ Global
 		{FBA11FD4-EBB4-4B60-BA71-274F53DF5124}.Debug.Build.0 = Debug|Win32
 		{FBA11FD4-EBB4-4B60-BA71-274F53DF5124}.Release.ActiveCfg = Release|Win32
 		{FBA11FD4-EBB4-4B60-BA71-274F53DF5124}.Release.Build.0 = Release|Win32
+		{FE5CC6C5-BE53-4C84-980F-E63DA63D98CA}.Debug.ActiveCfg = Debug|Win32
+		{FE5CC6C5-BE53-4C84-980F-E63DA63D98CA}.Debug.Build.0 = Debug|Win32
+		{FE5CC6C5-BE53-4C84-980F-E63DA63D98CA}.Release.ActiveCfg = Release|Win32
+		{FE5CC6C5-BE53-4C84-980F-E63DA63D98CA}.Release.Build.0 = Release|Win32
+		{15894C3C-BB67-41E4-BBE6-FFB91FD1D12D}.Debug.ActiveCfg = Debug|Win32
+		{15894C3C-BB67-41E4-BBE6-FFB91FD1D12D}.Debug.Build.0 = Debug|Win32
+		{15894C3C-BB67-41E4-BBE6-FFB91FD1D12D}.Release.ActiveCfg = Release|Win32
+		{15894C3C-BB67-41E4-BBE6-FFB91FD1D12D}.Release.Build.0 = Release|Win32
+		{3CB563B3-9B69-498E-92EB-3B1E8D8E767A}.Debug.ActiveCfg = Debug|Win32
+		{3CB563B3-9B69-498E-92EB-3B1E8D8E767A}.Debug.Build.0 = Debug|Win32
+		{3CB563B3-9B69-498E-92EB-3B1E8D8E767A}.Release.ActiveCfg = Release|Win32
+		{3CB563B3-9B69-498E-92EB-3B1E8D8E767A}.Release.Build.0 = Release|Win32
+		{D429D599-004E-4CD2-9BC9-9BA6E08A21C2}.Debug.ActiveCfg = Debug|Win32
+		{D429D599-004E-4CD2-9BC9-9BA6E08A21C2}.Debug.Build.0 = Debug|Win32
+		{D429D599-004E-4CD2-9BC9-9BA6E08A21C2}.Release.ActiveCfg = Release|Win32
+		{D429D599-004E-4CD2-9BC9-9BA6E08A21C2}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

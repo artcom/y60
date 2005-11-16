@@ -14,8 +14,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\..\..\..\extern\paintlib\lib\Debug"
-			IntermediateDirectory=".\..\..\..\extern\paintlib\obj\Debug"
+			OutputDirectory=".\..\..\..\extern\win\paintlib\lib\Debug"
+			IntermediateDirectory=".\..\..\..\extern\win\paintlib\obj\Debug"
 			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -25,7 +25,7 @@
 				AdditionalOptions="/Yd "
 				Optimization="0"
 				OptimizeForProcessor="1"
-				AdditionalIncludeDirectories=".;..\..\..\include;..\..\..\extern\paintlib\common;..\..\..\extern\paintlib\common\filter;..\..\..\extern\paintlib\win\paintlib;..\..\..\extern\paintlib\win\libtiff;..\..\..\extern\paintlib\otherlib\libtiff\libtiff;..\..\..\extern\paintlib\win\libjpeg;..\..\..\extern\paintlib\otherlib\libjpeg;..\..\..\extern\paintlib\otherlib\libpng;..\..\..\extern\paintlib\otherlib\zlib;..\..\..\extern\paintlib\otherlib\libungif\lib"
+				AdditionalIncludeDirectories=".;..\..\..\include;..\..\..\extern\win\paintlib\common;..\..\..\extern\win\paintlib\common\filter;..\..\..\extern\win\paintlib\win\paintlib;..\..\..\extern\win\paintlib\win\libtiff;..\..\..\extern\win\paintlib\otherlib\libtiff\libtiff;..\..\..\extern\win\paintlib\win\libjpeg;..\..\..\extern\win\paintlib\otherlib\libjpeg;..\..\..\extern\win\paintlib\otherlib\libpng;..\..\..\extern\win\paintlib\otherlib\zlib;..\..\..\extern\win\paintlib\otherlib\libungif\lib"
 				PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -37,9 +37,9 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="plstdpch.h"
-				PrecompiledHeaderFile=".\..\..\..\extern\paintlib\obj\Debug/paintlib.pch"
-				AssemblerListingLocation=".\..\..\..\extern\paintlib\obj\Debug/"
-				ObjectFile=".\..\..\..\extern\paintlib\obj\Debug/"
+				PrecompiledHeaderFile=".\..\..\..\extern\win\paintlib\obj\Debug/paintlib.pch"
+				AssemblerListingLocation=".\..\..\..\extern\win\paintlib\obj\Debug/"
+				ObjectFile=".\..\..\..\extern\win\paintlib\obj\Debug/"
 				ProgramDataBaseFileName="$(OutDir)/vc70.pdb"
 				BrowseInformation="1"
 				WarningLevel="3"
@@ -75,8 +75,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\..\..\..\extern\paintlib\lib\Release"
-			IntermediateDirectory=".\..\..\..\extern\paintlib\obj\Release"
+			OutputDirectory=".\..\..\..\extern\win\paintlib\lib\Release"
+			IntermediateDirectory=".\..\..\..\extern\win\paintlib\obj\Release"
 			ConfigurationType="4"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE"
@@ -85,7 +85,7 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="2"
 				OptimizeForProcessor="1"
-				AdditionalIncludeDirectories=".;..\..\..\include;..\..\..\extern\paintlib\common;..\..\..\extern\paintlib\common\filter;..\..\..\extern\paintlib\win\paintlib;..\..\..\extern\paintlib\win\libtiff;..\..\..\extern\paintlib\otherlib\libtiff\libtiff;..\..\..\extern\paintlib\win\libjpeg;..\..\..\extern\paintlib\otherlib\libjpeg;..\..\..\extern\paintlib\otherlib\libpng;..\..\..\extern\paintlib\otherlib\zlib;..\..\..\extern\paintlib\otherlib\libungif\lib"
+				AdditionalIncludeDirectories=".;..\..\..\include;..\..\..\extern\win\paintlib\common;..\..\..\extern\win\paintlib\common\filter;..\..\..\extern\win\paintlib\win\paintlib;..\..\..\extern\win\paintlib\win\libtiff;..\..\..\extern\win\paintlib\otherlib\libtiff\libtiff;..\..\..\extern\win\paintlib\win\libjpeg;..\..\..\extern\win\paintlib\otherlib\libjpeg;..\..\..\extern\win\paintlib\otherlib\libpng;..\..\..\extern\win\paintlib\otherlib\zlib;..\..\..\extern\win\paintlib\otherlib\libungif\lib"
 				PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -93,9 +93,9 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="plstdpch.h"
-				PrecompiledHeaderFile=".\..\..\..\extern\paintlib\obj\Release/paintlib.pch"
-				AssemblerListingLocation=".\..\..\..\extern\paintlib\obj\Release/"
-				ObjectFile=".\..\..\..\extern\paintlib\obj\Release/"
+				PrecompiledHeaderFile=".\..\..\..\extern\win\paintlib\obj\Release/paintlib.pch"
+				AssemblerListingLocation=".\..\..\..\extern\win\paintlib\obj\Release/"
+				ObjectFile=".\..\..\..\extern\win\paintlib\obj\Release/"
 				ProgramDataBaseFileName="$(OutDir)/vc70.pdb"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
@@ -104,8 +104,9 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="winmm.lib"
-				OutputFile=".\..\..\..\extern\paintlib\lib\Release\paintlib.lib"
+				AdditionalDependencies="winmm.lib libtiff.lib libjpeg.lib libpng.lib libungif.lib"
+				OutputFile=".\..\..\..\extern\win\paintlib\lib\Release\paintlib.lib"
+				AdditionalLibraryDirectories="C:\dev\pro60\extern\win\paintlib\lib\release"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -135,224 +136,212 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90">
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\jmemdest.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\jmemdest.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\jmemsrc.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\jmemsrc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\planybmp.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\planybmp.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\planydec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\planydec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbitmap.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbitmap.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbmpbase.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbmpbase.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbmpdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbmpdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbmpenc.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbmpenc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbmpinfo.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbmpinfo.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pldatasink.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\pldatasink.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pldatasrc.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\pldatasrc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plexcept.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plexcept.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plexif.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plexif.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plfilesink.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plfilesink.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plfilesrc.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plfilesrc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\Filter\plfilterfliprgb.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plgifdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plgifdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\pliff85dec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pliff85dec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\pljpegdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pljpegdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\pljpegenc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pljpegenc.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plmemsink.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plmemsink.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plmemsrc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plmemsrc.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plobject.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\PLObject.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpcxdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpcxdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpgmdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpgmdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpicdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpicdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpicenc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpicenc.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpictdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpictdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpixelformat.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpixelformat.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpngdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpngdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpngenc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpngenc.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plppmdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plppmdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpsddec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpsddec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plsgidec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plsgidec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plsubbmp.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plsubbmp.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\pltgadec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pltgadec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\pltiffdec.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pltiffdec.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\pltiffenc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pltiffenc.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\pltiffencex.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pltiffencex.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\plurlsrc.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plurlsrc.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\extern\paintlib\common\tif_msrc.c">
-				<FileConfiguration
-					Name="Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"/>
-				</FileConfiguration>
+				RelativePath="..\..\..\extern\win\paintlib\common\tif_msrc.c">
 			</File>
 			<Filter
 				Name="Filter."
 				Filter="">
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilter.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilter.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plfiltercolorize.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltercolorize.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterContrast.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltercontrast.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterCrop.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltercrop.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterFlip.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterflip.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterGetAlpha.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterfliprgb.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterGrayscale.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltergetalpha.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterIntensity.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltergrayscale.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterLightness.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterintensity.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterMirror.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterlightness.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterQuantize.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltermirror.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResize.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterquantize.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResizeBilinear.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresize.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResizeBox.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresizebilinear.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResizeGaussian.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresizebox.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResizeHamming.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresizegaussian.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plfilterrotate.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresizehamming.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterThreshold.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterrotate.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plfiltervideoinvert.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterthreshold.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plhsvconvert.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltervideoinvert.cpp">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plinplacefilter.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plhsvconvert.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plinplacefilter.cpp">
 				</File>
 			</Filter>
 			<Filter
 				Name="Win."
 				Filter="">
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\pldibsect.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\pldibsect.cpp">
 				</File>
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\plressrc.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\plressrc.cpp">
 				</File>
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\plStreamSink.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\plStreamSink.cpp">
 				</File>
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\plwemfdec.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\plwemfdec.cpp">
 				</File>
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\plwinbmp.cpp">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\plwinbmp.cpp">
 				</File>
 			</Filter>
 		</Filter>
@@ -360,278 +349,296 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;fi;fd">
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\config.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\config.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\jmemdest.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\jmemdest.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\jmemsrc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\jmemsrc.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\planybmp.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\planybmp.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\planydec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\planydec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbitmap.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbitmap.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbmpbase.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbmpbase.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbmpdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbmpdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbmpenc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbmpenc.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plbmpinfo.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plbmpinfo.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plcountedpointer.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plcountedpointer.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pldatasink.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pldatasink.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pldatasrc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pldatasrc.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pldebug.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pldebug.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plexcept.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pldecoderfactory.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plexif.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pldicomdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plfilesink.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pldirectfbbmp.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plfilesrc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plexcept.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\Filter\plfilterfliprgb.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plexif.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plgifdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plfilesink.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pliff85.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plfilesrc.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pliff85dec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plgifdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pljpegdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pliff85.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pljpegenc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pliff85dec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plmemsink.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pljpegdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plmemsrc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pljpegenc.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\PLObject.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plmemsink.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpaintlibdefs.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plmemsrc.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpcx.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plobject.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpcxdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\ploptable.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpgm.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpaintlibdefs.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpgmdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpcx.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpicdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpcxdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpicenc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpgm.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpictdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpgmdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpixel24.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpicdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpixel32.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpicenc.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpixel8.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpictdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpixeldefs.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpixel16.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpixelformat.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpixel24.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpngdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpixel32.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpngenc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpixel8.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpoint.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpixeldefs.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plppm.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpixelformat.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plppmdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpngdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plprognot.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpngenc.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plpsddec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpoint.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plrect.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plppm.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plsgidec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plppmdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plstdpch.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plprognot.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plsubbmp.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plpsddec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pltga.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plrect.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pltgadec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plsgidec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pltiffdec.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\plsubbmp.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pltiffenc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pltga.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\pltiffencex.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pltgadec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plurlsrc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pltiffdec.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\plwindefs.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pltiffenc.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\tif_msrc.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\pltiffencex.h">
+			</File>
+			<File
+				RelativePath="..\..\..\extern\win\paintlib\common\plurlsrc.h">
+			</File>
+			<File
+				RelativePath="..\..\..\extern\win\paintlib\common\plwindefs.h">
+			</File>
+			<File
+				RelativePath="..\..\..\extern\win\paintlib\common\qdraw.h">
+			</File>
+			<File
+				RelativePath="..\..\..\extern\win\paintlib\common\tif_msrc.h">
 			</File>
 			<Filter
 				Name="Filter"
 				Filter="">
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\pl2PassScale.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\pl2passscale.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plcontribdefs.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plcontribdefs.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilter.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilter.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterContrast.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltercolorize.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterCrop.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltercontrast.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterFill.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltercrop.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterFillRect.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterfill.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterFlip.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterfillrect.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterGetAlpha.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterflip.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterGrayscale.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterfliprgb.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterIntensity.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltergetalpha.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterLightness.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltergrayscale.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterMirror.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterintensity.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plfilterpixel.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterlightness.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterQuantize.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltermirror.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResize.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterpixel.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResizeBilinear.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterquantize.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResizeBox.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresize.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResizeGaussian.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresizebilinear.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterResizeHamming.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresizebox.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plfilterrotate.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresizegaussian.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterThreshold.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterresizehamming.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\PLFilterVideoInvert.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterrotate.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plhsvconvert.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfilterthreshold.h">
 				</File>
 				<File
-					RelativePath="..\..\..\extern\paintlib\common\Filter\plinplacefilter.h">
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plfiltervideoinvert.h">
+				</File>
+				<File
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plhsvconvert.h">
+				</File>
+				<File
+					RelativePath="..\..\..\extern\win\paintlib\common\Filter\plinplacefilter.h">
 				</File>
 			</Filter>
 			<Filter
 				Name="Win"
 				Filter="">
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\pldibsect.h">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\pldibsect.h">
 				</File>
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\plressrc.h">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\plressrc.h">
 				</File>
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\plStreamSink.h">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\plStreamSink.h">
 				</File>
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\plwemfdec.h">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\plwemfdec.h">
 				</File>
 				<File
-					RelativePath=".\..\..\..\extern\paintlib\win\paintlib\plwinbmp.h">
+					RelativePath="..\..\..\extern\win\paintlib\win\paintlib\plwinbmp.h">
 				</File>
 			</Filter>
 		</Filter>
@@ -640,44 +647,7 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe">
 		</Filter>
 		<File
-			RelativePath="..\..\..\extern\paintlib\common\config.vc">
-			<FileConfiguration
-				Name="Debug|Win32">
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Copying config.vc"
-					CommandLine="copy ..\..\..\extern\paintlib\common\config.vc ..\..\..\extern\paintlib\common\config.h
-"
-					Outputs="..\..\..\extern\paintlib\common\config.h"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32">
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="copy ..\..\..\extern\paintlib\common\config.vc ..\..\..\extern\paintlib\common\config.h
-"
-					Outputs="..\..\..\extern\paintlib\common\config.h"/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\extern\paintlib\common\plpixeldefs.vc">
-			<FileConfiguration
-				Name="Debug|Win32">
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Copying plpixeldefs.h"
-					CommandLine="copy ..\..\..\extern\paintlib\common\plpixeldefs.vc ..\..\..\extern\paintlib\common\plpixeldefs.h
-"
-					Outputs="..\..\..\extern\paintlib\common\plpixeldefs.h"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32">
-				<Tool
-					Name="VCCustomBuildTool"
-					CommandLine="copy ..\..\..\extern\paintlib\common\plpixeldefs.vc ..\..\..\extern\paintlib\common\plpixeldefs.h
-"
-					Outputs="..\..\..\extern\paintlib\common\plpixeldefs.h"/>
-			</FileConfiguration>
+			RelativePath="..\..\..\extern\win\paintlib\common\config.vc">
 		</File>
 	</Files>
 	<Globals>

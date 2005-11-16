@@ -13,15 +13,15 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\..\..\..\extern\paintlib\bin\Debug"
-			IntermediateDirectory=".\..\..\..\extern\paintlib\obj\Debug"
+			OutputDirectory=".\..\..\..\extern\win\paintlib\bin\Debug"
+			IntermediateDirectory=".\..\..\..\extern\win\paintlib\obj\Debug"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\extern\paintlib\common;..\..\..\extern\paintlib\win\paintlib;..\..\..\extern\paintlib\common\filter;..\..\..\extern\paintlib\win\libtiff;..\..\..\extern\paintlib\otherlib\libtiff\libtiff;..\..\..\extern\paintlib\win\libjpeg;..\..\..\extern\paintlib\otherlib\libjpeg;..\..\..\extern\paintlib\otherlib\libpng;..\..\..\extern\paintlib\otherlib\zlib"
+				AdditionalIncludeDirectories="..\..\..\extern\win\paintlib\common;..\..\..\extern\win\paintlib\win\paintlib;..\..\..\extern\win\paintlib\common\filter;..\..\..\extern\win\paintlib\win\libtiff;..\..\..\extern\win\paintlib\otherlib\libtiff\libtiff;..\..\..\extern\win\paintlib\win\libjpeg;..\..\..\extern\win\paintlib\otherlib\libjpeg;..\..\..\extern\win\paintlib\otherlib\libpng;..\..\..\extern\win\paintlib\otherlib\zlib"
 				PreprocessorDefinitions="_DEBUG;WIN32;_WINDOWS"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -32,9 +32,9 @@
 				ForceConformanceInForLoopScope="TRUE"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\..\..\..\extern\paintlib\obj\Debug/test.pch"
-				AssemblerListingLocation=".\..\..\..\extern\paintlib\obj\Debug/"
-				ObjectFile=".\..\..\..\extern\paintlib\obj\Debug/"
+				PrecompiledHeaderFile=".\..\..\..\extern\win\paintlib\obj\Debug/test.pch"
+				AssemblerListingLocation=".\..\..\..\extern\win\paintlib\obj\Debug/"
+				ObjectFile=".\..\..\..\extern\win\paintlib\obj\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="1"
@@ -44,14 +44,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="paintlib.lib libjpeg.lib libtiff.lib libpng.lib libcurl.lib ws2_32.lib"
-				OutputFile=".\..\..\..\extern\paintlib\bin\Debug/test.exe"
+				AdditionalDependencies="libjpeg.lib libtiff.lib libpng.lib libungif.lib libcurl.lib ws2_32.lib"
+				OutputFile=".\..\..\..\extern\win\paintlib\bin\Debug/test.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\..\extern\paintlib\lib\debug;..\..\..\lib"
+				AdditionalLibraryDirectories="..\..\..\extern\win\paintlib\lib\debug;..\..\..\lib"
 				IgnoreDefaultLibraryNames="MSVCRT"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\..\..\extern\paintlib\bin\Debug/test.pdb"
+				ProgramDatabaseFile=".\..\..\..\extern\win\paintlib\bin\Debug/test.pdb"
 				SubSystem="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -147,68 +147,65 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltest.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltest.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestcountedpointer.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestcountedpointer.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestdecoders.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestdecoders.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltester.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltester.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestexif.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestexif.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestfilters.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestfilters.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestpixelformat.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestpixelformat.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\win\test\test.rc">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\testfilterresizebilinear.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\testfilterresizebilinear.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\testpaintlib.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\testpaintlib.cpp">
-			</File>
-			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\testpsddecoder.cpp">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\testpsddecoder.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltest.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltest.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestcountedpointer.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestcountedpointer.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestdecoders.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestdecoders.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltester.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltester.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestexif.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestexif.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestfilters.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestfilters.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\pltestpixelformat.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\pltestpixelformat.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\testfilterresizebilinear.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\testfilterresizebilinear.h">
 			</File>
 			<File
-				RelativePath="..\..\..\extern\paintlib\common\test\testpsddecoder.h">
+				RelativePath="..\..\..\extern\win\paintlib\common\test\testpsddecoder.h">
 			</File>
 		</Filter>
 		<Filter
