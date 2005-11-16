@@ -17,14 +17,14 @@
 //
 //=============================================================================
 
-#ifndef _ac_jslib_OffScreenRenderArea_h_
-#define _ac_jslib_OffScreenRenderArea_h_
+#ifndef _ac_jslib_OffscreenRenderArea_h_
+#define _ac_jslib_OffscreenRenderArea_h_
 
 #include "AbstractRenderWindow.h"
 #include <asl/Logger.h>
 #include <dom/Nodes.h>
 #include <dom/Value.h>
-#include <y60/OffScreenBuffer.h>
+#include <y60/OffscreenBuffer.h>
 
 /**
  * 
@@ -34,10 +34,10 @@
 namespace jslib {
     class y60::Image;
     
-class OffScreenRenderArea : public y60::OffScreenBuffer, 
+class OffscreenRenderArea : public y60::OffscreenBuffer, 
                             public AbstractRenderWindow {
     public:
-        static asl::Ptr<OffScreenRenderArea> create();
+        static asl::Ptr<OffscreenRenderArea> create();
         
         /**
          * Allows Offscreen rendering into a texture.
@@ -46,8 +46,8 @@ class OffScreenRenderArea : public y60::OffScreenBuffer,
          * EXT_framebuffer_object GL extension if 
          * my rendercaps include y60::FRAMEBUFFER_SUPPORT
          */
-        OffScreenRenderArea();
-        virtual ~OffScreenRenderArea();
+        OffscreenRenderArea();
+        virtual ~OffscreenRenderArea();
 
         /**
          * renders my current scene onto the texture 
@@ -68,7 +68,7 @@ class OffScreenRenderArea : public y60::OffScreenBuffer,
         
         /** Sets the width of the viewport in pixels. All other
          * implementations of AbstractRenderWindow are resized by
-         * the window system. For OffScreenRenderArea the client is
+         * the window system. For OffscreenRenderArea the client is
          * responseable to set these values.
          */
          void setWidth(unsigned theWidth);
@@ -119,4 +119,4 @@ class OffScreenRenderArea : public y60::OffScreenBuffer,
 
 }
 
-#endif // _ac_jslib_OffScreenRenderArea_h_
+#endif // _ac_jslib_OffscreenRenderArea_h_

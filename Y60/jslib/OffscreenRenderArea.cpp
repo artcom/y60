@@ -18,7 +18,7 @@
 //=============================================================================
 
 
-#include "OffScreenRenderArea.h"
+#include "OffscreenRenderArea.h"
 #include "JSApp.h"
 
 #include <y60/Image.h>
@@ -31,63 +31,63 @@ using namespace y60;
 
 namespace jslib {
 
-asl::Ptr<OffScreenRenderArea>
-OffScreenRenderArea::create() {
-    asl::Ptr<OffScreenRenderArea> newObject = asl::Ptr<OffScreenRenderArea>(new OffScreenRenderArea());
+asl::Ptr<OffscreenRenderArea>
+OffscreenRenderArea::create() {
+    asl::Ptr<OffscreenRenderArea> newObject = asl::Ptr<OffscreenRenderArea>(new OffscreenRenderArea());
     newObject->setSelf(newObject);
     return newObject;
 }
 
-OffScreenRenderArea::OffScreenRenderArea() :
+OffscreenRenderArea::OffscreenRenderArea() :
     AbstractRenderWindow(JSApp::ShellErrorReporter),
     _myWidth(0),
     _myHeight(0)
 {
-    AC_TRACE << "OffScreenRenderArea::CTOR";
+    AC_TRACE << "OffscreenRenderArea::CTOR";
     setRenderingCaps(0);
 }
 
 
-OffScreenRenderArea::~OffScreenRenderArea() {
+OffscreenRenderArea::~OffscreenRenderArea() {
 }
 
 // IEventSink
-void OffScreenRenderArea::handle(y60::EventPtr theEvent) {
+void OffscreenRenderArea::handle(y60::EventPtr theEvent) {
 }
 
 // IGLContext
-void OffScreenRenderArea::activateGLContext() {
+void OffscreenRenderArea::activateGLContext() {
 }
-void OffScreenRenderArea::deactivateGLContext() {
+void OffscreenRenderArea::deactivateGLContext() {
 }
 
 // AbstractRenderWindow
-void OffScreenRenderArea::initDisplay() {
+void OffscreenRenderArea::initDisplay() {
 }
 
 void 
-OffScreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
-    AC_TRACE << "OffScreenRenderArea::renderToCanvas ";
+OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
+    AC_TRACE << "OffscreenRenderArea::renderToCanvas ";
     ImagePtr myTexture = getImage();
     if ( ! myTexture) {
-        AC_ERROR << "OffScreenRenderArea::renderToCanvas has no canvas / image to render... ignoring";
+        AC_ERROR << "OffscreenRenderArea::renderToCanvas has no canvas / image to render... ignoring";
         return;
     }
     onFrame();
 
     _myScene->updateAllModified();
 
-    preOffScreenRender(myTexture);
+    preOffscreenRender(myTexture);
 
     preRender();
     render();
     postRender();
 
-    postOffScreenRender(myTexture, theCopyToImageFlag);
+    postOffscreenRender(myTexture, theCopyToImageFlag);
 }    
 
 void 
-OffScreenRenderArea::downloadFromViewport(const dom::NodePtr & theImageNode) {
+OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theImageNode) {
     if ( ! theImageNode ) {
         throw OffscreenRendererException("No Image.", PLUS_FILE_LINE);
     }
@@ -108,25 +108,25 @@ OffScreenRenderArea::downloadFromViewport(const dom::NodePtr & theImageNode) {
 }
 
 void 
-OffScreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
+OffscreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
     AbstractRenderWindow::setRenderingCaps(theRenderingCaps);
-    OffScreenBuffer::setUseGLFramebufferObject(theRenderingCaps & y60::FRAMEBUFFER_SUPPORT);
+    OffscreenBuffer::setUseGLFramebufferObject(theRenderingCaps & y60::FRAMEBUFFER_SUPPORT);
 }
 
 void
-OffScreenRenderArea::setWidth(unsigned theWidth) {
+OffscreenRenderArea::setWidth(unsigned theWidth) {
     // TODO: some kind of range checking vs. image size
     _myWidth = theWidth;
 }
 
 void
-OffScreenRenderArea::setHeight(unsigned theHeight) {
+OffscreenRenderArea::setHeight(unsigned theHeight) {
     // TODO: some kind of range checking vs. image size
     _myHeight = theHeight;
 }
 
 bool 
-OffScreenRenderArea::setCanvas(const NodePtr & theCanvas) {
+OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
         ImagePtr myImage = getImage();
         if (myImage) { // XXX
@@ -141,19 +141,19 @@ OffScreenRenderArea::setCanvas(const NodePtr & theCanvas) {
 }
 
 const ImagePtr
-OffScreenRenderArea::getImage() const {
+OffscreenRenderArea::getImage() const {
     return getCanvas() ?
         getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() ) : ImagePtr(0);
 }
 
 ImagePtr
-OffScreenRenderArea::getImage() {
+OffscreenRenderArea::getImage() {
     return getCanvas() ?
         getCanvas()->getFacade<Canvas>()->getTarget( getCurrentScene() ) : ImagePtr(0);
 }
 
 int
-OffScreenRenderArea::getWidth() const {
+OffscreenRenderArea::getWidth() const {
     /*
     ImagePtr myImage = getImage();
     return myImage ? myImage->get<ImageWidthTag>() : 0;
@@ -162,7 +162,7 @@ OffScreenRenderArea::getWidth() const {
 }
 
 int
-OffScreenRenderArea::getHeight() const {
+OffscreenRenderArea::getHeight() const {
     /*
     ImagePtr myImage = getImage();
     return myImage ? myImage->get<ImageHeightTag>() : 0;
@@ -171,7 +171,7 @@ OffScreenRenderArea::getHeight() const {
 }
 
 ResizeableRasterPtr
-OffScreenRenderArea::ensureRaster(ImagePtr theImage) {
+OffscreenRenderArea::ensureRaster(ImagePtr theImage) {
     if ( ! theImage ) {
         throw OffscreenRendererException("No Image.", PLUS_FILE_LINE);
     }

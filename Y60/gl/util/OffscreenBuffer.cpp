@@ -1,5 +1,5 @@
 
-#include "OffScreenBuffer.h"
+#include "OffscreenBuffer.h"
 #include "GLUtils.h"
 #include "PixelEncodingInfo.h"
 
@@ -81,23 +81,23 @@ checkFramebufferStatus() {
     }
 }
 
-OffScreenBuffer::OffScreenBuffer(bool theUseGLFramebufferObject) 
+OffscreenBuffer::OffscreenBuffer(bool theUseGLFramebufferObject) 
     : _myUseGLFramebufferObject(theUseGLFramebufferObject),
-      _myOffScreenBuffer(0), _myDepthBuffer(0)
+      _myOffscreenBuffer(0), _myDepthBuffer(0)
 {
 }
 
-void OffScreenBuffer::preOffScreenRender( ImagePtr theTexture) {
-    AC_TRACE << "OffScreenBuffer::preOffScreenRender " 
+void OffscreenBuffer::preOffscreenRender( ImagePtr theTexture) {
+    AC_TRACE << "OffscreenBuffer::preOffscreenRender " 
              << " w/ gl framebuffer extension " << _myUseGLFramebufferObject;
     if (_myUseGLFramebufferObject) {
-        bindOffScreenFrameBuffer(theTexture);
+        bindOffscreenFrameBuffer(theTexture);
     }
 }
 
 
-void OffScreenBuffer::postOffScreenRender( ImagePtr theTexture, bool theCopyToImageFlag) {
-    AC_TRACE << "OffScreenBuffer::postOffScreenRender " 
+void OffscreenBuffer::postOffscreenRender( ImagePtr theTexture, bool theCopyToImageFlag) {
+    AC_TRACE << "OffscreenBuffer::postOffscreenRender " 
              << " w/ gl framebuffer extension " << _myUseGLFramebufferObject;
     if (_myUseGLFramebufferObject) {
         bindTexture(theTexture);
@@ -115,12 +115,12 @@ void OffScreenBuffer::postOffScreenRender( ImagePtr theTexture, bool theCopyToIm
 
 }
 
-void OffScreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
-    AC_TRACE << "OffScreenBuffer::copyFrameBufferToImage ";
+void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
+    AC_TRACE << "OffscreenBuffer::copyFrameBufferToImage ";
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseGLFramebufferObject) {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myOffScreenBuffer);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myOffscreenBuffer);
     }
 #endif
 
@@ -173,22 +173,22 @@ void OffScreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
 }
 
 
-void OffScreenBuffer::copyFrameBufferToTexture(ImagePtr theTexture) {
-    AC_TRACE << "OffScreenBuffer::copyFrameBufferToTexture ";
+void OffscreenBuffer::copyFrameBufferToTexture(ImagePtr theTexture) {
+    AC_TRACE << "OffscreenBuffer::copyFrameBufferToTexture ";
     glBindTexture (GL_TEXTURE_2D, theTexture->getGraphicsId() );
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP levels*/, 0, 0,
             0, 0, theTexture->get<ImageWidthTag>(), theTexture->get<ImageHeightTag>() );
     glBindTexture (GL_TEXTURE_2D, 0);
 }
 
-void OffScreenBuffer::bindOffScreenFrameBuffer(ImagePtr theTexture) {
-    AC_TRACE << "OffScreenBuffer::bindOffScreenFrameBuffer ";
+void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theTexture) {
+    AC_TRACE << "OffscreenBuffer::bindOffscreenFrameBuffer ";
 #ifdef GL_EXT_framebuffer_object
-    if ( ! _myOffScreenBuffer) {
-        glGenFramebuffersEXT(1, &_myOffScreenBuffer);
+    if ( ! _myOffscreenBuffer) {
+        glGenFramebuffersEXT(1, &_myOffscreenBuffer);
 
         glBindTexture(GL_TEXTURE_2D, 0);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myOffScreenBuffer);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myOffscreenBuffer);
 
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
             GL_TEXTURE_2D, theTexture->getGraphicsId(), 0);
@@ -204,7 +204,7 @@ void OffScreenBuffer::bindOffScreenFrameBuffer(ImagePtr theTexture) {
 
     } else {
         glBindTexture(GL_TEXTURE_2D, 0);
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myOffScreenBuffer);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myOffscreenBuffer);
     }
 
     checkFramebufferStatus();
@@ -213,8 +213,8 @@ void OffScreenBuffer::bindOffScreenFrameBuffer(ImagePtr theTexture) {
 #endif
 }
 
-void OffScreenBuffer::bindTexture(ImagePtr theTexture) {
-    AC_TRACE << "OffScreenBuffer::bindTexture ";
+void OffscreenBuffer::bindTexture(ImagePtr theTexture) {
+    AC_TRACE << "OffscreenBuffer::bindTexture ";
 #ifdef GL_EXT_framebuffer_object
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 #endif

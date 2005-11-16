@@ -17,10 +17,10 @@
 //
 //=============================================================================
 
-#ifndef _ac_jslib_JSOffScreenRenderArea_h_
-#define _ac_jslib_JSOffScreenRenderArea_h_
+#ifndef _ac_jslib_JSOffscreenRenderArea_h_
+#define _ac_jslib_JSOffscreenRenderArea_h_
 
-#include "OffScreenRenderArea.h"
+#include "OffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.h"
 
 /**
@@ -29,15 +29,15 @@
  */ 
 namespace jslib {
 
-class JSOffScreenRenderArea : public jslib::JSWrapper<jslib::OffScreenRenderArea, asl::Ptr<OffScreenRenderArea>, StaticAccessProtocol> {
+class JSOffscreenRenderArea : public jslib::JSWrapper<jslib::OffscreenRenderArea, asl::Ptr<OffscreenRenderArea>, StaticAccessProtocol> {
     public:
-        typedef jslib::OffScreenRenderArea NATIVE;
+        typedef jslib::OffscreenRenderArea NATIVE;
         typedef asl::Ptr<NATIVE> OWNERPTR;
         typedef JSWrapper<NATIVE,OWNERPTR,StaticAccessProtocol> Base;
-        typedef JSAbstractRenderWindow<jslib::OffScreenRenderArea> JSBASE;
+        typedef JSAbstractRenderWindow<jslib::OffscreenRenderArea> JSBASE;
         
         static const char * ClassName() {
-            return "OffScreenRenderArea";
+            return "OffscreenRenderArea";
         }
         static JSFunctionSpec * Functions();
         static JSPropertySpec * Properties();
@@ -67,14 +67,14 @@ class JSOffScreenRenderArea : public jslib::JSWrapper<jslib::OffScreenRenderArea
             return Base::Construct(cx, theOwner, theNative);
         }
 
-        JSOffScreenRenderArea(OWNERPTR theOwner, NATIVE * theNative)
+        JSOffscreenRenderArea(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
         {}
 
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
 
-        static JSOffScreenRenderArea & getObject(JSContext *cx, JSObject * obj) {
-            return dynamic_cast<JSOffScreenRenderArea &>(JSOffScreenRenderArea::getJSWrapper(cx,obj));
+        static JSOffscreenRenderArea & getObject(JSContext *cx, JSObject * obj) {
+            return dynamic_cast<JSOffscreenRenderArea &>(JSOffscreenRenderArea::getJSWrapper(cx,obj));
         }
 
     private:
@@ -83,15 +83,15 @@ class JSOffScreenRenderArea : public jslib::JSWrapper<jslib::OffScreenRenderArea
 
 
 template <>
-struct JSClassTraits<OffScreenRenderArea> : public JSClassTraitsWrapper<OffScreenRenderArea, JSOffScreenRenderArea> {
+struct JSClassTraits<OffscreenRenderArea> : public JSClassTraitsWrapper<OffscreenRenderArea, JSOffscreenRenderArea> {
     static JSClass * Class() {
-        return JSOffScreenRenderArea::Base::Class();
+        return JSOffscreenRenderArea::Base::Class();
     }
 };    
 
 
-bool convertFrom(JSContext *cx, jsval theValue, OffScreenRenderArea *& theRenderArea);
+bool convertFrom(JSContext *cx, jsval theValue, OffscreenRenderArea *& theRenderArea);
     
 } //namespace
 
-#endif // _ac_jslib_JSOffScreenRenderArea_h_
+#endif // _ac_jslib_JSOffscreenRenderArea_h_

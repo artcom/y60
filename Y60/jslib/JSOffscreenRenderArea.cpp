@@ -17,7 +17,7 @@
 //=============================================================================
 
 
-#include "JSOffScreenRenderArea.h"
+#include "JSOffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.h"
 //#include "AbstractRenderWindow.h"
 
@@ -27,9 +27,9 @@ using namespace asl;
 namespace jslib {
 
 template <>
-struct JSClassTraits<AbstractRenderWindow> : public JSClassTraitsWrapper<OffScreenRenderArea, JSOffScreenRenderArea> {
+struct JSClassTraits<AbstractRenderWindow> : public JSClassTraitsWrapper<OffscreenRenderArea, JSOffscreenRenderArea> {
     static JSClass * Class() {
-        return JSOffScreenRenderArea::Base::Class();
+        return JSOffscreenRenderArea::Base::Class();
     }
 };
 
@@ -44,7 +44,7 @@ renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
     ensureParamCount(argc, 0, 1);
 
-    OffScreenRenderArea * myNative(0);
+    OffscreenRenderArea * myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
     if (argc > 0) {
         bool myCopyToImageFlag;
@@ -63,7 +63,7 @@ setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
         ensureParamCount(argc, 1);
-        OffScreenRenderArea * myNative(0);
+        OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         
         unsigned myWidth;
@@ -80,12 +80,12 @@ downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         DOC_BEGIN("");
         DOC_END;
         ensureParamCount(argc, 1);
-        OffScreenRenderArea * myNative(0);
+        OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         
         dom::NodePtr myImageNode(0);
         if( ! convertFrom(cx, argv[0], myImageNode)) {
-            JS_ReportError(cx, "OffScreenRenderArea::downloadFromViewport(): argument #0 must be an image node.");
+            JS_ReportError(cx, "OffscreenRenderArea::downloadFromViewport(): argument #0 must be an image node.");
             return JS_FALSE;
         }
         myNative->downloadFromViewport(myImageNode);
@@ -100,7 +100,7 @@ setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("");
         DOC_END;
         ensureParamCount(argc, 1);
-        OffScreenRenderArea * myNative(0);
+        OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         
         unsigned myHeight;
@@ -112,7 +112,7 @@ setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 JSFunctionSpec *
-JSOffScreenRenderArea::Functions() {
+JSOffscreenRenderArea::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native               nargs
         {"renderToCanvas",       renderToCanvas,       1},
@@ -129,7 +129,7 @@ enum PropertyNumbers {
 };
 
 JSPropertySpec *
-JSOffScreenRenderArea::Properties() {
+JSOffscreenRenderArea::Properties() {
     static JSPropertySpec myProperties[] = {
         {0}
     };
@@ -137,32 +137,32 @@ JSOffScreenRenderArea::Properties() {
 }
 
 JSConstIntPropertySpec *
-JSOffScreenRenderArea::ConstIntProperties() {
+JSOffscreenRenderArea::ConstIntProperties() {
     static JSConstIntPropertySpec myProperties[] = {{0}};
     return myProperties;
 }
 
 JSPropertySpec *
-JSOffScreenRenderArea::StaticProperties() {
+JSOffscreenRenderArea::StaticProperties() {
     static JSPropertySpec myProperties[] = {{0}};
     return myProperties;
 }
 
 JSFunctionSpec *
-JSOffScreenRenderArea::StaticFunctions() {
+JSOffscreenRenderArea::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
 
 // getproperty handling
 JSBool
-JSOffScreenRenderArea::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSOffscreenRenderArea::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSOffScreenRenderArea::getPropertySwitch(NATIVE & theNative, unsigned long theID,
+JSOffscreenRenderArea::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
@@ -175,13 +175,13 @@ JSOffScreenRenderArea::getPropertySwitch(NATIVE & theNative, unsigned long theID
 
 // setproperty handling
 JSBool
-JSOffScreenRenderArea::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSOffscreenRenderArea::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return setPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSOffScreenRenderArea::setPropertySwitch(NATIVE & theNative, unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
+JSOffscreenRenderArea::setPropertySwitch(NATIVE & theNative, unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch(theID) {
         case 0:
@@ -191,8 +191,8 @@ JSOffScreenRenderArea::setPropertySwitch(NATIVE & theNative, unsigned long theID
 }
 
 JSBool
-JSOffScreenRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Constructs a new OffScreenRenderArea.");
+JSOffscreenRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Constructs a new OffscreenRenderArea.");
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
@@ -202,19 +202,19 @@ JSOffScreenRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsv
 
     OWNERPTR myNewObject = NATIVE::create();
 
-    JSOffScreenRenderArea * myNewJSObject = new JSOffScreenRenderArea(myNewObject, &(*myNewObject));
+    JSOffscreenRenderArea * myNewJSObject = new JSOffscreenRenderArea(myNewObject, &(*myNewObject));
 
     if (myNewJSObject) {
         JS_SetPrivate(cx,obj,myNewJSObject);
         return JS_TRUE;
     }
-    JS_ReportError(cx,"JSOffScreenRenderArea::Constructor: error");
+    JS_ReportError(cx,"JSOffscreenRenderArea::Constructor: error");
     return JS_FALSE;
 }
 
 
 void
-JSOffScreenRenderArea::addClassProperties(JSContext * cx, JSObject * theClassProto) {
+JSOffscreenRenderArea::addClassProperties(JSContext * cx, JSObject * theClassProto) {
     JSA_AddFunctions(cx, theClassProto, JSBASE::BaseFunctions());
     JSA_AddProperties(cx, theClassProto, JSBASE::BaseProperties());
     JSA_AddFunctions(cx, theClassProto, Functions());
@@ -222,7 +222,7 @@ JSOffScreenRenderArea::addClassProperties(JSContext * cx, JSObject * theClassPro
 }
 
 JSObject *
-JSOffScreenRenderArea::initClass(JSContext *cx, JSObject *theGlobalObject) {
+JSOffscreenRenderArea::initClass(JSContext *cx, JSObject *theGlobalObject) {
     //JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), 0);
     JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0, 0);
     if (myClass) {
@@ -234,20 +234,20 @@ JSOffScreenRenderArea::initClass(JSContext *cx, JSObject *theGlobalObject) {
         JSA_AddFunctions(cx, myConstructorFuncObj, JSBASE::BaseStaticFunctions());
         JSA_DefineConstInts(cx, myConstructorFuncObj, JSBASE::ConstIntProperties());
     } else {
-        cerr << "JSOffScreenRenderArea::initClass: constructor function object not "
+        cerr << "JSOffscreenRenderArea::initClass: constructor function object not "
              << "found, could not initialize static members" << endl;
 
     }
-    DOC_CREATE(JSOffScreenRenderArea);
+    DOC_CREATE(JSOffscreenRenderArea);
     return myClass;
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, OffScreenRenderArea *& theRenderArea) {
+bool convertFrom(JSContext *cx, jsval theValue, OffscreenRenderArea *& theRenderArea) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSOffScreenRenderArea::NATIVE>::Class()) {
-                theRenderArea = &(*JSClassTraits<JSOffScreenRenderArea::NATIVE>::getNativeOwner(cx,myArgument));
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSOffscreenRenderArea::NATIVE>::Class()) {
+                theRenderArea = &(*JSClassTraits<JSOffscreenRenderArea::NATIVE>::getNativeOwner(cx,myArgument));
                 return true;
             }
         }

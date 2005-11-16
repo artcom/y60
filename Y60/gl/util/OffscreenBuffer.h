@@ -21,15 +21,15 @@
 #include <asl/Ptr.h>
 #include <dom/ThreadingModel.h>
 
-#ifndef _ac_y60_OffScreenBuffer_h_
-#define _ac_y60_OffScreenBuffer_h_
+#ifndef _ac_y60_OffscreenBuffer_h_
+#define _ac_y60_OffscreenBuffer_h_
 
 DEFINE_EXCEPTION( OffscreenRendererException, asl::Exception );
 
 namespace y60 {
     class Image;
 
-    class OffScreenBuffer {
+    class OffscreenBuffer {
         public:
 
         
@@ -40,14 +40,14 @@ namespace y60 {
          * EXT_framebuffer_object GL extension if 
          * my rendercaps include y60::FRAMEBUFFER_SUPPORT
          */
-        OffScreenBuffer(bool theUseGLFramebufferObject = true);
-        virtual ~OffScreenBuffer() {}
+        OffscreenBuffer(bool theUseGLFramebufferObject = true);
+        virtual ~OffscreenBuffer() {}
 
         /**
          * prepares GL-things to render a scene
          * onto theTexture  
          */
-        void preOffScreenRender(asl::Ptr<Image, dom::ThreadingModel> theTexture); 
+        void preOffscreenRender(asl::Ptr<Image, dom::ThreadingModel> theTexture); 
         /**
          * finishes GL-things to render a scene
          * onto theTexture  
@@ -55,7 +55,7 @@ namespace y60 {
          * the underlying raster value is ignored
          * else the texture is copied into the raster.
          */
-        void postOffScreenRender(asl::Ptr<Image, dom::ThreadingModel> theImage, 
+        void postOffscreenRender(asl::Ptr<Image, dom::ThreadingModel> theImage, 
                 bool theCopyToImageFlag = false); 
 
         /**
@@ -74,10 +74,10 @@ namespace y60 {
     private:
         void copyFrameBufferToTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
         void bindTexture(asl::Ptr<Image, dom::ThreadingModel> theTexture);
-        void bindOffScreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture);
+        void bindOffscreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture);
         
         bool _myUseGLFramebufferObject;
-        unsigned _myOffScreenBuffer ,_myDepthBuffer;
+        unsigned _myOffscreenBuffer ,_myDepthBuffer;
     };
 }
 

@@ -46,7 +46,7 @@
 #include "JSScene.h"
 #include "JSFrustum.h"
 #include "JSGLResourceManager.h"
-#include "JSOffScreenRenderArea.h"
+#include "JSOffscreenRenderArea.h"
 #include "JSBlock.h"
 #include "JSZipWriter.h"
 #include "JSTestServer.h"
@@ -203,7 +203,7 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSGLResourceManager::initClass(cx, theGlobalObject)) {
         return false;
     }
-    if (!JSOffScreenRenderArea::initClass(cx, theGlobalObject)) {
+    if (!JSOffscreenRenderArea::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSBlock::initClass(cx, theGlobalObject)) {
