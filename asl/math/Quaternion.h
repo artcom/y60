@@ -176,6 +176,13 @@ namespace asl {
                 }
             }
 
+            /** inverts the quaternion.
+             *
+             */
+            void invert() {
+                this->val[3] *= -1;
+            }
+
             /** Conjugates the quaternion.
              * The resulting quaternion performs exactly the reverse rotation as
              * before.

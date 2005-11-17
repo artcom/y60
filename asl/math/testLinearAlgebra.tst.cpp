@@ -562,6 +562,14 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
             ENSURE_MSG(almostEqual(myTranslatedPlane.normal, Vector3d(-sqrt(2.0) * 0.5 ,sqrt(2.0) * 0.5, 0)),
                         "Testing transformed plane normal.");
             ENSURE_MSG(almostEqual(myTranslatedPlane.offset, - 5 * sqrt(2.0) ), "Testing transformed plane offset.");
+
+            // test scaling
+            Planef myPlane(Vector3f(0,0,1), 10);
+            Matrix4f myScaling;
+            myScaling.makeScaling(Vector3f(8,3,2));
+            Planef myScaledPlane = product(myPlane, myScaling);
+            DPRINT(myScaledPlane);
+            ENSURE(almostEqual(myScaledPlane.offset, 20));
         }
         {
             Plane<double> myXYPlane(Vector3d(0, 0, 1), 0);

@@ -143,7 +143,8 @@ namespace asl {
         myResult.normal[0] = myResultCoefficents[0];
         myResult.normal[1] = myResultCoefficents[1];
         myResult.normal[2] = myResultCoefficents[2];
-        myResult.offset    = myResultCoefficents[3];
+        myResult.offset    = myResultCoefficents[3] / magnitude(myResult.normal);
+
         myResult.normalize();
         return myResult;
     }
