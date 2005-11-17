@@ -35,7 +35,7 @@ class JSSocket : public jslib::JSWrapper<inet::Socket, asl::Ptr<inet::Socket> , 
         {}
 
         virtual ~JSSocket();
-        
+
         static const char * ClassName() {
             return "Socket";
         }
@@ -51,7 +51,7 @@ class JSSocket : public jslib::JSWrapper<inet::Socket, asl::Ptr<inet::Socket> , 
 
         static JSPropertySpec * StaticProperties();
         static JSFunctionSpec * StaticFunctions();
-        
+
         virtual unsigned long length() const {
             return 1;
         }
@@ -65,7 +65,7 @@ class JSSocket : public jslib::JSWrapper<inet::Socket, asl::Ptr<inet::Socket> , 
         static
         JSObject * Construct(JSContext *cx, OWNERPTR theOwner, NATIVE * theNative) {
             return Base::Construct(cx, theOwner, theNative);
-        }        
+        }
 
         static jslib::JSConstIntPropertySpec * ConstIntProperties();
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
@@ -77,12 +77,13 @@ class JSSocket : public jslib::JSWrapper<inet::Socket, asl::Ptr<inet::Socket> , 
 
 namespace jslib {
 template <>
-struct JSClassTraits<JSSocket::NATIVE> 
+struct JSClassTraits<JSSocket::NATIVE>
     : public JSClassTraitsWrapper<JSSocket::NATIVE , JSSocket> {};
 
 } // namespace jslib
 
-bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theSerial);
+bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theNative);
+bool convertFrom(JSContext *cx, jsval theValue, JSSocket::OWNERPTR & theNativePtr);
 
 jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner);
 jsval as_jsval(JSContext *cx, JSSocket::OWNERPTR theOwner, JSSocket::NATIVE * theSerial);

@@ -62,7 +62,7 @@ close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     string docStr = "read data from connected socket. (max. bytes " + asl::as_string(READ_BUFFER_SIZE) + ")";
-    DOC_BEGIN(docStr); 
+    DOC_BEGIN(docStr);
     DOC_RVAL("number of bytes read.", DOC_TYPE_INTEGER);
     DOC_END;
     try {
@@ -89,9 +89,11 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("write data to connected socket."); 
-    DOC_PARAM("theBlock", "", DOC_TYPE_OBJECT);DOC_RESET;
-    DOC_PARAM("theString", "", DOC_TYPE_STRING);DOC_RESET;
+    DOC_BEGIN("write data to connected socket.");
+    DOC_PARAM("theBlock", "A binary block to send", DOC_TYPE_OBJECT);
+    DOC_RESET;
+    DOC_PARAM("theString", "", DOC_TYPE_STRING);
+    DOC_RESET;
     DOC_PARAM("theArrayOfUnsignedByte", "", DOC_TYPE_ARRAY);
     DOC_RVAL("number of bytes written.", DOC_TYPE_INTEGER);
     DOC_END;
@@ -109,9 +111,13 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         unsigned myBytesWritten = 0;
         if (JSBlock::matchesClassOf(cx, argv[0])) {
             asl::Block * myBlock;
-            convertFrom(cx, argv[0], myBlock);
+            if (!convertFrom(cx, argv[0], myBlock)) {
+                JS_ReportError(cx, "JSSocket::write(): Could not convert block argument");
+                return JS_FALSE;
+            }
+
             myBytesWritten = JSSocket::getJSWrapper(cx,obj).openNative().send(myBlock->begin(), myBlock->size());
-            JSSocket::getJSWrapper(cx,obj).closeNative();                       
+            JSSocket::getJSWrapper(cx,obj).closeNative();
         } else {
             string myString;
             if (JSVAL_IS_STRING(argv[0])) {
@@ -132,11 +138,11 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             }
 
             myBytesWritten = JSSocket::getJSWrapper(cx,obj).openNative().send(myString.c_str(), myString.size());
-            JSSocket::getJSWrapper(cx,obj).closeNative();           
+            JSSocket::getJSWrapper(cx,obj).closeNative();
         }
 
         *rval = as_jsval(cx, myBytesWritten);
-        
+
         return JS_TRUE;
     } catch(inet::SocketException &) {
         // TODO, must be reworked once we can throw exception into javascript
@@ -147,7 +153,7 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("peek for available bytes at connected socket."); 
+    DOC_BEGIN("peek for available bytes at connected socket.");
     DOC_RVAL("number of bytes available.", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::peek,cx,obj,argc,argv,rval);
@@ -155,7 +161,7 @@ peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("connect to socket."); 
+    DOC_BEGIN("connect to socket.");
     DOC_PARAM("theRemoteIPAddress", "", DOC_TYPE_STRING);
     DOC_PARAM("theRemotePort", "", DOC_TYPE_INTEGER);
     DOC_RVAL("true if succesful.", DOC_TYPE_BOOLEAN);
@@ -221,7 +227,7 @@ setNoisy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setBlockingMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("set blocking mode on connection."); 
+    DOC_BEGIN("set blocking mode on connection.");
     DOC_PARAM("isBlocking", "", DOC_TYPE_BOOLEAN);
     DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::setBlockingMode,cx,obj,argc,argv,rval);
@@ -265,7 +271,7 @@ JSSocket::StaticProperties() {
     };
     return myProperties;
 }
-    
+
 JSFunctionSpec *
 JSSocket::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
@@ -408,12 +414,26 @@ JSSocket::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return myClass;
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theSerial) {
+bool convertFrom(JSContext *cx, jsval theValue, JSSocket::OWNERPTR & theNativePtr) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSSocket::NATIVE>::Class()) {
+                theNativePtr = JSClassTraits<JSSocket::NATIVE>::getNativeOwner(cx,myArgument);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
+bool convertFrom(JSContext *cx, jsval theValue, JSSocket::NATIVE & theNative) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSSocket::NATIVE >::Class()) {
-                theSerial = JSClassTraits<JSSocket::NATIVE>::getNativeRef(cx,myArgument);
+                theNative = JSClassTraits<JSSocket::NATIVE>::getNativeRef(cx,myArgument);
                 return true;
             }
         }
