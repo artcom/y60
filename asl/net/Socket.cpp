@@ -111,16 +111,23 @@ namespace inet {
 
         buf=new char[n];
         status=fcntl(fd, F_GETFL, 0);
-        if (!(status & FNONBLOCK))
+        if (!(status & FNONBLOCK)) {
             fcntl(fd,F_SETFL,status & FNONBLOCK);
-        //     rc=(n==recvfrom(fd,buf,n,MSG_PEEK,NULL,NULL));
-        rc=recvfrom(fd,buf,n,MSG_PEEK,NULL,NULL);
-        if (rc == -1) {
-            delete[] buf;
-            throw SocketException("Socket::peek() failed.");
         }
-        if (!(status & FNONBLOCK))
+        //     rc=(n==recvfrom(fd,buf,n,MSG_PEEK,NULL,NULL));
+        rc = recvfrom(fd,buf,n,MSG_PEEK,NULL,NULL);
+        if (rc == -1) {
+            if (errno == EAGAIN && (status & FNONBLOCK)) {
+                // this is OK
+                rc = 0;
+            } else {
+                delete[] buf;
+                throw SocketException("Socket::peek() failed.");
+            }
+        }
+        if (!(status & FNONBLOCK)) {
             fcntl(fd,F_SETFL,status);
+        }
         delete[] buf;
         return rc;
 #else
