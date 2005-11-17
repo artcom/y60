@@ -47,53 +47,62 @@ draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theLineSegment", "Line Segment to draw", DOC_TYPE_LINESEGMENT);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
+    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
+    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
+    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
+    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_END;
-    if (argc == 3) {
+    
+    if (argc == 4) {
         if (JSLineSegment::matchesClassOf(cx, argv[0])) {
             typedef void (Renderer::*MyMethod)(
                 const asl::LineSegment<float> &,
                 const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation);
+                const asl::Matrix4f & theTransformation,
+                const float & theLineWidth);
             return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
         }
         if (JSTriangle::matchesClassOf(cx, argv[0])) {
             typedef void (Renderer::*MyMethod)(
                 const asl::Triangle<float> &,
                 const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation);
+                const asl::Matrix4f & theTransformation,
+                const float & theLineWidth);
             return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
         }
         if (JSSphere::matchesClassOf(cx, argv[0])) {
             typedef void (Renderer::*MyMethod)(
                 const asl::Sphere<float> &,
                 const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation);
+                const asl::Matrix4f & theTransformation,
+                const float & theLineWidth);
             return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
         }
         if (JSBox3f::matchesClassOf(cx, argv[0])) {
             typedef void (Renderer::*MyMethod)(
                 const asl::Box3<float> &,
                 const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation);
+                const asl::Matrix4f & theTransformation,
+                const float & theLineWidth);
             return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
         }
         JS_ReportError(cx,"JSRenderWindow::draw: bad argument type #0");
         return JS_FALSE;
     }
-    JS_ReportError(cx,"JSRenderWindow::draw: bad number of arguments, 3 expected");
+    JS_ReportError(cx,"JSRenderWindow::draw: bad number of arguments, 4 expected");
     return JS_FALSE;
 }
 
