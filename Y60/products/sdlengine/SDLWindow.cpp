@@ -662,29 +662,6 @@ void SDLWindow::saveEvents(const std::string & theFilename) {
     _myEventRecorder.save(theFilename);
 }
 
-void SDLWindow::draw(const asl::LineSegment<float> & theLine,
-              const asl::Vector4f & theColor,
-              const asl::Matrix4f & theTransformation)
-{
-     _myRenderer->draw(theLine, theColor, theTransformation);
-}
-void SDLWindow::draw(const asl::Box3<float> & theBox, const asl::Vector4f & theColor,
-              const asl::Matrix4f & theTransformation)
-{
-     _myRenderer->draw(theBox, theColor, theTransformation);
-}
-void SDLWindow::draw(const asl::Sphere<float> & theSphere,
-              const asl::Vector4f & theColor,
-              const asl::Matrix4f & theTransformation)
-{
-     _myRenderer->draw(theSphere, theColor, theTransformation);
-}
-void SDLWindow::draw(const asl::Triangle<float> & theTriangle,
-              const asl::Vector4f & theColor,
-              const asl::Matrix4f & theTransformation)
-{
-    _myRenderer->draw(theTriangle, theColor, theTransformation);
-}
 
 void 
 SDLWindow::setSwapInterval(unsigned theInterval) {

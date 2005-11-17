@@ -173,46 +173,6 @@ setMousePosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 }
 
 static JSBool
-draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    if (argc == 3) {
-        if (JSLineSegment::matchesClassOf(cx, argv[0])) {
-            typedef void (SDLWindow::*MyMethod)(
-                const asl::LineSegment<float> &,
-                const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation);
-            return Method<SDLWindow>::call((MyMethod)&SDLWindow::draw,cx,obj,argc,argv,rval);
-        }
-        if (JSTriangle::matchesClassOf(cx, argv[0])) {
-            typedef void (SDLWindow::*MyMethod)(
-                const asl::Triangle<float> &,
-                const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation);
-            return Method<SDLWindow>::call((MyMethod)&SDLWindow::draw,cx,obj,argc,argv,rval);
-        }
-        if (JSSphere::matchesClassOf(cx, argv[0])) {
-            typedef void (SDLWindow::*MyMethod)(
-                const asl::Sphere<float> &,
-                const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation);
-            return Method<SDLWindow>::call((MyMethod)&SDLWindow::draw,cx,obj,argc,argv,rval);
-        }
-        if (JSBox3f::matchesClassOf(cx, argv[0])) {
-            typedef void (SDLWindow::*MyMethod)(
-                const asl::Box3<float> &,
-                const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation);
-            return Method<SDLWindow>::call((MyMethod)&SDLWindow::draw,cx,obj,argc,argv,rval);
-        }
-        JS_ReportError(cx,"JSRenderWindow::draw: bad argument type #0");
-        return JS_FALSE;
-    }
-    JS_ReportError(cx,"JSRenderWindow::draw: bad number of arguments, 3 expected");
-    return JS_FALSE;
-}
-
-static JSBool
 setEventRecorderMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set the EventRecorder mode");
     DOC_PARAM("theMode", "STOP, PLAY, or RECORD", DOC_TYPE_INTEGER);
@@ -275,7 +235,6 @@ JSRenderWindow::Functions() {
         {"stop",                 stop,                     0},
         {"loadTTF",              loadTTF,                  4},
         {"setMousePosition",     setMousePosition,         2},
-        {"draw",                 draw,                     1},
         {"setEventRecorderMode", setEventRecorderMode,     1},
         {"getEventRecorderMode", getEventRecorderMode,     0},
         {"loadEvents",           loadEvents,               1},

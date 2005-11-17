@@ -128,27 +128,6 @@ namespace y60 {
             /// Save recorded events to file.
             void saveEvents(const std::string & theFilename);
 
-            //////////////////////////////////////////////////////////////////////////
-
-            /// Immediate-mode line draw.
-            void draw(const asl::LineSegment<float> & theLine,
-                      const asl::Vector4f & theColor,
-                      const asl::Matrix4f & theTransformation);
-
-            /// Immediate-mode box draw.
-            void draw(const asl::Box3<float> & theBox, const asl::Vector4f & theColor,
-                      const asl::Matrix4f & theTransformation);
-
-            /// Immediate-mode sphere draw.
-            void draw(const asl::Sphere<float> & theSphere,
-                      const asl::Vector4f & theColor,
-                      const asl::Matrix4f & theTransformation);
-
-            /// Immediate-mode triangle draw.
-            void draw(const asl::Triangle<float> & theTriangle,
-                      const asl::Vector4f & theColor,
-                      const asl::Matrix4f & theTransformation);
-
 
 			~SDLWindow();
 
