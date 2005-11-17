@@ -100,16 +100,20 @@ namespace y60 {
 
             void draw(const asl::LineSegment<float> & theLine,
                     const asl::Vector4f & theColor,
-                    const asl::Matrix4f & theTransformation);
+                    const asl::Matrix4f & theTransformation,
+                    const float & theWidth = 1.0f);
             void draw(const asl::Triangle<float> & theTriangle,
                     const asl::Vector4f & theColor,
-                    const asl::Matrix4f & theTransformation);
+                    const asl::Matrix4f & theTransformation,
+                    const float & theWidth = 1.0f);
             void draw(const asl::Box3<float> & theBox,
                     const asl::Vector4f & theColor,
-                    const asl::Matrix4f & theTransformation);
+                    const asl::Matrix4f & theTransformation,
+                    const float & theWidth = 1.0f);
             void draw(const asl::Sphere<float> & theSphere,
                       const asl::Vector4f & theColor,
-                      const asl::Matrix4f & theTransformation);
+                      const asl::Matrix4f & theTransformation,
+                    const float & theWidth = 1.0f);
        private:
             void setupViewport(ViewportPtr theViewport);
 

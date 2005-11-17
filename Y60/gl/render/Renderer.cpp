@@ -656,13 +656,14 @@ namespace y60 {
 
     void Renderer::draw(const asl::LineSegment<float> & theLine,
             const asl::Vector4f & theColor,
-            const asl::Matrix4f & theTransformation)
+            const asl::Matrix4f & theTransformation,
+            const float & theWidth)
     {
         glDisable(GL_LIGHTING);
         glPushMatrix();
         glMultMatrixf(theTransformation.getData());
         glColor4fv(theColor.begin());
-
+        glLineWidth(theWidth);
         glBegin(GL_LINES);
             glVertex3fv(theLine.origin.begin());
             glVertex3fv(theLine.end.begin());
@@ -674,12 +675,14 @@ namespace y60 {
 
     void Renderer::draw(const asl::Sphere<float> & theSphere,
             const asl::Vector4f & theColor,
-            const asl::Matrix4f & theTransformation)
+            const asl::Matrix4f & theTransformation,
+            const float & theWidth)
     {
         glDisable(GL_LIGHTING);
         glPushMatrix();
         glMultMatrixf(theTransformation.getData());
         glColor4fv(theColor.begin());
+        glLineWidth(theWidth);
 
         const float TwoPI = float(asl::PI) * 2.0f;
         const unsigned mySegments = 32;
@@ -712,10 +715,12 @@ namespace y60 {
 
     void Renderer::draw(const asl::Box3<float> & theBox,
             const asl::Vector4f & theColor,
-            const asl::Matrix4f & theTransformation)
+            const asl::Matrix4f & theTransformation,
+            const float & theWidth)
     {
         glPushMatrix();
         glMultMatrixf(theTransformation.getData());
+        glLineWidth(theWidth);
 
         Point3f myLTF, myRBF, myRTF, myLBF;
         Point3f myLTBK, myRBBK, myRTBK, myLBBK;
@@ -731,12 +736,14 @@ namespace y60 {
 
     void Renderer::draw(const asl::Triangle<float> & theTriangle,
             const asl::Vector4f & theColor,
-            const asl::Matrix4f & theTransformation)
+            const asl::Matrix4f & theTransformation,
+            const float & theWidth)
     {
         glDisable(GL_LIGHTING);
         glPushMatrix();
         glMultMatrixf(theTransformation.getData());
         glColor4fv(theColor.begin());
+        glLineWidth(theWidth);
 
         glBegin(GL_TRIANGLES);
             glVertex3fv(theTriangle[0].begin());
