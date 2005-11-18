@@ -186,4 +186,54 @@ namespace inet {
 #endif
     }
 
+    void 
+    Socket::setSendBufferSize(int theSize) {
+#ifdef WIN32
+        if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char*) &theSize, sizeof(theSize)) < 0) {
+            AC_ERROR << "Socket::setSendBufferSize: Unable to set SO_SNDBUF" << endl;
+        }
+#else
+        AC_WARNING << "Socket::setSendBufferSize() not yet implemented for Linux/MaxOS";
+#endif
+    }
+    
+    int 
+    Socket::getSendBufferSize() const {
+        int mySize = 0;
+        int myIntSize = sizeof(mySize);
+#ifdef WIN32        
+        if (getsockopt(fd, SOL_SOCKET, SO_SNDBUF, (char*) &mySize, &myIntSize) < 0) {
+            AC_ERROR << "Socket::getSendBufferSize: Unable to set SO_SNDBUF";
+        }
+#else
+        AC_WARNING << "Socket::getSendBufferSize() not yet implemented for Linux/MaxOS";
+#endif
+        return mySize;
+    }
+
+    void 
+    Socket::setReceiveBufferSize(int theSize) {
+#ifdef WIN32
+        if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (char*) &theSize, sizeof(theSize)) < 0) {
+            AC_ERROR << "Socket::setReceiveBufferSize: Unable to set SO_SNDBUF" << endl;
+        }
+#else
+        AC_WARNING << "Socket::setReceiveBufferSize() not yet implemented for Linux/MaxOS";
+#endif
+    }
+
+    int 
+    Socket::getReceiveBufferSize() const {
+        int mySize = 0;
+        int myIntSize = sizeof(mySize);
+#ifdef WIN32
+        if (getsockopt(fd, SOL_SOCKET, SO_RCVBUF, (char*) &mySize, &myIntSize) < 0) {
+            AC_ERROR << "Socket::getReceiveBufferSize: Unable to set SO_SNDBUF";
+        }
+#else
+        AC_WARNING << "Socket::getReceiveBufferSize() not yet implemented for Linux/MaxOS";
+#endif
+        return mySize;
+    }
+
 }

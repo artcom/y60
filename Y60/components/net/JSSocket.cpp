@@ -259,6 +259,8 @@ JSPropertySpec *
 JSSocket::Properties() {
     static JSPropertySpec myProperties[] = {
         {"isValid", PROP_isValid, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"sendBufferSize", PROP_sendBufferSize, JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"receiveBufferSize", PROP_receiveBufferSize, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -287,6 +289,12 @@ JSSocket::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
         case PROP_isValid:
             *vp = as_jsval(cx, getNative().isValid());
             return JS_TRUE;
+        case PROP_sendBufferSize:
+            *vp = as_jsval(cx, getNative().getSendBufferSize());
+            return JS_TRUE;
+        case PROP_receiveBufferSize:
+            *vp = as_jsval(cx, getNative().getReceiveBufferSize());
+            return JS_TRUE;
         default:
             JS_ReportError(cx,"JSSocket::getProperty: index %d out of range", theID);
             return JS_FALSE;
@@ -296,11 +304,17 @@ JSSocket::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
 // setproperty handling
 JSBool
 JSSocket::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    jsval dummy;
     switch (theID) {
         case PROP_isValid:
-            //jsval dummy;
             //return Method<NATIVE>::call(&NATIVE::isOpen, cx, obj, 1, vp, &dummy);
             return JS_FALSE;
+        case PROP_sendBufferSize:
+            return Method<NATIVE>::call(&NATIVE::setSendBufferSize, cx, obj, 1, vp, &dummy);
+            return JS_TRUE;
+        case PROP_receiveBufferSize:
+            return Method<NATIVE>::call(&NATIVE::setReceiveBufferSize, cx, obj, 1, vp, &dummy);
+            return JS_TRUE;
         default:
             JS_ReportError(cx,"JSSocket::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;

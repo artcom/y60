@@ -87,6 +87,14 @@ class Socket {
         unsigned short getRemotePort() const {
             return ntohs(_myRemoteEndpoint.sin_port);
         }
+
+        // Sets the size of the send buffer in bytes (windows only for now)
+        void setSendBufferSize(int theSize);
+        int getSendBufferSize() const;
+
+        // Sets the size of the receive buffer in bytes (windows only for now)
+        void setReceiveBufferSize(int theSize);
+        int getReceiveBufferSize() const;
     protected:
         Endpoint _myLocalEndpoint;
 
