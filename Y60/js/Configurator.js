@@ -191,16 +191,16 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
     var _myCurrentSetting   = null;
     var _myListeners        = [];
 
-    var mySettingsFile = "settings-" + hostname() + ".xml";
-    if (fileExists(mySettingsFile)) {
-        Logger.warning("Using host-specific settings from '" + mySettingsFile + "'");
-        theSettingsFile = mySettingsFile;
-    }
     if (fileExists(theSettingsFile)) {
         Logger.info("Parsing settings from '" + theSettingsFile + "'");
         var mySettingsDom = new Node();
         mySettingsDom.parseFile(theSettingsFile);
         _mySettings = mySettingsDom.firstChild;
+        var myHostSettingsFile = "settings-" + hostname() + ".xml";
+        if (fileExists(myHostSettingsFile)) {
+            mergeHostSpecificSettings(myHostSettingsFile);
+        }
+
         _myCurrentSection   = _mySettings.firstChild;
         _myCurrentSetting   = new Setting(_myCurrentSection.firstChild);
         _myOriginalSettings = _mySettings.cloneNode(true);
@@ -338,5 +338,40 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
          print("  pagedown next section");
          print("   tab   save Settings to file");
          print("shift-tab restore original Settings");
+    }
+
+    function mergeHostSpecificSettings(theSettingsFile) {
+        Logger.info("Using host-specific settings from '" + theSettingsFile + "'");
+
+        var mySettingsDom = new Node();
+        mySettingsDom.parseFile(theSettingsFile);
+        var myHostSettings = mySettingsDom.firstChild;
+
+        for (var i = 0; i < myHostSettings.childNodes.length; ++i) {
+            var myHostSection = myHostSettings.childNode(i);
+            var myCommonSection = _mySettings.childNode(myHostSection.nodeName);
+
+            if (myCommonSection) {
+                // Merge section if it exits
+                mergeHostSpecificSection(myCommonSection, myHostSection);
+            } else {
+                // Add section to config if it does not exits there
+                _mySettings.appendChild(myHostSection.cloneNode(true));
+            }
+        }
+    }
+
+    function mergeHostSpecificSection(theCommonSection, theHostSection) {
+        for (var i = 0; i < theHostSection.childNodes.length; ++i) {
+            var myHostNode = theHostSection.childNode(i);
+            var myCommonNode = theCommonSection.childNode(myHostNode.nodeName);
+            if (myCommonNode) {
+                // Replace common node with host specific node
+                theCommonSection.replaceChild(myHostNode, myCommonNode);
+            } else {
+                // Add node to config if it does not exits there
+                theCommonSection.appendChild(myHostNode.cloneNode(true));
+            }
+        }
     }
 }
