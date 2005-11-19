@@ -14,8 +14,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\..\..\..\extern\paintlib\bin\Debug"
-			IntermediateDirectory=".\..\..\..\extern\paintlib\obj\Debug\piclook"
+			OutputDirectory=".\..\..\..\extern\win\paintlib\bin\Debug"
+			IntermediateDirectory=".\..\..\..\extern\win\paintlib\obj\Debug\piclook"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
@@ -34,7 +34,7 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\..\..\..\extern\paintlib\obj\Debug\piclook/PicLook.pch"
+				PrecompiledHeaderFile=".\..\..\..\extern\win\paintlib\obj\Debug\piclook/PicLook.pch"
 				AssemblerListingLocation=".\..\..\..\extern\win\paintlib\obj\Debug\piclook/"
 				ObjectFile=".\..\..\..\extern\win\paintlib\obj\Debug\piclook/"
 				BrowseInformation="1"
@@ -49,13 +49,13 @@
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="libjpeg.lib libtiff.lib libungif.lib libpng.lib vfw32.lib libcurl.lib ws2_32.lib"
 				ShowProgress="0"
-				OutputFile=".\..\..\..\extern\paintlib\bin\Debug/PicLook.exe"
+				OutputFile=".\..\..\..\extern\win\paintlib\bin\Debug/PicLook.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\..\extern\win\paintlib\lib\debug;..\..\..\lib"
 				IgnoreDefaultLibraryNames="MSVCRT"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile=".\..\..\..\extern\paintlib\bin\Debug/PicLook.pdb"
+				ProgramDatabaseFile=".\..\..\..\extern\win\paintlib\bin\Debug/PicLook.pdb"
 				SubSystem="2"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -63,7 +63,7 @@
 				MkTypLibCompatible="TRUE"
 				SuppressStartupBanner="TRUE"
 				TargetEnvironment="1"
-				TypeLibraryName=".\..\..\..\extern\paintlib\bin\Debug/PicLook.tlb"/>
+				TypeLibraryName=".\..\..\..\extern\win\paintlib\bin\Debug/PicLook.tlb"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
@@ -87,8 +87,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\..\..\..\extern\paintlib\bin\Release"
-			IntermediateDirectory=".\..\..\..\extern\paintlib\obj\Release\piclook"
+			OutputDirectory=".\..\..\..\extern\win\paintlib\bin\Release"
+			IntermediateDirectory=".\..\..\..\extern\win\paintlib\obj\Release\piclook"
 			ConfigurationType="1"
 			UseOfMFC="2"
 			ATLMinimizesCRunTimeLibraryUsage="FALSE">
@@ -96,7 +96,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="1"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\extern\paintlib\common,..\..\..\extern\paintlib\win\paintlib"
+				AdditionalIncludeDirectories="..\..\..\extern\win\paintlib\common,..\..\..\extern\win\paintlib\win\paintlib"
 				PreprocessorDefinitions="NDEBUG;WIN32;_WINDOWS"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -105,9 +105,9 @@
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\..\..\..\extern\paintlib\obj\Release\piclook/PicLook.pch"
-				AssemblerListingLocation=".\..\..\..\extern\paintlib\obj\Release\piclook/"
-				ObjectFile=".\..\..\..\extern\paintlib\obj\Release\piclook/"
+				PrecompiledHeaderFile=".\..\..\..\extern\win\paintlib\obj\Release\piclook/PicLook.pch"
+				AssemblerListingLocation=".\..\..\..\extern\win\paintlib\obj\Release\piclook/"
+				ObjectFile=".\..\..\..\extern\win\paintlib\obj\Release\piclook/"
 				WarningLevel="3"
 				SuppressStartupBanner="TRUE"
 				CompileAs="0"/>
@@ -117,11 +117,11 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="paintlib.lib libjpeg.lib libtiff.lib libpng.lib vfw32.lib libcurl.lib ws2_32.lib"
-				OutputFile=".\..\..\..\extern\paintlib\bin\Release/PicLook.exe"
+				OutputFile=".\..\..\..\extern\win\paintlib\bin\Release/PicLook.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="..\..\..\extern\paintlib\lib\release,..\..\..\lib"
-				ProgramDatabaseFile=".\..\..\..\extern\paintlib\bin\Release/PicLook.pdb"
+				AdditionalLibraryDirectories="..\..\..\extern\win\paintlib\lib\release,..\..\..\lib"
+				ProgramDatabaseFile=".\..\..\..\extern\win\paintlib\bin\Release/PicLook.pdb"
 				SubSystem="2"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -129,7 +129,7 @@
 				MkTypLibCompatible="TRUE"
 				SuppressStartupBanner="TRUE"
 				TargetEnvironment="1"
-				TypeLibraryName=".\..\..\..\extern\paintlib\bin\Release/PicLook.tlb"/>
+				TypeLibraryName=".\..\..\..\extern\win\paintlib\bin\Release/PicLook.tlb"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool

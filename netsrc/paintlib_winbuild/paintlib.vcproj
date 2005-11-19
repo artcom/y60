@@ -51,7 +51,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalDependencies="winmm.lib"
-				OutputFile=".\..\..\..\extern\paintlib\lib\Debug\paintlib.lib"
+				OutputFile=".\..\..\..\extern\win\paintlib\lib\Debug\paintlib.lib"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -106,7 +106,7 @@
 				Name="VCLibrarianTool"
 				AdditionalDependencies="winmm.lib libtiff.lib libjpeg.lib libpng.lib libungif.lib"
 				OutputFile=".\..\..\..\extern\win\paintlib\lib\Release\paintlib.lib"
-				AdditionalLibraryDirectories="C:\dev\pro60\extern\win\paintlib\lib\release"
+				AdditionalLibraryDirectories=".\..\..\..\extern\win\paintlib\lib\release"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
