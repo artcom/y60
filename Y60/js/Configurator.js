@@ -190,14 +190,14 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
     var _myCurrentSection   = null;
     var _myCurrentSetting   = null;
     var _myListeners        = [];
-
     if (fileExists(theSettingsFile)) {
-        Logger.info("Parsing settings from '" + theSettingsFile + "'");
+        print("Parsing settings from '" + theSettingsFile + "'");
         var mySettingsDom = new Node();
         mySettingsDom.parseFile(theSettingsFile);
         _mySettings = mySettingsDom.firstChild;
         var myHostSettingsFile = "settings-" + hostname() + ".xml";
         if (fileExists(myHostSettingsFile)) {
+            print("Merging settings with '" + myHostSettingsFile + "'");
             mergeHostSpecificSettings(myHostSettingsFile);
         }
 
@@ -367,7 +367,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             var myCommonNode = theCommonSection.childNode(myHostNode.nodeName);
             if (myCommonNode) {
                 // Replace common node with host specific node
-                theCommonSection.replaceChild(myHostNode, myCommonNode);
+                theCommonSection.replaceChild(myHostNode.cloneNode(true), myCommonNode);
             } else {
                 // Add node to config if it does not exits there
                 theCommonSection.appendChild(myHostNode.cloneNode(true));

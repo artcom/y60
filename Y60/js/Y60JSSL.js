@@ -662,6 +662,12 @@ function randomElement(theArray) {
     return theArray[Math.floor(randomBetween(0, theArray.length-0.000001))];
 }
 
+var _ourLastRandomNumber_ = 0;
+function deterministicRandom() {
+    _ourLastRandomNumber_ = (1277 * _ourLastRandomNumber_ + 1) % 131072;
+    return _ourLastRandomNumber_ / 131071;
+}
+
 function removeElement(theArray, theIndex) {
     return theArray.slice(0, theIndex).concat(theArray.slice(theIndex + 1, theArray.length));
 }
@@ -676,4 +682,5 @@ function getFrustumFrame(theFrustum, theDepth) {
     myFrame.bottom = theDepth * theFrustum.bottom / theFrustum.near;
     return myFrame;
 }
+
 
