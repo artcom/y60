@@ -121,7 +121,7 @@ jsval as_jsval(JSContext *cx, JSLineSegment::NativeValuePtr theLine);
 template <class NATIVE_LINE>
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("returns a string representation. e.g. '[[0,0,0],[100,100,100]]'");
     DOC_END;
     std::string myStringRep = asl::as_string(JSGenericLine<NATIVE_LINE>::getJSWrapper(cx,obj).getNative());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -223,7 +223,12 @@ JSGenericLine<asl::LineSegment<LineNumber> >::setPropertySwitch(unsigned long th
 template <class NATIVE_LINE>
 JSBool
 JSGenericLine<NATIVE_LINE>::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Construct a Line / LineSegment / Ray");
+    DOC_PARAM("thePointA", "A point through the Line. The start point of the Ray / LineSegment.", DOC_TYPE_POINT3F);
+    DOC_PARAM("thePointB", "Another point through the Line / Ray. The end point of the LineSegment.", DOC_TYPE_POINT3F);
+    DOC_RESET;
+    DOC_PARAM("thePoint", "A point through the Line / The origin of the Ray.", DOC_TYPE_POINT3F);
+    DOC_PARAM("theDirection", "The direction vector of the Line / Ray.", DOC_TYPE_VECTOR3F);
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << std::endl);
     if (JSA_GetClass(cx,obj) != Base::Class()) {

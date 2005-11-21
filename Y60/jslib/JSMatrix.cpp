@@ -30,31 +30,38 @@ typedef asl::Matrix4<Number> NATIVE;
 
 static JSBool
 setRow(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("set a row of this matrix.");
+    DOC_PARAM("theIndex", "the index of the row to set", DOC_TYPE_INTEGER);
+    DOC_PARAM("theVector", "the values to set.", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::assignRow,cx,obj,argc,argv,rval);
 }
 static JSBool
 getRow(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("get a row vector from this matrix.");
+    DOC_PARAM("theIndex", "the index of the row to get", DOC_TYPE_INTEGER);
+    DOC_RVAL("a vector containing the row values",DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::getRow,cx,obj,argc,argv,rval);
 }
 static JSBool
 getColumn(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("get a column vector from this matrix.");
+    DOC_PARAM("theIndex", "the index of the column to get", DOC_TYPE_INTEGER);
+    DOC_RVAL("a vector containing the column values",DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::getColumn,cx,obj,argc,argv,rval);
 }
 static JSBool
 setColumn(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("get a column vector from this matrix.");
+    DOC_PARAM("theIndex", "the index of the column to get", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::assignColumn,cx,obj,argc,argv,rval);
 }
 static JSBool
 makeIdentity(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Makes this a 4x4 identity matrix.");
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::makeIdentity,cx,obj,argc,argv,rval);
 }
@@ -100,14 +107,16 @@ return Method<NATIVE>::call(&NATIVE::makeRotating,cx,obj,argc,argv,rval);
 */
 static JSBool
 makeScaling(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Replace this Matrix with a scaling matrix (diagonal matrix).");
+    DOC_PARAM("theScale", "the scaling factors for the XYZ axis", DOC_TYPE_VECTOR3F);
     DOC_END;
     //typedef dom::NodePtr (NATIVE::*MyMethod)(int);
     return Method<NATIVE>::call(&NATIVE::makeScaling,cx,obj,argc,argv,rval);
 }
 static JSBool
 makeTranslating(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Replace this Matrix with a translating matrix.");
+    DOC_PARAM("theTranslation", "the translating offsets for the XYZ axis.", DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::makeTranslating,cx,obj,argc,argv,rval);
 }
@@ -187,13 +196,15 @@ decompose(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 scale(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Scale this matrix.");
+    DOC_PARAM("theScale", "the scaling factors for the XYZ axis", DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::scale,cx,obj,argc,argv,rval);
 }
 static JSBool
 translate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Translate this matrix.");
+    DOC_PARAM("theTranslation", "the translating offsets for the XYZ axis.", DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::translate,cx,obj,argc,argv,rval);
 }
@@ -369,7 +380,12 @@ JSMatrix::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj,
 
 JSBool
 JSMatrix::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Construct a 4x4 floating point Matrix.");
+    DOC_PARAM("theNumbers","16 numbers defining the matrix (row major format)",DOC_TYPE_FLOAT);
+    DOC_RESET;
+    DOC_PARAM("theOriginalMatrix", "copy ctor.", DOC_TYPE_MATRIX4F);
+    DOC_RESET;
+    DOC_PARAM("theQuaternion", "creates a rotation Matrix from the Quaternion.", DOC_TYPE_QUATERNIONF);
     DOC_END;
     AC_DEBUG << "Constructor argc =" << argc << endl;
     if (JSA_GetClass(cx,obj) != Class()) {
