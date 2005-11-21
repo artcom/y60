@@ -106,6 +106,68 @@ append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+update(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    
+    try {
+
+        ensureParamCount(argc, 2);
+
+        acgtk::TNTMeasurementList * myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        dom::NodePtr myMeasurementNode;
+        if ( ! convertFrom(cx, argv[0], myMeasurementNode)) {
+            JS_ReportError(cx, "TNTMeasurementList::update(): Argument 0 must be a xml node.");
+            return JS_FALSE;
+        }
+
+        Glib::ustring myDisplayValue;
+        if ( ! convertFrom(cx, argv[1], myDisplayValue)) {
+            JS_ReportError(cx, "TNTMeasurementList::update(): Argument 1 must be a string.");
+            return JS_FALSE;
+        }
+
+        Ptr<Gtk::TreeIter> myIt = Ptr<Gtk::TreeIter>( new Gtk::TreeIter(
+                            myNative->update(myMeasurementNode, myDisplayValue)));
+        *rval = as_jsval(cx, myIt, &(*myIt));
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+remove(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    
+    try {
+
+        ensureParamCount(argc, 1);
+
+        acgtk::TNTMeasurementList * myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        dom::NodePtr myMeasurementNode;
+        if ( ! convertFrom(cx, argv[0], myMeasurementNode)) {
+            JS_ReportError(cx, "TNTMeasurementList::update(): Argument 0 must be a xml node.");
+            return JS_FALSE;
+        }
+
+        //myNative->remove(myMeasurementNode);
+        Ptr<Gtk::TreeIter> myIt = Ptr<Gtk::TreeIter>( new Gtk::TreeIter(
+                            myNative->remove(myMeasurementNode)));
+        if (myNative->isEndIter(*myIt)) {
+            *rval = JSVAL_NULL;
+        } else {
+            *rval = as_jsval(cx, myIt, &(*myIt));
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -130,6 +192,8 @@ JSTNTMeasurementList::Functions() {
         {"toString",                 toString,                 0},
         {"registerTypeIcon",         registerTypeIcon,         2},
         {"append",                   append,                   2},
+        {"update",                   update,                   2},
+        {"remove",                   remove,                   1},
         {"clear",                    clear,                    0},
         {0}
     };

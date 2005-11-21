@@ -212,4 +212,53 @@ TNTMeasurementList::onSortByType() {
     }
 }
 
+TNTMeasurementList::Children::iterator
+TNTMeasurementList::remove(dom::NodePtr theMeasurementNode) {
+    Children::iterator myIter = findRowById(theMeasurementNode->getAttributeString("id"));
+    Children::iterator myNext = _myListModel->erase(myIter);
+    if (myNext == _myListModel->children().end() && !_myListModel->children().empty()) {
+        myNext--;
+    }
+    return myNext;
+}
+
+bool
+TNTMeasurementList::isEndIter(const Gtk::TreeIter & theIter) {
+    return (theIter == _myListModel->children().end());
+}
+
+TNTMeasurementList::Children::iterator 
+TNTMeasurementList::findRowById(const Glib::ustring & theId) {
+    Children myChildren = _myListModel->children();
+    for(Children::iterator iter = myChildren.begin(); iter != myChildren.end(); ++iter) {
+        if ((*iter)[_myColumns.xml_id] == theId) {
+            return iter;
+        }
+    }
+    throw asl::Exception(std::string("Could not find matching row for id '") +
+        theId + "'.", PLUS_FILE_LINE);
+}
+
+Gtk::TreeIter 
+TNTMeasurementList::update(dom::NodePtr theMeasurementNode, const Glib::ustring & theDisplayValue) {    
+    Children::iterator myIter = findRowById(theMeasurementNode->getAttributeString("id"));
+    Gtk::TreeModel::Row myRow = *myIter;
+
+    std::string myType = theMeasurementNode->getAttributeString("type");
+    IconMap::iterator myIt = _myTypeIcons.find(myType);
+    if (myIt == _myTypeIcons.end()) {
+        throw asl::Exception(std::string("Could not find icon for type '") +
+                             myType + "'.", PLUS_FILE_LINE);
+    }
+    
+    myRow[_myColumns.is_visible] = theMeasurementNode->getAttribute("visible")->nodeValueRef<bool>();
+    myRow[_myColumns.type_icon] = myIt->second;
+    myRow[_myColumns.type] = myType;
+    myRow[_myColumns.name] = theMeasurementNode->getAttributeString("name");
+    myRow[_myColumns.value] = theDisplayValue;
+    myRow[_myColumns.is_editable] = theMeasurementNode->getAttribute("editable")->nodeValueRef<bool>();
+    myRow[_myColumns.xml_id] = theMeasurementNode->getAttributeString("id");
+    return myIter;
+}
+
 } // end of namespace

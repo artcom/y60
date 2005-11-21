@@ -55,7 +55,7 @@ append_text(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 
         Gtk::ComboBoxText * mySelf = 0;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
-        string myLabel;
+        Glib::ustring myLabel;
         convertFrom(cx, argv[0], myLabel);
         mySelf->append_text(myLabel);
 

@@ -37,6 +37,18 @@ class TNTMeasurementList : public Gtk::TreeView {
          */
         Gtk::TreeIter append(dom::NodePtr theMeasurementNode, const Glib::ustring & theDisplayValue);
 
+        /** Removes the row correspondig to @p theMeasurementNode
+         */
+        Gtk::TreeIter 
+        remove(dom::NodePtr theMeasurementNode);
+
+        bool isEndIter(const Gtk::TreeIter & theIter);
+
+        /** Updates the row witht the id of @p theMeasurementNode with the data given by
+         *  @p theMeasurementNode  and @p theDisplayValue.
+         */
+        Gtk::TreeIter update(dom::NodePtr theMeasurementNode, const Glib::ustring & theDisplayValue);
+
         /** Clears the list. */
         void clear();
 
@@ -53,8 +65,12 @@ class TNTMeasurementList : public Gtk::TreeView {
             COL_XML_ID,
             COL_TYPE
         };
-            
+
     private:
+        typedef Gtk::TreeModel::Children Children; 
+        Children::iterator 
+        findRowById(const Glib::ustring & theId);
+
         class TNTMeasurementModelColumns : public Gtk::TreeModel::ColumnRecord {
             public:
                 TNTMeasurementModelColumns() {

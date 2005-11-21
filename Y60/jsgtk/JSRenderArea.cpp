@@ -141,7 +141,7 @@ JSRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
             } else {
                 AC_INFO << "Found unrealized Context";
             }
-        } 
+        }
     }
 
     if (!myShareList && myContextSet.size() > 0) {
