@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: ImageViewer.js,v $
-//   $Author: thomas $
-//   $Revision: 1.60 $
-//   $Date: 2005/04/26 12:05:00 $
-//
-//
-//=============================================================================
 
 if (__main__ == undefined) var __main__ = "ImageViewer";
 
@@ -26,9 +18,8 @@ use("Playlist.js");
 
 const MINZOOMFACTOR = 0.001;
 const FRAME_RATE    = 100;
-const LINUX = 0;
-const WINDOWS = 1;
-const OS = LINUX;
+const OS = operatingSystem();
+print(OS);
 
 function ImageViewerApp(theArguments) {
     this.Constructor(this, theArguments);
@@ -300,30 +291,30 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             print("plugged dshow");
         }
 
-        if (!_myMPEGPlugged && (myFilename.search(/\.mpg$/i)  != -1 ||
-                                myFilename.search(/\.m2v$/i)  != -1 ||
-                                myFilename.search(/\.mpeg$/i) != -1
-                                //myFilename.search(/\.ra$/i)   != -1 ||
-                                /*|| myFilename.search(/\.mov$/i)  != -1)*/
+        if (!_myMPEGPlugged && (myFilename.search(/\.mpg$/i)  != -1
+                                || myFilename.search(/\.m2v$/i)  != -1
+                                || myFilename.search(/\.mpeg$/i) != -1
+                                /* || myFilename.search(/\.ra$/i)   != -1 */
                                 )) {
             plug("y60FFMpegDecoder");
             print("plugged ffmpegdecoder");
             _myMPEGPlugged = true;
         }
         if ( myFilename.search(/\.mov$/i) != -1) {
-            if (OS == LINUX && !_myMPEGPlugged) {
+            if (OS == "Linux" && !_myMPEGPlugged) {
                 plug("y60FFMpegDecoder");
                 _myMPEGPlugged = true;
                 print("y60FFMpegDecoder")
-            } else if (OS == WINDOWS && !_myQTPlugged){
+            } else if (OS == "Win32" && !_myQTPlugged){
                 plug("y60QuicktimeDecoder");
                 _myQTPlugged = true;
                 print("y60QuicktimeDecoder")
             }
         }
-        if (!_myWMVPlugged && myFilename.search(/\.wmv$/i) != -1) {
+        if (!_myWMVPlugged &&
+            (myFilename.search(/\.wmv$/i) != -1 ||
+             myFilename.search(/\.avi$/i) != -1)) {
             plug("y60WMVDecoder");
-            //print("wmv");
             _myWMVPlugged = true;
         }
         if (!_myWMAPlugged &&
@@ -334,7 +325,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
              myFilename.search(/^http:\/\//i) != -1))
              // default wma fallback: i.e. http://server/dir/
         {
-            //print("wma");
             plug("y60WMADecoder");
             _myWMAPlugged = true;
         }

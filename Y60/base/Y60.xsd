@@ -1386,18 +1386,17 @@ cutoff (float)      Value that specifies the maximum spread angle of a light sou
 
 exponent (float)    Value that specifies the intensity distribution of the light.
                     Only values in the range [0,128] are accepted.
-					Effective light intensity is attenuated by the cosine of the angle between the direction of the light and
-					the direction from the light to the vertex being lighted, raised to the power of the spot exponent. Thus,
-					higher spot exponents result in a more focused light source, regardless of the spot cutoff angle.
-					The initial spot exponent is 0, resulting in uniform light distribution.
+                    Effective light intensity is attenuated by the cosine of the angle between the direction of the light and
+                    the direction from the light to the vertex being lighted, raised to the power of the spot exponent. Thus,
+                    higher spot exponents result in a more focused light source, regardless of the spot cutoff angle.
+                    The initial spot exponent is 0, resulting in uniform light distribution.
                         </xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
             <xs:attribute name="id" type="xs:ID">
                 <xs:annotation>
-                    <xs:documentation>Unique id for this ligthsource.
-Usually 'ls' plus a number, such as 'ls0'.</xs:documentation>
+                    <xs:documentation>Unique id for this lightsource.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="name" type="xs:string">

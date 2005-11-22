@@ -1,18 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003 ART+COM AG Berlin
+// Copyright (C) 2003-2005 ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//    $RCSfile: Renderer.cpp,v $
-//     $Author: jens $
-//   $Revision: 1.143 $
-//       $Date: 2005/04/26 19:55:58 $
-//
 //=============================================================================
 
 #ifdef WIN32
@@ -1161,7 +1154,7 @@ namespace y60 {
         glLightfv(gl_lightid, GL_POSITION, &(*myGLLightPos.begin()));
         glLightfv(gl_lightid, GL_AMBIENT,  myLightPropFacade->get<LightAmbientTag>().begin());
         glLightfv(gl_lightid, GL_DIFFUSE,  myLightPropFacade->get<LightDiffuseTag>().begin());
-		glLightfv(gl_lightid, GL_SPECULAR, myLightPropFacade->get<LightSpecularTag>().begin());
+        glLightfv(gl_lightid, GL_SPECULAR, myLightPropFacade->get<LightSpecularTag>().begin());
         glEnable(gl_lightid);
     }
 

@@ -35,6 +35,7 @@ namespace y60 {
     DEFINE_EXCEPTION(WindowsMediaException, asl::Exception);
 
     const std::string MIME_TYPE_WMV = "application/wmv";
+    const std::string MIME_TYPE_AVI = "application/avi";
 
     /**
      * @ingroup Y60componentsWMVDecoder

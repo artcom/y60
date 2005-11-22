@@ -129,8 +129,11 @@ namespace y60 {
 
     std::string
     WMVDecoder::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
-        if (asl::toLowerCase(asl::getExtension(theUrl)) == "wmv") {
+        const std::string myExtension = asl::toLowerCase(asl::getExtension(theUrl));
+        if (myExtension == "wmv") {
             return MIME_TYPE_WMV;
+        } else if (myExtension == "avi") {
+            return MIME_TYPE_AVI;
         } else {
             return "";
         }
@@ -196,7 +199,6 @@ namespace y60 {
 #endif
         setupVideoAndAudio(theUrl);
         AC_DEBUG << "+++ Open succeeded url=" << theUrl;
-
     }
 
     double
@@ -953,7 +955,7 @@ namespace y60 {
             {
                 AC_ERROR << "Not enough core";
                 hr = E_OUTOFMEMORY;
-            }
+           }
 
             hr = pProps->GetMediaType( pNativeType, &cbFormat );
             if( hr != S_OK )

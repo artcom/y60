@@ -60,7 +60,7 @@ MaterialExporter::getColor(BaseChannel * theColorChannel, Vector4f & theColor) {
 ExportedMaterialInfo
 MaterialExporter::createDefaultMaterial() {
     if (_myDefaultMaterialInfo._myMaterialName == "") {
-        _myDefaultMaterialBuilder = MaterialBuilderPtr (new y60::MaterialBuilder("default_material"));        
+        _myDefaultMaterialBuilder = MaterialBuilderPtr (new y60::MaterialBuilder("default_material"));
         _myDefaultMaterialInfo._myMaterialId = _mySceneBuilder->appendMaterial(*_myDefaultMaterialBuilder);
         _myDefaultMaterialInfo._myMaterialName = "default_material";
         _myDefaultMaterialInfo._myTextureCount = 0;
@@ -81,9 +81,9 @@ MaterialExporter::createDefaultMaterial() {
 }
 
 bool
-MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr theMaterialBuilder, 
-                                y60::SceneBuilder & theSceneBuilder,BaseContainer * theContainer, 
-                                const std::string & theUsage, TextureTag * theTextureTag, 
+MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr theMaterialBuilder,
+                                y60::SceneBuilder & theSceneBuilder,BaseContainer * theContainer,
+                                const std::string & theUsage, TextureTag * theTextureTag,
                                 const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord,
 								bool isAlphaChannel)
 {
@@ -97,7 +97,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
     std::string myApplyMode = y60::TEXTURE_APPLY_DECAL;
 
     if (theUsage == y60::TEXTURE_USAGE_BUMP) {
-        myApplyMode = y60::TEXTURE_APPLY_DECAL;    
+        myApplyMode = y60::TEXTURE_APPLY_DECAL;
     } else {
         LONG myMixMode = theContainer->GetReal(BASECHANNEL_MIXMODE_EX);
         switch (myMixMode) {
@@ -123,7 +123,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
 
 
     String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
-    
+
     std::string myTextureFilename = getTexturePath(_myDocumentPath, myTextureName);
     Real myAlpha = theContainer->GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
 
@@ -150,7 +150,7 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
                 break;
         }
 #endif
-        myImageId = theMaterialBuilder->createMovie(theSceneBuilder, getString(myTextureName), myTextureFilename, 
+        myImageId = theMaterialBuilder->createMovie(theSceneBuilder, getString(myTextureName), myTextureFilename,
 			                                        myLoopCount, myInternalFormat);
     } else {
 		if ( isAlphaChannel) {
@@ -171,18 +171,18 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
     LONG myCinemaxTexCoordMode = myData.GetLong();
     std::string myTextureMappingMode(TexCoordMappingStrings[myCinemaxTexCoordMode]);
     if (myCinemaxTexCoordMode > PERSPECTIVE_PROJECTION ||
-        myCinemaxTexCoordMode == SPATIAL_PROJECTION || 
-        myCinemaxTexCoordMode == SHRINKMAP_PROJECTION || 
+        myCinemaxTexCoordMode == SPATIAL_PROJECTION ||
+        myCinemaxTexCoordMode == SHRINKMAP_PROJECTION ||
         myCinemaxTexCoordMode == PERSPECTIVE_PROJECTION) {
-            displayMessage(std::string("Mapping not supported: ") + myTextureMappingMode + 
+            displayMessage(std::string("Mapping not supported: ") + myTextureMappingMode +
                                        " for texture: " + getString(myTextureName));
-            /*throw ExportException(std::string("Mapping not supported: ") + getString(myTextureMappingMode) + 
+            /*throw ExportException(std::string("Mapping not supported: ") + getString(myTextureMappingMode) +
                                        " for texture" + getString(myTextureName), PLUS_FILE_LINE);*/
     }
 
 
     GePrint(string(string("texture mapping: ") + myTextureMappingMode).c_str());
-    
+
     // export texturematrix
     Matrix4f myTextureMatrix;
     myTextureMatrix.makeIdentity();
@@ -199,68 +199,68 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
         myObjectSize[0] = myObjectSize[0] == 0 ? 1 : myObjectSize[0];
         myObjectSize[1] = myObjectSize[1] == 0 ? 1 : myObjectSize[1];
         myObjectSize[2] = myObjectSize[2] == 0 ? 1 : myObjectSize[2];
-        
+
         asl::Vector3f myObjScale;
         myObjScale[0] =  1.0 / myObjectSize[0];
         myObjScale[1] = -1.0 / myObjectSize[1]; //Cinema 4D left-handed coord system
         myObjScale[2] =  1.0 / myObjectSize[2];
-        
+
         asl::Vector3f myObjOffset;
         myObjOffset[0] = -0.5;
-        myObjOffset[1] = -0.5; 
+        myObjOffset[1] = -0.5;
         myObjOffset[2] = -0.5;
 
         myNormalizeObjectCoordsMatrix.setScale(myObjScale);
         myNormalizeObjectCoordsMatrix.setTranslation(myObjOffset);
-        
+
         // scaling
         Vector myScale = theTextureTag->GetScale();
-        
+
         asl::Matrix4f myScaleMatrix;
         myScaleMatrix.makeIdentity();
         myScaleMatrix.setScale(Vector3f( 0.5*float(myObjectSize[0] / myScale.x),
                                          0.5*float(myObjectSize[1] / myScale.y),
                                          0.5*float(myObjectSize[2] / myScale.z) ));
 
-        
+
         //translating
         Vector myPos = theTextureTag->GetPos();
 
         asl::Matrix4f myPosMatrix;
         myPosMatrix.makeIdentity();
-        myPosMatrix.setTranslation(Vector3f(-float(myPos.x), 
-                                            -float(myPos.y), 
+        myPosMatrix.setTranslation(Vector3f(-float(myPos.x),
+                                            -float(myPos.y),
                                              float(myPos.z) ));
 
         //rotating
         Vector myRotation = theTextureTag->GetRot();
-        
+
         asl::Matrix4f myPrePivot, myPostPivot, myRotMatrix;
-        
+
         myPrePivot.makeIdentity();
         myPrePivot.setTranslation(Vector3f(0.5,0.5,0.5));
-        
+
         myPostPivot.makeIdentity();
         myPostPivot.setTranslation(Vector3f(-0.5,-0.5,-0.5));
 
         myRotMatrix.makeIdentity();
-        
+
         myRotMatrix.postMultiply(myPrePivot);
-        myRotMatrix.rotateY(-myRotation.x); 
-        myRotMatrix.rotateX(-myRotation.y); 
+        myRotMatrix.rotateY(-myRotation.x);
+        myRotMatrix.rotateX(-myRotation.y);
         myRotMatrix.rotateZ(myRotation.z);
         myRotMatrix.postMultiply(myPostPivot);
 
-        
+
         /*
-        GePrint("pos: " + RealToString(myPos.x) + " , " 
+        GePrint("pos: " + RealToString(myPos.x) + " , "
                 + RealToString(myPos.y) + " , " + RealToString(myPos.z));
-        GePrint("scale: " + RealToString(myScale.x) + " , " 
+        GePrint("scale: " + RealToString(myScale.x) + " , "
                 + RealToString(myScale.y) + " , " + RealToString(myScale.z));
-        GePrint("rot: " + RealToString(myRotation.x) + " , " 
+        GePrint("rot: " + RealToString(myRotation.x) + " , "
                 + RealToString(myRotation.y) + " , " + RealToString(myRotation.z));
         */
-        
+
         // 2. apply operations
         myTexGenMatrix.postMultiply(myPosMatrix);
         myTexGenMatrix.postMultiply(myRotMatrix);
@@ -279,23 +279,23 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
 
     }
     std::string myWrapMode = TEXTURE_WRAP_REPEAT; // TODO: extract wrap mode
-    theMaterialBuilder->createTextureNode(myImageId, myApplyMode, theUsage, myWrapMode, 
+    theMaterialBuilder->createTextureNode(myImageId, myApplyMode, theUsage, myWrapMode,
                                           myTextureMappingMode, myTextureMatrix, 100, false, 0.0);
     return myDiffuseColorFlag;
 }
 
 bool
-MaterialExporter::exportShader(PluginShader * theShader, 
-                             y60::MaterialBuilderPtr theMaterialBuilder, 
-                             Material* theMaterial, 
+MaterialExporter::exportShader(PluginShader * theShader,
+                             y60::MaterialBuilderPtr theMaterialBuilder,
+                             Material* theMaterial,
                              y60::SceneBuilder & theSceneBuilder,
                              BaseContainer * theColorContainer,
-                             TextureTag * theTextureTag, 
+                             TextureTag * theTextureTag,
                              const asl::Vector3f & theMinCoord,
                              const asl::Vector3f & theMaxCoord,
 							 bool isAlphaChannel) {
     // iterate over all shaders of the material
-    // supported shaders are: 
+    // supported shaders are:
     //                       Layer (multitexture) Sorry, attributes are not available via api, dismissed
     //                       Bitmap(single texture)
     bool myDiffuseColorFlag = false;
@@ -303,8 +303,8 @@ MaterialExporter::exportShader(PluginShader * theShader,
         LONG myShaderType = theShader->GetType();
         switch (myShaderType) {
             /*case Xlayer: {
-                    GePrint("Material has a layered shader, name:" +  
-                            theShader->GetName() + " with id: " + 
+                    GePrint("Material has a layered shader, name:" +
+                            theShader->GetName() + " with id: " +
                             LongToString(theShader->GetType()) );
                     PluginShader * myDownShader = theShader->GetDown();
                     myDiffuseColorFlag |= exportShader(myDownShader, theMaterialBuilder,
@@ -313,11 +313,11 @@ MaterialExporter::exportShader(PluginShader * theShader,
                 }
                 break;*/
             case Xbitmap:{
-                    BaseContainer *  myColorContainer = theColorContainer ? 
+                    BaseContainer *  myColorContainer = theColorContainer ?
                                                theColorContainer : theShader->GetDataInstance();
                     myDiffuseColorFlag = exportTexture(theMaterial,
-													theMaterialBuilder, 
-                                                    theSceneBuilder, myColorContainer, 
+													theMaterialBuilder,
+                                                    theSceneBuilder, myColorContainer,
                                                     y60::TEXTURE_USAGE_PAINT,
                                                     theTextureTag,
                                                     theMinCoord,
@@ -334,7 +334,7 @@ MaterialExporter::exportShader(PluginShader * theShader,
                 GePrint("Ignoring Shader: " + theShader->GetName());
                 break;
             default:
-                throw ExportException(std::string("Unsupported shader: ") + 
+                throw ExportException(std::string("Unsupported shader: ") +
                                       getString(theShader->GetName()),
                                       "MaterialExporter::writeMaterial()");
 
@@ -344,16 +344,16 @@ MaterialExporter::exportShader(PluginShader * theShader,
     return myDiffuseColorFlag;
 }
 
-ExportedMaterialInfo  
+ExportedMaterialInfo
 MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureList,
                                  y60::SceneBuilder & theSceneBuilder) {
     ExportedMaterialInfo myExportedMaterialInfo;
     unsigned myCinemaTexturesCount = theTextureList.size();
     if (theNode == 0 ||  myCinemaTexturesCount == 0) {
         return createDefaultMaterial();
-    } 
+    }
 
-    // concatenate material name and collect cinemax materials 
+    // concatenate material name and collect cinemax materials
     _myMaterials.clear();
     std::string myY60MaterialName("");
     for (int myTextureIndex = 0; myTextureIndex < theTextureList.size(); myTextureIndex++) {
@@ -382,7 +382,7 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
 
     // count y60 textures that need uvmaps
     for (int myMaterialIndex = 0; myMaterialIndex < _myMaterials.size(); myMaterialIndex++) {
-        Material * myMaterial = _myMaterials[myMaterialIndex]._myMaterial; 
+        Material * myMaterial = _myMaterials[myMaterialIndex]._myMaterial;
         TextureTag * myTextureTag = _myMaterials[myMaterialIndex]._myTextureTag;
           if (myMaterial->GetChannelState(CHANNEL_COLOR)) {
               BaseChannel * myColorChannel = myMaterial->GetChannel(CHANNEL_COLOR);
@@ -420,9 +420,9 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
     return myExportedMaterialInfo;
 }
 
-void 
-MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, BaseObject * theNode, 
-                                TextureList theTextureList, y60::SceneBuilder & theSceneBuilder, 
+void
+MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, BaseObject * theNode,
+                                TextureList theTextureList, y60::SceneBuilder & theSceneBuilder,
                                 const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord)
 {
     if (theNode == 0) {
@@ -443,9 +443,9 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 //        myExportedMaterialInfo._myMaterialId = _mySceneBuilder->appendMaterial(*myMaterialBuilder);
         VectorOfRankedFeature myLightingRequirements;
         bool myMaterialAlphaFlag = false;
-        
+
         for (int myMaterialIndex = 0; myMaterialIndex < _myMaterials.size(); myMaterialIndex++) {
-            Material * myMaterial = _myMaterials[myMaterialIndex]._myMaterial; 
+            Material * myMaterial = _myMaterials[myMaterialIndex]._myMaterial;
             TextureTag * myTextureTag = _myMaterials[myMaterialIndex]._myTextureTag;
 
             y60::LightingModel myLightingType = y60::LAMBERT;
@@ -473,7 +473,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                         setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::AMBIENT_PROPERTY, myAmbientColor);
 
                     } else {
-                        myDiffuseColorFlag = exportShader(myShader, _myMaterialBuilder, 
+                        myDiffuseColorFlag = exportShader(myShader, _myMaterialBuilder,
                                                           myMaterial,theSceneBuilder,
                                                           &myColorContainer, myTextureTag,
                                                           theMinCoord, theMaxCoord, false);
@@ -520,7 +520,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     //myEmissiveColor[0] *= myBrightness;
                     //myEmissiveColor[1] *= myBrightness;
                     //myEmissiveColor[2] *= myBrightness;
-                    setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::EMISSIVE_PROPERTY, myEmissiveColor);                    
+                    setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::EMISSIVE_PROPERTY, myEmissiveColor);
 
                 }
             }
@@ -545,9 +545,9 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
             Vector4f mySpecularColor(0, 0, 0, 1);
             bool foundSpecularColor = false;
             if (myMaterial->GetChannelState(CHANNEL_SPECULARCOLOR)) {
-                  BaseChannel * mySpecularColorChannel = myMaterial->GetChannel(CHANNEL_SPECULARCOLOR);
-                  if (mySpecularColorChannel) {
-                       myLightingType = y60::PHONG;
+                BaseChannel * mySpecularColorChannel = myMaterial->GetChannel(CHANNEL_SPECULARCOLOR);
+                if (mySpecularColorChannel) {
+                    myLightingType = y60::PHONG;
                     getColor(mySpecularColorChannel, mySpecularColor);
                     foundSpecularColor = true;
                 }
@@ -623,9 +623,9 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
     }
 }
 
-void 
-MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, BaseObject * theNode, 
-                                y60::SceneBuilder & theSceneBuilder, 
+void
+MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, BaseObject * theNode,
+                                y60::SceneBuilder & theSceneBuilder,
                                 const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord)
 {
     TextureTag * myTextureTag = 0;
