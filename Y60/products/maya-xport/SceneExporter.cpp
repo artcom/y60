@@ -212,7 +212,7 @@ SceneExporter::writer(const MFileObject& theFile,
                 myDocument.appendChild(mySceneBuilder.getNode());
                 myDocument.binarize(myBlock);
 #ifdef USE_MEM_COLLECT_BLOCK_OUT
-                if (!asl::putWholeFile(myFileName.asChar(), myBlock)) {
+                if (!asl::writeWholeFile(myFileName.asChar(), myBlock)) {
                     throw IOError(std::string("Could not write binary file '") + myFileName.asChar() + "'", "SceneExporter::writer()");
                 }
 #endif

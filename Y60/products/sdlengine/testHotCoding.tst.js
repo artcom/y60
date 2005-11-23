@@ -32,15 +32,15 @@ HotCodingUnitTest.prototype.Constructor = function(obj, theName) {
     obj.run = function() {
         obj.myModuleName = "TemporaryTestModule.js";
         obj.myModule = "function calculateSum(a,b) { return a+b; };";
-        ENSURE("putWholeStringToFile(obj.myModuleName, obj.myModule) == true");;
+        ENSURE("writeWholeStringToFile(obj.myModuleName, obj.myModule) == true");;
         ENSURE("fileExists(obj.myModuleName)");
-        ENSURE("getWholeFileAsString(obj.myModuleName) == obj.myModule");
+        ENSURE("readWholeFileAsString(obj.myModuleName) == obj.myModule");
         use(obj.myModuleName);
         ENSURE("calculateSum(1,2) == 3");
 
         obj.myModule = "function calculateSum(a,b) { return a+b + 1; };";
-        putWholeStringToFile(obj.myModuleName, obj.myModule);
-        ENSURE("getWholeFileAsString(obj.myModuleName) == obj.myModule");
+        writeWholeStringToFile(obj.myModuleName, obj.myModule);
+        ENSURE("readWholeFileAsString(obj.myModuleName) == obj.myModule");
         reuse();
         ENSURE("calculateSum(1,2) == 4");
         ENSURE("deleteFile(obj.myModuleName) == true");

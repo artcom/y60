@@ -251,7 +251,7 @@ function writeHTML(theFileName, theString) {
         createDirectory(myDir);
     }
 
-    if (!putWholeStringToFile(myPath, myString)) {
+    if (!writeWholeStringToFile(myPath, myString)) {
         throw new Exception("Could not write file: " + myPath, fileline());
     }
 }
@@ -375,7 +375,7 @@ function createStyleSheet() {
     myString += ".y60class { color: #FF8000 }\n"
 
     var myPath = ourDirectory + "/jsdoc.css";
-    if (!putWholeStringToFile(myPath, myString)) {
+    if (!writeWholeStringToFile(myPath, myString)) {
         throw new Exception("Could not write file: " + myPath, fileline());
     }
 }
@@ -422,7 +422,7 @@ function createTutorials() {
         var myDotIndex = myTutorial.lastIndexOf(".");
         if (myDotIndex != -1 && myTutorial.substring(myDotIndex, myTutorial.length) == ".js") {
             var myHtmlFileName = myTutorial.substr(0, myDotIndex) + ".html";
-            var myFile = getWholeFileAsString(myTutorial);
+            var myFile = readWholeFileAsString(myTutorial);
             var myTitle = myTutorial;
             var myTutorialExplanation = "";
             var myTutorialCode = "";

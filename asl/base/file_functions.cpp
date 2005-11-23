@@ -195,7 +195,7 @@ namespace asl {
 
 /// read a complete file into a string
 
-    bool getWholeFile(const std::string & theFileName, std::string & theContent) {
+    bool readWholeFile(const std::string & theFileName, std::string & theContent) {
         std::ifstream inFile(theFileName.c_str(), std::ios::binary);
         if (inFile) {
             std::vector<char> myBuffer(65536);
@@ -217,7 +217,7 @@ namespace asl {
         }
     }
 
-    bool getWholeFile(const std::string & theFileName, asl::ResizeableBlock & theContent) {
+    bool readWholeFile(const std::string & theFileName, asl::ResizeableBlock & theContent) {
         const int myChunksize = 65536;
         unsigned long myFileSize = getFileSize(theFileName);
         theContent.resize(myFileSize);
@@ -241,15 +241,15 @@ namespace asl {
         return true;
     }
 
-    std::string getWholeFile(const std::string & theFileName) {
+    std::string readWholeFile(const std::string & theFileName) {
         std::string myResult;
-        if (!getWholeFile(theFileName,myResult)) {
+        if (!readWholeFile(theFileName,myResult)) {
             myResult.resize(0);
         };
         return myResult;
     };
 
-    bool putWholeFile(const std::string & theFileName, const std::string & theContent) {
+    bool writeWholeFile(const std::string & theFileName, const std::string & theContent) {
         std::ofstream outFile(theFileName.c_str(), std::ios::binary);
         if (outFile) {
             outFile << theContent;
@@ -258,7 +258,7 @@ namespace asl {
         return false;
     }
 
-    bool putWholeFile(const std::string & theFileName, const asl::ReadableBlock & theContent) {
+    bool writeWholeFile(const std::string & theFileName, const asl::ReadableBlock & theContent) {
         std::ofstream outFile(theFileName.c_str(), std::ios::binary);
         if (outFile) {
             outFile.write(theContent.strbegin(),theContent.size());

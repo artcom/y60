@@ -151,7 +151,7 @@ namespace asl {
 #endif
 #ifdef LINUX
         static string pid = asl::as_string(getpid());
-        static string procstat = asl::getWholeFile(string("/proc/")+pid+"/stat");
+        static string procstat = asl::readWholeFile(string("/proc/")+pid+"/stat");
         appname = procstat.substr(procstat.find('(')+1,procstat.find(')')-procstat.find('(')-1);
 #endif
 #ifdef OSX

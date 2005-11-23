@@ -2800,7 +2800,7 @@ _ready:     mov         a, edi
         for (int i = 0; i < theFiles.size(); ++i) {
             std::cerr << "analyze: reading file '"<<theFiles[i]<<std::endl;
             std::string myFileText;
-            if (asl::getWholeFile(theFiles[i], myFileText)) {
+            if (asl::readWholeFile(theFiles[i], myFileText)) {
                 std::cerr << "analyze: analyzing file '"<<theFiles[i]<<"'"<<std::endl;
                 if (!analyze(myFileText)) {
                     return false;

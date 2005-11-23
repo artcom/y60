@@ -63,9 +63,9 @@ public:
 		perform_putget(testFileName, largeTestContent); 
 	}
 	void perform_putget(const string & testFileName, const asl::ReadableBlock & testContent) {
-		ENSURE(putWholeFile(testFileName,testContent));
+		ENSURE(writeWholeFile(testFileName,testContent));
 		asl::Block fromFile;
-		ENSURE(getWholeFile(testFileName,fromFile));
+		ENSURE(readWholeFile(testFileName,fromFile));
 		ENSURE(fromFile == testContent);  
 		ENSURE(fileExists(testFileName));
 		ENSURE(getFileSize(testFileName) == testContent.size());
@@ -82,7 +82,7 @@ public:
 		string otherTestFileName = std::string("WRB1-") + testFileName;
 		asl::Block otherContent;
 		{
-			ENSURE(putWholeFile(otherTestFileName,testContent));
+			ENSURE(writeWholeFile(otherTestFileName,testContent));
 			WriteableMappedBlock myWriteableBlock(otherTestFileName);
 			ENSURE(testContent == myWriteableBlock);
 			otherContent.resize(testContent.size());
@@ -93,7 +93,7 @@ public:
 			ENSURE(testContent.size()==0 || testContent != myWriteableBlock); 
 		}
 		asl::Block fromMappedFile;
-		ENSURE(getWholeFile(otherTestFileName,fromMappedFile));
+		ENSURE(readWholeFile(otherTestFileName,fromMappedFile));
 		ENSURE(fromMappedFile == otherContent);  
 
         asl::deleteFile(testFileName);
@@ -270,7 +270,7 @@ public:
         DPRINT(totalSize);
         DPRINT(getFileSize(testFileName));
         ENSURE(getFileSize(testFileName) == totalSize);   
-        ENSURE(getWholeFile(testFileName) == myData1+myData2);
+        ENSURE(readWholeFile(testFileName) == myData1+myData2);
     }
 };
 

@@ -29,7 +29,7 @@ using namespace asl;
 namespace jslib {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
-GetWholeFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+ReadWholeFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Loads a text file into a string using the package manager");
     DOC_PARAM("theRelativeFilename", "", DOC_TYPE_STRING);
     DOC_PARAM("thePackagePath", "", DOC_TYPE_STRING);
@@ -39,7 +39,7 @@ GetWholeFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         string myFilename;
         string myPackage;
         if ( ! convertFrom(cx, argv[0], myFilename)) {
-            JS_ReportError(cx, "getWholeFile(): argument #1 must be a string (relative filename)");
+            JS_ReportError(cx, "readWholeFile(): argument #1 must be a string (relative filename)");
             return JS_FALSE;
         }
         Ptr<ReadableBlock> myBlock;
@@ -47,7 +47,7 @@ GetWholeFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             myBlock = JSApp::getPackageManager()->openFile(myFilename);
         } else {
             if ( ! convertFrom(cx, argv[1], myPackage)) {
-                JS_ReportError(cx, "getWholeFile(): argument #2 must be a string (package path)");
+                JS_ReportError(cx, "readWholeFile(): argument #2 must be a string (package path)");
                 return JS_FALSE;
             }
             myBlock = JSApp::getPackageManager()->openFile(myFilename, myPackage);
@@ -111,7 +111,7 @@ DeleteFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
-PutWholeStringToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+WriteWholeStringToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Writes a given string into a file");
     DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_PARAM("theString", "", DOC_TYPE_STRING);
@@ -123,13 +123,13 @@ PutWholeStringToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         convertFrom(cx, argv[0], myPath);
         std::string myContent;
         convertFrom(cx, argv[1], myContent);
-        *rval = as_jsval(cx, asl::putWholeFile(myPath, myContent));
+        *rval = as_jsval(cx, asl::writeWholeFile(myPath, myContent));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
-PutWholeBlockToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+WriteWholeBlockToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Writes a given binary block into a file");
     DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
     DOC_PARAM("theBlock", "", DOC_TYPE_BLOCK);
@@ -141,7 +141,7 @@ PutWholeBlockToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
         convertFrom(cx, argv[0], myPath);
         asl::Block * myContent = 0;
         convertFrom(cx, argv[1], myContent);
-        *rval = as_jsval(cx, asl::putWholeFile(myPath, *myContent));
+        *rval = as_jsval(cx, asl::writeWholeFile(myPath, *myContent));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -298,7 +298,7 @@ and returns all files in theRelativePath. If theRelativePath is a file it return
     } HANDLE_CPP_EXCEPTION;
 }
 JS_STATIC_DLL_CALLBACK(JSBool)
-GetWholeFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+ReadWholeFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages and open the file located at theRelativePath if found.");
     DOC_PARAM("theRelativePath", "The path to the file requested. It is relative and must be defined inside a package.", DOC_TYPE_STRING);
     DOC_PARAM("thePackageName", "The name of a package, Package names are stored just as you enter them by calling includePath.", DOC_TYPE_STRING);
@@ -337,10 +337,10 @@ GetWholeFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
 JSFunctionSpec *
 JSFileFunctions::Functions() {
     static JSFunctionSpec myFunctions[] = {
-        {"getWholeFileAsString",   GetWholeFileAsString,    1},
-        {"getWholeFileAsBlock",    GetWholeFileAsBlock,  1},
-        {"putWholeStringToFile",   PutWholeStringToFile, 2},
-        {"putWholeBlockToFile",    PutWholeStringToFile, 2},
+        {"readWholeFileAsString",   ReadWholeFileAsString,    1},
+        {"readWholeFileAsBlock",    ReadWholeFileAsBlock,  1},
+        {"writeWholeStringToFile",   WriteWholeStringToFile, 2},
+        {"writeWholeBlockToFile",    WriteWholeStringToFile, 2},
         {"getLastModified",        GetLastModified,   1},
         {"getFilenamePart",        GetFilenamePart,    1},
         {"getDirectoryPart",       GetDirectoryPart,     1},

@@ -93,7 +93,7 @@ void EventRecorder::setMode(Mode theMode, bool theDiscardFlag) {
 
 bool EventRecorder::load(const std::string & theFilename, bool theDiscardFlag) {
 
-    std::string myFile = asl::getWholeFile(theFilename);
+    std::string myFile = asl::readWholeFile(theFilename);
     if (myFile.empty()) {
         AC_ERROR << "Unable to open '" << theFilename << "'";
         return false;
@@ -153,7 +153,7 @@ void EventRecorder::save(const std::string & theFilename) const {
         myEventsNode->appendChild(myNode);
     }
 
-    asl::putWholeFile(theFilename, asl::as_string(*myEventsNode));
+    asl::writeWholeFile(theFilename, asl::as_string(*myEventsNode));
     AC_INFO << "Saved " << _myEvents.size() << " events to '" << theFilename << "'";
 }
 

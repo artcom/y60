@@ -89,11 +89,11 @@ class file_functions_UnitTest : public UnitTest {
             perform_putget_binary(testFileName,contentSize);
         }
         void perform_putget(const string & testFileName, const string & testContent) {
-            ENSURE(putWholeFile(testFileName,testContent));
+            ENSURE(writeWholeFile(testFileName,testContent));
             string fromFile;
-            ENSURE(getWholeFile(testFileName,fromFile));
+            ENSURE(readWholeFile(testFileName,fromFile));
             ENSURE(fromFile == testContent);   
-            ENSURE(getWholeFile(testFileName) == testContent);
+            ENSURE(readWholeFile(testFileName) == testContent);
             ENSURE(fileExists(testFileName));
             ENSURE(getFileSize(testFileName) == testContent.size());
         }
@@ -107,11 +107,11 @@ class file_functions_UnitTest : public UnitTest {
             perform_putget(testFileName, largeTestContent); 
         }
        void perform_putget(const string & testFileName, const asl::ResizeableBlock & testContent) {
-            ENSURE(putWholeFile(testFileName,testContent));
+            ENSURE(writeWholeFile(testFileName,testContent));
             asl::Block fromFile;
-            ENSURE(getWholeFile(testFileName,fromFile));
+            ENSURE(readWholeFile(testFileName,fromFile));
             ENSURE(fromFile == testContent);   
-            //ENSURE(getWholeFile(testFileName) == testContent);
+            //ENSURE(readWholeFile(testFileName) == testContent);
             ENSURE(fileExists(testFileName));
             ENSURE(getFileSize(testFileName) == testContent.size());
         }

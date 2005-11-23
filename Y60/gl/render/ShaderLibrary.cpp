@@ -62,7 +62,7 @@ namespace y60 {
     void
     ShaderLibrary::load(const std::string & theLibraryFileName) {
         string myShaderLibraryStr;
-        asl::getWholeFile(theLibraryFileName, myShaderLibraryStr );
+        asl::readWholeFile(theLibraryFileName, myShaderLibraryStr );
         if ( myShaderLibraryStr.empty()) {
             throw ShaderLibraryException(string("Could not load shader library '") + theLibraryFileName + "'",
                                     PLUS_FILE_LINE);

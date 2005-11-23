@@ -256,7 +256,7 @@ int main(int argc, char* argv[])
     if (argc > 1) {
         const char* file_name;
         file_name = argv[1];
-        std::cout << asl::getWholeFile(file_name) << std::endl;
+        std::cout << asl::readWholeFile(file_name) << std::endl;
         
         dom::Document dom;
         std::ifstream xml_file(file_name);
@@ -334,12 +334,12 @@ new file:
         */
         for (int i = 0; i < file_name.size(); ++i) {
 #ifdef single_test        
-            std::cout << asl::getWholeFile(file_name[i]) << std::endl;
+            std::cout << asl::readWholeFile(file_name[i]) << std::endl;
 #endif
             std::cout << "Parsing file '" << file_name[i] << "'" << std::endl;
             
                 asl::Time start_read1;
-                std::string fs1(asl::getWholeFile(file_name[i]));
+                std::string fs1(asl::readWholeFile(file_name[i]));
 
                 asl::Time start1;
                 dom::Document dom(fs1);
@@ -376,7 +376,7 @@ new file:
                 }
                 
                 
-                std::string fs(asl::getWholeFile("tmpout.xml"));
+                std::string fs(asl::readWholeFile("tmpout.xml"));
                 
                 asl::Time start;
                 dom::Document dom2(fs);
@@ -392,8 +392,8 @@ new file:
                         of2 << dom2;
                     }
                     
-                    file1 = asl::getWholeFile("tmpout.xml");
-                    file2 = asl::getWholeFile("tmpout2.xml");
+                    file1 = asl::readWholeFile("tmpout.xml");
+                    file2 = asl::readWholeFile("tmpout2.xml");
                     //file2 = utils::as_string(dom2);
                     if ( file1 != file2 )
                     {

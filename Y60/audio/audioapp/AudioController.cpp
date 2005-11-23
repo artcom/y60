@@ -129,7 +129,7 @@ AudioController::init(unsigned int mySampleRate, double myLatency, unsigned theN
 void
 AudioController::init(const string& myConfigFile, double myLatency)
 {
-    string s = asl::getWholeFile(myConfigFile);
+    string s = asl::readWholeFile(myConfigFile);
     if (s.length() == 0) {
         throw SoundException(
                 std::string("AudioController::init() Error reading configuration file '")

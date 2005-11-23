@@ -315,7 +315,7 @@ printUsage() {
 void
 readConfigFile(dom::Document & theConfigDoc,  std::string theFileName) {
     AC_DEBUG << "Loading configuration data..." ;
-    std::string myFileStr = asl::getWholeFile(theFileName);
+    std::string myFileStr = asl::readWholeFile(theFileName);
     if (myFileStr.empty()) {
         cerr << "Watchdog::readConfigFile: Can't open configuration file "
              << theFileName << "." << endl;

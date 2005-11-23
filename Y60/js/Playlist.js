@@ -294,7 +294,7 @@ Playlist.prototype.Constructor = function(self) {
             //print("ICE '" + self.myRequest.getResponseHeader("x-audiocast-url")+"'");
         } else {
             //read meta file
-            myResponse = getWholeFileAsString(theUrl);
+            myResponse = readWholeFileAsString(theUrl);
             myMimeType = getMimeType(theUrl);
         }
 

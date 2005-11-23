@@ -115,7 +115,7 @@ JSBlock::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         }
 
         OWNERPTR myNewBlock = OWNERPTR(new asl::Block());        
-        bool myResult = getWholeFile(myFilename, *myNewBlock);
+        bool myResult = readWholeFile(myFilename, *myNewBlock);
         if (!myResult) {
             JS_ReportError(cx, "Constructor for %s: Could not read file %s",ClassName(), myFilename.c_str());
             return JS_FALSE;
