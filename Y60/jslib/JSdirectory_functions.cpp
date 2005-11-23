@@ -27,8 +27,8 @@ using namespace std;
 namespace jslib {
 
 static JSBool
-getDirList(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
-    DOC_BEGIN("Fetch list of directories");
+getDirectoryEntries(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("Fetch list of directory entries");
     DOC_PARAM("thePath", "", DOC_TYPE_STRING);
     DOC_RVAL("List of paths", DOC_TYPE_ARRAY);
     DOC_END;
@@ -37,7 +37,7 @@ getDirList(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rva
         std::string myPath;
         convertFrom(cx, argv[0], myPath);
         try {
-            *rval = as_jsval(cx, asl::getDirList(asl::expandEnvironment(myPath)));
+            *rval = as_jsval(cx, asl::getDirectoryEntries(asl::expandEnvironment(myPath)));
         } catch (asl::DirectoryException &) {
             *rval = JSVAL_NULL;
             return JS_TRUE;
@@ -119,7 +119,7 @@ IsDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
-MakeDir(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+createDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates directory");
     DOC_PARAM("thePath", "", DOC_TYPE_STRING);
     DOC_END;
@@ -128,13 +128,13 @@ MakeDir(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         string myPath;
 
         if (argc != 1) {
-            JS_ReportError(cx, "'makeDir takes a filepath as argument");
+            JS_ReportError(cx, "'createDirectory takes a filepath as argument");
             return JS_FALSE;
         }
 
         str = JS_ValueToString(cx, argv[0]);
         if (!str) {
-            JS_ReportError(cx, "makeDir() could not convert argument value to string.");
+            JS_ReportError(cx, "createDirectory() could not convert argument value to string.");
             return JS_FALSE;
         }
 
@@ -157,12 +157,12 @@ MakeDir(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JSFunctionSpec *
 JSDirectoryFunctions::Functions() {
     static JSFunctionSpec myFunctions[] = {
-        {"getDirList",          getDirList,          1},
+        {"getDirectoryEntries", getDirectoryEntries, 1},
         {"isDirectory",         IsDirectory,         1},
         {"getAppDirectory",     getAppDirectory,     0},
         {"getAppDataDirectory", getAppDataDirectory, 1},
         {"getTempDirectory",    getTempDirectory,    0},
-        {"makeDir",             MakeDir,             1},
+        {"createDirectory",     createDirectory,     1},
         {0},
     };
     return myFunctions;

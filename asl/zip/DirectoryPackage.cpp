@@ -46,7 +46,7 @@ DirectoryPackage::FileList
 DirectoryPackage::getFileList(const std::string & theSubDir, bool theRecurseFlag) {
     AC_DEBUG << "getFileList dir='" << _myDirectory << "' path='" << theSubDir << "'";
     std::string myDirToSearch = getAbsolutePath(theSubDir);
-    FileList myDirList = getDirList(myDirToSearch);
+    FileList myDirList = getDirectoryEntries(myDirToSearch);
     FileList myFileList;
     for (unsigned i = 0; i < myDirList.size(); ++i) {
         if (_myIgnoreDotFiles && myDirList[i][0] == '.') {

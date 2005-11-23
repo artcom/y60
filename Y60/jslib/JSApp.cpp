@@ -266,7 +266,7 @@ FileLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         int myLine;
         if (getFileLine(cx,obj,argc,argv,myFile,myLine)) {
             JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
-            if (!JS_DefineProperty(cx, myReturnObject, "file",  as_jsval(cx, asl::getBaseName(myFile)), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
+            if (!JS_DefineProperty(cx, myReturnObject, "file",  as_jsval(cx, asl::getFilenamePart(myFile)), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
             if (!JS_DefineProperty(cx, myReturnObject, "line", as_jsval(cx, myLine), 0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
             *rval = OBJECT_TO_JSVAL(myReturnObject);
             return JS_TRUE;
@@ -337,133 +337,7 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
-JS_STATIC_DLL_CALLBACK(JSBool)
-IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Adds the given path as search-path to the packet manager.");
-    DOC_PARAM("theIncludePath", "A valid path", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        if (!argc) {
-            return JS_TRUE;
-        }
 
-        string myIncludePath;
-        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myIncludePath)) {
-            JS_ReportError(cx, "includePath(): argument #1 must be a string. (the path)");
-            return JS_FALSE;
-        }
-        JSApp::getPackageManager()->add(myIncludePath);
-        PlugInManager::get().setSearchPath(JSApp::getPackageManager()->getSearchPath());
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-JS_STATIC_DLL_CALLBACK(JSBool)
-RemovePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Removes the given path from the include path of the package manager.");
-    DOC_PARAM("thePath", "The path to remove", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        if (!argc) {
-            return JS_TRUE;
-        }
-
-        string myIncludePath;
-        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myIncludePath)) {
-            JS_ReportError(cx, "removePath(): argument #1 must be a string. (the path)");
-            return JS_FALSE;
-        }
-        JSApp::getPackageManager()->remove(myIncludePath);
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-JS_STATIC_DLL_CALLBACK(JSBool)
-GetPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the search-path of the package manager, which is used for includes, plugins, and shaderlibrary.");
-    DOC_RVAL("thePath", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        *rval = as_jsval(cx, JSApp::getPackageManager()->getSearchPath());
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-JS_STATIC_DLL_CALLBACK(JSBool)
-OpenFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages and open the file located at theRelativePath if found.");
-    DOC_PARAM("theRelativePath", "The path to the file requested. It is relative and must be defined inside a package.", DOC_TYPE_STRING);
-    DOC_PARAM("thePackageName", "The name of a package, Package names are stored just as you enter them by calling includePath.", DOC_TYPE_STRING);
-    DOC_RVAL("The opened file as a asl::ReadableBlock or null if not found.", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        if (argc == 0 || argc > 2 ) {
-            JS_ReportError(cx, "openFile(): expects one or two string arguments, (theRelativePath, [optional] package)");
-            return JS_FALSE;
-        }
-        string myRelativePath = "";
-        convertFrom(cx, argv[0], myRelativePath);
-
-        string myPackageName;
-        if (argc > 1) {
-            convertFrom(cx, argv[1], myPackageName);
-        }
-        // since we don't have a wrapped ReadableBlock,
-        // we have to make a copy
-        asl::Ptr<asl::Block> myBlock(new asl::Block);
-        if (argc == 1) {
-            *myBlock = *(JSApp::getPackageManager()->openFile(myRelativePath));
-        } else {
-            *myBlock = *(JSApp::getPackageManager()->openFile(myRelativePath, myPackageName));
-        }
-
-        if (myBlock) {
-            *rval = as_jsval(cx, myBlock, &(*myBlock) );
-        } else {
-            *rval = JSVAL_NULL;
-        }
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-JS_STATIC_DLL_CALLBACK(JSBool)
-listFiles(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages \
-and returns all files in theRelativePath. If theRelativePath is a file it returns theRelativePath.");
-    DOC_PARAM("theRelativePath", "The path to search in. It is relative and must be defined inside a package", DOC_TYPE_STRING);
-    DOC_RVAL("All files in theRelativePath as array of strings", DOC_TYPE_ARRAY);
-    DOC_RESET;
-    DOC_PARAM("theRelativePath", "The path to search in. It is relative and must be defined inside a package", DOC_TYPE_STRING);
-    DOC_PARAM("thePackageName", "The package to search in.", DOC_TYPE_STRING);
-    DOC_PARAM("theRecurseFlag", "Search recursivly, if true", DOC_TYPE_STRING);
-    DOC_RVAL("All files in theRelativePath as array of strings", DOC_TYPE_ARRAY);
-    DOC_END;
-    try {
-        if (argc > 3 ) {
-            JS_ReportError(cx, "listFiles(): expects at most three string arguments, (path, package, theRecurseFlag)");
-            return JS_FALSE;
-        }
-        string myRelativePath = "";
-        string myPackageName = "";
-        if (argc > 0) {
-            convertFrom(cx, argv[0], myRelativePath);
-        }
-        if (argc > 1) {
-            convertFrom(cx, argv[1], myPackageName);
-        }
-        vector<string> myFiles;
-        if (argc == 3) {
-            bool myRecurseFlag;
-            myRecurseFlag = convertFrom(cx, argv[2], myRecurseFlag);
-            myFiles = JSApp::getPackageManager()->listFiles(myRelativePath, myPackageName, myRecurseFlag);
-        } else {
-            myFiles = JSApp::getPackageManager()->listFiles(myRelativePath, myPackageName);
-        }
-
-        *rval = as_jsval(cx, myFiles);
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 ParseArguments(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -736,7 +610,7 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 return JS_FALSE;
             }
 
-            std::string myIncludePath = asl::getDirName(myCurrentFile);
+            std::string myIncludePath = asl::getDirectoryPart(myCurrentFile);
             AC_DEBUG << "use: myIncludePath=" << myIncludePath;
             std::string myIncludeFileWithPath = asl::searchFile(myIncludeFile, myIncludePath);
 
@@ -947,96 +821,7 @@ ExpandEnvironment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     } HANDLE_CPP_EXCEPTION;
 }
 
-JS_STATIC_DLL_CALLBACK(JSBool)
-FileExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Tests whether a given file exists.");
-    DOC_PARAM("theFileName", "Path and filename to test", DOC_TYPE_STRING);
-    DOC_RVAL("True if file exists", DOC_TYPE_BOOLEAN);
-    DOC_END;
-    try {
-        JSString   * str;
-        const char * myFileName;
 
-        if (argc != 1) {
-            JS_ReportError(cx, "'fileExists' takes a filename as argument");
-            return JS_FALSE;
-        }
-
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str) {
-            JS_ReportError(cx, "fileExists() could not convert argument value to string.");
-            return JS_FALSE;
-        }
-
-        myFileName = JS_GetStringBytes(str);
-
-        *rval = BOOLEAN_TO_JSVAL(asl::fileExists(myFileName));
-
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-JS_STATIC_DLL_CALLBACK(JSBool)
-GetBaseName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Strips the directory path from a filename.");
-    DOC_PARAM("theFileName", "Specifies filename with path to strip.", DOC_TYPE_STRING);
-    DOC_RVAL("The filename without its directory path", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        JSString   * str;
-        const char * myFileName;
-
-        if (argc != 1) {
-            JS_ReportError(cx, "'getBaseName' takes a filename as argument");
-            return JS_FALSE;
-        }
-
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str) {
-            JS_ReportError(cx, "getBaseName() could not convert argument value to string.");
-            return JS_FALSE;
-        }
-
-        myFileName = JS_GetStringBytes(str);
-
-        string myBaseName = asl::getBaseName(myFileName);
-        JSString * myBaseNameJs = JS_NewStringCopyN(cx, myBaseName.c_str(), myBaseName.size());
-        *rval = STRING_TO_JSVAL(myBaseNameJs);
-
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-JS_STATIC_DLL_CALLBACK(JSBool)
-GetDirName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Strips filename from a path name (opposite of 'dirname()').");
-    DOC_PARAM("theFileName", "Specifies Filename and path to strip", DOC_TYPE_STRING);
-    DOC_RVAL("Drive name and directory path", DOC_TYPE_STRING);
-    DOC_END;
-    try {
-        JSString   * str;
-        const char * myFileName;
-
-        if (argc != 1) {
-            JS_ReportError(cx, "'getDirName' takes a filename as argument");
-            return JS_FALSE;
-        }
-
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str) {
-            JS_ReportError(cx, "getDirName() could not convert argument value to string.");
-            return JS_FALSE;
-        }
-
-        myFileName = JS_GetStringBytes(str);
-
-        string myDirName = asl::getDirName(myFileName);
-        JSString * myDirNameJs = JS_NewStringCopyN(cx, myDirName.c_str(), myDirName.size());
-        *rval = STRING_TO_JSVAL(myDirNameJs);
-
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 HostName(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -1354,49 +1139,41 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 
 static JSFunctionSpec glob_functions[] = {
-    {"print",                Print,          0},
-    {"use",                  Use,            1},
-    {"reuse",                Reuse,          0},
-    {"parseArguments",       ParseArguments, 2},
-    {"plug",                 Plug,           1},
-    {"saveImage",            SaveImage,		2},
+    {"print",           Print,          0},
+    {"use",             Use,            1},
+    {"reuse",           Reuse,          0},
+    {"parseArguments",  ParseArguments, 2},
+    {"plug",            Plug,           1},
+    {"saveImage",       SaveImage,		2},
     {"saveImageFiltered",    SaveImageFiltered,	4},
-    {"exit",                 Exit,           0},
-    {"version",              Version,        1},
-    {"build",                BuildDate,      0},
-    {"revision",             Revision,       0},
-    {"gc",                   GC,             0},
-    {"clear",                Clear,          1},
-    {"__FILE__",             File,           0},
-    {"__LINE__",             Line,           0},
-    {"fileline",             FileLine,       0},
-    {"dumpstack",            DumpStack,      0},
-    {"millisec",             MilliSec,       1},
-    {"msleep",               MSleep,         1},
-    {"fileExists",           FileExists,     1},
-    {"getBaseName",          GetBaseName,    1},
-    {"getDirName",           GetDirName,     1},
-    {"getProgramName",       GetProgramName, 0},
-    {"hostname",             HostName,       1},
-    {"expandEnvironment",    ExpandEnvironment, 1},
-    {"includePath",          IncludePath,    1},
-    {"removePath",           RemovePath,     1},
-    {"getPath",              GetPath,        0},
-    {"listFiles",            listFiles,      2},
-    {"openFile",             OpenFile,       2},
+    {"exit",            Exit,           0},
+    {"version",         Version,        1},
+    {"build",           BuildDate,      0},
+    {"revision",        Revision,       0},
+    {"gc",              GC,             0},
+    {"clear",           Clear,          1},
+    {"__FILE__",        File,           0},
+    {"__LINE__",        Line,           0},
+    {"fileline",        FileLine,       0},
+    {"dumpstack",       DumpStack,      0},
+    {"millisec",        MilliSec,       1},
+    {"msleep",          MSleep,         1},
+    {"getProgramName",  GetProgramName, 0},
+    {"hostname",        HostName,       1},
+    {"expandEnvironment", ExpandEnvironment, 1},
 
     {"getDocumentation",     getDocumentation, 1},
     {"getDocumentedModules", getDocumentedModules, 0},
 
-    {"createUniqueId",       createUniqueId, 0},
+    {"createUniqueId",  createUniqueId, 0},
 
-    {"fromHexString",        fromHexString,   1},
-    {"asHexString",          asHexString,     1},
-    {"urlEncode",            urlEncode,       1},
-    {"urlDecode",            urlDecode,       1},
+    {"fromHexString",   fromHexString,   1},
+    {"asHexString",     asHexString,     1},
+    {"urlEncode",       urlEncode,       1},
+    {"urlDecode",       urlDecode,       1},
 
-    {"exec",                 execute,         2},
-    {"operatingSystem",      operatingSystem, 0},
+    {"exec",            execute,         2},
+    {"operatingSystem", operatingSystem, 0},
     {0}
 };
 

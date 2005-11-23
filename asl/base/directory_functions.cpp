@@ -27,7 +27,7 @@
 
 namespace asl {
 
-    std::vector<std::string> getDirList(const std::string & thePath) {
+    std::vector<std::string> getDirectoryEntries(const std::string & thePath) {
         std::vector<std::string> myDirEntries;
 
         DIR * myDirHandle = opendir(thePath.c_str());
@@ -97,7 +97,7 @@ std::string getAppDirectory() {
     char apppath[4096];
     sprintf(buffer, "/proc/%d/exe", getpid());
     readlink(buffer, apppath, 4096);
-    strAppDirectory = std::string(dirname(apppath));
+    strAppDirectory = std::string(getDirectoryPart(apppath));
 #endif
     return strAppDirectory;
 }

@@ -285,8 +285,8 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
         _myImageStripPrefix = theDirectory + "\\" + thePrefix;
         _myRenderFrame      = -1;
         // does the directory exist ?
-        if (getDirList(theDirectory)== null) {
-            makeDir(theDirectory);
+        if (getDirectoryEntries(theDirectory)== null) {
+            createDirectory(theDirectory);
         }
     }
 

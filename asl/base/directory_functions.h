@@ -24,7 +24,7 @@ namespace asl {
     DEFINE_EXCEPTION(FileNotFoundException, asl::Exception);
     DEFINE_EXCEPTION(DirectoryException, asl::Exception);
 
-    std::vector<std::string> getDirList(const std::string & thePath);
+    std::vector<std::string> getDirectoryEntries(const std::string & thePath);
     
     void createDirectory(const std::string & theDirectory);
     std::string getTempDirectory();

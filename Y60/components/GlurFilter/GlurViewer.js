@@ -321,7 +321,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
     function filterFilename(theFilename) {
         if (fileExists(theFilename) && theFilename[0] != '.') {
-            var myDirList = getDirList(theFilename);
+            var myDirList = getDirectoryEntries(theFilename);
             if (myDirList.length > 0) {
                 print("ignoring: "+theFilename);
                 print(myDirList.length);
@@ -338,7 +338,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         var myList = []
         // find out if the argument is a directory
         // if so, add all files to the list
-        var myDirList = getDirList(theArgument);
+        var myDirList = getDirectoryEntries(theArgument);
         print(myDirList);
         if (myDirList.length!=0) {
             for(var i=0; i<myDirList.length; ++i) {

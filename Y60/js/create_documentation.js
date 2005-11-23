@@ -245,13 +245,13 @@ function writeHTML(theFileName, theString) {
     }
 
     var myPath = ourDirectory + "/" + theFileName;
-    var myDir  = dirname(myPath);
+    var myDir  = getDirectoryPart(myPath);
 
     if (!isDirectory(myDir)) {
-        makeDir(myDir);
+        createDirectory(myDir);
     }
 
-    if (!putWholeFile(myPath, myString)) {
+    if (!putWholeStringToFile(myPath, myString)) {
         throw new Exception("Could not write file: " + myPath, fileline());
     }
 }
@@ -375,7 +375,7 @@ function createStyleSheet() {
     myString += ".y60class { color: #FF8000 }\n"
 
     var myPath = ourDirectory + "/jsdoc.css";
-    if (!putWholeFile(myPath, myString)) {
+    if (!putWholeStringToFile(myPath, myString)) {
         throw new Exception("Could not write file: " + myPath, fileline());
     }
 }
@@ -398,7 +398,7 @@ function getLinkedFile(theLink) {
 }
 
 function createTutorials() {
-    var myTutorials = getDirList("${PRO}/tutorials");
+    var myTutorials = getDirectoryEntries("${PRO}/tutorials");
     myTutorials.sort();
     var myTutorialIndex = "<h1>Y60 Tutorials</h1><div class='Indent'>";
     includePath("${PRO}/tutorials");
@@ -414,7 +414,7 @@ function createTutorials() {
 
     var myDir = ourDirectory + "/tutorials"
     if (!isDirectory(ourDirectory)) {
-        makeDir(ourDirectory);
+        createDirectory(ourDirectory);
     }
 
     for (var i = 0; i < myTutorials.length; ++i) {
@@ -422,7 +422,7 @@ function createTutorials() {
         var myDotIndex = myTutorial.lastIndexOf(".");
         if (myDotIndex != -1 && myTutorial.substring(myDotIndex, myTutorial.length) == ".js") {
             var myHtmlFileName = myTutorial.substr(0, myDotIndex) + ".html";
-            var myFile = getWholeFile(myTutorial);
+            var myFile = getWholeFileAsString(myTutorial);
             var myTitle = myTutorial;
             var myTutorialExplanation = "";
             var myTutorialCode = "";

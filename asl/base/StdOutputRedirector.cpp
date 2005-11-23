@@ -132,13 +132,13 @@ namespace asl {
            
     void
     StdOutputRedirector::removeoldArchives() {
-        vector<std::string> myFiles = getDirList(getDirName(_myOutputFilename));
+        vector<std::string> myFiles = getDirectoryEntries(getDirectoryPart(_myOutputFilename));
         // serch the newest
         int myNewesindex = -1;
         time_t myHighestTimeStamp = 0;
         vector<int> myFilesToDelete;
         for (int myFileIndex = 0; myFileIndex != myFiles.size(); myFileIndex++) {
-            string myFilename = myFiles[myFileIndex];//getDirName(_myOutputFilename) + myFiles[myFileIndex];
+            string myFilename = myFiles[myFileIndex];//getDirectoryPart(_myOutputFilename) + myFiles[myFileIndex];
             string mySearchString(removeExtension(_myOutputFilename) + "logarchive_" );                    
             size_t myPos = myFilename.rfind(mySearchString.c_str() ,0, mySearchString.size());
             if (myPos != string::npos) {
@@ -152,7 +152,7 @@ namespace asl {
         }
         for (int myFileIndex = 0; myFileIndex != myFilesToDelete.size(); myFileIndex++) {
             if (myFilesToDelete[myFileIndex] != myNewesindex ) {
-                deleteFile(getDirName(_myOutputFilename) + myFiles[myFilesToDelete[myFileIndex]]);                        
+                deleteFile(getDirectoryPart(_myOutputFilename) + myFiles[myFilesToDelete[myFileIndex]]);                        
             } else {
                 _myOldArchiveFilename = myFiles[myNewesindex];
             }

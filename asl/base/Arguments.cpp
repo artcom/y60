@@ -52,6 +52,7 @@ Arguments::addAllowedOptions(const AllowedOption * allowedOptions) {
     }
     _allowedOptions["--revision"] = "";
     _allowedOptions["--version"] = "";
+    _allowedOptions["--copyright"] = "";
 }
 
 const string &
@@ -125,6 +126,10 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
                     printVersion();
                     return false;
                 }
+                 if (foundItem->first == "--copyright") {
+                    printCopyright();
+                    return false;
+                }
                 _options[argv[i]] = i;
                 if (foundItem->second != "") {
                     // needs argument
@@ -152,7 +157,7 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
                 _programName = argv[0];
                 string::size_type myRealNameStart = _programName.rfind(theDirectorySeparator);
                 _programName = _programName.substr(++myRealNameStart);
-                printCopyright();
+                //printCopyright();
             }
         }
 

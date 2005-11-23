@@ -165,7 +165,7 @@ SceneExporter::writer(const MFileObject& theFile,
             dom::DocumentPtr myDocument(new dom::Document);
             SceneBuilder      mySceneBuilder(myDocument);
             MaterialExporter  myMaterialExporter(myOptions.inlineTexturesFlag);
-            myMaterialExporter.setBaseDirectory(asl::getDirName(std::string(myFileName.asChar())));
+            myMaterialExporter.setBaseDirectory(asl::getDirectoryPart(std::string(myFileName.asChar())));
             clearCurveMaterials();
 
             //check which objects are to be exported, and invoke the corresponding

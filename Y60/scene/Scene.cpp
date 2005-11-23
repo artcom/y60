@@ -249,7 +249,7 @@ namespace y60 {
                         << myPackageManager->getSearchPath();
                 } else {
                     _myTextureManager->getResourceManager()->loadShaderLibrary(myPath);
-                    _myTextureManager->getPackageManager()->add(asl::getDirName(myPath));
+                    _myTextureManager->getPackageManager()->add(asl::getDirectoryPart(myPath));
                 }
             }
         } else {
@@ -1155,7 +1155,7 @@ namespace y60 {
 
         // (1) Make all ids unique and fix the respective references
         map<string, string> myOldToNewIdMap;
-        createUniqueIds(getSceneDom(), mySceneDom, myOldToNewIdMap, removeExtension(getBaseName(theFilename)));
+        createUniqueIds(getSceneDom(), mySceneDom, myOldToNewIdMap, removeExtension(getFilenamePart(theFilename)));
         updateReferences(mySceneDom, myOldToNewIdMap);
 
         // (2) Append all nodes from the new dom into the old dom

@@ -53,7 +53,7 @@ public:
 
         // use getdir utility function instead
 
-        vector<string> myDirEntries = getDirList(std::string("..") + theDirectorySeparator + ".." + theDirectorySeparator + "testdir");
+        vector<string> myDirEntries = getDirectoryEntries(std::string("..") + theDirectorySeparator + ".." + theDirectorySeparator + "testdir");
         std::sort(myDirEntries.begin(), myDirEntries.end());
 
         ENSURE(myDirEntries.size() == 5);
@@ -63,8 +63,8 @@ public:
         ENSURE_MSG(myDirEntries[3] == "c" , "found dir c");
         ENSURE_MSG(myDirEntries[4] == "d" , "found dir d");
 
-        ENSURE_EXCEPTION(getDirList("../../testdir/a"), DirectoryException);
-        ENSURE_EXCEPTION(getDirList("nonexistingdir"), DirectoryException);
+        ENSURE_EXCEPTION(getDirectoryEntries("../../testdir/a"), DirectoryException);
+        ENSURE_EXCEPTION(getDirectoryEntries("nonexistingdir"), DirectoryException);
 
         std::cerr << getTempDirectory() << std::endl;
         std::cerr << getAppDataDirectory("TEST") << std::endl;

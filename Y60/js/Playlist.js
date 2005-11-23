@@ -75,7 +75,7 @@ Playlist.prototype.Constructor = function(self) {
         //print("addEntry:" + theUrl);
         if (isDirectory(theUrl)) {
             //handle directories
-	        var myDirList = getDirList(theUrl);
+	        var myDirList = getDirectoryEntries(theUrl);
 	        if (myDirList == null) {
 	            //print("### Playlist : Directory '" + theUrl + "' is null");
 	            return;
@@ -294,7 +294,7 @@ Playlist.prototype.Constructor = function(self) {
             //print("ICE '" + self.myRequest.getResponseHeader("x-audiocast-url")+"'");
         } else {
             //read meta file
-            myResponse = getWholeFile(theUrl);
+            myResponse = getWholeFileAsString(theUrl);
             myMimeType = getMimeType(theUrl);
         }
 

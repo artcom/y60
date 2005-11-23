@@ -91,35 +91,35 @@ class PackageManagerUnitTest : public UnitTest {
                 myPackageManager.add(IPackagePtr(new ZipPackage("../../testfiles/test2.zip")));
                 IPackage::FileList myEntries;
 
-                myEntries = myPackageManager.listFiles(); //list all files
+                myEntries = myPackageManager.findFiles(); //list all files
                 for (unsigned i = 0;i < myEntries.size(); ++i) {
                     cerr << "entry " << myEntries[i] << endl;
                     cerr << "path " << myPackageManager.searchFile(myEntries[i]) << endl;
                 }
                 
                 //list all files in relative dir. testfiles/
-                myEntries = myPackageManager.listFiles("testfiles");                 
+                myEntries = myPackageManager.findFiles("testfiles");                 
                 for(int i = 0;i < myEntries.size(); ++i) {
                     cerr << "listing '" << myEntries[i] << "'" << endl;
                 }
                 //list all files in package ../../testfiles
                 // *this is a different thing than the above*
-                myEntries = myPackageManager.listFiles("", "../../testfiles"); 
+                myEntries = myPackageManager.findFiles("", "../../testfiles"); 
                 ENSURE(myEntries.size() == 2);
                 for (unsigned i = 0;i < myEntries.size(); ++i) {
                     cerr << "listing '" << myEntries[i] << "'" << endl;
                 }
                 //list all files in package ../../testfiles/test.zip
-                myEntries = myPackageManager.listFiles("","../../testfiles/test.zip"); 
+                myEntries = myPackageManager.findFiles("","../../testfiles/test.zip"); 
                 for(int i = 0;i < myEntries.size(); ++i) {
                     cerr << "listing '" << myEntries[i] << "'" << endl;
                 }
                 
-                myEntries = myPackageManager.listFiles("d"); //d is dir in test2.zip
+                myEntries = myPackageManager.findFiles("d"); //d is dir in test2.zip
                 ENSURE(myEntries.size() == 3);
 
                 myPackageManager.add("../../testfiles/testdir");
-                myEntries = myPackageManager.listFiles("subdir1", "../../testfiles/testdir");
+                myEntries = myPackageManager.findFiles("subdir1", "../../testfiles/testdir");
                 ENSURE(myEntries.size() == 1);
             }  
             ENSURE(!myPackageManager.searchFile("testfiles/test.zip").empty())

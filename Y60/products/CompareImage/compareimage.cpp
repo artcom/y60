@@ -54,7 +54,7 @@ printHelp() {
 }
 
 int main( int argc, char *argv[])  {
-    string myArgDesc = string("image1 image2\nSee '") + string(getBaseName(argv[0])) +
+    string myArgDesc = string("image1 image2\nSee '") + string(getFilenamePart(argv[0])) +
                               " --help' for more information.";
     myArguments.setArgumentDescription(myArgDesc.c_str());
 

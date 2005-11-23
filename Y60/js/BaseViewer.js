@@ -298,7 +298,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             // get or create profiles node
             var myProfilesNode = null;
             if (fileExists(_myProfileFilename)) {
-                var myContent = getWholeFile(_myProfileFilename);
+                var myContent = getWholeFileAsString(_myProfileFilename);
                 if (myContent) {
                     myProfilesNode = new Node(myContent);
                     if (myProfilesNode) {
@@ -328,7 +328,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             myProfilesNode.appendChild(_myProfileNode);
 
             // save
-            putWholeFile(_myProfileFilename, myProfilesNode);
+            putWholeStringToFile(_myProfileFilename, myProfilesNode);
         }
     }
 

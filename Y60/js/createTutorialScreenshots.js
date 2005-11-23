@@ -33,7 +33,7 @@ RenderWindow.prototype.onProtoFrame = function(theTime) {
     if (ourFrameCount == 0) {
         this.resize(ourScreenshotSize[0], ourScreenshotSize[1]);
     } else if (ourFrameCount == ourFrameBreak) {
-        var myTutorial = basename(ourTutorialPath);
+        var myTutorial = getFilenamePart(ourTutorialPath);
         var myDotIndex = myTutorial.lastIndexOf(".");
         if (myDotIndex != -1 && myTutorial.substring(myDotIndex, myTutorial.length) == ".js") {
             var myScreenshotFileName = myTutorial.substr(0, myDotIndex) + ".png";

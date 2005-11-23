@@ -54,21 +54,21 @@ class file_functions_UnitTest : public UnitTest {
          }
 
         void perform_filename_func() {
-            ENSURE(getBaseName("/etc/passwd")=="passwd");
-            ENSURE(getBaseName("/etc/")=="");
-            ENSURE(getBaseName("passwd")=="passwd");
-            ENSURE(getBaseName("C:/WinNT/sux")=="sux");
+            ENSURE(getFilenamePart("/etc/passwd")=="passwd");
+            ENSURE(getFilenamePart("/etc/")=="");
+            ENSURE(getFilenamePart("passwd")=="passwd");
+            ENSURE(getFilenamePart("C:/WinNT/sux")=="sux");
 
-            ENSURE(getDirName("/etc/passwd")=="/etc/");
-            ENSURE(getDirName("/etc/")=="/etc/");
-            ENSURE(getDirName("passwd")=="./");
-            ENSURE(getDirName("C:/WinNT/sux")=="C:/WinNT/");
+            ENSURE(getDirectoryPart("/etc/passwd")=="/etc/");
+            ENSURE(getDirectoryPart("/etc/")=="/etc/");
+            ENSURE(getDirectoryPart("passwd")=="./");
+            ENSURE(getDirectoryPart("C:/WinNT/sux")=="C:/WinNT/");
 
-            ENSURE(searchFile(getBaseName(__FILE__), "/;.;../..") == std::string("../../") + getBaseName(__FILE__));            
-            ENSURE(searchFile(getBaseName(__FILE__), "") == "");            
-            ENSURE(searchFile(getBaseName(__FILE__), "../..") == std::string("../../") + getBaseName(__FILE__));            
+            ENSURE(searchFile(getFilenamePart(__FILE__), "/;.;../..") == std::string("../../") + getFilenamePart(__FILE__));            
+            ENSURE(searchFile(getFilenamePart(__FILE__), "") == "");            
+            ENSURE(searchFile(getFilenamePart(__FILE__), "../..") == std::string("../../") + getFilenamePart(__FILE__));            
 #ifdef LINUX
-            ENSURE(searchFile(getBaseName(__FILE__), "/:.:../..") == std::string("../../") + getBaseName(__FILE__));
+            ENSURE(searchFile(getFilenamePart(__FILE__), "/:.:../..") == std::string("../../") + getFilenamePart(__FILE__));
 #endif            
 
             ENSURE(getExtension("myfile.mp3") == "mp3");

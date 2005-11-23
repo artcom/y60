@@ -68,7 +68,7 @@ CTScan::~CTScan() {
 int 
 CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & theSubDir, const std::string& thePackage) {
     clear();
-    vector<string> myFileList(thePackageManager.listFiles(theSubDir,thePackage));
+    vector<string> myFileList(thePackageManager.findFiles(theSubDir,thePackage));
     AC_TRACE << "found " << myFileList.size() << " files in " << thePackage << ":" << theSubDir;    
 
     if ( myFileList.empty()) {           

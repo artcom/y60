@@ -23,6 +23,7 @@
 
 #include "Exception.h"
 #include "Block.h"
+#include <asl/PlugInManager.h>
 
 #include <string>
 #include <sys/types.h>
@@ -34,8 +35,9 @@ namespace asl {
 /* @{ */
     
 /// returns filename without directory     
-std::string getBaseName(const std::string & theFileName);
-std::string getDirName(const std::string & theFileName);
+std::string getFilenamePart(const std::string & theFileName);
+/// returns directory without filename     
+std::string getDirectoryPart(const std::string & theFileName);
 
 /// return filename extension, or "" if none was found
 std::string getExtension(const std::string & theFileName);

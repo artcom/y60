@@ -578,7 +578,7 @@ searchFileRelativeToJSInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *a
         JS_ReportError(cx, "Failed to determine current JS include file.");
         return JS_FALSE;
     }
-    std::string myIncludePath = asl::getDirName(myCurrentFile);
+    std::string myIncludePath = asl::getDirectoryPart(myCurrentFile);
 
     std::string myFileWithPath = asl::searchFile(theFile, myIncludePath);
     if (myFileWithPath.empty()) {

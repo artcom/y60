@@ -52,7 +52,7 @@ namespace asl {
 #endif
 
 
-    std::string getBaseName(const std::string & theFileName) {
+    std::string getFilenamePart(const std::string & theFileName) {
 #ifdef WIN32
         char drive[_MAX_DRIVE];
         char dir[_MAX_DIR];
@@ -64,7 +64,8 @@ namespace asl {
 #else
         std::string myBaseName;
         if ( ! theFileName.empty()) {
-            if (theFileName.at(theFileName.length()-1) == '/') { // Huh? what's that for??? [DS/MS]
+            if (theFileName.at(theFileName.length()-1) == '/') {  // Huh? what's that for??? [DS/MS]
+                // return empty string if theFileName ends with "/"
                 return std::string("");
             }
 
@@ -76,7 +77,7 @@ namespace asl {
         return myBaseName;
     }
 
-    std::string getDirName(const std::string & theFileName) {
+    std::string getDirectoryPart(const std::string & theFileName) {
 #ifdef WIN32
         char drive[_MAX_DRIVE];
         char dir[_MAX_DIR];
@@ -195,7 +196,7 @@ namespace asl {
 /// read a complete file into a string
 
     bool getWholeFile(const std::string & theFileName, std::string & theContent) {
-        std::ifstream inFile(theFileName.c_str());
+        std::ifstream inFile(theFileName.c_str(), std::ios::binary);
         if (inFile) {
             std::vector<char> myBuffer(65536);
             theContent.resize(0);
@@ -249,7 +250,7 @@ namespace asl {
     };
 
     bool putWholeFile(const std::string & theFileName, const std::string & theContent) {
-        std::ofstream outFile(theFileName.c_str());
+        std::ofstream outFile(theFileName.c_str(), std::ios::binary);
         if (outFile) {
             outFile << theContent;
             return outFile != 0;

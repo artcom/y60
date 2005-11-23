@@ -62,8 +62,8 @@ int main(int argc, char *argv[]) {
 
     char * myDirectoryName = strdup(argv[0]);
     char * myProgramName = strdup(argv[0]);
-    myDirectoryName = dirname(myDirectoryName);
-    myProgramName = basename(myProgramName);
+    myDirectoryName = getDirectoryPart(myDirectoryName);
+    myProgramName = getFilenamePart(myProgramName);
     cerr << myProgramName << " started in directory " << myDirectoryName << endl;
 
     string myScriptName = string("../../") + myProgramName + ".sh"; 

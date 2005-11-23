@@ -192,8 +192,8 @@ GTKFlightRecorder.prototype.Constructor = function(obj, theArguments, theName) {
     _myHandler.on_pbRecord_toggled = function() {
         _myImageStripPrefix = _myFlightIdWidget.text + "\\frame";
         // does the directory exist ?
-        if (getDirList(_myFlightIdWidget.text)== null) {
-            makeDir(_myFlightIdWidget.text);
+        if (getDirectoryEntries(_myFlightIdWidget.text)== null) {
+            createDirectory(_myFlightIdWidget.text);
         }
     }
 

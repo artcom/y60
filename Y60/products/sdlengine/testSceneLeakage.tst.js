@@ -50,7 +50,7 @@ window.onFrame = function(theTime) {
 
     var currentUsage = getProcessMemoryUsage();
     Logger.info("intial = " + ourInitialMemory +" kb, current = " + currentUsage + ", delta = " + (currentUsage - ourInitialMemory) + ", ="+(currentUsage - ourInitialMemory)/1024 + " kb");
-    if (theTime > 10 || ourExitFlag) {
+    if (ourMemoryStater < -50 || ourExitFlag) {
         var myMemory = getProcessMemoryUsage();
         removeObjects();
         print("Objects created: " + ourCounter);
@@ -60,7 +60,7 @@ window.onFrame = function(theTime) {
             exit(1);
         }
         var myMemoryIncrease = (myMemory - ourInitialMemory) / 1024;
-        if (myMemoryIncrease > 100) {
+        if (myMemoryIncrease > 500) {
             Logger.error("Memory usage increased by: " + myMemoryIncrease + " KB");
             exit(1);
         } else {
@@ -74,7 +74,7 @@ window.onFrame = function(theTime) {
 }
 
 var ourObjects          = [];
-var ourMemoryStater     = 5;
+var ourMemoryStater     = 50;
 var ourInitialNodeCount = countNodes(window.scene.dom);
 var ourInitialMemory    = null;
 var ourCounter          = 0;

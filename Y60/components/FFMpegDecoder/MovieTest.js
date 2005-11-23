@@ -58,7 +58,7 @@ function FFMpegTest(theArguments) {
         window.setTextColor([1,1,1,1], [1,1,1,1]);
         if (_myMovie) {
             myPos += 20;
-            var myText  = basename(_myMovie.src) + " " + _myMovie.playmode + " " +
+            var myText  = getFilenamePart(_myMovie.src) + " " + _myMovie.playmode + " " +
                     _myMovie.currentframe + "/" + _myMovie.framecount;
             window.renderText([10, myPos], myText, "Screen15");
             myPos += 10;

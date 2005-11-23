@@ -30,14 +30,14 @@ TestFileFunctions.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-        print("Directory Listing for .: " + getDirList("."));
-        print("Directory Listing for ${PRO}: " + getDirList("${PRO}"));
+        print("Directory Listing for .: " + getDirectoryEntries("."));
+        print("Directory Listing for ${PRO}: " + getDirectoryEntries("${PRO}"));
         ENSURE('fileExists("bla") == false');
         ENSURE('fileExists(__FILE__()) == true');
-        ENSURE('getDirList("bla") == null');
-        print("Director Listing for bla: " + getDirList("bla"));
+        ENSURE('getDirectoryEntries("bla") == null');
+        print("Director Listing for bla: " + getDirectoryEntries("bla"));
 
-       //ENSURE_EXCEPTION("getDirList('bla')");
+       //ENSURE_EXCEPTION("getDirectoryEntries('bla')");
     }
 };
 

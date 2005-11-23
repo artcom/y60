@@ -55,8 +55,8 @@ ConfiguratorUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-        putWholeFile("settings.xml", COMMON_SETTINGS);
-        putWholeFile("settings-" + hostname() + ".xml", HOST_SETTINGS);
+        putWholeStringToFile("settings.xml", COMMON_SETTINGS);
+        putWholeStringToFile("settings-" + hostname() + ".xml", HOST_SETTINGS);
         var myConfigurator = new Configurator(null, "settings.xml");
         obj.mySettings = myConfigurator.getSettings();
         obj.myResult = RESULT;

@@ -88,15 +88,16 @@ namespace jslib {
         DOC_TYPE_NODE,
         DOC_TYPE_NODELIST,
         DOC_TYPE_REQUEST,
-        DOC_TYPE_OBJECT
-    };
+        DOC_TYPE_OBJECT,
+        DOC_TYPE_BLOCK
+   };
 
     static const std::string DocTypeDescription[] = {
         "__intern__",
         "string", "int", "float", "bool", "enum", "array",
         "Vector2i", "Vector2f", "Vector3f", "Vector4f", "Point", "Quaternion", "Matrix", "Box",
         "Line", "Ray", "LineSegment", "Plane", "Triangle", "Sphere", "Frustum",
-        "Node", "NodeList", "Request", "object"
+        "Node", "NodeList", "Request", "object", "Block"
     };
 
     struct ParameterDescription {

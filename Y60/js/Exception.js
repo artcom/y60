@@ -58,7 +58,7 @@ function reportException(theException) {
         myMessage += trim(theException.message);
 
         if ("fileName" in theException) {
-            myMessage += " [" + basename(theException.fileName);
+            myMessage += " [" + getFilenamePart(theException.fileName);
         }
 
         if ("lineNumber" in theException) {

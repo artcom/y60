@@ -83,7 +83,7 @@ class PackageManager {
         Ptr<ReadableBlock> openFile(const std::string & theRelativePath,
                                     const std::string & thePackageName = "");
 
-        /// listFiles lists the files in theRelativePath.
+        /// findFiles lists the files in theRelativePath.
         /** Searches theRelativePath in either thePackageName or all packages.
             and returns all files in theRelativePath. 
             If theRelativePath is a file it returns theRelativePath.
@@ -93,7 +93,7 @@ class PackageManager {
             package names are stored just as you enter them by calling add.
             @returns the list as a std::vector<std::string> or an empty vector if not found.
         */
-        IPackage::FileList listFiles(const std::string & theRelativePath = "",
+        IPackage::FileList findFiles(const std::string & theRelativePath = "",
                                      const std::string & thePackageName = "",
                                      bool doRecursiveSearch = false);
 

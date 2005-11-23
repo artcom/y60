@@ -150,16 +150,16 @@ getTargetFilename(const asl::Arguments & theArguments,
     unsigned myTargetSize = 0;
     getParameter("target-size", theArguments, theTargetNode, myTargetSize);
 
-    string myTargetBaseName;
-    if (!getParameter("outfile", theArguments, theTargetNode, myTargetBaseName)) {
+    string myTargetFilenamePart;
+    if (!getParameter("outfile", theArguments, theTargetNode, myTargetFilenamePart)) {
 
-        myTargetBaseName =theSourceFileName.substr(0,theSourceFileName.find_last_of("."))+ theExtensionName.c_str();
+        myTargetFilenamePart =theSourceFileName.substr(0,theSourceFileName.find_last_of("."))+ theExtensionName.c_str();
     }
 
     if (myOutDir.length()) {
         myTargetDir += theDirectorySeparator + myOutDir;
     }
-    return myTargetDir + theDirectorySeparator + myTargetBaseName;
+    return myTargetDir + theDirectorySeparator + myTargetFilenamePart;
 }
 
 bool
@@ -439,7 +439,7 @@ convertFile(const string & theKeyFrameSourceFile, vector<string> &  theSourceFil
 }
 
 int main(int argc, char *argv[]) {
-    string myArgDesc = string("[image ... ]\nSee '") + string(getBaseName(argv[0])) +
+    string myArgDesc = string("[image ... ]\nSee '") + string(getFilenamePart(argv[0])) +
                               " --help' for more information.";
     myArguments.setArgumentDescription(myArgDesc.c_str());
 

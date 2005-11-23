@@ -125,7 +125,7 @@ namespace y60 {
             }
         } else {
             throw ImportException(std::string("Ascii stl format not implemented. "), PLUS_FILE_LINE);
-            // ok = readFileAscii(fp, basename, sceneBuilder, materialId);
+            // ok = readFileAscii(fp, theBaseName, sceneBuilder, materialId);
         }
         if (!ok) {
             return false;
@@ -279,10 +279,10 @@ namespace y60 {
         return normalized(cross(d01, d02));
     }
 
-    dom::NodePtr StlImport::setupMaterial(const std::string& basename,
+    dom::NodePtr StlImport::setupMaterial(const std::string& theBaseName,
                                           SceneBuilder& sceneBuilder)
     {
-        MaterialBuilder materialBuilder(basename);
+        MaterialBuilder materialBuilder(theBaseName);
 
         asl::Vector4f myOpaqueWhite(1.0, 1.0, 1.0, 1.0);
         setPropertyValue<asl::Vector4f>(materialBuilder.getNode(),

@@ -59,7 +59,7 @@ function askUserForFilename(theTitle, theSuffix, theAdditionalWidget) {
         var myFilename = getFilenameDialog(theTitle, FileChooserDialog.ACTION_SAVE, null, null, theAdditionalWidget);
         if (myFilename && myFilename.length > 0) {
             if (theSuffix) {
-                var myFilenameString = new String( basename( myFilename ));
+                var myFilenameString = new String( getFilenamePart( myFilename ));
                 if (myFilenameString.lastIndexOf('.') == -1) {
                     myFilename += "." + theSuffix;
                 }

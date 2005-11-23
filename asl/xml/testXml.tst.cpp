@@ -66,15 +66,15 @@ int dom_test() {
         data->appendAttribute("url","http://www.artcom.de/model.iv");
         data->appendAttribute("duration","3:43");
         
-        std::ofstream out("testdom.xml");
+        std::ofstream out("testdom.xml", std::ios::binary);
         out << root;
     }
     {
         dom::Node root2;
-        std::ifstream f2("testdom.xml");
+        std::ifstream f2("testdom.xml", std::ios::binary);
 	    f2 >> root2;
         
-        std::ofstream o2("testdom2.xml");
+        std::ofstream o2("testdom2.xml", std::ios::binary);
         o2 << root2;
         
         dom::NodePtr info = root2.childNode("scene")->childNode("info");
@@ -142,15 +142,15 @@ int dom_test2() {
             std::cerr << "correct: detected bad name: "<< de  << std::endl;	
         }
         
-        std::ofstream o3("testdom3.xml");
+        std::ofstream o3("testdom3.xml", std::ios::binary);
         o3 << root;
     }
     {
         dom::Node root2;
-        std::ifstream f2("testdom3.xml");
+        std::ifstream f2("testdom3.xml", std::ios::binary);
 	    f2  >> root2;
         
-        std::ofstream o4("testdom4.xml");
+        std::ofstream o4("testdom4.xml", std::ios::binary);
         o4 << root2;
         
         try {
@@ -363,7 +363,7 @@ new file:
 #endif
                 {
                     asl::Time writeStart;
-                    std::ofstream temp_out("tmpout.xml");
+                    std::ofstream temp_out("tmpout.xml", std::ios::binary);
                     if (temp_out) {
                         if (temp_out << dom)
                             std::cerr << "Rewritten file to 'tmpout.xml'" << std::endl;;
@@ -388,7 +388,7 @@ new file:
                         << ", total_size = " << dom2.docSize() << std::endl;
                     
                     {
-                        std::ofstream of2("tmpout2.xml");
+                        std::ofstream of2("tmpout2.xml", std::ios::binary);
                         of2 << dom2;
                     }
                     

@@ -159,11 +159,11 @@ PackageManager::listPackageFiles(IPackagePtr thePackage,
 }
 
 IPackage::FileList
-PackageManager::listFiles(const std::string & theRelativePath,
+PackageManager::findFiles(const std::string & theRelativePath,
                           const std::string & thePackage, 
                           bool doRecursiveSearch /*= false */)
 {
-    AC_TRACE << "listFiles pkg='" << thePackage << "' path='" << theRelativePath << "'";
+    AC_TRACE << "findFiles pkg='" << thePackage << "' path='" << theRelativePath << "'";
     IPackage::FileList myFileList;
     if (thePackage.empty() == false) {
         IPackagePtr myPackage = findPackage("", thePackage);

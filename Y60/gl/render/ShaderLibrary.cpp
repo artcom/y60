@@ -78,7 +78,7 @@ namespace y60 {
         myShaderLibraryXml.parse(myShaderLibraryStr);
 
         load(myShaderLibraryXml.childNode(SHADER_LIST_NAME));
-        std::string myShaderDir = asl::getDirName(theLibraryFileName);
+        std::string myShaderDir = asl::getDirectoryPart(theLibraryFileName);
         setShaderDir(myShaderDir);
         AC_INFO << "Loaded Shaderlibrary " + theLibraryFileName;
     }

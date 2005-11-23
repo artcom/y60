@@ -38,7 +38,7 @@ loadShaderLibrary(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
         convertFrom(cx,argv[0],theShaderLibFile);
 
         GLResourceManager::get().loadShaderLibrary(asl::expandEnvironment(theShaderLibFile));
-        JSApp::getPackageManager()->add(asl::getDirName(theShaderLibFile));    
+        JSApp::getPackageManager()->add(asl::getDirectoryPart(theShaderLibFile));    
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION; 
 }

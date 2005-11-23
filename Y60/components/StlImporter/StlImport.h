@@ -79,18 +79,18 @@ namespace y60 {
         IProgressNotifierPtr _myProgressNotifier;
         std::vector<dom::NodePtr> _myStlShapes;
 
-        static asl::Vector3f generateNormal(const asl::Vector3f& v0,
-            const asl::Vector3f& v1,
-            const asl::Vector3f& v2);
+        static asl::Vector3f generateNormal(const asl::Vector3f & v0,
+            const asl::Vector3f & v1,
+            const asl::Vector3f & v2);
 
-        dom::NodePtr setupMaterial(const std::string& basename,
+        dom::NodePtr setupMaterial(const std::string & theBaseName,
             y60::SceneBuilder& sceneBuilder);
 
         template <class AC_BYTE_ORDER_LOCAL>
         unsigned int 
         readFileBinary(const asl::ReadableArrangedStream<AC_BYTE_ORDER_LOCAL> & theData,
-                       asl::Unsigned32 theOffset, y60::SceneBuilder& sceneBuilder,
-                       const std::string& materialId);
+                       asl::Unsigned32 theOffset, y60::SceneBuilder & sceneBuilder,
+                       const std::string & materialId);
     };
 } // namespace
 
