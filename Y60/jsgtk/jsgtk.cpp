@@ -325,6 +325,7 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
     INIT_SIGNAL1(void, Glib::ustring);
     INIT_SIGNAL2(void, double, double);
     INIT_SIGNAL2(bool, double, Glib::ustring);
+    INIT_SIGNAL2(void, Glib::ustring, Glib::ustring);
     
     if (!JSSigConnection::initClass(cx, theGlobalObject)) {
         return false;

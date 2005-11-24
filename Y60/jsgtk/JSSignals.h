@@ -56,6 +56,7 @@ DEFINE_SIGNAL1_CLASS_TRAIT(void, Glib::ustring)
 
 DEFINE_SIGNAL2_CLASS_TRAIT(void, double, double)
 DEFINE_SIGNAL2_CLASS_TRAIT(bool, double, Glib::ustring)
+DEFINE_SIGNAL2_CLASS_TRAIT(void, Glib::ustring, Glib::ustring)
 
 } // end of namespace jslib
 

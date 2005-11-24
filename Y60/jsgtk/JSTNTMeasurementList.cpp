@@ -206,6 +206,7 @@ JSTNTMeasurementList::Properties() {
         {"signal_visible_toggled", PROP_signal_visible_toggled, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"signal_editable_toggled", PROP_signal_editable_toggled, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"signal_right_click", PROP_signal_right_click, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"signal_name_changed", PROP_signal_name_changed, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -247,6 +248,13 @@ JSTNTMeasurementList::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             {
                 JSSignal0<void>::OWNERPTR mySignal( new
                         JSSignal0<void>::NATIVE(theNative.signal_right_click()));
+                *vp = jslib::as_jsval(cx, mySignal);
+                return JS_TRUE;
+            }
+        case PROP_signal_name_changed:
+            {
+                JSSignal2<void, Glib::ustring, Glib::ustring>::OWNERPTR mySignal(new
+                        JSSignal2<void, Glib::ustring, Glib::ustring>::NATIVE(theNative.signal_name_changed()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }

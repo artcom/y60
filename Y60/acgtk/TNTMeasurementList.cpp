@@ -64,6 +64,9 @@ TNTMeasurementList::TNTMeasurementList( const std::string & theVisibleIcon,
     _myNameColumn->set_expand(true);
     _myNameColumn->set_clickable(true);
     _myNameColumn->signal_clicked().connect( sigc::mem_fun( *this, & TNTMeasurementList::onSortByName ));
+    Gtk::CellRenderer * myNameRenderer = _myNameColumn->get_first_cell_renderer();
+    Gtk::CellRendererText * myTextRenderer = dynamic_cast<Gtk::CellRendererText *>(myNameRenderer);
+    myTextRenderer->signal_edited().connect( sigc::mem_fun( *this, & TNTMeasurementList::onNameEdited ));
 
     //=== value ===================================
     append_column( "Value", _myColumns.value);
@@ -259,6 +262,13 @@ TNTMeasurementList::update(dom::NodePtr theMeasurementNode, const Glib::ustring 
     myRow[_myColumns.is_editable] = theMeasurementNode->getAttribute("editable")->nodeValueRef<bool>();
     myRow[_myColumns.xml_id] = theMeasurementNode->getAttributeString("id");
     return myIter;
+}
+
+void 
+TNTMeasurementList::onNameEdited(const Glib::ustring & thePath, const Glib::ustring & theValue) {
+    //AC_INFO << "Got NameEdited from: " << thePath << " to " << theValue;
+    Gtk::TreeModel::Row myRow = * (_myListModel->get_iter(Gtk::TreeModel::Path(thePath)));
+    _myNameChangedSignal.emit(myRow[_myColumns.xml_id], theValue);
 }
 
 } // end of namespace
