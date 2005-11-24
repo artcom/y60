@@ -662,6 +662,8 @@ namespace y60 {
             glVertex3fv(theLine.end.begin());
         glEnd();
 
+        glLineWidth(1.0f);
+        glEnable(GL_LIGHTING);
         glPopMatrix();
         CHECK_OGL_ERROR;
     }
@@ -701,6 +703,8 @@ namespace y60 {
             glVertex3f(myPos[i][0], 0.0f, myPos[i][1]);
         }
         glEnd();
+        glLineWidth(1.0f);
+        glEnable(GL_LIGHTING);
 
         glPopMatrix();
         CHECK_OGL_ERROR;
@@ -722,6 +726,8 @@ namespace y60 {
 
         renderBox(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK,
                   theColor);
+        glLineWidth(1.0f);
+        glEnable(GL_LIGHTING);
 
         glPopMatrix();
         CHECK_OGL_ERROR;
@@ -743,6 +749,8 @@ namespace y60 {
             glVertex3fv(theTriangle[1].begin());
             glVertex3fv(theTriangle[2].begin());
         glEnd();
+        glLineWidth(1.0f);
+        glEnable(GL_LIGHTING);
 
         glPopMatrix();
         CHECK_OGL_ERROR;
@@ -1400,6 +1408,7 @@ namespace y60 {
         glPopMatrix();
 
         glPopAttrib();
+        
     }
 
     void
