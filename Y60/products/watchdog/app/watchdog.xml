@@ -38,12 +38,12 @@
         <RestartApplication command="restart_app"/>
         <StopApplication shutterCloseProjectors="true" command="firealarm_on"/>
         <StartApplication command="firealarm_off"/>
-        <ProjectorControl powerUpOnStartup="true">
+        <!--<ProjectorControl powerUpOnStartup="true">
             <Projector type="panasonic" port="0" input="RGB_1">
                 <FirstID>1</FirstID>
                 <NumProjectors>1</NumProjectors>
             </Projector>
-        </ProjectorControl>
+        </ProjectorControl>-->
     </UdpControl>
     <!--<RebootTime>15:30</RebootTime>-->
     <!--<HaltTime>16:10</HaltTime>-->
