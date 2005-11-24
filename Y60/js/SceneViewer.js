@@ -140,6 +140,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
 
         _myOnScreenDisplay.onFrame(theTime);
+        _myConfigurator.onFrame(theTime);
         fadeSplashScreen(theTime);
     }
 

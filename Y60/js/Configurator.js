@@ -190,6 +190,8 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
     var _myCurrentSection   = null;
     var _myCurrentSetting   = null;
     var _myListeners        = [];
+    var _myKeyDown          = null;
+
     if (fileExists(theSettingsFile)) {
         print("Parsing settings from '" + theSettingsFile + "'");
         var mySettingsDom = new Node();
@@ -228,13 +230,25 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             theListener.onUpdateSettings(_mySettings);
         }
         _myListeners.push({obj:theListener, section:theSection});
+    }
 
+    obj.onFrame = function(theTime) {
+        if (_myKeyDown && (theTime - _myKeyDown.time) > 0.2) {
+            obj.onKey(_myKeyDown.key, true, _myKeyDown.shift);
+        }
     }
 
     obj.onKey = function(theKey, theKeyState, theShiftFlag) {
-        if (!theKeyState || !_mySettings) {
+        if (!_mySettings) {
             return;
         }
+        if (!theKeyState) {
+            _myKeyDown = null;
+            return;
+        }
+
+        _myKeyDown = { key: theKey, shift: theShiftFlag, time: _mySceneViewer.getCurrentTime()};
+
         switch (theKey) {
             case "up":
                 _myCurrentSetting.increment(theShiftFlag);
