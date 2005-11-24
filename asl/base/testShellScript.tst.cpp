@@ -28,6 +28,8 @@
 #include <errno.h>
 #include <libgen.h>  
 
+#include "file_functions.h"
+
 
 using namespace std;  // automatically added!
 
@@ -60,10 +62,8 @@ int main(int argc, char *argv[]) {
 
     cerr << argv[0] << " launched with argc = " << argc << endl;
 
-    char * myDirectoryName = strdup(argv[0]);
-    char * myProgramName = strdup(argv[0]);
-    myDirectoryName = getDirectoryPart(myDirectoryName);
-    myProgramName = getFilenamePart(myProgramName);
+    string myDirectoryName = asl::getDirectoryPart(argv[0]);
+    string myProgramName = asl::getFilenamePart(argv[0]);
     cerr << myProgramName << " started in directory " << myDirectoryName << endl;
 
     string myScriptName = string("../../") + myProgramName + ".sh"; 
