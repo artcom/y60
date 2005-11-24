@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2003, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: ImageManager.js,v $
-//   $Author: david $
-//   $Revision: 1.7 $
-//   $Date: 2005/04/04 14:40:15 $
-//
-//
-//=============================================================================
-
 
 function ImageManager(theBaseViewer) {
     this.Constructor(this, theBaseViewer);

@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003-2004, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: JSSocket.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.7 $
-//   $Date: 2005/04/28 17:12:57 $
-//
-//
 //=============================================================================
 
 #include "JSSocket.h"
@@ -41,7 +33,7 @@ const unsigned READ_BUFFER_SIZE = 20000;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("returns information on socket connection."); DOC_END;
+    DOC_BEGIN("Returns information on socket connection."); DOC_END;
     const inet::Socket & mySocket = JSSocket::getJSWrapper(cx,obj).getNative();
     std::string myStringRep = string("Socket [local ip: ") +
         as_dotted_address(mySocket.getLocalAddress()) + ", port: " +
@@ -55,13 +47,13 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("close connection."); DOC_END;
+    DOC_BEGIN("Close connection."); DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::close,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    string docStr = "read data from connected socket. (max. bytes " + asl::as_string(READ_BUFFER_SIZE) + ")";
+    string docStr = "Read data from connected socket. (max. bytes " + asl::as_string(READ_BUFFER_SIZE) + ")";
     DOC_BEGIN(docStr);
     DOC_RVAL("number of bytes read.", DOC_TYPE_INTEGER);
     DOC_END;
@@ -89,7 +81,7 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("write data to connected socket.");
+    DOC_BEGIN("Write data to connected socket.");
     DOC_PARAM("theBlock", "A binary block to send", DOC_TYPE_OBJECT);
     DOC_RESET;
     DOC_PARAM("theString", "", DOC_TYPE_STRING);
@@ -153,7 +145,7 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("peek for available bytes at connected socket.");
+    DOC_BEGIN("Peek for available bytes at connected socket.");
     DOC_RVAL("number of bytes available.", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::peek,cx,obj,argc,argv,rval);
@@ -161,55 +153,55 @@ peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("connect to socket.");
+    DOC_BEGIN("Connect to socket.");
     DOC_PARAM("theRemoteIPAddress", "", DOC_TYPE_STRING);
     DOC_PARAM("theRemotePort", "", DOC_TYPE_INTEGER);
     DOC_RVAL("true if succesful.", DOC_TYPE_BOOLEAN);
     DOC_END;
-	try {
-		if (argc != 2) {
-			JS_ReportError(cx, "Socket::connect: bad number of arguments: expected 2 "
-				"(remote port, remote ip adress), got %d", argc);
-			return JS_FALSE;
-		}
+    try {
+        if (argc != 2) {
+            JS_ReportError(cx, "Socket::connect: bad number of arguments: expected 2 "
+                "(remote port, remote ip adress), got %d", argc);
+            return JS_FALSE;
+        }
 
-		if (JSVAL_IS_VOID(argv[0])) {
-			JS_ReportError(cx,"Socket::connect: bad argument #1 (undefined)");
-			return JS_FALSE;
-		}
-		if (JSVAL_IS_VOID(argv[1])) {
-			JS_ReportError(cx,"Socket::connect: bad argument #2 (undefined)");
-			return JS_FALSE;
-		}
+        if (JSVAL_IS_VOID(argv[0])) {
+            JS_ReportError(cx,"Socket::connect: bad argument #1 (undefined)");
+            return JS_FALSE;
+        }
+        if (JSVAL_IS_VOID(argv[1])) {
+            JS_ReportError(cx,"Socket::connect: bad argument #2 (undefined)");
+            return JS_FALSE;
+        }
 
-		string myRemoteHostAddressString;
-		if (!convertFrom(cx, argv[0], myRemoteHostAddressString)) {
-			JS_ReportError(cx, "Socket::connect: argument #1 must be a string (remote ip address)");
-			return JS_FALSE;
-		}
+        string myRemoteHostAddressString;
+        if (!convertFrom(cx, argv[0], myRemoteHostAddressString)) {
+            JS_ReportError(cx, "Socket::connect: argument #1 must be a string (remote ip address)");
+            return JS_FALSE;
+        }
 
-		unsigned short myRemotePort;
-		if (!convertFrom(cx, argv[1], myRemotePort)) {
-			JS_ReportError(cx, "Socket::connect: argument #2 must be an unsigned short (remote port)");
-			return JS_FALSE;
-		}
+        unsigned short myRemotePort;
+        if (!convertFrom(cx, argv[1], myRemotePort)) {
+            JS_ReportError(cx, "Socket::connect: argument #2 must be an unsigned short (remote port)");
+            return JS_FALSE;
+        }
 
-		unsigned long myRemoteHostAddress = asl::hostaddress(myRemoteHostAddressString);
-		JSClassTraits<JSSocket::NATIVE>::ScopedNativeRef myScopedSocket(cx, obj);
-		inet::UDPConnection * myUDPSocket = dynamic_cast<inet::UDPConnection *>(&myScopedSocket.getNative());
-		if (myUDPSocket) {
-    		myUDPSocket->connect(myRemoteHostAddress, myRemotePort);
-    		myUDPSocket->setRemoteAddr(myRemoteHostAddress, myRemotePort);
-    		return JS_TRUE;
-    	}
+        unsigned long myRemoteHostAddress = asl::hostaddress(myRemoteHostAddressString);
+        JSClassTraits<JSSocket::NATIVE>::ScopedNativeRef myScopedSocket(cx, obj);
+        inet::UDPConnection * myUDPSocket = dynamic_cast<inet::UDPConnection *>(&myScopedSocket.getNative());
+        if (myUDPSocket) {
+            myUDPSocket->connect(myRemoteHostAddress, myRemotePort);
+            //myUDPSocket->setRemoteAddr(myRemoteHostAddress, myRemotePort); // Done in connect
+            return JS_TRUE;
+        }
 
-		inet::TCPClientSocket * myTCPClientSocket = dynamic_cast<inet::TCPClientSocket *>(&myScopedSocket.getNative());
-		if (!myTCPClientSocket) {
-			return JS_FALSE;
+        inet::TCPClientSocket * myTCPClientSocket = dynamic_cast<inet::TCPClientSocket *>(&myScopedSocket.getNative());
+        if (!myTCPClientSocket) {
+            return JS_FALSE;
         } else {
-    		myTCPClientSocket->setRemoteAddr(myRemoteHostAddress, myRemotePort);
-    		myTCPClientSocket->connect();
-    		return JS_TRUE;
+            myTCPClientSocket->setRemoteAddr(myRemoteHostAddress, myRemotePort);
+            myTCPClientSocket->connect();
+            return JS_TRUE;
         }
     } catch(inet::SocketException &) {
         // TODO, must be reworked once we can throw exception into javascript

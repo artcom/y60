@@ -1,18 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003, ART+COM AG Berlin
+// Copyright (C) 2003-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: JSdirectory_functions.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.3 $
-//   $Date: 2005/02/10 12:26:15 $
-//
 //=============================================================================
 
 #include "JSfile_functions.h"
@@ -170,6 +163,20 @@ GetDirectoryPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
         std::string myPath;
         convertFrom(cx, argv[0], myPath);
         *rval = as_jsval(cx, asl::getDirectoryPart((myPath)));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+GetExtensionPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Return extension of a filename");
+    DOC_PARAM("thePath", "", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        std::string myPath;
+        convertFrom(cx, argv[0], myPath);
+        *rval = as_jsval(cx, asl::getExtension((myPath)));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -337,20 +344,21 @@ ReadWholeFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 JSFunctionSpec *
 JSFileFunctions::Functions() {
     static JSFunctionSpec myFunctions[] = {
-        {"readWholeFileAsString",   ReadWholeFileAsString,    1},
-        {"readWholeFileAsBlock",    ReadWholeFileAsBlock,  1},
-        {"writeWholeStringToFile",   WriteWholeStringToFile, 2},
-        {"writeWholeBlockToFile",    WriteWholeStringToFile, 2},
-        {"getLastModified",        GetLastModified,   1},
-        {"getFilenamePart",        GetFilenamePart,    1},
-        {"getDirectoryPart",       GetDirectoryPart,     1},
-        {"deleteFile",             DeleteFile,        1},
-        {"moveFile",               MoveFile,          2},
-        {"fileExists",             FileExists,     1},
-        {"includePath",            IncludePath,    1},
-        {"removePath",             RemovePath,     1},
-        {"getPath",                GetPath,        0},
-        {"findFiles",              findFiles,      2},
+        {"readWholeFileAsString",  ReadWholeFileAsString,  1},
+        {"readWholeFileAsBlock",   ReadWholeFileAsBlock,   1},
+        {"writeWholeStringToFile", WriteWholeStringToFile, 2},
+        {"writeWholeBlockToFile",  WriteWholeStringToFile, 2},
+        {"getLastModified",        GetLastModified,  1},
+        {"getFilenamePart",        GetFilenamePart,  1},
+        {"getDirectoryPart",       GetDirectoryPart, 1},
+        {"getExtensionPart",       GetExtensionPart, 1},
+        {"deleteFile",             DeleteFile,  1},
+        {"moveFile",               MoveFile,    2},
+        {"fileExists",             FileExists,  1},
+        {"includePath",            IncludePath, 1},
+        {"removePath",             RemovePath,  1},
+        {"getPath",                GetPath,     0},
+        {"findFiles",              findFiles,   2},
         {0},
     };
     return myFunctions;
