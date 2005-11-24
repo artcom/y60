@@ -23,7 +23,7 @@
 
 #include "Exception.h"
 #include "Block.h"
-#include <asl/PlugInManager.h>
+#include "PlugInManager.h"
 
 #include <string>
 #include <sys/types.h>
