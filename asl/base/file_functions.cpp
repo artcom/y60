@@ -372,7 +372,6 @@ namespace asl {
 
     void
     createPath(const std::string & thePath) {
-#ifdef WIN32
         std::string myPath = thePath;
         std::vector<std::string> myPathList;
         while (myPath.size()) {
@@ -381,12 +380,17 @@ namespace asl {
         }
         int i = myPath.size()-1; 
         for (; i >= 0; --i) {
+#ifdef WIN32
             char drive[_MAX_DRIVE];
             char dir[_MAX_DIR];
             char fname[_MAX_FNAME];
             char ext[_MAX_EXT];
             _splitpath(myPathList[i].c_str(), drive, dir, fname, ext );
             std::string myDirName = std::string(drive)+std::string(dir);
+
+#else
+            std::string myDirName = myPathList[i];
+#endif
             if (myDirName.empty()) {
                 myDirName = "./";
             }
@@ -394,12 +398,6 @@ namespace asl {
                 createDirectory(myDirName);
             }
         }
-#else
-        if (createPath(thePath.c_str(),0777) != 0) {
-            throw CreateDirectoryFailed(std::string("thePath=")+thePath+" ,reason:"+asl::errorDescription(lastError()), PLUS_FILE_LINE);
-        };
-#endif
-
     }
 
     std::string getTempDirectory() {
