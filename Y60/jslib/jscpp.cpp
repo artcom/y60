@@ -41,7 +41,6 @@
 #include "JSCoordSpline.h"
 #include "JSModellingFunctions.h"
 #include "JSLogger.h"
-#include "JSdirectory_functions.h"
 #include "JSfile_functions.h"
 #include "JSScene.h"
 #include "JSFrustum.h"
@@ -215,12 +214,6 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSTestServer::initClass(cx, theGlobalObject)) {
         return false;
     }
-
-    if (!JS_DefineFunctions(cx,theGlobalObject, JSDirectoryFunctions::Functions())) {
-        return false;
-    }
-    createFunctionDocumentation("DirectoryFunctions", JSDirectoryFunctions::Functions());
-
     if (!JS_DefineFunctions(cx,theGlobalObject, JSFileFunctions::Functions())) {
         return false;
     }

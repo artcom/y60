@@ -29,7 +29,6 @@
 
 #include <asl/string_functions.h>
 #include <asl/file_functions.h>
-#include <asl/directory_functions.h>
 #include <asl/DirectoryPackage.h>
 #include <asl/os_functions.h>
 #include <asl/Time.h>

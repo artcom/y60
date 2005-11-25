@@ -35,7 +35,6 @@ namespace asl {
 }
 
 namespace y60 {
-    DEFINE_EXCEPTION(NotYetImplemented,asl::Exception);
     /**
      * @ingroup Y60video
      * Abstract base class for Movie Decoders.

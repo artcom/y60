@@ -14,7 +14,6 @@
 
 #include <asl/Arguments.h>
 #include <asl/file_functions.h>
-#include <asl/directory_functions.h>
 #include <asl/Logger.h>
 
 #include <paintlib/planydec.h>

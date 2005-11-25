@@ -27,6 +27,5 @@
 #include <asl/Exception.h>
 
 DEFINE_EXCEPTION(ExportException, asl::Exception)
-DEFINE_EXCEPTION(NotYetImplementedException, asl::Exception)
 
 #endif

@@ -20,7 +20,6 @@
 #include <asl/Arguments.h>
 #include <asl/numeric_functions.h>
 #include <asl/file_functions.h>
-#include <asl/directory_functions.h>
 #include <asl/MappedBlock.h>
 
 #include <dom/Nodes.h>

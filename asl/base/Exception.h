@@ -104,7 +104,8 @@ namespace asl {
 
     // Some generic exceptions
     DEFINE_EXCEPTION(ParseException, Exception);
-    DEFINE_EXCEPTION(NotYetImplementedException, Exception)
+    DEFINE_EXCEPTION(NotYetImplemented, Exception)
+    DEFINE_EXCEPTION(InputOutputFailure, Exception)
 
 
     /* @} */

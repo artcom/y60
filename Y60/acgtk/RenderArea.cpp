@@ -22,7 +22,6 @@
 #include "RenderArea.h"
 
 #include <asl/file_functions.h>
-#include <asl/directory_functions.h>
 #include <asl/os_functions.h>
 #include <asl/Exception.h>
 #include <y60/GLUtils.h>

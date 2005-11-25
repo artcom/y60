@@ -50,7 +50,6 @@ namespace y60 {
 
     DEFINE_EXCEPTION(SceneException, asl::Exception);
     DEFINE_EXCEPTION(SomError, asl::Exception);
-    DEFINE_EXCEPTION(NotYetImplemented, SceneException);
 
     struct BodyInfo {
         dom::NodePtr _myBody;

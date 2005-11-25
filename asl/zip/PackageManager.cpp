@@ -25,7 +25,6 @@
 #include "ZipPackage.h"
 #include <asl/file_functions.h>
 #include <asl/MappedBlock.h>
-#include <asl/directory_functions.h>
 #include <asl/Logger.h>
 #include <vector>
 

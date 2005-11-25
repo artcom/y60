@@ -60,7 +60,7 @@ namespace y60 {
     void MovieDecoderBase::load(asl::Ptr<asl::ReadableStream> theSource, 
             const std::string & theFilename)  
     {
-        throw NotYetImplemented(JUST_FILE_LINE);
+        throw asl::NotYetImplemented(JUST_FILE_LINE);
     }
 
     PixelEncoding MovieDecoderBase::getPixelFormat() const

@@ -33,11 +33,34 @@ namespace asl {
     
 /*! \addtogroup aslbase */
 /* @{ */
-    
+
+DEFINE_EXCEPTION(FileNotFoundException, asl::Exception);
+DEFINE_EXCEPTION(CreateDirectoryFailed, asl::Exception);
+DEFINE_EXCEPTION(OpenDirectoryFailed, asl::Exception);
+
+std::vector<std::string> getDirectoryEntries(const std::string & thePath);
+
+/** creates a new directory in an existing directory */
+void createDirectory(const std::string & theDirectory);
+
+/** creates a new directory and all necessary parent directories */
+void createPath(const std::string & theDirectory);
+
+std::string getTempDirectory();
+std::string getAppDataDirectory(const std::string & theAppName);
+std::string getAppDirectory();
+
+/// returns true if theDirectory is a readable directory, false otherwise
+bool isDirectory(const std::string & theDirectory);
+std::string stripTrailingSlashes(const std::string & theDirectory);
+
 /// returns filename without directory     
 std::string getFilenamePart(const std::string & theFileName);
 /// returns directory without filename     
 std::string getDirectoryPart(const std::string & theFileName);
+
+/// returns path shortened by last directory component     
+std::string getParentDirectory(const std::string & theDirectoryName);
 
 /// return filename extension, or "" if none was found
 std::string getExtension(const std::string & theFileName);
@@ -79,6 +102,7 @@ time_t getLastModified(const std::string & theFilename);
 #  define STAT64F  _stat64
 #endif
 
+/// returns true if file or directory exists
 inline
 bool fileExists(const std::string& theFileName) {
     struct STAT64 myStat;
@@ -105,6 +129,46 @@ off_t getFileSize(const std::string& theFileName) {
 
 #undef STAT64
 #undef STAT64F
+#ifdef __cplusplus
+extern "C"
+{
+        
+#endif
+#ifdef WIN32
+
+typedef struct DIR DIR;
+
+struct dirent
+{
+    char *d_name;
+};
+
+DIR           *opendir(const char *);
+int           closedir(DIR *);
+struct dirent *readdir(DIR *);
+void          rewinddir(DIR *);
+
+#else // Linux and Mac Os X
+#   include <dirent.h>
+#endif
+/*
+
+    Copyright Kevlin Henney, 1997, 2003. All rights reserved.
+
+    Permission to use, copy, modify, and distribute this software and its
+    documentation for any purpose is hereby granted without fee, provided
+    that this copyright and permissions notice appear in all copies and
+    derivatives.
+    
+    This software is supplied "as is" without express or implied warranty.
+
+    But that said, if there are any problems please get in touch.
+
+*/
+
+#ifdef __cplusplus
+} // extern C
+#endif
 
 #endif
 

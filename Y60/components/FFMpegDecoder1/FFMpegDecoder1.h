@@ -93,7 +93,7 @@ namespace y60 {
          * @param theFilename file to identify theSource
          */
         void load(asl::Ptr<asl::ReadableStream> theSource, const std::string & theFilename) {
-            throw NotYetImplemented(JUST_FILE_LINE);
+            throw asl::NotYetImplemented(JUST_FILE_LINE);
         }
     
         virtual asl::Ptr<MovieDecoderBase> instance() const;

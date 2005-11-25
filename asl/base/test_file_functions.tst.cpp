@@ -64,6 +64,14 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getDirectoryPart("passwd")=="./");
             ENSURE(getDirectoryPart("C:/WinNT/sux")=="C:/WinNT/");
 
+
+            ENSURE(getParentDirectory("C:/WinNT/sux/")=="C:/WinNT/");
+            ENSURE(getParentDirectory("C:/WinNT/sux")=="C:/WinNT/");
+            ENSURE(getParentDirectory("C:/WinNT")=="C:/");
+            ENSURE(getParentDirectory("/")=="");
+            ENSURE(getParentDirectory("")=="");
+            ENSURE(getParentDirectory("X")=="");
+
             ENSURE(searchFile(getFilenamePart(__FILE__), "/;.;../..") == std::string("../../") + getFilenamePart(__FILE__));            
             ENSURE(searchFile(getFilenamePart(__FILE__), "") == "");            
             ENSURE(searchFile(getFilenamePart(__FILE__), "../..") == std::string("../../") + getFilenamePart(__FILE__));            
@@ -76,6 +84,13 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getExtension("somewhere\\sometime\\myfile.something.mp3") == "mp3");
             ENSURE(getExtension("somewhere.sometime/myfile.mp3") == "mp3");
             ENSURE(getExtension("somewhere.sometime\\myfile") == "");
+
+            createDirectory("myTestSubDir");
+            ENSURE(isDirectory("myTestSubDir"));
+
+            createPath("myTestPath/myTestDir");
+            ENSURE(isDirectory("myTestPath/myTestDir"));
+
         }
 
         void perform_putget(const string & testFileName, int contentSize) {
@@ -117,6 +132,56 @@ class file_functions_UnitTest : public UnitTest {
         }
 };
 
+class DirectoryTest : public UnitTest {
+public:
+    DirectoryTest() : UnitTest("DirectoryTest") {  }
+    void run() {
+        DIR * myDirHandle = opendir(".");
+        struct dirent *dir_entry;
+
+        ENSURE(myDirHandle);
+        bool myFoundUpDirFlag = false;
+        bool myFoundCurDirFlag = false;
+
+        while((dir_entry = readdir(myDirHandle)) != NULL) {
+            if (std::string("..") == dir_entry->d_name) {
+                myFoundUpDirFlag = true;
+            }
+            if (std::string(".") == dir_entry->d_name) {
+                myFoundCurDirFlag = true;
+            }
+
+            DPRINT(dir_entry->d_name);
+        }
+        ENSURE_MSG(myFoundUpDirFlag, " found up dir entry");
+        ENSURE_MSG(myFoundCurDirFlag, " found current dir entry");
+        closedir(myDirHandle);
+
+        // use getdir utility function instead
+
+        vector<string> myDirEntries = getDirectoryEntries(std::string("..") + theDirectorySeparator + ".." + theDirectorySeparator + "testdir");
+        std::sort(myDirEntries.begin(), myDirEntries.end());
+
+        ENSURE(myDirEntries.size() == 5);
+//        ENSURE_MSG(myDirEntries[0] == ".svn "found dir .svn, ;-)");
+        ENSURE_MSG(myDirEntries[1] == "a" , "found dir a");
+        ENSURE_MSG(myDirEntries[2] == "b" , "found dir b");
+        ENSURE_MSG(myDirEntries[3] == "c" , "found dir c");
+        ENSURE_MSG(myDirEntries[4] == "d" , "found dir d");
+
+        ENSURE_EXCEPTION(getDirectoryEntries("../../testdir/a"), OpenDirectoryFailed);
+        ENSURE_EXCEPTION(getDirectoryEntries("nonexistingdir"), OpenDirectoryFailed);
+
+        std::cerr << getTempDirectory() << std::endl;
+        std::cerr << getAppDataDirectory("TEST") << std::endl;
+
+        ENSURE(isDirectory("."));
+        ENSURE(isDirectory("../../testdir/"));
+        ENSURE(!isDirectory("nonexistingdir"));
+        ENSURE(!isDirectory("../../testdir/a"));
+//        ENSURE(isDirectory("../../testdir/.svn"));
+    }
+};
 
 class MyTestSuite : public UnitTestSuite {
 public:
@@ -124,7 +189,8 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new file_functions_UnitTest);
-    }
+        addTest(new DirectoryTest);
+   }
 };
 
 

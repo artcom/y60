@@ -17,7 +17,6 @@
 #include "Arguments.h"
 #include "os_functions.h"
 #include "string_functions.h"
-#include "directory_functions.h"
 #include "Time.h"
 
 #include <iostream>

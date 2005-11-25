@@ -33,8 +33,6 @@ namespace asl {
     /*! @addtogroup aslmath */
     /* @{ */
 
-	DEFINE_EXCEPTION(NotYetImplemented,Exception);
-
     /** A 2-tupel of arbitrary (nummeric) type. 
      *  @f[ \vec{a} = (a_1, a_2) @f]
      */

@@ -217,7 +217,6 @@ Performance tests yield the following results:
 //#include "xpshell.h"
 
 #include <asl/string_functions.h>
-#include <asl/directory_functions.h>
 #include <asl/file_functions.h>
 #include <asl/UnitTest.h>
 #include <asl/Time.h>

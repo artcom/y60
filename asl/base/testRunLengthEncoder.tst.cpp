@@ -23,7 +23,6 @@
 
 #include "UnitTest.h"
 #include "Time.h"
-#include "directory_functions.h"
 #include "file_functions.h"
 
 #include <string>
