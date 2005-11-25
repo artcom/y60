@@ -32,25 +32,28 @@ typedef asl::Box3<Number> NATIVE;
 
 static JSBool
 makeEmpty(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Makes this Box contain nothing.");
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::makeEmpty,cx,obj,argc,argv,rval);
 }
 static JSBool
 makeFull(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Makes this Box contain anything.");
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::makeFull,cx,obj,argc,argv,rval);
 }
 static JSBool
 makeCorrect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Flips Coordinates so that the Box has a proper upper near left and lower far right corner.");
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::makeCorrect,cx,obj,argc,argv,rval);
 }
 static JSBool
 extendBy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Extend the Box to minimally include a given point/box.");
+    DOC_PARAM("theExtensionPoint", "a point defining the resulting extension", DOC_TYPE_POINT3F);
+    DOC_RESET;
+    DOC_PARAM("theExtensionBox", "a box defining the resulting extension", DOC_TYPE_POINT3F);
     DOC_END;
     if (argc == 1) {
         if (JSBox3f::matchesClassOf(cx, argv[0])) {
@@ -67,7 +70,8 @@ extendBy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 intersects(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Intersect the Box with another one.");
+    DOC_PARAM("theIntersectingBox", "", DOC_TYPE_BOX3F);
     DOC_END;
     if (argc == 1) {
         if (JSBox3f::matchesClassOf(cx, argv[0])) {
@@ -83,7 +87,11 @@ intersects(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 static JSBool
 contains(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Check if the Box contains a point/box.");
+    DOC_PARAM("theContainedPoint", "", DOC_TYPE_POINT3F);
+    DOC_RESET;
+    DOC_PARAM("theContainedBox", "", DOC_TYPE_BOX3F);
+    DOC_RVAL("true/false", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
         if (JSBox3f::matchesClassOf(cx, argv[0])) {
@@ -100,7 +108,11 @@ contains(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 envelopes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Check if the Box contains and doesn't touch a point/box.");
+    DOC_PARAM("theEnvelopedPoint", "", DOC_TYPE_POINT3F);
+    DOC_RESET;
+    DOC_PARAM("theEnvelopedBox", "", DOC_TYPE_BOX3F);
+    DOC_RVAL("true/false", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
         if (JSBox3f::matchesClassOf(cx, argv[0])) {
@@ -116,7 +128,11 @@ envelopes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 static JSBool
 touches(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Check if the Box touches a point/box.");
+    DOC_PARAM("theTouchingPoint", "", DOC_TYPE_POINT3F);
+    DOC_RESET;
+    DOC_PARAM("theTouchingBox", "", DOC_TYPE_BOX3F);
+    DOC_RVAL("true/false", DOC_TYPE_BOOLEAN);
     DOC_END;
     if (argc == 1) {
         if (JSBox3f::matchesClassOf(cx, argv[0])) {
@@ -132,35 +148,41 @@ touches(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 static JSBool
 setBounds(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("set the bounds of the Box.");
+    DOC_PARAM("theUpperNearLeftCorner", "", DOC_TYPE_POINT3F);
+    DOC_PARAM("theLowerFarRightCorner", "", DOC_TYPE_POINT3F);
     DOC_END;
     typedef void (NATIVE::*MyMethod)(const asl::Point3<Number> &, const asl::Point3<Number> &);
     return Method<NATIVE>::call((MyMethod)&NATIVE::setBounds,cx,obj,argc,argv,rval);
 }
 static JSBool
 add(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Translate the Box adding an offset to its corners.");
+    DOC_PARAM("theTranslationVector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
     typedef void (NATIVE::*MyMethod)(const asl::Vector3<Number> &);
     return Method<NATIVE>::call((MyMethod)&NATIVE::add,cx,obj,argc,argv,rval);
 }
 static JSBool
 sub(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Translate the Box subtracting an offset to its corners.");
+    DOC_PARAM("theTranslationVector", "", DOC_TYPE_VECTOR3F);
     DOC_END;
     typedef void (NATIVE::*MyMethod)(const asl::Vector3<Number> &);
     return Method<NATIVE>::call((MyMethod)&NATIVE::sub,cx,obj,argc,argv,rval);
 }
 static JSBool
 mult(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Scale the Box multiplying each coordinate by a factor.");
+    DOC_PARAM("theFactors", "", DOC_TYPE_VECTOR3F);
     DOC_END;
     typedef void (NATIVE::*MyMethod)(const asl::Vector3<Number> &);
     return Method<NATIVE>::call((MyMethod)&NATIVE::mult,cx,obj,argc,argv,rval);
 }
 static JSBool
 div(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Scale the Box dividing each coordinate by a factor.");
+    DOC_PARAM("theFactors", "", DOC_TYPE_VECTOR3F);
     DOC_END;
     typedef void (NATIVE::*MyMethod)(const asl::Vector3<Number> &);
     return Method<NATIVE>::call((MyMethod)&NATIVE::div,cx,obj,argc,argv,rval);
@@ -168,7 +190,8 @@ div(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("returns string representation of the Box.");
+    DOC_RVAL("", DOC_TYPE_STRING);
     DOC_END;
     std::string myStringRep = asl::as_string(JSBox3f::getJSWrapper(cx,obj).getNative());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
