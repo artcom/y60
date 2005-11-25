@@ -41,7 +41,9 @@ namespace y60 {
     HWND getActiveWindow();
 
     WMPPlayer::WMPPlayer() {
+        AC_DEBUG << "WMPPlayer::WMPPlayer() ";
 		_myModule.Init(NULL, NULL, &LIBID_ATLLib);
+        AC_DEBUG << "WMPPlayer::WMPPlayer() done.";
     }
 
     WMPPlayer::~WMPPlayer() {
@@ -49,9 +51,18 @@ namespace y60 {
     }
 
     void
-    WMPPlayer::setup() {
-        _myParentWindow = getActiveWindow();
+    WMPPlayer::setup(const string & theParentWindowTitle) {
+        AC_DEBUG << "WMPPlayer::setup ";
+
+        _myParentWindow = FindWindow(0, theParentWindowTitle.c_str());
+        if (_myParentWindow == NULL) {
+            throw asl::Exception(string("### ERROR: Could not get parent window") + theParentWindowTitle, PLUS_FILE_LINE);
+		}
+
+		//_myParentWindow = getActiveWindow();
+
         HRESULT hr = createWMP(_myParentWindow);
+        AC_DEBUG << "WMPPlayer::setup done.";
     }
 
     bool

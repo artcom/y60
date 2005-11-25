@@ -51,7 +51,8 @@ load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Setup the player (e.g. window). Call this before any usage");
+    DOC_BEGIN("Setup the player given a parent window. Call this before any usage");
+    DOC_PARAM("theParentWindow", "", DOC_TYPE_STRING);
     DOC_END;
     return Method<JSWMPPlayer::NATIVE>::call(&JSWMPPlayer::NATIVE::setup,cx,obj,argc,argv,rval);
 }
@@ -99,7 +100,7 @@ JSWMPPlayer::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"load",                 load,                    1},
-        {"setup",                setup,                   0},
+        {"setup",                setup,                   1},
         {"play",                 play,                    0},
         {"stop",                 stop,                    0},
         {"pause",                pause,                   0},
@@ -236,6 +237,8 @@ JSWMPPlayer::StaticProperties() {
     
 JSBool
 JSWMPPlayer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("constructs a WMPPlayer instance, nothing more.");
+    DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
         return JS_FALSE;
@@ -259,8 +262,11 @@ JSWMPPlayer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
 
 JSObject *
 JSWMPPlayer::initClass(JSContext *cx, JSObject *theGlobalObject) {
+	AC_DEBUG << "JSWMPPlayer::initClass()";
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
-    DOC_MODULE_CREATE("Components", JSWMPPlayer);
+	AC_DEBUG << "Base::initClass done.";
+	DOC_MODULE_CREATE("Components", JSWMPPlayer);
+	AC_DEBUG << "JSWMPPlayer::initClass done.";
     return myClass;
 }
 

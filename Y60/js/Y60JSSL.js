@@ -570,8 +570,14 @@ function hexToNum(theHex) {
     return parseInt(theHex, 16);
 }
 
-function numToHex(theNum) {
-    return theNum.toString(16);
+function numToHex(theNum, theDigitCount) {
+    var myHex = theNum.toString(16);
+    if (theDigitCount != undefined) {
+        while (myHex.length < theDigitCount) {
+            myHex = "0" + myHex;
+        }
+    }
+    return myHex;
 }
 
 function countNodes(theNode) {

@@ -572,7 +572,7 @@ SDLWindow::mainLoop() {
 #endif
         onFrame();
 
-        // Call onProtoFrame (a second on frame that can be used to automatically run tutorials)
+        // Call onProtoFrame (a second onframe that can be used to automatically run tutorials)
         if (_myEventListener && jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
             jsval argv[1], rval;
             argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
@@ -634,6 +634,10 @@ SDLWindow::go() {
     }
     try {
         AbstractRenderWindow::go();
+        if (_myEventListener && jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onStartMainLoop")) {
+            jsval argv[1], rval;
+			jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onStartMainLoop", 0, argv, &rval);
+        }
         mainLoop();
     } catch (const asl::Exception & ex) {
         AC_ERROR << "Exception caught in SDLWindow::go(): " << ex << endl;

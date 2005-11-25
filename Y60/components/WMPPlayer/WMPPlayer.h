@@ -54,7 +54,7 @@ namespace y60 {
         public:
             WMPPlayer();
             virtual ~WMPPlayer();
-            void WMPPlayer::setup();
+            void WMPPlayer::setup(const std::string & theParentWindowTitle);
 
             bool load(const std::string & theUrl);
 
