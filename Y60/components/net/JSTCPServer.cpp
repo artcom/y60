@@ -36,7 +36,7 @@ using namespace jslib;
 
 static JSBool
 waitForConnection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("start server waiting for connections."); 
+    DOC_BEGIN("Starts a blocking waiting for connections");
     DOC_END;
     const inet::TCPServer & myServer = JSTCPServer::getJSWrapper(cx,obj).getNative();
     asl::Ptr<inet::Socket> mySocket(myServer.waitForConnection());
@@ -74,7 +74,7 @@ JSTCPServer::StaticProperties() {
     };
     return myProperties;
 }
-    
+
 JSFunctionSpec *
 JSTCPServer::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
@@ -86,9 +86,9 @@ JSTCPServer::StaticFunctions() {
 JSBool
 JSTCPServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a TCP Server. Does not start the server.");
-    DOC_PARAM("theIPAddress", "", DOC_TYPE_STRING);
-    DOC_PARAM("thePort", "", DOC_TYPE_INTEGER);
-    DOC_PARAM_OPT("theReusePortFlag", "", DOC_TYPE_BOOLEAN, false);
+    DOC_PARAM("theIPAddress", "The ipadress or hostname the server is started on", DOC_TYPE_STRING);
+    DOC_PARAM("thePort", "The tcp-port the server is listening at", DOC_TYPE_INTEGER);
+    DOC_PARAM_OPT("theReusePortFlag", "If true, the server does not open a new port for each connection", DOC_TYPE_BOOLEAN, false);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());

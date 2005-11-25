@@ -84,10 +84,10 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Write data to connected socket.");
     DOC_PARAM("theBlock", "A binary block to send", DOC_TYPE_OBJECT);
     DOC_RESET;
-    DOC_PARAM("theString", "", DOC_TYPE_STRING);
+    DOC_PARAM("theString", "The string to write. (make sure there are no zero bytes inside)", DOC_TYPE_STRING);
     DOC_RESET;
-    DOC_PARAM("theArrayOfUnsignedByte", "", DOC_TYPE_ARRAY);
-    DOC_RVAL("number of bytes written.", DOC_TYPE_INTEGER);
+    DOC_PARAM("theArrayOfUnsignedByte", "An array of numbers less than 256 (if you need to send zero bytes)", DOC_TYPE_ARRAY);
+    DOC_RVAL("Number of bytes written.", DOC_TYPE_INTEGER);
     DOC_END;
     try {
         if (argc != 1) {
@@ -145,8 +145,8 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Peek for available bytes at connected socket.");
-    DOC_RVAL("number of bytes available.", DOC_TYPE_INTEGER);
+    DOC_BEGIN("Peek for available bytes at connected socket");
+    DOC_RVAL("The number of bytes available", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::peek,cx,obj,argc,argv,rval);
 }
@@ -154,9 +154,9 @@ peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Connect to socket.");
-    DOC_PARAM("theRemoteIPAddress", "", DOC_TYPE_STRING);
-    DOC_PARAM("theRemotePort", "", DOC_TYPE_INTEGER);
-    DOC_RVAL("true if succesful.", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("theRemoteIPAddress", "IP-address or hostname to connect to", DOC_TYPE_STRING);
+    DOC_PARAM("theRemotePort", "Port number to connect to", DOC_TYPE_INTEGER);
+    DOC_RVAL("True if succesful", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
         if (argc != 2) {
@@ -211,16 +211,9 @@ connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
-setNoisy(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("not supported."); DOC_END;
-    //return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::setNoisy,cx,obj,argc,argv,rval);
-    return JS_TRUE;
-}
-
-static JSBool
 setBlockingMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("set blocking mode on connection.");
-    DOC_PARAM("isBlocking", "", DOC_TYPE_BOOLEAN);
+    DOC_BEGIN("Set blocking mode on connection");
+    DOC_PARAM("isBlocking", "If false, a read call on the socket will only return if a packet has been received", DOC_TYPE_BOOLEAN);
     DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::setBlockingMode,cx,obj,argc,argv,rval);
 }
@@ -239,8 +232,7 @@ JSSocket::Functions() {
         {"write",                write,                   1},
         {"peek",                 peek,                    1},
         {"close",                close,                   0},
-        {"connect",              connect,        2},
-        {"setNoisy",             setNoisy,                1},
+        {"connect",              connect,                 2},
         {"setBlockingMode",      setBlockingMode,         1},
         {0}
     };
@@ -317,8 +309,8 @@ JSBool
 JSSocket::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a Socket. No connection is established.");
     DOC_PARAM("theSocketType", "UDP or TCPCLIENT", DOC_TYPE_STRING);
-    DOC_PARAM("thePort", "", DOC_TYPE_INTEGER);
-    DOC_PARAM_OPT("theLocalIPAddress", "", DOC_TYPE_STRING, asl::localhostname());
+    DOC_PARAM("thePort", "The local port the socket is listening on", DOC_TYPE_INTEGER);
+    DOC_PARAM_OPT("theLocalIPAddress", "The local ip-address or hostname the socket is listening on", DOC_TYPE_STRING, asl::localhostname());
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());

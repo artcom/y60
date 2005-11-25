@@ -24,8 +24,12 @@ namespace jslib {
 JS_STATIC_DLL_CALLBACK(JSBool)
 ReadWholeFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Loads a text file into a string using the package manager");
-    DOC_PARAM("theRelativeFilename", "", DOC_TYPE_STRING);
-    DOC_PARAM("thePackagePath", "", DOC_TYPE_STRING);
+    DOC_PARAM("theRelativePath", "The path to search in. It is relative and must be defined inside a package", DOC_TYPE_STRING);
+    DOC_RVAL("Returns the file content as string", DOC_TYPE_STRING);
+    DOC_RESET;
+    DOC_PARAM("theRelativePath", "The path to search in. It is relative and must be defined inside a package", DOC_TYPE_STRING);
+    DOC_PARAM("thePackageName", "The package to search in.", DOC_TYPE_STRING);
+    DOC_RVAL("Returns the file content as string", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1, 2);
@@ -59,7 +63,8 @@ ReadWholeFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 static JSBool
 GetLastModified(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the modification time for the given file");
-    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "The file path to read modification time for", DOC_TYPE_STRING);
+    DOC_RVAL("The timestamp of the last modification", DOC_TYPE_INTEGER);
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -73,8 +78,8 @@ GetLastModified(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 static JSBool
 MoveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Moves the given file");
-    DOC_PARAM("theSource", "", DOC_TYPE_STRING);
-    DOC_PARAM("theTarget", "", DOC_TYPE_STRING);
+    DOC_PARAM("theSource", "The source file path", DOC_TYPE_STRING);
+    DOC_PARAM("theTarget", "The destination file path", DOC_TYPE_STRING);
     DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
@@ -91,7 +96,7 @@ MoveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 DeleteFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Deletes the given file");
-    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "The file path to delete", DOC_TYPE_STRING);
     DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
@@ -106,8 +111,8 @@ DeleteFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 WriteWholeStringToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Writes a given string into a file");
-    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
-    DOC_PARAM("theString", "", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "The target file path", DOC_TYPE_STRING);
+    DOC_PARAM("theString", "The string to write to the file", DOC_TYPE_STRING);
     DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
@@ -124,8 +129,8 @@ WriteWholeStringToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 static JSBool
 WriteWholeBlockToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Writes a given binary block into a file");
-    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
-    DOC_PARAM("theBlock", "", DOC_TYPE_BLOCK);
+    DOC_PARAM("theFilename", "The target file path", DOC_TYPE_STRING);
+    DOC_PARAM("theBlock", "The block to write", DOC_TYPE_BLOCK);
     DOC_RVAL("Returns true if successful.", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
@@ -142,7 +147,8 @@ WriteWholeBlockToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
 static JSBool
 GetFilenamePart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the filename without its directory");
-    DOC_PARAM("thePath", "", DOC_TYPE_STRING);
+    DOC_PARAM("thePath", "The file path to get the filename from", DOC_TYPE_STRING);
+    DOC_RVAL("The filename without directory", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -155,8 +161,9 @@ GetFilenamePart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 static JSBool
 GetDirectoryPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("extracts the directory from a path");
-    DOC_PARAM("thePath", "", DOC_TYPE_STRING);
+    DOC_BEGIN("Extracts the directory from a path");
+    DOC_PARAM("thePath", "The file path to extract the directory from", DOC_TYPE_STRING);
+    DOC_RVAL("The directory without filename", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -170,7 +177,8 @@ GetDirectoryPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 static JSBool
 GetExtensionPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Return extension of a filename");
-    DOC_PARAM("thePath", "", DOC_TYPE_STRING);
+    DOC_PARAM("thePath", "The file path get the extension from", DOC_TYPE_STRING);
+    DOC_RVAL("The extension of the filename", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -184,7 +192,7 @@ GetExtensionPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
 JS_STATIC_DLL_CALLBACK(JSBool)
 FileExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Tests whether a given file exists.");
-    DOC_PARAM("theFileName", "Path and filename to test", DOC_TYPE_STRING);
+    DOC_PARAM("theFileName", "The filename to test", DOC_TYPE_STRING);
     DOC_RVAL("True if file exists", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
@@ -215,7 +223,7 @@ FileExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JS_STATIC_DLL_CALLBACK(JSBool)
 IncludePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Adds the given path as search-path to the packet manager.");
-    DOC_PARAM("theIncludePath", "A valid path", DOC_TYPE_STRING);
+    DOC_PARAM("theIncludePath", "The path to add to the packet manager", DOC_TYPE_STRING);
     DOC_END;
     try {
         if (!argc) {
@@ -256,7 +264,7 @@ RemovePath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JS_STATIC_DLL_CALLBACK(JSBool)
 GetPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the search-path of the package manager, which is used for includes, plugins, and shaderlibrary.");
-    DOC_RVAL("thePath", DOC_TYPE_STRING);
+    DOC_RVAL("The searchpath of the package manager", DOC_TYPE_STRING);
     DOC_END;
     try {
         *rval = as_jsval(cx, JSApp::getPackageManager()->getSearchPath());

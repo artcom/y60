@@ -23,39 +23,39 @@
 namespace jslib {
 
     static JSBool
-    getTotalMemory(JSContext * cx, JSObject * obj,
-                   uintN argc, jsval * argv, jsval * rval) {
+    getTotalMemory(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
         DOC_BEGIN("Returns total amount of physical system memory in KB");
+        DOC_RVAL("The amount of memory in KB.", DOC_TYPE_INTEGER);
         DOC_END;
         *rval = as_jsval(cx, asl::getTotalMemory());
-        return JS_TRUE; 
+        return JS_TRUE;
     }
 
     static JSBool
-    getFreeMemory(JSContext * cx, JSObject * obj,
-                  uintN argc, jsval * argv, jsval * rval) {
+    getFreeMemory(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
         DOC_BEGIN("Returns amount of free system memory in KB");
+        DOC_RVAL("The amount of memory in KB.", DOC_TYPE_INTEGER);
         DOC_END;
         *rval = as_jsval(cx, asl::getFreeMemory());
-        return JS_TRUE; 
+        return JS_TRUE;
     }
 
     static JSBool
-    getUsedMemory(JSContext * cx, JSObject * obj,
-                  uintN argc, jsval * argv, jsval * rval) {
+    getUsedMemory(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
         DOC_BEGIN("Returns amount of used system memory in KB");
+        DOC_RVAL("The amount of memory in KB.", DOC_TYPE_INTEGER);
         DOC_END;
         *rval = as_jsval(cx, asl::getUsedMemory());
-        return JS_TRUE; 
+        return JS_TRUE;
     }
 
     static JSBool
-    getProcessMemoryUsage(JSContext * cx, JSObject * obj,
-                          uintN argc, jsval * argv, jsval * rval) {
+    getProcessMemoryUsage(JSContext * cx, JSObject * obj,uintN argc, jsval * argv, jsval * rval) {
         DOC_BEGIN("Returns amount of memory used by this process in KB");
+        DOC_RVAL("The amount of memory in KB.", DOC_TYPE_INTEGER);
         DOC_END;
         *rval = as_jsval(cx, asl::getProcessMemoryUsage());
-        return JS_TRUE; 
+        return JS_TRUE;
     }
 
     JSFunctionSpec *

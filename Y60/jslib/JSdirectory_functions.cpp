@@ -28,9 +28,9 @@ namespace jslib {
 
 static JSBool
 getDirectoryEntries(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
-    DOC_BEGIN("Fetch list of directory entries");
-    DOC_PARAM("thePath", "", DOC_TYPE_STRING);
-    DOC_RVAL("List of paths", DOC_TYPE_ARRAY);
+    DOC_BEGIN("Collects a list of entries in a given directory");
+    DOC_PARAM("thePath", "The directory path to look inside", DOC_TYPE_STRING);
+    DOC_RVAL("Array of path-strings", DOC_TYPE_ARRAY);
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -53,6 +53,7 @@ getDirectoryEntries(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, js
 static JSBool
 getAppDirectory(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
     DOC_BEGIN("Returns directory where the running application is located");
+    DOC_RVAL("The application directory string", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 0);
@@ -65,7 +66,8 @@ getAppDirectory(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval 
 static JSBool
 getAppDataDirectory(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
     DOC_BEGIN("Returns directory for application data (e.g. $HOME/.application on Unix)");
-    DOC_PARAM("theAppName", "Application name", DOC_TYPE_STRING);
+    DOC_PARAM("theAppName", "The application name ot get the data directory for", DOC_TYPE_STRING);
+    DOC_RVAL("The application data directory string", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 1);
@@ -80,6 +82,7 @@ getAppDataDirectory(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, js
 static JSBool
 getTempDirectory(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
     DOC_BEGIN("Returns directory for temp. files (e.g. /tmp on Unix)");
+    DOC_RVAL("The temp directory string", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 0);
@@ -92,8 +95,8 @@ getTempDirectory(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval
 JS_STATIC_DLL_CALLBACK(JSBool)
 IsDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Tests if the path points to a directory.");
-    DOC_PARAM("thePath", "", DOC_TYPE_STRING);
-    DOC_RVAL("true if path is a directory", DOC_TYPE_BOOLEAN);
+    DOC_PARAM("thePath", "The path string to test", DOC_TYPE_STRING);
+    DOC_RVAL("True if path is a directory", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
         JSString   * str;
@@ -121,7 +124,8 @@ IsDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
 JS_STATIC_DLL_CALLBACK(JSBool)
 createDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates directory");
-    DOC_PARAM("thePath", "", DOC_TYPE_STRING);
+    DOC_PARAM("thePath", "The directory to create", DOC_TYPE_STRING);
+    DOC_RVAL("Returns true if successful, false if it fails", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
         JSString   * str;

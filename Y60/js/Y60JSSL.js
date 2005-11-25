@@ -239,7 +239,9 @@ function dumpElement(E,theSpace,theMaxDepth) {
 
 // Adjust Node.id (and it's descendants) to be unique
 function adjustNodeId(theNode, theDeepAdjustFlag) {
-    theNode.id = createUniqueId();
+    if ("id" in theNode) {
+        theNode.id = createUniqueId();
+    }
     if (theDeepAdjustFlag == undefined) {
         theDeepAdjustFlag = false;
     }
@@ -248,6 +250,10 @@ function adjustNodeId(theNode, theDeepAdjustFlag) {
             adjustNodeId(theNode.childNodes[i], theDeepAdjustFlag);
         }
     }
+}
+
+function adjustNodeIds(theNode) {
+    adjustNodeId(theNode, true);
 }
 
 //searches for a descendant of theNode (must be in DOM below theNode)

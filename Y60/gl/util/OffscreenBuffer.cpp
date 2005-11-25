@@ -136,6 +136,7 @@ void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
     glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
                 theImage->getRasterPtr()->pixels().begin());
+
 #ifdef DUMP_BUFFER
     PixelEncoding myEncoding;
     switch(long(myPixelEncodingInfo.bytesPerPixel)) {
