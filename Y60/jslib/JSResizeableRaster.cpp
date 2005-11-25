@@ -30,7 +30,15 @@ typedef JSWrapper<NATIVE,dom::ValuePtr> Base;
 
 static JSBool
 fillRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Fills a recangular region of the raster with a given color.");
+    DOC_PARAM("xmin", "left", DOC_TYPE_INTEGER);
+    DOC_PARAM("ymin", "top", DOC_TYPE_INTEGER);
+    DOC_PARAM("xmax", "right", DOC_TYPE_INTEGER);
+    DOC_PARAM("ymax", "bottom", DOC_TYPE_INTEGER);
+    DOC_PARAM("r", "red value", DOC_TYPE_FLOAT);
+    DOC_PARAM("g", "green value", DOC_TYPE_FLOAT);
+    DOC_PARAM("b", "blue value", DOC_TYPE_FLOAT);
+    DOC_PARAM("a", "alpha value", DOC_TYPE_FLOAT);
     DOC_END;
 //    typedef void (NATIVE::*MyMethod)(unsigned long,unsigned long, unsigned long,unsigned long, asl::Vector4f);
     typedef void (NATIVE::*MyMethod)(unsigned long,unsigned long, unsigned long,unsigned long,  float r, float g, float b, float a);
@@ -39,7 +47,10 @@ fillRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 getPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Get color of pixel.");
+    DOC_PARAM("x", "x pos", DOC_TYPE_INTEGER);
+    DOC_PARAM("y", "y pos", DOC_TYPE_INTEGER);
+    DOC_RVAL("Color", DOC_TYPE_VECTOR4F);
     DOC_END;
     typedef asl::Vector4f (NATIVE::*MyMethod)(unsigned long,unsigned long) const;
     return Method<NATIVE>::call((MyMethod)&NATIVE::getPixel,cx,obj,argc,argv,rval);
@@ -47,7 +58,13 @@ getPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 setPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Set color of pixel.");
+    DOC_PARAM("x", "x pos", DOC_TYPE_INTEGER);
+    DOC_PARAM("y", "y pos", DOC_TYPE_INTEGER);
+    DOC_PARAM("r", "red value", DOC_TYPE_FLOAT);
+    DOC_PARAM("g", "green value", DOC_TYPE_FLOAT);
+    DOC_PARAM("b", "blue value", DOC_TYPE_FLOAT);
+    DOC_PARAM("a", "alpha value", DOC_TYPE_FLOAT);
     DOC_END;
     //typedef void (NATIVE::*MyMethod)(unsigned long,unsigned long, asl::Vector4f);
 
