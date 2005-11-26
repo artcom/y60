@@ -36,12 +36,16 @@ namespace asl {
 
 DEFINE_EXCEPTION(FileNotFoundException, asl::Exception);
 DEFINE_EXCEPTION(CreateDirectoryFailed, asl::Exception);
+DEFINE_EXCEPTION(RemoveDirectoryFailed, asl::Exception);
 DEFINE_EXCEPTION(OpenDirectoryFailed, asl::Exception);
 
 std::vector<std::string> getDirectoryEntries(const std::string & thePath);
 
 /** creates a new directory in an existing directory */
 void createDirectory(const std::string & theDirectory);
+
+/** removes an empty directory directory */
+void removeDirectory(const std::string & theDirectory);
 
 /** creates a new directory and all necessary parent directories */
 void createPath(const std::string & theDirectory);

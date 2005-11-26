@@ -120,7 +120,7 @@ JS_STATIC_DLL_CALLBACK(JSBool)
 createDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates directory");
     DOC_PARAM("thePath", "The directory to create", DOC_TYPE_STRING);
-    DOC_RVAL("Returns true if successful, false if it fails", DOC_TYPE_BOOLEAN);
+    DOC_RVAL("Returns true if successful or directory already exists, false if it fails to create it and it does not exist", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
         JSString   * str;
@@ -144,7 +144,45 @@ createDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
                 asl::createDirectory(myPath);
                 *rval = as_jsval(cx, true);
             }
-        } catch (asl::FileNotFoundException) {
+        } catch (asl::CreateDirectoryFailed & ex) {
+            AC_DEBUG << ex;
+            *rval = JSVAL_NULL;
+            return JS_TRUE;
+        }
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+JS_STATIC_DLL_CALLBACK(JSBool)
+removeDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Removes directory");
+    DOC_PARAM("thePath", "The directory to create", DOC_TYPE_STRING);
+    DOC_RVAL("Returns true if successful or directory does not exist, false if it fails to remove it", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    try {
+        JSString   * str;
+        string myPath;
+
+        if (argc != 1) {
+            JS_ReportError(cx, "'removeDirectory takes a filepath as argument");
+            return JS_FALSE;
+        }
+
+        str = JS_ValueToString(cx, argv[0]);
+        if (!str) {
+            JS_ReportError(cx, "removeDirectory() could not convert argument value to string.");
+            return JS_FALSE;
+        }
+
+        myPath = asl::expandEnvironment(JS_GetStringBytes(str));
+
+        try {
+            if (asl::fileExists(myPath) ) {
+                asl::removeDirectory(myPath);
+                *rval = as_jsval(cx, true);
+            }
+        } catch (asl::RemoveDirectoryFailed & ex) {
+            AC_DEBUG << ex;
             *rval = JSVAL_NULL;
             return JS_TRUE;
         }
@@ -181,7 +219,8 @@ createPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 asl::createPath(myPath);
                 *rval = as_jsval(cx, true);
             }
-        } catch (asl::FileNotFoundException) {
+        } catch (asl::CreateDirectoryFailed & ex) {
+            AC_DEBUG << ex;
             *rval = JSVAL_NULL;
             return JS_TRUE;
         }

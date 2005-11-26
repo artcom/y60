@@ -85,12 +85,15 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getExtension("somewhere.sometime/myfile.mp3") == "mp3");
             ENSURE(getExtension("somewhere.sometime\\myfile") == "");
 
+            if (isDirectory("myTestSubDir")) {
+                removeDirectory("myTestSubDir");
+            }
             createDirectory("myTestSubDir");
             ENSURE(isDirectory("myTestSubDir"));
 
             createPath("myTestPath/myTestDir");
             ENSURE(isDirectory("myTestPath/myTestDir"));
-
+            //FAILURE("test");
         }
 
         void perform_putget(const string & testFileName, int contentSize) {

@@ -111,30 +111,17 @@ namespace asl {
     }
 
     std::string getParentDirectory(const std::string & theDirectory) {
-#ifdef WIN32
-        char drive[_MAX_DRIVE];
-        char dir[_MAX_DIR];
-        char fname[_MAX_FNAME];
-        char ext[_MAX_EXT];
-
-        _splitpath( theDirectory.c_str(), drive, dir, fname, ext );
-        std::string myDirName = std::string(drive)+std::string(dir);
-        if (myDirName.empty()) {
-            myDirName = "./";
-        }
-#else
-        std::string myDirName;
-        if (! theDirectory.empty() ) {
-            if (!(theDirectory.at(theDirectory.length()-1) == '/')) {
-                char * myBuffer = strdup(theDirectory.c_str());
-                myDirName = dirname(myBuffer);
-                free(myBuffer);
-                myDirName += "/";
+        std::string myDirName = theDirectory;
+         if (myDirName.size()>1) {
+            if (myDirName[myDirName.size()-1] == '/') {
+                myDirName.erase(myDirName.rfind('/',myDirName.size()-2)+1);
+            } else {
+                myDirName.erase(myDirName.rfind('/',myDirName.size())+1);
             }
-        }
-#endif
-        if (myDirName.size()) {
-            myDirName.erase(myDirName.rfind('/',myDirName.size()-1));
+        } else {
+            if (myDirName.size()==1) {
+                myDirName.resize(0);
+            }
         }
         return myDirName;
     }
@@ -371,6 +358,18 @@ namespace asl {
     }
 
     void
+    removeDirectory(const std::string & theDirectory) {
+#ifdef WIN32
+        if (RemoveDirectory(theDirectory.c_str()) == 0) {
+#else
+        if (rmdir(theDirectory.c_str()) != 0) {
+#endif
+            throw RemoveDirectoryFailed(std::string("theDirectory=")+theDirectory+" ,reason:"+asl::errorDescription(lastError()), PLUS_FILE_LINE);
+            //AC_WARNING << "removeDirectory failed, theDirectory="<<theDirectory<<" ,reason:"<<asl::errorDescription(lastError()), PLUS_FILE_LINE);
+        };
+    }
+
+    void
     createPath(const std::string & thePath) {
         std::string myPath = thePath;
         std::vector<std::string> myPathList;
@@ -378,23 +377,13 @@ namespace asl {
             myPathList.push_back(myPath);
             myPath = getParentDirectory(myPath);
         }
-        int i = myPath.size()-1; 
+        int i = myPathList.size()-1; 
         for (; i >= 0; --i) {
-#ifdef WIN32
-            char drive[_MAX_DRIVE];
-            char dir[_MAX_DIR];
-            char fname[_MAX_FNAME];
-            char ext[_MAX_EXT];
-            _splitpath(myPathList[i].c_str(), drive, dir, fname, ext );
-            std::string myDirName = std::string(drive)+std::string(dir);
-
-#else
             std::string myDirName = myPathList[i];
-#endif
             if (myDirName.empty()) {
                 myDirName = "./";
             }
-            if (!fileExists(myDirName)) {
+            if (!isDirectory(myDirName)) {
                 createDirectory(myDirName);
             }
         }
