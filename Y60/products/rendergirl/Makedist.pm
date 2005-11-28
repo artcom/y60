@@ -15,8 +15,7 @@ sub runLocalMakedist($) {
     copyDirTree("SCRIPTS", $theDistDir);
 
     # Install dependencies
-    depends("Y60/products/acgtkshell", "Y60/components");
-
+    depends("Y60/products/acgtkshell");
 }
 
 sub runLocalMakeInstaller() {
