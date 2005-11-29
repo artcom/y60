@@ -73,7 +73,6 @@ namespace y60 {
         void copyFrameBufferToImage(asl::Ptr<Image, dom::ThreadingModel> theImage);
     private:
         void copyFrameBufferToTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
-        void bindTexture(asl::Ptr<Image, dom::ThreadingModel> theTexture);
         void bindOffscreenFrameBuffer(asl::Ptr<Image, dom::ThreadingModel> theTexture);
         
         bool _myUseGLFramebufferObject;

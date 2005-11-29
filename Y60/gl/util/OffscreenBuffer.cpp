@@ -100,7 +100,10 @@ void OffscreenBuffer::postOffscreenRender( ImagePtr theTexture, bool theCopyToIm
     AC_TRACE << "OffscreenBuffer::postOffscreenRender " 
              << " w/ gl framebuffer extension " << _myUseGLFramebufferObject;
     if (_myUseGLFramebufferObject) {
-        bindTexture(theTexture);
+#ifdef GL_EXT_framebuffer_object
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+#endif
+        glBindTexture (GL_TEXTURE_2D, theTexture->getGraphicsId() );
     } else {
         copyFrameBufferToTexture(theTexture);
     }
@@ -212,14 +215,6 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theTexture) {
 #else
     throw OpenGLException("GL_EXT_framebuffer_object support not compiled", PLUS_FILE_LINE);
 #endif
-}
-
-void OffscreenBuffer::bindTexture(ImagePtr theTexture) {
-    AC_TRACE << "OffscreenBuffer::bindTexture ";
-#ifdef GL_EXT_framebuffer_object
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-#endif
-    glBindTexture (GL_TEXTURE_2D, theTexture->getGraphicsId() );
 }
 
 
