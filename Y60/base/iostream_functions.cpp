@@ -93,6 +93,10 @@ namespace asl {
             std::string myElement;
             do {
                 theStream >> myChar;
+                if (myChar == ']' && theStringVector.empty() && myElement.empty()) {
+                    //empty vector of strings
+                    break;
+                }
                 if ((myChar == ',') || (myChar == ']')) {
                     theStringVector.push_back(myElement);
                     myElement.clear();
