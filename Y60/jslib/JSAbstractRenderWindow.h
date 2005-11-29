@@ -435,6 +435,23 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_END;
             return Method<NATIVE>::call(&NATIVE::stopCharacter,cx,obj,argc,argv,rval);
         }
+        static JSBool
+        activateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("");
+            DOC_END;
+            jslib::JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
+            myObj.getNative().activateGLContext();
+            return JS_TRUE;
+        }
+        static JSBool
+        deactivateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("");
+            DOC_END;
+            jslib::JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
+            myObj.getNative().deactivateGLContext();
+            return JS_TRUE;
+        }
+
         static JSFunctionSpec * BaseStaticFunctions() {
             AC_DEBUG << "Registering class '"<<ClassName()<<"'";
             static JSFunctionSpec myFunctions[] = {
@@ -481,6 +498,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 {"isClipActive",       isClipActive,             2},
                 {"isCharacterActive",  isCharacterActive,        1},
                 {"stopCharacter",      stopCharacter,            1},
+                {"activateGLContext",  activateGLContext,        0},
+                {"deactivateGLContext",  deactivateGLContext,    0},
                 {0}
             };
             return myFunctions;
