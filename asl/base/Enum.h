@@ -42,7 +42,7 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
  *      FruitEnum_MAX
  * };
  *
- * const char * FruitStrings[] = {
+ * static const char * myFruitStrings[] = {
  *      "apple",
  *      "cherry",
  *      "banana",
@@ -50,11 +50,11 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
  *      ""
  * };
  *
- * DEFINE_ENUM( Fruit, FruitEnum, FruitStrings );
+ * DEFINE_ENUM( Fruit, FruitEnum);
  * @endcode
  * In the corresponding cpp file do:
  * @code
- * VERIFY_ENUM( Fruit );
+ * VERIFY_ENUM( Fruit, myFruitStrings );
  * @endcode
  * And here is how to use the resulting type Fruit
  * @code
@@ -88,7 +88,7 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
  * }
  * @endcode
  */
-template <class ENUM, int THE_MAX, const char ** STRINGS>
+template <class ENUM, int THE_MAX>
 class Enum {
     public:
         Enum() {};
@@ -115,7 +115,7 @@ class Enum {
          * */
         void fromString(const std::string & theString) {
             for (unsigned i = 0; i < THE_MAX; ++i) {
-                if (theString == STRINGS[i]) {
+                if (theString == _ourStrings[i]) {
                     _myValue = static_cast<ENUM>(i);
                     return;
                 }
@@ -158,17 +158,17 @@ class Enum {
 
         /** Returns the current value as a string identifier. */
         std::string asString() const {
-            return STRINGS[_myValue];
+            return _ourStrings[_myValue];
         }
 
         /** Prints the string identifier to the output stream @p os. */
         std::ostream & print(std::ostream & os = std::cerr) const {
-            return os << STRINGS[_myValue];
+            return os << _ourStrings[_myValue];
         }
         
         /** Static helper function to iterate over valid identifiers. */
         static const char * getString(unsigned theIndex) {
-            return STRINGS[theIndex];
+            return _ourStrings[theIndex];
         }
 
         /** Performs some simple checks and quits the application if
@@ -176,14 +176,14 @@ class Enum {
          */
         static bool verify(const char * theFile, unsigned theLine) {
             for (unsigned i = 0; i < THE_MAX; ++i) {
-                if (STRINGS[i] == 0 ) {
+                if (_ourStrings[i] == 0 ) {
                     std::cerr << "### FATAL: Not enough strings for enum "
                               << _ourName << " defined in file '" << theFile 
                               << "' at line " << theLine << std::endl;
                     exit(1);
                 }
             }
-            if ( std::string("") != STRINGS[THE_MAX]) {
+            if ( std::string("") != _ourStrings[THE_MAX]) {
                 std::cerr << "### FATAL: The string array for enum " << _ourName 
                           << " defined in file '" << theFile << "' at line " << theLine
                           << " has too many items or is not terminated with an "
@@ -194,6 +194,7 @@ class Enum {
         }
     private:
         ENUM _myValue;
+        static const char ** _ourStrings ;
         static const char * _ourName ;
         static bool  _ourVerifiedFlag; 
 };
@@ -205,9 +206,9 @@ class Enum {
 /** ostream operator for Enum 
  * @relates asl::Enum
  */
-template <class ENUM, int THE_MAX, const char ** STRINGS>
+template <class ENUM, int THE_MAX>
 std::ostream &
-operator<<(std::ostream & os, const asl::Enum<ENUM, THE_MAX, STRINGS> & theEnum) {
+operator<<(std::ostream & os, const asl::Enum<ENUM, THE_MAX> & theEnum) {
     theEnum.print( os );
     return os;
 }
@@ -215,9 +216,9 @@ operator<<(std::ostream & os, const asl::Enum<ENUM, THE_MAX, STRINGS> & theEnum)
 /** istream operator for Enum 
  * @relates asl::Enum
  */
-template <class ENUM, int THE_MAX, const char ** STRINGS>
+template <class ENUM, int THE_MAX>
 std::istream &
-operator>>(std::istream & is, asl::Enum<ENUM, THE_MAX, STRINGS> & theEnum) {
+operator>>(std::istream & is, asl::Enum<ENUM, THE_MAX> & theEnum) {
     theEnum.parse( is );
     return is;
 }
@@ -225,13 +226,14 @@ operator>>(std::istream & is, asl::Enum<ENUM, THE_MAX, STRINGS> & theEnum) {
 /** Helper macro. Creates a typedef.
  * @relates asl::Enum
  */
-#define DEFINE_ENUM( THE_NAME, THE_ENUM, THE_STRINGS) \
-    typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX, THE_STRINGS> THE_NAME; 
+#define DEFINE_ENUM( THE_NAME, THE_ENUM) \
+    typedef asl::Enum<THE_ENUM, THE_ENUM ## _MAX> THE_NAME; 
 
 /** Helper macro. Runs the verify() method during static initialization.
  * @relates asl::Enum
  */
-#define VERIFY_ENUM( THE_NAME ) \
+#define VERIFY_ENUM( THE_NAME, THE_STRINGS ) \
+    template <> const char ** THE_NAME ::_ourStrings = THE_STRINGS; \
     template <> const char * THE_NAME ::_ourName = #THE_NAME; \
     template <> bool THE_NAME ::_ourVerifiedFlag( THE_NAME ::verify(__FILE__, __LINE__));
 

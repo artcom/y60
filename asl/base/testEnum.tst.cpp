@@ -26,7 +26,7 @@ enum AnimalEnum {
     AnimalEnum_MAX
 };
 
-const char * AnimalStrings[] = {
+static const char * AnimalStrings[] = {
     "camel",
     "elephant",
     "lion",
@@ -35,9 +35,9 @@ const char * AnimalStrings[] = {
     ""
 };
 
-DEFINE_ENUM( Animal, AnimalEnum, AnimalStrings );
+DEFINE_ENUM( Animal, AnimalEnum);
 
-VERIFY_ENUM( Animal);
+VERIFY_ENUM( Animal, AnimalStrings);
 
 class EnumUnitTest : public UnitTest {
 public:
