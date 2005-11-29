@@ -1,2 +1,2 @@
-copy Pre-built\\include\\*.h ..\\..\\..\\include
-copy Pre-built\\lib\\pthreadVC.* ..\\..\\..\\lib
+xcopy /D /Y Pre-built\include\*.h ..\..\..\include\
+xcopy /D Pre-built\lib\pthreadVC.* ..\..\..\lib\
