@@ -439,16 +439,18 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         activateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("");
             DOC_END;
-            jslib::JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
-            myObj.getNative().activateGLContext();
+            DERIVED * mySelf;
+            convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+            mySelf->activateGLContext();
             return JS_TRUE;
         }
         static JSBool
         deactivateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("");
             DOC_END;
-            jslib::JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
-            myObj.getNative().deactivateGLContext();
+            DERIVED * mySelf;
+            convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+            mySelf->deactivateGLContext();
             return JS_TRUE;
         }
 
