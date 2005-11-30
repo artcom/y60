@@ -529,7 +529,7 @@ ReadWholeFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     DOC_END;
     try {
         if (argc == 0 || argc > 2 ) {
-            JS_ReportError(cx, "openFile(): expects one or two string arguments, (theRelativePath, [optional] package)");
+            JS_ReportError(cx, "ReadWholeFileAsBlock(): expects one or two string arguments, (theRelativePath, [optional] package)");
             return JS_FALSE;
         }
         string myRelativePath = "";
