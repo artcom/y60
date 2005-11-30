@@ -1,0 +1,25 @@
+<PRE>
+<B>PL_RGBA_BLUE, PL_RGBA_GREEN, PL_RGBA_RED, and PL_RGBA_ALPHA</B>
+</PRE>
+
+<P>
+These constants define the order of the channels in an image.
+To reference a particular channel in a pixel, add one of these
+constants to the pixel address. The constants can be changed if
+nessesary to change the channel ordering. The contents of PL_RGBA_ALPHA
+are only valid if HasAlpha() is TRUE.
+
+<PRE>
+<B>PL_PIXEL_BGRA_ORDER</B>
+</PRE>
+<P>
+If this is defined, the PL_RGBA_XXX constants are defined so that their 
+ordering is equal to the ordering that windows expects.
+
+<PRE>
+<B>PL_PIXEL_RGBA_ORDER</B>
+</PRE>
+<P>
+If this is defined, the PL_RGBA_XXX constants are defined so that red is 
+first.
+

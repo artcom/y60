@@ -1,0 +1,42 @@
+<B>BYTE</B>
+</PRE>
+
+<P>
+8 bits of unsigned data.
+<PRE>
+<B>WORD</B>
+</PRE>
+
+<P>
+An unsigned integer with 16 bits. Due to windows madness, <I>this is
+not nessesarily the size of a machine word!</I>
+<PRE>
+<B>LONG</B>
+</PRE>
+
+<P>
+A signed 32-bit integer.
+<PRE>
+<B>ULONG</B>
+</PRE>
+
+<P>
+An unsigned 32-bit integer.
+<PRE>
+<B>PLTRACE (char * pszFormat, ...);</B>
+</PRE>
+
+<P>
+In the debug version (_DEBUG defined), this macro outputs a string
+to the current debug console. In the release version, it expands
+to nothing. The parameters correspond to those of printf.
+<PRE>
+<B>PLASSERT (BOOL b);</B>
+</PRE>
+
+<P>
+This is an assert for debug purposes. In the debug version (_DEBUG
+defined), it causes a program halt if b is FALSE. In the release
+version, nothing is done. (Note: The parameter is not evaluated
+in release mode, so constructs like ASSERT (pF = fopen (&quot;bla&quot;))
+will not do what is expected.)

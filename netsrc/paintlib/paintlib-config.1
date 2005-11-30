@@ -1,0 +1,58 @@
+.ad l
+.nh
+.TH paintlib-config 1 "7 March 2004" "paintlib"
+.SH NAME
+paintlib-config \- get information about the installed version of
+paintlib
+.SH SYNOPSIS
+.B paintlib-config 
+.B [--prefix]
+.B [--libs]
+.B [--cflags]
+.B [--help]
+.B [--version]
+.SH DESCRIPTION
+.B paintlib-config
+prints the compiler and linker flags required to compile and link
+programs that use the
+.BR paintlib
+Application Programmer Interface.
+.SH EXAMPLES
+To print the version of the installed distribution of
+.BR paintlib ,
+use:
+
+.nf
+  paintlib-config --version
+.fi
+  
+To compile a program that calls the 
+.BR paintlib
+Application Programmer Interface, use:
+
+.nf
+  cc `paintlib-config --cflags --libs` program.c
+.fi
+
+.SH OPTIONS
+.TP
+.B --cflags
+Print the compiler flags that were used to compile 
+.BR paintlib .
+.TP
+.B --libs
+Print the linker flags that are needed to link a program with
+.BR paintlib .
+.TP
+.B --version
+Print the version of the
+.B paintlib
+distribution to standard output.
+.SH COPYRIGHT
+The paintlib source code and all documentation are copyright (c)
+1996-2002 Ulrich von Zadow and other contributors.
+.SH AUTHORS
+This package was debianized by Torsten Werner <twerner@debian.org>. The
+upstream Author is Ulrich von Zadow <uzadow@users.sourceforge.net>. This
+manual page was adapted from the Magick-config manual page of the
+ImageMagick package.

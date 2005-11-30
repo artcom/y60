@@ -1,0 +1,229 @@
+EXIF Tag documentation
+======================
+
+Below is a table of the currently known tag numbers, shortname and 
+descriptions. Unfortunately this information is not publicly published 
+and most of it has been reverse engineered by various dedicated individuals 
+(See acknowledgements below), However there are still gaps and anyone who 
+knows any tags not documented here please let us know about them!
+
+      Tag   Short Name          Description
+    ==========================================================
+    0x010E  Main.Desc           Image Description
+    0x010F  Main.Make           Camera Make
+    0x0110  Main.Model          Camera Model
+    0x0112  Main.Ori            Orientation
+    0x011A  Main.XRes           X Resolution
+    0x011B  Main.YRes           Y Resolution
+    0x0128  Main.ResUnit        Resolution Unit
+    0x0131  Main.Software       Camera Software
+    0x0132  Main.ModTime        Last Modification
+    0x013E  Main.WPoint         White Point
+    0x013F  Main.PrimChr        Primary Chromaticities
+    0x0211  Main.YCbCrCoef      YCbCrCoefficients
+    0x0213  Main.YCbCrPos       YCbCrPositioning
+    0x0214  Main.RefBW          Reference Black/White point
+    0x8298  Main.Copy           Copyright
+    0x8769  Main.ExifOffset     Sub IFD Offset
+
+    0x829A  Sub.Shutter         Exposure Time
+    0x829D  Sub.FStop           F-Stop
+    0x8822  Sub.Prog            Program
+    0x8827  Sub.Iso             Equivalent ISO speed
+    0x9000  Sub.ExifVer         Exif Version
+    0x9003  Sub.OrigTime        Original Time
+    0x9004  Sub.DigTime         Digitized Time
+    0x9101  Sub.CompConfig      Components Configuration
+    0x9102  Sub.Bpp             Average compression ratio
+    0x9201  Sub.Shuttera        Shutter Speed
+    0x9202  Sub.Aperturea       Aperture
+    0x9203  Sub.Brighta         Brightness APEX
+    0x9204  Sub.Expbiasa        Exposure Bias APEX
+    0x9205  Sub.Maxapa          Maximum Aperture APEX
+    0x9206  Sub.Dist            Subject Distance
+    0x9207  Sub.Meter           Metering Mode
+    0x9208  Sub.Lights          Light Source
+    0x9209  Sub.Flash           Flash Used
+    0x920a  Sub.Focal           Focal Length
+    0x927c  Sub.Maker           Maker Note
+    0x9286  Sub.User            User Comment
+    0x9290  Sub.STime           Subsecond Time
+    0x9291  Sub.SOrigTime       Subsecond Original Time
+    0x9292  Sub.SDigTime        Subsecond Digitized Time
+    0xA000  Sub.Flashpix        Flash Pix Version
+    0xA001  Sub.ColorSpace      Color Space
+    0xA002  Sub.Width           Image Width
+    0xA003  Sub.Height          Image Height
+    0xA004  Sub.SndFile         Sound File
+    0xA005  Sub.ExifIntOff      Exif Interoperability Offset
+    0xA20E  Sub.FPXRes          Focal Plane X Resolution
+    0xA20F  Sub.FPYRes          Focal Plane Y Resolution
+    0xA210  Sub.FPResUnit       Focal Plane Unit
+    0xA215  Sub.ExpIndex        Exposure Index
+    0xA217  Sub.SenseMethod     Sensing Method
+    0xA300  Sub.FileSource      File Source
+    0xA301  Sub.SceneType       Scene Type
+    0xA302  Sub.CFAPat          CFA Pattern
+
+Manufacturer Tags (Maker Notes)
+
+
+Nikon has two different formats:
+    0x0002  Nikon.ISO           Nikon ISO Setting
+    0x0003  Nikon.Color         Nikon Color Mode
+    0x0004  Nikon.Quality       Nikon Quality
+    0x0005  Nikon.WhiteBal      Nikon White Balance
+    0x0006  Nikon.Sharp         Nikon Image Sharpening
+    0x0007  Nikon.Focus         Nikon Focus Mode
+    0x0008  Nikon.Flash         Nikon Flash
+    0x0009  Nikon.FlashMode     Nikon Flash Mode
+    0x000F  Nikon.ISOSel        Nikon ISO Selection
+    0x0080  Nikon.ImgAdjust     Nikon Image Adjustment
+    0x0082  Nikon.Adapter       Nikon Adapter Setting
+    0x0084  Nikon.Lens          Nikon Lens
+    0x0085  Nikon.ManFocus      Nikon Manual Focus Distance
+    0x0086  Nikon.DigZoom       Nikon Digital Zoom
+    0x0088  Nikon.AFPos         Nikon Auto Focus Position
+
+    0x0002  Nikon2.Unknown0002  Nikon Unknown (0002)
+    0x0003  Nikon2.Quality      Nikon Quality
+    0x0004  Nikon2.Color        Nikon Color Mode
+    0x0005  Nikon2.ImgAdjust    Nikon Image Adjustment
+    0x0006  Nikon2.CCDSens      Nikon ISO Setting
+    0x0007  Nikon2.WhiteBal     Nikon White Balance
+    0x0008  Nikon2.Focus        Nikon Focus
+    0x0009  Nikon2.Unknown0009  Nikon Unknown (0009)
+    0x000A  Nikon2.DigZoom      Nikon Digital Zoom
+    0x000B  Nikon2.Converter    Nikon Converter
+    0x0F00  Nikon2.Unknown0F00  Nikon Unknown (0F00)
+
+Olympus
+    0x0200  Oly.SpcMode         Olympus Special Mode
+    0x0201  Oly.Quality         Olympus JPG Quality
+    0x0202  Oly.Macro           Olympus Macro
+    0x0204  Oly.DigZoom         Olympus Digital Zoom
+    0x0207  Oly.Software        Olympus Software
+    0x0209  Oly.CameraID        Olympus Camera ID
+    0x1004  Oly.Flash           Olympus Flash Mode
+    0x100F  Oly.Sharp           Olympus Sharpness Mode
+    0x102a  Oly.SharpScale      Olympus Sharpness
+    
+Canon
+    0x0001  Canon.CnSet1        Canon Settings 1
+    0x0004  Canon.CnSet2        Canon Settings 2
+    0x0006  Canon.ImageType     Canon Image Type
+    0x0007  Canon.Software      Canon Firmware Version
+    0x0008  Canon.ImageNo       Canon Image Number
+    0x0009  Canon.Owner         Canon Owner Name
+    0x000C  Canon.SerialNo      Canon Serial Number
+    0x000F  Canon.CustomFnc     Canon Custom Functions
+Canon have their own sub categories
+Set 1
+    1       CnSet1.Macro        Canon Macro Mode
+    4       CnSet1.Flash        Canon Flash Mode
+    5       CnSet1.Drive        Canon Drive Mode
+    7       CnSet1.Focus        Canon Focus Mode
+    10      CnSet1.ImgSize      Canon Image Size
+    11      CnSet1.Shoot        Canon Easy Shooting Mode
+    13      CnSet1.Contrast     Canon Contrast Setting
+    14      CnSet1.Saturation   Canon Saturation Setting
+    15      CnSet1.Sharpness    Canon Sharpness Setting
+    16      CnSet1.ISO          Canon ISO
+    17      CnSet1.Metering     Canon Metering mode
+    19      CnSet1.AFPoint      Canon AutoFocus Point
+    20      CnSet1.ExpMode      Canon Exposure Mode
+    23      CnSet1.LongFocal    Canon Long Focal Length
+    24      CnSet1.ShortFocal   Canon Short Focal Length
+    25      CnSet1.FocalUnits   Canon Focal Units per mm
+    29      CnSet1.FlashDet     Canon Flash Details
+    32      CnSet1.FocusMode    Canon Focus Mode
+Set 2
+    7       CnSet2.WhiteBal	Canon White Balance
+    9       CnSet2.SeqNo        Canon Continuous Frame
+    14      CnSet2.AF Point     Canon Focus Point
+    15      CnSet2.FlashBias    Canon Flash Bias
+    19      CnSet2.SubjectDist  Canon Subject Distance (0.01m or 0.001m)
+And then there's the Canon Custom Functions!
+    0x01    CanonCFn.NoiseRed   Canon CFn 01 Long exp noise reduction
+    0x02    CanonCFn.Lock       Canon CFn 02 Shutter/AE lock buttons
+    0x03    CanonCFn.MirrorLock Canon CFn 03 Mirror lockup
+    0x04    CanonCFn.TVAVexp    Canon CFn 04 Tv/Av & exposure level
+    0x05    CanonCFn.AFassist   Canon CFn 05 AF-assist light
+    0x06    CanonCFn.ShuttAv    Canon CFn 06 Shutter speed in Av mode
+    0x07    CanonCFn.AEBSeq     Canon CFn 07 AEB Sequence/auto cancel
+    0x08    CanonCFn.ShuttSync  Canon CFn 08 Shutter curtain sync
+    0x09    CanonCFn.AFStop     Canon CFn 09 Lens AF stop button switch
+    0x0A    CanonCFn.FillReduce Canon CFn 10 Fill flash auto reduction
+    0x0B    CanonCFn.MenuButt   Canon CFn 11 Menu button return pos
+    0x0C    CanonCFn.SetButt    Canon CFn 12 SET button when shooting
+    0x0D    CanonCFn.SensClean  Canon CFn 13 Sensor cleaning
+
+Fujifilm
+    0x0000  Fuji.Version        Fuji Version
+    0x1000  Fuji.Quality        Fuji Quality
+    0x1001  Fuji.Sharpness      Fuji Sharpness
+    0x1002  Fuji.WhiteBal       Fuji White Balance
+    0x1003  Fuji.Color          Fuji Color
+    0x1004  Fuji.Contrast       Fuji Tone
+    0x1010  Fuji.FlashMode      Fuji Flash Mode
+    0x1011  Fuji.FlashStrg      Fuji Flash Strength APEX
+    0x1020  Fuji.Macro          Fuji Macro Mode
+    0x1021  Fuji.Focus          Fuji Focus Mode
+    0x1022  Fuji.Unknown1022    Fuji Unknown (1022)
+    0x1023  Fuji.Unknown1023    Fuji Unknown (1023)
+    0x1030  Fuji.SlowSnyc       Fuji Slow Sync
+    0x1031  Fuji.Picture        Fuji Exposure Mode
+    0x1032  Fuji.Unknown1032    Fuji Unknown (1032)
+    0x1100  Fuji.Sequence       Fuji Sequence Mode
+    0x1101  Fuji.Unknown1101    Fuji Unknown (1101)
+    0x1200  Fuji.Unknown1200    Fuji Unknown (1200)
+    0x1300  Fuji.BlurWarn       Fuji Blur Warning
+    0x1301  Fuji.FocusWarn      Fuji Focus Warning
+    0x1302  Fuji.AEWarn         Fuji Exposure Warning
+
+Casio
+    0x0001  Casio.RecordMode    Casio Recording Mode",
+    0x0002  Casio.Quality       Casio Quality  ",
+    0x0003  Casio.FocusMode     Casio Focusing Mode",
+    0x0004  Casio.FlashMode     Casio Flash Mode",
+    0x0005  Casio.FlasIntense   Casio Flash Intensity",
+    0x0006  Casio.ObjDist       Casio Object Distance",
+    0x0007  Casio.WhiteBal      Casio White Balance",
+    0x0008  Casio.Unknown0008   Casio Unknown (0008)",
+    0x0009  Casio.Unknown0009   Casio Unknown (0009)",
+    0x000A  Casio.DigZoom       Casio Digital Zoom",
+    0x000B  Casio.Sharpness     Casio Sharpness",
+    0x000C  Casio.Contrast      Casio Contrast ",
+    0x000D  Casio.Saturation    Casio Saturation",
+    0x000E  Casio.Unknown000E   Casio Unknown (000E)",
+    0x000F  Casio.Unknown000F   Casio Unknown (000F)",
+    0x0010  Casio.Unknown0010   Casio Unknown (0010)",
+    0x0011  Casio.Unknown0011   Casio Unknown (0011)",
+    0x0012  Casio.Unknown0012   Casio Unknown (0012)",
+    0x0013  Casio.Unknown0013   Casio Unknown (0013)",
+
+All the above are confirmed from a number of sources whereas the tags below
+came from a single source and have not been confirmed due to a lack of
+sample Casio images.
+    0x0014  Casio.CCDSense      Casio CCD Sensitivity",
+    0x0015  Casio.Unknown0015   Casio Unknown (0015)",
+    0x0016  Casio.Enhancement   Casio Enhancement",
+    0x0017  Casio.Filter        Casio Filter   ",
+    0x0018  Casio.FocFrmLoc     Casio Focus Frame Locator",
+    0x0019  Casio.CCDSense      Casio CCD Sensitivity",
+    0x001A  Casio.Unknown001A   Casio Unknown (001A)",
+    0x0100  Casio.MeterMode     Casio Metering Mode",
+    0x0101  Casio.EVShift       Casio EV Shift",
+    0x0102  Casio.Unknown0102   Casio Unknown (0102)",
+    0x0103  Casio.Aperture      Casio Apertue",
+    0x0104  Casio.RecordMode2   Casio Recording Mode",
+    0x0105  Casio.Composition   Casio Composition Frame",
+    0x0106  Casio.ExpMode       Casio Exposure Mode",
+    0x0107  Casio.Unknown0107   Casio Unknown (0107)",
+
+Most information on tags came from 
+  http://www.ba.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+Additional Casio info from 
+  http://www.kadner-online.de/fotografie/exif/exif-iop-full-field-list.txt
+Additional Casio info from 
+  http://www.goto.onlinehome.de/dsc/casio3500.htm

@@ -1,0 +1,12 @@
+pushd
+cd %1
+for %x in (*.cpp;*.c;*.h) do (gosub doawk)
+popd
+goto end
+
+:doawk
+ awk -f c:\prog\paintlib\src\addcvsc.awk <%x >%x.tmp
+ move %x.tmp %x
+return
+
+:end

@@ -1,0 +1,169 @@
+EXIF Classes
+============
+
+PLExifTagCPtr
+
+This is a typedef of PLCountedPointer<PLExifTag> in general it can just be
+treated like any normal PLExifTag * pointer. It can be compared, dereferenced
+with * or ->, implicitly tested for NULL as in if(p) or the raw PLExifTag *
+pointer extracted with .get(). See PLCountedPointer for details.
+
+typedef PLCountedPointer<PLExifTag> PLExifTagCPtr;
+
+PLExifTagList
+
+A vector of counted pointers (PLExifTagCPtr) to dynamically created PLExifTag
+objects. The list and the tag objects pointed at will be destroyed when the
+PLExif object that provided the PLExifTagList is destroyed (unless copies of the
+PLExifTagCPtr counted pointer have been made; see PLCountedPointer for details).
+
+typedef std::vector<PLExifTagCPtr> PLExifTagList;
+
+
+
+PLExif
+
+#include "plexif.h"
+
+Stores all the EXIF data providing access in either raw binary form or by tag.
+Note this class uses counted pointers internally and can be safely and
+efficiently copied without actually making a copy of all the data.
+
+public members:
+
+  PLExif ();
+  Creates a PLExif object ready to hold EXIF data
+
+  ~PLExif ();
+  Destroys a PLExif object. This will destroy all associated PLExifTag objects.
+
+  void Clear ();
+  resets the internal data
+
+  size_t GetRawDataSize() const;
+  Gets the size of the raw (binary) EXIF data array. Number of bytes.
+
+  PLBYTE * GetRawData();
+  Gets the address of the raw (binary) EXIF data array.
+
+
+The following methods all return a reference to an internal vector of pointers
+to PLExifTag (see PLExifTagList). These vectors will all be destroyed along with
+their associated PLExifTag objects when the PLExif object is deastroyed.
+
+  const PLExifTagList & GetAllTags() const;
+    Returns a reference to a vector of pointers to all the tags in the EXIF data
+    in the order they were decoded.
+
+  const PLExifTagList & GetMainTags() const;
+    Returns a reference to a vector of pointers to all the "main" tags in the
+    EXIF data in the order they were decoded.
+
+  const PLExifTagList & GetSubTags() const;
+    Returns a reference to a vector of pointers to all the "sub" tags in the
+    EXIF data in the order they were decoded.
+
+  const PLExifTagList & GetManufacturerTags() const;
+    Returns a reference to a vector of pointers to all the "manufacturer" tags
+    in the EXIF data in the order they were decoded.
+
+
+  PLExifTagCPtr const * GetAllTagsC(size_t & size) const;
+  PLExifTagCPtr const * GetMainTagsC(size_t & size) const;
+  PLExifTagCPtr const * GetSubTagsC(size_t & size) const;
+  PLExifTagCPtr const * GetManufacturerTagsC(size_t & size) const;
+    These methods are all as those above but returning a traditional C style
+    array of PLExifTagCPtr counted pointers instead of the STL vector. The size
+    of this array is placed into the size reference parameter.
+
+
+All the following methods give access to a tag given the tag shortname. They
+almost all return a pointer to the whole PLExifTag object but this pointer will
+mostly just be used to check whether the tag was found by testing for a NULL
+pointer. The useful data - the tag value - is generally returned by reference.
+
+Duplicate copies of the functions allow efficient use whether the source tag
+short name string is a std::string or a char *.
+
+All forms return a pointer to the found tag, NULL if not found.
+
+  PLExifTag * GetTag(const char * TagShortName) const;
+  PLExifTag * GetTag(const std::string & TagShortName) const;
+    Just return the tag pointer - NULL if not found.
+
+  PLExifTag * GetTag(const char * TagShortName, std::string & Value) const;
+  PLExifTag * GetTag(const std::string & TagShortName, std::string & Value)
+          const;
+    Places the tag value into the Value string, format is basic - as stored in
+    the raw EXIF data eg f4.0 is likely to be 40/10
+
+  PLExifTag * GetTagCommon(const char * TagShortName, std::string & Value)
+          const;
+  PLExifTag * GetTagCommon(const std::string & TagShortName,
+                           std::string & Value) const;
+    Places the tag value in the Value string, format is common form eg f4.0 is
+    4.0 rather than 40/10
+
+  PLExifTag * GetTag(const char * TagShortName, double & Value) const;
+  PLExifTag * GetTag(const std::string & TagShortName, double & Value) const;
+    Place the tag value in the Value double where appropriate eg 1.234m focus
+
+  std::string & TagStr(const char * TagShortName) const;
+  std::string & TagStr(const std::string & TagShortName) const;
+    Return tag value as a string (empty string if not found), format is basic -
+    as stored in the raw EXIF data eg f4.0 is likely to be 40/10
+
+  std::string & TagStrCommon(const char * TagShortName) const;
+  std::string & TagStrCommon(const std::string & TagShortName) const;
+    Return tag value as a string (empty string if not found) format is common
+    form eg f4.0 is 4.0 rather than 40/10
+
+C string return versions of TagStr and TagStrCommon
+
+  const char * TagCStr(const char * TagShortName) const;
+  const char * TagCStr(const std::string & TagShortName) const
+    Return tag value as a string (empty string if not found), format is basic -
+    as stored in the raw EXIF data eg f4.0 is likely to be 40/10
+
+  const char * TagCStrCommon(const char * TagShortName) const;
+  const char * TagCStrCommon(const std::string & TagShortName) const;
+    Return tag value as a string (empty string if not found) format is common
+    form eg f4.0 is 4.0 rather than 40/10
+
+
+
+class PLExifTag
+
+#include "PLExif.h"
+
+No constructor is available - PLExifTag objects are only ever created by PLExif
+
+STL Interface - returning const string &
+
+  const std::string & GetShortName() const;
+    Return the tag short name.
+
+  const std::string GetDescription() const;
+    Return the tag long description.
+
+  const std::string & GetValue() const;
+    Format is basic as stored in the raw EXIF data eg f4.0 is likely to be 40/10
+
+  const std::string & GetValueCommon() const;
+    Format is common form eg f4.0 is 4.0 rather than 40/10
+
+C Interface - returning const char *
+
+  const char * GetShortNameCStr() const;
+    Return the tag short name.
+
+  const char * GetDescriptionCStr() const;
+    Return the tag long description.
+
+  const char * GetValueCStr() const;
+    Format is basic as stored in the raw EXIF data eg f4.0 is likely to be 40/10
+
+  const char * GetValueCommonCStr() const;
+    Format is common form eg f4.0 is 4.0 rather than 40/10
+
+
