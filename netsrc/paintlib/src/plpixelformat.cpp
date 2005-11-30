@@ -121,33 +121,16 @@ const PLPixelFormat & PLPixelFormat::FromName(const string & name)
 	throw UnsupportedPixelFormat(name);
 }
 
-PLPixelFormat :: Channel PLPixelFormat :: parseChannel(const string& s, string::size_type & pos)
-{
-  string::size_type oldpos = pos;
-  int ch = 0;
-  do
-  {
-    pos = s.find(ppChannelNames[ch], oldpos);
-    if (string::npos == pos)
-    {
-      ++ch;
-    } else
-    {
-      pos += strlen(ppChannelNames[ch]);
-      return Channel(ch);
-    }
-  } while(pos == string::npos && ch < COUNT);
-  throw UnsupportedPixelFormat(s);
-}
-
 const PLPixelFormat & PLPixelFormat :: FromChannels(const std::string & sChannels, int bpp)
 {
   std::string::size_type pos = 0;
   vector<Channel> channels;
-  while(pos < sChannels.length())
-  {
-    Channel ch = parseChannel(sChannels, pos);
-    channels.push_back(ch);
+
+  for (unsigned int ch = 0; ch < COUNT; ++ch) {
+     pos = sChannels.find(ppChannelNames[ch]);
+     if (pos != string::npos) {
+        channels.push_back(Channel(ch));
+     }
   }
 
   ostringstream ss;
@@ -156,6 +139,7 @@ const PLPixelFormat & PLPixelFormat :: FromChannels(const std::string & sChannel
     ss << string(ppChannelNames[channels[i]]);
     ss << (bpp / channels.size());
   }
+
   return FromName(ss.str());
 }
 

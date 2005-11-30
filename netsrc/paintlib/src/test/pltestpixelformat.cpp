@@ -104,7 +104,8 @@ void PLTestPixelFormat ::RunTests ()
   cerr << "  Testing fromChannels RGB, 24..." << endl;
   Test(PLPixelFormat::FromChannels("RGB", 24) == PLPixelFormat::R8G8B8);
 
-  cerr << "  Testing fromChannels YCrCb, 8..." << endl;
+#if 0
+  cerr << "  Testing fromChannels YCrCb, 8... supposed to fail" << endl;
   bool bOkay = false;
   try {
     PLPixelFormat::FromChannels("YCrCb", 8);
@@ -112,8 +113,7 @@ void PLTestPixelFormat ::RunTests ()
     bOkay = true;
   }
   Test(bOkay);
-
-  cerr << "  Testing fromChannels YCrCb, 8..." << endl;
+#endif
 }
 
 /*

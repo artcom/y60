@@ -79,7 +79,6 @@ public:
 
 private:
 	PLPixelFormat(const std::string& sName);
-    static Channel parseChannel(const std::string& s, std::string::size_type & pos);
 
 	std::string m_sName;
 	int m_BitsPerPixel;

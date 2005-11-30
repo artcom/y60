@@ -11,14 +11,17 @@
 #define PL_SUPPORT_JPEG 1
 #define PL_SUPPORT_PNG 1
 #define PL_SUPPORT_GIF 1
-#define PL_SUPPORT_WEMF 1
 #define PL_SUPPORT_PCX 1
 #define PL_SUPPORT_PGM 1
 #define PL_SUPPORT_PPM 1
 #define PL_SUPPORT_PSD 1
 #define PL_SUPPORT_SGI 1
 #define PL_SUPPORT_IFF85 1
-#define PL_SUPPORT_DICOM 1
 #define PL_SUPPORT_CURL 1
 
 #define PL_PIXEL_BGRA_ORDER
+
+//#define PL_SUPPORT_DICOM 1
+#ifdef WIN32
+#define PL_SUPPORT_WEMF 1
+#endif
