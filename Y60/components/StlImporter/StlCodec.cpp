@@ -145,27 +145,29 @@ namespace y60 {
         int myNumChildren = theNode->childNodesLength();
         int myNumFaces = 0;
         // First get the total amount of triangles
-        for (int i = 0; i < myNumChildren; ++i) {
-            dom::NodePtr myNode = theNode->childNode(i);
-            ShapePtr myShape = myNode->getFacade<Shape>();
-            const PrimitiveVector & myPrimitiveVector = myShape->getPrimitives();        
-            for (unsigned i = 0; i < myPrimitiveVector.size(); ++i) {
-                const Primitive & myPrimitive = (*myPrimitiveVector[i]);
-                const PrimitiveType & myType = myPrimitive.getType();
-                Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
-                Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
-                const VertexData3f & myVertexData = myPositionAccessor->get();
-                int myVSize = myVertexData.size();
-                switch (myType) {
-                case GL_TRIANGLES:
-                    myNumFaces += myVSize / 3;
-                    break;
-                case GL_QUADS: 
-                    myNumFaces += myVSize / 2;
-                    break;
-                default:
-                    AC_WARNING << "Can't STL-Export Primitives of different types than GL_TRIANGLES and GL_QUADS";
-                    break;
+        for (int j = 0; j < theIds.size(); ++j) {
+            dom::NodePtr myNode = theNode->getChildElementById(theIds[j], "id");
+            if (myNode) {
+                ShapePtr myShape = myNode->getFacade<Shape>();
+                const PrimitiveVector & myPrimitiveVector = myShape->getPrimitives();
+                for (unsigned i = 0; i < myPrimitiveVector.size(); ++i) {
+                    const Primitive & myPrimitive = (*myPrimitiveVector[i]);
+                    const PrimitiveType & myType = myPrimitive.getType();
+                    Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
+                    Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
+                    const VertexData3f & myVertexData = myPositionAccessor->get();
+                    int myVSize = myVertexData.size();
+                    switch (myType) {
+                    case GL_TRIANGLES:
+                        myNumFaces += myVSize / 3;
+                        break;
+                    case GL_QUADS: 
+                        myNumFaces += myVSize / 2;
+                        break;
+                    default:
+                        AC_WARNING << "Can't STL-Export Primitives of different types than GL_TRIANGLES and GL_QUADS";
+                        break;
+                    }
                 }
             }
         }
@@ -174,21 +176,25 @@ namespace y60 {
         if (_myBigEndianFlag) {
             if (_myBigStream) {
                 exportHeader(myName, myNumFaces, *_myBigStream);
-                for (int i = 0; i < myNumChildren; ++i) {
-                    dom::NodePtr myNode = theNode->childNode(i);
-                    ShapePtr myShape = myNode->getFacade<Shape>();
-                    exportShapeToStream(myShape, *_myBigStream, false);
-                }
+                for (int j = 0; j < theIds.size(); ++j) {
+                    dom::NodePtr myNode = theNode->getChildElementById(theIds[j], "id");
+                    if (myNode) {
+                        ShapePtr myShape = myNode->getFacade<Shape>();
+                        exportShapeToStream(myShape, *_myBigStream, false);
+                    } 
+                } 
             } else {
                 AC_ERROR << "Not a filename while exporting.";
             }
         } else {
             if (_myLittleStream) {
                 exportHeader(myName, myNumFaces, *_myLittleStream);
-                for (int i = 0; i < myNumChildren; ++i) {
-                    dom::NodePtr myNode = theNode->childNode(i);
-                    ShapePtr myShape = myNode->getFacade<Shape>();
-                    exportShapeToStream(myShape, *_myLittleStream, false);
+                for (int j = 0; j < theIds.size(); ++j) {
+                    dom::NodePtr myNode = theNode->getChildElementById(theIds[j], "id");
+                    if (myNode) {
+                        ShapePtr myShape = myNode->getFacade<Shape>();
+                        exportShapeToStream(myShape, *_myLittleStream, false);
+                    }
                 }
             } else {
                 AC_ERROR << "Not a filename while exporting.";
