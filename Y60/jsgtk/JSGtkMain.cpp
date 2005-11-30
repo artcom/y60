@@ -18,11 +18,15 @@
 
 #include "JSGtkMain.h"
 #include "JSWindow.h"
+#include "JSSigConnection.h"
 #include "jsgtk.h"
+#include "JSSignal0.h"
 
+#include <acgtk/GCObserver.h>
 #include <y60/JScppUtils.h>
 #include <iostream>
 #include <gtkmm/main.h>
+#include <sigc++/slot.h>
 
 using namespace std;
 using namespace asl;
@@ -126,6 +130,69 @@ quit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+connect_timeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Install Gtk timeout callbacks");
+    DOC_END;
+    try {
+        if (argc != 3) {
+            JS_ReportError(cx, "GtkMain.connect_timeout(obj, func, msecs) needs three arguments.");
+            return JS_FALSE;
+        }
+        JSObject * myTarget;
+        if ( ! convertFrom(cx, argv[0], myTarget)) {
+            JS_ReportError(cx, "GtkMain.connect_timeout() first argument is not an object.");
+            return JS_FALSE;
+        }
+
+        Glib::ustring myMethodName;
+        if ( ! convertFrom(cx, argv[1], myMethodName)) {
+            JS_ReportError(cx, "GtkMain.connect_timeout() second argument is not a string.");
+            return JS_FALSE;
+        }
+
+        unsigned myInterval;
+        if ( ! convertFrom(cx, argv[2], myInterval)) {
+            JS_ReportError(cx, "GtkMain.connect_timeout() third argument is not a number.");
+            return JS_FALSE;
+        }
+
+        SigC::Slot0<bool> mySlot = sigc::bind<JSContext*, JSObject*, std::string>(
+                sigc::ptr_fun( & JSGtkMain::on_timeout ), cx, myTarget, myMethodName);
+        JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new SigC::Connection);
+        *myConnection = Glib::signal_timeout().connect( mySlot, myInterval);
+
+        // register our target object with the GCObserver
+        GCObserver::FinalizeSignal myFinalizer = GCObserver::get().watchObject(myTarget);
+        // now add our cleanup code to the finalize signal,
+        // binding the connection as an extra argument
+        myFinalizer.connect(sigc::bind<sigc::connection>(
+                    sigc::ptr_fun( & JSSignalAdapter0<bool>::on_target_finalized),
+                    *myConnection));
+
+        *rval = as_jsval(cx, myConnection, & ( * myConnection));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+
+}
+
+bool 
+JSGtkMain::on_timeout( JSContext * cx, JSObject * theJSObject, std::string theMethodName) {
+    jsval myVal;
+    JSBool bOK = JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
+    if (myVal == JSVAL_VOID) {
+        AC_WARNING << "no JS event handler for event '" << theMethodName << "'";
+    }
+    // call the function
+    jsval rval;
+    AC_TRACE << "GtkMain::on_timeout calling JS event handler '" << theMethodName << "'";
+    JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName.c_str(), 0, 0, &rval);
+
+    bool myResult;
+    convertFrom(cx, rval, myResult);
+    return myResult;
+}
+
 JSFunctionSpec *
 JSGtkMain::StaticFunctions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -135,6 +202,7 @@ JSGtkMain::StaticFunctions() {
         {"run",                  run,                     1},
         {"iteration",            iteration,               1},
         {"events_pending",       events_pending,          0},
+        {"connect_timeout",      connect_timeout,         3},
         {"quit",                 quit,                    0},
         {0}
     };

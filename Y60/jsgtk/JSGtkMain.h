@@ -65,7 +65,7 @@ class JSGtkMain : public JSWrapper<int, asl::Ptr<int>, StaticAccessProtocol>
             return dynamic_cast<JSGtkMain &>(JSGtkMain::getJSWrapper(cx,obj));
         }
 
-    private:
+        static bool on_timeout( JSContext * cx, JSObject * theJSObject, std::string theMethodName);
 };
 
 
