@@ -86,11 +86,17 @@ VectorOfStringTest.prototype.Constructor = function(obj, theName) {
 			+"	<vofi foo='[1,2,3]'/>\n"
 			+"	<vofs foo='[one,two,three]'/>\n"
 			+"	<vofv2f foo='[[0.1,0.2], [2,3]]'/>\n"
+			+"	<vofs foo='[]'/>\n"
+			+"	<vofs foo='[,23,foo,,bar,]'/>\n"
 			+"</root>\n"
 			);
         obj.myVectorOfInt = obj.myDocument.firstChild.childNode(0).foo;
         obj.myVectorOfString = obj.myDocument.firstChild.childNode(1).foo;
         obj.myVectorOfVector2f = obj.myDocument.firstChild.childNode(2).foo;
+        obj.myEmptyVectorOfString = obj.myDocument.firstChild.childNode(3).foo;
+        obj.myVectorWithEmptyString = obj.myDocument.firstChild.childNode(4).foo;
+
+        
         ENSURE('obj.myVectorOfInt[0] == 1');
         ENSURE('obj.myVectorOfInt[1] == 2');
         ENSURE('obj.myVectorOfInt[2] == 3');
@@ -109,6 +115,13 @@ VectorOfStringTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.myVectorOfString[2] == "three"');
         obj.myVectorOfString[1] = "zwei";
         ENSURE('obj.myVectorOfString[1] == "zwei"');
+        
+        ENSURE('obj.myEmptyVectorOfString.length == 0');
+        
+        ENSURE('obj.myVectorWithEmptyString.length == 6');
+        ENSURE('obj.myVectorWithEmptyString[0] == ""');
+        ENSURE('obj.myVectorWithEmptyString[4] == "bar"');
+        ENSURE('obj.myVectorWithEmptyString[5] == ""');
     }
 }
 
