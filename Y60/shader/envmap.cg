@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 2003 ART+COM AG Berlin
+// Copyright (C) 2003-2005 ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: envmap.cg,v $
-//   $Author: martin $
-//   $Revision: 1.9 $
-//   $Date: 2004/03/10 16:49:44 $
-//
-//  Description: environment mapping shader
 //=============================================================================
 
 #define FRESNEL // experimental
@@ -34,7 +26,6 @@ struct app2vert {
     float2 texCoord1        : TEXCOORD1;
 };
 
-
 struct vert2frag {
     float4 homPosition   : POSITION;
     float2 texCoord0     : TEXCOORD0;
@@ -45,7 +36,9 @@ struct vert2frag {
     float3 refractVector : TEXCOORD5;
     float4 lighting      : TEXCOORD6;
     float4 primaryColor    : COLOR0;
+#ifdef FRESNEL
     float reflectionFactor : COLOR1;
+#endif
 };
 
 vert2frag mainVertex(app2vert IN,
@@ -58,8 +51,8 @@ vert2frag mainVertex(app2vert IN,
         uniform float4 AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
         uniform float3 AC_POSITIONAL_LIGHTS[],
         uniform float4 AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
-        uniform float4 diffuse,
 #endif
+        uniform float4 diffuse,
         uniform float  shininess
         )
 {
@@ -73,6 +66,7 @@ vert2frag mainVertex(app2vert IN,
 
     OUT.worldPosition = myWorldPosition.xyz;
     OUT.worldNormal = myWorldNormal;
+
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
 
@@ -88,7 +82,7 @@ vert2frag mainVertex(app2vert IN,
 #endif // PAINT
 
 #ifdef LIGHTING
-    OUT.primaryColor = float4(1,1,1,1);
+    OUT.primaryColor = diffuse; //float4(1,1,1,1);
 #else
     OUT.primaryColor = float4(0,0,0,0); // should be vertex color
 #endif

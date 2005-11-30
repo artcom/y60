@@ -34,7 +34,6 @@
 
 namespace inet {
 
-
     UDPConnection::UDPConnection(asl::Unsigned32 thehost, asl::Unsigned16 theport):UDPSocket(thehost, theport)
     {
     }

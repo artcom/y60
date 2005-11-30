@@ -181,7 +181,7 @@ namespace inet {
         }
         int theRC = ioctlsocket(fd, FIONBIO, &theFlag);
         if (theRC == SOCKET_ERROR) {
-                throw SocketException("Socket::setBlockingMode failed");
+            throw SocketException("Socket::setBlockingMode failed");
         }
 #endif
     }

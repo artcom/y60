@@ -170,8 +170,4 @@ namespace inet {
         return strerror(ErrorID);
 #endif                
     }
-
-
-
-    
 }
