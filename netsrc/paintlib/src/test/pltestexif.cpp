@@ -110,9 +110,9 @@ void PLTestExif::testEncode()
     Decoder.Close();
 
     Encoder.SetExifData(ExifData);
-    Encoder.MakeFileFromBmp("test.jpg", &Bmp);
-    
-    Decoder.OpenFile ("test.jpg");
+    Encoder.MakeFileFromBmp("exiftest.jpg", &Bmp);
+
+    Decoder.OpenFile ("exiftest.jpg");
     Decoder.GetExifData(ExifData);
     Test(NumTags == ExifData.GetAllTags().size());
   }
@@ -128,7 +128,6 @@ void PLTestExif::testEncode()
       Test(false);
     }
   }
-
 }
 
 /*

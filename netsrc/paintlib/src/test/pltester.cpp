@@ -586,28 +586,28 @@ void PLTester::testRect ()
 void PLTester::testCodec (const PLPicEncoder& Encoder, const PLPicDecoder& Decoder)
 {
   cerr << "  Testing 32 bpp PLAnyBmp....\n";
-  testCodecBmp (m_AnyBmp32, Encoder, Decoder, "test");
+  testCodecBmp (m_AnyBmp32, Encoder, Decoder, "mytestbmp");
 #ifdef PL_SUPPORT_PNG
   if (typeid(Encoder) == typeid (PLPNGEncoder))
   {
     cerr << "  Testing 24 bpp PLAnyBmp....\n";
-    testCodecBmp (m_AnyBmp24, Encoder, Decoder, "test");
+    testCodecBmp (m_AnyBmp24, Encoder, Decoder, "mytestbmp");
   }
 #endif
   cerr << "  Testing 8 bpp PLAnyBmp....\n";
-  testCodecBmp (m_AnyBmp8, Encoder, Decoder, "test");
+  testCodecBmp (m_AnyBmp8, Encoder, Decoder, "mytestbmp");
 #ifdef _WIN32
   cerr << "  Testing 32 bpp PLDIBSection....\n";
-  testCodecBmp (m_DIBSect32, Encoder, Decoder, "test");
+  testCodecBmp (m_DIBSect32, Encoder, Decoder, "mytestbmp");
   cerr << "  Testing 8 bpp PLDIBSection....\n";
-  testCodecBmp (m_DIBSect8, Encoder, Decoder, "test");
+  testCodecBmp (m_DIBSect8, Encoder, Decoder, "mytestbmp");
 #endif
 
   // Test bit-depth conversion.
   cerr << "  Testing bit-depth conversion....\n";
   PLAnyBmp NewBmp;
-  const_cast<PLPicEncoder&>(Encoder).MakeFileFromBmp ("test", &m_AnyBmp8);
-  const_cast<PLPicDecoder&>(Decoder).MakeBmpFromFile ("test", &NewBmp, PLPixelFormat::X8R8G8B8);
+  const_cast<PLPicEncoder&>(Encoder).MakeFileFromBmp ("mytestbmp", &m_AnyBmp8);
+  const_cast<PLPicDecoder&>(Decoder).MakeBmpFromFile ("mytestbmp", &NewBmp, PLPixelFormat::X8R8G8B8);
   PLAnyBmp Bmp32;
   Bmp32.CreateCopy (m_AnyBmp8, PLPixelFormat::X8R8G8B8);
   Test (NewBmp == Bmp32);
@@ -647,7 +647,7 @@ void PLTester::testCodecBmp (PLBmp& Bmp, const PLPicEncoder& Encoder,
 #ifdef PL_SUPPORT_TIFF
 void PLTester::testCTIFFEx (PLBmp& Bmp)
 {
-  const char szFName[] = "test";
+  const char szFName[] = "mytestbmp";
   PLAnyBmp NewBmp;
   PLTIFFEncoderEx Encoder;
   PLFileSink Sink;
