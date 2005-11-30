@@ -1043,6 +1043,28 @@ inverseDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     return JS_FALSE;
 }
 
+static JSBool
+signedDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Calculates the signed distance between a point and a plane");
+    DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);
+    DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);
+    DOC_RVAL("The signed distance between point and plane", DOC_TYPE_MATRIX4F);
+    DOC_END;
+    if (argc == 2) {
+        Point3f myPoint;
+        convertFrom(cx, argv[0], myPoint);
+
+        Planef myPlane;
+        convertFrom(cx, argv[1], myPlane);
+        
+        *rval = as_jsval(cx, asl::signedDistance(myPoint, myPlane));
+        return JS_TRUE;
+    }
+    JS_ReportError(cx,"inverseDispatcher: bad number of arguments for 'signedDistance'");
+    return JS_FALSE;
+
+}
+
 JSFunctionSpec *
 Global::Functions() {
     static JSFunctionSpec myFunctions[] = {
@@ -1060,6 +1082,7 @@ Global::Functions() {
         {"orthonormal",  orthonormal,      1},
         {"cosAngle",     cosAngle   ,      2},
         {"distance",     distance,   2},
+        {"signedDistance", signedDistance, 2},
         {"intersection", intersectionDispatcher,  2},
         {"projection",  projectionDispatcher,  2},
         {"nearest",     nearestDispatcher,     2},
