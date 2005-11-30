@@ -401,7 +401,10 @@ useFactoriesImpl(JSContext *cx, dom::Node & theNode, const std::string & theFact
         } else if (myFactoryNames[i] == "y60") {
             y60::registerSomTypes(*myFactory);
         } else if (myFactoryNames[i] == "som") {
-            AC_WARNING << "'som' factory is deprecated";
+            // [DS] som factory is deprecated for x60 models only.
+            // Other schemas using it still have to register it beforehand.
+            // So this is defenitly the wrong place for this warning.
+            //AC_WARNING << "'som' factory is deprecated";
             y60::registerSomTypes(*myFactory);
         } else {
             JS_ReportError(cx,"JSNode::useFactories: Could not find factory '%s'",myFactoryNames[i].c_str());
