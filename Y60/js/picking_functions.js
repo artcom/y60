@@ -46,8 +46,10 @@ obj.getViewportAt = function(theScreenPixelX, theScreenPixelY, theCanvas) {
 }
 
 
-obj.pickPosition = function(theScreenPixelX, theScreenPixelY)
-{
+/** Find intersection closest to the current camera.
+ * An optional world space clipping plane can be specified
+ */
+obj.pickPosition = function(theScreenPixelX, theScreenPixelY, theClippingPlane) {
     var myClosestPosition = null;
     var myInfo = pickIntersection(theScreenPixelX, theScreenPixelY);
     if (myInfo) {
@@ -55,14 +57,24 @@ obj.pickPosition = function(theScreenPixelX, theScreenPixelY)
         if (myIntersections.length > 0) {
 
             var myCameraPos = getCameraPos();
-            var myClosestDistance = distance(myIntersections[0].position,myCameraPos);
-            var myClosestPosition = myIntersections[0].position;
-            for (var i = 1; i < myIntersections.length; ++i) {
-                //print ("pos["+i+"]=" + myClosestPosition + ". distance = " + myClosestDistance);
+            var myClosestDistance = null; // = distance(myIntersections[0].position,myCameraPos);
+            //myClosestPosition = myIntersections[0].position;
+            for (var i = 0; i < myIntersections.length; ++i) {
                 var myDistance = distance(myIntersections[i].position,myCameraPos);
-                if (myDistance < myClosestDistance) {
-                    myClosestDistance = myDistance;
-                    myClosestPosition = myIntersections[i].position;
+
+                if ( theClippingPlane ) {
+                    var myDistanceToPlane = signedDistance(myIntersections[i].position, theClippingPlane);
+                    if (myDistanceToPlane > 0) {
+                        if ( myClosestDistance == undefined || myDistance < myClosestDistance) {
+                            myClosestDistance = myDistance;
+                            myClosestPosition = myIntersections[i].position;
+                        }
+                    }
+                } else {
+                    if ( myClosestDistance == undefined || myDistance < myClosestDistance) {
+                        myClosestDistance = myDistance;
+                        myClosestPosition = myIntersections[i].position;
+                    }
                 }
             }
             //print ("closest is "+myInfo.info.body+"@" + myClosestPosition + ", distance = " + myClosestDistance);
