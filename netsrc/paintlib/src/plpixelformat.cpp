@@ -163,7 +163,9 @@ PLPixelFormat PLPixelFormat::GetRGBSwapped() const
       return **i;
     }
   }
-  return PLPixelFormat(s);
+
+  PLPixelFormat * pf = new PLPixelFormat(s);
+  return *pf;
 }
 
 PLPixelFormat :: PLPixelFormat(const string& sName)
