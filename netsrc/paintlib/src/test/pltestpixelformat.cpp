@@ -54,6 +54,7 @@ void PLTestPixelFormat ::RunTests ()
   Test(PLPixelFormat::R8G8B8.IsGrayscale()==false);
   cerr << "    GetName..." << endl;
   Test(PLPixelFormat::R8G8B8.GetName()=="R8G8B8");
+  cerr << "    GetRGBSwapped..." << endl;
   Test(PLPixelFormat::R8G8B8.GetRGBSwapped()==PLPixelFormat::B8G8R8);
 
   cerr << "  Testing PixelFormat A8R8G8B8..." << endl;
@@ -70,6 +71,7 @@ void PLTestPixelFormat ::RunTests ()
   Test(PLPixelFormat::A8R8G8B8.IsGrayscale()==false);
   cerr << "    GetName..." << endl;
   Test(PLPixelFormat::A8R8G8B8.GetName()=="A8R8G8B8");
+  cerr << "    GetRGBSwapped..." << endl;
   Test(PLPixelFormat::A8R8G8B8.GetRGBSwapped()==PLPixelFormat::A8B8G8R8);
 
   cerr << "  Testing PixelFormat B16G16R16..." << endl;
@@ -104,7 +106,6 @@ void PLTestPixelFormat ::RunTests ()
   cerr << "  Testing fromChannels RGB, 24..." << endl;
   Test(PLPixelFormat::FromChannels("RGB", 24) == PLPixelFormat::R8G8B8);
 
-#if 0
   cerr << "  Testing fromChannels YCrCb, 8... supposed to fail" << endl;
   bool bOkay = false;
   try {
@@ -113,7 +114,6 @@ void PLTestPixelFormat ::RunTests ()
     bOkay = true;
   }
   Test(bOkay);
-#endif
 }
 
 /*

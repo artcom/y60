@@ -155,6 +155,14 @@ PLPixelFormat PLPixelFormat::GetRGBSwapped() const
   int BPos = s.find('B');
   s[RPos] = 'B';
   s[BPos] = 'R';
+
+  // find pixelformat
+  PixelFormatList::iterator i;
+  for(i = s_pixelFormatList.begin(); i!=s_pixelFormatList.end(); ++i) {
+    if ((*i)->GetName() == s) {
+      return **i;
+    }
+  }
   return PLPixelFormat(s);
 }
 
@@ -236,4 +244,3 @@ PLPixelFormat :: PLPixelFormat(const string& sName)
 
 	s_pixelFormatList.push_back(this);
 }
-
