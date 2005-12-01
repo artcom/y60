@@ -12,12 +12,12 @@
 #define INCL_RESSRC
 
 #ifndef INCL_PLDATASRC
-#include "pldatasrc.h"
+#include "../pldatasrc.h"
 #endif
-#include "plpaintlibdefs.h"
+#include "../plpaintlibdefs.h"
 
 #ifdef _WIN32
-  // TODO: This is really just to define HANDLE. 
+  // TODO: This is really just to define HANDLE.
   #define WIN32_LEAN_AND_MEAN  /* Prevent including <winsock*.h> in <windows.h> */
   #define VC_EXTRALEAN  // Exclude rarely-used stuff from Windows headers
   #include <windows.h>
@@ -64,7 +64,7 @@ public:
   virtual void Seek
     ( int n
     );
-    
+
 private:
   HRSRC   m_hRsrc;
   HGLOBAL m_hGlobal;

@@ -56,7 +56,9 @@ namespace y60 {
         GRAYS16,
         ALPHA,
         DEPTH,
-        GRAY32
+        GRAY32,
+        RGB_HALF,
+        RGBA_HALF
     };
 
     static const char * PixelEncodingString[] = {
@@ -80,6 +82,8 @@ namespace y60 {
         "ALPHA",
         "DEPTH",
         "GRAY32",
+        "RGB_HALF",
+        "RGBA_HALF",
         0
     };
     static const char * RasterEncodingString[] = {
@@ -103,6 +107,8 @@ namespace y60 {
         "RasterOfGRAY",
         "RasterOfGRAY32",
         "RasterOfGRAY32",
+        "RasterOfRGB_HALF",
+        "RasterOfRGBA_HALF",
         0
     };
    static const char * RasterElementNames[] = {
@@ -126,6 +132,8 @@ namespace y60 {
         "rasterofgray",
         "rasterofgray32",
         "rasterofgray32",
+        "rasterofrgb_half",
+        "rasterofrgba_half",
         0
     };
 
@@ -201,6 +209,12 @@ namespace y60 {
             case S3TC_DXT3:
             case S3TC_DXT5:
                 myBytesPerPixel = 1;
+                break;
+            case RGB_HALF:
+                myBytesPerPixel = 6;
+                break;
+            case RGBA_HALF:
+                myBytesPerPixel = 8;
                 break;
             default:
                 throw asl::Exception(std::string("getBytesRequired(): Unsupported Encoding: ") +

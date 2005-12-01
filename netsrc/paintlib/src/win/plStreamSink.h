@@ -14,9 +14,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "plobject.h"
-#include "pldatasink.h"
-#include "plpaintlibdefs.h"
+#include "../plobject.h"
+#include "../pldatasink.h"
+#include "../plpaintlibdefs.h"
 
 class PLStreamSink : public PLDataSink
 {

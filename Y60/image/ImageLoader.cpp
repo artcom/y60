@@ -54,7 +54,7 @@ namespace y60 {
 
     void
     applyCustomFilter(PLBmp & theBitmap, const std::string & theFilterName, const VectorOfFloat & theFilterparams) {
-        asl::Ptr<PLFilter> myPaintLibFilter = y60::PaintLibFilterFactory::get().createFilter(theFilterName, 
+        asl::Ptr<PLFilter> myPaintLibFilter = y60::PaintLibFilterFactory::get().createFilter(theFilterName,
                                                                                              theFilterparams);
         if (myPaintLibFilter) {
             theBitmap.ApplyFilter(*myPaintLibFilter);
@@ -94,8 +94,8 @@ namespace y60 {
         _myImageMatrix.makeIdentity();
     }
 
-    ImageLoader::ImageLoader(const string & theFilename, 
-            PackageManager * thePackageManager, 
+    ImageLoader::ImageLoader(const string & theFilename,
+            PackageManager * thePackageManager,
             const ITextureManagerPtr & theTextureManager,
             unsigned /*theDepth*/) :
         PLBmp(),
@@ -148,8 +148,8 @@ namespace y60 {
         }
     }
 
-    ImageLoader::ImageLoader(Ptr<ReadableBlock> theInputData, 
-            const std::string & theFileDescription, 
+    ImageLoader::ImageLoader(Ptr<ReadableBlock> theInputData,
+            const std::string & theFileDescription,
             const ITextureManagerPtr & theTextureManager,
             unsigned /*theDepth*/) :
         PLBmp(),
@@ -323,7 +323,7 @@ namespace y60 {
                                     const PLPixelFormat &  thePixelformat)
     {
         AC_DEBUG << "Pixelformat: " << thePixelformat.GetName();
-/*        
+/*
        int theBitsPerPixel = thePixelformat.GetBitsPerPixel();
         switch (theBitsPerPixel) {
             case 32:
@@ -389,9 +389,9 @@ namespace y60 {
 				    << theAlpha << " in image: " << _myFilename << endl;
             if (GetBitsPerPixel() != 32) {
 				// Add Alpha channel (do we ever get here ? dk/vs)
-                // A: yes - when 24-bit files and an alpha-scale != 1.0 are combined. 
+                // A: yes - when 24-bit files and an alpha-scale != 1.0 are combined.
 				AC_INFO << "Create alpha channel for setting alpha on a "
-					    << getStringFromEnum(_myEncoding,PixelEncodingString)  << " encoded image: " 
+					    << getStringFromEnum(_myEncoding,PixelEncodingString)  << " encoded image: "
 						<< _myFilename << endl;
 				PLAnyBmp myCopy;
                 switch (_myEncoding) {
@@ -469,7 +469,7 @@ namespace y60 {
                 default:
                     throw ImageLoaderException("Unsupported pixel encoding", PLUS_FILE_LINE);
             }
-            _myRasterData = createRasterValue(_myEncoding, myWidth, myHeight, 
+            _myRasterData = createRasterValue(_myEncoding, myWidth, myHeight,
                 *myDestinationBlock);
             PLPixelFormat myPixelFormat;
             mapPixelEncodingToFormat(_myEncoding, myPixelFormat);
@@ -539,13 +539,13 @@ namespace y60 {
             if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
                 myTextureSizeLimit = myTextureManager->getMaxTextureSize( theDepth = 1 ? 2 : 3 );
             }
-           
+
             unsigned myTargetWidth = GetWidth();
             unsigned myTargetHeight = GetHeight();
 
-            while (myTextureSizeLimit && 
-                ((myTargetWidth / myWidthFactor) > myTextureSizeLimit || 
-                 (myTargetHeight / myHeightFactor)  > myTextureSizeLimit) ) 
+            while (myTextureSizeLimit &&
+                ((myTargetWidth / myWidthFactor) > myTextureSizeLimit ||
+                 (myTargetHeight / myHeightFactor)  > myTextureSizeLimit) )
             {
                 myTargetWidth  = (myTargetWidth / myWidthFactor)/2 * myWidthFactor;
                 myTargetHeight = (myTargetHeight / myHeightFactor)/2 * myHeightFactor;
@@ -572,5 +572,5 @@ namespace y60 {
     ImageLoader::applyCustomFilter(ImageFilter theFilter, const vector<float> & theFilterparams) {
         y60::applyCustomFilter(*this, theFilter, theFilterparams);
     }
-    
+
 }

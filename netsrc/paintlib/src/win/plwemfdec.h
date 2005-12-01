@@ -12,7 +12,7 @@
 #define INCL_WEMFDEC_H
 
 #ifndef INCL_PLPICDEC
-#include "plpicdec.h"
+#include "../plpicdec.h"
 #endif
 
 // This only makes sense for Windows
@@ -23,9 +23,9 @@
 #endif // _MSC_VER > 1000
 
 
-//! Decoder for 16-Bit Windows Metafiles (*.wmf) and 16-Bit Adobe 
-//! Placeable Metafiles (*,wmf) and 32-Bit Enhanced Windows 
-//! Metafiles (*.emf) for Windows 95, Windows 98 and Windows NT 
+//! Decoder for 16-Bit Windows Metafiles (*.wmf) and 16-Bit Adobe
+//! Placeable Metafiles (*,wmf) and 32-Bit Enhanced Windows
+//! Metafiles (*.emf) for Windows 95, Windows 98 and Windows NT
 //! >= 3.1.
 //!
 //! Comments by the author, Mario Westphal:<BR>
@@ -34,9 +34,9 @@
 //!   you find a WMF/EMF file it cannot handle, attach it to
 //!   an email and send it to mw@mwlabs.de. I'll see what I
 //!   can do. But, please, test it with another program
-//!   before you send it in to see if it is really a valid 
+//!   before you send it in to see if it is really a valid
 //!   metafile.</I>
-class PLWEMFDecoder : public PLPicDecoder  
+class PLWEMFDecoder : public PLPicDecoder
 {
 public:
   //!
@@ -49,7 +49,7 @@ public:
   //! file.
   virtual void Open (PLDataSource * pDataSrc);
 
-  //! Fills the bitmap with the image. 
+  //! Fills the bitmap with the image.
   virtual void GetImage (PLBmpBase & Bmp);
 
   //!

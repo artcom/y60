@@ -12,7 +12,7 @@
 #define INCL_WINBMP
 
 #ifndef INCL_PLBITMAP
-#include "plbitmap.h"
+#include "../plbitmap.h"
 #endif
 
 #ifdef _WIN32
@@ -23,7 +23,7 @@
 
 //! This is the windows version of PLBmp. The internal storage format
 //! is a windows DIB. It supports all color depths allowed by
-//! windows: 1, 8, 16, 24, and 32 bpp. 
+//! windows: 1, 8, 16, 24, and 32 bpp.
 //!
 //! The subset of the windows DIB format supported is as follows: The
 //! DIB is stored so that header, palette, and bits are in one
@@ -154,7 +154,7 @@ protected:
 
   //! Create a new empty DIB. Bits are uninitialized.
   //! Assumes that no memory is allocated before the call.
-  virtual void internalCreate (PLLONG Width, PLLONG Height, 
+  virtual void internalCreate (PLLONG Width, PLLONG Height,
          const PLPixelFormat& pf);
 
   //! Creates a PLWinBmp from an existing bitmap pointer.
@@ -186,8 +186,8 @@ private:
 };
 
 
-// Note that _both_ these copy constructors are needed. If only the 
-// second one is there, the compiler generates a default copy 
+// Note that _both_ these copy constructors are needed. If only the
+// second one is there, the compiler generates a default copy
 // constructor anyway :-(.
 inline PLWinBmp::PLWinBmp
     ( const PLWinBmp &Orig
@@ -206,7 +206,7 @@ inline PLWinBmp::PLWinBmp
 }
 
 inline PLWinBmp & PLWinBmp::operator= ( PLBmpBase const &Orig)
-{ 
+{
   PLBmp::operator=(Orig);
   return *this;
 }
