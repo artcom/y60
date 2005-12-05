@@ -48,7 +48,7 @@ public:
 
 
 int main( int argc, char *argv[] ) {
-    UnitTestSuite mySuite ("UDP halt tests");
+    UnitTestSuite mySuite("UDP halt tests", argc, argv);
 
     mySuite.addTest(new TestUDPHalt);
     mySuite.run();
