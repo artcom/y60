@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2004, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,7 +8,39 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//
+//
+// Description:  Memory Mapping Classes with asl::Block interface
+//
+// Last Review: pavel 30.11.2005 
+//
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : ok
+//    formatting             : poor
+//    documentation          : poor
+//    test coverage          : ok
+//    names                  : poor
+//    style guide conformance: poor
+//    technical soundness    : fair
+//    dead code              : poor
+//    readability            : fair
+//    understandabilty       : ok
+//    interfaces             : ok
+//    confidence             : fair
+//    integration            : fair
+//    dependencies           : fair
+//    cheesyness             : fair
+//
+//    overall review status  : poor
+//
+//    recommendations:
+//       - remove dead code
+//       - reformat source code
+//       - put OS-dependent i/o functions into separate file
+//       - put beef into .cpp file
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
+
 #ifndef _included_asl_MappedBlock_
 #define _included_asl_MappedBlock_
 

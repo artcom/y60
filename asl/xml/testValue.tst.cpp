@@ -530,7 +530,7 @@ private:
 
 class MyTestSuite : public UnitTestSuite {
 public:
-    MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
+    MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new XmlValueUnitTest<int>("int",23));
@@ -556,7 +556,7 @@ public:
 
 int main(int argc, char *argv[]) {
 
-    asl::MyTestSuite mySuite(argv[0]);
+    asl::MyTestSuite mySuite(argv[0], argc, argv);
 
     mySuite.run();
 

@@ -91,7 +91,7 @@ class FFMpegAudioReaderTest : public UnitTest {
 
 class MyTestSuite : public UnitTestSuite {
     public:
-        MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
+        MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
         void setup() {
             UnitTestSuite::setup();
             addTest(new FFMpegAudioReaderTest);
@@ -99,7 +99,7 @@ class MyTestSuite : public UnitTestSuite {
 };
 
 int main(int argc, char *argv[]) {
-    MyTestSuite mySuite(argv[0]);
+    MyTestSuite mySuite(argv[0], argc, argv);
 
     try {
         mySuite.run();

@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2004, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,15 +9,38 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: error_functions.h,v $
 //
-//   $Revision: 1.3 $
+// Description:  Cross Platform Error Code 
 //
-// Description: file helper functions
+// Last Review: pavel 30.11.2005 
 //
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : ok
+//    formatting             : ok
+//    documentation          : poor
+//    test coverage          : poor
+//    names                  : fair
+//    style guide conformance: ok
+//    technical soundness    : ok
+//    dead code              : ok
+//    readability            : ok
+//    understandabilty       : ok
+//    interfaces             : ok
+//    confidence             : ok
+//    integration            : fair
+//    dependencies           : ok
+//    cheesyness             : fair
 //
+//    overall review status  : ok
+//
+//    recommendations:
+//       - make a documentation
+//       - make general use of this throughout the whole framework, at least throughout asl
+//       - rename LAST_ERROR_TYPE to something style-guide conforming
+//       - pur errorDescription() implementation into a .cpp file
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
+
 #ifndef _included_asl_error_functions_
 #define _included_asl_error_functions_
 
@@ -59,8 +82,7 @@ inline
 std::string errorDescription(LAST_ERROR_TYPE err) {
 #ifdef WIN32
     LPVOID lpMsgBuf;
-    if (!FormatMessage(
-                       FORMAT_MESSAGE_ALLOCATE_BUFFER |
+    if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                        FORMAT_MESSAGE_FROM_SYSTEM |
                        FORMAT_MESSAGE_IGNORE_INSERTS,
                        NULL,
@@ -70,8 +92,8 @@ std::string errorDescription(LAST_ERROR_TYPE err) {
                        0,
                        NULL ))
 	{
-            // Handle the error.
-            return std::string("unknown error code=")+asl::as_string(err);
+        // Handle the error.
+        return std::string("unknown error code=")+asl::as_string(err);
 	}
     std::string myResult = static_cast<const char*>(lpMsgBuf);
     LocalFree( lpMsgBuf );

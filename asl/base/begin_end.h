@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2004, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,24 +9,42 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: begin_end.h,v $
 //
-//   $Revision: 1.2 $
+// Description:  Helper functions for generic programming 
 //
-// Description: helper for generic programming
+// Last Review: pavel 30.11.2005 
 //
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : ok
+//    formatting             : ok
+//    documentation          : poor
+//    test coverage          : poor
+//    names                  : fair
+//    style guide conformance: ok
+//    technical soundness    : fair
+//    dead code              : ok
+//    readability            : fair
+//    understandabilty       : fair
+//    interfaces             : fair
+//    confidence             : fair
+//    integration            : ok
+//    dependencies           : ok
+//    cheesyness             : fair
 //
+//    overall review status  : fair
+//
+//    recommendation:
+//       - check if really necessary
+//       - very short file, potentially merge with other helpers
+//       - improve documentation
+//       - improve test coverage
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-// originally written by Pavel - Tue Jun 17 19:18:17 CEST 1997
-// major refactoring during spare time 2003/2004
-//
+
 #ifndef _ASL_BEGIN_END_H_INCLUDED_
 #define _ASL_BEGIN_END_H_INCLUDED_
 
 namespace asl {
-
 
     /*! \addtogroup aslbase */
     /* @{ */
@@ -70,9 +88,6 @@ namespace asl {
     typename CONTAINER<ELEM>::const_iterator end(const CONTAINER<ELEM> & c) {
         return c.end();
     }
-
-
     /* @} */
-
 } // namespace asl
 #endif

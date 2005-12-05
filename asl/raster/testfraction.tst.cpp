@@ -208,7 +208,7 @@ private:
 
 class MyTestSuite : public UnitTestSuite {
 public:
-    MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
+    MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         
@@ -222,7 +222,7 @@ public:
 
 int main(int argc, char *argv[]) {
 
-    MyTestSuite mySuite(argv[0]);
+    MyTestSuite mySuite(argv[0], argc, argv);
 
     mySuite.run();
 

@@ -172,7 +172,7 @@ private:
 };
 
 int main( int argc, char *argv[] ) {
-    UnitTestSuite mySuite ("Effect tests");
+    UnitTestSuite mySuite ("Effect tests", argc, argv);
     mySuite.addTest(new TestNullEffect);
     mySuite.addTest(new TestHalfEffect);
     mySuite.addTest(new TestVolumeFader);

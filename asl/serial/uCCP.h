@@ -1,6 +1,6 @@
 //============================================================================
 //
-// Copyright (C) 2003, ART+COM AG Berlin
+// Copyright (C) 1993-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and

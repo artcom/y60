@@ -55,7 +55,7 @@ int main( int argc, char *argv[] ) {
     // program.
     //Logger::get().setVerbosity(SEV_DEBUG);
 
-    UnitTestSuite mySuite ("Sound tests");
+    UnitTestSuite mySuite ("Sound tests", argc, argv);
     mySuite.addTest(new TestRealPump);
 
     mySuite.run();

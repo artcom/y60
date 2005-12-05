@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2003, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,16 +9,36 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: MemoryPool.h,v $
 //
-//   $Revision: 1.4 $
+// Description:  A fast allocator for small objects of same size
 //
-// Description: reference counting smart pointer
-//              based on shared_ptr from www.boost.org
+// Last Review: pavel 30.11.2005 
 //
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : ok
+//    formatting             : ok
+//    documentation          : poor
+//    test coverage          : fair (threading tests currently disabled)
+//    names                  : ok
+//    style guide conformance: ok
+//    technical soundness    : ok
+//    dead code              : fair
+//    readability            : ok
+//    understandabilty       : ok
+//    interfaces             : ok
+//    confidence             : ok
+//    integration            : ok
+//    dependencies           : ok
+//    cheesyness             : ok
 //
+//    overall review status  : fair
+//
+//    recommendations:
+//       - remove dead code
+//       - re-enable or discard thread-safety tests
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
+
 #ifndef _included_asl_MemoryPool_
 #define _included_asl_MemoryPool_
 
@@ -47,7 +67,6 @@ typedef unsigned long Size;
 
 /*! \addtogroup aslbase */
 /* @{ */
-
 
 // see Efficient C++ Pg. 85
 template <class T>

@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2002, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,15 +9,37 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: os_functions.h,v $
 //
-//   $Revision: 1.3 $
+// Description:  misc operating system & environment helper functions
 //
-// Description: misc operating system & environment helper functions
+// Last Review: pavel 30.11.2005 
 //
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : ok
+//    formatting             : ok
+//    documentation          : poor (not yet doxygenized)
+//    test coverage          : poor
+//    names                  : poor
+//    style guide conformance: poor
+//    technical soundness    : ok
+//    dead code              : ok
+//    readability            : ok
+//    understandabilty       : ok
+//    interfaces             : ok
+//    confidence             : ok
+//    integration            : ok
+//    dependencies           : ok
+//    cheesyness             : ok
 //
+//    overall review status  : poor
+//
+//    recommendations:
+//       - doxygenize documentation
+//       - add missing tests
+//       - unify names with styleguide in mind
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
+
 #ifndef _included_asl_os_functions_
 #define _included_asl_os_functions_
 
@@ -34,7 +56,6 @@
 #endif
 
 namespace asl {
-
 
     /*! \addtogroup aslbase */
     /* @{ */

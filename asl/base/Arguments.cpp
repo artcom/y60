@@ -1,24 +1,39 @@
-//============================================================================
-// Copyright (C) 2000-2001, ART+COM AG Berlin
+/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//============================================================================
-//
-//   $RCSfile : $
-//   $Author  : $
-//   $Revision: 1.8 $
-//   $Date    : $
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-//  Description:
+// Description: command line argument parser
 //
-// (CVS log at the bottom of this file)
+// Last Review: pavel 30.11.2005 
 //
-//=============================================================================
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    formatting             : perfect
+//    documentation          : ok
+//    test coverage          : ok
+//    names                  : ok
+//    style guide conformance: ok
+//    technical soundness    : ok
+//    dead code              : ok
+//    readability            : ok
+//    understandabilty       : ok
+//    interfaces             : ok
+//    confidence             : ok
+//    cheesyness             : ok
+//
+//    overall review status  : ok
+//
+//    recommendations: none
+//       
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+*/
 
 #include "settings.h"
 #include "Arguments.h"
@@ -209,33 +224,4 @@ Arguments::setArgumentDescription(const char * theArgumentDescription) {
 
 } // namespace asl
 
-//=============================================================================
-//
-// $Log: Arguments.cpp,v $
-// Revision 1.8  2005/04/24 00:30:18  pavel
-// make use of  asl::Logger for majority of messages
-//
-// Revision 1.7  2005/01/18 12:36:38  martin
-// added argument parser to JS
-//
-// Revision 1.6  2003/10/30 16:37:12  david
-//  - fixed build
-//
-// Revision 1.5  2003/10/29 18:11:21  david
-//  - initial checkin of serial device classes
-//
-// Revision 1.4  2003/06/28 22:37:14  pavel
-// fixed a usage argument name print glitch
-//
-// Revision 1.3  2003/05/14 12:45:15  uzadow
-// no message
-//
-// Revision 1.6  2002/10/30 16:24:47  uzadow
-// Massive windows compatibility changes
-//
-// Revision 1.5  2002/10/18 11:02:49  wolfger
-// no message
-//
-//
-//=============================================================================
 

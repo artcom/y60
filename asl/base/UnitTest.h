@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -46,6 +46,8 @@ public:
     virtual void setAbortOnFailure(bool makeAbort = true);
     virtual void setup();
     virtual void teardown();
+    virtual unsigned getProfileRepeatCount() const;
+    virtual void setProfileRepeatCount(unsigned theCount);
  private:
     UnitTest();
     UnitTest(const UnitTest &);
@@ -66,22 +68,25 @@ private:
     const char * _myName;
     unsigned int _passedCount;
     unsigned int _failedCount;
+    unsigned int _profilingRepeatCount;
     bool _silentSuccess;
     bool _abortOnFailure;
 };
 
 class UnitTestSuite : public UnitTest {
 public:
-    explicit UnitTestSuite(const char * myName) : UnitTest(myName) {
+    explicit UnitTestSuite(const char * myName, int argc, char *argv[]) 
+        : UnitTest(myName), _argc(argc), _argv(argv) {
     }
     ~UnitTestSuite() {
         destroyMyTests();
     }
 
-    virtual void addTest(UnitTest * myTest) {
-        if (myTest) {
-            _myTests.push_back(myTest);
-            std::cerr << ">> Added Test '" << myTest->getMyName() << "', ptr = " << myTest << std::endl;
+    virtual void addTest(UnitTest * theTest, unsigned int theProfileRepeatCount = 1) {
+        if (theTest) {
+            _myTests.push_back(theTest);
+            theTest->setProfileRepeatCount(theProfileRepeatCount);
+            std::cerr << ">> Added Test '" << theTest->getMyName() << "', ptr = " << theTest << std::endl;
         } else {
             std::cerr << "## Failed to add Test" << std::endl;
             incrementFailedCount();
@@ -100,6 +105,12 @@ protected:
     UnitTest * getTest(int i) {
         return _myTests[i];
     }
+    int get_argc() const {
+        return _argc;
+    }
+    char ** get_argv() const {
+        return _argv;
+    }
 private:
     void destroyMyTests() {
         while (_myTests.size()) {
@@ -108,6 +119,8 @@ private:
         }
     }
     std::vector<UnitTest *> _myTests;
+    int _argc;
+    char ** _argv;
 };
 
 class TemplateUnitTest : public UnitTest {

@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -32,6 +32,7 @@ class TestUnitTest : public UnitTest {
 public:
     explicit TestUnitTest() : UnitTest("TestUnitTest") {}
     void run() {
+        setAbortOnFailure(false);
         DTITLE("------------ This is a Title --------------"); 
         ENSURE(std::string(getMyName())=="TestUnitTest");
         ENSURE(getPassedCount() == 1);
@@ -76,7 +77,7 @@ public:
 
 int main(int argc, char *argv[]) {
 
-    UnitTestSuite mySuite(argv[0]);
+    UnitTestSuite mySuite(argv[0], argc, argv);
 
     try {
         mySuite.addTest(new TestUnitTest);
@@ -90,7 +91,7 @@ int main(int argc, char *argv[]) {
         mySuite.incrementFailedCount();
     }
 
-    int returnStatus = -1;
+    int returnStatus = 1;
     if (mySuite.getPassedCount() != 0 && mySuite.getFailedCount() == 3) {
         returnStatus = 0;
     } else {

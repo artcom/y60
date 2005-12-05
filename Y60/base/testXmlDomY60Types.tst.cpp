@@ -164,7 +164,7 @@ private:
 
 class MyTestSuite : public UnitTestSuite {
 public:
-    MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
+    MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new XmlValueUnitTest<asl::Vector3d>("Vector3d",asl::Vector3d(1,2,3)));
@@ -184,7 +184,7 @@ public:
 
 int main(int argc, char *argv[]) {
 
-    MyTestSuite mySuite(argv[0]);
+    MyTestSuite mySuite(argv[0], argc, argv);
 
     if (argc == 2 && string("dumpschema") == argv[1]) {
         cerr << "dumping y60 schema to file 'y60.xsd'"<<endl;

@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -99,18 +99,18 @@ public:
 
 class MyTestSuite : public UnitTestSuite {
 public:
-    MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
+    MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        addTest(new TimeUnitTest);
-        addTest(new NanoTimeUnitTest);
+        addTest(new TimeUnitTest,100);
+        addTest(new NanoTimeUnitTest,100);
     }
 };
 
 
 int main(int argc, char *argv[]) {
 
-    MyTestSuite mySuite(argv[0]);
+    MyTestSuite mySuite(argv[0], argc, argv);
 
     mySuite.run();
 

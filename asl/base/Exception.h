@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,13 +9,32 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: Exception.h,v $
 //
-//   $Revision: 1.5 $
+// Description:  Exception Base Class & Macros
 //
-// Description: ExceptionBase class hierarchy
+// Last Review: pavel 30.11.2005 
 //
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : perfect
+//    formatting             : ok
+//    documentation          : poor
+//    test coverage          : ok
+//    names                  : ok
+//    style guide conformance: ok
+//    technical soundness    : ok
+//    dead code              : ok
+//    readability            : ok
+//    understandabilty       : ok
+//    interfaces             : ok
+//    confidence             : ok
+//    integration            : ok
+//    dependencies           : ok
+//    cheesyness             : ok
 //
+//    overall review status  : fair
+//
+//    recommendations:
+//       - make a documentation
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
@@ -27,10 +46,9 @@
 
 namespace asl {
 
-
     /*! \addtogroup aslbase */
     /* @{ */
-    
+
     class Exception {
     public:
 
@@ -106,7 +124,6 @@ namespace asl {
     DEFINE_EXCEPTION(ParseException, Exception);
     DEFINE_EXCEPTION(NotYetImplemented, Exception)
     DEFINE_EXCEPTION(InputOutputFailure, Exception)
-
 
     /* @} */
 

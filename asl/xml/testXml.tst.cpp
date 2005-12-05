@@ -253,7 +253,7 @@ int main(int argc, char* argv[])
     dom_test2();
 #endif
     //const char* file_name = argv[1]l;
-    if (argc > 1) {
+    if (argc > 1 && std::string("profile") != argv[1]) {
         const char* file_name;
         file_name = argv[1];
         std::cout << asl::readWholeFile(file_name) << std::endl;
@@ -270,8 +270,8 @@ int main(int argc, char* argv[])
         
         std::cout << dom;
         
-        std::cout << "press key & enter to continue" << std::endl;
-        char c; std::cin >> c;
+        //std::cout << "press key & enter to continue" << std::endl;
+        //char c; std::cin >> c;
     }
     else {
         asl::Time total_time = 0;

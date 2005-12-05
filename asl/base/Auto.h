@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,20 +9,38 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: Auto.h,v $
-//
-//   $Revision: 1.3 $
 //
 // Description:  Automatic Resource Management Functions 
 //
+// Last Review: pavel 30.11.2005 
 //
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : ok
+//    formatting             : ok
+//    documentation          : poor
+//    test coverage          : poor
+//    names                  : fair
+//    style guide conformance: ok
+//    technical soundness    : ok
+//    dead code              : ok
+//    readability            : ok
+//    understandabilty       : fair
+//    interfaces             : ok
+//    confidence             : ok
+//    integration            : ok
+//    dependencies           : ok
+//    cheesyness             : ok
+//
+//    overall review status  : fair
+//
+//    recommendation: 
+//       - improve documentation
+//       - improve test coverage
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef _included_asl_Auto_
 #define _included_asl_Auto_
-
-
 
 namespace asl {
 /*! \addtogroup aslbase */

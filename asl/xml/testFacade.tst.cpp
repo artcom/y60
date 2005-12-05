@@ -665,7 +665,7 @@ class FacadeUnitTest : public UnitTest {
 
 class MyTestSuite : public UnitTestSuite {
     public:
-        MyTestSuite(const char * myName) : UnitTestSuite(myName) {}
+        MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
         void setup() {
             UnitTestSuite::setup();
             addTest(new FacadeUnitTest);
@@ -689,7 +689,7 @@ int main(int argc, char *argv[]) {
     _CrtSetDbgFlag(tmpDbgFlag);
 #endif
 
-    MyTestSuite mySuite(argv[0]);
+    MyTestSuite mySuite(argv[0], argc, argv);
     mySuite.run();
 
     std::cerr << ">> Finished test suite '" << argv[0] << "'"

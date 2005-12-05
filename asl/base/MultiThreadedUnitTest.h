@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,13 +9,32 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: MultiThreadedUnitTest.h,v $
 //
-//   $Revision: 1.4 $
+// Description:  Wrapper to automatically run tests in parallel as thread
 //
-// Description: unit test for Ptr class
+// Last Review: pavel 30.11.2005 
 //
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : ok
+//    formatting             : ok
+//    documentation          : poor
+//    test coverage          : ok
+//    names                  : ok
+//    style guide conformance: ok
+//    technical soundness    : ok
+//    dead code              : ok
+//    readability            : ok
+//    understandabilty       : ok
+//    interfaces             : ok
+//    confidence             : ok
+//    integration            : ok
+//    dependencies           : ok
+//    cheesyness             : ok
 //
+//    overall review status  : fair
+//
+//    recommendations:
+//       - write some documentation
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
@@ -31,9 +50,7 @@
 #include <iostream>
 #include <vector>
 
-
 namespace asl {
-
 
     /*! \addtogroup aslbase */
     /* @{ */
@@ -43,14 +60,16 @@ namespace asl {
         virtual void join() = 0;
     };
 
-
     template <class TEST>
         class ThreadedTemplateUnitTest : public TEST, public ThreadInterface {
             public:
 #ifdef WIN32
 #pragma warning(push)
-// TODO: This is not a fix.
-#pragma warning(disable:4355)     // This used in base member initializer list is unsafe.
+#pragma warning(disable:4355)     // "this" used in base member initializer list is unsafe.
+                // use of this here is safe because we just store it on construction time
+                // and use it later; derived "this" *must* not be used in the base class
+                // to access the derived class during construction time because the derived
+                // class might not be fully contructed at this point
 #endif
                 ThreadedTemplateUnitTest() : TEST(), _myThread(this) {
                     std::cerr << "Created ThreadedTemplateUnitTest this = " << this << ", _myThread = " << &_myThread << std::endl;
@@ -58,7 +77,6 @@ namespace asl {
 #ifdef WIN32
 #pragma warning(pop)
 #endif
-
                 PosixThread & getThread() {
                     return _myThread;
                 }
@@ -108,21 +126,16 @@ namespace asl {
 
     class MultiThreadedTestSuite : public UnitTestSuite {
         public:
-            MultiThreadedTestSuite(const char * theName) : UnitTestSuite(theName) {  }
-
+            MultiThreadedTestSuite(const char * theName, int argc, char *argv[]) : UnitTestSuite(theName, argc, argv) {  }
             virtual void run();
     };
 
     class CatchingUnitTestSuite : public UnitTestSuite {
         public:
-            CatchingUnitTestSuite(const char * theName) : UnitTestSuite(theName) {  }
-
+            CatchingUnitTestSuite(const char * theName, int argc, char *argv[]) : UnitTestSuite(theName, argc, argv) {  }
             virtual void run();
     };
 
-
     /* @} */
-
-
 }
 #endif

@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -140,7 +140,7 @@ UnitTest::returnStatus() const {
     if (getPassedCount() != 0 && getFailedCount() == 0) {
         return 0;
     } else {
-        return -1;
+        return 1;
     }
 }
 
@@ -178,7 +178,7 @@ UnitTest::teardown() {
 
 UnitTest::UnitTest(const char * myName)
     : _myName(myName), _passedCount(0),
-    _failedCount(0), _silentSuccess(false), _abortOnFailure(false) { }
+    _failedCount(0), _silentSuccess(false), _abortOnFailure(false), _profilingRepeatCount(0) { }
 
 void
 UnitTest::ensure(bool myExpressionResult,
@@ -211,10 +211,22 @@ void
 UnitTest::setPassedCount(unsigned int passedTests) {
     _passedCount = passedTests;
 }
+
+void
+UnitTest::setProfileRepeatCount(unsigned int theCount) {
+    _profilingRepeatCount = theCount;
+}
+
+unsigned int
+UnitTest::getProfileRepeatCount() const {
+    return _profilingRepeatCount;
+}
+
 void
 UnitTest::setMyName(const char * theName) {
     _myName = theName;
 }
+
 
 void
 UnitTestSuite::run() {
@@ -238,12 +250,30 @@ UnitTestSuite::run() {
             throw;
         }
         try {
-            for (unsigned i = 0; i < _myTests.size(); ++i) {
-                _myTests[i]->setup();
-                _myTests[i]->run();
-                setFailedCount(getFailedCount() + _myTests[i]->getFailedCount());
-                setPassedCount(getPassedCount() + _myTests[i]->getPassedCount());
-                _myTests[i]->teardown();
+            if (_argc == 1) {
+                for (unsigned i = 0; i < _myTests.size(); ++i) {
+                    _myTests[i]->setup();
+                    _myTests[i]->run();
+                    setFailedCount(getFailedCount() + _myTests[i]->getFailedCount());
+                    setPassedCount(getPassedCount() + _myTests[i]->getPassedCount());
+                    _myTests[i]->teardown();
+                }
+            } else {
+                if ((_argc > 1) && string("profile") == _argv[1]) {
+                    std::cerr << "Running in profile mode" << std::endl;
+                    for (unsigned i = 0; i < _myTests.size(); ++i) {
+                        _myTests[i]->setup();
+                        _myTests[i]->setSilentSuccess();
+                        _myTests[i]->setAbortOnFailure();
+                        std::cerr << "Repeating Test " << _myTests[i]->getMyName() << " in profile mode "<< _myTests[i]->getProfileRepeatCount()<<" times."<< endl;
+                        for (unsigned r = 0; r < _myTests[i]->getProfileRepeatCount(); ++r) {
+                            _myTests[i]->run();
+                        }
+                        setFailedCount(getFailedCount() + _myTests[i]->getFailedCount());
+                        setPassedCount(getPassedCount() + _myTests[i]->getPassedCount());
+                        _myTests[i]->teardown();
+                    }
+                }
             }
         } catch (std::exception & e) {
             std::cerr << TTYRED << "## A std::exception occured during execution of test suite '"

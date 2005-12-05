@@ -1,3 +1,48 @@
+/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//
+//
+// Description:  Collect and Display Profiling Information
+//
+// Last Review: pavel 30.11.2005 
+//
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : ok
+//    formatting             : ok
+//    documentation          : perfect
+//    test coverage          : ok
+//    names                  : ok
+//    style guide conformance: ok
+//    technical soundness    : fair
+//    dead code              : ok
+//    readability            : ok
+//    understandabilty       : ok
+//    interfaces             : ok
+//    confidence             : ok
+//    integration            : poor
+//    dependencies           : ok
+//    cheesyness             : fair
+//
+//    overall review status  : ok
+//
+//    recommendations:
+//       - make a documentation
+//       - replace existing enums in Y60 with this thing
+//       - try to find a compile-time check instead of run-time verify()
+// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+*/
+
+#ifndef _asl_base_Enum_h_included_
+#define _asl_base_Enum_h_included_
+
 #include "Exception.h"
 
 #include <vector>
@@ -237,3 +282,4 @@ operator>>(std::istream & is, asl::Enum<ENUM, THE_MAX> & theEnum) {
     template <> const char * THE_NAME ::_ourName = #THE_NAME; \
     template <> bool THE_NAME ::_ourVerifiedFlag( THE_NAME ::verify(__FILE__, __LINE__));
 
+#endif

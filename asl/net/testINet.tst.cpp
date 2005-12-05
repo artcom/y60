@@ -37,7 +37,7 @@ using namespace inet;
 int main( int argc, char *argv[] ) {
     initSockets();
     
-    UnitTestSuite mySuite ("INet tests");
+    UnitTestSuite mySuite ("INet tests", argc, argv);
 
 #ifndef WIN32
     mySuite.addTest (new TestINetMonitor);

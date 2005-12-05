@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -162,7 +162,7 @@ public:
 
 class MyDummyMultiThreadTest : public MultiThreadedTestSuite  {
 public:
-    MyDummyMultiThreadTest() : MultiThreadedTestSuite("PtrMultiThreadTest") { 
+    MyDummyMultiThreadTest(int argc, char *argv[]) : MultiThreadedTestSuite("PtrMultiThreadTest", argc, argv) { 
         cerr << "Created PtrMultiThreadTest()" << endl;
     }
 
@@ -178,19 +178,19 @@ public:
 
 class MyTestSuite : public CatchingUnitTestSuite {
 public:
-    MyTestSuite(const char * myName) : CatchingUnitTestSuite(myName) {}
+    MyTestSuite(const char * myName, int argc, char *argv[]) : CatchingUnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        addTest(new DummyUnitTest<0>);  // make sure it works single threaded
-        addTest(new DummyUnitTest2<0>); // make sure it works single threaded
-        addTest(new MyDummyMultiThreadTest); // now run as five threads
+        addTest(new DummyUnitTest<0>,100);  // make sure it works single threaded
+        addTest(new DummyUnitTest2<0>,100); // make sure it works single threaded
+        addTest(new MyDummyMultiThreadTest(get_argc(), get_argv()),3); // now run as five threads
     }
 };
 
 
 int main(int argc, char *argv[]) {
 
-    MyTestSuite mySuite(argv[0]);
+    MyTestSuite mySuite(argv[0], argc, argv);
 
     mySuite.run();
 

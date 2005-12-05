@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2005, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,13 +9,33 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: AtomicCount.h,v $
-//
-//   $Revision: 1.6 $
 //
 // Description: atomic counter for different processing models
 //
+// Last Review: pavel 30.11.2005 
 //
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : perfect
+//    formatting             : ok
+//    documentation          : poor
+//    test coverage          : good
+//    names                  : fair
+//    style guide conformance: poor
+//    technical soundness    : ok
+//    dead code              : ok
+//    readability            : fair
+//    understandabilty       : fair
+//    interfaces             : ok
+//    confidence             : ok
+//    integration            : ok
+//    dependencies           : ok
+//    cheesyness             : ok
+//
+//    overall review status  : fair
+//
+//    recommendation: 
+//       - improve documentation
+//       - reduce number of #ifdefs
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 #ifndef _included_asl_AtomicCount_

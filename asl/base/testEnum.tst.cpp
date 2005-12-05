@@ -116,10 +116,10 @@ public:
 
 int main(int argc, char *argv[]) {
 
-    UnitTestSuite mySuite(argv[0]);
+    UnitTestSuite mySuite(argv[0], argc, argv);
 
     try {
-        mySuite.addTest(new EnumUnitTest);
+        mySuite.addTest(new EnumUnitTest, 10000);
         mySuite.run();
     }
     catch (...) {

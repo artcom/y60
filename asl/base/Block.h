@@ -1,6 +1,6 @@
 /* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-// Copyright (C) 1993-2003, ART+COM Berlin GmbH
+// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -9,16 +9,39 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: Block.h,v $
 //
-//   $Revision: 1.26 $
+// Description:  Memory Block handling functions; should be used whenever
+//               using memcpy is considered; features
+//               - typesafe conversion,
+//		         - compile-time memory read-write control, 
+//               - convenient windows api interfaces and
+//               - also a copy-on-write (COW) implementation
 //
-// Description:  Memory Block handling functions; consider to use them whenever
-//               you think about using memcpy; here you get typesafe conversion
-//		 read-write control, convenient windows api interfaces and
-//               also a copy-on-write (COW) implementation if you want.
+// Last Review: pavel 30.11.2005 
 //
+//  review status report: (perfect, ok, fair, poor, disaster)
+//    usefullness            : perfect
+//    formatting             : ok
+//    documentation          : fair
+//    test coverage          : ok
+//    names                  : ok
+//    style guide conformance: ok
+//    technical soundness    : ok
+//    dead code              : fair
+//    readability            : ok
+//    understandabilty       : fair
+//    interfaces             : ok
+//    confidence             : ok
+//    integration            : ok
+//    dependencies           : ok
+//    cheesyness             : fair
 //
+//    overall review status  : fair
+//
+//    recommendation:
+//       - review & complete &documentation
+//       - remove dead code
+//       - explain usage
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
