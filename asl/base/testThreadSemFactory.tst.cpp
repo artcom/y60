@@ -8,18 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//    $RCSfile: testThreadSemFactory.tst.cpp,v $
-//
-//     $Author: uzadow $
-//
-//   $Revision: 1.1.1.1 $//
-// Description: 
-//
-// (CVS log at the bottom of this file)
-//
-//
-//=============================================================================
 
 #include "UnitTest.h"
 
@@ -155,7 +143,7 @@ class LockFactoryTest : public UnitTest {
 
 class MyTestSuite : public UnitTestSuite {
     public:
-        MyTestSuite( const char * myName ) : UnitTestSuite( myName ) {}
+        MyTestSuite( const char * myName, int argc, char * argv[] ) : UnitTestSuite( myName, argc, argv ) {}
         void setup() {
             UnitTestSuite::setup(); // print the launch Message
             addTest( new LockFactoryTest );
@@ -165,7 +153,7 @@ class MyTestSuite : public UnitTestSuite {
 int
 main( int argc, char * argv[] ) {
 
-    MyTestSuite mySuite( argv[0] );
+    MyTestSuite mySuite( argv[0], argc, argv );
 
     mySuite.run();
 
