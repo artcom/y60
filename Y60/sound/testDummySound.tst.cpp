@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 #ifdef USE_DASHBOARD
     Dashboard::get();  // Make sure the dashboard gets deleted after the pumps.
 #endif
-    SoundTestSuite mySuite(argv[0], true);
+    SoundTestSuite mySuite(argv[0], true, argc, argv);
 
     try {
         mySuite.run();

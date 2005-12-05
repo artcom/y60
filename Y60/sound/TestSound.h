@@ -596,8 +596,8 @@ class MemLeakStressTest: public StressTest {
 
 class SoundTestSuite : public UnitTestSuite {
     public:
-        SoundTestSuite(const char * myName, bool myUseDummyPump) 
-            : UnitTestSuite(myName),
+        SoundTestSuite(const char * myName, bool myUseDummyPump, int argc, char * argv[]) 
+            : UnitTestSuite(myName, argc, argv),
               _myUseDummyPump (myUseDummyPump)
         {}
 
