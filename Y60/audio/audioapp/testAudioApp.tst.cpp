@@ -144,7 +144,7 @@ private:
 
 int main( int argc, char *argv[] ) {
     try  {
-        UnitTestSuite mySuite ("Sound tests");
+        UnitTestSuite mySuite ("Sound tests", argc, argv);
 
         mySuite.addTest (new TestWAVLeak("../../../audiobase/testfiles/"));
         mySuite.addTest (new TestFFMpegAudioReader("../../../audiobase/testfiles/"));
