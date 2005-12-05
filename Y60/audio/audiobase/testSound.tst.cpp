@@ -169,7 +169,7 @@ private:
 };
 
 int main( int argc, char *argv[] ) {
-    UnitTestSuite mySuite ("Sound tests");
+    UnitTestSuite mySuite ("Sound tests", argc, argv);
     AudioBuffer::setSize(3*1536);
     mySuite.addTest(new TestSoundOut);
     mySuite.addTest(new TestWAVReader);
