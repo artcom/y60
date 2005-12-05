@@ -115,6 +115,17 @@ namespace asl {
             return theStream;
     }
 
-
+    std::ostream &
+    operator << (std::ostream & theStream, const dom::ResizeableVector & theVector) {
+        theStream << "[";
+        for (unsigned i = 0; i < theVector.length(); ++i) {
+            if (i) {
+                theStream << ",";
+            }
+            theStream << theVector.getElement(i)->getString();
+        }
+        theStream << "]";
+        return theStream;
+    }
 }
 

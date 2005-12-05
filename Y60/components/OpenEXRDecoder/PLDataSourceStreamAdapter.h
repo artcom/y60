@@ -12,7 +12,7 @@
 #ifndef _ac_y60_PLDataSourceStreamAdapter_h_
 #define _ac_y60_PLDataSourceStreamAdapter_h_
 
-#include <OpenEXR/IlmImf/ImfIO.h>
+#include <OpenEXR/ImfIO.h>
 
 class PLDataSourceStreamAdapter : public Imf::IStream {
     public:

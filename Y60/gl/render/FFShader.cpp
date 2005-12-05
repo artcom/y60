@@ -138,11 +138,6 @@ namespace y60 {
                         throw ShaderException(std::string("Unknown texture type '")+
                                 myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
                 }
-                asl::Matrix4f myMatrix = myTexture.getImage()->get<ImageMatrixTag>();
-                myMatrix.postMultiply(myTexture.get<TextureMatrixTag>());
-				AC_TRACE << "TM " << myTexture.get<TextureMatrixTag>();
-				AC_TRACE << "MM " << myMatrix;
-                glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
 
                 if (myTexture.get<TextureSpriteTag>()) {
                     if (!alreadyHasSpriteTexture) {

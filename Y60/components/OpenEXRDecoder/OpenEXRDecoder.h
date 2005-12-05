@@ -13,13 +13,21 @@
 #define _ac_y60_OpenEXRDecoder_h_
 
 #include <asl/Exception.h>
+#include <asl/pixels.h>
+#include <asl/raster.h>
+#include <dom/Value.h>
+
 #include <paintlib/plpicdec.h>
-#include <OpenEXR/IlmImf/ImfRgbaFile.h>
+#include <OpenEXR/half.h>
+#include <OpenEXR/ImfRgbaFile.h>
+
+class PLDataSourceStreamAdapter;
 
 DEFINE_EXCEPTION(OpenEXRException, asl::Exception);
 
 class OpenEXRDecoder : public PLPicDecoder {
     public:
+
         //! Creates a pDecoder
         OpenEXRDecoder();
 
@@ -33,6 +41,7 @@ class OpenEXRDecoder : public PLPicDecoder {
         //! Fills the bitmap with the image.
         virtual void GetImage (PLBmpBase & Bmp);
     private:
+        PLDataSourceStreamAdapter * _myDataStream;
         Imf::RgbaInputFile * _myOpenEXRFile;
 };
 

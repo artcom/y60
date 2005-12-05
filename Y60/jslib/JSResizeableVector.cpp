@@ -31,6 +31,16 @@ typedef dom::ResizeableVector NATIVE_VECTOR;
 //typedef JSWrapper<NATIVE_VECTOR,dom::ValuePtr> Base;
 
 static JSBool
+toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns a string representation of the vector.");
+    DOC_END;
+    std::string myStringRep = asl::as_string(JSResizeableVector::getJSWrapper(cx,obj).getNative());
+    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
+    *rval = STRING_TO_JSVAL(myString);
+    return JS_TRUE;
+}
+
+static JSBool
 item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -77,6 +87,7 @@ JSResizeableVector::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         /* name         native          nargs    */
+        {"toString",         toString,        0},
         {"item",             item,            1},
         {"resize",           resize,          1},
 // TODO   {"append",           append,          1},
@@ -119,12 +130,12 @@ JSResizeableVector::StaticFunctions() {
 JSBool
 JSResizeableVector::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
-            case PROP_length:
-                *vp = as_jsval(cx, getNative().length());
-                return JS_TRUE;
-            default:
-                JS_ReportError(cx,"JSResizeableVector::getProperty: index %d out of range", theID);
-                return JS_FALSE;
+        case PROP_length:
+            *vp = as_jsval(cx, getNative().length());
+            return JS_TRUE;
+        default:
+            JS_ReportError(cx,"JSResizeableVector::getProperty: index %d out of range", theID);
+            return JS_FALSE;
     }
 }
 
@@ -187,5 +198,4 @@ jsval as_jsval(JSContext *cx, dom::ValuePtr theValuePtr, dom::ResizeableVector *
     JSObject * myObject = JSResizeableVector::Construct(cx, theValuePtr);
     return OBJECT_TO_JSVAL(myObject);
 }
-
 }

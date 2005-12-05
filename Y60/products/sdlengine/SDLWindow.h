@@ -128,8 +128,7 @@ namespace y60 {
             /// Save recorded events to file.
             void saveEvents(const std::string & theFilename);
 
-
-			~SDLWindow();
+            virtual ~SDLWindow();
 
         private:
             SDLWindow();
@@ -161,6 +160,7 @@ namespace y60 {
             bool        _myAutoPauseFlag;
 
             SDL_Surface * _myScreen;
+            unsigned    _mySwapInterval;
     };
 
 }

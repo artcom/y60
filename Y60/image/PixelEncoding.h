@@ -25,6 +25,7 @@
 #ifndef _ac_y60_PixelEncoding_h_
 #define _ac_y60_PixelEncoding_h_
 
+#include <asl/Logger.h>
 #include <y60/DataTypes.h>
 #include <asl/string_functions.h>
 #include <math.h>
@@ -57,8 +58,10 @@ namespace y60 {
         ALPHA,
         DEPTH,
         GRAY32,
+        RGBA_HALF,
         RGB_HALF,
-        RGBA_HALF
+        RGBA_FLOAT,
+        RGB_FLOAT
     };
 
     static const char * PixelEncodingString[] = {
@@ -82,8 +85,10 @@ namespace y60 {
         "ALPHA",
         "DEPTH",
         "GRAY32",
-        "RGB_HALF",
         "RGBA_HALF",
+        "RGB_HALF",
+        "RGBA_FLOAT",
+        "RGB_FLOAT",
         0
     };
     static const char * RasterEncodingString[] = {
@@ -107,8 +112,10 @@ namespace y60 {
         "RasterOfGRAY",
         "RasterOfGRAY32",
         "RasterOfGRAY32",
-        "RasterOfRGB_HALF",
         "RasterOfRGBA_HALF",
+        "RasterOfRGB_HALF",
+        "RasterOfRGBA_FLOAT",
+        "RasterOfRGB_FLOAT",
         0
     };
    static const char * RasterElementNames[] = {
@@ -132,8 +139,10 @@ namespace y60 {
         "rasterofgray",
         "rasterofgray32",
         "rasterofgray32",
-        "rasterofrgb_half",
         "rasterofrgba_half",
+        "rasterofrgb_half",
+        "rasterofrgba_float",
+        "rasterofrgb_float",
         0
     };
 
@@ -156,7 +165,7 @@ namespace y60 {
                 myRaster->resize(theWidth, theHeight);
             }
         } else {
-            std::cerr << "# WARNING: no raster found in factory for type "<<RasterEncodingString[theEncoding]<<std::endl;
+            AC_WARNING << "No raster found in factory for type "<<RasterEncodingString[theEncoding];
             return dom::ValuePtr(0);
         }
         return myReturnValue;
@@ -210,11 +219,17 @@ namespace y60 {
             case S3TC_DXT5:
                 myBytesPerPixel = 1;
                 break;
+            case RGBA_HALF:
+                myBytesPerPixel = 8;
+                break;
             case RGB_HALF:
                 myBytesPerPixel = 6;
                 break;
-            case RGBA_HALF:
-                myBytesPerPixel = 8;
+            case RGBA_FLOAT:
+                myBytesPerPixel = 16;
+                break;
+            case RGB_FLOAT:
+                myBytesPerPixel = 12;
                 break;
             default:
                 throw asl::Exception(std::string("getBytesRequired(): Unsupported Encoding: ") +

@@ -232,7 +232,39 @@ Example:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
-    <xs:simpleType name="RasterOfGRAY">
+    <xs:simpleType name="RasterOfRGBA_HALF">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding red/green/blue/alpha with 16 bit float accuracy.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded. </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfRGB_HALF">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding red/green/blue, with 16 bit float accuracy.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded. </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfRGBA_FLOAT">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding red/green/blue/alpha with 32 bit float accuracy.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded. </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="RasterOfRGB_FLOAT">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding red/green/blue, with 32 bit float accuracy.
+The first two numbers in brackets represent the width and height of the raster.
+The pixel values are run-lenght encoded. </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+     <xs:simpleType name="RasterOfGRAY">
         <xs:annotation>
             <xs:documentation>Type for a 2-dimensional array of pixels with 8 bit greylevel pixel encoding.
 The first two numbers in brackets represent the width and height of the raster.
@@ -376,6 +408,28 @@ Example:
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="RasterOfBGRA"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+     <xs:element name="rasterofrgb_half">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has the pixel type red/green/blue, with 16bit float accuracy.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfRGB_HALF"/>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rasterofrgba_half">
+        <xs:annotation>
+            <xs:documentation>This element contains a image data as text child.
+The data has the pixel type red/green/blue/alpha, with 16 bit float accuracy</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="RasterOfRGBA_HALF"/>
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
@@ -2153,6 +2207,16 @@ Usefull to animate texture coordinates, or to tweak texture repeat and position.
             <xs:element ref="rasterofabgr">
                 <xs:annotation>
                     <xs:documentation>Contains runlength encoded pixel data of type abgr</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+             <xs:element ref="rasterofrgb_half">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type rgb with 16 bit float pixel values</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="rasterofrgba_half">
+                <xs:annotation>
+                    <xs:documentation>Contains runlength encoded pixel data of type rgba with 16 bit float pixel values</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element ref="rasterofgray">

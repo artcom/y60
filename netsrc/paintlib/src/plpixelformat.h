@@ -43,8 +43,11 @@ public:
 	static const PLPixelFormat B8G8R8X8;
 	static const PLPixelFormat A8B8G8R8;
 	static const PLPixelFormat X8B8G8R8;
-	static const PLPixelFormat B16G16R16;
-	static const PLPixelFormat A16B16G16R16;
+
+	static const PLPixelFormat A16B16G16R16; // RGBA half
+	static const PLPixelFormat B16G16R16; // RGB half
+	static const PLPixelFormat A32B32G32R32; // RGBA float
+	static const PLPixelFormat B32G32R32; // RGB float
 
 	static const PLPixelFormat L8Cbr8;	// aka YUV 4:2:2
 	static const PLPixelFormat L8Cb8Cr8;	// aka YUV 4:4:4

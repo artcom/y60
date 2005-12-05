@@ -20,6 +20,8 @@
 */
 
 use("UnitTest.js");
+use("Overlay.js");
+use("Y60JSSL.js");
 
 function OpenEXRUnitTest() {
     this.Constructor(this, "OpenEXRUnitTest");
@@ -29,20 +31,61 @@ function OpenEXRUnitTest() {
 OpenEXRUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
+    var _myMaterial = null;
+    var _myHDRWindow = null;
+
+    obj.setWindow = function(theMin, theMax) {
+        theMax = 1.0;
+        if (theMin > theMax) {
+            var t = theMin;
+            theMin = theMax;
+            theMax = t;
+        }
+        _myHDRWindow.x = 1.0 / (theMax - theMin);
+        _myHDRWindow.y = -_myHDRWindow.x * theMin;
+        //print("min=" + theMin, "max=" + theMax, "window=" + _myHDRWindow);
+    }
+
     obj.run = function() {
         plug("y60OpenEXR");
 
         var window = new RenderWindow();
 
-        var myImage = window.scene.images.appendChild(new Node("<image/>").firstChild);
-        //myImage.src = expandEnvironment("${PRO}/testmodels/tex/testbild01.rgb");
-        myImage.src = "../../testimages/Desk.exr";
-        print(myImage);
-        window.scene.update(Scene.IMAGES);
+        _myMaterial = window.scene.createTexturedMaterial("../../testimages/Desk.exr");
+        var myShape    = window.scene.createQuadShape(_myMaterial, [-0.4,-0.4,0], [0.4,0.4,0]);
+        var myBody     = window.scene.createBody(myShape);
+
+        var myImage = window.scene.images.firstChild;
+        myImage.resize = "pad";
+        _myMaterial.requires.lighting = "[120[hdr]]";
+        window.scene.update(Scene.ALL);
+
+        window.camera.position = [0,0,2];
+
+        window.onStartMainLoop = function() {
+            //print("onStartMainLoop");
+            //print(_myMaterial.properties.hdr);
+        }
+
+        window.onFrame = function(theTime) {
+            if (_myHDRWindow == null) {
+                _myHDRWindow = _myMaterial.properties.hdr;
+                obj.setWindow(0,1);
+            }
+            if (theTime > 5.0) {
+                exit(0);
+            }
+        }
+        
+        window.onMouseMotion = function(theX, theY) {
+            var min = theX / window.width;
+            var max = (window.height - theY) / window.height;
+            obj.setWindow(min, max);
+        }
+        window.go();
 
         obj.myVar = 1;
         ENSURE('obj.myVar == 1');
-        ENSURE('1 + 1 == 2');
     }
 };
 

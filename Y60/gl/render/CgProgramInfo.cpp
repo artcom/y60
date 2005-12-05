@@ -162,9 +162,7 @@ namespace y60 {
     void
     CgProgramInfo::processParameters() {
         AC_DEBUG << "processParameters";
-        // CGparameter myParam = cgGetFirstParameter(_myCgProgramID, CG_PROGRAM);
-        // while (myParam != 0) {
-        //
+
         _myGlParams.clear();
         _myAutoParams.clear();
         _myTextureParams.clear();
@@ -288,25 +286,26 @@ namespace y60 {
 
     void
     CgProgramInfo::enableProfile() {
+        //AC_TRACE << "enabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
         cgGLEnableProfile(asCgProfile(_myShader));
         assertCg("CgProgramInfo::enableProfile()");
-        //AC_TRACE << "enabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
     }
 
     void
     CgProgramInfo::disableProfile() {
+        //AC_TRACE << "disabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
         cgGLDisableProfile(asCgProfile(_myShader));
         assertCg("CgProgramInfo::disableProfile()");
-        //AC_TRACE << "disabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
     }
 
     void CgProgramInfo::setCGGLParameters() {
         //AC_DEBUG << "CgProgramInfo::setCGGLParameters";
         for (unsigned i=0; i<_myGlParams.size(); ++i) {
-            CgProgramGlParam curParam = _myGlParams[i];
-            cgGLSetStateMatrixParameter(curParam._myParameter, curParam._myStateMatrixType,
-                    curParam._myTransform);
-            AC_TRACE << "setting CGGL parameter " << curParam._myParamName << " to " << curParam._myTransform << endl;
+            CgProgramGlParam myParam = _myGlParams[i];
+            AC_DEBUG << "setting CgGL parameter " << myParam._myParamName << " type=" << myParam._myStateMatrixType << " transform=" << myParam._myTransform;
+            cgGLSetStateMatrixParameter(myParam._myParameter,
+                                        myParam._myStateMatrixType,
+                                        myParam._myTransform);
             assertCg("CgProgramInfo::setCGGLParameters()");
         }
     }
@@ -416,7 +415,8 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        //AC_DEBUG << "CgProgramInfo::bindBodyParams";
+        AC_DEBUG << "CgProgramInfo::bindBodyParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction;
+
         DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_bindBodyParams));
         setCGGLParameters();
         setAutoParameters(theLightInstances, theViewport, theBody, theCamera);
@@ -424,8 +424,7 @@ namespace y60 {
     
     void
     CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
-        AC_DEBUG << "CgProgramInfo::bindMaterialParams this=" << hex << (void*)this << dec 
-			     << " material=" << theMaterial.get<NameTag>();
+        AC_DEBUG << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
 
 		const MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         const Facade::PropertyMap & myProperties = myPropFacade->getProperties();

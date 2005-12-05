@@ -27,6 +27,8 @@
 
 #include "pixels.h"
 
+#include <OpenEXR/half.h>
+
 namespace asl {
 
 typedef unsigned char pchar;
@@ -54,6 +56,12 @@ typedef saturation<pchar> SATURATION;
 typedef gray<pchar> VALUE;
 
 //typedef RGB_t<char> GRAYALPHA;
+
+typedef RGBA_t<half> RGBA_HALF;
+typedef RGB_t<half>  RGB_HALF;
+
+typedef RGBA_t<float> RGBA_FLOAT;
+typedef RGB_t<float>  RGB_FLOAT;
 
 
 template <class VALUE>

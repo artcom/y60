@@ -1,13 +1,13 @@
 //=============================================================================
 //
-// Copyright (C) 2000-2001, ART+COM AG Berlin
-//
+// Copyright (C) 2000-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
+//============================================================================
 
 #include "PixelEncodingInfo.h"
 
@@ -38,6 +38,8 @@ namespace y60 {
             case y60::S3TC_DXT1A:              return PixelEncodingInfo(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, 0.5, true, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT);
             case y60::S3TC_DXT3:               return PixelEncodingInfo(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 1, true, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT);
             case y60::S3TC_DXT5:               return PixelEncodingInfo(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 1, true, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT);
+            case y60::RGBA_HALF:               return PixelEncodingInfo(GL_RGBA16F_ARB, 8, false, GL_RGBA, GL_HALF_FLOAT_ARB);
+            case y60::RGB_HALF:                return PixelEncodingInfo(GL_RGB16F_ARB, 8, false, GL_RGB, GL_HALF_FLOAT_ARB);
             default:
                 throw GLUtilException(string("Unsupported texture pixelformat ") +
                         asl::getStringFromEnum(theEncoding, y60::PixelEncodingString), PLUS_FILE_LINE);
@@ -45,4 +47,3 @@ namespace y60 {
     }
 
 }
-

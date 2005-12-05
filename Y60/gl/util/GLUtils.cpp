@@ -75,10 +75,39 @@ namespace y60 {
         }
     }
 
+    static bool queryStringForExtension(const char * supported,
+                                        const char * extName) {
+
+        if (supported == NULL) {
+            return false;
+        }
+
+        /*
+        ** Search for extName in the extensions string. Use of strstr()
+        ** is not sufficient because extension names can be prefixes of
+        ** other extension names. Could use strtok() but the constant
+        ** string returned by glGetString might be in read-only memory.
+        */
+        const char * p = supported;
+        int extNameLen = strlen(extName);
+        const char * end = p + strlen(p);
+
+        while (p < end) {
+            int n = strcspn(p, " ");
+            if ((extNameLen == n) && (strncmp(extName, p, n) == 0)) {
+                AC_DEBUG << "Extension " << extName << " is supported";
+                return true;
+            }
+            p += (n + 1);
+        }
+
+        AC_INFO << "Extension " << extName << " is not supported";
+        return false;
+    }
+
 #ifdef WIN32
     bool queryWGLExtension(const char *extension)
     {
-    	const size_t extlen = strlen(extension);
     	const char *supported = NULL;
 
     	// Try To Use wglGetExtensionStringARB On Current DC, If Possible
@@ -91,59 +120,29 @@ namespace y60 {
     	if (supported == NULL)
     		supported = (char*)glGetString(GL_EXTENSIONS);
 
-    	// If That Failed Too, Must Be No Extensions Supported
-    	if (supported == NULL)
-    		return false;
-
-    	// Begin Examination At Start Of String, Increment By 1 On False Match
-    	for (const char* p = supported; ; p++)
-    	{
-    		// Advance p Up To The Next Possible Match
-    		p = strstr(p, extension);
-
-    		if (p == NULL)
-    			return false; // No Match
-
-    		// Make Sure That Match Is At The Start Of The String Or That
-    		// The Previous Char Is A Space, Or Else We Could Accidentally
-    		// Match "wglFunkywglExtension" With "wglExtension"
-
-    		// Also, Make Sure That The Following Character Is Space Or NULL
-    		// Or Else "wglExtensionTwo" Might Match "wglExtension"
-    		if ((p==supported || p[-1]==' ') && (p[extlen]=='\0' || p[extlen]==' '))
-    			return true; // Match
-    	}
+        return queryStringForExtension(supported, extension);
     }
 #endif
 
-    bool queryOGLExtension(const char *extName, bool theVerboseFlag)
+#ifdef LINUX
+    bool queryGLXExtension(const char *extName)
     {
-        /*
-        ** Search for extName in the extensions string. Use of strstr()
-        ** is not sufficient because extension names can be prefixes of
-        ** other extension names. Could use strtok() but the constant
-        ** string returned by glGetString might be in read-only memory.
-        */
-
-        char * p = (char *)glGetString(GL_EXTENSIONS);
-        if (NULL == p) {
-            AC_ERROR << "GL_EXTENSIONS is NULL; is there a valid GL context?";
+        Display * dpy = glXGetCurrentDisplay();
+        if (!dpy) {
+            AC_ERROR << "Unable to contact display server for GLX extensions";
             return false;
         }
 
-        int extNameLen = strlen(extName);
-        char * end = p + strlen(p);
-        while (p < end) {
-            int n = strcspn(p, " ");
-            if ((extNameLen == n) && (strncmp(extName, p, n) == 0)) {
-                AC_DEBUG << "Extension " << extName << " is supported";
-                return true;
-            }
-            p += (n + 1);
-        }
+        const char * supports = glXQueryExtensionsString(dpy, 0);
+        bool supported = queryStringForExtension(supports, extName);
 
-        AC_INFO << "Extension " << extName << " is not supported";
-        return false;
+        return supported;
+    }
+#endif
+
+    bool queryOGLExtension(const char *extName, bool)
+    {
+        return queryStringForExtension((char*) glGetString(GL_EXTENSIONS), extName);
     }
 
     DEFINE_EXCEPTION(GlTextureFunctionException, asl::Exception);
@@ -245,6 +244,10 @@ namespace y60 {
             case TEXTURE_IFMT_RGB10_A2: return GL_RGB10_A2;
             case TEXTURE_IFMT_RGBA12: return GL_RGBA12;
             case TEXTURE_IFMT_RGBA16: return GL_RGBA16;
+            case TEXTURE_IFMT_RGBA_HALF: return GL_RGBA16F_ARB;
+            case TEXTURE_IFMT_RGB_HALF: return GL_RGB16F_ARB;
+            case TEXTURE_IFMT_RGBA_FLOAT: return GL_RGBA32F_ARB;
+            case TEXTURE_IFMT_RGB_FLOAT: return GL_RGB32F_ARB;
             default:
                throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
         }
@@ -292,6 +295,10 @@ namespace y60 {
             case GL_RGB10_A2: return TEXTURE_IFMT_RGB10_A2;
             case GL_RGBA12: return TEXTURE_IFMT_RGBA12;
             case GL_RGBA16: return TEXTURE_IFMT_RGBA16;
+            case GL_RGBA16F_ARB: return TEXTURE_IFMT_RGBA_HALF;
+            case GL_RGB16F_ARB: return TEXTURE_IFMT_RGB_HALF;
+            case GL_RGBA32F_ARB: return TEXTURE_IFMT_RGBA_FLOAT;
+            case GL_RGB32F_ARB: return TEXTURE_IFMT_RGB_FLOAT;
             default:
                throw GLTextureUnknownInternalFormat("Unknown internal texture format.", PLUS_FILE_LINE);
         }
@@ -653,7 +660,13 @@ namespace y60 {
             SET_PROC_ADDRESS( PFNWGLSWAPINTERVALEXTPROC, wglSwapIntervalEXT );
             SET_PROC_ADDRESS( PFNWGLGETSWAPINTERVALEXTPROC, wglGetSwapIntervalEXT );
         }
-#endif        
+#endif
+#ifdef LINUX
+        if (queryGLXExtension("GLX_SGI_video_sync")) {
+            SET_PROC_ADDRESS( PFNGLXGETVIDEOSYNCSGIPROC, glXGetVideoSyncSGI );
+            SET_PROC_ADDRESS( PFNGLXWAITVIDEOSYNCSGIPROC, glXWaitVideoSyncSGI );
+        }
+#endif
     }
 
     bool hasCap(const string & theCapStr) {        

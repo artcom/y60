@@ -171,15 +171,13 @@ namespace y60 {
             void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, 
                 const std::vector<asl::Vector4f> & theValue);
 
-
-
-            ShaderDescription _myShader;
-            CGprogram _myCgProgramID;
-            CGcontext _myContext;
-            std::string _myPathName;
+            ShaderDescription           _myShader;
+            CGprogram                   _myCgProgramID;
+            CGcontext                   _myContext;
+            std::string                 _myPathName;
             CgProgramGlParamVector      _myGlParams;  // GL-State to CG parameters
-            CgProgramAutoParams    _myAutoParams;// other automatic CG parameters (e.g. CameraPosition)
-            CgProgramTextureParamVector    _myTextureParams;// Texture parameters
+            CgProgramAutoParams         _myAutoParams;// other automatic CG parameters (e.g. CameraPosition)
+            CgProgramTextureParamVector _myTextureParams;// Texture parameters
 
             std::map<int,int> _myUnsizedArrayAutoParamSizes;
             
@@ -190,6 +188,5 @@ namespace y60 {
     typedef asl::Ptr<CgProgramInfo> CgProgramInfoPtr;
     typedef std::vector<CgProgramInfoPtr> CgProgramVector;
 }
-
 
 #endif

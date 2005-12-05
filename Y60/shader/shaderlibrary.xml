@@ -775,5 +775,28 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>    
+    <shader id="s31" name="hdr" cost="120">
+        <supports>
+            <feature class="textures" values="[paint]"/>
+            <feature class="lighting" values="[hdr]"/>
+            <feature class="texcoord" values="[*]"/>
+        </supports>
+        <vertexshader profile="VP30" file="hdr.cg" entryfunction="mainVertex">
+            <properties>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector2f name="hdr">[0,1]</vector2f>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="hdr.cg" entryfunction="mainFragment">
+            <properties>
+                <sampler2d name="tex">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>    
 </shaders>
 

@@ -1470,19 +1470,19 @@ namespace dom {
 
 #define DEFINE_VALUE_WRAPPER_TEMPLATE(TYPE, WRAPPER)\
     template <>\
-    struct ValueWrapper<TYPE > {\
+    struct dom::ValueWrapper<TYPE > {\
         typedef WRAPPER<TYPE > Type;\
     };
 
 #define DEFINE_VALUE_WRAPPER_TEMPLATE2(TYPE, WRAPPER, WRAPPER_ARG)\
     template <>\
-    struct ValueWrapper<TYPE > {\
+    struct dom::ValueWrapper<TYPE > {\
         typedef WRAPPER<TYPE, WRAPPER_ARG > Type;\
     };
 
 #define DEFINE_VALUE_WRAPPER_TEMPLATE3(TYPE, WRAPPER, WRAPPER_ARG, ELEMENT_WRAPPER)\
     template <>\
-    struct ValueWrapper<TYPE > {\
+    struct dom::ValueWrapper<TYPE > {\
         typedef WRAPPER<TYPE, WRAPPER_ARG,ELEMENT_WRAPPER > Type;\
     };
 

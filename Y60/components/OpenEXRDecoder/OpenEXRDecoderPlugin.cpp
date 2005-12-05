@@ -17,8 +17,8 @@
 #include <asl/PlugInBase.h>
 #include <y60/IPaintLibExtension.h>
 
-#include <OpenEXR/IlmImf/ImfVersion.h>
 #include <paintlib/pldecoderfactory.h>
+#include <OpenEXR/ImfVersion.h>
 
 using namespace std;
 using namespace asl;
@@ -30,7 +30,8 @@ namespace y60 {
         public ::PLDecoderFactory
 	{
 	public:
-		OpenEXRDecoderPlugin(asl::DLHandle theDLHandle) : PlugInBase(theDLHandle) {}
+		OpenEXRDecoderPlugin(asl::DLHandle theDLHandle) : PlugInBase(theDLHandle) {
+        }
 
         // IPaintLibExtension
 		PLDecoderFactory * getDecoderFactory() const {

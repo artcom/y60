@@ -29,7 +29,7 @@ namespace y60 {
 
     //=== Lighting Model ==========================================================
     enum LightingModel {
-        BLINN, PHONG, GOURAUD, LAMBERT, FLAT, UNLIT, MAX_LIGHTING_MODEL
+        BLINN, PHONG, GOURAUD, LAMBERT, FLAT, UNLIT, HDR, MAX_LIGHTING_MODEL
     };
     static const char * LIGHTING_MODEL_BLINN = "blinn";
     static const char * LIGHTING_MODEL_PHONG = "phong";
@@ -37,6 +37,7 @@ namespace y60 {
     static const char * LIGHTING_MODEL_LAMBERT = "lambert";
     static const char * LIGHTING_MODEL_FLAT = "flat";
     static const char * LIGHTING_MODEL_UNLIT = "unlit";
+    static const char * LIGHTING_MODEL_HDR = "hdr";
 
     static const char * LightingModelString[] = {
         LIGHTING_MODEL_BLINN,
@@ -45,6 +46,7 @@ namespace y60 {
         LIGHTING_MODEL_LAMBERT,
         LIGHTING_MODEL_FLAT,
         LIGHTING_MODEL_UNLIT,
+        LIGHTING_MODEL_HDR,
         0
     };
 
@@ -163,6 +165,10 @@ namespace y60 {
     static const char * TEXTURE_INTERNAL_FORMAT_RGB10_A2            = "RGB10_A2";
     static const char * TEXTURE_INTERNAL_FORMAT_RGBA12              = "RGBA12";
     static const char * TEXTURE_INTERNAL_FORMAT_RGBA16              = "RGBA16";
+    static const char * TEXTURE_INTERNAL_FORMAT_RGBA_HALF           = "RGBA_HALF";
+    static const char * TEXTURE_INTERNAL_FORMAT_RGB_HALF            = "RGB_HALF";
+    static const char * TEXTURE_INTERNAL_FORMAT_RGBA_FLOAT          = "RGBA_FLOAT";
+    static const char * TEXTURE_INTERNAL_FORMAT_RGB_FLOAT           = "RGB_FLOAT";
 
     enum TextureInternalFormat {
         TEXTURE_IFMT_DEPTH,
@@ -203,7 +209,11 @@ namespace y60 {
         TEXTURE_IFMT_RGBA8,
         TEXTURE_IFMT_RGB10_A2,
         TEXTURE_IFMT_RGBA12,
-        TEXTURE_IFMT_RGBA16
+        TEXTURE_IFMT_RGBA16,
+        TEXTURE_IFMT_RGBA_HALF,
+        TEXTURE_IFMT_RGB_HALF,
+        TEXTURE_IFMT_RGBA_FLOAT,
+        TEXTURE_IFMT_RGB_FLOAT
     };
 
     static const char * TextureInternalFormatStrings[] = {
@@ -246,6 +256,10 @@ namespace y60 {
         TEXTURE_INTERNAL_FORMAT_RGB10_A2,
         TEXTURE_INTERNAL_FORMAT_RGBA12, 
         TEXTURE_INTERNAL_FORMAT_RGBA16,
+        TEXTURE_INTERNAL_FORMAT_RGBA_HALF,
+        TEXTURE_INTERNAL_FORMAT_RGB_HALF,
+        TEXTURE_INTERNAL_FORMAT_RGBA_FLOAT,
+        TEXTURE_INTERNAL_FORMAT_RGB_FLOAT,
         0
     };
 

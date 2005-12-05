@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: GLUtils.h,v $
-//   $Author: david $
-//   $Revision: 1.22 $
-//   $Date: 2005/04/04 14:40:14 $
-//
-//  Description: This class performs texture loading and management.
-//
-//=============================================================================
 
 #ifndef _ac_render_GLUtils_h_
 #define _ac_render_GLUtils_h_
@@ -52,6 +43,7 @@
 #endif
 #ifdef LINUX
     #include <GL/glx.h>
+    #include <GL/glxext.h>
 #endif
 
 
@@ -196,6 +188,12 @@ DEF_PROC_ADDRESS( PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC, glCheckFramebufferStatusEX
     DEF_PROC_ADDRESS( PFNWGLGETSWAPINTERVALEXTPROC, wglGetSwapIntervalEXT );
     #define wglGetSwapIntervalEXT _ac_wglGetSwapIntervalEXT
 #endif
+#ifdef LINUX
+    DEF_PROC_ADDRESS( PFNGLXGETVIDEOSYNCSGIPROC, glXGetVideoSyncSGI );
+    #define glXGetVideoSyncSGI _ac_glXGetVideoSyncSGI
+    DEF_PROC_ADDRESS( PFNGLXWAITVIDEOSYNCSGIPROC, glXWaitVideoSyncSGI );
+    #define glXWaitVideoSyncSGI _ac_glXWaitVideoSyncSGI
+#endif
 
 } // extern C
 
@@ -228,6 +226,9 @@ namespace y60 {
     bool queryOGLExtension(const char *extName, bool theVerboseFlag = true);
 #ifdef WIN32
     bool queryWGLExtension(const char *extension);
+#endif
+#ifdef LINUX
+    bool queryGLXExtension(const char *extension);
 #endif
     GLenum asGLBlendFunction(BlendFunction theFunction);
     GLenum asGLTextureRegister(unsigned theIndex);

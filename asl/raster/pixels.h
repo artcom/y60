@@ -92,48 +92,48 @@ struct Pixel {
     }
 
     DERIVED operator+(const DERIVED & y) const {
-        return get() + y.get();
+        return (DERIVED)(get() + y.get());
     }
     DERIVED operator-(const DERIVED & y) const {
-        return get() - y.get();
+        return (DERIVED)(get() - y.get());
     }
     DERIVED operator*(const DERIVED & y) const {
-        return get() * y.get();
+        return (DERIVED)(get() * y.get());
     }
     DERIVED operator/(const DERIVED & y) const {
-        return get() / y.get();
+        return (DERIVED)(get() / y.get());
     }
     DERIVED operator&(const DERIVED & y) const {
-        return get() & y.get();
+        return (DERIVED)(get() & y.get());
     }
     DERIVED operator|(const DERIVED & y) const {
-        return get() | y.get();
+        return (DERIVED)(get() | y.get());
     }
     DERIVED operator^(const DERIVED & y) const {
-        return get() ^ y.get();
+        return (DERIVED)(get() ^ y.get());
     }
     DERIVED operator>>(const DERIVED & y) const {
-        return get() >> y.get();
+        return (DERIVED)(get() >> y.get());
     }
     DERIVED operator<<(const DERIVED & y) const {
-        return get() << y.get();
+        return (DERIVED)(get() << y.get());
     }
 
     template <class NUMBER>
     DERIVED operator+(NUMBER y) const {
-        return get() + y;
+        return (DERIVED)(get() + y);
     }
     template <class NUMBER>
     DERIVED operator-(NUMBER y) const {
-        return get() - y;
+        return (DERIVED)(get() - y);
     }
     template <class NUMBER>
     DERIVED operator*(NUMBER y) const {
-        return VALUE(get() * y);
+        return (DERIVED)(VALUE(get() * y));
     }
     template <class NUMBER>
     DERIVED operator/(NUMBER y) const {
-        return get() / y;
+        return (DERIVED)(get() / y);
     }
 
     const VALUE & get() const {

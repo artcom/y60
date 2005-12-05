@@ -57,6 +57,15 @@ namespace y60 {
             dom::ValuePtr(new dom::ComplexValue<RasterOfDXT3,dom::MakeResizeableRaster>(RasterOfDXT3(0,0,0),0)));
         theFactory.registerPrototype("RasterOfDXT5",
             dom::ValuePtr(new dom::ComplexValue<RasterOfDXT5,dom::MakeResizeableRaster>(RasterOfDXT5(0,0,0),0)));
+
+        theFactory.registerPrototype("RasterOfRGBA_HALF",
+            dom::ValuePtr(new dom::ComplexValue<RasterOfRGBA_HALF,dom::MakeResizeableRaster>(RasterOfRGBA_HALF(0,0,0),0)));
+        theFactory.registerPrototype("RasterOfRGB_HALF",
+            dom::ValuePtr(new dom::ComplexValue<RasterOfRGB_HALF,dom::MakeResizeableRaster>(RasterOfRGB_HALF(0,0,0),0)));
+        theFactory.registerPrototype("RasterOfRGBA_FLOAT",
+            dom::ValuePtr(new dom::ComplexValue<RasterOfRGBA_FLOAT,dom::MakeResizeableRaster>(RasterOfRGBA_FLOAT(0,0,0),0)));
+        theFactory.registerPrototype("RasterOfRGB_FLOAT",
+            dom::ValuePtr(new dom::ComplexValue<RasterOfRGB_FLOAT,dom::MakeResizeableRaster>(RasterOfRGB_FLOAT(0,0,0),0)));
     }
 
 	void registerSomMathTypes(dom::ValueFactory & theFactory) {

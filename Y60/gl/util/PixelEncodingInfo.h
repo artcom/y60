@@ -1,6 +1,6 @@
 //============================================================================
 //
-// Copyright (C) 2002, ART+COM AG Berlin
+// Copyright (C) 2002-2005, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,18 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//    $RCSfile: PixelEncodingInfo.h,v $
-//
-//     $Author: martin $
-//
-//   $Revision: 1.6 $
-//
-// Description:
-//
-// (CVS log at the bottom of this file)
-//
-//=============================================================================
 
 #ifndef INCL_TEXTURE_COMPRESSION_TYPE
 #define INCL_TEXTURE_COMPRESSION_TYPE

@@ -214,8 +214,11 @@ namespace y60 {
 
     void 
     GLShader::enableTextures(const y60::MaterialBase & theMaterial) {
+
         unsigned myTextureCount = theMaterial.getTextureCount();
         AC_DEBUG << "GLShader::enableTextures " << theMaterial.get<NameTag>() << " count=" << myTextureCount;
+
+        glMatrixMode(GL_TEXTURE);
         for (unsigned i = 0; i < myTextureCount; ++i) {
 
             const y60::Texture & myTexture = theMaterial.getTexture(i);
@@ -223,6 +226,13 @@ namespace y60 {
 
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTextureARB(myTexUnit);
+
+            // load texture matrix
+            asl::Matrix4f myMatrix = myTexture.getImage()->get<ImageMatrixTag>();
+            myMatrix.postMultiply(myTexture.get<TextureMatrixTag>());
+            //AC_TRACE << "TM " << myTexture.get<TextureMatrixTag>();
+            //AC_TRACE << "MM " << myMatrix;
+            glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
 
             // [DS] this isn't necessary. Filtering and wrapmode are stored
             // as part of the texture object. Instead we should set it once
@@ -262,6 +272,7 @@ namespace y60 {
                 CHECK_OGL_ERROR;
             }
         }
+        glMatrixMode(GL_MODELVIEW);
     }
 
     void 

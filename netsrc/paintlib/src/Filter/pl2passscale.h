@@ -16,6 +16,7 @@
 
 #include <math.h>
 #include <iostream>
+#include <OpenEXR/half.h>
 
 // Not every math.h defines this :-(.
 #ifndef  min
@@ -110,6 +111,34 @@ public:
   };
 };
 
+class CDataRGBA_UBYTE {
+public:
+  typedef unsigned char _DataType[4];
+  typedef _DataType* _RowType;
+  class _Accumulator {
+  public:
+      _Accumulator ()
+      {
+        val [0] = val [1] = val [2] = val [3] = 0;
+      };
+      void Accumulate (int dWeight, _DataType &value)
+      {
+        val [0] += (dWeight * (value [0]));
+        val [1] += (dWeight * (value [1]));
+        val [2] += (dWeight * (value [2]));
+        val [3] += (dWeight * (value [3]));
+      };
+      void Store (_DataType &value)
+      {
+        value [0] = (unsigned char) ((val [0] + 128)/256);
+        value [1] = (unsigned char) ((val [1] + 128)/256);
+        value [2] = (unsigned char) ((val [2] + 128)/256);
+        value [3] = (unsigned char) ((val [3] + 128)/256);
+      };
+      int val [4];
+  };
+};
+
 class CDataRGB_UBYTE
 {
 public:
@@ -137,31 +166,112 @@ public:
   };
 };
 
-class CDataRGBA_UBYTE {
+class CDataRGBA_HALF
+{
 public:
-  typedef unsigned char _DataType[4];
+  typedef half _DataType[4];
   typedef _DataType* _RowType;
   class _Accumulator {
   public:
       _Accumulator ()
       {
-        val [0] = val [1] = val [2] = val [3] = 0;
+        val[0] = val[1] = val[2] = val[3] = 0;
       };
-      void Accumulate (int dWeight, _DataType &value)
+      void Accumulate (int Weight, _DataType &value)
       {
-        val [0] += (dWeight * (value [0]));
-        val [1] += (dWeight * (value [1]));
-        val [2] += (dWeight * (value [2]));
-        val [3] += (dWeight * (value [3]));
+        val[0] += (Weight * float(value[0]));
+        val[1] += (Weight * float(value[1]));
+        val[2] += (Weight * float(value[2]));
+        val[3] += (Weight * float(value[3]));
       };
       void Store (_DataType &value)
       {
-        value [0] = (unsigned char) ((val [0] + 128)/256);
-        value [1] = (unsigned char) ((val [1] + 128)/256);
-        value [2] = (unsigned char) ((val [2] + 128)/256);
-        value [3] = (unsigned char) ((val [3] + 128)/256);
+        value[0] = half(val[0]);
+        value[1] = half(val[1]);
+        value[2] = half(val[2]);
+        value[3] = half(val[3]);
       };
-      int val [4];
+      float val[4];
+  };
+};
+class CDataRGB_HALF
+{
+public:
+  typedef half _DataType[3];
+  typedef _DataType* _RowType;
+  class _Accumulator {
+  public:
+      _Accumulator ()
+      {
+        val[0] = val[1] = val[2] = 0;
+      };
+      void Accumulate (int Weight, _DataType &value)
+      {
+        val[0] += (Weight * float(value[0]));
+        val[1] += (Weight * float(value[1]));
+        val[2] += (Weight * float(value[2]));
+      };
+      void Store (_DataType &value)
+      {
+        value[0] = half(val[0]);
+        value[1] = half(val[1]);
+        value[2] = half(val[2]);
+      };
+      float val[3];
+  };
+};
+class CDataRGBA_FLOAT
+{
+public:
+  typedef float _DataType[4];
+  typedef _DataType* _RowType;
+  class _Accumulator {
+  public:
+      _Accumulator ()
+      {
+        val[0] = val[1] = val[2] = val[3] = 0;
+      };
+      void Accumulate (int Weight, _DataType &value)
+      {
+        val[0] += (Weight * float(value[0]));
+        val[1] += (Weight * float(value[1]));
+        val[2] += (Weight * float(value[2]));
+        val[3] += (Weight * float(value[3]));
+      };
+      void Store (_DataType &value)
+      {
+        value[0] = float(val[0]);
+        value[1] = float(val[1]);
+        value[2] = float(val[2]);
+        value[3] = float(val[3]);
+      };
+      float val[4];
+  };
+};
+class CDataRGB_FLOAT
+{
+public:
+  typedef float _DataType[3];
+  typedef _DataType* _RowType;
+  class _Accumulator {
+  public:
+      _Accumulator ()
+      {
+        val[0] = val[1] = val[2] = 0;
+      };
+      void Accumulate (int Weight, _DataType &value)
+      {
+        val[0] += (Weight * float(value[0]));
+        val[1] += (Weight * float(value[1]));
+        val[2] += (Weight * float(value[2]));
+      };
+      void Store (_DataType &value)
+      {
+        value[0] = float(val[0]);
+        value[1] = float(val[1]);
+        value[2] = float(val[2]);
+      };
+      float val[3];
   };
 };
 

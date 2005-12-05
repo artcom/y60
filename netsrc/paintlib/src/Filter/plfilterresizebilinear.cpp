@@ -79,6 +79,38 @@ void PLFilterResizeBilinear::Apply(PLBmpBase * pBmpSource, PLBmp * pBmpDest) con
                 (CDataL_SWORD::_RowType *) pBmpDest->GetLineArray(),
                 pBmpDest->GetWidth(),
                 pBmpDest->GetHeight());
+    } else if (pBmpSource->GetPixelFormat() == PLPixelFormat::A16B16G16R16) {
+        C2PassScale <CDataRGBA_HALF> sS(f);
+        sS.Scale ((CDataRGBA_HALF::_RowType *) pBmpSource->GetLineArray(), 
+                pBmpSource->GetWidth(), 
+                pBmpSource->GetHeight(), 
+                (CDataRGBA_HALF::_RowType *) pBmpDest->GetLineArray(),
+                pBmpDest->GetWidth(),
+                pBmpDest->GetHeight());
+    } else if (pBmpSource->GetPixelFormat() == PLPixelFormat::B16G16R16) {
+        C2PassScale <CDataRGB_HALF> sS(f);
+        sS.Scale ((CDataRGB_HALF::_RowType *) pBmpSource->GetLineArray(), 
+                pBmpSource->GetWidth(), 
+                pBmpSource->GetHeight(), 
+                (CDataRGB_HALF::_RowType *) pBmpDest->GetLineArray(),
+                pBmpDest->GetWidth(),
+                pBmpDest->GetHeight());
+    } else if (pBmpSource->GetPixelFormat() == PLPixelFormat::A32B32G32R32) {
+        C2PassScale <CDataRGBA_FLOAT> sS(f);
+        sS.Scale ((CDataRGBA_FLOAT::_RowType *) pBmpSource->GetLineArray(), 
+                pBmpSource->GetWidth(), 
+                pBmpSource->GetHeight(), 
+                (CDataRGBA_FLOAT::_RowType *) pBmpDest->GetLineArray(),
+                pBmpDest->GetWidth(),
+                pBmpDest->GetHeight());
+    } else if (pBmpSource->GetPixelFormat() == PLPixelFormat::B32G32R32) {
+        C2PassScale <CDataRGB_FLOAT> sS(f);
+        sS.Scale ((CDataRGB_FLOAT::_RowType *) pBmpSource->GetLineArray(), 
+                pBmpSource->GetWidth(), 
+                pBmpSource->GetHeight(), 
+                (CDataRGB_FLOAT::_RowType *) pBmpDest->GetLineArray(),
+                pBmpDest->GetWidth(),
+                pBmpDest->GetHeight());
     } else {
         throw PLTextException (PL_ERRFORMAT_NOT_SUPPORTED, 
                     string(pBmpSource->GetPixelFormat().GetName()+

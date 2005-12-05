@@ -66,7 +66,8 @@ SDLWindow::SDLWindow() :
     _myInitialHeight(600),
     _myUserDefinedCursor(0),
     _myStandardCursor(0),
-    _myAutoPauseFlag(false)
+    _myAutoPauseFlag(false),
+    _mySwapInterval(0)
 {
 }
 
@@ -110,6 +111,12 @@ void
 SDLWindow::postRender() {
     AbstractRenderWindow::postRender();
     MAKE_SCOPE_TIMER(SDL_GL_SwapBuffers);
+#ifdef LINUX
+    if (_mySwapInterval) {
+        unsigned counter;
+        glXWaitVideoSyncSGI(_mySwapInterval, 0, &counter);
+    }
+#endif
     SDL_GL_SwapBuffers();
 }
 
@@ -119,8 +126,8 @@ SDLWindow::onResize(Event & theEvent) {
     AC_DEBUG << "Window Resize Event: " << myWindowEvent.width << "x" << myWindowEvent.height;
 #ifdef WIN32
     if (!_myWinDecoFlag) {
-        // Sorry, in case of a non decorated window sdl seems to use getClientRect for getting the window size.
-        // This is wrong, cause decorations are excluded, and so the height and width is not right
+        // Sorry, in case of a non decorated window SDL seems to use getClientRect for getting the window size.
+        // This is wrong, because decorations are excluded, and so height and width are not right
         // and the window is too small, use GetWindowRect instead. (VS)
         SDL_SysWMinfo wminfo;
         SDL_VERSION(&wminfo.version);
@@ -559,6 +566,11 @@ SDLWindow::mainLoop() {
         _myRenderer->getCurrentScene()->updateAllModified();
     }
 
+    if (_myEventListener && jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onStartMainLoop")) {
+        jsval argv[1], rval;
+        jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onStartMainLoop", 0, argv, &rval);
+    }
+
     while ( ! _myAppQuitFlag ) {
 #ifdef WIN32
         bool isOnTop = false;
@@ -634,10 +646,6 @@ SDLWindow::go() {
     }
     try {
         AbstractRenderWindow::go();
-        if (_myEventListener && jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onStartMainLoop")) {
-            jsval argv[1], rval;
-			jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onStartMainLoop", 0, argv, &rval);
-        }
         mainLoop();
     } catch (const asl::Exception & ex) {
         AC_ERROR << "Exception caught in SDLWindow::go(): " << ex << endl;
@@ -668,9 +676,10 @@ void SDLWindow::saveEvents(const std::string & theFilename) {
 
 
 void 
-SDLWindow::setSwapInterval(unsigned theInterval) {
+SDLWindow::setSwapInterval(unsigned theInterval)
+{
     if (!_myRenderer) {
-        AC_WARNING << "Sorry, setting the swap interval will take no effect before the renderer is created!" << endl;
+        AC_WARNING << "Sorry, setting the swap interval will take no effect before the renderer is created!";
         return;
     }
 
@@ -681,7 +690,20 @@ SDLWindow::setSwapInterval(unsigned theInterval) {
         AC_WARNING << "setSwapInterval(): wglSwapInterval Extension not supported.";
     }    
 #else
-    AC_WARNING << "setSwapInterval(): Not yet inplemented for Linux";
+    if (glXGetVideoSyncSGI && glXWaitVideoSyncSGI) {
+        unsigned counter0, counter1;
+        glXGetVideoSyncSGI(&counter0);
+        asl::msleep(100);
+        glXGetVideoSyncSGI(&counter1);
+        if (counter1 > counter0) {
+            _mySwapInterval = theInterval;
+        } else {
+            AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working?";
+            _mySwapInterval = 0;
+        }
+    } else {
+        AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not supported";
+    }
 #endif
 }
 
@@ -697,10 +719,13 @@ SDLWindow::getSwapInterval() {
         return wglGetSwapIntervalEXT();
     } else {
         AC_WARNING << "getSwapInterval(): wglSwapInterval Extension not supported.";
-        return 0;
     }    
 #else
-    AC_WARNING << "getSwapInterval(): Not yet inplemented for Linux";
-    return 0;
+    if (glXGetVideoSyncSGI) {
+        return _mySwapInterval;
+    } else {
+        AC_WARNING << "getSwapInterval(): glXGetVideoSyncSGI not supported";
+    }
 #endif
+    return 0;
 }

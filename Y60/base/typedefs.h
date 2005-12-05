@@ -37,7 +37,6 @@
 
 namespace y60 {
 
-
     typedef std::vector<AcBool>                VectorOfBool;
     typedef std::vector<unsigned int>          VectorOfUnsignedInt;
     typedef std::vector<int>                   VectorOfSignedInt;
@@ -65,6 +64,11 @@ namespace y60 {
     typedef asl::raster<asl::DXT1a>            RasterOfDXT1a;
     typedef asl::raster<asl::DXT3>             RasterOfDXT3;
     typedef asl::raster<asl::DXT5>             RasterOfDXT5;
+
+    typedef asl::raster<asl::RGBA_HALF> RasterOfRGBA_HALF;
+    typedef asl::raster<asl::RGB_HALF>  RasterOfRGB_HALF;
+    typedef asl::raster<asl::RGBA_FLOAT> RasterOfRGBA_FLOAT;
+    typedef asl::raster<asl::RGB_FLOAT>  RasterOfRGB_FLOAT;
 }
 
 #endif

@@ -89,6 +89,9 @@ namespace asl {
     std::istream &
     operator >> (std::istream & theStream, std::vector<std::string> & theStringVector);
 
+    std::ostream &
+    operator << (std::ostream & theStream, const dom::ResizeableVector & theVector);
+
 //
 ///  generic ostream output operator template for raster templates
 //
