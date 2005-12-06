@@ -28,7 +28,7 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("a string repesentation of the request manager.");
     DOC_END;
     std::string myStringRep = as_string(JSRequestManager::getJSWrapper(cx,obj).getNative().getActiveCount());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -120,7 +120,7 @@ JSRequestManager::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject
 
 JSBool
 JSRequestManager::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Construct a Request Manager.");
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());

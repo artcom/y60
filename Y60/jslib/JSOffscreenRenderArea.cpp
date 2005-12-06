@@ -60,7 +60,8 @@ renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 static JSBool
 setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("sets the width of the offscreen area. TODO what exactly is this ?");
+        DOC_PARAM("theWidth", "", DOC_TYPE_INTEGER);
         DOC_END;
         ensureParamCount(argc, 1);
         OffscreenRenderArea * myNative(0);
@@ -77,7 +78,8 @@ setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("downloads the content of the offscreen area to an image");
+        DOC_PARAM("theImage", "", DOC_TYPE_NODE);
         DOC_END;
         ensureParamCount(argc, 1);
         OffscreenRenderArea * myNative(0);
@@ -97,7 +99,8 @@ downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 static JSBool
 setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("sets the height of the offscreen area. TODO what exactly is this ?");
+        DOC_PARAM("theHeight", "", DOC_TYPE_INTEGER);
         DOC_END;
         ensureParamCount(argc, 1);
         OffscreenRenderArea * myNative(0);
