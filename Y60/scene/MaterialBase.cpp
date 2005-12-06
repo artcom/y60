@@ -235,9 +235,6 @@ namespace y60 {
             VectorOfRankedFeature myTexCoordFeatures = myMappingRequirement->nodeValueAs<VectorOfRankedFeature>();
             if (myTexCoordFeatures.size() > 0) {
  
-                // assume it's on until told otherwise
-                _myTexGenFlag = true;
-
                 const VectorOfString & myTexCoordFeature = myTexCoordFeatures[0]._myFeature;
                 for (unsigned myTexUnit = 0 ; myTexUnit < myTexCoordFeature.size(); ++myTexUnit) {
                     TexGenMode myTexGenModes;
@@ -245,58 +242,66 @@ namespace y60 {
 
                     TexCoordMapping myTexCoordMode = TexCoordMapping( 
                             asl::getEnumFromString(myTexCoordFeature[myTexUnit], TexCoordMappingStrings));
+
                     switch (myTexCoordMode) {
                         case PLANAR_PROJECTION:
                             //AC_DEBUG << "PLANAR_PROJECTION" << endl;
                             myTexGenModes.push_back(OBJECT_LINEAR); // generate s
                             myTexGenModes.push_back(OBJECT_LINEAR); // and t
                             myTexGenModes.push_back(OBJECT_LINEAR); // and r
+                            _myTexGenFlag = true;
                             break;
                         case CUBE_PROJECTION:
                             //AC_DEBUG << "CUBE_PROJECTION" << endl;
                             myTexGenModes.push_back(OBJECT_LINEAR); // generate s
                             myTexGenModes.push_back(OBJECT_LINEAR); // and t
                             myTexGenModes.push_back(OBJECT_LINEAR); // and r
+                            _myTexGenFlag = true;
                             break;
                         case FRONTAL_PROJECTION:
                             //AC_DEBUG << "FRONTAL_PROJECTION" << endl;
                             myTexGenModes.push_back(EYE_LINEAR); // generate s
                             myTexGenModes.push_back(EYE_LINEAR); // and t
                             myTexGenModes.push_back(EYE_LINEAR); // and r
+                            _myTexGenFlag = true;
                             break;
                         case SPHERICAL_PROJECTION:
                             //AC_DEBUG << "SPHERICAL_PROJECTION" << endl;
                             myTexGenModes.push_back(SPHERE_MAP); // generate s
                             myTexGenModes.push_back(SPHERE_MAP); // and t
+                            _myTexGenFlag = true;
                             break;
                         case CYLINDRICAL_PROJECTION:
                             //AC_DEBUG << "CYLINDRICAL_PROJECTION" << endl;
                             myTexGenModes.push_back(SPHERE_MAP); // generate s
                             myTexGenModes.push_back(OBJECT_LINEAR); // and t
+                            _myTexGenFlag = true;
                             break;
                         case UV_MAP:
                             // do not use any texgen mode at all
                             // do not generate uvcoords at all
                             myTexGenModes.push_back(NONE);
-                            _myTexGenFlag = false;
                             break;
                         case PERSPECTIVE_PROJECTION:
                         default:
                             throw ShaderException(string("Invalid texgenmode '") + myTexCoordFeature[myTexUnit] + 
                                     "' in material " + get<NameTag>(), PLUS_FILE_LINE);
                     }
-
-                    // fetch texgen params
-					MaterialPropertiesFacadePtr myPropertyFacade = getChild<MaterialPropertiesTag>();
-                    string myTexGenParamName = string("texgenparam") + asl::as_string(myTexUnit);
-					NodePtr myTexGenProperty = myPropertyFacade->getProperty(myTexGenParamName);
-                    if (myTexGenProperty) {
-						VectorOfVector4f myTexGenParamsVec = myTexGenProperty->nodeValueAs<VectorOfVector4f>();
-                        for (unsigned i = 0; i < myTexGenParamsVec.size(); ++i) {
-                            myTexGenParams.push_back(myTexGenParamsVec[i]);
+                    
+                    if (myTexCoordMode != UV_MAP) {
+                    
+                        // fetch texgen params
+                        MaterialPropertiesFacadePtr myPropertyFacade = getChild<MaterialPropertiesTag>();
+                        string myTexGenParamName = string("texgenparam") + asl::as_string(myTexUnit);
+                        NodePtr myTexGenProperty = myPropertyFacade->getProperty(myTexGenParamName);
+                        if (myTexGenProperty) {
+                            VectorOfVector4f myTexGenParamsVec = myTexGenProperty->nodeValueAs<VectorOfVector4f>();
+                            for (unsigned i = 0; i < myTexGenParamsVec.size(); ++i) {
+                                myTexGenParams.push_back(myTexGenParamsVec[i]);
+                            }
+                        } else {
+                            AC_WARNING << "No such property: " << myTexGenParamName <<" in material " << get<NameTag>();
                         }
-                    } else {
-                        AC_DEBUG << "No such property: " << myTexGenParamName <<" in material " << get<NameTag>();
                     }
 
                     _myTexGenModes.push_back(myTexGenModes);
@@ -304,7 +309,7 @@ namespace y60 {
                 }
             }
             if (_myTexGenFlag) {
-                AC_DEBUG << "TexGen enabled for material " << get<NameTag>();
+                AC_INFO << "TexGen enabled for material " << get<NameTag>();
             }
         } else {
             AC_DEBUG << "No such feature '" << MAPPING_FEATURE << "' for material " << get<NameTag>();

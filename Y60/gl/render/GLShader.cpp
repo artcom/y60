@@ -376,6 +376,10 @@ namespace y60 {
                     //AC_DEBUG << " mode=" << myModes[i] << " params=" << myParams[i];
 
                     // set texgen plane params
+                    if (myModes[i] == NONE) {
+                        continue;
+                    }  
+                        
                     if (myModes[i] == EYE_LINEAR) {
 
                         if (mustRestoreMatrix == false) {
