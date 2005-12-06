@@ -62,7 +62,8 @@ namespace y60 {
 		                BLENDFUNCTION_PROPERTY, PROPERTY_LIST_NAME, getDefaultBlendFunction());
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,
-		                LIGHTING_FEATURE, REQUIRES_LIST_NAME, y60::VectorOfRankedFeature(100,"unlit"));
+		                //LIGHTING_FEATURE, REQUIRES_LIST_NAME, y60::VectorOfRankedFeature(100,"unlit"));
+		                LIGHTING_FEATURE, REQUIRES_LIST_NAME, y60::VectorOfRankedFeature(1, RankedFeature(100,"unlit")));
 
 	class MaterialPropertiesFacade :
 		public PropertyListFacade,

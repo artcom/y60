@@ -204,7 +204,7 @@ namespace y60 {
         }
         _myPreviousDomVersion = 0;
         _mySceneBuilder = SceneBuilderPtr(new SceneBuilder(_mySceneDom));
-
+        {ofstream("test_out.x60") << asl::as_string(*_mySceneDom);}
         asl::Time loadEnd;
         AC_INFO << "  Total load time: " << (loadEnd - loadStart) << " sec" << endl;
         setup();

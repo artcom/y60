@@ -444,7 +444,7 @@ namespace y60 {
             appendTexture(*(theScene->getSceneBuilder()), theScene, myMaterialBuilder,
                             theTextureFilename, theSpriteFlag, theDepth);
         }
-        myMaterialBuilder.addFeature("vertexparams", VectorOfRankedFeature(100,"color"));
+        myMaterialBuilder.addFeature("vertexparams", VectorOfRankedFeature(1, RankedFeature(100,"color")));
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();
     }

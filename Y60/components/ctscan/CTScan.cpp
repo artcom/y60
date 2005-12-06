@@ -986,7 +986,7 @@ CTScan::setupMaterial(SceneBuilderPtr theSceneBuilder, bool theCreateNormalsFlag
                 SURFACE_COLOR_PROPERTY, Vector4f(0.8f, 0.8f, 0.8f, 1.0f));
     }
     
-    myMaterialBuilder.addFeature("vertexparams", VectorOfRankedFeature(10,"color"));
+    myMaterialBuilder.addFeature("vertexparams", VectorOfRankedFeature(1, RankedFeature(10,"color")));
 
     string myBlendFunction = "[src_alpha, one_minus_src_alpha]";
     setPropertyValue<VectorOfString>(myMaterialBuilder.getNode(), "vectorofstring",

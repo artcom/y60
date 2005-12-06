@@ -40,6 +40,9 @@ namespace asl {
 namespace y60 {
 
     struct RankedFeature {
+        RankedFeature() {}
+        RankedFeature(float theRanking, const std::string & theFeatures)
+            : _myRanking(theRanking), _myFeature(1, theFeatures) {}
         typedef void value_type;
         float _myRanking;
         std::vector<std::string> _myFeature;
@@ -56,7 +59,8 @@ namespace y60 {
         return !(l == r);
     }
 
-    //typedef std::vector<RankedFeature> VectorOfRankedFeature;
+    typedef std::vector<RankedFeature> VectorOfRankedFeature;
+    /*
     class VectorOfRankedFeature : public std::vector<RankedFeature> {
         public:
         VectorOfRankedFeature() {}
@@ -68,6 +72,7 @@ namespace y60 {
             push_back(myFeature);
         }
     };
+    */
 
 }
 

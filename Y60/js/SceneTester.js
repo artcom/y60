@@ -69,6 +69,24 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         print("Writing test image to file: " + myImageFilename);
         window.saveBuffer(myImageFilename);
     }
+    
+    obj.testSaveLoad = function() {
+        var myXmlFilename = _myOutputImageName + '.out.x60';
+        print("Writing scene to xml file: " + myXmlFilename);
+        window.scene.save(myXmlFilename, false);
+        
+        var myBinXmlFilename = _myOutputImageName + '.out.b60';
+        print("Writing scene to binary file: " + myBinXmlFilename);
+        window.scene.save(myBinXmlFilename, true);
+        
+        var myNewXmlScene = new Scene(myXmlFilename);
+        var myNewBinScene = new Scene(myBinXmlFilename);
+        
+        if (myNewXmlScene.dom.toString() != myNewBinScene.dom.toString()) {
+            print("comparing " + myXmlFilename + " and " + myBinXmlFilename + " failed.");
+            exit(1);
+        }
+    }
 
 
     obj.onPostRender = function() {
@@ -89,6 +107,7 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         if (_myOutputImageName) {
             if (theFrameCount == _myTestDurationInFrames) {
                 obj.saveTestImage();
+                obj.testSaveLoad();
                 exit(0);
             }
         }
