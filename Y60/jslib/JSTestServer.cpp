@@ -18,10 +18,11 @@ using namespace asl;
 namespace jslib {
 
 typedef JSTestServer::NATIVE NATIVE;
-    
+
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns the name of the test server");
+    DOC_RVAL("The string", DOC_TYPE_STRING);
     DOC_END;
     std::string myStringRep = string("Test Server - ") + as_string(JSTestServer::getJSWrapper(cx,obj).getNative().getActiveServerCount());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -31,7 +32,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 start(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("start the acceptor. It will begin accepting incoming connections & spawning servers.");
+    DOC_BEGIN("Start the acceptor. It will begin accepting incoming connections & spawning servers.");
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::start,cx,obj,argc,argv,rval);
 }
@@ -81,7 +82,7 @@ JSTestServer::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 // getproperty handling
 JSBool
 JSTestServer::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
@@ -106,7 +107,9 @@ JSTestServer::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *ob
 
 JSBool
 JSTestServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Creates a new test server");
+    DOC_PARAM("theURL", "IP-Adress of the server", DOC_TYPE_STRING);
+    DOC_PARAM("thePort", "Port number on which the server is listening", DOC_TYPE_INTEGER);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
@@ -136,7 +139,7 @@ JSTestServer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
         myNewObject = new JSTestServer(myNewTestServer, &(*myNewTestServer));
     } else {
-        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (URL) %d",ClassName(), argc);
+        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 2 (URL, port) %d",ClassName(), argc);
         return JS_FALSE;
     }
 

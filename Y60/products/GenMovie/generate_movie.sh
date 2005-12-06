@@ -1,25 +1,28 @@
-#!/bin/bash
+#!/bin/bash -e
 
 if [ "$1" == "" ]; then
     echo Usage: \"$0 directoryname\"
     exit 1
 fi
 
-SRC_DIRECTORY=$1
+# Remove trailing slash
+SRC_DIRECTORY=`dirname $1`/`basename $1`
+I60_DIRECTORY=${SRC_DIRECTORY}_i60
+echo "Generating m60-movie from source directory $SRC_DIRECTORY"
 
-EXTENSION=OPT
+EXTENSION=""
 if [ "$DEBUG" == "1" ] ; then
     EXTENSION=DBG
 fi
 
 generateCompressTex() {
-    if [ -e ${SRC_DIRECTORY}_i60 ]; then
-        rm -rf ${SRC_DIRECTORY}_i60        
+    if [ -e ${I60_DIRECTORY} ]; then
+        rm -rf ${I60_DIRECTORY}
     fi
 
-    mkdir ${SRC_DIRECTORY}_i60
+    mkdir ${I60_DIRECTORY}
 
-    GenCompressedTex$EXTENSION --img-dir $SRC_DIRECTORY --out-dir ${SRC_DIRECTORY}_i60
+    GenCompressedTex$EXTENSION --img-dir $SRC_DIRECTORY --out-dir ${I60_DIRECTORY}
 }
 
 generateMovie() {
@@ -30,10 +33,10 @@ generateMovie() {
         rm $MOVIENAME
     fi
 
-    GenMovie$EXTENSION --source-dir ${SRC_DIRECTORY}_i60 --outfile $MOVIENAME --encoding $ENCODING
+    GenMovie$EXTENSION --source-dir ${I60_DIRECTORY} --outfile $MOVIENAME --encoding DRLE
 }
 
 generateCompressTex
-generateMovie DRLE
+generateMovie
 
 exit 0;

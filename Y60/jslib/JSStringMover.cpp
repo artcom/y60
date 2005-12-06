@@ -30,28 +30,33 @@ namespace jslib {
 
 static JSBool
 onFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Must be called once per frame");
+    DOC_PARAM("theTime", "The current time", DOC_TYPE_FLOAT);
     DOC_END;
     return Method<JSStringMover::NATIVE>::call(&JSStringMover::NATIVE::onFrame,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 addCharacter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Adds a new character position. There must exist a corresponding shape (see CharacterMover.js)");
+    DOC_PARAM("theFinalPosition", "Position where the character should move to after the explosion", DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<JSStringMover::NATIVE>::call(&JSStringMover::NATIVE::addCharacter,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 resetPositions(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Reset all characters to new positions");
+    DOC_PARAM("theStartPosition", "Startposition of the character explosion", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theTargetPositionOffset", "Offset between start and target position", DOC_TYPE_VECTOR3F);
     DOC_END;
     return Method<JSStringMover::NATIVE>::call(&JSStringMover::NATIVE::resetPositions,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 onMouseButton(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Triggers interaction depending on the current mouse position");
+    DOC_PARAM("theMousePosition", "Mouse position in screen space", DOC_TYPE_VECTOR2F);
     DOC_END;
     return Method<JSStringMover::NATIVE>::call(&JSStringMover::NATIVE::onMouseButton,cx,obj,argc,argv,rval);
 }
@@ -95,7 +100,7 @@ JSStringMover::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 // getproperty handling
 JSBool
 JSStringMover::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
@@ -125,7 +130,10 @@ JSStringMover::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *o
 
 JSBool
 JSStringMover::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Creates a new string mover. (An object to move around charachters in funny ways)");
+    DOC_PARAM("theStartPosition", "The world position, where the charachters should explode from", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theShapeNode", "The shape, which contains all the character quads (see CharacterMover.js)", DOC_TYPE_NODE);
+    DOC_PARAM("theBodyNode", "The body, connected to the character shape", DOC_TYPE_NODE);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());

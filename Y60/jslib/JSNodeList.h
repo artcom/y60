@@ -39,40 +39,22 @@ public:
     }
     static JSBool
     item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+        DOC_BEGIN("Returns a node with a given index from the nodelist");
+        DOC_PARAM("theIndex", "Index of the node to retrieve", DOC_TYPE_INTEGER);
+        DOC_RVAL("The node from the nodelist at the specified index", DOC_TYPE_NODE);
+        DOC_END;
         typedef dom::NodePtr (NATIVE_LIST::*MyMethod)(int);
         return Method<NATIVE_LIST>::call((MyMethod)&NATIVE_LIST::item,cx,obj,argc,argv,rval);
     }
     static JSBool
     appendNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+        DOC_BEGIN("Appends a node to the node list");
+        DOC_PARAM("theNode", "The xml node to append", DOC_TYPE_NODE);
+        DOC_RVAL("The appended node", DOC_TYPE_NODE);
+        DOC_END;
         typedef dom::NodePtr (NATIVE_LIST::*MyMethod)(int);
         return Method<NATIVE_LIST>::call((MyMethod)&NATIVE_LIST::append,cx,obj,argc,argv,rval);
     }
-    /*
-    static JSBool
-    setAllNodeValues(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-        if (argc != 1) {
-            JS_ReportError(cx,"JSNodeList::setAllNodeValues: wrong number of parameters: %d, 1 expected", argc);
-            return JS_FALSE;
-        }
-        NATIVE_LIST * myNodeList;
-        dom::ValuePtr myValue;
-        if (convertFrom(cx, OBJECT_TO_JSVAL(obj),myNodeList) &&
-            convertFrom(cx, argv[0], myValue) )
-        {
-            for (int i = 0; i < myNodeList->size(); ++i) {
-                (*myNodeList)[i].nodeValueWrapper(*myValue);
-            }
-            return JS_TRUE;
-        }
-        return JS_FALSE;
-    }
-    */
 
     static JSFunctionSpec * Functions() {
         AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<std::endl;
@@ -95,7 +77,7 @@ public:
         };
         return myProperties;
     }
-    
+
     static JSConstIntPropertySpec * ConstIntProperties() {
         static JSConstIntPropertySpec myProperties[] = {{0}};
         return myProperties;
@@ -110,7 +92,7 @@ public:
         static JSFunctionSpec myFunctions[] = {{0}};
         return myFunctions;
     }
- 
+
     virtual unsigned long length() const {
         return this->getNative().length();
     }
@@ -145,9 +127,9 @@ public:
 
     static JSBool
     Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-        IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << std::endl);
+        DOC_BEGIN("Creates a new node list");
+        DOC_END;
+
         if (JSA_GetClass(cx,obj) != Base::Class()) {
             JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
             return JS_FALSE;
