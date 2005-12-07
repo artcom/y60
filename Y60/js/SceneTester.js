@@ -69,19 +69,19 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         print("Writing test image to file: " + myImageFilename);
         window.saveBuffer(myImageFilename);
     }
-    
+
     obj.testSaveLoad = function() {
-        var myXmlFilename = _myOutputImageName + '.out.x60';
+        var myXmlFilename = 'saved_testscene.x60';
         print("Writing scene to xml file: " + myXmlFilename);
         window.scene.save(myXmlFilename, false);
-        
-        var myBinXmlFilename = _myOutputImageName + '.out.b60';
+
+        var myBinXmlFilename = 'saved_testscene.b60';
         print("Writing scene to binary file: " + myBinXmlFilename);
         window.scene.save(myBinXmlFilename, true);
-        
+
         var myNewXmlScene = new Scene(myXmlFilename);
         var myNewBinScene = new Scene(myBinXmlFilename);
-        
+
         if (myNewXmlScene.dom.toString() != myNewBinScene.dom.toString()) {
             print("comparing " + myXmlFilename + " and " + myBinXmlFilename + " failed.");
             exit(1);
@@ -90,16 +90,21 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
 
 
     obj.onPostRender = function() {
-        if (_myOutputImageName) {
-            ++obj.myFrameCount;
-            if (obj.myFrameCount > obj.MAX_FRAME_COUNT) {
-                if (!_myOutputImageName) {
-                    print ("Maximum frame count "+obj.myFrameCount+" reached - something went wrong. Terminating test");
-                    exit(1);
+        try {
+            if (_myOutputImageName) {
+                ++obj.myFrameCount;
+                if (obj.myFrameCount > obj.MAX_FRAME_COUNT) {
+                    if (!_myOutputImageName) {
+                        print ("Maximum frame count "+obj.myFrameCount+" reached - something went wrong. Terminating test");
+                        exit(1);
+                    }
                 }
-            }
 
-            obj.onFrameDone(obj.myFrameCount);
+                obj.onFrameDone(obj.myFrameCount);
+            }
+        } catch(ex) {
+            print("### ERROR: Exception caught: " + ex);
+            exit(1);
         }
     }
 
