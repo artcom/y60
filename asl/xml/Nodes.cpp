@@ -952,7 +952,7 @@ dom::Node::loadSchemas(const DOMString & theURLList)  {
         if (myURLs[i].find("urn:") == 0) {
             // ignore urn
         } else {
-            std::string mySchemaString = asl::readWholeFile(myURLs[i]); // TODO: use real URL loader here
+            std::string mySchemaString = asl::readFile(myURLs[i]); // TODO: use real URL loader here
             if (!mySchemaString.size()) {
                 throw LoadFileFailed(std::string("Could not load file '")+myURLs[i]+"'","dom::Node::loadSchemas");
             }
@@ -1450,7 +1450,7 @@ dom::Node::parseAll(const String& is) {
 
 void Node::parseFile(const std::string & theFileName) {
     DOMString myXmlString;
-    if (asl::readWholeFile(asl::expandEnvironment(theFileName), myXmlString)) {
+    if (asl::readFile(asl::expandEnvironment(theFileName), myXmlString)) {
         parseAll(myXmlString);
     } else {
         *this = Node();

@@ -83,7 +83,7 @@ namespace y60 {
 #endif
             _mySceneDom->binarize(theBlock);
 #ifdef DONT_USE_MAPPED_BLOCK_IO
-            if (!asl::writeWholeFile(theFilename,theBlock)) {
+            if (!asl::writeFile(theFilename,theBlock)) {
                 throw IOError(std::string("Could not open or write binary file '") + theFilename + "'", "Scene::save()");
             }
 #endif
@@ -147,7 +147,7 @@ namespace y60 {
         theDocument.setFacadeFactory(myFacadeFactory);
         if (theSchemaFilename.size()) {
             std::string myFile;
-            if (asl::readWholeFile(theSchemaFilename, myFile)) {
+            if (asl::readFile(theSchemaFilename, myFile)) {
                 Document mySchema(myFile);
                 theDocument.addSchema(mySchema,"");
             } else {

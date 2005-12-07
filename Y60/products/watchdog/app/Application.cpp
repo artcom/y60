@@ -307,7 +307,7 @@ void
 Application::checkHeartbeat() {
     if (_myPerformECG && (getElapsedSecondsToday() - _myStartTimeInSeconds >= _myAppStartTimeInSeconds) ) {
         string myHeartbeatStr;
-        asl::readWholeFile(_myHeartbeatFile, myHeartbeatStr );
+        asl::readFile(_myHeartbeatFile, myHeartbeatStr );
         if ( myHeartbeatStr.empty()) {
             _myLogger.logToFile("Could not read heartbeatfile: " + _myHeartbeatFile);
             _myHeartIsBroken =  false;

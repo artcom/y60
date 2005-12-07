@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
             for (int i = 2; i < myArguments.getCount(); ++i) {
                 string myFile;
                 bool hasBeenModified = false;
-                if (readWholeFile(myArguments.getArgument(i), myFile)) {
+                if (readFile(myArguments.getArgument(i), myFile)) {
                     int matchPos = 0; 
                     while ((matchPos = myFile.find(searchForString, matchPos)) != string::npos) {
                         if (myArguments.haveOption("-w")) {
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
                     cerr << "### WARNING: could not read file '" << myArguments.getArgument(i) << endl;
                 }
                 if (!myArguments.haveOption("-n") && hasBeenModified) {
-                    if (!writeWholeFile(myArguments.getArgument(i), myFile)) {
+                    if (!writeFile(myArguments.getArgument(i), myFile)) {
                         cerr << "### WARNING: could not write file '" << myArguments.getArgument(i) << endl;
                     }
                 }

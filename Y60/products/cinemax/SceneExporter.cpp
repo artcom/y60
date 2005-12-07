@@ -610,7 +610,7 @@ SceneExporter::Save(PluginSceneSaver * theNode,
 #else
             asl::Block myBlock;
             _mySceneBuilder->binarize(myBlock);
-            if (!asl::writeWholeFile(myFileName,myBlock)) {
+            if (!asl::writeFile(myFileName,myBlock)) {
                 throw IOError(std::string("Could not open or write binary file '") + myFileName + "'", "Scene::save()");
             }
 #endif

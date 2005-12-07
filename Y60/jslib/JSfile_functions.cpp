@@ -230,7 +230,7 @@ createPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
-ReadWholeFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+ReadFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Loads a text file into a string using the package manager");
     DOC_PARAM("theRelativePath", "The path to search in. It is relative and must be defined inside a package", DOC_TYPE_STRING);
     DOC_RVAL("Returns the file content as string", DOC_TYPE_STRING);
@@ -244,7 +244,7 @@ ReadWholeFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
         string myFilename;
         string myPackage;
         if ( ! convertFrom(cx, argv[0], myFilename)) {
-            JS_ReportError(cx, "readWholeFile(): argument #1 must be a string (relative filename)");
+            JS_ReportError(cx, "readFile(): argument #1 must be a string (relative filename)");
             return JS_FALSE;
         }
         Ptr<ReadableBlock> myBlock;
@@ -252,7 +252,7 @@ ReadWholeFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
             myBlock = JSApp::getPackageManager()->openFile(myFilename);
         } else {
             if ( ! convertFrom(cx, argv[1], myPackage)) {
-                JS_ReportError(cx, "readWholeFile(): argument #2 must be a string (package path)");
+                JS_ReportError(cx, "readFile(): argument #2 must be a string (package path)");
                 return JS_FALSE;
             }
             myBlock = JSApp::getPackageManager()->openFile(myFilename, myPackage);
@@ -317,7 +317,7 @@ DeleteFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
-WriteWholeStringToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+WriteStringToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Writes a given string into a file");
     DOC_PARAM("theFilename", "The target file path", DOC_TYPE_STRING);
     DOC_PARAM("theString", "The string to write to the file", DOC_TYPE_STRING);
@@ -329,13 +329,13 @@ WriteWholeStringToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
         convertFrom(cx, argv[0], myPath);
         std::string myContent;
         convertFrom(cx, argv[1], myContent);
-        *rval = as_jsval(cx, asl::writeWholeFile(myPath, myContent));
+        *rval = as_jsval(cx, asl::writeFile(myPath, myContent));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
-WriteWholeBlockToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+WriteBlockToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Writes a given binary block into a file");
     DOC_PARAM("theFilename", "The target file path", DOC_TYPE_STRING);
     DOC_PARAM("theBlock", "The block to write", DOC_TYPE_BLOCK);
@@ -347,7 +347,7 @@ WriteWholeBlockToFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
         convertFrom(cx, argv[0], myPath);
         asl::Block * myContent = 0;
         convertFrom(cx, argv[1], myContent);
-        *rval = as_jsval(cx, asl::writeWholeFile(myPath, *myContent));
+        *rval = as_jsval(cx, asl::writeFile(myPath, *myContent));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -521,7 +521,7 @@ and returns all files in theRelativePath. If theRelativePath is a file it return
     } HANDLE_CPP_EXCEPTION;
 }
 JS_STATIC_DLL_CALLBACK(JSBool)
-ReadWholeFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+ReadFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Searches theRelativePath in either thePackageName or all packages and open the file located at theRelativePath if found.");
     DOC_PARAM("theRelativePath", "The path to the file requested. It is relative and must be defined inside a package.", DOC_TYPE_STRING);
     DOC_PARAM("thePackageName", "The name of a package, Package names are stored just as you enter them by calling includePath.", DOC_TYPE_STRING);
@@ -529,7 +529,7 @@ ReadWholeFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     DOC_END;
     try {
         if (argc == 0 || argc > 2 ) {
-            JS_ReportError(cx, "ReadWholeFileAsBlock(): expects one or two string arguments, (theRelativePath, [optional] package)");
+            JS_ReportError(cx, "ReadFileAsBlock(): expects one or two string arguments, (theRelativePath, [optional] package)");
             return JS_FALSE;
         }
         string myRelativePath = "";
@@ -560,10 +560,10 @@ ReadWholeFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 JSFunctionSpec *
 JSFileFunctions::Functions() {
     static JSFunctionSpec myFunctions[] = {
-        {"readWholeFileAsString",  ReadWholeFileAsString,  1},
-        {"readWholeFileAsBlock",   ReadWholeFileAsBlock,   1},
-        {"writeWholeStringToFile", WriteWholeStringToFile, 2},
-        {"writeWholeBlockToFile",  WriteWholeStringToFile, 2},
+        {"readFileAsString",  ReadFileAsString,  1},
+        {"readFileAsBlock",   ReadFileAsBlock,   1},
+        {"writeStringToFile", WriteStringToFile, 2},
+        {"writeBlockToFile",  WriteStringToFile, 2},
         {"getLastModified",        GetLastModified,  1},
         {"getFilenamePart",        GetFilenamePart,  1},
         {"getDirectoryPart",       GetDirectoryPart, 1},

@@ -101,11 +101,11 @@ unsigned splitPaths(const std::string & theDelimitedPaths, std::vector<std::stri
 std::string searchFile(const std::string & theFileName, const std::string & theSearchPath);
 
 /// read a complete file into a string
-std::string readWholeFile(const std::string& theFileName);
-bool readWholeFile(const std::string& theFileName, std::string & theContent);
-bool readWholeFile(const std::string& theFileName, asl::ResizeableBlock & theContent);
-bool writeWholeFile(const std::string& theFileName, const std::string & theContent);
-bool writeWholeFile(const std::string& theFileName, const asl::ReadableBlock & theContent);
+std::string readFile(const std::string& theFileName);
+bool readFile(const std::string& theFileName, std::string & theContent);
+bool readFile(const std::string& theFileName, asl::ResizeableBlock & theContent);
+bool writeFile(const std::string& theFileName, const std::string & theContent);
+bool writeFile(const std::string& theFileName, const asl::ReadableBlock & theContent);
 
 bool deleteFile(const std::string& theFileName);
 bool moveFile(const std::string& theOldFileName, const std::string & theNewFileName);
