@@ -63,11 +63,12 @@ namespace y60 {
 
         //check if we have an inline movie, if so open it using FFMpeg
         dom::NodePtr myBinaryElement = getNode().firstChild();
-        if (myBinaryElement) {
+        if (myBinaryElement && !getRasterPtr()) {
             AC_DEBUG << "found an inline movie for " << get<ImageSourceTag>();
 
             //DK hold this as a member, otherwise our ReadableStream goes out of scope :-(
             _myStreamData = myBinaryElement->firstChild()->nodeValueWrapperPtr();
+
             asl::ReadableStream * myStream
                 = const_cast<asl::ReadableBlock*>(&_myStreamData->accessReadableBlock());
 
@@ -156,7 +157,7 @@ namespace y60 {
     Movie::readFrame() {
         readFrame(0, true);
     }
-    
+
     void
     Movie::readFrame(double theCurrentTime, bool theIgnoreCurrentTime) {
         DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime);
@@ -189,7 +190,7 @@ namespace y60 {
                     myMovieTime = 0;
                 } else {
                     myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
-                }                    
+                }
                 myNextFrame = (int)getFrameFromTime(myMovieTime);
                 break;
             case PLAY_MODE_STOP:
@@ -200,7 +201,7 @@ namespace y60 {
         if (myNextFrame < 0) {
             setPlayMode(PLAY_MODE_STOP);
         }
-        
+
         DB(AC_TRACE << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
         if (myNextFrame != _myLastDecodedFrame) {
             double myDecodedTime = decodeFrame(myMovieTime, myNextFrame);
