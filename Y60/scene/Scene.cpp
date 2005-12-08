@@ -1198,6 +1198,21 @@ namespace y60 {
                         "' with type IDREF points to unknown id: " + myAttribute->nodeValue(), PLUS_FILE_LINE);
                 }
             }
+
+            // Special case for skeleton nodes
+            if (myAttribute->nodeName() == "skeleton" && myAttribute->nodeValue().size()) {
+                dom::Node::WritableValue<VectorOfString> mySkeletonLock(myAttribute);
+                VectorOfString & myJointIds = mySkeletonLock.get();
+                for (unsigned i = 0; i < myJointIds.size(); ++i) {
+                    map<string, string>::iterator myNewId = theOldToNewIdMap.find(myJointIds[i]);
+                    if (myNewId != theOldToNewIdMap.end()) {
+                        myJointIds[i] = myNewId->second;
+                    } else {
+                        throw InvalidIdReference(string("Skeleton attribute '") + myAttribute->nodeValue() +
+                            "' points to unknown id: " + myJointIds[i], PLUS_FILE_LINE);
+                    }
+                }
+            }
         }
 
         // Recurse into child nodes

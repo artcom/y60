@@ -84,7 +84,7 @@ namespace y60 {
         if (mySkeletons.size() > 1) {
             throw SkinAndBonesException(string("More than one skeletons use the shape ") + myShapeId, PLUS_FILE_LINE);
         }
-        
+
         // Find connected joints
         NodePtr mySkeletonAttribute = mySkeletons[0]->getAttribute(SKELETON_ATTRIB);
 
@@ -95,6 +95,7 @@ namespace y60 {
 
         // Cache global matrix pointer and inverted initial matrices of all connected joints
         const VectorOfString & myJointIds = mySkeletonAttribute->nodeValueRef<VectorOfString>();
+        _myJoints.clear();
         for (unsigned i = 0; i < myJointIds.size(); ++i) {
             NodePtr myJoint = myWorldsNode->getElementById(myJointIds[i]);
 
@@ -102,7 +103,7 @@ namespace y60 {
                 throw SkinAndBonesException(std::string("Skeleton node points to unknown joint: ") + myJointIds[i] + "\n"
                     +asl::as_string(*mySkeletons[0]), PLUS_FILE_LINE);
             }
-            
+
             // Cache Joint Facade
             const JointFacadePtr myJointFacade = myJoint->getFacade<JointFacade>();
             _myJoints.push_back(myJointFacade);
@@ -137,7 +138,7 @@ namespace y60 {
             myBoundingBox->extendBy(asPoint(_myJoints[i]->get<GlobalMatrixTag>().getTranslation()));
         }
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
-        _myBoundingBoxNode->nodeValuePtrClose<Box3f>();        
+        _myBoundingBoxNode->nodeValuePtrClose<Box3f>();
 
    }
 }
