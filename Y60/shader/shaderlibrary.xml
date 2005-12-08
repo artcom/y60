@@ -717,7 +717,7 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
-    <shader id="s27" name="voxel_plasma" cost="400">
+    <shader id="s27" name="voxel_plasma" cost="120">
             <supports>
                 <feature class="textures" values="[paint]"/>
                 <feature class="lighting" values="[unlit]"/>
