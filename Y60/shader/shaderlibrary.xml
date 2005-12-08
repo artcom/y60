@@ -5,7 +5,7 @@
         <supports>
             <feature class="lighting" values="[lambert]"/>
             <feature class="textures" values="[paint,bump]"/>
-            <feature class="texcoord" values="[uv_map, uv_map]"/>            
+            <feature class="texcoord" values="[uv_map, uv_map]"/>
         </supports>
         <fragmentshader profile="FP30" file="phongBump.cg" entryfunction="mainFragment">
             <properties>
@@ -89,7 +89,7 @@
                 <vector3f name="position"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader>    
+    </shader>
     <shader id="s3" name="doubletex_lambert" cost="120">
         <supports>
             <feature class="textures" values="[paint,paint]"/>
@@ -694,7 +694,7 @@
                  <vector3f name="normal"/>
             </vertexparameters>
         </vertexshader>
-    </shader>    
+    </shader>
     <shader id="s26" name="generictex_lambert" cost="120">
         <supports>
             <feature class="textures" values="[paint]"/>
@@ -760,7 +760,7 @@
                 <vector3f name="position"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader>    
+    </shader>
     <shader id="s29" name="generic_tripletex_lambert" cost="120">
         <supports>
             <feature class="textures" values="[paint,paint,paint]"/>
@@ -784,7 +784,7 @@
                 <vector3f name="position"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader>    
+    </shader>
     <shader id="s30" name="generic_quadrupletex_lambert" cost="120">
         <supports>
             <feature class="textures" values="[paint,paint,paint,paint]"/>
@@ -809,11 +809,11 @@
                 <vector3f name="position"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader>    
-    <shader id="s31" name="hdr" cost="120">
+    </shader>
+    <shader id="s31" name="hdr" cost="10">
         <supports>
-            <feature class="textures" values="[paint]"/>
-            <feature class="lighting" values="[hdr]"/>
+            <feature class="textures" values="[hdr_paint]"/>
+            <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
         <vertexshader profile="VP30" file="hdr.cg" entryfunction="mainVertex">
@@ -832,6 +832,6 @@
                 <sampler2d name="tex">0</sampler2d>
             </properties>
         </fragmentshader>
-    </shader>    
+    </shader>
 </shaders>
 

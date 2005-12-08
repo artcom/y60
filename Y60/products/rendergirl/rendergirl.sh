@@ -16,7 +16,7 @@ fi
 shift
 shift
 
-APPLICATION=acgtkshellOPT
+APPLICATION=acgtkshell
 if [ "$DEBUG" == "1" ] ; then
     APPLICATION=acgtkshellDBG
 fi

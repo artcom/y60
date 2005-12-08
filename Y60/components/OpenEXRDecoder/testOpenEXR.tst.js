@@ -20,8 +20,6 @@
 */
 
 use("UnitTest.js");
-use("Overlay.js");
-use("Y60JSSL.js");
 
 function OpenEXRUnitTest() {
     this.Constructor(this, "OpenEXRUnitTest");
@@ -31,67 +29,49 @@ function OpenEXRUnitTest() {
 OpenEXRUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
-    var _myMaterial = null;
-    var _myHDRWindow = null;
-
-    obj.setWindow = function(theMin, theMax) {
-        theMax = 1.0;
-        if (theMin > theMax) {
-            var t = theMin;
-            theMin = theMax;
-            theMax = t;
-        }
-        _myHDRWindow.x = 1.0 / (theMax - theMin);
-        _myHDRWindow.y = -_myHDRWindow.x * theMin;
-        //print("min=" + theMin, "max=" + theMax, "window=" + _myHDRWindow);
-    }
+    obj.myHDRWindow = null;
 
     obj.run = function() {
         plug("y60OpenEXR");
-
         var window = new RenderWindow();
 
-        _myMaterial = window.scene.createTexturedMaterial("../../testimages/Desk.exr");
-        var myShape    = window.scene.createQuadShape(_myMaterial, [-0.4,-0.4,0], [0.4,0.4,0]);
-        var myBody     = window.scene.createBody(myShape);
+        GLResourceManager.loadShaderLibrary("../../../../shader/shaderlibrary.xml");
 
-        var myImage = window.scene.images.firstChild;
+        //var myScene = new Scene();
+        var myScene = window.scene;
+        var myMaterial = myScene.createTexturedMaterial("../../testimages/Desk.exr");
+        var myShape    = myScene.createQuadShape(myMaterial, [-0.4,-0.4,0], [0.4,0.4,0]);
+        var myBody     = myScene.createBody(myShape);
+
+        var myImage = myScene.images.firstChild;
         myImage.resize = "pad";
-        _myMaterial.requires.lighting = "[120[hdr]]";
-        window.scene.update(Scene.ALL);
+        myMaterial.requires.textures = "[100[hdr_paint]]";
 
+        window.scene = myScene;
         window.camera.position = [0,0,2];
 
-        window.onStartMainLoop = function() {
-            //print("onStartMainLoop");
-            //print(_myMaterial.properties.hdr);
+        window.onFrame = function(theTime) {
+            if (obj.myHDRWindow == null) {
+                obj.myHDRWindow = myMaterial.properties.hdr;
+                ENSURE("almostEqual(obj.myHDRWindow, [0,1])");
+            }
+            if (theTime > 1.0) {
+                window.stop();
+            }
+
+            window.renderText([10,10], "HDR scale: " + obj.myHDRWindow.x.toFixed(2) + ", bias: " + obj.myHDRWindow.y.toFixed(2));
         }
 
-        window.onFrame = function(theTime) {
-            if (_myHDRWindow == null) {
-                _myHDRWindow = _myMaterial.properties.hdr;
-                obj.setWindow(0,1);
-            }
-            if (theTime > 5.0) {
-                exit(0);
-            }
-        }
-        
         window.onMouseMotion = function(theX, theY) {
-            var min = theX / window.width;
-            var max = (window.height - theY) / window.height;
-            obj.setWindow(min, max);
+            obj.myHDRWindow.x = theX / window.width * 2; // scale
+            obj.myHDRWindow.y = (window.height - theY) * -2/ window.height; // bias
         }
         window.go();
-
-        obj.myVar = 1;
-        ENSURE('obj.myVar == 1');
     }
 };
 
 var myTestName = "testOpenEXR.tst.js";
 var mySuite = new UnitTestSuite(myTestName);
-
 mySuite.addTest(new OpenEXRUnitTest());
 mySuite.run();
 
