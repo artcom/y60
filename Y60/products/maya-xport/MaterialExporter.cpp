@@ -60,7 +60,7 @@
 #include <cctype> // needed for std::toupper
 
 #define DB(x) //x
-#define DB2(x)  x
+#define DB2(x)  //x
 
 using namespace std;
 using namespace asl;
@@ -120,26 +120,36 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
 {
     MStatus myStatus;
 
-    DB(dumpAttributes(theTextureNode));
 
     std::string myMaterialName = theBuilder.getName();
+    std::string myTextureName(MFnDependencyNode(theTextureNode).name().asChar());
+    DB(AC_PRINT << "dumping texture '" << myTextureName << "'");
+    DB(dumpAttributes(theTextureNode));
+    DB(
+        MPlugArray myConnections;
+        MFnDependencyNode(theTextureNode).getConnections(myConnections);
+        for(int i = 0;i < myConnections.length(); ++i) {
+            AC_PRINT << "CONN " << i << ": " <<myConnections[i].name();
+        }
+    );
 
     // texture mapping
     string myTextureMapping = getTextureMappingType(theTextureNode);
-    std::string myTextureName(MFnDependencyNode(theTextureNode).name().asChar());
+
+    MObject myImageNode = theTextureNode;
 
     MString myFileName("");
     if (myTextureMapping == y60::TEXCOORD_UV_MAP) {
-        MPlug myFilenamePlug = MFnDependencyNode(theTextureNode).findPlug("fileTextureName");
-        myFilenamePlug.getValue(myFileName);
         _myMaterialUVMappedTexturesMap[myMaterialName].push_back(myTextureName);
+        
     } else { // generative mapping
         MPlug myImagePlug = MFnDependencyNode(theTextureNode).findPlug("image");
-        MObject myImageNode;
         getConnectedNode(myImagePlug, myImageNode);
-        MPlug myFilenamePlug = MFnDependencyNode(myImageNode).findPlug("fileTextureName");
-        myFilenamePlug.getValue(myFileName);
     }
+    
+    MPlug myFilenamePlug = MFnDependencyNode(theTextureNode).findPlug("fileTextureName");
+    myFilenamePlug.getValue(myFileName);
+        
 
     std::string myStrippedFileName = myFileName.asChar();
     stripBaseDir(myStrippedFileName);
@@ -188,16 +198,15 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         theColorScale, theColorBias, SINGLE,"");
 
     // wrap
-    std::string myWrapMode = y60::TEXTURE_WRAP_REPEAT;
-
+    std::string myWrapMode  = y60::TEXTURE_WRAP_REPEAT;
     bool myWrapU = false;
-    MPlug myWarpUPlug = MFnDependencyNode(theTextureNode).findPlug("wrapU");
+    MPlug myWarpUPlug = MFnDependencyNode(myImageNode).findPlug("wrapU");
     if (myWarpUPlug.getValue(myWrapU) != MStatus::kSuccess) {
         AC_WARNING << "No wrapU";
     }
 
     bool myWrapV = false;
-    MPlug myWarpVPlug = MFnDependencyNode(theTextureNode).findPlug("wrapV");
+    MPlug myWarpVPlug = MFnDependencyNode(myImageNode).findPlug("wrapV");
     if (myWarpVPlug.getValue(myWrapV) != MStatus::kSuccess) {
         AC_WARNING << "No wrapV";
     }
@@ -337,7 +346,6 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
             setPropertyValue<VectorOfVector4f>(theBuilder.getNode(),
                     "vectorofvector4f", "texgenparam0", myTexGenParams);
 
-            myWrapMode = TEXTURE_WRAP_REPEAT;
         } else {
             /*
              * Use texture placement matrix
