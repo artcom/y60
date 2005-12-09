@@ -756,6 +756,7 @@ namespace dom {
         virtual void resize(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) = 0;
         virtual void add(const ValueBase & theRasterArg) = 0;
         virtual void sub(const ValueBase & theRasterArg) = 0;
+        virtual void clear() = 0;
         virtual asl::Vector4<float> getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const = 0;
         virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, float r, float g, float b, float a) = 0;
 
@@ -834,10 +835,14 @@ namespace dom {
             _myRasterValue.closeWriteableValue();
         }
 
+        virtual void clear() {
+            std::fill(pixels().begin(), pixels().end(), 0);
+        }
+
         virtual asl::Vector4<float> getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const {
             const T & myNativeRaster = _myRasterValue.getValue();
             PIXEL myPixel = myNativeRaster(x,y);
-            asl::Vector4<float> myColor((float)asl::getRedValue(myPixel), (float)asl::getGreenValue(myPixel), 
+            asl::Vector4<float> myColor((float)asl::getRedValue(myPixel), (float)asl::getGreenValue(myPixel),
                                         (float)asl::getBlueValue(myPixel), (float)asl::getAlphaValue(myPixel));
             return myColor;
         }
@@ -895,11 +900,11 @@ namespace dom {
             } else {
                 throw RasterArgumentTypeMismatch(JUST_FILE_LINE);
             }
-            
+
             _myRasterValue.closeWriteableValue();
         }
 
-        
+
         virtual void resize(asl::AC_SIZE_TYPE newWidth, asl::AC_SIZE_TYPE newHeight) {
             _myRasterValue.openWriteableValue().resize(newWidth, newHeight);
             _myRasterValue.closeWriteableValue();

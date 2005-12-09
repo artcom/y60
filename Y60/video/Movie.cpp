@@ -312,7 +312,7 @@ namespace y60 {
 
         Image::createRaster(_myDecoder->getPixelFormat());
         getRasterPtr()->resize(get<ImageWidthTag>(), get<ImageHeightTag>());
-
+        getRasterPtr()->clear();
     }
 
     bool

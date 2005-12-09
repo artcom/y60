@@ -68,7 +68,7 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
     obj.switchToState = function(theState) {
         _myAnimationManager.stop(_myCharacterName);
         _myStateQueue = new Array(theState);
-        print("Switched to state: " + theState);
+        //print("Switched to state: " + theState);
     }
 
     // add a statechange and a corresponding animation
@@ -102,7 +102,7 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
             var mySrcState  = _myStateQueue.shift();
             var myDestState = _myStateQueue[0];
             if (mySrcState in _myStateChangeAnims && myDestState in _myStateChangeAnims[mySrcState]) {
-                print("Statechange : from: " + mySrcState + " to: " + myDestState + " ");
+                //print("Statechange : from: " + mySrcState + " to: " + myDestState + " ");
                 changeClip(_myStateChangeAnims[mySrcState][myDestState], _myStateChangeParams[mySrcState][myDestState]);
             } else {
                 print("### WARNING Statechange from: " + mySrcState + " to: " + myDestState + " does not have a clip");
