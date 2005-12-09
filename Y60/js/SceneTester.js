@@ -84,7 +84,10 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
 
         if (myNewXmlScene.dom.toString() != myNewBinScene.dom.toString()) {
             print("comparing " + myXmlFilename + " and " + myBinXmlFilename + " failed.");
-            exit(1);
+            writeStringToFile("saved_binary_testscene.x60", myNewBinScene.dom.toString());
+            writeStringToFile("saved_xml_testscene.x60", myNewXmlScene.dom.toString());
+            print("inspect 'saved_binary_testscene.x60' and 'saved_xml_testscene.x60' for differences");
+	    exit(1);
         }
     }
 
