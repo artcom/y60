@@ -147,7 +147,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         getConnectedNode(myImagePlug, myImageNode);
     }
     
-    MPlug myFilenamePlug = MFnDependencyNode(theTextureNode).findPlug("fileTextureName");
+    MPlug myFilenamePlug = MFnDependencyNode(myImageNode).findPlug("fileTextureName");
     myFilenamePlug.getValue(myFileName);
         
 
