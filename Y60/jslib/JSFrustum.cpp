@@ -29,7 +29,8 @@ typedef asl::Frustum NATIVE;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns a string representation of the frustrum");
+    DOC_RVAL("The string", DOC_TYPE_STRING);
     DOC_END;
     std::string myStringRep = asl::as_string(JSFrustum::getJSWrapper(cx,obj).getNative());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -154,7 +155,7 @@ JSFrustum::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
 
 JSBool
 JSFrustum::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Creates a new empty frustrum");
     DOC_END;
     IF_NOISY2(cerr << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {

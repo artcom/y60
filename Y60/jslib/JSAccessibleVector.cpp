@@ -30,7 +30,9 @@ typedef JSWrapper<NATIVE_VECTOR,dom::ValuePtr> Base;
 
 static JSBool
 item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns one item of the vector");
+    DOC_PARAM("theIndex", "The index of the item to get", DOC_TYPE_INTEGER);
+    DOC_RVAL("The item", DOC_TYPE_OBJECT);
     DOC_END;
     typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(int);
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getElement,cx,obj,argc,argv,rval);
@@ -112,7 +114,7 @@ JSBool JSAccessibleVector::setPropertyIndex(unsigned long theIndex, JSContext *c
 
 JSBool
 JSAccessibleVector::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Constructs a new accessible vecotr");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {

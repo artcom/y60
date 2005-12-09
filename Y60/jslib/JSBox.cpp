@@ -304,7 +304,7 @@ JSBox3f::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 
 // getproperty handling
 JSBool
@@ -395,7 +395,12 @@ JSBox3f::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, 
 
 JSBool
 JSBox3f::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Constructs a new box object");
+    DOC_RESET;
+    DOC_PARAM("theCorner", "One corner of the box", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theCorner", "Another corner of the box", DOC_TYPE_VECTOR3F);
+    DOC_RESET;
+    DOC_PARAM("theOtherBox", "Construct from another box (copy constructor)", DOC_TYPE_BOX3F);
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {

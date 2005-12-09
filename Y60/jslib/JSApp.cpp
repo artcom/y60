@@ -515,7 +515,11 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 SaveImageFiltered(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Apply a filter to an image and save it to disk");
+    DOC_PARAM("theImageNode", "A image node in the X60-DOM to save", DOC_TYPE_NODE);
+    DOC_PARAM("theFileName", "The filename to save to", DOC_TYPE_STRING);
+    DOC_PARAM("theFilterName", "Name of the filter to apply to the image", DOC_TYPE_STRING);
+    DOC_PARAM("theFilterParams", "List of filter parameters", DOC_TYPE_VECTOROFFLOAT);
     DOC_END;
     try {
         if (argc != 4) {

@@ -40,17 +40,22 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 Append(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Appends data to a file inside the zip file.");
+    DOC_PARAM("theString", "A string to append to the zip-file.", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "The filename inside the zip file to append to.", DOC_TYPE_STRING);
+    DOC_RESET;
+    DOC_PARAM("theBlock", "A block of data to append to the zip-file.", DOC_TYPE_BLOCK);
+    DOC_PARAM("theFilename", "The filename inside the zip file to append to.", DOC_TYPE_STRING);
     DOC_END;
     try {
         ensureParamCount(argc, 2);
-        
+
         asl::ZipWriter * myNative = 0;
         if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
             JS_ReportError(cx,"ZipWriter::append: self is not a ZipWriter");
             return JS_FALSE;
         }
-      
+
         string myString;
         asl::Block * myBlock = 0;
         if (!convertFrom(cx, argv[0], myBlock) && !convertFrom(cx,argv[0], myString)) {
@@ -121,7 +126,7 @@ JSZipWriter::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj
 JSBool
 JSZipWriter::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a new ZipWriter from a file");
-    DOC_PARAM("theFileName", "", DOC_TYPE_STRING);
+    DOC_PARAM("theFileName", "The name of the output file.", DOC_TYPE_STRING);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
@@ -142,7 +147,7 @@ JSZipWriter::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
             return JS_FALSE;
         }
 
-        OWNERPTR myNewZipWriter = OWNERPTR(new asl::ZipWriter(myFilename));        
+        OWNERPTR myNewZipWriter = OWNERPTR(new asl::ZipWriter(myFilename));
 
         myNewObject = new JSZipWriter(myNewZipWriter, &(*myNewZipWriter));
     } else {

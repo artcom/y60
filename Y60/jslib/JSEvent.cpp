@@ -29,7 +29,8 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns the type of the native event");
+    DOC_RVAL("The string", DOC_TYPE_STRING);
     DOC_END;
     JSEvent::Base * myWrapperPtr = JSEvent::getJSWrapperPtr(cx,obj);
     if (myWrapperPtr) {
@@ -53,7 +54,7 @@ initEvent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     *rval = as_jsval(cx, true);
     return JS_TRUE;
 }
-static JSBool 
+static JSBool
 stopPropagation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Stop event propagation in dom.");
     DOC_END;
@@ -123,7 +124,7 @@ JSEvent::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 // getproperty handling
 JSBool
 JSEvent::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
@@ -181,11 +182,11 @@ JSEvent::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
 JSBool
 JSEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a dom event.");
-    DOC_PARAM("theEventIdentifier", "", DOC_TYPE_STRING);    
-    DOC_PARAM("thePayload", "", DOC_TYPE_OBJECT);    
+    DOC_PARAM("theEventIdentifier", "", DOC_TYPE_STRING);
+    DOC_PARAM("thePayload", "", DOC_TYPE_OBJECT);
     DOC_PARAM("theCanBubbleFlag", "", DOC_TYPE_BOOLEAN);
     DOC_PARAM("theCancelableFlag", "", DOC_TYPE_BOOLEAN);
-    DOC_PARAM("theTimeStamp", "", DOC_TYPE_OBJECT);    
+    DOC_PARAM("theTimeStamp", "", DOC_TYPE_OBJECT);
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());

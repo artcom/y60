@@ -437,7 +437,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         }
         static JSBool
         activateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Use this function to switch the OpenGL context to an offscreen windows.");
             DOC_END;
             DERIVED * mySelf;
             convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
@@ -446,7 +446,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
         }
         static JSBool
         deactivateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Use this function to switch of an OpenGL context of an offscreen window.");
             DOC_END;
             DERIVED * mySelf;
             convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
@@ -712,7 +712,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                     {
                         dom::NodePtr myCanvasNode(0);
                         if (convertFrom(cx, *vp, myCanvasNode)) {
-                            theNative.setCanvas(myCanvasNode);    
+                            theNative.setCanvas(myCanvasNode);
                             return JS_TRUE;
                         }
                         return JS_FALSE;

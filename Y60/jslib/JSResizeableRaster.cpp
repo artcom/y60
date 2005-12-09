@@ -155,7 +155,7 @@ JSBool JSResizeableRaster::setPropertyIndex(unsigned long theIndex, JSContext *c
 */
 JSBool
 JSResizeableRaster::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Creates a new resizable raster");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {

@@ -27,7 +27,8 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns the url of the request.");
+    DOC_RVAL("The string", DOC_TYPE_STRING);
     DOC_END;
     std::string myStringRep = JSRequestWrapper::getJSWrapper(cx,obj).getNative().getURL();
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -45,7 +46,8 @@ get(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 post(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Post a string as one block of data.");
-    DOC_PARAM("theData", "", DOC_TYPE_STRING);
+    DOC_PARAM("theData", "The data to post", DOC_TYPE_STRING);
+    DOC_RVAL("The size of the post buffer", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::post,cx,obj,argc,argv,rval);
 }
@@ -53,7 +55,8 @@ post(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 postFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Post a file as one block of data.");
-    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theFilename", "The filename to post", DOC_TYPE_STRING);
+    DOC_RVAL("The size of the post buffer", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::postFile,cx,obj,argc,argv,rval);
 }
@@ -70,8 +73,8 @@ addHttpHeader(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 getResponseHeader(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the HTTP Response header field with the name given by theHeader.");
-    DOC_PARAM("theHeader", "", DOC_TYPE_STRING);
-    DOC_RVAL("", DOC_TYPE_STRING);
+    DOC_PARAM("theHeader", "Name of the header field", DOC_TYPE_STRING);
+    DOC_RVAL("The requested http response header field", DOC_TYPE_STRING);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::getResponseHeader,cx,obj,argc,argv,rval);
 }
@@ -131,7 +134,7 @@ JSRequestWrapper::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 // getproperty handling
 JSBool
 JSRequestWrapper::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
@@ -170,7 +173,10 @@ JSRequestWrapper::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject
 
 JSBool
 JSRequestWrapper::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Creates a new RequestWrapper");
+    DOC_RESET;
+    DOC_PARAM("theUrl", "The url for the reqest", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theUserAgent", "The user agent", DOC_TYPE_STRING, "");
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
@@ -197,17 +203,17 @@ JSRequestWrapper::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
                 JS_ReportError(cx,"JSRequestWrapper::Constructor: bad argument #2 (undefined)");
                 return JS_FALSE;
             }
-    
+
             std::string myUserAgent = "";
             if (!convertFrom(cx, argv[1], myUserAgent)) {
                 JS_ReportError(cx, "JSRequestWrapper::Constructor: argument #2 must be an UserAgent");
                 return JS_FALSE;
             }
-            
+
             myNewRequest = OWNERPTR(new JSRequest(myURL, myUserAgent));
 
         }
-                    
+
         myNewObject = new JSRequestWrapper(myNewRequest, &(*myNewRequest));
         myNewRequest->setJSListener(cx, obj);
     } else {

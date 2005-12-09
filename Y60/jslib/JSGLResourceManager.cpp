@@ -21,7 +21,8 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns a string representation of the object");
+    DOC_RVAL("The string", DOC_TYPE_STRING);
     DOC_END;
     std::string myStringRep = std::string("GLResourceManager@") + as_string(obj);
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
@@ -29,18 +30,19 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
-static JSBool 
+static JSBool
 loadShaderLibrary(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Loads a given shader library.");
+    DOC_PARAM("theFileName", "Filename of the shaderlibrary to load", DOC_TYPE_STRING);
     DOC_END;
     try {
         std::string theShaderLibFile;
         convertFrom(cx,argv[0],theShaderLibFile);
 
         GLResourceManager::get().loadShaderLibrary(asl::expandEnvironment(theShaderLibFile));
-        JSApp::getPackageManager()->add(asl::getDirectoryPart(theShaderLibFile));    
+        JSApp::getPackageManager()->add(asl::getDirectoryPart(theShaderLibFile));
         return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION; 
+    } HANDLE_CPP_EXCEPTION;
 }
 
 JSFunctionSpec *
@@ -63,7 +65,7 @@ JSGLResourceManager::StaticFunctions() {
     };
     return myFunctions;
 }
- 
+
 JSPropertySpec *
 JSGLResourceManager::Properties() {
     static JSPropertySpec myProperties[] = {{0}};
@@ -105,7 +107,7 @@ JSGLResourceManager::setPropertySwitch(unsigned long theID, JSContext *cx, JSObj
 
 JSBool
 JSGLResourceManager::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Creates a new resource manager");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Base::Class()) {

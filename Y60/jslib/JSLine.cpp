@@ -45,15 +45,6 @@ JSLineSegment::ClassName() {
     return "LineSegment";
 }
 
-/*
-static JSBool
-normalize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    return Method<NATIVE>::call(&NATIVE::normalize,cx,obj,argc,argv,rval);
-}
-*/
-
 template<>
 JSPropertySpec *
 JSLineSegment::Properties() {
