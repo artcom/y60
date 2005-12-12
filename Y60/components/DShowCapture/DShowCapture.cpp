@@ -39,15 +39,21 @@ namespace y60 {
     }
 
     void DShowCapture::load(const std::string & theFilename) {
-        AC_INFO << "Load " << theFilename;
-        // Create frame grabber
+        AC_DEBUG << "DShowCapture::load " << theFilename;
 
-        unsigned myFrameRate = (unsigned)getFrameRate();
         int myFrameWidth = getFrameWidth();
         int myFrameHeight = getFrameHeight();
-        if (myFrameWidth == 0) myFrameWidth=320;
-        if (myFrameHeight == 0) myFrameHeight=240;
+        unsigned myFrameRate = (unsigned)getFrameRate();
+        unsigned myInputPinNumber = 0;
         unsigned myDeviceId = getDevice();
+
+        if (myFrameWidth == 0) {
+            myFrameWidth = 320;
+        }
+        if (myFrameHeight == 0) {
+            myFrameHeight = 240;
+        }
+
         ASSURE(NULL == _myGraph);
         _myGraph = new DShowGraph();
 
@@ -65,6 +71,10 @@ namespace y60 {
         if (idx != std::string::npos) {
             myFrameRate = asl::as_int(theFilename.substr(idx+4));
         }
+        idx = theFilename.find("input=");
+        if (idx != std::string::npos) {
+            myInputPinNumber = asl::as_int(theFilename.substr(idx+6));
+        }
         idx = theFilename.find("device=");
         if (idx != std::string::npos && theFilename.substr(idx+7).length() > 0) {
             myDeviceId = asl::as_int(theFilename.substr(idx+7));
@@ -73,11 +83,13 @@ namespace y60 {
         if (myDeviceId >= myDevices.size()) {
             throw DShowCapture::Exception("No such Device. Highest available DeviceId is: " + myDevices.size()-1, PLUS_FILE_LINE);
         } 
+
         setName(myDevices[myDeviceId]);
         setFrameRate(myFrameRate);
         setFrameHeight(myFrameHeight);
         setFrameWidth(myFrameWidth);
         setDevice(myDeviceId);
+
         // Setup video size and image matrix
         float myXResize = float(myFrameWidth) / asl::nextPowerOfTwo(myFrameWidth);
         float myYResize = float(myFrameHeight) / asl::nextPowerOfTwo(myFrameHeight);
@@ -88,7 +100,7 @@ namespace y60 {
         myMatrix.translate(asl::Vector3f(0, myYResize, 0));
         setImageMatrix(myMatrix);
         // Start Capturing
-		_myGraph->CaptureLive(myDeviceId); // set this to false if you don't want the video format dialog.
+		_myGraph->CaptureLive(myDeviceId, myInputPinNumber); // set this to false if you don't want the video format dialog.
     }
 
     std::string DShowCapture::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {

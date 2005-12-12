@@ -159,7 +159,7 @@ bool DShowGraph::buildCaptureGraph(IBaseFilter * pSrcFilter, int theIndex) {
 	return true;
 }
 
-bool DShowGraph::createFilterGraph(int theIndex)
+bool DShowGraph::createFilterGraph(int theIndex, unsigned theInputPinNumber)
 {
     IPin* pGrabIn = NULL, *pGrabOut = NULL;
 	HRESULT hr;
@@ -173,9 +173,10 @@ bool DShowGraph::createFilterGraph(int theIndex)
 
         buildCaptureGraph(NULL, theIndex);
 	}
-    configCrossbar();
+    configCrossbar(theInputPinNumber);
 	// Do some initialization of the extra filters
 	initExtraFilters();
+
 	// release the Pin
     SafeRelease( pGrabIn );
     SafeRelease( pGrabOut );
@@ -280,7 +281,7 @@ HRESULT DShowGraph::findCaptureDevice(IBaseFilter ** ppSrcFilter, int theDeviceI
                 // Add it to the application's list box.
                 USES_CONVERSION;
                 _myDevice = std::string(OLE2A(varName.bstrVal));
-                AC_INFO << "Capture Device is: " << _myDevice;
+                AC_DEBUG << "Capture Device is: " << _myDevice;
                 VariantClear(&varName); 
             }
             pPropBag->Release();
@@ -362,11 +363,11 @@ void DShowGraph::removeGraphFromRot(DWORD pdwRegister)
     }
 }
 
-void DShowGraph::CaptureLive(int theIndex)
+void DShowGraph::CaptureLive(int theIndex, unsigned theInputPinNumber)
 {
 	destroyFilterGraph();
 
-    if (createFilterGraph(theIndex))
+    if (createFilterGraph(theIndex, theInputPinNumber))
 		startGraph();
 	else {
 		destroyFilterGraph();
@@ -388,7 +389,7 @@ LONGLONG DShowGraph::Seek(int offset)
 	return cur_pos;
 };
 
-bool DShowGraph::createFilterGraph(IMoniker *videoDevice)
+bool DShowGraph::createFilterGraph(IMoniker *videoDevice, unsigned theInputPinNumber)
 {
     IPin* pGrabIn = NULL, *pGrabOut = NULL;
     HRESULT hr;
@@ -436,10 +437,10 @@ bool DShowGraph::createFilterGraph(IMoniker *videoDevice)
     return true; // success build the graph
 }
 
-bool DShowGraph::initCaptureLive (IMoniker * videoDevice) {
+bool DShowGraph::initCaptureLive (IMoniker * videoDevice, unsigned theInputPinNumber) {
 	destroyFilterGraph();
 
-    if (!createFilterGraph(videoDevice)) {
+    if (!createFilterGraph(videoDevice, theInputPinNumber)) {
 		destroyFilterGraph();
 		MessageBox(NULL, "Unable to build Filter Graph", NULL, MB_OK|MB_ICONEXCLAMATION|MB_TASKMODAL);
 		return false;
@@ -659,25 +660,28 @@ void DShowGraph::traceCrossbarInfo(IAMCrossbar *pXBar)
     {
         long lRelated = -1, lType = -1, lRouted = -1;
         hr = pXBar->get_CrossbarPinInfo(FALSE, i, &lRelated, &lType);
-        AC_INFO << "Output pin " << i << ": " << pinToString(lType);
+        AC_DEBUG << "Output pin " << i << ": " << pinToString(lType);
     }
 
     for (i = 0; i < cInput; i++)
     {
         long lRelated = -1, lType = -1;
         hr = pXBar->get_CrossbarPinInfo(TRUE, i, &lRelated, &lType);
-        AC_INFO << "Input pin " << i << " - " << pinToString(lType);
+        AC_DEBUG << "Input pin " << i << " - " << pinToString(lType);
     }
 }
 
-void DShowGraph::configCrossbar() {
+void DShowGraph::configCrossbar(unsigned theInputPinNumber) {
     // Search upstream for a crossbar.
     IAMCrossbar *pXBar1 = NULL;
     HRESULT hr = m_pCaptureGraphBuilder2->FindInterface(&LOOK_UPSTREAM_ONLY, NULL, m_pSrcFilter,
         IID_IAMCrossbar, (void**)&pXBar1);
     if (SUCCEEDED(hr)) 
     {
+        AC_DEBUG << "Routing Crossbar1 input=" << theInputPinNumber;
+        pXBar1->Route(0, theInputPinNumber);
         traceCrossbarInfo(pXBar1);
+        
         // Found one crossbar. Get its IBaseFilter interface.
         IBaseFilter *pFilter = NULL;
         hr = pXBar1->QueryInterface(IID_IBaseFilter, (void**)&pFilter);
@@ -691,6 +695,8 @@ void DShowGraph::configCrossbar() {
 
             if (SUCCEEDED(hr))
             {
+                AC_DEBUG << "Routing Crossbar2 input=" << theInputPinNumber;
+                pXBar2->Route(0, theInputPinNumber);
                 traceCrossbarInfo(pXBar2);
                 /* ... */
                 pXBar2->Release();
@@ -739,7 +745,7 @@ std::vector<std::string> DShowGraph::enumDevices() {
                 // Add it to the application's list box.
                 USES_CONVERSION;
                 myDeviceList.push_back(std::string(OLE2A(varName.bstrVal)));
-                AC_INFO << "Found Device " << myDeviceList.size()-1 << ": " << myDeviceList[myDeviceList.size()-1]; 
+                AC_DEBUG << "Found Device " << myDeviceList.size()-1 << ": " << myDeviceList[myDeviceList.size()-1]; 
                 VariantClear(&varName); 
             }
             pPropBag->Release();
