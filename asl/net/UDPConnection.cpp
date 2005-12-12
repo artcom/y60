@@ -42,11 +42,7 @@ namespace inet {
     {
         setRemoteAddr(thehost, theport);
 
-#ifdef WIN32 
-        if( ::connect(fd,&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) == 0 )
-#else            
         if( ::connect(fd,(struct sockaddr*)&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) == 0 )
-#endif
         {
             return true;
         }
