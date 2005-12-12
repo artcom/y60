@@ -8,10 +8,16 @@ using namespace dom;
 
 namespace y60 {
 
-    StlCodec::StlCodec(std::string theFilename, bool theBigEndianFlag) : _myBigEndianFlag(theBigEndianFlag) {
+    StlCodec::StlCodec(asl::Ptr<asl::ResizeableBlock> theBlock) : _myBlock(theBlock) {
+        _myOutputMode = BLOCK;
+    }
+
+    StlCodec::StlCodec(std::string theFilename, bool theBigEndianFlag) {
         if (theBigEndianFlag) {
+            _myOutputMode = BIGENDIAN;
             _myBigStream = asl::Ptr<WriteableArrangedFile<X86ByteOrder> >(new WriteableArrangedFile<X86ByteOrder>(theFilename));
         } else {
+            _myOutputMode = LITTLEENDIAN;
             _myLittleStream = asl::Ptr<WriteableArrangedFile<PowerPCByteOrder> >(new WriteableArrangedFile<PowerPCByteOrder>(theFilename));
         }
     }
@@ -125,18 +131,20 @@ namespace y60 {
     void 
     StlCodec::exportShape(const dom::NodePtr theNode) {
         ShapePtr myShape = theNode->getFacade<Shape>();
-        if (_myBigEndianFlag) {
-            if (myShape && _myBigStream) {
-                exportShapeToStream(myShape, *_myBigStream);
-            } else {
-                AC_ERROR << "Not a shape or not a filename while exporting.";
+        if (myShape && _myBigStream) {
+            switch (_myOutputMode) {
+                case BIGENDIAN:
+                    exportShapeToStream(myShape, *_myBigStream);
+                    break;
+                case LITTLEENDIAN:
+                    exportShapeToStream(myShape, *_myLittleStream);
+                    break;
+                case BLOCK:
+                    exportShapeToStream(myShape, *_myBlock);
+                    break;
             }
         } else {
-            if (myShape && _myLittleStream) {
-                exportShapeToStream(myShape, *_myLittleStream);
-            } else {
-                AC_ERROR << "Not a shape or not a filename while exporting.";
-            }
+            AC_ERROR << "Not a shape or not a filename while exporting.";
         }
     }
 
@@ -173,33 +181,35 @@ namespace y60 {
         }
         std::string myName("EXPORT");
         // Export a header
-        if (_myBigEndianFlag) {
-            if (_myBigStream) {
+        switch (_myOutputMode) {
+            case BIGENDIAN:
                 exportHeader(myName, myNumFaces, *_myBigStream);
-                for (int j = 0; j < theIds.size(); ++j) {
-                    dom::NodePtr myNode = theNode->getChildElementById(theIds[j], "id");
-                    if (myNode) {
-                        ShapePtr myShape = myNode->getFacade<Shape>();
-                        exportShapeToStream(myShape, *_myBigStream, false);
-                    } 
-                } 
-            } else {
-                AC_ERROR << "Not a filename while exporting.";
-            }
-        } else {
-            if (_myLittleStream) {
+                break;
+            case LITTLEENDIAN:
                 exportHeader(myName, myNumFaces, *_myLittleStream);
-                for (int j = 0; j < theIds.size(); ++j) {
-                    dom::NodePtr myNode = theNode->getChildElementById(theIds[j], "id");
-                    if (myNode) {
-                        ShapePtr myShape = myNode->getFacade<Shape>();
-                        exportShapeToStream(myShape, *_myLittleStream, false);
-                    }
-                }
-            } else {
-                AC_ERROR << "Not a filename while exporting.";
-            }
+                break;
+            case BLOCK:
+                exportHeader(myName, myNumFaces, *_myBlock);
+                break;
         }
+        // export shapes
+        for (int j = 0; j < theIds.size(); ++j) {
+            dom::NodePtr myNode = theNode->getChildElementById(theIds[j], "id");
+            if (myNode) {
+                ShapePtr myShape = myNode->getFacade<Shape>();
+                switch (_myOutputMode) {
+                    case BIGENDIAN:
+                        exportShapeToStream(myShape, *_myBigStream, false);
+                        break;
+                    case LITTLEENDIAN:
+                        exportShapeToStream(myShape, *_myLittleStream, false);
+                        break;
+                    case BLOCK:
+                        exportShapeToStream(myShape, *_myBlock, false);
+                        break;
+                }
+            } 
+        } 
     }
 
 

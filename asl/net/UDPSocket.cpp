@@ -28,7 +28,7 @@
 #include <asl/Logger.h>
 
 #include <errno.h>
-#ifdef LINUX
+#ifndef WIN32
 #include <unistd.h>
 #else
 #endif
@@ -65,10 +65,10 @@ namespace inet {
 
     unsigned UDPSocket::receiveFrom(asl::Unsigned32* thehost, asl::Unsigned16 * theport, void *data, const int maxlen)
     {
-#ifdef LINUX    
-        unsigned int fromsize;
-#else
+#ifdef WIN32    
         int fromsize;
+#else
+        unsigned int fromsize;
 #endif                
         fromsize=sizeof(_myLocalEndpoint);
 

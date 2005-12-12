@@ -46,7 +46,9 @@ public:
     enum PropertyNumbers {
         PROP_imag = -100,
         PROP_real,
-        PROP_length
+        PROP_length,
+        PROP_axis,
+        PROP_angle
     };
 
     static JSPropertySpec * Properties();

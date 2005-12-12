@@ -56,8 +56,8 @@ DragButton::on_motion_notify_event(GdkEventMotion * theEvent) {
         GetCursorPos(&absMousePos);
         SetCursorPos(absMousePos.x-int(myDeltaX), absMousePos.y-int(myDeltaY));
 #else        
-        _myLastX = theEvent->x;
-        _myLastY = theEvent->y;
+        _myLastX = int( theEvent->x);
+        _myLastY = int( theEvent->y);
 #endif        
 
 /* TODO: find a way to filter the events ... [DS]

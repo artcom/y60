@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 2003, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: JSToolButton.cpp,v $
+//   $RCSfile: JSSeparatorToolItem.cpp,v $
 //   $Author: martin $
 //   $Revision: 1.3 $
 //   $Date: 2004/11/26 13:01:25 $
@@ -17,7 +17,7 @@
 //=============================================================================
 
 #include "JSSignalProxies.h"
-#include "JSToolButton.h"
+#include "JSSeparatorToolItem.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
 #include <iostream>
@@ -32,14 +32,14 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    std::string myStringRep = string("Gtk::ToolButton@") + as_string(obj);
+    std::string myStringRep = string("Gtk::SeparatorToolItem@") + as_string(obj);
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
     *rval = STRING_TO_JSVAL(myString);
     return JS_TRUE;
 }
 
 JSFunctionSpec *
-JSToolButton::Functions() {
+JSSeparatorToolItem::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
@@ -50,10 +50,8 @@ JSToolButton::Functions() {
 }
 
 JSPropertySpec *
-JSToolButton::Properties() {
+JSSeparatorToolItem::Properties() {
     static JSPropertySpec myProperties[] = {
-        {"signal_clicked",  PROP_signal_clicked,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
-        {"stock_id",  PROP_stock_id,  JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -61,58 +59,40 @@ JSToolButton::Properties() {
 
 // getproperty handling
 JSBool
-JSToolButton::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSSeparatorToolItem::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return getPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSToolButton::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSSeparatorToolItem::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     return setPropertySwitch(myObj.getNative(), theID, cx, obj, id, vp);
 }
 
 JSBool
-JSToolButton::getPropertySwitch(NATIVE & theNative, unsigned long theID,
+JSSeparatorToolItem::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        case PROP_signal_clicked:
-            {
-                JSSignalProxy0<void>::OWNERPTR mySignal( new
-                        JSSignalProxy0<void>::NATIVE(theNative.signal_clicked()));
-                *vp = jslib::as_jsval(cx, mySignal);
-                return JS_TRUE;
-            }
-        case PROP_stock_id:
-            {
-                Glib::ustring myStockID( theNative.get_stock_id());
-                *vp = jslib::as_jsval(cx, myStockID);
-                return JS_TRUE;
-            }
+        case 0:
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
 }
 JSBool
-JSToolButton::setPropertySwitch(NATIVE & theNative, unsigned long theID,
+JSSeparatorToolItem::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        case PROP_stock_id:
-            {
-                Glib::ustring myStockId;
-                convertFrom(cx, *vp, myStockId);
-                theNative.set_stock_id( Gtk::StockID(myStockId) );
-                return JS_TRUE;
-            }
+        case 0:
         default:
             return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
 }
 
 JSBool
-JSToolButton::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSSeparatorToolItem::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
     if (JSA_GetClass(cx,obj) != Class()) {
@@ -122,34 +102,26 @@ JSToolButton::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
     NATIVE * newNative = 0;
 
-    JSToolButton * myNewObject = 0;
+    JSSeparatorToolItem * myNewObject = 0;
 
     if (argc == 0) {
-        newNative = new Gtk::ToolButton();
-    } else if (argc == 2) {
-        Gtk::Widget * myWidget(0);
-        convertFrom(cx, argv[0], myWidget);
-
-        Glib::ustring myLabel;
-        convertFrom(cx, argv[1], myLabel);
-
-        newNative = new Gtk::ToolButton(* myWidget, myLabel);
+        newNative = new Gtk::SeparatorToolItem();
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;
     }
-    myNewObject = new JSToolButton(OWNERPTR(newNative), newNative);
+    myNewObject = new JSSeparatorToolItem(OWNERPTR(newNative), newNative);
 
     if (myNewObject) {
         JS_SetPrivate(cx,obj,myNewObject);
         return JS_TRUE;
     }
-    JS_ReportError(cx,"JSToolButton::Constructor: bad parameters");
+    JS_ReportError(cx,"JSSeparatorToolItem::Constructor: bad parameters");
     return JS_FALSE;
 }
 /*
 JSConstIntPropertySpec *
-JSToolButton::ConstIntProperties() {
+JSSeparatorToolItem::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
             "POST",              PROP_HTTP_POST,         Request::HTTP_POST,
@@ -162,7 +134,7 @@ JSToolButton::ConstIntProperties() {
 */
 
 void
-JSToolButton::addClassProperties(JSContext * cx, JSObject * theClassProto) {
+JSSeparatorToolItem::addClassProperties(JSContext * cx, JSObject * theClassProto) {
     JSBASE::addClassProperties(cx, theClassProto);
     JSA_AddFunctions(cx, theClassProto, Functions());
     JSA_AddProperties(cx, theClassProto, Properties());
@@ -171,7 +143,7 @@ JSToolButton::addClassProperties(JSContext * cx, JSObject * theClassProto) {
 }
 
 JSObject *
-JSToolButton::initClass(JSContext *cx, JSObject *theGlobalObject) {
+JSSeparatorToolItem::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0 ,0);
     if (myClassObject) {
         addClassProperties(cx, myClassObject);
@@ -181,13 +153,13 @@ JSToolButton::initClass(JSContext *cx, JSObject *theGlobalObject) {
 //        JSObject * myConstructorFuncObj = JSVAL_TO_OBJECT(myConstructorFuncObjVal);
 //        JSA_DefineConstInts(cx, myConstructorFuncObj, ConstIntProperties());
     } else {
-        cerr << "JSToolButton::initClass: constructor function object not found, could not initialize static members"<<endl;
+        cerr << "JSSeparatorToolItem::initClass: constructor function object not found, could not initialize static members"<<endl;
     }
     return myClassObject;
 }
 
-jsval as_jsval(JSContext *cx, JSToolButton::OWNERPTR theOwner, JSToolButton::NATIVE * theNative) {
-    JSObject * myReturnObject = JSToolButton::Construct(cx, theOwner, theNative);
+jsval as_jsval(JSContext *cx, JSSeparatorToolItem::OWNERPTR theOwner, JSSeparatorToolItem::NATIVE * theNative) {
+    JSObject * myReturnObject = JSSeparatorToolItem::Construct(cx, theOwner, theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 

@@ -48,6 +48,12 @@ public:
         unsigned short color;
     };
 
+    enum OutputMode {
+        LITTLEENDIAN,
+        BIGENDIAN,
+        BLOCK
+    };
+    StlCodec(asl::Ptr<asl::ResizeableBlock> theBlock);
     StlCodec(std::string theFilename, bool theBigEndianFlag);
     virtual ~StlCodec();
     void exportShape(const dom::NodePtr theNode);
@@ -61,9 +67,11 @@ private:
     template <class AC_BYTE_ORDER_LOCAL>
     void exportFacet(const StlFacet & theFacet, asl::WriteableArrangedStream<AC_BYTE_ORDER_LOCAL> & theStream);
 
-    bool _myBigEndianFlag;
+    OutputMode _myOutputMode;
+    // depending on the outputmode, exactly one of the following are not null
     asl::Ptr<asl::WriteableArrangedFile<asl::X86ByteOrder> > _myBigStream;
     asl::Ptr<asl::WriteableArrangedFile<asl::PowerPCByteOrder> > _myLittleStream;
+    asl::Ptr<asl::ResizeableBlock> _myBlock;
 };
 
 } //namespace y60

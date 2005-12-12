@@ -26,7 +26,9 @@
 #include <y60/JSScene.h>
 #include <y60/JSSphere.h>
 #include <y60/JSVector.h>
+#include <y60/JSPlane.h>
 #include <y60/JSQuaternion.h>
+#include <y60/JSMatrix.h>
 #include <dom/Nodes.h>
 
 #include <asl/PackageManager.h>
@@ -64,12 +66,12 @@ loadSphere(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                                "expected 1 (theSize), got %d.", argc);
             return JS_FALSE;
         }
-        int mySlices;
+        asl::Vector3i mySize;
         if (!JSVAL_IS_NULL(argv[0])) {
-            convertFrom(cx, argv[0], mySlices);
+            convertFrom(cx, argv[0], mySize);
         }
         CTScan & myCTScan = myObj.getNative();
-        int slicesLoaded = myCTScan.loadSphere(mySlices);
+        int slicesLoaded = myCTScan.loadSphere(mySize);
         *rval = as_jsval(cx, slicesLoaded);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -130,8 +132,23 @@ getVoxelSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 }
 
 static JSBool
+getVoxelAspect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    return Method<JSCTScan::NATIVE>::call(&JSCTScan::NATIVE::getVoxelAspect,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 getValueRange(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<JSCTScan::NATIVE>::call(&JSCTScan::NATIVE::getValueRange,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+getVoxelPlane(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    return Method<JSCTScan::NATIVE>::call(&JSCTScan::NATIVE::getVoxelPlane,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+getModelViewMatrix(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    return Method<JSCTScan::NATIVE>::call(&JSCTScan::NATIVE::getModelViewMatrix,cx,obj,argc,argv,rval);
 }
 
 static JSBool
@@ -220,8 +237,6 @@ reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
             return JS_FALSE;
         }
         
-        int mySlice = 0;
-        convertFrom(cx, argv[1], mySlice);
         dom::NodePtr myImageNode;
         convertFrom(cx, argv[2], myImageNode);
         CTScan & myCTScan = myObj.getNative();
@@ -233,12 +248,19 @@ reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
                 JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #0 must be an Orientation or a Quaternion");
                 return JS_FALSE;
             }
+            asl::Vector3f mySlicePosition;
+            if (!convertFrom(cx, argv[1], mySlicePosition)) {
+                JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #1 must be an Vector3f for arbitrary angles");
+                return JS_FALSE;
+            }
             bool myInterpolateFlag = true;
             if (! JSVAL_IS_VOID(argv[3])) {
                 convertFrom(cx, argv[3], myInterpolateFlag);
             }
-            myCTScan.reconstructToImage(myOrientationQuaternion, mySlice, myImageNode, myInterpolateFlag);
+            myCTScan.reconstructToImage(myOrientationQuaternion, mySlicePosition, myImageNode, myInterpolateFlag);
         } else {
+            int mySlice = 0;
+            convertFrom(cx, argv[1], mySlice);
             myCTScan.reconstructToImage(static_cast<CTScan::Orientation>(myOrientationEnum), mySlice, myImageNode);
         }
         return JS_TRUE;
@@ -276,6 +298,12 @@ getReconstructionDimensions(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
+
+static JSBool
+getSliceThickness(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    return Method<JSCTScan::NATIVE>::call(&JSCTScan::NATIVE::getSliceThickness,cx,obj,argc,argv,rval);
+}
+
 
 static JSBool
 countTrianglesGlobal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -601,8 +629,11 @@ JSCTScan::Functions() {
         {"reconstructToImage",   reconstructToImage,      4},
         {"clear",                clear,                   0},
         {"verifyCompleteness",   verifyCompleteness,      0},
+        {"getModelViewMatrix",   getModelViewMatrix,      1},
+        {"getVoxelPlane",        getVoxelPlane,           2},
         {"setVoxelSize",         setVoxelSize,            1},
         {"getVoxelSize",         getVoxelSize,            0},
+        {"getVoxelAspect",       getVoxelAspect,          0},
         {"getVoxelDimensions",   getVoxelDimensions,      0},
         {"getValueRange",        getValueRange,           0},
         {"getOccurringValueRange", getOccurringValueRange,0},
@@ -614,6 +645,7 @@ JSCTScan::Functions() {
         {"computeHistogram",     computeHistogram,        1},
         {"computeProfile",       computeProfile,          1},
         {"getReconstructionDimensions", getReconstructionDimensions, 1},
+        {"getSliceThickness",    getSliceThickness, 1},
         {0}
     };
     return myFunctions;

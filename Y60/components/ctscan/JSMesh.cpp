@@ -26,6 +26,7 @@
 #include <y60/JSScene.h>
 #include <y60/JSSphere.h>
 #include <y60/JSVector.h>
+#include <y60/JSMatrix.h>
 #include <dom/Nodes.h>
 
 #include <asl/PackageManager.h>
@@ -104,6 +105,16 @@ computeError(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         JSClassTraits<Mesh>::ScopedNativeRef myObj(cx, obj);
         Mesh & myMesh = myObj.getNative();
         *rval = as_jsval(cx, myMesh.computeError());
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+removeMeshAndColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSClassTraits<Mesh>::ScopedNativeRef myObj(cx, obj);
+        Mesh & myMesh = myObj.getNative();
+        myMesh.removeMeshAndColor();
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -201,6 +212,35 @@ test(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+colorScreenSpaceLasso(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        ensureParamCount(argc, 3);
+        dom::NodePtr myLassoBody;
+        if (!convertFrom(cx, argv[0], myLassoBody)) {
+            JS_ReportError(cx,"JSCTScan::colorScreenSpaceLasso: param 1 must be a body node (lasso)");
+            return JS_FALSE;
+        }
+        dom::NodePtr myTransformationRoot;
+        if (!convertFrom(cx, argv[1], myTransformationRoot)) {
+            JS_ReportError(cx,"JSCTScan::colorScreenSpaceLasso: param 2 must be a body node (transformation root)");
+            return JS_FALSE;
+        }
+        asl::Matrix4f myViewProjection;
+        if (!convertFrom(cx, argv[2], myViewProjection)) {
+            JS_ReportError(cx,"JSCTScan::colorScreenSpaceLasso: param 3 must be a Matrix4f (view-projection matrix)");
+            return JS_FALSE;
+        }
+        unsigned int myColor;
+        if (!convertFrom(cx, argv[3], myColor)) {
+            JS_ReportError(cx,"JSCTScan::colorScreenSpaceLasso: param 4 must be an int (Color index)");
+            return JS_FALSE;
+        }
+        unsigned myNumVertices = Mesh::colorScreenSpaceLasso(myLassoBody, myTransformationRoot, myViewProjection, myColor);
+        *rval = as_jsval(cx, myNumVertices);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+static JSBool
 colorSweptSphere(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         ensureParamCount(argc, 4);
@@ -255,6 +295,7 @@ JSMesh::Functions() {
         {"colorizeDisconnected",    colorizeDisconnected,       1},
         {"computeError",            computeError,               0},
         {"setColor",                setColor,                   1},
+        {"removeMeshAndColor",      removeMeshAndColor,         0},
         {0}
     };
     return myFunctions;
@@ -265,6 +306,7 @@ JSMesh::StaticFunctions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         {"test",                    test,                       1},
+        {"colorScreenSpaceLasso",   colorScreenSpaceLasso,      4},
         {"colorSweptSphere",        colorSweptSphere,           4},
         // name                  native                   nargs
         {0}

@@ -160,7 +160,6 @@ JSPlane::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         myNewObject=new JSPlane(myNewValue);
     } else {
         if (argc == 2) {
-            // construct from three points
             JSObject * myObject = JSVector<asl::Vector3<Number> >::Construct(cx, argv[0]);
             if (!myObject) {
                 JS_ReportError(cx,"JSPlane::Constructor: first argument must be a normal vector of size 3",ClassName());
@@ -172,6 +171,7 @@ JSPlane::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
                 myNewPlane = asl::Plane<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject), Number(myNumber));
                 myNewPlane.normalize();
             } else {
+                // use normal/point-on-plane construction
                 JSObject * myObject2 = JSVector<asl::Vector3<Number> >::Construct(cx, argv[1]);
                 if (!myObject2) {
                     JS_ReportError(cx,"JSPlane::Constructor: second argument must be a distance number or point on the plane of size 3");

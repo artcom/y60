@@ -39,7 +39,6 @@ class DummyPump : public Singleton<DummyPump>, public Pump
         
         unsigned _curFrame;
         AudioBuffer<float> _myOutputBuffer;
-        AudioBuffer<float> _myTempBuffer;
 };
 
 }

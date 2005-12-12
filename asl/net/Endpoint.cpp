@@ -32,21 +32,21 @@ using namespace asl;
 
 namespace inet {
     Endpoint::Endpoint(const char * theHost, Unsigned16 myPort) {
-        memset(this, 0, sizeof(this));
+        memset(this, 0, sizeof(*this));
         sin_family=AF_INET;
         sin_addr.s_addr=htonl(asl::hostaddress(theHost));
         sin_port=htons(myPort);
     }
 
     Endpoint::Endpoint(Unsigned32 theHost, Unsigned16 myPort) {
-        memset(this, 0, sizeof(this));
+        memset(this, 0, sizeof(*this));
         sin_family=AF_INET;
         sin_addr.s_addr=htonl(theHost);
         sin_port=htons(myPort);
     }
 
     Endpoint::Endpoint() {
-        memset(this, 0, sizeof(this));
+        memset(this, 0, sizeof(*this));
         sin_family=AF_INET;
     }
 }

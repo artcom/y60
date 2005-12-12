@@ -63,11 +63,12 @@ class CTScan {
         virtual ~CTScan();
        
         int loadSlices(asl::PackageManager & thePackageManager, const std::string & theSubDir, const std::string& thePackage);
-        int loadSphere(int size);
+        int loadSphere(const asl::Vector3i & size);
         int setSlices(std::vector<dom::ResizeableRasterPtr> theSlices);
 
         void reconstructToImage(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);
-        void reconstructToImage(const asl::Quaternionf & theOrientation, int theSliceIndex, dom::NodePtr & theImageNode, bool theTrilliniarInterpolate = true);
+        void reconstructToImage(const asl::Quaternionf & theOrientation, const asl::Vector3f & theSlicePosition,
+                                dom::NodePtr & theImageNode, bool theTrilliniarInterpolate = true);
 
         /** Returns the default window center/width */
         const asl::Vector2f & getDefaultWindow() const;
@@ -158,6 +159,11 @@ class CTScan {
         static void applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
                                dom::NodePtr theBrushImage, const asl::Vector4f & theColor);
 
+        asl::Matrix4f getModelViewMatrix(const asl::Quaternionf & theOrientation);
+
+        // input in Voxels, output in VoxelSpace
+        asl::Planef getVoxelPlane(const asl::Quaternionf & theOrientation, float theMetricOffset);
+        
         // everything below this line is deprecated
         bool verifyCompleteness();
         void clear();
@@ -170,6 +176,9 @@ class CTScan {
 
         asl::Vector3i
         getReconstructionDimensions(const asl::Quaternionf & theOrientation) const;
+
+        float
+        getSliceThickness(const asl::Quaternionf & theOrientation) const;
 
     private:
         CTScan(const CTScan&); // hide copy constructor
@@ -194,6 +203,9 @@ class CTScan {
             }                
         }
 
+        void getReconstructionBounds(const asl::Quaterniond & theOrientation, 
+                asl::Box3d & theBounds, asl::Vector3i & theSize) const;
+
         asl::Box3f computeProjectionBounds(const asl::Matrix4f & theProjection) const;
 
         template <class VoxelT>
@@ -208,17 +220,18 @@ class CTScan {
          */
         template <class VoxelT>
         VoxelT
-        interpolatedValueAt(const asl::Vector3f & thePosition);
+        interpolatedValueAt(const asl::Vector3d & thePosition);
 
         /**
          * non interpolated voxel value at thePosition
          */
         template <class VoxelT>
         VoxelT
-        fastValueAt(const asl::Vector3f & thePosition);
+        fastValueAt(const asl::Vector3d & thePosition);
 
         template <class VoxelT>
-        void reconstructToImageImpl(const asl::Quaternionf & theOrientation, int theSliceIndex, dom::NodePtr & theImageNode, bool theTrilliniarInterpolate = true);
+        void reconstructToImageImpl(const asl::Quaternionf & theOrientation, const asl::Vector3f & theSlicePosition, 
+                                    dom::NodePtr & theImageNode, bool theTrilliniarInterpolate = true);
 
         template <class VoxelT>
         void reconstructToImageImpl(Orientation theOrientation, int theSliceIndex, dom::NodePtr & theImageNode);

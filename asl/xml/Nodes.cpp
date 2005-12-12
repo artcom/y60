@@ -2404,7 +2404,7 @@ enum {
 };
 
 void dumpType(unsigned short theType) {
-    std::cerr << "Type = " << (void*)(int)theType << ", "<< dom::NodeTypeName[theType&0xf] << ",";
+    std::cerr << "Type = " << (void*)(ptrdiff_t)theType << ", "<< dom::NodeTypeName[theType&0xf] << ",";
     if (theType&hasName) cerr << "N ";
     if (theType&hasValue) cerr << "V ";
     if (theType&hasTypedValue) cerr << "TV ";

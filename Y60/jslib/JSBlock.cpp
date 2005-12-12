@@ -174,6 +174,18 @@ bool convertFrom(JSContext *cx, jsval theValue, JSBlock::NATIVE *& theBlock) {
     }
     return false;
 }
+bool convertFrom(JSContext *cx, jsval theValue, JSBlock::OWNERPTR & theBlock) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSBlock::NATIVE >::Class()) {
+                theBlock = JSBlock::getJSWrapper(cx,myArgument).getOwner();
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner) {
     JSObject * myReturnObject = JSBlock::Construct(cx, theOwner, &(*theOwner));

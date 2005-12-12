@@ -245,9 +245,7 @@ public:
     void setup() {
         inet::initSockets();
         UnitTestSuite::setup(); // called to print a launch message
-        addTest(new ConduitTest<TCPPolicy>("TCPPolicy", 
-                    TCPPolicy::Endpoint("127.0.0.1",5678)));
-#ifdef LINUX
+#ifndef WIN32
         addTest(new ConduitTest<LocalPolicy>("LocalPolicy", 
                     "TestConduit"));
 
@@ -255,6 +253,8 @@ public:
         addTest(new MessageConduitTest<LocalPolicy>("LocalPolicy", 
                     "TestConduit"));
 #endif        
+        addTest(new ConduitTest<TCPPolicy>("TCPPolicy", 
+                    TCPPolicy::Endpoint("127.0.0.1",5678)));
         addTest(new MessageConduitTest<TCPPolicy>("TCPPolicy", 
                     TCPPolicy::Endpoint("127.0.0.1",5678)));
 

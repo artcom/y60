@@ -19,6 +19,7 @@
 #include "JSGrayScale.h"
 #include "JSTNTMeasurementList.h"
 #include "JSTNTThresholdList.h"
+#include "JSACIconFactory.h"
 
 // standard Gtk widgets
 #include "JSFrame.h"
@@ -45,6 +46,7 @@
 #include "JSRadioToolButton.h"
 #include "JSToggleToolButton.h"
 #include "JSToolButton.h"
+#include "JSSeparatorToolItem.h"
 #include "JSToolItem.h"
 #include "JSButton.h"
 #include "JSACColumnRecord.h"
@@ -110,6 +112,9 @@ using namespace asl;
 bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
 
     // === Custom ART+COM Widgets =======================================
+    if (!JSACIconFactory::initClass(cx, theGlobalObject)) {
+        return false;
+    }
     if (!JSGrayScale::initClass(cx, theGlobalObject)) {
         return false;
     }
@@ -187,6 +192,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSToggleButton::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSSeparatorToolItem::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSToolItem::initClass(cx, theGlobalObject)) {
@@ -427,6 +435,7 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::RadioToolButton );
     TRY_DYNAMIC_CAST(Gtk::ToggleToolButton );
     TRY_DYNAMIC_CAST(Gtk::ToolButton );
+    TRY_DYNAMIC_CAST(Gtk::SeparatorToolItem );
     TRY_DYNAMIC_CAST(Gtk::ToolItem );
     TRY_DYNAMIC_CAST(Gtk::TreeView );
     TRY_DYNAMIC_CAST(Gtk::Entry );
@@ -568,6 +577,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
                 return true;
             } else if (castFrom<Gtk::ToolButton>(cx, myArgument, theTarget)) {
                 return true;
+            } else if (castFrom<Gtk::SeparatorToolItem>(cx, myArgument, theTarget)) {
+                return true;
             } else if (castFrom<Gtk::ToolItem>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::Entry>(cx, myArgument, theTarget)) {
@@ -692,6 +703,7 @@ CONVERT_FROM_GLIB_OBJECT(Gtk::Button);
 CONVERT_FROM_GLIB_OBJECT(Gtk::RadioToolButton);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ToggleToolButton);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ToolButton);
+CONVERT_FROM_GLIB_OBJECT(Gtk::SeparatorToolItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ToolItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Entry);
 CONVERT_FROM_GLIB_OBJECT(Gtk::TreeView);

@@ -1,4 +1,4 @@
-/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//==============================================================================
 //
 // Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
 //
@@ -37,10 +37,11 @@
 //       - improve documentation
 //       - reduce number of #ifdefs
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-*/
+
 #ifndef _included_asl_AtomicCount_
 #define _included_asl_AtomicCount_
 
+#include <iostream>
 
 /*! \addtogroup aslbase */
 /* @{ */
@@ -249,95 +250,116 @@ inline int atomic_conditional_decrement_SingleProcessor(atomic_t * pw )
 
 #ifdef OSX
 
-// taken from http://www.mulle-kybernetik.com/artikel/Optimization/opti-4-atomic.html
-
-static inline
-int
-atomic_inc( int *p) {
-    int tmp;
-    asm volatile(
-            "1:     lwarx   %0,0,%1\n"
-            "       addic   %0,%0,1\n"
-            "       stwcx.  %0,0,%1\n"
-            "       bne-    1b"
-            : "=&r" (tmp)
-            : "r" (p)
-            : "cc", "memory");
-
-    return( tmp);
-}
-
-static inline
-int
-atomic_dec( int *p) {
-    int tmp;
-    asm volatile(
-            "1:     lwarx   %0,0,%1\n"
-            "       addic   %0,%0,-1\n"
-            "       stwcx.  %0,0,%1\n"
-            "       bne-    1b"
-            : "=&r" (tmp)
-            : "r" (p)
-            : "cc", "memory");
-
-    return( tmp);
-}
-
 // Taken from boost/detail/sp_counted_base_gcc_ppc.hpp.
 // This hasn't even been compiled, much less tested!
 
-inline long atomic_conditional_increment( long * pw )
+inline int atomic_inc( int * pw )
 {
-    // if( *pw != 0 ) ++*pw;
-    // return *pw;
+    // ++*pw;
 
-    long rv;
-    __asm__
+    int tmp;
+
+    __asm__ __volatile__
     (
+        "sync\n\t"
         "0:\n\t"
         "lwarx %1, 0, %2\n\t"
-        "cmpwi %1, 0\n\t"
-        "beq 1f\n\t"
         "addi %1, %1, 1\n\t"
-        "1:\n\t"
         "stwcx. %1, 0, %2\n\t"
-        "bne- 0b":
+        "bne- 0b\n\t"
+        "isync":
+
+        "=m"( *pw ), "=&b"( tmp ):
+        "r"( pw ):
+        "memory", "cc"
+    );
+    return tmp;
+}
+
+inline int atomic_dec( int * pw )
+{
+    // return --*pw;
+
+    int rv;
+
+    __asm__ __volatile__
+    (
+        "sync\n\t"
+        "0:\n\t"
+        "lwarx %1, 0, %2\n\t"
+        "addi %1, %1, -1\n\t"
+        "stwcx. %1, 0, %2\n\t"
+        "bne- 0b\n\t"
+        "isync":
 
         "=m"( *pw ), "=&b"( rv ):
         "r"( pw ):
-        "cc"
+        "memory", "cc"
     );
 
     return rv;
 }
 
-inline int __declspec(fastcall) atomic_conditional_decrement(atomic_t * pw )
+
+inline int atomic_conditional_increment( volatile int * pw )
 {
-    // int rv = *pw;
-    // if( rv != 0 ) --*pw;
-    // return rv == 1;
+    // if( *pw != 0 ) ++*pw;
+    // return *pw;
 
     int rv, tmp;
-
-    __asm
-    {
-        "movl %0, %%eax\n\t"
+    __asm__ __volatile__
+    (
+        "sync\n\t"
         "0:\n\t"
-        "test %%eax, %%eax\n\t"
-        "je 1f\n\t"
-        "movl %%eax, %2\n\t"
-        "decl %2\n\t"
-        "lock\n\t"
-        "cmpxchgl %2, %0\n\t"
-        "jne 0b\n\t"
-        "1:":
-        "=m"( *pw ), "=&a"( rv ), "=&r"( tmp ): // outputs (%0, %1, %2)
-        "m"( *pw ): // input (%3)
-        "cc" // clobbers
-    };
+        "lwarx %1, 0, %3\n\t"
+        "cmpwi %1, 0\n\t"
+        "beq 1f\n\t"         // XXX was: beq 1f
+        "mr %2, %1\n\t"
+        "addi %2, %2, 1\n\t"
+        "stwcx. %2, 0, %3\n\t"
+        "bne- 0b\n\t"
+        "1:\n\t"
+        "isync":
+        "=m"( *pw ), "=&b"( rv ), "=&b"( tmp ):
+        "r"( pw ):
+        "memory", "cc"
+    );
 
-    return rv!=1;
+    return rv;
 }
+
+inline int atomic_conditional_decrement( volatile int * pw )
+{
+    int rv, tmp;
+    __asm__ __volatile__
+    (
+        "sync\n\t"
+        "0:\n\t"
+        "lwarx %1, 0, %3\n\t"
+        "cmpwi %1, 0\n\t"
+        "beq 1f\n\t"         // XXX was: beq 1f
+        "mr %2, %1\n\t"
+        "subi %2, %2, 1\n\t"
+        "stwcx. %2, 0, %3\n\t"
+        "bne- 0b\n\t"
+        "1:\n\t"
+        "isync":
+        "=m"( *pw ), "=&b"( rv ), "=&b"( tmp ):
+        "r"( pw ):
+        "memory", "cc"
+    );
+
+    return rv==1;
+}
+
+inline int atomic_conditional_decrement_SingleProcessor(int volatile* pw) {
+    return atomic_conditional_decrement(pw);
+}
+
+inline int atomic_conditional_increment_SingleProcessor(int volatile* pw) {
+    return atomic_conditional_increment(pw);
+}
+
 
 #endif
 

@@ -7,13 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: SliceViewer.js,v $
-//   $Author: danielk $
-//   $Revision: 1.97 $
-//   $Date: 2005/04/29 13:49:59 $
-//
-//=============================================================================
 
 #ifndef ACGTK_EMBEDDED_BUTTON_INCLUDED
 #define ACGTK_EMBEDDED_BUTTON_INCLUDED

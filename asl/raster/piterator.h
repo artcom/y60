@@ -70,7 +70,7 @@ inline asl::AC_OFFSET_TYPE * distance_type(const T *) {
 
 template <class Iterator, class T>
 T* pointer(Iterator& b, T*) {
-//    cerr << "[pointer(" << (void*)&b << ") returns " << (void*)&(*b) << "]" << endl;
+//    std::cerr << "[pointer(" << (void*)&b << ") returns " << (void*)&(*b) << "]" << std::endl;
     return &(*b);
 }
 
@@ -78,7 +78,7 @@ namespace asl {
 
 template <class Iterator, class T>
 inline T* iseek(T*a, Iterator b) {
-//    cerr << "[iseek(" << (void*)a << "," << (void*)&(*b) << ")]" <<endl;
+//    std::cerr << "[iseek(" << (void*)a << "," << (void*)&(*b) << ")]" <<endl;
     return &(*b);
 }
 
@@ -104,26 +104,26 @@ public:
     step_iterator() {}
     step_iterator(const self& x) {current = x.current; step = x.step;}
     step_iterator(RandomAccessIterator x, Distance Step) : current(x) , step(Step) {
-        //	cerr << "step_iterator(current = " << (void*)&(*x) << ", step = " << step << ")" << endl;
+        //  std::cerr << "step_iterator(current = " << (void*)&(*x) << ", step = " << step << ")" << std::endl;
     }
     RandomAccessIterator base() { return current; }
     Reference operator*() const { return *current; }
     self& operator++() {
-	    current+=step;
+        current+=step;
         return *this;
     }
     self operator++(int) {
         self tmp = *this;
-	    current+=step;
+        current+=step;
         return tmp;
     }
     self& operator--() {
-	    current-=step;
+        current-=step;
         return *this;
     }
     self operator--(int) {
         self tmp = *this;
- 	    current-=step;
+        current-=step;
         return tmp;
     }
     self operator+(Distance n) const {
@@ -252,8 +252,8 @@ public:
     rect_iterator(hiterator hbegin, viterator vbegin, Distance h_size)
         : hiter(hbegin) , viter(vbegin) , current(hbegin) 
         {
-            //	    assert(pointer(hbegin, ptr_T()) == pointer(vbegin, ptr_T()));
-            // cerr <<"rect_iterator( hbegin = " << (void*)&(*hbegin) << ", vbegin = " << (void*)&(*vbegin) << ", h_size = " << h_size <<  endl;
+            //      assert(pointer(hbegin, ptr_T()) == pointer(vbegin, ptr_T()));
+            // std::cerr <<"rect_iterator( hbegin = " << (void*)&(*hbegin) << ", vbegin = " << (void*)&(*vbegin) << ", h_size = " << h_size <<  std::endl;
 
             begin_of_line = vbegin;
             end_of_line = viter(hbegin + h_size);
@@ -274,7 +274,7 @@ public:
     */
     rect_iterator(hiterator hbegin, viterator vbegin, Distance h_size, hiterator cur)
         : hiter(hbegin) , viter(vbegin) , current(cur) {
-          /*  	    cerr <<"rect_iterator( hbegin = " << (void*)&(*hbegin) << ", vbegin = " << (void*)&(*vbegin) << ", h_size = " << h_size << ", cur = " << (void*)&(*cur) <<")" << endl;
+          /*        std::cerr <<"rect_iterator( hbegin = " << (void*)&(*hbegin) << ", vbegin = " << (void*)&(*vbegin) << ", h_size = " << h_size << ", cur = " << (void*)&(*cur) <<")" << std::endl;
             */
             assert(&(*hbegin) == &(*vbegin));
 
@@ -282,7 +282,7 @@ public:
 
             Distance vd = viter(cur) - vbegin;
             if (vd) {
-                //  cerr << "!!! rect_iterator: vd = " << vd << endl;
+                //  std::cerr << "!!! rect_iterator: vd = " << vd << std::endl;
                 begin_of_line+=vd;
             }
             end_of_line = viter(hiter(begin_of_line) + h_size);
@@ -297,16 +297,16 @@ public:
     Distance hsize() const {
         hiterator eoln = hiter(end_of_line);
         hiterator bgnln = hiter(begin_of_line);
-        	    //cerr << "eoln =" << (void*)&(*eoln) << endl;
-        	    //cerr << "bgnln =" << (void*)&(*bgnln) << endl;
+                //cerr << "eoln =" << (void*)&(*eoln) << std::endl;
+                //cerr << "bgnln =" << (void*)&(*bgnln) << std::endl;
         Distance d = eoln - bgnln;
-        	    //cerr << "hsize() returning d =" << d << endl;
+                //cerr << "hsize() returning d =" << d << std::endl;
         return d;
     }
 
     hiterator base() { return current; }
     Reference operator*() const { 
-        	    // cerr << "mat_it deref @" << (void*)&(*current) << ", val = " << *current << endl;
+                // std::cerr << "mat_it deref @" << (void*)&(*current) << ", val = " << *current << std::endl;
         return *current;
     }
 
@@ -326,45 +326,45 @@ public:
 
     void increment()
     {
-        //	    std::cerr << "before incr:" << endl;
-        //	    debug();
+        //      std::cerr << "before incr:" << std::endl;
+        //      debug();
         ++current;
-        //	    if ( pointer(current, ptr_T()) == pointer(end_of_line, ptr_T()))
+        //      if ( pointer(current, ptr_T()) == pointer(end_of_line, ptr_T()))
         if ( &(*current) == &(*end_of_line))
         {
-            //	        std::cerr << "EOL encountered..." << endl;
+            //          std::cerr << "EOL encountered..." << std::endl;
             ++begin_of_line;
             ++end_of_line;
             current = iseek(current, begin_of_line);
         }
-        //	    std::cerr << "after incr:" << endl;
-        //	    debug();
+        //      std::cerr << "after incr:" << std::endl;
+        //      debug();
     }
     void vincrement()
     {
-        //	    std::cerr << "before vincr:" << endl;
-        //	    debug();
+        //      std::cerr << "before vincr:" << std::endl;
+        //      debug();
         viterator vcurrent = viter(current);
         ++vcurrent;
         current = hiter(vcurrent);
         ++begin_of_line;
         ++end_of_line;
 
-        //	std::cerr << "after vincr:" << endl;
-        //	debug();
+        //  std::cerr << "after vincr:" << std::endl;
+        //  debug();
     }
     void vadd(Distance n)
     {
-        //	    std::cerr << "before vadd " << n << endl;
-        //	    debug();
+        //      std::cerr << "before vadd " << n << std::endl;
+        //      debug();
         viterator vcurrent = viter(current);
         vcurrent+=n;
         current = hiter(vcurrent);
         begin_of_line+=n;
         end_of_line+=n;
 
-        //	    std::cerr << "after vadd " << n << endl;
-        //	    debug();
+        //      std::cerr << "after vadd " << n << std::endl;
+        //      debug();
     }
 
     void decrement()
@@ -381,9 +381,9 @@ public:
     }
 
     Distance x() const {
-        //std::cerr << "current:" << (void*)&(*current) << endl;
-        //std::cerr << "bgnofln:" << (void*)&(*begin_of_line) << endl;
-        //std::cerr << "hiter(bngofln):" << (void*)&(*hiter(begin_of_line)) << endl;
+        //std::cerr << "current:" << (void*)&(*current) << std::endl;
+        //std::cerr << "bgnofln:" << (void*)&(*begin_of_line) << std::endl;
+        //std::cerr << "hiter(bngofln):" << (void*)&(*hiter(begin_of_line)) << std::endl;
         return current - hiter(begin_of_line);
     }
     Distance y() const {return begin_of_line - viter(hiter.begin);}
@@ -486,7 +486,7 @@ template <class hIterator, class vIterator,class T, class Reference, class Dista
 inline rect_iterator<hIterator, vIterator, T, Reference, Distance> 
 iseek(const rect_iterator<hIterator, vIterator, T, Reference, Distance>& a, const DestIterator& b) {
     return rect_iterator<hIterator, vIterator, T, Reference, Distance>(
-		  a.hiter.begin, a.viter.begin, a.hsize(), iseek(a.current, b));
+          a.hiter.begin, a.viter.begin, a.hsize(), iseek(a.current, b));
 }
 
 } // namespace asl
@@ -521,19 +521,17 @@ template <class RandomAccessIterator, class T, class Reference = T &, class Dist
 class fraction_iterator {
     typedef fraction_iterator<RandomAccessIterator, T, Reference, Distance> self;
     //typedef frac<Distance> fraction;
-#ifdef OSX
     typedef double fraction;
-#else
-    typedef float fraction;
-#endif
 
 #ifdef STD_FRIENDS
+#warning "Have STD_FRIENDS"
     friend bool operator==(const self& x, const self& y);
     friend bool operator<(const self& x, const self& y);
     friend Distance operator-(const self& x, const self& y);
     friend self operator+(Distance n, const self& x);
 #else
 #ifdef P_DECLARE_FRIEND_OPS
+#warning "Have P_DECLARE_FRIEND_OPS"
     friend bool operator== <>(const self& x, const self& y);
     friend bool operator< <>(const self& x, const self& y);
     friend Distance operator- <>(const self& x, const self& y);
@@ -562,26 +560,26 @@ public:
           current_fraction(stepsize - floor(stepsize)) 
     {
         
-        //	std::cerr << " current = " << (void*)&(*current) << endl;
-        //	std::cerr << " stepsize = " << stepsize << endl;
-        //	std::cerr << " current_fraction = " << current_fraction << endl;
+        //  std::cerr << " current = " << (void*)&(*current) << std::endl;
+        //  std::cerr << " stepsize = " << stepsize << std::endl;
+        //  std::cerr << " current_fraction = " << current_fraction << std::endl;
     }
     fraction_iterator(RandomAccessIterator x, fraction Stepsize, fraction Current_fraction) 
         : current(x) ,stepsize(Stepsize), current_fraction(Current_fraction) {
 
-            //	cerr << " current = " << (void*)&(*current) << endl;
-            //	cerr << " stepsize = " << stepsize << endl;
-            //	cerr << " current_fraction = " << current_fraction << endl;
+            //  std::cerr << " current = " << (void*)&(*current) << std::endl;
+            //  std::cerr << " stepsize = " << stepsize << std::endl;
+            //  std::cerr << " current_fraction = " << current_fraction << std::endl;
         }
     fraction_iterator(RandomAccessIterator x, fraction Stepsize) 
-        //	: current(x) ,stepsize(Stepsize), current_fraction(1, 2) {
+        //  : current(x) ,stepsize(Stepsize), current_fraction(1, 2) {
         : current(x),
           stepsize(Stepsize),
           current_fraction(stepsize - floor(stepsize)) 
         {
-            //	cerr << " current = " << (void*)&(*current) << endl;
-            //	cerr << " stepsize = " << stepsize << endl;
-            //	cerr << " current_fraction = " << current_fraction << endl;
+            //  std::cerr << " current = " << (void*)&(*current) << std::endl;
+            //  std::cerr << " stepsize = " << stepsize << std::endl;
+            //  std::cerr << " current_fraction = " << current_fraction << std::endl;
         }
     RandomAccessIterator base() { return current; }
     const RandomAccessIterator& base() const { return current; }
@@ -591,25 +589,25 @@ public:
     void increment() {
 //#define DEBUG_FRACTION_ITERATOR
 #ifdef DEBUG_FRACTION_ITERATOR
-        cerr << " increment() " << endl;
-        cerr << " current_fraction = " << current_fraction << endl;
-        cerr << " stepsize = " << stepsize << endl;
+        std::cerr << " increment() " << std::endl;
+        std::cerr << " current_fraction = " << current_fraction << std::endl;
+        std::cerr << " stepsize = " << stepsize << std::endl;
 #endif
         current_fraction+=stepsize;
 #ifdef DEBUG_FRACTION_ITERATOR
-        cerr << " current_fraction += stepsize= " << current_fraction << endl;
+        std::cerr << " current_fraction += stepsize= " << current_fraction << std::endl;
 #endif
         Distance n = (Distance)floor(current_fraction);
 #ifdef DEBUG_FRACTION_ITERATOR
-        cerr << " n = " << n << endl;
+        std::cerr << " n = " << n << std::endl;
 #endif
         current_fraction -= fraction(n); 
 #ifdef DEBUG_FRACTION_ITERATOR
-        cerr << " current_fraction -= n= " << current_fraction << endl;
+        std::cerr << " current_fraction -= n= " << current_fraction << std::endl;
 #endif
         current+=n;
 #ifdef DEBUG_FRACTION_ITERATOR
-        cerr << " current += n= " << (void*)&(*current) << endl;
+        std::cerr << " current += n= " << (void*)&(*current) << std::endl;
 #endif
     }
     void decrement() {
@@ -619,17 +617,17 @@ public:
         current-=n;
     }
     void add(Distance f) {
-        //	cerr << " add(" << f << ") " << endl;
-        //	cerr << " current_fraction = " << current_fraction << endl;
-        //	cerr << " stepsize*f = " << stepsize*f << endl;
+        //  std::cerr << " add(" << f << ") " << std::endl;
+        //  std::cerr << " current_fraction = " << current_fraction << std::endl;
+        //  std::cerr << " stepsize*f = " << stepsize*f << std::endl;
         current_fraction+=stepsize*f;
-        //	cerr << " current_fraction += stepsize= " << current_fraction << endl;
+        //  std::cerr << " current_fraction += stepsize= " << current_fraction << std::endl;
         Distance n = (Distance)floor(current_fraction);
-        //	cerr << " n = " << n << endl;
+        //  std::cerr << " n = " << n << std::endl;
         current_fraction -= fraction(n); 
-        //	cerr << " current_fraction -= n= " << current_fraction << endl;
+        //  std::cerr << " current_fraction -= n= " << current_fraction << std::endl;
         current+=n;
-        //	cerr << " current += n= " << (void*)&(*current) << endl;
+        //  std::cerr << " current += n= " << (void*)&(*current) << std::endl;
     }
     void subtract(Distance f) {
         current_fraction-=stepsize*f;
@@ -675,14 +673,15 @@ public:
         return *this;
     }
     Reference operator[](Distance f) { return *(*this + f); }
+
     bool operator==(const self & y) const {
 #ifdef DEBUG_FRACTION_ITERATOR
-        cerr << " operator == :   current = " << (void*)&(*current) << endl;
-        cerr << " operator == : y.current = " << (void*)&(*y.current) << endl;
-        cerr << " operator == :   current_fraction = " << current_fraction << endl;
-        cerr << " operator == : y.current_fraction = " << y.current_fraction << endl;
-        cerr << " operator == : current equal = " << (current == y.current) << endl;
-        cerr << " operator == : current_fraction almostEqual = " << asl::almostEqual(current_fraction,y.current_fraction) << endl;
+        std::cerr << " operator == :   current = " << (void*)&(*current) << std::endl;
+        std::cerr << " operator == : y.current = " << (void*)&(*y.current) << std::endl;
+        std::cerr << " operator == :   current_fraction = " << current_fraction << std::endl;
+        std::cerr << " operator == : y.current_fraction = " << y.current_fraction << std::endl;
+        std::cerr << " operator == : current equal = " << (current == y.current) << std::endl;
+        std::cerr << " operator == : current_fraction almostEqual = " << asl::almostEqual(current_fraction,y.current_fraction) << std::endl;
 #endif
         return (current == y.current) && asl::almostEqual(current_fraction,y.current_fraction);
     }
@@ -703,12 +702,15 @@ public:
     }
  
     Distance operator-(const self & y) const { 
-        fraction f(float(current - y.current));
+        // [DS, TS] the volatile keyword is required to prevent gcc from optimizing this stuff.
+        // If anybody has a better solution or understanding what is going on here, please tell me.
+        volatile fraction f(fraction(current - y.current));
         f += (current_fraction - y.current_fraction);
         f/=stepsize;
         return (Distance)floor(f);
     }
 };
+
 
 template <class RandomAccessIterator, class T, class Reference, class Distance, class DestIterator> 
 inline fraction_iterator<RandomAccessIterator, T, Reference, Distance> 
@@ -775,16 +777,16 @@ public:
 
     bresenham_iterator(RandomAccessIterator it)
         : current(it)  {
-            //	cerr << "bresenham_iterator = " << (void*)(&(*it)) << endl;
+            //  std::cerr << "bresenham_iterator = " << (void*)(&(*it)) << std::endl;
     }
 
     bresenham_iterator(RandomAccessIterator it, Distance Stride, Distance H, Distance V)
         : current(it) {
 #if 0    
-            cerr << "bresenham_iterator = " << (void*)(&(*it)) << endl;
-            cerr << "Stride = " << Stride << endl;
-            cerr << "dh = " << H << endl;
-            cerr << "dv = " << V << endl;
+            std::cerr << "bresenham_iterator = " << (void*)(&(*it)) << std::endl;
+            std::cerr << "Stride = " << Stride << std::endl;
+            std::cerr << "dh = " << H << std::endl;
+            std::cerr << "dv = " << V << std::endl;
 #endif
 
             hstride = asl::sign(H);
@@ -809,13 +811,13 @@ public:
             error = 2 * (dv > 0 ? dv -1 : dv) - (dh > 0 ? dh - 1 : dh);
 
 #if 0
-            cerr << "dh = " << dh << endl;
-            cerr << "dv = " << dv << endl;
-            cerr << "hstride = " << hstride << endl;
-            cerr << "vstride = " << vstride << endl;
-            cerr << "swapped = " << swapped << endl;
-            cerr << "error = " << error << endl;
-            cerr << "current = " << (void*)(&(*current)) << endl;
+            std::cerr << "dh = " << dh << std::endl;
+            std::cerr << "dv = " << dv << std::endl;
+            std::cerr << "hstride = " << hstride << std::endl;
+            std::cerr << "vstride = " << vstride << std::endl;
+            std::cerr << "swapped = " << swapped << std::endl;
+            std::cerr << "error = " << error << std::endl;
+            std::cerr << "current = " << (void*)(&(*current)) << std::endl;
 #endif
         }
 
@@ -834,29 +836,29 @@ public:
     void increment() {
         while (error >= 0) {
             if (swapped) {
-                //		cerr << ">=0 += h " << hstride << endl;
+                //      std::cerr << ">=0 += h " << hstride << std::endl;
                 current += hstride;
             } else {
-                //		cerr << ">= += v " << vstride << endl;
+                //      std::cerr << ">= += v " << vstride << std::endl;
                 current += vstride;
             }
             error = error - 2 * dh;
         }
-        //	cerr << "After loop Increment error = " << error << endl;
-        //	if (error<0) {
+        //  std::cerr << "After loop Increment error = " << error << std::endl;
+        //  if (error<0) {
         if (swapped) {
-            //		cerr << "<0 += v " << vstride << endl;
+            //      std::cerr << "<0 += v " << vstride << std::endl;
             current += vstride;
         } else {
-            //		cerr << "<0 += h " << hstride << endl;
+            //      std::cerr << "<0 += h " << hstride << std::endl;
             current += hstride;
         }
         error = error + 2 * dv;
-        //	}
+        //  }
 #if 0
-        cerr << "After Increment = " << endl;
-        cerr << "error = " << error << endl;
-        cerr << "current = " << (void*)(&(*current)) << endl;
+        std::cerr << "After Increment = " << std::endl;
+        std::cerr << "error = " << error << std::endl;
+        std::cerr << "current = " << (void*)(&(*current)) << std::endl;
 #endif
     }
 #endif
@@ -878,9 +880,9 @@ public:
             error = error - 2 * dv;
         }
 #if 0
-        cerr << "After Decrement = " << endl;
-        cerr << "error = " << error << endl;
-        cerr << "current = " << (void*)(&(*current)) << endl;
+        std::cerr << "After Decrement = " << std::endl;
+        std::cerr << "error = " << error << std::endl;
+        std::cerr << "current = " << (void*)(&(*current)) << std::endl;
 #endif
     }
     void add(Distance n) {
@@ -892,7 +894,7 @@ public:
         std::cerr << "OK add " << n << std::endl;
 
         //      current += n * real_steps / virtual_steps + error;
-        //	error = error + n * virtual_steps / real_steps;
+        //  error = error + n * virtual_steps / real_steps;
     }
     void subtract(Distance n) {
         if (n>0)
@@ -900,7 +902,7 @@ public:
         else
             while (n++) increment();
         //      current -= n * real_steps / virtual_steps + error;
-        //	error = error - n * virtual_steps / real_steps
+        //  error = error - n * virtual_steps / real_steps
         std::cerr << "OK subtract " << n << std::endl;
     }
 

@@ -41,7 +41,7 @@ class ZipReaderUnitTest : public UnitTest {
             DPRINT(myDirectory[0].filename);
             ENSURE(myDirectory[0].filename == "File One.txt");
 
-            Ptr<ReadableBlock> myFile(myZipReader.getFile(myDirectory[0]));
+            asl::Ptr<ReadableBlock> myFile(myZipReader.getFile(myDirectory[0]));
             string myExpectedString = "Hello World One!";
             string myTestString;
             myFile->readString(myTestString, myExpectedString.size(),0);
@@ -66,7 +66,7 @@ class ZipWriterUnitTest : public UnitTest {
             myZipWriter.close();
             
             ZipReader myReader(myTestZip);
-            Ptr<ReadableBlock> myBlockRead = myReader.getFile(myTestFileInZip);
+            asl::Ptr<ReadableBlock> myBlockRead = myReader.getFile(myTestFileInZip);
 
             ENSURE(*myBlockRead == myTestBlock);
 

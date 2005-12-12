@@ -44,6 +44,10 @@ public:
     static bool test(dom::NodePtr theShapeNode);
     void setColor(unsigned theColor);
     DEFINE_EXCEPTION(InconsistencyException, asl::Exception);
+    static unsigned colorScreenSpaceLasso(const dom::NodePtr & theLassoBody, 
+                            const dom::NodePtr & theTransformationRoot,
+                            const asl::Matrix4f & theViewProjection,
+                            unsigned int theColor);
     static unsigned colorSweptSphere(const asl::Sphere<float> & theSphere, 
         const asl::Vector3f & theMotion, 
         const dom::NodePtr & theTransformationRoot, unsigned int theColor);
@@ -52,6 +56,7 @@ public:
     sigc::signal<bool, double, Glib::ustring> signal_progress() const { return _myProgressSignal; }
     void setSimplifyProceed(bool theSimplifySwitch) { _mySimplifyMode = theSimplifySwitch; }
     bool getSimplifyProceed() const { return _mySimplifyMode; }
+    void removeMeshAndColor();
 private:
     int deleteFace(unsigned int theIndex);
     float calcEdgeError(unsigned theIndex);

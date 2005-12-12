@@ -1,15 +1,23 @@
+
+
+
 #include "Mesh.h"
 #include "ErrorMap.h"
-#include <asl/Logger.h>
-#include <list>
+#include "EdgeList.h"
+
 #include <y60/NodeNames.h>
+#include <y60/Scene.h>
+#include <y60/Body.h>
+
+#include <asl/Logger.h>
 #include <asl/Assure.h>
 #include <asl/GeometryUtils.h>
-#include "EdgeList.h"
-#include <y60/Scene.h>
+
+#include <list>
 
 using namespace asl;
 using namespace std;
+using namespace dom;
 
 #define DB(x) // x;
 
@@ -334,13 +342,13 @@ Mesh::lockWrite() {
         _myPositionVertices = _myPositionVerticesNode->dom::Node::nodeValuePtrOpen<vector<Vector3f> >();
         _myNormalVertices = _myNormalVerticesNode->dom::Node::nodeValuePtrOpen<vector<Vector3f> >();        
         _myEdgeList = EdgeListPtr(new EdgeList(*_myHalfEdges, *_myPositions));
-
     }
 }
 
 void
 Mesh::unlockWrite(bool theForceFlag /*= false*/) {
     if (_myWriteLockCount == 1 || theForceFlag) {
+        AC_INFO << "Write unlocked.";
         _myPositionIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
         _myPositions = 0;
         if (_myNormalIndexNode) {
@@ -717,6 +725,114 @@ Mesh::colorSweptSphere(const asl::Sphere<float> & theSphere,
     return myCollisions.size();
 }
 
+bool 
+pointInPolygon(const std::vector<asl::Vector2f> & thePolygon, const asl::Point3f & thePoint) {
+
+  int  i;
+  int  j=0;
+  bool myOddNodes=false;
+
+  for (i=0; i < thePolygon.size()-1; i++) {
+      if (thePolygon[i][1]   < thePoint[1] && thePolygon[i+1][1] >= thePoint[1] || 
+              thePolygon[i+1][1] < thePoint[1] && thePolygon[i][1]   >= thePoint[1] ) 
+      {
+          if (thePolygon[i][0]+(thePoint[1]-thePolygon[i][1])/(thePolygon[i+1][1]-thePolygon[i][1])*
+                  (thePolygon[i+1][0]-thePolygon[i][0])< thePoint[0]) 
+          {
+              myOddNodes = !myOddNodes;
+          }
+      }
+  }
+  return myOddNodes; 
+}
+
+unsigned
+recurseLasso(const std::vector<asl::Vector2f> & thePolygon, const dom::NodePtr & theTransformNode, 
+             const asl::Matrix4f & theViewProjection, unsigned theColor) 
+{
+    unsigned myColoredCount = 0;
+    if (theTransformNode->nodeName() == BODY_NODE_NAME) {
+        Matrix4f myModelViewProjection = theTransformNode->getFacade<Body>()->get<GlobalMatrixTag>();
+        myModelViewProjection.postMultiply(theViewProjection);
+
+        dom::NodePtr myShape = theTransformNode->getElementById(theTransformNode->getFacade<Body>()->get<ShapeTag>());
+        dom::NodePtr myVertexData = myShape->childNode(VERTEX_DATA_NAME);
+        dom::NodePtr myPositionsNode = myVertexData->childNodeByAttribute(SOM_VECTOR_VECTOR3F_NAME, NAME_ATTRIB, POSITION_ROLE );
+        const VectorOfVector3f & myShapePositions = myPositionsNode->childNode(0)->nodeValueRef<VectorOfVector3f>();
+        vector<bool> myHitArray(myShapePositions.size(), false);
+
+        for (int i = 0; i < myShapePositions.size(); ++i) {
+            asl::Point3f myClipSpacePosition = asPoint(myShapePositions[i]) * myModelViewProjection;
+            // inside Polygon test
+            if (pointInPolygon(thePolygon, myClipSpacePosition)) {
+                myHitArray[i] = true;
+                myColoredCount++;
+            }
+        }
+
+        NodePtr myPrimitiveList = myShape->childNode(PRIMITIVE_LIST_NAME);
+        for (int i = 0; i < myPrimitiveList->childNodesLength(ELEMENTS_NODE_NAME); ++i) {
+            NodePtr myElementsNode = myPrimitiveList->childNode(ELEMENTS_NODE_NAME, i);
+            NodePtr myPositionsNode = myElementsNode->childNodeByAttribute(VERTEX_INDICES_NAME, VERTEX_DATA_ROLE_ATTRIB, POSITION_ROLE);
+            const VectorOfUnsignedInt & myPositions = myPositionsNode->childNode("#text")->nodeValueRef<VectorOfUnsignedInt>();
+
+            NodePtr myColorsNode = myElementsNode->childNodeByAttribute(VERTEX_INDICES_NAME, VERTEX_DATA_ROLE_ATTRIB, COLOR_ROLE);
+            VectorOfUnsignedInt & myColors = myColorsNode->childNode("#text")->nodeValueRefOpen<VectorOfUnsignedInt>();
+
+            for (int j=0; j < myPositions.size(); ++j) {
+                if (myHitArray[myPositions[j]]) {
+                    myColors[j] = theColor;
+                }
+            }
+
+            myColorsNode->childNode("#text")->nodeValueRefClose<VectorOfUnsignedInt>();
+        }
+    }
+    for (int i = 0; i < theTransformNode->childNodesLength(); ++i) {
+        myColoredCount += recurseLasso(thePolygon, theTransformNode->childNode(i), theViewProjection, theColor);
+    }
+    return myColoredCount;
+}
+    
+unsigned
+Mesh::colorScreenSpaceLasso(const dom::NodePtr & theLassoBody, 
+                            const dom::NodePtr & theTransformationRoot,
+                            const asl::Matrix4f & theViewProjection,
+                            unsigned int theColor)
+{
+    // transform the lasso to a clip-space 2D-polygon
+    Matrix4f myModelViewProjection = theLassoBody->getFacade<Body>()->get<GlobalMatrixTag>();
+    myModelViewProjection.postMultiply(theViewProjection);
+    dom::NodePtr myLassoShape = theLassoBody->getElementById(theLassoBody->getFacade<Body>()->get<ShapeTag>());
+    dom::NodePtr myVertexData = myLassoShape->childNode(VERTEX_DATA_NAME);
+    dom::NodePtr myPositionsNode = myVertexData->childNodeByAttribute(SOM_VECTOR_VECTOR3F_NAME, NAME_ATTRIB, POSITION_ROLE );
+    
+    const VectorOfVector3f & myShapePositions = myPositionsNode->childNode(0)->nodeValueRef<VectorOfVector3f>();
+        
+    std::vector<asl::Vector2f> myPolygon;
+    for (int i = 0; i < myShapePositions.size(); ++i) {
+        asl::Point3f myClipSpacePosition = asPoint(myShapePositions[i]) * myModelViewProjection;
+        myPolygon.push_back(Vector2f(myClipSpacePosition[0], myClipSpacePosition[1]));
+    }
+    // now recurse through all the bodies
+    return recurseLasso(myPolygon, theTransformationRoot, theViewProjection, theColor);
+}
+
+void 
+Mesh::removeMeshAndColor() {
+    if (_myWriteLockCount <= 0) {
+        if (!_myElementsNode->removeChild(_myElementsNode->childNode(HALFEDGES_NODE_NAME))) {
+            AC_WARNING << "Halfedges not found in Mesh";
+        }
+        _myHalfEdgesNode = dom::NodePtr(0);
+        if (!_myElementsNode->removeChild(_myElementsNode->childNodeByAttribute(VERTEX_INDICES_NAME, VERTEX_DATA_ROLE_ATTRIB, COLOR_ROLE))) {
+            AC_WARNING << "Colors not found in Mesh";
+        }
+        _myColorIndexNode = dom::NodePtr(0);
+    } else {
+        AC_WARNING << "Can't remove HalfEdges and Colors since the Mesh is still locked.";
+    }
+}
 
 bool 
 Mesh::notifyProgress(double theProgress, const std::string & theMessage) {

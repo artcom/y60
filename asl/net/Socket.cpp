@@ -29,7 +29,7 @@
 
 #include <asl/Logger.h>
 
-#ifdef LINUX
+#ifndef WIN32
 #include <unistd.h>
 #endif
 #include <fcntl.h>
@@ -65,11 +65,10 @@ namespace inet {
     void Socket::close() {
         // TODO: error handling.
         if (isValid()) {
-#ifdef LINUX
-            ::close(fd);
-#endif
 #ifdef WIN32        
             closesocket(fd);
+#else            
+            ::close(fd);
 #endif
             fd = -1;
             AC_DEBUG <<  "Socket closed" << endl;
@@ -142,7 +141,7 @@ namespace inet {
 
     void PrintStatus(int fd)
     {
-#ifdef LINUX
+#ifndef WIN32
         int status;
         status=fcntl(fd, F_GETFL, 0);
         AC_INFO << "STATUS of fd:";

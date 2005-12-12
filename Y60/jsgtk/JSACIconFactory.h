@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 2003, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,48 +7,40 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSBlock.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.5 $
-//   $Date: 2005/04/22 14:58:47 $
-//
-//
-//=============================================================================
 
-#ifndef _Y60_ACXPSHELL_JSBLOCK_INCLUDED_
-#define _Y60_ACXPSHELL_JSBLOCK_INCLUDED_
+#ifndef _Y60_AC_ICON_FACTORY_INCLUDED_
+#define _Y60_AC_ICON_FACTORY_INCLUDED_
 
-#include "JSWrapper.h"
+#include <y60/JSWrapper.h>
+#include <acgtk/ACIconFactory.h>
 
-#include <asl/Block.h>
+#include <asl/string_functions.h>
 
 namespace jslib {
 
-class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, StaticAccessProtocol>
-{
-        JSBlock() {}
+class JSACIconFactory : public JSWrapper<acgtk::ACIconFactory, asl::Ptr<acgtk::ACIconFactory>, StaticAccessProtocol> {
+        JSACIconFactory() {}
     public:
-        typedef asl::Block NATIVE;
+        typedef acgtk::ACIconFactory NATIVE;
         typedef asl::Ptr<NATIVE> OWNERPTR;
-        typedef JSWrapper<NATIVE,OWNERPTR,StaticAccessProtocol> Base;
+        typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
         static const char * ClassName() {
-            return "Block";
+            return "ACIconFactory";
         }
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
-            PROP_size = -100,
-            PROP_capacity
+            PROP_END = -100
         };
-
         static JSPropertySpec * Properties();
-        static JSFunctionSpec * StaticFunctions();
+        static JSConstIntPropertySpec * ConstIntProperties();
         static JSPropertySpec * StaticProperties();
+        static JSFunctionSpec * StaticFunctions();
+
 
         virtual unsigned long length() const {
-            return getNative().size();
+            return 1;
         }
 
         virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
@@ -62,29 +54,31 @@ class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, StaticAccessP
             return Base::Construct(cx, theOwner, theNative);
         }
 
-        JSBlock(OWNERPTR theOwner, NATIVE * theNative)
+        JSACIconFactory(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
         {}
 
-        static JSConstIntPropertySpec * ConstIntProperties();
-
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
 
-        static JSBlock & getObject(JSContext *cx, JSObject * obj) {
-            return dynamic_cast<JSBlock &>(JSBlock::getJSWrapper(cx,obj));
+        static JSACIconFactory & getObject(JSContext *cx, JSObject * obj) {
+            return dynamic_cast<JSACIconFactory &>(JSACIconFactory::getJSWrapper(cx,obj));
         }
+
+    private:
 };
 
+
 template <>
-struct JSClassTraits<asl::Block> : public JSClassTraitsWrapper<asl::Block, JSBlock> {};
+struct JSClassTraits<JSACIconFactory::NATIVE>
+    : public JSClassTraitsWrapper<JSACIconFactory::NATIVE, JSACIconFactory> {};
 
-bool convertFrom(JSContext *cx, jsval theValue, JSBlock::NATIVE *& theBlock);
-bool convertFrom(JSContext *cx, jsval theValue, JSBlock::OWNERPTR & theBlock);
+bool convertFrom(JSContext *cx, jsval theValue, JSACIconFactory::OWNERPTR & theRequest);
 
-jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSBlock::OWNERPTR theOwner, JSBlock::NATIVE * theBlock);
+jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner);
+//jsval as_jsval(JSContext *cx, JSACIconFactory::OWNERPTR theOwner, JSACIconFactory::NATIVE * theSerial);
 
 }
 
 #endif
+
 

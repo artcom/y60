@@ -398,7 +398,6 @@ namespace y60 {
         DBP2(STOP_TIMER(renderBodyPart_bodyChanged));
 
         DBP2(START_TIMER(renderBodyPart_bodyChanged));
-        bool isRendered = false;
 
         // get renderstyles for this primitive
         DBP2(START_TIMER(renderBodyPart_prim_getRenderStyles));
@@ -409,6 +408,12 @@ namespace y60 {
         const std::vector<RenderStyleType> & myShapeStyle    = myShape.getRenderStyles();
         DBP2(STOP_TIMER(renderBodyPart_shape_getRenderStyles));
 
+        // if there are primitive-level styles, use them instead of the shape level
+#if 0 // disabled because of bug#91       
+        if ( !myShapeStyle.empty() && !myPrimitveStyle.empty()) {
+            AC_WARNING << "Primitive styles overridding shape style. Style accumulation not implemented yet";
+        }
+#endif        
         DBP2(START_TIMER(renderBodyPart_getRenderStyles));
         const std::vector<RenderStyleType> & myRenderStyles  = myPrimitveStyle.empty() ? myShapeStyle : myPrimitveStyle;
         DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
@@ -434,25 +439,43 @@ namespace y60 {
         }
 
         DBP2(START_TIMER(renderBodyPart_findRenderStyles2));
-        if (std::find(myRenderStyles.begin(), myRenderStyles.end(), BACK) !=  myRenderStyles.end()) {
-            DBP2(MAKE_SCOPE_TIMER(renderBodyPart_renderPrimitivesS));
-            glCullFace(GL_FRONT);
+        bool myRendererCullingEnabled = _myState.getBackfaceCulling();
+        if (myRendererCullingEnabled) {
+            bool myRenderFrontFlag = std::find(myRenderStyles.begin(), myRenderStyles.end(), FRONT) !=  myRenderStyles.end(); 
+            bool myRenderBackFlag = std::find(myRenderStyles.begin(), myRenderStyles.end(), BACK) !=  myRenderStyles.end();
+            
+            if (myRenderFrontFlag && myRenderBackFlag) {
+                // render front & back (two passes, supposedly faster
+                DBP2(START_TIMER(renderBodyPart_renderPrimitives));
+                glCullFace(GL_FRONT);
+                renderPrimitives(theBodyPart, myMaterial);
+                glCullFace(GL_BACK);
+                renderPrimitives(theBodyPart, myMaterial);
+                DBP2(STOP_TIMER(renderBodyPart_renderPrimitives));
+            } else {  // render one or zero faces - single pass
+                if (!myRenderFrontFlag && !myRenderBackFlag) {
+                    glCullFace(GL_FRONT_AND_BACK);
+                } else {
+                    if (!myRenderFrontFlag) {
+                        glCullFace(GL_FRONT);
+                    }
+                    if (!myRenderBackFlag) {
+                        glCullFace(GL_BACK);
+                    }
+                }
+                DBP2(START_TIMER(renderBodyPart_renderPrimitives));
+                renderPrimitives(theBodyPart, myMaterial);
+                DBP2(START_TIMER(renderBodyPart_renderPrimitives));
+            }
+        } else { // face culling is disabled - just render it.
             DBP2(START_TIMER(renderBodyPart_renderPrimitives));
             renderPrimitives(theBodyPart, myMaterial);
-            DBP2(STOP_TIMER(renderBodyPart_renderPrimitives));
-            isRendered = true;
-            CHECK_OGL_ERROR;
+            DBP2(START_TIMER(renderBodyPart_renderPrimitives));
         }
+        CHECK_OGL_ERROR;
         DBP2(STOP_TIMER(renderBodyPart_findRenderStyles2));
 
-        DBP2(START_TIMER(renderBodyPart_findRenderStyles3));
-        if (!isRendered || std::find(myRenderStyles.begin(), myRenderStyles.end(), FRONT) !=  myRenderStyles.end()) {
-            glCullFace(GL_BACK);
-            renderPrimitives(theBodyPart, myMaterial);
-            CHECK_OGL_ERROR;
-        }
-        DBP2(STOP_TIMER(renderBodyPart_findRenderStyles3));
-
+        // reset the states now
         if (myIgnoreDepthFlag) {
             glDepthFunc(GL_LESS);
         }
@@ -504,7 +527,7 @@ namespace y60 {
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
         DBP(STOP_TIMER(getPrimitive));
         DBP2(
-            AC_TRACE << "------ renderPrimitives for BodyPart of Body id='"
+            AC_WARNING << "------ renderPrimitives for BodyPart of Body id='"
                     << theBodyPart.getBody().get<IdTag>()<<"'"
                     << ", name='"<<theBodyPart.getBody().get<NameTag>()<<"'";
         )

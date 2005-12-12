@@ -86,15 +86,15 @@ class Pump : public AudioTimeSource, private PosixThread
         static unsigned    _mySampleRate_Init;
         static unsigned    _numOutputChannels_Init;
         static bool        _useDummy_Init;
+        bool               _myRunning;
 
     private:
         void run();
-        virtual void pump() = 0;
+        virtual void pump() {};
         void removeDeadSinks();
 
         std::vector < HWSampleSinkWeakPtr > _mySampleSinks;
         asl::ThreadLock _mySinkLock;
-        bool _myRunning;
         Time _myLatency;
 
         SampleFormat _mySF;

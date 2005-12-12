@@ -39,22 +39,20 @@ namespace asl {
     
 void
 SocketPolicy::disconnect(Handle & theHandle) {
-#ifdef LINUX
-    ::close(theHandle);
-#endif
 #ifdef WIN32        
     closesocket(theHandle);
+#else    
+    ::close(theHandle);
 #endif
     theHandle = 0;
 }
 
 void 
 SocketPolicy::stopListening(Handle theHandle) {
-#ifdef LINUX
-    ::close(theHandle);
-#endif
 #ifdef WIN32        
     closesocket(theHandle);
+#else
+    ::close(theHandle);
 #endif
 }
 

@@ -141,6 +141,30 @@ namespace asl {
                 return this->val[3];
             }
 
+            /** Extracts @p theAxis and @p theAngle from normalized quaternion. 
+             * If angle is almost 0, the axis is arbitrary and we
+             * return [1,0,0].
+             * @returns false if not normalized, otherwise true.
+             */
+            bool getAxisAndAngle(Vector3<Number> & theAxis, Number & theAngle) const {
+                if (this->val[3] > 1) {
+                    return false; // not normalized
+                }
+                theAngle = 2 * acos(this->val[3]);
+                Number s = sqrt(1- this->val[3]*this->val[3] );
+                if (almostEqual(s, 0)) {
+                    // angle close to 0, axis not important
+                    theAxis[0] = Number(1.0);
+                    theAxis[1] = Number(0.0);
+                    theAxis[2] = Number(0.0);
+                } else {
+                    theAxis[0] = this->val[0]/s;
+                    theAxis[1] = this->val[1]/s;
+                    theAxis[2] = this->val[2]/s;
+                }
+                return true;
+            }
+
             /** Set the imaginary part of the quaternion.
              */
             void setImaginaryPart(const Vector3<Number> & theImaginary) {

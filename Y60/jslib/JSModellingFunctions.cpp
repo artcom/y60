@@ -241,6 +241,43 @@ CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+CreateLineStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("");
+        DOC_END;
+        ensureParamCount(argc, 3, 4);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+
+        string myLineMaterialId;
+        convertFrom(cx, argv[1], myLineMaterialId);
+
+        std::vector<asl::Vector3f> myPositions;
+        convertFrom(cx, argv[2], myPositions);
+
+        string myName;
+        if (argc > 3) {
+            convertFrom(cx, argv[3], myName);
+        }
+
+        dom::NodePtr myResult;
+        switch (argc) {
+            case 3:
+                myResult = createLineStrip(myScene, myLineMaterialId, myPositions);
+                break;
+            case 4:
+                myResult = createLineStrip(myScene, myLineMaterialId, myPositions, myName);
+                break;
+        }
+        *rval = as_jsval(cx, myResult);
+
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+
+}
+JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         DOC_BEGIN("");
@@ -437,6 +474,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createDistanceMarkup",        CreateDistanceMarkup,        5},
         {"createAngleMarkup",           CreateAngleMarkup,           6},
         {"createTriangleMeshMarkup",    CreateTriangleMeshMarkup,    5},
+        {"createLineStrip",             CreateLineStrip,             4},
         {"createQuadStack",             CreateQuadStack,             5},
         {"createUnlitTexturedMaterial", CreateUnlitTexturedMaterial, 7},
         {0}

@@ -16,7 +16,6 @@
 #include <y60/NodeValueNames.h>
 #include <y60/MaterialParameter.h>
 
-
 #ifdef WIN32
     #ifndef WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN 1
@@ -24,14 +23,6 @@
     #include <windows.h>
     #undef max
 #endif
-
-#ifdef LINUX
-// we now retrieve the prototypes using glXGetProcAddressARB
-//    #ifndef GL_GLEXT_PROTOTYPES
-//    #define GL_GLEXT_PROTOTYPES 1
-//    #endif
-#endif
-
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -46,8 +37,24 @@
     #include <GL/glxext.h>
 #endif
 
+namespace y60 {
+    DEFINE_EXCEPTION(OpenGLException, asl::Exception);
+    DEFINE_EXCEPTION(CantParseOpenGLVersion, asl::Exception);
+    DEFINE_EXCEPTION(CantQueryOpenGLVersion, asl::Exception);
+    DEFINE_EXCEPTION(MissingExtensionsException, asl::Exception);
+    DEFINE_EXCEPTION(MissingFunctionException, asl::Exception);
 
-#ifdef LINUX
+template <const char* NAME>
+struct GLExceptionHelper {
+    static void throwMissingException() {
+        throw y60::MissingExtensionsException(NAME, PLUS_FILE_LINE);
+    }
+    static void throwMissingFunction() {
+        throw y60::MissingFunctionException(NAME, PLUS_FILE_LINE);
+    }
+};
+
+}
 
 /* we have to define our own function pointers
  * we give them private names and
@@ -56,14 +63,25 @@
 */
 #ifdef _ac_render_GLUtils_cpp_
     #define DEF_PROC_ADDRESS(T,X) \
-    T                _ac_ ## X = 0;
+    extern const char _name_ ## X [] = #X; \
+    T  _ac_ ## X = (T)&y60::GLExceptionHelper< _name_ ##X>::throwMissingException;
 #else
     #define DEF_PROC_ADDRESS(T,X) \
     extern  T       _ac_ ## X;
 #endif
 
+
+typedef void (*PFNACTESTPROC)(int, int);
+
 extern "C" {
 
+// test cases for unit test    
+DEF_PROC_ADDRESS( PFNACTESTPROC, acTestMissingExtension );
+#define acTestMissingExtension _ac_acTestMissingExtension
+DEF_PROC_ADDRESS( PFNACTESTPROC, acTestMissingFunction );
+#define acTestMissingFunction _ac_acTestMissingFunction
+
+// now the real extensions
 DEF_PROC_ADDRESS( PFNGLBINDBUFFERARBPROC, glBindBufferARB );
 #define glBindBufferARB _ac_glBindBufferARB
 DEF_PROC_ADDRESS( PFNGLDELETEBUFFERSARBPROC, glDeleteBuffersARB );
@@ -197,8 +215,6 @@ DEF_PROC_ADDRESS( PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC, glCheckFramebufferStatusEX
 
 } // extern C
 
-#endif
-
 #ifndef GL_ARB_point_sprite
 #define GL_ARB_point_sprite
 #define GL_POINT_SPRITE_ARB               0x8861
@@ -206,12 +222,6 @@ DEF_PROC_ADDRESS( PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC, glCheckFramebufferStatusEX
 #endif
 
 namespace y60 {
-
-    DEFINE_EXCEPTION(OpenGLException, asl::Exception);
-    DEFINE_EXCEPTION(CantParseOpenGLVersion, asl::Exception);
-    DEFINE_EXCEPTION(CantQueryOpenGLVersion, asl::Exception);
-    DEFINE_EXCEPTION(MissingExtensionsException, asl::Exception);
-
     void checkOGLError(const std::string& theLocation);
     void queryGLVersion(unsigned & theMajor, unsigned & theMinor, unsigned & theRelease);
 

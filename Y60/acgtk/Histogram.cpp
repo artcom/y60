@@ -149,6 +149,7 @@ Histogram::on_expose_event(GdkEventExpose * theEvent) {
 void
 Histogram::rebuildBins() {
     int myWidth = get_allocation().get_width();
+    AC_WARNING << "Width=" << myWidth << ", Samples=" << _mySampleData.size();
     if (myWidth < _mySampleData.size()) {
         _myBins.clear();
         _myBins.resize(myWidth);

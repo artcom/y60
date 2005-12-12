@@ -32,7 +32,7 @@
 #include <algorithm>
 #include <string>
 
-#ifdef LINUX
+#ifndef WIN32
 #include <errno.h>
 #endif
 

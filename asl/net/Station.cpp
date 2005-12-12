@@ -260,12 +260,11 @@ Station::closeStation() {
     if (_good) {
         _good = false;
         _myOutgoingMessageNumber = 0;
-#ifdef LINUX        
-            ::close(_myFileDescriptor);
-#endif
 #ifdef WIN32        
             closesocket(_myFileDescriptor);
-#endif            
+#else            
+            ::close(_myFileDescriptor);
+#endif
     }
 }
 

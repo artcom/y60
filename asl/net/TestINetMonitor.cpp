@@ -28,7 +28,7 @@
 #include <asl/Exception.h>
 #include <asl/Time.h>
 
-#ifdef LINUX
+#ifndef WIN32
 #include <unistd.h>
 #endif
 

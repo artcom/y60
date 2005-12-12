@@ -55,7 +55,14 @@ namespace y60 {
     }
 
     void queryGLVersion(unsigned & theMajor, unsigned & theMinor, unsigned & theRelease) {
-        std::string myVersion = (const char*)glGetString(GL_VERSION);
+        const char * myVersionPChar = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+        if (!myVersionPChar) {
+            theMajor = 0;
+            theMinor = 0;
+            theRelease = 0;
+            return;
+        }
+        std::string myVersion(myVersionPChar);
         std::vector<std::string> myVendorSplit = asl::splitString(myVersion, " ");
         if (myVendorSplit.size()) {
             std::vector<std::string> myVersionSplit = asl::splitString(myVendorSplit[0], ".");
@@ -506,13 +513,17 @@ namespace y60 {
 #ifdef WIN32
 #define SET_PROC_ADDRESS(p,x) \
     x = (p) wglGetProcAddress( #x ); \
-    if (!x) AC_ERROR << "Unable to get proc address for " << #x
+    if (!x) { \
+        x = (p) (&GLExceptionHelper< _name_ ## x >::throwMissingFunction); \
+    }
 #endif    
     
 #ifdef LINUX
 #define SET_PROC_ADDRESS(p,x) \
     _ac_ ## x = (p) glXGetProcAddressARB((const GLubyte*) #x ); \
-    if (!x) AC_ERROR << "Unable to get proc address for " << #x
+    if (!x) { \
+        x = (p) (&GLExceptionHelper< _name_ ## x >::throwMissingFunction); \
+    }
 #endif
     
     void
@@ -524,6 +535,11 @@ namespace y60 {
         unsigned myVersionRelease = 0;
         queryGLVersion(myVersionMajor, myVersionMinor, myVersionRelease);
         AC_DEBUG << "Found OpenGL " << myVersionMajor << "." << myVersionMinor << " rel " << myVersionRelease;
+
+        // don't call SET_PROC_ADDRESS to simulate a missing extenstion
+        // SET_PROC_ADDRESS( PFNACTESTPROC, acTestMissingExtension );
+        // call SET_PROC_ADDRESS to simulate a missing function pointer lookup
+        SET_PROC_ADDRESS( PFNACTESTPROC, acTestMissingFunction );
 
         if (queryOGLExtension("GL_ARB_vertex_buffer_object") ||
             queryOGLExtension("GL_EXT_vertex_buffer_object")) {

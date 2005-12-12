@@ -206,6 +206,7 @@ class AudioBuffer: public AudioBufferBase {
             }
         }
             
+        // TODO: Change interface to use frames, not bytes.
         void copyToRawMem(void * theWritePtr, unsigned theStartByte,
                           unsigned theLength)
         {

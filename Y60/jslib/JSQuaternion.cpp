@@ -89,6 +89,13 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+invert(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("inverts the Quaternion.");
+    DOC_END;
+    return Method<NATIVE>::call(&NATIVE::invert,cx,obj,argc,argv,rval);
+}
+
 
 
 static JSBool
@@ -106,7 +113,7 @@ multiply(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         JSClassTraits<NATIVE>::ScopedNativeRef myObjRef(cx, obj);
 
         NATIVE myQuaternion;
-        float  myScalar;
+        Number  myScalar;
         if (convertFrom(cx, argv[0], myQuaternion)) {
             myObjRef.getNative().mult(myQuaternion);
             return JS_TRUE;
@@ -233,6 +240,7 @@ JSQuaternion::Functions() {
         {"setRealPart",      setRealPart,      1},
         {"normalize",        normalize,        0},
         {"multiply",         multiply,         1},
+        {"invert",           invert,           0},
         {0}
     };
     return myFunctions;
@@ -241,9 +249,11 @@ JSQuaternion::Functions() {
 JSPropertySpec *
 JSQuaternion::Properties() {
     static JSPropertySpec myProperties[] = {
-        {"imag", PROP_imag, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},     // readwrite attribute Vector3f
-        {"real", PROP_real, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},     // readwrite attribute float
-        {"length", PROP_length, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},   // readonly attribute boolean
+        {"imag", PROP_imag, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"real", PROP_real, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"length", PROP_length, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"axis", PROP_axis, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"angle", PROP_angle, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
     };
     return myProperties;
@@ -271,6 +281,30 @@ JSQuaternion::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *ob
             case PROP_real:
                 *vp = as_jsval(cx, getNative().getRealPart());
                 return JS_TRUE;
+            case PROP_axis:
+                {
+                    Vector3<Number> myAxis;
+                    Number myAngle;
+                    if (getNative().getAxisAndAngle(myAxis, myAngle)) {
+                        *vp = as_jsval(cx, myAxis);
+                        return JS_TRUE;
+                    } else {
+                        JS_ReportError(cx, "JSQuaternion::axis - quaternion is not normalized");
+                        return JS_FALSE;
+                    }
+                }
+            case PROP_angle:
+                {
+                    Vector3<Number> myAxis;
+                    Number myAngle;
+                    if (getNative().getAxisAndAngle(myAxis, myAngle)) {
+                        *vp = as_jsval(cx, myAngle);
+                        return JS_TRUE;
+                    } else {
+                        JS_ReportError(cx, "JSQuaternion::angle - quaternion is not normalized");
+                        return JS_FALSE;
+                    }
+                }
              case PROP_length:
                 *vp = as_jsval(cx, length());
                 return JS_TRUE;
@@ -359,7 +393,7 @@ JSQuaternion::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
             } else {
                 JSObject * mySecondObject = JSVector<asl::Vector3<Number> >::Construct(cx, argv[1]);
                 if (mySecondObject) {
-                    // construct from axis and angle
+                    // Given two normalized Vectors, compute the quaternion between them
                     myNewQuaternion = asl::Quaternion<Number>(JSVector<asl::Vector3<Number> >::getNativeRef(cx,myObject), JSVector<asl::Vector3<Number> >::getNativeRef(cx,mySecondObject));
                 } else {
                     JS_ReportError(cx,"JSQuaternion::Constructor: argument #2 must be a float or a Vector3f");

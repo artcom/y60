@@ -65,6 +65,34 @@ CTScan::CTScan() : _myEncoding(y60::GRAY), _myDefaultWindow(128.0f, 256.0f), _my
 CTScan::~CTScan() {
 }
 
+asl::Matrix4f
+CTScan::getModelViewMatrix(const asl::Quaternionf & theOrientation) {
+    Matrix4f myModelView;
+    myModelView.makeScaling(getVoxelAspect());
+    
+    Quaternionf myOrientation = theOrientation; // inverse camera rotation
+    myOrientation.invert();
+    
+    myModelView.postMultiply(Matrix4f(myOrientation));
+   
+    Quaternionf myYFlipRotation;
+    myYFlipRotation.assignFromEuler(Vector3f(PI,0,0));
+    myModelView.postMultiply(Matrix4f(myYFlipRotation));
+
+    return myModelView;
+}
+
+asl::Planef
+CTScan::getVoxelPlane(const asl::Quaternionf & theOrientation, float theVoxelSlice) {
+    Quaternionf myOrientation = theOrientation;
+
+    Vector4f myVoxelNormal = product(Vector4f(0,0,1,0), myOrientation);
+
+    Vector3f myNormal3(myVoxelNormal[0], myVoxelNormal[1], myVoxelNormal[2]);
+    Planef myVoxelSpacePlane(myNormal3, -theVoxelSlice);
+    return myVoxelSpacePlane;
+}
+
 int 
 CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & theSubDir, const std::string& thePackage) {
     clear();
@@ -141,21 +169,23 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
 }
 
 int 
-CTScan::loadSphere(int size) {
+CTScan::loadSphere(const asl::Vector3i & size) {
     clear();
-    for (int i = 0; i < size; ++i) {
+    for (int z = 0; z < size[2]; ++z) {
         ResizeableRasterPtr myRaster = 
-            dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::GRAY, size, size));
+            dynamic_cast_Ptr<dom::ResizeableRaster>(createRasterValue(y60::GRAY, size[0], size[1]));
 
         Unsigned8 * myPixels = myRaster->pixels().begin();
-        Point3f myCenter(float(size)/2.0f, float(size)/2.0f, float(size)/2.0f);
-        for (int y = 0; y < size; ++y) {
-            for (int x = 0; x < size; ++x) {
-                float myDist = asl::distance(myCenter, Point3f(float(x),float(y),float(i))) / (size/2);
+        Point3f myCenter = Point3f(float(size[0])/2.0f, float(size[1])/2.0f, float(size[2])/2.0f);
+        for (int y = 0; y < size[1]; ++y) {
+            for (int x = 0; x < size[0]; ++x) {
+                float myDist = sqrt((myCenter[0]-float(x))/float(size[0]/2) * (myCenter[0]-float(x))/float(size[0]/2)+
+                                    (myCenter[1]-float(y))/float(size[1]/2) * (myCenter[1]-float(y))/float(size[1]/2)+ 
+                                    (myCenter[2]-float(z))/float(size[2]/2) * (myCenter[2]-float(z))/float(size[2]/2)); 
                 if (myDist > 1.0f) {
-                    myPixels[x+y*size] = 0;
+                    myPixels[x+y*size[1]] = 0;
                 } else {
-                    myPixels[x+y*size] = Unsigned8((1.f - myDist) * 255.0f); 
+                    myPixels[x+y*size[1]] = Unsigned8((1.f - myDist) * 255.0f); 
                 }
             }
         }
@@ -569,37 +599,50 @@ CTScan::getReconstructionDimensions(CTScan::Orientation theOrientation) const {
     return myResult;
 }
 
-Vector3i
-CTScan::getReconstructionDimensions(const Quaternionf & theOrientation) const {
+void
+CTScan::getReconstructionBounds(const Quaterniond & theOrientation, asl::Box3d & theBounds, asl::Vector3i & theSize) const {
     if (_myState != COMPLETE) {
         throw CTScanException("cannot reconstruct image when loading not complete!", PLUS_FILE_LINE);
     }
-    Vector3i mySize = getVoxelDimensions();
-    Vector3i myResult;
-    Matrix4f myScreenToVoxelProjection(theOrientation);
+    Matrix4d myScreenToVoxelProjection(theOrientation);
     Vector3i myVoxelSize = getVoxelDimensions();
-    Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
+    Matrix4d myVoxelToScreenProjection = myScreenToVoxelProjection;
     myVoxelToScreenProjection.invert();
-    Box3f myBounds = Box3f(Vector3f(0,0,0), Vector3f(float(myVoxelSize[0]), float(myVoxelSize[1]), 
-        float(myVoxelSize[2]))) * myVoxelToScreenProjection;
-    Vector3f myFloatSize = myBounds.getSize();
+    theBounds = Box3d(Vector3d(0,0,0), Vector3d(double(myVoxelSize[0]), double(myVoxelSize[1]), 
+        double(myVoxelSize[2]))) * myVoxelToScreenProjection;
+    Vector3d myFloatSize = theBounds.getSize();
     for (int i = 0; i < 3; ++i) {
         if (!almostEqual(myFloatSize[i], floor(myFloatSize[i]))) {
             myFloatSize[i] = ceil(myFloatSize[i]);
         }
-        myResult[i] = int(myFloatSize[i]);
+        theSize[i] = int(myFloatSize[i]);
     }
-    //myResult = Vector3i(int(ceil(myFloatSize[0])), int(ceil(myFloatSize[1])), int(ceil(myFloatSize[2])));
-    return myResult;
 }
 
+Vector3i
+CTScan::getReconstructionDimensions(const Quaternionf & theOrientation) const {
+    Box3d myBounds;
+    Vector3i mySize;
+    getReconstructionBounds(Quaterniond(double(theOrientation[0]),
+                                        double(theOrientation[1]),
+                                        double(theOrientation[2]),
+                                        double(theOrientation[3])),
+                            myBounds, mySize);
+    return mySize;
+}
+float
+CTScan::getSliceThickness(const asl::Quaternionf & theOrientation) const {
+    Matrix4f myMatrix(theOrientation);
+    myMatrix.scale(getVoxelAspect());
+    return magnitude(product(Vector4f(0,0,1,0), myMatrix));
+ }
 
 template <class VoxelT>
 VoxelT
-CTScan::fastValueAt(const asl::Vector3f & thePosition) {
-    Vector3i myDiscretePos(round(thePosition[0]), 
-        round(thePosition[1]), 
-        round(thePosition[2]));
+CTScan::fastValueAt(const asl::Vector3d & thePosition) {
+    Vector3i myDiscretePos = Vector3i(int(round(thePosition[0])), 
+        int(round(thePosition[1])), 
+        int(round(thePosition[2])));
 
     if (isInside(myDiscretePos[0], myDiscretePos[1], myDiscretePos[2])) {
         dom::ResizeableRasterPtr & mySlice = _mySlices[myDiscretePos[2]];
@@ -613,7 +656,7 @@ CTScan::fastValueAt(const asl::Vector3f & thePosition) {
 
 template <class VoxelT>
 VoxelT
-CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
+CTScan::interpolatedValueAt(const asl::Vector3d & thePosition) {
     Vector3i myFloorPos(static_cast<int>(floor(thePosition[0])), 
         static_cast<int>(floor(thePosition[1])), 
         static_cast<int>(floor(thePosition[2])));
@@ -688,25 +731,25 @@ CTScan::interpolatedValueAt(const asl::Vector3f & thePosition) {
 }
 
 void 
-CTScan::reconstructToImage(const Quaternionf & theOrientation, int theSliceIndex, 
-        dom::NodePtr & theImageNode, bool theTrilliniarInterpolate) {
+CTScan::reconstructToImage(const asl::Quaternionf & theOrientation, const asl::Vector3f & theSlicePosition,
+                           dom::NodePtr & theImageNode, bool theTrilliniarInterpolate) {
     switch (_myEncoding) {
         case y60::GRAY:
             {
                 typedef unsigned char VoxelT;
-                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode, theTrilliniarInterpolate);
+                reconstructToImageImpl<VoxelT>(theOrientation, theSlicePosition, theImageNode, theTrilliniarInterpolate);
             }
             break;
         case y60::GRAY16:
             {
                 typedef unsigned short VoxelT;
-                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode, theTrilliniarInterpolate);
+                reconstructToImageImpl<VoxelT>(theOrientation, theSlicePosition, theImageNode, theTrilliniarInterpolate);
             }
             break;
         case y60::GRAYS16:
             {
                 typedef short VoxelT;
-                reconstructToImageImpl<VoxelT>(theOrientation, theSliceIndex, theImageNode, theTrilliniarInterpolate);
+                reconstructToImageImpl<VoxelT>(theOrientation, theSlicePosition, theImageNode, theTrilliniarInterpolate);
             }
             break;
         default:
@@ -772,7 +815,8 @@ CTScan::reconstructToImageImpl(CTScan::Orientation theOrientation, int theSliceI
                 int myLineWidth = getBytesRequired(myWidth, _myEncoding);
                 for (int y=0; y < myHeight; ++y) {
                     const unsigned char * mySource = _mySlices[theSliceIndex]->pixels().begin();
-                    memcpy(myTarget->begin()+myLineStride*y,
+                    unsigned int myTargetLine = myLineStride * y;
+                    memcpy(myTarget->begin()+myTargetLine,
                            mySource+myLineWidth*y,
                            myLineWidth);
                 }
@@ -790,7 +834,7 @@ CTScan::reconstructToImageImpl(CTScan::Orientation theOrientation, int theSliceI
                 int myLineStride = getBytesRequired(myPoTWidth, _myEncoding);
                 int myLineWidth = getBytesRequired(myWidth, _myEncoding);
                 for (int ySrc=0; ySrc < myHeight; ++ySrc) {
-                    int yTarget = myHeight-ySrc-1;
+                    int yTarget = myHeight-ySrc-1; // Flip Y
                     const unsigned char * mySource = _mySlices[ySrc]->pixels().begin();
                     memcpy(myTarget->begin()+myLineStride*yTarget,
                            mySource+myLineWidth*theSliceIndex,
@@ -807,18 +851,12 @@ CTScan::reconstructToImageImpl(CTScan::Orientation theOrientation, int theSliceI
                 myPoTHeight = nextPowerOfTwo(myHeight);
                 Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));
                 unsigned myBpp = getBytesRequired(1, _myEncoding);
-                unsigned mySourceLineOffset = myBpp*theSliceIndex;
+                int mySliceCount = getSliceCount();
+                unsigned mySourceLineOffset = myBpp * theSliceIndex;
                 int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
                 int mySourceLineStride = getBytesRequired(mySize[0], _myEncoding);
-                int mySliceCount = getSliceCount();
                 for (int x=0; x < myWidth; ++x) {
-                    //const unsigned char * mySource = _mySlices[mySliceCount-x-1]->pixels().begin();
-                    //int xTarget = myWidth-x-1;
-                    //for (int y=0; y < myHeight; ++y) {
-                    //    memcpy(myTarget->begin()+myTargetLineStride*y+myBpp*xTarget, 
-                    //        mySource+mySourceLineStride*y+mySourceLineOffset, myBpp);
-                    //}                    
-                    const unsigned char * mySource = _mySlices[x]->pixels().begin();
+                    const unsigned char * mySource = _mySlices[mySliceCount-x-1]->pixels().begin();
                     for (int y=0; y < myHeight; ++y) {
                         memcpy(myTarget->begin()+myTargetLineStride*y+myBpp*x, 
                             mySource+mySourceLineStride*y+mySourceLineOffset, myBpp);
@@ -842,7 +880,7 @@ CTScan::reconstructToImageImpl(CTScan::Orientation theOrientation, int theSliceI
 
 template <class VoxelT>
 void 
-CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceIndex, 
+CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, const asl::Vector3f & theSlicePosition, 
         dom::NodePtr & theImageNode, bool theTrilliniarInterpolate) 
 {
     try {
@@ -855,67 +893,56 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
         int myPoTWidth;
         int myPoTHeight;
         Ptr<ReadableBlock> myPixelData;
-        //Box3f myBounds;
-        Vector3i myVoxelSize = getVoxelDimensions();
 
-        
-        Matrix4f myScreenToVoxelProjection;
-        myScreenToVoxelProjection.makeXRotating(float(asl::PI));
-        myScreenToVoxelProjection.postMultiply(Matrix4f(theOrientation));
-        Matrix4f myVoxelToScreenProjection = myScreenToVoxelProjection;
-        bool myInversionDone = myVoxelToScreenProjection.invert();
-        if (!myInversionDone) {
-            throw CTScanException("Coundn't invert rotation matrix", PLUS_FILE_LINE);
-        }
-        Box3f myBounds = Box3f(Vector3f(0,0,0), Vector3f(float(myVoxelSize[0]), 
-            float(myVoxelSize[1]), float(myVoxelSize[2]))) * myVoxelToScreenProjection;
-        Vector3f mySize = myBounds.getSize();
-        if (!almostEqual(mySize[0], floor(mySize[0]))) {
-            myWidth = int(ceil(mySize[0]));
-        } else {
-            myWidth = int(mySize[0]);
-        }
-        if (!almostEqual(mySize[1], floor(mySize[1]))) {
-            myHeight = int(ceil(mySize[1]));
-        } else {
-            myHeight = int(mySize[1]);
-        }
+        Box3d myBounds;
+        Vector3i myBoundsSize;
+
+        getReconstructionBounds(Quaterniond(double(theOrientation[0]),
+                                        double(theOrientation[1]),
+                                        double(theOrientation[2]),
+                                        double(theOrientation[3])),
+                            myBounds, myBoundsSize);
+    
+        asl::Quaterniond myOrientation((double)theOrientation[0], 
+                                       (double)theOrientation[1], 
+                                       (double)theOrientation[2], 
+                                       (double)theOrientation[3]);
+
+        myWidth = myBoundsSize[0];
+        myHeight = myBoundsSize[1];
+
         myPoTWidth = nextPowerOfTwo(myWidth);
         myPoTHeight = nextPowerOfTwo(myHeight);
+        Matrix4d myScreenToVoxelProjection(myOrientation);
+
         // Fill with white
-        //Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding), 255));    
         Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));    
         int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
-    
-        Vector3f myViewVector = product(Point3f(0,0,-1), myScreenToVoxelProjection);
-        float myZScale = dot(myViewVector, Vector3f(1,1,1));    // XXX Use Unit aspect instead of 1,1,1
         
-        float mySlicePosition1 = myBounds[Box3f::MAX][2] - float(theSliceIndex);
-        float mySlicePosition2 = float(theSliceIndex) + myBounds[Box3f::MIN][2];
-        float mySlicePosition;
-        if (myZScale < 0.0f) {
-            mySlicePosition = mySlicePosition2;
-        } else {
-            mySlicePosition = mySlicePosition1;
-        }
-        Vector3f myStartPos = product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MIN][1], mySlicePosition),
-            myScreenToVoxelProjection);
-        Vector3f mySourceDeltaU = (product(Point3f(myBounds[Box3f::MAX][0], myBounds[Box3f::MIN][1], mySlicePosition),
-            myScreenToVoxelProjection) - myStartPos) / mySize[0];
-        Vector3f mySourceDeltaV = (product(Point3f(myBounds[Box3f::MIN][0], myBounds[Box3f::MAX][1], mySlicePosition),
-            myScreenToVoxelProjection) - myStartPos) / mySize[1];
+        double myCenterSlicePosition = myBounds.getCenter()[2];
+        Vector3d mySlicePosition((double)theSlicePosition[0], (double)theSlicePosition[1], (double)theSlicePosition[2]);
+
+        Vector3d myStartPos = product(Point3d(myBounds[Box3d::MIN][0], myBounds[Box3d::MIN][1], myCenterSlicePosition)+mySlicePosition, 
+                                      myScreenToVoxelProjection);
+        Vector3d mySourceDeltaU = (product(Point3d(myBounds[Box3d::MAX][0], myBounds[Box3d::MIN][1], myCenterSlicePosition)+mySlicePosition,
+            myScreenToVoxelProjection) - myStartPos) / myWidth;
+        
+        Vector3d mySourceDeltaV = (product(Point3d(myBounds[Box3d::MIN][0], myBounds[Box3d::MAX][1], myCenterSlicePosition)+mySlicePosition,
+            myScreenToVoxelProjection) - myStartPos) / myHeight;
+
         AC_TRACE << "Width: " << myWidth << ", Height: " << myHeight << ", myStartPos: " << myStartPos
             << " DeltaU: " << mySourceDeltaU << " DeltaV " << mySourceDeltaV;
-        typedef Line<float> Linef;
-        Box3f myVoxelBox(Point3f(0.0f, 0.0f, 0.0f), 
-            Point3f(float(myVoxelSize[0]), float(myVoxelSize[1]), float(myVoxelSize[2])));
+        typedef Line<double> Lined;
+        Vector3i myVoxelSize = getVoxelDimensions();
+        Box3d myVoxelBox(Point3d(0.0f, 0.0f, 0.0f), 
+            Point3d(double(myVoxelSize[0]), double(myVoxelSize[1]), double(myVoxelSize[2])));
         for (int v = 0; v < myHeight; ++v) {
-            Vector3f myLinePos = myStartPos + (float(v) * mySourceDeltaV);
-            Linef myScanLine(myLinePos, mySourceDeltaU);
-            float myMinValue, myMaxValue;
+            Vector3d myLinePos = myStartPos + (double(v) * mySourceDeltaV);
+            Lined myScanLine(myLinePos, mySourceDeltaU);
+            double myMinValue, myMaxValue;
             if (intersection(myVoxelBox, myScanLine, myMinValue, myMaxValue)) {
                 if (myMinValue > myMaxValue) {
-                    float myHelper = myMinValue;
+                    double myHelper = myMinValue;
                     myMinValue = myMaxValue;
                     myMaxValue = myHelper;
                     AC_WARNING << "Wrongly oriented intersection.";
@@ -924,7 +951,7 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, int theSliceI
                 int myEnd = int(floor(myMaxValue));
                 VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+(myTargetLineStride*v)+myStart);
                 for (int u = myStart; u < myEnd; ++u) {
-                    Vector3f mySourcePos = myLinePos + (float(u) * mySourceDeltaU);
+                    Vector3d mySourcePos = myLinePos + (double(u) * mySourceDeltaU);
                     if (theTrilliniarInterpolate) {
                         *myAddress = interpolatedValueAt<VoxelT>(mySourcePos);
                     } else {
@@ -1293,17 +1320,10 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f & theDir
     const Box3f & myOldBox = theVoxelVolume->getAttributeValue<Box3f>("boundingbox");
 
     Box3f myNewBox = myOldBox;
-    //Box3f myDirtyBox(theDirtyBox.getMin()[0]-1, theDirtyBox.getMin()[1]-1, theDirtyBox.getMin()[2]-1,
-    //    theDirtyBox.getMax()[0]+1, theDirtyBox.getMax()[1]+1, theDirtyBox.getMax()[2]+1);
     Box3f myDirtyBox(theDirtyBox);
     myNewBox.extendBy( myDirtyBox );
 
-    //AC_INFO << "theDirtyBox = " << theDirtyBox;
-    //AC_INFO << "myOldBox = " << myOldBox;
-    //AC_INFO << "myNewBox = " << myNewBox;
-
     if (myNewBox == myOldBox) {
-        //AC_INFO << "Raster box didn't change.";
         return;
     }
 
@@ -1311,13 +1331,10 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f & theDir
 
     int myTargetWidth  = int( round(mySize[0]) );
     int myTargetHeight = int( round(mySize[1]) );
-    //AC_INFO << "target width = " << myTargetWidth << " target height = " << myTargetHeight;
     int myNewRasterCount  = int( round(mySize[2]) );
 
     int myNewBoxBegin = int( round( myNewBox[Box3f::MIN][2] ));
     int myNewBoxEnd   = int( round( myNewBox[Box3f::MAX][2] ));
-    //AC_INFO << "myNewBoxBegin = " << myNewBoxBegin;
-    //AC_INFO << "myNewBoxEnd = " << myNewBoxEnd;
 
     int myOldBoxBegin = int( round(myOldBox[Box3f::MIN][2]) );
     int myOldBoxEnd   = int( round(myOldBox[Box3f::MAX][2]) );
@@ -1332,15 +1349,12 @@ CTScan::resizeVoxelVolume(dom::NodePtr theVoxelVolume, const asl::Box3f & theDir
     for(int i = myNewBoxBegin;i < myNewBoxEnd; ++i) {
         myNewRaster = CTScan::createGrayImage(myRasters, myTargetWidth, myTargetHeight, 0);
         if (i >= myOldBoxBegin && i < myOldBoxEnd) {
-            //AC_INFO << "blitting to " << myXOrigin << "x" << myYOrigin << "on " << i;
             myOldRaster = myRasters->childNode(0);
             ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
                     myNewRaster->childNode(0)->nodeValueWrapperPtr());
             ValuePtr mySourceRaster = myOldRaster->childNode(0)->nodeValueWrapperPtr();
             myTargetRaster->pasteRaster(myXOrigin, myYOrigin, * mySourceRaster); 
             myRasters->removeChild(myOldRaster);
-        } else {
-            //AC_INFO << "Creating new " << i;
         }
     }
 
@@ -1356,7 +1370,6 @@ CTScan::fillColorMap(dom::NodePtr thePaletteNode, ColorMap & theColorMap) {
         myColor = myItem->getAttributeValue<Vector3i>("color");
         myIndex = (unsigned char)(myItem->getAttributeValue<int>("index"));
         theColorMap[myColor] = myIndex;
-        //cerr << "index = " << int(myIndex) << " color = " << myColor << endl;
     }
 }
 
@@ -1395,10 +1408,8 @@ CTScan::applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
 
     for (unsigned y = myYStart; y < myYEnd; ++y) {
         for (unsigned x = myXStart; x < myXEnd; ++x) {
-            // AC_TRACE << "getPixel(" << x << "," << y << ")";
             asl::Vector4f myBrushPixel = myBrushRaster->getPixel(x, y);
             if (int(myBrushPixel[0]) == 255) {
-                // AC_TRACE << "setPixel(" << x +myXOrigin<< "," << y +myYOrigin<< ")";
                 myCanvasRaster->setPixel(myXOrigin + x, myYOrigin + y,
                         theColor[0], theColor[1], theColor[2], theColor[3]);
             }
@@ -1419,10 +1430,9 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
             theCanvasImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
 
     Box3f myMeasurementBox = theMeasurement->getAttributeValue<Box3f>("boundingbox");
-    //AC_WARNING << "theDirtyBox=" << theDirtyBox;
-    //AC_WARNING << "myMeasurementBox=" << myMeasurementBox;
 
-    unsigned myCanvasLineStride = getBytesRequired(myCanvas->width(), y60::RGBA);
+    unsigned myCanvasWidth = myCanvas->width();
+    unsigned myCanvasLineStride = getBytesRequired(myCanvasWidth, y60::RGBA);
     unsigned myBytesPerPixel = getBytesRequired(1, y60::RGBA);
     const unsigned char * mySourcePixels = myCanvas->pixels().begin();
     switch (theOrientation) {
@@ -1526,10 +1536,11 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
 
                     unsigned myTargetLineStride  = getBytesRequired(myTargetRaster->width(), y60::GRAY);
                     unsigned char * myTargetPixels = myTargetRaster->pixels().begin();
+                    unsigned myCanvasLineOffset = (myCanvasWidth-z-1) * myBytesPerPixel;
 
                     for (unsigned y = myYStart; y < myYEnd; ++y) {
 
-                        const unsigned char * myRGBPixel = & mySourcePixels[y * myCanvasLineStride + z * myBytesPerPixel];
+                        const unsigned char * myRGBPixel = & mySourcePixels[y * myCanvasLineStride + myCanvasLineOffset];
                         myPixel = Vector3i(myRGBPixel[0], myRGBPixel[1], myRGBPixel[2]);
 
                         // XXX: argh! map.find() in inner loop... any ideas? [DS]
@@ -1733,12 +1744,13 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
 
                     unsigned mySourceLineStride  = getBytesRequired(mySourceRaster->width(), y60::GRAY);
                     unsigned char * mySourcePixels = mySourceRaster->pixels().begin();
+                    unsigned myTargetLineOffset = (myCanvasWidth-z-1) * myBytesPerPixel;
 
                     for (unsigned y = myYStart; y < myYEnd; ++y) {
                         myIndex = mySourcePixels[(y - myYStart) * mySourceLineStride + mySourceX];
                         myColor = myPalette[myIndex].color;
                         myVoxel = *reinterpret_cast<const VoxelT*>(&(myRIPixels[y * myRIStride + z * myRIBPP]));
-                        myPixelIndex = y * myTargetLineStride + z * myBytesPerPixel;
+                        myPixelIndex = y * myTargetLineStride + myTargetLineOffset;
                         myTargetPixels[myPixelIndex] = myColor[0];
                         myTargetPixels[myPixelIndex + 1] = myColor[1];
                         myTargetPixels[myPixelIndex + 2] = myColor[2];

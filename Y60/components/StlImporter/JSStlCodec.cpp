@@ -2,6 +2,7 @@
 
 #include <asl/PackageManager.h>
 #include <y60/JSNode.h>
+#include <y60/JSBlock.h>
 
 using namespace asl;
 using namespace y60;
@@ -101,16 +102,29 @@ JSStlCodec::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
         return JS_FALSE;
     }
-    ensureParamCount(argc, 2);
+    ensureParamCount(argc, 1, 2);
     OWNERPTR myNewNative;
-    if (argc == 2) {
+    if (argc == 1) {
+        asl::Ptr<asl::Block> myBlock;
+        if (!convertFrom(cx, argv[0], myBlock)) {
+            JS_ReportError(cx, "Constructor for %s: first of 1 argument must be a block "
+                    ", got %d", ClassName(), argc);
+        }
+        myNewNative = OWNERPTR(new StlCodec(myBlock));
+    } else if (argc == 2) {
         std::string myFilename;
         bool myBigEndianFlag;
-        convertFrom(cx, argv[0], myFilename);
-        convertFrom(cx, argv[1], myBigEndianFlag);
+        if (!convertFrom(cx, argv[0], myFilename)) {
+            JS_ReportError(cx, "Constructor for %s: first of 2 arguments must be a string "
+                    "(filepath)", ClassName());
+        }
+        if (!convertFrom(cx, argv[1], myBigEndianFlag)) {
+            JS_ReportError(cx, "Constructor for %s: 2nd on 2 arguments must be a bool "
+                    "(bigendian?)", ClassName());
+        }
         myNewNative = OWNERPTR(new StlCodec(myFilename, myBigEndianFlag));
     } else {
-        JS_ReportError(cx, "Constructor for %s: bad number of arguments: expected none or one "
+        JS_ReportError(cx, "Constructor for %s: bad number of arguments: expected one or two "
             "(filepath), got %d", ClassName(), argc);
         return JS_FALSE;
     }

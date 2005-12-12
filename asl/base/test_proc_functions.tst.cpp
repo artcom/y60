@@ -33,7 +33,6 @@ class ProcUnitTest : public UnitTest {
             ENSURE(asl::getFreeMemory() > 0 && asl::getFreeMemory() < asl::getTotalMemory());
             ENSURE(asl::getUsedMemory() > 0);
 
-            DPRINT(asl::getProcessMemoryUsage());
             ENSURE(asl::getProcessMemoryUsage() > 0);
         }
 };

@@ -36,12 +36,41 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     *rval = STRING_TO_JSVAL(myString);
     return JS_TRUE;
 }
+
+static JSBool
+set(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+
+        JSImage::NATIVE * myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        Glib::ustring myStockID;
+        if ( ! convertFrom(cx, argv[0], myStockID)) {
+            JS_ReportError(cx, "Image::set() argument 0 must be a string");
+            return JS_FALSE;
+        }
+
+        int myIconSize;
+        if ( ! convertFrom(cx, argv[1], myIconSize)) {
+            JS_ReportError(cx, "Image::set() argument 1 must be a Gtk.BuiltinIconSize");
+            return JS_FALSE;
+        }
+
+        myNative->set(Gtk::StockID(myStockID), Gtk::BuiltinIconSize(myIconSize));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JSFunctionSpec *
 JSImage::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"set",                  set,                     2},
         {0}
     };
     return myFunctions;
@@ -119,6 +148,22 @@ JSImage::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             }
             std::string myImageWithPath = searchFileRelativeToJSInclude(cx, obj, argc, argv, myString);
             newNative = new NATIVE(myImageWithPath);
+        }
+        break;
+    case 2:
+        { 
+            // stock item, size
+            Glib::ustring myString;
+            if ( ! convertFrom(cx, argv[0], myString)) {
+                JS_ReportError(cx,"Constructor for %s: argument 0 must be a string", ClassName());
+                return JS_FALSE;
+            }
+            int mySize;
+            if ( ! convertFrom(cx, argv[1], mySize)) {
+                JS_ReportError(cx,"Constructor for %s: argument 0 must be a string", ClassName());
+                return JS_FALSE;
+            }
+            newNative = new NATIVE(Gtk::StockID(myString), Gtk::BuiltinIconSize(mySize));
         }
         break;
     default:

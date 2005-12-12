@@ -104,6 +104,10 @@ createAngleMarkup(y60::ScenePtr theScene, const std::string & theMaterialId,
 
 
 dom::NodePtr
+createLineStrip(y60::ScenePtr theScene, const std::string & theLineMaterialId,
+                         const std::vector<asl::Vector3f> & thePositions,
+                         const std::string & theName = "LineStripShape") ;
+dom::NodePtr
 createTriangleMeshMarkup(y60::ScenePtr theScene, const std::string & theLineMaterialId,
                          const std::string & theAreaMaterialId, 
                          const std::vector<asl::Vector3f> & thePositions,

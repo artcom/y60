@@ -42,10 +42,10 @@ namespace inet {
     {
         setRemoteAddr(thehost, theport);
 
-#if (MAKE_OS_VARIANT) == LINUX || (MAKE_OS_VARIANT) == SUNOS
-        if( ::connect(fd,(struct sockaddr*)&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) == 0 )
-#else
+#ifdef WIN32 
         if( ::connect(fd,&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) == 0 )
+#else            
+        if( ::connect(fd,(struct sockaddr*)&_myRemoteEndpoint,sizeof(_myRemoteEndpoint)) == 0 )
 #endif
         {
             return true;

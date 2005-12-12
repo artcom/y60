@@ -369,7 +369,7 @@ public abstract class CommandLineLinker extends AbstractLinker
           	writer.write(args[i]);
           	writer.write("\"\n");
           } else {
-          	writer.write(args[i]);
+            writer.write(args[i]);
             writer.write('\n');
           }
         }

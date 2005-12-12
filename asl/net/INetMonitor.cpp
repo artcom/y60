@@ -29,7 +29,7 @@
 #include <curl/curl.h>
 
 #include <string>
-#ifdef LINUX
+#ifndef WIN32
 #include <unistd.h>
 #endif
 

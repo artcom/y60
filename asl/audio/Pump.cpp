@@ -14,10 +14,12 @@
 #include "Pump.h"
 #include "DummyPump.h"
 #include "AudioException.h"
-#ifdef LINUX
-#include "ALSAPump.h"
-#else
+#ifdef WIN32
 #include "DirectSoundPump.h"
+#elif LINUX
+#include "ALSAPump.h"
+#elif OSX
+#include "CoreAudioPump.h"
 #endif
 
 #include <asl/Auto.h>
@@ -123,23 +125,19 @@ Pump& Pump::get() {
         useRealPump = false;
     }
     if (useRealPump) {
-#ifdef LINUX
         try {
-            return Singleton<ALSAPump>::get();
-        } catch (const AudioException& e) {
-            AC_WARNING << "Could not create ALSAPump.";
-            AC_WARNING << "Error was: " << e;
-            useRealPump = false;
-        }
-#else
-        try {
+#ifdef WIN32           
             return Singleton<DirectSoundPump>::get();
+#elif LINUX
+            return Singleton<ALSAPump>::get();
+#else
+            return Singleton<CoreAudioPump>::get();
+#endif
         } catch (const AudioException& e) {
-            AC_WARNING << "Could not create DirectSoundPump.";
+            AC_WARNING << "Could not create NativePump.";
             AC_WARNING << "Error was: " << e;
             useRealPump = false;
         }
-#endif
     }
     return Singleton<DummyPump>::get();
     
@@ -225,7 +223,7 @@ void Pump::start() {
         if (!amIRoot) {
             setPriority (SCHED_OTHER, PosixThread::getMaxPriority(SCHED_OTHER));
             AC_WARNING << "Audio running at normal priority.";
-#ifdef LINUX
+#ifndef WIN32
             AC_WARNING << "To get realtime priority, start as root.";
 #endif
         } else {

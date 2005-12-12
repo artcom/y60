@@ -249,6 +249,30 @@ namespace y60 {
     }
     
     dom::NodePtr
+    createLineStrip(y60::ScenePtr theScene, const std::string & theLineMaterialId,
+                         const std::vector<asl::Vector3f> & thePositions,
+                         const std::string & theName) 
+    {
+        ShapeBuilder myShapeBuilder(theName);
+        ElementBuilder myLineElementBuilder(PRIMITIVE_TYPE_LINE_STRIP, theLineMaterialId);
+
+        theScene->getSceneBuilder()->appendShape(myShapeBuilder);
+
+        myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE,
+                    thePositions.size());
+
+        myLineElementBuilder.createIndex(POSITION_ROLE, POSITIONS, thePositions.size());
+
+        for(unsigned i = 0; i < thePositions.size(); ++i) {
+            myShapeBuilder.appendVertexData(POSITION_ROLE, thePositions[i]);
+            myLineElementBuilder.appendIndex(POSITIONS, i);
+        }
+
+        myShapeBuilder.appendElements( myLineElementBuilder );
+        return myShapeBuilder.getNode();
+    }
+
+    dom::NodePtr
     createTriangleMeshMarkup(y60::ScenePtr theScene, const std::string & theLineMaterialId,
                              const std::string & theAreaMaterialId,
                              const std::vector<asl::Vector3f> & thePositions,

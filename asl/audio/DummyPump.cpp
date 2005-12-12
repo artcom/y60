@@ -45,7 +45,6 @@ DummyPump::DummyPump ()
 
     _curFrame = 0;
     _myOutputBuffer.init(2048, getNumOutputChannels(), getNativeSampleRate());
-    _myTempBuffer.init(2048, getNumOutputChannels(), getNativeSampleRate());
     
     dumpState();
     start();

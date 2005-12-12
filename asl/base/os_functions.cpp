@@ -275,10 +275,10 @@ namespace asl {
     }
 
     unsigned long getThreadId() {
-#ifdef LINUX
-        return getpid();
-#else
+#ifdef WIN32
         return GetCurrentThreadId();
+#else
+        return getpid(); // TODO: check if this ok on Mac OS
 #endif
     }
 

@@ -15,6 +15,7 @@
 */
 
 #include "proc_functions.h"
+#include "error_functions.h"
 #include "Logger.h"
 
 #ifdef WIN32
@@ -22,6 +23,16 @@
 #else
 #include "file_functions.h" // IO_Exception
 #endif
+
+#ifdef OSX
+#include <mach/mach.h>
+#include <kvm.h>
+#include <paths.h>
+#include <sys/sysctl.h>
+#include <Carbon/Carbon.h>
+#endif
+
+using namespace std;
 
 namespace asl {
 
@@ -139,6 +150,24 @@ namespace asl {
     }
 #endif
 
+#ifdef OSX
+    void getMemInfoMach(unsigned long long & theUsedBytes, unsigned long long & theFreeBytes) {
+        mach_port_t myHostPort = mach_host_self();
+        mach_msg_type_number_t myHostSize = sizeof(vm_statistics_data_t) / sizeof( integer_t);
+        vm_size_t myPagesize;
+        host_page_size(myHostPort, & myPagesize);
+        vm_statistics_data_t myVmStats;
+        if (host_statistics(myHostPort, HOST_VM_INFO, (host_info_t) & myVmStats,
+                    & myHostSize) != KERN_SUCCESS) 
+        {
+            throw asl::Exception("Failed to get memory info.", PLUS_FILE_LINE);
+        }
+        theUsedBytes = (myVmStats.active_count + myVmStats.inactive_count +
+                myVmStats.wire_count) * myPagesize;
+        theFreeBytes = myVmStats.free_count * myPagesize;
+    }
+#endif
+
     unsigned getTotalMemory() {
         static unsigned myTotalMemory = 0;
         if (myTotalMemory == 0) {
@@ -151,6 +180,11 @@ namespace asl {
             myTotalMemory = myMemStat.dwTotalPhys;
 #elif LINUX
             myTotalMemory = getMemInfo(MEM_TOTAL);
+#elif OSX
+            unsigned long long myUsedBytes;
+            unsigned long long myFreeBytes;
+            getMemInfoMach( myUsedBytes, myFreeBytes);
+            myTotalMemory = (myUsedBytes + myFreeBytes) / 1024;
 #endif
             AC_TRACE << "Total system memory " << (myTotalMemory / 1024) << " MB";
         }
@@ -168,6 +202,11 @@ namespace asl {
         // the kernel usually tries to take all free memory for caching.
         // Free memory is a waste of resources anyway...
         myUsedMemory = getMemInfo(MEM_USED);
+#elif OSX
+        unsigned long long myUsedBytes;
+        unsigned long long myFreeBytes;
+        getMemInfoMach( myUsedBytes, myFreeBytes);
+        myUsedMemory = myUsedBytes / 1024;
 #endif
         AC_TRACE << "Used system memory " << (myUsedMemory / 1024) << " MB";
         return myUsedMemory;
@@ -181,6 +220,11 @@ namespace asl {
         myFreeMemory = myMemStat.dwAvailPhys;
 #elif LINUX
         myFreeMemory = getTotalMemory() - getUsedMemory();
+#elif OSX
+        unsigned long long myUsedBytes;
+        unsigned long long myFreeBytes;
+        getMemInfoMach( myUsedBytes, myFreeBytes);
+        myFreeMemory = myFreeBytes / 1024;
 #endif
         AC_TRACE << "Free system memory " << (myFreeMemory / 1024) << " MB";
         return myFreeMemory;
@@ -192,6 +236,11 @@ namespace asl {
             thePid = GetCurrentProcessId();
 #else
             thePid = getpid();
+#endif
+        } else {
+#ifdef OSX
+            throw asl::Exception("Can not retrieve process memory for foreign processes on MacOS X.",
+                                 PLUS_FILE_LINE);
 #endif
         }
         unsigned myMemUsage = 0;
@@ -206,6 +255,23 @@ namespace asl {
         }
 #elif LINUX
         myMemUsage = getProcMemInfo(thePid);
+#elif OSX
+        kern_return_t myStatus;
+
+        mach_port_t myTask;
+        myStatus = task_for_pid(mach_task_self(), thePid, & myTask);
+        if ( myStatus != KERN_SUCCESS) {
+            throw asl::Exception(std::string("Mach call failed: ") + mach_error_string(myStatus), PLUS_FILE_LINE);
+        }
+        struct task_basic_info myTaskInfo;
+        mach_msg_type_number_t myCount = TASK_BASIC_INFO_COUNT;
+        myStatus = task_info(myTask, TASK_BASIC_INFO, (task_info_t)& myTaskInfo, & myCount);
+        if ( myStatus != KERN_SUCCESS) {
+            throw asl::Exception(std::string("Mach call failed: ") + mach_error_string(myStatus), PLUS_FILE_LINE);
+        }
+
+        // [DS] dunno exactly if this is correct ... but it works;
+        myMemUsage = myTaskInfo.resident_size / 1024;
 #endif
         AC_TRACE << "Process " << thePid << " uses " << (myMemUsage / 1024) << " MB";
         return myMemUsage;

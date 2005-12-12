@@ -89,11 +89,15 @@ public:
         fraction_iterator<int*, int> end = begin + 10;
         vector<int> result(11,-1);
         copy(begin, end, result.begin());
-        int expectedResult[] = {0,30,60,100,130,160,200,230,260,300,-1};
+        int expectedResult[] = {0,30,70,100,130,170,200,230,270,300,-1};
+        int expectedResultWin[] = {0,30,60,100,130,160,200,230,260,300,-1};
 
-        ENSURE(equal(expectedResult,expectedResult+11,result.begin()));
+        ENSURE(equal(expectedResult,expectedResult+11,result.begin()) ||
+               equal(expectedResultWin,expectedResultWin+11,result.begin()));
         DTITLE("expectedResult:");
         copy(expectedResult, expectedResult+11, ostream_iterator<int>(cerr, " "));cerr<<endl;
+        DTITLE("expectedResultWin:");
+        copy(expectedResultWin, expectedResultWin+11, ostream_iterator<int>(cerr, " "));cerr<<endl;
         DTITLE("result:");
         copy(result.begin(), result.end(), ostream_iterator<int>(cerr, " "));cerr<<endl;
 
@@ -131,11 +135,15 @@ public:
         fraction_iterator<int*, int> end = begin + 10;
         vector<int> result(11,-1);
         copy(begin, end, result.begin());
-        int expectedResult[] = {0,0,0,10,10,10,20,20,20,30,-1};
+        int expectedResult[] = {0,0,0,10,10,10,20,20,20,20,-1};
+        int expectedResultWin[] = {0,0,0,10,10,10,20,20, 20, 30, -1};
 
-        ENSURE(equal(expectedResult,expectedResult+11,result.begin()));
+        ENSURE(equal(expectedResult,expectedResult+11,result.begin()) || 
+            equal(expectedResultWin,expectedResultWin+11,result.begin()));
         DTITLE("expectedResult:");
         copy(expectedResult, expectedResult+11, ostream_iterator<int>(cerr, " "));cerr<<endl;
+        DTITLE("expectedResultWin:");
+        copy(expectedResultWin, expectedResultWin+11, ostream_iterator<int>(cerr, " "));cerr<<endl;
         DTITLE("result:");
         copy(result.begin(), result.end(), ostream_iterator<int>(cerr, " "));cerr<<endl;
 

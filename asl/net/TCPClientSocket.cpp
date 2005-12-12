@@ -27,7 +27,7 @@
 #include <asl/Logger.h>
 #include <asl/Time.h>
 
-#ifdef LINUX
+#ifndef WIN32
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netinet/in.h>

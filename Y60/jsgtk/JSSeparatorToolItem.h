@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 2003, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: JSToolButton.h,v $
+//   $RCSfile: JSSeparatorToolItem.h,v $
 //   $Author: martin $
 //   $Revision: 1.2 $
 //   $Date: 2004/11/27 16:22:00 $
@@ -16,36 +16,34 @@
 //
 //=============================================================================
 
-#ifndef _Y60_ACGTKSHELL_JSTOOLBUTTON_INCLUDED_
-#define _Y60_ACGTKSHELL_JSTOOLBUTTON_INCLUDED_
+#ifndef _Y60_ACGTKSHELL_JSSEPARATOR_TOOL_ITEM_INCLUDED_
+#define _Y60_ACGTKSHELL_JSSEPARATOR_TOOL_ITEM_INCLUDED_
 
 #include "JSToolItem.h"
 #include <y60/JSWrapper.h>
-#include <gtkmm/toolbutton.h>
+#include <gtkmm/separatortoolitem.h>
 
 #include <asl/string_functions.h>
 
 namespace jslib {
 
-class JSToolButton : public JSWrapper<Gtk::ToolButton, asl::Ptr<Gtk::ToolButton>, StaticAccessProtocol> {
-        JSToolButton();  // hide default constructor
+class JSSeparatorToolItem : public JSWrapper<Gtk::SeparatorToolItem, asl::Ptr<Gtk::SeparatorToolItem>, StaticAccessProtocol> {
+        JSSeparatorToolItem();  // hide default constructor
     typedef JSToolItem JSBASE;
     public:
-        virtual ~JSToolButton() {
+        virtual ~JSSeparatorToolItem() {
         }
-        typedef Gtk::ToolButton NATIVE;
-        typedef asl::Ptr<Gtk::ToolButton> OWNERPTR;
+        typedef Gtk::SeparatorToolItem NATIVE;
+        typedef asl::Ptr<Gtk::SeparatorToolItem> OWNERPTR;
         typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
         static const char * ClassName() {
-            return "ToolButton";
+            return "SeparatorToolItem";
         };
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
-             PROP_signal_clicked = JSBASE::PROP_END,
-             PROP_stock_id,
-             PROP_END
+             PROP_END = JSBASE::PROP_END
         };
         static JSPropertySpec * Properties();
 
@@ -68,7 +66,7 @@ class JSToolButton : public JSWrapper<Gtk::ToolButton, asl::Ptr<Gtk::ToolButton>
             return Base::Construct(cx, theOwner, theNative);
         }
 
-        JSToolButton(OWNERPTR theOwner, NATIVE * theNative)
+        JSSeparatorToolItem(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
         { }
 
@@ -76,18 +74,18 @@ class JSToolButton : public JSWrapper<Gtk::ToolButton, asl::Ptr<Gtk::ToolButton>
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
         static void addClassProperties(JSContext * cx, JSObject * theClassProto);
 
-        static JSToolButton & getObject(JSContext *cx, JSObject * obj) {
-            return dynamic_cast<JSToolButton &>(JSToolButton::getJSWrapper(cx,obj));
+        static JSSeparatorToolItem & getObject(JSContext *cx, JSObject * obj) {
+            return dynamic_cast<JSSeparatorToolItem &>(JSSeparatorToolItem::getJSWrapper(cx,obj));
         }
 
     private:
 };
 
 template <>
-struct JSClassTraits<JSToolButton::NATIVE>
-    : public JSClassTraitsWrapper<JSToolButton::NATIVE, JSToolButton> {};
+struct JSClassTraits<JSSeparatorToolItem::NATIVE>
+    : public JSClassTraitsWrapper<JSSeparatorToolItem::NATIVE, JSSeparatorToolItem> {};
 
-jsval as_jsval(JSContext *cx, JSToolButton::OWNERPTR theOwner, JSToolButton::NATIVE * theToolButton);
+jsval as_jsval(JSContext *cx, JSSeparatorToolItem::OWNERPTR theOwner, JSSeparatorToolItem::NATIVE * theSeparatorToolItem);
 
 } // namespace
 

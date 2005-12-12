@@ -45,7 +45,13 @@
 #define _included_asl_error_functions_
 
 #include "string_functions.h"
+#include "Exception.h"
+
 #include <errno.h>
+
+#ifdef OSX
+#include <Carbon/Carbon.h>
+#endif
 
 #ifdef WIN32
 # include <windows.h>
@@ -102,6 +108,20 @@ std::string errorDescription(LAST_ERROR_TYPE err) {
     return strerror(err);
 #endif
 }
+
+#ifdef OSX
+
+DEFINE_EXCEPTION(OSXError, asl::Exception);
+
+static void
+checkOSXError(OSErr theErrorCode, const std::string & theWhere) {
+    if (theErrorCode != noErr) {
+        throw OSXError(std::string("An error occured. Error code: ") +
+                       as_string(theErrorCode), theWhere);
+    }
+}
+
+#endif
 
 /* @} */
 

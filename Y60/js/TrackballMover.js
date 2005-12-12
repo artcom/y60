@@ -166,7 +166,11 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
 
     function getTrackballCenter() {
         if (_myTrackballBody) {
-            return _myTrackballBody.boundingbox.center;
+            if (_myTrackballBody.boundingbox.isEmpty) {
+                return _myTrackballBody.globalmatrix.getRow(3).xyz;
+            } else {
+                return _myTrackballBody.boundingbox.center;
+            }
         } else {
             var myViewVector = product(obj.getMoverObject().globalmatrix.getRow(2).xyz, -1);
             var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();

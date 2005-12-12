@@ -76,11 +76,10 @@ namespace inet {
     }
 
     void TCPServer::close() {
-#ifdef LINUX
-        ::close(fd);
-#endif
 #ifdef WIN32
         closesocket(fd);
+#else
+        ::close(fd);
 #endif
         fd = -1;
         AC_INFO << "TCPServer closed" << endl;
@@ -88,10 +87,10 @@ namespace inet {
 
     TCPSocket* TCPServer::waitForConnection() const
     {
-#ifdef LINUX
-        unsigned int remoteEndpointLen;
-#else
+#ifdef WIN32
         int remoteEndpointLen;
+#else
+        socklen_t remoteEndpointLen;
 #endif
         char *myaddrstr;
         Endpoint remoteEndpoint;
