@@ -70,12 +70,12 @@ ourHandler.on_mainWindow_realize = function() {
 
 ourHandler.on_new_activate = function() {
     ourViewer.setModelName("");
-    var myScene = new Scene();
+    var myScene = new Scene(null);
     ourViewer.setScene(myScene);
     var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
     ourViewer.setCanvas(myCanvas);
-    ourPreferenceDialog.apply();
     ourStatusBar.set("New scene");
+    setupGUI();
     window.queue_draw();
 }
 
@@ -104,9 +104,8 @@ ourHandler.on_open_activate = function() {
         ourViewer.setScene(myScene);
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         ourViewer.setCanvas(myCanvas);
-        ourViewer.setMover(ClassicTrackballMover, window.canvas.childNode('viewport'));
-        ourPreferenceDialog.apply();
         ourStatusBar.set("Opened scene: " + myFilename);
+        setupGUI();
         window.queue_draw();
     }
     window.pause = isPaused;
@@ -472,6 +471,7 @@ var ourCameraComboBox = null;
 
 function setupCameraComboBox() {
     ourCameraComboBox = new ComboBoxText();
+    ourGlade.get_widget("camera_box").pack_end(ourCameraComboBox, false, false);
     ourCameraComboBox.show();
 
     var myCameras = window.scene.cameras;
@@ -481,7 +481,6 @@ function setupCameraComboBox() {
         }
         ourCameraComboBox.active_text = window.camera.name;
 
-        ourGlade.get_widget("camera_box").pack_end(ourCameraComboBox, false, false);
         ourCameraComboBox.signal_changed.connect(ourCameraComboBox, "on_changed");
         ourCameraComboBox.on_changed = function() {
             for (i = 0; i < window.scene.cameras.length; ++i) {
@@ -490,6 +489,7 @@ function setupCameraComboBox() {
                 }
             }
         }
+        ourGlade.get_widget("camera_box").show();
     } else {
         ourGlade.get_widget("camera_box").hide();
     }
@@ -524,13 +524,17 @@ function main(argv) {
     ourViewer.registerMover(ClassicTrackballMover);
     ourViewer.registerMover(FlyMover);
     ourViewer.registerMover(WalkMover);
-    ourViewer.setMover(ClassicTrackballMover, window.canvas.childNode('viewport'));
-
-    ourPreferenceDialog.apply();
     ourAnimationManager = new GtkAnimationManager(ourViewer);
-    setupCameraComboBox();
+    setupGUI();
 
     return GtkMain.run(ourMainWindow);
+}
+
+function setupGUI() {
+    ourAnimationManager.setup();
+    ourViewer.setMover(ClassicTrackballMover, window.canvas.childNode('viewport'));
+    ourPreferenceDialog.apply();
+    setupCameraComboBox();
 }
 
 if (main(arguments) != 0) {

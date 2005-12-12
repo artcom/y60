@@ -89,13 +89,17 @@ GtkAnimationManager.prototype.Constructor = function(self, theViewer) {
         }
     }
 
-    function setup() {
+    self.setup = function() {
         // Turn off all animation widgets, if we do not need them
         if (_myViewer.getAnimations().childNodes.length == 0 && _myViewer.getCharacters().childNodes.length == 0) {
             ourGlade.get_widget("animation_toolbar").hide();
             ourGlade.get_widget("animation_menu").hide();
             _myActive = false;
             return;
+        } else {
+            ourGlade.get_widget("animation_toolbar").show();
+            ourGlade.get_widget("animation_menu").show();
+            _myActive = true;
         }
 
         self.enable(false);
@@ -145,8 +149,6 @@ GtkAnimationManager.prototype.Constructor = function(self, theViewer) {
 
         _myCharacterComboBox.active_index = 0;
     }
-
-    setup();
 }
 
 //=================================================
