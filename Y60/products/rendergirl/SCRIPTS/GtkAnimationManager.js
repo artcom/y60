@@ -29,6 +29,7 @@ GtkAnimationManager.prototype.Constructor = function(self, theViewer) {
     AnimationManager.prototype.Constructor(self, theViewer);
     var Base = {};
 
+    const ANIMATION_FRAMES_PER_SECOND = 25;
     var _myViewer            = theViewer;
     var _myCurrentCharacter  = null;
     var _myCurrentClip       = null;
