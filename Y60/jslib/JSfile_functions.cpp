@@ -563,7 +563,7 @@ JSFileFunctions::Functions() {
         {"readFileAsString",  ReadFileAsString,  1},
         {"readFileAsBlock",   ReadFileAsBlock,   1},
         {"writeStringToFile", WriteStringToFile, 2},
-        {"writeBlockToFile",  WriteStringToFile, 2},
+        {"writeBlockToFile",  WriteBlockToFile, 2},
         {"getLastModified",        GetLastModified,  1},
         {"getFilenamePart",        GetFilenamePart,  1},
         {"getDirectoryPart",       GetDirectoryPart, 1},
