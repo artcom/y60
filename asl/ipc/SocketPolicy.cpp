@@ -22,6 +22,7 @@
 
 #include <asl/net.h>
 #include <asl/string_functions.h>
+#include <asl/Logger.h>
 
 #include <errno.h>
 
@@ -41,7 +42,8 @@ void
 SocketPolicy::disconnect(Handle & theHandle) {
 #ifdef WIN32        
     closesocket(theHandle);
-#else    
+#else   
+    ::shutdown(theHandle, SHUT_RDWR);
     ::close(theHandle);
 #endif
     theHandle = 0;
@@ -52,8 +54,10 @@ SocketPolicy::stopListening(Handle theHandle) {
 #ifdef WIN32        
     closesocket(theHandle);
 #else
+    ::shutdown(theHandle, SHUT_RDWR);
     ::close(theHandle);
 #endif
+    theHandle = 0;
 }
 
 SocketPolicy::Handle 
