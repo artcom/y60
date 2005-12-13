@@ -28,7 +28,7 @@ rm -f TEST_IMAGES/*
 rm -f TESTMODELS/*.x60
 maya2x60 TESTMODELS/testcube.mb
 cp TESTMODELS/testcube.x60 TESTMODELS/test_save.x60
-acgtkshell -I "SCRIPTS;C:/Dev/pro60/src/Y60/js;C:/Dev/pro60/lib" ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60
+acgtkshell -I "SCRIPTS;$PRO/src/Y60/js;$PRO/src/Y60/shader;$PRO/lib" ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60
 
 for BASELINE_IMAGE in BASELINE_IMAGES/* ; do
     compareSceneImages $BASELINE_IMAGE
