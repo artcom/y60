@@ -32,7 +32,7 @@ namespace asl {
 
 class TCPPolicy : public SocketPolicy {
     public:
-        typedef INetEndpoint asl::Endpoint; 
+        typedef INetEndpoint Endpoint;
         /// Creates a (client) conduit connected to the remote endpoint
         // @throws ConduitException
         static Handle connectTo(Endpoint theRemoteEndpoint);
