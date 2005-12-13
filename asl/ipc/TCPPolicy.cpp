@@ -52,6 +52,11 @@ TCPPolicy::connectTo(Endpoint theRemoteEndpoint) {
 TCPPolicy::Handle
 TCPPolicy::startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount) {
     Handle myHandle=socket(AF_INET,SOCK_STREAM,0);    
+    
+    int myReuseSocketFlag = 1;
+    if (setsockopt(myHandle, SOL_SOCKET, SO_REUSEADDR, (char*)&myReuseSocketFlag, sizeof(myReuseSocketFlag)) != 0) {
+        throw ConduitException("can`t set already bound rcv socket to reuse.", PLUS_FILE_LINE);
+    }
 
     if (bind(myHandle,(struct sockaddr*)&theEndpoint,sizeof(theEndpoint))<0) {
         int myLastError = inet::getLastSocketError();
