@@ -131,7 +131,7 @@ namespace y60 {
     void 
     StlCodec::exportShape(const dom::NodePtr theNode) {
         ShapePtr myShape = theNode->getFacade<Shape>();
-        if (myShape && _myBigStream) {
+        if (myShape) {
             switch (_myOutputMode) {
                 case BIGENDIAN:
                     exportShapeToStream(myShape, *_myBigStream);
