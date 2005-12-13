@@ -253,11 +253,18 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                 case "sys req":
                 case "print screen":
                     var myDate = new Date();
-                    print("save screenshot as: " + "screenshot_" + myDate.getDate() + "." +
-                        (myDate.getMonth()+1) + "_" + _myScreenShotCounter + ".png");
-                    window.saveBuffer("screenshot_" + myDate.getDate() + "." +
-                                    (myDate.getMonth()+1) + "_" + _myScreenShotCounter + ".png");
-                    _myScreenShotCounter++;
+                    var myFilename = "";
+                    while (1) {
+                        myFilename = "screenshot-";
+                        myFilename += String(myDate.getFullYear()) + padStringFront(myDate.getMonth()+1, "0", 2) + padStringFront(myDate.getDate(), "0", 2);
+                        myFilename += "-" + _myScreenShotCounter + ".png";
+                        if (!fileExists(myFilename)) {
+                            break;
+                        }
+                        _myScreenShotCounter++;
+                    }
+                    print("Saving screenshot as '" + myFilename + "'");
+                    window.saveBuffer(myFilename);
                     break;
                 case 'M':
                     window.showMouseCursor = !window.showMouseCursor;
