@@ -350,10 +350,9 @@ public class CUtil {
             throws BuildException {
         try {
            
+            //DK & TS split space spearated cmd line options before execution
             Vector myVector = new Vector();
             for(int i=0;i<cmdline.length;++i) {
-                //DK & TS split space spearated cmd line options before execution
-                /*
                 if (cmdline[i].indexOf(" -") >= 0) {
                     String[] myArgs = cmdline[i].split(" -");
                     myVector.add(myArgs[0]);
@@ -366,25 +365,13 @@ public class CUtil {
                         myVector.add(cmdline[i]);
                     }
                 }
-                */
-                //DS & TS split space spearated cmd line options before execution
-                //This may break pathes, that contain blanks in their names
-                if (cmdline[i].indexOf(" ") >= 0) {
-                    String[] myArgs = cmdline[i].split(" ");
-                    for (int j = 0; j < myArgs.length; ++j) {
-                        myVector.add(myArgs[j]);
-                    }
-                } else {
-                    if (cmdline[i].length() > 0) {
-                        myVector.add(cmdline[i]);
-                    }
-                }
             }
-            // XXX
-            /*for(int i=0;i<myVector.size();++i) {
+            /* 
+            for(int i=0;i<myVector.size();++i) {
                 System.out.println("<" + myVector.elementAt(i) + ">");
-            } */
-
+            }
+            */
+            
             String[] mySpaceSplittedCmdLine = (String[]) myVector.toArray(new String[0]);
             //DK & TS done. 
             //String[] mySpaceSplittedCmdLine = cmdline;
