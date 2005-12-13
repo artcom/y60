@@ -32,19 +32,10 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
 
     obj.setup = function() {
         if (getDescendantById(_mySceneViewer.getMaterials(), "mCoordinateSystem") == null) {
-            var myDiffuseColor = new Vector4f(0.8,0.8,0.8,1);
-            var myAmbientColor = new Vector4f(0.5,0.5,0.5,1);
-            var myLightingFeatures = "[10[unlit]]";
-
-            _myMaterial = buildMaterialNode(_mySceneViewer.getMaterials(),
-                                            "CoordinateSystem",
-                                            myDiffuseColor,
-                                            myAmbientColor,
-                                            null,
-                                            myLightingFeatures);
+            _myMaterial = _mySceneViewer.getScene().createColorMaterial([1,1,1,1]);
             var myVertexparamsFeatures = new Node('<feature name="vertexparams">[0[]]</feature>\n').firstChild;
             _myMaterial.requires.appendChild(myVertexparamsFeatures);
-            myMaterialNode.requires.vertexparams = "[100[color]]";
+            _myMaterial.requires.vertexparams = "[100[color]]";
 
             var myShapeBuilder = new ShapeBuilder("s_CoordinateSystem");
             myShapeBuilder.appendNormal([0,0,0]);
@@ -59,8 +50,6 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
 
             _myShapeNode = myShapeBuilder.buildNode();
             _mySceneViewer.getShapes().appendChild(_myShapeNode);
-
-            _mySceneViewer.getScene().update(Renderer.ALL);
         }
     }
 
@@ -106,12 +95,15 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     function showCoordinate(theNode, theFlag) {
-        var myScaleFactor = distance(theNode.boundingbox[0],theNode.boundingbox[1]);
-
         if (theFlag) {
-            var myBodyNode = buildBodyNode("b_coord_" + theNode.id, _myShapeNode.id);
-            myBodyNode.scale = new Vector3f(myScaleFactor, myScaleFactor, myScaleFactor);
-            theNode.appendChild(myBodyNode);
+            if (!theNode.boundingbox.isEmpty) {
+                var myScaleFactor = distance(theNode.boundingbox[0], theNode.boundingbox[1]);
+                var myBodyNode = new Node('<body/>').firstChild;
+                myBodyNode.name = "b_coord_" + theNode.id;
+                myBodyNode.shape = _myShapeNode.id;
+                myBodyNode.scale = new Vector3f(myScaleFactor, myScaleFactor, myScaleFactor);
+                theNode.appendChild(myBodyNode);
+            }
         } else {
             var myCoordNode = getDescendantByName(theNode, "b_coord_" + theNode.id, true);
             if (myCoordNode) {

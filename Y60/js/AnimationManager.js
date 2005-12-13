@@ -342,6 +342,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
     obj.reset = function() {
         _myAnimationTime = 0;
         _myUpdated = true;
+        window.runAnimations(_myAnimationTime);
     }
 
     obj.step = function(theDirection) {

@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: rendergirl.js,v $
-//   $Author: christian $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/27 13:18:38 $
-//
-//
-//=============================================================================
 
 use("BaseViewer.js");
 use("PreferenceDialog.js");
@@ -29,7 +21,7 @@ var ourHandler           = {};
 use("StatusBar.js");
 use("GtkAnimationManager.js");
 
-const VERSION_STRING    = "0.9";
+const REVISION_STRING    = revision();
 
 var window               = new RenderArea();
 
@@ -82,22 +74,29 @@ ourHandler.on_new_activate = function() {
 ourHandler.on_save_activate = function() {
     var myFilename = ourViewer.getModelName();
     var myBinaryFlag = (myFilename.search(/\.b60$/i) != -1);
-    window.saveScene(myFilename, myBinaryFlag);
+    window.scene.save(myFilename, myBinaryFlag);
     ourStatusBar.set("Saved scene: " + myFilename);
 }
 
-ourHandler.on_save_as_activate = function() {
-    var myFilename = askUserForFilename("Save scene");
+ourHandler.on_save_as_activate = function(theArguments) {
+    var myFilename = theArguments;
+    if (typeof(myFilename) == "object") {
+        myFilename = askUserForFilename("Save scene");
+    }
+
     if (myFilename) {
         var myBinaryFlag = (myFilename.search(/\.b60$/i) != -1);
-        window.saveScene(myFilename, myBinaryFlag);
+        window.scene.save(myFilename, myBinaryFlag);
         ourStatusBar.set("Saved scene as: " + myFilename);
     }
 }
-ourHandler.on_open_activate = function() {
+ourHandler.on_open_activate = function(theArguments) {
     var isPaused = window.pause;
     window.pause = true;
-    var myFilename = getFilenameDialog("Open Scene", FileChooserDialog.ACTION_OPEN);
+    var myFilename = theArguments;
+    if (typeof(theArguments) == "object") {
+        myFilename = getFilenameDialog("Open Scene", FileChooserDialog.ACTION_OPEN);
+    }
     if (myFilename) {
         ourViewer.setModelName(myFilename);
         var myScene = new Scene(myFilename);
@@ -110,8 +109,11 @@ ourHandler.on_open_activate = function() {
     }
     window.pause = isPaused;
 }
-ourHandler.on_save_screenshot_activate = function() {
-    var myFilename = askUserForFilename("Save screenshot");
+ourHandler.on_save_screenshot_activate = function(theArguments) {
+    var myFilename = theArguments;
+    if (typeof(myFilename) == "object") {
+        myFilename = askUserForFilename("Save screenshot");
+    }
     if (myFilename) {
         window.saveBuffer(myFilename);
         ourStatusBar.set("Saved screenshot: " + myFilename);
@@ -187,7 +189,7 @@ ourHandler.on_fullscreen_activate = function(theMenuItem) {
 
         // Well the window size we get from gtk is not the same we have to put into resize to get
         // the same result :-(
-        ourMainWindow.size = [ourWindowState.size.x - 8, ourWindowState.size.x - 40];
+        ourMainWindow.size = [ourWindowState.size.x - 8, ourWindowState.size.y - 34];
         ourMainWindow.position = ourWindowState.position;
     }
 }
@@ -325,7 +327,7 @@ ourHandler.on_bb_shape_activate = function() {
     window.queue_draw();
 }
 ourHandler.on_hierarchy_activate = function() {
-    window.getRenderer().boundingVolumeMode = Renderer.BV_HIRARCHY;
+    window.getRenderer().boundingVolumeMode = Renderer.BV_HIERARCHY;
     ourStatusBar.set("Bounding volume mode: hierarchy");
     window.queue_draw();
 }
@@ -360,7 +362,7 @@ ourHandler.on_about1_activate = function(theMenuItem) {
     var myDialog = ourGlade.get_widget("dlgAbout", ourViewer);
     myDialog.find_child("lblVersion").label =
             "<span size=\"25000\">rendergirl</span>\n" +
-            "Version: " + VERSION_STRING;
+            "Revision: " + REVISION_STRING;
     myDialog.show();
 }
 ourHandler.on_about_closed = function() {
@@ -396,6 +398,9 @@ ourHandler.on_walkmover_toggled = function(theButton) {
 // Main Viewer
 //=================================================
 
+
+if (RenderTest == undefined) var RenderTest = null;
+
 function Viewer(theArguments) {
     this.Constructor(this, theArguments);
 }
@@ -405,6 +410,10 @@ Viewer.prototype.Constructor = function(self, theArguments) {
     self.BaseViewer = [];
 
     self.onFrame = function(theTime) {
+        if (RenderTest) {
+            RenderTest.onFrame(theTime);
+        }
+
         ourStatusBar.onFrame();
 
         var myMover = self.getMover();
@@ -449,6 +458,12 @@ Viewer.prototype.Constructor = function(self, theArguments) {
                 break;
         }
     }
+
+    self.onPostRender = function() {
+        if (RenderTest) {
+            RenderTest.onPostRender();
+        }
+    }
 /*
     self.BaseViewer.onMouseButton = self.onMouseButton;
     self.onMouseButton = function(theButton, theState, theX, theY) {
@@ -460,6 +475,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
             self.BaseViewer.onMouseButton(theButton, theState, theX, theY);
         }
     }
+
 */
 }
 
@@ -498,36 +514,42 @@ function setupCameraComboBox() {
 }
 
 function main(argv) {
-    ourGlade            = new Glade(GLADE_FILE);
-    ourMainWindow       = ourGlade.get_widget("mainWindow");
+    try {
+        GtkMain.exitCode    = 0;
+        ourGlade            = new Glade(GLADE_FILE);
+        ourMainWindow       = ourGlade.get_widget("mainWindow");
 
-    ourPreferenceDialog = new PreferenceDialog(ourGlade);
-    ourStatusBar        = new StatusBar(ourGlade.get_widget("statusbar"));
+        ourPreferenceDialog = new PreferenceDialog(ourGlade);
+        ourStatusBar        = new StatusBar(ourGlade.get_widget("statusbar"));
 
-    ourGlade.autoconnect(ourHandler, ourMainWindow);
-    ourHandler.arguments = parseArguments(argv, ourAllowedOptions);
-    ourHandler.isLoaded = false;
+        ourGlade.autoconnect(ourHandler, ourMainWindow);
+        ourHandler.arguments = parseArguments(argv, ourAllowedOptions);
+        ourHandler.isLoaded = false;
 
-    window.renderingCaps = Renderer.MULTITEXTURE_SUPPORT;
-    ourGlade.get_widget("renderbox").add(window);
-    window.show();
-    ourMainWindow.show();
-    ourViewer = new Viewer(ourHandler.arguments);
-    ourMainWindow.signal_key_press_event.connect(ourViewer, "onKeyDown");
-    ourMainWindow.signal_key_release_event.connect(ourViewer, "onKeyUp");
-    ourViewer.setupWindow(window);
+        window.renderingCaps = Renderer.MULTITEXTURE_SUPPORT;
+        ourGlade.get_widget("renderbox").add(window);
+        window.show();
+        ourMainWindow.show();
+        ourViewer = new Viewer(ourHandler.arguments);
+        ourMainWindow.signal_key_press_event.connect(ourViewer, "onKeyDown");
+        ourMainWindow.signal_key_release_event.connect(ourViewer, "onKeyUp");
+        ourViewer.setupWindow(window);
 
-    var myScene = new Scene(ourViewer.getModelName());
-    ourViewer.setScene(myScene);
-    var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
-    ourViewer.setCanvas(myCanvas);
-    ourViewer.registerMover(ClassicTrackballMover);
-    ourViewer.registerMover(FlyMover);
-    ourViewer.registerMover(WalkMover);
-    ourAnimationManager = new GtkAnimationManager(ourViewer);
-    setupGUI();
+        var myScene = new Scene(ourViewer.getModelName());
+        ourViewer.setScene(myScene);
+        var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
+        ourViewer.setCanvas(myCanvas);
+        ourViewer.registerMover(ClassicTrackballMover);
+        ourViewer.registerMover(FlyMover);
+        ourViewer.registerMover(WalkMover);
+        ourAnimationManager = new GtkAnimationManager(ourViewer);
+        setupGUI();
 
-    return GtkMain.run(ourMainWindow);
+        return GtkMain.run(ourMainWindow);
+    } catch (ex) {
+        print("### Exception: " + ex);
+        return 1;
+    }
 }
 
 function setupGUI() {
@@ -537,7 +559,7 @@ function setupGUI() {
     setupCameraComboBox();
 }
 
-if (main(arguments) != 0) {
+if (main(arguments) != 0 || GtkMain.exitCode != 0) {
     exit(1);
 };
 
