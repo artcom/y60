@@ -59,7 +59,7 @@ namespace inet {
 
     void Socket::setRemoteAddr(asl::Unsigned32 myhost, Unsigned16 myport)
     {
-        _myRemoteEndpoint = Endpoint(myhost, myport);
+        _myRemoteEndpoint = asl::INetEndpoint(myhost, myport);
     }
 
     void Socket::close() {

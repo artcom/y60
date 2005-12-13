@@ -27,7 +27,7 @@
 #define INCL_INET_SOCKET
 
 #include "SocketException.h"
-#include "Endpoint.h"
+#include "INetEndpoint.h"
 #include "address.h"
 
 #ifdef WIN32
@@ -96,10 +96,10 @@ class Socket {
         void setReceiveBufferSize(int theSize);
         int getReceiveBufferSize() const;
     protected:
-        Endpoint _myLocalEndpoint;
+        asl::INetEndpoint _myLocalEndpoint;
 
         // TODO: Should be moved to COSocket.
-        Endpoint _myRemoteEndpoint;
+        asl::INetEndpoint _myRemoteEndpoint;
 
         int fd;
 

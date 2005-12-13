@@ -22,7 +22,7 @@
 
 #include "SocketPolicy.h"
 
-#include <asl/Endpoint.h>
+#include <asl/INetEndpoint.h>
 #include <asl/Exception.h>
 
 #include <sys/socket.h>

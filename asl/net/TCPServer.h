@@ -27,7 +27,7 @@
 #define INCL_INET_TCPSERVER
 
 #include "TCPSocket.h"
-#include "Endpoint.h"
+#include "INetEndpoint.h"
 
 namespace inet {
 
@@ -69,7 +69,7 @@ namespace inet {
         private:
             asl::Unsigned32 _myHost;
             asl::Unsigned16 _myPort;
-            Endpoint _myFromAddr;
+            asl::INetEndpoint _myFromAddr;
             int fd;
     };
 

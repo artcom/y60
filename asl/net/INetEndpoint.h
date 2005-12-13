@@ -39,14 +39,14 @@
     #include <netinet/in.h>
 #endif
 
-namespace inet {
+namespace asl {
 
     // This is a POD type. Don't add virtual functions.
-    class Endpoint: public sockaddr_in {
+    class INetEndpoint: public sockaddr_in {
         public:
-            Endpoint(const char * myHost, asl::Unsigned16 myPort);
-            Endpoint(asl::Unsigned32 myHost, asl::Unsigned16 myPort);
-            Endpoint();
+            INetEndpoint(const char * myHost, asl::Unsigned16 myPort);
+            INetEndpoint(asl::Unsigned32 myHost, asl::Unsigned16 myPort);
+            INetEndpoint();
     };
 
 }

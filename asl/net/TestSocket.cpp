@@ -210,7 +210,7 @@ void * TestSocket::TCPServerThread(void *arg) {
     TCPServer * theServer = reinterpret_cast<TCPServer*>(arg);
 
     char myInputBuffer[5];
-    int myResult = 0;
+    long myResult = 0;
 
     for (int i = 0; i<2; i++) {
         AC_DEBUG <<"TCPServerThread waiting to connect" << endl;

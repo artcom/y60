@@ -39,7 +39,6 @@
 #include <cctype>
 
 //using namespace std;
-using namespace inet;
 using namespace asl;
 using namespace std;
 
@@ -252,12 +251,11 @@ public:
         deleteFile(UnixAddress::PIPE_PREFIX + "TestConduit");
         addTest(new MessageConduitTest<LocalPolicy>("LocalPolicy", 
                     "TestConduit"));
-#endif        
+#endif   
         addTest(new ConduitTest<TCPPolicy>("TCPPolicy", 
                     TCPPolicy::Endpoint("127.0.0.1",5678)));
         addTest(new MessageConduitTest<TCPPolicy>("TCPPolicy", 
                     TCPPolicy::Endpoint("127.0.0.1",5678)));
-
     }
 };
 

@@ -25,8 +25,6 @@
 #include <errno.h>
 
 using namespace std;
-using namespace inet;
-
 namespace asl {
 
 #ifdef WIN32
@@ -40,12 +38,12 @@ TCPPolicy::connectTo(Endpoint theRemoteEndpoint) {
     Handle myHandle = socket(AF_INET,SOCK_STREAM,0);   
     if (myHandle == INVALID_SOCKET) {
         throw ConduitException(string("TCPPolicy::ctor: create - ") + 
-                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
     }
     if( ::connect(myHandle,(struct sockaddr*)&theRemoteEndpoint,sizeof(theRemoteEndpoint)) != 0 )
     {
         throw ConduitException(string("TCPPolicy::ctor: connect - ") + 
-                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
     }
     return myHandle;
 }
@@ -56,17 +54,17 @@ TCPPolicy::startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount) 
     Handle myHandle=socket(AF_INET,SOCK_STREAM,0);    
 
     if (bind(myHandle,(struct sockaddr*)&theEndpoint,sizeof(theEndpoint))<0) {
-        int myLastError = getLastSocketError();
+        int myLastError = inet::getLastSocketError();
         if (myLastError == EADDRINUSE) {
             throw ConduitInUseException(string("TCPPolicy::ctor create"), PLUS_FILE_LINE);
         } else {
             throw ConduitException(string("TCPPolicy::TCPPolicy bind - ")+
-                    getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                    inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
         }
     }
     if (listen(myHandle, theMaxConnectionCount)<0) {
         throw ConduitException("TCPPolicy::TCPPolicy: listen - "+
-                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
     }
     return myHandle;
 }

@@ -26,6 +26,8 @@
 #include "TCPSocket.h"
 #include "SocketException.h"
 
+using namespace asl;
+
 namespace inet {
 
     TCPSocket::TCPSocket(asl::Unsigned32 thehost, asl::Unsigned16 theport)
@@ -34,8 +36,8 @@ namespace inet {
         open();
     }
 
-    TCPSocket::TCPSocket(int myFD, const Endpoint & localEndpoint,
-                      const Endpoint & remoteEndpoint)
+    TCPSocket::TCPSocket(int myFD, const INetEndpoint & localEndpoint,
+                      const INetEndpoint & remoteEndpoint)
         : Socket (0,0)
     {
           _myLocalEndpoint = localEndpoint;

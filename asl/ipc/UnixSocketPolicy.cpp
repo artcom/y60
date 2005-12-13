@@ -26,7 +26,6 @@
 #include <errno.h>
 
 using namespace std;
-using namespace inet;
 
 #define DB(x) // x
 
@@ -61,18 +60,18 @@ UnixSocketPolicy::connectTo(Endpoint theRemoteEndpoint) {
     Handle myHandle = socket(AF_UNIX,SOCK_STREAM,0);   
     if (myHandle == INVALID_SOCKET) {
         throw ConduitException(string("UnixSocketPolicy::ctor: create - ") + 
-                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
     }
 
     if( ::connect(myHandle,(struct sockaddr*)&theRemoteEndpoint,sizeof(theRemoteEndpoint)) != 0 )
     {
-        int myLastError = getLastSocketError();
+        int myLastError = inet::getLastSocketError();
         if (myLastError == ECONNREFUSED) {
             throw ConduitRefusedException(string("UnixSocketPolicy::ctor: connect - ") + 
-                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
         } else {
             throw ConduitException(string("UnixSocketPolicy::ctor: connect - ") + 
-                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
         }
     }
     DB(cerr << "Client connected " << endl);
@@ -85,22 +84,22 @@ UnixSocketPolicy::startListening(Endpoint theEndpoint, unsigned theMaxConnection
     Handle myHandle=socket(AF_UNIX,SOCK_STREAM,0);    
     if (myHandle == INVALID_SOCKET) {
         throw ConduitException(string("UnixSocketPolicy::ctor: create - ") + 
-                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
     }
 
     if (bind(myHandle,(struct sockaddr*)&theEndpoint,sizeof(theEndpoint))<0) {
-        int myLastError = getLastSocketError();
+        int myLastError = inet::getLastSocketError();
         if (myLastError == EADDRINUSE) {
             throw ConduitInUseException(string("UnixSocketPolicy::ctor create"), PLUS_FILE_LINE);
         } else {
             throw ConduitException(string("UnixSocketPolicy::UnixSocketPolicy bind - ")+
-                    getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                    inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
         }
     }
 
     if (listen(myHandle, theMaxConnectionCount)<0) {
         throw ConduitException("UnixSocketPolicy::UnixSocketPolicy: listen - "+
-                getSocketErrorMessage(getLastSocketError()), PLUS_FILE_LINE);
+                inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
     }
     DB(cerr << "Listening " << endl);
     return myHandle;

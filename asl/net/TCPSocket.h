@@ -27,7 +27,7 @@
 #define INCL_INET_TCPSOCKET
 
 #include "Socket.h"
-#include "Endpoint.h"
+#include "INetEndpoint.h"
 
 namespace inet {
 
@@ -36,8 +36,8 @@ namespace inet {
             TCPSocket(asl::Unsigned32 thehost, asl::Unsigned16 theport);
 
             // Used by TCPServer.
-            TCPSocket(int myFD, const Endpoint & localEndpoint, 
-                      const Endpoint & remoteEndpoint);
+            TCPSocket(int myFD, const asl::INetEndpoint & localEndpoint, 
+                      const asl::INetEndpoint & remoteEndpoint);
 
             virtual void open();
     };

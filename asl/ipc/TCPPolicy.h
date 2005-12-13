@@ -22,7 +22,7 @@
 
 #include "SocketPolicy.h"
 
-#include <asl/Endpoint.h>
+#include <asl/INetEndpoint.h>
 #include <asl/Exception.h>
 
 namespace asl {
@@ -32,7 +32,7 @@ namespace asl {
 
 class TCPPolicy : public SocketPolicy {
     public:
-        typedef inet::Endpoint Endpoint; 
+        typedef INetEndpoint asl::Endpoint; 
         /// Creates a (client) conduit connected to the remote endpoint
         // @throws ConduitException
         static Handle connectTo(Endpoint theRemoteEndpoint);

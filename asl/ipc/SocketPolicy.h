@@ -22,7 +22,7 @@
 
 #include "ConduitPolicy.h"
 
-#include <asl/Endpoint.h>
+#include <asl/INetEndpoint.h>
 #include <asl/Exception.h>
 
 namespace asl {

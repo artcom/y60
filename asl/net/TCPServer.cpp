@@ -93,7 +93,7 @@ namespace inet {
         socklen_t remoteEndpointLen;
 #endif
         char *myaddrstr;
-        Endpoint remoteEndpoint;
+        asl::INetEndpoint remoteEndpoint;
 
         remoteEndpointLen=sizeof(remoteEndpoint);
         int newFD;
