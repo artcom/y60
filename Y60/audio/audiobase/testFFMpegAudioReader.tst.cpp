@@ -79,7 +79,7 @@ class FFMpegAudioReaderTest : public UnitTest {
             AudioBase::AudioBuffer::setSize(2048);
 
             play("../../testfiles/pitchbend_mono.wav", 1000);
-            play("http://himmel/testfiles/track2.mp3", 3000);
+            //play("http://himmel/testfiles/track2.mp3", 3000);
             play("../../testfiles/One_Better_Day.mp3", 3000);
             // Don't test WMA for FFMpeg. It is b0rken.
             //play("../../testfiles/Leben_cut_160_stereo_wma7.wma", 3000);
