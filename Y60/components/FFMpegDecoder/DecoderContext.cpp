@@ -254,7 +254,7 @@ namespace y60 {
         #if LIBAVFORMAT_BUILD <= 4616
             int myResult = av_seek_frame(_myFormatContext, _myVideoStreamIndex, myFrameIndex);
         #else
-            int myResult = av_seek_frame(_myFormatContext, _myVideoStreamIndex, myFrameIndex, 0);
+            int myResult = av_seek_frame(_myFormatContext, _myVideoStreamIndex, myFrameIndex, AVSEEK_FLAG_BACKWARD);
         #endif
 
         if (myResult < 0) {
