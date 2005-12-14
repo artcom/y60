@@ -22,14 +22,22 @@
 struct app2vert {
     float4 Position         : POSITION;
     float4 Normal           : NORMAL;
-    float2 texCoord         : TEXCOORD0;
+#ifdef PAINT
+    float2 texCoord0        : TEXCOORD0;
+#ifdef PAINT==2
     float2 texCoord1        : TEXCOORD1;
+#endif
+#endif
 };
 
 struct vert2frag {
     float4 homPosition   : POSITION;
+#ifdef PAINT
     float2 texCoord0     : TEXCOORD0;
+#ifdef PAINT==2
     float2 texCoord1     : TEXCOORD1;
+#endif
+#endif
     float3 worldPosition : TEXCOORD2;
     float3 worldNormal   : TEXCOORD3;
     float3 reflectVector : TEXCOORD4;
@@ -46,14 +54,7 @@ vert2frag mainVertex(app2vert IN,
         uniform float4x4 AC_OBJECTWORLD_IT,
         uniform float4x4 AC_OBJECTWORLD,
         uniform float3 AC_CAMERA_POSITION,
-#if 0
-        uniform float3 AC_DIRECTIONAL_LIGHTS[],
-        uniform float4 AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
-        uniform float3 AC_POSITIONAL_LIGHTS[],
-        uniform float4 AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
-#endif
-        uniform float4 diffuse,
-        uniform float  shininess
+        uniform float4 diffuse
         )
 {
     vert2frag OUT;
@@ -71,7 +72,7 @@ vert2frag mainVertex(app2vert IN,
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
 
 #ifdef PAINT
-    OUT.texCoord0 = IN.texCoord;
+    OUT.texCoord0 = IN.texCoord0;
 #if PAINT==2
     OUT.texCoord1 = IN.texCoord1;
 #ifdef FRESNEL
@@ -85,48 +86,6 @@ vert2frag mainVertex(app2vert IN,
     OUT.primaryColor = diffuse; //float4(1,1,1,1);
 #else
     OUT.primaryColor = float4(0,0,0,0); // should be vertex color
-#endif
-
-#if 0
-    // lighting
-    OUT.lighting = float4(0,0,0,0);
-    float3 dirLightVec;
-    float  diffuseTerm;
-
-    float3 halfVec;
-    float specularTerm;
-    for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
-        dirLightVec = normalize(AC_DIRECTIONAL_LIGHTS[i]);
-        halfVec = normalize(dirLightVec+myViewVector);
-
-        diffuseTerm = dot(myWorldNormal, dirLightVec);
-        specularTerm = dot(myWorldNormal,halfVec);
-
-        float4 lighting = lit(diffuseTerm, specularTerm, 12);
-        OUT.lighting += lighting;
-
-        // lit() returns a vector containing these values:
-        //     result.x = 1.0;  
-        //     result.y = max(diffuse, 0);
-        //     result.z = if (result.y > 0.0) then pow(specular, 32) else 0.0
-        //     result.w = 1.0;
-
-        OUT.primColor += AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[i] * lighting.y;
-    }
-    for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
-
-        dirLightVec = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
-        diffuseTerm = dot(myWorldNormal, dirLightVec);
-
-        halfVec = normalize(dirLightVec - myViewVector);
-        specularTerm = dot(myWorldNormal,halfVec);
-
-        float4 lighting = lit(diffuseTerm, specularTerm, 3*shininess);
-
-        OUT.primColor += AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i] * lighting.y;        
-        OUT.lighting += lighting;
-    }
-    OUT.primColor *= diffuse;
 #endif
 
     return OUT;
@@ -150,7 +109,7 @@ float4 mainFragment(vert2frag   IN,
         uniform float4 diffuse,
         uniform float4 specular,
         uniform float shininess
-        ): COLOR
+        ) : COLOR
 {
     float4 myEnvTexel = texCUBE(envTex, IN.reflectVector);
 #ifdef PAINT
@@ -233,6 +192,11 @@ float4 mainFragment(vert2frag   IN,
 #endif // LIGHTING
  
     //myBaseColor = float4(abs(N), 1); // visualize normals
+#ifdef PAINT_XXX
+    // visualize texcoord
+    myBaseColor.r = IN.texCoord0.x;
+    myBaseColor.g = IN.texCoord0.y;
+#endif
 
     // blend with environment intensity
     float myEnvIntensity = (myEnvTexel.r + myEnvTexel.g + myEnvTexel.b) / 3.0;

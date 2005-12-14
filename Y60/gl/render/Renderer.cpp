@@ -366,12 +366,9 @@ namespace y60 {
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
         DBP2(START_TIMER(renderBodyPart_getDrawNormals));
         if (_myState.getDrawNormals()) {
-            glPushAttrib(GL_ALL_ATTRIB_BITS);
-            glDisable(GL_LIGHTING);
             const Box3f & myBoundingBox = myShape.get<BoundingBoxTag>();
             float myDiameter = magnitude(myBoundingBox[Box3f::MAX] - myBoundingBox[Box3f::MIN]);
             drawNormals(myPrimitive, myDiameter / 64.0f);
-            glPopAttrib();
         }
         DBP2(STOP_TIMER(renderBodyPart_getDrawNormals));
 
@@ -501,7 +498,8 @@ namespace y60 {
     void
     Renderer::drawNormals(const Primitive & thePrimitive, float theNormalScale) {
         if (thePrimitive.hasVertexData(NORMALS)) {
-            glPushAttrib(GL_ALL_ATTRIB_BITS);
+            glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT);
+            glDisable(GL_LIGHTING);
             glColor3f(1.0f, .5f, 0);
 
             Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = thePrimitive.getConstLockingPositionsAccessor();
@@ -539,7 +537,7 @@ namespace y60 {
             const MaterialParameter & myParameter = myMaterialParameters[i];
             if (myPrimitive.hasVertexData(myParameter.getRole())) {
                 const VertexDataBase & myData = myPrimitive.getVertexData(myParameter.getRole());
-                DB(AC_TRACE << "-- Parameter " << i << " role " << getStringFromEnum(myParameter.getRole(), VertexDataRoleString) << ", data=" << myData.getDataPtr());
+                DB(AC_DEBUG << "-- Parameter " << i << " role " << getStringFromEnum(myParameter.getRole(), VertexDataRoleString) << ", data=" << myData.getDataPtr());
                 GLRegister myRegister = myParameter.getRegister();
                 switch (myRegister) {
                     case POSITION_REGISTER:
@@ -550,7 +548,6 @@ namespace y60 {
                         break;
                     case COLORS_REGISTER:
                         myData.useAsColor();
-                        CHECK_OGL_ERROR;
                         break;
                     default:
                         GLenum myGlRegister = asGLTextureRegister(myRegister);
@@ -561,8 +558,8 @@ namespace y60 {
                         myData.useAsTexCoord();
                         break;
                 }
+                CHECK_OGL_ERROR;
             }
-            CHECK_OGL_ERROR;
         }
 
         DBP2(

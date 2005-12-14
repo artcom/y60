@@ -161,6 +161,7 @@ namespace y60 {
 
             SDL_Surface * _myScreen;
             unsigned    _mySwapInterval;
+            unsigned    _myLastSwapCounter;
     };
 
 }

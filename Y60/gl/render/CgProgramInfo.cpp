@@ -627,7 +627,7 @@ namespace y60 {
                     unsigned myTextureIndex = theNode.nodeValueAs<unsigned>();
                     if (myTextureIndex  < theMaterial.getTextureCount()) {
                         const Texture & myTexture = theMaterial.getTexture(myTextureIndex);
-                        //AC_DEBUG << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTexture.getId();
+                        AC_DEBUG << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTexture.getId();
                         cgGLSetTextureParameter( theCgParameter, myTexture.getId());
                         DB(AC_TRACE << "cgGLSetTextureParameter: Texture index: "<< as_string(myTextureIndex)
                                 << " , glid : " << myTexture.getId()

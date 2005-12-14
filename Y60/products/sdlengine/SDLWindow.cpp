@@ -67,7 +67,8 @@ SDLWindow::SDLWindow() :
     _myUserDefinedCursor(0),
     _myStandardCursor(0),
     _myAutoPauseFlag(false),
-    _mySwapInterval(0)
+    _mySwapInterval(0),
+    _myLastSwapCounter(0)
 {
 }
 
@@ -115,6 +116,13 @@ SDLWindow::postRender() {
     if (_mySwapInterval) {
         unsigned counter;
         glXWaitVideoSyncSGI(_mySwapInterval, 0, &counter);
+        if (_myLastSwapCounter == 0) {
+            _myLastSwapCounter = counter;
+        }
+        if ((counter - _myLastSwapCounter) != _mySwapInterval) {
+            AC_WARNING << "Missed frame diff=" << (counter - _myLastSwapCounter - _mySwapInterval);
+        }
+        _myLastSwapCounter = counter;
     }
 #endif
     SDL_GL_SwapBuffers();
@@ -691,18 +699,23 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     }    
 #else
     if (glXGetVideoSyncSGI && glXWaitVideoSyncSGI) {
-        unsigned counter0, counter1;
-        glXGetVideoSyncSGI(&counter0);
-        asl::msleep(100);
-        glXGetVideoSyncSGI(&counter1);
-        if (counter1 > counter0) {
-            _mySwapInterval = theInterval;
-        } else {
-            AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working?";
-            _mySwapInterval = 0;
+        if (_mySwapInterval == 0 && theInterval != 0) {
+            // check if it's working
+            unsigned counter0, counter1;
+            glXGetVideoSyncSGI(&counter0);
+            asl::msleep(20);
+            glXGetVideoSyncSGI(&counter1);
+            if (counter1 <= counter0) {
+                AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working properly, disabling";
+                theInterval = 0;
+            } else {
+                AC_INFO << "setSwapInterval(): glXGetVideoSyncSGI working properly";
+            }
         }
+        _mySwapInterval = theInterval;
     } else {
         AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not supported";
+        _mySwapInterval = 0;
     }
 #endif
 }

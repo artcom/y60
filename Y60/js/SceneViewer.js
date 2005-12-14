@@ -428,6 +428,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (theWindowTitle != null) {
             window.title = theWindowTitle;
         }
+        //window.swapInterval = 1;
     }
 
     self.createShutter = function() {
