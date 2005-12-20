@@ -57,6 +57,7 @@ DEFINE_EXCEPTION(FileNotFoundException, asl::Exception);
 DEFINE_EXCEPTION(CreateDirectoryFailed, asl::Exception);
 DEFINE_EXCEPTION(RemoveDirectoryFailed, asl::Exception);
 DEFINE_EXCEPTION(OpenDirectoryFailed, asl::Exception);
+DEFINE_EXCEPTION(GetAppDirectoryFailed, asl::Exception);
 
 std::vector<std::string> getDirectoryEntries(const std::string & thePath);
 

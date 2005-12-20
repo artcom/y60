@@ -418,7 +418,7 @@ namespace asl {
 std::string getAppDirectory() {
     std::string strAppDirectory;
 #ifdef WIN32
-    char        szAppPath[MAX_PATH] = "";
+    char szAppPath[MAX_PATH] = "";
 
     ::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
     // Extract directory
@@ -426,10 +426,14 @@ std::string getAppDirectory() {
     strAppDirectory = strAppDirectory.substr(0, strAppDirectory.rfind("\\"));
 #else
     char buffer[256];
-    char apppath[4096];
-    sprintf(buffer, "/proc/%d/exe", getpid());
-    readlink(buffer, apppath, 4096);
-    strAppDirectory = std::string(getDirectoryPart(apppath));
+    char appPath[4096];
+    snprintf(buffer, sizeof(buffer), "/proc/%d/exe", getpid());
+    int myBufferSize = readlink(buffer, appPath, sizeof(appPath)-1); // room for nul char
+    if (myBufferSize < 0) { 
+        throw GetAppDirectoryFailed(std::string("readlink failed for '") + buffer + "'", PLUS_FILE_LINE);
+    }
+    appPath[myBufferSize] = 0;
+    strAppDirectory = std::string(getDirectoryPart(appPath));
 #endif
     return strAppDirectory;
 }
