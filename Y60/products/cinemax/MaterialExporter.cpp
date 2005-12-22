@@ -118,7 +118,6 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
     std::string myInternalFormat = "";
 	if (isAlphaChannel) {
 		myInternalFormat = TEXTURE_INTERNAL_FORMAT_INTENSITY;
-        //GePrint("************************ ALPHA CHANNEL myApplyMode=" + String(myApplyMode.c_str()));
 	}
 
     // color scale
@@ -126,21 +125,18 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
     GePrint("isAlphaChannel=" + LongToString(isAlphaChannel) + " mix=" + RealToString(myMixStrength));
     asl::Vector4f myColorScale;
     if (isAlphaChannel) {
-        myColorScale = asl::Vector4f(myMixStrength,myMixStrength,myMixStrength,myMixStrength);
+        myColorScale = asl::Vector4f(myMixStrength, myMixStrength, myMixStrength, myMixStrength);
     } else {
-        myColorScale = asl::Vector4f(myMixStrength,myMixStrength,myMixStrength,1);
+        myColorScale = asl::Vector4f(myMixStrength, myMixStrength, myMixStrength, 1);
     }
 
-    // color bias
-    asl::Vector4f myColorBias(0,0,0,0);
-    if (myApplyMode == y60::TEXTURE_APPLY_MODULATE) {
-        // if modulating then setup color bias so that colors aren't blacked out
-        myColorBias = asl::Vector4f(1,1,1,1) - myColorScale;
-    }
+    // setup color bias so that colors aren't blacked out
+    asl::Vector4f myColorBias = asl::Vector4f(1,1,1,1) - myColorScale;
+    GePrint(myMaterialName + ": colorScale=" + String(asl::as_string(myColorScale).c_str()) + " colorBias=" + String(asl::as_string(myColorBias).c_str()));
 
     // Texture
-    String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
     std::string myImageId = "";
+    String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
     if (myTextureName.GetLength()) {
         std::string myTextureFilename = getTexturePath(_myDocumentPath, myTextureName);
         if (theMaterialBuilder->isMovie(myTextureFilename)) {
