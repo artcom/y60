@@ -19,10 +19,9 @@
 
 #include "WMVDecoder.h"
 
-#include <audio/AudioController.h>
-#include <audio/BufferedSource.h>
 #include <asl/ComSingleton.h>
 #include <asl/Auto.h>
+#include <asl/Pump.h>
 #include <asl/Logger.h>
 #include <asl/os_functions.h>
 #include <typeinfo>
@@ -47,6 +46,7 @@ EXPORT asl::PlugInBase * y60WMVDecoder_instantiatePlugIn(asl::DLHandle myDLHandl
 namespace y60 {
 
     static const unsigned FRAME_CACHE_SIZE = 256;
+    asl::Block WMVDecoder::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 
     bool
     checkForError(HRESULT hr, const std::string & theMessage, const std::string & theFileLine) {
@@ -90,7 +90,8 @@ namespace y60 {
         _myLastVideoTimeStamp(0.0),
         _myLastAudioTimeStamp(0.0),
         _myAudioVideoDelay(0.0),
-        _myCachingFlag(false)
+        _myCachingFlag(false),
+        _myResampleContext(0)
     {
         AC_DEBUG << "WMVDecoder::WMVDecoder " << (void*)this;
         asl::ComSingleton::get().ref();
@@ -115,6 +116,11 @@ namespace y60 {
         if (_myReader) {
             _myReader->Release();
             _myReader = NULL;
+        }
+
+        if (_myResampleContext) {
+            audio_resample_close(_myResampleContext);
+            _myResampleContext = 0;
         }
 
         if (_myReferenceCount != 0) {
@@ -208,8 +214,8 @@ namespace y60 {
         if (_myReadEOF && _myFrameCache.size() <= 1) {
             AC_DEBUG << "EoF and FrameCache empty";
             setEOF(true);
-            if (_myAudioBufferedSource) {
-                _myAudioBufferedSource->setRunning(false);
+            if (_myAudioSink) {
+                _myAudioSink->stop();
             }
             _myReadEOF = false;
         }
@@ -225,11 +231,11 @@ namespace y60 {
         }
 
         // adjust volume
-        if (_myAudioBufferedSource) {
+        if (_myAudioSink) {
             float myVolume = getMovie()->get<VolumeTag>();
-            if (!asl::almostEqual(_myAudioBufferedSource->getVolume(), myVolume)) {
-                _myAudioBufferedSource->setVolume(myVolume);
-            }
+            if (!asl::almostEqual(Pump::get().getVolume(), myVolume)) {
+                Pump::get().setVolume(myVolume);
+            } //if          
         }
 
         asl::AutoLocker<WMVDecoder> myLocker(*this); // protect shared vars (_myFrameCache, ...)
@@ -247,10 +253,11 @@ namespace y60 {
         }
 
         if (theTime > _myLastVideoTimeStamp) {
-            AC_WARNING << "FrameCache underrun, timeDiff=" << theTime-_myLastVideoTimeStamp;
+            AC_WARNING << "FrameCache underrun, time=" << theTime << "last in cache " << _myLastVideoTimeStamp;
             theTime = _myLastVideoTimeStamp;
         }
 
+AC_PRINT << "************* audio time = " << _myAudioSink->getCurrentTime();
         // Find 'closest' frame in VideoFrameCache
         double myMinTimeDiff = 1000000.0;
         VideoFramePtr myBestFrame(NULL);
@@ -310,7 +317,8 @@ namespace y60 {
             memset(theTargetRaster->pixels().begin(), 0xff, theTargetRaster->pixels().size());
         }
 
-        return myBestFrame->getTimestamp();
+        return theTime;
+        //return myBestFrame->getTimestamp();
     }
 
     void
@@ -319,16 +327,10 @@ namespace y60 {
         if (_myReader) {
             resetEvent();
             asl::AutoLocker<WMVDecoder> myLocker(*this);
-            double myPauseTime = AudioApp::AudioController::get().getCurrentTime() - _myPauseStartTime;
-            _myPauseStartTime = -1;
-            _myAudioStartTime += myPauseTime;
-            if (_myAudioBufferedSource) {
-                _myAudioBufferedSource->setRunning(true);
-            }
             HRESULT hr = _myReader->Resume();
             checkForError(hr, "Could not resume WMVDecoder", PLUS_FILE_LINE);
         }
-        MovieDecoderBase::resumeMovie(theStartTime);
+        AsyncDecoder::resumeMovie(theStartTime);
     }
 
     void
@@ -343,16 +345,15 @@ namespace y60 {
             checkForError(_myEventResult, "Starting playback failed.", PLUS_FILE_LINE);
 
             asl::AutoLocker<WMVDecoder> myLocker(*this);
-            if (_myAudioBufferedSource) {
+            if (_myAudioSink) {
                 // flush AudioBuffer
-                _myAudioBufferedSource->clear();
-                _myAudioBufferedSource->setRunning(false);
+                _myAudioSink->stop();
                 _myCachingFlag = true;
             } else {
                 _myCachingFlag = false;
             }
         }
-        MovieDecoderBase::startMovie(theStartTime);
+        AsyncDecoder::startMovie(theStartTime);
     }
 
     void
@@ -371,7 +372,7 @@ namespace y60 {
         releaseBuffers();
         _myFirstFrameDelivered = false;
 
-        MovieDecoderBase::stopMovie();
+        AsyncDecoder::stopMovie();
     }
 
     void
@@ -396,10 +397,7 @@ namespace y60 {
             waitForEvent();
             //checkForError(_myEventResult, "Stopping playback failed.", PLUS_FILE_LINE);
         }
-        if (_myAudioBufferedSource) {
-            _myAudioBufferedSource->setRunning(false);
-        }
-        MovieDecoderBase::closeMovie();
+        AsyncDecoder::closeMovie();
     }
 
     bool
@@ -587,7 +585,7 @@ namespace y60 {
             } else if (myMediaType->formattype == WMFORMAT_WaveFormatEx) {
                 WAVEFORMATEX * myAudioInfo = (WAVEFORMATEX *)myMediaType->pbFormat;
 
-                myAudioNumberOfChannels = myAudioInfo->nChannels ;
+                _myAudioNumberOfChannels = myAudioInfo->nChannels ;
                 myAudioSampleRate       = myAudioInfo->nSamplesPerSec;
                 myAudioBitsPerSample    = myAudioInfo->wBitsPerSample;
             }
@@ -637,29 +635,27 @@ namespace y60 {
         AC_DEBUG << "       fps=" << _myFrameRate << " duration=" << myDuration / 10000000.f << " s" << " frameCount=" << getFrameCount();
 
         // Cleanup audio buffer
-        if (_myAudioBufferedSource) {
-            _myAudioBufferedSource->stop();
-            _myAudioBufferedSource = 0;
+        if (_myAudioSink) {
+            _myAudioSink->stop();
         }
 
         // Setup audio controller
         if (_myAudioOutputId >= 0) {
-            AC_DEBUG << "Audio: numChannels=" << myAudioNumberOfChannels << " sampleRate=" << myAudioSampleRate << " bitPerSample=" << myAudioBitsPerSample;
-#if 1
-            initBufferedSource(myAudioNumberOfChannels, myAudioSampleRate, myAudioBitsPerSample);
-#else
-            // XXX Initializing the Controller with low samplerates may not be a good idea
-            AudioApp::AudioController & myAudioController = AudioApp::AudioController::get();
-            if (!myAudioController.isRunning()) {
-                myAudioController.init(asl::maximum(myAudioSampleRate, (unsigned) 44100));
-            }
+            AC_DEBUG << "Audio: numChannels=" << myAudioNumberOfChannels 
+                     << " sampleRate=" << myAudioSampleRate 
+                     << " bitPerSample=" << myAudioBitsPerSample;
 
-            string myId = myAudioController.createReader(
-                theUrl, "Mixer", myAudioSampleRate, myAudioNumberOfChannels);
-            _myAudioBufferedSource = dynamic_cast<AudioBase::BufferedSource *>(myAudioController.getFileReaderFromID(myId));
-            _myAudioBufferedSource->setVolume(getMovie()->get<VolumeTag>());
-            _myAudioBufferedSource->setSampleBits(myAudioBitsPerSample);
-#endif
+            _myAudioSink = Pump::get().createSampleSink(theUrl);
+            
+            if (myAudioSampleRate != Pump::get().getNativeSampleRate()) 
+            {
+                _myResampleContext = audio_resample_init(myAudioNumberOfChannels, 
+                        myAudioNumberOfChannels, Pump::get().getNativeSampleRate(), 
+                        myAudioSampleRate);
+            }
+            AC_INFO << "WMVDecoder::setupAudio() done. resampling " 
+                    << (_myResampleContext != 0);
+
         } else {
             AC_INFO << "Movie '" << theUrl << "' does not contain audio.";
         }
@@ -725,35 +721,40 @@ namespace y60 {
                 _myFrameCache.pop_front();
             }
 
-#if 1
-            // Start audio when AudioBuffer is full enough
-            if (_myCachingFlag &&
-                _myAudioBufferedSource->getCacheFillLevel() >= _myAudioBufferedSource->getCacheSize()>>2) {
-#else
             // Start audio when frameCache is full enough
             double myStartTime = (_myFrameCacheSize/2) / _myFrameRate;
             if (_myCachingFlag &&
                 (_myFrameCache.size() >= _myFrameCacheSize/2 || _myLastAudioTimeStamp >= myStartTime)) {
-#endif
-                AC_INFO << "Starting A/V playback, FrameCache size=" << _myFrameCache.size() << ", AudioCache fillLevel=" << _myAudioBufferedSource->getCacheFillLevel();
+                AC_INFO << "Starting A/V playback, FrameCache size=" << _myFrameCache.size();
                 _myCachingFlag = false;
-                _myAudioBufferedSource->setRunning(true);
-				AudioApp::AudioController & myAudioController = AudioApp::AudioController::get();
-				_myAudioStartTime = myAudioController.getCurrentTime();
+                _myAudioSink->play();
             }
 
             // Signal, new buffer is ready
             //SetEvent(_myEvent);
-        } else if (_myAudioBufferedSource && theOutputNumber == _myAudioOutputId) {
+        } else if (_myAudioSink && theOutputNumber == _myAudioOutputId) {
             //AC_TRACE << ">>> AudioSample arrived: " << myTimeStamp << "s";
 
             BYTE * myBuffer;
             DWORD myBufferLength;
             HRESULT hr = theSample->GetBufferAndLength(&myBuffer, &myBufferLength);
             checkForError(hr, "Could not get buffer from sample", PLUS_FILE_LINE);
+            int _myAudioNumberOfChannels = 2;
+            int numFrames = myBufferLength/(getBytesPerSample(SF_S16)*_myAudioNumberOfChannels);
+            // queue audio sample
+            AudioBufferPtr myAudioBuffer;
+            if (_myResampleContext) {
+                numFrames = audio_resample(_myResampleContext, 
+                        (int16_t*)(_myResampledSamples.begin()),
+                        (int16_t*)(myBuffer), _myAudioNumberOfChannels);
+                myAudioBuffer = Pump::get().createBuffer(numFrames);
+                myAudioBuffer->convert(_myResampledSamples.begin(), SF_S16, _myAudioNumberOfChannels);
+            } else {
+                myAudioBuffer = Pump::get().createBuffer(numFrames);
+                myAudioBuffer->convert(myBuffer, SF_S16, _myAudioNumberOfChannels);
+            }
+            _myAudioSink->queueSamples(myAudioBuffer);
 
-            // queue data
-            _myAudioBufferedSource->addBuffer(myTimeStamp, myBuffer, myBufferLength);
             _myLastAudioTimeStamp = myTimeStamp;
         } else if (theOutputNumber != _myAudioOutputId) {
             AC_WARNING << "Unexpected output=" << theOutputNumber;
@@ -796,18 +797,16 @@ namespace y60 {
             break;
         case WMT_STOPPED:
             AC_INFO << "Stopped.";
-            if (_myAudioBufferedSource) {
-                _myAudioBufferedSource->setRunning(false);
-                _myAudioBufferedSource->clear();
+            if (_myAudioSink) {
+                _myAudioSink->stop();
             }
             _myEventResult = hr;
             SetEvent(_myEvent);
             break;
         case WMT_CLOSED:
             AC_INFO << "Closed File.";
-            if (_myAudioBufferedSource) {
-                _myAudioBufferedSource->stop();
-                _myAudioBufferedSource = 0;
+            if (_myAudioSink) {
+                _myAudioSink->stop();
             }
             _myEventResult = hr;
             SetEvent(_myEvent);

@@ -20,15 +20,14 @@
 #include "FFMpegDecoder2.h"
 #include "FFMpegURLProtocol.h"
 
+#include <y60/SoundManager.h>
 #include <asl/Ptr.h>
 #include <asl/Auto.h>
+#include <asl/Pump.h> //must come before Assure.h
 #include <asl/Block.h>
 #include <asl/Logger.h>
 #include <asl/Assure.h>
 #include <asl/file_functions.h>
-
-#include <audio/BufferedSource.h>
-#include <audio/AudioController.h>
 
 #include <iostream>
 
@@ -48,21 +47,30 @@ EXPORT asl::PlugInBase * y60FFMpegDecoder2_instantiatePlugIn(asl::DLHandle myDLH
 
 
 namespace y60 {
+
+    asl::Block FFMpegDecoder2::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+    asl::Block FFMpegDecoder2::_mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+    
     FFMpegDecoder2::FFMpegDecoder2(asl::DLHandle theDLHandle) :
         PlugInBase(theDLHandle),AsyncDecoder(), PosixThread(),
         _myFormatContext(0), _myFrame(0),
         _myVStreamIndex(-1), _myVStream(0), _myStartTimestamp(0),
-        _myAStreamIndex(-1), _myAStream(0), _mySamples(0), 
+        _myAStreamIndex(-1), _myAStream(0), 
         _mySeekTimestamp(AV_NOPTS_VALUE), _myLastSeekTimestamp(AV_NOPTS_VALUE),
         _myEOFVideoTimestamp(INT_MIN), _myLastAudioTimeStamp(0), 
         _myNextPacketTimestamp(0),
         _myTimePerFrame(0), _myLineSizeBytes(0), 
-        _myFrameCache(SEMAPHORE_TIMEOUT), _myFrameRecycler(SEMAPHORE_TIMEOUT)
+        _myFrameCache(SEMAPHORE_TIMEOUT), _myFrameRecycler(SEMAPHORE_TIMEOUT),
+        _myResampleContext(0)
     {
     }
 
     FFMpegDecoder2::~FFMpegDecoder2() {
         closeMovie();
+        if (_myResampleContext) {
+            audio_resample_close(_myResampleContext);
+            _myResampleContext = 0;
+        }
     }
 
     asl::Ptr<MovieDecoderBase> FFMpegDecoder2::instance() const {
@@ -84,38 +92,52 @@ namespace y60 {
         }
     }
 
-    bool
-    FFMpegDecoder2::hasAudio() const {
-        return (_myAStream ? true : false);
-    }
 
     bool FFMpegDecoder2::addAudioPacket(const AVPacket & thePacket) {
         // decode audio
-        int mySampleSize = 0; // decompressed sample size in bytes
+        int myBytesDecoded = 0; // decompressed sample size in bytes
         unsigned char* myData = thePacket.data;
         unsigned myDataLen = thePacket.size;
         double myTime = thePacket.dts / (double)AV_TIME_BASE;
 
+        AC_TRACE << "FFMpegDecoder2::addAudioPacket()";
         while (myDataLen > 0) {
             int myLen = avcodec_decode_audio(&_myAStream->codec,
-                (int16_t*)_mySamples, &mySampleSize,
-                myData, myDataLen);
-            if (myLen < 0 || mySampleSize < 0) {
+                (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);
+            if (myLen < 0 || myBytesDecoded < 0) {
                 AC_WARNING << "av_decode_audio error";
                 break;
             }
+            int myNumChannels = _myAStream->codec.channels;
+            int numFrames = myBytesDecoded/(getBytesPerSample(SF_S16)*myNumChannels);
+            AC_TRACE << "FFMpegDecoder2::decode(): Frames per buffer= " << numFrames;
+            // queue audio sample
+            AudioBufferPtr myBuffer;
+            if (_myResampleContext) {
+                numFrames = audio_resample(_myResampleContext, 
+                        (int16_t*)(_myResampledSamples.begin()),
+                        (int16_t*)(_mySamples.begin()), 
+                        numFrames);
+                myBuffer = Pump::get().createBuffer(numFrames);
+                myBuffer->convert(_myResampledSamples.begin(), SF_S16, myNumChannels);
+            } else {
+                myBuffer = Pump::get().createBuffer(numFrames);
+                myBuffer->convert(_mySamples.begin(), SF_S16, myNumChannels);
+            }
+            _myAudioSink->queueSamples(myBuffer);
+
             myData += myLen;
             myDataLen -= myLen;
+            AC_TRACE << "data left " << myDataLen << " read " << myLen;
 
-            // push audio sample
             AC_DEBUG << "decoded audio time=" << myTime;
-            _myAudioBufferedSource->addBuffer(myTime, (const unsigned char*)_mySamples, mySampleSize);
             _myLastAudioTimeStamp = myTime;
         } // while
+
         // adjust volume
         float myVolume = getMovie()->get<VolumeTag>();
-        if (!asl::almostEqual(_myAudioBufferedSource->getVolume(), myVolume)) {
-            _myAudioBufferedSource->setVolume(myVolume);
+        if (!asl::almostEqual(Pump::get().getVolume(), myVolume)) {
+            Pump::get().setVolume(myVolume);
         } //if          
         return true;
     }
@@ -283,6 +305,7 @@ namespace y60 {
             setupAudio(theFilename);
         } else {
             AC_INFO << "FFMpegDecoder2::load " << theFilename << " no audio stream found or disabled";
+            _myAudioSink = HWSampleSinkPtr(0);
             _myAStream = 0;
             _myAStreamIndex = -1;
         }
@@ -371,9 +394,8 @@ namespace y60 {
         createCache();
         // XXX unblock locked ffmpeg-thread.
         _myReadEOF = false;
-        if (_myAudioBufferedSource) {
-            _myAudioBufferedSource->clear();
-            _myAudioBufferedSource->setRunning(false);
+        if (_myAudioSink) {
+            _myAudioSink->stop();
         }
         _myCachingFlag = true;
         _mySeekTimestamp = AV_NOPTS_VALUE;
@@ -420,9 +442,6 @@ namespace y60 {
     void FFMpegDecoder2::stopMovie() {
         AC_DEBUG << "stopMovie";
 		lock();
-        if (_myAudioBufferedSource) {
-            _myAudioBufferedSource->setRunning(false);
-        }
         _myState = STOP;
 		unlock();
         // Wake up sleeping decoder thread
@@ -439,11 +458,6 @@ namespace y60 {
         AC_DEBUG << "closeMovie";
         // stop thread
         stopMovie();
-        // audio samples
-        if (_mySamples) {
-            delete[] _mySamples;
-            _mySamples = 0;
-        }
 
         // codecs
         if (_myVStream) {
@@ -531,7 +545,7 @@ namespace y60 {
                 return;
             }
 
-			AC_TRACE << "start audio?";
+			AC_TRACE << "start audio " << getAudioFlag();
             // Start playback?
             double myStartTime = (FRAME_CACHE_SIZE/2) / myFrameRate;
             if (_myAStream && getAudioFlag() && _myCachingFlag &&
@@ -539,9 +553,7 @@ namespace y60 {
             {
                 AC_INFO << "Start Audio. Cache: " << _myFrameCache.size();
                 _myCachingFlag = false;
-                _myAudioBufferedSource->setRunning(true);
-                AudioApp::AudioController & myAudioController = AudioApp::AudioController::get();
-                _myAudioStartTime = myAudioController.getCurrentTime();
+                _myAudioSink->play();
             } else {
                 AC_DEBUG << "Caching, Cache: " << _myFrameCache.size() << ", StartTime: " << myStartTime;
             }
@@ -569,6 +581,9 @@ namespace y60 {
         if (_myVStream) {
             AC_TRACE << "flushing video codec buffers";
             avcodec_flush_buffers(&_myVStream->codec);
+        }
+        if (_myAudioSink) {
+            _myAudioSink->stop();
         }
     }
 
@@ -653,14 +668,20 @@ namespace y60 {
             throw FFMpegDecoder2Exception(std::string("Unable to open audio codec: ") + theFilename, PLUS_FILE_LINE);
         }
 
-        initBufferedSource(_myAStream->codec.channels, _myAStream->codec.sample_rate, 16);
+        _myAudioSink = Pump::get().createSampleSink(theFilename);
+        
+        if (_myAStream->codec.sample_rate != Pump::get().getNativeSampleRate()) 
+        {
+            _myResampleContext = audio_resample_init(_myAStream->codec.channels, 
+                    _myAStream->codec.channels, Pump::get().getNativeSampleRate(), 
+                    _myAStream->codec.sample_rate);
+        }
+        AC_INFO << "FFMpegDecoder2::setupAudio() done. resampling " << (_myResampleContext != 0);
 
-        // audio samples
-        _mySamples = new unsigned char[AVCODEC_MAX_AUDIO_FRAME_SIZE];
     }
 
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, int64_t theTimestamp) {
-		AC_TRACE << "try to add frame";
+		AC_TRACE << "try to add frame at " << theTimestamp;
         try {
             FrameCache::VideoFramePtr myVideoFrame = _myFrameRecycler.pop_front();
             myVideoFrame->setTimestamp(theTimestamp);

@@ -21,6 +21,7 @@
 #define _ac_WMVDecoder_h_
 
 #include <y60/AsyncDecoder.h>
+#include <y60/FFMpegDecoder.h>
 #include <y60/MovieEncoding.h>
 #include <asl/PlugInBase.h>
 #include <asl/ThreadLock.h>
@@ -184,6 +185,12 @@ namespace y60 {
         double        _myLastAudioTimeStamp;
         double        _myAudioVideoDelay;
         bool          _myCachingFlag;
+        
+        ReSampleContext *   _myResampleContext;
+        unsigned      _myAudioNumberOfChannels;
+
+        static asl::Block     _mySamples;
+        static asl::Block     _myResampledSamples;
     };
     typedef asl::Ptr<WMVDecoder> WMVDecoderPtr;
 }

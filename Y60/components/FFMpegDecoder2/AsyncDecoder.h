@@ -24,9 +24,8 @@
 
 #include <asl/ThreadLock.h>
 #include <asl/Logger.h>
-#include <audio/AudioController.h>
-#include <audio/BufferedSource.h>
 
+#include <asl/HwSampleSink.h>
 
 namespace y60 {
     
@@ -38,8 +37,9 @@ namespace y60 {
     public:
           AsyncDecoder() :
               _myReadEOF(false), _myAudioStartTime(0), _myMovieTime(0),
-              _myAudioBufferedSource(0), _myPauseStartTime(0), _myState(IDLE)
+              _myPauseStartTime(0), _myState(IDLE)
           {}
+
 
           /**
            * computes the audio time for audio/video sync. If no audio is played,
@@ -51,22 +51,19 @@ namespace y60 {
 
           /**
            * @return true, if the file currently decoded has audio
+           * derived classes should set _myAudioSink according to media
            */
           virtual bool hasAudio() const {
-              return false;
+              return _myAudioSink != 0;
           }
 
           double getMovieTime(double theSystemTime) {
               if (!hasAudio()) {
-                  //AC_TRACE << "No Audio";
+                  AC_DEBUG << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
                   return MovieDecoderBase::getMovieTime(theSystemTime);
               } else {
-                  if (_myAudioBufferedSource->isRunning()) {
-                      double myAudioTime = AudioApp::AudioController::get().getCurrentTime() - _myAudioStartTime;
-                      double myMovieTime = myAudioTime + getMovie()->get<AVDelayTag>();
-                      _myMovieTime = myMovieTime;
-                  } 
-                  return _myMovieTime;
+                  AC_DEBUG << " returning audio time " << _myAudioSink->getCurrentTime();
+                  return _myAudioSink->getCurrentTime();
               }
           }
 
@@ -75,10 +72,8 @@ namespace y60 {
            */
           virtual void pauseMovie() {
               AC_INFO << "pauseMovie";
-              if (_myAudioBufferedSource) {
-                  _myAudioBufferedSource->setRunning(false);
-                  AudioApp::AudioController & myAudioController = AudioApp::AudioController::get();
-                  _myPauseStartTime = myAudioController.getCurrentTime();
+              if (_myAudioSink) {            
+                  _myAudioSink->pause();
               } else {
                   _myPauseStartTime = 0.0;
               }
@@ -86,23 +81,29 @@ namespace y60 {
               MovieDecoderBase::pauseMovie();
           }
 
+          void startMovie(double theStartTime) {
+              AC_DEBUG << "startMovie";
+              MovieDecoderBase::startMovie();
+              if (_myAudioSink) {            
+                  _myAudioSink->play();
+              }
+          }
           /**
            * Resumes from pause
            */
           void resumeMovie(double theStartTime) {
               AC_DEBUG << "resumeMovie";
+              MovieDecoderBase::resumeMovie();
               double myPauseTime = 0.0;
-              if (_myAudioBufferedSource) {
-                  AudioApp::AudioController & myAudioController = AudioApp::AudioController::get();
-                  myPauseTime = myAudioController.getCurrentTime() - _myPauseStartTime;
-                  _myAudioBufferedSource->setRunning(true);
-                  //AC_TRACE << "resume mpeg video";
+
+              if (_myAudioSink) {            
+                  _myAudioSink->play();
               } else {
-                  //AC_TRACE << "resume audio free mpeg video";
+                  AC_TRACE << "resume audio free mpeg video";
                   myPauseTime = _myPauseStartTime;
+                  _myAudioStartTime += myPauseTime;
+                  _myPauseStartTime = -1;
               }
-              _myAudioStartTime += myPauseTime;
-              _myPauseStartTime = -1;
           }
 
           /**
@@ -110,8 +111,13 @@ namespace y60 {
            * the movie as if it was 
            */
           virtual void stopMovie() {
+              AC_DEBUG << "stopMovie";
               MovieDecoderBase::stopMovie();
-              _myAudioStartTime = _myPauseStartTime = _myMovieTime = 0;
+              if (_myAudioSink) {            
+                  _myAudioSink->stop();
+              } else {
+                  _myAudioStartTime = _myPauseStartTime = _myMovieTime = 0;
+              }
           }
 
           /**
@@ -125,27 +131,8 @@ namespace y60 {
           }
 
     protected:
-        AudioBase::BufferedSource * _myAudioBufferedSource;
-        void initBufferedSource(unsigned theNumChannels, unsigned theSampleRate, unsigned theSampleBits) {
-            AudioApp::AudioController & myAudioController = AudioApp::AudioController::get();
-            std::string myURL = getMovie()->get<ImageSourceTag>();
-            if (theSampleBits != 16) {
-                AC_WARNING << "Movie '" << myURL << "' contains " << theSampleBits
-                    << " bit audio stream. Only 16 bit supported. Playing movie without sound.";
-            } else {
-                if (!myAudioController.isRunning()) {
-                    myAudioController.init(asl::maximum(theSampleRate, (unsigned) 44100));
-                }
 
-                std::string myId = myAudioController.createReader(
-                    myURL, "Mixer", theSampleRate, theNumChannels);
-                _myAudioBufferedSource = dynamic_cast<AudioBase::BufferedSource *>(myAudioController.getFileReaderFromID(myId));
-                _myAudioBufferedSource->setVolume(getMovie()->get<VolumeTag>());
-                _myAudioBufferedSource->setSampleBits(theSampleBits);
-                AC_INFO << "Audio: channels=" << theNumChannels << ", samplerate=" << theSampleRate << ", samplebits=" << theSampleBits;
-            }
-
-        }
+        asl::HWSampleSinkPtr  _myAudioSink;
 
         double          _myMovieTime;
         double          _myAudioStartTime;

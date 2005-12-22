@@ -21,13 +21,16 @@
 #define _ac_y60_FFMpegDecoder2_h_
 
 #include "AsyncDecoder.h"
+#include "FrameCache.h"
+
 #include <y60/MovieEncoding.h>
+
 #include <asl/PlugInBase.h>
 
-#include "FrameCache.h"
 #include <asl/PosixThread.h>
 #include <asl/ThreadLock.h>
 #include <asl/ThreadSemaphore.h>
+
 
 #include <string>
 #include <list>
@@ -73,10 +76,9 @@ namespace y60 {
         FFMpegDecoder2(asl::DLHandle theDLHandle);
         virtual ~FFMpegDecoder2();
 
+        
         virtual asl::Ptr<MovieDecoderBase> instance() const;
         std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
-
-        bool hasAudio() const;  /// @retval true, if this stream contains audio
 
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
         void copyFrame(FrameCache::VideoFramePtr theVideoFrame, dom::ResizeableRasterPtr theTargetRaster);
@@ -133,7 +135,6 @@ namespace y60 {
 
         int               _myAStreamIndex;
         AVStream *        _myAStream;
-        unsigned char *   _mySamples;
 
         FrameCache        _myFrameCache;
         FrameCache        _myFrameRecycler;
@@ -149,7 +150,12 @@ namespace y60 {
         bool              _myCachingFlag;
 
 
+        ReSampleContext *   _myResampleContext;
 
+        static asl::Block     _mySamples;
+        static asl::Block     _myResampledSamples;
+
+        
         /**
          * Thread run method.
          */
