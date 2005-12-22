@@ -52,7 +52,7 @@ namespace y60 {
     asl::Block FFMpegDecoder2::_mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
     
     FFMpegDecoder2::FFMpegDecoder2(asl::DLHandle theDLHandle) :
-        PlugInBase(theDLHandle),AsyncDecoder(), PosixThread(),
+        PlugInBase(theDLHandle), AsyncDecoder(), PosixThread(),
         _myFormatContext(0), _myFrame(0),
         _myVStreamIndex(-1), _myVStream(0), _myStartTimestamp(0),
         _myAStreamIndex(-1), _myAStream(0), 

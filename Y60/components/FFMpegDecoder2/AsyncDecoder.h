@@ -25,7 +25,7 @@
 #include <asl/ThreadLock.h>
 #include <asl/Logger.h>
 
-#include <asl/HwSampleSink.h>
+#include <asl/HWSampleSink.h>
 
 namespace y60 {
     
