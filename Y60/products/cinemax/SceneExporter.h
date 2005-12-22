@@ -87,25 +87,24 @@ class SceneExporter : public SceneSaverData {
         void writeActiveCamera();
 
         void exportTransformation(y60::TransformBuilderBase & theBuilder,
-                                  BaseObject * theNode,
-                                  bool theInverseTransformFlag = false);
+                                  BaseObject * theNode, bool theInverseTransformFlag = false);
 
         BaseDocument     *  _myDocument;
         y60::SceneBuilderPtr _mySceneBuilder;
         y60::WorldBuilderPtr _myWorldBuilder;
         MaterialExporter *   _myMaterialExporter;
 
-        typedef std::map< void*, std::vector<std::string> > ShapeMap;
+        typedef std::map<void*, std::vector<std::string> > ShapeMap;
         ShapeMap  _myExportedShapes;
 
-        typedef std::map<void *, std::string> LightMap;
+        typedef std::map<void*, std::string> LightMap;
         LightMap  _myExportedLightSources;
 
         typedef std::map<BaseObject*, std::string> CameraMap;
         CameraMap _myExportedCameras;
 
-	    unsigned            _myObjectCount;
-	    bool                _myBinaryFlag;
+	    unsigned  _myObjectCount;
+	    bool      _myBinaryFlag;
 };
 
 #endif

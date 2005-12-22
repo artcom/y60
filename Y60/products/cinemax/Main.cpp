@@ -15,7 +15,9 @@ Bool RegisterAcXmlExporter(void);
 
 Bool _cdecl PluginStart(void) {
     // The one and only ART+COM XML-Export Plugin
-	if (!RegisterAcXmlExporter()) return FALSE;	
+    if (!RegisterAcXmlExporter()) {
+        return FALSE;
+    }
 	
 	return TRUE;
 }

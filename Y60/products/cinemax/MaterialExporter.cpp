@@ -7,34 +7,26 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: MaterialExporter.cpp,v $
-//   $Author: valentin $
-//   $Revision: 1.43 $
-//   $Date: 2005/04/29 15:07:34 $
-//
-//  Description: This class implements a exporter plugin for Cinema 4D.
-//
-//=============================================================================
 
 #include "MaterialExporter.h"
 
 #include "Exceptions.h"
 #include "CinemaHelpers.h"
 
+#include <asl/Matrix4.h>
 #include <y60/property_functions.h>
 #include <y60/ShapeBuilder.h>
 #include <y60/PropertyNames.h>
-#include <asl/Matrix4.h>
 
 #if API_VERSION >= 8500
 #include <Xbitmap.h>
 #endif
 
 #include <string>
+
+using namespace std;
 using namespace asl;
 using namespace y60;
-using namespace std;
 
 const float AMBIENT_COLOR = 0.4;
 
@@ -82,17 +74,18 @@ MaterialExporter::createDefaultMaterial() {
 
 bool
 MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr theMaterialBuilder,
-                                y60::SceneBuilder & theSceneBuilder,BaseContainer * theContainer,
+                                y60::SceneBuilder & theSceneBuilder,
+                                BaseContainer * theContainer,
                                 const std::string & theUsage, TextureTag * theTextureTag,
                                 const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord,
-								bool isAlphaChannel)
+								bool isAlphaChannel, bool isEnvMap)
 {
-
 	String myMaterialName = theMaterial->GetName();
     if (!theContainer) {
         throw ExportException(std::string("Export texture with undefined cinema container"),
                                             "MaterialExporter::writeMaterial()");
     }
+
     bool myDiffuseColorFlag = false;
     std::string myApplyMode = y60::TEXTURE_APPLY_DECAL;
 
@@ -121,164 +114,171 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
         }
     }
 
+    // internal texture format
+    std::string myInternalFormat = "";
+	if (isAlphaChannel) {
+		myInternalFormat = TEXTURE_INTERNAL_FORMAT_INTENSITY;
+        //GePrint("************************ ALPHA CHANNEL myApplyMode=" + String(myApplyMode.c_str()));
+	}
 
-    String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
-
-    std::string myTextureFilename = getTexturePath(_myDocumentPath, myTextureName);
-    Real myAlpha = theContainer->GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
-
-	string myInternalFormat("");
-
-    std::string myImageId;
-    if (theMaterialBuilder->isMovie(myTextureFilename)) {
-		if (isAlphaChannel) {
-			myInternalFormat = TEXTURE_INTERNAL_FORMAT_INTENSITY;
-		}
-        LONG myTimeMode = theContainer->GetLong(BASECHANNEL_TIME_MODE);
-        unsigned myLoopCount = 0;
-#if API_VERSION >= 8500
-        switch(myTimeMode) {
-            case BITMAPSHADER_TIMING_MODE_SIMPLE:
-                myLoopCount = 1;
-                break;
-            case BITMAPSHADER_TIMING_MODE_LOOP:
-                myLoopCount = 0;
-                break;
-            case BITMAPSHADER_TIMING_MODE_PINGPONG:
-                myLoopCount = 0;
-                displayMessage(std::string("Ping-Pong Mode is not supported: ") + getString(myTextureName));
-                break;
-        }
-#endif
-        myImageId = theMaterialBuilder->createMovie(theSceneBuilder, getString(myTextureName), myTextureFilename,
-			                                        myLoopCount, myInternalFormat);
+    // color scale
+    Real myMixStrength = theContainer->GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
+    GePrint("isAlphaChannel=" + LongToString(isAlphaChannel) + " mix=" + RealToString(myMixStrength));
+    asl::Vector4f myColorScale;
+    if (isAlphaChannel) {
+        myColorScale = asl::Vector4f(myMixStrength,myMixStrength,myMixStrength,myMixStrength);
     } else {
-		if ( isAlphaChannel) {
-			myInternalFormat = TEXTURE_INTERNAL_FORMAT_ALPHA;
-		}
-        bool myCreateMipmapFlag = (theUsage == TEXTURE_USAGE_PAINT);
-        myImageId = theMaterialBuilder->createImage(theSceneBuilder,
-                                                    getString(myTextureName), myTextureFilename,
-                                                    theUsage, myCreateMipmapFlag,
-                                                    asl::Vector4f(1,1,1,myAlpha),
-                                                    asl::Vector4f(0,0,0,0),
-                                                    SINGLE,
-													myInternalFormat);
-    }
-    // export mapping
-    GeData myData;
-    theTextureTag->GetParameter(DescID(TEXTURETAG_PROJECTION), myData, 0);
-    LONG myCinemaxTexCoordMode = myData.GetLong();
-    std::string myTextureMappingMode(TexCoordMappingStrings[myCinemaxTexCoordMode]);
-    if (myCinemaxTexCoordMode > PERSPECTIVE_PROJECTION ||
-        myCinemaxTexCoordMode == SPATIAL_PROJECTION ||
-        myCinemaxTexCoordMode == SHRINKMAP_PROJECTION ||
-        myCinemaxTexCoordMode == PERSPECTIVE_PROJECTION) {
-            displayMessage(std::string("Mapping not supported: ") + myTextureMappingMode +
-                                       " for texture: " + getString(myTextureName));
-            /*throw ExportException(std::string("Mapping not supported: ") + getString(myTextureMappingMode) +
-                                       " for texture" + getString(myTextureName), PLUS_FILE_LINE);*/
+        myColorScale = asl::Vector4f(myMixStrength,myMixStrength,myMixStrength,1);
     }
 
+    // color bias
+    asl::Vector4f myColorBias(0,0,0,0);
+    if (myApplyMode == y60::TEXTURE_APPLY_MODULATE) {
+        // if modulating then setup color bias so that colors aren't blacked out
+        myColorBias = asl::Vector4f(1,1,1,1) - myColorScale;
+    }
 
-    GePrint(string(string("texture mapping: ") + myTextureMappingMode).c_str());
+    // Texture
+    String myTextureName = theContainer->GetString(BASECHANNEL_TEXTURE);
+    std::string myImageId = "";
+    if (myTextureName.GetLength()) {
+        std::string myTextureFilename = getTexturePath(_myDocumentPath, myTextureName);
+        if (theMaterialBuilder->isMovie(myTextureFilename)) {
+            LONG myTimeMode = theContainer->GetLong(BASECHANNEL_TIME_MODE);
+            unsigned myLoopCount = 0;
+#if API_VERSION >= 8500
+            switch(myTimeMode) {
+                case BITMAPSHADER_TIMING_MODE_SIMPLE:
+                    myLoopCount = 1;
+                    break;
+                case BITMAPSHADER_TIMING_MODE_LOOP:
+                    myLoopCount = 0;
+                    break;
+                case BITMAPSHADER_TIMING_MODE_PINGPONG:
+                    myLoopCount = 0;
+                    displayMessage(std::string("Ping-Pong Mode is not supported: ") + getString(myTextureName));
+                    break;
+            }
+#endif
+            myImageId = theMaterialBuilder->createMovie(theSceneBuilder, getString(myTextureName), myTextureFilename,
+			                                            myLoopCount, myColorScale, myColorBias, myInternalFormat);
+        } else {
+            bool myCreateMipmapFlag = (theUsage == TEXTURE_USAGE_PAINT);
+            myImageId = theMaterialBuilder->createImage(theSceneBuilder,
+                                                        getString(myTextureName), myTextureFilename,
+                                                        theUsage, myCreateMipmapFlag,
+                                                        myColorScale, myColorBias,
+                                                        SINGLE, myInternalFormat);
+        }
+    }
 
-    // export texturematrix
+    // Texture projection
+    std::string myTextureMappingMode = "";
+
     Matrix4f myTextureMatrix;
     myTextureMatrix.makeIdentity();
 
-    if (myTextureMappingMode != TEXCOORD_UV_MAP) {
-		Matrix4f myTexGenMatrix;
-		myTexGenMatrix.makeIdentity();
+    if (isEnvMap) {
+        myTextureMappingMode = TexCoordMappingStrings[SPHERICAL_PROJECTION];
+    } else {
+        GeData myData;
+        theTextureTag->GetParameter(DescID(TEXTURETAG_PROJECTION), myData, 0);
+        LONG myCinemaTexCoordMode = myData.GetLong();
+        myTextureMappingMode = TexCoordMappingStrings[myCinemaTexCoordMode];
+        if (myCinemaTexCoordMode > PERSPECTIVE_PROJECTION ||
+            myCinemaTexCoordMode == SPATIAL_PROJECTION ||
+            myCinemaTexCoordMode == SHRINKMAP_PROJECTION ||
+            myCinemaTexCoordMode == PERSPECTIVE_PROJECTION) {
+            displayMessage(std::string("Mapping not supported: ") + myTextureMappingMode +
+                                        " for texture: " + getString(myTextureName));
+        } else {
+            GePrint("Texture mapping mode=" + String(myTextureMappingMode.c_str()));
+        }
 
-        Matrix4f myNormalizeObjectCoordsMatrix;
-        myNormalizeObjectCoordsMatrix.makeIdentity();
+        if (myTextureMappingMode != TEXCOORD_UV_MAP) {
+		    Matrix4f myTexGenMatrix;
+		    myTexGenMatrix.makeIdentity();
 
-        // object normalization to [-0.5,0.5]
-        asl::Vector3f myObjectSize = difference(theMaxCoord, theMinCoord);
-        myObjectSize[0] = myObjectSize[0] == 0 ? 1 : myObjectSize[0];
-        myObjectSize[1] = myObjectSize[1] == 0 ? 1 : myObjectSize[1];
-        myObjectSize[2] = myObjectSize[2] == 0 ? 1 : myObjectSize[2];
+            Matrix4f myNormalizeObjectCoordsMatrix;
+            myNormalizeObjectCoordsMatrix.makeIdentity();
 
-        asl::Vector3f myObjScale;
-        myObjScale[0] =  1.0 / myObjectSize[0];
-        myObjScale[1] = -1.0 / myObjectSize[1]; //Cinema 4D left-handed coord system
-        myObjScale[2] =  1.0 / myObjectSize[2];
+            // object normalization to [-0.5,0.5]
+            asl::Vector3f myObjectSize = difference(theMaxCoord, theMinCoord);
+            myObjectSize[0] = myObjectSize[0] == 0 ? 1 : myObjectSize[0];
+            myObjectSize[1] = myObjectSize[1] == 0 ? 1 : myObjectSize[1];
+            myObjectSize[2] = myObjectSize[2] == 0 ? 1 : myObjectSize[2];
 
-        asl::Vector3f myObjOffset;
-        myObjOffset[0] = -0.5;
-        myObjOffset[1] = -0.5;
-        myObjOffset[2] = -0.5;
+            asl::Vector3f myObjScale;
+            myObjScale[0] =  1.0 / myObjectSize[0];
+            myObjScale[1] = -1.0 / myObjectSize[1]; //Cinema 4D left-handed coord system
+            myObjScale[2] =  1.0 / myObjectSize[2];
 
-        myNormalizeObjectCoordsMatrix.setScale(myObjScale);
-        myNormalizeObjectCoordsMatrix.setTranslation(myObjOffset);
+            asl::Vector3f myObjOffset;
+            myObjOffset[0] = -0.5;
+            myObjOffset[1] = -0.5;
+            myObjOffset[2] = -0.5;
 
-        // scaling
-        Vector myScale = theTextureTag->GetScale();
+            myNormalizeObjectCoordsMatrix.setScale(myObjScale);
+            myNormalizeObjectCoordsMatrix.setTranslation(myObjOffset);
 
-        asl::Matrix4f myScaleMatrix;
-        myScaleMatrix.makeIdentity();
-        myScaleMatrix.setScale(Vector3f( 0.5*float(myObjectSize[0] / myScale.x),
-                                         0.5*float(myObjectSize[1] / myScale.y),
-                                         0.5*float(myObjectSize[2] / myScale.z) ));
+            // scaling
+            Vector myScale = theTextureTag->GetScale();
 
+            asl::Matrix4f myScaleMatrix;
+            myScaleMatrix.makeIdentity();
+            myScaleMatrix.setScale(Vector3f( 0.5*float(myObjectSize[0] / myScale.x),
+                                            0.5*float(myObjectSize[1] / myScale.y),
+                                            0.5*float(myObjectSize[2] / myScale.z) ));
 
-        //translating
-        Vector myPos = theTextureTag->GetPos();
+            //translating
+            Vector myPos = theTextureTag->GetPos();
 
-        asl::Matrix4f myPosMatrix;
-        myPosMatrix.makeIdentity();
-        myPosMatrix.setTranslation(Vector3f(-float(myPos.x),
-                                            -float(myPos.y),
-                                             float(myPos.z) ));
+            asl::Matrix4f myPosMatrix;
+            myPosMatrix.makeIdentity();
+            myPosMatrix.setTranslation(Vector3f(-float(myPos.x),
+                                                -float(myPos.y),
+                                                float(myPos.z) ));
 
-        //rotating
-        Vector myRotation = theTextureTag->GetRot();
+            //rotating
+            Vector myRotation = theTextureTag->GetRot();
 
-        asl::Matrix4f myPrePivot, myPostPivot, myRotMatrix;
+            asl::Matrix4f myPrePivot, myPostPivot, myRotMatrix;
 
-        myPrePivot.makeIdentity();
-        myPrePivot.setTranslation(Vector3f(0.5,0.5,0.5));
+            myPrePivot.makeIdentity();
+            myPrePivot.setTranslation(Vector3f(0.5,0.5,0.5));
 
-        myPostPivot.makeIdentity();
-        myPostPivot.setTranslation(Vector3f(-0.5,-0.5,-0.5));
+            myPostPivot.makeIdentity();
+            myPostPivot.setTranslation(Vector3f(-0.5,-0.5,-0.5));
 
-        myRotMatrix.makeIdentity();
+            myRotMatrix.makeIdentity();
 
-        myRotMatrix.postMultiply(myPrePivot);
-        myRotMatrix.rotateY(-myRotation.x);
-        myRotMatrix.rotateX(-myRotation.y);
-        myRotMatrix.rotateZ(myRotation.z);
-        myRotMatrix.postMultiply(myPostPivot);
+            myRotMatrix.postMultiply(myPrePivot);
+            myRotMatrix.rotateY(-myRotation.x);
+            myRotMatrix.rotateX(-myRotation.y);
+            myRotMatrix.rotateZ(myRotation.z);
+            myRotMatrix.postMultiply(myPostPivot);
 
+            // 2. apply operations
+            myTexGenMatrix.postMultiply(myPosMatrix);
+            myTexGenMatrix.postMultiply(myRotMatrix);
+            myTexGenMatrix.postMultiply(myScaleMatrix);
 
-        /*
-        GePrint("pos: " + RealToString(myPos.x) + " , "
-                + RealToString(myPos.y) + " , " + RealToString(myPos.z));
-        GePrint("scale: " + RealToString(myScale.x) + " , "
-                + RealToString(myScale.y) + " , " + RealToString(myScale.z));
-        GePrint("rot: " + RealToString(myRotation.x) + " , "
-                + RealToString(myRotation.y) + " , " + RealToString(myRotation.z));
-        */
+            // 1. normalize object dimensions to [0,1]
+            myTexGenMatrix.postMultiply(myNormalizeObjectCoordsMatrix);
 
-        // 2. apply operations
-        myTexGenMatrix.postMultiply(myPosMatrix);
-        myTexGenMatrix.postMultiply(myRotMatrix);
-        myTexGenMatrix.postMultiply(myScaleMatrix);
-
-        // 1. normalize object dimensions to [0,1]
-        myTexGenMatrix.postMultiply(myNormalizeObjectCoordsMatrix);
-
-        VectorOfVector4f myTexGenParams;
-        myTexGenParams.push_back(myTexGenMatrix.getColumn(0));
-        myTexGenParams.push_back(myTexGenMatrix.getColumn(1));
-        myTexGenParams.push_back(myTexGenMatrix.getColumn(2));
-        myTexGenParams.push_back(myTexGenMatrix.getColumn(3));
-        setPropertyValue<VectorOfVector4f>(theMaterialBuilder->getNode(),
-                "vectorofvector4f", "texgenparam0", myTexGenParams);
-
+            VectorOfVector4f myTexGenParams;
+            myTexGenParams.push_back(myTexGenMatrix.getColumn(0));
+            myTexGenParams.push_back(myTexGenMatrix.getColumn(1));
+            myTexGenParams.push_back(myTexGenMatrix.getColumn(2));
+            myTexGenParams.push_back(myTexGenMatrix.getColumn(3));
+            setPropertyValue<VectorOfVector4f>(theMaterialBuilder->getNode(),
+                    "vectorofvector4f", "texgenparam0", myTexGenParams);
+        }
     }
+
+    // wrap mode
     std::string myWrapMode = TEXTURE_WRAP_REPEAT; // TODO: extract wrap mode
+
     theMaterialBuilder->createTextureNode(myImageId, myApplyMode, theUsage, myWrapMode,
                                           myTextureMappingMode, myTextureMatrix, 100, false, 0.0);
     return myDiffuseColorFlag;
@@ -286,45 +286,52 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
 
 bool
 MaterialExporter::exportShader(PluginShader * theShader,
-                             y60::MaterialBuilderPtr theMaterialBuilder,
-                             Material* theMaterial,
-                             y60::SceneBuilder & theSceneBuilder,
-                             BaseContainer * theColorContainer,
-                             TextureTag * theTextureTag,
-                             const asl::Vector3f & theMinCoord,
-                             const asl::Vector3f & theMaxCoord,
-							 bool isAlphaChannel) {
+                               y60::MaterialBuilderPtr theMaterialBuilder,
+                               Material* theMaterial,
+                               y60::SceneBuilder & theSceneBuilder,
+                               BaseContainer * theColorContainer,
+                               TextureTag * theTextureTag,
+                               const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord,
+							   bool isAlphaChannel, bool isEnvMap)
+{
+    GePrint("exportShader: Material=" + theMaterial->GetName());
+
     // iterate over all shaders of the material
     // supported shaders are:
     //                       Layer (multitexture) Sorry, attributes are not available via api, dismissed
     //                       Bitmap(single texture)
     bool myDiffuseColorFlag = false;
-    while(theShader!=NULL) {
+    while (theShader != NULL) {
         LONG myShaderType = theShader->GetType();
+        GePrint("     Shader=" + theShader->GetName());
         switch (myShaderType) {
-            /*case Xlayer: {
+            case Xlayer:
+                {
+#if 1
+                    GePrint("Ignoring layered Shader '" + theShader->GetName() + "' not supported");
+#else
                     GePrint("Material has a layered shader, name:" +
                             theShader->GetName() + " with id: " +
                             LongToString(theShader->GetType()) );
                     PluginShader * myDownShader = theShader->GetDown();
                     myDiffuseColorFlag |= exportShader(myDownShader, theMaterialBuilder,
                                                        theMaterial, theSceneBuilder,
-                                                       0, theTextureTag);
-                }
-                break;*/
-            case Xbitmap:{
-                    BaseContainer *  myColorContainer = theColorContainer ?
-                                               theColorContainer : theShader->GetDataInstance();
-                    myDiffuseColorFlag = exportTexture(theMaterial,
-													theMaterialBuilder,
-                                                    theSceneBuilder, myColorContainer,
-                                                    y60::TEXTURE_USAGE_PAINT,
-                                                    theTextureTag,
-                                                    theMinCoord,
-                                                    theMaxCoord,isAlphaChannel);
+                                                       0, theTextureTag,
+                                                       theMinCoord, theMaxCoord,
+                                                       isAlphaChannel, isEnvMap);
+#endif
                 }
                 break;
-            case Xlayer:
+            case Xbitmap:
+                {
+                    BaseContainer *  myColorContainer = theColorContainer ? theColorContainer : theShader->GetDataInstance();
+                    myDiffuseColorFlag |= exportTexture(theMaterial, theMaterialBuilder,
+                                                        theSceneBuilder, myColorContainer,
+                                                        y60::TEXTURE_USAGE_PAINT, theTextureTag,
+                                                        theMinCoord, theMaxCoord,
+                                                        isAlphaChannel, isEnvMap);
+                }
+                break;
             case Xgradient:
             case Xfilter:
             case Xnoise:
@@ -393,8 +400,8 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
                     if ( myShaderType == Xbitmap) {
                         GeData myData;
                         myTextureTag->GetParameter(DescID(TEXTURETAG_PROJECTION), myData, 0);
-                        LONG myCinemaxTexCoordMode = myData.GetLong();
-                        myExportedMaterialInfo._myTexureMapping.push_back(myCinemaxTexCoordMode);
+                        LONG myCinemaTexCoordMode = myData.GetLong();
+                        myExportedMaterialInfo._myTexureMapping.push_back(myCinemaTexCoordMode);
                         myExportedMaterialInfo._myTextureCount++;
                     }
                 }
@@ -409,8 +416,8 @@ MaterialExporter::initiateExport(BaseObject * theNode, TextureList theTextureLis
 					if ( myShaderType == Xbitmap) {
 						GeData myData;
 						myTextureTag->GetParameter(DescID(TEXTURETAG_PROJECTION), myData, 0);
-						LONG myCinemaxTexCoordMode = myData.GetLong();
-						myExportedMaterialInfo._myTexureMapping.push_back(myCinemaxTexCoordMode);
+						LONG myCinemaTexCoordMode = myData.GetLong();
+						myExportedMaterialInfo._myTexureMapping.push_back(myCinemaTexCoordMode);
 						myExportedMaterialInfo._myTextureCount++;
 					}
 				}
@@ -439,45 +446,43 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
             return;
         }
 
-//        y60::MaterialBuilderPtr myMaterialBuilder(new y60::MaterialBuilder(myY60MaterialName, _myInlineTextures));
-//        myExportedMaterialInfo._myMaterialId = _mySceneBuilder->appendMaterial(*myMaterialBuilder);
         VectorOfRankedFeature myLightingRequirements;
         bool myMaterialAlphaFlag = false;
 
-        for (int myMaterialIndex = 0; myMaterialIndex < _myMaterials.size(); myMaterialIndex++) {
+        for (unsigned myMaterialIndex = 0; myMaterialIndex < _myMaterials.size(); ++myMaterialIndex) {
             Material * myMaterial = _myMaterials[myMaterialIndex]._myMaterial;
             TextureTag * myTextureTag = _myMaterials[myMaterialIndex]._myTextureTag;
 
+            // Export diffuse color and texture
             y60::LightingModel myLightingType = y60::LAMBERT;
-              // Export diffuse color and texture
-              if (myMaterial->GetChannelState(CHANNEL_COLOR)) {
-                  BaseChannel * myColorChannel = myMaterial->GetChannel(CHANNEL_COLOR);
-                  if (myColorChannel) {
-                    // Export texture
+            if (myMaterial->GetChannelState(CHANNEL_COLOR)) {
+                BaseChannel * myColorChannel = myMaterial->GetChannel(CHANNEL_COLOR);
+                if (myColorChannel) {
+                    // Color texture
                     BaseContainer myColorContainer = myColorChannel->GetData();
                     String myTextureName = myColorContainer.GetString(BASECHANNEL_TEXTURE);
                     String myTextureShaderid = myColorContainer.GetString(BASECHANNEL_SHADERID);
-                    GePrint("Texture name: " + myTextureName + " Shaderid: " + myTextureShaderid);
+                    GePrint("### " + myMaterial->GetName() + ": Texture=" + myTextureName + " ShaderID=" + myTextureShaderid);
 
                     bool myDiffuseColorFlag = false;
-
                     PluginShader  * myShader = myColorChannel->GetShader();
                     if (!myShader) {
                         // Note: We do not export the diffuse color if a texture is present, because we are
                         // currently not able to support the mix-mode feature of cinema 4d
-                        Vector4f myDiffuseColor;
-                           getColor(myColorChannel, myDiffuseColor);
+                        asl::Vector4f myDiffuseColor;
+                        getColor(myColorChannel, myDiffuseColor);
                         setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
 
-                        Vector4f myAmbientColor(AMBIENT_COLOR * myDiffuseColor[0], AMBIENT_COLOR * myDiffuseColor[1], AMBIENT_COLOR * myDiffuseColor[2], 1);
+                        asl::Vector4f myAmbientColor = product(myDiffuseColor, AMBIENT_COLOR);
+                        myAmbientColor[3] = 1.0f;
                         setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::AMBIENT_PROPERTY, myAmbientColor);
-
                     } else {
                         myDiffuseColorFlag = exportShader(myShader, _myMaterialBuilder,
                                                           myMaterial,theSceneBuilder,
                                                           &myColorContainer, myTextureTag,
-                                                          theMinCoord, theMaxCoord, false);
-                        // export materials base color
+                                                          theMinCoord, theMaxCoord);
+
+                        // Material base color
                         Vector4f myColor(1, 1, 1, 1);
                         if (myDiffuseColorFlag) {
                             getColor(myColorChannel, myColor);
@@ -487,7 +492,6 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                         myColor *= AMBIENT_COLOR;
                         myColor[3] = 1.0;
                         setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::AMBIENT_PROPERTY, myColor);
-
                     }
                 }
             }
@@ -497,10 +501,11 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                 BaseChannel * myTransparencyChannel = myMaterial->GetChannel(CHANNEL_TRANSPARENCY);
                 if (myTransparencyChannel) {
                     BaseContainer myColorContainer = myTransparencyChannel->GetData();
-                    //getColor(myTransparencyChannel, myDiffuseColor); // we do not know what to do with this color value (vs)
-                    //Real myAlpha = myColorContainer.GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
-                    Real   myBrightness    = myColorContainer.GetReal(BASECHANNEL_BRIGHTNESS_EX);
+                    Real myMixStrength = myColorContainer.GetReal(BASECHANNEL_MIXSTRENGTH_EX, 1.0);
+                    Real myBrightness = myColorContainer.GetReal(BASECHANNEL_BRIGHTNESS_EX);
+
                     Vector4f myDiffuseColor(1, 1, 1, 1);
+                    getColor(myTransparencyChannel, myDiffuseColor); // we do not know what to do with this color value (vs)
                     if (hasPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY) ) {
                         myDiffuseColor = getPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY);
                     }
@@ -508,40 +513,43 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
                 }
             }
+
             // Luminance
             if (myMaterial->GetChannelState(CHANNEL_LUMINANCE)) {
                 BaseChannel * myLuminanceChannel = myMaterial->GetChannel(CHANNEL_LUMINANCE);
                 if (myLuminanceChannel) {
-                    Vector4f myEmissiveColor(1, 1, 1, 1);
+                    asl::Vector4f myEmissiveColor;
                     BaseContainer myColorContainer = myLuminanceChannel->GetData();
                     // Brightness has already scaled luminance channel color
                     getColor(myLuminanceChannel, myEmissiveColor);
-                    //Real   myBrightness    = myColorContainer.GetReal(BASECHANNEL_BRIGHTNESS_EX);
+
+                    Real myBrightness = myColorContainer.GetReal(BASECHANNEL_BRIGHTNESS_EX);
+                    GePrint("luminance brightness=" + RealToString(myBrightness));
                     //myEmissiveColor[0] *= myBrightness;
                     //myEmissiveColor[1] *= myBrightness;
                     //myEmissiveColor[2] *= myBrightness;
                     setPropertyValue<asl::Vector4f>(_myMaterialBuilder->getNode(), "vector4f", y60::EMISSIVE_PROPERTY, myEmissiveColor);
-
                 }
             }
+
+            // Alpha
             if (myMaterial->GetChannelState(CHANNEL_ALPHA)) {
-                  BaseChannel * myAlphaChannel = myMaterial->GetChannel(CHANNEL_ALPHA);
-                  if (myAlphaChannel) {
-						// Export texture
-						BaseContainer myColorContainer = myAlphaChannel->GetData();
-						String myTextureName = myColorContainer.GetString(BASECHANNEL_TEXTURE);
-						String myTextureShaderid = myColorContainer.GetString(BASECHANNEL_SHADERID);
-                        GePrint("CHANNEL_ALPHA: Texture name: " + myTextureName + " Shaderid: " + myTextureShaderid);
-	                    PluginShader  * myShader = myAlphaChannel->GetShader();
-                        exportShader(myShader, _myMaterialBuilder, myMaterial,theSceneBuilder,
-                                     &myColorContainer, myTextureTag, theMinCoord, theMaxCoord, true);
+                BaseChannel * myAlphaChannel = myMaterial->GetChannel(CHANNEL_ALPHA);
+                if (myAlphaChannel) {
+			        BaseContainer myColorContainer = myAlphaChannel->GetData();
+			        String myTextureName = myColorContainer.GetString(BASECHANNEL_TEXTURE);
+			        String myTextureShaderid = myColorContainer.GetString(BASECHANNEL_SHADERID);
+                    GePrint("### " + myMaterial->GetName() + ": Alpha texture=" + myTextureName);
+	                PluginShader  * myShader = myAlphaChannel->GetShader();
+                    exportShader(myShader, _myMaterialBuilder, myMaterial,theSceneBuilder,
+                                 &myColorContainer, myTextureTag, theMinCoord, theMaxCoord, true);
+		        }
+		    }
 
-				  }
-			}
-
-			myMaterialAlphaFlag = myMaterialAlphaFlag | (myMaterial->GetChannelState(CHANNEL_ALPHA)==TRUE) |
+		    myMaterialAlphaFlag = myMaterialAlphaFlag | (myMaterial->GetChannelState(CHANNEL_ALPHA)==TRUE) |
                                                         (myMaterial->GetChannelState(CHANNEL_TRANSPARENCY)==TRUE) ;
-            // Export specular color
+
+            // Specular color
             Vector4f mySpecularColor(0, 0, 0, 1);
             bool foundSpecularColor = false;
             if (myMaterial->GetChannelState(CHANNEL_SPECULARCOLOR)) {
@@ -553,7 +561,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                 }
             }
 
-            // Export specular material tab
+            // Specular material
             if (myMaterial->GetChannelState(CHANNEL_SPECULAR)) {
                 BaseChannel * mySpecularChannel = myMaterial->GetChannel(CHANNEL_SPECULAR);
                 if (mySpecularChannel) {
@@ -568,15 +576,9 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                             }
                             break;
                     }
-                }
-            }
 
-            // Export shininess
-            if (myMaterial->GetChannelState(CHANNEL_SPECULAR)) {
-                BaseChannel * mySpecularChannel = myMaterial->GetChannel(CHANNEL_SPECULAR);
-                if (mySpecularChannel) {
+                    // Shininess
                     myLightingType = y60::PHONG;
-                    BaseContainer * mySpecularContainer = myMaterial->GetDataInstance();
                     float mySpecularWidth      = mySpecularContainer->GetReal(MATERIAL_SPECULAR_WIDTH);
                     float mySpecularHeight     = mySpecularContainer->GetReal(MATERIAL_SPECULAR_HEIGHT);
                     float mySpecularFallOff    = mySpecularContainer->GetReal(MATERIAL_SPECULAR_FALLOFF);
@@ -590,36 +592,54 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                 }
             }
 
-            // Export bumpmap
-              if (myMaterial->GetChannelState(CHANNEL_BUMP)) {
-                  BaseChannel * myBumpChannel = myMaterial->GetChannel(CHANNEL_BUMP);
-                  if (myBumpChannel) {
-                    // Export texture
-                    BaseContainer myBumpContainer = myBumpChannel->GetData();
-                    String myBumpMapName = "";//myBumpContainer.GetString(BASECHANNEL_TEXTURE);
-                    if (myBumpMapName.GetLength() ) {
-                        exportTexture(myMaterial, _myMaterialBuilder, theSceneBuilder, &myBumpContainer, y60::TEXTURE_USAGE_BUMP, myTextureTag, theMinCoord, theMaxCoord, false);
+            // Bumpmap
+            if (myMaterial->GetChannelState(CHANNEL_BUMP)) {
+                BaseChannel * myChannel = myMaterial->GetChannel(CHANNEL_BUMP);
+                if (myChannel) {
+                    BaseContainer myContainer = myChannel->GetData();
+                    String myBumpMapName = myContainer.GetString(BASECHANNEL_TEXTURE);
+                    if (myBumpMapName.GetLength()) {
+#if 1
+                        GePrint("### " + myMaterial->GetName() + ": Bumpmap is not supported: " + myBumpMapName);
+#else
+                        exportTexture(myMaterial, _myMaterialBuilder, theSceneBuilder, &myContainer, y60::TEXTURE_USAGE_BUMP, myTextureTag, theMinCoord, theMaxCoord, false);
                         _myMaterialBuilder->needTextureFallback(true);
+#endif
+                    }
+                }
+            }
+
+            // Environment map
+            if (myMaterial->GetChannelState(CHANNEL_ENVIRONMENT)) {
+                BaseChannel * myChannel = myMaterial->GetChannel(CHANNEL_ENVIRONMENT);
+                if (myChannel) {
+                    BaseContainer myContainer = myChannel->GetData();
+                    String myTextureName = myContainer.GetString(BASECHANNEL_TEXTURE);
+                    GePrint("### " + myMaterial->GetName() + ": Environment texture=" + myTextureName);
+                    if (myTextureName.GetLength() ) {
+                        exportTexture(myMaterial,
+                                      _myMaterialBuilder, theSceneBuilder,
+                                      &myContainer, y60::TEXTURE_USAGE_PAINT,
+                                      myTextureTag, theMinCoord, theMaxCoord, false, true);
                     }
                 }
             }
 
             // build material requirements
             createLightingFeature(myLightingRequirements, myLightingType);
-               _myMaterialBuilder->setType(myLightingRequirements);
+                _myMaterialBuilder->setType(myLightingRequirements);
         }
-
 
         _myMaterialBuilder->setTransparencyFlag(myMaterialAlphaFlag);
         //myExportedMaterialInfo._myTextureCount = _myMaterialBuilder->getTextureCount();
         _myMaterialMap[theMaterialInfo._myMaterialName] = theMaterialInfo;
         _myMaterialBuilder->computeRequirements();
-        GePrint("+++ Exported material '" + String(theMaterialInfo._myMaterialName.c_str()) + "'");
 
+        GePrint("+++ Exported material '" + String(theMaterialInfo._myMaterialName.c_str()) + "'");
         //return myExportedMaterialInfo;
         //return _myMaterialBuilder;
     } else {
-            writeMaterial(theMaterialInfo, theNode->GetUp(), theSceneBuilder,theMinCoord, theMaxCoord);
+        writeMaterial(theMaterialInfo, theNode->GetUp(), theSceneBuilder,theMinCoord, theMaxCoord);
     }
 }
 
@@ -635,7 +655,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
             UVWTag * myUvTag = static_cast<UVWTag*>(theNode->GetTag(Tuvw, ti));
             myTextureList.push_back(std::pair<TextureTag*,UVWTag*>(myTextureTag, myUvTag));
         }
-        GePrint("*** texture: " + theNode->GetName() + " texturecount=" + LongToString(myTextureList.size()));
+        GePrint("*** Texture=" + theNode->GetName() + " count=" + LongToString(myTextureList.size()));
     }
 
     writeMaterial(theMaterialInfo, theNode, myTextureList, theSceneBuilder, theMinCoord, theMaxCoord);

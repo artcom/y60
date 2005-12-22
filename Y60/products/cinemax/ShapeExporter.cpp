@@ -312,10 +312,8 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
     LONG myPolyFrom, myPolyTo;
     LONG mySelectionIndex = 0;
     myBaseSelect->GetRange(mySelectionIndex, &myPolyFrom, &myPolyTo);
-    GePrint(String(myName.c_str()) + " from=" + LongToString(myPolyFrom) + " to=" + LongToString(myPolyTo));
-    if (String(myName.c_str()) == "b2 architektur_grafik") {
-        GePrint(String(myName.c_str()) + " from=" + LongToString(myPolyFrom) + " to=" + LongToString(myPolyTo));
-    }
+    //GePrint(String(myName.c_str()) + " from=" + LongToString(myPolyFrom) + " to=" + LongToString(myPolyTo));
+
     bool myVerticesFound = false;
     for (mySelectionIndex = 0; myBaseSelect->GetRange(mySelectionIndex, &myPolyFrom, &myPolyTo); ++mySelectionIndex) {
         for (LONG myPolyIndex = myPolyFrom; myPolyIndex <= myPolyTo; ++myPolyIndex) {

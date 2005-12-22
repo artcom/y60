@@ -283,7 +283,9 @@ namespace y60 {
     MaterialBuilder::createMovie(SceneBuilder & theSceneBuilder,
                                  const std::string & theName,
                                  const std::string & theFileName,
-                                 unsigned theLoopCount,										
+                                 unsigned theLoopCount,
+                                 const asl::Vector4f theColorScale,
+                                 const asl::Vector4f theColorBias,
 								 const std::string & theInternalFormat)
     {
         std::string myFileName(theFileName);
@@ -297,7 +299,9 @@ namespace y60 {
             MovieBuilder myMovieBuilder(theName, myFileName);
             const string & myId = theSceneBuilder.appendMovie(myMovieBuilder);
             myMovieBuilder.setLoopCount(theLoopCount);
-			myMovieBuilder.setInternalFormat(theInternalFormat);
+            myMovieBuilder.setColorScale(theColorScale);
+            myMovieBuilder.setColorBias(theColorBias);
+            myMovieBuilder.setInternalFormat(theInternalFormat);
             return myId;
         }
     }

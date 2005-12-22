@@ -34,7 +34,7 @@ void displayMessage(const char * theMessage) {
 }
 
 void 
-displayMessage(const std::string & theMessage) {    
+displayMessage(const std::string & theMessage) {
     class MyDialog : public GeModalDialog {  
     public:
         void setMessage(const std::string & theMessage) {
@@ -61,6 +61,8 @@ displayMessage(const std::string & theMessage) {
         std::string _myMessage;
     };
     
+    GePrint(theMessage.c_str());
+
     MyDialog myDialog;        
     myDialog.setMessage(theMessage);
     myDialog.Open();

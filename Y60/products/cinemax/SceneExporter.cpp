@@ -67,7 +67,8 @@ SceneExporter::countObjects(BaseObject *theNode) {
 void
 SceneExporter::exportTransformation(y60::TransformBuilderBase & theBuilder,
                                     BaseObject * theNode,
-                                    bool theInverseTransformFlag) {
+                                    bool theInverseTransformFlag)
+{
     Vector myPos = theNode->GetPos();
     Vector myScale = theNode->GetScale();
     Vector myOrientation = theNode->GetRot();
@@ -600,7 +601,7 @@ SceneExporter::Save(PluginSceneSaver * theNode,
         // Write current scene camera
         writeActiveCamera();
 
-        // Save xml dom to file
+        // Save to file
         StatusSetText("Saving '" + theFileName.GetString() + "'");
         std::string myFileName = getString(theFileName.GetString());
         if (_myBinaryFlag) {

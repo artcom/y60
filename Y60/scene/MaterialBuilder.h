@@ -61,6 +61,8 @@ namespace y60 {
                                         const std::string & theName,
                                         const std::string & theFileName,
                                         unsigned theLoopCount,
+                                        const asl::Vector4f theColorScale,
+                                        const asl::Vector4f theColorBias,
 										const std::string & theInternalFormat);
 
         const std::string & createImage(SceneBuilder & theSceneBuilder,

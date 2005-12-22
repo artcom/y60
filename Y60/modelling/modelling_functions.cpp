@@ -57,14 +57,14 @@ namespace y60 {
         return myNode;
     }
 
-    dom::NodePtr 
+    dom::NodePtr
     createCanvas(y60::ScenePtr theScene, const std::string & theCanvasName) {
         CanvasBuilder myCanvas(theCanvasName);
         theScene->getSceneBuilder()->appendCanvas(myCanvas);
         return myCanvas.getNode();
     }
 
-    dom::NodePtr 
+    dom::NodePtr
     createQuad(y60::ScenePtr theScene, const std::string & theMaterialId,
         asl::Vector3f theTopLeftCorner,
         asl::Vector3f theBottomRightCorner)
@@ -247,11 +247,11 @@ namespace y60 {
         myShapeBuilder.appendElements( myElementBuilder );
         return myShapeBuilder.getNode();
     }
-    
+
     dom::NodePtr
     createLineStrip(y60::ScenePtr theScene, const std::string & theLineMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
-                         const std::string & theName) 
+                         const std::string & theName)
     {
         ShapeBuilder myShapeBuilder(theName);
         ElementBuilder myLineElementBuilder(PRIMITIVE_TYPE_LINE_STRIP, theLineMaterialId);
@@ -322,7 +322,7 @@ namespace y60 {
 
         int myNumSlices = 2 * myHSlices + 1;
         int myVertexCount = myNumSlices * 4;
-        // XXX wild guess ... 
+        // XXX wild guess ...
         float myDeltaDist = sqrt(theSize * theSize + theSize * theSize + theSize * theSize) / myNumSlices;
 
         ShapeBuilder myShapeBuilder(theName);
@@ -381,6 +381,7 @@ namespace y60 {
             unsigned myLoopCount = 0;
             myImageId = theMaterialBuilder.createMovie(theSceneBuilder, myTexName,
                                                        theTextureFilename, myLoopCount,
+                                                       myColorScale, myColorBias,
                                                        "");
         } else {
             myImageId = theMaterialBuilder.createImage(theSceneBuilder, myTexName,
@@ -463,7 +464,7 @@ namespace y60 {
         myMaterialBuilder.setTransparencyFlag(true);
         appendUnlitProperties(myMaterialBuilder, Vector4f(1.0, 1.0, 1.0, 1.0));
         appendBlendFunction(myMaterialBuilder);
-        
+
         if ( ! theTextureFilename.empty()) {
             appendTexture(*(theScene->getSceneBuilder()), theScene, myMaterialBuilder,
                             theTextureFilename, theSpriteFlag, theDepth);
@@ -492,10 +493,10 @@ namespace y60 {
         return myMaterialBuilder.getNode();
     }
 
-    dom::NodePtr 
+    dom::NodePtr
     createLambertMaterial(y60::ScenePtr theScene,
                         const asl::Vector4f & theDiffuseColor,
-                        const asl::Vector4f & theAmbientColor) 
+                        const asl::Vector4f & theAmbientColor)
     {
         MaterialBuilder myMaterialBuilder("myMaterial", false);
         string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
@@ -511,9 +512,9 @@ namespace y60 {
         return myMaterialBuilder.getNode();
     }
 
-    dom::NodePtr 
+    dom::NodePtr
     createColorMaterial(y60::ScenePtr theScene,
-                        const asl::Vector4f & theColor) 
+                        const asl::Vector4f & theColor)
     {
         MaterialBuilder myMaterialBuilder("myMaterial", false);
         theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);

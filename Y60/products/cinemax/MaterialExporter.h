@@ -80,9 +80,13 @@ class MaterialExporter {
         void getColor(BaseChannel * theColorChannel, asl::Vector4f & theColor);
         const std::string getTexturePath(Filename & theDocumentpath, String & theTextureFilename);
 
-        bool exportTexture(Material* theMaterial, y60::MaterialBuilderPtr theMaterialBuilder, y60::SceneBuilder & theSceneBuilder, 
+        bool exportTexture(Material* theMaterial,
+                           y60::MaterialBuilderPtr theMaterialBuilder,
+                           y60::SceneBuilder & theSceneBuilder, 
                            BaseContainer * theContainer, const std::string & theUsage, TextureTag * theTextureTag,
-						   const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord, bool isAlphaChannel);
+						   const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord,
+                           bool isAlphaChannel = false, bool isEnvMap = false);
+
         bool exportShader(PluginShader * theShader, 
                           y60::MaterialBuilderPtr theMaterialBuilder, 
                           Material* theMaterial, 
@@ -90,7 +94,7 @@ class MaterialExporter {
                           BaseContainer * theColorContainer,
 						  TextureTag * theTextureTag, 
 						  const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord, 
-						  bool isAlphaChannel);
+						  bool isAlphaChannel = false, bool isEnvMap = false);
 
         ExportedMaterialInfo createDefaultMaterial();
 

@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: MaterialBase.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.45 $
-//   $Date: 2005/04/24 00:41:21 $
-//
-//  Description: A simple material class.
-//
-//=============================================================================
 
 #include "MaterialBase.h"
 #include "TextureManager.h"
@@ -267,14 +258,14 @@ namespace y60 {
                             break;
                         case SPHERICAL_PROJECTION:
                             //AC_DEBUG << "SPHERICAL_PROJECTION" << endl;
-                            myTexGenModes.push_back(SPHERE_MAP); // generate s
-                            myTexGenModes.push_back(SPHERE_MAP); // and t
+                            myTexGenModes.push_back(SPHERE_MAP);
+                            myTexGenModes.push_back(SPHERE_MAP);
                             _myTexGenFlag = true;
                             break;
                         case CYLINDRICAL_PROJECTION:
                             //AC_DEBUG << "CYLINDRICAL_PROJECTION" << endl;
-                            myTexGenModes.push_back(SPHERE_MAP); // generate s
-                            myTexGenModes.push_back(OBJECT_LINEAR); // and t
+                            myTexGenModes.push_back(SPHERE_MAP);
+                            myTexGenModes.push_back(OBJECT_LINEAR);
                             _myTexGenFlag = true;
                             break;
                         case UV_MAP:
@@ -288,7 +279,7 @@ namespace y60 {
                                     "' in material " + get<NameTag>(), PLUS_FILE_LINE);
                     }
                     
-                    if (myTexCoordMode != UV_MAP) {
+                    if (myTexCoordMode != UV_MAP && myTexCoordMode != SPHERICAL_PROJECTION) {
                     
                         // fetch texgen params
                         MaterialPropertiesFacadePtr myPropertyFacade = getChild<MaterialPropertiesTag>();
