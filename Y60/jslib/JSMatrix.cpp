@@ -115,6 +115,27 @@ makeTranslating(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 }
 
 static JSBool
+makeLookAt(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Make this matrix a transform which looks from eye to center.");
+    DOC_PARAM("theEye", "Eye Position", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theCenter", "Center Position", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theUp", "Up Vector", DOC_TYPE_VECTOR3F);
+    DOC_END;
+    return Method<NATIVE>::call(&NATIVE::makeLookAt,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+makePerspective(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Make this matrix a projection matrix.");
+    DOC_PARAM("theFovy", "Field of View", DOC_TYPE_FLOAT);
+    DOC_PARAM("theAspect", "Aspect ratio", DOC_TYPE_FLOAT);
+    DOC_PARAM("theZNear", "Near Plane Distance", DOC_TYPE_FLOAT);
+    DOC_PARAM("theZFar", "Far Plane Distance", DOC_TYPE_FLOAT);
+    DOC_END;
+    return Method<NATIVE>::call(&NATIVE::makePerspective,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 rotateX(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Rotate this matrix around the X axis.");
     DOC_PARAM("theAngle", "Angle around the X-axis", DOC_TYPE_FLOAT);
@@ -190,9 +211,16 @@ getTranslation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     return Method<NATIVE>::call(&NATIVE::getTranslation,cx,obj,argc,argv,rval);
 }
 static JSBool
-getRotation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+getScale(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Get scaling part of this matrix.");
     DOC_RVAL("Scale vector", DOC_TYPE_VECTOR3F);
+    DOC_END;
+    return Method<NATIVE>::call(&NATIVE::getScale,cx,obj,argc,argv,rval);
+}
+static JSBool
+getRotation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Get orientation part of this matrix.");
+    DOC_RVAL("orientation vector", DOC_TYPE_VECTOR3F);
     DOC_END;
     asl::Matrix4f myObj;
     if (convertFrom(cx, OBJECT_TO_JSVAL(obj), myObj)) {
@@ -267,6 +295,8 @@ JSMatrix::Functions() {
         //{"makeQuaternionRotating", makeQuaternionRotating, 1},
         {"makeScaling",        makeScaling,             3},
         {"makeTranslating",    makeTranslating,         3},
+        {"makeLookAt",         makeLookAt,              3},
+        {"makePerspective",    makePerspective,         4},
         {"rotateX",            rotateX,                 1},
         {"rotateY",            rotateY,                 1},
         {"rotateZ",            rotateZ,                 1},
@@ -279,6 +309,7 @@ JSMatrix::Functions() {
         {"invert",             invert,                  0},
         {"getTranslation",     getTranslation,          0},
         {"getRotation",        getRotation,             0},
+        {"getScale",           getScale,                0},
         {"decompose",          decompose,               0},
         {"toString",           toString,                0},
         {0}
@@ -400,8 +431,19 @@ JSMatrix::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
                 JS_ReportError(cx,"JSMatrix::Constructor: parameter %d must be a number",i);
                 return JS_FALSE;
             }
+#if 0
             myNewMatrix[i/4][i%4] = float(myArgs[i]);
+#endif
         }
+        myNewMatrix.assign(float(myArgs[0]), float(myArgs[1]), 
+                           float(myArgs[2]), float(myArgs[3]),
+                           float(myArgs[4]), float(myArgs[5]), 
+                           float(myArgs[6]), float(myArgs[7]),
+                           float(myArgs[8]), float(myArgs[9]), 
+                           float(myArgs[10]),float(myArgs[11]),
+                           float(myArgs[12]),float(myArgs[13]),
+                           float(myArgs[14]),float(myArgs[15])  );
+
         myNewObject = new JSMatrix(myNewValue);
     } else if (argc == 1) {
         JSObject * myArgument;

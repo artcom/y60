@@ -80,14 +80,23 @@ static JSBool
 setVerbosity(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Set global Verbosity of Logger.");
     DOC_PARAM("theVerbosity", "", DOC_TYPE_ENUMERATION);
+    DOC_PARAM_OPT("theFilename", "", DOC_TYPE_STRING, "");
+    DOC_PARAM_OPT("theMinId", "", DOC_TYPE_INTEGER, 0);
+    DOC_PARAM_OPT("theMaxId", "", DOC_TYPE_INTEGER, 99999999);
     DOC_END;
     try {
-        int myVerbosity, myMinId, myMaxId;
+        int myVerbosity;
+        //ensureParamCount(argc, 2);
+        convertFrom(cx, argv[0], myVerbosity);
+        if (argc == 1) {
+            Logger::get().setVerbosity(asl::Severity(myVerbosity));
+            return JS_TRUE;
+        }
+
+        int myMinId, myMaxId;
         myMinId = 0;
         myMaxId = std::numeric_limits<int>::max();
         std::string myModule;
-        //ensureParamCount(argc, 2);
-        convertFrom(cx, argv[0], myVerbosity);
         convertFrom(cx, argv[1], myModule);
         if (argc > 2) {
             convertFrom(cx, argv[2], myMinId);

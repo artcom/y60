@@ -296,8 +296,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                                 || myFilename.search(/\.mpeg$/i) != -1
                                 /* || myFilename.search(/\.ra$/i)   != -1 */
                                 )) {
-            plug("y60FFMpegDecoder");
-            print("plugged ffmpegdecoder");
+            plug("y60FFMpegDecoder2");
+            print("plugged ffmpegdecoder 2");
             _myMPEGPlugged = true;
         }
         if ( myFilename.search(/\.mov$/i) != -1) {
@@ -325,7 +325,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
              myFilename.search(/^http:\/\//i) != -1))
              // default wma fallback: i.e. http://server/dir/
         {
-            plug("y60WMADecoder");
+            plug("y60WMADecoder2");
             _myWMAPlugged = true;
         }
         if (!_myVFWCapturePlugged && myFilename.search(/^video:\/\//i) != -1) {

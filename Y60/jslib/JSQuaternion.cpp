@@ -48,8 +48,6 @@ static JSBool
 getRealPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the real part of the quaternion.");
     DOC_RVAL("", DOC_TYPE_FLOAT);
-    DOC_RESET;
-    DOC_RVAL("", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::getRealPart,cx,obj,argc,argv,rval);
 }
@@ -66,8 +64,6 @@ static JSBool
 setRealPart(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the real part of the quaternion.");
     DOC_PARAM("theReal", "", DOC_TYPE_FLOAT);
-    DOC_RESET;
-    DOC_PARAM("theReal", "", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<NATIVE>::call(&NATIVE::setRealPart,cx,obj,argc,argv,rval);
 }

@@ -31,7 +31,7 @@
 using namespace dom;
 using namespace std;
 
-#define DB(x) // x
+#define DB(x) x
 #define DB2(x) // x
 
 
@@ -140,16 +140,20 @@ namespace y60 {
     }
 
     double Movie::getTimeFromFrame(unsigned theFrame) const {
-        DB(AC_TRACE << "getTimeFromFrame count " << get<FrameCountTag>() << " framerate " << get<FrameRateTag>();)
+        AC_DEBUG << "getTimeFromFrame count " << get<FrameCountTag>() << " framerate " << get<FrameRateTag>();
+        AC_DEBUG << "returning " << (double)(theFrame % get<FrameCountTag>()) / get<FrameRateTag>();
+ 
         return (double)(theFrame % get<FrameCountTag>()) / get<FrameRateTag>();
     }
 
     unsigned Movie::getFrameFromTime(double theTime) const {
+        AC_DEBUG << "getFrameFromTime theTime " << theTime;
         double myFrameHelper = theTime * get<FrameRateTag>();
         int myFrame = int(myFrameHelper < 0 ? ceil(myFrameHelper) : floor(myFrameHelper));
         while (myFrame < 0) {
             myFrame += get<FrameCountTag>();
         }
+        AC_DEBUG << "returning " << myFrame << " mod " << get<FrameCountTag>();
         return (unsigned)(myFrame % get<FrameCountTag>());
     }
 
