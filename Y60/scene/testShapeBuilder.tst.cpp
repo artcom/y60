@@ -127,7 +127,7 @@ class ShapeBuilderUnitTest : public UnitTest {
                                                           asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE,"");
                 myMaterialBuilder.createTextureNode(myImageId, "OTHER_APPLY_MODE", TEXTURE_USAGE_PAINT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
 
-                string myMovieId = myMaterialBuilder.createMovie(mySceneBuilder, "testTexture3", "mymovie.mpg", 0,"");
+                string myMovieId = myMaterialBuilder.createMovie(mySceneBuilder, "testTexture3", "mymovie.mpg", 0, asl::Vector4f(1,1,1,1), asl::Vector4f(0,0,0,0), "");
                 myMaterialBuilder.createTextureNode(myMovieId, "OTHER_APPLY_MODE", TEXTURE_USAGE_PAINT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
             }
 
