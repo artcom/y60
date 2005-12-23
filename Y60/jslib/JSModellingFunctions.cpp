@@ -37,7 +37,9 @@ namespace jslib {
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Creates a new transform node and adds it to a given parent");
+        DOC_PARAM("theParentNode", "A node in the world", DOC_TYPE_NODE);
+        DOC_RVAL("The new transform node", DOC_TYPE_NODE);
         DOC_END;
         ensureParamCount(argc, 1);
 
@@ -57,7 +59,10 @@ CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateCanvas(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Creates a new canvas");
+        DOC_PARAM("theScene", "The scene to create the canvas inside", DOC_TYPE_SCENE);
+        DOC_PARAM("theName", "Name of the canvas", DOC_TYPE_STRING);
+        DOC_RVAL("The new canvas node", DOC_TYPE_NODE);
         DOC_END;
 
         ensureParamCount(argc, 2);
@@ -77,7 +82,10 @@ CreateCanvas(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rva
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateBody(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Creates a new body");
+        DOC_PARAM("theParentNode", "A node inside the world, to append the body to", DOC_TYPE_NODE);
+        DOC_PARAM("theShapeId", "The id of the shape connected to the body", DOC_TYPE_STRING);
+        DOC_RVAL("The new body node", DOC_TYPE_NODE);
         DOC_END;
 
         ensureParamCount(argc, 2);
@@ -102,6 +110,7 @@ CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
         DOC_PARAM("theMaterialId", "", DOC_TYPE_STRING);
         DOC_PARAM("theTopLeftCorner", "", DOC_TYPE_VECTOR3F);
         DOC_PARAM("theBottomRightCorner", "", DOC_TYPE_VECTOR3F);
+        DOC_RVAL("The quad shape node", DOC_TYPE_NODE);
         DOC_END;
 
         ensureParamCount(argc, 4);
@@ -126,7 +135,13 @@ CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateCrosshair(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Creates a new crosshair shape");
+        DOC_PARAM("theScene", "The scene to append the crosshair to", DOC_TYPE_SCENE);
+        DOC_PARAM("theMaterialId", "The id of the material for the crosshair shape", DOC_TYPE_STRING);
+        DOC_PARAM("theInnerRadius", "Inner radius", DOC_TYPE_FLOAT);
+        DOC_PARAM("theHairLength", "Crosshair length", DOC_TYPE_FLOAT);
+        DOC_PARAM("theName", "Name of the shape", DOC_TYPE_STRING);
+        DOC_RVAL("The new crosshair shape", DOC_TYPE_NODE);
         DOC_END;
 
         ensureParamCount(argc, 5);
@@ -157,7 +172,12 @@ CreateCrosshair(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateDistanceMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Create a distance markup shape");
+        DOC_PARAM("theScene", "The scene to create the distance inside", DOC_TYPE_SCENE);
+        DOC_PARAM("theMaterialId", "The id of the material used for the shapes", DOC_TYPE_STRING);
+        DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+        DOC_PARAM_OPT("theName", "Name for the quadstack shape", DOC_TYPE_STRING, "");
+        DOC_RVAL("The new created distance shape", DOC_TYPE_NODE);
         DOC_END;
         ensureParamCount(argc, 3, 4);
 
@@ -195,8 +215,16 @@ CreateDistanceMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, js
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Create an angle markup shape");
+        DOC_PARAM("theScene", "The scene to create the angle inside", DOC_TYPE_SCENE);
+        DOC_PARAM("theMaterialId", "The id of the material used for the shapes", DOC_TYPE_STRING);
+        DOC_PARAM("theApex", "", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("thePointA", "", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("thePointA", "", DOC_TYPE_VECTOR3F);
+        DOC_PARAM_OPT("theName", "Name for the quadstack shape", DOC_TYPE_STRING, "");
+        DOC_RVAL("The new created angle shape", DOC_TYPE_NODE);
         DOC_END;
+
         ensureParamCount(argc, 6, 7);
 
         y60::ScenePtr myScene(0);
@@ -243,7 +271,12 @@ CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateLineStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Create an linestrip shape");
+        DOC_PARAM("theScene", "The scene to create the linestrip inside", DOC_TYPE_SCENE);
+        DOC_PARAM("theMaterialId", "The id of the material used for the shapes", DOC_TYPE_STRING);
+        DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+        DOC_PARAM_OPT("theName", "Name for the quadstack shape", DOC_TYPE_STRING, "");
+        DOC_RVAL("The new created linestrip shape", DOC_TYPE_NODE);
         DOC_END;
         ensureParamCount(argc, 3, 4);
 
@@ -280,7 +313,13 @@ CreateLineStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Create an trinangle mesh markup shape");
+        DOC_PARAM("theScene", "The scene to create the shape inside", DOC_TYPE_SCENE);
+        DOC_PARAM("theLineMaterialId", "The id of the material used for the lines", DOC_TYPE_STRING);
+        DOC_PARAM("theAreaMaterialId", "The id of the material used for the areas", DOC_TYPE_STRING);
+        DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+        DOC_PARAM_OPT("theName", "Name for the quadstack shape", DOC_TYPE_STRING, "");
+        DOC_RVAL("The new created shape", DOC_TYPE_NODE);
         DOC_END;
         ensureParamCount(argc, 4, 5);
 
@@ -322,9 +361,16 @@ CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
-
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Create an unlit textured material");
+        DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);
+        DOC_PARAM_OPT("theTextureFilename", "Path of the file to use for as texture", DOC_TYPE_STRING, "");
+        DOC_PARAM_OPT("theName", "Name for the quadstack shape", DOC_TYPE_STRING, "ColorMaterial");
+        DOC_PARAM_OPT("theTransparencyFlag", "Does the texture contain transparent pixels", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("theSpriteFlag", "Use the material as sprite (for particles)", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("theDepth", "The Depth of the texture (for 3D-Textures)", DOC_TYPE_INTEGER, 1);
+        DOC_PARAM_OPT("theColor", "Surfacecolor of the material", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
+        DOC_RVAL("The new created material", DOC_TYPE_NODE);
         DOC_END;
 
         ensureParamCount(argc, 1, 7);
@@ -399,7 +445,13 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateQuadStack(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("");
+        DOC_BEGIN("Creates a stack of quads");
+        DOC_PARAM("theScene", "The scene to create the quadstack inside", DOC_TYPE_SCENE);
+        DOC_PARAM("theDimensions", "I am not quite sure, how this works. Try asking David or Thomas.", DOC_TYPE_VECTOR3I);
+        DOC_PARAM("theSize", "The size of the quad shape", DOC_TYPE_FLOAT);
+        DOC_PARAM("theMaterialId", "The id of the material used for the quad shapes", DOC_TYPE_STRING);
+        DOC_PARAM_OPT("theName", "Name for the quadstack shape", DOC_TYPE_STRING, "");
+        DOC_RVAL("The new created quadstack shape", DOC_TYPE_NODE);
         DOC_END;
         ensureParamCount(argc, 4, 5);
 
@@ -442,9 +494,10 @@ CreateQuadStack(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns string representation fo the modelling functions");
+    DOC_RVAL("theString", DOC_TYPE_STRING);
     DOC_END;
-    std::string myStringRep = std::string("Renderer@") + as_string(obj);
+    std::string myStringRep = std::string("ModellingFunctions@") + as_string(obj);
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
     *rval = STRING_TO_JSVAL(myString);
     return JS_TRUE;
@@ -452,7 +505,6 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JSFunctionSpec *
 JSModellingFunctions::Functions() {
-    AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
@@ -463,7 +515,6 @@ JSModellingFunctions::Functions() {
 
 JSFunctionSpec *
 JSModellingFunctions::StaticFunctions() {
-    AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                         native                       nargs
         {"createTransform",             CreateTransform,             1},
@@ -516,7 +567,7 @@ JSModellingFunctions::setPropertySwitch(unsigned long theID, JSContext *cx, JSOb
 
 JSBool
 JSModellingFunctions::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("This object is static. You do not need to construct it.");
     DOC_END;
     AC_TRACE << "Constructor start " << endl;
     AC_TRACE << "Constructor argc =" << argc << endl;

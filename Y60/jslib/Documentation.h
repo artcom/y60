@@ -72,6 +72,7 @@ namespace jslib {
         DOC_TYPE_ARRAY, // js-array
         DOC_TYPE_VECTOR2I,
         DOC_TYPE_VECTOR2F,
+        DOC_TYPE_VECTOR3I,
         DOC_TYPE_VECTOR3F,
         DOC_TYPE_VECTOR4F,
         DOC_TYPE_VECTOROFFLOAT,
@@ -90,15 +91,17 @@ namespace jslib {
         DOC_TYPE_NODELIST,
         DOC_TYPE_REQUEST,
         DOC_TYPE_OBJECT,
-        DOC_TYPE_BLOCK
+        DOC_TYPE_BLOCK,
+        DOC_TYPE_SCENE,
+        DOC_TYPE_VECTOROFVECTOR3F
    };
 
     static const std::string DocTypeDescription[] = {
         "__intern__",
         "string", "int", "float", "bool", "enum", "array",
-        "Vector2i", "Vector2f", "Vector3f", "Vector4f", "VectorOfFloat", "Point", "Quaternion", "Matrix", "Box",
+        "Vector2i", "Vector2f", "Vector3i", "Vector3f", "Vector4f", "VectorOfFloat", "Point", "Quaternion", "Matrix", "Box",
         "Line", "Ray", "LineSegment", "Plane", "Triangle", "Sphere", "Frustum",
-        "Node", "NodeList", "Request", "object", "Block"
+        "Node", "NodeList", "Request", "object", "Block", "Scene", "VectorOfVector3f"
     };
 
     struct ParameterDescription {

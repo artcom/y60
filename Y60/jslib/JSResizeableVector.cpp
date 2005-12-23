@@ -42,14 +42,17 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns an element from the vector. Throws an exception, if index is out of bounds.");
+    DOC_PARAM("theIndex", "Index of the element to retrieve.", DOC_TYPE_INTEGER);
+    DOC_RVAL("theElement", DOC_TYPE_OBJECT);
     DOC_END;
     typedef dom::ValuePtr (NATIVE_VECTOR::*MyMethod)(int);
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::getElement,cx,obj,argc,argv,rval);
 }
 static JSBool
 resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Resizes the vector to the requested size, adding default elements or removing superflous elements.");
+    DOC_PARAM("theSize", "The new size of the vector", DOC_TYPE_INTEGER);
     DOC_END;
     typedef void (NATIVE_VECTOR::*MyMethod)(int);
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::resize,cx,obj,argc,argv,rval);
@@ -58,7 +61,7 @@ resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 /* TODO
 static JSBool
 append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("todo");
     DOC_END;
     typedef bool (NATIVE_VECTOR::*MyMethod)(const dom::ValueBase &);
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::append,cx,obj,argc,argv,rval);
@@ -66,7 +69,9 @@ append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 */
 static JSBool
 erase(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Erases one element from the vector");
+    DOC_PARAM("theIndex", "The index of the element to erase", DOC_TYPE_INTEGER);
+    DOC_RVAL("true, if successfull", DOC_TYPE_BOOLEAN);
     DOC_END;
     typedef bool (NATIVE_VECTOR::*MyMethod)(int);
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::erase,cx,obj,argc,argv,rval);
@@ -75,7 +80,7 @@ erase(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 /* TODO
 static JSBool
 insertBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("todo");
     DOC_END;
     typedef bool (NATIVE_VECTOR::*MyMethod)(int, const ValueBase &);
     return Method<NATIVE_VECTOR>::call((MyMethod)&NATIVE_VECTOR::insertBefore,cx,obj,argc,argv,rval);
@@ -125,7 +130,7 @@ JSResizeableVector::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 // getproperty handling
 JSBool
 JSResizeableVector::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
@@ -171,7 +176,7 @@ JSBool JSResizeableVector::setPropertyIndex(unsigned long theIndex, JSContext *c
 
 JSBool
 JSResizeableVector::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Creats a new resizeable vector");
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {
