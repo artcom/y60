@@ -19,19 +19,11 @@
 
 #include "JSOffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.h"
-//#include "AbstractRenderWindow.h"
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
-
-template <>
-struct JSClassTraits<AbstractRenderWindow> : public JSClassTraitsWrapper<OffscreenRenderArea, JSOffscreenRenderArea> {
-    static JSClass * Class() {
-        return JSOffscreenRenderArea::Base::Class();
-    }
-};
 
 typedef jslib::AbstractRenderWindow BASE;
 
@@ -66,7 +58,7 @@ setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         ensureParamCount(argc, 1);
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        
+
         unsigned myWidth;
         convertFrom(cx, argv[0], myWidth);
         myNative->setWidth(myWidth);
@@ -84,7 +76,7 @@ downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         ensureParamCount(argc, 1);
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        
+
         dom::NodePtr myImageNode(0);
         if( ! convertFrom(cx, argv[0], myImageNode)) {
             JS_ReportError(cx, "OffscreenRenderArea::downloadFromViewport(): argument #0 must be an image node.");
@@ -105,7 +97,7 @@ setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         ensureParamCount(argc, 1);
         OffscreenRenderArea * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        
+
         unsigned myHeight;
         convertFrom(cx, argv[0], myHeight);
         myNative->setHeight(myHeight);

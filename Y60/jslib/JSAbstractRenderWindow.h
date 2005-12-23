@@ -37,12 +37,13 @@
 
 namespace jslib {
 
-// TODO:  move more non-templatized implementation to this base class
-class JSAbstractRenderWindowBase : public JSWrapper<AbstractRenderWindow,
-                                   asl::Ptr<AbstractRenderWindow>,
-                                            StaticAccessProtocol>
-{
+template<class DERIVED>
+class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, StaticAccessProtocol> {
     public:
+        typedef AbstractRenderWindow NATIVE;
+        typedef asl::Ptr<NATIVE> OWNERPTR;
+        typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
+
         enum PropertyNumbers {
             PROP_BEGIN = -128,
             PROP_pause,
@@ -68,15 +69,6 @@ class JSAbstractRenderWindowBase : public JSWrapper<AbstractRenderWindow,
             PROP_debugCulling,
             PROP_END
         };
-};
-
-template<class DERIVED>
-class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
-{
-    public:
-        typedef AbstractRenderWindow NATIVE;
-        typedef asl::Ptr<NATIVE> OWNERPTR;
-        typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
         static JSBool setTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Sets a javascript line to be executed after a certain time");
@@ -84,7 +76,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theMilliseconds", "", DOC_TYPE_FLOAT);
             DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setTimeout,cx,obj,argc,argv,rval);
+            typedef long (DERIVED::*MyMethod)(const std::string &, float);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setTimeout,cx,obj,argc,argv,rval);
         }
 
         static JSBool setInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -93,21 +86,24 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theMilliseconds", "", DOC_TYPE_FLOAT);
             DOC_RVAL("theTimeoutId", DOC_TYPE_INTEGER);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setInterval,cx,obj,argc,argv,rval);
+            typedef long (DERIVED::*MyMethod)(const std::string &, float);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setInterval,cx,obj,argc,argv,rval);
         }
 
         static JSBool clearTimeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Stops a timeout from beeing executed");
             DOC_PARAM("theTimeoutId", "", DOC_TYPE_INTEGER);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::clearTimeout,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(long);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::clearTimeout,cx,obj,argc,argv,rval);
         }
 
         static JSBool clearInterval(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Stops an interval from beeing executed");
             DOC_PARAM("theTimeoutId", "", DOC_TYPE_INTEGER);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::clearInterval,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(long);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::clearInterval,cx,obj,argc,argv,rval);
         }
 
         static JSBool
@@ -115,7 +111,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_BEGIN("Saves a screenshot to a given file");
             DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::saveBuffer,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(const std::string & );
+            return Method<DERIVED>::call((MyMethod)&DERIVED::saveBuffer,cx,obj,argc,argv,rval);
         }
         static JSBool
         getRenderer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -137,7 +134,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theCapability", "Capability to test for", DOC_TYPE_ENUMERATION);
             DOC_RVAL("theResult", DOC_TYPE_BOOLEAN);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::hasCap,cx,obj,argc,argv,rval);
+            typedef bool (DERIVED::*MyMethod)(unsigned);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::hasCap,cx,obj,argc,argv,rval);
         }
         static JSBool
         hasCapAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -146,14 +144,16 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theCapability", "Capability to test for", DOC_TYPE_STRING);
             DOC_RVAL("theResult", DOC_TYPE_BOOLEAN);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::hasCapAsString,cx,obj,argc,argv,rval);
+            typedef bool (DERIVED::*MyMethod)(const std::string &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::hasCapAsString,cx,obj,argc,argv,rval);
         }
 
         static JSBool
         printStatistics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Prints render statistics and profiling information to the console");
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::printStatistics,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(void);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::printStatistics,cx,obj,argc,argv,rval);
         }
         static JSBool
         getImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -163,7 +163,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theYPosition", "", DOC_TYPE_INTEGER);
             DOC_RVAL("theColor", DOC_TYPE_VECTOR4F);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::getImagePixel,cx,obj,argc,argv,rval);
+            typedef asl::Vector4i (DERIVED::*MyMethod)(dom::NodePtr, unsigned long, unsigned long);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::getImagePixel,cx,obj,argc,argv,rval);
         }
         static JSBool
         setImagePixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -174,7 +175,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theColor", "", DOC_TYPE_VECTOR4F);
             DOC_RVAL("theSuccess", DOC_TYPE_BOOLEAN);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setImagePixel,cx,obj,argc,argv,rval);
+            typedef bool (DERIVED::*MyMethod)(dom::NodePtr, unsigned long, unsigned long, const asl::Vector4i &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setImagePixel,cx,obj,argc,argv,rval);
         }
 
         static JSBool
@@ -187,8 +189,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                     JS_ReportError(cx,"JSRenderWindow::performRequest: bad argument type #0");
                     return JS_FALSE;
                 }
-                typedef void (NATIVE::*MyMethod)(const JSRequestPtr &);
-                return Method<NATIVE>::call((MyMethod)&NATIVE::performRequest,cx,obj,argc,argv,rval);
+                typedef void (DERIVED::*MyMethod)(const JSRequestPtr &);
+                return Method<DERIVED>::call((MyMethod)&DERIVED::performRequest,cx,obj,argc,argv,rval);
             }
             JS_ReportError(cx,"JSRenderWindow::performRequest: bad number of arguments, 1 expected");
             return JS_FALSE;
@@ -230,11 +232,11 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_END;
 
             if (argc == 2) {
-                typedef void (NATIVE::*MyMethod)(const asl::Vector2f &, const std::string &);
-                return Method<NATIVE>::call((MyMethod)&NATIVE::renderText,cx,obj,argc,argv,rval);
+                typedef void (DERIVED::*MyMethod)(const asl::Vector2f &, const std::string &);
+                return Method<DERIVED>::call((MyMethod)&DERIVED::renderText,cx,obj,argc,argv,rval);
             } else {// argc == 3
-                typedef void (NATIVE::*MyMethod)(const asl::Vector2f &, const std::string &, const std::string &);
-                return Method<NATIVE>::call((MyMethod)&NATIVE::renderText,cx,obj,argc,argv,rval);
+                typedef void (DERIVED::*MyMethod)(const asl::Vector2f &, const std::string &, const std::string &);
+                return Method<DERIVED>::call((MyMethod)&DERIVED::renderText,cx,obj,argc,argv,rval);
             }
         }
         static JSBool
@@ -244,11 +246,11 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM_OPT("theBackGroundColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
             DOC_END;
             if (argc == 1) {
-                typedef void (NATIVE::*MyMethod)(const asl::Vector4f &);
-                return Method<NATIVE>::call((MyMethod)&NATIVE::setTextColor,cx,obj,argc,argv,rval);
+                typedef void (DERIVED::*MyMethod)(const asl::Vector4f &);
+                return Method<DERIVED>::call((MyMethod)&DERIVED::setTextColor,cx,obj,argc,argv,rval);
             } else { // argc == 2
-                typedef void (NATIVE::*MyMethod)(const asl::Vector4f &, const asl::Vector4f &);
-                return Method<NATIVE>::call((MyMethod)&NATIVE::setTextColor,cx,obj,argc,argv,rval);
+                typedef void (DERIVED::*MyMethod)(const asl::Vector4f &, const asl::Vector4f &);
+                return Method<DERIVED>::call((MyMethod)&DERIVED::setTextColor,cx,obj,argc,argv,rval);
             }
         }
         static JSBool
@@ -261,7 +263,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theTextBoxHeight", "", DOC_TYPE_INTEGER);
             DOC_RVAL("theFilledTextBoxSize", DOC_TYPE_VECTOR2I);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::renderTextAsImage,cx,obj,argc,argv,rval);
+            typedef asl::Vector2i (DERIVED::*MyMethod)(dom::NodePtr, const std::string &, const std::string &, const unsigned int &, const unsigned int &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::renderTextAsImage,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTextStyle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -269,7 +272,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                       "See Renderer static properties for possible constants");
             DOC_PARAM("theHorizontalAlignment", "", DOC_TYPE_ENUMERATION);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setTextStyle,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(unsigned);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setTextStyle,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -279,7 +283,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theLeftPadding", "", DOC_TYPE_INTEGER);
             DOC_PARAM("theRightPadding", "", DOC_TYPE_INTEGER);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setTextPadding,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(int, int, int, int);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setTextPadding,cx,obj,argc,argv,rval);
         }
         static JSBool
         setHTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -287,7 +292,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                       "See Renderer static properties for possible constants");
             DOC_PARAM("theHorizontalAlignment", "", DOC_TYPE_ENUMERATION);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setHTextAlignment,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(unsigned);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setHTextAlignment,cx,obj,argc,argv,rval);
         }
         static JSBool
         setVTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -295,14 +301,16 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                       "See Renderer static properties for possible constants");
             DOC_PARAM("theVerticalAlignment", "", DOC_TYPE_ENUMERATION);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setVTextAlignment,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(unsigned);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setVTextAlignment,cx,obj,argc,argv,rval);
         }
         static JSBool
         setLineHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Sets line height in pixel for text paragraphs");
             DOC_PARAM("theLineHeight", "", DOC_TYPE_INTEGER);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setLineHeight,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(unsigned);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setLineHeight,cx,obj,argc,argv,rval);
         }
         static JSBool
         setParagraph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -310,7 +318,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theTopMargin", "", DOC_TYPE_INTEGER);
             DOC_PARAM("theBottomMargin", "", DOC_TYPE_INTEGER);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setParagraph,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(unsigned, unsigned);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setParagraph,cx,obj,argc,argv,rval);
         }
         static JSBool
         getGlyphMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -336,7 +345,7 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                 jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getGlyphMetrics(myFontName, myCharacter, myGlyphBox, myAdvance);
                 jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
 #else
-                jslib::JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
+                jslib::JSClassTraits<DERIVED>::ScopedNativeRef myObj(cx, obj);
                 myObj.getNative().getGlyphMetrics(myFontName, myCharacter, myGlyphBox, myAdvance);
 #endif
 
@@ -358,14 +367,16 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theGlyph0", "First glyph", DOC_TYPE_STRING);
             DOC_PARAM("theGlyph1", "Second glyph", DOC_TYPE_STRING);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::getKerning,cx,obj,argc,argv,rval);
+            typedef double (DERIVED::*MyMethod)(const std::string &, const std::string &, const std::string &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::getKerning,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTracking(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Set font tracking");
             DOC_PARAM("theTracking", "Tracking value", DOC_TYPE_FLOAT);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setTracking,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(float);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setTracking,cx,obj,argc,argv,rval);
         }
 
         static JSBool
@@ -375,7 +386,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theCharacterName", "", DOC_TYPE_STRING);
             DOC_PARAM("theClipName", "", DOC_TYPE_STRING);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::playClip,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(float, const std::string &, const std::string &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::playClip,cx,obj,argc,argv,rval);
         }
         static JSBool
         setClipLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -384,7 +396,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theClipName", "", DOC_TYPE_STRING);
             DOC_PARAM("theNumberOfLoops", "", DOC_TYPE_INTEGER);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setClipLoops,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(const std::string &, const std::string &, unsigned);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setClipLoops,cx,obj,argc,argv,rval);
         }
         static JSBool
         setClipForwardDirection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -393,7 +406,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theClipName", "", DOC_TYPE_STRING);
             DOC_PARAM("theDirection", "", DOC_TYPE_BOOLEAN);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::setClipForwardDirection,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(const std::string &, const std::string &, bool);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setClipForwardDirection,cx,obj,argc,argv,rval);
         }
         static JSBool
         getLoops(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -402,14 +416,16 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theClipName", "", DOC_TYPE_STRING);
             DOC_RVAL("numberOfLoops", DOC_TYPE_INTEGER);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::getLoops,cx,obj,argc,argv,rval);
+            typedef unsigned (DERIVED::*MyMethod)(const std::string &, const std::string &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::getLoops,cx,obj,argc,argv,rval);
         }
         static JSBool
         runAnimations(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Runs all global animations with a given time.");
             DOC_PARAM("theTime", "", DOC_TYPE_FLOAT);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::runAnimations,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(float);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::runAnimations,cx,obj,argc,argv,rval);
         }
         static JSBool
         isClipActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -418,7 +434,8 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theClipName", "", DOC_TYPE_STRING);
             DOC_RVAL("isActive", DOC_TYPE_BOOLEAN);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::isClipActive,cx,obj,argc,argv,rval);
+            typedef bool (DERIVED::*MyMethod)(const std::string &, const std::string &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::isClipActive,cx,obj,argc,argv,rval);
         }
         static JSBool
         isCharacterActive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -426,14 +443,16 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             DOC_PARAM("theCharacterName", "", DOC_TYPE_STRING);
             DOC_RVAL("isActive", DOC_TYPE_BOOLEAN);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::isCharacterActive,cx,obj,argc,argv,rval);
+            typedef bool (DERIVED::*MyMethod)(const std::string &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::isCharacterActive,cx,obj,argc,argv,rval);
         }
         static JSBool
         stopCharacter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Stops an animated character with a given name");
             DOC_PARAM("theCharacterName", "", DOC_TYPE_STRING);
             DOC_END;
-            return Method<NATIVE>::call(&NATIVE::stopCharacter,cx,obj,argc,argv,rval);
+            typedef void (DERIVED::*MyMethod)(const std::string &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::stopCharacter,cx,obj,argc,argv,rval);
         }
         static JSBool
         activateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -640,7 +659,10 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
             jsval dummy;
             switch (theID) {
                 case PROP_pause:
-                    return Method<NATIVE>::call(&NATIVE::setPause, cx, obj, 1, vp, &dummy);
+                    {
+                        typedef void (DERIVED::*MyMethod)(bool);
+                        return Method<DERIVED>::call((MyMethod)&DERIVED::setPause, cx, obj, 1, vp, &dummy);
+                    }
                 case PROP_eventListener:
                     {
                         JSObject * myListener;
@@ -717,7 +739,6 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                         }
                         return JS_FALSE;
                     }
-                    //return Method<NATIVE>::call(&NATIVE::setCanvas, cx, obj, 1, vp, &dummy);
                 case PROP_renderingCaps:
                     unsigned myFlags;
                     if (convertFrom(cx, *vp, myFlags)) {
@@ -725,9 +746,11 @@ class JSAbstractRenderWindow : public JSAbstractRenderWindowBase
                         return JS_TRUE;
                     }
                     return JS_FALSE;
-                    //return Method<NATIVE>::call(&NATIVE::setRenderingCaps, cx, obj, 1, vp, &dummy);
                 case PROP_fixedFrameTime:
-                    return Method<NATIVE>::call(&NATIVE::setFixedDeltaT, cx, obj, 1, vp, &dummy);
+                    {
+                        typedef void (DERIVED::*MyMethod)(const float &);
+                        return Method<DERIVED>::call((MyMethod)&DERIVED::setFixedDeltaT, cx, obj, 1, vp, &dummy);
+                    }
                 default:
                     JS_ReportError(cx,"JSAbstractRenderWindow::setPropertySwitch: index %d out of range", theID);
                     return JS_FALSE;

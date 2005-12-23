@@ -49,21 +49,9 @@ using namespace std;
 using namespace y60;
 using namespace jslib;
 
-// typedef std::map<string, KeyEvent> KeyMap;
 typedef SDLWindow NATIVE;
 typedef jslib::AbstractRenderWindow BASE;
 typedef jslib::JSAbstractRenderWindow<SDLWindow> JSBASE;
-
-namespace jslib {
-
-template <>
-struct JSClassTraits<AbstractRenderWindow> : public JSClassTraitsWrapper<SDLWindow, JSRenderWindow> {
-    static JSClass * Class() {
-        return JSRenderWindow::Base::Class();
-    }
-};
-
-}
 
 // =============== Wrapper Implementation
 

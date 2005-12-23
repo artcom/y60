@@ -19,10 +19,11 @@
 #ifndef _Y60_ACGTKSHELL_JSWIDGET_INCLUDED_
 #define _Y60_ACGTKSHELL_JSWIDGET_INCLUDED_
 
+#include "JSRenderArea.h"
+
 #include <y60/JSWrapper.h>
 #include <gtkmm/widget.h>
 #include <y60/JSAbstractRenderWindow.h>
-
 #include <asl/string_functions.h>
 
 namespace jslib {
@@ -43,10 +44,10 @@ class JSWidget : public JSWrapper<Gtk::Widget, asl::Ptr<Gtk::Widget>, StaticAcce
         static JSFunctionSpec * Functions();
 
         enum PropertyNumbers {
-            // TODO: since JSRenderArea inherits properites from both JSWidget and 
+            // TODO: since JSRenderArea inherits properites from both JSWidget and
             //       JSAbstractRenderWindow, the property ids may not overlap.
             //       A better solution would be to use different property get/set methods.
-            PROP_BEGIN = JSAbstractRenderWindowBase::PROP_END,
+            PROP_BEGIN = JSAbstractRenderWindow<JSRenderArea>::PROP_END,
             PROP_name,
             PROP_is_realized,
             PROP_is_visible,

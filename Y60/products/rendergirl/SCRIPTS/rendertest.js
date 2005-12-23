@@ -8,8 +8,10 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-var RenderTest = {};
-var ourFrameCounter = 0;
+use("Y60JSSL.js");
+
+var RenderTest           = {};
+var ourFrameCounter      = 0;
 var ourSavedFrameCounter = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,16 +103,9 @@ RenderTest.onFrame = function(theTime) {
     try {
         window.fixedFrameTime = 0.1;
         var myTest = ourTests[ourFrameCounter];
-        var myLastTest = ourFrameCounter ? ourTests[ourFrameCounter - 1] : null;
         print(ourFrameCounter + ". " + myTest.title);
 
-        // Deactivate last test
-        if (myLastTest && "handler" in myLastTest && "active" in myLastTest) {
-            myLastTest.active = !myLastTest.active;
-            ourHandler[myLastTest.handler](myLastTest);
-        }
-
-        // Activate current test
+        // Activate test
         if ("handler" in myTest) {
             var myArguments = myTest;
             if ("arguments" in myTest) {
@@ -132,17 +127,97 @@ RenderTest.onFrame = function(theTime) {
 }
 
 RenderTest.onPostRender = function(theTime) {
-    var myTest = ourTests[ourFrameCounter];
-    if ("screenshot" in myTest && myTest.screenshot) {
-        //print(">>> Save: '" + myTest.title + "' as 'cube_" + ourFrameCounter + ".png'");
-        var myNumber = ourFrameCounter < 10 ? "0" + ourFrameCounter : ourFrameCounter;
-        window.saveBuffer("TEST_IMAGES/cube_" + myNumber + ".png");
-    }
-    ourFrameCounter++;
+    try {
+        var myTest = ourTests[ourFrameCounter];
+        if ("screenshot" in myTest && myTest.screenshot) {
+            //print(">>> Save: '" + myTest.title + "' as 'cube_" + ourFrameCounter + ".png'");
+            var myNumber = ourFrameCounter < 10 ? "0" + ourFrameCounter : ourFrameCounter;
+            //window.saveBuffer("TEST_IMAGES/cube_" + myNumber + ".png");
+            triggerOffscreenRendering("TEST_IMAGES/cube_" + myNumber + ".png");
+            GtkMain.quit();
+        }
+        ourFrameCounter++;
 
-    if (ourFrameCounter >= ourTests.length) {
+        // Deactivate the test
+        if ("handler" in myTest && "active" in myTest) {
+            myTest.active = !myTest.active;
+            ourHandler[myTest.handler](myTest);
+        }
+
+        if (ourFrameCounter >= ourTests.length) {
+            GtkMain.quit();
+        }
+    } catch (ex) {
+        reportException(ex);
+        GtkMain.exitCode = 1;
         GtkMain.quit();
     }
+}
+
+var myTargetImage         = null;
+var myOffscreenRenderArea = null;
+var myOffscreenCanvas     = null;
+var myMainCanvas          = null;
+var once = true;
+
+function setupOffscreenRendering() {
+    // Create target image for offscreen rendering
+    myTargetImage = window.scene.images.appendChild(new Node("<image/>").firstChild);
+    myTargetImage.mipmap = false;
+    myTargetImage.width  = 800;
+    myTargetImage.height = 521;
+
+    // Create canvas for offscreen render area
+    myMainCanvas = window.canvas;
+    myOffscreenCanvas = window.canvas.cloneNode(true);
+    adjustNodeIds(myOffscreenCanvas);
+    window.scene.canvases.appendChild(myOffscreenCanvas);
+
+    // Setup offscreen render area
+    myOffscreenRenderArea = new OffscreenRenderArea();
+    print("set scene");
+    myOffscreenRenderArea.scene = window.scene;
+
+    myOffscreenRenderArea.eventListener = myOffscreenRenderArea;
+
+print("testx");
+    myOffscreenRenderArea.renderText([30, 500], ourFrameCounter + ". " + ourTests[ourFrameCounter].title);
+print("testy");
+    myOffscreenRenderArea.onFrame = function() {
+        print("onFrame");
+        print(myOffscreenRenderArea);
+        myOffscreenRenderArea.renderText([30, 500], ourFrameCounter + ". " + ourTests[ourFrameCounter].title);
+        print("done");
+    }
+
+    myOffscreenRenderArea.onPreViewport = function() {
+        ourViewer.onPreViewport(myMainCanvas.firstChild);
+    }
+    myOffscreenRenderArea.onPostViewport = function() {
+        ourViewer.onPostViewport(myMainCanvas.firstChild);
+    }
+}
+
+function triggerOffscreenRendering(theFilename) {
+    print("triggerOffscreenRendering");
+    if (once) {
+        setupOffscreenRendering();
+        once = false;
+    }
+    // Trigger offscreen rendering
+    myOffscreenCanvas = window.scene.canvases.firstChild.cloneNode(true);
+    adjustNodeIds(myOffscreenCanvas);
+    myOffscreenCanvas.target = myTargetImage.id;
+    myOffscreenRenderArea.canvas = myOffscreenCanvas;
+    myOffscreenCanvas = window.scene.canvases.replaceChild(myOffscreenCanvas, window.scene.canvases.lastChild);
+    //print(window.scene.canvases.firstChild);
+    //print(window.scene.canvases.lastChild);
+
+    myOffscreenRenderArea.renderToCanvas(true);
+
+    // Flip vertically since framebuffer content is upside-down
+    print("Save: " + theFilename);
+    saveImageFiltered(myTargetImage, theFilename, ["flip"], [[]]);
 }
 
 // Start the rendergirl application

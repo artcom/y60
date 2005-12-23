@@ -33,7 +33,7 @@ namespace jslib {
 class JSRenderArea : public JSWrapper<acgtk::RenderArea, asl::Ptr<acgtk::RenderArea>, StaticAccessProtocol> {
         JSRenderArea();  // hide default constructor
     public:
-        virtual ~JSRenderArea() { 
+        virtual ~JSRenderArea() {
         }
         typedef acgtk::RenderArea NATIVE;
         typedef asl::Ptr<acgtk::RenderArea> OWNERPTR;
@@ -54,11 +54,11 @@ class JSRenderArea : public JSWrapper<acgtk::RenderArea, asl::Ptr<acgtk::RenderA
             return 1;
         }
 
-        static JSBool getPropertySwitch(NATIVE & theNative, unsigned long theID, 
-                JSContext *cx, JSObject *obj, jsval id, jsval *vp); 
+        static JSBool getPropertySwitch(NATIVE & theNative, unsigned long theID,
+                JSContext *cx, JSObject *obj, jsval id, jsval *vp);
         virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-        static JSBool setPropertySwitch(NATIVE & theNative, unsigned long theID, JSContext *cx, 
-                JSObject *obj, jsval id, jsval *vp); 
+        static JSBool setPropertySwitch(NATIVE & theNative, unsigned long theID, JSContext *cx,
+                JSObject *obj, jsval id, jsval *vp);
         virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
 
         static JSBool
@@ -85,15 +85,8 @@ class JSRenderArea : public JSWrapper<acgtk::RenderArea, asl::Ptr<acgtk::RenderA
 };
 
 template <>
-struct JSClassTraits<JSRenderArea::NATIVE> 
+struct JSClassTraits<JSRenderArea::NATIVE>
     : public JSClassTraitsWrapper<JSRenderArea::NATIVE, JSRenderArea> {};
-
-template <>
-struct JSClassTraits<AbstractRenderWindow> : public JSClassTraitsWrapper<acgtk::RenderArea, JSRenderArea> {
-    static JSClass * Class() {
-        return JSRenderArea::Base::Class();
-    }
-};
 
 jsval as_jsval(JSContext *cx, JSRenderArea::OWNERPTR theOwner, JSRenderArea::NATIVE * theWindow);
 bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<acgtk::RenderArea> & theRenderArea);

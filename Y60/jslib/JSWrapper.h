@@ -795,8 +795,7 @@ public:
         } HANDLE_CPP_EXCEPTION;
     }
     static JSBool
-    setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
-    {
+    setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         try {
             if (JS_GetPrivate(cx, obj) != Class()) {
                 IF_NOISY(printParams("JSWrapper::getProperty",cx,obj,id,vp));
@@ -814,18 +813,7 @@ public:
         } HANDLE_CPP_EXCEPTION;
     }
     static JSBool
-    newResolve(JSContext *cx, JSObject *obj, jsval id, uintN flags, JSObject **objp)
-    {
-        IF_NOISY(
-            printParams("newresolve",cx,obj,id);
-            if (flags & JSRESOLVE_QUALIFIED) {
-                std::cerr << "JSRESOLVE_QUALIFIED"<<std::endl;
-            }
-            if (flags & JSRESOLVE_ASSIGNING) {
-                std::cerr << "JSRESOLVE_ASSIGNING"<<std::endl;
-            }
-            std::cerr << "objp=" << (void*)*objp<<std::endl;
-        )
+    newResolve(JSContext *cx, JSObject *obj, jsval id, uintN flags, JSObject **objp) {
         *objp = 0;
         return JS_TRUE;
     }
@@ -884,7 +872,6 @@ public:
         JSClass _myJSClass;
     }; // end JSClassSingleton
 
-
     static JSClass * Class(const char * theName = 0) {
         return JSClassSingleton::get().getClass(theName);
     }
@@ -937,7 +924,7 @@ protected:
                 /* class constructor properties and methods */
                 //static_props, static_methods
                 theStaticProperties, theStaticFunctions
-                );        
+                );
 
         if (theConstIntProperties) {
             jsval myConstructorFuncObjVal;

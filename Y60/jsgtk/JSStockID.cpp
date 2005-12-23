@@ -24,6 +24,10 @@
 using namespace std;
 using namespace asl;
 
+#ifdef DELETE
+    #undef DELETE
+#endif
+
 namespace jslib {
 
 typedef Gtk::Dialog NATIVE;
