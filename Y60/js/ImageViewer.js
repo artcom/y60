@@ -325,7 +325,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
              myFilename.search(/^http:\/\//i) != -1))
              // default wma fallback: i.e. http://server/dir/
         {
-            plug("y60WMADecoder2");
+            plug("y60WMADecoder");
             _myWMAPlugged = true;
         }
         if (!_myVFWCapturePlugged && myFilename.search(/^video:\/\//i) != -1) {
