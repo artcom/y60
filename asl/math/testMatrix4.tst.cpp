@@ -1929,7 +1929,7 @@ class Matrix4UnitTest : public UnitTest {
             ENSURE(almostEqual(myMatrix.getRow(1), Vector4<T>(-0.333333,0.666667,-0.333333,0))); 
             ENSURE(almostEqual(myMatrix.getRow(2), Vector4<T>(0.57735,0.57735,0.57735,0))); 
 
-            AC_PRINT << myMatrix;
+            //std::cout << myMatrix << std::endl;
         }
 
             
