@@ -435,7 +435,7 @@ namespace asl {
             if (zFar <= zNear) {
                 throw asl::Exception("Matrix4::makePerspective: zFar must be greater than zNear.", PLUS_FILE_LINE);
             }
-            Number f = cos(fovy/2.0) / sin(fovy/2.0);
+            Number f = float(cos(fovy/2.0) / sin(fovy/2.0));
             assign(f / aspect, 0, 0, 0,
                     0, f, 0, 0,
                     0, 0, (zFar + zNear) / (zNear - zFar), 2*zFar*zNear / (zNear - zFar),
