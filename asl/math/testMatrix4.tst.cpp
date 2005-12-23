@@ -76,6 +76,7 @@ class Matrix4UnitTest : public UnitTest {
             testMultiplyMatrixPV();
             testTransformedNormal();
             testEasyMatrixAccess();
+            testMakeLookAt();
 
             if (ourPerformanceTest) {
                 finalPerformanceTest();
@@ -1914,6 +1915,24 @@ class Matrix4UnitTest : public UnitTest {
             //myMatrix.assign(1,2,3,0,15,6,7,8,9,10,11,12,13,14,15, 1, Matrix4<T>::UNKNOWN);
             //testTransformedNormalHelper(myMatrix);
         }
+
+        void testMakeLookAt() {
+            Matrix4<T> myMatrix;
+            Vector3<T> myEye(1,1,1);
+            Vector3<T> myCenter(0,0,0);
+            Vector3<T> myUp(0,1,0);
+
+            myMatrix.makeLookAt(myEye, myCenter, myUp);
+
+            ENSURE(myMatrix.getTranslation() == Vector3<T>(-1,-1,-1)); 
+            ENSURE(almostEqual(myMatrix.getRow(0), Vector4<T>(0.57735,0,-0.57735,0))); 
+            ENSURE(almostEqual(myMatrix.getRow(1), Vector4<T>(-0.333333,0.666667,-0.333333,0))); 
+            ENSURE(almostEqual(myMatrix.getRow(2), Vector4<T>(0.57735,0.57735,0.57735,0))); 
+
+            AC_PRINT << myMatrix;
+        }
+
+            
 };
 
 class MyTestSuite : public UnitTestSuite {

@@ -261,7 +261,7 @@ namespace asl {
             _myType = theType;
         }
 
-        // Automatically calucaltes the matrix type
+        // Automatically calculates the matrix type
         void assign(Number a00, Number a01, Number a02, Number a03, Number a10, Number
             a11, Number a12, Number a13, Number a20, Number a21, Number a22,
             Number a23, Number a30, Number a31, Number a32, Number a33)
@@ -412,6 +412,37 @@ namespace asl {
             // 0  0  1  0
             // tx ty tz 1
         }
+
+        void makeLookAt(const Vector3<Number> &theEyePos, 
+                        const Vector3<Number> &theCenterPos,
+                        const Vector3<Number> &theUpVector) {
+            Vector3<Number> f = normalized(theCenterPos - theEyePos);
+            Vector3<Number> up = normalized(theUpVector);
+            Vector3<Number> s = cross(f,up);
+            Vector3<Number> u = cross(s,f);
+
+            assign(s[0], s[1], s[2], 0,
+                   u[0], u[1], u[2], 0,
+                   -f[0], -f[1], -f[2], 0,
+                   -theEyePos[0], -theEyePos[1], -theEyePos[2], 1);
+            
+        }
+
+        void makePerspective(Number fovy, Number aspect, Number zNear, Number zFar) {
+            if (fovy == 0 || aspect == 0) {
+                throw asl::Exception("Matrix4::makePerspective: fovy, aspect must not be 0.", PLUS_FILE_LINE);
+            }
+            if (zFar <= zNear) {
+                throw asl::Exception("Matrix4::makePerspective: zFar must be greater than zNear.", PLUS_FILE_LINE);
+            }
+            Number f = cos(fovy/2.0) / sin(fovy/2.0);
+            assign(f / aspect, 0, 0, 0,
+                    0, f, 0, 0,
+                    0, 0, (zFar + zNear) / (zNear - zFar), 2*zFar*zNear / (zNear - zFar),
+                    0, 0, -1, 0);
+             
+        }
+        
         void rotateX(Number cosAngle, Number sinAngle){
             if (_myType == IDENTITY) {
                base::makeXRotating(cosAngle, sinAngle);

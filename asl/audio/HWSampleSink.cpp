@@ -372,12 +372,15 @@ AudioBufferBase* HWSampleSink::getNextBuffer() {
     }
     if (_myBufferQueue.empty()) {
         if (_myState != PLAYBACK_DONE) {
-            if (_myStopWhenEmpty || _myState == STOPPING_FADE_OUT || 
-                    _myState == PAUSING_FADE_OUT) 
+            if (_myStopWhenEmpty || _myState == STOPPING_FADE_OUT)
             {
                 _myStopWhenEmpty = false;
                 changeState(PLAYBACK_DONE);
                 AudioTimeSource::stop();
+                
+            } else if (_myState == PAUSING_FADE_OUT) {                
+               ; //deliverData will hopeful-and-eventually put us into PAUSED state (dk)
+
             } else {
                 _numUnderruns++;
                 if (_numUnderruns == 1) {

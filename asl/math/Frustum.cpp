@@ -56,11 +56,11 @@ Frustum::updateCorners(float theNearPlane, float theFarPlane, float theHFov, flo
     bool isPerpective = theHFov > 0.0f;
     bool isOrtho = theOrthoWidth > 0.0f;
     if (isPerpective && isOrtho) {
-        throw FrustumException("Camera has hfov AND ortho_width attributes",
+        throw FrustumException("Camera has hfov AND width attributes",
                 PLUS_FILE_LINE);
     }
     if (!isPerpective && !isOrtho) {
-        throw FrustumException("Camera has neither hfov NOR ortho_width attributes",
+        throw FrustumException("Camera has neither hfov NOR width attributes",
                 PLUS_FILE_LINE);
     }
 
