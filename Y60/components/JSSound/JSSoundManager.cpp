@@ -163,6 +163,19 @@ namespace jslib {
         static JSConstIntPropertySpec myProperties[] = {{0}};
         return myProperties;
     }
+    
+    JSPropertySpec *
+    JSSoundManager::StaticProperties() {
+            static JSPropertySpec myProperties[] = {{0}};
+            return myProperties;
+        }
+
+    JSFunctionSpec *
+    JSSoundManager::StaticFunctions() {
+            static JSFunctionSpec myFunctions[] = {{0}};
+            return myFunctions;
+        }
+
 
     JSObject *
     JSSoundManager::initClass(JSContext *cx, JSObject *theGlobalObject) {

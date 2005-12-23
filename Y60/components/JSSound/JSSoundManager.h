@@ -35,6 +35,7 @@ namespace jslib {
                 return "SoundManager";
             }
             static JSFunctionSpec * Functions();
+            static JSFunctionSpec * StaticFunctions();
     
             enum PropertyNumbers {
                 PROP_volume = -100,
@@ -43,6 +44,7 @@ namespace jslib {
             };
 
             static JSPropertySpec * Properties();
+            static JSPropertySpec * StaticProperties();
     
             virtual unsigned long length() const {
                 return 1;
