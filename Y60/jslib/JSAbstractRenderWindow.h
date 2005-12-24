@@ -230,14 +230,36 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             DOC_PARAM("theTextString", "", DOC_TYPE_STRING);
             DOC_PARAM_OPT("theFontName", "An OpenGL compiled font name", DOC_TYPE_STRING, "Screen15");
             DOC_END;
+            try {
+                ensureParamCount(argc, 2, 3);
 
-            if (argc == 2) {
-                typedef void (DERIVED::*MyMethod)(const asl::Vector2f &, const std::string &);
-                return Method<DERIVED>::call((MyMethod)&DERIVED::renderText,cx,obj,argc,argv,rval);
-            } else {// argc == 3
-                typedef void (DERIVED::*MyMethod)(const asl::Vector2f &, const std::string &, const std::string &);
-                return Method<DERIVED>::call((MyMethod)&DERIVED::renderText,cx,obj,argc,argv,rval);
-            }
+                asl::Vector2f thePixelPosition;
+                if (!convertFrom(cx, argv[0], thePixelPosition)) {
+                    JS_ReportError(cx,"JSRenderWindow::renderText: parameter 1 must be a Vector2f");
+                    return JS_FALSE;
+                }
+
+                std::string theString;
+                if (!convertFrom(cx, argv[1], theString)) {
+                    JS_ReportError(cx,"JSRenderWindow::renderText: parameter 2 must be a string");
+                    return JS_FALSE;
+                }
+
+                if (argc == 2) {
+                    jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString);
+                    jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+                } else {
+                    std::string theFont;
+                    if (!convertFrom(cx, argv[2], theFont)) {
+                        JS_ReportError(cx,"JSRenderWindow::renderText: parameter 3 must be a fontname");
+                        return JS_FALSE;
+                    }
+                    jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).renderText(thePixelPosition, theString, theFont);
+                    jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+                }
+
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
         }
         static JSBool
         setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -245,13 +267,30 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             DOC_PARAM("theTextColor", "", DOC_TYPE_VECTOR4F);
             DOC_PARAM_OPT("theBackGroundColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
             DOC_END;
-            if (argc == 1) {
-                typedef void (DERIVED::*MyMethod)(const asl::Vector4f &);
-                return Method<DERIVED>::call((MyMethod)&DERIVED::setTextColor,cx,obj,argc,argv,rval);
-            } else { // argc == 2
-                typedef void (DERIVED::*MyMethod)(const asl::Vector4f &, const asl::Vector4f &);
-                return Method<DERIVED>::call((MyMethod)&DERIVED::setTextColor,cx,obj,argc,argv,rval);
-            }
+            try {
+                ensureParamCount(argc, 1, 2);
+
+                asl::Vector4f theTextColor;
+                if (!convertFrom(cx, argv[0], theTextColor)) {
+                    JS_ReportError(cx,"JSRenderWindow::setTextColor: parameter 1 must be a Vector4f (textcolor)");
+                    return JS_FALSE;
+                }
+
+                if (argc == 1) {
+                    jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextColor(theTextColor);
+                    jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+                } else {
+                    asl::Vector4f theBackColor;
+                    if (!convertFrom(cx, argv[1], theBackColor)) {
+                        JS_ReportError(cx,"JSRenderWindow::renderText: parameter 2 must be a Vector4f (backcolor)");
+                        return JS_FALSE;
+                    }
+                    jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextColor(theTextColor, theBackColor);
+                    jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+                }
+
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
         }
         static JSBool
         renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
