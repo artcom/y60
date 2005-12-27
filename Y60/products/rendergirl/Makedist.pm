@@ -24,7 +24,7 @@ sub runLocalMakeInstaller() {
     addShortcut("rendergirl", $myArguments, "acgtkshell.exe");
     addFileType("rendergirl model", "x60", $myArguments, "acgtkshell.exe");
     addFileType("rendergirl binary model", "b60", $myArguments, "acgtkshell.exe");
-    addShortcut("flighrecorder", $myFlighrecorderArguments, "acgtkshell.exe");
+    #addShortcut("flighrecorder", $myFlighrecorderArguments, "acgtkshell.exe");
     addFileType("rendergirl flight", "f60", $myFlighrecorderArguments, "acgtkshell.exe");
 }
 

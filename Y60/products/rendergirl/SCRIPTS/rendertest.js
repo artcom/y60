@@ -134,7 +134,6 @@ RenderTest.onPostRender = function(theTime) {
             var myNumber = ourFrameCounter < 10 ? "0" + ourFrameCounter : ourFrameCounter;
             //window.saveBuffer("TEST_IMAGES/cube_" + myNumber + ".png");
             triggerOffscreenRendering("TEST_IMAGES/cube_" + myNumber + ".png");
-            GtkMain.quit();
         }
         ourFrameCounter++;
 
@@ -154,69 +153,61 @@ RenderTest.onPostRender = function(theTime) {
     }
 }
 
-var myTargetImage         = null;
-var myOffscreenRenderArea = null;
-var myOffscreenCanvas     = null;
-var myMainCanvas          = null;
-var once = true;
+var ourOffscreenRenderArea = null;
 
 function setupOffscreenRendering() {
     // Create target image for offscreen rendering
-    myTargetImage = window.scene.images.appendChild(new Node("<image/>").firstChild);
-    myTargetImage.mipmap = false;
-    myTargetImage.width  = 800;
-    myTargetImage.height = 521;
+    var myTargetImage = getDescendantByName(window.scene.images, "offscreen", false);
+    if (!myTargetImage) {
+        myTargetImage = window.scene.images.appendChild(new Node("<image/>").firstChild);
+        myTargetImage.name = "offscreen"
+        myTargetImage.mipmap = false;
+        myTargetImage.width  = 800;
+        myTargetImage.height = 520;
+    }
 
-    // Create canvas for offscreen render area
-    myMainCanvas = window.canvas;
-    myOffscreenCanvas = window.canvas.cloneNode(true);
+    // Copy main canvas to offscreen canvas
+    var myOffscreenCanvas = window.scene.canvases.firstChild.cloneNode(true);
     adjustNodeIds(myOffscreenCanvas);
-    window.scene.canvases.appendChild(myOffscreenCanvas);
+    myOffscreenCanvas.target = myTargetImage.id;
+
+    if (window.scene.canvases.childNodes.length == 1) {
+        window.scene.canvases.appendChild(myOffscreenCanvas);
+    } else {
+        window.scene.canvases.replaceChild(myOffscreenCanvas, window.scene.canvases.lastChild);
+    }
 
     // Setup offscreen render area
-    myOffscreenRenderArea = new OffscreenRenderArea();
-    print("set scene");
-    myOffscreenRenderArea.scene = window.scene;
+    ourOffscreenRenderArea = new OffscreenRenderArea();
+    ourOffscreenRenderArea.scene = window.scene;
+    ourOffscreenRenderArea.canvas = myOffscreenCanvas;
+    ourOffscreenRenderArea.eventListener = ourOffscreenRenderArea;
+    ourOffscreenRenderArea.fixedFrameTime = window.fixedFrameTime;
+    ourOffscreenRenderArea.getRenderer().boundingVolumeMode = window.getRenderer().boundingVolumeMode;
 
-    myOffscreenRenderArea.eventListener = myOffscreenRenderArea;
-
-print("testx");
-    myOffscreenRenderArea.renderText([30, 500], ourFrameCounter + ". " + ourTests[ourFrameCounter].title);
-print("testy");
-    myOffscreenRenderArea.onFrame = function() {
-        print("onFrame");
-        print(myOffscreenRenderArea);
-        myOffscreenRenderArea.renderText([30, 500], ourFrameCounter + ". " + ourTests[ourFrameCounter].title);
-        print("done");
+    ourOffscreenRenderArea.onFrame = function() {
+        ourOffscreenRenderArea.renderText([30, 500], ourFrameCounter + ". " + ourTests[ourFrameCounter].title);
     }
 
-    myOffscreenRenderArea.onPreViewport = function() {
-        ourViewer.onPreViewport(myMainCanvas.firstChild);
+    ourOffscreenRenderArea.onPreViewport = function() {
+        // Use main canvas viewport, otherwise the lightmanager gets confused
+        ourViewer.onPreViewport(window.scene.canvases.firstChild.firstChild);
     }
-    myOffscreenRenderArea.onPostViewport = function() {
-        ourViewer.onPostViewport(myMainCanvas.firstChild);
+    ourOffscreenRenderArea.onPostViewport = function() {
+        // Use main canvas viewport, otherwise the lightmanager gets confused
+        ourViewer.onPostViewport(window.scene.canvases.firstChild.firstChild);
     }
+
+    return myTargetImage;
 }
 
 function triggerOffscreenRendering(theFilename) {
-    print("triggerOffscreenRendering");
-    if (once) {
-        setupOffscreenRendering();
-        once = false;
-    }
-    // Trigger offscreen rendering
-    myOffscreenCanvas = window.scene.canvases.firstChild.cloneNode(true);
-    adjustNodeIds(myOffscreenCanvas);
-    myOffscreenCanvas.target = myTargetImage.id;
-    myOffscreenRenderArea.canvas = myOffscreenCanvas;
-    myOffscreenCanvas = window.scene.canvases.replaceChild(myOffscreenCanvas, window.scene.canvases.lastChild);
-    //print(window.scene.canvases.firstChild);
-    //print(window.scene.canvases.lastChild);
+    var myTargetImage = setupOffscreenRendering();
 
-    myOffscreenRenderArea.renderToCanvas(true);
+    // Trigger offscreen rendering
+    ourOffscreenRenderArea.renderToCanvas(true);
 
     // Flip vertically since framebuffer content is upside-down
-    print("Save: " + theFilename);
     saveImageFiltered(myTargetImage, theFilename, ["flip"], [[]]);
 }
 
