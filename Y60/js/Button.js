@@ -36,17 +36,17 @@ use("Label.js");
 
 var ourButtonCounter = 0;
 
-const MOUSE_UP   = 0;
-const MOUSE_DOWN = 1;
+var MOUSE_UP   = 0;
+var MOUSE_DOWN = 1;
 
-function ButtonBase(Public, Protected, theSceneViewer, theId,
+function ButtonBase(Public, Protected, theScene, theId,
                     theSize, thePosition, theStyle, theParent)
 {
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Inheritance
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    LabelBase(Public, Protected, theSceneViewer,
+    LabelBase(Public, Protected, theScene,
               theSize, thePosition, theStyle, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -57,16 +57,16 @@ function ButtonBase(Public, Protected, theSceneViewer, theId,
     }
 
     Public.isPressed = function(theButton) {
-        return _isPressed;
+        return Protected.isPressed;
     }
 
     Public.setPressed = function(theFlag) {
         if (theFlag) {
-            Public.color = Protected.myStyle.selectedColor;
+            Public.color = Protected.style.selectedColor;
         } else {
-            Public.color = Protected.myStyle.color;
+            Public.color = Protected.style.color;
         }
-        _isPressed = theFlag;
+        Protected.isPressed = theFlag;
     }
 
     Public.getId = function() {
@@ -75,10 +75,10 @@ function ButtonBase(Public, Protected, theSceneViewer, theId,
 
     Public.onMouseButton = function(theState, theX, theY) {
         if (Public.enabled && isVisible(Public.node)) {
-            if (theState == MOUSE_UP && _isPressed) {
+            if (theState == MOUSE_UP && Protected.isPressed) {
                 Public.setPressed(false);
-                Public.onClick(this);
-            } else if (theState == MOUSE_DOWN && !_isPressed && Public.touches(theX, theY)) {
+                Public.onClick(Public);
+            } else if (theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY)) {
                 Public.setPressed(true);
             }
         }
@@ -89,9 +89,9 @@ function ButtonBase(Public, Protected, theSceneViewer, theId,
     Public.setToggleGroup = function(theButtons) {
         // Replace the onMouseButton function with something more advanced
         Public.onMouseButton = function(theState, theX, theY) {
-            if (Public.enabled && isVisible(Public.node) && theState == MOUSE_UP && _isPressed && Public.touches(theX, theY)) {
+            if (Public.enabled && isVisible(Public.node) && theState == MOUSE_UP && Protected.isPressed && Public.touches(theX, theY)) {
                 Public.onClick(this);
-            } else  if (Public.enabled && isVisible(Public.node) && theState == MOUSE_DOWN && !_isPressed && Public.touches(theX, theY)) {
+            } else  if (Public.enabled && isVisible(Public.node) && theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY)) {
                 for (var i = 0; i < theButtons.length; ++i) {
                     if (theButtons[i].enabled && theButtons[i].isPressed()) {
                         theButtons[i].setPressed(false);
@@ -106,13 +106,12 @@ function ButtonBase(Public, Protected, theSceneViewer, theId,
     // Protected
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    Protected.id = theId;
+    Protected.id        = theId;
+    Protected.isPressed = false;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////
-
-    var _isPressed     = false;
 
     function isVisible(theNode) {
         if (!theNode || theNode.nodeName != "overlay") {
@@ -129,19 +128,19 @@ function ButtonBase(Public, Protected, theSceneViewer, theId,
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-function TextButton(theSceneViewer, theId, theText,
+function TextButton(theScene, theId, theText,
                     theSize, thePosition, theStyle, theParent)
 {
     var Public    = this;
     var Protected = {}
-    TextButtonBase(Public, Protected, theSceneViewer, theId, theText,
+    TextButtonBase(Public, Protected, theScene, theId, theText,
                    theSize, thePosition, theStyle, theParent);
 }
 
-function TextButtonBase(Public, Protected, theSceneViewer, theId, theText,
+function TextButtonBase(Public, Protected, theScene, theId, theText,
                         theSize, thePosition, theStyle, theParent)
 {
-    ButtonBase(Public, Protected, theSceneViewer, theId,
+    ButtonBase(Public, Protected, theScene, theId,
                theSize, thePosition, theStyle, theParent);
     Public.setText(theText);
 }
@@ -152,34 +151,66 @@ function TextButtonBase(Public, Protected, theSceneViewer, theId, theText,
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-function ImageButton(theSceneViewer, theId, theSource,
+function ImageButton(theScene, theId, theSource,
                      thePosition, theStyle, theParent)
 {
     var Public    = this;
     var Protected = {}
-    ButtonBase(Public, Protected, theSceneViewer, theId,
+    ButtonBase(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
     Public.setImage(theSource);
 }
 
-function DualImageButton(theSceneViewer, theId, theSources,
+function DualImageButton(theScene, theId, theSources,
                          thePosition, theStyle, theParent) {
     var Base      = {};
     var Public    = this;
     var Protected = {};
-    ButtonBase(Public, Protected, theSceneViewer, theId,
+    ButtonBase(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
     Public.setImage(theSources[0]);
 
     Base.setPressed = Public.setPressed;
     Public.setPressed = function(theFlag) {
         if (theFlag) {
-            Public.color = Protected.myStyle.selectedColor;
+            Public.color = Protected.style.selectedColor;
             Public.setImage(theSources[1]);
         } else {
-            Public.color = Protected.myStyle.color;
+            Public.color = Protected.style.color;
             Public.setImage(theSources[0]);
         }
         Base.setPressed(theFlag);
     }
+}
+
+// [CH]: The only way to get the background transparent.
+function TransparentTextButtonBase(Public, Protected, theScene, theId, theText, theSize, thePosition, theStyle, theParent) {
+    // Create a button as child of an background overlay
+    var _myBackground = new Overlay(window.scene, theStyle.color, thePosition, theSize);
+    TextButtonBase(Public, Protected, theScene, theId, theText, theSize, [0, 0], theStyle, _myBackground.node);
+    Public.color = new Vector4f(1,1,1,1);
+
+    Public.setPressed = function(theFlag) {
+        if (theFlag) {
+            _myBackground.color = Protected.style.selectedColor;
+        } else {
+            _myBackground.color = Protected.style.color;
+        }
+        Protected.isPressed = theFlag;
+    }
+
+    Public.visible getter = function() { return _myBackground.visible; }
+    Public.visible setter = function(theArgument) { _myBackground.visible = theArgument; }
+    Public.alpha getter = function() { return _myBackground.alpha; }
+    Public.alpha setter = function(theArgument) { _myBackground.alpha = theArgument; Public.node.alpha = theArgument; }
+    Public.width getter = function() { return _myBackground.width; }
+    Public.width setter = function(theArgument) { _myBackground.width = theArgument; Public.node.width = theArgument; }
+    Public.height getter = function() { return _myBackground.height; }
+    Public.height setter = function(theArgument) { _myBackground.height = theArgument; Public.node.height = theArgument; }
+}
+
+function TransparentTextButton(theScene, theId, theText, theSize, thePosition, theStyle, theParent) {
+    var Public    = this;
+    var Protected = {};
+    TransparentTextButtonBase(Public, Protected, theScene, theId, theText, theSize, thePosition, theStyle, theParent);
 }

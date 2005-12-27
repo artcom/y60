@@ -7,9 +7,14 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
+
 use("ImageManager.js");
 use("Y60JSSL.js");
+
 var ourOverlayCounter = 0;
+
+// Just a test...
+var ourImageCache = [];
 
 // Pure virtual base class
 function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
@@ -98,8 +103,8 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
 
     /// Removes the overlay and the connected material and image node from the scene dom
     Public.removeFromScene = function() {
-        _myNode.parentNode.removeChild(_myNode);
-        _myMaterial.parentNode.removeChild(_myMaterial);
+        //_myNode.parentNode.removeChild(_myNode);
+        //_myMaterial.parentNode.removeChild(_myMaterial);
     }
 
     /// Moves overlay to first position in the overlay z-order
@@ -117,6 +122,13 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     Public.touches = function(theXPos, theYPos, theSquareSize) {
         var myLeftPixel = _myNode.position.x;
         var myTopPixel  = _myNode.position.y;
+        var myParent = Public.node.parentNode;
+        while (myParent.nodeName == "overlay") {
+            myLeftPixel += myParent.position.x;
+            myTopPixel  += myParent.position.y;
+            myParent = myParent.parentNode;
+        }
+
         if (theSquareSize != undefined) {
             var myOverlayBox = new Box3f([myLeftPixel, myTopPixel, 0],
                 [myLeftPixel + _myNode.width - 1, myTopPixel + _myNode.height - 1, 1]);
@@ -291,7 +303,7 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
     Public.removeFromScene = function() {
         var myParent = Protected.myImages[0].parentNode;
         for(var i = 0;i < Protected.myImages.length; ++i) {
-            myParent.removeChild(Protected.myImages[i]);
+            //myParent.removeChild(Protected.myImages[i]);
         }
         Base.removeFromScene();
     }
@@ -322,7 +334,6 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
     }
 
     Protected.addTexture = function(theImageId) {
-
         _myTextures = getDescendantByTagName(Public.material, "textures", false);
         if (!_myTextures) {
             _myTextures = Public.material.appendChild(Node.createElement("textures"));
@@ -391,16 +402,32 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    function addImage(theSource) {
+    Protected.addImage = function(theSource) {
         var myImage = null;
         if (typeof(theSource) == "string") {
-            // theSource is a string
-            myImage = Node.createElement("image");
-            theScene.images.appendChild(myImage);
-            myImage.src  = expandEnvironment(theSource);
-            myImage.name = theSource;
-            myImage.resize = "pad";
+            var mySource = expandEnvironment(theSource);
+            if (mySource in ourImageCache) {
+                myImage = ourImageCache[mySource];
 
+  /*
+                for (var i = 0; i < theScene.images.childNodes.length; ++i) {
+                    var myImageNode = theScene.images.childNode(i);
+                    if (myImageNode.src == theSource) {
+                        print("cache hit: " + myImageNode.src);
+                        myImage = myImageNode;
+                        break;
+                    }
+                }
+*/
+            } else {
+                // theSource is a string
+                myImage = Node.createElement("image");
+                theScene.images.appendChild(myImage);
+                myImage.src  = expandEnvironment(theSource);
+                myImage.name = mySource;
+                myImage.resize = "pad";
+                ourImageCache[mySource] = myImage;
+            }
         } else if (typeof(theSource) == "object" && "previousSibling" in theSource) {
             // theSource is a node
             myImage = theSource;
@@ -418,10 +445,10 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             if (typeof(theSource) == "object" && "splice" in theSource) {
                 // theSource is an array
                 for (var i = 0; i < theSource.length; ++i) {
-                    addImage(theSource[i]);
+                    Protected.addImage(theSource[i]);
                 }
             } else {
-                addImage(theSource);
+                Protected.addImage(theSource);
             }
             theScene.update(Scene.IMAGES);
 

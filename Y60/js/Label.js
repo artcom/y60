@@ -26,16 +26,17 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+use("Overlay.js");
+
 var ourFontCache = [];
 
-function LabelBase(Public, Protected, theSceneViewer,
+function LabelBase(Public, Protected, theScene,
                    theSize, thePosition, theStyle, theParent)
 {
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Inheritance
     ///////////////////////////////////////////////////////////////////////////////////////////
-    ImageOverlayBase(Public, Protected, theSceneViewer.getOverlayManager(), null,
-                     thePosition, theParent);
+    ImageOverlayBase(Public, Protected, theScene, null, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -47,7 +48,7 @@ function LabelBase(Public, Protected, theSceneViewer,
         if (theStyle) {
             myStyle = theStyle;
         } else {
-            myStyle = Protected.myStyle;
+            myStyle = Protected.style;
         }
 
         var topPad    = "topPad"    in myStyle ? myStyle.topPad : 0;
@@ -68,21 +69,11 @@ function LabelBase(Public, Protected, theSceneViewer,
             ourFontCache[myFontName] = true;
         }
 
-        if (theSize == null || theSize[0] == 0 || theSize[1] == 0) {
-            // force recreation of image
-            Public.image = theSceneViewer.getImageManager().getImageNode(createUniqueId());
-            if (theSize == null || theSize[0] == 0) {
-                Public.width = 0;
-            }
-            if (theSize == null || theSize[1] == 0) {
-                Public.height = 0;
-            }
-        }
-        ensureImage();
-        var mySize = window.renderTextAsImage(Public.image, theText, myFontName, Public.width, Public.height);
+        var myImage = Protected.getImageNode();
+        var mySize = window.renderTextAsImage(myImage, theText, myFontName, Public.width, Public.height);
 
-        Public.srcsize.x = mySize[0] / Public.image.width;
-        Public.srcsize.y = mySize[1] / Public.image.height;
+        Public.srcsize.x = mySize[0] / myImage.width;
+        Public.srcsize.y = mySize[1] / myImage.height;
         window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
         window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
         window.setTextPadding(0,0,0,0);
@@ -98,30 +89,41 @@ function LabelBase(Public, Protected, theSceneViewer,
     }
 
     Public.setImage = function(theSource) {
-        ensureImage();
-        Public.image.src = theSource;
+        var myImage = Protected.getImageNode();
+        myImage.src = theSource;
         window.scene.update(Scene.IMAGES);
-        var mySize = getImageSize(Public.image);
+        var mySize = getImageSize(myImage);
         Public.width  = mySize.x;
         Public.height = mySize.y;
+        Public.srcsize.x = 1;
+        Public.srcsize.y = 1;
     }
-
+/*
     Public.setBackgroundTransparent = function() {
-        Public.texture.applymode = "modulate";
+        Public.textures.lastChild.applymode = "modulate";
     }
-
+*/
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Protected
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    Protected.myStyle     = theStyle;
+    Protected.style = theStyle;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    Protected.getImageNode= function() {
+        if (Public.image == null) {
+            var myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
+            myImage.resize = "pad";
+            Protected.addImage(myImage);
+        }
+        return Public.image;
+    }
+
     function setup() {
-        Public.color = Protected.myStyle.color;
+        Public.color = Protected.style.color;
         if (theSize) {
             Public.width  = theSize[0];
             Public.height = theSize[1];
@@ -130,22 +132,32 @@ function LabelBase(Public, Protected, theSceneViewer,
         Public.position.y = thePosition[1];
     }
 
-    function ensureImage() {
-        if (Public.image == null) {
-            Public.image = theSceneViewer.getImageManager().getImageNode(createUniqueId());
-            Public.texture.applymode = "decal";
-        }
-    }
-
     setup();
 }
 
-function Label(theSceneViewer, theText,
-               theSize, thePosition, theStyle, theParent)
+function Label(theScene, theText, theSize, thePosition, theStyle, theParent) {
+    var Public    = this;
+    var Protected = {}
+    LabelBase(Public, Protected, theScene, theSize, thePosition, theStyle, theParent);
+    Public.setText(theText);
+}
+
+function BackgroundImageLabel(theScene, theText, theBackgroundImageSrc, theSize,
+    thePosition, theStyle, theParent)
 {
     var Public    = this;
     var Protected = {}
-    LabelBase(Public, Protected, theSceneViewer,
-              theSize, thePosition, theStyle, theParent);
+    LabelBase(Public, Protected, theScene, theSize, thePosition, theStyle, theParent);
+
+    Protected.getImageNode = function() {
+        if (Public.image == null) {
+            Protected.addImage(theBackgroundImageSrc);
+            var myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
+            myImage.resize = "pad";
+            Protected.addImage(myImage);
+        }
+        return Public.images[Public.images.length - 1];
+    }
+
     Public.setText(theText);
 }

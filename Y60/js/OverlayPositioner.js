@@ -15,16 +15,15 @@
 //
 //=============================================================================
 
-const OVERLAY_POSITIONER_FILE = "OverlayPositions.xml";
-
 function OverlayPositioner(theSceneViewer) {
     this.Constructor(this, theSceneViewer);
 }
 
 OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
+    const OVERLAY_POSITIONER_FILE = "OverlayPositions.xml";
 
     var _mySceneViewer   = theSceneViewer;
-    var _myOverlays      = theSceneViewer.getViewports().firstChild.firstChild;
+    var _myOverlays      = theSceneViewer.getActiveViewport().firstChild;
     var _myPickedOverlay = null;
     var _myMouseStart    = null;
     var _myShiftFlag     = false;
@@ -104,7 +103,7 @@ OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
             myConfig.parseFile(OVERLAY_POSITIONER_FILE);
             mergeConfig(myConfig.firstChild);
         } else {
-            _myOverlays.saveFile(OVERLAY_POSITIONER_FILE);
+            //_myOverlays.saveFile(OVERLAY_POSITIONER_FILE);
         }
     }
 
@@ -132,7 +131,7 @@ OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
             if (myResult) {
                 return myResult;
             } else {
-                if (myOverlay.visible && myOverlay.alpha > 0 &&
+                if (myOverlay.visible && myOverlay.name != "insensible" && myOverlay.alpha > 0 &&
                     theX > myOverlay.position.x && theX <= myOverlay.position.x + myOverlay.width &&
                     theY > myOverlay.position.y && theY <= myOverlay.position.y + myOverlay.height)
                 {
@@ -205,6 +204,10 @@ OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
                         _mySceneViewer.setMessage("Calibration saved.");
                     }
                     break;
+                case "space":
+                    print(_myPickedOverlay.name);
+                    print("Position: " + _myPickedOverlay.position + ", width: " + _myPickedOverlay.width + ", height: " + _myPickedOverlay.height);
+                    break;
             }
         }
     }
@@ -218,7 +221,7 @@ OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
     //////////////////////////////////////////////////////////////////////
 
     function printHelp() {
-        _mySceneViewer.setMessage("F1 toggles calibration mode.");
+        _mySceneViewer.setMessage("Overlay Positioner Help.");
         _mySceneViewer.setMessage("    Use the mouse, to pick overlays.");
         _mySceneViewer.setMessage("    Use cursor keys, to move the picked overlay around.");
         _mySceneViewer.setMessage("    Use alt + cursor keys, to change the picked overlay size.");
