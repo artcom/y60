@@ -48,7 +48,7 @@ using namespace asl;
 
 namespace y60 {
 
-    const unsigned MAX_FITTING_FONT_HEIGHT = 30;
+    const unsigned MAX_FITTING_FONT_HEIGHT = 10;
 
     SDLTextRenderer::SDLTextRenderer() :
          _myRenderStyle(Text::BLENDED_TEXT), _myTextureSurface(0),
@@ -93,7 +93,8 @@ namespace y60 {
 
         string myFontName = makeFontName(theName, theFontType);
         if (_myFonts.find(myFontName) != _myFonts.end()) {
-            throw GLTextRendererException(string("Font: ") + myFontName + " already in fontlibrary", PLUS_FILE_LINE);
+            // Font already loaded
+            return;
         }
 
         if (theFontType != SDLFontInfo::NORMAL) {
@@ -187,10 +188,10 @@ namespace y60 {
 
  #ifdef DUMP_TEXT_AS_PNG
        PLAnyBmp myBmp;
-        myBmp.Create( _myTextureSurface->w, _myTextureSurface->h, PLPixelFormat::A8B8G8R8, 
+        myBmp.Create( _myTextureSurface->w, _myTextureSurface->h, PLPixelFormat::A8B8G8R8,
                       (unsigned char*)_myTextureSurface->pixels, _myTextureSurface->w*4);
         PLPNGEncoder myEncoder;
-        myEncoder.MakeFileFromBmp("test.png", &myBmp);               
+        myEncoder.MakeFileFromBmp("test.png", &myBmp);
 #endif
 
         return myTextSize;
@@ -311,7 +312,7 @@ namespace y60 {
             case SDLText::BLENDED_TEXT:
                 myTextSurface = TTF_RenderUTF8_Blended((TTF_Font*) theFont, theText.c_str(), theTextColor);
                 //SDL_SaveBMP(myTextSurface, string(string("word_") + theText + ".bmp" ).c_str());
-                
+
                 break;
             case SDLText::SHADED_TEXT:
                 myTextSurface = TTF_RenderUTF8_Shaded((TTF_Font*) theFont, theText.c_str(), theTextColor, theBackColor);
@@ -342,7 +343,7 @@ namespace y60 {
              * UH: enabling this breaks text rendering on Windows/SDL-1.2.8 but works fine
              *     under Windows/SDL-1.2.6 and Linux.
              */
-#ifdef LINUX            
+#ifdef LINUX
             SDL_SetColorKey(myTextSurface, SDL_SRCCOLORKEY, 0);
 #endif
         }
