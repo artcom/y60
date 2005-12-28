@@ -48,11 +48,9 @@ using namespace asl;
 
 namespace y60 {
 
-    const unsigned MAX_FITTING_FONT_HEIGHT = 10;
-
     SDLTextRenderer::SDLTextRenderer() :
          _myRenderStyle(Text::BLENDED_TEXT), _myTextureSurface(0),
-         _myWordDelimiters(" \t;-:\\/|")
+         _myWordDelimiters(" \t;-:\\/|"), _myMaxFontFittingSize(30)
     {
         if ( TTF_Init() < 0 ) {
             AC_ERROR << "Couldn't initialize TTF: "<< SDL_GetError()<<endl;
@@ -72,7 +70,7 @@ namespace y60 {
 
     void
     SDLTextRenderer::setFontFitting(int theHeight) {
-        if (theHeight > MAX_FITTING_FONT_HEIGHT) {
+        if (theHeight > _myMaxFontFittingSize) {
             TTF_SetFitting(0);
         } else {
             TTF_SetFitting(1);

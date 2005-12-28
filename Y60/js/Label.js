@@ -162,7 +162,7 @@ function BackgroundImageLabel(theScene, theText, theBackgroundImageSrc, theSize,
     Public.setText(theText);
 
     Public.setBackgroundImage = function(theImageSrc) {
-        //Public.image.src = theImageSrc;
-        Public.image = theScene.createImage(theImageSrc);
+        Public.image.src = theImageSrc;
+        //Public.image = theScene.createImage(theImageSrc);
     }
 }

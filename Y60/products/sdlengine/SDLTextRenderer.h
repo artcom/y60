@@ -49,7 +49,9 @@ namespace y60 {
 
             bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const;
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
-
+            virtual void setMaxFontFittingSize(unsigned theSize) {
+                _myMaxFontFittingSize = theSize;
+            }
     	private:
             typedef std::map<std::string, SDLFontInfo> FontLibrary;
             struct Format {
@@ -125,6 +127,7 @@ namespace y60 {
             FontLibrary          _myFonts;
    	        Text::RENDERSTYLE    _myRenderStyle;
             std::string          _myWordDelimiters;
+            unsigned             _myMaxFontFittingSize;
 
     };
     typedef asl::Ptr<SDLTextRenderer> SDLTextRendererPtr;

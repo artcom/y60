@@ -410,16 +410,6 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             var mySource = expandEnvironment(theSource);
             if (mySource in ourImageCache) {
                 myImage = ourImageCache[mySource];
-/*
-                for (var i = 0; i < theScene.images.childNodes.length; ++i) {
-                    var myImageNode = theScene.images.childNode(i);
-                    if (myImageNode.src == theSource) {
-                        print("cache hit: " + myImageNode.src);
-                        myImage = myImageNode;
-                        break;
-                    }
-                }
-*/
             } else {
                 // theSource is a string
                 myImage = Node.createElement("image");
@@ -427,7 +417,7 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
                 myImage.src  = expandEnvironment(theSource);
                 myImage.name = mySource;
                 myImage.resize = "pad";
-                ourImageCache[mySource] = myImage;
+                //ourImageCache[mySource] = myImage;
             }
         } else if (typeof(theSource) == "object" && "previousSibling" in theSource) {
             // theSource is a node

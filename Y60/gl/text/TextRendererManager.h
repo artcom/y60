@@ -55,6 +55,7 @@ namespace y60 {
             bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const;
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
             void setTracking(float theTracking);
+            void setMaxFontFittingSize(unsigned theSize);
 
         private:
             TextRenderer & getTextRendererByFont(const std::string & theFont);

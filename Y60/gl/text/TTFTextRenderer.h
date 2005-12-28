@@ -57,6 +57,7 @@ namespace y60 {
                     const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const = 0;
             virtual double getKerning(const std::string & theFontName,
                     const std::string & theFirstCharacter, const std::string & theSecondCharacter) const = 0;
+            virtual void setMaxFontFittingSize(unsigned theSize) = 0;
     };
     typedef asl::Ptr<TTFTextRenderer> TTFTextRendererPtr;
 
