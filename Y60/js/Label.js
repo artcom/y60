@@ -16,8 +16,10 @@
 //  int                 fontsize      (Size of font)
 //  Vector4f            textColor
 //  enum                HTextAlign    (Renderer.CENTER_ALIGNMENT | LEFT_ALIGNMENT | RIGHT_ALIGNMENT)
+//                                    (optional, default LEFT_ALIGNMENT)
 //  enum                VTextAlign    (Renderer.TOP_ALIGNMENT | CENTER_ALIGNMENT | BOTTOM_ALIGNMENT)
-//  Vector4f            color
+//                                    (optional, default TOP_ALIGNMENT)
+//  Vector4f            color         (background color)
 //  int                 topPad        (optional)
 //  int                 bottomPad     (optional)
 //  int                 rightPad      (optional)
@@ -51,15 +53,18 @@ function LabelBase(Public, Protected, theScene,
             myStyle = Protected.style;
         }
 
-        var topPad    = "topPad"    in myStyle ? myStyle.topPad : 0;
-        var bottomPad = "bottomPad" in myStyle ? myStyle.bottomPad : 0;
-        var rightPad  = "rightPad"  in myStyle ? myStyle.rightPad : 0;
-        var leftPad   = "leftPad"   in myStyle ? myStyle.leftPad : 0;
-        var tracking  = "tracking"  in myStyle ? myStyle.tracking : 0;
+        var topPad    = "topPad"      in myStyle ? myStyle.topPad : 0;
+        var bottomPad = "bottomPad"   in myStyle ? myStyle.bottomPad : 0;
+        var rightPad  = "rightPad"    in myStyle ? myStyle.rightPad : 0;
+        var leftPad   = "leftPad"     in myStyle ? myStyle.leftPad : 0;
+        var tracking  = "tracking"    in myStyle ? myStyle.tracking : 0;
+        var HTextAlign = "HTextAlign" in myStyle ? myStyle.HTextAlign : Renderer.LEFT_ALIGNMENT;
+        var VTextAlign = "VTextAlign" in myStyle ? myStyle.VTextAlign : Renderer.TOP_ALIGNMENT;
+
         window.setTextStyle(Renderer.BLENDED_TEXT);
         window.setTextPadding(topPad, bottomPad, leftPad, rightPad);
-        window.setHTextAlignment(myStyle.HTextAlign);
-        window.setVTextAlignment(myStyle.VTextAlign);
+        window.setHTextAlignment(HTextAlign);
+        window.setVTextAlignment(VTextAlign);
         window.setTextColor(myStyle.textColor, new Vector4f(1,1,1,1));
         window.setTracking(tracking);
 

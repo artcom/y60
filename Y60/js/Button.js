@@ -69,10 +69,6 @@ function ButtonBase(Public, Protected, theScene, theId,
         Protected.isPressed = theFlag;
     }
 
-    Public.getId = function() {
-        return Protected.id;
-    }
-
     Public.onMouseButton = function(theState, theX, theY) {
         if (Public.enabled && isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
@@ -106,7 +102,8 @@ function ButtonBase(Public, Protected, theScene, theId,
     // Protected
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    Protected.id        = theId;
+    Public.name         = theId;
+    Public.id           = theId;
     Protected.isPressed = false;
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -207,6 +204,14 @@ function TransparentTextButtonBase(Public, Protected, theScene, theId, theText, 
     Public.width setter = function(theArgument) { _myBackground.width = theArgument; Public.node.width = theArgument; }
     Public.height getter = function() { return _myBackground.height; }
     Public.height setter = function(theArgument) { _myBackground.height = theArgument; Public.node.height = theArgument; }
+    Public.name getter = function() { return _myBackground.name; }
+    Public.name setter = function(theArgument) { _myBackground.name = theArgument; }
+
+    var BaseRemoveFromScene = Public.removeFromScene;
+    Public.removeFromScene = function() {
+        BaseRemoveFromScene();
+        _myBackground.removeFromScene();
+    }
 }
 
 function TransparentTextButton(theScene, theId, theText, theSize, thePosition, theStyle, theParent) {

@@ -20,35 +20,12 @@ var ourImageCache = [];
 function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
-    // Convenience access to referenced nodes
+    // Delegation of all overlay node attributes
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.toString = function() {
         return _myNode.toString();
     }
-
-    Public.material getter = function() {
-        return _myMaterial;
-    }
-    Public.material setter = function(theMaterial) {
-        _myNode.material = theMaterial.id;
-        _myMaterial      = theMaterial;
-
-        // Notify derived classes
-        Protected.onMaterialChange();
-    }
-
-    Public.color getter = function() {
-        return _myMaterial.properties.surfacecolor;
-    }
-
-    Public.color setter = function(theColor) {
-        _myMaterial.properties.surfacecolor = theColor;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // Delegation of all overlay node attributes
-    ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.node getter = function() { return _myNode; }
 
@@ -101,10 +78,9 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     // Utility functions
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    /// Removes the overlay and the connected material and image node from the scene dom
+    /// Removes the overlay from the scene dom
     Public.removeFromScene = function() {
         _myNode.parentNode.removeChild(_myNode);
-        _myMaterial.parentNode.removeChild(_myMaterial);
     }
 
     /// Moves overlay to first position in the overlay z-order
@@ -146,6 +122,71 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
+    // Private
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    /// Create an overlay without material
+    function setup() {
+        var myParent = null;
+        if (theParent != undefined) {
+            if ("node" in theParent) {
+                myParent = theParent.node;
+            } else {
+                myParent = theParent;
+            }
+        } else {
+            myParent = theScene.overlays;
+        }
+
+        _myNode = myParent.appendChild(new Node("<overlay/>").firstChild);
+        _myNode.name = "Overlay_" + ourOverlayCounter++;
+
+        if (thePosition) {
+            _myNode.position.x = thePosition[0];
+            _myNode.position.y = thePosition[1];
+        }
+    }
+
+    var _myNode = null;
+
+    setup();
+}
+
+// Pure virtual base class
+function MaterialOverlay(Public, Protected, theScene, thePosition, theParent) {
+    OverlayBase(Public, Protected, theScene, thePosition, theParent);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // Convenience access to referenced nodes
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    Public.material getter = function() {
+        return _myMaterial;
+    }
+    Public.material setter = function(theMaterial) {
+        _myNode.material = theMaterial.id;
+        _myMaterial      = theMaterial;
+
+        // Notify derived classes
+        Protected.onMaterialChange();
+    }
+
+    Public.color getter = function() {
+        return _myMaterial.properties.surfacecolor;
+    }
+
+    Public.color setter = function(theColor) {
+        _myMaterial.properties.surfacecolor = theColor;
+    }
+
+    /// Removes the overlay and the connected material and image node from the scene dom
+    var BaseRemoveFromScene = Public.removeFromScene;
+    Public.removeFromScene = function() {
+        BaseRemoveFromScene();
+        _myMaterial.parentNode.removeChild(_myMaterial);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
     // Protected
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -158,42 +199,22 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
 
     /// Create an untextured overlay
     function setup() {
-        var myName = "Overlay_" + ourOverlayCounter++;
         var myMaterialId = createUniqueId();
-
         _myMaterial = Node.createElement('material');
         theScene.materials.appendChild(_myMaterial);
 
         _myMaterial.id = myMaterialId;
-        _myMaterial.name = myName + "M";
+        _myMaterial.name = Public.name + "M";
         _myMaterial.transparent = 1;
         _myMaterial.properties.surfacecolor = "[1,1,1,1]";
-        var myParent = null;
-        if (theParent != undefined) {
-            if ("node" in theParent) {
-                myParent = theParent.node;
-            } else {
-                myParent = theParent;
-            }
-        } else {
-            myParent = theScene.overlays;
-        }
-        var myOverlayString = '<overlay name="' + myName + '" material="' + _myMaterial.id + '"/>';
-        var myNode = new Node(myOverlayString);
-
-        _myNode = myParent.appendChild(myNode.firstChild);
-
-        if (thePosition) {
-            _myNode.position.x = thePosition[0];
-            _myNode.position.y = thePosition[1];
-        }
+        Public.node.material = _myMaterial.id;
     }
 
-    var _myNode     = null;
     var _myMaterial = null;
 
     setup();
 }
+
 
 /// Creates a uniform colored overlay
 // @param theScene     Scene     The scene the overlay should be appended to
@@ -204,7 +225,8 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
 function Overlay(theScene, theColor, thePosition, theSize, theParent) {
     var Public    = this;
     var Protected = {};
-    OverlayBase(Public, Protected, theScene, thePosition, theParent);
+
+    MaterialOverlay(Public, Protected, theScene, thePosition, theParent);
     if (theSize) {
         Public.width  = theSize[0];
         Public.height = theSize[1];
@@ -221,7 +243,7 @@ function Overlay(theScene, theColor, thePosition, theSize, theParent) {
 // Pure virtual base class
 function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
     var Base = {}
-    OverlayBase(Public, Protected, theScene, thePosition, theParent);
+    MaterialOverlay(Public, Protected, theScene, thePosition, theParent);
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
@@ -301,12 +323,10 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
 
     Base.removeFromScene = Public.removeFromScene;
     Public.removeFromScene = function() {
-        /* [CH]: Don't remove to allow image caching
         var myParent = Protected.myImages[0].parentNode;
         for (var i = 0;i < Protected.myImages.length; ++i) {
             myParent.removeChild(Protected.myImages[i]);
         }
-        */
         Base.removeFromScene();
     }
 
@@ -562,4 +582,18 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
     }
 
     setup();
+}
+
+/// Creates a group overlay
+// @param theScene     Scene     The scene the overlay should be appended to
+// @param theName      String    Name of the overlay group (optional)
+// @param thePosition  Vector2f  Pixelposition of the overlay (optional, default is [0,0])
+// @param theParent    Node      Parent overlay node (optional, optional default is toplevel)
+function GroupOverlay(theScene, theName, thePosition, theParent) {
+    var Public    = this;
+    var Protected = {};
+    OverlayBase(Public, Protected, theScene, thePosition, theParent);
+    if (theName != undefined && theName) {
+        Public.name = theName;
+    }
 }
