@@ -52,6 +52,7 @@ function ButtonBase(Public, Protected, theScene, theId,
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Public
     ///////////////////////////////////////////////////////////////////////////////////////////
+
     Public.onClick = function(theButton) {
         print ("Clicked " + Public.name + " - Override me!");
     }
@@ -130,16 +131,8 @@ function TextButton(theScene, theId, theText,
 {
     var Public    = this;
     var Protected = {}
-    TextButtonBase(Public, Protected, theScene, theId, theText,
-                   theSize, thePosition, theStyle, theParent);
-}
-
-function TextButtonBase(Public, Protected, theScene, theId, theText,
-                        theSize, thePosition, theStyle, theParent)
-{
     ButtonBase(Public, Protected, theScene, theId,
                theSize, thePosition, theStyle, theParent);
-    Public.setText(theText);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -180,42 +173,9 @@ function DualImageButton(theScene, theId, theSources,
     }
 }
 
-// [CH]: The only way to get the background transparent.
-function TransparentTextButtonBase(Public, Protected, theScene, theId, theText, theSize, thePosition, theStyle, theParent) {
-    // Create a button as child of an background overlay
-    var _myBackground = new Overlay(window.scene, theStyle.color, thePosition, theSize);
-    TextButtonBase(Public, Protected, theScene, theId, theText, theSize, [0, 0], theStyle, _myBackground.node);
-    Public.color = new Vector4f(1,1,1,1);
-
-    Public.setPressed = function(theFlag) {
-        if (theFlag) {
-            _myBackground.color = Protected.style.selectedColor;
-        } else {
-            _myBackground.color = Protected.style.color;
-        }
-        Protected.isPressed = theFlag;
-    }
-
-    Public.visible getter = function() { return _myBackground.visible; }
-    Public.visible setter = function(theArgument) { _myBackground.visible = theArgument; }
-    Public.alpha getter = function() { return _myBackground.alpha; }
-    Public.alpha setter = function(theArgument) { _myBackground.alpha = theArgument; Public.node.alpha = theArgument; }
-    Public.width getter = function() { return _myBackground.width; }
-    Public.width setter = function(theArgument) { _myBackground.width = theArgument; Public.node.width = theArgument; }
-    Public.height getter = function() { return _myBackground.height; }
-    Public.height setter = function(theArgument) { _myBackground.height = theArgument; Public.node.height = theArgument; }
-    Public.name getter = function() { return _myBackground.name; }
-    Public.name setter = function(theArgument) { _myBackground.name = theArgument; }
-
-    var BaseRemoveFromScene = Public.removeFromScene;
-    Public.removeFromScene = function() {
-        BaseRemoveFromScene();
-        _myBackground.removeFromScene();
-    }
-}
-
-function TransparentTextButton(theScene, theId, theText, theSize, thePosition, theStyle, theParent) {
+function ColorButton(theScene, theId, theSize, thePosition, theStyle, theParent) {
     var Public    = this;
-    var Protected = {};
-    TransparentTextButtonBase(Public, Protected, theScene, theId, theText, theSize, thePosition, theStyle, theParent);
+    var Protected = {}
+    ButtonBase(Public, Protected, theScene, theId, theSize,
+               thePosition, theStyle, theParent);
 }

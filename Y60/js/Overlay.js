@@ -78,9 +78,11 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     // Utility functions
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    /// Removes the overlay from the scene dom
+    /// Removes the overlay and all its children and all
+    /// connected materials and images from the scene dom.
+    /// Do not call this function, if you share materials or images.
     Public.removeFromScene = function() {
-        _myNode.parentNode.removeChild(_myNode);
+        removeFromScene(_myNode);
     }
 
     /// Moves overlay to first position in the overlay z-order
@@ -124,6 +126,37 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////
+
+    function removeFromScene(theOverlayNode) {
+        // Remove children
+        while(theOverlayNode.childNodes.length) {
+            removeFromScene(theOverlayNode.firstChild);
+        }
+
+        if (theOverlayNode.material) {
+            var myMaterialNode = theOverlayNode.getElementById(theOverlayNode.material);
+            if (myMaterialNode) {
+
+                // Remove images
+                var myTextures = getDescendantByTagName(myMaterialNode, "textures", false);
+                if (myTextures) {
+                    for (var i = 0; i < myTextures.childNodes.length; ++i) {
+                        var myImageId = myTextures.childNode(i).image;
+                        var myImage = theOverlayNode.getElementById(myImageId);
+                        myImage.parentNode.removeChild(myImage);
+                    }
+                }
+
+                // Remove material node
+                myMaterialNode.parentNode.removeChild(myMaterialNode);
+            } else {
+                print("### WARNING: Could not remove material node " + theOverlayNode.material);
+            }
+        }
+
+        // Remove overlay node
+        theOverlayNode.parentNode.removeChild(theOverlayNode);
+    }
 
     /// Create an overlay without material
     function setup() {
@@ -177,13 +210,6 @@ function MaterialOverlay(Public, Protected, theScene, thePosition, theParent) {
 
     Public.color setter = function(theColor) {
         _myMaterial.properties.surfacecolor = theColor;
-    }
-
-    /// Removes the overlay and the connected material and image node from the scene dom
-    var BaseRemoveFromScene = Public.removeFromScene;
-    Public.removeFromScene = function() {
-        BaseRemoveFromScene();
-        _myMaterial.parentNode.removeChild(_myMaterial);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -319,15 +345,6 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
     Public.texture setter = function(theTexture) {
         _myTextures.replaceChild(theTexture, _myTextures.firstChild);
         Protected.onTextureChange();
-    }
-
-    Base.removeFromScene = Public.removeFromScene;
-    Public.removeFromScene = function() {
-        var myParent = Protected.myImages[0].parentNode;
-        for (var i = 0;i < Protected.myImages.length; ++i) {
-            myParent.removeChild(Protected.myImages[i]);
-        }
-        Base.removeFromScene();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

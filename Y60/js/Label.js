@@ -93,6 +93,32 @@ function LabelBase(Public, Protected, theScene,
         }
     }
 
+    // Use this function if you need a foreground text that is independently
+    // transparent from the background
+    Public.setChildText = function(theText, theStyle) {
+        if (_myChildLabel) {
+            _myChildLabel.setText(theText, theStyle);
+        } else {
+            _myChildLabel = new Label(theScene, theText, theSize, [0,0], theStyle, Public.node);
+
+            // We do not want to blend with the background color in this case
+            _myChildLabel.texture.applymode = "replace";
+        }
+    }
+
+    // Use this function if you need a foreground image that is independently
+    // transparent from the background
+    Public.setChildImage = function(theSource) {
+        if (_myChildLabel) {
+            _myChildLabel.setImage(theSource);
+        } else {
+            _myChildLabel = new ImageLabel(theScene, theSource, [0, 0], theStyle, Public.node);
+
+            // We do not want to blend with the background color in this case
+            _myChildLabel.texture.applymode = "replace";
+        }
+    }
+
     Public.setImage = function(theSource) {
         var myImage = Protected.getImageNode();
         myImage.src = theSource;
@@ -103,11 +129,7 @@ function LabelBase(Public, Protected, theScene,
         Public.srcsize.x = 1;
         Public.srcsize.y = 1;
     }
-/*
-    Public.setBackgroundTransparent = function() {
-        Public.textures.lastChild.applymode = "modulate";
-    }
-*/
+
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Protected
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +145,7 @@ function LabelBase(Public, Protected, theScene,
             var myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
             myImage.resize = "pad";
             Protected.addImage(myImage);
+            Public.textures.lastChild.applymode = "modulate";
         }
         return Public.image;
     }
@@ -137,6 +160,8 @@ function LabelBase(Public, Protected, theScene,
         Public.position.y = thePosition[1];
     }
 
+    var _myChildLabel = null;
+
     setup();
 }
 
@@ -145,6 +170,13 @@ function Label(theScene, theText, theSize, thePosition, theStyle, theParent) {
     var Protected = {}
     LabelBase(Public, Protected, theScene, theSize, thePosition, theStyle, theParent);
     Public.setText(theText);
+}
+
+function ImageLabel(theScene, theSource, thePosition, theStyle, theParent) {
+    var Public    = this;
+    var Protected = {}
+    LabelBase(Public, Protected, theScene, null, thePosition, theStyle, theParent);
+    Public.setImage(theSource);
 }
 
 function BackgroundImageLabel(theScene, theText, theBackgroundImageSrc, theSize,
@@ -157,8 +189,7 @@ function BackgroundImageLabel(theScene, theText, theBackgroundImageSrc, theSize,
     Protected.getImageNode = function() {
         if (Public.image == null) {
             Protected.addImage(theBackgroundImageSrc);
-            var myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
-            myImage.resize = "pad";
+            var myImage = theScene.createImage("");
             Protected.addImage(myImage);
         }
         return Public.images[Public.images.length - 1];
@@ -168,6 +199,5 @@ function BackgroundImageLabel(theScene, theText, theBackgroundImageSrc, theSize,
 
     Public.setBackgroundImage = function(theImageSrc) {
         Public.image.src = theImageSrc;
-        //Public.image = theScene.createImage(theImageSrc);
     }
 }

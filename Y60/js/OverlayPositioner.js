@@ -205,8 +205,9 @@ OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
                     }
                     break;
                 case "space":
-                    print(_myPickedOverlay.name);
-                    print("Position: " + _myPickedOverlay.position + ", width: " + _myPickedOverlay.width + ", height: " + _myPickedOverlay.height);
+                    print("Position: " + _myPickedOverlay.position + ", width: " +
+                        _myPickedOverlay.width + ", height: " + _myPickedOverlay.height +
+                        " (" + _myPickedOverlay.name + ")");
                     break;
             }
         }
