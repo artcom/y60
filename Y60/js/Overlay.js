@@ -103,8 +103,8 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
 
     /// Removes the overlay and the connected material and image node from the scene dom
     Public.removeFromScene = function() {
-        //_myNode.parentNode.removeChild(_myNode);
-        //_myMaterial.parentNode.removeChild(_myMaterial);
+        _myNode.parentNode.removeChild(_myNode);
+        _myMaterial.parentNode.removeChild(_myMaterial);
     }
 
     /// Moves overlay to first position in the overlay z-order
@@ -301,10 +301,12 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
 
     Base.removeFromScene = Public.removeFromScene;
     Public.removeFromScene = function() {
+        /* [CH]: Don't remove to allow image caching
         var myParent = Protected.myImages[0].parentNode;
-        for(var i = 0;i < Protected.myImages.length; ++i) {
-            //myParent.removeChild(Protected.myImages[i]);
+        for (var i = 0;i < Protected.myImages.length; ++i) {
+            myParent.removeChild(Protected.myImages[i]);
         }
+        */
         Base.removeFromScene();
     }
 
@@ -408,8 +410,7 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             var mySource = expandEnvironment(theSource);
             if (mySource in ourImageCache) {
                 myImage = ourImageCache[mySource];
-
-  /*
+/*
                 for (var i = 0; i < theScene.images.childNodes.length; ++i) {
                     var myImageNode = theScene.images.childNode(i);
                     if (myImageNode.src == theSource) {

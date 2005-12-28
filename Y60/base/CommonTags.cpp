@@ -26,7 +26,7 @@
 #include <asl/os_functions.h>
 
 namespace y60 {
-   
+
     IdTag::IdTag() : counter(0) {
         myStartTime = asl::Time().secs() - 1117122059;
     }
@@ -35,13 +35,23 @@ namespace y60 {
     }
 
     const IdTag::TYPE IdTag::getDefault() {
-        //return asl::as_string(IdTag::get().myStartTime) + asl::as_string(IdTag::get().counter++);
         asl::Block myIdBlock;
         unsigned myCounter = ++IdTag::get().counter;
         if (myCounter == 0) {
             IdTag::get().myStartTime = asl::Time().secs() - 1117122059;
         }
-        myIdBlock.appendUnsigned(myCounter);
+
+        // Most significant bytes first improves legibility and map lookup-speed
+        myIdBlock.appendUnsigned8(myCounter);
+        if (myCounter > 0xff) {
+            myIdBlock.appendUnsigned8(myCounter >> 8);
+        }
+        if (myCounter > 0xffff) {
+            myIdBlock.appendUnsigned8(myCounter >> 16);
+        }
+        if (myCounter > 0xffffff) {
+            myIdBlock.appendUnsigned8(myCounter >> 24);
+        }
         myIdBlock.appendUnsigned16((unsigned short)asl::getThreadId() & 0xFFFF);
         myIdBlock.appendUnsigned(IdTag::get().myStartTime);
 

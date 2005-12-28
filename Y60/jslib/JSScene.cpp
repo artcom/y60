@@ -348,10 +348,10 @@ CreateQuadShape(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 static JSBool
 CreateBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates a body");
-    DOC_PARAM("theShape", "", DOC_TYPE_NODE);
-    DOC_PARAM_OPT("theParent", "", DOC_TYPE_NODE, "toplevel node");
-    DOC_RVAL("theBody", DOC_TYPE_NODE)
+    DOC_BEGIN("Creates a body inside the scene");
+    DOC_PARAM("theShape", "A shape node inside the scene for this body", DOC_TYPE_NODE);
+    DOC_PARAM_OPT("theParent", "A parent node inside the world hierarchy", DOC_TYPE_NODE, "toplevel node");
+    DOC_RVAL("The new body", DOC_TYPE_NODE)
     DOC_END;
     try {
         ensureParamCount(argc, 1, 2);
@@ -368,6 +368,31 @@ CreateBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         ShapePtr myShape = myShapeNode->getFacade<Shape>();
 
         dom::NodePtr myResult = y60::createBody(myParent, myShape->get<IdTag>());
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates an image inside the scene");
+    DOC_PARAM("theImageSource", "Path to image file", DOC_TYPE_NODE);
+    DOC_RVAL("The new image", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1, 1);
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+        std::string myImageSrc;
+        if (!convertFrom(cx, argv[0], myImageSrc)) {
+            JS_ReportError(cx, "JSScene::createImage(): argument #1 must be a string (File path)");
+            return JS_FALSE;
+        }
+
+        dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
+            dom::NodePtr(new dom::Element("image")));
+        myResult->appendAttribute(IMAGE_SRC_ATTRIB, myImageSrc);
         *rval = as_jsval(cx, myResult);
         return JS_TRUE;
 
@@ -460,6 +485,7 @@ JSScene::Functions() {
         {"createColorMaterial",   CreateColorMaterial,   1},
         {"createTexturedMaterial",CreateTexturedMaterial,1},
         {"createBody",            CreateBody,            2},
+        {"createImage",           CreateImage,           2},
         {"createQuadShape",       CreateQuadShape,       3},
         {"loadMovieFrame",        loadMovieFrame,        1},
         {"loadCaptureFrame",      loadCaptureFrame,      1},

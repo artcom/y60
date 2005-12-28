@@ -336,7 +336,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.onPreViewport = function(theViewport) {
-//Logger.warning("=== PRE VIEWPORT" + theViewport.name);
         var myCamera = theViewport.getElementById(theViewport.camera);
     	// calculate near/far planes from world size and distance camera-world
     	var myWorldSize = _myRenderWindow.scene.getWorldSize(myCamera);
