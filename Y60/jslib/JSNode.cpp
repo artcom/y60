@@ -356,6 +356,17 @@ appendChild(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     return Method<dom::Node>::call((MyMethod)&dom::Node::appendChild, cx, obj, argc, argv, rval);
 }
 static JSBool
+insertBefore(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Adds the node newChild before the child node refChild.");
+    DOC_PARAM("newChild", "The new child not to insert", DOC_TYPE_NODE);
+    DOC_PARAM("refChild", "A child node, where the new child should be inserted before", DOC_TYPE_NODE);
+    DOC_RVAL("The node added", DOC_TYPE_NODE);
+    DOC_END;
+    typedef dom::NodePtr (dom::Node::*MyMethod)(dom::NodePtr, dom::NodePtr);
+    return Method<dom::Node>::call((MyMethod)&dom::Node::insertBefore, cx, obj, argc, argv, rval);
+}
+
+static JSBool
 hasChildNodes(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns whether this node has any children.");
     DOC_RVAL("Returns true if this node has any children, false otherwise.", DOC_TYPE_BOOLEAN);
@@ -612,7 +623,7 @@ JSNode::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         /* name         native          nargs    */
-        //            {"insertBefore",     insertBefore,    2},
+        {"insertBefore",     insertBefore,    2},
         {"replaceChild",     replaceChild,    2},
         {"removeChild",      removeChild,     1},
         {"appendChild",      appendChild,     1},
@@ -966,14 +977,14 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                         AC_TRACE << "JSNode::getProperty: myAttrNode-Facade = " <<*myAttrNode;
                         *vp = as_jsval(cx, myAttrNode->nodeValueWrapperPtr());
                         return JS_TRUE;
-                    }                    
+                    }
 		            // 2.5: Check for children
                     dom::NodePtr myChildNode = myFacade->getChildNode(myProperty);
                     if (myChildNode) {
                         AC_TRACE << "JSNode::getProperty: myAttrNode-Facade = " <<*myChildNode;
                         *vp = as_jsval(cx, myChildNode);
                         return JS_TRUE;
-                    }                    				
+                    }
 					// ask the facades propertylist (features, properties, etc)
                     dom::NodePtr myPropertyNode = myFacade->getProperty(myProperty);
                     if (myPropertyNode) {
