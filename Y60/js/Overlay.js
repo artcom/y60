@@ -82,7 +82,7 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     /// connected materials and images from the scene dom.
     /// Do not call this function, if you share materials or images.
     Public.removeFromScene = function() {
-        removeFromScene(_myNode);
+        removeOverlay(_myNode);
     }
 
     /// Moves overlay to first position in the overlay z-order
@@ -126,37 +126,6 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////
-
-    function removeFromScene(theOverlayNode) {
-        // Remove children
-        while(theOverlayNode.childNodes.length) {
-            removeFromScene(theOverlayNode.firstChild);
-        }
-
-        if (theOverlayNode.material) {
-            var myMaterialNode = theOverlayNode.getElementById(theOverlayNode.material);
-            if (myMaterialNode) {
-
-                // Remove images
-                var myTextures = getDescendantByTagName(myMaterialNode, "textures", false);
-                if (myTextures) {
-                    for (var i = 0; i < myTextures.childNodes.length; ++i) {
-                        var myImageId = myTextures.childNode(i).image;
-                        var myImage = theOverlayNode.getElementById(myImageId);
-                        myImage.parentNode.removeChild(myImage);
-                    }
-                }
-
-                // Remove material node
-                myMaterialNode.parentNode.removeChild(myMaterialNode);
-            } else {
-                print("### WARNING: Could not remove material node " + theOverlayNode.material);
-            }
-        }
-
-        // Remove overlay node
-        theOverlayNode.parentNode.removeChild(theOverlayNode);
-    }
 
     /// Create an overlay without material
     function setup() {
@@ -613,4 +582,35 @@ function GroupOverlay(theScene, theName, thePosition, theParent) {
     if (theName != undefined && theName) {
         Public.name = theName;
     }
+}
+
+function removeOverlay(theOverlayNode) {
+    // Remove children
+    while(theOverlayNode.childNodes.length) {
+        removeOverlay(theOverlayNode.firstChild);
+    }
+
+    if (theOverlayNode.material) {
+        var myMaterialNode = theOverlayNode.getElementById(theOverlayNode.material);
+        if (myMaterialNode) {
+
+            // Remove images
+            var myTextures = getDescendantByTagName(myMaterialNode, "textures", false);
+            if (myTextures) {
+                for (var i = 0; i < myTextures.childNodes.length; ++i) {
+                    var myImageId = myTextures.childNode(i).image;
+                    var myImage = theOverlayNode.getElementById(myImageId);
+                    myImage.parentNode.removeChild(myImage);
+                }
+            }
+
+            // Remove material node
+            myMaterialNode.parentNode.removeChild(myMaterialNode);
+        } else {
+            print("### WARNING: Could not remove material node " + theOverlayNode.material);
+        }
+    }
+
+    // Remove overlay node
+    theOverlayNode.parentNode.removeChild(theOverlayNode);
 }
