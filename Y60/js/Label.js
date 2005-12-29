@@ -100,9 +100,7 @@ function LabelBase(Public, Protected, theScene,
             _myChildLabel.setText(theText, theStyle);
         } else {
             _myChildLabel = new Label(theScene, theText, theSize, [0,0], theStyle, Public.node);
-
-            // We do not want to blend with the background color in this case
-            _myChildLabel.texture.applymode = "replace";
+            _myChildLabel.color = new Vector4f(1,1,1,1);
         }
     }
 
@@ -113,9 +111,7 @@ function LabelBase(Public, Protected, theScene,
             _myChildLabel.setImage(theSource);
         } else {
             _myChildLabel = new ImageLabel(theScene, theSource, [0, 0], theStyle, Public.node);
-
-            // We do not want to blend with the background color in this case
-            _myChildLabel.texture.applymode = "replace";
+            _myChildLabel.color = new Vector4f(1,1,1,1);
         }
     }
 

@@ -406,11 +406,11 @@ namespace y60 {
         DBP2(STOP_TIMER(renderBodyPart_shape_getRenderStyles));
 
         // if there are primitive-level styles, use them instead of the shape level
-#if 0 // disabled because of bug#91       
+#if 0 // disabled because of bug#91
         if ( !myShapeStyle.empty() && !myPrimitveStyle.empty()) {
             AC_WARNING << "Primitive styles overridding shape style. Style accumulation not implemented yet";
         }
-#endif        
+#endif
         DBP2(START_TIMER(renderBodyPart_getRenderStyles));
         const std::vector<RenderStyleType> & myRenderStyles  = myPrimitveStyle.empty() ? myShapeStyle : myPrimitveStyle;
         DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
@@ -438,9 +438,9 @@ namespace y60 {
         DBP2(START_TIMER(renderBodyPart_findRenderStyles2));
         bool myRendererCullingEnabled = _myState.getBackfaceCulling();
         if (myRendererCullingEnabled) {
-            bool myRenderFrontFlag = std::find(myRenderStyles.begin(), myRenderStyles.end(), FRONT) !=  myRenderStyles.end(); 
+            bool myRenderFrontFlag = std::find(myRenderStyles.begin(), myRenderStyles.end(), FRONT) !=  myRenderStyles.end();
             bool myRenderBackFlag = std::find(myRenderStyles.begin(), myRenderStyles.end(), BACK) !=  myRenderStyles.end();
-            
+
             if (myRenderFrontFlag && myRenderBackFlag) {
                 // render front & back (two passes, supposedly faster
                 DBP2(START_TIMER(renderBodyPart_renderPrimitives));
@@ -1428,7 +1428,7 @@ namespace y60 {
         glPopMatrix();
 
         glPopAttrib();
-        
+
     }
 
     void
@@ -1490,16 +1490,6 @@ namespace y60 {
                 const asl::Vector2f & mySourceSize   = myOverlay.get<SrcSizeTag>();
 
                 unsigned myTextureCount = myMaterial->getTextureCount();
-/*
-                // TODO: Workaround: switchMaterial enables vertex arrays for all vertex registers
-                // but overlays do not use arrays
-                for (unsigned i = 0; i < myTextureCount; ++i) {
-                    glActiveTextureARB(asGLTextureRegister(i));
-                    glClientActiveTextureARB(asGLTextureRegister(i));
-                    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-                    CHECK_OGL_ERROR;
-                }
-*/
                 if (myTextureCount == 1) {
                     glBegin(GL_QUADS);
                     glTexCoord2f(mySourceOrigin[0],mySourceOrigin[1]);
