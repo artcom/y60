@@ -166,7 +166,7 @@ function MaterialOverlay(Public, Protected, theScene, thePosition, theParent) {
         return _myMaterial;
     }
     Public.material setter = function(theMaterial) {
-        _myNode.material = theMaterial.id;
+        Public.node.material = theMaterial.id;
         _myMaterial      = theMaterial;
 
         // Notify derived classes

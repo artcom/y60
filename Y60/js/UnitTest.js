@@ -215,8 +215,7 @@ UnitTestSuite.prototype.Constructor = function(obj, theName) {
                 throw(e);
             }
         } catch (e) {
-            print("## test suite '" + obj.getMyName() + "'"
-                    + " was not completed because of an exception: "+e+"");
+            reportException(e);
         }
     }
     obj.setup = function() {
