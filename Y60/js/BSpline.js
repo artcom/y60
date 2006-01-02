@@ -41,74 +41,51 @@ function BSpline() {
         // Clear last result
         _myResult = [];
 
-        if (theEaseIn == null) {
-            theEaseIn = 0;
-        }
-        if (theEaseOut == null) {
-            theEaseOut = 0;
-        }
-
-        theEaseOut = 1 - theEaseOut;
-
-        // anzahl der Dimensionen
-        var myDimensionCount = 3;
-
-        // punkte umsortieren
-        var myP0 = new Array(); // punkt 1
-        var myP1 = new Array(); // anfasser 1
-        var myP2 = new Array(); // punkt 2
-        var myP3 = new Array(); // anfasser 2
-        for (var j = 0; j < myDimensionCount; ++j) {
-            myP0[j] = theStart[j];
-            myP1[j] = theStartHandle[j];
-            myP3[j] = theEnd[j];
-            myP2[j] = theEndHandle[j];
-        }
-
-        // b-Funktion
-        var a = new Array();
-        var b = new Array();
-        var c = new Array();
-
-        for (var j = 0; j < myDimensionCount; j++) {
-            c[j] = 3 * (myP1[j] - myP0[j]);
-            b[j] = 3 * (myP2[j] - myP1[j]) - c[j];
-            a[j] = myP3[j] - myP0[j] - c[j] - b[j];
-        }
-
-        // fill ease array
-        var myEaseArray = calcEaseModifier(theEaseIn, theEaseOut, theResolution);
-        for (var i = 0; i < theResolution; ++i) {
-            // ease
-            var t = myEaseArray[i];
-            //print("t: " + t);
-            // b-function
-            var x = a[0] * t * t * t +
-                    b[0] * t * t +
-                    c[0] * t +
-                    myP0[0];
-            var y = a[1] * t * t * t +
-                    b[1] * t * t +
-                    c[1] * t +
-                    myP0[1];
-            var z = a[2] * t * t * t +
-                    b[2] * t * t +
-                    c[2] * t +
-                    myP0[2];
-
-            _myResult[i] = new Vector3f(x, y, z);
-        }
-    }
-
-    function calcEaseModifier(theEaseIn, theEaseOut, theResolution) {
-        var myEaseArray = new Array();
+        this.setup(theStart, theStartHandle, theEnd, theEndHandle);
+        
         for (var i = 0; i < theResolution; ++i) {
             var myValue = i / theResolution;
-            myEaseArray[i] = smoothstep(theEaseIn, theEaseOut, myValue);
+            _myResult[i] = this.evaluate(myValue, theEaseIn, theEaseOut);
+            //print("t: " + t);
+
         }
-        return myEaseArray;
     }
 
+    this.setup = function(theStart, theStartHandle, theEnd, theEndHandle) {
+        _myPolyCoefs = [];
+
+        // b-Funktion
+        for (var i = 0;i < 4; ++i) {
+            _myPolyCoefs[i] = [];
+        }
+
+        for (var j = 0; j < _myDimensionCount; j++) {
+            _myPolyCoefs[0][j] = theStart[j];
+            _myPolyCoefs[1][j] = 3 * (theStartHandle[j] - theStart[j]);
+            _myPolyCoefs[2][j] = 3 * (theEndHandle[j] - theStartHandle[j]) - _myPolyCoefs[1][j];
+            _myPolyCoefs[3][j] = theEnd[j] - theStart[j] - _myPolyCoefs[1][j] - _myPolyCoefs[2][j];
+        }
+    }
+
+    this.evaluate = function(theCurveParameter, theEaseIn, theEaseOut) {
+        if (theEaseIn != null && theEaseOut != null) {
+            theEaseOut = 1 - theEaseOut;
+            theCurveParameter = smoothstep(theEaseIn, theEaseOut, theCurveParameter);
+        }
+        return getValue(theCurveParameter);
+    }
+    
+    function getValue(t) {            
+        var myPoint = new Vector3f();
+        for (var j = 0; j < _myDimensionCount; j++) {
+            myPoint[j] = _myPolyCoefs[3][j] * t*t*t
+                + _myPolyCoefs[2][j] * t*t
+                + _myPolyCoefs[1][j] * t
+                + _myPolyCoefs[0][j];
+        }
+        return myPoint;
+    }
+            
     function smoothstep(theEaseIn, theEaseOut, theInput) {
         if (theInput < theEaseIn) {
             return 0.0;
@@ -120,7 +97,10 @@ function BSpline() {
         return (myOutput * myOutput) * (3 - 2 * myOutput);
     }
 
-    var _myResult = new Array();
+    const _myDimensionCount = 3;
+    var _myResult = [];
+    var _myPolyCoefs;
+    
 }
 
 // Neccessary for auto-documentation
