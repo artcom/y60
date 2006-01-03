@@ -704,7 +704,7 @@ function getFrustumFrame(theFrustum, theDepth) {
 }
 
 function getWorldPosition(theBody) {
-    return theBody.globalmatrix.getTranslation();        
+    return theBody.globalmatrix.getTranslation();
 }
 
 function setWorldPosition(theBody, theWorldPosition) {
@@ -713,4 +713,13 @@ function setWorldPosition(theBody, theWorldPosition) {
     theBody.position = product(theWorldPosition, myT);
 }
 
-
+function smoothstep(theEaseIn, theEaseOut, theInput) {
+    if (theInput < theEaseIn) {
+        return 0.0;
+    }
+    if (theInput >= theEaseOut) {
+        return 1.0;
+    }
+    var myOutput = (theInput - theEaseIn) / (theEaseOut - theEaseIn);
+    return (myOutput * myOutput) * (3 - 2 * myOutput);
+}
