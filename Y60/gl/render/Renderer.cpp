@@ -961,10 +961,10 @@ namespace y60 {
 
         renderOverlays(theViewport, UNDERLAY_LIST_NAME);
 
-        setupViewport(theViewport);
-
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+
+        setupViewport(theViewport);
 
         dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
                 theViewport->get<CameraTag>());
