@@ -59,18 +59,12 @@ OverlayUnitTest.prototype.Constructor = function(obj, theName) {
         // Test material convenience property
         obj.myMaterialNode = obj.myScene.getElementById(obj.getAttribute(obj.myOverlay, "material"));
         ENSURE('obj.myOverlay.material.id == "' + obj.myMaterialNode.id + '"');
-        print( "DUMMY NODE "  + obj.myDummyOverlay.node);
-        print( "DUMMY MAT "  + obj.myDummyOverlay.material);
-        print( "MAT "  + obj.myOverlay.material);
         obj.myOverlay.material = obj.myDummyOverlay.material;
 
         ENSURE('obj.myOverlay.material.id == obj.myDummyOverlay.material.id');
-        print( "### DUMMY ");
         ENSURE('obj.getAttribute(obj.myOverlay, "material") == obj.myDummyOverlay.material.id');
-        print( "### DUMMY ");
         ENSURE('obj.myOverlay.color == 1,1,1,1');
         obj.myOverlay.material = obj.myMaterialNode;
-        print( "### DUMMY ");
 
         // Test color convenience property
         obj.myOverlay.color = new Vector4f(4,3,2,1);
