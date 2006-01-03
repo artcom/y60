@@ -703,4 +703,14 @@ function getFrustumFrame(theFrustum, theDepth) {
     return myFrame;
 }
 
+function getWorldPosition(theBody) {
+    return theBody.globalmatrix.getTranslation();        
+}
+
+function setWorldPosition(theBody, theWorldPosition) {
+    var myT = new Matrix4f(theBody.parentNode.globalmatrix);
+    myT.invert();
+    theBody.position = product(theWorldPosition, myT);
+}
+
 
