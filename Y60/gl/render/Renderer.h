@@ -115,7 +115,7 @@ namespace y60 {
                       const asl::Matrix4f & theTransformation,
                     const float & theWidth = 1.0f);
        private:
-            void setupViewport(ViewportPtr theViewport);
+            void setupRenderState(ViewportPtr theViewport);
 
             void resetModelView();
             void bindViewMatrix(y60::CameraPtr theCamera);
