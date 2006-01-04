@@ -25,7 +25,7 @@
 
 using namespace std;
 
-#define DB(x) x
+#define DB(x) // x
 
 
 DSADriver::DSADriver (asl::DLHandle theDLHandle) : PlugInBase(theDLHandle)
@@ -36,7 +36,7 @@ DSADriver::DSADriver (asl::DLHandle theDLHandle) : PlugInBase(theDLHandle)
 void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
     const dom::NodePtr & myConfigNode = theConfiguration->childNode("DSADriver");
     if (!myConfigNode) {
-        cerr << "### ERROR DSADriver: No <DSADirver> element found in configuration" << endl;
+        AC_ERROR << "DSADriver: No <DSADirver> element found in configuration" << endl;
         return;
     }
 
@@ -53,8 +53,8 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
                 SensorServerPtr mySensorServer(new SensorServer(myComPort, myBaudRate));
                 _mySensorServers[myPortID] = mySensorServer;
             } catch (asl::SerialPortException & e) {
-                cerr << "### WARNING DSADriver: Could not open com port in " << __FILE__ << ", "
-                     << __LINE__ << ". Message was " << e.what() << endl;
+                AC_WARNING << "DSADriver: Could not open com port in " << __FILE__ << ", "
+                     << __LINE__ << ". Message was " << e.what();
             }
         }
     }
@@ -95,8 +95,7 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
 
                     SensorServerList::iterator it = _mySensorServers.find(myPortId);
                     if (it == _mySensorServers.end()) {
-                        // warning
-                        cerr << "### WARNING DSADriver: No such port for sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber << "; sensor ignored" << endl;
+                        AC_WARNING << "DSADriver: No such port for sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber << "; sensor ignored" << endl;
                     }
                     else {
                         mySensorArray->addSensor(myPortId,

@@ -23,7 +23,6 @@
 #include <sstream>
 #include <memory>
 
-
 using namespace std;
 
 SensorServer::SensorServer(unsigned theComPort, unsigned theBaudRate) {
@@ -35,9 +34,13 @@ SensorServer::SensorServer(unsigned theComPort, unsigned theBaudRate) {
 void
 SensorServer::parseLine(const string & theLine, unsigned & theController, unsigned & theBitMask) {
     istringstream myStream(theLine);
-    myStream >> theController;
+
     char  c;
-    myStream >> c;
+    if (theLine[0] == 7) {
+        myStream >> c; // skip bell
+    }
+    myStream >> theController;
+    myStream >> c; // skip comma
     myStream >> theBitMask;
 }
 
