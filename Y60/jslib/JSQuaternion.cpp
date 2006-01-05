@@ -403,15 +403,21 @@ JSQuaternion::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
                 JS_ReportError(cx,"JSQuaternion::Constructor: need one argument");
                 return JS_FALSE;
             }
-            JSObject * myArgument;
-            if (!JS_ValueToObject(cx, argv[0], &myArgument)) {
-                JS_ReportError(cx,"JSQuaternion::Constructor: argument #1 must be a Quaternion");
+
+            asl::Vector4<Number> myVector4;
+
+            if (convertFrom(cx, argv[0], myNewQuaternion)) {
+                myNewObject = new JSQuaternion(myNewValue);
+                
+            } else if (convertFrom(cx, argv[0], myVector4)) {
+                myNewQuaternion = asl::Quaternion<Number>(myVector4);
+                myNewObject = new JSQuaternion(myNewValue);
+
+            } else {
+                JS_ReportError(cx,"JSQuaternion::Constructor: argument #1 must be a Quaternion or a Vector4");
                 return JS_FALSE;
             }
-            if (JSA_GetClass(cx,myArgument) == Class()) {
-                myNewQuaternion = getJSWrapper(cx, myArgument).getNative();
-                myNewObject = new JSQuaternion(myNewValue);
-            }
+            
         } else if (argc == 4) {
             // construct from four numbers
             for (int i = 0; i < 4 ;++i) {
