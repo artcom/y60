@@ -78,6 +78,10 @@ PackageManager::add(const std::string & thePaths) {
             add(IPackagePtr(new DirectoryPackage(myPathVector[i])));
             continue;
         }
+        if (!fileExists(myPathVector[i])) {
+            AC_WARNING << "PackageManager: File '" << myPathVector[i] << "' does not exist";
+            continue;
+        }
         ConstMappedBlock myBlock(myPathVector[i]);
         // check zip file signature
         if (myBlock[0] == 0x50 && myBlock[1] == 0x4b && myBlock[2] == 0x03 && myBlock[3] == 0x04) {
@@ -130,11 +134,11 @@ PackageManager::openFile(const std::string & theRelativePath,
 }
 
 std::string
-PackageManager::searchFile(const std::string & theRelativePath) {
+PackageManager::searchFile(const std::string & theRelativePath) const {
     if (_myPackages.size() == 0) {
         AC_WARNING << "No packages to search!";
     }
-    for (PackageList::iterator iter = _myPackages.begin();
+    for (PackageList::const_iterator iter = _myPackages.begin();
          iter != _myPackages.end(); ++iter) {
         std::string myAbsolutePath = (*iter)->findFile(theRelativePath);
         if (myAbsolutePath.empty() == false) {
@@ -159,7 +163,7 @@ PackageManager::listPackageFiles(IPackagePtr thePackage,
 
 IPackage::FileList
 PackageManager::findFiles(const std::string & theRelativePath,
-                          const std::string & thePackage, 
+                          const std::string & thePackage,
                           bool doRecursiveSearch /*= false */)
 {
     AC_TRACE << "findFiles pkg='" << thePackage << "' path='" << theRelativePath << "'";
@@ -168,7 +172,7 @@ PackageManager::findFiles(const std::string & theRelativePath,
         IPackagePtr myPackage = findPackage("", thePackage);
         myFileList = listPackageFiles(myPackage, theRelativePath, doRecursiveSearch);
     } else {
-        for (PackageList::iterator iter = _myPackages.begin();
+        for (PackageList::const_iterator iter = _myPackages.begin();
              iter != _myPackages.end(); ++iter) {
             IPackage::FileList myTmpFileList = listPackageFiles((*iter), theRelativePath, doRecursiveSearch);
             for (unsigned i = 0; i < myTmpFileList.size(); ++i) {

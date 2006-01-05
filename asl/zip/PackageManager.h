@@ -35,16 +35,16 @@ namespace asl {
 
 /*! \addtogroup aslbase */
 /* @{ */
-   
-/// Manages packages of files. 
-/** allows the efficient search for and opening of files contained in packages (see asl::IPackage). 
+
+/// Manages packages of files.
+/** allows the efficient search for and opening of files contained in packages (see asl::IPackage).
  *  Example packages are asl::DirectoryPackage and asl::ZipPackage
 */
 class PackageManager {
     public:
         PackageManager() {};
         virtual ~PackageManager() {};
- 
+
         /// add a package to the package manager
         void add(IPackagePtr thePackage);
 
@@ -67,16 +67,16 @@ class PackageManager {
 
         /// adds the contents of other PackageManager.
         /** All packages contained in theOther are also added to this.
-            @param theOther the PackageManager from which to copy 
+            @param theOther the PackageManager from which to copy
         */
         void add(const PackageManager & theOther);
 
         /// opens a file located at theRelativePath.
         /** Searches theRelativePath in either thePackageName or all packages.
-            and open the file located at theRelativePath if found. 
-            @param theRelativePath is the path to the file requested, 
+            and open the file located at theRelativePath if found.
+            @param theRelativePath is the path to the file requested,
             it is relative and must be defined inside a package.
-            @param thePackageName is the name of a package, 
+            @param thePackageName is the name of a package,
             package names are stored just as you enter them by calling add.
             @returns the opened file as a asl::ReadableBlock or null if not found.
         */
@@ -85,11 +85,11 @@ class PackageManager {
 
         /// findFiles lists the files in theRelativePath.
         /** Searches theRelativePath in either thePackageName or all packages.
-            and returns all files in theRelativePath. 
+            and returns all files in theRelativePath.
             If theRelativePath is a file it returns theRelativePath.
-            @param theRelativePath is the path to the file requested, 
+            @param theRelativePath is the path to the file requested,
             it is relative and must be defined inside a package.
-            @param thePackageName is the name of a package, 
+            @param thePackageName is the name of a package,
             package names are stored just as you enter them by calling add.
             @returns the list as a std::vector<std::string> or an empty vector if not found.
         */
@@ -99,14 +99,14 @@ class PackageManager {
 
         /// searches for a file.
         /**
-            @deprecated backward compatibility for asl::searchFile(), use 
+            @deprecated backward compatibility for asl::searchFile(), use
                     asl::PackageManager::openFile instead.
             @returns the path to a file or an empty string if not found.
             If the file was found inside a container (e.g. zip-file), then
             the zip file will be part of the path.
             (myDir/myZipfile.zip/myFile.txt)
         */
-        std::string searchFile(const std::string & theRelativePath);
+        std::string searchFile(const std::string & theRelativePath) const;
 
         /// get a list of package paths.
         /**
@@ -121,9 +121,9 @@ class PackageManager {
         PackageList _myPackages;
 
         IPackage::FileList listPackageFiles(IPackagePtr thePackage,
-                                            const std::string & theRelativePath, 
+                                            const std::string & theRelativePath,
                                             bool doRecursiveSearch);
-        IPackagePtr findPackage(const std::string & theRelativePath, const std::string & thePackage);   
+        IPackagePtr findPackage(const std::string & theRelativePath, const std::string & thePackage);
 };
 
 typedef Ptr<PackageManager> PackageManagerPtr;

@@ -63,13 +63,13 @@ DirectoryPackage::getFileList(const std::string & theSubDir, bool theRecurseFlag
                 myFileList.push_back(mySubdirList[i]);
             }
         }
-        
+
     }
     return myFileList;
 }
 
 std::string
-DirectoryPackage::findFile(const std::string & theRelativePath) {
+DirectoryPackage::findFile(const std::string & theRelativePath) const {
     AC_DEBUG << "findFile dir='" << _myDirectory << "' path='" << theRelativePath << "'";
     std::string myAbsolutePath = getAbsolutePath(theRelativePath);
     if (fileExists(myAbsolutePath)) {
@@ -78,7 +78,7 @@ DirectoryPackage::findFile(const std::string & theRelativePath) {
     return "";
 }
 
-Ptr<ReadableBlock> 
+Ptr<ReadableBlock>
 DirectoryPackage::getFile(const std::string & theRelativePath) {
     return Ptr<ReadableBlock>(new ConstMappedBlock(getAbsolutePath(theRelativePath)));
 }

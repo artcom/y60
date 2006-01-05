@@ -56,10 +56,9 @@ ZipPackage::getFileList(const std::string & theSubDir, bool theRecurseFlag) {
 }
 
 std::string
-ZipPackage::findFile(const std::string & theRelativePath) {
+ZipPackage::findFile(const std::string & theRelativePath) const {
     AC_DEBUG << "findFile path='" << theRelativePath << "'";
     for (unsigned i = 0; i < _myFileList.size(); ++i) {
-        AC_TRACE << _myFileList[i];
         if (_myFileList[i].find(theRelativePath) == 0) { // must start with theRelativePath
             return _myZipFilename + "/" + _myFileList[i];
         }
@@ -67,7 +66,7 @@ ZipPackage::findFile(const std::string & theRelativePath) {
     return "";
 }
 
-Ptr<ReadableBlock> 
+Ptr<ReadableBlock>
 ZipPackage::getFile(const std::string & theRelativePath) {
     return _myZipReader.getFile(theRelativePath);
 }

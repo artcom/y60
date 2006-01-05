@@ -33,24 +33,24 @@ DEFINE_EXCEPTION(PackageException, asl::Exception);
 
 /*! \addtogroup aslbase */
 /* @{ */
-   
+
 /// interface for file packages
 class IPackage {
     public:
         typedef std::vector<std::string> FileList;
 
         virtual ~IPackage() {};
- 
+
         /// returns the path of the package.
         virtual const std::string & getPath() const = 0;
 
-        /// returns a list of contained files. 
+        /// returns a list of contained files.
         virtual FileList getFileList(const std::string & theSubDir = "", bool theRecursiveFlag = false) = 0;
 
         /// returns absolute path to contained file or empty.
-        virtual std::string findFile(const std::string & theRelativePath) = 0;
+        virtual std::string findFile(const std::string & theRelativePath) const = 0;
 
-        /// opens a contained file. 
+        /// opens a contained file.
         virtual Ptr<ReadableBlock> getFile(const std::string & theRelativePath) = 0;
 };
 
