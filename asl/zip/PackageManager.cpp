@@ -145,6 +145,9 @@ PackageManager::searchFile(const std::string & theRelativePath) const {
             return myAbsolutePath;
         }
     }
+    if (fileExists(theRelativePath)) {
+        return theRelativePath;
+    }
     return "";
 }
 
