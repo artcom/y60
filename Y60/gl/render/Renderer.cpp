@@ -952,18 +952,17 @@ namespace y60 {
     void
     Renderer::render(ViewportPtr theViewport) {
         MAKE_SCOPE_TIMER(render);
+        glViewport(theViewport->get<ViewportLeftTag>(), theViewport->getLower(),
+                   theViewport->get<ViewportWidthTag>(), theViewport->get<ViewportHeightTag>());
+        CHECK_OGL_ERROR;
+        
+	renderOverlays(theViewport, UNDERLAY_LIST_NAME);
 
         // Render state needs to be set up before glPushAttrib, because it caches the current render state
         setupRenderState(theViewport);
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-
-        renderOverlays(theViewport, UNDERLAY_LIST_NAME);
-
-        glViewport(theViewport->get<ViewportLeftTag>(), theViewport->getLower(),
-                   theViewport->get<ViewportWidthTag>(), theViewport->get<ViewportHeightTag>());
-        CHECK_OGL_ERROR;
 
         dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
                 theViewport->get<CameraTag>());
