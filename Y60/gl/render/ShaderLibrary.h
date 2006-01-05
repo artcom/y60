@@ -37,7 +37,7 @@ namespace y60 {
             virtual y60::IShaderPtr findShader(MaterialBasePtr theMaterial);
 
             const std::string & getShaderDir() const { return _myShaderDirectory; };
-            void setShaderDir(const std::string & theShaderDir) { _myShaderDirectory = theShaderDir; };
+
             const GLShaderVector & getShaders() const { return _myShaders; };
             CGcontext getCgContext();
          private:

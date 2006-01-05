@@ -29,6 +29,7 @@
 #include <y60/iostream_functions.h>
 #include <dom/Nodes.h>
 
+#include <asl/PackageManager.h>
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
 #include <asl/string_functions.h>
@@ -54,18 +55,23 @@ namespace y60 {
         assertCg("ShaderLibrary::~ShaderLibrary() - cgDestroyContext()");
     }
 
-    CGcontext 
+    CGcontext
 	ShaderLibrary::getCgContext() {
-		return _myCgContext; 
+		return _myCgContext;
 	}
 
     void
     ShaderLibrary::load(const std::string & theLibraryFileName) {
+        string myShaderLibraryFileName = AppPackageManager::get().getPtr()->searchFile(theLibraryFileName);
+        if (myShaderLibraryFileName.empty()) {
+            throw ShaderLibraryException(string("Could not find library '") + theLibraryFileName + "' in " +
+                AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
+        }
         string myShaderLibraryStr;
-        asl::readFile(theLibraryFileName, myShaderLibraryStr );
-        if ( myShaderLibraryStr.empty()) {
-            throw ShaderLibraryException(string("Could not load shader library '") + theLibraryFileName + "'",
-                                    PLUS_FILE_LINE);
+        asl::readFile(myShaderLibraryFileName, myShaderLibraryStr);
+        if (myShaderLibraryStr.empty()) {
+            throw ShaderLibraryException(string("Could not load library '") + myShaderLibraryFileName + "'",
+                PLUS_FILE_LINE);
         }
         dom::Document myShaderLibraryXml;
         asl::Ptr<dom::ValueFactory> myFactory = asl::Ptr<dom::ValueFactory>(new dom::ValueFactory());
@@ -78,9 +84,9 @@ namespace y60 {
         myShaderLibraryXml.parse(myShaderLibraryStr);
 
         load(myShaderLibraryXml.childNode(SHADER_LIST_NAME));
-        std::string myShaderDir = asl::getDirectoryPart(theLibraryFileName);
-        setShaderDir(myShaderDir);
-        AC_INFO << "Loaded Shaderlibrary " + theLibraryFileName;
+        std::string myShaderDir = asl::getDirectoryPart(myShaderLibraryFileName);
+        _myShaderDirectory = myShaderDir;
+        AC_INFO << "Loaded Shaderlibrary " + myShaderLibraryFileName;
     }
 
     void

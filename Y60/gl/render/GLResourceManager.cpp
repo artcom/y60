@@ -32,7 +32,7 @@ namespace y60 {
         GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB,  /// <bottom
     };
 
-    int 
+    int
     GLResourceManager::getMaxTextureSize(int theDimensions) const {
         GLint myMaxSize = 0;
         switch (theDimensions) {
@@ -231,7 +231,7 @@ namespace y60 {
         _myShaderLibrary->load(theShaderLibraryFile);
     }
 
-    IShaderLibraryPtr 
+    IShaderLibraryPtr
     GLResourceManager::getShaderLibrary() const {
         return _myShaderLibrary;
     }
@@ -248,7 +248,7 @@ namespace y60 {
         if (!theImage) {
             throw TextureException("setupSingleTexture: ImagePtr is null!", PLUS_FILE_LINE);
         }
- 
+
         unsigned int myId = theImage->getGraphicsId();
         unsigned int myWidth = theImage->get<ImageWidthTag>();
         unsigned int myHeight = theImage->get<ImageHeightTag>();
@@ -270,7 +270,7 @@ namespace y60 {
             glBindTexture(GL_TEXTURE_2D, myId);
             CHECK_OGL_ERROR;
             // [DS] the min filter defaults to GL_NEAREST_MIPMAP_LINEAR. This
-            // causes problems with offscreen rendering. 
+            // causes problems with offscreen rendering.
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER , GL_NEAREST);
             CHECK_OGL_ERROR;
         } else {
@@ -368,7 +368,7 @@ namespace y60 {
             unsigned int myTexDepth = nextPowerOfTwo(myDepth);
             AC_DEBUG << "image size=" << myWidth << "x" << myHeight;
             AC_DEBUG << "tex size=" << myTexWidth << "x" << myTexHeight;
-            
+
             if (myDepth == 1) {
                 AC_TRACE << "setupSingle internalFormat=" << hex << myPixelEncoding.internalformat << dec;
                 // First allocate the texture with power of two dimensions

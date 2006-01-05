@@ -239,18 +239,7 @@ namespace y60 {
         if (_myTextureManager->getResourceManager()) {
             if (!_myTextureManager->getResourceManager()->getShaderLibrary()) {
                 // If no shaderlibrary has been set, yet, add a default library.
-                asl::PackageManagerPtr myPackageManager = _myTextureManager->getPackageManager();
-                string myPath = myPackageManager->searchFile("shaderlibrary.xml");
-                if (myPath.empty()) {
-                    myPath = myPackageManager->searchFile("shader/shaderlibrary.xml");
-                }
-                if (myPath.empty()) {
-                    AC_WARNING << "Scene::getShaderLibrary(): Could not find 'shaderlibrary.xml' in search path "
-                        << myPackageManager->getSearchPath();
-                } else {
-                    _myTextureManager->getResourceManager()->loadShaderLibrary(myPath);
-                    _myTextureManager->getPackageManager()->add(asl::getDirectoryPart(myPath));
-                }
+                _myTextureManager->getResourceManager()->loadShaderLibrary("shaderlibrary.xml");
             }
         } else {
             AC_WARNING << "Scene::setupShaderLibrary(): No resource manager found.";
@@ -467,7 +456,6 @@ namespace y60 {
 
         unsigned long myShapeVertexCount = 0;
         const std::string & myShapeId = myShapeNode->getAttributeString("id");
-        AC_DEBUG << "Scene::buildShape " << myShapeId;
 
         // Iterate over all indices and find the corresponding data
         NodePtr myPrimitiveListNode = myShapeNode->childNode(PRIMITIVE_LIST_NAME);
