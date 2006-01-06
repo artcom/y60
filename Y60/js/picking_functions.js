@@ -119,14 +119,6 @@ obj.pickBodyBySweepingSphereFromBodies = function(theScreenPixelX, theScreenPixe
 /*******************************************************/
 /**    Private Methods                                **/
 /*******************************************************/
-obj.transformClipToWorld = function(theScreenPos) {
-
-    var myProjectionMatrix = new Matrix4f(_myRenderWindow.projectionmatrix);
-    myProjectionMatrix.invert();
-    myProjectionMatrix.postMultiply(_myRenderWindow.camera.globalmatrix);
-    // print (myProjectionMatrix);
-    return product(theScreenPos, myProjectionMatrix);
-}
 
 obj.transformWorldToClip = function(theWorldPos) {
     var myProjectionMatrix = new Matrix4f(_myRenderWindow.camera.globalmatrix);
@@ -135,15 +127,13 @@ obj.transformWorldToClip = function(theWorldPos) {
     return product(theWorldPos, myProjectionMatrix);
 }
 
+obj.transformClipToWorld = function(theClipPos) {
+    return transformClipToWorld(theScreenPos, _myRenderWindow.camera);
+}
+
+
 function getScreenPos(theScreenPixelX, theScreenPixelY) {
-    // TODO: This is not portrait orientation aware.
-    // Implement function:
-    // _myRenderWindow.screenToWorldSpace(theX, theY, NEAR_PLANE);
-    var myPosX = 2 * theScreenPixelX / _myRenderWindow.width  - 1;
-    var myPosY = - (2 * theScreenPixelY / _myRenderWindow.height - 1);
-    var myScreenPos = new Point3f(myPosX, myPosY, -1);
-    // print ("myScreenPos:" + myScreenPos);
-    return obj.transformClipToWorld(myScreenPos);
+    return transformScreenToWorld(theScreenPixelX, theScreenPixelY, _myRenderWindow.camera);
 }
 
 function getCameraPos() {

@@ -79,7 +79,6 @@ namespace y60 {
         ImagePtr myImage = getNode()->getFacade<Image>();
         myImage->set<ImageSourceTag>(theFileName);
         myImage->set<ImageFilterTag>(asl::getStringFromEnum(theFilter, ImageFilterStrings));
-        myImage->set<ImageResizeTag>(IMAGE_RESIZE_SCALE);
         myImage->load();
     }
 
@@ -87,10 +86,6 @@ namespace y60 {
     ImageBuilder::createFileReference(const std::string & theFileName) {
         ImagePtr myImage = getNode()->getFacade<Image>();
         myImage->set<ImageSourceTag>(theFileName);
-        myImage->set<ImageResizeTag>(IMAGE_RESIZE_SCALE);
-        //dom::NodePtr myNode = getNode();
-        //myNode->appendAttribute(IMAGE_SRC_ATTRIB,  myFileName);
-        //myNode->appendAttribute(IMAGE_RESIZE_ATTRIB,  "scale");
     }
 
     void

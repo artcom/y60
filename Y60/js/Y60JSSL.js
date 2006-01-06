@@ -713,6 +713,30 @@ function setWorldPosition(theBody, theWorldPosition) {
     theBody.position = product(theWorldPosition, myT);
 }
 
+function transformClipToWorld(theClipPos, theCamera) {
+    var myProjectionMatrix = new Matrix4f(window.projectionmatrix);
+    myProjectionMatrix.invert();
+    myProjectionMatrix.postMultiply(theCamera.globalmatrix);
+    return product(theClipPos, myProjectionMatrix);
+}
+
+function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera) 
+{
+    var myPosX = 2 * theScreenPixelX / window.width  - 1;
+    var myPosY = - (2 * theScreenPixelY / window.height - 1);
+    var myScreenPos = new Point3f(myPosX, myPosY, -1);
+    return transformClipToWorld(myScreenPos, theCamera);
+}
+
+function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theCamera) 
+{
+    var myScreenPos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera);
+    var myRay = new Ray(theCamera.position, myScreenPos);
+    print(myRay);
+    return intersection(myRay, new Planef(new Vector3f(0,0,-1), theZ));
+}
+
+
 function smoothstep(theEaseIn, theEaseOut, theInput) {
     if (theInput < theEaseIn) {
         return 0.0;
