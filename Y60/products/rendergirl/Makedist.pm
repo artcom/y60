@@ -19,13 +19,12 @@ sub runLocalMakedist($) {
 }
 
 sub runLocalMakeInstaller() {
-    my $myArguments = "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]SCRIPTS;[TARGETDIR]js\" \"[TARGETDIR]SCRIPTS/rendergirl.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"";
-    my $myFlighrecorderArguments = "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]SCRIPTS;[TARGETDIR]js\" \"[TARGETDIR]SCRIPTS/FlightRecorder.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"";
-    addShortcut("rendergirl", $myArguments, "acgtkshell.exe");
-    addFileType("rendergirl model", "x60", $myArguments, "acgtkshell.exe");
-    addFileType("rendergirl binary model", "b60", $myArguments, "acgtkshell.exe");
-    #addShortcut("flighrecorder", $myFlighrecorderArguments, "acgtkshell.exe");
-    addFileType("rendergirl flight", "f60", $myFlighrecorderArguments, "acgtkshell.exe");
+    my $myArguments = "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]SCRIPTS\" \"[TARGETDIR]SCRIPTS/rendergirl.js\" \"[TARGETDIR]/shaderlibrary.xml\" \"%1\"";
+    my $myFlighrecorderArguments = "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]SCRIPTS\" \"[TARGETDIR]SCRIPTS/FlightRecorder.js\" \"[TARGETDIR]/shaderlibrary.xml\" \"%1\"";
+    addShortcut("Rendergirl", $myArguments, "acgtkshell.exe");
+    addFileType("Rendergirl Model", "x60", $myArguments, "acgtkshell.exe");
+    addFileType("Rendergirl Binary Model", "b60", $myArguments, "acgtkshell.exe");
+    addFileType("Rendergirl Flight", "f60", $myFlighrecorderArguments, "acgtkshell.exe");
 }
 
 1;

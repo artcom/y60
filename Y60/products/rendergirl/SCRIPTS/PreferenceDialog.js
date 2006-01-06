@@ -79,7 +79,7 @@ PreferenceDialog.prototype.Constructor = function(self, theGladeHandle, theViewe
         if (fileExists(PREFERENCE_FILE_NAME)) {
             _myPreferenceDocument.parseFile(PREFERENCE_FILE_NAME);
         } else {
-            print("### WARNING: preference file '" + PREFERENCE_FILE_NAME + "' not found. Creating default preferences.");
+            //print("### WARNING: preference file '" + PREFERENCE_FILE_NAME + "' not found. Creating default preferences.");
             _myPreferenceDocument.appendChild(new Node.createElement("preferences"));
         }
 

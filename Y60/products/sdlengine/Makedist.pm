@@ -24,25 +24,14 @@ sub runLocalMakedist($) {
 }
 
 sub runLocalMakeInstaller() {
-    addShortcut("rendergirl",
-                "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/sv.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "y60.exe");
+    my $mySceneViewerArguments = "--pause-on-error -I \"[TARGETDIR];\" \"[TARGETDIR]/sv.js\" \"[TARGETDIR]/shaderlibrary.xml\" \"%1%\"";
+    my $myImageViewerArguments = "--pause-on-error -I \"[TARGETDIR];\" \"[TARGETDIR]/ImageViewer.js\" \"[TARGETDIR]/shaderlibrary.xml\" \"%1%\"";
 
-    addFileType("rendergirl model", "x60",
-                "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/sv.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "y60.exe");
-
-    addFileType("rendergirl binary model", "b60",
-                "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/sv.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "y60.exe");
-
-    addFileType("rendergirl movie", "m60",
-                "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/ImageViewer.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "y60.exe");
-
-    addFileType("rendergirl image", "i60",
-                "--pause-on-error -I \"[TARGETDIR];[TARGETDIR]js\" \"[TARGETDIR]js/ImageViewer.js\" \"[TARGETDIR]shader/shaderlibrary.xml\" \"%1\"",
-                "y60.exe");
+    addShortcut("Y60 Viewer", $mySceneViewerArguments, "y60.exe");
+    addFileType("Rendergirl Model", "x60", $mySceneViewerArguments, "y60.exe");
+    addFileType("Rendergirl Binary Model", "b60", $mySceneViewerArguments, "y60.exe");
+    addFileType("Rendergirl Movie", "m60", $myImageViewerArguments, "y60.exe");
+    addFileType("Rendergirl Image", "i60", $myImageViewerArguments,  "y60.exe");
 }
 
 1;

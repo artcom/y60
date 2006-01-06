@@ -8,7 +8,7 @@ DIST_BIN_DIR=${DIST_DIR}/c4d
 
 ################################ libraries ############################################
 
-Y60_LIBS="pthreadVC.dll"
+Y60_WIN_LIBS="pthreadVC.dll libcurl.dll libeay32.dll ssleay32.dll"
 
 WINDOWS_SYSTEM_LIBS="msvcp71.dll msvcp71d.dll msvcr71.dll msvcr71d.dll"
 WINDOWS_SYSTEM32_DIR="$SYSTEMROOT/system32"
@@ -38,7 +38,7 @@ copyFile res/Facbinaryexport.str "$DIST_BIN_DIR/Plugins/Y60/res/strings_us/descr
 copyFile res/Facxmlexport.str    "$DIST_BIN_DIR/Plugins/Y60/res/strings_us/description"
 
 echo "    Copy Y60 libraries"
-copySet $PRO/lib "$Y60_LIBS" $DIST_BIN_DIR
+copySet $PRO/lib "$Y60_WIN_LIBS" $DIST_BIN_DIR
 
 echo "    Copy windows system libraries"
 copySet $WINDOWS_SYSTEM32_DIR "$WINDOWS_SYSTEM_LIBS" $DIST_BIN_DIR

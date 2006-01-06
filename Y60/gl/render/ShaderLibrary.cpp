@@ -62,6 +62,7 @@ namespace y60 {
 
     void
     ShaderLibrary::load(const std::string & theLibraryFileName) {
+        AC_DEBUG << "Loading shader library: " << theLibraryFileName;
         string myShaderLibraryFileName = AppPackageManager::get().getPtr()->searchFile(theLibraryFileName);
         if (myShaderLibraryFileName.empty()) {
             throw ShaderLibraryException(string("Could not find library '") + theLibraryFileName + "' in " +
