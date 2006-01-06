@@ -146,6 +146,7 @@ write(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 peek(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Peek for available bytes at connected socket");
+    DOC_PARAM("theBufferSize", "Maximum number of bytes to be peeked at.", DOC_TYPE_INTEGER);
     DOC_RVAL("The number of bytes available", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::peek,cx,obj,argc,argv,rval);
