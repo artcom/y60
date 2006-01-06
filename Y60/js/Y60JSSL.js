@@ -732,7 +732,6 @@ function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, t
 {
     var myScreenPos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera);
     var myRay = new Ray(theCamera.position, myScreenPos);
-    print(myRay);
     return intersection(myRay, new Planef(new Vector3f(0,0,-1), theZ));
 }
 
