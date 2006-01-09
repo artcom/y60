@@ -588,7 +588,6 @@ SDLWindow::mainLoop() {
             HWND myRenderGirlWindow = FindWindow(0, myRenderGirlWindowName);
             isOnTop = (myTopWindow == myRenderGirlWindow);
         }
-        asl::Time myStartFrameTime;
 #endif
         onFrame();
 
@@ -617,9 +616,9 @@ SDLWindow::mainLoop() {
 
         asl::AGPMemoryFlushSingleton::get().resetGLAGPMemoryFlush();
 #ifdef WIN32
-        long long myFrameTimeInMillis = asl::Time().millis() -  myStartFrameTime.millis();
         if (_myAutoPauseFlag && isOnTop == false) {
-            asl::msleep(unsigned long(myFrameTimeInMillis) * 1); // sleep 100% of cpu framtime
+            unsigned long mySleepDuration = 40; // in millisec
+            asl::msleep(mySleepDuration); 
         }
 #endif
         if (jslib::JSApp::getQuitFlag() == JS_TRUE) {
