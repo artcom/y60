@@ -146,6 +146,7 @@ function TextButton(theScene, theId, theText,
     var Protected = {}
     ButtonBase(Public, Protected, theScene, theId,
                theSize, thePosition, theStyle, theParent);
+    Public.setText(theText);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
