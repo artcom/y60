@@ -37,9 +37,9 @@ namespace y60 {
 		init(theName, theCreateMipmapFlag);
 
     }
-	ImageBuilder::ImageBuilder(const std::string & theNodeName, 
-		                       const std::string & theName, 
-							   bool theCreateMipmapFlag) : BuilderBase(theNodeName) 
+	ImageBuilder::ImageBuilder(const std::string & theNodeName,
+		                       const std::string & theName,
+							   bool theCreateMipmapFlag) : BuilderBase(theNodeName)
 	{
 		init(theName, theCreateMipmapFlag);
 	}
@@ -73,19 +73,21 @@ namespace y60 {
 
 
     void
-    ImageBuilder::inlineImage(const std::string & theFileName, ImageFilter theFilter) {
+    ImageBuilder::inlineImage(const std::string & theFileName, ImageFilter theFilter, const std::string & theResizeMode) {
         MAKE_SCOPE_TIMER(ImageBuilder_inlineImage);
 
         ImagePtr myImage = getNode()->getFacade<Image>();
         myImage->set<ImageSourceTag>(theFileName);
         myImage->set<ImageFilterTag>(asl::getStringFromEnum(theFilter, ImageFilterStrings));
+        myImage->set<ImageResizeTag>(theResizeMode);
         myImage->load();
     }
 
     void
-    ImageBuilder::createFileReference(const std::string & theFileName) {
+    ImageBuilder::createFileReference(const std::string & theFileName, const std::string & theResizeMode) {
         ImagePtr myImage = getNode()->getFacade<Image>();
         myImage->set<ImageSourceTag>(theFileName);
+        myImage->set<ImageResizeTag>(theResizeMode);
     }
 
     void
@@ -94,7 +96,7 @@ namespace y60 {
     }
 
     void
-    ImageBuilder::setInternalFormat(const std::string & theType) {		
+    ImageBuilder::setInternalFormat(const std::string & theType) {
         getNode()->getAttribute(IMAGE_INTERNAL_FORMAT_ATTRIB)->nodeValue(theType);
     }
 

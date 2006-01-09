@@ -72,8 +72,9 @@ namespace y60 {
                                         bool  theCreateMipmapsFlag,
                                         const asl::Vector4f theColorScale,
                                         const asl::Vector4f theColorBias,
-                                        ImageType theType,										
+                                        ImageType theType,
 										const std::string & theInternalFormat,
+										const std::string & theResizeMode = IMAGE_RESIZE_SCALE,
                                         unsigned theDepth = 1);
 
 /*

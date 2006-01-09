@@ -124,7 +124,7 @@ namespace y60 {
 	        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, MAPPING_FEATURE, _myMappingRequirements, REQUIRES_LIST_NAME);
         }
 
-		
+
         // lighting feature
         if (!_myLightingRequirements.empty()) {
 	        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, LIGHTING_FEATURE, _myLightingRequirements, REQUIRES_LIST_NAME);
@@ -235,8 +235,9 @@ namespace y60 {
                                  bool  theCreateMipmapsFlag,
                                  asl::Vector4f theColorScale,
                                  asl::Vector4f theColorBias,
-                                 ImageType theType,										
+                                 ImageType theType,
 								 const std::string & theInternalFormat,
+								 const std::string & theResizeMode,
                                  unsigned theDepth)
     {
         std::string myFileName(theFileName);
@@ -269,9 +270,9 @@ namespace y60 {
             ImageFilter myFilter = lookupFilter(myUsage);
 
             if (_myInlineTextureFlag || myFilter != NO_FILTER) {
-                myImageBuilder.inlineImage(myFileName, myFilter);
+                myImageBuilder.inlineImage(myFileName, myFilter, theResizeMode);
             } else {
-                myImageBuilder.createFileReference(myFileName);
+                myImageBuilder.createFileReference(myFileName, theResizeMode);
             }
 			myImageBuilder.setInternalFormat(theInternalFormat);
 
@@ -346,7 +347,7 @@ namespace y60 {
                                           theColorScale, asl::Vector4f(0.0f,0.0f,0.0f,0.0f), CUBEMAP,
 										  "");
 		// default applay mode: TEXTURE_APPLY_DECAL
-        createTextureNode(myId, theApplyMode, TEXTURE_USAGE_ENVIRONMENT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, 
+        createTextureNode(myId, theApplyMode, TEXTURE_USAGE_ENVIRONMENT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP,
 						  Matrix4f::Identity(), 10.0f, false, 0.0f, false);
     }
 

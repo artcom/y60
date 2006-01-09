@@ -35,8 +35,8 @@ namespace y60 {
             DEFINE_EXCEPTION(ImageBuilderException, asl::Exception);
             ImageBuilder(const std::string & theName, bool theCreateMipmapFlag);
             virtual ~ImageBuilder();
-		    void inlineImage(const std::string & theFileName, ImageFilter theFilter);
-            void createFileReference(const std::string & myFileName);
+		    void inlineImage(const std::string & theFileName, ImageFilter theFilter, const std::string & theResizeMode);
+            void createFileReference(const std::string & myFileName, const std::string & theResizeMode);
 
             void setType(ImageType theType);
             void setColorScale(asl::Vector4f theColorScale);
