@@ -1,6 +1,4 @@
 #!/bin/bash -e
-#acgtkshell -I "SCRIPTS;$PRO/src/Y60/js;$PRO/src/Y60/shader;$PRO/lib" ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60
-#exit 0
 PASSED=0
 FAILED=0
 FAILED_IMAGES=""
@@ -27,6 +25,10 @@ compareSceneImages() {
 
 rm -f TEST_IMAGES/*
 rm -f TESTMODELS/*.x60
+
+cd ../maya-xport
+./install_maya
+cd -
 maya2x60 TESTMODELS/testcube.mb
 cp TESTMODELS/testcube.x60 TESTMODELS/test_save.x60
 acgtkshell -I "SCRIPTS;$PRO/src/Y60/js;$PRO/src/Y60/shader;$PRO/lib" ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60
