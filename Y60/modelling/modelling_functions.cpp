@@ -130,28 +130,7 @@ namespace y60 {
 
         return myShapeBuilder.getNode();
     }
-/*
-    dom::NodePtr
-    createDistanceMarkup(y60::ScenePtr theScene, const std::string & theMaterialId,
-                         const asl::Vector3f & thePointA,  const asl::Vector3f & thePointB,
-                         const std::string & theName)
-    {
-        ShapeBuilder myShapeBuilder(theName);
-        theScene->getSceneBuilder()->appendShape(myShapeBuilder);
-        myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE, 2);
-        myShapeBuilder.appendVertexData(POSITION_ROLE, thePointA);
-        myShapeBuilder.appendVertexData(POSITION_ROLE, thePointB);
 
-        ElementBuilder myElementBuilder(PRIMITIVE_TYPE_LINES, theMaterialId);
-        myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, 2);
-
-        myElementBuilder.appendIndex(POSITIONS, 0);
-        myElementBuilder.appendIndex(POSITIONS, 1);
-
-        myShapeBuilder.appendElements( myElementBuilder );
-        return myShapeBuilder.getNode();
-    }
-*/
     dom::NodePtr
     createAngleMarkup(y60::ScenePtr theScene, const std::string & theMaterialId,
                          const asl::Vector3f & theApex,
@@ -393,8 +372,6 @@ namespace y60 {
         theMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode, myUVMappingMode,
                                              Matrix4f::Identity(), myRanking, myIsFallback,
                                              myFallbackRanking, mySpriteFlag);
-
-        // theScene->update(Scene::IMAGES);
     }
 
     void
@@ -601,59 +578,6 @@ namespace y60 {
         for (unsigned int i=0; i < myNormals.size(); ++i) {
             myNormals[i] = normalized(myNormals[i]);
         }
-        //theShape->getFacade<Shape>()->setDirty(true);
     }
-
-
-/* XXX DS: Do we need this here? It has a very little chance being up to date!
-
-    - Texture
-    - Lighting
-    - Color
-
-GLOBAL
-"           <xs:attribute name='name' type='xs:string' />\n"
-"           <xs:attribute name='id'   type='xs:ID' />\n"
-"           <xs:attribute name='transparent' type='xs:boolean' />\n"
-"           <xs:attribute name='writedepthbuffer' type='xs:boolean' />\n"
-
-
-"               <xs:element ref='requires' />\n"
-"           <xs:attribute name='class' type='xs:IDREF' />\n"
-"           <xs:attribute name='values' type='VectorOfRankedFeature' />\n"
-
-"               <xs:element ref='properties' />\n"
-"               <xs:element ref='unsignedint' />\n"
-"               <xs:element ref='float' />\n"
-"               <xs:element ref='point3f' />\n"
-"               <xs:element ref='vector2f' />\n"
-"               <xs:element ref='vector3f' />\n"
-"               <xs:element ref='vector4f' />\n"
-"               <xs:element ref='vectorofvector2f' />\n"
-"               <xs:element ref='vectorofvector4f' />\n"
-"               <xs:element ref='vectorofstring' />\n"
-"               <xs:element ref='sampler2d' />\n"
-"               <xs:element ref='samplerCUBE' />\n"
-
-TEXTURES
-"               <xs:element ref='textures' />\n"
-"           <xs:attribute name='image' type='xs:IDREF' />\n"
-"           <xs:attribute name='applymode' type='xs:string' />\n"
-"           <xs:attribute name='wrapmode' type='xs:string' />\n"
-"           <xs:attribute name='sprite' type='xs:boolean' />\n"
-
-IMAGE
-"       <xs:attribute name='id' type='xs:ID' />\n"
-"       <xs:attribute name='name' type='xs:string' />\n"
-"       <xs:attribute name='src' type='xs:string' />\n"
-"       <xs:attribute name='matrix' type='Matrix4f' />\n"
-"       <xs:attribute name='type' type='xs:string' />\n"
-"       <xs:attribute name='alpha' type='xs:float' />\n"
-"       <xs:attribute name='mipmap' type='xs:boolean' />\n"
-"       <xs:attribute name='resize' type='xs:string' />\n"
-"       <xs:attribute name='filter' type='xs:string' />\n"
-"       <xs:attribute name='filter_params' type='VectorOfFloat' />\n"
-"       <xs:attribute name='tile' type='Vector2i' />\n"
-*/
 
 }

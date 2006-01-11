@@ -313,7 +313,7 @@ namespace y60 {
         const char * myMovieExtensions[] = {
             "m60", "mpg", "m2v", "avi", "mov", "mpeg", "wmv", 0
         };
-        for (unsigned int i = 0; ++i;) {
+        for (unsigned int i = 0; true; ++i) {
             if (myMovieExtensions[i]) {
                 if (myExtension == myMovieExtensions[i]) {
                     return true;
