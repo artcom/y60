@@ -171,6 +171,7 @@ namespace y60 {
     TransformHierarchyFacade::recalculateLocalMatrix() {
         PRINTMESSAGE(getNode(), "Recalculating local matrix (copy local to global) @ " << (Field*)(&*LocalMatrixTag::Plug::getValuePtr()), TTYRED);
         asl::Matrix4f myMatrix = Matrix4f::Identity(); 
+        myMatrix.translate(get<ShearTag>());
         myMatrix.scale(get<ScaleTag>());
         myMatrix.translate(-get<PivotTag>());
         Matrix4f myRotation(get<OrientationTag>());
