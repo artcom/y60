@@ -413,6 +413,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 } else {
                     myMover = self.getMover(myViewportUnderMouse);
                 }
+            } else {
+                if (_myClickedViewport) {
+                    myMover = self.getMover(_myClickedViewport);
+                } else {
+                    myMover = self.getMover();                     
+                }
             }
         }
         if (myMover) {
