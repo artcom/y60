@@ -58,11 +58,13 @@ using namespace dom;
 namespace y60 {
 
     void
-    assertCg(const std::string & theWhere) {
+    assertCg(const std::string & theWhere, const CGcontext theCgContext) {
         CGerror myCgError = cgGetError();
-        if (myCgError != CG_NO_ERROR) {
-            throw RendererException(std::string("Cg error: ") + cgGetErrorString(myCgError),
+        if (myCgError == CG_COMPILER_ERROR && theCgContext) {
+            throw RendererException(std::string("Cg compile error: ") + cgGetLastListing(theCgContext),
                     theWhere);
+        } else if (myCgError != CG_NO_ERROR) {
+            throw RendererException(cgGetErrorString(myCgError), theWhere);
         }
     }
 
@@ -88,9 +90,9 @@ namespace y60 {
                     &(*_myCachedCompilerArgs.begin()));
             DBP2(STOP_TIMER(CgProgramInfo_cgCreateProgramFromFile));
 
-            assertCg("CgProgramInfo::reloadProgram - createProgram");
+            assertCg("CgProgramInfo::reloadProgram - createProgram", _myContext);
 
-            //DK: we cannot keep a compiled version 
+            //DK: we cannot keep a compiled version
             //    because unsized arrays of size 0 are completely gone after compilation
             _myCgProgramString = cgGetProgramString(_myCgProgramID, CG_PROGRAM_SOURCE);
 
@@ -100,20 +102,13 @@ namespace y60 {
 
             cgDestroyProgram(_myCgProgramID);
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
-                    asCgProfile(_myShader), _myShader._myEntryFunction.c_str(), 
+                    asCgProfile(_myShader), _myShader._myEntryFunction.c_str(),
                     &(*_myCachedCompilerArgs.begin()));
 
         }
 
         CGerror myCgError = cgGetError();
-        if (myCgError != CG_NO_ERROR) {
-            std::string myErrorMessage = "Cg error loading '" + _myShader._myEntryFunction +
-                "' from " + _myPathName + ": " + cgGetErrorString(myCgError);
-            if (myCgError == CG_COMPILER_ERROR) {
-                myErrorMessage += "\n" + std::string(cgGetLastListing(_myContext));
-            }
-            throw RendererException(myErrorMessage, "CgProgramInfo::CgProgramInfo()");
-        }
+        assertCg(PLUS_FILE_LINE, _myContext);
         DBP2(START_TIMER(CgProgramInfo_processParameters));
         processParameters();
         DBP2(STOP_TIMER(CgProgramInfo_processParameters));
@@ -146,7 +141,7 @@ namespace y60 {
     void
     CgProgramInfo::load() {
         cgGLLoadProgram(_myCgProgramID);
-        assertCg("CgProgramInfo::load()");
+        assertCg("CgProgramInfo::load()", _myContext);
     }
 
     CgProgramInfo::~CgProgramInfo() {
@@ -156,7 +151,7 @@ namespace y60 {
                 cgDestroyProgram(_myCgProgramID);
             }
         }
-        assertCg("CgProgramInfo::~CgProgramInfo()");
+        assertCg("CgProgramInfo::~CgProgramInfo()", _myContext);
     }
 
     void
@@ -177,7 +172,7 @@ namespace y60 {
             CGtype myParameterType    = cgGetParameterType(myParam);
             AC_DEBUG << "processing " << myParamName;
 
-            assertCg("CgProgramInfo::processParameters() - 1");
+            assertCg(PLUS_FILE_LINE, _myContext);
 
             // scan for reserved GL_ prefix in uniform parameters
             if (myParamName.compare(0, 3, "GL_") == 0) {
@@ -240,19 +235,19 @@ namespace y60 {
                         AC_DEBUG << "setting array " << myParamName << " to size " << myArraySize;
 
                         CGtype myArrayType = cgGetArrayType(myParam);
-                        CGparameter myArray 
+                        CGparameter myArray
                             = cgCreateParameterArray(_myContext, myArrayType, myArraySize);
-                        assertCg(PLUS_FILE_LINE);
+                        assertCg(PLUS_FILE_LINE, _myContext);
 
                         for(int i = 0; i <  myArraySize; ++i) {
 
-                            CGparameter myArrayElement 
+                            CGparameter myArrayElement
                                 = cgCreateParameter(_myContext, myArrayType);
                             cgConnectParameter(myArrayElement, cgGetArrayParameter(myArray, i));
                         }
 
                         cgConnectParameter(myArray, myParam);
-                        assertCg("CgProgramInfo::processParameters() unsized array");
+                        assertCg(PLUS_FILE_LINE, _myContext);
                         AC_DEBUG << "done. created unsized array of size " << myArraySize;
                     }
                 }
@@ -268,7 +263,7 @@ namespace y60 {
                         = CgProgramAutoParam(myParamName, myParam, myParamID, myParameterType);
 
                 } else {
-                    AC_WARNING << "skipping non-referenced AC-CG parameter " 
+                    AC_WARNING << "skipping non-referenced AC-CG parameter "
                         << myParamName << endl;
                 }
             }
@@ -279,23 +274,23 @@ namespace y60 {
                     myParameterType == CG_SAMPLERCUBE ) {
                 _myTextureParams.push_back(CgProgramTextureParam(myParamName, myParam));
             }
-            assertCg("CgProgramInfo::processParameters() - 2");
+            assertCg(PLUS_FILE_LINE, _myContext);
         }
-        assertCg("CgProgramInfo::processParameters()");
+        assertCg(PLUS_FILE_LINE, _myContext);
     }
 
     void
     CgProgramInfo::enableProfile() {
         //AC_TRACE << "enabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
         cgGLEnableProfile(asCgProfile(_myShader));
-        assertCg("CgProgramInfo::enableProfile()");
+        assertCg(PLUS_FILE_LINE, _myContext);
     }
 
     void
     CgProgramInfo::disableProfile() {
         //AC_TRACE << "disabled CgProfile(" << asCgProfile(_myShader) << ")" << endl;
         cgGLDisableProfile(asCgProfile(_myShader));
-        assertCg("CgProgramInfo::disableProfile()");
+        assertCg(PLUS_FILE_LINE, _myContext);
     }
 
     void CgProgramInfo::setCGGLParameters() {
@@ -306,14 +301,14 @@ namespace y60 {
             cgGLSetStateMatrixParameter(myParam._myParameter,
                                         myParam._myStateMatrixType,
                                         myParam._myTransform);
-            assertCg("CgProgramInfo::setCGGLParameters()");
+            assertCg(PLUS_FILE_LINE, _myContext);
         }
     }
-    
+
     bool
     CgProgramInfo::reloadIfRequired(
             const LightVector & theLightInstances,
-            const MaterialBase & theMaterial) 
+            const MaterialBase & theMaterial)
     {
         DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_reloadIfRequired));
         //AC_DEBUG << "reloadIfRequired";
@@ -387,7 +382,7 @@ namespace y60 {
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
             createAndCompileProgram();
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
-            
+
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_load));
             cgGLLoadProgram(_myCgProgramID);
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_load));
@@ -407,7 +402,7 @@ namespace y60 {
         return myReload;
 
     }
-            
+
     void
     CgProgramInfo::bindBodyParams(
             const LightVector & theLightInstances,
@@ -421,7 +416,7 @@ namespace y60 {
         setCGGLParameters();
         setAutoParameters(theLightInstances, theViewport, theBody, theCamera);
     }
-    
+
     void
     CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
         AC_DEBUG << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
@@ -489,8 +484,8 @@ namespace y60 {
 
 
         // set parameter values
-        for (CgProgramAutoParams::iterator myIter = _myAutoParams.begin(); 
-                myIter != _myAutoParams.end(); ++myIter) 
+        for (CgProgramAutoParams::iterator myIter = _myAutoParams.begin();
+                myIter != _myAutoParams.end(); ++myIter)
         {
             bool myParamValueFoundFlag = true;
 
@@ -572,7 +567,7 @@ namespace y60 {
     }
 
     void
-    CgProgramInfo::setCgMaterialParameter(CGparameter & theCgParameter, 
+    CgProgramInfo::setCgMaterialParameter(CGparameter & theCgParameter,
                                           const dom::Node & theNode,
                                           const std::string & thePropertyName,
                                           const MaterialBase & theMaterial)
@@ -645,7 +640,7 @@ namespace y60 {
                         "CGShader::setCgParameter()");
         }
 
-        assertCg("setCgMaterialParameter");
+        assertCg(PLUS_FILE_LINE, 0);
     }
 
     void
@@ -666,7 +661,7 @@ namespace y60 {
                 throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                         + " should be FLOAT3 or FLOAT4.", "CgProgramInfo::setCgVectorParameter()");
         }
-        assertCg(string("setting auto parameter ") + theParam._myName);
+        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -684,7 +679,7 @@ namespace y60 {
                 throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                         + " should be FLOAT3 or FLOAT4.", "CgProgramInfo::setCgVectorParameter()");
         }
-        assertCg(string("setting auto parameter ") + theParam._myName);
+        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -696,7 +691,7 @@ namespace y60 {
                     + " should be FLOAT4x4.", "CgProgramInfo::setCgVectorParameter()");
         }
         cgGLSetMatrixParameterfc(theParam._myParameter, theValue.getData());
-        assertCg(string("setting auto parameter ") + theParam._myName);
+        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -714,7 +709,7 @@ namespace y60 {
             throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                     + " should be FLOAT3[].", "CgProgramInfo::setCgArrayVector3fParameter()");
         }
-        assertCg(string("setting auto parameter ") + theParam._myName);
+        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -731,11 +726,11 @@ namespace y60 {
             throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                     + " should be FLOAT4[].", "CgProgramInfo::setCgArrayVector4fParameter()");
         }
-        assertCg(string("setting auto parameter ") + theParam._myName);
+        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
-    CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, 
+    CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam,
                                               const vector<asl::Vector3f> & theValue)
     {
         int mySize = cgGetArraySize(theParam._myParameter, 0);
@@ -744,11 +739,11 @@ namespace y60 {
             //AC_DEBUG << "setting component " << i << " to " << theValue[i];
             cgSetParameter3f(myElement, theValue[i][0], theValue[i][1], theValue[i][2]);
         }
-        assertCg(string("setting auto parameter ") + theParam._myName);
+        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
-    CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, 
+    CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam,
                                               const vector<asl::Vector4f> & theValue)
     {
         int mySize = cgGetArraySize(theParam._myParameter, 0);
@@ -757,7 +752,7 @@ namespace y60 {
             //AC_DEBUG << "setting component " << i << " to " << theValue[i];
             cgSetParameter4f(myElement, theValue[i][0], theValue[i][1], theValue[i][2], theValue[i][3]);
         }
-        assertCg(string("setting auto parameter ") + theParam._myName);
+        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -766,7 +761,7 @@ namespace y60 {
         CHECK_OGL_ERROR;
         DB(AC_TRACE << "binding " << _myShader._myEntryFunction << ":" <<_myCgProgramID << endl;)
         cgGLBindProgram(_myCgProgramID);
-        assertCg(string("CgProgramInfo::bind()") + _myPathName);
+        assertCg(string("CgProgramInfo::bind()") + _myPathName, _myContext);
     }
 
     void

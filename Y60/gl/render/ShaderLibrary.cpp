@@ -46,13 +46,13 @@ namespace y60 {
 
 	ShaderLibrary::ShaderLibrary():_myCgContext(0)  {
         _myCgContext = cgCreateContext();
-        assertCg("ShaderLibrary::ShaderLibrary() - cgCreateContext()");
+        assertCg("ShaderLibrary::ShaderLibrary() - cgCreateContext()", _myCgContext);
     }
 
     ShaderLibrary::~ShaderLibrary()  {
         _myShaders.clear(); // destroy all shaders first
         cgDestroyContext(_myCgContext);
-        assertCg("ShaderLibrary::~ShaderLibrary() - cgDestroyContext()");
+        assertCg("ShaderLibrary::~ShaderLibrary() - cgDestroyContext()", _myCgContext);
     }
 
     CGcontext
