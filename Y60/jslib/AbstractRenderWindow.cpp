@@ -120,8 +120,14 @@ namespace jslib {
             _myScene = theScene;
             _myRenderer->setCurrentScene(_myScene);
 
-            setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
-
+            //set canvas automatically only if the scene has a single canvas (dk)
+            if (_myScene->getCanvasRoot()->childNodesLength() == 1) {                
+                dom::NodePtr myCanvas = _myScene->getCanvasRoot()->childNode("canvas");
+                setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
+            } else {
+                AC_INFO << "theScene has multiple canvases. No canvas set automatically.";
+            }
+                
             for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
                 std::string myName = (*it)->getName() + "::onSceneLoaded";
                 try {
@@ -205,6 +211,7 @@ namespace jslib {
         if (theCanvas) {
             unsetCanvas();
             CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
+            AC_DEBUG << "AbstractRenderWindow::setCanvas setting canvas to " << myCanvas->get<IdTag>();
             if (myCanvas->setFrameBuffer(_mySelf.lock())) {
                 _myCanvas = theCanvas;
                 return true;
