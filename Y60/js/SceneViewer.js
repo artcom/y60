@@ -474,10 +474,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             }
 
             for (var i = 0; i < myText.length; ++i) {
-                window.setTextColor([0.1,0.1,0.1,1], [1,1,1,1]);
-                window.renderText([window.width - 161, 19 + (i * 15)], myText[i], "Screen8");
-                window.setTextColor([0.9,0.9,0.9,1], [1,1,1,1]);
-                window.renderText([window.width - 160, 20 + (i * 15)], myText[i], "Screen8");
+                window.setTextColor([0,0,0,1], [1,1,1,1]);
+                window.renderText([window.width - 161, 19 + (i * 15)], myText[i], "Screen13");
+                window.setTextColor([1,1,1,1], [1,1,1,1]);
+                window.renderText([window.width - 160.8, 19.2 + (i * 15)], myText[i], "Screen13");
             }
         }
     }

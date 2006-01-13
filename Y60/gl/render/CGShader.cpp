@@ -43,13 +43,15 @@ using namespace y60;
 
 namespace y60 {
 
+/*
 #define checkCgError() { \
     CGerror myCgError = cgGetError(); \
     if (myCgError != CG_NO_ERROR) { \
         throw ShaderException(std::string("Cg error: ") + cgGetErrorString(myCgError), \
                 PLUS_FILE_LINE); \
     } \
-} 
+}
+*/
 
     CGShader::CGShader(const dom::NodePtr theNode) : GLShader(theNode)
     {
@@ -81,15 +83,15 @@ namespace y60 {
             throw ShaderException("CGShader::compile() - Dynamic cast of IShaderLibrary failed",
                                   PLUS_FILE_LINE);
         }
-        checkCgError();
- 
+        assertCg(PLUS_FILE_LINE, myShaderLibrary->getCgContext());
+
         // compile fragment shader
         if (!_myFragmentProgram) {
             DB(AC_TRACE << "CGShader::loadShader(): Loading fragment shader from file '"
                     << _myFragmentShader._myFilename << "'");
             _myFragmentProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myFragmentShader,
                     myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
-            checkCgError();
+            assertCg(PLUS_FILE_LINE, myShaderLibrary->getCgContext());
         }
 
         // compile vertex shader
@@ -98,7 +100,7 @@ namespace y60 {
                     << _myVertexShader._myFilename << "'");
             _myVertexProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myVertexShader,
                     myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
-            checkCgError();
+            assertCg(PLUS_FILE_LINE, myShaderLibrary->getCgContext());
         }
 
         AC_DEBUG << "Successfully compiled '" << getName() << "'";
@@ -106,7 +108,7 @@ namespace y60 {
 
     void CGShader::load(IShaderLibrary & theShaderLibrary) {
         compile(theShaderLibrary);
- 
+
         // load fragment shader
         if (_myFragmentProgram) {
             _myFragmentProgram->load();

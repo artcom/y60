@@ -280,6 +280,8 @@ static JSBool
 CreateTexturedMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates a textured, unlit material.");
     DOC_PARAM("theTextureFilename", "", DOC_TYPE_STRING);
+    DOC_RESET;
+    DOC_PARAM("theImageNode", "A image node that should be attached to the material", DOC_TYPE_NODE);
     DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
     DOC_END;
     try {
@@ -287,9 +289,18 @@ CreateTexturedMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
         JSScene::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         dom::NodePtr myResult;
-        string myTextureFilename;
-        convertFrom(cx, argv[0], myTextureFilename);
-        myResult = y60::createUnlitTexturedMaterial(myNative, myTextureFilename);
+        dom::NodePtr myImageNode;
+        if (convertFrom(cx, argv[0], myImageNode)) {
+            myResult = y60::createUnlitTexturedMaterial(myNative, myImageNode);
+        } else {
+            string myTextureFilename;
+            if (convertFrom(cx, argv[0], myTextureFilename)) {
+                myResult = y60::createUnlitTexturedMaterial(myNative, myTextureFilename);
+            } else {
+                JS_ReportError(cx, "JSScene::createTexturedMaterial(): argument #1 must be a string (File path) or a image node");
+                return JS_FALSE;
+            }
+        }
         *rval = as_jsval(cx, myResult);
         return JS_TRUE;
 

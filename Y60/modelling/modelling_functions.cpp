@@ -451,6 +451,36 @@ namespace y60 {
         return myMaterialBuilder.getNode();
     }
 
+
+    dom::NodePtr
+    createUnlitTexturedMaterial(ScenePtr theScene, dom::NodePtr theImageNode,
+                                const std::string & theName, bool theTransparencyFlag, bool theSpriteFlag, const Vector4f & theColor)
+    {
+        MaterialBuilder myMaterialBuilder(theName, false);
+        string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
+        myMaterialBuilder.setTransparencyFlag(theTransparencyFlag);
+        appendUnlitProperties(myMaterialBuilder, theColor);
+        appendBlendFunction(myMaterialBuilder);
+
+        // Texture code
+        string myApplyMode         = TEXTURE_APPLY_MODULATE;
+        string myUsage             = TEXTURE_USAGE_PAINT;
+        string myWrapMode          = TEXTURE_WRAP_CLAMP;
+		string myUVMappingMode     = TEXCOORD_UV_MAP;
+        float myRanking            = 100.0f;
+        bool myIsFallback          = true;
+        float myFallbackRanking    = 100.0f;
+        bool  mySpriteFlag         = theSpriteFlag;
+
+        string myImageId = theImageNode->getAttributeString(ID_ATTRIB);
+        myMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode, myUVMappingMode,
+                                             Matrix4f::Identity(), myRanking, myIsFallback,
+                                             myFallbackRanking, mySpriteFlag);
+
+        myMaterialBuilder.computeRequirements();
+        return myMaterialBuilder.getNode();
+    }
+
     dom::NodePtr
     createUnlitTexturedMaterial(ScenePtr theScene, const std::string & theTextureFilename,
                                 const std::string & theName, bool theTransparencyFlag, bool theSpriteFlag,
