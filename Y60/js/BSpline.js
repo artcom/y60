@@ -13,12 +13,18 @@
  * @author Christian Hardenberg
  */
 
+use("Exception.js");
+
 /**
  * Constructs a new BSpline object
- */
-function BSpline() {
+ *   @param {Vector3f} theStart       Startpunkt
+ *   @param {Vector3f} theStartHandle Anfasser-Startpunkt
+ *   @param {Vector3f} theEnd         Endpunkt
+ *   @param {Vector3f} theEndHandle   Anfasser-Endpunkt
+ **/
+function BSpline(theStart, theStartHandle, theEnd, theEndHandle) {
     /**
-     * Gets the point array of the BSpline
+     * Gets the point array of the BSpline, call calculate to create the point array
      * @return {ArrayOfPoint3f} The point array
      */
     this.getResult = function() {
@@ -30,10 +36,9 @@ function BSpline() {
      *   @param {integer}  theResolution  Anzahl der schritte, von anfang bis ende
      *   @param {float}    theEaseIn      Wert zwischen 0 und 1. 1 für maximales theEaseIn
      *   @param {float}    theEaseOut     Wert zwischen 0 und 1. 1 für maximales theEaseOut
-     * @return {ArrayOfPoint3f} The point array
+     *   @return {ArrayOfPoint3f} The point array
      **/
-    this.calculate = function(theResolution, theEaseIn, theEaseOut)
-    {
+    this.calculate = function(theResolution, theEaseIn, theEaseOut) {
         if (_myPolyCoefs == null) {
             throw new Exception("you need to call setup first", fileline());
         }
@@ -49,40 +54,22 @@ function BSpline() {
         return _myResult;
     }
 
-    this.setupFromPoints = function(thePoints, theSize)
-    {
+    this.setupFromPoints = function(thePoints, theSize) {
         var myDir1 = product(normalized(difference(thePoints[2], thePoints[0])), theSize);
         var myStartHandle = sum(thePoints[1], myDir1);
         var myDir2 = product(normalized(difference(thePoints[1], thePoints[3])), theSize);
         var myEndHandle   = sum(thePoints[2], myDir2);
 
-        this.setup(thePoints[1], myStartHandle, thePoints[2], myEndHandle);
+        setup(thePoints[1], myStartHandle, thePoints[2], myEndHandle);
     }
 
     /**
-     *   Setup the BSpline point array
-     *   @param {Vector3f} theStart       Startpunkt
-     *   @param {Vector3f} theStartHandle Anfasser-Startpunkt
-     *   @param {Vector3f} theEnd         Endpunkt
-     *   @param {Vector3f} theEndHandle   Anfasser-Endpunkt
+     *   Calculates the a point along the spline
+     *   @param {float} theCurveParameter Position along the curve (between 0 and 1)
+     *   @param {float} theEaseIn Ease in between zero and one (optional)
+     *   @param {float} theEaseOut Ease out between zero and one (optional)
+     *   @return {Vector3f} The point
      **/
-    this.setup = function(theStart, theStartHandle, theEnd, theEndHandle) {
-        _myPolyCoefs = [];
-
-        // b-Funktion
-        for (var i = 0;i < 4; ++i) {
-            _myPolyCoefs[i] = [];
-        }
-
-        for (var j = 0; j < _myDimensionCount; j++) {
-            _myPolyCoefs[0][j] = theStart[j];
-            _myPolyCoefs[1][j] = 3 * (theStartHandle[j] - theStart[j]);
-            _myPolyCoefs[2][j] = 3 * (theEndHandle[j] - theStartHandle[j]) - _myPolyCoefs[1][j];
-            _myPolyCoefs[3][j] = theEnd[j] - theStart[j] - _myPolyCoefs[1][j] - _myPolyCoefs[2][j];
-        }
-        _myArcLength = null;
-    }
-
     this.evaluate = function(theCurveParameter, theEaseIn, theEaseOut) {
         if (theEaseIn != null && theEaseOut != null) {
             theEaseOut = 1 - theEaseOut;
@@ -91,6 +78,10 @@ function BSpline() {
         return getValue(theCurveParameter);
     }
 
+    /**
+     *   Calculates the arc length of the spline. Caches result
+     *   @return {float} The arc length
+     **/
     this.getArcLength = function() {
         if (_myArcLength == null) {
             var myP1 = this.evaluate(0);
@@ -100,9 +91,30 @@ function BSpline() {
         return _myArcLength;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // Private
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    function setup(theStart, theStartHandle, theEnd, theEndHandle) {
+        _myPolyCoefs = [];
+
+        // b-Funktion
+        for (var i = 0;i < 4; ++i) {
+            _myPolyCoefs[i] = [];
+        }
+
+        for (var j = 0; j < 3; j++) {
+            _myPolyCoefs[0][j] = theStart[j];
+            _myPolyCoefs[1][j] = 3 * (theStartHandle[j] - theStart[j]);
+            _myPolyCoefs[2][j] = 3 * (theEndHandle[j] - theStartHandle[j]) - _myPolyCoefs[1][j];
+            _myPolyCoefs[3][j] = theEnd[j] - theStart[j] - _myPolyCoefs[1][j] - _myPolyCoefs[2][j];
+        }
+        _myArcLength = null;
+    }
+
     function getValue(t) {
         var myPoint = new Vector3f();
-        for (var j = 0; j < _myDimensionCount; j++) {
+        for (var j = 0; j < 3; j++) {
             myPoint[j] = _myPolyCoefs[3][j] * t*t*t
                 + _myPolyCoefs[2][j] * t*t
                 + _myPolyCoefs[1][j] * t
@@ -126,12 +138,15 @@ function BSpline() {
         return myL1 + myL2;
     }
 
-    const _myDimensionCount = 3;
     var _myResult = [];
     var _myPolyCoefs = null;
     var _myArcLength;
 
     var self = this;
+
+    if (theStart != undefined) {
+        setup(theStart, theStartHandle, theEnd, theEndHandle);
+    }
 }
 
 
