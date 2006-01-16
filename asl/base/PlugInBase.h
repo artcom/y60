@@ -10,19 +10,19 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
 //
-// Description:  misc operating system & environment helper functions
+// Description:  basic plugin interface
 //
-// Last Review: pavel 30.11.2005 
+// Last Review: pavel 8.12.2005 
 //
 //  review status report: (perfect, ok, fair, poor, disaster)
 //    usefullness            : ok
 //    formatting             : ok
-//    documentation          : poor (not yet doxygenized)
+//    documentation          : poor
 //    test coverage          : poor
 //    names                  : ok
 //    style guide conformance: ok
 //    technical soundness    : ok
-//    dead code              : ok
+//    dead code              : poor
 //    readability            : ok
 //    understandabilty       : ok
 //    interfaces             : ok
@@ -31,12 +31,11 @@
 //    dependencies           : ok
 //    cheesyness             : ok
 //
-//    overall review status  : poor
+//    overall review status  : fair
 //
 //    recommendations:
-//       - doxygenize documentation
-//       - add missing tests
-//       - unify names with styleguide in mind
+//       - write documentation
+//       - add some tests
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
