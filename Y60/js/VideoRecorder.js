@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2004, ART+COM AG Berlin
+// Copyright (C) 2004-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,57 +7,47 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: VideoRecoder.js,v $
-//   $Author: valentin $
-//   $Revision: 1.2 $
-//   $Date: 2005/03/08 13:48:38 $
-//
-//=============================================================================
 
-function VideoRecoder(theDirectory, theFrameRate) {
-    this.Constructor(this, theDirectory, theFrameRate)
+use("Y60JSSL.js");
+
+function VideoRecorder(theFramesPerSecond, theDirectory, thePrefix) {
+    this.Constructor(this, theFramesPerSecond, theDirectory, thePrefix)
 }
 
-VideoRecoder.prototype.Constructor = function(obj, theDirectory, theFrameRate) {
+VideoRecorder.prototype.Constructor = function(self, theFramesPerSecond, theDirectory, thePrefix)
+{
+    var _myEnabled       = true;
+    var _myFrameCount    = 0;
+    var _myNextFrameTime = 0.0;
+    var _myFrameDelta    = (theFramesPerSecond ? (1.0 / theFramesPerSecond) : 0.0);
 
-    var _myDirectory         = theDirectory;
-    var _myFrameTime         = 1 / theFrameRate;
-    var _myEnabled           = false;
-    var _myTime              = 0;
-    var _myScreenShotCounter = 0;
+    var _myDirectory     = (theDirectory ? theDirectory : "frames");
+    var _myPrefix        = (thePrefix ? thePrefix : "frame");
 
-    obj.onFrame = function(theTime) {
-        if (_myEnabled) {
-            _myTime += _myFrameTime;
+    self.setEnable = function(theEnableFlag) {
+        _myEnabled = theEnableFlag;
+    }
 
-            var myFileName = _myDirectory + "/";
-            if (_myScreenShotCounter < 10) {
-                myFileName += "000";
-            } else if (_myScreenShotCounter < 100) {
-                myFileName += "00";
-            } else if (_myScreenShotCounter < 1000) {
-                myFileName += "0";
-            }
+    self.getEnable = function() {
+        return _myEnabled;
+    }
 
-            myFileName += _myScreenShotCounter++ + ".png";
-
+    self.onFrame = function(theTime) {
+        if (_myEnabled && theTime >= _myNextFrameTime) {
+            var myFileName = _myDirectory + "/" + _myPrefix;
+            myFileName += padStringFront(_myFrameCount++, "0", 5);
+            myFileName += ".png";
             window.saveBuffer(myFileName);
-        } else {
-            _myTime = theTime;
-        }
-
-        return _myTime;
-    }
-
-    obj.onKey = function(theKey, theState) {
-        if (theState) {
-            switch (theKey) {
-                case 'R':
-                    print((_myEnabled ? "Disable" : "Enable") + " video recording.");
-                    _myEnabled = !_myEnabled;
-                    break;
-            }
+            _myNextFrameTime = theTime + _myFrameDelta;
         }
     }
+
+    function setup() {
+        if (!fileExists(_myDirectory)) {
+            Logger.warning("Creating directory '" + _myDirectory + "'");
+            createDirectory(_myDirectory);
+        }
+    }
+
+    setup();
 }

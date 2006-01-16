@@ -314,8 +314,13 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         if (!_myWMVPlugged &&
             (myFilename.search(/\.wmv$/i) != -1 ||
              myFilename.search(/\.avi$/i) != -1)) {
-            plug("y60WMVDecoder");
-            _myWMVPlugged = true;
+            if (OS == "Win32") {
+                plug("y60WMVDecoder");
+                _myWMVPlugged = true;
+            } else {
+                plug("y60FFMpegDecoder2");
+                _myMPEGPlugged = true;
+            }
         }
         if (!_myWMAPlugged &&
             (myFilename.search(/\.wma$/i) != -1 ||
