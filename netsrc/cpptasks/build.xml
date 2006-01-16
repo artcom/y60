@@ -17,21 +17,12 @@ Copyright 2001-2004 The Ant-Contrib project
 -->
 <project default="jars" basedir=".">
 
-  <path id="compile.classpath">
-    <fileset dir="/usr/share/ant-core/lib">
-      <include name="*.jar"/>
-    </fileset>
-    <fileset dir="/usr/share/xerces-2/lib">
-      <include name="*.jar"/>
-    </fileset>
-  </path>
-
   <!-- Give user a chance to override without editing this file
        (and without typing -D each time it compiles it) -->
 
   <property name="Name" value="cpptasks"/>
   <property name="name" value="cpptasks"/>
-  <property name="version" value="1.0b4"/>
+  <property name="version" value="1.0b3"/>
 
   <property name="debug" value="true" />
   <property name="deprecation" value="false" />
@@ -117,12 +108,12 @@ Copyright 2001-2004 The Ant-Contrib project
                         <format type="html"/>
                 </current>
         </clover-report>
-
+	
         <replace dir="${build.dir}/coverage/report"
             includes="**/*.html"
             token='Ant-Contrib Tasks only. &lt;/td&gt;'
         	value='Ant-Contrib Tasks only. &lt;/td&gt;&lt;td&gt;&lt;a target="_parent" href="http://sourceforge.net"&gt;&lt;img src="http://sourceforge.net/sflogo.php?group_id=36177&amp;amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo" /&gt;&lt;/a&gt;&lt;/td&gt;'/>
-
+		
 </target>
 
   <!--
@@ -130,7 +121,6 @@ Copyright 2001-2004 The Ant-Contrib project
          Build the code
        ===================================================================
   -->
-  
   <target name="build"
           depends="prepare"
           description="--> compiles the source code">
@@ -139,10 +129,8 @@ Copyright 2001-2004 The Ant-Contrib project
            destdir="${build.classes}"
            debug="${debug}"
            target="1.1"
-           source="1.3"
            deprecation="${deprecation}"
            optimize="${optimize}" >
-           <classpath refid="compile.classpath"/> 
     </javac>
   </target>
 
@@ -158,12 +146,12 @@ Copyright 2001-2004 The Ant-Contrib project
     <jar jarfile="${build.lib}/${name}.jar" manifest="${src.dir}/cpptasks.mf">
                  <fileset dir="." includes="LICENSE NOTICE"/>
          <fileset dir="${build.classes}"/>
-                 <fileset dir="${src.dir}" includes="cpptasks.tasks,cpptasks.types,net/sf/antcontrib/cpptasks/antlib.xml"/>
+                 <fileset dir="${src.dir}" includes="cpptasks.tasks,cpptasks.types"/>
     </jar>
   </target>
 
     <target name="junit-warning" depends="prepare" unless="junit-available">
-        <fail message="junit.jar is required in Ant's lib directory to build this target.  Download from http://www.junit.org"/>
+        <fail message="junit.jar is required in Ant's lib directory to build this target.  Downloade from http://www.junit.org"/>
     </target>
 
 
@@ -175,7 +163,6 @@ Copyright 2001-2004 The Ant-Contrib project
            debug="true"
            deprecation="false"
            target="1.1"
-           source="1.3"
            optimize="false"
            classpath="${build.lib}/${name}.jar;${java.class.path}"/>
     <jar jarfile="${tests.build.lib}/${name}_test.jar">
@@ -218,7 +205,7 @@ Copyright 2001-2004 The Ant-Contrib project
 
         </junit>
   </target>
-
+	
   <target name="run-devstudio-tests"  depends="build-tests">
         <junit printsummary="true" haltonfailure="true">
             <classpath>
@@ -373,16 +360,6 @@ Copyright 2001-2004 The Ant-Contrib project
                 <include name="net/sf/antcontrib/cpptasks/ArchEnum.java"/>
                 <include name="net/sf/antcontrib/cpptasks/OSFamilyEnum.java"/>
                 <include name="net/sf/antcontrib/cpptasks/OptimizationEnum.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/WarningLevelEnum.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/trolltech/*.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/mozilla/*.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/openwatcom/*.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/platforms/*.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/platforms/*.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/ide/*.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/borland/CBuilderXProjectWriter.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/devstudio/DevStudioProjectWriter.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/devstudio/VisualStudioNETProjectWriter.java"/>
         </fileset>
             <fileset dir="${tests.java.dir}">
                     <include name="net/sf/antcontrib/cpptasks/parser/TestFortranParser.java"/>
@@ -392,11 +369,6 @@ Copyright 2001-2004 The Ant-Contrib project
                     <include name="net/sf/antcontrib/cpptasks/TestLinkerDef.java"/>
                     <include name="net/sf/antcontrib/cpptasks/types/TestLibrarySet.java"/>
                     <include name="net/sf/antcontrib/cpptasks/types/TestLibrarySet.java"/>
-            	    <include name="net/sf/antcontrib/cpptasks/TestCCTask.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/trolltech/TestMetaObjectParser.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/mozilla/*.java"/>
-        	    <include name="net/sf/antcontrib/cpptasks/openwatcom/*.java"/>
-            	<include name="net/sf/antcontrib/cpptasks/platforms/*.java"/>
             </fileset>
     </checkstyle>
   </target>
@@ -420,11 +392,6 @@ Copyright 2001-2004 The Ant-Contrib project
   -->
   <target name="xdocs" depends="xdocs-cctask-warning,xdocs-build-warning">
 
-        <condition property="shellcmd" value="cmd">
-            <os family="windows"/>
-         </condition>
-         <property name="shellcmd" value="sh"/>
-
         <mkdir dir="${build.dir}/xdocs"/>
         <ant dir="${xdocs.dir}" target="gen" inheritAll="false">
             <property name="src.dir" location="${src.dir}/net/sf/antcontrib/cpptasks"/>
@@ -446,8 +413,7 @@ Copyright 2001-2004 The Ant-Contrib project
             <property name="build.dir" location="${build.dir}/xdocs"/>
         </ant>
         -->
-        <exec dir="${xdocs.dir}" executable="${shellcmd}">
-            <arg value="ant"/>
+        <exec dir="${xdocs.dir}" executable="ant.bat">
             <arg value="docs"/>
         </exec>
         <copy todir="${build.dir}/xdocs">
@@ -455,7 +421,7 @@ Copyright 2001-2004 The Ant-Contrib project
         </copy>
 
         <!--  Replace Apache Software copyright notice with Ant-Contrib  -->
-        <property name="nontask.html" value="compilerarg.html,linkerarg.html,compiler.html,fileset.html,includepath.html,sysincludepath.html,define.html,undefine.html,defineset.html,libset.html,syslibset.html,linker.html,precompile.html,except.html,versioninfo.html,target.html,distributer.html,map.html,project.html"/>
+        <property name="nontask.html" value="compilerarg.html,linkerarg.html,compiler.html,fileset.html,includepath.html,sysincludepath.html,define.html,undefine.html,defineset.html,libset.html,syslibset.html,linker.html,precompile.html,except.html,versioninfo.html,target.html,distributer.html,map.html"/>
         <property name="all.html" value="cc.html,${nontask.html}"/>
         <property name="doc.dir" value="${build.dir}/xdocs/docs/manual/other"/>
 
@@ -474,7 +440,6 @@ Copyright 2001-2004 The Ant-Contrib project
         <move file="${doc.dir}/systemincludepath.html" tofile="${doc.dir}/sysincludepath.html"/>
         <move file="${doc.dir}/precompileexceptdef.html" tofile="${doc.dir}/except.html"/>
         <move file="${doc.dir}/distributermap.html" tofile="${doc.dir}/map.html"/>
-        <move file="${doc.dir}/projectdef.html" tofile="${doc.dir}/project.html"/>
 
         <replace dir="${build.dir}/xdocs/docs/manual/other"
             includes="${all.html}"
@@ -589,12 +554,6 @@ Copyright 2001-2004 The Ant-Contrib project
             token="&lt;strong&gt;map&lt;/strong&gt; (net.sf.antcontrib.cpptasks.DistributerMap)"
             value='&lt;strong&gt;&lt;a href="map.html" style="color: white"&gt;map&lt;/a&gt;&lt;/strong&gt;'/>
 
-       <replace dir="${build.dir}/xdocs/docs/manual/other"
-            includes="${all.html}"
-            token="&lt;strong&gt;project&lt;/strong&gt; (net.sf.antcontrib.cpptasks.ide.ProjectDef)"
-            value='&lt;strong&gt;&lt;a href="project.html" style="color: white"&gt;project&lt;/a&gt;&lt;/strong&gt;'/>
-
-
         <!--   remove Task from the title of everything but cc.html   -->
         <replace dir="${build.dir}/xdocs/docs/manual/other"
             includes="${nontask.html}"
@@ -707,12 +666,6 @@ Copyright 2001-2004 The Ant-Contrib project
             token="Distributermap"
             value="map"/>
 
-
-        <replace dir="${build.dir}/xdocs/docs/manual/other"
-            includes="project.html"
-            token="Projectdef"
-            value="project"/>
-
   </target>
 
   <target name="check-sfuser" unless="sfuser">
@@ -732,9 +685,9 @@ Copyright 2001-2004 The Ant-Contrib project
               <arg line="-r -C ${build.dir}/coverage/report/* ${sfuser}@shell.sourceforge.net:/home/groups/a/an/ant-contrib/htdocs/cpptasks/coverage"/>
       </exec>
   </target>
-
-
-
+  	
+  		
+	
   <target name="xdocs-clean"
           description="--> cleans up xdocs directories">
     <delete dir="${build.dir}/xdocs" />

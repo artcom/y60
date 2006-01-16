@@ -233,6 +233,33 @@ public class LibrarySet extends ProjectComponent {
     public void setType(LibraryTypeEnum type) {
     	this.libraryType = type;
     }
+
+    void visit(FileVisitor visitor, DirectoryScanner scanner) {
+        File basedir = scanner.getBasedir();
+        String[] files = scanner.getIncludedFiles();
+        
+// dk original version - order of visiting is given by the directory scanner (lexographic)       
+/*
+        for (int k = 0; k < files.length; k++) {
+            visitor.visit(basedir, files[k]);
+        }
+*/        
+        
+// new version - order of visiting stays as set by setLibs
+
+        for (int l = 0;l < libnames.length; ++l) {
+            for (int k = 0;k < files.length; ++k) {
+                //a filename matches a libname if filename = libname.SOMETHING
+                //this should work in win32. gcc and alike don't use this anyway
+                int dot = files[k].indexOf("."); 
+                String fname = files[k].substring(0,dot);                
+                if (fname.compareToIgnoreCase(libnames[l]) == 0) {                                  visitor.visit(basedir, files[k]);
+//System.out.println("visited " + files[k] + "@" + basedir);
+                }
+            }
+        }
+        
+    }
     
     public void visitLibraries(Project project, Linker linker, File[] libpath,
             FileVisitor visitor) throws BuildException {
@@ -272,19 +299,21 @@ public class LibrarySet extends ProjectComponent {
 		                FileSet clone = (FileSet) localSet.clone();
 		                clone.setDir(libpath[j]);
 		                DirectoryScanner scanner = clone.getDirectoryScanner(project);
-		                File basedir = scanner.getBasedir();
-		                String[] files = scanner.getIncludedFiles();
-		                for (int k = 0; k < files.length; k++) {
-		                    visitor.visit(basedir, files[k]);
-		                }
+                        /* dk moved out to func. visit() and modified
+                           for (int k = 0; k < files.length; k++) {
+                              visitor.visit(basedir, files[k]);
+                           }
+                        */
+                        visit(visitor, scanner);                        
 		            }
 		        } else {
 		            DirectoryScanner scanner = localSet.getDirectoryScanner(project);
-		            File basedir = scanner.getBasedir();
-		            String[] files = scanner.getIncludedFiles();
-		            for (int k = 0; k < files.length; k++) {
-		                visitor.visit(basedir, files[k]);
-		            }
+                    /* dk moved out to func. visit() and modified
+                       for (int k = 0; k < files.length; k++) {
+                          visitor.visit(basedir, files[k]);
+                       }
+                    */
+                    visit(visitor, scanner);
 		        }
         	}
         }
