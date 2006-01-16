@@ -1,7 +1,7 @@
 package Makedist;
 use MakedistTools;
 
-$PRODUCT_NAME   = "Y60-SDK";
+$PRODUCT_NAME   = "sdlengine";
 $ICON_FILE      = "rendergirl.ico";
 $PRODUCT_CODE   = "6e6f3569-d80d-4e2e-855c-7be2d3b980ed";
 
