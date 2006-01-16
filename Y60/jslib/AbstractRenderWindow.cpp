@@ -714,12 +714,12 @@ namespace jslib {
         for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
             if ( myName == (*i)->getName()) {
                 AC_WARNING << "Extension name '" << myName
-                    << "' is ambiguous. Statistical timers will be missleading." << endl;
+                    << "' is ambiguous. Statistical timers will be misleading." << endl;
             }
         }
         _myExtensions.push_back(theExtension);
 
-        AC_INFO << " added extension " << theExtension->getName();
+        AC_INFO << "Added extension '" << theExtension->getName() << "'";
         theExtension->onStartup(this);
         if (getCurrentScene()) {
             theExtension->onSceneLoaded(this);

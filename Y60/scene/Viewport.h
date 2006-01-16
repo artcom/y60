@@ -36,8 +36,8 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ViewportOrientationTag,     std::string,   ORIENTATION_ATTRIB,              LANDSCAPE_ORIENTATION);
     DEFINE_ATTRIBUT_TAG(CameraTag,                  std::string,   CAMERA_ATTRIB,                   "");
     DEFINE_ATTRIBUT_TAG(Size2DTag,                  asl::Vector2f, VIEWPORT_SIZE_ATTRIB,            asl::Vector2f(1,1));
-    DEFINE_ATTRIBUT_TAG(ViewportLeftTag,            unsigned,      VIEWPORT_LEFT_ATTRIB,            0);
-    DEFINE_ATTRIBUT_TAG(ViewportTopTag,             unsigned,      VIEWPORT_TOP_ATTRIB,             0);
+    DEFINE_ATTRIBUT_TAG(ViewportLeftTag,            int,           VIEWPORT_LEFT_ATTRIB,            0);
+    DEFINE_ATTRIBUT_TAG(ViewportTopTag,             int,           VIEWPORT_TOP_ATTRIB,             0);
     DEFINE_ATTRIBUT_TAG(ViewportHeightTag,          unsigned,      VIEWPORT_HEIGHT_ATTRIB,          0);
     DEFINE_ATTRIBUT_TAG(ViewportWidthTag,           unsigned,      VIEWPORT_WIDTH_ATTRIB,           0);
     DEFINE_ATTRIBUT_TAG(ProjectionMatrixTag,        asl::Matrix4f, PROJECTIONMATRIX_ATTRIB,         asl::Matrix4f::Identity());
@@ -103,11 +103,11 @@ namespace y60 {
             void updateClippingPlanes();
             /// returns the distance between bottom of viewport and bottom of
             //  canvas. Suitable for glViewport.
-            unsigned getLower() const; 
+            int getLower() const; 
         private:
             bool getProjectionMatrix(asl::Matrix4f & theProjection) const;
-            bool getTop(unsigned & theTop) const;
-            bool getLeft(unsigned & theLeft) const;
+            bool getTop(int & theTop) const;
+            bool getLeft(int & theLeft) const;
             bool getHeight(unsigned & theHeight) const;
             bool getWidth(unsigned & theWidth) const;
             bool getFrustum(asl::Frustum & theFrustum) const;

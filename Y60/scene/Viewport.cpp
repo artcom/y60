@@ -33,38 +33,40 @@ using namespace std;
 namespace y60 {
 
 bool 
-Viewport::getLeft(unsigned & theLeft) const {
+Viewport::getLeft(int & theLeft) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
-         unsigned newLeft = unsigned(get<Position2DTag>()[0] * myCanvasNode->getFacade<Canvas>()->getWidth());
+         int newLeft = int(get<Position2DTag>()[0] * myCanvasNode->getFacade<Canvas>()->getWidth());
          if (theLeft != newLeft) {
              theLeft = newLeft;
              return true;
          }
+    } else {
+        AC_ERROR << "Canvas is null!";
     } 
     return false;
 }
 
-unsigned 
+int 
 Viewport::getLower() const { 
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
-        return unsigned((1.0 - get<Position2DTag>()[1] - get<Size2DTag>()[1]) 
-                        * myCanvasNode->getFacade<Canvas>()->getHeight());
+        return int((1.0 - get<Position2DTag>()[1] - get<Size2DTag>()[1]) * myCanvasNode->getFacade<Canvas>()->getHeight());
     } 
     return 0;
 }
+
 bool 
-Viewport::getTop(unsigned & theTop) const {
+Viewport::getTop(int & theTop) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
-        unsigned newTop = unsigned(get<Position2DTag>()[1] * myCanvasNode->getFacade<Canvas>()->getHeight());
+        int newTop = int(get<Position2DTag>()[1] * myCanvasNode->getFacade<Canvas>()->getHeight());
         if (theTop != newTop) {
             theTop = newTop;
             return true;
         }
     } else {
-        AC_ERROR << "Canvas is null!" << endl;
+        AC_ERROR << "Canvas is null!";
     }
     return false;
 }
@@ -74,11 +76,9 @@ Viewport::getWidth(unsigned & theWidth) const {
     const Node * myCanvasNode = this->getNode().parentNode();
     if (myCanvasNode) {
         const CanvasPtr & myCanvas = myCanvasNode->getFacade<Canvas>();
-        // AC_TRACE << "Parent " << myCanvas->get<IdTag>() << " width is " << myCanvas->getWidth() << endl; 
         unsigned newWidth = unsigned(get<Size2DTag>()[0] * myCanvas->getWidth());
         if (theWidth != newWidth) {
             theWidth = newWidth;
-            // AC_TRACE << "updating value to " << newWidth << endl;
             return true;
         }
     } 

@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2003-2005 ART+COM AG Berlin
+// Copyright (C) 2003-2006 ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -839,6 +839,7 @@ namespace y60 {
         }
 
         TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
+        //AC_PRINT << myFacade->get<NameTag>() << " vis=" << myFacade->get<VisibleTag>();
 
         // Skip invisible nodes
         if (!(myFacade->get<VisibleTag>())) {
@@ -952,11 +953,14 @@ namespace y60 {
     void
     Renderer::render(ViewportPtr theViewport) {
         MAKE_SCOPE_TIMER(render);
+
+        // setup viewport, parameters are in screen space
         glViewport(theViewport->get<ViewportLeftTag>(), theViewport->getLower(),
                    theViewport->get<ViewportWidthTag>(), theViewport->get<ViewportHeightTag>());
         CHECK_OGL_ERROR;
         
-	renderOverlays(theViewport, UNDERLAY_LIST_NAME);
+        // render underlays
+	    renderOverlays(theViewport, UNDERLAY_LIST_NAME);
 
         // Render state needs to be set up before glPushAttrib, because it caches the current render state
         setupRenderState(theViewport);
@@ -989,34 +993,41 @@ namespace y60 {
             Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
             createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera, myEyeSpaceTransform,
                     theViewport, true, std::vector<asl::Planef>());
-            resetModelView();
-            CHECK_OGL_ERROR;
         }
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        CHECK_OGL_ERROR;
+
         setProjection(theViewport);
         CHECK_OGL_ERROR;
+
+        // (3) render skybox
         {
             MAKE_SCOPE_TIMER(renderSkyBox);
             renderSkyBox(myCamera);
             CHECK_OGL_ERROR;
         }
 
+        // (4) Setup camera
+        bindViewMatrix(myCamera);
+
+        // (5) activate all visible lights
         {
             MAKE_SCOPE_TIMER(enableVisibleLights);
-            // (4) Setup camera
-            bindViewMatrix(myCamera);
-
-            // (5) activate all visible lights
             enableVisibleLights();
             CHECK_OGL_ERROR;
         }
 
+        // (6) enable fog
         {
+            MAKE_SCOPE_TIMER(enableFog);
             enableFog();
             CHECK_OGL_ERROR;
         }
 
         // (7) render bodies
-        {
+        if (myBodyParts.size()) {
             MAKE_SCOPE_TIMER(renderBodyParts);
             _myPreviousBody = 0;
             glPushMatrix();
@@ -1033,8 +1044,9 @@ namespace y60 {
             }
             glPopMatrix();
         }
-        glPopAttrib();
+
         glPopClientAttrib();
+        glPopAttrib();
 
         if (_myBoundingVolumeMode & BV_HIERARCHY) {
             renderBoundingBoxHierarchy(_myScene->getWorldRoot());
@@ -1050,6 +1062,7 @@ namespace y60 {
             renderTextSnippets(theViewport);
             glPopAttrib();
         }
+ 
         // Set renderer into known state for drawing calls from js
         deactivatePreviousMaterial();
         _myPreviousMaterial = 0;
@@ -1078,12 +1091,6 @@ namespace y60 {
     }
 
     void
-    Renderer::resetModelView() {
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-    }
-
-    void
     Renderer::bindViewMatrix(CameraPtr theCamera) {
 #if 0
         if (AC_TRACE_ON) {
@@ -1096,7 +1103,7 @@ namespace y60 {
     }
 
     GLenum
-    Renderer::getPrimitiveGLType(y60::PrimitiveType theType) {
+    Renderer::getPrimitiveGLType(y60::PrimitiveType theType) const {
         return GLenum(theType);
     }
 
@@ -1111,12 +1118,12 @@ namespace y60 {
         for (unsigned i = 0; i < myLights.size(); ++i) {
             if (myLights[i]->get<VisibleTag>()) {
                 enableLight(myLights[i], myActiveLightCount);
-                AC_TRACE << myLights[i]->getNode();
+                DB(AC_TRACE << myLights[i]->getNode());
                 myActiveLightCount++;
             }
         }
         COUNT_N(ActiveLights, myActiveLightCount);
-        AC_TRACE << "enabled " << myActiveLightCount << " lights" << endl;
+        DB(AC_TRACE << "Enabled " << myActiveLightCount << " lights");
     }
 
     void
@@ -1136,6 +1143,7 @@ namespace y60 {
             case UNSUPPORTED:
                 return;
         }
+
         GLint myMaxLights = 8;
         glGetIntegerv(GL_MAX_LIGHTS, &myMaxLights);
         if (theActiveLightIndex >= myMaxLights) {
@@ -1146,6 +1154,7 @@ namespace y60 {
             }
             return;
         }
+
         GLenum gl_lightid = asGLLightEnum(theActiveLightIndex);
         asl::Vector4f myGLLightPos;
 
@@ -1188,7 +1197,7 @@ namespace y60 {
     Renderer::enableFog() {
         WorldFacadePtr myWorldFacade = _myScene->getWorldRoot()->getFacade<WorldFacade>();
         const string & myFogModeString = myWorldFacade->get<FogModeTag>();
-        if (myFogModeString == "") {
+        if (myFogModeString.size() == 0) {
             return;
         }
         FogMode myFogMode = static_cast<FogMode>(getEnumFromString(myFogModeString, FogModeStrings));
@@ -1383,7 +1392,8 @@ namespace y60 {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     void
-    Renderer::renderOverlays(const ViewportPtr & theViewport, std::string theRootNodeName) {
+    Renderer::renderOverlays(const ViewportPtr & theViewport,
+                             const std::string & theRootNodeName) {
         dom::NodePtr myOverlays = theViewport->getNode().childNode(theRootNodeName);
         if (!myOverlays) {
             return;
@@ -1393,15 +1403,27 @@ namespace y60 {
             return;
         }
 
+#if 0
+        AC_PRINT << "name=" << theViewport->get<NameTag>() << " pos=" << theViewport->get<Position2DTag>() << " size=" << theViewport->get<Size2DTag>() << " pixel=" << theViewport->get<ViewportLeftTag>() << "," << theViewport->get<ViewportTopTag>() << "," << theViewport->getLower() << " " << theViewport->get<ViewportWidthTag>() << "x" << theViewport->get<ViewportHeightTag>();
+#endif
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
+
+        // UH: projection matrix is relative to viewport so no translation is necessary
+        // (already done in glViewport)
+#if 1
+        gluOrtho2D(0.0, theViewport->get<ViewportWidthTag>(),
+                   theViewport->get<ViewportHeightTag>(), 0.0);
+#else
         gluOrtho2D(theViewport->get<ViewportLeftTag>(),
                    theViewport->get<ViewportLeftTag>() + theViewport->get<ViewportWidthTag>(),
                    theViewport->getLower() + theViewport->get<ViewportHeightTag>(),
                    theViewport->getLower());
+#endif
+
         if (theViewport->get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
             asl::Matrix4f myRotationMatrix;
             myRotationMatrix.makeZRotating(float(asl::PI_2));

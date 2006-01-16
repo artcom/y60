@@ -1,20 +1,11 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: Renderer.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.66 $
-//   $Date: 2005/04/18 16:50:09 $
-//
-//  Description: A simple renderer.
-//
 //=============================================================================
 
 #ifndef _ac_renderer_Renderer_h_
@@ -117,12 +108,11 @@ namespace y60 {
        private:
             void setupRenderState(ViewportPtr theViewport);
 
-            void resetModelView();
             void bindViewMatrix(y60::CameraPtr theCamera);
             void setProjection(ViewportPtr theViewport);
             void rotateBillboard(const Body & theBody, const Camera & theCamera);
 
-            GLenum getPrimitiveGLType(PrimitiveType theType);
+            GLenum getPrimitiveGLType(PrimitiveType theType) const;
 
             bool switchMaterial(const MaterialBase & theMaterial, bool isOverlay = false);
             void deactivatePreviousMaterial() const;
@@ -145,7 +135,8 @@ namespace y60 {
             void renderBoundingBoxHierarchy(dom::NodePtr theNode);
 
             void renderFrustum(const ViewportPtr & theViewport);
-            void renderOverlays(const ViewportPtr & theViewport, std::string theRootNodeName);
+            void renderOverlays(const ViewportPtr & theViewport,
+                                const std::string & theRootNodeName);
             void renderOverlay(dom::NodePtr theOverlayNode, float theAlpha = 1);
             void renderTextSnippets(ViewportPtr theViewport);
 

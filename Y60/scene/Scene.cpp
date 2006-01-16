@@ -797,8 +797,7 @@ namespace y60 {
         // break travsersal if:
         // not visible and not a light (always continue for lights, since
         // lights can be turned on/off at any time, e.g. per viewport pass)
-        if (myFacade->get<VisibleTag>() == false && !isLightNode)
-        {
+        if (myFacade->get<VisibleTag>() == false && !isLightNode) {
             return;
         }
 
