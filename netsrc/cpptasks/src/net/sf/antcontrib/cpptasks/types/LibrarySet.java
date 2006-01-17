@@ -238,7 +238,7 @@ public class LibrarySet extends ProjectComponent {
         File basedir = scanner.getBasedir();
         String[] files = scanner.getIncludedFiles();
         
-// dk original version - order of visiting is given by the directory scanner (lexographic)       
+// DK original version - order of visiting is given by the directory scanner (lexographic)       
 /*
         for (int k = 0; k < files.length; k++) {
             visitor.visit(basedir, files[k]);
@@ -248,11 +248,13 @@ public class LibrarySet extends ProjectComponent {
 // new version - order of visiting stays as set by setLibs
 
         for (int l = 0;l < libnames.length; ++l) {
+//System.out.println("visiting " + libnames[l]);
             for (int k = 0;k < files.length; ++k) {
-                //a filename matches a libname if filename = libname.SOMETHING
+                //a filename matches a libname if filename = libname.ext
                 //this should work in win32. gcc and alike don't use this anyway
-                int dot = files[k].indexOf("."); 
+                int dot = files[k].lastIndexOf("."); 
                 String fname = files[k].substring(0,dot);                
+//System.out.println("matching " + files[k]);
                 if (fname.compareToIgnoreCase(libnames[l]) == 0) {                                  visitor.visit(basedir, files[k]);
 //System.out.println("visited " + files[k] + "@" + basedir);
                 }
