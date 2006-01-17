@@ -9,7 +9,7 @@
 //=============================================================================
 
 #include "SoundManager.h"
-#include "FFMpegDecoder.h"
+#include "FFMpegAudioDecoder.h"
 #include "CacheReader.h"
 
 #include <asl/Logger.h>
@@ -36,8 +36,8 @@ SoundManager::SoundManager()
     //av_log_set_level(AV_LOG_ERROR);
     av_register_all();
     
-    _myFFMpegDecoderFactory = new FFMpegDecoderFactory;
-    registerDecoderFactory(_myFFMpegDecoderFactory);
+    _myFFMpegAudioDecoderFactory = new FFMpegAudioDecoderFactory;
+    registerDecoderFactory(_myFFMpegAudioDecoderFactory);
     fork();
 }
 
@@ -50,8 +50,8 @@ SoundManager::~SoundManager() {
         stopAll();
     }
     join();
-    unregisterDecoderFactory(_myFFMpegDecoderFactory);
-    delete _myFFMpegDecoderFactory;
+    unregisterDecoderFactory(_myFFMpegAudioDecoderFactory);
+    delete _myFFMpegAudioDecoderFactory;
     _myCache.clear();
     if (_myDecoderFactories.size()) {
         AC_WARNING << _myDecoderFactories.size() << " decoder factories still registered.";

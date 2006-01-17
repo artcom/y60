@@ -88,18 +88,18 @@ namespace jslib {
         };
         return myProperties;
     }
-JSPropertySpec *
-JSSound::StaticProperties() {
-    static JSPropertySpec myProperties[] = {{0}};
-    return myProperties;
-}
 
-JSFunctionSpec *
-JSSound::StaticFunctions() {
-    static JSFunctionSpec myFunctions[] = {{0}};
-    return myFunctions;
-}
+    JSPropertySpec *
+    JSSound::StaticProperties() {
+        static JSPropertySpec myProperties[] = {{0}};
+        return myProperties;
+    }
 
+    JSFunctionSpec *
+    JSSound::StaticFunctions() {
+        static JSFunctionSpec myFunctions[] = {{0}};
+        return myFunctions;
+    }
 
     // getproperty handling
     JSBool

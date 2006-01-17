@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: AudioController.js,v $
-//   $Author: christian $
-//   $Revision: 1.30 $
-//   $Date: 2005/04/08 18:41:05 $
-//
-//
-//=============================================================================
 
 const DUMMY_AUDIO_CONTROLLER = false;
 
@@ -33,7 +25,6 @@ if (DUMMY_AUDIO_CONTROLLER) {
     ourSoundController.setVolume = function() {};
     ourSoundController.getVolume = function() {};
     ourSoundController.getDuration = function() {};
-
 }
 
 function initSoundController() {
@@ -41,7 +32,7 @@ function initSoundController() {
         plug("y60JSSound");
         ourSoundController = new SoundManager();
     } catch (ex) {
-        print("### Warning: Could not construct AudioController. Sound will not work.");
+        print("### Warning: Could not construct SoundController. Sound will not work.");
         print("### Error was " + ex);
     }
 }

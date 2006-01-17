@@ -8,8 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef _FFMpegDecoder_H_
-#define _FFMpegDecoder_H_
+#ifndef _FFMpegAudioDecoder_H_
+#define _FFMpegAudioDecoder_H_
 
 #include "IAudioDecoder.h"
 #include "SoundManager.h"
@@ -24,11 +24,11 @@
 
 namespace y60 {
 
-class FFMpegDecoder: public IAudioDecoder
+class FFMpegAudioDecoder: public IAudioDecoder
 {
     public:
-        FFMpegDecoder (const std::string& myURI);
-        virtual ~FFMpegDecoder();
+        FFMpegAudioDecoder (const std::string& myURI);
+        virtual ~FFMpegAudioDecoder();
 
         virtual unsigned getSampleRate();
         virtual unsigned getNumChannels();
@@ -60,10 +60,10 @@ class FFMpegDecoder: public IAudioDecoder
         unsigned _myCurFrame;
 };
 
-class FFMpegDecoderFactory: public IAudioDecoderFactory
+class FFMpegAudioDecoderFactory: public IAudioDecoderFactory
 {
     public:
-        FFMpegDecoderFactory();
+        FFMpegAudioDecoderFactory();
         virtual IAudioDecoder* tryCreateDecoder(const std::string& myURI);
         virtual int getPriority() const; 
 };

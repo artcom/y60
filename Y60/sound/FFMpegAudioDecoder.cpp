@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "FFMpegDecoder.h"
+#include "FFMpegAudioDecoder.h"
 
 #include <asl/Auto.h>
 #include <asl/Pump.h>
@@ -18,10 +18,10 @@ using namespace asl;
 
 namespace y60 {
 
-asl::Block FFMpegDecoder::_mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
-asl::Block FFMpegDecoder::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+asl::Block FFMpegAudioDecoder::_mySamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+asl::Block FFMpegAudioDecoder::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 
-FFMpegDecoder::FFMpegDecoder (const string& myURI)
+FFMpegAudioDecoder::FFMpegAudioDecoder (const string& myURI)
     : _myURI (myURI),
       _myFormatContext(0),
       _myStreamIndex(-1),
@@ -29,41 +29,41 @@ FFMpegDecoder::FFMpegDecoder (const string& myURI)
       _mySampleSink(0),
       _myCurFrame(0)
 {
-    AC_DEBUG << "FFMpegDecoder::FFMpegDecoder";
+    AC_DEBUG << "FFMpegAudioDecoder::FFMpegAudioDecoder";
     open();
 }
 
-FFMpegDecoder::~FFMpegDecoder() {
-    AC_DEBUG << "FFMpegDecoder::~FFMpegDecoder (" << _myURI << ")";
+FFMpegAudioDecoder::~FFMpegAudioDecoder() {
+    AC_DEBUG << "FFMpegAudioDecoder::~FFMpegAudioDecoder (" << _myURI << ")";
     close();
 }
 
-bool FFMpegDecoder::isSyncDecoder() const {
+bool FFMpegAudioDecoder::isSyncDecoder() const {
     // Note that if this is ever changed - i.e. if several decoders run in different 
     // threads, _mySamples and _myResampledSamples can't be static variables anymore!
     return true;
 }
 
-std::string FFMpegDecoder::getName() const {
+std::string FFMpegAudioDecoder::getName() const {
     return _myURI;
 }
 
-void FFMpegDecoder::setSampleSink(asl::ISampleSink* mySampleSink) {
+void FFMpegAudioDecoder::setSampleSink(asl::ISampleSink* mySampleSink) {
     _mySampleSink = mySampleSink;
 }
 
-unsigned FFMpegDecoder::getCurFrame() const {
+unsigned FFMpegAudioDecoder::getCurFrame() const {
     return _myCurFrame;
 }
 
-void FFMpegDecoder::decodeEverything() {
+void FFMpegAudioDecoder::decodeEverything() {
     bool isDone = false;
     while (!isDone) {
         isDone = decode();
     }
 }
 
-Time FFMpegDecoder::getDuration() const {
+Time FFMpegAudioDecoder::getDuration() const {
     if (_myFormatContext) {
         return (_myFormatContext->streams[_myStreamIndex]->duration/double(AV_TIME_BASE));
     } else {
@@ -71,7 +71,7 @@ Time FFMpegDecoder::getDuration() const {
     }
 }
 
-void FFMpegDecoder::seek (Time thePosition)
+void FFMpegAudioDecoder::seek (Time thePosition)
 {
 #if (LIBAVCODEC_BUILD < 4738)
     int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE));
@@ -85,8 +85,8 @@ void FFMpegDecoder::seek (Time thePosition)
     }
 }
 
-void FFMpegDecoder::open() {
-    AC_DEBUG << "FFMpegDecoder::open (" << _myURI << ")" << _myURI;
+void FFMpegAudioDecoder::open() {
+    AC_DEBUG << "FFMpegAudioDecoder::open (" << _myURI << ")" << _myURI;
     
     try {
         int err;
@@ -150,8 +150,8 @@ void FFMpegDecoder::open() {
     }
 }
 
-void FFMpegDecoder::close() {
-    AC_DEBUG << "FFMpegDecoder::close() (" << _myURI << ")";
+void FFMpegAudioDecoder::close() {
+    AC_DEBUG << "FFMpegAudioDecoder::close() (" << _myURI << ")";
 
     if (_myFormatContext) {
         if (_myResampleContext) {
@@ -172,7 +172,7 @@ void FFMpegDecoder::close() {
     }
 }
 
-bool FFMpegDecoder::decode() {
+bool FFMpegAudioDecoder::decode() {
     ASSURE(_myFormatContext);
     AVPacket myPacket;
 
@@ -196,7 +196,7 @@ bool FFMpegDecoder::decode() {
                     &myBytesDecoded, myData, myDataLen);
             if (myLen > 0 && myBytesDecoded > 0) {
                 int numFrames = myBytesDecoded/(getBytesPerSample(SF_S16)*_myNumChannels);
-                AC_TRACE << "FFMpegDecoder::decode(): Frames per buffer= " << numFrames;
+                AC_TRACE << "FFMpegAudioDecoder::decode(): Frames per buffer= " << numFrames;
                 AudioBufferPtr myBuffer;
                 if (_myResampleContext) {
                     numFrames = audio_resample(_myResampleContext, 
@@ -230,26 +230,25 @@ bool FFMpegDecoder::decode() {
     return false;
 }
 
-unsigned FFMpegDecoder::getSampleRate() {
+unsigned FFMpegAudioDecoder::getSampleRate() {
     return _mySampleRate;
 }
 
-unsigned FFMpegDecoder::getNumChannels() {
+unsigned FFMpegAudioDecoder::getNumChannels() {
     return _myNumChannels;
 }
 
-FFMpegDecoderFactory::FFMpegDecoderFactory() {
+FFMpegAudioDecoderFactory::FFMpegAudioDecoderFactory() {
 }
 
-IAudioDecoder* FFMpegDecoderFactory::tryCreateDecoder(const std::string& myURI) 
+IAudioDecoder* FFMpegAudioDecoderFactory::tryCreateDecoder(const std::string& myURI) 
 {
-    AC_DEBUG << "FFMpegDecoder::tryCreateDecoder (" << myURI << ")";
-    return new FFMpegDecoder(myURI);
+    AC_DEBUG << "FFMpegAudioDecoderFactory::tryCreateDecoder (" << myURI << ")";
+    return new FFMpegAudioDecoder(myURI);
 }
 
-int FFMpegDecoderFactory::getPriority() const {
+int FFMpegAudioDecoderFactory::getPriority() const {
     return 1; 
 }
 
 }
-

@@ -75,7 +75,7 @@ namespace y60 {
 
         // Sorted according to decoder priority.
         std::vector < IAudioDecoderFactory* > _myDecoderFactories; 
-        IAudioDecoderFactory* _myFFMpegDecoderFactory;
+        IAudioDecoderFactory* _myFFMpegAudioDecoderFactory;
 
         // Cache stuff.
         unsigned _myMaxCacheSize; // In bytes.

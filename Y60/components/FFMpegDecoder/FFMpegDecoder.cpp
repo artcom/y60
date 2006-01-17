@@ -92,6 +92,7 @@ namespace y60 {
         if (myExtension == "mpg" || myExtension == "m2v" || myExtension == "mov" || 
             myExtension == "avi" || myExtension == "mpeg") 
         {
+            AC_DEBUG << "FFMpegDecoder::canDecode " << myExtension;
             return MIME_TYPE_MPG;
         } else {
             return "";
