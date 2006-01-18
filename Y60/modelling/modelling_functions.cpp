@@ -228,26 +228,74 @@ namespace y60 {
     }
 
     dom::NodePtr
-    createLineStrip(y60::ScenePtr theScene, const std::string & theLineMaterialId,
+    createLineStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
                          const std::string & theName)
     {
+        return createStrip(PRIMITIVE_TYPE_LINE_STRIP, theScene, 
+                theMaterialId, thePositions, theName);
+    }
+
+    dom::NodePtr
+    createQuadStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
+                const std::vector<asl::Vector3f> & thePositions,
+                const std::string & theName) 
+    {
+        return createStrip(PRIMITIVE_TYPE_QUAD_STRIP, theScene, 
+                theMaterialId, thePositions, theName);
+    }
+
+    dom::NodePtr
+    createStrip(const std::string & theType, y60::ScenePtr theScene, 
+                const std::string & theMaterialId,
+                const std::vector<asl::Vector3f> & thePositions,
+                const std::string & theName) 
+    {
+
+        bool needsNormals = false;
+        if (theType == PRIMITIVE_TYPE_QUAD_STRIP || theType == PRIMITIVE_TYPE_TRIANGLE_STRIP) {
+            needsNormals = true;
+        }            
+            
         ShapeBuilder myShapeBuilder(theName);
-        ElementBuilder myLineElementBuilder(PRIMITIVE_TYPE_LINE_STRIP, theLineMaterialId);
+        ElementBuilder myElementBuilder(theType, theMaterialId);
 
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
 
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE,
                     thePositions.size());
+        myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, thePositions.size());
 
-        myLineElementBuilder.createIndex(POSITION_ROLE, POSITIONS, thePositions.size());
-
+        if (needsNormals) {
+            myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, thePositions.size());
+            myElementBuilder.createIndex(NORMAL_ROLE, NORMALS, thePositions.size());
+        }
+        
         for(unsigned i = 0; i < thePositions.size(); ++i) {
             myShapeBuilder.appendVertexData(POSITION_ROLE, thePositions[i]);
-            myLineElementBuilder.appendIndex(POSITIONS, i);
+            myElementBuilder.appendIndex(POSITIONS, i);
+            
+            if (needsNormals) {
+                asl::Vector3f myNormal;
+                int ii = i;
+                if (i >= thePositions.size()-2) {
+                    ii = (i%2 == 0) ? i-1 : i-2;
+                }
+                const asl::Vector3f & myV1 = (ii%2 == 0) ? 
+                    thePositions[ii+1] : thePositions[ii+2];
+                const asl::Vector3f & myV2 = (ii%2 == 0) ? 
+                    thePositions[ii+2] : thePositions[ii+1];
+                myNormal = cross(difference(myV1, thePositions[ii]), 
+                                 difference(myV2, thePositions[ii]) );
+                myNormal = normalized(myNormal);
+                
+                myShapeBuilder.appendVertexData(NORMAL_ROLE, myNormal);
+                myElementBuilder.appendIndex(NORMALS, i);
+            }                
         }
 
-        myShapeBuilder.appendElements( myLineElementBuilder );
+
+        myShapeBuilder.appendElements( myElementBuilder );
         return myShapeBuilder.getNode();
     }
 

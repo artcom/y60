@@ -24,6 +24,7 @@
 
 #include "JSScene.h"
 #include <y60/modelling_functions.h>
+#include <y60/Body.h>
 
 #include <iostream>
 
@@ -96,6 +97,7 @@ CreateBody(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
         convertFrom(cx, argv[1], myShapeId);
 
         dom::NodePtr myResult = createBody(myParentNode, myShapeId);
+        
         *rval = as_jsval(cx, myResult);
         return JS_TRUE;
 
@@ -268,23 +270,16 @@ CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
     } HANDLE_CPP_EXCEPTION;
 }
 
-JS_STATIC_DLL_CALLBACK(JSBool)
-CreateLineStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+static JSBool jsCreateStrip(const std::string &theType, JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
+{
     try {
-        DOC_BEGIN("Create an linestrip shape");
-        DOC_PARAM("theScene", "The scene to create the linestrip inside", DOC_TYPE_SCENE);
-        DOC_PARAM("theMaterialId", "The id of the material used for the shapes", DOC_TYPE_STRING);
-        DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
-        DOC_PARAM_OPT("theName", "Name for the quadstack shape", DOC_TYPE_STRING, "");
-        DOC_RVAL("The new created linestrip shape", DOC_TYPE_NODE);
-        DOC_END;
         ensureParamCount(argc, 3, 4);
 
         y60::ScenePtr myScene(0);
         convertFrom(cx, argv[0], myScene);
 
-        string myLineMaterialId;
-        convertFrom(cx, argv[1], myLineMaterialId);
+        string myMaterialId;
+        convertFrom(cx, argv[1], myMaterialId);
 
         std::vector<asl::Vector3f> myPositions;
         convertFrom(cx, argv[2], myPositions);
@@ -292,24 +287,58 @@ CreateLineStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
         string myName;
         if (argc > 3) {
             convertFrom(cx, argv[3], myName);
+        } else {
+            myName = string("my") + theType;
         }
 
-        dom::NodePtr myResult;
-        switch (argc) {
-            case 3:
-                myResult = createLineStrip(myScene, myLineMaterialId, myPositions);
-                break;
-            case 4:
-                myResult = createLineStrip(myScene, myLineMaterialId, myPositions, myName);
-                break;
-        }
+        dom::NodePtr myResult = createStrip(theType, myScene, myMaterialId, myPositions, myName);
         *rval = as_jsval(cx, myResult);
 
         return JS_TRUE;
 
     } HANDLE_CPP_EXCEPTION;
-
 }
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateLineStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
+{
+    DOC_BEGIN("Create an linestrip shape");
+    DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
+    DOC_PARAM("theMaterialId", "The shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+    DOC_PARAM_OPT("theName", "Shape Name", DOC_TYPE_STRING, "");
+    DOC_RVAL("The new created linestrip shape", DOC_TYPE_NODE);
+    DOC_END;
+    return jsCreateStrip(PRIMITIVE_TYPE_LINE_STRIP, cx, obj, argc, argv, rval);
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateQuadStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
+{
+    DOC_BEGIN("Create a quadstrip shape");
+    DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
+    DOC_PARAM("theMaterialId", "The shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+    DOC_PARAM_OPT("theName", "Shape Name", DOC_TYPE_STRING, "");
+    DOC_RVAL("The new created quadstrip shape", DOC_TYPE_NODE);
+    DOC_END;
+    return jsCreateStrip(PRIMITIVE_TYPE_QUAD_STRIP, cx, obj, argc, argv, rval);
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateTriangleStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
+{
+    DOC_BEGIN("Create a quadstrip shape");
+    DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
+    DOC_PARAM("theMaterialId", "The shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
+    DOC_PARAM_OPT("theName", "Shape Name", DOC_TYPE_STRING, "");
+    DOC_RVAL("The new created trianglestrip shape", DOC_TYPE_NODE);
+    DOC_END;
+    return jsCreateStrip(PRIMITIVE_TYPE_TRIANGLE_STRIP, cx, obj, argc, argv, rval);
+}
+
+
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
@@ -526,6 +555,8 @@ JSModellingFunctions::StaticFunctions() {
         {"createAngleMarkup",           CreateAngleMarkup,           6},
         {"createTriangleMeshMarkup",    CreateTriangleMeshMarkup,    5},
         {"createLineStrip",             CreateLineStrip,             4},
+        {"createQuadStrip",             CreateQuadStrip,             4},
+        {"createTriangleStrip",         CreateTriangleStrip,         4},
         {"createQuadStack",             CreateQuadStack,             5},
         {"createUnlitTexturedMaterial", CreateUnlitTexturedMaterial, 7},
         {0}

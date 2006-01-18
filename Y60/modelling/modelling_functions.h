@@ -124,6 +124,17 @@ dom::NodePtr createQuadStack(y60::ScenePtr theScene, const asl::Vector3i & theDi
                      float theSize, const std::string & theMaterialId,
                      const std::string theName = "QuadStack");
 
+dom::NodePtr
+createQuadStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
+                         const std::vector<asl::Vector3f> & thePositions,
+                         const std::string & theName = "QuadStripShape") ;
+
+dom::NodePtr
+createStrip(const std::string & theType, y60::ScenePtr theScene, 
+        const std::string & theMaterialId,
+        const std::vector<asl::Vector3f> & thePositions,
+        const std::string & theName);
+
 struct PlanePosition {
     PlanePosition(const asl::Point3f & theOrigin,
                   const asl::Vector3f & theXVector,
@@ -141,6 +152,7 @@ struct PlanePosition {
         return _myOrigin + _myXVector * float(x) + _myYVector * float(y);
     }
 private:
+
     const asl::Point3f  _myOrigin;
     const asl::Vector3f _myXVector;
     const asl::Vector3f _myYVector;

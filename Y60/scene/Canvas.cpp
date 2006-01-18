@@ -43,6 +43,7 @@ Canvas::getHeight() const {
 
 bool
 Canvas::setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer) {
+    AC_DEBUG << "Canvas::setFrameBuffer to " << &*theFrameBuffer;
     if (theFrameBuffer) {
         asl::Ptr<IFrameBuffer> myFrameBuffer = _myFrameBuffer.lock();
         if (! myFrameBuffer) {
