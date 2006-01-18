@@ -246,9 +246,8 @@ namespace y60 {
         // *** this does the actual drawing into the GWorld ***
         MoviesTask(_myMovie,0);
         Ptr baseAddr = GetPixBaseAddr(GetGWorldPixMap(_myOffScreenWorld)); 
-        QTGetPixMapHandleRowBytes(GetGWorldPixMap(_myOffScreenWorld));    
+        QTGetPixMapHandleRowBytes(GetGWorldPixMap(_myOffScreenWorld));
         memcpy(theTargetRaster->pixels().begin(), baseAddr, theTargetRaster->pixels().size());
-
         _myLastDecodedFrame = theFrameNumber;
 
     }    

@@ -599,8 +599,6 @@
             </supports>
             <fixedfunctionshader>
                <properties>
-                    <vectorofstring name="autotexcoordmodes">[eye_linear, eye_linear, eye_linear]</vectorofstring>
-                    <vectorofvector4f name="autotexcoordparams">[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]]</vectorofvector4f>
                     <vectorofstring name="blendfunction">[one, one_minus_src_alpha]</vectorofstring>
                     <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                     <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>
@@ -622,8 +620,6 @@
             </supports>
             <fixedfunctionshader>
                <properties>
-                    <vectorofstring name="autotexcoordmodes">[eye_linear, eye_linear, ]</vectorofstring>
-                    <vectorofvector4f name="autotexcoordparams">[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]]</vectorofvector4f>
                     <vectorofstring name="blendfunction">[one, one_minus_src_alpha]</vectorofstring>
                     <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
                     <vector4f name="diffuse">[1.0,1.0,1.0,1]</vector4f>

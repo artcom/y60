@@ -313,7 +313,6 @@ namespace y60 {
 		myMaterial->setShader(myShader);
 		DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
 			endl << " with shader: " << (myShader ? myShader->getName() : "NULL"));
-		myMaterial->load(*_myTextureManager);
 		if (myShader) {
 			for (unsigned i = 0; i < myShader->getPropertyNodeCount(); ++i) {
 				// default the material property with the shader default, only if the material
@@ -331,6 +330,7 @@ namespace y60 {
 				}
 			}
         }
+		myMaterial->load(*_myTextureManager);
 
         DB(AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
                     << ", name: " << myMaterial->get<NameTag>());

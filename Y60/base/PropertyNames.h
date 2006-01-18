@@ -43,12 +43,12 @@ namespace y60 {
                                                                   // (last two work with attenuation)
     static const char * POINTATTENUATION_PROPERTY  = "pointattenuation"; // v[0] + v[1] * d + v[2] * d ^ 2;
 
-    static const char * AUTOTEXCOORDMODES_PROPERTY   = "autotexcoordmodes"; //[U_Mode, V_Mode, W_Mode, Q_Mode] where each
+/*    static const char * AUTOTEXCOORDMODES_PROPERTY   = "autotexcoordmodes"; //[U_Mode, V_Mode, W_Mode, Q_Mode] where each
                                                                             // mode is one of OBJECT_LINEAR, EYE_LINEAR, SPHERE_MAP
     static const char * AUTOTEXCOORDPARAMS_PROPERTY = "autotexcoordparams"; // [U_Params, V_Params, W_Params, Q_Params]
                                                                             // Sphere mapped coords are not supported yet ... 
                                                                             // see also OGL Redbook p.413 ff
-
+*/
 
 } // namespace
 #endif
