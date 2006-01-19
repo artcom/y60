@@ -254,6 +254,7 @@ namespace y60 {
             myDecoders = DecoderManager::get().findAllDecoders<MovieDecoderBase>(theFilename);
             std::vector<MovieDecoderBasePtr>::iterator it;
             for(it = myDecoders.begin(); it != myDecoders.end(); ++it) {
+                AC_DEBUG << "possible decoder " << (*it)->getName();
                 if ((*it)->getName() == myDecoderHint) {
                     myDecoder = (*it);
                     break;
@@ -289,7 +290,6 @@ namespace y60 {
     Movie::loadFile(const std::string & theUrl) {
 
         const std::string & mySourceFile = get<ImageSourceTag>();
-        AC_INFO << "Movie::loadFile url=" << theUrl;
 
         // if imagesource is an url do not take the packetmanaged or searchfiled new url
 
@@ -303,10 +303,10 @@ namespace y60 {
             AC_ERROR << "Unable to find url=" << theUrl << " filename=" << myFilename;
             return;
         }
-        AC_DEBUG << "Movie::loadFile " << (void*)this << " filename=" << myFilename;
+        AC_INFO << "Movie::loadFile " << (void*)this << " filename=" << myFilename;
 
         // First: Look for registered decoders that could handle the source
-        MovieDecoderBasePtr myDecoder = getDecoder(theUrl);
+        MovieDecoderBasePtr myDecoder = getDecoder(myFilename);
 
         if (!myDecoder) {
             // Second: Try m60, by extension
