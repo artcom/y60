@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//    $RCSfile: FFMpegDecoder.cpp,v $
+//    $RCSfile: FFMpegDecoder1.cpp,v $
 //     $Author: ulrich $
 //   $Revision: 1.6 $
 //       $Date: 2005/04/01 17:03:27 $
@@ -29,24 +29,24 @@ using namespace std;
 
 extern "C"
 EXPORT asl::PlugInBase * y60FFMpegDecoder1_instantiatePlugIn(asl::DLHandle myDLHandle) {
-    return new y60::FFMpegDecoder(myDLHandle);
+    return new y60::FFMpegDecoder1(myDLHandle);
 }
 
 namespace y60 {
 
-    FFMpegDecoder::VideoFrame::VideoFrame(unsigned theBufferSize) {
+    FFMpegDecoder1::VideoFrame::VideoFrame(unsigned theBufferSize) {
         _myBuffer = new unsigned char[theBufferSize];
         DB(AC_DEBUG << "VideoFrame buffer=" << (void*)_myBuffer);
     }
 
-    FFMpegDecoder::VideoFrame::~VideoFrame() {
+    FFMpegDecoder1::VideoFrame::~VideoFrame() {
         DB(AC_DEBUG << "~VideoFrame buffer=" << (void*)_myBuffer);
         delete[] _myBuffer;
         _myBuffer = 0;
     }
 
-    // FFMpegDecoder
-    FFMpegDecoder::FFMpegDecoder(asl::DLHandle theDLHandle) :
+    // FFMpegDecoder1
+    FFMpegDecoder1::FFMpegDecoder1(asl::DLHandle theDLHandle) :
         PlugInBase(theDLHandle),
         _myFormatContext(0), _myFrame(0),
         _myVStreamIndex(-1), _myVStream(0),
@@ -54,18 +54,21 @@ namespace y60 {
         _myLowerCacheTimestamp(INT_MAX), _myUpperCacheTimestamp(INT_MIN),
         _myFirstTimestamp(0), _myStartTimestamp(0),
         _myLastVideoTimestamp(0), _myEOFVideoTimestamp(INT_MIN)
-    {}
+    {
+        DB(AC_DEBUG << "instantiated an FFMpegDecoder1...");    
+    }
 
-    FFMpegDecoder::~FFMpegDecoder() {
+    FFMpegDecoder1::~FFMpegDecoder1() {
         closeMovie();
     }
 
-    asl::Ptr<MovieDecoderBase> FFMpegDecoder::instance() const {
-        return asl::Ptr<MovieDecoderBase>(new FFMpegDecoder(getDLHandle()));
+    asl::Ptr<MovieDecoderBase> FFMpegDecoder1::instance() const {
+        return asl::Ptr<MovieDecoderBase>(new FFMpegDecoder1(getDLHandle()));
     }
 
     std::string
-    FFMpegDecoder::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+    FFMpegDecoder1::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+        AC_PRINT << "candecode FFMpegDecoder1...";    
         if (asl::toLowerCase(asl::getExtension(theUrl)) == "mpg" || 
             asl::toLowerCase(asl::getExtension(theUrl)) == "m2v") {
             AC_INFO << "FFMpegDecoder1 can decode :" << theUrl << endl;
@@ -77,8 +80,8 @@ namespace y60 {
     }
 
     void
-    FFMpegDecoder::closeMovie() {
-        AC_DEBUG << "FFMpegDecoder::closeMovie";
+    FFMpegDecoder1::closeMovie() {
+        AC_DEBUG << "FFMpegDecoder1::closeMovie";
 
         if (_myVStream) {
             avcodec_close(&_myVStream->codec);
@@ -101,13 +104,13 @@ namespace y60 {
     }
 
     void
-    FFMpegDecoder::load(const std::string & theFilename) {
+    FFMpegDecoder1::load(const std::string & theFilename) {
         asl::Time myLoadStartTime;
 
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
-            AC_PRINT << "FFMpegDecoder avcodec version " << LIBAVCODEC_IDENT;
+            AC_PRINT << "FFMpegDecoder1 avcodec version " << LIBAVCODEC_IDENT;
             av_log_set_level(AV_LOG_ERROR);
             av_register_all();
             avRegistered = true;
@@ -227,7 +230,7 @@ namespace y60 {
     }
 
     double
-    FFMpegDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+    FFMpegDecoder1::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
 
         //asl::Time myDecodeStartTime;
 
@@ -265,7 +268,7 @@ namespace y60 {
 
         if (myVideoFrame && myMinTimeDiff < (myTimePerFrame / 2)) {
             myFrameTimestamp = myVideoFrame->getTimestamp();
-            DB(AC_TRACE << "FFMpegDecoder::readFrame found cached timestamp=" << myFrameTimestamp);
+            DB(AC_TRACE << "FFMpegDecoder1::readFrame found cached timestamp=" << myFrameTimestamp);
             copyFrame(myVideoFrame, theTargetRaster);
         }
         else if (!decodeFrame(myFrameTimestamp, theTargetRaster)) {
@@ -277,7 +280,7 @@ namespace y60 {
             }
             setEOF(true);
         } else {
-            DB(AC_TRACE << "FFMpegDecoder::readFrame decoded timestamp=" << myFrameTimestamp);
+            DB(AC_TRACE << "FFMpegDecoder1::readFrame decoded timestamp=" << myFrameTimestamp);
         }
 
         //asl::Time myDecodeEndTime; AC_TRACE << "Decoding time " << (myDecodeEndTime - myDecodeStartTime) << "s";
@@ -286,7 +289,7 @@ namespace y60 {
     }
 
     bool
-    FFMpegDecoder::decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
+    FFMpegDecoder1::decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
 
         int64_t myTimePerFrame = (int64_t)(AV_TIME_BASE / getFrameRate());
 
@@ -407,10 +410,10 @@ namespace y60 {
         return true;
     }
 
-    void FFMpegDecoder::convertFrame(AVFrame* theFrame, unsigned char* theBuffer) {
+    void FFMpegDecoder1::convertFrame(AVFrame* theFrame, unsigned char* theBuffer) {
 
         if (!theFrame) {
-            AC_ERROR << "FFMpegDecoder::decodeVideoFrame invalid AVFrame";
+            AC_ERROR << "FFMpegDecoder1::decodeVideoFrame invalid AVFrame";
             return;
         }
         unsigned int myLineSizeBytes = getBytesRequired(getFrameWidth(), getPixelFormat());
@@ -436,7 +439,7 @@ namespace y60 {
                     _myVStream->codec.width, _myVStream->codec.height);
     }
 
-    void FFMpegDecoder::copyFrame(VideoFramePtr theVideoFrame, dom::ResizeableRasterPtr theTargetRaster) {
+    void FFMpegDecoder1::copyFrame(VideoFramePtr theVideoFrame, dom::ResizeableRasterPtr theTargetRaster) {
         theTargetRaster->resize(getFrameWidth(), getFrameHeight());
         memcpy(theTargetRaster->pixels().begin(), theVideoFrame->getBuffer(), theTargetRaster->pixels().size());
     }

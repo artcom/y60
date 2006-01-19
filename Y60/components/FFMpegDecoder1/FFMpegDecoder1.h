@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: FFMpegDecoder.h,v $
+//   $RCSfile: FFMpegDecoder1.h,v $
 //   $Author: ulrich $
 //   $Revision: 1.4 $
 //   $Date: 2005/04/01 10:12:21 $
@@ -47,7 +47,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(FFMpegDecoderException, asl::Exception);
 
-    class FFMpegDecoder : 
+    class FFMpegDecoder1 : 
         public MovieDecoderBase,
         public asl::PlugInBase
     {
@@ -79,8 +79,8 @@ namespace y60 {
         typedef std::vector<VideoFramePtr> VideoFrameCache;
 
     public:
-        FFMpegDecoder(asl::DLHandle theDLHandle);
-        virtual ~FFMpegDecoder();
+        FFMpegDecoder1(asl::DLHandle theDLHandle);
+        virtual ~FFMpegDecoder1();
 
         /**
          * loads a movie from the file given by theFilename
@@ -138,7 +138,7 @@ namespace y60 {
         int64_t           _myEOFVideoTimestamp;
     };
 
-    typedef asl::Ptr<FFMpegDecoder> FFMpegDecoderPtr;
+    typedef asl::Ptr<FFMpegDecoder1> FFMpegDecoder1Ptr;
 }
 
 #endif
