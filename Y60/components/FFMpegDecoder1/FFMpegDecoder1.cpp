@@ -68,7 +68,6 @@ namespace y60 {
 
     std::string
     FFMpegDecoder1::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
-        AC_PRINT << "candecode FFMpegDecoder1...";    
         if (asl::toLowerCase(asl::getExtension(theUrl)) == "mpg" || 
             asl::toLowerCase(asl::getExtension(theUrl)) == "m2v") {
             AC_INFO << "FFMpegDecoder1 can decode :" << theUrl << endl;
