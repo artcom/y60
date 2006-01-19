@@ -68,6 +68,29 @@ class DecoderManager : public asl::Singleton<DecoderManager> {
             }
             return asl::Ptr<DECODERTYPE>(0);
         }
+
+        /**
+        * Collects all decoders that accept the url/stream.
+        * @param theUrl can be used to check for known file extensions.
+        * @param theStream should also be provided if possible, to check for magic numbers, etc.
+        * @return all decoders that accept the given url/stream.
+        */
+        template <class DECODERTYPE>
+        std::vector<asl::Ptr<DECODERTYPE> > findAllDecoders(const std::string & theUrl, asl::ReadableStream * theSource = 0) {
+            std::vector<asl::Ptr<DECODERTYPE> > myCapableDecoders;
+            for (int i = 0; i < _myDecoders.size(); ++i) {
+                AC_TRACE << "checking decoder #" << i;
+                asl::Ptr<DECODERTYPE> myDecoder = dynamic_cast_Ptr<DECODERTYPE>(_myDecoders[i]);
+                if (myDecoder) {
+                    std::string myMimeType = myDecoder->canDecode(theUrl, theSource);
+                    AC_TRACE << "decoder returned '" << myMimeType << "'";
+                    if (!myMimeType.empty()) {
+                        myCapableDecoders.push_back(myDecoder);
+                    }
+                }
+            }
+            return myCapableDecoders;
+        }
     private:
         std::vector<IDecoderPtr> _myDecoders;
 };

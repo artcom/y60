@@ -2461,6 +2461,16 @@ Default is zero for ffmpeg and 0.3 for wmv decoding.</xs:documentation>
                     <xs:documentation>Number of loops the movie will play. If set to zero, the movie will run forever</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="decoderhint" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Use this decoder if available. Otherwise any matching decoder will be used.
+Among possible values are:
+'y60FFMpegDecoder'   
+'y60QuicktimeDecoder'
+'y60WMVDecoder'
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
         </xs:complexType>
     </xs:element>
     <xs:element name="capture" substitutionGroup="ImageBase">

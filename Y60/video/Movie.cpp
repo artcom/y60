@@ -49,6 +49,7 @@ namespace y60 {
         CacheSizeTag::Plug(theNode),
         AVDelayTag::Plug(theNode),
         AudioTag::Plug(theNode),
+        DecoderHintTag::Plug(theNode),
         _myDecoder(0),
         _myLastDecodedFrame(UINT_MAX),
         _myLastCurrentTime(-1.0),
@@ -243,22 +244,42 @@ namespace y60 {
 #endif
     }
 
+    MovieDecoderBasePtr Movie::getDecoder(const std::string theFilename) {
+
+        MovieDecoderBasePtr myDecoder = DecoderManager::get().findDecoder<MovieDecoderBase>(theFilename);
+
+        const std::string & myDecoderHint = get<DecoderHintTag>();
+        if (myDecoderHint != "") {
+            std::vector<MovieDecoderBasePtr> myDecoders; 
+            myDecoders = DecoderManager::get().findAllDecoders<MovieDecoderBase>(theFilename);
+            std::vector<MovieDecoderBasePtr>::iterator it;
+            for(it = myDecoders.begin(); it != myDecoders.end(); ++it) {
+                if ((*it)->getName() == myDecoderHint) {
+                    myDecoder = (*it);
+                    break;
+                }
+            }
+        }
+        AC_INFO << "using decoder " << myDecoder->getName() << " for decoding " << theFilename << " hint " << myDecoderHint;
+        return myDecoder;
+    }
+    
     void
     Movie::load(const std::string & theTexturePath) {
         loadFile( asl::searchFile(get<ImageSourceTag>(), theTexturePath) );
     }
 
     void
-    Movie::loadStream(asl::Ptr<asl::ReadableStream> theSource, const std::string theName) {
-        AC_INFO << "Movie::loadStream " << theName;
-        MovieDecoderBasePtr myDecoder = DecoderManager::get().findDecoder<MovieDecoderBase>(theName);
+    Movie::loadStream(asl::Ptr<asl::ReadableStream> theSource, const std::string theUrl) {
+        AC_INFO << "Movie::loadStream " << theUrl;
+        MovieDecoderBasePtr myDecoder = getDecoder(theUrl);
         if (!myDecoder) {
-            throw MovieException(string("Sorry, could not find a streamable decoder for: ") + theName, PLUS_FILE_LINE);
+            throw MovieException(string("Sorry, could not find a streamable decoder for: ") + theUrl, PLUS_FILE_LINE);
         }
         _myDecoder = myDecoder->instance();
 
         _myDecoder->initialize(this);
-        _myDecoder->load(theSource, theName);
+        _myDecoder->load(theSource, theUrl);
 
         postLoad();
     }
@@ -285,7 +306,7 @@ namespace y60 {
         AC_DEBUG << "Movie::loadFile " << (void*)this << " filename=" << myFilename;
 
         // First: Look for registered decoders that could handle the source
-        MovieDecoderBasePtr myDecoder = DecoderManager::get().findDecoder<MovieDecoderBase>(myFilename);
+        MovieDecoderBasePtr myDecoder = getDecoder(theUrl);
 
         if (!myDecoder) {
             // Second: Try m60, by extension

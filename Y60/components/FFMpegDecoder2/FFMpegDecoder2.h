@@ -126,6 +126,8 @@ namespace y60 {
          * @retval true if successful
          */
         bool addAudioPacket(const AVPacket & thePacket);
+        
+        const char * getName() const { return "FFMpegDecoder2"; }
     private:
         AVFormatContext * _myFormatContext;
 

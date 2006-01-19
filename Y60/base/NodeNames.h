@@ -240,6 +240,7 @@ namespace y60 {
     static const char * MOVIE_VOLUME_ATTRIB         = "volume";
     static const char * MOVIE_LOOPCOUNT_ATTRIB      = "loopcount";
     static const char * MOVIE_AUDIO_ATTRIB          = "audio";
+    static const char * MOVIE_DECODERHINT_ATTRIB    = "decoderhint";
 
     static const char * CAPTURE_NODE_NAME           = "capture";
     static const char * CAPTURE_NORM_ATTRIB         = "norm";

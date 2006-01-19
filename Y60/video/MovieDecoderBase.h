@@ -130,6 +130,8 @@ namespace y60 {
              * @return new instance of the concrete MovieDecoder.
              */
             virtual asl::Ptr<MovieDecoderBase> instance() const;
+            
+            virtual const char * getName() const { return "";}
 
         protected:
             const Movie * getMovie() const;

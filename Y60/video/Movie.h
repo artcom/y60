@@ -50,6 +50,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(VolumeTag,       float,       MOVIE_VOLUME_ATTRIB,      1);
     DEFINE_ATTRIBUT_TAG(LoopCountTag,    unsigned,    MOVIE_LOOPCOUNT_ATTRIB,   1);
     DEFINE_ATTRIBUT_TAG(AudioTag,        bool,        MOVIE_AUDIO_ATTRIB,       true);
+    DEFINE_ATTRIBUT_TAG(DecoderHintTag,  std::string, MOVIE_DECODERHINT_ATTRIB, "");
 
     /**
      * @ingroup Y60video
@@ -69,7 +70,8 @@ namespace y60 {
         public LoopCountTag::Plug,
         public CacheSizeTag::Plug,
         public AVDelayTag::Plug,
-        public AudioTag::Plug
+        public AudioTag::Plug,
+        public DecoderHintTag::Plug
     {
         public:
             Movie(dom::Node & theNode);
@@ -139,6 +141,8 @@ namespace y60 {
                             const std::string theName);
 
             void postLoad();
+
+            asl::Ptr<MovieDecoderBase>  getDecoder(const std::string theFilename);
 
             asl::Ptr<MovieDecoderBase> _myDecoder;
             std::string                _myLoadedFilename;

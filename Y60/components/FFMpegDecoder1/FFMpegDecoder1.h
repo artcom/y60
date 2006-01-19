@@ -108,6 +108,7 @@ namespace y60 {
          */
         double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
 
+        const char * getName() const { return "FFMpegDecoder1"; }
     private:
         void closeMovie();
 
