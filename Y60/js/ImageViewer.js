@@ -53,7 +53,10 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myQTPlugged        = false;
     var _myVFWCapturePlugged= false;
     var _myDShowCapturePlugged = false;
-
+    var _myMissedFrameCounter = 0;
+    var _myMaxMissedFrame     = 0;
+    var _myLastFrame          = 0;
+    var _myFrameCounter       = 0;
     //////////////////////////////////////////////////////////////////////
     //
     // Constructor
@@ -177,7 +180,19 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         Base.onFrame(theTime);
         if (_myMovieNode && _myMovieOverlay && _myMovieOverlay.visible) {
             //_myFrameRateLimiter.onFrame(theTime);
+            var myFrameDiff = _myMovieNode.currentframe - _myLastFrame;
+            if (myFrameDiff > 1) {
+                if (myFrameDiff > _myMaxMissedFrame ) {
+                    _myMaxMissedFrame = myFrameDiff;
+                    print("frames total : " + _myFrameCounter + ", misses: " + myFrameDiff + ", sum : " + _myMissedFrameCounter + ", max : " + _myMaxMissedFrame);                    
+                }
+                _myMissedFrameCounter += myFrameDiff;                
+            } 
             window.scene.loadMovieFrame(_myMovieNode, theTime);
+            if (myFrameDiff >0) {
+                _myFrameCounter += myFrameDiff;
+            }
+            _myLastFrame = _myMovieNode.currentframe;
         }
         if (_myCaptureNode && _myMovieOverlay && _myMovieOverlay.visible) {
             //_myFrameRateLimiter.onFrame(theTime);
@@ -293,6 +308,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
         if (!_myMPEGPlugged && (myFilename.search(/\.mpg$/i)  != -1
                                 || myFilename.search(/\.m2v$/i)  != -1
+                                || myFilename.search(/\.avi$/i)  != -1
                                 || myFilename.search(/\.mpeg$/i) != -1
                                 /* || myFilename.search(/\.ra$/i)   != -1 */
                                 )) {
@@ -508,18 +524,20 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             }
 
             var mySize = getSize();
-            myString += "\nSize:      " + mySize.x + "x" + mySize.y +"\n";
-            myString += "Encoding:  " + myNode.pixelformat +"\n";
+            myString += "\nSize:         " + mySize.x + "x" + mySize.y +"\n";
+            myString += "Encoding:     " + myNode.pixelformat +"\n";
             if (myNode.nodeName == "movie") {
-                myString += "Frame:     " + (myNode.currentframe + 1) + " / " + myNode.framecount +"\n";
-                myString += "Framerate: " + myNode.fps.toPrecision(5) +"\n";
-                myString += "Playmode:  " + myNode.playmode +"\n";
-                myString += "Playspeed: " + myNode.playspeed.toPrecision(5) +"\n";
-                myString += "Volume:    " + myNode.volume.toFixed(2) +"\n";
-                myString += "cachesize: " + myNode.cachesize +"\n";
-                myString += "avdelay:   " + myNode.avdelay.toPrecision(3) + "\n";
+                myString += "Frame:        " + (myNode.currentframe + 1) + " / " + myNode.framecount +"\n";
+                myString += "Framerate:    " + myNode.fps.toPrecision(5) +"\n";
+                myString += "Playmode:     " + myNode.playmode +"\n";
+                myString += "Playspeed:    " + myNode.playspeed.toPrecision(5) +"\n";
+                myString += "Volume:       " + myNode.volume.toFixed(2) +"\n";
+                myString += "cachesize:    " + myNode.cachesize +"\n";
+                myString += "avdelay:      " + myNode.avdelay.toPrecision(3) + "\n";
+                myString += "Total frames: " + _myFrameCounter + "\n";                
+                myString += "Misses:       sum: " + _myMissedFrameCounter + ", max: " + _myMaxMissedFrame + "\n";                
             }
-            myString += "Zoom:      " + (_myZoomFactor*100).toFixed(1) + "%\n";
+            myString += "Zoom:         " + (_myZoomFactor*100).toFixed(1) + "%\n";
         }
         return myString.split("\n");
     }
