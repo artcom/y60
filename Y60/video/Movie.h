@@ -51,6 +51,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(LoopCountTag,    unsigned,    MOVIE_LOOPCOUNT_ATTRIB,   1);
     DEFINE_ATTRIBUT_TAG(AudioTag,        bool,        MOVIE_AUDIO_ATTRIB,       true);
     DEFINE_ATTRIBUT_TAG(DecoderHintTag,  std::string, MOVIE_DECODERHINT_ATTRIB, "");
+    DEFINE_ATTRIBUT_TAG(MovieTimeTag,    double,      MOVIE_MOVIETIME_ATTRIB, 0);
 
     /**
      * @ingroup Y60video
@@ -71,13 +72,14 @@ namespace y60 {
         public CacheSizeTag::Plug,
         public AVDelayTag::Plug,
         public AudioTag::Plug,
-        public DecoderHintTag::Plug
+        public DecoderHintTag::Plug,
+        public dom::DynamicAttributePlug<MovieTimeTag, Movie>
     {
         public:
             Movie(dom::Node & theNode);
             virtual ~Movie();
 
-            IMPLEMENT_FACADE(Movie);
+            IMPLEMENT_DYNAMIC_FACADE(Movie);
 
             /**
              * reads the frame closest to theCurrentTime from the movie. Some
@@ -123,6 +125,7 @@ namespace y60 {
                 return PixelEncoding(asl::getEnumFromString(get<ImagePixelFormatTag>(), PixelEncodingString));
             }
 
+            bool getMovieTime(double & theTime) const;
         private:
             Movie();
 
@@ -141,6 +144,7 @@ namespace y60 {
                             const std::string theName);
 
             void postLoad();
+            
 
             asl::Ptr<MovieDecoderBase>  getDecoder(const std::string theFilename);
 

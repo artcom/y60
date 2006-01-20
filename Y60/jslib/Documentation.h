@@ -93,6 +93,7 @@ namespace jslib {
         DOC_TYPE_OBJECT,
         DOC_TYPE_BLOCK,
         DOC_TYPE_SCENE,
+        DOC_TYPE_VECTOROFVECTOR2F,
         DOC_TYPE_VECTOROFVECTOR3F
    };
 
@@ -101,7 +102,8 @@ namespace jslib {
         "string", "int", "float", "bool", "enum", "array",
         "Vector2i", "Vector2f", "Vector3i", "Vector3f", "Vector4f", "VectorOfFloat", "Point", "Quaternion", "Matrix", "Box",
         "Line", "Ray", "LineSegment", "Plane", "Triangle", "Sphere", "Frustum",
-        "Node", "NodeList", "Request", "object", "Block", "Scene", "VectorOfVector3f"
+        "Node", "NodeList", "Request", "object", "Block", "Scene",
+        "VectorOfVector2f", "VectorOfVector3f"
     };
 
     struct ParameterDescription {

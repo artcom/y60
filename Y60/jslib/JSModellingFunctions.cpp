@@ -270,7 +270,7 @@ CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
     } HANDLE_CPP_EXCEPTION;
 }
 
-static JSBool jsCreateStrip(const std::string &theType, JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
+static JSBool CreateStrip(const std::string &theType, JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
 {
     try {
         ensureParamCount(argc, 3, 4);
@@ -284,14 +284,12 @@ static JSBool jsCreateStrip(const std::string &theType, JSContext * cx, JSObject
         std::vector<asl::Vector3f> myPositions;
         convertFrom(cx, argv[2], myPositions);
 
-        string myName;
+        std::vector<asl::Vector2f> myTexCoords;
         if (argc > 3) {
-            convertFrom(cx, argv[3], myName);
-        } else {
-            myName = string("my") + theType;
+            convertFrom(cx, argv[3], myTexCoords);
         }
 
-        dom::NodePtr myResult = createStrip(theType, myScene, myMaterialId, myPositions, myName);
+        dom::NodePtr myResult = createStrip(theType, myScene, myMaterialId, myPositions, myTexCoords);
         *rval = as_jsval(cx, myResult);
 
         return JS_TRUE;
@@ -302,14 +300,14 @@ static JSBool jsCreateStrip(const std::string &theType, JSContext * cx, JSObject
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateLineStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
 {
-    DOC_BEGIN("Create an linestrip shape");
+    DOC_BEGIN("Create a linestrip shape");
     DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
-    DOC_PARAM("theMaterialId", "The shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
     DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
-    DOC_PARAM_OPT("theName", "Shape Name", DOC_TYPE_STRING, "");
+    DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
     DOC_RVAL("The new created linestrip shape", DOC_TYPE_NODE);
     DOC_END;
-    return jsCreateStrip(PRIMITIVE_TYPE_LINE_STRIP, cx, obj, argc, argv, rval);
+    return CreateStrip(PRIMITIVE_TYPE_LINE_STRIP, cx, obj, argc, argv, rval);
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
@@ -317,12 +315,12 @@ CreateQuadStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
 {
     DOC_BEGIN("Create a quadstrip shape");
     DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
-    DOC_PARAM("theMaterialId", "The shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
     DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
-    DOC_PARAM_OPT("theName", "Shape Name", DOC_TYPE_STRING, "");
+    DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
     DOC_RVAL("The new created quadstrip shape", DOC_TYPE_NODE);
     DOC_END;
-    return jsCreateStrip(PRIMITIVE_TYPE_QUAD_STRIP, cx, obj, argc, argv, rval);
+    return CreateStrip(PRIMITIVE_TYPE_QUAD_STRIP, cx, obj, argc, argv, rval);
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
@@ -330,19 +328,19 @@ CreateTriangleStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsv
 {
     DOC_BEGIN("Create a quadstrip shape");
     DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
-    DOC_PARAM("theMaterialId", "The shape material id.", DOC_TYPE_STRING);
+    DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
     DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
-    DOC_PARAM_OPT("theName", "Shape Name", DOC_TYPE_STRING, "");
+    DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
     DOC_RVAL("The new created trianglestrip shape", DOC_TYPE_NODE);
     DOC_END;
-    return jsCreateStrip(PRIMITIVE_TYPE_TRIANGLE_STRIP, cx, obj, argc, argv, rval);
+    return CreateStrip(PRIMITIVE_TYPE_TRIANGLE_STRIP, cx, obj, argc, argv, rval);
 }
 
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("Create an trinangle mesh markup shape");
+        DOC_BEGIN("Create a triangle mesh markup shape");
         DOC_PARAM("theScene", "The scene to create the shape inside", DOC_TYPE_SCENE);
         DOC_PARAM("theLineMaterialId", "The id of the material used for the lines", DOC_TYPE_STRING);
         DOC_PARAM("theAreaMaterialId", "The id of the material used for the areas", DOC_TYPE_STRING);

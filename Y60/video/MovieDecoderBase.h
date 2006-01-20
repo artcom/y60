@@ -62,7 +62,7 @@ namespace y60 {
              *                      if the audioclock or the framecache are used.
              * @return current movie time
              */
-            virtual double getMovieTime(double theSystemTime);
+            virtual double getMovieTime(double theSystemTime); 
 
             /**
              * Reads a frame from the decoder.

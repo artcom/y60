@@ -36,7 +36,7 @@ using namespace std;
 
 
 namespace y60 {
-
+    
     Movie::Movie(dom::Node & theNode):
         Image(theNode),
         FrameCountTag::Plug(theNode),
@@ -50,6 +50,7 @@ namespace y60 {
         AVDelayTag::Plug(theNode),
         AudioTag::Plug(theNode),
         DecoderHintTag::Plug(theNode),
+        dom::DynamicAttributePlug<MovieTimeTag, Movie>(this, &Movie::getMovieTime),
         _myDecoder(0),
         _myLastDecodedFrame(UINT_MAX),
         _myLastCurrentTime(-1.0),
@@ -227,7 +228,15 @@ namespace y60 {
         }
     }
 
-
+    bool Movie::getMovieTime(double & theTime) const {
+        //DK my workaround for not knowing how to const_cast the asl::Ptr itself
+        MovieDecoderBase & myDecoder = const_cast<MovieDecoderBase&>(*_myDecoder);
+        theTime = myDecoder.getMovieTime(_myLastCurrentTime);
+        AC_DEBUG << "Movie::getMovieTime systime " << _myLastCurrentTime 
+                 << " got " << theTime;
+        return true;
+    }
+    
     void Movie::load(asl::PackageManager & thePackageManager) {
         /*
          * XXX

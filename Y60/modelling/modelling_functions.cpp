@@ -230,34 +230,35 @@ namespace y60 {
     dom::NodePtr
     createLineStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
-                         const std::string & theName)
+                         const std::vector<asl::Vector2f> & theTexCoords)
     {
         return createStrip(PRIMITIVE_TYPE_LINE_STRIP, theScene, 
-                theMaterialId, thePositions, theName);
+                theMaterialId, thePositions, theTexCoords);
     }
 
     dom::NodePtr
     createQuadStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
                 const std::vector<asl::Vector3f> & thePositions,
-                const std::string & theName) 
+                const std::vector<asl::Vector2f> & theTexCoords) 
     {
         return createStrip(PRIMITIVE_TYPE_QUAD_STRIP, theScene, 
-                theMaterialId, thePositions, theName);
+                theMaterialId, thePositions, theTexCoords);
     }
 
     dom::NodePtr
     createStrip(const std::string & theType, y60::ScenePtr theScene, 
                 const std::string & theMaterialId,
                 const std::vector<asl::Vector3f> & thePositions,
-                const std::string & theName) 
+                const std::vector<asl::Vector2f> & theTexCoords) 
     {
 
         bool needsNormals = false;
         if (theType == PRIMITIVE_TYPE_QUAD_STRIP || theType == PRIMITIVE_TYPE_TRIANGLE_STRIP) {
             needsNormals = true;
         }            
-            
-        ShapeBuilder myShapeBuilder(theName);
+
+        string myDefaultName = string("my") + theType;
+        ShapeBuilder myShapeBuilder(myDefaultName);
         ElementBuilder myElementBuilder(theType, theMaterialId);
 
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
@@ -265,6 +266,16 @@ namespace y60 {
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE,
                     thePositions.size());
         myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, thePositions.size());
+
+        if ( ! theTexCoords.empty()) {
+            if (theTexCoords.size() != thePositions.size()) {
+              throw asl::Exception(string("createStrip:: theTexCoords count does not match thePosition count: ") + asl::as_string(theTexCoords.size()) + " vs " + asl::as_string(thePositions.size()) );
+                
+            }
+            myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector2f>("uvset", theTexCoords.size());
+            myElementBuilder.createIndex("uvset", getTextureRole(0), theTexCoords.size());
+        }
+        
 
         if (needsNormals) {
             myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, thePositions.size());
@@ -292,8 +303,11 @@ namespace y60 {
                 myShapeBuilder.appendVertexData(NORMAL_ROLE, myNormal);
                 myElementBuilder.appendIndex(NORMALS, i);
             }                
+            if ( ! theTexCoords.empty()) {
+                myShapeBuilder.appendVertexData("uvset", theTexCoords[i]);
+                myElementBuilder.appendIndex(getTextureRole(0), i);
+            }
         }
-
 
         myShapeBuilder.appendElements( myElementBuilder );
         return myShapeBuilder.getNode();

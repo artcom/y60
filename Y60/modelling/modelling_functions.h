@@ -111,10 +111,6 @@ createAngleMarkup(y60::ScenePtr theScene, const std::string & theMaterialId,
 
 
 dom::NodePtr
-createLineStrip(y60::ScenePtr theScene, const std::string & theLineMaterialId,
-                         const std::vector<asl::Vector3f> & thePositions,
-                         const std::string & theName = "LineStripShape") ;
-dom::NodePtr
 createTriangleMeshMarkup(y60::ScenePtr theScene, const std::string & theLineMaterialId,
                          const std::string & theAreaMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
@@ -124,16 +120,22 @@ dom::NodePtr createQuadStack(y60::ScenePtr theScene, const asl::Vector3i & theDi
                      float theSize, const std::string & theMaterialId,
                      const std::string theName = "QuadStack");
 
+
+dom::NodePtr
+createLineStrip(y60::ScenePtr theScene, const std::string & theLineMaterialId,
+                         const std::vector<asl::Vector3f> & thePositions,
+                         const std::vector<asl::Vector2f> & theTexCoords = std::vector<asl::Vector2f>()) ;
+
 dom::NodePtr
 createQuadStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
-                         const std::string & theName = "QuadStripShape") ;
+                         const std::vector<asl::Vector2f> & theTexCoords = std::vector<asl::Vector2f>()) ;
 
 dom::NodePtr
 createStrip(const std::string & theType, y60::ScenePtr theScene, 
         const std::string & theMaterialId,
         const std::vector<asl::Vector3f> & thePositions,
-        const std::string & theName);
+        const std::vector<asl::Vector2f> & theTexCoords); 
 
 struct PlanePosition {
     PlanePosition(const asl::Point3f & theOrigin,
