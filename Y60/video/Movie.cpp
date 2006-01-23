@@ -32,6 +32,7 @@ using namespace dom;
 using namespace std;
 
 #define DB2(x) // x
+#define DB(x) // x
 
 
 namespace y60 {
