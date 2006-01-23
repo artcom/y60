@@ -40,7 +40,7 @@ namespace y60 {
 
     // QuicktimeDecoder
     QuicktimeDecoder::QuicktimeDecoder(asl::DLHandle theDLHandle) :
-        PlugInBase(theDLHandle), _myLastDecodedFrame(UINT_MAX),_myInternalMovieTime(0)
+        PlugInBase(theDLHandle), _myLastDecodedFrame(UINT_MAX),_myInternalMovieTime(0), _myFrameTimeStep(0)
     {}
 
     QuicktimeDecoder::~QuicktimeDecoder() {
@@ -141,6 +141,8 @@ namespace y60 {
         myMovie->set<ImageWidthTag>(movieBounds.right);
         myMovie->set<ImageHeightTag>(movieBounds.bottom);
 
+        _myFrameTimeStep = ((myMovie->get<FrameRateTag>() == 50) ? 12:24);
+
         // Setup video size and image matrix
         float myXResize = float(movieBounds.right) / asl::nextPowerOfTwo(movieBounds.right);
         float myYResize = float(movieBounds.bottom) / asl::nextPowerOfTwo(movieBounds.bottom);
@@ -230,13 +232,14 @@ namespace y60 {
         if (theFrameNumber == 0) {
             myFlags |= nextTimeEdgeOK;
         }
+        ::TimeValue myDesiredMovieTime = theFrameNumber * _myFrameTimeStep;
 
         // skip to the next interesting time and get the duration for that frame
         GetMovieNextInterestingTime(_myMovie,
                   myFlags,
                   1,
                   &myMediaType,
-                  _myInternalMovieTime,
+                  myDesiredMovieTime,
                   0,
                   &_myInternalMovieTime,
                   &myDuration);

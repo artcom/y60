@@ -93,7 +93,8 @@ namespace y60 {
 
             ::Movie                  _myMovie;    
             unsigned                 _myLastDecodedFrame;
-            ::TimeValue              _myInternalMovieTime;  
+            ::TimeValue              _myInternalMovieTime; 
+            ::TimeValue              _myFrameTimeStep;             
             GWorldPtr                _myOffScreenWorld;
 
         };
