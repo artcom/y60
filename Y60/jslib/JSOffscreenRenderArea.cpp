@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSStringMover.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.10 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
-
 
 #include "JSOffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.h"
@@ -28,31 +19,31 @@ namespace jslib {
 typedef jslib::AbstractRenderWindow BASE;
 
 static JSBool
-renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    try {
-    DOC_BEGIN("Renders my current scene onto the texture given by the target attribute of my canvas. ");
-    DOC_PARAM_OPT("theCopyToImageFlag", "if true the underlying image is updated.", DOC_TYPE_BOOLEAN, false);
-    DOC_END;
+    renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        try {
+            DOC_BEGIN("Renders my current scene onto the texture given by the target attribute of my canvas. ");
+            DOC_PARAM_OPT("theCopyToImageFlag", "if true the underlying image is updated.", DOC_TYPE_BOOLEAN, false);
+            DOC_END;
 
-    ensureParamCount(argc, 0, 1);
+            ensureParamCount(argc, 0, 1);
 
-    OffscreenRenderArea * myNative(0);
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-    if (argc > 0) {
-        bool myCopyToImageFlag;
-        convertFrom(cx, argv[0], myCopyToImageFlag);
-        myNative->renderToCanvas(myCopyToImageFlag);
-    } else {
-        myNative->renderToCanvas();
+            OffscreenRenderArea * myNative(0);
+            convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+            if (argc > 0) {
+                bool myCopyToImageFlag;
+                convertFrom(cx, argv[0], myCopyToImageFlag);
+                myNative->renderToCanvas(myCopyToImageFlag);
+            } else {
+                myNative->renderToCanvas();
+            }
+            return JS_TRUE;
+        } HANDLE_CPP_EXCEPTION;
     }
-    return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
 
 static JSBool
 setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("sets the width of the offscreen area. TODO what exactly is this ?");
+        DOC_BEGIN("Sets the width of the offscreen area. TODO what exactly is this ?");
         DOC_PARAM("theWidth", "", DOC_TYPE_INTEGER);
         DOC_END;
         ensureParamCount(argc, 1);
@@ -68,9 +59,27 @@ setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Sets the height of the offscreen area. TODO what exactly is this ?");
+        DOC_PARAM("theHeight", "", DOC_TYPE_INTEGER);
+        DOC_END;
+        ensureParamCount(argc, 1);
+        OffscreenRenderArea * myNative(0);
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        unsigned myHeight;
+        convertFrom(cx, argv[0], myHeight);
+        myNative->setHeight(myHeight);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-        DOC_BEGIN("downloads the content of the offscreen area to an image");
+        DOC_BEGIN("Downloads the content of the offscreen area to an image");
         DOC_PARAM("theImage", "", DOC_TYPE_NODE);
         DOC_END;
         ensureParamCount(argc, 1);
@@ -83,24 +92,6 @@ downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             return JS_FALSE;
         }
         myNative->downloadFromViewport(myImageNode);
-        return JS_TRUE;
-
-    } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
-setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    try {
-        DOC_BEGIN("sets the height of the offscreen area. TODO what exactly is this ?");
-        DOC_PARAM("theHeight", "", DOC_TYPE_INTEGER);
-        DOC_END;
-        ensureParamCount(argc, 1);
-        OffscreenRenderArea * myNative(0);
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-
-        unsigned myHeight;
-        convertFrom(cx, argv[0], myHeight);
-        myNative->setHeight(myHeight);
         return JS_TRUE;
 
     } HANDLE_CPP_EXCEPTION;

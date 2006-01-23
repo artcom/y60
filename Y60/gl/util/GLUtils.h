@@ -197,6 +197,8 @@ DEF_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEEXTPROC, glRenderbufferStorageEXT );
 #define glRenderbufferStorageEXT _ac_glRenderbufferStorageEXT
 DEF_PROC_ADDRESS( PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC, glCheckFramebufferStatusEXT );
 #define glCheckFramebufferStatusEXT _ac_glCheckFramebufferStatusEXT
+DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
+#define glGenerateMipmapEXT _ac_glGenerateMipmapEXT
 #endif
 
 // Swap interval

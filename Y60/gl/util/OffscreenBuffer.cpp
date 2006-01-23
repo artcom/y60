@@ -1,3 +1,13 @@
+//============================================================================
+//
+// Copyright (C) 2005-2006, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//============================================================================
 
 #include "OffscreenBuffer.h"
 #include "GLUtils.h"
@@ -21,12 +31,12 @@ using namespace dom;
 
 namespace y60 {
 
-
 void
 checkFramebufferStatus() {
     GLenum myStatus;
     myStatus = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    bool isOK(true);
+
+    bool isOK = false;
     ostringstream os;
     switch(myStatus) {                                          
         case GL_FRAMEBUFFER_COMPLETE_EXT: // Everything's OK
@@ -34,41 +44,33 @@ checkFramebufferStatus() {
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT" << endl;
-            isOK = false;
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT" << endl;
-            isOK = false;
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT" << endl;
-            isOK = false;
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT" << endl;
-            isOK = false;
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT" << endl;
-            isOK = false;
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT" << endl;
-            isOK = false;
             break;
         case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
             os << "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT" << endl;
-            isOK = false;
             break;
         case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
             os << "GL_FRAMEBUFFER_UNSUPPORTED_EXT" << endl;
-            isOK = false;
             break;
         /* [DS] not found in current headers
-        case GL_FRAMEBUFFER_STATUS_ERROR_EXT:
-            os << "GL_FRAMEBUFFER_STATUS_ERROR_EXT" << endl;
-            isOK = false;
-            break;
+         * [UH] has been removed from spec
+         case GL_FRAMEBUFFER_STATUS_ERROR_EXT:
+             os << "GL_FRAMEBUFFER_STATUS_ERROR_EXT" << endl;
+             break;
         */
         default:
             /* programming error; will fail on all hardware */
@@ -76,7 +78,7 @@ checkFramebufferStatus() {
                         + asl::as_string(myStatus), PLUS_FILE_LINE);
     }
 
-    if (! isOK) {
+    if (!isOK) {
         throw OffscreenRendererException(os.str(), PLUS_FILE_LINE);
     }
 }
@@ -89,7 +91,7 @@ OffscreenBuffer::OffscreenBuffer(bool theUseGLFramebufferObject)
 
 void OffscreenBuffer::preOffscreenRender( ImagePtr theTexture) {
     AC_TRACE << "OffscreenBuffer::preOffscreenRender " 
-             << " w/ gl framebuffer extension " << _myUseGLFramebufferObject;
+             << "w/ GL framebuffer extension " << _myUseGLFramebufferObject;
     if (_myUseGLFramebufferObject) {
         bindOffscreenFrameBuffer(theTexture);
     }
@@ -98,12 +100,19 @@ void OffscreenBuffer::preOffscreenRender( ImagePtr theTexture) {
 
 void OffscreenBuffer::postOffscreenRender( ImagePtr theTexture, bool theCopyToImageFlag) {
     AC_TRACE << "OffscreenBuffer::postOffscreenRender " 
-             << " w/ gl framebuffer extension " << _myUseGLFramebufferObject;
+             << "w/ GL framebuffer extension " << _myUseGLFramebufferObject;
+
     if (_myUseGLFramebufferObject) {
 #ifdef GL_EXT_framebuffer_object
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 #endif
         glBindTexture (GL_TEXTURE_2D, theTexture->getGraphicsId() );
+#ifdef GL_EXT_framebuffer_object
+        if (glGenerateMipmapEXT && theTexture->get<ImageMipmapTag>()) {
+            AC_TRACE << "OffscreenBuffer::postOffscreenRender: generating mipmap levels";
+            glGenerateMipmapEXT(GL_TEXTURE_2D);
+        }
+#endif
     } else {
         copyFrameBufferToTexture(theTexture);
     }
@@ -111,30 +120,30 @@ void OffscreenBuffer::postOffscreenRender( ImagePtr theTexture, bool theCopyToIm
     if (theCopyToImageFlag) {
         copyFrameBufferToImage(theTexture);
     }
+ 
     // cleanly unbind the texture
     if (_myUseGLFramebufferObject) {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-
 }
 
+
 void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
-    AC_TRACE << "OffscreenBuffer::copyFrameBufferToImage ";
+    AC_TRACE << "OffscreenBuffer::copyFrameBufferToImage";
 
 #ifdef GL_EXT_framebuffer_object
     if (_myUseGLFramebufferObject) {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myOffscreenBuffer);
     }
 #endif
-
-    
+ 
     PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(theImage->getEncoding());
 
-    AC_DEBUG << "RGB: " << (myPixelEncodingInfo.externalformat==GL_RGB);
-    AC_DEBUG << "DEPTH: " << (myPixelEncodingInfo.externalformat==GL_DEPTH_COMPONENT);
     AC_DEBUG << "RGBA: " << (myPixelEncodingInfo.externalformat==GL_RGBA);
-    AC_DEBUG << "bytes per pixel: " << myPixelEncodingInfo.bytesPerPixel;
-    AC_DEBUG << "GLFLOAT: " << (myPixelEncodingInfo.pixeltype==GL_FLOAT);
+    AC_DEBUG << "RGB:  " << (myPixelEncodingInfo.externalformat==GL_RGB);
+    AC_DEBUG << "DEPTH:" << (myPixelEncodingInfo.externalformat==GL_DEPTH_COMPONENT);
+    AC_DEBUG << "pixeltype is GLFLOAT: " << (myPixelEncodingInfo.pixeltype==GL_FLOAT);
+    AC_DEBUG << "bytes-per-pixel=" << myPixelEncodingInfo.bytesPerPixel;
 
     glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
@@ -164,9 +173,10 @@ void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
                   theImage->get<ImageWidthTag>() * myPixelEncodingInfo.bytesPerPixel);
     PLPNGEncoder myEncoder;
     myEncoder.MakeFileFromBmp(myFilename.c_str(), &myBmp);               
-
 #endif
-// texture is already uploaded, either by bindTexture(..) or by copyFrameBufferToTexture(..) VS/UH
+
+    // texture is already uploaded, either by bindTexture(..) or
+    // by copyFrameBufferToTexture(..) VS/UH
     //theImage->getRasterValueNode()->bumpVersion(); 
 
 #ifdef GL_EXT_framebuffer_object
@@ -180,13 +190,13 @@ void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
 void OffscreenBuffer::copyFrameBufferToTexture(ImagePtr theTexture) {
     AC_TRACE << "OffscreenBuffer::copyFrameBufferToTexture ";
     glBindTexture (GL_TEXTURE_2D, theTexture->getGraphicsId() );
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP levels*/, 0, 0,
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
             0, 0, theTexture->get<ImageWidthTag>(), theTexture->get<ImageHeightTag>() );
     glBindTexture (GL_TEXTURE_2D, 0);
 }
 
 void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theTexture) {
-    AC_TRACE << "OffscreenBuffer::bindOffscreenFrameBuffer ";
+    AC_TRACE << "OffscreenBuffer::bindOffscreenFrameBuffer";
 #ifdef GL_EXT_framebuffer_object
     if ( ! _myOffscreenBuffer) {
         glGenFramebuffersEXT(1, &_myOffscreenBuffer);
@@ -216,6 +226,4 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theTexture) {
     throw OpenGLException("GL_EXT_framebuffer_object support not compiled", PLUS_FILE_LINE);
 #endif
 }
-
-
 }
