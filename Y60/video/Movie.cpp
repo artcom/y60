@@ -31,6 +31,7 @@
 using namespace dom;
 using namespace std;
 
+#define DB(x) // x
 #define DB2(x) // x
 #define DB(x) // x
 
@@ -86,13 +87,17 @@ namespace y60 {
 
     void Movie::stop() {
         AC_DEBUG  << "Movie::stop";
-        _myDecoder->stopMovie();
+        if (_myDecoder) {
+            _myDecoder->stopMovie();
+        }
         set<PlayModeTag>(asl::getStringFromEnum(PLAY_MODE_STOP, MoviePlayModeStrings));
         set<CurrentFrameTag>(0);
         _myLastDecodedFrame = UINT_MAX;
         _myCurrentLoopCount = 0;
         dom::ResizeableRasterPtr myRaster = getRasterPtr();
-        memset(myRaster->pixels().begin(), 0, myRaster->pixels().size());
+        if (myRaster) {
+            memset(myRaster->pixels().begin(), 0, myRaster->pixels().size());
+        }
     }
 
     void
@@ -309,6 +314,13 @@ namespace y60 {
     Movie::loadFile(const std::string & theUrl) {
 
         const std::string & mySourceFile = get<ImageSourceTag>();
+        if (_myDecoder) {
+            _myDecoder->stopMovie();
+        }
+        set<CurrentFrameTag>(0);
+        _myLastDecodedFrame = UINT_MAX;
+        _myCurrentLoopCount = 0;
+
         _myPlayMode = PLAY_MODE_STOP;
 
         // if imagesource is an url do not take the packetmanaged or searchfiled new url

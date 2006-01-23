@@ -105,16 +105,19 @@ namespace y60 {
     }
 
     void MovieDecoderBase::startMovie(double theStartTime) {
+        AC_DEBUG << "MovieDecoderBase::startMovie -> " << theStartTime;
         _myMovieTime      = theStartTime;
         _myLastSystemTime = -1.0;
     }
 
     void MovieDecoderBase::resumeMovie(double theStartTime) {
+        AC_DEBUG << "MovieDecoderBase::resumeMovie -> " << theStartTime;
         _myMovieTime      = theStartTime;
         _myLastSystemTime = -1.0;
     }
 
     void MovieDecoderBase::stopMovie() {
+        AC_DEBUG << "MovieDecoderBase::stopMovie";
         _myMovieTime = 0.0; 
         _myLastSystemTime = -1.0;
     }
