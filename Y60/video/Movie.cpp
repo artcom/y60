@@ -31,7 +31,6 @@
 using namespace dom;
 using namespace std;
 
-#define DB(x) x
 #define DB2(x) // x
 
 
@@ -299,6 +298,7 @@ namespace y60 {
     Movie::loadFile(const std::string & theUrl) {
 
         const std::string & mySourceFile = get<ImageSourceTag>();
+        _myPlayMode = PLAY_MODE_STOP;
 
         // if imagesource is an url do not take the packetmanaged or searchfiled new url
 
@@ -331,7 +331,6 @@ namespace y60 {
 
         _myDecoder->initialize(this);
         _myDecoder->load(myFilename);
-
         postLoad();
     }
 
