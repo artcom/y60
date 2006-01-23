@@ -51,7 +51,8 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(LoopCountTag,    unsigned,    MOVIE_LOOPCOUNT_ATTRIB,   1);
     DEFINE_ATTRIBUT_TAG(AudioTag,        bool,        MOVIE_AUDIO_ATTRIB,       true);
     DEFINE_ATTRIBUT_TAG(DecoderHintTag,  std::string, MOVIE_DECODERHINT_ATTRIB, "");
-    DEFINE_ATTRIBUT_TAG(MovieTimeTag,    double,      MOVIE_MOVIETIME_ATTRIB, 0);
+    DEFINE_ATTRIBUT_TAG(MovieTimeTag,    double,      MOVIE_MOVIETIME_ATTRIB,   0);
+    DEFINE_ATTRIBUT_TAG(DecoderTag,      std::string, MOVIE_DECODER_ATTRIB,     "UNKNOWN");
 
     /**
      * @ingroup Y60video
@@ -73,9 +74,11 @@ namespace y60 {
         public AVDelayTag::Plug,
         public AudioTag::Plug,
         public DecoderHintTag::Plug,
-        public dom::DynamicAttributePlug<MovieTimeTag, Movie>
+        public dom::DynamicAttributePlug<MovieTimeTag, Movie>,
+        public dom::DynamicAttributePlug<DecoderTag, Movie>
     {
         public:
+
             Movie(dom::Node & theNode);
             virtual ~Movie();
 
@@ -126,6 +129,7 @@ namespace y60 {
             }
 
             bool getMovieTime(double & theTime) const;
+            bool getDecoderName(std::string & theName) const;
         private:
             Movie();
 

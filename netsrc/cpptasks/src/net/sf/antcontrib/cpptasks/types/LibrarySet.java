@@ -243,8 +243,7 @@ public class LibrarySet extends ProjectComponent {
         for (int k = 0; k < files.length; k++) {
             visitor.visit(basedir, files[k]);
         }
-*/        
-        
+*/
 // new version - order of visiting stays as set by setLibs
 
         for (int l = 0;l < libnames.length; ++l) {
@@ -260,7 +259,6 @@ public class LibrarySet extends ProjectComponent {
                 }
             }
         }
-        
     }
     
     public void visitLibraries(Project project, Linker linker, File[] libpath,

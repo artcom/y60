@@ -316,7 +316,12 @@ namespace dom {
         }
 
         static void updateNodeValue(FACADE * theFacade, Node & theAttributeNode) {
-            const typename TAG::TYPE & theValue = theAttributeNode.Node::nodeValueRef<typename TAG::TYPE>();
+
+			const typename TAG::TYPE & theValue 
+				= ValueHelper<VALUE, WRAPPER>::getValue(theAttributeNode.nodeValueWrapperPtr());
+
+            //const typename TAG::TYPE & theValue = theAttributeNode.Node::nodeValueRef<typename TAG::TYPE>();
+
             if (theFacade->DynamicAttributePlug<TAG,FACADE>::updateBeforeRead(const_cast<typename TAG::TYPE&>(theValue))) {
                 theAttributeNode.setVersion(theAttributeNode.documentVersion());
             }

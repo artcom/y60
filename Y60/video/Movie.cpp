@@ -35,6 +35,7 @@ using namespace std;
 #define DB(x) // x
 
 
+
 namespace y60 {
     
     Movie::Movie(dom::Node & theNode):
@@ -51,6 +52,7 @@ namespace y60 {
         AudioTag::Plug(theNode),
         DecoderHintTag::Plug(theNode),
         dom::DynamicAttributePlug<MovieTimeTag, Movie>(this, &Movie::getMovieTime),
+        dom::DynamicAttributePlug<DecoderTag, Movie>(this, &Movie::getDecoderName),
         _myDecoder(0),
         _myLastDecodedFrame(UINT_MAX),
         _myLastCurrentTime(-1.0),
@@ -234,6 +236,14 @@ namespace y60 {
         theTime = myDecoder.getMovieTime(_myLastCurrentTime);
         AC_DEBUG << "Movie::getMovieTime systime " << _myLastCurrentTime 
                  << " got " << theTime;
+        return true;
+    }
+    
+    bool Movie::getDecoderName(std::string & theName) const {
+        AC_DEBUG << "Movie::getDecoderName";
+        MovieDecoderBase & myDecoder = const_cast<MovieDecoderBase&>(*_myDecoder);
+        theName = myDecoder.getName();
+        AC_DEBUG << "Movie::getDecoderName got " << theName;
         return true;
     }
     
