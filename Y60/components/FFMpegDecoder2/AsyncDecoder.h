@@ -36,8 +36,7 @@ namespace y60 {
     class AsyncDecoder : public MovieDecoderBase {
     public:
           AsyncDecoder() :
-              _myReadEOF(false), _myAudioStartTime(0), _myMovieTime(0),
-              _myPauseStartTime(0), _myState(IDLE)
+              _myReadEOF(false), _myState(IDLE)
           {}
 
 
@@ -74,8 +73,6 @@ namespace y60 {
               AC_INFO << "pauseMovie";
               if (_myAudioSink) {            
                   _myAudioSink->pause();
-              } else {
-                  _myPauseStartTime = 0.0;
               }
               _myState = PAUSE;
               MovieDecoderBase::pauseMovie();
@@ -83,7 +80,7 @@ namespace y60 {
 
           void startMovie(double theStartTime) {
               AC_DEBUG << "startMovie";
-              MovieDecoderBase::startMovie();
+              MovieDecoderBase::startMovie(theStartTime);
               if (_myAudioSink) {            
                   _myAudioSink->play();
               }
@@ -93,16 +90,9 @@ namespace y60 {
            */
           void resumeMovie(double theStartTime) {
               AC_DEBUG << "resumeMovie";
-              MovieDecoderBase::resumeMovie();
-              double myPauseTime = 0.0;
-
+              MovieDecoderBase::resumeMovie(theStartTime);
               if (_myAudioSink) {            
                   _myAudioSink->play();
-              } else {
-                  AC_TRACE << "resume audio free mpeg video";
-                  myPauseTime = _myPauseStartTime;
-                  _myAudioStartTime += myPauseTime;
-                  _myPauseStartTime = -1;
               }
           }
 
@@ -115,9 +105,7 @@ namespace y60 {
               MovieDecoderBase::stopMovie();
               if (_myAudioSink) {            
                   _myAudioSink->stop();
-              } else {
-                  _myAudioStartTime = _myPauseStartTime = _myMovieTime = 0;
-              }
+              } 
           }
 
           /**
@@ -133,10 +121,6 @@ namespace y60 {
     protected:
 
         asl::HWSampleSinkPtr  _myAudioSink;
-
-        double          _myMovieTime;
-        double          _myAudioStartTime;
-        double          _myPauseStartTime;
         bool            _myReadEOF;
         asl::ThreadLock _myLock;
 
