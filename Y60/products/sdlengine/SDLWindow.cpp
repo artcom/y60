@@ -693,8 +693,12 @@ SDLWindow::setSwapInterval(unsigned theInterval)
 #ifdef WIN32
     if (wglSwapIntervalEXT) {
         wglSwapIntervalEXT(theInterval);
+        _mySwapInterval = wglGetSwapIntervalEXT();
+        if (theInterval != _mySwapInterval) {
+            AC_ERROR << "setSwapInterval(): wglSwapInterval is buggy, using " << _mySwapInterval;
+        }
     } else {
-        AC_WARNING << "setSwapInterval(): wglSwapInterval Extension not supported.";
+        AC_WARNING << "setSwapInterval(): wglSwapInterval not supported.";
     }    
 #else
     if (glXGetVideoSyncSGI && glXWaitVideoSyncSGI) {
