@@ -308,6 +308,8 @@ namespace dom {
     {
     protected:
         typedef bool(FACADE::*Getter)(typename TAG::TYPE&) const;
+        typedef typename TAG::TYPE VALUE;
+        typedef typename ValueWrapper<VALUE>::Type WRAPPER;
 
         DynamicAttributePlug(FACADE * theFacade, Getter theGetter) :
             FacadeAttributePlug<TAG>(theFacade), _myGetter(theGetter)
@@ -317,7 +319,7 @@ namespace dom {
 
         static void updateNodeValue(FACADE * theFacade, Node & theAttributeNode) {
 
-			const typename TAG::TYPE & theValue 
+			const VALUE & theValue 
 				= ValueHelper<VALUE, WRAPPER>::getValue(theAttributeNode.nodeValueWrapperPtr());
 
             //const typename TAG::TYPE & theValue = theAttributeNode.Node::nodeValueRef<typename TAG::TYPE>();
