@@ -148,10 +148,12 @@ namespace y60 {
         int myDataLen = thePacket.size;
         double myTime = thePacket.dts / (double)AV_TIME_BASE;
 
+        AC_TRACE << "decoding @ " << myTime << " size " << myDataLen;
         while (frameFinished == 0 && myDataLen > 0) {
             int myLen = avcodec_decode_video(&_myVStream->codec,
                 _myFrame, &frameFinished,
                 myData, myDataLen);
+            AC_TRACE << "avcodec_decode_video returned " << myLen << " got pic " << frameFinished;
             if (myLen < 0) {
                 AC_ERROR << "av_decode_video error";
                 break;
@@ -635,6 +637,15 @@ namespace y60 {
         }
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps=" << getFrameRate() << " framecount=" << getFrameCount();
 
+        // allocate frame for YUV data            
+        _myFrame = avcodec_alloc_frame();
+        
+/* DK:
+ * disabled because it causes errors (spratzer) while looping
+ * 
+ * i don't think this is the start time you should seek to.
+ * reading and decoding afterwards leads to incomplete frames (returned by av_decode_video)
+ * 
         // Get first timestamp
         AVPacket myPacket;
         bool myEndOfFileFlag = (av_read_frame(_myFormatContext, &myPacket) < 0);
@@ -642,8 +653,6 @@ namespace y60 {
         AC_TRACE << "FFMpegDecoder2::setupVideo() - First packet has timestamp: " << myPacket.dts;
         av_free_packet(&myPacket);
         avcodec_flush_buffers(&_myVStream->codec);
-                // allocate frame for YUV data
-        _myFrame = avcodec_alloc_frame();
 
         // Get starttime
         if (_myVStream->start_time != AV_NOPTS_VALUE) {
@@ -651,6 +660,9 @@ namespace y60 {
         } else {
             _myStartTimestamp = 0;
         }
+ */        
+        _myStartTimestamp = 0;
+        
         AC_TRACE << "FFMpegDecoder2::setupVideo() - Start timestamp: " << _myStartTimestamp;
         _myTimePerFrame = (int64_t)(AV_TIME_BASE / double(getFrameRate()));
         _myLineSizeBytes = getBytesRequired(getFrameWidth(), getPixelFormat());
