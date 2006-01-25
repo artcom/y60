@@ -339,7 +339,7 @@ namespace y60 {
                 myVideoFrame = _myFrameCache.pop_front();
                 int64_t myTimeDiff = myFrameTimestamp - myVideoFrame->getTimestamp();
                 AC_TRACE << "TimeDiff: " << myTimeDiff;
-				if (myTimeDiff <= 0 || _myFrameCache.size() == 0) {
+				if (myTimeDiff < 0 || _myFrameCache.size() == 0) {
                     _myFrameCache.push_front(myVideoFrame);
                     break;
                 } else {
@@ -375,6 +375,7 @@ namespace y60 {
             }
             AC_TRACE << "Readframe ending.";
             getMovie()->set<CacheSizeTag>(_myFrameCache.size());
+
 
 			AC_TRACE << "readFrame (2) release lock";
         } catch (asl::ThreadSemaphore::ClosedException &) {
