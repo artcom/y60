@@ -74,13 +74,13 @@ class EdgeBlender :
 
     private:
         float getBlendValue(float theValue);
-        enum Mode {
-            BLEND_OUT_RIGHT,
-            BLEND_OUT_LEFT,
-            BLEND_OUT_BOTH
-        };
-        unsigned  _myMode;
-        float _myBlendLeft;
+        void drawBlackLevel();
+        void drawBlendedEdge(unsigned theEdge);
+        const static unsigned BLEND_EDGE_LEFT  = 1;
+        const static unsigned BLEND_EDGE_RIGHT = 2;
+        const static unsigned BLEND_EDGE_UP    = 4;
+        const static unsigned BLEND_EDGE_DOWN  = 8;
+        unsigned  _myEdges;
         float _myBlendWidth;
         unsigned _myNumSubdivisions;
 
@@ -97,8 +97,7 @@ EdgeBlender :: EdgeBlender(asl::DLHandle theDLHandle) :
 
 void
 EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow) {
-    _myMode = BLEND_OUT_LEFT;
-    _myBlendLeft = 0.0f;
+    _myEdges = BLEND_EDGE_LEFT;
     _myBlendWidth = 0.2f;
     _myNumSubdivisions = 32;
     _myBlackLevel = 0.1f;
@@ -111,10 +110,8 @@ EdgeBlender::onGetProperty(const std::string & thePropertyName,
         PropertyValue & theReturnValue) const
 {
     AC_DEBUG << "onGetProperty " << thePropertyName;
-    if (thePropertyName == "mode") {
-        theReturnValue.set<unsigned>(_myMode);
-    } else if (thePropertyName == "blendleft") {
-        theReturnValue.set<float>(_myBlendLeft);
+    if (thePropertyName == "edges") {
+        theReturnValue.set<unsigned>(_myEdges);
     } else if (thePropertyName == "blendwidth") {
         theReturnValue.set<float>(_myBlendWidth);
     } else if (thePropertyName == "subdivisions") {
@@ -133,10 +130,8 @@ EdgeBlender::onSetProperty(const std::string & thePropertyName,
         const PropertyValue & thePropertyValue)
 {
     AC_DEBUG << "onSetProperty " << thePropertyName;
-    if (thePropertyName == "mode") {
-        _myMode = thePropertyValue.get<unsigned>();
-    } else if (thePropertyName == "blendleft") {
-        _myBlendLeft = thePropertyValue.get<float>();
+    if (thePropertyName == "edges") {
+        _myEdges = thePropertyValue.get<unsigned>();
     } else if (thePropertyName == "blendwidth") {
         _myBlendWidth = thePropertyValue.get<float>();
     } else if (thePropertyName == "subdivisions") {
@@ -153,8 +148,7 @@ EdgeBlender::onSetProperty(const std::string & thePropertyName,
 void 
 EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     AC_DEBUG << "onUpdateSettings " << *theSettings;
-    _myMode = getSetting(theSettings, "mode", _myMode);
-    _myBlendLeft = getSetting(theSettings, "blendleft", _myBlendWidth);
+    _myEdges = getSetting(theSettings, "edges", _myEdges);
     _myBlendWidth = getSetting(theSettings, "blendwidth", _myBlendWidth);
     _myNumSubdivisions = getSetting(theSettings, "subdivisions", _myNumSubdivisions);
     _myBlackLevel = getSetting(theSettings, "blacklevel", _myBlackLevel);
@@ -203,6 +197,67 @@ EdgeBlender::getBlendValue(float theValue) {
 }
 
 void
+EdgeBlender::drawBlackLevel() {
+    float myLeft = _myEdges & BLEND_EDGE_LEFT ? _myBlendWidth : 0.0f;
+    float myRight = _myEdges & BLEND_EDGE_RIGHT ? 1.0f - _myBlendWidth : 1.0f;
+    float myUp = _myEdges & BLEND_EDGE_UP ? _myBlendWidth : 0.0f;
+    float myDown = _myEdges & BLEND_EDGE_DOWN ? 1.0f - _myBlendWidth : 1.0f;
+    glLoadIdentity();
+    glBegin(GL_TRIANGLE_STRIP);
+    glColor4f(1.0f, 1.0f, 1.0f, _myBlackLevel);
+    glVertex2f(myLeft, myUp);
+    glVertex2f(myLeft, myDown);
+    glVertex2f(myRight, myUp);
+    glVertex2f(myRight, myDown);
+    glEnd();
+}
+
+void 
+EdgeBlender::drawBlendedEdge(unsigned theMode) {
+    AC_DEBUG << "drawBlendedEdge " << theMode;
+    float myAngle = 0.0f;
+    switch (theMode) {
+        case BLEND_EDGE_LEFT:
+            break;
+        case BLEND_EDGE_RIGHT:
+            myAngle = 180.0f;
+            break;
+        case BLEND_EDGE_UP:
+            myAngle = 90.0f;
+            break;
+        case BLEND_EDGE_DOWN:
+            myAngle = 270.0f;
+            break;
+        default:
+            AC_WARNING << "theMode " << theMode << " unknown.";
+    }
+
+    //rotate according to the mode
+    glLoadIdentity();
+    glTranslatef(0.5f, 0.5f, 0.0f);
+    glRotatef(myAngle, 0.0f, 0.0f, 1.0f);
+    glTranslatef(-0.5f, -0.5f, 0.0f);
+    
+    glBegin(GL_TRIANGLE_STRIP);
+    for (unsigned i = 0; i < _myNumSubdivisions+1; ++i) {
+
+        float myValue = i / (float)(_myNumSubdivisions);
+        float myBlendValue = getBlendValue(1.0f - myValue);
+
+        glColor4f(0.0f, 0.0f, 0.0f, myBlendValue);
+        //glColor4f(myBlendValue ,0 ,0 ,1);
+
+        float myX = myValue*_myBlendWidth;
+        glVertex2f(myX, 0.0f);
+        glVertex2f(myX, 1.0f);
+
+        AC_DEBUG << "i=" << i << " blend=" << myBlendValue;
+    }
+    glEnd();
+    
+}
+
+void
 EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
     AC_TRACE << "onPostRender";
 
@@ -223,60 +278,24 @@ EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
     glDisable(GL_LIGHTING); 
 
 
-    // blacklevel left
-    if (_myBlendLeft > 0.0f) {
-        glBegin(GL_TRIANGLE_STRIP);
-        glColor4f(1.0f, 1.0f, 1.0f, _myBlackLevel);
-        glVertex2f(0.0f, 0.0f);
-        glVertex2f(0.0f, 1.0f);
-        glVertex2f(_myBlendLeft, 0.0f);
-        glVertex2f(_myBlendLeft, 1.0f);
-        glEnd();
-    }
-
-    glBegin(GL_TRIANGLE_STRIP);
-    for (unsigned i = 0; i < _myNumSubdivisions+1; ++i) {
-
-        float myValue = i / (float)(_myNumSubdivisions);
-        float myBlendValue;
-
-        switch (_myMode) {
-            case BLEND_OUT_LEFT:
-                myBlendValue = getBlendValue(myValue);
-                break;
-            case BLEND_OUT_RIGHT:
-                myBlendValue = getBlendValue(1.0f - myValue);
-                break;
-            case BLEND_OUT_BOTH:
-                if (myValue < 0.5f) {
-                    myBlendValue = getBlendValue(2.0f*myValue);
-                } else {
-                    myBlendValue = getBlendValue(2.0f*(1.0f - myValue));
-                }
-                break;
-        }
-        
-        glColor4f(0.0f, 0.0f, 0.0f, myBlendValue);
-
-        float myX = _myBlendLeft + myValue*_myBlendWidth;
-        glVertex2f(myX, 0.0f);
-        glVertex2f(myX, 1.0f);
-
-        //AC_DEBUG << "i=" << i << " blend=" << myBlendValue;
-    }
-    glEnd();
+    //blended edges
+    if (_myEdges & BLEND_EDGE_LEFT) {
+        drawBlendedEdge(BLEND_EDGE_LEFT);
+    }        
+    if (_myEdges & BLEND_EDGE_RIGHT) {
+        drawBlendedEdge(BLEND_EDGE_RIGHT);
+    }        
+    if (_myEdges & BLEND_EDGE_UP) {
+        drawBlendedEdge(BLEND_EDGE_UP);
+    }        
+    if (_myEdges & BLEND_EDGE_DOWN) {
+        drawBlendedEdge(BLEND_EDGE_DOWN);
+    }        
+    //
+    //blacklevel
+    drawBlackLevel();
     
-    // blacklevel right
-    if (_myBlendLeft + _myBlendWidth < 1.0f) {
-        glBegin(GL_TRIANGLE_STRIP);
-        glColor4f(1.0f, 1.0f, 1.0f, _myBlackLevel);
-        glVertex2f(_myBlendLeft + _myBlendWidth, 0.0f);
-        glVertex2f(_myBlendLeft + _myBlendWidth, 1.0f);
-        glVertex2f(1.0f, 0.0f);
-        glVertex2f(1.0f, 1.0f);
-        glEnd();
-    }
-
+    
     glPopAttrib();
 
     // restore modelview

@@ -1,7 +1,6 @@
 <settings>
 <EdgeBlender>
-    <mode min="0" max="2" step="1">0</mode>
-    <blendleft min="0.0" max="1.0" step="0.01">0.0</blendleft>
+    <edges min="1" max="15" step="1">4</edges>
     <blendwidth min="0.0" max="1.0" step="0.01">0.1</blendwidth>
     <subdivisions min="1" max="64" step="1">32</subdivisions>
     <blacklevel min="0.0" max="1.0" step="0.01">0.1</blacklevel>

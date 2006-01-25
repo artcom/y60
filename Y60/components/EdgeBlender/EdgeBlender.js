@@ -17,7 +17,7 @@
 //=============================================================================
 
 use("SceneViewer.js");
-//plug("EdgeBlender");
+plug("EdgeBlender");
 
 
 function EdgeBlendViewer(theArguments) {
@@ -34,7 +34,7 @@ EdgeBlendViewer.prototype.Constructor = function(self, theArguments) {
 
     SceneViewer.prototype.Constructor(self, theArguments);
     var Base = [];
-    var _myEdgeBlender = null; //new EdgeBlender();
+    var _myEdgeBlender = new EdgeBlender();
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -55,33 +55,14 @@ EdgeBlendViewer.prototype.Constructor = function(self, theArguments) {
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theFullscreen, theTitle) {
         window = new RenderWindow();
-        window.decorations = false;
         window.position = new Vector2i(0,0);
 
-        var myCamera = getDescendantByTagName(self.getWorld(), "camera", true);
-        //self.setActiveCamera(myCamera);
-
-        self.setSplashScreen(false);
         Base.setup(theWidth, theHeight, theFullscreen, theTitle);
 
-        //self.setMover(null);
-
-        //window.addExtension(_myEdgeBlender);
-        //self.registerSettingsListener(_myEdgeBlender, "EdgeBlender");
+        window.addExtension(_myEdgeBlender);
+        self.registerSettingsListener(_myEdgeBlender, "EdgeBlender");
         
-        // clone viewport
-        _myViewport1 = getDescendantByTagName(window.canvas, "viewport");
-        _myViewport1.position = new Vector2f(-0.1,0);
-        
-        if (_myViewport1) {
-            print("Cloning viewport '" + _myViewport1.name + "'");
-            _myViewport2 = _myViewport1.cloneNode(true);
-            _myViewport2.position = new Vector2f(0.1,0);
-            adjustNodeId(_myViewport2, true);
-            _myViewport2.name = "Left";
-            window.canvas.appendChild(_myViewport2);
-        }
-        window.scene.save("buf.x60");
+        //window.scene.save("buf.x60");
         
     }
 
@@ -133,9 +114,6 @@ EdgeBlendViewer.prototype.Constructor = function(self, theArguments) {
         Base.onFrame(theTime);
 
     }
-
-    var _myViewport1, _myViewport2;
-
 }
 
 //
@@ -145,7 +123,7 @@ EdgeBlendViewer.prototype.Constructor = function(self, theArguments) {
 try {
     var ourApp = new EdgeBlendViewer(arguments);
 
-    ourApp.setup(2048, 800, false, "EdgeBlendViewer");
+    ourApp.setup(1024, 800, false, "EdgeBlendViewer");
     ourApp.go();
 } catch (ex) {
     print("-------------------------------------------------------------------------------");
