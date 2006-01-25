@@ -88,6 +88,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 break;
             }
         }
+        //window.swapInterval = 0;
         if (_myPlaylist.getNumEntries() == 0) {
             print("Nothing to show!");
             exit(0);
@@ -300,7 +301,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
         if (myFilename.search(/^video:\/\//i) != -1) {
             plug("y60VFWCapture");
-            print("VideoForWindows dshow");
         } else if (myFilename.search(/^dshow:\/\//i) != -1) {
             plug("y60DShowCapture");
             print("plugged dshow");
@@ -536,6 +536,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 myString += "avdelay:      " + myNode.avdelay.toPrecision(3) + "\n";
                 myString += "Total frames: " + _myFrameCounter + "\n";                
                 myString += "Misses:       sum: " + _myMissedFrameCounter + ", max: " + _myMaxMissedFrame + "\n";                
+                myString += "Decoder:      " + myNode.decoder + "\n";
             }
             myString += "Zoom:         " + (_myZoomFactor*100).toFixed(1) + "%\n";
         }
