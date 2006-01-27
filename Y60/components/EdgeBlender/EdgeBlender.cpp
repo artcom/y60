@@ -193,8 +193,6 @@ EdgeBlender::getBlendValue(float theValue) {
         myBlendValue = powf(myBlendValue, 1.0f / _myGamma);
     }
 
-    // blacklevel
-    myBlendValue = _myBlackLevel + myBlendValue * (1.0f - _myBlackLevel);
     return myBlendValue;
 }
 
