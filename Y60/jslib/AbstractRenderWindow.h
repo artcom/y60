@@ -217,31 +217,34 @@ namespace jslib {
 
         virtual y60::TTFTextRendererPtr createTTFRenderer() = 0;
 
-        y60::ScenePtr _myScene;
-        dom::NodePtr _myCanvas;
+        y60::ScenePtr    _myScene;
+        dom::NodePtr     _myCanvas;
         y60::RendererPtr _myRenderer;
-        //asl::Ptr<y60::TextureManager> _myTextureManager;
 
-        JSObject *       _myEventListener;
-        JSContext *      _myJSContext;
-        y60::GLContext * _myContext;
+        typedef std::list<y60::IRendererExtensionPtr> ExtensionList;
+        ExtensionList        _myExtensions;
+
+        JSObject *           _myEventListener;
+        JSContext *          _myJSContext;
+        y60::GLContext *     _myContext;
+        JSErrorReporter      _myErrorReporter;
+        inet::RequestManager _myRequestManager;
 
         unsigned int _myRenderingCaps;
 
-        typedef std::list<y60::IRendererExtensionPtr> ExtensionList;
-        ExtensionList _myExtensions;
-        JSErrorReporter _myErrorReporter;
-        inet::RequestManager   _myRequestManager;
         double                 _myElapsedTime;
+
         asl::WeakPtr<AbstractRenderWindow> _mySelf;
+
     private:
         AbstractRenderWindow();
         void ensureScene();
 
-        TimeoutQueue           _myTimeoutQueue;
-        float                  _myFixedDeltaT;
-        double                 _myPauseTime;
-        bool                   _myPauseFlag;
+        TimeoutQueue _myTimeoutQueue;
+        float        _myFixedDeltaT;
+        double       _myStartTime;
+        double       _myPauseTime;
+        bool         _myPauseFlag;
     };
 }
 

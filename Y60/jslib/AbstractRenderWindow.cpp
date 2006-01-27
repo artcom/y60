@@ -47,11 +47,10 @@ namespace jslib {
         _myEventListener(0),
         _myJSContext(0),
         _myRenderingCaps(~0), // enable all (~)
-        _myPauseTime(0),
-        _myPauseFlag(false),
         _myErrorReporter(theErrorReporter),
         _myFixedDeltaT(0.0),
-        _myElapsedTime(0.0)
+        _myStartTime(-1.0), _myElapsedTime(0.0),
+        _myPauseTime(0.0), _myPauseFlag(false)
         {
         }
 
@@ -121,13 +120,13 @@ namespace jslib {
             _myRenderer->setCurrentScene(_myScene);
 
             //set canvas automatically only if the scene has a single canvas (dk)
-            if (_myScene->getCanvasRoot()->childNodesLength() == 1) {                
+            if (_myScene->getCanvasRoot()->childNodesLength() == 1) {
                 dom::NodePtr myCanvas = _myScene->getCanvasRoot()->childNode("canvas");
                 setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
             } else {
-                AC_INFO << "theScene has multiple canvases. No canvas set automatically.";
+                AC_INFO << "Scene has multiple canvases. No canvas set automatically.";
             }
-                
+
             for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
                 std::string myName = (*it)->getName() + "::onSceneLoaded";
                 try {
@@ -253,15 +252,15 @@ namespace jslib {
     }
 
     void
-    AbstractRenderWindow::setPause(bool aPause) {
+    AbstractRenderWindow::setPause(bool thePauseFlag) {
         asl::NanoTime myTime = asl::NanoTime();
         static double _myPauseStart;
-        if (aPause) {
+        if (thePauseFlag) {
             _myPauseStart = myTime.seconds();
         } else {
             _myPauseTime += (myTime.seconds() - _myPauseStart);
         }
-        _myPauseFlag = aPause;
+        _myPauseFlag = thePauseFlag;
     }
 
     bool
@@ -271,8 +270,7 @@ namespace jslib {
 
     long
     AbstractRenderWindow::setTimeout(const std::string & myCommand, float myMilliseconds) {
-        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime,
-                myMilliseconds);
+        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime, myMilliseconds);
     }
     void
     AbstractRenderWindow::clearTimeout(long myTimeoutId) {
@@ -280,8 +278,7 @@ namespace jslib {
     }
     long
     AbstractRenderWindow::setInterval(const std::string & myCommand, float myMilliseconds) {
-        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime,
-                myMilliseconds, true /* isInterval */);
+        return _myTimeoutQueue.addTimeout(myCommand, _myElapsedTime, myMilliseconds, true /* isInterval */);
     }
     void
     AbstractRenderWindow::clearInterval(long myIntervalId) {
@@ -302,9 +299,10 @@ namespace jslib {
 
     void
     AbstractRenderWindow::setRenderingCaps(unsigned int theRenderingCaps) {
-        _myRenderingCaps = theRenderingCaps;
         if (_myRenderer) {
-            AC_WARNING << "Sorry, setting the rendering caps will only take effect before renderer is created!" << endl;
+            AC_WARNING << "Sorry, setting the rendering caps will only take effect before renderer is created!";
+        } else {
+            _myRenderingCaps = theRenderingCaps;
         }
     }
     unsigned int
@@ -314,93 +312,99 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onFrame() {
+
         asl::NanoTime myTime = asl::NanoTime();
-        static double _myStartTime = myTime.seconds();
+        if (_myStartTime < 0.0) {
+            _myStartTime = myTime.seconds();
+            DB(AC_DEBUG << "startTime=" << _myStartTime);
+        }
 
         MAKE_SCOPE_TIMER(onFrame);
         asl::StdOutputRedirector::get().checkForFileWrapAround();
 
-        if (!_myPauseFlag) {
-            if (_myFixedDeltaT == 0.0) {
-                _myElapsedTime = myTime.seconds() - _myStartTime - _myPauseTime;
-                // dk + uz: sometimes myTime.seconds() - _myStartTime *is* negative
-                // on the first frame.
-                if (_myElapsedTime < 0) {
-                    _myElapsedTime = 0;
-                }
-            }
-            DB(cerr << "st: " << _myStartTime << " pt " << _myPauseTime << " et " << _myElapsedTime << endl;)
-            // Check for timeouts
-            {
-                MAKE_SCOPE_TIMER(Timeouts);
-                while (_myTimeoutQueue.isShowTime(_myElapsedTime)) {
-                    TimeoutPtr myTimeout = _myTimeoutQueue.popTimeout();
+        if (_myPauseFlag) {
+            return;
+        }
 
-                    const std::string & myTimeoutCommand = myTimeout->getCommand();
-                    try {
-                        MAKE_SCOPE_TIMER(onPostViewport);
-                        if (JSA_hasFunction(_myJSContext, _myEventListener,
-//                        if (JSA_hasFunction(_myJSContext, myTimeout->getJSObject(),
-                                    myTimeoutCommand.c_str()))
-                        {
-                            jsval rval;
-                            jslib::JSA_CallFunctionName(_myJSContext, _myEventListener,
-//                            jslib::JSA_CallFunctionName(_myJSContext, myTimeout->getJSObject(),
-                                    myTimeoutCommand.c_str(), 0, 0, &rval);
-                        } else {
-                            AC_ERROR << "Timeout: Function " << myTimeoutCommand
-                                    << " does not exist." << endl;
-                        }
-                    } catch (const asl::Exception & ex) {
-                        AC_ERROR << "asl exception caught in AbstractRenderWindow::onFrame(),"
-                                << " (timeout " << myTimeoutCommand << "): " << ex;
-                    } catch (const std::exception & ex) {
-                        AC_ERROR << "std::exception caught in AbstractRenderWindow::onFrame(),"
-                                << " (timeout " << myTimeoutCommand << "): " << ex.what();
-                    } catch (...) {
-                        AC_ERROR << "Unknown exception in AbstractRenderWindow::onFrame(),"
-                                << " (timeout " << myTimeoutCommand << ") ";
-                    }
-                }
-            }
+        DB(AC_DEBUG << "pauseT=" << _myPauseTime << " elapsedT=" << _myElapsedTime);
+        // Check for timeouts
+        {
+            MAKE_SCOPE_TIMER(Timeouts);
+            while (_myTimeoutQueue.isShowTime(_myElapsedTime)) {
+                TimeoutPtr myTimeout = _myTimeoutQueue.popTimeout();
 
-            if (_myScene) {
-                dom::NodePtr myImages = _myScene->getImagesRoot();
-                for (unsigned i = 0; i < myImages->childNodesLength(); ++i) {
-                    dom::NodePtr myImage = myImages->childNode(i);
-                    if (myImage->nodeType() != dom::Node::ELEMENT_NODE) {
-                        continue;
-                    }
-                    if (myImage->nodeName() == MOVIE_NODE_NAME) {
-                        _myScene->getTextureManager()->loadMovieFrame(myImage->getFacade<Movie>(), _myElapsedTime);
-                    }
-                    else if (myImage->nodeName() == CAPTURE_NODE_NAME) {
-                        _myScene->getTextureManager()->loadCaptureFrame(myImage->getFacade<Capture>());
-                    }
-                }
-            }
-
-            if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onFrame")) {
-                MAKE_SCOPE_TIMER(onFrame_JSCallback);
-                jsval argv[1], rval;
-                argv[0] = as_jsval(_myJSContext, _myElapsedTime);
-                JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 1, argv, &rval);
-            }
-
-
-            for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
-                string myName = (*i)->getName() + "::onFrame";
+                const std::string & myTimeoutCommand = myTimeout->getCommand();
                 try {
-                    MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
-                    (*i)->onFrame(this, _myElapsedTime);
+                    MAKE_SCOPE_TIMER(onPostViewport);
+                    if (JSA_hasFunction(_myJSContext, _myEventListener, myTimeoutCommand.c_str()))
+                    {
+                        jsval rval;
+                        jslib::JSA_CallFunctionName(_myJSContext, _myEventListener,
+                                                    myTimeoutCommand.c_str(), 0, 0, &rval);
+                    } else {
+                        AC_ERROR << "Timeout: Function " << myTimeoutCommand
+                                << " does not exist." << endl;
+                    }
                 } catch (const asl::Exception & ex) {
-                    AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
+                    AC_ERROR << "asl exception caught in AbstractRenderWindow::onFrame(),"
+                            << " (timeout " << myTimeoutCommand << "): " << ex;
+                } catch (const std::exception & ex) {
+                    AC_ERROR << "std::exception caught in AbstractRenderWindow::onFrame(),"
+                            << " (timeout " << myTimeoutCommand << "): " << ex.what();
                 } catch (...) {
-                    AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
+                    AC_ERROR << "Unknown exception in AbstractRenderWindow::onFrame(),"
+                            << " (timeout " << myTimeoutCommand << ") ";
                 }
             }
-            if (_myFixedDeltaT != 0.0) {
-                _myElapsedTime += _myFixedDeltaT;
+        }
+
+        // update movies and capture
+        if (_myScene) {
+            dom::NodePtr myImages = _myScene->getImagesRoot();
+            for (unsigned i = 0; i < myImages->childNodesLength(); ++i) {
+                dom::NodePtr myImage = myImages->childNode(i);
+                if (myImage->nodeType() != dom::Node::ELEMENT_NODE) {
+                    continue;
+                }
+                if (myImage->nodeName() == MOVIE_NODE_NAME) {
+                    _myScene->getTextureManager()->loadMovieFrame(myImage->getFacade<Movie>(), _myElapsedTime);
+                }
+                else if (myImage->nodeName() == CAPTURE_NODE_NAME) {
+                    _myScene->getTextureManager()->loadCaptureFrame(myImage->getFacade<Capture>());
+                }
+            }
+        }
+
+        // JavaScript onFrame(theTime)
+        if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onFrame")) {
+            MAKE_SCOPE_TIMER(onFrame_JSCallback);
+            jsval argv[1], rval;
+            argv[0] = as_jsval(_myJSContext, _myElapsedTime);
+            JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 1, argv, &rval);
+        }
+
+        // extensions onFrame
+        for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
+            const std::string myName = (*i)->getName() + "::onFrame";
+            try {
+                MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
+                (*i)->onFrame(this, _myElapsedTime);
+            } catch (const asl::Exception & ex) {
+                AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
+            } catch (...) {
+                AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
+            }
+        }
+
+        // advance time
+        if (_myFixedDeltaT != 0.0) {
+            _myElapsedTime += _myFixedDeltaT;
+        } else {
+            _myElapsedTime = myTime.seconds() - _myStartTime - _myPauseTime;
+            // dk + uz: sometimes myTime.seconds() - _myStartTime *is* negative
+            // on the first frame.
+            if (_myElapsedTime < 0.0) {
+                _myElapsedTime = 0.0;
             }
         }
     }
@@ -409,7 +413,6 @@ namespace jslib {
     AbstractRenderWindow::preRender() {
         try {
             MAKE_SCOPE_TIMER(onPreRender);
-
             if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPreRender")) {
                 jsval argv[1], rval;
                 MAKE_SCOPE_TIMER(onPreRender_JSCallback);
@@ -417,7 +420,7 @@ namespace jslib {
             }
 
             for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
-                string myName = (*i)->getName() + "::onPreRender";
+                const std::string myName = (*i)->getName() + "::onPreRender";
                 try {
                     MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
                     (*i)->onPreRender(this);
@@ -455,6 +458,7 @@ namespace jslib {
             AC_ERROR << "Unknown exception in Y60Render::preViewport()";
         }
     }
+
     void
     AbstractRenderWindow::render() {
         MAKE_SCOPE_TIMER(render);
@@ -470,7 +474,6 @@ namespace jslib {
     AbstractRenderWindow::postViewport(const dom::NodePtr & theViewport) {
         try {
             MAKE_SCOPE_TIMER(onPostViewport);
-
             if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPostViewport")) {
                 jsval argv[1], rval;
                 argv[0] = as_jsval(_myJSContext, theViewport);
@@ -484,13 +487,15 @@ namespace jslib {
             AC_ERROR << "Unknown exception in AbstractRenderWindow::postViewport()";
         }
     }
+
     void
     AbstractRenderWindow::postRender() {
         try {
             MAKE_SCOPE_TIMER(postRender);
             _myRenderer->postRender();
+
             for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
-                string myName = (*i)->getName() + "::onPostRender";
+                const std::string myName = (*i)->getName() + "::onPostRender";
                 try {
                     MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
                     (*i)->onPostRender(this);

@@ -1,20 +1,11 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: FFMpegDecoder2.h,v $
-//   $Author: thomas $
-//   $Revision: 1.3 $
-//   $Date: 2005/04/20 11:08:27 $
-//
-//  ffmpeg movie decoder.
-//
 //=============================================================================
 
 #ifndef _ac_y60_FFMpegDecoder2_h_
@@ -30,7 +21,6 @@
 #include <asl/PosixThread.h>
 #include <asl/ThreadLock.h>
 #include <asl/ThreadSemaphore.h>
-
 
 #include <string>
 #include <list>
@@ -65,8 +55,8 @@ namespace y60 {
      * video decoding but no seeking.
      *
      */
-    class FFMpegDecoder2 : 
-        public AsyncDecoder, 
+    class FFMpegDecoder2 :
+        public AsyncDecoder,
         public PosixThread,
         public asl::PlugInBase
     {
@@ -76,7 +66,7 @@ namespace y60 {
         FFMpegDecoder2(asl::DLHandle theDLHandle);
         virtual ~FFMpegDecoder2();
 
-        
+
         virtual asl::Ptr<MovieDecoderBase> instance() const;
         std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
 
@@ -111,7 +101,7 @@ namespace y60 {
         void closeMovie();
         /**
          * Tries to generate a frame from thePacket. If a frame was generated,
-         * it is added to the cache, by calling addCacheFrame and true is returned, 
+         * it is added to the cache, by calling addCacheFrame and true is returned,
          * otherwise false is returned
          * is returned.
          * @warn blocks if there is no room in the cache
@@ -126,7 +116,7 @@ namespace y60 {
          * @retval true if successful
          */
         bool addAudioPacket(const AVPacket & thePacket);
-        
+
         const char * getName() const { return "FFMpegDecoder2"; }
     private:
         AVFormatContext * _myFormatContext;
@@ -141,23 +131,22 @@ namespace y60 {
         FrameCache        _myFrameCache;
         FrameCache        _myFrameRecycler;
         AVFrame *         _myFrame;
-        int64_t         _mySeekTimestamp;
-        int64_t         _myLastSeekTimestamp;
+        int64_t           _mySeekTimestamp;
+        int64_t           _myLastSeekTimestamp;
 
-        int64_t         _myEOFVideoTimestamp;
-        int64_t         _myNextPacketTimestamp;
-        int64_t         _myTimePerFrame;
+        int64_t           _myEOFVideoTimestamp;
+        int64_t           _myNextPacketTimestamp;
+        int64_t           _myTimePerFrame;
         double            _myLastAudioTimeStamp;
         unsigned          _myLineSizeBytes;
+        int               _myDestinationPixelFormat;
         bool              _myCachingFlag;
-
 
         ReSampleContext *   _myResampleContext;
 
         static asl::Block     _mySamples;
         static asl::Block     _myResampledSamples;
 
-        
         /**
          * Thread run method.
          */

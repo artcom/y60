@@ -322,6 +322,18 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     reuse();
                     print("All includes re-evaluated.");
                     break;
+                case "i":
+                    {
+                        // Cycle swap interval
+                        var mySwapInterval = window.swapInterval;
+                        mySwapInterval++;
+                        if (mySwapInterval > 4) {
+                            mySwapInterval = 0;
+                        }
+                        window.swapInterval = mySwapInterval;
+                        print("Swap interval=" + window.swapInterval);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -404,6 +416,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         self.setScene(myScene, myCanvas);
         renderer = window.getRenderer();
+        window.swapInterval = 0;
 
         // standard movers
         self.registerMover(TrackballMover);

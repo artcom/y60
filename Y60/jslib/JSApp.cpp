@@ -765,7 +765,7 @@ Clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 MilliSec(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the time since acxpshell/acgtkshell start in milliseconds.");
+    DOC_BEGIN("Returns the time since program start in milliseconds.");
     DOC_RVAL("The time in milliseconds", DOC_TYPE_FLOAT);
     DOC_END;
     try {

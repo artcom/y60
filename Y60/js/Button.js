@@ -67,6 +67,7 @@ function ButtonBase(Public, Protected, theScene, theId,
         } else {
             Public.color = Protected.style.color;
         }
+print("button color=" + Public.color);
         Protected.isPressed = theFlag;
     }
 
@@ -103,9 +104,9 @@ function ButtonBase(Public, Protected, theScene, theId,
         // Replace the onMouseButton function with something more advanced
         Public.onMouseButton = function(theState, theX, theY) {
             if (theState == MOUSE_UP) {
-                Public.setPressed(false);              
-            } else if (theState == MOUSE_DOWN && Public.enabled && isVisible(Public.node) && 
-                       !Protected.isPressed && Public.touches(theX, theY)) 
+                Public.setPressed(false);
+            } else if (theState == MOUSE_DOWN && Public.enabled && isVisible(Public.node) &&
+                       !Protected.isPressed && Public.touches(theX, theY))
             {
                 Public.setPressed(true);
                 Public.onClick(Public);

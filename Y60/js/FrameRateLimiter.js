@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2004, ART+COM AG Berlin
+// Copyright (C) 2004-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,13 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: FrameRateLimiter.js,v $
-//   $Author: christian $
-//   $Revision: 1.3 $
-//   $Date: 2004/11/10 18:37:33 $
-//
-//=============================================================================
+
+/*
+ * You may want to consider using 'window.swapInterval' instead as it's
+ * done in hardware and more precise than using the system timer...
+ */
 
 function FrameRateLimiter(theFrameRate) {
     var _myTargetFrameTime   = 1 / theFrameRate;

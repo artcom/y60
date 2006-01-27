@@ -123,7 +123,6 @@ namespace y60 {
                 set<ImagePixelFormatTag>(asl::getStringFromEnum(thePixelEncoding, PixelEncodingString));
             }
 
-            
             PixelEncoding getPixelEncoding() {
                 return PixelEncoding(asl::getEnumFromString(get<ImagePixelFormatTag>(), PixelEncodingString));
             }
@@ -148,7 +147,7 @@ namespace y60 {
                             const std::string theName);
 
             void postLoad();
-            
+
 
             asl::Ptr<MovieDecoderBase>  getDecoder(const std::string theFilename);
 

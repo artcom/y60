@@ -169,7 +169,6 @@ namespace y60 {
             if (myDepth == 0) {
                 myDepth = 1;
             }
-
             if (myDepth == 1) {
                 glBindTexture(GL_TEXTURE_2D, theImage->getGraphicsId());
             } else {
@@ -271,7 +270,7 @@ namespace y60 {
             CHECK_OGL_ERROR;
             // [DS] the min filter defaults to GL_NEAREST_MIPMAP_LINEAR. This
             // causes problems with offscreen rendering.
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER , GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             CHECK_OGL_ERROR;
         } else {
             // 3D-Texture
@@ -408,7 +407,6 @@ namespace y60 {
             CHECK_OGL_ERROR;
 
             myTopLevelTextureSize = getBytesRequired(myTexWidth * myTexHeight * myTexDepth, theImage->getEncoding());
-
             _myTextureMemUsage +=  myTopLevelTextureSize;
         }
 

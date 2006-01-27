@@ -7,23 +7,14 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//    $RCSfile: Movie.cpp,v $
-//     $Author: ulrich $
-//   $Revision: 1.9 $
-//       $Date: 2005/04/22 14:58:47 $
-//
-//=============================================================================
-
 
 #include "Movie.h"
 #include "MovieDecoderBase.h"
+#include "M60Decoder.h"
+
 #include <y60/PixelEncoding.h>
 #include <y60/DecoderManager.h>
 #include <asl/Logger.h>
-
-#include "M60Decoder.h"
-
 #include <asl/PackageManager.h>
 
 #include <string.h>
@@ -38,7 +29,7 @@ using namespace std;
 
 
 namespace y60 {
-    
+
     Movie::Movie(dom::Node & theNode):
         Image(theNode),
         FrameCountTag::Plug(theNode),
@@ -151,7 +142,7 @@ namespace y60 {
     double Movie::getTimeFromFrame(unsigned theFrame) const {
         AC_DEBUG << "getTimeFromFrame count " << get<FrameCountTag>() << " framerate " << get<FrameRateTag>();
         AC_DEBUG << "returning " << (double)(theFrame % get<FrameCountTag>()) / get<FrameRateTag>();
- 
+
         return (double)(theFrame % get<FrameCountTag>()) / get<FrameRateTag>();
     }
 
@@ -239,11 +230,11 @@ namespace y60 {
         //DK my workaround for not knowing how to const_cast the asl::Ptr itself
         MovieDecoderBase & myDecoder = const_cast<MovieDecoderBase&>(*_myDecoder);
         theTime = myDecoder.getMovieTime(_myLastCurrentTime);
-        AC_DEBUG << "Movie::getMovieTime systime " << _myLastCurrentTime 
+        AC_DEBUG << "Movie::getMovieTime systime " << _myLastCurrentTime
                  << " got " << theTime;
         return true;
     }
-    
+
     bool Movie::getDecoderName(std::string & theName) const {
         AC_DEBUG << "Movie::getDecoderName";
         MovieDecoderBase & myDecoder = const_cast<MovieDecoderBase&>(*_myDecoder);
@@ -251,7 +242,7 @@ namespace y60 {
         AC_DEBUG << "Movie::getDecoderName got " << theName;
         return true;
     }
-    
+
     void Movie::load(asl::PackageManager & thePackageManager) {
         /*
          * XXX
@@ -274,7 +265,7 @@ namespace y60 {
 
         const std::string & myDecoderHint = get<DecoderHintTag>();
         if (myDecoderHint != "") {
-            std::vector<MovieDecoderBasePtr> myDecoders; 
+            std::vector<MovieDecoderBasePtr> myDecoders;
             myDecoders = DecoderManager::get().findAllDecoders<MovieDecoderBase>(theFilename);
             std::vector<MovieDecoderBasePtr>::iterator it;
             for(it = myDecoders.begin(); it != myDecoders.end(); ++it) {
@@ -288,7 +279,7 @@ namespace y60 {
         AC_INFO << "using decoder " << myDecoder->getName() << " for decoding " << theFilename << " hint " << myDecoderHint;
         return myDecoder;
     }
-    
+
     void
     Movie::load(const std::string & theTexturePath) {
         loadFile( asl::searchFile(get<ImageSourceTag>(), theTexturePath) );

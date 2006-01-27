@@ -34,9 +34,9 @@ const unsigned DEFAULT_TEXTURE_SIZE_LIMIT = 0; // ask gl for max texture size
 namespace y60 {
 
     TextureManager::TextureManager() :
-        _myResourceManager(0), _myResourceManagerCount(0), 
-        _myMaxTextureSize(DEFAULT_TEXTURE_SIZE_LIMIT), 
-        _myMemoryResourceManager(new MemoryResourceManager()) 
+        _myResourceManager(0), _myResourceManagerCount(0),
+        _myMaxTextureSize(DEFAULT_TEXTURE_SIZE_LIMIT),
+        _myMemoryResourceManager(new MemoryResourceManager())
     {
         string myLimitString;
         if (get_environment_var(Y60_TEXTURE_SIZE_LIMIT_ENV, myLimitString)) {
@@ -109,25 +109,24 @@ namespace y60 {
 
     void
     TextureManager::uploadTexture(ImagePtr theImage) {
-        MAKE_SCOPE_TIMER(TextureManager_uploadTexture);
+        //MAKE_SCOPE_TIMER(TextureManager_uploadTexture);
         AC_TRACE << "TextureManager::uploadTexture('" << theImage->get<NameTag>() << "')";
         if (theImage->canReuseTexture()) {
-            AC_TRACE << "Reusing texture, just uploading image data." << endl;
-            MAKE_SCOPE_TIMER(TextureManager_updatingImageData);
+            AC_TRACE << "Reusing texture, just uploading image data.";
+            MAKE_SCOPE_TIMER(TextureManager_updateImageData);
             updateImageData(theImage);
         } else {
-            AC_TRACE << "Replacing texture." << endl;
+            AC_TRACE << "Replacing texture.";
             MAKE_SCOPE_TIMER(TextureManager_replacingTexture);
             if (theImage->getGraphicsId()) {
-                // In order to prevent a texture leak, we need to unbind
-                // the texture before setupImage()
+                // In order to prevent a texture leak, we need to unbind the texture before setupImage()
                 unbindTexture(&*theImage);
             }
             setupImage(theImage);
         }
     }
 
-    int 
+    int
     TextureManager::getMaxTextureSize(int theDimensions) const {
         if (_myMaxTextureSize == 0) {
             return _myResourceManager->getMaxTextureSize(theDimensions);
@@ -140,9 +139,10 @@ namespace y60 {
     TextureManager::loadMovieFrame(MoviePtr theMovie, double theCurrentTime) {
         MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame);
         AC_DEBUG << "loadMovieFrame: theCurrentTime = " << theCurrentTime;
-        
+
         // First time load, or source has changed
         if (theMovie->reloadRequired()) {
+            MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame_movieLoad);
             try {
                 theMovie->load(_myPackageManager->getSearchPath());
             } catch (asl::Exception & ex) {
@@ -152,20 +152,27 @@ namespace y60 {
                 throw ex;
             }
         }
-        if (theCurrentTime == -1) {
-            theMovie->readFrame();
-        } else {
-            theMovie->readFrame(theCurrentTime);
+
+        {
+            MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame_movieReadFrame);
+            if (theCurrentTime == -1) {
+                theMovie->readFrame();
+            } else {
+                theMovie->readFrame(theCurrentTime);
+            }
         }
 
         // load/subload texture
-        ImagePtr myMovieImage = dynamic_cast_Ptr<Image>(theMovie);
-        if (theMovie->getGraphicsId()) {
-            if (theMovie->isImageNewerThanTexture()) {
-                updateImageData(myMovieImage);
+        {
+            MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame_updateImage);
+            ImagePtr myMovieImage = dynamic_cast_Ptr<Image>(theMovie);
+            if (theMovie->getGraphicsId()) {
+                if (theMovie->isImageNewerThanTexture()) {
+                    updateImageData(myMovieImage);
+                }
+            } else {
+                setupImage(myMovieImage);
             }
-        } else {
-            setupImage(myMovieImage);
         }
     }
 

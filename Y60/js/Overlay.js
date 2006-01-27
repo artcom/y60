@@ -470,19 +470,21 @@ function ImageOverlay(theScene, theSource, thePosition, theParent) {
 }
 
 /// Creates an overlay and with a movie as content
-//  @param theScene      Scene        The scene the overlay should be appended to
-//  @param theSource     String/Node  Movie file name or movie node
-//  @param thePosition   Vector2f     Pixelposition of the overlay (optional, default is [0,0])
-//  @param theParent     Node         Parent overlay node (optional, default is toplevel)
-//  @param theAudioFlag  Boolean      Play audio with the movie (optional, default is true)
-function MovieOverlay(theScene, theSource, thePosition, theParent, theAudioFlag) {
+//  @param theScene       Scene        The scene the overlay should be appended to
+//  @param theSource      String/Node  Movie file name or movie node
+//  @param thePosition    Vector2f     Pixelposition of the overlay (optional, default is [0,0])
+//  @param theParent      Node         Parent overlay node (optional, default is toplevel)
+//  @param theAudioFlag   Boolean      Play audio with the movie (optional, default is true)
+//  @param thePixelFormat String       Pixel format (optional, default is BGR)
+function MovieOverlay(theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat) {
     var Public    = this;
     var Protected = {};
-    MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent, theAudioFlag);
+    MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat);
 }
 
 // pure virtual base class
-function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent, theAudioFlag) {
+function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent,
+                          theAudioFlag, thePixelFormat) {
 
     TextureOverlay(Public, Protected, theScene, thePosition, theParent);
 
@@ -551,6 +553,10 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
                 theAudioFlag = true;
             }
             myImage.audio = theAudioFlag;
+            if (thePixelFormat == undefined) {
+                thePixelFormat = "BGR";
+            }
+            myImage.pixelformat = thePixelFormat;
             window.scene.loadMovieFrame(myImage);
         }
 
