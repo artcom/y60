@@ -75,7 +75,9 @@ class EdgeBlender :
     private:
         float getBlendValue(float theValue);
         void drawBlackLevel();
-        void drawBlendedEdge(unsigned theEdge);
+        void rotateTo(unsigned theEdge);
+        void drawBlendedEdge(float theStart, float theEnd);
+        void drawBlendedCorner();
         const static unsigned BLEND_EDGE_LEFT  = 1;
         const static unsigned BLEND_EDGE_RIGHT = 2;
         const static unsigned BLEND_EDGE_UP    = 4;
@@ -97,7 +99,7 @@ EdgeBlender :: EdgeBlender(asl::DLHandle theDLHandle) :
 
 void
 EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow) {
-    _myEdges = BLEND_EDGE_LEFT;
+    _myEdges = 15; //BLEND_EDGE_LEFT;
     _myBlendWidth = 0.2f;
     _myNumSubdivisions = 32;
     _myBlackLevel = 0.1f;
@@ -212,12 +214,12 @@ EdgeBlender::drawBlackLevel() {
     glEnd();
 }
 
-void 
-EdgeBlender::drawBlendedEdge(unsigned theMode) {
-    AC_DEBUG << "drawBlendedEdge " << theMode;
+void
+EdgeBlender::rotateTo(unsigned theEdge) {
     float myAngle = 0.0f;
-    switch (theMode) {
+    switch (theEdge) {
         case BLEND_EDGE_LEFT:
+            myAngle = 0.0f;
             break;
         case BLEND_EDGE_RIGHT:
             myAngle = 180.0f;
@@ -229,32 +231,72 @@ EdgeBlender::drawBlendedEdge(unsigned theMode) {
             myAngle = 270.0f;
             break;
         default:
-            AC_WARNING << "theMode " << theMode << " unknown.";
+            AC_WARNING << "theEdge " << theEdge << " unknown.";
     }
 
-    //rotate according to the mode
+    //rotate to the edge
     glLoadIdentity();
     glTranslatef(0.5f, 0.5f, 0.0f);
     glRotatef(myAngle, 0.0f, 0.0f, 1.0f);
     glTranslatef(-0.5f, -0.5f, 0.0f);
-    
+}
+
+void 
+EdgeBlender::drawBlendedEdge(float theStart, float theEnd) {
+    AC_DEBUG << "drawBlendedEdge start " << theStart << " end " << theEnd;
+
+    float myDelta = 1.0f / _myNumSubdivisions;
+
     glBegin(GL_TRIANGLE_STRIP);
-    for (unsigned i = 0; i < _myNumSubdivisions+1; ++i) {
+    for (unsigned i = 0; i <= _myNumSubdivisions; ++i) {
+        float myX = i * myDelta;
 
-        float myValue = i / (float)(_myNumSubdivisions);
-        float myBlendValue = getBlendValue(1.0f - myValue);
+        float myBlendValue = getBlendValue(myX);
 
-        glColor4f(0.0f, 0.0f, 0.0f, myBlendValue);
-        //glColor4f(myBlendValue ,0 ,0 ,1);
+        glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
 
-        float myX = myValue*_myBlendWidth;
-        glVertex2f(myX, 0.0f);
-        glVertex2f(myX, 1.0f);
+        float myXPos = myX * _myBlendWidth;
+        glVertex2f(myXPos, theStart);
+        glVertex2f(myXPos, theEnd);
+        
+        AC_DEBUG << "x " << myX << " blend=" << myBlendValue;
 
-        AC_DEBUG << "i=" << i << " blend=" << myBlendValue;
     }
     glEnd();
     
+}
+
+void 
+EdgeBlender::drawBlendedCorner() {
+
+    float myDelta = 1.0f / _myNumSubdivisions;
+    
+    for (unsigned i = 0; i <= _myNumSubdivisions; ++i) {
+        float myY = i * myDelta;
+        float myY1BlendValue = getBlendValue( myY);
+        float myY2BlendValue = getBlendValue( min(1.0f, myY + myDelta));
+
+        glBegin(GL_TRIANGLE_STRIP);
+        for (unsigned j = 0; j <= _myNumSubdivisions; ++j) {
+            float myX = j * myDelta;
+            float myXBlendValue = getBlendValue( myX);
+
+            float myXPos = myX * _myBlendWidth;
+            float myYPos = myY * _myBlendWidth;
+
+            float myBlendValue = myXBlendValue * myY1BlendValue;
+            glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
+            glVertex2f(myXPos, myYPos);
+            
+            myBlendValue = myXBlendValue * myY2BlendValue;
+            glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
+            glVertex2f(myXPos, myYPos + _myBlendWidth / _myNumSubdivisions);
+
+            AC_DEBUG << "x " << myX << "y " << myY << " blend=" << myBlendValue;
+        }
+        glEnd();
+    }
+
 }
 
 void
@@ -279,18 +321,59 @@ EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
 
 
     //blended edges
-    if (_myEdges & BLEND_EDGE_LEFT) {
-        drawBlendedEdge(BLEND_EDGE_LEFT);
+    if (_myEdges & BLEND_EDGE_LEFT) {        
+        rotateTo(BLEND_EDGE_LEFT);
+        float myStart = (_myEdges & BLEND_EDGE_UP) ?
+            _myBlendWidth : 0.0f;
+        float myEnd = (_myEdges & BLEND_EDGE_DOWN) ?
+            1.0f - _myBlendWidth : 1.0f;
+        rotateTo(BLEND_EDGE_LEFT);
+        drawBlendedEdge(myStart, myEnd);
     }        
     if (_myEdges & BLEND_EDGE_RIGHT) {
-        drawBlendedEdge(BLEND_EDGE_RIGHT);
+        float myStart = (_myEdges & BLEND_EDGE_DOWN) ?
+            _myBlendWidth : 0.0f;
+        float myEnd = (_myEdges & BLEND_EDGE_UP) ?
+            1.0f - _myBlendWidth : 1.0f;
+        rotateTo(BLEND_EDGE_RIGHT);
+        drawBlendedEdge(myStart, myEnd);
     }        
     if (_myEdges & BLEND_EDGE_UP) {
-        drawBlendedEdge(BLEND_EDGE_UP);
+        float myStart = (_myEdges & BLEND_EDGE_RIGHT) ?
+            _myBlendWidth : 0.0f;
+        float myEnd = (_myEdges & BLEND_EDGE_LEFT) ?
+            1.0f - _myBlendWidth : 1.0f;
+        rotateTo(BLEND_EDGE_UP);
+        drawBlendedEdge(myStart, myEnd);
     }        
     if (_myEdges & BLEND_EDGE_DOWN) {
-        drawBlendedEdge(BLEND_EDGE_DOWN);
+        float myStart = (_myEdges & BLEND_EDGE_LEFT) ?
+            _myBlendWidth : 0.0f;
+        float myEnd = (_myEdges & BLEND_EDGE_RIGHT) ?
+            1.0f - _myBlendWidth : 1.0f;
+        rotateTo(BLEND_EDGE_DOWN);
+        drawBlendedEdge(myStart, myEnd);
     }        
+
+    //corners
+    if (_myEdges & BLEND_EDGE_LEFT && _myEdges & BLEND_EDGE_UP) {
+        rotateTo(BLEND_EDGE_LEFT);
+        drawBlendedCorner(); 
+    }
+    if (_myEdges & BLEND_EDGE_UP && _myEdges & BLEND_EDGE_RIGHT) {
+        rotateTo(BLEND_EDGE_UP);
+        drawBlendedCorner(); 
+    }
+    if (_myEdges & BLEND_EDGE_RIGHT && _myEdges & BLEND_EDGE_DOWN) {
+        rotateTo(BLEND_EDGE_RIGHT);
+        drawBlendedCorner(); 
+    }
+    if (_myEdges & BLEND_EDGE_DOWN && _myEdges & BLEND_EDGE_LEFT) {
+        rotateTo(BLEND_EDGE_DOWN);
+        drawBlendedCorner(); 
+    }
+
+    
     //
     //blacklevel
     drawBlackLevel();

@@ -88,6 +88,7 @@ EdgeBlendViewer.prototype.Constructor = function(self, theArguments) {
                     break;
                 case 's':
                     _myEdgeBlender.blacklevel -= 0.01;
+                    window.saveBuffer("shot.png");
                     break;
                 case 'q':
                     _myEdgeBlender.mode = (_myEdgeBlender.mode + 1) % 3;

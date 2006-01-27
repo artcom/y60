@@ -1,9 +1,9 @@
 <settings>
 <EdgeBlender>
-    <edges min="1" max="15" step="1">4</edges>
-    <blendwidth min="0.0" max="1.0" step="0.01">0.1</blendwidth>
-    <subdivisions min="1" max="64" step="1">32</subdivisions>
-    <blacklevel min="0.0" max="1.0" step="0.01">0.1</blacklevel>
+    <edges min="1" max="15" step="1">15</edges>
+    <blendwidth min="0.0" max="1.0" step="0.01">0.2</blendwidth>
+    <subdivisions min="1" max="64" step="1">4</subdivisions>
+    <blacklevel min="0.0" max="1.0" step="0.01">0</blacklevel>
     <power min="1.0" max="3.0" step="0.05">1.5</power>
     <gamma min="0.0" max="2.0" step="0.01">1.2</gamma>
 </EdgeBlender>
