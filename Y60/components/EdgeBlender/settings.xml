@@ -1,5 +1,7 @@
 <settings>
 <EdgeBlender>
+    <!--mode values are 1=multiPC, 2=dualScreenHorizontal, 3=dualScreenVertical -->
+    <mode min="1" max="3" step="1">2</mode> 
     <edges min="0" max="15" step="1">15</edges>
     <blendwidth min="0.0" max="1.0" step="0.01">0.2</blendwidth>
     <subdivisions min="1" max="64" step="1">4</subdivisions>

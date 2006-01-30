@@ -27,15 +27,17 @@
 #include <y60/AbstractRenderWindow.h>
 #include <y60/Scene.h>
 #include <y60/Movie.h>
+#include <y60/OffscreenBuffer.h>
 
 #include <asl/string_functions.h>
+#include <asl/numeric_functions.h>
 #include <asl/Exception.h>
 #include <asl/Logger.h>
 
 #include <iostream>
 
 using namespace std;
-//using namespace asl;
+using namespace asl;
 using namespace jslib;
 using namespace dom;
 using namespace y60;
@@ -76,12 +78,50 @@ class EdgeBlender :
         float getBlendValue(float theValue);
         void drawBlackLevel();
         void rotateTo(unsigned theEdge);
-        void drawBlendedEdge(float theStart, float theEnd);
+        void drawBlendedEdge(float theStart, float theEnd, float theMargin = 0.0f);
         void drawBlendedCorner();
+        void renderTexture(float theStartX, float theStartY, 
+                           float theEndX, float theEndY,
+                           float thePosX, float thePosY);
+        void copyToTexture();
+        void renderBlending();
+        void preRender();
+        void postRender();
+        
+        void renderDualScreen();
+        void renderMultiPC();
+
+        unsigned _mySceneWidth, _mySceneHeight;
+        GLuint _mySceneTexture;
+        
         const static unsigned BLEND_EDGE_LEFT  = 1;
         const static unsigned BLEND_EDGE_RIGHT = 2;
         const static unsigned BLEND_EDGE_UP    = 4;
         const static unsigned BLEND_EDGE_DOWN  = 8;
+/*        
+  enum FruitEnum {
+ *      APPLE,
+ *      CHERRY,
+ *      BANANA,
+ *      PASSION_FRUIT,
+ *      FruitEnum_MAX
+ * };
+ *
+ * static const char * myFruitStrings[] = {
+ *      "apple",
+ *      "cherry",
+ *      "banana",
+ *      "passion_fruit",
+ *      ""
+ * };
+ *
+*/       
+        enum { MODE_MULTI_PC               = 1,
+               MODE_DUAL_SCREEN_HORIZONTAL = 2,
+               MODE_DUAL_SCREEN_VERTICAL   = 3
+        };
+
+        unsigned _myMode;
         unsigned  _myEdges;
         float _myBlendWidth;
         unsigned _myNumSubdivisions;
@@ -98,13 +138,44 @@ EdgeBlender :: EdgeBlender(asl::DLHandle theDLHandle) :
 {}
 
 void
+EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
+    AC_TRACE << "onPostRender";
+    switch (_myMode) {
+        case MODE_DUAL_SCREEN_HORIZONTAL:
+        case MODE_DUAL_SCREEN_VERTICAL:
+            renderDualScreen();
+        break;
+        case MODE_MULTI_PC:
+            renderMultiPC();
+        break;            
+    }        
+}
+
+void
 EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow) {
+    _myMode = MODE_DUAL_SCREEN_HORIZONTAL;
     _myEdges = 15; //BLEND_EDGE_LEFT;
     _myBlendWidth = 0.2f;
     _myNumSubdivisions = 32;
     _myBlackLevel = 0.1f;
     _myPower = 1.5f;
     _myGamma = 1.2f;
+    
+    //setup texture for rendering
+    _mySceneWidth = theWindow->getWidth();
+    _mySceneHeight = theWindow->getHeight();
+    int mySceneTextureWidth = nextPowerOfTwo(_mySceneWidth);
+    int mySceneTextureHeight = nextPowerOfTwo(_mySceneHeight);
+    
+    glGenTextures(1, &_mySceneTexture);
+    glBindTexture (GL_TEXTURE_2D, _mySceneTexture );
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, mySceneTextureWidth, mySceneTextureHeight, 
+                 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    checkOGLError(PLUS_FILE_LINE);
+    AC_INFO << "bind texture " << _mySceneTexture << " " 
+            << _mySceneWidth << "x" << _mySceneHeight;
 }
 
 void
@@ -150,12 +221,14 @@ EdgeBlender::onSetProperty(const std::string & thePropertyName,
 void 
 EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     AC_DEBUG << "onUpdateSettings " << *theSettings;
+    _myMode = getSetting(theSettings, "mode", _myMode);
     _myEdges = getSetting(theSettings, "edges", _myEdges);
     _myBlendWidth = getSetting(theSettings, "blendwidth", _myBlendWidth);
     _myNumSubdivisions = getSetting(theSettings, "subdivisions", _myNumSubdivisions);
     _myBlackLevel = getSetting(theSettings, "blacklevel", _myBlackLevel);
     _myPower = getSetting(theSettings, "power", _myPower);
     _myGamma = getSetting(theSettings, "gamma", _myGamma);
+    
 }
 
 bool
@@ -176,6 +249,143 @@ EdgeBlender::onFrame(AbstractRenderWindow * theWindow , double t) {
 void
 EdgeBlender::onPreRender(AbstractRenderWindow * theRenderer) {
     AC_TRACE << "onPreRender";
+}
+
+void 
+EdgeBlender::renderDualScreen() {
+    preRender();
+    copyToTexture();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (_myMode == MODE_DUAL_SCREEN_HORIZONTAL) {
+        renderTexture(0.0f, 0.0f, 0.5f + _myBlendWidth/2, 1.0f, -_myBlendWidth/2, 0.0f);
+        renderTexture(0.5f - _myBlendWidth/2, 0.0f, 1.0f, 1.0f, 0.5f, 0.0f);
+        rotateTo(BLEND_EDGE_RIGHT);
+        drawBlendedEdge(0.0f, 1.0f, 0.5f); 
+        rotateTo(BLEND_EDGE_LEFT);
+        drawBlendedEdge(0.0f, 1.0f, 0.5f);
+
+    } else if (_myMode == MODE_DUAL_SCREEN_VERTICAL) {        
+        renderTexture(0.0f, 0.0f, 1.0f, 0.5f + _myBlendWidth/2, 0.0f, 0.0f);
+        renderTexture(0.0f, 0.5f - _myBlendWidth/2, 1.0f, 1.0f, 0.0f, 0.5f);
+        rotateTo(BLEND_EDGE_UP);
+        drawBlendedEdge(0.0f, 1.0f, 0.5f);
+        rotateTo(BLEND_EDGE_DOWN);
+        drawBlendedEdge(0.0f, 1.0f, 0.5f);
+    }        
+    
+    postRender();
+}
+
+void 
+EdgeBlender::renderMultiPC() {
+    preRender();
+    renderBlending();
+    postRender();
+}
+    
+void 
+EdgeBlender::renderBlending() {
+    glDisable(GL_TEXTURE_2D);
+
+    //blended edges
+    if (_myEdges & BLEND_EDGE_LEFT) {        
+        float myStart = (_myEdges & BLEND_EDGE_UP) ?
+            _myBlendWidth : 0.0f;
+        float myEnd = (_myEdges & BLEND_EDGE_DOWN) ?
+            1.0f - _myBlendWidth : 1.0f;
+        rotateTo(BLEND_EDGE_LEFT);
+        drawBlendedEdge(myStart, myEnd);
+    }        
+    if (_myEdges & BLEND_EDGE_RIGHT) {
+        float myStart = (_myEdges & BLEND_EDGE_DOWN) ?
+            _myBlendWidth : 0.0f;
+        float myEnd = (_myEdges & BLEND_EDGE_UP) ?
+            1.0f - _myBlendWidth : 1.0f;
+        rotateTo(BLEND_EDGE_RIGHT);
+        drawBlendedEdge(myStart, myEnd);
+    }        
+    if (_myEdges & BLEND_EDGE_UP) {
+        float myStart = (_myEdges & BLEND_EDGE_RIGHT) ?
+            _myBlendWidth : 0.0f;
+        float myEnd = (_myEdges & BLEND_EDGE_LEFT) ?
+            1.0f - _myBlendWidth : 1.0f;
+        rotateTo(BLEND_EDGE_UP);
+        drawBlendedEdge(myStart, myEnd);
+    }        
+    if (_myEdges & BLEND_EDGE_DOWN) {
+        float myStart = (_myEdges & BLEND_EDGE_LEFT) ?
+            _myBlendWidth : 0.0f;
+        float myEnd = (_myEdges & BLEND_EDGE_RIGHT) ?
+            1.0f - _myBlendWidth : 1.0f;
+        rotateTo(BLEND_EDGE_DOWN);
+        drawBlendedEdge(myStart, myEnd);
+    }        
+
+    //corners
+    if (_myEdges & BLEND_EDGE_LEFT && _myEdges & BLEND_EDGE_UP) {
+        rotateTo(BLEND_EDGE_LEFT);
+        drawBlendedCorner(); 
+    }
+    if (_myEdges & BLEND_EDGE_UP && _myEdges & BLEND_EDGE_RIGHT) {
+        rotateTo(BLEND_EDGE_UP);
+        drawBlendedCorner(); 
+    }
+    if (_myEdges & BLEND_EDGE_RIGHT && _myEdges & BLEND_EDGE_DOWN) {
+        rotateTo(BLEND_EDGE_RIGHT);
+        drawBlendedCorner(); 
+    }
+    if (_myEdges & BLEND_EDGE_DOWN && _myEdges & BLEND_EDGE_LEFT) {
+        rotateTo(BLEND_EDGE_DOWN);
+        drawBlendedCorner(); 
+    }
+
+    
+    //blacklevel
+    drawBlackLevel();
+    
+}
+
+void 
+EdgeBlender::preRender() {
+    // load ortho projection
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0f, 1.0f, 1.0f, 0.0f);
+
+    //load texture matrix
+    glMatrixMode(GL_TEXTURE);
+    glPushMatrix();
+    glLoadIdentity();
+    
+    // load modelview
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+ 
+    // load attribs
+    //glPushAttrib(CURRENT_BIT | GL_ENABLE_BIT);
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    glDisable(GL_LIGHTING); 
+    glDisable(GL_DEPTH_TEST);
+}
+
+void 
+EdgeBlender::postRender() {
+    //restore attribs
+    glPopAttrib();
+
+    // restore modelview
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_TEXTURE);
+    glPopMatrix();
+    
+    //put into model view
+    glMatrixMode(GL_MODELVIEW);
 }
 
 float 
@@ -240,7 +450,7 @@ EdgeBlender::rotateTo(unsigned theEdge) {
 }
 
 void 
-EdgeBlender::drawBlendedEdge(float theStart, float theEnd) {
+EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
     AC_DEBUG << "drawBlendedEdge start " << theStart << " end " << theEnd;
 
     float myDelta = 1.0f / _myNumSubdivisions;
@@ -252,8 +462,9 @@ EdgeBlender::drawBlendedEdge(float theStart, float theEnd) {
         float myBlendValue = getBlendValue(myX);
 
         glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
+        //glColor4f(1.0f, 1.0f, 0.0f, 1.0f); // - myBlendValue);
 
-        float myXPos = myX * _myBlendWidth;
+        float myXPos = theMargin + myX * _myBlendWidth;
         glVertex2f(myXPos, theStart);
         glVertex2f(myXPos, theEnd);
         
@@ -269,10 +480,10 @@ EdgeBlender::drawBlendedCorner() {
 
     float myDelta = 1.0f / _myNumSubdivisions;
     
-    for (unsigned i = 0; i <= _myNumSubdivisions; ++i) {
+    for (unsigned i = 0; i < _myNumSubdivisions; ++i) {
         float myY = i * myDelta;
         float myY1BlendValue = getBlendValue( myY);
-        float myY2BlendValue = getBlendValue( min(1.0f, myY + myDelta));
+        float myY2BlendValue = getBlendValue( myY + myDelta);
 
         glBegin(GL_TRIANGLE_STRIP);
         for (unsigned j = 0; j <= _myNumSubdivisions; ++j) {
@@ -297,95 +508,38 @@ EdgeBlender::drawBlendedCorner() {
 
 }
 
-void
-EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
-    AC_TRACE << "onPostRender";
-
-    // load ortho projection
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    gluOrtho2D(0.0f, 1.0f, 1.0f, 0.0f);
-
-    // load modelview
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
- 
-    // draw stuff
-    glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT);
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_LIGHTING); 
-
-
-    //blended edges
-    if (_myEdges & BLEND_EDGE_LEFT) {        
-        rotateTo(BLEND_EDGE_LEFT);
-        float myStart = (_myEdges & BLEND_EDGE_UP) ?
-            _myBlendWidth : 0.0f;
-        float myEnd = (_myEdges & BLEND_EDGE_DOWN) ?
-            1.0f - _myBlendWidth : 1.0f;
-        rotateTo(BLEND_EDGE_LEFT);
-        drawBlendedEdge(myStart, myEnd);
-    }        
-    if (_myEdges & BLEND_EDGE_RIGHT) {
-        float myStart = (_myEdges & BLEND_EDGE_DOWN) ?
-            _myBlendWidth : 0.0f;
-        float myEnd = (_myEdges & BLEND_EDGE_UP) ?
-            1.0f - _myBlendWidth : 1.0f;
-        rotateTo(BLEND_EDGE_RIGHT);
-        drawBlendedEdge(myStart, myEnd);
-    }        
-    if (_myEdges & BLEND_EDGE_UP) {
-        float myStart = (_myEdges & BLEND_EDGE_RIGHT) ?
-            _myBlendWidth : 0.0f;
-        float myEnd = (_myEdges & BLEND_EDGE_LEFT) ?
-            1.0f - _myBlendWidth : 1.0f;
-        rotateTo(BLEND_EDGE_UP);
-        drawBlendedEdge(myStart, myEnd);
-    }        
-    if (_myEdges & BLEND_EDGE_DOWN) {
-        float myStart = (_myEdges & BLEND_EDGE_LEFT) ?
-            _myBlendWidth : 0.0f;
-        float myEnd = (_myEdges & BLEND_EDGE_RIGHT) ?
-            1.0f - _myBlendWidth : 1.0f;
-        rotateTo(BLEND_EDGE_DOWN);
-        drawBlendedEdge(myStart, myEnd);
-    }        
-
-    //corners
-    if (_myEdges & BLEND_EDGE_LEFT && _myEdges & BLEND_EDGE_UP) {
-        rotateTo(BLEND_EDGE_LEFT);
-        drawBlendedCorner(); 
-    }
-    if (_myEdges & BLEND_EDGE_UP && _myEdges & BLEND_EDGE_RIGHT) {
-        rotateTo(BLEND_EDGE_UP);
-        drawBlendedCorner(); 
-    }
-    if (_myEdges & BLEND_EDGE_RIGHT && _myEdges & BLEND_EDGE_DOWN) {
-        rotateTo(BLEND_EDGE_RIGHT);
-        drawBlendedCorner(); 
-    }
-    if (_myEdges & BLEND_EDGE_DOWN && _myEdges & BLEND_EDGE_LEFT) {
-        rotateTo(BLEND_EDGE_DOWN);
-        drawBlendedCorner(); 
-    }
-
+void 
+EdgeBlender::copyToTexture() {
     
-    //
-    //blacklevel
-    drawBlackLevel();
-    
-    
-    glPopAttrib();
+    glEnable(GL_TEXTURE_2D);
 
-    // restore modelview
-    glPopMatrix();
+    glBindTexture (GL_TEXTURE_2D, _mySceneTexture );
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, _mySceneWidth, _mySceneHeight, 0);
 
-    // restore projection
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
+    CHECK_OGL_ERROR;
+}
+
+void 
+EdgeBlender::renderTexture(float theStartX, float theStartY, float theEndX, float theEndY,
+                           float thePosX, float thePosY) 
+{
+    float myZ = -0.5f; //behind the blending    
+    float myWidth = theEndX - theStartX;
+    float myHeight = theEndY - theStartY;
+    //glColor4f(1.0f, 1.0f, 0.0f, 0.5f);
+    glBegin(GL_QUADS);
+    glTexCoord2f(theStartX, 1.0f - theStartY); 
+    glVertex3f(thePosX, thePosY, myZ);
+    
+    glTexCoord2f(theStartX, 1.0f - theEndY); 
+    glVertex3f(thePosX, thePosY + myHeight, myZ);
+    
+    glTexCoord2f(theEndX, 1.0f - theEndY); 
+    glVertex3f(thePosX + myWidth, thePosY + myHeight, myZ);
+    
+    glTexCoord2f(theEndX, 1.0f - theStartY); 
+    glVertex3f(thePosX + myWidth, thePosY, myZ);
+    glEnd();
 }
 
 extern "C"
