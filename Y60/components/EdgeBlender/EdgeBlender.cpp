@@ -75,54 +75,71 @@ class EdgeBlender :
         void onUpdateSettings(dom::NodePtr theSettings);
 
     private:
-        float getBlendValue(float theValue);
-        void drawBlackLevel();
-        void rotateTo(unsigned theEdge);
-        void drawBlendedEdge(float theStart, float theEnd, float theMargin = 0.0f);
-        void drawBlendedCorner();
+        void renderDualScreen();
+        void renderMultiPC();
+
+        void preRender();
+        void postRender();
+        void renderBlending();
+        void copyToTexture();
         void renderTexture(float theStartX, float theStartY, 
                            float theEndX, float theEndY,
                            float thePosX, float thePosY);
-        void copyToTexture();
-        void renderBlending();
-        void preRender();
-        void postRender();
+        void rotateTo(unsigned theEdge);
+        void drawBlendedEdge(float theStart, float theEnd, float theMargin = 0.0f);
+        void drawBlendedCorner();
+        void drawBlackLevel(float theLeft, float theTop, float theRight, float theBottom);
+        float getBlendValue(float theValue);
         
-        void renderDualScreen();
-        void renderMultiPC();
 
         unsigned _mySceneWidth, _mySceneHeight;
         GLuint _mySceneTexture;
         
-        const static unsigned BLEND_EDGE_LEFT  = 1;
-        const static unsigned BLEND_EDGE_RIGHT = 2;
-        const static unsigned BLEND_EDGE_UP    = 4;
-        const static unsigned BLEND_EDGE_DOWN  = 8;
-/*        
-  enum FruitEnum {
- *      APPLE,
- *      CHERRY,
- *      BANANA,
- *      PASSION_FRUIT,
- *      FruitEnum_MAX
- * };
- *
- * static const char * myFruitStrings[] = {
- *      "apple",
- *      "cherry",
- *      "banana",
- *      "passion_fruit",
- *      ""
- * };
- *
-*/       
-        enum { MODE_MULTI_PC               = 1,
+        
+       /* Modes:
+        * MODE_MULTI_PC 
+        *       multiple PC's render a scene using multiple projectors
+        *       each PC uses one projector and shows part of the scene
+        *       given by a viewport. 
+        *       the portion shown has blended edges which may be any combination
+        *       of BLEND_EDGE_LEFT, BLEND_EDGE_UP, BLEND_EDGE_RIGHT, BLEND_EDGE_DOWN
+        *       according to where the scene continues.
+        *
+        * MODE_DUAL_SCREEN_VERTICAL
+        * MODE_DUAL_SCREEN_HORIZONTAL
+        *       one PC renders a scene using two projectors
+        *       the scene may be split horizontally or vertically 
+        *       EdgeBlender will render the scene on a texture 
+        *       and display this texture producing redundancy at the overlapping region.
+        *       
+        *       e.g. if the blending is horizontal and the width is 20% 
+        *       then 60% of the texture is taken starting from the left border 
+        *       and rendered on the screen.
+        *       than another 60% percent of the texture starting from the right border
+        *       are taken and rendered next to the first one.
+        *       the screen now covers 120% of the original scene width
+        *       the central 20% of the screen are totally redundant 
+        *       this region is blended. 
+        *       the projected half-screens should overlap throughout this region.
+        *       
+        **/
+
+        enum { MODE_MULTI_PC               = 1, 
                MODE_DUAL_SCREEN_HORIZONTAL = 2,
                MODE_DUAL_SCREEN_VERTICAL   = 3
         };
 
         unsigned _myMode;
+        /*
+         * _myEdges is a bit-wise logical combination of BLEND_EDGE_XXX
+         */
+        const static unsigned BLEND_EDGE_LEFT  = 1;
+        const static unsigned BLEND_EDGE_RIGHT = 2;
+        const static unsigned BLEND_EDGE_UP    = 4;
+        const static unsigned BLEND_EDGE_DOWN  = 8;
+        
         unsigned  _myEdges;
+        
         float _myBlendWidth;
         unsigned _myNumSubdivisions;
 
@@ -154,7 +171,7 @@ EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
 void
 EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow) {
     _myMode = MODE_DUAL_SCREEN_HORIZONTAL;
-    _myEdges = 15; //BLEND_EDGE_LEFT;
+    _myEdges = 15;  
     _myBlendWidth = 0.2f;
     _myNumSubdivisions = 32;
     _myBlackLevel = 0.1f;
@@ -264,6 +281,8 @@ EdgeBlender::renderDualScreen() {
         drawBlendedEdge(0.0f, 1.0f, 0.5f); 
         rotateTo(BLEND_EDGE_LEFT);
         drawBlendedEdge(0.0f, 1.0f, 0.5f);
+        drawBlackLevel(0.0f, 0.0f, 0.5f - _myBlendWidth/2, 1.0f);
+        drawBlackLevel(0.5f + _myBlendWidth/2, 0.0f, 1.0f, 1.0f);
 
     } else if (_myMode == MODE_DUAL_SCREEN_VERTICAL) {        
         renderTexture(0.0f, 0.0f, 1.0f, 0.5f + _myBlendWidth/2, 0.0f, 0.0f);
@@ -272,6 +291,8 @@ EdgeBlender::renderDualScreen() {
         drawBlendedEdge(0.0f, 1.0f, 0.5f);
         rotateTo(BLEND_EDGE_DOWN);
         drawBlendedEdge(0.0f, 1.0f, 0.5f);
+        drawBlackLevel(0.0f, 0.0f, 1.0f, 0.5f - _myBlendWidth/2);
+        drawBlackLevel(0.0f, 0.5f + _myBlendWidth/2, 1.0f, 1.0f);
     }        
     
     postRender();
@@ -286,7 +307,6 @@ EdgeBlender::renderMultiPC() {
     
 void 
 EdgeBlender::renderBlending() {
-    glDisable(GL_TEXTURE_2D);
 
     //blended edges
     if (_myEdges & BLEND_EDGE_LEFT) {        
@@ -342,7 +362,11 @@ EdgeBlender::renderBlending() {
 
     
     //blacklevel
-    drawBlackLevel();
+    float myLeft = _myEdges & BLEND_EDGE_LEFT ? _myBlendWidth : 0.0f;
+    float myRight = _myEdges & BLEND_EDGE_RIGHT ? 1.0f - _myBlendWidth : 1.0f;
+    float myTop = _myEdges & BLEND_EDGE_UP ? _myBlendWidth : 0.0f;
+    float myBottom = _myEdges & BLEND_EDGE_DOWN ? 1.0f - _myBlendWidth : 1.0f;
+    drawBlackLevel(myLeft, myTop, myRight, myBottom);
     
 }
 
@@ -407,18 +431,14 @@ EdgeBlender::getBlendValue(float theValue) {
 }
 
 void
-EdgeBlender::drawBlackLevel() {
-    float myLeft = _myEdges & BLEND_EDGE_LEFT ? _myBlendWidth : 0.0f;
-    float myRight = _myEdges & BLEND_EDGE_RIGHT ? 1.0f - _myBlendWidth : 1.0f;
-    float myUp = _myEdges & BLEND_EDGE_UP ? _myBlendWidth : 0.0f;
-    float myDown = _myEdges & BLEND_EDGE_DOWN ? 1.0f - _myBlendWidth : 1.0f;
+EdgeBlender::drawBlackLevel(float theLeft, float theTop, float theRight, float theBottom) {
     glLoadIdentity();
     glBegin(GL_TRIANGLE_STRIP);
     glColor4f(1.0f, 1.0f, 1.0f, _myBlackLevel);
-    glVertex2f(myLeft, myUp);
-    glVertex2f(myLeft, myDown);
-    glVertex2f(myRight, myUp);
-    glVertex2f(myRight, myDown);
+    glVertex2f(theLeft, theTop);
+    glVertex2f(theLeft, theBottom);
+    glVertex2f(theRight, theTop);
+    glVertex2f(theRight, theBottom);
     glEnd();
 }
 
@@ -449,6 +469,12 @@ EdgeBlender::rotateTo(unsigned theEdge) {
     glTranslatef(-0.5f, -0.5f, 0.0f);
 }
 
+/*
+ * an edge is a region of the screen
+ * where 2 projector images overlap
+ * the edge blending function f(x) 
+ * satisfies f(x) + f(1-x) = 1 forall x
+ */
 void 
 EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
     AC_DEBUG << "drawBlendedEdge start " << theStart << " end " << theEnd;
@@ -475,19 +501,26 @@ EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
     
 }
 
+/*
+ * a corner is a region of the screen
+ * where 4 projector images overlap
+ * given the simple, edge blending function f(x) 
+ * which satisfies f(x) + f(1-x) = 1 forall x
+ * at a corner we basically take as the blending function
+ * g(x,y) = f(x)f(y) because then
+ * g(x,y) + g(1-x,y) + g(x,1-y) + g(1-x,1-y) = 1 forall x,y
+ */
 void 
 EdgeBlender::drawBlendedCorner() {
 
-    float myDelta = 1.0f / _myNumSubdivisions;
-    
     for (unsigned i = 0; i < _myNumSubdivisions; ++i) {
-        float myY = i * myDelta;
+        float myY = float(i) / _myNumSubdivisions;
         float myY1BlendValue = getBlendValue( myY);
-        float myY2BlendValue = getBlendValue( myY + myDelta);
+        float myY2BlendValue = getBlendValue(float(i+1) / _myNumSubdivisions);
 
         glBegin(GL_TRIANGLE_STRIP);
         for (unsigned j = 0; j <= _myNumSubdivisions; ++j) {
-            float myX = j * myDelta;
+            float myX = float(j) / _myNumSubdivisions;
             float myXBlendValue = getBlendValue( myX);
 
             float myXPos = myX * _myBlendWidth;
@@ -527,6 +560,7 @@ EdgeBlender::renderTexture(float theStartX, float theStartY, float theEndX, floa
     float myWidth = theEndX - theStartX;
     float myHeight = theEndY - theStartY;
     //glColor4f(1.0f, 1.0f, 0.0f, 0.5f);
+    glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
     glTexCoord2f(theStartX, 1.0f - theStartY); 
     glVertex3f(thePosX, thePosY, myZ);
@@ -540,6 +574,7 @@ EdgeBlender::renderTexture(float theStartX, float theStartY, float theEndX, floa
     glTexCoord2f(theEndX, 1.0f - theStartY); 
     glVertex3f(thePosX + myWidth, thePosY, myZ);
     glEnd();
+    glDisable(GL_TEXTURE_2D);
 }
 
 extern "C"
