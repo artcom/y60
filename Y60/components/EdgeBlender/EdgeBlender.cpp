@@ -1,6 +1,6 @@
 //============================================================================
 //
-// Copyright (C) 2000-2001, ART+COM AG Berlin
+// Copyright (C) 2000-20011, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,16 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//    $RCSfile: EdgeBlender.cpp,v $
-//
-//     $Author: pavel $
-//
-//   $Revision: 1.15 $
-//
-// Description:
-//
-//=============================================================================
 
 #include <y60/JSNode.h>
 #include <asl/PlugInBase.h>
@@ -75,19 +65,18 @@ class EdgeBlender :
         void onUpdateSettings(dom::NodePtr theSettings);
 
     private:
-        void renderDualScreen();
+        void renderMultiScreen();
         void renderMultiPC();
 
         void preRender();
         void postRender();
         void renderBlending();
         void copyToTexture();
-        void renderTexture(float theStartX, float theStartY, 
-                           float theEndX, float theEndY,
-                           float thePosX, float thePosY);
+        void renderTexture(float thePosX, float thePosY,
+                float theStartX, float theStartY, float theEndX, float theEndY);
         void rotateTo(unsigned theEdge);
         void drawBlendedEdge(float theStart, float theEnd, float theMargin = 0.0f);
-        void drawBlendedCorner();
+        void drawBlendedCorner(float theMarginX, float theMarginY);
         void drawBlackLevel(float theLeft, float theTop, float theRight, float theBottom);
         float getBlendValue(float theValue);
         
@@ -105,10 +94,9 @@ class EdgeBlender :
         *       of BLEND_EDGE_LEFT, BLEND_EDGE_UP, BLEND_EDGE_RIGHT, BLEND_EDGE_DOWN
         *       according to where the scene continues.
         *
-        * MODE_DUAL_SCREEN_VERTICAL
-        * MODE_DUAL_SCREEN_HORIZONTAL
-        *       one PC renders a scene using two projectors
-        *       the scene may be split horizontally or vertically 
+        * MODE_MULTI_SCREEN
+        *       one PC renders a scene using many projectors
+        *       the scene may be split horizontally or vertically or both
         *       EdgeBlender will render the scene on a texture 
         *       and display this texture producing redundancy at the overlapping region.
         *       
@@ -125,8 +113,7 @@ class EdgeBlender :
         **/
 
         enum { MODE_MULTI_PC               = 1, 
-               MODE_DUAL_SCREEN_HORIZONTAL = 2,
-               MODE_DUAL_SCREEN_VERTICAL   = 3
+               MODE_MULTI_SCREEN           = 2
         };
 
         unsigned _myMode;
@@ -139,6 +126,8 @@ class EdgeBlender :
         const static unsigned BLEND_EDGE_DOWN  = 8;
         
         unsigned  _myEdges;
+
+        unsigned _myRowCount, _myColumnCount;
         
         float _myBlendWidth;
         unsigned _myNumSubdivisions;
@@ -158,9 +147,8 @@ void
 EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
     AC_TRACE << "onPostRender";
     switch (_myMode) {
-        case MODE_DUAL_SCREEN_HORIZONTAL:
-        case MODE_DUAL_SCREEN_VERTICAL:
-            renderDualScreen();
+        case MODE_MULTI_SCREEN:
+            renderMultiScreen();
         break;
         case MODE_MULTI_PC:
             renderMultiPC();
@@ -170,13 +158,15 @@ EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
 
 void
 EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow) {
-    _myMode = MODE_DUAL_SCREEN_HORIZONTAL;
+    _myMode = MODE_MULTI_SCREEN;
     _myEdges = 15;  
     _myBlendWidth = 0.2f;
     _myNumSubdivisions = 32;
     _myBlackLevel = 0.1f;
     _myPower = 1.5f;
     _myGamma = 1.2f;
+    _myRowCount = 2;
+    _myColumnCount = 3;
     
     //setup texture for rendering
     _mySceneWidth = theWindow->getWidth();
@@ -240,6 +230,8 @@ EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     AC_DEBUG << "onUpdateSettings " << *theSettings;
     _myMode = getSetting(theSettings, "mode", _myMode);
     _myEdges = getSetting(theSettings, "edges", _myEdges);
+    _myColumnCount = getSetting(theSettings, "columns", _myColumnCount);
+    _myRowCount = getSetting(theSettings, "rows", _myRowCount);
     _myBlendWidth = getSetting(theSettings, "blendwidth", _myBlendWidth);
     _myNumSubdivisions = getSetting(theSettings, "subdivisions", _myNumSubdivisions);
     _myBlackLevel = getSetting(theSettings, "blacklevel", _myBlackLevel);
@@ -269,32 +261,77 @@ EdgeBlender::onPreRender(AbstractRenderWindow * theRenderer) {
 }
 
 void 
-EdgeBlender::renderDualScreen() {
+EdgeBlender::renderMultiScreen() {
     preRender();
     copyToTexture();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (_myMode == MODE_DUAL_SCREEN_HORIZONTAL) {
-        renderTexture(0.0f, 0.0f, 0.5f + _myBlendWidth/2, 1.0f, -_myBlendWidth/2, 0.0f);
-        renderTexture(0.5f - _myBlendWidth/2, 0.0f, 1.0f, 1.0f, 0.5f, 0.0f);
-        rotateTo(BLEND_EDGE_RIGHT);
-        drawBlendedEdge(0.0f, 1.0f, 0.5f); 
-        rotateTo(BLEND_EDGE_LEFT);
-        drawBlendedEdge(0.0f, 1.0f, 0.5f);
-        drawBlackLevel(0.0f, 0.0f, 0.5f - _myBlendWidth/2, 1.0f);
-        drawBlackLevel(0.5f + _myBlendWidth/2, 0.0f, 1.0f, 1.0f);
-
-    } else if (_myMode == MODE_DUAL_SCREEN_VERTICAL) {        
-        renderTexture(0.0f, 0.0f, 1.0f, 0.5f + _myBlendWidth/2, 0.0f, 0.0f);
-        renderTexture(0.0f, 0.5f - _myBlendWidth/2, 1.0f, 1.0f, 0.0f, 0.5f);
-        rotateTo(BLEND_EDGE_UP);
-        drawBlendedEdge(0.0f, 1.0f, 0.5f);
-        rotateTo(BLEND_EDGE_DOWN);
-        drawBlendedEdge(0.0f, 1.0f, 0.5f);
-        drawBlackLevel(0.0f, 0.0f, 1.0f, 0.5f - _myBlendWidth/2);
-        drawBlackLevel(0.0f, 0.5f + _myBlendWidth/2, 1.0f, 1.0f);
-    }        
+    glClear(GL_COLOR_BUFFER_BIT); 
     
+    float myTextureOffsetX = (_myColumnCount-1)*_myBlendWidth/2;
+    float myTextureOffsetY = (_myRowCount-1)*_myBlendWidth/2;
+    float myTexCoordY0 = myTextureOffsetY;
+
+
+    for(int i = 0; i < _myRowCount; ++i) {
+        float myY  = float(i) / _myRowCount;
+
+        float myTexCoordY1 = myTexCoordY0 + 1.0f / _myRowCount;
+        float myTexCoordX0 = myTextureOffsetX;
+        for(int j = 0; j < _myColumnCount; ++j) {
+            float myX  = float(j) / _myColumnCount; 
+            float myTexCoordX1 = myTexCoordX0 + 1.0f / _myColumnCount;
+            
+            renderTexture(myX, myY, myTexCoordX0, myTexCoordY0, myTexCoordX1, myTexCoordY1);
+            
+            myTexCoordX0 = myTexCoordX1 - _myBlendWidth;
+        }        
+        myTexCoordY0 = myTexCoordY1 - _myBlendWidth;
+    }
+    
+    for(int i = 0; i < _myRowCount; ++i) {
+        float myY  = float(i) / _myRowCount;
+        float myY0 = (i > 0 ? myY + _myBlendWidth : myY);
+        float myY1 = float(i+1) / _myRowCount;
+        if (i < _myRowCount-1) {
+            myY1 -= _myBlendWidth;
+        }
+        
+        for(int j = 0; j < _myColumnCount; ++j) {
+            float myX  = float(j) / _myColumnCount; 
+            float myX0 = (j > 0 ? myX + _myBlendWidth : myX);
+            float myX1 = float(j+1) / _myColumnCount;
+            if (j < _myColumnCount-1) {
+                myX1 -= _myBlendWidth;
+            }
+            
+            drawBlackLevel(myX0, myY0, myX1, myY1);
+
+            if (j > 0) {
+                rotateTo(BLEND_EDGE_RIGHT);
+                drawBlendedEdge(myY0, myY1, myX); 
+                rotateTo(BLEND_EDGE_LEFT);                
+                drawBlendedEdge(myY0, myY1, myX); 
+
+            }
+            if (i > 0) {
+                rotateTo(BLEND_EDGE_UP);
+                drawBlendedEdge(myX0, myX1, myY); 
+                rotateTo(BLEND_EDGE_DOWN);
+                drawBlendedEdge(myX0, myX1, myY); 
+            }                
+            if (j > 0 && i > 0) {
+                rotateTo(BLEND_EDGE_LEFT);
+                drawBlendedCorner(myX, myY);
+                rotateTo(BLEND_EDGE_UP);
+                drawBlendedCorner(myY, myX);
+                rotateTo(BLEND_EDGE_RIGHT);
+                drawBlendedCorner(myX, myY);
+                rotateTo(BLEND_EDGE_DOWN);
+                drawBlendedCorner(myY, myX);
+            }                
+        }        
+    }
+
     postRender();
 }
 
@@ -345,19 +382,19 @@ EdgeBlender::renderBlending() {
     //corners
     if (_myEdges & BLEND_EDGE_LEFT && _myEdges & BLEND_EDGE_UP) {
         rotateTo(BLEND_EDGE_LEFT);
-        drawBlendedCorner(); 
+        drawBlendedCorner(0.0f, 0.0f); 
     }
     if (_myEdges & BLEND_EDGE_UP && _myEdges & BLEND_EDGE_RIGHT) {
         rotateTo(BLEND_EDGE_UP);
-        drawBlendedCorner(); 
+        drawBlendedCorner(0.0f, 0.0f); 
     }
     if (_myEdges & BLEND_EDGE_RIGHT && _myEdges & BLEND_EDGE_DOWN) {
         rotateTo(BLEND_EDGE_RIGHT);
-        drawBlendedCorner(); 
+        drawBlendedCorner(0.0f, 0.0f); 
     }
     if (_myEdges & BLEND_EDGE_DOWN && _myEdges & BLEND_EDGE_LEFT) {
         rotateTo(BLEND_EDGE_DOWN);
-        drawBlendedCorner(); 
+        drawBlendedCorner(0.0f, 0.0f); 
     }
 
     
@@ -432,6 +469,8 @@ EdgeBlender::getBlendValue(float theValue) {
 
 void
 EdgeBlender::drawBlackLevel(float theLeft, float theTop, float theRight, float theBottom) {
+    AC_DEBUG << "drawBlackLevel " << theLeft << "," << theTop
+             << " - " << theRight << "," << theBottom;
     glLoadIdentity();
     glBegin(GL_TRIANGLE_STRIP);
     glColor4f(1.0f, 1.0f, 1.0f, _myBlackLevel);
@@ -487,8 +526,8 @@ EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
 
         float myBlendValue = getBlendValue(myX);
 
+        //glColor4f(0.0f, myBlendValue, 0.0f, max(0.2f, 1.0f - myBlendValue));
         glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
-        //glColor4f(1.0f, 1.0f, 0.0f, 1.0f); // - myBlendValue);
 
         float myXPos = theMargin + myX * _myBlendWidth;
         glVertex2f(myXPos, theStart);
@@ -511,7 +550,7 @@ EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
  * g(x,y) + g(1-x,y) + g(x,1-y) + g(1-x,1-y) = 1 forall x,y
  */
 void 
-EdgeBlender::drawBlendedCorner() {
+EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY) {
 
     for (unsigned i = 0; i < _myNumSubdivisions; ++i) {
         float myY = float(i) / _myNumSubdivisions;
@@ -523,14 +562,16 @@ EdgeBlender::drawBlendedCorner() {
             float myX = float(j) / _myNumSubdivisions;
             float myXBlendValue = getBlendValue( myX);
 
-            float myXPos = myX * _myBlendWidth;
-            float myYPos = myY * _myBlendWidth;
+            float myXPos = theMarginX + myX * _myBlendWidth;
+            float myYPos = theMarginY + myY * _myBlendWidth;
 
             float myBlendValue = myXBlendValue * myY1BlendValue;
+            //glColor4f(myBlendValue, 0.0f, 0.0f, max(0.2f, 1.0f - myBlendValue));
             glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
             glVertex2f(myXPos, myYPos);
             
             myBlendValue = myXBlendValue * myY2BlendValue;
+            //glColor4f(myBlendValue, 0.0f, 0.0f, max(0.2f, 1.0f - myBlendValue));
             glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
             glVertex2f(myXPos, myYPos + _myBlendWidth / _myNumSubdivisions);
 
@@ -549,32 +590,44 @@ EdgeBlender::copyToTexture() {
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture );
     glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, _mySceneWidth, _mySceneHeight, 0);
 
+    glBindTexture (GL_TEXTURE_2D, 0 );
+    glDisable(GL_TEXTURE_2D);
     CHECK_OGL_ERROR;
 }
 
 void 
-EdgeBlender::renderTexture(float theStartX, float theStartY, float theEndX, float theEndY,
-                           float thePosX, float thePosY) 
+EdgeBlender::renderTexture(float thePosX, float thePosY, 
+        float theStartX, float theStartY, float theEndX, float theEndY) 
 {
-    float myZ = -0.5f; //behind the blending    
     float myWidth = theEndX - theStartX;
     float myHeight = theEndY - theStartY;
-    //glColor4f(1.0f, 1.0f, 0.0f, 0.5f);
+
+    AC_DEBUG << "renderTexture " << thePosX << "," << thePosY
+             << " TEX " << theStartX << "," << theStartY << " - " << theEndX << "," << theEndY
+             << " WxH " << myWidth << "x" << myHeight;
+ 
+    glLoadIdentity();
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_TEXTURE_2D);
+    glBindTexture (GL_TEXTURE_2D, _mySceneTexture );
+
     glBegin(GL_QUADS);
     glTexCoord2f(theStartX, 1.0f - theStartY); 
-    glVertex3f(thePosX, thePosY, myZ);
+    glVertex2f(thePosX, thePosY);
     
     glTexCoord2f(theStartX, 1.0f - theEndY); 
-    glVertex3f(thePosX, thePosY + myHeight, myZ);
+    glVertex2f(thePosX, thePosY + myHeight);
     
     glTexCoord2f(theEndX, 1.0f - theEndY); 
-    glVertex3f(thePosX + myWidth, thePosY + myHeight, myZ);
+    glVertex2f(thePosX + myWidth, thePosY + myHeight);
     
     glTexCoord2f(theEndX, 1.0f - theStartY); 
-    glVertex3f(thePosX + myWidth, thePosY, myZ);
+    glVertex2f(thePosX + myWidth, thePosY);
     glEnd();
+
+    glBindTexture (GL_TEXTURE_2D, 0 );
     glDisable(GL_TEXTURE_2D);
+    CHECK_OGL_ERROR;
 }
 
 extern "C"
