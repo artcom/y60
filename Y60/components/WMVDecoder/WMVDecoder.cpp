@@ -209,7 +209,6 @@ namespace y60 {
 
     double
     WMVDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
-
         // EOF and framecache empty?
         if (_myReadEOF && _myFrameCache.size() <= 1) {
             AC_DEBUG << "EoF and FrameCache empty";
@@ -257,12 +256,15 @@ namespace y60 {
             theTime = _myLastVideoTimeStamp;
         }
 
-AC_PRINT << "************* audio time = " << _myAudioSink->getCurrentTime();
+        if (_myAudioSink) {
+            AC_PRINT << "************* audio time = " << _myAudioSink->getCurrentTime();
+        }
         // Find 'closest' frame in VideoFrameCache
         double myMinTimeDiff = 1000000.0;
         VideoFramePtr myBestFrame(NULL);
         unsigned myCachePosition = 0;
         unsigned myFoundCachePosition = 0;
+
         for (VideoFrameCache::const_iterator it = _myFrameCache.begin(); it != _myFrameCache.end(); ++it) {
             VideoFramePtr myVideoFrame(*it);
             //double myTimeDiff = fabs(theTime - myVideoFrame->getTimestamp());
