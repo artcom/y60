@@ -67,7 +67,6 @@ function ButtonBase(Public, Protected, theScene, theId,
         } else {
             Public.color = Protected.style.color;
         }
-print("button color=" + Public.color);
         Protected.isPressed = theFlag;
     }
 
