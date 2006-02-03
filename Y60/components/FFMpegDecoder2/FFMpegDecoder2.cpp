@@ -613,22 +613,24 @@ namespace y60 {
         myMovie->set<ImageWidthTag>(_myVStream->codec.width);
         myMovie->set<ImageHeightTag>(_myVStream->codec.height);
 
-        AC_PRINT << "PF=" << myMovie->get<ImagePixelFormatTag>();
+        AC_TRACE << "PF=" << myMovie->get<ImagePixelFormatTag>();
         switch (myMovie->getPixelEncoding()) {
         case y60::RGBA:
         case y60::BGRA:
-            AC_PRINT << "Using RGBA pixels";
+            AC_TRACE << "Using RGBA pixels";
+            myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::RGBA, PixelEncodingString));
             _myDestinationPixelFormat = PIX_FMT_RGBA32;
             break;
         case y60::GRAY:
-            AC_PRINT << "Using GRAY pixels";
+            AC_TRACE << "Using GRAY pixels";
             _myDestinationPixelFormat = PIX_FMT_GRAY8;
             break;
         case y60::RGB:
         case y60::BGR:
         default:
-            AC_PRINT << "Using BGR pixels";
+            AC_TRACE << "Using BGR pixels";
             _myDestinationPixelFormat = PIX_FMT_BGR24;
+            myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGR, PixelEncodingString));
             break;
         }
 
