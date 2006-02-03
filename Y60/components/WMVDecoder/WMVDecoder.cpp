@@ -252,7 +252,7 @@ namespace y60 {
         }
 
         if (theTime > _myLastVideoTimeStamp) {
-            AC_WARNING << "FrameCache underrun, time=" << theTime << "last in cache " << _myLastVideoTimeStamp;
+            AC_WARNING << "FrameCache underrun, time=" << theTime << " last in cache " << _myLastVideoTimeStamp;
             theTime = _myLastVideoTimeStamp;
         }
 
@@ -714,6 +714,7 @@ namespace y60 {
             if (_myLastVideoTimeStamp && (myTimeStamp - _myLastVideoTimeStamp) > 1.0) {
                 AC_WARNING << "Last VideoSample is " << (myTimeStamp - _myLastVideoTimeStamp) << "s old.";
             }
+            cout <<"Got a video sample" << endl;
             _myLastVideoTimeStamp = myTimeStamp;
 
             // Push to VideoFrameCache, limit size when not caching
@@ -761,6 +762,7 @@ namespace y60 {
         } else if (theOutputNumber != _myAudioOutputId) {
             AC_WARNING << "Unexpected output=" << theOutputNumber;
         }
+
         return S_OK;
     }
 
@@ -826,7 +828,6 @@ namespace y60 {
             AC_WARNING << "OnStatus: Unhandled status=" << theStatus << " result=" << hr;
             break;
         }
-
         return S_OK;
     }
 
