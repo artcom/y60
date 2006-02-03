@@ -1646,6 +1646,11 @@ Usually 'o' plus a number, such as 'o0'.</xs:documentation>
                     <xs:documentation>Sets the overlay visible/invisible.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="scale" type="Vector2f">
+                <xs:annotation>
+                    <xs:documentation>The scale of the overlay on the screen in pixels.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="position" type="Vector2f">
                 <xs:annotation>
                     <xs:documentation>The position of the upper-left corner of the overlay on the screen in pixels.</xs:documentation>

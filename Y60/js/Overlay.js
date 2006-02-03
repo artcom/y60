@@ -38,6 +38,9 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     Public.position getter = function() { return _myNode.position; }
     Public.position setter = function(theArgument) { _myNode.position = theArgument; }
 
+    Public.scale getter = function() { return _myNode.scale; }
+    Public.scale setter = function(theArgument) { _myNode.scale = theArgument; }
+
     Public.rotation getter = function() { return _myNode.rotation; }
     Public.rotation setter = function(theArgument) { _myNode.rotation = theArgument; }
 

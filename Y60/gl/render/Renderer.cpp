@@ -1482,6 +1482,9 @@ namespace y60 {
             glTranslatef(myPivotTranslation[0], myPivotTranslation[1], myPivotTranslation[2]);
 #endif
         }
+        
+        const asl::Vector2f myScale = myOverlay.get<Scale2DTag>();
+        glScalef(myScale[0], myScale[1], 1.0f);
 
         float myWidth  = myOverlay.get<WidthTag>();
         float myHeight = myOverlay.get<HeightTag>();

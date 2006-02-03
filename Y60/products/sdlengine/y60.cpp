@@ -10,7 +10,7 @@
 //
 //   $RCSfile: acxpshell.cpp,v $
 //   $Author: pavel $
-//   $Revision: 1.56 $
+//   $Revision: 1.56 $  
 //   $Date: 2005/04/24 00:41:20 $
 //
 //   Description: Application-wrapper for xpshell

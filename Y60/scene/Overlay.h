@@ -45,6 +45,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(LeftBorderTag,   bool,          OVERLAY_LEFTBORDER_ATTRIB,   false);
     DEFINE_ATTRIBUT_TAG(RightBorderTag,  bool,          OVERLAY_RIGHTBORDER_ATTRIB,  false);
     DEFINE_ATTRIBUT_TAG(Rotation2DTag,   float,         OVERLAY_ROTATION2D_ATTRIB,   0.0);
+    DEFINE_ATTRIBUT_TAG(Scale2DTag,      asl::Vector2f, OVERLAY_SCALE2D_ATTRIB,      asl::Vector2f(1,1));
 
     class Overlay :
         public dom::Facade,
@@ -63,7 +64,8 @@ namespace y60 {
         public BottomBorderTag::Plug,
         public LeftBorderTag::Plug,
         public RightBorderTag::Plug,
-        public Rotation2DTag::Plug
+        public Rotation2DTag::Plug,
+        public Scale2DTag::Plug
     {
         public:
             Overlay(dom::Node & theNode) :
@@ -83,7 +85,8 @@ namespace y60 {
                   BottomBorderTag::Plug(theNode),
                   LeftBorderTag::Plug(theNode),
                   RightBorderTag::Plug(theNode),
-                  Rotation2DTag::Plug(theNode)
+                  Rotation2DTag::Plug(theNode),
+                  Scale2DTag::Plug(theNode)
               {}
             IMPLEMENT_FACADE(Overlay);
     };
