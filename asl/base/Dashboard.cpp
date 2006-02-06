@@ -88,7 +88,8 @@ namespace asl {
 			return myNewTimer;
 		}
 		return found->second;
-	};
+	}
+
     CounterPtr
     Dashboard::getCounter(const std::string & theName) {
 		std::map<std::string,CounterPtr>::iterator found = _myCounters.find(theName);
@@ -109,24 +110,25 @@ namespace asl {
     }
 
     Dashboard & getDashboard() {
-        //static asl::Ptr<Dashboard> ourDashboard = asl::Ptr<Dashboard>(new Dashboard);
-        //return *ourDashboard;
         return Dashboard::get();
     }
 
     double
     Dashboard::getFrameRate() {
-        if (_myCycleTimes.size() > 1) {
-            double myFrameTime = (_myCycleTimes.back() - _myCycleTimes.front()) / _myCycleTimes.size();
-            if (myFrameTime > 0) {
-                return 1 / myFrameTime;
+        // We only want to update the frame rate value once per second
+        if ((Time() - _myLastFrameRateTime) > 1) {
+            if (_myCycleTimes.size() > 1) {
+                double myFrameTime = (_myCycleTimes.back() - _myCycleTimes.front()) / _myCycleTimes.size();
+                if (myFrameTime > 0) {
+                    _myFrameRate = 1 / myFrameTime;                    
+                    _myLastFrameRateTime = asl::Time();
+                }
             }
-        }
-
-        return 0;
+        }        
+        return _myFrameRate;
     }
 
-    const double FRAME_AVERAGING_TIME = 3;
+    const double FRAME_AVERAGING_TIME = 2;
 
     void Dashboard::cycle(unsigned int theGroup, unsigned long theIncrement) {
         _myGroupCounters[theGroup].count(theIncrement);
@@ -148,10 +150,11 @@ namespace asl {
                 _myCompleteCycleCounters[it->first] = *(it->second);
                 it->second->reset();
 		    }
-        }
+        }        
 
-        _myCycleTimes.push_back(Time());
-        if (_myCycleTimes.size() > 2 && (_myCycleTimes.back() - _myCycleTimes[1]) > FRAME_AVERAGING_TIME) {
+        // Calculate an sliding-window average 
+        _myCycleTimes.push_back(Time());        
+        while (_myCycleTimes.size() > 2 && (_myCycleTimes.back() - _myCycleTimes.front()) > FRAME_AVERAGING_TIME) {
             _myCycleTimes.pop_front();
         }
     }

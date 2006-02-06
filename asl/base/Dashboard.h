@@ -380,7 +380,7 @@ namespace asl {
 
     class Dashboard : public Singleton<Dashboard> {
         public:
-            Dashboard() {}
+            Dashboard() : _myLastFrameRateTime(0), _myFrameRate(0) {}
             TimerPtr getTimer(const std::string & theName);
             CounterPtr getCounter(const std::string & theName);
             unsigned long getCounterValue(const std::string & theName);
@@ -401,7 +401,11 @@ namespace asl {
 			std::map<std::string,Timer> _myCompleteCycleTimers;
 			std::map<std::string,Counter> _myCompleteCycleCounters;
 			std::vector<std::pair<std::string, TimerPtr> > _mySortedTimers;
+
+            // All this for calculating the current framerate
 			std::deque<double> _myCycleTimes;
+            double _myLastFrameRateTime;
+            double _myFrameRate;
     };
 
     class ScopeTimer {
