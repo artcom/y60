@@ -282,6 +282,12 @@ SDLWindow::dumpSDLGLParams() {
     AC_PRINT << "  SDL_GL_BUFFER_SIZE = " << value << endl;
     SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE , &value);
     AC_PRINT << "  SDL_GL_STENCIL_SIZE = " << value << endl;
+    SDL_GL_GetAttribute(SDL_GL_ACCUM_RED_SIZE , &value);
+    AC_PRINT << "  SDL_GL_ACCUM_RED_SIZE = " << value << endl;
+    SDL_GL_GetAttribute(SDL_GL_ACCUM_GREEN_SIZE , &value);
+    AC_PRINT << "  SDL_GL_ACCUM_GREEN_SIZE = " << value << endl;
+    SDL_GL_GetAttribute(SDL_GL_ACCUM_BLUE_SIZE , &value);
+    AC_PRINT << "  SDL_GL_ACCUM_BLUE_SIZE = " << value << endl;
 }
 
 void
@@ -454,6 +460,9 @@ void SDLWindow::ensureSDLSubsystem() {
         SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
         SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
         SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
+        /*SDL_GL_SetAttribute( SDL_GL_ACCUM_RED_SIZE, 16 );
+        SDL_GL_SetAttribute( SDL_GL_ACCUM_GREEN_SIZE, 16 );
+        SDL_GL_SetAttribute( SDL_GL_ACCUM_BLUE_SIZE, 16 );*/
         SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
     }
 }
