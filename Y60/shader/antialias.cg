@@ -8,6 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+#define WINDOW_WIDTH  4
+#define WINDOW_HEIGHT 4
+
 struct vert2frag {
     float4 position : POSITION;
     float2 texCoord : TEXCOORD0;
@@ -24,18 +27,18 @@ vert2frag mainVertex(float4 thePosition : POSITION,
     return OUT;
 }
 
-float4 mainFragment(vert2frag IN,                    
+float4 mainFragment(vert2frag IN,
                     uniform sampler2D tex,
                     uniform float2 pixelSize,
-                    uniform float4 surfacecolor) : COLOR 
+                    uniform float4 surfacecolor) : COLOR
 {
     float4 myResult = float4(0.0, 0.0, 0.0, 0.0);
 
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < 3; ++j) {
-            myResult += tex2D(tex, float2(IN.texCoord.x + i * pixelSize.x, IN.texCoord.y + j * pixelSize.y));
+    for (int i = 0; i < WINDOW_WIDTH; ++i) {
+        for (int j = 0; j < WINDOW_HEIGHT; ++j) {
+            myResult += tex2D(tex, float2(IN.texCoord.x + i*2 * pixelSize.x + pixelSize.x/2, IN.texCoord.y + j*2 * pixelSize.y+pixelSize.y/2));
         }
     }
 
-    return (myResult / 9) * surfacecolor;
+    return (myResult / (WINDOW_WIDTH * WINDOW_HEIGHT)) * surfacecolor;
 }

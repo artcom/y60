@@ -108,7 +108,6 @@ namespace y60 {
     void
     GLResourceManager::updateTextureData(ImagePtr theImage) {
         PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
-
         if ( ! theImage->getRasterPtr()) {
             AC_WARNING << "No raster in image";
             return;

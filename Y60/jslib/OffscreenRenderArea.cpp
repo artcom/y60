@@ -119,10 +119,12 @@ bool
 OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
         ImagePtr myImage = getImage();
-        if (myImage) { // XXX
+        if (myImage) { 
             ensureRaster(myImage);
             _myWidth  = myImage->get<ImageWidthTag>();
             _myHeight = myImage->get<ImageHeightTag>();
+        } else {
+            throw OffscreenRendererException(std::string("No target set for canvas: ") + theCanvas->getAttributeString(ID_ATTRIB), PLUS_FILE_LINE);
         }
         return true;
     } else {
@@ -152,32 +154,24 @@ OffscreenRenderArea::getImage() {
 
 int
 OffscreenRenderArea::getWidth() const {
-    /*
-    ImagePtr myImage = getImage();
-    return myImage ? myImage->get<ImageWidthTag>() : 0;
-    */
     return _myWidth;
 }
 
 int
 OffscreenRenderArea::getHeight() const {
-    /*
-    ImagePtr myImage = getImage();
-    return myImage ? myImage->get<ImageHeightTag>() : 0;
-    */
     return _myHeight;
 }
 
 ResizeableRasterPtr
 OffscreenRenderArea::ensureRaster(ImagePtr theImage) {
     if ( ! theImage ) {
-        throw OffscreenRendererException("No Image.", PLUS_FILE_LINE);
+        throw OffscreenRendererException("No image.", PLUS_FILE_LINE);
     }
     ResizeableRasterPtr myRaster = theImage->getRasterPtr();
 
     if (!myRaster) {
         theImage->set(theImage->get<ImageWidthTag>(),
-                theImage->get<ImageHeightTag>(), 1, theImage->getEncoding());
+                      theImage->get<ImageHeightTag>(), 1, theImage->getEncoding());
         myRaster = theImage->getRasterPtr();
     }
     if (theImage->get<ImageWidthTag>() != myRaster->width() ||
