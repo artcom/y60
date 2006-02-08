@@ -55,5 +55,3 @@ function getImageSize(theImage) {
     mySize = product(mySize, myImageMatrix);
     return new Vector2i(Math.abs(Math.round(mySize.x)), Math.abs(Math.round(mySize.y)));
 }
-
-

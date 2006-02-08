@@ -1,18 +1,11 @@
 //=============================================================================
-// Copyright (C) 2004, ART+COM AG Berlin
+// Copyright (C) 2004-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: ShapeBuilder.js,v $
-//   $Author: ulrich $
-//   $Revision: 1.10 $
-//   $Date: 2004/11/16 18:35:02 $
-//
 //=============================================================================
 
 use("ShapeBuilder.js");
@@ -51,7 +44,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
     obj.buildNode = function() {
 
         var myShapeString =
-            '<shape>\n' +
+            '<shape renderstyle="[frontfacing]">\n' +
             '    <vertexdata>\n' +
             '        <vectorofvector3f name="position">' + arrayToString(_myPositions) + '</vectorofvector3f>\n' +
             '        <vectorofvector3f name="normal">' +  arrayToString(_myNormals) + '</vectorofvector3f>\n';
@@ -178,7 +171,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.texcoords.push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
     }
 
-    obj.appendQuadWithCustumTexCoords = function (theElement, thePosition, theSize, theUVOrigin, theUVSize) {
+    obj.appendQuadWithCustomTexCoords = function (theElement, thePosition, theSize, theUVOrigin, theUVSize) {
         // add positions to shape's vertex data
         var myHalfWidth  = theSize[0] / 2;
         var myHalfHeight = theSize[1] / 2;
