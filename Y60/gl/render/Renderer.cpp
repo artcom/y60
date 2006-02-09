@@ -1502,8 +1502,15 @@ namespace y60 {
                 }
 
                 COUNT(Overlays);
-
-                switchMaterial(*myMaterial, true);
+                
+                bool myMaterialHasChanged = switchMaterial(*myMaterial, true);
+                if (myMaterialHasChanged) {
+                    IShaderPtr myShader = myMaterial->getShader();
+                    if (myShader) {
+                        myShader->bindOverlayParams(*myMaterial);
+                        CHECK_OGL_ERROR;
+                    }
+                }
                 MaterialPropertiesFacadePtr myPropFacade = myMaterial->getChild<MaterialPropertiesTag>();
 
                 const asl::Vector4f & myColor = myPropFacade->get<SurfaceColorTag>();

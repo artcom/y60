@@ -53,6 +53,7 @@ namespace y60 {
                     const LightVector & theLights,
                     const Body & theBody,
                     const Camera & theCamera); 
+            void bindOverlayParams(const MaterialBase & theMaterial);
 
         protected:
             void loadShaderProperties(const dom::NodePtr theShaderNode,

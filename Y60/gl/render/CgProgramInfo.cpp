@@ -410,11 +410,21 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        AC_DEBUG << "CgProgramInfo::bindBodyParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction;
-
         DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_bindBodyParams));
         setCGGLParameters();
         setAutoParameters(theLightInstances, theViewport, theBody, theCamera);
+    }
+
+    void 
+    CgProgramInfo::bindOverlayParams() {
+        setCGGLParameters();
+
+        for (CgProgramAutoParams::iterator myIter = _myAutoParams.begin();
+                myIter != _myAutoParams.end(); ++myIter)
+        {
+            CgProgramAutoParam curParam = myIter->second;
+            AC_WARNING << "Cg parameter " << curParam._myName << " is not supported for overlays, yet.";
+        }
     }
 
     void

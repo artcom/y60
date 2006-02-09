@@ -43,18 +43,7 @@ using namespace y60;
 
 namespace y60 {
 
-/*
-#define checkCgError() { \
-    CGerror myCgError = cgGetError(); \
-    if (myCgError != CG_NO_ERROR) { \
-        throw ShaderException(std::string("Cg error: ") + cgGetErrorString(myCgError), \
-                PLUS_FILE_LINE); \
-    } \
-}
-*/
-
-    CGShader::CGShader(const dom::NodePtr theNode) : GLShader(theNode)
-    {
+    CGShader::CGShader(const dom::NodePtr theNode) : GLShader(theNode) {
         _myType = CG_MATERIAL;
         dom::NodePtr myShaderNode = theNode->childNode(VERTEX_SHADER_NODE_NAME);
         if (myShaderNode) {
@@ -190,8 +179,7 @@ namespace y60 {
     }
 
     const ShaderDescription &
-    CGShader::getShader(const ShaderType & theShadertype) const
-    {
+    CGShader::getShader(const ShaderType & theShadertype) const {
         if (theShadertype == VERTEX_SHADER ) {
             return _myVertexShader;
         } else if (theShadertype == FRAGMENT_SHADER) {
@@ -204,7 +192,6 @@ namespace y60 {
 
     void
     CGShader::activate(MaterialBase & theMaterial) {
-        //AC_DEBUG << "CGShader::activate " << theMaterial.getName() << " " << hex << (void*)this << dec;
         GLShader::activate(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->enableProfile();
@@ -217,7 +204,6 @@ namespace y60 {
 
     void
     CGShader::deactivate(const MaterialBase & theMaterial) {
-        //AC_DEBUG << "CGShader::deactivate " << theMaterial.getName() << " " << hex << (void*)this << dec;
         if (_myVertexProgram) {
             _myVertexProgram->disableProfile();
         }
@@ -228,7 +214,6 @@ namespace y60 {
 
     void
     CGShader::enableTextures(const MaterialBase & theMaterial) {
-        //AC_DEBUG << "CGShader::enableTextures " << theMaterial.getName() << " " << hex << (void*)this << dec;
         GLShader::enableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->enableTextures();
@@ -240,7 +225,6 @@ namespace y60 {
 
     void
     CGShader::disableTextures(const MaterialBase & theMaterial) {
-        //AC_DEBUG << "CGShader::disableTextures " << theMaterial.getName() << " " << hex << (void*)this << dec;
         GLShader::disableTextures(theMaterial);
         if (_myVertexProgram) {
             _myVertexProgram->disableTextures();
@@ -250,7 +234,6 @@ namespace y60 {
         }
     }
 
-
     void
     CGShader::bindBodyParams(const MaterialBase & theMaterial,
             const Viewport & theViewport,
@@ -258,7 +241,6 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        //AC_DEBUG << "CGShader::bindBodyParams " << theMaterial.getName();
         DBP2(MAKE_SCOPE_TIMER(CGShader_bindBodyParams));
         GLShader::bindBodyParams(theMaterial, theViewport, theLights, theBody, theCamera);
 
@@ -290,12 +272,26 @@ namespace y60 {
 
     void
     CGShader::bindMaterialParams(const MaterialBase & theMaterial) {
-        //AC_DEBUG << "CGShader::bindMaterialParams " << theMaterial.getName();
         if (_myVertexProgram) {
             _myVertexProgram->bindMaterialParams(theMaterial);
         }
         if (_myFragmentProgram) {
             _myFragmentProgram->bindMaterialParams(theMaterial);
+        }
+    }
+
+    void 
+    CGShader::bindOverlayParams(const MaterialBase & theMaterial) {
+        LightVector myEmptyLights;
+        if (_myVertexProgram) {
+            _myVertexProgram->reloadIfRequired(myEmptyLights, theMaterial);
+            _myVertexProgram->bindOverlayParams();
+            _myVertexProgram->bind();            
+        }
+        if (_myFragmentProgram) {
+            _myFragmentProgram->reloadIfRequired(myEmptyLights, theMaterial);
+            _myFragmentProgram->bindOverlayParams();
+            _myFragmentProgram->bind();
         }
     }
 
@@ -311,7 +307,6 @@ namespace y60 {
             return unsigned(myMaxTexUnits);
         } else {
             return GLShader::getMaxTextureUnits();
-        }
-        
+        }        
     }
-} // namespace y60
+} 

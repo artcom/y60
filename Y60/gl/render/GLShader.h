@@ -54,14 +54,15 @@ namespace y60 {
             
             virtual void enableTextures(const MaterialBase & theMaterial);
             virtual void disableTextures(const MaterialBase & theMaterial);
-            
+            virtual unsigned getMaxTextureUnits() const;
+
             // called on body change
             virtual void bindBodyParams(const MaterialBase & theMaterial,
                     const Viewport & theViewport,
                     const LightVector & theLights,
                     const Body & theBody, 
                     const Camera & theCamera);
-            virtual unsigned getMaxTextureUnits() const;
+            virtual void bindOverlayParams(const MaterialBase & theMaterial) {};            
 
        protected:
             virtual void loadShaderProperties(const dom::NodePtr theShaderNode, 

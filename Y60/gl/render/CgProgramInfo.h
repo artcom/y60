@@ -94,6 +94,7 @@ namespace y60 {
                         const Viewport & theViewport,
                         const y60::Body & theBody,
                         const y60::Camera & theCamera);
+            void bindOverlayParams();
 
             void bind();
             bool reloadIfRequired(const y60::LightVector & theLightInstances,

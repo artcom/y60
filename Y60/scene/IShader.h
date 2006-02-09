@@ -72,7 +72,7 @@ namespace y60 {
                                         const LightVector & theLights,
                                         const Body & theBody, 
                                         const Camera & theCamera) = 0;
-
+            virtual void bindOverlayParams(const MaterialBase & theMaterial) = 0;
     };
     typedef asl::Ptr<IShader> IShaderPtr;
 
