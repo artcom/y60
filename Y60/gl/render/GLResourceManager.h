@@ -146,12 +146,6 @@ namespace y60 {
         int getMaxTextureSize(int theDimensions) const;
 
         /**
-         * Return maximum number of texture units available in the current GL context.
-         * @return Maximum number of texture units. Returns 0 on error.
-         */
-        unsigned getMaxTextureUnits() const;
-
-        /**
          * Set the texture priority.
          * Zero (0.0) is the lowest, one (1.0) the highest priority.
          * Values outside this range are clamped.

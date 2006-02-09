@@ -164,13 +164,11 @@ namespace y60 {
 
     void
     MaterialBase::addTexture(dom::NodePtr theTextureNode, TextureManager & theTextureManager) {
-        unsigned myMaxUnits = theTextureManager.getMaxTextureUnits();
-        if (_myTextures.size() < myMaxUnits) {
-            
+        unsigned myMaxUnits = _myShader->getMaxTextureUnits();
+        if (_myTextures.size() < myMaxUnits) {            
 			TexturePtr myTexture = TexturePtr(new Texture(*theTextureNode));
 			myTexture->update(theTextureManager);
             _myTextures.push_back(myTexture);
-            
         } else {
             AC_WARNING << "Your OpenGL implementation only supports " 
                  << asl::as_string(myMaxUnits) << " texture units, "

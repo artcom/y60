@@ -49,6 +49,14 @@ namespace y60 {
             virtual const MaterialParameterVector & getVertexParameters() const = 0;
             virtual const VertexRegisterFlags & getVertexRegisterFlags() const = 0;
 
+            /**
+            * Return maximum number of texture units available in the current GL context.
+            * The value is dependant on the type of shader. Fixed function shader typically
+            * can use 4 texture unites. Cg fragment shader can use 16.
+            * @return Maximum number of texture units. Returns 0 on error.
+            */
+            virtual unsigned getMaxTextureUnits() const = 0;
+
             virtual void load(IShaderLibrary & theShaderLibrary) = 0;
 
             // will be called once per material change

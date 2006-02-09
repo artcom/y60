@@ -40,7 +40,7 @@ class ResourceManager {
         virtual int getMaxTextureSize(int theDimensions) const = 0;
         virtual void updateTextureData(ImagePtr theImage) = 0;
         virtual void rebindTexture(ImagePtr theImage) = 0;
-        virtual unsigned getMaxTextureUnits() const = 0;
+
         /**
          * Sets the Priority of the Texture theImage to thePriority. The Texture priority
          * is used to determine which texture should be removed from the graphics hardware

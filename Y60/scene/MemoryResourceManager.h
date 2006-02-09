@@ -32,7 +32,7 @@ class MemoryResourceManager : public ResourceManager {
         int getMaxTextureSize(int theDimensions) const { return 0; }
         void updateTextureData(ImagePtr theImage) {}
         void rebindTexture(ImagePtr theImage) {}
-        unsigned getMaxTextureUnits() const { return 0; }
+
         /**
          * Sets the Priority of the Texture theImage to thePriority. The Texture priority
          * is used to determine which texture should be removed from the graphics hardware

@@ -46,6 +46,7 @@ namespace y60 {
             virtual void enableTextures(const MaterialBase & theMaterial);
             virtual void disableTextures(const MaterialBase & theMaterial);
             virtual bool isCGShader() { return true; }
+            virtual unsigned getMaxTextureUnits() const;
 
             void bindBodyParams(const MaterialBase & theMaterial,
                     const Viewport & theViewport,

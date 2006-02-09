@@ -61,6 +61,7 @@ namespace y60 {
                     const LightVector & theLights,
                     const Body & theBody, 
                     const Camera & theCamera);
+            virtual unsigned getMaxTextureUnits() const;
 
        protected:
             virtual void loadShaderProperties(const dom::NodePtr theShaderNode, 

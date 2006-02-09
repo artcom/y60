@@ -427,5 +427,15 @@ namespace y60 {
     GLShader::getCosts() const {
         return _myCost;
     }
+
+    unsigned 
+    GLShader::getMaxTextureUnits() const {
+        int myMaxTexUnits;
+        glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &myMaxTexUnits);
+        if (myMaxTexUnits < 0) { // should not happen
+            myMaxTexUnits = 0;
+        }
+        return unsigned(myMaxTexUnits);
+    }
 } // namespace y60
 

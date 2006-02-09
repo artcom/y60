@@ -245,11 +245,6 @@ namespace y60 {
         _myResourceManager->rebindTexture(theImage);
     }
 
-    unsigned TextureManager::getMaxTextureUnits() const {
-        // Delegate to my ResourceManager
-        return _myResourceManager->getMaxTextureUnits();
-    }
-
     void TextureManager::setPriority(Image * theImage, float thePriority) {
         // Delegate to my ResourceManager
         _myResourceManager->setTexturePriority(theImage, thePriority);

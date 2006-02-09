@@ -50,16 +50,6 @@ namespace y60 {
     }
 
     unsigned
-    GLResourceManager::getMaxTextureUnits() const {
-        int myMaxTexUnits;
-        glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &myMaxTexUnits);
-        if (myMaxTexUnits < 0) { // should not happen
-            myMaxTexUnits = 0;
-        }
-        return unsigned(myMaxTexUnits);
-    }
-
-    unsigned
     GLResourceManager::setupTexture(ImagePtr theImage) {
         AC_DEBUG << "setupTexture(" << theImage->get<NameTag>() << ")";
         glPushAttrib(GL_ALL_ATTRIB_BITS);

@@ -53,7 +53,6 @@ namespace y60 {
             virtual int getMaxTextureSize(int theDimensions) const; 
             void updateImageData(asl::Ptr<Image, dom::ThreadingModel> theImage);
             void rebind(asl::Ptr<Image, dom::ThreadingModel> theImage);
-            unsigned getMaxTextureUnits() const;
             void setPriority(Image * theImage, float thePriority);           
             void unbindTexture(Image * theImage);
             void unbindTextures();
