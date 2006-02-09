@@ -860,7 +860,7 @@
     </shader>
     <shader id="s33" name="accumulation" cost="120">
         <supports>
-            <feature class="filter" values="[antialias2]"/>
+            <feature class="filter" values="[accumulation]"/>
             <feature class="textures" values="[paint,paint,paint,paint,paint,paint,paint,paint]"/>
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[uv_map]"/>
