@@ -71,7 +71,7 @@ function ButtonBase(Public, Protected, theScene, theId,
     }
 
     Public.onMouseButton = function(theState, theX, theY) {
-        if (Public.enabled && isVisible(Public.node)) {
+        if (Public.enabled && Protected.isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
                 Public.setPressed(false);
                 Public.onClick(Public);
@@ -86,15 +86,17 @@ function ButtonBase(Public, Protected, theScene, theId,
     Public.setToggleGroup = function(theButtons) {
         // Replace the onMouseButton function with something more advanced
         Public.onMouseButton = function(theState, theX, theY) {
-            if (Public.enabled && isVisible(Public.node) && theState == MOUSE_UP && Protected.isPressed && Public.touches(theX, theY)) {
-                Public.onClick(this);
-            } else  if (Public.enabled && isVisible(Public.node) && theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY)) {
-                for (var i = 0; i < theButtons.length; ++i) {
-                    if (theButtons[i].enabled && theButtons[i].isPressed()) {
-                        theButtons[i].setPressed(false);
+            if (Public.enabled && Protected.isVisible(Public.node) && Public.touches(theX, theY)) {
+                if (theState == MOUSE_UP && Protected.isPressed) {
+                    Public.onClick(this);
+                } else  if (theState == MOUSE_DOWN && !Protected.isPressed) {
+                    for (var i = 0; i < theButtons.length; ++i) {
+                        if (theButtons[i].enabled && theButtons[i].isPressed()) {
+                            theButtons[i].setPressed(false);
+                        }
                     }
+                    Public.setPressed(true);
                 }
-                Public.setPressed(true);
             }
         }
     }
@@ -104,7 +106,7 @@ function ButtonBase(Public, Protected, theScene, theId,
         Public.onMouseButton = function(theState, theX, theY) {
             if (theState == MOUSE_UP) {
                 Public.setPressed(false);
-            } else if (theState == MOUSE_DOWN && Public.enabled && isVisible(Public.node) &&
+            } else if (theState == MOUSE_DOWN && Public.enabled && Protected.isVisible(Public.node) &&
                        !Protected.isPressed && Public.touches(theX, theY))
             {
                 Public.setPressed(true);
@@ -120,17 +122,17 @@ function ButtonBase(Public, Protected, theScene, theId,
     Public.id           = theId;
     Protected.isPressed = false;
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    function isVisible(theNode) {
+    Protected.isVisible = function(theNode) {
         if (!theNode || theNode.nodeName != "overlay") {
             return true;
         } else {
-            return (theNode.visible ? isVisible(theNode.parentNode) : false);
+            return (theNode.visible ? Protected.isVisible(theNode.parentNode) : false);
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // Private
+    ///////////////////////////////////////////////////////////////////////////////////////////
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
