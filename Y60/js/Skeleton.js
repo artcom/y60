@@ -15,7 +15,7 @@
 //
 //=============================================================================
 // example windows start code
-// acxpshellOPT.exe -I $PRO/src/Y60/js Skeleton.js $PRO/src/Y60/shader/shaderlibrary_nocg.xml rehearsal
+// y6ß.exe -I "$PRO/src/Y60/js;$PRO/src/Y60/shader/" Skeleton.js shaderlibrary.xml rehearsal
 
 use("SceneViewer.js");
 
@@ -151,8 +151,6 @@ try {
     window.showMouseCursor = !ourShow.getReleaseMode();
     ourShow.go();
 } catch (ex) {
-    print("-------------------------------------------------------------------------------");
-    print("### Error: " + ex);
-    print("-------------------------------------------------------------------------------");
+    reportException(ex);
     exit(1);
 }
