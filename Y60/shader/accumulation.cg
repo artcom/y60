@@ -1,0 +1,51 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+struct vert2frag {
+    float4 position : POSITION;
+    float2 texCoord : TEXCOORD0;
+};
+
+vert2frag mainVertex(float4 thePosition : POSITION,
+                     float4 theTexCoord : TEXCOORD0,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 GL_TEXTURE)
+{
+    vert2frag OUT;
+    OUT.position = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    OUT.texCoord = mul(GL_TEXTURE, theTexCoord).xy;
+    return OUT;
+}
+
+float4 mainFragment(vert2frag IN,
+                    uniform sampler2D tex0,
+                    uniform sampler2D tex1,
+                    uniform sampler2D tex2,
+                    uniform sampler2D tex3,
+                    uniform sampler2D tex4,
+                    uniform sampler2D tex5,
+                    uniform sampler2D tex6,
+                    uniform sampler2D tex7,
+                    uniform float4 weights0,
+                    uniform float4 weights1,
+                    uniform float4 surfacecolor) : COLOR
+{
+    float4 myResult =
+        tex2D(tex0, IN.texCoord) * weights0[0] +
+        tex2D(tex1, IN.texCoord) * weights0[1] +
+        tex2D(tex2, IN.texCoord) * weights0[2] +
+        tex2D(tex3, IN.texCoord) * weights0[3] +
+        tex2D(tex4, IN.texCoord) * weights1[0] +
+        tex2D(tex5, IN.texCoord) * weights1[1] +
+        tex2D(tex6, IN.texCoord) * weights1[2] +
+        tex2D(tex7, IN.texCoord) * weights1[3];
+
+    return myResult * surfacecolor;
+}

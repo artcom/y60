@@ -858,5 +858,38 @@
             </properties>
         </fragmentshader>
     </shader>
+    <shader id="s33" name="accumulation" cost="120">
+        <supports>
+            <feature class="filter" values="[antialias2]"/>
+            <feature class="textures" values="[paint,paint,paint,paint,paint,paint,paint,paint]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="texcoord" values="[uv_map]"/>
+        </supports>
+        <vertexshader profile="VP30" file="accumulation.cg" entryfunction="mainVertex">
+            <properties>
+                <vector4f name="surfacecolor">[1,1,1,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="weights0">[1,1,1,1]</vector4f>
+                <vector4f name="weights1">[1,1,1,1]</vector4f>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="accumulation.cg" entryfunction="mainFragment">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
+                <sampler2d name="tex3">3</sampler2d>
+                <sampler2d name="tex4">4</sampler2d>
+                <sampler2d name="tex5">5</sampler2d>
+                <sampler2d name="tex6">6</sampler2d>
+                <sampler2d name="tex7">7</sampler2d>
+            </properties>
+        </fragmentshader>
+     </shader>
 </shaders>
 
