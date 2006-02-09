@@ -29,15 +29,15 @@ namespace y60 {
 
     void
     RenderState::init() {
-        commitWireframe(_myWireframeFlag);
-        commitLighting(_myLightingFlag);
-        commitBackfaceCulling(_myBackfaceCullingFlag);
-        commitFlatShading(_myFlatShadingFlag);
-        commitTexturing(_myTexturingFlag);
+        setWireframe(_myWireframeFlag);
+        setLighting(_myLightingFlag);
+        setBackfaceCulling(_myBackfaceCullingFlag);
+        setFlatShading(_myFlatShadingFlag);
+        setTexturing(_myTexturingFlag);
     }
 
     void
-    RenderState::commitWireframe(bool theFlag) {
+    RenderState::setWireframe(bool theFlag) {
         if (theFlag) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         } else {
@@ -47,7 +47,7 @@ namespace y60 {
     }
 
     void
-    RenderState::commitLighting(bool theFlag) {
+    RenderState::setLighting(bool theFlag) {
         if (theFlag) {
             glEnable(GL_LIGHTING);
         } else {
@@ -57,7 +57,7 @@ namespace y60 {
     }
 
     void
-    RenderState::commitBackfaceCulling(bool theFlag) {
+    RenderState::setBackfaceCulling(bool theFlag) {
         if (theFlag) {
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
@@ -68,7 +68,7 @@ namespace y60 {
     }
 
     void
-    RenderState::commitFlatShading(bool theFlag) {
+    RenderState::setFlatShading(bool theFlag) {
         if (theFlag) {
             glShadeModel(GL_FLAT);
         } else {
@@ -78,7 +78,7 @@ namespace y60 {
     }
 
     void
-    RenderState::commitTexturing(bool theFlag) {
+    RenderState::setTexturing(bool theFlag) {
         if (theFlag) {
             glEnable(GL_TEXTURE_2D);
         } else {

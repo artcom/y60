@@ -940,6 +940,7 @@ namespace y60 {
 
     void
     Renderer::setupRenderState(ViewportPtr theViewport) {
+        MAKE_SCOPE_TIMER(Renderer_setupRenderState);
         _myState.setWireframe(theViewport->get<ViewportWireframeTag>());
         _myState.setFlatShading(theViewport->get<ViewportFlatshadingTag>());
         _myState.setLighting(theViewport->get<ViewportLightingTag>());

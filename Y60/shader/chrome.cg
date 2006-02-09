@@ -25,7 +25,7 @@ struct app2vert {
 };
 
 struct vert2frag {
-    float4 homPosition   : POSITION;    
+    float4 homPosition   : POSITION;
     float4 primColor     : COLOR0;
     float3 reflectVector : TEXCOORD0;
 };
@@ -63,8 +63,8 @@ vert2frag mainVertex(app2vert IN,
         myDiffuse  += max(0, dot(myWorldNormal, posLightDirection)) * AC_POSITIONAL_LIGHT_COLORS[i];
     }
 
-    OUT.primColor = myDiffuse*diffuse + AC_AMBIENT_LIGHT_COLOR*ambient;    
-        
+    OUT.primColor = myDiffuse*diffuse + AC_AMBIENT_LIGHT_COLOR*ambient;
+
     float3 myViewVector = normalize(myWorldPosition - AC_CAMERA_POSITION);
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
     // inside-out transformation

@@ -40,69 +40,27 @@ namespace y60 {
 
             void init();
 
-            void setWireframe(bool theFlag) {
-                if (theFlag != _myWireframeFlag) {
-                    commitWireframe(theFlag);
-                }
-            }
+            void setWireframe(bool theFlag);
+            bool getWireframe() const { return _myWireframeFlag; }
 
-            bool getLighting() const {
-                return _myLightingFlag;
-            }
+            void setLighting(bool theFlag);
+            bool getLighting() const { return _myLightingFlag; }            
 
-            void setLighting(bool theFlag) {
-                if (theFlag != _myLightingFlag) {
-                    commitLighting(theFlag);
-                }
-            }
+            void setBackfaceCulling(bool theFlag);
+            bool getBackfaceCulling() const { return _myBackfaceCullingFlag; }
 
-            bool getBackfaceCulling() const {
-                return _myBackfaceCullingFlag;
-            }
+            void setFlatShading(bool theFlag);
+            bool getFlatShading() const { return _myFlatShadingFlag; }
+            
+            void setTexturing(bool theFlag);
+            bool getTexturing() const { return _myTexturingFlag; }
 
-            void setBackfaceCulling(bool theFlag) {
-                if (theFlag != _myBackfaceCullingFlag) {
-                    commitBackfaceCulling(theFlag);
-                }
-            }
-
-            bool getFlatShading() const {
-                return _myFlatShadingFlag;
-            }
-
-            void setFlatShading(bool theFlag) {
-                if (theFlag != _myFlatShadingFlag) {
-                    commitFlatShading(theFlag);
-                }
-            }
-
-            bool getTexturing() const {
-                return _myTexturingFlag;
-            }
-
-            void setTexturing(bool theFlag) {
-                if (theFlag != _myTexturingFlag) {
-                    commitTexturing(theFlag);
-                }
-            }
-
-            void setDrawNormals(bool theFlag) {
-                _myDrawNormalsFlag = theFlag;
-            }
-
-            bool getDrawNormals() const {
-                return _myDrawNormalsFlag;
-            }
+            void setDrawNormals(bool theFlag) { _myDrawNormalsFlag = theFlag; }
+            bool getDrawNormals() const { return _myDrawNormalsFlag; }
 
             void setClippingPlanes(const std::vector<asl::Planef> & thePlanes);
 
         private:
-            void commitWireframe(bool theFlag);
-            void commitLighting(bool theFlag);
-            void commitBackfaceCulling(bool theFlag);
-            void commitFlatShading(bool theFlag);
-            void commitTexturing(bool theFlag);
-
             bool _myWireframeFlag;
             bool _myLightingFlag;
             bool _myBackfaceCullingFlag;
