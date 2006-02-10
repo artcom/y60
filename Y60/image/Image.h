@@ -102,6 +102,8 @@ namespace y60 {
                     unsigned int theNewDepth,
                     PixelEncoding theEncoding,
                     const asl::ReadableBlock & thePixels);
+            void blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage,
+                           const asl::Vector2i & theTargetPos);
             void set(unsigned int theNewWidth,
                     unsigned int theNewHeight,
                     unsigned int theNewDepth,
@@ -109,6 +111,7 @@ namespace y60 {
                     dom::ValuePtr theRaster);
             void createRaster(PixelEncoding theEncoding);
             //void makeHalfSize();
+
 
             virtual void load(asl::PackageManager & thePackageManager);
             virtual void load(const std::string & theImagePath = ".");
@@ -157,13 +160,15 @@ namespace y60 {
                 return _myTextureImageVersion < myNewVersion;
             }
             /** Saves the image to disk using the PNG format. 
-             * @todo replace @p theVerticalFlipFlag by generic filter factory
-             * string
              */
             void saveToFile(const std::string & theImagePath);
 
             void saveToFileFiltered(const std::string & theImagePath, const VectorOfString & theFilter,
                                     const VectorOfVectorOfFloat & theFilterParams);
+
+            /** Apply filter to the image. 
+             */
+            void applyFilter(const std::string & theFilter, const VectorOfFloat & theFilterParam);
 
             unsigned long long getValueVersion() const {
                 dom::NodePtr myValueNode = getRasterValueNode();
@@ -229,6 +234,8 @@ namespace y60 {
             Image();
             void loadFromFile(asl::PackageManager & thePackageManager);
             void convertToPLBmp(PLAnyBmp & theBitmap);
+            void convertFromPLBmp(PLAnyBmp & theBitmap);
+
 
             unsigned                      _myTexId;
 

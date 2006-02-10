@@ -295,11 +295,11 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         static JSBool
         renderTextAsImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Renders a text into a target image node");
-            DOC_PARAM("theImageNode", "", DOC_TYPE_NODE);
-            DOC_PARAM("theTextString", "", DOC_TYPE_STRING);
-            DOC_PARAM("theFontName", "", DOC_TYPE_STRING);
-            DOC_PARAM("theTextBoxWidth", "", DOC_TYPE_INTEGER);
-            DOC_PARAM("theTextBoxHeight", "", DOC_TYPE_INTEGER);
+            DOC_PARAM("theImageNode", "A X60 target imagenode", DOC_TYPE_NODE);
+            DOC_PARAM("theTextString", "The text to render", DOC_TYPE_STRING);
+            DOC_PARAM("theFontName", "The font name", DOC_TYPE_STRING);
+            DOC_PARAM("theTextBoxWidth", "The textbox width, 0 to fit text", DOC_TYPE_INTEGER);
+            DOC_PARAM("theTextBoxHeight", "The textbox height, 0 to fit text", DOC_TYPE_INTEGER);
             DOC_RVAL("theFilledTextBoxSize", DOC_TYPE_VECTOR2I);
             DOC_END;
             typedef asl::Vector2i (DERIVED::*MyMethod)(dom::NodePtr, const std::string &, const std::string &, const unsigned int &, const unsigned int &);

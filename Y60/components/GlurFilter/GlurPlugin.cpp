@@ -32,7 +32,7 @@ class GlurFilterFactory :
     public IPaintLibFilterFactory
 {
     asl::Ptr<PLFilter> createFilter(const VectorOfFloat & theParameters) {
-        //cerr << "GlurFilterFactory::createFilter" << endl;        
+        cerr << "GlurFilterFactory::createFilter" << endl;        
         if (!_myCachedFilterInstance || _myLastArguments != theParameters) {
             _myLastArguments = theParameters;
             _myCachedFilterInstance = asl::Ptr<PLFilter>(new GlurFilter(theParameters));    
@@ -54,7 +54,7 @@ public:
 protected:
 	void _initializeSingletonManager(SingletonManager* theSingletonManager) {
 	    PlugInBase::_initializeSingletonManager(theSingletonManager);
-	    //cerr << "ADDING GLUR FILTER" << endl;
+	    cerr << "ADDING GLUR FILTER" << endl;
 	    PaintLibFilterFactory::get().addFilterFactory(
 	        "glur", 
 	        asl::Ptr<IPaintLibFilterFactory>(new GlurFilterFactory)

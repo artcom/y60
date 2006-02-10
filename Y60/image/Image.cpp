@@ -165,6 +165,34 @@ namespace y60 {
         }
         myRaster->assign(theNewWidth, theNewHeight * theNewDepth, thePixels);
     }
+
+    void
+    Image::blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage, const asl::Vector2i & theTargetPos)
+    {
+        if (get<ImageDepthTag>() != theSourceImage->get<ImageDepthTag>() || 
+            get<ImagePixelFormatTag>() != theSourceImage->get<ImagePixelFormatTag>()) {
+            // depth and encoding must match
+              throw ImageException(std::string("Image::blitImage(): Sourceimage and subimage must have same depth and encoding."), PLUS_FILE_LINE);
+        }
+        dom::ResizeableRasterPtr myRaster = getRasterPtr();
+        if (theTargetPos[0] + theSourceImage->get<ImageWidthTag>() <= get<ImageWidthTag>() &&
+            theTargetPos[1] + theSourceImage->get<ImageHeightTag>() <= get<ImageHeightTag>()) {
+            // everything super, subimage fits without resizing the image
+            if (!myRaster) {
+                throw BadRasterValue(JUST_FILE_LINE);
+            }
+            dom::ValuePtr mySourceRaster = theSourceImage->getNode().childNode(0)->childNode(0)->nodeValueWrapperPtr();
+            myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]), 
+                                  *mySourceRaster); 
+        } else {
+            // image must be resized to fit new size
+            //set(theNewWidth, theNewHeight, theNewDepth, theEncoding);
+            //myRaster->assign(theWidth, theHeight * theNewDepth, thePixels);
+              throw ImageException(std::string("Image::blitImage(): Sourceimage does not fit into targetimage."), PLUS_FILE_LINE);
+        }
+
+    }
+
     void
     Image::set(unsigned int theNewWidth,
                unsigned int theNewHeight,
@@ -249,6 +277,32 @@ namespace y60 {
     }
 
     void 
+    Image::convertFromPLBmp(PLAnyBmp & theBitmap) {
+        PixelEncoding mySourceEncoding;
+        mapFormatToPixelEncoding(theBitmap.GetPixelFormat(), mySourceEncoding);
+
+        if (getEncoding() != mySourceEncoding) {
+            throw ImageException(std::string("Image::convertFromPLBmp(): Encoding do not match: destination : ") +
+                getStringFromEnum(getEncoding(), PixelEncodingString) + " source : " + getStringFromEnum(mySourceEncoding, PixelEncodingString), PLUS_FILE_LINE);
+
+        }
+        getRasterPtr()->resize(theBitmap.GetWidth(), theBitmap.GetHeight());
+        set<ImageWidthTag>(theBitmap.GetWidth());
+        set<ImageHeightTag>(theBitmap.GetHeight());
+        PLBYTE ** mySrcLines = theBitmap.GetLineArray();
+
+        unsigned myFaceHeight = theBitmap.GetHeight();
+        long myLineSize = theBitmap.GetBytesPerLine();
+        int myBytesPerLine = theBitmap.GetPixelFormat().GetBitsPerPixel() * theBitmap.GetWidth() / 8;
+        unsigned char *myData = getRasterPtr()->pixels().begin();
+
+        for (int y = 0; y < myFaceHeight; ++y) {
+            memcpy(myData + myBytesPerLine *y, mySrcLines[y], myLineSize);
+        }
+
+   }
+
+    void 
     Image::convertToPLBmp(PLAnyBmp & theBitmap) {
         int myWidth = get<ImageWidthTag>();
         int myHeight = get<ImageHeightTag>();
@@ -261,7 +315,6 @@ namespace y60 {
               throw ImageException(std::string("Image::saveToFile(): Unsupported Encoding: ") +
                       asl::as_string(getEncoding()), PLUS_FILE_LINE);
         }
-        AC_DEBUG << "Saving PNG as " << myPixelFormat.GetName();
         theBitmap.Create(myWidth, myHeight, myPixelFormat, NULL, 0, PLPoint(72, 72));
         PLBYTE **myLineArray = theBitmap.GetLineArray();
         int myBytesPerLine = myPixelFormat.GetBitsPerPixel() * myWidth / 8;
@@ -270,6 +323,18 @@ namespace y60 {
             memcpy(myLineArray[y], myData + myBytesPerLine * y, myBytesPerLine);
         }
 
+    }
+
+    void
+    Image::applyFilter(const std::string & theFilter, const VectorOfFloat & theFilterParam) {
+        PLAnyBmp myBmp;
+        convertToPLBmp( myBmp );
+        applyCustomFilter(myBmp, theFilter, theFilterParam);
+
+        PLPNGEncoder myEncoder;
+        myEncoder.MakeFileFromBmp("test_filtered.png", &myBmp);
+
+        convertFromPLBmp(myBmp);
     }
 
     void 

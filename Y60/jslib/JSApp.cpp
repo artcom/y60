@@ -22,6 +22,7 @@
 #include "JScppUtils.h"
 #include "JSNode.h"
 #include "JSBlock.h"
+#include "JSVector.h"
 #include "IScriptablePlugin.h"
 #include "IFactoryPlugin.h"
 #include "QuitFlagSingleton.h"
@@ -512,13 +513,86 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
+JS_STATIC_DLL_CALLBACK(JSBool)
+BlitImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Apply a filter to an image");
+    DOC_PARAM("theSourceNode", "A X60 source imagenode", DOC_TYPE_NODE);
+    DOC_PARAM("theTargetNode", "A X60 target imagenode", DOC_TYPE_NODE);
+    DOC_PARAM("theTextPos", "The pixelposition in target image", DOC_TYPE_VECTOR2I);
+    DOC_END;
+    try {
+        if (argc != 3) {
+			JS_ReportError(cx, "blitImage(): expects at least three arguments : source image node,"
+                               "target image node, target position");
+            return JS_FALSE;
+        }
+		dom::NodePtr mySourceImageNode;
+		if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], mySourceImageNode)) {
+            JS_ReportError(cx, "blitImage(): argument #1 must be an image node");
+            return JS_FALSE;
+        }
+		dom::NodePtr myTargetImageNode;
+		if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myTargetImageNode)) {
+            JS_ReportError(cx, "blitImage(): argument #2 must be an image node");
+            return JS_FALSE;
+        }
+        asl::Vector2i myTargetPosition;
+		if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myTargetPosition)) {
+            JS_ReportError(cx, "blitImage(): argument #3 must be a Vector2i");
+            return JS_FALSE;
+        }
+		ImagePtr myTargetImage = myTargetImageNode->getFacade<y60::Image>();
+		ImagePtr mySourceImage = mySourceImageNode->getFacade<y60::Image>();
+		myTargetImage->blitImage(mySourceImage, myTargetPosition);
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+ApplyImageFilter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Apply a filter to an image");
+    DOC_PARAM("theImageNode", "A image node in the X60-DOM", DOC_TYPE_NODE);
+    DOC_PARAM("theFilterName", "Name of the filter to apply to the image", DOC_TYPE_STRING);
+    DOC_PARAM("theFilterParams", "Filter parameter", DOC_TYPE_VECTOROFFLOAT);
+    DOC_END;
+    try {
+        if (argc != 3) {
+			JS_ReportError(cx, "applyImageFilter(): expects at least three arguments : image node,"
+                               "filter name, filter params");
+            return JS_FALSE;
+        }
+		dom::NodePtr myImageNode;
+		if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
+            JS_ReportError(cx, "applyImageFilter(): argument #1 must be an image node");
+            return JS_FALSE;
+        }
+
+        std::string myFilterName;
+        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myFilterName)) {
+            JS_ReportError(cx, "applyImageFilter(): argument #2 must be a vector of strings. (theFilterName)");
+            return JS_FALSE;
+        }
+
+        VectorOfFloat myFilterParams;
+        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myFilterParams)) {
+            JS_ReportError(cx, "applyImageFilter(): argument #3 must be a vector of VectorOfFloat. (theFilterParams)");
+            return JS_FALSE;
+        }
+
+		ImagePtr myImage = myImageNode->getFacade<y60::Image>();
+		myImage->applyFilter(myFilterName, myFilterParams);
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 SaveImageFiltered(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Apply a filter to an image and save it to disk");
     DOC_PARAM("theImageNode", "A image node in the X60-DOM to save", DOC_TYPE_NODE);
     DOC_PARAM("theFileName", "The filename to save to", DOC_TYPE_STRING);
-    DOC_PARAM("theFilterName", "Name of the filter to apply to the image", DOC_TYPE_STRING);
+    DOC_PARAM("theFilterName", "List of the filters to apply to the image", DOC_TYPE_STRING);
     DOC_PARAM("theFilterParams", "List of filter parameters", DOC_TYPE_VECTOROFFLOAT);
     DOC_END;
     try {
@@ -1142,27 +1216,29 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 
 static JSFunctionSpec glob_functions[] = {
-    {"print",           Print,          0},
-    {"use",             Use,            1},
-    {"reuse",           Reuse,          0},
-    {"parseArguments",  ParseArguments, 2},
-    {"plug",            Plug,           1},
-    {"saveImage",       SaveImage,		2},
-    {"saveImageFiltered",    SaveImageFiltered,	4},
-    {"exit",            Exit,           0},
-    {"version",         Version,        1},
-    {"build",           BuildDate,      0},
-    {"revision",        Revision,       0},
-    {"gc",              GC,             0},
-    {"clear",           Clear,          1},
-    {"__FILE__",        File,           0},
-    {"__LINE__",        Line,           0},
-    {"fileline",        FileLine,       0},
-    {"dumpstack",       DumpStack,      0},
-    {"millisec",        MilliSec,       1},
-    {"msleep",          MSleep,         1},
-    {"getProgramName",  GetProgramName, 0},
-    {"hostname",        HostName,       1},
+    {"print",             Print,          0},
+    {"use",               Use,            1},
+    {"reuse",             Reuse,          0},
+    {"parseArguments",    ParseArguments, 2},
+    {"plug",              Plug,           1},
+    {"saveImage",         SaveImage,		2},
+    {"saveImageFiltered", SaveImageFiltered,	4},
+    {"applyImageFilter",  ApplyImageFilter,	3},  
+    {"blitImage",         BlitImage,	3},      
+    {"exit",              Exit,           0},
+    {"version",           Version,        1},
+    {"build",             BuildDate,      0},
+    {"revision",          Revision,       0},
+    {"gc",                GC,             0},
+    {"clear",             Clear,          1},
+    {"__FILE__",          File,           0},
+    {"__LINE__",          Line,           0},
+    {"fileline",          FileLine,       0},
+    {"dumpstack",         DumpStack,      0},
+    {"millisec",          MilliSec,       1},
+    {"msleep",            MSleep,         1},
+    {"getProgramName",    GetProgramName, 0},
+    {"hostname",          HostName,       1},
     {"expandEnvironment", ExpandEnvironment, 1},
 
     {"getDocumentation",     getDocumentation, 1},

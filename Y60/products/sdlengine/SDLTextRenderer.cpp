@@ -171,11 +171,10 @@ namespace y60 {
         ImagePtr myImage = theImageNode->getFacade<y60::Image>();
         unsigned myOldWidth = myImage->get<ImageWidthTag>();
         unsigned myOldHeight = myImage->get<ImageHeightTag>();
-
         unsigned int myImageDataSize = _myTextureSurface->w * _myTextureSurface->h * sizeof(asl::RGBA);
         myImage->set(_myTextureSurface->w, _myTextureSurface->h, 1, y60::RGBA,
-                       ReadableBlockAdapter((unsigned char*)_myTextureSurface->pixels,
-                                            (unsigned char*)_myTextureSurface->pixels + myImageDataSize));
+                        ReadableBlockAdapter((unsigned char*)_myTextureSurface->pixels,
+                        (unsigned char*)_myTextureSurface->pixels + myImageDataSize)); 
         if ((_myTextureSurface->w == myOldWidth) && (_myTextureSurface->h == myOldHeight)) {
             // reuse glTexture
             theTextureManager.updateImageData(myImage);

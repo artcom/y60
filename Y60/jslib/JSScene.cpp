@@ -392,19 +392,45 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_RVAL("The new image", DOC_TYPE_NODE)
     DOC_END;
     try {
-        ensureParamCount(argc, 1, 1);
         JSScene::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        std::string myImageSrc;
-        if (!convertFrom(cx, argv[0], myImageSrc)) {
-            JS_ReportError(cx, "JSScene::createImage(): argument #1 must be a string (File path)");
-            return JS_FALSE;
-        }
+        if (argc == 1) {
+            std::string myImageSrc;
+            if (!convertFrom(cx, argv[0], myImageSrc)) {
+                JS_ReportError(cx, "JSScene::createImage(): argument #1 must be a string (File path)");
+                return JS_FALSE;
+            }
 
-        dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
-            dom::NodePtr(new dom::Element("image")));
-        myResult->appendAttribute(IMAGE_SRC_ATTRIB, myImageSrc);
-        *rval = as_jsval(cx, myResult);
+            dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
+                dom::NodePtr(new dom::Element("image")));
+            myResult->appendAttribute(IMAGE_SRC_ATTRIB, myImageSrc);
+            *rval = as_jsval(cx, myResult);
+        } else if (argc ==3) {
+            unsigned myWidth;
+            if (!convertFrom(cx, argv[0], myWidth)) {
+                JS_ReportError(cx, "JSScene::createImage(): argument #1 must be a int (imagewidth)");
+                return JS_FALSE;
+            }
+            unsigned myHeight;
+            if (!convertFrom(cx, argv[1], myHeight)) {
+                JS_ReportError(cx, "JSScene::createImage(): argument #2 must be a int (imageheight)");
+                return JS_FALSE;
+            }
+            std::string myPixelencoding;
+            if (!convertFrom(cx, argv[2], myPixelencoding)) {
+                JS_ReportError(cx, "JSScene::createImage(): argument #3 must be a string (pixelencoding)");
+                return JS_FALSE;
+            }
+            dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
+                dom::NodePtr(new dom::Element("image")));
+            y60::ImagePtr myImage = myResult->getFacade<y60::Image>();
+            myImage->set(myWidth, myHeight, 1, PixelEncoding(getEnumFromString(myPixelencoding, PixelEncodingString))); 
+            myImage->getRasterPtr()->resize(myWidth, myHeight);
+            *rval = as_jsval(cx, myResult);            
+
+        } else {
+            throw asl::Exception(string("Not enough arguments, must be 1 (filename) or 3(width,height,encoding)."));
+        }
         return JS_TRUE;
 
     } HANDLE_CPP_EXCEPTION;
@@ -496,7 +522,7 @@ JSScene::Functions() {
         {"createColorMaterial",   CreateColorMaterial,   1},
         {"createTexturedMaterial",CreateTexturedMaterial,1},
         {"createBody",            CreateBody,            2},
-        {"createImage",           CreateImage,           2},
+        {"createImage",           CreateImage,           3},
         {"createQuadShape",       CreateQuadShape,       3},
         {"loadMovieFrame",        loadMovieFrame,        1},
         {"loadCaptureFrame",      loadCaptureFrame,      1},

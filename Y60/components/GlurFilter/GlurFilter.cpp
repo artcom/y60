@@ -35,7 +35,6 @@ using namespace std;
 using namespace asl;
 
 GlurFilter::GlurFilter(const y60::VectorOfFloat & theParameters) {
-    
     _myColor = Vector4f(
         theParameters[0],
         theParameters[1],
@@ -78,11 +77,11 @@ GlurFilter::GlurFilter(const y60::VectorOfFloat & theParameters) {
 
 void
 GlurFilter::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
-    if ( theSource->GetPixelFormat() != PLPixelFormat::A8R8G8B8) {
+    if ( theSource->GetPixelFormat() != PLPixelFormat::A8R8G8B8 && 
+         theSource->GetPixelFormat() != PLPixelFormat::A8B8G8R8 ) {
         // TODO: use right exception class
-        throw PLPixelFormat::UnsupportedPixelFormat("GlurFilter (must be A8R8G8B8)");
+        throw PLPixelFormat::UnsupportedPixelFormat("GlurFilter (must be A8R8G8B8 or A8B8G8R8)");
     }
-    
     int mySrcWidth = theSource->GetWidth();
     int mySrcHeight = theSource->GetHeight();
     //cerr << "Src: " << mySrcWidth << "x" << mySrcHeight << endl;
@@ -92,7 +91,7 @@ GlurFilter::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     //cerr << "Dest: " << myDestWidth << "x" << myDestHeight << endl;
 
     PLAnyBmp myTempBmp;
-    myTempBmp.Create(myDestWidth, mySrcHeight, PLPixelFormat::A8R8G8B8, 0, 0, theSource->GetResolution());
+    myTempBmp.Create(myDestWidth, mySrcHeight, theSource->GetPixelFormat(), 0, 0, theSource->GetResolution());
 
     PLBYTE ** pSrcLineArray = theSource->GetLineArray();
     PLBYTE ** pDstLineArray = myTempBmp.GetLineArray();
@@ -124,7 +123,7 @@ GlurFilter::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
     }
 
     // Second pass: glur in y direrction
-    theDestination->Create(myDestWidth, myDestHeight, PLPixelFormat::A8R8G8B8, 0, 0, theSource->GetResolution());
+    theDestination->Create(myDestWidth, myDestHeight, theSource->GetPixelFormat(), 0, 0, theSource->GetResolution());
     pSrcLineArray = myTempBmp.GetLineArray();
     pDstLineArray = theDestination->GetLineArray();
     for(int x=0; x<myDestWidth; ++x) {
@@ -152,7 +151,7 @@ GlurFilter::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
             *(pDest + x) = (sum << 24) | _myColorValue;
         }
     }
-
+/*
     // third pass, if alpha !=0, blend original image on top of glurred alpha channel
     if (_myAlpha > 0) {  
         PLBYTE ** pSrcLineArray = theSource->GetLineArray();
@@ -183,4 +182,5 @@ GlurFilter::Apply(PLBmpBase * theSource, PLBmp * theDestination) const {
             }
         }   
     }
+    */
 }
