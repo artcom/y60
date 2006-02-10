@@ -99,7 +99,6 @@ namespace y60 {
             const ITextureManagerPtr & theTextureManager,
             unsigned /*theDepth*/) :
         PLBmp(),
-        //_myData(Ptr<Block>(new Block)),
         _myFilename(theFilename),
         _myHeaderSize(0),
         _isI60(false),
@@ -153,7 +152,6 @@ namespace y60 {
             const ITextureManagerPtr & theTextureManager,
             unsigned /*theDepth*/) :
         PLBmp(),
-        //_myData(Ptr<Block>(new Block)),
         _myFilename(theFileDescription.empty() ? "<asl::Block>" : theFileDescription),
         _myHeaderSize(0),
         _isI60(false),
@@ -169,11 +167,8 @@ namespace y60 {
     }
 
     ImageLoader::~ImageLoader() {
-        //AC_DEBUG << "ImageLoader::~ImageLoader";
-        delete [] m_pClrTab;
-        if (m_pLineArray) {
-            delete[] m_pLineArray;
-        }
+        AC_TRACE << "ImageLoader::~ImageLoader";
+        freeMembers();
     }
 
     void
@@ -348,6 +343,14 @@ namespace y60 {
         _myRasterData = createRasterValue(_myEncoding, theWidth, theHeight);
 
         initLocals (theWidth, theHeight, thePixelformat);
+    }
+
+    void ImageLoader::freeMembers() {
+        if (m_pLineArray) {
+            AC_TRACE << "ImageLoader::freeMembers delete m_pLineArray";
+            delete[] m_pLineArray;
+            m_pLineArray = 0;
+        }
     }
 
     void

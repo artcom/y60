@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: ImageLoader.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/19 10:02:40 $
-//
-//  Description: Adapter between Paintlib bitmap and BlockImage
-//
-//=============================================================================
 
 #ifndef _ac_y60_ImageLoader_h_
 #define _ac_y60_ImageLoader_h_
@@ -127,7 +118,7 @@ namespace y60 {
                                     const PLPixelFormat &  pf);
 
         //! Deletes memory allocated by member variables.
-        virtual void freeMembers() {};
+        virtual void freeMembers();
 
         //! Initializes internal table of line addresses.
         virtual void initLineArray();

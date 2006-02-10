@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Image.cpp,v $
-//   $Author: ulrich $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/19 10:02:40 $
-//
-//  Description: This class performs texture loading and management.
-//
-//=============================================================================
 
 #include "Image.h"
 #include "ImageLoader.h"
