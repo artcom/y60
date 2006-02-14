@@ -7,16 +7,10 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: CharacterMover.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.14 $
-//   $Date: 2005/04/24 00:41:19 $
-//
-//
-//=============================================================================
 
 #include "CharacterMover.h"
+
+#include <asl/Logger.h>
 #include <asl/Time.h>
 #include <cmath>
 
@@ -315,32 +309,33 @@ namespace jslib {
 
             unsigned myElementCount = myElements.size();
             for (unsigned i = 0; i < myElementCount; ++i) {
-#ifdef OLD
-                VertexData4f::VertexDataVector * myColors = myElements[i].getColors();
-                VertexData3f::VertexDataVector * myPositions = myElements[i].getPositions();
-
+#ifdef OLD_NO_LONGER_WORKING
+                VertexData3f::VertexDataVector * myPositions = myElements[i]->getPositions();
+                VertexData4f::VertexDataVector * myColors = myElements[i]->getColors();
 #else
-                
                 Ptr<VertexDataAccessor<Vector3f> > myPositionsAccessor = myElements[i]->getLockingPositionsAccessor();
                 VertexData3f * myPositions = &myPositionsAccessor->get();
 
                 Ptr<VertexDataAccessor<Vector4f> > myColorsAccessor = myElements[i]->getLockingColorsAccessor();
                 VertexData4f * myColors = &myColorsAccessor->get();
 #endif                
-                unsigned myPrimitveCount = myPositions->size() / 4;
-                for (unsigned j = 0; j < myPrimitveCount; ++j) {
+
+                unsigned myPrimitiveCount = myPositions->size() / 4;
+                for (unsigned j = 0; j < myPrimitiveCount; ++j) {
                     unsigned myIndex = j + myOffset;
 
+                    asl::Vector3f * myPosition = &(*myPositions)[j * 4];
+                    asl::Vector4f * myColor = &(*myColors)[j * 4];
+
                     CharacterMover::State myState = _myCharacters[myIndex].onFrame(
-                            myDeltaTime, &(*myColors)[j * 4],
-                            &(*myPositions)[j * 4], myBoundingBox);
+                            myDeltaTime, myColor, myPosition, myBoundingBox);
 
                     // Set string state to minimum character state
                     if (myState < _myState) {
                         _myState = myState;
                     }
                 }
-                myOffset += myPrimitveCount;
+                myOffset += myPrimitiveCount;
             }
 
             _myShape->set<BoundingBoxTag>(myBoundingBox);

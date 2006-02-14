@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: CharacterMover.h,v $
-//   $Author: christian $
-//   $Revision: 1.8 $
-//   $Date: 2004/11/08 10:47:37 $
-//
-//
-//=============================================================================
 
 #ifndef _plugin_CharacterMover_h_
 #define _plugin_CharacterMover_h_
