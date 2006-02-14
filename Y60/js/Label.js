@@ -136,7 +136,7 @@ function LabelBase(Public, Protected, theScene,
     // Private
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    Protected.getImageNode= function() {
+    Protected.getImageNode = function() {
         if (Public.image == null) {
             var myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
             myImage.resize = "pad";

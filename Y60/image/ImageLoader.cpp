@@ -168,6 +168,7 @@ namespace y60 {
 
     ImageLoader::~ImageLoader() {
         AC_TRACE << "ImageLoader::~ImageLoader";
+        delete[] m_pClrTab;
         freeMembers();
     }
 
@@ -346,9 +347,6 @@ namespace y60 {
     }
 
     void ImageLoader::freeMembers() {
-        delete[] m_pClrTab;
-        m_pClrTab = 0;
-
         if (m_pLineArray) {
             AC_TRACE << "ImageLoader::freeMembers delete m_pLineArray";
             delete[] m_pLineArray;
