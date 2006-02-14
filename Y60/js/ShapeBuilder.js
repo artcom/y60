@@ -171,7 +171,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.texcoords.push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
     }
 
-    obj.appendQuadWithCustomTexCoords = function (theElement, thePosition, theSize, theUVOrigin, theUVSize) {
+    obj.appendQuadWithCustomTexCoords = function (theElement, thePosition, theSize, theUVOrigin, theUVSize, theGenSingleVertexColorFlag) {
         // add positions to shape's vertex data
         var myHalfWidth  = theSize[0] / 2;
         var myHalfHeight = theSize[1] / 2;
@@ -199,7 +199,15 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.texcoords.push(myTexIndex,myTexIndex+1,myTexIndex+2,myTexIndex+3);
 
         var myColorIndex = _myColors.length;
-        _myColors.push([1,1,1,1]);
-        theElement.colors.push(myColorIndex, myColorIndex, myColorIndex, myColorIndex);
+        if (theGenSingleVertexColorFlag || theGenSingleVertexColorFlag == undefined) {
+            _myColors.push([1,1,1,1]);        
+            theElement.colors.push(myColorIndex, myColorIndex, myColorIndex, myColorIndex);
+        } else {
+            _myColors.push([1,1,1,1]);        
+            _myColors.push([1,1,1,1]);        
+            _myColors.push([1,1,1,1]);        
+            _myColors.push([1,1,1,1]);        
+            theElement.colors.push(myColorIndex, myColorIndex+1, myColorIndex+2, myColorIndex+3);
+        }
     }
 }
