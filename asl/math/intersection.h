@@ -264,10 +264,9 @@ namespace asl {
         //Number dist = clamp(dot(direction, p-l.origin),0.0f,1.0f);
         return l.origin + direction * clamp(f, 0.0f, 1.0f); 
 	}
-    
     template<class Number>
-	Point3<Number> nearest(const LineSegment<Number> & l, const Point3<Number> & p) {
-        return nearest(p,l);
+	Point3<Number> nearest(const LineSegment<Number> & l, const Point3<Number> & p, float * factor = 0) {
+        return nearest(p,l,factor);
     }
 
     // point/line distance

@@ -389,6 +389,11 @@ static JSBool
 CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Creates an image inside the scene");
     DOC_PARAM("theImageSource", "Path to image file", DOC_TYPE_NODE);
+    DOC_RESET;
+    DOC_PARAM("theWidth", "Image width", DOC_TYPE_INTEGER);
+    DOC_PARAM("theHeight", "Image height", DOC_TYPE_INTEGER);
+    DOC_PARAM("thePixelEncoding", "Pixel encoding", DOC_TYPE_STRING);
+    // 
     DOC_RVAL("The new image", DOC_TYPE_NODE)
     DOC_END;
     try {
@@ -416,16 +421,17 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
                 JS_ReportError(cx, "JSScene::createImage(): argument #2 must be a int (imageheight)");
                 return JS_FALSE;
             }
-            std::string myPixelencoding;
-            if (!convertFrom(cx, argv[2], myPixelencoding)) {
+            std::string myPixelEncoding;
+            if (!convertFrom(cx, argv[2], myPixelEncoding)) {
                 JS_ReportError(cx, "JSScene::createImage(): argument #3 must be a string (pixelencoding)");
                 return JS_FALSE;
             }
             dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
                 dom::NodePtr(new dom::Element("image")));
             y60::ImagePtr myImage = myResult->getFacade<y60::Image>();
-            myImage->set(myWidth, myHeight, 1, PixelEncoding(getEnumFromString(myPixelencoding, PixelEncodingString))); 
+            myImage->set(myWidth, myHeight, 1, PixelEncoding(getEnumFromString(myPixelEncoding, PixelEncodingString))); 
             myImage->getRasterPtr()->resize(myWidth, myHeight);
+            memset(myImage->getRasterPtr()->pixels().begin(), 0, myImage->getRasterPtr()->pixels().size());
             *rval = as_jsval(cx, myResult);            
 
         } else {

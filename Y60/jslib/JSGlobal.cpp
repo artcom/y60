@@ -932,6 +932,8 @@ nearestDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     DOC_PARAM("theLine", "", DOC_TYPE_LINE);       DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F); DOC_RESET;
     DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);   DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE); DOC_RESET;
     DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);   DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F); DOC_RESET;
+    DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);   DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT); DOC_RESET;
+    DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT);   DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F); DOC_RESET;
     DOC_RVAL("The nearest point on the object", DOC_TYPE_POINT3F);
     DOC_END;
     if (argc == 2) {
@@ -945,31 +947,58 @@ nearestDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
             JS_ValueToObject(cx, argv[1], &myObj1) == JS_TRUE)
         {
             CallStatus myStatus = NOT_FOUND;
+            { // Plane
+                typedef Point3<PlaneNumber> (*NearestPointPlane)(const Point3<PlaneNumber> &, const Plane<PlaneNumber> &);
+                myStatus = VectorObjectFunction((NearestPointPlane)&nearest, cx, myObj0, myObj1, rval);
+                if (myStatus != NOT_FOUND) return JS_TRUE;
+            }
             {
-            typedef Point3<PlaneNumber> (*NearestPointPlane)(const Point3<PlaneNumber> &, const Plane<PlaneNumber> &);
-            myStatus = VectorObjectFunction((NearestPointPlane)&nearest, cx, myObj0, myObj1, rval);
-            if (myStatus != NOT_FOUND) return JS_TRUE;
-            }{
-            typedef Point3<PlaneNumber> (*NearestPlanePoint)(const Plane<PlaneNumber> &, const Point3<PlaneNumber> &);
-            myStatus = ObjectVectorFunction((NearestPlanePoint)&nearest, cx, myObj0, myObj1, rval);
-            if (myStatus != NOT_FOUND) return JS_TRUE;
-            }{ //--
-            typedef Point3<LineNumber> (*NearestPointLine)(const Point3<LineNumber> &, const Line<LineNumber> &);
-            myStatus = VectorObjectFunction((NearestPointLine)&nearest, cx, myObj0, myObj1, rval);
-            if (myStatus != NOT_FOUND) return JS_TRUE;
-            }{
-            typedef Point3<LineNumber> (*NearestLinePoint)(const Line<LineNumber> &, const Point3<LineNumber> &);
-            myStatus = ObjectVectorFunction((NearestLinePoint)&nearest, cx, myObj0, myObj1, rval);
-            if (myStatus != NOT_FOUND) return JS_TRUE;
-            }{ //--
-            typedef Point3<LineNumber> (*NearestPointSphere)(const Point3<LineNumber> &, const Sphere<LineNumber> &);
-            myStatus = VectorObjectFunction((NearestPointSphere)&nearest, cx, myObj0, myObj1, rval);
-            if (myStatus != NOT_FOUND) return JS_TRUE;
-            }{
-            typedef Point3<LineNumber> (*NearestSpherePoint)(const Sphere<LineNumber> &, const Point3<LineNumber> &);
-            myStatus = ObjectVectorFunction((NearestSpherePoint)&nearest, cx, myObj0, myObj1, rval);
-            if (myStatus != NOT_FOUND) return JS_TRUE;
-            } //--
+                typedef Point3<PlaneNumber> (*NearestPlanePoint)(const Plane<PlaneNumber> &, const Point3<PlaneNumber> &);
+                myStatus = ObjectVectorFunction((NearestPlanePoint)&nearest, cx, myObj0, myObj1, rval);
+                if (myStatus != NOT_FOUND) return JS_TRUE;
+            }
+            { // Line
+                typedef Point3<LineNumber> (*NearestPointLine)(const Point3<LineNumber> &, const Line<LineNumber> &);
+                myStatus = VectorObjectFunction((NearestPointLine)&nearest, cx, myObj0, myObj1, rval);
+                if (myStatus != NOT_FOUND) return JS_TRUE;
+            }
+            {
+                typedef Point3<LineNumber> (*NearestLinePoint)(const Line<LineNumber> &, const Point3<LineNumber> &);
+                myStatus = ObjectVectorFunction((NearestLinePoint)&nearest, cx, myObj0, myObj1, rval);
+                if (myStatus != NOT_FOUND) return JS_TRUE;
+            }
+            { // Sphere
+                typedef Point3<LineNumber> (*NearestPointSphere)(const Point3<LineNumber> &, const Sphere<LineNumber> &);
+                myStatus = VectorObjectFunction((NearestPointSphere)&nearest, cx, myObj0, myObj1, rval);
+                if (myStatus != NOT_FOUND) return JS_TRUE;
+            }
+            {
+                typedef Point3<LineNumber> (*NearestSpherePoint)(const Sphere<LineNumber> &, const Point3<LineNumber> &);
+                myStatus = ObjectVectorFunction((NearestSpherePoint)&nearest, cx, myObj0, myObj1, rval);
+                if (myStatus != NOT_FOUND) return JS_TRUE;
+            }
+            { // LineSegment
+                LineSegment<float> myLineSegment;
+                convertFrom(cx, argv[0], myLineSegment);
+
+                Point3f myPoint;
+                convertFrom(cx, argv[1], myPoint);
+
+                float factor;
+                *rval = as_jsval(cx, asl::nearest(myLineSegment, myPoint, &factor));
+                return JS_TRUE;
+            }
+                Point3f myPoint;
+                convertFrom(cx, argv[0], myPoint);
+
+                LineSegment<float> myLineSegment;
+                convertFrom(cx, argv[1], myLineSegment);
+
+                float factor;
+                *rval = as_jsval(cx, asl::nearest(myLineSegment, myPoint, &factor));
+                return JS_TRUE;
+            {
+            }
             JS_ReportError(cx,"nearestDispatcher: no 'nearest' function found for this two argument types");
         } else {
             JS_ReportError(cx,"nearestDispatcher: both arguments for 'nearest' arguments must be objects");
