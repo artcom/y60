@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Shape.h,v $
-//   $Author: pavel $
-//   $Revision: 1.24 $
-//   $Date: 2004/11/24 16:29:23 $
-//
-//  Description: A simple scene class.
-//
-//=============================================================================
 
 #ifndef AC_Y60_SCENE_SHAPE_INCLUDED
 #define AC_Y60_SCENE_SHAPE_INCLUDED
@@ -23,9 +14,13 @@
 #include "Primitive.h"
 
 #include <asl/Dashboard.h>
-#include <dom/Facade.h>
+
 #include <y60/CommonTags.h>
 #include <y60/NodeNames.h>
+#include <y60/DataTypes.h>
+
+#include <dom/Facade.h>
+#include <dom/AttributePlug.h>
 
 #include <map>
 #include <vector>
@@ -35,31 +30,33 @@ namespace y60 {
 
     class MaterialBase;
 
-	class Shape :
-		public dom::Facade,
+    class Shape :
+        public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,
-	    public dom::FacadeAttributePlug<BoundingBoxTag>
-	{
+        public dom::FacadeAttributePlug<BoundingBoxTag>
+    {
         public:        
-            Shape(dom::Node & theXmlNode) : 
-                  dom::AttributePlug<IdTag>(theXmlNode),
-                  dom::AttributePlug<NameTag>(theXmlNode),
-                  dom::FacadeAttributePlug<BoundingBoxTag>(this),
-                  _myVertexCount(0),
-                  _myLastRenderVersion(0),
-                  Facade(theXmlNode)
-            {}
+            Shape(dom::Node & theNode) : 
+                dom::Facade(theNode),
+                IdTag::Plug(theNode),
+                NameTag::Plug(theNode),
+                dom::FacadeAttributePlug<BoundingBoxTag>(this),
+                _myVertexCount(0),
+                _myLastRenderVersion(0)
+            {
+            }
+
             virtual ~Shape() {
-                AC_TRACE << "Shape DTOR " << this << std::endl;
-            };
+            }
+
             IMPLEMENT_FACADE(Shape);
 
             Primitive & createPrimitive(PrimitiveType theType, 
-                                        MaterialBasePtr theMaterial, unsigned int theDomIndex) 
+                    MaterialBasePtr theMaterial, unsigned int theDomIndex) 
             {    
                 _myPrimitives.push_back(PrimitivePtr(new Primitive(theType, theMaterial, 
-                    getNode().getAttributeString("id"), theDomIndex)));    
+                                getNode().getAttributeString("id"), theDomIndex)));    
                 return *_myPrimitives.back();
             }
 
@@ -94,30 +91,30 @@ namespace y60 {
                 _myVertexCount = theVertexCount;
             }
             template <class LINE>
-            bool intersect(const LINE & theStick,
-                           Primitive::IntersectionList & theIntersectionInfo)
-            {
-                MAKE_SCOPE_TIMER(Shape_intersect);
-                bool myResult = false;
-                AC_TRACE << "Intersecting " << _myPrimitives.size() << " primitives";
-                for (int i = 0; i < _myPrimitives.size();++i) {
-                    if (_myPrimitives[i]->intersect(theStick, theIntersectionInfo)) {
-                        myResult = true;
+                bool intersect(const LINE & theStick,
+                        Primitive::IntersectionList & theIntersectionInfo)
+                {
+                    MAKE_SCOPE_TIMER(Shape_intersect);
+                    bool myResult = false;
+                    AC_TRACE << "Intersecting " << _myPrimitives.size() << " primitives";
+                    for (int i = 0; i < _myPrimitives.size();++i) {
+                        if (_myPrimitives[i]->intersect(theStick, theIntersectionInfo)) {
+                            myResult = true;
+                        }
                     }
+                    return myResult;
                 }
-                return myResult;
-            }
 
             bool collide(const asl::Sphere<float> & theSphere,
-                         const asl::Vector3f & theMotion,
-                         const asl::Matrix4f & theTransformation,
-                         Primitive::SphereContactsList & theSphereContacts);
-            
+                    const asl::Vector3f & theMotion,
+                    const asl::Matrix4f & theTransformation,
+                    Primitive::SphereContactsList & theSphereContacts);
+
             bool collide(const asl::Sphere<float> & theSphere,
-                         const asl::Vector3f & theMotion,
-                         const asl::Matrix4f & theTransformation,
-                         const asl::SweptSphereContact<float> & theCurrentContact,
-                         Primitive::SphereContacts & theNewContactInfo);
+                    const asl::Vector3f & theMotion,
+                    const asl::Matrix4f & theTransformation,
+                    const asl::SweptSphereContact<float> & theCurrentContact,
+                    Primitive::SphereContacts & theNewContactInfo);
 
             void clear() {
                 _myPrimitives.clear();
@@ -131,7 +128,7 @@ namespace y60 {
             Shape(const Shape &);
             Shape & operator=(const Shape &);
 
-            PrimitiveVector                   _myPrimitives;   
+            PrimitiveVector              _myPrimitives;   
             std::vector<RenderStyleType> _myRenderStyles;
             unsigned long      _myVertexCount;
             unsigned long long _myLastRenderVersion;
