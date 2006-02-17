@@ -256,8 +256,11 @@ namespace asl {
     template<class Number>
 	Point3<Number> nearest(const Point3<Number> & p, const LineSegment<Number> & l, float * factor=0) {
         Vector3<Number> direction = l.getDirection();
-        Number distance = magnitude(l.getDirection());
-        Number f = dot(p-l.origin, normalized(direction))/distance;
+        Number distance = magnitude(direction); //l.getDirection());
+        Number f = 0.0;
+        if (distance != 0.0) {
+            f = dot(p-l.origin, normalized(direction))/distance;
+        }
         if (factor) {
             *factor = f;
         }
