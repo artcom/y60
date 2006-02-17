@@ -442,7 +442,7 @@ namespace y60 {
             bool myRenderBackFlag = std::find(myRenderStyles.begin(), myRenderStyles.end(), BACK) !=  myRenderStyles.end();
 
             if (myRenderFrontFlag && myRenderBackFlag) {
-                // render front & back (two passes, supposedly faster
+                // render back & front (two passes, supposedly faster
                 DBP2(START_TIMER(renderBodyPart_renderPrimitives));
                 glCullFace(GL_FRONT);
                 renderPrimitives(theBodyPart, myMaterial);
@@ -451,14 +451,23 @@ namespace y60 {
                 DBP2(STOP_TIMER(renderBodyPart_renderPrimitives));
             } else {  // render one or zero faces - single pass
                 if (!myRenderFrontFlag && !myRenderBackFlag) {
+                    // UH: no facets are drawn but other primitives such as points and lines are
                     glCullFace(GL_FRONT_AND_BACK);
                 } else {
+#if 1
+                    if (myRenderFrontFlag) {
+                        glCullFace(GL_BACK); // render front
+                    } else {
+                        glCullFace(GL_FRONT); // render back
+                    }
+#else
                     if (!myRenderFrontFlag) {
                         glCullFace(GL_FRONT);
                     }
                     if (!myRenderBackFlag) {
                         glCullFace(GL_BACK);
                     }
+#endif
                 }
                 DBP2(START_TIMER(renderBodyPart_renderPrimitives));
                 renderPrimitives(theBodyPart, myMaterial);

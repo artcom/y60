@@ -143,6 +143,45 @@ class IntersectionTest : public UnitTest {
                 ENSURE(!intersection(myPlane2, myPlane2, myResult));
                 ENSURE(!intersection(myPlane2, myCoplanarPlane2, myResult));
             }
+            // Sphere / LineSegment intersection
+            {
+                std::vector<Point3f> myResult;
+                Sphere<float> mySphere(Vector3f(0,0,0), 1);
+                LineSegment<float> myLineSegment0(Point3f(-1,2,0), Point3f(1,2,0));
+                LineSegment<float> myLineSegment1(Point3f(0,2,0), Point3f(0,-2,0));
+                LineSegment<float> myLineSegment2(Point3f(0,0,0), Point3f(2,0,0));
+                LineSegment<float> myLineSegment3(Point3f(-2,0,0), Point3f(0,0,0));
+                LineSegment<float> myLineSegment4(Point3f(-1,0,0), Point3f(-1,1,0));
+
+                // outside
+                myResult.clear();
+                ENSURE(!intersection(mySphere, myLineSegment0, myResult));
+
+                // straight through
+                myResult.clear();
+                ENSURE(intersection(mySphere, myLineSegment1, myResult));
+                ENSURE(myResult.size() == 2);
+                ENSURE(myResult[0] == Point3f(0,-1,0));
+                ENSURE(myResult[1] == Point3f(0,1,0));
+
+                // inside-out
+                myResult.clear();
+                ENSURE(intersection(mySphere, myLineSegment2, myResult));
+                ENSURE(myResult.size() == 1);
+                ENSURE(myResult[0] == Point3f(1,0,0));
+
+                // outside-in
+                myResult.clear();
+                ENSURE(intersection(mySphere, myLineSegment3, myResult));
+                ENSURE(myResult.size() == 1);
+                ENSURE(myResult[0] == Point3f(-1,0,0));
+
+                // touching
+                myResult.clear();
+                ENSURE(intersection(mySphere, myLineSegment4, myResult));
+                ENSURE(myResult.size() == 1);
+                ENSURE(myResult[0] == Point3f(-1,0,0));
+            }
         }
 };
 

@@ -37,6 +37,38 @@ namespace asl {
 
     // see Graphics GEMS 1 Page 297 for some of the following functions
 
+    // LineSegment/Sphere intersection
+    template<class Number>
+    bool intersection(const Sphere<Number> & s, const LineSegment<Number> & l,
+                      std::vector<Point3<Number> > & P) {
+        Vector3<Number> line = l.end - l.origin;
+        Vector3<Number> direction = normalized(line);
+		Vector3<Number> G = l.origin - s.center;
+		Number a = dot(direction,direction);
+		Number b = 2*dot(direction,G);
+		Number c = dot(G,G) - s.radius*s.radius;
+		Number d = b*b - 4*a*c;
+		if (d < 0) {
+			return false;
+		}
+		Number wd = static_cast<Number>(sqrt(d));
+        Number u1 = (-b + wd) / (Number(2) * a);
+        Number u2 = (-b - wd) / (Number(2) * a);
+        Number lineLen = magnitude(line);
+        if (u1 >= Number(0) && u1 <= lineLen) {
+            P.push_back(l.origin + direction * u1);
+        }
+        if (u2 >= Number(0) && u2 <= lineLen && u2 != u1) {
+		    P.push_back(l.origin + direction * u2);
+        }
+		return true;
+    }
+    template<class Number>
+    bool intersection(const LineSegment<Number> & l, const Sphere<Number> & s, 
+                      std::vector<Point3<Number> > & P) {
+        return intersection(s,l, P);
+    }
+
     // Line/Sphere intersection
     template<class Number>
 	bool intersection(const Sphere<Number> & s, const Line<Number> & l, Point3<Number> & P1, Point3<Number> & P2) {
@@ -53,6 +85,10 @@ namespace asl {
 		P2 = l.origin + l.direction * (-b - wd)/Number(2)*a;
 		return true;
 	}
+    template<class Number>
+	bool intersection(const Line<Number> & l, const Sphere<Number> & s, Point3<Number> & P1, Point3<Number> & P2) {
+        return intersection(s, l, P1, P2);
+    }
 
     // Line/Line intersection (G.Gems pp 304)
     template<class Number>

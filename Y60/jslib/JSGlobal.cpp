@@ -782,6 +782,32 @@ ObjectObjectDualResultFunction(bool (*theFunction)(const NATIVE_A &,const NATIVE
     }
     return CALLED;
 }
+
+template <class NATIVE_A, class NATIVE_B, class RESULT_TYPE>
+static CallStatus
+ObjectObjectVariableResultFunction(bool (*theFunction)(const NATIVE_A &,const NATIVE_B &, std::vector<RESULT_TYPE> &),
+                           JSContext *cx, JSObject *myObj0, JSObject *myObj1, jsval *rval)
+{
+    // check first argument for native type
+    if (!JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
+        return NOT_FOUND;
+    }
+    // check second argument for native type
+    if (!JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
+        return NOT_FOUND;
+    }
+    // make the actual call
+    vector<RESULT_TYPE> myResult;
+    bool mySuccess = theFunction(
+        JSClassTraits<NATIVE_A>::getNativeRef(cx,myObj0),
+        JSClassTraits<NATIVE_B>::getNativeRef(cx,myObj1),
+        myResult);
+    if (mySuccess) {
+        *rval = as_jsval(cx, myResult);
+    }
+    return CALLED;
+}
+
 static JSBool
 intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Finds the intersections between two objects.");
@@ -799,6 +825,8 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
     DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT); DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);       DOC_RESET;
     DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);       DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT); DOC_RESET;
     DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);               DOC_PARAM("theFrustum", "", DOC_TYPE_FRUSTUM);       DOC_RESET;
+    DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT); DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);       DOC_RESET;
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);           DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT); DOC_RESET;
     DOC_RVAL("Returns an array of intersection structures.", DOC_TYPE_ARRAY);
     DOC_END;
     if (argc == 2) {
@@ -865,6 +893,14 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 
             typedef bool (*TriangleLineSegmentIntersection)(const Triangle<TriangleNumber> &, const LineSegment<LineSegmentNumber> &,Point3<TriangleNumber> &);
             myStatus = ObjectObjectResultFunction((TriangleLineSegmentIntersection)&intersection, cx, myObj0, myObj1, rval);
+            if (myStatus != NOT_FOUND) return JS_TRUE;
+
+            typedef bool (*SphereLineSegmentIntersection)(const Sphere<LineNumber> &, const LineSegment<SphereNumber> &, std::vector< Point3<SphereNumber> > &);
+            myStatus = ObjectObjectVariableResultFunction((SphereLineSegmentIntersection)&intersection, cx, myObj0, myObj1, rval);
+            if (myStatus != NOT_FOUND) return JS_TRUE;
+
+            typedef bool (*LineSegmentSphereIntersection)(const LineSegment<SphereNumber> &, const Sphere<LineNumber> &, std::vector< Point3<SphereNumber> > &);
+            myStatus = ObjectObjectVariableResultFunction((LineSegmentSphereIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
             // Box / Frustum
