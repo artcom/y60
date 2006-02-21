@@ -230,28 +230,31 @@ namespace y60 {
     dom::NodePtr
     createLineStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
-                         const std::vector<asl::Vector2f> & theTexCoords)
+                         const std::vector<asl::Vector2f> & theTexCoords,
+                         const std::vector<asl::Vector4f> & theColors)
     {
         return createStrip(PRIMITIVE_TYPE_LINE_STRIP, theScene, 
-                theMaterialId, thePositions, theTexCoords);
+                theMaterialId, thePositions, theTexCoords, theColors);
     }
 
     dom::NodePtr
     createQuadStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
                 const std::vector<asl::Vector3f> & thePositions,
-                const std::vector<asl::Vector2f> & theTexCoords) 
+                const std::vector<asl::Vector2f> & theTexCoords,
+                const std::vector<asl::Vector4f> & theColors) 
     {
         return createStrip(PRIMITIVE_TYPE_QUAD_STRIP, theScene, 
-                theMaterialId, thePositions, theTexCoords);
+                theMaterialId, thePositions, theTexCoords, theColors);
     }
 
     dom::NodePtr
     createStrip(const std::string & theType, y60::ScenePtr theScene, 
                 const std::string & theMaterialId,
                 const std::vector<asl::Vector3f> & thePositions,
-                const std::vector<asl::Vector2f> & theTexCoords) 
+                const std::vector<asl::Vector2f> & theTexCoords,
+                const std::vector<asl::Vector4f> & theColors) 
     {
-
+        bool needColors = theColors.size() !=0;
         bool needsNormals = false;
         if (theType == PRIMITIVE_TYPE_QUAD_STRIP || theType == PRIMITIVE_TYPE_TRIANGLE_STRIP) {
             needsNormals = true;
@@ -276,7 +279,13 @@ namespace y60 {
             myElementBuilder.createIndex("uvset", getTextureRole(0), theTexCoords.size());
         }
         
-
+        if (needColors) {
+            if (theColors.size() != thePositions.size()) {
+              throw asl::Exception(string("createStrip:: theColors count does not match thePosition count: ") + asl::as_string(theColors.size()) + " vs " + asl::as_string(thePositions.size()) );                
+            }
+            myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector4f>(COLOR_ROLE, theColors.size());
+            myElementBuilder.createIndex(COLOR_ROLE, COLORS, theColors.size());
+        }
         if (needsNormals) {
             myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, thePositions.size());
             myElementBuilder.createIndex(NORMAL_ROLE, NORMALS, thePositions.size());
@@ -306,6 +315,10 @@ namespace y60 {
             if ( ! theTexCoords.empty()) {
                 myShapeBuilder.appendVertexData("uvset", theTexCoords[i]);
                 myElementBuilder.appendIndex(getTextureRole(0), i);
+            }
+            if (needColors) {
+                myShapeBuilder.appendVertexData(COLOR_ROLE, theColors[i]);
+                myElementBuilder.appendIndex(COLORS, i);
             }
         }
 

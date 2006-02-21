@@ -124,18 +124,21 @@ dom::NodePtr createQuadStack(y60::ScenePtr theScene, const asl::Vector3i & theDi
 dom::NodePtr
 createLineStrip(y60::ScenePtr theScene, const std::string & theLineMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
-                         const std::vector<asl::Vector2f> & theTexCoords = std::vector<asl::Vector2f>()) ;
+                         const std::vector<asl::Vector2f> & theTexCoords = std::vector<asl::Vector2f>(),
+                         const std::vector<asl::Vector4f> & theColors = std::vector<asl::Vector4f>()) ;
 
 dom::NodePtr
 createQuadStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
-                         const std::vector<asl::Vector2f> & theTexCoords = std::vector<asl::Vector2f>()) ;
+                         const std::vector<asl::Vector2f> & theTexCoords = std::vector<asl::Vector2f>(),
+                         const std::vector<asl::Vector4f> & theColors = std::vector<asl::Vector4f>()) ;
 
 dom::NodePtr
 createStrip(const std::string & theType, y60::ScenePtr theScene, 
         const std::string & theMaterialId,
         const std::vector<asl::Vector3f> & thePositions,
-        const std::vector<asl::Vector2f> & theTexCoords); 
+        const std::vector<asl::Vector2f> & theTexCoords,
+        const std::vector<asl::Vector4f> & theColors); 
 
 struct PlanePosition {
     PlanePosition(const asl::Point3f & theOrigin,
