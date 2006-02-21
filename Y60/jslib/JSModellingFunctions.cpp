@@ -273,7 +273,7 @@ CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
 static JSBool CreateStrip(const std::string &theType, JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
 {
     try {
-        ensureParamCount(argc, 3, 4);
+        ensureParamCount(argc, 3, 5);
 
         y60::ScenePtr myScene(0);
         convertFrom(cx, argv[0], myScene);
@@ -289,7 +289,11 @@ static JSBool CreateStrip(const std::string &theType, JSContext * cx, JSObject *
             convertFrom(cx, argv[3], myTexCoords);
         }
 
-        dom::NodePtr myResult = createStrip(theType, myScene, myMaterialId, myPositions, myTexCoords);
+        std::vector<asl::Vector4f> myColors;
+        if (argc > 4) {
+            convertFrom(cx, argv[4], myColors);
+        }
+        dom::NodePtr myResult = createStrip(theType, myScene, myMaterialId, myPositions, myTexCoords, myColors);
         *rval = as_jsval(cx, myResult);
 
         return JS_TRUE;
@@ -305,6 +309,7 @@ CreateLineStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
     DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
     DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
     DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
+    DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
     DOC_RVAL("The new created linestrip shape", DOC_TYPE_NODE);
     DOC_END;
     return CreateStrip(PRIMITIVE_TYPE_LINE_STRIP, cx, obj, argc, argv, rval);
@@ -318,6 +323,7 @@ CreateQuadStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
     DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
     DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
     DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
+    DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
     DOC_RVAL("The new created quadstrip shape", DOC_TYPE_NODE);
     DOC_END;
     return CreateStrip(PRIMITIVE_TYPE_QUAD_STRIP, cx, obj, argc, argv, rval);
@@ -331,6 +337,7 @@ CreateTriangleStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsv
     DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
     DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);
     DOC_PARAM_OPT("theTexCoords", "Texture Coordinates", DOC_TYPE_VECTOROFVECTOR2F, "");
+    DOC_PARAM_OPT("theColors", "Vertexcolors", DOC_TYPE_VECTOROFVECTOR4F, "");
     DOC_RVAL("The new created trianglestrip shape", DOC_TYPE_NODE);
     DOC_END;
     return CreateStrip(PRIMITIVE_TYPE_TRIANGLE_STRIP, cx, obj, argc, argv, rval);
