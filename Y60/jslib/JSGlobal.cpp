@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSGlobal.cpp,v $
-//   $Author: danielk $
-//   $Revision: 1.13 $
-//   $Date: 2005/04/29 13:25:43 $
-//
-//
-//=============================================================================
 
 #include "JScppUtils.h"
 #include "JSVector.h"
@@ -811,6 +803,7 @@ ObjectObjectVariableResultFunction(bool (*theFunction)(const NATIVE_A &,const NA
 static JSBool
 intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Finds the intersections between two objects.");
+    DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_RESET;
     DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_RESET;
     DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_RESET;
     DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);       DOC_RESET;
@@ -841,6 +834,11 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
             JS_ValueToObject(cx, argv[1], &myObj1) == JS_TRUE)
         {
             CallStatus myStatus = NOT_FOUND;
+
+            typedef bool (*LineLineIntersection)(const Line<LineNumber> &,const Line<LineNumber> &, Point3<LineNumber> &);
+            myStatus = ObjectObjectResultFunction((LineLineIntersection)&intersection, cx, myObj0, myObj1, rval);
+            if (myStatus != NOT_FOUND) return JS_TRUE;
+
             typedef bool (*LinePlaneIntersection)(const Line<LineNumber> &,const Plane<PlaneNumber> &, Point3<PlaneNumber> &);
             myStatus = ObjectObjectResultFunction((LinePlaneIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;

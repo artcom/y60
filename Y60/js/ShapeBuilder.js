@@ -8,94 +8,131 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("ShapeBuilder.js");
+//use("ShapeBuilder.js"); // UH: self-referential reference? ;-)
 
-var ELEMENT_TYPE_POINTS          = "points";
-var ELEMENT_TYPE_LINES           = "lines";
-var ELEMENT_TYPE_LINE_STRIP      = "linestrip";
-var ELEMENT_TYPE_LINE_LOOP       = "lineloop";
-var ELEMENT_TYPE_TRIANGLES       = "triangles";
-var ELEMENT_TYPE_TRIANGLE_STRIP  = "trianglestrip";
-var ELEMENT_TYPE_TRIANGLE_FAN    = "trianglefan";
-var ELEMENT_TYPE_QUADS           = "quads";
-var ELEMENT_TYPE_QUAD_STRIP      = "quadstrip";
-var ELEMENT_TYPE_POLYGON         = "polygon";
+const ELEMENT_TYPE_POINTS          = "points";
+const ELEMENT_TYPE_LINES           = "lines";
+const ELEMENT_TYPE_LINE_STRIP      = "linestrip";
+const ELEMENT_TYPE_LINE_LOOP       = "lineloop";
+const ELEMENT_TYPE_TRIANGLES       = "triangles";
+const ELEMENT_TYPE_TRIANGLE_STRIP  = "trianglestrip";
+const ELEMENT_TYPE_TRIANGLE_FAN    = "trianglefan";
+const ELEMENT_TYPE_QUADS           = "quads";
+const ELEMENT_TYPE_QUAD_STRIP      = "quadstrip";
+const ELEMENT_TYPE_POLYGON         = "polygon";
 
 function Element(theType, theMaterial) {
-    this.type      = theType;
-    this.material  = theMaterial;
-    this.positions = [];
-    this.normals   = [];
-    this.colors    = [];
-    this.texcoords = [];
+    this.Constructor(this, theType, theMaterial);
 }
 
+Element.prototype.Constructor = function(self, theType, theMaterial) {
+
+    self.type = theType;
+    self.material = theMaterial;
+
+    // position,normal,etc. indices
+    self.positions = [];
+    self.normals   = [];
+    self.colors    = [];
+    self.texcoords = [];
+}
+
+/**
+ */
 function ShapeBuilder() {
     this.Constructor(this);
 }
 
 ShapeBuilder.prototype.Constructor = function(obj) {
+
     var _myElements  = [];
+
+    // position,normal,etc. data
     var _myPositions = [];
     var _myNormals   = [];
-    var _myUVCoords  = [];
     var _myColors    = [];
+    var _myUVCoords  = [];
 
-    obj.buildNode = function() {
+    /// Create <shape> node from the data previously passed in.
+    obj.buildNode = function(theName) {
+
+        if (theName == null) {
+            theName = "ShapeBuilder";
+        }
 
         var myShapeString =
-            '<shape renderstyle="[frontfacing]">\n' +
-            '    <vertexdata>\n' +
-            '        <vectorofvector3f name="position">' + arrayToString(_myPositions) + '</vectorofvector3f>\n' +
-            '        <vectorofvector3f name="normal">' +  arrayToString(_myNormals) + '</vectorofvector3f>\n';
-            if (_myColors.length >0) {
-                myShapeString += '        <vectorofvector4f name="color">' + arrayToString(_myColors) + '</vectorofvector4f>\n';
-            }
-            if (_myUVCoords.length >0) {
-                myShapeString += '        <vectorofvector2f name="map1">' + arrayToString(_myUVCoords) + '</vectorofvector2f>\n';
-            }
-            myShapeString += '    </vertexdata>\n' +
-            '    <primitives>\n';
+            '<shape name="' + theName + '" renderstyle="[frontfacing]">\n' +
+            ' <vertexdata>\n' +
+            '  <vectorofvector3f name="position">' + arrayToString(_myPositions) + '</vectorofvector3f>\n';
+        if (_myNormals.length > 0) {
+            myShapeString += '  <vectorofvector3f name="normal">' +  arrayToString(_myNormals) + '</vectorofvector3f>\n';
+        }
+        if (_myColors.length >0) {
+            myShapeString += '  <vectorofvector4f name="color">' + arrayToString(_myColors) + '</vectorofvector4f>\n';
+        }
+        if (_myUVCoords.length >0) {
+            myShapeString += '  <vectorofvector2f name="map1">' + arrayToString(_myUVCoords) + '</vectorofvector2f>\n';
+        }
+        myShapeString += ' </vertexdata>\n<primitives>\n';
 
         for (var i = 0; i < _myElements.length; ++i) {
             var myElement = _myElements[i];
             myShapeString +=
-                '    <elements type="' + myElement.type + '" material="' + myElement.material + '">\n' +
-                '        <indices vertexdata="position" role="position">' + arrayToString(myElement.positions) + '</indices>\n' +
-                '        <indices vertexdata="normal" role="normal">' + arrayToString(myElement.normals) + '</indices>\n';
-                if (myElement.colors.length >0) {
-                   myShapeString +='        <indices vertexdata="color" role="color">' + arrayToString(myElement.colors) + '</indices>\n';
-                }
-                if (myElement.texcoords.length >0) {
-                   myShapeString +='        <indices vertexdata="map1" role="texcoord0">' + arrayToString(myElement.texcoords) + '</indices>\n';
-                }
-                myShapeString +='    </elements>\n';
+                '  <elements type="' + myElement.type + '" material="' + myElement.material + '">\n' +
+                '   <indices vertexdata="position" role="position">' + arrayToString(myElement.positions) + '</indices>\n';
+            if (myElement.normals.length > 0) {
+                myShapeString += '   <indices vertexdata="normal" role="normal">' + arrayToString(myElement.normals) + '</indices>\n';
+            }
+            if (myElement.colors.length >0) {
+                myShapeString +='   <indices vertexdata="color" role="color">' + arrayToString(myElement.colors) + '</indices>\n';
+            }
+            if (myElement.texcoords.length >0) {
+                myShapeString +='   <indices vertexdata="map1" role="texcoord0">' + arrayToString(myElement.texcoords) + '</indices>\n';
+            }
+            myShapeString +='  </elements>\n';
         }
-        myShapeString += '    </primitives>\n';
-        myShapeString += '</shape>\n';
+        myShapeString += '</primitives>\n</shape>\n';
 
         var myShapeDoc = new Node(myShapeString);
         return myShapeDoc.firstChild;
     }
 
+    /// Append a new shape element of the type using the material.
     obj.appendElement = function(theType, theMaterial) {
         var e = new Element(theType, theMaterial);
         _myElements.push(e);
         return e;
     }
 
-    obj.appendNormal = function (theNormal) {
+    obj.appendVertex = function(theElement, theVertex) {
+        var myIndex = _myPositions.length;
+        _myPositions.push(theVertex);
+        theElement.positions.push(myIndex);
+        return myIndex;
+    }
+
+    obj.appendNormal = function(theElement, theNormal) {
         var myIndex = _myNormals.length;
         _myNormals.push(theNormal);
+        theElement.normals.push(myIndex);
         return myIndex;
     }
 
-    obj.appendColor = function (theColor) {
+    obj.appendColor = function(theElement, theColor) {
         var myIndex = _myColors.length;
         _myColors.push(theColor);
+        theElement.colors.push(myIndex);
         return myIndex;
     }
 
+    obj.appendTexCoord = function(theElement, theTexCoord) {
+        var myIndex = _myUVCoords.length;
+        _myUVCoords.push(theTexCoord);
+        theElement.texcoords.push(myIndex);
+        return myIndex;
+    }
+
+    /// Append a line to the given element.
     obj.appendLineElement = function (theElement, theLineBegin, theLineEnd){
         _myPositions.push(theLineBegin);
         theElement.positions.push(_myPositions.length-1);
@@ -107,27 +144,28 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         theElement.colors.push(_myColors.length-1);
     }
 
+    /// Append a point to a linestrip element.
     obj.appendLineStripElement = function (theElement, thePosition) {
-        // add positions to shape's vertex data
-        _myPositions.push(thePosition);
-        theElement.positions.push(_myPositions.length-1);
+        Logger.warning("Consider using separate appendVertex");
+        theElement.positions.push(obj.appendVertex(thePosition));
         theElement.normals.push(0);
         theElement.colors.push(0);
     }
 
     obj.appendQuad = function (theElement, thePosition, theSize, theDepth) {
-        var myDepth = 0;
-        if (theDepth != undefined) {
-            myDepth = theDepth;
+
+        if (theDepth == null) {
+            theDepth = 0;
         }
+
         // add positions to shape's vertex data
         var myHalfWidth  = theSize[0] / 2;
         var myHalfHeight = theSize[1] / 2;
         var myPosIndex = _myPositions.length;
-        _myPositions.push([thePosition[0] - myHalfWidth, thePosition[1] - myHalfHeight, myDepth]);
-        _myPositions.push([thePosition[0] + myHalfWidth, thePosition[1] - myHalfHeight, myDepth]);
-        _myPositions.push([thePosition[0] + myHalfWidth, thePosition[1] + myHalfHeight, myDepth]);
-        _myPositions.push([thePosition[0] - myHalfWidth, thePosition[1] + myHalfHeight, myDepth]);
+        _myPositions.push([thePosition[0] - myHalfWidth, thePosition[1] - myHalfHeight, theDepth]);
+        _myPositions.push([thePosition[0] + myHalfWidth, thePosition[1] - myHalfHeight, theDepth]);
+        _myPositions.push([thePosition[0] + myHalfWidth, thePosition[1] + myHalfHeight, theDepth]);
+        _myPositions.push([thePosition[0] - myHalfWidth, thePosition[1] + myHalfHeight, theDepth]);
         // set element's position indices
         theElement.positions.push(myPosIndex,myPosIndex+1,myPosIndex+2,myPosIndex+3);
 
