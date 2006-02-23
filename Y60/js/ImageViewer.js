@@ -187,6 +187,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 }
                 _myMissedFrameCounter += myFrameDiff;
             }
+            
             window.scene.loadMovieFrame(_myMovieNode, theTime);
             if (myFrameDiff >0) {
                 _myFrameCounter += myFrameDiff;
@@ -534,6 +535,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 myString += "cachesize:    " + myNode.cachesize +"\n";
                 myString += "avdelay:      " + myNode.avdelay.toPrecision(3) + "\n";
                 myString += "Total frames: " + _myFrameCounter + "\n";
+                myString += "Decoder     : " + myNode.decoder + "\n";
                 myString += "Misses:       sum: " + _myMissedFrameCounter + ", max: " + _myMaxMissedFrame + "\n";
             }
             myString += "Zoom:         " + (_myZoomFactor*100).toFixed(1) + "%\n";
@@ -589,8 +591,9 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.name = "IVMovieNode";
             _myMovieNode.id = createUniqueId();
             _myMovieNode.playmode = "play";
-            _myMovieNode.loopcount = 0; // indefinitively
+            _myMovieNode.loopcount = 0;
             _myMovieNode.audio = 1;
+            //_myMovieNode.decoderhint = "FFMpegDecoder1";
             _myMovieOverlay = new MovieOverlay(self.getOverlayManager(), _myMovieNode);
         }
 

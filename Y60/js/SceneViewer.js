@@ -37,7 +37,7 @@ use("MemoryMeter.js");
 if (operatingSystem() == "Win32") {
     plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
 }
-plug("y60FFMpegDecoder");
+plug("y60FFMpegDecoder1");
 
 // Global window object (similar to html window)
 if (window == undefined) var window   = null;
