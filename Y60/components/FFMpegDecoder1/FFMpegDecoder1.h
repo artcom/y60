@@ -75,9 +75,6 @@ namespace y60 {
         };
         typedef asl::Ptr<VideoFrame> VideoFramePtr;
 
-        static const unsigned FRAME_CACHE_SIZE = 1;
-        typedef std::vector<VideoFramePtr> VideoFrameCache;
-
     public:
         FFMpegDecoder1(asl::DLHandle theDLHandle);
         virtual ~FFMpegDecoder1();
@@ -114,9 +111,10 @@ namespace y60 {
 
         /// Decode frame at theTimestamp into theTargetRaster. Returns true if EOF was met.
         bool decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster);
+    
+        // Convert frame from yuv to rgb
+        void convertFrame(AVFrame* theFrame, dom::ResizeableRasterPtr theTargetRaster);
 
-        void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
-        void copyFrame(VideoFramePtr theVideoFrame, dom::ResizeableRasterPtr theTargetRaster);
 
         AVFormatContext * _myFormatContext;
         AVFrame *         _myFrame;
@@ -126,11 +124,6 @@ namespace y60 {
 
         int               _myAStreamIndex;
         AVStream *        _myAStream;
-
-        VideoFrameCache   _myFrameCache;
-        unsigned          _myCacheWriteIndex;
-        int64_t           _myLowerCacheTimestamp;
-        int64_t           _myUpperCacheTimestamp;
 
         int64_t           _myFirstTimestamp;
         int64_t           _myStartTimestamp;

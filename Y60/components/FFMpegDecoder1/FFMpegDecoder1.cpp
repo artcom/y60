@@ -51,7 +51,6 @@ namespace y60 {
         _myFormatContext(0), _myFrame(0),
         _myVStreamIndex(-1), _myVStream(0),
         _myAStreamIndex(-1), _myAStream(0),
-        _myLowerCacheTimestamp(INT_MAX), _myUpperCacheTimestamp(INT_MIN),
         _myFirstTimestamp(0), _myStartTimestamp(0),
         _myLastVideoTimestamp(0), _myEOFVideoTimestamp(INT_MIN)
     {
@@ -216,14 +215,6 @@ namespace y60 {
             AC_ERROR << "Could not seek to start timestamp " << _myStartTimestamp;
         }
 
-        // create cache
-        _myFrameCache.resize(FRAME_CACHE_SIZE);
-        unsigned myBufferSize = getFrameWidth() * getFrameHeight() * 3;
-        for (unsigned i = 0; i < FRAME_CACHE_SIZE; ++i) {
-            _myFrameCache[i] = VideoFramePtr(new VideoFrame(myBufferSize));
-        }
-        _myCacheWriteIndex = 0;
-
         asl::Time myLoadEndTime;
         AC_INFO << "Load time " << (myLoadEndTime - myLoadStartTime) << "s";
     }
@@ -241,36 +232,7 @@ namespace y60 {
         }
         DB(AC_TRACE << "time=" << theTime << " timestamp=" << myFrameTimestamp);
 
-        // search for suitable frame in cache
-        VideoFramePtr myVideoFrame(0);
-        int64_t myMinTimeDiff = INT_MAX;
-        _myLowerCacheTimestamp = INT_MAX;
-        _myUpperCacheTimestamp = INT_MIN;
-
-        for (VideoFrameCache::iterator it = _myFrameCache.begin(); myMinTimeDiff != 0 && it != _myFrameCache.end(); ++it) {
-            int64_t myCacheTimestamp = (*it)->getTimestamp();
-            if (myCacheTimestamp < _myLowerCacheTimestamp) {
-                _myLowerCacheTimestamp = myCacheTimestamp;
-            }
-            if (myCacheTimestamp > _myUpperCacheTimestamp) {
-                _myUpperCacheTimestamp = myCacheTimestamp;
-            }
-
-            int64_t myTimeDiff = asl::abs(myCacheTimestamp - myFrameTimestamp);
-            if (myTimeDiff < myMinTimeDiff) {
-                myVideoFrame = *it;
-                myMinTimeDiff = myTimeDiff;
-            }
-            DB(AC_TRACE << "cached=" << myCacheTimestamp << " best=" << (myVideoFrame ? myVideoFrame->getTimestamp() : 0) << " diff=" << myMinTimeDiff);
-        }
-        DB(AC_TRACE << "cache lower=" << _myLowerCacheTimestamp << " upper=" << _myUpperCacheTimestamp);
-
-        if (myVideoFrame && myMinTimeDiff < (myTimePerFrame / 2)) {
-            myFrameTimestamp = myVideoFrame->getTimestamp();
-            DB(AC_TRACE << "FFMpegDecoder1::readFrame found cached timestamp=" << myFrameTimestamp);
-            copyFrame(myVideoFrame, theTargetRaster);
-        }
-        else if (!decodeFrame(myFrameTimestamp, theTargetRaster)) {
+        if (!decodeFrame(myFrameTimestamp, theTargetRaster)) {
             AC_DEBUG << "EOF reached for timestamp=" << myFrameTimestamp;
             if (getFrameCount() == INT_MAX) {
                 unsigned myLastFrame = asl::round((_myEOFVideoTimestamp - _myStartTimestamp) * getFrameRate() / AV_TIME_BASE);
@@ -292,25 +254,10 @@ namespace y60 {
 
         int64_t myTimePerFrame = (int64_t)(AV_TIME_BASE / getFrameRate());
 
-        // seek if timestamp is outside these boundaries
-        if (theTimestamp < _myLowerCacheTimestamp || theTimestamp > (_myUpperCacheTimestamp + myTimePerFrame*2)) {
+        if (theTimestamp < _myLastVideoTimestamp || theTimestamp > _myLastVideoTimestamp + (2*myTimePerFrame)) {
+            //cout <<"seek, theTimeStanp: " << theTimestamp << " last timestamp : " << _myLastVideoTimestamp << " Frametime : " << myTimePerFrame <<endl;
 
-            if (theTimestamp < _myLowerCacheTimestamp) {
-                AC_DEBUG << "Seeking because timestamp below lower cache bound " << theTimestamp << "<" << _myLowerCacheTimestamp;
-            } else if (theTimestamp > (_myUpperCacheTimestamp + myTimePerFrame*2)) {
-                AC_DEBUG << "Seeking because timestamp beyond upper cache bound " << theTimestamp << ">" << _myUpperCacheTimestamp;
-            }
-
-            int64_t mySeekTimestamp;
-            if (theTimestamp < _myLowerCacheTimestamp) {
-                mySeekTimestamp = theTimestamp - (myTimePerFrame*2);
-                if (mySeekTimestamp < _myStartTimestamp) {
-                    mySeekTimestamp = 0;
-                }
-                avcodec_flush_buffers(&_myVStream->codec);
-            } else {
-                mySeekTimestamp = theTimestamp;
-            }
+            int64_t mySeekTimestamp = theTimestamp;
             DB(AC_TRACE << "timestamp=" << theTimestamp << " seeking to=" << mySeekTimestamp);
 
 #if (LIBAVCODEC_BUILD < 4738)
@@ -348,11 +295,6 @@ namespace y60 {
                 if (frameFinished) {
                     _myLastVideoTimestamp += myTimePerFrame;
 
-                    // YUV to RGB
-                    myVideoFrame = _myFrameCache[_myCacheWriteIndex++ % _myFrameCache.size()];
-                    myVideoFrame->setTimestamp(_myLastVideoTimestamp);
-                    convertFrame(_myFrame, myVideoFrame->getBuffer());
-
                     // last frame found
                     if (_myLastVideoTimestamp >= theTimestamp) {
                         break;
@@ -380,17 +322,20 @@ namespace y60 {
                     myData += myLen;
                     myDataLen -= myLen;
                 }
-                DB(AC_TRACE << "decoded dts=" << myPacket.dts << " finished=" << frameFinished);
+                DB(AC_INFO << "decoded dts=" << myPacket.dts << " pts=" << myPacket.pts << " finished=" << frameFinished);
                 if (frameFinished == 0) {
                     continue;
                 }
-                _myLastVideoTimestamp = myPacket.dts;
-
-                // YUV to RGB
-                myVideoFrame = _myFrameCache[_myCacheWriteIndex++ % _myFrameCache.size()];
-                myVideoFrame->setTimestamp(myPacket.dts);
-                convertFrame(_myFrame, myVideoFrame->getBuffer());
-
+// highly experimental (vs/uh)
+#if 1
+                if (myPacket.pts == 0 ) {
+                    _myLastVideoTimestamp += myTimePerFrame;
+                } else {
+                    _myLastVideoTimestamp = myPacket.pts;
+                }
+#else 
+                    _myLastVideoTimestamp = myPacket.dts;
+#endif
                 // suitable framestamp?
                 if (_myLastVideoTimestamp >= theTimestamp) {
                     DB(AC_TRACE << "found " << _myLastVideoTimestamp << " for " << theTimestamp);
@@ -401,16 +346,16 @@ namespace y60 {
             }
         }
 
+        convertFrame(_myFrame, theTargetRaster);
         // store actual timestamp
         theTimestamp = myPacket.dts;
         av_free_packet(&myPacket);
-        copyFrame(myVideoFrame, theTargetRaster);
 
         return true;
     }
 
-    void FFMpegDecoder1::convertFrame(AVFrame* theFrame, unsigned char* theBuffer) {
-
+    void FFMpegDecoder1::convertFrame(AVFrame* theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+        theTargetRaster->resize(getFrameWidth(), getFrameHeight());
         if (!theFrame) {
             AC_ERROR << "FFMpegDecoder1::decodeVideoFrame invalid AVFrame";
             return;
@@ -418,9 +363,9 @@ namespace y60 {
         unsigned int myLineSizeBytes = getBytesRequired(getFrameWidth(), getPixelFormat());
 
         AVPicture myDestPict;
-        myDestPict.data[0] = theBuffer;
-        myDestPict.data[1] = theBuffer+1;
-        myDestPict.data[2] = theBuffer+2;
+        myDestPict.data[0] = theTargetRaster->pixels().begin();
+        myDestPict.data[1] = theTargetRaster->pixels().begin()+1;
+        myDestPict.data[2] = theTargetRaster->pixels().begin()+2;
 
         myDestPict.linesize[0] = myLineSizeBytes;
         myDestPict.linesize[1] = myLineSizeBytes;
@@ -436,10 +381,5 @@ namespace y60 {
         img_convert(&myDestPict, myDestFmt,
                     (AVPicture*)theFrame, _myVStream->codec.pix_fmt,
                     _myVStream->codec.width, _myVStream->codec.height);
-    }
-
-    void FFMpegDecoder1::copyFrame(VideoFramePtr theVideoFrame, dom::ResizeableRasterPtr theTargetRaster) {
-        theTargetRaster->resize(getFrameWidth(), getFrameHeight());
-        memcpy(theTargetRaster->pixels().begin(), theVideoFrame->getBuffer(), theTargetRaster->pixels().size());
     }
 }
