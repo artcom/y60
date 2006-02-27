@@ -177,7 +177,7 @@ namespace asl {
             // GlobalMemoryStatusEx for that.
             MEMORYSTATUS myMemStat;
             GlobalMemoryStatus(&myMemStat);
-            myTotalMemory = myMemStat.dwTotalPhys;
+            myTotalMemory = myMemStat.dwTotalVirtual;
 #elif LINUX
             myTotalMemory = getMemInfo(MEM_TOTAL);
 #elif OSX
@@ -196,7 +196,7 @@ namespace asl {
 #ifdef WIN32
         MEMORYSTATUS myMemStat;
         GlobalMemoryStatus(&myMemStat);
-        myUsedMemory = myMemStat.dwTotalPhys - myMemStat.dwAvailPhys;
+        myUsedMemory = myMemStat.dwTotalVirtual - myMemStat.dwAvailVirtual;
 #elif LINUX
         // Determining used/free memory under Linux is a bit tricky since
         // the kernel usually tries to take all free memory for caching.
@@ -217,7 +217,7 @@ namespace asl {
 #ifdef WIN32
         MEMORYSTATUS myMemStat;
         GlobalMemoryStatus(&myMemStat);
-        myFreeMemory = myMemStat.dwAvailPhys;
+        myFreeMemory = myMemStat.dwAvailVirtual;
 #elif LINUX
         myFreeMemory = getTotalMemory() - getUsedMemory();
 #elif OSX
