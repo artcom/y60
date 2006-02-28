@@ -89,7 +89,8 @@ toString(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
 JSBool
 loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Updates a movie node.");
-    DOC_PARAM("theMovie", "", DOC_TYPE_NODE);
+    DOC_PARAM("theMovieNode", "The movie node to update.", DOC_TYPE_NODE);
+    DOC_PARAM_OPT("theCurrentTime", "The time for which the matching frame should be loaded.", DOC_TYPE_FLOAT, 0);
     DOC_END;
     try {
         if (argc < 1) {
@@ -393,7 +394,7 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_PARAM("theWidth", "Image width", DOC_TYPE_INTEGER);
     DOC_PARAM("theHeight", "Image height", DOC_TYPE_INTEGER);
     DOC_PARAM("thePixelEncoding", "Pixel encoding", DOC_TYPE_STRING);
-    // 
+    //
     DOC_RVAL("The new image", DOC_TYPE_NODE)
     DOC_END;
     try {
@@ -429,10 +430,10 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
             dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
                 dom::NodePtr(new dom::Element("image")));
             y60::ImagePtr myImage = myResult->getFacade<y60::Image>();
-            myImage->set(myWidth, myHeight, 1, PixelEncoding(getEnumFromString(myPixelEncoding, PixelEncodingString))); 
+            myImage->set(myWidth, myHeight, 1, PixelEncoding(getEnumFromString(myPixelEncoding, PixelEncodingString)));
             myImage->getRasterPtr()->resize(myWidth, myHeight);
             memset(myImage->getRasterPtr()->pixels().begin(), 0, myImage->getRasterPtr()->pixels().size());
-            *rval = as_jsval(cx, myResult);            
+            *rval = as_jsval(cx, myResult);
 
         } else {
             throw asl::Exception(string("Not enough arguments, must be 1 (filename) or 3(width,height,encoding)."));
