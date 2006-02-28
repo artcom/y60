@@ -328,7 +328,7 @@ namespace y60 {
                 }
 // highly experimental (vs/uh)
 #if 1
-                if (myPacket.pts == 0 ) {
+                if (myPacket.pts == AV_NOPTS_VALUE) {
                     _myLastVideoTimestamp += myTimePerFrame;
                 } else {
                     _myLastVideoTimestamp = myPacket.pts;
