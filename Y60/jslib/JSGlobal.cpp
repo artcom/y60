@@ -451,7 +451,7 @@ struct Call {
     {
         if (argc != 1) {
             if (argc < minArgCount || argc > maxArgCount) {
-                AC_ERROR << "dispatch: bad number of arguments: "<<argc<<", expected 2"<<endl;
+                AC_ERROR << "dispatch: bad number of arguments: "<<argc<<", expected 1"<<endl;
                 return FAILED;
             }
             return NOT_FOUND;

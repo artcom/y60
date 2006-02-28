@@ -123,6 +123,11 @@ namespace jslib {
         void setLineHeight(unsigned int theLineHeight);
         void setParagraph(unsigned int theTopMargin, unsigned int theBottomMargin);
 
+        bool getFontMetrics(const std::string & theFontName,
+                int & theFontHeight,
+                int & theFontAscent, int & theFontDescent,
+                int & theFontLineSkip);
+
         bool getGlyphMetrics(const std::string & theFontName,
                              const std::string & theCharacter,
                              asl::Box2f & theGlyphBox, double & theAdvance);

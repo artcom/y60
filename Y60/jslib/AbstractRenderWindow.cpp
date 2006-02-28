@@ -831,7 +831,6 @@ namespace jslib {
                         theImageNode, theString, theFont, theTargetWidth, theTargetHeight);
     }
 
-
     void AbstractRenderWindow::setTextStyle(unsigned int theStyle) {
         _myRenderer->getTextManager().setTextStyle(y60::Text::RENDERSTYLE(theStyle));
     }
@@ -852,6 +851,13 @@ namespace jslib {
     }
     void AbstractRenderWindow::setParagraph(unsigned int theTopMargin, unsigned int theBottomMargin) {
         _myRenderer->getTextManager().setParagraph(theTopMargin, theBottomMargin);
+    }
+
+    bool AbstractRenderWindow::getFontMetrics(const std::string & theFontName,
+            int & theFontHeight,
+            int & theFontAscent, int & theFontDescent,
+            int & theFontLineSkip) {
+        return _myRenderer->getTextManager().getFontMetrics(theFontName, theFontHeight, theFontAscent, theFontDescent, theFontLineSkip);
     }
 
     bool AbstractRenderWindow::getGlyphMetrics(const std::string & theFontName,

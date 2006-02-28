@@ -1,6 +1,6 @@
 //============================================================================
 //
-// Copyright (C) 2002, ART+COM AG Berlin
+// Copyright (C) 2002-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,17 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//    $RCSfile: SDLTextRenderer.cpp,v $
-//
-//     $Author: pavel $
-//
-//   $Revision: 1.8 $
-//
-// Description:
-//
-//
-//=============================================================================
 
 #include "SDLTextRenderer.h"
 
@@ -183,15 +172,36 @@ namespace y60 {
             theTextureManager.rebind(myImage);
         }
 
- #ifdef DUMP_TEXT_AS_PNG
-       PLAnyBmp myBmp;
+#ifdef DUMP_TEXT_AS_PNG
+        PLAnyBmp myBmp;
         myBmp.Create( _myTextureSurface->w, _myTextureSurface->h, PLPixelFormat::A8B8G8R8,
-                      (unsigned char*)_myTextureSurface->pixels, _myTextureSurface->w*4);
+                (unsigned char*)_myTextureSurface->pixels, _myTextureSurface->w*4);
         PLPNGEncoder myEncoder;
         myEncoder.MakeFileFromBmp("test.png", &myBmp);
 #endif
 
         return myTextSize;
+    }
+
+    bool
+    SDLTextRenderer::getFontMetrics(const std::string & theFontName,
+            int & theFontHeight,
+            int & theFontAscent, int & theFontDescent,
+            int & theFontLineSkip) const
+    {
+        SDLFontInfo::FONTTYPE myFontType = SDLFontInfo::NORMAL;
+        std::string myFontName = makeFontName(theFontName, myFontType);
+        TTF_Font* myFont = const_cast<TTF_Font*>(getFont(myFontName));
+        if (!myFont) {
+            throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
+        }
+
+        theFontHeight = TTF_FontHeight(myFont);
+        theFontAscent = TTF_FontAscent(myFont);
+        theFontDescent = TTF_FontDescent(myFont);
+        theFontLineSkip = TTF_FontLineSkip(myFont);
+
+        return true;
     }
 
     bool

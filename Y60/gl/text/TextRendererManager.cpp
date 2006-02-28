@@ -1,6 +1,6 @@
 //============================================================================
 //
-// Copyright (C) 2002, ART+COM AG Berlin
+// Copyright (C) 2002-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,18 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//    $RCSfile: TextRendererManager.cpp,v $
-//
-//     $Author: pavel $
-//
-//   $Revision: 1.21 $
-//
-// Description:
-//
-// (CVS log at the bottom of this file)
-//
-//=============================================================================
 
 #include "TextRendererManager.h"
 #include <y60/GLUtils.h>
@@ -195,6 +183,15 @@ namespace y60 {
     void
     TextRendererManager::setTextStyle(Text::RENDERSTYLE theStyle) {
         _myTTFRenderer->setRenderStyle(theStyle);
+    }
+
+    bool
+    TextRendererManager::getFontMetrics(const std::string & theFontName,
+            int & theFontHeight,
+            int & theFontAscent, int & theFontDescent,
+            int & theFontLineSkip) const
+    {
+        return _myTTFRenderer->getFontMetrics(theFontName, theFontHeight, theFontAscent, theFontDescent, theFontLineSkip);
     }
 
     bool

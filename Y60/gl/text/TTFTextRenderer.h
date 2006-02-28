@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: TTFTextRenderer.h,v $
-//   $Author: christian $
-//   $Revision: 1.2 $
-//   $Date: 2005/03/24 23:36:00 $
-//
-//  Description: abstract ttf font renderer
-//
-//=============================================================================
 
 #ifndef AC_Y60_TTFTEXTRENDERER
 #define AC_Y60_TTFTEXTRENDERER
@@ -46,17 +37,28 @@ namespace y60 {
                     const std::string & theString,
                     const std::string & theFontName) = 0;
 
-            virtual void renderText(TextPtr & theText) = 0;
             virtual bool haveFont(const std::string theFontName) = 0;
+
+            virtual void renderText(TextPtr & theText) = 0;
             virtual asl::Vector2i renderTextAsImage(TextureManager & theTextureManager,
                     dom::NodePtr theImageNode,
                     const std::string & theText, const std::string & theFontName,
                     unsigned int theTextureWidth = 0, unsigned int theTextureHeight = 0) = 0;
 
+            virtual bool getFontMetrics(const std::string & theFontName,
+                    int & theFontHeight,
+                    int & theFontAscent, int & theFontDescent,
+                    int & theFontLineSkip) const = 0;
+
             virtual bool getGlyphMetrics(const std::string & theFontName,
-                    const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const = 0;
+                    const std::string & theCharacter,
+                    asl::Box2f & theGlyphBox,
+                    double & theAdvance) const = 0;
+
             virtual double getKerning(const std::string & theFontName,
-                    const std::string & theFirstCharacter, const std::string & theSecondCharacter) const = 0;
+                    const std::string & theFirstCharacter,
+                    const std::string & theSecondCharacter) const = 0;
+
             virtual void setMaxFontFittingSize(unsigned theSize) = 0;
     };
     typedef asl::Ptr<TTFTextRenderer> TTFTextRendererPtr;
@@ -64,4 +66,3 @@ namespace y60 {
 } // namespace y60
 
 #endif
-

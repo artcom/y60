@@ -52,7 +52,13 @@ namespace y60 {
                     const std::string & theFont,
                     unsigned int theTargetWidth, unsigned int theTargetHeight);
 
-            bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const;
+            bool getFontMetrics(const std::string & theFontName,
+                    int & theFontHeight,
+                    int & theFontAscent, int & theFontDescent,
+                    int & theFontLineSkip) const;
+            bool getGlyphMetrics(const std::string & theFontName,
+                    const std::string & theCharacter,
+                    asl::Box2f & theGlyphBox, double & theAdvance) const;
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
             void setTracking(float theTracking);
             void setMaxFontFittingSize(unsigned theSize);

@@ -360,11 +360,43 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             typedef void (DERIVED::*MyMethod)(unsigned, unsigned);
             return Method<DERIVED>::call((MyMethod)&DERIVED::setParagraph,cx,obj,argc,argv,rval);
         }
+
+        static JSBool
+        getFontMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Gets metrics of the given font");
+            DOC_PARAM("theFont", "Font name", DOC_TYPE_STRING);
+            DOC_RVAL("{height,ascent,descent,lineskip}", DOC_TYPE_OBJECT);
+            DOC_END;
+            if (argc == 1) {
+                std::string myFontName;
+                if (!convertFrom(cx,argv[0],myFontName)) {
+                    JS_ReportError(cx,"JSRenderWindow::getFontMetrics: parameter 0 must be a string");
+                    return JS_FALSE;
+                }
+
+                int myFontHeight, myFontAscent, myFontDescent, myFontLineSkip;
+                jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getFontMetrics(myFontName, myFontHeight, myFontAscent, myFontDescent, myFontLineSkip);
+                jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+
+                JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
+                *rval = OBJECT_TO_JSVAL(myReturnObject);
+                if (!JS_DefineProperty(cx, myReturnObject, "height", as_jsval(cx, myFontHeight), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+                if (!JS_DefineProperty(cx, myReturnObject, "ascent", as_jsval(cx, myFontAscent), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+                if (!JS_DefineProperty(cx, myReturnObject, "descent", as_jsval(cx, myFontDescent), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+                if (!JS_DefineProperty(cx, myReturnObject, "lineskip", as_jsval(cx, myFontLineSkip), 0,0, JSPROP_ENUMERATE)) return JS_FALSE;
+
+                return JS_TRUE;
+            }
+            JS_ReportError(cx,"JSRenderWindow::getFontMetrics: bad number of arguments, 1 expected");
+            return JS_FALSE;
+        }
+
         static JSBool
         getGlyphMetrics(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Gets metrics of a glyph of the given font");
             DOC_PARAM("theFont", "Font name", DOC_TYPE_STRING);
             DOC_PARAM("theGlyph", "Glyph", DOC_TYPE_STRING);
+            DOC_RVAL("{min,max,advance}", DOC_TYPE_OBJECT);
             DOC_END;
             if (argc == 2) {
                 std::string myFontName;
@@ -405,6 +437,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             DOC_PARAM("theFont", "Font name", DOC_TYPE_STRING);
             DOC_PARAM("theGlyph0", "First glyph", DOC_TYPE_STRING);
             DOC_PARAM("theGlyph1", "Second glyph", DOC_TYPE_STRING);
+            DOC_RVAL("Kerning", DOC_TYPE_FLOAT);
             DOC_END;
             typedef double (DERIVED::*MyMethod)(const std::string &, const std::string &, const std::string &);
             return Method<DERIVED>::call((MyMethod)&DERIVED::getKerning,cx,obj,argc,argv,rval);
@@ -493,6 +526,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             typedef void (DERIVED::*MyMethod)(const std::string &);
             return Method<DERIVED>::call((MyMethod)&DERIVED::stopCharacter,cx,obj,argc,argv,rval);
         }
+
         static JSBool
         activateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Use this function to switch the OpenGL context to an offscreen windows.");
@@ -546,6 +580,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 {"setVTextAlignment",  setVTextAlignment,        1},
                 {"setLineHeight",      setLineHeight,            1},
                 {"setParagraph",       setParagraph,             2},
+                {"getFontMetrics",     getFontMetrics,           1},
                 {"getGlyphMetrics",    getGlyphMetrics,          7},
                 {"getKerning",         getKerning,               3},
                 {"setTracking",        setTracking,              1},
