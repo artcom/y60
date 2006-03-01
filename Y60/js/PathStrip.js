@@ -1,0 +1,306 @@
+//=============================================================================
+// Copyright (C) 2006, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+use("SvgPath.js");
+use("BuildUtils.js");
+
+/**
+ */
+function PathStrip(theSceneViewer, theMaterial) {
+    this.Constructor(this, theSceneViewer, theMaterial);
+}
+
+PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
+
+    const COLOR = new Vector4f(0,0.25,0.5,1);
+
+    self.getMaterial = function() {
+        return _myMaterial;
+    }
+
+    self.getShape = function() {
+        return _myShape;
+    }
+
+    self.getBody = function() {
+        return _myBody;
+    }
+
+    self.getPositions = function() {
+        var myPositions = getDescendantByAttribute(_myShape, "name", "position", true);
+        myPositions = myPositions.childNode('#text')[1];
+        return myPositions;
+    }
+
+    self.getColors = function() {
+        var myColors = getDescendantByAttribute(_myShape, "name", "color", true);
+        myColors = myColors.childNode('#text')[1];
+        return myColors;
+    }
+
+    self.getTexCoords = function() {
+        var myTexCoords = getDescendantByAttribute(_myShape, "name", "uvmap", true);
+        myTexCoords = myTexCoords.childNode('#text')[1];
+        return myTexCoords;
+    }
+
+    self.setAlignment = function(theAlignment) {
+        _myAlignment = theAlignment;
+    }
+
+    self.align = function(thePath, theLength, thePos, theWidth) {
+
+        if (theLength == null) {
+            theLength = thePath.length;
+        }
+        if (theWidth == null) {
+            theWidth = 1.0;
+        }
+ 
+        // shape building
+        var myShapeBuilder = new ShapeBuilder();
+        var myShapeElement = null;
+
+        // current position
+        var myLastPos = null;
+        var mySegment = 0;
+        if (thePos != null) {
+            var myNearest = thePath.nearest(thePos);
+            mySegment = myNearest.segment;
+            myLastPos = myNearest.point;
+        } else {
+            mySegment = 0;
+            myLastPos = thePath.getElement(mySegment).origin;
+        }
+        var myLastElement = null;
+
+        // last
+        var myLastLeftVector = null, myLastRightVector = null;
+        var myLastLeftLine = null, myLastRightLine = null;
+
+        var myLength = theLength;
+        while (myLength > 0.0) {
+
+            // path tex coord
+            var myU = (theLength - myLength) / theLength;
+            //print("accumLen=" + myLength, "targetLen=" + theLength, "u=" + myU);
+            var myLeftUV = new Vector2f(myU, 0.0);
+            var myRightUV = new Vector2f(myU, 1.0);
+
+            // next element
+            var myElement = thePath.getElement(mySegment);
+            //print("segment=" + mySegment, "element=" + myElement);
+            mySegment = (mySegment + 1) % thePath.getNumElements();
+
+            var myForward = difference(myElement.end, myElement.origin);
+            if (magnitude(myForward) < 0.005) {
+                // skip zero-length segment
+                //print("skip zero-length");
+                continue;
+            }
+
+            // left-vector
+            var myNormalVector = normalized(cross(UP_VECTOR, myForward));
+            var myLeftVector = null;
+            var myRightVector = null;
+            switch (_myAlignment) {
+                case BOTTOM_ALIGNMENT:
+                    myLeftVector = product(myNormalVector, theWidth);
+                    myRightVector = new Vector3f(0,0,0);
+                    break;
+                case CENTER_ALIGNMENT:
+                    myLeftVector = product(myNormalVector, theWidth * 0.5);
+                    myRightVector = product(myNormalVector, theWidth * -0.5);
+                    break;
+                case TOP_ALIGNMENT:
+                    myLeftVector = new Vector3f(0,0,0);
+                    myRightVector = product(myNormalVector, theWidth * -1.0);
+                    break;
+            }
+
+            // begin new shape element when start/end positions don't match
+            if (myShapeElement == null || 
+                (myLastElement && !almostEqual(myLastElement.end, myElement.origin))) {
+                if (myShapeElement) {
+                    // finish previous strip
+                    //print("finish previous");
+                    push(myShapeBuilder, myShapeElement, sum(myLastPos, myLastLeftVector), myLeftUV);
+                    push(myShapeBuilder, myShapeElement, sum(myLastPos, myLastRightVector), myRightUV);
+                }
+                if (myLastElement && !almostEqual(myLastElement.end, myElement.origin)) {
+                    myLastPos = myElement.origin;
+                }
+ 
+                // begin new strip
+                //print("begin");
+                myShapeElement = myShapeBuilder.appendElement("quadstrip", _myMaterial.id);
+                push(myShapeBuilder, myShapeElement, sum(myLastPos, myLeftVector), myLeftUV);
+                push(myShapeBuilder, myShapeElement, sum(myLastPos, myRightVector), myRightUV);
+                myLastLeftLine = null;
+                myLastRightLine = null;
+            }
+
+            // lines
+            var myL0 = sum(myElement.origin, myLeftVector);
+            var myLeftLine = new Line(myL0, myForward);
+
+            var myR0 = sum(myElement.origin, myRightVector);
+            var myRightLine = new Line(myR0, myForward);
+
+            if (myLastLeftLine && myLastRightLine) {
+                // intersect lines
+                //print("isect");
+                var myLeftIsect = intersection(myLastLeftLine, myLeftLine);
+                var myRightIsect = intersection(myLastRightLine, myRightLine);
+
+                if (!myLeftIsect) {
+                    myLeftIsect = sum(myElement.end, myLeftVector);
+                }
+                push(myShapeBuilder, myShapeElement, myLeftIsect, myLeftUV);
+
+                if (!myRightIsect) {
+                    myRightIsect = sum(myElement.end, myRightVector);
+                }
+                push(myShapeBuilder, myShapeElement, myRightIsect, myRightUV);
+            }
+
+            // remaining vector of this segment
+            var myRemain = difference(myElement.end, myLastPos);
+            var myRemainLength = magnitude(myRemain);
+
+            // length fits this segment
+            if (myLength < myRemainLength) {
+                //print("fits");
+                myLastPos = sum(myLastPos, product(normalized(myForward), myLength));
+                myLastLeftVector = myLeftVector;
+                myLastRightVector = myRightVector;
+                break;
+            }
+
+            // next segment
+            myLength -= myRemainLength;
+            myLastElement = myElement;
+            myLastPos = myElement.end;
+            myLastLeftVector = myLeftVector;
+            myLastRightVector = myRightVector;
+            myLastLeftLine = myLeftLine;
+            myLastRightLine = myRightLine;
+        }
+
+        // finish
+        if (myLastLeftVector) {
+            //print("last");
+            myU = 1.0;
+            push(myShapeBuilder, myShapeElement, sum(myLastPos, myLastLeftVector), new Vector2f(myU,0));
+            push(myShapeBuilder, myShapeElement, sum(myLastPos, myLastRightVector), new Vector2f(myU,1));
+        }
+
+        // delete body, shape
+        if (_myBody) {
+            theSceneViewer.getWorld().removeChild(_myBody);
+        }
+        if (_myShape) {
+            theSceneViewer.getShapes().removeChild(_myShape);
+        }
+
+        // create shape, body
+        _myShape = myShapeBuilder.buildNode();
+        _myShape.name = "Pathstrip_"+_myMaterial.id;
+        theSceneViewer.getShapes().appendChild(_myShape);
+        _myBody = theSceneViewer.getScene().createBody(_myShape);
+        theSceneViewer.getScene().update(Scene.SHAPES | Scene.MATERIALS);
+    }
+
+    /**********************************************************************
+     * 
+     * Private
+     *
+     **********************************************************************/
+
+    var _myMaterial = null;
+    var _myShape = null;
+    var _myBody = null;
+    var _myAlignment = CENTER_ALIGNMENT;
+
+    function push(theShapeBuilder, theElement, theVertex, theTexCoord) {
+        //print("push", theVertex);
+        theShapeBuilder.appendVertex(theElement, theVertex);
+        theShapeBuilder.appendColor(theElement, COLOR);
+        if (theTexCoord) {
+            //print("texcoord=" + theTexCoord);
+            theShapeBuilder.appendTexCoord(theElement, theTexCoord);
+        }
+    }
+
+    function setup() {
+        if (theMaterial == undefined) {
+            // material w. vertex color
+            _myMaterial = Modelling.createUnlitTexturedMaterial(theSceneViewer.getScene());
+            _myMaterial.transparent = 1;
+            addMaterialRequirement(_myMaterial, "vertexparams", "[10[color]]");
+        } else {
+            _myMaterial = theMaterial;
+        }
+    }
+
+    setup();
+}
+
+/*
+ * test
+ */
+function test_PathStrip() {
+
+    use("SceneViewer.js");
+    var mySceneViewer = new SceneViewer(null);
+    mySceneViewer.setup(800, 600, false, "SvgPath");
+
+    // path
+    var myPath;
+    var myWidth = 1.0;
+    if (0) {
+        myPath = new SvgPath();
+        myPath.setCurveSegmentLength(1);
+        myPath.move(new Vector3f(0,0,0));
+        myPath.vline(5, true);
+        myPath.vline(5, true);
+        myPath.line(new Vector3f(20,10,0), true);
+        myPath.line(new Vector3f(-10,10,0), true);
+        myPath.move(new Vector3f(-10,0,0));
+        myPath.vline(15, true);
+        //myPath.cbezier(new Vector3f(20,10,0), new Vector3f(0,-10,0), new Vector3f(0,0,0));
+        //myPath.close();
+
+        window.camera.position = new Vector3f(0,0,30);
+    } else {
+        var mySvgFile = readFileAsString("../CONFIG/curves.svg"); //svg-logo-001.svg");
+        var mySvgNode = new Node(mySvgFile);
+        var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
+        myPath = new SvgPath(myPaths[6]);
+        myWidth = 20.0;
+
+        window.camera.position = new Vector3f(400, 1800, 1300);
+    }
+
+    var myStrip = new PathStrip(mySceneViewer);
+    myStrip.setAlignment(TOP_ALIGNMENT);
+    myStrip.align(myPath, 50.0, null, myWidth);
+
+    mySceneViewer.onFrame = function(theTime) {
+        myStrip.align(myPath, theTime * 30.0, new Vector3f(500,2300,0), myWidth);
+    }
+
+    mySceneViewer.onPostRender = function() {
+        myPath.draw();
+    }
+
+    mySceneViewer.go();
+}
+//test_PathStrip();
