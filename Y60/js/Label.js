@@ -152,8 +152,10 @@ function LabelBase(Public, Protected, theScene,
             Public.width  = theSize[0];
             Public.height = theSize[1];
         }
-        Public.position.x = thePosition[0];
-        Public.position.y = thePosition[1];
+        if (thePosition) {
+            Public.position.x = thePosition[0];
+            Public.position.y = thePosition[1];
+        }
     }
 
     var _myChildLabel = null;
