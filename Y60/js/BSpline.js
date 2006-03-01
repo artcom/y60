@@ -45,11 +45,9 @@ function BSpline(theStart, theStartHandle, theEnd, theEndHandle) {
         // Clear last result
         _myResult = [];
 
-        for (var i = 0; i < theResolution; ++i) {
+        for (var i = 0; i < theResolution + 1; ++i) {
             var myValue = i / theResolution;
             _myResult[i] = this.evaluate(myValue, theEaseIn, theEaseOut);
-            //print("t: " + t);
-
         }
         return _myResult;
     }
@@ -89,6 +87,17 @@ function BSpline(theStart, theStartHandle, theEnd, theEndHandle) {
             _myArcLength = getSegmentLength(0, 1, myP1, myP2, distance(myP1, myP2));
         }
         return _myArcLength;
+    }
+
+    /**
+     *   Recalculates the the spline coeficients
+     *   @param {Vector3f} theStart       Startpunkt
+     *   @param {Vector3f} theStartHandle Anfasser-Startpunkt
+     *   @param {Vector3f} theEnd         Endpunkt
+     *   @param {Vector3f} theEndHandle   Anfasser-Endpunkt
+     **/
+    this.setControlPoints = function(theStart, theStartHandle, theEnd, theEndHandle) {
+        setup(theStart, theStartHandle, theEnd, theEndHandle);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

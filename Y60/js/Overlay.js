@@ -108,20 +108,20 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
         myMatrix.rotateZ(Public.rotation);
         myMatrix.translate(new Vector3f(_myNode.position.x,_myNode.position.y,0));
 
-        var myParentMatrix = new Matrix4f();            
+        var myParentMatrix = new Matrix4f();
         while (myParent.nodeName == "overlay") {
-            myParentMatrix.makeScaling(new Vector3f(myParent.scale.x, myParent.scale.y,1.0));            
-            
+            myParentMatrix.makeScaling(new Vector3f(myParent.scale.x, myParent.scale.y,1.0));
+
             myParentMatrix.rotateZ(myParent.rotation);
-            myParentMatrix.translate(new Vector3f(myParent.position.x,myParent.position.y,0));            
+            myParentMatrix.translate(new Vector3f(myParent.position.x,myParent.position.y,0));
             myMatrix.postMultiply(myParentMatrix);
-            
+
             myParent = myParent.parentNode;
-        }     
+        }
 
         myMatrix.invert();
         var myNewPoint = product(new Vector3f(theXPos, theYPos,0), myMatrix);
-           
+
         if (theSquareSize != undefined) {
             var myOverlayBox = new Box3f([0, 0, 0],
                 [_myNode.width - 1, _myNode.height - 1, 1]);
