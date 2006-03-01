@@ -1,28 +1,29 @@
 <WatchdogConfig logfile="watch.log" watchFrequency="15">
     <!--
-    NOTE: The format for the projector control has changed considerably during O2 development in Nov.2004.
+    NOTE: The format for the projector control has changed considerably during O2 development
+          in Nov.2004.
           The only customizable strings for the <UdpControl> are the ones for <SystemHalt> and
-          <RestartApplication>. The projector commands are handled internally by the Projector.cpp base class
-          and are not customizable. The recognized commands are:
+          <RestartApplication>. The projector commands are handled internally by the Projector.cpp
+          base class and are not customizable. The recognized commands are:
 
                                             Panasonic     NEC
           projector_on                          X          X
           projector_off                         X          X
           projector_shutter_open                X          X
           projector_shutter_close               X          X
-          projector_power_low (lamp output)     X          O
-          projector_power_high                  X          O
+          projector_power_low (lamp output)     X          -
+          projector_power_high                  X          -
           projector_input_select=<input>        X          X
 
           The UDP packets containing the commands can be send via cygwin as follows:
             echo -n <command> | nc -w 1 -u <host> 2346
-          
-          The commands are passed to all connected projectors and are observed by those projectors that
-          support the given command.          
+
+          The commands are passed to all connected projectors and are observed by those projectors
+          that support the given command.          
           
           ProjectorControl:
             <Projector type="nec(default)|(panasonic|pt-d5500)|pdf1" port="0" input="<input>">
-            
+ 
           Inputs:
             RGB_1
             RGB_2
