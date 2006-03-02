@@ -10,6 +10,7 @@
 
 use("ImageManager.js");
 use("Y60JSSL.js");
+use("Playlist.js");
 
 var ourOverlayCounter = 0;
 
