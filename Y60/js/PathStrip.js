@@ -19,8 +19,6 @@ function PathStrip(theSceneViewer, theMaterial) {
 
 PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
 
-    const COLOR = new Vector4f(0,0.25,0.5,1);
-
     self.getMaterial = function() {
         return _myMaterial;
     }
@@ -227,6 +225,8 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
      **********************************************************************/
 
     var _myMaterial = null;
+    var _myColor = null;
+
     var _myShape = null;
     var _myBody = null;
     var _myAlignment = CENTER_ALIGNMENT;
@@ -234,7 +234,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
     function push(theShapeBuilder, theElement, theVertex, theTexCoord) {
         //print("push", theVertex);
         theShapeBuilder.appendVertex(theElement, theVertex);
-        theShapeBuilder.appendColor(theElement, COLOR);
+        theShapeBuilder.appendColor(theElement, _myColor);
         if (theTexCoord) {
             //print("texcoord=" + theTexCoord);
             theShapeBuilder.appendTexCoord(theElement, theTexCoord);
@@ -250,6 +250,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         } else {
             _myMaterial = theMaterial;
         }
+        _myColor = _myMaterial.diffuse;
     }
 
     setup();
