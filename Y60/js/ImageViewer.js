@@ -46,10 +46,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myCurrentMediaType = -1;
     var _mySoundId	        = -1;
     var _myMasterVolume     = 1.0;
-    var _myWMVPlugged       = false;
     var _myWMAPlugged       = false;
-    var _myMPEGPlugged      = false;
-    var _myQTPlugged        = false;
     var _myVFWCapturePlugged= false;
     var _myDShowCapturePlugged = false;
     var _myMissedFrameCounter = 0;
@@ -297,66 +294,30 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         var myFilename = urlDecode(myEntry.href);
         _myCurrentMediaType = myEntry.mediaType;
         print("Now showing " + myFilename);
-
-        if (myFilename.search(/^video:\/\//i) != -1) {
-            plug("y60VFWCapture");
-            print("VideoForWindows dshow");
-        } else if (myFilename.search(/^dshow:\/\//i) != -1) {
-            plug("y60DShowCapture");
-            print("plugged dshow");
+        /// plug audio and capture plugs, video is handled inside y60 engine via decoderhint
+        var myPlaylist = new Playlist();
+        switch (myPlaylist.getMediaHintFromURL(myFilename)) {
+            case AUDIO_MEDIA:
+                print("Media: audio");
+                if (!_myWMAPlugged) {
+                    plug("y60WMADecoder");
+                    _myWMAPlugged = true;                
+                }
+                break;            
+            case CAPTURE_MEDIA:
+                print("Media: Capture Video");
+                if (myFilename.search(/^video:\/\//i) != -1 && !_myVFWCapturePlugged) {    
+                    plug("y60VFWCapture");
+                    print("VideoForWindows dshow");
+                    _myVFWCapturePlugged = true;
+                } else if (myFilename.search(/^dshow:\/\//i) != -1 && !_myDShowCapturePlugged) {
+                    _myDShowCapturePlugged = true;
+                    plug("y60DShowCapture");
+                    print("plugged dshow");
+                }                
+                break;            
         }
 
-        if (!_myMPEGPlugged && (myFilename.search(/\.mpg$/i)  != -1
-                                || myFilename.search(/\.m2v$/i)  != -1
-                                || myFilename.search(/\.avi$/i)  != -1
-                                || myFilename.search(/\.mpeg$/i) != -1
-                                /* || myFilename.search(/\.ra$/i)   != -1 */
-                                )) {
-            plug("y60FFMpegDecoder2");
-            print("plugged FFMpegDecoder2");
-            _myMPEGPlugged = true;
-        }
-        if ( myFilename.search(/\.mov$/i) != -1) {
-            if (OS == "Linux" && !_myMPEGPlugged) {
-                plug("y60FFMpegDecoder");
-                _myMPEGPlugged = true;
-                print("y60FFMpegDecoder")
-            } else if (OS == "Win32" && !_myQTPlugged){
-                plug("y60QuicktimeDecoder");
-                _myQTPlugged = true;
-                print("y60QuicktimeDecoder")
-            }
-        }
-        if (!_myWMVPlugged &&
-            (myFilename.search(/\.wmv$/i) != -1 ||
-             myFilename.search(/\.avi$/i) != -1)) {
-            if (OS == "Win32") {
-                plug("y60WMVDecoder");
-                _myWMVPlugged = true;
-            } else {
-                plug("y60FFMpegDecoder2");
-                _myMPEGPlugged = true;
-            }
-        }
-        if (!_myWMAPlugged &&
-            (myFilename.search(/\.wma$/i) != -1 ||
-             myFilename.search(/\.asf$/i) != -1 ||
-             myFilename.search(/\.mp3$/i) != -1 ||
-             myFilename.search(/^mms:\/\//i) != -1 ||
-             myFilename.search(/^http:\/\//i) != -1))
-             // default wma fallback: i.e. http://server/dir/
-        {
-            plug("y60WMADecoder");
-            _myWMAPlugged = true;
-        }
-        if (!_myVFWCapturePlugged && myFilename.search(/^video:\/\//i) != -1) {
-            plug("y60VFWCapture");
-            _myVFWCapturePlugged = true;
-        }
-        if (!_myDShowCapturePlugged && myFilename.search(/^dshow:\/\//i) != -1) {
-            plug("y60DShowCapture");
-            _myDShowCapturePlugged = true;
-        }
         switch (myEntry.mediaType) {
         case IMAGE_MEDIA:
             showImage(myFilename);
@@ -365,7 +326,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             }
             break;
         case VIDEO_MEDIA:
-            showMovie(myFilename);
+            var mySeekableFlag = false;        
+            showMovie(myFilename, myPlaylist.getVideoDecoderHintFromURL(myFilename, mySeekableFlag));
             if (_myImageOverlay) {
                _myImageOverlay.visible = false;
             }
@@ -584,7 +546,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         applyViewport();
     }
 
-    function showMovie(theFilename) {
+    function showMovie(theFilename, theDecoderHint) {
         if (!_myMovieNode) {
             _myMovieNode = Node.createElement("movie");
             self.getImages().appendChild(_myMovieNode);
@@ -593,7 +555,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
             _myMovieNode.audio = 1;
-            //_myMovieNode.decoderhint = "FFMpegDecoder1";
+            _myMovieNode.decoderhint = theDecoderHint;//"y60FFMpegDecoder2";
             _myMovieOverlay = new MovieOverlay(self.getOverlayManager(), _myMovieNode);
         }
 

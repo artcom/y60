@@ -207,7 +207,7 @@ namespace y60 {
 
         asl::Time loadEnd;
         AC_INFO << "  Total load time: " << (loadEnd - loadStart) << " sec" << endl;
-        setup();
+        //setup();
     }
 
     void

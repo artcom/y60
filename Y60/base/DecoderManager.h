@@ -41,12 +41,13 @@ namespace y60 {
 
       </ol>
       */
+    DEFINE_EXCEPTION(DecoderManagerException, asl::Exception);
+
 class DecoderManager : public asl::Singleton<DecoderManager> {
     public:
         DecoderManager() {};
         virtual ~DecoderManager() {};
         void addDecoder(IDecoderPtr theDecoder);
-
         /**
         * Trys to find a decoder, that accepts the url/stream.
         * @param theUrl can be used to check for known file extensions.

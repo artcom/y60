@@ -34,10 +34,10 @@ use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
 
-if (operatingSystem() == "Win32") {
-    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
-}
-plug("y60FFMpegDecoder1");
+//if (operatingSystem() == "Win32") {
+//    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
+//}
+//plug("y60FFMpegDecoder1");
 
 // Global window object (similar to html window)
 if (window == undefined) var window   = null;
@@ -406,12 +406,13 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         window.renderWhileSleep = false;
 
         self.setupWindow(window, _mySetDefaultRenderingCap);
-
         var myScene;
         if (theScene) {
             myScene = theScene;
         } else {
             myScene = new Scene(self.getModelName());
+            self.preprocessScene(myScene);
+            myScene.setup();
         }
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         self.setScene(myScene, myCanvas);

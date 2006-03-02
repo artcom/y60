@@ -460,6 +460,14 @@ clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+setup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Setup the scene.");
+    DOC_END;
+    ensureParamCount(argc, 0, 0);
+    return Method<NATIVE>::call(&NATIVE::setup,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 createStubs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Create a minimal empty world.");
     DOC_END;
@@ -524,6 +532,7 @@ JSScene::Functions() {
         {"clear",               clear,               0},
         {"bodyVolume",          bodyVolume,          1},
         {"save",                save,                2},
+        {"setup",               setup,                0},
         {"createStubs",         createStubs,         0},
         {"createLambertMaterial", CreateLambertMaterial, 2},
         {"createColorMaterial",   CreateColorMaterial,   1},
@@ -764,6 +773,7 @@ jsval as_jsval(JSContext *cx, asl::Ptr<y60::Scene> theScene) {
     }
     return JSVAL_NULL;
 }
+
 
 JSBool
 JSScene::save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

@@ -16,6 +16,7 @@
 #include <y60/DecoderManager.h>
 #include <asl/Logger.h>
 #include <asl/PackageManager.h>
+#include <asl/PlugInManager.h>
 
 #include <string.h>
 
@@ -260,7 +261,6 @@ namespace y60 {
     }
 
     MovieDecoderBasePtr Movie::getDecoder(const std::string theFilename) {
-
         MovieDecoderBasePtr myDecoder = DecoderManager::get().findDecoder<MovieDecoderBase>(theFilename);
 
         const std::string & myDecoderHint = get<DecoderHintTag>();
@@ -268,11 +268,24 @@ namespace y60 {
             std::vector<MovieDecoderBasePtr> myDecoders;
             myDecoders = DecoderManager::get().findAllDecoders<MovieDecoderBase>(theFilename);
             std::vector<MovieDecoderBasePtr>::iterator it;
+            bool foundDecoderFlag = false;
             for(it = myDecoders.begin(); it != myDecoders.end(); ++it) {
                 AC_DEBUG << "possible decoder " << (*it)->getName();
                 if ((*it)->getName() == myDecoderHint) {
                     myDecoder = (*it);
+                    foundDecoderFlag = true;
                     break;
+                }
+            }
+            if (!foundDecoderFlag) {
+                // we did not find a decoder for the decoderhint, plug it and try to use it
+                asl::PlugInBasePtr myPlugIn = asl::PlugInManager::get().getPlugIn(myDecoderHint);
+                if (IDecoderPtr myDecoderPlug = dynamic_cast_Ptr<IDecoder>(myPlugIn)) {
+                    AC_INFO << "Plug: " << myDecoderHint << ": as Decoder" << endl;
+                    DecoderManager::get().addDecoder(myDecoderPlug);
+                    myDecoder = dynamic_cast_Ptr<MovieDecoderBase>(myDecoderPlug);
+                } else {
+                    throw MovieException(std::string("Unable to plug decoder: ") + myDecoderHint, PLUS_FILE_LINE);
                 }
             }
         }

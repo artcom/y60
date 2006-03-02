@@ -53,6 +53,7 @@ const MimeTypes = {
     MP3: 19,
     TXT: 20
 }
+const OS = operatingSystem();
 
 // Constructor
 function Playlist() {
@@ -138,13 +139,87 @@ Playlist.prototype.Constructor = function(self) {
         _myPlaylistIndex = theIndex;
         return _myPlaylist[theIndex];
     }
+    self.getMediaHintFromURL = function(theUrl) {
+        //print("####:"+ theUrl);
+        if (theUrl.search(/^dshow:\/\//i) != -1 ||
+            theUrl.search(/^video:\/\//i) != -1) {
+            return CAPTURE_MEDIA;
+        } else if (theUrl.search(/\.mp3$/i)  != -1 ||
+                   theUrl.search(/\.wma$/i)  != -1 ||
+                   theUrl.search(/\.rm$/i)   != -1 ||
+                   theUrl.search(/\.ra$/i)   != -1 ||
+                   theUrl.search(/\.wav$/i)  != -1 ||
+                   theUrl.search(/\.asf$/i)  != -1/*||
+                   theUrl.search(/^mms:\/\//i) != -1*/ )
+                   //XXX default fallback for mms://server/dir/
+        {
+            return AUDIO_MEDIA;
+        } else if (theUrl.search(/\.m60$/i)  != -1 ||
+                   theUrl.search(/\.mp4$/i)  != -1 ||
+                   theUrl.search(/\.mpg$/i)  != -1 ||
+                   theUrl.search(/\.mpeg$/i) != -1 ||
+                   theUrl.search(/\.divx$/i) != -1 ||
+                   theUrl.search(/\.avi$/i)  != -1 ||
+                   theUrl.search(/\.wmv$/i)  != -1 ||
+                   theUrl.search(/\.mov$/i)  != -1 ||
+                   theUrl.search(/\.m2v$/i)  != -1)
+        {
+            return VIDEO_MEDIA;
+        } else if (theUrl.search(/\.x60$/i) != -1 ||
+                   theUrl.search(/\.b60$/i) != -1 ||
+                   theUrl.search(/\.stl$/i) != -1 ||
+                   theUrl.search(/\.sta$/i) != -1)
+        {
+            return MODEL_MEDIA;
+        } else {
+            // one more chance for http audio
+            if (theUrl.search(/:\/\//) != -1) {
+                return AUDIO_MEDIA;
+            } else {
+                return IMAGE_MEDIA;
+            }
+        }
+    }
+    self.getVideoDecoderHintFromURL = function(theUrl, theSeekableFlag) {
+        if (theSeekableFlag == undefined) {
+            theSeekableFlag = false;
+        }
+        var myDecoderHint = "";
+        if (theUrl.search(/\.mpg$/i)  != -1 ||
+            theUrl.search(/\.mpeg$/i) != -1 ||
+            theUrl.search(/\.mp4$/i) != -1 ||
+            theUrl.search(/\.divx$/i) != -1 ||
+            theUrl.search(/\.m2v$/i) != -1 ) {
+            if (theSeekableFlag) {                
+                myDecoderHint = "y60FFMpegDecoder1";
+            } else {
+                myDecoderHint = "y60FFMpegDecoder2";
+            }
+        }
+        if (theUrl.search(/\.mov$/i)  != -1) {
+            if (OS == "Linux" || theSeekableFlag) {
+                myDecoderHint = "y60FFMpegDecoder";
+            } else {
+                myDecoderHint = "y60QuicktimeDecoder";
+            }
+        }
+        if (theUrl.search(/\.wmv$/i)  != -1 ||
+            theUrl.search(/\.avi$/i)  != -1) {
+            if (OS == "Linux") {
+                myDecoderHint = "y60FFMpegDecoder";
+            } else {
+                myDecoderHint = "y60WMVDecoder";
+            }
+        }
+        return myDecoderHint;
+    }
 
     function pushEntry(theUrl, theTitle, theMediaHint) {
         if (theTitle == undefined) {
             theTitle = theUrl;
         }
         if (theMediaHint == undefined) {
-            theMediaHint = getMediaHintFromURL(theUrl);
+            theMediaHint = self.getMediaHintFromURL(theUrl);
         }
         //print("pushEntry:" + theUrl);
         var myEntryNodeString = '<Entry href="' + urlEncode(theUrl) + '" title="' + urlEncode(theTitle) + '" mediaType="' + theMediaHint + '"/>';
@@ -397,45 +472,4 @@ Playlist.prototype.Constructor = function(self) {
         //return;
     }
 
-    function getMediaHintFromURL(theUrl) {
-        //print("####:"+ theUrl);
-        if (theUrl.search(/^dshow:\/\//i) != -1) {
-            return CAPTURE_MEDIA;
-        } else if (theUrl.search(/\.mp3$/i)  != -1 ||
-                   theUrl.search(/\.wma$/i)  != -1 ||
-                   theUrl.search(/\.rm$/i)   != -1 ||
-                   theUrl.search(/\.ra$/i)   != -1 ||
-                   theUrl.search(/\.wav$/i)  != -1 ||
-                   theUrl.search(/\.asf$/i)  != -1/*||
-                   theUrl.search(/^mms:\/\//i) != -1*/ )
-                   //XXX default fallback for mms://server/dir/
-        {
-            return AUDIO_MEDIA;
-        } else if (theUrl.search(/\.m60$/i)  != -1 ||
-                   theUrl.search(/^video:\/\//i) != -1 ||
-                   theUrl.search(/\.mp4$/i)  != -1 ||
-                   theUrl.search(/\.mpg$/i)  != -1 ||
-                   theUrl.search(/\.mpeg$/i) != -1 ||
-                   theUrl.search(/\.divx$/i) != -1 ||
-                   theUrl.search(/\.avi$/i)  != -1 ||
-                   theUrl.search(/\.wmv$/i)  != -1 ||
-                   theUrl.search(/\.mov$/i)  != -1 ||
-                   theUrl.search(/\.m2v$/i)  != -1)
-        {
-            return VIDEO_MEDIA;
-        } else if (theUrl.search(/\.x60$/i) != -1 ||
-                   theUrl.search(/\.b60$/i) != -1 ||
-                   theUrl.search(/\.stl$/i) != -1 ||
-                   theUrl.search(/\.sta$/i) != -1)
-        {
-            return MODEL_MEDIA;
-        } else {
-            // one more chance for http audio
-            if (theUrl.search(/:\/\//) != -1) {
-                return AUDIO_MEDIA;
-            } else {
-                return IMAGE_MEDIA;
-            }
-        }
-    }
 }

@@ -317,7 +317,7 @@ namespace y60 {
                                                      myData, myDataLen);
                     if (myLen < 0) {
                         AC_ERROR << "av_decode_video error";
-                        break;
+                        break; 
                     }
                     myData += myLen;
                     myDataLen -= myLen;

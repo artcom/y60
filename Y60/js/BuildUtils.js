@@ -9,6 +9,7 @@
 //=============================================================================
 
 use("Y60JSSL.js");
+use("Playlist.js");
 
 // build a <transform> node
 function buildGroupNode(theName) {
@@ -185,8 +186,10 @@ function buildImageNode(theName, theFilename, theMipMapFlag)
 // build a <movie> node
 function buildMovieNode(theName, theFilename)
 {
-    var myMovie = '<movie name="' + theName + '" id="i' + theName + '" src="' + theFilename + '"/>';
-
+    var myPlaylist = new Playlist();
+    var myDecoderHint = myPlaylist.getVideoDecoderHintFromURL(theFilename, false); 
+    var myMovie = '<movie name="' + theName + '" id="i' + theName + '" src="' + theFilename + '" decoderhint="' + myDecoderHint + '"/>';
+           
     var myMovieDoc = new Node(myMovie);
     return myMovieDoc.childNodes[0];
 }

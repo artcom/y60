@@ -25,6 +25,7 @@ use("Exception.js");
 use("LightManager.js");
 use("picking_functions.js");
 use("HeartbeatThrober.js");
+use("Playlist.js");
 
 
 function BaseViewer(theArguments) {
@@ -531,8 +532,25 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         return myArgumentMap;
     }
+    
+    // is called before first scene update
+    self.preprocessScene = function(theScene) {
+        // find all movienodes with no decoderhint and try to set it
+        var myMovies = getDescendantsByTagName(theScene.images, "movie", false);
+        if (myMovies) {
+            for (var myMovieIndex = 0; myMovieIndex < myMovies.length; myMovieIndex++) {
+                var myMovie = myMovies[myMovieIndex];
+                var myPlaylist = new Playlist();
+                if (myMovie.decoderhint == "") {
+                    myMovie.decoderhint = myPlaylist.getVideoDecoderHintFromURL(myMovie.src, false);        
+                    print("Set decoderhint for movie with source : " + myMovie.src + " to: " + myMovie.decoderhint);
+                }
+            }
+        }
+        
+    }
 
-   self.prepareScene = function (theScene, theCanvas) {
+    self.prepareScene = function (theScene, theCanvas) {
 
         if (theScene) {
             // Cache main scene nodes for fast access
