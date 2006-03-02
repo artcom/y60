@@ -145,10 +145,20 @@ namespace y60 {
     void
     FFMpegDecoder::load(const std::string & theFilename) {        
         DB(cerr << "FFMpegDecoder::load " << theFilename << endl;)
-        DecoderContextPtr myContext = DecoderContextPtr(new DecoderContext(theFilename));
+        DecoderContextPtr myContext = DecoderContextPtr(new DecoderContext(theFilename,MovieDecoderBasePtr(this)));
         setupMovie(myContext);
         _myFrameConveyor.setContext(myContext);
         _myFrameConveyor.setupAudio(getMovie()->get<AudioTag>());
+    }
+
+    void
+    FFMpegDecoder::setDestPixelFormat(PixelEncoding thePixelFormat) {
+        getMovie()->set<ImagePixelFormatTag>(asl::getStringFromEnum(thePixelFormat, PixelEncodingString));
+    }
+
+    PixelEncoding
+    FFMpegDecoder::getDestPixelFormat() {
+        return y60::PixelEncoding(getMovie()->getPixelEncoding());
     }
 
     void
@@ -156,7 +166,7 @@ namespace y60 {
         AVStream * myVideoStream = theContext->getVideoStream();
         if (myVideoStream) {
             Movie * myMovie = getMovie();
-            myMovie->setPixelEncoding(getPixelEncoding(myVideoStream));            
+            //myMovie->setPixelEncoding(getPixelEncoding(myVideoStream));            
             myMovie->set<ImageWidthTag>(myVideoStream->codec.width);
             myMovie->set<ImageHeightTag>(myVideoStream->codec.height);
 

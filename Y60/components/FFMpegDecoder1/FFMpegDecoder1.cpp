@@ -154,7 +154,6 @@ namespace y60 {
         _myFrame = avcodec_alloc_frame();
 
         Movie * myMovie = getMovie();
-        myMovie->setPixelEncoding(y60::BGR);
         myMovie->set<ImageWidthTag>(_myVStream->codec.width);
         myMovie->set<ImageHeightTag>(_myVStream->codec.height);
 
@@ -371,13 +370,29 @@ namespace y60 {
         myDestPict.linesize[1] = myLineSizeBytes;
         myDestPict.linesize[2] = myLineSizeBytes;
 
-        // convert to RGB
+        // pixelformat stuff
         int myDestFmt;
-        if (getPixelFormat() == y60::RGB) {
-            myDestFmt = PIX_FMT_RGB24;
-        } else {
+        switch (getMovie()->getPixelEncoding()) {
+        case y60::RGBA:
+        case y60::BGRA:
+            AC_TRACE << "Using RGBA pixels";
+            getMovie()->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::RGBA, PixelEncodingString));
+            myDestFmt = PIX_FMT_RGBA32;
+            break;
+        case y60::ALPHA:
+        case y60::GRAY:
+            AC_TRACE << "Using GRAY pixels";
+            myDestFmt = PIX_FMT_GRAY8;
+            break;
+        case y60::RGB:
+        case y60::BGR:
+        default:
+            AC_TRACE << "Using BGR pixels";
             myDestFmt = PIX_FMT_BGR24;
+            getMovie()->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGR, PixelEncodingString));
+            break;
         }
+
         img_convert(&myDestPict, myDestFmt,
                     (AVPicture*)theFrame, _myVStream->codec.pix_fmt,
                     _myVStream->codec.width, _myVStream->codec.height);

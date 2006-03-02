@@ -45,7 +45,7 @@ using namespace asl;
 
 namespace y60 {
 
-    DecoderContext::DecoderContext(const std::string & theFilename) : 
+    DecoderContext::DecoderContext(const std::string & theFilename, MovieDecoderBasePtr theDecoder) : 
         _myVideoStream(0),
         _myAudioStream(0),
         _myVideoStreamIndex(-1),
@@ -54,7 +54,8 @@ namespace y60 {
         _myFilename(theFilename),
         _myCurAudioPacket(0),
         _myCurPosInAudioPacket(0),
-        _myAudioEnabled(true)
+        _myAudioEnabled(true),
+        _myDecoder(theDecoder)
     {
         AC_DEBUG << "DecoderContext::DecoderContext";
         // register all formats and codecs
@@ -134,7 +135,17 @@ namespace y60 {
         _myFormatContext = 0;
     }
 
-    PixelFormat 
+    void
+    DecoderContext::setDestPixelFormat(PixelEncoding thePixelFormat) {
+        dynamic_cast_Ptr<FFMpegDecoder>(_myDecoder)->setDestPixelFormat(thePixelFormat);
+    }
+
+    PixelEncoding
+    DecoderContext::getDestPixelFormat() {
+        return dynamic_cast_Ptr<FFMpegDecoder>(_myDecoder)->getDestPixelFormat();
+    }
+
+    PixelFormat
     DecoderContext::getPixelFormat() {
         if (_myVideoStream) {
             return _myVideoStream->codec.pix_fmt;

@@ -67,6 +67,10 @@ namespace y60 {
                     dom::ResizeableRasterPtr theTargetRaster);
             
             const char * getName() const { return "y60FFMpegDecoder"; }
+
+            void setDestPixelFormat(PixelEncoding thePixelFormat);
+            PixelEncoding getDestPixelFormat();
+
         private:
             void setupMovie(asl::Ptr<DecoderContext> theContext);
 

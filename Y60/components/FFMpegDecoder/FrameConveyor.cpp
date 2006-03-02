@@ -343,7 +343,7 @@ namespace y60 {
 
         theEndOfFileFlag = _myContext->decodeVideo(_myVideoFrame);
         if ( ! theEndOfFileFlag) {
-            unsigned myBPP = getBytesRequired(1, getPixelEncoding(_myContext->getVideoStream()));
+            unsigned myBPP = getBytesRequired(1, _myContext->getDestPixelFormat());
             VideoFramePtr myNewFrame = VideoFramePtr(new VideoFrame(_myContext->getWidth(),
                     _myContext->getHeight(), myBPP));
 
@@ -363,7 +363,7 @@ namespace y60 {
         }
 
         unsigned int myLineSizeBytes = getBytesRequired(_myContext->getWidth(), 
-                getPixelEncoding(_myContext->getVideoStream()));
+                _myContext->getDestPixelFormat());
         AVPicture myDestPict;
         myDestPict.data[0] = theTargetBuffer;
         myDestPict.data[1] = theTargetBuffer + 1;
@@ -373,12 +373,27 @@ namespace y60 {
         myDestPict.linesize[1] = myLineSizeBytes;
         myDestPict.linesize[2] = myLineSizeBytes;
 
-        // convert to RGB
+        // pixelformat stuff
         int myDestFmt;
-        if (_myContext->getPixelFormat() == PIX_FMT_BGR24) {
+        switch (_myContext->getDestPixelFormat()) {
+        case y60::RGBA:
+        case y60::BGRA:
+            AC_TRACE << "Using RGBA pixels";
+            _myContext->setDestPixelFormat(y60::RGBA);
+            myDestFmt = PIX_FMT_RGBA32;
+            break;
+        case y60::ALPHA:
+        case y60::GRAY:
+            AC_TRACE << "Using GRAY pixels";
+            myDestFmt = PIX_FMT_GRAY8;
+            break;
+        case y60::RGB:
+        case y60::BGR:
+        default:
+            AC_TRACE << "Using BGR pixels";
             myDestFmt = PIX_FMT_BGR24;
-        } else {
-            myDestFmt = PIX_FMT_RGB24;
+            _myContext->setDestPixelFormat(y60::BGR);
+            break;
         }
 
         img_convert(&myDestPict, myDestFmt, (AVPicture*)theFrame, _myContext->getPixelFormat(),

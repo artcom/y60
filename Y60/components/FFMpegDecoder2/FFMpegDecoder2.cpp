@@ -621,6 +621,7 @@ namespace y60 {
             myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::RGBA, PixelEncodingString));
             _myDestinationPixelFormat = PIX_FMT_RGBA32;
             break;
+        case y60::ALPHA:
         case y60::GRAY:
             AC_TRACE << "Using GRAY pixels";
             _myDestinationPixelFormat = PIX_FMT_GRAY8;

@@ -21,6 +21,7 @@
 #define _ac_y60_DecoderContext_h_
 
 #include "FFMpegPixelEncoding.h"
+#include <y60/MovieDecoderBase.h>
 
 #include <asl/Ptr.h>
 #include <string>
@@ -32,7 +33,7 @@ namespace y60 {
     
     class DecoderContext {
         public:
-            DecoderContext(const std::string & theFilename);
+            DecoderContext(const std::string & theFilename, MovieDecoderBasePtr theDecoder);
             ~DecoderContext();
 
             bool decodeVideo(AVFrame * theVideoFrame);
@@ -60,7 +61,9 @@ namespace y60 {
 
             unsigned getWidth(); 
             unsigned getHeight();
-
+            
+            void setDestPixelFormat(PixelEncoding thePixelFormat);
+            PixelEncoding getDestPixelFormat();
             PixelFormat getPixelFormat();             
             double getFrameRate();
 
@@ -78,7 +81,7 @@ namespace y60 {
             int               _myAudioStreamIndex;
             std::string       _myFilename;
             double            _myEndOfFileTimestamp;
-
+            MovieDecoderBasePtr _myDecoder;
             // Demuxing and packet-level buffering support.
             AVPacket* getPacket(bool theGetVideo);
             void clearPacketCache();

@@ -126,17 +126,37 @@ namespace y60 {
         Rect movieBounds;
         GetMovieBox(_myMovie, &movieBounds);
 
-        PixelEncoding myPixelEncoding = getPixelFormat();
-        QTNewGWorld(&_myOffScreenWorld, k32RGBAPixelFormat, &movieBounds, 0, 0, 0);
+        Movie * myMovie = getMovie();
+        unsigned myQTPixelFormat;
+        switch (myMovie->getPixelEncoding()) {
+        case y60::RGBA:
+        case y60::BGRA:
+            AC_TRACE << "Using RGBA pixels";
+            myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::RGBA, PixelEncodingString));
+            myQTPixelFormat = k32RGBAPixelFormat;
+            break;
+        case y60::ALPHA:
+        case y60::GRAY:
+            myQTPixelFormat = k24BGRPixelFormat ;
+            break;
+        case y60::RGB:
+        case y60::BGR:
+        default:
+            AC_TRACE << "Using BGR pixels";
+            myQTPixelFormat = k24BGRPixelFormat;
+            myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGR, PixelEncodingString));
+            break;
+        }
+
+        QTNewGWorld(&_myOffScreenWorld, myQTPixelFormat, &movieBounds, 0, 0, 0);
 
         unsigned myFrameCount = getFramecount();
         unsigned myDuration = getDurationInMilliseconds();
         unsigned myFrameRate = floor(double(myFrameCount)/ double((myDuration/1000)));
 
-        //   setPixelFormat(PixelEncoding(RGBA));
         
-        Movie * myMovie = getMovie();
-        myMovie->setPixelEncoding(PixelEncoding(RGBA));
+
+//        myMovie->setPixelEncoding(PixelEncoding(RGBA));
         myMovie->set<FrameRateTag>(myFrameRate);
         myMovie->set<ImageWidthTag>(movieBounds.right);
         myMovie->set<ImageHeightTag>(movieBounds.bottom);
@@ -250,7 +270,22 @@ namespace y60 {
         MoviesTask(_myMovie,0);
         Ptr baseAddr = GetPixBaseAddr(GetGWorldPixMap(_myOffScreenWorld)); 
         QTGetPixMapHandleRowBytes(GetGWorldPixMap(_myOffScreenWorld));
-        memcpy(theTargetRaster->pixels().begin(), baseAddr, theTargetRaster->pixels().size());
+        
+        // since i did not find a suitable 8bit qt pixelformat for use in rgb for alpha and gray
+        // textures -> use a rgb texture and manually stride the frame into a 8-bit targetraster
+        Movie * myMovie = getMovie();
+        if (myMovie->getPixelEncoding() == y60::ALPHA || myMovie->getPixelEncoding() == y60::GRAY) {
+            unsigned char * myRasterbegin = theTargetRaster->pixels().begin();
+            unsigned char * myQTWorldBegin = (unsigned char *)baseAddr;
+            for (int x = 0; x <  myMovie->get<ImageWidthTag>(); x++) {
+                for (int y = 0; y <  myMovie->get<ImageHeightTag>(); y++) {
+                    *myRasterbegin++ = *myQTWorldBegin;
+                    myQTWorldBegin += 3;
+                }
+            }
+        } else {
+            memcpy(theTargetRaster->pixels().begin(), baseAddr, theTargetRaster->pixels().size());
+        }
         _myLastDecodedFrame = theFrameNumber;
 
     }    
