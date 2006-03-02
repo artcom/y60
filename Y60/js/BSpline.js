@@ -45,6 +45,9 @@ function BSpline(theStart, theStartHandle, theEnd, theEndHandle) {
 
         // Make sure the resolution is an *integer*
         theResolution = Math.floor(theResolution);
+        if (theResolution < 1) {
+            theResolution = 1;
+        }
 
         // Clear last result
         _myResult = [];
