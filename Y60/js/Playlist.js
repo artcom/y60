@@ -53,7 +53,6 @@ const MimeTypes = {
     MP3: 19,
     TXT: 20
 }
-OS = operatingSystem();
 
 // Constructor
 function Playlist() {
@@ -197,7 +196,7 @@ Playlist.prototype.Constructor = function(self) {
             }
         }
         if (theUrl.search(/\.mov$/i)  != -1) {
-            if (OS == "Linux" || theSeekableFlag) {
+            if (operatingSystem() == "Linux" || theSeekableFlag) {
                 myDecoderHint = "y60FFMpegDecoder";
             } else {
                 myDecoderHint = "y60QuicktimeDecoder";
@@ -205,7 +204,7 @@ Playlist.prototype.Constructor = function(self) {
         }
         if (theUrl.search(/\.wmv$/i)  != -1 ||
             theUrl.search(/\.avi$/i)  != -1) {
-            if (OS == "Linux") {
+            if (operatingSystem() == "Linux") {
                 myDecoderHint = "y60FFMpegDecoder";
             } else {
                 myDecoderHint = "y60WMVDecoder";
