@@ -42,10 +42,14 @@ function BSpline(theStart, theStartHandle, theEnd, theEndHandle) {
         if (_myPolyCoefs == null) {
             throw new Exception("you need to call setup first", fileline());
         }
+
+        // Make sure the resolution is an *integer*
+        theResolution = Math.floor(theResolution);
+
         // Clear last result
         _myResult = [];
 
-        for (var i = 0; i < theResolution + 1; ++i) {
+        for (var i = 0; i < (theResolution + 1); ++i) {
             var myValue = i / theResolution;
             _myResult[i] = this.evaluate(myValue, theEaseIn, theEaseOut);
         }

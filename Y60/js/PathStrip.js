@@ -105,6 +105,8 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
                 //print("skip zero-length");
                 continue;
             }
+            myForward = normalized(myForward);
+            //print("fwd=" + myForward);
 
             // left-vector
             var myNormalVector = normalized(cross(UP_VECTOR, myForward));
@@ -156,9 +158,9 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
 
             if (myLastLeftLine && myLastRightLine) {
                 // intersect lines
-                //print("isect");
                 var myLeftIsect = intersection(myLastLeftLine, myLeftLine);
                 var myRightIsect = intersection(myLastRightLine, myRightLine);
+                //print("isect", myLastRightLine, myRightLine);
 
                 if (!myLeftIsect) {
                     myLeftIsect = sum(myElement.end, myLeftVector);
@@ -178,7 +180,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
             // length fits this segment
             if (myLength < myRemainLength) {
                 //print("fits");
-                myLastPos = sum(myLastPos, product(normalized(myForward), myLength));
+                myLastPos = sum(myLastPos, product(myForward, myLength));
                 myLastLeftVector = myLeftVector;
                 myLastRightVector = myRightVector;
                 break;
@@ -280,21 +282,42 @@ function test_PathStrip() {
 
         window.camera.position = new Vector3f(0,0,30);
     } else {
-        var mySvgFile = readFileAsString("../CONFIG/curves.svg"); //svg-logo-001.svg");
+        var mySvgFile = readFileAsString("curves.svg"); //svg-logo-001.svg");
         var mySvgNode = new Node(mySvgFile);
         var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
-        myPath = new SvgPath(myPaths[6]);
+        myPath = new SvgPath(myPaths[6], 100);
         myWidth = 20.0;
 
-        window.camera.position = new Vector3f(400, 1800, 1300);
+        window.camera.position = new Vector3f(700, 1800, 1300);
     }
 
     var myStrip = new PathStrip(mySceneViewer);
     myStrip.setAlignment(TOP_ALIGNMENT);
-    myStrip.align(myPath, 50.0, null, myWidth);
+    //myStrip.align(myPath, 35.0, new Vector3f(1200,2200,0), myWidth);
+
+    var myValue = 30.0;
+    var myRealign = true;
+
+    var myBaseOnKey = mySceneViewer.onKey;
+    mySceneViewer.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
+        if (theCtrlFlag) {
+            myBaseOnKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
+        } else if (theState) {
+            if (theKey == "up") {
+                myValue += (theShiftFlag ? 1.0 : 0.25);
+                myRealign = true;
+            } else if (theKey == "down") {
+                myValue -= (theShiftFlag ? 1.0 : 0.25);
+                myRealign = true;
+            }
+        }
+    }
 
     mySceneViewer.onFrame = function(theTime) {
-        myStrip.align(myPath, theTime * 30.0, new Vector3f(500,2300,0), myWidth);
+        if (myRealign) {
+            myStrip.align(myPath, myValue, new Vector3f(1200,2150,0), myWidth);
+            myRealign = false;
+        }
     }
 
     mySceneViewer.onPostRender = function() {

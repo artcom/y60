@@ -27,7 +27,7 @@ function SvgPath(theDescription) {
     this.Constructor(this, theDescription);
 }
 
-SvgPath.prototype.Constructor = function(self, theDescription) {
+SvgPath.prototype.Constructor = function(self, theDescription, theCurveSegmentLength) {
 
     /// Move to position.
     self.move = function(thePoint, theRelativeFlag) {
@@ -100,7 +100,7 @@ SvgPath.prototype.Constructor = function(self, theDescription) {
         }
         var mySpline = new BSpline(_myLastPos, myStartHandle, myEnd, myEndHandle);
         //push(mySpline); // XXX what we ultimately want
-        segmentSpline(mySpline, myEnd);
+        segmentBSpline(mySpline, myEnd);
         _myLastPos = myEnd;
     }
 
@@ -462,10 +462,10 @@ SvgPath.prototype.Constructor = function(self, theDescription) {
     }
 
     // render BSpline into LineSegments
-    function segmentSpline(theSpline, theEnd) {
+    function segmentBSpline(theSpline, theEnd) {
 
         // number of line segments
-        var myNumSegments = theSpline.getArcLength() / _myCurveSegmentLength;
+        var myNumSegments = Math.floor(theSpline.getArcLength() / _myCurveSegmentLength);
         if (myNumSegments < _myMinSegments) {
             myNumSegments = _myMinSegments;
         } else if (myNumSegments > _myMaxSegments) {
@@ -473,15 +473,8 @@ SvgPath.prototype.Constructor = function(self, theDescription) {
         }
 
         var myResult = theSpline.calculate(myNumSegments);
-        for (var i = 0; i < myResult.length; ++i) {
-
-            if (i > 0) {
-                push(new LineSegment(myResult[i-1], myResult[i]));
-            }
-            if (i == myResult.length-1) {
-                // end-segment
-                push(new LineSegment(myResult[i], theEnd));
-            }
+        for (var i = 1; i < myResult.length; ++i) {
+            push(new LineSegment(myResult[i-1], myResult[i]));
         }
     }
 
@@ -676,6 +669,9 @@ SvgPath.prototype.Constructor = function(self, theDescription) {
         if (theDescription == null) {
             return;
         }
+        if (theCurveSegmentLength != null) {
+            self.setCurveSegmentLength(theCurveSegmentLength);
+        }
 
         var myNode = null;
         if (typeof(theDescription) == "string") {
@@ -772,7 +768,7 @@ function test_SvgPath() {
         myDynamicPath.close();
     }
 
-    if (1) {
+    if (0) {
         // perpendicular path
         var myPPath = p[0].createPerpendicularPath(new Vector3f(25,5,0), 100);
         p.push(myPPath);

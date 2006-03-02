@@ -313,7 +313,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                                 /* || myFilename.search(/\.ra$/i)   != -1 */
                                 )) {
             plug("y60FFMpegDecoder2");
-            print("plugged ffmpegdecoder 2");
+            print("plugged FFMpegDecoder2");
             _myMPEGPlugged = true;
         }
         if ( myFilename.search(/\.mov$/i) != -1) {
