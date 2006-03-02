@@ -566,6 +566,7 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             if (theAudioFlag == undefined) {
                 theAudioFlag = true;
             }
+            myImage.decoderhint = new Playlist().getVideoDecoderHintFromURL(myImage.src, false); 
             myImage.audio = theAudioFlag;
             if (thePixelFormat == undefined) {
                 thePixelFormat = "BGR";

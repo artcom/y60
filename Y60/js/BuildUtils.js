@@ -186,8 +186,7 @@ function buildImageNode(theName, theFilename, theMipMapFlag)
 // build a <movie> node
 function buildMovieNode(theName, theFilename)
 {
-    var myPlaylist = new Playlist();
-    var myDecoderHint = myPlaylist.getVideoDecoderHintFromURL(theFilename, false); 
+    var myDecoderHint = new Playlist().getVideoDecoderHintFromURL(theFilename, false); 
     var myMovie = '<movie name="' + theName + '" id="i' + theName + '" src="' + theFilename + '" decoderhint="' + myDecoderHint + '"/>';
            
     var myMovieDoc = new Node(myMovie);

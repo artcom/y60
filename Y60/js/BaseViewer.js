@@ -540,9 +540,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (myMovies) {
             for (var myMovieIndex = 0; myMovieIndex < myMovies.length; myMovieIndex++) {
                 var myMovie = myMovies[myMovieIndex];
-                var myPlaylist = new Playlist();
                 if (myMovie.decoderhint == "") {
-                    myMovie.decoderhint = myPlaylist.getVideoDecoderHintFromURL(myMovie.src, false);        
+                    myMovie.decoderhint = new Playlist().getVideoDecoderHintFromURL(myMovie.src, false);        
                     print("Set decoderhint for movie with source : " + myMovie.src + " to: " + myMovie.decoderhint);
                 }
             }
