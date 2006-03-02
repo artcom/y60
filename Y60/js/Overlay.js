@@ -557,7 +557,7 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
     function setup() {
         var myImage = null;
         if (typeof(theSource) == "object") {
-            myImage = theSource;
+            myImage = theSource;            
         } else {
             myImage = Node.createElement("movie");
             theScene.images.appendChild(myImage);
