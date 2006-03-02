@@ -53,7 +53,7 @@ const MimeTypes = {
     MP3: 19,
     TXT: 20
 }
-const OS = operatingSystem();
+OS = operatingSystem();
 
 // Constructor
 function Playlist() {
