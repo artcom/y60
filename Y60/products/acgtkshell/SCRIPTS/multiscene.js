@@ -171,6 +171,7 @@ function main(argv) {
 
     for (var i = 0; i < ourHandler.files.length; ++i) {
         var myScene = new Scene(ourHandler.files[i]);
+        myScene.setup();
         ourScenes[i] = myScene;
         var myArea = null;
         if (ourAreas.length == 0) {

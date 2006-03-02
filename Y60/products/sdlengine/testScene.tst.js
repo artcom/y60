@@ -32,7 +32,8 @@ MyClassUnitTest.prototype.Constructor = function(obj, theName) {
 
     obj.run = function() {
         obj.myScene = new Scene(null);
-
+        obj.myScene.setup();
+        
         // Test convinience scene access properties
         ENSURE('obj.myScene.dom.nodeName == "scene"');
         ENSURE('obj.myScene.world.nodeName == "world"');

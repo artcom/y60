@@ -195,6 +195,7 @@ function main(argv) {
     ourLeftViewer.setupWindow(myLeftArea);
     // load scene in first viewer
     var myScene = new Scene(ourRightViewer.getModelName());
+    myScene.setup();
     ourRightViewer.setScene(myScene);
     ourLeftViewer.setScene(myScene);
     ourRightViewer.setCanvasByIndex(0);

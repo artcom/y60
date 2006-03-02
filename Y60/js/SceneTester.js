@@ -80,7 +80,9 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         window.scene.save(myBinXmlFilename, true);
 
         var myNewXmlScene = new Scene(myXmlFilename);
+        myNewXmlScene.setup();
         var myNewBinScene = new Scene(myBinXmlFilename);
+        myNewBinScene.setup();
 
         if (myNewXmlScene.dom.toString() != myNewBinScene.dom.toString()) {
             print("comparing " + myXmlFilename + " and " + myBinXmlFilename + " failed.");

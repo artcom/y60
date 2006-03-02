@@ -63,6 +63,7 @@ ourHandler.on_mainWindow_realize = function() {
 ourHandler.on_new_activate = function() {
     ourViewer.setModelName("");
     var myScene = new Scene(null);
+    myScene.setup();
     ourViewer.setScene(myScene);
     var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
     ourViewer.setCanvas(myCanvas);
@@ -100,6 +101,7 @@ ourHandler.on_open_activate = function(theArguments) {
     if (myFilename) {
         ourViewer.setModelName(myFilename);
         var myScene = new Scene(myFilename);
+        myScene.setup();        
         ourViewer.setScene(myScene);
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         ourViewer.setCanvas(myCanvas);
@@ -536,6 +538,7 @@ function main(argv) {
         ourViewer.setupWindow(window);
 
         var myScene = new Scene(ourViewer.getModelName());
+        myScene.setup();
         ourViewer.setScene(myScene);
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         ourViewer.setCanvas(myCanvas);
