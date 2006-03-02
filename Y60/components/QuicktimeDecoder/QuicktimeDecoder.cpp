@@ -271,8 +271,8 @@ namespace y60 {
         Ptr baseAddr = GetPixBaseAddr(GetGWorldPixMap(_myOffScreenWorld)); 
         QTGetPixMapHandleRowBytes(GetGWorldPixMap(_myOffScreenWorld));
         
-        // since i did not find a suitable 8bit qt pixelformat for use in rgb for alpha and gray
-        // textures -> use a rgb texture and manually stride the frame into a 8-bit targetraster
+        // since i did not find a suitable 8bit qt pixelformat for use in alpha and gray textures 
+        // -> use a rgb texture and manually stride the frame into a 8-bit targetraster (vs)
         Movie * myMovie = getMovie();
         if (myMovie->getPixelEncoding() == y60::ALPHA || myMovie->getPixelEncoding() == y60::GRAY) {
             unsigned char * myRasterbegin = theTargetRaster->pixels().begin();
