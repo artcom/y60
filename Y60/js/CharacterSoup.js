@@ -58,12 +58,14 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
     }
 
     self.createText = function(theText, theSize) {
+        self.createUnicodeText(asUnicodeString(theText), theSize);
+    }
+    self.createUnicodeText = function(theText, theSize) {
         if (!(theSize in _myAlphabetMap)) {
             Logger.warning("CharacterSoup.createText: No such size '" + theSize + "'");
             self.setupFont(theSize);
         }
 
-        var myUnicode = asUnicodeString(theText);
         var myCharacters = [];
 
         var myFontName = _myAlphabetMap[theSize].fontname;
@@ -72,14 +74,13 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
         var myTexCoord = new Vector2f(0,0);
         var myTexSize = new Vector2f(0,0);
-        for (var i = 0; i < myUnicode.length; ++i) {
+        for (var i = 0; i < theText.length; ++i) {
 
-            var myChar = myUnicode[i];
+            var myChar = theText[i];
             if (myChar == "\n" || myChar == "\r" || myChar == "\t") {
                 // map white space characters to space
                 myChar = asUnicodeString(" ");
             }
-
             var myCharacter = null;
             if (!(myChar in _myAlphabetMap[theSize])) {
                 // character is not in alphabet map -> render it into alphabet image

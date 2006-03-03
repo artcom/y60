@@ -217,6 +217,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         theSceneViewer.getShapes().appendChild(_myShape);
         _myBody = theSceneViewer.getScene().createBody(_myShape);
         theSceneViewer.getScene().update(Scene.SHAPES | Scene.MATERIALS);
+        
     }
 
     /**********************************************************************
@@ -251,7 +252,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         } else {
             _myMaterial = theMaterial;
         }
-        _myColor = _myMaterial.diffuse;
+        _myColor = new Vector4f(0,0,1,1);
     }
 
     setup();

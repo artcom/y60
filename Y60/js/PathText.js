@@ -163,8 +163,8 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
     function setup() {
 
-        _myText = theText;
-        _myCharacters = theCharacterSoup.createText(_myText, theFontSize);
+        _myText = asUnicodeString(theText);
+        _myCharacters = theCharacterSoup.createUnicodeText(_myText, theFontSize);
 
         var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
         var myShapeBuilder = new ShapeBuilder();
@@ -174,7 +174,6 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         var myCharacterSize = new Vector3f(1.0, 1.0, 0.0);
 
         for (var i = 0; i < _myText.length; ++i) {
-
             var myCharacter = _myCharacters[i];
             myShapeBuilder.appendQuadWithCustomTexCoords(myElement,
                     myCharacterPos, myCharacterSize,
