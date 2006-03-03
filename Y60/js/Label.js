@@ -75,7 +75,8 @@ function LabelBase(Public, Protected, theScene,
         }
 
         var myImage = Protected.getImageNode();
-        var mySize = window.renderTextAsImage(myImage, theText, myFontName, Public.width, Public.height);
+        var mySize = window.renderTextAsImage(myImage, theText, myFontName,
+                                              theSize?Public.width:null, theSize?Public.height:null);
 
         Public.srcsize.x = mySize[0] / myImage.width;
         Public.srcsize.y = mySize[1] / myImage.height;
