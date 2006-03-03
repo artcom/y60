@@ -15,10 +15,8 @@
 //   $Date: 2005/03/17 20:31:50 $
 //
 //=============================================================================
-plug("y60FFMpegDecoder");
-use("SceneViewer.js");
 
-plug("y60FFMpegDecoder");
+use("SceneViewer.js");
 plug("y60JSSound");
 
 function FFMpegTest(theArguments) {
@@ -62,7 +60,7 @@ function FFMpegTest(theArguments) {
                     _myMovie.currentframe + "/" + _myMovie.framecount;
             window.renderText([10, myPos], myText, "Screen15");
             myPos += 10;
-        }            
+        }
     }
 
     function setupTest(theName, theFile, theUseSound) {
@@ -71,10 +69,10 @@ function FFMpegTest(theArguments) {
             _myMovie.removeFromScene();
             delete _myMovie;
             _myMovie = 0;
-        }            
+        }
         print ("Starting test: "+theName);
         var myMovie = new MovieOverlay(Public.getOverlayManager(), theFile,
-                new Vector2f(300, 70), null, theUseSound);
+                new Vector2f(300, 70), null, theUseSound, null, "y60FFMpegDecoder");
         myMovie.playspeed = 1;
         myMovie.loopcount = 1;
         myMovie.avdelay   = 0;
@@ -104,7 +102,7 @@ function FFMpegTest(theArguments) {
 
             //                "setupLongTest(true)"
     ];
-    
+
     Public.nextTest = function() {
         if (_myTestName) {
             print ("Test finished: "+_myTestName);
@@ -119,19 +117,17 @@ function FFMpegTest(theArguments) {
                 _myMovie.removeFromScene();
                 delete _myMovie;
                 _myMovie = 0;
-            } 
+            }
             exit(0);
         }
     }
 
     Public.testPlaying = function() {
-        assure_msg(_myMovie.playmode == "play",
-                "Movie is still playing.");
+        assure_msg(_myMovie.playmode == "play", "Movie is still playing.");
     }
 
     Public.testStopped = function() {
-        assure_msg(_myMovie.playmode == "stop",
-                "Movie has stopped.");
+        assure_msg(_myMovie.playmode == "stop", "Movie has stopped.");
     }
 
     Public.play = function() {
@@ -160,7 +156,7 @@ function FFMpegTest(theArguments) {
     }
 
     function setupPlayTest(theUseSound) {
-        setupTest("Play to End", "testfiles/counter_short.mpg", theUseSound);        
+        setupTest("Play to End", "testfiles/counter_short.mpg", theUseSound);
         window.setTimeout("testPlaying", 1000);
         window.setTimeout("testStopped", 10000);
         window.setTimeout("nextTest", 10100);
@@ -170,7 +166,7 @@ function FFMpegTest(theArguments) {
         setupTest("Play, Stop, Play again", "testfiles/counter_short.mpg", theUseSound);
         window.setTimeout("stop", 1000);
         window.setTimeout("play", 2000);
-        window.setTimeout("stop", 3000);
+        window.setTimeout("stop", 300);
         window.setTimeout("nextTest", 4000);
     }
 
@@ -190,7 +186,7 @@ function FFMpegTest(theArguments) {
         window.setTimeout("stop", 10050);
         window.setTimeout("nextTest", 10100);
     }
-    
+
     function setupSeekBackTest(theUseSound) {
         setupTest("SeekBack", "testfiles/counter_short.mpg", theUseSound);
         _myMovie.loopcount = 1;
@@ -199,7 +195,7 @@ function FFMpegTest(theArguments) {
         window.setTimeout("seek", 6000);
         window.setTimeout("nextTest", 8000);
     }
-    
+
     function setupSeekFwdTest(theUseSound) {
         setupTest("SeekFwd", "testfiles/counter_short.mpg", theUseSound);
         _myMovie.loopcount = 1;
@@ -207,7 +203,7 @@ function FFMpegTest(theArguments) {
         window.setTimeout("seek", 1000);
         window.setTimeout("nextTest", 2000);
     }
-    
+
     function setupPauseStopTest(theUseSound) {
         setupTest("PauseStop", "testfiles/counter_short.mpg", theUseSound);
         _myMovie.loopcount = 1;
@@ -217,7 +213,7 @@ function FFMpegTest(theArguments) {
         window.setTimeout("stop", 1600);
         window.setTimeout("nextTest", 2000);
     }
-    
+
     function setupStopPauseTest(theUseSound) {
         setupTest("StopPause", "testfiles/counter_short.mpg", theUseSound);
         _myMovie.loopcount = 1;
@@ -227,7 +223,7 @@ function FFMpegTest(theArguments) {
         window.setTimeout("stop", 1600);
         window.setTimeout("nextTest", 2000);
     }
-    
+
     function setupLongTest(theUseSound) {
         setupTest("Almost Endless test", "/tmp/FantFour.mpg");
         _myMovie.loopcount = 0;

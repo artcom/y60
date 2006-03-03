@@ -491,15 +491,16 @@ function ImageOverlay(theScene, theSource, thePosition, theParent) {
 //  @param theParent      Node         Parent overlay node (optional, default is toplevel)
 //  @param theAudioFlag   Boolean      Play audio with the movie (optional, default is true)
 //  @param thePixelFormat String       Pixel format (optional, default is BGR)
-function MovieOverlay(theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat) {
+//  @param theDecoderHint String       Which movie decoder to use (optional, default depends on file-extension)
+function MovieOverlay(theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat, theDecoderHint) {
     var Public    = this;
     var Protected = {};
-    MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat);
+    MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent, theAudioFlag, thePixelFormat, theDecoderHint);
 }
 
 // pure virtual base class
 function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, theParent,
-                          theAudioFlag, thePixelFormat) {
+                          theAudioFlag, thePixelFormat, theDecoderHint) {
 
     TextureOverlay(Public, Protected, theScene, thePosition, theParent);
 
@@ -557,7 +558,7 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
     function setup() {
         var myImage = null;
         if (typeof(theSource) == "object") {
-            myImage = theSource;            
+            myImage = theSource;
         } else {
             myImage = Node.createElement("movie");
             theScene.images.appendChild(myImage);
@@ -567,7 +568,11 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             if (theAudioFlag == undefined) {
                 theAudioFlag = true;
             }
-            myImage.decoderhint = new Playlist().getVideoDecoderHintFromURL(myImage.src, false); 
+            if (theDecoderHint) {
+                myImage.decoderhint = theDecoderHint;
+            } else {
+                myImage.decoderhint = new Playlist().getVideoDecoderHintFromURL(myImage.src, false);
+            }
             myImage.audio = theAudioFlag;
             if (thePixelFormat == undefined) {
                 thePixelFormat = "BGR";
