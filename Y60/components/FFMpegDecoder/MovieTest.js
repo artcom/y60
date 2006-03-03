@@ -1,4 +1,3 @@
-
 //=============================================================================
 // Copyright (C) 1993-2005, ART+COM AG Berlin
 //
@@ -70,7 +69,7 @@ function FFMpegTest(theArguments) {
             delete _myMovie;
             _myMovie = 0;
         }
-        print ("Starting test: "+theName);
+        print ("Starting test: "+theName + " " + millisec());
         var myMovie = new MovieOverlay(Public.getOverlayManager(), theFile,
                 new Vector2f(300, 70), null, theUseSound, null, "y60FFMpegDecoder");
         myMovie.playspeed = 1;
@@ -87,7 +86,7 @@ function FFMpegTest(theArguments) {
 
     var _myTests = [
         "setupPlayTest(true)",
-        "setupStopTest(true)",
+        /*"setupStopTest(true)",
         "setupPlayTest(false)",
         "setupStopTest(false)",
         "setupLoopTest(false)",
@@ -98,7 +97,7 @@ function FFMpegTest(theArguments) {
         "setupPauseStopTest(false)",
         "setupPauseStopTest(true)",
         "setupStopPauseTest(false)",
-        "setupStopPauseTest(true)"
+        "setupStopPauseTest(true)"*/
 
             //                "setupLongTest(true)"
     ];
@@ -114,10 +113,12 @@ function FFMpegTest(theArguments) {
             eval(myTestFunc);
         } else {
             if (_myMovie) {
+                print("remove movie");
                 _myMovie.removeFromScene();
+                print("delete movie");
                 delete _myMovie;
                 _myMovie = 0;
-            }
+            }            
             exit(0);
         }
     }
@@ -131,13 +132,14 @@ function FFMpegTest(theArguments) {
     }
 
     Public.play = function() {
-        print("Starting playback.");
+        print("Starting playback. " + millisec());
         _myMovie.playmode = "play";
     }
 
     Public.stop = function() {
-        print("Stopping playback.");
+        print("Stopping playback. " + millisec());
         _myMovie.playmode = "stop";
+        print("current frame: " + _myMovie.currentframe);
     }
 
     Public.pause = function() {
@@ -158,15 +160,16 @@ function FFMpegTest(theArguments) {
     function setupPlayTest(theUseSound) {
         setupTest("Play to End", "testfiles/counter_short.mpg", theUseSound);
         window.setTimeout("testPlaying", 1000);
-        window.setTimeout("testStopped", 10000);
-        window.setTimeout("nextTest", 10100);
+        window.setTimeout("nextTest", 1100);
+        //window.setTimeout("testStopped", 10000);
+        //window.setTimeout("nextTest", 10100);
     }
 
     function setupStopTest(theUseSound) {
         setupTest("Play, Stop, Play again", "testfiles/counter_short.mpg", theUseSound);
         window.setTimeout("stop", 1000);
         window.setTimeout("play", 2000);
-        window.setTimeout("stop", 300);
+        window.setTimeout("stop", 3000);
         window.setTimeout("nextTest", 4000);
     }
 
@@ -232,6 +235,7 @@ function FFMpegTest(theArguments) {
     function assure_msg(theCondition, theMsg) {
         if (!theCondition) {
             print("FAILED : "+theMsg);
+            print("exit");
             exit(5);
         } else {
             print("SUCCESS: "+theMsg);
@@ -242,4 +246,5 @@ function FFMpegTest(theArguments) {
 var ourShow = new FFMpegTest(arguments);
 ourShow.setup();
 ourShow.go();
+
 

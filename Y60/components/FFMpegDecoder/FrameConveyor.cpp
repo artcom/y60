@@ -463,7 +463,7 @@ namespace y60 {
     }
     void FrameConveyor::setVolume(double theVolume) {
         if (_myAudioSink) {
-            _myAudioSink->setVolume(theVolume);
+            _myAudioSink->setVolume(float(theVolume));
         }
     }
             

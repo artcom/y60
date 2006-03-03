@@ -196,7 +196,8 @@ namespace y60 {
 
     bool
     MaterialBase::writeDepthBuffer() const {
-        const VectorOfString & myTargetBuffers = getNode().getAttributeValue<VectorOfString>(TARGETBUFFERS_PROPERTY);
+        MaterialPropertiesFacadePtr myPropFacade = getChild<MaterialPropertiesTag>();
+        const VectorOfString & myTargetBuffers = myPropFacade->get<TargetBuffersTag>();
         TargetBuffers myEnum;
         for (int i = 0; i < myTargetBuffers.size(); ++i) {
             myEnum.fromString(myTargetBuffers[i]);
