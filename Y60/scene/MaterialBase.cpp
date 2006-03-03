@@ -197,8 +197,10 @@ namespace y60 {
     bool
     MaterialBase::writeDepthBuffer() const {
         const VectorOfString & myTargetBuffers = getNode().getAttributeValue<VectorOfString>(TARGETBUFFERS_PROPERTY);
+        TargetBuffers myEnum;
         for (int i = 0; i < myTargetBuffers.size(); ++i) {
-            if (TargetBuffers(myTargetBuffers[i]) == DEPTH_MASK) {
+            myEnum.fromString(myTargetBuffers[i]);
+            if (myEnum == DEPTH_MASK) {
                 return true;
             }
         }
