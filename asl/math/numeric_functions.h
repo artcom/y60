@@ -311,17 +311,23 @@ int solveQuadratic(Number a, Number b, Number c, Number & theRoot0, Number & the
     return 2;
 }
 
-// bi-cubic interpolation w. ease-in/ease-out
+/**
+ * bi-cubic interpolation between in/out
+ * @param theValue Value to interpolate.
+ * @param theIn In-point for smoothstep; default is 0.
+ * @param theOut Out-point for smoothstep; default is 1.
+ * @return Interpolated value.
+ */
 template <class T>
-T smoothStep(T theValue, T theEaseIn = 0, T theEaseOut = 1)
+T smoothStep(T theValue, T theIn = 0, T theOut = 1)
 {
-    if (theValue <= theEaseIn) {
+    if (theValue <= theIn) {
         return 0;
-    } else if (theValue >= theEaseOut) {
+    } else if (theValue >= theOut) {
         return 1;
     }
 
-    T myOutput = (theValue - theEaseIn) / (theEaseOut - theEaseIn);
+    T myOutput = (theValue - theIn) / (theOut - theIn);
     return (myOutput * myOutput) * (3 - 2 * myOutput);
 }
 
