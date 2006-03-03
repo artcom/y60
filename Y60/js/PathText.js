@@ -62,7 +62,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
             theLastCharacter = _myText.length;
         }
 
-        // alignment
+        var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
         var myFontMetrics = theCharacterSoup.getFontMetrics(theFontSize);
         var myWidth = 0.0;
         var myVertexPositions = getDescendantByAttribute(_myShape, "name", "position", true);
@@ -124,6 +124,10 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
                     myBottom = 0; 
                     break;
                 case CENTER_ALIGNMENT:
+                    myTop = myAlphabetMap.cellsize * 0.5 - (myAlphabetMap.cellsize - myFontMetrics.height) * 0.5;
+                    myBottom = -myTop;
+                    break;
+                case BASELINE_ALIGNMENT:
                     myTop = myFontMetrics.ascent;
                     myBottom = myFontMetrics.descent;
                     break;
@@ -196,7 +200,7 @@ function test_PathText() {
     mySceneViewer.setup(800, 600, false, "PathText");
 
     const FONT_SIZE = 18;
-    var myCharacterSoup = new CharacterSoup(mySceneViewer, "Unit", "../FONTS/UnitMed.ttf", [FONT_SIZE]);
+    var myCharacterSoup = new CharacterSoup(mySceneViewer, "Unit", "${PRO}/testmodels/fonts/UnitMed.ttf", [FONT_SIZE]);
 
     var mySvgPath = null;
     var myPos = null;
@@ -210,7 +214,7 @@ function test_PathText() {
         var myPathNode = new Node(TEST_PATHS[0]).firstChild;
         mySvgPath = new SvgPath(myPathNode);
     } else {
-        var mySvgFile = readFileAsString("../CONFIG/curves.svg");
+        var mySvgFile = readFileAsString(expandEnvironment("${PRO}/testmodels/curves.svg"));
         var mySvgNode = new Node(mySvgFile);
  
         var mySvgPaths = []
@@ -235,14 +239,16 @@ function test_PathText() {
     var myAlignment = TOP_ALIGNMENT;
     var myRealign = true;
 
-    mySceneViewer.onKey = function(theKey, theState) {
-
+    var myBaseOnKey = mySceneViewer.onKey;
+    mySceneViewer.onKey = function(theKey, theState, theX, theY, theShiftFlag, theControlFlag, theAltFlag) {
         if (theState && theKey == "space") {
             myAlignment += 1;
-            if (myAlignment > CENTER_ALIGNMENT) {
+            if (myAlignment > BASELINE_ALIGNMENT) {
                 myAlignment = TOP_ALIGNMENT;
             }
             myRealign = true;
+        } else {
+            myBaseOnKey(theKey, theState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
         }
     }
 

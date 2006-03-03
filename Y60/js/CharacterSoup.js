@@ -140,7 +140,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
         // load font
         var myFontName = theFontname + "_" + String(theSize);
-        window.loadTTF(myFontName, theFontFilename, theSize);
+        window.loadTTF(myFontName, expandEnvironment(theFontFilename), theSize);
 
         var myFontMetrics = window.getFontMetrics(myFontName);
         var myCellSize = nextPowerOfTwo(myFontMetrics.height);

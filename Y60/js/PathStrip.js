@@ -111,17 +111,18 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
             var myLeftVector = null;
             var myRightVector = null;
             switch (_myAlignment) {
+                case TOP_ALIGNMENT:
+                    myLeftVector = new Vector3f(0,0,0);
+                    myRightVector = product(myNormalVector, theWidth * -1.0);
+                    break;
                 case BOTTOM_ALIGNMENT:
                     myLeftVector = product(myNormalVector, theWidth);
                     myRightVector = new Vector3f(0,0,0);
                     break;
                 case CENTER_ALIGNMENT:
+                case BASELINE_ALIGNMENT:
                     myLeftVector = product(myNormalVector, theWidth * 0.5);
                     myRightVector = product(myNormalVector, theWidth * -0.5);
-                    break;
-                case TOP_ALIGNMENT:
-                    myLeftVector = new Vector3f(0,0,0);
-                    myRightVector = product(myNormalVector, theWidth * -1.0);
                     break;
             }
 
@@ -212,7 +213,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
 
         // create shape, body
         _myShape = myShapeBuilder.buildNode();
-        _myShape.name = "Pathstrip_"+_myMaterial.id;
+        _myShape.name = "PathStrip_"+_myMaterial.id;
         theSceneViewer.getShapes().appendChild(_myShape);
         _myBody = theSceneViewer.getScene().createBody(_myShape);
         theSceneViewer.getScene().update(Scene.SHAPES | Scene.MATERIALS);
@@ -293,7 +294,7 @@ function test_PathStrip() {
     }
 
     var myStrip = new PathStrip(mySceneViewer);
-    myStrip.setAlignment(TOP_ALIGNMENT);
+    myStrip.setAlignment(CENTER_ALIGNMENT);
     //myStrip.align(myPath, 35.0, new Vector3f(1200,2200,0), myWidth);
 
     var myValue = 30.0;

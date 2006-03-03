@@ -14,6 +14,7 @@ use("BSpline.js");
 const TOP_ALIGNMENT    = 0;
 const BOTTOM_ALIGNMENT = 1;
 const CENTER_ALIGNMENT = 2;
+const BASELINE_ALIGNMENT = 3;
 
 /// Global up vector.
 const UP_VECTOR = new Vector3f(0,0,1);
