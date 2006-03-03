@@ -734,15 +734,3 @@ function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, t
     var myRay = new Ray(theCamera.position, myScreenPos);
     return intersection(myRay, new Planef(new Vector3f(0,0,-1), theZ));
 }
-
-
-function smoothstep(theEaseIn, theEaseOut, theInput) {
-    if (theInput < theEaseIn) {
-        return 0.0;
-    }
-    if (theInput >= theEaseOut) {
-        return 1.0;
-    }
-    var myOutput = (theInput - theEaseIn) / (theEaseOut - theEaseIn);
-    return (myOutput * myOutput) * (3 - 2 * myOutput);
-}

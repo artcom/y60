@@ -97,6 +97,7 @@ namespace y60 {
                 bool textureUploadRequired = myImage->textureUploadRequired() ||
                                              myImage->isImageNewerThanTexture();
                 AC_DEBUG << myImage->get<NameTag>() << " reload=" << reloadRequired << " upload=" << textureUploadRequired;
+                //AC_PRINT << " tUR=" << myImage->textureUploadRequired() << " iINTT=" << myImage->isImageNewerThanTexture();
 
                 if (reloadRequired || textureUploadRequired) {
                     uploadTexture(myImage);

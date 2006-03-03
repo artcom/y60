@@ -8,6 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+#include "JSBSpline.h"
 #include "JSSphere.h"
 #include "JSBox.h"
 #include "JSLine.h"
@@ -152,6 +153,10 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSSphere::initClass(cx, theGlobalObject)) {
         return false;
     }
+    if (!JSBSpline::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+
     if (!JSStringMover::initClass(cx, theGlobalObject)) {
         return false;
     }

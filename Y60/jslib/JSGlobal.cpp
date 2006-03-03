@@ -1135,6 +1135,31 @@ signedDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
 }
 
+static JSBool
+smoothStep(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Calculates a smooth-step (bicubic interpolation) between in/out.");
+    DOC_PARAM("theIn", "In-point for smoothstep", DOC_TYPE_FLOAT);
+    DOC_PARAM("theOut", "Out-point for smoothstep", DOC_TYPE_FLOAT);
+    DOC_PARAM("theValue", "Input value", DOC_TYPE_FLOAT);
+    DOC_END;
+
+    if (argc != 3) {
+        JS_ReportError(cx,"smoothStep: bad number of arguments, expected 3");
+        return JS_FALSE;
+    }
+
+    // UH: the JavaScript implementation used this argument order...
+    float myIn, myOut, myValue;
+    convertFrom(cx, argv[0], myIn);
+    convertFrom(cx, argv[1], myOut);
+    convertFrom(cx, argv[2], myValue);
+
+    // UH: the C++ implementation uses this (IMHO) more logical order...
+    *rval = as_jsval(cx, asl::smoothStep(myValue, myIn, myOut));
+    return JS_FALSE;
+
+}
+
 JSFunctionSpec *
 Global::Functions() {
     static JSFunctionSpec myFunctions[] = {
@@ -1157,7 +1182,7 @@ Global::Functions() {
         {"projection",  projectionDispatcher,  2},
         {"nearest",     nearestDispatcher,     2},
         {"transformedNormal", transformedNormalDispatcher,     2},
-
+        {"smoothStep", smoothStep,     3},
         {0}
     };
     return myFunctions;

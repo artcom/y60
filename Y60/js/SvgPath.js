@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("BSpline.js");
+//use("BSpline.js");
 
 /// Alignment for Text and PathStrip.
 const TOP_ALIGNMENT    = 0;
@@ -101,7 +101,7 @@ SvgPath.prototype.Constructor = function(self, theDescription, theCurveSegmentLe
         }
         var mySpline = new BSpline(_myLastPos, myStartHandle, myEnd, myEndHandle);
         //push(mySpline); // XXX what we ultimately want
-        segmentBSpline(mySpline, myEnd);
+        segmentBSpline(mySpline);
         _myLastPos = myEnd;
     }
 
@@ -463,7 +463,7 @@ SvgPath.prototype.Constructor = function(self, theDescription, theCurveSegmentLe
     }
 
     // render BSpline into LineSegments
-    function segmentBSpline(theSpline, theEnd) {
+    function segmentBSpline(theSpline) {
 
         // number of line segments
         var myNumSegments = Math.floor(theSpline.getArcLength() / _myCurveSegmentLength);
@@ -473,9 +473,11 @@ SvgPath.prototype.Constructor = function(self, theDescription, theCurveSegmentLe
             myNumSegments = _myMaxSegments;
         }
 
-        var myResult = theSpline.calculate(myNumSegments);
-        for (var i = 1; i < myResult.length; ++i) {
-            push(new LineSegment(myResult[i-1], myResult[i]));
+        var myP = theSpline.evaluate(0);
+        for (var i = 1; i <= myNumSegments; ++i) {
+            var myP2 = theSpline.evaluate(i / myNumSegments);
+            push(new LineSegment(myP, myP2));
+            myP = myP2;
         }
     }
 
@@ -713,8 +715,11 @@ SvgPath.prototype.Constructor = function(self, theDescription, theCurveSegmentLe
  * test
  */
 function test_SvgPath() {
-    var i;
 
+    use("SceneViewer.js");
+    use("Y60JSSL.js");
+
+    var i;
     var p = [];
     var myColor = new Vector4f(1,1,0,1);
     var myMatrix = new Matrix4f();
@@ -722,17 +727,17 @@ function test_SvgPath() {
     if (1) {
         var SVG_FILE;
         if (0) {
-            SVG_FILE = "../CONFIG/svg-logo-001.svg";
+            SVG_FILE = "${PRO}/testmodels/svg-logo-001.svg";
             myMatrix.scale(new Vector3f(0.0000015, -0.0000015, 0));
             myMatrix.translate(new Vector3f(-0.5, 0.4, -1));
         } else {
-            SVG_FILE = "../CONFIG/curves.svg";
+            SVG_FILE = "${PRO}/testmodels/curves.svg";
             myMatrix.scale(new Vector3f(0.00025, 0.00025, 0));
             myMatrix.translate(new Vector3f(-0.15, -0.25, -1));
         }
 
         print("Loading '" + SVG_FILE + "'");
-        var mySvgFile = readFileAsString(SVG_FILE);
+        var mySvgFile = readFileAsString(expandEnvironment(SVG_FILE));
         var mySvgNode = new Node(mySvgFile);
 
         var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
@@ -795,12 +800,9 @@ function test_SvgPath() {
         p.push(mySubPath);
     }
 
-    var myIndex = 0;
-    var myLastTime = null;
-
-    use("SceneViewer.js");
     var mySceneViewer = new SceneViewer(null);
     mySceneViewer.setup(800, 600, false, "SvgPath");
+    var myIndex = 0;
 
     mySceneViewer.onKey = function(theKey, theState) {
         if (theKey == "space" && theState) {

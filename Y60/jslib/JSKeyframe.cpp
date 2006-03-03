@@ -133,25 +133,25 @@ JSKeyframe::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     } else if (argc == 4) {
         asl::Vector3f myPosition;
         if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPosition)) {
-            JS_ReportError(cx, "JSStringMover::Constructor: argument #1 must be a vector");
+            JS_ReportError(cx, "JSKeyFrame::Constructor: argument #1 must be a vector");
             return JS_FALSE;
         }
 
-//        asl::Vector3f myOrienation;
         asl::Quaternionf myOrienation;
         if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myOrienation)) {
-            JS_ReportError(cx, "JSStringMover::Constructor: argument #2 must be a vector");
+            JS_ReportError(cx, "JSKeyFrame::Constructor: argument #2 must be a quaternion");
             return JS_FALSE;
         }
 
         float myTimeStamp;
         if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myTimeStamp)) {
-            JS_ReportError(cx, "JSStringMover::Constructor: argument #3 must be a float");
+            JS_ReportError(cx, "JSKeyFrame::Constructor: argument #3 must be a float");
             return JS_FALSE;
         }
+
         float mySpeed;
         if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], mySpeed)) {
-            JS_ReportError(cx, "JSStringMover::Constructor: argument #4 must be a float");
+            JS_ReportError(cx, "JSKeyFrame::Constructor: argument #4 must be a float");
             return JS_FALSE;
         }
 

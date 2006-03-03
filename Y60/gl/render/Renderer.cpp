@@ -211,11 +211,21 @@ namespace y60 {
             }
             CHECK_OGL_ERROR;
 
-            if (theMaterial.writesDepthBuffer()) {
+            if (theMaterial.writeDepthBuffer()) {
                 glDepthMask(GL_TRUE);
             } else {
                 glDepthMask(GL_FALSE);
             }
+
+#if 0
+            // disabled since overlays *must* be rendered with depthtest disabled
+            // but use materials as everyone else...
+            if (theMaterial.testDepthBuffer()) {
+                glEnable(GL_DEPTH_TEST);
+            } else {
+                glDisable(GL_DEPTH_TEST);
+            }
+#endif
 
             // [CH] TODO: Material should be const.
             // The renderer should just take the scene information and render it as it is.
@@ -676,24 +686,37 @@ namespace y60 {
         glPopAttrib();
     }
 
-    void Renderer::draw(const asl::LineSegment<float> & theLine,
-            const asl::Vector4f & theColor,
-            const asl::Matrix4f & theTransformation,
-            const float & theWidth)
+    void Renderer::preDraw(const asl::Vector4f & theColor,
+                           const asl::Matrix4f & theTransformation,
+                           const float & theWidth)
     {
         glDisable(GL_LIGHTING);
         glPushMatrix();
         glMultMatrixf(theTransformation.getData());
         glColor4fv(theColor.begin());
         glLineWidth(theWidth);
+    }
+
+    void Renderer::postDraw()
+    {
+        glLineWidth(1.0f);
+        glPopMatrix();
+        glEnable(GL_LIGHTING);
+    }
+
+    void Renderer::draw(const asl::LineSegment<float> & theLine,
+            const asl::Vector4f & theColor,
+            const asl::Matrix4f & theTransformation,
+            const float & theWidth)
+    {
+        preDraw(theColor, theTransformation, theWidth);
+
         glBegin(GL_LINES);
             glVertex3fv(theLine.origin.begin());
             glVertex3fv(theLine.end.begin());
         glEnd();
 
-        glLineWidth(1.0f);
-        glEnable(GL_LIGHTING);
-        glPopMatrix();
+        postDraw();
         CHECK_OGL_ERROR;
     }
 
@@ -702,11 +725,7 @@ namespace y60 {
             const asl::Matrix4f & theTransformation,
             const float & theWidth)
     {
-        glDisable(GL_LIGHTING);
-        glPushMatrix();
-        glMultMatrixf(theTransformation.getData());
-        glColor4fv(theColor.begin());
-        glLineWidth(theWidth);
+        preDraw(theColor, theTransformation, theWidth);
 
         const float TwoPI = float(asl::PI) * 2.0f;
         const unsigned mySegments = 32;
@@ -732,10 +751,8 @@ namespace y60 {
             glVertex3f(myPos[i][0], 0.0f, myPos[i][1]);
         }
         glEnd();
-        glLineWidth(1.0f);
-        glEnable(GL_LIGHTING);
 
-        glPopMatrix();
+        postDraw();
         CHECK_OGL_ERROR;
     }
 
@@ -744,9 +761,7 @@ namespace y60 {
             const asl::Matrix4f & theTransformation,
             const float & theWidth)
     {
-        glPushMatrix();
-        glMultMatrixf(theTransformation.getData());
-        glLineWidth(theWidth);
+        preDraw(theColor, theTransformation, theWidth);
 
         Point3f myLTF, myRBF, myRTF, myLBF;
         Point3f myLTBK, myRBBK, myRTBK, myLBBK;
@@ -755,10 +770,8 @@ namespace y60 {
 
         renderBox(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK,
                   theColor);
-        glLineWidth(1.0f);
-        glEnable(GL_LIGHTING);
 
-        glPopMatrix();
+        postDraw();
         CHECK_OGL_ERROR;
     }
 
@@ -767,21 +780,34 @@ namespace y60 {
             const asl::Matrix4f & theTransformation,
             const float & theWidth)
     {
-        glDisable(GL_LIGHTING);
-        glPushMatrix();
-        glMultMatrixf(theTransformation.getData());
-        glColor4fv(theColor.begin());
-        glLineWidth(theWidth);
+        preDraw(theColor, theTransformation, theWidth);
 
         glBegin(GL_TRIANGLES);
             glVertex3fv(theTriangle[0].begin());
             glVertex3fv(theTriangle[1].begin());
             glVertex3fv(theTriangle[2].begin());
         glEnd();
-        glLineWidth(1.0f);
-        glEnable(GL_LIGHTING);
 
-        glPopMatrix();
+        postDraw();
+        CHECK_OGL_ERROR;
+    }
+
+    void Renderer::draw(const asl::BSpline<float> & theBSpline,
+            const asl::Vector4f & theColor,
+            const asl::Matrix4f & theTransformation,
+            const float & theWidth)
+    {
+        preDraw(theColor, theTransformation, theWidth);
+
+        glBegin(GL_LINE_STRIP);
+        unsigned myNumSegments = 16;
+        for (unsigned i = 0; i <= myNumSegments; ++i) {
+            const asl::Vector3f myPoint = theBSpline.evaluate(i / (float)myNumSegments);
+            glVertex3fv(myPoint.begin());
+        }
+        glEnd();
+
+        postDraw();
         CHECK_OGL_ERROR;
     }
 

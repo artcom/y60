@@ -165,6 +165,7 @@ namespace y60 {
     static const char * SENSOR_ATTRIB               = "sensor";
     static const char * TRANSPARENCY_ATTRIB         = "transparent";
     static const char * WRITE_DEPTH_BUFFER_ATTRIB   = "writedepthbuffer";
+    static const char * DEPTH_TEST_ATTRIB           = "depthtest";
     static const char * INSENSIBLE_ATTRIB           = "insensible";
     static const char * SKELETON_ATTRIB             = "skeleton";
     static const char * PIVOT_TRANSLATION_ATTRIB    = "pivottranslation";

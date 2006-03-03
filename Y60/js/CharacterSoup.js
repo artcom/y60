@@ -14,9 +14,6 @@ use("BuildUtils.js");
 plug("GlurFilter");
 
 
-const CHARACTERS_PER_LINE = 16; // must be power-of-two
-
-
 function Character(theUnicode, theUV, theUVSize, theGlyphMetric) {
     this.unicode = String(theUnicode);
     this.uv      = new Vector2f(theUV);
@@ -32,6 +29,8 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
     
     var _myAlphabetMap = [];
     var _myGlurRadi    = new Array();
+
+    const CHARACTERS_PER_LINE = 16; // must be power-of-two
 
     /////////////////////////////////////////////////////////////////////////////
     ///                        public functions                            //////

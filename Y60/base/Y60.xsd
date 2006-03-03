@@ -1778,6 +1778,11 @@ For transparent shapes, that intersect heavily it is sometimes visually more ple
 to render without depth buffer</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="depthtest" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turn depthbuffer testing on/off.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
         </xs:complexType>
     </xs:element>
     <xs:element name="requires">

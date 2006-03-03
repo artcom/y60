@@ -194,9 +194,17 @@ namespace y60 {
     }
 
     bool
-    MaterialBase::writesDepthBuffer() const {
+    MaterialBase::writeDepthBuffer() const {
         if (getNode().getAttribute(WRITE_DEPTH_BUFFER_ATTRIB)) {
             return getNode().getAttributeValue<bool>(WRITE_DEPTH_BUFFER_ATTRIB);
+        }
+        return true;
+    }
+
+    bool
+    MaterialBase::testDepthBuffer() const {
+        if (getNode().getAttribute(DEPTH_TEST_ATTRIB)) {
+            return getNode().getAttributeValue<bool>(DEPTH_TEST_ATTRIB);
         }
         return true;
     }

@@ -90,21 +90,26 @@ namespace y60 {
             void initGL();
 
             void draw(const asl::LineSegment<float> & theLine,
-                    const asl::Vector4f & theColor,
-                    const asl::Matrix4f & theTransformation,
-                    const float & theWidth = 1.0f);
+                      const asl::Vector4f & theColor,
+                      const asl::Matrix4f & theTransformation,
+                      const float & theWidth = 1.0f);
             void draw(const asl::Triangle<float> & theTriangle,
-                    const asl::Vector4f & theColor,
-                    const asl::Matrix4f & theTransformation,
-                    const float & theWidth = 1.0f);
+                      const asl::Vector4f & theColor,
+                      const asl::Matrix4f & theTransformation,
+                      const float & theWidth = 1.0f);
             void draw(const asl::Box3<float> & theBox,
-                    const asl::Vector4f & theColor,
-                    const asl::Matrix4f & theTransformation,
-                    const float & theWidth = 1.0f);
+                      const asl::Vector4f & theColor,
+                      const asl::Matrix4f & theTransformation,
+                      const float & theWidth = 1.0f);
             void draw(const asl::Sphere<float> & theSphere,
                       const asl::Vector4f & theColor,
                       const asl::Matrix4f & theTransformation,
-                    const float & theWidth = 1.0f);
+                      const float & theWidth = 1.0f);
+            void draw(const asl::BSpline<float> & theBSpline,
+                      const asl::Vector4f & theColor,
+                      const asl::Matrix4f & theTransformation,
+                      const float & theWidth = 1.0f);
+
        private:
             void setupRenderState(ViewportPtr theViewport);
 
@@ -145,6 +150,14 @@ namespace y60 {
                            const asl::Point3f & theLTBK, const asl::Point3f & theRBBK,
                            const asl::Point3f & theRTBK, const asl::Point3f & theLBBK,
                            const asl::Vector4f & theColor, asl::Vector4f theBackColor = asl::Vector4f(0,0,0,0));
+
+            /// setup immediate draw
+            void preDraw(const asl::Vector4f & theColor,
+                         const asl::Matrix4f & theTransformation,
+                         const float & theWidth = 1.0f);
+
+            /// restore from immediate draw
+            void postDraw();
 
             void enableFog();
             void enableVisibleLights();

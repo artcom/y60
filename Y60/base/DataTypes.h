@@ -38,6 +38,7 @@
 #include <asl/Vector234.h>
 #include <asl/Quaternion.h>
 #include <asl/Frustum.h>
+#include <asl/BSpline.h>
 
 #include <string>
 #include <vector>
@@ -109,6 +110,9 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Plane<double>, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Sphere<double>, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Triangle<double>, SimpleValue);
+
+    DEFINE_VALUE_WRAPPER_TEMPLATE(asl::BSpline<float>, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(asl::BSpline<double>, SimpleValue);
 
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfBool, VectorValue, dom::MakeResizeableVector);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfUnsignedInt, VectorValue, dom::MakeResizeableVector);

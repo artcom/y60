@@ -150,7 +150,8 @@ namespace y60 {
             const LightingModel getLightingModel() const { return _myLightingModel; }
 
             TextureUsage MaterialBase::getTextureUsage(unsigned theTextureSlot) const;
-            bool writesDepthBuffer() const;
+            bool writeDepthBuffer() const;
+            bool testDepthBuffer() const;
 
             // texgen parameters
             void updateParams();
