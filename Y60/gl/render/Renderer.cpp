@@ -679,7 +679,6 @@ namespace y60 {
         glPopAttrib();
     }
 
-<<<<<<< .mine
     void 
     Renderer::enableRenderStyles(const std::vector<RenderStyleType> & theRenderStyles) {
         bool myIgnoreDepthFlag = (std::find(theRenderStyles.begin(), theRenderStyles.end(),
@@ -705,18 +704,12 @@ namespace y60 {
             glPolygonOffset(1.0, 1.0);
         }
     }
-
-    void Renderer::draw(const asl::LineSegment<float> & theLine,
-            const asl::Vector4f & theColor,
-            const asl::Matrix4f & theTransformation,
-            const float & theWidth,
-            const std::string & theRenderStyles)
-=======
     void Renderer::preDraw(const asl::Vector4f & theColor,
                            const asl::Matrix4f & theTransformation,
-                           const float & theWidth)
->>>>>>> .r5381
-    {
+                           const float & theWidth,
+                           const std::string & theRenderStyles) 
+   {
+
         std::istringstream myRenderStylesStream(theRenderStyles);
         vector<RenderStyleType> myRenderStyles;
         VectorOfString myRenderStylesStrings;
@@ -735,30 +728,26 @@ namespace y60 {
 
     void Renderer::postDraw()
     {
-        glLineWidth(1.0f);
+//        glLineWidth(1.0f);
         glPopMatrix();
-        glEnable(GL_LIGHTING);
+//        glEnable(GL_LIGHTING);
+        glPopAttrib();
     }
 
     void Renderer::draw(const asl::LineSegment<float> & theLine,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            const float & theWidth)
+            const float & theWidth,
+            const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth);
+        preDraw(theColor, theTransformation, theWidth,theRenderStyles);
 
         glBegin(GL_LINES);
             glVertex3fv(theLine.origin.begin());
             glVertex3fv(theLine.end.begin());
         glEnd();
 
-<<<<<<< .mine
-        glLineWidth(1.0f);
-        glPopMatrix();
-=======
         postDraw();
->>>>>>> .r5381
-        glPopAttrib();
         CHECK_OGL_ERROR;
     }
 
@@ -767,7 +756,7 @@ namespace y60 {
             const asl::Matrix4f & theTransformation,
             const float & theWidth)
     {
-        preDraw(theColor, theTransformation, theWidth);
+        preDraw(theColor, theTransformation, theWidth,"");
 
         const float TwoPI = float(asl::PI) * 2.0f;
         const unsigned mySegments = 32;
@@ -803,7 +792,7 @@ namespace y60 {
             const asl::Matrix4f & theTransformation,
             const float & theWidth)
     {
-        preDraw(theColor, theTransformation, theWidth);
+        preDraw(theColor, theTransformation, theWidth,"");
 
         Point3f myLTF, myRBF, myRTF, myLBF;
         Point3f myLTBK, myRBBK, myRTBK, myLBBK;
@@ -822,7 +811,7 @@ namespace y60 {
             const asl::Matrix4f & theTransformation,
             const float & theWidth)
     {
-        preDraw(theColor, theTransformation, theWidth);
+        preDraw(theColor, theTransformation, theWidth,"");
 
         glBegin(GL_TRIANGLES);
             glVertex3fv(theTriangle[0].begin());
@@ -839,7 +828,7 @@ namespace y60 {
             const asl::Matrix4f & theTransformation,
             const float & theWidth)
     {
-        preDraw(theColor, theTransformation, theWidth);
+        preDraw(theColor, theTransformation, theWidth,"");
 
         glBegin(GL_LINE_STRIP);
         unsigned myNumSegments = 16;
