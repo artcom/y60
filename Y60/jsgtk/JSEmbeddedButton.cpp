@@ -40,12 +40,54 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+Leave(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0);
+        EmbeddedButton * myEmbeddedButton=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myEmbeddedButton);
+        myEmbeddedButton->leave();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+Released(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0);
+        EmbeddedButton * myEmbeddedButton=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myEmbeddedButton);
+        myEmbeddedButton->released();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+Pressed(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0);
+        EmbeddedButton * myEmbeddedButton=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myEmbeddedButton);
+        myEmbeddedButton->pressed();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JSFunctionSpec *
 JSEmbeddedButton::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"leave",                Leave,                   0},
+        {"released",             Released,                0},
+        {"pressed",              Pressed,                 0},
         {0}
     };
     return myFunctions;

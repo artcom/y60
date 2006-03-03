@@ -45,6 +45,7 @@ class ALSAPump : public Singleton<ALSAPump>, public Pump
 
         virtual void pump();
         void handleUnderrun (int err);
+        void determineName(); 
 
         bool _myIsOutOpen;
 

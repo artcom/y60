@@ -44,9 +44,14 @@ string PlugInManager :: getPlugInFileName(const string & theLibraryName, const c
         myFilename += "OPT";
 #endif
     }
+
 #ifdef LINUX
     myFilename += ".so";
-#else
+#endif
+#ifdef OSX
+    myFilename += ".dylib";
+#endif
+#ifdef WIN32
     myFilename += ".dll";
 #endif
     return myFilename;

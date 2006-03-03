@@ -60,15 +60,27 @@ namespace jslib {
         /**
          * Sets a previously loaded scene to be rendered.
          * @param theScene Scene to be rendered.
+         * @param theCanvas the canvas to to render to. If 0, use the first canvas.
          * @return true if the scene was successfully set and is rendered in the
          *         window.
          * @warn Currently, theScene may not be Ptr(0)!
+         */
+        bool AbstractRenderWindow::setSceneAndCanvas(const y60::ScenePtr & theScene, 
+                const dom::NodePtr & theCanvas = dom::NodePtr(0));
+
+        /**
+         * Sets a previously loaded scene to be rendered.
+         * @param theScene Scene to be rendered.
+         * @return true if the scene was successfully set and is rendered in the
+         *         window.
+         * @warn Currently, theScene may not be Ptr(0)!
+         * @deprecated use setSceneAndCanvas
          */
         bool AbstractRenderWindow::setScene(const y60::ScenePtr & theScene);
 
         /**
          * Creates the renderer and opens the renderwindow, if this has not been
-         * done by a setScene() call, before.
+         * done by a setSceneAndCanvas() call, before.
          */
         virtual void go();
 
@@ -87,6 +99,12 @@ namespace jslib {
         bool hasCapAsString(const std::string & theCapStr);
         virtual void setRenderingCaps(unsigned int theRenderingCaps);
         unsigned int getRenderingCaps();
+
+        std::string getGLVersionString();
+        std::string getGLVendorString();
+        std::string getGLRendererString();
+        unsigned int getGLExtensionStrings(std::vector<std::string> & theTokens);
+
         void printStatistics();
         double getFrameRate() const;
 
@@ -201,6 +219,15 @@ namespace jslib {
             static std::string myDefaultFont = "Screen15";
             return myDefaultFont;
         }
+        /*
+        template <typename P>
+        void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, P & theValue) {
+            throw RenderWindowException("Format not supported", PLUS_FILE_LINE); 
+        }
+        */
+
+        void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, asl::Unsigned8 & theValue);
+        void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, float & theValue);
 
     protected:
         AbstractRenderWindow(const JSErrorReporter & theErrorReporter);
@@ -251,6 +278,7 @@ namespace jslib {
         double       _myPauseTime;
         bool         _myPauseFlag;
     };
+
 }
 
 #endif

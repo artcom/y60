@@ -108,7 +108,7 @@ JSMessageDialog::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *ar
 
     JSMessageDialog * myNewObject = 0;
 
-    string myMessage;
+    Glib::ustring myMessage;
     convertFrom(cx, argv[0], myMessage);
 
     bool myUseMarkupFlag;

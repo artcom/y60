@@ -191,20 +191,16 @@ namespace y60 {
                 internalCreate(512, 512, PLPixelFormat::B8G8R8);
 #else
                 // throw exception
-                throw ImageLoaderException(string("Paintlib exception occured while loading ") + _myFilename +
-                    ": " + static_cast<const char *>(e), PLUS_FILE_LINE);
+                throw ImageLoaderException(_myFilename + " - " + static_cast<const char *>(e), PLUS_FILE_LINE);
 #endif
             } catch(PLPixelFormat::UnsupportedPixelFormat & e) {
-                throw ImageLoaderException(string("Paintlib UnsupportedPixelFormat exception occured while loading ") + _myFilename +
-                    ": " + e.m_what, PLUS_FILE_LINE);
+                throw ImageLoaderException(_myFilename + " - UnsupportedPixelFormat: " + e.m_what, PLUS_FILE_LINE);
 			} catch(std::exception & e) {
-                throw ImageLoaderException(string("Unknown (Paintlib) exception occured while loading ") + _myFilename +
-                     " " + e.what(), PLUS_FILE_LINE);
+                throw ImageLoaderException(_myFilename + " - " + e.what(), PLUS_FILE_LINE);
 			} catch(const asl::Exception &) {
                 throw;
 			} catch(...) {
-                throw ImageLoaderException(string("Unknown (Paintlib) exception occured while loading ") + _myFilename,
-                    PLUS_FILE_LINE);
+                throw ImageLoaderException(_myFilename + "Unknown (Paintlib) exception occured while loading.", PLUS_FILE_LINE);
             }
         }
     }

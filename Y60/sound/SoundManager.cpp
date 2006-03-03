@@ -68,16 +68,6 @@ SoundManager::~SoundManager() {
     }
 }
 
-void SoundManager::setSysConfig(const Time& myLatency, const string& myDeviceName) {
-    Pump::setSysConfig(myLatency, myDeviceName);
-}
-
-void SoundManager::setAppConfig(unsigned mySampleRate, unsigned numOutputChannels, 
-        bool useDummy)
-{
-    Pump::setAppConfig(mySampleRate, numOutputChannels, useDummy);
-}
-
 void SoundManager::setCacheSize(unsigned myTotalSize, unsigned myItemSize) {
     _myMaxCacheSize = myTotalSize;
     _myMaxCacheItemSize = myItemSize;

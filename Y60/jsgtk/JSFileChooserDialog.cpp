@@ -47,7 +47,7 @@ Get_filename(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         // native method call
         Gtk::FileChooserDialog * myNative=0;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        string myRetVal = myNative->get_filename();
+        Glib::ustring myRetVal = Glib::filename_to_utf8(myNative->get_filename());
         *rval = as_jsval(cx, myRetVal);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -169,7 +169,7 @@ JSFileChooserDialog::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval
 
     JSFileChooserDialog * myNewObject = 0;
 
-    string myTitle;
+    Glib::ustring myTitle;
     convertFrom(cx, argv[0], myTitle);
 
     if (argc == 1) {

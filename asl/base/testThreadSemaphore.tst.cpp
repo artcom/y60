@@ -93,21 +93,21 @@ SemaphoreUnitTest::run() {
     ENSURE_MSG (myRetVal == 0, "pthread_join succeeded");
 
     int diff1, diff2;
-    NanoTime start, end;
+    Time start, end;
 
-    start = NanoTime();
+    start = Time();
     _mySecondSemaphore.wait(1000);
-    end = NanoTime();
-    diff1 = int((end - start).millis() / 10);
+    end = Time();
+    diff1 = int((end.micros() - start.micros()) / 1000);
     
-    start = NanoTime();
+    start = Time();
     _mySecondSemaphore.wait(2000);
-    end = NanoTime();
-    diff2 = int((end - start).millis() / 10);
+    end = Time();
+    diff2 = int((end.micros() - start.micros()) / 1000);
     
     string msg = string("waiting 2 secs takes roughly twice as long as waiting 1 sec. waited ")
-               + as_string(2*diff1) + " vs. " + as_string(diff2) + " hundredths of secs.";
-    ENSURE_MSG(abs(2*diff1 - diff2) < 10, msg.c_str());
+               + as_string(2*diff1) + " vs. " + as_string(diff2) + " milliseconds.";
+    ENSURE_MSG(abs(2*diff1 - diff2) < 100, msg.c_str());
     
     ENSURE_MSG(true, "Waiting for 3 seconds");
     ENSURE_MSG(!_mySecondSemaphore.wait(3000), "Timeout works.");
@@ -135,7 +135,7 @@ SemaphoreUnitTest::secondThread() {
     ENSURE_MSG(true, "Blocking second thread.");
     try {
         _mySemaphore.wait();
-    } catch (ThreadSemaphore::ClosedException & e) {
+    } catch (ThreadSemaphore::ClosedException &) {
         msleep(500);
         ENSURE_MSG(true, "Semaphore closed exception caught.");
     }

@@ -67,7 +67,7 @@ namespace asl {
 
     class MessageSink {
     public:
-        virtual void push(const std::string & theMessage) = 0;
+        virtual void push(Severity theSeverity, const std::string & theMessage) = 0;
     };
     DEFINE_EXCEPTION(UnknownSinkExeption, Exception);
 

@@ -135,6 +135,10 @@ DEF_PROC_ADDRESS( PFNGLFLUSHVERTEXARRAYRANGENVPROC, glFlushVertexArrayRangeNV );
 DEF_PROC_ADDRESS( PFNGLVERTEXARRAYRANGENVPROC, glVertexArrayRangeNV );
 #define glVertexArrayRangeNV _ac_glVertexArrayRangeNV
 
+
+DEF_PROC_ADDRESS( PFNGLBLENDEQUATIONPROC, glBlendEquation );
+#define glBlendEquation _ac_glBlendEquation
+
 //texture compression
 DEF_PROC_ADDRESS( PFNGLCOMPRESSEDTEXIMAGE1DARBPROC, glCompressedTexImage1DARB );
 #define glCompressedTexImage1DARB _ac_glCompressedTexImage1DARB
@@ -252,6 +256,7 @@ namespace y60 {
     GLenum asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag=false);
     GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
     GLenum asGLTexCoordMode(TexCoordMode theMode);
+    GLenum asGLBlendEquation(const std::string & theBlendEquationString);
 
     TextureInternalFormat fromGLTextureInternalFormat(GLenum theFormat);
 
@@ -277,6 +282,11 @@ namespace y60 {
     bool hasCap(unsigned int theCap);
     /// Query for supported OpenGL *extension*.
     bool hasCap(const std::string & theCapsStr);
+
+    std::string getGLVersionString();
+    std::string getGLVendorString();
+    std::string getGLRendererString();
+    unsigned int getGLExtensionStrings(std::vector<std::string> & theTokens);
 }
 
 #endif // _ac_render_GLUtils_h_

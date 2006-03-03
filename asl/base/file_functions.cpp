@@ -25,6 +25,7 @@
 #include "string_functions.h"
 #include "error_functions.h"
 #include "Logger.h"
+#include "Path.h"
 
 #include <string>
 #include <vector>
@@ -44,6 +45,8 @@
 #endif
 
 #define DB(x) // x
+
+using namespace std;
 
 namespace asl {
 
@@ -82,28 +85,36 @@ namespace asl {
     }
 
     std::string getDirectoryPart(const std::string & theFileName) {
+        string myProtocol;
+        string myPath;
+        parseURI(theFileName, &myProtocol, 0, &myPath);
+        
 #ifdef WIN32
         char drive[_MAX_DRIVE];
         char dir[_MAX_DIR];
         char fname[_MAX_FNAME];
         char ext[_MAX_EXT];
 
-        _splitpath( theFileName.c_str(), drive, dir, fname, ext );
+        _splitpath( myPath.c_str(), drive, dir, fname, ext );
         std::string myDirName = std::string(drive)+std::string(dir);
         if (myDirName.empty()) {
             myDirName = "./";
         }
 #else
         std::string myDirName;
-        if (! theFileName.empty() ) {
-            if (theFileName.at(theFileName.length()-1) == '/') {
-                return theFileName;
+        if (! myPath.empty() ) {
+            if (myPath.at(myPath.length()-1) == '/') {
+                return myPath;
             }
 
-            char * myBuffer = strdup(theFileName.c_str());
+            char * myBuffer = strdup(myPath.c_str());
             myDirName = dirname(myBuffer);
             free(myBuffer);
-            myDirName += "/";
+            if (!myDirName.empty() &&
+                myDirName.at(myDirName.length()-1) != '/')
+            {
+                myDirName += "/";
+            }
         }
 
 #endif
@@ -126,20 +137,20 @@ namespace asl {
         return myDirName;
     }
 
-    std::string getExtension(const std::string & theFileName)
+    std::string getExtension(const std::string & myPath)
     {
-        std::string::size_type myDotPos = theFileName.rfind(".");
+        std::string::size_type myDotPos = myPath.rfind(".");
         if (myDotPos != std::string::npos) {
 
-            std::string::size_type mySlashPos = theFileName.rfind("/");
+            std::string::size_type mySlashPos = myPath.rfind("/");
             if (mySlashPos == std::string::npos) {
-                mySlashPos = theFileName.rfind("\\");
+                mySlashPos = myPath.rfind("\\");
             }
             if (mySlashPos != std::string::npos && mySlashPos > myDotPos) {
                 return "";
             }
 
-            return theFileName.substr(myDotPos+1);
+            return myPath.substr(myDotPos+1);
         }
         return "";
     }
@@ -162,6 +173,79 @@ namespace asl {
         }
         return theFileName;
     }
+
+/// returns the Host:Port part of an URI
+// URI's are formated as protocol://login/path
+// where login = [username:password@]hostport
+// and hostport = host[:port]
+
+void
+parseURI(const std::string & theURI, std::string * theProtocol, std::string * theLogin, std::string * thePath) {
+    std::string::size_type myProtocolLoginDelimit = theURI.find("://");
+    if (myProtocolLoginDelimit == string::npos && theURI[1] == ':') {
+        // we have a DOS-type path 'C:\foo\bar'
+        if (thePath) {
+            *thePath = theURI;
+        }
+        return;
+    }
+
+    string::size_type myLoginStartDelimiter = string::npos; // position of "//"
+    string::size_type myLoginPathDelimit = string::npos;
+
+    if (myProtocolLoginDelimit != string::npos) {
+        if (theProtocol) {
+            *theProtocol = theURI.substr(0, myProtocolLoginDelimit);
+        }
+        myLoginStartDelimiter = myProtocolLoginDelimit+1;
+    } else if (theURI.substr(0,2) == "\\\\")  {
+        // we have MS-URI  \\server\path
+        myLoginStartDelimiter = 0;
+    }
+
+    if (myLoginStartDelimiter != string::npos) {
+        std::string::size_type myLoginStartPos = myLoginStartDelimiter+2;
+
+        myLoginPathDelimit = theURI.find("/", myLoginStartPos );
+        
+        if (theLogin) {
+            if (myLoginPathDelimit != string::npos) {
+                *theLogin = theURI.substr(myLoginStartPos, myLoginPathDelimit-myLoginStartPos);
+            } else {
+                *theLogin = theURI.substr(myLoginStartPos);
+            }
+        }
+    }
+    
+    std::string::size_type myPathStartPos = (myLoginPathDelimit == std::string::npos ? 0 : myLoginPathDelimit); 
+    if (thePath) {
+        *thePath = theURI.substr(myPathStartPos);
+    }
+
+    return;
+}
+
+/// returns the Host part of an URI
+std::string 
+getHostPortPart(const std::string & theURI) {
+    std::string myLogin;
+    parseURI(theURI, 0, &myLogin, 0);
+    string::size_type myCredentialServerDelimiter = myLogin.find("@");
+    if (myCredentialServerDelimiter == string::npos) {
+        return myLogin;
+    }
+    return myLogin.substr(myCredentialServerDelimiter+1);
+}
+/// returns the Host part of an URI
+std::string 
+getHostPart(const std::string & theURI) {
+    string myHostPort = getHostPortPart(theURI);
+    string::size_type myHostPortDelimiter = myHostPort.find(":");
+    if (myHostPortDelimiter == string::npos) {
+        return myHostPort;
+    }
+    return myHostPort.substr(0, myHostPortDelimiter);
+}
 
     unsigned
     splitPaths(const std::string & theDelimitedPaths,
@@ -215,8 +299,8 @@ namespace asl {
 
 /// read a complete file into a string
 
-    bool readFile(const std::string & theFileName, std::string & theContent) {
-        std::ifstream inFile(theFileName.c_str(), std::ios::binary);
+    bool readFile(const std::string & theUTF8Filename, std::string & theContent) {
+        std::ifstream inFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), std::ios::binary);
         if (inFile) {
             std::vector<char> myBuffer(65536);
             theContent.resize(0);
@@ -237,12 +321,12 @@ namespace asl {
         }
     }
 
-    bool readFile(const std::string & theFileName, asl::ResizeableBlock & theContent) {
+    bool readFile(const std::string & theUTF8Filename, asl::ResizeableBlock & theContent) {
         const int myChunksize = 65536;
-        unsigned long myFileSize = getFileSize(theFileName);
+        unsigned long myFileSize = getFileSize(theUTF8Filename);
         theContent.resize(myFileSize);
         DB(AC_TRACE << "myFileSize = " << myFileSize);
-        std::ifstream inFile(theFileName.c_str(), std::ios::binary);
+        std::ifstream inFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), std::ios::binary);
         unsigned long myPos = 0;
         if (inFile) {
             while (inFile && myPos < theContent.size()) {
@@ -261,16 +345,16 @@ namespace asl {
         return true;
     }
 
-    std::string readFile(const std::string & theFileName) {
+    std::string readFile(const std::string & theUTF8Filename) {
         std::string myResult;
-        if (!readFile(theFileName,myResult)) {
+        if (!readFile(theUTF8Filename,myResult)) {
             myResult.resize(0);
         };
         return myResult;
     };
 
-    bool writeFile(const std::string & theFileName, const std::string & theContent) {
-        std::ofstream outFile(theFileName.c_str(), std::ios::binary);
+    bool writeFile(const std::string & theUTF8Filename, const std::string & theContent) {
+        std::ofstream outFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), std::ios::binary);
         if (outFile) {
             outFile << theContent;
             return outFile != 0;
@@ -278,8 +362,8 @@ namespace asl {
         return false;
     }
 
-    bool writeFile(const std::string & theFileName, const asl::ReadableBlock & theContent) {
-        std::ofstream outFile(theFileName.c_str(), std::ios::binary);
+    bool writeFile(const std::string & theUTF8Filename, const asl::ReadableBlock & theContent) {
+        std::ofstream outFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), std::ios::binary);
         if (outFile) {
             outFile.write(theContent.strbegin(),theContent.size());
             return outFile != 0;
@@ -287,25 +371,41 @@ namespace asl {
         return false;
     }
 
-    bool deleteFile(const std::string & theFileName) {
+    bool deleteFile(const std::string & theUTF8Filename) {
 #ifdef WIN32
-        return _unlink(theFileName.c_str()) == 0;
+        return _unlink(Path(theUTF8Filename, UTF8).toLocale().c_str()) == 0;
 #else
-        return unlink(theFileName.c_str()) == 0;
+        return unlink(Path(theUTF8Filename, UTF8).toLocale().c_str()) == 0;
 #endif
     }
 
     bool
     moveFile(const std::string& theOldFileName, const std::string & theNewFileName) {
+        Path myOldFileName(theOldFileName, UTF8);
+        Path myNewFileName(theNewFileName, UTF8);
+        LAST_ERROR_TYPE myError = 0;
 #ifdef WIN32
-        return MoveFileEx(theOldFileName.c_str(), theNewFileName.c_str(), MOVEFILE_COPY_ALLOWED) != 0;
+        if (MoveFileEx(myOldFileName.toLocale().c_str(), 
+                       myNewFileName.toLocale().c_str(), MOVEFILE_COPY_ALLOWED
+                                                        +MOVEFILE_REPLACE_EXISTING) == 0)
+        {
+            myError = lastError();
+        }
 #else
-        return rename(theOldFileName.c_str(), theNewFileName.c_str())==0;
+        if (rename(myOldFileName.toLocale().c_str(), myNewFileName.toLocale().c_str()) != 0) {
+            myError = lastError();
+        }
 #endif
+        if (myError) {
+            AC_ERROR << "Error while moveFile('" << myOldFileName << "','" << myNewFileName << "')";
+            AC_ERROR << "    " << errorDescription(myError);
+            return false;
+        }
+        return true;
     }
 
     bool
-    setLastModified(const std::string & theFilename, time_t theModificationDate) {
+    setLastModified(const std::string & theUTF8Filename, time_t theModificationDate) {
 #ifdef WIN32
         _utimbuf myTimeBuf;
 #else
@@ -314,32 +414,32 @@ namespace asl {
         myTimeBuf.actime = theModificationDate;
         myTimeBuf.modtime = theModificationDate;
 #ifdef WIN32
-        return _utime(theFilename.c_str(), &myTimeBuf)==0;
+        return _utime(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myTimeBuf)==0;
 #else
-        return utime(theFilename.c_str(), &myTimeBuf)==0;
+        return utime(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myTimeBuf)==0;
 #endif
     }
 
     time_t
-    getLastModified(const std::string & theFilename) {
+    getLastModified(const std::string & theUTF8Filename) {
         struct STAT myStat;
-        if (STAT(theFilename.c_str(), &myStat) == -1) {
+        if (STAT(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myStat) == -1) {
             return -1;
         }
         return myStat.st_mtime;
     }
 
-   std::vector<std::string> getDirectoryEntries(const std::string & thePath) {
+   std::vector<std::string> getDirectoryEntries(const std::string & theUTF8Path) {
         std::vector<std::string> myDirEntries;
 
-        DIR * myDirHandle = opendir(thePath.c_str());
+        DIR * myDirHandle = opendir(Path(theUTF8Path, UTF8).toLocale().c_str());
         if (!myDirHandle) {
-            throw OpenDirectoryFailed(std::string("thePath='") + thePath + "',reason:"+asl::errorDescription(lastError()), PLUS_FILE_LINE);
+            throw OpenDirectoryFailed(std::string("thePath='") + theUTF8Path + "',reason:"+asl::errorDescription(lastError()), PLUS_FILE_LINE);
         }
         struct dirent *dir_entry;
         while((dir_entry = readdir(myDirHandle)) != 0) {
             if (std::string("..")!= dir_entry->d_name && std::string(".") != dir_entry->d_name) {
-                myDirEntries.push_back(dir_entry->d_name);
+                myDirEntries.push_back(Path(dir_entry->d_name, Locale).toUTF8());
             }
         }
         closedir(myDirHandle);
@@ -347,24 +447,26 @@ namespace asl {
     }
 
     void
-    createDirectory(const std::string & theDirectory) {
+    createDirectory(const std::string & theUTF8Path) {
+        Path myPath(theUTF8Path, UTF8);
 #ifdef WIN32
-        if (CreateDirectory(theDirectory.c_str(), 0) == 0) {
+        if (CreateDirectory(myPath.toLocale().c_str(), 0) == 0) {
 #else
-        if (mkdir(theDirectory.c_str(),0777) != 0) {
+        if (mkdir(myPath.toLocale().c_str(),0777) != 0) {
 #endif
-            throw CreateDirectoryFailed(std::string("theDirectory=")+theDirectory+" ,reason:"+asl::errorDescription(lastError()), PLUS_FILE_LINE);
+            throw CreateDirectoryFailed(std::string("theDirectory=")+theUTF8Path+" ,reason:"+asl::errorDescription(lastError()), PLUS_FILE_LINE);
         };
     }
 
     void
-    removeDirectory(const std::string & theDirectory) {
+    removeDirectory(const std::string & theUTF8Path) {
+        Path myPath(theUTF8Path, UTF8);
 #ifdef WIN32
-        if (RemoveDirectory(theDirectory.c_str()) == 0) {
+        if (RemoveDirectory(myPath.toLocale().c_str()) == 0) {
 #else
-        if (rmdir(theDirectory.c_str()) != 0) {
+        if (rmdir(myPath.toLocale().c_str()) != 0) {
 #endif
-            throw RemoveDirectoryFailed(std::string("theDirectory=")+theDirectory+" ,reason:"+asl::errorDescription(lastError()), PLUS_FILE_LINE);
+            throw RemoveDirectoryFailed(std::string("theDirectory=")+theUTF8Path+" ,reason:"+asl::errorDescription(lastError()), PLUS_FILE_LINE);
             //AC_WARNING << "removeDirectory failed, theDirectory="<<theDirectory<<" ,reason:"<<asl::errorDescription(lastError()), PLUS_FILE_LINE);
         };
     }
@@ -393,10 +495,11 @@ namespace asl {
 #ifdef WIN32
         char myTempBuffer[MAX_PATH];
         GetTempPath(MAX_PATH, myTempBuffer);
-        return std::string(myTempBuffer);
+        Path myTempPath(myTempBuffer, Locale);
 #else
-        return std::string("/tmp/");
+        Path myTempPath("/tmp/", Locale);
 #endif
+        return myTempPath.toUTF8();
     }
 
     std::string getAppDataDirectory(const std::string & theAppName) {
@@ -405,9 +508,9 @@ namespace asl {
         char myTempBuffer[MAX_PATH];
         //SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, myTempBuffer);
         SHGetSpecialFolderPath(NULL, myTempBuffer, CSIDL_APPDATA, true);
-        myAppDirectory = std::string(myTempBuffer)+"/"+theAppName;
+        myAppDirectory = Path(myTempBuffer, Locale).toUTF8()+"/"+theAppName;
 #else
-        myAppDirectory = expandEnvironment("${HOME}")+"/."+theAppName;
+        myAppDirectory = Path(expandEnvironment("${HOME}"), Locale).toUTF8()+"/."+theAppName;
 #endif
         if (!fileExists(myAppDirectory)) {
             createDirectory(myAppDirectory);
@@ -422,7 +525,7 @@ std::string getAppDirectory() {
 
     ::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
     // Extract directory
-    strAppDirectory = szAppPath;
+    strAppDirectory = Path(szAppPath, Locale).toUTF8();
     strAppDirectory = strAppDirectory.substr(0, strAppDirectory.rfind("\\"));
 #else
     char buffer[256];
@@ -433,7 +536,7 @@ std::string getAppDirectory() {
         throw GetAppDirectoryFailed(std::string("readlink failed for '") + buffer + "'", PLUS_FILE_LINE);
     }
     appPath[myBufferSize] = 0;
-    strAppDirectory = std::string(getDirectoryPart(appPath));
+    strAppDirectory = std::string(getDirectoryPart(Path(appPath, Locale).toUTF8()));
 #endif
     return strAppDirectory;
 }
@@ -441,19 +544,25 @@ std::string getAppDirectory() {
 
 // TODO: deal with degenerate cases like "C:\" or "/" (root)
 std::string 
-stripTrailingSlashes(const std::string & theDirectory) { 
+normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash) { 
     std::string myDirectory(theDirectory);
-    while (true) { // strip all trailing slashes
+    // replace backslashes with forward slashes
+    string::size_type myBackslashPos;
+    while (string::npos != (myBackslashPos = myDirectory.find("\\"))) {
+        myDirectory.replace(myBackslashPos, 1, "/");
+    }
+    // replace double-slashes with single slashes        
+    string::size_type myDoubleSlash;
+    while (string::npos != (myDoubleSlash = myDirectory.find("//"))) {
+        myDirectory.replace(myDoubleSlash, 2, "/");
+    }
+    while (stripTrailingSlash) { // strip all trailing slashes
         size_t myLen = myDirectory.size();
         if (myLen == 0) {
             break;
         }
         if (myDirectory[myLen-1] == '/') {
             myDirectory = myDirectory.substr(0, myLen-1);
-#ifdef WIN32
-        } else if (myDirectory[myDirectory.size()-1] == '\\') {
-            myDirectory = myDirectory.substr(0, myLen-1);
-#endif
         } else {
             break;
         }
@@ -461,8 +570,8 @@ stripTrailingSlashes(const std::string & theDirectory) {
     return myDirectory;    
 }
 
-bool isDirectory(const std::string & theDirectory) {
-    DIR * myDirHandle = opendir(theDirectory.c_str());
+bool isDirectory(const std::string & theUTF8Path) {
+    DIR * myDirHandle = opendir(Path(theUTF8Path, UTF8).toLocale().c_str());
     if (myDirHandle) {
         closedir(myDirHandle);
         return true;

@@ -143,8 +143,12 @@ void PLTestDecoders::RunTests ()
 
 
 #ifndef WIN32
+#ifdef OSX
 // this function is used to select all files that do not start with a dot
+int selectFile(struct dirent * theEntry)
+#else
 int selectFile(const struct dirent * theEntry)
+#endif
 {
   if (theEntry->d_name[0] == '.')
   {

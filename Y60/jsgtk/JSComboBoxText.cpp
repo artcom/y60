@@ -63,6 +63,9 @@ append_text(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     } HANDLE_CPP_EXCEPTION;
 }
 
+/* XXX doesn't work... will be resolved in Gtk 2.8 ... for now you have to destroy and re-create
+       the ComboBox ... [DS]
+*/
 static JSBool
 clear(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");

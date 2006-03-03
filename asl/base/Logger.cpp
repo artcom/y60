@@ -217,7 +217,7 @@ Logger::log(Time theTime, Severity theSeverity, const char * theModule, int theI
         } else {
             myMessage = theText;
         }
-        _myMessageSinks[i]->push(myMessage);
+        _myMessageSinks[i]->push(theSeverity, myMessage);
     }
     setLastError(myError);
 }

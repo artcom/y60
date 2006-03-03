@@ -23,6 +23,7 @@
 #include "ZipPackage.h"
 
 #include <asl/Logger.h>
+#include <asl/file_functions.h>
 
 
 using namespace std;
@@ -30,13 +31,19 @@ using namespace std;
 namespace asl {
 
 ZipPackage::ZipPackage(const std::string & theZipFilename) :
-    _myZipReader(theZipFilename.c_str()), _myZipFilename(theZipFilename)
+    _myZipReader(theZipFilename.c_str())
 {
+    _myZipFilename = normalizeDirectory(theZipFilename, true);
+    AC_DEBUG << "opening Zip " << _myZipFilename;
     const ZipReader::Directory & myDirectory = _myZipReader.getDirectory();
     ZipReader::Directory::const_iterator it;
     for (it = myDirectory.begin(); it != myDirectory.end(); ++it) {
-        _myFileList.push_back(it->filename);
+        _myFileList.push_back(it->filename.toUTF8());
     }
+}
+
+ZipPackage::~ZipPackage() {
+    AC_DEBUG << "closing Zip " << _myZipFilename;
 }
 
 ZipPackage::FileList

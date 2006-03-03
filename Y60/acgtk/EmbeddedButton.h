@@ -22,6 +22,9 @@ class EmbeddedButton : public Gtk::EventBox {
         EmbeddedButton(const std::string & theIconFile);
 
         sigc::signal<void> signal_clicked() const { return _myClickedSignal; }
+        virtual void released();
+        virtual void leave();
+        virtual void pressed();
 
     protected:
         void setup();

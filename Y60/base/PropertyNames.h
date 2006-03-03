@@ -39,9 +39,17 @@ namespace y60 {
     static const char * LINEWIDTH_PROPERTY         = "linewidth";
     static const char * LINESTIPPLE_PROPERTY       = "linestipple";
     static const char * BLENDFUNCTION_PROPERTY     = "blendfunction";
+    static const char * BLENDEQUATION_PROPERTY     = "blendequation";
     static const char * POINTSIZE_PROPERTY         = "pointsize"; // PointSize, PointSizeMin, PointSizeMax 
                                                                   // (last two work with attenuation)
     static const char * POINTATTENUATION_PROPERTY  = "pointattenuation"; // v[0] + v[1] * d + v[2] * d ^ 2;
+
+    static const char * AUTOTEXCOORDMODES_PROPERTY   = "autotexcoordmodes"; //[U_Mode, V_Mode, W_Mode, Q_Mode] where each
+                                                                            // mode is one of OBJECT_LINEAR, EYE_LINEAR, SPHERE_MAP
+    static const char * AUTOTEXCOORDPARAMS_PROPERTY = "autotexcoordparams"; // [U_Params, V_Params, W_Params, Q_Params]
+                                                                            // Sphere mapped coords are not supported yet ... 
+                                                                            // see also OGL Redbook p.413 ff
+    static const char * TARGETBUFFERS_PROPERTY     = "targetbuffers";
 } // namespace
 #endif
 

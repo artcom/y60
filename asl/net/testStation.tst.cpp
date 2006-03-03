@@ -55,6 +55,7 @@ class StationTest : public TemplateUnitTest {
 #endif
                                       Station::defaultOwnIPAddress());
                 ENSURE(myStation);
+                DPRINT(Station::defaultBroadcastPort()+1);
 
                 asl::Block testData;
 
@@ -63,7 +64,7 @@ class StationTest : public TemplateUnitTest {
                     testData.appendString(asl::as_string(i));
                 }
                 cerr << "Testdata size = " << testData.size() << ":" << endl;
-                cerr << testData << endl;
+                // cerr << testData << endl;
 #ifdef DEBUG_VARIANT
                 const int testCount = 30;
 #else

@@ -35,6 +35,7 @@
 #include <asl/Time.h>
 #include <asl/Dashboard.h>
 #include <asl/Logger.h>
+#include <asl/Stream.h>
 
 #include <dom/Schema.h>
 #include <iostream>
@@ -76,7 +77,7 @@ namespace y60 {
 #ifdef DONT_USE_MAPPED_BLOCK_IO
             asl::Block theBlock;
 #else
-            asl::MappedBlock theBlock(theFilename);
+            asl::WriteableFile theBlock(theFilename);
             if (!theBlock) {
                 throw IOError(std::string("Could map the new writable binary file '") + theFilename + "'", "Scene::save()");
             }
@@ -441,14 +442,17 @@ namespace y60 {
     void
     Scene::parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles ) {
         if (theNode->getAttribute(RENDER_STYLE_ATTRIB)) {
-            const VectorOfString myRenderStyles = theNode->getAttributeValue<VectorOfString>(RENDER_STYLE_ATTRIB);
-            for (int i = 0; i< myRenderStyles.size(); i++) {
-                RenderStyleType myRenderType = (RenderStyleType)getEnumFromString(myRenderStyles[i],RenderStylesSL);
-                theRenderStyles.push_back(myRenderType);
-            }
+            parseRenderStyles(theNode->getAttributeValue<VectorOfString>(RENDER_STYLE_ATTRIB), theRenderStyles);
         }
     }
 
+    void
+    Scene::parseRenderStyles(const VectorOfString & theStyles, std::vector<RenderStyleType> & theRenderStyles ) {
+        for (int i = 0; i< theStyles.size(); i++) {
+            RenderStyleType myRenderType = (RenderStyleType)getEnumFromString(theStyles[i],RenderStylesSL);
+            theRenderStyles.push_back(myRenderType);
+        }
+    }
 	void
 	Scene::buildShape(ShapePtr theShape) {
 		NodePtr myShapeNode = theShape->getXmlNode();

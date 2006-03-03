@@ -302,6 +302,9 @@ namespace y60 {
             const ResourceManager * getResourceManager() const;
             ResourceManager * getResourceManager();
 
+            static void parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles );
+            static void parseRenderStyles(const VectorOfString & theStyles, std::vector<RenderStyleType> & theRenderStyles );
+
         private:
             void updateReferences(dom::NodePtr theRootNode,
                 std::map<std::string, std::string> & theOldToNewIdMap);
@@ -328,8 +331,6 @@ namespace y60 {
 
             Primitive & createPrimitive(int theMaterialNumber,
                                         const std::string & theShapeId, unsigned int theDomIndex);
-            void parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles );
-
             void collectCameras(dom::NodeList & theCameras, dom::NodePtr theNode) const;
 
             template <class VISITOR>

@@ -144,7 +144,8 @@ namespace y60 {
                     dom::NodePtr curPropList = _myShader->getPropertyNode(i);
 
                     for (unsigned j = 0; j < curPropList->childNodesLength(); ++j) {
-                        if (curPropList->childNode(j)->nodeName() == "sampler2d") {
+                        // Q: What about the other samplers (3d, Cube, etc)? [DS]
+                        if (curPropList->childNode(j)->nodeName() == "sampler2d") { 
                             dom::NodePtr mySamplerNode = curPropList->childNode(j);
                             unsigned myTextureIndex = (*mySamplerNode)("#text").dom::Node::nodeValueAs<unsigned>();
                             if (myTextureIndex >= _myTextures.size()) {
@@ -195,10 +196,13 @@ namespace y60 {
 
     bool
     MaterialBase::writeDepthBuffer() const {
-        if (getNode().getAttribute(WRITE_DEPTH_BUFFER_ATTRIB)) {
-            return getNode().getAttributeValue<bool>(WRITE_DEPTH_BUFFER_ATTRIB);
+        const VectorOfString & myTargetBuffers = getNode().getAttributeValue<VectorOfString>(TARGETBUFFERS_PROPERTY);
+        for (int i = 0; i < myTargetBuffers.size(); ++i) {
+            if (TargetBuffers(myTargetBuffers[i]) == DEPTH_MASK) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     bool

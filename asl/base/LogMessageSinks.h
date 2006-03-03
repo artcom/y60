@@ -42,15 +42,37 @@
 #define _ac_asl_LogMessageSinks_h_
 
 #include "Logger.h"
+#include "console_functions.h"
 
 namespace asl {
+
+    class FarewellMessageSink : public MessageSink {
+    public:
+        FarewellMessageSink() {}
+        void push(Severity theSeverity, const std::string & theMessage) {
+            if (theSeverity == SEV_FATAL) {
+                abort();
+            }
+        };
+    private:
+    };
 
     class StreamPrinter : public MessageSink {
     public:
         StreamPrinter(std::ostream & theStream) : _myStream(theStream) {}
-        void push(const std::string & theMessage) {
+        void push(Severity theSeverity, const std::string & theMessage) {
             myLock.lock();
-            _myStream << theMessage << std::endl;
+           
+            switch (theSeverity) {
+                case SEV_FATAL :
+                case SEV_ERROR :
+                    _myStream << TTYRED;
+                    break;
+                case SEV_WARNING:
+                    _myStream << TTYYELLOW;
+                    break;
+            }
+            _myStream << theMessage << ENDCOLOR << std::endl;
             myLock.unlock();
         };
     private:
@@ -58,12 +80,25 @@ namespace asl {
         std::ostream & _myStream;
     };
 
+    class FilePrinter : public MessageSink {
+    public:
+        FilePrinter(const std::string & theFilename) : _myStream(theFilename.c_str()) {}
+        void push(Severity theSeverity, const std::string & theMessage) {
+            myLock.lock();
+            _myStream << theMessage << std::endl;
+            myLock.unlock();
+        };
+    private:
+        static ThreadLock myLock;
+        std::ofstream _myStream;
+    };
+
 #ifdef WIN32
 #include "windows.h"
     class OutputWindowPrinter : public MessageSink {
     public:
         OutputWindowPrinter() {}
-        void push(const std::string & theMessage) {
+        void push(Severity theSeverity, const std::string & theMessage) {
             myLock.lock();
             OutputDebugString((theMessage + "\n").c_str());
             myLock.unlock();

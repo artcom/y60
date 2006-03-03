@@ -116,10 +116,10 @@ createTriangleMeshMarkup(y60::ScenePtr theScene, const std::string & theLineMate
                          const std::vector<asl::Vector3f> & thePositions,
                          const std::string & theName = "TriangleMeshMarkupShape") ;
 
+/** Creates a stack of quads used for volumetric rendering */
 dom::NodePtr createQuadStack(y60::ScenePtr theScene, const asl::Vector3i & theDimensions,
                      float theSize, const std::string & theMaterialId,
                      const std::string theName = "QuadStack");
-
 
 dom::NodePtr
 createLineStrip(y60::ScenePtr theScene, const std::string & theLineMaterialId,
@@ -139,6 +139,11 @@ createStrip(const std::string & theType, y60::ScenePtr theScene,
         const std::vector<asl::Vector3f> & thePositions,
         const std::vector<asl::Vector2f> & theTexCoords,
         const std::vector<asl::Vector4f> & theColors); 
+
+dom::NodePtr createVoxelProxyGeometry(y60::ScenePtr theScene, const asl::Box3f & theVoxelBox,
+                                      const asl::Matrix4f & theModelMatrix, const asl::Matrix4f & theCameraMatrix,
+                                      const asl::Vector3i & theVolumeSize, float theSampleRate,
+                                      const std::string & theMaterialId, const std::string & theName);
 
 struct PlanePosition {
     PlanePosition(const asl::Point3f & theOrigin,

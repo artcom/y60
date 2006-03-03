@@ -35,10 +35,11 @@ namespace asl {
     
 ZipReader::ZipReader(const char *  theInputFileName) : _myInputStream(0)
 {
-    _myInputStream = unzOpen(theInputFileName);
-    AC_DEBUG << "opening " << theInputFileName;
+    Path myPath(theInputFileName, UTF8);
+    _myInputStream = unzOpen(myPath.toLocale().c_str());
+    AC_DEBUG << "opening " << myPath;
     if (_myInputStream == 0) {
-        throw ZipFileException(string("can't open zip file '") + theInputFileName + "'",
+        throw ZipFileException(string("can't open zip file '") + myPath.toLocale() + "'",
                 PLUS_FILE_LINE);
     }
     readDirectory();
@@ -80,7 +81,7 @@ ZipReader::readDirectory() {
             }
         }
         
-        curEntry.filename = filename_inzip;
+        curEntry.filename = Path(filename_inzip, Locale);
         curEntry.size = file_info.uncompressed_size;
         unz_file_pos myFilePos;
         unzGetFilePos(_myInputStream, &myFilePos);
@@ -91,7 +92,7 @@ ZipReader::readDirectory() {
         // a trailing directory seperator, then
         // add the entry to the list
         if (!curEntry.filename.empty() && 
-            curEntry.filename[curEntry.filename.size()-1] != '/')
+            curEntry.filename.toLocale()[curEntry.filename.toLocale().size()-1] != '/')
         {
             _myDirectory.push_back(curEntry); 
         }
@@ -110,9 +111,10 @@ ZipReader::getFile(int theFileIndex) {
 
 Ptr<ReadableBlock> 
 ZipReader::getFile(const std::string & theFilePath) {
+    Path myPath(theFilePath, UTF8);
     for (int i = 0; i < _myDirectory.size(); ++i) {
         DB(AC_TRACE << "cmp:" << _myDirectory[i].filename << "==" << theFilePath << endl);
-        if (theFilePath == _myDirectory[i].filename) {
+        if (myPath == _myDirectory[i].filename) {
             DB(AC_TRACE << "OK" << endl);
             return getFile(_myDirectory[i]);
         }

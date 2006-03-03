@@ -257,7 +257,7 @@ TNTMeasurementList::update(dom::NodePtr theMeasurementNode, const Glib::ustring 
     myRow[_myColumns.is_visible] = theMeasurementNode->getAttribute("visible")->nodeValueRef<bool>();
     myRow[_myColumns.type_icon] = myIt->second;
     myRow[_myColumns.type] = myType;
-    myRow[_myColumns.name] = theMeasurementNode->getAttributeString("name");
+    myRow[_myColumns.name] = Glib::ustring(theMeasurementNode->getAttributeString("name").c_str());
     myRow[_myColumns.value] = theDisplayValue;
     myRow[_myColumns.is_editable] = theMeasurementNode->getAttribute("editable")->nodeValueRef<bool>();
     myRow[_myColumns.xml_id] = theMeasurementNode->getAttributeString("id");

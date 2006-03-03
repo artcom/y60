@@ -169,17 +169,11 @@ RenderArea::on_expose_event (GdkEventExpose *event) {
             glFlush ();
         }
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_expose_event(): "
-             << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_expose_event(): "
-             << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_expose_event()"
-             << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }
@@ -187,23 +181,17 @@ RenderArea::on_expose_event (GdkEventExpose *event) {
 /* new window size or exposure */
 bool
 RenderArea::on_configure_event(GdkEventConfigure *event) {
+    Gtk::DrawingArea::on_configure_event(event);
     try {
-        Gtk::DrawingArea::on_configure_event(event);
         _myEventAdapter.addWindowEvent(event);
 
         queue_draw();
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-             << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-             << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-             << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }
@@ -213,20 +201,14 @@ RenderArea::on_realize() {
     try {
         DB(cerr << "on_realize called" << endl);
         queue_draw();
-        Gtk::DrawingArea::on_realize();
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-             << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-             << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-             << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
+    Gtk::DrawingArea::on_realize();
 }
 
 void
@@ -247,17 +229,11 @@ RenderArea::on_scroll_event (GdkEventScroll* event) {
         _myEventAdapter.addMouseScrollEvent(event);
         queue_draw();
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-            << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }
@@ -266,19 +242,13 @@ bool
 RenderArea::on_motion_notify_event(GdkEventMotion *event) {
     try {
         _myEventAdapter.addMouseMotionEvent(event);
-        queue_draw();
+        //queue_draw();
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-            << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }
@@ -287,19 +257,13 @@ bool
 RenderArea::on_button_release_event(GdkEventButton* event) {
     try {
         _myEventAdapter.addMouseButtonEvent(event);
-        queue_draw();
+        //queue_draw();
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-            << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }
@@ -308,19 +272,13 @@ bool
 RenderArea::on_button_press_event(GdkEventButton* event) {
     try {
         _myEventAdapter.addMouseButtonEvent(event);
-        queue_draw();
+        //queue_draw();
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-            << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }
@@ -335,17 +293,11 @@ RenderArea::on_idle () {
         gdk_window_process_updates (GTK_WIDGET(gobj())->window, FALSE);
 
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-            << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }
@@ -383,17 +335,11 @@ RenderArea::on_map_event (GdkEventAny *event) {
         // idle_add ();
 
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-            << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }
@@ -404,17 +350,11 @@ RenderArea::on_unmap_event (GdkEventAny *event) {
         // idle_remove ();
 
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-            << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }
@@ -429,18 +369,13 @@ RenderArea::on_visibility_notify_event (GdkEventVisibility *event) {
            idle_add ();
          */
 
+
     } catch (const asl::Exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {
-        cerr << endl << "### ERROR: Exception caught in RenderArea::on_configure_event(): "
-            << ex.what() << endl;
-        throw ex;
+        AC_FATAL << "Exception caught: " << ex.what();
     } catch (...) {
-        cerr << endl << "### ERROR: Unknown exception in RenderArea::on_configure_event()"
-            << endl;
-        throw;
+        AC_FATAL << "Unknown exception";
     }
     return true;
 }

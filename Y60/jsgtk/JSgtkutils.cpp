@@ -15,8 +15,13 @@
 
 namespace jslib {
 
+/*
 jsval as_jsval(JSContext *cx, const Glib::ustring & theUTF8String) {
-    gunichar2 * myUTF16 = g_utf8_to_utf16(theUTF8String.data(), theUTF8String.bytes(),0,0,0);
+    if (! g_utf8_validate(theUTF8String.data(), -1, 0) ) {
+        AC_ERROR << "String not valid UTF8";
+        return JSVAL_NULL;
+    }
+    gunichar2 * myUTF16 = g_utf8_to_utf16(theUTF8String.data(), -1,0,0,0);
     
     JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myUTF16));
     g_free(myUTF16);
@@ -45,7 +50,7 @@ bool convertFrom(JSContext *cx, jsval theValue, Glib::ustring & theDest) {
     g_free(myUTF8);
     return true;
 };
-
+*/
 
 }
 

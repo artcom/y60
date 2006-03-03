@@ -28,6 +28,7 @@
 #include <js/jsarena.h>
 #include <js/jscntxt.h>
 #include <js/jsdbgapi.h>
+#include <glib.h>
 
 using namespace std;
 using namespace asl;
@@ -36,16 +37,36 @@ using namespace asl;
 
 namespace asl {
 
-std::string as_string(JSContext *cx, jsval theVal) {
-    JSString *str;
-    str = JS_ValueToString(cx, theVal);
-    if (!str) {
-        return "";
+Glib::ustring 
+as_ustring(JSContext *cx, jsval theVal) {
+    JSString *myJSStr = JS_ValueToString(cx, theVal);
+    if (!myJSStr) {
+        return false;
     }
-    char *bytes = JS_GetStringBytes(str);
-    std::string myResult = bytes;
-    //nsMemory::Free(bytes);
+    size_t srcLen = JS_GetStringLength(myJSStr);
+
+    // get pointer to 16-bit chars
+    gunichar2 * myData = reinterpret_cast<gunichar2*>(JS_GetStringChars(myJSStr));
+
+    // now convert to utf-8 encoded c-string
+    glong targetLen;
+    gchar * myUTF8 = g_utf16_to_utf8(myData, srcLen * sizeof(gunichar2), 0, &targetLen, 0); 
+
+    // now convert to std::string
+    if ( ! myUTF8) {
+        throw asl::Exception("Failed to convert UTF8 from UTF16.", PLUS_FILE_LINE);
+    }
+    
+    Glib::ustring myResult = Glib::ustring(myUTF8);
+
+    // clean up
+    g_free(myUTF8);
     return myResult;
+}
+
+std::string 
+as_string(JSContext *cx, jsval theVal) {
+    return as_ustring(cx, theVal);
 }
 
 std::string as_string(JSContext *cx, JSObject *theObj) {
@@ -433,6 +454,38 @@ JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError)
         JS_RemoveRoot(cx, &exnObject);
     return JS_TRUE;
 }
+
+JSBool
+JSA_CallFunctionName(JSContext * cx, JSObject * obj, const Glib::ustring & theName, int argc, jsval argv[], jsval* rval) {
+
+    JSBool bOK = JS_TRUE;
+    gunichar2 * myUTF16 = 0;
+    try {
+        try {
+            glong myLength = g_utf8_strlen(theName.c_str(), -1);
+            myUTF16 = g_utf8_to_utf16(theName.c_str(), -1,0,0,0);
+            jsval myVal;
+            bOK = JS_GetUCProperty(cx, obj, reinterpret_cast<jschar*>(myUTF16), myLength, &myVal);
+            if (myVal == JSVAL_VOID) {
+                AC_WARNING << "no JS function named '" << theName << "' found.";
+            } else { 
+                bOK = JS_CallFunctionValue(cx, obj, myVal, argc, argv, rval);
+                if (!bOK && !QuitFlagSingleton::get().getQuitFlag()) {
+                    AC_ERROR << "Exception while calling js function '" << theName << "'" << endl;
+                    JSA_reportUncaughtException(cx, cx->errorReporter);
+                }
+            }
+            g_free(myUTF16);
+        } catch (...) {
+            if (myUTF16) {
+                g_free(myUTF16);
+            }
+            throw;
+        }
+    } HANDLE_CPP_EXCEPTION; 
+    return bOK;
+}
+
 
 JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int argc, jsval argv[], jsval* rval) {

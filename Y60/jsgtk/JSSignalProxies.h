@@ -69,6 +69,8 @@ DEFINE_SIGNALPROXY1_CLASS_TRAIT(bool, GdkEventCrossing*)
 DEFINE_SIGNALPROXY1_CLASS_TRAIT(bool, GdkEventFocus*)
 DEFINE_SIGNALPROXY1_CLASS_TRAIT(bool, GdkEventAny*)
 
+DEFINE_SIGNALPROXY1_CLASS_TRAIT(std::string, const std::string &)
+
 //=====================================================
 // RVAL on_signal(P1, P2);
 //=====================================================

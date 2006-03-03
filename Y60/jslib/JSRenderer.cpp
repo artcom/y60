@@ -66,13 +66,24 @@ draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_RESET;
     DOC_END;
     
-    if (argc == 4) {
+    if (argc == 5) {
         if (JSLineSegment::matchesClassOf(cx, argv[0])) {
             typedef void (Renderer::*MyMethod)(
                 const asl::LineSegment<float> &,
                 const asl::Vector4f & theColor,
                 const asl::Matrix4f & theTransformation,
-                const float & theLineWidth);
+                const float & theLineWidth,
+                const std::string & theRenderStyles);
+            return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
+        }
+    } else if (argc == 4) {
+        if (JSLineSegment::matchesClassOf(cx, argv[0])) {
+            typedef void (Renderer::*MyMethod)(
+                const asl::LineSegment<float> &,
+                const asl::Vector4f & theColor,
+                const asl::Matrix4f & theTransformation,
+                const float & theLineWidth,
+                const std::string & theRenderStyles);
             return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
         }
         if (JSTriangle::matchesClassOf(cx, argv[0])) {

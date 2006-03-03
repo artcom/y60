@@ -39,7 +39,7 @@ class ZipReaderUnitTest : public UnitTest {
             ZipReader::Directory myDirectory = myZipReader.getDirectory();
             ENSURE(myDirectory.size() == 4);
             DPRINT(myDirectory[0].filename);
-            ENSURE(myDirectory[0].filename == "File One.txt");
+            ENSURE(myDirectory[0].filename.toUTF8() == "File One.txt");
 
             asl::Ptr<ReadableBlock> myFile(myZipReader.getFile(myDirectory[0]));
             string myExpectedString = "Hello World One!";

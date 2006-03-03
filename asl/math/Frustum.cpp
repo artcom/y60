@@ -125,7 +125,7 @@ Frustum::getProjectionMatrix(asl::Matrix4f & theProjectionMatrix) const {
                 0.0f, 0.0f, float(-2.0f/(_myFar - _myNear)), 0.0f,
                 float(-(_myRight+_myLeft) / (_myRight-_myLeft)),
                 float(-(_myTop+_myBottom) / (_myTop-_myBottom)),
-                float(-(_myFar + _myNear) / (_myFar - _myNear)), 1.0f, Matrix4f::UNKNOWN);
+                float(-(_myFar + _myNear) / (_myFar - _myNear)), 1.0f, Matrix4f::AFFINE);
         return true;
     }
     return false;

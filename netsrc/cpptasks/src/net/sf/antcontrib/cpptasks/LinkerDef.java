@@ -50,9 +50,10 @@ public class LinkerDef extends ProcessorDef {
     private Boolean map;
     private int stack;
     private final Vector sysLibrarySets = new Vector();
+    private final Vector frameworkSets = new Vector();
     /**
      * Default constructor
-     * 
+     *
      * @see java.lang.Object#Object()
      */
     public LinkerDef() {
@@ -114,10 +115,9 @@ public class LinkerDef extends ProcessorDef {
         }
         sysLibrarySets.addElement(libset);
     }
-    
-    
+
     public ProcessorConfiguration createConfiguration(CCTask task,
-            LinkType linkType, ProcessorDef baseDef, 
+            LinkType linkType, ProcessorDef baseDef,
 			TargetDef targetPlatform,
 			VersionInfo versionInfo) {
         //
@@ -147,7 +147,7 @@ public class LinkerDef extends ProcessorDef {
      * Returns an array of active library sets for this linker definition.
      */
     public LibrarySet[] getActiveLibrarySets(LinkerDef[] defaultProviders,
-            int index) {    	
+            int index) {
         if (isReference()) {
             return ((LinkerDef) getCheckedRef(LinkerDef.class, "LinkerDef"))
                     .getActiveUserLibrarySets(defaultProviders, index);
@@ -294,10 +294,10 @@ public class LinkerDef extends ProcessorDef {
     }
     /**
      * Sets the base address. May be specified in either decimal or hex.
-     * 
+     *
      * @param base
      *            base address
-     *  
+     *
      */
     public void setBase(FlexLong base) {
         if (isReference()) {
@@ -307,7 +307,7 @@ public class LinkerDef extends ProcessorDef {
     }
     /**
      * Sets the starting address.
-     * 
+     *
      * @param name
      *            function name
      */
@@ -328,7 +328,7 @@ public class LinkerDef extends ProcessorDef {
     }
     /**
      * If true, allows incremental linking.
-     *  
+     *
      */
     public void setIncremental(boolean incremental) {
         if (isReference()) {
@@ -347,8 +347,8 @@ public class LinkerDef extends ProcessorDef {
     }
     /**
      * Sets linker type.
-     * 
-     * 
+     *
+     *
      * <table width="100%" border="1"> <thead>Supported linkers </thead>
      * <tr>
      * <td>gcc</td>

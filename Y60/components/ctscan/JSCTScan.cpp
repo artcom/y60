@@ -195,7 +195,7 @@ computeProfile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
             JS_ReportError(cx, "JSCTScan::computeProfile(): 1 argument must be an array of Points");
             return JS_FALSE;
         }
-        std::vector<Signed16> myProfile;
+        std::vector<Signed32> myProfile;
         std::vector<asl::Point3i> mySampledPoints;
         CTScan & myCTScan = myObj.getNative();
         myCTScan.computeProfile(myVoxelPositions, myProfile, mySampledPoints);
@@ -311,7 +311,7 @@ countTrianglesGlobal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
         CTScan & myCTScan = myObj.getNative();
 
-        ensureParamCount(argc, 4);
+        ensureParamCount(argc, 5);
 
         // have to convert a Box3f into a Box3i because Box3i isn't available in JS
         Box3f myFloatBox;
@@ -328,8 +328,11 @@ countTrianglesGlobal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         convertFrom(cx, argv[2], myThresholdMax);
         int myDownSampleRate;
         convertFrom(cx, argv[3], myDownSampleRate);
+        bool myCloseAtClippingBoxFlag;
+        convertFrom(cx, argv[4], myCloseAtClippingBoxFlag);
 
-        Vector2i myCount = myCTScan.countTrianglesGlobal(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate);
+        Vector2i myCount = myCTScan.countTrianglesGlobal(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,
+                myCloseAtClippingBoxFlag);
         *rval = as_jsval(cx, myCount);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -340,7 +343,7 @@ countTrianglesInVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsva
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
         CTScan & myCTScan = myObj.getNative();
 
-        ensureParamCount(argc, 4);
+        ensureParamCount(argc, 5);
 
         // have to convert a Box3f into a Box3i because Box3i isn't available in JS
         Box3f myFloatBox;
@@ -361,7 +364,11 @@ countTrianglesInVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsva
         int myDownSampleRate;
         convertFrom(cx, argv[3], myDownSampleRate);
 
-        Vector2i myCount = myCTScan.countTrianglesInVolumeMeasurement(myVoxelBox, myMeasurementNode, myThresholdPalette, myDownSampleRate);
+        bool myCloseAtClippingBoxFlag;
+        convertFrom(cx, argv[4], myCloseAtClippingBoxFlag);
+        
+        Vector2i myCount = myCTScan.countTrianglesInVolumeMeasurement(myVoxelBox, myMeasurementNode, 
+                myThresholdPalette, myDownSampleRate, myCloseAtClippingBoxFlag);
         *rval = as_jsval(cx, myCount);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -372,7 +379,7 @@ polygonizeGlobal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
         CTScan & myCTScan = myObj.getNative();
 
-        ensureParamCount(argc, 5, 7);
+        ensureParamCount(argc, 6, 8);
 
         // have to convert a Box3f into a Box3i because Box3i isn't available in JS
         Box3f myFloatBox;
@@ -391,20 +398,23 @@ polygonizeGlobal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
         int myDownSampleRate;
         convertFrom(cx, argv[3], myDownSampleRate);
 
+        bool myCloseAtClippingBoxFlag;
+        convertFrom(cx, argv[4], myCloseAtClippingBoxFlag);
+
         bool myCreateNormalsFlag;
-        convertFrom(cx, argv[4], myCreateNormalsFlag);
+        convertFrom(cx, argv[5], myCreateNormalsFlag);
 
         unsigned myNumVertices = 0;
-        if (argc > 5) {
-            convertFrom(cx, argv[5], myNumVertices);
+        if (argc > 6) {
+            convertFrom(cx, argv[6], myNumVertices);
         }
         unsigned myNumTriangles = 0;
-        if (argc > 6) {
-            convertFrom(cx, argv[6], myNumTriangles);
+        if (argc > 7) {
+            convertFrom(cx, argv[7], myNumTriangles);
         }
 
-        ScenePtr myScene = myCTScan.polygonizeGlobal(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,  
-            myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles);
+        ScenePtr myScene = myCTScan.polygonizeGlobal(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate, 
+                myCloseAtClippingBoxFlag, myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles);
         *rval = as_jsval(cx, myScene);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -415,7 +425,7 @@ polygonizeVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         JSClassTraits<CTScan>::ScopedNativeRef myObj(cx, obj);
         CTScan & myCTScan = myObj.getNative();
 
-        ensureParamCount(argc, 5, 7);
+        ensureParamCount(argc, 6, 8);
 
         // have to convert a Box3f into a Box3i because Box3i isn't available in JS
         Box3f myFloatBox;
@@ -436,20 +446,23 @@ polygonizeVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
         int myDownSampleRate;
         convertFrom(cx, argv[3], myDownSampleRate);
 
+        bool myCloseAtClippingBoxFlag;
+        convertFrom(cx, argv[4], myCloseAtClippingBoxFlag);
+
         bool myCreateNormalsFlag;
-        convertFrom(cx, argv[4], myCreateNormalsFlag);
+        convertFrom(cx, argv[5], myCreateNormalsFlag);
 
         unsigned myNumVertices = 0;
-        if (argc > 3) {
-            convertFrom(cx, argv[5], myNumVertices);
+        if (argc > 6) {
+            convertFrom(cx, argv[6], myNumVertices);
         }
         unsigned myNumTriangles = 0;
-        if (argc > 4) {
-            convertFrom(cx, argv[6], myNumTriangles);
+        if (argc > 7) {
+            convertFrom(cx, argv[7], myNumTriangles);
         }
 
         ScenePtr myScene = myCTScan.polygonizeVolumeMeasurement(myVoxelBox, myMeasurementNode, myThresholdPalette,
-                myDownSampleRate, myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices,
+                myDownSampleRate, myCloseAtClippingBoxFlag, myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices,
                 myNumTriangles);
         *rval = as_jsval(cx, myScene);
         return JS_TRUE;
@@ -543,28 +556,32 @@ copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 static JSBool
 copyVoxelVolumeToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
-       ensureParamCount(argc, 6);
+       ensureParamCount(argc, 7);
 
         dom::NodePtr myMeasurement;
         convertFrom(cx, argv[0], myMeasurement);
 
+        unsigned myGlobalThresholdIndex;
+        convertFrom(cx, argv[1], myGlobalThresholdIndex);
+        
         dom::NodePtr myCanvas;
-        convertFrom(cx, argv[1], myCanvas);
+        convertFrom(cx, argv[2], myCanvas);
 
         dom::NodePtr myReconstructedImage;
-        convertFrom(cx, argv[2], myReconstructedImage);
+        convertFrom(cx, argv[3], myReconstructedImage);
 
         unsigned mySliceIndex;
-        convertFrom(cx, argv[3], mySliceIndex);
+        convertFrom(cx, argv[4], mySliceIndex);
 
         unsigned mySliceOrientationInt;
-        convertFrom(cx, argv[4], mySliceOrientationInt);
+        convertFrom(cx, argv[5], mySliceOrientationInt);
         CTScan::Orientation myOrientation = static_cast<CTScan::Orientation>( mySliceOrientationInt );
 
         dom::NodePtr myPaletteNode;
-        convertFrom(cx, argv[5], myPaletteNode);
+        convertFrom(cx, argv[6], myPaletteNode);
 
-        CTScan::copyVoxelVolumeToCanvas(myMeasurement, myCanvas, myReconstructedImage, mySliceIndex, myOrientation, myPaletteNode);
+        CTScan::copyVoxelVolumeToCanvas(myMeasurement, myGlobalThresholdIndex, myCanvas, myReconstructedImage, 
+                mySliceIndex, myOrientation, myPaletteNode);
 
         return JS_TRUE;
         
@@ -600,6 +617,23 @@ applyBrush(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 create3DTexture(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<JSCTScan::NATIVE>::call(&JSCTScan::NATIVE::create3DTexture,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+renderTransferFunction(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        ensureParamCount(argc, 2);
+
+        dom::NodePtr myTransferFunction;
+        convertFrom(cx, argv[0], myTransferFunction);
+
+        dom::NodePtr myTargetImage;
+        convertFrom(cx, argv[1], myTargetImage);
+
+        CTScan::renderTransferFunction(myTransferFunction, myTargetImage);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    return JS_FALSE;
 }
 
 #define DEFINE_ORIENTATION_PROP(NAME) { #NAME, PROP_ ## NAME , CTScan::NAME }
@@ -661,6 +695,7 @@ JSCTScan::StaticFunctions() {
         {"copyCanvasToVoxelVolume", copyCanvasToVoxelVolume, 5},
         {"copyVoxelVolumeToCanvas", copyVoxelVolumeToCanvas, 6},
         {"applyBrush",              applyBrush,              5},
+        {"renderTransferFunction",  renderTransferFunction,  2},
         {0}
     };
     return myFunctions;

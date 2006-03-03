@@ -59,11 +59,13 @@ namespace y60 {
         friend class ExportShapePolicy<VoxelT, SegmentationPolicy>;
         public:
 
-            MarchingCubes(int theDownSampleRate, OutputPolicy & theOutputPolicy,
+            MarchingCubes(int theDownSampleRate, bool theCloseAtClippingBoxFlag, 
+                          OutputPolicy & theOutputPolicy,
                           SegmentationPolicy & theSegmentizer, CTScan * theVoxelData) :
                 _myOutputPolicy(theOutputPolicy),
                 _myVoxelData(theVoxelData),
                 _myDownSampleRate(theDownSampleRate),
+                _myCloseAtClippingBoxFlag(theCloseAtClippingBoxFlag),
                 _myLineStride(0),
                 _myMCLookup(),
                 _mySegmentizer( theSegmentizer )
@@ -130,14 +132,19 @@ namespace y60 {
                 AC_WARNING << "MarchingCubes: Logging disabled at compile time. See MarchingCubes.h";
 #endif
                 int j, i, k;
-                int myCubeIndex;
                 int myUpperCacheIndex = 0;  // will be switched on first iteration
-                const int iBoxStart = _myVBox[asl::Box3i::MIN][0];
-                const int iBoxEnd   = _myVBox[asl::Box3i::MAX][0];
-                const int jBoxStart = _myVBox[asl::Box3i::MIN][1];
-                const int jBoxEnd   = _myVBox[asl::Box3i::MAX][1];
-                const int kBoxStart = _myVBox[asl::Box3i::MIN][2];
-                const int kBoxEnd   = _myVBox[asl::Box3i::MAX][2];
+                int iBoxStart = _myVBox[asl::Box3i::MIN][0];
+                int iBoxEnd   = _myVBox[asl::Box3i::MAX][0];
+                int jBoxStart = _myVBox[asl::Box3i::MIN][1];
+                int jBoxEnd   = _myVBox[asl::Box3i::MAX][1];
+                int kBoxStart = _myVBox[asl::Box3i::MIN][2];
+                int kBoxEnd   = _myVBox[asl::Box3i::MAX][2];
+                if (_myCloseAtClippingBoxFlag) {
+                    jBoxStart--;
+                    kBoxStart--;
+                    jBoxEnd++;
+                    kBoxEnd++;
+                }
 
                 AC_TRACE << "Data dimension: X(" << _myDimensions[0] << "), Y(" 
                     << _myDimensions[1] << "), Z(" << _myDimensions[2] << ")\n";
@@ -164,19 +171,61 @@ namespace y60 {
                     myUpperCacheIndex = 1 - myUpperCacheIndex;
                     _myCache[myUpperCacheIndex]->reset();
                     _myKCache->reset(-1);
+                    int kCubeIndex = 0;
+                    if (k < _myVBox[asl::Box3i::MIN][2]) {
+                        kCubeIndex |= BIT_0 | BIT_1 | BIT_2 | BIT_3; 
+                    }
+                    if (k >= _myVBox[asl::Box3i::MAX][2]) {
+                        kCubeIndex |= BIT_4 | BIT_5 | BIT_6 | BIT_7; 
+                    }
                     for(j = jBoxStart; j < jBoxEnd; j++) {
+                        int jCubeIndex = 0;
+                        if (j < _myVBox[asl::Box3i::MIN][1]) {
+                            jCubeIndex |= BIT_0 | BIT_3 | BIT_4 | BIT_7; 
+                        }
+                        if (j >= _myVBox[asl::Box3i::MAX][1]) {
+                            jCubeIndex |= BIT_1 | BIT_2 | BIT_5 | BIT_6; 
+                        }
+                        // add empty value at iBoxStart-1
+                        if (_myCloseAtClippingBoxFlag) { 
+                            int myCubeIndex = kCubeIndex | jCubeIndex
+                                              | BIT_0 | BIT_1 | BIT_4 | BIT_5; 
+                            getCubeIndex(iBoxStart-1, j, k, myCubeIndex);
+                            if((myCubeIndex > 0) && (myCubeIndex < 255)) {
+                                _mySegmentizer.fillThresholdCube(iBoxStart-1, j, k);
+                                fillVoxelCube(iBoxStart-1, j, k, _myCurrent);
+                                asl::Vector3i myVoxel(iBoxStart-1, j, k);
+                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex], 
+                                        *_myCache[myUpperCacheIndex], *_myKCache);
+                            }
+                        }
                         for(i = iBoxStart; i < iBoxEnd; i++) {
                             // [TS] This makes MC behave different from before. But still I
                             // believe it is more correct than before. We cant triangulate
                             // the rightmost voxels. Visual results are kindof strange. We
                             // could make it check against the myCubeIndex so we at least close
                             // everything we can... but that would still be strange...
-                            myCubeIndex = getCubeIndex(i, j, k);
+                            int myCubeIndex = kCubeIndex | jCubeIndex; 
+                            getCubeIndex(i, j, k, myCubeIndex);
                             if((myCubeIndex > 0) && (myCubeIndex < 255)) {
                                 _mySegmentizer.fillThresholdCube(i, j, k);
                                 fillVoxelCube(i, j, k, _myCurrent);
                                 asl::Vector3i myVoxel(i, j, k);
-                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex], *_myCache[myUpperCacheIndex], *_myKCache);
+                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex], 
+                                        *_myCache[myUpperCacheIndex], *_myKCache);
+                            }
+                        }
+                        // add empty value at iBoxEnd
+                        if (_myCloseAtClippingBoxFlag) { 
+                            int myCubeIndex = kCubeIndex | jCubeIndex
+                                | BIT_2 | BIT_3 | BIT_6 | BIT_7; 
+                            getCubeIndex(iBoxEnd, j, k, myCubeIndex);
+                            if((myCubeIndex > 0) && (myCubeIndex < 255)) {
+                                _mySegmentizer.fillThresholdCube(iBoxEnd, j, k);
+                                fillVoxelCube(iBoxEnd, j, k, _myCurrent);
+                                asl::Vector3i myVoxel(iBoxEnd, j, k);
+                                triangulateVoxel(myCubeIndex, myVoxel, *_myCache[1-myUpperCacheIndex], 
+                                        *_myCache[myUpperCacheIndex], *_myKCache);
                             }
                         }
                     }
@@ -220,7 +269,9 @@ namespace y60 {
                 }
             }
 
-            inline void triangulateVoxel(int theCubeIndex, const asl::Vector3i & theMarchPos, IJCache & theLowerCache, IJCache & theUpperCache, KCache & theKCache) {
+            inline void triangulateVoxel(int theCubeIndex, const asl::Vector3i & theMarchPos, 
+                    IJCache & theLowerCache, IJCache & theUpperCache, KCache & theKCache) 
+            {
                 std::vector<int> myEdgeTable;
                 myEdgeTable.resize(12, -1);
                 myEdgeTable[1] = -2;
@@ -313,7 +364,8 @@ namespace y60 {
                 for (int i = 0; i < 3; ++i) {
                     int myIndex = _myAdjacents[theCubeIndex][i];
                     asl::Vector3i myOffset = myDoublePos - _myCubeTable[myIndex];
-                    theGradient[i] = _mySegmentizer.interpolateNormal(_myCurrent[myIndex], myIndex, clampedAt(thePosition + myOffset), thePosition + myOffset, theUpperFlag) / _myVoxelSize[i];
+                    theGradient[i] = _mySegmentizer.interpolateNormal(_myCurrent[myIndex], myIndex, 
+                            clampedAt(thePosition + myOffset), thePosition + myOffset, theUpperFlag) / _myVoxelSize[i];
                     if (_myCubeTable[myIndex][i]) {
                         theGradient[i] = -theGradient[i];
                     }
@@ -494,7 +546,7 @@ namespace y60 {
              * Gets a (downsampled) value from the Voxel data. 
              */
             inline
-            const VoxelT &
+            VoxelT 
             at(const asl::Vector3i & thePosition) const {
                 return at(thePosition[0], thePosition[1], thePosition[2]);
             }
@@ -503,31 +555,55 @@ namespace y60 {
              * Gets a (downsampled) value from the Voxel data. 
              */
             inline
-            const VoxelT &
+            VoxelT 
             at(int x, int y, int z) const {
-                return at(asl::Vector2i((_myLineStride*y + x)*_myDownSampleRate, z*_myDownSampleRate));
+                if (_myDownSampleRate == 1) {
+                    return _mySlices[z*_myDownSampleRate][(_myLineStride*y + x)*_myDownSampleRate];
+                } else { 
+                    int myCount = 0;
+                    float myValue = 0.0f;
+                    for (int i = 0; i < _myDownSampleRate; ++i) {
+                        for (int j = 0; j < _myDownSampleRate; ++j) {
+                            for (int k = 0; k < _myDownSampleRate; ++k) {
+                                myCount++;
+                                myValue +=_mySlices[z*_myDownSampleRate+i][_myLineStride* (y*_myDownSampleRate+j)+ 
+                                                    x*_myDownSampleRate+k];
+                            }
+                        }
+                    }
+                    return VoxelT(myValue / float(myCount));
+                }
             }
 
             /**
              * Gets a value from the Voxel data by the downsampled sliceindex and offset in the slice
              */
+            /*
             inline
-            const VoxelT &
+            VoxelT 
             at(const asl::Vector2i & theOffset) const {
                 return _mySlices[theOffset[1]][theOffset[0]];
             }
+            */
+            inline
+            VoxelT 
+            clampedAt(int x, int y, int z) const {
+                return clampedAt(asl::Vector3i(x,y,z));
+            }
 
             inline
-            const VoxelT 
+            VoxelT 
             clampedAt(const asl::Vector3i & thePosition) const {
-                asl::Point3i myClippedPosition = thePosition;
-                if (_myVBox.contains(myClippedPosition)) {
-                    return at(myClippedPosition);
+                if ((thePosition[0] >= _myVBox[asl::Box3i::MIN][0]) && (thePosition[0] <= _myVBox[asl::Box3i::MAX][0])
+                 && (thePosition[1] >= _myVBox[asl::Box3i::MIN][1]) && (thePosition[1] <= _myVBox[asl::Box3i::MAX][1])
+                 && (thePosition[2] >= _myVBox[asl::Box3i::MIN][2]) && (thePosition[2] <= _myVBox[asl::Box3i::MAX][2]))
+                {
+                    return at(asl::asPoint(thePosition));
                 } else {
                     return asl::NumericTraits<VoxelT>::min();
                 }
             }
-
+            /*
             // Fast but ugly method. Deprecate this if possible.
             inline VoxelT
             getValueByCubeCorner(int iMarch, int jMarch, int kMarch, int theCubeCorner) {
@@ -552,22 +628,20 @@ namespace y60 {
                     throw MarchingCubesException(std::string("Illegal CubeIndex: ") + asl::as_string(theCubeCorner), PLUS_FILE_LINE);
                 }
             }
+            */
 
             inline void
             fillVoxelCube(int theI, int theJ, int theK, std::vector<VoxelT> & theVoxelCube) {
                 theVoxelCube.clear();
                 theVoxelCube.reserve(8);
-                int myDownSampledSlice = theK * _myDownSampleRate;
-                int myDownSampledPosition = (theJ * _myLineStride + theI) * _myDownSampleRate;
-                int mySlicePosition;
-                int mySliceOffset;
-                for (int i = 0; i < 8; ++i) {
-                    mySlicePosition = myDownSampledSlice+_myOffsetTable[i][1];
-                    mySliceOffset = myDownSampledPosition+_myOffsetTable[i][0];
-                    theVoxelCube.push_back(_mySlices[mySlicePosition][mySliceOffset]); 
-                    // This is a bit faster but less elegant:
-                    // theVoxelCube.push_back(getValueByCubeCorner(iMarch, jMarch, kMarch, i));
-                }
+                theVoxelCube.push_back(clampedAt(theI, theJ, theK));
+                theVoxelCube.push_back(clampedAt(theI, theJ+1, theK));
+                theVoxelCube.push_back(clampedAt(theI+1, theJ+1, theK));
+                theVoxelCube.push_back(clampedAt(theI+1, theJ, theK));
+                theVoxelCube.push_back(clampedAt(theI, theJ, theK+1));
+                theVoxelCube.push_back(clampedAt(theI, theJ+1, theK+1));
+                theVoxelCube.push_back(clampedAt(theI+1, theJ+1, theK+1));
+                theVoxelCube.push_back(clampedAt(theI+1, theJ, theK+1));
             }
 
             void
@@ -604,38 +678,33 @@ namespace y60 {
                 }
             }
 
-            inline int 
-            getCubeIndex(int theI, int theJ, int theK) const {
-                unsigned int myBitMask = 0;
-
-
-                //const VoxelT & myValue = at(x, y, z);
-
-                if(_mySegmentizer.isOutside(theI, theJ, theK, at(theI, theJ, theK))) {
-                    myBitMask |= BIT_0;
+            inline void 
+            getCubeIndex(int theI, int theJ, int theK, int & theBitMask) const {
+                if( ((theBitMask & BIT_0) == 0) && _mySegmentizer.isOutside(theI, theJ, theK, at(theI, theJ, theK))) {
+                    theBitMask |= BIT_0;
                 }
-                if(_mySegmentizer.isOutside(theI, theJ+1, theK, at(theI, theJ+1, theK))) {
-                    myBitMask |= BIT_1;
+                if( ((theBitMask & BIT_1) == 0) && _mySegmentizer.isOutside(theI, theJ+1, theK, at(theI, theJ+1, theK))) {
+                    theBitMask |= BIT_1;
                 }
-                if(_mySegmentizer.isOutside(theI+1, theJ+1, theK, at(theI+1, theJ+1, theK))) {
-                    myBitMask |= BIT_2;
+                if( ((theBitMask & BIT_2) == 0) && _mySegmentizer.isOutside(theI+1, theJ+1, theK, at(theI+1, theJ+1, theK))) {
+                    theBitMask |= BIT_2;
                 }
-                if(_mySegmentizer.isOutside(theI+1, theJ, theK, at(theI+1, theJ, theK))) {
-                    myBitMask |= BIT_3;
+                if( ((theBitMask & BIT_3) == 0) && _mySegmentizer.isOutside(theI+1, theJ, theK, at(theI+1, theJ, theK))) {
+                    theBitMask |= BIT_3;
                 }
-                if(_mySegmentizer.isOutside(theI, theJ, theK+1, at(theI, theJ, theK+1))) {
-                    myBitMask |= BIT_4;
+                if( ((theBitMask & BIT_4) == 0) && _mySegmentizer.isOutside(theI, theJ, theK+1, at(theI, theJ, theK+1))) {
+                    theBitMask |= BIT_4;
                 }
-                if(_mySegmentizer.isOutside(theI, theJ+1, theK+1, at(theI, theJ+1, theK+1))) {
-                    myBitMask |= BIT_5;
+                if( ((theBitMask & BIT_5) == 0) && _mySegmentizer.isOutside(theI, theJ+1, theK+1, at(theI, theJ+1, theK+1))) {
+                    theBitMask |= BIT_5;
                 }
-                if(_mySegmentizer.isOutside(theI+1, theJ+1, theK+1, at(theI+1, theJ+1, theK+1))) {
-                    myBitMask |= BIT_6;
+                if( ((theBitMask & BIT_6) == 0) && _mySegmentizer.isOutside(theI+1, theJ+1, theK+1, at(theI+1, theJ+1, theK+1))) {
+                    theBitMask |= BIT_6;
                 }
-                if(_mySegmentizer.isOutside(theI+1, theJ, theK+1, at(theI+1, theJ, theK+1))) {
-                    myBitMask |= BIT_7;
+                if( ((theBitMask & BIT_7) == 0) && _mySegmentizer.isOutside(theI+1, theJ, theK+1, at(theI+1, theJ, theK+1))) {
+                    theBitMask |= BIT_7;
                 }
-                return myBitMask;
+                return;
             }
 
 
@@ -655,6 +724,7 @@ namespace y60 {
             MCLookup _myMCLookup;
 
             const int _myDownSampleRate;
+            bool _myCloseAtClippingBoxFlag;
             int _myLineStride;
             int _mySliceOffset;
 

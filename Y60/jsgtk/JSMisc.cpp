@@ -53,7 +53,7 @@ JSMisc::Functions() {
 JSPropertySpec *
 JSMisc::Properties() {
     static JSPropertySpec myProperties[] = {
-//        {"URL", PROP_URL, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"alignment", PROP_alignment, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -77,10 +77,17 @@ JSMisc::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        case 0:
+        case PROP_alignment:
+            {
+                float x,y;
+                theNative.get_alignment(x,y);
+                *vp = as_jsval(cx, Vector2f(x,y));
+                break;
+            }
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
+    return JS_TRUE;
 }
 JSBool
 JSMisc::setPropertySwitch(NATIVE & theNative, unsigned long theID,
@@ -88,9 +95,15 @@ JSMisc::setPropertySwitch(NATIVE & theNative, unsigned long theID,
 {
     switch (theID) {
         case 0:
+            {
+                Vector2f myAlignment;
+                convertFrom(cx, *vp, myAlignment);
+                theNative.set_alignment(myAlignment[0], myAlignment[1]);
+            }
         default:
             return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
+    return JS_TRUE;
 }
 
 JSBool

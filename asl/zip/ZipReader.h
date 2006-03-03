@@ -25,6 +25,7 @@
 
 #include <asl/Stream.h>
 #include <asl/Block.h>
+#include <asl/Path.h>
 #include <string>
 
 namespace asl {
@@ -34,7 +35,7 @@ DEFINE_EXCEPTION(ZipFileException, asl::Exception);
 class ZipReader {
     public:
         struct Entry {
-            std::string filename;
+            Path filename;
             size_t size;
             size_t directory_pos;
             size_t file_index;

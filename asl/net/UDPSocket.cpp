@@ -83,6 +83,8 @@ namespace inet {
             if (errno!=OS_SOCKET_ERROR(EWOULDBLOCK))
                 throw SocketException("UDPSocket::ReadFrom failed");
         }
+        AC_TRACE << "received from (network byte order)" << _myLocalEndpoint.sin_addr.s_addr << ":" 
+            << _myLocalEndpoint.sin_port;
         return bytesread;
     }
 
@@ -91,6 +93,8 @@ namespace inet {
         setRemoteAddr(thehost, theport);
 
         int byteswritten;
+        AC_TRACE << "Sending to (network byte order)" << _myRemoteEndpoint.sin_addr.s_addr << ":" 
+            << _myRemoteEndpoint.sin_port;
         if ((byteswritten=sendto(fd, (char*)data, len, 0, (struct sockaddr*)&_myRemoteEndpoint, sizeof(_myRemoteEndpoint)))!=len) {
             throw SocketException("UDPSocket::SendTo failed");
         }

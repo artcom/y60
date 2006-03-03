@@ -43,6 +43,7 @@
 #ifndef _included_asl_os_functions_
 #define _included_asl_os_functions_
 
+#include "string_functions.h"
 
 #include <string>
 #include <sys/types.h>
@@ -89,6 +90,17 @@ namespace asl {
     bool get_environment_var(const std::string & theVariable, std::string & theValue);
     void set_environment_var(const std::string & theVariable, const std::string & theValue);
 
+    template <class T>
+    bool get_environment_var_as(const std::string & theVariable, T& theValue) {
+        std::string myStringValue;
+        if (get_environment_var(theVariable, myStringValue)) {
+            theValue = as<T>(myStringValue);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
 #ifdef WIN32
 		bool hResultIsOk(HRESULT hr, std::string & theMessage);
 #endif		

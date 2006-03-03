@@ -49,9 +49,10 @@ ZipWriter::~ZipWriter() {
 
 void
 ZipWriter::create(const char * theOutputFileName) {
-    _myZipFile = zipOpen(theOutputFileName,0);
+    Path myPath(theOutputFileName, UTF8);
+    _myZipFile = zipOpen(myPath.toLocale().c_str(),0);
     if (!_myZipFile) {
-        throw ZipWriterException(string("ZIP Error: could not create zip file '")+theOutputFileName+"'", PLUS_FILE_LINE);
+        throw ZipWriterException(string("ZIP Error: could not create zip file '")+myPath.toLocale()+"'", PLUS_FILE_LINE);
     }
 }
 
@@ -65,7 +66,8 @@ ZipWriter::close() {
 
 void 
 ZipWriter::append(ReadableBlock & theData, const char * theFilename) {
-    CHECK_ZIP(zipOpenNewFileInZip(_myZipFile, theFilename, 
+    Path myPath(theFilename, UTF8);
+    CHECK_ZIP(zipOpenNewFileInZip(_myZipFile, myPath.toLocale().c_str(), 
             0, // zip_fileinfo
             0, // extrafield_local
             0, // extrafield_local size
@@ -78,9 +80,6 @@ ZipWriter::append(ReadableBlock & theData, const char * theFilename) {
     CHECK_ZIP(zipWriteInFileInZip(_myZipFile, theData.begin(), theData.size()));
 
     CHECK_ZIP(zipCloseFileInZip(_myZipFile));
-    
-    
-
 }
 
 void 

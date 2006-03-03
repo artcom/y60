@@ -21,6 +21,8 @@
 
 #include "JSNode.h"
 #include "JSVector.h"
+#include "JSBox.h"
+#include "JSMatrix.h"
 
 #include "JSScene.h"
 #include <y60/modelling_functions.h>
@@ -525,6 +527,47 @@ CreateQuadStack(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
 
 }
 
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateVoxelProxyGeometry(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Creates a proxy geometry for a volume renderer");
+        DOC_END;
+        ensureParamCount(argc, 7);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+
+        asl::Box3f myVoxelBox;
+        convertFrom(cx, argv[1], myVoxelBox);
+
+        Matrix4f myModel;
+        convertFrom(cx, argv[2], myModel);
+
+        Matrix4f myCamera;
+        convertFrom(cx, argv[3], myCamera);
+
+        Vector3i myVolumeSize;
+        convertFrom(cx, argv[4], myVolumeSize);
+
+        float mySampleRate;
+        convertFrom(cx, argv[5], mySampleRate);
+
+        string myMaterialId;
+        convertFrom(cx, argv[6], myMaterialId);
+
+        string myName;
+        convertFrom(cx, argv[7], myName);
+
+        dom::NodePtr myResult;
+        myResult = createVoxelProxyGeometry(myScene, myVoxelBox, myModel, myCamera,
+                                            myVolumeSize, mySampleRate, myMaterialId, myName);
+        *rval = as_jsval(cx, myResult);
+
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+
+}
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -564,6 +607,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createTriangleStrip",         CreateTriangleStrip,         4},
         {"createQuadStack",             CreateQuadStack,             5},
         {"createUnlitTexturedMaterial", CreateUnlitTexturedMaterial, 7},
+        {"createVoxelProxyGeometry",    CreateVoxelProxyGeometry,    7},
         {0}
     };
     return myFunctions;

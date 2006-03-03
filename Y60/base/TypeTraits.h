@@ -30,11 +30,12 @@
 #include <asl/Quaternion.h>
 #include <asl/string_functions.h>
 #include <string>
+#include "DataTypes.h"
 
 namespace y60 {
 
     //======================================================================
-    // some some type name traits
+    // some type name traits
     //    you can use getTypeName<asl::Vector4f>() to get the som node name
     //    for the corresponding type 'vector4f'
     //
@@ -56,7 +57,11 @@ namespace y60 {
                   STRING,
                   SAMPLER1D,
                   SAMPLER2D,
-                  SAMPLERCUBE };
+                  SAMPLERCUBE,
+                  SAMPLER3D,
+                  VECTOR_OF_STRING,
+                  VECTOR_OF_RANKED_FEATURE
+    }; // TODO: move me up when file format compatibility isn't an issue
 
     static const char * TypeIdStrings[] =
     {
@@ -77,6 +82,9 @@ namespace y60 {
         "sampler1d",
         "sampler2d",
         "samplerCUBE",
+        "sampler3d",  // TODO: move me up when file format compatibility isn't an issue
+        "vectorofstring",
+        "vectorofrankedfeature",
         0
     };
 
@@ -91,6 +99,12 @@ namespace y60 {
     struct TypeIdTraits<float> {
         static const TypeId type_id() {
             return FLOAT;
+        }
+    };
+    template <>
+    struct TypeIdTraits<std::string> {
+        static const TypeId type_id() {
+            return STRING;
         }
     };
     template <>
@@ -109,6 +123,18 @@ namespace y60 {
     struct TypeIdTraits<asl::Vector4f> {
         static const TypeId type_id() {
             return VECTOR4F;
+        }
+    };
+    template <>
+    struct TypeIdTraits<VectorOfString> {
+        static const TypeId type_id() {
+            return VECTOR_OF_STRING;
+        }
+    };
+    template <>
+    struct TypeIdTraits<VectorOfRankedFeature> {
+        static const TypeId type_id() {
+            return VECTOR_OF_RANKED_FEATURE;
         }
     };
 

@@ -25,11 +25,9 @@ public:
       void Accumulate (long long Weight, _DataType &value)
       {
         val += (Weight * (long long)(value[0]));
-          // AC_WARNING << "adding " << Weight << "x" << value[0] << " -> " << val;
       };
       void Store (_DataType &value)
       {
-          // AC_WARNING << "storing val=" << val;
         value [0] = (unsigned int) ((val + 128)/256);
       };
       long long val;
@@ -87,6 +85,17 @@ Histogram::on_motion_notify_event(GdkEventMotion * theEvent) {
 }
 */
 
+void 
+Histogram::on_size_request(Gtk::Requisition* requisition)
+{
+  *requisition = Gtk::Requisition();
+  // hack: since paintlib's resize filters have a problem with
+  // minification higher than 1:256, set the minimum
+  // width so that this rate will never be reached even
+  // bit full 16-bit ranges
+  requisition->width = 257;
+}
+
 bool 
 Histogram::on_configure_event(GdkEventConfigure * theEvent) {
     //cerr << "Histogram::on_configure_event()" << endl;
@@ -112,6 +121,7 @@ Histogram::on_expose_event(GdkEventExpose * theEvent) {
     Glib::RefPtr<Gdk::GC> myGC = get_style()->get_black_gc();
 
     unsigned myCount;
+    // AC_WARNING << "drawing " << _myBins.size() << " bins, value range is " << _myValueRange;
     for (unsigned i = 0; i < _myBins.size(); ++i) {
         myCount = convertSampleCountToScreenPos(_myBins[i], _myMaxCount);
         _myWindow->draw_rectangle(myGC, true, int(i * myBarWidth), myHeight - myCount, 
@@ -149,7 +159,6 @@ Histogram::on_expose_event(GdkEventExpose * theEvent) {
 void
 Histogram::rebuildBins() {
     int myWidth = get_allocation().get_width();
-    AC_WARNING << "Width=" << myWidth << ", Samples=" << _mySampleData.size();
     if (myWidth < _mySampleData.size()) {
         _myBins.clear();
         _myBins.resize(myWidth);
@@ -157,8 +166,8 @@ Histogram::rebuildBins() {
         // set up some pointers to simulate paintlib's linearray
         unsigned int * mySrcLinePtr = (&_mySampleData[0]); 
         unsigned int * myDestLinePtr = (&_myBins[0]); 
-        // set up the scaler
-        PLBilinearContribDef f(0.64);
+        // PLGaussianContribDef f;
+        PLBilinearContribDef f(2.0);
         C2PassScale <CData_UnsignedInt> sS(f);
         // and start it 
         sS.Scale( (CData_UnsignedInt::_RowType*)(&mySrcLinePtr), _mySampleData.size(), 1,
@@ -183,6 +192,9 @@ Histogram::findMaxCount() {
 int 
 Histogram::convertSampleCountToScreenPos(int theSampleCount, int theMaxSampleCount) {
     int myHeight   = get_allocation().get_height();
+    if (theMaxSampleCount == 0) {
+        return myHeight / 2;
+    } 
     if (_myLogarithmicScaleFlag) {
         return int( log( float(theSampleCount)) * myHeight / log(float(theMaxSampleCount)));
     } else {

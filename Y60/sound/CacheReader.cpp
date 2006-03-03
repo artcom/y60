@@ -59,6 +59,11 @@ void CacheReader::seek (Time thePosition)
 }
 
 bool CacheReader::decode() {
+    AC_TRACE << "CacheReader::decode(" << _myCurFrame << " of "
+            << _myCacheItem->getNumFrames() << "frames )";
+    if (_myCurFrame == _myCacheItem->getNumFrames()) {
+        return true;
+    }
     AudioBufferPtr myBuffer = _myCacheItem->getBuffer(_myCurFrame);
     _myCurFrame += myBuffer->getNumFrames();
     _mySampleSink->queueSamples(myBuffer);

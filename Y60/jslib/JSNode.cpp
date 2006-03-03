@@ -460,13 +460,49 @@ parseFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+debinarizeFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Loads a binary stream from a file");
+    DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_END;
+
+    try {
+        if (argc != 1) {
+            JS_ReportError(cx,"JSNode::debinarizeFile() - Wrong number of parameters: %d, 1 expected", argc);
+            return JS_FALSE;
+        }
+
+        dom::NodePtr myNode;
+        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode)) {
+            JS_ReportError(cx,"JSNode::debinarizeFile() - Could not convert object to node");
+            return JS_FALSE;
+        }
+
+        std::string myFilename;
+        if(!convertFrom(cx, argv[0], myFilename))  {
+            JS_ReportError(cx,"JSNode::debinarizeFile() - Could not convert first argument, string expected");
+            return JS_FALSE;
+        }
+        myFilename = asl::expandEnvironment(myFilename);
+        ReadableFile mySource(myFilename);
+        if (!mySource) {
+            myNode->debinarize(mySource);
+        } else {
+            JS_ReportError(cx,"JSNode::debinarizeFile() - Could not read file");
+            return JS_FALSE;
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 saveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Saves this document as file");
     DOC_PARAM("theFilename", "", DOC_TYPE_STRING);
+    DOC_PARAM("theBinaryFlag", "true, if the file should be saved binary", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
-        if (argc != 1) {
-            JS_ReportError(cx,"JSNode::saveFile() - Wrong number of parameters: %d, 1 expected", argc);
+        if (argc != 1 && argc != 2) {
+            JS_ReportError(cx,"JSNode::saveFile() - Wrong number of parameters: %d, 1 or 2 expected", argc);
             return JS_FALSE;
         }
 
@@ -481,20 +517,46 @@ saveFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JS_ReportError(cx,"JSNode::saveFile() - Could not convert first argument, string expected");
             return JS_FALSE;
         }
-
         myFilename = asl::expandEnvironment(myFilename);
 
-        std::ofstream myFile(myFilename.c_str());
-        if (!myFile) {
-            JS_ReportError(cx, "JSNode::saveFile() - "
-                    "Can not open file '%s' for writing.", myFilename.c_str());
-            return JS_FALSE;
+        bool myBinaryFlag = false;
+        if (argc == 2) {
+            if(!convertFrom(cx, argv[1], myBinaryFlag))  {
+                JS_ReportError(cx,"JSNode::saveFile() - Could not convert second argument, bool expected");
+                return JS_FALSE;
+            }
         }
-        myFile << *myNode;
-        if (!myFile) {
-            JS_ReportError(cx, "JSNode::saveFile() - "
-                    "Can not write text file '%s' for writing.", myFilename.c_str());
-            return JS_FALSE;
+        if (!myBinaryFlag) {
+            Path myPath(myFilename, UTF8);
+            std::ofstream myFile(myPath.toLocale().c_str());
+            if (!myFile) {
+                JS_ReportError(cx, "JSNode::saveFile() - "
+                        "Can not open file '%s' for writing.", myFilename.c_str());
+                return JS_FALSE;
+            }
+            myFile << *myNode;
+            if (!myFile) {
+                JS_ReportError(cx, "JSNode::saveFile() - "
+                        "Can not write text file '%s' for writing.", myFilename.c_str());
+                return JS_FALSE;
+            }
+        } else {
+#ifdef DONT_USE_MAPPED_BLOCK_IO
+            asl::Block theBlock;
+#else
+            asl::WriteableFile theBlock(myFilename);
+            if (!theBlock) {
+                JS_ReportError(cx, "Could map the new writable binary file.");
+                return JS_FALSE;
+            }
+#endif
+            myNode->binarize(theBlock);
+#ifdef DONT_USE_MAPPED_BLOCK_IO
+            if (!asl::writeFile(myFilename, theBlock)) {
+                JS_ReportError(cx, "Could not open or write binary file.");
+                return JS_FALSE;
+            }
+#endif
         }
         return JS_TRUE;
 
@@ -635,7 +697,8 @@ JSNode::Functions() {
         {"useFactories",     useFactories,    1},
         {"parse",            parse,           1},
         {"parseFile",        parseFile,       1},
-        {"saveFile",         saveFile,        1},
+        {"saveFile",         saveFile,        2},
+        {"debinarizeFile",   debinarizeFile,  1},
         {"childNode",        childNode,       2},
         {"childNodesLength", childNodesLength,1},
         {"getElementById",   getElementById,  2},

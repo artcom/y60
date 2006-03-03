@@ -26,8 +26,8 @@ use("Y60JSSL.js");
 function Exception(theMessage, theLocation, theName) {
     var self = this; // inner function this bug workaround
     self.message    = theMessage;
-    self.fileName   = theLocation.file;
-    self.lineNumber = theLocation.line;
+    self.fileName   = theLocation ? theLocation.file : "";
+    self.lineNumber = theLocation ? theLocation.line : "";
     self.name       = theName || "Exception";
 
     this.what = function() {

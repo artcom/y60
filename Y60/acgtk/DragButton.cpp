@@ -18,23 +18,37 @@ DragButton::DragButton(const std::string & theIconFile) :
     _myDragInProgressFlag(false)
 {
 }
-
 bool 
 DragButton::on_button_press_event(GdkEventButton * theEvent) {
-    EmbeddedButton::on_button_press_event(theEvent);
-    _myDragInProgressFlag = true;
     _myLastX = int(theEvent->x);
     _myLastY = int(theEvent->y);
-    _myDragStartSignal.emit(theEvent->x, theEvent->y);
+    _myPressedButton = theEvent->button;
+    EmbeddedButton::on_button_press_event(theEvent);
     return true;
 }
 
+void
+DragButton::pressed() {
+    EmbeddedButton::pressed();
+    _myDragInProgressFlag = true;
+    _myDragStartSignal.emit(_myLastX, _myLastY, _myPressedButton);
+}
+
+/* moved to released()
 bool
 DragButton::on_button_release_event(GdkEventButton * theEvent) {
     EmbeddedButton::on_button_release_event(theEvent);
     _myDragInProgressFlag = false;
     _myDragDoneSignal.emit();
     return true;
+}
+*/
+
+void
+DragButton::released() {
+    EmbeddedButton::released();
+    _myDragInProgressFlag = false;
+    _myDragDoneSignal.emit();
 }
 
 bool
@@ -50,7 +64,6 @@ DragButton::on_motion_notify_event(GdkEventMotion * theEvent) {
         double myDeltaX = theEvent->x - _myLastX;
         double myDeltaY = theEvent->y - _myLastY;
         _myDragSignal.emit(myDeltaX, myDeltaY);
-        AC_TRACE << _myLastX << "," << _myLastY;
 #if WIN32
         POINT absMousePos;
         GetCursorPos(&absMousePos);

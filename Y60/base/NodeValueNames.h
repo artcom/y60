@@ -7,23 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: NodeValueNames.h,v 1.2 2005/04/04 14:40:14 david Exp $
-//   $RCSfile: NodeValueNames.h,v $
-//   $Author: david $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/04 14:40:14 $
-//
-//
-//  Description: This file contains all the wellknown names for the
-//               SOM
-//
-// (CVS log at the bottom of this file)
-//
-//=============================================================================
 
 #ifndef _ac_NodeValueNames_h_
 #define _ac_NodeValueNames_h_
+
+#include <asl/Enum.h>
 
 namespace y60 {
 
@@ -390,10 +378,11 @@ namespace y60 {
     static const char * FRONTFACING_STYLE     = "frontfacing";
     static const char * BOUNDING_VOLUME_STYLE = "bounding_volume";
     static const char * IGNORE_DEPTH_STYLE    = "ignore_depth";
+    static const char * NO_DEPTH_WRITES_STYLE = "no_depth_writes";
     static const char * POLYGON_OFFSET_STYLE  = "polygon_offset";
 
     enum RenderStyleType {
-        FRONT, BACK, BOUNDING_VOLUME, IGNORE_DEPTH, POLYGON_OFFSET
+        FRONT, BACK, BOUNDING_VOLUME, IGNORE_DEPTH, NO_DEPTH_WRITES, POLYGON_OFFSET
     };
 
     static const char * RenderStylesSL[] = {
@@ -401,6 +390,7 @@ namespace y60 {
         BACKFACING_STYLE,
         BOUNDING_VOLUME_STYLE,
         IGNORE_DEPTH_STYLE,
+        NO_DEPTH_WRITES_STYLE,
         POLYGON_OFFSET_STYLE,
         0
     };
@@ -441,6 +431,45 @@ namespace y60 {
         "one_minus_constant_alpha",
         0
     };
+    
+    enum TargetBuffersEnum {
+        RED_MASK,
+        GREEN_MASK,
+        BLUE_MASK,
+        ALPHA_MASK,
+        DEPTH_MASK,
+        TargetBuffersEnum_MAX
+    };
+
+    static const char * TargetBuffersStrings[] = {
+        "red",
+        "green", 
+        "blue", 
+        "alpha", 
+        "depth",
+        ""
+    };
+
+    enum BlendEquationEnum {
+        EQUATION_MIN,
+        EQUATION_MAX,
+        EQUATION_ADD,
+        EQUATION_SUBTRACT,
+        EQUATION_REVERSE_SUBTRACT,
+        BlendEquationEnum_MAX
+    };
+
+    static const char * BlendEquationStrings[] = {
+        "min",
+        "max",
+        "add",
+        "subtract",
+        "reverse_subtract",
+        ""
+    };
+
+    DEFINE_ENUM(TargetBuffers, TargetBuffersEnum);
+    DEFINE_ENUM(BlendEquation, BlendEquationEnum);
 
     //=== Animation types ===============================================
     enum AnimationDirection {

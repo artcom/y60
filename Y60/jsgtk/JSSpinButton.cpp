@@ -165,12 +165,34 @@ JSSpinButton::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     NATIVE * newNative = 0;
 
     JSSpinButton * myNewObject = 0;
+    double myClimbRate;
+    unsigned int myDigits;
 
-    if (argc == 0) {
-        newNative = new Gtk::SpinButton(); // Abstract
-    } else {
-        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
-        return JS_FALSE;
+    switch (argc) {
+        case 0: 
+            newNative = new Gtk::SpinButton();
+            break;
+        case 1:
+            if (! convertFrom(cx, argv[0], myClimbRate)) {
+                JS_ReportError(cx,"Constructor for %s: bad arguments 1: expected float",ClassName());
+                return JS_FALSE;
+            }
+            newNative = new Gtk::SpinButton(myClimbRate);
+            break;
+        case 2:
+            if (! convertFrom(cx, argv[0], myClimbRate)) {
+                JS_ReportError(cx,"Constructor for %s: bad arguments 1: expected float",ClassName());
+                return JS_FALSE;
+            }
+            if (! convertFrom(cx, argv[1], myDigits)) {
+                JS_ReportError(cx,"Constructor for %s: bad arguments 2: expected unsigned int",ClassName());
+                return JS_FALSE;
+            }
+            newNative = new Gtk::SpinButton(myClimbRate, myDigits);
+            break;
+        default:
+            JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
+            return JS_FALSE;
     }
     myNewObject = new JSSpinButton(OWNERPTR(newNative), newNative);
 

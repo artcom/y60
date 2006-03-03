@@ -370,7 +370,8 @@ class FacadeUnitTest : public UnitTest {
                     "       <xs:complexType>\n"
                     "           <xs:attribute name='id' type='xs:ID' />\n"
                     "       </xs:complexType>\n"
-                    "   </xs:element>\n");
+                    "   </xs:element>\n" ); // XXX
+                    // "</xs:schema>");     //
 
                 Document myDocument;
                 myDocument.setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));

@@ -97,6 +97,7 @@ namespace y60 {
     
     bool 
     BufferToFile::saveBufferAsImage(unsigned theFormat, const std::string & theFileName) {
+        Path myPath(theFileName, UTF8);
         PLAnyPicDecoder myDecoder;
         PLAnyBmp myBmp;
         PixelEncoding myEncoding;
@@ -122,7 +123,7 @@ namespace y60 {
             case PL_FT_PNG:
                 {
                     PLPNGEncoder myEncoder;
-                    myEncoder.MakeFileFromBmp(theFileName.c_str(), &myBmp);               
+                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
                 }
                 break;
              default:

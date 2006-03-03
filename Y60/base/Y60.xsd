@@ -1771,13 +1771,6 @@ Usually 'm' plus a number, such as 'm0'.</xs:documentation>
 Transparent materials are rendered in z-order in a second pass.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="writedepthbuffer" type="xs:boolean">
-                <xs:annotation>
-                    <xs:documentation>Turn depthbuffer writing on/off.
-For transparent shapes, that intersect heavily it is sometimes visually more pleasing
-to render without depth buffer</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
             <xs:attribute name="depthtest" type="xs:boolean">
                 <xs:annotation>
                     <xs:documentation>Turn depthbuffer testing on/off.</xs:documentation>
@@ -1857,6 +1850,11 @@ surfacecolor - color for unlit materials</xs:documentation>
                         <xs:documentation>Property of type float</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element ref="string">
+                    <xs:annotation>
+                        <xs:documentation>Property of type string</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element ref="point3f">
                     <xs:annotation>
                         <xs:documentation>Property of type Point3f</xs:documentation>
@@ -1897,7 +1895,13 @@ surfacecolor - color for unlit materials</xs:documentation>
                         <xs:documentation>Property of type vector of String</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                
                 <xs:element ref="sampler2d">
+                    <xs:annotation>
+                        <xs:documentation>Property that references a CG texture</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="sampler3d">
                     <xs:annotation>
                         <xs:documentation>Property that references a CG texture</xs:documentation>
                     </xs:annotation>
@@ -1939,6 +1943,25 @@ Example:
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="xs:float">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="string">
+        <xs:annotation>
+            <xs:documentation>Property that contains an string as text child
+
+Example:
+&lt;float name='foo'&gt;4.56&lt;/string&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
                     <xs:attribute name="name" type="xs:string">
                         <xs:annotation>
                             <xs:documentation>Name of the property</xs:documentation>
@@ -2068,6 +2091,25 @@ Example:
 
 Example:
 &lt;sampler2d name='foo'&gt;1&lt;/sampler2d&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="sampler3d">
+        <xs:annotation>
+            <xs:documentation>Property that contains an an index of a 3D texture as text child
+
+Example:
+&lt;sampler3d name='bar'&gt;1&lt;/sampler3d&gt;</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:simpleContent>

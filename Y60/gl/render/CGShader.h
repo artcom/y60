@@ -62,8 +62,6 @@ namespace y60 {
         private:
             void processCompilerArgs(std::vector<std::string> & theArgs, const std::string & theArgList);
             void bindMaterialParams(const MaterialBase & theMaterial);
-            void setCgParameter(CGparameter & theCgParameter, const dom::NodePtr & theNode,
-                                const MaterialBase & theMaterial);
 
             ShaderDescription     _myVertexShader;
             ShaderDescription     _myFragmentShader;

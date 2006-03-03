@@ -14,6 +14,7 @@
 #include "AudioException.h"
 
 #include <asl/Logger.h>
+#include <asl/os_functions.h>
 #include <asl/string_functions.h>
 #include <asl/numeric_functions.h>
 #include <asl/Assure.h>
@@ -32,6 +33,7 @@ using namespace std;
 namespace asl {
 
 void checkRetVal (int theRetVal, const char * theMsg, const string& theWhere);
+void outputInfo (snd_pcm_t * theDevice);
 void outputHWParams (snd_pcm_t * theDevice); 
 void outputSWParams (snd_pcm_t * theDevice);
 
@@ -46,6 +48,7 @@ void ALSAPump::dumpState () const {
     Pump::dumpState();
     if (isOutputOpen()) {
         AC_DEBUG << "  Output State: " << snd_pcm_state_name(snd_pcm_state(_myOutputDevice));
+        outputInfo(_myOutputDevice);
         outputHWParams(_myOutputDevice);
         outputSWParams(_myOutputDevice);
     }
@@ -59,24 +62,17 @@ ALSAPump::ALSAPump ()
     int myRetVal;
     static snd_output_t * myOutput = 0;
 
-    string myDeviceName = _myDeviceName_Init;
-    if (myDeviceName.empty()) {
-        myDeviceName = "plughw:0,0";
-    }
+    string myDeviceName = "plughw:0,0";
+    get_environment_var_as("Y60_SOUND_DEVICE_NAME", myDeviceName);
+    
     AC_DEBUG << "ALSA Device name: \"" << myDeviceName << "\"";
     setDeviceName(myDeviceName);
     
     myRetVal = snd_output_stdio_attach(&myOutput, stdout, 0);
     checkRetVal (myRetVal, "failed", PLUS_FILE_LINE);
 
-    int myIndex = 0;
-    char * myName;
-    myRetVal = snd_card_get_name (myIndex, &myName);
-    checkRetVal (myRetVal, "snd_card_get_name error: ", PLUS_FILE_LINE);
-    setCardName(myName);
-    free(myName);
-
     openOutput();
+    determineName();
     dumpState();
     start();
 }
@@ -126,7 +122,8 @@ ALSAPump::openDevice(snd_pcm_stream_t theStreamType) {
     // if the device isn't available.
     myRetVal = snd_pcm_open(&myDevice, getDeviceName().c_str(), theStreamType,
             SND_PCM_NONBLOCK);
-    checkRetVal (myRetVal, "Open error: ", PLUS_FILE_LINE);
+    checkRetVal (myRetVal, (string("Opening ") + getDeviceName() + " failed: ").c_str(), 
+            PLUS_FILE_LINE);
     snd_pcm_close (myDevice);
 
     // Nonblocking open worked, so we can open the device in blocking mode again.
@@ -176,7 +173,10 @@ ALSAPump::setHWParams(snd_pcm_t * theDevice, int myNumChannels) {
 
     myRetVal = snd_pcm_hw_params_set_periods
             (theDevice, myHWParams, 2, 0);
-    checkRetVal (myRetVal, "Unable to set number of buffers.", PLUS_FILE_LINE);
+    if (myRetVal < 0) {
+        AC_WARNING << "Unable to set number of buffers";
+    }
+    //checkRetVal (myRetVal, "Unable to set number of buffers.", PLUS_FILE_LINE);
 
     /* write the parameters to device */
     myRetVal = snd_pcm_hw_params(theDevice, myHWParams);
@@ -227,12 +227,16 @@ void ALSAPump::pump()
     snd_pcm_sframes_t numFramesToDeliver;
     numFramesToDeliver = snd_pcm_avail_update (_myOutputDevice);
     handleUnderrun(numFramesToDeliver);
-
+    if (numFramesToDeliver == 0) {
+        // XXX: Not sure why this happens, but it does.
+        return;
+    }
+    
     // The ALSA example has this code. It seems to be utterly useless, but who knows.
     if (numFramesToDeliver > _myFramesPerBuffer) {
         numFramesToDeliver = _myFramesPerBuffer;
     }    
-
+    
     mix(_myOutputBuffer, numFramesToDeliver);
 
     AC_TRACE << "ALSAPump::pump called with " << numFramesToDeliver << " frames";
@@ -275,12 +279,41 @@ ALSAPump::handleUnderrun (int err) {
     }
 }
 
+void ALSAPump::determineName() {
+    snd_pcm_info_t * myInfo;
+    
+    snd_pcm_info_malloc(&myInfo);
+    snd_pcm_info(_myOutputDevice, myInfo);
+
+    const char * myName = snd_pcm_info_get_name(myInfo);
+    setCardName(myName);
+    snd_pcm_info_free(myInfo);
+}
+
 void
 checkRetVal (int theRetVal, const char * theMsg, const string& theWhere) {
     if (theRetVal < 0) {
         throw AudioException(string("ALSASoundCard: ") + theMsg +
                 snd_strerror(theRetVal) + ". ",theWhere);
     }
+}
+
+void outputInfo (snd_pcm_t * theDevice) {
+    snd_pcm_info_t * myInfo;
+    
+    snd_pcm_info_malloc(&myInfo);
+    snd_pcm_info(theDevice, myInfo);
+
+    AC_DEBUG << "ALSA 'Stream Information':";
+    int myCard = snd_pcm_info_get_card(myInfo);
+    AC_DEBUG << "  Card: " << myCard;
+    const char * myId = snd_pcm_info_get_id(myInfo);
+    AC_DEBUG << "  ID: " << myId;
+    const char * myName = snd_pcm_info_get_name(myInfo);
+    AC_DEBUG << "  Name: " << myName;
+    const char * mySubdeviceName = snd_pcm_info_get_subdevice_name(myInfo);
+    AC_DEBUG << "  Subdevice name: " << mySubdeviceName;
+    snd_pcm_info_free(myInfo);
 }
 
 void outputHWParams (snd_pcm_t * theDevice) {

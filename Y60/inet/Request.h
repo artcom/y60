@@ -53,6 +53,7 @@ namespace inet {
             void setTimeoutParams(unsigned theBytesPerSec, unsigned theSeconds);
             void setVerbose(bool theVerboseFlag);
             void setSSLCertificate(const std::string & theCertificateFilename);
+            void verifyPeer(bool theFlag);
             void setCookie(const std::string & theCookie);
             void setResume(long theResumeOffset);
             void setProxy(const std::string & theProxyServer, bool theTunnelFlag = false);

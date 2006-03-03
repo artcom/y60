@@ -33,8 +33,8 @@ public class GppLinker extends AbstractLdLinker {
     protected static final String[] discardFiles = new String[0];
     protected static final String[] objFiles = new String[]{".o", ".a", ".lib",
             ".dll", ".so", ".sl"};
-    private static final GppLinker dllLinker = new GppLinker("gcc", objFiles,
-            discardFiles, "lib", ".so", false, new GppLinker("gcc", objFiles,
+    private static final GppLinker dllLinker = new GppLinker("g++", objFiles,
+            discardFiles, "lib", ".so", false, new GppLinker("g++", objFiles,
                     discardFiles, "lib", ".so", true, null));
     private final static String libPrefix = "libraries: =";
     protected static final String[] libtoolObjFiles = new String[]{".fo", ".a",
@@ -42,11 +42,11 @@ public class GppLinker extends AbstractLdLinker {
     private static String[] linkerOptions = new String[]{"-bundle", "-dylib",
             "-dynamic", "-dynamiclib", "-nostartfiles", "-nostdlib",
             "-prebind", "-s", "-static", "-shared", "-symbolic", "-Xlinker"};
-    private static final GppLinker instance = new GppLinker("gcc", objFiles,
+    private static final GppLinker instance = new GppLinker("g++", objFiles,
             discardFiles, "", "", false, null);
-    private static final GppLinker machDllLinker = new GppLinker("gcc",
+    private static final GppLinker machDllLinker = new GppLinker("g++",
             objFiles, discardFiles, "lib", ".dylib", false, null);
-    private static final GppLinker machPluginLinker = new GppLinker("gcc",
+    private static final GppLinker machPluginLinker = new GppLinker("g++",
             objFiles, discardFiles, "lib", ".bundle", false, null);
     public static GppLinker getInstance() {
         return instance;
@@ -185,14 +185,14 @@ public class GppLinker extends AbstractLdLinker {
             return GccLibrarian.getInstance();
         }
         if (type.isPluginModule()) {
-            if (GccProcessor.getMachine().indexOf("darwin") >= 0) {
+            if (isDarwin()) {
                 return machPluginLinker;
             } else {
                 return dllLinker;
             }
         }
         if (type.isSharedLibrary()) {
-            if (GccProcessor.getMachine().indexOf("darwin") >= 0) {
+            if (isDarwin()) {
                 return machDllLinker;
             } else {
                 return dllLinker;

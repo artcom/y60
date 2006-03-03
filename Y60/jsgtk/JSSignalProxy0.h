@@ -66,7 +66,7 @@ class JSSignalProxy0 : public JSWrapper<Glib::SignalProxy0<R>, asl::Ptr<Glib::Si
                     convertFrom(cx, argv[2], myAfterFlag);
                 }
 
-                SigC::Slot0<R> mySlot = sigc::bind<JSContext*, JSObject*, std::string>(
+                SigC::Slot0<R> mySlot = sigc::bind<JSContext*, JSObject*, Glib::ustring>(
                     sigc::ptr_fun( & JSSignalAdapter0<R>::on_signal ), cx, myTarget, myMethodName);
                 JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR( new sigc::connection);
                 switch (argc) {

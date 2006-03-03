@@ -37,6 +37,7 @@
 
 #include "settings.h"
 #include "Arguments.h"
+#include "Path.h"
 #include "Logger.h"
 #include "Revision.h"
 
@@ -109,20 +110,20 @@ Arguments::getOptionNames() const {
 
 
 bool
-Arguments::parse(std::vector<string> myArgs, int errorHandlingPolicy) {
+Arguments::parse(std::vector<string> myArgs, StringEncoding theEncoding, int errorHandlingPolicy) {
     vector<const char *> myArgv;
 
     for (int i = 0; i < myArgs.size(); ++i) {
         myArgv.push_back(myArgs[i].c_str());
     }
-    return parse(myArgv.size(), &(*myArgv.begin()), errorHandlingPolicy);
+    return parse(myArgv.size(), &(*myArgv.begin()), theEncoding, errorHandlingPolicy);
 }
 
 bool
-Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
+Arguments::parse(int argc, const char * const argv[], StringEncoding theEncoding, int errorHandlingPolicy) {
     bool myIgnoreFurtherOptionsFlag = false;
     for (int i = 0; i < argc; ++i) {
-        _allArguments.push_back(string(argv[i]));
+        _allArguments.push_back(Path(argv[i], theEncoding).toUTF8());
         DB(AC_DEBUG << "Parsing '" << argv[i] << "'" << endl);
 
         if (myIgnoreFurtherOptionsFlag) {
@@ -156,7 +157,7 @@ Arguments::parse(int argc, const char * const argv[], int errorHandlingPolicy) {
                     }
                     // take next argument
                     ++i;
-                    _allArguments.push_back(argv[i]);
+                    _allArguments.push_back(Path(argv[i], theEncoding).toUTF8());
                 }
             } else {
                 if (errorHandlingPolicy & BailOnUnknownOptions) {

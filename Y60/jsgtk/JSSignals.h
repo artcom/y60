@@ -22,6 +22,7 @@
 #include "JSSignal0.h"
 #include "JSSignal1.h"
 #include "JSSignal2.h"
+#include "JSSignal3.h"
 
 #include "JSGdkEvent.h"
 
@@ -38,6 +39,7 @@ namespace jslib {
 //=====================================================
 
 DEFINE_SIGNAL0_CLASS_TRAIT(void)
+DEFINE_SIGNAL0_CLASS_TRAIT(int)
 
 //=====================================================
 // RVAL on_signal(P1);
@@ -49,6 +51,7 @@ DEFINE_SIGNAL1_CLASS_TRAIT(void, float)
 DEFINE_SIGNAL1_CLASS_TRAIT(bool, double)
 
 DEFINE_SIGNAL1_CLASS_TRAIT(void, Glib::ustring)
+DEFINE_SIGNAL1_CLASS_TRAIT(void, const std::string &)
 
 //=====================================================
 // RVAL on_signal(P1, P2);
@@ -58,6 +61,11 @@ DEFINE_SIGNAL2_CLASS_TRAIT(void, double, double)
 DEFINE_SIGNAL2_CLASS_TRAIT(bool, double, Glib::ustring)
 DEFINE_SIGNAL2_CLASS_TRAIT(void, Glib::ustring, Glib::ustring)
 
+//=====================================================
+// RVAL on_signal(P1, P2, P3);
+//=====================================================
+
+DEFINE_SIGNAL3_CLASS_TRAIT(void, double, double, unsigned int)
 } // end of namespace jslib
 
 #endif // _Y60_ACGTKSHELL_JSSIGNAL_PROXYS_INCLUDED_

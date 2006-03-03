@@ -1,0 +1,75 @@
+//=============================================================================
+// Copyright (C) 1993-2005, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+
+struct vertexOutput {
+    float4 position : POSITION;
+    float3 texCoord:  TEXCOORD0;
+};
+
+// Greyscale window C/W version
+float4
+mainFragmentBW( vertexOutput IN, 
+              uniform float theScaleCorrection,
+              uniform float theAlphaFactor,
+              uniform float2 theValueRange,
+              uniform sampler3D theDataTex) : COLOR
+{
+    
+    float myVoxelValue = tex3D(theDataTex, IN.texCoord);
+    float myIntensity = (myVoxelValue - theValueRange.x) / (theValueRange.y - theValueRange.x);
+    
+    float myAlpha = min(1.0, myIntensity);
+    
+    return float4(myIntensity.xxx, myAlpha * theAlphaFactor * theScaleCorrection );
+    
+    // more opaque view
+    //float myAlpha = 1.0 - pow(1.0 - min(1.0, myIntensity), theScaleCorrection);
+    //return float4(myIntensity.xxx, myAlpha * theAlphaFactor);
+
+    // xray like view
+    //return float4(myIntensity.xxx, 1.0 - pow(1.0 - (myVoxelValue * theAlphaFactor), theScaleCorrection));
+    //return float4(myIntensity.xxx, 0.05);
+} 
+
+
+// transfer function version
+float4
+mainFragmentTF( vertexOutput IN, 
+              uniform float theScaleCorrection,
+              uniform float theAlphaFactor,
+              uniform float2 theValueRange,
+              uniform sampler3D theDataTex,
+              uniform sampler2D theTransferTable) : COLOR
+{
+    
+    float myVoxelValue = tex3D(theDataTex, IN.texCoord); 
+    float myLookupValue = (myVoxelValue - theValueRange.x) / (theValueRange.y - theValueRange.x);
+    float4 myColor = tex2D(theTransferTable, float2(myLookupValue, 0.5));
+    
+    // myColor.a = 1.0 - pow(1.0 - (myColor.a * theAlphaFactor), theScaleCorrection);
+    myColor.a = (1.0 - pow(1.0 - myColor.a, theScaleCorrection)) * theAlphaFactor;
+    return myColor;
+} 
+
+vertexOutput
+mainVertex(float4 thePosition : POSITION,
+           float3 theTexCoord : TEXCOORD0,
+           uniform float4x4 GL_MODELVIEW_PROJECTION)
+{
+    vertexOutput myOUT;
+    myOUT.position = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    myOUT.texCoord = theTexCoord;
+
+    return myOUT;
+    
+}
+
+/* vim: set filetype=c : */

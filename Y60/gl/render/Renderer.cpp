@@ -210,6 +210,23 @@ namespace y60 {
                 glEnable(GL_LIGHTING);
             }
             CHECK_OGL_ERROR;
+            MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
+            const VectorOfString & myBuffersEnabled = myPropFacade->get<TargetBuffersTag>();
+            vector<bool> myMasks(TargetBuffers::MAX, false);
+            TargetBuffers myTarget;
+            for(int i = 0; i < myBuffersEnabled.size(); ++i) {
+                myTarget.fromString(myBuffersEnabled[i]);
+                myMasks[myTarget] = true;
+            }
+            glDepthMask(myMasks[y60::DEPTH_MASK]);
+            glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK], 
+                myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
+
+            const string & myBlendEquationString = myPropFacade->get<BlendEquationTag>();            
+            GLenum myEquation = asGLBlendEquation(myBlendEquationString); 
+            if (glBlendEquation) {
+                glBlendEquation(myEquation);
+            }
 
             if (theMaterial.writeDepthBuffer()) {
                 glDepthMask(GL_TRUE);
@@ -424,26 +441,9 @@ namespace y60 {
         DBP2(START_TIMER(renderBodyPart_getRenderStyles));
         const std::vector<RenderStyleType> & myRenderStyles  = myPrimitveStyle.empty() ? myShapeStyle : myPrimitveStyle;
         DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
-
-        DBP2(START_TIMER(renderBodyPart_findRenderStyles1));
-        bool myIgnoreDepthFlag = (std::find(myRenderStyles.begin(), myRenderStyles.end(),
-                                            IGNORE_DEPTH) !=  myRenderStyles.end());
-        bool myPolygonOffsetFlag = (std::find(myRenderStyles.begin(), myRenderStyles.end(),
-                                            POLYGON_OFFSET) !=  myRenderStyles.end());
-        DBP2(STOP_TIMER(renderBodyPart_findRenderStyles1));
-        if (myIgnoreDepthFlag) {
-            glDepthFunc(GL_ALWAYS);
-            glEnable(GL_POLYGON_OFFSET_POINT);
-            glEnable(GL_POLYGON_OFFSET_LINE);
-            glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(0.0, -1.0);
-        }
-        if (myPolygonOffsetFlag) {
-            glEnable(GL_POLYGON_OFFSET_POINT);
-            glEnable(GL_POLYGON_OFFSET_LINE);
-            glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(1.0, 1.0);
-        }
+        
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+        enableRenderStyles(myRenderStyles);
 
         DBP2(START_TIMER(renderBodyPart_findRenderStyles2));
         bool myRendererCullingEnabled = _myState.getBackfaceCulling();
@@ -492,14 +492,7 @@ namespace y60 {
         DBP2(STOP_TIMER(renderBodyPart_findRenderStyles2));
 
         // reset the states now
-        if (myIgnoreDepthFlag) {
-            glDepthFunc(GL_LESS);
-        }
-        if (myPolygonOffsetFlag || myIgnoreDepthFlag) {
-            glDisable(GL_POLYGON_OFFSET_POINT);
-            glDisable(GL_POLYGON_OFFSET_LINE);
-            glDisable(GL_POLYGON_OFFSET_FILL);
-        }
+        glPopAttrib();
 
         DBP2(START_TIMER(renderBodyPart_findRenderStyles4));
         if (std::find(myRenderStyles.begin(), myRenderStyles.end(), BOUNDING_VOLUME) !=  myRenderStyles.end() ||
@@ -686,12 +679,55 @@ namespace y60 {
         glPopAttrib();
     }
 
+<<<<<<< .mine
+    void 
+    Renderer::enableRenderStyles(const std::vector<RenderStyleType> & theRenderStyles) {
+        bool myIgnoreDepthFlag = (std::find(theRenderStyles.begin(), theRenderStyles.end(),
+                                            IGNORE_DEPTH) !=  theRenderStyles.end());
+        bool myNoDepthWritesFlag = (std::find(theRenderStyles.begin(), theRenderStyles.end(),
+                                            NO_DEPTH_WRITES) !=  theRenderStyles.end());
+        bool myPolygonOffsetFlag = (std::find(theRenderStyles.begin(), theRenderStyles.end(),
+                                            POLYGON_OFFSET) !=  theRenderStyles.end());
+        if (myIgnoreDepthFlag) {
+            glDepthFunc(GL_ALWAYS);
+            glEnable(GL_POLYGON_OFFSET_POINT);
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(0.0, -1.0);
+        }
+        if (myNoDepthWritesFlag) {
+            glDepthMask(GL_FALSE);
+        }
+        if (myPolygonOffsetFlag) {
+            glEnable(GL_POLYGON_OFFSET_POINT);
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(1.0, 1.0);
+        }
+    }
+
+    void Renderer::draw(const asl::LineSegment<float> & theLine,
+            const asl::Vector4f & theColor,
+            const asl::Matrix4f & theTransformation,
+            const float & theWidth,
+            const std::string & theRenderStyles)
+=======
     void Renderer::preDraw(const asl::Vector4f & theColor,
                            const asl::Matrix4f & theTransformation,
                            const float & theWidth)
+>>>>>>> .r5381
     {
-        glDisable(GL_LIGHTING);
+        std::istringstream myRenderStylesStream(theRenderStyles);
+        vector<RenderStyleType> myRenderStyles;
+        VectorOfString myRenderStylesStrings;
+        myRenderStylesStream >> myRenderStylesStrings;
+        Scene::parseRenderStyles(myRenderStylesStrings, myRenderStyles);
+        
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
         glPushMatrix();
+        glDisable(GL_LIGHTING);
+        enableRenderStyles(myRenderStyles);
+        
         glMultMatrixf(theTransformation.getData());
         glColor4fv(theColor.begin());
         glLineWidth(theWidth);
@@ -716,7 +752,13 @@ namespace y60 {
             glVertex3fv(theLine.end.begin());
         glEnd();
 
+<<<<<<< .mine
+        glLineWidth(1.0f);
+        glPopMatrix();
+=======
         postDraw();
+>>>>>>> .r5381
+        glPopAttrib();
         CHECK_OGL_ERROR;
     }
 
@@ -950,7 +992,7 @@ namespace y60 {
         dom::NodePtr myGeometryNode;
         for (unsigned i = 0; i < myPlaneIds.size(); ++i) {
             // XXX Workaround for Bug 91
-            if ( ! myPlaneIds[i].empty()) {
+            //if ( ! myPlaneIds[i].empty()) {
                 myGeometryNode = theNode->getElementById( myPlaneIds[i] );
                 if (!myGeometryNode) {
                     throw RendererException(string("Can not find geometry '")+myPlaneIds[i]+
@@ -959,7 +1001,7 @@ namespace y60 {
                 }
                 GeometryPtr myGeometry = myGeometryNode->getFacade<Geometry>();
                 theClippingPlanes.push_back( myGeometry->get<GeometryGlobalPlaneTag>());
-            }
+            //}
         }
     }
 

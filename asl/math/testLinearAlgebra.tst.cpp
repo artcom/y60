@@ -451,11 +451,13 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
                 "Planes plane copy ctor.")
 
             // test plane, vector projection
-            Vector3d myProjectedVec = projection(Vector3d(1,1,1), myPlane2);
-        ENSURE_MSG( almostEqual(myProjectedVec, Vector3d(1, 0, 1)), "Vector3 projection to a Plane.")
+            Vector3d myProjectedVec = projection(Vector3d(1,10,1), myPlane2);
+        DPRINT(myProjectedVec);
+        ENSURE_MSG( almostEqual(myProjectedVec, Vector3d(1, -1, 1)), "Vector3 projection to a Plane. ")
 
             Vector3d myProjectedVec2 = projection(Vector3d(0,1,0), myPlane2);
-        ENSURE_MSG( almostEqual(myProjectedVec2, Vector3d(0, 0, 0)), "Vector3 projection to a Plane.")
+        DPRINT(myProjectedVec2);
+        ENSURE_MSG( almostEqual(myProjectedVec2, Vector3d(0, -1, 0)), "Vector3 projection to a Plane.")
 
             // test line <-> plane intersection
             Line<double>myLine(Point3d(0,0,0), Vector3d(1,0,0));
@@ -600,6 +602,17 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
             DPRINT(myDistance);
             ENSURE(distance(Point3d(0,3,0), myPlane) == distance(myPlane, Point3d(0,3,0)));
             ENSURE(almostEqual(myDistance, 2.0));
+        }
+        {
+        // projection
+            Plane<double> myPlane(Vector3d(0,1,0), -100);
+            Vector3d myPoint(33, 75, 3);
+            Vector3d myProjection = projection(myPoint, myPlane);
+            double myDistance = distance(Point3d(myProjection), myPlane);
+            DPRINT(myProjection);
+            DPRINT(myDistance);
+            ENSURE(myDistance == 0);
+            ENSURE(myProjection[1] == 100);
         }
     }
 };

@@ -43,6 +43,7 @@
 #include "Exception.h"
 #include "Block.h"
 #include "PlugInManager.h"
+#include "Path.h"
 
 #include <string>
 #include <sys/types.h>
@@ -76,7 +77,8 @@ std::string getAppDirectory();
 
 /// returns true if theDirectory is a readable directory, false otherwise
 bool isDirectory(const std::string & theDirectory);
-std::string stripTrailingSlashes(const std::string & theDirectory);
+/// converts backslashes to slashes & reduces double slashes to single slashes.
+std::string normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash); 
 
 /// returns filename without directory     
 std::string getFilenamePart(const std::string & theFileName);
@@ -87,10 +89,27 @@ std::string getDirectoryPart(const std::string & theFileName);
 std::string getParentDirectory(const std::string & theDirectoryName);
 
 /// return filename extension, or "" if none was found
+// @note: this function should be changed. Now it returns the extension without the "."
+// This is a bad idea, since the filename "foo" and "foo." both return the same string.
+// this makes it impossible to reconstruct the filename from its components. 
 std::string getExtension(const std::string & theFileName);
 
 /// returns theFileName without extension
 std::string removeExtension(const std::string & theFileName);
+
+/// returns the Host:Port part of an URI
+// URI's are formated as protocol://login/path
+// where login = [username:password@]hostport
+// and hostport = host[:port]
+
+void
+parseURI(const std::string & theURI, std::string * theProtocol, std::string * theLogin, std::string * thePath);
+
+/// returns the Host:Port part of an URI
+std::string getHostPortPart(const std::string & theURI);
+
+/// returns the Host part of an URI
+std::string getHostPart(const std::string & theURI);
 
 /// splits a delimited path list (semicolon or colon delimited) into its components
 unsigned splitPaths(const std::string & theDelimitedPaths, std::vector<std::string> & thePathVector);
@@ -128,9 +147,9 @@ time_t getLastModified(const std::string & theFilename);
 
 /// returns true if file or directory exists
 inline
-bool fileExists(const std::string& theFileName) {
+bool fileExists(const std::string& theUTF8Filename) {
     struct STAT64 myStat;
-    return STAT64F(theFileName.c_str(), &myStat) != -1;
+    return STAT64F(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myStat) != -1;
 }
 
 DEFINE_EXCEPTION(IO_Failure,asl::Exception)
@@ -139,9 +158,9 @@ DEFINE_EXCEPTION(IO_Failure,asl::Exception)
 // Warning: off_t is 32 bit (at least) under windows. This function will
 // return incorrect values for files > 2 gb.
 inline
-off_t getFileSize(const std::string& theFileName) {
+off_t getFileSize(const std::string& theUTF8Filename) {
     struct STAT64 myStat;
-    if (STAT64F(theFileName.c_str(), &myStat) != -1) {
+    if (STAT64F(Path(theUTF8Filename, UTF8).toLocale().c_str(), &myStat) != -1) {
         return static_cast<off_t>(myStat.st_size);
     };
     throw asl::IO_Failure("getFileSize","can't stat file");

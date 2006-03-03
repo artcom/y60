@@ -88,9 +88,13 @@ namespace y60 {
         }
 
         string IS_ASCII("solid");
+        string IS_ASCII_END("endsolid");
         string myAsciiHeader;
         theSource.readString(myAsciiHeader, IS_ASCII.size(), 0);
         bool binaryFormat = (myAsciiHeader != IS_ASCII);
+        if (!binaryFormat) {
+            AC_WARNING << "This file starts with 'solid' and therefore looks like an ASCII file. Still trying";
+        }
 
         SceneBuilder sceneBuilder(theScene);
 
@@ -100,32 +104,27 @@ namespace y60 {
 
         // import
         bool ok = false;
-        if (binaryFormat) {
-            if (isBigEndian(theSource)) {
-                asl::ReadableStreamAdapter<PowerPCByteOrder, AC_HOST_BYTE_ORDER> myAdapter(theSource);
-                AC_SIZE_TYPE myPos = 0;
-                while (myPos < myAdapter.size()) {
-                    DB(cerr << "STL binary big endian import file position " << myPos << endl);
-                    myPos += readFileBinary(myAdapter, myPos, sceneBuilder, materialId);
-                }
-                ok = myPos;
-                AC_INFO << "Loaded STL binary big endian file";
-            } else if (isLittleEndian(theSource)) {
-                asl::ReadableStreamAdapter<X86ByteOrder, AC_HOST_BYTE_ORDER> myAdapter(theSource);
-                AC_SIZE_TYPE myPos = 0;
-                while (myPos < myAdapter.size()) {
-                    DB(cerr << "STL binary little endian file position " << myPos << endl);
-                    myPos += readFileBinary(myAdapter, myPos, sceneBuilder, materialId);
-                }
-                ok = myPos;
-                AC_INFO << "Loaded STL binary little endian file";
-            } else {
-                throw ImportException(std::string("This file is not in STL binary format. Tried big- and little-endian."), 
-                        PLUS_FILE_LINE);
+        if (isBigEndian(theSource)) {
+            asl::ReadableStreamAdapter<PowerPCByteOrder, AC_HOST_BYTE_ORDER> myAdapter(theSource);
+            AC_SIZE_TYPE myPos = 0;
+            while (myPos < myAdapter.size()) {
+                DB(cerr << "STL binary big endian import file position " << myPos << endl);
+                myPos += readFileBinary(myAdapter, myPos, sceneBuilder, materialId);
             }
+            ok = myPos;
+            AC_INFO << "Loaded STL binary big endian file";
+        } else if (isLittleEndian(theSource)) {
+            asl::ReadableStreamAdapter<X86ByteOrder, AC_HOST_BYTE_ORDER> myAdapter(theSource);
+            AC_SIZE_TYPE myPos = 0;
+            while (myPos < myAdapter.size()) {
+                DB(cerr << "STL binary little endian file position " << myPos << endl);
+                myPos += readFileBinary(myAdapter, myPos, sceneBuilder, materialId);
+            }
+            ok = myPos;
+            AC_INFO << "Loaded STL binary little endian file";
         } else {
-            throw ImportException(std::string("Ascii stl format not implemented. "), PLUS_FILE_LINE);
-            // ok = readFileAscii(fp, theBaseName, sceneBuilder, materialId);
+            throw ImportException(std::string("This file is not in STL binary format. Tried big- and little-endian."), 
+                    PLUS_FILE_LINE);
         }
         if (!ok) {
             return false;

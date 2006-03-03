@@ -54,6 +54,9 @@ class AudioBuffer: public AudioBufferBase {
 
         void init(unsigned numFrames, unsigned numChannels, unsigned mySampleRate) 
         {
+            if (numFrames == 0) {
+                AC_DEBUG << "AudioBuffer::init, numFrames=0";
+            }
             _numFrames = numFrames;
             _numChannels = numChannels;
             _mySampleRate = mySampleRate;
@@ -61,6 +64,9 @@ class AudioBuffer: public AudioBufferBase {
         }
 
         void resize(unsigned numFrames) {
+            if (numFrames == 0) {
+                AC_WARNING << "AudioBuffer::resize, numFrames=0";
+            }
             _numFrames = numFrames;
             ASSURE_MSG(_numChannels != 0,
                     "AudioBuffer::resize called but _numChannels=0 (forgot init?)");
@@ -309,7 +315,7 @@ class AudioBuffer: public AudioBufferBase {
                 if (fabs(sampleToFloat(*mySample)-sampleToFloat(*(mySample-_numChannels))) 
                         > MaxDiff) 
                 {
-                    AC_TRACE << "Click at buffer start: " <<  sampleToFloat(*mySample) << " -- " << 
+                    AC_TRACE << "Click at sample " << mySample-begin() << ": " <<  sampleToFloat(*mySample) << " -- " << 
                             sampleToFloat(*(mySample-_numChannels));
                     return true;
                 }

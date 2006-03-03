@@ -115,8 +115,8 @@ namespace y60 {
             if (myGLShader) {
                 _myShaders.push_back(myGLShader);
             } else {
-                throw ShaderException(string("Can't determine shader type for shader") +
-                    theShaderNode->getAttributeString(ID_ATTRIB),PLUS_FILE_LINE);
+                throw ShaderException(string("Can't determine shader type for shader with id '") +
+                    theShaderNode->getAttributeString(ID_ATTRIB) + "'",PLUS_FILE_LINE);
             }
         }
     }

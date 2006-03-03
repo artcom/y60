@@ -31,6 +31,7 @@ namespace asl {
 class ZipPackage : public IPackage {
     public:
         ZipPackage(const std::string & theZipReader);
+        ~ZipPackage();
         const std::string & getPath() const { return _myZipFilename; };
         FileList getFileList(const std::string & theSubDir = "", bool theRecurseFlag = false);
         std::string findFile(const std::string & theRelativePath) const;

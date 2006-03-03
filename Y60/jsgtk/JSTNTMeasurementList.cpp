@@ -200,6 +200,10 @@ JSTNTMeasurementList::Functions() {
     return myFunctions;
 }
 
+
+#define DEFINE_RO_PROPERTY( NAME ) \
+    { #NAME, PROP_ ## NAME,  JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT}
+
 JSPropertySpec *
 JSTNTMeasurementList::Properties() {
     static JSPropertySpec myProperties[] = {
@@ -207,6 +211,8 @@ JSTNTMeasurementList::Properties() {
         {"signal_editable_toggled", PROP_signal_editable_toggled, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"signal_right_click", PROP_signal_right_click, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"signal_name_changed", PROP_signal_name_changed, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"signal_key_press_event", PROP_signal_key_press_event, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"signal_key_release_event", PROP_signal_key_release_event, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -255,6 +261,20 @@ JSTNTMeasurementList::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             {
                 JSSignal2<void, Glib::ustring, Glib::ustring>::OWNERPTR mySignal(new
                         JSSignal2<void, Glib::ustring, Glib::ustring>::NATIVE(theNative.signal_name_changed()));
+                *vp = jslib::as_jsval(cx, mySignal);
+                return JS_TRUE;
+            }
+        case PROP_signal_key_press_event:
+            {
+                JSSignalProxy1<bool, GdkEventKey*>::OWNERPTR mySignal( new
+                        JSSignalProxy1<bool, GdkEventKey*>::NATIVE(theNative.signal_key_press_event()));
+                *vp = jslib::as_jsval(cx, mySignal);
+                return JS_TRUE;
+            }
+        case PROP_signal_key_release_event:
+            {
+                JSSignalProxy1<bool, GdkEventKey*>::OWNERPTR mySignal( new
+                        JSSignalProxy1<bool, GdkEventKey*>::NATIVE(theNative.signal_key_release_event()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }

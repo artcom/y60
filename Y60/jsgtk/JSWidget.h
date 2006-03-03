@@ -57,6 +57,7 @@ class JSWidget : public JSWrapper<Gtk::Widget, asl::Ptr<Gtk::Widget>, StaticAcce
             PROP_parent,
             PROP_width,
             PROP_height,
+            PROP_state,
             PROP_signal_show,
             PROP_signal_hide,
             PROP_signal_map,

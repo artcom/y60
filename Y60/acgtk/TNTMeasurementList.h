@@ -115,6 +115,10 @@ class TNTMeasurementList : public Gtk::TreeView {
         sigc::signal<void, Glib::ustring> _myLockedToggledSignal;
         sigc::signal<void> _myRightClickSignal;
         sigc::signal<void, Glib::ustring, Glib::ustring> _myNameChangedSignal;
+        /*
+        sigc::signal<bool, GdkEventKey*> _myKeyPressSignal;
+        sigc::signal<bool, GdkEventKey*> _myKeyReleaseSignal;
+        */
 };
 
 } // end of namespace

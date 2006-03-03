@@ -326,7 +326,7 @@ public class CCTask extends Task {
      * Checks all targets that are not forced to be rebuilt or are missing
      * object files to be checked for modified include files
      * 
-     * @returns total number of targets to be rebuilt
+     * @return total number of targets to be rebuilt
      *  
      */
     protected int checkForChangedIncludeFiles(Hashtable targets) {

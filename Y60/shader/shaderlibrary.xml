@@ -891,5 +891,50 @@
             </properties>
         </fragmentshader>
      </shader>
+    <shader id="s123" name="VoxelTransferFunction" cost="9">
+        <supports>
+            <feature class="voxels" values="[colored]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="textures" values="[paint,paint]"/>
+            <feature class="texcoord" values="[uv_map, *]"/>
+        </supports>
+        <vertexshader profile="VP30" file="voxelUnlit.cg" entryfunction="mainVertex">
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="voxelUnlit.cg" entryfunction="mainFragmentTF" compilerargs="">
+            <properties>
+                <sampler3d name="theDataTex">0</sampler3d>
+                <sampler2d name="theTransferTable">1</sampler2d>
+                <float name="theAlphaFactor">1.0</float>
+                <float name="theScaleCorrection">1.0</float>
+                <vector2f name="theValueRange">[0.0, 1.0]</vector2f>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s124" name="VoxelGrayWindow" cost="9">
+        <supports>
+            <feature class="voxels" values="[gray]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="textures" values="[paint]"/>
+            <feature class="texcoord" values="[uv_map]"/>
+        </supports>
+        <vertexshader profile="VP30" file="voxelUnlit.cg" entryfunction="mainVertex">
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="voxelUnlit.cg" entryfunction="mainFragmentBW" compilerargs="">
+            <properties>
+                <sampler3d name="theDataTex">0</sampler3d>
+                <float name="theAlphaFactor">1.0</float>
+                <float name="theScaleCorrection">1.0</float>
+                <vector2f name="theValueRange">[0.0, 1.0]</vector2f>
+            </properties>
+        </fragmentshader>
+    </shader>
 </shaders>
 

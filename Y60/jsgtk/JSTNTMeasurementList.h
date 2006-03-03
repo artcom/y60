@@ -49,6 +49,8 @@ class JSTNTMeasurementList : public JSWrapper<acgtk::TNTMeasurementList, asl::Pt
             PROP_signal_right_click,
             PROP_selectedId,
             PROP_signal_name_changed,
+            PROP_signal_key_press_event,
+            PROP_signal_key_release_event,
             PROP_END
         };
 

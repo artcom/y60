@@ -37,6 +37,7 @@ namespace y60 {
     static const char * SOM_VECTOR_VECTOR2F_NAME = "vectorofvector2f";
     static const char * SOM_VECTOR_VECTOR3F_NAME = "vectorofvector3f";
     static const char * SOM_VECTOR_VECTOR4F_NAME = "vectorofvector4f";
+    static const char * SOM_STRING_NAME          = "string";
 
 
     //=== Node names ==============================================================
@@ -164,7 +165,6 @@ namespace y60 {
     static const char * SENSOR_RADIUS_ATTRIB        = "sensorradius";
     static const char * SENSOR_ATTRIB               = "sensor";
     static const char * TRANSPARENCY_ATTRIB         = "transparent";
-    static const char * WRITE_DEPTH_BUFFER_ATTRIB   = "writedepthbuffer";
     static const char * DEPTH_TEST_ATTRIB           = "depthtest";
     static const char * INSENSIBLE_ATTRIB           = "insensible";
     static const char * SKELETON_ATTRIB             = "skeleton";

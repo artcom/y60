@@ -93,9 +93,14 @@ namespace jslib {
         return _myScene;
     }
 
-    // TODO: do something with the extensions
     bool
     AbstractRenderWindow::setScene(const y60::ScenePtr & theScene) {
+        return setSceneAndCanvas(theScene, dom::NodePtr(0));
+    }
+    
+    // TODO: do something with the extensions
+    bool
+    AbstractRenderWindow::setSceneAndCanvas(const y60::ScenePtr & theScene, const dom::NodePtr & theCanvas) {
 
         if (!_mySelf) {
             throw asl::Exception("ERROR: AbstractRenderWindow::_mySelf is 0! Did you use the proper factory method?", PLUS_FILE_LINE);
@@ -119,12 +124,14 @@ namespace jslib {
             _myScene = theScene;
             _myRenderer->setCurrentScene(_myScene);
 
-            //set canvas automatically only if the scene has a single canvas (dk)
-            if (_myScene->getCanvasRoot()->childNodesLength() == 1) {
+            if ( theCanvas ) {
+                setCanvas(theCanvas);
+            } else if (_myScene->getCanvasRoot()->childNodesLength() == 1) {
+                //set canvas automatically only if the scene has a single canvas (dk)
                 dom::NodePtr myCanvas = _myScene->getCanvasRoot()->childNode("canvas");
                 setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
             } else {
-                AC_INFO << "Scene has multiple canvases. No canvas set automatically.";
+                AC_WARNING << "Scene has multiple canvases. No canvas set automatically.";
             }
 
             for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
@@ -295,6 +302,29 @@ namespace jslib {
     AbstractRenderWindow::hasCapAsString(const std::string & theCapStr) {
         y60::ScopedGLContext myGLContext(this);
         return y60::hasCap(theCapStr);
+    }
+
+    std::string
+    AbstractRenderWindow::getGLVersionString() {
+        y60::ScopedGLContext myGLContext(this);
+        return y60::getGLVersionString();
+    }
+
+    std::string
+    AbstractRenderWindow::getGLVendorString() {
+        y60::ScopedGLContext myGLContext(this);
+        return y60::getGLVendorString();
+    }
+    std::string
+    AbstractRenderWindow::getGLRendererString() {
+        y60::ScopedGLContext myGLContext(this);
+        return y60::getGLRendererString();
+    }
+
+    unsigned int 
+    AbstractRenderWindow::getGLExtensionStrings(std::vector<std::string> & theTokens) {
+        y60::ScopedGLContext myGLContext(this);
+        return y60::getGLExtensionStrings(theTokens);
     }
 
     void
@@ -945,6 +975,15 @@ namespace jslib {
     AbstractRenderWindow::getFixedDeltaT() const {
         return _myFixedDeltaT;
     }
-
+    void
+    AbstractRenderWindow::getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, float & theValue) {
+        y60::ScopedGLContext myGLContext(this);
+        glReadPixels(theXPos, theYPos, 1,1, theFormat, GL_FLOAT, &theValue);
+    }
+    void
+    AbstractRenderWindow::getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, asl::Unsigned8 & theValue) {
+        y60::ScopedGLContext myGLContext(this);
+        glReadPixels(theXPos, theYPos, 1,1, theFormat, GL_UNSIGNED_BYTE, &theValue);
+    }
 }
 

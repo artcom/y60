@@ -44,41 +44,38 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     *rval = STRING_TO_JSVAL(myString);
     return JS_TRUE;
 }
-/*
+
+// XXX clear_items appears in Gtk 2.8  [DS]
+// until then, we dispatch to get_model()->clear
 static JSBool
-add_item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+clear_items(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("calls get_model().clear(), removing all the rows");
     DOC_END;
     try {
-        if (argc != 1) {
-            JS_ReportError(cx, "JSComboBox::add_item(): Wrong number of arguments, 1 expected.");
+        if (argc != 0) {
+            JS_ReportError(cx, "JSComboBox::clear_items(): Wrong number of arguments, 0 expected.");
             return JS_FALSE;
         }
 
         Gtk::ComboBox * mySelf = 0;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
-        string myLabel;
-        convertFrom(cx, argv[0], myLabel);
 
-        Gtk::ListStore * myList = dynamic_cast<Gtk::ListStore *>(mySelf->get_model());
-
-        if (myList) {
-            Gtk::TreeModel::iterator iter = myList->append();
-            iter->set_value(0, myLabel);
-        } else {
-            cerr << "### ERROR: Could not dynamic cast to ListStore" << endl;
+        Glib::RefPtr<Gtk::ListStore> myList = Glib::RefPtr<Gtk::ListStore>::cast_dynamic(mySelf->get_model());
+        if (!myList) {
+            JS_ReportError(cx, "JSComboBox::clear_items() can only be called on Gtk::ListStore-based ComboBoxes");
+            return JS_FALSE;
         }
-
+        myList->clear(); 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
-*/
+
 JSFunctionSpec *
 JSComboBox::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         {"toString",                    toString,                      0},
-  //      {"add_item",                    add_item,                      1},
+        {"clear_items",                 clear_items,                   0},
         // name                      native                    nargs
         {0}
     };

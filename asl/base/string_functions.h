@@ -44,6 +44,11 @@ namespace asl {
     extern const char cb66[];
     extern const char cb67[];
 
+    enum StringEncoding {
+        Locale,
+        UTF8
+    };
+    
     DEFINE_EXCEPTION(BufferTooSmall, asl::Exception);
 
     /// return every type that has a operator<<(ostream) as string

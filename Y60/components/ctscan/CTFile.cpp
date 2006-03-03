@@ -17,16 +17,7 @@ namespace y60 {
 
 asl::Vector2f 
 CTFile::getDefaultWindow() const {
-    switch (getEncoding()) {
-        case GRAY:
-            return Vector2f(float(1<<7), float(1<<8));
-        case GRAY16:
-            return Vector2f(float(1<<15), float(1<<16));
-        case GRAYS16:
-            return Vector2f(0.0f, float(1<<16));
-        default:
-            throw CTException("unsupported pixel format", PLUS_FILE_LINE);
-    }
+    return Vector2f(0.0f,0.0f);
 }
 }
 

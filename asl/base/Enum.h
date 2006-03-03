@@ -283,3 +283,4 @@ operator>>(std::istream & is, asl::Enum<ENUM, THE_MAX> & theEnum) {
     template <> bool THE_NAME ::_ourVerifiedFlag( THE_NAME ::verify(__FILE__, __LINE__));
 
 #endif
+

@@ -15,6 +15,7 @@
 #include "JSEmbeddedButton.h"
 #include "JSEmbeddedToggle.h"
 #include "JSCWRuler.h"
+#include "JSGradientSlider.h"
 #include "JSHistogram.h"
 #include "JSGrayScale.h"
 #include "JSTNTMeasurementList.h"
@@ -60,6 +61,7 @@
 #include "JSFileChooserDialog.h"
 #include "JSColorSelectionDialog.h"
 #include "JSLabel.h"
+#include "JSArrow.h"
 #include "JSImage.h"
 #include "JSStatusBar.h"
 #include "JSProgressBar.h"
@@ -122,6 +124,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSCWRuler::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSGradientSlider::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSEmbeddedButton::initClass(cx, theGlobalObject)) {
@@ -248,6 +253,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSLabel::initClass(cx, theGlobalObject)) {
         return false;
     }
+    if (!JSArrow::initClass(cx, theGlobalObject)) {
+        return false;
+    }
     if (!JSStatusBar::initClass(cx, theGlobalObject)) {
         return false;
     }
@@ -319,6 +327,7 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
     INIT_SIGNALPROXY1(bool, GdkEventCrossing*);
     INIT_SIGNALPROXY1(bool, GdkEventFocus*);
     INIT_SIGNALPROXY1(bool, GdkEventAny*);
+    INIT_SIGNALPROXY1(std::string, const std::string &);
     INIT_SIGNALPROXY2(void, const Glib::ustring &, const Glib::ustring &);
     INIT_SIGNALPROXY2(void, guint, const Glib::ustring &);
     INIT_SIGNALPROXY2(void, GtkNotebookPage*, guint);
@@ -326,14 +335,17 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
     // === sigc::signal Stuff =======================================
     // don't forget to add a class trait in JSSignals.h
     INIT_SIGNAL0(void);
+    INIT_SIGNAL0(int);
     INIT_SIGNAL1(void, int);
     INIT_SIGNAL1(void, float);
     INIT_SIGNAL1(void, double);
     INIT_SIGNAL1(bool, double);
     INIT_SIGNAL1(void, Glib::ustring);
+    INIT_SIGNAL1(void, const std::string &);
     INIT_SIGNAL2(void, double, double);
     INIT_SIGNAL2(bool, double, Glib::ustring);
     INIT_SIGNAL2(void, Glib::ustring, Glib::ustring);
+    INIT_SIGNAL3(void, double, double, unsigned int);
     
     if (!JSSigConnection::initClass(cx, theGlobalObject)) {
         return false;
@@ -401,6 +413,7 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(acgtk::GrayScale);
     TRY_DYNAMIC_CAST(acgtk::Histogram);
     TRY_DYNAMIC_CAST(acgtk::CWRuler);
+    TRY_DYNAMIC_CAST(acgtk::GradientSlider);
     TRY_DYNAMIC_CAST(acgtk::RenderArea);
     TRY_DYNAMIC_CAST(acgtk::DragButton);
     TRY_DYNAMIC_CAST(acgtk::EmbeddedToggle);
@@ -444,6 +457,7 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::TextView );
     TRY_DYNAMIC_CAST(Gtk::Toolbar );
     TRY_DYNAMIC_CAST(Gtk::Label );
+    TRY_DYNAMIC_CAST(Gtk::Arrow );
     TRY_DYNAMIC_CAST(Gtk::Image );
     TRY_DYNAMIC_CAST(Gtk::ProgressBar );
     TRY_DYNAMIC_CAST(Gtk::HRuler);
@@ -520,6 +534,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
             } else if (castFrom<acgtk::Histogram>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<acgtk::CWRuler>(cx, myArgument, theTarget)) {
+                return true;
+            } else if (castFrom<acgtk::GradientSlider>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<acgtk::EmbeddedToggle>(cx, myArgument, theTarget)) {
                 return true;
@@ -599,6 +615,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
                 return true;
             } else if (castFrom<Gtk::Label>(cx, myArgument, theTarget)) {
                 return true;
+            } else if (castFrom<Gtk::Arrow>(cx, myArgument, theTarget)) {
+                return true;
             } else if (castFrom<Gtk::Dialog>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::MessageDialog>(cx, myArgument, theTarget)) {
@@ -665,6 +683,7 @@ CONVERT_FROM(Gtk::TreeModelColumnRecord);
 CONVERT_FROM_GLIB_OBJECT(acgtk::GrayScale);
 CONVERT_FROM_GLIB_OBJECT(acgtk::Histogram);
 CONVERT_FROM_GLIB_OBJECT(acgtk::CWRuler);
+CONVERT_FROM_GLIB_OBJECT(acgtk::GradientSlider);
 CONVERT_FROM_GLIB_OBJECT(acgtk::DragButton);
 CONVERT_FROM_GLIB_OBJECT(acgtk::EmbeddedToggle);
 CONVERT_FROM_GLIB_OBJECT(acgtk::EmbeddedButton);
@@ -713,6 +732,7 @@ CONVERT_FROM_GLIB_OBJECT(Gtk::Paned);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Toolbar);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Image);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Label);
+CONVERT_FROM_GLIB_OBJECT(Gtk::Arrow);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Dialog);
 CONVERT_FROM_GLIB_OBJECT(Gtk::MessageDialog);
 CONVERT_FROM_GLIB_OBJECT(Gtk::FileChooserDialog);

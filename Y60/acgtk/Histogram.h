@@ -71,7 +71,7 @@ class Histogram : public Gtk::DrawingArea {
         virtual bool on_motion_notify_event(GdkEventMotion * theEvent);
         */
         void on_realize();
-
+        void on_size_request(Gtk::Requisition* requisition);
     private:
         unsigned findMaxCount();
         int convertSampleCountToScreenPos(int theSampleCount, int theMaxSampleCount);

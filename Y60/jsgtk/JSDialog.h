@@ -56,6 +56,7 @@ class JSDialog : public JSWrapper<Gtk::Dialog, asl::Ptr<Gtk::Dialog>, StaticAcce
             PROP_RESPONSE_APPLY,
             PROP_RESPONSE_HELP,
             PROP_vbox,
+            PROP_has_separator,
             PROP_END
         };
         static JSPropertySpec * Properties();

@@ -102,47 +102,16 @@ namespace jslib {
     JSBool
     JSSoundManager::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Create a SoundManager.");
-        DOC_PARAM_OPT("theSamplerate", "", DOC_TYPE_INTEGER, 44100);
-        DOC_PARAM_OPT("theOutputChannels", "", DOC_TYPE_INTEGER, 2);
-        DOC_PARAM_OPT("theLatency", "", DOC_TYPE_FLOAT, 0.2);
         DOC_END;
         try {
             checkForUndefinedArguments("JSSoundManager::Constructor()", argc, argv);
 
-            if (argc > 3) {
+            if (argc > 0) {
                 throw BadArgumentException(string("JSSoundManager::Constructor(): Wrong number of arguments. Got ") +
-                    as_string(argc) + ", expected between none and three.", PLUS_FILE_LINE);
+                    as_string(argc) + ", expected between none.", PLUS_FILE_LINE);
             }
 
             OWNERPTR myNewNative = &(Singleton<SoundManager>::get());
-            int mySampleRate = 0;
-            if (argc > 0) {
-                if (!convertFrom(cx, argv[0], mySampleRate)) {
-                    JS_ReportError(cx, "JSSoundManager::Constructor(): argument #1 must be an integer (Samplerate)");
-                    return JS_FALSE;
-                }
-
-                if (argc > 1) {
-                    int myNumOutputChannels = 0;
-                    if (!convertFrom(cx, argv[1], myNumOutputChannels)) {
-                        JS_ReportError(cx, "JSSoundManager::Constructor(): argument #1 must be an integer (NumOutputChannels)");
-                        return JS_FALSE;
-                    }
-                    myNewNative->setAppConfig(mySampleRate, myNumOutputChannels);
-                } else {
-                    myNewNative->setAppConfig(mySampleRate);
-                }
-            }
-
-            double myLatency = -1.0;
-            if (argc == 3) {
-                if (!convertFrom(cx, argv[2], myLatency)) {
-                    JS_ReportError(cx, "JSSoundManager::Constructor(): argument #2 must be a double (Latency)");
-                    return JS_FALSE;
-                }
-                myNewNative->setSysConfig(myLatency);
-            }
-
 
             JSSoundManager * myNewObject = new JSSoundManager(myNewNative, &*myNewNative);
             if (myNewObject) {

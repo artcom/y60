@@ -95,18 +95,20 @@ class CTScan {
         asl::Vector2d getOccurringValueRange();
 
         asl::Vector2i countTrianglesGlobal(const asl::Box3i & theVoxelBox, 
-            double theThresholdMin, double theThresholdMax, int theDownSampleRate);
+            double theThresholdMin, double theThresholdMax, int theDownSampleRate, bool theCloseAtClippingBoxFlag);
 
         asl::Vector2i countTrianglesInVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode,
-                    dom::NodePtr theThresholdPalette, int theDownSampleRate);
+                    dom::NodePtr theThresholdPalette, int theDownSampleRate, bool theCloseAtClippingBoxFlag);
 
         /** Create an isosurface from the voxel dataset */
         ScenePtr polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
-            int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
+            int theDownSampleRate, bool theCloseAtClippingBoxFlag, bool theCreateNormalsFlag, 
+            asl::PackageManagerPtr thePackageManager, 
             unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
 
-        ScenePtr polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode, dom::NodePtr theThresholdPalette, 
-            int theDownSampleRate, bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
+        ScenePtr polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode, 
+            dom::NodePtr theThresholdPalette, int theDownSampleRate, bool theCloseAtClippingBoxFlag, 
+            bool theCreateNormalsFlag, asl::PackageManagerPtr thePackageManager, 
             unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
 
         /** Create a downscaled 3D texture from the dataset */
@@ -121,10 +123,10 @@ class CTScan {
                          bool useOccurringRange = true);
 
         // add a the grey value of a single voxel to the profile 
-        void computeProfile(const asl::Point3i & thePoint, std::vector<asl::Signed16> & theProfile);
+        void computeProfile(const asl::Point3i & thePoint, std::vector<asl::Signed32> & theProfile);
         // add the grey values of all voxels in the multiline defined by thePoints to theProfile  
         void computeProfile(const std::vector<asl::Point3i> & thePoints,
-                std::vector<asl::Signed16> & theProfile, std::vector<asl::Point3i> & thePointsSampled);
+                std::vector<asl::Signed32> & theProfile, std::vector<asl::Point3i> & thePointsSampled);
 
         /** Get a pointer to the first voxel of a slice */
         template <class VoxelT>
@@ -143,21 +145,25 @@ class CTScan {
         static dom::NodePtr createGrayImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
         static dom::NodePtr createRGBAImage(dom::NodePtr theParent, int theWidth, int theHeight, int theValue);
         static void resizeVoxelVolume(dom::NodePtr theVoxelVolumeNode, const asl::Box3f & theDirtyBox);
-        static void copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCanvasImage,
+        static void copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, 
                                             const asl::Box3f & theDirtyBox, Orientation theOrientation,
                                             dom::NodePtr thePaletteNode);
         template <class VoxelT>
-        static void copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, 
+        static void copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, 
+            unsigned theGlobalThresholdIndex, dom::NodePtr theCanvas, 
             dom::NodePtr theReconstructedImage,unsigned theSliceIndex,
             Orientation theOrientation, dom::NodePtr thePaletteNode);
 
-        static void copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, 
+        static void copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, 
+            unsigned theGlobalThresholdIndex, dom::NodePtr theCanvas, 
             dom::NodePtr theReconstructedImage,unsigned theSliceIndex,
             Orientation theOrientation, dom::NodePtr thePaletteNode);
         
 
         static void applyBrush(dom::NodePtr theCanvasImage, unsigned theX, unsigned theY,
                                dom::NodePtr theBrushImage, const asl::Vector4f & theColor);
+
+        static void renderTransferFunction(dom::NodePtr theTransferFunction, dom::NodePtr theTargetImage);
 
         asl::Matrix4f getModelViewMatrix(const asl::Quaternionf & theOrientation);
 
@@ -240,12 +246,12 @@ class CTScan {
         
         template <class VoxelT, class SegmentationPolicy>
         bool
-        countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
+        countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate, bool theCloseAtClippingBoxFlag,
                            SegmentationPolicy & theSegmentizer,
                            unsigned int & theVertexCount, unsigned int & theTriangleCount);
         template <class VoxelT, class SegmentationPolicy> 
         bool
-        applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
+        applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate, bool theCloseAtClippingBoxFlag,
                              bool theCreateNormalsFlag, ScenePtr theScene,
                              SegmentationPolicy & theSegmentizer,
                              unsigned int theNumVertices = 0, unsigned int theNumTriangles = 0);
@@ -261,7 +267,7 @@ class CTScan {
         // separatly.
         void computeLineSegmentProfile(const asl::Point3i & theStart, 
                                        const asl::Point3i & theEnd, 
-                                       std::vector<asl::Signed16> & theProfile,
+                                       std::vector<asl::Signed32> & theProfile,
                                        std::vector<asl::Point3i> & thePointsSampled);
         
         

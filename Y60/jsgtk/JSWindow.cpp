@@ -22,6 +22,10 @@
 #include <iostream>
 #include <gdkmm/general.h>
 
+#ifdef WIN32
+#include <gdk/gdkwin32.h>
+#endif
+
 using namespace std;
 using namespace asl;
 
@@ -65,7 +69,13 @@ Raise(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
         ensureParamCount(argc, 0);
         Gtk::Window * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+#ifdef WIN32        
+        HWND myWindow = reinterpret_cast<HWND>(GDK_WINDOW_HWND(myNative->get_window()->gobj()));
+        ShowWindow(myWindow, SW_SHOW);
+        SetForegroundWindow(myWindow);
+#else        
         myNative->raise();
+#endif        
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION
 }
@@ -93,7 +103,10 @@ SetTransientFor(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval 
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
         Gtk::Window * myParent(0);
-        convertFrom(cx, argv[0], myParent);
+        if (!convertFrom(cx, argv[0], myParent)) {
+            JS_ReportError(cx,"set_transient_for: Parent is not a Window.");
+            return JS_FALSE;
+        }
 
         myNative->set_transient_for( * myParent);
 
@@ -122,6 +135,27 @@ SetDefaultSize(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval *
     } HANDLE_CPP_EXCEPTION
 }
 
+static JSBool
+SetIconFromFile(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        Gtk::Window * myNative(0);
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        Glib::ustring myString;
+        if ( ! convertFrom(cx, argv[0], myString)) {
+            JS_ReportError(cx,"SetIconFromFile: argument 0 must be a string");
+            return JS_FALSE;
+        }
+        std::string myImageWithPath = searchFileRelativeToJSInclude(cx, obj, argc, argv, myString);
+        myNative->set_icon_from_file( myImageWithPath );
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION
+}
+
 JSFunctionSpec *
 JSWindow::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -133,6 +167,7 @@ JSWindow::Functions() {
         {"present",              Present,                 0},
         {"set_transient_for",    SetTransientFor,         1},
         {"set_default_size",     SetDefaultSize,          2},
+        {"set_icon_from_file",   SetIconFromFile,         1},
         {0}
     };
     return myFunctions;
@@ -147,6 +182,7 @@ JSWindow::Properties() {
         {"position",        PROP_position,         JSPROP_ENUMERATE|JSPROP_PERMANENT}, // Vector2i
         {"size",            PROP_size,             JSPROP_ENUMERATE|JSPROP_PERMANENT}, // Vector2i
         {"type_hint",       PROP_type_hint,        JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"modal",           PROP_modal,            JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -198,6 +234,9 @@ JSWindow::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         case PROP_type_hint:
             *vp = as_jsval(cx, static_cast<int>(theNative.get_type_hint()));
             return JS_TRUE;
+        case PROP_modal:
+            *vp = as_jsval(cx, theNative.get_modal());
+            return JS_TRUE;
         default:
             return JSBASE::getPropertySwitch(theNative, theID, cx, obj, id, vp);
     }
@@ -234,6 +273,13 @@ JSWindow::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                     Vector2i theSize;
                     convertFrom(cx, *vp, theSize);
                     theNative.resize(theSize[0], theSize[1]);
+                    return JS_TRUE;
+                }
+            case PROP_modal:
+                {
+                    bool myModelFlag = false;
+                    convertFrom(cx, *vp, myModelFlag);
+                    theNative.set_modal(myModelFlag);
                     return JS_TRUE;
                 }
             case PROP_type_hint:

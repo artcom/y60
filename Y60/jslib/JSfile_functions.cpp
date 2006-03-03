@@ -94,7 +94,6 @@ IsDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_RVAL("True if path is a directory", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
-        JSString   * str;
         string myPath;
 
         if (argc != 1) {
@@ -102,13 +101,13 @@ IsDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
             return JS_FALSE;
         }
 
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str) {
+        string myString;
+        if (!convertFrom(cx, argv[0], myString)) {
             JS_ReportError(cx, "isDirectory() could not convert argument value to string.");
             return JS_FALSE;
         }
 
-        myPath = asl::expandEnvironment(JS_GetStringBytes(str));
+        myPath = asl::expandEnvironment(myString);
 
         *rval = as_jsval(cx, asl::isDirectory(myPath));
 
@@ -123,7 +122,6 @@ createDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     DOC_RVAL("Returns true if successful or directory already exists, false if it fails to create it and it does not exist", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
-        JSString   * str;
         string myPath;
 
         if (argc != 1) {
@@ -131,13 +129,12 @@ createDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             return JS_FALSE;
         }
 
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str) {
+        string myString;
+        if (!convertFrom(cx, argv[0], myString)) {
             JS_ReportError(cx, "createDirectory() could not convert argument value to string.");
             return JS_FALSE;
         }
-
-        myPath = asl::expandEnvironment(JS_GetStringBytes(str));
+        myPath = asl::expandEnvironment(myString);
 
         try {
             if (!asl::fileExists(myPath) ) {
@@ -160,7 +157,6 @@ removeDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     DOC_RVAL("Returns true if successful or directory does not exist, false if it fails to remove it", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
-        JSString   * str;
         string myPath;
 
         if (argc != 1) {
@@ -168,13 +164,12 @@ removeDirectory(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             return JS_FALSE;
         }
 
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str) {
+        string myString;
+        if (!convertFrom(cx, argv[0], myString)) {
             JS_ReportError(cx, "removeDirectory() could not convert argument value to string.");
             return JS_FALSE;
         }
-
-        myPath = asl::expandEnvironment(JS_GetStringBytes(str));
+        myPath = asl::expandEnvironment(myString);
 
         try {
             if (asl::fileExists(myPath) ) {
@@ -198,7 +193,6 @@ createPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_RVAL("Returns true if successful, false if it fails", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
-        JSString   * str;
         string myPath;
 
         if (argc != 1) {
@@ -206,13 +200,13 @@ createPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str) {
+        string myString;
+        if (!convertFrom(cx, argv[0], myString)) {
             JS_ReportError(cx, "createDirectory() could not convert argument value to string.");
             return JS_FALSE;
         }
 
-        myPath = asl::expandEnvironment(JS_GetStringBytes(str));
+        myPath = asl::expandEnvironment(myString);
 
         try {
             if (!asl::fileExists(myPath) ) {
@@ -404,23 +398,18 @@ FileExists(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_RVAL("True if file exists", DOC_TYPE_BOOLEAN);
     DOC_END;
     try {
-        JSString   * str;
-        const char * myFileName;
-
         if (argc != 1) {
             JS_ReportError(cx, "'fileExists' takes a filename as argument");
             return JS_FALSE;
         }
 
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str) {
+        std::string myPath;
+        if (!convertFrom(cx, argv[0], myPath)) {
             JS_ReportError(cx, "fileExists() could not convert argument value to string.");
             return JS_FALSE;
         }
 
-        myFileName = JS_GetStringBytes(str);
-
-        *rval = BOOLEAN_TO_JSVAL(asl::fileExists(myFileName));
+        *rval = BOOLEAN_TO_JSVAL(asl::fileExists(myPath));
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -539,16 +528,18 @@ ReadFileAsBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
         if (argc > 1) {
             convertFrom(cx, argv[1], myPackageName);
         }
-        // since we don't have a wrapped ReadableBlock,
-        // we have to make a copy
-        asl::Ptr<asl::Block> myBlock(new asl::Block);
+        asl::Ptr<asl::ReadableBlock> myReadableBlock;
         if (argc == 1) {
-            *myBlock = *(JSApp::getPackageManager()->openFile(myRelativePath));
+            myReadableBlock = JSApp::getPackageManager()->openFile(myRelativePath);
         } else {
-            *myBlock = *(JSApp::getPackageManager()->openFile(myRelativePath, myPackageName));
+            myReadableBlock = JSApp::getPackageManager()->openFile(myRelativePath, myPackageName);
         }
 
-        if (myBlock) {
+        if (myReadableBlock) {
+            // since we don't have a wrapped ReadableBlock,
+            // we have to make a copy
+            asl::Ptr<asl::Block> myBlock(new asl::Block);
+            *myBlock = *myReadableBlock;
             *rval = as_jsval(cx, myBlock, &(*myBlock) );
         } else {
             *rval = JSVAL_NULL;

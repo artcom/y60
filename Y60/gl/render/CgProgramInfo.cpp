@@ -627,6 +627,7 @@ namespace y60 {
                     break;
                 }
             case SAMPLER2D:
+            case SAMPLER3D:
             case SAMPLERCUBE:
                 {
                     unsigned myTextureIndex = theNode.nodeValueAs<unsigned>();
@@ -637,17 +638,17 @@ namespace y60 {
                         DB(AC_TRACE << "cgGLSetTextureParameter: Texture index: "<< as_string(myTextureIndex)
                                 << " , glid : " << myTexture.getId()
                                 << " , property : " << thePropertyName
-                                << " to parameter : "<< cgGetParameterName(theCgParameter) << endl;)
+                                << " to parameter : "<< cgGetParameterName(theCgParameter) << endl);
                     } else {
                         throw ShaderException(string("Texture Index ") + as_string(myTextureIndex) +
                                 " not found. Material has " + as_string(theMaterial.getTextureCount()) + " texture(s)",
-                                "CGShader::setCgParameter()");
+                                "CgProgramInfo::setCgMaterialParameter()");
                     }
                     break;
                 }
             default:
                 throw ShaderException(string("Unknown CgParameter type in property '")+thePropertyName+"'",
-                        "CGShader::setCgParameter()");
+                        "CgProgramInfo::setCgMaterialParameter()");
         }
 
         assertCg(PLUS_FILE_LINE, 0);
@@ -782,9 +783,10 @@ namespace y60 {
             GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
             glActiveTextureARB(myTexUnit);
 
-            // AC_DEBUG << "CgProgramInfo::enableTextures paramName=" << _myTextureParams[i]._myParamName << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
+            // AC_DEBUG << "CgProgramInfo::enableTextures paramName=" << _myTextureParams[i]._myParamName
+            //          << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
             cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
-            glEnable(GL_TEXTURE_2D);
+            glEnable(GL_TEXTURE_2D); // Huh? What's that? What if the texture is 3D or Cube or something else? [DS]
             CHECK_OGL_ERROR;
         }
     }

@@ -22,6 +22,8 @@
 #include <y60/JSWrapper.h>
 #include <gtkmm/main.h>
 
+#include <asl/MessageAcceptor.h>
+#include <asl/LocalPolicy.h>
 #include <asl/string_functions.h>
 
 namespace jslib {
@@ -66,6 +68,15 @@ class JSGtkMain : public JSWrapper<int, asl::Ptr<int>, StaticAccessProtocol>
         }
 
         static bool on_timeout( JSContext * cx, JSObject * theJSObject, std::string theMethodName);
+        static int on_idle( JSContext * cx, JSObject * theJSObject, std::string theMethodName);
+
+        // non-gtk extensions (single application instance support)
+        static asl::Ptr<asl::MessageAcceptor<asl::LocalPolicy> > ourAppAcceptor;
+        static sigc::connection ourAcceptorTimeout;
+        typedef sigc::signal<void, const std::string &> OtherInstanceSignal;
+        static OtherInstanceSignal ourOtherInstanceSignal; 
+        static bool onAcceptorTimeout();
+        static bool sendToPrevInstance(const std::string & theSessionPipeId, const std::string & theInitialProjectfilename);
 };
 
 

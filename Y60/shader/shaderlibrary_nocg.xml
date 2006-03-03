@@ -772,5 +772,47 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>    
+    <!-- dummy voxel shader; does nothing usefull -->
+    <shader id="s123" name="VoxelColored" cost="9">
+        <supports>
+            <feature class="voxels" values="[colored]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="textures" values="[paint,paint]"/>
+            <feature class="texcoord" values="[uv_map, *]"/>
+        </supports>
+        <fixedfunctionshader>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="texcoord0"/>
+            </vertexparameters>
+            <properties>
+                <sampler3d name="theDataTex">0</sampler3d>
+                <sampler2d name="theTransferTable">1</sampler2d>
+                <float name="theAlphaFactor">1.0</float>
+                <float name="theScaleCorrection">1.0</float>
+                <vector2f name="theValueRange">[0.0, 1.0]</vector2f>
+            </properties>
+         </fixedfunctionshader>
+    </shader>
+    <shader id="s124" name="VoxelGray" cost="9">
+        <supports>
+            <feature class="voxels" values="[gray]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="textures" values="[paint]"/>
+            <feature class="texcoord" values="[uv_map]"/>
+        </supports>
+        <fixedfunctionshader>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="texcoord0"/>
+            </vertexparameters>
+            <properties>
+                <sampler3d name="theDataTex">0</sampler3d>
+                <float name="theAlphaFactor">1.0</float>
+                <float name="theScaleCorrection">1.0</float>
+                <vector2f name="theValueRange">[0.0, 1.0]</vector2f>
+            </properties>
+         </fixedfunctionshader>
+    </shader>
 </shaders>
 

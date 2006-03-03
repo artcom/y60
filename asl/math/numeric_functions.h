@@ -34,7 +34,7 @@ namespace asl {
 static const double PI   = 3.14159265358979323846;
 static const double PI_2 = 1.57079632679489661923;
 static const double PI_4 = 0.785398163397448309616;
-
+static const double EULER = 2.7182818284590452354;
 
 inline double radFromDeg(double theDegree)  { return (theDegree * PI) / 180.0; }
 inline double degFromRad(double theRadiant) { return (theRadiant * 180.0) / PI; }
@@ -329,6 +329,11 @@ T smoothStep(T theValue, T theIn = 0, T theOut = 1)
 
     T myOutput = (theValue - theIn) / (theOut - theIn);
     return (myOutput * myOutput) * (3 - 2 * myOutput);
+}
+
+template <class T>
+T sqr(const T & a) {
+    return a * a;
 }
 
 /* @} */

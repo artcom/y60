@@ -101,9 +101,7 @@ namespace asl {
         }
         return myHostname;
     }
-#endif
-
-#ifdef OSX
+#else
     // This is executed once on program start.
     char * reallyGetHostname() {
         const size_t myLength = 4096;
@@ -114,7 +112,9 @@ namespace asl {
         }
         return myHostname;
     }
+#endif
 
+#ifdef OSX
     std::string getAppname() {
         static string myPid = asl::as_string(getpid());
         const size_t myLength = 4096;
@@ -129,15 +129,7 @@ namespace asl {
 #endif
 
     const string & hostname() {
-#ifdef WIN32
-        static string hostname (reallyGetHostname());
-#endif
-#ifdef LINUX
-        static string hostname( getenv("HOSTNAME"));
-#endif
-#ifdef OSX
-        static string hostname( reallyGetHostname());
-#endif
+        static string hostname(reallyGetHostname());
         return hostname;
     }
 

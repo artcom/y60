@@ -38,25 +38,40 @@ EmbeddedButton::setup() {
 
 bool 
 EmbeddedButton::on_leave_notify_event(GdkEventCrossing * theEvent) {
-    _myClickAheadFlag = false;
-    set_state(Gtk::STATE_NORMAL);
+    leave();
     return true;
 }
 
 bool 
 EmbeddedButton::on_button_press_event(GdkEventButton * theEvent) {
-    _myClickAheadFlag = true;
-    set_state(Gtk::STATE_ACTIVE);
+    pressed();
     return true;
 }
 
-bool 
-EmbeddedButton::on_button_release_event(GdkEventButton * theEvent) {
+void 
+EmbeddedButton::pressed() {
+    _myClickAheadFlag = true;
+    set_state(Gtk::STATE_ACTIVE);
+}
+
+void
+EmbeddedButton::released() {
     if(_myClickAheadFlag) {
         on_clicked();
     }
     set_state(Gtk::STATE_NORMAL);
     _myClickAheadFlag = false;
+}
+
+void
+EmbeddedButton::leave() {
+    _myClickAheadFlag = false;
+    set_state(Gtk::STATE_NORMAL);
+}
+
+bool 
+EmbeddedButton::on_button_release_event(GdkEventButton * theEvent) {
+    released();
     return true;
 }
 

@@ -35,7 +35,7 @@
 #include <dom/Value.h>
 
 #include <paintlib/plexcept.h>
-
+#include <glibmm.h>
 
 #include <limits>
 
@@ -51,6 +51,7 @@
 
 namespace asl {
 
+    Glib::ustring as_ustring(JSContext *cx, jsval theVal);
     std::string as_string(JSContext *cx, jsval theVal);
     std::string as_string(JSContext *cx, JSObject *theObj);
     std::string as_string(JSType theType);
@@ -116,6 +117,9 @@ DEFINE_EXCEPTION(JSArgMismatch, asl::Exception);
 //=============================================================================
 
 JSBool JSA_reportUncaughtException(JSContext *cx);
+
+JSBool
+JSA_CallFunctionName(JSContext * cx, JSObject * obj, const Glib::ustring & theName, int argc, jsval argv[], jsval* rval);
 
 JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int argc, jsval argv[], jsval* rval);
@@ -284,10 +288,25 @@ jsval as_jsval(JSContext *cx, int theValue) {
 }
 
 inline
-jsval as_jsval(JSContext *cx, const std::string & theValue) {
-    JSString * myString = JS_NewStringCopyN(cx,theValue.c_str(),theValue.size());
+jsval as_jsval(JSContext *cx, const char * theU8String) {
+    gunichar2 * myUTF16 = g_utf8_to_utf16(theU8String, -1,0,0,0);
+    
+    JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myUTF16));
+    g_free(myUTF16);
+
     return STRING_TO_JSVAL(myString);
 }
+
+inline
+jsval as_jsval(JSContext *cx, const std::string & theValue) {
+    return as_jsval(cx, theValue.c_str());
+}
+
+inline
+jsval as_jsval(JSContext *cx, const Glib::ustring & theUTF8String) {
+    return as_jsval(cx, theUTF8String.data());
+}
+
 
 template <class T>
 jsval as_jsval(JSContext *cx, const std::vector<T> & theVector) {
@@ -444,11 +463,13 @@ bool convertFrom(JSContext *cx, jsval theValue, bool & theDest) {
 
 inline
 bool convertFrom(JSContext *cx, jsval theValue, std::string & theDest) {
-    JSString *myJSStr = JS_ValueToString(cx, theValue);
-    if (!myJSStr) {
-        return JS_TRUE;
-    }
-    theDest = JS_GetStringBytes(myJSStr);
+    theDest = asl::as_string(cx, theValue);
+    return true;
+}
+
+inline
+bool convertFrom(JSContext *cx, jsval theValue, Glib::ustring & theDest) {
+    theDest = asl::as_ustring(cx, theValue);
     return true;
 }
 

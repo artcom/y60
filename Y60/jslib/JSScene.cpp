@@ -221,8 +221,8 @@ update(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Updates the components of the scene that are set in theUpdateFlags.");
     DOC_END;
     JSBool mySuccess = Method<NATIVE>::call(&NATIVE::update,cx,obj,argc,argv,rval);
-    *rval = as_jsval(cx, mySuccess);
-    return JS_TRUE;
+    //*rval = as_jsval(cx, mySuccess);
+    return mySuccess;
 }
 
 static JSBool
@@ -497,6 +497,7 @@ enum PropertyNumbers {
     PROP_characters,
     PROP_shapes,
     PROP_images,
+    PROP_document,
     PROP_MATERIALS,
     PROP_SHAPES,
     PROP_ANIMATIONS,
@@ -571,6 +572,7 @@ JSScene::Properties() {
     static JSPropertySpec myProperties[] = {
         {"statistics",   PROP_statistics,   JSPROP_ENUMERATE | JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"dom",          PROP_dom,          JSPROP_ENUMERATE | JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
+        {"document",     PROP_document,     JSPROP_ENUMERATE | JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"cameras",      PROP_cameras,      JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"world",        PROP_world,        JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
         {"canvases",     PROP_canvases,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED | JSPROP_READONLY},
@@ -632,6 +634,9 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             }
         case PROP_dom:
             *vp = as_jsval(cx, getNative().getSceneDom()->childNode(SCENE_ROOT_NAME));
+            return JS_TRUE;
+        case PROP_document:
+            *vp = as_jsval(cx, static_cast_Ptr<dom::Node>(getNative().getSceneDom()));
             return JS_TRUE;
         case PROP_world:
             *vp = as_jsval(cx, getNative().getWorldRoot());
@@ -727,7 +732,7 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             } else {
                 std::string myFilename = as_string(cx, argv[0]);
                 PackageManagerPtr myPackageManager = JSApp::getPackageManager();
-                AC_INFO << "Loading Scene " << myFilename;
+                AC_INFO << "Loading Scene " << getFilenamePart(myFilename) << " from " << getDirectoryPart(myFilename);
                 myPackageManager->add(asl::getDirectoryPart(myFilename));
                 myNewPtr->load(getFilenamePart(myFilename), myPackageManager, myCallback);
             }

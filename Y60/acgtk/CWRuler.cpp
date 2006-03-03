@@ -7,13 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: SliceViewer.js,v $
-//   $Author: danielk $
-//   $Revision: 1.97 $
-//   $Date: 2005/04/29 13:49:59 $
-//
-//=============================================================================
 
 #include "CWRuler.h"
 #include "CellRendererPixbufToggle.h"
@@ -77,13 +70,13 @@ CWRuler::on_button_press_event(GdkEventButton * theEvent) {
         int myCenterMarkerPos = convertValueToScreenPos(_myWindowCenter);
         int myLeftMarkerPos = convertValueToScreenPos(_myWindowCenter - myHWindowWidth);
         int myRightMarkerPos = convertValueToScreenPos(_myWindowCenter + myHWindowWidth);
-        if (intersectWithMarker(theEvent, myCenterMarkerPos)) {
-            _myState = CHANGE_CENTER;
-        } else if (intersectWithMarker(theEvent, myLeftMarkerPos)) {
+        if (intersectWithMarker(theEvent, myLeftMarkerPos)) {
             _myState = CHANGE_WIDTH_LEFT;
         } else if (intersectWithMarker(theEvent, myRightMarkerPos)) {
             _myState = CHANGE_WIDTH_RIGHT;
-        }
+        } else if (intersectWithMarker(theEvent, myCenterMarkerPos)) {
+            _myState = CHANGE_CENTER;
+        } 
     } else if (_myMode == MODE_THRESHOLD) {
         int myCenterMarkerPos = convertValueToScreenPos(_myWindowCenter);
         if (intersectWithMarker(theEvent, myCenterMarkerPos)) {

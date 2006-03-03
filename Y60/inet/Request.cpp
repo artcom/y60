@@ -265,6 +265,12 @@ namespace inet {
     }
 
     void
+    Request::verifyPeer(bool theFlag) {
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_SSL_VERIFYPEER, theFlag);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    }
+
+    void
     Request::setCookie(const std::string & theCookie) {
         _myCookieBuffer = theCookie;
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_COOKIE, _myCookieBuffer.c_str());

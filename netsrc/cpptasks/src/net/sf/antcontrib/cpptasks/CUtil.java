@@ -349,7 +349,11 @@ public class CUtil {
             String[] cmdline, boolean newEnvironment, Environment env)
             throws BuildException {
         try {
-           
+
+            // DK & TS split space spearated cmd line options before execution
+            // [TS] This was done for some pkg-config stuff to work
+            // [TS] also added special handling of -framework which is split
+            //      so it does not get quoted
             //DK & TS split space spearated cmd line options before execution
             Vector myVector = new Vector();
             for(int i=0;i<cmdline.length;++i) {
@@ -360,22 +364,23 @@ public class CUtil {
                         myArgs[j] = "-" + myArgs[j];
                         myVector.add(myArgs[j]);
                     }
+                } else if (cmdline[i].indexOf("-framework") == 0) {
+                    String[] myArgs = cmdline[i].split(" ");
+                    for(int j=0;j<myArgs.length;++j) {
+                        myVector.add(myArgs[j]);
+                    }
                 } else {
+                    //task.log("No Match for: " + cmdline[i]);
                     if (cmdline[i].length() > 0) {
                         myVector.add(cmdline[i]);
                     }
                 }
             }
-            /* 
-            for(int i=0;i<myVector.size();++i) {
-                System.out.println("<" + myVector.elementAt(i) + ">");
-            }
-            */
             
             String[] mySpaceSplittedCmdLine = (String[]) myVector.toArray(new String[0]);
-            //DK & TS done. 
+            //DK & TS done.
             //String[] mySpaceSplittedCmdLine = cmdline;
-            
+
             // task.log(Commandline.toString(cmdline), Project.MSG_VERBOSE);
             task.log(Commandline.toString(mySpaceSplittedCmdLine), Project.MSG_INFO); /* MS */
             Execute exe = new Execute(new LogStreamHandler(task,

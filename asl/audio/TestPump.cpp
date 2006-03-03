@@ -13,6 +13,7 @@
 #include "TestPump.h"
 
 #include "Pump.h"
+#include "DummyPump.h"
 
 #include <asl/proc_functions.h>
 #include <asl/os_functions.h>
@@ -27,12 +28,9 @@ const SampleFormat ourNativeSampleFormat = SF_F32;
 
 void TestPump::runWithPump(bool useDummyPump) {
         unsigned myBeginMemory = getProcessMemoryUsage(); 
-#ifdef WIN32
-        Pump::setSysConfig(0.05, "");
-#else
-        Pump::setSysConfig(0.02, "");
-#endif
-        Pump::setAppConfig(44100, 2, useDummyPump);
+        if (!useDummyPump) {
+            ENSURE(0 == dynamic_cast<DummyPump *>(&(Pump::get())));
+        }
         string myVal;
         if (!useDummyPump && get_environment_var("Y60_NOISY_SOUND_TESTS", myVal)) {
             _myNoisy = true;
@@ -66,7 +64,7 @@ void TestPump::runWithPump(bool useDummyPump) {
         testRunUntilEmpty();
         testDelayed();
 
-//        stressTest(5);
+        stressTest(5);
         
         ENSURE(Pump::get().getNumClicks() == 0);
 

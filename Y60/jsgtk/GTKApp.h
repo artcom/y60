@@ -24,6 +24,8 @@
 #include <y60/JSApp.h>
 #include <y60/JScppUtils.h>
 
+namespace jslib {
+
 class GTKApp : public jslib::JSApp {
     public:
         GTKApp();
@@ -35,14 +37,13 @@ class GTKApp : public jslib::JSApp {
                    gboolean after,
                    gpointer theTargetJSObject);
         static gulong deleteSignalHandler(GObject* theSource, gpointer theUserData);
-
-                
-
     protected:
         virtual bool initClasses(JSContext * theContext, JSObject * theGlobalObject);
     private:
         typedef std::map<GObject*, JSGladeSignalAdapterVector> SignalAdapterMap;
         static SignalAdapterMap _mySignalAdapterMap_;
 };
+
+}
    
 #endif

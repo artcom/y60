@@ -41,7 +41,7 @@ class SoundTestBase: public UnitTest {
         SoundManager& getSoundManager() {
             return _mySoundManager;
         }
-       
+ 
         void checkTime(SoundPtr theSound, asl::Time theTime) {
             double myTime = theSound->getCurrentTime();
             ENSURE(myTime > theTime-0.1 && myTime < theTime+0.2);
@@ -198,6 +198,7 @@ class TestTwoSounds: public SoundTestBase {
             SoundPtr mySound = getSoundManager().createSound("../../testfiles/aussentuer.mp3");
             mySound->play();
             myDuration = mySound->getDuration();
+            ENSURE(fabs(myDuration-1.619) < 0.01);
             mySound = getSoundManager().createSound("../../testfiles/stereotest441.wav");
             mySound->play();
             myDuration = maximum(myDuration, mySound->getDuration());
@@ -286,6 +287,7 @@ class TestCache: public SoundTestBase {
             ENSURE(getSoundManager().getNumItemsInCache() == 1);
             getSoundManager().deleteCacheItem("../../testfiles/stereotest441.wav");
             ENSURE(getSoundManager().getNumItemsInCache() == 0);
+            AC_PRINT << "Testing warning code. Ignore warnings about cache memory usage following this line.";
             getSoundManager().setCacheSize(0,0);
             play("../../testfiles/aussentuer.mp3");
             ENSURE(getSoundManager().getNumItemsInCache() == 0);
@@ -430,10 +432,12 @@ class TestLoop: public SoundTestBase {
             mySound->pause();
             msleep(500);
             myTime = mySound->getCurrentTime();
+            AC_PRINT << "myTime: " << myTime;
             ENSURE(myTime > 2.5 && myTime < 4.5);
             mySound->play();
             msleep(1000);
             myTime = mySound->getCurrentTime();
+            AC_PRINT << "myTime: " << myTime;
             ENSURE(myTime > 3.5 && myTime < 5.5);
             mySound->stop();
         }
@@ -606,12 +610,6 @@ class SoundTestSuite : public UnitTestSuite {
 
             SoundManager& mySoundManager = Singleton<SoundManager>::get();
 
-#ifdef WIN32
-            mySoundManager.setSysConfig(0.05, "");
-#else
-            mySoundManager.setSysConfig(0.02, "");
-#endif
-            mySoundManager.setAppConfig(44100, 2, _myUseDummyPump);
             bool myNoisy;
             string myVal;
             if (!_myUseDummyPump && get_environment_var("Y60_NOISY_SOUND_TESTS", myVal)) {

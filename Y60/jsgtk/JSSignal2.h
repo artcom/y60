@@ -36,21 +36,14 @@ template <class R, class P0, class P1>
 class JSSignalAdapter2 : public JSSignalAdapterBase {
     public:
         static R on_signal(P0 theParam0, P1 theParam1,
-                           JSContext * cx, JSObject * theJSObject, std::string theMethodName)
+                           JSContext * cx, JSObject * theJSObject, Glib::ustring theMethodName)
         {
-            // does the required function object exists?
-            jsval myVal;
-            JSBool bOK = JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
-            if (myVal == JSVAL_VOID) {
-                std::cerr << "#WARNING: JS event handler for event '" <<
-                    theMethodName << "' missing." << std::endl;
-            }
             // call the function
             jsval argv[2], rval;
             argv[0] = as_jsval(cx, theParam0);
             argv[1] = as_jsval(cx, theParam1);
             AC_TRACE << "calling signal2 " << theMethodName;
-            JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName.c_str(), 2, argv, &rval);
+            JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 2, argv, &rval);
 
             R myResult;
             convertFrom(cx, rval, myResult);
@@ -62,20 +55,12 @@ template <class P0, class P1>
 class JSSignalAdapter2<void, P0, P1> : public JSSignalAdapterBase {
     public:
         static void on_signal(P0 theParam0, P1 theParam1,
-                              JSContext * cx,  JSObject * theJSObject, std::string theMethodName)
+                              JSContext * cx,  JSObject * theJSObject, Glib::ustring theMethodName)
         {
-            // does the required function object exists?
-            jsval myVal;
-            JSBool bOK = JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
-            if (myVal == JSVAL_VOID) {
-                std::cerr << "#WARNING: JS event handler for event '" <<
-                    theMethodName << "' missing." << std::endl;
-            }
-            // call the function
             jsval argv[2], rval;
             argv[0] = as_jsval(cx, theParam0);
             argv[1] = as_jsval(cx, theParam1);
-            JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName.c_str(), 2, argv, &rval);
+            JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName, 2, argv, &rval);
         }
 };
 
@@ -115,7 +100,7 @@ class JSSignal2 : public JSWrapper<sigc::signal2<R, P0, P1>, asl::Ptr<sigc::sign
                 Glib::ustring myMethodName;
                 convertFrom(cx, argv[1], myMethodName);
 
-                SigC::Slot2<R, P0, P1> mySlot = sigc::bind<JSContext*, JSObject*, std::string>(
+                SigC::Slot2<R, P0, P1> mySlot = sigc::bind<JSContext*, JSObject*, Glib::ustring>(
                     sigc::ptr_fun( & JSSignalAdapter2<R, P0, P1>::on_signal ), cx, myTarget, myMethodName);
                 JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new SigC::Connection);
 

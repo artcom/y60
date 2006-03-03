@@ -216,7 +216,7 @@ namespace y60 {
     GLShader::enableTextures(const y60::MaterialBase & theMaterial) {
 
         unsigned myTextureCount = theMaterial.getTextureCount();
-        AC_DEBUG << "GLShader::enableTextures " << theMaterial.get<NameTag>() << " count=" << myTextureCount;
+        // AC_TRACE << "GLShader::enableTextures " << theMaterial.get<NameTag>() << " count=" << myTextureCount;
 
         glMatrixMode(GL_TEXTURE);
         for (unsigned i = 0; i < myTextureCount; ++i) {
@@ -226,6 +226,9 @@ namespace y60 {
 
             GLenum myTexUnit = asGLTextureRegister(i);
             glActiveTextureARB(myTexUnit);
+
+            GLenum myTextureType = myTexture.getImage()->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
+            glBindTexture(myTextureType, myTexture.getId());
 
             // load texture matrix
             asl::Matrix4f myMatrix = myTexture.getImage()->get<ImageMatrixTag>();
@@ -355,7 +358,7 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        AC_DEBUG << "bindBodyParams " << theMaterial.get<NameTag>();
+        // AC_DEBUG << "bindBodyParams " << theMaterial.get<NameTag>();
         DBP2(MAKE_SCOPE_TIMER(GLShader_bindBodyParams));
         if (theMaterial.hasTexGen()) {
 

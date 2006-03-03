@@ -155,9 +155,9 @@ namespace asl {
             swap(this->val[3][1], this->val[1][3]);
             swap(this->val[3][2], this->val[2][3]);
         }
-                bool invert() {
-                        return invertCramer();
-                }
+        bool invert() {
+            return invertCramer();
+        }
 
         Number getDeterminant() {
             return   this->val[0][0] * this->val[1][1] * this->val[2][2] * this->val[3][3]
@@ -194,7 +194,9 @@ namespace asl {
                                           this->val[2][0], this->val[2][1], this->val[2][2]);
 
             // Is the submatrix A singular?
-            if (almostEqual(myDeterminant, Number(0), Number(1E-10))) {
+            // not using almostEqual - its too paraniod in this case.
+            // just prevent a division-by-zero error
+            if ( myDeterminant == 0.0f) {
                 // Matrix M has no inverse
                 return false;
             }
@@ -234,7 +236,9 @@ namespace asl {
             // then the inverse matrix is not unique.
             Number myDeterminant = getDeterminant();
 
-            if (almostEqual(myDeterminant, Number(0), Number(1E-10))) {
+            // not using almostEqual - its too paraniod in this case.
+            // just prevent a division-by-zero error
+            if ( myDeterminant == 0.0f) {
                 // Matrix has no inverse
                 return false;
             }
@@ -267,7 +271,7 @@ namespace asl {
             this->val[3][3] = out.val[3][3] * myDeterminant;
 
             return true;
-                }
+        }
 
         bool invertLinear() {
             // calc determinant of upper-left 3x3 submatrix
@@ -276,7 +280,9 @@ namespace asl {
                                           this->val[2][0], this->val[2][1], this->val[2][2]);
 
             // Is the 3x3 submatrix singular?
-            if (almostEqual(myDeterminant, Number(0), Number(1E-10))) {
+            // not using almostEqual - its too paraniod in this case.
+            // just prevent a division-by-zero error
+            if ( myDeterminant == 0.0f) {
                 // Matrix has no inverse
                 return false;
             }

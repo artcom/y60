@@ -48,6 +48,7 @@ class JSColorButton : public JSWrapper<Gtk::ColorButton, asl::Ptr<Gtk::ColorButt
              PROP_alpha,
              PROP_use_alpha,
              PROP_title,
+             PROP_signal_color_set,
              PROP_END
         };
         static JSPropertySpec * Properties();

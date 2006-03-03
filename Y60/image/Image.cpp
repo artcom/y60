@@ -337,7 +337,7 @@ namespace y60 {
         applyCustomFilter(myBmp, theFilter, theFilterParams);
 
         PLPNGEncoder myPNGEncoder;
-        myPNGEncoder.MakeFileFromBmp(theImagePath.c_str(), &myBmp);
+        myPNGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myBmp);
     }
 
     void
@@ -346,7 +346,7 @@ namespace y60 {
         convertToPLBmp( myBmp );
 
         PLPNGEncoder myPNGEncoder;
-        myPNGEncoder.MakeFileFromBmp(theImagePath.c_str(), &myBmp);
+        myPNGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myBmp);
     }
 
     void Image::storeTextureVersion()
@@ -360,6 +360,7 @@ namespace y60 {
         _myAppliedInternalFormat = get<ImageInternalFormatTag>();
         _myAppliedColorBias    = get<ImageColorBiasTag>();
         _myAppliedColorScale   = get<ImageColorScaleTag>();
+        _myAppliedMipmap   = get<ImageMipmapTag>();
     }
 
     /// Reload *from file* required?
@@ -375,7 +376,8 @@ namespace y60 {
         /*
          * want to check what condition the condition is in ?   
          *  Ask theDude or try this:
-         
+         */
+#if 0         
 if (myReloadRequired) {
 
         bool b1 = getRasterValue();
@@ -405,7 +407,7 @@ if (myReloadRequired) {
 << "s1 = " << s1;
 
 }
-        */      
+#endif
 
         return myReloadRequired;
     }
@@ -426,7 +428,6 @@ if (myReloadRequired) {
                 }
             }
         }
-
         return getGraphicsId() == 0 ||
             _myAppliedColorScale != get<ImageColorScaleTag>() ||
             _myAppliedColorBias != get<ImageColorBiasTag>() ||
@@ -437,12 +438,25 @@ if (myReloadRequired) {
     /// Applied texture parameters are compatible with DOM values.
     bool
     Image::canReuseTexture() const {
-        return getGraphicsId() != 0 &&
+        bool myCanReuseFlag = (getGraphicsId() != 0 &&
             _myTextureWidth == get<ImageWidthTag>() &&
             _myTextureHeight == get<ImageHeightTag>() &&
             _myTextureDepth == get<ImageDepthTag>() &&
             _myTexturePixelFormat == get<ImagePixelFormatTag>() &&
             _myAppliedInternalFormat == get<ImageInternalFormatTag>() &&
-            _myAppliedMipmap == get<ImageMipmapTag>();
+            _myAppliedMipmap == get<ImageMipmapTag>());
+#if 0
+        if (!myCanReuseFlag) {
+            AC_PRINT << "Graphics ID " << getGraphicsId();
+            AC_PRINT << "Width: Texture " << _myTextureWidth << ", Image " << get<ImageWidthTag>();
+            AC_PRINT << "Height: Texture " << _myTextureHeight << ", Image " << get<ImageHeightTag>();
+            AC_PRINT << "Depth: Texture " << _myTextureDepth << ", Image " << get<ImageDepthTag>();
+            AC_PRINT << "PixelFormat: Texture " << _myTexturePixelFormat << ", Image " << get<ImagePixelFormatTag>();
+            AC_PRINT << "InternalFormat: Applied " << _myAppliedInternalFormat << ", Image " << get<ImageInternalFormatTag>();
+            AC_PRINT << "MipMap: Applied " << _myAppliedMipmap << ", Image " << get<ImageMipmapTag>();
+        }
+#endif        
+        return myCanReuseFlag;
     }
 }
+

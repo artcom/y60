@@ -30,10 +30,6 @@ namespace y60 {
     public:
         virtual ~SoundManager();
 
-        virtual void setSysConfig(const asl::Time& myLatency, 
-                const std::string& myDeviceName = "");
-        virtual void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels = 2, 
-                bool useDummy = false);
         virtual void setCacheSize(unsigned myTotalSize, unsigned myItemSize);
         virtual unsigned getMaxCacheSize() const;
         virtual unsigned getMaxCacheItemSize() const;

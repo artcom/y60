@@ -42,6 +42,7 @@
 #define included_asl_Arguments_h
 
 #include "Exception.h"
+#include "string_functions.h"
 
 #include <map>
 #include <vector>
@@ -76,8 +77,8 @@ public:
     DEFINE_EXCEPTION(IllegalOptionQuery,asl::Exception)
 
     bool haveOption(const std::string & option) const;
-    bool parse(std::vector<std::string> myArgs, int errorHandlingPolicy=BailOnUnknownOptions); 
-    bool parse(int argc, const char * const argv[], int errorHandlingPolicy=BailOnUnknownOptions);
+    bool parse(std::vector<std::string> myArgs, StringEncoding theEncoding=UTF8, int errorHandlingPolicy=BailOnUnknownOptions); 
+    bool parse(int argc, const char * const argv[], StringEncoding theEncoding=Locale, int errorHandlingPolicy=BailOnUnknownOptions);
     void printUsage() const;
     void printRevision() const;
     void printVersion() const;

@@ -30,6 +30,7 @@
 #include "string_functions.h"
 
 #include "Ptr.h"
+#include "Path.h"
 
 #include <fstream>
 #include <vector>
@@ -390,10 +391,11 @@ namespace asl {
     public:
         ReadableArrangedFile(const std::string & theFileName)
             : _mySize(getFileSize(theFileName)),
-            _myInFile(theFileName.c_str(),std::ios::binary),
             _myPosition(0),
-            _myFileName(theFileName)
-        {}
+            _myFileName(theFileName, UTF8)
+        {
+            _myInFile.open(_myFileName.toLocale().c_str() ,std::ios::binary);
+        }
 
         typename Base::size_type readBytes(void * theDest, typename Base::size_type theSize, typename Base::size_type theReadOffset) const {
             if (theReadOffset != _myPosition) {
@@ -402,7 +404,7 @@ namespace asl {
                 if (_myPosition != theReadOffset) {
                     throw StreamPositionMismatch(
                         std::string("ReadableFile::readBytes(size=")+as_string(theSize)+")",
-                        std::string("Filename='")+ _myFileName + "', desired pos= " + as_string(theReadOffset) 
+                        std::string("Filename='")+ _myFileName.toLocale() + "', desired pos= " + as_string(theReadOffset) 
                         + ", actual pos = "+ as_string(_myPosition) );
                 }
             }
@@ -410,7 +412,7 @@ namespace asl {
             if (_myInFile.gcount() != theSize) {
                 throw StreamReadFailed(
                     std::string("ReadableFile::readBytes(size=")+as_string(theSize)+")",
-                    std::string("Filename='")+ _myFileName + "', pos = " + as_string(theReadOffset) 
+                    std::string("Filename='")+ _myFileName.toLocale() + "', pos = " + as_string(theReadOffset) 
                     + ", actual size read = "+ as_string(_myPosition) );
             }
             _myPosition += _myInFile.gcount();
@@ -424,9 +426,10 @@ namespace asl {
             return _myInFile;
         }
     private:
-        mutable std::ifstream _myInFile;
         mutable typename Base::size_type _myPosition;
-        std::string _myFileName;
+        // _myFileName must be initialized before the stream
+        Path _myFileName;
+        mutable std::ifstream _myInFile;
         typename Base::size_type _mySize;
     };
     typedef ReadableArrangedFile<AC_DEFAULT_BYTE_ORDER> ReadableFile;
@@ -606,17 +609,18 @@ namespace asl {
     class WriteableArrangedFile : public WriteableArrangedStream<EXTERNAL_BYTE_ORDER> {
         typedef WriteableArrangedStream<EXTERNAL_BYTE_ORDER> Base;
     public:
-        WriteableArrangedFile(const std::string & theFileName) 
-            : _myOutFile(theFileName.c_str(),std::ios::binary),
-            _myFileName(theFileName)
-        {}
+        WriteableArrangedFile(const std::string & theFileName) : 
+            _myFileName(theFileName, UTF8)
+        {
+            _myOutFile.open(_myFileName.toLocale().c_str(),std::ios::binary);
+        }
 
         typename Base::WriteableStream & append(const void * theMemory, typename Base::size_type theSize) {
             _myOutFile.write((char*)theMemory, theSize);
             if (!_myOutFile) {
                 throw StreamWriteFailed(
                     std::string("WriteableFile::append(size=")+as_string(theSize)+")",
-                    std::string("Filename='")+ _myFileName + "' failed." );
+                    std::string("Filename='")+ _myFileName.toLocale() + "' failed." );
             }
             return *this;
         }
@@ -624,8 +628,9 @@ namespace asl {
             return _myOutFile;
         }
     private:
+        // _myFileName must be initialized before the stream
+        Path _myFileName;
         mutable std::ofstream _myOutFile;
-        std::string _myFileName;
     };
     typedef WriteableArrangedFile<AC_DEFAULT_BYTE_ORDER> WriteableFile;
     /* @} */

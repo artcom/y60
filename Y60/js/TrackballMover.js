@@ -40,7 +40,6 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
 
     //////////////////////////////////////////////////////////////////////
 
-    var _myTrackballBody        = null;
     var _myTrackball            = new Trackball();
     var _myTrackballCenter      = new Point3f(0,0,0);
     var _prevNormalizedMousePosition = new Vector3f(0,0,0); // [-1..1]
@@ -55,7 +54,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
 
     obj.setup = function() {
         var myTrackballBody = obj.getMoverObject().parentNode;
-        setupTrackball(myTrackballBody);
+        obj.selectBody(myTrackballBody);
     }
 
     obj.Mover.onMouseButton = obj.onMouseButton;
@@ -74,7 +73,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
                     } else {
                         print("  -> Trackball object picking only works with top-level cameras");
                     }
-                    setupTrackball(myTrackedBody);
+                    obj.selectBody(myTrackedBody);
                     applyRotation();
                 }
                 _prevNormalizedMousePosition = obj.getNormalizedScreen(theX, theY);
@@ -86,6 +85,11 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
 
     obj.rotate = function(thePrevMousePos, theCurMousePos) {
         _myTrackball.rotate(thePrevMousePos, theCurMousePos);
+        applyRotation();
+    }
+
+    obj.rotateByQuaternion = function( theQuaternion ) {
+        _myTrackball.setQuaternion( product( theQuaternion, _myTrackball.getQuaternion()));
         applyRotation();
     }
 
@@ -116,7 +120,6 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
             // negate to move camera (not object)
             myScreenTranslation.x = -theDeltaX * myWorldSize * myPanFactor / PAN_SPEED;
             myScreenTranslation.y = -theDeltaY * myWorldSize * myPanFactor / PAN_SPEED;
-            _myTrackballBody = null;
         }
         obj.update(myScreenTranslation, 0);
         //Logger.warning("Pan:"+obj.getScreenPanVector());
@@ -136,9 +139,22 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
     }
 
     obj.selectBody = function(theBody) {
-        setupTrackball(theBody);
+        _myTrackballCenter = getTrackballCenterFromBody(theBody);
+        setupTrackball();
     }
 
+    obj.setTrackballCenter = function(theCenter) {
+        _myTrackballCenter = theCenter;
+    }
+
+    obj.getOrientation = function() {
+        return _myTrackball.getQuaternion();
+    }
+
+    obj.setOrientation = function(theOrientation) {
+        _myTrackball.setQuaternion(theOrientation);
+        applyRotation();
+    }
     //////////////////////////////////////////////////////////////////////
     //
     // private
@@ -152,24 +168,17 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         return myDistanceFactor;
     }
 
-    function setupTrackball(theBody) {
-        if (theBody) {
-            _myTrackballBody = theBody;
-        } else {
-            _myTrackballBody = null;
-        }
-        _myTrackballCenter = getTrackballCenter();
-
+    function setupTrackball() {
         var myDecomposition = obj.getMoverObject().globalmatrix.decompose();
         _myTrackball.setQuaternion(myDecomposition.orientation);
     }
 
-    function getTrackballCenter() {
-        if (_myTrackballBody) {
-            if (_myTrackballBody.boundingbox.isEmpty) {
-                return _myTrackballBody.globalmatrix.getRow(3).xyz;
+    function getTrackballCenterFromBody(theBody) {
+        if (theBody) {
+            if (theBody.boundingbox.isEmpty) {
+                return theBody.globalmatrix.getRow(3).xyz;
             } else {
-                return _myTrackballBody.boundingbox.center;
+                return theBody.boundingbox.center;
             }
         } else {
             var myViewVector = product(obj.getMoverObject().globalmatrix.getRow(2).xyz, -1);

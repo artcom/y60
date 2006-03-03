@@ -34,6 +34,7 @@
 #include "JSCoordSpline.h"
 #include "JSModellingFunctions.h"
 #include "JSLogger.h"
+#include "JSLocale.h"
 #include "JSfile_functions.h"
 #include "JSScene.h"
 #include "JSFrustum.h"
@@ -191,6 +192,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSLogger::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSLocale::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSFrustum::initClass(cx, theGlobalObject)) {

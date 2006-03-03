@@ -16,9 +16,8 @@
 
 #include <asl/settings.h>
 #include <asl/Exception.h>
-
-#include <y60/jssettings.h>
 #include <y60/JScppUtils.h>
+#include <y60/jssettings.h>
 #include <y60/AbstractRenderWindow.h>
 #include <y60/KeyEvent.h>
 #include <y60/WindowEvent.h>

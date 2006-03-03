@@ -18,6 +18,7 @@
 
 #include "JSLogger.h"
 #include "Documentation.h"
+#include <asl/LogMessageSinks.h>
 #include <iostream>
 
 using namespace asl;
@@ -29,11 +30,14 @@ static JSBool log(asl::Severity theSeverity, JSContext *cx, JSObject *obj, uintN
     try {
         const char * myFilename;
         int myLineNo;
-        getFileLine(cx, obj, argc, argv, myFilename, myLineNo);
-        std::string myMessage;
-        ensureParamCount(argc, 1);
-        convertFrom(cx, argv[0], myMessage);
-        AC_LOG(theSeverity, myFilename, myLineNo) << myMessage;
+		if (! getFileLine(cx, obj, argc, argv, myFilename, myLineNo)) {
+			myLineNo = 0;
+			myFilename = "unknown";
+		}
+		std::string myMessage;
+		ensureParamCount(argc, 1);
+		convertFrom(cx, argv[0], myMessage);
+		AC_LOG(theSeverity, myFilename, myLineNo) << myMessage;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -73,6 +77,31 @@ static JSBool debug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     DOC_PARAM("theMessage", "", DOC_TYPE_STRING);
     DOC_END;
     return log(asl::SEV_DEBUG, cx, obj, argc, argv, rval);
+}
+
+static JSBool addFileSink(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Add a log file to the logger");
+    DOC_PARAM("theLogFilename", "", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        std::string myLogFilename;
+        convertFrom(cx, argv[0], myLogFilename);
+
+        Logger::get().addMessageSink(Ptr<MessageSink>(new asl::FilePrinter(myLogFilename)));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+
+}
+static JSBool addFarewellSink(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Add an abort-on-fatal errors sink to the logger");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0);
+        Logger::get().addMessageSink(Ptr<MessageSink>(new asl::FarewellMessageSink()));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+
 }
 
 
@@ -121,6 +150,8 @@ JSLogger::StaticFunctions() {
         {"debug",     debug,     1},
         {"trace",     trace,     1},
         {"setVerbosity", setVerbosity, 4},
+        {"addFileSink", addFileSink, 1},
+        {"addFarewellSink", addFarewellSink, 0},
         {0}
     };
     return myFunctions;

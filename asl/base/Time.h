@@ -45,27 +45,30 @@
 
 typedef asl::Unsigned64 cycles_t;
 
+#define USE_TIME_OF_DAY  
+
 #ifdef LINUX
-# if defined __x86_64__
+#    if defined __x86_64__
     inline
     cycles_t
     get_cycles() {
         cycles_t ret;
-        asl::Unsigned32 a,d; 
+        asl::Unsigned32 a = 0;
+        asl::Unsigned32 d = 0; 
         asm volatile("rdtsc" : "=a" (a), "=d" (d)); 
         (ret) = ((asl::Unsigned64)a) | (((asl::Unsigned64)d)<<32); 
         return ret;
     }
-# endif
-# if defined __i386__
+#    endif
+#    if defined __i386__
     inline
     cycles_t
     get_cycles() {
-        cycles_t ret;
+        cycles_t ret = 0;
         __asm__ __volatile__("rdtsc" : "=A" (ret));
         return ret;
     }
-# endif
+#    endif
 #endif
 
 #ifdef OSX
@@ -299,7 +302,13 @@ namespace asl {
 #ifdef WIN32
 			QueryPerformanceCounter((LARGE_INTEGER*)&_myCounter);
 #else
+#ifdef USE_TIME_OF_DAY
+            timespec tv;
+            clock_gettime(CLOCK_REALTIME, &tv);
+            _myCounter = tv.tv_sec * asl::Unsigned64(1000000000) + tv.tv_nsec;
+#else
 			_myCounter = get_cycles();
+#endif            
 #endif
 		}
 		static unsigned long long perSecond() {
@@ -308,6 +317,9 @@ namespace asl {
 #ifdef WIN32
 				QueryPerformanceFrequency((LARGE_INTEGER*)&perSecond);
 #else
+#ifdef USE_TIME_OF_DAY                
+                perSecond = asl::Unsigned64(1000000000); // nsec            
+#else                
                 /*
                 perSecond = cpu_khz;
                 perSecond *=1000;
@@ -319,6 +331,7 @@ namespace asl {
 				double myCalibDurationTime = Time() - myCalibTime;
 				unsigned long long myCalibCounterElapsed = get_cycles() - myCalibCounter;
 				perSecond = static_cast<unsigned long long>(myCalibCounterElapsed/myCalibDurationTime);
+#endif                
 #endif
 			}
 			return perSecond;

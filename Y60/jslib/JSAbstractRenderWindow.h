@@ -53,9 +53,14 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             PROP_backgroundColor,
             PROP_width,
             PROP_height,
-            PROP_renderingCaps,
             PROP_fixedFrameTime,
             PROP_fps,
+            // renderer information
+            PROP_renderingCaps,
+            PROP_glVersionString,
+            PROP_glVendorString,
+            PROP_glRendererString,
+            PROP_glExtensionStrings,
             // convenience attributes when in single-viewport mode
             PROP_camera,
             PROP_projectionmatrix,
@@ -67,6 +72,24 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             PROP_backfaceCulling,
             PROP_culling,
             PROP_debugCulling,
+            // GL enums
+            PROP_GL_RED,
+            PROP_GL_GREEN,
+            PROP_GL_BLUE,
+            PROP_GL_ALPHA,
+            PROP_GL_RGB,
+            PROP_GL_BGR,
+            PROP_GL_RGBA,
+            PROP_GL_BGRA,
+            PROP_GL_DEPTH_COMPONENT,
+            PROP_GL_UNSIGNED_BYTE,
+            PROP_GL_BYTE,
+            PROP_GL_BITMAP,
+            PROP_GL_UNSIGNED_SHORT,
+            PROP_GL_SHORT,
+            PROP_GL_UNSIGNED_INT,
+            PROP_GL_INT,
+            PROP_GL_FLOAT,
             PROP_END
         };
 
@@ -128,6 +151,47 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             } HANDLE_CPP_EXCEPTION;
         }
         static JSBool
+        setSceneAndCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("set the scene and canvas to render");
+            DOC_PARAM("theScene", "the Scene to render", DOC_TYPE_OBJECT);
+            DOC_PARAM("theCanvas", "canvas node to render to. If omitted, use the first canvas", DOC_TYPE_OBJECT);
+            DOC_RVAL("bSuccess", DOC_TYPE_OBJECT);
+            DOC_END;
+            try {
+                DERIVED * mySelf;
+                convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+                if (argc == 1 || (argc == 2 && JSVAL_IS_VOID(argv[1]))) {
+                    convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+                    y60::ScenePtr myScene;
+                    if (!convertFrom(cx, argv[0], myScene)) {
+                        return JS_FALSE;
+                    }
+                    bool myResult = mySelf->setSceneAndCanvas(myScene);
+                    *rval = as_jsval(cx, myResult);
+                    return JS_TRUE;
+                    // XXX
+                    //typedef bool (NATIVE::*MyMethod)(const y60::ScenePtr & theScene);
+                    //return Method<NATIVE>::call((MyMethod)&NATIVE::setSceneAndCanvas,cx,obj,1,argv,rval);
+                } else {// argc == 2
+                    convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+                    y60::ScenePtr myScene;
+                    if (!convertFrom(cx, argv[0], myScene)) {
+                        return JS_FALSE;
+                    }
+                    dom::NodePtr myCanvasNode;
+                    if (!convertFrom(cx, argv[1], myCanvasNode)) {
+                        return JS_FALSE;
+                    }
+                    bool myResult = mySelf->setSceneAndCanvas(myScene, myCanvasNode);
+                    *rval = as_jsval(cx, myResult);
+                    return JS_TRUE;
+                    // XXX
+                    //typedef bool (NATIVE::*MyMethod)(const y60::ScenePtr & theScene, const dom::NodePtr & theCanvas);
+                    //return Method<NATIVE>::call((MyMethod)&NATIVE::setSceneAndCanvas,cx,obj,argc,argv,rval);
+                }
+            } HANDLE_CPP_EXCEPTION;
+        }
+        static JSBool
         hasCap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Checks if the renderer has a certain capability." \
                       "Possible Capability constants are static properties of the Renderer object");
@@ -177,6 +241,55 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             DOC_END;
             typedef bool (DERIVED::*MyMethod)(dom::NodePtr, unsigned long, unsigned long, const asl::Vector4i &);
             return Method<DERIVED>::call((MyMethod)&DERIVED::setImagePixel,cx,obj,argc,argv,rval);
+        }
+        static JSBool
+        getPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Returns the pixel at position x, y of a GL buffer (see man glReadPixels)");
+            DOC_PARAM("theXPosition", "", DOC_TYPE_INTEGER);
+            DOC_PARAM("theYPosition", "", DOC_TYPE_INTEGER);
+            DOC_PARAM("theFormat", "a GL Format type GL_RED, GL_BLUE, GL_DEPTH_COMPONENT, etc.", DOC_TYPE_ENUMERATION);
+            DOC_PARAM("theType", "", DOC_TYPE_ENUMERATION);
+            DOC_RVAL("thePixelValue", DOC_TYPE_VECTOR4F);
+            DOC_END;
+            try {
+                ensureParamCount(argc, 4); 
+                DERIVED * mySelf;
+                convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+                int myXPos;
+                convertFrom(cx, argv[0], myXPos);
+                int myYPos;
+                convertFrom(cx, argv[1], myYPos);
+                GLenum myFormat;
+                convertFrom(cx, argv[2], myFormat);
+                GLenum myType;
+                convertFrom(cx, argv[3], myType);
+                if (myXPos < 0 || myYPos < 0 || myXPos >= mySelf->getWidth() || 
+                    myYPos >= mySelf->getHeight())
+                {
+                    *rval = JSVAL_NULL;
+                    return JS_TRUE;
+                }
+                switch (myType) {
+                    case GL_UNSIGNED_BYTE:
+                        {
+                            asl::Unsigned8 myPixel;
+                            mySelf->getPixel(myXPos, myYPos, myFormat, myPixel);
+                            *rval = as_jsval(cx, myPixel);
+                            break;
+                        }
+                    case GL_FLOAT:
+                        {
+                            float myPixel;
+                            mySelf->getPixel(myXPos, myYPos, myFormat, myPixel);
+                            *rval = as_jsval(cx, myPixel);
+                            break;
+                        }
+                    default:
+                        JS_ReportError(cx,"readPixel: Format not supported");
+                        return JS_FALSE;
+                }
+                return JS_TRUE; 
+            } HANDLE_CPP_EXCEPTION;
         }
 
         static JSBool
@@ -547,7 +660,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         }
 
         static JSFunctionSpec * BaseStaticFunctions() {
-            AC_DEBUG << "Registering class '"<<ClassName()<<"'";
+            AC_DEBUG << "Registering class '"<< JSWrapper<DERIVED, asl::Ptr<DERIVED>, StaticAccessProtocol>::ClassName()<<"'";
             static JSFunctionSpec myFunctions[] = {
                 // name                    native          nargs
                 {0}
@@ -564,11 +677,13 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 {"saveBuffer",         saveBuffer,               2},
                 {"getRenderer",        getRenderer,              0},
                 {"addExtension",       addExtension,             1},
+                {"setSceneAndCanvas",  setSceneAndCanvas,        2},
                 {"hasCap",             hasCap,                   1},
                 {"hasCapAsString",     hasCapAsString,           1},
                 {"printStatistics",    printStatistics,          2}, // base class
                 {"getImagePixel",      getImagePixel,            3},
                 {"setImagePixel",      setImagePixel,            4},
+                {"getPixel",           getPixel,                 4},
                 {"performRequest",     performRequest,           1},
                 // text rendering
                 {"renderText",         renderText,               3},
@@ -600,8 +715,27 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             return myFunctions;
         }
 
+#define DEFINE_GL_ENUM( NAME ) { #NAME, PROP_ ## NAME, NAME}
         static JSConstIntPropertySpec * ConstIntProperties() {
             static JSConstIntPropertySpec myProperties[] = {
+                DEFINE_GL_ENUM(GL_RED),
+                DEFINE_GL_ENUM(GL_BLUE),
+                DEFINE_GL_ENUM(GL_GREEN),
+                DEFINE_GL_ENUM(GL_ALPHA),
+                DEFINE_GL_ENUM(GL_RGB),
+                DEFINE_GL_ENUM(GL_BGR),
+                DEFINE_GL_ENUM(GL_RGBA),
+                DEFINE_GL_ENUM(GL_BGRA),
+                DEFINE_GL_ENUM(GL_DEPTH_COMPONENT),
+
+                DEFINE_GL_ENUM(GL_UNSIGNED_BYTE),
+                DEFINE_GL_ENUM(GL_BYTE),
+                DEFINE_GL_ENUM(GL_BITMAP),
+                DEFINE_GL_ENUM(GL_UNSIGNED_SHORT),
+                DEFINE_GL_ENUM(GL_SHORT),
+                DEFINE_GL_ENUM(GL_UNSIGNED_INT),
+                DEFINE_GL_ENUM(GL_INT),
+                DEFINE_GL_ENUM(GL_FLOAT),
                 {0}
             };
             return myProperties;
@@ -618,6 +752,10 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 {"camera",          PROP_camera,            JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // Node
                 {"projectionmatrix",PROP_projectionmatrix,  JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_READONLY|JSPROP_SHARED},
                 {"renderingCaps",   PROP_renderingCaps,     JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // unsined int
+                {"glVendorString", PROP_glVendorString,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED|JSPROP_READONLY},
+                {"glVersionString", PROP_glVersionString,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED|JSPROP_READONLY},
+                {"glRendererString",PROP_glRendererString,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED|JSPROP_READONLY},
+                {"glExtensionStrings",PROP_glExtensionStrings,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED|JSPROP_READONLY},
                 {"fixedFrameTime",  PROP_fixedFrameTime,    JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // unsined int
                 {"fps",             PROP_fps,               JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED}, // double
                 {"wireframe",       PROP_wireframe,         JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
@@ -703,6 +841,22 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 case PROP_renderingCaps:
                     *vp = as_jsval(cx, theNative.getRenderingCaps());
                     return JS_TRUE;
+                case PROP_glVersionString:
+                    *vp = as_jsval(cx, theNative.getGLVersionString());
+                    return JS_TRUE;
+                case PROP_glVendorString:
+                    *vp = as_jsval(cx, theNative.getGLVendorString());
+                    return JS_TRUE;
+                case PROP_glRendererString:
+                    *vp = as_jsval(cx, theNative.getGLRendererString());
+                    return JS_TRUE;
+                case PROP_glExtensionStrings:
+                    {
+                        std::vector<std::string> myTokens;
+                        theNative.getGLExtensionStrings(myTokens);
+                        *vp = as_jsval(cx, myTokens);
+                        return JS_TRUE;
+                    }
                 case PROP_fixedFrameTime:
                     *vp = as_jsval(cx, theNative.getFixedDeltaT());
                     return JS_TRUE;

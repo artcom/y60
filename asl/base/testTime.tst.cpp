@@ -103,7 +103,12 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new TimeUnitTest,100);
-        addTest(new NanoTimeUnitTest,100);
+       
+        // Note: the CPU's TSC is not reliable on multi-core systems, but the new HPEC is not yet widely
+        // available, so we now simply use gettimeofday. This only has usec (not nsec) resolution
+        // so disable the nsec test
+        
+        //addTest(new NanoTimeUnitTest,100);
     }
 };
 

@@ -21,6 +21,8 @@
 #include "JSSigConnection.h"
 #include "jsgtk.h"
 #include "JSSignal0.h"
+#include "JSSignalProxy0.h"
+#include "JSSignal1.h"
 
 #include <acgtk/GCObserver.h>
 #include <y60/JScppUtils.h>
@@ -33,6 +35,10 @@ using namespace asl;
 
 namespace jslib {
 
+Ptr<MessageAcceptor<LocalPolicy> > JSGtkMain::ourAppAcceptor;
+sigc::connection JSGtkMain::ourAcceptorTimeout;
+JSGtkMain::OtherInstanceSignal JSGtkMain::ourOtherInstanceSignal; 
+    
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -193,6 +199,148 @@ JSGtkMain::on_timeout( JSContext * cx, JSObject * theJSObject, std::string theMe
     return myResult;
 }
 
+static JSBool
+connect_idle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Install Gtk idle callbacks");
+    DOC_END;
+    try {
+        if (argc != 3) {
+            JS_ReportError(cx, "GtkMain.connect_idle(obj, func, prio) needs three arguments.");
+            return JS_FALSE;
+        }
+        JSObject * myTarget;
+        if ( ! convertFrom(cx, argv[0], myTarget)) {
+            JS_ReportError(cx, "GtkMain.connect_idle() first argument is not an object.");
+            return JS_FALSE;
+        }
+
+        Glib::ustring myMethodName;
+        if ( ! convertFrom(cx, argv[1], myMethodName)) {
+            JS_ReportError(cx, "GtkMain.connect_idle() second argument is not a string.");
+            return JS_FALSE;
+        }
+
+        unsigned myInterval;
+        if ( ! convertFrom(cx, argv[2], myInterval)) {
+            JS_ReportError(cx, "GtkMain.connect_idle() third argument is not a number.");
+            return JS_FALSE;
+        }
+
+        SigC::Slot0<int> mySlot = sigc::bind<JSContext*, JSObject*, std::string>(
+                sigc::ptr_fun( & JSGtkMain::on_idle ), cx, myTarget, myMethodName);
+        JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new SigC::Connection);
+        *myConnection = Glib::signal_idle().connect( mySlot, myInterval);
+
+        // register our target object with the GCObserver
+        GCObserver::FinalizeSignal myFinalizer = GCObserver::get().watchObject(myTarget);
+        // now add our cleanup code to the finalize signal,
+        // binding the connection as an extra argument
+        myFinalizer.connect(sigc::bind<sigc::connection>(
+                    sigc::ptr_fun( & JSSignalAdapter0<int>::on_target_finalized),
+                    *myConnection));
+
+        *rval = as_jsval(cx, myConnection, & ( * myConnection));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+
+}
+
+int 
+JSGtkMain::on_idle( JSContext * cx, JSObject * theJSObject, std::string theMethodName) {
+    jsval myVal;
+    JSBool bOK = JS_GetProperty(cx, theJSObject, theMethodName.c_str(), &myVal);
+    if (myVal == JSVAL_VOID) {
+        AC_WARNING << "no JS event handler for event '" << theMethodName << "'";
+    }
+    // call the function
+    jsval rval;
+    AC_TRACE << "GtkMain::on_idle calling JS event handler '" << theMethodName << "'";
+    JSBool ok = jslib::JSA_CallFunctionName(cx, theJSObject, theMethodName.c_str(), 0, 0, &rval);
+
+    int myResult;
+    convertFrom(cx, rval, myResult);
+    return myResult;
+}
+
+    
+bool 
+JSGtkMain::onAcceptorTimeout() {
+    Ptr<MessageAcceptor<LocalPolicy>::Message> myMessage;
+    while (myMessage = JSGtkMain::ourAppAcceptor->popIncomingMessage()) {
+        AC_DEBUG << "received '" << myMessage->as_string() << "'";
+        JSGtkMain::ourAppAcceptor->pushOutgoingMessage(myMessage->server, "ACK");
+        AC_DEBUG << "sent ACK ";
+        ourOtherInstanceSignal.emit(myMessage->as_string()); 
+    }
+    return true;
+}
+
+bool
+JSGtkMain::sendToPrevInstance(const std::string & theSessionPipeId, const std::string & theInitialProjectfilename) {
+    try {
+        AC_DEBUG << "opening conduit to already running instance";
+        Conduit<LocalPolicy> myAppConduit(theSessionPipeId);
+        myAppConduit.send(theInitialProjectfilename);
+        AC_DEBUG << "sending " << theInitialProjectfilename;
+        std::string myResponse;
+        myAppConduit.receive(myResponse, 1000);
+        AC_DEBUG << "received " << myResponse;
+    } catch (const ConduitRefusedException &) {
+        return false;
+    }
+    return true;
+}
+
+static JSBool
+GetSignalOtherInstance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        JSSignal1<void, const string &>::OWNERPTR mySignal( new
+                JSSignal1<void, const string &>::NATIVE(JSGtkMain::ourOtherInstanceSignal));
+        *rval = jslib::as_jsval(cx, mySignal);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+SetSingleInstance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Ensures only one instance of the app runs.");
+    DOC_PARAM("theApplicationName", "the id of the application", DOC_TYPE_STRING);
+    DOC_PARAM("theProjectFilename", "if another instance is detected, this string it sent to it.", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        string theApplicationName;
+        string theProjectFilename;
+        convertFrom(cx, argv[0], theApplicationName);
+        if (JSVAL_IS_STRING(argv[1])) {
+            convertFrom(cx, argv[1], theProjectFilename);
+        }
+        // generate a pipe name from the session id to ensure the app is
+        // run only once per login session.
+        try {
+            JSGtkMain::ourAppAcceptor = Ptr<MessageAcceptor<LocalPolicy> >(
+                    new MessageAcceptor<LocalPolicy>(theApplicationName));
+        } catch (const ConduitInUseException &) {
+            if (!JSGtkMain::sendToPrevInstance(theApplicationName, theProjectFilename)) {
+#ifdef LINUX            
+                // delete dead socket and try again
+                deleteFile(UnixAddress::PIPE_PREFIX + theApplicationName);
+                JSGtkMain::ourAppAcceptor = Ptr<MessageAcceptor<LocalPolicy> >(
+                        new MessageAcceptor<LocalPolicy>(theApplicationName));
+#endif
+            }
+        }
+        if (JSGtkMain::ourAppAcceptor) {
+            JSGtkMain::ourAppAcceptor->start();
+            JSGtkMain::ourAcceptorTimeout = Glib::signal_timeout().connect(sigc::ptr_fun(JSGtkMain::onAcceptorTimeout), 100);
+            *rval = as_jsval(cx, true);
+        } else {
+            *rval = as_jsval(cx, false);
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JSFunctionSpec *
 JSGtkMain::StaticFunctions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -203,7 +351,10 @@ JSGtkMain::StaticFunctions() {
         {"iteration",            iteration,               1},
         {"events_pending",       events_pending,          0},
         {"connect_timeout",      connect_timeout,         3},
+        {"connect_idle",         connect_idle,            3},
         {"quit",                 quit,                    0},
+        {"setSingleInstance",    SetSingleInstance, 2},
+        {"get_signal_other_instance", GetSignalOtherInstance, 0},
         {0}
     };
     return myFunctions;
@@ -212,7 +363,6 @@ JSGtkMain::StaticFunctions() {
 JSPropertySpec *
 JSGtkMain::StaticProperties() {
     static JSPropertySpec myProperties[] = {
-//        {"responseCode", PROP_responseCode, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
 //        {"responseString", PROP_responseString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
 //        {"errorString", PROP_errorString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
 //        {"URL", PROP_URL, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},

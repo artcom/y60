@@ -19,6 +19,7 @@
 #include "JSDragButton.h"
 #include "JSSignal0.h"
 #include "JSSignal2.h"
+#include "JSSignal3.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
 #include <y60/JSAbstractRenderWindow.h>
@@ -83,8 +84,8 @@ JSDragButton::getPropertySwitch(NATIVE & theNative, unsigned long theID,
     switch (theID) {
         case PROP_signal_drag_start:
             {
-                JSSignal2<void,double, double>::OWNERPTR mySignal( new
-                        JSSignal2<void,double, double>::NATIVE(theNative.signal_drag_start()));
+                JSSignal3<void,double, double, unsigned int>::OWNERPTR mySignal( new
+                        JSSignal3<void,double, double, unsigned int>::NATIVE(theNative.signal_drag_start()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }

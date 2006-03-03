@@ -80,6 +80,26 @@ Set_response_sensitive(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
 }
 
 static JSBool
+Set_default_response(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        // native method call
+        Gtk::Dialog * myNative=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        int myResponseId;
+        convertFrom(cx, argv[0], myResponseId);
+
+        myNative->set_default_response(myResponseId);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+    return JS_FALSE;
+}
+
+static JSBool
 Add_button(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -123,6 +143,7 @@ JSDialog::Functions() {
         {"run",                  Run,                     0},
         {"add_button",           Add_button,              2},
         {"set_response_sensitive",Set_response_sensitive, 2},
+        {"set_default_response",  Set_default_response,   1},
         {0}
     };
     return myFunctions;
@@ -133,6 +154,7 @@ JSDialog::Properties() {
     static JSPropertySpec myProperties[] = {
         {"signal_response", PROP_signal_response, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"vbox", PROP_vbox, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"has_separator", PROP_has_separator, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -161,6 +183,11 @@ JSDialog::getPropertySwitch(NATIVE & theNative, unsigned long theID,
                 * vp = as_jsval(cx, Ptr<Gtk::VBox>(0), theNative.get_vbox());
                 return JS_TRUE;
             }
+        case PROP_has_separator:
+            {
+                * vp = as_jsval(cx, theNative.get_has_separator());
+                return JS_TRUE;
+            }
         case PROP_signal_response:
             {
                 JSSignalProxy1<void, int>::OWNERPTR mySignal( new
@@ -177,7 +204,13 @@ JSDialog::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        case 0:
+        case PROP_has_separator:
+            try {
+                bool myHasSeparatorFlag;
+                convertFrom(cx, *vp, myHasSeparatorFlag);
+                theNative.set_has_separator(myHasSeparatorFlag);
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
         default:
             return JSBASE::setPropertySwitch(theNative, theID, cx, obj, id, vp);
     }

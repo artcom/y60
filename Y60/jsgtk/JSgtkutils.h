@@ -18,11 +18,11 @@
 namespace jslib {
 
 // convert from glib's utf8 to JS utf-16
-jsval as_jsval(JSContext *cx, const Glib::ustring & theUTF8String);
+// jsval as_jsval(JSContext *cx, const Glib::ustring & theUTF8String);
 
 
 // convert from JS utf-16 to glib's utf-8
-bool convertFrom(JSContext *cx, jsval theValue, Glib::ustring & theTarget);
+// bool convertFrom(JSContext *cx, jsval theValue, Glib::ustring & theTarget);
 
 
 }

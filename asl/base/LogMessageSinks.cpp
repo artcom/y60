@@ -13,6 +13,7 @@
 namespace asl {
 
 ThreadLock StreamPrinter::myLock;
+ThreadLock FilePrinter::myLock;
 
 #ifdef WIN32
 ThreadLock OutputWindowPrinter::myLock;

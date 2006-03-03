@@ -94,12 +94,13 @@ namespace y60 {
                     myImage->load(*_myPackageManager);
                 }
 
-                bool textureUploadRequired = myImage->textureUploadRequired() ||
-                                             myImage->isImageNewerThanTexture();
-                AC_DEBUG << myImage->get<NameTag>() << " reload=" << reloadRequired << " upload=" << textureUploadRequired;
+                bool textureUploadRequired = myImage->textureUploadRequired();
+                bool isNewerThanTexture = myImage->isImageNewerThanTexture();
+                AC_DEBUG << myImage->get<NameTag>() << " reload=" << reloadRequired << " upload=" << textureUploadRequired <<
+                         " newer=" << isNewerThanTexture;
                 //AC_PRINT << " tUR=" << myImage->textureUploadRequired() << " iINTT=" << myImage->isImageNewerThanTexture();
 
-                if (reloadRequired || textureUploadRequired) {
+                if (reloadRequired || textureUploadRequired || isNewerThanTexture) {
                     uploadTexture(myImage);
                 } else {
                     AC_TRACE << "Texture not uploaded.";

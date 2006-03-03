@@ -18,13 +18,20 @@
 
 #include "GTKApp.h"
 #include "jsgtk.h"
+#include "JSSignal1.h"
 #include <acgtk/GCObserver.h>
+#include <y60/Documentation.h>
 
 #define DB(x) // x
 
 using namespace std;
 using namespace asl;
-using namespace jslib;
+
+namespace jslib {
+    
+static JSFunctionSpec glob_functions[] = {
+    {0}
+};
 
 GTKApp::GTKApp() 
 {
@@ -37,6 +44,9 @@ GTKApp::initClasses(JSContext * theContext, JSObject * theGlobalObject) {
         return false;
     }
     if (!initGtkClasses(theContext, theGlobalObject)) {
+        return false;
+    }
+    if (!JS_DefineFunctions(theContext, theGlobalObject, glob_functions)) {
         return false;
     }
     return true;
@@ -83,6 +93,8 @@ GTKApp::addSignalHandler(const gchar *theHandlerName, GObject *theSource, const 
                 theSignalData, theConnectObject, theAfterFlag, myInfo->context, myInfo->object));
     it->second.push_back(myAdapter);
     return;
+}
+
 }
 
 

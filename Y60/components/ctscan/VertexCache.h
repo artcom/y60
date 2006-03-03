@@ -32,9 +32,9 @@ template <class ItemT>
 class VertexCache {
     public:
         VertexCache(int iSize, int jSize, const ItemT & theValue = ItemT()) {
-            _myISize = iSize;
-            _myJSize = jSize;
-            _myVector.resize(iSize * jSize, theValue);
+            _myISize = iSize + 2; // make them 2 bigger so we can get -1 and len
+            _myJSize = jSize + 2; // for CloseAtClippingBoxFlag
+            _myVector.resize(_myISize * _myJSize, theValue);
         }
 
         void reset(const ItemT & theValue = ItemT()) {
@@ -43,12 +43,12 @@ class VertexCache {
         }
 
         ItemT & get(int theI, int theJ) {
-            return _myVector[theJ * _myISize + theI];
+            return _myVector[(theJ+1) * _myISize + (theI+1)];
         }
 
 
         const ItemT & get(int theI, int theJ) const {
-            return _myVector[theJ * _myISize + theI];
+            return _myVector[(theJ+1) * _myISize + (theI+1)];
         }
 
     private:

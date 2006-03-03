@@ -239,7 +239,7 @@ namespace asl {
     
     // Line/Plane intersection
     template<class Number>
-	bool intersection(const Line<Number> & l,const Plane<Number> & j, Point3<Number> & result, Number & t) {
+	bool intersection(const Line<Number> & l, const Plane<Number> & j, Point3<Number> & result, Number & t) {
 		Number d = dot(l.direction,j.normal);
         if (almostEqual(d,0)) {
 			return false;
@@ -328,15 +328,25 @@ namespace asl {
 	}
 
     // LineSegment/Plane intersection
+    // [TS+DS] Unwrappable due to 4 arguments
     template<class Number>
-	bool intersection(const LineSegment<Number> & l,const Plane<Number> & j, Point3<Number> & result) {
+	bool intersection(const LineSegment<Number> & l,const Plane<Number> & j, Point3<Number> & result, Number theEpsilon) {
 		Number t;
-        Line<Number> myLine(l.origin,l.end);
-        if (intersection(myLine,j,result,t)) {
-            return (t >= 0) && (t <= distance(l.origin,l.end));
+        Line<Number> myLine(l.origin, l.end);
+        if (intersection(myLine, j, result, t)) {
+            return (t + theEpsilon >= 0) && (t - theEpsilon <= distance(l.origin,l.end));
         }
         return false;
 	}
+
+    // LineSegment/Plane intersection
+    // for wrapper access
+    template<class Number>
+	bool intersection(const LineSegment<Number> & l,const Plane<Number> & j, Point3<Number> & result) {
+        return intersection(l, j, result, Number(0.0));
+	}
+
+
     template<class Number>
 	bool intersection(const Plane<Number> & j, const LineSegment<Number> & l, Point3<Number> & result) {
         return intersection(l,j,result);

@@ -27,13 +27,15 @@ class DragButton : public EmbeddedButton {
         DragButton();
         DragButton(const std::string & theIconFile);
 
-        sigc::signal<void, double, double> signal_drag_start() const { return _myDragStartSignal; }
+        sigc::signal<void, double, double, unsigned int> signal_drag_start() const { return _myDragStartSignal; }
         sigc::signal<void, double, double> signal_drag() const { return _myDragSignal; }
         sigc::signal<void> signal_drag_done() const { return _myDragDoneSignal; }
 
+        void pressed();
+        void released();
     protected:
         virtual bool on_button_press_event(GdkEventButton * theEvent);
-        virtual bool on_button_release_event(GdkEventButton * theEvent);
+        //virtual bool on_button_release_event(GdkEventButton * theEvent);
         virtual bool on_motion_notify_event(GdkEventMotion * theEvent);
 
         bool on_leave_notify_event(GdkEventCrossing * theEvent);
@@ -41,8 +43,9 @@ class DragButton : public EmbeddedButton {
         bool _myDragInProgressFlag;
         int _myLastX;
         int _myLastY;
+        unsigned int _myPressedButton;
     
-        sigc::signal<void, double, double> _myDragStartSignal;
+        sigc::signal<void, double, double, unsigned int> _myDragStartSignal;
         sigc::signal<void, double, double> _myDragSignal;
         sigc::signal<void>                 _myDragDoneSignal;
         

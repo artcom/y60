@@ -69,6 +69,7 @@ PackageManager::remove(const std::string & thePackageName) {
 
 void
 PackageManager::add(const std::string & thePaths) {
+    AC_TRACE << "adding '" << thePaths << "'";
     std::vector<std::string> myPathVector;
     splitPaths(thePaths, myPathVector);
     AC_DEBUG << "adding " << myPathVector.size() << " packages";
@@ -109,9 +110,11 @@ PackageManager::findPackage(const std::string & theRelativePath,
                             const std::string & thePackage)
 {
     AC_TRACE << "findPackage pkg='" << thePackage << "' path='" << theRelativePath << "'";
-    std::string myPackage = stripTrailingSlashes(thePackage);
+    std::string myPackage = normalizeDirectory(thePackage, true);
+    AC_TRACE << "findPackage myPkg='" << myPackage << "'";
     for (PackageList::iterator iter = _myPackages.begin();
-         iter != _myPackages.end(); ++iter) {
+         iter != _myPackages.end(); ++iter)
+    {
         if ((myPackage != "" && (*iter)->getPath() != myPackage)) {
             continue;
         }

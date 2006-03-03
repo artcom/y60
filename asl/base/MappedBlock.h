@@ -49,6 +49,7 @@
 #include "file_functions.h"
 #include "error_functions.h"
 #include "Logger.h"
+#include "Path.h"
 
 #include <stdio.h>
 #include <errno.h>
@@ -193,8 +194,8 @@ void removeMappingInfo(const void * theAddr) {
 DEFINE_EXCEPTION(UnsupportedParameters, asl::Exception);
 
 inline
-FD_t asl_open(const char *filename, int oflag, int pmode, bool share = true) {
-    DB(AC_TRACE << "asl_open('"<<filename<<"', oflag="<<oflag<<",pmode="<<pmode<<",share="<<share<<std::endl);
+FD_t asl_open(const char * theFilename, int oflag, int pmode, bool share = true) {
+    DB(AC_TRACE << "asl_open('"<< theFilename <<"', oflag="<<oflag<<",pmode="<<pmode<<",share="<<share<<std::endl);
     DWORD dwDesiredAccess = 0;
     DWORD dwShareMode = 0;
     LPSECURITY_ATTRIBUTES lpSecurityAttributes = 0;
@@ -223,7 +224,7 @@ FD_t asl_open(const char *filename, int oflag, int pmode, bool share = true) {
     }
 
     HANDLE myResult = CreateFile(
-                                 filename,
+                                 theFilename,
                                  dwDesiredAccess,
                                  dwShareMode,
                                  lpSecurityAttributes,
@@ -517,28 +518,28 @@ namespace asl {
         }
 #endif
 
-        static void openFileReadOnly(const char * theFileName, FD_t & fd) {
-            DB(AC_TRACE << "openFileReadOnly filename='" << theFileName << "'");
-            fd = OPEN(theFileName, O_RDONLY, 0);
+        static void openFileReadOnly(const Path & theFilename, FD_t & fd) {
+            DB(AC_TRACE << "openFileReadOnly filename='" << theFilename << "'");
+            fd = OPEN(theFilename.toLocale().c_str(), O_RDONLY, 0);
             if (fd == FD_INVALID) {
                 LAST_ERROR_TYPE err = lastError();
-                throw MappedIO::OpenReadOnlyFailed(std::string("filename=")+theFileName+" ,reason:"+asl::errorDescription(err), PLUS_FILE_LINE);
+                throw MappedIO::OpenReadOnlyFailed(std::string("filename=")+theFilename.toLocale()+" ,reason:"+asl::errorDescription(err), PLUS_FILE_LINE);
             }
         }
 
-        static void openFileReadWrite(const char * theFileName, FD_t & fd) {
-            fd = OPEN(theFileName, O_RDWR, 0);
+        static void openFileReadWrite(const Path & theFilename, FD_t & fd) {
+            fd = OPEN(theFilename.toLocale().c_str(), O_RDWR, 0);
             if (fd == FD_INVALID) {
                 LAST_ERROR_TYPE err = lastError();
-                throw MappedIO::OpenReadWriteFailed(std::string("filename=")+theFileName+" ,reason:"+asl::errorDescription(err), PLUS_FILE_LINE);
+                throw MappedIO::OpenReadWriteFailed(std::string("filename=")+theFilename.toLocale()+" ,reason:"+asl::errorDescription(err), PLUS_FILE_LINE);
             }
         }
 
-        static void createFileReadWrite(const char* theFileName, FD_t & fd) {
-            fd = OPEN(theFileName, O_RDWR|O_CREAT, 0666);
+        static void createFileReadWrite(const Path & theFilename, FD_t & fd) {
+            fd = OPEN(theFilename.toLocale().c_str(), O_RDWR|O_CREAT, 0666);
             if (fd == FD_INVALID) {
                 LAST_ERROR_TYPE err = lastError();
-                throw MappedIO::OpenCreateReadWriteFailed(std::string("filename=")+theFileName+" ,reason:"+asl::errorDescription(err), PLUS_FILE_LINE);
+                throw MappedIO::OpenCreateReadWriteFailed(std::string("filename=")+theFilename.toLocale()+" ,reason:"+asl::errorDescription(err), PLUS_FILE_LINE);
             }
         }
 
@@ -611,7 +612,7 @@ namespace asl {
         OFF_T offset() const {
             return _myOffset;
         }
-        const std::string & name() const {
+        const Path & name() const {
             return _myFileName;
         }
         ~MappedIO() {
@@ -628,13 +629,13 @@ namespace asl {
                 _myfd = 0;
             }
         }
-        void init(const char * theFileName) {
-            DB(AC_TRACE << "MappedIO::init(theFileName='"<<theFileName);
-            _myFileName = theFileName;
+        void init(const asl::Path & theFilename) {
+            DB(AC_TRACE << "MappedIO::init(theFilename='"<<theFilename);
+            _myFileName = theFilename;
             _myOffset = 0;
             _mySize = 0;
             _myData = 0;
-            openFile(theFileName, _myfd);
+            openFile(theFilename, _myfd);
             getFileSize(_myfd, _mySize);
             if (_mySize == 0) {
                 return;
@@ -642,13 +643,13 @@ namespace asl {
             mapFile(_myfd, _mySize, _myOffset, _myData);
         }
 
-        void init(const char * theFileName, OFF_T theSize, OFF_T theOffset = 0) {
-            DB(AC_TRACE << "MappedIO::init(theFileName='"<<theFileName<<"',theSize="<<theSize<<",theOffset="<<theOffset<<")");
-            _myFileName = theFileName;
+        void init(const Path & theFilename, OFF_T theSize, OFF_T theOffset = 0) {
+            DB(AC_TRACE << "MappedIO::init(theFilename='"<<theFilename<<"',theSize="<<theSize<<",theOffset="<<theOffset<<")");
+            _myFileName = theFilename;
             _myOffset = theOffset;
             _mySize = theSize;
             _myData = 0;
-            openFile(theFileName, _myfd);
+            openFile(theFilename, _myfd);
             //OFF_T myRealSize = 0;
             //getFileSize(_myfd, myRealSize);
             if (theSize == 0) {
@@ -661,14 +662,14 @@ namespace asl {
               return;
               }
               else {
-              throw FileSizeMismatch(std::string("Filename:")+theFileName+
+              throw FileSizeMismatch(std::string("Filename:")+theFilename+
               ", size="+as_string(myRealSize)+
               ",requested offset+size"+as_string(_myOffset+_mySize),PLUS_FILE_LINE);
               }
             */
         }
 
-        virtual void openFile(const char * theFileName, FD_t & fd) = 0;
+        virtual void openFile(const Path & theFilename, FD_t & fd) = 0;
 
         void closeFile(FD_t fd) {
             if (CLOSE(fd) != 0) {
@@ -725,7 +726,7 @@ namespace asl {
         OFF_T _mySize;
         OFF_T _myOffset;
         FD_t _myfd;
-        std::string _myFileName;
+        Path _myFileName;
         mutable bool _myErrorFlag;
     };
 
@@ -735,24 +736,24 @@ namespace asl {
         ConstMappedBlock() {}
         ConstMappedBlock(const ConstMappedBlock & r) {
             cleanup();
-            init(r.name().c_str(), r.nbytes());
+            init(r.name(), r.nbytes());
         }
         ConstMappedBlock & operator=(const ConstMappedBlock & r) {
             cleanup();
-            init(r.name().c_str(), r.nbytes());
+            init(r.name(), r.nbytes());
             return *this;
         }
-        explicit ConstMappedBlock(const std::string & filename) {
-            init(filename.c_str());
+        explicit ConstMappedBlock(const std::string & theUTF8Filename) {
+            init(Path(theUTF8Filename, UTF8));
         }
-        ConstMappedBlock(const std::string & filename, OFF_T Size)  {
-            init(filename.c_str(), Size);
+        ConstMappedBlock(const std::string & theUTF8Filename, OFF_T Size)  {
+            init(Path(theUTF8Filename, UTF8), Size);
         }
-        explicit ConstMappedBlock(const char * filename) {
-            init(filename);
+        explicit ConstMappedBlock(const char * theUTF8Filename) {
+            init(Path(theUTF8Filename, UTF8));
         }
-        ConstMappedBlock(const char * filename, OFF_T Size)  {
-            init(filename, Size);
+        ConstMappedBlock(const char * theUTF8Filename, OFF_T Size)  {
+            init(Path(theUTF8Filename, UTF8), Size);
         }
         const unsigned char * begin() const {
             return static_cast<const unsigned char *>(data());
@@ -767,8 +768,8 @@ namespace asl {
             return isGood();
         }
     private:
-        void openFile(const char * theFileName, FD_t & fd) {
-            openFileReadOnly(theFileName, fd);
+        void openFile(const Path & theFilename, FD_t & fd) {
+            openFileReadOnly(theFilename, fd);
         }
         void mapFile(FD_t fd, OFF_T theSize, OFF_T theOffset, void * & theData) {
             mapFileReadOnly(fd, theSize, theOffset, theData);
@@ -786,17 +787,17 @@ namespace asl {
             return *this; // avoid warning
         }
     public:
-        WriteableMappedBlock(const char* filename) {
-            init(filename);
+        WriteableMappedBlock(const char* theUTF8Filename) {
+            init(Path(theUTF8Filename, UTF8));
         }
-        WriteableMappedBlock(const char* filename, long Size)  {
-            init(filename, Size);
+        WriteableMappedBlock(const char* theUTF8Filename, long Size)  {
+            init(Path(theUTF8Filename, UTF8), Size);
         }
-        WriteableMappedBlock(const std::string & filename) {
-            init(filename.c_str());
+        WriteableMappedBlock(const std::string & theUTF8Filename) {
+            init(Path(theUTF8Filename, UTF8));
         }
-        WriteableMappedBlock(const std::string & filename, OFF_T Size)  {
-            init(filename.c_str(), Size);
+        WriteableMappedBlock(const std::string & theUTF8Filename, OFF_T Size)  {
+            init(Path(theUTF8Filename, UTF8), Size);
         }
         const unsigned char * begin() const {
             return static_cast<const unsigned char *>(data());
@@ -824,8 +825,8 @@ namespace asl {
             return isGood();
         }
     private:
-        void openFile(const char * theFileName, FD_t & fd) {
-            openFileReadWrite(theFileName, fd);
+        void openFile(const Path & theFilename, FD_t & fd) {
+            openFileReadWrite(theFilename, fd);
         }
         void mapFile(FD_t fd, OFF_T theSize, OFF_T theOffset, void *& theData) {
             mapFileReadWrite(fd, theSize, theOffset, theData);
@@ -842,8 +843,8 @@ namespace asl {
             return *this; // avoid warning
         }
     public:
-        NewMappedBlock(const char* filename, long Size)  {
-            init(filename, Size);
+        NewMappedBlock(const char* theUTF8Filename, long Size)  {
+            init(Path(theUTF8Filename, UTF8), Size);
         }
         const unsigned char * begin() const {
             return static_cast<const unsigned char *>(data());
@@ -871,8 +872,8 @@ namespace asl {
             return isGood();
         }
     private:
-        void openFile(const char * theFileName, FD_t & fd) {
-            createFileReadWrite(theFileName, fd);
+        void openFile(const Path & theFilename, FD_t & fd) {
+            createFileReadWrite(theFilename, fd);
             setFileSize(fd, nbytes());
         }
         void mapFile(FD_t fd, OFF_T theSize, OFF_T theOffset, void *& theData) {
@@ -894,20 +895,20 @@ namespace asl {
             return *this; // avoid warning
         }
     public:
-        MappedBlock(const char* filename)  {
-            init(filename);
+        MappedBlock(const char* theUTF8Filename)  {
+            init(Path(theUTF8Filename, UTF8));
             _mySize = capacity();
         }
-        MappedBlock(const char* filename, long Size)  {
-            init(filename, Size);
+        MappedBlock(const char* theUTF8Filename, long Size)  {
+            init(Path(theUTF8Filename, UTF8), Size);
             _mySize = capacity();
         }
-        MappedBlock(const std::string & filename) {
-            init(filename.c_str());
+        MappedBlock(const std::string & theUTF8Filename) {
+            init(Path(theUTF8Filename, UTF8));
             _mySize = capacity();
         }
-        MappedBlock(const std::string & filename, OFF_T Size)  {
-            init(filename.c_str(), Size);
+        MappedBlock(const std::string & theUTF8Filename, OFF_T Size)  {
+            init(Path(theUTF8Filename, UTF8), Size);
             _mySize = capacity();
         }
         void resize(AC_SIZE_TYPE newSize) {
@@ -949,8 +950,8 @@ namespace asl {
         enum { MIN_CAPACITY = 4096 };
         OFF_T _mySize;
 
-        void openFile(const char * theFileName, FD_t & fd) {
-            createFileReadWrite(theFileName, fd);
+        void openFile(const Path & theFilename, FD_t & fd) {
+            createFileReadWrite(theFilename, fd);
             setFileSize(fd, capacity());
         }
         void mapFile(FD_t fd, OFF_T theSize, OFF_T theOffset, void *& theData) {

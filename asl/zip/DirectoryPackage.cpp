@@ -27,7 +27,7 @@ DirectoryPackage::DirectoryPackage(const std::string & theDirectory,
                                    bool theIgnoreDotFiles) :
     _myIgnoreDotFiles(theIgnoreDotFiles)
 {
-    _myDirectory = stripTrailingSlashes(theDirectory);
+    _myDirectory = normalizeDirectory(theDirectory, true);
 }
 
 std::string

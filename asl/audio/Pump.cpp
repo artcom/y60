@@ -9,7 +9,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //
 //=============================================================================
-  
+
 //#define ASSURE_POLICY AssurePolicy::Abort
 #include "Pump.h"
 #include "DummyPump.h"
@@ -23,6 +23,8 @@
 #endif
 
 #include <asl/Auto.h>
+#include <asl/os_functions.h>
+#include <asl/string_functions.h>
 
 #ifdef USE_DASHBOARD
 #include <asl/Dashboard.h>
@@ -32,18 +34,8 @@ using namespace std;
 
 namespace asl {
 
-#ifdef WIN32
-double Pump::_myLatency_Init = 0.05;
-#else
-double Pump::_myLatency_Init = 0.04;
-#endif
-std::string Pump::_myDeviceName_Init = "";
-unsigned Pump::_mySampleRate_Init = 44100;
-unsigned Pump::_numOutputChannels_Init = 2;
-bool Pump::_useDummy_Init = false;
-    
 Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay) 
-    : AudioTimeSource(myTimeStartDelay, _mySampleRate_Init),
+    : AudioTimeSource(myTimeStartDelay, getSampleRateConfig()),
       _myRunning(false),
       _myNumUnderruns(0),
       _mySF(mySF),
@@ -53,10 +45,18 @@ Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay)
       _myLastFrame(0)
 {
     AC_INFO << "Pump::Pump";
-    
-    _myLatency = _myLatency_Init;
-    _numOutputChannels = _numOutputChannels_Init;
-    _mySampleRate = _mySampleRate_Init;
+
+#ifdef WIN32
+    double myLatency= 0.05;
+#else
+    double myLatency= 0.04;
+#endif
+    get_environment_var_as("Y60_SOUND_LATENCY", myLatency);
+    _myLatency = myLatency;
+    _numOutputChannels = 2;
+    get_environment_var_as("Y60_SOUND_NUM_OUTPUT_CHANNELS", _numOutputChannels);
+    _mySampleRate = 44100;
+    get_environment_var_as("Y60_SOUND_SAMPLE_RATE", _mySampleRate);
     _curFrame = 0;
 
     _myTempBuffer = AudioBufferPtr(createAudioBuffer(getNativeSampleFormat(), 
@@ -99,29 +99,13 @@ AudioBufferPtr Pump::createBuffer(unsigned theNumFrames)
             getNumOutputChannels(), getNativeSampleRate()));
 }
 
-void Pump::setSysConfig(const Time& myLatency, const std::string& myDeviceName)
-{
-    AC_INFO << "Pump::setSysConfig";
-    _myLatency_Init = myLatency;
-    _myDeviceName_Init = myDeviceName;
-    
-}
-
-void Pump::setAppConfig(unsigned mySampleRate, unsigned numOutputChannels, bool useDummy)
-{
-    AC_INFO << "Pump::setAppConfig";
-    _mySampleRate_Init = mySampleRate;
-    _numOutputChannels_Init = numOutputChannels;
-    _useDummy_Init = useDummy;
-    
-}
-
 Pump& Pump::get() {
     // TODO: The way this is now, useRealPump gets instantiated once per plugin.
     // To change this, move useRealPump to ALSAPump and DirectSoundPump.
 
     static bool useRealPump = true;
-    if (_useDummy_Init) {
+    string myWhoCares;
+    if (get_environment_var("Y60_SOUND_USE_DUMMY", myWhoCares)) {
         useRealPump = false;
     }
     if (useRealPump) {
@@ -370,6 +354,13 @@ void Pump::removeDeadSinks() {
         }
     }
 }
+
+int Pump::getSampleRateConfig() {
+    string myRateString = "44100";
+    get_environment_var("Y60_SOUND_SAMPLE_RATE", myRateString);
+    return as<int>(myRateString);
+}
+
 
 } // namespace
 

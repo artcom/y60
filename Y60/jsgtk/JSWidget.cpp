@@ -41,6 +41,19 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+grab_focus(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+        myWidget->grab_focus();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
 queue_draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
@@ -172,6 +185,204 @@ set_manage(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rva
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+set_events(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        asl::Unsigned32 myEventMask;
+        convertFrom(cx, argv[0], myEventMask);
+        myWidget->set_events(Gdk::EventMask(myEventMask));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+add_events(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        asl::Unsigned32 myEventMask;
+        convertFrom(cx, argv[0], myEventMask);
+        myWidget->add_events(Gdk::EventMask(myEventMask));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+modify_fg(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        int myState;
+        if ( ! convertFrom(cx, argv[0], myState)) {
+             JS_ReportError(cx,"JSWidget::modify_fg(): parameter 0 must be a StateType");
+        }
+        asl::Vector4f myColor;
+        if ( ! convertFrom(cx, argv[1], myColor)) {
+             JS_ReportError(cx,"JSWidget::modify_fg(): parameter 1 must be a Vector4f");
+        }
+        Gdk::Color myGdkColor;
+        myGdkColor.set_rgb_p(myColor[0], myColor[1], myColor[2]);
+        myWidget->modify_fg(Gtk::StateType(myState), myGdkColor);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+static JSBool
+unset_fg(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        int myState;
+        if ( ! convertFrom(cx, argv[0], myState)) {
+             JS_ReportError(cx,"JSWidget::unset_fg(): parameter 0 must be a StateType");
+        }
+        myWidget->unset_fg(Gtk::StateType(myState));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+static JSBool
+modify_bg(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        int myState;
+        if ( ! convertFrom(cx, argv[0], myState)) {
+             JS_ReportError(cx,"JSWidget::modify_fg(): parameter 0 must be a StateType");
+        }
+        asl::Vector4f myColor;
+        if ( ! convertFrom(cx, argv[1], myColor)) {
+             JS_ReportError(cx,"JSWidget::modify_fg(): parameter 1 must be a Vector4f");
+        }
+        Gdk::Color myGdkColor;
+        myGdkColor.set_rgb_p(myColor[0], myColor[1], myColor[2]);
+        myWidget->modify_bg(Gtk::StateType(myState), myGdkColor);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+unset_bg(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        int myState;
+        if ( ! convertFrom(cx, argv[0], myState)) {
+             JS_ReportError(cx,"JSWidget::unset_bg(): parameter 0 must be a StateType");
+        }
+        myWidget->unset_bg(Gtk::StateType(myState));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+modify_text(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        int myState;
+        if ( ! convertFrom(cx, argv[0], myState)) {
+             JS_ReportError(cx,"JSWidget::modify_fg(): parameter 0 must be a StateType");
+        }
+        asl::Vector4f myColor;
+        if ( ! convertFrom(cx, argv[1], myColor)) {
+             JS_ReportError(cx,"JSWidget::modify_fg(): parameter 1 must be a Vector4f");
+        }
+        Gdk::Color myGdkColor;
+        myGdkColor.set_rgb_p(myColor[0], myColor[1], myColor[2]);
+        myWidget->modify_text(Gtk::StateType(myState), myGdkColor);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+unset_text(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        int myState;
+        if ( ! convertFrom(cx, argv[0], myState)) {
+             JS_ReportError(cx,"JSWidget::unset_fg(): parameter 0 must be a StateType");
+        }
+        myWidget->unset_text(Gtk::StateType(myState));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+modify_base(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        int myState;
+        if ( ! convertFrom(cx, argv[0], myState)) {
+             JS_ReportError(cx,"JSWidget::modify_fg(): parameter 0 must be a StateType");
+        }
+        asl::Vector4f myColor;
+        if ( ! convertFrom(cx, argv[1], myColor)) {
+             JS_ReportError(cx,"JSWidget::modify_fg(): parameter 1 must be a Vector4f");
+        }
+        Gdk::Color myGdkColor;
+        myGdkColor.set_rgb_p(myColor[0], myColor[1], myColor[2]);
+        myWidget->modify_base(Gtk::StateType(myState), myGdkColor);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+unset_base(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        Gtk::Widget * myWidget=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myWidget);
+
+        int myState;
+        if ( ! convertFrom(cx, argv[0], myState)) {
+             JS_ReportError(cx,"JSWidget::unset_fg(): parameter 0 must be a StateType");
+        }
+        myWidget->unset_base(Gtk::StateType(myState));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 /*
 static JSBool
 reparent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -200,10 +411,21 @@ JSWidget::Functions() {
         {"show_all",             show_all,                0},
         {"hide_all",             hide_all,                0},
         {"queue_draw",           queue_draw,              0},
+        {"grab_focus",           grab_focus,              0},
         {"process_updates",      process_updates,         1},
         {"set_size_request",     set_size_request,        2},
         {"set_cursor",           set_cursor,              1},
         {"set_manage",           set_manage,              0},
+        {"set_events",           set_events,              1},
+        {"add_events",           add_events,              1},
+        {"modify_fg",            modify_fg,               2},
+        {"modify_bg",            modify_bg,               2},
+        {"modify_text",          modify_text,             2},
+        {"modify_base",          modify_base,             2},
+        {"unset_fg",             unset_fg,                1},
+        {"unset_bg",             unset_bg,                1},
+        {"unset_text",           unset_text,              1},
+        {"unset_base",           unset_base,              1},
         {0}
     };
     return myFunctions;
@@ -227,6 +449,7 @@ JSWidget::Properties() {
         DEFINE_RO_PROPERTY(width),
         DEFINE_RO_PROPERTY(height),
         DEFINE_PROPERTY(sensitive),
+        DEFINE_PROPERTY(state),
         DEFINE_RO_PROPERTY(signal_show),
         DEFINE_RO_PROPERTY(signal_hide),
         DEFINE_RO_PROPERTY(signal_map),
@@ -271,6 +494,9 @@ JSWidget::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             return JS_TRUE;
         case PROP_flags:
             *vp = as_jsval(cx, static_cast<int>(theNative.get_flags()));
+            return JS_TRUE;
+        case PROP_state:
+            *vp = as_jsval(cx, static_cast<int>(theNative.get_state()));
             return JS_TRUE;
         case PROP_focus:
             *vp = as_jsval(cx, theNative.has_focus());
@@ -436,6 +662,13 @@ JSWidget::setPropertySwitch(NATIVE & theNative, unsigned long theID,
                 int myFlags;
                 convertFrom(cx, *vp, myFlags);
                 theNative.set_flags(static_cast<Gtk::WidgetFlags>(myFlags));
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
+        case PROP_state:
+            try {
+                int myFlags;
+                convertFrom(cx, *vp, myFlags);
+                theNative.set_state(static_cast<Gtk::StateType>(myFlags));
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         default:

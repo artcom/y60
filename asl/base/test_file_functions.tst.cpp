@@ -51,7 +51,36 @@ class file_functions_UnitTest : public UnitTest {
             perform_putget(testFileName, 20*65536+1);
             
             perform_filename_func();
+            perform_uri_func();
          }
+        
+        void perform_uri_func() {
+            ENSURE(getFilenamePart("http://www.artcom.de/foo/bar")=="bar");
+            ENSURE(getFilenamePart("http://www.artcom.de/etc/")=="");
+            ENSURE(getFilenamePart("http://www.artcom.de/passwd")=="passwd");
+
+            ENSURE(getDirectoryPart("http://www.artcom.de/etc/passwd")=="/etc/");
+            ENSURE(getDirectoryPart("http://www.artcom.de/etc/")=="/etc/");
+            DPRINT(getDirectoryPart("http://www.artcom.de/passwd"));
+            ENSURE(getDirectoryPart("http://www.artcom.de/passwd")=="/");
+            
+            ENSURE(getExtension("http://www.artcom.de/index.html")=="html");
+            ENSURE(getExtension("http://root:pass:www.artcom.de/index.html")=="html");
+            ENSURE(getExtension("http://www.artcom.de/index")=="");
+            ENSURE(getExtension("http://www.artcom.de/index.")=="");
+
+            ENSURE(getHostPortPart("http://root:path@www.artcom.de:80/foo/bar") == "www.artcom.de:80");
+            ENSURE(getHostPortPart("http://root:path@www.artcom.de:80") == "www.artcom.de:80");
+
+            DPRINT(getHostPart("http://root:path@www.artcom.de:80"));
+            ENSURE(getHostPart("http://root:path@www.artcom.de:80") == "www.artcom.de");
+            ENSURE(getHostPart("http://root:path@www.artcom.de:80/foo/bar") == "www.artcom.de");
+            ENSURE(getHostPart("http://root:path@www.artcom.de:80/") == "www.artcom.de");
+
+            DPRINT(getHostPart("/homes/martin/.visicore//undo/scene_0.b60"));
+            ENSURE(getHostPart("/homes/martin/.visicore//undo/scene_0.b60") == "");
+            ENSURE(getHostPart("foo.bar") == "");
+        }
 
         void perform_filename_func() {
             ENSURE(getFilenamePart("/etc/passwd")=="passwd");
@@ -60,7 +89,11 @@ class file_functions_UnitTest : public UnitTest {
             ENSURE(getFilenamePart("C:/WinNT/sux")=="sux");
 
             ENSURE(getDirectoryPart("/etc/passwd")=="/etc/");
+            ENSURE(getDirectoryPart("/homes/martin/.visicore//undo/scene_0.b60") == "/homes/martin/.visicore//undo/");
+            DPRINT(getDirectoryPart("/etc//passwd"));
+            ENSURE(getDirectoryPart("/etc//passwd")=="/etc/");
             ENSURE(getDirectoryPart("/etc/")=="/etc/");
+            ENSURE(getDirectoryPart("/foo")=="/");
             ENSURE(getDirectoryPart("passwd")=="./");
             ENSURE(getDirectoryPart("C:/WinNT/sux")=="C:/WinNT/");
 
@@ -174,9 +207,6 @@ public:
 
         ENSURE_EXCEPTION(getDirectoryEntries("../../testdir/a"), OpenDirectoryFailed);
         ENSURE_EXCEPTION(getDirectoryEntries("nonexistingdir"), OpenDirectoryFailed);
-
-        std::cerr << getTempDirectory() << std::endl;
-        std::cerr << getAppDataDirectory("TEST") << std::endl;
 
         ENSURE(isDirectory("."));
         ENSURE(isDirectory("../../testdir/"));

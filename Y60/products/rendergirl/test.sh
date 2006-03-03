@@ -23,6 +23,11 @@ compareSceneImages() {
     return 0
 }
 
+if [ "$MAYA_SDK" == "" ] ; then
+    echo "MAYA_SDK not set - skipping tests"
+    exit 0
+fi
+
 rm -f TEST_IMAGES/*
 rm -f TESTMODELS/*.x60
 

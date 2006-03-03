@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include <y60/jssettings.h>
+#include <y60/JScppUtils.h>
 
 #include "SDLApp.h"
 #include "SDLFontInfo.h"

@@ -147,9 +147,10 @@ JSZipWriter::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
             return JS_FALSE;
         }
 
-        OWNERPTR myNewZipWriter = OWNERPTR(new asl::ZipWriter(myFilename));
-
-        myNewObject = new JSZipWriter(myNewZipWriter, &(*myNewZipWriter));
+        try {
+            OWNERPTR myNewZipWriter = OWNERPTR(new asl::ZipWriter(myFilename));
+            myNewObject = new JSZipWriter(myNewZipWriter, &(*myNewZipWriter));
+        } HANDLE_CPP_EXCEPTION;
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (filename) %d",ClassName(), argc);
         return JS_FALSE;

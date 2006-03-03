@@ -308,7 +308,6 @@ namespace y60 {
             {
                 const VoxelT & firstValue = theVoxelCube[theFirstIndex];
                 const VoxelT & secondValue = theVoxelCube[theSecondIndex];
-                
 
                 if ((firstValue <= _myThresholds[0] && secondValue >= _myThresholds[0]) ||
                     (firstValue >= _myThresholds[0] && secondValue <= _myThresholds[0])) 
@@ -370,6 +369,8 @@ namespace y60 {
                     dom::NodePtr myRasterNode = myRasterList->childNode("rasterofgray", i)->childNode(0);
                     _mySegmentationBitmaps.push_back(dynamic_cast_Ptr<dom::ResizeableRaster>(myRasterNode->nodeValueWrapperPtr()));
                 }
+
+                _myGlobalThresholdIndex = theMeasurement->dom::Node::getAttributeValue<int>("global_threshold");
                 asl::Box3f myBoundingBox = theMeasurement->dom::Node::getAttributeValue<asl::Box3f>("boundingbox");
                 _myBoundingBox[asl::Box3i::MIN][0] = int( myBoundingBox[asl::Box3f::MIN][0] );
                 _myBoundingBox[asl::Box3i::MIN][1] = int( myBoundingBox[asl::Box3f::MIN][1] );
@@ -461,7 +462,7 @@ namespace y60 {
                     asl::Vector4f myPixel =  _mySegmentationBitmaps[z]->getPixel(x,y); 
                     myIndex = (unsigned char) myPixel[0];
                 }
-                return _myThresholdPalette[myIndex]; 
+                return _myThresholdPalette[myIndex ? myIndex : _myGlobalThresholdIndex]; 
             }
 
             std::vector<asl::Vector2<VoxelT> >    _myThresholdPalette;
@@ -469,6 +470,7 @@ namespace y60 {
             std::vector<asl::Vector2<VoxelT> >    _myThresholdCube;
             asl::Box3i                            _myBoundingBox;
             int                                   _myDownSampleRate;
+            unsigned                              _myGlobalThresholdIndex;
     };
 }
 

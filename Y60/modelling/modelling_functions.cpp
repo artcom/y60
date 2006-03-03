@@ -27,7 +27,7 @@
 
 #include <y60/property_functions.h>
 #include <y60/PropertyNames.h>
-
+#include <asl/Assure.h>
 #include <asl/Matrix4.h>
 
 #define DB(x) // x
@@ -37,6 +37,7 @@ using namespace std;
 using namespace asl;
 
 namespace y60 {
+
 
     dom::NodePtr
     createTransform(dom::NodePtr theParentNode) {
@@ -684,5 +685,219 @@ namespace y60 {
             myNormals[i] = normalized(myNormals[i]);
         }
     }
+
+enum CornerNames {
+    LTF, RBF, RTF, LBF,
+    LTBK, RBBK, RTBK, LBBK,
+    MAX_CORNER
+};
+
+void
+intersectBoxWithPlane(const asl::Point3f * theCorners, const asl::Planef & thePlane,
+                      std::vector<Point3f> & theIntersections, float theEpsilon)
+{
+    asl::Point3f myIntersection;
+
+    if (intersection( LineSegment<float>(theCorners[LTF], theCorners[RTF]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[RTF], theCorners[RBF]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[RBF], theCorners[LBF]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[LBF], theCorners[LTF]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[LTBK], theCorners[RTBK]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[RTBK], theCorners[RBBK]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[RBBK], theCorners[LBBK]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[LBBK], theCorners[LTBK]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+
+    if (intersection( LineSegment<float>(theCorners[LTF], theCorners[LTBK]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[RTF], theCorners[RTBK]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[LBF], theCorners[LBBK]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+    if (intersection( LineSegment<float>(theCorners[RBF], theCorners[RBBK]), thePlane, myIntersection, theEpsilon)) {
+        theIntersections.push_back(myIntersection);
+    }
+
+}
+
+Point3f
+averageVertices( const std::vector<Point3f> & thePoints ) {
+    Point3f mySum(0.0, 0.0, 0.0);
+    for (unsigned i = 0; i < thePoints.size(); ++i) {
+        mySum += asVector(thePoints[i]);
+    }
+    return mySum / float(thePoints.size());
+}
+
+float
+pseudoAngle(const Point3f & p1, const Point3f & p2) {
+    float myDX = p2[0] - p1[0];
+    float myDY = p2[1] - p1[1];
+    if (myDX == 0.0 && myDY == 0.0) {
+        return -1.0; 
+    } else {
+        float myT = myDY / (fabs( myDX) + fabs(myDY));
+        if (myDX < 0.0) {
+            myT = 2.0f - myT;
+        } else if (myDY < 0.0) {
+            myT += 4.0f;
+        }
+        return myT;
+    }
+}
+
+class PseudoAngle {
+    public:
+        PseudoAngle(const Point3f & theCenter) :
+            _myCenter(theCenter) {};
+
+        bool operator()(const Point3f & p1, const Point3f & p2) {
+            return pseudoAngle(_myCenter, p1) < pseudoAngle(_myCenter, p2);
+        }
+    private:
+        Point3f _myCenter;
+};
+
+Vector3f
+calcUV(const Point3f & myPosition,
+       const Box3f & theVoxelBox,
+       const asl::Matrix4f & theInverseModelView)
+{
+    Point3f myModelPosition = myPosition * theInverseModelView;
+    return quotient((asVector(myModelPosition) - asVector(theVoxelBox[Box3f::MIN])), theVoxelBox.getSize());
+}
+
+
+dom::NodePtr
+createVoxelProxyGeometry(y60::ScenePtr theScene, const asl::Box3f & theVoxelBox,
+                         const asl::Matrix4f & theModelMatrix, const asl::Matrix4f & theCameraMatrix,
+                         const Vector3i & theVolumeSize, float theSampleRate,
+                         const std::string & theMaterialId, const std::string & theName)
+{
+    Point3f myCorners[MAX_CORNER];
+
+    theVoxelBox.getCorners(myCorners[LTF], myCorners[RBF], myCorners[RTF], myCorners[LBF],
+                           myCorners[LTBK], myCorners[RBBK], myCorners[RTBK], myCorners[LBBK]);
+
+    Matrix4f myViewMatrix = theCameraMatrix;
+    myViewMatrix.invert();
+    Matrix4f myModelViewMatrix = theModelMatrix;
+    myModelViewMatrix.postMultiply(myViewMatrix);
+
+    for (unsigned i = 0; i < MAX_CORNER; ++i) {
+        myCorners[i]  = myCorners[i] * myModelViewMatrix;
+    }
+
+    // find min and max in view direction
+    float myMaxZ = - numeric_limits<float>::max();
+    float myMinZ = numeric_limits<float>::max();
+    for (unsigned i = 0; i < MAX_CORNER; ++i) {
+        if (myCorners[i][2] < myMinZ) {
+            myMinZ = myCorners[i][2];
+        }
+        if (myCorners[i][2] > myMaxZ) {
+            myMaxZ = myCorners[i][2];
+        }
+    }
+    ShapeBuilder myShape(theName);
+    ElementBuilder myElementBuilder(PRIMITIVE_TYPE_TRIANGLES, theMaterialId);
+
+    theScene->getSceneBuilder()->appendShape( myShape );
+    myShape.appendElements( myElementBuilder );
+
+    dom::NodePtr myVertexNode = myShape.createVertexDataBin<Vector3f>(POSITION_ROLE);
+    vector<Vector3f> * myVertices = myVertexNode->nodeValuePtrOpen<vector<Vector3f> >();
+
+    dom::NodePtr myUVNode = myShape.createVertexDataBin<asl::Vector3f>("uvset");
+    vector<Vector3f> * myUVSet = myUVNode->nodeValuePtrOpen<vector<Vector3f> >();
+
+    dom::NodePtr myIndexNode = myElementBuilder.createIndex(POSITION_ROLE, POSITIONS);
+    vector<unsigned> * myIndices = myIndexNode->nodeValuePtrOpen<vector<unsigned int> >();
+
+    float mySampleDistance =  (myMaxZ - myMinZ) * theSampleRate; // XXX TODO: non-cubic voxels
+    unsigned myVertexCount = 0;
+    float myEpsilon = 1e-6f;
+
+    Matrix4f myInverseModelView = myModelViewMatrix;
+    myInverseModelView.invert();
+
+    float myZ = myMinZ;
+    while (myZ < myMaxZ || almostEqual(myZ, myMaxZ)) {
+        asl::Planef myPlane(Vector3f(0.0, 0.0, 1.0), -myZ);
+        std::vector<Point3f> myIntersections;        
+        intersectBoxWithPlane(myCorners, myPlane, myIntersections, myEpsilon);
+        if ( ! myIntersections.empty()) {
+
+            Point3f myCenter = averageVertices( myIntersections );
+            int myNumIntersections = myIntersections.size();
+
+            // sort vertices in CCW order
+            std::sort(myIntersections.begin(), myIntersections.end(), PseudoAngle(myCenter) );
+
+            myVertices->push_back(product(myCenter, myInverseModelView));
+
+            myUVSet->push_back(calcUV(myCenter, theVoxelBox, myInverseModelView));
+            myVertexCount++;
+
+            for (unsigned j = 0; j < myNumIntersections; ++j) {
+                myVertices->push_back(product(myIntersections[j], myInverseModelView));
+
+                myUVSet->push_back(calcUV(myIntersections[j], theVoxelBox, myInverseModelView));
+                myIndices->push_back(myVertexCount-1);
+                myIndices->push_back(myVertexCount+j);
+                myIndices->push_back(myVertexCount + ( (j+1) % myIntersections.size() ));
+            }
+            myVertexCount += myIntersections.size();
+        }
+
+        // XXX non cubic voxels ....
+        myZ += (myMaxZ - myMinZ) / (theVolumeSize[0] * theSampleRate);
+    }
+    myElementBuilder.copyIndexBin(POSITIONS, getTextureRole(0), "uvset");
+
+    myVertexNode->nodeValuePtrClose<vector<Vector3f> >();
+    myVertexNode = dom::NodePtr(0);
+    myVertices = 0;
+
+    myUVNode->nodeValuePtrClose<vector<Vector3f> >();
+    myUVNode = dom::NodePtr(0);
+    myUVSet = 0;
+
+    myIndexNode->dom::Node::nodeValuePtrClose<vector<unsigned int> >();
+    myIndexNode = dom::NodePtr(0);
+    myIndices = 0;
+
+
+    return myShape.getNode();
+}
 
 }

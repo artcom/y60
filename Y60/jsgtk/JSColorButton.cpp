@@ -17,6 +17,7 @@
 //=============================================================================
 
 #include "JSColorButton.h"
+#include "JSSignalProxies.h"
 #include "jsgtk.h"
 #include <y60/JSVector.h>
 #include <y60/JScppUtils.h>
@@ -52,10 +53,11 @@ JSColorButton::Functions() {
 JSPropertySpec *
 JSColorButton::Properties() {
     static JSPropertySpec myProperties[] = {
-        {"color",     PROP_color,     JSPROP_ENUMERATE|JSPROP_PERMANENT},
-        {"alpha",     PROP_alpha,     JSPROP_ENUMERATE|JSPROP_PERMANENT},
-        {"use_alpha", PROP_use_alpha, JSPROP_ENUMERATE|JSPROP_PERMANENT},
-        {"title",     PROP_title,     JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"color",            PROP_color,            JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"alpha",            PROP_alpha,            JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"use_alpha",        PROP_use_alpha,        JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"title",            PROP_title,            JSPROP_ENUMERATE|JSPROP_PERMANENT},
+        {"signal_color_set", PROP_signal_color_set, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -112,6 +114,13 @@ JSColorButton::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             {
                 Glib::ustring myTitle = theNative.get_title();
                 * vp = as_jsval(cx, myTitle);
+                return JS_TRUE;
+            }
+        case PROP_signal_color_set:
+            {
+                JSSignalProxy0<void>::OWNERPTR mySignal( new
+                        JSSignalProxy0<void>::NATIVE(theNative.signal_color_set()));
+                *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }
         default:

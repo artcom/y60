@@ -320,14 +320,13 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     try {
         uintN i, n;
-        JSString *str;
 
         for (i = n = 0; i < argc; i++) {
-            str = JS_ValueToString(cx, argv[i]);
-            if (!str) {
+            std::string myString;
+            if (! convertFrom(cx, argv[i], myString) ) {
                 return JS_FALSE;
             }
-            cerr << (i ? " " : "") << JS_GetStringBytes(str) ;
+            cerr << (i ? " " : "") << myString ;
         }
         n++;
         if (n) {
@@ -665,8 +664,7 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     try {
         uintN i;
-        JSString *str;
-        const char * myIncludeFile;
+        string myIncludeFile;
         JSScript *script;
         JSBool ok;
         jsval result;
@@ -674,12 +672,11 @@ Use(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         int myLine;
 
         for (i = 0; i < argc; i++) {
-            str = JS_ValueToString(cx, argv[i]);
-            if (!str) {
+
+            if (!convertFrom(cx, argv[0], myIncludeFile)) {
+                JS_ReportError(cx, "Use could not convert argument value to string.");
                 return JS_FALSE;
             }
-            argv[i] = STRING_TO_JSVAL(str);
-            myIncludeFile = JS_GetStringBytes(str);
             AC_DEBUG << "use: myIncludeFile=" << myIncludeFile;
 
             // Compute file path relative to file in which the use() statement was called
@@ -796,8 +793,9 @@ GC(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         preBytes = rt->gcBytes;
 #ifdef GC_MARK_DEBUG
         if (argc && JSVAL_IS_STRING(argv[0])) {
-            char *name = JS_GetStringBytes(JSVAL_TO_STRING(argv[0]));
-            FILE *file = fopen(name, "w");
+            string myName;
+            convertFrom(cx, argv[0], myName);
+            FILE *file = fopen(myName.c_str(), "w");
             if (!file) {
                 fprintf(gErrFile, "gc: can't open %s: %s\n", strerror(errno));
                 return JS_FALSE;
@@ -874,25 +872,20 @@ ExpandEnvironment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     DOC_RVAL("The string with expanded environment variables.", DOC_TYPE_STRING);
     DOC_END;
     try {
-        JSString   * str;
-        const char * myString;
-
         if (argc != 1) {
             JS_ReportError(cx, "'expandEnvironment' takes a string as argument");
             return JS_FALSE;
         }
 
-        str = JS_ValueToString(cx, argv[0]);
-        if (!str) {
+        string myString;
+        if (!convertFrom(cx, argv[0], myString)) {
             JS_ReportError(cx, "expandEnvironment() could not convert argument value to string.");
             return JS_FALSE;
         }
-
-        myString = JS_GetStringBytes(str);
+        
         string myExpandedString = asl::expandEnvironment(myString);
 
-        JSString * myExpandedJsString = JS_NewStringCopyN(cx, myExpandedString.c_str(), myExpandedString.size());
-        *rval = STRING_TO_JSVAL(myExpandedJsString);
+		*rval = as_jsval(cx, myExpandedString);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

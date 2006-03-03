@@ -259,20 +259,18 @@ namespace y60 {
             CHECK_OGL_ERROR;
             // [DS] the min filter defaults to GL_NEAREST_MIPMAP_LINEAR. This
             // causes problems with offscreen rendering.
+            // causes problems with non mipmaped textures. 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER , GL_NEAREST);
             CHECK_OGL_ERROR;
         } else {
             // 3D-Texture
             glBindTexture(GL_TEXTURE_3D, myId);
             CHECK_OGL_ERROR;
-            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S , GL_REPEAT);
+            // [DS] the min filter defaults to GL_NEAREST_MIPMAP_LINEAR. This
+            // causes problems with non mipmaped textures. 
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER , GL_NEAREST);
             CHECK_OGL_ERROR;
-            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T , GL_REPEAT);
-            CHECK_OGL_ERROR;
-            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R , GL_REPEAT);
-            CHECK_OGL_ERROR;
-            //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER , GL_LINEAR);
-            //CHECK_OGL_ERROR;
         }
 
         unsigned int myTopLevelTextureSize = theImage->getMemUsed();

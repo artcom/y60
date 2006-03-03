@@ -109,7 +109,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
    }
 
    self.setScene = function(theScene, theCanvas) {
-       var myStatus = _myRenderWindow.scene = theScene;
+       var myStatus = _myRenderWindow.setSceneAndCanvas(theScene, theCanvas);
        if (!myStatus) {
            throw new Exception("Could not load model", fileline());
        }

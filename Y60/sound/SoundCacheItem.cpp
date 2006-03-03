@@ -117,7 +117,7 @@ bool SoundCacheItem::isInUse() const {
 }
 
 bool SoundCacheItem::queueSamples(asl::AudioBufferPtr& theBuffer) {
-    AC_TRACE << "SoundCacheItem::addBuffer (frame " << theBuffer->getStartFrame() << ")";
+    AC_TRACE << "SoundCacheItem::queueSamples (frame " << theBuffer->getStartFrame() << ")";
     if (!_myBuffers.empty()) {
         BufferMap::iterator it = _myBuffers.end();
         --it;
@@ -132,7 +132,7 @@ bool SoundCacheItem::queueSamples(asl::AudioBufferPtr& theBuffer) {
     _myFramesDecoded += theBuffer->getNumFrames();
 
     if (getMemUsed() > SoundManager::get().getMaxCacheItemSize()) {
-        AC_WARNING << "SoundCacheItem::addBuffer: Max. memory usage per cache item exceeded.";
+        AC_WARNING << "SoundCacheItem::queueSamples: Max. memory usage per cache item exceeded.";
         AC_WARNING << "    Sound: " << _myURI << ", Max. mem: " 
                 << SoundManager::get().getMaxCacheItemSize();
         AC_WARNING << "    Disabling cache for this item.";

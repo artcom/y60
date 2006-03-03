@@ -321,8 +321,6 @@ void TestSocket::UDPTest() {
     void * threadResult;
     pthread_join(myThread, &threadResult);
     ENSURE(threadResult==0);
-
-
 }
 
 void * TestSocket::UDPServerThread(void *arg) {
@@ -333,7 +331,13 @@ void * TestSocket::UDPServerThread(void *arg) {
     unsigned short otherPort;
     Unsigned32 otherHost;
 
+#ifdef OSX 
+    // mac doesn't have loopback broadcast capability,
+    // so use network broadcast and flood the lan
+    Unsigned32 broadcastLoopback = getHostAddress("BROADCAST");
+#else    
     Unsigned32 broadcastLoopback = getHostAddress("127.255.255.255");
+#endif    
 
 
     do {
@@ -347,6 +351,7 @@ void * TestSocket::UDPServerThread(void *arg) {
         {
             cerr << "UDP Server broadcasting " << string(myInputBuffer, sizeof(myInputBuffer)) << endl;
             myUDPSocket->sendTo(broadcastLoopback, otherPort, myInputBuffer, sizeof(myInputBuffer) );
+            cerr << "UDP Server broadcast ok on port " << otherPort << endl;
         }
     } while (myUDPSocket);
 

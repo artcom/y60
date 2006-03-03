@@ -90,9 +90,16 @@ namespace y60 {
             void initGL();
 
             void draw(const asl::LineSegment<float> & theLine,
+<<<<<<< .mine
+                    const asl::Vector4f & theColor,
+                    const asl::Matrix4f & theTransformation,
+                    const float & theWidth = 1.0f,
+                    const std::string & theRenderStyles = "");
+=======
                       const asl::Vector4f & theColor,
                       const asl::Matrix4f & theTransformation,
                       const float & theWidth = 1.0f);
+>>>>>>> .r5381
             void draw(const asl::Triangle<float> & theTriangle,
                       const asl::Vector4f & theColor,
                       const asl::Matrix4f & theTransformation,
@@ -119,6 +126,7 @@ namespace y60 {
 
             GLenum getPrimitiveGLType(PrimitiveType theType) const;
 
+            void enableRenderStyles(const std::vector<RenderStyleType> & theRenderStyles);
             bool switchMaterial(const MaterialBase & theMaterial, bool isOverlay = false);
             void deactivatePreviousMaterial() const;
 

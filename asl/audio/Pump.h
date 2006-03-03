@@ -33,11 +33,6 @@ class Pump : public AudioTimeSource, private PosixThread
         Pump(SampleFormat mySF, unsigned myTimeStartDelay);
         virtual ~Pump();
 
-        // Latency and Device name are system-specific (and should ideally be read from a 
-        // configuration file), while the other parameters are all application-specific. 
-        static void setSysConfig(const Time& myLatency, const std::string& myDeviceName = "");
-        static void setAppConfig(unsigned mySampleRate, unsigned numOutputChannels = 2, 
-                bool useDummy = false);
         static Pump& get();
         
         HWSampleSinkPtr createSampleSink(const std::string & theName);
@@ -78,20 +73,13 @@ class Pump : public AudioTimeSource, private PosixThread
         void addUnderrun();
         void mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver);
 
-        // The following are used only as initializers - set by setConfig, read 
-        // by Pump::Pump and derived constructors.
-        // TODO: Anyone know of a better way to do this?
-        static double      _myLatency_Init;
-        static std::string _myDeviceName_Init;
-        static unsigned    _mySampleRate_Init;
-        static unsigned    _numOutputChannels_Init;
-        static bool        _useDummy_Init;
-        bool               _myRunning;
+        bool _myRunning;
 
     private:
         void run();
         virtual void pump() {};
         void removeDeadSinks();
+        int getSampleRateConfig();
 
         std::vector < HWSampleSinkWeakPtr > _mySampleSinks;
         asl::ThreadLock _mySinkLock;

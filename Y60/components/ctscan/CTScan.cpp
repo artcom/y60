@@ -59,7 +59,7 @@ using namespace y60;
 
 namespace y60 {
 
-CTScan::CTScan() : _myEncoding(y60::GRAY), _myDefaultWindow(128.0f, 256.0f), _myVoxelSize(0,0,0) {
+CTScan::CTScan() : _myEncoding(y60::GRAY), _myDefaultWindow(0.0f, 0.0f), _myVoxelSize(0,0,0) {
 }
 
 CTScan::~CTScan() {
@@ -76,7 +76,7 @@ CTScan::getModelViewMatrix(const asl::Quaternionf & theOrientation) {
     myModelView.postMultiply(Matrix4f(myOrientation));
    
     Quaternionf myYFlipRotation;
-    myYFlipRotation.assignFromEuler(Vector3f(PI,0,0));
+    myYFlipRotation.assignFromEuler(Vector3f(float(PI),0.0f,0.0f));
     myModelView.postMultiply(Matrix4f(myYFlipRotation));
 
     return myModelView;
@@ -100,7 +100,7 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
     AC_TRACE << "found " << myFileList.size() << " files in " << thePackage << ":" << theSubDir;    
 
     if ( myFileList.empty()) {           
-        throw CTScanException("Files in " + theSubDir + " not found \n", PLUS_FILE_LINE);
+        throw CTScanException("No files in " + thePackage +"/"+theSubDir + " found \n", PLUS_FILE_LINE);
     } 
 
     int totalFileCount = myFileList.size();
@@ -113,7 +113,7 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
 
     int myProgressTotal = totalFileCount;
     int myProgressCounter = 0;
-    
+
     for (int i = 0; i < totalFileCount; ++i) {
         AC_TRACE << "reading '" << myFileList[i] << "'";    
         CTFilePtr myFile;
@@ -133,7 +133,7 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
         } catch (ImageLoaderException &) {
             myFrameCount = 0;
         }
-    
+
         // adjust the progress total if more than one frame is in the file
         myProgressTotal += myFrameCount -1;
 
@@ -145,7 +145,8 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
             // Progress notification
             _myProgressSignal.emit(double(++myProgressCounter)/double(myProgressTotal), "loading");
         }
-        if ( i <= representativeFileIndex || !representativeFile ) {
+        if ( myFrameCount && (i <= representativeFileIndex || !representativeFile )) {
+            AC_TRACE << "setting representativeFile";
             representativeFile = myFile;
         }
     }
@@ -155,16 +156,22 @@ CTScan::loadSlices(asl::PackageManager & thePackageManager, const std::string & 
         _mySlices.push_back(it->second);
     }
     AC_TRACE << "done, read " << _mySlices.size() << " slices";
-    if (!_mySlices.empty()) {
+    if (_mySlices.empty()) {
+        throw CTScanException("No slice files in " + thePackage +"/"+theSubDir + " found \n", PLUS_FILE_LINE);
+    }
+    AC_TRACE << "representativeFile = " << representativeFile != 0;
         // extract information from the representative slice
         _myDefaultWindow = representativeFile->getDefaultWindow(); 
-        _myVoxelSize = representativeFile->getVoxelSize(); 
-        _myEncoding = representativeFile->getEncoding(); 
-    }
-    //allocateStencils();
-    
+    AC_TRACE << "default window " << _myDefaultWindow;
+    _myVoxelSize = representativeFile->getVoxelSize(); 
+    AC_TRACE << "Voxel Size " << _myVoxelSize;
+    _myEncoding = representativeFile->getEncoding(); 
+    AC_TRACE << "Encoding " << _myEncoding;
     findOccurringValueRange();
-    
+    //allocateStencils();
+    AC_TRACE << "returning " << _mySlices.size() << " slices";
+
+
     return _mySlices.size();
 }
 
@@ -327,14 +334,15 @@ CTScan::getValueRange() {
 
 template <class VoxelT, class SegmentationPolicy>
 bool
-CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
+CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate, bool theCloseAtClippingBoxFlag,
                              bool theCreateNormalsFlag, ScenePtr theScene, 
                              SegmentationPolicy & theSegmentizer,
                              unsigned int theNumVertices, unsigned int theNumTriangles)
 {
     if (theNumVertices == 0 || theNumTriangles == 0) {
         // estimation not done yet - force it
-        countMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theSegmentizer, theNumVertices, theNumTriangles); 
+        countMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                theSegmentizer, theNumVertices, theNumTriangles); 
     }
     
     SceneBuilderPtr mySceneBuilder = theScene->getSceneBuilder();
@@ -345,7 +353,7 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate
     
     // here we go ...
     MarchingCubes<VoxelT, ExportShapePolicy<VoxelT, SegmentationPolicy >, SegmentationPolicy >
-           myMarcher(theDownSampleRate, myVertexStore, theSegmentizer, this);
+           myMarcher(theDownSampleRate, theCloseAtClippingBoxFlag, myVertexStore, theSegmentizer, this);
 
     myMarcher.setBox(theVoxelBox);
     bool isDone = myMarcher.march();
@@ -362,7 +370,7 @@ CTScan::applyMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate
 template <class VoxelT, class SegmentationPolicy>
 bool
 CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate,
-                           SegmentationPolicy & theSegmentizer,
+                           bool theCloseAtClippingBoxFlag, SegmentationPolicy & theSegmentizer,
                            unsigned int & theVertexCount, unsigned int & theTriangleCount)
 {
     // here we go ...
@@ -371,7 +379,7 @@ CTScan::countMarchingCubes(const asl::Box3i & theVoxelBox, int theDownSampleRate
     MarchingCubes<VoxelT,
                   CountPolygonPolicy<VoxelT, SegmentationPolicy >,
                   SegmentationPolicy >
-           myMarcher(theDownSampleRate, myPolygonCounter, theSegmentizer, this);
+           myMarcher(theDownSampleRate, theCloseAtClippingBoxFlag, myPolygonCounter, theSegmentizer, this);
 
     myMarcher.setBox(theVoxelBox);
     AC_INFO << "starting dry run";
@@ -390,7 +398,8 @@ asl::Vector2i
 CTScan::countTrianglesGlobal(const asl::Box3i & theVoxelBox, 
                        double theThresholdMin, 
                        double theThresholdMax, 
-                       int theDownSampleRate)
+                       int theDownSampleRate,
+                       bool theCloseAtClippingBoxFlag)
 {
     unsigned int myVertexCount;
     unsigned int myTriangleCount;
@@ -400,21 +409,24 @@ CTScan::countTrianglesGlobal(const asl::Box3i & theVoxelBox,
             {
                 typedef unsigned char Voxel;
                 GlobalThresholdSegmentationPolicy<Voxel> mySegmentizer((Voxel)theThresholdMin, (Voxel)theThresholdMax);
-                isDone = countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                isDone = countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                        mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         case y60::GRAY16:
             {
                 typedef unsigned short Voxel;
                 GlobalThresholdSegmentationPolicy<Voxel> mySegmentizer((Voxel)theThresholdMin, (Voxel)theThresholdMax);
-                isDone = countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                isDone = countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                        mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         case y60::GRAYS16:
             {
                 typedef short Voxel;
                 GlobalThresholdSegmentationPolicy<Voxel> mySegmentizer((Voxel)theThresholdMin, (Voxel)theThresholdMax);
-                isDone = countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                isDone = countMarchingCubes<Voxel>(theVoxelBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                        mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         default:
@@ -429,7 +441,8 @@ CTScan::countTrianglesGlobal(const asl::Box3i & theVoxelBox,
 
 asl::Vector2i
 CTScan::countTrianglesInVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode,
-                                          dom::NodePtr theThresholdPalette, int theDownSampleRate)
+                                          dom::NodePtr theThresholdPalette, int theDownSampleRate, 
+                                          bool theCloseAtClippingBoxFlag)
 {
     unsigned int myVertexCount;
     unsigned int myTriangleCount;
@@ -442,22 +455,28 @@ CTScan::countTrianglesInVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::N
         case y60::GRAY:
             {
                 typedef unsigned char Voxel;
-                PerVoxelThresholdSegmentationPolicy<Voxel> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                isDone = countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                PerVoxelThresholdSegmentationPolicy<Voxel> mySegmentizer(theThresholdPalette, theVolumeNode, 
+                        theDownSampleRate);
+                isDone = countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                        mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         case y60::GRAY16:
             {
                 typedef unsigned short Voxel;
-                PerVoxelThresholdSegmentationPolicy<Voxel> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                isDone = countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                PerVoxelThresholdSegmentationPolicy<Voxel> mySegmentizer(theThresholdPalette, theVolumeNode, 
+                        theDownSampleRate);
+                isDone = countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                        mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         case y60::GRAYS16:
             {
                 typedef short Voxel;
-                PerVoxelThresholdSegmentationPolicy<Voxel> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                isDone = countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, mySegmentizer, myVertexCount, myTriangleCount);
+                PerVoxelThresholdSegmentationPolicy<Voxel> mySegmentizer(theThresholdPalette, theVolumeNode, 
+                        theDownSampleRate);
+                isDone = countMarchingCubes<Voxel>(myBoundingBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                        mySegmentizer, myVertexCount, myTriangleCount);
                 break;
             }
         default:
@@ -471,8 +490,8 @@ CTScan::countTrianglesInVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::N
 }
 ScenePtr
 CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin, double theThresholdMax, 
-                   int theDownSampleRate, bool theCreateNormalsFlag, PackageManagerPtr thePackageManager, 
-                   unsigned int theNumVertices, unsigned int theNumTriangles)
+                   int theDownSampleRate, bool theCloseAtClippingBoxFlag, bool theCreateNormalsFlag, 
+                   PackageManagerPtr thePackageManager, unsigned int theNumVertices, unsigned int theNumTriangles)
 {
     asl::Time myStartTime;
 
@@ -484,15 +503,15 @@ CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin,
             {
                 typedef unsigned char VoxelT;
                 GlobalThresholdSegmentationPolicy<VoxelT> mySegmentizer( (VoxelT)theThresholdMin, (VoxelT)theThresholdMax);
-                isDone = applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCreateNormalsFlag, myScene,
-                            mySegmentizer, theNumVertices, theNumTriangles);
+                isDone = applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCloseAtClippingBoxFlag, theCreateNormalsFlag, 
+                        myScene, mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
         case y60::GRAY16:
             {
                 typedef unsigned short VoxelT;
                 GlobalThresholdSegmentationPolicy<VoxelT> mySegmentizer( (VoxelT)theThresholdMin, (VoxelT)theThresholdMax);
-                isDone = applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCreateNormalsFlag, myScene,
+                isDone = applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCloseAtClippingBoxFlag, theCreateNormalsFlag, myScene,
                             mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
@@ -500,7 +519,7 @@ CTScan::polygonizeGlobal(const asl::Box3i & theVoxelBox, double theThresholdMin,
             {
                 typedef short VoxelT;
                 GlobalThresholdSegmentationPolicy<VoxelT> mySegmentizer( (VoxelT)theThresholdMin, (VoxelT)theThresholdMax);
-                isDone = applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCreateNormalsFlag, myScene,
+                isDone = applyMarchingCubes<VoxelT>(theVoxelBox, theDownSampleRate, theCloseAtClippingBoxFlag, theCreateNormalsFlag, myScene,
                             mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
@@ -527,7 +546,8 @@ void CTScan::prepareBox(asl::Box3i & theVoxelBox) {
 
 ScenePtr
 CTScan::polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr theVolumeNode, dom::NodePtr theThresholdPalette, 
-                   int theDownSampleRate, bool theCreateNormalsFlag, PackageManagerPtr thePackageManager, 
+                   int theDownSampleRate, bool theCloseAtClippingBoxFlag, bool theCreateNormalsFlag, 
+                   PackageManagerPtr thePackageManager, 
                    unsigned int theNumVertices, unsigned int theNumTriangles)
 {
     asl::Time myStartTime;
@@ -542,24 +562,25 @@ CTScan::polygonizeVolumeMeasurement(const asl::Box3i & theVoxelBox, dom::NodePtr
             {
                 typedef unsigned char VoxelT;
                 PerVoxelThresholdSegmentationPolicy<VoxelT> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                isDone = applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCreateNormalsFlag, myScene,
-                            mySegmentizer, theNumVertices, theNumTriangles);
+                isDone = applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                                    theCreateNormalsFlag, myScene,
+                                    mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
         case y60::GRAY16:
             {
                 typedef unsigned short VoxelT;
                 PerVoxelThresholdSegmentationPolicy<VoxelT> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                isDone = applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCreateNormalsFlag, myScene,
-                            mySegmentizer, theNumVertices, theNumTriangles);
+                isDone = applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                        theCreateNormalsFlag, myScene, mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
         case y60::GRAYS16:
             {
                 typedef short VoxelT;
                 PerVoxelThresholdSegmentationPolicy<VoxelT> mySegmentizer(theThresholdPalette, theVolumeNode, theDownSampleRate);
-                isDone = applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCreateNormalsFlag, myScene,
-                            mySegmentizer, theNumVertices, theNumTriangles);
+                isDone = applyMarchingCubes<VoxelT>(myBoundingBox, theDownSampleRate, theCloseAtClippingBoxFlag, 
+                        theCreateNormalsFlag, myScene, mySegmentizer, theNumVertices, theNumTriangles);
             }
             break;
         default:
@@ -680,7 +701,7 @@ CTScan::interpolatedValueAt(const asl::Vector3d & thePosition) {
             myCeilValue = mySource[myCeilPos[0]];
         }
         myValueA = linearInterpolate(myFloorValue, myCeilValue,
-            myFloorPos[0], myCeilPos[0], thePosition[0]);
+            myFloorPos[0], myCeilPos[0], float(thePosition[0]));
 
         myFloorValue = NumericTraits<VoxelT>::min();
         myCeilValue = NumericTraits<VoxelT>::min();
@@ -692,9 +713,9 @@ CTScan::interpolatedValueAt(const asl::Vector3d & thePosition) {
             myCeilValue = mySource[myCeilPos[0]];
         }
         myValueB = linearInterpolate(myFloorValue, myCeilValue,
-            myFloorPos[0], myCeilPos[0], thePosition[0]);
+            myFloorPos[0], myCeilPos[0], float(thePosition[0]));
 
-        myFloorResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], myCeilPos[1], thePosition[1]);            
+        myFloorResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], myCeilPos[1], float(thePosition[1]));            
     } else {
         myFloorResult = NumericTraits<VoxelT>::min();
     }
@@ -709,7 +730,7 @@ CTScan::interpolatedValueAt(const asl::Vector3d & thePosition) {
             myCeilValue = mySource[myCeilPos[0]];
         }
         myValueA = linearInterpolate(myFloorValue, myCeilValue,
-            int(myFloorPos[0]), int(myCeilPos[0]), thePosition[0]);
+            int(myFloorPos[0]), int(myCeilPos[0]), float(thePosition[0]));
 
         myFloorValue = NumericTraits<VoxelT>::min();
         myCeilValue = NumericTraits<VoxelT>::min();
@@ -721,13 +742,13 @@ CTScan::interpolatedValueAt(const asl::Vector3d & thePosition) {
             myCeilValue = mySource[myCeilPos[0]];
         }
         myValueB = linearInterpolate(myFloorValue, myCeilValue,
-            int(myFloorPos[0]), int(myCeilPos[0]), thePosition[0]);
-        myCeilResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], myCeilPos[1], thePosition[1]);
+            int(myFloorPos[0]), int(myCeilPos[0]), float(thePosition[0]));
+        myCeilResult = linearInterpolate(myValueA, myValueB, myFloorPos[1], myCeilPos[1], float(thePosition[1]));
     } else {
         myCeilResult = NumericTraits<VoxelT>::min();
     }
     return VoxelT(linearInterpolate(myFloorResult, myCeilResult, 
-        myFloorPos[2], myCeilPos[2], thePosition[2]));
+        myFloorPos[2], myCeilPos[2], float(thePosition[2])));
 }
 
 void 
@@ -918,6 +939,7 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, const asl::Ve
         // Fill with white
         Ptr<Block> myTarget(new Block(getBytesRequired(myPoTWidth* myPoTHeight, _myEncoding)));    
         int myTargetLineStride = getBytesRequired(myPoTWidth, _myEncoding);
+        int myTargetPixelStride = getBytesRequired(1, _myEncoding);
         
         double myCenterSlicePosition = myBounds.getCenter()[2];
         Vector3d mySlicePosition((double)theSlicePosition[0], (double)theSlicePosition[1], (double)theSlicePosition[2]);
@@ -949,7 +971,7 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, const asl::Ve
                 }
                 int myStart = int(ceil(myMinValue));
                 int myEnd = int(floor(myMaxValue));
-                VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+(myTargetLineStride*v)+myStart);
+                VoxelT * myAddress = reinterpret_cast<VoxelT*>(myTarget->begin()+(myTargetLineStride*v)+(myStart * myTargetPixelStride));
                 for (int u = myStart; u < myEnd; ++u) {
                     Vector3d mySourcePos = myLinePos + (double(u) * mySourceDeltaU);
                     if (theTrilliniarInterpolate) {
@@ -962,7 +984,6 @@ CTScan::reconstructToImageImpl(const Quaternionf & theOrientation, const asl::Ve
             }
         }
         myPixelData = myTarget; 
-        // set the image data
         y60::ImagePtr myFacade = theImageNode->dom::Node::getFacade<y60::Image>();
         myFacade->set(myPoTWidth, myPoTHeight, 1, _myEncoding, *myPixelData);
         // set the matrix to make up for the padded image
@@ -981,6 +1002,8 @@ CTScan::setupMaterial(SceneBuilderPtr theSceneBuilder, bool theCreateNormalsFlag
     // instead of using a modelling function we roll our own material here,
     // beacuse we don't have a Scene object ...
     std::string myMaterialName = "mSTL"; // XXX [DS] this name should not be changed
+                                         // XXX [TS] There is code in Polygonization that
+                                         //          depends on this name
     MaterialBuilder myMaterialBuilder(myMaterialName, false);
     theSceneBuilder->appendMaterial(myMaterialBuilder);
     myMaterialBuilder.setTransparencyFlag(false);
@@ -1089,7 +1112,7 @@ CTScan::create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize) {
     int myBytesPerSlice = getBytesRequired(myTextureSize[0]*myTextureSize[1], _myEncoding);
     AC_DEBUG << "creating 3D texture, size=" << myTextureSize << ", slice count=" 
         << mySliceCount << ", bytes/slice=" << myBytesPerSlice;
-
+    /*
     switch (_myEncoding) {
         case GRAY:
             appendEmptySlices<unsigned char>(my3DTexture, 1, myBytesPerSlice);
@@ -1101,11 +1124,13 @@ CTScan::create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize) {
             appendEmptySlices<signed short>(my3DTexture, 1, myBytesPerSlice);
             break;
     }
-    for (int z = 0; z < myTextureSize[2]-2; ++z) {
+    */
+    for (int z = 0; z < myTextureSize[2]; ++z) {
         int mySlice = int(floor(float(z*mySliceCount)/myTextureSize[2]));
         AC_TRACE << " adding slice " << mySlice; 
         CTScan::appendTo3DTexture(mySlice, my3DTexture, myTextureSize[0], myTextureSize[1]);
     }
+    /*
     if (myTextureSize[2] > 1) {
         switch (_myEncoding) {
             case GRAY:
@@ -1119,6 +1144,7 @@ CTScan::create3DTexture(dom::NodePtr theImageNode, int theMaxTextureSize) {
                 break;
         }
     }
+    */
     y60::ImagePtr myImage = theImageNode->getFacade<y60::Image>();
     myImage->set(myTextureSize[0], myTextureSize[1], myTextureSize[2], _myEncoding, my3DTexture);
     AC_DEBUG << "done creating 3d texture" << endl;
@@ -1184,7 +1210,7 @@ CTScan::computeHistogram(const Box3i & theVOI, std::vector<unsigned> & theHistog
 
 void
 CTScan::computeProfile(const std::vector<asl::Point3i> & thePoints, 
-        std::vector<Signed16> & theProfile, std::vector<asl::Point3i> & thePointsSampled)
+        std::vector<Signed32> & theProfile, std::vector<asl::Point3i> & thePointsSampled)
 {
     if (thePoints.empty()) {
         return;
@@ -1201,7 +1227,7 @@ CTScan::computeProfile(const std::vector<asl::Point3i> & thePoints,
 }
 
 void
-CTScan::computeProfile(const asl::Point3i & thePosition, std::vector<Signed16> & theProfile) {
+CTScan::computeProfile(const asl::Point3i & thePosition, std::vector<Signed32> & theProfile) {
     const unsigned char * myData = _mySlices[thePosition[2]]->pixels().begin();
     myData += getBytesRequired(thePosition[0], _myEncoding)
               +thePosition[1]*getBytesRequired(_mySlices[thePosition[2]]->width(), _myEncoding);
@@ -1224,7 +1250,7 @@ CTScan::computeProfile(const asl::Point3i & thePosition, std::vector<Signed16> &
 // from [theStart, theEnd[  (without theEnd)
 void
 CTScan::computeLineSegmentProfile(const asl::Point3i & theStart, const asl::Point3i & theEnd, 
-        std::vector<Signed16> & theProfile, std::vector<Point3i> & thePointsSampled) 
+        std::vector<Signed32> & theProfile, std::vector<Point3i> & thePointsSampled) 
 {
     // find the axis with the max delta
     int maxDelta = 0;
@@ -1273,6 +1299,12 @@ CTScan::appendTo3DTexture(int theSlice, asl::Block & the3dTexture, int theXSize,
     myScaler.Apply(& myTempBitmap, & myScaledBitmap);
 
     PLBYTE ** myLineArray = myScaledBitmap.GetLineArray();
+    /*
+    PLPNGEncoder myPNGEncoder;
+    string myImageFile = string("__3DTex_")+as_string(the3dTexture.size())+".png";
+    myPNGEncoder.MakeFileFromBmp(Path(myImageFile, UTF8).toLocale().c_str(), &myScaledBitmap);
+*/
+
 
     ReadableBlockAdapter myAdapter(myLineArray[0],
             myLineArray[myScaledBitmap.GetHeight() - 1] + 
@@ -1564,7 +1596,8 @@ CTScan::copyCanvasToVoxelVolume(dom::NodePtr theMeasurement, dom::NodePtr theCan
 }
 
 void
-CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCanvas,
+CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, 
+                                unsigned theGlobalThresholdIndex, dom::NodePtr theCanvas,
                                 dom::NodePtr theReconstructedImage, unsigned theSliceIndex,
                                 Orientation theOrientation, dom::NodePtr thePaletteNode) 
 {
@@ -1574,21 +1607,21 @@ CTScan::copyVoxelVolumeToCanvas(dom::NodePtr theMeasurement, dom::NodePtr theCan
         case y60::GRAY:
             {
                 typedef unsigned char VoxelT;
-                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage,
+                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theGlobalThresholdIndex, theCanvas, theReconstructedImage,
                                                     theSliceIndex, theOrientation, thePaletteNode);            
             }
             break;
         case y60::GRAY16:
             {
                 typedef unsigned short VoxelT;
-                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage,
+                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theGlobalThresholdIndex, theCanvas, theReconstructedImage,
                                                     theSliceIndex, theOrientation, thePaletteNode);
             }
             break;
         case y60::GRAYS16:
             {
                 typedef short VoxelT;
-                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theCanvas, theReconstructedImage,
+                copyVoxelVolumeToCanvasImpl<VoxelT>(theMeasurement, theGlobalThresholdIndex, theCanvas, theReconstructedImage,
                                                     theSliceIndex, theOrientation, thePaletteNode);
             }
             break;
@@ -1615,7 +1648,8 @@ CTScan::getSegmentationAlpha(unsigned theIndex, VoxelT theVoxel, const PaletteTa
 
 template <class VoxelT>
 void 
-CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr theCanvas, 
+CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, 
+                                    unsigned theGlobalThresholdIndex, dom::NodePtr theCanvas, 
                                     dom::NodePtr theReconstructedImage, unsigned theSliceIndex,
                                     Orientation theOrientation, dom::NodePtr thePaletteNode)
 {
@@ -1636,6 +1670,7 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
         myItem.thresholds = Vector2<VoxelT>(VoxelT(myThresholdsFloat[0]), VoxelT(myThresholdsFloat[1]));
         myPalette[myIndex] = myItem;
     }
+    
 
     Box3f myBoundingBox = theMeasurement->dom::Node::getAttributeValue<Box3f>("boundingbox");
     Point3i myMin(round(myBoundingBox[Box3f::MIN][0]), 
@@ -1665,24 +1700,39 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
     unsigned char * myTargetPixels = myTargetRaster->pixels().begin();
     unsigned myPixelIndex;
     
+    unsigned myXStart = unsigned(myMin[0]);
+    unsigned myXEnd = unsigned(myMax[0]);
+    unsigned myYStart = unsigned(myMin[1]);
+    unsigned myYEnd = unsigned(myMax[1]);
+    unsigned myZStart = unsigned( myMin[2]);
+    unsigned myZEnd = unsigned( myMax[2]);
     switch ( theOrientation) {
         case CTScan::IDENTITY: // front
-            if (theSliceIndex >= myMin[2] && theSliceIndex < myMax[2]) {
-                dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(int( theSliceIndex - myMin[2]));
-                ResizeableRasterPtr mySourceRaster =
-                    dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
-                unsigned mySourceLineStride  = getBytesRequired(mySourceRaster->width(), y60::GRAY);
-                unsigned char * mySourcePixels = mySourceRaster->pixels().begin();
+            {
+                unsigned char * mySourcePixels = 0;
+                unsigned mySourceLineStride  = 0;
+                if (theSliceIndex >= myZStart && theSliceIndex < myZEnd) {
+                    dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(int( theSliceIndex - myMin[2]));
+                    ResizeableRasterPtr mySourceRaster =
+                        dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
+                    mySourceLineStride  = getBytesRequired(mySourceRaster->width(), y60::GRAY);
+                    mySourcePixels = mySourceRaster->pixels().begin();
+                }
 
-                unsigned myXStart = unsigned(myMin[0]);
-                unsigned myXEnd = unsigned(myMax[0]);
-                unsigned myYStart = unsigned(myMin[1]);
-                unsigned myYEnd = unsigned(myMax[1]);
                 Vector3i myColor;
                 VoxelT myVoxel;
-                for (unsigned y = myYStart; y < myYEnd; ++y) {
-                    for (unsigned x = myXStart; x < myXEnd; ++x) {
-                        myIndex = mySourcePixels[(y - myYStart) * mySourceLineStride + (x - myXStart)];
+                for (unsigned y = 0; y < myCanvasHeight; ++y) {
+                    for (unsigned x = 0; x < myCanvasWidth; ++x) {
+                        myIndex = 0;
+                        if ( y >= myYStart && y < myYEnd && 
+                             x >= myXStart && x < myXEnd &&
+                             mySourcePixels)
+                        {
+                            myIndex = mySourcePixels[(y - myYStart) * mySourceLineStride + (x - myXStart)];
+                        }
+                        if (myIndex == 0) {
+                            myIndex = theGlobalThresholdIndex; 
+                        }
                         myColor = myPalette[myIndex].color;
 
                         myVoxel = *reinterpret_cast<const VoxelT*>(&(myRIPixels[y * myRIStride + x * myRIBPP]));
@@ -1696,25 +1746,34 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
             }
             break;
         case CTScan::Y2Z: // top
-            if (theSliceIndex >= myMin[1] && theSliceIndex < myMax[1]) {
+            {
                 unsigned mySourceY = unsigned( theSliceIndex - myMin[1]);
-                unsigned myZStart = unsigned( myMin[2]);
-                unsigned myZEnd = unsigned( myMax[2]);
-                unsigned myXStart = unsigned(myMin[0]);
-                unsigned myXEnd = unsigned(myMax[0]);
                 Vector3i myColor;
                 VoxelT myVoxel;
-                for (unsigned z = myZStart; z < myZEnd; ++z) {
-                    unsigned myCurrentSliceIndex = z - myZStart;
-                    dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(myCurrentSliceIndex);
-                    ResizeableRasterPtr mySourceRaster =
-                        dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
+                for (unsigned z = 0; z < myCanvasHeight; ++z) {
+                    unsigned char * mySourcePixels = 0;
+                    unsigned mySourceLineStride = 0;
+                    if (z >= myZStart && z < myZEnd) { // inside the bounding box?
+                        unsigned myCurrentSliceIndex = z - myZStart;
+                        dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(myCurrentSliceIndex);
+                        ResizeableRasterPtr mySourceRaster =
+                            dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
 
-                    unsigned mySourceLineStride  = getBytesRequired(mySourceRaster->width(), y60::GRAY);
-                    unsigned char * mySourcePixels = mySourceRaster->pixels().begin();
+                        mySourceLineStride  = getBytesRequired(mySourceRaster->width(), y60::GRAY);
+                        mySourcePixels = mySourceRaster->pixels().begin();
+                    }
 
-                    for (unsigned x = myXStart; x < myXEnd; ++x) {
-                        myIndex = mySourcePixels[mySourceY * mySourceLineStride + (x - myXStart)];
+                    for (unsigned x = 0; x < myCanvasWidth; ++x) {
+                        myIndex = 0;
+                        if ( mySourcePixels && 
+                             theSliceIndex >= myYStart && theSliceIndex < myYEnd && 
+                             x >= myXStart && x < myXEnd) // inside the bounding box?
+                        {
+                            myIndex = mySourcePixels[mySourceY * mySourceLineStride + (x - myXStart)];
+                        }
+                        if (myIndex == 0) {
+                            myIndex = theGlobalThresholdIndex; 
+                        }
                         myColor = myPalette[myIndex].color;
                         myPixelIndex = (myRIHeight - z - 1) * myRIStride + x * myRIBPP;
                         myVoxel = *reinterpret_cast<const VoxelT*>(&(myRIPixels[myPixelIndex]));
@@ -1728,33 +1787,43 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
             }
             break;
         case CTScan::X2Z: // side
-            if (theSliceIndex >= myMin[0] && theSliceIndex < myMax[0]) {
+            {
                 unsigned mySourceX = unsigned( theSliceIndex - myMin[0]);
-                unsigned myZStart = unsigned( myMin[2]);
-                unsigned myZEnd = unsigned( myMax[2]);
-                unsigned myYStart = unsigned(myMin[1]);
-                unsigned myYEnd = unsigned(myMax[1]);
                 Vector3i myColor;
                 VoxelT myVoxel;
-                for (unsigned z = myZStart; z < myZEnd; ++z) {
-                    unsigned myCurrentSliceIndex = z - myZStart;
-                    dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(myCurrentSliceIndex);
-                    ResizeableRasterPtr mySourceRaster =
-                        dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
+                for (unsigned z = 0; z < myCanvasWidth; ++z) {
+                    unsigned char * mySourcePixels = 0;
+                    unsigned mySourceLineStride = 0;
+                    if (z >= myZStart && z < myZEnd) {
+                        unsigned myCurrentSliceIndex = z - myZStart;
+                        dom::NodePtr myRasterNode = theMeasurement->childNode(0)->childNode(myCurrentSliceIndex);
+                        ResizeableRasterPtr mySourceRaster =
+                            dynamic_cast_Ptr<ResizeableRaster>(myRasterNode->childNode(0)->nodeValueWrapperPtr());
 
-                    unsigned mySourceLineStride  = getBytesRequired(mySourceRaster->width(), y60::GRAY);
-                    unsigned char * mySourcePixels = mySourceRaster->pixels().begin();
+                        mySourceLineStride  = getBytesRequired(mySourceRaster->width(), y60::GRAY);
+                        mySourcePixels = mySourceRaster->pixels().begin();
+                    }
                     unsigned myTargetLineOffset = (myCanvasWidth-z-1) * myBytesPerPixel;
+                    unsigned myVoxelLineOffset = (myCanvasWidth-z-1) * myRIBPP;
 
-                    for (unsigned y = myYStart; y < myYEnd; ++y) {
-                        myIndex = mySourcePixels[(y - myYStart) * mySourceLineStride + mySourceX];
+                    for (unsigned y = 0; y < myCanvasHeight; ++y) {
+                        myIndex = 0;
+                        if ( theSliceIndex >= myXStart && theSliceIndex < myXEnd && 
+                             y >= myYStart && y < myYEnd && 
+                             mySourcePixels) // inside the bounding box?
+                        {
+                            myIndex = mySourcePixels[(y - myYStart) * mySourceLineStride + mySourceX];
+                        }
+                        if (myIndex == 0) {
+                            myIndex = theGlobalThresholdIndex; 
+                        }
                         myColor = myPalette[myIndex].color;
-                        myVoxel = *reinterpret_cast<const VoxelT*>(&(myRIPixels[y * myRIStride + z * myRIBPP]));
+                        myVoxel = *reinterpret_cast<const VoxelT*>(&(myRIPixels[y * myRIStride + myVoxelLineOffset]));
                         myPixelIndex = y * myTargetLineStride + myTargetLineOffset;
                         myTargetPixels[myPixelIndex] = myColor[0];
                         myTargetPixels[myPixelIndex + 1] = myColor[1];
                         myTargetPixels[myPixelIndex + 2] = myColor[2];
-                        myTargetPixels[myPixelIndex + 3] = getSegmentationAlpha(myIndex, myVoxel, myPalette, myAlpha);                        
+                        myTargetPixels[myPixelIndex + 3] = getSegmentationAlpha(myIndex, myVoxel, myPalette, myAlpha);                   
                     }
                 }
             }
@@ -1762,5 +1831,53 @@ CTScan::copyVoxelVolumeToCanvasImpl(dom::NodePtr theMeasurement, dom::NodePtr th
     }
 }
 
+void 
+CTScan::renderTransferFunction(dom::NodePtr theTransferFunction, dom::NodePtr theTargetImage) {
+    if (theTransferFunction && theTargetImage) {
+        ResizeableRasterPtr myTargetRaster = dynamic_cast_Ptr<ResizeableRaster>(
+                theTargetImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
+
+        unsigned myWidth = myTargetRaster->width();
+        unsigned myHeight = myTargetRaster->height();
+        unsigned myPixelStride  = getBytesRequired(1, y60::RGBA);
+        unsigned myLineStride  = getBytesRequired(myWidth, y60::RGBA);
+        unsigned myColorCount = theTransferFunction->childNodesLength();
+        const Vector2f & myValueRange = theTransferFunction->getAttributeValue<Vector2f>("value_range");
+        Ptr<Block> myTarget(new Block(getBytesRequired(myWidth * myHeight, y60::RGBA)));
+        unsigned char * myPixels = myTarget->begin();
+        for (unsigned i = 0; i < myWidth; ++i) {
+            Vector4f myColor(0.0, 0.0, 0.0, 0.0);
+            float myAlphaSum(0.0);
+            for (unsigned j = 0; j < myColorCount; ++j) {
+                dom::NodePtr myColorNode = theTransferFunction->childNode(j);
+                float myCenter = (float(myColorNode->getAttributeValue<int>("value")) - myValueRange[0]) /
+                    (myValueRange[1] - myValueRange[0]) * myWidth;
+                float myBellWidth = float(myColorNode->getAttributeValue<int>("width") / (myValueRange[1] - myValueRange[0])) *
+                        myWidth;
+                float myAlpha = powf(asl::EULER, 1 - sqr( 6 * ( i - myCenter ) / myBellWidth )) / asl::EULER;
+                //myPixels[3] += (unsigned char)( myAlpha );
+                myColor += myColorNode->getAttributeValue<Vector4f>("color") * myAlpha;
+                myAlphaSum += myAlpha;
+            }
+
+            myColor /= myAlphaSum;
+            myPixels[0] = (unsigned char)(myColor[0] * 255);
+            myPixels[1] = (unsigned char)(myColor[1] * 255);
+            myPixels[2] = (unsigned char)(myColor[2] * 255);
+            myPixels[3] = (unsigned char)(myColor[3] * myAlphaSum * 255);
+            myPixels += myPixelStride;
+        }
+
+        for (unsigned i = 1; i < myTargetRaster->height(); ++i) {
+            //AC_WARNING << "line " << i;
+            memcpy(myTarget->begin() + i * myLineStride, myTarget->begin(), myLineStride);
+        }
+
+        y60::ImagePtr myFacade = theTargetImage->dom::Node::getFacade<y60::Image>();
+        Ptr<ReadableBlock> myPixelData = myTarget;
+        myFacade->set(myWidth, myHeight, 1, y60::RGBA, *myPixelData);
+    }
 }
+
+} // end of namespace
 

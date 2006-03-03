@@ -208,6 +208,30 @@ namespace y60 {
         return GLenum(0);
     }
 
+
+    GLenum 
+    asGLBlendEquation(const string & theBlendEquationString) {
+        if (!theBlendEquationString.empty()) {
+            BlendEquation myEquation;
+            myEquation.fromString(theBlendEquationString);
+            switch (myEquation) {
+                case EQUATION_MIN:
+                    return GL_MIN;
+                case EQUATION_MAX:
+                    return GL_MAX;
+                case EQUATION_ADD:
+                    return GL_FUNC_ADD;
+                case EQUATION_SUBTRACT:
+                    return GL_FUNC_SUBTRACT;
+                case EQUATION_REVERSE_SUBTRACT:
+                    return GL_FUNC_REVERSE_SUBTRACT;
+                default:
+                    break;
+            }
+        }
+        return GLenum(GL_FUNC_ADD);
+    }
+
     DEFINE_EXCEPTION(GLTextureUnknownInternalFormat, asl::Exception);
 
     GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat) {
@@ -573,6 +597,7 @@ namespace y60 {
 
             SET_PROC_ADDRESS( PFNGLFLUSHVERTEXARRAYRANGENVPROC, glFlushVertexArrayRangeNV );
             SET_PROC_ADDRESS( PFNGLVERTEXARRAYRANGENVPROC, glVertexArrayRangeNV );
+            SET_PROC_ADDRESS( PFNGLBLENDEQUATIONPROC, glBlendEquation );
  
             if (!(glBindBuffer && 
                 glDeleteBuffers &&
@@ -729,5 +754,32 @@ namespace y60 {
             
         }
         return myResult;
+    }
+
+    std::string
+    getGLVersionString() {
+        return string(reinterpret_cast<const char *>(glGetString(GL_VERSION)));
+    }
+
+    std::string
+    getGLVendorString() {
+        return string(reinterpret_cast<const char *>(glGetString(GL_VENDOR)));
+    }
+    std::string
+    getGLRendererString() {
+        return string(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
+    }
+
+    unsigned int
+    getGLExtensionStrings(std::vector<std::string> & theTokens) {
+        std::string myExtensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
+        string myBuffer; // Have a buffer string
+        stringstream myStream(myExtensions); // Insert the string into a stream
+        theTokens.clear();
+
+        while (myStream >> myBuffer) {
+            theTokens.push_back(myBuffer);
+        }
+        return theTokens.size();
     }
 }
