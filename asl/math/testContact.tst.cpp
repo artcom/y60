@@ -374,11 +374,11 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        //addTest(new SweptSpherePointContact<float>("float"));
-        //addTest(new SweptSpherePointContact<double>("double"));
-        //addTest(new SweptSphereEdgeContact<float>("float"));
-        //addTest(new SweptSphereEdgeContact<double>("double"));
-        addTest(new SweptSphereTriangleContact<double>("double"));
+        //addTest(new SweptSpherePointContact<float>("<float>));
+        //addTest(new SweptSpherePointContact<double>("<double>));
+        //addTest(new SweptSphereEdgeContact<float>("<float>));
+        //addTest(new SweptSphereEdgeContact<double>("<double>));
+        addTest(new SweptSphereTriangleContact<double>("<double>"));
     }
 };
 

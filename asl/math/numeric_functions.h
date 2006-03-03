@@ -70,7 +70,7 @@ bool almostEqual(double a, double b, double thePrecision = 1E-5) {
 
 inline
 float distance(float a, float b) {
-    return fabs(a - b);
+    return fabsf(a - b);
 }
 
 inline
@@ -309,6 +309,20 @@ int solveQuadratic(Number a, Number b, Number c, Number & theRoot0, Number & the
         return 1;
     }
     return 2;
+}
+
+// bi-cubic interpolation w. ease-in/ease-out
+template <class T>
+T smoothStep(T theValue, T theEaseIn = 0, T theEaseOut = 1)
+{
+    if (theValue <= theEaseIn) {
+        return 0;
+    } else if (theValue >= theEaseOut) {
+        return 1;
+    }
+
+    T myOutput = (theValue - theEaseIn) / (theEaseOut - theEaseIn);
+    return (myOutput * myOutput) * (3 - 2 * myOutput);
 }
 
 /* @} */

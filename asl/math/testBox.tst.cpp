@@ -313,8 +313,8 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
-        addTest(new BoxTest<float>("float"));
-        addTest(new BoxTest<double>("double"));
+        addTest(new BoxTest<float>("<float>"));
+        addTest(new BoxTest<double>("<double>"));
     }
 };
 
