@@ -88,6 +88,18 @@ namespace dom {
     inline bool is_printable(Char c) {
         return (c >= 0x20 && c < 0x7f);
     }
+    inline bool is_ascii(Char c) {
+        return (c <= 0x7f);
+    }
+    inline bool is_utf8_sequence_followup(Char c) {
+        return (c >= 0x80) && (c <= 0xBF);
+    }
+    inline bool is_utf8_sequence_start(Char c) {
+        return (c & 0xC0) == 0xC0;
+    }
+    inline bool is_utf8_multibyte(Char c) {
+        return is_utf8_sequence_start(c) || is_utf8_sequence_followup(c);
+    }
     inline bool is_underscore(Char c) {
         return c == '_';
     }
@@ -640,7 +652,7 @@ readSystemLiteral:
                     result+=s[i];
                 break;
             default:
-                if (is_printable(s[i]) || is_space(s[i])) {
+                if (is_printable(s[i]) || is_space(s[i]) || is_utf8_multibyte(s[i])) {
                     result+=s[i];
                 } else {
                     result.append(as_decimal_entity(s[i]));

@@ -49,7 +49,7 @@ int dom_test() {
         dom::NodePtr info = root.childNode("scene")->appendChild(dom::Element("info"));
         
         info->appendChild(dom::Element("title"));
-        info->childNode("title")->appendChild(dom::Text("Über große und kleine µ-Prozessoren"));
+        info->childNode("title")->appendChild(dom::Text("Ãœber groÃŸe und kleine Âµ-Prozessoren"));
         
         dom::NodePtr actor = info->appendChild(dom::Element("actor"));
         actor->appendChild(dom::Element("name"))->appendChild(dom::Text("Pavel"));
@@ -105,8 +105,8 @@ int dom_test2() {
 
 	std::cout << "DEBUG: dom_test2() YES!!!" << std::endl;
 
-        root("scene")("info")("title")("#text")="Über große und kleine µ-Prozessoren";
-        root("scene")("info")("title")("#text")="Über große und kleine µ-Prozessoren";
+        root("scene")("info")("title")("#text")="Ãœber groÃŸe und kleine Âµ-Prozessoren";
+        root("scene")("info")("title")("#text")="Ãœber groÃŸe und kleine Âµ-Prozessoren";
         root("scene")("info")("actor")("name")("#text")="Pavel";
         root("scene")("info")("actor")("category")("#text")="amateur";
         root("scene")("info")("model-urls")("model",0)["url"]="http://www.slashdot.org/";
@@ -161,8 +161,8 @@ int dom_test2() {
 
             TESTIF(root2("scene")["version"].nodeValue()=="1.0");
             TESTIF(root2("scene").getAttributeString("version") == "1.0");
-            TESTIF(root2("scene")("info")("title")("#text").nodeValue()=="Über große und kleine µ-Prozessoren");
-            TESTIF(root2("scene")("info")("title")("#text").nodeValue()=="Über große und kleine µ-Prozessoren");
+            TESTIF(root2("scene")("info")("title")("#text").nodeValue()=="Ãœber groÃŸe und kleine Âµ-Prozessoren");
+            TESTIF(root2("scene")("info")("title")("#text").nodeValue()=="Ãœber groÃŸe und kleine Âµ-Prozessoren");
             
             TESTIF(root2("scene")("info")("actor"));
             
