@@ -81,7 +81,7 @@ namespace asl {
         template <class T> friend
         bool almostEqual(const asl::Matrix4<T> & myMatrix1,
                          const asl::Matrix4<T> & myMatrix2,
-                         T theTolerance = 1e-5);
+                         T theTolerance);
 
         friend class Matrix4UnitTest<Number>;
 
