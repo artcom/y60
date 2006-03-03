@@ -822,7 +822,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                     return JS_FALSE;
                 case PROP_fixedFrameTime:
                     {
-                        typedef void (DERIVED::*MyMethod)(const float &);
+                        typedef void (DERIVED::*MyMethod)(const double &);
                         return Method<DERIVED>::call((MyMethod)&DERIVED::setFixedDeltaT, cx, obj, 1, vp, &dummy);
                     }
                 default:

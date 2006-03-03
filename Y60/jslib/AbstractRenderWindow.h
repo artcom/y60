@@ -190,8 +190,8 @@ namespace jslib {
          */
         void unsetCanvas();
 
-        void setFixedDeltaT(const float & theDeltaT);
-        const float & getFixedDeltaT() const;
+        void setFixedDeltaT(const double & theDeltaT);
+        const double & getFixedDeltaT() const;
 
         inline std::string getOrientation() {
             return y60::LANDSCAPE_ORIENTATION;
@@ -246,7 +246,7 @@ namespace jslib {
         void ensureScene();
 
         TimeoutQueue _myTimeoutQueue;
-        float        _myFixedDeltaT;
+        double       _myFixedDeltaT;
         double       _myStartTime;
         double       _myPauseTime;
         bool         _myPauseFlag;

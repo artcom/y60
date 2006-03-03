@@ -379,7 +379,7 @@ namespace jslib {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onFrame")) {
             MAKE_SCOPE_TIMER(onFrame_JSCallback);
             jsval argv[1], rval;
-            argv[0] = as_jsval(_myJSContext, _myElapsedTime);
+            argv[0] = as_jsval(_myJSContext, float(_myElapsedTime));         
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 1, argv, &rval);
         }
 
@@ -938,10 +938,10 @@ namespace jslib {
     }
 
     void
-    AbstractRenderWindow::setFixedDeltaT(const float & theDeltaT) {
+    AbstractRenderWindow::setFixedDeltaT(const double & theDeltaT) {
         _myFixedDeltaT = theDeltaT;
     }
-    const float &
+    const double &
     AbstractRenderWindow::getFixedDeltaT() const {
         return _myFixedDeltaT;
     }

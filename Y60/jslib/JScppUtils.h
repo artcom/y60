@@ -336,7 +336,7 @@ bool convertFrom(JSContext *cx, jsval theValue, float & theDest) {
     if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
         !JSDOUBLE_IS_NaN(myDoubleDest) )
     {
-        theDest = float(myDoubleDest);
+        theDest = (float)myDoubleDest;
         return true;
     }
     return false;
