@@ -25,13 +25,43 @@ namespace jslib {
         DOC_PARAM("thePoints", "List of four points", DOC_TYPE_VECTOROFVECTOR3F);
         DOC_END;
 
+        JSBSpline::NATIVE * myNative = 0;
+        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+            JS_ReportError(cx, "JSBSpline: self is not a BSpline");
+            return JS_FALSE;
+        }
+        
         if (argc == 1) {
-            typedef void (JSBSpline::NATIVE::*MyMethod)(const std::vector<asl::Vector3f>&);
-            return Method<JSBSpline::NATIVE>::call((MyMethod)&JSBSpline::NATIVE::setControlPoints, cx, obj, argc, argv, rval);
+            std::vector<asl::Vector3f> myPoints;
+            if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPoints)) {
+                JS_ReportError(cx, "JSBSpline: argument #1 must be a vectorofvector");
+                return JS_FALSE;
+            }
+            
+            myNative->setControlPoints(myPoints);
+            return JS_TRUE;
         } else if (argc == 4) {
-            typedef void (JSBSpline::NATIVE::*MyMethod)(const asl::Vector3f&, const asl::Vector3f&,
-                    const asl::Vector3f&, const asl::Vector3f&);
-            return Method<JSBSpline::NATIVE>::call((MyMethod)&JSBSpline::NATIVE::setControlPoints, cx, obj, argc, argv, rval);
+            asl::Vector3f myStart, myStartAnchor;
+            asl::Vector3f myEnd, myEndAnchor;
+
+            if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myStart)) {
+                JS_ReportError(cx, "JSBSpline: argument #1 must be a vector");
+                return JS_FALSE;
+            }
+            if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myStartAnchor)) {
+                JS_ReportError(cx, "JSBSpline: argument #2 must be a vector");
+                return JS_FALSE;
+            }
+            if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myEnd)) {
+                JS_ReportError(cx, "JSBSpline: argument #3 must be a vector");
+                return JS_FALSE;
+            }
+            if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], myEndAnchor)) {
+                JS_ReportError(cx, "JSBSpline: argument #4 must be a vector");
+                return JS_FALSE;
+            }
+            myNative->setControlPoints(myStart, myStartAnchor, myEnd, myEndAnchor);
+            return JS_TRUE;            
         }
 
         JS_ReportError(cx, "JSBSpline::setControlPoints: bad number of arguments: expected 1 or 4");

@@ -153,7 +153,7 @@ namespace asl {
         {
             _myResult.clear();
             for (unsigned i = 0; i <= theResolution; ++i) {
-                _myResult.push_back(evaluate(i / (double) theResolution, theEaseIn, theEaseOut));
+                _myResult.push_back(evaluate(i / T(theResolution), theEaseIn, theEaseOut));
             }
 
             return _myResult;
@@ -185,19 +185,19 @@ namespace asl {
         }
 
         // get segment length
-        double getSegmentLength(double theLeft, double theRight,
+        T getSegmentLength(T theLeft, T theRight,
                                 Vector3<T> theLeftPoint, Vector3<T> theRightPoint,
                                 T theChordLength)
         {
             const double MAX_ERROR = 0.01;
 
-            double myCenter = 0.5 * (theLeft + theRight);
+            T myCenter = T(0.5) * (theLeft + theRight);
             Vector3<T> myCenterPoint = getValue(myCenter);
 
-            double myLeftLen = distance(theLeftPoint, myCenterPoint);
-            double myRightLen = distance(theRightPoint, myCenterPoint);
+            T myLeftLen = distance(theLeftPoint, myCenterPoint);
+            T myRightLen = distance(theRightPoint, myCenterPoint);
 
-            double myError = ((myLeftLen + myRightLen) - theChordLength) / theChordLength;
+            T myError = ((myLeftLen + myRightLen) - theChordLength) / theChordLength;
             if (myError > MAX_ERROR) {
                 myLeftLen = getSegmentLength(theLeft, myCenter, theLeftPoint, myCenterPoint, myLeftLen);
                 myRightLen = getSegmentLength(myCenter, theRight, myCenterPoint, theRightPoint, myRightLen);
