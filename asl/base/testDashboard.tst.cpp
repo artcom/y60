@@ -49,8 +49,8 @@ public:
             NanoTime myTime = runTimer->getElapsed();
             for (int i = 0; i < 5; ++i) {
                 msleep(1);
-                NanoTime myNewTime = runTimer->getElapsed().ticks();
-                DPRINT(myNewTime.ticks());
+                NanoTime myNewTime = runTimer->getElapsed();
+                DPRINT(myNewTime.ticks());                
                 ENSURE(myNewTime.ticks() > myTime.ticks());
                 myTime = myNewTime;
                 runCounter->count();
