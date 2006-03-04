@@ -30,7 +30,7 @@ TestLocale.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-        obj.myLocale = new Locale("German");
+        obj.myLocale = new Locale("german");
         DPRINT('obj.myLocale');
         DPRINT('obj.myLocale.formatFloat(2.5)');
         DPRINT('obj.myLocale.parseFloat("not-a-number")');
