@@ -100,6 +100,14 @@ namespace asl {
         if (myDirName.empty()) {
             myDirName = "./";
         }
+        
+        // Remove trailing double slashes
+        if (myDirName.length() > 1 &&
+            myDirName.at(myDirName.length()-1) == '/' && 
+            myDirName.at(myDirName.length()-2) == '/') 
+        {
+            myDirName.resize(myDirName.length() - 1);
+        }
 #else
         std::string myDirName;
         if (! myPath.empty() ) {
