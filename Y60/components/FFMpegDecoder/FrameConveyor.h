@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: FrameConveyor.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/01 10:12:21 $
-//
-//  ffmpeg movie decoder.
-//
-//=============================================================================
 
 #ifndef _ac_y60_FrameConveyor_h_
 #define _ac_y60_FrameConveyor_h_
@@ -83,9 +74,6 @@ namespace y60 {
              *  Returns the timestamp of the decoded frame or -1 if EOF was met.
              **/
             void decodeFrame(double & theLastDecodedVideoTime, bool & theEndOfFileFlag);
-
-            /// Convert frame vom YUV to RGB
-            void convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer);
 
             /// Copy raster to raster
             void copyFrame(unsigned char * theSourceBuffer, 

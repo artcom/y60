@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//    $RCSfile: FFMpegDecoder.cpp,v $
-//     $Author: ulrich $
-//   $Revision: 1.6 $
-//       $Date: 2005/04/01 17:03:27 $
-//
-//  ffmpeg movie decoder.
-//
-//=============================================================================
 
 /*
     This decoder tries to combine the advantages of FFMpegDecoder1 and FFMpegDecoder2.    
@@ -78,13 +69,9 @@ namespace y60 {
 
     FFMpegDecoder::FFMpegDecoder(asl::DLHandle theDLHandle) :
         PlugInBase(theDLHandle)
-    {
-        AC_DEBUG << "FFMpegDecoder::FFMpegDecoder";
-    }
+    {}
 
-    FFMpegDecoder::~FFMpegDecoder() {
-        AC_DEBUG << "FFMpegDecoder::~FFMpegDecoder";
-    }
+    FFMpegDecoder::~FFMpegDecoder() {}
 
     std::string
     FFMpegDecoder::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
@@ -102,25 +89,22 @@ namespace y60 {
     double 
     FFMpegDecoder::getMovieTime(double theSystemTime) {
         if (_myFrameConveyor.hasAudio()) {
-            return _myFrameConveyor.getAudioTime() +
-                getMovie()->get<AVDelayTag>();
+            return _myFrameConveyor.getAudioTime() + getMovie()->get<AVDelayTag>();
         } else {
-            DB(cerr << "sys: " << theSystemTime << " mov " << 
-                    MovieDecoderBase::getMovieTime(theSystemTime) << endl;)
             return MovieDecoderBase::getMovieTime(theSystemTime);
         }
     }
 
     void 
     FFMpegDecoder::resumeMovie(double theStartTime) {
-        DB(cerr << "FFMpegDecoder::resumeMovie " << endl;)
+        AC_DEBUG << "FFMpegDecoder::resumeMovie() at time: " << theStartTime;
         MovieDecoderBase::resumeMovie(theStartTime);        
         _myFrameConveyor.playAudio();
     }
 
     void 
     FFMpegDecoder::startMovie(double theStartTime) {
-        DB(cerr << "FFMpegDecoder::startMovie " << endl;)
+        AC_DEBUG << "FFMpegDecoder::startMovie() at time " << theStartTime;
         MovieDecoderBase::startMovie(theStartTime);
 
         //XXX should preload do nothing when no audio ?
@@ -130,35 +114,25 @@ namespace y60 {
 
     void 
     FFMpegDecoder::stopMovie() {
-        DB(cerr << "FFMpegDecoder::stopMovie " << endl;)
+        AC_DEBUG << "FFMpegDecoder::stopMovie()";
         MovieDecoderBase::stopMovie();        
         _myFrameConveyor.stopAudio();
     }
 
     void 
     FFMpegDecoder::pauseMovie() {
-        DB(cerr << "FFMpegDecoder::pauseMovie " << endl;)
+        AC_DEBUG << "FFMpegDecoder::pauseMovie()";
         MovieDecoderBase::pauseMovie();
         _myFrameConveyor.pauseAudio();
     }
 
     void
     FFMpegDecoder::load(const std::string & theFilename) {        
-        DB(cerr << "FFMpegDecoder::load " << theFilename << endl;)
-        DecoderContextPtr myContext = DecoderContextPtr(new DecoderContext(theFilename,MovieDecoderBasePtr(this)));
+        AC_DEBUG << "FFMpegDecoder::load " << theFilename;
+        DecoderContextPtr myContext = DecoderContextPtr(new DecoderContext(theFilename));
         setupMovie(myContext);
         _myFrameConveyor.setContext(myContext);
         _myFrameConveyor.setupAudio(getMovie()->get<AudioTag>());
-    }
-
-    void
-    FFMpegDecoder::setDestPixelFormat(PixelEncoding thePixelFormat) {
-        getMovie()->set<ImagePixelFormatTag>(asl::getStringFromEnum(thePixelFormat, PixelEncodingString));
-    }
-
-    PixelEncoding
-    FFMpegDecoder::getDestPixelFormat() {
-        return y60::PixelEncoding(getMovie()->getPixelEncoding());
     }
 
     void
@@ -166,11 +140,10 @@ namespace y60 {
         AVStream * myVideoStream = theContext->getVideoStream();
         if (myVideoStream) {
             Movie * myMovie = getMovie();
-            //myMovie->setPixelEncoding(getPixelEncoding(myVideoStream));            
             myMovie->set<ImageWidthTag>(myVideoStream->codec.width);
             myMovie->set<ImageHeightTag>(myVideoStream->codec.height);
 
-            // Setup size and image matrix
+            // Setup image matrix
             float myXResize = float(myVideoStream->codec.width) 
                     / asl::nextPowerOfTwo(myVideoStream->codec.width);
             float myYResize = float(myVideoStream->codec.height) 
@@ -179,37 +152,69 @@ namespace y60 {
             asl::Matrix4f myMatrix;
             myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
             myMovie->set<ImageMatrixTag>(myMatrix); 
-            double myFPS = theContext->getFrameRate();
-            myMovie->set<FrameRateTag>(myFPS);
+
+            myMovie->set<FrameRateTag>(theContext->getFrameRate());
 
             // Durations are mostly wrong in mpeg files, so we just do not use them to avoid looping errors
             myMovie->set<FrameCountTag>(INT_MAX);
 
-            AC_INFO << "url='" << getMovie()->get<ImageSourceTag>() << "' fps=" << myFPS << " framecount=" << getFrameCount();            
+            // Setup most performant pixelencoding
+            // TODO: Find out, if these encodings really imporve performance.
+            PixelEncoding myPixelEncoding = myMovie->getPixelEncoding();
+            switch (myPixelEncoding) {
+                case y60::BGRA:
+                    // Switch to more performant RGBA
+                    myMovie->setPixelEncoding(y60::RGBA);
+                    break;
+                case y60::RGB:                
+                    // Switch to more performant BGR
+                    myMovie->setPixelEncoding(y60::BGR);                        
+                    break;
+                case y60::RGBA:
+                case y60::BGR:
+                case y60::ALPHA:
+                case y60::GRAY:
+                    // Do nothing
+                    break;
+                default:
+                    // Use pixel encoding of the stream
+                    myMovie->setPixelEncoding(getPixelEncoding(myVideoStream)); 
+                    break;
+            }
+
+            // Tell the context which encoding to use
+            theContext->setTargetPixelEncoding(myMovie->getPixelEncoding());
+
+            AC_INFO << "url: " << getMovie()->get<ImageSourceTag>() 
+                    << " fps: " << theContext->getFrameRate() 
+                    << " framecount: " << getFrameCount() 
+                    << " stream encoding: " << getPixelEncodingInfo(myVideoStream) 
+                    << " destination encoding: " << getMovie()->get<ImagePixelFormatTag>();      
         } else {
-            AC_INFO << "FFMpegDecoder::load " << getMovie()->get<ImageSourceTag>() << " no video stream found";
+            AC_WARNING << "FFMpegDecoder::load " << getMovie()->get<ImageSourceTag>() << " no video stream found";
         }
     }
 
     double
-    FFMpegDecoder::readFrame(double theTime, unsigned theFrame,
-            dom::ResizeableRasterPtr theTargetRaster) {
-        AC_TRACE << "readFrame at : " << theTime << " system time " << asl::Time();
+    FFMpegDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+        AC_TRACE << "FFMpegDecoder::readFrame() at: " << theTime << " system time: " << asl::Time();
         if (theTime >= _myFrameConveyor.getEndOfFileTimestamp()) {
             setEOF(true);
             return theTime;
         }
 
         double myDecodedFrameTime = _myFrameConveyor.getFrame(theTime, theTargetRaster);
+
+        // The user can change the movie volue any time, so we need to poll it.
         _myFrameConveyor.setVolume(getMovie()->get<VolumeTag>());
         
         // In case we reached the end of file while decoding we can now correctly set the 
-        // frame rate
+        // frame count
         if (_myFrameConveyor.getEndOfFileTimestamp() != DBL_MAX) {
             getMovie()->set<FrameCountTag>((unsigned)(_myFrameConveyor.getEndOfFileTimestamp() 
                         * getMovie()->get<FrameRateTag>()));
         }
-        AC_TRACE << "readFrame returns " << myDecodedFrameTime;
+        AC_TRACE << "readFrame returns decoded frame time: " << myDecodedFrameTime;
         return myDecodedFrameTime;
     }
 }

@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: FFMpegDecoder.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/01 10:12:21 $
-//
-//  ffmpeg movie decoder.
-//
-//=============================================================================
 
 #ifndef _ac_y60_DecoderContext_h_
 #define _ac_y60_DecoderContext_h_
@@ -33,7 +24,7 @@ namespace y60 {
     
     class DecoderContext {
         public:
-            DecoderContext(const std::string & theFilename, MovieDecoderBasePtr theDecoder);
+            DecoderContext(const std::string & theFilename);
             ~DecoderContext();
 
             bool decodeVideo(AVFrame * theVideoFrame);
@@ -59,17 +50,19 @@ namespace y60 {
                 _myEndOfFileTimestamp = theTime;
             }
 
-            unsigned getWidth(); 
-            unsigned getHeight();
-            
-            void setDestPixelFormat(PixelEncoding thePixelFormat);
-            PixelEncoding getDestPixelFormat();
-            PixelFormat getPixelFormat();             
-            double getFrameRate();
+            unsigned getWidth() const; 
+            unsigned getHeight() const;
+            double getFrameRate() const;
 
-            unsigned getNumAudioChannels() const;
+            void setTargetPixelEncoding(PixelEncoding thePixelEncoding);
+            unsigned getBytesPerPixel() const;
+
+            unsigned getAudioCannelCount() const;
             void disableAudio();
             
+            /// Convert frame vom YUV to target format
+            void convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer);
+
         private:
             long long advance() const;
 
@@ -81,16 +74,17 @@ namespace y60 {
             int               _myAudioStreamIndex;
             std::string       _myFilename;
             double            _myEndOfFileTimestamp;
-            MovieDecoderBasePtr _myDecoder;
+            int               _myDestinationFormat;
+
             // Demuxing and packet-level buffering support.
-            AVPacket* getPacket(bool theGetVideo);
+            AVPacket * getPacket(bool theGetVideo);
             void clearPacketCache();
             
             typedef std::list<AVPacket *> PacketList;
             PacketList _myAudioPackets;
             PacketList _myVideoPackets;
 
-            AVPacket * _myCurAudioPacket;
+            AVPacket * _myCurrentAudioPacket;
             int _myCurPosInAudioPacket;
 
             bool _myAudioEnabled;

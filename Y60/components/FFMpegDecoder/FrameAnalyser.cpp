@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//    $RCSfile: FrameAnalyser.cpp,v $
-//     $Author: ulrich $
-//   $Revision: 1.6 $
-//       $Date: 2005/04/01 17:03:27 $
-//
-//  ffmpeg movie decoder.
-//
-//=============================================================================
 
 #include "FrameAnalyser.h"
 

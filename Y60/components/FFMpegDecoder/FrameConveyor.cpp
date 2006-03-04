@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//    $RCSfile: FrameConveyor.cpp,v $
-//     $Author: ulrich $
-//   $Revision: 1.6 $
-//       $Date: 2005/04/01 17:03:27 $
-//
-//  ffmpeg movie decoder.
-//
-//=============================================================================
 
 #include "FrameConveyor.h"
 #include "VideoFrame.h"
@@ -256,8 +247,8 @@ namespace y60 {
             while (!myEndOfFileFlag && myLastDecodedAudioTime < theEndTime ) {
                 myEndOfFileFlag = _myContext->decodeAudio(&_myAudioFrame);
                 if (!myEndOfFileFlag) {
-                    int numFrames = _myAudioFrame.getSizeInBytes()
-                            /(getBytesPerSample(SF_S16)*_myContext->getNumAudioChannels());
+                    int numFrames = _myAudioFrame.getSizeInBytes() /
+                        (getBytesPerSample(SF_S16) * _myContext->getAudioCannelCount());
                     AudioBufferPtr myBuffer;
                     if (_myResampleContext) {
                         DB2(cerr << "Resampling" << endl;)
@@ -267,11 +258,11 @@ namespace y60 {
                             numFrames);
                         myBuffer = Pump::get().createBuffer(numFrames);
                         myBuffer->convert(_myResampledSamples.begin(), SF_S16, 
-                                _myContext->getNumAudioChannels());
+                                _myContext->getAudioCannelCount());
                     } else {   
                         myBuffer = Pump::get().createBuffer(numFrames);
                         myBuffer->convert(_myAudioFrame.getSamples(), SF_S16, 
-                            _myContext->getNumAudioChannels());
+                            _myContext->getAudioCannelCount());
                     }
                     _myAudioSink->queueSamples(myBuffer);
                     myLastDecodedAudioTime = _myAudioFrame.getTimestamp();
@@ -285,13 +276,12 @@ namespace y60 {
             _myContext->setEndOfFileTimestamp(myLastDecodedVideoTime);  
         }
         DB2(
-                cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
-                cerr << "  current time: " << myLastDecodedVideoTime << endl;
-                if (_myAudioSink) {
-                cerr << "  A-Buffersize in secs: " << (_myAudioSink->getBufferedTime())
-                <<endl;
-                }
-           )
+            cerr << "  V-Buffersize: " << _myFrameCache.size() << endl;
+            cerr << "  current time: " << myLastDecodedVideoTime << endl;
+            if (_myAudioSink) {
+                cerr << "  A-Buffersize in secs: " << (_myAudioSink->getBufferedTime()) << endl;
+            }
+        )
     }
 
     double
@@ -321,20 +311,19 @@ namespace y60 {
         } else {
             myFrame = myPreviousFrameIt->second;
         }
-/*
+
         DB(
             cerr << "getFrame: " << theTimestamp << "the system time " << asl::Time() << endl;
             cerr << "    previous/next:     " << myPreviousFrameIt->first << " / " << myNextFrameIt->first << endl;
             cerr << "   using frame: " << myFrame->getTimestamp() << endl;
         )
-*/
+
         copyFrame(myFrame->getData()->begin(), theTargetRaster);
         return myFrame->getTimestamp();
     }
 
     void
-    FrameConveyor::decodeFrame(double & theLastDecodedVideoTime, bool & theEndOfFileFlag) 
-    {
+    FrameConveyor::decodeFrame(double & theLastDecodedVideoTime, bool & theEndOfFileFlag) {
         DB2(cerr << "decodeFrame" << endl;)
         if (!_myContext) {
             throw FrameConveyorException(std::string("No decoding context set, yet."),
@@ -343,61 +332,15 @@ namespace y60 {
 
         theEndOfFileFlag = _myContext->decodeVideo(_myVideoFrame);
         if ( ! theEndOfFileFlag) {
-            unsigned myBPP = getBytesRequired(1, _myContext->getDestPixelFormat());
             VideoFramePtr myNewFrame = VideoFramePtr(new VideoFrame(_myContext->getWidth(),
-                    _myContext->getHeight(), myBPP));
+                    _myContext->getHeight(), _myContext->getBytesPerPixel()));
 
-            convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
+            _myContext->convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
             myNewFrame->setTimestamp(_myVideoFrame->pts / (double)AV_TIME_BASE);
             _myFrameCache[myNewFrame->getTimestamp()] = myNewFrame;
             theLastDecodedVideoTime = myNewFrame->getTimestamp();
         }
         DB2(cerr << "decodeFrame decoded " << theLastDecodedVideoTime << endl;)
-    }
-
-    void 
-    FrameConveyor::convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer) {
-        if (!_myContext || !theFrame) {
-            AC_ERROR << "FFMpegDecoder::decodeVideoFrame no context or invalid frame";
-            return;
-        }
-
-        unsigned int myLineSizeBytes = getBytesRequired(_myContext->getWidth(), 
-                _myContext->getDestPixelFormat());
-        AVPicture myDestPict;
-        myDestPict.data[0] = theTargetBuffer;
-        myDestPict.data[1] = theTargetBuffer + 1;
-        myDestPict.data[2] = theTargetBuffer + 2;
-
-        myDestPict.linesize[0] = myLineSizeBytes;
-        myDestPict.linesize[1] = myLineSizeBytes;
-        myDestPict.linesize[2] = myLineSizeBytes;
-
-        // pixelformat stuff
-        int myDestFmt;
-        switch (_myContext->getDestPixelFormat()) {
-        case y60::RGBA:
-        case y60::BGRA:
-            AC_TRACE << "Using RGBA pixels";
-            _myContext->setDestPixelFormat(y60::RGBA);
-            myDestFmt = PIX_FMT_RGBA32;
-            break;
-        case y60::ALPHA:
-        case y60::GRAY:
-            AC_TRACE << "Using GRAY pixels";
-            myDestFmt = PIX_FMT_GRAY8;
-            break;
-        case y60::RGB:
-        case y60::BGR:
-        default:
-            AC_TRACE << "Using BGR pixels";
-            myDestFmt = PIX_FMT_BGR24;
-            _myContext->setDestPixelFormat(y60::BGR);
-            break;
-        }
-
-        img_convert(&myDestPict, myDestFmt, (AVPicture*)theFrame, _myContext->getPixelFormat(),
-                    _myContext->getWidth(), _myContext->getHeight());
     }
 
     void 
@@ -413,7 +356,8 @@ namespace y60 {
         return _myContext->getEndOfFileTimestamp();
     }
     
-    void FrameConveyor::setupAudio(bool theUseAudioFlag) {
+    void 
+    FrameConveyor::setupAudio(bool theUseAudioFlag) {
         AVStream * myAudioStream = _myContext->getAudioStream();
         if (myAudioStream && theUseAudioFlag) {
             AVCodec * myCodec = avcodec_find_decoder(myAudioStream->codec.codec_id);
@@ -446,28 +390,33 @@ namespace y60 {
         
     }
     
-    void FrameConveyor::playAudio() {
+    void 
+    FrameConveyor::playAudio() {
         if (_myAudioSink) {            
             _myAudioSink->play();
         }        
     }
-    void FrameConveyor::stopAudio() {
+    void 
+    FrameConveyor::stopAudio() {
         if (_myAudioSink) {            
             _myAudioSink->stop();
         }        
     }
-    void FrameConveyor::pauseAudio() {
+    void 
+    FrameConveyor::pauseAudio() {
         if (_myAudioSink) {            
             _myAudioSink->pause();
         }        
     }
-    void FrameConveyor::setVolume(double theVolume) {
+    void 
+    FrameConveyor::setVolume(double theVolume) {
         if (_myAudioSink) {
             _myAudioSink->setVolume(float(theVolume));
         }
     }
             
-    void FrameConveyor::initResample(int theNumInputChannels, int theInputSampleRate) {
+    void 
+    FrameConveyor::initResample(int theNumInputChannels, int theInputSampleRate) {
         // TODO: Convert num. of channels here?
         if (theInputSampleRate != Pump::get().getNativeSampleRate()) {
             _myResampleContext = audio_resample_init(theNumInputChannels, theNumInputChannels,

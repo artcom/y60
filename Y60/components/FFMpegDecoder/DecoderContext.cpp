@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: FFMpegDecoder.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/01 10:12:21 $
-//
-//  ffmpeg movie decoder.
-//
-//=============================================================================
 
 #include "DecoderContext.h"
 #include "FFMpegDecoder.h"
@@ -45,17 +36,18 @@ using namespace asl;
 
 namespace y60 {
 
-    DecoderContext::DecoderContext(const std::string & theFilename, MovieDecoderBasePtr theDecoder) : 
+    DecoderContext::DecoderContext(const std::string & theFilename) : 
         _myVideoStream(0),
         _myAudioStream(0),
         _myVideoStreamIndex(-1),
         _myAudioStreamIndex(-1),
         _myEndOfFileTimestamp(DBL_MAX),
         _myFilename(theFilename),
-        _myCurAudioPacket(0),
+        _myCurrentAudioPacket(0),
         _myCurPosInAudioPacket(0),
         _myAudioEnabled(true),
-        _myDecoder(theDecoder)
+        _myDestinationFormat(PIX_FMT_BGR24)
+
     {
         AC_DEBUG << "DecoderContext::DecoderContext";
         // register all formats and codecs
@@ -117,7 +109,6 @@ namespace y60 {
     }
 
     DecoderContext::~DecoderContext() {
-        AC_DEBUG << "DecoderContext::~DecoderContext";
         if (_myAudioStream && _myAudioEnabled) {
             AC_DEBUG << "  Closing audio";
             avcodec_close(&_myAudioStream->codec);
@@ -136,27 +127,43 @@ namespace y60 {
     }
 
     void
-    DecoderContext::setDestPixelFormat(PixelEncoding thePixelFormat) {
-        dynamic_cast_Ptr<FFMpegDecoder>(_myDecoder)->setDestPixelFormat(thePixelFormat);
-    }
-
-    PixelEncoding
-    DecoderContext::getDestPixelFormat() {
-        return dynamic_cast_Ptr<FFMpegDecoder>(_myDecoder)->getDestPixelFormat();
-    }
-
-    PixelFormat
-    DecoderContext::getPixelFormat() {
-        if (_myVideoStream) {
-            return _myVideoStream->codec.pix_fmt;
-        } else {
-            return PIX_FMT_NB;
+    DecoderContext::setTargetPixelEncoding(PixelEncoding thePixelEncoding) {
+        switch (thePixelEncoding) {
+            case y60::RGBA:
+            case y60::BGRA:
+                _myDestinationFormat = PIX_FMT_RGBA32;
+                break;
+            case y60::ALPHA:
+            case y60::GRAY:
+                _myDestinationFormat = PIX_FMT_GRAY8;
+                break;
+            case y60::RGB:
+            case y60::BGR:
+            default:
+                _myDestinationFormat = PIX_FMT_BGR24;
+                break;
         }
     }
-    unsigned DecoderContext::getWidth() {
+
+    unsigned
+    DecoderContext::getBytesPerPixel() const {
+        switch (_myDestinationFormat) {
+            case PIX_FMT_GRAY8:
+                return 1;
+            case PIX_FMT_BGR24:
+                return 3;
+            case PIX_FMT_RGBA32:
+                return 4;
+            default:
+                throw FFMpegDecoderException(std::string("Unknown bytes per pixel for destination format: ") + 
+                     as_string(_myDestinationFormat), PLUS_FILE_LINE);
+        }
+    }
+
+    unsigned DecoderContext::getWidth() const {
         return _myVideoStream->codec.width;
     }
-    unsigned DecoderContext::getHeight() {
+    unsigned DecoderContext::getHeight() const {
         return _myVideoStream->codec.height;
     }
 
@@ -164,7 +171,6 @@ namespace y60 {
     DecoderContext::decodeVideo(AVFrame * theVideoFrame) {
         DB(cerr << "decodeVideo" << endl;)
         AVPacket * myPacket;
-        //memset(&myPacket, 0, sizeof(myPacket));
  
         int64_t myStartTime = 0;
         if (_myVideoStream->start_time != AV_NOPTS_VALUE) {
@@ -190,7 +196,8 @@ namespace y60 {
                 }                
 
                 if (myFrameCompleteFlag) {
-                    /// XXX is it ok to just copy a dts to a pts? - uz
+                    // The presenation timestamp is not always set by ffmpeg, so we calculate
+                    // it ourself. ffplay uses the same technique.
                     theVideoFrame->pts = myPacket->dts - myStartTime;
                     break;
                 }                 
@@ -210,10 +217,10 @@ namespace y60 {
         if (_myVideoStream->start_time != AV_NOPTS_VALUE) {
             myStartTime = _myVideoStream->start_time;
         } 
-        if (!_myCurAudioPacket) {
-            _myCurAudioPacket = getPacket(false);
+        if (!_myCurrentAudioPacket) {
+            _myCurrentAudioPacket = getPacket(false);
         }
-        if (!_myCurAudioPacket) {
+        if (!_myCurrentAudioPacket) {
             DB(cerr << "Audio: eof" << endl;)
             return true;
         }
@@ -221,21 +228,21 @@ namespace y60 {
         int myFrameSize = -1;
         int64_t myPacketTime;
         while (myFrameSize < 0) {
-            uint8_t* myCurReadPtr = _myCurAudioPacket->data+_myCurPosInAudioPacket;
-            int myDataLeftInPacket = _myCurAudioPacket->size-_myCurPosInAudioPacket;
+            uint8_t* myCurReadPtr = _myCurrentAudioPacket->data+_myCurPosInAudioPacket;
+            int myDataLeftInPacket = _myCurrentAudioPacket->size-_myCurPosInAudioPacket;
             int myBytesDecoded = avcodec_decode_audio(&_myAudioStream->codec,
                     (int16_t*)(theAudioFrame->getSamples()), &myFrameSize,
                     myCurReadPtr, myDataLeftInPacket);
-            myPacketTime = _myCurAudioPacket->dts;
+            myPacketTime = _myCurrentAudioPacket->dts;
             if (myBytesDecoded < 0) {
                 AC_WARNING << "av_decode_audio error";
             }
             _myCurPosInAudioPacket += myBytesDecoded;
-            if (myBytesDecoded < 0 || _myCurPosInAudioPacket >= _myCurAudioPacket->size) {
-                av_free_packet(_myCurAudioPacket);
-                delete _myCurAudioPacket;
-                _myCurAudioPacket = getPacket(false);
-                if (!_myCurAudioPacket) {
+            if (myBytesDecoded < 0 || _myCurPosInAudioPacket >= _myCurrentAudioPacket->size) {
+                av_free_packet(_myCurrentAudioPacket);
+                delete _myCurrentAudioPacket;
+                _myCurrentAudioPacket = getPacket(false);
+                if (!_myCurrentAudioPacket) {
                     DB(cerr << "Audio: eof" << endl;)
                         return true;
                 }
@@ -332,7 +339,7 @@ namespace y60 {
     }
 
     double
-    DecoderContext::getFrameRate() {
+    DecoderContext::getFrameRate() const {
         double myFPS = _myVideoStream->codec.frame_rate / (double) _myVideoStream->codec.frame_rate_base;
         if (myFPS > 1000.0f) {
             myFPS /= 1000.0f;
@@ -341,7 +348,8 @@ namespace y60 {
         return myFPS;
     }
 
-    unsigned DecoderContext::getNumAudioChannels() const {
+    unsigned 
+    DecoderContext::getAudioCannelCount() const {
         if (_myAudioStream) {
             return _myAudioStream->codec.channels;
         } else {
@@ -349,12 +357,13 @@ namespace y60 {
         }
     }
 
-    void DecoderContext::disableAudio() {
+    void 
+    DecoderContext::disableAudio() {
         _myAudioEnabled = false;
     }
 
-    AVPacket* DecoderContext::getPacket(bool theGetVideo) 
-    {
+    AVPacket * 
+    DecoderContext::getPacket(bool theGetVideo) {
         int myStreamIndex;
         int myOtherStreamIndex;
         PacketList* myPacketList;
@@ -397,7 +406,8 @@ namespace y60 {
         }
     }
     
-    void DecoderContext::clearPacketCache() {
+    void 
+    DecoderContext::clearPacketCache() {
         list<AVPacket*>::iterator it;
         for (it=_myVideoPackets.begin(); it != _myVideoPackets.end(); ++it) {
             av_free_packet(*it);
@@ -409,12 +419,33 @@ namespace y60 {
             delete *it;
         }
         _myAudioPackets.clear();
-        if (_myCurAudioPacket) {
-            av_free_packet(_myCurAudioPacket);
-            delete _myCurAudioPacket;
-            _myCurAudioPacket = 0;
+        if (_myCurrentAudioPacket) {
+            av_free_packet(_myCurrentAudioPacket);
+            delete _myCurrentAudioPacket;
+            _myCurrentAudioPacket = 0;
             _myCurPosInAudioPacket = 0;
         }
+    }
+
+    void 
+    DecoderContext::convertFrame(AVFrame * theFrame, unsigned char * theTargetBuffer) {
+        if (!theFrame) {
+            AC_ERROR << "DecoderContext::convertFrame() - Invalid frame";
+            return;
+        }
+
+        unsigned int myLineSizeBytes = _myVideoStream->codec.width * getBytesPerPixel();
+        AVPicture myDestPict;
+        myDestPict.data[0] = theTargetBuffer;
+        myDestPict.data[1] = theTargetBuffer + 1;
+        myDestPict.data[2] = theTargetBuffer + 2;
+
+        myDestPict.linesize[0] = myLineSizeBytes;
+        myDestPict.linesize[1] = myLineSizeBytes;
+        myDestPict.linesize[2] = myLineSizeBytes;
+
+        img_convert(&myDestPict, _myDestinationFormat, (AVPicture*)theFrame, _myVideoStream->codec.pix_fmt,
+                    _myVideoStream->codec.width, _myVideoStream->codec.height);
     }
 }
 

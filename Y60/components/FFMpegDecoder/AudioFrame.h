@@ -7,13 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: AudioFrame.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/01 10:12:21 $
-//
-//=============================================================================
 
 #ifndef _ac_y60_AudioFrame_h_
 #define _ac_y60_AudioFrame_h_

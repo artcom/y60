@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: FFMpegDecoder.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/01 10:12:21 $
-//
-//  ffmpeg movie decoder.
-//
-//=============================================================================
 
 #ifndef _ac_y60_FFMpegDecoder_h_
 #define _ac_y60_FFMpegDecoder_h_
@@ -68,17 +59,11 @@ namespace y60 {
             
             const char * getName() const { return "y60FFMpegDecoder"; }
 
-            void setDestPixelFormat(PixelEncoding thePixelFormat);
-            PixelEncoding getDestPixelFormat();
-
         private:
             void setupMovie(asl::Ptr<DecoderContext> theContext);
 
-            FrameConveyor               _myFrameConveyor;
-
+            FrameConveyor _myFrameConveyor;
     };
-
-    typedef asl::Ptr<FFMpegDecoder> FFMpegDecoderPtr;
 }
 
 #endif
