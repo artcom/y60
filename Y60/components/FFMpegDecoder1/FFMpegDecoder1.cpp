@@ -205,6 +205,9 @@ namespace y60 {
         }
 
         // seek to start
+        // [jb] If the resulting delay is not caused now,
+        // [jb] it would unfortunately be caused when the first seek occures!
+        // [jb] The cause for the delay is FFMpeg, that caches/hashes something for the entire movie.
 #if (LIBAVCODEC_BUILD < 4738)
         int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp);
 #else
@@ -325,8 +328,11 @@ namespace y60 {
                 if (frameFinished == 0) {
                     continue;
                 }
-// highly experimental (vs/uh)
-#if 1
+// highly experimental... (vs/uh)
+// [js] ... does not work with movies that only PARTIALLY contain correct PTS values!
+// [js] For those movies "_myLastVideoTimestamp += myTimePerFrame" would do.
+// [js] But NOT when seeking (and that's what we are here for, in FFMpegDecoderONE)!!!
+#if 0
                 if (myPacket.pts == AV_NOPTS_VALUE) {
                     _myLastVideoTimestamp += myTimePerFrame;
                 } else {
