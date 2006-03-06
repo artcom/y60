@@ -39,15 +39,26 @@ namespace y60 {
         AC_DEBUG << "getMovieTime start: _myMovieTime: " << _myMovieTime 
                 << ", theSystemTime: " << theSystemTime << ", _myLastSystemTime: " 
                 << _myLastSystemTime;
-        if (theSystemTime == _myLastSystemTime) {
+        if (theSystemTime <= _myLastSystemTime) {
             return _myMovieTime;
         }
         float myPlaySpeed = _myMovie->get<PlaySpeedTag>();
         if (_myLastSystemTime >= 0) {
             _myMovieTime += (theSystemTime - _myLastSystemTime) * myPlaySpeed;
-            double myIncrement = getFrameCount() / getFrameRate();
-            while (_myMovieTime < 0) {
-                _myMovieTime += myIncrement;
+            
+            // Calculate the wraparaound for reverse playback
+            if (_myMovieTime < 0) {
+                unsigned myFrameCount = getFrameCount();
+                if (myFrameCount == INT_MAX || myFrameCount == 0) {
+                    AC_WARNING << "Movie cannot play backwards, because its framecount is unknown (framecount=" 
+                               << myFrameCount << ")";   
+                    _myMovieTime = 0;                              
+                } else {
+                    double myIncrement = getFrameCount() / getFrameRate();
+                    while (_myMovieTime < 0) {
+                        _myMovieTime += myIncrement;
+                    }
+                }
             }
         }
         _myLastSystemTime = theSystemTime;
