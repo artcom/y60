@@ -152,7 +152,6 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
         var myMaterial = buildUnlitTextureMaterialNode(myFontName + "_material", myFontImage.id);
         addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
-        myMaterial.writedepthbuffer = false;
         myMaterial.transparent = true;
         theSceneViewer.getMaterials().appendChild(myMaterial);
 

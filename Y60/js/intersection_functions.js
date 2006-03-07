@@ -87,6 +87,7 @@ function findNearestCollision(theCollisions, theReferencePoint) {
 // it may be a LineSegment or a Ray
 function nearestIntersection(theRootNode, myLineSegment) {
     var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment);
+    
     if (myIntersectionInfo) {
         return findNearestIntersection(myIntersectionInfo, myLineSegment.origin);
     }

@@ -20,7 +20,6 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
     self.getLength = function() {
         return _myText.length;
     }
-
     self.getShape = function() {
         return _myShape;
     }
@@ -187,6 +186,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         theSceneViewer.getShapes().appendChild(_myShape);
 
         _myBody = buildBodyNode(myName, _myShape.id);
+        _myBody.insensible = true;
         theSceneViewer.getWorld().appendChild(_myBody);
     }
 
