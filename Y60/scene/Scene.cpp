@@ -957,6 +957,7 @@ namespace y60 {
         bool isInsensible = myTransform->TransformHierarchyFacade::get<y60::InsensibleTag>();
         Box3f myBoundingBox = myTransform->TransformHierarchyFacade::get<BoundingBoxTag>();
         if (theVisitor.hitBoundingBox(myBoundingBox, isInsensible)) {
+            //AC_WARNING << "hit BB " << myTransform->get<NameTag>();
             // check bounding box hierarchy first
             if (theNode->nodeName() == BODY_NODE_NAME) {
                 // prepare check for intersection with body geometry

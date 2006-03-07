@@ -385,16 +385,28 @@ namespace y60 {
                         // get normals from plane
                         myQuadHit = theDetector(this, i, asl::asTriangle(asl::asPoint(thePositions[i])));
                     }
-
                     if (!myQuadHit) {
                         // TODO: make faster routine for quad intersection
-                        asl::Triangle<float> myOtherTriangle(
-                            asl::asPoint(thePositions[i+2]),
-                            asl::asPoint(thePositions[i+3]),
-                            asl::asPoint(thePositions[i+0])
-                        );
+                        asl::Triangle<float> myOtherTriangle;
+                        asl::Vector3<asl::Vector3<float> > myOtherNormals;
+                        if (_myType == QUADS) {
+                            myOtherTriangle = asl::Triangle<float>(
+                                asl::asPoint(thePositions[i+2]),
+                                asl::asPoint(thePositions[i+3]),
+                                asl::asPoint(thePositions[i+0]));
+                            if (myHasNormals) {
+                                myOtherNormals = asl::Vector3<asl::Vector3<float> >((*theNormals)[i+2], (*theNormals)[i+3], (*theNormals)[i+0]);
+                            }
+                        } else {
+                            myOtherTriangle = asl::Triangle<float>(
+                                asl::asPoint(thePositions[i+1]),
+                                asl::asPoint(thePositions[i+3]),
+                                asl::asPoint(thePositions[i+2]));
+                            if (myHasNormals) {
+                                myOtherNormals = asl::Vector3<asl::Vector3<float> >((*theNormals)[i+1], (*theNormals)[i+3], (*theNormals)[i+2]);
+                            }
+                        }
                         if (myHasNormals) {
-                            asl::Vector3<asl::Vector3<float> > myOtherNormals((*theNormals)[i+2], (*theNormals)[i+3], (*theNormals)[i+0]);
                             // supply normals for interpolation
                             myQuadHit = theDetector(this, i, myOtherTriangle, myOtherNormals);
                         } else {
