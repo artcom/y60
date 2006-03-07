@@ -359,14 +359,20 @@ namespace y60 {
     void 
     FrameConveyor::setupAudio(bool theUseAudioFlag) {
         AVStream * myAudioStream = _myContext->getAudioStream();
+#if LIBAVCODEC_BUILD >= 0x5100
+        AVCodecContext * myACodec = myAudioStream->codec;
+#else
+        AVCodecContext * myACodec = &myAudioStream->codec;
+#endif
+
         if (myAudioStream && theUseAudioFlag) {
-            AVCodec * myCodec = avcodec_find_decoder(myAudioStream->codec.codec_id);
+            AVCodec * myCodec = avcodec_find_decoder(myACodec->codec_id);
             if (!myCodec) {
                 AC_WARNING << "Unable to find audio decoder: " << _myContext->getFilename();
                  _myAudioSink = HWSampleSinkPtr(0);
                  return;
             }
-            if (avcodec_open(&myAudioStream->codec, myCodec) < 0 ) {
+            if (avcodec_open(myACodec, myCodec) < 0 ) {
                 AC_WARNING << "Unable to find audio decoder: " << _myContext->getFilename();
                 _myAudioSink = HWSampleSinkPtr(0);
                 return;
@@ -375,14 +381,14 @@ namespace y60 {
             Pump & myAudioPump = Pump::get();
 //            if (!myAudioController.isRunning()) {
 //                myAudioController.init(asl::maximum
-//                      ((unsigned)myAudioStream->codec.sample_rate, (unsigned) 44100));
+//                      ((unsigned)myACodec->sample_rate, (unsigned) 44100));
 //            }
 
             _myAudioSink = myAudioPump.createSampleSink(_myContext->getFilename());
             //_myAudioSink->setVolume(getMovie()->get<VolumeTag>());
-            AC_INFO << "Audio: channels=" << myAudioStream->codec.channels << ", samplerate=" 
-                    << myAudioStream->codec.sample_rate;
-            initResample(myAudioStream->codec.channels, myAudioStream->codec.sample_rate);
+            AC_INFO << "Audio: channels=" << myACodec->channels << ", samplerate=" 
+                    << myACodec->sample_rate;
+            initResample(myACodec->channels, myACodec->sample_rate);
         } else {
             _myAudioSink = HWSampleSinkPtr(0);
             _myContext->disableAudio();

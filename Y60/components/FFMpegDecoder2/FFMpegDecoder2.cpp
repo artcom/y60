@@ -94,13 +94,22 @@ namespace y60 {
 
         AC_TRACE << "FFMpegDecoder2::addAudioPacket()";
         while (myDataLen > 0) {
+#if LIBAVCODEC_BUILD >= 0x5100
+            int myLen = avcodec_decode_audio(_myAStream->codec,
+                (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);
+#else
             int myLen = avcodec_decode_audio(&_myAStream->codec,
                 (int16_t*)_mySamples.begin(), &myBytesDecoded, myData, myDataLen);
+#endif
             if (myLen < 0 || myBytesDecoded < 0) {
                 AC_WARNING << "av_decode_audio error";
                 break;
             }
+#if LIBAVCODEC_BUILD >= 0x5100
+            int myNumChannels = _myAStream->codec->channels;
+#else
             int myNumChannels = _myAStream->codec.channels;
+#endif
             int numFrames = myBytesDecoded/(getBytesPerSample(SF_S16)*myNumChannels);
             AC_TRACE << "FFMpegDecoder2::decode(): Frames per buffer= " << numFrames;
             // queue audio sample
@@ -142,9 +151,15 @@ namespace y60 {
 
         AC_TRACE << "decoding @ " << myTime << " size " << myDataLen;
         while (frameFinished == 0 && myDataLen > 0) {
+#if LIBAVCODEC_BUILD >= 0x5100
+            int myLen = avcodec_decode_video(_myVStream->codec,
+                _myFrame, &frameFinished,
+                myData, myDataLen);
+#else
             int myLen = avcodec_decode_video(&_myVStream->codec,
                 _myFrame, &frameFinished,
                 myData, myDataLen);
+#endif
             AC_TRACE << "avcodec_decode_video returned " << myLen << " got pic " << frameFinished;
             if (myLen < 0) {
                 AC_ERROR << "av_decode_video error";
@@ -184,7 +199,11 @@ namespace y60 {
                  * chance to get the last frame of the video
                  */
                 int frameFinished = 0;
+#if LIBAVCODEC_BUILD >= 0x5100
+                int myLen = avcodec_decode_video(_myVStream->codec, _myFrame, &frameFinished, NULL, 0);
+#else
                 int myLen = avcodec_decode_video(&_myVStream->codec, _myFrame, &frameFinished, NULL, 0);
+#endif
                 if (frameFinished) {
 		            AC_TRACE << "add frame";
                     addCacheFrame(_myFrame, _myEOFVideoTimestamp);
@@ -227,9 +246,14 @@ namespace y60 {
         myDestPict.linesize[1] = _myLineSizeBytes;
         myDestPict.linesize[2] = _myLineSizeBytes;
 
+#if LIBAVCODEC_BUILD >= 0x5100
+        AVCodecContext * myVCodec = _myVStream->codec;
+#else
+        AVCodecContext * myVCodec = &_myVStream->codec;
+#endif
         img_convert(&myDestPict, _myDestinationPixelFormat,
-                    (AVPicture*)theFrame, _myVStream->codec.pix_fmt,
-                    _myVStream->codec.width, _myVStream->codec.height);
+                    (AVPicture*)theFrame, myVCodec->pix_fmt,
+                    myVCodec->width, myVCodec->height);
     }
 
     void FFMpegDecoder2::copyFrame(FrameCache::VideoFramePtr theVideoFrame,
@@ -295,11 +319,16 @@ namespace y60 {
 
         // find video/audio streams
         for (unsigned i = 0; i < _myFormatContext->nb_streams; ++i) {
-            if (_myVStreamIndex == -1 && _myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_VIDEO) {
+#if LIBAVCODEC_BUILD >= 0x5100
+            int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
+#else
+            int myCodecType =  _myFormatContext->streams[i]->codec.codec_type;
+#endif
+            if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
                 _myVStreamIndex = i;
                 _myVStream = _myFormatContext->streams[i];
             }
-            else if (_myAStreamIndex == -1 && _myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO) {
+            else if (_myAStreamIndex == -1 && myCodecType == CODEC_TYPE_AUDIO) {
                 _myAStreamIndex = i;
                 _myAStream = _myFormatContext->streams[i];
             }
@@ -422,7 +451,11 @@ namespace y60 {
 #else
         int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp, AVSEEK_FLAG_BACKWARD);
 #endif
+#if LIBAVCODEC_BUILD >= 0x5100
+        avcodec_flush_buffers(_myVStream->codec);
+#else
         avcodec_flush_buffers(&_myVStream->codec);
+#endif
         updateCache();
 
         _myState = RUN;
@@ -473,12 +506,20 @@ namespace y60 {
 
         // codecs
         if (_myVStream) {
+#if LIBAVCODEC_BUILD >= 0x5100
+            avcodec_close(_myVStream->codec);
+#else
             avcodec_close(&_myVStream->codec);
+#endif
             _myVStreamIndex = -1;
             _myVStream = 0;
         }
         if (_myAStream) {
+#if LIBAVCODEC_BUILD >= 0x5100
+            avcodec_close(_myAStream->codec);
+#else
             avcodec_close(&_myAStream->codec);
+#endif
             _myAStreamIndex = -1;
             _myAStream = 0;
         }
@@ -592,7 +633,11 @@ namespace y60 {
         _mySeekTimestamp = theTimestamp;
         if (_myVStream) {
             AC_TRACE << "flushing video codec buffers";
+#if LIBAVCODEC_BUILD >= 0x5100
+            avcodec_flush_buffers(_myVStream->codec);
+#else
             avcodec_flush_buffers(&_myVStream->codec);
+#endif
         }
         if (_myAudioSink) {
             _myAudioSink->stop();
@@ -600,19 +645,22 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::setupVideo(const std::string & theFilename) {
+#if LIBAVCODEC_BUILD >= 0x5100
+        AVCodecContext * myVCodec = _myVStream->codec;
+#else
+        AVCodecContext * myVCodec = &_myVStream->codec;
+#endif
+
         // open codec
-        AVCodec * myCodec = avcodec_find_decoder(_myVStream->codec.codec_id);
+        AVCodec * myCodec = avcodec_find_decoder(myVCodec->codec_id);
         if (!myCodec) {
-            throw FFMpegDecoder2Exception(std::string("Unable to find video decoder: ") + theFilename, PLUS_FILE_LINE);
+            throw FFMpegDecoder2Exception(std::string("Unable to find video codec: ") + theFilename, PLUS_FILE_LINE);
         }
-        if (avcodec_open(&_myVStream->codec, myCodec) < 0 ) {
+        if (avcodec_open(myVCodec, myCodec) < 0 ) {
             throw FFMpegDecoder2Exception(std::string("Unable to open video codec: ") + theFilename, PLUS_FILE_LINE);
         }
 
         Movie * myMovie = getMovie();
-        myMovie->set<ImageWidthTag>(_myVStream->codec.width);
-        myMovie->set<ImageHeightTag>(_myVStream->codec.height);
-
         AC_TRACE << "PF=" << myMovie->get<ImagePixelFormatTag>();
         switch (myMovie->getPixelEncoding()) {
         case y60::RGBA:
@@ -636,8 +684,14 @@ namespace y60 {
         }
 
         // Setup size and image matrix
-        float myXResize = float(_myVStream->codec.width) / asl::nextPowerOfTwo(_myVStream->codec.width);
-        float myYResize = float(_myVStream->codec.height) / asl::nextPowerOfTwo(_myVStream->codec.height);
+        int myWidth = myVCodec->width;
+        int myHeight = myVCodec->height;
+
+        myMovie->set<ImageWidthTag>(myWidth);
+        myMovie->set<ImageHeightTag>(myHeight);
+
+        float myXResize = float(myWidth) / asl::nextPowerOfTwo(myWidth);
+        float myYResize = float(myHeight) / asl::nextPowerOfTwo(myHeight);
 
         asl::Matrix4f myMatrix;
         myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
@@ -647,13 +701,18 @@ namespace y60 {
          * hack to correct wrong frame rates that seem to be generated
          * by some codecs
          */
+        float myFPS;
+#if LIBAVCODEC_BUILD >= 0x5100
+        myFPS = (1.0f / av_q2d(myVCodec->time_base));
+#else
         if (_myVStream->codec.frame_rate > 1000 && _myVStream->codec.frame_rate_base == 1) {
             _myVStream->codec.frame_rate_base = 1000;
         }
-        double myFPS = _myVStream->codec.frame_rate / (double) _myVStream->codec.frame_rate_base;
+        myFPS = _myVStream->codec.frame_rate / (float) _myVStream->codec.frame_rate_base;
         if (myFPS > 1000.0f) {
             myFPS /= 1000.0f;
         }
+#endif
         myMovie->set<FrameRateTag>(myFPS);
 
         if (_myVStream->duration == AV_NOPTS_VALUE) {
@@ -702,22 +761,28 @@ namespace y60 {
 
     void
     FFMpegDecoder2::setupAudio(const std::string & theFilename) {
+#if LIBAVCODEC_BUILD >= 0x5100
+        AVCodecContext * myACodec = _myAStream->codec;
+#else
+        AVCodecContext * myACodec = &_myAStream->codec;
+#endif
+
         // open codec
-        AVCodec * myCodec = avcodec_find_decoder(_myAStream->codec.codec_id);
+        AVCodec * myCodec = avcodec_find_decoder(myACodec->codec_id);
         if (!myCodec) {
             throw FFMpegDecoder2Exception(std::string("Unable to find audio decoder: ") + theFilename, PLUS_FILE_LINE);
         }
-        if (avcodec_open(&_myAStream->codec, myCodec) < 0 ) {
+        if (avcodec_open(myACodec, myCodec) < 0 ) {
             throw FFMpegDecoder2Exception(std::string("Unable to open audio codec: ") + theFilename, PLUS_FILE_LINE);
         }
 
         _myAudioSink = Pump::get().createSampleSink(theFilename);
 
-        if (_myAStream->codec.sample_rate != Pump::get().getNativeSampleRate())
+        if (myACodec->sample_rate != Pump::get().getNativeSampleRate())
         {
-            _myResampleContext = audio_resample_init(_myAStream->codec.channels,
-                    _myAStream->codec.channels, Pump::get().getNativeSampleRate(),
-                    _myAStream->codec.sample_rate);
+            _myResampleContext = audio_resample_init(myACodec->channels,
+                    myACodec->channels, Pump::get().getNativeSampleRate(),
+                    myACodec->sample_rate);
         }
         AC_INFO << "FFMpegDecoder2::setupAudio() done. resampling " << (_myResampleContext != 0);
 

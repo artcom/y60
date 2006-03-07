@@ -140,14 +140,21 @@ namespace y60 {
         AVStream * myVideoStream = theContext->getVideoStream();
         if (myVideoStream) {
             Movie * myMovie = getMovie();
-            myMovie->set<ImageWidthTag>(myVideoStream->codec.width);
-            myMovie->set<ImageHeightTag>(myVideoStream->codec.height);
+
+#if LIBAVCODEC_BUILD >= 0x5100
+            int myWidth = myVideoStream->codec->width;
+            int myHeight = myVideoStream->codec->height;
+#else
+            int myWidth = myVideoStream->codec.width;
+            int myHeight = myVideoStream->codec.height;
+#endif
+
+            myMovie->set<ImageWidthTag>(myWidth);
+            myMovie->set<ImageHeightTag>(myHeight);
 
             // Setup image matrix
-            float myXResize = float(myVideoStream->codec.width) 
-                    / asl::nextPowerOfTwo(myVideoStream->codec.width);
-            float myYResize = float(myVideoStream->codec.height) 
-                    / asl::nextPowerOfTwo(myVideoStream->codec.height);
+            float myXResize = float(myWidth) / asl::nextPowerOfTwo(myWidth);
+            float myYResize = float(myHeight) / asl::nextPowerOfTwo(myHeight);
 
             asl::Matrix4f myMatrix;
             myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));

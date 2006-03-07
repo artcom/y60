@@ -1,20 +1,11 @@
 //=============================================================================
-// Copyright (C) 2004,2005, ART+COM AG Berlin
+// Copyright (C) 2004-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//    $RCSfile: FFMpegDecoder1.cpp,v $
-//     $Author: ulrich $
-//   $Revision: 1.6 $
-//       $Date: 2005/04/01 17:03:27 $
-//
-//  ffmpeg movie decoder.
-//
 //=============================================================================
 
 #include "FFMpegDecoder1.h"
@@ -23,7 +14,7 @@
 #include <asl/file_functions.h>
 #include <iostream>
 
-#define DB(x) //x
+#define DB(x) // x
 
 using namespace std;
 
@@ -50,8 +41,7 @@ namespace y60 {
         PlugInBase(theDLHandle),
         _myFormatContext(0), _myFrame(0),
         _myVStreamIndex(-1), _myVStream(0),
-        _myAStreamIndex(-1), _myAStream(0),
-        _myFirstTimestamp(0), _myStartTimestamp(0),
+        _myStartTimestamp(0),
         _myLastVideoTimestamp(0), _myEOFVideoTimestamp(INT_MIN)
     {
         DB(AC_DEBUG << "instantiated an FFMpegDecoder1...");    
@@ -80,16 +70,14 @@ namespace y60 {
     void
     FFMpegDecoder1::closeMovie() {
         AC_DEBUG << "FFMpegDecoder1::closeMovie";
-
         if (_myVStream) {
+#if LIBAVCODEC_BUILD >= 0x5100
+            avcodec_close(_myVStream->codec);
+#else
             avcodec_close(&_myVStream->codec);
+#endif
             _myVStreamIndex = -1;
             _myVStream = 0;
-        }
-        if (_myAStream) {
-            avcodec_close(&_myAStream->codec);
-            _myAStreamIndex = -1;
-            _myAStream = 0;
         }
 
         if (_myFrame) {
@@ -108,7 +96,7 @@ namespace y60 {
         // register all formats and codecs
         static bool avRegistered = false;
         if (!avRegistered) {
-            AC_PRINT << "FFMpegDecoder1 avcodec version " << LIBAVCODEC_IDENT;
+            AC_INFO << "FFMpegDecoder1 avcodec version " << LIBAVCODEC_IDENT;
             av_log_set_level(AV_LOG_ERROR);
             av_register_all();
             avRegistered = true;
@@ -118,35 +106,47 @@ namespace y60 {
         if (av_open_input_file(&_myFormatContext, theFilename.c_str(), 0, FFM_PACKET_SIZE, 0) < 0) {
             throw FFMpegDecoderException(std::string("Unable to open input file: ") + theFilename, PLUS_FILE_LINE);
         }
+
+#if LIBAVCODEC_BUILD >= 0x5100
+        av_read_play(_myFormatContext);
+#endif
+
         if (av_find_stream_info(_myFormatContext) < 0) {
             throw FFMpegDecoderException(std::string("Unable to find stream info: ") + theFilename, PLUS_FILE_LINE);
         }
 
         // find video/audio streams
         for (unsigned i = 0; i < _myFormatContext->nb_streams; ++i) {
-            if (_myVStreamIndex == -1 && _myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_VIDEO) {
+            int myCodecType;
+#if LIBAVCODEC_BUILD >= 0x5100
+            myCodecType = _myFormatContext->streams[i]->codec->codec_type;
+#else
+            myCodecType = _myFormatContext->streams[i]->codec.codec_type;
+#endif
+            if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
                 _myVStreamIndex = i;
                 _myVStream = _myFormatContext->streams[i];
-            }
-            else if (_myAStreamIndex == -1 && _myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO) {
-                _myAStreamIndex = i;
-                _myAStream = _myFormatContext->streams[i];
             }
         }
 
         if (_myVStreamIndex < 0) {
             throw FFMpegDecoderException(std::string("No video stream found: ") + theFilename, PLUS_FILE_LINE);
         }
-        if (_myAStreamIndex < 0) {
-            AC_WARNING << "url='" << theFilename << "' no audio stream found";
-        }
 
         // open codec
+#if LIBAVCODEC_BUILD >= 0x5100
+        AVCodec * myCodec = avcodec_find_decoder(_myVStream->codec->codec_id);
+#else
         AVCodec * myCodec = avcodec_find_decoder(_myVStream->codec.codec_id);
+#endif
         if (!myCodec) {
             throw FFMpegDecoderException(std::string("Unable to find decoder: ") + theFilename, PLUS_FILE_LINE);
         }
+#if LIBAVCODEC_BUILD >= 0x5100
+        if (avcodec_open(_myVStream->codec, myCodec) < 0 ) {
+#else
         if (avcodec_open(&_myVStream->codec, myCodec) < 0 ) {
+#endif
             throw FFMpegDecoderException(std::string("Unable to open codec: ") + theFilename, PLUS_FILE_LINE);
         }
 
@@ -154,17 +154,31 @@ namespace y60 {
         _myFrame = avcodec_alloc_frame();
 
         Movie * myMovie = getMovie();
-        myMovie->set<ImageWidthTag>(_myVStream->codec.width);
-        myMovie->set<ImageHeightTag>(_myVStream->codec.height);
+
+        int myWidth, myHeight; 
+#if LIBAVCODEC_BUILD >= 0x5100
+        myWidth = _myVStream->codec->width;
+        myHeight = _myVStream->codec->height;
+#else
+        myWidth = _myVStream->codec.width;
+        myHeight = _myVStream->codec.height;
+#endif
+        myMovie->set<ImageWidthTag>(myWidth);
+        myMovie->set<ImageHeightTag>(myHeight);
 
         // Setup size and image matrix
-        float myXResize = float(_myVStream->codec.width) / asl::nextPowerOfTwo(_myVStream->codec.width);
-        float myYResize = float(_myVStream->codec.height) / asl::nextPowerOfTwo(_myVStream->codec.height);
+        float myXResize = float(myWidth) / asl::nextPowerOfTwo(myWidth);
+        float myYResize = float(myHeight) / asl::nextPowerOfTwo(myHeight);
 
         asl::Matrix4f myMatrix;
         myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
         myMovie->set<ImageMatrixTag>(myMatrix);
 
+        // framerate
+        float myFPS;
+#if LIBAVCODEC_BUILD >= 0x5100
+        myFPS = (1.0f / av_q2d(_myVStream->codec->time_base));
+#else
         /*
          * hack to correct wrong frame rates that seem to be generated
          * by some codecs
@@ -172,11 +186,14 @@ namespace y60 {
         if (_myVStream->codec.frame_rate > 1000 && _myVStream->codec.frame_rate_base == 1) {
             _myVStream->codec.frame_rate_base = 1000;
         }
-        float myFPS = _myVStream->codec.frame_rate / (float) _myVStream->codec.frame_rate_base;
+        myFPS = _myVStream->codec.frame_rate / (float) _myVStream->codec.frame_rate_base;
         if (myFPS > 1000.0f) {
             myFPS /= 1000.0f;
         }
+#endif
         myMovie->set<FrameRateTag>(myFPS);
+
+        // duration
         if (_myVStream->duration == AV_NOPTS_VALUE || 
             int(myFPS * (_myVStream->duration / (double) AV_TIME_BASE)) <= 0) {
             AC_WARNING << "url='" << theFilename << "' contains no valid duration";
@@ -184,38 +201,19 @@ namespace y60 {
         } else {
             myMovie->set<FrameCountTag>(int(myFPS * (_myVStream->duration / (float) AV_TIME_BASE)));
         }
+
         AC_DEBUG << "url='" << theFilename << "' fps=" << myFPS << " framecount=" << getFrameCount();
 
-        _myLastVideoTimestamp = 0;
+        _myLastVideoTimestamp = AV_NOPTS_VALUE;
         _myEOFVideoTimestamp = INT_MIN;
-
-        // Get first timestamp
-        AVPacket myPacket;
-        bool myEndOfFileFlag = (av_read_frame(_myFormatContext, &myPacket) < 0);
-        _myFirstTimestamp = myPacket.dts;
-        av_free_packet(&myPacket);
-        DB(AC_TRACE << "firstTimestamp=" << _myFirstTimestamp);
 
         // Get Starttime
         if (_myVStream->start_time != AV_NOPTS_VALUE) {
             _myStartTimestamp = _myVStream->start_time;
-            DB(AC_TRACE << "startTimestamp=" << _myStartTimestamp);
         } else {
             _myStartTimestamp = 0;
         }
-
-        // seek to start
-        // [jb] If the resulting delay is not caused now,
-        // [jb] it would unfortunately be caused when the first seek occures!
-        // [jb] The cause for the delay is FFMpeg, that caches/hashes something for the entire movie.
-#if (LIBAVCODEC_BUILD < 4738)
-        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp);
-#else
-        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp, AVSEEK_FLAG_BACKWARD);
-#endif
-        if (myResult < 0) {
-            AC_ERROR << "Could not seek to start timestamp " << _myStartTimestamp;
-        }
+        AC_DEBUG << "startTimestamp=" << _myStartTimestamp;
 
         asl::Time myLoadEndTime;
         AC_INFO << "Load time " << (myLoadEndTime - myLoadStartTime) << "s";
@@ -223,16 +221,16 @@ namespace y60 {
 
     double
     FFMpegDecoder1::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
-
-        //asl::Time myDecodeStartTime;
-
-        int64_t myFrameTimestamp = (int64_t)(theTime * AV_TIME_BASE);
-        int64_t myTimePerFrame = (int64_t)(AV_TIME_BASE / float(getFrameRate()));
-
-        if (_myFirstTimestamp < 0) {
-            myFrameTimestamp += myTimePerFrame;
-        }
-        DB(AC_TRACE << "time=" << theTime << " timestamp=" << myFrameTimestamp);
+        int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
+#if LIBAVCODEC_BUILD >= 0x5100        
+        int64_t myFrameTimestamp = (int64_t)(theTime * myTimeUnitsPerSecond) + _myStartTimestamp;
+#else
+        int64_t myFrameTimestamp = (int64_t)(theTime * AV_TIME_BASE) + _myStartTimestamp;
+#endif
+        
+        AC_DEBUG << "time=" << theTime << " timestamp=" << myFrameTimestamp << 
+                " myTimeUnitsPerSecond=" << myTimeUnitsPerSecond;
+        AC_DEBUG << "_myLastVideoTimestamp=" << _myLastVideoTimestamp;
 
         if (!decodeFrame(myFrameTimestamp, theTargetRaster)) {
             AC_DEBUG << "EOF reached for timestamp=" << myFrameTimestamp;
@@ -246,21 +244,26 @@ namespace y60 {
             DB(AC_TRACE << "FFMpegDecoder1::readFrame decoded timestamp=" << myFrameTimestamp);
         }
 
-        //asl::Time myDecodeEndTime; AC_TRACE << "Decoding time " << (myDecodeEndTime - myDecodeStartTime) << "s";
-
-        return theTime; //(myFrameTimestamp / (double)AV_TIME_BASE);
+        return theTime;
     }
 
+    // TODO: Make theTimestamp an input-only parameter.
     bool
     FFMpegDecoder1::decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
-
+        int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
+#if LIBAVCODEC_BUILD >= 0x5100 
+        int64_t myTimePerFrame = (int64_t)(myTimeUnitsPerSecond / getFrameRate());
+#else
         int64_t myTimePerFrame = (int64_t)(AV_TIME_BASE / getFrameRate());
+#endif
 
-        if (theTimestamp < _myLastVideoTimestamp || theTimestamp > _myLastVideoTimestamp + (2*myTimePerFrame)) {
-            //cout <<"seek, theTimeStanp: " << theTimestamp << " last timestamp : " << _myLastVideoTimestamp << " Frametime : " << myTimePerFrame <<endl;
+        if (_myLastVideoTimestamp != AV_NOPTS_VALUE &&
+            (theTimestamp < _myLastVideoTimestamp || theTimestamp > _myLastVideoTimestamp + (2*myTimePerFrame)))
+        {
+//            cout <<"seek, theTimeStanp: " << theTimestamp << " last timestamp : " << _myLastVideoTimestamp << " Frametime : " << myTimePerFrame <<endl;
 
             int64_t mySeekTimestamp = theTimestamp;
-            DB(AC_TRACE << "timestamp=" << theTimestamp << " seeking to=" << mySeekTimestamp);
+            AC_DEBUG << "SEEK timestamp=" << theTimestamp << " lastVideoTimestamp=" << _myLastVideoTimestamp << " seek=" << mySeekTimestamp;
 
 #if (LIBAVCODEC_BUILD < 4738)
             int myResult = av_seek_frame(_myFormatContext, -1, mySeekTimestamp);
@@ -277,9 +280,16 @@ namespace y60 {
         AVPacket myPacket;
         memset(&myPacket, 0, sizeof(myPacket));
 
+#if LIBAVCODEC_BUILD >= 0x5100
+        AVCodecContext * myVCodec = _myVStream->codec;
+#else
+        AVCodecContext * myVCodec = &_myVStream->codec;
+#endif
+
         // until a frame is found or eof
         while (true) {
 
+            // EOF handling
             if (av_read_frame(_myFormatContext, &myPacket) < 0) {
                 av_free_packet(&myPacket);
 
@@ -288,14 +298,16 @@ namespace y60 {
                     _myEOFVideoTimestamp = _myLastVideoTimestamp;
                 }
 
-                /* some codecs, such as MPEG, transmit the I and P frame with a
+                /*
+                 * Some codecs, such as MPEG, transmit the I and P frame with a
                  * latency of one frame. You must do the following to have a
                  * chance to get the last frame of the video
                  */
                 int frameFinished = 0;
-                int myLen = avcodec_decode_video(&_myVStream->codec, _myFrame, &frameFinished, NULL, 0);
+                int myLen = avcodec_decode_video(myVCodec, _myFrame, &frameFinished, NULL, 0);
                 if (frameFinished) {
                     _myLastVideoTimestamp += myTimePerFrame;
+//                    _myEOFVideoTimestamp = _myLastVideoTimestamp;
 
                     // last frame found
                     if (_myLastVideoTimestamp >= theTimestamp) {
@@ -314,7 +326,7 @@ namespace y60 {
                 int myDataLen = myPacket.size;
 
                 while (frameFinished == 0 && myDataLen > 0) {
-                    int myLen = avcodec_decode_video(&_myVStream->codec,
+                    int myLen = avcodec_decode_video(myVCodec,
                                                      _myFrame, &frameFinished,
                                                      myData, myDataLen);
                     if (myLen < 0) {
@@ -324,36 +336,27 @@ namespace y60 {
                     myData += myLen;
                     myDataLen -= myLen;
                 }
-                DB(AC_INFO << "decoded dts=" << myPacket.dts << " pts=" << myPacket.pts << " finished=" << frameFinished);
+
+                AC_DEBUG << "decoded dts=" << myPacket.dts << " pts=" << myPacket.pts 
+                        << " finished=" << frameFinished;
                 if (frameFinished == 0) {
                     continue;
                 }
-// highly experimental... (vs/uh)
-// [js] ... does not work with movies that only PARTIALLY contain correct PTS values!
-// [js] For those movies "_myLastVideoTimestamp += myTimePerFrame" would do.
-// [js] But NOT when seeking (and that's what we are here for, in FFMpegDecoderONE)!!!
-#if 0
-                if (myPacket.pts == AV_NOPTS_VALUE) {
-                    _myLastVideoTimestamp += myTimePerFrame;
-                } else {
-                    _myLastVideoTimestamp = myPacket.pts;
-                }
-#else 
-                    _myLastVideoTimestamp = myPacket.dts;
-#endif
+                _myLastVideoTimestamp = myPacket.dts;
+
                 // suitable framestamp?
                 if (_myLastVideoTimestamp >= theTimestamp) {
                     DB(AC_TRACE << "found " << _myLastVideoTimestamp << " for " << theTimestamp);
                     break;
                 }
-            } else if (myPacket.stream_index == _myAStreamIndex) {
-                //AC_WARNING << "Got audio timestamp=" << myPacket.dts;
-            }
+            } 
         }
 
         convertFrame(_myFrame, theTargetRaster);
         // store actual timestamp
+
         theTimestamp = myPacket.dts;
+        AC_DEBUG << "Packet dts: " << myPacket.dts << ", pts: " << myPacket.pts;
         av_free_packet(&myPacket);
 
         return true;
@@ -399,8 +402,12 @@ namespace y60 {
             break;
         }
 
-        img_convert(&myDestPict, myDestFmt,
-                    (AVPicture*)theFrame, _myVStream->codec.pix_fmt,
-                    _myVStream->codec.width, _myVStream->codec.height);
+#if LIBAVCODEC_BUILD >= 0x5100
+        AVCodecContext * myVCodec = _myVStream->codec;
+#else
+        AVCodecContext * myVCodec = &_myVStream->codec;
+#endif
+        img_convert(&myDestPict, myDestFmt, (AVPicture*)theFrame,
+                    myVCodec->pix_fmt, myVCodec->width, myVCodec->height);
     }
 }

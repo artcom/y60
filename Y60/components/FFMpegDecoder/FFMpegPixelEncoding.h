@@ -28,7 +28,11 @@ namespace y60 {
 
     inline PixelEncoding 
     getPixelEncoding(AVStream * theStream) {
+#if LIBAVCODEC_BUILD >= 0x5100
+        switch (theStream->codec->pix_fmt) {
+#else
         switch (theStream->codec.pix_fmt) {
+#endif
             case PIX_FMT_RGB24:
                 return y60::RGB;
             case PIX_FMT_BGR24:
@@ -44,7 +48,11 @@ namespace y60 {
 
     inline std::string
     getPixelEncodingInfo(AVStream * theStream) {
+#if LIBAVCODEC_BUILD >= 0x5100
+        switch (theStream->codec->pix_fmt) {
+#else
         switch (theStream->codec.pix_fmt) {
+#endif
             case PIX_FMT_YUV420P:
                 return "PIX_FMT_YUV420P: Planar YUV 4:2:0 (1 Cr & Cb sample per 2x2 Y samples).";
             case PIX_FMT_YUV422:

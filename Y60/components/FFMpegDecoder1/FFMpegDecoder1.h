@@ -1,20 +1,11 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 2004-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: FFMpegDecoder1.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/01 10:12:21 $
-//
-//  ffmpeg movie decoder.
-//
 //=============================================================================
 
 #ifndef _ac_y60_FFMpegDecoder_h_
@@ -106,6 +97,7 @@ namespace y60 {
         double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
 
         const char * getName() const { return "y60FFMpegDecoder1"; }
+
     private:
         void closeMovie();
 
@@ -122,10 +114,7 @@ namespace y60 {
         int               _myVStreamIndex;
         AVStream *        _myVStream;
 
-        int               _myAStreamIndex;
-        AVStream *        _myAStream;
-
-        int64_t           _myFirstTimestamp;
+        int64_t           _myTimeBase;
         int64_t           _myStartTimestamp;
         int64_t           _myLastVideoTimestamp;
         int64_t           _myEOFVideoTimestamp;

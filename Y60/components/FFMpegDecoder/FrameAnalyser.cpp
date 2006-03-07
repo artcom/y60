@@ -106,11 +106,15 @@ namespace y60 {
     FrameAnalyser::printTableRow(Table & theTable, AVPacket & thePacket, AVFrame & theFrame) {
         theTable.addRow();
 
-
         if (thePacket.stream_index == _myVStreamIndex) {
             ourFrameCounter++;
+#if LIBAVCODEC_BUILD >= 0x5100
+            int myFrameIndex = asl::round(double(thePacket.dts - _myVStream->start_time) 
+                    / av_q2d(_myVStream->codec->time_base));
+#else
             int myFrameIndex = asl::round(double(thePacket.dts - _myVStream->start_time) 
                     / AV_TIME_BASE * _myVStream->r_frame_rate / _myVStream->r_frame_rate_base);
+#endif
             theTable.setField("frame", as_string(myFrameIndex));        
             switch (theFrame.pict_type) {
                 case FF_I_TYPE:
@@ -143,6 +147,12 @@ namespace y60 {
         AVFrame * myFrame = avcodec_alloc_frame();
         int myFoundPictureFlag = 0;
 
+#if LIBAVCODEC_BUILD >= 0x5100
+        AVCodecContext * myVCodec = _myVStream->codec;
+#else
+        AVCodecContext * myVCodec = &_myVStream->codec;
+#endif
+
         while (myFoundPictureFlag == 0) {
             if (av_read_frame(_myFormatContext, &myPacket) < 0) {
                 break;
@@ -151,7 +161,7 @@ namespace y60 {
     
             // Make sure that the packet is from the actual video stream.
             if (myPacket.stream_index == _myVStreamIndex) {
-                avcodec_decode_video(&_myVStream->codec,
+                avcodec_decode_video(myVCodec,
                     myFrame, &myFoundPictureFlag,
                     myPacket.data, myPacket.size);
             }
@@ -162,10 +172,14 @@ namespace y60 {
         // I and P frame with a latency of one frame. You must do the
         // following to have a chance to get the last frame of the video.
         if (!myFoundPictureFlag) {
-            avcodec_decode_video(&_myVStream->codec,
+            avcodec_decode_video(myVCodec,
                                  myFrame, &myFoundPictureFlag,
                                  0, 0);
+#if LIBAVCODEC_BUILD >= 0x5100
+            myLastDTS += (int64_t) av_q2d(_myVStream->time_base);
+#else
             myLastDTS += AV_TIME_BASE * _myVStream->r_frame_rate_base / _myVStream->r_frame_rate;
+#endif
         }
         if (!myFoundPictureFlag) {
             myLastDTS = UINT_MAX;
@@ -187,11 +201,17 @@ namespace y60 {
 #endif              
             return;
         }
+
+#if LIBAVCODEC_BUILD >= 0x5100
+        int64_t myHalfFrame = av_q2d(_myVStream->time_base) / 2;
+        int64_t myTimestamp = theFrame * (int64_t)av_q2d(_myVStream->time_base) + _myVStream->start_time;
+#else
         int64_t myHalfFrame = int64_t(AV_TIME_BASE) * _myVStream->r_frame_rate_base / 
                 _myVStream->r_frame_rate / 2;        
         int64_t myTimestamp = int64_t(theFrame) * AV_TIME_BASE * 
                 _myVStream->r_frame_rate_base / _myVStream->r_frame_rate + 
                 _myVStream->start_time;
+#endif
 
         if (myTimestamp > myHalfFrame) {
             myTimestamp -= myHalfFrame;
@@ -199,7 +219,7 @@ namespace y60 {
             myTimestamp = 0;
         }
         
-        // newer releases of ffmpeg may require a 4th argument to av_seek_frame
+        // newer releases of ffmpeg require a 4th argument to av_seek_frame
 #if LIBAVFORMAT_BUILD <= 4616
         int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, theFrame);
 #else
@@ -266,8 +286,13 @@ namespace y60 {
             if (myPacket.stream_index == _myVStreamIndex) {                
                 printPacketInfo(myPacket);
                 int myFrameCompleteFlag = 0;
+#if LIBAVCODEC_BUILD >= 0x5100
+                int myLength = avcodec_decode_video(_myVStream->codec, myFrame, &myFrameCompleteFlag,
+                                                 myPacket.data, myPacket.size);
+#else
                 int myLength = avcodec_decode_video(&_myVStream->codec, myFrame, &myFrameCompleteFlag,
                                                  myPacket.data, myPacket.size);
+#endif
 
                 if (myLength < 0) {
                     AC_ERROR << "av_decode_video error";
