@@ -7,80 +7,85 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Skeleton.js,v $
-//   $Author: christian $
-//   $Revision: 1.12 $
-//   $Date: 2005/04/28 10:00:26 $
-//
+// example start code
+// y60 Skeleton.js rehearsal
 //=============================================================================
-// example windows start code
-// y6ß.exe -I "$PRO/src/Y60/js;$PRO/src/Y60/shader/" Skeleton.js shaderlibrary.xml rehearsal
 
 use("SceneViewer.js");
 
-function Skeleton(theArguments) {
-    this.Constructor(this, theArguments);
-}
-
-Skeleton.prototype.Constructor = function(self, theArguments) {
+function Skeleton(theArguments, theWidth, theHeight, theTitle) {
 
     //////////////////////////////////////////////////////////////////////
-    //
-    // Constructor
-    //
+    // Baseclass construction
     //////////////////////////////////////////////////////////////////////
 
-    SceneViewer.prototype.Constructor(self, theArguments);
-    var Base = [];
+    var Base   = {};
+    var Public = this;
+    SceneViewer.prototype.Constructor(Public, theArguments);
 
-    var _myPrivateMember = null;
+    Public.Constructor = function() {
+        window = new RenderWindow();
+        window.position = [0, 0];
+        window.decorations = false;
 
-    //////////////////////////////////////////////////////////////////////
-    //
-    // Callbacks
-    //
-    //////////////////////////////////////////////////////////////////////
+        // Call base class setup
+        Public.setSplashScreen(Public.getReleaseMode());
+        Public.setup(theWidth, theHeight, false, theTitle);
+        window.showTaskbar = !Public.getReleaseMode();
+        window.backgroundColor = [0.8, 0.8, 0.8];
+        window.showMouseCursor = !Public.getReleaseMode();
+        window.swapInterval    = 1;
 
-    // Will be called once, initialize window, scene, mover, etc.
-    Base.setup = self.setup;
-    self.setup = function(theWidth, theHeight, theFullscreen, theTitle) {
-        Base.setup(theWidth, theHeight, theFullscreen, theTitle);
+        // Add your own setup here
+
+        // Some dummy code for fun
+        _myCrossHair = new ImageOverlay(window.scene, "shadertex/crosshair.png", [100, 100]);
     }
 
+    //////////////////////////////////////////////////////////////////////
+    // Callbacks
+    //////////////////////////////////////////////////////////////////////
+
     //  Will be called first in renderloop, has the time since application start
-    Base.onFrame = self.onFrame;
-    self.onFrame = function(theTime) {
+    Base.onFrame = Public.onFrame;
+    Public.onFrame = function(theTime) {
         Base.onFrame(theTime);
     }
 
     // Will be called before rendering the frame
-    Base.onPreRender = self.onPreRender;
-    self.onPreRender = function() {
+    Base.onPreRender = Public.onPreRender;
+    Public.onPreRender = function() {
         Base.onPreRender();
     }
 
     // Will be called after rendering the frame, but before swap buffer
-    Base.onPostRender = self.onPostRender;
-    self.onPostRender = function() {
+    Base.onPostRender = Public.onPostRender;
+    Public.onPostRender = function() {
         Base.onPostRender();
     }
 
     // Will be called on a mouse move
-    Base.onMouseMotion = self.onMouseMotion;
-    self.onMouseMotion = function(theX, theY) {
-        Base.onMouseMotion(theX, theY);
+    Base.onMouseMotion = Public.onMouseMotion;
+    Public.onMouseMotion = function(theX, theY) {
+        if (_myMoverEnabled) {
+            Base.onMouseMotion(theX, theY);
+        }
+
+        // Some dummy code for fun
+        _myCrossHair.position = [theX- _myCrossHair.width / 2, theY - _myCrossHair.height / 2];
     }
 
     // Will be called on a mouse button
-    Base.onMouseButton = self.onMouseButton;
-    self.onMouseButton = function(theButton, theState, theX, theY) {
-        Base.onMouseButton(theButton, theState, theX, theY);
+    Base.onMouseButton = Public.onMouseButton;
+    Public.onMouseButton = function(theButton, theState, theX, theY) {
+        if (_myMoverEnabled) {
+            Base.onMouseButton(theButton, theState, theX, theY);
+        }
     }
 
     // Will be called on a keyboard event
-    Base.onKey = self.onKey;
-    self.onKey = function(theKey, theKeyState, theX, theY,
+    Base.onKey = Public.onKey;
+    Public.onKey = function(theKey, theKeyState, theX, theY,
                          theShiftFlag, theControlFlag, theAltFlag)
     {
         if (theControlFlag) {
@@ -91,6 +96,10 @@ Skeleton.prototype.Constructor = function(self, theArguments) {
             }
 
             switch (theKey) {
+                case "m":
+                    _myMoverEnabled = !_myMoverEnabled;
+                    print("Mover " + (_myMoverEnabled ? "enabled" : "disabled"));
+                    break;
                 case "h":
                     printHelp();
                     break;
@@ -99,56 +108,57 @@ Skeleton.prototype.Constructor = function(self, theArguments) {
     }
 
     // Will be called on a mouse wheel event
-    Base.onMouseWheel = self.onMouseWheel;
-    self.onMouseWheel = function(theDeltaX, theDeltaY) {
+    Base.onMouseWheel = Public.onMouseWheel;
+    Public.onMouseWheel = function(theDeltaX, theDeltaY) {
         Base.onMouseWheel(theDeltaX, theDeltaY);
     }
 
     // Will be called on a joystick axis event
-    Base.onAxis = self.onAxis;
-    self.onAxis = function(device, axis, value) {
+    Base.onAxis = Public.onAxis;
+    Public.onAxis = function(device, axis, value) {
         Base.onAxis(device, axis, value);
     }
 
     // Will be called on a joystick button event
-    Base.onButton = self.onButton;
-    self.onButton = function(theDevice, theButton, theState) {
+    Base.onButton = Public.onButton;
+    Public.onButton = function(theDevice, theButton, theState) {
         Base.onButton(theDevice, theButton, theState);
     }
 
     // Will be called on a window reshape event
-    Base.onResize = self.onResize;
-    self.onResize = function(theNewWidth, theNewHeight) {
+    Base.onResize = Public.onResize;
+    Public.onResize = function(theNewWidth, theNewHeight) {
         Base.onResize(theNewWidth, theNewHeight);
     }
 
     // Will be called before exit
-    Base.onExit = self.onExit;
-    self.onExit = function() {
+    Base.onExit = Public.onExit;
+    Public.onExit = function() {
         Base.onExit();
     }
 
     //////////////////////////////////////////////////////////////////////
-    //
-    // private members
-    //
+    // Private
     //////////////////////////////////////////////////////////////////////
+
     function printHelp() {
         print("Skeleton help:");
+        print("   m    - Enable/Disable mover");
     }
+
+    var _myMoverEnabled = false;
+    var _myCrossHair    = null;
+
+    Public.Constructor();
 }
 
 //
 // main
 //
 try {
-    var ourShow = new Skeleton(arguments);
     var myWindowWidth  = 800;
     var myWindowHeight = 640;
-    ourShow.setup(myWindowWidth, myWindowHeight, ourShow.getReleaseMode(), "Skeleton");
-
-    window.backgroundColor = [0, 0, 0];
-    window.showMouseCursor = !ourShow.getReleaseMode();
+    var ourShow = new Skeleton(arguments, myWindowWidth, myWindowHeight, "Skeleton");
     ourShow.go();
 } catch (ex) {
     reportException(ex);
