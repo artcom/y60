@@ -10,12 +10,24 @@ sub runLocalMakedist($) {
 
     # Install special files
     copyIfMoreRecent("rendergirl.ico", $theDistDir);
-    copyIfMoreRecent("$ENV{PRO}/lib/libeay32.dll", $theDistDir);
-    copyIfMoreRecent("$ENV{PRO}/lib/ssleay32.dll", $theDistDir);
+
+    # Add some usefull scripts
+    copyIfMoreRecent("iv", $theDistDir);
+    copyIfMoreRecent("sv", $theDistDir);
+    copyIfMoreRecent("$ENV{PRO}/build/bin/ue", $theDistDir);
+    copyIfMoreRecent("$ENV{PRO}/build/bin/show.sh", $theDistDir);
+    copyIfMoreRecent("$ENV{PRO}/build/bin/make_project.sh", $theDistDir);
 
     if ($ourPlatform eq "WIN") {
         copyIfMoreRecent("$ENV{SYSTEMROOT}/system32/msvcp71.dll", $theDistDir);
         copyIfMoreRecent("$ENV{SYSTEMROOT}/system32/msvcr71.dll", $theDistDir);
+        copyIfMoreRecent("$ENV{PRO}/lib/libeay32.dll", $theDistDir);
+        copyIfMoreRecent("$ENV{PRO}/lib/ssleay32.dll", $theDistDir);
+        copyIfMoreRecent("$ENV{PRO}/lib/libglib-2.0-0.dll", $theDistDir);
+        copyIfMoreRecent("$ENV{PRO}/lib/iconv.dll", $theDistDir);
+        copyIfMoreRecent("$ENV{PRO}/lib/intl.dll", $theDistDir);
+        copyIfMoreRecent("$ENV{PRO}/lib/libgobject-2.0-0.dll", $theDistDir);
+        copyIfMoreRecent("$ENV{PRO}/lib/libgmodule-2.0-0.dll", $theDistDir);
     }
 
     # Install dependencies
