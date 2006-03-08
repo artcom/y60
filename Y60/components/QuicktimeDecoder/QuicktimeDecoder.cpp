@@ -127,33 +127,65 @@ namespace y60 {
         GetMovieBox(_myMovie, &movieBounds);
 
         Movie * myMovie = getMovie();
-        unsigned myQTPixelFormat;
+
+        unsigned myQTTargetPixelFormat;
+        // get movie pixelformat
+        GWorldPtr myOrigGWorld = NULL;
+        GetMovieGWorld(_myMovie, &myOrigGWorld, NULL);
+        PixMapHandle myPortPixMap = myOrigGWorld->portPixMap;
+        OSType myMoviePixelType = (*myPortPixMap)->pixelFormat;
+
+        myQTTargetPixelFormat = myMoviePixelType;
+
+        switch (myMoviePixelType) {
+            case k32BGRAPixelFormat:
+            case k32RGBAPixelFormat:
+            case k32ABGRPixelFormat:
+                myQTTargetPixelFormat = k32BGRAPixelFormat;
+                AC_TRACE << "Using BGRA pixels";
+                myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGRA, PixelEncodingString));
+                break;
+            case k24BGRPixelFormat:
+            case k16LE555PixelFormat:
+            case k16LE5551PixelFormat:
+            case k16BE565PixelFormat:
+            case k16LE565PixelFormat:
+            case kYUVSPixelFormat:
+            case kYUVUPixelFormat:
+            case kYVU9PixelFormat:
+            case kYUV411PixelFormat:
+            case kYVYU422PixelFormat:
+            case kUYVY422PixelFormat:
+            case kYUV211PixelFormat:
+            case k2vuyPixelFormat:
+            default:
+                AC_TRACE << "Using BGR pixels";
+                myQTTargetPixelFormat = k24BGRPixelFormat;
+                myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGR, PixelEncodingString));
+                break;
+        
+        }
+        // override pixelformat in case of demanded use of GRAY or ALPHA texture
         switch (myMovie->getPixelEncoding()) {
-        case y60::RGBA:
-        case y60::BGRA:
-            AC_TRACE << "Using RGBA pixels";
-            myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::RGBA, PixelEncodingString));
-            myQTPixelFormat = k32RGBAPixelFormat;
-            break;
-        case y60::ALPHA:
-        case y60::GRAY:
-            myQTPixelFormat = k24BGRPixelFormat ;
-            break;
-        case y60::RGB:
-        case y60::BGR:
-        default:
-            AC_TRACE << "Using BGR pixels";
-            myQTPixelFormat = k24BGRPixelFormat;
-            myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGR, PixelEncodingString));
-            break;
+            case y60::ALPHA:
+                myQTTargetPixelFormat = k24BGRPixelFormat ;
+                myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::ALPHA, PixelEncodingString));
+            case y60::GRAY:
+                myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::GRAY, PixelEncodingString));
+                myQTTargetPixelFormat = k24BGRPixelFormat ;
+                break;
         }
 
-        QTNewGWorld(&_myOffScreenWorld, myQTPixelFormat, &movieBounds, 0, 0, 0);
+        QTNewGWorld(&_myOffScreenWorld, myQTTargetPixelFormat, &movieBounds, 0, 0, 0);
 
         unsigned myFrameCount = getFramecount();
         unsigned myDuration = getDurationInMilliseconds();
         unsigned myFrameRate = floor(double(myFrameCount)/ double((myDuration/1000)));
-
+        if (!myFrameRate) {
+            throw QuicktimeDecoderException(string("Movie ") + theFilename +
+                ": could not get framecount and framerate.", PLUS_FILE_LINE);
+            //myFrameRate = 25;
+        }
         
 
 //        myMovie->setPixelEncoding(PixelEncoding(RGBA));
@@ -193,9 +225,13 @@ namespace y60 {
     QuicktimeDecoder::getFramecount() {
         int      frameCount = 0;
         OSType      whichMediaType = VIDEO_TYPE;
-        unsigned int flags = nextTimeMediaSample + nextTimeEdgeOK;
+        unsigned int flags = nextTimeMediaSample + nextTimeEdgeOK; // nextTimeStep;
         TimeValue   duration;
         TimeValue   theTime = 0;
+
+        // due to a bug in QuickTime 6 we        
+        // must task the movie first  
+        //MoviesTask( _myMovie, 0 );
 
         while (theTime >= 0) {
             frameCount++;
@@ -204,7 +240,7 @@ namespace y60 {
                                 1,
                                 &whichMediaType,
                                 theTime,
-                                0,
+                                1,
                                 &theTime,
                                 &duration);
 
@@ -213,7 +249,11 @@ namespace y60 {
 
             flags = nextTimeMediaSample;
         } // while
-        return frameCount;
+        if (frameCount == 0) {
+            return INT_MAX;
+        } else {
+            return frameCount;
+        }
 
     }
 
