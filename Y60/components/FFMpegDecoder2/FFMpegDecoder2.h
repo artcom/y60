@@ -147,6 +147,10 @@ namespace y60 {
         static asl::Block     _mySamples;
         static asl::Block     _myResampledSamples;
 
+        //XXX: Since time_base is specified per stream by ffmpeg, we should really be 
+        //     calculating this per stream and not per file.
+        int64_t           _myTimeUnitsPerSecond;
+        
         /**
          * Thread run method.
          */
