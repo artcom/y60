@@ -65,7 +65,12 @@ void FFMpegAudioDecoder::decodeEverything() {
 
 Time FFMpegAudioDecoder::getDuration() const {
     if (_myFormatContext) {
-        return (_myFormatContext->streams[_myStreamIndex]->duration/double(AV_TIME_BASE));
+        AVStream * myStream = _myFormatContext->streams[_myStreamIndex];	
+#if LIBAVCODEC_BUILD >= 0x5100
+        return (double(myStream->duration)*av_q2d(myStream->time_base));
+#else
+        return (double(myStream->duration)/double(AV_TIME_BASE));
+#endif	
     } else {
         return 0;
     }
