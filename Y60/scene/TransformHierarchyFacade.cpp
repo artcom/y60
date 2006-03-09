@@ -203,14 +203,11 @@ namespace y60 {
         asl::Box3f myBoundingBox;
         myBoundingBox.makeEmpty();
 
-        if (get<VisibleTag>()) {
-            // Extend by child bounding boxes
-            for (unsigned i = 0; i < getNode().childNodesLength(); ++i) {
-                NodePtr myChildNode = getNode().childNode(i);
-                if (myChildNode == Node::ELEMENT_NODE) {
-                    TransformHierarchyFacadePtr myChild = myChildNode->getFacade<TransformHierarchyFacade>();
-                    myBoundingBox.extendBy(myChild->get<BoundingBoxTag>());
-                }
+        for (unsigned i = 0; i < getNode().childNodesLength(); ++i) {
+            NodePtr myChildNode = getNode().childNode(i);
+            if (myChildNode == Node::ELEMENT_NODE) {
+                TransformHierarchyFacadePtr myChild = myChildNode->getFacade<TransformHierarchyFacade>();
+                myBoundingBox.extendBy(myChild->get<BoundingBoxTag>());
             }
         }
         set<BoundingBoxTag>(myBoundingBox);        

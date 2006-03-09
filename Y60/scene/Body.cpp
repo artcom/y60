@@ -132,23 +132,17 @@ namespace y60 {
  
     void
     Body::recalculateBoundingBox() {  
-        if (get<VisibleTag>()) {
-            const Shape & myShape = getShape();
-            // Get shape bounding box
-            const asl::Box3f & myShapeBoundingBox = myShape.get<BoundingBoxTag>();
+        const Shape & myShape = getShape();
+        // Get shape bounding box
+        const asl::Box3f & myShapeBoundingBox = myShape.get<BoundingBoxTag>();
 
-            // Multiply with global matrix to transform shape bb into world coordinates
-            asl::Box3f myBoundingBox = myShapeBoundingBox * get<GlobalMatrixTag>();
+        // Multiply with global matrix to transform shape bb into world coordinates
+        asl::Box3f myBoundingBox = myShapeBoundingBox * get<GlobalMatrixTag>();
 
-            // Extend by child bounding boxes
-            TransformHierarchyFacade::recalculateBoundingBox();
-            myBoundingBox.extendBy(get<BoundingBoxTag>());
-            set<BoundingBoxTag>(myBoundingBox);
-        } else {
-            Box3f myBoundingBox;
-            myBoundingBox.makeEmpty();
-            set<BoundingBoxTag>(myBoundingBox);
-        }
+        // Extend by child bounding boxes
+        TransformHierarchyFacade::recalculateBoundingBox();
+        myBoundingBox.extendBy(get<BoundingBoxTag>());
+        set<BoundingBoxTag>(myBoundingBox);
     }
 
     BodyPtr 
