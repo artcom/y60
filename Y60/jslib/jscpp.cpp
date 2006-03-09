@@ -43,6 +43,7 @@
 #include "JSBlock.h"
 #include "JSZipWriter.h"
 #include "JSTestServer.h"
+#include "JSPerlinNoise.h"
 
 #include "jscpp.h"
 
@@ -213,6 +214,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSTestServer::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSPerlinNoise::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JS_DefineFunctions(cx,theGlobalObject, JSFileFunctions::Functions())) {
