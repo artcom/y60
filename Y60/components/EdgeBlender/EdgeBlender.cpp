@@ -202,6 +202,12 @@ EdgeBlender::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set<float>(_myPower);
     } else if (thePropertyName == "gamma") {
         theReturnValue.set<float>(_myGamma);
+    } else if (thePropertyName == "rows") {
+        theReturnValue.set<unsigned>(_myRowCount);
+    } else if (thePropertyName == "columns") {
+        theReturnValue.set<unsigned>(_myColumnCount);
+    } else if (thePropertyName == "mode") {
+        theReturnValue.set<unsigned>(_myMode);
     }
 }
 
@@ -222,6 +228,12 @@ EdgeBlender::onSetProperty(const std::string & thePropertyName,
         _myPower = thePropertyValue.get<float>();
     } else if (thePropertyName == "gamma") {
         _myGamma = thePropertyValue.get<float>();
+    } else if (thePropertyName == "rows") {
+        _myRowCount = thePropertyValue.get<unsigned>();
+    } else if (thePropertyName == "columns") {
+        _myColumnCount = thePropertyValue.get<unsigned>();
+    } else if (thePropertyName == "mode") {
+        _myMode = thePropertyValue.get<unsigned>();
     }
 }
 
