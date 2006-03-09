@@ -153,6 +153,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         var myMaterial = buildUnlitTextureMaterialNode(myFontName + "_material", myFontImage.id);
         addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
         myMaterial.transparent = true;
+        myMaterial.properties.targetbuffers = "[red,green,blue,alpha]"
         theSceneViewer.getMaterials().appendChild(myMaterial);
 
         _myAlphabetMap[theSize] = [];
@@ -163,7 +164,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         _myAlphabetMap[theSize].fontname = myFontName;
         _myAlphabetMap[theSize].fontmetrics = myFontMetrics;
 
-        window.scene.update(Scene.MATERIALS);
+        window.scene.update(Scene.MATERIALS);        
     }
 
     /////////////////////////////////////////////////////////////////////////////
