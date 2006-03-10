@@ -31,23 +31,28 @@ PerlinNoiseUnitTest.prototype.Constructor = function(obj, theName) {
     UnitTest.prototype.Constructor(obj, theName);
 
     obj.run = function() {
-        obj.myPerlinNoise = new PerlinNoise(1, 3);
-        ENSURE('obj.myPerlinNoise.persistence == 1');
+        obj.myPerlinNoise = new PerlinNoise(3);
         ENSURE('obj.myPerlinNoise.octavecount == 3');
-        print("Noise [1,1] = " + obj.myPerlinNoise.noise2D([1,1]));
-        obj.myPerlinNoise.persistence = 1.5;
-        ENSURE('obj.myPerlinNoise.persistence == 1.5');
-        var myTime = millisec();
-        print("Noise [1,1] = " + obj.myPerlinNoise.noise2D([1,1]));
-        print("timing: " + (millisec() - myTime));
-        print("Noise [1,1] = " + obj.myPerlinNoise.noise2D(new Vector2f(1,1)));
+        ENSURE('obj.myPerlinNoise.amplitudefalloff == 0.5');
+        obj.myPerlinNoise = new PerlinNoise(4, 0.9);
+        ENSURE('obj.myPerlinNoise.octavecount == 4');
+        ENSURE('almostEqual(obj.myPerlinNoise.amplitudefalloff, 0.9)');
+        DPRINT('obj.myPerlinNoise.noise(0.1)');
+        DPRINT('obj.myPerlinNoise.noise([0.1,0.1])');
+        DPRINT('obj.myPerlinNoise.noise([1,2,3])');
+        DPRINT('obj.myPerlinNoise.noise(new Vector2f(0.2,0.3))');
 
+        var myNoise = new PerlinNoise(3);
+        var myTime = millisec();
+        for (var i = 0; i < 1000; ++i) {
+            myNoise.noise([1,2,3]);
+        }
+        print("timing: " + (millisec() - myTime) / 1000);
 /*
         var myWindow = new RenderWindow();
         for (var i = 0; i < 10; ++i) {
-            print(i);
             for (var j = 0; j < 10; ++j) {
-                var myNoise = obj.myPerlinNoise.noise2D([i,j])
+                var myNoise = obj.myPerlinNoise.noise([i,j])
                 new Overlay(myWindow.scene, new Vector4f(myNoise, myNoise, myNoise, 1), [i * 10 + 1, j * 10 + 1], [10,10]);
             }
         }

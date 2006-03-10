@@ -24,11 +24,11 @@
 
 namespace jslib {
 
-class JSPerlinNoise : public JSWrapper<asl::PerlinNoise2D, asl::Ptr<asl::PerlinNoise2D>, StaticAccessProtocol>
+class JSPerlinNoise : public JSWrapper<asl::PerlinNoise3D, asl::Ptr<asl::PerlinNoise3D>, StaticAccessProtocol>
 {
         JSPerlinNoise() {}
     public:
-        typedef asl::PerlinNoise2D NATIVE;
+        typedef asl::PerlinNoise3D NATIVE;
         typedef asl::Ptr<NATIVE> OWNERPTR;
         typedef JSWrapper<NATIVE,OWNERPTR,StaticAccessProtocol> Base;
 
@@ -39,7 +39,7 @@ class JSPerlinNoise : public JSWrapper<asl::PerlinNoise2D, asl::Ptr<asl::PerlinN
 
         enum PropertyNumbers {
             PROP_octavecount = -100,
-            PROP_persistance
+            PROP_amplitudefalloff
         };
 
         static JSPropertySpec * Properties();
@@ -77,7 +77,7 @@ class JSPerlinNoise : public JSWrapper<asl::PerlinNoise2D, asl::Ptr<asl::PerlinN
 };
 
 template <>
-struct JSClassTraits<asl::PerlinNoise2D> : public JSClassTraitsWrapper<asl::PerlinNoise2D, JSPerlinNoise> {};
+struct JSClassTraits<asl::PerlinNoise3D> : public JSClassTraitsWrapper<asl::PerlinNoise3D, JSPerlinNoise> {};
 
 bool convertFrom(JSContext *cx, jsval theValue, JSPerlinNoise::NATIVE & thePerlinNoise);
 
@@ -87,4 +87,3 @@ jsval as_jsval(JSContext *cx, JSPerlinNoise::OWNERPTR theOwner, JSPerlinNoise::N
 }
 
 #endif
-

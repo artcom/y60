@@ -30,14 +30,14 @@ namespace jslib {
             JS_ReportError(cx, "JSBSpline: self is not a BSpline");
             return JS_FALSE;
         }
-        
+
         if (argc == 1) {
             std::vector<asl::Vector3f> myPoints;
             if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPoints)) {
                 JS_ReportError(cx, "JSBSpline: argument #1 must be a vectorofvector");
                 return JS_FALSE;
             }
-            
+
             myNative->setControlPoints(myPoints);
             return JS_TRUE;
         } else if (argc == 4) {
@@ -61,7 +61,7 @@ namespace jslib {
                 return JS_FALSE;
             }
             myNative->setControlPoints(myStart, myStartAnchor, myEnd, myEndAnchor);
-            return JS_TRUE;            
+            return JS_TRUE;
         }
 
         JS_ReportError(cx, "JSBSpline::setControlPoints: bad number of arguments: expected 1 or 4");
@@ -216,7 +216,7 @@ namespace jslib {
         static JSFunctionSpec myProperties[] = {{0}};
         return myProperties;
     }
- 
+
     // getproperty handling
     JSBool
     JSBSpline::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
@@ -235,7 +235,7 @@ namespace jslib {
         JS_ReportError(cx,"JSBSpline::setProperty: index %d out of range", theID);
         return JS_FALSE;
     }
-    
+
     JSBool JSBSpline::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Constructor a new BSpline object");
         DOC_PARAM("theStart", "Start point", DOC_TYPE_VECTOR3F);
@@ -305,8 +305,7 @@ namespace jslib {
     JSObject * JSBSpline::initClass(JSContext * cx, JSObject * theGlobalObject)
     {
         JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
-        DOC_CREATE(JSBSpline);
-
+        DOC_MODULE_CREATE("Math", JSBSpline);
         return myClass;
     }
 
