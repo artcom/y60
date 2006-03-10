@@ -205,13 +205,12 @@ function test_PathText() {
     var myPos = null;
 
     if (0) { 
-        const TEST_PATHS = [
-            '<path d="M 0 0 l 200 0 Z" />',
-            '<path d="M 0,0 C 75,0 75,50 150,50 h 100 Z"/>',
+        const __PATHTEXT_TEST = [
+            'M 0 0 l 200 0 l 200 200Z',
+            'M 0,0 C 75,0 75,50 150,50 h 100 Z',
         ];
 
-        var myPathNode = new Node(TEST_PATHS[0]).firstChild;
-        mySvgPath = new SvgPath(myPathNode);
+        mySvgPath = new SvgPath(__PATHTEXT_TEST[0]);
     } else {
         var mySvgFile = readFileAsString(expandEnvironment("${PRO}/testmodels/curves.svg"));
         var mySvgNode = new Node(mySvgFile);
@@ -219,7 +218,7 @@ function test_PathText() {
         var mySvgPaths = []
         var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
         for (var i = 0; i < myPaths.length; ++i) {
-            mySvgPaths.push(new SvgPath(myPaths[i]));
+            mySvgPaths.push(new SvgPath(myPaths[i].d));
         }
         mySvgPath = mySvgPaths[0];
         myPos = new Vector3f(0, 1.15 * 100, 0);
@@ -257,7 +256,7 @@ function test_PathText() {
             myPathText.align(myPathAlign, myPos);
             myRealign = false;
         }
-        mySvgPath.draw();
+        window.getRenderer().draw(mySvgPath, [1,1,0,1]);
     }
 
     mySceneViewer.go();

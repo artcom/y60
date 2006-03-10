@@ -8,7 +8,14 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("SvgPath.js");
+/// Alignment for Text and PathStrip.
+const TOP_ALIGNMENT    = 0;
+const BOTTOM_ALIGNMENT = 1;
+const CENTER_ALIGNMENT = 2;
+const BASELINE_ALIGNMENT = 3;
+
+/// Up-vector for determination of path left-vector.
+const UP_VECTOR = new Vector3f(0,0,1);
 
 function PathAlign(thePath) {
     this.Constructor(this, thePath);
@@ -29,7 +36,7 @@ PathAlign.prototype.Constructor = function(self, thePath) {
             return false;
         }
         _myCurrentPosition = myNearest.point;
-        _myCurrentSegment = myNearest.segment;
+        _myCurrentSegment = myNearest.element;
         return true;
     }
 
@@ -133,10 +140,12 @@ PathAlign.prototype.Constructor = function(self, thePath) {
 
 function test_PathAlign() {
 
+    use("Y60JSSL.js");
+
     var myMatrix = new Matrix4f();
     var myPath;
     if (1) {
-        var SVG_FILE = "../CONFIG/curves.svg";
+        var SVG_FILE = expandEnvironment("${PRO}/testmodels/curves.svg");
         myMatrix.scale(new Vector3f(0.00025, 0.00025, 0));
         myMatrix.translate(new Vector3f(-0.15, -0.25, -1));
 
@@ -145,20 +154,19 @@ function test_PathAlign() {
         var mySvgNode = new Node(mySvgFile);
 
         var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
-        myPath = new SvgPath(myPaths[6]);
+        myPath = new SvgPath(myPaths[6].d);
     } else {
         const __PATHALIGN_TESTS = [
-            '<path d="M 0 0 l 0 50 l 10 50 l -10 50 l -50 0 z" />',
-            '<path d="M 50 40 l 50 50 l 30 -20 Z" />',
-            '<path d="M 50 60 Q 100 10 150 60 T 250 60 T 350 60" />',
-            '<path d="M 50 90 L 150 35 Q 200 110 250 35 L 300 90 Z" />',
-            '<path d="M 350 35 V 75 C 300 30 250 110 200 85 S 150 30 100 50 V 35 Z" />',
-            '<path d="M 50 90 V 75 C 60 30 200 110 250 35 L 300 90 Z" />',
-            '<path d="M 365 35 V 95 H 35 V 75 A 40 40 0 0 0 75 35 Z M 355 45 V 85 H 45 A 50 50 0 0 0 85 45 Z" />',
+            'M 0 0 l 0 50 l 10 50 l -10 50 l -50 0 z',
+            'M 50 40 l 50 50 l 30 -20 Z',
+            'M 50 60 Q 100 10 150 60 T 250 60 T 350 60',
+            'M 50 90 L 150 35 Q 200 110 250 35 L 300 90 Z',
+            'M 350 35 V 75 C 300 30 250 110 200 85 S 150 30 100 50 V 35 Z',
+            'M 50 90 V 75 C 60 30 200 110 250 35 L 300 90 Z',
+            'M 365 35 V 95 H 35 V 75 A 40 40 0 0 0 75 35 Z M 355 45 V 85 H 45 A 50 50 0 0 0 85 45 Z',
             ];
 
-        var myPathNode = new Node(__PATHALIGN_TESTS[0]).firstChild;
-        myPath = new SvgPath(myPathNode);
+        myPath = new SvgPath(__PATHALIGN_TESTS[0]);
         myMatrix.translate(new Vector3f(0,0,-10));
     }
     var myPathAlign = new PathAlign(myPath);
@@ -184,7 +192,7 @@ function test_PathAlign() {
     }
 
     mySceneViewer.onPostRender = function() {
-        myPath.draw([1,1,0,1], myMatrix, 1);
+        window.getRenderer().draw(myPath, [1,1,0,1], myMatrix);
         if (next) {
             print("*** advance");
             var mySegment = myPathAlign.advance(-45);

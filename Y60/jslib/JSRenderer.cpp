@@ -22,6 +22,8 @@
 #include "JSLine.h"
 #include "JSTriangle.h"
 #include "JSSphere.h"
+#include "JSBSpline.h"
+#include "JSSvgPath.h"
 
 #include <iostream>
 
@@ -38,6 +40,56 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     std::string myStringRep = std::string("Renderer@") + as_string(obj);
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
     *rval = STRING_TO_JSVAL(myString);
+    return JS_TRUE;
+}
+
+template <class T>
+static JSBool
+drawHelper(JSContext * cx, JSObject * obj, uintN argc, jsval * argv)
+{
+    T myObject;
+    asl::Vector4f myColor(1.0f, 1.0f, 1.0f, 1.0f);
+    asl::Matrix4f myMatrix;
+    myMatrix.makeIdentity();
+    float myLineWidth = 1.0f;
+    std::string myRenderStyles = "";
+
+    if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myObject)) {
+        JS_ReportError(cx, "JSRenderer::draw: argument #1 must be a drawable element");
+        return JS_FALSE;
+    }
+    if (argc > 1) {
+        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myColor)) {
+            JS_ReportError(cx, "JSRenderer::draw: argument #2 must be a Vector4f");
+            return JS_FALSE;
+        }
+    }
+    if (argc > 2) {
+        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myMatrix)) {
+            JS_ReportError(cx, "JSRenderer::draw: argument #3 must be a Matrix4f");
+            return JS_FALSE;
+        }
+    }
+    if (argc > 3) {
+        if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], myLineWidth)) {
+            JS_ReportError(cx, "JSRenderer::draw: argument #4 must be a float");
+            return JS_FALSE;
+        }
+    }
+    if (argc > 4) {
+        if (JSVAL_IS_VOID(argv[4]) || !convertFrom(cx, argv[4], myRenderStyles)) {
+            JS_ReportError(cx, "JSRenderer::draw: argument #5 must be a string");
+            return JS_FALSE;
+        }
+    }
+
+    JSRenderer::NATIVE * myNative = 0;
+    if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+        JS_ReportError(cx, "JSRenderer::draw: self is not a Renderer");
+        return JS_FALSE;
+    }
+    myNative->draw(myObject, myColor, myMatrix, myLineWidth, myRenderStyles);
+
     return JS_TRUE;
 }
 
@@ -61,59 +113,41 @@ draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_RESET;
     DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("theTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
+    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
+    DOC_RESET;
+    DOC_PARAM("theBSpline", "", DOC_TYPE_BSPLINE);
+    DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
     DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_RESET;
+    DOC_PARAM("theSvgPath", "", DOC_TYPE_SVGPATH);
+    DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
+    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_END;
-    
-    if (argc == 5) {
+    try {
+        ensureParamCount(argc, 1,5);
+
         if (JSLineSegment::matchesClassOf(cx, argv[0])) {
-            typedef void (Renderer::*MyMethod)(
-                const asl::LineSegment<float> &,
-                const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation,
-                const float & theLineWidth,
-                const std::string & theRenderStyles);
-            return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
-        }
-    } else if (argc == 4) {
-        if (JSLineSegment::matchesClassOf(cx, argv[0])) {
-            typedef void (Renderer::*MyMethod)(
-                const asl::LineSegment<float> &,
-                const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation,
-                const float & theLineWidth,
-                const std::string & theRenderStyles);
-            return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
+            return drawHelper<asl::LineSegment<float> >(cx, obj, argc, argv);
         }
         if (JSTriangle::matchesClassOf(cx, argv[0])) {
-            typedef void (Renderer::*MyMethod)(
-                const asl::Triangle<float> &,
-                const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation,
-                const float & theLineWidth);
-            return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
+            return drawHelper<asl::Triangle<float> >(cx, obj, argc, argv);
         }
         if (JSSphere::matchesClassOf(cx, argv[0])) {
-            typedef void (Renderer::*MyMethod)(
-                const asl::Sphere<float> &,
-                const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation,
-                const float & theLineWidth);
-            return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
+            return drawHelper<asl::Sphere<float> >(cx, obj, argc, argv);
         }
         if (JSBox3f::matchesClassOf(cx, argv[0])) {
-            typedef void (Renderer::*MyMethod)(
-                const asl::Box3<float> &,
-                const asl::Vector4f & theColor,
-                const asl::Matrix4f & theTransformation,
-                const float & theLineWidth);
-            return Method<Renderer>::call((MyMethod)&Renderer::draw,cx,obj,argc,argv,rval);
+            return drawHelper<asl::Box3<float> >(cx, obj, argc, argv);
         }
-        JS_ReportError(cx,"JSRenderWindow::draw: bad argument type #0");
-        return JS_FALSE;
-    }
-    JS_ReportError(cx,"JSRenderWindow::draw: bad number of arguments, 4 expected");
+        if (JSBSpline::matchesClassOf(cx, argv[0])) {
+            return drawHelper<asl::BSpline<float> >(cx, obj, argc, argv);
+        }
+        if (JSSvgPath::matchesClassOf(cx, argv[0])) {
+            return drawHelper<asl::SvgPath>(cx, obj, argc, argv);
+        }
+    } HANDLE_CPP_EXCEPTION;
     return JS_FALSE;
 }
 
@@ -123,7 +157,7 @@ JSRenderer::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
-        {"draw",                 draw,                    3},
+        {"draw",                 draw,                    5},
         {0}
     };
     return myFunctions;
@@ -323,7 +357,6 @@ bool convertFrom(JSContext *cx, jsval theValue, Renderer *& theRenderer) {
     return false;
 }
 
-
 bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<Renderer> & theRenderer) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
@@ -343,6 +376,3 @@ jsval as_jsval(JSContext *cx, JSRenderer::OWNERPTR & theOwner) {
 }
 
 }
-
-
-

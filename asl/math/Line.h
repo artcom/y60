@@ -25,6 +25,7 @@
 #include "Vector234.h"
 #include "Point234.h"
 
+#include <asl/Ptr.h>
 #include <iostream>
 
 namespace asl {	
@@ -137,6 +138,7 @@ namespace asl {
     const LineSegment<Number> & asLineSegment(const Point3<Number> & theTwoPoints) {
         return reinterpret_cast<const LineSegment<Number>&>(theTwoPoints);
     }
+
     //==============================================================================
     // stream operator stuff
     //==============================================================================

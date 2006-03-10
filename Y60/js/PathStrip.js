@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("SvgPath.js");
+use("PathAlign.js"); // for ALIGNMENT consts
 use("BuildUtils.js");
 
 /**
@@ -71,7 +71,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         var mySegment = 0;
         if (thePos != null) {
             var myNearest = thePath.nearest(thePos);
-            mySegment = myNearest.segment;
+            mySegment = myNearest.element;
             myLastPos = myNearest.point;
         } else {
             mySegment = 0;
@@ -285,10 +285,10 @@ function test_PathStrip() {
 
         window.camera.position = new Vector3f(0,0,30);
     } else {
-        var mySvgFile = readFileAsString("curves.svg"); //svg-logo-001.svg");
+        var mySvgFile = readFileAsString(expandEnvironment("${PRO}/testmodels/curves.svg")); //svg-logo-001.svg");
         var mySvgNode = new Node(mySvgFile);
         var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
-        myPath = new SvgPath(myPaths[6], 100);
+        myPath = new SvgPath(myPaths[6].d, 100);
         myWidth = 20.0;
 
         window.camera.position = new Vector3f(700, 1800, 1300);
@@ -324,7 +324,7 @@ function test_PathStrip() {
     }
 
     mySceneViewer.onPostRender = function() {
-        myPath.draw();
+        window.getRenderer().draw(myPath);
     }
 
     mySceneViewer.go();

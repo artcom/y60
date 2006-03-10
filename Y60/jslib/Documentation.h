@@ -95,7 +95,9 @@ namespace jslib {
         DOC_TYPE_SCENE,
         DOC_TYPE_VECTOROFVECTOR2F,
         DOC_TYPE_VECTOROFVECTOR3F,
-        DOC_TYPE_VECTOROFVECTOR4F
+        DOC_TYPE_VECTOROFVECTOR4F,
+        DOC_TYPE_BSPLINE,
+        DOC_TYPE_SVGPATH
    };
 
     static const std::string DocTypeDescription[] = {
@@ -104,7 +106,8 @@ namespace jslib {
         "Vector2i", "Vector2f", "Vector3i", "Vector3f", "Vector4f", "VectorOfFloat", "Point", "Quaternion", "Matrix", "Box",
         "Line", "Ray", "LineSegment", "Plane", "Triangle", "Sphere", "Frustum",
         "Node", "NodeList", "Request", "object", "Block", "Scene",
-        "VectorOfVector2f", "VectorOfVector3f", "VectorOfVector3f"
+        "VectorOfVector2f", "VectorOfVector3f", "VectorOfVector4f",
+        "BSpline", "SvgPath"
     };
 
     struct ParameterDescription {

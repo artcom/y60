@@ -21,7 +21,7 @@ namespace asl {
 
     /**
      * BSpline class.
-     * Based on BSpline.js code.
+     * Based on BSpline.js code. [Rev 5374]
      */
     template<class T>
     class BSpline {

@@ -681,6 +681,7 @@ namespace y60 {
 
     void 
     Renderer::enableRenderStyles(const std::vector<RenderStyleType> & theRenderStyles) {
+
         bool myIgnoreDepthFlag = (std::find(theRenderStyles.begin(), theRenderStyles.end(),
                                             IGNORE_DEPTH) !=  theRenderStyles.end());
         bool myNoDepthWritesFlag = (std::find(theRenderStyles.begin(), theRenderStyles.end(),
@@ -704,12 +705,12 @@ namespace y60 {
             glPolygonOffset(1.0, 1.0);
         }
     }
+
     void Renderer::preDraw(const asl::Vector4f & theColor,
                            const asl::Matrix4f & theTransformation,
-                           const float & theWidth,
+                           float theWidth,
                            const std::string & theRenderStyles) 
    {
-
         std::istringstream myRenderStylesStream(theRenderStyles);
         vector<RenderStyleType> myRenderStyles;
         VectorOfString myRenderStylesStrings;
@@ -728,17 +729,16 @@ namespace y60 {
 
     void Renderer::postDraw()
     {
-//        glLineWidth(1.0f);
         glPopMatrix();
-//        glEnable(GL_LIGHTING);
         glPopAttrib();
     }
 
+    template <>
     void Renderer::draw(const asl::LineSegment<float> & theLine,
-            const asl::Vector4f & theColor,
-            const asl::Matrix4f & theTransformation,
-            const float & theWidth,
-            const std::string & theRenderStyles)
+                        const asl::Vector4f & theColor,
+                        const asl::Matrix4f & theTransformation,
+                        float theWidth,
+                        const std::string & theRenderStyles)
     {
         preDraw(theColor, theTransformation, theWidth,theRenderStyles);
 
@@ -751,12 +751,14 @@ namespace y60 {
         CHECK_OGL_ERROR;
     }
 
+    template <>
     void Renderer::draw(const asl::Sphere<float> & theSphere,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            const float & theWidth)
+            float theWidth,
+            const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth,"");
+        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
 
         const float TwoPI = float(asl::PI) * 2.0f;
         const unsigned mySegments = 32;
@@ -787,12 +789,14 @@ namespace y60 {
         CHECK_OGL_ERROR;
     }
 
+    template <>
     void Renderer::draw(const asl::Box3<float> & theBox,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            const float & theWidth)
+            float theWidth,
+            const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth,"");
+        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
 
         Point3f myLTF, myRBF, myRTF, myLBF;
         Point3f myLTBK, myRBBK, myRTBK, myLBBK;
@@ -806,12 +810,14 @@ namespace y60 {
         CHECK_OGL_ERROR;
     }
 
+    template <>
     void Renderer::draw(const asl::Triangle<float> & theTriangle,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            const float & theWidth)
+            float theWidth,
+            const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth,"");
+        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
 
         glBegin(GL_TRIANGLES);
             glVertex3fv(theTriangle[0].begin());
@@ -823,18 +829,51 @@ namespace y60 {
         CHECK_OGL_ERROR;
     }
 
+    template <>
     void Renderer::draw(const asl::BSpline<float> & theBSpline,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            const float & theWidth)
+            float theWidth,
+            const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth,"");
+        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
 
         glBegin(GL_LINE_STRIP);
         unsigned myNumSegments = 16;
         for (unsigned i = 0; i <= myNumSegments; ++i) {
             const asl::Vector3f myPoint = theBSpline.evaluate(i / (float)myNumSegments);
             glVertex3fv(myPoint.begin());
+        }
+        glEnd();
+
+        postDraw();
+        CHECK_OGL_ERROR;
+    }
+
+    template <>
+    void Renderer::draw(const asl::SvgPath & thePath,
+            const asl::Vector4f & theColor,
+            const asl::Matrix4f & theTransformation,
+            float theWidth,
+            const std::string & theRenderStyles)
+    {
+        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
+
+        glBegin(GL_LINE_STRIP);
+        asl::Vector3f myLastPos;
+        for (unsigned i = 0; i < thePath.getNumElements(); ++i) {
+            const asl::SvgPath::LineSegmentPtr mySegment = thePath.getElement(i);
+            if (i == 0 || !asl::almostEqual(mySegment->origin, myLastPos)) {
+                // discontinuous
+                if (i > 0) {
+                    glEnd();
+                    glBegin(GL_LINE_STRIP);
+                }
+                glVertex3fv(mySegment->origin.begin());
+            }
+
+            myLastPos = mySegment->end;
+            glVertex3fv(myLastPos.begin());
         }
         glEnd();
 

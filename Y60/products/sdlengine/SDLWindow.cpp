@@ -120,7 +120,7 @@ SDLWindow::postRender() {
             _myLastSwapCounter = counter;
         }
         if ((counter - _myLastSwapCounter) != _mySwapInterval) {
-            AC_WARNING << "Missed frame diff=" << (counter - _myLastSwapCounter - _mySwapInterval);
+            AC_WARNING << "Missed frame diff=" << (counter - _myLastSwapCounter);
         }
         _myLastSwapCounter = counter;
     }
@@ -719,7 +719,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
             asl::msleep(20);
             glXGetVideoSyncSGI(&counter1);
             if (counter1 <= counter0) {
-                AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working properly, disabling";
+                AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working properly (counter1=" << counter1 << ", counter0=" << counter0 << "), disabling";
                 theInterval = 0;
             } else {
                 AC_INFO << "setSwapInterval(): glXGetVideoSyncSGI working properly";

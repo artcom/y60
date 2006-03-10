@@ -8,7 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSBSpline.h"
 #include "JSSphere.h"
 #include "JSBox.h"
 #include "JSLine.h"
@@ -43,6 +42,8 @@
 #include "JSBlock.h"
 #include "JSZipWriter.h"
 #include "JSTestServer.h"
+#include "JSBSpline.h"
+#include "JSSvgPath.h"
 #include "JSPerlinNoise.h"
 
 #include "jscpp.h"
@@ -156,6 +157,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSBSpline::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSSvgPath::initClass(cx, theGlobalObject)) {
         return false;
     }
 

@@ -8,41 +8,40 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef _Y60_JSBSPLINE_H_
-#define _Y60_JSBSPLINE_H_
+#ifndef _Y60_JSSVGPATH_H_
+#define _Y60_JSSVGPATH_H_
 
 #include "JSWrapper.h"
 
-#include <asl/Vector234.h>
-#include <asl/BSpline.h>
+#include <asl/SvgPath.h>
 #include <dom/Value.h>
 
 namespace jslib {
 
-typedef float BSplineNumber;
-
-class JSBSpline : public JSWrapper<asl::BSpline<BSplineNumber>, asl::Ptr<asl::BSpline<BSplineNumber> >, StaticAccessProtocol>
+class JSSvgPath : public JSWrapper<asl::SvgPath, asl::Ptr<asl::SvgPath>, StaticAccessProtocol>
 {
-    JSBSpline() {}
+    JSSvgPath() {}
 
 public:
-    typedef asl::BSpline<BSplineNumber> NATIVE;
+    typedef asl::SvgPath NATIVE;
     typedef asl::Ptr<NATIVE> OWNERPTR;
     typedef JSWrapper<NATIVE, OWNERPTR, StaticAccessProtocol> Base;
 
     static const char * ClassName() {
-        return "BSpline";
+        return "SvgPath";
     };
 
     enum PropertyNumbers {
-        PROP_length = -100
+        PROP_length = -100,
+        PROP_numelements,
+        PROP_segmentlength,
     };
 
-    static JSFunctionSpec * Functions();
-    static JSPropertySpec * Properties();
     static JSConstIntPropertySpec * ConstIntProperties();
-    static JSPropertySpec * StaticProperties();
     static JSFunctionSpec * StaticFunctions();
+    static JSFunctionSpec * Functions();
+    static JSPropertySpec * StaticProperties();
+    static JSPropertySpec * Properties();
 
     virtual unsigned long length() const {
         return 1;
@@ -62,23 +61,23 @@ public:
         return Base::Construct(cx, theOwner, theNative);
     }
 
-    JSBSpline(OWNERPTR theOwner, NATIVE * theNative) : Base(theOwner, theNative) {
+    JSSvgPath(OWNERPTR theOwner, NATIVE * theNative) : Base(theOwner, theNative) {
     }
 
     static JSObject * initClass(JSContext *cx, JSObject * theGlobalObject);
 };
 
 template <>
-struct JSClassTraits<asl::BSpline<BSplineNumber> >
-    : public JSClassTraitsWrapper<asl::BSpline<BSplineNumber>, JSBSpline> 
+struct JSClassTraits<asl::SvgPath>
+    : public JSClassTraitsWrapper<asl::SvgPath, JSSvgPath> 
 {
 };
 
-bool convertFrom(JSContext * cx, jsval theValue, JSBSpline::NATIVE *& theBSpline);
-bool convertFrom(JSContext * cx, jsval theValue, JSBSpline::NATIVE & theBSpline);
+bool convertFrom(JSContext * cx, jsval theValue, asl::SvgPath *& theSvgPath);
+bool convertFrom(JSContext * cx, jsval theValue, asl::SvgPath & theSvgPath);
 
-jsval as_jsval(JSContext * cx, JSBSpline::OWNERPTR theOwner);
-jsval as_jsval(JSContext * cx, JSBSpline::OWNERPTR theOwner, JSBSpline::NATIVE * theBSpline);
+jsval as_jsval(JSContext * cx, JSSvgPath::OWNERPTR theOwner);
+jsval as_jsval(JSContext * cx, JSSvgPath::OWNERPTR theOwner, JSSvgPath::NATIVE * theSvgPath);
 
 } // namespace
 

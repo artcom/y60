@@ -310,6 +310,21 @@ namespace jslib {
         return myClass;
     }
 
+    bool convertFrom(JSContext * cx, jsval theValue, JSBSpline::NATIVE & theBSpline) {
+        if (JSVAL_IS_OBJECT(theValue)) {
+            JSObject * myArgument;
+            if (JS_ValueToObject(cx, theValue, &myArgument)) {
+                if (JSA_GetClass(cx,myArgument) == JSClassTraits<asl::BSpline<BSplineNumber> >::Class()) {
+                    typedef JSClassTraits<asl::BSpline<BSplineNumber> >::ScopedNativeRef NativeRef;
+                    NativeRef myObj(cx, myArgument);
+                    theBSpline = myObj.getNative();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     bool convertFrom(JSContext *cx, jsval theValue, JSBSpline::NATIVE *& theBSpline) {
         if (JSVAL_IS_OBJECT(theValue)) {
             JSObject * myArgument;

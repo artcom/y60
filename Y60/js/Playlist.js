@@ -192,12 +192,12 @@ Playlist.prototype.Constructor = function(self) {
             if (theSeekableFlag) {                
                 myDecoderHint = "y60FFMpegDecoder1";
             } else {
-                myDecoderHint = "y60FFMpegDecoder2";
+                myDecoderHint = "y60FFMpegDecoder1";
             }
         }
         if (theUrl.search(/\.mov$/i)  != -1) {
             if (operatingSystem() == "Linux" || theSeekableFlag) {
-                myDecoderHint = "y60FFMpegDecoder";
+                myDecoderHint = "y60FFMpegDecoder1";
             } else {
                 myDecoderHint = "y60QuicktimeDecoder";
             }

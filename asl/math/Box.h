@@ -15,7 +15,7 @@
 //
 //   $Revision: 1.25 $
 //
-// Description: Point2<Number> and Point3 class
+// Description: Box2<Number> and Box3<Number> class
 //
 //=============================================================================
 
@@ -25,6 +25,8 @@
 #include "Vector234.h"
 #include "Point234.h"
 #include "numeric_functions.h"
+
+#include <asl/Logger.h>
 #include <math.h>
 
 #undef min
@@ -49,24 +51,24 @@ namespace asl {
         typedef Vector2<Number> VectorType;
 
         /** Default constructor */
-        Box2() {}
+        Box2() { }
 
         /** Copy constructor */
-        Box2(const Box2 & theOtherBox) : Base(theOtherBox) {}
+        Box2(const Box2 & theOtherBox) : Base(theOtherBox) { }
 
         /** Constructor given bounds */
         Box2(Number xmin, Number ymin, Number xmax, Number ymax)
             : Base(Point2<Number>(xmin, ymin), Point2<Number>(xmax, ymax))
-        {}
+        { }
 
         /** Constructor given minimum and maximum points */
         Box2(const Point2<Number> & theMinCorner, const Point2<Number> & theMaxCorner )
             : Base(theMinCorner, theMaxCorner)
-        {}
+        { }
 
         /** Destructor */
         ~Box2()
-        {};
+        { }
 
         /** Assignment operator */
         Box2 & operator=(const Box2 & t) {
@@ -483,8 +485,10 @@ namespace asl {
 
         /** Default constructor */
         Box3() {};
-        Box3(const Box3 & theOtherBox) : Base(theOtherBox)
+        Box3(const Box3 & theOtherBox)
+            : Base(theOtherBox)
         {}
+
         /** Constructor given bounds */
         Box3(Number xmin, Number ymin, Number zmin, Number xmax, Number ymax, Number zmax)
             : Base(Point3<Number>(xmin, ymin, zmin), Point3<Number>(xmax, ymax, zmax))

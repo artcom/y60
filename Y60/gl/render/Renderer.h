@@ -28,6 +28,7 @@
 #include <asl/linearAlgebra.h>
 #include <asl/intersection.h>
 #include <asl/Exception.h>
+#include <asl/SvgPath.h>
 
 #ifdef WIN32
 #   include <windows.h>
@@ -89,27 +90,12 @@ namespace y60 {
 
             void initGL();
 
-            void draw(const asl::LineSegment<float> & theLine,
-                    const asl::Vector4f & theColor,
-                    const asl::Matrix4f & theTransformation,
-                    const float & theWidth = 1.0f,
-                    const std::string & theRenderStyles = "");
-            void draw(const asl::Triangle<float> & theTriangle,
+            template <class T>
+            void draw(const T & theDrawable,
                       const asl::Vector4f & theColor,
                       const asl::Matrix4f & theTransformation,
-                      const float & theWidth = 1.0f);
-            void draw(const asl::Box3<float> & theBox,
-                      const asl::Vector4f & theColor,
-                      const asl::Matrix4f & theTransformation,
-                      const float & theWidth = 1.0f);
-            void draw(const asl::Sphere<float> & theSphere,
-                      const asl::Vector4f & theColor,
-                      const asl::Matrix4f & theTransformation,
-                      const float & theWidth = 1.0f);
-            void draw(const asl::BSpline<float> & theBSpline,
-                      const asl::Vector4f & theColor,
-                      const asl::Matrix4f & theTransformation,
-                      const float & theWidth = 1.0f);
+                      float theWidth = 1.0f,
+                      const std::string & theRenderStyles = "");
 
        private:
             void setupRenderState(ViewportPtr theViewport);
@@ -156,7 +142,7 @@ namespace y60 {
             /// setup immediate draw
             void preDraw(const asl::Vector4f & theColor,
                          const asl::Matrix4f & theTransformation,
-                         const float & theWidth = 1.0f,
+                         float theWidth = 1.0f,
                          const std::string & theRenderStyle = "");
 
             /// restore from immediate draw
