@@ -55,17 +55,17 @@ public:
             ENSURE(almostEqual(myPath.getLength(), 170.71067f));
 
             DPRINT(myPath.nearest(Vector3f(42,2.3,0)));
-            ENSURE(myPath.nearest(Vector3f(42,2.3,0)) == Vector3f(42,0,0));
+            ENSURE(almostEqual(myPath.nearest(Vector3f(42,2.3,0)), Vector3f(42,0,0)));
 
             SvgPath::PathNormal myNormal = myPath.normal(Vector3f(130,20,0));
-            ENSURE(myNormal.normal == normalized(Vector3f(-1,1,0)));
-            ENSURE(myNormal.nearest == Vector3f(125,25,0));
+            ENSURE(almostEqual(myNormal.normal, normalized(Vector3f(-1,1,0))));
+            ENSURE(almostEqual(myNormal.nearest, Vector3f(125,25,0)));
 
             SvgPath * myPerPath = myPath.createPerpendicularPath(Vector3f(23,0,0), 100.0f);
             ENSURE(myPerPath->getLength() == 100.0f);
-            ENSURE(myPerPath->pointOnPath(0.0f) == Vector3f(23,0,0));
-            ENSURE(myPerPath->pointOnPath(0.5f) == Vector3f(23,50,0));
-            ENSURE(myPerPath->pointOnPath(1.0f) == Vector3f(23,100,0));
+            ENSURE(almostEqual(myPerPath->pointOnPath(0.0f), Vector3f(23,0,0)));
+            ENSURE(almostEqual(myPerPath->pointOnPath(0.5f), Vector3f(23,50,0)));
+            ENSURE(almostEqual(myPerPath->pointOnPath(1.0f), Vector3f(23,100,0)));
 
             SvgPath * mySubPath = myPath.createSubPath(Vector3f(10,0,0), Vector3f(90,0,0));
             DPRINT(mySubPath->getLength());
