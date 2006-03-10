@@ -15,7 +15,7 @@
 //
 //   $Revision: 1.4 $
 //
-// Description: simple 2d perlin noise with cosine interpolation
+// Description: simple 2d _myPerlin noise with cosine interpolation
 //              TODO: - 1d/3d variants
 //
 //=============================================================================
@@ -46,19 +46,19 @@ PrimePool::createPrimeNumberList(int theStart, int theEnd, std::vector<int> & th
 }
 
 void
-PrimePool::createNoiseSeed(unsigned theOctaves, NoiseSeed & theSeed) {
+PrimePool::createNoiseSeed(unsigned theOctaves, NoiseSeed & theSeeds) {
     if (_myPool1.empty()) {
         createPrimeNumberList(10000, 20000, _myPool1);
         createPrimeNumberList(700000, 800000, _myPool2);
         createPrimeNumberList(1376310000, 1376320000, _myPool3);
     }
     
-    theSeed.clear();
+    theSeeds.clear();
     for (unsigned i = 0; i < theOctaves; ++i) {
         Vector3i mySeed(getRandomElement(_myPool1),
                         getRandomElement(_myPool2),
                         getRandomElement(_myPool3));
-        theSeed.push_back(mySeed);
+        theSeeds.push_back(mySeed);
     }
 }
 
@@ -73,11 +73,10 @@ PerlinNoise2D::PerlinNoise2D(float thePersistence) :
     _myPersistence(thePersistence)
 {}
 
-PerlinNoise2D::PerlinNoise2D(const NoiseSeed & theSeed, float thePersistence) :
-    _mySeeds(theSeed),
+PerlinNoise2D::PerlinNoise2D(const NoiseSeed & theSeeds, float thePersistence) :
+    _mySeeds(theSeeds),
     _myPersistence(thePersistence)
-{
-}
+{}
 
 float 
 PerlinNoise2D::operator()(const asl::Vector2f & thePosition) const {
@@ -88,17 +87,13 @@ float
 PerlinNoise2D::operator()(float x, float y) const {
     unsigned n = getOctaveCount() - 1;
     float myTotal = 0;
-    for (unsigned i = 0; i < n; ++i) {
-        
+    for (unsigned i = 0; i < n; ++i) {      
         float myFrequency = pow(2.0f, float(i));
-        float myAmplitude = pow(_myPersistence, float(i));
-        
-        myTotal = myTotal + interpolatedNoise(x * myFrequency, y * myFrequency, i) * myAmplitude;
-        
+        float myAmplitude = pow(_myPersistence, float(i));        
+        myTotal = myTotal + interpolatedNoise(x * myFrequency, y * myFrequency, i) * myAmplitude;        
     }
     
-    return myTotal;
-    
+    return myTotal;    
 }
 
 float
@@ -110,8 +105,8 @@ PerlinNoise2D::noise(int theX, int theY, unsigned theOctave) const {
 }
 
 void 
-PerlinNoise2D::setSeed(const NoiseSeed & theSeed) {
-    _mySeeds = theSeed;
+PerlinNoise2D::setSeed(const NoiseSeed & theSeeds) {
+    _mySeeds = theSeeds;
 }
 
 const NoiseSeed & 
@@ -166,11 +161,89 @@ PerlinNoise2D::interpolatedNoise(float x, float y, unsigned theOctave) const {
 
 float
 PerlinNoise2D::interpolate(float a, float b, float theGamma) const {
-    //return (a * theGamma) + ( b * (1 - theGamma));
     float ft = float(theGamma * PI);
-    float f = (1 - cos(ft)) * 0.5f;
-    
+    float f = (1 - cos(ft)) * 0.5f;   
     return  a * ( 1 - f) + b * f;    
 }
 
-} // endo of namespace asl
+///////////////////////////////////////////////////////////////////////////////////////////////
+//
+// The following code comes from andi schlegel and seems to be faster
+//
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+PerlinNoise3D::PerlinNoise3D(unsigned theOctaveCount, float theAmplitudeFalloff) : 
+    _myOctaveCount(theOctaveCount),
+    _myAmplitudeFalloff(theAmplitudeFalloff)
+{
+    for (int i = 0; i < 360; i++) {
+        _mySinLUT[i] = sinf(i * 0.01745329f);
+        _myCosLUT[i] = cosf(i * 0.01745329f);
+    }
+
+    for (unsigned i = 0; i < 4096; ++i)
+        _myPerlin[i] = float(rand()) / RAND_MAX;
+    }
+}
+
+float
+PerlinNoise3D::noise(float f, float f1, float f2) {
+    if (f < 0.0f) {
+        f = -f;
+    }
+    if (f1 < 0.0f) {
+        f1 = -f1;
+    }
+    if (f2 < 0.0f) {
+        f2 = -f2;
+    }
+
+    int j = int(f);
+    int k = int(f1);
+    int l = int(f2);
+    
+    float f3 = f - float(j);
+    float f4 = f1 - float(k);
+    float f5 = f2 - float(l);
+    float f8 = 0.0f;
+    float f9 = 0.5f;
+    for (unsigned i1 = 0; i1 < _myOctaveCount; ++i1) {
+        int j1 = j + (k << 4) + (l << 8);
+        float f6 = noise_fsc(f3);
+        float f7 = noise_fsc(f4);
+        float f10 = _myPerlin[j1 & 0xfff];
+        f10 += f6 * (_myPerlin[j1 + 1 & 0xfff] - f10);
+        float f11 = _myPerlin[j1 + 16 & 0xfff];
+        f11 += f6 * (_myPerlin[j1 + 16 + 1 & 0xfff] - f11);
+        f10 += f7 * (f11 - f10);
+        j1 += 256;
+        f11 = _myPerlin[j1 & 0xfff];
+        f11 += f6 * (_myPerlin[j1 + 1 & 0xfff] - f11);
+        float f12 = _myPerlin[j1 + 16 & 0xfff];
+        f12 += f6 * (_myPerlin[j1 + 16 + 1 & 0xfff] - f12);
+        f11 += f7 * (f12 - f11);
+        f10 += noise_fsc(f5) * (f11 - f10);
+        f8 += f10 * f9;
+        f9 *= _myAmplitudeFalloff;
+        j <<= 1;
+        f3 *= 2.0f;
+        k <<= 1;
+        f4 *= 2.0f;
+        l <<= 1;
+        f5 *= 2.0f;
+        if (f3 >= 1.0f) {
+            j++;
+            f3--;
+        }
+        if (f4 >= 1.0f) {
+            k++;
+            f4--;
+        }
+        if (f5 >= 1.0f) {
+            l++;
+            f5--;
+        }
+    }
+
+    return f8;
+} 

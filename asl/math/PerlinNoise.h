@@ -52,10 +52,10 @@ class PrimePool {
 class PerlinNoise2D {
     public:
         PerlinNoise2D(float thePersistence);
-        PerlinNoise2D(const NoiseSeed & theSeed, float thePersistence);
+        PerlinNoise2D(const NoiseSeed & theSeeds, float thePersistence);
         unsigned getOctaveCount() const;
 
-        void setSeed(const NoiseSeed & theSeed);
+        void setSeed(const NoiseSeed & theSeeds);
         const NoiseSeed & getSeed() const;
 
         void setPersistence(const float & thePersistence);
@@ -75,6 +75,58 @@ class PerlinNoise2D {
 
         NoiseSeed _mySeeds;
         float     _myPersistence;
+};
+
+class PerlinNoise3D {
+    public:
+        PerlinNoise3D(unsigned theOctaveCount, float theAmplitudeFalloff = 0.5);
+
+        float noise(float f1) {
+            return noise(f1, 0.0, 0.0);
+        }
+
+        float noise(float f1, float f2) {
+            return noise(f1, f2, 0.0);
+        }
+
+        float noise(asl::Vector2f f) {
+            return noise(f[0], f[1], 0.0);
+        }
+
+        float noise(asl::Vector3f f) {
+            return noise(f[0], f[1], f[2]);
+        }
+
+        float noise(float f1, float f2, float f3);
+
+        float getAmplitudeFalloff() const {
+            return _myAmplitudeFalloff;
+        }
+
+        void setAmplitudeFalloff(float theFalloff) {
+            if (_myAmplitudeFalloff > 0) {
+                _myAmplitudeFalloff = theFalloff;
+            }
+        }
+
+        unsigned getOctaveCount() const {
+            return _myOctaveCount;
+        }
+
+        void setOctaveCount(unsigned theCount) {
+            _myOctaveCount = theCount;
+        }
+
+    private:
+        float noise_fsc(float f) const {
+            return 0.5f * (1.0f - _myCosLUT[(int)(f * 180.0f) % 360]);
+        }
+
+        unsigned _myOctaveCount;
+        float _myAmplitudeFalloff;
+        float _mySinLUT[360];
+        float _myCosLUT[360];
+        float _myPerlin[4096];
 };
 
 /* @} */
