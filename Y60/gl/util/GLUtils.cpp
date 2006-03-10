@@ -597,7 +597,6 @@ namespace y60 {
 
             SET_PROC_ADDRESS( PFNGLFLUSHVERTEXARRAYRANGENVPROC, glFlushVertexArrayRangeNV );
             SET_PROC_ADDRESS( PFNGLVERTEXARRAYRANGENVPROC, glVertexArrayRangeNV );
-            SET_PROC_ADDRESS( PFNGLBLENDEQUATIONPROC, glBlendEquation );
  
             if (!(glBindBuffer && 
                 glDeleteBuffers &&
@@ -688,14 +687,8 @@ namespace y60 {
             SET_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
         }
 #endif
-#if 0        
-        GLuint myTest;
-        cerr << " test... " << endl;
-        glGenFramebuffersEXT = (PFNGLGENRENDERBUFFERSEXTPROC) 
-            glXGetProcAddressARB( (const GLubyte *)"glGenFramebuffersEXT" );
-        glGenFramebuffersEXT( 1, &myTest);
-        cerr << " test done. " << endl;
-#endif        
+
+        SET_PROC_ADDRESS( PFNGLBLENDEQUATIONPROC, glBlendEquation );
 
 #ifdef WIN32
         if (queryWGLExtension("WGL_EXT_swap_control")) {
