@@ -125,7 +125,7 @@ JSRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     NATIVE * newNative = 0;
 
     JSRenderArea * myNewObject = 0;
-    GdkGLContext * myShareList = 0;
+    acgtk::RenderAreaPtr myRenderArea(0);
     ensureParamCount(argc, 0);
 
     const GLContextRegistry::ContextSet & myContextSet = GLContextRegistry::get().getContextSet();
@@ -133,21 +133,21 @@ JSRenderArea::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
         if (*i) {
             WeakPtr<AbstractRenderWindow> myWeaky = *i;
             asl::Ptr<AbstractRenderWindow> myContext = myWeaky.lock();
-            asl::Ptr<acgtk::RenderArea> myRenderArea = dynamic_cast_Ptr<acgtk::RenderArea>(myContext);
+            myRenderArea = dynamic_cast_Ptr<acgtk::RenderArea>(myContext);
             if (myRenderArea && myRenderArea->is_realized()) {
-                myShareList = myRenderArea->getGdkGlContext();
                 AC_INFO << "Realized Context found.";
                 break;
             } else {
+                myRenderArea = acgtk::RenderAreaPtr(0);
                 AC_INFO << "Found unrealized Context";
             }
         }
     }
 
-    if (!myShareList && myContextSet.size() > 0) {
+    if (!myRenderArea && myContextSet.size() > 0) {
         AC_ERROR << "Can not reuse a context although there exists one. Please realize any contexts before creating new ones! ";
     }
-    newNative = new NATIVE(myShareList);
+    newNative = new NATIVE(myRenderArea);
     OWNERPTR newOwner(newNative);
     newNative->setSelf(newOwner);
     myNewObject = new JSRenderArea(newOwner, newNative);

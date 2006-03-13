@@ -27,22 +27,16 @@
 #include <asl/Exception.h>
 
 #include "GLUtils.h"
+#include "RenderState.h"
 
 #include <vector>
 #include <string>
 
 namespace y60 {
 
-DEFINE_EXCEPTION(GLContextException, asl::Exception);
+    DEFINE_EXCEPTION(GLContextException, asl::Exception);
 
-    class DrawingContext {
-    public:
-        virtual bool activate() const = 0;
-        virtual bool saveCurrent() = 0;
-    };
-
-
-    class GLContext : public DrawingContext {
+    class GLContext {
         public:
             GLContext();
 
@@ -52,18 +46,25 @@ DEFINE_EXCEPTION(GLContextException, asl::Exception);
             virtual bool saveCurrent();
 
     	    static void checkLastError(const std::string & theScope);
-        protected:
+            
+            RenderStatePtr getStateCache() const {
+                return _myStateCache;
+            }
+         private:
     #ifdef WIN32
-            HDC             _myHdc;
-            HGLRC           _myHglrc;
+            HDC         _myHdc;
+            HGLRC       _myHglrc;
     #endif
     #ifdef LINUX
-            Display * _myDisplay;
+            Display *   _myDisplay;
             GLXDrawable _myDrawable;
-            GLXContext _myGLXContext;
+            GLXContext  _myGLXContext;
     #endif
+            RenderStatePtr _myStateCache;
     };
 
+    typedef asl::Ptr<GLContext> GLContextPtr;
 } // namespace 
+
 
 #endif // AC_Y60_PBUFFER

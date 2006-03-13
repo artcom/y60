@@ -43,7 +43,6 @@ namespace jslib {
 
     AbstractRenderWindow::AbstractRenderWindow(const JSErrorReporter & theErrorReporter) :
         _myScene(0), _myRenderer(0),
-        _myContext(0),
         _myEventListener(0),
         _myJSContext(0),
         _myRenderingCaps(~0), // enable all (~)
@@ -115,10 +114,10 @@ namespace jslib {
         //    throw asl::Exception("ERROR: AbstractRenderWindow::theScene is 0!", PLUS_FILE_LINE);
         //}
         try {
-            y60::ScopedGLContext myGLContext(this);
+            y60::ScopedGLContext myContextLock(this);
             initDisplay();
 
-            _myRenderer = RendererPtr(new Renderer(_myRenderingCaps));
+            _myRenderer = RendererPtr(new Renderer(_myGLContext, _myRenderingCaps));
             _myRenderer->getTextManager().setTTFRenderer(createTTFRenderer());
 
             _myScene = theScene;
@@ -163,10 +162,10 @@ namespace jslib {
         // If the renderer has not been created by setScene(), yet, because everything
         // was added using the initial default scene, do so now.
         if (!_myRenderer) {
-            y60::ScopedGLContext myGLContext(this);
+            y60::ScopedGLContext myContextLock(this);
             initDisplay();
 
-            _myRenderer = RendererPtr(new Renderer(_myRenderingCaps));
+            _myRenderer = RendererPtr(new Renderer(_myGLContext, _myRenderingCaps));
             _myRenderer->getTextManager().setTTFRenderer(createTTFRenderer());
             _myRenderer->setCurrentScene(getCurrentScene());
 
@@ -294,36 +293,36 @@ namespace jslib {
 
     bool
     AbstractRenderWindow::hasCap(unsigned int theCap) {
-        y60::ScopedGLContext myGLContext(this);
+        y60::ScopedGLContext myContextLock(this);
         return y60::hasCap(theCap);
     }
 
     bool
     AbstractRenderWindow::hasCapAsString(const std::string & theCapStr) {
-        y60::ScopedGLContext myGLContext(this);
+        y60::ScopedGLContext myContextLock(this);
         return y60::hasCap(theCapStr);
     }
 
     std::string
     AbstractRenderWindow::getGLVersionString() {
-        y60::ScopedGLContext myGLContext(this);
+        y60::ScopedGLContext myContextLock(this);
         return y60::getGLVersionString();
     }
 
     std::string
     AbstractRenderWindow::getGLVendorString() {
-        y60::ScopedGLContext myGLContext(this);
+        y60::ScopedGLContext myContextLock(this);
         return y60::getGLVendorString();
     }
     std::string
     AbstractRenderWindow::getGLRendererString() {
-        y60::ScopedGLContext myGLContext(this);
+        y60::ScopedGLContext myContextLock(this);
         return y60::getGLRendererString();
     }
 
     unsigned int 
     AbstractRenderWindow::getGLExtensionStrings(std::vector<std::string> & theTokens) {
-        y60::ScopedGLContext myGLContext(this);
+        y60::ScopedGLContext myContextLock(this);
         return y60::getGLExtensionStrings(theTokens);
     }
 
@@ -977,12 +976,12 @@ namespace jslib {
     }
     void
     AbstractRenderWindow::getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, float & theValue) {
-        y60::ScopedGLContext myGLContext(this);
+        y60::ScopedGLContext myContextLock(this);
         glReadPixels(theXPos, theYPos, 1,1, theFormat, GL_FLOAT, &theValue);
     }
     void
     AbstractRenderWindow::getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, asl::Unsigned8 & theValue) {
-        y60::ScopedGLContext myGLContext(this);
+        y60::ScopedGLContext myContextLock(this);
         glReadPixels(theXPos, theYPos, 1,1, theFormat, GL_UNSIGNED_BYTE, &theValue);
     }
 }

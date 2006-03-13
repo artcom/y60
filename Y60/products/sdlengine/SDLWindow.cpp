@@ -70,6 +70,7 @@ SDLWindow::SDLWindow() :
     _mySwapInterval(0),
     _myLastSwapCounter(0)
 {
+    setGLContext(GLContextPtr(new GLContext()));
 }
 
 SDLWindow::~SDLWindow() {

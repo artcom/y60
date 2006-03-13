@@ -49,7 +49,7 @@ using namespace y60;
 
 namespace acgtk {
 
-RenderArea::RenderArea(GdkGLContext * theShareList) : AbstractRenderWindow(jslib::JSApp::ShellErrorReporter),
+RenderArea::RenderArea(RenderAreaPtr theContext) : AbstractRenderWindow(jslib::JSApp::ShellErrorReporter),
     _myContextRefCount(0),
     _isFirstFrame(true)
 {
@@ -59,11 +59,24 @@ RenderArea::RenderArea(GdkGLContext * theShareList) : AbstractRenderWindow(jslib
         throw asl::Exception("can't init gl",PLUS_FILE_LINE);
     }
 
+    // If another render area is supplied as constructor paramter, this render area is uses as 
+    // source for a shared y60-gl-context and gdk-gl-context.
+    GdkGLContext * myGdkGLContext = 0;
+    if (theContext) {
+        myGdkGLContext = theContext->getGdkGlContext();
+        if (!myGdkGLContext) {
+            throw asl::Exception("RenderArea: Failed to get gdk gl context from shared render area.", PLUS_FILE_LINE);
+        }
+        setGLContext(theContext->getGLContext());
+    } else {
+        setGLContext(GLContextPtr(new GLContext()));
+    }
+
     /* Set OpenGL-capability to the widget. */
-    DB(cerr << "RenderArea::RenderArea() sharing with " << theShareList << endl);
+    DB(cerr << "RenderArea::RenderArea() sharing with " << myGdkGLContext << endl);
     if (!gtk_widget_set_gl_capability (GTK_WIDGET(gobj()),
 				myGLConfig,
-				theShareList,
+				myGdkGLContext,
 				true,
 				GDK_GL_RGBA_TYPE))
     {

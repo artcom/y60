@@ -12,7 +12,7 @@
 #define _ac_renderer_Renderer_h_
 
 #include "BodyPart.h"
-#include "RenderState.h"
+#include <y60/RenderState.h>
 
 #include <y60/TextRendererManager.h>
 
@@ -22,6 +22,7 @@
 #include <y60/Scene.h>
 #include <y60/MaterialBase.h>
 #include <y60/Light.h>
+#include <y60/GLContext.h>
 
 #include <asl/Frustum.h>
 #include <asl/Dashboard.h>
@@ -54,7 +55,7 @@ namespace y60 {
 
     class Renderer {
         public:
-            Renderer(unsigned int theRenderingCaps = -1 /*get em all*/);
+            Renderer(GLContextPtr theGLContext, unsigned int theRenderingCaps = -1 /*get em all*/);
             virtual ~Renderer();
 
             void preRender(const y60::CanvasPtr & theCanvas);
@@ -164,7 +165,8 @@ namespace y60 {
             y60::ScenePtr           _myScene;
 
             // OpenGl state chache
-            RenderState             _myState;
+            GLContextPtr            _myContext;
+            RenderStatePtr          _myState;
             unsigned short          _myBoundingVolumeMode;
 
             // transient state (valid during one render pass)

@@ -29,15 +29,19 @@ namespace y60 {
 
     void
     RenderState::init() {
-        setWireframe(_myWireframeFlag);
-        setLighting(_myLightingFlag);
-        setBackfaceCulling(_myBackfaceCullingFlag);
-        setFlatShading(_myFlatShadingFlag);
-        setTexturing(_myTexturingFlag);
+        commitWireframe(_myWireframeFlag);
+        commitLighting(_myLightingFlag);
+        commitBackfaceCulling(_myBackfaceCullingFlag);        
+        commitFlatShading(_myFlatShadingFlag);
+        commitTexturing(_myTexturingFlag);
+        commitIgnoreDepth(_myIgnoreDepthFlag);
+        commitDepthWrites(_myDepthWritesFlag);
+        commitPolygonOffset(_myPolygonOffsetFlag);
+        commitCullFaces(_myCullFaces);
     }
 
     void
-    RenderState::setWireframe(bool theFlag) {
+    RenderState::commitWireframe(bool theFlag) {
         if (theFlag) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         } else {
@@ -47,7 +51,7 @@ namespace y60 {
     }
 
     void
-    RenderState::setLighting(bool theFlag) {
+    RenderState::commitLighting(bool theFlag) {
         if (theFlag) {
             glEnable(GL_LIGHTING);
         } else {
@@ -57,10 +61,9 @@ namespace y60 {
     }
 
     void
-    RenderState::setBackfaceCulling(bool theFlag) {
+    RenderState::commitBackfaceCulling(bool theFlag) {
         if (theFlag) {
             glEnable(GL_CULL_FACE);
-            glCullFace(GL_BACK);
         } else {
             glDisable(GL_CULL_FACE);
         }
@@ -68,7 +71,7 @@ namespace y60 {
     }
 
     void
-    RenderState::setFlatShading(bool theFlag) {
+    RenderState::commitFlatShading(bool theFlag) {
         if (theFlag) {
             glShadeModel(GL_FLAT);
         } else {
@@ -78,7 +81,7 @@ namespace y60 {
     }
 
     void
-    RenderState::setTexturing(bool theFlag) {
+    RenderState::commitTexturing(bool theFlag) {
         if (theFlag) {
             glEnable(GL_TEXTURE_2D);
         } else {
@@ -100,4 +103,48 @@ namespace y60 {
         _myEnabledClippingPlanes = thePlanes.size();
     }
 
+    void
+    RenderState::commitIgnoreDepth(bool theFlag) {                    
+        if (theFlag) {
+            glDepthFunc(GL_ALWAYS);
+        } else {
+            glDepthFunc(GL_LESS);
+        }
+
+        _myIgnoreDepthFlag = theFlag;
+    }
+
+    void
+    RenderState::commitDepthWrites(bool theFlag) {                    
+        if (theFlag) {
+            glDepthMask(GL_TRUE);
+        } else {
+            glDepthMask(GL_FALSE);
+        }
+
+        _myDepthWritesFlag = theFlag;
+    }
+
+    void
+    RenderState::commitPolygonOffset(bool theFlag) {                    
+        if (theFlag) {
+            glEnable(GL_POLYGON_OFFSET_POINT);
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(1.0, 1.0);
+        } else {
+            glDisable(GL_POLYGON_OFFSET_POINT);
+            glDisable(GL_POLYGON_OFFSET_LINE);
+            glDisable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(0.0, 0.0);
+        }
+
+        _myPolygonOffsetFlag = theFlag;
+    }
+
+    void
+    RenderState::commitCullFaces(GLenum theFaces) {
+        glCullFace(theFaces);
+        _myCullFaces = theFaces;
+    }
 }

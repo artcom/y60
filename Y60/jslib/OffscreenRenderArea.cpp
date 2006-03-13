@@ -13,6 +13,7 @@
 
 #include <y60/Image.h>
 #include <y60/PixelEncodingInfo.h>
+#include <y60/GLContextRegistry.h>
 #include <asl/Logger.h>
 
 
@@ -35,6 +36,14 @@ OffscreenRenderArea::OffscreenRenderArea() :
 {
     AC_TRACE << "OffscreenRenderArea::CTOR";
     setRenderingCaps(0);
+
+    asl::Ptr<AbstractRenderWindow> myContextWindow = GLContextRegistry::get().getContext();
+    if (myContextWindow) {
+        setGLContext(myContextWindow->getGLContext());
+    } else {
+        throw OffscreenRendererException("Could not find active render window. "
+            "Offscreen render areas always need an gl context to share.", PLUS_FILE_LINE);
+    }
 }
 
 
@@ -43,12 +52,6 @@ OffscreenRenderArea::~OffscreenRenderArea() {
 
 // IEventSink
 void OffscreenRenderArea::handle(y60::EventPtr theEvent) {
-}
-
-// IGLContext
-void OffscreenRenderArea::activateGLContext() {
-}
-void OffscreenRenderArea::deactivateGLContext() {
 }
 
 // AbstractRenderWindow

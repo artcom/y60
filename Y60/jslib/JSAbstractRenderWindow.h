@@ -642,7 +642,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
 
         static JSBool
         activateGLContext(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("Use this function to switch the OpenGL context to an offscreen windows.");
+            DOC_BEGIN("Use this function to switch the OpenGL context to an offscreen window.");
             DOC_END;
             DERIVED * mySelf;
             convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);

@@ -44,8 +44,6 @@ namespace y60 {
         DB(AC_TRACE << "TextRendererManager:: setup render pass" << endl);
         MAKE_SCOPE_TIMER(renderTextSnippets);
 
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
@@ -53,15 +51,12 @@ namespace y60 {
 
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
-#if 0
-        glLoadIdentity();
-#else
+
         Matrix4f myScreenMatrix;
         myScreenMatrix.makeTranslating(Vector3f(-float(_myWindowWidth)/2, -float(_myWindowHeight)/2,0));
         myScreenMatrix.postMultiply(theScreenMatrix);
         myScreenMatrix.translate(Vector3f(float(_myWindowWidth)/2, float(_myWindowHeight)/2,0));
         glLoadMatrixf(static_cast<const GLfloat *>(myScreenMatrix.getData()));
-#endif
 
         // TODO: Workaround: switchMaterial enables vertex arrays for all vertex registers
         // but overlays do not use arrays
@@ -84,7 +79,6 @@ namespace y60 {
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
 
-        glPopAttrib();
         CHECK_OGL_ERROR;
     }
 

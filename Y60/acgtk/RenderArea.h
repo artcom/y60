@@ -33,9 +33,12 @@
 
 namespace acgtk {
 
+class RenderArea;
+typedef asl::Ptr<RenderArea> RenderAreaPtr;
+
 class RenderArea : public Gtk::DrawingArea, public jslib::AbstractRenderWindow {
     public:
-        RenderArea(GdkGLContext * theShareList = 0);
+        RenderArea(RenderAreaPtr theContext = RenderAreaPtr(0));
         virtual ~RenderArea();
         // Y60 AbstractWindowArea
         void initDisplay();

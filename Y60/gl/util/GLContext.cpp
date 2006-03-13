@@ -43,7 +43,9 @@ namespace y60 {
 #ifdef LINUX
         : _myDisplay(0), _myDrawable(0), _myGLXContext(0)  
 #endif
-    { }
+    { 
+        _myStateCache = RenderStatePtr(new RenderState());
+    }
 
     GLContext::~GLContext() {
     }

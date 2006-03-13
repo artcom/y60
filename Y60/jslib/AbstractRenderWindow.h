@@ -23,16 +23,12 @@
 #include <y60/TTFTextRenderer.h>
 #include <y60/IGLContextManager.h>
 #include <y60/RequestManager.h>
-
+#include <y60/GLContext.h>
 #include <y60/Scene.h>
 #include <y60/IEventSink.h>
 #include <y60/IEventSource.h>
 
 #include <list>
-
-namespace y60 {
-    class GLContext;
-}
 
 namespace jslib {
 
@@ -228,7 +224,10 @@ namespace jslib {
 
         void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, asl::Unsigned8 & theValue);
         void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, float & theValue);
-
+        
+        y60::GLContextPtr getGLContext() const {
+            return _myGLContext;
+        }
     protected:
         AbstractRenderWindow(const JSErrorReporter & theErrorReporter);
         virtual void preRender();
@@ -258,7 +257,7 @@ namespace jslib {
 
         JSObject *           _myEventListener;
         JSContext *          _myJSContext;
-        y60::GLContext *     _myContext;
+        
         JSErrorReporter      _myErrorReporter;
         inet::RequestManager _myRequestManager;
 
@@ -268,15 +267,20 @@ namespace jslib {
 
         asl::WeakPtr<AbstractRenderWindow> _mySelf;
 
+        void setGLContext(y60::GLContextPtr theContext) {
+            _myGLContext = theContext;
+        }
     private:
         AbstractRenderWindow();
         void ensureScene();
 
-        TimeoutQueue _myTimeoutQueue;
-        double       _myFixedDeltaT;
-        double       _myStartTime;
-        double       _myPauseTime;
-        bool         _myPauseFlag;
+        y60::GLContextPtr _myGLContext;
+        TimeoutQueue      _myTimeoutQueue;
+        double            _myFixedDeltaT;
+        double            _myStartTime;
+        double            _myPauseTime;
+        bool              _myPauseFlag;
+        
     };
 
 }

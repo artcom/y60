@@ -166,7 +166,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
 
         // switch mover
-        var myNewMover = self.setMover(_myMoverFactories[myNextMoverIndex]);
+        var myNewMover = self.setMover(_myMoverFactories[myNextMoverIndex], theViewport);
         print("Activated Mover: " + myNewMover.name);
 
     }
@@ -418,7 +418,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
                 if (_myClickedViewport) {
                     myMover = self.getMover(_myClickedViewport);
                 } else {
-                    myMover = self.getMover();                     
+                    myMover = self.getMover();
                 }
             }
         }
@@ -532,7 +532,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         return myArgumentMap;
     }
-    
+
     // is called before first scene update
     self.preprocessScene = function(theScene) {
         // find all movienodes with no decoderhint and try to set it
@@ -541,12 +541,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             for (var myMovieIndex = 0; myMovieIndex < myMovies.length; myMovieIndex++) {
                 var myMovie = myMovies[myMovieIndex];
                 if (myMovie.decoderhint == "") {
-                    myMovie.decoderhint = new Playlist().getVideoDecoderHintFromURL(myMovie.src, false);        
+                    myMovie.decoderhint = new Playlist().getVideoDecoderHintFromURL(myMovie.src, false);
                     print("Set decoderhint for movie with source : " + myMovie.src + " to: " + myMovie.decoderhint);
                 }
             }
         }
-        
+
     }
 
     self.prepareScene = function (theScene, theCanvas) {

@@ -419,19 +419,20 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         renderer = window.getRenderer();
         window.swapInterval = 0;
 
+        var myViewport = self.getRenderWindow().canvas.childNode("viewport");
+
         // standard movers
         self.registerMover(TrackballMover);
         self.registerMover(ClassicTrackballMover);
         self.registerMover(FlyMover);
         self.registerMover(WalkMover);
-        self.setMover(ClassicTrackballMover);
-        self.setActiveCamera(window.camera);
+        self.setMover(ClassicTrackballMover, myViewport);
+        self.setActiveCamera(window.scene.dom.getElementById(myViewport.camera), myViewport);
 
         _myDebugVisual = new DebugVisual(self.getWorld(), self);
 
         _myAnimationManager = new AnimationManager(self);
         _myImageManager = new ImageManager(self);
-        var myViewport = self.getRenderWindow().canvas.childNode("viewport");
         _myOverlayManager = new OverlayManager(self.getScene(), myViewport);
 
         if (_mySplashScreen) {
