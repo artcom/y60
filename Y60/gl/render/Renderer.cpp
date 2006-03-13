@@ -1021,7 +1021,7 @@ namespace y60 {
 
         // We need to push all thouse bits, that need to be reset after the main render pass (before 
         // text and overlay rendering). But not thouse that are managed by the renderstate class.
-        glPushAttrib(GL_TEXTURE_BIT);
+        glPushAttrib(GL_TEXTURE_BIT | GL_LIGHTING_BIT);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
         dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
