@@ -13,7 +13,7 @@
 
 #include <y60/Image.h>
 #include <y60/PixelEncodingInfo.h>
-#include <y60/GLContextRegistry.h>
+#include "GLContextRegistry.h"
 #include <asl/Logger.h>
 
 
