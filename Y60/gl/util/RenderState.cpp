@@ -17,7 +17,7 @@
 
 #include "RenderState.h"
 
-#include <y60/GLUtils.h>
+#include "GLUtils.h"
 
 #ifdef WIN32
 #   include <GL/glh_extensions.h>
