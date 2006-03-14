@@ -191,7 +191,7 @@ namespace jslib {
             JS_ReportError(cx, "JSSvgPath::cbezier: argument #2 must be a vector");
             return JS_FALSE;
         }
-        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myStartAnchor)) {
+        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myEnd)) {
             JS_ReportError(cx, "JSSvgPath::cbezier: argument #3 must be a vector");
             return JS_FALSE;
         }
