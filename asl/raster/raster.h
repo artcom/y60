@@ -83,8 +83,6 @@ class raster {
 
         D stride() const { return _stride;}
 
-        T* dataptr() const {return this->start;}
-
         void resize(D X, D Y, const T& x) { _stride = X; resize_vec(_stride * Y, x);}
         void resize(D X, D Y) { resize(X, Y, T());}
 
