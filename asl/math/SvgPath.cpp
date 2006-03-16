@@ -608,8 +608,19 @@ namespace asl {
 
         return myPath;
     }
-} // namespace
 
-std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath) {
-    return os << "[" << thePath.getLength() << "]";
-}
+    std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath) {
+        os << "[";
+        for (unsigned i = 0; i < thePath.getNumElements(); ++i) {
+            if (i > 0) {
+                os << ",";
+            }
+            SvgPath::LineSegmentPtr myLineSegment = thePath.getElement(i);
+            if (myLineSegment) {
+                os << *myLineSegment;
+            }
+        }
+        os << "]";
+        return os;
+    }
+} // namespace

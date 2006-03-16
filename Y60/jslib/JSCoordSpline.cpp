@@ -155,8 +155,7 @@ JSCoordSpline::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv
 JSObject *
 JSCoordSpline::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
-    DOC_CREATE(JSCoordSpline);
-
+    DOC_MODULE_CREATE("Math", JSCoordSpline);
     return myClass;
 }
 

@@ -8,10 +8,12 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSVector.h"
 #include "JSSvgPath.h"
+#include "JSVector.h"
 #include "JSLine.h"
 #include "JSSphere.h"
+
+#include <asl/string_functions.h>
 
 namespace jslib {
 
@@ -26,8 +28,8 @@ namespace jslib {
     toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Print path.");
         DOC_END;
-        std::string myStringRep = std::string("SvgPath@") + asl::as_string(obj);
-        JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
+        std::string myStringRep = asl::as_string(JSClassTraits<asl::SvgPath>::getNativeRef(cx, obj));
+        JSString * myString = JS_NewStringCopyN(cx, myStringRep.c_str(), myStringRep.size());
         *rval = STRING_TO_JSVAL(myString);
         return JS_TRUE;
     }
@@ -654,8 +656,7 @@ namespace jslib {
     JSObject * JSSvgPath::initClass(JSContext * cx, JSObject * theGlobalObject)
     {
         JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
-        DOC_CREATE(JSSvgPath);
-
+        DOC_MODULE_CREATE("Math", JSSvgPath);
         return myClass;
     }
 

@@ -334,7 +334,7 @@ CreateQuadStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTriangleStrip(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) 
 {
-    DOC_BEGIN("Create a quadstrip shape");
+    DOC_BEGIN("Create a trianglestrip shape");
     DOC_PARAM("theScene", "The scene to create the strip in", DOC_TYPE_SCENE);
     DOC_PARAM("theMaterialId", "Shape material id.", DOC_TYPE_STRING);
     DOC_PARAM("thePositions", "Array of positions", DOC_TYPE_VECTOROFVECTOR3F);

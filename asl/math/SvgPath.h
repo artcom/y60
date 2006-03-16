@@ -254,8 +254,8 @@ namespace asl {
                                 float theMaxLength = -1.0f);
     };
 
-} // namespace
+    std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath);
 
-std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath);
+} // namespace
 
 #endif

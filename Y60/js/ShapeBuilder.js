@@ -21,14 +21,14 @@ const ELEMENT_TYPE_QUADS           = "quads";
 const ELEMENT_TYPE_QUAD_STRIP      = "quadstrip";
 const ELEMENT_TYPE_POLYGON         = "polygon";
 
-function Element(theType, theMaterial) {
-    this.Constructor(this, theType, theMaterial);
+function Element(theType, theMaterialId) {
+    this.Constructor(this, theType, theMaterialId);
 }
 
-Element.prototype.Constructor = function(self, theType, theMaterial) {
+Element.prototype.Constructor = function(self, theType, theMaterialId) {
 
     self.type = theType;
-    self.material = theMaterial;
+    self.material = theMaterialId;
 
     // position,normal,etc. indices
     self.positions = [];
@@ -98,8 +98,8 @@ ShapeBuilder.prototype.Constructor = function(obj) {
     }
 
     /// Append a new shape element of the type using the material.
-    obj.appendElement = function(theType, theMaterial) {
-        var e = new Element(theType, theMaterial);
+    obj.appendElement = function(theType, theMaterialId) {
+        var e = new Element(theType, theMaterialId);
         _myElements.push(e);
         return e;
     }
