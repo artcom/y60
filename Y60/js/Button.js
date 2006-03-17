@@ -19,6 +19,7 @@
 //  enum                VTextAlign    (Renderer.TOP_ALIGNMENT | CENTER_ALIGNMENT | BOTTOM_ALIGNMENT)
 //  Vector4f            color
 //  Vector4f            selectedColor
+//  Vector4f            disabledColor
 //  int                 topPad        (optional)
 //  int                 bottomPad     (optional)
 //  int                 rightPad      (optional)
@@ -81,7 +82,20 @@ function ButtonBase(Public, Protected, theScene, theId,
         }
     }
 
-    Public.enabled = true;
+    Public.enabled getter = function() {
+        return Protected.enabled;
+    }
+
+    Public.enable setter = function(theFlag) {
+        if (Protected.enabled != theFlag) {
+            Protected.enabled = theFlag;
+            if (!theFlag && "disabledColor" in Protected.style) {
+                Public.color = Protected.style.disabledColor;
+            } else {
+                Public.color = Protected.style.color;
+            }
+        }
+    }
 
     Public.setToggleGroup = function(theButtons) {
         // Replace the onMouseButton function with something more advanced
@@ -121,6 +135,7 @@ function ButtonBase(Public, Protected, theScene, theId,
     Public.name         = theId;
     Public.id           = theId;
     Protected.isPressed = false;
+    Protected.enabled   = true;
 
     Protected.isVisible = function(theNode) {
         if (!theNode || theNode.nodeName != "overlay") {
