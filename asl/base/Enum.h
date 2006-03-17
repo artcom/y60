@@ -46,6 +46,7 @@
 #include "Exception.h"
 
 #include <vector>
+#include <bitset>
 
 namespace asl {
 
@@ -58,7 +59,7 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
  * a char pointer array. It almost exactly behaves like a native enumeration
  * type. It supports string conversion through stream operators. This is usefull
  * for debugging, serialization/deserialization and also helps with implementing
- * language bindings. The two convinient macros DEFINE_ENUM() and VERIFY_ENUM()
+ * language bindings. The two convinient macros DEFINE_ENUM() and IMPLEMENT_ENUM()
  * are provided to help with instanciation.
  *
  * @par Limitations:
@@ -99,7 +100,7 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
  * @endcode
  * In the corresponding cpp file do:
  * @code
- * VERIFY_ENUM( Fruit, myFruitStrings );
+ * IMPLEMENT_ENUM( Fruit, myFruitStrings );
  * @endcode
  * And here is how to use the resulting type Fruit
  * @code
@@ -136,6 +137,7 @@ DEFINE_EXCEPTION(IllegalEnumValue, asl::Exception);
 template <class ENUM, int THE_MAX>
 class Enum {
     public:
+        typedef ENUM Native;
         Enum() {};
         Enum( ENUM theValue ) : _myValue(theValue) {} 
         
@@ -182,11 +184,14 @@ class Enum {
                 if (is.eof()) {
                     break;
                 }
-                if (((myChar >= 'A' && myChar <= 'Z') || myChar >= 'a' && myChar <= 'z') ||
-                    (myChar >= '0' && myChar <= '9') || (myChar == '_'))
+                if ( isspace(myChar) && myWord.empty() ) {
+                    continue;
+                }
+                if ( isalnum(myChar) || (myChar == '_'))
                 {
                     myWord += myChar;
                 } else {
+                    is.unget();
                     break;
                 }
             } 
@@ -244,9 +249,71 @@ class Enum {
         static bool  _ourVerifiedFlag; 
 };
 
+template <class THE_ENUM>
+class Bitset : public std::bitset<THE_ENUM::MAX> {
+    public:
+        Bitset(unsigned long theValue = 0) :
+            std::bitset<THE_ENUM::MAX>(theValue) 
+        {}
+
+        std::istream & parse(std::istream & is) {
+            this->reset();
+            char myChar;
+            is >> myChar;
+            if (myChar != '[') {
+                is.setstate(std::ios::failbit);
+            }
+
+            // special case: empty set
+            if (is.good() && is.peek() == ']') {
+                return is;
+            }
+
+            THE_ENUM myEnum;
+            while ( is.good() && ! is.eof() ) {
+                
+                myEnum.parse(is);
+                
+                if (this->test(myEnum)) {
+                    is.setstate(std::ios::failbit);
+                }
+                if ( is.fail() ) {
+                    break;
+                }
+                this->set(myEnum);
+
+                is >> myChar;
+
+                if (myChar == ']') {
+                    break;
+                } else if (myChar != ',') {
+                    is.setstate(std::ios::failbit);
+                }
+            } 
+
+            return is;
+        }
+        /** Prints the string identifier to the output stream @p os. */
+        std::ostream & print(std::ostream & os = std::cerr) const {
+            os << '[';
+            int mySetBitCount = 0;
+            int myTotalBitCount = this->count();
+
+            for (int i = 0; i < this->size(); ++i) {
+                if (this->test(i)) {
+                    os << THE_ENUM(static_cast<typename THE_ENUM::Native>(i));
+                    if (++mySetBitCount < myTotalBitCount) {
+                        os << ',';
+                    }
+                }
+            }
+            os << ']';
+            return os;
+        }
+};
+
 /* @} */
 
-} // end of namespace
 
 /** ostream operator for Enum 
  * @relates asl::Enum
@@ -268,6 +335,28 @@ operator>>(std::istream & is, asl::Enum<ENUM, THE_MAX> & theEnum) {
     return is;
 }
 
+/** ostream operator for Bitset 
+ * @relates asl::Bitset
+ */
+template <class ENUM>
+std::ostream &
+operator<<(std::ostream & os, const asl::Bitset<ENUM> & theBitset) {
+    theBitset.print( os );
+    return os;
+}
+
+/** istream operator for Bitset 
+ * @relates asl::Bitset
+ */
+template <class ENUM>
+std::istream &
+operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
+    theBitset.parse( is );
+    return is;
+}
+
+} // end of namespace
+
 /** Helper macro. Creates a typedef.
  * @relates asl::Enum
  */
@@ -277,10 +366,32 @@ operator>>(std::istream & is, asl::Enum<ENUM, THE_MAX> & theEnum) {
 /** Helper macro. Runs the verify() method during static initialization.
  * @relates asl::Enum
  */
-#define VERIFY_ENUM( THE_NAME, THE_STRINGS ) \
+#define IMPLEMENT_ENUM( THE_NAME, THE_STRINGS ) \
     template <> const char ** THE_NAME ::_ourStrings = THE_STRINGS; \
     template <> const char * THE_NAME ::_ourName = #THE_NAME; \
     template <> bool THE_NAME ::_ourVerifiedFlag( THE_NAME ::verify(__FILE__, __LINE__));
+
+
+/** Helper macro. Creates a typedef.
+ * @relates asl::Bitset
+ */
+#define DEFINE_BITSET( THE_BITSET_NAME, THE_ENUM_NAME, THE_ENUM) \
+    DEFINE_ENUM( THE_ENUM_NAME, THE_ENUM ); \
+    typedef asl::Bitset<THE_ENUM_NAME> THE_BITSET_NAME; 
+
+/** Helper macro. Runs the verify() method during static initialization.
+ * @relates asl::Enum
+ */
+#define IMPLEMENT_ENUM( THE_NAME, THE_STRINGS ) \
+    template <> const char ** THE_NAME ::_ourStrings = THE_STRINGS; \
+    template <> const char * THE_NAME ::_ourName = #THE_NAME; \
+    template <> bool THE_NAME ::_ourVerifiedFlag( THE_NAME ::verify(__FILE__, __LINE__));
+
+/** Helper macro. Runs the verify() method during static initialization.
+ * @relates asl::Bitset
+ */
+#define IMPLEMENT_BITSET( THE_BITSET_NAME, THE_ENUM_NAME, THE_STRINGS ) \
+    IMPLEMENT_ENUM( THE_ENUM_NAME, THE_STRINGS );
 
 #endif
 

@@ -52,13 +52,12 @@ namespace asl {
     class Exception {
     public:
 
-        Exception(const std::string & what = "", const std::string & where ="")
-            : _what(what), _where(where), _name("Exception") {};
+        Exception(const std::string & what = "", const std::string & where ="");
 
         virtual ~Exception() {}
 
         Exception(const Exception& ex)
-            : _what(ex.what()), _where(ex.where()), _name(ex.name()) {}
+            : _what(ex.what()), _where(ex.where()), _name(ex.name()) {};
 
         Exception& operator=(const Exception& ex) {
             set(ex.what(),ex.where(),ex.name());
@@ -84,8 +83,7 @@ namespace asl {
             _where = where;
             _name = name;
         }
-        Exception(const std::string & what, const std::string & where, const char * name)
-            : _what(what), _where(where), _name(name) {};
+        Exception(const std::string & what, const std::string & where, const char * name);
 
     private:
         mutable std::string _what;

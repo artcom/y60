@@ -29,6 +29,7 @@
 #include "Value.h"
 
 #include <asl/UnitTest.h>
+#include <asl/Enum.h>
 #include <asl/linearAlgebra.h>
 #include <asl/raster.h>
 #include <asl/standard_pixel_types.h>
@@ -42,6 +43,7 @@
 #include <vector>
 
 using namespace std;
+using namespace dom;
 
 namespace dom {
     typedef asl::raster<asl::RGB> RasterOfRGB;
@@ -528,11 +530,80 @@ private:
 	std::string _myTypeName;
 };
 
+
+enum AnimalPropertyEnum {
+    EDIBLE,
+    PETABLE,
+    RIDEABLE,
+    CRUSHABLE,
+    AnimalPropertyEnum_MAX
+};
+
+static const char * AnimalPropertyStrings[] = {
+    "edible",
+    "petable",
+    "ridable",
+    "crushable",
+    "" 
+};
+
+DEFINE_BITSET( AnimalProperties, AnimalProperty, AnimalPropertyEnum );
+IMPLEMENT_BITSET( AnimalPropertes, AnimalProperty, AnimalPropertyStrings );
+
+class BitsetValueUnitTest : public UnitTest {
+    public:
+        BitsetValueUnitTest() : UnitTest("BitsetValueUnitTest") {  }
+
+        void testAnimal(Document & myDoc, AnimalProperties theProps) {
+            dom::NodePtr  myNode = myDoc.childNode("animal")->getAttribute("properties");
+            myNode->nodeValueRefOpen<AnimalProperties>() = theProps;
+            myNode->nodeValueRefClose<AnimalProperties>();
+
+            ENSURE(as_string(theProps) == myNode->nodeValue());
+            ENSURE( theProps == myNode->nodeValueRef<AnimalProperties>());
+
+            myNode->nodeValue(as_string(theProps));
+            ENSURE(as_string(theProps) == myNode->nodeValue());
+            ENSURE( theProps == myNode->nodeValueRef<AnimalProperties>());
+
+        }
+        
+        void run()
+        {
+            dom::Document mySchema(
+                    "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+                    "   <xs:simpleType name='AnimalProperties'>  "
+                    "     <xs:restriction base='xs:string'/> "
+                    "   </xs:simpleType> "
+                    "   <xs:element name='animal'>\n"
+                    "       <xs:complexType>\n"
+                    "           <xs:attribute name='properties' type='AnimalProperties'/>\n"
+                    "       </xs:complexType>\n"
+                    "   </xs:element>\n"
+                    "</xs:schema>\n"
+                    );
+            dom::Document myDocument;
+            myDocument.setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));
+            myDocument.getValueFactory()->registerPrototype("AnimalProperties", ValuePtr(new SimpleValue<AnimalProperties>(AnimalProperties(),0)));
+            dom::registerStandardTypes(*myDocument.getValueFactory());
+            myDocument.addSchema(mySchema,"");
+            myDocument.parse("<animal properties='[petable]'/>");
+            ENSURE(myDocument);
+
+            testAnimal(myDocument, AnimalProperties()); 
+            testAnimal(myDocument, AnimalProperties(1 << PETABLE)); 
+            testAnimal(myDocument, AnimalProperties((1 << PETABLE) | (1 << CRUSHABLE))); 
+            testAnimal(myDocument, AnimalProperties((1 << PETABLE) | (1 << CRUSHABLE) | (1 << RIDEABLE) | (1 << EDIBLE) )); 
+        }
+};
+
+
 class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
+        
         addTest(new XmlValueUnitTest<int>("int",23));
         addTest(new XmlValueUnitTest<float>("float",43.23f));
         float myNumber[3] = { 1.0f, 2.0f, 3.0f };
@@ -549,6 +620,7 @@ public:
         asl::raster<asl::RGB> myRaster(3,4,RGB(10,11,12));
         myRaster(0,0) = RGB(20,21,22);
         addTest(new XmlRasterValueUnitTest<dom::ComplexValue,asl::raster<asl::RGB> >("raster<RGB>",myRaster));
+        addTest(new BitsetValueUnitTest());
     }
 };
 

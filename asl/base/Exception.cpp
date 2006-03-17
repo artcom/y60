@@ -25,6 +25,22 @@
 
 using namespace std;
 
+#define ABORT_ON_THROW() // abort();
+
+namespace asl {
+    Exception::Exception(const std::string & what, const std::string & where)
+            : _what(what), _where(where), _name("Exception")
+    {
+        ABORT_ON_THROW();
+    };
+    
+    Exception::Exception(const std::string & what, const std::string & where, const char * name)
+            : _what(what), _where(where), _name(name) 
+    {
+        ABORT_ON_THROW();
+    };
+}
+
 string
 asl::file_string(const char* file_name) {
     std::string myFilename(file_name); //asl::toLowerCase(file_name));

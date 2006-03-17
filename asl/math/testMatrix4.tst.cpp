@@ -1606,7 +1606,6 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.rotateX(-5);
             testDecompositionHelper(myMatrix, myResult);
 
-/*
             // [CH] This does not work, yet - sorry
 
             myResult.scale = Vector3<T>(-3,-2,-1);
@@ -1615,6 +1614,7 @@ class Matrix4UnitTest : public UnitTest {
             myMatrix.rotateX(1);
             testDecompositionHelper(myMatrix, myResult);
 
+/*
             myResult.scale = Vector3<T>(3,2,1);
             myResult.orientation = Vector3<T>(3,4,5);
             myMatrix.makeScaling(myResult.scale);

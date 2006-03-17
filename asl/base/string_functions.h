@@ -51,7 +51,7 @@ namespace asl {
     
     DEFINE_EXCEPTION(BufferTooSmall, asl::Exception);
 
-    /// return every type that has a operator<<(ostream) as string
+    /// return every type that has a operator>>(ostream) as string
 #ifdef _SETTING_USE_STRSTREAM_INSTEAD_OF_STRINGSTREAM_
     template <class T>
     std::string as_string(const T& x) {

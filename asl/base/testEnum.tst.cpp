@@ -36,8 +36,27 @@ static const char * AnimalStrings[] = {
 };
 
 DEFINE_ENUM( Animal, AnimalEnum);
+IMPLEMENT_ENUM( Animal, AnimalStrings);
 
-VERIFY_ENUM( Animal, AnimalStrings);
+enum PropertyEnum {
+    EDIBLE,
+    PETABLE,
+    RIDEABLE,
+    CRUSHABLE,
+    PropertyEnum_MAX
+};
+
+static const char * PropertyStrings[] = {
+    "edible",
+    "petable",
+    "ridable",
+    "crushable",
+    "" 
+};
+
+
+DEFINE_BITSET( Properties, Property, PropertyEnum );
+IMPLEMENT_BITSET( Propertes, Property, PropertyStrings );
 
 class EnumUnitTest : public UnitTest {
 public:
@@ -113,12 +132,122 @@ public:
     }
 };
 
+class BitsetUnitTest : public UnitTest {
+public:
+    explicit BitsetUnitTest() : UnitTest("BitsetUnitTest") {}
+    void run() {
+        Properties myElefantProps;
+        myElefantProps.set(RIDEABLE);
+        myElefantProps.set(PETABLE);
+        ENSURE(myElefantProps[RIDEABLE]);
+        ENSURE(myElefantProps[PETABLE]);
+        ENSURE( ! myElefantProps[EDIBLE]);
+        ENSURE( ! myElefantProps[CRUSHABLE]);
+        DPRINT(myElefantProps);
+
+        {
+            Properties myAntProps;
+            istringstream myStream("[edible,crushable]");
+            myAntProps.parse(myStream);
+            ENSURE( myStream.good() );
+            ENSURE( myAntProps[CRUSHABLE] );
+            ENSURE( ! myAntProps[RIDEABLE] );
+            ENSURE( myAntProps[EDIBLE] );
+            ENSURE( ! myAntProps[PETABLE] );
+            ostringstream myOStream;
+            myAntProps.print(myOStream);
+            DPRINT(myOStream.str());
+            ENSURE(myOStream.str() == "[edible,crushable]");
+            myOStream.str("");
+            myOStream << myAntProps;
+            DPRINT(myOStream.str());
+            ENSURE(myOStream.str() == "[edible,crushable]");
+
+
+            myStream.str("[edible]");
+            myAntProps.parse(myStream);
+            ENSURE( myStream.good() );
+            ENSURE( ! myAntProps[CRUSHABLE] );
+            ENSURE( ! myAntProps[RIDEABLE] );
+            ENSURE( myAntProps[EDIBLE] );
+            ENSURE( ! myAntProps[PETABLE] );
+        }
+        {
+            Properties myAntProps;
+            istringstream myStream("[crushable,edible]");
+            ENSURE( myStream.good() );
+            myAntProps.parse(myStream);
+            ENSURE( myAntProps[CRUSHABLE] );
+            ENSURE( ! myAntProps[RIDEABLE] );
+            ENSURE( myAntProps[EDIBLE] );
+            ENSURE( ! myAntProps[PETABLE] );
+        }
+        {
+            Properties myAntProps;
+            istringstream myStream("[crushable,crushable]");
+            myAntProps.parse(myStream);
+            ENSURE(myStream.fail());
+        }
+        {
+            Properties myAntProps;
+            istringstream myStream("[crushable,edible");
+            myAntProps.parse(myStream);
+            ENSURE(myStream.fail());
+        }
+        {
+            Properties myAntProps;
+            istringstream myStream("[crushable,elephant]");
+            myAntProps.parse(myStream);
+            ENSURE(myStream.fail());
+        }
+        {
+            Properties myAntProps;
+            istringstream myStream("crushable]");
+            myAntProps.parse(myStream);
+            ENSURE(myStream.fail());
+        }
+        {
+            Properties myJellyfishProps;
+            istringstream myStream("[]");
+            myJellyfishProps.parse(myStream);
+            ENSURE(myStream.good());
+            ENSURE( ! myJellyfishProps[CRUSHABLE] );
+            ENSURE( ! myJellyfishProps[RIDEABLE] );
+            ENSURE( ! myJellyfishProps[EDIBLE] );
+            ENSURE( ! myJellyfishProps[PETABLE] );
+            ostringstream myOStream;
+            myJellyfishProps.print(myOStream);
+            // myOStream << myJellyfishProps;
+            DPRINT(myOStream.str());
+            ENSURE(myOStream.str() == "[]");
+        }
+        {
+            Properties myAntProps;
+            istringstream myStream("[crushable,,edible]");
+            myAntProps.parse(myStream);
+            ENSURE(myStream.fail());
+        }
+        {
+            Properties myAntProps;
+            istringstream myStream("[crushable,]");
+            myAntProps.parse(myStream);
+            ENSURE(myStream.fail());
+        }
+        {
+            Properties myAntProps;
+            istringstream myStream("");
+            myAntProps.parse(myStream);
+            ENSURE(myStream.fail());
+        }
+    }
+};
 
 int main(int argc, char *argv[]) {
 
     UnitTestSuite mySuite(argv[0], argc, argv);
 
     try {
+        mySuite.addTest(new BitsetUnitTest, 10000);
         mySuite.addTest(new EnumUnitTest, 10000);
         mySuite.run();
     }
