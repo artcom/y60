@@ -14,6 +14,7 @@
 // b0rks. So just keep it in global space which does no harm anyway
 // since it only creates a class which itself will be in y60.
 
-VERIFY_ENUM(y60::TargetBuffers, y60::TargetBuffersStrings);
-VERIFY_ENUM(y60::BlendEquation, y60::BlendEquationStrings);
+IMPLEMENT_ENUM(y60::TargetBuffers, y60::TargetBuffersStrings);
+IMPLEMENT_ENUM(y60::BlendEquation, y60::BlendEquationStrings);
+IMPLEMENT_BITSET(y60::RenderStyles, y60::RenderStyle, y60::RenderStyleStrings);
 

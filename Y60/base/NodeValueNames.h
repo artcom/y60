@@ -374,26 +374,26 @@ namespace y60 {
     };
 
     //=== Renderstyle types =====================================================
-    static const char * BACKFACING_STYLE      = "backfacing";
-    static const char * FRONTFACING_STYLE     = "frontfacing";
-    static const char * BOUNDING_VOLUME_STYLE = "bounding_volume";
-    static const char * IGNORE_DEPTH_STYLE    = "ignore_depth";
-    static const char * NO_DEPTH_WRITES_STYLE = "no_depth_writes";
-    static const char * POLYGON_OFFSET_STYLE  = "polygon_offset";
-
-    enum RenderStyleType {
-        FRONT, BACK, BOUNDING_VOLUME, IGNORE_DEPTH, NO_DEPTH_WRITES, POLYGON_OFFSET
+    enum RenderStyleEnum {
+        FRONT, 
+        BACK, 
+        BOUNDING_VOLUME, 
+        IGNORE_DEPTH, 
+        NO_DEPTH_WRITES, 
+        POLYGON_OFFSET,
+        RenderStyleEnum_MAX
     };
 
-    static const char * RenderStylesSL[] = {
-        FRONTFACING_STYLE,
-        BACKFACING_STYLE,
-        BOUNDING_VOLUME_STYLE,
-        IGNORE_DEPTH_STYLE,
-        NO_DEPTH_WRITES_STYLE,
-        POLYGON_OFFSET_STYLE,
-        0
+    static const char * RenderStyleStrings[] = {
+       "frontfacing",     
+       "backfacing",      
+       "bounding_volume",
+       "ignore_depth", 
+       "no_depth_writes",
+       "polygon_offset", 
+       "" 
     };
+    DEFINE_BITSET(RenderStyles, RenderStyle, RenderStyleEnum);
 
     enum BlendFunction {
         ONE,
