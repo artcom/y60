@@ -498,7 +498,8 @@ namespace y60 {
 
 
                     // collect renderstyles for this element
-                    myPrimitive.getRenderStyles() = myElementsNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB);
+                    myPrimitive.getRenderStyles() = myElementsNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, 
+                                                            RenderStyles(0));
                     unsigned myIndicesCount = myElementsNode->childNodesLength(VERTEX_INDICES_NAME);
                     for (unsigned k = 0; k < myIndicesCount; ++k) {
                         NodePtr myIndicesNode = myElementsNode->childNode(VERTEX_INDICES_NAME, k);
@@ -519,7 +520,7 @@ namespace y60 {
         }
 
         // collect per shape renderstyles
-        theShape->getRenderStyles() = myShapeNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB);
+        theShape->getRenderStyles() = myShapeNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, RenderStyles(0));
 
         // Set vertex count
         theShape->setVertexCount(myShapeVertexCount);
