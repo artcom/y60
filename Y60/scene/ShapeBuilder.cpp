@@ -77,11 +77,11 @@ namespace y60 {
 
     void
     ShapeBuilder::setBackFacing(bool isBackFacing) {
-         getNode()->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB).set(BACK, isBackFacing);
+         getNode()->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, RenderStyles(0)).set(BACK, isBackFacing);
     }
 
     void
     ShapeBuilder::setFrontFacing(bool isFrontFacing) {
-         getNode()->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB).set(FRONT, isFrontFacing);
+         getNode()->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, RenderStyles(0)).set(FRONT, isFrontFacing);
     }
 }
