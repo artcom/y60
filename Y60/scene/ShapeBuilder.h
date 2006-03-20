@@ -60,12 +60,8 @@ namespace y60 {
     private:
         typedef std::map<std::string, dom::NodePtr> VertexDataMap;
 
-        void updateRenderStyle();
-
         VertexDataMap   _myVertexDataBins;
 
-        bool _myFrontFacingFlag;
-        bool _myBackFacingFlag;
         bool _myTestAlmostEqualFlag;
 
     };

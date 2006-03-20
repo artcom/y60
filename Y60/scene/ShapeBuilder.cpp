@@ -33,9 +33,7 @@ namespace y60 {
     ShapeBuilder::ShapeBuilder(const std::string & theName,
                                bool theTestAlmostEqualFlag) :
         BuilderBase(SHAPE_NODE_NAME),
-        _myTestAlmostEqualFlag(theTestAlmostEqualFlag),
-        _myFrontFacingFlag(true),
-        _myBackFacingFlag(false)
+        _myTestAlmostEqualFlag(theTestAlmostEqualFlag)
     {
         dom::NodePtr myNode = getNode();
 
@@ -49,27 +47,13 @@ namespace y60 {
             ShapePtr myShape = getNode()->getFacade<Shape>();
             myShape->set<NameTag>(theName);
         }
-
-        updateRenderStyle();
     }
 
     ShapeBuilder::ShapeBuilder(dom::NodePtr theShapeNode) :
-        _myTestAlmostEqualFlag(false),
-        _myFrontFacingFlag(false),
-        _myBackFacingFlag(false)
+        _myTestAlmostEqualFlag(false)
     {
         setNode(theShapeNode);
         dom::NodePtr myVertexDataNode = theShapeNode->childNode(VERTEX_DATA_NAME);
-        VectorOfString myRenderStyles =
-            theShapeNode->getAttributeValue<VectorOfString>(RENDER_STYLE_ATTRIB);
-        for (unsigned i = 0; i < myRenderStyles.size(); ++i) {
-            if (myRenderStyles[i] == FRONTFACING_STYLE) {
-                _myFrontFacingFlag = true;
-            }
-            if (myRenderStyles[i] == BACKFACING_STYLE) {
-                _myBackFacingFlag = true;
-            }
-        }
         for (unsigned i = 0; i < myVertexDataNode->childNodesLength(); ++i) {
             dom::NodePtr myCurrentBin = myVertexDataNode->childNode(i);
             std::string myName = myCurrentBin->getAttributeString(NAME_ATTRIB);
@@ -91,31 +75,11 @@ namespace y60 {
 
     void
     ShapeBuilder::setBackFacing(bool isBackFacing) {
-        _myBackFacingFlag = isBackFacing;
-        updateRenderStyle();
+         getNode()->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB).set(BACK, isBackFacing);
     }
 
     void
     ShapeBuilder::setFrontFacing(bool isFrontFacing) {
-        _myFrontFacingFlag = isFrontFacing;
-        updateRenderStyle();
-    }
-
-    void
-    ShapeBuilder::updateRenderStyle() {
-        VectorOfString myRenderStyles;
-        if (_myFrontFacingFlag) {
-            myRenderStyles.push_back(FRONTFACING_STYLE);
-        }
-        if (_myBackFacingFlag) {
-            myRenderStyles.push_back(BACKFACING_STYLE);
-        }
-        dom::NodePtr myAttribute = getNode()->getAttribute(RENDER_STYLE_ATTRIB);
-        dom::DOMString myValue = asl::as_string(myRenderStyles);
-        if (myAttribute) {
-            myAttribute->nodeValue(myValue);
-        } else {
-            getNode()->appendAttribute(RENDER_STYLE_ATTRIB, myValue);
-        }
+         getNode()->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB).set(FRONT, isFrontFacing);
     }
 }

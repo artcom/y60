@@ -107,7 +107,7 @@ namespace y60 {
 
             GLenum getPrimitiveGLType(PrimitiveType theType) const;
 
-            void enableRenderStyles(const std::vector<RenderStyleType> & theRenderStyles);
+            void enableRenderStyles(const RenderStyles & theRenderStyles);
             bool switchMaterial(const MaterialBase & theMaterial, bool isOverlay = false);
             void deactivatePreviousMaterial() const;
 

@@ -355,6 +355,19 @@ Example:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="RenderStyles">
+        <xs:annotation>
+             <xs:documentation>A list of optional renderstyle strings.
+
+Currently the following styles are supported:
+'backfacing'      - The backfaces of the shape are rendered
+'frontfacing'     - The frontfaces of the shape are rendered
+'bounding_volume' - The bounding volumes of the shape are rendered
+'ignore_depth'    - The shape is rendered without z-Buffer testing
+'polygon_offset'  - The shape is rendered with its polygons offset</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:element name="rasterofrgb">
         <xs:annotation>
             <xs:documentation>This element contains a image data as text child.
@@ -1221,7 +1234,7 @@ Usually 's' plus a number, such as 's0'.</xs:documentation>
 This attribute is maintained by the scene and should not be changed from JavaScript.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="renderstyle" type="VectorOfString">
+            <xs:attribute name="renderstyle" type="RenderStyles">
                 <xs:annotation>
                     <xs:documentation>A list of optional renderstyle strings.
 

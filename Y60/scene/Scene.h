@@ -302,8 +302,8 @@ namespace y60 {
             const ResourceManager * getResourceManager() const;
             ResourceManager * getResourceManager();
 
-            static void parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles );
-            static void parseRenderStyles(const VectorOfString & theStyles, std::vector<RenderStyleType> & theRenderStyles );
+            // static void parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles );
+            // static void parseRenderStyles(const VectorOfString & theStyles, std::vector<RenderStyleType> & theRenderStyles );
 
         private:
             void updateReferences(dom::NodePtr theRootNode,

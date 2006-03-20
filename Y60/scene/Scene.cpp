@@ -438,7 +438,7 @@ namespace y60 {
             _myStatistics.primitiveCount += myShape->getPrimitives().size();
         }
     }
-
+    /*
     void
     Scene::parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles ) {
         if (theNode->getAttribute(RENDER_STYLE_ATTRIB)) {
@@ -453,6 +453,7 @@ namespace y60 {
             theRenderStyles.push_back(myRenderType);
         }
     }
+    */
 	void
 	Scene::buildShape(ShapePtr theShape) {
 		NodePtr myShapeNode = theShape->getXmlNode();
@@ -497,7 +498,7 @@ namespace y60 {
 
 
                     // collect renderstyles for this element
-                    parseRenderStyles( myElementsNode, myPrimitive.getRenderStyles());
+                    myPrimitive.getRenderStyles() = myElementsNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB);
                     unsigned myIndicesCount = myElementsNode->childNodesLength(VERTEX_INDICES_NAME);
                     for (unsigned k = 0; k < myIndicesCount; ++k) {
                         NodePtr myIndicesNode = myElementsNode->childNode(VERTEX_INDICES_NAME, k);
@@ -518,7 +519,7 @@ namespace y60 {
         }
 
         // collect per shape renderstyles
-        parseRenderStyles(myShapeNode, theShape->getRenderStyles());
+        theShape->getRenderStyles() = myShapeNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB);
 
         // Set vertex count
         theShape->setVertexCount(myShapeVertexCount);

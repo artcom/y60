@@ -419,8 +419,8 @@ namespace y60 {
 
         // get renderstyles for this primitive
         DBP2(START_TIMER(renderBodyPart_getRenderStyles));
-        const std::vector<RenderStyleType> & myPrimitveStyle = myPrimitive.getRenderStyles();
-        const std::vector<RenderStyleType> & myShapeStyle    = myShape.getRenderStyles();
+        const RenderStyles & myPrimitveStyle = myPrimitive.getRenderStyles();
+        const RenderStyles & myShapeStyle    = myShape.getRenderStyles();
 
         // if there are primitive-level styles, use them instead of the shape level
 #if 0 // disabled because of bug#91
@@ -428,16 +428,14 @@ namespace y60 {
             AC_WARNING << "Primitive styles overridding shape style. Style accumulation not implemented yet";
         }
 #endif
-        const std::vector<RenderStyleType> & myRenderStyles  = myPrimitveStyle.empty() ? myShapeStyle : myPrimitveStyle;
+        const RenderStyles & myRenderStyles  = myPrimitveStyle.any() ? myPrimitveStyle : myShapeStyle;
         DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
         
         DBP2(START_TIMER(renderBodyPart_render));
         enableRenderStyles(myRenderStyles);
         bool myRendererCullingEnabled = _myState->getBackfaceCulling();
         if (myRendererCullingEnabled) {
-            bool myRenderFrontFlag = std::find(myRenderStyles.begin(), myRenderStyles.end(), FRONT) !=  myRenderStyles.end();
-            bool myRenderBackFlag = std::find(myRenderStyles.begin(), myRenderStyles.end(), BACK) !=  myRenderStyles.end();
-            if (myRenderFrontFlag && myRenderBackFlag) {
+            if (myRenderStyles[FRONT] && myRenderStyles[BACK]) {
                 // render back & front (two passes, supposedly faster
                 DBP2(START_TIMER(renderBodyPart_renderPrimitives1));
                 _myState->setCullFaces(GL_FRONT);
@@ -447,11 +445,11 @@ namespace y60 {
                 DBP2(STOP_TIMER(renderBodyPart_renderPrimitives1));
             } else {  // render one or zero faces - single pass
                 DBP2(START_TIMER(renderBodyPart_renderPrimitives2));
-                if (!myRenderFrontFlag && !myRenderBackFlag) {
+                if (!myRenderStyles[FRONT] && !myRenderStyles[BACK]) {
                     // UH: no facets are drawn but other primitives such as points and lines are
                     _myState->setCullFaces(GL_FRONT_AND_BACK);
                 } else {
-                    if (myRenderFrontFlag) {
+                    if (myRenderStyles[FRONT]) {
                         _myState->setCullFaces(GL_BACK); // render front
                     } else {
                         _myState->setCullFaces(GL_FRONT); // render back
@@ -469,9 +467,7 @@ namespace y60 {
         DBP2(STOP_TIMER(renderBodyPart_render));
 
         DBP2(START_TIMER(renderBodyPart_setupBoundingVolume));
-        if (std::find(myRenderStyles.begin(), myRenderStyles.end(), BOUNDING_VOLUME) !=  myRenderStyles.end() ||
-            (_myBoundingVolumeMode & BV_SHAPE))
-        {
+        if (myRenderStyles[BOUNDING_VOLUME] || (_myBoundingVolumeMode & BV_SHAPE)) {
             const asl::Box3f & myBoundingBox = myShape.get<BoundingBoxTag>();
             renderBoundingBox(myBoundingBox);
             CHECK_OGL_ERROR;
@@ -647,13 +643,10 @@ namespace y60 {
     }
 
     void 
-    Renderer::enableRenderStyles(const std::vector<RenderStyleType> & theRenderStyles) {
-        _myState->setIgnoreDepth(std::find(theRenderStyles.begin(), theRenderStyles.end(),
-                                            IGNORE_DEPTH) !=  theRenderStyles.end());
-        _myState->setDepthWrites(!(std::find(theRenderStyles.begin(), theRenderStyles.end(),
-                                            NO_DEPTH_WRITES) !=  theRenderStyles.end()));
-        _myState->setPolygonOffset(std::find(theRenderStyles.begin(), theRenderStyles.end(),
-                                            POLYGON_OFFSET) !=  theRenderStyles.end());
+    Renderer::enableRenderStyles(const RenderStyles & theRenderStyles) {
+        _myState->setIgnoreDepth(theRenderStyles[IGNORE_DEPTH]);
+        _myState->setDepthWrites( ! theRenderStyles[NO_DEPTH_WRITES]);
+        _myState->setPolygonOffset( theRenderStyles[POLYGON_OFFSET]);
     }
 
     void Renderer::preDraw(const asl::Vector4f & theColor,
@@ -662,10 +655,8 @@ namespace y60 {
                            const std::string & theRenderStyles) 
    {
         std::istringstream myRenderStylesStream(theRenderStyles);
-        vector<RenderStyleType> myRenderStyles;
-        VectorOfString myRenderStylesStrings;
-        myRenderStylesStream >> myRenderStylesStrings;
-        Scene::parseRenderStyles(myRenderStylesStrings, myRenderStyles);
+        RenderStyles myRenderStyles;
+        myRenderStylesStream >> myRenderStyles;
         
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         glPushMatrix();

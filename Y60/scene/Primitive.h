@@ -224,10 +224,10 @@ namespace y60 {
             const std::vector<VertexDataBasePtr> & getVertexData() const {
                 return _myVertexData;
             }
-            const std::vector<RenderStyleType> & getRenderStyles() const { 
+            const RenderStyles & getRenderStyles() const { 
                 return _myRenderStyles; 
             }
-            std::vector<RenderStyleType> & getRenderStyles() { 
+            RenderStyles & getRenderStyles() { 
                 return _myRenderStyles; 
             }
        private:
@@ -270,7 +270,7 @@ namespace y60 {
             PrimitiveType                  _myType;
             MaterialBasePtr                _myMaterial;
             std::vector<VertexDataBasePtr> _myVertexData;
-            std::vector<RenderStyleType>   _myRenderStyles;
+            RenderStyles                   _myRenderStyles;
             unsigned int                   _myDomIndex;
             mutable BoundingBoxTreePtr     _myBoundingBoxTree;
     };

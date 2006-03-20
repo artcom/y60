@@ -66,10 +66,10 @@ namespace y60 {
             PrimitiveVector & getPrimitives() { 
                 return _myPrimitives; 
             }
-            const std::vector<RenderStyleType> & getRenderStyles() const { 
+            const RenderStyles & getRenderStyles() const { 
                 return _myRenderStyles; 
             }
-            std::vector<RenderStyleType> & getRenderStyles() { 
+            RenderStyles & getRenderStyles() { 
                 return _myRenderStyles; 
             }
             dom::NodePtr getXmlNode() { 
@@ -118,7 +118,7 @@ namespace y60 {
 
             void clear() {
                 _myPrimitives.clear();
-                _myRenderStyles.clear();
+                _myRenderStyles.reset();
                 _myVertexCount = 0;
                 _myLastRenderVersion = 0;
             }
@@ -128,8 +128,8 @@ namespace y60 {
             Shape(const Shape &);
             Shape & operator=(const Shape &);
 
-            PrimitiveVector              _myPrimitives;   
-            std::vector<RenderStyleType> _myRenderStyles;
+            PrimitiveVector    _myPrimitives;   
+            RenderStyles       _myRenderStyles;
             unsigned long      _myVertexCount;
             unsigned long long _myLastRenderVersion;
     };

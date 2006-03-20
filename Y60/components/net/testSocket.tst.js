@@ -61,7 +61,7 @@ SocketUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.mySocket1.read() == ""');
         obj.mySocket1.setBlockingMode(true);
         
-        obj.mySocket3 = new Socket(Socket.UDP, 1103);
+        obj.mySocket3 = new Socket(Socket.UDP, 1103, "0.0.0.0");
         obj.mySocket3.connect("BROADCAST", 1101);
         print(obj.mySocket3);
 

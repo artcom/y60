@@ -19,6 +19,7 @@
 //=============================================================================
 
 #include "DataTypes.h"
+#include "NodeValueNames.h"
 
 namespace y60 {
 
@@ -148,9 +149,14 @@ namespace y60 {
             dom::ValuePtr(new dom::ComplexValue<VectorOfRankedFeature,dom::MakeResizeableVector>(VectorOfRankedFeature(),0)));
     }
 
+	void registerEnumBitsetTypes(dom::ValueFactory & theFactory) {
+            theFactory.registerPrototype("RenderStyles", dom::ValuePtr(new dom::SimpleValue<y60::RenderStyles>(y60::RenderStyles(0),0)));
+    }
+
     void registerSomTypes(dom::ValueFactory & theFactory) {
         registerSomMathTypes(theFactory);
         registerSomVectorTypes(theFactory);
         registerSomImageTypes(theFactory);
+        registerEnumBitsetTypes(theFactory);
 	}
 }
