@@ -14,14 +14,18 @@ using namespace std;
 
 namespace y60 {
     DShowCapture::DShowCapture(asl::DLHandle theDLHandle) : PlugInBase(theDLHandle), _myGraph(0) {
-        CoInitialize(NULL); //  First thing first, we must initalize the COM interface
+        static bool myFirstInit (true);
+        if (myFirstInit) {
+            CoInitialize(NULL);
+            myFirstInit = false;
+        }
     }
 
     DShowCapture::~DShowCapture() {
         if (_myGraph) {
             delete _myGraph;
         }
-        CoUninitialize();
+//        CoUninitialize();
     }
 
     void DShowCapture::readFrame(dom::ResizeableRasterPtr theTargetRaster) {
@@ -55,6 +59,11 @@ namespace y60 {
         }
 
         ASSURE(NULL == _myGraph);
+        bool myRestartGraph = false;
+        if (_myGraph) {
+            myRestartGraph = _myGraph->isRunning();
+            delete _myGraph;
+        }
         _myGraph = new DShowGraph();
 
         setPixelFormat(BGR);
@@ -101,6 +110,9 @@ namespace y60 {
         setImageMatrix(myMatrix);
         // Start Capturing
 		_myGraph->CaptureLive(myDeviceId, myInputPinNumber); // set this to false if you don't want the video format dialog.
+        if (myRestartGraph) {
+            _myGraph->Play();
+        }
     }
 
     std::string DShowCapture::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {

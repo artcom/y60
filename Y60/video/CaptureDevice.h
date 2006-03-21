@@ -35,6 +35,7 @@ namespace y60 {
 
     class CaptureDevice : public IDecoder {
     public:
+        virtual ~CaptureDevice() {};
         /**
          * Stops the currently running capturing. No new frames should be displayed on
          * calls to readframe. Ideally, implementations should drop all connections to

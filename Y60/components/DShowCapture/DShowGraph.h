@@ -26,8 +26,6 @@
 #include <vector>
 #include "DXSampleGrabber.h"
 
-#define SafeRelease(p) { if( (p) != 0 ) { (p)->Release(); (p)= NULL; } }
-
 namespace y60 {
 /*! @addtogroup Y60componentsDShowCapture */
 /* @{ */
@@ -54,22 +52,21 @@ public:
     void Play() ;
     // Stop the video
     void Stop()  { m_pMediaControl->Stop(); }
-    LONGLONG Seek( int offset );
-    // Seek in the video if the media type allows
 
     // this is only useful before the video graph is built
     // if you don't want to show the video, 
     // call it first thing after the object is constructed.
-    void setVideoFlag(bool flag); 
+//    void setVideoFlag(bool flag); 
     void unlockImage() {m_pTrackingCB->unlockImage();}
-    unsigned char* lockImage() {return m_pTrackingCB->lockImage();}
+    unsigned char* lockImage();
     int getWidth() const {return m_pTrackingCB->getWidth();}
     int getHeight() const {return m_pTrackingCB->getHeight();}
+    bool isRunning() const { return m_fstartGraph; }
     void setAnalogVideoFormat(void);
     void traceCrossbarInfo(IAMCrossbar *pXBar);
     void configCrossbar(unsigned theInputPinNumber = 0);
     std::vector<std::string> enumDevices();
-protected:
+private:
     // Create the filter graph to render the video (capture or playback)
     virtual bool createFilterGraph(int theIndex = 0, unsigned theInputPinNumber = 0);
     // Release the filter graph
@@ -105,7 +102,6 @@ protected:
     ICaptureGraphBuilder2 * m_pCaptureGraphBuilder2; // for capture
     IMediaControl*			m_pMediaControl; // MediaControl
     IFilterGraph*			m_pFilterGraph;  // Filter Graph
-    IMediaSeeking*			m_pMediaSeeking; // Seeking interface
 	// The interface to set callback function
 	// ColorConverter is needed to convert other color to RGB24
 	IBaseFilter *           m_pColorConv;
@@ -129,8 +125,6 @@ protected:
     std::string     pinToString(long lType);
 
     HRESULT         selectVideoFormat();
-    //private:
-public:
     IBaseFilter *   m_pSrcFilter;
 };
 /* @} */

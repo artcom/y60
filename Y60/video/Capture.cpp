@@ -81,6 +81,9 @@ namespace y60 {
 
     void
     Capture::open(const std::string & theUrl) {
+        if (_myDevice) {
+            _myDevice = CaptureDevicePtr(0);
+        }
 
         AC_DEBUG << "Capture::open " << (void*)this << " url=" << theUrl;
 
@@ -88,7 +91,6 @@ namespace y60 {
         CaptureDevicePtr myDevice = DecoderManager::get().findDecoder<CaptureDevice>(theUrl);
 
         if (!myDevice) {
-            _myDevice = CaptureDevicePtr(0);
             return;
         }
         _myDevice = myDevice->instance();
@@ -105,7 +107,9 @@ namespace y60 {
 
         Image::createRaster(_myDevice->getPixelFormat());
         getRasterPtr()->resize(get<ImageWidthTag>(), get<ImageHeightTag>());
-
+        if (_myPlayMode == PLAY_MODE_PLAY) {
+            _myDevice->startCapture();
+        }
     }
 
     bool

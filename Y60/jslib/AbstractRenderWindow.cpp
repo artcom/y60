@@ -420,6 +420,8 @@ namespace jslib {
                 (*i)->onFrame(this, _myElapsedTime);
             } catch (const asl::Exception & ex) {
                 AC_ERROR << "EXCEPTION while calling " << myName << ": " << ex;
+            } catch (const std::exception & ex) {
+                AC_ERROR << "std::exception while calling" << myName << ": " << ex.what();
             } catch (...) {
                 AC_ERROR << "UNKNOWN EXCEPTION while calling " << myName;
             }
