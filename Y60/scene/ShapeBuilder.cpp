@@ -48,8 +48,7 @@ namespace y60 {
             myShape->set<NameTag>(theName);
         }
         
-        setBackFacing(true);
-        setFrontFacing(true);
+        myNode->appendAttribute(RENDER_STYLE_ATTRIB, "[frontfacing]");
     }
 
     ShapeBuilder::ShapeBuilder(dom::NodePtr theShapeNode) :

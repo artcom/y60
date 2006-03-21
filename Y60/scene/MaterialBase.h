@@ -68,7 +68,7 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(ShininessTag, float, SHININESS_PROPERTY, float(1.0));
     DEFINE_MATERIAL_PROPERTY_TAG(TargetBuffersTag, y60::VectorOfString, TARGETBUFFERS_PROPERTY, getDefaultTargetBuffers());
     DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfString, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
-    DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, BlendEquation, BLENDEQUATION_PROPERTY, EQUATION_ADD);
+    DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, std::string, BLENDEQUATION_PROPERTY, std::string("add"));
     //DEFINE_MATERIAL_PROPERTY_TAG(ReqLightingTag, y60::VectorOfRankedFeature, LIGHTING_FEATURE, y60::VectorOfRankedFeature(1, RankedFeature(100,"unlit")));
     //DEFINE_PROPERTY_TAG(TargetBuffersTag, MaterialPropertiesFacade, y60::VectorOfString, SOM_VECTOR_STRING_NAME,
     //                    TARGETBUFFERS_PROPERTY, PROPERTY_LIST_NAME, getDefaultTargetBuffers());
