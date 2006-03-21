@@ -48,8 +48,10 @@ namespace y60 {
             myShape->set<NameTag>(theName);
         }
         
-        setBackFacing(true);
-        setFrontFacing(true);
+	myNode->appendAttribute(RENDER_STYLE_ATTRIB, "[frontfacing,backfacing]");
+	// the following will work soon XXX 
+        // setFrontFacing(true);
+        // setBackFacing(true);
     }
 
     ShapeBuilder::ShapeBuilder(dom::NodePtr theShapeNode) :
@@ -78,6 +80,7 @@ namespace y60 {
 
     void
     ShapeBuilder::setBackFacing(bool isBackFacing) {
+         // TODO: This doesn't work - check getAttributeValue
          getNode()->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, RenderStyles(0)).set(BACK, isBackFacing);
     }
 
