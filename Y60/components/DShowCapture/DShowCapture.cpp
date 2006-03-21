@@ -50,6 +50,10 @@ namespace y60 {
         unsigned myFrameRate = (unsigned)getFrameRate();
         unsigned myInputPinNumber = 0;
         unsigned myDeviceId = getDevice();
+        unsigned myWhitebalanceU;
+        unsigned myWhitebalanceV;
+        unsigned myShutter;
+        unsigned myGain;
 
         if (myFrameWidth == 0) {
             myFrameWidth = 320;
@@ -88,6 +92,22 @@ namespace y60 {
         if (idx != std::string::npos && theFilename.substr(idx+7).length() > 0) {
             myDeviceId = asl::as_int(theFilename.substr(idx+7));
         }
+        idx = theFilename.find("whitebalanceb=");
+        if (idx != std::string::npos && theFilename.substr(idx+14).length() > 0) {
+            myWhitebalanceU = asl::as_int(theFilename.substr(idx+14));
+        }
+        idx = theFilename.find("whitebalancer=");
+        if (idx != std::string::npos && theFilename.substr(idx+14).length() > 0) {
+            myWhitebalanceV = asl::as_int(theFilename.substr(idx+14));
+        }
+        idx = theFilename.find("shutter=");
+        if (idx != std::string::npos && theFilename.substr(idx+8).length() > 0) {
+            myShutter = asl::as_int(theFilename.substr(idx+8));
+        }
+        idx = theFilename.find("gain=");
+        if (idx != std::string::npos && theFilename.substr(idx+5).length() > 0) {
+            myGain = asl::as_int(theFilename.substr(idx+5));
+        }
         std::vector<std::string> myDevices = _myGraph->enumDevices();
         if (myDeviceId >= myDevices.size()) {
             throw DShowCapture::Exception("No such Device. Highest available DeviceId is: " + myDevices.size()-1, PLUS_FILE_LINE);
@@ -113,6 +133,7 @@ namespace y60 {
         if (myRestartGraph) {
             _myGraph->Play();
         }
+        _myGraph->setCameraParams(myWhitebalanceU, myWhitebalanceV, myShutter, myGain);
     }
 
     std::string DShowCapture::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {

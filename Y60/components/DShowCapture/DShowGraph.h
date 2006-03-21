@@ -31,7 +31,6 @@ namespace y60 {
 /* @{ */
 class DShowGraph {
 public:
-    bool createFilterGraph(IMoniker * videoDevice, unsigned theInputPinNumber = 0);
     DShowGraph();
     virtual ~DShowGraph();
 
@@ -39,9 +38,6 @@ public:
 
     // Automatically find a capturing device to capture video
     void CaptureLive(int theIndex, unsigned theInputPinNumber = 0);
-
-    // Init the given video device, but does NOT start the capture;
-    bool initCaptureLive (IMoniker * videoDevice, unsigned theInputPinNumber = 0);
 
     // Destroy the whole Graph
     void Destroy() { destroyFilterGraph(); };
@@ -53,10 +49,9 @@ public:
     // Stop the video
     void Stop()  { m_pMediaControl->Stop(); }
 
-    // this is only useful before the video graph is built
-    // if you don't want to show the video, 
-    // call it first thing after the object is constructed.
-//    void setVideoFlag(bool flag); 
+    void setCameraParams(unsigned long theWhiteBalanceU, unsigned long theWhiteBalanceV,
+            unsigned long theShutter, unsigned long theGain);
+            
     void unlockImage() {m_pTrackingCB->unlockImage();}
     unsigned char* lockImage();
     int getWidth() const {return m_pTrackingCB->getWidth();}
@@ -75,17 +70,13 @@ private:
     void startGraph();
     // Stop playing
     void stopGraph();
-    // automaticly find a usable capturing device
+    // automatically find a usable capturing device
     HRESULT findCaptureDevice(IBaseFilter ** ppSrcFilter, int theDeviceIndex = 0);
 
     ///////////////////////////////////////////////////////////////////
     // Build the capture graph
     virtual bool buildCaptureGraph(IBaseFilter * filter = 0, int theIndex = 0);
 
-    ///////////////////////////////////////////////////////////////////
-    // The following 3 functions are for derivation if you need extra
-    // filters in the graph, implement the 3 functions to do it
-    ///////////////////////////////////////////////////////////////////
     // create and add extra filters, called in createFilterGraph() to
     // create extra filters into the graph
     virtual void    addExtraFilters();

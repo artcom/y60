@@ -312,6 +312,29 @@ HRESULT DShowGraph::findCaptureDevice(IBaseFilter ** ppSrcFilter, int theDeviceI
     return hr;
 }
 
+void DShowGraph::setCameraParams(unsigned long theWhiteBalanceU, unsigned long theWhiteBalanceV,
+        unsigned long theShutter, unsigned long theGain)
+{
+    CComQIPtr<IAVTDolphinPropSet, &PROPSETID_VIDCAP_AVT> pAVTFilter(m_pSrcFilter);
+
+    if(pAVTFilter)
+    {
+        AC_DEBUG << "Found AVT camera interface." << endl;        
+        HRESULT hr;
+        hr = pAVTFilter->SetWhitebalanceU(theWhiteBalanceU, 0, 0);
+        checkForDShowError(hr, "SetWhiteBalanceU", PLUS_FILE_LINE);
+        hr = pAVTFilter->SetWhitebalanceV(theWhiteBalanceV, 0, 0);
+        checkForDShowError(hr, "SetWhiteBalanceV", PLUS_FILE_LINE);
+        hr = pAVTFilter->SetGain(theGain, 0, 0);
+        checkForDShowError(hr, "SetGain", PLUS_FILE_LINE);
+        hr = pAVTFilter->SetExposure(theShutter, 0, 0);
+        checkForDShowError(hr, "SetExposure", PLUS_FILE_LINE);
+    } else {
+        AC_DEBUG << "AVT camera interface not found." << endl;
+    }  
+}
+
+
 IPin* DShowGraph::get_pin( IBaseFilter* pFilter, PIN_DIRECTION dir )
 {
     IEnumPins*  pEnumPins = 0;
@@ -398,68 +421,6 @@ unsigned char* DShowGraph::lockImage()
     }
 }
 
-bool DShowGraph::createFilterGraph(IMoniker *videoDevice, unsigned theInputPinNumber)
-{
-    IPin* pGrabIn = NULL, *pGrabOut = NULL;
-    HRESULT hr;
-    IBaseFilter * psrcFilter = 0;
-
-    hr = CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC, 
-        IID_IGraphBuilder, (void **)&m_pGraphBuilder );
-    if (FAILED(hr)) {
-        
-        return false; // unable to build graph 
-    }
-    m_pGraphBuilder->QueryInterface(IID_IMediaControl,(void**)&m_pMediaControl);
-    m_pGraphBuilder->QueryInterface(IID_IFilterGraph, (void**)&m_pFilterGraph);
-
-
-    // Create the capture graph builder
-    if(videoDevice != 0)
-    {
-        IPropertyBag *pBag;
-
-        hr = videoDevice->BindToStorage(0, 0, IID_IPropertyBag, (void **)&pBag);
-        if(SUCCEEDED(hr))
-        {
-            VARIANT var;
-            var.vt = VT_BSTR;
-            hr = pBag->Read(L"FriendlyName", &var, NULL);
-            if (hr == NOERROR) {
-                // var.bstrVal is a wide string
-                //_myAVName = std::string(var.bstrVal);
-                SysFreeString(var.bstrVal);
-            }
-            pBag->Release();
-        }
-        hr = videoDevice->BindToObject(0, 0, IID_IBaseFilter, (void**)&psrcFilter);
-    }
-    buildCaptureGraph(psrcFilter);
-    configCrossbar();
-
-    // Do some initialization of the extra filters
-    initExtraFilters();
-    // release the Pin
-    SafeRelease( pGrabIn );
-    SafeRelease( pGrabOut );
-
-    this->m_fstartGraph = false;
-    return true; // success build the graph
-}
-
-bool DShowGraph::initCaptureLive (IMoniker * videoDevice, unsigned theInputPinNumber) {
-    // TODO: Is this ever called?
-	destroyFilterGraph();
-
-    if (!createFilterGraph(videoDevice, theInputPinNumber)) {
-		destroyFilterGraph();
-		MessageBox(NULL, "Unable to build Filter Graph", NULL, MB_OK|MB_ICONEXCLAMATION|MB_TASKMODAL);
-		return false;
-	}
-
-	return true;
-}
-
 void DShowGraph::Play(){ 
 	if (!this->m_fstartGraph)
 		this->startGraph();
@@ -519,26 +480,7 @@ HRESULT DShowGraph::selectVideoFormat() {
 	//pmt->subtype = MEDIASUBTYPE_UYVY; //MEDIASUBTYPE_RGB24;
     
 	hr = pSC->SetFormat(pmt);
-/*
-    CComQIPtr<IAVTDolphinPropSet, &PROPSETID_VIDCAP_AVT> pAVTFilter(m_pSrcFilter);
 
-    if(pAVTFilter)
-    {
-        cerr << "Found AVT camera interface." << endl;        
-        long value = 0;  // This is actually a bool.
-        hr = pAVTFilter->SetGamma((long)true);
-        hr = pAVTFilter->GetGamma(&value);
-
-        unsigned long gainMin, gainMax;
-
-        long myAuto;  // This is actually a bool.
-        long myOnePush;
-        hr = pAVTFilter->GetGainRange(&gainMin, &gainMax, &myAuto, &myOnePush); 
-        cerr << "gain range: " << gainMin << "-" << gainMax << endl;
-    } else {
-        cerr << "AVT camera interface not found." << endl;
-    }
-*/    
 	pSC->Release();
 
 	return hr;

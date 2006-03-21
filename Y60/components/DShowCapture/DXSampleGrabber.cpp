@@ -46,35 +46,9 @@ STDMETHODIMP DXSampleGrabber::SampleCB(double SampleTime, IMediaSample *pSample)
 
     _myLock.unlock();
 
-    // XXX m_imageReady.SetEvent();
-
-	// Create a ImageWrapper to access the image data
-	
-	//DxImageWrapper image(m_imgWidth, m_imgHeight, pData);
-	// Call the callback function in Tracker Class to process this frame
-	//m_oVisTracker.ImageFrameCB(&image);
-	
-	//image.DisplayImage(*pDC, 200, 0);
-
-/*	
-
-	CVisRGBAByteImage rgbImage(m_imgWidth, m_imgHeight);
-    CVisByteImage rgbAlias;
-	CVisByteImage tempImg;
-	
-	image.GetVisImage(&tempImg);
-    rgbAlias.Alias(rgbImage);
-
-    tempImg.CopyPixelsTo(0, 0, rgbAlias);    
-    tempImg.CopyPixelsTo(1, 1, rgbAlias);    
-    tempImg.CopyPixelsTo(2, 2, rgbAlias);    
-
-	//this->m_pVision->Process(&rgbImage, 0);
-	*/
 	// display the debug info into the m_pDisplayWnd
 	m_dFrameRate = 0.8 * m_dFrameRate + 0.2 / (SampleTime - m_dPrevTime);
 	m_dPrevTime = SampleTime;
-
 	
 	return S_OK;
 }
