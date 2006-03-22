@@ -152,7 +152,7 @@ namespace y60 {
             GLShaderPtr myShader = dynamic_cast_Ptr<GLShader>(it->second->getShader());
             if (myShader) {
                 myShader->load(*getShaderLibrary());
-                AC_INFO << "Renderer::preloadShader(): using shader '" << myShader->getName() << 
+                AC_INFO << "Renderer::preloadShader(): using shader '" << myShader->getName() <<
                            "' for material '"<<it->second->get<NameTag>()<<"'" << endl;
             }
         }
@@ -201,7 +201,7 @@ namespace y60 {
         DBP(COUNT(materialChange));
 
         IShaderPtr myShader = theMaterial.getShader();
-        deactivatePreviousMaterial();        
+        deactivatePreviousMaterial();
 
         {
             // activate new material
@@ -222,11 +222,11 @@ namespace y60 {
                 myMasks[myTarget] = true;
             }
             glDepthMask(myMasks[y60::DEPTH_MASK]);
-            glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK], 
+            glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
                 myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
 
-            const string & myBlendEquationString = myPropFacade->get<BlendEquationTag>();            
-            GLenum myEquation = asGLBlendEquation(myBlendEquationString); 
+            const string & myBlendEquationString = myPropFacade->get<BlendEquationTag>();
+            GLenum myEquation = asGLBlendEquation(myBlendEquationString);
             if (glBlendEquation) {
                 glBlendEquation(myEquation);
             }
@@ -430,7 +430,7 @@ namespace y60 {
 #endif
         const RenderStyles & myRenderStyles  = myPrimitveStyle.any() ? myPrimitveStyle : myShapeStyle;
         DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
-        
+
         DBP2(START_TIMER(renderBodyPart_render));
         enableRenderStyles(myRenderStyles);
         bool myRendererCullingEnabled = _myState->getBackfaceCulling();
@@ -642,7 +642,7 @@ namespace y60 {
         glPopAttrib();
     }
 
-    void 
+    void
     Renderer::enableRenderStyles(const RenderStyles & theRenderStyles) {
         _myState->setIgnoreDepth(theRenderStyles[IGNORE_DEPTH]);
         _myState->setDepthWrites( ! theRenderStyles[NO_DEPTH_WRITES]);
@@ -652,17 +652,17 @@ namespace y60 {
     void Renderer::preDraw(const asl::Vector4f & theColor,
                            const asl::Matrix4f & theTransformation,
                            float theWidth,
-                           const std::string & theRenderStyles) 
+                           const std::string & theRenderStyles)
    {
         std::istringstream myRenderStylesStream(theRenderStyles);
         RenderStyles myRenderStyles;
         myRenderStylesStream >> myRenderStyles;
-        
+
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         glPushMatrix();
         glDisable(GL_LIGHTING);
         enableRenderStyles(myRenderStyles);
-        
+
         glMultMatrixf(theTransformation.getData());
         glColor4fv(theColor.begin());
         glLineWidth(theWidth);
@@ -1004,15 +1004,15 @@ namespace y60 {
         glViewport(theViewport->get<ViewportLeftTag>(), theViewport->getLower(),
                    theViewport->get<ViewportWidthTag>(), theViewport->get<ViewportHeightTag>());
         CHECK_OGL_ERROR;
-        
+
         // Render underlays
 	    renderOverlays(theViewport, UNDERLAY_LIST_NAME);
 
         setupRenderState(theViewport);
 
-        // We need to push all thouse bits, that need to be reset after the main render pass (before 
+        // We need to push all thouse bits, that need to be reset after the main render pass (before
         // text and overlay rendering). But not thouse that are managed by the renderstate class.
-        glPushAttrib(GL_TEXTURE_BIT | GL_LIGHTING_BIT);
+        glPushAttrib(GL_TEXTURE_BIT | GL_LIGHTING_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
         dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
@@ -1072,7 +1072,7 @@ namespace y60 {
             enableFog();
             CHECK_OGL_ERROR;
         }
-       
+
         // (7) render bodies
         if (myBodyParts.size()) {
             MAKE_SCOPE_TIMER(renderBodyParts);
@@ -1087,8 +1087,8 @@ namespace y60 {
                     glEnable(GL_ALPHA_TEST);
                     currentMaterialHasAlpha = true;
                 }
-                
-                renderBodyPart(it->second, *theViewport, *myCamera);                
+
+                renderBodyPart(it->second, *theViewport, *myCamera);
             }
             glPopMatrix();
         }
@@ -1110,7 +1110,7 @@ namespace y60 {
             renderTextSnippets(theViewport);
             glPopAttrib();
         }
- 
+
         // Set renderer into known state for drawing calls from js
         deactivatePreviousMaterial();
         _myPreviousMaterial = 0;
@@ -1528,7 +1528,7 @@ namespace y60 {
             glTranslatef(myPivotTranslation[0], myPivotTranslation[1], myPivotTranslation[2]);
 #endif
         }
-        
+
         const asl::Vector2f myScale = myOverlay.get<Scale2DTag>();
         glScalef(myScale[0], myScale[1], 1.0f);
 
@@ -1548,7 +1548,7 @@ namespace y60 {
                 }
 
                 COUNT(Overlays);
-                
+
                 bool myMaterialHasChanged = switchMaterial(*myMaterial, true);
                 if (myMaterialHasChanged) {
                     IShaderPtr myShader = myMaterial->getShader();
