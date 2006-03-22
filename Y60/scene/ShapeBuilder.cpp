@@ -48,10 +48,10 @@ namespace y60 {
             myShape->set<NameTag>(theName);
         }
         
-	myNode->appendAttribute(RENDER_STYLE_ATTRIB, "[frontfacing,backfacing]");
-	// the following will work soon XXX 
-        // setFrontFacing(true);
-        // setBackFacing(true);
+	    // myNode->appendAttribute(RENDER_STYLE_ATTRIB, "[frontfacing,backfacing]");
+    	// the following will work soon XXX 
+        setFrontFacing(true);
+        setBackFacing(true);
     }
 
     ShapeBuilder::ShapeBuilder(dom::NodePtr theShapeNode) :
@@ -80,12 +80,21 @@ namespace y60 {
 
     void
     ShapeBuilder::setBackFacing(bool isBackFacing) {
-         // TODO: This doesn't work - check getAttributeValue
-         getNode()->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, RenderStyles(0)).set(BACK, isBackFacing);
+        dom::NodePtr myRenderStyleNode = getNode()->getAttribute(RENDER_STYLE_ATTRIB);
+        if (!myRenderStyleNode) {
+            getNode()->appendAttribute(RENDER_STYLE_ATTRIB, RenderStyles(0));
+        }
+        dom::Node::WritableValue<RenderStyles> myValue(myRenderStyleNode);
+        myValue.get().set(BACK, isBackFacing);
     }
 
     void
     ShapeBuilder::setFrontFacing(bool isFrontFacing) {
-         getNode()->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, RenderStyles(0)).set(FRONT, isFrontFacing);
+        dom::NodePtr myRenderStyleNode = getNode()->getAttribute(RENDER_STYLE_ATTRIB);
+        if (!myRenderStyleNode) {
+            getNode()->appendAttribute(RENDER_STYLE_ATTRIB, RenderStyles(0));
+        }
+        dom::Node::WritableValue<RenderStyles> myValue(myRenderStyleNode);
+        myValue.get().set(FRONT, isFrontFacing);
     }
 }
