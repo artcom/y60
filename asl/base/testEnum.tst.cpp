@@ -56,7 +56,7 @@ static const char * PropertyStrings[] = {
 
 
 DEFINE_BITSET( Properties, Property, PropertyEnum );
-IMPLEMENT_BITSET( Propertes, Property, PropertyStrings );
+IMPLEMENT_BITSET( Properties, Property, PropertyStrings );
 
 class EnumUnitTest : public UnitTest {
 public:
