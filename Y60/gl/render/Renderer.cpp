@@ -206,9 +206,8 @@ namespace y60 {
         {
             // activate new material
             DBP(MAKE_SCOPE_TIMER(activateShader));
+            
             _myState->setLighting(theViewport.get<ViewportLightingTag>() && (theMaterial.getLightingModel() != UNLIT));
-
-
             /*
             if (theMaterial.getLightingModel() == UNLIT) {
                 glDisable(GL_LIGHTING);
@@ -1002,10 +1001,10 @@ namespace y60 {
                    theViewport->get<ViewportWidthTag>(), theViewport->get<ViewportHeightTag>());
         CHECK_OGL_ERROR;
 
+        setupRenderState(theViewport);
+
         // Render underlays
 	    renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
-
-        setupRenderState(theViewport);
 
         // We need to push all thouse bits, that need to be reset after the main render pass (before
         // text and overlay rendering). But not thouse that are managed by the renderstate class.
@@ -1457,7 +1456,8 @@ namespace y60 {
 #if 0
         AC_PRINT << "name=" << theViewport.get<NameTag>() << " pos=" << theViewport.get<Position2DTag>() << " size=" << theViewport.get<Size2DTag>() << " pixel=" << theViewport.get<ViewportLeftTag>() << "," << theViewport.get<ViewportTopTag>() << "," << theViewport.getLower() << " " << theViewport.get<ViewportWidthTag>() << "x" << theViewport.get<ViewportHeightTag>();
 #endif
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
+        glPushAttrib(GL_TEXTURE_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
