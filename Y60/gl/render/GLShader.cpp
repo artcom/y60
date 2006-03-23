@@ -16,8 +16,8 @@
 //   Description:
 //
 //=============================================================================
-
 #ifdef WIN32
+#define NOMINMAX
 // Note: GLH_EXT_SINGLE_FILE must be defined only in one object file
 // it makes the header file to define the function pointer variables
 // never set it in a .h file or any other file that shall be linked
