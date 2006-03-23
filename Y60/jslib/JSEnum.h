@@ -60,7 +60,7 @@ class JSEnum : public JSWrapper<ENUM> {
 
         static JSBool
         Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("");
+            DOC_BEGIN("Not instantiatable.");
             DOC_END;
             JS_ReportError(cx,"Constructor for %s called. Class is not instantiatable.",ClassName());
             return JS_FALSE;
