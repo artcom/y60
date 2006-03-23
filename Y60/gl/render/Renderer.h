@@ -108,7 +108,7 @@ namespace y60 {
             GLenum getPrimitiveGLType(PrimitiveType theType) const;
 
             void enableRenderStyles(const RenderStyles & theRenderStyles);
-            bool switchMaterial(const MaterialBase & theMaterial, bool isOverlay = false);
+            bool switchMaterial(const Viewport & theViewport, const MaterialBase & theMaterial, bool isOverlay = false);
             void deactivatePreviousMaterial() const;
 
             dom::NodePtr getActiveLodChild(dom::NodePtr theNode, const y60::CameraPtr theCamera);
@@ -129,9 +129,9 @@ namespace y60 {
             void renderBoundingBoxHierarchy(dom::NodePtr theNode);
 
             void renderFrustum(const ViewportPtr & theViewport);
-            void renderOverlays(const ViewportPtr & theViewport,
+            void renderOverlays(const Viewport & theViewport,
                                 const std::string & theRootNodeName);
-            void renderOverlay(dom::NodePtr theOverlayNode, float theAlpha = 1);
+            void renderOverlay(const Viewport & theViewport, dom::NodePtr theOverlayNode, float theAlpha = 1);
             void renderTextSnippets(ViewportPtr theViewport);
 
             void renderBox(const asl::Point3f & theLTF, const asl::Point3f & theRBF,
@@ -152,7 +152,7 @@ namespace y60 {
             void enableFog();
             void enableVisibleLights();
             void enableLight(y60::LightPtr & theLight, int theActiveLightIndex);
-            void renderSkyBox(y60::CameraPtr theCamera);
+            void renderSkyBox(const Viewport & theViewport, y60::CameraPtr theCamera);
             void drawNormals(const Primitive & thePrimitive, float theNormalScale);
 
             double getBillboardRotation(const asl::Matrix4f & theBillboardMatrix,

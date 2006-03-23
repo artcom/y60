@@ -190,7 +190,7 @@ namespace y60 {
     }
 
     bool
-    Renderer::switchMaterial(const MaterialBase & theMaterial, bool isOverlay) {
+    Renderer::switchMaterial(const Viewport & theViewport, const MaterialBase & theMaterial, bool isOverlay) {
         if (_myPreviousMaterial == &theMaterial) {
             return false;
         } else if (_myPreviousMaterial == 0) {
@@ -206,12 +206,15 @@ namespace y60 {
         {
             // activate new material
             DBP(MAKE_SCOPE_TIMER(activateShader));
+            _myState->setLighting(theViewport.get<ViewportLightingTag>() && (theMaterial.getLightingModel() != UNLIT));
 
+
+            /*
             if (theMaterial.getLightingModel() == UNLIT) {
                 glDisable(GL_LIGHTING);
             } else if (_myState->getLighting()) {
                 glEnable(GL_LIGHTING);
-            }
+            }*/
             CHECK_OGL_ERROR;
             MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
             const VectorOfString & myBuffersEnabled = myPropFacade->get<TargetBuffersTag>();
@@ -391,7 +394,7 @@ namespace y60 {
 
         DBP2(START_TIMER(renderBodyPart_getDrawNormals));
         const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
-        if (_myState->getDrawNormals()) {
+        if (theViewport.get<ViewportDrawNormalsTag>()) {
             const Box3f & myBoundingBox = myShape.get<BoundingBoxTag>();
             float myDiameter = magnitude(myBoundingBox[Box3f::MAX] - myBoundingBox[Box3f::MIN]);
             drawNormals(myPrimitive, myDiameter / 64.0f);
@@ -400,7 +403,7 @@ namespace y60 {
 
         DBP2(START_TIMER(renderBodyPart_switchMaterial));
         const MaterialBase & myMaterial = myPrimitive.getMaterial();
-        bool  myMaterialHasChanged = switchMaterial(myMaterial);
+        bool  myMaterialHasChanged = switchMaterial(theViewport, myMaterial);
         DBP2(STOP_TIMER(renderBodyPart_switchMaterial));
 
         DBP2(START_TIMER(renderBodyPart_materialChanged));
@@ -991,7 +994,6 @@ namespace y60 {
         _myState->setLighting(theViewport->get<ViewportLightingTag>());
         _myState->setBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
         _myState->setTexturing(theViewport->get<ViewportTexturingTag>());
-        _myState->setDrawNormals(theViewport->get<ViewportDrawNormalsTag>());
         CHECK_OGL_ERROR;
     }
 
@@ -1006,13 +1008,13 @@ namespace y60 {
         CHECK_OGL_ERROR;
 
         // Render underlays
-	    renderOverlays(theViewport, UNDERLAY_LIST_NAME);
+	    renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
 
         setupRenderState(theViewport);
 
         // We need to push all thouse bits, that need to be reset after the main render pass (before
         // text and overlay rendering). But not thouse that are managed by the renderstate class.
-        glPushAttrib(GL_TEXTURE_BIT | GL_LIGHTING_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glPushAttrib(GL_TEXTURE_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
         dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
@@ -1052,7 +1054,7 @@ namespace y60 {
         // (3) render skybox
         {
             MAKE_SCOPE_TIMER(renderSkyBox);
-            renderSkyBox(myCamera);
+            renderSkyBox(*theViewport, myCamera);
             CHECK_OGL_ERROR;
         }
 
@@ -1102,7 +1104,7 @@ namespace y60 {
 
         {
             MAKE_SCOPE_TIMER(renderOverlays);
-            renderOverlays(theViewport, OVERLAY_LIST_NAME);
+            renderOverlays(*theViewport, OVERLAY_LIST_NAME);
         }
         {
             MAKE_SCOPE_TIMER(renderTextSnippets);
@@ -1160,15 +1162,34 @@ namespace y60 {
 
     void
     Renderer::enableVisibleLights() {
+        static GLint myMaxLights = 0;
+        if (myMaxLights == 0) {
+            glGetIntegerv(GL_MAX_LIGHTS, &myMaxLights);
+        }
+
         int myActiveLightCount = 0;
         LightVector & myLights = _myScene->getLights();
         for (unsigned i = 0; i < myLights.size(); ++i) {
             if (myLights[i]->get<VisibleTag>()) {
+                if (myActiveLightCount >= myMaxLights) {
+                    static bool myAlreadyWarned = false;
+                    if (!myAlreadyWarned) {
+                        AC_WARNING << "Only " << int(myMaxLights) << " hardware light sources supported by open gl" << endl;
+                        myAlreadyWarned = true;
+                    }
+                    break;
+                }
                 enableLight(myLights[i], myActiveLightCount);
                 DB(AC_TRACE << myLights[i]->getNode());
                 myActiveLightCount++;
             }
         }
+
+        // Disable remaining lights
+        for (unsigned i = myActiveLightCount; i < myMaxLights; ++i) {
+            glDisable(asGLLightEnum(myActiveLightCount));
+        }
+
         COUNT_N(ActiveLights, myActiveLightCount);
         DB(AC_TRACE << "Enabled " << myActiveLightCount << " lights");
     }
@@ -1189,17 +1210,6 @@ namespace y60 {
                 return;
             case UNSUPPORTED:
                 return;
-        }
-
-        GLint myMaxLights = 8;
-        glGetIntegerv(GL_MAX_LIGHTS, &myMaxLights);
-        if (theActiveLightIndex >= myMaxLights) {
-            static bool myAlreadyWarned = false;
-            if (!myAlreadyWarned) {
-                AC_WARNING << "Only " << int(myMaxLights) << " hardware light sources supported by open gl" << endl;
-                myAlreadyWarned = true;
-            }
-            return;
         }
 
         GLenum gl_lightid = asGLLightEnum(theActiveLightIndex);
@@ -1328,7 +1338,7 @@ namespace y60 {
     }
 
     void
-    Renderer::renderSkyBox(CameraPtr theCamera) {
+    Renderer::renderSkyBox(const Viewport & theViewport, CameraPtr theCamera) {
         // Get Material
         const dom::NodePtr & myWorldNode = _myScene->getWorldRoot();
         WorldFacadePtr myWorld = myWorldNode->getFacade<WorldFacade>();
@@ -1351,7 +1361,7 @@ namespace y60 {
         glPushMatrix();
         glLoadMatrixf(static_cast<const GLfloat *>(myModelView.getData()));
 
-        switchMaterial(*myMaterial);
+        switchMaterial(theViewport, *myMaterial);
 
         // We'll just index into the cube map directly to render the cubic panorama
         GLfloat rgba[4] = { 1.0, 1.0, 1.0, 1.0 };
@@ -1438,9 +1448,9 @@ namespace y60 {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     void
-    Renderer::renderOverlays(const ViewportPtr & theViewport,
+    Renderer::renderOverlays(const Viewport & theViewport,
                              const std::string & theRootNodeName) {
-        dom::NodePtr myOverlays = theViewport->getNode().childNode(theRootNodeName);
+        dom::NodePtr myOverlays = theViewport.getNode().childNode(theRootNodeName);
         if (!myOverlays) {
             return;
         }
@@ -1450,7 +1460,7 @@ namespace y60 {
         }
 
 #if 0
-        AC_PRINT << "name=" << theViewport->get<NameTag>() << " pos=" << theViewport->get<Position2DTag>() << " size=" << theViewport->get<Size2DTag>() << " pixel=" << theViewport->get<ViewportLeftTag>() << "," << theViewport->get<ViewportTopTag>() << "," << theViewport->getLower() << " " << theViewport->get<ViewportWidthTag>() << "x" << theViewport->get<ViewportHeightTag>();
+        AC_PRINT << "name=" << theViewport.get<NameTag>() << " pos=" << theViewport.get<Position2DTag>() << " size=" << theViewport.get<Size2DTag>() << " pixel=" << theViewport.get<ViewportLeftTag>() << "," << theViewport.get<ViewportTopTag>() << "," << theViewport.getLower() << " " << theViewport.get<ViewportWidthTag>() << "x" << theViewport.get<ViewportHeightTag>();
 #endif
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 
@@ -1461,19 +1471,19 @@ namespace y60 {
         // UH: projection matrix is relative to viewport so no translation is necessary
         // (already done in glViewport)
 #if 1
-        gluOrtho2D(0.0, theViewport->get<ViewportWidthTag>(),
-                   theViewport->get<ViewportHeightTag>(), 0.0);
+        gluOrtho2D(0.0, theViewport.get<ViewportWidthTag>(),
+                   theViewport.get<ViewportHeightTag>(), 0.0);
 #else
-        gluOrtho2D(theViewport->get<ViewportLeftTag>(),
-                   theViewport->get<ViewportLeftTag>() + theViewport->get<ViewportWidthTag>(),
-                   theViewport->getLower() + theViewport->get<ViewportHeightTag>(),
-                   theViewport->getLower());
+        gluOrtho2D(theViewport.get<ViewportLeftTag>(),
+                   theViewport.get<ViewportLeftTag>() + theViewport.get<ViewportWidthTag>(),
+                   theViewport.getLower() + theViewport.get<ViewportHeightTag>(),
+                   theViewport.getLower());
 #endif
 
-        if (theViewport->get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
+        if (theViewport.get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
             asl::Matrix4f myRotationMatrix;
             myRotationMatrix.makeZRotating(float(asl::PI_2));
-            myRotationMatrix.translate(asl::Vector3f(float(theViewport->get<ViewportWidthTag>()), 0.0f, 0.0f));
+            myRotationMatrix.translate(asl::Vector3f(float(theViewport.get<ViewportWidthTag>()), 0.0f, 0.0f));
             glMultMatrixf(static_cast<const GLfloat *>(myRotationMatrix.getData()));
         }
 
@@ -1486,7 +1496,7 @@ namespace y60 {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         for (unsigned i = 0; i < myOverlayCount; ++i) {
-             renderOverlay(myOverlays->childNode(i));
+             renderOverlay(theViewport, myOverlays->childNode(i));
         }
 
         glPopMatrix();
@@ -1498,7 +1508,7 @@ namespace y60 {
     }
 
     void
-    Renderer::renderOverlay(dom::NodePtr theOverlayNode, float theAlpha) {
+    Renderer::renderOverlay(const Viewport & theViewport, dom::NodePtr theOverlayNode, float theAlpha) {
 
         if (theOverlayNode->nodeType() != dom::Node::ELEMENT_NODE) {
             return;
@@ -1549,7 +1559,7 @@ namespace y60 {
 
                 COUNT(Overlays);
 
-                bool myMaterialHasChanged = switchMaterial(*myMaterial, true);
+                bool myMaterialHasChanged = switchMaterial(theViewport, *myMaterial, true);
                 if (myMaterialHasChanged) {
                     IShaderPtr myShader = myMaterial->getShader();
                     if (myShader) {
@@ -1615,7 +1625,8 @@ namespace y60 {
                 Vector4f myBorderColor = myOverlay.get<BorderColorTag>();
                 myBorderColor[3] *= myAlpha;
 
-                glDisable(GL_TEXTURE_2D);
+                _myState->setTexturing(false);
+
                 glColor4fv(myBorderColor.begin()); // border color
                 glLineWidth(myOverlay.get<BorderWidthTag>());
                 glBegin(GL_LINES);
@@ -1637,16 +1648,14 @@ namespace y60 {
                 }
                 glEnd();
 
-                if (_myState->getTexturing()) {
-                    glEnable(GL_TEXTURE_2D);
-                }
+                _myState->setTexturing(theViewport.get<ViewportTexturingTag>());
             }
         }
 
         // Render child overlays
         unsigned myOverlayCount = theOverlayNode->childNodesLength();
         for (unsigned i = 0; i < myOverlayCount; ++i) {
-             renderOverlay(theOverlayNode->childNode(i), myAlpha);
+             renderOverlay(theViewport, theOverlayNode->childNode(i), myAlpha);
         }
         glPopMatrix();
     }

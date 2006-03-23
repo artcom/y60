@@ -46,7 +46,7 @@
     private: \
         void commit ## THE_NAME (bool theFlag); \
         bool _my ## THE_NAME ## Flag; \
-    public: 
+    public:
 
 
 namespace y60 {
@@ -63,7 +63,6 @@ namespace y60 {
                 _myDepthWritesFlag(true),
                 _myPolygonOffsetFlag(false),
                 _myCullFaces(GL_BACK),
-                _myDrawNormalsFlag(false),
                 _myEnabledClippingPlanes(0)
             {
                 init();
@@ -87,12 +86,10 @@ namespace y60 {
             }
             GLenum getCullFaces() const { return _myCullFaces; }
             void setClippingPlanes(const std::vector<asl::Planef> & thePlanes);
-            void setDrawNormals(bool theFlag) { _myDrawNormalsFlag = theFlag; }
-            bool getDrawNormals() const { return _myDrawNormalsFlag; }
+
         private:
             void commitCullFaces(GLenum theFaces);
 
-            bool _myDrawNormalsFlag;
             int  _myEnabledClippingPlanes;
             GLenum _myCullFaces;
 
