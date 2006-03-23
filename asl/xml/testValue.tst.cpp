@@ -548,7 +548,7 @@ static const char * AnimalPropertyStrings[] = {
 };
 
 DEFINE_BITSET( AnimalProperties, AnimalProperty, AnimalPropertyEnum );
-IMPLEMENT_BITSET( AnimalPropertes, AnimalProperty, AnimalPropertyStrings );
+IMPLEMENT_BITSET( AnimalProperties, AnimalProperty, AnimalPropertyStrings );
 
 class BitsetValueUnitTest : public UnitTest {
     public:
