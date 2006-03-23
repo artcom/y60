@@ -217,13 +217,7 @@ namespace y60 {
             }*/
             CHECK_OGL_ERROR;
             MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
-            const VectorOfString & myBuffersEnabled = myPropFacade->get<TargetBuffersTag>();
-            vector<bool> myMasks(TargetBuffers::MAX, false);
-            TargetBuffers myTarget;
-            for(int i = 0; i < myBuffersEnabled.size(); ++i) {
-                myTarget.fromString(myBuffersEnabled[i]);
-                myMasks[myTarget] = true;
-            }
+            const TargetBuffers & myMasks = myPropFacade->get<TargetBuffersTag>();
             glDepthMask(myMasks[y60::DEPTH_MASK]);
             glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
                 myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
@@ -234,7 +228,7 @@ namespace y60 {
                 glBlendEquation(myEquation);
             }
 
-            if (theMaterial.writeDepthBuffer()) {
+            if (theMaterial.getDepthBufferWrite()) {
                 glDepthMask(GL_TRUE);
             } else {
                 glDepthMask(GL_FALSE);
@@ -243,7 +237,7 @@ namespace y60 {
 #if 0
             // disabled since overlays *must* be rendered with depthtest disabled
             // but use materials as everyone else...
-            if (theMaterial.testDepthBuffer()) {
+            if (theMaterial.getDepthBufferTest()) {
                 glEnable(GL_DEPTH_TEST);
             } else {
                 glDisable(GL_DEPTH_TEST);

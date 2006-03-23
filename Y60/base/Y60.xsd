@@ -368,6 +368,13 @@ Currently the following styles are supported:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="TargetBuffers">
+        <xs:annotation>
+             <xs:documentation>A set of target buffer strings.
+'red','green','blue','alpha','depth'</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:element name="rasterofrgb">
         <xs:annotation>
             <xs:documentation>This element contains a image data as text child.
@@ -684,6 +691,21 @@ Example:
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="VectorOfString">
+                    <xs:attribute name="name" type="xs:string"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="targetbuffers">
+        <xs:annotation>
+            <xs:documentation>This element contains a target buffer bitset as a text child.
+
+Example:
+&lt;targetbuffers name='targetbuffers'&gt;[red,green]&lt;/targetbuffers&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="TargetBuffers">
                     <xs:attribute name="name" type="xs:string"/>
                 </xs:extension>
             </xs:simpleContent>
@@ -1922,6 +1944,11 @@ surfacecolor - color for unlit materials</xs:documentation>
                 <xs:element ref="samplerCUBE">
                     <xs:annotation>
                         <xs:documentation>Property that references a CG cubemap</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element ref="targetbuffers">
+                    <xs:annotation>
+                        <xs:documentation>Property that references a set of target buffers</xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>

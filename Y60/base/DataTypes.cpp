@@ -151,6 +151,7 @@ namespace y60 {
 
 	void registerEnumBitsetTypes(dom::ValueFactory & theFactory) {
             theFactory.registerPrototype("RenderStyles", dom::ValuePtr(new dom::SimpleValue<y60::RenderStyles>(y60::RenderStyles(0),0)));
+            theFactory.registerPrototype("TargetBuffers", dom::ValuePtr(new dom::SimpleValue<y60::TargetBuffers>(y60::TargetBuffers(0),0)));
     }
 
     void registerSomTypes(dom::ValueFactory & theFactory) {

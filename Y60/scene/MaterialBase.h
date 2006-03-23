@@ -49,14 +49,6 @@ namespace y60 {
 		return myResult;
 	}
 
-    static y60::VectorOfString getDefaultTargetBuffers() {
-        y60::VectorOfString myResult;//(TargetBuffers::max());
-        for (int i = 0; i < TargetBuffers::MAX; ++i) {
-            myResult.push_back(TargetBuffers::getString(i));
-        }
-        return myResult;
-    }
-
 #define DEFINE_MATERIAL_PROPERTY_TAG(theTagName, theType, thePropertyName, theDefault) \
 	DEFINE_PROPERTY_TAG(theTagName,  MaterialPropertiesFacade, theType, y60::getTypeName<theType>(), thePropertyName,  PROPERTY_LIST_NAME, theDefault);
 
@@ -66,19 +58,13 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(MaterialEmissiveTag, asl::Vector4f, EMISSIVE_PROPERTY, asl::Vector4f(0,0,0,1));
 	DEFINE_MATERIAL_PROPERTY_TAG(SurfaceColorTag, asl::Vector4f, SURFACE_COLOR_PROPERTY, asl::Vector4f(0.0f,0.0f,0.0f,1));
     DEFINE_MATERIAL_PROPERTY_TAG(ShininessTag, float, SHININESS_PROPERTY, float(1.0));
-    DEFINE_MATERIAL_PROPERTY_TAG(TargetBuffersTag, y60::VectorOfString, TARGETBUFFERS_PROPERTY, getDefaultTargetBuffers());
+    DEFINE_MATERIAL_PROPERTY_TAG(TargetBuffersTag, y60::TargetBuffers, TARGETBUFFERS_PROPERTY, TargetBuffers((1<<RED_MASK)|(1<<GREEN_MASK)|(1<<BLUE_MASK)|(1<<ALPHA_MASK)|(1<<DEPTH_MASK)));
     DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfString, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
     DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, std::string, BLENDEQUATION_PROPERTY, std::string("add"));
-    //DEFINE_MATERIAL_PROPERTY_TAG(ReqLightingTag, y60::VectorOfRankedFeature, LIGHTING_FEATURE, y60::VectorOfRankedFeature(1, RankedFeature(100,"unlit")));
-    //DEFINE_PROPERTY_TAG(TargetBuffersTag, MaterialPropertiesFacade, y60::VectorOfString, SOM_VECTOR_STRING_NAME,
-    //                    TARGETBUFFERS_PROPERTY, PROPERTY_LIST_NAME, getDefaultTargetBuffers());
-	//DEFINE_PROPERTY_TAG(BlendFunctionTag, MaterialPropertiesFacade, y60::VectorOfString, SOM_VECTOR_STRING_NAME,
-	//	                BLENDFUNCTION_PROPERTY, PROPERTY_LIST_NAME, getDefaultBlendFunction());
+
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,
 		                LIGHTING_FEATURE, REQUIRES_LIST_NAME, y60::VectorOfRankedFeature(1, RankedFeature(100,"unlit")));
-    //DEFINE_PROPERTY_TAG(BlendEquationTag, MaterialRequirementFacade, std::string, FEATURE_NODE_NAME,
-    //    BLENDEQUATION_PROPERTY, REQUIRES_LIST_NAME, std::string(""));
 
 	class MaterialPropertiesFacade :
 		public PropertyListFacade,
@@ -170,9 +156,12 @@ namespace y60 {
 
             TextureUsage MaterialBase::getTextureUsage(unsigned theTextureSlot) const;
 
-            bool writeDepthBuffer() const;
-            bool testDepthBuffer() const;
-
+            bool getDepthBufferWrite() const;
+            void setDepthBufferWrite(const bool theFlag);
+            
+            // performe depth buffer test
+            bool getDepthBufferTest() const;
+            
             // texgen parameters
             void updateParams();
 

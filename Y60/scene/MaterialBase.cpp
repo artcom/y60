@@ -195,21 +195,21 @@ namespace y60 {
     }
 
     bool
-    MaterialBase::writeDepthBuffer() const {
+    MaterialBase::getDepthBufferWrite() const {
         MaterialPropertiesFacadePtr myPropFacade = getChild<MaterialPropertiesTag>();
-        const VectorOfString & myTargetBuffers = myPropFacade->get<TargetBuffersTag>();
-        TargetBuffers myEnum;
-        for (int i = 0; i < myTargetBuffers.size(); ++i) {
-            myEnum.fromString(myTargetBuffers[i]);
-            if (myEnum == DEPTH_MASK) {
-                return true;
-            }
-        }
-        return false;
+        return myPropFacade->get<TargetBuffersTag>()[DEPTH_MASK];
+    }
+
+    void
+    MaterialBase::setDepthBufferWrite(const bool theFlag) {
+        MaterialPropertiesFacadePtr myPropFacade = getChild<MaterialPropertiesTag>();
+        TargetBuffers mySet = myPropFacade->get<TargetBuffersTag>();
+        mySet.set(DEPTH_MASK, theFlag);
+        myPropFacade->set<TargetBuffersTag>(mySet);
     }
 
     bool
-    MaterialBase::testDepthBuffer() const {
+    MaterialBase::getDepthBufferTest() const {
         if (getNode().getAttribute(DEPTH_TEST_ATTRIB)) {
             return getNode().getAttributeValue<bool>(DEPTH_TEST_ATTRIB);
         }

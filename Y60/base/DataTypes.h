@@ -28,6 +28,7 @@
 #include "typedefs.h"
 #include "iostream_functions.h"
 #include "RankedFeature.h"
+#include "NodeValueNames.h"
 
 #include <dom/Value.h>
 #include <asl/string_functions.h>
@@ -149,6 +150,8 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGB_HALF, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGBA_FLOAT, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGB_FLOAT, SimpleValue);
+
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TargetBuffers, SimpleValue);
 
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfRGB, ComplexValue, dom::MakeResizeableRaster);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::RasterOfRGBA, ComplexValue, dom::MakeResizeableRaster);

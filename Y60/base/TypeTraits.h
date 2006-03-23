@@ -60,7 +60,8 @@ namespace y60 {
                   SAMPLERCUBE,
                   SAMPLER3D,
                   VECTOR_OF_STRING,
-                  VECTOR_OF_RANKED_FEATURE
+                  VECTOR_OF_RANKED_FEATURE,
+                  TARGETBUFFERS
     }; // TODO: move me up when file format compatibility isn't an issue
 
     static const char * TypeIdStrings[] =
@@ -85,6 +86,7 @@ namespace y60 {
         "sampler3d",  // TODO: move me up when file format compatibility isn't an issue
         "vectorofstring",
         "vectorofrankedfeature",
+        "targetbuffers",
         0
     };
 
@@ -135,6 +137,12 @@ namespace y60 {
     struct TypeIdTraits<VectorOfRankedFeature> {
         static const TypeId type_id() {
             return VECTOR_OF_RANKED_FEATURE;
+        }
+    };
+    template <>
+    struct TypeIdTraits<TargetBuffers> {
+        static const TypeId type_id() {
+            return TARGETBUFFERS;
         }
     };
 

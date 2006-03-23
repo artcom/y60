@@ -468,7 +468,7 @@ namespace y60 {
         ""
     };
 
-    DEFINE_ENUM(TargetBuffers, TargetBuffersEnum);
+    DEFINE_BITSET(TargetBuffers, TargetBuffer, TargetBuffersEnum);
     DEFINE_ENUM(BlendEquation, BlendEquationEnum);
 
     //=== Animation types ===============================================
