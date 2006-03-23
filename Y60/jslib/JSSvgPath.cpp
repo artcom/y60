@@ -577,6 +577,7 @@ namespace jslib {
             {"length", PROP_length, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
             {"numelements", PROP_numelements, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
             {"segmentlength", PROP_segmentlength, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+            {"numsegments", PROP_numsegments, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
             {0}
         };
         return myProperties;
@@ -595,6 +596,9 @@ namespace jslib {
         case PROP_segmentlength:
             *vp = as_jsval(cx, getNative().getSegmentLength());
             break;
+        case PROP_numsegments:
+            *vp = as_jsval(cx, getNative().getNumSegments());
+            break;
         default:
             JS_ReportError(cx,"JSSvgPath::getProperty: index %d out of range", theID);
             return JS_FALSE;
@@ -609,6 +613,8 @@ namespace jslib {
         switch (theID) {
         case PROP_segmentlength:
             return Method<JSSvgPath::NATIVE>::call(&JSSvgPath::NATIVE::setSegmentLength, cx, obj, 1, vp, &dummy);
+        case PROP_numsegments:
+            return Method<JSSvgPath::NATIVE>::call(&JSSvgPath::NATIVE::setNumSegments, cx, obj, 1, vp, &dummy);
         default:
             JS_ReportError(cx,"JSSvgPath::setProperty: index %d out of range", theID);
             return JS_FALSE;

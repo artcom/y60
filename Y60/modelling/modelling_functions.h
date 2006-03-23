@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2004-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: modelling_functions.h,v 1.17 2005/04/19 17:09:58 danielk Exp $
-//   $RCSfile: modelling_functions.h,v $
-//   $Author: danielk $
-//   $Revision: 1.17 $
-//   $Date: 2005/04/19 17:09:58 $
-//
-//=============================================================================
 
 #ifndef AC_Y60_GEOMETRY_FUNCTIONS_INCLUDED
 #define AC_Y60_GEOMETRY_FUNCTIONS_INCLUDED
@@ -60,7 +52,7 @@ dom::NodePtr createUnlitTexturedMaterial(y60::ScenePtr theScene,
                                  const std::string & theTextureFilename,
                                  const std::string & theName = "Material",
                                  bool theTransparencyFlag = false,
-			  	                 bool theSpriteFlag = false,
+                                 bool theSpriteFlag = false,
                                  unsigned theDepth = 1,
                                  const asl::Vector4f & theColor = asl::Vector4f(1.0, 1.0, 1.0, 1.0));
 
@@ -68,7 +60,7 @@ dom::NodePtr createUnlitTexturedMaterial(y60::ScenePtr theScene,
                                  dom::NodePtr theImageNode,
                                  const std::string & theName = "Material",
                                  bool theTransparencyFlag = false,
-			  	                 bool theSpriteFlag = false,
+                                 bool theSpriteFlag = false,
                                  const asl::Vector4f & theColor = asl::Vector4f(1.0, 1.0, 1.0, 1.0));
 
 dom::NodePtr createLambertMaterial(y60::ScenePtr theScene,
@@ -196,23 +188,23 @@ private:
 // 4 5 6 7
 // 8 9 10 11
 struct ArbitraryPlanePosition {
-	ArbitraryPlanePosition(const std::vector<asl::Vector3f> & theVertices, unsigned theXCount,
-		unsigned theYCount) :
-			_myVertices(theVertices),
-			_myXCount(theXCount)
+    ArbitraryPlanePosition(const std::vector<asl::Vector3f> & theVertices, unsigned theXCount,
+        unsigned theYCount) :
+            _myVertices(theVertices),
+            _myXCount(theXCount)
     {
-		if (_myVertices.size() < theXCount * theYCount) {
-			throw asl::Exception("Number of vertices in vertex array is less than xcount * ycount",
-				PLUS_FILE_LINE);
-		}
-	}
+        if (_myVertices.size() < theXCount * theYCount) {
+            throw asl::Exception("Number of vertices in vertex array is less than xcount * ycount",
+                PLUS_FILE_LINE);
+        }
+    }
 
     asl::Vector3f operator()(unsigned x, unsigned y) const {
         return _myVertices[y * _myXCount + x];
     }
 private:
     const std::vector<asl::Vector3f> & _myVertices;
-	unsigned _myXCount;
+    unsigned _myXCount;
 };
 
 
@@ -344,20 +336,20 @@ private:
 // 4 5 6 7
 // 8 9 10 11
 struct ArbitraryUVCoord {
-	ArbitraryUVCoord(const std::vector<asl::Vector2f> & theTexCoords, unsigned theXCount, unsigned theYCount) :
-	    _myTexCoords(theTexCoords), _myXCount(theXCount)
+    ArbitraryUVCoord(const std::vector<asl::Vector2f> & theTexCoords, unsigned theXCount, unsigned theYCount) :
+        _myTexCoords(theTexCoords), _myXCount(theXCount)
     {
-		if (theTexCoords.size() != (theXCount * theYCount)) {
-			throw asl::Exception("Number of texcoords doesn't match xcount * ycount", PLUS_FILE_LINE);
-		}
-	}
+        if (theTexCoords.size() != (theXCount * theYCount)) {
+            throw asl::Exception("Number of texcoords doesn't match xcount * ycount", PLUS_FILE_LINE);
+        }
+    }
 
     asl::Vector2f operator()(unsigned x, unsigned y) const {
         return _myTexCoords[y * _myXCount + x];
     }
 private:
     const std::vector<asl::Vector2f> & _myTexCoords;
-	unsigned _myXCount;
+    unsigned _myXCount;
 };
 
 struct BlackColor {

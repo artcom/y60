@@ -27,27 +27,27 @@
 #include "numeric_functions.h"
 #include <math.h>
 
-namespace asl {	
+namespace asl { 
 
     /*! @addtogroup aslmath */
     /* @{ */
 
     template<class Number>
-	class Sphere {
-	public:
-		Sphere() {};
-		Sphere(const Sphere<Number> & s) {
-			center = s.center;
-			radius = s.radius;
-		}
-		Sphere(const Point3<Number> & theCenter,const Number & theRadius) {
-			center = theCenter;
-			radius = theRadius;
-		}
-		Sphere(const Point3<Number> & p1,const Point3<Number> & p2) {
+    class Sphere {
+    public:
+        Sphere() {};
+        Sphere(const Sphere<Number> & s) {
+            center = s.center;
+            radius = s.radius;
+        }
+        Sphere(const Point3<Number> & theCenter,const Number & theRadius) {
+            center = theCenter;
+            radius = theRadius;
+        }
+        Sphere(const Point3<Number> & p1,const Point3<Number> & p2) {
             radius = distance(p1,p2)/2;
             center = asPoint((asVector(p1) + asVector(p2))/2);
-		}
+        }
         void setCenter(const Point3<Number> & theCenter) {
             center = theCenter;
         }
@@ -176,17 +176,17 @@ namespace asl {
                 distance(s.center,center) <= s.radius + radius; 
         } 
     public:
-		Point3<Number> center;
-		Number radius;
-	};
+        Point3<Number> center;
+        Number radius;
+    };
 
    
     template<class Number>
-	Point3<Number> nearest(const Sphere<Number> & s,const Point3<Number> & P) {
-		return s.center + s.radius * normalized(P-s.center);
-	}
+    Point3<Number> nearest(const Sphere<Number> & s,const Point3<Number> & P) {
+        return s.center + s.radius * normalized(P-s.center);
+    }
     template<class Number>
-	Point3<Number> nearest(const Point3<Number> & P, const Sphere<Number> & s) {
+    Point3<Number> nearest(const Point3<Number> & P, const Sphere<Number> & s) {
         return nearest(s, P);
     }
 

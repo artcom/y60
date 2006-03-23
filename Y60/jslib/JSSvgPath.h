@@ -35,6 +35,7 @@ public:
         PROP_length = -100,
         PROP_numelements,
         PROP_segmentlength,
+        PROP_numsegments,
     };
 
     static JSConstIntPropertySpec * ConstIntProperties();

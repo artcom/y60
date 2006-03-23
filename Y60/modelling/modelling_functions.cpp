@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2004-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: modelling_functions.cpp,v 1.27 2005/04/24 00:41:19 pavel Exp $
-//   $RCSfile: modelling_functions.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.27 $
-//   $Date: 2005/04/24 00:41:19 $
-//
-//=============================================================================
 
 #include "modelling_functions.h"
 
@@ -37,7 +29,6 @@ using namespace std;
 using namespace asl;
 
 namespace y60 {
-
 
     dom::NodePtr
     createTransform(dom::NodePtr theParentNode) {
@@ -422,7 +413,7 @@ namespace y60 {
         string myApplyMode         = TEXTURE_APPLY_MODULATE;
         string myUsage             = TEXTURE_USAGE_PAINT;
         string myWrapMode          = TEXTURE_WRAP_CLAMP;
-		string myUVMappingMode     = TEXCOORD_UV_MAP;
+        string myUVMappingMode     = TEXCOORD_UV_MAP;
         float myRanking            = 100.0f;
         bool myIsFallback          = true;
         float myFallbackRanking    = 100.0f;
@@ -530,7 +521,10 @@ namespace y60 {
 
     dom::NodePtr
     createUnlitTexturedMaterial(ScenePtr theScene, dom::NodePtr theImageNode,
-                                const std::string & theName, bool theTransparencyFlag, bool theSpriteFlag, const Vector4f & theColor)
+                                const std::string & theName,
+                                bool theTransparencyFlag,
+                                bool theSpriteFlag,
+                                const Vector4f & theColor)
     {
         MaterialBuilder myMaterialBuilder(theName, false);
         string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
@@ -542,7 +536,7 @@ namespace y60 {
         string myApplyMode         = TEXTURE_APPLY_MODULATE;
         string myUsage             = TEXTURE_USAGE_PAINT;
         string myWrapMode          = TEXTURE_WRAP_CLAMP;
-		string myUVMappingMode     = TEXCOORD_UV_MAP;
+        string myUVMappingMode     = TEXCOORD_UV_MAP;
         float myRanking            = 100.0f;
         bool myIsFallback          = true;
         float myFallbackRanking    = 100.0f;
@@ -568,7 +562,7 @@ namespace y60 {
         appendUnlitProperties(myMaterialBuilder, theColor);
         appendBlendFunction(myMaterialBuilder);
 
-         if ( ! theTextureFilename.empty()) {
+        if ( ! theTextureFilename.empty()) {
             appendTexture(*(theScene->getSceneBuilder()), theScene, myMaterialBuilder,
                             theTextureFilename, theSpriteFlag, theDepth);
         }

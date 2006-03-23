@@ -316,7 +316,8 @@ namespace asl {
         _myLength = 0.0f;
         _myLastPos = Vector3f(0.0f, 0.0f, 0.0f);
         _myOrigin = Vector3f(0.0f, 0.0f, 0.0f);
-        _mySegmentLength = 16.0f;
+        _mySegmentLength = 2.0f;
+        _myNumSegments = 2;
     }
 
     // deep copy
@@ -328,6 +329,7 @@ namespace asl {
         _myCp0 = thePath._myCp0;
         _myCp1 = thePath._myCp1;
         _mySegmentLength = thePath._mySegmentLength;
+        _myNumSegments = thePath._myNumSegments;
         for (unsigned i = 0; i < thePath._myElements.size(); ++i) {
             _myElements.push_back(thePath._myElements[i]);
         }
@@ -341,11 +343,16 @@ namespace asl {
 
     void SvgPath::push(BSpline<float> * theSpline) {
 
-        unsigned myNumSegments = (unsigned)(theSpline->getArcLength() / _mySegmentLength);
-        if (myNumSegments < MIN_SPLINE_SEGMENTS) {
-            myNumSegments = MIN_SPLINE_SEGMENTS;
-        } else if (myNumSegments > MAX_SPLINE_SEGMENTS) {
-            myNumSegments = MAX_SPLINE_SEGMENTS;
+        unsigned myNumSegments;
+        if (_mySegmentLength <= 0.0f) {
+            myNumSegments = _myNumSegments;
+        } else {
+            myNumSegments = (unsigned)(theSpline->getArcLength() / _mySegmentLength);
+            if (myNumSegments < MIN_SPLINE_SEGMENTS) {
+                myNumSegments = MIN_SPLINE_SEGMENTS;
+            } else if (myNumSegments > MAX_SPLINE_SEGMENTS) {
+                myNumSegments = MAX_SPLINE_SEGMENTS;
+            }
         }
 
         Point3f myP = theSpline->evaluate(0.0f);

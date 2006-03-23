@@ -297,7 +297,7 @@ void
 EdgeBlender::renderMultiScreen()
 {
     copyToTexture();
-    glClear(GL_COLOR_BUFFER_BIT); 
+    //glClear(GL_COLOR_BUFFER_BIT); // UH: not necessary since we overwrite the entire screen
 
     // draw scene texture to suitable parts of the screen w/o any blending
     float myTextureOffsetX = (_myColumnCount-1)*_myBlendWidth/2;

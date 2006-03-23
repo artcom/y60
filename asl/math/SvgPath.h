@@ -101,6 +101,17 @@ namespace asl {
             return _mySegmentLength;
         }
 
+        /// Set number of segments for BSpline segmentation.
+        void setNumSegments(unsigned theNum) {
+            _myNumSegments = theNum;
+            _mySegmentLength = -1.0f;
+        }
+
+        /// Get number of segments.
+        unsigned getNumSegments() const {
+            return _myNumSegments;
+        }
+
         /// Return length of path.
         float getLength() const {
             return _myLength;
@@ -179,8 +190,9 @@ namespace asl {
 
         // BSpline segmentation
         float _mySegmentLength;
+        unsigned _myNumSegments;
         enum {
-            MIN_SPLINE_SEGMENTS = 1,
+            MIN_SPLINE_SEGMENTS = 4,
             MAX_SPLINE_SEGMENTS = 32
         };
 

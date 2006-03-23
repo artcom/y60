@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: IScriptablePlugin.cpp,v $
-//   $Author: david $
-//   $Revision: 1.2 $
-//   $Date: 2004/11/08 18:03:19 $
-//
-//
-//=============================================================================
 
 #include "IScriptablePlugin.h"
 #include "JSScriptablePlugin.h"
