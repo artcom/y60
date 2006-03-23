@@ -29,7 +29,7 @@
 #endif
 #include <windows.h>
 
-/*! @addtogroup VFWCapture */
+/*! @addtogroup Y60componentsVFWCapture */
 /* @{ */
 namespace y60 {
     const std::string MIME_TYPE_CAMERA = "video/camera";

@@ -354,12 +354,15 @@ namespace y60 {
         }
         _myEOFVideoTimestamp = INT_MIN;
         createCache();
+#if 0
         // seek to start
 #if (LIBAVCODEC_BUILD < 4738)
         int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp);
 #else
         int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp, AVSEEK_FLAG_BACKWARD);
 #endif
+#endif
+
     }
 
     double
