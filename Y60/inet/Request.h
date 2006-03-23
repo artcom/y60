@@ -37,7 +37,11 @@ namespace inet {
 
     class RequestManager;
 
-    class Request {
+    /**
+     * @ingroup y60inet
+     * HTTP Request.
+     *
+     */    class Request {
         friend class RequestManager;
 
         public:

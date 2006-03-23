@@ -25,7 +25,13 @@
 namespace inet {
 
 
-    class RequestManager {
+    /**
+     * @ingroup y60inet
+     * Handles HTTP Requests.
+     *
+     * @relates Request
+     *
+     */    class RequestManager {
         public:
             RequestManager();
             ~RequestManager();
