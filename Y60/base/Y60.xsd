@@ -355,6 +355,18 @@ Example:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="BlendEquation">
+        <xs:annotation>
+             <xs:documentation>One of the following Enum values:
+
+- min
+- max
+- add
+- subtract
+- reverse_subtract</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:simpleType name="RenderStyles">
         <xs:annotation>
              <xs:documentation>A list of optional renderstyle strings.
@@ -1946,6 +1958,11 @@ surfacecolor - color for unlit materials</xs:documentation>
                         <xs:documentation>Property that references a CG cubemap</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element ref="blendequation">
+                    <xs:annotation>
+                        <xs:documentation>Property that defines a blend equation</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element ref="targetbuffers">
                     <xs:annotation>
                         <xs:documentation>Property that references a set of target buffers</xs:documentation>
@@ -2173,6 +2190,25 @@ Example:
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="xs:int">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="blendequation">
+        <xs:annotation>
+            <xs:documentation>Property that defines a blend equation as a text child 
+
+Example:
+&lt;blendequation name='blendequation'&gt;max&lt;/blendequation&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="BlendEquation">
                     <xs:attribute name="name" type="xs:string">
                         <xs:annotation>
                             <xs:documentation>Name of the property</xs:documentation>
