@@ -147,7 +147,7 @@ class Enum {
         }
 
         /** Conversion operator for native enum values. */
-        operator ENUM() {
+        operator ENUM() const {
             return _myValue;
         }
 
@@ -179,11 +179,8 @@ class Enum {
             std::string myWord;
             char myChar;
 
-            while ( ! is.eof() ) {
+            while ( is.peek() != std::char_traits< char >::eof()) {
                 is >> myChar;
-                if (is.eof()) {
-                    break;
-                }
                 if ( isspace(myChar) && myWord.empty() ) {
                     continue;
                 }
@@ -242,6 +239,9 @@ class Enum {
             }
             return true;
         }
+        static const char * getName() {
+            return _ourName;
+        }
     private:
         ENUM _myValue;
         static const char ** _ourStrings ;
@@ -249,9 +249,13 @@ class Enum {
         static bool  _ourVerifiedFlag; 
 };
 
+#define BIT( theBit ) (1 << theBit )
+
 template <class THE_ENUM>
 class Bitset : public std::bitset<THE_ENUM::MAX> {
     public:
+        typedef THE_ENUM Flags;
+
         Bitset(unsigned long theValue = 0) :
             std::bitset<THE_ENUM::MAX>(theValue) 
         {}
@@ -301,7 +305,8 @@ class Bitset : public std::bitset<THE_ENUM::MAX> {
 
             for (int i = 0; i < this->size(); ++i) {
                 if (this->test(i)) {
-                    os << THE_ENUM(static_cast<typename THE_ENUM::Native>(i));
+                    //os << THE_ENUM(static_cast<typename THE_ENUM::Native>(i));
+                    os << THE_ENUM::getString(i);
                     if (++mySetBitCount < myTotalBitCount) {
                         os << ',';
                     }
@@ -310,6 +315,11 @@ class Bitset : public std::bitset<THE_ENUM::MAX> {
             os << ']';
             return os;
         }
+        static const char * getName() {
+            return _ourName;
+        }
+    private:
+        static const char * _ourName ;
 };
 
 /* @} */
@@ -391,6 +401,7 @@ operator>>(std::istream & is, asl::Bitset<ENUM> & theBitset) {
  * @relates asl::Bitset
  */
 #define IMPLEMENT_BITSET( THE_BITSET_NAME, THE_ENUM_NAME, THE_STRINGS ) \
+    template <> const char * THE_BITSET_NAME ::_ourName = #THE_BITSET_NAME; \
     IMPLEMENT_ENUM( THE_ENUM_NAME, THE_STRINGS );
 
 #endif

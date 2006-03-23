@@ -25,6 +25,7 @@
 
 
 #include "NodeNames.h"
+#include "NodeValueNames.h"
 #include "AcBool.h"
 #include <asl/Vector234.h>
 #include <asl/Quaternion.h>
@@ -61,6 +62,8 @@ namespace y60 {
                   SAMPLER3D,
                   VECTOR_OF_STRING,
                   VECTOR_OF_RANKED_FEATURE,
+                  BLEND_EQUATION,
+                  RENDER_STYLES,
                   TARGETBUFFERS
     }; // TODO: move me up when file format compatibility isn't an issue
 
@@ -86,6 +89,8 @@ namespace y60 {
         "sampler3d",  // TODO: move me up when file format compatibility isn't an issue
         "vectorofstring",
         "vectorofrankedfeature",
+        "blendequation",
+        "renderstyles",
         "targetbuffers",
         0
     };
@@ -137,6 +142,18 @@ namespace y60 {
     struct TypeIdTraits<VectorOfRankedFeature> {
         static const TypeId type_id() {
             return VECTOR_OF_RANKED_FEATURE;
+        }
+    };
+    template <>
+    struct TypeIdTraits<BlendEquation> {
+        static const TypeId type_id() {
+            return BLEND_EQUATION;
+        }
+    };
+    template <>
+    struct TypeIdTraits<RenderStyles> {
+        static const TypeId type_id() {
+            return RENDER_STYLES;
         }
     };
     template <>

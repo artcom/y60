@@ -131,6 +131,9 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE3(y60::RankedFeature, ComplexValue, dom::MakeOpaqueVector, void);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfRankedFeature, ComplexValue, dom::MakeResizeableVector);
 
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::BlendEquation, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::RenderStyles, SimpleValue);
+
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGB, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGBA, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::BGR, SimpleValue);

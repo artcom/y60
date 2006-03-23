@@ -45,8 +45,12 @@
 #include "JSBSpline.h"
 #include "JSSvgPath.h"
 #include "JSPerlinNoise.h"
+#include "JSEnum.h"
+#include "JSBitset.h"
 
 #include "jscpp.h"
+
+#include <y60/NodeValueNames.h>
 
 namespace jslib {
 
@@ -223,6 +227,13 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSPerlinNoise::initClass(cx, theGlobalObject)) {
         return false;
     }
+    if (!JSEnum<y60::BlendEquation>::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSBitset<y60::RenderStyles>::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+
     if (!JS_DefineFunctions(cx,theGlobalObject, JSFileFunctions::Functions())) {
         return false;
     }

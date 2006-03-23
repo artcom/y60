@@ -150,6 +150,8 @@ namespace y60 {
     }
 
 	void registerEnumBitsetTypes(dom::ValueFactory & theFactory) {
+            theFactory.registerPrototype("BlendEquation", dom::ValuePtr(new dom::SimpleValue<y60::BlendEquation>(EQUATION_ADD,0)));
+            theFactory.registerPrototype("RenderStyle", dom::ValuePtr(new dom::SimpleValue<y60::RenderStyle>(FRONT,0)));
             theFactory.registerPrototype("RenderStyles", dom::ValuePtr(new dom::SimpleValue<y60::RenderStyles>(y60::RenderStyles(0),0)));
             theFactory.registerPrototype("TargetBuffers", dom::ValuePtr(new dom::SimpleValue<y60::TargetBuffers>(y60::TargetBuffers(0),0)));
     }

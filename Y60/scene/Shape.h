@@ -30,10 +30,14 @@ namespace y60 {
 
     class MaterialBase;
 
+    //                  theTagName      theType       theAttributeName        theDefault
+    DEFINE_ATTRIBUT_TAG(RenderStyleTag, RenderStyles, RENDER_STYLE_ATTRIB,    TYPE());
+
     class Shape :
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,
+        public RenderStyleTag::Plug,
         public dom::FacadeAttributePlug<BoundingBoxTag>
     {
         public:        
@@ -41,6 +45,7 @@ namespace y60 {
                 dom::Facade(theNode),
                 IdTag::Plug(theNode),
                 NameTag::Plug(theNode),
+                RenderStyleTag::Plug(theNode),
                 dom::FacadeAttributePlug<BoundingBoxTag>(this),
                 _myVertexCount(0),
                 _myLastRenderVersion(0)
@@ -66,12 +71,14 @@ namespace y60 {
             PrimitiveVector & getPrimitives() { 
                 return _myPrimitives; 
             }
+            /*
             const RenderStyles & getRenderStyles() const { 
                 return _myRenderStyles; 
             }
             RenderStyles & getRenderStyles() { 
                 return _myRenderStyles; 
             }
+            */
             dom::NodePtr getXmlNode() { 
                 return getNode().self().lock();
             }
@@ -118,7 +125,7 @@ namespace y60 {
 
             void clear() {
                 _myPrimitives.clear();
-                _myRenderStyles.reset();
+                // _myRenderStyles.reset();
                 _myVertexCount = 0;
                 _myLastRenderVersion = 0;
             }
@@ -129,7 +136,7 @@ namespace y60 {
             Shape & operator=(const Shape &);
 
             PrimitiveVector    _myPrimitives;   
-            RenderStyles       _myRenderStyles;
+            // RenderStyles       _myRenderStyles;
             unsigned long      _myVertexCount;
             unsigned long long _myLastRenderVersion;
     };

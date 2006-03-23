@@ -84,7 +84,7 @@ namespace asl {
     bool fromString(const std::string & theString, T & outValue) {
         std::istringstream myStream(theString);
         myStream >> outValue;
-        return (myStream != 0);
+        return (myStream != 0); // Shouldn't this be (myStream.good() || myStream.eof()) ? (MS)
     }
 #endif
 

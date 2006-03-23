@@ -520,7 +520,7 @@ namespace y60 {
         }
 
         // collect per shape renderstyles
-        theShape->getRenderStyles() = myShapeNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, RenderStyles(0));
+        // theShape->getRenderStyles() = myShapeNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, RenderStyles(0));
 
         // Set vertex count
         theShape->setVertexCount(myShapeVertexCount);

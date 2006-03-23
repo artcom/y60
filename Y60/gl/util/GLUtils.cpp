@@ -210,26 +210,23 @@ namespace y60 {
 
 
     GLenum 
-    asGLBlendEquation(const string & theBlendEquationString) {
-        if (!theBlendEquationString.empty()) {
-            BlendEquation myEquation;
-            myEquation.fromString(theBlendEquationString);
-            switch (myEquation) {
-                case EQUATION_MIN:
-                    return GL_MIN;
-                case EQUATION_MAX:
-                    return GL_MAX;
-                case EQUATION_ADD:
-                    return GL_FUNC_ADD;
-                case EQUATION_SUBTRACT:
-                    return GL_FUNC_SUBTRACT;
-                case EQUATION_REVERSE_SUBTRACT:
-                    return GL_FUNC_REVERSE_SUBTRACT;
-                default:
-                    break;
-            }
+    asGLBlendEquation(const BlendEquation & theBlendEquation) {
+        switch (theBlendEquation) {
+            case EQUATION_MIN:
+                return GL_MIN;
+            case EQUATION_MAX:
+                return GL_MAX;
+            case EQUATION_ADD:
+                return GL_FUNC_ADD;
+            case EQUATION_SUBTRACT:
+                return GL_FUNC_SUBTRACT;
+            case EQUATION_REVERSE_SUBTRACT:
+                return GL_FUNC_REVERSE_SUBTRACT;
+            default:
+                throw GLUnknownBlendEquation("Unknown blend equation", PLUS_FILE_LINE);
+                break;
         }
-        return GLenum(GL_FUNC_ADD);
+        return GLenum(0);
     }
 
     DEFINE_EXCEPTION(GLTextureUnknownInternalFormat, asl::Exception);

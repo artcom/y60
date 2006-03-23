@@ -429,6 +429,9 @@ namespace dom {
                     return _myValue;
                 }
             private:
+                WritableValue();
+                WritableValue(const WritableValue &); // not copy-safe!
+                WritableValue & operator=(const WritableValue &); // not copy-safe!
                 T            & _myValue;
                 dom::NodePtr _myNode;
         };

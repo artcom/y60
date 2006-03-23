@@ -60,7 +60,7 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(ShininessTag, float, SHININESS_PROPERTY, float(1.0));
     DEFINE_MATERIAL_PROPERTY_TAG(TargetBuffersTag, y60::TargetBuffers, TARGETBUFFERS_PROPERTY, TargetBuffers((1<<RED_MASK)|(1<<GREEN_MASK)|(1<<BLUE_MASK)|(1<<ALPHA_MASK)|(1<<DEPTH_MASK)));
     DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfString, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
-    DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, std::string, BLENDEQUATION_PROPERTY, std::string("add"));
+    DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, BlendEquation, BLENDEQUATION_PROPERTY, EQUATION_ADD);
 
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,

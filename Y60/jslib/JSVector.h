@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSVector.h,v $
-//   $Author: christian $
-//   $Revision: 1.7 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACXPSHELL_JSVECTOR_INCLUDED_
 #define _Y60_ACXPSHELL_JSVECTOR_INCLUDED_

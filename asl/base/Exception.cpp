@@ -22,22 +22,33 @@
 #include "settings.h"
 #include "Exception.h"
 #include "string_functions.h"
+#include "os_functions.h"
 
 using namespace std;
 
-#define ABORT_ON_THROW() // abort();
-
 namespace asl {
+    // TODO: make this a static function
+    bool abortOnThrow() {
+        bool myDummy;
+        static bool myAbortOnThrowFlag = asl::get_environment_var_as("AC_ABORT_ON_THROW", myDummy);
+        return myAbortOnThrowFlag;
+    }
     Exception::Exception(const std::string & what, const std::string & where)
             : _what(what), _where(where), _name("Exception")
     {
-        ABORT_ON_THROW();
+        if (abortOnThrow()) {
+            cerr << *this;
+            abort();
+        }
     };
     
     Exception::Exception(const std::string & what, const std::string & where, const char * name)
             : _what(what), _where(where), _name(name) 
     {
-        ABORT_ON_THROW();
+        if (abortOnThrow()) {
+            cerr << *this;
+            abort();
+        }
     };
 }
 

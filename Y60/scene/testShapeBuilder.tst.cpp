@@ -145,7 +145,19 @@ class ShapeBuilderUnitTest : public UnitTest {
             unsigned myNormalIndex0 = myOptShapeBuilder.appendVertexData(NORMAL_ROLE, Vector3f(1,0,0));
             unsigned myNormalIndex1 = myOptShapeBuilder.appendVertexData(NORMAL_ROLE, Vector3f(1,0,0));
             ENSURE(myNormalIndex0 == myNormalIndex1);
-
+            
+            //==============================================================================
+            // Renderstyle tests
+            //==============================================================================
+            RenderStyles myStyle; 
+            myStyle.set(FRONT);
+            myStyle.set(BACK); // default FRONT & BACK
+            DPRINT(myOptShapeBuilder.getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue());
+            ENSURE(myOptShapeBuilder.getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue() == as_string(myStyle));
+            myOptShapeBuilder.setBackFacing(false); // turn off back, front should still be set
+            myStyle.set(BACK, false);
+            DPRINT(myOptShapeBuilder.getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue());
+            ENSURE(myOptShapeBuilder.getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue() == as_string(myStyle));
             //==============================================================================
             // Shape tests
             //==============================================================================

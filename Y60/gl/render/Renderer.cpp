@@ -222,8 +222,9 @@ namespace y60 {
             glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
                 myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
 
-            const string & myBlendEquationString = myPropFacade->get<BlendEquationTag>();
-            GLenum myEquation = asGLBlendEquation(myBlendEquationString);
+            const BlendEquation & myBlendEquation= myPropFacade->get<BlendEquationTag>();            
+            GLenum myEquation = asGLBlendEquation(myBlendEquation); 
+
             if (glBlendEquation) {
                 glBlendEquation(myEquation);
             }
@@ -417,7 +418,7 @@ namespace y60 {
         // get renderstyles for this primitive
         DBP2(START_TIMER(renderBodyPart_getRenderStyles));
         const RenderStyles & myPrimitveStyle = myPrimitive.getRenderStyles();
-        const RenderStyles & myShapeStyle    = myShape.getRenderStyles();
+        const RenderStyles & myShapeStyle    = myShape.get<RenderStyleTag>();
 
         // if there are primitive-level styles, use them instead of the shape level
 #if 0 // disabled because of bug#91

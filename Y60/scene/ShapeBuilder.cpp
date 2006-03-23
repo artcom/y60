@@ -28,6 +28,8 @@
 
 #define DB(x) //x
 
+using namespace asl;
+using namespace dom;
 
 namespace y60 {
     ShapeBuilder::ShapeBuilder(const std::string & theName,
@@ -47,11 +49,18 @@ namespace y60 {
             ShapePtr myShape = getNode()->getFacade<Shape>();
             myShape->set<NameTag>(theName);
         }
-        
-	    myNode->appendAttribute(RENDER_STYLE_ATTRIB, "[frontfacing,backfacing]");
-    	// the following will work soon XXX 
-        //setFrontFacing(true);
-        //setBackFacing(true);
+        RenderStyles myDefaultStyle(BIT(FRONT) | BIT(BACK));
+        if (!myNode->hasFacade()) {
+	        myNode->appendAttribute(RENDER_STYLE_ATTRIB, as_string(myDefaultStyle));
+        } else {
+            myNode->getFacade<Shape>()->set<RenderStyleTag>(myDefaultStyle);
+        }
+        /*
+	    myNode->appendAttribute(RENDER_STYLE_ATTRIB, as_string(RenderStyles()));
+
+        setFrontFacing(true);
+        setBackFacing(true);
+        */
     }
 
     ShapeBuilder::ShapeBuilder(dom::NodePtr theShapeNode) :
@@ -80,21 +89,31 @@ namespace y60 {
 
     void
     ShapeBuilder::setBackFacing(bool isBackFacing) {
-        dom::NodePtr myRenderStyleNode = getNode()->getAttribute(RENDER_STYLE_ATTRIB);
-        if (!myRenderStyleNode) {
-            myRenderStyleNode = getNode()->appendAttribute(RENDER_STYLE_ATTRIB);
+        if (!getNode()->hasFacade()) {
+            // hard way - no facades
+            RenderStyles myStyle = as<RenderStyles>(getNode()->getAttributeString(RENDER_STYLE_ATTRIB));
+            myStyle.set(BACK, isBackFacing);
+            getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue(as_string(myStyle));
+        } else {
+            // easy way - with facades
+            RenderStyles myStyle = getNode()->getFacade<Shape>()->get<RenderStyleTag>();
+            myStyle.set(BACK, isBackFacing);
+            getNode()->getFacade<Shape>()->set<RenderStyleTag>(myStyle);
         }
-        dom::Node::WritableValue<RenderStyles> myValue(myRenderStyleNode);
-        myValue.get().set(BACK, isBackFacing);
     }
 
     void
     ShapeBuilder::setFrontFacing(bool isFrontFacing) {
-        dom::NodePtr myRenderStyleNode = getNode()->getAttribute(RENDER_STYLE_ATTRIB);
-        if (!myRenderStyleNode) {
-            myRenderStyleNode = getNode()->appendAttribute(RENDER_STYLE_ATTRIB);
+        if (!getNode()->hasFacade()) {
+            // hard way - no facades
+            RenderStyles myStyle = as<RenderStyles>(getNode()->getAttributeString(RENDER_STYLE_ATTRIB));
+            myStyle.set(FRONT, isFrontFacing);
+            getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue(as_string(myStyle));
+        } else {
+            // easy way - with facades
+            RenderStyles myStyle = getNode()->getFacade<Shape>()->get<RenderStyleTag>();
+            myStyle.set(FRONT, isFrontFacing);
+            getNode()->getFacade<Shape>()->set<RenderStyleTag>(myStyle);
         }
-        dom::Node::WritableValue<RenderStyles> myValue(myRenderStyleNode);
-        myValue.get().set(FRONT, isFrontFacing);
     }
 }

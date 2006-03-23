@@ -43,6 +43,7 @@ namespace y60 {
     DEFINE_EXCEPTION(CantQueryOpenGLVersion, asl::Exception);
     DEFINE_EXCEPTION(MissingExtensionsException, asl::Exception);
     DEFINE_EXCEPTION(MissingFunctionException, asl::Exception);
+    DEFINE_EXCEPTION(GLUnknownBlendEquation, asl::Exception);
 
 template <const char* NAME>
 struct GLExceptionHelper {
@@ -256,7 +257,7 @@ namespace y60 {
     GLenum asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag=false);
     GLenum asGLTextureInternalFormat(TextureInternalFormat theFormat);
     GLenum asGLTexCoordMode(TexCoordMode theMode);
-    GLenum asGLBlendEquation(const std::string & theBlendEquationString);
+    GLenum asGLBlendEquation(const BlendEquation & theBlendEquation);
 
     TextureInternalFormat fromGLTextureInternalFormat(GLenum theFormat);
 
