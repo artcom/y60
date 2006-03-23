@@ -206,32 +206,23 @@ namespace y60 {
         {
             // activate new material
             DBP(MAKE_SCOPE_TIMER(activateShader));
-            
+
             _myState->setLighting(theViewport.get<ViewportLightingTag>() && (theMaterial.getLightingModel() != UNLIT));
-            /*
-            if (theMaterial.getLightingModel() == UNLIT) {
-                glDisable(GL_LIGHTING);
-            } else if (_myState->getLighting()) {
-                glEnable(GL_LIGHTING);
-            }*/
+
             CHECK_OGL_ERROR;
             MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
             const TargetBuffers & myMasks = myPropFacade->get<TargetBuffersTag>();
+
             glDepthMask(myMasks[y60::DEPTH_MASK]);
+
             glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
                 myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
 
-            const BlendEquation & myBlendEquation= myPropFacade->get<BlendEquationTag>();            
-            GLenum myEquation = asGLBlendEquation(myBlendEquation); 
+            const BlendEquation & myBlendEquation= myPropFacade->get<BlendEquationTag>();
+            GLenum myEquation = asGLBlendEquation(myBlendEquation);
 
             if (glBlendEquation) {
                 glBlendEquation(myEquation);
-            }
-
-            if (theMaterial.getDepthBufferWrite()) {
-                glDepthMask(GL_TRUE);
-            } else {
-                glDepthMask(GL_FALSE);
             }
 
 #if 0
@@ -316,7 +307,6 @@ namespace y60 {
 
         _myPreviousMaterial        = &theMaterial;
         _myLastVertexRegisterFlags = myVertexRegisterFlags;
-
         return true;
     }
 
@@ -1008,7 +998,7 @@ namespace y60 {
 
         // We need to push all thouse bits, that need to be reset after the main render pass (before
         // text and overlay rendering). But not thouse that are managed by the renderstate class.
-        glPushAttrib(GL_TEXTURE_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
         dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
@@ -1091,6 +1081,7 @@ namespace y60 {
 
         glPopClientAttrib();
         glPopAttrib();
+        glDepthMask(true);
 
         if (_myBoundingVolumeMode & BV_HIERARCHY) {
             renderBoundingBoxHierarchy(_myScene->getWorldRoot());
