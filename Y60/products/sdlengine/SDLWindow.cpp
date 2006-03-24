@@ -74,6 +74,7 @@ SDLWindow::SDLWindow() :
 }
 
 SDLWindow::~SDLWindow() {
+    AC_DEBUG << "SDLWindow::~SDLWindow";
     SDL_Quit();
 }
 
@@ -121,7 +122,7 @@ SDLWindow::postRender() {
             _myLastSwapCounter = counter;
         }
         if ((counter - _myLastSwapCounter) != _mySwapInterval) {
-            AC_WARNING << "Missed frame diff=" << (counter - _myLastSwapCounter);
+            AC_DEBUG << "Missed frame diff=" << (counter - _myLastSwapCounter);
         }
         _myLastSwapCounter = counter;
     }
@@ -640,7 +641,6 @@ SDLWindow::mainLoop() {
         asl::getDashboard().cycle();
         START_TIMER(frames);
     }
-    //SDL_Quit();
 
     jsval argv[1], rval;
     if (jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onExit")) {
@@ -656,21 +656,20 @@ SDLWindow::stop() {
 
 void
 SDLWindow::go() {
-    AC_DEBUG << "SDLWindow::Go" << endl;
-
+    AC_DEBUG << "SDLWindow::go";
     if (!_myJSContext) {
-        AC_WARNING << "SDLWindow::Go() - No js context found, please assign an eventHandler to window before calling go" << endl;
+        AC_WARNING << "SDLWindow::go() - No js context found, please assign an eventHandler to window before calling go()";
         return;
     }
     try {
         AbstractRenderWindow::go();
         mainLoop();
     } catch (const asl::Exception & ex) {
-        AC_ERROR << "Exception caught in SDLWindow::go(): " << ex << endl;
+        AC_ERROR << "Exception caught in SDLWindow::go(): " << ex;
     } catch (const exception & ex) {
-        AC_ERROR << "Exception caught in SDLWindow::go(): " << ex.what() << endl;
+        AC_ERROR << "Exception caught in SDLWindow::go(): " << ex.what();
     } catch (...) {
-        AC_ERROR << "Unknown exception in SDLWindow::go()" << endl;
+        AC_ERROR << "Unknown exception in SDLWindow::go()";
     }
     // release mouse capture
     setCaptureMouseCursor(false);
