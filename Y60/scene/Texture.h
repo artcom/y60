@@ -46,35 +46,35 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(TextureMatrixTag,    asl::Matrix4f, TEXTURE_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
 
     DEFINE_EXCEPTION(TextureException, asl::Exception);
-	class Texture :
+    class Texture :
         public dom::Facade,
         /*public IdTag::Plug,*/
         public TextureImageTag::Plug,
         public TextureApplyModeTag::Plug,
         public TextureWrapModeTag::Plug,
         public TextureSpriteTag::Plug,
-		public TextureMinFilterTag::Plug, 
-		public TextureMagFilterTag::Plug, 
-		public TextureMatrixTag::Plug 
-	{
+        public TextureMinFilterTag::Plug, 
+        public TextureMagFilterTag::Plug, 
+        public TextureMatrixTag::Plug 
+    {
         public:
-			//Texture(dom::Node & theNode, int theFoo) {}
-			Texture(dom::Node & theNode);
+            //Texture(dom::Node & theNode, int theFoo) {}
+            Texture(dom::Node & theNode);
             IMPLEMENT_FACADE(Texture);
             virtual ~Texture();
 
             //you have to call update after construction !
             bool update(const TextureManager & theTextureManager);
 
-			void setUsage(TextureUsage theUsage) {}
+            void setUsage(TextureUsage theUsage) {}
 
-			TextureApplyMode  getApplyMode() const;
+            TextureApplyMode  getApplyMode() const;
             TextureWrapMode   getWrapMode() const;
             TextureSampleFilter  getMinFilter() const;
             TextureSampleFilter  getMagFilter() const;
             bool getSpriteMode() const;
 
-			unsigned      getId() const;
+            unsigned      getId() const;
             ImagePtr getImage() const;
 
         private:
