@@ -26,6 +26,59 @@ namespace asl {
     template<class T>
     class BSpline {
     public:
+        class Position {
+            public:
+                Position(const BSpline & theSpline, const float & theStrokeSize) :
+                    _mySpline(theSpline),
+                    _myStrokeSize(theStrokeSize)
+                {}
+    
+                Vector3<T> operator()(unsigned x, unsigned y) const {
+                    const std::vector<Vector3<T> > & myPoints = _mySpline.getResult();
+                    if (x == myPoints.size() - 1) {
+                        x--;
+                    }
+                    Vector3<T> mySideVector;
+                    Vector3<T> myUpVector;
+                    _mySpline.getSideAndUpVector(myPoints[x + 1] - myPoints[x], mySideVector, myUpVector);
+                    mySideVector *= _myStrokeSize / 2;
+                    if (y == 0) {
+                        return asl::Vector3<T>(myPoints[x] - mySideVector);
+                    } else {
+                        return asl::Vector3<T>(myPoints[x] + mySideVector);
+                    }
+                }
+    
+            private:
+                const BSpline & _mySpline;
+                const float & _myStrokeSize;
+        };
+
+        class Normal {
+            public:
+                Normal(const BSpline & theSpline, Vector3<T> & theUpVector = Vector3<T>(0,0,1)) :
+                    _mySpline(theSpline),
+                    _myUpVector(theUpVector)
+                {}
+
+                asl::Vector3<T> operator()(unsigned x, unsigned y) const {
+                    const std::vector<Vector3<T> > & myPoints = _mySpline.getResult();
+
+                    if (x == myPoints.size() - 1) {
+                        x--;
+                    }
+                    Vector3<T> mySideVector;
+                    Vector3<T> myUpVector;
+                    _mySpline.getSideAndUpVector(myPoints[x + 1] - myPoints[x], mySideVector, myUpVector);
+                    
+                    return myUpVector;
+                }
+
+            private:
+                const BSpline    & _mySpline;
+                const Vector3<T> & _myUpVector;
+        };
+
         BSpline() {}
 
         /**
@@ -162,6 +215,16 @@ namespace asl {
         /// Get sampled points.
         const std::vector< Vector3<T> > & getResult() const {
             return _myResult;
+        }
+
+        void getSideAndUpVector(const asl::Vector3<T> & theForwardVector,
+                                asl::Vector3<T> & theSideVector,
+                                asl::Vector3<T> & theUpVector) const
+        {
+            theSideVector = cross(theUpVector, theForwardVector);
+            theSideVector = normalized(theSideVector);
+            theUpVector = cross(theForwardVector, theSideVector);
+            theUpVector = normalized(theUpVector);
         }
 
     private:

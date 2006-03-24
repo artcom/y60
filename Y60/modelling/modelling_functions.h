@@ -11,8 +11,9 @@
 #ifndef AC_Y60_GEOMETRY_FUNCTIONS_INCLUDED
 #define AC_Y60_GEOMETRY_FUNCTIONS_INCLUDED
 
+#include "VertexIndexBuilder.h"
+
 #include <y60/Scene.h>
-#include <y60/VertexIndexBuilder.h>
 #include <y60/ShapeBuilder.h>
 #include <y60/ElementBuilder.h>
 #include <y60/MaterialBuilder.h>
