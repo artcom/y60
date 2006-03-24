@@ -292,7 +292,7 @@ namespace y60 {
             // EOF handling
             if (av_read_frame(_myFormatContext, &myPacket) < 0) {
                 av_free_packet(&myPacket);
-
+#if 0
                 // Remember the end of file timestamp
                 if (_myEOFVideoTimestamp == INT_MIN) {
                     _myEOFVideoTimestamp = _myLastVideoTimestamp;
@@ -316,6 +316,7 @@ namespace y60 {
                         continue;
                     }
                 }
+#endif
                 return false;
             }
 
