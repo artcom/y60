@@ -61,10 +61,23 @@ namespace asl {
         char myBuf[1024];
         char myKey[256];
         unsigned myValue;
+        char myUnit[16];
+
         while (fgets(myBuf, sizeof(myBuf), fp)) {
 
-            if (sscanf(myBuf, "%s %d", myKey, &myValue) != 2) {
+            int n = sscanf(myBuf, "%s %d %s", myKey, &myValue, myUnit);
+            if (n < 2) {
                 continue;
+            }
+
+            if (n == 3) {
+                unsigned myMemUnit = 1;
+                if (strcasecmp(myUnit, "kb") == 0) {
+                    myMemUnit = 1024;
+                } else if (strcasecmp(myUnit, "mb") == 0) {
+                    myMemUnit = 1024 * 1024;
+                }
+                myValue *= myMemUnit;
             }
 
             if (strcmp(myKey, "MemTotal:") == 0) {
@@ -124,10 +137,23 @@ namespace asl {
         char myBuf[1024];
         char myKey[256];
         unsigned myValue;
+        char myUnit[16];
+
         while (fgets(myBuf, sizeof(myBuf), fp)) {
 
-            if (sscanf(myBuf, "%s %d", myKey, &myValue) != 2) {
+            int n = sscanf(myBuf, "%s %d %s", myKey, &myValue, myUnit);
+            if (n < 2) {
                 continue;
+            }
+
+            if (n == 3) {
+                unsigned myMemUnit = 1;
+                if (strcasecmp(myUnit, "kb") == 0) {
+                    myMemUnit = 1024;
+                } else if (strcasecmp(myUnit, "mb") == 0) {
+                    myMemUnit = 1024 * 1024;
+                }
+                myValue *= myMemUnit;
             }
 
             if (strcmp(myKey, "VmSize:") == 0) {

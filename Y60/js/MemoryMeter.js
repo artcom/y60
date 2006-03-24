@@ -71,8 +71,9 @@ MemoryMeter.prototype.Constructor = function(self, theSceneViewer) {
             window.setTextColor([myRed,myGreen,0,1], [1,1,1,1]);
             window.renderText(new Vector2f(10, 20), asMemoryString(_myMaxMemoryUsage), "Screen8");
 
+            var myMem = asMemoryString(getFreeMemory()) + "/" + asMemoryString(getTotalMemory());
             window.setTextColor(myTextColor, [1,1,1,1]);
-            window.renderText(new Vector2f(10, 30), asMemoryString(getFreeMemory()), "Screen8");
+            window.renderText(new Vector2f(10, 30), myMem, "Screen8");
         }
     }
 }
