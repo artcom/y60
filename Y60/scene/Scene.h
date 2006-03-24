@@ -214,7 +214,7 @@ namespace y60 {
             dom::NodePtr getCanvasRoot();
             const dom::NodePtr getCanvasRoot() const;
 
-            float getWorldSize(const dom::Node & theActiveCamera) const;
+            float getWorldSize(const dom::NodePtr & theActiveCamera) const;
 
             dom::NodePtr getWorldRoot();
             const dom::NodePtr getWorldRoot() const;

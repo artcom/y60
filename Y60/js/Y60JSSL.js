@@ -606,11 +606,11 @@ function asMemoryString(theBytes) {
     if (theBytes < 1024) {
         return theBytes;
     } else if (theBytes < 1048576) {
-        return (theBytes / 1024).toFixed(1) + " K";
+        return (theBytes / 1024).toFixed(2) + "K";
     } else if (theBytes < 1073741824) {
-        return (theBytes / 1048576).toFixed(1) + " M";
+        return (theBytes / 1048576).toFixed(2) + "M";
     } else if (theBytes < 1073741824 * 1024) {
-        return (theBytes / (1048576 * 1024)).toFixed(1) + " G";
+        return (theBytes / (1048576 * 1024)).toFixed(2) + "G";
     }
 }
 

@@ -179,7 +179,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
         // theKeyState is true, if the key is pressed
         if (!theKeyState) {
-            return true;
+            return;
         }
 
         if (theShiftFlag) {

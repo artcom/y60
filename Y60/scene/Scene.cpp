@@ -782,12 +782,12 @@ namespace y60 {
     }
 
     float
-    Scene::getWorldSize(const Node & theActiveCamera) const {
+    Scene::getWorldSize(const NodePtr & theActiveCamera) const {
         const NodePtr myWorld = getWorldRoot();
         WorldFacadePtr myWorldFacade = myWorld->getFacade<WorldFacade>();
         asl::Box3f myWorldBox = myWorld->getFacade<WorldFacade>()->get<BoundingBoxTag>();
 
-        asl::Matrix4f myCameraMatrix = theActiveCamera.getFacade<Camera>()->get<GlobalMatrixTag>();
+        asl::Matrix4f myCameraMatrix = theActiveCamera->getFacade<Camera>()->get<GlobalMatrixTag>();
         asl::Vector3f myCameraPos = myCameraMatrix.getTranslation();
         myWorldBox.extendBy(myCameraPos);
         return asl::distance(myWorldBox[0], myWorldBox[1]);
