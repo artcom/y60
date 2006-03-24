@@ -97,6 +97,8 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                 // blur/glow
                 if (_myGlurRadi[theSize] > 0) {
                     applyGlurFilter(_myGlurRadi[theSize], myTmpImage);
+                    //saveImage(myTmpImage, "test/"+myChar + "_" + theSize + ".png");
+
                 }
                 blitImage(myTmpImage, myFontImage, myTargetUVPosition);
                 theSceneViewer.getImages().removeChild(myTmpImage);
@@ -104,8 +106,8 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                 // texture coordinates
                 myTexCoord[0] = myTargetUVPosition.x / myFontImage.width;
                 myTexCoord[1] = myTargetUVPosition.y / myFontImage.height;
-                myTexSize[0] = (myCharSize[0] /*+ _myGlurRadi[theSize] * 0.5*/) / myFontImage.width;
-                myTexSize[1] = (myCharSize[1] /*+ _myGlurRadi[theSize] * 0.5*/) / myFontImage.height;
+                myTexSize[0] = (myCharSize[0] + _myGlurRadi[theSize] * 0.6) / myFontImage.width;
+                myTexSize[1] = (myCharSize[1] + _myGlurRadi[theSize] * 0.6) / myFontImage.height;
 
                 // position of next character
                 _myAlphabetMap[theSize].nextCharSlot.x += myCellSize;
@@ -126,7 +128,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
             myCharacters.push(myCharacter);
         }
-        //saveImage(myFontImage, myFontName + ".png");
+        //saveImage(myFontImage, myFontName + "_" + theSize  + ".png");
 
         return myCharacters;
     }
@@ -151,6 +153,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         window.scene.update(Scene.IMAGES);
 
         var myMaterial = buildUnlitTextureMaterialNode(myFontName + "_material", myFontImage.id);
+        myMaterial.name = myFontName + "_material";
         addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
         myMaterial.transparent = true;
         myMaterial.properties.targetbuffers = "[red,green,blue,alpha]"
