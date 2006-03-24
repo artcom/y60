@@ -7,19 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: MaterialBuilder.cpp,v 1.2 2005/04/21 08:59:01 jens Exp $
-//   $RCSfile: MaterialBuilder.cpp,v $
-//   $Author: jens $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/21 08:59:01 $
-//
-//
-//  Description: XML-File-Export Plugin
-//
-// (CVS log at the bottom of this file)
-//
-//=============================================================================
 
 #include "MaterialBuilder.h"
 #include "SceneBuilder.h"
@@ -106,10 +93,10 @@ namespace y60 {
                 myFallbackFeature._myRanking = 0.0f;
                 _myTextureRequirements.push_back(myFallbackFeature);
             }
-	        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, TEXTURE_FEATURE, _myTextureRequirements, REQUIRES_LIST_NAME);
+            setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, TEXTURE_FEATURE, _myTextureRequirements, REQUIRES_LIST_NAME);
         }
 
-		// Mapping feature
+        // Mapping feature
         if (!_myMappingRequirements.empty()) {
             if (!_needTextureFallback && (_myMappingRequirements.size() > 1)) {
                 VectorOfRankedFeature::iterator it = _myMappingRequirements.begin() + 1;
@@ -121,13 +108,13 @@ namespace y60 {
                 myFallbackFeature._myRanking = 0.0f;
                 _myMappingRequirements.push_back(myFallbackFeature);
             }
-	        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, MAPPING_FEATURE, _myMappingRequirements, REQUIRES_LIST_NAME);
+            setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, MAPPING_FEATURE, _myMappingRequirements, REQUIRES_LIST_NAME);
         }
 
 
         // lighting feature
         if (!_myLightingRequirements.empty()) {
-	        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, LIGHTING_FEATURE, _myLightingRequirements, REQUIRES_LIST_NAME);
+            setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, LIGHTING_FEATURE, _myLightingRequirements, REQUIRES_LIST_NAME);
         }
 
         _myRequirementsAdded = true;
@@ -136,16 +123,16 @@ namespace y60 {
 
     void
     MaterialBuilder::addFeature(const std::string & theClass, const VectorOfRankedFeature & theValue) {
-	    setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, theClass.c_str(),									theValue, REQUIRES_LIST_NAME);
+        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, theClass.c_str(),                                 theValue, REQUIRES_LIST_NAME);
     }
 /*
-		dom::NodePtr myFeatureListNode = getNode()->childNode(REQUIRES_LIST_NAME);
+        dom::NodePtr myFeatureListNode = getNode()->childNode(REQUIRES_LIST_NAME);
         dom::NodePtr myFeatureNode = dom::NodePtr(new dom::Element(FEATURE_NODE_NAME));
         myFeatureNode->appendAttribute(NAME_ATTRIB, theClass);
         myFeatureNode->appendAttribute(VALUES_ATTRIB, theValue);
         myFeatureListNode->appendChild(myFeatureNode);*/
 
-	void
+    void
     MaterialBuilder::checkState() {
         if (_myRequirementsAdded) {
             throw MaterialBuilderException("Material is already added to dom. Further additions not allowed",
@@ -164,7 +151,7 @@ namespace y60 {
                                        const std::string & theApplyMode,
                                        const std::string & theUsage,
                                        const std::string & theWrapMode,
-									   const std::string & theMappingMode,
+                                       const std::string & theMappingMode,
                                        const asl::Matrix4f & theTextureMatrix,
                                        float theRanking,
                                        bool  isFallback,
@@ -206,22 +193,22 @@ namespace y60 {
                 RankedFeature myFirstTextureSet;
                 _myTextureRequirements.push_back(myFirstTextureSet);
 
-				RankedFeature myFirstMappingSet;
-				_myMappingRequirements.push_back(myFirstMappingSet);
+                RankedFeature myFirstMappingSet;
+                _myMappingRequirements.push_back(myFirstMappingSet);
 
-			}
+            }
             _myTextureRequirements[1]._myFeature.push_back(theUsage);
             _myTextureRequirements[1]._myRanking = theFallbackRanking;
 
-			_myMappingRequirements[1]._myFeature.push_back(theMappingMode);
-			_myMappingRequirements[1]._myRanking = theFallbackRanking;
+            _myMappingRequirements[1]._myFeature.push_back(theMappingMode);
+            _myMappingRequirements[1]._myRanking = theFallbackRanking;
 
-		}
+        }
 
         _myTextureRequirements[0]._myFeature.push_back(theUsage);
         _myTextureRequirements[0]._myRanking = theRanking;
 
-		_myMappingRequirements[0]._myFeature.push_back(theMappingMode);
+        _myMappingRequirements[0]._myFeature.push_back(theMappingMode);
         _myMappingRequirements[0]._myRanking = theRanking;
 
         return myTextureNode;
@@ -236,8 +223,8 @@ namespace y60 {
                                  asl::Vector4f theColorScale,
                                  asl::Vector4f theColorBias,
                                  ImageType theType,
-								 const std::string & theInternalFormat,
-								 const std::string & theResizeMode,
+                                 const std::string & theInternalFormat,
+                                 const std::string & theResizeMode,
                                  unsigned theDepth)
     {
         std::string myFileName(theFileName);
@@ -274,7 +261,7 @@ namespace y60 {
             } else {
                 myImageBuilder.createFileReference(myFileName, theResizeMode);
             }
-			myImageBuilder.setInternalFormat(theInternalFormat);
+            myImageBuilder.setInternalFormat(theInternalFormat);
 
             return myId;
         }
@@ -287,7 +274,7 @@ namespace y60 {
                                  unsigned theLoopCount,
                                  const asl::Vector4f theColorScale,
                                  const asl::Vector4f theColorBias,
-								 const std::string & theInternalFormat)
+                                 const std::string & theInternalFormat)
     {
         std::string myFileName(theFileName);
         asl::findAndReplace(myFileName, "\\","/");
@@ -335,8 +322,8 @@ namespace y60 {
                                    const std::string & theLeftFileName,
                                    const std::string & theTopFileName,
                                    const std::string & theBottomFileName,
-								   const std::string & theApplyMode,
-								   const asl::Vector4f theColorScale)
+                                   const std::string & theApplyMode,
+                                   const asl::Vector4f theColorScale)
     {
         checkState();
         string myFileName = theFrontFileName + "|" + theRightFileName + "|"
@@ -345,10 +332,10 @@ namespace y60 {
 
         const string & myId = createImage(theSceneBuilder, theName, myFileName, TEXTURE_USAGE_ENVIRONMENT, false,
                                           theColorScale, asl::Vector4f(0.0f,0.0f,0.0f,0.0f), CUBEMAP,
-										  "");
-		// default applay mode: TEXTURE_APPLY_DECAL
+                                          "");
+        // default applay mode: TEXTURE_APPLY_DECAL
         createTextureNode(myId, theApplyMode, TEXTURE_USAGE_ENVIRONMENT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP,
-						  Matrix4f::Identity(), 10.0f, false, 0.0f, false);
+                          Matrix4f::Identity(), 10.0f, false, 0.0f, false);
     }
 
     void
