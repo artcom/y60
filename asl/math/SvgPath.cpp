@@ -361,6 +361,9 @@ namespace asl {
             push(new LineSegment<float>(myP, myP1));
             myP = myP1;
         }
+
+        // no longer needed
+        delete theSpline;
     }
 
     bool SvgPath::isCommand(char theChar) const {
