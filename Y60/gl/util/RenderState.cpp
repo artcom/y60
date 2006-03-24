@@ -37,6 +37,8 @@ namespace y60 {
         commitIgnoreDepth(_myIgnoreDepthFlag);
         commitDepthWrites(_myDepthWritesFlag);
         commitPolygonOffset(_myPolygonOffsetFlag);
+        commitBlend(_myBlendFlag);
+        commitAlphaTest(_myAlphaTestFlag);
         commitCullFaces(_myCullFaces);
     }
 
@@ -52,6 +54,7 @@ namespace y60 {
 
     void
     RenderState::commitLighting(bool theFlag) {
+        //AC_PRINT << (theFlag ? "enable" : "disable") << " LIGHTING, current=" << _myLightingFlag;
         if (theFlag) {
             glEnable(GL_LIGHTING);
         } else {
@@ -82,6 +85,7 @@ namespace y60 {
 
     void
     RenderState::commitTexturing(bool theFlag) {
+        //AC_PRINT << (theFlag ? "enable" : "disable") << " TEXTURE_2D, current=" << _myTexturingFlag;
         if (theFlag) {
             glEnable(GL_TEXTURE_2D);
         } else {
@@ -106,11 +110,12 @@ namespace y60 {
     void
     RenderState::commitIgnoreDepth(bool theFlag) {                    
         if (theFlag) {
-            glDepthFunc(GL_ALWAYS);
+            glDepthFunc(GL_ALWAYS); // has no effect since disabled
+            glDisable(GL_DEPTH_TEST);
         } else {
             glDepthFunc(GL_LESS);
+            glEnable(GL_DEPTH_TEST);
         }
-
         _myIgnoreDepthFlag = theFlag;
     }
 
@@ -121,7 +126,6 @@ namespace y60 {
         } else {
             glDepthMask(GL_FALSE);
         }
-
         _myDepthWritesFlag = theFlag;
     }
 
@@ -138,8 +142,27 @@ namespace y60 {
             glDisable(GL_POLYGON_OFFSET_FILL);
             glPolygonOffset(0.0, 0.0);
         }
-
         _myPolygonOffsetFlag = theFlag;
+    }
+
+    void
+    RenderState::commitBlend(bool theFlag) {
+        if (theFlag) {
+            glEnable(GL_BLEND);
+        } else {
+            glDisable(GL_BLEND);
+        }
+        _myBlendFlag = theFlag;
+    }
+
+    void
+    RenderState::commitAlphaTest(bool theFlag) {
+        if (theFlag) {
+            glEnable(GL_ALPHA_TEST);
+        } else {
+            glDisable(GL_ALPHA_TEST);
+        }
+        _myAlphaTestFlag = theFlag;
     }
 
     void

@@ -70,7 +70,7 @@ namespace y60 {
                 setupSingleTexture(theImage);
                 break;
             case CUBEMAP:
-                setupCubemapTexture(theImage);
+                setupCubemap(theImage);
                 break;
             default:
                 throw TextureException(std::string("Unknown texture type '")+
@@ -83,117 +83,63 @@ namespace y60 {
 
     void
     GLResourceManager::unbindTexture(Image * theImage) {
-        AC_TRACE << "unbindTexture(" << theImage->get<NameTag>() << ")";
+        AC_TRACE << "unbindTexture " << theImage->get<NameTag>();
         unsigned myId = theImage->getGraphicsId();
         if (myId) {
             glDeleteTextures(1, &myId);
             theImage->setGraphicsId(0);
 
+            unsigned int myBufferId = theImage->getBufferId();
+            if (glDeleteBuffersARB && myBufferId) {
+                glDeleteBuffersARB(1, &myBufferId);
+                theImage->setBufferId(0);
+                CHECK_OGL_ERROR;
+            }
+
             // adjust texmem usage
             unsigned int myTopLevelTextureSize = theImage->getMemUsed();
-            _myTextureMemUsage -=  myTopLevelTextureSize;
+            //PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
+            //if (myPixelEncoding.compressedFlag) {
+            if (theImage->get<ImageMipmapTag>()) {
+                _myTextureMemUsage -= myTopLevelTextureSize/3;
+            }
+            _myTextureMemUsage -= myTopLevelTextureSize;
         }
     }
 
     void
+    GLResourceManager::rebindTexture(ImagePtr theImage) {
+        AC_TRACE << "rebindTexture " << theImage->get<NameTag>();
+        unbindTexture(&*theImage);
+
+        unsigned myId = setupTexture(theImage);
+        theImage->setGraphicsId(myId);
+        CHECK_OGL_ERROR;
+    }
+
+    void
     GLResourceManager::updateTextureData(ImagePtr theImage) {
-        PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
-        if ( ! theImage->getRasterPtr()) {
-            AC_WARNING << "No raster in image";
+        if (! theImage->getRasterPtr()) {
+            AC_ERROR << "No raster in image";
             return;
         }
 
         theImage->storeTextureVersion();
-        GLsizei myWidth  = theImage->get<ImageWidthTag>();
-        GLsizei myHeight = theImage->get<ImageHeightTag>();
 
         glPushAttrib(GL_PIXEL_MODE_BIT | GL_TEXTURE_BIT);
         setupPixelTransfer(theImage);
 
         if (theImage->getType() == CUBEMAP) {
-
-            glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, theImage->getGraphicsId());
-            CHECK_OGL_ERROR;
-
-            const asl::Vector2i myTileVec = theImage->get<ImageTileTag>();
-            unsigned int myNumTiles = myTileVec[0] * myTileVec[1];
-
-            GLsizei myTileWidth = myWidth / myTileVec[0];
-            GLsizei myTileHeight = myHeight / myTileVec[1];
-            const unsigned int myTileSize = theImage->getMemUsed() / myNumTiles;
-
-            if (myTileWidth != myWidth) {
-                glPixelStorei(GL_UNPACK_ROW_LENGTH, myWidth);
-            }
-            unsigned int myBytesPerLine = getBytesRequired(myWidth, theImage->getEncoding());
-            unsigned int myBytesPerTileLine = getBytesRequired(myTileWidth, theImage->getEncoding());
-
-            for (unsigned int i = 0; i < CUBEMAP_SIDES; ++i) {
-
-                const unsigned char * myTile = theImage->getRasterPtr()->pixels().begin();
-
-                unsigned int myColumn = i % myTileVec[0];
-                unsigned int myRow = i / myTileVec[0];
-                myTile += (myTileHeight * myBytesPerLine) * myRow +
-                    myBytesPerTileLine * myColumn;
-
-                if (myPixelEncoding.compressedFlag) {
-                    glCompressedTexSubImage2DARB(ourCubeMapFaces[i], 0,
-                                                 0, 0,
-                                                 myTileWidth, myTileHeight,
-                                                 myPixelEncoding.externalformat,
-                                                 myTileSize, myTile);
-                } else {
-                    glTexSubImage2D(ourCubeMapFaces[i], 0,
-                                    0, 0,
-                                    myTileWidth, myTileHeight,
-                                    myPixelEncoding.externalformat,
-                                    myPixelEncoding.pixeltype, myTile);
-                }
-                CHECK_OGL_ERROR;
-            }
+            updateCubemap(theImage);
         } else {
             GLsizei myDepth  = theImage->get<ImageDepthTag>();
-
-            if (myDepth == 0) {
-                myDepth = 1;
-            }
             if (myDepth == 1) {
-                glBindTexture(GL_TEXTURE_2D, theImage->getGraphicsId());
+                update2DTexture(theImage);
             } else {
-                glBindTexture(GL_TEXTURE_3D, theImage->getGraphicsId());
-            }
-
-            if (myPixelEncoding.compressedFlag) {
-                if (myDepth == 1) {
-                    glCompressedTexSubImage2DARB(GL_TEXTURE_2D, 0,
-                                                0, 0, myWidth, myHeight,
-                                                myPixelEncoding.externalformat,
-                                                theImage->getMemUsed(),
-                                                theImage->getRasterPtr()->pixels().begin());
-                } else {
-                    glCompressedTexSubImage3DARB(GL_TEXTURE_3D, 0,
-                                                0, 0, 0, myWidth, myHeight, myDepth,
-                                                myPixelEncoding.externalformat,
-                                                theImage->getMemUsed(),
-                                                theImage->getRasterPtr()->pixels().begin());
-                }
-            } else {
-                if (myDepth == 1) {
-                    DB(AC_TRACE << "subloading 2D " << myWidth << "x" << myHeight << " internalFormat=" << hex << myPixelEncoding.internalformat << dec);
-                    glTexSubImage2D(GL_TEXTURE_2D, 0,
-                                    0, 0, myWidth, myHeight,
-                                    myPixelEncoding.externalformat,
-                                    myPixelEncoding.pixeltype, theImage->getRasterPtr()->pixels().begin());
-                } else {
-                    DB(AC_TRACE << "subloading 3D " << myWidth << "x" << myHeight << "x" << myDepth);
-                    glTexSubImage3D(GL_TEXTURE_3D, 0,
-                                    0, 0, 0, myWidth, myHeight, myDepth,
-                                    myPixelEncoding.externalformat,
-                                    myPixelEncoding.pixeltype, theImage->getRasterPtr()->pixels().begin());
-                }
+                update3DTexture(theImage);
             }
         }
+
         glPopAttrib();
         CHECK_OGL_ERROR;
     }
@@ -202,16 +148,6 @@ namespace y60 {
     GLResourceManager::setTexturePriority(Image * theImage, float thePriority) {
         unsigned myTextureId = theImage->getGraphicsId();
         glPrioritizeTextures(1, &myTextureId, &thePriority);
-    }
-
-    void
-    GLResourceManager::rebindTexture(ImagePtr theImage) {
-        AC_TRACE << "GLResourceManager::rebindTexture " << theImage->get<NameTag>();
-        unbindTexture(&(*theImage));
-
-        unsigned myId = setupTexture(theImage);
-        theImage->setGraphicsId(myId);
-        CHECK_OGL_ERROR;
     }
 
     void GLResourceManager::loadShaderLibrary(const std::string & theShaderLibraryFile) {
@@ -233,18 +169,16 @@ namespace y60 {
      */
     unsigned
     GLResourceManager::setupSingleTexture(ImagePtr theImage) {
-        if (!theImage) {
-            throw TextureException("setupSingleTexture: ImagePtr is null!", PLUS_FILE_LINE);
-        }
 
         unsigned int myId = theImage->getGraphicsId();
+
         unsigned int myWidth = theImage->get<ImageWidthTag>();
         unsigned int myHeight = theImage->get<ImageHeightTag>();
 
         unsigned int myDepth = theImage->get<ImageDepthTag>();
         if (myDepth == 0) {
             myDepth = 1;
-            theImage->set<ImageDepthTag>(1);
+            theImage->set<ImageDepthTag>(myDepth);
         }
 
         bool myMipmapFlag = theImage->get<ImageMipmapTag>();
@@ -292,8 +226,23 @@ namespace y60 {
             myMipmapFlag = false;
         }
 
+#ifdef GL_PIXEL_UNPACK_BUFFER_ARB
+        // pixel buffer
+        if (glGenBuffersARB && myDepth == 1) {// && theImage->usePixelBuffer()) {
+            unsigned int myBufferId = 0;
+            glGenBuffersARB(1, &myBufferId);
+            theImage->setBufferId(myBufferId);
+            CHECK_OGL_ERROR;
+        }
+        if (glBindBufferARB) {
+            glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+            CHECK_OGL_ERROR;
+        }
+#endif
+
 #ifdef GL_SGIS_generate_mipmap
-        static bool SGIS_generate_mipmap = queryOGLExtension("GL_SGIS_generate_mipmap");
+        // UH: disabled since it produces problems with alpha (according to DS)
+        static bool SGIS_generate_mipmap = false; //queryOGLExtension("GL_SGIS_generate_mipmap");
 #endif
 
         if (myMipmapFlag && myDepth == 1 /* no 3D-Mipmaps yet */) {
@@ -301,7 +250,7 @@ namespace y60 {
             if (myDepth == 1) {
 #ifdef GL_SGIS_generate_mipmap
                 if (SGIS_generate_mipmap) {
-                    //glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+                    glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
                 }
 #endif
                 // 2D-Texture
@@ -323,13 +272,12 @@ namespace y60 {
 
             // UH: myTopLevelTextureSize is added later
             _myTextureMemUsage += myTopLevelTextureSize/3;
-            //_myTextureMemUsage +=  myTopLevelTextureSize + myTopLevelTextureSize/3;
         } else {
             // no mipmapping
             if (myDepth == 1) {
 #ifdef GL_SGIS_generate_mipmap
                 if (SGIS_generate_mipmap) {
-                    //glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
+                    glTexParameterf(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
                 }
 #endif
             }
@@ -352,8 +300,8 @@ namespace y60 {
             unsigned int myTexWidth = nextPowerOfTwo(myWidth);
             unsigned int myTexHeight = nextPowerOfTwo(myHeight);
             unsigned int myTexDepth = nextPowerOfTwo(myDepth);
-            AC_DEBUG << "image size=" << myWidth << "x" << myHeight;
-            AC_DEBUG << "tex size=" << myTexWidth << "x" << myTexHeight;
+            AC_DEBUG << "image size=" << myWidth << "x" << myHeight << "x" << myDepth;
+            AC_DEBUG << "tex size=" << myTexWidth << "x" << myTexHeight << "x" << myTexDepth;
 
             if (myDepth == 1) {
                 AC_TRACE << "setupSingle internalFormat=" << hex << myPixelEncoding.internalformat << dec;
@@ -394,7 +342,7 @@ namespace y60 {
             CHECK_OGL_ERROR;
 
             myTopLevelTextureSize = getBytesRequired(myTexWidth * myTexHeight * myTexDepth, theImage->getEncoding());
-            _myTextureMemUsage +=  myTopLevelTextureSize;
+            _myTextureMemUsage += myTopLevelTextureSize;
         }
 
         theImage->storeTextureVersion();
@@ -404,11 +352,90 @@ namespace y60 {
         return myId;
     }
 
+    void
+    GLResourceManager::update2DTexture(ImagePtr theImage) {
+
+        GLsizei myWidth  = theImage->get<ImageWidthTag>();
+        GLsizei myHeight = theImage->get<ImageHeightTag>();
+        PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
+
+        void * myImageData = theImage->getRasterPtr()->pixels().begin();
+        unsigned int myImageDataLen = theImage->getMemUsed();
+
+        glBindTexture(GL_TEXTURE_2D, theImage->getGraphicsId());
+
+#ifdef GL_PIXEL_UNPACK_BUFFER_ARB
+        unsigned int myBufferId = theImage->getBufferId();
+        if (glBindBufferARB && myBufferId) {
+
+            // bind buffer
+            glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, myBufferId);
+            CHECK_OGL_ERROR;
+
+            // map buffer
+            glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, myImageDataLen, NULL, GL_STREAM_DRAW);
+            void * myPBOData = glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
+            memcpy(myPBOData, myImageData, myImageDataLen);
+            glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB);
+            CHECK_OGL_ERROR;
+ 
+            // treated as an offset into the pixel buffer
+            myImageData = 0;
+        }
+#endif
+
+        if (myPixelEncoding.compressedFlag) {
+            glCompressedTexSubImage2DARB(GL_TEXTURE_2D, 0,
+                    0, 0, myWidth, myHeight,
+                    myPixelEncoding.externalformat,
+                    theImage->getMemUsed(), myImageData);
+        } else {
+            DB(AC_TRACE << "subloading 2D " << myWidth << "x" << myHeight << " internalFormat=" << hex << myPixelEncoding.internalformat << dec);
+            glTexSubImage2D(GL_TEXTURE_2D, 0,
+                    0, 0, myWidth, myHeight,
+                    myPixelEncoding.externalformat,
+                    myPixelEncoding.pixeltype, myImageData);
+        }
+
+#ifdef GL_PIXEL_UNPACK_BUFFER_ARB
+        // unbind buffer
+        if (glBindBufferARB && myBufferId) {
+            glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+            CHECK_OGL_ERROR;
+        }
+#endif
+    }
+
+    void
+    GLResourceManager::update3DTexture(ImagePtr theImage) {
+
+        GLsizei myWidth  = theImage->get<ImageWidthTag>();
+        GLsizei myHeight = theImage->get<ImageHeightTag>();
+        PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
+        GLsizei myDepth  = theImage->get<ImageDepthTag>();
+        void * myImageData = theImage->getRasterPtr()->pixels().begin();
+
+        glBindTexture(GL_TEXTURE_3D, theImage->getGraphicsId());
+
+        if (myPixelEncoding.compressedFlag) {
+            glCompressedTexSubImage3DARB(GL_TEXTURE_3D, 0,
+                    0, 0, 0, myWidth, myHeight, myDepth,
+                    myPixelEncoding.externalformat,
+                    theImage->getMemUsed(), myImageData);
+        } else {
+            DB(AC_TRACE << "subloading 3D " << myWidth << "x" << myHeight << "x" << myDepth);
+            glTexSubImage3D(GL_TEXTURE_3D, 0,
+                    0, 0, 0, myWidth, myHeight, myDepth,
+                    myPixelEncoding.externalformat,
+                    myPixelEncoding.pixeltype, myImageData);
+        }
+    }
+
     /*
      * Cubemap texture
      */
     unsigned
-    GLResourceManager::setupCubemapTexture(ImagePtr theImage)
+    GLResourceManager::setupCubemap(ImagePtr theImage)
     {
         unsigned int myId = theImage->getGraphicsId();
         glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, myId);
@@ -490,7 +517,57 @@ namespace y60 {
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         }
         glPopAttrib();
+
         return myId;
+    }
+
+    void
+    GLResourceManager::updateCubemap(ImagePtr theImage) {
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, theImage->getGraphicsId());
+        CHECK_OGL_ERROR;
+
+        const asl::Vector2i myTileVec = theImage->get<ImageTileTag>();
+        unsigned int myNumTiles = myTileVec[0] * myTileVec[1];
+
+        GLsizei myWidth  = theImage->get<ImageWidthTag>();
+        GLsizei myHeight = theImage->get<ImageHeightTag>();
+        PixelEncodingInfo myPixelEncoding = getInternalTextureFormat(theImage);
+
+        GLsizei myTileWidth = myWidth / myTileVec[0];
+        GLsizei myTileHeight = myHeight / myTileVec[1];
+        const unsigned int myTileSize = theImage->getMemUsed() / myNumTiles;
+
+        if (myTileWidth != myWidth) {
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, myWidth);
+        }
+        unsigned int myBytesPerLine = getBytesRequired(myWidth, theImage->getEncoding());
+        unsigned int myBytesPerTileLine = getBytesRequired(myTileWidth, theImage->getEncoding());
+
+        for (unsigned int i = 0; i < CUBEMAP_SIDES; ++i) {
+
+            const unsigned char * myTile = theImage->getRasterPtr()->pixels().begin();
+
+            unsigned int myColumn = i % myTileVec[0];
+            unsigned int myRow = i / myTileVec[0];
+            myTile += (myTileHeight * myBytesPerLine) * myRow +
+                myBytesPerTileLine * myColumn;
+
+            if (myPixelEncoding.compressedFlag) {
+                glCompressedTexSubImage2DARB(ourCubeMapFaces[i], 0,
+                        0, 0,
+                        myTileWidth, myTileHeight,
+                        myPixelEncoding.externalformat,
+                        myTileSize, myTile);
+            } else {
+                glTexSubImage2D(ourCubeMapFaces[i], 0,
+                        0, 0,
+                        myTileWidth, myTileHeight,
+                        myPixelEncoding.externalformat,
+                        myPixelEncoding.pixeltype, myTile);
+            }
+            CHECK_OGL_ERROR;
+        }
     }
 
     void
@@ -527,6 +604,11 @@ namespace y60 {
 
     PixelEncodingInfo
     GLResourceManager::getInternalTextureFormat(ImagePtr theImage) {
+        return getInternalTextureFormat(&*theImage);
+    }
+
+    PixelEncodingInfo
+    GLResourceManager::getInternalTextureFormat(Image * theImage) {
         PixelEncoding myEncoding = theImage->getEncoding();
         PixelEncodingInfo myEncodingInfo = getDefaultGLTextureParams(myEncoding);
 

@@ -62,6 +62,8 @@ namespace y60 {
                 _myIgnoreDepthFlag(false),
                 _myDepthWritesFlag(true),
                 _myPolygonOffsetFlag(false),
+                _myBlendFlag(false),
+                _myAlphaTestFlag(false),
                 _myCullFaces(GL_BACK),
                 _myEnabledClippingPlanes(0)
             {
@@ -78,6 +80,8 @@ namespace y60 {
             RENDERSTATE_GETTER_SETTER(IgnoreDepth);
             RENDERSTATE_GETTER_SETTER(DepthWrites);
             RENDERSTATE_GETTER_SETTER(PolygonOffset);
+            RENDERSTATE_GETTER_SETTER(Blend);
+            RENDERSTATE_GETTER_SETTER(AlphaTest);
 
             void setCullFaces(GLenum theFaces) {
                 if (theFaces != _myCullFaces) {
@@ -85,6 +89,7 @@ namespace y60 {
                 }
             }
             GLenum getCullFaces() const { return _myCullFaces; }
+
             void setClippingPlanes(const std::vector<asl::Planef> & thePlanes);
 
         private:
@@ -92,11 +97,9 @@ namespace y60 {
 
             int  _myEnabledClippingPlanes;
             GLenum _myCullFaces;
-
     };
 
     typedef asl::Ptr<RenderState> RenderStatePtr;
 }
 
 #endif
-

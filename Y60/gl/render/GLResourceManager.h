@@ -158,14 +158,14 @@ namespace y60 {
          * This function re-uploads the Image pixels to the GL texture memory.
          * @param theImage Image to update.
          */
-        void updateTextureData(asl::Ptr<Image, dom::ThreadingModel> theImage);
+        void updateTextureData(ImagePtr theImage);
 
         /**
          * Rebinds the GL texture object.
          * This function re-binds the texture by unbinding it and calling setupTexture.
          * @param theImage Image to rebind.
          */
-        void rebindTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
+        void rebindTexture(ImagePtr theImage);
 
         /**
          * Delete the texture object for the given Image.
@@ -197,22 +197,32 @@ namespace y60 {
 
     private:
         static PixelEncodingInfo getInternalTextureFormat(ImagePtr theImage);
+        static PixelEncodingInfo getInternalTextureFormat(Image * theImage);
 
         /**
-         * Setup a single-image texture.
+         * Setup a 2D/3D texture.
          * @param theImage 
          * @throws TextureException theImage was invalid or contained no raster info
          * @return 
          */
-        unsigned setupSingleTexture(ImagePtr theBmp);
+        unsigned setupSingleTexture(ImagePtr theImage);
+
+        /// Update 2D texture from image.
+        void update2DTexture(ImagePtr theImage);
+
+        /// Update 3D texture from image.
+        void update3DTexture(ImagePtr theImage);
 
         /**
          * Setup a cubemap texture.
-         * @param theBmp 
+         * @param theImage 
          * @return 
          * @throws TextureException theImage was not a cubemap or invalid
          */
-        unsigned setupCubemapTexture(ImagePtr theBmp);
+        unsigned setupCubemap(ImagePtr theImage);
+
+        /// Update cubemap from image.
+        void updateCubemap(ImagePtr theImage);
 
         /**
          * Sets up color scale and color bias
@@ -226,7 +236,4 @@ namespace y60 {
     };
 }
 
-
 #endif
-
-

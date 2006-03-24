@@ -131,7 +131,7 @@ namespace y60 {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // This prevents translucent pixels from beeing drawn. This way the
+        // This prevents translucent pixels from being drawn. This way the
         // background can shine through.
         glAlphaFunc(GL_GREATER, 0.0);
         glEnable(GL_ALPHA_TEST);
@@ -210,6 +210,7 @@ namespace y60 {
             _myState->setLighting(theViewport.get<ViewportLightingTag>() && (theMaterial.getLightingModel() != UNLIT));
 
             CHECK_OGL_ERROR;
+
             MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
             const TargetBuffers & myMasks = myPropFacade->get<TargetBuffersTag>();
 
@@ -226,12 +227,9 @@ namespace y60 {
             }
 
 #if 0
-            // disabled since overlays *must* be rendered with depthtest disabled
-            // but use materials as everyone else...
-            if (theMaterial.getDepthBufferTest()) {
-                glEnable(GL_DEPTH_TEST);
-            } else {
-                glDisable(GL_DEPTH_TEST);
+            // experimental code
+            if (!isOverlay) {
+                _myState->setDepthTest(theMaterial.testDepthBuffer());
             }
 #endif
 
@@ -566,7 +564,6 @@ namespace y60 {
         Point3f myLTBK, myRBBK, myRTBK, myLBBK;
 
         theBox.getCorners(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK);
-
         renderBox(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK,
                   Vector4f(1.0, 0.5, 0.5, 1.0));
     }
@@ -645,19 +642,33 @@ namespace y60 {
         RenderStyles myRenderStyles;
         myRenderStylesStream >> myRenderStyles;
 
+#if 1
+        glPushAttrib(GL_COLOR_BUFFER_BIT | // color writemasks
+                     GL_CURRENT_BIT |      // current RGBA color
+                     GL_DEPTH_BUFFER_BIT | // depth mask
+                     GL_ENABLE_BIT |       // depth test, lighting, texture_2d
+                     GL_LINE_BIT |         // line width
+                     GL_POLYGON_BIT);      // polygon offset
+#else
         glPushAttrib(GL_ALL_ATTRIB_BITS);
-        glPushMatrix();
+#endif
+        glDepthMask(false);
+        glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
-        enableRenderStyles(myRenderStyles);
+        glDisable(GL_TEXTURE_2D);
 
-        glMultMatrixf(theTransformation.getData());
+        enableRenderStyles(myRenderStyles);
         glColor4fv(theColor.begin());
         glLineWidth(theWidth);
+        
+        glPushMatrix();
+        glMultMatrixf(theTransformation.getData());
     }
 
     void Renderer::postDraw() {
         glPopMatrix();
         glPopAttrib();
+        CHECK_OGL_ERROR;
     }
 
     template <>
@@ -675,7 +686,6 @@ namespace y60 {
         glEnd();
 
         postDraw();
-        CHECK_OGL_ERROR;
     }
 
     template <>
@@ -713,7 +723,6 @@ namespace y60 {
         glEnd();
 
         postDraw();
-        CHECK_OGL_ERROR;
     }
 
     template <>
@@ -729,12 +738,10 @@ namespace y60 {
         Point3f myLTBK, myRBBK, myRTBK, myLBBK;
 
         theBox.getCorners(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK);
-
         renderBox(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK,
                   theColor);
 
         postDraw();
-        CHECK_OGL_ERROR;
     }
 
     template <>
@@ -753,7 +760,6 @@ namespace y60 {
         glEnd();
 
         postDraw();
-        CHECK_OGL_ERROR;
     }
 
     template <>
@@ -774,7 +780,6 @@ namespace y60 {
         glEnd();
 
         postDraw();
-        CHECK_OGL_ERROR;
     }
 
     template <>
@@ -805,7 +810,6 @@ namespace y60 {
         glEnd();
 
         postDraw();
-        CHECK_OGL_ERROR;
     }
 
     dom::NodePtr
@@ -1063,6 +1067,7 @@ namespace y60 {
         if (myBodyParts.size()) {
             MAKE_SCOPE_TIMER(renderBodyParts);
             _myPreviousBody = 0;
+
             glPushMatrix();
             glDisable(GL_ALPHA_TEST);
             CHECK_OGL_ERROR;
@@ -1456,15 +1461,8 @@ namespace y60 {
 
         // UH: projection matrix is relative to viewport so no translation is necessary
         // (already done in glViewport)
-#if 1
         gluOrtho2D(0.0, theViewport.get<ViewportWidthTag>(),
                    theViewport.get<ViewportHeightTag>(), 0.0);
-#else
-        gluOrtho2D(theViewport.get<ViewportLeftTag>(),
-                   theViewport.get<ViewportLeftTag>() + theViewport.get<ViewportWidthTag>(),
-                   theViewport.getLower() + theViewport.get<ViewportHeightTag>(),
-                   theViewport.getLower());
-#endif
 
         if (theViewport.get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
             asl::Matrix4f myRotationMatrix;
@@ -1478,11 +1476,12 @@ namespace y60 {
         glLoadIdentity();
         glDepthMask(GL_FALSE);
         glDisable(GL_DEPTH_TEST);
+
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         for (unsigned i = 0; i < myOverlayCount; ++i) {
-             renderOverlay(theViewport, myOverlays->childNode(i));
+            renderOverlay(theViewport, myOverlays->childNode(i));
         }
 
         glPopMatrix();
