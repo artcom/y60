@@ -59,7 +59,7 @@ namespace y60 {
         ImageColorBiasTag::Plug(theNode),
         dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
         _myRefCount(0),
-        _myTexId(0),
+        _myTexId(0), _myBufferId(0),
         _myLoadedFilename(""),
         _myTextureImageVersion(0),
         _myTextureWidth(0), _myTextureHeight(0), _myTextureDepth(0)
@@ -322,8 +322,10 @@ namespace y60 {
         convertToPLBmp( myBmp );
         applyCustomFilter(myBmp, theFilter, theFilterParam);
 
+#if 0 // debug
         PLPNGEncoder myEncoder;
         myEncoder.MakeFileFromBmp("test_filtered.png", &myBmp);
+#endif
 
         convertFromPLBmp(myBmp);
     }
@@ -416,6 +418,19 @@ if (myReloadRequired) {
     bool
     Image::textureUploadRequired() const {
 
+        // if colorscale introduces an alpha channel ensure 
+        // that internal format has alpha
+#if 1
+        const std::string & myExternalFormat = get<ImagePixelFormatTag>();
+        if ((_myAppliedColorScale != get<ImageColorScaleTag>()) &&
+            (myExternalFormat == "RGB" || myExternalFormat == "BGR")) {
+            const asl::Vector4f & myColorScale = get<ImageColorScaleTag>();
+            if (!asl::almostEqual(myColorScale[3], 1.0f)) {
+                const_cast<Image*>(this)->set<ImageInternalFormatTag>("RGBA");
+                AC_TRACE << "Using internalFormat '" << get<ImageInternalFormatTag>() << "'";
+            }
+        }
+#else
         if (_myAppliedColorScale != get<ImageColorScaleTag>() ||
             _myAppliedColorBias != get<ImageColorBiasTag>()) {
 
@@ -428,6 +443,8 @@ if (myReloadRequired) {
                 }
             }
         }
+#endif
+
         return getGraphicsId() == 0 ||
             _myAppliedColorScale != get<ImageColorScaleTag>() ||
             _myAppliedColorBias != get<ImageColorBiasTag>() ||

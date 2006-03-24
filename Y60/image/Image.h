@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Image.h,v $
-//   $Author: david $
-//   $Revision: 1.3 $
-//   $Date: 2005/04/06 16:47:30 $
-//
-//  Description: A simple scene class.
-//
-//=============================================================================
 
 #ifndef _ac_y60_Image_h_
 #define _ac_y60_Image_h_
@@ -89,6 +80,14 @@ namespace y60 {
                 return _myTexId;
             }
 
+            void setBufferId(unsigned theId) {
+                _myBufferId = theId;
+            }
+
+            unsigned getBufferId() const {
+                return _myBufferId;
+            }
+
             void setTextureManager(const ITextureManager & theTextureManager);
             void registerTexture();
             void deregisterTexture();
@@ -110,7 +109,6 @@ namespace y60 {
                     PixelEncoding theEncoding,
                     dom::ValuePtr theRaster);
             void createRaster(PixelEncoding theEncoding);
-            //void makeHalfSize();
 
 
             virtual void load(asl::PackageManager & thePackageManager);
@@ -159,6 +157,7 @@ namespace y60 {
                 unsigned long long myNewVersion = getValueVersion();
                 return _myTextureImageVersion < myNewVersion;
             }
+
             /** Saves the image to disk using the PNG format. 
              */
             void saveToFile(const std::string & theImagePath);
@@ -170,6 +169,7 @@ namespace y60 {
              */
             void applyFilter(const std::string & theFilter, const VectorOfFloat & theFilterParam);
 
+            /// Get the node version number.
             unsigned long long getValueVersion() const {
                 dom::NodePtr myValueNode = getRasterValueNode();
                 if (myValueNode) {
@@ -177,6 +177,7 @@ namespace y60 {
                 }
                 return 0;
             }
+
             dom::NodePtr getRasterValueNode() const {
                 dom::NodePtr myValueElement = getNode().firstChild();
                 if (myValueElement) {
@@ -212,14 +213,9 @@ namespace y60 {
             const dom::ResizeableRasterPtr getRasterPtr() const {
                 return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue());
             }
-    protected:
-            //asl::Ptr<asl::ReadableBlock> & getDataBlock() {
-            //    return _myData;
-            //}
 
-            //void replaceBlock(asl::Ptr<asl::ReadableBlock> theData, unsigned theHeaderSize = 0);
-
-            // This is neccessary to detect, when the src-Attribute does not correspond to the
+        protected:
+            // This is necessary to detect when the src-Attribute does not correspond to the
             // loaded data. Hopefully we can find a more elegant solution with xml-events, soon.
             std::string                  _myLoadedFilename;
             std::string                  _myAppliedFilter;
@@ -238,6 +234,7 @@ namespace y60 {
 
 
             unsigned                      _myTexId;
+            unsigned                      _myBufferId;
 
             int                           _myRefCount;
             asl::WeakPtr<ITextureManager> _myTextureManager;
