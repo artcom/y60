@@ -114,7 +114,7 @@ namespace y60 {
     }
 
     VertexDataBasePtr
-    Primitive::createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType, VertexDataRole theRole) {        
+    Primitive::createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType, VertexDataRole theRole) {
         switch (theBinType) {
             case VECTOR_OF_VECTOR2F:
                 if (theResourceManager) {
@@ -149,7 +149,7 @@ namespace y60 {
             case FLOAT:
             case STRING:
                 throw NotYetImplemented(string("Can not create uvset with type ") +
-                                     getStringFromEnum(theBinType, TypeIdStrings),PLUS_FILE_LINE);
+                                     getStringFromEnum(theBinType, TypeIdStrings), PLUS_FILE_LINE);
                 break;
             default:
                 throw PrimitiveException(std::string("Can not create vertex data bin. Type '") +
@@ -168,7 +168,7 @@ namespace y60 {
         }
     }
 
-	bool 
+	bool
 	Primitive::hasVertexData(VertexDataRole theRole) const {
 		return _myVertexData.size() > theRole && _myVertexData[theRole];
 	}
@@ -250,7 +250,7 @@ namespace y60 {
         if (myPrimitiveTypeString == PRIMITIVE_TYPE_POLYGON) {
             return POLYGON;
         }
-        throw UnknownPrimitiveType(myPrimitiveTypeString,"PLUS_FILE_LINE");
+        throw UnknownPrimitiveType(myPrimitiveTypeString, PLUS_FILE_LINE);
     }
 
     template <>
@@ -345,7 +345,6 @@ namespace y60 {
                 myStep = 2;
             case LINE_STRIP:
             case LINE_LOOP:
-                myStep = 1;
                 for (unsigned i = 0; (i + 1) < thePositions.size(); i += myStep) {
                     myHit |= theDetector(this, i, asl::asLineSegment(asl::asPoint(thePositions[i])));
                 }
@@ -355,12 +354,23 @@ namespace y60 {
                     myHit |= theDetector(this, thePositions.size(), edge);
                 }
                 break;
-//                return false;
+            case TRIANGLE_FAN:
+                AC_TRACE << "Scanning " << thePositions.size() << " positions.";
+                for (unsigned i = 1; i < (thePositions.size()-1); ++i) {
+                    asl::Triangle<float> myTriangle(asl::asPoint(thePositions[0]),
+                            asl::asPoint(thePositions[i]),
+                            asl::asPoint(thePositions[i+1]));
+                    if (myHasNormals) {
+                        myHit |= theDetector(this, i, myTriangle, asl::asVector3((*theNormals)[i]));
+                    } else {
+                        // get normals from triangle plane
+                        myHit |= theDetector(this, i, myTriangle);
+                    }
+                }
+                break;
             case TRIANGLES:
                 myStep = 3;
             case TRIANGLE_STRIP:
-            //case TRIANGLE_FAN:
-                // TODO: fix fan vertex order:
                 AC_TRACE << "Scanning " << thePositions.size() << " positions.";
                 for (unsigned i = 0; (i + 2) < thePositions.size(); i += myStep) {
                     if (myHasNormals) {
@@ -420,7 +430,7 @@ namespace y60 {
             case POLYGON:
                 return false;
             default:
-                throw UnknownPrimitiveType(asl::as_string(_myType),"PLUS_FILE_LINE");
+                throw UnknownPrimitiveType(asl::as_string(_myType), PLUS_FILE_LINE);
         }
 
         return myHit;
@@ -505,17 +515,29 @@ namespace y60 {
             case LINE_LOOP:
                 //dk TODO Copy/Paste from scanElements ?
                 return false;
-            case TRIANGLES:
-            case TRIANGLE_STRIP:
-            //case TRIANGLE_FAN:
-                // TODO: fix fan vertex order:
+            case TRIANGLE_FAN:
+                AC_TRACE << "scanHierarchy " << thePositions.size() << " positions.";
+                {
+                    asl::Triangle<float> myTriangle(asl::asPoint(thePositions[0]),
+                            asl::asPoint(thePositions[i]),
+                            asl::asPoint(thePositions[i+1]));
                     if (myHasNormals) {
-                        myHit |= theDetector(this, i, asl::asTriangle(asl::asPoint(thePositions[i])),
-                                                asl::asVector3((*theNormals)[i]));
+                        myHit |= theDetector(this, i, myTriangle, asl::asVector3((*theNormals)[i]));
                     } else {
                         // get normals from triangle plane
-                        myHit |= theDetector(this, i, asl::asTriangle(asl::asPoint(thePositions[i])));
+                        myHit |= theDetector(this, i, myTriangle);
                     }
+                }
+                break;
+            case TRIANGLES:
+            case TRIANGLE_STRIP:
+                if (myHasNormals) {
+                    myHit |= theDetector(this, i, asl::asTriangle(asl::asPoint(thePositions[i])),
+                                            asl::asVector3((*theNormals)[i]));
+                } else {
+                    // get normals from triangle plane
+                    myHit |= theDetector(this, i, asl::asTriangle(asl::asPoint(thePositions[i])));
+                }
                 break;
             case QUADS:
             case QUAD_STRIP:
@@ -552,7 +574,7 @@ namespace y60 {
             case POLYGON:
                 return false;
             default:
-                throw UnknownPrimitiveType(asl::as_string(_myType),"PLUS_FILE_LINE");
+                throw UnknownPrimitiveType(asl::as_string(_myType), PLUS_FILE_LINE);
         }
 
         return myHit;
@@ -1042,7 +1064,7 @@ namespace y60 {
     Primitive::generateMesh(dom::NodePtr theIndicesNode) {
 
     }
-    
+
 
 #endif
 }

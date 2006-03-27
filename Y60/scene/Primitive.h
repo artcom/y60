@@ -175,7 +175,7 @@ namespace y60 {
 
             unsigned size() const;
 
-			bool hasVertexData(VertexDataRole theRole) const;
+            bool hasVertexData(VertexDataRole theRole) const;
 
             VertexDataBase & getVertexData(VertexDataRole theRole);
             const VertexDataBase & getVertexData(VertexDataRole theRole) const;
