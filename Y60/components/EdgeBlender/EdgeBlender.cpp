@@ -158,7 +158,7 @@ EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow)
     unsigned mySceneTextureWidth = asl::nextPowerOfTwo(_mySceneWidth);
     unsigned mySceneTextureHeight = asl::nextPowerOfTwo(_mySceneHeight);
     
-    glActiveTextureARB(GL_TEXTURE0_ARB);
+    //glActiveTextureARB(GL_TEXTURE0_ARB); // must lookup func pointer under Windows
     glGenTextures(1, &_mySceneTexture);
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture );
     glTexImage2D(GL_TEXTURE_2D, 0, 3, mySceneTextureWidth, mySceneTextureHeight, 
@@ -607,7 +607,7 @@ EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY) {
 void 
 EdgeBlender::copyToTexture()
 {
-    glActiveTextureARB(GL_TEXTURE0_ARB);
+    //glActiveTextureARB(GL_TEXTURE0_ARB);
     glEnable(GL_TEXTURE_2D);
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture);
     glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, _mySceneWidth, _mySceneHeight, 0);
