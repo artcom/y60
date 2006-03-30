@@ -1153,10 +1153,9 @@ smoothStep(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     convertFrom(cx, argv[0], myIn);
     convertFrom(cx, argv[1], myOut);
     convertFrom(cx, argv[2], myValue);
-
     // UH: the C++ implementation uses this (IMHO) more logical order...
     *rval = as_jsval(cx, asl::smoothStep(myValue, myIn, myOut));
-    return JS_FALSE;
+    return JS_TRUE;
 
 }
 
