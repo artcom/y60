@@ -142,8 +142,8 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
         // load font
         var myFontName = theFontname + "_" + String(theSize);
+        window.setMaxFontFittingSize(0);
         window.loadTTF(myFontName, expandEnvironment(theFontFilename), theSize);
-
         var myFontMetrics = window.getFontMetrics(myFontName);
         var myCellSize = nextPowerOfTwo(myFontMetrics.height);
         Logger.info("CharacterSoup.setupFont " + theFontname, "size=" + theSize, "cellsize=" + myCellSize);
