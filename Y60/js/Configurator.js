@@ -127,13 +127,14 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             }
 
             myValue += myStep;
+            
             if ("max" in _myNode) {
                 var myMax   = Number(_myNode.max);
                 if (myValue > myMax) {
                     myValue = myMax;
                 }
             }
-            myValue = myValue.toFixed(2);
+            myValue = myValue.toFixed(3);
             if (_myArrayFlag) {
                 _myArray[_myArrayPos] = myValue;
                 myValue = "[" + _myArray.join(",") + "]";
@@ -159,7 +160,6 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             if (theFastFlag) {
                 myStep *= 5;
             }
-
             myValue -= myStep;
             if ("min" in _myNode) {
                 var myMin   = Number(_myNode.min);
@@ -167,7 +167,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
                     myValue = myMin;
                 }
             }
-            myValue = myValue.toFixed(2);
+            myValue = myValue.toFixed(3);
             if (_myArrayFlag) {
                 _myArray[_myArrayPos] = myValue;
                 myValue = "[" + _myArray.join(",") + "]";
