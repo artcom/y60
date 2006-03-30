@@ -84,6 +84,15 @@ namespace y60 {
         return true;
     }
 
+    bool GLContext::isActive() {
+#ifdef WIN32
+        return (_myHdc && _myHglrc);
+#else
+        return (_myDisplay && _myDrawable && _myGLXContext);
+#endif
+    }
+    
+
     void
     GLContext::checkLastError(const std::string & theScope)
     {

@@ -50,6 +50,9 @@ namespace y60 {
             RenderStatePtr getStateCache() const {
                 return _myStateCache;
             }
+            
+            bool isActive();
+            
          private:
     #ifdef WIN32
             HDC         _myHdc;

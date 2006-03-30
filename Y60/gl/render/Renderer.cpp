@@ -98,7 +98,7 @@ namespace y60 {
     }
 
     Renderer::~Renderer() {
-        if (_myScene) {
+        if (_myScene && _myContext && _myContext->isActive()) {
             _myScene->deregisterResourceManager();
         }
     }
