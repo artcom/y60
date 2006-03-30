@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSNode.h,v $
-//   $Author: pavel $
-//   $Revision: 1.7 $
-//   $Date: 2005/04/24 00:41:19 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACXPSHELL_JSNODE_INCLUDED_
 #define _Y60_ACXPSHELL_JSNODE_INCLUDED_

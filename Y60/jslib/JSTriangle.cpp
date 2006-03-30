@@ -7,15 +7,8 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSTriangle.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.5 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
+#include "JSNode.h"
 #include "JSVector.h"
 #include "JSTriangle.h"
 #include "JSPlane.h"
@@ -77,7 +70,7 @@ JSTriangle::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 // getproperty handling
 JSBool
 JSTriangle::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
