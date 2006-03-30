@@ -428,17 +428,14 @@ class TestLoop: public SoundTestBase {
             mySound->play();
             msleep(3000);
             double myTime = mySound->getCurrentTime();
-            AC_PRINT << "myTime: " << myTime;
             ENSURE(myTime > 2.5 && myTime < 4.5);
             mySound->pause();
             msleep(500);
             myTime = mySound->getCurrentTime();
-            AC_PRINT << "myTime: " << myTime;
             ENSURE(myTime > 2.5 && myTime < 4.5);
             mySound->play();
             msleep(1000);
             myTime = mySound->getCurrentTime();
-            AC_PRINT << "myTime: " << myTime;
             ENSURE(myTime > 3.5 && myTime < 5.5);
             mySound->stop();
         }
@@ -446,8 +443,9 @@ class TestLoop: public SoundTestBase {
 
 class TestVolume: public SoundTestBase {
     public:
-        TestVolume(SoundManager& mySoundManager) 
-            : SoundTestBase(mySoundManager, "TestVolume")
+        TestVolume(SoundManager& mySoundManager, bool myTestGlobalVolume)
+            : SoundTestBase(mySoundManager, "TestVolume"),
+              _myTestGlobalVolume(myTestGlobalVolume)
         {  
         }
        
@@ -467,7 +465,7 @@ class TestVolume: public SoundTestBase {
                 ENSURE(almostEqual(mySound->getVolume(), 1));
                 mySound->stop();
             }
-            {
+            if (_myTestGlobalVolume) {
                 // Global volume
                 SoundPtr mySound = getSoundManager().createSound
                         ("../../testfiles/aussentuer.mp3");
@@ -482,8 +480,10 @@ class TestVolume: public SoundTestBase {
                 ENSURE(almostEqual(getSoundManager().getVolume(), 1));
                 mySound->stop();
             }
-            
         }
+
+    private:
+        bool _myTestGlobalVolume;
 };
 
 class TestSeek: public SoundTestBase {
@@ -637,9 +637,8 @@ class SoundTestSuite : public UnitTestSuite {
             addTest(new TestSeek(mySoundManager));
           
             addTest(new TestLoop(mySoundManager));
-            if (myNoisy) {
-                addTest(new TestVolume(mySoundManager));
-            }
+            addTest(new TestVolume(mySoundManager, myNoisy));
+
 #ifndef DEBUG_VARIANT
             // In debug mode, the program runs too slowly for this test.
             addTest(new StressTest(mySoundManager, 5));

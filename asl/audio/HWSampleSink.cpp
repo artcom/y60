@@ -46,6 +46,7 @@ HWSampleSink::HWSampleSink(const string & myName, SampleFormat mySampleFormat,
     _myFrameCount = 0;
     _myVolume = 1;
     _myVolumeFader = VolumeFaderPtr(new VolumeFader(_mySampleFormat));
+    _myVolumeFader->setVolume(1, 0); 
     _numChannels = numChannels;
     _myBackupBuffer = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 32, 
                 _numChannels, _mySampleRate));
@@ -168,7 +169,7 @@ bool HWSampleSink::isPlaying() const {
 }
 
 float HWSampleSink::getVolume() const {
-    return _myVolumeFader->getVolume();//_myVolume;
+    return _myVolumeFader->getVolume();
 }
 
 bool HWSampleSink::queueSamples(AudioBufferPtr& theBuffer) {

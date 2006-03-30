@@ -309,7 +309,7 @@ namespace y60 {
         }
         PLPixelFormat myPixelFormat;
         if (!mapPixelEncodingToFormat(getEncoding(), myPixelFormat)) {
-              throw ImageException(std::string("Image::saveToFile(): Unsupported Encoding: ") +
+              throw ImageException(std::string("Image::convertToPLBmp(): Unsupported Encoding: ") +
                       asl::as_string(getEncoding()), PLUS_FILE_LINE);
         }
         theBitmap.Create(myWidth, myHeight, myPixelFormat, NULL, 0, PLPoint(72, 72));
