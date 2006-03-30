@@ -38,7 +38,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         }
 
         obj.mySound = new Sound("../../../../sound/testfiles/aussentuer.mp3");
-
+        obj.mySound.play();
         ENSURE("obj.mySoundManager.soundcount == 1");
         ENSURE("obj.mySound.time == 0");
         obj.mySound.volume = 1.0;
