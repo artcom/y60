@@ -89,10 +89,10 @@ namespace y60 {
             glDeleteTextures(1, &myId);
             theImage->setGraphicsId(0);
 
-            unsigned int myBufferId = theImage->getBufferId();
+            unsigned int myBufferId = theImage->getPixelBufferId();
             if (glDeleteBuffersARB && myBufferId) {
                 glDeleteBuffersARB(1, &myBufferId);
-                theImage->setBufferId(0);
+                theImage->setPixelBufferId(0);
                 CHECK_OGL_ERROR;
             }
 
@@ -228,10 +228,10 @@ namespace y60 {
 
 #ifdef GL_PIXEL_UNPACK_BUFFER_ARB
         // pixel buffer
-        if (glGenBuffersARB && myDepth == 1) {// && theImage->usePixelBuffer()) {
+        if (glGenBuffersARB && myDepth == 1 && theImage->usePixelBuffer()) {
             unsigned int myBufferId = 0;
             glGenBuffersARB(1, &myBufferId);
-            theImage->setBufferId(myBufferId);
+            theImage->setPixelBufferId(myBufferId);
             CHECK_OGL_ERROR;
         }
         if (glBindBufferARB) {
@@ -365,7 +365,7 @@ namespace y60 {
         glBindTexture(GL_TEXTURE_2D, theImage->getGraphicsId());
 
 #ifdef GL_PIXEL_UNPACK_BUFFER_ARB
-        unsigned int myBufferId = theImage->getBufferId();
+        unsigned int myBufferId = theImage->getPixelBufferId();
         if (glBindBufferARB && myBufferId) {
 
             // bind buffer

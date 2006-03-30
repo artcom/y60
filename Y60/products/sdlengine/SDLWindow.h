@@ -108,7 +108,7 @@ namespace y60 {
             virtual void handle(EventPtr theEvent);
             void onKey(Event & theEvent);
             void mainLoop();
-            void go();
+            bool go();
             void stop();
 
             // Sets the number of screen-redraws per swap buffer

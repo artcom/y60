@@ -654,16 +654,18 @@ SDLWindow::stop() {
     _myAppQuitFlag = true;
 }
 
-void
+bool
 SDLWindow::go() {
+    bool myResult = false;
     AC_DEBUG << "SDLWindow::go";
     if (!_myJSContext) {
         AC_WARNING << "SDLWindow::go() - No js context found, please assign an eventHandler to window before calling go()";
-        return;
+        return myResult;
     }
     try {
         AbstractRenderWindow::go();
         mainLoop();
+        myResult = true;
     } catch (const asl::Exception & ex) {
         AC_ERROR << "Exception caught in SDLWindow::go(): " << ex;
     } catch (const exception & ex) {
@@ -673,6 +675,7 @@ SDLWindow::go() {
     }
     // release mouse capture
     setCaptureMouseCursor(false);
+    return myResult;
 }
 
 void SDLWindow::setEventRecorderMode(EventRecorder::Mode theMode, bool theDiscardFlag) {

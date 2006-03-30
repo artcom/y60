@@ -78,7 +78,7 @@ namespace jslib {
          * Creates the renderer and opens the renderwindow, if this has not been
          * done by a setSceneAndCanvas() call, before.
          */
-        virtual void go();
+        virtual bool go();
 
         JSObject * getEventListener() const;
         void setEventListener(JSObject * theListener);

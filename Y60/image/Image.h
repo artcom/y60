@@ -80,12 +80,13 @@ namespace y60 {
                 return _myTexId;
             }
 
-            void setBufferId(unsigned theId) {
-                _myBufferId = theId;
+            virtual bool usePixelBuffer() const;
+            void setPixelBufferId(unsigned theId) {
+                _myPixelBufferId = theId;
             }
 
-            unsigned getBufferId() const {
-                return _myBufferId;
+            unsigned getPixelBufferId() const {
+                return _myPixelBufferId;
             }
 
             void setTextureManager(const ITextureManager & theTextureManager);
@@ -234,7 +235,7 @@ namespace y60 {
 
 
             unsigned                      _myTexId;
-            unsigned                      _myBufferId;
+            unsigned                      _myPixelBufferId;
 
             int                           _myRefCount;
             asl::WeakPtr<ITextureManager> _myTextureManager;

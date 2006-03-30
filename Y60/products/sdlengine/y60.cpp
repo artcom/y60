@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: acxpshell.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.56 $  
-//   $Date: 2005/04/24 00:41:20 $
-//
-//   Description: Application-wrapper for xpshell
-//
-//=============================================================================
 
 #include <y60/jssettings.h>
 #include "SDLApp.h"

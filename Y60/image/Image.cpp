@@ -59,7 +59,7 @@ namespace y60 {
         ImageColorBiasTag::Plug(theNode),
         dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
         _myRefCount(0),
-        _myTexId(0), _myBufferId(0),
+        _myTexId(0), _myPixelBufferId(0),
         _myLoadedFilename(""),
         _myTextureImageVersion(0),
         _myTextureWidth(0), _myTextureHeight(0), _myTextureDepth(0)
@@ -109,6 +109,12 @@ namespace y60 {
                 myTextureManager->setPriority(this, TEXTURE_PRIORITY_IDLE);
             }
         }
+    }
+
+    bool
+    Image::usePixelBuffer() const {
+        // not much use for regular images
+        return false;
     }
 
     DEFINE_EXCEPTION(BadRasterValue, asl::Exception);

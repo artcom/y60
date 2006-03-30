@@ -66,27 +66,28 @@ namespace jslib {
         }
 
         /**
-         * Get named attribute from settings node. Returns given default on error.
+         * Get named attribute from settings node. Returns default on error.
          * @param theSettings Settings node.
-         * @param theAttribName Name of the attribute to fetch.
+         * @param theSettingName Name of the setting to fetch.
          * @param theDefault Default value in case an error occurs.
          * @return value of attribute or default.
          */
         template <class T>
-        T getSetting(dom::NodePtr theSettings,
-                     const std::string & theAttribName, T theDefault) {
+        T getSetting(const dom::NodePtr & theSettings,
+                     const std::string & theSettingName, T theDefault)
+        {
             if (!theSettings) {
                 AC_ERROR << "Settings node is invalid";
                 return theDefault;
             }
-            dom::Node myAttrib = (*theSettings)(theAttribName.c_str());
-            if (!myAttrib) {
-                AC_WARNING << "No such attribute '" << theAttribName << "'";
+            const dom::NodePtr & mySetting = theSettings->childNode(theSettingName);
+            if (!mySetting) {
+                AC_WARNING << "No such setting '" << theSettingName << "'";
                 return theDefault;
             }
-            dom::Node myValue = myAttrib("#text");
+            const dom::Node myValue = (*mySetting)("#text");
             if (!myValue) {
-                AC_ERROR << "Attribute '" << theAttribName << "' has no value";
+                AC_ERROR << "Setting '" << theSettingName << "' has no value";
                 return theDefault;
             }
             return asl::as<T>(myValue.nodeValue());

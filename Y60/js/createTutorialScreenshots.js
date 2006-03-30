@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: scenetest.js,v $
-//   $Author: martin $
-//   $Revision: 1.1 $
-//   $Date: 2004/08/03 17:17:03 $
-//
-//
-//=============================================================================
 
 const ourFrameBreak      = 5;
 const ourScreenshotSize  = [200,200];

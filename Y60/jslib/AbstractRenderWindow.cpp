@@ -157,7 +157,7 @@ namespace jslib {
         return true;
     }
 
-    void
+    bool
     AbstractRenderWindow::go() {
         // If the renderer has not been created by setScene(), yet, because everything
         // was added using the initial default scene, do so now.
@@ -171,6 +171,7 @@ namespace jslib {
 
             setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
         }
+        return true;
     }
 
     ViewportPtr

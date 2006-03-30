@@ -36,34 +36,31 @@ EventFactory::EventFactory() {
 
 EventPtr
 EventFactory::createEvent(const DOMString & theType) const {
-	EventPtr myPrototype = findPrototype(theType); 
-	if (myPrototype) {
-		DB(AC_TRACE << "EventFactory::createEvent('"<<theType<<"')"<<" returns value"<<std::endl;)
-		return myPrototype->clone();
-	}
-	DB(AC_TRACE << "EventFactory::createEvent('"<<theType<<"')"<<" returns 0"<<std::endl;)
-	return EventPtr(0);
+    EventPtr myPrototype = findPrototype(theType); 
+    if (myPrototype) {
+        DB(AC_TRACE << "EventFactory::createEvent('"<<theType<<"')"<<" returns value"<<std::endl;)
+        return myPrototype->clone();
+    }
+    DB(AC_TRACE << "EventFactory::createEvent('"<<theType<<"')"<<" returns 0"<<std::endl;)
+    return EventPtr(0);
 }
 
 void
 EventFactory::registerPrototype(const DOMString & theType, EventPtr thePrototype) {
-	DB(AC_TRACE << "EventFactory::registerPrototype('"<<theType<<"',"<<(void*)&(*thePrototype)<<")"<<std::endl;)
-	_myPrototypes[theType] = EventPtr(thePrototype->clone());
+    DB(AC_TRACE << "EventFactory::registerPrototype('"<<theType<<"',"<<(void*)&(*thePrototype)<<")"<<std::endl;)
+    _myPrototypes[theType] = EventPtr(thePrototype->clone());
 }
 
 const EventPtr
 EventFactory::findPrototype(const DOMString & theType) const {
-	ProtoMap::const_iterator myPrototype = _myPrototypes.find(theType);
-	if (myPrototype != _myPrototypes.end()) {
-		return myPrototype->second;
-	}
-	return EventPtr(0);
+    ProtoMap::const_iterator myPrototype = _myPrototypes.find(theType);
+    if (myPrototype != _myPrototypes.end()) {
+        return myPrototype->second;
+    }
+    return EventPtr(0);
 }
 
 void dom::registerStandardTypes(EventFactory & theFactory) {
-	theFactory.registerPrototype("generic", EventPtr(new GenericEvent<int>("generic",true, true)));
-	theFactory.registerPrototype("test", EventPtr(new GenericEvent<int>("test",true, true)));
+    theFactory.registerPrototype("generic", EventPtr(new GenericEvent<int>("generic",true, true)));
+    theFactory.registerPrototype("test", EventPtr(new GenericEvent<int>("test",true, true)));
 }
-
-
-

@@ -78,7 +78,7 @@ void PLBmp::CreateCopy (const PLBmpBase & rSrcBmp,
   PLASSERT (BPPWanted == 32 || BPPWanted == 24 || BPPWanted == 16 ||
           BPPWanted == 8 || BPPWanted == 1 || BPPWanted == 0);
   int BPPSrc = rSrcBmp.GetBitsPerPixel();
-  PLASSERT (BPPSrc == 32 || BPPSrc == 24 || BPPSrc == 16 ||
+  PLASSERT (BPPSrc == 64 || BPPSrc == 32 || BPPSrc == 24 || BPPSrc == 16 ||
           BPPSrc == 8 || BPPSrc == 1);
 
   if (pfWanted == rSrcBmp.GetPixelFormat() || 

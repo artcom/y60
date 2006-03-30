@@ -261,7 +261,7 @@ namespace jslib {
 
     void
     JSScriptablePlugin::initClass(JSContext *cx, JSObject * theGlobalObject, const char * theClassName) {
-        DB(AC_TRACE << "JSScriptablePlugin::initClass for class " << theClassName << endl;)
+        AC_DEBUG << "JSScriptablePlugin::initClass for class " << theClassName;
 
         JSObject * myClassObject = JS_InitClass(cx, theGlobalObject, NULL, Class(theClassName),
                 Constructor, 0, Properties(), Functions(), 0, 0);
@@ -276,7 +276,7 @@ namespace jslib {
         if (JS_GetProperty(cx, theGlobalObject, theClassName, &myConstructorFuncObjVal)) {
         } else {
             AC_ERROR << "JSScriptablePlugin::initClass(): constructor function object not found, " <<
-                "could not initialize static members"<<endl;
+                "could not initialize static members";
         }
     }
 
