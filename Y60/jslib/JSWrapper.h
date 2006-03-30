@@ -50,6 +50,13 @@ struct Argument<const T &> {
     typedef const T & FullType;
 };
 
+#if 0
+struct Argument<const dom::Node &> {
+    typedef dom::Node * const PlainType;
+    typedef const dom::Node & FullType;
+};
+#endif
+
 template<class T>
 struct Argument<const T> {
     typedef T PlainType;
@@ -98,6 +105,24 @@ struct ArgumentHolder<NoArgument,N> {
         return _ourNoArgument;
     };
 };
+#if 1
+template <unsigned N>
+struct ArgumentHolder<const dom::Node &, N> {
+    typedef const dom::Node & ARG_TYPE;
+    typedef const dom::Node & PLAIN_TYPE;
+
+    ArgumentHolder(JSCallArgs & theArgs) {
+        if(!convertFrom(theArgs.cx, theArgs.argv[N], _myArg)) {
+            throw ArgumentConversionFailed(JUST_FILE_LINE);
+        }
+    }
+	const dom::Node & getArg() const {
+        return *_myArg;
+    };
+private:
+	dom::Node const * _myArg; // pointer to const Node, same as const dom::Node * _myArg
+};
+#endif
 
 template <class T>
 struct ResultConverter {

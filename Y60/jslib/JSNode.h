@@ -52,8 +52,9 @@ bool convertFrom(JSContext *cx, jsval theValue, dom::Node::CloneDepth & theDest)
 bool convertFrom(JSContext *cx, jsval theValue, dom::NodePtr & thePtr);
 
 bool convertFrom(JSContext *cx, jsval theValue, dom::Node & thePtr);
-
-
+#if 1
+bool convertFrom(JSContext *cx, jsval theValue, const dom::Node * & theNode);
+#endif
 class JSNode {
 public:
     typedef dom::NodePtr NativeValuePtr;

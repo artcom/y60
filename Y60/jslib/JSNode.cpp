@@ -27,8 +27,6 @@
 #include "JSQuaternion.h"
 #include "JSFrustum.h"
 #include "JSVector.h"
-#include "JSEnum.h"
-#include "JSBitset.h"
 #include "JSResizeableRaster.h"
 #include "JSResizeableVector.h"
 #include "JSAccessibleVector.h"
@@ -45,7 +43,6 @@
 
 using namespace std;
 using namespace asl;
-using namespace y60;
 
 namespace jslib {
 
@@ -172,7 +169,7 @@ public:
         REGISTER_BYVALUE_CONVERTER(float);
         REGISTER_BYVALUE_CONVERTER(double);
         REGISTER_BYVALUE_CONVERTER(bool);
-        
+
         REGISTER_BYREFERENCE_CONVERTER(Vector2f);
         REGISTER_BYREFERENCE_CONVERTER(Vector3f);
         REGISTER_BYREFERENCE_CONVERTER(Vector4f);
@@ -188,9 +185,6 @@ public:
         REGISTER_BYREFERENCE_CONVERTER(Frustum);
         REGISTER_BYREFERENCE_CONVERTER(Box3f);
         REGISTER_BYREFERENCE_CONVERTER(Triangle<TriangleNumber>);
-
-        REGISTER_BYREFERENCE_CONVERTER(BlendEquation);
-        REGISTER_BYREFERENCE_CONVERTER(RenderStyles);
     }
 };
 
@@ -1390,5 +1384,23 @@ bool convertFrom(JSContext *cx, jsval theValue, dom::Node & theNode) {
     }
     return false;
 }
+
+#if 1
+bool convertFrom(JSContext *cx, jsval theValue, const dom::Node * & theNode) {
+    if (JSVAL_IS_NULL(theValue)) {
+        return false;
+    }
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<dom::Node>::Class()) {
+                theNode = &JSClassTraits<dom::Node>::getNativeRef(cx,myArgument);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+#endif
 
 }
