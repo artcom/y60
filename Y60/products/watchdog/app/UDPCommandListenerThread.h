@@ -9,16 +9,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//    $RCSfile: UDPCommandListenerThread.h,v $
-//
-//     $Author: valentin $
-//
-//   $Revision: 1.9 $
-//
-// Description:
-//
-//============================================================================
 
 #ifndef INCL_UDPCOMMANDLISTENERTHREAD_H
 #define INCL_UDPCOMMANDLISTENERTHREAD_H
@@ -57,6 +47,7 @@ class UDPCommandListenerThread : public PosixThread {
         Application &           _myApplication;
         bool                    _myPowerDownProjectorsOnHalt;
         bool                    _myShutterCloseProjectorsOnStop;
+        bool                    _myShutterCloseProjectorsOnReboot;
         std::string             _mySystemHaltCommand;
         std::string             _myRestartAppCommand;
         std::string             _mySystemRebootCommand;

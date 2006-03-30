@@ -22,6 +22,7 @@
 #include "NecProjector.h"
 #include "PdF1Projector.h"
 #include "PanasonicProjector.h"
+#include "HitachiProjector.h"
 
 #include <asl/SerialDeviceFactory.h>
 #include <asl/SerialDevice.h>
@@ -40,6 +41,9 @@ Projector* Projector::getProjector(const std::string& theType, int thePortNum)
     }
     else if (theType == "panasonic" || theType == "pt-d5500") {
         projector = new PanasonicProjector(thePortNum);
+    }
+    else if (theType == "liesegang" || theType == "hitachi" || theType == "infocus") {
+        projector = new HitachiProjector(thePortNum);
     }
     else {
         throw asl::Exception(std::string("Unknown projector: ") + theType);
@@ -72,6 +76,9 @@ Projector* Projector::getProjector(const dom::NodePtr & theProjectorNode, Logger
             }
             else if (myType == "panasonic" || myType == "pt-d5500") {
                 projector = new PanasonicProjector(myPort);
+            }
+            else if (myType == "liesegang" || myType == "hitachi" || myType == "infocus") {
+                projector = new HitachiProjector(myPort);
             }
             else {
                 throw asl::Exception(std::string("Unknown projector type: ") + myType);
@@ -176,7 +183,8 @@ Projector::~Projector()
 Projector::VideoSource
 Projector::getEnumFromString(const std::string& theSource)
 {
-    if (theSource == "RGB_1") {
+    if (theSource == "RGB_1" ||
+        theSource == "RGB") {
         return RGB_1;
     }
     if (theSource == "RGB_2") {
@@ -190,6 +198,11 @@ Projector::getEnumFromString(const std::string& theSource)
     }
     if (theSource == "DVI") {
         return DVI;
+    }
+    if (theSource == "M1" ||
+        theSource == "M1D" ||
+        theSource == "M1-D") {
+        return M1;
     }
     if (theSource == "VIEWER") {
         return VIEWER;
@@ -214,6 +227,9 @@ Projector::getStringFromEnum(const Projector::VideoSource theSource)
     }
     if (theSource == DVI) {
         return "DVI";
+    }
+    if (theSource == M1) {
+        return "M1";
     }
     if (theSource == VIEWER) {
         return "VIEWER";

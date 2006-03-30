@@ -35,7 +35,7 @@
     -->
     <UdpControl port="2346">
         <SystemHalt powerDownProjectors="true" command="halt"/>    
-        <SystemReboot powerDownProjectors="true" command="reboot"/>
+        <SystemReboot shutterCloseProjectors="true" command="reboot"/>
         <RestartApplication command="restart_app"/>
         <StopApplication shutterCloseProjectors="true" command="firealarm_on"/>
         <StartApplication command="firealarm_off"/>

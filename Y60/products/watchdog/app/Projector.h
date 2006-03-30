@@ -8,11 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//         $Id: Projector.h,v 1.5 2004/11/27 11:19:07 ulrich Exp $
-//     $Author: ulrich $
-//   $Revision: 1.5 $
-//       $Date: 2004/11/27 11:19:07 $
-//
 // Projector controller class.
 //
 //=============================================================================
@@ -39,6 +34,7 @@ public:
      * \return 
      */                            
     static Projector* getProjector(const std::string& theType, int thePort);
+    
     /**
      * Factory method to get a projector
      * \param theProjectorNode XML-Node from the config file
@@ -73,6 +69,7 @@ public:
         VIDEO,
         SVIDEO,
         DVI,
+        M1,
         VIEWER
     };
     

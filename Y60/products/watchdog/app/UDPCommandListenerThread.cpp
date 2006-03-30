@@ -9,16 +9,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//    $RCSfile: UDPCommandListenerThread.cpp,v $
-//
-//     $Author: valentin $
-//
-//   $Revision: 1.12 $
-//
-// Description:
-//
-//============================================================================
 
 #include "UDPCommandListenerThread.h"
 #include "system_functions.h"
@@ -49,6 +39,7 @@ UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theP
     _myUDPPort(2342),
     _myPowerDownProjectorsOnHalt(false),
     _myShutterCloseProjectorsOnStop(false),
+    _myShutterCloseProjectorsOnReboot(false),
     _mySystemHaltCommand(""), 
     _mySystemRebootCommand(""),
     _myRestartAppCommand(""), 
@@ -69,11 +60,11 @@ UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theP
     }
     // check for system reboot command configuration
     if (theConfigNode->childNode("SystemReboot")) {
-        const dom::NodePtr & mySystemHaltNode = theConfigNode->childNode("SystemReboot");
-        _myPowerDownProjectorsOnHalt = asl::as<bool>(mySystemHaltNode->getAttribute("powerDownProjectors")->nodeValue());
-        _mySystemRebootCommand = mySystemHaltNode->getAttributeString("command");
+        const dom::NodePtr & mySystemRebootNode = theConfigNode->childNode("SystemReboot");
+        _myShutterCloseProjectorsOnReboot = asl::as<bool>(mySystemRebootNode->getAttribute("shutterCloseProjectors")->nodeValue());
+        _mySystemRebootCommand = mySystemRebootNode->getAttributeString("command");
         AC_DEBUG <<"_mySystemRebootCommand: " << _mySystemRebootCommand;
-        AC_DEBUG <<"_myPowerDownProjectorsOnHalt: " << _myPowerDownProjectorsOnHalt;
+        AC_DEBUG <<"_myShutterCloseProjectorsOnReboot: " << _myShutterCloseProjectorsOnReboot;
     }
     // check for application restart command configuration
     if (theConfigNode->childNode("RestartApplication")) {
@@ -87,6 +78,7 @@ UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theP
         _myShutterCloseProjectorsOnStop = asl::as<bool>(myStopAppNode->getAttribute("shutterCloseProjectors")->nodeValue());
         _myStopAppCommand = myStopAppNode->getAttributeString("command");
         AC_DEBUG <<"_myStopAppCommand: " << _myStopAppCommand;
+        AC_DEBUG <<"_myShutterCloseProjectorsOnStop: " << _myShutterCloseProjectorsOnStop;
     }
     // check for application start command configuration
     if (theConfigNode->childNode("StartApplication")) {
@@ -160,9 +152,9 @@ UDPCommandListenerThread::initiateShutdown() {
 void
 UDPCommandListenerThread::initiateReboot() {
     
-    if (_myPowerDownProjectorsOnHalt) {
-        // shutdown all connected projectors
-        controlProjector("projector_off");
+    if (_myShutterCloseProjectorsOnReboot) {
+        // close shutter on all connected projectors
+        controlProjector("projector_shutter_close");
     }
     initiateSystemReboot();
 }
