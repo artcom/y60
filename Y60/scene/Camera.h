@@ -38,13 +38,8 @@ namespace y60 {
         public FarPlaneTag::Plug
     {
     public:
-        Camera(dom::Node & theNode) 
-            : TransformHierarchyFacade(theNode),
-            HfovTag::Plug(theNode),
-            OrthoWidthTag::Plug(theNode),
-            NearPlaneTag::Plug(theNode),
-            FarPlaneTag::Plug(theNode)
-        {}
+        Camera(dom::Node & theNode); 
+        ~Camera(); 
             IMPLEMENT_FACADE(Camera);
    };
 
