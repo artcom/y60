@@ -34,6 +34,8 @@ using namespace std;
 
 namespace asl {
 
+bool Pump::_myUseRealPump = true;
+
 Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay) 
     : AudioTimeSource(myTimeStartDelay, getSampleRateConfig()),
       _myRunning(false),
@@ -103,12 +105,11 @@ Pump& Pump::get() {
     // TODO: The way this is now, useRealPump gets instantiated once per plugin.
     // To change this, move useRealPump to ALSAPump and DirectSoundPump.
 
-    static bool useRealPump = true;
     string myWhoCares;
     if (get_environment_var("Y60_SOUND_USE_DUMMY", myWhoCares)) {
-        useRealPump = false;
+        _myUseRealPump = false;
     }
-    if (useRealPump) {
+    if (_myUseRealPump) {
         try {
 #ifdef WIN32           
             return Singleton<DirectSoundPump>::get();
@@ -120,11 +121,16 @@ Pump& Pump::get() {
         } catch (const AudioException& e) {
             AC_WARNING << "Could not create NativePump.";
             AC_WARNING << "Error was: " << e;
-            useRealPump = false;
+            _myUseRealPump = false;
         }
     }
     return Singleton<DummyPump>::get();
     
+}
+
+void 
+Pump::setUseRealPump(bool theRealPumpFlag) {
+    _myUseRealPump = theRealPumpFlag;
 }
 
 void Pump::setVolume (float theVolume) {

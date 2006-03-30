@@ -50,7 +50,7 @@ class Pump : public AudioTimeSource, private PosixThread
         unsigned getOutputBytesPerFrame() const;
         unsigned getNumClicks() const;
         virtual void dumpState() const;
-
+        static void setUseRealPump(bool theRealPumpFlag);
         bool isRunning() const;
 
         // Interface to HWSampleSink
@@ -99,6 +99,8 @@ class Pump : public AudioTimeSource, private PosixThread
         bool        _doBritzelTest;
         unsigned    _numClicks;
         float       _myLastFrame;
+        static bool _myUseRealPump;
+
 };
 
 }

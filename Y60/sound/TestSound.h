@@ -16,6 +16,7 @@
 #include <asl/UnitTest.h>
 
 #include "SoundManager.h"
+#include <asl/Pump.h>
 
 #include <asl/numeric_functions.h>
 #include <asl/string_functions.h>
@@ -455,6 +456,7 @@ class TestVolume: public SoundTestBase {
                 SoundPtr mySound = getSoundManager().createSound
                         ("../../testfiles/aussentuer.mp3");
                 mySound->setVolume(0.2f);
+                ENSURE(almostEqual(mySound->getVolume(), 0.2));
                 mySound->play();
                 msleep(200);
                 mySound->setVolume(0.5f);
@@ -607,12 +609,12 @@ class SoundTestSuite : public UnitTestSuite {
 
         void setup() {
             UnitTestSuite::setup();
-
+            Pump::setUseRealPump(!_myUseDummyPump);
             SoundManager& mySoundManager = Singleton<SoundManager>::get();
 
             bool myNoisy;
             string myVal;
-            if (!_myUseDummyPump && get_environment_var("Y60_NOISY_SOUND_TESTS", myVal)) {
+            if (_myUseDummyPump || get_environment_var("Y60_NOISY_SOUND_TESTS", myVal)) {
                 myNoisy = true;
                 mySoundManager.setVolume(1);
             } else {
@@ -638,9 +640,10 @@ class SoundTestSuite : public UnitTestSuite {
             if (myNoisy) {
                 addTest(new TestVolume(mySoundManager));
             }
-
+#ifndef DEBUG_VARIANT
+            // In debug mode, the program runs too slowly for this test.
             addTest(new StressTest(mySoundManager, 5));
-
+#endif
 //            addTest(new TestLeak(mySoundManager));
 //            addTest(new MemLeakStressTest(mySoundManager, 5*60));
         }

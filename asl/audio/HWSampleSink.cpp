@@ -168,7 +168,7 @@ bool HWSampleSink::isPlaying() const {
 }
 
 float HWSampleSink::getVolume() const {
-    return _myVolume;
+    return _myVolumeFader->getVolume();//_myVolume;
 }
 
 bool HWSampleSink::queueSamples(AudioBufferPtr& theBuffer) {

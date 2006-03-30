@@ -30,7 +30,13 @@ void VolumeFader::setVolume(float theTargetVolume, unsigned theFadeDurationFrame
 }
 
 float VolumeFader::getVolume() const {
-    return getVolume(_myCurrentFrame);
+    // Hack: In a real fade, we want to return the actual volume. In a fade that's
+    // just there to prevent clicks, this returns the destination volume.
+    if (_myCurrentFrame + DEFAULT_FADE_FRAMES < _myFadeEndFrame) {
+        return getVolume(_myCurrentFrame);
+    } else {
+        return _myEndVolume;
+    }
 }
 
 float VolumeFader::getVolume(Unsigned64 theFrame) const {
