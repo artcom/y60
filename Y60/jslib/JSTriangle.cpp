@@ -8,7 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSNode.h"
 #include "JSVector.h"
 #include "JSTriangle.h"
 #include "JSPlane.h"

@@ -15,8 +15,7 @@
 //
 //=============================================================================
 
-
-#include "JSNode.h"
+#include "JSWrapper.h" //#include "JSNode.h"
 #include "JSNodeList.h"
 #include "JSNamedNodeMap.h"
 

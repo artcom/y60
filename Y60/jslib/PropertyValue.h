@@ -7,19 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: PropertyValue.h,v $
-//   $Author: ulrich $
-//   $Revision: 1.6 $
-//   $Date: 2004/11/23 16:54:25 $
-//
-//
-//=============================================================================
 
 #ifndef _PROPERTY_VALUE_INCLUDED
 #define _PROPERTY_VALUE_INCLUDED
 
-#include "JSNode.h"
+//#include "JSNode.h"
 #include "JScppUtils.h"
 #include <js/jsapi.h>
 

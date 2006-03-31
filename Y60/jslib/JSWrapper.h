@@ -30,6 +30,8 @@
 
 #include <set>
 
+#include "JSNode.h"
+
 namespace jslib {
 
 template<class T>

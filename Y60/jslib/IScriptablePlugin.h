@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: IScriptablePlugin.h,v $
-//   $Author: christian $
-//   $Revision: 1.2 $
-//   $Date: 2004/10/31 15:58:17 $
-//
-//
-//=============================================================================
 
 #ifndef _ac_jslib_IScriptablePlugin_h_
 #define _ac_jslib_IScriptablePlugin_h_

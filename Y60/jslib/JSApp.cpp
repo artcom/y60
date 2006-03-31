@@ -20,7 +20,7 @@
 
 #include "jscpp.h"
 #include "JScppUtils.h"
-#include "JSNode.h"
+//#include "JSNode.h"
 #include "JSBlock.h"
 #include "JSVector.h"
 #include "IScriptablePlugin.h"
