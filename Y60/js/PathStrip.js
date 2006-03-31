@@ -69,6 +69,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         // current position
         var myLastPos = null;
         var mySegment = 0;
+        var myFirstSegmentOffset = 0;
         if (thePos != null) {
             var myNearest = thePath.nearest(thePos);
             mySegment = myNearest.element;
@@ -84,13 +85,9 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         var myLastLeftLine = null, myLastRightLine = null;
 
         var myLength = theLength;
+        var myU = 0.0;
+        var myLengthSum = 0;
         while (myLength > 0.0) {
-
-            // path tex coord
-            var myU = (theLength - myLength) / theLength;
-            //print("accumLen=" + myLength, "targetLen=" + theLength, "u=" + myU);
-            var myLeftUV = new Vector2f(myU, 0.0);
-            var myRightUV = new Vector2f(myU, 1.0);
 
             // next element
             var myElement = thePath.getElement(mySegment);
@@ -98,14 +95,24 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
             mySegment = (mySegment + 1) % thePath.getNumElements();
 
             var myForward = difference(myElement.end, myElement.origin);
+            var myRealForward = magnitude(difference(myElement.end, myLastPos));
+            // last piece
+            if (myLength < myRealForward) {
+                myRealForward = myLength;
+            }
+            myLengthSum += myRealForward;
             if (magnitude(myForward) < 0.005) {
                 // skip zero-length segment
                 //print("skip zero-length");
                 continue;
             }
+
+            // path tex coord
+            var myUDelta = myRealForward / theLength;
+            var myLeftUV = new Vector2f(myU, 0.0);
+            var myRightUV = new Vector2f(myU, 1.0);
             myForward = normalized(myForward);
             //print("fwd=" + myForward);
-
             // left-vector
             var myNormalVector = normalized(cross(UP_VECTOR, myForward));
             var myLeftVector = null;
@@ -193,6 +200,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
             myLastRightVector = myRightVector;
             myLastLeftLine = myLeftLine;
             myLastRightLine = myRightLine;
+            myU += myUDelta;            
         }
 
         // finish
