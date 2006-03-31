@@ -7,15 +7,8 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSNode.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.19 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//=============================================================================
 
-#include "JSWrapper.h" //#include "JSNode.h"
+#include "JSNode.h"
 #include "JSNodeList.h"
 #include "JSNamedNodeMap.h"
 

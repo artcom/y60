@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSWrapper.h,v $
-//   $Author: christian $
-//   $Revision: 1.14 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACXPSHELL_JSWRAPPER_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSWRAPPER_H_INCLUDED_
@@ -30,7 +22,6 @@
 
 #include <set>
 
-#include "JSNode.h"
 
 namespace jslib {
 
@@ -108,6 +99,7 @@ struct ArgumentHolder<NoArgument,N> {
     };
 };
 #if 1
+extern bool convertFrom(JSContext *cx, jsval theValue, const dom::Node * & theNode);
 template <unsigned N>
 struct ArgumentHolder<const dom::Node &, N> {
     typedef const dom::Node & ARG_TYPE;
