@@ -86,7 +86,7 @@ function ButtonBase(Public, Protected, theScene, theId,
         return Protected.enabled;
     }
 
-    Public.enable setter = function(theFlag) {
+    Public.enabled setter = function(theFlag) {
         if (Protected.enabled != theFlag) {
             Protected.enabled = theFlag;
             if (!theFlag && "disabledColor" in Protected.style) {
