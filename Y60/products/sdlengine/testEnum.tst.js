@@ -76,12 +76,15 @@ TestBitset.prototype.Constructor = function(obj, theName) {
         obj.myBitset.frontfacing = true;
         ENSURE('obj.myBitset.backfacing');
         ENSURE('obj.myBitset["backfacing"]');
-        ENSURE_EXCEPTION('obj.myBitset.topfacing = true');
 
+/*
+        Nice to have:
+        ENSURE_EXCEPTION('obj.myBitset.topfacing = true');
         obj.myBitset.setValue( RenderStyle.frontfacing, RenderStyle.backfacing, RenderStyle.ignore_depth);
         obj.myBitset.setValue( 0xff );
         var myMask = RenderStyles.asMask( RenderStyle.frontfacing, RenderStyle.backfacing, RenderStyle.ignore_depth);
         obj.myBitset.setValue( myMask );
+*/
     }
 };
 var mySuite = new UnitTestSuite("UnitTest");

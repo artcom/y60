@@ -24,6 +24,10 @@
 #include "JSAccessibleVector.h"
 #include "JSEvent.h"
 #include "JSPlane.h"
+#include "JSEnum.h"
+#include "JSBitset.h"
+
+#include <y60/NodeValueNames.h>
 
 #include <asl/os_functions.h>
 #include <asl/Logger.h>
@@ -177,6 +181,10 @@ public:
         REGISTER_BYREFERENCE_CONVERTER(Frustum);
         REGISTER_BYREFERENCE_CONVERTER(Box3f);
         REGISTER_BYREFERENCE_CONVERTER(Triangle<TriangleNumber>);
+        REGISTER_BYREFERENCE_CONVERTER(y60::RenderStyles);
+        REGISTER_BYREFERENCE_CONVERTER(y60::BlendEquation);
+        REGISTER_BYREFERENCE_CONVERTER(y60::TargetBuffers);
+
     }
 };
 

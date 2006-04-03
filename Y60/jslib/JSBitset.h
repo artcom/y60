@@ -23,7 +23,7 @@
 
 namespace jslib {
 
-template <class BITSET>    
+template <class BITSET>
 class JSBitset : public JSWrapper<BITSET> {
     private:
         JSBitset();  // hide default constructor
@@ -48,12 +48,11 @@ class JSBitset : public JSWrapper<BITSET> {
             static std::string myClassName = buildClassName( BITSET::getName());
             return myClassName.c_str();
         };
-        
+
         virtual unsigned long length() const {
             return BITSET::Flags::MAX;
         }
         virtual JSBool getPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-            std::cerr << "getPropertyByNumericId " << theID << " called" << std::endl;
             if (theID >= 0 && theID < BITSET::Flags::MAX) {
                 const NATIVE & myBitset = this->getNative();
                 *vp = BOOLEAN_TO_JSVAL(myBitset.test(theID));
@@ -62,12 +61,10 @@ class JSBitset : public JSWrapper<BITSET> {
             return JS_FALSE;
         }
         virtual JSBool setPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-            std::cerr << "setPropertyByNumericId " << theID << " called" << std::endl;
             typename JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
             if (theID >= 0 && theID < BITSET::Flags::MAX) {
                 bool myFlag;
                 convertFrom(cx, *vp, myFlag);
-                std::cerr << "settting prop " << theID << " to " << myFlag << std::endl;
                 myObj.getNative()[theID] = myFlag;
                 return JS_TRUE;
             }
@@ -173,11 +170,11 @@ class JSBitset : public JSWrapper<BITSET> {
             return Base::Construct(cx, theOwner, theNative);
         }
         */
-        
+
         JSBitset(NativeValuePtr theValue)
             : Base(theValue, 0)
         {}
-        
+
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
 
     private:
@@ -214,8 +211,8 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Bitset<ENUM> & theBitset) {
     return false;
 }
 template <class ENUM>
-bool convertFrom(JSContext *cx, jsval theValue, 
-        asl::Ptr<dom::SimpleValue<asl::Bitset<ENUM> >, dom::ThreadingModel> theValuePtr) 
+bool convertFrom(JSContext *cx, jsval theValue,
+        asl::Ptr<dom::SimpleValue<asl::Bitset<ENUM> >, dom::ThreadingModel> theValuePtr)
 {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
@@ -229,8 +226,8 @@ bool convertFrom(JSContext *cx, jsval theValue,
     return false;
 }
 
-template <class BITSET>    
-JSObject * 
+template <class BITSET>
+JSObject *
 JSBitset<BITSET>::initClass(JSContext *cx, JSObject *theGlobalObject) {
     JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0, 0, 0, 0, 0);
     if (myClassObject) {
