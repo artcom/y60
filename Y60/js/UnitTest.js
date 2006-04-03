@@ -160,26 +160,23 @@ UnitTestSuite.prototype.Constructor = function(obj, theName) {
             _myTests.push(myTest);
             print(">> Added Test '" + myTest.getMyName() + "'");
         } else {
-            print("## Failed to add Test");
+            print("### Failed to add Test");
             obj.incrementFailedCount();
         }
     }
 
     obj.run = function() {
-        //print("UnitTestSuite.run()");
         try {
             try {
                 obj.setup();
             } catch (e if e == Exception) {
-                print("## An exception occured during setup of test suite '"
-                        + obj.getMyName() << "':" + e + "");
+                print("### An exception occured during setup of test suite '"
+                        + obj.getMyName() + "': " + e + "");
                 obj.incrementFailedCount();
-                throw(e);
             } catch (e) {
-                print("## An exception occured during setup of test suite '"
-                        + obj.getMyName() << "':" + e + "");
+                print("### An exception occured during setup of test suite '"
+                        + obj.getMyName() + "': " + e + "");
                 obj.incrementFailedCount();
-                throw(e);
             }
             try {
                 for (var i = 0; i < _myTests.length; ++i) {
@@ -191,28 +188,24 @@ UnitTestSuite.prototype.Constructor = function(obj, theName) {
                     _myTests[i].teardown();
                 }
             } catch (e if e == Exception) {
-                print("## An exception occured during execution of test suite '"
-                        + obj.getMyName() << "':" + e + "");
+                print("### An exception occured during execution of test suite '"
+                        + obj.getMyName() + "': " + e + "");
                 obj.incrementFailedCount();
-                throw(e);
             } catch (e) {
-                print("## An exception occured during execution of test suite '"
-                        + obj.getMyName() << "':" + e + "");
+                print("### An exception occured during execution of test suite '"
+                        + obj.getMyName() + "': " + e + "");
                 obj.incrementFailedCount();
-                throw(e);
             }
             try {
                 obj.teardown();
             } catch (e if e == Exception) {
-                print("## An exception occured during teardown of test suite '"
-                        + obj.getMyName() << "':" + e + "");
+                print("### An exception occured during teardown of test suite '"
+                        + obj.getMyName() + "': " + e + "");
                 obj.incrementFailedCount();
-                throw(e);
             } catch (e) {
-                print("## An exception occured during teardown of test suite '"
-                        + obj.getMyName() << "':" + e + "");
+                print("### An exception occured during teardown of test suite '"
+                        + obj.getMyName() + "': " + e + "");
                 obj.incrementFailedCount();
-                throw(e);
             }
         } catch (e) {
             reportException(e);

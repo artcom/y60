@@ -651,6 +651,7 @@ function parseXML(theFilename) {
 }
 
 function formatTimecode(theTimestamp) {
+    theTimestamp = Number(theTimestamp);
     var myHours   = 0;
     var myMinutes = 0;
     var mySeconds = 0;
@@ -720,7 +721,7 @@ function transformClipToWorld(theClipPos, theCamera) {
     return product(theClipPos, myProjectionMatrix);
 }
 
-function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera) 
+function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera)
 {
     var myPosX = 2 * theScreenPixelX / window.width  - 1;
     var myPosY = - (2 * theScreenPixelY / window.height - 1);
@@ -728,7 +729,7 @@ function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera)
     return transformClipToWorld(myScreenPos, theCamera);
 }
 
-function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theCamera) 
+function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theCamera)
 {
     var myScreenPos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera);
     var myRay = new Ray(theCamera.position, myScreenPos);

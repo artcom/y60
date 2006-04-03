@@ -184,8 +184,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 }
                 _myMissedFrameCounter += myFrameDiff;
             }
-            
-            window.scene.loadMovieFrame(_myMovieNode, theTime);
+
             if (myFrameDiff >0) {
                 _myFrameCounter += myFrameDiff;
             }
@@ -301,12 +300,12 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 print("Media: audio");
                 if (!_myWMAPlugged) {
                     plug("y60WMADecoder");
-                    _myWMAPlugged = true;                
+                    _myWMAPlugged = true;
                 }
-                break;            
+                break;
             case CAPTURE_MEDIA:
                 print("Media: Capture Video");
-                if (myFilename.search(/^video:\/\//i) != -1 && !_myVFWCapturePlugged) {    
+                if (myFilename.search(/^video:\/\//i) != -1 && !_myVFWCapturePlugged) {
                     plug("y60VFWCapture");
                     print("VideoForWindows dshow");
                     _myVFWCapturePlugged = true;
@@ -314,8 +313,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                     _myDShowCapturePlugged = true;
                     plug("y60DShowCapture");
                     print("plugged dshow");
-                }                
-                break;            
+                }
+                break;
         }
 
         switch (myEntry.mediaType) {
@@ -326,7 +325,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             }
             break;
         case VIDEO_MEDIA:
-            var mySeekableFlag = false;        
+            var mySeekableFlag = false;
             showMovie(myFilename, myPlaylist.getVideoDecoderHintFromURL(myFilename, mySeekableFlag));
             if (_myImageOverlay) {
                _myImageOverlay.visible = false;
@@ -420,6 +419,9 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         if (_myMovieNode && _myMovieOverlay.visible) {
             if (theIncreaseFlag) {
                 _myMovieNode.volume *= 1.1;
+                if (_myMovieNode.volume > 1) {
+                    _myMovieNode.volume = 1;
+                }
             } else {
                 _myMovieNode.volume *= 0.9;
             }
@@ -554,8 +556,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.id = createUniqueId();
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
-            _myMovieNode.audio = 1;
-            _myMovieNode.decoderhint = theDecoderHint;
+            _myMovieNode.audio = 0;
+            _myMovieNode.decoderhint = "y60FFMpegDecoder"; //theDecoderHint;
             _myMovieOverlay = new MovieOverlay(self.getOverlayManager(), _myMovieNode);
         }
 
