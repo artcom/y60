@@ -82,7 +82,6 @@ TestBitset.prototype.Constructor = function(obj, theName) {
         obj.myBitset.setValue( 0xff );
         var myMask = RenderStyles.asMask( RenderStyle.frontfacing, RenderStyle.backfacing, RenderStyle.ignore_depth);
         obj.myBitset.setValue( myMask );
-        
     }
 };
 var mySuite = new UnitTestSuite("UnitTest");
@@ -95,3 +94,6 @@ try {
     print("## An unknown exception occured during execution." + e + "");
     mySuite.incrementFailedCount();
 }
+
+print(">> Finished test suite '"+mySuite.getMyName() +"', return status = " + mySuite.returnStatus() + "");
+exit(mySuite.returnStatus());
