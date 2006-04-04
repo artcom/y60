@@ -372,7 +372,7 @@ function getDescendantsByAttributeName(theNode, theAttribute, doDeepSearch) {
                 }
 
                 if (doDeepSearch) {
-                    myResult = myResult.concat(getDescendantByAttributeName(myChild, theAttribute, doDeepSearch));
+                    myResult = myResult.concat(getDescendantsByAttributeName(myChild, theAttribute, doDeepSearch));
                 }
             }
         }

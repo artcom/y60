@@ -87,11 +87,10 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         var myLength = theLength;
         var myU = 0.0;
         var myLengthSum = 0;
-        while (myLength > 0.0) {
-
+        while (myLength > 0.01) {
             // next element
             var myElement = thePath.getElement(mySegment);
-            //print("segment=" + mySegment, "element=" + myElement);
+            //print("segment=" + mySegment, "element=" + myElement + " / " + thePath.getNumElements());
             mySegment = (mySegment + 1) % thePath.getNumElements();
 
             var myForward = difference(myElement.end, myElement.origin);
