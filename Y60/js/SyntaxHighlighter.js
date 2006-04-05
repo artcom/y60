@@ -51,12 +51,13 @@ SyntaxHighlighter.prototype.Constructor = function(Public) {
     	} else {
     	    myResult = addWord(theCode, null);
     	}
-
     	return myResult;
     }
 
     Public.addKeywords = function(theKeywords, theStyle) {
-        myRegexList.push({ regex: new RegExp(getKeywords(theKeywords), 'gm'), css: theStyle });
+        if (theKeywords) {
+            myRegexList.push({ regex: new RegExp(getKeywords(theKeywords), 'gm'), css: theStyle });
+        }
     }
 
 	const myKeywords = 'abstract boolean break byte case catch char class const continue debugger ' +
@@ -86,6 +87,7 @@ SyntaxHighlighter.prototype.Constructor = function(Public) {
         while ((myMatch = theRegex.exec(theCode)) != null) {
     		myResult.push({value: myMatch[0], index: myMatch.index, css: theCss, length: myMatch[0].length });
     	}
+
     	return myResult;
     }
 
@@ -93,10 +95,10 @@ SyntaxHighlighter.prototype.Constructor = function(Public) {
     	var myResult = null;
 
         // Create html entities
-    	theWord = theWord.replace(/&/g, '&amp;');
+    	//theWord = theWord.replace(/&/g, '&amp;');
     	theWord = theWord.replace(/ /g, '&nbsp;');
-    	theWord = theWord.replace(/</g, '&lt;');
-    	theWord = theWord.replace(/\n/gm, '&nbsp;<br>');
+    	//theWord = theWord.replace(/</g, '&lt;');
+    	theWord = theWord.replace(/\n/gm, '<br/>');
 
         // Add css class
     	if (theCSS) {
@@ -125,25 +127,25 @@ SyntaxHighlighter.prototype.Constructor = function(Public) {
     	return 0;
     }
 
-    function isInside(theMatches, theMatch) { 
+    function isInside(theMatches, theMatch) {
     	if (theMatch == null || theMatch.length == 0) {
     		return;
     	}
-    	
+
     	for (var i = 0; i < theMatches.length; i++) {
     		var myMatch = theMatches[i];
-    		
+
     		if (myMatch == null) {
     			continue;
     		}
-    		
+
     		if ((theMatch.index > myMatch.index) &&
     		    (theMatch.index <= myMatch.index + myMatch.length))
             {
     			return true;
     		}
     	}
-    	
+
     	return false;
     }
 

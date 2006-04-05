@@ -237,9 +237,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.addSkyBoxFromImage = function(theImageNode) {
-        var myMaterialId = createUniqueId();
         _mySkyboxMaterial = Node.createElement('material');
-        _mySkyboxMaterial.id = myMaterialId;
+        _mySkyboxMaterial.name = "skyboxmaterial";
         self.getMaterials().appendChild(_mySkyboxMaterial);
 
         // add textures
@@ -247,7 +246,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             '<textures>\n' +
             '    <texture image="' + theImageNode.id + '" applymode="decal" wrapmode="repeat" />\n' +
             '</textures>';
-        var myTexturesDoc = new Node(myTexturesString);
+        var myTexturesDoc  = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
         _mySkyboxMaterial.appendChild(myTexturesNode);
 
@@ -255,8 +254,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         var myTextureFeatures = new Node('<feature name="textures">[100[skybox]]</feature>\n').firstChild;
         _mySkyboxMaterial.requires.appendChild(myTextureFeatures);
 
-        self.getWorld().skyboxmaterial = myMaterialId;
-        self.getScene().update(Scene.IMAGES);
+        self.getWorld().skyboxmaterial = _mySkyboxMaterial.id;
     }
 
     self.addSkyBoxFromFile = function(theFileName, theTile) {
