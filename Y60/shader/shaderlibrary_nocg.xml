@@ -91,7 +91,7 @@
                 <vector2f name="texcoord0"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader>    
+    </shader>
     <shader id="s2.5" name="LambertColor" cost="120">
         <supports>
             <feature class="lighting" values="[lambert]"/>
@@ -111,7 +111,7 @@
                 <vector3f name="position"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader>    
+    </shader>
     <shader id="s4" name="doubletex_lambert" cost="120">
         <supports>
             <feature class="textures" values="[paint,paint]"/>
@@ -234,7 +234,7 @@
         <supports>
             <feature class="lighting" values="[unlit]"/>
             <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map]"/> 
+            <feature class="texcoord" values="[uv_map,uv_map]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
@@ -252,7 +252,7 @@
         <supports>
             <feature class="lighting" values="[unlit]"/>
             <feature class="textures" values="[paint,paint,paint]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/> 
+            <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
@@ -378,6 +378,28 @@
         <supports>
             <feature class="textures" values="[paint,environment]"/>
             <feature class="texcoord" values="[uv_map,uv_map]"/>
+            <feature class="lighting" values="[lambert]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+             </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
+    <shader id="s150" name="pseudo_carpaint" cost="10" >
+        <supports>
+            <feature class="textures" values="[paint,environment,environment]"/>
+            <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
         <fixedfunctionshader>
@@ -545,7 +567,7 @@
             <feature class="textures" values="[paint]"/>
             <feature class="physics" values="[skin]"/>
             <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[uv_map]"/>            
+            <feature class="texcoord" values="[uv_map]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
@@ -616,7 +638,7 @@
                 <feature class="textures" values="[paint]"/>
                 <feature class="lighting" values="[unlit]"/>
                 <feature class="autotexcoords" values="[eye_linear_2d]" />
-                <feature class="texcoord" values="[uv_map]"/>            
+                <feature class="texcoord" values="[uv_map]"/>
             </supports>
             <fixedfunctionshader>
                <properties>
@@ -722,7 +744,7 @@
                 <vector3f name="position"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader>    
+    </shader>
     <shader id="s32" name="generic_tripletex_lambert" cost="120">
         <supports>
             <feature class="textures" values="[paint,paint,paint]"/>
@@ -746,7 +768,7 @@
                 <vector3f name="position"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader>    
+    </shader>
     <shader id="s33" name="generic_quadrupletex_lambert" cost="120">
         <supports>
             <feature class="textures" values="[paint,paint,paint,paint]"/>
@@ -771,7 +793,7 @@
                 <vector3f name="position"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader>    
+    </shader>
     <!-- dummy voxel shader; does nothing usefull -->
     <shader id="s123" name="VoxelColored" cost="9">
         <supports>
