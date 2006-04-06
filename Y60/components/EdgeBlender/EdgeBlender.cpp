@@ -37,19 +37,20 @@ class EdgeBlender :
         EdgeBlender(asl::DLHandle theDLHandle);
         ~EdgeBlender();
 
-        void onStartup(jslib::AbstractRenderWindow * theWindow);
-
-        bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow);
-
-        void handle(AbstractRenderWindow * theWindow, y60::EventPtr theEvent);
-        void onFrame(AbstractRenderWindow * theWindow , double t);
-
         void onGetProperty(const std::string & thePropertyName, 
                 PropertyValue & theReturnValue) const;
         void onSetProperty(const std::string & thePropertyName, 
                 const PropertyValue & thePropertyValue);
+        void onUpdateSettings(dom::NodePtr theSettings);
 
-        void onPreRender(AbstractRenderWindow * theRenderer);
+        void onStartup(jslib::AbstractRenderWindow * theWindow);
+        bool onSceneLoaded(jslib::AbstractRenderWindow * theWindow) {
+            return true;
+        }
+        void handle(AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {}
+        void onFrame(AbstractRenderWindow * theWindow, double theTime) {}
+
+        void onPreRender(AbstractRenderWindow * theRenderer) {}
         void onPostRender(AbstractRenderWindow * theRenderer);
 
         const char * ClassName() {
@@ -57,12 +58,11 @@ class EdgeBlender :
             return myClassName;
         }
 
-        void onUpdateSettings(dom::NodePtr theSettings);
-
     private:
         void renderMultiScreen();
         void renderBlending();
 
+        void drawGrid(const asl::Vector4f & theColor, unsigned theGridSize = 50);
         void preRender();
         void postRender();
         void copyToTexture();
@@ -129,18 +129,36 @@ class EdgeBlender :
         float _myPower;
         float _myGamma;
 
-        bool _myDebug;
+        bool _myPreGridFlag;
+        bool _myPostGridFlag;
         bool _myBlendingFlag;
         bool _myBlackLevelFlag;
 
         bool _myCopyFrameBufferFlag;
+        asl::Vector4f _myFrameBufferArea;
         unsigned char * _myFrameBuffer;
 };
 
-EdgeBlender :: EdgeBlender(asl::DLHandle theDLHandle) :
+EdgeBlender::EdgeBlender(asl::DLHandle theDLHandle) :
     asl::PlugInBase(theDLHandle),
     IRendererExtension("EdgeBlender")
 {
+    _myMode = MODE_MULTI_SCREEN;
+    _myEdges = 0;
+    _myBlendWidth = 0.2f;
+    _myNumSubdivisions = 32;
+    _myBlackLevel = 0.1f;
+    _myPower = 1.5f;
+    _myGamma = 1.2f;
+    _myRowCount = 1;
+    _myColumnCount = 2;
+
+    _myPreGridFlag = _myPostGridFlag = false;
+    _myBlendingFlag = true;
+    _myBlackLevelFlag = true;
+
+    _myCopyFrameBufferFlag = false;
+    _myFrameBuffer = 0;
 }
 
 EdgeBlender::~EdgeBlender() {
@@ -154,39 +172,24 @@ EdgeBlender::~EdgeBlender() {
 void
 EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow)
 {
-    _myMode = MODE_MULTI_SCREEN;
-    _myEdges = 0;
-    _myBlendWidth = 0.2f;
-    _myNumSubdivisions = 32;
-    _myBlackLevel = 0.1f;
-    _myPower = 1.5f;
-    _myGamma = 1.2f;
-    _myRowCount = 1;
-    _myColumnCount = 2;
-
-    _myDebug = false;
-    _myBlendingFlag = true;
-    _myBlackLevelFlag = true;
-
-    _myCopyFrameBufferFlag = true;
-    _myFrameBuffer = 0;
-
-    //setup texture for rendering
     _myWindowWidth = theWindow->getWidth();
     _myWindowHeight = theWindow->getHeight();
-    unsigned mySceneTextureWidth = asl::nextPowerOfTwo(_myWindowWidth);
-    unsigned mySceneTextureHeight = asl::nextPowerOfTwo(_myWindowHeight);
-    
+    AC_DEBUG << "window=" << _myWindowWidth << "x" << _myWindowHeight;
+    _myFrameBufferArea = asl::Vector4f(0,0, (float) _myWindowWidth, (float) _myWindowHeight);
+
+    unsigned myTextureWidth = asl::nextPowerOfTwo(_myWindowWidth);
+    unsigned myTextureHeight = asl::nextPowerOfTwo(_myWindowHeight);
+    AC_DEBUG << "texture=" << myTextureWidth << "x" << myTextureHeight;
+
     //glActiveTextureARB(GL_TEXTURE0_ARB); // must lookup func pointer under Windows
     glGenTextures(1, &_mySceneTexture);
-    glBindTexture (GL_TEXTURE_2D, _mySceneTexture );
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, mySceneTextureWidth, mySceneTextureHeight, 
+    glBindTexture (GL_TEXTURE_2D, _mySceneTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3,
+                 myTextureWidth, myTextureHeight, 
                  0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     checkOGLError(PLUS_FILE_LINE);
-
-    AC_DEBUG << "bind texture " << _mySceneTexture << " " << _myWindowWidth << "x" << _myWindowHeight;
 }
 
 void
@@ -212,12 +215,18 @@ EdgeBlender::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set<unsigned>(_myColumnCount);
     } else if (thePropertyName == "mode") {
         theReturnValue.set<unsigned>(_myMode);
-    } else if (thePropertyName == "debug") {
-        theReturnValue.set<bool>(_myDebug);
+    } else if (thePropertyName == "preGridFlag") {
+        theReturnValue.set<bool>(_myPreGridFlag);
+    } else if (thePropertyName == "postGridFlag") {
+        theReturnValue.set<bool>(_myPostGridFlag);
     } else if (thePropertyName == "blendingFlag") {
         theReturnValue.set<bool>(_myBlendingFlag);
     } else if (thePropertyName == "blacklevelFlag") {
         theReturnValue.set<bool>(_myBlackLevelFlag);
+    } else if (thePropertyName == "copyFrameBufferFlag") {
+        theReturnValue.set<bool>(_myCopyFrameBufferFlag);
+    } else if (thePropertyName == "frameBufferArea") {
+        //theReturnValue.set<asl::Vector4f>(_myFrameBufferArea);
     }
 }
 
@@ -225,7 +234,7 @@ void
 EdgeBlender::onSetProperty(const std::string & thePropertyName,
         const PropertyValue & thePropertyValue)
 {
-    AC_DEBUG << "onSetProperty " << thePropertyName;
+    AC_DEBUG << "onSetProperty " << thePropertyName << "=" << thePropertyValue.get<std::string>();
     if (thePropertyName == "edges") {
         _myEdges = thePropertyValue.get<unsigned>();
     } else if (thePropertyName == "blendwidth") {
@@ -244,12 +253,18 @@ EdgeBlender::onSetProperty(const std::string & thePropertyName,
         _myColumnCount = thePropertyValue.get<unsigned>();
     } else if (thePropertyName == "mode") {
         _myMode = thePropertyValue.get<unsigned>();
-    } else if (thePropertyName == "debug") {
-        _myDebug = thePropertyValue.get<bool>();
+    } else if (thePropertyName == "preGridFlag") {
+        _myPreGridFlag = thePropertyValue.get<bool>();
+    } else if (thePropertyName == "postGridFlag") {
+        _myPostGridFlag = thePropertyValue.get<bool>();
     } else if (thePropertyName == "blendingFlag") {
         _myBlendingFlag = thePropertyValue.get<bool>();
     } else if (thePropertyName == "blacklevelFlag") {
         _myBlackLevelFlag = thePropertyValue.get<bool>();
+    } else if (thePropertyName == "copyFrameBufferFlag") {
+        _myCopyFrameBufferFlag = thePropertyValue.get<bool>();
+    } else if (thePropertyName == "frameBufferArea") {
+        //_myFrameBufferArea = thePropertyValue.get<asl::Vector4f>();
     }
 }
 
@@ -265,60 +280,29 @@ EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     _myBlackLevel = getSetting(theSettings, "blacklevel", _myBlackLevel);
     _myPower = getSetting(theSettings, "power", _myPower);
     _myGamma = getSetting(theSettings, "gamma", _myGamma);
-    _myDebug = (int) getSetting(theSettings, "debug", (int) _myDebug);
+
+    _myPreGridFlag = (int) getSetting(theSettings, "preGridFlag", (int) _myPreGridFlag);
+    _myPostGridFlag = (int) getSetting(theSettings, "postGridFlag", (int) _myPostGridFlag);
     _myBlendingFlag = (int) getSetting(theSettings, "blendingFlag", (int) _myBlendingFlag);
     _myBlackLevelFlag = (int) getSetting(theSettings, "blacklevelFlag", (int) _myBlackLevelFlag);
     _myCopyFrameBufferFlag = (int) getSetting(theSettings, "copyFrameBufferFlag", (int) _myCopyFrameBufferFlag);
-}
-
-bool
-EdgeBlender::onSceneLoaded(jslib::AbstractRenderWindow * theWindow) {
-    AC_DEBUG << "onSceneLoaded";
-    return true;
+    _myFrameBufferArea = getSetting(theSettings, "frameBufferArea", _myFrameBufferArea);
 }
 
 void
-EdgeBlender::handle(AbstractRenderWindow * theWindow, y60::EventPtr theEvent) {
-}
-
-void
-EdgeBlender::onFrame(AbstractRenderWindow * theWindow , double t) {
-    //AC_TRACE << "onFrame";
-}
-
-void
-EdgeBlender::onPreRender(AbstractRenderWindow * theRenderer) {
-    //AC_TRACE << "onPreRender";
-}
-
-void
-EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
+EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer)
+{
     //AC_TRACE << "onPostRender";
     if (_myMode == 0) {
         return;
     }
 
-    // draw grid
-    if (_myDebug) {
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glBegin(GL_LINES);
-
-        for (unsigned y = 0; y < _myWindowHeight; y += 10) {
-            for (unsigned x = 0; x < _myWindowWidth; x += 10) {
-
-                float myX = x / (float) _myWindowWidth;
-                glVertex2f(myX, 0.0f);
-                glVertex2f(myX, 1.0f);
-            }
-
-            float myY = y / (float) _myWindowHeight;
-            glVertex2f(0.0f, myY);
-            glVertex2f(1.0f, myY);
-        }
-        glEnd();
-    }
-
     preRender();
+
+    // pre-blend grid
+    if (_myPreGridFlag) {
+        drawGrid(asl::Vector4f(0,1,0,1));
+    }
 
     switch (_myMode) {
         case MODE_MULTI_SCREEN:
@@ -329,7 +313,32 @@ EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer) {
             break;
     }
 
+    // post-blend grid
+    if (_myPostGridFlag) {
+        drawGrid(asl::Vector4f(1,1,0,1));
+    }
+
     postRender();
+}
+
+void
+EdgeBlender::drawGrid(const asl::Vector4f & theColor, unsigned theGridSize)
+{
+    glColor4fv(theColor.begin());
+    glBegin(GL_LINES);
+    for (unsigned y = 0; y < _myWindowHeight; y += theGridSize) {
+        for (unsigned x = 0; x < _myWindowWidth; x += theGridSize) {
+
+            float myX = x / (float) _myWindowWidth;
+            glVertex2f(myX, 0.0f);
+            glVertex2f(myX, 1.0f);
+        }
+
+        float myY = y / (float) _myWindowHeight;
+        glVertex2f(0.0f, myY);
+        glVertex2f(1.0f, myY);
+    }
+    glEnd();
 }
 
 void 
@@ -339,10 +348,11 @@ EdgeBlender::renderMultiScreen()
     //glClear(GL_COLOR_BUFFER_BIT); // UH: not necessary since we overwrite the entire screen
 
     // draw scene texture to suitable parts of the screen w/o any blending
-    float myTextureOffsetX = (_myColumnCount-1)*_myBlendWidth/2;
-    float myTextureOffsetY = (_myRowCount-1)*_myBlendWidth/2;
+    float myTextureOffsetX = (_myColumnCount-1) * _myBlendWidth * 0.5f;
+    float myTextureOffsetY = (_myRowCount-1) * _myBlendWidth * 0.5f;
     float myTexCoordY0 = myTextureOffsetY;
 
+    // draw scene texture
     glEnable(GL_TEXTURE_2D);
     for(unsigned i = 0; i < _myRowCount; ++i) {
         float myY  = float(i) / _myRowCount;
@@ -360,8 +370,8 @@ EdgeBlender::renderMultiScreen()
     }
     glDisable(GL_TEXTURE_2D);
 
+    // draw blending over scene texture
     if (_myBlendingFlag) {
-        // draw blending over scene texture
         for(unsigned i = 0; i < _myRowCount; ++i) {
             float myY  = float(i) / _myRowCount;
             float myY0 = (i > 0 ? myY + _myBlendWidth : myY);
@@ -412,7 +422,7 @@ EdgeBlender::renderMultiScreen()
 void 
 EdgeBlender::renderBlending() {
 
-    //blended edges
+    // blended edges
     if (_myEdges & BLEND_EDGE_LEFT) {        
         float myStart = (_myEdges & BLEND_EDGE_UP) ?
             _myBlendWidth : 0.0f;
@@ -446,7 +456,7 @@ EdgeBlender::renderBlending() {
         drawBlendedEdge(myStart, myEnd);
     }        
 
-    //corners
+    // corners
     if (_myEdges & BLEND_EDGE_LEFT && _myEdges & BLEND_EDGE_UP) {
         rotateTo(BLEND_EDGE_LEFT);
         drawBlendedCorner(0.0f, 0.0f); 
@@ -464,7 +474,7 @@ EdgeBlender::renderBlending() {
         drawBlendedCorner(0.0f, 0.0f); 
     }
 
-    //blacklevel
+    // blacklevel
     float myLeft = _myEdges & BLEND_EDGE_LEFT ? _myBlendWidth : 0.0f;
     float myRight = _myEdges & BLEND_EDGE_RIGHT ? 1.0f - _myBlendWidth : 1.0f;
     float myTop = _myEdges & BLEND_EDGE_UP ? _myBlendWidth : 0.0f;
@@ -480,7 +490,7 @@ EdgeBlender::preRender() {
     glLoadIdentity();
     gluOrtho2D(0.0f, 1.0f, 1.0f, 0.0f);
 
-    //load texture matrix
+    // load texture matrix
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
     glLoadIdentity();
@@ -500,7 +510,7 @@ EdgeBlender::preRender() {
 
 void 
 EdgeBlender::postRender() {
-    //restore attribs
+    // restore attribs
     glPopAttrib();
 
     // restore modelview
@@ -510,7 +520,7 @@ EdgeBlender::postRender() {
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
     
-    //put into model view
+    // put into model view
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -563,11 +573,11 @@ EdgeBlender::rotateTo(unsigned theEdge) {
             myAngle = 270.0f;
             break;
         default:
-            AC_WARNING << "theEdge " << theEdge << " unknown.";
+            AC_WARNING << "Unknown edge " << theEdge;
     }
     AC_DEBUG << "rotateTo edge=" << theEdge << " angle=" << myAngle;
 
-    //rotate to the edge
+    // rotate to the edge
     glLoadIdentity();
     glTranslatef(0.5f, 0.5f, 0.0f);
     glRotatef(myAngle, 0.0f, 0.0f, 1.0f);
@@ -650,19 +660,25 @@ EdgeBlender::copyToTexture()
     glEnable(GL_TEXTURE_2D);
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture);
 
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, _myWindowWidth, _myWindowHeight, 0);
+    CHECK_OGL_ERROR;
+
     if (_myCopyFrameBufferFlag) {
         if (!_myFrameBuffer) {
             _myFrameBuffer = new unsigned char[_myWindowWidth * _myWindowHeight * 3];
         }
-        glReadPixels(0, 0, _myWindowWidth, _myWindowHeight,
+
+        glReadPixels((GLint) _myFrameBufferArea[0], (GLint) _myFrameBufferArea[1],
+                     (GLsizei) _myFrameBufferArea[2], (GLsizei) _myFrameBufferArea[3],
                      GL_RGB, GL_UNSIGNED_BYTE, _myFrameBuffer);
+        CHECK_OGL_ERROR;
+
         glTexSubImage2D(GL_TEXTURE_2D, 0,
-                        0,0, _myWindowWidth, _myWindowHeight,
+                        (GLint) _myFrameBufferArea[0], (GLint) _myFrameBufferArea[1],
+                        (GLsizei) _myFrameBufferArea[2], (GLsizei) _myFrameBufferArea[3],
                         GL_RGB, GL_UNSIGNED_BYTE, _myFrameBuffer); 
-    } else {
-        glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, _myWindowWidth, _myWindowHeight, 0);
+        CHECK_OGL_ERROR;
     }
-    CHECK_OGL_ERROR;
 }
 
 void 
