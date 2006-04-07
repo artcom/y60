@@ -8,11 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//    $RCSfile: DSADriver.cpp,v $
-//     $Author: christian $
-//   $Revision: 1.19 $
-//       $Date: 2005/02/10 19:59:30 $
-//
 // Dieters Sensor Array...
 //
 //=============================================================================
@@ -36,7 +31,7 @@ DSADriver::DSADriver (asl::DLHandle theDLHandle) : PlugInBase(theDLHandle)
 void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
     const dom::NodePtr & myConfigNode = theConfiguration->childNode("DSADriver");
     if (!myConfigNode) {
-        AC_ERROR << "DSADriver: No <DSADirver> element found in configuration" << endl;
+        AC_ERROR << "DSADriver: No <DSADriver> element found in configuration";
         return;
     }
 
@@ -48,7 +43,7 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
             unsigned myComPort = asl::as<int>(myPortNode->getAttribute("comport")->nodeValue());
             unsigned myBaudRate = asl::as<int>(myPortNode->getAttribute("baudrate")->nodeValue());
 
-            DB(cerr << "Port " << myPortID << " on comport=" << myComPort << " @ " << myBaudRate << endl);
+            AC_DEBUG << "DSADriver: Port=" << myPortID << " on comport=" << myComPort << " @ " << myBaudRate;
             try {
                 SensorServerPtr mySensorServer(new SensorServer(myComPort, myBaudRate));
                 _mySensorServers[myPortID] = mySensorServer;
@@ -68,19 +63,18 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
 
             const asl::Vector2i myGridSize = asl::as<asl::Vector2i>(myArrayNode->getAttribute("gridsize")->nodeValue());
 
-            _myInterpolateFlag = true;
             if (myArrayNode->getAttribute("interpolate")) {
                 _myInterpolateFlag = asl::as<bool>(myArrayNode->getAttribute("interpolate")->nodeValue());
             }
-            DB(cerr << "DSADriver: interpolate=" << _myInterpolateFlag << endl);
+            AC_DEBUG << "DSADriver: interpolate=" << _myInterpolateFlag;
 
             SensorArrayPtr mySensorArray(new SensorArray(myArrayName,myGridSize));
             _mySensorArray[myArrayID] = mySensorArray;
 
             /*
-                * regular grid
-                * [portID,controllerID,bitNumber]
-                */
+             * regular grid
+             * [portID,controllerID,bitNumber]
+             */
             std::string myData = (*myArrayNode)("#text").nodeValue();
             typedef std::vector< std::vector< asl::Vector3i > > VectorOfVectorOfVector3i;
             VectorOfVectorOfVector3i mySensorMapping = asl::as<VectorOfVectorOfVector3i>(myData);
@@ -95,7 +89,7 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
 
                     SensorServerList::iterator it = _mySensorServers.find(myPortId);
                     if (it == _mySensorServers.end()) {
-                        AC_WARNING << "DSADriver: No such port for sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber << "; sensor ignored" << endl;
+                        AC_WARNING << "DSADriver: No such port for sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber << "; sensor ignored";
                     }
                     else {
                         mySensorArray->addSensor(myPortId,
@@ -137,20 +131,23 @@ vector<y60::EventPtr> DSADriver::poll()
 
                 asl::Vector2f myPosition((float)myRawEvents[i][0], (float)myRawEvents[i][1]);
                 unsigned int myCount = 1;
-                for (unsigned int j = 0; j < myRawEvents.size(); ++j) {
-                    if (i == j) {
-                        continue;
+                if (_myInterpolateFlag) {
+                    for (unsigned int j = 0; j < myRawEvents.size(); ++j) {
+                        if (i == j) {
+                            continue;
+                        }
+                        asl::Vector2i myDelta = asl::difference(myRawEvents[j], myRawEvents[i]);
+                        if (magnitude(myDelta) <= 1) {
+                            myPosition += asl::Vector2f((float)myRawEvents[j][0], (float)myRawEvents[j][1]);
+                            myCount++;
+                        }
                     }
-                    asl::Vector2i myDelta = asl::difference(myRawEvents[j], myRawEvents[i]);
-                    if (magnitude(myDelta) <= 1) {
-                        myPosition += asl::Vector2f((float)myRawEvents[j][0], (float)myRawEvents[j][1]);
-                        myCount++;
+                    if (myCount > 1) {
+                        myPosition = product(myPosition, 1.0f / float(myCount));
+                        AC_TRACE << "DSADriver: interpolated distance " << myPosition << "," << myCount;
                     }
                 }
-                if (myCount > 1) {
-                    myPosition = product(myPosition, 1.0f / float(myCount));
-                    DB(cerr << "DSADriver: interpolated distance " << myPosition << "," << myCount << endl);
-                }
+
                 y60::EventPtr myEvent(new y60::TouchEvent(sali->second->getName(), myPosition, sali->second->getGridSize(), float(myCount)));
                 myEvents.push_back(myEvent);
             }

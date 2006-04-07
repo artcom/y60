@@ -49,15 +49,76 @@ namespace y60 {
         return myNode;
     }
 
+    bool
+    setAlpha(dom::NodePtr theNode, float theAlpha) {
+
+        if (theNode->nodeName() == "body") {
+            AC_DEBUG << "Fetching shape from body: " << *theNode;
+            theNode = theNode->getElementById(theNode->getAttributeString("shape"));
+        }
+
+        dom::Node * myShapeNode;
+        if (theNode->nodeName() == "shape") {
+            myShapeNode = &*theNode;
+        } else if (theNode->nodeName() == "element") {
+            AC_DEBUG << "Parent of element: " << *(theNode->parentNode());
+            AC_DEBUG << "Grand-parent of element: " << *(theNode->parentNode()->parentNode());
+            myShapeNode = theNode->parentNode()->parentNode();
+        } else {
+            AC_ERROR << "Unsupported node type '" << theNode->nodeName() << "'";
+            return false;
+        }
+        ShapePtr myShape = myShapeNode->getFacade<Shape>();
+
+        dom::NodePtr myVertexDataNode = myShape->getNode().childNode("vertexdata", 0);
+        if (!myVertexDataNode) {
+            AC_ERROR << "Shape '" << myShape->get<NameTag>() << "' has no 'vertexdata'";
+            return false;
+        }
+
+        // XXX check material requirements either of all elements or only the given element
+        // if 'vertexparams=color' is found then do the code below
+        // else modify either 'surfacecolor' or alpha values of 'ambient', 'diffuse' etc.
+
+        dom::NodePtr myColorsNode = myVertexDataNode->childNodeByAttribute(SOM_VECTOR_VECTOR4F_NAME, NAME_ATTRIB, COLOR_ROLE);
+        if (!myColorsNode) {
+            AC_WARNING << "Shape '" << myShape->get<NameTag>() << "' has no vertex colors";
+            return false;
+        }
+
+        VectorOfVector4f & myColors = myColorsNode->firstChild()->nodeValueRefOpen<VectorOfVector4f>();
+        if (theNode->nodeName() == "shape") {
+            // set all vertex colors
+            for (unsigned i = 0; i < myColors.size(); ++i) {
+                myColors[i][3] = theAlpha;
+            }
+        } else {
+            // set only vertices that this element uses
+            dom::NodePtr myColorIndicesNode = theNode->childNodeByAttribute("indices", "role", "color");
+            if (myColorIndicesNode) {
+                VectorOfUnsignedInt myColorIndices = myColorIndicesNode->firstChild()->nodeValueRefOpen<VectorOfUnsignedInt>();
+                for (unsigned i = 0; i < myColorIndices.size(); ++i) {
+                    myColors[myColorIndices[i]][3] = theAlpha;
+                }
+                myColorIndicesNode->firstChild()->nodeValueRefClose<VectorOfUnsignedInt>();
+            } else {
+                AC_WARNING << "Element has no vertex color indices";
+            }
+        }
+        myColorsNode->firstChild()->nodeValueRefClose<VectorOfVector4f>();
+
+        return true;
+    }
+
     dom::NodePtr
-    createCanvas(y60::ScenePtr theScene, const std::string & theCanvasName) {
+    createCanvas(ScenePtr theScene, const std::string & theCanvasName) {
         CanvasBuilder myCanvas(theCanvasName);
         theScene->getSceneBuilder()->appendCanvas(myCanvas);
         return myCanvas.getNode();
     }
 
     dom::NodePtr
-    createQuad(y60::ScenePtr theScene, const std::string & theMaterialId,
+    createQuad(ScenePtr theScene, const std::string & theMaterialId,
         asl::Vector3f theTopLeftCorner,
         asl::Vector3f theBottomRightCorner)
     {
@@ -74,7 +135,7 @@ namespace y60 {
     }
 
 
-    dom::NodePtr createCrosshair(y60::ScenePtr theScene, const std::string & theMaterialId,
+    dom::NodePtr createCrosshair(ScenePtr theScene, const std::string & theMaterialId,
                                  float theInnerRadius, float theHairLength,
                                  const std::string & theName)
     {
@@ -124,7 +185,7 @@ namespace y60 {
     }
 
     dom::NodePtr
-    createAngleMarkup(y60::ScenePtr theScene, const std::string & theMaterialId,
+    createAngleMarkup(ScenePtr theScene, const std::string & theMaterialId,
                          const asl::Vector3f & theApex,
                          const asl::Vector3f & thePointA,  const asl::Vector3f & thePointB,
                          bool theOuterAngleFlag, const std::string & theName)
@@ -199,7 +260,7 @@ namespace y60 {
     }
 
     dom::NodePtr
-    createDistanceMarkup(y60::ScenePtr theScene, const std::string & theMaterialId,
+    createDistanceMarkup(ScenePtr theScene, const std::string & theMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
                          const std::string & theName)
     {
@@ -220,7 +281,7 @@ namespace y60 {
     }
 
     dom::NodePtr
-    createLineStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
+    createLineStrip(ScenePtr theScene, const std::string & theMaterialId,
                          const std::vector<asl::Vector3f> & thePositions,
                          const std::vector<asl::Vector2f> & theTexCoords,
                          const std::vector<asl::Vector4f> & theColors)
@@ -230,7 +291,7 @@ namespace y60 {
     }
 
     dom::NodePtr
-    createQuadStrip(y60::ScenePtr theScene, const std::string & theMaterialId,
+    createQuadStrip(ScenePtr theScene, const std::string & theMaterialId,
                 const std::vector<asl::Vector3f> & thePositions,
                 const std::vector<asl::Vector2f> & theTexCoords,
                 const std::vector<asl::Vector4f> & theColors) 
@@ -240,7 +301,7 @@ namespace y60 {
     }
 
     dom::NodePtr
-    createStrip(const std::string & theType, y60::ScenePtr theScene, 
+    createStrip(const std::string & theType, ScenePtr theScene, 
                 const std::string & theMaterialId,
                 const std::vector<asl::Vector3f> & thePositions,
                 const std::vector<asl::Vector2f> & theTexCoords,
@@ -319,7 +380,7 @@ namespace y60 {
     }
 
     dom::NodePtr
-    createTriangleMeshMarkup(y60::ScenePtr theScene, const std::string & theLineMaterialId,
+    createTriangleMeshMarkup(ScenePtr theScene, const std::string & theLineMaterialId,
                              const std::string & theAreaMaterialId,
                              const std::vector<asl::Vector3f> & thePositions,
                              const std::string & theName)
@@ -571,7 +632,7 @@ namespace y60 {
     }
 
     dom::NodePtr
-    createLambertMaterial(y60::ScenePtr theScene,
+    createLambertMaterial(ScenePtr theScene,
                         const asl::Vector4f & theDiffuseColor,
                         const asl::Vector4f & theAmbientColor,
                         const std::string & theName)
@@ -591,7 +652,7 @@ namespace y60 {
     }
 
     dom::NodePtr
-    createColorMaterial(y60::ScenePtr theScene,
+    createColorMaterial(ScenePtr theScene,
                         const asl::Vector4f & theColor,
                         const std::string & theName,
                         bool theTransparencyFlag)
@@ -794,9 +855,8 @@ calcUV(const Point3f & myPosition,
     return quotient((asVector(myModelPosition) - asVector(theVoxelBox[Box3f::MIN])), theVoxelBox.getSize());
 }
 
-
 dom::NodePtr
-createVoxelProxyGeometry(y60::ScenePtr theScene, const asl::Box3f & theVoxelBox,
+createVoxelProxyGeometry(ScenePtr theScene, const asl::Box3f & theVoxelBox,
                          const asl::Matrix4f & theModelMatrix, const asl::Matrix4f & theCameraMatrix,
                          const Vector3i & theVolumeSize, float theSampleRate,
                          const std::string & theMaterialId, const std::string & theName)

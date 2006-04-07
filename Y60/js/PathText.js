@@ -75,14 +75,14 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
                 // line break
-                var myNewLineOffet = 0;
+                var myNewLineOffset = 0;
                 if (_myText.length > i+1) {
                     if (_myText[i+1] == "\n") {
                         //print("found carriage return AND a newline");
-                        myNewLineOffet = 1;
+                        myNewLineOffset = 1;
                     }
                 }                
-                return i + myNewLineOffet;
+                return i + myNewLineOffset;
             }
             var myCharacter = _myCharacters[i];
             if (myCharacter == null) {
@@ -141,10 +141,11 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
             var myStart = mySegment.start;
             var myEnd = sum(myStart, myForwardVector);
-            myPositions[i * 4 + 0] = sum(myStart, myBottomOffset);
-            myPositions[i * 4 + 1] = sum(myEnd, myBottomOffset);
-            myPositions[i * 4 + 2] = sum(myEnd, myTopOffset);
-            myPositions[i * 4 + 3] = sum(myStart, myTopOffset);
+            var j = i * 4;
+            myPositions[j + 0] = sum(myStart, myBottomOffset);
+            myPositions[j + 1] = sum(myEnd, myBottomOffset);
+            myPositions[j + 2] = sum(myEnd, myTopOffset);
+            myPositions[j + 3] = sum(myStart, myTopOffset);
         }
 
         // write-back positions

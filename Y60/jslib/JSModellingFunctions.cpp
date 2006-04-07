@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: JSModellingFunctions.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.10 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
 //=============================================================================
 
 #include "JSModellingFunctions.h"
@@ -569,6 +561,29 @@ CreateVoxelProxyGeometry(JSContext * cx, JSObject * obj, uintN argc, jsval *argv
 
 }
 
+JS_STATIC_DLL_CALLBACK(JSBool)
+SetAlpha(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Set body/shape alpha.");
+        DOC_PARAM("theNode", "The node to operate on, can be a body or a shape.", DOC_TYPE_NODE);
+        DOC_PARAM("theAlpha", "Alpha value to set.", DOC_TYPE_FLOAT);
+        DOC_END;
+
+        ensureParamCount(argc, 2);
+
+        dom::NodePtr myNode;
+        float myAlpha;
+
+        convertFrom(cx, argv[0], myNode);
+        convertFrom(cx, argv[1], myAlpha);
+
+        y60::setAlpha(myNode, myAlpha);
+
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns string representation fo the modelling functions");
@@ -608,6 +623,7 @@ JSModellingFunctions::StaticFunctions() {
         {"createQuadStack",             CreateQuadStack,             5},
         {"createUnlitTexturedMaterial", CreateUnlitTexturedMaterial, 7},
         {"createVoxelProxyGeometry",    CreateVoxelProxyGeometry,    7},
+        {"setAlpha",                    SetAlpha,                    2},
         {0}
     };
     return myFunctions;
