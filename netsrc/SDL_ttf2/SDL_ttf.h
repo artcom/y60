@@ -88,6 +88,9 @@ extern DECLSPEC void TTF_SetFitting(int theFittingFlag);
 /* Get the kerning between two characters  [ART+COM Patch] */
 extern DECLSPEC double TTF_Kerning(TTF_Font * theFont, const Uint16 theFirstCharacter, const Uint16 theSecondCharacter);
 
+/* Is a character part of font  [ART+COM Patch]  (-1 -> failed, 0 ->o.k.) */
+extern DECLSPEC int TTF_HasGlyph(TTF_Font * theFont, const Uint16 theCharacter);
+
 /* Get the kerning between two characters  [ART+COM Patch] */
 extern DECLSPEC void TTF_SetTracking(float theTracking);
 

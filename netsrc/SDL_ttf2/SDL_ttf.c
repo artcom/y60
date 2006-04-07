@@ -1014,6 +1014,17 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h) {
 	return status;
 }
 
+/* Is a character part of font  [ART+COM Patch] */
+int TTF_HasGlyph(TTF_Font * theFont, const Uint16 theCharacter) {
+	FT_Face face = theFont->face;
+   
+	if (FT_Get_Char_Index( face, theCharacter )  == 0) {
+        return -1;
+    } else {
+        return 0;
+    }   
+ }
+
 /* Get kerning between two glyphs by characters [ART+COM Patch] */
 double TTF_Kerning(TTF_Font * theFont, const Uint16 theFirstCharacter, const Uint16 theSecondCharacter) {
     double myKerning = 0.0;
