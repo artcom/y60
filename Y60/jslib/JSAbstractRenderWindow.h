@@ -556,6 +556,16 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             return Method<DERIVED>::call((MyMethod)&DERIVED::getKerning,cx,obj,argc,argv,rval);
         }
         static JSBool
+        hasGlyph(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Is a glyph part of the given font");
+            DOC_PARAM("theFont", "Font name", DOC_TYPE_STRING);
+            DOC_PARAM("theGlyph", "The glyph", DOC_TYPE_STRING);
+            DOC_RVAL("Result (-1 ->no, 0->o.k.", DOC_TYPE_FLOAT);
+            DOC_END;
+            typedef bool (DERIVED::*MyMethod)(const std::string &, const std::string &);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::hasGlyph,cx,obj,argc,argv,rval);
+        }
+        static JSBool
         setTracking(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Set font tracking");
             DOC_PARAM("theTracking", "Tracking value", DOC_TYPE_FLOAT);
@@ -698,6 +708,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 {"getFontMetrics",     getFontMetrics,           1},
                 {"getGlyphMetrics",    getGlyphMetrics,          7},
                 {"getKerning",         getKerning,               3},
+                {"hasGlyph",           hasGlyph,               3},
                 {"setTracking",        setTracking,              1},
                 // animations
                 {"runAnimations",      runAnimations,            1},

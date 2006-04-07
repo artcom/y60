@@ -150,6 +150,9 @@ namespace jslib {
                           const std::string & theFirstCharacter,
                           const std::string & theSecondCharacter);
 
+        bool hasGlyph(const std::string & theFontName,
+                       const std::string & theCharacter);
+
         void setTracking(float theTracking);
 
         // Animation Manager

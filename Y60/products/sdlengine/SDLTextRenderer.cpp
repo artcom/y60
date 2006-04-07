@@ -248,6 +248,24 @@ namespace y60 {
         DB(AC_TRACE << "### myFont=" << myFontName << " Ch=" << theFirstCharacter << theSecondCharacter << " myKerning=" << myKerning << endl;)
         return myKerning;
     }
+    
+    bool SDLTextRenderer::hasGlyph(const std::string& theFontName,
+                                       const std::string& theCharacter) const
+    {
+        SDLFontInfo::FONTTYPE myFontType = SDLFontInfo::NORMAL;
+        std::string myFontName = makeFontName(theFontName, myFontType);
+        const TTF_Font* myFont = getFont(myFontName);
+        if (!myFont) {
+            throw GLTextRendererException(string("Font: ") + myFontName + " not in fontlibrary", PLUS_FILE_LINE);
+        }
+
+        Uint16 myUnicodeChar[2];
+        UTF8_to_UNICODE(myUnicodeChar,  theCharacter.c_str(),  1);
+        double myResult = TTF_HasGlyph((TTF_Font*) myFont, myUnicodeChar[0]);
+        DB(AC_TRACE << "### myFont=" << myFontName << " Ch=" << theCharacter << " available=" << myResult << endl;)
+        return myResult==0;
+
+    }
 
     int
     SDLTextRenderer::calcHorizontalAlignment(unsigned theSurfaceWidth, unsigned theLineWidth,

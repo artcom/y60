@@ -33,6 +33,10 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         var myPositions = myVertexPositions.childNode('#text')[1];
         return myPositions;
     }
+    self.getPositionsNode = function() {
+        var myVertexPositions = getDescendantByAttribute(_myShape, "name", "position", true);
+        return myVertexPositions;
+    }
 
     self.getColors = function() {
         var myVertexColors = getDescendantByAttribute(_myShape, "name", "color", true);

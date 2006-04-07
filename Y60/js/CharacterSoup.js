@@ -77,7 +77,8 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         for (var i = 0; i < theText.length; ++i) {
 
             var myChar = theText[i];
-            if (myChar == "\n" || myChar == "\r" || myChar == "\t") {
+            var myFound = window.hasGlyph(myFontName, myChar);
+            if (!myFound || myChar == "\n" || myChar == "\r" || myChar == "\t") {
                 // map white space characters to space
                 myChar = asUnicodeString(" ");
             }
@@ -86,6 +87,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                 // character is not in alphabet map -> render it into alphabet image
                 var myTargetUVPosition = new Vector2f(_myAlphabetMap[theSize].nextCharSlot);
                 var myMetric = window.getGlyphMetrics(myFontName, myChar);
+                //print("i="+i, "font="+theFontname, "char=" + myChar, "max=" + myMetric.max,"min="+myMetric.min,"advance="+myMetric.advance, "found="+myFound);
                 var myGlyphSize = difference(myMetric.max, myMetric.min);
 
                 var myTmpImage = window.scene.createImage(myGlyphSize.x, myGlyphSize.y, "RGBA");

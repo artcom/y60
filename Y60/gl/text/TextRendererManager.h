@@ -60,6 +60,7 @@ namespace y60 {
                     const std::string & theCharacter,
                     asl::Box2f & theGlyphBox, double & theAdvance) const;
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
+            bool hasGlyph(const std::string & theFontName, const std::string & theCharacter) const;
             void setTracking(float theTracking);
             void setMaxFontFittingSize(unsigned theSize);
 

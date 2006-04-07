@@ -774,7 +774,6 @@ Exit(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         return JS_FALSE;
     } HANDLE_CPP_EXCEPTION;
 }
-
 #ifdef GC_MARK_DEBUG
 extern "C" JS_FRIEND_DATA(FILE *) js_DumpGCHeap;
 #endif

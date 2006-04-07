@@ -924,7 +924,10 @@ namespace jslib {
                                             const std::string & theSecondCharacter) {
         return _myRenderer->getTextManager().getKerning(theFontName, theFirstCharacter, theSecondCharacter);
     }
-
+    bool AbstractRenderWindow::hasGlyph(const std::string & theFontName,
+                                            const std::string & theCharacter) {
+        return _myRenderer->getTextManager().hasGlyph(theFontName, theCharacter);
+    }
     void AbstractRenderWindow::setTracking(float theTracking) {
         _myRenderer->getTextManager().setTracking(theTracking);
     }

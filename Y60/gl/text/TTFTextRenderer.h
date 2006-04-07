@@ -59,6 +59,9 @@ namespace y60 {
                     const std::string & theFirstCharacter,
                     const std::string & theSecondCharacter) const = 0;
 
+            virtual bool hasGlyph(const std::string & theFontName,
+                    const std::string & theCharacter) const = 0;
+
             virtual void setMaxFontFittingSize(unsigned theSize) = 0;
     };
     typedef asl::Ptr<TTFTextRenderer> TTFTextRendererPtr;

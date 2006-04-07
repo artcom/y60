@@ -200,6 +200,12 @@ namespace y60 {
     {
         return _myTTFRenderer->getKerning(theFontName, theFirstCharacter, theSecondCharacter);
     }
+    
+    bool
+    TextRendererManager::hasGlyph(const std::string& theFontName, const std::string& theCharacter) const
+    {
+        return _myTTFRenderer->hasGlyph(theFontName, theCharacter);
+    }
 
     void
     TextRendererManager::setTracking(float theTracking) {

@@ -54,7 +54,8 @@ namespace y60 {
 
             bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const;
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
-
+            bool hasGlyph(const std::string& theFontName, const std::string& theCharacter) const;
+    
             void setMaxFontFittingSize(unsigned theSize) {
                 _myMaxFontFittingSize = theSize;
             }
