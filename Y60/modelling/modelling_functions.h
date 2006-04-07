@@ -45,31 +45,34 @@ dom::NodePtr createPhongTexturedMaterial(ScenePtr theScene,
 
 dom::NodePtr createUnlitTexturedColoredMaterial(y60::ScenePtr theScene,
                                  const std::string & theTextureFilename,
-                                 const std::string & theName = "ColorMaterial",
+                                 const std::string & theName = "UnlitTexturedColored",
                                  bool theSpriteFlag = false,
                                  unsigned theDepth = 1);
 
 dom::NodePtr createUnlitTexturedMaterial(y60::ScenePtr theScene,
                                  const std::string & theTextureFilename,
-                                 const std::string & theName = "Material",
+                                 const std::string & theName = "UnlitTextured",
                                  bool theTransparencyFlag = false,
                                  bool theSpriteFlag = false,
                                  unsigned theDepth = 1,
-                                 const asl::Vector4f & theColor = asl::Vector4f(1.0, 1.0, 1.0, 1.0));
+                                 const asl::Vector4f & theColor = asl::Vector4f(1,1,1,1));
 
 dom::NodePtr createUnlitTexturedMaterial(y60::ScenePtr theScene,
                                  dom::NodePtr theImageNode,
-                                 const std::string & theName = "Material",
+                                 const std::string & theName = "UnlitTextured",
                                  bool theTransparencyFlag = false,
                                  bool theSpriteFlag = false,
-                                 const asl::Vector4f & theColor = asl::Vector4f(1.0, 1.0, 1.0, 1.0));
+                                 const asl::Vector4f & theColor = asl::Vector4f(1,1,1,1));
 
 dom::NodePtr createLambertMaterial(y60::ScenePtr theScene,
-                                   const asl::Vector4f & theDiffuseColor = asl::Vector4f(1.0, 1.0, 1.0, 1.0),
-                                   const asl::Vector4f & theAmbientColor = asl::Vector4f(0.0, 0.0, 0.0, 1.0));
+                                   const asl::Vector4f & theDiffuseColor = asl::Vector4f(1,1,1,1),
+                                   const asl::Vector4f & theAmbientColor = asl::Vector4f(0,0,0,1),
+                                   const std::string & theName = "Lambert");
 
 dom::NodePtr createColorMaterial(y60::ScenePtr theScene,
-                                 const asl::Vector4f & theColor = asl::Vector4f(1.0, 1.0, 1.0, 1.0));
+                                 const asl::Vector4f & theColor = asl::Vector4f(1,1,1,1),
+                                 const std::string & theName = "Color",
+                                 bool theTransparencyFlag = false);
 
 dom::NodePtr createTransform(dom::NodePtr theParentNode);
 dom::NodePtr createBody(dom::NodePtr theParentNode, const std::string & theShapeId);

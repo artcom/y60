@@ -67,7 +67,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         if (_myNormals.length > 0) {
             myShapeString += '  <vectorofvector3f name="normal">' +  arrayToString(_myNormals) + '</vectorofvector3f>\n';
         }
-        if (_myColors.length >0) {
+        if (_myColors.length > 0) {
             myShapeString += '  <vectorofvector4f name="color">' + arrayToString(_myColors) + '</vectorofvector4f>\n';
         }
         if (_myUVCoords.length >0) {
@@ -83,10 +83,10 @@ ShapeBuilder.prototype.Constructor = function(obj) {
             if (myElement.normals.length > 0) {
                 myShapeString += '   <indices vertexdata="normal" role="normal">' + arrayToString(myElement.normals) + '</indices>\n';
             }
-            if (myElement.colors.length >0) {
+            if (myElement.colors.length > 0) {
                 myShapeString +='   <indices vertexdata="color" role="color">' + arrayToString(myElement.colors) + '</indices>\n';
             }
-            if (myElement.texcoords.length >0) {
+            if (myElement.texcoords.length > 0) {
                 myShapeString +='   <indices vertexdata="map1" role="texcoord0">' + arrayToString(myElement.texcoords) + '</indices>\n';
             }
             myShapeString +='  </elements>\n';

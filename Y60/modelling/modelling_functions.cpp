@@ -557,7 +557,7 @@ namespace y60 {
                                 unsigned theDepth, const Vector4f & theColor)
     {
         MaterialBuilder myMaterialBuilder(theName, false);
-        string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
+        theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
         myMaterialBuilder.setTransparencyFlag(theTransparencyFlag);
         appendUnlitProperties(myMaterialBuilder, theColor);
         appendBlendFunction(myMaterialBuilder);
@@ -573,10 +573,11 @@ namespace y60 {
     dom::NodePtr
     createLambertMaterial(y60::ScenePtr theScene,
                         const asl::Vector4f & theDiffuseColor,
-                        const asl::Vector4f & theAmbientColor)
+                        const asl::Vector4f & theAmbientColor,
+                        const std::string & theName)
     {
-        MaterialBuilder myMaterialBuilder("myMaterial", false);
-        string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
+        MaterialBuilder myMaterialBuilder(theName, false);
+        theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
         VectorOfRankedFeature myLightingFeature;
         createLightingFeature(myLightingFeature, LAMBERT);
         myMaterialBuilder.setType(myLightingFeature);
@@ -591,10 +592,13 @@ namespace y60 {
 
     dom::NodePtr
     createColorMaterial(y60::ScenePtr theScene,
-                        const asl::Vector4f & theColor)
+                        const asl::Vector4f & theColor,
+                        const std::string & theName,
+                        bool theTransparencyFlag)
     {
-        MaterialBuilder myMaterialBuilder("myMaterial", false);
+        MaterialBuilder myMaterialBuilder(theName, false);
         theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
+        myMaterialBuilder.setTransparencyFlag(theTransparencyFlag);
         appendUnlitProperties(myMaterialBuilder, theColor);
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();

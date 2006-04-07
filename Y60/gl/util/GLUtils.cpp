@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,6 +7,7 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
+
 extern "C" {
 typedef void (*GdkGLProc)(void);
 GdkGLProc gdk_gl_get_proc_address            (const char *proc_name);
@@ -203,11 +204,10 @@ namespace y60 {
             case ADD:
                return GL_ADD;
             default:
-               throw GlTextureFunctionException("Unknown texture function.", PLUS_FILE_LINE);
+               throw GlTextureFunctionException("Unknown texture apply mode.", PLUS_FILE_LINE);
         }
         return GLenum(0);
     }
-
 
     GLenum 
     asGLBlendEquation(const BlendEquation & theBlendEquation) {
@@ -396,7 +396,7 @@ namespace y60 {
     GLenum
     asGLLightEnum(unsigned theLightNum) {
 #if 1
-        if (theLightNum >= 0 && theLightNum <= 7) {
+        if (theLightNum <= 7) {
             return GL_LIGHT0 + theLightNum;
         }
         throw GlLightOutOfRangeException("too many light sources",PLUS_FILE_LINE);
@@ -427,6 +427,14 @@ namespace y60 {
     DEFINE_EXCEPTION(GlPlaneOutOfRangeException, asl::Exception);
     GLenum 
     asGLClippingPlaneId(unsigned thePlaneNum) {
+#if 1
+        if (thePlaneNum <= 5) {
+            return GL_CLIP_PLANE0 + thePlaneNum;
+        }
+        throw GlPlaneOutOfRangeException(
+                std::string("too many Clipping Planes, max index = 5, got ") +
+                asl::as_string(thePlaneNum), PLUS_FILE_LINE);
+#else
         switch (thePlaneNum) {
             case 0 :
                 return GL_CLIP_PLANE0;
@@ -445,6 +453,7 @@ namespace y60 {
                         std::string("too many Clipping Planes, max index = 5, got ") +
                         asl::as_string(thePlaneNum), PLUS_FILE_LINE);
         }
+#endif
     }
 
     DEFINE_EXCEPTION(GlTextureOutOfRangeException, asl::Exception);
@@ -452,10 +461,10 @@ namespace y60 {
     GLenum
     asGLTextureRegister(unsigned theIndex) {
 #if 1
-        if (theIndex >= 0 && theIndex <= 7) {
+        if (theIndex <= 7) {
             return GL_TEXTURE0_ARB + theIndex;
         }
-        throw GlTextureOutOfRangeException("Primitive uses more texture units than currently implemented", PLUS_FILE_LINE);
+        throw GlTextureOutOfRangeException("Primitive uses more texture units than implemented", PLUS_FILE_LINE);
 #else
         GLenum myUnit;
         switch (theIndex) {
@@ -526,7 +535,7 @@ namespace y60 {
             case SPHERE_MAP:
                 return GL_SPHERE_MAP;
             default:
-                throw asl::Exception("Unkown TexCoordMode", PLUS_FILE_LINE);
+                throw asl::Exception(std::string("Unkown TexCoordMode ") + asl::as_string(theMode), PLUS_FILE_LINE);
         }
         return GL_OBJECT_LINEAR;
     }

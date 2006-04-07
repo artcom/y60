@@ -1883,7 +1883,9 @@ diffuse      - diffuse color
 ambient      - ambient color
 specular     - specular color
 shininess    - strength of specular reflection
-surfacecolor - color for unlit materials</xs:documentation>
+surfacecolor - color for unlit materials
+linewidth    - line width for line primitives
+            </xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">

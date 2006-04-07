@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,17 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//   $Id: PropertyNames.h,v 1.2 2005/04/04 14:40:14 david Exp $
-//   $RCSfile: PropertyNames.h,v $
-//   $Author: david $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/04 14:40:14 $
-//
-//
-//  Description: This file contains all the wellknown names for the
-//               SOM
-//
-// (CVS log at the bottom of this file)
+//  Description: This file contains all the wellknown names for the SOM
 //
 //=============================================================================
 
@@ -52,4 +42,3 @@ namespace y60 {
     static const char * TARGETBUFFERS_PROPERTY     = "targetbuffers";
 } // namespace
 #endif
-

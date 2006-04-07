@@ -221,10 +221,11 @@ namespace y60 {
 
             const BlendEquation & myBlendEquation= myPropFacade->get<BlendEquationTag>();
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
-
             if (glBlendEquation) {
                 glBlendEquation(myEquation);
             }
+
+            //glLineWidth(myPropFacade->get<LineWidthTag>());
 
 #if 0
             // experimental code

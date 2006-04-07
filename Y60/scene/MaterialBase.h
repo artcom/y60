@@ -52,6 +52,7 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(TargetBuffersTag, y60::TargetBuffers, TARGETBUFFERS_PROPERTY, TargetBuffers((1<<RED_MASK)|(1<<GREEN_MASK)|(1<<BLUE_MASK)|(1<<ALPHA_MASK)|(1<<DEPTH_MASK)));
     DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfString, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
     DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, BlendEquation, BLENDEQUATION_PROPERTY, EQUATION_ADD);
+    DEFINE_MATERIAL_PROPERTY_TAG(LineWidthTag, float, LINEWIDTH_PROPERTY, float(1.0));
 
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,
@@ -67,7 +68,8 @@ namespace y60 {
         public ShininessTag::Plug,
         public BlendFunctionTag::Plug,
         public TargetBuffersTag::Plug,
-        public BlendEquationTag::Plug
+        public BlendEquationTag::Plug,
+        public LineWidthTag::Plug
     {
         public:
             MaterialPropertiesFacade(dom::Node & theNode) :
@@ -80,7 +82,8 @@ namespace y60 {
                 MaterialEmissiveTag::Plug(this),
                 BlendFunctionTag::Plug(this),
                 TargetBuffersTag::Plug(this),
-                BlendEquationTag::Plug(this)
+                BlendEquationTag::Plug(this),
+                LineWidthTag::Plug(this)
             {}
             IMPLEMENT_FACADE(MaterialPropertiesFacade);
     };

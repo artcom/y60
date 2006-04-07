@@ -47,7 +47,7 @@ namespace y60 {
 
 template <const char* NAME>
 struct GLExceptionHelper {
-    static void throwMissingException() {
+    static void throwMissingExtension() {
         throw y60::MissingExtensionsException(NAME, PLUS_FILE_LINE);
     }
     static void throwMissingFunction() {
@@ -65,7 +65,7 @@ struct GLExceptionHelper {
 #ifdef _ac_render_GLUtils_cpp_
     #define DEF_PROC_ADDRESS(T,X) \
     extern const char _name_ ## X [] = #X; \
-    T  _ac_ ## X = (T)&y60::GLExceptionHelper< _name_ ##X>::throwMissingException;
+    T  _ac_ ## X = (T)&y60::GLExceptionHelper< _name_ ##X>::throwMissingExtension;
 #else
     #define DEF_PROC_ADDRESS(T,X) \
     extern  T       _ac_ ## X;
