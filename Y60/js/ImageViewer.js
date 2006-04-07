@@ -557,7 +557,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
             _myMovieNode.audio = 0;
-            _myMovieNode.decoderhint = "y60FFMpegDecoder"; //theDecoderHint;
+            _myMovieNode.decoderhint = theDecoderHint;
             _myMovieOverlay = new MovieOverlay(self.getOverlayManager(), _myMovieNode);
         }
 
