@@ -184,7 +184,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
                     myCharacter.uv, myCharacter.uvsize, false);
         }
 
-        var myName = "Text_" + urlEncode(_myText);
+        var myName = "Text_";// + urlEncode(_myText);
 
         _myShape = myShapeBuilder.buildNode();
         _myShape.name = myName;
