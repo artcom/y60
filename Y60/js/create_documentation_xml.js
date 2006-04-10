@@ -23,11 +23,11 @@ use("SyntaxHighlighter.js");
 const VALIDATE_HTML = false;
 
 if (!("0" in arguments)) {
-    print("Usage: create_documentation.js outputfile");
+    print("Usage: create_documentation.js directory");
     exit(1);
 }
 
-var ourResultFile        = arguments[0];
+var ourDirectory         = arguments[0];
 var ourTutorialIndex     = [];
 var ourModuleIndex       = [];
 var ourSyntaxHighlighter = new SyntaxHighlighter();
@@ -36,6 +36,10 @@ main();
 
 function main() {
     try {
+        if (!isDirectory(ourDirectory)) {
+            createDirectory(ourDirectory);
+        }
+
         includePath("${PRO}/lib");
         plugComponentsForDocumentation();
         var myModules = [];
@@ -46,7 +50,7 @@ function main() {
         createIndex(myModules);
         createTutorials();
         generateJSLibDocumentation(myModules);
-        print("Successfully created documentation " + ourResultFile);
+        print("Successfully created documentation " + ourDirectory + "/jslibdoc.xml");
     } catch (ex) {
         reportException(ex);
         exit(1);
@@ -127,7 +131,7 @@ function generateJSLibDocumentation(theModules) {
             }
         }
     }
-    myDom.saveFile(ourResultFile);
+    myDom.saveFile(ourDirectory + "/jslibdoc.xml");
 }
 
 function createFunctionDocumentation(theFunctions, theResultNode) {
@@ -255,12 +259,7 @@ function createTutorials() {
         myY60Keywords += myWord;
     }
     ourSyntaxHighlighter.addKeywords(myY60Keywords, "y60class");
-/*
-    var myDir = ourDirectory + "/tutorials"
-    if (!isDirectory(ourDirectory)) {
-        createDirectory(ourDirectory);
-    }
-*/
+
     var myDom = new Node("<tutorials/>").firstChild;
     for (var i = 0; i < myTutorials.length; ++i) {
         var myTutorial = myTutorials[i];
@@ -319,9 +318,9 @@ function createTutorials() {
             myNode.appendChild(new Node("<explanation><![CDATA[\n" + myTutorialExplanation + "]]></explanation>").firstChild);
             myNode.appendChild(new Node("<tutorialcode><![CDATA[\n" + myTutorialCode + "]]></tutorialcode>").firstChild);
 
-            //exec("bash -c 'cp $PRO/tutorials/BaselineImages/*.png " + ourDirectory + "/tutorials/'");
+            exec("bash -c 'cp $PRO/tutorials/BaselineImages/*.png " + ourDirectory);
         }
     }
-    print("Create tutorial xml");
-    myDom.saveFile("tutorials.xml");
+    print("Succesfully created " + ourDirectory + "/tutorial.xml");
+    myDom.saveFile(ourDirectory + "/tutorials.xml");
 }
