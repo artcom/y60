@@ -259,7 +259,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         } else {
             _myMaterial = theMaterial;
         }
-        _myColor = new Vector4f(0,0,1,1);
+        _myColor = new Vector4f(1,1,1,1); // boring ol' white
     }
 
     setup();
