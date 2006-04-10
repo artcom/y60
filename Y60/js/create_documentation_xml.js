@@ -318,7 +318,7 @@ function createTutorials() {
             myNode.appendChild(new Node("<explanation><![CDATA[\n" + myTutorialExplanation + "]]></explanation>").firstChild);
             myNode.appendChild(new Node("<tutorialcode><![CDATA[\n" + myTutorialCode + "]]></tutorialcode>").firstChild);
 
-            exec("bash -c 'cp $PRO/tutorials/BaselineImages/*.png " + ourDirectory);
+            exec("bash -c 'cp $PRO/tutorials/BaselineImages/*.png " + ourDirectory + "'");
         }
     }
     print("Succesfully created " + ourDirectory + "/tutorial.xml");
