@@ -54,6 +54,14 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
                 return Number(_myValue);
             }
         }
+        
+        this.help = function() {
+            if ("help" in _myNode) {
+                return _myNode.help;   
+            } else {
+                return "";
+            }            
+        }
 
         function isValidNode(theNode) {
             return (theNode.nodeName != "#comment");
@@ -329,17 +337,22 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
     }
 
     function updateOnScreenDisplay() {
-        displayMessage(_myCurrentSection.nodeName, _myCurrentSetting.name() + " = " + _myCurrentSetting.value());
+        displayMessage(_myCurrentSection.nodeName, _myCurrentSetting.name() + " = " + _myCurrentSetting.value(), _myCurrentSetting.help());
     }
 
-    function displayMessage(theFirstLine, theSecondLine) {
+    function displayMessage(theFirstLine, theSecondLine, theThirdLine) {
+        if (!theSecondLine) {
+            theSecondLine = "";
+        }
+        
+        if (!theThirdLine) {
+            theThirdLine = "";
+        }
+        
         _mySceneViewer.setMessage("", 0);
         _mySceneViewer.setMessage(theFirstLine, 1);
-        if (theSecondLine) {
-            _mySceneViewer.setMessage(theSecondLine, 2);
-        } else {
-            _mySceneViewer.setMessage("", 2);
-        }
+        _mySceneViewer.setMessage(theSecondLine, 2);
+        _mySceneViewer.setMessage(theThirdLine, 3);
     }
 
     function printHelp() {

@@ -193,8 +193,6 @@ namespace y60 {
                 // throw exception
                 throw ImageLoaderException(_myFilename + " - " + static_cast<const char *>(e), PLUS_FILE_LINE);
 #endif
-            } catch(PLPixelFormat::UnsupportedPixelFormat & e) {
-                throw ImageLoaderException(_myFilename + " - UnsupportedPixelFormat: " + e.m_what, PLUS_FILE_LINE);
 			} catch(std::exception & e) {
                 throw ImageLoaderException(_myFilename + " - " + e.what(), PLUS_FILE_LINE);
 			} catch(const asl::Exception &) {

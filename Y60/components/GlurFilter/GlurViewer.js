@@ -39,7 +39,7 @@ function glurImage(theImageNode) {
 
     // this actually is the diameter (must not be even!)
     // only half of the calculated values are actually used (quick hack)
-    var radius = 5;  //65;
+    var radius = 3;  //65;
     for (var x = 0; x < radius; x++) {
         var z = ((x + 2)/(radius));
         var dev = 0.5 + (((radius * radius)) * 0.001); // you can adjust this factor to change the shape/center-weighting of the gaussian
@@ -71,16 +71,18 @@ myOverlay.position = [300, 100];
 window.backgroundColor = [0.5,0.5,0.5];
 glurImage(myOverlay.image);
 
-/*
+
 window.onStartMainLoop = function() {
-    window.loadTTF("Arial", "arial.ttf", 18);
+    window.loadTTF("Arial", "${PRO}/testmodels/fonts/arial.ttf", 18);
     var myImageNode = window.scene.images.appendChild(new Node("<image/>").firstChild);
+    glurImage(myImageNode);
     window.renderTextAsImage(myImageNode, "hallo welt", "Arial", 200, 100)
     var myTextOverlay = new ImageOverlay(window.scene, myImageNode, [100,100]);
     window.scene.update(Scene.IMAGES);
-    saveImage(myImageNode, "test.png");
-    glurImage(myImageNode);
+    //saveImage(myImageNode, "test.png");
+    print(myImageNode.filter_params);
+    applyImageFilter(myImageNode, "glur", [1,1,1,1,0.547441,0.452559]);
 }
-*/
+
 
 window.go();

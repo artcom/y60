@@ -12,6 +12,7 @@
 #define INCL_PLPIXELFORMAT
 
 #include "pldebug.h"
+#include "plexcept.h"
 
 #include <string>
 #include <list>
@@ -75,9 +76,10 @@ public:
 	int GetNumColors() const;
     PLPixelFormat GetRGBSwapped() const;
 
-	struct UnsupportedPixelFormat {
-		UnsupportedPixelFormat(const std::string& what) : m_what(what) {};
-		const std::string m_what;
+	struct UnsupportedPixelFormat : public PLTextException {
+		UnsupportedPixelFormat(const std::string & what) : 
+			PLTextException(PL_ERRFORMAT_UNKNOWN, what.c_str()) {
+		}
 	};
 
 private:

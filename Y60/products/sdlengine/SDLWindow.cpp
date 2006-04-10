@@ -670,6 +670,8 @@ SDLWindow::go() {
         AC_ERROR << "Exception caught in SDLWindow::go(): " << ex;
     } catch (const exception & ex) {
         AC_ERROR << "Exception caught in SDLWindow::go(): " << ex.what();
+    } catch (const PLTextException & ex) {
+        AC_ERROR << "Exception caught in SDLWindow::go(): " << ex;
     } catch (...) {
         AC_ERROR << "Unknown exception in SDLWindow::go()";
     }
