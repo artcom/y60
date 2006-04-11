@@ -199,7 +199,7 @@ namespace y60 {
             AC_WARNING << "url='" << theFilename << "' contains no valid duration";
             myMovie->set<FrameCountTag>(INT_MAX);
         } else {
-            myMovie->set<FrameCountTag>(int(myFPS * (_myVStream->duration / (float) AV_TIME_BASE)));
+            myMovie->set<FrameCountTag>(asl::round(myFPS * (_myVStream->duration / (float) AV_TIME_BASE)));
         }
 
         AC_DEBUG << "url='" << theFilename << "' fps=" << myFPS << " framecount=" << getFrameCount();
@@ -316,6 +316,7 @@ namespace y60 {
                         continue;
                     }
                 }
+                AC_DEBUG << "eof reached";
 #endif
                 return false;
             }
