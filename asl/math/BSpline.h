@@ -43,9 +43,9 @@ namespace asl {
                     _mySpline.getSideAndUpVector(myPoints[x + 1] - myPoints[x], mySideVector, myUpVector);
                     mySideVector *= _myStrokeSize / 2;
                     if (y == 0) {
-                        return asl::Vector3<T>(myPoints[x] - mySideVector);
+                        return Vector3<T>(myPoints[x] - mySideVector);
                     } else {
-                        return asl::Vector3<T>(myPoints[x] + mySideVector);
+                        return Vector3<T>(myPoints[x] + mySideVector);
                     }
                 }
     
@@ -61,7 +61,7 @@ namespace asl {
                     _myUpVector(theUpVector)
                 {}
 
-                asl::Vector3<T> operator()(unsigned x, unsigned y) const {
+                Vector3<T> operator()(unsigned x, unsigned y) const {
                     const std::vector<Vector3<T> > & myPoints = _mySpline.getResult();
 
                     if (x == myPoints.size() - 1) {
@@ -116,7 +116,6 @@ namespace asl {
                               const Vector3<T> & theEnd,
                               const Vector3<T> & theEndAnchor)
         {
-
             // setup polynom coefficients
             for (unsigned i = 0; i < 3; ++i) {
                 _myCoeff[0][i] = theStart[i];
@@ -135,25 +134,6 @@ namespace asl {
             setControlPoints(thePoints[0], thePoints[1],
                              thePoints[2], thePoints[3]);
         }
-
-#if 0
-        // UH: disabled since the only place this is used seems to be testBSpline.tst.js
-        /**
-         * Setup from points. WTF? In need of documentation.
-         * Hint: it's not a convex hull thingy.
-         */
-        void setupFromPoints(const std::vector< Vector3<T> > & thePoints,
-                             T theSize)
-        {
-            Vector3<T> myDir1 = product(normalized(difference(thePoints[2], thePoints[0])), theSize);
-            Vector3<T> myStartAnchor = sum(thePoints[1], myDir1);
-
-            Vector3<T> myDir2 = product(normalized(difference(thePoints[1], thePoints[3])), theSize);
-            Vector3<T> myEndAnchor = sum(thePoints[2], myDir2);
-
-            setControlPoints(thePoints[1], myStartAnchor, thePoints[2], myEndAnchor);
-        }
-#endif
 
         /**
          * Calculate a point on the spline.
@@ -175,6 +155,29 @@ namespace asl {
                 theCurveParameter = 1;
             }
             return getValue(theCurveParameter);
+        }
+
+        /**
+         * Calculate first derivate at the given curve position.
+         * @param theCurveParameter Position along the curve.
+         * @param theEaseIn Ease-in. Range [0..1].
+         * @param theEaseOut Ease-out. Range [0..1].
+         * @return Normal at the given curve position.
+         */
+        Vector3<T> evaluateNormal(T theCurveParameter,
+                                  T theEaseIn = 0, T theEaseOut = 0,
+                                  const Vector3<T> & theUpVector = Vector3<T>(0,0,1)) const
+        {
+            if (theEaseIn > 0 && theEaseOut > 0) {
+                theEaseOut = 1 - theEaseOut;
+                theCurveParameter = smoothStep(theCurveParameter, theEaseIn, theEaseOut);
+            }
+            if (theCurveParameter < 0) {
+                theCurveParameter = 0;
+            } else if (theCurveParameter > 1) {
+                theCurveParameter = 1;
+            }
+            return getNormal(theCurveParameter, theUpVector);
         }
 
         /**
@@ -217,9 +220,9 @@ namespace asl {
             return _myResult;
         }
 
-        void getSideAndUpVector(const asl::Vector3<T> & theForwardVector,
-                                asl::Vector3<T> & theSideVector,
-                                asl::Vector3<T> & theUpVector) const
+        void getSideAndUpVector(const Vector3<T> & theForwardVector,
+                                Vector3<T> & theSideVector,
+                                Vector3<T> & theUpVector) const
         {
             theSideVector = cross(theUpVector, theForwardVector);
             theSideVector = normalized(theSideVector);
@@ -247,10 +250,27 @@ namespace asl {
             return myPoint;
         }
 
+        // evaluate normal at 't'
+        Vector3<T> getNormal(T t, const Vector3<T> & theUpVector) const {
+
+            Vector3<T> myPos0, myPos1;
+            if (t >= 1) {
+                myPos0 = getValue(t - (T)0.01);
+                myPos1 = getValue(t);
+            } else {
+                myPos0 = getValue(t);
+                myPos1 = getValue(t + (T)0.01);
+            }
+
+            Vector3<T> myNormal = normalized(cross(theUpVector, myPos1 - myPos0));
+
+            return myNormal;
+        }
+
         // get segment length
         T getSegmentLength(T theLeft, T theRight,
-                                Vector3<T> theLeftPoint, Vector3<T> theRightPoint,
-                                T theChordLength)
+                           Vector3<T> theLeftPoint, Vector3<T> theRightPoint,
+                           T theChordLength)
         {
             const double MAX_ERROR = 0.01;
 

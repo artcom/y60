@@ -120,13 +120,13 @@ namespace jslib {
     {
         DOC_BEGIN("Calculate a point on the spline.");
         DOC_PARAM("theCurveParameter", "Position along the curve.", DOC_TYPE_FLOAT);
-        DOC_PARAM("theEaseIn", "Ease-in value.", DOC_TYPE_FLOAT);
-        DOC_PARAM("theEaseOut", "Ease-out value.", DOC_TYPE_FLOAT);
+        DOC_PARAM_OPT("theEaseIn", "Ease-in value.", DOC_TYPE_FLOAT, 0);
+        DOC_PARAM_OPT("theEaseOut", "Ease-out value.", DOC_TYPE_FLOAT, 0);
         DOC_RVAL("Point on spline.", DOC_TYPE_VECTOR3F);
         DOC_END;
 
         if (argc < 1) {
-            JS_ReportError(cx, "JSBSpline::calculate: bad number of arguments: expected at least 1");
+            JS_ReportError(cx, "JSBSpline::evaluate: bad number of arguments: expected at least 1");
             return JS_FALSE;
         }
 
@@ -158,6 +158,61 @@ namespace jslib {
             }
 
             *rval = as_jsval(cx, myNative->evaluate(myCurveParameter, myEaseIn, myEaseOut));
+            return JS_TRUE;
+        } HANDLE_CPP_EXCEPTION;
+    }
+
+    static JSBool
+    evaluateNormal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+    {
+        DOC_BEGIN("Calculate normal at point on the spline.");
+        DOC_PARAM("theCurveParameter", "Position along the curve.", DOC_TYPE_FLOAT);
+        DOC_PARAM_OPT("theEaseIn", "Ease-in value.", DOC_TYPE_FLOAT, 0);
+        DOC_PARAM_OPT("theEaseOut", "Ease-out value.", DOC_TYPE_FLOAT, 0);
+        DOC_PARAM_OPT("theUpVector", "Up-vector.", DOC_TYPE_VECTOR3F, "[0,0,1]");
+        DOC_RVAL("Point on spline.", DOC_TYPE_VECTOR3F);
+        DOC_END;
+
+        if (argc < 1) {
+            JS_ReportError(cx, "JSBSpline::evaluateNormal: bad number of arguments: expected at least 1");
+            return JS_FALSE;
+        }
+
+        JSBSpline::NATIVE * myNative = 0;
+        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+            JS_ReportError(cx, "JSBSpline: self is not a BSpline");
+            return JS_FALSE;
+        }
+
+        try {
+            float myCurveParameter;
+            float myEaseIn = 0.0f, myEaseOut = 0.0f;
+            asl::Vector3f myUpVector(0.0f, 0.0f, 1.0f);
+
+            if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myCurveParameter)) {
+                JS_ReportError(cx, "JSBSpline: argument #1 must be a float");
+                return JS_FALSE;
+            }
+            if (argc >= 2) {
+                if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myEaseIn)) {
+                    JS_ReportError(cx, "JSBSpline: argument #2 must be a float");
+                    return JS_FALSE;
+                }
+            }
+            if (argc >= 3) {
+                if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myEaseOut)) {
+                    JS_ReportError(cx, "JSBSpline: argument #3 must be a float");
+                    return JS_FALSE;
+                }
+            }
+            if (argc >= 4) {
+                if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], myUpVector)) {
+                    JS_ReportError(cx, "JSBSpline: argument #3 must be a float");
+                    return JS_FALSE;
+                }
+            }
+
+            *rval = as_jsval(cx, myNative->evaluateNormal(myCurveParameter, myEaseIn, myEaseOut, myUpVector));
             return JS_TRUE;
         } HANDLE_CPP_EXCEPTION;
     }
