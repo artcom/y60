@@ -35,6 +35,11 @@ namespace asl {
     
                 Vector3<T> operator()(unsigned x, unsigned y) const {
                     const std::vector<Vector3<T> > & myPoints = _mySpline.getResult();
+                    if (x >= myPoints.size()) {
+                        throw asl::Exception(std::string("Invalid x value for bspline-position: ") + 
+                            as_string(x) + ". Must be less than " +
+                            as_string(myPoints.size()), PLUS_FILE_LINE);
+                    }
                     if (x == myPoints.size() - 1) {
                         x--;
                     }
@@ -63,7 +68,11 @@ namespace asl {
 
                 Vector3<T> operator()(unsigned x, unsigned y) const {
                     const std::vector<Vector3<T> > & myPoints = _mySpline.getResult();
-
+                    if (x >= myPoints.size()) {
+                        throw asl::Exception(std::string("Invalid x value for bspline-normal: ") + 
+                            as_string(x) + ". Must be less than " +
+                            as_string(myPoints.size()), PLUS_FILE_LINE);
+                    }
                     if (x == myPoints.size() - 1) {
                         x--;
                     }
