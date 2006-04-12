@@ -20,12 +20,10 @@
 
 using namespace std;
 
-#define DB(x) // x
-
 
 DSADriver::DSADriver (asl::DLHandle theDLHandle) : PlugInBase(theDLHandle)
 {
-    _myInterpolateFlag = true;
+    _myInterpolateFlag = false;
 }
 
 void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
@@ -86,6 +84,12 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
                     myPortId = mySensorMapping[row][col][0];
                     myControllerId = mySensorMapping[row][col][1];
                     myBitNumber = mySensorMapping[row][col][2];
+                    if (myPortId == (unsigned)-1 ||
+                        myControllerId == (unsigned)-1 ||
+                        myBitNumber == (unsigned)-1) {
+                        AC_WARNING << "DSADriver: Ignoring sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber;
+                        continue;
+                    }
 
                     SensorServerList::iterator it = _mySensorServers.find(myPortId);
                     if (it == _mySensorServers.end()) {
@@ -93,9 +97,9 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
                     }
                     else {
                         mySensorArray->addSensor(myPortId,
-                                                    myControllerId,
-                                                    myBitNumber,
-                                                    asl::Vector2i(col,row));
+                                                 myControllerId,
+                                                 myBitNumber,
+                                                 asl::Vector2i(col,row));
                     }
                 }
             }

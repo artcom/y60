@@ -78,7 +78,7 @@ dom::NodePtr createTransform(dom::NodePtr theParentNode);
 dom::NodePtr createBody(dom::NodePtr theParentNode, const std::string & theShapeId);
 
 /// Set node alpha value. Node can be a body or a shape.
-bool setAlpha(dom::NodePtr theNode, float theAlpha);
+bool setAlpha(dom::Node * theNode, float theAlpha);
 
 /**
  * Creates a canvas in the scene given in theScene

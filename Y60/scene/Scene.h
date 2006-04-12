@@ -209,10 +209,14 @@ namespace y60 {
             dom::DocumentPtr getSceneDom() const {
                 return _mySceneDom;
             }
+
             dom::NodePtr getImagesRoot();
             const dom::NodePtr getImagesRoot() const;
             dom::NodePtr getCanvasRoot();
             const dom::NodePtr getCanvasRoot() const;
+
+            dom::NodePtr getMaterialsRoot();
+            const dom::NodePtr getMaterialsRoot() const;
 
             float getWorldSize(const dom::NodePtr & theActiveCamera) const;
 

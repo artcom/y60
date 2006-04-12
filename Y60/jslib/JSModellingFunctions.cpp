@@ -577,7 +577,7 @@ SetAlpha(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
         convertFrom(cx, argv[0], myNode);
         convertFrom(cx, argv[1], myAlpha);
 
-        y60::setAlpha(myNode, myAlpha);
+        y60::setAlpha(&*myNode, myAlpha);
 
         return JS_TRUE;
 

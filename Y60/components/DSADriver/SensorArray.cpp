@@ -8,11 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//    $RCSfile: SensorArray.cpp,v $
-//     $Author: ulrich $
-//   $Revision: 1.5 $
-//       $Date: 2005/02/03 16:59:51 $
-//
 // Dieters Sensor Array...
 //
 //=============================================================================
@@ -64,5 +59,3 @@ SensorArray::createEvents(std::vector<asl::Vector2i> & theEventList,
         }
     }
 }
-
-

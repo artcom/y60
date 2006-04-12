@@ -771,6 +771,16 @@ namespace y60 {
         return _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(CANVAS_LIST_NAME);
     }
 
+    NodePtr
+    Scene::getMaterialsRoot() {
+        return _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME);
+    }
+
+    const NodePtr
+    Scene::getMaterialsRoot() const {
+        return _mySceneDom->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME);
+    }
+
     const MaterialBasePtr
     Scene::getMaterial(const std::string & theMaterialId) const {
         MaterialIdMap::const_iterator myIt = _myMaterials.find(theMaterialId);

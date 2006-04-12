@@ -50,16 +50,16 @@ namespace y60 {
     }
 
     bool
-    setAlpha(dom::NodePtr theNode, float theAlpha) {
+    setAlpha(dom::Node * theNode, float theAlpha) {
 
         if (theNode->nodeName() == "body") {
             AC_DEBUG << "Fetching shape from body: " << *theNode;
-            theNode = theNode->getElementById(theNode->getAttributeString("shape"));
+            theNode = &*theNode->getElementById(theNode->getAttributeString("shape"));
         }
 
         dom::Node * myShapeNode;
         if (theNode->nodeName() == "shape") {
-            myShapeNode = &*theNode;
+            myShapeNode = theNode;
         } else if (theNode->nodeName() == "element") {
             AC_DEBUG << "Parent of element: " << *(theNode->parentNode());
             AC_DEBUG << "Grand-parent of element: " << *(theNode->parentNode()->parentNode());
