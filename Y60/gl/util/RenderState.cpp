@@ -7,13 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: RenderState.cpp,v $
-//   $Author: david $
-//   $Revision: 1.3 $
-//   $Date: 2005/03/23 17:49:09 $
-//
-//=============================================================================
 
 #include "RenderState.h"
 

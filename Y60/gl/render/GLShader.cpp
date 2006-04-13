@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2003 ART+COM AG Berlin
+// Copyright (C) 2003-2006 ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,15 +7,7 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: GLShader.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.14 $
-//   $Date: 2005/04/24 00:41:18 $
-//
-//   Description:
-//
-//=============================================================================
+
 #ifdef WIN32
 #define NOMINMAX
 // Note: GLH_EXT_SINGLE_FILE must be defined only in one object file
@@ -117,10 +109,10 @@ namespace y60 {
             if ((*myFeaturesLeft == theRequirementList)) {
                 return FULL_MATCH;
             }
-			// ignore requirement => WILDCARD_MATCH
-			//if (theRequirementList.size() == 0) {
-	        //    return WILDCARD_MATCH;
-			//}
+            // ignore requirement => WILDCARD_MATCH
+            //if (theRequirementList.size() == 0) {
+            //    return WILDCARD_MATCH;
+            //}
             if (myFeaturesLeft->size() != theRequirementList.size() ) {
                 return NO_MATCH;
             }
@@ -166,7 +158,7 @@ namespace y60 {
     void
     GLShader::activate(MaterialBase & theMaterial) {
         //AC_DEBUG << "GLShader::activate " << theMaterial.getName();
-		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
+        MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
         dom::NodePtr myLineWidthProp = myMaterialPropFacade->getProperty(LINEWIDTH_PROPERTY);
         if (myLineWidthProp) {
@@ -193,10 +185,10 @@ namespace y60 {
         dom::NodePtr myPointAttenuationProp = myMaterialPropFacade->getProperty(POINTATTENUATION_PROPERTY);
         if (myPointAttenuationProp) {
             glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,
-								  myPointAttenuationProp->nodeValueAs<asl::Vector3f>().begin());
+                                  myPointAttenuationProp->nodeValueAs<asl::Vector3f>().begin());
         }
 
-		const VectorOfString & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
+        const VectorOfString & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
         if (myBlendFunction.size() == 2) {
             BlendFunction mySrcFunc = BlendFunction( asl::getEnumFromString(myBlendFunction[0],
                                                                             BlendFunctionStrings));
@@ -224,10 +216,22 @@ namespace y60 {
             const y60::Texture & myTexture = theMaterial.getTexture(i);
             bool hasMipMaps = myTexture.getImage()->get<ImageMipmapTag>();
 
+            GLenum myTextureType = 0;
+            switch (myTexture.getImage()->getType()) {
+            case SINGLE:
+                myTextureType = myTexture.getImage()->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
+                break;
+            case CUBEMAP:
+                myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
+                break;
+            default:
+                throw ShaderException(string("Invalid image type in material '") + theMaterial.get<NameTag>() + "'", PLUS_FILE_LINE);
+                break;
+            }
             GLenum myTexUnit = asGLTextureRegister(i);
-            glActiveTextureARB(myTexUnit);
+            AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.get<NameTag>() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId() << " wrap=" << myTexture.getWrapMode();
 
-            GLenum myTextureType = myTexture.getImage()->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
+            glActiveTextureARB(myTexUnit);
             glBindTexture(myTextureType, myTexture.getId());
 
             // load texture matrix
@@ -241,39 +245,25 @@ namespace y60 {
             // as part of the texture object. Instead we should set it once
             // at creation time to make the texture usable even if it is not
             // rendered at all. Some kind of dirty notification would be necessary.
-            if (myTexture.getImage()->get<ImageDepthTag>()==1) {
-                //AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.getName() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId() << " wrap=" << myTexture.getWrapMode();
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+            glTexParameteri(myTextureType, GL_TEXTURE_WRAP_S,
+                    asGLTextureWrapmode(myTexture.getWrapMode()));
+            CHECK_OGL_ERROR;
+            glTexParameteri(myTextureType, GL_TEXTURE_WRAP_T,
+                    asGLTextureWrapmode(myTexture.getWrapMode()));
+            CHECK_OGL_ERROR;
+            if (myTextureType == GL_TEXTURE_3D) {
+                glTexParameteri(myTextureType, GL_TEXTURE_WRAP_R,
                         asGLTextureWrapmode(myTexture.getWrapMode()));
-                CHECK_OGL_ERROR;
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-                        asGLTextureWrapmode(myTexture.getWrapMode()));
-                CHECK_OGL_ERROR;
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                        asGLTextureSampleFilter(myTexture.getMagFilter(), false));
-                CHECK_OGL_ERROR;
-                // only minification can use mipmaps
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                        asGLTextureSampleFilter(myTexture.getMinFilter(), hasMipMaps));
-                CHECK_OGL_ERROR;
-            } else {
-                glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S,
-                        asGLTextureWrapmode(myTexture.getWrapMode()));
-                CHECK_OGL_ERROR;
-                glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T,
-                        asGLTextureWrapmode(myTexture.getWrapMode()));
-                CHECK_OGL_ERROR;
-                glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R,
-                        asGLTextureWrapmode(myTexture.getWrapMode()));
-                CHECK_OGL_ERROR;
-                glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER,
-                        asGLTextureSampleFilter(myTexture.getMagFilter(), false));
-                CHECK_OGL_ERROR;
-                // only minification can use mipmaps
-                glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER,
-                        asGLTextureSampleFilter(myTexture.getMinFilter(), hasMipMaps));
                 CHECK_OGL_ERROR;
             }
+
+            glTexParameteri(myTextureType, GL_TEXTURE_MAG_FILTER,
+                    asGLTextureSampleFilter(myTexture.getMagFilter(), false));
+            CHECK_OGL_ERROR;
+            // only minification can use mipmaps
+            glTexParameteri(myTextureType, GL_TEXTURE_MIN_FILTER,
+                    asGLTextureSampleFilter(myTexture.getMinFilter(), hasMipMaps));
+            CHECK_OGL_ERROR;
         }
         glMatrixMode(GL_MODELVIEW);
     }

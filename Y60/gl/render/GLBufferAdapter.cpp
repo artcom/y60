@@ -39,7 +39,7 @@ using namespace asl;
 
 namespace y60 {
 
-    BufferAdaptor::BufferAdaptor (int theWidth, int theHeight, int theComponents) :
+    BufferAdaptor::BufferAdaptor (unsigned theWidth, unsigned theHeight, unsigned theComponents) :
                 _myWidth(theWidth), _myHeight(theHeight), _myComponents(theComponents) {
         alloc(_myWidth * _myHeight * _myComponents);
     }
@@ -56,36 +56,51 @@ namespace y60 {
         return _myData;
     }
 
-    const unsigned 
+    unsigned 
     BufferAdaptor::getWidth() const {
         return _myWidth;
     }
 
-    const unsigned 
+    unsigned 
     BufferAdaptor::getHeight() const {
         return _myHeight;
     }
 
-    const unsigned 
+    unsigned 
     BufferAdaptor::getComponents() const {
         return _myComponents;
     }
     
     void
     BufferAdaptor::performAction(GLSourceBuffer theSourceBuffer) {
+        GLenum myFormat;
         switch (theSourceBuffer) {
-            case FRAME_BUFFER:
-                glReadBuffer(GL_BACK);
-                break;
-            case DEPTH_BUFFER:
-                //break;
-            default:
-                throw GLBufferAdapterException(std::string("Unknown Sourcebuffer: " ) + asl::as_string(theSourceBuffer),
-                                               PLUS_FILE_LINE);
-                
+        case FRAME_BUFFER:
+            glReadBuffer(GL_BACK);
+            switch (getComponents()) {
+                case 1:
+                    myFormat = GL_LUMINANCE;
+                    break;
+                case 2:
+                    myFormat = GL_LUMINANCE_ALPHA;
+                    break;
+                case 3:
+                    myFormat = GL_RGB;
+                    break;
+                case 4:
+                    myFormat = GL_RGBA;
+                    break;
+            }
+            break;
+        case DEPTH_BUFFER:
+            myFormat = GL_DEPTH_COMPONENT;
+            break;
+        default:
+            throw GLBufferAdapterException(std::string("Unknown Sourcebuffer: " ) + asl::as_string(theSourceBuffer), PLUS_FILE_LINE);
         }
-        glReadPixels(0, 0, _myWidth, _myHeight, GL_RGBA, GL_UNSIGNED_BYTE, _myData.begin());
-}
+
+        glReadPixels(0, 0, _myWidth, _myHeight, myFormat, GL_UNSIGNED_BYTE, _myData.begin());
+    }
 
     // ----------------------------------------------------------------------------------------    
     BufferToFile::BufferToFile (int theWidth, int theHeight, int theComponents) : 

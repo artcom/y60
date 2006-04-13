@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: RenderState.h,v $
-//   $Author: danielk $
-//   $Revision: 1.2 $
-//   $Date: 2005/03/23 15:08:20 $
-//
-//  Description:
-//
-//=============================================================================
 
 #ifndef _ac_y60_RendererState_h_
 #define _ac_y60_RendererState_h_
@@ -63,7 +54,7 @@ namespace y60 {
                 _myDepthWritesFlag(true),
                 _myPolygonOffsetFlag(false),
                 _myBlendFlag(false),
-                _myAlphaTestFlag(false),
+                _myAlphaTestFlag(true),
                 _myCullFaces(GL_BACK),
                 _myEnabledClippingPlanes(0)
             {

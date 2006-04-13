@@ -87,14 +87,8 @@ namespace y60 {
         unsigned myId = theImage->getGraphicsId();
         if (myId) {
             glDeleteTextures(1, &myId);
+            CHECK_OGL_ERROR;
             theImage->setGraphicsId(0);
-
-            unsigned int myBufferId = theImage->getPixelBufferId();
-            if (glDeleteBuffersARB && myBufferId) {
-                glDeleteBuffersARB(1, &myBufferId);
-                theImage->setPixelBufferId(0);
-                CHECK_OGL_ERROR;
-            }
 
             // adjust texmem usage
             unsigned int myTopLevelTextureSize = theImage->getMemUsed();
@@ -104,6 +98,13 @@ namespace y60 {
                 _myTextureMemUsage -= myTopLevelTextureSize/3;
             }
             _myTextureMemUsage -= myTopLevelTextureSize;
+        }
+
+        unsigned int myBufferId = theImage->getPixelBufferId();
+        if (glDeleteBuffersARB && myBufferId) {
+            glDeleteBuffersARB(1, &myBufferId);
+            theImage->setPixelBufferId(0);
+            CHECK_OGL_ERROR;
         }
     }
 
@@ -195,7 +196,6 @@ namespace y60 {
             // causes problems with offscreen rendering.
             // causes problems with non mipmaped textures. 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER , GL_NEAREST);
             CHECK_OGL_ERROR;
         } else {
             // 3D-Texture
@@ -203,7 +203,7 @@ namespace y60 {
             CHECK_OGL_ERROR;
             // [DS] the min filter defaults to GL_NEAREST_MIPMAP_LINEAR. This
             // causes problems with non mipmaped textures. 
-            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER , GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             CHECK_OGL_ERROR;
         }
 
@@ -517,6 +517,7 @@ namespace y60 {
             glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
         }
         glPopAttrib();
+        CHECK_OGL_ERROR;
 
         return myId;
     }

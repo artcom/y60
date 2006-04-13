@@ -85,6 +85,7 @@ SDLWindow::createTTFRenderer() {
 
 void
 SDLWindow::activateGLContext() {
+    AC_DEBUG << "SDLWindow::activateGLContext";
     if (!SDL_WasInit(SDL_INIT_VIDEO)) {
         ensureSDLSubsystem();
 #ifdef WIN32
@@ -98,6 +99,7 @@ SDLWindow::activateGLContext() {
 
 void
 SDLWindow::deactivateGLContext() {
+    AC_DEBUG << "SDLWindow::deactivateGLContext";
 }
 
 int
@@ -200,6 +202,10 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
             wminfo.info.x11.unlock_func();
         }
 #endif
+        if (_myScene) {
+            // before creating a new context unbind all created textures
+            _myScene->getTextureManager()->unbindTextures();
+        }
 
         DB(AC_TRACE << "SDL_SetVideoMode(" << theTargetWidth << ", " << theTargetHeight <<
                 ", FS=" << theFullscreenFlag << ", Deco=" << _myWinDecoFlag << ")" << endl);

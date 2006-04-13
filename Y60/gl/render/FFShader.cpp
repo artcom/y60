@@ -1,27 +1,15 @@
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
+//=============================================================================
+// Copyright (C) 2003-2006 ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-//    $RCSfile: FFShader.cpp,v $
-//
-//   $Revision: 1.27 $
-//
-// Description: Block Allocator
-//
-//
-//
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//=============================================================================
 
 #include <y60/GLUtils.h>
 #include <asl/Logger.h>
-
 
 #include "FFShader.h"
 #include <y60/glExtensions.h>
@@ -107,6 +95,7 @@ namespace y60 {
             TextureUsage 
                 myTextureUsage = theMaterial.getTextureUsage(myTextureCounter); 
 
+            unsigned myId = myTexture.getId();
             DB(AC_TRACE << "FFShader::enableTextures: texture index=" << myTextureCounter <<
                 ", gl-id = " << myTexture.getId() <<
                 ", image id =" << myTexture.getImage()->get<IdTag>() <<", size = " <<
@@ -116,28 +105,23 @@ namespace y60 {
                 endl);
             // Fixed Function Shaders only support paint & skybox usage
             if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
+
+                GLenum myTextureType;
                 switch (myTexture.getImage()->getType()) {
-                    case SINGLE :
-                        if (myTexture.getImage()->get<ImageDepthTag>()==1) {
-                            glBindTexture(GL_TEXTURE_2D, myTexture.getId());
-                            CHECK_OGL_ERROR;
-                            glEnable(GL_TEXTURE_2D);
-                            CHECK_OGL_ERROR;
-                        } else {
-                            glBindTexture(GL_TEXTURE_3D, myTexture.getId());
-                            CHECK_OGL_ERROR;
-                            glEnable(GL_TEXTURE_3D);
-                            CHECK_OGL_ERROR;
-                        }
-                        break;
-                    case CUBEMAP :
-                        glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, myTexture.getId());
-                        glEnable(GL_TEXTURE_CUBE_MAP_ARB);
-                        break;
-                    default :
-                        throw ShaderException(std::string("Unknown texture type '")+
-                                myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
+                case SINGLE:
+                    myTextureType = myTexture.getImage()->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
+                    break;
+                case CUBEMAP:
+                    myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
+                    break;
+                default :
+                    throw ShaderException(std::string("Unknown texture type '")+
+                            myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
                 }
+                glBindTexture(myTextureType, myId);
+                CHECK_OGL_ERROR;
+                glEnable(myTextureType);
+                CHECK_OGL_ERROR;
 
                 if (myTexture.get<TextureSpriteTag>()) {
                     if (!alreadyHasSpriteTexture) {

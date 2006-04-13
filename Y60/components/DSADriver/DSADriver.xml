@@ -3,7 +3,7 @@
     <Port id="0" comport="0" baudrate="57600"/>
   </Ports>
   <SensorArrays>
-    <SensorArray id="0" name="BatCave" gridsize="[5,9]">
+    <SensorArray id="0" name="BatCave" gridsize="[5,9]" interpolate="0">
       [
       [[1,0,0], [1,0,1], [1,0,2], [2,4,3], [1,0,4], [1,0,5]],
       [[1,0,0], [1,0,1], [1,0,2], [2,4,3], [1,0,4], [1,0,5]],

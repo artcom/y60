@@ -98,7 +98,10 @@ namespace y60 {
     }
 
     Renderer::~Renderer() {
-        if (_myScene && _myContext && _myContext->isActive()) {
+        // UH: _myContext->isActive does not reflect the true status of a valid OpenGL context
+        // the problem is that the destructor is called after the window is destroyed and therefore no
+        // valid OpenGL context is available... maybe circumvent this by setting the scene to 0?
+        if (_myScene) { // && _myContext && _myContext->isActive()) {
             _myScene->deregisterResourceManager();
         }
     }
@@ -225,7 +228,7 @@ namespace y60 {
                 glBlendEquation(myEquation);
             }
 
-            //glLineWidth(myPropFacade->get<LineWidthTag>());
+            glLineWidth(myPropFacade->get<LineWidthTag>());
 
 #if 0
             // experimental code
@@ -419,6 +422,7 @@ namespace y60 {
 
         DBP2(START_TIMER(renderBodyPart_render));
         enableRenderStyles(myRenderStyles);
+
         bool myRendererCullingEnabled = _myState->getBackfaceCulling();
         if (myRendererCullingEnabled) {
             if (myRenderStyles[FRONT] && myRenderStyles[BACK]) {

@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: GLBufferAdapter.h,v $
-//   $Author: janbo $
-//   $Revision: 1.2 $
-//   $Date: 2004/10/18 16:22:56 $
-//
-//  Description: This class performs buffer magic.
-//
-//=============================================================================
 
 #ifndef _ac_render_GLBufferAdapter_h_
 #define _ac_render_GLBufferAdapter_h_
@@ -35,14 +26,14 @@ namespace y60 {
     DEFINE_EXCEPTION(GLBufferAdapterException, asl::Exception);
     class BufferAdaptor {
         public:
-            BufferAdaptor(int theWidth, int theHeight, int theComponents);
+            BufferAdaptor(unsigned theWidth, unsigned theHeight, unsigned theComponents);
             virtual ~BufferAdaptor();
             virtual void performAction(GLSourceBuffer theSourceBuffer);
 
             asl::Block & getBlock();
-            const unsigned getWidth() const;
-            const unsigned getHeight() const;
-            const unsigned getComponents() const;
+            unsigned getWidth() const;
+            unsigned getHeight() const;
+            unsigned getComponents() const;
         protected:
             void alloc(const unsigned myMemorySize);
         private:

@@ -1137,7 +1137,7 @@ they must be triggered individually.</xs:documentation>
     </xs:element>
     <xs:element name="character">
         <xs:annotation>
-            <xs:documentation>A character is usefull to group animations.
+            <xs:documentation>A character is useful to group animations.
 A animated character contains a number of clips, which contain a number of animations.
 
 Example:
@@ -1168,7 +1168,7 @@ Usually 'ch' plus a number, such as 'ch0'.</xs:documentation>
     </xs:element>
     <xs:element name="clip">
         <xs:annotation>
-            <xs:documentation>A clip is usefull to group animations.
+            <xs:documentation>A clip is useful to group animations.
 A clip should contain one movements of a character, which usually consists of many submovements.
 
 Example:
@@ -1654,7 +1654,7 @@ Overlays are not part of the world hierachy. They are rendered in a second pass,
 Overlays are independant of the camera position. They are always screen aligned. The coordinates are
 set in pixel units.
 
-Overlays can be usefull for GUI elements, On-Screen-Display of text or display of movies.
+Overlays can be useful for GUI elements, On-Screen-Display of text or display of movies.
 
 Overlays are rendered pixel-exact. I.e. a pixel in an image/movie will be mapped to one pixel on the screen.
 
@@ -2292,14 +2292,14 @@ Possible values are:
                 <xs:annotation>
                     <xs:documentation>Set this flag, to render the texture as point sprite.
 Point sprites are always facing the screen (like billboards) and only need one vertex to be rendered.
-They are usefull for particle rendering (snowflakes, etc.)</xs:documentation>
+They are useful for particle rendering (snowflakes, etc.)</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="matrix" type="Matrix4f">
                 <xs:annotation>
                     <xs:documentation>Defines a texture-coordinate matrix.
 All texture coordinates will be multiplied with this matrix.
-Usefull to animate texture coordinates, or to tweak texture repeat and position.</xs:documentation>
+useful to animate texture coordinates, or to tweak texture repeat and position.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         </xs:complexType>
@@ -2424,7 +2424,7 @@ If the image is not inlined, it will be loaded from this file.</xs:documentation
         <xs:attribute name="matrix" type="Matrix4f">
             <xs:annotation>
                 <xs:documentation>UV-coordiante matrix. This matrix will be multiplied with
-all uv-coordiates. (In addition to the texture matrix). It is usefull to scale non-power-of-two textures to the right dimensions.</xs:documentation>
+all uv-coordiates. (In addition to the texture matrix). It is useful to scale non-power-of-two textures to the right dimensions.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
         <xs:attribute name="pixelformat" type="xs:string">
