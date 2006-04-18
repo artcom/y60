@@ -37,8 +37,12 @@ class GetProcAddressTest : public UnitTest {
         GetProcAddressTest() : UnitTest("GetProcAddressTest") {  }
         void run() {
             initGLExtensions(0);
+#ifdef DEBUG_VARIANT
             ENSURE_EXCEPTION(acTestMissingExtension(10,10), MissingExtensionsException);
             ENSURE_EXCEPTION(acTestMissingFunction(10,10);, MissingFunctionException);
+#else
+            ENSURE(acTestMissingExtension == 0);
+#endif
         }
 };
 
