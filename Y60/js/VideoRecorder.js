@@ -11,29 +11,17 @@
 use("Y60JSSL.js");
 
 function VideoRecorder(theFramesPerSecond, theDirectory, thePrefix) {
-    this.Constructor(this, theFramesPerSecond, theDirectory, thePrefix)
-}
 
-VideoRecorder.prototype.Constructor = function(self, theFramesPerSecond, theDirectory, thePrefix)
-{
-    var _myEnabled       = true;
-    var _myFrameCount    = 0;
-    var _myNextFrameTime = 0.0;
-    var _myFrameDelta    = (theFramesPerSecond ? (1.0 / theFramesPerSecond) : 0.0);
+    var Public = this;
 
-    var _myDirectory     = (theDirectory ? theDirectory : "frames");
-    var _myPrefix        = (thePrefix ? thePrefix : "frame");
+    //////////////////////////////////////////////////////////////////////
+    // Public
+    //////////////////////////////////////////////////////////////////////
 
-    self.setEnable = function(theEnableFlag) {
-        _myEnabled = theEnableFlag;
-    }
+    Public.enabled = false;
 
-    self.getEnable = function() {
-        return _myEnabled;
-    }
-
-    self.onFrame = function(theTime) {
-        if (_myEnabled && theTime >= _myNextFrameTime) {
+    Public.onFrame = function(theTime) {
+        if (Public.enabled && theTime >= _myNextFrameTime) {
             var myFileName = _myDirectory + "/" + _myPrefix;
             myFileName += padStringFront(_myFrameCount++, "0", 5);
             myFileName += ".png";
@@ -42,12 +30,23 @@ VideoRecorder.prototype.Constructor = function(self, theFramesPerSecond, theDire
         }
     }
 
+    //////////////////////////////////////////////////////////////////////
+    // Private
+    //////////////////////////////////////////////////////////////////////
+
     function setup() {
         if (!fileExists(_myDirectory)) {
-            Logger.warning("Creating directory '" + _myDirectory + "'");
+            Logger.warning("VideoRecorder: Creating directory '" + _myDirectory + "'");
             createDirectory(_myDirectory);
         }
     }
+
+    var _myFrameCount    = 0;
+    var _myNextFrameTime = 0.0;
+    var _myFrameDelta    = (theFramesPerSecond ? (1.0 / theFramesPerSecond) : 0.0);
+
+    var _myDirectory     = (theDirectory ? theDirectory : "frames");
+    var _myPrefix        = (thePrefix ? thePrefix : "frame");
 
     setup();
 }

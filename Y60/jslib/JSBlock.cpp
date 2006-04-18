@@ -28,9 +28,10 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Prints out some boring block info.");
+    DOC_BEGIN("Converts the block into a string.");
     DOC_END;
-    std::string myStringRep = string("Well this is just a block of size ") + as_string(JSBlock::getJSWrapper(cx,obj).getNative().size());
+    const ReadableBlock & myBlock = JSBlock::getJSWrapper(cx,obj).getNative();
+    std::string myStringRep(myBlock.strbegin(), myBlock.strend());
     JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
     *rval = STRING_TO_JSVAL(myString);
     return JS_TRUE;
@@ -114,7 +115,7 @@ JSBlock::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             return JS_FALSE;
         }
 
-        OWNERPTR myNewBlock = OWNERPTR(new asl::Block());        
+        OWNERPTR myNewBlock = OWNERPTR(new asl::Block());
         bool myResult = readFile(myFilename, *myNewBlock);
         if (!myResult) {
             JS_ReportError(cx, "Constructor for %s: Could not read file %s",ClassName(), myFilename.c_str());
