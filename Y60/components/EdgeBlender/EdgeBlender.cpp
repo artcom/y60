@@ -513,8 +513,7 @@ EdgeBlender::postRender() {
     // restore attribs
     glPopAttrib();
 
-    // restore modelview
-    glPopMatrix();
+    // restore matrices
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_TEXTURE);
@@ -522,6 +521,7 @@ EdgeBlender::postRender() {
     
     // put into model view
     glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
 }
 
 float 

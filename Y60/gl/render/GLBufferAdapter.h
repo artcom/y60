@@ -41,7 +41,6 @@ namespace y60 {
             unsigned _myWidth;
             unsigned _myHeight;
             unsigned _myComponents;
-
     };
 
 /* // paintlib image formats
@@ -64,7 +63,7 @@ namespace y60 {
     
     class BufferToFile : public BufferAdaptor{
         public:
-            BufferToFile (int theWidth, int theHeight, int theComponents);
+            BufferToFile (unsigned theWidth, unsigned theHeight, unsigned theComponents);
             virtual ~BufferToFile();
             bool saveBufferAsImage(unsigned theFormat, const std::string & theFileName);
             

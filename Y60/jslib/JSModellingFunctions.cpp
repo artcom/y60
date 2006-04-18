@@ -393,7 +393,7 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         DOC_BEGIN("Create an unlit textured material");
         DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);
         DOC_PARAM_OPT("theTextureFilename", "Path of the file to use for as texture", DOC_TYPE_STRING, "");
-        DOC_PARAM_OPT("theName", "Name for the quadstack shape", DOC_TYPE_STRING, "ColorMaterial");
+        DOC_PARAM_OPT("theName", "Material name", DOC_TYPE_STRING, "ColorMaterial");
         DOC_PARAM_OPT("theTransparencyFlag", "Does the texture contain transparent pixels", DOC_TYPE_BOOLEAN, false);
         DOC_PARAM_OPT("theSpriteFlag", "Use the material as sprite (for particles)", DOC_TYPE_BOOLEAN, false);
         DOC_PARAM_OPT("theDepth", "The Depth of the texture (for 3D-Textures)", DOC_TYPE_INTEGER, 1);
@@ -730,6 +730,3 @@ jsval as_jsval(JSContext *cx, JSModellingFunctions::OWNERPTR & theOwner) {
 }
 
 }
-
-
-

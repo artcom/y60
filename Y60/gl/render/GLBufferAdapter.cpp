@@ -103,7 +103,7 @@ namespace y60 {
     }
 
     // ----------------------------------------------------------------------------------------    
-    BufferToFile::BufferToFile (int theWidth, int theHeight, int theComponents) : 
+    BufferToFile::BufferToFile (unsigned theWidth, unsigned theHeight, unsigned theComponents) : 
                 BufferAdaptor(theWidth, theHeight, theComponents) {
     }
     
@@ -148,4 +148,3 @@ namespace y60 {
         return true;
     }        
 }
-

@@ -160,16 +160,33 @@ namespace y60 {
         //AC_DEBUG << "GLShader::activate " << theMaterial.getName();
         MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
+        // color,depth mask
+        const TargetBuffers & myMasks = myMaterialPropFacade->get<TargetBuffersTag>();
+        glDepthMask(myMasks[y60::DEPTH_MASK]);
+        glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
+                myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
+
+#if 1
+        if (myMaterialPropFacade->get<LineSmoothTag>()) {
+            glEnable(GL_LINE_SMOOTH);
+        } else {
+            glDisable(GL_LINE_SMOOTH);
+        }
+
+        float myLineWidth = myMaterialPropFacade->get<LineWidthTag>();
+        glLineWidth(myLineWidth);
+#else
         dom::NodePtr myLineWidthProp = myMaterialPropFacade->getProperty(LINEWIDTH_PROPERTY);
         if (myLineWidthProp) {
             glEnable(GL_LINE_SMOOTH);
             glLineWidth(myLineWidthProp->nodeValueAs<float>());
         }
+#endif
 
         dom::NodePtr myLineStippleProp = myMaterialPropFacade->getProperty(LINESTIPPLE_PROPERTY);
         if (myLineStippleProp) {
             glEnable(GL_LINE_STIPPLE);
-            glEnable(GL_LINE_SMOOTH);
+            //glEnable(GL_LINE_SMOOTH);
             glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());    
         }
 
@@ -199,6 +216,12 @@ namespace y60 {
         } else {
             throw ShaderException(string("Blendfunction for material '") + theMaterial.get<NameTag>() + " has "
                     + asl::as_string(myBlendFunction.size()) + " elements. Expected two.", PLUS_FILE_LINE);
+        }
+
+        if (glBlendEquation) {
+            const BlendEquation & myBlendEquation= myMaterialPropFacade->get<BlendEquationTag>();
+            GLenum myEquation = asGLBlendEquation(myBlendEquation);
+            glBlendEquation(myEquation);
         }
 
         theMaterial.updateParams();

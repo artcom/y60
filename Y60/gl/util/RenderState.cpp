@@ -78,7 +78,6 @@ namespace y60 {
 
     void
     RenderState::commitTexturing(bool theFlag) {
-        //AC_PRINT << (theFlag ? "enable" : "disable") << " TEXTURE_2D, current=" << _myTexturingFlag;
         if (theFlag) {
             glEnable(GL_TEXTURE_2D);
         } else {
@@ -89,12 +88,12 @@ namespace y60 {
 
     void 
     RenderState::setClippingPlanes(const std::vector<asl::Planef> & thePlanes) {
-        for (int i = 0; i < thePlanes.size(); ++i) {
+        for (unsigned i = 0; i < thePlanes.size(); ++i) {
             GLenum myGLPlaneId = asGLClippingPlaneId(i);
             glEnable(myGLPlaneId);
             glClipPlane(myGLPlaneId, thePlanes[i].getCoefficients<double>().begin());
         }
-        for (int i = thePlanes.size(); i < _myEnabledClippingPlanes; ++i) {
+        for (unsigned i = thePlanes.size(); i < _myEnabledClippingPlanes; ++i) {
             glDisable(asGLClippingPlaneId(i));
         }
         _myEnabledClippingPlanes = thePlanes.size();

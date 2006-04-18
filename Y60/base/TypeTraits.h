@@ -7,18 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: TypeTraits.h,v 1.1 2005/03/24 23:35:56 christian Exp $
-//   $RCSfile: TypeTraits.h,v $
-//   $Author: christian $
-//   $Revision: 1.1 $
-//   $Date: 2005/03/24 23:35:56 $
-//
-//
-//  Description: This file contains all the wellknown names for the
-//               SOM
-//
-//=============================================================================
 
 #ifndef _ac_y60_TypeTraits_h_
 #define _ac_y60_TypeTraits_h_
@@ -102,6 +90,12 @@ namespace y60 {
         NO_SUCH_SPECIALIZATION<T> Kaputt;
     };
 
+    template <>
+    struct TypeIdTraits<bool> {
+        static const TypeId type_id() {
+            return BOOL;
+        }
+    };
     template <>
     struct TypeIdTraits<float> {
         static const TypeId type_id() {

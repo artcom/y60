@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSApp.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.34 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSApp.h"
 

@@ -1885,10 +1885,16 @@ specular     - specular color
 shininess    - strength of specular reflection
 surfacecolor - color for unlit materials
 linewidth    - line width for line primitives
+linesmooth   - enable/disable line smoothing
             </xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element ref="bool">
+                    <xs:annotation>
+                        <xs:documentation>Property of type bool</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element ref="unsignedint">
                     <xs:annotation>
                         <xs:documentation>Property of type unsigned integer</xs:documentation>
@@ -1971,6 +1977,25 @@ linewidth    - line width for line primitives
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="bool">
+        <xs:annotation>
+            <xs:documentation>Property that contains a bool as text child
+
+Example:
+&lt;bool name='foo'&gt;true&lt;/bool&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:boolean">
+                    <xs:attribute name="name" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Name of the property</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
         </xs:complexType>
     </xs:element>
     <xs:element name="unsignedint">

@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2000-2003, ART+COM AG Berlin
+// Copyright (C) 2000-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,20 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: PixelEncoding.cpp,v 1.2 2005/04/21 10:00:40 martin Exp $
-//   $RCSfile: PixelEncoding.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/21 10:00:40 $
-//
-//
-//  Description: This file contains all the wellknown names for the
-//               SOM
-//
-// (CVS log at the bottom of this file)
-//
-//=============================================================================
 
 #include "PixelEncoding.h"
 #include <paintlib/plpixelformat.h>

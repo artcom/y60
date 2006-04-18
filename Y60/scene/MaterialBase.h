@@ -53,6 +53,7 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfString, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
     DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, BlendEquation, BLENDEQUATION_PROPERTY, EQUATION_ADD);
     DEFINE_MATERIAL_PROPERTY_TAG(LineWidthTag, float, LINEWIDTH_PROPERTY, float(1.0));
+    DEFINE_MATERIAL_PROPERTY_TAG(LineSmoothTag, bool, LINESMOOTH_PROPERTY, bool(false));
 
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,
@@ -69,7 +70,8 @@ namespace y60 {
         public BlendFunctionTag::Plug,
         public TargetBuffersTag::Plug,
         public BlendEquationTag::Plug,
-        public LineWidthTag::Plug
+        public LineWidthTag::Plug,
+        public LineSmoothTag::Plug
     {
         public:
             MaterialPropertiesFacade(dom::Node & theNode) :
@@ -83,7 +85,8 @@ namespace y60 {
                 BlendFunctionTag::Plug(this),
                 TargetBuffersTag::Plug(this),
                 BlendEquationTag::Plug(this),
-                LineWidthTag::Plug(this)
+                LineWidthTag::Plug(this),
+                LineSmoothTag::Plug(this)
             {}
             IMPLEMENT_FACADE(MaterialPropertiesFacade);
     };

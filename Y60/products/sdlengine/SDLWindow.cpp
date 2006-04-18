@@ -712,7 +712,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     }
 
 #ifdef WIN32
-    if (wglSwapIntervalEXT) {
+    if (wglSwapIntervalEXT && wglGetSwapIntervalEXT) {
         wglSwapIntervalEXT(theInterval);
         _mySwapInterval = wglGetSwapIntervalEXT();
         if (theInterval != _mySwapInterval) {

@@ -63,9 +63,15 @@ struct GLExceptionHelper {
  * idea taken from glew.sourceforge.net
 */
 #ifdef _ac_render_GLUtils_cpp_
+#ifdef DEBUG_VARIANT
     #define DEF_PROC_ADDRESS(T,X) \
     extern const char _name_ ## X [] = #X; \
     T  _ac_ ## X = (T)&y60::GLExceptionHelper< _name_ ##X>::throwMissingExtension;
+#else
+    #define DEF_PROC_ADDRESS(T,X) \
+    extern const char _name_ ## X [] = #X; \
+    T  _ac_ ## X = 0;
+#endif
 #else
     #define DEF_PROC_ADDRESS(T,X) \
     extern  T       _ac_ ## X;

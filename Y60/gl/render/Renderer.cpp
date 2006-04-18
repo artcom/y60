@@ -211,31 +211,7 @@ namespace y60 {
             DBP(MAKE_SCOPE_TIMER(activateShader));
 
             _myState->setLighting(theViewport.get<ViewportLightingTag>() && (theMaterial.getLightingModel() != UNLIT));
-
             CHECK_OGL_ERROR;
-
-            MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
-            const TargetBuffers & myMasks = myPropFacade->get<TargetBuffersTag>();
-
-            glDepthMask(myMasks[y60::DEPTH_MASK]);
-
-            glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
-                myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
-
-            const BlendEquation & myBlendEquation= myPropFacade->get<BlendEquationTag>();
-            GLenum myEquation = asGLBlendEquation(myBlendEquation);
-            if (glBlendEquation) {
-                glBlendEquation(myEquation);
-            }
-
-            glLineWidth(myPropFacade->get<LineWidthTag>());
-
-#if 0
-            // experimental code
-            if (!isOverlay) {
-                _myState->setDepthTest(theMaterial.testDepthBuffer());
-            }
-#endif
 
             // [CH] TODO: Material should be const.
             // The renderer should just take the scene information and render it as it is.
