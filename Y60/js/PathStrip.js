@@ -94,7 +94,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
             mySegment = (mySegment + 1) % thePath.getNumElements();
 
             var myForward = difference(myElement.end, myElement.origin);
-            var myRealForward = magnitude(difference(myElement.end, myLastPos));
+            var myRealForward = distance(myElement.end, myLastPos);
             // last piece
             if (myLength < myRealForward) {
                 myRealForward = myLength;

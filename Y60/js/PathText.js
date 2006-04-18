@@ -99,11 +99,11 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
                     var myKerning = window.getKerning(theCharacterSoup.getFontName(theFontSize), myCharacter.unicode, myNextCharacter.unicode);
                     myWidth += myKerning;
                     if (myKerning != 0.0) {
-                        //print("kern=" + myKerning, "char=" + myCharacter.unicode, "next=" + myNextCharacter.unicode);
+                        //print("kern=" + myKerning, "char=" + myCharacter.unicode, "next=" + myNextCharacter.unicode, "advance="+myCharacter.metric.advance);
                     }
                 }
             }
-
+            //print("width=" + myWidth, "char=" + myCharacter.unicode);
             /*
              * move 'advance+kern' on path but make characters 'advance' wide
              */
