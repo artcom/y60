@@ -331,9 +331,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-    self.onPreRender = function() {
-    }
-
     self.onPreViewport = function(theViewport) {
         var myCamera = theViewport.getElementById(theViewport.camera);
     	// calculate near/far planes from world size and distance camera-world
@@ -356,9 +353,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.onPostViewport = function(theViewport) {
         _myLightManager.onPostViewport(theViewport);
-    }
-
-    self.onPostRender = function() {
     }
 
     self.onResize = function() {

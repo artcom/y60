@@ -33,6 +33,7 @@ use("Configurator.js");
 use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
+use("VideoRecorder.js");
 
 //if (operatingSystem() == "Win32") {
 //    plug("y60QuicktimeDecoder"); // turn quicktime decoder on for windows and better mov decoder support
@@ -97,26 +98,14 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.setSplashScreen = function(theFlag) {
-        _mySplashScreen = theFlag;
-    }
-    self.setMessage = function(theMessage, theLine) {
-        _myOnScreenDisplay.setMessage(theMessage, theLine);
+        _mySplashScreenFlag = theFlag;
     }
 
-    function fadeSplashScreen(theTime) {
-        if (_mySplashScreen && _mySplashScreenOverlay) {
-            const START_FADE = 1;
-            const STOP_FADE  = 3;
-            _mySplashScreenOverlay.moveToTop();
-            if (theTime > START_FADE && theTime < STOP_FADE) {
-                _mySplashScreenOverlay.alpha = clamp((STOP_FADE - theTime) / (STOP_FADE - START_FADE), 0, 1);
-            }
-            if (theTime > STOP_FADE + 1) {
-                _mySplashScreenOverlay.removeFromScene();
-                _mySplashScreen = false;
-                _mySplashScreenOverlay = null;
-            }
+    self.setMessage = function(theMessage, theLine) {
+        if (!_myOnScreenDisplay) {
+            _myOnScreenDisplay = new OnScreenDisplay(self);
         }
+        _myOnScreenDisplay.setMessage(theMessage, theLine);
     }
 
     self.BaseViewer.onFrame = self.onFrame;
@@ -125,6 +114,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         _myCurrentTime = theTime;
         if (_myShutter) {
             _myShutter.onFrame(theTime);
+        }
+        if (_myVideoRecorder) {
+            _myVideoRecorder.onFrame(theTime);
         }
         var myCanvas = self.getRenderWindow().canvas;
         if (myCanvas) {
@@ -138,26 +130,31 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (_myAnimationManager) {
             _myAnimationManager.onFrame(theTime);
         }
-
-        _myOnScreenDisplay.onFrame(theTime);
+        if (_myOnScreenDisplay) {
+            _myOnScreenDisplay.onFrame(theTime);
+        }
+        if (_mySplashScreen) {
+            fadeSplashScreen(theTime);
+        }
         _myConfigurator.onFrame(theTime);
-        fadeSplashScreen(theTime);
     }
 
-    self.BaseViewer.onPreRender = self.onPreRender;
     self.onPreRender = function() {
-        self.BaseViewer.onPreRender();
     }
 
-    self.BaseViewer.onPostRender = self.onPostRender;
     self.onPostRender = function() {
-        self.BaseViewer.onPostRender();
         if (_myAnimationManager) {
             _myAnimationManager.onPostRender();
         }
-        _myOnScreenDisplay.onPostRender();
-        _myMemoryMeter.onPostRender();
-        showStatistics();
+        if (_myOnScreenDisplay) {
+            _myOnScreenDisplay.onPostRender();
+        }
+        if (_myMemoryMeter) {
+            _myMemoryMeter.onPostRender();
+        }
+        if (_myOnScreenStatistics > 0) {
+            showStatistics();
+        }
     }
 
     self.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
@@ -266,6 +263,13 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Saving screenshot as '" + myFilename + "'");
                     window.saveBuffer(myFilename);
                     break;
+                case "PRINT SCREEN":
+                case "SYS REQ":
+                    if (!_myVideoRecorder) {
+                        _myVideoRecorder = new VideoRecorder(25);
+                    }
+                    _myVideoRecorder.enabled = !_myVideoRecorder.enabled;
+                    break;
                 case 'M':
                     window.showMouseCursor = !window.showMouseCursor;
                     print("Mouse cursor: " + (window.showMouseCursor ? "on" : "off"));
@@ -295,6 +299,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
                     break;
                 case 'u':
+                    if (!_myMemoryMeter) {
+                        _myMemoryMeter = new MemoryMeter(self);
+                    }
                     _myMemoryMeter.toggleEnableFlag();
                     break;
                 case '0':
@@ -417,7 +424,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         self.setScene(myScene, myCanvas);
         renderer = window.getRenderer();
-        window.swapInterval = 0;
+
+        // Turn on sync to V-Blank
+        window.swapInterval = 1;
 
         var myViewport = self.getRenderWindow().canvas.childNode("viewport");
 
@@ -435,15 +444,18 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         _myImageManager = new ImageManager(self);
         _myOverlayManager = new OverlayManager(self.getScene(), myViewport);
 
-        if (_mySplashScreen) {
-            showSplashScreen();
-        }
         _myConfigurator = new Configurator(self, SETTINGS_FILE_NAME);
 
         if (theWindowTitle != null) {
             window.title = theWindowTitle;
         }
-        //window.swapInterval = 1;
+
+        if (_mySplashScreenFlag) {
+            _mySplashScreen = new ImageOverlay(window.scene, "shadertex/ac_logo.png", [0, 0]);
+            _mySplashScreen.name = "splashscreen";
+            _mySplashScreen.position = new Vector2f((window.width - _mySplashScreen.width) / 2,
+                                                    (window.height - _mySplashScreen.height) / 2);
+        }
     }
 
     self.createShutter = function() {
@@ -458,42 +470,45 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         window.go();
     }
 
-    function showSplashScreen() {
-        _mySplashScreenOverlay = new ImageOverlay(_myOverlayManager, "shadertex/ac_logo.png", [0, 0]);
-        _mySplashScreenOverlay.name = "splashscreen";
-        //TODO viewport/canvas
-        _mySplashScreenOverlay.position = new Vector2f((window.width - _mySplashScreenOverlay.width) / 2,
-                                                       (window.height - _mySplashScreenOverlay.height) / 2);
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     // private members
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    function fadeSplashScreen(theTime) {
+        const START_FADE = 1;
+        const STOP_FADE  = 3;
+        _mySplashScreen.moveToTop();
+        if (theTime > START_FADE && theTime < STOP_FADE) {
+            _mySplashScreen.alpha = clamp((STOP_FADE - theTime) / (STOP_FADE - START_FADE), 0, 1);
+        }
+        if (theTime > STOP_FADE + 1) {
+            _mySplashScreen.removeFromScene();
+            _mySplashScreen = null;
+        }
+    }
+
     function showStatistics() {
-        if (_myOnScreenStatistics > 0) {
-            var myText = [];
-            myText.push(window.fps.toFixed(1));
+        var myText = [];
+        myText.push(window.fps.toFixed(1));
 
-            if (_myOnScreenStatistics > 1) {
-                var myStatistics = window.scene.statistics;
-                myText.push("Vertices:   " + myStatistics.renderedVertices + "/" + myStatistics.vertices);
-                myText.push("Primitives: " + myStatistics.renderedPrimitives + "/" + myStatistics.primitives);
-                myText.push("Worldnodes: " + myStatistics.worldNodes);
-                myText.push("Bodies:     " + myStatistics.bodies);
-                myText.push("Lights:     " + myStatistics.activeLights + "/" + myStatistics.lights);
-                myText.push("Overlays:   " + myStatistics.overlays);
-                myText.push("Materials:  " + myStatistics.materials);
-            }
+        if (_myOnScreenStatistics > 1) {
+            var myStatistics = window.scene.statistics;
+            myText.push("Vertices:   " + myStatistics.renderedVertices + "/" + myStatistics.vertices);
+            myText.push("Primitives: " + myStatistics.renderedPrimitives + "/" + myStatistics.primitives);
+            myText.push("Worldnodes: " + myStatistics.worldNodes);
+            myText.push("Bodies:     " + myStatistics.bodies);
+            myText.push("Lights:     " + myStatistics.activeLights + "/" + myStatistics.lights);
+            myText.push("Overlays:   " + myStatistics.overlays);
+            myText.push("Materials:  " + myStatistics.materials);
+        }
 
-            for (var i = 0; i < myText.length; ++i) {
-                window.setTextColor([0,0,0,1], [1,1,1,1]);
-                window.renderText([window.width - 161, 19 + (i * 15)], myText[i], "Screen13");
-                window.setTextColor([1,1,1,1], [1,1,1,1]);
-                window.renderText([window.width - 160.8, 19.2 + (i * 15)], myText[i], "Screen13");
-            }
+        for (var i = 0; i < myText.length; ++i) {
+            window.setTextColor([0,0,0,1], [1,1,1,1]);
+            window.renderText([window.width - 161, 19 + (i * 15)], myText[i], "Screen13");
+            window.setTextColor([1,1,1,1], [1,1,1,1]);
+            window.renderText([window.width - 160.8, 19.2 + (i * 15)], myText[i], "Screen13");
         }
     }
 
@@ -515,31 +530,32 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
     function printHelp() {
          print("Scene Viewer Keys:");
-         print("  print  create screenshot named screenshot + date + counter, as png image");
-         print("    w    toggle wireframe");
-         print("    F    toggle flatshading");
-         print("    t    toggle texturing");
-         print("    b    toggle backface culling");
-         print("    m    switch to next mover");
-         print("    M    toggles mouse cursor visibility");
-         print("    f    toggles fullscreen");
-         print("    v    toggles bounding box visualization");
-         print("    c    toggles culling");
-         print("    C    toggles culling debug mode");
-         print("    p    pause continous rendering");
-         print("    s    print statistic");
-         print("    S    save scene to file");
-         print("    B    save scene to binary file");
-         print("    q    quits the application");
-         print("    X    dumps scene on console");
-         print("    u    toggle used memory display");
-         print("    e    re-evaluate all include-files");
-         print("    +    increase zoom factor");
-         print("    -    decrease zoom factor");
-         print("    ,    switch to previous camera");
-         print("    .    switch to next camera");
-         print("   0-9   switch to camera number 0-9");
-         print("    h    print this help");
+         print("  print        create screenshot named screenshot + date + counter, as png image");
+         print("  shift-print  enables/disables video recorder");
+         print("    w          toggle wireframe");
+         print("    F          toggle flatshading");
+         print("    t          toggle texturing");
+         print("    b          toggle backface culling");
+         print("    m          switch to next mover");
+         print("    M          toggles mouse cursor visibility");
+         print("    f          toggles fullscreen");
+         print("    v          toggles bounding box visualization");
+         print("    c          toggles culling");
+         print("    C          toggles culling debug mode");
+         print("    p          pause continous rendering");
+         print("    s          print statistic");
+         print("    S          save scene to file");
+         print("    B          save scene to binary file");
+         print("    q          quits the application");
+         print("    X          dumps scene on console");
+         print("    u          toggle used memory display");
+         print("    e          re-evaluate all include-files");
+         print("    +          increase zoom factor");
+         print("    -          decrease zoom factor");
+         print("    ,          switch to previous camera");
+         print("    .          switch to next camera");
+         print("   0-9         switch to camera number 0-9");
+         print("    h          print this help");
     }
 
     var _myFullscreen            = false;
@@ -558,11 +574,12 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     var _myPBufferWidth          = 0;
     var _myCurrentTime           = 0;
     var _myTimer                 = new AutoTimer("SceneViewer Timer");
-    var _mySplashScreen          = false; // self.getReleaseMode();
-    var _mySplashScreenOverlay   = null;
+    var _mySplashScreen          = null;
+    var _mySplashScreenFlag      = false;
     var _myShutter               = null;
-    var _myOnScreenDisplay       = new OnScreenDisplay(self);
+    var _myOnScreenDisplay       = null;
     var _mySetDefaultRenderingCap= true;
-    var _myMemoryMeter           = new MemoryMeter(self);
+    var _myMemoryMeter           = null;
     var _myOnScreenStatistics    = 0;
+    var _myVideoRecorder         = null;
 }

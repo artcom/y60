@@ -10,7 +10,7 @@
 
 use("Y60JSSL.js");
 
-function VideoRecorder(theFramesPerSecond, theDirectory, thePrefix) {
+function VideoRecorder(theFramesPerSecond, theDirectory) {
 
     var Public = this;
 
@@ -18,15 +18,30 @@ function VideoRecorder(theFramesPerSecond, theDirectory, thePrefix) {
     // Public
     //////////////////////////////////////////////////////////////////////
 
-    Public.enabled = false;
+    Public.enabled getter = function() {
+        return _myEnabledFlag;
+    }
+
+    Public.enabled setter = function(theFlag) {
+        if (theFlag != _myEnabledFlag) {
+            if (theFlag) {
+                _myFixedFrameTime = window.fixedFrameTime;
+                window.fixedFrameTime = 1 / _myFramesPerSecond;
+                print("Video Recorder enabled for directory: " + _myDirectory);
+            } else {
+                window.fixedFrameTime = _myFixedFrameTime;
+                print("Video Recorder disabled");
+            }
+            _myEnabledFlag = theFlag;
+        }
+    }
 
     Public.onFrame = function(theTime) {
-        if (Public.enabled && theTime >= _myNextFrameTime) {
-            var myFileName = _myDirectory + "/" + _myPrefix;
+        if (_myEnabledFlag) {
+            var myFileName = _myDirectory + "/frame";
             myFileName += padStringFront(_myFrameCount++, "0", 5);
             myFileName += ".png";
             window.saveBuffer(myFileName);
-            _myNextFrameTime = theTime + _myFrameDelta;
         }
     }
 
@@ -35,18 +50,23 @@ function VideoRecorder(theFramesPerSecond, theDirectory, thePrefix) {
     //////////////////////////////////////////////////////////////////////
 
     function setup() {
-        if (!fileExists(_myDirectory)) {
-            Logger.warning("VideoRecorder: Creating directory '" + _myDirectory + "'");
-            createDirectory(_myDirectory);
+        var myCounter = 0;
+        var myDirectory = _myDirectory;
+        while (true) {
+            if (!fileExists(myDirectory)) {
+                createDirectory(myDirectory);
+                break;
+            }
+            myDirectory = _myDirectory + "_" + myCounter++;
         }
+        _myDirectory = myDirectory;
     }
 
-    var _myFrameCount    = 0;
-    var _myNextFrameTime = 0.0;
-    var _myFrameDelta    = (theFramesPerSecond ? (1.0 / theFramesPerSecond) : 0.0);
-
-    var _myDirectory     = (theDirectory ? theDirectory : "frames");
-    var _myPrefix        = (thePrefix ? thePrefix : "frame");
+    var _myEnabledFlag     = false;
+    var _myFrameCount      = 0;
+    var _myFramesPerSecond = theFramesPerSecond;
+    var _myFixedFrameTime  = window.fixedFrameTime;
+    var _myDirectory       = (theDirectory ? theDirectory : "frames");
 
     setup();
 }
