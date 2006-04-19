@@ -173,7 +173,7 @@ namespace y60 {
         }
         return myTexWrapMode;
     }
-    
+
     GLenum
     asGLTextureSampleFilter(TextureSampleFilter theSampleFilter, bool theMipmapsFlag) {
         GLenum myTexSampleFilter;
@@ -209,7 +209,7 @@ namespace y60 {
         return GLenum(0);
     }
 
-    GLenum 
+    GLenum
     asGLBlendEquation(const BlendEquation & theBlendEquation) {
         switch (theBlendEquation) {
             case EQUATION_MIN:
@@ -334,7 +334,7 @@ namespace y60 {
     };
 
     DEFINE_EXCEPTION(GLBlendFunctionOutOfRangeException, asl::Exception);
-    
+
     GLenum
     asGLBlendFunction(BlendFunction theBlendFunction) {
         GLenum myBlendFunc;
@@ -425,7 +425,7 @@ namespace y60 {
     }
 
     DEFINE_EXCEPTION(GlPlaneOutOfRangeException, asl::Exception);
-    GLenum 
+    GLenum
     asGLClippingPlaneId(unsigned thePlaneNum) {
 #if 1
         if (thePlaneNum <= 5) {
@@ -519,13 +519,13 @@ namespace y60 {
             case TEXCOORD7_REGISTER:
                 return GL_TEXTURE7_ARB;
             default:
-                throw GlTextureOutOfRangeException(std::string("Cannot convert texture register ") + 
+                throw GlTextureOutOfRangeException(std::string("Cannot convert texture register ") +
                     asl::as_string(theRegister) + " to gl register.", PLUS_FILE_LINE);
         }
         return GL_TEXTURE0_ARB;
     }
-    
-    GLenum 
+
+    GLenum
     asGLTexCoordMode(TexCoordMode theMode) {
         switch (theMode) {
             case OBJECT_LINEAR:
@@ -539,23 +539,23 @@ namespace y60 {
         }
         return GL_OBJECT_LINEAR;
     }
- 
+
 #ifdef WIN32
 #define SET_PROC_ADDRESS(p,x) \
     x = (p) wglGetProcAddress( #x ); \
     if (!x) { \
-        x = (p) (&GLExceptionHelper< _name_ ## x >::throwMissingFunction); \
+        x = Missing_ ## x; \
     }
-#endif    
-    
+#endif
+
 #ifdef LINUX
 #define SET_PROC_ADDRESS(p,x) \
     _ac_ ## x = (p) glXGetProcAddressARB((const GLubyte*) #x ); \
     if (!x) { \
-        x = (p) (&GLExceptionHelper< _name_ ## x >::throwMissingFunction); \
+        x = Missing_ ## x; \
     }
 #endif
-    
+
     void
     initGLExtensions(unsigned int /*theNeededExtensions*/,
                      bool /*theVerboseFlag*/)
@@ -588,7 +588,7 @@ namespace y60 {
             SET_PROC_ADDRESS( PFNGLGETBUFFERPOINTERVARBPROC, glGetBufferPointervARB );
 
             /* OpenGL core 1.5 functions without ARB-identifier */
-            
+
             SET_PROC_ADDRESS( PFNGLBINDBUFFERPROC, glBindBuffer );
             SET_PROC_ADDRESS( PFNGLDELETEBUFFERSPROC, glDeleteBuffers );
             SET_PROC_ADDRESS( PFNGLGENBUFFERSPROC, glGenBuffers );
@@ -603,8 +603,8 @@ namespace y60 {
 
             SET_PROC_ADDRESS( PFNGLFLUSHVERTEXARRAYRANGENVPROC, glFlushVertexArrayRangeNV );
             SET_PROC_ADDRESS( PFNGLVERTEXARRAYRANGENVPROC, glVertexArrayRangeNV );
- 
-            if (!(glBindBuffer && 
+
+            if (!(glBindBuffer &&
                 glDeleteBuffers &&
                 glGenBuffers &&
                 glIsBuffer &&
@@ -623,7 +623,7 @@ namespace y60 {
         if (queryOGLExtension("GL_ARB_texture_cube_map") ||
             queryOGLExtension("GL_EXT_texture_cube_map")) {
         }
-        
+
         // texture compression
         if (queryOGLExtension("GL_ARB_texture_compression") ||
             queryOGLExtension("GL_EXT_texture_compression_s3tc")) {
@@ -648,12 +648,12 @@ namespace y60 {
             SET_PROC_ADDRESS( PFNGLMULTITEXCOORD2FARBPROC, glMultiTexCoord2fARB );
             SET_PROC_ADDRESS( PFNGLACTIVETEXTUREARBPROC,glActiveTextureARB );
             SET_PROC_ADDRESS( PFNGLCLIENTACTIVETEXTUREARBPROC, glClientActiveTextureARB );
-        }        
-        
+        }
+
       // DS: for some reason this extension is not in the nvidia extension list but I've
       //     seen a demo using it. According to the GL_NV_point_sprite extension spec it
       //     uses exact the same tokens as GL_ARB_point_sprite. So they are exchangable.
-      //     the token names are different but we defined these tokens ourself in 
+      //     the token names are different but we defined these tokens ourself in
       //     glExtensions.h anyway.
         // point sprites
         if (queryOGLExtension("GL_ARB_point_sprite") ||
@@ -665,7 +665,7 @@ namespace y60 {
             SET_PROC_ADDRESS( PFNGLPOINTPARAMETERFARBPROC, glPointParameterfARB );
             SET_PROC_ADDRESS( PFNGLPOINTPARAMETERFVARBPROC, glPointParameterfvARB );
         }
-        
+
         // 3d texture
         if (myVersionMajor >= 2 || myVersionMinor >= 2) {
             GLint myMaxSize = 0;
@@ -710,11 +710,11 @@ namespace y60 {
 #endif
     }
 
-    bool hasCap(const string & theCapStr) {        
+    bool hasCap(const string & theCapStr) {
         return queryOGLExtension(theCapStr.c_str());
     }
-    
-    bool hasCap(unsigned int theCap) {        
+
+    bool hasCap(unsigned int theCap) {
         bool myResult = false;
         switch (theCap) {
             case CUBEMAP_SUPPORT:
@@ -750,7 +750,7 @@ namespace y60 {
                 break;
             default:
              throw OpenGLException(string("Sorry, unknown capability : ") + asl::as_string(theCap), PLUS_FILE_LINE);
-            
+
         }
         return myResult;
     }

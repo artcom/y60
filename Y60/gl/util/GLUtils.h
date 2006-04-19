@@ -42,16 +42,12 @@ namespace y60 {
     DEFINE_EXCEPTION(CantParseOpenGLVersion, asl::Exception);
     DEFINE_EXCEPTION(CantQueryOpenGLVersion, asl::Exception);
     DEFINE_EXCEPTION(MissingExtensionsException, asl::Exception);
-    DEFINE_EXCEPTION(MissingFunctionException, asl::Exception);
     DEFINE_EXCEPTION(GLUnknownBlendEquation, asl::Exception);
 
 template <const char* NAME>
 struct GLExceptionHelper {
     static void throwMissingExtension() {
         throw y60::MissingExtensionsException(NAME, PLUS_FILE_LINE);
-    }
-    static void throwMissingFunction() {
-        throw y60::MissingFunctionException(NAME, PLUS_FILE_LINE);
     }
 };
 
@@ -63,18 +59,14 @@ struct GLExceptionHelper {
  * idea taken from glew.sourceforge.net
 */
 #ifdef _ac_render_GLUtils_cpp_
-#ifdef DEBUG_VARIANT
     #define DEF_PROC_ADDRESS(T,X) \
     extern const char _name_ ## X [] = #X; \
-    T  _ac_ ## X = (T)&y60::GLExceptionHelper< _name_ ##X>::throwMissingExtension;
+    extern T Missing_ ## X = (T)&y60::GLExceptionHelper< _name_ ##X>::throwMissingExtension; \
+    T  _ac_ ## X = Missing_ ## X;
 #else
     #define DEF_PROC_ADDRESS(T,X) \
-    extern const char _name_ ## X [] = #X; \
-    T  _ac_ ## X = 0;
-#endif
-#else
-    #define DEF_PROC_ADDRESS(T,X) \
-    extern  T       _ac_ ## X;
+    extern  T _ac_ ## X; \
+    extern T Missing_ ## X;
 #endif
 
 
@@ -82,7 +74,7 @@ typedef void (*PFNACTESTPROC)(int, int);
 
 extern "C" {
 
-// test cases for unit test    
+// test cases for unit test
 DEF_PROC_ADDRESS( PFNACTESTPROC, acTestMissingExtension );
 #define acTestMissingExtension _ac_acTestMissingExtension
 DEF_PROC_ADDRESS( PFNACTESTPROC, acTestMissingFunction );

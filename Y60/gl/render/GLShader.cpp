@@ -118,7 +118,7 @@ namespace y60 {
             }
             // check if we have any wildcards to ignore
             for (int myIndex = 0; myIndex < myFeaturesLeft->size(); myIndex++) {
-                if ((*myFeaturesLeft)[myIndex] != theRequirementList[myIndex] && 
+                if ((*myFeaturesLeft)[myIndex] != theRequirementList[myIndex] &&
                     (*myFeaturesLeft)[myIndex] != "*" ) {
                         return NO_MATCH;
                     }
@@ -187,7 +187,7 @@ namespace y60 {
         if (myLineStippleProp) {
             glEnable(GL_LINE_STIPPLE);
             //glEnable(GL_LINE_SMOOTH);
-            glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());    
+            glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());
         }
 
         dom::NodePtr myPointSizeProp = myMaterialPropFacade->getProperty(POINTSIZE_PROPERTY);
@@ -218,7 +218,7 @@ namespace y60 {
                     + asl::as_string(myBlendFunction.size()) + " elements. Expected two.", PLUS_FILE_LINE);
         }
 
-        if (glBlendEquation) {
+        if (glBlendEquation != Missing_glBlendEquation) {
             const BlendEquation & myBlendEquation= myMaterialPropFacade->get<BlendEquationTag>();
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
             glBlendEquation(myEquation);
@@ -227,7 +227,7 @@ namespace y60 {
         theMaterial.updateParams();
     }
 
-    void 
+    void
     GLShader::enableTextures(const y60::MaterialBase & theMaterial) {
 
         unsigned myTextureCount = theMaterial.getTextureCount();
@@ -291,7 +291,7 @@ namespace y60 {
         glMatrixMode(GL_MODELVIEW);
     }
 
-    void 
+    void
     GLShader::disableTextures(const y60::MaterialBase & theMaterial) {
         // nothing to do
     }
@@ -394,8 +394,8 @@ namespace y60 {
                     // set texgen plane params
                     if (myModes[i] == NONE) {
                         continue;
-                    }  
-                        
+                    }
+
                     if (myModes[i] == EYE_LINEAR) {
 
                         if (mustRestoreMatrix == false) {
@@ -444,7 +444,7 @@ namespace y60 {
         return _myCost;
     }
 
-    unsigned 
+    unsigned
     GLShader::getMaxTextureUnits() const {
         int myMaxTexUnits;
         glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &myMaxTexUnits);
