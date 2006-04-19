@@ -17,13 +17,14 @@ function PathText(theSceneViewer, theText, theFontSize, theCharacterSoup) {
 }
 
 PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFontSize, theCharacterSoup) {
+
     self.getLength = function() {
         return _myText.length;
     }
+
     self.getShape = function() {
         return _myShape;
     }
-
     self.getBody = function() {
         return _myBody;
     }
@@ -47,6 +48,9 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
     self.setAlignment = function(theAlignment) {
         _myAlignment = theAlignment;
     }
+    self.getAlignment = function() {
+        return _myAlignment;
+    }
 
     /**
      * Align this text along given path.
@@ -67,6 +71,8 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
         var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
         var myFontMetrics = theCharacterSoup.getFontMetrics(theFontSize);
+        //print("font metrics:", "height=" + myFontMetrics.height, "ascent=" + myFontMetrics.ascent, "descent=" + myFontMetrics.descent);
+
         var myWidth = 0.0;
         var myVertexPositions = getDescendantByAttribute(_myShape, "name", "position", true);
         var myPositions = myVertexPositions.childNode('#text')[1]; // firstChild.nodeValue;
@@ -91,19 +97,23 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
             // advance
             myWidth = myCharacter.metric.advance;
+            //print("char=" + myCharacter.unicode + " advance=" + myWidth);
 
             // kerning
             if (i < (_myText.length-1)) {
                 var myNextCharacter = _myCharacters[i+1];
                 if (myNextCharacter != null) {
                     var myKerning = window.getKerning(theCharacterSoup.getFontName(theFontSize), myCharacter.unicode, myNextCharacter.unicode);
-                    myWidth += myKerning;
                     if (myKerning != 0.0) {
                         //print("kern=" + myKerning, "char=" + myCharacter.unicode, "next=" + myNextCharacter.unicode, "advance="+myCharacter.metric.advance);
                     }
+                    myWidth += myKerning;
                 }
             }
-            //print("width=" + myWidth, "char=" + myCharacter.unicode);
+
+            myWidth += theCharacterSoup.getTracking() / 64.0;
+            //print("advance+kern=" + myWidth);
+
             /*
              * move 'advance+kern' on path but make characters 'advance' wide
              */
@@ -148,8 +158,6 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
             myPositions[j + 3] = sum(myStart, myTopOffset);
         }
 
-        // write-back positions
-        //myVertexPositions.childNode('#text')[1] = myPositions;
         return _myText.length;
     }
 
@@ -162,6 +170,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
     var _myText = null;
     var _myCharacters = null;
     var _myAlignment = CENTER_ALIGNMENT;
+
     var _myShape = null;
     var _myBody = null;
 
@@ -179,6 +188,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
         for (var i = 0; i < _myText.length; ++i) {
             var myCharacter = _myCharacters[i];
+            //print("char=" + myCharacter.unicode, "uv=" + myCharacter.uv, "uvsize=" + myCharacter.uvsize);
             myShapeBuilder.appendQuadWithCustomTexCoords(myElement,
                     myCharacterPos, myCharacterSize,
                     myCharacter.uv, myCharacter.uvsize, false);
@@ -204,7 +214,7 @@ function test_PathText() {
     mySceneViewer.setup(800, 600, false, "PathText");
 
     const FONT_SIZE = 18;
-    var myCharacterSoup = new CharacterSoup(mySceneViewer, "Unit", "${PRO}/testmodels/fonts/UnitMed.ttf", [FONT_SIZE]);
+    var myCharacterSoup = new CharacterSoup(mySceneViewer, "Unit", "${PRO}/testmodels/fonts/UnMd____.ttf", [FONT_SIZE]);
 
     var mySvgPath = null;
     var myPos = null;
@@ -226,18 +236,20 @@ function test_PathText() {
             mySvgPaths.push(new SvgPath(myPaths[i].d));
         }
         mySvgPath = mySvgPaths[0];
-        myPos = new Vector3f(0, 1.15 * 100, 0);
+        myPos = new Vector3f(500, 1.15 * 100, 0);
 
         window.camera.position = new Vector3f(0,300,500);
     }
     var myPathAlign = new PathAlign(mySvgPath);
 
-    const __TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                   "abcdefghijklmnopqrstuvwxyz" +
-                   "0123456789!@#$%^&*()" +
-                   ",<.>/?;:\'\"\\|[{]}-_=+";
-    //const __TEXT = "hello Helo AV Ti Wgj.....";
+    //const __TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                   //"abcdefghijklmnopqrstuvwxyz" +
+                   //"0123456789!@#$%^&*()" +
+                   //",<.>/?;:\'\"\\|[{]}-_=+";
+    const __TEXT = "Longfire AV Ti THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG" +
+                   "the quick brown fox jumps over the lazy dog";
     var myPathText = new PathText(mySceneViewer, __TEXT, FONT_SIZE, myCharacterSoup);
+    myPathText.setTracking(0);
 
     var myAlignment = TOP_ALIGNMENT;
     var myRealign = true;

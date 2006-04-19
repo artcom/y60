@@ -56,10 +56,10 @@ namespace y60 {
     std::string
     QuicktimeDecoder::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
         if (asl::toLowerCase(asl::getExtension(theUrl)) == "mov") {
-            AC_INFO << "QuicktimeDecoder1 can decode :" << theUrl << endl;
+            AC_INFO << "QuicktimeDecoder can decode :" << theUrl << endl;
             return MIME_TYPE_MOV;
         } else {
-            AC_INFO << "QuicktimeDecoder1 can not decode :" << theUrl << " responsible for extension mov" << endl;
+            AC_INFO << "QuicktimeDecoder can not decode :" << theUrl << " responsible for extension mov" << endl;
             return "";
         }
     }
@@ -163,7 +163,6 @@ namespace y60 {
                 myQTTargetPixelFormat = k24BGRPixelFormat;
                 myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGR, PixelEncodingString));
                 break;
-        
         }
         // override pixelformat in case of demanded use of GRAY or ALPHA texture
         switch (myMovie->getPixelEncoding()) {

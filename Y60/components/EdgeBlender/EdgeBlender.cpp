@@ -62,7 +62,7 @@ class EdgeBlender :
         void renderMultiScreen();
         void renderBlending();
 
-        void drawGrid(const asl::Vector4f & theColor, unsigned theGridSize = 50);
+        void drawGrid(const asl::Vector4f & theColor, unsigned theGridSize = 20);
         void preRender();
         void postRender();
         void copyToTexture();
@@ -181,6 +181,7 @@ EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow)
     unsigned myTextureHeight = asl::nextPowerOfTwo(_myWindowHeight);
     AC_DEBUG << "texture=" << myTextureWidth << "x" << myTextureHeight;
 
+    checkOGLError(PLUS_FILE_LINE);
     //glActiveTextureARB(GL_TEXTURE0_ARB); // must lookup func pointer under Windows
     glGenTextures(1, &_mySceneTexture);
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture);
@@ -327,16 +328,14 @@ EdgeBlender::drawGrid(const asl::Vector4f & theColor, unsigned theGridSize)
     glColor4fv(theColor.begin());
     glBegin(GL_LINES);
     for (unsigned y = 0; y < _myWindowHeight; y += theGridSize) {
-        for (unsigned x = 0; x < _myWindowWidth; x += theGridSize) {
-
-            float myX = x / (float) _myWindowWidth;
-            glVertex2f(myX, 0.0f);
-            glVertex2f(myX, 1.0f);
-        }
-
         float myY = y / (float) _myWindowHeight;
         glVertex2f(0.0f, myY);
         glVertex2f(1.0f, myY);
+    }
+    for (unsigned x = 0; x < _myWindowWidth; x += theGridSize) {
+        float myX = x / (float) _myWindowWidth;
+        glVertex2f(myX, 0.0f);
+        glVertex2f(myX, 1.0f);
     }
     glEnd();
 }
@@ -506,6 +505,7 @@ EdgeBlender::preRender() {
     glDisable(GL_LIGHTING); 
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT, GL_FILL);
+    CHECK_OGL_ERROR;
 }
 
 void 
@@ -516,6 +516,7 @@ EdgeBlender::postRender() {
     // restore matrices
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
+
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
     

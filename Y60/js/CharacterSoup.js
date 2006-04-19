@@ -29,6 +29,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
     
     var _myAlphabetMap = [];
     var _myGlurRadi    = new Array();
+    var _myTracking    = 0.0;
 
     const CHARACTERS_PER_LINE = 16; // must be power-of-two
 
@@ -55,6 +56,13 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
             self.setupFont(theSize);
         }
         return _myAlphabetMap[theSize];
+    }
+
+    self.setTracking = function(theTracking) {
+        _myTracking = theTracking;
+    }
+    self.getTracking = function() {
+        return _myTracking;
     }
 
     self.createText = function(theText, theSize) {
@@ -87,7 +95,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                 // character is not in alphabet map -> render it into alphabet image
                 var myTargetUVPosition = new Vector2f(_myAlphabetMap[theSize].nextCharSlot);
                 var myMetric = window.getGlyphMetrics(myFontName, myChar);
-                //print("i="+i, "font="+theFontname, "char=" + myChar, "max=" + myMetric.max,"min="+myMetric.min,"advance="+myMetric.advance, "found="+myFound);
+                //print("char=" + myChar, "max=" + myMetric.max,"min="+myMetric.min,"advance="+myMetric.advance, "found="+myFound);
                 var myGlyphSize = difference(myMetric.max, myMetric.min);
 
                 var myTmpImage = window.scene.createImage(myGlyphSize.x, myGlyphSize.y, "RGBA");
@@ -99,10 +107,16 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                 // blur/glow
                 if (_myGlurRadi[theSize] > 0) {
                     applyGlurFilter(_myGlurRadi[theSize], myTmpImage);
-                    //saveImage(myTmpImage, "test/"+myChar + "_" + theSize + ".png");
-
                 }
-                blitImage(myTmpImage, myFontImage, myTargetUVPosition);
+                //saveImage(myTmpImage, "test/"+myChar + "_" + theSize + ".png");
+
+                var myBlitPos = new Vector2f(myTargetUVPosition);
+                myBlitPos.x += myMetric.min[0];
+                if (myBlitPos.x < 0) {
+                    Logger.error("Blit pos < 0");
+                    myBlitPos.x = 0;
+                }
+                blitImage(myTmpImage, myFontImage, myBlitPos);
                 theSceneViewer.getImages().removeChild(myTmpImage);
 
                 // texture coordinates
@@ -111,9 +125,27 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                 myTexSize[0] = (myCharSize[0] + _myGlurRadi[theSize] * 0.6) / myFontImage.width;
                 myTexSize[1] = (myCharSize[1] + _myGlurRadi[theSize] * 0.6) / myFontImage.height;
 
+                //XXX
+                if (0) {
+                    var myRasterData = myFontImage.firstChild.firstChild.nodeValue;
+                    var myX = myTexCoord[0] * myFontImage.width;
+                    var myY = myTexCoord[1] * myFontImage.height;
+                    var myW = myTexSize[0] * myFontImage.width;
+                    var myH = myTexSize[1] * myFontImage.height;
+                    for (var y = 0; y < myH; ++y) {
+                        myRasterData.setPixel(myX, myY+y,
+                                255,0,0,255);
+                        myRasterData.setPixel(myX + myW, myY+y,
+                                255,255,0,255);
+
+                        myRasterData.setPixel(myX + myCharSize[0], myY+y,
+                                0,255,0,255);
+                    }
+                }
+
                 // position of next character
-                _myAlphabetMap[theSize].nextCharSlot.x += myCellSize;
-                if (_myAlphabetMap[theSize].nextCharSlot.x > myFontImage.width - (2*myCellSize)) {
+                _myAlphabetMap[theSize].nextCharSlot.x += nextPowerOfTwo(myMetric.advance); //myCellSize;
+                if (_myAlphabetMap[theSize].nextCharSlot.x > (myFontImage.width - myCellSize)) {
                     _myAlphabetMap[theSize].nextCharSlot.x = 1;
                     _myAlphabetMap[theSize].nextCharSlot.y += myCellSize;
                     if (_myAlphabetMap[theSize].nextCharSlot.y > myFontImage.height - (2*myCellSize)) {
@@ -153,6 +185,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         var myFontImageSize = myCellSize * CHARACTERS_PER_LINE;
         var myFontImage = window.scene.createImage(myFontImageSize, myFontImageSize, "RGBA");
         window.scene.update(Scene.IMAGES);
+        myFontImage.mipmap = false;
 
         var myMaterial = buildUnlitTextureMaterialNode(myFontName + "_material", myFontImage.id);
         myMaterial.name = myFontName + "_material";

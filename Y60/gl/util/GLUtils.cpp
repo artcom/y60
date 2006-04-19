@@ -648,13 +648,13 @@ namespace y60 {
             SET_PROC_ADDRESS( PFNGLMULTITEXCOORD2FARBPROC, glMultiTexCoord2fARB );
             SET_PROC_ADDRESS( PFNGLACTIVETEXTUREARBPROC,glActiveTextureARB );
             SET_PROC_ADDRESS( PFNGLCLIENTACTIVETEXTUREARBPROC, glClientActiveTextureARB );
-        }
+        }        
 
-      // DS: for some reason this extension is not in the nvidia extension list but I've
-      //     seen a demo using it. According to the GL_NV_point_sprite extension spec it
-      //     uses exact the same tokens as GL_ARB_point_sprite. So they are exchangable.
-      //     the token names are different but we defined these tokens ourself in
-      //     glExtensions.h anyway.
+        // DS: for some reason this extension is not in the nvidia extension list but I've
+        //     seen a demo using it. According to the GL_NV_point_sprite extension spec it
+        //     uses exact the same tokens as GL_ARB_point_sprite. So they are exchangable.
+        //     the token names are different but we defined these tokens ourself in 
+        //     glExtensions.h anyway.
         // point sprites
         if (queryOGLExtension("GL_ARB_point_sprite") ||
             queryOGLExtension("GL_NV_point_sprite")) {
