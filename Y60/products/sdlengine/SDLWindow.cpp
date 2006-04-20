@@ -75,6 +75,10 @@ SDLWindow::SDLWindow() :
 
 SDLWindow::~SDLWindow() {
     AC_DEBUG << "SDLWindow::~SDLWindow";
+    if (_myScene) {
+        // unbind all created textures while we still have a valid context
+        _myScene->getTextureManager()->unbindTextures();
+    }
     SDL_Quit();
 }
 
@@ -202,8 +206,9 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
             wminfo.info.x11.unlock_func();
         }
 #endif
+
         if (_myScene) {
-            // before creating a new context unbind all created textures
+            // unbind all created textures before creating a new context
             _myScene->getTextureManager()->unbindTextures();
         }
 
