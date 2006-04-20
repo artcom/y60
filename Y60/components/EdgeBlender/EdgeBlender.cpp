@@ -181,10 +181,9 @@ EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow)
     unsigned myTextureHeight = asl::nextPowerOfTwo(_myWindowHeight);
     AC_DEBUG << "texture=" << myTextureWidth << "x" << myTextureHeight;
 
-    checkOGLError(PLUS_FILE_LINE);
-    //glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, &_mySceneTexture);
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture);
+
     glTexImage2D(GL_TEXTURE_2D, 0, 3,
                  myTextureWidth, myTextureHeight,
                  0, GL_RGB, GL_UNSIGNED_BYTE, 0);
