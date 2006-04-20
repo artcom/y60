@@ -21,6 +21,7 @@
 #include "JSTNTMeasurementList.h"
 #include "JSTNTThresholdList.h"
 #include "JSACIconFactory.h"
+#include "JSConsoleView.h"
 
 // standard Gtk widgets
 #include "JSFrame.h"
@@ -114,6 +115,9 @@ using namespace asl;
 bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
 
     // === Custom ART+COM Widgets =======================================
+    if (!JSConsoleView::initClass(cx, theGlobalObject)) {
+        return false;
+    }
     if (!JSACIconFactory::initClass(cx, theGlobalObject)) {
         return false;
     }
@@ -410,6 +414,7 @@ bool try_to_cast(JSContext * cx, Gtk::Widget * theWidget, jsval & theTarget, boo
 jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     jsval myJsVal = JSVAL_NULL;
 
+    TRY_DYNAMIC_CAST(acgtk::ConsoleView);
     TRY_DYNAMIC_CAST(acgtk::GrayScale);
     TRY_DYNAMIC_CAST(acgtk::Histogram);
     TRY_DYNAMIC_CAST(acgtk::CWRuler);
@@ -528,6 +533,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (castFrom<acgtk::RenderArea>(cx, myArgument, theTarget)) {
+                return true;
+            } else if (castFrom<acgtk::ConsoleView>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<acgtk::GrayScale>(cx, myArgument, theTarget)) {
                 return true;
@@ -680,6 +687,7 @@ CONVERT_FROM(ACColumnRecord);
 CONVERT_FROM(Gtk::TreeModelColumnRecord);
 //CONVERT_FROM(AbstractRenderWindow);
 
+CONVERT_FROM_GLIB_OBJECT(acgtk::ConsoleView);
 CONVERT_FROM_GLIB_OBJECT(acgtk::GrayScale);
 CONVERT_FROM_GLIB_OBJECT(acgtk::Histogram);
 CONVERT_FROM_GLIB_OBJECT(acgtk::CWRuler);
