@@ -194,7 +194,7 @@ namespace y60 {
             CHECK_OGL_ERROR;
             // [DS] the min filter defaults to GL_NEAREST_MIPMAP_LINEAR. This
             // causes problems with offscreen rendering.
-            // causes problems with non mipmaped textures. 
+            // causes problems with non mipmaped textures.
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             CHECK_OGL_ERROR;
         } else {
@@ -202,7 +202,7 @@ namespace y60 {
             glBindTexture(GL_TEXTURE_3D, myId);
             CHECK_OGL_ERROR;
             // [DS] the min filter defaults to GL_NEAREST_MIPMAP_LINEAR. This
-            // causes problems with non mipmaped textures. 
+            // causes problems with non mipmaped textures.
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             CHECK_OGL_ERROR;
         }
@@ -234,7 +234,7 @@ namespace y60 {
             theImage->setPixelBufferId(myBufferId);
             CHECK_OGL_ERROR;
         }
-        if (glBindBufferARB) {
+        if (glBindBufferARB != Missing_glBindBufferARB) {
             glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
             CHECK_OGL_ERROR;
         }
@@ -366,7 +366,7 @@ namespace y60 {
 
 #ifdef GL_PIXEL_UNPACK_BUFFER_ARB
         unsigned int myBufferId = theImage->getPixelBufferId();
-        if (glBindBufferARB && myBufferId) {
+        if (glBindBufferARB != Missing_glBindBufferARB && myBufferId) {
 
             // bind buffer
             glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, myBufferId);
@@ -378,7 +378,7 @@ namespace y60 {
             memcpy(myPBOData, myImageData, myImageDataLen);
             glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB);
             CHECK_OGL_ERROR;
- 
+
             // treated as an offset into the pixel buffer
             myImageData = 0;
         }
@@ -399,7 +399,7 @@ namespace y60 {
 
 #ifdef GL_PIXEL_UNPACK_BUFFER_ARB
         // unbind buffer
-        if (glBindBufferARB && myBufferId) {
+        if (glBindBufferARB != Missing_glBindBufferARB && myBufferId) {
             glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
             CHECK_OGL_ERROR;
         }

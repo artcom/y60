@@ -163,10 +163,10 @@ DEF_PROC_ADDRESS( PFNGLMULTITEXCOORD3FVARBPROC, glMultiTexCoord3fvARB );
 #define glMultiTexCoord3fvARB _ac_glMultiTexCoord3fvARB
 DEF_PROC_ADDRESS( PFNGLMULTITEXCOORD2FARBPROC, glMultiTexCoord2fARB );
 #define glMultiTexCoord2fARB _ac_glMultiTexCoord2fARB
-DEF_PROC_ADDRESS( PFNGLACTIVETEXTUREARBPROC,glActiveTextureARB );
-#define glActiveTextureARB _ac_glActiveTextureARB
-DEF_PROC_ADDRESS( PFNGLCLIENTACTIVETEXTUREARBPROC, glClientActiveTextureARB );
-#define glClientActiveTextureARB _ac_glClientActiveTextureARB
+DEF_PROC_ADDRESS( PFNGLACTIVETEXTUREPROC,glActiveTexture );
+#define glActiveTexture _ac_glActiveTexture
+DEF_PROC_ADDRESS( PFNGLCLIENTACTIVETEXTUREPROC, glClientActiveTexture );
+#define glClientActiveTexture _ac_glClientActiveTexture
 
 // point sprites
 DEF_PROC_ADDRESS( PFNGLPOINTPARAMETERFARBPROC, glPointParameterfARB );

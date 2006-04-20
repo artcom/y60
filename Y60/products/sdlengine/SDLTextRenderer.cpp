@@ -163,7 +163,7 @@ namespace y60 {
         unsigned int myImageDataSize = _myTextureSurface->w * _myTextureSurface->h * sizeof(asl::RGBA);
         myImage->set(_myTextureSurface->w, _myTextureSurface->h, 1, y60::RGBA,
                         ReadableBlockAdapter((unsigned char*)_myTextureSurface->pixels,
-                        (unsigned char*)_myTextureSurface->pixels + myImageDataSize)); 
+                        (unsigned char*)_myTextureSurface->pixels + myImageDataSize));
         if ((_myTextureSurface->w == myOldWidth) && (_myTextureSurface->h == myOldHeight)) {
             // reuse glTexture
             theTextureManager.updateImageData(myImage);
@@ -248,7 +248,7 @@ namespace y60 {
         DB(AC_TRACE << "### myFont=" << myFontName << " Ch=" << theFirstCharacter << theSecondCharacter << " myKerning=" << myKerning << endl;)
         return myKerning;
     }
-    
+
     bool SDLTextRenderer::hasGlyph(const std::string& theFontName,
                                        const std::string& theCharacter) const
     {
@@ -775,8 +775,8 @@ namespace y60 {
         const GLuint myTexture = mySDLText->createTextureFromSurface(_myTextureSurface);
 
         glEnable(GL_TEXTURE_2D);
-        glActiveTextureARB(GL_TEXTURE0_ARB);
-        glClientActiveTextureARB(GL_TEXTURE0_ARB);
+        glActiveTexture(GL_TEXTURE0);
+        glClientActiveTexture(GL_TEXTURE0);
 
         glBindTexture(GL_TEXTURE_2D, myTexture);
         unsigned int myXPos = (unsigned int) (theText->_myPos[0] * getWindowWidth());

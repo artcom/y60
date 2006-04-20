@@ -415,7 +415,7 @@ namespace y60 {
         setAutoParameters(theLightInstances, theViewport, theBody, theCamera);
     }
 
-    void 
+    void
     CgProgramInfo::bindOverlayParams() {
         setCGGLParameters();
 
@@ -781,7 +781,7 @@ namespace y60 {
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
 
             GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
-            glActiveTextureARB(myTexUnit);
+            glActiveTexture(myTexUnit);
 
             // AC_DEBUG << "CgProgramInfo::enableTextures paramName=" << _myTextureParams[i]._myParamName
             //          << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
@@ -797,7 +797,7 @@ namespace y60 {
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
 
             GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
-            glActiveTextureARB(myTexUnit);
+            glActiveTexture(myTexUnit);
 
             //AC_DEBUG << "CgProgramInfo::disableTextures paramName=" << _myTextureParams[i]._myParamName << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
             cgGLDisableTextureParameter(_myTextureParams[i]._myParameter);

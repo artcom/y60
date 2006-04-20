@@ -254,7 +254,7 @@ namespace y60 {
             GLenum myTexUnit = asGLTextureRegister(i);
             AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.get<NameTag>() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId() << " wrap=" << myTexture.getWrapMode();
 
-            glActiveTextureARB(myTexUnit);
+            glActiveTexture(myTexUnit);
             glBindTexture(myTextureType, myTexture.getId());
 
             // load texture matrix
@@ -302,7 +302,7 @@ namespace y60 {
         if (theMaterial.hasTexGen()) {
             // disable texture coordinate generation
             for (unsigned myTexUnit = 0; myTexUnit < theMaterial.getTexGenModes().size(); ++myTexUnit) {
-                glActiveTextureARB(asGLTextureRegister(myTexUnit));
+                glActiveTexture(asGLTextureRegister(myTexUnit));
                 glDisable(GL_TEXTURE_GEN_S);
                 glDisable(GL_TEXTURE_GEN_T);
                 glDisable(GL_TEXTURE_GEN_R);
@@ -382,7 +382,7 @@ namespace y60 {
             // enable texture coordinate generation
             for (unsigned myTexUnit = 0; myTexUnit < myTexGenModes.size(); ++myTexUnit) {
 
-                glActiveTextureARB(asGLTextureRegister(myTexUnit));
+                glActiveTexture(asGLTextureRegister(myTexUnit));
 
                 MaterialBase::TexGenMode myModes = myTexGenModes[myTexUnit];
                 MaterialBase::TexGenParams myParams = myTexGenParams[myTexUnit];

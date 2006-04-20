@@ -89,11 +89,11 @@ namespace y60 {
 
         bool alreadyHasSpriteTexture = false;
         for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {
-            glActiveTextureARB(asGLTextureRegister(myTextureCounter));
+            glActiveTexture(asGLTextureRegister(myTextureCounter));
             CHECK_OGL_ERROR;
             const y60::Texture & myTexture = theMaterial.getTexture(myTextureCounter);
-            TextureUsage 
-                myTextureUsage = theMaterial.getTextureUsage(myTextureCounter); 
+            TextureUsage
+                myTextureUsage = theMaterial.getTextureUsage(myTextureCounter);
 
             unsigned myId = myTexture.getId();
             DB(AC_TRACE << "FFShader::enableTextures: texture index=" << myTextureCounter <<
@@ -161,8 +161,8 @@ namespace y60 {
 
             // Fixed Function Shaders only support paint & skybox usage
             if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
-                glActiveTextureARB(asGLTextureRegister(myTextureCounter));
-                glClientActiveTextureARB(asGLTextureRegister(myTextureCounter));
+                glActiveTexture(asGLTextureRegister(myTextureCounter));
+                glClientActiveTexture(asGLTextureRegister(myTextureCounter));
 
                 switch (myTexture.getImage()->getType()) {
                     case SINGLE :

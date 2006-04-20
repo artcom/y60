@@ -263,8 +263,8 @@ namespace y60 {
                     }
                     break;
                 default:
-                    glActiveTextureARB(asGLTextureRegister(GLRegister(myRegister)));
-                    glClientActiveTextureARB(asGLTextureRegister(GLRegister(myRegister)));
+                    glActiveTexture(asGLTextureRegister(GLRegister(myRegister)));
+                    glClientActiveTexture(asGLTextureRegister(GLRegister(myRegister)));
                     DB2(AC_TRACE <<"Active Texture Register "<<asGLTextureRegister(GLRegister(myRegister))<<endl);
                     if (myEnable) {
                         DB2(AC_TRACE <<"Enable GL_TEXTURE_COORD_ARRAY"<<endl);
@@ -492,9 +492,9 @@ namespace y60 {
                         break;
                     default:
                         GLenum myGlRegister = asGLTextureRegister(myRegister);
-                        glActiveTextureARB(myGlRegister);
+                        glActiveTexture(myGlRegister);
                         CHECK_OGL_ERROR;
-                        glClientActiveTextureARB(myGlRegister);
+                        glClientActiveTexture(myGlRegister);
                         CHECK_OGL_ERROR;
                         myData.useAsTexCoord();
                         break;
@@ -641,7 +641,7 @@ namespace y60 {
         enableRenderStyles(myRenderStyles);
         glColor4fv(theColor.begin());
         glLineWidth(theWidth);
-        
+
         glPushMatrix();
         glMultMatrixf(theTransformation.getData());
     }
@@ -1290,8 +1290,8 @@ namespace y60 {
 
     void
     Renderer::renderTextSnippets(ViewportPtr theViewport) {
-        glActiveTextureARB(asGLTextureRegister(0));
-        glClientActiveTextureARB(asGLTextureRegister(0));
+        glActiveTexture(asGLTextureRegister(0));
+        glClientActiveTexture(asGLTextureRegister(0));
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         CHECK_OGL_ERROR;
 

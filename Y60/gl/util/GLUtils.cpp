@@ -460,69 +460,36 @@ namespace y60 {
 
     GLenum
     asGLTextureRegister(unsigned theIndex) {
-#if 1
         if (theIndex <= 7) {
-            return GL_TEXTURE0_ARB + theIndex;
+            return GL_TEXTURE0 + theIndex;
         }
         throw GlTextureOutOfRangeException("Primitive uses more texture units than implemented", PLUS_FILE_LINE);
-#else
-        GLenum myUnit;
-        switch (theIndex) {
-            case 0:
-                myUnit = GL_TEXTURE0_ARB;
-                break;
-            case 1:
-                myUnit = GL_TEXTURE1_ARB;
-                break;
-            case 2:
-                myUnit = GL_TEXTURE2_ARB;
-                break;
-            case 3:
-                myUnit = GL_TEXTURE3_ARB;
-                break;
-            case 4:
-                myUnit = GL_TEXTURE4_ARB;
-                break;
-            case 5:
-                myUnit = GL_TEXTURE5_ARB;
-                break;
-            case 6:
-                myUnit = GL_TEXTURE6_ARB;
-                break;
-            case 7:
-                myUnit = GL_TEXTURE7_ARB;
-                break;
-            default:
-                throw GlTextureOutOfRangeException("Primitive uses more texture units than currently implemented", PLUS_FILE_LINE);
-        }
-        return myUnit;
-#endif
     }
 
     GLenum
     asGLTextureRegister(GLRegister theRegister) {
         switch (theRegister) {
             case TEXCOORD0_REGISTER:
-                return GL_TEXTURE0_ARB;
+                return GL_TEXTURE0;
             case TEXCOORD1_REGISTER:
-                return GL_TEXTURE1_ARB;
+                return GL_TEXTURE1;
             case TEXCOORD2_REGISTER:
-                return GL_TEXTURE2_ARB;
+                return GL_TEXTURE2;
             case TEXCOORD3_REGISTER:
-                return GL_TEXTURE3_ARB;
+                return GL_TEXTURE3;
             case TEXCOORD4_REGISTER:
-                return GL_TEXTURE4_ARB;
+                return GL_TEXTURE4;
             case TEXCOORD5_REGISTER:
-                return GL_TEXTURE5_ARB;
+                return GL_TEXTURE5;
             case TEXCOORD6_REGISTER:
-                return GL_TEXTURE6_ARB;
+                return GL_TEXTURE6;
             case TEXCOORD7_REGISTER:
-                return GL_TEXTURE7_ARB;
+                return GL_TEXTURE7;
             default:
                 throw GlTextureOutOfRangeException(std::string("Cannot convert texture register ") +
                     asl::as_string(theRegister) + " to gl register.", PLUS_FILE_LINE);
         }
-        return GL_TEXTURE0_ARB;
+        return GL_TEXTURE0;
     }
 
     GLenum
@@ -646,14 +613,14 @@ namespace y60 {
             SET_PROC_ADDRESS( PFNGLMULTITEXCOORD3FARBPROC, glMultiTexCoord3fARB );
             SET_PROC_ADDRESS( PFNGLMULTITEXCOORD3FVARBPROC, glMultiTexCoord3fvARB );
             SET_PROC_ADDRESS( PFNGLMULTITEXCOORD2FARBPROC, glMultiTexCoord2fARB );
-            SET_PROC_ADDRESS( PFNGLACTIVETEXTUREARBPROC,glActiveTextureARB );
-            SET_PROC_ADDRESS( PFNGLCLIENTACTIVETEXTUREARBPROC, glClientActiveTextureARB );
-        }        
+            SET_PROC_ADDRESS( PFNGLACTIVETEXTUREPROC,glActiveTexture );
+            SET_PROC_ADDRESS( PFNGLCLIENTACTIVETEXTUREPROC, glClientActiveTexture );
+        }
 
         // DS: for some reason this extension is not in the nvidia extension list but I've
         //     seen a demo using it. According to the GL_NV_point_sprite extension spec it
         //     uses exact the same tokens as GL_ARB_point_sprite. So they are exchangable.
-        //     the token names are different but we defined these tokens ourself in 
+        //     the token names are different but we defined these tokens ourself in
         //     glExtensions.h anyway.
         // point sprites
         if (queryOGLExtension("GL_ARB_point_sprite") ||

@@ -37,9 +37,9 @@ class EdgeBlender :
         EdgeBlender(asl::DLHandle theDLHandle);
         ~EdgeBlender();
 
-        void onGetProperty(const std::string & thePropertyName, 
+        void onGetProperty(const std::string & thePropertyName,
                 PropertyValue & theReturnValue) const;
-        void onSetProperty(const std::string & thePropertyName, 
+        void onSetProperty(const std::string & thePropertyName,
                 const PropertyValue & thePropertyValue);
         void onUpdateSettings(dom::NodePtr theSettings);
 
@@ -76,12 +76,12 @@ class EdgeBlender :
 
         unsigned _myWindowWidth, _myWindowHeight;
         GLuint _mySceneTexture;
- 
+
        /* Modes:
-        * MODE_MULTI_PC 
+        * MODE_MULTI_PC
         *       multiple PC's render a scene using multiple projectors
         *       each PC uses one projector and shows part of the scene
-        *       given by a viewport. 
+        *       given by a viewport.
         *       the portion shown has blended edges which may be any combination
         *       of BLEND_EDGE_LEFT, BLEND_EDGE_UP, BLEND_EDGE_RIGHT, BLEND_EDGE_DOWN
         *       according to where the scene continues.
@@ -89,22 +89,22 @@ class EdgeBlender :
         * MODE_MULTI_SCREEN
         *       one PC renders a scene using many projectors
         *       the scene may be split horizontally or vertically or both
-        *       EdgeBlender will render the scene on a texture 
+        *       EdgeBlender will render the scene on a texture
         *       and display this texture producing redundancy at the overlapping region.
-        *       
-        *       e.g. if the blending is horizontal and the width is 20% 
-        *       then 60% of the texture is taken starting from the left border 
+        *
+        *       e.g. if the blending is horizontal and the width is 20%
+        *       then 60% of the texture is taken starting from the left border
         *       and rendered on the screen.
         *       than another 60% percent of the texture starting from the right border
         *       are taken and rendered next to the first one.
         *       the screen now covers 120% of the original scene width
-        *       the central 20% of the screen are totally redundant 
-        *       this region is blended. 
+        *       the central 20% of the screen are totally redundant
+        *       this region is blended.
         *       the projected half-screens should overlap throughout this region.
-        *       
+        *
         */
         enum {
-            MODE_MULTI_PC               = 1, 
+            MODE_MULTI_PC               = 1,
             MODE_MULTI_SCREEN           = 2
         };
         unsigned _myMode;
@@ -182,13 +182,13 @@ EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow)
     AC_DEBUG << "texture=" << myTextureWidth << "x" << myTextureHeight;
 
     checkOGLError(PLUS_FILE_LINE);
-    //glActiveTextureARB(GL_TEXTURE0_ARB); // must lookup func pointer under Windows
+    //glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, &_mySceneTexture);
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, 3,
-                 myTextureWidth, myTextureHeight, 
+                 myTextureWidth, myTextureHeight,
                  0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     checkOGLError(PLUS_FILE_LINE);
 }
@@ -269,7 +269,7 @@ EdgeBlender::onSetProperty(const std::string & thePropertyName,
     }
 }
 
-void 
+void
 EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     AC_DEBUG << "onUpdateSettings " << *theSettings;
     _myMode = getSetting(theSettings, "mode", _myMode);
@@ -340,7 +340,7 @@ EdgeBlender::drawGrid(const asl::Vector4f & theColor, unsigned theGridSize)
     glEnd();
 }
 
-void 
+void
 EdgeBlender::renderMultiScreen()
 {
     copyToTexture();
@@ -359,7 +359,7 @@ EdgeBlender::renderMultiScreen()
         float myTexCoordY1 = myTexCoordY0 + 1.0f / _myRowCount;
         float myTexCoordX0 = myTextureOffsetX;
         for(unsigned j = 0; j < _myColumnCount; ++j) {
-            float myX  = float(j) / _myColumnCount; 
+            float myX  = float(j) / _myColumnCount;
             float myTexCoordX1 = myTexCoordX0 + 1.0f / _myColumnCount;
 
             renderTexture(myX, myY, myTexCoordX0, myTexCoordY0, myTexCoordX1, myTexCoordY1);
@@ -380,7 +380,7 @@ EdgeBlender::renderMultiScreen()
             }
 
             for(unsigned j = 0; j < _myColumnCount; ++j) {
-                float myX  = float(j) / _myColumnCount; 
+                float myX  = float(j) / _myColumnCount;
                 float myX0 = (j > 0 ? myX + _myBlendWidth : myX);
                 float myX1 = float(j+1) / _myColumnCount;
                 if (j < _myColumnCount-1) {
@@ -393,15 +393,15 @@ EdgeBlender::renderMultiScreen()
 
                 if (j > 0) {
                     rotateTo(BLEND_EDGE_RIGHT);
-                    drawBlendedEdge(myY0, myY1, myX); 
+                    drawBlendedEdge(myY0, myY1, myX);
                     rotateTo(BLEND_EDGE_LEFT);
-                    drawBlendedEdge(myY0, myY1, myX); 
+                    drawBlendedEdge(myY0, myY1, myX);
                 }
                 if (i > 0) {
                     rotateTo(BLEND_EDGE_UP);
-                    drawBlendedEdge(myX0, myX1, myY); 
+                    drawBlendedEdge(myX0, myX1, myY);
                     rotateTo(BLEND_EDGE_DOWN);
-                    drawBlendedEdge(myX0, myX1, myY); 
+                    drawBlendedEdge(myX0, myX1, myY);
                 }
                 if (j > 0 && i > 0) {
                     rotateTo(BLEND_EDGE_LEFT);
@@ -413,23 +413,23 @@ EdgeBlender::renderMultiScreen()
                     rotateTo(BLEND_EDGE_DOWN);
                     drawBlendedCorner(myY, myX);
                 }
-            }        
+            }
         }
     }
 }
 
-void 
+void
 EdgeBlender::renderBlending() {
 
     // blended edges
-    if (_myEdges & BLEND_EDGE_LEFT) {        
+    if (_myEdges & BLEND_EDGE_LEFT) {
         float myStart = (_myEdges & BLEND_EDGE_UP) ?
             _myBlendWidth : 0.0f;
         float myEnd = (_myEdges & BLEND_EDGE_DOWN) ?
             1.0f - _myBlendWidth : 1.0f;
         rotateTo(BLEND_EDGE_LEFT);
         drawBlendedEdge(myStart, myEnd);
-    }        
+    }
     if (_myEdges & BLEND_EDGE_RIGHT) {
         float myStart = (_myEdges & BLEND_EDGE_DOWN) ?
             _myBlendWidth : 0.0f;
@@ -437,7 +437,7 @@ EdgeBlender::renderBlending() {
             1.0f - _myBlendWidth : 1.0f;
         rotateTo(BLEND_EDGE_RIGHT);
         drawBlendedEdge(myStart, myEnd);
-    }        
+    }
     if (_myEdges & BLEND_EDGE_UP) {
         float myStart = (_myEdges & BLEND_EDGE_RIGHT) ?
             _myBlendWidth : 0.0f;
@@ -445,7 +445,7 @@ EdgeBlender::renderBlending() {
             1.0f - _myBlendWidth : 1.0f;
         rotateTo(BLEND_EDGE_UP);
         drawBlendedEdge(myStart, myEnd);
-    }        
+    }
     if (_myEdges & BLEND_EDGE_DOWN) {
         float myStart = (_myEdges & BLEND_EDGE_LEFT) ?
             _myBlendWidth : 0.0f;
@@ -453,24 +453,24 @@ EdgeBlender::renderBlending() {
             1.0f - _myBlendWidth : 1.0f;
         rotateTo(BLEND_EDGE_DOWN);
         drawBlendedEdge(myStart, myEnd);
-    }        
+    }
 
     // corners
     if (_myEdges & BLEND_EDGE_LEFT && _myEdges & BLEND_EDGE_UP) {
         rotateTo(BLEND_EDGE_LEFT);
-        drawBlendedCorner(0.0f, 0.0f); 
+        drawBlendedCorner(0.0f, 0.0f);
     }
     if (_myEdges & BLEND_EDGE_UP && _myEdges & BLEND_EDGE_RIGHT) {
         rotateTo(BLEND_EDGE_UP);
-        drawBlendedCorner(0.0f, 0.0f); 
+        drawBlendedCorner(0.0f, 0.0f);
     }
     if (_myEdges & BLEND_EDGE_RIGHT && _myEdges & BLEND_EDGE_DOWN) {
         rotateTo(BLEND_EDGE_RIGHT);
-        drawBlendedCorner(0.0f, 0.0f); 
+        drawBlendedCorner(0.0f, 0.0f);
     }
     if (_myEdges & BLEND_EDGE_DOWN && _myEdges & BLEND_EDGE_LEFT) {
         rotateTo(BLEND_EDGE_DOWN);
-        drawBlendedCorner(0.0f, 0.0f); 
+        drawBlendedCorner(0.0f, 0.0f);
     }
 
     // blacklevel
@@ -481,7 +481,7 @@ EdgeBlender::renderBlending() {
     drawBlackLevel(myLeft, myTop, myRight, myBottom);
 }
 
-void 
+void
 EdgeBlender::preRender() {
     // load ortho projection
     glMatrixMode(GL_PROJECTION);
@@ -493,22 +493,22 @@ EdgeBlender::preRender() {
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
     glLoadIdentity();
-    
+
     // load modelview
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
- 
+
     // load attribs
     glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TEXTURE_BIT | GL_POLYGON_BIT); // GL_ALL_ATTRIB_BITS);
 
-    glDisable(GL_LIGHTING); 
+    glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT, GL_FILL);
     CHECK_OGL_ERROR;
 }
 
-void 
+void
 EdgeBlender::postRender() {
     // restore attribs
     glPopAttrib();
@@ -519,13 +519,13 @@ EdgeBlender::postRender() {
 
     glMatrixMode(GL_TEXTURE);
     glPopMatrix();
-    
+
     // put into model view
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
 }
 
-float 
+float
 EdgeBlender::getBlendValue(float theValue) {
     float myBlendValue;
     // blend value
@@ -534,7 +534,7 @@ EdgeBlender::getBlendValue(float theValue) {
     } else {
         myBlendValue = 1.0f - 0.5f * powf(2.0f * (1.0f - theValue), _myPower);
     }
-    
+
     // gamma correction
     if (_myGamma > 0.0f) {
         myBlendValue = powf(myBlendValue, 1.0f / _myGamma);
@@ -588,10 +588,10 @@ EdgeBlender::rotateTo(unsigned theEdge) {
 /*
  * an edge is a region of the screen
  * where 2 projector images overlap
- * the edge blending function f(x) 
+ * the edge blending function f(x)
  * satisfies f(x) + f(1-x) = 1 forall x
  */
-void 
+void
 EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
 
     AC_DEBUG << "drawBlendedEdge start " << theStart << " end " << theEnd;
@@ -610,19 +610,19 @@ EdgeBlender::drawBlendedEdge(float theStart, float theEnd, float theMargin) {
         glVertex2f(myXPos, theEnd);
     }
     glEnd();
-    
+
 }
 
 /*
  * a corner is a region of the screen
  * where 4 projector images overlap
- * given the simple, edge blending function f(x) 
+ * given the simple, edge blending function f(x)
  * which satisfies f(x) + f(1-x) = 1 forall x
  * at a corner we basically take as the blending function
  * g(x,y) = f(x)f(y) because then
  * g(x,y) + g(1-x,y) + g(x,1-y) + g(1-x,1-y) = 1 forall x,y
  */
-void 
+void
 EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY) {
 
     for (unsigned i = 0; i < _myNumSubdivisions; ++i) {
@@ -642,7 +642,7 @@ EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY) {
             //glColor4f(myBlendValue, 0.0f, 0.0f, max(0.2f, 1.0f - myBlendValue));
             glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
             glVertex2f(myXPos, myYPos);
-            
+
             myBlendValue = myXBlendValue * myY2BlendValue;
             //glColor4f(myBlendValue, 0.0f, 0.0f, max(0.2f, 1.0f - myBlendValue));
             glColor4f(0.0f, 0.0f, 0.0f, 1.0f - myBlendValue);
@@ -654,10 +654,10 @@ EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY) {
     }
 }
 
-void 
+void
 EdgeBlender::copyToTexture()
 {
-    //glActiveTextureARB(GL_TEXTURE0_ARB);
+    //glActiveTexture(GL_TEXTURE0);
     glEnable(GL_TEXTURE_2D);
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture);
 
@@ -677,14 +677,14 @@ EdgeBlender::copyToTexture()
         glTexSubImage2D(GL_TEXTURE_2D, 0,
                         (GLint) _myFrameBufferArea[0], (GLint) _myFrameBufferArea[1],
                         (GLsizei) _myFrameBufferArea[2], (GLsizei) _myFrameBufferArea[3],
-                        GL_RGB, GL_UNSIGNED_BYTE, _myFrameBuffer); 
+                        GL_RGB, GL_UNSIGNED_BYTE, _myFrameBuffer);
         CHECK_OGL_ERROR;
     }
 }
 
-void 
-EdgeBlender::renderTexture(float thePosX, float thePosY, 
-        float theStartX, float theStartY, float theEndX, float theEndY) 
+void
+EdgeBlender::renderTexture(float thePosX, float thePosY,
+        float theStartX, float theStartY, float theEndX, float theEndY)
 {
     float myWidth = theEndX - theStartX;
     float myHeight = theEndY - theStartY;
@@ -692,21 +692,21 @@ EdgeBlender::renderTexture(float thePosX, float thePosY,
     AC_DEBUG << "renderTexture pos=" << thePosX << "," << thePosY
              << " tex=" << theStartX << "," << theStartY << " - " << theEndX << "," << theEndY
              << " size=" << myWidth << "x" << myHeight;
- 
+
     glLoadIdentity();
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     glBegin(GL_QUADS);
-    glTexCoord2f(theStartX, 1.0f - theStartY); 
+    glTexCoord2f(theStartX, 1.0f - theStartY);
     glVertex2f(thePosX, thePosY);
-    
-    glTexCoord2f(theStartX, 1.0f - theEndY); 
+
+    glTexCoord2f(theStartX, 1.0f - theEndY);
     glVertex2f(thePosX, thePosY + myHeight);
-    
-    glTexCoord2f(theEndX, 1.0f - theEndY); 
+
+    glTexCoord2f(theEndX, 1.0f - theEndY);
     glVertex2f(thePosX + myWidth, thePosY + myHeight);
-    
-    glTexCoord2f(theEndX, 1.0f - theStartY); 
+
+    glTexCoord2f(theEndX, 1.0f - theStartY);
     glVertex2f(thePosX + myWidth, thePosY);
     glEnd();
     CHECK_OGL_ERROR;
