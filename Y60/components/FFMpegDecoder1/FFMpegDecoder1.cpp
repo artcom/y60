@@ -250,6 +250,7 @@ namespace y60 {
     // TODO: Make theTimestamp an input-only parameter.
     bool
     FFMpegDecoder1::decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
+        AC_DEBUG << "--- decodeFrame ---" << endl;
         int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
 #if LIBAVCODEC_BUILD >= 0x5100 
         int64_t myTimePerFrame = (int64_t)(myTimeUnitsPerSecond / getFrameRate());
@@ -352,6 +353,7 @@ namespace y60 {
                     break;
                 }
             } 
+            av_free_packet(&myPacket);
         }
 
         convertFrame(_myFrame, theTargetRaster);
