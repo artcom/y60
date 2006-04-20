@@ -767,7 +767,6 @@ namespace y60 {
 
         AC_TRACE << "FFMpegDecoder2::setupVideo() - Start timestamp: " << _myStartTimestamp;
         _myTimePerFrame = (int64_t)(_myTimeUnitsPerSecond/getFrameRate());
-        cerr << "_myTimePerFrame: " << _myTimePerFrame << endl;
         _myLineSizeBytes = getBytesRequired(getFrameWidth(), getPixelFormat());
         // Seek to beginning
     }

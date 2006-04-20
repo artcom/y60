@@ -19,7 +19,6 @@
 
 #include "WMVDecoder.h"
 
-#include <asl/ComSingleton.h>
 #include <asl/Auto.h>
 #include <asl/Pump.h>
 #include <asl/Logger.h>
@@ -94,7 +93,7 @@ namespace y60 {
         _myResampleContext(0)
     {
         AC_DEBUG << "WMVDecoder::WMVDecoder " << (void*)this;
-        asl::ComSingleton::get().ref();
+        CoInitialize(0);
 
         _myEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
         if (!_myEvent) {
@@ -126,7 +125,7 @@ namespace y60 {
         if (_myReferenceCount != 0) {
             AC_WARNING << "Still have " << _myReferenceCount << " references to WMVDecoder";
         }
-        asl::ComSingleton::get().unref();
+        CoUninitialize();
     }
 
     asl::Ptr<MovieDecoderBase> WMVDecoder::instance() const {

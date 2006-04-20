@@ -32,8 +32,7 @@ WMADecoderFactory::WMADecoderFactory(asl::DLHandle theDLHandle)
     : PlugInBase(theDLHandle)
 {
     AC_DEBUG << "WMADecoderFactory::WMADecoderFactory";
-    HRESULT hr = CoInitialize(NULL);
-    checkForWMError(hr, "CoInitialize failed", PLUS_FILE_LINE);
+    CoInitialize(0);
 }
 
 WMADecoderFactory::~WMADecoderFactory() {

@@ -24,7 +24,6 @@
 
 #include <y60/IScriptablePlugin.h>
 #include <asl/PlugInBase.h>
-#include <asl/ComSingleton.h>
 
 namespace y60 {
 	class WMPPlayerPlugIn :
@@ -53,11 +52,11 @@ using namespace y60;
 WMPPlayerPlugIn::WMPPlayerPlugIn(DLHandle theDLHandle) :
 			PlugInBase(theDLHandle)
 {
-    asl::ComSingleton::get().ref();
+    CoInitialize(0);
 }
 
 WMPPlayerPlugIn::~WMPPlayerPlugIn() {
-    asl::ComSingleton::get().unref();
+    CoUninitialize();
 }
 
 void

@@ -72,7 +72,7 @@ public:
   
     template<class T>  
     T& getSingletonInstance() const {  
-        // NOTE: this is only called once per module and Singelton class,  
+        // NOTE: this is only called once per module and Singleton class,  
         // so performance doesn't really matter.  
         DB2(AC_TRACE << "getSingletonInstance with " << this << std::endl);  
         if (_myDelegate) {  

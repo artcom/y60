@@ -1,9 +1,11 @@
+
 #include "DShowCapture.h"
-#include <dshow.h>
-#include <iostream>
 #include <asl/Logger.h>
 #include <asl/Time.h>
 #include <asl/assure.h>
+
+#include <dshow.h>
+#include <iostream>
 
 extern "C"
 EXPORT asl::PlugInBase * y60DShowCapture_instantiatePlugIn(asl::DLHandle myDLHandle) {
@@ -14,18 +16,14 @@ using namespace std;
 
 namespace y60 {
     DShowCapture::DShowCapture(asl::DLHandle theDLHandle) : PlugInBase(theDLHandle), _myGraph(0) {
-        static bool myFirstInit (true);
-        if (myFirstInit) {
-            CoInitialize(NULL);
-            myFirstInit = false;
-        }
+        CoInitialize(0);
     }
 
     DShowCapture::~DShowCapture() {
         if (_myGraph) {
             delete _myGraph;
         }
-//        CoUninitialize();
+        CoUninitialize();
     }
 
     void DShowCapture::readFrame(dom::ResizeableRasterPtr theTargetRaster) {
