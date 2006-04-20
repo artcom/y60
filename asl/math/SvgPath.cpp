@@ -139,6 +139,11 @@ namespace asl {
                 myPoint.path = this; // marks it as valid
                 myPoint.element = i;
                 myNearestDistance = myDistance;
+
+                // abort if nearest distance is almost zero
+                if (almostEqual(myNearestDistance, 0)) {
+                    break;
+                }
             }
         }
 
