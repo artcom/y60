@@ -8,12 +8,13 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include <y60/JSNode.h>
 #include <asl/PlugInBase.h>
+#include <y60/JSNode.h>
 #include <y60/IRendererExtension.h>
 #include <y60/JSScriptablePlugin.h>
 #include <y60/AbstractRenderWindow.h>
 #include <y60/Scene.h>
+#include <y60/GLUtils.h>
 
 #include <asl/string_functions.h>
 #include <asl/numeric_functions.h>
@@ -137,6 +138,7 @@ class EdgeBlender :
         bool _myCopyFrameBufferFlag;
         asl::Vector4f _myFrameBufferArea;
         unsigned char * _myFrameBuffer;
+        GLint _myMaxTexUnits;
 };
 
 EdgeBlender::EdgeBlender(asl::DLHandle theDLHandle) :
@@ -181,8 +183,16 @@ EdgeBlender::onStartup(jslib::AbstractRenderWindow * theWindow)
     unsigned myTextureHeight = asl::nextPowerOfTwo(_myWindowHeight);
     AC_DEBUG << "texture=" << myTextureWidth << "x" << myTextureHeight;
 
+    initGLExtensions(0);
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &_myMaxTexUnits);
+    AC_DEBUG << "maxTextureUnits=" << _myMaxTexUnits;
+
+    //glActiveTexture(GL_TEXTURE0_ARB);
+    glEnable(GL_TEXTURE_2D);
+
     glGenTextures(1, &_mySceneTexture);
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture);
+    AC_DEBUG << "sceneTextureId=" << _mySceneTexture;
 
     glTexImage2D(GL_TEXTURE_2D, 0, 3,
                  myTextureWidth, myTextureHeight,
@@ -304,6 +314,7 @@ EdgeBlender::onPostRender(AbstractRenderWindow * theRenderer)
         drawGrid(asl::Vector4f(0,1,0,1));
     }
 
+    // edge blending
     switch (_myMode) {
         case MODE_MULTI_SCREEN:
             renderMultiScreen();
@@ -482,6 +493,13 @@ EdgeBlender::renderBlending() {
 
 void
 EdgeBlender::preRender() {
+    // disable all texture units except the first
+    for (unsigned i = 1; i < _myMaxTexUnits; ++i) {
+        glActiveTexture(GL_TEXTURE0_ARB + i);
+        glDisable(GL_TEXTURE_2D);
+    }
+    glActiveTexture(GL_TEXTURE0_ARB);
+
     // load ortho projection
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -656,8 +674,6 @@ EdgeBlender::drawBlendedCorner(float theMarginX, float theMarginY) {
 void
 EdgeBlender::copyToTexture()
 {
-    //glActiveTexture(GL_TEXTURE0);
-    glEnable(GL_TEXTURE_2D);
     glBindTexture (GL_TEXTURE_2D, _mySceneTexture);
 
     glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, _myWindowWidth, _myWindowHeight, 0);
