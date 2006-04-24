@@ -402,3 +402,24 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         }
     }
 }
+
+//
+// A generic XML-to-JavaScript converter.
+//
+// Usage:
+// (1) Setup: 
+// self.registerSettingsListener(ourSettings, "MySettingsNode");
+// (2) Access: 
+// var myValue = ourSettings.value;
+//
+
+function Settings() {
+    this.onUpdateSettings = function(theNode) {
+        for (var i = 0; i < theNode.childNodes.length; ++i) {
+            var myChild = theNode.childNodes[i];
+            this[myChild.nodeName] = myChild.firstChild.nodeValue;                
+        }
+    }
+}
+
+var ourSettings = (ourSettings == undefined) ? new Settings() : ourSettings;

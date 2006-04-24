@@ -463,8 +463,12 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
                 Protected.addImage(theSource);
             }
             theScene.update(Scene.IMAGES);
-
-            var mySize    = getImageSize(Protected.myImages[0]);
+            var myImage = Protected.myImages[0];
+            var mySize = getImageSize(myImage);
+            if (myImage.src.search(/dshow:\/\//) != -1) {      
+                mySize = new Vector2i(myImage.width, myImage.height);
+            }            
+            
             Public.width  = mySize.x;
             Public.height = mySize.y;
         }
