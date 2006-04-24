@@ -221,6 +221,7 @@ namespace y60 {
 
     double
     FFMpegDecoder1::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+        // theTime is in seconds, 
         int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
 #if LIBAVCODEC_BUILD >= 0x5100        
         int64_t myFrameTimestamp = (int64_t)(theTime * myTimeUnitsPerSecond) + _myStartTimestamp;
