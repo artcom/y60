@@ -87,13 +87,14 @@ function FFMpegTest(theArguments) {
     var _myTests = [
         "setupPlayTest()",
         "setupStopTest()",
+/*        
         "setupLoopTest()",
         "setupPauseTest()",
         "setupSeekBackTest()",
         "setupSeekFwdTest()",
         "setupPauseStopTest()",
         "setupStopPauseTest()",
-
+*/
             //                "setupLongTest(true)"
     ];
 

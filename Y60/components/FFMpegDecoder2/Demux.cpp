@@ -40,16 +40,16 @@ AVPacket * Demux::getPacket(int theStreamIndex)
     }
     PacketList & myCurPacketList = _myPacketLists.find(theStreamIndex)->second;
     if (!myCurPacketList.empty()) {
-        AC_DEBUG << "Demux::getPacket: packet already there.";
+        AC_TRACE << "Demux::getPacket: packet already there.";
         AVPacket * myPacket = myCurPacketList.front();
         myCurPacketList.pop_front();
         return myPacket;
     } else {
-        AC_DEBUG << "Demux::getPacket: packet needs to be read.";
+        AC_TRACE << "Demux::getPacket: packet needs to be read.";
         AVPacket * myPacket;
         bool myEndOfFileFlag;
         do {
-            AC_DEBUG << "Demux::getPacket: read.";
+            AC_TRACE << "Demux::getPacket: read.";
             myPacket = new AVPacket;
             myEndOfFileFlag = (av_read_frame(_myFormatContext, myPacket) < 0);
             if (myEndOfFileFlag) {
@@ -61,7 +61,7 @@ AVPacket * Demux::getPacket(int theStreamIndex)
             }
             if (myPacket->stream_index != theStreamIndex) {
                 if (_myPacketLists.find(myPacket->stream_index) != _myPacketLists.end()) {
-                    AC_DEBUG << "Demux::getPacket: caching packet.";
+                    AC_TRACE << "Demux::getPacket: caching packet.";
                     // Without av_dup_packet, ffmpeg reuses myPacket->data at first 
                     // opportunity and trashes our memory.
                     av_dup_packet(myPacket);
@@ -69,14 +69,14 @@ AVPacket * Demux::getPacket(int theStreamIndex)
                             _myPacketLists.find(myPacket->stream_index)->second;
                     myOtherPacketList.push_back(myPacket);
                 } else {
-                    AC_DEBUG << "Demux::getPacket: rejecting packet.";
+                    AC_TRACE << "Demux::getPacket: rejecting packet.";
                     av_free_packet(myPacket);
                     delete myPacket;
                     myPacket = 0;
                 }
             }
         } while (!myPacket || myPacket->stream_index != theStreamIndex);
-        AC_DEBUG << "Demux::getPacket: end.";
+        AC_TRACE << "Demux::getPacket: end.";
         av_dup_packet(myPacket);
         return myPacket; 
     }

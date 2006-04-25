@@ -96,8 +96,10 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::readAudio() {
-        AC_TRACE << "FFMpegDecoder2::readAudio";
+        AC_DEBUG << "FFMpegDecoder2::readAudio:";
         while (double(_myAudioSink->getBufferedTime()) < AUDIO_BUFFER_SIZE) {
+            AC_DEBUG << "FFMpegDecoder2::readAudio: getBufferedTime=" 
+                    << _myAudioSink->getBufferedTime();
             AC_TRACE << "FFMpegDecoder2::readAudio: getPacket()";
             AVPacket * myPacket = _myDemux->getPacket(_myAStreamIndex);
             if (!myPacket) {
@@ -473,9 +475,10 @@ namespace y60 {
         createCache();
         // XXX unblock locked ffmpeg-thread.
         _myReadEOF = false;
-        if (_myAudioSink) {
+/*        if (_myAudioSink) {
             _myAudioSink->stop();
         }
+*/        
         _myCachingFlag = true;
         _myEOFVideoTimestamp = INT_MIN;
         _myLastAudioTimeStamp = 0;
@@ -493,7 +496,7 @@ namespace y60 {
         avcodec_flush_buffers(&_myVStream->codec);
 #endif
         readFrame();
-        
+        readAudio();
 
         _myState = RUN;
         if (!isActive()) {
@@ -526,6 +529,7 @@ namespace y60 {
 		lock();
         _myState = STOP;
 		unlock();
+        _myAudioSink->stop();
         // Wake up sleeping decoder thread
         if (isActive()) {
             AC_TRACE << "Joining FFMpegDecoder Thread";
