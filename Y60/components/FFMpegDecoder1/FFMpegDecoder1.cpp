@@ -44,7 +44,7 @@ namespace y60 {
         _myStartTimestamp(0),
         _myLastVideoTimestamp(0), _myEOFVideoTimestamp(INT_MIN)
     {
-        DB(AC_DEBUG << "instantiated an FFMpegDecoder1...");    
+        DB(AC_DEBUG << "instantiated an FFMpegDecoder1...");
     }
 
     FFMpegDecoder1::~FFMpegDecoder1() {
@@ -57,7 +57,7 @@ namespace y60 {
 
     std::string
     FFMpegDecoder1::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
-        if (asl::toLowerCase(asl::getExtension(theUrl)) == "mpg" || 
+        if (asl::toLowerCase(asl::getExtension(theUrl)) == "mpg" ||
             asl::toLowerCase(asl::getExtension(theUrl)) == "m2v") {
             AC_INFO << "FFMpegDecoder1 can decode :" << theUrl << endl;
             return MIME_TYPE_MPG;
@@ -155,7 +155,7 @@ namespace y60 {
 
         Movie * myMovie = getMovie();
 
-        int myWidth, myHeight; 
+        int myWidth, myHeight;
 #if LIBAVCODEC_BUILD >= 0x5100
         myWidth = _myVStream->codec->width;
         myHeight = _myVStream->codec->height;
@@ -194,7 +194,7 @@ namespace y60 {
         myMovie->set<FrameRateTag>(myFPS);
 
         // duration
-        if (_myVStream->duration == AV_NOPTS_VALUE || 
+        if (_myVStream->duration == AV_NOPTS_VALUE ||
             int(myFPS * (_myVStream->duration / (double) AV_TIME_BASE)) <= 0) {
             AC_WARNING << "url='" << theFilename << "' contains no valid duration";
             myMovie->set<FrameCountTag>(INT_MAX);
@@ -204,7 +204,7 @@ namespace y60 {
 
         AC_DEBUG << "url='" << theFilename << "' fps=" << myFPS << " framecount=" << getFrameCount();
 
-        _myLastVideoTimestamp = AV_NOPTS_VALUE;
+        _myLastVideoTimestamp = 0;
         _myEOFVideoTimestamp = INT_MIN;
 
         // Get Starttime
@@ -221,15 +221,15 @@ namespace y60 {
 
     double
     FFMpegDecoder1::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
-        // theTime is in seconds, 
+        // theTime is in seconds,
         int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
-#if LIBAVCODEC_BUILD >= 0x5100        
+#if LIBAVCODEC_BUILD >= 0x5100
         int64_t myFrameTimestamp = (int64_t)(theTime * myTimeUnitsPerSecond) + _myStartTimestamp;
 #else
         int64_t myFrameTimestamp = (int64_t)(theTime * AV_TIME_BASE) + _myStartTimestamp;
 #endif
-        
-        AC_DEBUG << "time=" << theTime << " timestamp=" << myFrameTimestamp << 
+
+        AC_DEBUG << "time=" << theTime << " timestamp=" << myFrameTimestamp <<
                 " myTimeUnitsPerSecond=" << myTimeUnitsPerSecond;
         AC_DEBUG << "_myLastVideoTimestamp=" << _myLastVideoTimestamp;
 
@@ -253,7 +253,7 @@ namespace y60 {
     FFMpegDecoder1::decodeFrame(int64_t & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
         AC_DEBUG << "--- decodeFrame ---" << endl;
         int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
-#if LIBAVCODEC_BUILD >= 0x5100 
+#if LIBAVCODEC_BUILD >= 0x5100
         int64_t myTimePerFrame = (int64_t)(myTimeUnitsPerSecond / getFrameRate());
 #else
         int64_t myTimePerFrame = (int64_t)(AV_TIME_BASE / getFrameRate());
@@ -335,13 +335,13 @@ namespace y60 {
                                                      myData, myDataLen);
                     if (myLen < 0) {
                         AC_ERROR << "av_decode_video error";
-                        break; 
+                        break;
                     }
                     myData += myLen;
                     myDataLen -= myLen;
                 }
 
-                AC_DEBUG << "decoded dts=" << myPacket.dts << " pts=" << myPacket.pts 
+                AC_DEBUG << "decoded dts=" << myPacket.dts << " pts=" << myPacket.pts
                         << " finished=" << frameFinished;
                 if (frameFinished == 0) {
                     continue;
@@ -353,7 +353,7 @@ namespace y60 {
                     DB(AC_TRACE << "found " << _myLastVideoTimestamp << " for " << theTimestamp);
                     break;
                 }
-            } 
+            }
             av_free_packet(&myPacket);
         }
 
