@@ -260,17 +260,21 @@ namespace y60 {
 #endif
 
         if (_myLastVideoTimestamp != AV_NOPTS_VALUE &&
-            (theTimestamp < _myLastVideoTimestamp || theTimestamp > _myLastVideoTimestamp + (2*myTimePerFrame)))
+            (theTimestamp < _myLastVideoTimestamp || theTimestamp > 
+             _myLastVideoTimestamp + (2*myTimePerFrame)))
         {
-//            cout <<"seek, theTimeStanp: " << theTimestamp << " last timestamp : " << _myLastVideoTimestamp << " Frametime : " << myTimePerFrame <<endl;
+//            cout <<"seek, theTimeStanp: " << theTimestamp << " last timestamp : " 
+//                  << _myLastVideoTimestamp << " Frametime : " << myTimePerFrame <<endl;
 
             int64_t mySeekTimestamp = theTimestamp;
-            AC_DEBUG << "SEEK timestamp=" << theTimestamp << " lastVideoTimestamp=" << _myLastVideoTimestamp << " seek=" << mySeekTimestamp;
+            AC_DEBUG << "SEEK timestamp=" << theTimestamp << " lastVideoTimestamp=" 
+                    << _myLastVideoTimestamp << " seek=" << mySeekTimestamp;
 
 #if (LIBAVCODEC_BUILD < 4738)
             int myResult = av_seek_frame(_myFormatContext, -1, mySeekTimestamp);
 #else
-            int myResult = av_seek_frame(_myFormatContext, -1, mySeekTimestamp, AVSEEK_FLAG_BACKWARD);
+            int myResult = av_seek_frame(_myFormatContext, -1, mySeekTimestamp, 
+                    AVSEEK_FLAG_BACKWARD);
 #endif
             if (myResult < 0) {
                 AC_ERROR << "Could not seek to timestamp " << mySeekTimestamp;
