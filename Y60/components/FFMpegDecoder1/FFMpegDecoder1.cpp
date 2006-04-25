@@ -142,6 +142,7 @@ namespace y60 {
         if (!myCodec) {
             throw FFMpegDecoderException(std::string("Unable to find decoder: ") + theFilename, PLUS_FILE_LINE);
         }
+
 #if LIBAVCODEC_BUILD >= 0x5100
         if (avcodec_open(_myVStream->codec, myCodec) < 0 ) {
 #else
@@ -266,7 +267,9 @@ namespace y60 {
 //            cout <<"seek, theTimeStanp: " << theTimestamp << " last timestamp : " 
 //                  << _myLastVideoTimestamp << " Frametime : " << myTimePerFrame <<endl;
 
-            int64_t mySeekTimestamp = theTimestamp;
+            // [ch] If we seek directly to the seek timestamp the packet sometimes cannot be decoded afterwards.
+            // Therefore this workaround seeks a bit (0.0001 s) before the requested timestamp
+            int64_t mySeekTimestamp = (theTimestamp > 100) ? (theTimestamp - 100) : 0;
             AC_DEBUG << "SEEK timestamp=" << theTimestamp << " lastVideoTimestamp=" 
                     << _myLastVideoTimestamp << " seek=" << mySeekTimestamp;
 
@@ -294,7 +297,6 @@ namespace y60 {
 
         // until a frame is found or eof
         while (true) {
-
             // EOF handling
             if (av_read_frame(_myFormatContext, &myPacket) < 0) {
                 av_free_packet(&myPacket);
@@ -328,7 +330,6 @@ namespace y60 {
             }
 
             if (myPacket.stream_index == _myVStreamIndex) {
-
                 int frameFinished = 0;
                 unsigned char* myData = myPacket.data;
                 int myDataLen = myPacket.size;
