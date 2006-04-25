@@ -612,7 +612,6 @@ SDLWindow::mainLoop() {
             isOnTop = (myTopWindow == myRenderGirlWindow);
         }
 #endif
-        onFrame();
 
         // Call onProtoFrame (a second onframe that can be used to automatically run tutorials)
         if (_myEventListener && jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
@@ -620,6 +619,7 @@ SDLWindow::mainLoop() {
             argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
             jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 1, argv, &rval);
         }
+        onFrame();
 
         START_TIMER(dispatchEvents);
         EventDispatcher::get().dispatch();
