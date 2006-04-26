@@ -475,10 +475,7 @@ namespace y60 {
         createCache();
         // XXX unblock locked ffmpeg-thread.
         _myReadEOF = false;
-/*        if (_myAudioSink) {
-            _myAudioSink->stop();
-        }
-*/        
+        
         _myCachingFlag = true;
         _myEOFVideoTimestamp = INT_MIN;
         _myLastAudioTimeStamp = 0;

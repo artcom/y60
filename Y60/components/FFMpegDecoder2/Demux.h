@@ -13,7 +13,17 @@
 
 #include <asl/Ptr.h>
 
+#ifdef WIN32
+#pragma warning(push)
+#pragma warning(disable:4244)
+#define EMULATE_INTTYPES
+#endif
+
 #include <ffmpeg/avformat.h>
+
+#ifdef WIN32
+#pragma warning(pop)
+#endif
 
 #include <list>
 #include <map>
