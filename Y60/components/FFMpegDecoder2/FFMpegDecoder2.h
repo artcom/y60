@@ -61,8 +61,8 @@ namespace y60 {
         public PosixThread,
         public asl::PlugInBase
     {
-        static const unsigned FRAME_CACHE_SIZE = 8;  ///< Number of frames to cache in the Framecache
-        static const double AUDIO_BUFFER_SIZE = 0.5;
+        static const unsigned FRAME_CACHE_SIZE;  ///< Number of frames to cache in the Framecache.
+        static const double AUDIO_BUFFER_SIZE;   ///< Audio cache size in seconds.
         
     public:
         FFMpegDecoder2(asl::DLHandle theDLHandle);
