@@ -290,7 +290,11 @@ namespace y60 {
             }
         }
         theAudioFrame->setSizeInBytes(myFrameSize);
+#if LIBAVCODEC_BUILD >= 0x5100
+        theAudioFrame->setTimestamp((myPacketTime - myStartTime) * av_q2d(_myAudioStream->time_base));
+#else
         theAudioFrame->setTimestamp((myPacketTime - myStartTime) / (double)AV_TIME_BASE);
+#endif
         return false;
     }
 
@@ -298,15 +302,14 @@ namespace y60 {
     DecoderContext::seekToTime(double theTimestamp) {
         clearPacketCache();
 #if LIBAVCODEC_BUILD >= 0x5100
-        int64_t myFrameIndex = (int64_t)(theTimestamp * AV_TIME_BASE);
-        double myFrameTime = 1.0 / av_q2d(_myVideoStream->codec->time_base);
+        int64_t myFrameIndex = (int64_t)(theTimestamp /av_q2d(_myVideoStream->codec->time_base));
+        double myFrameTime = av_q2d(_myVideoStream->codec->time_base);
 #else
         int myFrameIndex = int(theTimestamp * _myVideoStream->r_frame_rate / 
                 _myVideoStream->r_frame_rate_base);        
         double myFrameTime = double(_myVideoStream->r_frame_rate_base) / 
                 _myVideoStream->r_frame_rate;
 #endif
-
         DB(cerr << TTYYELLOW << "seekToTime: " << theTimestamp << " index: " << myFrameIndex << ENDCOLOR << endl;)
         if (theTimestamp > myFrameTime * 1.5) {
             // We only want to decode to the timestamp just before the searched frame
@@ -337,8 +340,11 @@ namespace y60 {
                 AC_WARNING << "Seek reached end of file";
                 return;
             }
-
+#if LIBAVCODEC_BUILD >= 0x5100
+            double myTimestamp = (myLastDTS - _myVideoStream->start_time) * av_q2d(_myVideoStream->time_base);
+#else
             double myTimestamp = (myLastDTS - _myVideoStream->start_time) / (double)AV_TIME_BASE;
+#endif
             if (myTimestamp >= theTimestamp) {
                 if (myTimestamp >= theTimestamp + myFrameTime) {
                     AC_ERROR << "Seek went into the future. Last dts: " << myTimestamp << endl;
@@ -397,14 +403,13 @@ namespace y60 {
     double
     DecoderContext::getFrameRate() const {
 #if LIBAVCODEC_BUILD >= 0x5100
-        double myFPS = av_q2d(_myVideoStream->codec->time_base);
+        double myFPS = 1/av_q2d(_myVideoStream->codec->time_base);
 #else
         double myFPS = _myVideoStream->codec.frame_rate / (double) _myVideoStream->codec.frame_rate_base;
         if (myFPS > 1000.0f) {
             myFPS /= 1000.0f;
         }
 #endif
-
         return myFPS;
     }
 

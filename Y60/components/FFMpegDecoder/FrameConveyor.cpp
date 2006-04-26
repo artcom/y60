@@ -209,21 +209,28 @@ namespace y60 {
     }
 
     void FrameConveyor::fillCache(double theStartTime, double theEndTime) {
+        DB(cerr << "fillCache [" << theStartTime << " to " << theEndTime << "]" << endl;)
         theStartTime = asl::maximum(0.0, theStartTime);
         theEndTime   = asl::maximum(theStartTime, theEndTime);
         theEndTime   = asl::minimum(_myContext->getEndOfFileTimestamp(), theEndTime);
 
         // seek if timestamp is outside these boundaries
         double myTimePerFrame = 1.0 / _myContext->getFrameRate();
+#if LIBAVCODEC_BUILD >= 0x5100
+        AVStream * myVStream = _myContext->getVideoStream();
+        double myLastDecodedTime = _myVideoFrame->pts * av_q2d(myVStream->time_base);
+#else
         double myLastDecodedTime = _myVideoFrame->pts / (double)AV_TIME_BASE;
+#endif
+        DB(cerr << "  last decoded: " << myLastDecodedTime << endl;)
+        DB2(cerr << "  myTimePerFrame: " << myTimePerFrame << endl;)
         
         // Special case: prevent seek due to inaccuracies in the cache size calculation.
         if (theEndTime - theStartTime < myTimePerFrame/4) {
+            DB2(cerr << "Premature end." << endl;)
             return;
         }
 
-        DB2(cerr << "fillCache [" << theStartTime << " to " << theEndTime << "]" << endl;)
-        DB2(cerr << " last decoded " << myLastDecodedTime << endl;)
         if (fabs(theStartTime - myLastDecodedTime) >= myTimePerFrame * 1.5) {
             _myContext->seekToTime(theStartTime);
             if (_myAudioSink && _myAudioSink->getState() != HWSampleSink::STOPPED) {
@@ -336,7 +343,12 @@ namespace y60 {
                     _myContext->getHeight(), _myContext->getBytesPerPixel()));
 
             _myContext->convertFrame(_myVideoFrame, myNewFrame->getData()->begin());
+#if LIBAVCODEC_BUILD >= 0x5100
+            AVStream * myVStream = _myContext->getVideoStream();
+            myNewFrame->setTimestamp(_myVideoFrame->pts * av_q2d(myVStream->time_base));
+#else
             myNewFrame->setTimestamp(_myVideoFrame->pts / (double)AV_TIME_BASE);
+#endif            
             _myFrameCache[myNewFrame->getTimestamp()] = myNewFrame;
             theLastDecodedVideoTime = myNewFrame->getTimestamp();
         }
