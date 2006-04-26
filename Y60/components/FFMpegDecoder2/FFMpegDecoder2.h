@@ -127,7 +127,7 @@ namespace y60 {
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
         /**
-         *  updates the Framecache depending of the current position
+         *  updates the Framecache depending on the current position
          */
         bool readFrame();
         void readAudio();
@@ -166,10 +166,7 @@ namespace y60 {
         int64_t _myEOFVideoTimestamp;
         int64_t _myNextPacketTimestamp;
         int64_t _myTimePerFrame;
-        double _myLastAudioTimeStamp;
-        unsigned _myLineSizeBytes;
         int _myDestinationPixelFormat;
-        bool _myCachingFlag;
 
         ReSampleContext * _myResampleContext;
         static asl::Block _mySamples;

@@ -86,15 +86,14 @@ function FFMpegTest(theArguments) {
 
     var _myTests = [
         "setupPlayTest()",
+        "setupSlowPlayTest()",
         "setupStopTest()",
-/*        
         "setupLoopTest()",
         "setupPauseTest()",
         "setupSeekBackTest()",
         "setupSeekFwdTest()",
         "setupPauseStopTest()",
         "setupStopPauseTest()",
-*/
             //                "setupLongTest(true)"
     ];
 
@@ -115,6 +114,10 @@ function FFMpegTest(theArguments) {
             }
             exit(0);
         }
+    }
+
+    Public.stopSwapInterval = function() {
+        window.swapInterval = 0;
     }
 
     Public.testPlaying = function() {
@@ -153,6 +156,15 @@ function FFMpegTest(theArguments) {
     function setupPlayTest() {
         setupTest("Play to End", "../FFMpegDecoder/testfiles/counter_short.mpg");
         window.setTimeout("testPlaying", 1000);
+        window.setTimeout("testStopped", 10000);
+        window.setTimeout("nextTest", 10100);
+    }
+
+    function setupSlowPlayTest() {
+        setupTest("Play, slow swapInterval", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        window.swapInterval = 10;
+        window.setTimeout("testPlaying", 1000);
+        window.setTimeout("stopSwapInterval", 9000);
         window.setTimeout("testStopped", 10000);
         window.setTimeout("nextTest", 10100);
     }
