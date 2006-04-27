@@ -24,6 +24,7 @@
 
 #include <paintlib/plpixelformat.h>
 #include <paintlib/plpngenc.h>
+#include <paintlib/pljpegenc.h>
 #include <paintlib/Filter/plfilterflip.h>
 
 using namespace asl;
@@ -319,7 +320,6 @@ namespace y60 {
         for(int y=0; y<myHeight; ++y) {
             memcpy(myLineArray[y], myData + myBytesPerLine * y, myBytesPerLine);
         }
-
     }
 
     void
@@ -344,6 +344,25 @@ namespace y60 {
         convertToPLBmp( myBmp );
         applyCustomFilter(myBmp, theFilter, theFilterParams);
 
+        string myImagePath = toLowerCase(theImagePath);
+        string::size_type pos = string::npos;
+        
+        pos = myImagePath.find_last_of("."); 
+        if ( pos != string::npos) {
+            string myExtension = myImagePath.substr(pos);
+            if (myExtension == ".jpg" || myExtension == ".jpeg") {
+                // [jb] PLJPEGEncoder expects images to have alpha (32bit),
+                //      this hack stuffs the pixelformat with the missing 8bit:
+                PLAnyBmp myTmpBmp;
+                convertToPLBmp( myTmpBmp );
+                myTmpBmp.CreateCopy(myBmp, PLPixelFormat::X8B8G8R8);
+                
+                PLJPEGEncoder myJPEGEncoder;
+                myJPEGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myTmpBmp);
+                return;
+            }
+        }
+
         PLPNGEncoder myPNGEncoder;
         myPNGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myBmp);
     }
@@ -352,6 +371,25 @@ namespace y60 {
     Image::saveToFile(const string & theImagePath) {
         PLAnyBmp myBmp;
         convertToPLBmp( myBmp );
+        
+        string myImagePath = toLowerCase(theImagePath);
+        string::size_type pos = string::npos;
+        
+        pos = myImagePath.find_last_of("."); 
+        if ( pos != string::npos) {
+            string myExtension = myImagePath.substr(pos);
+            if (myExtension == ".jpg" || myExtension == ".jpeg") {
+                // [jb] PLJPEGEncoder expects images to have alpha (32bit),
+                //      this hack stuffs the pixelformat with the missing 8bit:
+                PLAnyBmp myTmpBmp;
+                convertToPLBmp( myTmpBmp );
+                myTmpBmp.CreateCopy(myBmp, PLPixelFormat::X8B8G8R8);
+                
+                PLJPEGEncoder myJPEGEncoder;
+                myJPEGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myTmpBmp);
+                return;
+            }
+        }
 
         PLPNGEncoder myPNGEncoder;
         myPNGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myBmp);
