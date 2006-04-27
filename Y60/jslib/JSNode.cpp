@@ -1096,13 +1096,15 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                 AC_TRACE << "JSNode::setProperty: myNode = " << *myNode << endl;
             )
             dom::NodePtr myAttrNode = myNode->attributes().getNamedItem(myProperty);
+
+            // Try to convert array to strings
+            std::string myResult;
+            if (!JSA_ArrayToString(cx, vp, myResult)) {
+                myResult = as_string(cx,*vp);
+            }
+
             if (myAttrNode) {
-                IF_NOISY(AC_TRACE << "JSNode::setProperty: myAttrNode = " <<*myAttrNode << endl);
-                // Try to convert array to strings
-                std::string myResult;
-                if (!JSA_ArrayToString(cx, vp, myResult)) {
-                    myResult = as_string(cx,*vp);
-                }
+                IF_NOISY(AC_TRACE << "JSNode::setProperty: myAttrNode = " <<*myAttrNode << endl);               
                 myAttrNode->nodeValue(myResult);
                 return JS_TRUE;
             } else {
@@ -1117,14 +1119,14 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                             AC_ERROR << "JSNode::setProperty: facade attribute '"<<myProperty<<"' is not writeable."<<endl;
                             return JS_FALSE;
 #else
-                            myAttrNode->nodeValue(as_string(cx,*vp));
+                            myAttrNode->nodeValue(myResult);
                             return JS_TRUE;
 #endif
                         }
 						// ask the facades propertylist (features, properties, etc)
                         dom::NodePtr myPropertyNode = myFacade->getProperty(myProperty);
                         if (myPropertyNode) {
-                            myPropertyNode->nodeValue(as_string(cx,*vp));
+                            myPropertyNode->nodeValue(myResult);
                             return JS_TRUE;
 						}
                     }
