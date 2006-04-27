@@ -49,7 +49,7 @@ function Exception(theMessage, theLocation, theName) {
 }
 
 // This functions works for c++ and for JavaScript exceptions
-function reportException(theException) {
+function composeException(theException) {
     var myMessage = "";
     if (typeof(theException) == "object" && "message" in theException) {
         if (theException.name != "Error") {
@@ -67,5 +67,9 @@ function reportException(theException) {
     } else {
         myMessage = "ERROR: " + String(theException);
     }
-    print("### " + myMessage);
+    return myMessage;
+}
+
+function reportException(theException) {    
+    print("### " + composeException(theException));
 }
