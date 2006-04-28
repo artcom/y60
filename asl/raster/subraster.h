@@ -362,12 +362,12 @@ class const_subraster
         }
 
         template <class RT, class Alloc, class RD>
-        const_subraster(const raster<T, Alloc, D>& m) {
+        const_subraster(const raster<RT, Alloc, RD>& m) {
             set( m.xsize(), m.ysize(), m.xsize(), (const T*)(&(*(m.begin()))) );
         }
 
         template <class RT, class Alloc, class RD>
-        const_subraster(const raster<T, Alloc, D>& m, D xpos, D ypos, D Xsize, D Ysize) {
+        const_subraster(const raster<RT, Alloc, RD>& m, RD xpos, RD ypos, RD Xsize, RD Ysize) {
             set( Xsize, Ysize, m.xsize(), (const T*)(&(*(m.find(xpos, ypos)))) );
         }
 
