@@ -48,7 +48,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE("obj.mySound.src == '../../../../sound/testfiles/aussentuer.mp3'");
         ENSURE("obj.mySound.time == 0.0");
         ENSURE("obj.mySound.looping == false");
-        ENSURE("obj.mySound.duration == 1.619499");
+        ENSURE("Math.abs(obj.mySound.duration-1.6195) < 0.0001");
 
         DTITLE("Playing sound...");
         obj.mySound.play();
