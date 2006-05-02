@@ -506,15 +506,17 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 JS_STATIC_DLL_CALLBACK(JSBool)
 BlitImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Apply a filter to an image");
+    DOC_BEGIN("Copy pixels from one image to another");
     DOC_PARAM("theSourceNode", "A X60 source imagenode", DOC_TYPE_NODE);
     DOC_PARAM("theTargetNode", "A X60 target imagenode", DOC_TYPE_NODE);
-    DOC_PARAM("theTextPos", "The pixelposition in target image", DOC_TYPE_VECTOR2I);
+    DOC_PARAM("theTargetPos", "The pixelposition in target image", DOC_TYPE_VECTOR2I);
+    DOC_PARAM("theSourceMin", "The min position of the source image area to copy (default: 0,0). Must be combined with theSourceSize", DOC_TYPE_VECTOR2I);
+    DOC_PARAM("theSourceMax", "The max position of the source area to copy (default: width,height). Must be combined with theSourceSize", DOC_TYPE_VECTOR2I);
     DOC_END;
     try {
-        if (argc != 3) {
+        if (argc != 3 && argc != 5) {
 			JS_ReportError(cx, "blitImage(): expects at least three arguments : source image node,"
-                               "target image node, target position");
+                               "target image node, target position [,source position, source-size]");
             return JS_FALSE;
         }
 		dom::NodePtr mySourceImageNode;
@@ -534,7 +536,22 @@ BlitImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
 		ImagePtr myTargetImage = myTargetImageNode->getFacade<y60::Image>();
 		ImagePtr mySourceImage = mySourceImageNode->getFacade<y60::Image>();
-		myTargetImage->blitImage(mySourceImage, myTargetPosition);
+        if (argc == 5) {
+            asl::Vector2i myMinPosition;
+            if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], myMinPosition)) {
+                JS_ReportError(cx, "blitImage(): argument #4 must be a Vector2i");
+                return JS_FALSE;
+            }
+            asl::Vector2i myMaxPosition;
+            if (JSVAL_IS_VOID(argv[4]) || !convertFrom(cx, argv[4], myMaxPosition)) {
+                JS_ReportError(cx, "blitImage(): argument #5 must be a Vector2i");
+                return JS_FALSE;
+            }
+            asl::Box2i mySourceArea(myMinPosition, myMaxPosition);
+		    myTargetImage->blitImage(mySourceImage, myTargetPosition, & mySourceArea);
+        } else {
+    		myTargetImage->blitImage(mySourceImage, myTargetPosition);
+        }
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

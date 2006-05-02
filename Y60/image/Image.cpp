@@ -165,23 +165,34 @@ namespace y60 {
     }
 
     void
-    Image::blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage, const asl::Vector2i & theTargetPos)
+    Image::blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage, const asl::Vector2i & theTargetPos,
+            const asl::Box2i * theSourceRect)
     {
         if (get<ImageDepthTag>() != theSourceImage->get<ImageDepthTag>() || 
             get<ImagePixelFormatTag>() != theSourceImage->get<ImagePixelFormatTag>()) {
             // depth and encoding must match
               throw ImageException(std::string("Image::blitImage(): Sourceimage and subimage must have same depth and encoding."), PLUS_FILE_LINE);
         }
+        int sourceWidth = theSourceRect ? theSourceRect->getSize()[0] : theSourceImage->get<ImageWidthTag>();
+        int sourceHeight = theSourceRect ? theSourceRect->getSize()[1] : theSourceImage->get<ImageHeightTag>();
         dom::ResizeableRasterPtr myRaster = getRasterPtr();
-        if (theTargetPos[0] + theSourceImage->get<ImageWidthTag>() <= get<ImageWidthTag>() &&
-            theTargetPos[1] + theSourceImage->get<ImageHeightTag>() <= get<ImageHeightTag>()) {
+        if (theTargetPos[0] + sourceWidth <= get<ImageWidthTag>() &&
+            theTargetPos[1] + sourceHeight <= get<ImageHeightTag>()) 
+        {
             // everything super, subimage fits without resizing the image
             if (!myRaster) {
                 throw BadRasterValue(JUST_FILE_LINE);
             }
             dom::ValuePtr mySourceRaster = theSourceImage->getNode().childNode(0)->childNode(0)->nodeValueWrapperPtr();
-            myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]), 
-                                  *mySourceRaster); 
+            if ( theSourceRect ) {
+                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]), 
+                                      *mySourceRaster, 
+                                      theSourceRect->getMin()[0], theSourceRect->getMin()[1],
+                                      theSourceRect->getSize()[0], theSourceRect->getSize()[1]);
+            } else {
+                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]), 
+                                      *mySourceRaster); 
+            }
         } else {
             // image must be resized to fit new size
             //set(theNewWidth, theNewHeight, theNewDepth, theEncoding);

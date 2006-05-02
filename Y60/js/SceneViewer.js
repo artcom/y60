@@ -279,24 +279,34 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Texturing: " + (window.texturing ? "on" : "off"));
                     break;
                 case '[-]':
-                    var myHfov = window.camera.hfov;
-                    if (myHfov < 5) {
-                        myHfov += 0.1;
-                    } else if (myHfov < 175) {
-                        myHfov += 5;
+                    if (window.camera.hfov) { // persp camera
+                        var myHfov = window.camera.hfov;
+                        if (myHfov < 5) {
+                            myHfov += 0.1;
+                        } else if (myHfov < 175) {
+                            myHfov += 5;
+                        }
+                        window.camera.hfov = myHfov;
+                        print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
+                    } else {  // ortho camera
+                        window.camera.width *= 1.1;
+                        print("Zoom to width " + window.camera.width);
                     }
-                    window.camera.hfov = myHfov;
-                    print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
                     break;
                 case '[+]':
-                    myHfov = window.camera.hfov;
-                    if (myHfov > 5) {
-                        myHfov -= 5;
-                    } else if (myHfov > 0.1) {
-                        myHfov -= 0.1;
+                    if (window.camera.hfov) { // persp camera
+                        myHfov = window.camera.hfov;
+                        if (myHfov > 5) {
+                            myHfov -= 5;
+                        } else if (myHfov > 0.1) {
+                            myHfov -= 0.1;
+                        }
+                        window.camera.hfov = myHfov;
+                        print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
+                    } else {  // ortho camera
+                        window.camera.width /= 1.1;
+                        print("Zoom to width " + window.camera.width);
                     }
-                    window.camera.hfov = myHfov;
-                    print("Zoom to " + getFocalLength(myHfov).toFixed(1) + "mm (hfov: " + myHfov.toFixed(1) + ")");
                     break;
                 case 'u':
                     if (!_myMemoryMeter) {

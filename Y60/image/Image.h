@@ -103,7 +103,8 @@ namespace y60 {
                     PixelEncoding theEncoding,
                     const asl::ReadableBlock & thePixels);
             void blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage,
-                           const asl::Vector2i & theTargetPos);
+                           const asl::Vector2i & theTargetPos,
+                           const asl::Box2i * theSourceRect = 0);
             void set(unsigned int theNewWidth,
                     unsigned int theNewHeight,
                     unsigned int theNewDepth,

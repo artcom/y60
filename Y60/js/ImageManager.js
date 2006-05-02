@@ -43,7 +43,7 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
         _myBaseViewer.getImages().appendChild(myMovie);
         myMovie.src = theSource;
         myMovie.name = theSource;
-        window.loadMovieFrame(myMovie);
+        window.scene.loadMovieFrame(myMovie);
         return myMovie;
     }
 }
