@@ -297,7 +297,8 @@ namespace y60 {
         static bool avRegistered = false;
         if (!avRegistered) {
             AC_INFO << "FFMpegDecoder2::load " << LIBAVCODEC_IDENT;
-            av_log_set_level(AV_LOG_ERROR);
+            av_log_set_level(AV_LOG_DEBUG);
+            cerr << "av_register_all" << endl;
             av_register_all();
             avRegistered = true;
         }

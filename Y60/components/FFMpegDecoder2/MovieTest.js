@@ -33,11 +33,13 @@ function FFMpegTest(theArguments) {
         Public.setSplashScreen(false);
         Base.setup(840, 500);
         window.eventListener = Public;
+/*
         var myNoisyString = expandEnvironment("${Y60_NOISY_SOUND_TESTS}");
         if (myNoisyString == "") {
             var mySoundManager = new SoundManager();
             mySoundManager.volume = 0.0;
         }
+*/        
         Public.nextTest();
     }
 
