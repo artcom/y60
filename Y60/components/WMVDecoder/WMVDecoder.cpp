@@ -237,7 +237,7 @@ namespace y60 {
             } //if          
         }
 
-        asl::AutoLocker<WMVDecoder> myLocker(*this); // protect shared vars (_myFrameCache, ...)
+        asl::AutoLocker<ThreadLock> myLocker(_myLock); // protect shared vars (_myFrameCache, ...)
 		getMovie()->set<CacheSizeTag>(_myFrameCache.size()); // purely informational, sets value in DOM
 
         if (_myFirstFrameDelivered == false) {
@@ -328,7 +328,7 @@ namespace y60 {
         AC_INFO << "WMVDecoder::resumeMovie " << (void*)this << " time=" << theStartTime;
         if (_myReader) {
             resetEvent();
-            asl::AutoLocker<WMVDecoder> myLocker(*this);
+            asl::AutoLocker<ThreadLock> myLocker(_myLock);
             HRESULT hr = _myReader->Resume();
             checkForError(hr, "Could not resume WMVDecoder", PLUS_FILE_LINE);
         }
@@ -346,7 +346,7 @@ namespace y60 {
             waitForEvent();
             checkForError(_myEventResult, "Starting playback failed.", PLUS_FILE_LINE);
 
-            asl::AutoLocker<WMVDecoder> myLocker(*this);
+            asl::AutoLocker<ThreadLock> myLocker(_myLock);
             if (_myAudioSink) {
                 // flush AudioBuffer
                 _myAudioSink->stop();
@@ -360,7 +360,6 @@ namespace y60 {
 
     void
     WMVDecoder::stopMovie() {
-        //asl::AutoLocker<WMVDecoder> myLocker(*this);
         AC_INFO << "WMVDecoder::stopMovie";
         if (_myReader) {
             resetEvent();
@@ -379,7 +378,7 @@ namespace y60 {
 
     void
     WMVDecoder::pauseMovie() {
-        asl::AutoLocker<WMVDecoder> myLocker(*this);
+        asl::AutoLocker<ThreadLock> myLocker(_myLock);
         AC_INFO << "WMVDecoder::pauseMovie";
         if (_myReader) {
             resetEvent();
@@ -391,7 +390,6 @@ namespace y60 {
 
     void
     WMVDecoder::closeMovie() {
-        //asl::AutoLocker<WMVDecoder> myLocker(*this);
         AC_INFO << "WMVDecoder::closeMovie";
         if (_myReader) {
             HRESULT hr = _myReader->Close();
@@ -709,7 +707,7 @@ namespace y60 {
 
         if (theOutputNumber == _myVideoOutputId) {
             //AC_TRACE << "VideoSample arrived: " << myTimeStamp << "s";
-            asl::AutoLocker<WMVDecoder> myLocker(*this);
+            asl::AutoLocker<ThreadLock> myLocker(_myLock);
 
             if (_myLastVideoTimeStamp && (myTimeStamp - _myLastVideoTimeStamp) > 1.0) {
                 AC_WARNING << "Last VideoSample is " << (myTimeStamp - _myLastVideoTimeStamp) << "s old.";
@@ -773,7 +771,7 @@ namespace y60 {
                          BYTE __RPC_FAR * theValue,
                          void __RPC_FAR * theContext)
     {
-        asl::AutoLocker<WMVDecoder> myLocker(*this); // protect _myEventResult, _myReadEOF
+        asl::AutoLocker<ThreadLock> myLocker(_myLock); // protect _myEventResult, _myReadEOF
         switch (theStatus) {
         case WMT_LOCATING:
             AC_INFO << "Locating.";
