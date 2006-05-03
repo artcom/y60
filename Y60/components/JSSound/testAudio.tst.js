@@ -74,7 +74,7 @@ SoundUnitTest.prototype.Constructor = function(obj, theName) {
         DTITLE("Volume fade...");
         obj.mySound.fadeToVolume(0.5, 0.1);
         msleep(250);
-        ENSURE("obj.mySound.volume == 0.5");
+        ENSURE("Math.abs(obj.mySound.volume-0.5) < 0.001");
         DTITLE("Stopping sound...");
         obj.mySound.stop();
 

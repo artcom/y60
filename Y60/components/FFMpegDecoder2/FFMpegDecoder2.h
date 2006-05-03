@@ -68,20 +68,15 @@ namespace y60 {
         FFMpegDecoder2(asl::DLHandle theDLHandle);
         virtual ~FFMpegDecoder2();
 
-
         virtual asl::Ptr<MovieDecoderBase> instance() const;
         std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
-
-        void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
-        void copyFrame(FrameCache::VideoFramePtr theVideoFrame, dom::ResizeableRasterPtr theTargetRaster);
-//        void fillCache(double theStartTime = 0.0f);
 
         /**
          * loads a movie from the file given by theFilename
          * @param theFilename file to load into the decoder
          */
         void load(const std::string & theFilename);
-        double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
+        double readFrame(double theTime, unsigned, dom::ResizeableRasterPtr theTargetRaster);
 
         /**
          * loads a movie from the stream given by theSource
@@ -102,34 +97,20 @@ namespace y60 {
         void stopMovie();
         void closeMovie();
         
-        /**
-         * Tries to generate a frame from thePacket. If a frame was generated,
-         * it is added to the cache, by calling addCacheFrame and true is returned,
-         * otherwise false is returned
-         * is returned.
-         * @warn blocks if there is no room in the cache
-         * @throws asl::ThreadSemaphore::ClosedException
-         * @param thePacket video packet to decode and add to the cache
-         * @retval true, if a frame was added
-         */
-//        bool addVideoPacket(const AVPacket & thePacket);
-
         const char * getName() const { return "y60FFMpegDecoder2"; }
+        
     private:
         /**
          * Thread run method.
          */
         void run();
 
-        int64_t getTimestampFromFrame(unsigned theFrame);
-        unsigned getFrameFromTimestamp(int64_t theTimestamp);
-
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
         /**
          *  updates the Framecache depending on the current position
          */
-        bool readFrame();
+        bool decodeFrame();
         void readAudio();
         /**
          * Add theFrame to the framecache with the timestamp theTimestamp.
@@ -147,6 +128,10 @@ namespace y60 {
          */
         void addAudioPacket(const AVPacket & thePacket);
         void createCache();
+        
+        void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
+        void copyFrame(FrameCache::VideoFramePtr theVideoFrame, 
+                dom::ResizeableRasterPtr theTargetRaster);
 
         AVFormatContext * _myFormatContext;
 
@@ -175,7 +160,9 @@ namespace y60 {
         //XXX: Since time_base is specified per stream by ffmpeg, we should really be 
         //     calculating this per stream and not per file.
         int64_t _myTimeUnitsPerSecond;
-        
+       
+        bool _myReadEOF;
+        asl::ThreadLock _myLock;
     };
     typedef asl::Ptr<FFMpegDecoder2> FFMpegDecoder2Ptr;
 }

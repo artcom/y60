@@ -33,13 +33,12 @@ function FFMpegTest(theArguments) {
         Public.setSplashScreen(false);
         Base.setup(840, 500);
         window.eventListener = Public;
-/*
+
         var myNoisyString = expandEnvironment("${Y60_NOISY_SOUND_TESTS}");
         if (myNoisyString == "") {
             var mySoundManager = new SoundManager();
             mySoundManager.volume = 0.0;
         }
-*/        
         Public.nextTest();
     }
 
@@ -157,6 +156,7 @@ function FFMpegTest(theArguments) {
 
     function setupPlayTest() {
         setupTest("Play to End", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        window.swapInterval = 0;
         window.setTimeout("testPlaying", 1000);
         window.setTimeout("testStopped", 10000);
         window.setTimeout("nextTest", 10100);

@@ -44,18 +44,18 @@ namespace y60 {
             VideoFrame(unsigned theBufferSize);
             ~VideoFrame();
     
-            inline void setTimestamp(long long theTimestamp) {
+            inline void setTimestamp(double theTimestamp) {
                 _myTimestamp = theTimestamp;
             }
     
-            inline long long getTimestamp() const {
+            inline double getTimestamp() const {
                 return _myTimestamp;
             }
             inline unsigned char* getBuffer() {
                 return _myBuffer;
             }
         private:
-            long long _myTimestamp;
+            double _myTimestamp;
             unsigned char* _myBuffer;
             bool _myFree;
         };

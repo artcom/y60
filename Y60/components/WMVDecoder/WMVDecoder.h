@@ -192,6 +192,7 @@ namespace y60 {
 
         static asl::Block     _mySamples;
         static asl::Block     _myResampledSamples;
+        bool _myReadEOF;
     };
     typedef asl::Ptr<WMVDecoder> WMVDecoderPtr;
 }

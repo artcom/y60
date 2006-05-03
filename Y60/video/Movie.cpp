@@ -129,7 +129,7 @@ namespace y60 {
     }
 
     double Movie::decodeFrame(double theTime, unsigned theFrame) {
-        DB(AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame);
+        AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame;
         double myReturnTime = _myDecoder->readFrame(theTime, theFrame, getRasterPtr());
         if (myReturnTime != theTime) {
             _myLastDecodedFrame = getFrameFromTime(myReturnTime);
@@ -146,7 +146,7 @@ namespace y60 {
 
     unsigned Movie::getFrameFromTime(double theTime) const {
         double myFrameHelper = theTime * get<FrameRateTag>();
-        int myFrame = int(asl::round(myFrameHelper));
+        int myFrame = int(myFrameHelper);
         while (myFrame < 0) {
             myFrame += get<FrameCountTag>();
         }

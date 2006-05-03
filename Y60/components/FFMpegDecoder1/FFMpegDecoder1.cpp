@@ -196,11 +196,16 @@ namespace y60 {
 
         // duration
         if (_myVStream->duration == AV_NOPTS_VALUE ||
-            int(myFPS * (_myVStream->duration / (double) AV_TIME_BASE)) <= 0) {
+            int(myFPS * (_myVStream->duration) <= 0)) {
             AC_WARNING << "url='" << theFilename << "' contains no valid duration";
             myMovie->set<FrameCountTag>(INT_MAX);
         } else {
-            myMovie->set<FrameCountTag>(asl::round(myFPS * (_myVStream->duration / (float) AV_TIME_BASE)));
+#if LIBAVCODEC_BUILD >= 0x5100
+            myMovie->set<FrameCountTag>(int(myFPS * _myVStream->duration 
+                        * av_q2d(_myVStream->time_base)));
+#else
+            myMovie->set<FrameCountTag>(int(myFPS * (_myVStream->duration / (float) AV_TIME_BASE)));
+#endif
         }
 
         AC_DEBUG << "url='" << theFilename << "' fps=" << myFPS << " framecount=" << getFrameCount();

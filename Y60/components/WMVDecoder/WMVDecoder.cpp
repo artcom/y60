@@ -90,8 +90,9 @@ namespace y60 {
         _myLastAudioTimeStamp(0.0),
         _myAudioVideoDelay(0.0),
         _myCachingFlag(false),
-        _myResampleContext(0)
-    {
+        _myResampleContext(0),
+        _myReadEOF(false)
+    { 
         AC_DEBUG << "WMVDecoder::WMVDecoder " << (void*)this;
         CoInitialize(0);
 

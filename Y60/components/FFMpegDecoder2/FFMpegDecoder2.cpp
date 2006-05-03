@@ -65,7 +65,8 @@ namespace y60 {
         _myDestinationPixelFormat(0),
         _myFrameCache(SEMAPHORE_TIMEOUT), 
         _myFrameRecycler(SEMAPHORE_TIMEOUT),
-        _myResampleContext(0)
+        _myResampleContext(0),
+        _myReadEOF(false)
     {
     }
 
@@ -88,12 +89,191 @@ namespace y60 {
             asl::toLowerCase(asl::getExtension(theUrl)) == "avi" ||
             asl::toLowerCase(asl::getExtension(theUrl)) == "mov" ||
             asl::toLowerCase(asl::getExtension(theUrl)) == "mpeg") {
-            AC_INFO << "FFMpegDecoder2 can decode :" << theUrl << endl;
+            AC_TRACE << "FFMpegDecoder2 can decode :" << theUrl << endl;
             return MIME_TYPE_MPG;
         } else {
-            AC_INFO << "FFMpegDecoder2 can not decode :" << theUrl << " responsible for extensions mpg and m2v" << endl;
+            AC_TRACE << "FFMpegDecoder2 can not decode :" << theUrl << 
+                    "responsible for extensions mpg and m2v" << endl;
             return "";
         }
+    }
+
+    void
+    FFMpegDecoder2::load(Ptr<ReadableStream> theSource, const string & theFilename) {
+        string theStreamID = string("acstream://") + theFilename;
+        registerStream(theStreamID, theSource);
+        load(theStreamID);
+    }
+
+    void
+    FFMpegDecoder2::load(const std::string & theFilename) {
+        AC_DEBUG << "load(" << theFilename << ")";
+        AutoLocker<ThreadLock> myLock(_myLock);
+
+        // register all formats and codecs
+        static bool avRegistered = false;
+        if (!avRegistered) {
+            AC_INFO << "FFMpegDecoder2::load " << LIBAVCODEC_IDENT;
+            av_log_set_level(AV_LOG_ERROR);
+            av_register_all();
+            avRegistered = true;
+        }
+
+        if (av_open_input_file(&_myFormatContext, theFilename.c_str(), 0, FFM_PACKET_SIZE, 0) < 0) {
+            throw FFMpegDecoder2Exception(std::string("Unable to open input file: ") + theFilename, PLUS_FILE_LINE);
+        }
+
+        if (av_find_stream_info(_myFormatContext) < 0) {
+            throw FFMpegDecoder2Exception(std::string("Unable to find stream info: ") + theFilename, PLUS_FILE_LINE);
+        }
+
+        // find video/audio streams
+        for (unsigned i = 0; i < _myFormatContext->nb_streams; ++i) {
+#if LIBAVCODEC_BUILD >= 0x5100
+            int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
+#else
+            int myCodecType =  _myFormatContext->streams[i]->codec.codec_type;
+#endif
+            if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
+                _myVStreamIndex = i;
+                _myVStream = _myFormatContext->streams[i];
+            }
+            else if (_myAStreamIndex == -1 && myCodecType == CODEC_TYPE_AUDIO) {
+                _myAStreamIndex = i;
+                _myAStream = _myFormatContext->streams[i];
+            }
+        }
+#if LIBAVCODEC_BUILD >= 0x5100        
+        _myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
+#else
+        _myTimeUnitsPerSecond = (int64_t)AV_TIME_BASE;
+#endif
+        if (_myVStream) {
+            setupVideo(theFilename);
+        } else {
+            AC_INFO << "FFMpegDecoder2::load " << theFilename << " no video stream found";
+            _myVStream = 0;
+            _myVStreamIndex = -1;
+        }
+        if (_myAStream && getAudioFlag()) {
+            setupAudio(theFilename);
+        } else {
+            AC_INFO << "FFMpegDecoder2::load " << theFilename << " no audio stream found or disabled";
+            _myAudioSink = HWSampleSinkPtr(0);
+            _myAStream = 0;
+            _myAStreamIndex = -1;
+        }
+        _myDemux = asl::Ptr<Demux>(new Demux(_myFormatContext));
+        if (_myVStreamIndex != -1) {
+            _myDemux->enableStream(_myVStreamIndex);
+        }
+        if (_myAStreamIndex != -1) {
+            _myDemux->enableStream(_myAStreamIndex);
+        }
+        _myEOFVideoTimestamp = INT_MIN;
+    }
+
+    void FFMpegDecoder2::startMovie(double theStartTime) {
+        AC_DEBUG << "startMovie, time: " << theStartTime;
+
+        AutoLocker<ThreadLock> myLock(_myLock);
+        _myFrameCache.clear();
+        createCache();
+        // XXX unblock locked ffmpeg-thread.
+        _myReadEOF = false;
+        
+        _myEOFVideoTimestamp = INT_MIN;
+        _myNextPacketTimestamp = 0;
+
+        // seek to start
+#if (LIBAVCODEC_BUILD < 4738)
+        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp);
+#else
+        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp, AVSEEK_FLAG_BACKWARD);
+#endif
+#if LIBAVCODEC_BUILD >= 0x5100
+        avcodec_flush_buffers(_myVStream->codec);
+#else
+        avcodec_flush_buffers(&_myVStream->codec);
+#endif
+        decodeFrame();
+        readAudio();
+        if (_myAStream && getAudioFlag())
+        {
+//            AC_INFO << "Start Audio";
+            _myAudioSink->play();
+        }
+
+        setState(RUN);
+        if (!isActive()) {
+            AC_DEBUG << "Forking FFMpegDecoder Thread";
+            PosixThread::fork();
+        } else {
+            AC_INFO << "Thread already running. No forking.";
+        }
+        AC_TRACE << "Movie starting. _myStartTimestamp is " << _myStartTimestamp;
+        AsyncDecoder::startMovie(theStartTime);
+    }
+
+    void FFMpegDecoder2::resumeMovie(double theStartTime) {
+        AC_DEBUG << "resumeMovie, time: " << theStartTime;
+        AutoLocker<ThreadLock> myLock(_myLock);
+        _myNextPacketTimestamp = 0;
+        setState(RUN);
+        if (!isActive()) {
+            AC_TRACE << "Forking FFMpegDecoder Thread";
+            PosixThread::fork();
+        } else {
+            AC_INFO << "Thread already running. No forking.";
+        }
+        AC_TRACE << "Movie resuming. _myStartTimestamp is " << _myStartTimestamp;
+        AsyncDecoder::resumeMovie(theStartTime);
+    }
+
+    void FFMpegDecoder2::stopMovie() {
+        AC_DEBUG << "stopMovie";
+		_myLock.lock();
+        setState(STOP);
+		_myLock.unlock();
+        _myAudioSink->stop();
+        // Wake up sleeping decoder thread
+        if (isActive()) {
+            AC_TRACE << "Joining FFMpegDecoder Thread";
+            _myFrameRecycler.close();
+            join();
+        }
+        AsyncDecoder::stopMovie();
+    }
+
+    void
+    FFMpegDecoder2::closeMovie() {
+        AC_DEBUG << "closeMovie";
+        // stop thread
+        stopMovie();
+
+        // codecs
+        if (_myVStream) {
+#if LIBAVCODEC_BUILD >= 0x5100
+            avcodec_close(_myVStream->codec);
+#else
+            avcodec_close(&_myVStream->codec);
+#endif
+            _myVStreamIndex = -1;
+            _myVStream = 0;
+        }
+        if (_myAStream) {
+#if LIBAVCODEC_BUILD >= 0x5100
+            avcodec_close(_myAStream->codec);
+#else
+            avcodec_close(&_myAStream->codec);
+#endif
+            _myAStreamIndex = -1;
+            _myAStream = 0;
+        }
+
+        av_close_input_file(_myFormatContext);
+        _myFormatContext = 0;
+        AsyncDecoder::closeMovie();
     }
 
     void FFMpegDecoder2::readAudio() {
@@ -169,8 +349,8 @@ namespace y60 {
         } //if
     }
 
-    bool FFMpegDecoder2::readFrame() {
-        AC_TRACE << "FFMpegDecoder2::readFrame";
+    bool FFMpegDecoder2::decodeFrame() {
+        AC_TRACE << "FFMpegDecoder2::decodeFrame";
         AVPacket * myPacket;
         
         int64_t myStartTime = 0;
@@ -184,7 +364,7 @@ namespace y60 {
             myPacket = _myDemux->getPacket(_myVStreamIndex); 
             if (myPacket == 0) {
                 myEndOfFileFlag = true;
-                AC_DEBUG << "FFMpegDecoder2::readFrame: eof";
+                AC_DEBUG << "FFMpegDecoder2::decodeFrame: eof";
             } else {
                 int myFrameCompleteFlag = 0;
 #if LIBAVCODEC_BUILD >= 0x5100
@@ -258,8 +438,6 @@ namespace y60 {
 
     void FFMpegDecoder2::createCache() {
 
-        AC_DEBUG << "FFMpegDecoder2::createCache PIX_FMT=" << _myDestinationPixelFormat;
-
         _myFrameRecycler.clear();
         _myFrameRecycler.reset();
 
@@ -282,83 +460,9 @@ namespace y60 {
         _myFrameCache.push_back(FrameCache::VideoFramePtr(new FrameCache::VideoFrame(myBufferSize)));
     }
 
-    void
-    FFMpegDecoder2::load(Ptr<ReadableStream> theSource, const string & theFilename) {
-        string theStreamID = string("acstream://") + theFilename;
-        registerStream(theStreamID, theSource);
-        load(theStreamID);
-    }
-
-    void
-    FFMpegDecoder2::load(const std::string & theFilename) {
-        asl::AutoLocker<FFMpegDecoder2> myLock(*this);
-
-        // register all formats and codecs
-        static bool avRegistered = false;
-        if (!avRegistered) {
-            AC_INFO << "FFMpegDecoder2::load " << LIBAVCODEC_IDENT;
-            av_log_set_level(AV_LOG_DEBUG);
-            cerr << "av_register_all" << endl;
-            av_register_all();
-            avRegistered = true;
-        }
-
-        if (av_open_input_file(&_myFormatContext, theFilename.c_str(), 0, FFM_PACKET_SIZE, 0) < 0) {
-            throw FFMpegDecoder2Exception(std::string("Unable to open input file: ") + theFilename, PLUS_FILE_LINE);
-        }
-
-        if (av_find_stream_info(_myFormatContext) < 0) {
-            throw FFMpegDecoder2Exception(std::string("Unable to find stream info: ") + theFilename, PLUS_FILE_LINE);
-        }
-
-        // find video/audio streams
-        for (unsigned i = 0; i < _myFormatContext->nb_streams; ++i) {
-#if LIBAVCODEC_BUILD >= 0x5100
-            int myCodecType =  _myFormatContext->streams[i]->codec->codec_type;
-#else
-            int myCodecType =  _myFormatContext->streams[i]->codec.codec_type;
-#endif
-            if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
-                _myVStreamIndex = i;
-                _myVStream = _myFormatContext->streams[i];
-            }
-            else if (_myAStreamIndex == -1 && myCodecType == CODEC_TYPE_AUDIO) {
-                _myAStreamIndex = i;
-                _myAStream = _myFormatContext->streams[i];
-            }
-        }
-#if LIBAVCODEC_BUILD >= 0x5100        
-        _myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
-#else
-        _myTimeUnitsPerSecond = (int64_t)AV_TIME_BASE;
-#endif
-        if (_myVStream) {
-            setupVideo(theFilename);
-        } else {
-            AC_INFO << "FFMpegDecoder2::load " << theFilename << " no video stream found";
-            _myVStream = 0;
-            _myVStreamIndex = -1;
-        }
-        if (_myAStream && getAudioFlag()) {
-            setupAudio(theFilename);
-        } else {
-            AC_INFO << "FFMpegDecoder2::load " << theFilename << " no audio stream found or disabled";
-            _myAudioSink = HWSampleSinkPtr(0);
-            _myAStream = 0;
-            _myAStreamIndex = -1;
-        }
-        _myDemux = asl::Ptr<Demux>(new Demux(_myFormatContext));
-        if (_myVStreamIndex != -1) {
-            _myDemux->enableStream(_myVStreamIndex);
-        }
-        if (_myAStreamIndex != -1) {
-            _myDemux->enableStream(_myAStreamIndex);
-        }
-        _myEOFVideoTimestamp = INT_MIN;
-    }
-
     double
-    FFMpegDecoder2::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
+    FFMpegDecoder2::readFrame(double theTime, unsigned /*theFrame*/, dom::ResizeableRasterPtr theTargetRaster) {
+        AC_TRACE << "FFMpegDecoder2::readFrame, theTime=" << theTime;
         ASSURE(!getEOF());
         if (theTargetRaster == 0) {
             throw FFMpegDecoder2Exception("TargetRasterPtr is null.", PLUS_FILE_LINE);
@@ -368,13 +472,14 @@ namespace y60 {
             if (getPlayMode() != y60::PLAY_MODE_PLAY) {
                 return theTime;
             }
-            int64_t myBaseTime = (int64_t)(theTime * _myTimeUnitsPerSecond);
-            int64_t myFrameTimestamp = _myStartTimestamp + (int64_t)(myBaseTime);
-            AC_TRACE << "Time=" << theTime << " - Reading FrameTimestamp: " << myFrameTimestamp << " from Cache.";
+            double myBaseTime = theTime;
+            double myFrameTime = _myStartTimestamp + myBaseTime;
+            AC_TRACE << "Time=" << theTime << " - Reading FrameTimestamp: " << myFrameTime << " from Cache.";
             {
                 for (;;) {
                     myVideoFrame = _myFrameCache.pop_front();
-                    int64_t myTimeDiff = myFrameTimestamp - myVideoFrame->getTimestamp();
+                    AC_TRACE << "pop_front, FrameTime=" << myVideoFrame->getTimestamp();
+                    double myTimeDiff = myFrameTime - myVideoFrame->getTimestamp();
                     AC_TRACE << "TimeDiff: " << myTimeDiff;
     				if (myTimeDiff <= 0 || _myFrameCache.size() == 0) {
                         _myFrameCache.push_front(myVideoFrame);
@@ -386,34 +491,38 @@ namespace y60 {
             }
             // XXX Handle EOF
 			AC_TRACE << "readFrame trying to acquire lock";
-            asl::AutoLocker<FFMpegDecoder2> myLock(*this);
+            AutoLocker<ThreadLock> myLock(_myLock);
 			AC_TRACE << "readFrame acquired lock";
             if (_myReadEOF && _myFrameCache.size() <= 1) {
                 AC_TRACE << "Readframe: EOF Write down";
                 _myReadEOF = false;
-                AC_DEBUG << "Setting Movie to EOF";
+                AC_TRACE << "Setting Movie to EOF";
                 setEOF(true);
 				AC_TRACE << "readFrame (1) release lock";
                 return theTime;
             }
 
-            /*
-            if (myVideoFrame && myVideoFrame->getTimestamp() != myFrameTimestamp) {
-            // not found, seek to frame
-            //seekToFrame(theFrame);
-            yield();
-            }
-            */
             // convert frame
             theTargetRaster->resize(getFrameWidth(), getFrameHeight());
             if (myVideoFrame) {
+                AC_DEBUG << "readFrame, FrameTime=" << myVideoFrame->getTimestamp() 
+                        << ", Calculated frame #=" << myVideoFrame->getTimestamp()*getFrameRate();
                 copyFrame(myVideoFrame, theTargetRaster);
             } else {
+                AC_DEBUG << "readFrame, empty frame.";
                 memset(theTargetRaster->pixels().begin(), 0, theTargetRaster->pixels().size());
             }
-            AC_TRACE << "Readframe ending.";
+            AC_TRACE << "ReadFrame ending.";
             getMovie()->set<CacheSizeTag>(_myFrameCache.size());
+            AC_TRACE << "ReadFrame, timestamp=" << myVideoFrame->getTimestamp();
 
+/*
+            // Hack to correct the frame count in case the movie itself contains a bogus frame
+            // count.
+            if (getFrameCount() < (myVideoFrame->getTimestamp()*getFrameRate()+1)) {
+                getMovie()->set<FrameCountTag>(int(myVideoFrame->getTimestamp()*getFrameRate()+1));
+            }
+*/            
 			AC_TRACE << "readFrame (2) release lock";
         } catch (asl::ThreadSemaphore::ClosedException &) {
             AC_WARNING << "Semaphore Destroyed while in readframe";
@@ -423,109 +532,6 @@ namespace y60 {
             return theTime;
         }
         return theTime;
-    }
-
-    void FFMpegDecoder2::startMovie(double theStartTime) {
-        AC_DEBUG << "startMovie, time: " << theStartTime << ". Resetting locks";
-
-        asl::AutoLocker<FFMpegDecoder2> myLock(*this);
-        _myFrameCache.clear();
-        createCache();
-        // XXX unblock locked ffmpeg-thread.
-        _myReadEOF = false;
-        
-        _myEOFVideoTimestamp = INT_MIN;
-        _myNextPacketTimestamp = 0;
-
-        // seek to start
-#if (LIBAVCODEC_BUILD < 4738)
-        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp);
-#else
-        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp, AVSEEK_FLAG_BACKWARD);
-#endif
-#if LIBAVCODEC_BUILD >= 0x5100
-        avcodec_flush_buffers(_myVStream->codec);
-#else
-        avcodec_flush_buffers(&_myVStream->codec);
-#endif
-        readFrame();
-        readAudio();
-        if (_myAStream && getAudioFlag())
-        {
-            AC_INFO << "Start Audio";
-            _myAudioSink->play();
-        }
-
-        _myState = RUN;
-        if (!isActive()) {
-            AC_TRACE << "Forking FFMpegDecoder Thread";
-            PosixThread::fork();
-        } else {
-            AC_INFO << "Thread already running. No forking.";
-        }
-        AC_DEBUG << "Movie starting. _myStartTimestamp is " << _myStartTimestamp;
-        AsyncDecoder::startMovie(theStartTime);
-    }
-
-    void FFMpegDecoder2::resumeMovie(double theStartTime) {
-        AC_DEBUG << "resumeMovie, time: " << theStartTime << ". Resetting locks";
-        asl::AutoLocker<FFMpegDecoder2> myLock(*this);
-        _myNextPacketTimestamp = 0;
-        _myState = RUN;
-        if (!isActive()) {
-            AC_TRACE << "Forking FFMpegDecoder Thread";
-            PosixThread::fork();
-        } else {
-            AC_INFO << "Thread already running. No forking.";
-        }
-        AC_DEBUG << "Movie resuming. _myStartTimestamp is " << _myStartTimestamp;
-        AsyncDecoder::resumeMovie(theStartTime);
-    }
-
-    void FFMpegDecoder2::stopMovie() {
-        AC_DEBUG << "stopMovie";
-		lock();
-        _myState = STOP;
-		unlock();
-        _myAudioSink->stop();
-        // Wake up sleeping decoder thread
-        if (isActive()) {
-            AC_TRACE << "Joining FFMpegDecoder Thread";
-            _myFrameRecycler.close();
-            join();
-        }
-        AsyncDecoder::stopMovie();
-    }
-
-    void
-    FFMpegDecoder2::closeMovie() {
-        AC_DEBUG << "closeMovie";
-        // stop thread
-        stopMovie();
-
-        // codecs
-        if (_myVStream) {
-#if LIBAVCODEC_BUILD >= 0x5100
-            avcodec_close(_myVStream->codec);
-#else
-            avcodec_close(&_myVStream->codec);
-#endif
-            _myVStreamIndex = -1;
-            _myVStream = 0;
-        }
-        if (_myAStream) {
-#if LIBAVCODEC_BUILD >= 0x5100
-            avcodec_close(_myAStream->codec);
-#else
-            avcodec_close(&_myAStream->codec);
-#endif
-            _myAStreamIndex = -1;
-            _myAStream = 0;
-        }
-
-        av_close_input_file(_myFormatContext);
-        _myFormatContext = 0;
-        AsyncDecoder::closeMovie();
     }
 
     void FFMpegDecoder2::run() {
@@ -541,29 +547,29 @@ namespace y60 {
         int64_t mySeekTimestamp = AV_NOPTS_VALUE;
 
         // decoder loop
-        while (_myState != STOP) {
+        while (getState() != STOP) {
 			AC_TRACE << "FFMpegDecoder2::loop";
-            if (_myState != RUN) {
+            if (getState() != RUN) {
                 // do nothing...
                 asl::msleep(10);
                 yield();
 				AC_TRACE << "FFMpegDecoder2::run : state =! run, yielding and continue";
                 continue;
             }
-			AC_TRACE << "FFMpeg-Tread acquiring lock";
-	        lock();
-			AC_TRACE << "FFMpeg-Tread lock acquired.";
+			AC_TRACE << "FFMpeg-Thread acquiring lock";
+	        _myLock.lock();
+			AC_TRACE << "FFMpeg-Thread lock acquired.";
             if (_myReadEOF) {
-				unlock();
+				_myLock.unlock();
                 asl::msleep(500);
 				AC_TRACE << "EOF read.";
                 continue;
             }
-			unlock();
+			_myLock.unlock();
 
             AC_TRACE << "Updating cache";
             try {
-                if (!readFrame()) {
+                if (!decodeFrame()) {
                     unsigned myLastFrame = asl::round(myFrameRate * 
                             (_myEOFVideoTimestamp - _myStartTimestamp) / _myTimeUnitsPerSecond);
                     AC_TRACE << "EOF in Decoder, StartTimeStamp: " << _myStartTimestamp 
@@ -573,9 +579,9 @@ namespace y60 {
                         getMovie()->set<FrameCountTag>(myLastFrame + 1);
                         AC_INFO << "FFMpegDecoder::run set framecount=" << getFrameCount();
                     }
-					lock();
+					_myLock.lock();
                     _myReadEOF = true;
-					unlock();
+					_myLock.unlock();
 					AC_TRACE << "EOF Yielding Thread.";
                     yield();
                 }
@@ -588,19 +594,11 @@ namespace y60 {
             
 			AC_TRACE << "end of loop";
         }
-        AC_TRACE << "FFMpegDecoder2::run terminating";
-    }
-
-    int64_t FFMpegDecoder2::getTimestampFromFrame(unsigned theFrame) {
-        return _myStartTimestamp + (int64_t)((theFrame * _myTimeUnitsPerSecond)/getFrameRate());
-    }
-    
-    unsigned FFMpegDecoder2::getFrameFromTimestamp(int64_t theTimestamp) {
-        return (unsigned)(((theTimestamp - _myStartTimestamp) * getFrameRate())/
-                (double)_myTimeUnitsPerSecond);
+        AC_DEBUG << "FFMpegDecoder2::run terminating";
     }
 
     void FFMpegDecoder2::setupVideo(const std::string & theFilename) {
+        AC_DEBUG << "setupVideo";
 #if LIBAVCODEC_BUILD >= 0x5100
         AVCodecContext * myVCodec = _myVStream->codec;
 #else
@@ -676,16 +674,18 @@ namespace y60 {
         myMovie->set<FrameRateTag>(myFPS);
 
         if (_myVStream->duration == AV_NOPTS_VALUE) {
-            AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename 
+            AC_TRACE << "FFMpegDecoder2::setupVideo() " << theFilename 
                     << " has no valid duration";
         }
         if (_myVStream->duration == AV_NOPTS_VALUE || _myVStream->duration <= 0) {
-            AC_WARNING << "FFMpegDecoder::load '" << theFilename 
+            AC_WARNING << "FFMpegDecoder2::setupVideo(): '" << theFilename 
                     << "' contains no valid duration";
             myMovie->set<FrameCountTag>(INT_MAX);
         } else {
 	        myMovie->set<FrameCountTag>(int(myFPS * (_myVStream->duration
                     / (double) _myTimeUnitsPerSecond)));
+            AC_TRACE << "FFMpegDecoder2::setupVideo(): _myVStream->duration=" << _myVStream->duration 
+                    << ", _myTimeUnitsPerSecond=" << _myTimeUnitsPerSecond;
         }
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps=" 
                 << getFrameRate() << " framecount=" << getFrameCount();
@@ -748,7 +748,7 @@ namespace y60 {
                     myACodec->channels, Pump::get().getNativeSampleRate(),
                     myACodec->sample_rate);
         }
-        AC_INFO << "FFMpegDecoder2::setupAudio() done. resampling " 
+        AC_TRACE << "FFMpegDecoder2::setupAudio() done. resampling " 
             << (_myResampleContext != 0);
 
     }
@@ -757,10 +757,10 @@ namespace y60 {
 		AC_TRACE << "try to add frame at " << theTimestamp;
         try {
             FrameCache::VideoFramePtr myVideoFrame = _myFrameRecycler.pop_front();
-            myVideoFrame->setTimestamp(theTimestamp);
+            myVideoFrame->setTimestamp(theTimestamp/(double)_myTimeUnitsPerSecond);
             convertFrame(theFrame, myVideoFrame->getBuffer());
             _myFrameCache.push_back(myVideoFrame);
-            AC_TRACE << "Added Frame, Timestamp: " 
+            AC_TRACE << "Added Frame to cache, Timestamp: " 
                     << double(theTimestamp)/_myTimeUnitsPerSecond;
         } catch (FrameCache::TimeoutException &) {
             AC_FATAL << "Semaphore Timeout";
