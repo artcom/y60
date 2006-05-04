@@ -75,7 +75,8 @@ namespace y60 {
                                         ImageType theType,
 										const std::string & theInternalFormat,
 										const std::string & theResizeMode = IMAGE_RESIZE_SCALE,
-                                        unsigned theDepth = 1);
+                                        unsigned theDepth = 1,
+                                        bool allowSharing = true);
 
 /*
         void appendTexture(SceneBuilder & theSceneBuilder,

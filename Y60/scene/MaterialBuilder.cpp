@@ -225,7 +225,8 @@ namespace y60 {
                                  ImageType theType,
                                  const std::string & theInternalFormat,
                                  const std::string & theResizeMode,
-                                 unsigned theDepth)
+                                 unsigned theDepth,
+                                 bool allowSharing)
     {
         std::string myFileName(theFileName);
         asl::findAndReplace(myFileName, "\\","/");
@@ -238,7 +239,7 @@ namespace y60 {
                                     theColorScale,
                                     theColorBias);
 
-        if (myImage) {
+        if (myImage && allowSharing) {
             return myImage->getAttributeString(ID_ATTRIB);
         } else {
             ImageBuilder myImageBuilder(theName, theCreateMipmapsFlag);
