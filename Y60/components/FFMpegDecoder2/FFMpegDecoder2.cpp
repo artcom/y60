@@ -171,14 +171,14 @@ namespace y60 {
             _myDemux->enableStream(_myAStreamIndex);
         }
         _myEOFVideoTimestamp = INT_MIN;
+        createCache();
     }
 
     void FFMpegDecoder2::startMovie(double theStartTime) {
         AC_DEBUG << "startMovie, time: " << theStartTime;
 
         AutoLocker<ThreadLock> myLock(_myLock);
-        _myFrameCache.clear();
-        createCache();
+//        _myFrameCache.clear();
         // XXX unblock locked ffmpeg-thread.
         _myReadEOF = false;
         
@@ -186,17 +186,25 @@ namespace y60 {
         _myNextPacketTimestamp = 0;
 
         // seek to start
+        cerr << "before seek" << endl;
 #if (LIBAVCODEC_BUILD < 4738)
-        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp);
+        int myResult = av_seek_frame(_myFormatContext, -1, theStartTime);
 #else
-        int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp, AVSEEK_FLAG_BACKWARD);
+        int myResult = av_seek_frame(_myFormatContext, -1, (int64_t)(theStartTime*AV_TIME_BASE),
+                AVSEEK_FLAG_BACKWARD);
 #endif
+        cerr << "before flush_buffers" << endl;
 #if LIBAVCODEC_BUILD >= 0x5100
         avcodec_flush_buffers(_myVStream->codec);
+        if (_myAStream) {
+            avcodec_flush_buffers(_myAStream->codec);
+        }
 #else
         avcodec_flush_buffers(&_myVStream->codec);
 #endif
+        cerr << "after flush_buffers" << endl;
         decodeFrame();
+        cerr << "after decodeFrame" << endl;
         readAudio();
         if (_myAStream && getAudioFlag())
         {
@@ -242,6 +250,8 @@ namespace y60 {
             _myFrameRecycler.close();
             join();
         }
+        _myDemux->clearPacketCache();
+        _myFrameCache.clear();
         AsyncDecoder::stopMovie();
     }
 
@@ -437,7 +447,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::createCache() {
-
+        AC_DEBUG << "createCache";
         _myFrameRecycler.clear();
         _myFrameRecycler.reset();
 
@@ -655,9 +665,9 @@ namespace y60 {
         myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
         myMovie->set<ImageMatrixTag>(myMatrix);
 
-        float myFPS;
+        double myFPS;
 #if LIBAVCODEC_BUILD >= 0x5100
-        myFPS = (1.0f / av_q2d(myVCodec->time_base));
+        myFPS = (1.0 / av_q2d(myVCodec->time_base));
 #else
         /*
          * hack to correct wrong frame rates that seem to be generated
@@ -666,9 +676,9 @@ namespace y60 {
         if (_myVStream->codec.frame_rate > 1000 && _myVStream->codec.frame_rate_base == 1) {
             _myVStream->codec.frame_rate_base = 1000;
         }
-        myFPS = _myVStream->codec.frame_rate / (float) _myVStream->codec.frame_rate_base;
-        if (myFPS > 1000.0f) {
-            myFPS /= 1000.0f;
+        myFPS = _myVStream->codec.frame_rate / (double) _myVStream->codec.frame_rate_base;
+        if (myFPS > 1000.0) {
+            myFPS /= 1000.0;
         }
 #endif
         myMovie->set<FrameRateTag>(myFPS);
