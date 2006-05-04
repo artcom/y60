@@ -494,7 +494,7 @@ namespace y60 {
             myImageId = theMaterialBuilder.createImage(theSceneBuilder, myTexName,
                                                        theTextureFilename, myUsage,
                                                        myCreateMipmapFlag, myColorScale,
-                                                       myColorBias, SINGLE, "", IMAGE_RESIZE_PAD, theDepth);
+                                                       myColorBias, SINGLE, "", IMAGE_RESIZE_PAD, theDepth, false);
         }
 
         theMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode, myUVMappingMode,
