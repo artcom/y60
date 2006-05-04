@@ -836,5 +836,26 @@
             </properties>
          </fixedfunctionshader>
     </shader>
+    <shader id="s125" name="unlitmulticolortex" cost="120">
+        <supports>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="textures" values="[paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,uv_map]"/>
+            <feature class="vertexparams" values="[color]"/>            
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+                <vector3f name="color"/>                
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
+    
 </shaders>
 
