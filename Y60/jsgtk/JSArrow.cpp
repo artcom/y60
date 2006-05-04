@@ -32,8 +32,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
     std::string myStringRep = string("Gtk::Arrow@") + as_string(obj);
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 
@@ -108,7 +107,7 @@ JSArrow::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 
     switch (argc) {
         case 2:
-            { 
+            {
                 int myArrowType;
                 if ( ! convertFrom(cx, argv[0], myArrowType)) {
                     JS_ReportError(cx,"Constructor for %s: argument 0 must be a Gtk.ArrowType",

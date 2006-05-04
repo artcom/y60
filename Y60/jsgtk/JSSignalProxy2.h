@@ -84,7 +84,7 @@ class JSSignalProxy2 : public JSWrapper<Glib::SignalProxy2<R, P0, P1>, asl::Ptr<
                 myFinalizer.connect(sigc::bind<sigc::connection>(
                             sigc::ptr_fun( & JSSignalAdapter2<R, P0, P1>::on_target_finalized),
                             *myConnection));
-                
+
                 *rval = as_jsval(cx, myConnection, & ( * myConnection));
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
@@ -157,11 +157,10 @@ class JSSignalProxy2 : public JSWrapper<Glib::SignalProxy2<R, P0, P1>, asl::Ptr<
     private:
         static JSBool
         toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             std::string myStringRep = std::string("SignalProxy2@") + asl::as_string(obj);
-            JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-            *rval = STRING_TO_JSVAL(myString);
+            *rval = as_jsval(cx, myStringRep);
             return JS_TRUE;
         }
 };

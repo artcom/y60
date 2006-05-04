@@ -80,8 +80,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Prints the Quaternion.");
     DOC_END;
     std::string myStringRep = asl::as_string(JSQuaternion::getJSWrapper(cx,obj).getNative());
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 
@@ -154,7 +153,7 @@ lerp(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
     DOC_PARAM("q", "", DOC_TYPE_QUATERNIONF);
     DOC_PARAM("r", "", DOC_TYPE_QUATERNIONF);
     DOC_PARAM("theT", "", DOC_TYPE_FLOAT);
-    DOC_END;    
+    DOC_END;
     try {
         ensureParamCount(argc, 3);
 
@@ -185,7 +184,7 @@ slerp(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
     DOC_PARAM("q", "", DOC_TYPE_QUATERNIONF);
     DOC_PARAM("r", "", DOC_TYPE_QUATERNIONF);
     DOC_PARAM("theT", "", DOC_TYPE_FLOAT);
-    DOC_END;    
+    DOC_END;
     try {
         ensureParamCount(argc, 3);
 
@@ -363,7 +362,7 @@ JSQuaternion::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     DOC_PARAM("j", "", DOC_TYPE_FLOAT);
     DOC_PARAM("k", "", DOC_TYPE_FLOAT);
     DOC_PARAM("w", "", DOC_TYPE_FLOAT);
-    DOC_END;    
+    DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
@@ -408,7 +407,7 @@ JSQuaternion::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
             if (convertFrom(cx, argv[0], myNewQuaternion)) {
                 myNewObject = new JSQuaternion(myNewValue);
-                
+
             } else if (convertFrom(cx, argv[0], myVector4)) {
                 myNewQuaternion = asl::Quaternion<Number>(myVector4);
                 myNewObject = new JSQuaternion(myNewValue);
@@ -417,7 +416,7 @@ JSQuaternion::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
                 JS_ReportError(cx,"JSQuaternion::Constructor: argument #1 must be a Quaternion or a Vector4");
                 return JS_FALSE;
             }
-            
+
         } else if (argc == 4) {
             // construct from four numbers
             for (int i = 0; i < 4 ;++i) {

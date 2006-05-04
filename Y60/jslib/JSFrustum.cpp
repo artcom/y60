@@ -33,8 +33,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_RVAL("The string", DOC_TYPE_STRING);
     DOC_END;
     std::string myStringRep = asl::as_string(JSFrustum::getJSWrapper(cx,obj).getNative());
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+*rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 

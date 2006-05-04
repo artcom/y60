@@ -19,14 +19,13 @@ using namespace asl;
 namespace jslib {
 
 typedef JSACIconFactory::NATIVE NATIVE;
-    
+
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
     std::string myStringRep = string("ACIconFactory@") + as_string(obj);
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 
@@ -102,7 +101,7 @@ JSACIconFactory::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 // getproperty handling
 JSBool
 JSACIconFactory::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {

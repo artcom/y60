@@ -324,8 +324,7 @@ JSNode::toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     DOC_BEGIN("Returns the node as string representation.");
     DOC_END;
     std::string myStringRep = asl::as_string(*getNodePtr(cx,obj));
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 
@@ -1104,7 +1103,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             }
 
             if (myAttrNode) {
-                IF_NOISY(AC_TRACE << "JSNode::setProperty: myAttrNode = " <<*myAttrNode << endl);               
+                IF_NOISY(AC_TRACE << "JSNode::setProperty: myAttrNode = " <<*myAttrNode << endl);
                 myAttrNode->nodeValue(myResult);
                 return JS_TRUE;
             } else {

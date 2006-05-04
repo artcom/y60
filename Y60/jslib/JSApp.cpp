@@ -239,9 +239,7 @@ File(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         const char * myFile;
         int myLine;
         if (getFileLine(cx,obj,argc,argv,myFile,myLine)) {
-            size_t myStringLen = strlen(myFile);
-            JSString * myFileString = JS_NewStringCopyN(cx,myFile,myStringLen);
-            *rval = STRING_TO_JSVAL(myFileString);
+            *rval = as_jsval(cx, string(myFile));
             return JS_TRUE;
         }
         return JS_FALSE;
@@ -318,11 +316,11 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             if (! convertFrom(cx, argv[i], myString) ) {
                 return JS_FALSE;
             }
-            cerr << (i ? " " : "") << myString ;
+            cout << (i ? " " : "") << myString ;
         }
         n++;
         if (n) {
-            cerr << endl;
+            cout << endl;
         }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -890,7 +888,7 @@ ExpandEnvironment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
             JS_ReportError(cx, "expandEnvironment() could not convert argument value to string.");
             return JS_FALSE;
         }
-        
+
         string myExpandedString = asl::expandEnvironment(myString);
 
 		*rval = as_jsval(cx, myExpandedString);
@@ -914,8 +912,7 @@ while all other Windows versions return the fully qualified DNS name).");
         }
 
         string myHostName = hostname();
-        JSString * myHostNameJsString = JS_NewStringCopyN(cx, myHostName.c_str(), myHostName.size());
-        *rval = STRING_TO_JSVAL(myHostNameJsString);
+        *rval = as_jsval(cx, myHostName);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -1079,8 +1076,7 @@ asHexString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
         string myString;
         binToString(&myByte, 1, myString);
 
-        JSString * myJsString = JS_NewStringCopyN(cx, myString.c_str(), myString.size());
-        *rval = STRING_TO_JSVAL(myJsString);
+        *rval = as_jsval(cx, myString);
         return JS_TRUE;
     }
     JS_ReportError(cx,"asHexString: bad number of arguments should be one, got %d", argc);
@@ -1105,9 +1101,7 @@ urlEncode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        string myEncodedString = inet::Request::urlEncode(myString);
-        JSString * myJsString = JS_NewStringCopyN(cx, myEncodedString.c_str(), myEncodedString.size());
-        *rval = STRING_TO_JSVAL(myJsString);
+        *rval = as_jsval(cx, inet::Request::urlEncode(myString));
         return JS_TRUE;
     }
     JS_ReportError(cx,"urlEncode: bad number of arguments - should be one, got %d", argc);
@@ -1132,9 +1126,7 @@ urlDecode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        string myDecodedString = inet::Request::urlDecode(myString);
-        JSString * myJsString = JS_NewStringCopyN(cx, myDecodedString.c_str(), myDecodedString.size());
-        *rval = STRING_TO_JSVAL(myJsString);
+        *rval = as_jsval(cx, inet::Request::urlDecode(myString));
         return JS_TRUE;
     }
     JS_ReportError(cx,"urlDecode: bad number of arguments - should be one, got %d", argc);
@@ -1210,8 +1202,7 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 #ifdef OSX
     string myOsName("MacOsX");
 #endif
-    JSString * myJsString = JS_NewStringCopyN(cx, myOsName.c_str(), myOsName.size());
-    *rval = STRING_TO_JSVAL(myJsString);
+    *rval = as_jsval(cx, myOsName);
     return JS_TRUE;
 };
 
@@ -1224,8 +1215,8 @@ static JSFunctionSpec glob_functions[] = {
     {"plug",              Plug,           1},
     {"saveImage",         SaveImage,		2},
     {"saveImageFiltered", SaveImageFiltered,	4},
-    {"applyImageFilter",  ApplyImageFilter,	3},  
-    {"blitImage",         BlitImage,	3},      
+    {"applyImageFilter",  ApplyImageFilter,	3},
+    {"blitImage",         BlitImage,	3},
     {"exit",              Exit,           0},
     {"version",           Version,        1},
     {"build",             BuildDate,      0},

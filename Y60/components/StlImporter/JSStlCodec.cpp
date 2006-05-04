@@ -15,10 +15,7 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    const StlCodec & myNative = JSStlCodec::getJSWrapper(cx,obj).getNative();
-    std::string myStringRep = string("StlCodec ");
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(), myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, "StlCodec");
     return JS_TRUE;
 }
 

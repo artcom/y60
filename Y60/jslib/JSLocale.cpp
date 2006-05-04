@@ -22,8 +22,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("current locale in string representation.");
     DOC_END;
     std::string myStringRep = JSLocale::getJSWrapper(cx,obj).getNative().name();
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+*rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 

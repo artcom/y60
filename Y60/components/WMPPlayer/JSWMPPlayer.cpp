@@ -35,9 +35,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
     const WMPPlayer & myNative = JSWMPPlayer::getJSWrapper(cx,obj).getNative();
-    std::string myStringRep = string("WMPPlayer");
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, "WMPPlayer");
     return JS_TRUE;
 }
 
@@ -234,7 +232,7 @@ JSWMPPlayer::StaticProperties() {
     };
     return myProperties;
 }
-    
+
 JSBool
 JSWMPPlayer::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("constructs a WMPPlayer instance, nothing more.");

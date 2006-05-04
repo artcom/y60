@@ -38,8 +38,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Prints the index of the current renderer.");
     DOC_END;
     std::string myStringRep = std::string("Renderer@") + as_string(obj);
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 
@@ -108,22 +107,22 @@ draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_RESET;
     DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
-    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
+    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
     DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
-    DOC_PARAM("theTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
+    DOC_PARAM("theTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
     DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theBSpline", "", DOC_TYPE_BSPLINE);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
-    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
+    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
     DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theSvgPath", "", DOC_TYPE_SVGPATH);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
-    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);    
+    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
     DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
     DOC_END;
     try {

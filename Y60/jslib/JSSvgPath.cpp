@@ -29,8 +29,7 @@ namespace jslib {
         DOC_BEGIN("Print path.");
         DOC_END;
         std::string myStringRep = asl::as_string(JSClassTraits<asl::SvgPath>::getNativeRef(cx, obj));
-        JSString * myString = JS_NewStringCopyN(cx, myStringRep.c_str(), myStringRep.size());
-        *rval = STRING_TO_JSVAL(myString);
+        *rval = as_jsval(cx, myStringRep);
         return JS_TRUE;
     }
 
@@ -533,7 +532,7 @@ namespace jslib {
         } else {
             *rval = as_jsval(cx, asl::Ptr<asl::SvgPath>(myPath));
         }
- 
+
         return JS_TRUE;
     }
 
@@ -541,7 +540,7 @@ namespace jslib {
         static JSFunctionSpec myProperties[] = {{0}};
         return myProperties;
     }
- 
+
     JSFunctionSpec * JSSvgPath::Functions() {
         static JSFunctionSpec myFunctions[] = {
             //{"name", native, nargs},
@@ -621,7 +620,7 @@ namespace jslib {
         }
         return JS_TRUE;
     }
-    
+
     JSBool JSSvgPath::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Constructor a new SvgPath object");
         DOC_PARAM("thePathDefinition", "Path definition string", DOC_TYPE_STRING);

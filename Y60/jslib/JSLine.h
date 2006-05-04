@@ -124,8 +124,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("returns a string representation. e.g. '[[0,0,0],[100,100,100]]'");
     DOC_END;
     std::string myStringRep = asl::as_string(JSGenericLine<NATIVE_LINE>::getJSWrapper(cx,obj).getNative());
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+*rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 

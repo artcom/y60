@@ -32,8 +32,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     const ReadableBlock & myBlock = JSBlock::getJSWrapper(cx,obj).getNative();
     std::string myStringRep(myBlock.strbegin(), myBlock.strend());
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+*rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 

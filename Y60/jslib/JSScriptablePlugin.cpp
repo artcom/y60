@@ -30,9 +30,7 @@ namespace jslib {
     toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Prints 'JSScriptablePlugin'");
         DOC_END;
-        std::string myStringRep = "JSScriptablePlugin";
-        JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-        *rval = STRING_TO_JSVAL(myString);
+        *rval = as_jsval(cx, "JSScriptablePlugin");
         return JS_TRUE;
     }
 
@@ -93,7 +91,7 @@ namespace jslib {
         };
         return myProperties;
     }
-    
+
     JSConstIntPropertySpec *
     JSScriptablePlugin::ConstIntProperties() {
         static JSConstIntPropertySpec myProperties[] = {{0}};
@@ -257,11 +255,11 @@ namespace jslib {
 
         JSObject * myClassObject = JS_InitClass(cx, theGlobalObject, NULL, Class(theClassName),
                 Constructor, 0, Properties(), Functions(), 0, 0);
-         
+
         //document the plugin mechanism and not the plugin named theClassName itself...
         createClassModuleDocumentation("Global", "JSScriptablePlugin", Properties(),
-                                       Functions(), ConstIntProperties(), 
-                                       StaticProperties(), StaticFunctions(), ""); 
+                                       Functions(), ConstIntProperties(),
+                                       StaticProperties(), StaticFunctions(), "");
         documentConstructor("Global", "JSScriptablePlugin", Constructor);
 
         jsval myConstructorFuncObjVal;

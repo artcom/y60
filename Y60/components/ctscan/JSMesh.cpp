@@ -44,10 +44,7 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    const Mesh & myNative = JSMesh::getJSWrapper(cx,obj).getNative();
-    std::string myStringRep = string("Mesh ");
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+        *rval = as_jsval(cx, "Mesh");
     return JS_TRUE;
 }
 

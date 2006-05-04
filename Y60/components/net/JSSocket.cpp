@@ -40,8 +40,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         as_string(mySocket.getLocalPort()) + " | remote ip: " +
         as_dotted_address(mySocket.getRemoteAddress()) + ", port: " +
         as_string(mySocket.getRemotePort()) + "]";
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 

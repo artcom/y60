@@ -416,8 +416,7 @@ struct JSVector  {
     DOC_BEGIN("Returns a string representation of the vector.");
     DOC_END;
         std::string myStringRep = asl::as_string(getNativeRef(cx,obj));
-        JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-        *rval = STRING_TO_JSVAL(myString);
+        *rval = as_jsval(cx, myStringRep);
         return JS_TRUE;
     }
 

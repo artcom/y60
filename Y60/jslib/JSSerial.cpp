@@ -41,8 +41,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Prints the comport device name.");
     DOC_END;
     std::string myStringRep = JSSerial::getJSWrapper(cx,obj).getNative().getDeviceName();
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 
@@ -231,8 +230,7 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             myResult.append(myBuffer, myReadBytes);
         } while (myReadBytes == READ_BUFFER_SIZE);
 
-        JSString * myString = JS_NewStringCopyN(cx, myResult.c_str(), myResult.size());
-        *rval = STRING_TO_JSVAL(myString);
+        *rval = as_jsval(cx, myResult);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -298,8 +296,7 @@ receivePacket(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
             myPayload = myUCCP.popPacket();
         }
 
-        JSString * myString = JS_NewStringCopyN(cx, myPayload.c_str(), myPayload.size());
-        *rval = STRING_TO_JSVAL(myString);
+        *rval = as_jsval(cx, myPayload);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;

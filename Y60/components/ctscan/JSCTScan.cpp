@@ -50,10 +50,7 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    const CTScan & myNative = JSCTScan::getJSWrapper(cx,obj).getNative();
-    string myStringRep = string("CTScan ");
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, "CTScan");
     return JS_TRUE;
 }
 
@@ -94,10 +91,10 @@ loadSlices(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         convertFrom(cx, argv[1], myPackage);
         CTScan & myCTScan = myObj.getNative();
 
-        // [TS] Couldn't make it work in acxpshell without this... 
-        PackageManager myPackageManager;   
-        myPackageManager.add(*JSApp::getPackageManager());   
-        myPackageManager.add(myPackage); 
+        // [TS] Couldn't make it work in acxpshell without this...
+        PackageManager myPackageManager;
+        myPackageManager.add(*JSApp::getPackageManager());
+        myPackageManager.add(myPackage);
 
         //int slicesLoaded = myCTScan.loadSlices(*JSApp::getPackageManager(), mySubDir, myPackage);
         int slicesLoaded = myCTScan.loadSlices(myPackageManager, mySubDir, myPackage);
@@ -174,7 +171,7 @@ computeHistogram(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
                               static_cast<int>( myFloatBox[Box3f::MAX][2]));
 
         vector<unsigned> myHistogram;
-        
+
         CTScan & myCTScan = myObj.getNative();
         myCTScan.computeHistogram(myVoxelBox, myHistogram);
          *rval = as_jsval(cx, myHistogram);
@@ -209,7 +206,7 @@ computeProfile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
             JS_ReportError(cx, "JSCTScan::computeProfile(): could not create 'values' property ");
             return JS_FALSE;
         }
-        
+
         *rval = OBJECT_TO_JSVAL(myReturnObject);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -236,7 +233,7 @@ reconstructToImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
             JS_ReportError(cx, "JSCTScan::reconstructToImage(): Argument #2 is undefined");
             return JS_FALSE;
         }
-        
+
         dom::NodePtr myImageNode;
         convertFrom(cx, argv[2], myImageNode);
         CTScan & myCTScan = myObj.getNative();
@@ -366,8 +363,8 @@ countTrianglesInVolumeMeasurement(JSContext *cx, JSObject *obj, uintN argc, jsva
 
         bool myCloseAtClippingBoxFlag;
         convertFrom(cx, argv[4], myCloseAtClippingBoxFlag);
-        
-        Vector2i myCount = myCTScan.countTrianglesInVolumeMeasurement(myVoxelBox, myMeasurementNode, 
+
+        Vector2i myCount = myCTScan.countTrianglesInVolumeMeasurement(myVoxelBox, myMeasurementNode,
                 myThresholdPalette, myDownSampleRate, myCloseAtClippingBoxFlag);
         *rval = as_jsval(cx, myCount);
         return JS_TRUE;
@@ -413,7 +410,7 @@ polygonizeGlobal(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
             convertFrom(cx, argv[7], myNumTriangles);
         }
 
-        ScenePtr myScene = myCTScan.polygonizeGlobal(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate, 
+        ScenePtr myScene = myCTScan.polygonizeGlobal(myVoxelBox, myThresholdMin, myThresholdMax, myDownSampleRate,
                 myCloseAtClippingBoxFlag, myCreateNormalsFlag, JSApp::getPackageManager(), myNumVertices, myNumTriangles);
         *rval = as_jsval(cx, myScene);
         return JS_TRUE;
@@ -515,13 +512,13 @@ resizeVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
         if ( ! myVoxelVolume) {
             JS_ReportError(cx, "Argument 0 must be a Node");
             return JS_FALSE;
-        } 
+        }
 
         Box3f myDirtyBox;
         convertFrom(cx, argv[1], myDirtyBox);
 
         CTScan::resizeVoxelVolume(myVoxelVolume, myDirtyBox);
-        
+
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -539,7 +536,7 @@ copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 
         Box3f myDirtyBox;
         convertFrom(cx, argv[2], myDirtyBox);
-        
+
         int mySliceOrientationInt;
         convertFrom(cx, argv[3], mySliceOrientationInt);
         CTScan::Orientation myOrientation = static_cast<CTScan::Orientation>( mySliceOrientationInt );
@@ -548,7 +545,7 @@ copyCanvasToVoxelVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         convertFrom(cx, argv[4], myPaletteNode);
 
         CTScan::copyCanvasToVoxelVolume(myMeasurement, myCanvasImage, myDirtyBox, myOrientation, myPaletteNode);
-       
+
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -563,7 +560,7 @@ copyVoxelVolumeToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 
         unsigned myGlobalThresholdIndex;
         convertFrom(cx, argv[1], myGlobalThresholdIndex);
-        
+
         dom::NodePtr myCanvas;
         convertFrom(cx, argv[2], myCanvas);
 
@@ -580,11 +577,11 @@ copyVoxelVolumeToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         dom::NodePtr myPaletteNode;
         convertFrom(cx, argv[6], myPaletteNode);
 
-        CTScan::copyVoxelVolumeToCanvas(myMeasurement, myGlobalThresholdIndex, myCanvas, myReconstructedImage, 
+        CTScan::copyVoxelVolumeToCanvas(myMeasurement, myGlobalThresholdIndex, myCanvas, myReconstructedImage,
                 mySliceIndex, myOrientation, myPaletteNode);
 
         return JS_TRUE;
-        
+
     } HANDLE_CPP_EXCEPTION;
     return JS_FALSE;
 }

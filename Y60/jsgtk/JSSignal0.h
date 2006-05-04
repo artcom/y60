@@ -98,7 +98,7 @@ class JSSignal0 : public JSWrapper<sigc::signal0<R>, asl::Ptr<sigc::signal0<R> >
                 AC_TRACE << "JSSignal0 connecting to '" << myMethodName << "'";
 
                 *myConnection = myOwner->connect(mySlot);
-                
+
                 // register our target object with the GCObserver
                 GCObserver::FinalizeSignal myFinalizer = GCObserver::get().watchObject(myTarget);
                 // now add our cleanup code to the finalize signal,
@@ -179,11 +179,10 @@ class JSSignal0 : public JSWrapper<sigc::signal0<R>, asl::Ptr<sigc::signal0<R> >
     private:
         static JSBool
         toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
+            DOC_BEGIN("");
+            DOC_END;
             std::string myStringRep = std::string("Signal0@") + asl::as_string(obj);
-            JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-            *rval = STRING_TO_JSVAL(myString);
+            *rval = as_jsval(cx, myStringRep);
             return JS_TRUE;
         }
 };

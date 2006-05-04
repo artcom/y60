@@ -38,8 +38,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
     std::string myStringRep = JSWindow::getJSWrapper(cx,obj).getNative().get_title();
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 
@@ -69,13 +68,13 @@ Raise(JSContext * cx, JSObject * obj, uintN argc, jsval * argv, jsval * rval) {
         ensureParamCount(argc, 0);
         Gtk::Window * myNative(0);
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-#ifdef WIN32        
+#ifdef WIN32
         HWND myWindow = reinterpret_cast<HWND>(GDK_WINDOW_HWND(myNative->get_window()->gobj()));
         ShowWindow(myWindow, SW_SHOW);
         SetForegroundWindow(myWindow);
-#else        
+#else
         myNative->raise();
-#endif        
+#endif
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION
 }

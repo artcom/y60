@@ -35,8 +35,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     JSEvent::Base * myWrapperPtr = JSEvent::getJSWrapperPtr(cx,obj);
     if (myWrapperPtr) {
         std::string myStringRep = std::string("Event<")+myWrapperPtr->getNative().type()+">";
-        JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-        *rval = STRING_TO_JSVAL(myString);
+        *rval = as_jsval(cx, myStringRep);
         return JS_TRUE;
     } else {
         *rval = STRING_TO_JSVAL("");

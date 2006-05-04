@@ -31,15 +31,14 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("a string repesentation of the request manager.");
     DOC_END;
     std::string myStringRep = as_string(JSRequestManager::getJSWrapper(cx,obj).getNative().getActiveCount());
-    JSString * myString = JS_NewStringCopyN(cx,myStringRep.c_str(),myStringRep.size());
-    *rval = STRING_TO_JSVAL(myString);
+    *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
 
 static JSBool
 performRequest(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Add HTTP-Request to request queue.");
-    DOC_PARAM("theRequest", "", DOC_TYPE_REQUEST);    
+    DOC_PARAM("theRequest", "", DOC_TYPE_REQUEST);
     DOC_END;
     return Method<JSRequestManager::NATIVE>::call(&JSRequestManager::NATIVE::performRequest,cx,obj,argc,argv,rval);
 }
@@ -90,7 +89,7 @@ JSRequestManager::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
+
 // getproperty handling
 JSBool
 JSRequestManager::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
