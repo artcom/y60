@@ -58,7 +58,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
      * - if given, start at character 'theFirstCharacter'; default is 0.
      * - if given, end at character 'theLastCharacter'; default is last character in text.
      */
-    self.align = function(thePathAlign, thePos, theFirstCharacter, theLastCharacter) {
+    self.align = function(thePathAlign, thePos, theFirstCharacter, theLastCharacter, doTheWrapAroundFlag) {
         if (thePos != undefined) {
             thePathAlign.setCurrentPosition(thePos);
         }
@@ -68,16 +68,31 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         if (theLastCharacter == undefined) {
             theLastCharacter = _myText.length;
         }
-
+        if (doTheWrapAroundFlag == undefined) {
+            doTheWrapAroundFlag = true;
+        }
+        var myAlignedCharacter = _myText.length;
+        var myBuildGeometry = false;
+        var myAlphabetMap = null;
+        var myShapeBuilder = null;
+        var myElement = null;
+        var myUVCoordX = 0;
+        
+        if (!_myShape) {
+            myBuildGeometry = true;
+            myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
+            myShapeBuilder = new ShapeBuilder();
+            myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material);   
+        }
+        
         var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
         var myFontMetrics = theCharacterSoup.getFontMetrics(theFontSize);
         //print("font metrics:", "height=" + myFontMetrics.height, "ascent=" + myFontMetrics.ascent, "descent=" + myFontMetrics.descent);
 
         var myWidth = 0.0;
-        var myVertexPositions = getDescendantByAttribute(_myShape, "name", "position", true);
-        var myPositions = myVertexPositions.childNode('#text')[1]; // firstChild.nodeValue;
 
         for (var i = theFirstCharacter; i < theLastCharacter; ++i) {
+            
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
                 // line break
@@ -117,8 +132,13 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
             /*
              * move 'advance+kern' on path but make characters 'advance' wide
              */
+            if (!doTheWrapAroundFlag && !thePathAlign.fitsAdvancement(myWidth)) {
+                myAlignedCharacter = i;
+                break;
+            }
             var mySegment = thePathAlign.advance(myWidth);
             if (mySegment == null) {
+                myAlignedCharacter = i;
                 break;
             }
             var myForwardVector = difference(mySegment.end, mySegment.start);
@@ -152,13 +172,47 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
             var myStart = mySegment.start;
             var myEnd = sum(myStart, myForwardVector);
             var j = i * 4;
-            myPositions[j + 0] = sum(myStart, myBottomOffset);
-            myPositions[j + 1] = sum(myEnd, myBottomOffset);
-            myPositions[j + 2] = sum(myEnd, myTopOffset);
-            myPositions[j + 3] = sum(myStart, myTopOffset);
+            var myPositions = [];
+            myPositions.push(sum(myStart, myBottomOffset));
+            myPositions.push(sum(myEnd, myBottomOffset));
+            myPositions.push(sum(myEnd, myTopOffset));
+            myPositions.push(sum(myStart, myTopOffset));
+            
+            if (myBuildGeometry) {
+                var myCharacter = _myCharacters[i];
+                //print("char=" + myCharacter.unicode, "uv=" + myCharacter.uv, "uvsize=" + myCharacter.uvsize);
+                myShapeBuilder.appendQuadWithCustomTexCoordsAndPositions(myElement,
+                        myPositions, myCharacter.uv, myCharacter.uvsize, false);
+                var myXDelta = (1.0/_myText.length);
+                for(var myTextureIndex = 1; myTextureIndex < _myTextureCount; myTextureIndex++) {
+                    myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX,1), myTextureIndex);
+                    myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,1), myTextureIndex);                
+                    myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,0), myTextureIndex);
+                    myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX ,0), myTextureIndex);
+                    myUVCoordX += myXDelta;
+                }                                       
+            } else {
+                var myVertexPositions = getDescendantByAttribute(_myShape, "name", "position", true);
+                var myShapeVertexPositions = myVertexPositions.childNode('#text')[1]; // firstChild.nodeValue;                
+                myShapeVertexPositions[j + 0] = myPositions[0];
+                myShapeVertexPositions[j + 1] = myPositions[1];
+                myShapeVertexPositions[j + 2] = myPositions[2];
+                myShapeVertexPositions[j + 3] = myPositions[3];
+            }
+            
         }
-
-        return _myText.length;
+        if (myBuildGeometry) {
+            var myName = "Text_";// + urlEncode(_myText);
+    
+            _myShape = myShapeBuilder.buildNode();
+            _myShape.name = myName;
+            theSceneViewer.getShapes().appendChild(_myShape);
+    
+            _myBody = buildBodyNode(myName, _myShape.id);
+            _myBody.insensible = true;
+            theSceneViewer.getWorld().appendChild(_myBody);
+        }
+        return myAlignedCharacter;
     }
 
     /**********************************************************************
@@ -173,36 +227,17 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
     var _myShape = null;
     var _myBody = null;
-
+    var _myTextureCount = 1;
+    
     function setup() {
 
         _myText = asUnicodeString(theText);
         _myCharacters = theCharacterSoup.createUnicodeText(_myText, theFontSize);
-
-        var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
-        var myShapeBuilder = new ShapeBuilder();
-        var myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material);
-
-        var myCharacterPos = new Vector3f(-0.5, -0.5, 0.0);
-        var myCharacterSize = new Vector3f(1.0, 1.0, 0.0);
-
-        for (var i = 0; i < _myText.length; ++i) {
-            var myCharacter = _myCharacters[i];
-            //print("char=" + myCharacter.unicode, "uv=" + myCharacter.uv, "uvsize=" + myCharacter.uvsize);
-            myShapeBuilder.appendQuadWithCustomTexCoords(myElement,
-                    myCharacterPos, myCharacterSize,
-                    myCharacter.uv, myCharacter.uvsize, false);
-        }
-
-        var myName = "Text_";// + urlEncode(_myText);
-
-        _myShape = myShapeBuilder.buildNode();
-        _myShape.name = myName;
-        theSceneViewer.getShapes().appendChild(_myShape);
-
-        _myBody = buildBodyNode(myName, _myShape.id);
-        _myBody.insensible = true;
-        theSceneViewer.getWorld().appendChild(_myBody);
+        var myMaterialId = theCharacterSoup.getAlphabetMap(theFontSize).material;
+        var myMaterial = window.scene.dom.getElementById(myMaterialId);        
+        var myTextures = getDescendantByTagName(myMaterial, "textures", false);
+        _myTextureCount = myTextures.childNodesLength();
+        
     }
 
     setup();

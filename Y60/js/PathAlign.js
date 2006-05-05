@@ -44,6 +44,28 @@ PathAlign.prototype.Constructor = function(self, thePath) {
         return _myCurrentPosition;
     }
 
+    self.fitsAdvancement = function(theLength) {        
+        var myElement = _myPath.getElement(_myCurrentSegment);
+        var myRemainSegment = difference(myElement.end, _myCurrentPosition);
+        var myRemainLength = magnitude(myRemainSegment);
+        if (myRemainLength >= theLength) {
+            return true;
+        } else {
+            if (_myCurrentSegment == _myPath.getNumElements()-1) {
+                return false;
+            } else {
+                var myNextElement = _myPath.getElement(_myCurrentSegment+1);
+                var myNextRemainSegment = difference(myNextElement.end, myElement.end);
+                var myNextRemainLength = magnitude(myNextRemainSegment);
+                if (myRemainLength + myNextRemainLength >= theLength) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+    
     /**
      * Advance on path for the given length.
      * NOTE: 'theStartPosition' must not be used by external applications!
