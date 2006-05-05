@@ -12,11 +12,11 @@ use("SceneViewer.js");
 use("CharacterSoup.js");
 use("PathAlign.js");
 
-function PathText(theSceneViewer, theText, theFontSize, theCharacterSoup) {
-    this.Constructor(this, theSceneViewer, theText, theFontSize, theCharacterSoup);
+function PathText(theSceneViewer, theText, theFontSize, theCharacterSoup, thePrebuildFlag) {
+    this.Constructor(this, theSceneViewer, theText, theFontSize, theCharacterSoup, thePrebuildFlag);
 }
 
-PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFontSize, theCharacterSoup) {
+PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFontSize, theCharacterSoup, thePrebuildFlag) {
 
     self.getLength = function() {
         return _myText.length;
@@ -237,9 +237,48 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         var myMaterial = window.scene.dom.getElementById(myMaterialId);        
         var myTextures = getDescendantByTagName(myMaterial, "textures", false);
         _myTextureCount = myTextures.childNodesLength();
+        print(thePrebuildFlag)
+        if (thePrebuildFlag) {
+            var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);  	 
+            var myShapeBuilder = new ShapeBuilder(); 	 
+            var myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material); 	 
+      	 
+            var myCharacterPos = new Vector3f(-0.5, -0.5, 0.0); 	 
+            var myCharacterSize = new Vector3f(1.0, 1.0, 0.0); 	 
+      	    var myUVCoordX = 0.0;
+      	    
+            for (var i = 0; i < _myText.length; ++i) { 	 
+                var myCharacter = _myCharacters[i]; 	 
+                //print("char=" + myCharacter.unicode, "uv=" + myCharacter.uv, "uvsize=" + myCharacter.uvsize); 	 
+                    myShapeBuilder.appendQuadWithCustomTexCoords(myElement, 	 
+                        myCharacterPos, myCharacterSize, 	 
+                        myCharacter.uv, myCharacter.uvsize, false); 	
+                    var myXDelta = (1.0/_myText.length);
+                    for(var myTextureIndex = 1; myTextureIndex < _myTextureCount; myTextureIndex++) {
+                        myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX,1), myTextureIndex);
+                        myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,1), myTextureIndex);                
+                        myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,0), myTextureIndex);
+                        myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX ,0), myTextureIndex);
+                        myUVCoordX += myXDelta;
+                    }                                       
+                         
+            } 	 
+      	 
+            var myName = "Text_";// + urlEncode(_myText); 	 
+    	 
+            _myShape = myShapeBuilder.buildNode(); 	 
+            _myShape.name = myName; 	 
+            theSceneViewer.getShapes().appendChild(_myShape); 	 
+      	 
+            _myBody = buildBodyNode(myName, _myShape.id); 	 
+            _myBody.insensible = true; 	 
+            theSceneViewer.getWorld().appendChild(_myBody);       
+        }
         
+    }    
+    if (thePrebuildFlag == undefined) {
+        thePrebuildFlag = true;
     }
-
     setup();
 }
 
