@@ -237,7 +237,6 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         var myMaterial = window.scene.dom.getElementById(myMaterialId);        
         var myTextures = getDescendantByTagName(myMaterial, "textures", false);
         _myTextureCount = myTextures.childNodesLength();
-        print(thePrebuildFlag)
         if (thePrebuildFlag) {
             var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);  	 
             var myShapeBuilder = new ShapeBuilder(); 	 
