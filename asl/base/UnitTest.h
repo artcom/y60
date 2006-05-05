@@ -170,6 +170,15 @@ public:
 #define DPRINT2(TITEL,VARIABLE) std::cerr << getTracePrefix() << TITEL << ": " << #VARIABLE << " = " << VARIABLE << std::endl;;
 
 
+#define ENSURE_EQUAL(EXP1,EXP2) { \
+	ensure(EXP1 == EXP2, # EXP1 "==" # EXP2, __FILE__, __LINE__); \
+	if ((EXP1) != (EXP2)) { \
+		std::cerr << getTracePrefix() << #EXP1 << " = " << EXP1 << std::endl; \
+		std::cerr << getTracePrefix() << #EXP2 << " = " << EXP2 << std::endl; \
+	} \
+}
+
+
 /* @} */
 
 #endif
