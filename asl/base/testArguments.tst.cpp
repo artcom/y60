@@ -31,7 +31,6 @@
 using namespace std;  // automatically added!
 
 
-
 class ArgumentsUnitTest : public UnitTest {
     public:
         ArgumentsUnitTest() : UnitTest("ArgumentsUnitTest") {  }
@@ -104,20 +103,20 @@ class ArgumentsUnitTest : public UnitTest {
                                        "firstFileName", "--bottles-in-fridge", "12" , 
                                        "someFileName", "anotherFileName"}; 
             ENSURE( myArguments.parse(dummyArgcGood, dummyArgvGood));
-            ENSURE( myArguments.getProgramName() == "dummyProgramName");
-            ENSURE( myArguments.getCount() == 3); 
-            ENSURE( myArguments.getOptionCount() == 2); 
+            ENSURE_EQUAL( myArguments.getProgramName() , "dummyProgramName");
+            ENSURE_EQUAL( myArguments.getCount() , 3); 
+            ENSURE_EQUAL( myArguments.getOptionCount() , 2); 
             ENSURE( myArguments.haveOption("--blah-fasel"));
-            ENSURE( myArguments.getOptionArgument("--bottles-in-fridge")=="12" );
-            ENSURE( myArguments.getArgument(0)=="firstFileName" );
-            ENSURE( myArguments.getArgument(1)=="someFileName" );
-            ENSURE( myArguments.getArgument(2)=="anotherFileName" );
+            ENSURE_EQUAL( myArguments.getOptionArgument("--bottles-in-fridge"),"12" );
+            ENSURE_EQUAL( myArguments.getArgument(0),"firstFileName" );
+            ENSURE_EQUAL( myArguments.getArgument(1),"someFileName" );
+            ENSURE_EQUAL( myArguments.getArgument(2),"anotherFileName" );
 
             // new flags to test non-destructible arguments
-            ENSURE( string(dummyArgvGood[0]) == "dummyProgramName");
-            ENSURE( string(dummyArgvGood[1]) == "--blah-fasel");
-            ENSURE( string(dummyArgvGood[2]) == "firstFileName");
-            ENSURE( string(dummyArgvGood[3]) == "--bottles-in-fridge");
+            ENSURE_EQUAL( string(dummyArgvGood[0]) , "dummyProgramName");
+            ENSURE_EQUAL( string(dummyArgvGood[1]) , "--blah-fasel");
+            ENSURE_EQUAL( string(dummyArgvGood[2]) , "firstFileName");
+            ENSURE_EQUAL( string(dummyArgvGood[3]) , "--bottles-in-fridge");
 
             { 
                 myArguments = asl::Arguments(myOptions);
@@ -127,10 +126,10 @@ class ArgumentsUnitTest : public UnitTest {
                 ENSURE( myArguments.parse(dummyArgcGood, dummyArgvGood));
                 ENSURE( myArguments.haveOption("--bottles-in-fridge"));
                 DPRINT( myArguments.getCount() );
-                ENSURE( myArguments.getCount() == 3 );
-                ENSURE( myArguments.getArgument(0) == "foo" );
-                ENSURE( myArguments.getArgument(1) == "--not-parsed" );
-                ENSURE( myArguments.getArgument(2) == "--" );
+                ENSURE_EQUAL( myArguments.getCount() , 3 );
+                ENSURE_EQUAL( myArguments.getArgument(0) , "foo" );
+                ENSURE_EQUAL( myArguments.getArgument(1) , "--not-parsed" );
+                ENSURE_EQUAL( myArguments.getArgument(2) , "--" );
             }
             //exit(1);
             //FAILURE("test failure");       
