@@ -30,6 +30,7 @@
 #include <asl/PlugInManager.h>
 #include <asl/Logger.h>
 #include <asl/Revision.h>
+#include <asl/numeric_functions.h>
 
 #include <js/jsapi.h>
 #include <js/jsprf.h>
@@ -322,6 +323,43 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         if (n) {
             cout << endl;
         }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+ReadStdIn(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Reads n bytes from stdin or until an EOF.");
+    DOC_PARAM("theByteCount", "Number of bytes to be read", DOC_TYPE_STRING);
+    DOC_RVAL("input string", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        unsigned myByteCount = 0;
+        if (argc > 0) {
+            if (!convertFrom(cx, argv[0], myByteCount)) {
+                JS_ReportError(cx, "JSApp::ReadStdIn(): argument #1 must be an integer (byte count)");
+                return JS_FALSE;
+            }
+        }
+
+        const unsigned BUFSIZE = 1024;
+        char myBuffer[BUFSIZE];
+        string myInputStr;
+        unsigned n = 0;
+        do {
+            cin.read(myBuffer, asl::minimum(BUFSIZE, myByteCount - n));
+            unsigned myBytesRead = cin.gcount();
+            myInputStr.append(myBuffer, myBytesRead);
+            n += myBytesRead;
+        } while (cin.good() && n < myByteCount);
+
+        if (cin.bad() || (!cin.eof() && n < myByteCount)) {
+            JS_ReportError(cx, "JSApp::ReadStdIn(): error while reading from stdin");
+            return JS_FALSE;
+        }
+
+        *rval = as_jsval(cx, myInputStr);
+
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -1126,7 +1164,7 @@ urlDecode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        // Here we cannot use the JS_NewStringCopyUCN function, because the result from urlDecode is
+        // Here we cannot use the JS_NewUCStringCopyN function, because the result from urlDecode is
         // encoded in Latin-1
         string myDecodedString = inet::Request::urlDecode(myString);
         JSString * myJsString = JS_NewStringCopyN(cx, myDecodedString.c_str(), myDecodedString.size());
@@ -1213,6 +1251,7 @@ operatingSystem(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 static JSFunctionSpec glob_functions[] = {
     {"print",             Print,          0},
+    {"readStdIn",         ReadStdIn,      1},
     {"use",               Use,            1},
     {"reuse",             Reuse,          0},
     {"parseArguments",    ParseArguments, 2},
