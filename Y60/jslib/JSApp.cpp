@@ -316,7 +316,7 @@ Print(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             if (! convertFrom(cx, argv[i], myString) ) {
                 return JS_FALSE;
             }
-            cout << (i ? " " : "") << myString ;
+            cout << (i ? " " : "") << myString;
         }
         n++;
         if (n) {
@@ -1126,7 +1126,11 @@ urlDecode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        *rval = as_jsval(cx, inet::Request::urlDecode(myString));
+        // Here we cannot use the JS_NewStringCopyUCN function, because the result from urlDecode is
+        // encoded in Latin-1
+        string myDecodedString = inet::Request::urlDecode(myString);
+        JSString * myJsString = JS_NewStringCopyN(cx, myDecodedString.c_str(), myDecodedString.size());
+        *rval = STRING_TO_JSVAL(myJsString);
         return JS_TRUE;
     }
     JS_ReportError(cx,"urlDecode: bad number of arguments - should be one, got %d", argc);
