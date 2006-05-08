@@ -44,24 +44,20 @@ PathAlign.prototype.Constructor = function(self, thePath) {
         return _myCurrentPosition;
     }
 
-    self.fitsAdvancement = function(theLength) {        
-        var myElement = _myPath.getElement(_myCurrentSegment);
+    self.fitsAdvancement = function(theLength, theSegment) {
+        if (theSegment == undefined) {
+            theSegment = _myCurrentSegment;
+        }        
+        var myElement = _myPath.getElement(theSegment);
         var myRemainSegment = difference(myElement.end, _myCurrentPosition);
         var myRemainLength = magnitude(myRemainSegment);
         if (myRemainLength >= theLength) {
             return true;
         } else {
-            if (_myCurrentSegment == _myPath.getNumElements()-1) {
+            if (theSegment == _myPath.getNumElements()-1) {
                 return false;
             } else {
-                var myNextElement = _myPath.getElement(_myCurrentSegment+1);
-                var myNextRemainSegment = difference(myNextElement.end, myElement.end);
-                var myNextRemainLength = magnitude(myNextRemainSegment);
-                if (myRemainLength + myNextRemainLength >= theLength) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return self.fitsAdvancement(theLength-myRemainLength ,theSegment+1);
             }
         }
     }
@@ -85,7 +81,6 @@ PathAlign.prototype.Constructor = function(self, thePath) {
         var myLastPos = theStartPosition;
         var mySegment = _myCurrentSegment;
         var myForwardTraversal = (theLength > 0.0 ? true : false);
-
         while (Math.abs(theLength) > 0.0) {
 
             var myElement = _myPath.getElement(mySegment);
