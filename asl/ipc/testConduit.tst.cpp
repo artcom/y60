@@ -242,12 +242,16 @@ class MyTestSuite : public UnitTestSuite {
 public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
+        asl::Unsigned16 myTestPort = 5678;
+        get_environment_var_as("AC_TEST_PORT_START", myTestPort);
+        AC_PRINT << "Using port " << myTestPort << " for tests";
+
         inet::initSockets();
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new ConduitTest<TCPPolicy>("TCPPolicy", 
-                    TCPPolicy::Endpoint("127.0.0.1",5678)));
+                    TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
         addTest(new MessageConduitTest<TCPPolicy>("TCPPolicy", 
-                    TCPPolicy::Endpoint("127.0.0.1",5678)));
+                    TCPPolicy::Endpoint("127.0.0.1",myTestPort)));
 #ifndef WIN32
         addTest(new ConduitTest<LocalPolicy>("LocalPolicy", 
                     "TestConduit"));

@@ -25,7 +25,9 @@
 
 #include <asl/UnitTest.h>
 #include <asl/string_functions.h>
+#include <asl/os_functions.h>
 #include <asl/Time.h>
+#include <asl/Logger.h>
 
 #include <string>
 #include <iostream>
@@ -44,10 +46,13 @@ class StationTest : public TemplateUnitTest {
                 Station myStation;
 
                 ENSURE(!myStation);
+                asl::Unsigned16 myTestPort = Station::defaultBroadcastPort()+1;
+                get_environment_var_as("AC_TEST_PORT_START", myTestPort);
+                AC_PRINT << "Using port " << myTestPort << " for tests";
 
                 myStation.openStationDefault(Station::defaultBroadcastAddress(),
-                                      Station::defaultBroadcastPort()+1,
-                                      Station::defaultBroadcastPort()+1,
+                                      myTestPort,
+                                      myTestPort,
 #ifdef IGNORE_OWN_PACKETS
                                       Station::defaultOwnIPAddress(),
 #else
@@ -55,7 +60,7 @@ class StationTest : public TemplateUnitTest {
 #endif
                                       Station::defaultOwnIPAddress());
                 ENSURE(myStation);
-                DPRINT(Station::defaultBroadcastPort()+1);
+                DPRINT(myTestPort);
 
                 asl::Block testData;
 
