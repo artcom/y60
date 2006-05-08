@@ -114,8 +114,8 @@ namespace y60 {
         int               _myVStreamIndex;
         AVStream *        _myVStream;
 
-        // All Timestamp variables are in movie time units (1/90000 seconds for those 
-        // movies we've seen).
+        // All Timestamp variables are in movie time units (We've seen 1/90000 and 1/25 second
+        // time units in movies).
         int64_t           _myStartTimestamp;
         int64_t           _myLastVideoTimestamp;
         int64_t           _myEOFVideoTimestamp;
