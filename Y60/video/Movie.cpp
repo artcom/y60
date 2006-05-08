@@ -23,10 +23,8 @@
 using namespace dom;
 using namespace std;
 
-#define DB(x) // x
+#define DB(x) x
 #define DB2(x) // x
-#define DB(x) // x
-
 
 
 namespace y60 {
@@ -146,7 +144,7 @@ namespace y60 {
 
     unsigned Movie::getFrameFromTime(double theTime) const {
         double myFrameHelper = theTime * get<FrameRateTag>();
-        int myFrame = int(myFrameHelper);
+        int myFrame = int(asl::round(myFrameHelper));
         while (myFrame < 0) {
             myFrame += get<FrameCountTag>();
         }
@@ -284,7 +282,7 @@ namespace y60 {
                 }
             }
         }
-        AC_INFO << "using decoder " << myDecoder->getName() << " for decoding " << theFilename << " hint " << myDecoderHint;
+//        AC_INFO << "using decoder " << myDecoder->getName() << " for decoding " << theFilename << " hint " << myDecoderHint;
         return myDecoder;
     }
 
