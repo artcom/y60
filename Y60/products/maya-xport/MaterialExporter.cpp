@@ -32,6 +32,7 @@
 #include <y60/PropertyNames.h>
 #include <y60/property_functions.h>
 
+#include <asl/file_functions.h>
 #include <asl/string_functions.h>
 #include <asl/numeric_functions.h>
 #include <asl/Dashboard.h>
@@ -962,7 +963,15 @@ MaterialExporter::hasUVMappedTextures(const std::string & theMaterialName) {
 
 void
 MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
-    _myBaseDirectory = theDirectory;
+    if (theDirectory.empty() || theDirectory[0] == '.') {
+        AC_DEBUG << "MaterialExporter::setBaseDirectory, relative base directory ->"<< getCWD();
+        _myBaseDirectory = normalizeDirectory(getCWD(), false);
+        _myBaseDirectory += '/';
+    } else {
+        _myBaseDirectory = theDirectory;
+    }
+    AC_DEBUG << "MaterialExporter::setBaseDirectory _myBaseDirectory=" << _myBaseDirectory;
+
 }
 
 void
@@ -977,15 +986,22 @@ MaterialExporter::stripBaseDir(std::string & theFileName) const {
     std::string myUpperBaseName(_myBaseDirectory);
     std::transform(_myBaseDirectory.begin(), _myBaseDirectory.end(),
                    myUpperBaseName.begin(), std::toupper);
-
-    if (myUpperFileName.find(myUpperBaseName) == 0) {
-        theFileName = theFileName.substr(_myBaseDirectory.length());
+    size_t myIndex = myUpperFileName.find(myUpperBaseName);
+    if (myIndex != std::string::npos) {
+        if (myIndex == 0) {
+            theFileName = theFileName.substr(_myBaseDirectory.length());
+        } else {
+            theFileName = theFileName.substr(myIndex + _myBaseDirectory.length());
+        }
     }
+
 #else
     if (theFileName.find(_myBaseDirectory) == 0) {
         theFileName = theFileName.substr(_myBaseDirectory.length());
     }
 #endif
+    AC_DEBUG << "stripBaseDir::stripBaseDir stripped filename=" << theFileName;
+
 }
 
 std::string
