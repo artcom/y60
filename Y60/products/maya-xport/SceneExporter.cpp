@@ -31,6 +31,7 @@
 #include <asl/numeric_functions.h>
 #include <asl/file_functions.h>
 #include <asl/MappedBlock.h>
+#include <asl/Revision.h>
 
 #include <y60/SceneBuilder.h>
 #include <y60/LightBuilder.h>
@@ -92,7 +93,7 @@ MStatus
 initializePlugin(MObject theObject) {
     DB(AC_TRACE << "SceneExporter::initializePlugin()" << endl);
     MStatus myStatus;
-    MFnPlugin myPlugin(theObject, "Art+Com XML exporter plugin", "0.1", "Any");
+    MFnPlugin myPlugin(theObject, "Art+Com XML exporter plugin", ourRevision.c_str(), "Any");
 
     // Register the translator with the system
     //
