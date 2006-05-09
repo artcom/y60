@@ -44,16 +44,10 @@ namespace y60 {
             VideoFrame(unsigned theBufferSize);
             ~VideoFrame();
     
-            inline void setTimestamp(double theTimestamp) {
-                _myTimestamp = theTimestamp;
-            }
-    
-            inline double getTimestamp() const {
-                return _myTimestamp;
-            }
-            inline unsigned char* getBuffer() {
-                return _myBuffer;
-            }
+            void setTimestamp(double theTimestamp);
+            double getTimestamp() const;
+            unsigned char* getBuffer();
+
         private:
             double _myTimestamp;
             unsigned char* _myBuffer;
@@ -105,30 +99,32 @@ namespace y60 {
          * @return Item in the back of the cache or VideoFramePtr(NULL) if the cache is empty.
          */
         VideoFramePtr back() const;
-        inline unsigned size() const { return _myList.size(); }
+        unsigned size() const;
         /**
          * Closes this Cache. No further reading or writing is possible. Threads pending in 
          * a pop_back or pop_front are woken up with a asl::ThreadSemaphore::ClosedException.
          */
-        void close() { _mySemaphore.close(); }
+        void close();
         /**
          * Resets a previously cleared cache.
          */
-        void reset() { _mySemaphore.reset(_myList.size()); }
+        void reset();
         /**
          * Clears the cache. Threads pending in a pop_back or pop_front are woken up
          * with a asl::ThreadSemaphore::ClosedException.
          */
-        void clear() { _mySemaphore.close(); _myList.clear(); _mySemaphore.reset(); }
+        void clear();
+        
         DEFINE_EXCEPTION(TimeoutException, asl::Exception);
         /**
          * @return the timeout for pop_back and pop_front operations.
          */
-        long getErrorTimeout() const { return _myErrorTimeout; }
+        long getErrorTimeout() const;
         /**
          * @param theTimeout timeout for pop_back and pop_front operations.
          */
-        void setErrorTimeout(long theTimeout) { _myErrorTimeout = theTimeout; }
+        void setErrorTimeout(long theTimeout);
+
     private:
         asl::ThreadSemaphore _mySemaphore;
         mutable asl::ThreadLock _myListLock;

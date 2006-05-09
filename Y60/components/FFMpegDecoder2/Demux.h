@@ -38,6 +38,7 @@ namespace y60 {
             void enableStream(int theStreamIndex);
             AVPacket * getPacket(int theStreamIndex);
             void clearPacketCache();
+            void dump();
             
         private:
             typedef std::list<AVPacket *> PacketList;

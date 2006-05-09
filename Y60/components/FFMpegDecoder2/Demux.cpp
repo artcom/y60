@@ -33,7 +33,7 @@ void Demux::enableStream(int theStreamIndex)
 
 AVPacket * Demux::getPacket(int theStreamIndex)
 {
-    AC_DEBUG << "Demux::getPacket";
+    AC_TRACE << "Demux::getPacket";
     if (_myPacketLists.find(theStreamIndex) == _myPacketLists.end()) {
         AC_ERROR << "Demux::getPacket called with nonexistent stream index " 
             << theStreamIndex << ".";
@@ -87,12 +87,21 @@ void Demux::clearPacketCache()
     map<int, PacketList>::iterator it;
     for (it=_myPacketLists.begin(); it != _myPacketLists.end(); ++it) {
         PacketList::iterator it2;
-        PacketList thePacketList = it->second;
-        for (it2=thePacketList.begin(); it2 != thePacketList.end(); ++it2) {
+        PacketList* thePacketList = &(it->second);
+        for (it2=thePacketList->begin(); it2 != thePacketList->end(); ++it2) {
             av_free_packet(*it2);
             delete *it2;
         }
-        thePacketList.clear();
+        thePacketList->clear();
+    }
+}
+
+void Demux::dump()
+{
+    AC_DEBUG << "Demux list sizes: ";
+    map<int, PacketList>::iterator it;
+    for (it=_myPacketLists.begin(); it != _myPacketLists.end(); ++it) {
+        AC_DEBUG << "  " << it->second.size();
     }
 }
 

@@ -127,7 +127,8 @@ namespace y60 {
          * @retval true if successful
          */
         void addAudioPacket(const AVPacket & thePacket);
-        void createCache();
+        void createPacketCache();
+        void dumpCaches();
         
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
         void copyFrame(FrameCache::VideoFramePtr theVideoFrame, 

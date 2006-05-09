@@ -86,8 +86,8 @@ function FFMpegTest(theArguments) {
     }
 
     var _myTests = [
-//        "setupPlayTest()",
-//        "setupSlowPlayTest()",
+        "setupPlayTest()",
+        "setupSlowPlayTest()",
         "setupStopTest()",
 //        "setupLoopTest()",
 //        "setupPauseTest()",
