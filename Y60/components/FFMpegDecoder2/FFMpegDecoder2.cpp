@@ -206,7 +206,6 @@ namespace y60 {
     void FFMpegDecoder2::resumeMovie(double theStartTime) {
         AC_DEBUG << "resumeMovie, time: " << theStartTime;
         AutoLocker<ThreadLock> myLock(_myLock);
-        _myNextPacketTimestamp = 0;
         setState(RUN);
         if (!isActive()) {
             AC_TRACE << "Forking FFMpegDecoder Thread";
