@@ -59,7 +59,6 @@ namespace y60 {
         _myAStreamIndex(-1), 
         _myAStream(0),
         _myDemux(0),
-        _myEOFVideoTimestamp(INT_MIN), 
         _myNextPacketTimestamp(0),
         _myTimePerFrame(0), 
         _myDestinationPixelFormat(0),
@@ -165,7 +164,6 @@ namespace y60 {
         if (_myAStreamIndex != -1) {
             _myDemux->enableStream(_myAStreamIndex);
         }
-        _myEOFVideoTimestamp = INT_MIN;
         createPacketCache();
     }
 
@@ -176,7 +174,6 @@ namespace y60 {
 //        _myFrameCache.clear();
         _myReadEOF = false;
         
-        _myEOFVideoTimestamp = INT_MIN;
         _myNextPacketTimestamp = 0;
 
         // seek to start
@@ -358,9 +355,6 @@ namespace y60 {
                     _myFrame->pts = myPacket->dts - myStartTime;
                     // Remember the end of file timestamp
                     _myNextPacketTimestamp += _myTimePerFrame;
-                    if (_myEOFVideoTimestamp == INT_MIN) {
-                        _myEOFVideoTimestamp = _myNextPacketTimestamp;
-                    }
 		            AC_TRACE << "add frame";
                     addCacheFrame(_myFrame, _myNextPacketTimestamp);
                     break;
@@ -541,15 +535,6 @@ namespace y60 {
             AC_TRACE << "Updating cache";
             try {
                 if (!decodeFrame()) {
-                    unsigned myLastFrame = asl::round(myFrameRate * 
-                            (_myEOFVideoTimestamp - _myStartTimestamp) / _myTimeUnitsPerSecond);
-                    AC_DEBUG << "EOF in Decoder, StartTimeStamp: " << _myStartTimestamp 
-                            << ", EOFTimestamp: " << _myEOFVideoTimestamp << ", Lastframe: " 
-                            << myLastFrame;
-                    if (getFrameCount() == INT_MAX) {
-                        getMovie()->set<FrameCountTag>(myLastFrame + 1);
-                        AC_INFO << "FFMpegDecoder::run set framecount=" << getFrameCount();
-                    }
 					_myLock.lock();
                     _myReadEOF = true;
 					_myLock.unlock();

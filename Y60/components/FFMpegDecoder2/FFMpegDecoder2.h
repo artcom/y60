@@ -149,7 +149,6 @@ namespace y60 {
 
         DemuxPtr _myDemux;
         
-        int64_t _myEOFVideoTimestamp;
         int64_t _myNextPacketTimestamp;
         int64_t _myTimePerFrame;
         int _myDestinationPixelFormat;
