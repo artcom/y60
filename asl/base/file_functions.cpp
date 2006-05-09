@@ -38,6 +38,7 @@
 #include <shlobj.h>
 #include <errno.h>
 #include <io.h> /* _findfirst and _findnext set errno if they return -1 */
+#include <direct.h>
 #else
 #include <libgen.h>
 #include <unistd.h>
@@ -549,6 +550,16 @@ std::string getAppDirectory() {
     return strAppDirectory;
 }
 
+std::string 
+getCWD() {
+#ifdef WIN32    
+    return std::string(_getcwd( NULL, 0 ));
+#else
+    char myBuffer[1024];
+    getcwd( myBuffer, 1024);
+    return std::string(myBuffer);
+#endif    
+}
 
 // TODO: deal with degenerate cases like "C:\" or "/" (root)
 std::string 

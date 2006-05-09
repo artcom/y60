@@ -80,6 +80,9 @@ bool isDirectory(const std::string & theDirectory);
 /// converts backslashes to slashes & reduces double slashes to single slashes.
 std::string normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash); 
 
+/// returns the current working directory
+std::string getCWD();
+
 /// returns filename without directory     
 std::string getFilenamePart(const std::string & theFileName);
 /// returns directory without filename     
