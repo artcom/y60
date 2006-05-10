@@ -84,17 +84,17 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
             var myLine = 0;
             for (var i = _myNextMessageLine; i < _myMessage.length; ++i) {
                 var myGreyValue = 1 - (_myMessage.length - myLine) * (0.3 / LINE_COUNT);
-                window.setTextColor([myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha], [1,1,1,1]);
+                window.setTextColor([myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha]);
                 window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], "Screen15");
                 myLine++;
             }
             for (i = 0; i < _myNextMessageLine; ++i) {
                 var myGreyValue = 1 - (_myMessage.length - myLine) * (0.3 / LINE_COUNT);
-                window.setTextColor([myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha], [1,1,1,1]);
+                window.setTextColor([myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha]);
                 window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], "Screen15");
                 myLine++;
             }
-            window.setTextColor([1,1,1,1], [1,1,1,1]);
+            window.setTextColor([1,1,1,1]);
         }
     }
 

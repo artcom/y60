@@ -679,6 +679,9 @@ function randomBetween(theMin, theMax) {
     return Math.random() * (theMax - theMin) + theMin;
 }
 
+function randomInteger(theMin, theMax) {
+    return Math.round(Math.random() * (theMax - theMin) + theMin) ;
+}
 function randomElement(theArray) {
     return theArray[Math.floor(randomBetween(0, theArray.length-0.000001))];
 }
@@ -721,17 +724,28 @@ function transformClipToWorld(theClipPos, theCamera) {
     return product(theClipPos, myProjectionMatrix);
 }
 
-function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera)
-{
+function transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera) {
     var myPosX = 2 * theScreenPixelX / window.width  - 1;
     var myPosY = - (2 * theScreenPixelY / window.height - 1);
     var myScreenPos = new Point3f(myPosX, myPosY, -1);
     return transformClipToWorld(myScreenPos, theCamera);
 }
 
-function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theCamera)
-{
+function transformScreenAlignedToWorld(theScreenPixelX, theScreenPixelY, theZ, theCamera) {
     var myScreenPos = transformScreenToWorld(theScreenPixelX, theScreenPixelY, theCamera);
     var myRay = new Ray(theCamera.position, myScreenPos);
     return intersection(myRay, new Planef(new Vector3f(0,0,-1), theZ));
 }
+
+function easeInOut(theValue) {
+    return theValue*theValue*(3-2*theValue);
+}
+
+function easeOut(theValue) {
+    return 2*easeInOut((theValue+1)/2)-1;
+}
+
+function easeIn(theValue) {
+    return 2*easeInOut(theValue/2);
+}
+

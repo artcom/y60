@@ -61,11 +61,10 @@ function LabelBase(Public, Protected, theScene,
         var HTextAlign = "HTextAlign" in myStyle ? myStyle.HTextAlign : Renderer.LEFT_ALIGNMENT;
         var VTextAlign = "VTextAlign" in myStyle ? myStyle.VTextAlign : Renderer.TOP_ALIGNMENT;
 
-        window.setTextStyle(Renderer.BLENDED_TEXT);
         window.setTextPadding(topPad, bottomPad, leftPad, rightPad);
         window.setHTextAlignment(HTextAlign);
         window.setVTextAlignment(VTextAlign);
-        window.setTextColor(myStyle.textColor, new Vector4f(1,1,1,1));
+        window.setTextColor(myStyle.textColor);
         window.setTracking(tracking);
 
         var myFontName = myStyle.font + "_" + myStyle.fontsize;

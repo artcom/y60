@@ -95,7 +95,7 @@ DemoModellingRendexApp.prototype.Constructor = function(self, theArguments) {
     function createTextOverlay() {
         window.loadTTF("Arial", "${PRO}/src/Y60/gl/text/fonts/arial.ttf", 18);
         window.setTextPadding(10,10,10,10);
-        window.setTextColor([0.2,0.2,1,1], [1,1,1,1]);
+        window.setTextColor([0.2,0.2,1,1]);
 
         var myTextImage = self.getImageManager().getImageNode("infobox");
         _myTextOverlay = self.getOverlayManager().create("infobox", myTextImage.id, true);
