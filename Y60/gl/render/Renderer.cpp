@@ -332,6 +332,7 @@ namespace y60 {
             glPopMatrix();
 
             _myState->setClippingPlanes(theBodyPart.getClippingPlanes());
+            _myState->setScissorBox(theBodyPart.getScissorBox(), theViewport);
 
             glPushMatrix();
 
@@ -838,7 +839,8 @@ namespace y60 {
                                const Matrix4f & theEyeSpaceTransform,
                                ViewportPtr theViewport,
                                bool theOverlapFrustumFlag,
-                               std::vector<asl::Planef> theClippingPlanes)
+                               std::vector<asl::Planef> theClippingPlanes,
+                               asl::Box2f theScissorBox)
     {
         // Skip undefined nodes
         if (!theNode) {
@@ -864,11 +866,12 @@ namespace y60 {
         }
 
         collectClippingPlanes(theNode, theClippingPlanes);
+        collectScissorBox(theNode, theScissorBox);
 
         // Check for lodding
         if (theNode->nodeName() == LOD_NODE_NAME) {
             createRenderList(getActiveLodChild(theNode, theCamera), theBodyParts, theCamera, theEyeSpaceTransform,
-                    theViewport, theOverlapFrustumFlag, theClippingPlanes);
+                    theViewport, theOverlapFrustumFlag, theClippingPlanes, theScissorBox);
             return;
         }
 
@@ -910,7 +913,7 @@ namespace y60 {
                     COUNT(OpaquePrimitives);
                 }
 
-                theBodyParts.insert(std::make_pair(myKey, BodyPart(myBody, myShape, myPrimitive, theClippingPlanes)));
+                theBodyParts.insert(std::make_pair(myKey, BodyPart(myBody, myShape, myPrimitive, theClippingPlanes, theScissorBox)));
             }
 
             COUNT(RenderedBodies);
@@ -918,7 +921,7 @@ namespace y60 {
 
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
             createRenderList(theNode->childNode(i), theBodyParts, theCamera, theEyeSpaceTransform,
-                    theViewport, myOverlapFrustumFlag, theClippingPlanes);
+                    theViewport, myOverlapFrustumFlag, theClippingPlanes, theScissorBox);
         }
     }
 
@@ -945,6 +948,19 @@ namespace y60 {
         }
     }
 
+    void
+    Renderer::collectScissorBox(dom::NodePtr theNode,
+                                asl::Box2f & theScissorBox)
+    {
+        TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
+
+        const string & myScissorId = myFacade->get<ScissorTag>();
+        dom::NodePtr myBoxNode = theNode->getElementById(myScissorId);
+        if (myBoxNode) {
+            const asl::Box2f & myBox = myBoxNode->childNode("#text")->nodeValueAs<asl::Box2f>();
+            theScissorBox.intersect(myBox);
+        }
+    }
     void
     Renderer::preRender(const CanvasPtr & theCanvas) {
         MAKE_SCOPE_TIMER(Renderer_preRender);
@@ -1009,8 +1025,10 @@ namespace y60 {
         {
             MAKE_SCOPE_TIMER(createRenderList_lod_cull);
             Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
+            asl::Box2f myScissorBox;
+            myScissorBox.makeFull();
             createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera, myEyeSpaceTransform,
-                    theViewport, true, std::vector<asl::Planef>());
+                    theViewport, true, std::vector<asl::Planef>(), myScissorBox);
         }
 
         glMatrixMode(GL_MODELVIEW);
@@ -1063,6 +1081,7 @@ namespace y60 {
                 renderBodyPart(it->second, *theViewport, *myCamera);
             }
             glPopMatrix();
+            _myState->setScissorTest(false);
         }
 
         glPopClientAttrib();

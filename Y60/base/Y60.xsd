@@ -188,6 +188,26 @@ Example:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="Box2f">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional box of float values.
+The box is axis aligned. The two points represent two opposite corners of the box.
+
+Example:
+[[0.1, 0.2], [1.0, 2.0]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="Box2i">
+        <xs:annotation>
+            <xs:documentation>Type for a 2-dimensional box of integer values.
+The box is axis aligned. The two points represent two opposite corners of the box.
+
+Example:
+[[-10,-10], [30,30]]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:simpleType name="RasterOfRGB">
         <xs:annotation>
             <xs:documentation>Type for a 2-dimensional array of pixels with the pixel encoding red/green/blue.
@@ -921,6 +941,11 @@ solution might be to use a scaling image matrix of [1,-1,1].
                         <xs:documentation>Defines a view into the scene</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element ref="box2f">
+                    <xs:annotation>
+                        <xs:documentation>Defines a rectangular part of the screen. Can be used for scissor tests</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -1032,6 +1057,22 @@ Debug culling is disabled by default.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="box2f">
+        <xs:annotation>
+            <xs:documentation>defines a box2f. One possible application is to use this box for a scissors-test</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="Box2f">
+                    <xs:attribute name="id" type="xs:ID">
+                        <xs:annotation>
+                            <xs:documentation>Unique id for this box.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
         </xs:complexType>
     </xs:element>
     <xs:element name="overlays">
@@ -2789,6 +2830,11 @@ Useful for cameras and lights.</xs:documentation>
             <xs:annotation>
                 <xs:documentation>A list of ids, that reference geometry/plane nodes.
 The planes specified by these nodes are used as additional clipping planes.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="scissor" type="xs:IDREF">
+            <xs:annotation>
+                <xs:documentation>id of a viewport box on which the scissor test should be applied.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>

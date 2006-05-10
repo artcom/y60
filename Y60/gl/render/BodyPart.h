@@ -75,11 +75,13 @@ namespace y60 {
 
             BodyPart(const Body & theBodyPtr, const Shape & theShape, 
                      const Primitive & thePrimitive,
-                     const std::vector<asl::Planef> & theClippingPlanes) :
+                     const std::vector<asl::Planef> & theClippingPlanes,
+                     const asl::Box2f & theScissorBox) :
                 _myBody(theBodyPtr), 
                 _myShape(theShape),
                 _myPrimitive(thePrimitive), 
-                _myClippingPlanes(theClippingPlanes)
+                _myClippingPlanes(theClippingPlanes),
+                _myScissorBox(theScissorBox)
             {}
 
             const y60::Body & getBody() const {
@@ -97,11 +99,16 @@ namespace y60 {
             const std::vector<asl::Planef> & getClippingPlanes() const {
                 return _myClippingPlanes;
             }
+
+            const asl::Box2f & getScissorBox() const {
+                return _myScissorBox;
+            }
         private:
             const Body &             _myBody;
             const Shape &            _myShape;
             const y60::Primitive &   _myPrimitive;
             std::vector<asl::Planef> _myClippingPlanes;
+            asl::Box2f               _myScissorBox;
     };
 
     inline

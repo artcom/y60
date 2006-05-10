@@ -11,12 +11,16 @@
 #include "RenderState.h"
 
 #include "GLUtils.h"
+#include <y60/Viewport.h>
+#include <y60/Canvas.h>
 
 #ifdef WIN32
 #   include <GL/glh_extensions.h>
 #else
 #   include <GL/gl.h>
 #endif
+
+using namespace asl;
 
 namespace y60 {
 
@@ -77,6 +81,16 @@ namespace y60 {
     }
 
     void
+    RenderState::commitScissorTest(bool theFlag) {
+        if (theFlag) {
+            glEnable(GL_SCISSOR_TEST);
+        } else {
+            glDisable(GL_SCISSOR_TEST);
+        }
+        _myScissorTestFlag = theFlag;
+    }
+
+    void
     RenderState::commitTexturing(bool theFlag) {
         if (theFlag) {
             glEnable(GL_TEXTURE_2D);
@@ -97,6 +111,34 @@ namespace y60 {
             glDisable(asGLClippingPlaneId(i));
         }
         _myEnabledClippingPlanes = thePlanes.size();
+    }
+    void 
+    RenderState::setScissorBox(const asl::Box2f & theBox, const Viewport & theViewport) {
+        if (theBox.contains(asl::Box2f(0,0,1,1))) {
+            // box is >= screen, turn off scissor test
+            setScissorTest(false);
+            return;
+        }
+        setScissorTest(true);
+        asl::Vector4i myParams(0,0,0,0);
+        if (!theBox.isEmpty()) {
+            // transform box to screen (pixel) coords 
+            const dom::Node * myCanvasNode = theViewport.getNode().parentNode();
+            const CanvasPtr & myCanvas = myCanvasNode->getFacade<Canvas>();
+            int myHeight = myCanvas->getHeight();
+            int myWidth = myCanvas->getWidth();
+
+            int myXMin = static_cast<int>(theBox.getMin()[0] * myWidth);
+            int myXMax = static_cast<int>(theBox.getMax()[0] * myWidth);
+            int myYMin = static_cast<int>(theBox.getMin()[1] * myHeight);
+            int myYMax = static_cast<int>(theBox.getMax()[1] * myHeight);
+
+            myParams = Vector4i(myXMin, myYMin, myXMax-myXMin, myYMax-myYMin);
+        }
+        if (myParams != _myScissorParams) {
+            glScissor(myParams[0], myParams[1], myParams[2], myParams[3]);
+            _myScissorParams = myParams;
+        }
     }
 
     void

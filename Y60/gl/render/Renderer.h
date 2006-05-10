@@ -118,7 +118,8 @@ namespace y60 {
                                   const asl::Matrix4f & theEyeSpaceTransform,
                                   ViewportPtr theViewport,
                                   bool theOverlapFrustumFlag,
-                                  std::vector<asl::Planef> theClippingPlanes);
+                                  std::vector<asl::Planef> theClippingPlanes,
+                                  asl::Box2f theScissorBox);
             void renderBodyPart(const BodyPart & theBodyPart,
                                 const Viewport & theViewport,
                                 const Camera & theCamera);
@@ -159,6 +160,7 @@ namespace y60 {
                                         const asl::Matrix4f & theCameraMatrix);
 
             void collectClippingPlanes(dom::NodePtr theNode, std::vector<asl::Planef> & theClippingPlanes);
+            void collectScissorBox(dom::NodePtr theNode, asl::Box2f & theScissorBox);
             // renderer members
             TextRendererManager     _myTextRendererManager;
             unsigned int            _myRenderingCaps;

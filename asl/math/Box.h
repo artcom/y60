@@ -301,6 +301,22 @@ namespace asl {
             }
         }
 
+        /** */
+        void intersect(const Box2 & theOtherBox) {
+            if (theOtherBox.val[MIN][0] > this->val[MIN][0]) {
+                this->val[MIN][0] = theOtherBox.val[MIN][0];
+            }
+            if (theOtherBox.val[MIN][1] > this->val[MIN][1]) {
+                this->val[MIN][1] = theOtherBox.val[MIN][1];
+            }
+            if (theOtherBox.val[MAX][0] < this->val[MAX][0]) {
+                this->val[MAX][0] = theOtherBox.val[MAX][0];
+            }
+            if (theOtherBox.val[MAX][1] < this->val[MAX][1]) {
+                this->val[MAX][1] = theOtherBox.val[MAX][1];
+            }
+        }
+
         /** Return whether the box is empty */
         bool isEmpty() const {
             return !hasArea();

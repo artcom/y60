@@ -170,6 +170,7 @@ namespace y60 {
     static const char * SKELETON_ATTRIB             = "skeleton";
     static const char * PIVOT_TRANSLATION_ATTRIB    = "pivottranslation";
     static const char * CLIPPING_PLANES_ATTRIB      = "clippingplanes";
+    static const char * SCISSOR_ATTRIB              = "scissor";
 
     static const char * ANIM_ENABLED_ATTRIB         = "enabled";
     static const char * ANIM_ATTRIBUTE_ATTRIB       = "attribute";

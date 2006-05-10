@@ -10,6 +10,7 @@
 
 #include "JSSphere.h"
 #include "JSBox.h"
+#include "JSBox2f.h"
 #include "JSLine.h"
 #include "JSPlane.h"
 #include "JSTriangle.h"
@@ -155,6 +156,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSBox3f::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSBox2f::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSSphere::initClass(cx, theGlobalObject)) {

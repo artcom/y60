@@ -120,7 +120,35 @@ public:
             ENSURE(b1.contains(p1));
             b1.makeEmpty();
             ENSURE(!b1.contains(p1));
-        }        
+        }  
+        // test intersect
+        {
+            asl::Box2<T> myFull;
+            myFull.makeFull();
+            asl::Box2<T> myEmpty;
+            myEmpty.makeEmpty();
+            
+            asl::Box2<T> myBox;
+            myBox.makeEmpty();
+            myBox.intersect(myFull);
+            ENSURE(myBox.isEmpty());
+            myBox.makeFull();
+            myBox.intersect(myEmpty);
+            ENSURE(myBox.isEmpty());
+
+            asl::Box2<T> b1(p3, p1);
+            asl::Box2<T> b2(p0, p2);
+            myBox = b1;
+            myBox.intersect(myEmpty);
+            ENSURE(myBox.isEmpty());
+            myBox = b1;
+            myBox.intersect(myFull);
+            ENSURE(myBox == b1);
+
+            myBox = b1;
+            myBox.intersect(b2);
+            ENSURE(myBox == Box2<T>(p0, p1));
+        }
         
         // Test isEmpty, hasPosition, hasSize, hasArea
         {

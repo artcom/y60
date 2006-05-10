@@ -13,6 +13,7 @@
 
 #include <asl/Plane.h>
 #include <asl/Ptr.h>
+#include <asl/Box.h>
 
 #ifdef WIN32
     #ifndef WIN32_LEAN_AND_MEAN
@@ -42,6 +43,8 @@
 
 namespace y60 {
 
+    class Viewport;
+
     class RenderState {
         public:
             RenderState() :
@@ -55,8 +58,10 @@ namespace y60 {
                 _myPolygonOffsetFlag(false),
                 _myBlendFlag(false),
                 _myAlphaTestFlag(true),
+                _myScissorTestFlag(false),
                 _myCullFaces(GL_BACK),
-                _myEnabledClippingPlanes(0)
+                _myEnabledClippingPlanes(0),
+                _myScissorParams(0,0,1,1)
             {
                 init();
             }
@@ -73,6 +78,7 @@ namespace y60 {
             RENDERSTATE_GETTER_SETTER(PolygonOffset);
             RENDERSTATE_GETTER_SETTER(Blend);
             RENDERSTATE_GETTER_SETTER(AlphaTest);
+            RENDERSTATE_GETTER_SETTER(ScissorTest);
 
             void setCullFaces(GLenum theFaces) {
                 if (theFaces != _myCullFaces) {
@@ -82,11 +88,13 @@ namespace y60 {
             GLenum getCullFaces() const { return _myCullFaces; }
 
             void setClippingPlanes(const std::vector<asl::Planef> & thePlanes);
+            void setScissorBox(const asl::Box2f & theBox, const Viewport & theViewport);
 
         private:
             void commitCullFaces(GLenum theFaces);
 
             int  _myEnabledClippingPlanes;
+            asl::Vector4i _myScissorParams;
             GLenum _myCullFaces;
     };
 
