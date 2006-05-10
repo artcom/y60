@@ -23,6 +23,7 @@ if [ "$OS" == "Windows_NT" ] ; then
     MODULE_DIR="$PROGRAMFILES/ART+COM/mayaY60export"
     mkdir -p $MODULE_DIR/plug-ins
     mkdir -p $MODULE_DIR/scripts
+    mkdir -p $MAYA_SDK/modules
     REVISION=`cd $PRO && svn info | sed -n 's/^Revision: \(\d*\)/\1/p'`
     echo -n "+ mayaY60export $REVISION ${MODULE_DIR}" > "$MAYA_SDK/modules/mayaY60export.txt"
     cp -v o.ANT.WIN.${VARIANT}/mayaY60-export${VARIANT}.dll "$MODULE_DIR/plug-ins/mayaY60export${REVISION}.mll"
