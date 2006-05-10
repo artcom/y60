@@ -57,27 +57,26 @@ makedistLinux() {
 
 makedistWindows() {
     echo "Building windows distribution"
-    PACKAGENAME=${PLUGIN_NAME}-win32.zip
-    DIST_BIN_DIR=${DIST_DIR}/${CODENAME}
+    PACKAGENAME=${PLUGIN_NAME}_setup
+    DIST_BIN_DIR=${DIST_DIR}/${CODENAME}_setup
 
     removeDistribution
 
     echo "    Creating distribution directories"
-    mkdir -p ${DIST_BIN_DIR}/bin/plug-ins
-    mkdir -p ${DIST_BIN_DIR}/scripts/others
+    mkdir -p ${DIST_BIN_DIR}/plug-ins
+    mkdir -p ${DIST_BIN_DIR}/scripts
 
     echo "    Copy Y60 libraries"
-    copySet $PRO/lib "$Y60_WIN_LIBS" ${DIST_BIN_DIR}/bin
+    copySet $PRO/lib "$Y60_WIN_LIBS" ${DIST_BIN_DIR}
 
     echo "    Installing plugin"
-    copyFile o.ANT.WIN.OPT/${PLUGIN_NAME}OPT.dll ${DIST_BIN_DIR}/bin/plug-ins/${CODENAME}.mll
-    copyWildSet . "*.mel" ${DIST_BIN_DIR}/scripts/others
+    REVISION=`cd $PRO && svn info | sed -n 's/^Revision: \(\d*\)/\1/p'`
+    copyFile o.ANT.WIN.OPT/${PLUGIN_NAME}OPT.dll ${DIST_BIN_DIR}/plug-ins/mayaY60export${REVISION}.mll
+    copyFile setup.bat ${DIST_BIN_DIR}
+    copyWildSet . "*.mel" ${DIST_BIN_DIR}/scripts
 
     echo "    Copy windows system libraries"
-    copySet $WINDOWS_SYSTEM32_DIR "$WINDOWS_SYSTEM_LIBS" $DIST_BIN_DIR/bin
-
-    zipFiles
-    removeIntermediates
+    copySet $WINDOWS_SYSTEM32_DIR "$WINDOWS_SYSTEM_LIBS" $DIST_BIN_DIR
 }
 
 SUCCESS=0
