@@ -989,15 +989,15 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h) {
 		if ( glyph->maxy > maxy ) {
 			maxy = glyph->maxy;
 		}
-        
+
         DB2(
             printf("SizeUNICODE char %c, minx: %d, maxx: %d, kerning: %f, start: %f, advance_unf: %f\n",
                    *ch, glyph->minx, glyph->maxx,
 				   getKerning(font, prev_index, glyph->index),
                    xstart, glyph->advance_unfitted);
         )
-        
-        prev_index = glyph->index;                
+
+        prev_index = glyph->index;
 	}
 
 	/* Fill the bounds rectangle */
@@ -1017,12 +1017,12 @@ int TTF_SizeUNICODE(TTF_Font *font, const Uint16 *text, int *w, int *h) {
 /* Is a character part of font  [ART+COM Patch] */
 int TTF_HasGlyph(TTF_Font * theFont, const Uint16 theCharacter) {
 	FT_Face face = theFont->face;
-   
+
 	if (FT_Get_Char_Index( face, theCharacter )  == 0) {
         return -1;
     } else {
         return 0;
-    }   
+    }
  }
 
 /* Get kerning between two glyphs by characters [ART+COM Patch] */
@@ -1198,7 +1198,7 @@ SDL_Surface *TTF_RenderUNICODE_Solid(TTF_Font *font,
 			dstOffset = sdlround(xstart) + glyph->minx;
 			dst = (Uint8*) textbuf->pixels + (row+glyph->yoffset) * textbuf->pitch + dstOffset;
 			src = current->buffer + row * current->pitch;
-			
+
 			/* Make sure we don't go over the limit [ART+COM Patch] */
 			width = current->width;
 			if ((dstOffset + width) > textbuf->w) {
@@ -1453,15 +1453,15 @@ SDL_Surface* TTF_RenderUNICODE_Shaded( TTF_Font* font,
 				continue;
 			}
 			dstOffset = sdlround(xstart) + glyph->minx;
-			dst = (Uint8*) textbuf->pixels + (row+glyph->yoffset) * textbuf->pitch + dstOffset;				
+			dst = (Uint8*) textbuf->pixels + (row+glyph->yoffset) * textbuf->pitch + dstOffset;
 			src = current->buffer + row * current->pitch;
-			
+
 			/* Make sure we don't go over the limit [ART+COM Patch] */
 			width = current->width;
 			if ((dstOffset + width) > textbuf->w) {
 			    width = textbuf->w - dstOffset;
 			}
-			
+
 			for ( col=width; col>0; --col ) {
 				*dst++ |= *src++;
 			}
@@ -1625,7 +1625,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 	int width, height;
 	SDL_Surface *textbuf;
 	Uint32 alpha;
-	Uint32 pixel;
+	Uint32 pixel = 0;
 	const Uint16 *ch;
 	Uint8 *src;
 	Uint32 *dst;
@@ -1650,10 +1650,15 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 		return(NULL);
 	}
 
+	pixel = (fg.r<<16)|(fg.g<<8)|fg.b;
+
+	/* Initialize the destination surface with the text color to avoid
+	   OpenGL texture filtering artefacts [ART+COM Patch] */
+	SDL_FillRect(textbuf, 0, pixel);
+
     /* Load and render each character */
 	xstart = 0.0;
 	swapped = TTF_byteswapped;
-	pixel = (fg.r<<16)|(fg.g<<8)|fg.b;
 	for ( ch=text; *ch; ++ch ) {
 		Uint16 c = *ch;
 		if ( c == UNICODE_BOM_NATIVE ) {
@@ -1700,18 +1705,18 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 				continue;
 			}
 			dstOffset = sdlround(xstart) + glyph->minx;
-			dst = (Uint32*) textbuf->pixels + (row+glyph->yoffset) * textbuf->pitch/4 + dstOffset;            
+			dst = (Uint32*) textbuf->pixels + (row+glyph->yoffset) * textbuf->pitch/4 + dstOffset;
 
 			/* Added code to adjust src pointer for pixmaps to
 			 * account for pitch.
 			 * */
 			src = (Uint8*) (glyph->pixmap.buffer + glyph->pixmap.pitch * row);
-			
+
 			/* Make sure we don't go over the limit [ART+COM Patch] */
 			if ((dstOffset + width) > textbuf->w) {
 			    width = textbuf->w - dstOffset;
 			}
-			
+
 			for ( col = width; col>0; --col) {
 				alpha = *src++;
 				*dst++ |= pixel | (alpha << 24);
@@ -1735,7 +1740,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 				   getKerning(font, prev_index, glyph->index),
                    xstart, glyph->advance_unfitted);
             //printf("    width: %d, height: %d, yoffset: %d\n", width, glyph->pixmap.rows, glyph->yoffset);
-        )        
+        )
 
         prev_index = glyph->index;
 	}
@@ -1762,7 +1767,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
     	    if (col < 10 || col > textbuf->w - 10) {
         	    dst = (Uint32 *)textbuf->pixels + col;
         	    *dst = 0xFF0000FF;
-    
+
         	    dst = (Uint32 *)textbuf->pixels + col + (textbuf->h - 1) * textbuf->w;
         	    *dst = 0xFF0000FF;
         	}
@@ -1771,7 +1776,7 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
     	    if (row < 10 || row > textbuf->h - 10) {
         	    dst = (Uint32 *)textbuf->pixels + row * textbuf->w;
         	    *dst = 0xFF0000FF;
-    
+
         	    dst = (Uint32 *)textbuf->pixels + (row + 1) * textbuf->w - 1;
         	    *dst = 0xFF0000FF;
         	}

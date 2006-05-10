@@ -38,7 +38,7 @@ using namespace asl;
 namespace y60 {
 
     SDLTextRenderer::SDLTextRenderer() :
-         _myRenderStyle(Text::BLENDED_TEXT), _myTextureSurface(0),
+         _myTextureSurface(0),
          _myWordDelimiters(" \t;-:\\/|"), _myMaxFontFittingSize(30)
     {
         if ( TTF_Init() < 0 ) {
@@ -130,17 +130,12 @@ namespace y60 {
     SDLTextRenderer::createText(const asl::Vector2f & thePos,
                                 const std::string & theString, const std::string & theFontName)
     {
-        return TextPtr(new SDLText(this, thePos, getTextColor(), getBackColor(), theString, _myRenderStyle, theFontName));
+        return TextPtr(new SDLText(this, thePos, getTextColor(), theString, theFontName));
     }
 
     bool
     SDLTextRenderer::haveFont(const std::string theName) {
         return (_myFonts.find(makeFontName(theName, SDLFontInfo::NORMAL)) != _myFonts.end());
-    }
-
-    void
-    SDLTextRenderer::setRenderStyle(Text::RENDERSTYLE theStyle) {
-        _myRenderStyle = theStyle;
     }
 
     Vector2i
@@ -153,8 +148,7 @@ namespace y60 {
     {
         TTF_SetTracking(_myTracking);
 
-        Vector2i myTextSize = createTextSurface(theText, theFontName, _myRenderStyle,
-            getTextColor(), getBackColor(),
+        Vector2i myTextSize = createTextSurface(theText, theFontName, getTextColor(),
             theTargetWidth, theTargetHeight);
 
         ImagePtr myImage = theImageNode->getFacade<y60::Image>();
@@ -299,7 +293,7 @@ namespace y60 {
     }
 
     void
-    SDLTextRenderer::createTargetSurface(unsigned theWidth, unsigned theHeight) {
+    SDLTextRenderer::createTargetSurface(unsigned theWidth, unsigned theHeight, const Vector4f & theTextColor) {
         DB2(AC_TRACE << "createTargetSurface with size: " << theWidth << "x" << theHeight << endl;)
         SDL_FreeSurface(_myTextureSurface);
 
@@ -318,43 +312,31 @@ namespace y60 {
             throw GLTextRendererException("TextRenderer::createTargetSurface - Could not create SDL RGB Surface",
                 PLUS_FILE_LINE);
         }
+
+        Uint32 myTextColor = SDL_MapRGBA(_myTextureSurface->format, Uint8(theTextColor[0] * 255),
+            Uint8(theTextColor[1] * 255), Uint8(theTextColor[2] * 255), 0);
+
+//cerr << "first pixel before fill: " << *((unsigned*)_myTextureSurface->pixels) << endl;
+
+        // Fill background image with text color, to avoid OpenGl texture filtering artefacts.
+        SDL_FillRect(_myTextureSurface, 0, myTextColor);
+
+  //      cerr << "first pixel after fill: " << *((unsigned*)_myTextureSurface->pixels) << endl;
     }
 
     SDL_Surface *
     SDLTextRenderer::renderToSurface(
         string theText,
-        Text::RENDERSTYLE theRenderStyle,
         const TTF_Font * theFont,
-        const SDL_Color & theTextColor,
-        const SDL_Color & theBackColor)
+        const SDL_Color & theTextColor)
     {
         if (!theText.size()) {
             theText = " ";
         }
 
         SDL_Surface * myTextSurface;
-        switch (theRenderStyle) {
-            case SDLText::BLENDED_TEXT:
-                myTextSurface = TTF_RenderUTF8_Blended((TTF_Font*) theFont, theText.c_str(), theTextColor);
-                //SDL_SaveBMP(myTextSurface, string(string("word_") + theText + ".bmp" ).c_str());
-
-                break;
-            case SDLText::SHADED_TEXT:
-                myTextSurface = TTF_RenderUTF8_Shaded((TTF_Font*) theFont, theText.c_str(), theTextColor, theBackColor);
-                break;
-            case SDLText::SOLID_TEXT:
-#ifdef LINUX
-                // solid doesn't work under linux,
-                // the ft_render_mode_mono always fails,
-                // so we use blended instead
-                myTextSurface = TTF_RenderUTF8_Blended((TTF_Font*) theFont, theText.c_str(), theTextColor);
-#else
-                myTextSurface = TTF_RenderUTF8_Solid((TTF_Font*) theFont, theText.c_str(), theTextColor);
-#endif
-                break;
-            default:
-                throw GLTextRendererException("SDLTextRenderer - unknown render quality.", PLUS_FILE_LINE);
-        }
+        myTextSurface = TTF_RenderUTF8_Blended((TTF_Font*) theFont, theText.c_str(), theTextColor);
+        //SDL_SaveBMP(myTextSurface, string(string("word_") + theText + ".bmp" ).c_str());
 
         if (!myTextSurface) {
             throw GLTextRendererException(string("SDLTextRenderer - TTF text rendering failed while rendering '") +
@@ -363,15 +345,13 @@ namespace y60 {
 
         SDL_SetAlpha(myTextSurface, 0, 0);
 
-        if (theRenderStyle != SDLText::SHADED_TEXT) {
-            /*
-             * UH: enabling this breaks text rendering on Windows/SDL-1.2.8 but works fine
-             *     under Windows/SDL-1.2.6 and Linux.
-             */
+        /*
+         * UH: enabling this breaks text rendering on Windows/SDL-1.2.8 but works fine
+         *     under Windows/SDL-1.2.6 and Linux.
+         */
 #ifdef LINUX
-            SDL_SetColorKey(myTextSurface, SDL_SRCCOLORKEY, 0);
+        SDL_SetColorKey(myTextSurface, SDL_SRCCOLORKEY, 0);
 #endif
-        }
 
         DB(AC_TRACE << "Text Surface: (" << myTextSurface->w << "x" << myTextSurface->h << ")" << endl);
         return myTextSurface;
@@ -560,9 +540,7 @@ namespace y60 {
     void
     SDLTextRenderer::renderWords(vector<Word> & theWords,
                                  const string & theFontName,
-                                 Text::RENDERSTYLE theRenderStyle,
-                                 const Vector4f & theTextColor,
-                                 const Vector4f & theBackColor)
+                                 const Vector4f & theTextColor)
     {
         DB2(AC_TRACE << "-------  Render Words  -------" << endl;)
         SDLFontInfo mySDLFontInfo = (getFontInfo(makeFontName(theFontName, SDLFontInfo::NORMAL)));
@@ -581,10 +559,6 @@ namespace y60 {
                                   Uint8(theTextColor[1] * 255),
                                   Uint8(theTextColor[2] * 255),
                                   Uint8(theTextColor[3] * 255) };
-        SDL_Color myBackColor = { Uint8(theBackColor[0] * 255),
-                                  Uint8(theBackColor[1] * 255),
-                                  Uint8(theBackColor[2] * 255),
-                                  Uint8(theBackColor[3] * 255) };
 
         for (unsigned i = 0; i < theWords.size(); ++i) {
             Word & myWord = theWords[i];
@@ -618,7 +592,7 @@ namespace y60 {
             DB2(AC_TRACE << "Rendering word: '" << myWord.text << "' with format: " << mySDLFormat << endl;)
             TTF_SetFontStyle((TTF_Font*) myFont, mySDLFormat);
 
-            myWord.surface = renderToSurface(myWord.text, theRenderStyle, myFont, myTextColor, myBackColor);
+            myWord.surface = renderToSurface(myWord.text, myFont, myTextColor);
             myWord.minx = TTF_CurrentLineMinX();
 
             TTF_SetFontStyle((TTF_Font*) myFont, TTF_STYLE_NORMAL);
@@ -638,9 +612,7 @@ namespace y60 {
 
     Vector2i
     SDLTextRenderer::createTextSurface(const string & theText, const string & theFontName,
-                                       Text::RENDERSTYLE theRenderStyle,
                                        const Vector4f & theTextColor,
-                                       const Vector4f & theBackColor,
                                        unsigned int theTargetWidth,
                                        unsigned int theTargetHeight)
     {
@@ -656,7 +628,7 @@ namespace y60 {
 
         vector<Word> myWords;
         parseWords(theText, myWords);
-        renderWords(myWords, theFontName, theRenderStyle, theTextColor, theBackColor);
+        renderWords(myWords, theFontName, theTextColor);
 
         if (theTargetWidth == 0) {
             // Use the surface width and (if not given) height
@@ -691,7 +663,7 @@ namespace y60 {
             mySurfaceHeight = myTotalLineHeight + _myTopPadding + _myBottomPadding;
         }
 
-        createTargetSurface(nextPowerOfTwo(mySurfaceWidth), nextPowerOfTwo(mySurfaceHeight));
+        createTargetSurface(nextPowerOfTwo(mySurfaceWidth), nextPowerOfTwo(mySurfaceHeight), theTextColor);
 
         DB2(
             AC_TRACE << "-------- Text puzzel ----------" << endl;
@@ -763,9 +735,7 @@ namespace y60 {
 
         Vector2i myTextSize = createTextSurface(mySDLText->_myString,
             mySDLText->_myFont,
-            mySDLText->getRenderStyle(),
-            mySDLText->_myTextColor,
-            mySDLText->_myBackColor);
+            mySDLText->_myTextColor);
 
         GLfloat texMinX = 0.0f;         /* Min X */
         GLfloat texMinY = 0.0f;         /* Min Y */

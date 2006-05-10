@@ -51,7 +51,7 @@ namespace y60 {
             void updateWindow(const unsigned int & _myWindowWidth, const unsigned int & _myWindowHeight);
             virtual bool haveFont(const std::string theFontName) = 0;
             virtual void renderText(TextPtr & theText) = 0;
-            void setColor(const asl::Vector4f & theTextColor, const asl::Vector4f & theBackColor);
+            void setColor(const asl::Vector4f & theTextColor);
             void setPadding(int theTop, int theBottom, int theLeft, int theRight);
         	void setVTextAlignment(TextRenderer::TextAligment theVAlignment);
 	        void setHTextAlignment(TextRenderer::TextAligment theHAlignment);
@@ -69,7 +69,6 @@ namespace y60 {
             const unsigned int & getWindowHeight() { return _myWindowHeight; }
             const unsigned int & getWindowWidth()  { return _myWindowWidth; }
             const asl::Vector4f & getTextColor()   { return _myCurrentTextColor; }
-            const asl::Vector4f & getBackColor()   { return _myCurrentBackColor; }
         protected:
    	        TextAligment  _myHorizontalAlignment;
    	        TextAligment  _myVerticalAlignment;
@@ -85,7 +84,6 @@ namespace y60 {
             unsigned int  _myWindowWidth;
             unsigned int  _myWindowHeight;
    	        asl::Vector4f _myCurrentTextColor;
-   	        asl::Vector4f _myCurrentBackColor;
 
     };
     typedef asl::Ptr<TextRenderer> TextRendererPtr;

@@ -252,7 +252,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             DOC_RVAL("thePixelValue", DOC_TYPE_VECTOR4F);
             DOC_END;
             try {
-                ensureParamCount(argc, 4); 
+                ensureParamCount(argc, 4);
                 DERIVED * mySelf;
                 convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
                 int myXPos;
@@ -263,7 +263,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 convertFrom(cx, argv[2], myFormat);
                 GLenum myType;
                 convertFrom(cx, argv[3], myType);
-                if (myXPos < 0 || myYPos < 0 || myXPos >= mySelf->getWidth() || 
+                if (myXPos < 0 || myYPos < 0 || myXPos >= mySelf->getWidth() ||
                     myYPos >= mySelf->getHeight())
                 {
                     *rval = JSVAL_NULL;
@@ -288,7 +288,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                         JS_ReportError(cx,"readPixel: Format not supported");
                         return JS_FALSE;
                 }
-                return JS_TRUE; 
+                return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         }
 
@@ -378,10 +378,9 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         setTextColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Sets the text foreground and background color");
             DOC_PARAM("theTextColor", "", DOC_TYPE_VECTOR4F);
-            DOC_PARAM_OPT("theBackGroundColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
             DOC_END;
             try {
-                ensureParamCount(argc, 1, 2);
+                ensureParamCount(argc, 1, 1);
 
                 asl::Vector4f theTextColor;
                 if (!convertFrom(cx, argv[0], theTextColor)) {
@@ -389,19 +388,8 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                     return JS_FALSE;
                 }
 
-                if (argc == 1) {
-                    jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextColor(theTextColor);
-                    jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
-                } else {
-                    asl::Vector4f theBackColor;
-                    if (!convertFrom(cx, argv[1], theBackColor)) {
-                        JS_ReportError(cx,"JSRenderWindow::renderText: parameter 2 must be a Vector4f (backcolor)");
-                        return JS_FALSE;
-                    }
-                    jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextColor(theTextColor, theBackColor);
-                    jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
-                }
-
+                jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).setTextColor(theTextColor);
+                jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         }
@@ -417,15 +405,6 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             DOC_END;
             typedef asl::Vector2i (DERIVED::*MyMethod)(dom::NodePtr, const std::string &, const std::string &, const unsigned int &, const unsigned int &);
             return Method<DERIVED>::call((MyMethod)&DERIVED::renderTextAsImage,cx,obj,argc,argv,rval);
-        }
-        static JSBool
-        setTextStyle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("Sets style for text paragraphs (normal, bold, italic, bolditalic)" \
-                      "See Renderer static properties for possible constants");
-            DOC_PARAM("theHorizontalAlignment", "", DOC_TYPE_ENUMERATION);
-            DOC_END;
-            typedef void (DERIVED::*MyMethod)(unsigned);
-            return Method<DERIVED>::call((MyMethod)&DERIVED::setTextStyle,cx,obj,argc,argv,rval);
         }
         static JSBool
         setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -697,9 +676,8 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 {"performRequest",     performRequest,           1},
                 // text rendering
                 {"renderText",         renderText,               3},
-                {"setTextColor",       setTextColor,             2},
+                {"setTextColor",       setTextColor,             1},
                 {"renderTextAsImage",  renderTextAsImage,        5},
-                {"setTextStyle",       setTextStyle,             1},
                 {"setTextPadding",     setTextPadding,           4},
                 {"setHTextAlignment",  setHTextAlignment,        1},
                 {"setVTextAlignment",  setVTextAlignment,        1},

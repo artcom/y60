@@ -50,12 +50,10 @@ namespace y60 {
     SDLText::SDLText(TextRenderer * theRenderer,
                      const asl::Vector2f & thePos,
                      const asl::Vector4f & theTextColor,
-                     const asl::Vector4f & theBackColor,
                      const std::string & theString,
-                     const RENDERSTYLE & theRenderStyle,
                      const std::string & theFontName)
-            : Text(theRenderer, thePos, theTextColor, theBackColor, theString, theFontName),
-                   _myRenderStyle(theRenderStyle), _glTexture(0)
+            : Text(theRenderer, thePos, theTextColor, theString, theFontName),
+                   _glTexture(0)
     {
        	glGenTextures(1, &_glTexture);
     	glBindTexture(GL_TEXTURE_2D, _glTexture);

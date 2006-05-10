@@ -34,12 +34,11 @@ namespace y60 {
     Text::Text(TextRenderer *  theRenderer,
                const Vector2f & thePos,
                const asl::Vector4f & theTextColor,
-               const asl::Vector4f & theBackColor,
                const string & theString,
                const string theFont)
             : _myPos(thePos),_myRenderer(theRenderer),
               _myString(theString), _myFont(theFont),
-              _myTextColor(theTextColor),  _myBackColor(theBackColor)
+              _myTextColor(theTextColor)
     {
     }
 

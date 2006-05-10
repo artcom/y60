@@ -61,7 +61,7 @@ namespace jslib {
          *         window.
          * @warn Currently, theScene may not be Ptr(0)!
          */
-        bool AbstractRenderWindow::setSceneAndCanvas(const y60::ScenePtr & theScene, 
+        bool AbstractRenderWindow::setSceneAndCanvas(const y60::ScenePtr & theScene,
                 const dom::NodePtr & theCanvas = dom::NodePtr(0));
 
         /**
@@ -120,10 +120,7 @@ namespace jslib {
             return renderText(thePixelPosition, theString, getDefaultFont());
         }
 
-        void setTextColor(const asl::Vector4f & theTextColor, const asl::Vector4f & theBackColor);
-        void setTextColor(const asl::Vector4f & theTextColor) {
-            return setTextColor(theTextColor, asl::Vector4f(1,1,1,1));
-        }
+        void setTextColor(const asl::Vector4f & theTextColor);
 
         asl::Vector2i renderTextAsImage(dom::NodePtr theImageNode,
                 const std::string & theString, const std::string & theFont,
@@ -221,13 +218,13 @@ namespace jslib {
         /*
         template <typename P>
         void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, P & theValue) {
-            throw RenderWindowException("Format not supported", PLUS_FILE_LINE); 
+            throw RenderWindowException("Format not supported", PLUS_FILE_LINE);
         }
         */
 
         void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, asl::Unsigned8 & theValue);
         void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, float & theValue);
-        
+
         y60::GLContextPtr getGLContext() const {
             return _myGLContext;
         }
@@ -260,7 +257,7 @@ namespace jslib {
 
         JSObject *           _myEventListener;
         JSContext *          _myJSContext;
-        
+
         JSErrorReporter      _myErrorReporter;
         inet::RequestManager _myRequestManager;
 
@@ -283,7 +280,7 @@ namespace jslib {
         double            _myStartTime;
         double            _myPauseTime;
         bool              _myPauseFlag;
-        
+
     };
 
 }

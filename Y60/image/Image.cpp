@@ -25,6 +25,7 @@
 #include <paintlib/plpixelformat.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/pljpegenc.h>
+#include <paintlib/pltiffenc.h>
 #include <paintlib/Filter/plfilterflip.h>
 
 using namespace asl;
@@ -141,7 +142,7 @@ namespace y60 {
         set<ImageHeightTag>(theNewHeight);
         set<ImageDepthTag>(theNewDepth);
         set<ImagePixelFormatTag>(getStringFromEnum(theEncoding, PixelEncodingString));
-        
+
         set<ImageBytesPerPixelTag>(float(getBytesRequired(4, theEncoding))/4.0f);
         createRaster(theEncoding);
 
@@ -168,7 +169,7 @@ namespace y60 {
     Image::blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage, const asl::Vector2i & theTargetPos,
             const asl::Box2i * theSourceRect)
     {
-        if (get<ImageDepthTag>() != theSourceImage->get<ImageDepthTag>() || 
+        if (get<ImageDepthTag>() != theSourceImage->get<ImageDepthTag>() ||
             get<ImagePixelFormatTag>() != theSourceImage->get<ImagePixelFormatTag>()) {
             // depth and encoding must match
               throw ImageException(std::string("Image::blitImage(): Sourceimage and subimage must have same depth and encoding."), PLUS_FILE_LINE);
@@ -177,7 +178,7 @@ namespace y60 {
         int sourceHeight = theSourceRect ? theSourceRect->getSize()[1] : theSourceImage->get<ImageHeightTag>();
         dom::ResizeableRasterPtr myRaster = getRasterPtr();
         if (theTargetPos[0] + sourceWidth <= get<ImageWidthTag>() &&
-            theTargetPos[1] + sourceHeight <= get<ImageHeightTag>()) 
+            theTargetPos[1] + sourceHeight <= get<ImageHeightTag>())
         {
             // everything super, subimage fits without resizing the image
             if (!myRaster) {
@@ -185,13 +186,13 @@ namespace y60 {
             }
             dom::ValuePtr mySourceRaster = theSourceImage->getNode().childNode(0)->childNode(0)->nodeValueWrapperPtr();
             if ( theSourceRect ) {
-                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]), 
-                                      *mySourceRaster, 
+                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
+                                      *mySourceRaster,
                                       theSourceRect->getMin()[0], theSourceRect->getMin()[1],
                                       theSourceRect->getSize()[0], theSourceRect->getSize()[1]);
             } else {
-                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]), 
-                                      *mySourceRaster); 
+                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
+                                      *mySourceRaster);
             }
         } else {
             // image must be resized to fit new size
@@ -285,7 +286,7 @@ namespace y60 {
         set<ImageMatrixTag>(myImageLoader.getImageMatrix());
     }
 
-    void 
+    void
     Image::convertFromPLBmp(PLAnyBmp & theBitmap) {
         PixelEncoding mySourceEncoding;
         mapFormatToPixelEncoding(theBitmap.GetPixelFormat(), mySourceEncoding);
@@ -311,7 +312,7 @@ namespace y60 {
 
    }
 
-    void 
+    void
     Image::convertToPLBmp(PLAnyBmp & theBitmap) {
         int myWidth = get<ImageWidthTag>();
         int myHeight = get<ImageHeightTag>();
@@ -347,7 +348,7 @@ namespace y60 {
         convertFromPLBmp(myBmp);
     }
 
-    void 
+    void
     Image::saveToFileFiltered(const std::string & theImagePath, const VectorOfString & theFilter,
                               const VectorOfVectorOfFloat & theFilterParams)
     {
@@ -357,8 +358,8 @@ namespace y60 {
 
         string myImagePath = toLowerCase(theImagePath);
         string::size_type pos = string::npos;
-        
-        pos = myImagePath.find_last_of("."); 
+
+        pos = myImagePath.find_last_of(".");
         if ( pos != string::npos) {
             string myExtension = myImagePath.substr(pos);
             if (myExtension == ".jpg" || myExtension == ".jpeg") {
@@ -367,7 +368,7 @@ namespace y60 {
                 PLAnyBmp myTmpBmp;
                 convertToPLBmp( myTmpBmp );
                 myTmpBmp.CreateCopy(myBmp, PLPixelFormat::X8B8G8R8);
-                
+
                 PLJPEGEncoder myJPEGEncoder;
                 myJPEGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myTmpBmp);
                 return;
@@ -382,22 +383,26 @@ namespace y60 {
     Image::saveToFile(const string & theImagePath) {
         PLAnyBmp myBmp;
         convertToPLBmp( myBmp );
-        
+
         string myImagePath = toLowerCase(theImagePath);
         string::size_type pos = string::npos;
-        
-        pos = myImagePath.find_last_of("."); 
+
+        pos = myImagePath.find_last_of(".");
         if ( pos != string::npos) {
             string myExtension = myImagePath.substr(pos);
+
             if (myExtension == ".jpg" || myExtension == ".jpeg") {
                 // [jb] PLJPEGEncoder expects images to have alpha (32bit),
                 //      this hack stuffs the pixelformat with the missing 8bit:
                 PLAnyBmp myTmpBmp;
                 convertToPLBmp( myTmpBmp );
                 myTmpBmp.CreateCopy(myBmp, PLPixelFormat::X8B8G8R8);
-                
                 PLJPEGEncoder myJPEGEncoder;
                 myJPEGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myTmpBmp);
+                return;
+            } else if (myExtension == ".tif" || myExtension == ".tiff") {
+                PLTIFFEncoder myTiffEncoder;
+                myTiffEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myBmp);
                 return;
             }
         }
@@ -431,10 +436,10 @@ namespace y60 {
             _myAppliedFilterParams != get<ImageFilterParamsTag>();
 
         /*
-         * want to check what condition the condition is in ?   
+         * want to check what condition the condition is in ?
          *  Ask theDude or try this:
          */
-#if 0         
+#if 0
 if (myReloadRequired) {
 
         bool b1 = getRasterValue();
@@ -445,22 +450,22 @@ if (myReloadRequired) {
         bool b5 = _myAppliedFilterParams != get<ImageFilterParamsTag>();
         bool b6 = _myAppliedColorScale != get<ImageColorScaleTag>();
         bool b7 =_myAppliedColorBias != get<ImageColorBiasTag>();
-        bool b8 =getGraphicsId() == 0; 
+        bool b8 =getGraphicsId() == 0;
         bool b9 = _myAppliedPixelFormat != get<ImagePixelFormatTag>();
         bool b10= _myAppliedInternalFormat != get<ImageInternalFormatTag>();
 
-        
-        AC_PRINT 
-<< "b1 = " << b1 << " " 
-<< "b2 = " << b2 << " " 
-<< "b3 = " << b3 << " " 
-<< "b4 = " << b4 << " " 
-<< "b5 = " << b5 << " " 
-<< "b6 = " << b6 << " " 
-<< "b7 = " << b7 << " " 
-<< "b8 = " << b8 << " " 
-<< "b9 = " << b9 << " " 
-<< "b10 = " << b10 << " " 
+
+        AC_PRINT
+<< "b1 = " << b1 << " "
+<< "b2 = " << b2 << " "
+<< "b3 = " << b3 << " "
+<< "b4 = " << b4 << " "
+<< "b5 = " << b5 << " "
+<< "b6 = " << b6 << " "
+<< "b7 = " << b7 << " "
+<< "b8 = " << b8 << " "
+<< "b9 = " << b9 << " "
+<< "b10 = " << b10 << " "
 << "s1 = " << s1;
 
 }
@@ -473,7 +478,7 @@ if (myReloadRequired) {
     bool
     Image::textureUploadRequired() const {
 
-        // if colorscale introduces an alpha channel ensure 
+        // if colorscale introduces an alpha channel ensure
         // that internal format has alpha
 #if 1
         const std::string & myExternalFormat = get<ImagePixelFormatTag>();
@@ -527,7 +532,7 @@ if (myReloadRequired) {
             AC_PRINT << "InternalFormat: Applied " << _myAppliedInternalFormat << ", Image " << get<ImageInternalFormatTag>();
             AC_PRINT << "MipMap: Applied " << _myAppliedMipmap << ", Image " << get<ImageMipmapTag>();
         }
-#endif        
+#endif
         return myCanReuseFlag;
     }
 }

@@ -30,7 +30,6 @@ namespace y60 {
 
     class TTFTextRenderer : public TextRenderer {
         public:
-            virtual void setRenderStyle(Text::RENDERSTYLE theStyle) = 0;
             virtual void loadFont(const std::string & theName, const std::string & theFileName,
                     int theHeight, TTFFontInfo::FONTTYPE theFontType) = 0;
             virtual TextPtr createText(const asl::Vector2f & thePos,

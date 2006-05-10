@@ -40,7 +40,6 @@ namespace y60 {
     TextRenderer::TextRenderer() :
         _myLineHeight(0),
         _myCurrentTextColor(Vector4f(1.0, 1.0, 1.0, 1.0)),
-        _myCurrentBackColor(Vector4f(1.0, 1.0, 1.0, 1.0)),
         _myHorizontalAlignment(LEFT_ALIGNMENT),
         _myVerticalAlignment(TOP_ALIGNMENT),
         _myParagraphTopOffset(0),
@@ -59,7 +58,7 @@ namespace y60 {
                              const string & theString,
                              const string & theFont)
     {
-        return TextPtr(new Text(this, thePos, getTextColor(), getBackColor(), theString, theFont));
+        return TextPtr(new Text(this, thePos, getTextColor(), theString, theFont));
     }
 
 
@@ -73,11 +72,8 @@ namespace y60 {
 
 
     void
-    TextRenderer::setColor(const asl::Vector4f & theTextColor,
-                           const asl::Vector4f & theBackColor)
-    {
+    TextRenderer::setColor(const asl::Vector4f & theTextColor) {
         _myCurrentTextColor = theTextColor;
-        _myCurrentBackColor = theBackColor;
     }
 
     void
@@ -87,7 +83,7 @@ namespace y60 {
         _myLeftPadding = theLeft;
         _myRightPadding = theRight;
     }
-    
+
 	void
 	TextRenderer::setVTextAlignment(TextRenderer::TextAligment theVAlignment) {
 	    _myVerticalAlignment = theVAlignment;

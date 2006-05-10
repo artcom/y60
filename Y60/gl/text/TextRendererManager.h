@@ -38,7 +38,7 @@ namespace y60 {
             void updateWindow(const unsigned int & _myWindowWidth, const unsigned int & _myWindowHeight);
             void addText(const asl::Vector2f & thePos, const std::string & theString,
                     const std::string & theFont);
-            void setColor(const asl::Vector4f & theTextColor, const asl::Vector4f & theBackColor);
+            void setColor(const asl::Vector4f & theTextColor);
             void setPadding(int topPadding, int bottomPadding, int leftpadding, int rightpadding);
             void setVTextAlignment(TextRenderer::TextAligment theVAlignment);
             void setHTextAlignment(TextRenderer::TextAligment theHAlignment);
@@ -46,7 +46,6 @@ namespace y60 {
             void setParagraph(unsigned theTopOffset, unsigned theBottomOffset);
             void loadTTF(const std::string & theName, const std::string & theFileName,
                     int theHeight, TTFFontInfo::FONTTYPE & theFonttype);
-            void setTextStyle(Text::RENDERSTYLE theStyle);
             asl::Vector2i renderTextAsImage(TextureManager & theTextureManager, dom::NodePtr theImageNode,
                     const std::string & theString,
                     const std::string & theFont,

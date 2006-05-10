@@ -33,7 +33,6 @@ namespace y60 {
             SDLTextRenderer();
             ~SDLTextRenderer();
 
-            void setRenderStyle(Text::RENDERSTYLE theStyle);
             void loadFont(const std::string & theName, const std::string & theFileName,
                     int theHeight, TTFFontInfo::FONTTYPE theFontType);
             TextPtr SDLTextRenderer::createText(const asl::Vector2f & thePos,
@@ -50,12 +49,12 @@ namespace y60 {
             bool getFontMetrics(const std::string & theFontName,
                     int & theFontHeight,
                     int & theFontAscent, int & theFontDescent,
-                    int & theFontLineSkip) const; 
+                    int & theFontLineSkip) const;
 
             bool getGlyphMetrics(const std::string & theFontName, const std::string & theCharacter, asl::Box2f & theGlyphBox, double & theAdvance) const;
             double getKerning(const std::string & theFontName, const std::string & theFirstCharacter, const std::string & theSecondCharacter) const;
             bool hasGlyph(const std::string& theFontName, const std::string& theCharacter) const;
-    
+
             void setMaxFontFittingSize(unsigned theSize) {
                 _myMaxFontFittingSize = theSize;
             }
@@ -95,18 +94,14 @@ namespace y60 {
             };
 
             asl::Vector2i createTextSurface(const std::string & theText, const std::string & theFontName,
-                    Text::RENDERSTYLE theRenderStyle,
                     const asl::Vector4f & theTextColor,
-                    const asl::Vector4f & theBackColor,
                     unsigned int theTextureWidth = 0,
                     unsigned int theTextureHeight = 0);
-            void createTargetSurface(unsigned theWidth, unsigned theHeight);
+            void createTargetSurface(unsigned theWidth, unsigned theHeight, const asl::Vector4f & theTextColor);
 
             SDL_Surface * renderToSurface(std::string theText,
-                    Text::RENDERSTYLE theRenderStyle,
                     const TTF_Font * theFont,
-                    const SDL_Color & theTextColor,
-                    const SDL_Color & theBackColor);
+                    const SDL_Color & theTextColor);
 
             unsigned createLines(const std::vector<Word> & theWords, std::vector<Line> & theLines,
                     unsigned theLineWidth, unsigned theLineHeight);
@@ -122,9 +117,7 @@ namespace y60 {
 
             void renderWords(std::vector<Word> & theWords,
                     const std::string & theFontName,
-                    Text::RENDERSTYLE theRenderStyle,
-                    const asl::Vector4f & theTextColor,
-                    const asl::Vector4f & theBackColor);
+                    const asl::Vector4f & theTextColor);
 
             unsigned parseNewline(const std::string & theText, unsigned thePos);
             unsigned parseHtmlTag(const std::string & theText, unsigned thePos, Format & theFormat);
@@ -133,7 +126,6 @@ namespace y60 {
 
             SDL_Surface *        _myTextureSurface;
             FontLibrary          _myFonts;
-            Text::RENDERSTYLE    _myRenderStyle;
             std::string          _myWordDelimiters;
             unsigned             _myMaxFontFittingSize;
 

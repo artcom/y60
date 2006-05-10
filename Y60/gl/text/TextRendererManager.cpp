@@ -109,10 +109,10 @@ namespace y60 {
     }
 
 	void
-	TextRendererManager::setColor(const asl::Vector4f & theTextColor, const asl::Vector4f & theBackColor) {
-        _myBitmapRenderer.setColor(theTextColor, theBackColor);
+	TextRendererManager::setColor(const asl::Vector4f & theTextColor) {
+        _myBitmapRenderer.setColor(theTextColor);
         if (_myTTFRenderer) {
-            _myTTFRenderer->setColor(theTextColor, theBackColor);
+            _myTTFRenderer->setColor(theTextColor);
         }
     }
 
@@ -174,11 +174,6 @@ namespace y60 {
         _myTTFRenderer->loadFont(theName, expandEnvironment(theFileName), theHeight, theFonttype);
 	}
 
-    void
-    TextRendererManager::setTextStyle(Text::RENDERSTYLE theStyle) {
-        _myTTFRenderer->setRenderStyle(theStyle);
-    }
-
     bool
     TextRendererManager::getFontMetrics(const std::string & theFontName,
             int & theFontHeight,
@@ -200,7 +195,7 @@ namespace y60 {
     {
         return _myTTFRenderer->getKerning(theFontName, theFirstCharacter, theSecondCharacter);
     }
-    
+
     bool
     TextRendererManager::hasGlyph(const std::string& theFontName, const std::string& theCharacter) const
     {

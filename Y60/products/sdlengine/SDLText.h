@@ -38,16 +38,12 @@ namespace y60 {
             SDLText(TextRenderer * theRenderer,
                     const asl::Vector2f & thePos,
                     const asl::Vector4f & theTextColor,
-                    const asl::Vector4f & theBackColor,
                     const std::string & theString,
-                    const RENDERSTYLE & theRenderStyle,
                     const std::string & theFontName);
             virtual ~SDLText();
             const GLuint createTextureFromSurface(SDL_Surface *surface);
-            const RENDERSTYLE & getRenderStyle() { return _myRenderStyle; }
         private:
         	GLuint      _glTexture;
-   	        RENDERSTYLE _myRenderStyle;
     };
     typedef asl::Ptr<SDLText> SDLTextPtr;
 

@@ -215,7 +215,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     self.onPostRender = function() {
         Base.onPostRender();
         if (_myTextOverlay.visible) {
-            window.setTextColor([1,1,1,1], [1,1,1,1]);
+            window.setTextColor([1,1,1,1]);
             var myText  = getDisplayText();
             var myWidth = 400;
             for (var i = 0; i < myText.length; ++i) {

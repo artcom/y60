@@ -96,7 +96,7 @@ namespace jslib {
     AbstractRenderWindow::setScene(const y60::ScenePtr & theScene) {
         return setSceneAndCanvas(theScene, dom::NodePtr(0));
     }
-    
+
     // TODO: do something with the extensions
     bool
     AbstractRenderWindow::setSceneAndCanvas(const y60::ScenePtr & theScene, const dom::NodePtr & theCanvas) {
@@ -321,7 +321,7 @@ namespace jslib {
         return y60::getGLRendererString();
     }
 
-    unsigned int 
+    unsigned int
     AbstractRenderWindow::getGLExtensionStrings(std::vector<std::string> & theTokens) {
         y60::ScopedGLContext myContextLock(this);
         return y60::getGLExtensionStrings(theTokens);
@@ -409,7 +409,7 @@ namespace jslib {
         if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onFrame")) {
             MAKE_SCOPE_TIMER(onFrame_JSCallback);
             jsval argv[1], rval;
-            argv[0] = as_jsval(_myJSContext, float(_myElapsedTime));         
+            argv[0] = as_jsval(_myJSContext, float(_myElapsedTime));
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onFrame", 1, argv, &rval);
         }
 
@@ -871,9 +871,9 @@ namespace jslib {
         _myRenderer->getTextManager().addText(myRelativePosition, theString, theFont);
     }
 
-    void AbstractRenderWindow::setTextColor(const asl::Vector4f & theTextColor, const asl::Vector4f & theBackColor)
+    void AbstractRenderWindow::setTextColor(const asl::Vector4f & theTextColor)
     {
-        _myRenderer->getTextManager().setColor(theTextColor, theBackColor);
+        _myRenderer->getTextManager().setColor(theTextColor);
     }
 
     asl::Vector2i AbstractRenderWindow::renderTextAsImage(dom::NodePtr theImageNode,
@@ -882,10 +882,6 @@ namespace jslib {
     {
         return _myRenderer->getTextManager().renderTextAsImage(*(_myScene->getTextureManager()),
                         theImageNode, theString, theFont, theTargetWidth, theTargetHeight);
-    }
-
-    void AbstractRenderWindow::setTextStyle(unsigned int theStyle) {
-        _myRenderer->getTextManager().setTextStyle(y60::Text::RENDERSTYLE(theStyle));
     }
 
     void AbstractRenderWindow::setTextPadding(int topPadding, int bottomPadding, int leftPadding, int rightPadding) {

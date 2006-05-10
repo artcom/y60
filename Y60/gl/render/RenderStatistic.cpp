@@ -44,7 +44,7 @@ namespace y60 {
     renderStatistic(Renderer & theRenderer, unsigned short theStatisticLevel) {
         bool myFoundAStatistic = false;
         int  myStatisticFlags  = 0;
-        theRenderer.getTextManager().setColor(Vector4f(1,1,1,1), Vector4f(0,0,0,1));
+        theRenderer.getTextManager().setColor(Vector4f(1,1,1,1));
         try {
             static double myTime = asl::Time();
             double myElapsedTime = asl::Time() - myTime;
