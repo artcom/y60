@@ -62,7 +62,7 @@
 
 
 // this is not exactly accurate
-#ifdef OSX
+#ifdef OSX_PPC
 #   define _SETTING_BIG_ENDIAN_
 #else
 #   define _SETTING_LITTLE_ENDIAN_

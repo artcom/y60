@@ -53,7 +53,7 @@
 namespace AssurePolicy {
     
     DEFINE_NESTED_EXCEPTION(AssurePolicy, Violation, asl::Exception)
-
+#undef check
     struct Throw {
             static void check( bool myExpressionResult, const char * myExpression, 
                     const char * mySourceFileName, unsigned long mySourceLine)

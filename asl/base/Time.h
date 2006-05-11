@@ -39,6 +39,9 @@
     #include <windows.h>
     #include <mmsystem.h>
 #else
+    #ifdef OSX
+        #include <Carbon/Carbon.h>
+    #endif
     #include <sys/time.h>
     #include <unistd.h>
 #endif
@@ -87,45 +90,45 @@ get_cycles() {
 namespace asl {
 
 
-	/**
-	 * @ingroup aslbase
-	 * Wrapper around a milliseconds precise time.
-	 *
-	 */
-	class Time {
-	private:
+        /**
+         * @ingroup aslbase
+         * Wrapper around a milliseconds precise time.
+         *
+         */
+        class Time {
+        private:
 #ifdef WIN32
         static const long long SECS_BETWEEN_EPOCHS = 11644473600;
         static const long long SECS_TO_100NS = 10000000; /* 10^7 */
-		struct timeval {
-			long tv_sec;
-			long tv_usec;
-		};
+                struct timeval {
+                        long tv_sec;
+                        long tv_usec;
+                };
 #endif
-		struct timeval when;
+                struct timeval when;
 
-	public:
-		/**
-		 * Default Constructor. Creates an instance that holds the current
+        public:
+                /**
+                 * Default Constructor. Creates an instance that holds the current
          * time (GMT).
-		 */
-		Time() {
-			setNow();
-		};
-		/**
-		 * Constructor. 
-		 * @param secs Number of seconds. If this has to be a absolute time,
+                 */
+                Time() {
+                        setNow();
+                };
+                /**
+                 * Constructor. 
+                 * @param secs Number of seconds. If this has to be a absolute time,
          *             the number of seconds since 1.1.1970 0:00.
-		 */
-		Time(const double secs) {
-			when.tv_sec=static_cast<time_t>(floor(secs));
-			when.tv_usec=static_cast<time_t>(fmod(secs, 1.0)*1.0e6);
-		}
-		/**
-		 * Sets the instance to the current time (GMT).
-		 * @return *this
-		 */
-		Time& setNow() {
+                 */
+                Time(const double secs) {
+                        when.tv_sec=static_cast<time_t>(floor(secs));
+                        when.tv_usec=static_cast<time_t>(fmod(secs, 1.0)*1.0e6);
+                }
+                /**
+                 * Sets the instance to the current time (GMT).
+                 * @return *this
+                 */
+                Time& setNow() {
 #ifdef WIN32
 
             long long myBigValue = 0;
@@ -135,42 +138,42 @@ namespace asl {
             when.tv_sec = (long) myBigTempValue;
             myBigTempValue = (myBigValue % SECS_TO_100NS) / 10;
             when.tv_usec = (unsigned long) myBigTempValue;
-			//unsigned long myTime = timeGetTime();
+                        //unsigned long myTime = timeGetTime();
 
-			//when.tv_sec  = myTime / 1000;
-			//when.tv_usec = (myTime % 1000) * 1000;
+                        //when.tv_sec  = myTime / 1000;
+                        //when.tv_usec = (myTime % 1000) * 1000;
 #else
-			gettimeofday(&when, 0);
+                        gettimeofday(&when, 0);
 #endif
-			return *this;
-		};
-		int secs() {
-			return when.tv_sec;
-		};
-		int usecs() {
-			return when.tv_usec;
-		};
-		bool operator==(const Time & t) const {
-			return((when.tv_sec==t.when.tv_sec) && (when.tv_usec==t.when.tv_usec));
-		};
-		bool operator!=(const Time & t) const {
-			return((when.tv_sec!=t.when.tv_sec) || (when.tv_usec!=t.when.tv_usec));
-		};
-		bool operator>(const Time & t) const {
-			return( (when.tv_sec==t.when.tv_sec) ? (when.tv_usec>t.when.tv_usec) : (when.tv_sec>t.when.tv_sec));
-		};
-		bool operator<(const Time & t) const {
-			return( (when.tv_sec==t.when.tv_sec) ? (when.tv_usec<t.when.tv_usec) : (when.tv_sec<t.when.tv_sec));
-		};
-		bool operator>=(const Time & t) const {
-			return *this > t || t == *this;
-		};
-		bool operator<=(const Time & t) const {
-			return *this < t || t == *this;
-		};
-		operator double() const {
-			return (double)when.tv_sec+(double)when.tv_usec/1.0e6;
-		};
+                        return *this;
+                };
+                int secs() {
+                        return when.tv_sec;
+                };
+                int usecs() {
+                        return when.tv_usec;
+                };
+                bool operator==(const Time & t) const {
+                        return((when.tv_sec==t.when.tv_sec) && (when.tv_usec==t.when.tv_usec));
+                };
+                bool operator!=(const Time & t) const {
+                        return((when.tv_sec!=t.when.tv_sec) || (when.tv_usec!=t.when.tv_usec));
+                };
+                bool operator>(const Time & t) const {
+                        return( (when.tv_sec==t.when.tv_sec) ? (when.tv_usec>t.when.tv_usec) : (when.tv_sec>t.when.tv_sec));
+                };
+                bool operator<(const Time & t) const {
+                        return( (when.tv_sec==t.when.tv_sec) ? (when.tv_usec<t.when.tv_usec) : (when.tv_sec<t.when.tv_sec));
+                };
+                bool operator>=(const Time & t) const {
+                        return *this > t || t == *this;
+                };
+                bool operator<=(const Time & t) const {
+                        return *this < t || t == *this;
+                };
+                operator double() const {
+                        return (double)when.tv_sec+(double)when.tv_usec/1.0e6;
+                };
         operator const timeval() const {
             return when;
         };
@@ -181,19 +184,19 @@ namespace asl {
             return myTimeSpec;
         };
 
-		long long micros() const {
-			return when.tv_sec * 1000000L + when.tv_usec;
-		}
+                long long micros() const {
+                        return when.tv_sec * 1000000L + when.tv_usec;
+                }
 
-		long long millis() const {
-			return when.tv_sec * 1000L + when.tv_usec/1000L;
-		}
-		inline std::ostream& print(std::ostream& s) const;
-	};
+                long long millis() const {
+                        return when.tv_sec * 1000L + when.tv_usec/1000L;
+                }
+                inline std::ostream& print(std::ostream& s) const;
+        };
 
-	inline std::ostream& Time::print(std::ostream& s) const
-	{
-		struct tm *tp;
+        inline std::ostream& Time::print(std::ostream& s) const
+        {
+                struct tm *tp;
         tp=gmtime((time_t*)&when.tv_sec);
         if ( s.iword(TimeStreamFormater::ourIsFormatedFlagIndex) ) {
             std::string myFormatString( static_cast<const char * >(
@@ -259,63 +262,68 @@ namespace asl {
         }
 
         return s;
-	};
+        };
 
 #ifdef WIN32
-	inline void msleep(unsigned long theMilliSeconds) {
-		Sleep(theMilliSeconds);
-	}
+        inline void msleep(unsigned long theMilliSeconds) {
+                Sleep(theMilliSeconds);
+        }
 #else
-	inline void msleep(unsigned long theMilliSeconds) {
-		usleep(theMilliSeconds * 1000);
-	}
+        inline void msleep(unsigned long theMilliSeconds) {
+                usleep(theMilliSeconds * 1000);
+        }
 #endif
 
-	class NanoTime {
-	public:
-		NanoTime() {
-			setNow();
-		}
-		NanoTime(unsigned long long t) {
-			_myCounter = t;
-		}
-		unsigned long long ticks() const {
-			return _myCounter;
-		}
-		double nanos() const {
-			return _myCounter * nanoSecondsPerTick();
-		}
-		double micros() const {
-			return _myCounter * microSecondPerTick();
-		}
-		double millis() const {
-			return _myCounter * milliSecondPerTick();
-		}
-		double secs() const {
-			return seconds();
-		}
-		double seconds() const {
-			return double(_myCounter)/double(perSecond());
-		}
+        class NanoTime {
+        public:
+                NanoTime() {
+                        setNow();
+                }
+                NanoTime(unsigned long long t) {
+                        _myCounter = t;
+                }
+                unsigned long long ticks() const {
+                        return _myCounter;
+                }
+                double nanos() const {
+                        return _myCounter * nanoSecondsPerTick();
+                }
+                double micros() const {
+                        return _myCounter * microSecondPerTick();
+                }
+                double millis() const {
+                        return _myCounter * milliSecondPerTick();
+                }
+                double secs() const {
+                        return seconds();
+                }
+                double seconds() const {
+                        return double(_myCounter)/double(perSecond());
+                }
 
-		void setNow() {
+                void setNow() {
 #ifdef WIN32
-			QueryPerformanceCounter((LARGE_INTEGER*)&_myCounter);
+                    QueryPerformanceCounter((LARGE_INTEGER*)&_myCounter);
 #else
-#ifdef USE_TIME_OF_DAY
-            timespec tv;
-            clock_gettime(CLOCK_REALTIME, &tv);
-            _myCounter = tv.tv_sec * asl::Unsigned64(1000000000) + tv.tv_nsec;
-#else
-			_myCounter = get_cycles();
-#endif            
-#endif
-		}
-		static unsigned long long perSecond() {
-			static unsigned long long perSecond = 0;
-			if (perSecond == 0) {
+    #ifdef OSX
+                    Nanoseconds myNanos=AbsoluteToNanoseconds(UpTime());
+                    _myCounter = *(asl::Unsigned64*)(&myNanos);
+    #else
+        #ifdef USE_TIME_OF_DAY
+                    timespec tv;
+                    clock_gettime(CLOCK_REALTIME, &tv);
+                    _myCounter = tv.tv_sec * asl::Unsigned64(1000000000) + tv.tv_nsec;
+        #else
+                    _myCounter = get_cycles();
+        #endif
+    #endif
+ #endif
+                }
+                static unsigned long long perSecond() {
+                        static unsigned long long perSecond = 0;
+                        if (perSecond == 0) {
 #ifdef WIN32
-				QueryPerformanceFrequency((LARGE_INTEGER*)&perSecond);
+                                QueryPerformanceFrequency((LARGE_INTEGER*)&perSecond);
 #else
 #ifdef USE_TIME_OF_DAY                
                 perSecond = asl::Unsigned64(1000000000); // nsec            
@@ -325,17 +333,17 @@ namespace asl {
                 perSecond *=1000;
                 */
 
-				double myCalibTime = Time();
-				unsigned long long myCalibCounter = get_cycles();
-				msleep(200);
-				double myCalibDurationTime = Time() - myCalibTime;
-				unsigned long long myCalibCounterElapsed = get_cycles() - myCalibCounter;
-				perSecond = static_cast<unsigned long long>(myCalibCounterElapsed/myCalibDurationTime);
+                                double myCalibTime = Time();
+                                unsigned long long myCalibCounter = get_cycles();
+                                msleep(200);
+                                double myCalibDurationTime = Time() - myCalibTime;
+                                unsigned long long myCalibCounterElapsed = get_cycles() - myCalibCounter;
+                                perSecond = static_cast<unsigned long long>(myCalibCounterElapsed/myCalibDurationTime);
 #endif                
 #endif
-			}
-			return perSecond;
-		}
+                        }
+                        return perSecond;
+                }
 
         static double nanoSecondsPerTick() {
             static double myNanoSecondsPerTick = 1E9 / double(perSecond());
@@ -355,65 +363,65 @@ namespace asl {
 
         static double _myTicksPerMilliSecond;
 
-		NanoTime & operator+=(const NanoTime & theOther) {
-			_myCounter += theOther.ticks();
-			return *this;
-		}
-	private:
-		unsigned long long _myCounter;
-	};
-	inline
-	NanoTime operator-(const NanoTime & a, const NanoTime & b) {
-		return NanoTime(a.ticks() - b.ticks());
-	}
-	inline
-	NanoTime operator+(const NanoTime & a, const NanoTime & b) {
-		return NanoTime(a.ticks() + b.ticks());
-	}
-	inline
-	bool operator>(const NanoTime & a, const NanoTime & b) {
-		return a.ticks() > b.ticks();
-	}
+                NanoTime & operator+=(const NanoTime & theOther) {
+                        _myCounter += theOther.ticks();
+                        return *this;
+                }
+        private:
+                unsigned long long _myCounter;
+        };
+        inline
+        NanoTime operator-(const NanoTime & a, const NanoTime & b) {
+                return NanoTime(a.ticks() - b.ticks());
+        }
+        inline
+        NanoTime operator+(const NanoTime & a, const NanoTime & b) {
+                return NanoTime(a.ticks() + b.ticks());
+        }
+        inline
+        bool operator>(const NanoTime & a, const NanoTime & b) {
+                return a.ticks() > b.ticks();
+        }
     inline
-	bool operator<(const NanoTime & a, const NanoTime & b) {
-		return a.ticks() < b.ticks();
-	}
+        bool operator<(const NanoTime & a, const NanoTime & b) {
+                return a.ticks() < b.ticks();
+        }
     inline
- 	bool operator>=(const NanoTime & a, const NanoTime & b) {
-		return a.ticks() >= b.ticks();
-	}
+        bool operator>=(const NanoTime & a, const NanoTime & b) {
+                return a.ticks() >= b.ticks();
+        }
     inline
-	bool operator<=(const NanoTime & a, const NanoTime & b) {
-		return a.ticks() <= b.ticks();
-	}
+        bool operator<=(const NanoTime & a, const NanoTime & b) {
+                return a.ticks() <= b.ticks();
+        }
     inline
-	bool operator==(const NanoTime & a, const NanoTime & b) {
-		return a.ticks() == b.ticks();
-	}
+        bool operator==(const NanoTime & a, const NanoTime & b) {
+                return a.ticks() == b.ticks();
+        }
     inline
-	bool operator!=(const NanoTime & a, const NanoTime & b) {
-		return a.ticks() != b.ticks();
-	}
+        bool operator!=(const NanoTime & a, const NanoTime & b) {
+                return a.ticks() != b.ticks();
+        }
 
     class NoisyScopeTimer {
-	public:
+        public:
         NoisyScopeTimer(const std::string & theTitle = "", int theCount = 1)
             : _myCount(theCount), _myTitle(theTitle)
         {
             std::cerr << ":: NoisyScopeTimer start: " << theTitle << std::endl;
-			_myStartTime.setNow();
-		}
-		~NoisyScopeTimer() {
+                        _myStartTime.setNow();
+                }
+                ~NoisyScopeTimer() {
             NanoTime myTimeTaken(NanoTime().ticks()-_myStartTime.ticks());
             std::cerr << ":: Time " << myTimeTaken.micros()/1000.0 << " ms, count = "<<_myCount<<", mio.per sec. = "<<_myCount/myTimeTaken.secs()/1000/1000<<std::endl;
             std::cerr << ":: NoisyScopeTimer ready: " << _myTitle << std::endl;
-		}
-	private:
+                }
+        private:
         std::string _myTitle;
         int _myCount;
 
-		NanoTime _myStartTime;
-	};
+                NanoTime _myStartTime;
+        };
     inline std::ostream & operator<<(std::ostream& s, const asl::Time & t) {
         return t.print(s);
     };

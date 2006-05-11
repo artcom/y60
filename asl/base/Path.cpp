@@ -16,63 +16,124 @@
 */
 
 #include "Path.h"
-
+#include "Assure.h"
 #include "Logger.h"
+#ifdef OSX
+#else
 #include <glib.h>
+#endif
+
 
 namespace asl {
 
-Path::Path() : _myLocaleChars(0)
-{
+Path::Path() {
+#ifdef OSX
+#else
+	_myLocaleChars = 0;
+#endif
 }
 
-Path::Path(const char * theString, StringEncoding theEncoding) : _myLocaleChars(0)
+Path::Path(const char * theString, StringEncoding theEncoding)
 {
+#ifdef OSX
+#else
+	_myLocaleChars = 0;
+#endif
     assign(theString, theEncoding);
 }
 
-Path::Path(const std::string & theString, StringEncoding theEncoding) : _myLocaleChars(0)
+Path::Path(const std::string & theString, StringEncoding theEncoding)
 {
+#ifdef OSX
+#else
+	_myLocaleChars = 0;
+#endif
     assign(theString.c_str(), theEncoding);
 }
 
-Path::Path(const Path & theOther) : _myLocaleChars(0) {
+Path::Path(const Path & theOther) {
+#ifdef OSX
+	_myString = CFStringCreateCopy(0, theOther._myString);
+#else
+	_myLocaleChars = 0;
     assign(theOther._myLocaleChars, Locale);
+#endif
 }
 
 Path::~Path() {
+#ifdef OSX
+#else
     if (_myLocaleChars) {
         g_free(_myLocaleChars);
-        _myLocaleChars = 0;
     }
+     _myLocaleChars = 0;
+#endif
 }
 
 void
 Path::assign(const char * theString, StringEncoding theEncoding) {
+#ifdef OSX
+#else
     if (_myLocaleChars) {
         g_free(_myLocaleChars);
         _myLocaleChars = 0;
     }
+#endif
     switch (theEncoding) {
         case UTF8:
+#ifdef OSX
+			_myString = CFStringCreateWithCString(NULL, theString, kCFStringEncodingUTF8);
+#else
             _myLocaleChars = g_filename_from_utf8(theString, -1, 0, 0, 0);
+#endif
             break;
         case Locale:
+#ifdef OSX
+			_myString = CFStringCreateWithCString(NULL, theString, CFStringGetSystemEncoding());
+#else
             _myLocaleChars = g_strdup(theString); 
+#endif
             break;
     }
 }
     
 std::string
 Path::toLocale() const {
+#ifdef OSX
+	CFRange myRange = CFRangeMake(0, CFStringGetLength(_myString));
+	CFIndex myBufferSize = 0;
+	std::string myResult;
+	CFIndex myCharCount = CFStringGetBytes(_myString, myRange, CFStringGetSystemEncoding(), '?', FALSE, 0, 0, &myBufferSize);
+	if (myCharCount) {
+		myResult.resize(myBufferSize);
+		CFIndex myExCharCount = CFStringGetBytes(_myString, myRange, CFStringGetSystemEncoding(), '?',
+													FALSE, (UInt8*)&(*(myResult.begin())), myBufferSize, &myBufferSize);
+		ASSURE_WITH(AssurePolicy::Throw, myExCharCount == myCharCount);
+	}
+	return myResult;
+#else
     if (_myLocaleChars == 0) {
         return std::string();
     }
     return std::string(_myLocaleChars);
+#endif
 }
 
 std::string 
 Path::toUTF8() const {
+#ifdef OSX
+	CFRange myRange = CFRangeMake(0, CFStringGetLength(_myString));
+	CFIndex myBufferSize = 0;
+	std::string myResult;
+	CFIndex myCharCount = CFStringGetBytes(_myString, myRange, kCFStringEncodingUTF8, '?', FALSE, 0, 0, &myBufferSize);
+	if (myCharCount) {
+		myResult.resize(myBufferSize);
+		CFIndex myExCharCount = CFStringGetBytes(_myString, myRange, kCFStringEncodingUTF8, '?',
+													FALSE, (UInt8*)&(*(myResult.begin())), myBufferSize, &myBufferSize);
+		ASSURE_WITH(AssurePolicy::Throw, myExCharCount == myCharCount);
+	}
+	return myResult;
+#else
     if (_myLocaleChars == 0) {
         return std::string();
     }
@@ -83,7 +144,8 @@ Path::toUTF8() const {
     }
     std::string myUTF8String(myUTF);
     g_free(myUTF);
-    return myUTF8String;
+   return myUTF8String;
+ #endif
 }
 
 
@@ -92,21 +154,33 @@ Path::operator=(const Path& theOther) {
 	if (this == &theOther) {
 		return *this;
 	}
+#ifdef OSX
+	_myString = CFStringCreateCopy(0, theOther._myString);
+#else
     assign(theOther._myLocaleChars, Locale);
+#endif
 	return *this;
 }
 
 bool
 Path::empty() const {
+#ifdef OSX
+ return CFStringGetLength(_myString) == 0;
+#else
     return _myLocaleChars == 0 || strlen(_myLocaleChars) == 0;
+#endif
 }
 
 bool
 Path::operator==(const Path& theOther) const {
+#ifdef OSX
+	return CFStringCompare(_myString, theOther._myString, 0) == kCFCompareEqualTo;
+#else
 	if (this->_myLocaleChars == theOther._myLocaleChars) {
 		return true;
 	}
     return strcmp(this->_myLocaleChars, theOther._myLocaleChars) == 0;
+#endif
 }
 
 std::ostream & operator << (std::ostream & os, const asl::Path & thePath) {

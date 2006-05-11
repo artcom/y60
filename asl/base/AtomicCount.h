@@ -41,7 +41,13 @@
 #ifndef _included_asl_AtomicCount_
 #define _included_asl_AtomicCount_
 
+#include "settings.h"
+
 #include <iostream>
+
+#ifdef OSX_X86
+    #include <libkern/OSAtomic.h>
+#endif
 
 /*! \addtogroup aslbase */
 /* @{ */
@@ -49,9 +55,13 @@
 // ATTENTION: The Mac OS X atomic counter is not tested on multiprocessor 
 //            machines because I don't have one. (HINT!) DS
 
-#ifdef LINUX
+#if defined(LINUX) || defined(OSX_X86)
+	#define UNIX_X86
+#endif
 
-typedef struct { volatile int counter; } atomic_t;
+#ifdef UNIX_X86 
+
+typedef struct { volatile asl::Signed32 counter; } atomic_t;
 
 #define ATOMIC_INIT(i)	{ (i) }
 
@@ -248,7 +258,7 @@ inline int atomic_conditional_decrement_SingleProcessor(atomic_t * pw )
 
 #endif
 
-#ifdef OSX
+#ifdef OSX_PPC
 
 // Taken from boost/detail/sp_counted_base_gcc_ppc.hpp.
 // This hasn't even been compiled, much less tested!
@@ -475,26 +485,26 @@ namespace asl
             inline
             explicit AtomicCount(long v)
             {
-#ifdef LINUX
+#ifdef UNIX_X86
                 atomic_t init = ATOMIC_INIT(v);
 				value = init;
 #endif
 #ifdef WIN32
 				value = v;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                 value = v;
 #endif
             }
 	        inline
 	    	void increment() {
-#ifdef LINUX
+#ifdef UNIX_X86
                	atomic_inc_SingleProcessor(&value);
 #endif
 #ifdef WIN32
-        		InterlockedIncrement(&value);
+        	InterlockedIncrement(&value);
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                 atomic_inc( & value);
 #endif
 	    	}
@@ -511,63 +521,63 @@ namespace asl
             
             inline
             long post_increment() {
-#ifdef LINUX
+#ifdef UNIX_X86
                	return atomic_post_inc_SingleProcessor(&value);
 #endif
 #ifdef WIN32
         		return InterlockedIncrement(&value)-1;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                 return atomic_inc(&value) - 1;
 #endif
 	    	}
             inline
 	    	long decrement_and_test() {
-#ifdef LINUX
+#ifdef UNIX_X86
                 return atomic_dec_and_test_SingleProcessor(&value);
 #endif
 #ifdef WIN32
         		return InterlockedDecrement(&value) == 0;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                 return atomic_dec(&value) == 0;
 #endif
 	    	}
             inline
             operator long() const
             {
-#ifdef LINUX
+#ifdef UNIX_X86
             	return atomic_read(&value);
 #endif
 #ifdef WIN32
 				return value;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                 return value;
 #endif
             }
             inline void set(long i) 
             {
-#ifdef LINUX
+#ifdef UNIX_X86
             	atomic_set(&value, i);
 #endif
 #ifdef WIN32
 				value = i;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                 value = i;
 #endif
             }
         private:
             AtomicCount(AtomicCount const &);
             AtomicCount & operator=(AtomicCount const &);
-#ifdef LINUX
+#ifdef UNIX_X86
             atomic_t value;
 #endif
 #ifdef WIN32
 			volatile long value;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
 			int value;
 #endif
 	};
@@ -577,27 +587,27 @@ namespace asl
             inline
             explicit AtomicCount(long v)
             {
-#ifdef LINUX
+#ifdef UNIX_X86
                 atomic_t init = ATOMIC_INIT(v);
 				value = init;
 #endif
 #ifdef WIN32
 				value = v;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
 				value = v;
 #endif
             }
 	
             inline
 	    	void increment() {
-#ifdef LINUX
+#ifdef UNIX_X86
                	atomic_inc(&value);
 #endif
 #ifdef WIN32
         		InterlockedIncrement(&value);
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                	atomic_inc(&value);
 #endif
 	    	}
@@ -614,26 +624,27 @@ namespace asl
 
             inline
             long post_increment() {
-#ifdef LINUX
-               	return atomic_post_inc(&value);
+#ifdef UNIX_X86
+				return OSAtomicAdd32(1, (int32_t*)&value)-1;
+               	//return atomic_post_inc(&value);
 #endif
 #ifdef WIN32
         		return InterlockedIncrement(&value)-1;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                	return atomic_inc(&value) - 1;
 #endif
 	    	}
 
             inline
 	    	long decrement_and_test() {
-#ifdef LINUX
+#ifdef UNIX_X86
                 return atomic_dec_and_test(&value);
 #endif
 #ifdef WIN32
-        		return InterlockedDecrement(&value) == 0;
+        	return InterlockedDecrement(&value) == 0;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                	return atomic_dec(&value) == 0;
 #endif
 	    	}
@@ -641,38 +652,38 @@ namespace asl
             inline
             operator long() const
             {
-#ifdef LINUX
+#ifdef UNIX_X86
             	return atomic_read(&value);
 #endif
 #ifdef WIN32
-				return value;
+		return value;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
                	return value;
 #endif
             }
             inline void set(long i) 
             {
-#ifdef LINUX
+#ifdef UNIX_X86
             	atomic_set(&value, i);
 #endif
 #ifdef WIN32
 				value = i;
 #endif
-#ifdef OSX
-				value = i;
+#ifdef OSX_PPC
+			    value = i;
 #endif
             }
         private:
             AtomicCount(AtomicCount const &);
             AtomicCount & operator=(AtomicCount const &);
-#ifdef LINUX
+#ifdef UNIX_X86
             atomic_t value;
 #endif
 #ifdef WIN32
 			volatile long value;
 #endif
-#ifdef OSX
+#ifdef OSX_PPC
 			int value;
 #endif
 	};

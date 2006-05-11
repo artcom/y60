@@ -37,7 +37,12 @@
 #include <iostream>
 #include <vector>
 
+using namespace asl;
 using namespace std;
+
+#ifdef OSX
+namespace asl {
+#endif
 
 // #define SINGLE_CPU
 
@@ -79,12 +84,10 @@ public:
     }
 };
 
-using namespace asl;
 
 #ifdef _SETTING_USE_SGI_STRINGS_
 #endif
 #define perform_std_string_test
-
 template <int N, class ThreadingModel = asl::MultiProcessor>
 class PtrUnitTest : public TemplateUnitTest {
 public:
@@ -460,6 +463,10 @@ public:
         addTest(new PtrUnitPerfTest<0,MultiProcessor>);
     }
 };
+
+#ifdef OSX
+}
+#endif
 
 
 int main(int argc, char *argv[]) {

@@ -23,6 +23,9 @@
 #include <iostream>
 #include <string>
 
+#ifdef OSX
+    #include <Carbon/Carbon.h>
+#endif
 
 /*! \addtogroup aslbase */
 /* @{ */
@@ -44,7 +47,11 @@ public:
     std::string toLocale() const;
     std::string toUTF8() const;
 private:
+#ifdef OSX
+	CFStringRef _myString;	
+#else
     char * _myLocaleChars;
+#endif
 };
 
 std::ostream & operator << (std::ostream & os, const asl::Path & thePath);

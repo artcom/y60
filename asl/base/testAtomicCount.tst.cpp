@@ -38,30 +38,31 @@ public:
         : TemplateUnitTest("AtomicCountTemplateUnitTest",theTemplateArgument) {}
     void run() {
         asl::AtomicCount<T> myCount(0);
-        ENSURE(myCount == 0);
+        ENSURE_EQUAL(myCount , 0);
         myCount.increment();
-        ENSURE(myCount == 1);
+        ENSURE_EQUAL(myCount , 1);
         myCount.increment();
-        ENSURE(myCount == 2);
+        ENSURE_EQUAL(myCount , 2);
         ENSURE(!myCount.decrement_and_test());
-        ENSURE(myCount == 1);
-        ENSURE(myCount.post_increment() == 1);
-        ENSURE(myCount == 2);
+        ENSURE_EQUAL(myCount , 1);
+		long myValue = myCount.post_increment();
+        ENSURE_EQUAL(myValue , 1);
+        ENSURE_EQUAL(myCount , 2);
         ENSURE(!myCount.decrement_and_test());
-        ENSURE(myCount == 1);
+        ENSURE_EQUAL(myCount , 1);
         ENSURE(myCount.decrement_and_test());
-        ENSURE(myCount == 0);
+        ENSURE_EQUAL(myCount , 0);
         ENSURE(!myCount.decrement_and_test());
-        ENSURE(myCount == -1);
+        ENSURE_EQUAL(myCount , -1);
         myCount.set(2);
         ENSURE(!myCount.conditional_decrement());
-        ENSURE(myCount == 1);
+        ENSURE_EQUAL(myCount , 1);
         ENSURE(myCount.conditional_decrement());
-        ENSURE(myCount == 0);
+        ENSURE_EQUAL(myCount , 0);
         ENSURE(!myCount.conditional_decrement());
-        ENSURE(myCount == 0);
+        ENSURE_EQUAL(myCount , 0);
         ENSURE(!myCount.conditional_increment());
-        ENSURE(myCount == 0);
+        ENSURE_EQUAL(myCount , 0);
         myCount.set(1);
         ENSURE(myCount.conditional_increment());
     }
@@ -141,7 +142,8 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new AtomicCountTemplateUnitTest<asl::SingleThreaded>("<SingleThreaded>"),100);
-        addTest(new AtomicCountTemplateUnitTest<asl::SingleProcessor>("<SingleProcessor>"),100);
+		// TODO: run this test only on machines with a single processor, or maybe we drop it at all
+        // addTest(new AtomicCountTemplateUnitTest<asl::SingleProcessor>("<SingleProcessor>"),100);
         addTest(new AtomicCountTemplateUnitTest<asl::MultiProcessor>("<MultiProcessor>"),100);
         addTest(new AtomicThreadSafetyTest());
     }

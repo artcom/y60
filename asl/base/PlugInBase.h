@@ -77,7 +77,7 @@ protected:
 
 typedef Ptr<PlugInBase> PlugInBasePtr;
 
-typedef PlugInBase* (*InstantiatePlugInFunctionPtr)(DLHandle theHandle);
+typedef PlugInBase * (*InstantiatePlugInFunctionPtr)(DLHandle theHandle);
 /*
 extern "C" EXPORT PlugInBase* instantiatePlugIn(DLHandle theHandle);
 */

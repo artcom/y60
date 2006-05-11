@@ -62,7 +62,7 @@ string PlugInManager :: getSearchPath() const {
 }
 
 
-Ptr<PlugInBase> PlugInManager :: getPlugIn(const std::string & theName) {
+asl::Ptr<PlugInBase> PlugInManager :: getPlugIn(const std::string & theName) {
     PlugInCache::iterator i = _myCache.find(theName);
     Ptr<PlugInBase> myPlugIn;
     if (i != _myCache.end() && (myPlugIn = i->second.lock())) {
@@ -94,7 +94,7 @@ void* PlugInManager :: getFunction(DLHandle theHandle, const std::string & theSy
     return myFunction;
 }
 
-Ptr<PlugInBase> PlugInManager :: loadPlugIn(const std::string & theName) {
+asl::Ptr<PlugInBase> PlugInManager :: loadPlugIn(const std::string & theName) {
     string myFilename = searchFile(getPlugInFileName(theName), _mySearchPath);
     if (myFilename.empty()) {
         throw PlugInException(string("PlugIn '") +theName+"' not found in search path '"+ _mySearchPath +"'", PLUS_FILE_LINE);
