@@ -624,9 +624,11 @@ namespace asl
 
             inline
             long post_increment() {
-#ifdef UNIX_X86
+#ifdef OSX_X86
 				return OSAtomicAdd32(1, (int32_t*)&value)-1;
-               	//return atomic_post_inc(&value);
+#endif
+#ifdef LINUX
+               	return atomic_post_inc(&value);
 #endif
 #ifdef WIN32
         		return InterlockedIncrement(&value)-1;
