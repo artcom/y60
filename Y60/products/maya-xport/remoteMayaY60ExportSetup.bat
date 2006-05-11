@@ -14,10 +14,10 @@ ECHO Creating installation directory %INSTALL_PATH%
 MKDIR %INSTALL_PATH%\plug-ins
 MKDIR %INSTALL_PATH%\scripts
 
-ECHO Installing mayaY60-Exporter files...
-COPY /Y scripts\* "%ProgramFiles%\ART+COM\mayaY60export\scripts"
-COPY /Y plug-ins\* "%ProgramFiles%\ART+COM\mayaY60export\plug-ins"
-COPY /Y *.dll "%MAYA_PATH%\bin"
+echo Installing mayaY60-Exporter files from balthasar...
+copy /Y \\balthasar\dist\mayaY60-export_setup\scripts\* "%ProgramFiles%\ART+COM\mayaY60export\scripts"
+copy /Y \\balthasar\dist\mayaY60-export_setup\plug-ins\* "%ProgramFiles%\ART+COM\mayaY60export\plug-ins"
+copy /Y \\balthasar\dist\mayaY60-export_setup\*.dll "%MAYA_PATH%\bin"
 
 ECHO Creating module file %MODULE_FILE%
 ECHO + mayaY60export %MAYA_VERSION% %INSTALL_PATH% > %MODULE_FILE%
