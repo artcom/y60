@@ -18,6 +18,8 @@
 use("SceneViewer.js");
 plug("y60JSSound");
 
+const ENDLESS_TEST = false;
+
 function FFMpegTest(theArguments) {
     var Public = this;
     var Base   = {};
@@ -90,10 +92,10 @@ function FFMpegTest(theArguments) {
         "setupStopTest()",
         "setupLoopTest()",
         "setupPauseTest()",
+        "setupPauseStopTest()",
+        "setupStopPauseTest()",
 //        "setupSeekBackTest()",
 //        "setupSeekFwdTest()",
-//        "setupPauseStopTest()",
-//        "setupStopPauseTest()",
             //                "setupLongTest(true)"
     ];
 
@@ -102,17 +104,25 @@ function FFMpegTest(theArguments) {
             print ("Test finished: "+_myTestName);
         }
         _myCurTestIndex++;
+        var myTestFunc;
         if (_myCurTestIndex < _myTests.length) {
-            var myTestFunc = _myTests[_myCurTestIndex];
+            myTestFunc = _myTests[_myCurTestIndex];
             print(myTestFunc);
             eval(myTestFunc);
         } else {
-            if (_myMovie) {
-                _myMovie.removeFromScene();
-                delete _myMovie;
-                _myMovie = 0;
+            if (ENDLESS_TEST) {
+                _myCurTestIndex = 0;
+                myTestFunc = _myTests[_myCurTestIndex];
+                print(myTestFunc);
+                eval(myTestFunc);
+            } else {
+                if (_myMovie) {
+                    _myMovie.removeFromScene();
+                    delete _myMovie;
+                    _myMovie = 0;
+                }
+                exit(0);
             }
-            exit(0);
         }
     }
 
@@ -166,8 +176,8 @@ function FFMpegTest(theArguments) {
         window.swapInterval = 10;
         window.setTimeout("testPlaying", 1000);
         window.setTimeout("stopSwapInterval", 9000);
-        window.setTimeout("testStopped", 10000);
-        window.setTimeout("nextTest", 10100);
+        window.setTimeout("testStopped", 13000);
+        window.setTimeout("nextTest", 13100);
     }
 
     function setupStopTest() {
