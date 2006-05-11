@@ -41,15 +41,15 @@ public:
     void run() {
         {
             cout << "Loading PlugIn " << myPlugInName << endl;
-	        Ptr<PlugInBase> myPlugIn = PlugInManager::get().getPlugIn(myPlugInName);
+	        asl::Ptr<PlugInBase> myPlugIn = PlugInManager::get().getPlugIn(myPlugInName);
         }
         ENSURE(!PlugInManager::get().isLoaded(myPlugInName));    
 
         {
             cout << "Loading PlugIn twice" << myPlugInName << endl;
-	        Ptr<PlugInBase> myPlugIn = PlugInManager::get().getPlugIn(myPlugInName);
+	        asl::Ptr<PlugInBase> myPlugIn = PlugInManager::get().getPlugIn(myPlugInName);
             {
-                Ptr<PlugInBase> myPlugIn2 = PlugInManager::get().getPlugIn(myPlugInName);
+                asl::Ptr<PlugInBase> myPlugIn2 = PlugInManager::get().getPlugIn(myPlugInName);
             }
             ENSURE(PlugInManager::get().isLoaded(myPlugInName));    
         }

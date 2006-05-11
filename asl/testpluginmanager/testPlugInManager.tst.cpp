@@ -46,7 +46,7 @@ public:
         dynamic_cast<ITest*>(&*_myPlugIn)->addTests(*this);
     }
 protected:
-    Ptr<PlugInBase> _myPlugIn;
+    asl::Ptr<PlugInBase> _myPlugIn;
 };
 
 

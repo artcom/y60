@@ -22,7 +22,10 @@
 
 #include "Nodes.h"
 #include <asl/UnitTest.h>
+#ifdef OSX
+#else
 #include <glib.h>
+#endif
 #include <sstream>
 
 using namespace std; 
@@ -38,7 +41,9 @@ class XMLUTF_8Test : public UnitTest {
             {
                 string myString = myDoc.childNode("utf8-test")->getAttributeString("auml");
                 ENSURE(myString.size() == 2); // 2 bytes
-                ENSURE(g_utf8_strlen(myString.c_str(), -1) == 1); // one utf8 char
+                ENSURE(myString[0] == char(0xC3)); 
+                ENSURE(myString[1] == char(0xA4)); 
+                //ENSURE(g_utf8_strlen(myString.c_str(), -1) == 1); // one utf8 char
             }
 
             ostringstream myBuffer;
@@ -48,7 +53,9 @@ class XMLUTF_8Test : public UnitTest {
             {
                 string myString = myOtherDoc.childNode("utf8-test")->getAttributeString("auml");
                 ENSURE(myString.size() == 2); // 2 bytes
-                ENSURE(g_utf8_strlen(myString.c_str(), -1) == 1); // one utf8 char
+                ENSURE(myString[0] == char(0xC3)); 
+                ENSURE(myString[1] == char(0xA4)); 
+                //ENSURE(g_utf8_strlen(myString.c_str(), -1) == 1); // one utf8 char
             }
             
         }

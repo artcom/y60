@@ -44,25 +44,25 @@ class IntersectionTest : public UnitTest {
             Point3f D(2.0f, 0.0f, 0.0f);
             Point3f E(3.0f, 1.0f, 0.0f);
             {
-                Line<float> myLine(A,B);
+                asl::Line<float> myLine(A,B);
                 ENSURE(almostEqual(distance(myLine,C), 1.0f));
                 LineSegment<float> mySegment(A,B);
                 ENSURE(almostEqual(distance(mySegment,C), sqrt(2.0f)));
             }
             {
-                Line<float> myLine(B,A);
+                asl::Line<float> myLine(B,A);
                 ENSURE(almostEqual(distance(myLine,C), 1.0f));
                 LineSegment<float> mySegment(B,A);
                 ENSURE(almostEqual(distance(mySegment,C), sqrt(2.0f)));
             }
             {
-                Line<float> myLine(A,D);
+                asl::Line<float> myLine(A,D);
                 ENSURE(almostEqual(distance(myLine,C), 1.0f));
                 LineSegment<float> mySegment(A,D);
                 ENSURE(almostEqual(distance(mySegment,C), 1.0f));
             }
             {
-                Line<float> myLine(D,B);
+                asl::Line<float> myLine(D,B);
                 ENSURE(almostEqual(distance(myLine,C), 1.0f));
                 LineSegment<float> mySegment(D,B);
                 ENSURE(almostEqual(distance(mySegment,C), 1.0f));
@@ -125,7 +125,7 @@ class IntersectionTest : public UnitTest {
             }
             // Plane / Plane intersection
             {
-                typedef Line<float> Linef;
+                typedef asl::Line<float> Linef;
                 Planef myPlane1(Vector3f(1,0,0), 0.0f);
                 Planef myPlane2(Vector3f(0,1,0), 100.0f);
                 Planef myCoplanarPlane1(Vector3f(1,0,0), 100.0f);

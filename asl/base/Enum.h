@@ -221,6 +221,10 @@ class Enum {
         /** Performs some simple checks and quits the application if
          * any error is detected. Tries to print helpful error messages.
          */
+#ifdef verify
+#warning verify defined as macro, undefining
+#undef verify
+#endif
         static bool verify(const char * theFile, unsigned theLine) {
             for (unsigned i = 0; i < THE_MAX; ++i) {
                 if (_ourStrings[i] == 0 ) {

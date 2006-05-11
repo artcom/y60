@@ -371,11 +371,11 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
 
 			// Test Line
 			{
-				Line<double> myLine;
-				Line<double> myOriginPointer(Point3d(-1,0,0), Vector3d(1,0,0));
-				Line<double> myOriginPointer2(Point3d(-1,0,0), Point3d(0,0,0));
+				asl::Line<double> myLine;
+				asl::Line<double> myOriginPointer(Point3d(-1,0,0), Vector3d(1,0,0));
+				asl::Line<double> myOriginPointer2(Point3d(-1,0,0), Point3d(0,0,0));
 
-				Line<double>myLine2(myOriginPointer2);
+				asl::Line<double>myLine2(myOriginPointer2);
 				bool myLine2PositionComparision = almostEqual(myLine2.origin, myOriginPointer2.origin);
 				bool myLine2TargetComparision   = almostEqual(myLine2.direction, myOriginPointer2.direction);
 				ENSURE_MSG( myLine2PositionComparision && myLine2TargetComparision,
@@ -400,19 +400,19 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
 							   mySphere3.radius == mySphere2.radius), "Sphere copy ctor.")
 
 				Point3d myIntersectionP1, myIntersectionP2;
-				Line<double>myPhaser(Point3d(1,0,1), Vector3d(0,1,0) );
+				asl::Line<double>myPhaser(Point3d(1,0,1), Vector3d(0,1,0) );
 				bool myIntersection = intersection(mySphere3, myPhaser, myIntersectionP1, myIntersectionP2);
 				ENSURE_MSG( myIntersection, "Intersection Line <-> Sphere")
 				ENSURE_MSG( almostEqual(myIntersectionP1, Point3d(1, 11, 1)), "1st intersection line sphere")
 				ENSURE_MSG( almostEqual(myIntersectionP2, Point3d(1, -9, 1)), "2nd intersection line sphere")
 
-				Line<double>myPhaser2(Point3d(1,20,1), Vector3d(1,0,0) );
+				asl::Line<double>myPhaser2(Point3d(1,20,1), Vector3d(1,0,0) );
 				bool myIntersection2 = intersection(mySphere3, myPhaser2, myIntersectionP1, myIntersectionP2);
 				ENSURE_MSG( !myIntersection2, "NonIntersection Line <-> Sphere")
 		    }
 
 			{ // nearest stuff
-                Line<double> myLine(Point3d(0,1,0), Vector3d(1,0,0) );
+                asl::Line<double> myLine(Point3d(0,1,0), Vector3d(1,0,0) );
                 double myDistance = distance(Point3d(0,3,0), myLine);
                 Point3d myNearest = nearest(Point3d(0,3,0), myLine);
                 ENSURE(almostEqual(myNearest, Point3d(0,1,0)));
@@ -460,13 +460,13 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
         ENSURE_MSG( almostEqual(myProjectedVec2, Vector3d(0, -1, 0)), "Vector3 projection to a Plane.")
 
             // test line <-> plane intersection
-            Line<double>myLine(Point3d(0,0,0), Vector3d(1,0,0));
+            asl::Line<double>myLine(Point3d(0,0,0), Vector3d(1,0,0));
 
         Point3d myIntersection;
         bool myIntersected = intersection(myLine, myPlane2, myIntersection);
         ENSURE_MSG(!myIntersected, "Line parallel to plane should not intersect.");
 
-        Line<double>myLine2(Point3d(0,0,0), Vector3d(0,1,0) );
+        asl::Line<double>myLine2(Point3d(0,0,0), Vector3d(0,1,0) );
         const Plane<double> myPlane7(Vector3d(0,1,0), -1.0);
         bool myIntersected2 = intersection(myLine2, myPlane7, myIntersection);
         ENSURE_MSG(myIntersected2, "Line <-> Plane should intersect.");
@@ -475,7 +475,7 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
         DPRINT (myIntersection[2]);
         ENSURE_MSG( almostEqual(myIntersection, Point3d(0, 1, 0)), "Intersects at (0,1,0)")
 
-        Line<double>myLine3(Point3d(1,0,0), Vector3d(0,1,0) );
+        asl::Line<double>myLine3(Point3d(1,0,0), Vector3d(0,1,0) );
         const Plane<double> myPlane8(Vector3d(0,1,0), 0.0);
         myIntersected2 = intersection(myLine3, myPlane8, myIntersection);
         ENSURE_MSG(myIntersected2, "Line <-> Plane should intersect.");

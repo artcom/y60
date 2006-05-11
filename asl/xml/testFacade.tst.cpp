@@ -147,7 +147,7 @@ class ChildFacade :
             Node & myNode = getNode();
             if (myNode) {
                 HalfFloatTag::Plug::dependsOn<FloatTag>(*this);
-                Ptr<ChildFacade, dom::ThreadingModel> mySelf = dynamic_cast_Ptr<ChildFacade>(getSelf());
+                asl::Ptr<ChildFacade, dom::ThreadingModel> mySelf = dynamic_cast_Ptr<ChildFacade>(getSelf());
                 HalfFloatTag::Plug::setCalculatorFunction(&ChildFacade::recalculateHalfFloat);
             }
          }
@@ -156,9 +156,9 @@ class ChildFacade :
             AC_TRACE << "ChildFacade::registerDependenciesForDoubleParentFloat: this ="<<(void*)this;
             Node & myNode = getNode();
             if (myNode) {
-                Ptr<ChildFacade, dom::ThreadingModel> mySelf = dynamic_cast_Ptr<ChildFacade>(getSelf());
+                asl::Ptr<ChildFacade, dom::ThreadingModel> mySelf = dynamic_cast_Ptr<ChildFacade>(getSelf());
                 if (myNode.parentNode() && myNode.parentNode()->nodeName() != "root") {
-                    Ptr<ChildFacade, dom::ThreadingModel> myParent = myNode.parentNode()->getFacade<ChildFacade>();
+                    asl::Ptr<ChildFacade, dom::ThreadingModel> myParent = myNode.parentNode()->getFacade<ChildFacade>();
                     DoubleParentFloatTag::Plug::dependsOn<DoubleParentFloatTag>(*myParent);
                     DoubleParentFloatTag::Plug::setCalculatorFunction(&ChildFacade::recalculateDoubleParentFloat);
                 } else {
@@ -214,7 +214,7 @@ class ChildFacade :
         }
         void recalculateDoubleParentFloat() {
             AC_TRACE << "recalculateDoubleParentFloat: this="<<(void*)this <<",node=" << getNode() << endl;
-            Ptr<ChildFacade, dom::ThreadingModel> myParent = getNode().parentNode()->getFacade<ChildFacade>();
+            asl::Ptr<ChildFacade, dom::ThreadingModel> myParent = getNode().parentNode()->getFacade<ChildFacade>();
             if (myParent) {
                 AC_TRACE << "recalculateDoubleParentFloat: parent="<<(void*)&(*myParent) <<",node=" << getNode() << endl;
                 float myValue = myParent->get<DoubleParentFloatTag>();

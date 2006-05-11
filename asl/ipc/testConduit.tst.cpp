@@ -102,7 +102,7 @@ class MessageConduitTest : public TemplateUnitTest {
             myClient->send(myOutputString);
             
 			// did the message get to the server?
-            Ptr<typename MessageAcceptor<POLICY>::Message> myMessage;
+            asl::Ptr<typename MessageAcceptor<POLICY>::Message> myMessage;
             while (!(myMessage = _myAcceptor->popIncomingMessage())) {
                 msleep(100);
             }

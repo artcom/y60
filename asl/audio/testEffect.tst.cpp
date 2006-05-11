@@ -101,10 +101,10 @@ public:
 
 private:
     virtual void run(SampleFormat theSampleFormat) {
-        Ptr<AudioBufferBase> myAudioBuffer = Ptr<AudioBufferBase>(
+        asl::Ptr<AudioBufferBase> myAudioBuffer = asl::Ptr<AudioBufferBase>(
                 createAudioBuffer(theSampleFormat, 2048, 2, 44100));
         fillSineBuffer(&(*myAudioBuffer), theSampleFormat, 440, 1.0);
-        Ptr<AudioBufferBase> myBaselineBuffer = Ptr<AudioBufferBase>(
+        asl::Ptr<AudioBufferBase> myBaselineBuffer = asl::Ptr<AudioBufferBase>(
                 createAudioBuffer(theSampleFormat, 2048, 2, 44100));
         fillSineBuffer(&(*myBaselineBuffer), theSampleFormat, 440, 0.5);
         HalfEffect myEffect(theSampleFormat);
@@ -119,10 +119,10 @@ public:
 
 private:
     virtual void run(SampleFormat theSampleFormat) {
-        Ptr<AudioBufferBase> myAudioBuffer = Ptr<AudioBufferBase>(
+        asl::Ptr<AudioBufferBase> myAudioBuffer = asl::Ptr<AudioBufferBase>(
                 createAudioBuffer(theSampleFormat, 2048, 2, 44100));
         fillSineBuffer(&(*myAudioBuffer), theSampleFormat, 440, 1.0);
-        Ptr<AudioBufferBase> myBaselineBuffer = Ptr<AudioBufferBase>(myAudioBuffer->clone());
+        asl::Ptr<AudioBufferBase> myBaselineBuffer = asl::Ptr<AudioBufferBase>(myAudioBuffer->clone());
         NullEffect myEffect(theSampleFormat);
         myEffect.apply(*myAudioBuffer, 0);
         ENSURE(*myBaselineBuffer == *myAudioBuffer);
@@ -134,10 +134,10 @@ public:
     explicit TestVolumeFader(): TestEffect ("TestVolumeFader") {}
 private:
     virtual void run(SampleFormat theSampleFormat) {
-        Ptr<AudioBufferBase> myAudioBuffer = Ptr<AudioBufferBase>(
+        asl::Ptr<AudioBufferBase> myAudioBuffer = asl::Ptr<AudioBufferBase>(
                 createAudioBuffer(theSampleFormat, 2048, 2, 44100));
         fillSineBuffer(&(*myAudioBuffer), theSampleFormat, 440, 1.0);
-        Ptr<AudioBufferBase> myBaselineBuffer = Ptr<AudioBufferBase>(myAudioBuffer->clone());
+        asl::Ptr<AudioBufferBase> myBaselineBuffer = asl::Ptr<AudioBufferBase>(myAudioBuffer->clone());
         VolumeFader myFader(theSampleFormat);
         myFader.setVolume(1.0);
         // One buffer fadein
@@ -152,7 +152,7 @@ private:
         ENSURE(::almostEqual(myFader.getVolume(curFrame), 1.0));
         
         // One buffer full volume
-        myAudioBuffer = Ptr<AudioBufferBase>(myBaselineBuffer->clone());
+        myAudioBuffer = asl::Ptr<AudioBufferBase>(myBaselineBuffer->clone());
         myFader.apply(*myAudioBuffer, curFrame);
         ENSURE(*myBaselineBuffer == *myAudioBuffer);
         
@@ -160,7 +160,7 @@ private:
         myFader.setVolume(0.5);
         curFrame += myAudioBuffer->getNumFrames();
         ENSURE(::almostEqual(myFader.getVolume(curFrame), 1.0));
-        myAudioBuffer = Ptr<AudioBufferBase>(myBaselineBuffer->clone());
+        myAudioBuffer = asl::Ptr<AudioBufferBase>(myBaselineBuffer->clone());
         myFader.apply(*myAudioBuffer, curFrame);
         ENSURE(::almostEqual(myBaselineBuffer->getSampleAsFloat(VolumeFader::DEFAULT_FADE_FRAMES, 0)*0.5,
                 myAudioBuffer->getSampleAsFloat(VolumeFader::DEFAULT_FADE_FRAMES, 0), 0.001));
