@@ -8,11 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//   $Id: NecProjector.cpp,v 1.2 2004/09/24 12:56:10 valentin Exp $
-//   $Author: valentin $
-//   $Revision: 1.2 $
-//   $Date: 2004/09/24 12:56:10 $
-//
 // NEC Projector controller.
 //
 //=============================================================================
@@ -41,13 +36,13 @@ const char NEC_SHUTTER_CLOSE[] = { 0x02, 0x10, 0x00, 0x00, 0x00, 0x12 };
 
 using namespace std;
 
-NecProjector::NecProjector(int thePortNum) : Projector(thePortNum)
+NecProjector::NecProjector(int thePortNum, int theBaud) : Projector(thePortNum, theBaud == -1 ? 38400 : theBaud)
 {
     asl::SerialDevice * myDevice = getDevice();
     if (!myDevice) {
         throw asl::Exception("Failed to get serial device!", PLUS_FILE_LINE);
     }
-    myDevice->open(9600, 8, asl::SerialDevice::NO_PARITY, 1);
+    myDevice->open(getBaudRate(), 8, asl::SerialDevice::NO_PARITY, 1);
     _myDescription = "NEC on port : " + asl::as_string(thePortNum); 
 }
 
@@ -63,7 +58,7 @@ NecProjector::power(bool thePowerFlag) {
         myDevice->write(NEC_POWER_UP, 6);
         asl::msleep(1000);
         myDevice->close();
-        myDevice->open(9600, 8, asl::SerialDevice::NO_PARITY, 1);
+        myDevice->open(getBaudRate(), 8, asl::SerialDevice::NO_PARITY, 1);
         asl::msleep(1000);
         AC_DEBUG << "NecProjector::powerUp - 2" ;
         myDevice->write(NEC_POWER_UP, 6);
@@ -81,7 +76,7 @@ NecProjector::selectInput(VideoSource theVideoSource) {
     if (!myDevice)
         return;
 
-    std::cerr << "NecProjector::selectInput " << getStringFromEnum(theVideoSource) << std::endl;
+    AC_PRINT << "NecProjector::selectInput " << getStringFromEnum(theVideoSource);
 
     myDevice->write(NEC_INPUT_SELECT, 6);
     switch (theVideoSource) {
@@ -104,9 +99,8 @@ NecProjector::selectInput(VideoSource theVideoSource) {
         myDevice->write(NEC_INPUT_VIEWER, 2);
         break;
     default:
-        throw asl::Exception("Unknown projector input source.", PLUS_FILE_LINE);
-    };
-    AC_DEBUG << "NecProjector::selectInput" ;
+        AC_WARNING << "Unknown projector input source '" << getStringFromEnum(theVideoSource) << "'.";
+    }
 }
 
 

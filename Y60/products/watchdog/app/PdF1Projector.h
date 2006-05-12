@@ -8,11 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//   $Id: PdF1Projector.h,v 1.1 2004/09/15 15:03:45 ulrich Exp $
-//   $Author: ulrich $
-//   $Revision: 1.1 $
-//   $Date: 2004/09/15 15:03:45 $
-//
 // projectiondesign F1 Projector controller.
 //
 //=============================================================================
@@ -25,7 +20,7 @@
 class PdF1Projector : public Projector
 {
 public:
-    explicit PdF1Projector(int thePortNumber);
+    explicit PdF1Projector(int thePortNumber, int theBaud);
 
     virtual void power(bool thePowerFlag);
     virtual void selectInput(VideoSource theSource);

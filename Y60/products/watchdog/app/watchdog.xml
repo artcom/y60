@@ -22,7 +22,7 @@
           that support the given command.          
           
           ProjectorControl:
-            <Projector type="nec(default)|(panasonic|pt-d5500)|pdf1" port="0" input="<input>">
+            <Projector type="nec(default)|(panasonic|pt-d5500)|pdf1|(hitachi|liesegang)" port="0" baud="19200" input="<input>">
  
           Inputs:
             RGB_1
@@ -39,12 +39,9 @@
         <RestartApplication command="restart_app"/>
         <StopApplication shutterCloseProjectors="true" command="firealarm_on"/>
         <StartApplication command="firealarm_off"/>
-        <!--<ProjectorControl powerUpOnStartup="true">
-            <Projector type="panasonic" port="0" input="RGB_1">
-                <FirstID>1</FirstID>
-                <NumProjectors>1</NumProjectors>
-            </Projector>
-        </ProjectorControl>-->
+        <ProjectorControl powerUpOnStartup="true">
+            <Projector type="nec" port="0" baud="38400" input="RGB_1"/>
+        </ProjectorControl>
     </UdpControl>
     <!--<RebootTime>15:30</RebootTime>-->
     <!--<HaltTime>16:10</HaltTime>-->

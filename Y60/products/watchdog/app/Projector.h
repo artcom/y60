@@ -33,7 +33,7 @@ public:
      * \param thePort UDP-port
      * \return 
      */                            
-    static Projector* getProjector(const std::string& theType, int thePort);
+    static Projector* getProjector(const std::string& theType, int thePort, int theBaud);
     
     /**
      * Factory method to get a projector
@@ -43,7 +43,7 @@ public:
      */                            
     static Projector* getProjector(const dom::NodePtr & theProjectorNode, Logger* theLogger);
 
-    explicit Projector(int thePortNumber);
+    explicit Projector(int thePortNumber, unsigned theBaud);
     virtual ~Projector();
 
     const std::string & getDescription() const { return _myDescription; }
@@ -70,7 +70,8 @@ public:
         SVIDEO,
         DVI,
         M1,
-        VIEWER
+        VIEWER,
+        BNC
     };
     
     /**
@@ -122,12 +123,14 @@ protected:
 
     VideoSource getEnumFromString(const std::string& theSource);
     std::string getStringFromEnum(const Projector::VideoSource theSource);
+    unsigned getBaudRate() const { return _myBaud; }
     
 private:
     asl::SerialDevice * _mySerialDevice;
     Logger *            _myLogger;
     bool                _myCommandEnable;
     VideoSource         _myInitialInputSource;
+    unsigned            _myBaud;
 
     //Projector();
 };

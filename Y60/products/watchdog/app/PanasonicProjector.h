@@ -8,11 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//         $Id: PanasonicProjector.h,v 1.4 2004/11/27 11:19:07 ulrich Exp $
-//     $Author: ulrich $
-//   $Revision: 1.4 $
-//       $Date: 2004/11/27 11:19:07 $
-//
 // Panasonic PT-D5500 projector
 //
 //=============================================================================
@@ -28,7 +23,7 @@
 class PanasonicProjector : public Projector
 {
 public:
-    explicit PanasonicProjector(int thePortNumber);
+    explicit PanasonicProjector(int thePortNumber, int theBaud);
 
     virtual void configure(const dom::NodePtr & theConfigNode);
 

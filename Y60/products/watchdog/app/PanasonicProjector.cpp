@@ -8,11 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//         $Id: PanasonicProjector.cpp,v 1.7 2004/12/01 16:28:38 ulrich Exp $
-//     $Author: ulrich $
-//   $Revision: 1.7 $
-//       $Date: 2004/12/01 16:28:38 $
-//
 // Panasonic PT-D5500 projector
 //
 //=============================================================================
@@ -28,10 +23,10 @@
 
 #include <iostream>
 #include <strstream>
+
 using namespace std;
 
-
-PanasonicProjector::PanasonicProjector(int thePortNum) : Projector(thePortNum),
+PanasonicProjector::PanasonicProjector(int thePortNum, int theBaud) : Projector(thePortNum, theBaud == -1 ? 9600 : theBaud),
     _myFirstID(1),
     _myNumProjectors(2),
     _myPowerDelay(2000),
@@ -41,7 +36,7 @@ PanasonicProjector::PanasonicProjector(int thePortNum) : Projector(thePortNum),
     if (!myDevice) {
         throw asl::Exception("Failed to get serial device!", PLUS_FILE_LINE);
     }
-    myDevice->open(9600, 8, asl::SerialDevice::NO_PARITY, 1);
+    myDevice->open(getBaudRate(), 8, asl::SerialDevice::NO_PARITY, 1);
     _myDescription = "Panasonic PT-D5500 on port : " + asl::as_string(thePortNum);
 }
 
@@ -92,7 +87,6 @@ PanasonicProjector::power(bool thePowerFlag)
 void
 PanasonicProjector::selectInput(VideoSource theVideoSource)
 {
-    cerr << "PanasonicProjector::selectInput " << getStringFromEnum(theVideoSource) << endl;
     std::string myParams;
     switch (theVideoSource) {
     case RGB_1:
@@ -110,9 +104,9 @@ PanasonicProjector::selectInput(VideoSource theVideoSource)
     case DVI:
         myParams = "DVI";
         break;
-    case VIEWER:
-        default:
-        throw asl::Exception("Unknown projector input source.", PLUS_FILE_LINE);
+    default:
+        AC_WARNING << "Unknown projector input source '" << getStringFromEnum(theVideoSource) << "'.";
+        return;
     }
     sendCommand("IIS", myParams);
 }

@@ -8,11 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//   $Id: HitachiProjector.h,v 1.1 2004/09/15 15:03:45 ulrich Exp $
-//   $Author: ulrich $
-//   $Revision: 1.1 $
-//   $Date: 2004/09/15 15:03:45 $
-//
 // Hitachi Projector controller.
 //
 //=============================================================================
@@ -25,7 +20,7 @@
 class HitachiProjector : public Projector
 {
 public:
-    explicit HitachiProjector(int thePortNumber);
+    explicit HitachiProjector(int thePortNumber, int theBaud);
 
     virtual void power(bool thePowerFlag);
     virtual void selectInput(VideoSource theSource);

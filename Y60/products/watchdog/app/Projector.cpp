@@ -8,11 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//         $Id: Projector.cpp,v 1.6 2004/11/27 11:19:07 ulrich Exp $
-//     $Author: ulrich $
-//   $Revision: 1.6 $
-//       $Date: 2004/11/27 11:19:07 $
-//
 // Projector factory
 //
 //=============================================================================
@@ -29,21 +24,21 @@
 #include <asl/Exception.h>
 #include <dom/Nodes.h>
 
-Projector* Projector::getProjector(const std::string& theType, int thePortNum)
+Projector* Projector::getProjector(const std::string& theType, int thePortNum, int theBaud)
 {
     Projector* projector = 0;
 
     if (theType.size() == 0 || theType == "nec") {
-        projector = new NecProjector(thePortNum);
+        projector = new NecProjector(thePortNum, theBaud);
     }
     else if (theType == "pdf1") {
-        projector = new PdF1Projector(thePortNum);
+        projector = new PdF1Projector(thePortNum, theBaud);
     }
     else if (theType == "panasonic" || theType == "pt-d5500") {
-        projector = new PanasonicProjector(thePortNum);
+        projector = new PanasonicProjector(thePortNum, theBaud);
     }
     else if (theType == "liesegang" || theType == "hitachi" || theType == "infocus") {
-        projector = new HitachiProjector(thePortNum);
+        projector = new HitachiProjector(thePortNum, theBaud);
     }
     else {
         throw asl::Exception(std::string("Unknown projector: ") + theType);
@@ -57,6 +52,7 @@ Projector* Projector::getProjector(const dom::NodePtr & theProjectorNode, Logger
     Projector*  projector = 0;
     std::string myType  = "";
     int         myPort = -1;
+    int         myBaud = -1;
 
     if (theProjectorNode->nodeType() == dom::Node::ELEMENT_NODE) {
         if (theProjectorNode->getAttribute("type")) {
@@ -67,18 +63,22 @@ Projector* Projector::getProjector(const dom::NodePtr & theProjectorNode, Logger
             myPort = asl::as<int>(theProjectorNode->getAttribute("port")->nodeValue());
         }
 
+        if (theProjectorNode->getAttribute("baud")) {
+            myBaud = asl::as<int>(theProjectorNode->getAttribute("baud")->nodeValue());
+        }
+
         if (myPort != -1) {
             if (myType.size() == 0 || myType == "nec") {
-                projector = new NecProjector(myPort);
+                projector = new NecProjector(myPort, myBaud);
             }
             else if (myType == "pdf1") {
-                projector = new PdF1Projector(myPort);
+                projector = new PdF1Projector(myPort, myBaud);
             }
             else if (myType == "panasonic" || myType == "pt-d5500") {
-                projector = new PanasonicProjector(myPort);
+                projector = new PanasonicProjector(myPort, myBaud);
             }
             else if (myType == "liesegang" || myType == "hitachi" || myType == "infocus") {
-                projector = new HitachiProjector(myPort);
+                projector = new HitachiProjector(myPort, myBaud);
             }
             else {
                 throw asl::Exception(std::string("Unknown projector type: ") + myType);
@@ -107,7 +107,7 @@ Projector::selectInput(const std::string& theSource)
 {
     VideoSource mySource = getEnumFromString(theSource);
     if (mySource != NONE) {
-	    std::cerr << "Projector::selectInput " << theSource << std::endl;
+	    AC_PRINT << "Projector::selectInput " << theSource;
         selectInput(mySource);
     }
 }
@@ -157,9 +157,9 @@ Projector::command(const std::string & theCommand)
 /*
  * Private
  */
-Projector::Projector(int thePortNum) :
+Projector::Projector(int thePortNum, unsigned theBaud) :
     _mySerialDevice(0), _myLogger(0), _myCommandEnable(true),
-    _myInitialInputSource(NONE)
+    _myInitialInputSource(NONE), _myBaud(theBaud)
 {
     if (thePortNum != -1) {
         _mySerialDevice = asl::getSerialDevice(thePortNum);
@@ -207,6 +207,9 @@ Projector::getEnumFromString(const std::string& theSource)
     if (theSource == "VIEWER") {
         return VIEWER;
     }
+    if (theSource == "BNC") {
+        return BNC;
+    }
     return NONE;
 }
 
@@ -233,6 +236,9 @@ Projector::getStringFromEnum(const Projector::VideoSource theSource)
     }
     if (theSource == VIEWER) {
         return "VIEWER";
+    }
+    if (theSource == BNC) {
+        return "BNC";
     }
     return "NONE";
 }

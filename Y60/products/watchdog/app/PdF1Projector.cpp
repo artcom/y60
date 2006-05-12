@@ -1,5 +1,5 @@
 //============================================================================
-// Copyright (C) 2004, ART+COM AG Berlin
+// Copyright (C) 2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,11 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: PdF1Projector.cpp,v 1.3 2004/09/24 12:56:10 valentin Exp $
-//   $Author: valentin $
-//   $Revision: 1.3 $
-//   $Date: 2004/09/24 12:56:10 $
 //
 // projectiondesign F1 Projector controller.
 //
@@ -22,6 +17,7 @@
 
 #include <asl/SerialDevice.h>
 #include <asl/string_functions.h>
+#include <asl/Logger.h>
 #include <asl/Exception.h>
 
 #include <iostream>
@@ -60,13 +56,13 @@ const unsigned char F1_SELECT_INPUT[] = {
 };
 
 
-PdF1Projector::PdF1Projector(int thePortNum) : Projector(thePortNum)
+PdF1Projector::PdF1Projector(int thePortNum, int theBaud) : Projector(thePortNum, theBaud == -1 ? 19200 : theBaud)
 {
     asl::SerialDevice * myDevice = getDevice();
     if (!myDevice) {
         throw asl::Exception("Failed to get serial device!", PLUS_FILE_LINE);
     }
-    myDevice->open(19200, 8, asl::SerialDevice::NO_PARITY, 1);
+    myDevice->open(getBaudRate(), 8, asl::SerialDevice::NO_PARITY, 1);
     _myDescription = "Projection Design F1 on port : " + asl::as_string(thePortNum); 
 }
 
@@ -87,8 +83,6 @@ PdF1Projector::power(bool thePowerFlag)
 void
 PdF1Projector::selectInput(VideoSource theVideoSource)
 {
-    std::cerr << "PdF1Projector::selectInput " << getStringFromEnum(theVideoSource) << std::endl;
-
     unsigned char packet[PACKET_SIZE];
     memset(packet, 0, sizeof(packet));
     memcpy(packet, F1_SELECT_INPUT, sizeof(F1_SELECT_INPUT));
@@ -110,9 +104,9 @@ PdF1Projector::selectInput(VideoSource theVideoSource)
     case VIDEO:
         value = 0x0005;
         break;
-    case VIEWER:
     default:
-        throw asl::Exception("Unknown projector input source.", PLUS_FILE_LINE);
+        AC_WARNING << "Unknown projector input source '" << getStringFromEnum(theVideoSource) << "'.";
+        return;
     }
 
     setOpValue(packet, value);

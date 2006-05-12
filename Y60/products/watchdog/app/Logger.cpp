@@ -8,14 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//   $RCSfile: Logger.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.2 $
-//   $Date: 2004/06/07 11:23:51 $
-//
-//
 //  Description: A little logger class for dogs and bones
-//
 //
 //=============================================================================
 
