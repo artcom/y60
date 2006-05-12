@@ -33,7 +33,7 @@ public:
      * \param thePort UDP-port
      * \return 
      */                            
-    static Projector* getProjector(const std::string& theType, int thePort, int theBaud);
+    static Projector* getProjector(const std::string& theType, int thePort, int theBaud = -1);
     
     /**
      * Factory method to get a projector

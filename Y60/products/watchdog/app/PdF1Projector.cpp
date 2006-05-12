@@ -63,7 +63,7 @@ PdF1Projector::PdF1Projector(int thePortNum, int theBaud) : Projector(thePortNum
         throw asl::Exception("Failed to get serial device!", PLUS_FILE_LINE);
     }
     myDevice->open(getBaudRate(), 8, asl::SerialDevice::NO_PARITY, 1);
-    _myDescription = "Projection Design F1 on port : " + asl::as_string(thePortNum); 
+    _myDescription = "Projection Design F1 on port: " + asl::as_string(thePortNum) + " ("+asl::as_string(getBaudRate())+"baud,8,N,1)"; 
 }
 
 

@@ -43,7 +43,7 @@ NecProjector::NecProjector(int thePortNum, int theBaud) : Projector(thePortNum, 
         throw asl::Exception("Failed to get serial device!", PLUS_FILE_LINE);
     }
     myDevice->open(getBaudRate(), 8, asl::SerialDevice::NO_PARITY, 1);
-    _myDescription = "NEC on port : " + asl::as_string(thePortNum); 
+    _myDescription = "NEC on port: " + asl::as_string(thePortNum) + " ("+asl::as_string(getBaudRate())+"baud,8,N,1)"; 
 }
 
 

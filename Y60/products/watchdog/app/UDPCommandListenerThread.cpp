@@ -90,7 +90,7 @@ UDPCommandListenerThread::UDPCommandListenerThread(std::vector<Projector *> theP
     if (_myProjectors.size() > 0 ) {
         cout << "Projectors: " << endl;    
         for (int i = 0; i < _myProjectors.size(); i++) {
-            cout << i << " : " << _myProjectors[i]->getDescription()<< endl;;
+            cout << (i+1) << ": " << _myProjectors[i]->getDescription()<< endl;;
         }
     }
 }
