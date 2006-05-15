@@ -25,6 +25,7 @@ function VideoRecorder(theFramesPerSecond, theDirectory) {
     Public.enabled setter = function(theFlag) {
         if (theFlag != _myEnabledFlag) {
             if (theFlag) {
+                setup();
                 _myFixedFrameTime = window.fixedFrameTime;
                 window.fixedFrameTime = 1 / _myFramesPerSecond;
                 print("Video Recorder enabled for directory: " + _myDirectory);
@@ -51,22 +52,22 @@ function VideoRecorder(theFramesPerSecond, theDirectory) {
 
     function setup() {
         var myCounter = 0;
-        var myDirectory = _myDirectory;
-        while (true) {
-            if (!fileExists(myDirectory)) {
-                createDirectory(myDirectory);
+        var myDirectoryName = (theDirectory ? theDirectory : "frames");
+        _myDirectory = myDirectoryName;
+        do {
+            _myDirectory = myDirectoryName + "_" + myCounter++;
+            if (!fileExists(_myDirectory)) {
+                createDirectory(_myDirectory);
                 break;
             }
-            myDirectory = _myDirectory + "_" + myCounter++;
-        }
-        _myDirectory = myDirectory;
+        } while (true);
+
+        _myFrameCount = 0;
     }
 
-    var _myEnabledFlag     = false;
     var _myFrameCount      = 0;
+    var _myEnabledFlag     = false;
     var _myFramesPerSecond = theFramesPerSecond;
     var _myFixedFrameTime  = window.fixedFrameTime;
-    var _myDirectory       = (theDirectory ? theDirectory : "frames");
-
-    setup();
+    var _myDirectory       = null;
 }
