@@ -94,11 +94,11 @@ Projector* Projector::getProjector(const dom::NodePtr & theProjectorNode, Logger
 void
 Projector::configure(const dom::NodePtr & theConfigNode)
 {
-    std::cerr << "Projector::configure " << *theConfigNode << std::endl;
+    AC_PRINT << "Projector::configure " << *theConfigNode;
     
     if (theConfigNode->getAttribute("input")) {
         _myInitialInputSource = getEnumFromString(theConfigNode->getAttribute("input")->nodeValue());
-        AC_DEBUG << "_myInitialInputSource: " << getStringFromEnum(_myInitialInputSource) << std::endl;
+        AC_DEBUG << "_myInitialInputSource: " << getStringFromEnum(_myInitialInputSource);
     }
 }
 
@@ -116,11 +116,11 @@ bool
 Projector::command(const std::string & theCommand)
 {
     if (!_myCommandEnable) {
-        std::cerr << "Projector::command disabled, ignoring '" << theCommand << "'" << std::endl;
+        AC_PRINT << "Projector::command disabled, ignoring '" << theCommand << "'";
         return true;
     }
 
-    std::cerr << "Projector::command '" << theCommand << "'" << std::endl;
+    AC_PRINT << "Projector::command '" << theCommand << "'";
     if (theCommand == "projector_on") {
         power(true);
     }
@@ -147,7 +147,7 @@ Projector::command(const std::string & theCommand)
         }
     }
     else {
-        std::cerr << "Projector::command unknown '" << theCommand << "'" << std::endl;
+        AC_PRINT << "Projector::command unknown '" << theCommand << "'";
         return false;
     }
     return true;
@@ -183,8 +183,7 @@ Projector::~Projector()
 Projector::VideoSource
 Projector::getEnumFromString(const std::string& theSource)
 {
-    if (theSource == "RGB_1" ||
-        theSource == "RGB") {
+    if (theSource == "RGB_1" || theSource == "RGB") {
         return RGB_1;
     }
     if (theSource == "RGB_2") {
