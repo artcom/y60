@@ -44,12 +44,15 @@ PathAlign.prototype.Constructor = function(self, thePath) {
         return _myCurrentPosition;
     }
 
-    self.fitsAdvancement = function(theLength, theSegment) {
+    self.fitsAdvancement = function(theLength, theSegment, theCurrentPosition) {
         if (theSegment == undefined) {
             theSegment = _myCurrentSegment;
         }        
+        if (theCurrentPosition == undefined) {
+            theCurrentPosition = _myCurrentPosition;
+        }        
         var myElement = _myPath.getElement(theSegment);
-        var myRemainSegment = difference(myElement.end, _myCurrentPosition);
+        var myRemainSegment = difference(myElement.end, theCurrentPosition);
         var myRemainLength = magnitude(myRemainSegment);
         if (myRemainLength >= theLength) {
             return true;
@@ -57,7 +60,7 @@ PathAlign.prototype.Constructor = function(self, thePath) {
             if (theSegment == _myPath.getNumElements()-1) {
                 return false;
             } else {
-                return self.fitsAdvancement(theLength-myRemainLength ,theSegment+1);
+                return self.fitsAdvancement(theLength-myRemainLength ,theSegment+1, myElement.end);
             }
         }
     }
@@ -98,7 +101,6 @@ PathAlign.prototype.Constructor = function(self, thePath) {
             }
             var myRemainLength = magnitude(myRemainSegment);
             var myRemainDirection = normalized(myRemainSegment);
-
             if (Math.abs(theLength) > myRemainLength) {
                 // still room
                 if (myForwardTraversal) {
@@ -211,9 +213,7 @@ function test_PathAlign() {
     mySceneViewer.onPostRender = function() {
         window.getRenderer().draw(myPath, [1,1,0,1], myMatrix);
         if (next) {
-            print("*** advance");
             var mySegment = myPathAlign.advance(-45);
-            print(mySegment.start, mySegment.end);
             myLineSegment = new LineSegment(mySegment.start, mySegment.end);
             next = false;
         }

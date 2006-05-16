@@ -90,9 +90,8 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         //print("font metrics:", "height=" + myFontMetrics.height, "ascent=" + myFontMetrics.ascent, "descent=" + myFontMetrics.descent);
 
         var myWidth = 0.0;
-
+        
         for (var i = theFirstCharacter; i < theLastCharacter; ++i) {
-            
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
                 // line break
