@@ -53,13 +53,13 @@ function LabelBase(Public, Protected, theScene,
             myStyle = Protected.style;
         }
 
-        var topPad    = "topPad"      in myStyle ? myStyle.topPad : 0;
-        var bottomPad = "bottomPad"   in myStyle ? myStyle.bottomPad : 0;
-        var rightPad  = "rightPad"    in myStyle ? myStyle.rightPad : 0;
-        var leftPad   = "leftPad"     in myStyle ? myStyle.leftPad : 0;
-        var tracking  = "tracking"    in myStyle ? myStyle.tracking : 0;
-        var HTextAlign = "HTextAlign" in myStyle ? myStyle.HTextAlign : Renderer.LEFT_ALIGNMENT;
-        var VTextAlign = "VTextAlign" in myStyle ? myStyle.VTextAlign : Renderer.TOP_ALIGNMENT;
+        var topPad     = "topPad"      in myStyle ? myStyle.topPad : 0;
+        var bottomPad  = "bottomPad"   in myStyle ? myStyle.bottomPad : 0;
+        var rightPad   = "rightPad"    in myStyle ? myStyle.rightPad : 0;
+        var leftPad    = "leftPad"     in myStyle ? myStyle.leftPad : 0;
+        var tracking   = "tracking"    in myStyle ? myStyle.tracking : 0;
+        var HTextAlign = "HTextAlign"  in myStyle ? myStyle.HTextAlign : Renderer.LEFT_ALIGNMENT;
+        var VTextAlign = "VTextAlign"  in myStyle ? myStyle.VTextAlign : Renderer.TOP_ALIGNMENT;
 
         window.setTextPadding(topPad, bottomPad, leftPad, rightPad);
         window.setHTextAlignment(HTextAlign);
@@ -67,11 +67,7 @@ function LabelBase(Public, Protected, theScene,
         window.setTextColor(myStyle.textColor);
         window.setTracking(tracking);
 
-        var myFontName = myStyle.font + "_" + myStyle.fontsize;
-        if (!(myFontName in ourFontCache)) {
-            window.loadTTF(myFontName, myStyle.font, myStyle.fontsize);
-            ourFontCache[myFontName] = true;
-        }
+        var myFontName = loadFont(myStyle.font, myStyle.fontsize);
 
         var myImage = Protected.getImageNode();
         var mySize = window.renderTextAsImage(myImage, theText, myFontName,
@@ -132,10 +128,6 @@ function LabelBase(Public, Protected, theScene,
 
     Protected.style = theStyle;
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // Private
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
     Protected.getImageNode = function() {
         if (Public.image == null) {
             var myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
@@ -144,6 +136,47 @@ function LabelBase(Public, Protected, theScene,
             Public.textures.lastChild.applymode = "modulate";
         }
         return Public.image;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // Private
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Loads a font into the fontcache.
+     * @param {string|Object} theFont The path to the ttf font file.
+     * Or {regular: "regular.ttf", bold: "bold.ttf", italic: "italic.ttf"}
+     * @param {int} theSize The font size.
+     */
+    function loadFont(theFont, theSize) {
+        var myFontName = null;
+        if (typeof(theFont) == "string") {
+            myFontName = theFont + "_" + theSize;
+            loadFontFace(myFontName, theFont, theSize, 0);
+        } else {
+            myFontName = theFont.regular + "_" + theSize;
+            loadFontFace(myFontName, theFont.regular, theSize, 0);
+
+            if ("bold" in theFont) {
+                loadFontFace(myFontName, theFont.bold, theSize, Renderer.BOLD);
+            }
+            if ("italic" in theFont) {
+                loadFontFace(myFontName, theFont.italic, theSize, Renderer.ITALIC);
+            }
+            if ("bolditalic" in theFont) {
+                loadFontFace(myFontName, theFont.bolditalic, theSize, Renderer.BOLDITALIC);
+            }
+        }
+
+        return myFontName;
+    }
+
+    function loadFontFace(theFontName, theFont, theSize, theFace) {
+        var myFontCacheName = theFontName + "_" + theSize + "_" + theFace;
+        if (!(myFontCacheName in ourFontCache)) {
+            window.loadTTF(theFontName, theFont, theSize, theFace);
+            ourFontCache[myFontCacheName] = true;
+        }
     }
 
     function setup() {
