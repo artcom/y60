@@ -86,7 +86,7 @@ namespace y60 {
 
         if (theFontType != SDLFontInfo::NORMAL) {
             if (_myFonts.find(makeFontName(theName, SDLFontInfo::NORMAL)) == _myFonts.end()) {
-                throw GLTextRendererException("You must register a normal style font, before registering bold or italic fonts", PLUS_FILE_LINE);
+                throw GLTextRendererException("You must register a normal style font with the same name, before registering bold or italic fonts", PLUS_FILE_LINE);
             }
         }
 
@@ -316,12 +316,8 @@ namespace y60 {
         Uint32 myTextColor = SDL_MapRGBA(_myTextureSurface->format, Uint8(theTextColor[0] * 255),
             Uint8(theTextColor[1] * 255), Uint8(theTextColor[2] * 255), 0);
 
-//cerr << "first pixel before fill: " << *((unsigned*)_myTextureSurface->pixels) << endl;
-
         // Fill background image with text color, to avoid OpenGl texture filtering artefacts.
         SDL_FillRect(_myTextureSurface, 0, myTextColor);
-
-  //      cerr << "first pixel after fill: " << *((unsigned*)_myTextureSurface->pixels) << endl;
     }
 
     SDL_Surface *
@@ -698,18 +694,29 @@ namespace y60 {
                     myLineY = mySurfaceHeight-_myBottomPadding-myYPos;
                 }
 
-                SDL_Rect srcRectangle  = {0, 0, myWord.surface->w, myLineY};
-                SDL_Rect destRectangle = {myXPos, myYPos, myXPos + myWord.surface->w , myXPos + myWord.surface->h};
                 DB2(
-                    AC_TRACE << "  Blit: " << srcRectangle.x << ", " << srcRectangle.y << ", "
+                    cerr << "  Blit: " << srcRectangle.x << ", " << srcRectangle.y << ", "
                         << srcRectangle.w << ", " << srcRectangle.h
                         << "  ->  " << destRectangle.x << ", " << destRectangle.y << ", "
                         << destRectangle.w << ", " << destRectangle.h << endl;
                 )
 
-                //SDL_SaveBMP(myWord.surface, string(string("word") + asl::as_string(j) + ".bmp").c_str());
-                if (SDL_BlitSurface(myWord.surface, &srcRectangle, _myTextureSurface, &destRectangle)) {
-                    AC_ERROR << "SDL_BlitSurface failed: " << SDL_GetError();
+                asl::Unsigned32 * mySrcLinePtr = (asl::Unsigned32 *)myWord.surface->pixels;
+                asl::Unsigned32 * myDstLinePtr = (asl::Unsigned32 *)_myTextureSurface->pixels + myYPos * _myTextureSurface->w + myXPos;
+
+                for (unsigned i = 0; i < myLineY; ++i) {
+                    asl::Unsigned32 * mySrcPixelPtr = mySrcLinePtr;
+                    asl::Unsigned32 * myDstPixelPtr = myDstLinePtr;
+                    for (unsigned j = 0; j < myWord.surface->w; ++j) {
+                        if (*mySrcPixelPtr >> 24) {
+                            *myDstPixelPtr = *mySrcPixelPtr;
+                        }
+                        ++mySrcPixelPtr;
+                        ++myDstPixelPtr;
+                    }
+
+                    mySrcLinePtr += myWord.surface->w;
+                    myDstLinePtr += _myTextureSurface->w;
                 }
 
                 myXPos += myWord.surface->w;

@@ -109,7 +109,7 @@ loadTTF(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_PARAM("theName", "Symbolic font name", DOC_TYPE_STRING);
     DOC_PARAM("theFilename", "Filename to load the font from", DOC_TYPE_STRING);
     DOC_PARAM("theHeight", "Font height", DOC_TYPE_INTEGER);
-    DOC_PARAM_OPT("theFontFace", "Font face", DOC_TYPE_INTEGER, SDLFontInfo::NORMAL);
+    DOC_PARAM_OPT("theFontFace", "Font face, see static properties of Renderer", DOC_TYPE_ENUMERATION, SDLFontInfo::NORMAL);
     DOC_END;
     // Binding is implemented by hand to allow overloading
     try {
