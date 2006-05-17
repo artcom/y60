@@ -963,49 +963,101 @@ MaterialExporter::hasUVMappedTextures(const std::string & theMaterialName) {
 
 void
 MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
-    if (theDirectory.empty() || theDirectory[0] == '.') {
-        AC_DEBUG << "MaterialExporter::setBaseDirectory, relative base directory ->"<< getCWD();
+#ifdef WIN32
+    if (theDirectory.length() > 1 && theDirectory[1] != ':') {
+#else
+    if (theDirectory.length() > 0 && theDirectory[1] != '/') {
+#endif
+        if (theDirectory[0] == '.' && theDirectory[1] == '/') {
+            _myBaseDirectory = normalizeDirectory(getCWD(), false) + 
+                               normalizeDirectory(theDirectory.substr(2,theDirectory.length()) , false);
+        } else {
+            _myBaseDirectory = normalizeDirectory(getCWD(), false) + '/' + normalizeDirectory(theDirectory, false);
+        }
+    } else if (theDirectory.empty()) {
+         //AC_DEBUG << "MaterialExporter::setBaseDirectory, relative base directory ->"<< getCWD();
         _myBaseDirectory = normalizeDirectory(getCWD(), false);
         _myBaseDirectory += '/';
     } else {
         _myBaseDirectory = theDirectory;
     }
-    AC_DEBUG << "MaterialExporter::setBaseDirectory _myBaseDirectory=" << _myBaseDirectory;
+    // be sure to end with a slash
+    if (_myBaseDirectory[_myBaseDirectory.length()-1] != '/') {
+        _myBaseDirectory += '/';
+    }
+    AC_DEBUG << "MaterialExporter::setBaseDirectory _myBaseDirectory=" << _myBaseDirectory << ", was:" << theDirectory;
 
 }
 
 void
-MaterialExporter::stripBaseDir(std::string & theFileName) const {
+MaterialExporter::stripBaseDir(std::string & theFileName) {
+    std::string myFilename = theFileName;
 #ifdef WIN32
     // We need to convert basedir and filename toupper, before comparing, because under windows
     // there are differences :( [ch]
-    std::string myUpperFileName(theFileName);
-    std::transform(theFileName.begin(), theFileName.end(),
+    std::string myUpperFileName(myFilename);
+    std::transform(myFilename.begin(), myFilename.end(),
                    myUpperFileName.begin(), std::toupper);
-
+    myFilename = myUpperFileName;
     std::string myUpperBaseName(_myBaseDirectory);
     std::transform(_myBaseDirectory.begin(), _myBaseDirectory.end(),
                    myUpperBaseName.begin(), std::toupper);
+    _myBaseDirectory = myUpperBaseName;
     size_t myIndex = myUpperFileName.find(myUpperBaseName);
+#else
+    size_t myIndex = myFilename.find(_myBaseDirectory);
+#endif
     if (myIndex != std::string::npos) {
         if (myIndex == 0) {
-            theFileName = theFileName.substr(_myBaseDirectory.length());
+            myFilename = myFilename.substr(_myBaseDirectory.length());
         } else {
-            theFileName = theFileName.substr(myIndex + _myBaseDirectory.length());
+            myFilename = myFilename.substr(myIndex + _myBaseDirectory.length());
         }
+    } else {
+        // try to find as much directories as possible from BaseDirectory
+        bool myEqualFlag = true;
+        std::string myBaseRest(_myBaseDirectory);
+        std::string myFileRest(myFilename);
+        while (myEqualFlag) {
+            size_t mySlashBaseIndex = myBaseRest.find('/');
+            size_t mySlashFilenameIndex = myFileRest.find('/');
+            if (mySlashBaseIndex != std::string::npos && mySlashFilenameIndex != std::string::npos) {
+                std::string myBaseDir = myBaseRest.substr(0, mySlashBaseIndex);
+                std::string myFilenameDir = myFileRest.substr(0, mySlashFilenameIndex);
+                if (myBaseDir == myFilenameDir) {
+                    myBaseRest = myBaseRest.substr(mySlashBaseIndex+1, myBaseRest.length());
+                    myFileRest = myFileRest.substr(mySlashFilenameIndex+1, myFileRest.length());
+                } else {
+                    myEqualFlag = false;
+                }
+            } else {
+                myEqualFlag = false;
+            }
+        }
+        // do we have a chance to optimize??
+        if (myBaseRest != _myBaseDirectory && myFileRest != myFilename) {
+            // count the directories in the rest of the base name and add some relative '..' to restfilename
+            int myResult = std::count(myBaseRest.begin(), myBaseRest.end(), '/');
+            for (int myCounter = 0; myCounter < myResult; myCounter++) {
+                myFileRest = std::string("../") + myFileRest;
+            }
+            myFilename = myFileRest;
+        }
+        AC_DEBUG << "MaterialExporter::stripBaseDir found nothing";
     }
 
+#if 0
 #else
     if (theFileName.find(_myBaseDirectory) == 0) {
         theFileName = theFileName.substr(_myBaseDirectory.length());
     }
 #endif
-    AC_DEBUG << "stripBaseDir::stripBaseDir stripped filename=" << theFileName;
-
+    AC_DEBUG << "stripBaseDir::stripBaseDir stripped filename=" << myFilename;
+     theFileName = myFilename;
 }
 
 std::string
-MaterialExporter::getStrippedTextureFilename(const MPlug & theTexturePlug) const {
+MaterialExporter::getStrippedTextureFilename(const MPlug & theTexturePlug) {
     MObject theFileNode;
     getConnectedNode(theTexturePlug, theFileNode);
     MString myFileName("");

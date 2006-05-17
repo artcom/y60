@@ -150,8 +150,8 @@ class MaterialExporter {
         void exportBlinnFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
         void exportUnlitFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
 
-		std::string getStrippedTextureFilename(const MPlug & theTexturePlug) const;
-        void stripBaseDir(std::string & theFileName) const;
+		std::string getStrippedTextureFilename(const MPlug & theTexturePlug);
+        void stripBaseDir(std::string & theFileName);
 
         bool checkTransparency(const MObject & theShaderNode);
         bool checkAlphaTexture(const MObject & theShaderNode, const std::string thePlugName);
