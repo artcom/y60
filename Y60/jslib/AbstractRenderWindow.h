@@ -128,6 +128,7 @@ namespace jslib {
         void setTextStyle(unsigned int theStyle);
 
         void setTextPadding(int topPadding, int bottomPadding, int leftPadding, int rightPadding);
+        void setTextIndentation(int theIndentation);
 
         void setHTextAlignment(unsigned int theHAlignment);
         void setVTextAlignment(unsigned int theVAlignment);

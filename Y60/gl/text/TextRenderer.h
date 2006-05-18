@@ -53,6 +53,7 @@ namespace y60 {
             virtual void renderText(TextPtr & theText) = 0;
             void setColor(const asl::Vector4f & theTextColor);
             void setPadding(int theTop, int theBottom, int theLeft, int theRight);
+            void setIndentation(int theIndent);
         	void setVTextAlignment(TextRenderer::TextAligment theVAlignment);
 	        void setHTextAlignment(TextRenderer::TextAligment theHAlignment);
 	        void setLineHeight(unsigned theHeight) {
@@ -80,6 +81,7 @@ namespace y60 {
         	unsigned      _myParagraphTopOffset;
         	unsigned      _myParagraphBottomOffset;
             float         _myTracking;
+            int           _myIndentation;
         private:
             unsigned int  _myWindowWidth;
             unsigned int  _myWindowHeight;

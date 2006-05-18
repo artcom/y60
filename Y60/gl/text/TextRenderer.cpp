@@ -48,6 +48,7 @@ namespace y60 {
         _myBottomPadding(0),
         _myRightPadding(0),
         _myLeftPadding(0),
+        _myIndentation(0),
         _myTracking(0.0f)
     {}
 
@@ -82,6 +83,11 @@ namespace y60 {
         _myBottomPadding = theBottom;
         _myLeftPadding = theLeft;
         _myRightPadding = theRight;
+    }
+
+    void
+    TextRenderer::setIndentation(int theIndent) {
+        _myIndentation = theIndent;
     }
 
 	void

@@ -86,11 +86,12 @@ namespace y60 {
             };
 
             struct Line {
-                Line() : width(0), wordCount(0), newline(false) {}
+                Line() : width(0), wordCount(0), newline(false), indent(false) {}
 
                 unsigned width;
                 unsigned wordCount;
                 bool     newline;
+                bool     indent;
             };
 
             asl::Vector2i createTextSurface(const std::string & theText, const std::string & theFontName,
@@ -106,7 +107,7 @@ namespace y60 {
             unsigned createLines(const std::vector<Word> & theWords, std::vector<Line> & theLines,
                     unsigned theLineWidth, unsigned theLineHeight);
 
-            int calcHorizontalAlignment(unsigned theTextWidth, unsigned theLineWidth,
+            int calcHorizontalAlignment(unsigned theTextWidth, const Line & theLine,
                     int theMinX);
             int calcVerticalAlignment(unsigned theTextHeight, unsigned theBlockHeight);
             SDLFontInfo & getFontInfo(const std::string & theName);

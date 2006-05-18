@@ -888,6 +888,9 @@ namespace jslib {
         _myRenderer->getTextManager().setPadding(topPadding, bottomPadding, leftPadding, rightPadding);
     }
 
+    void AbstractRenderWindow::setTextIndentation(int theIndentaion) {
+        _myRenderer->getTextManager().setIndentation(theIndentaion);
+    }
     void AbstractRenderWindow::setHTextAlignment(unsigned int theHAlignment) {
         _myRenderer->getTextManager().setHTextAlignment(TextRenderer::TextAligment(theHAlignment));
     }

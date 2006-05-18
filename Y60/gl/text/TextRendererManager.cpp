@@ -140,6 +140,13 @@ namespace y60 {
         }
     }
 
+	void
+	TextRendererManager::setIndentation(int theIndentation) {
+        _myBitmapRenderer.setIndentation(theIndentation);
+        if (_myTTFRenderer) {
+            _myTTFRenderer->setIndentation(theIndentation);
+        }
+    }
     void
 	TextRendererManager::setLineHeight(unsigned theHeight) {
         _myBitmapRenderer.setLineHeight(theHeight);

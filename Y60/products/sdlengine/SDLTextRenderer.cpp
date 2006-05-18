@@ -262,7 +262,7 @@ namespace y60 {
     }
 
     int
-    SDLTextRenderer::calcHorizontalAlignment(unsigned theSurfaceWidth, unsigned theLineWidth,
+    SDLTextRenderer::calcHorizontalAlignment(unsigned theSurfaceWidth, const Line & theLine,
         int theMinX)
     {
         if (theMinX < 0) {
@@ -270,11 +270,11 @@ namespace y60 {
         }
         switch(_myHorizontalAlignment) {
             case LEFT_ALIGNMENT:
-                return _myLeftPadding - theMinX;
+                return _myLeftPadding - theMinX + (theLine.indent ? _myIndentation : 0);
             case RIGHT_ALIGNMENT:
-                return theSurfaceWidth-_myRightPadding-theLineWidth;
+                return theSurfaceWidth-_myRightPadding-theLine.width;
             case CENTER_ALIGNMENT:
-                return (_myLeftPadding-_myRightPadding+theSurfaceWidth-theLineWidth) / 2;
+                return (_myLeftPadding-_myRightPadding+theSurfaceWidth-theLine.width) / 2;
         }
         return 0;
     }
@@ -516,7 +516,10 @@ namespace y60 {
                 if (i < theWords.size() - 1 && theLines.back().width + theWords[i+1].surface->w > theLineWidth) {
                     DB2(AC_TRACE << "  End of line with width: " << theLines.back().width <<
                         " wordcount: "<< theLines.back().wordCount << endl;)
+                    // start new line
                     theLines.push_back(Line());
+                    theLines.back().indent = true;
+                    theLines.back().width = _myIndentation;
                 }
             }
         }
@@ -674,7 +677,7 @@ namespace y60 {
 
         for (unsigned i = 0; i < myLines.size(); ++i) {
             int myMinX = myLines[i].wordCount ? myWords[myWordCount].minx : 0;
-            int myXPos = calcHorizontalAlignment(mySurfaceWidth, myLines[i].width, myMinX);
+            int myXPos = calcHorizontalAlignment(mySurfaceWidth, myLines[i], myMinX);
 
             DB2(AC_TRACE << "line: " << i << " wordcount: " << myLines[i].wordCount << endl;)
             for (unsigned j = 0; j < myLines[i].wordCount; ++j) {

@@ -220,7 +220,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         if (_mySettings) {
             return _mySettings;
         } else {
-            throw ("No settings found (Configurator.js)", fileline());
+            throw new Exception("No settings found (Configurator.js)", fileline());
         }
     }
 
@@ -231,7 +231,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         if (theSection) {
             var mySection = _mySettings.childNode(theSection);
             if (!mySection) {
-                throw ("Section " + theSection + " does not exist in " + theSettingsFile, fileline());
+                throw new Exception("Section " + theSection + " does not exist in " + theSettingsFile, fileline());
             }
             theListener.onUpdateSettings(mySection);
         } else {

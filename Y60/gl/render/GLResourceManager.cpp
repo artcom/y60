@@ -121,7 +121,7 @@ namespace y60 {
     void
     GLResourceManager::updateTextureData(ImagePtr theImage) {
         if (! theImage->getRasterPtr()) {
-            AC_ERROR << "No raster in image";
+            AC_ERROR << "No raster in image " << theImage->get<IdTag>();
             return;
         }
 

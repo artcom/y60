@@ -418,6 +418,14 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             return Method<DERIVED>::call((MyMethod)&DERIVED::setTextPadding,cx,obj,argc,argv,rval);
         }
         static JSBool
+        setTextIndentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Sets the indentation for 2nd and following lines of a paragraph");
+            DOC_PARAM("theIndentation", "", DOC_TYPE_INTEGER);
+            DOC_END;
+            typedef void (DERIVED::*MyMethod)(int);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::setTextIndentation,cx,obj,argc,argv,rval);
+        }
+        static JSBool
         setHTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             DOC_BEGIN("Sets horizontal alignment for text paragraphs" \
                       "See Renderer static properties for possible constants");
@@ -679,6 +687,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 {"setTextColor",       setTextColor,             1},
                 {"renderTextAsImage",  renderTextAsImage,        5},
                 {"setTextPadding",     setTextPadding,           4},
+                {"setTextIndentation", setTextIndentation,       1},
                 {"setHTextAlignment",  setHTextAlignment,        1},
                 {"setVTextAlignment",  setVTextAlignment,        1},
                 {"setLineHeight",      setLineHeight,            1},
