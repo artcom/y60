@@ -265,6 +265,9 @@ namespace y60 {
                                   CollisionInfo & theCollision);
 
             static bool intersectBodies(dom::NodePtr theRootNode,
+                                 const asl::Box3<float> & theBox,
+                                 IntersectionInfoVector & theIntersections);
+            static bool intersectBodies(dom::NodePtr theRootNode,
                                  const asl::LineSegment<float> & theStick,
                                  IntersectionInfoVector & theIntersections);
             static bool intersectBodies(dom::NodePtr theRootNode,

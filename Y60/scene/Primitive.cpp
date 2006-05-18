@@ -640,7 +640,7 @@ namespace y60 {
             myInfo._myNormal   = theNormal;
         }
     };
-
+    
     bool
     Primitive::intersect(const asl::LineSegment<float> & theStick,  IntersectionList & theIntersectionInfo) {
 

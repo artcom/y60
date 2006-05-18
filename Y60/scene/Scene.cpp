@@ -908,7 +908,39 @@ namespace y60 {
             return false;
         }
     };
+    
+    // By now we only check intersection on bb level (VS)
+    // TODO extend the box intersection visit by getting real contact with the primitives
+    template<>
+    struct IntersectBodyVisitor<class asl::Box3<float> >{
+        IntersectionInfoVector & _myList;
+        const asl::Box3<float> & _myBox;
 
+        IntersectBodyVisitor(const asl::Box3<float> & theBox, IntersectionInfoVector & theList) :
+            _myBox(theBox), _myList(theList) {
+        }
+
+        bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible) {
+            return (!isInsensible && _myBox.intersects(myBoundingBox));
+        }
+
+        bool visit(NodePtr theNode, y60::ShapePtr theShape, const asl::Matrix4f & theTransformation) {
+            // will only be called if the bb test suceeds, so just add the stuff to the intersection info pool
+            asl::Matrix4f myInverseTransformation = asl::inverse(theTransformation);
+            asl::Ptr<Primitive::IntersectionList> myPrimitiveIntersections =
+                asl::Ptr<Primitive::IntersectionList>(new Primitive::IntersectionList);
+            _myList.push_back(y60::IntersectionInfo());
+            y60::IntersectionInfo & myIntersection = _myList.back();
+            myIntersection._myBody = theNode;
+            myIntersection._myShape = theShape;
+            myIntersection._myTransformation = theTransformation;
+            myIntersection._myInverseTransformation = myInverseTransformation;
+            myIntersection._myPrimitiveIntersections = myPrimitiveIntersections;
+            return true;
+        }
+    };
+
+    
     bool
     Scene::intersectWorld(const LineSegment<float> & theStick,
                           IntersectionInfoVector & theIntersections)
@@ -934,6 +966,14 @@ namespace y60 {
         return visitBodys(myVisitor, getWorldRoot() );
     }
 
+    bool
+    Scene::intersectBodies(dom::NodePtr theRootNode, const asl::Box3<float> & theBox,
+                          IntersectionInfoVector & theIntersections)
+    {
+        MAKE_SCOPE_TIMER(Scene_intersect_Box3f);
+        IntersectBodyVisitor<asl::Box3<float> > myVisitor(theBox, theIntersections);
+        return visitBodys(myVisitor, theRootNode);
+    }
     bool
     Scene::intersectBodies(dom::NodePtr theRootNode, const LineSegment<float> & theStick,
                           IntersectionInfoVector & theIntersections)

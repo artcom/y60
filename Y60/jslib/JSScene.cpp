@@ -20,6 +20,7 @@
 #include "JSNode.h"
 #include "JSNodeList.h"
 #include "JSLine.h"
+#include "JSBox.h"
 #include "JSSphere.h"
 #include "JSMatrix.h"
 #include "JSintersection_functions.h"
@@ -141,6 +142,9 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     DOC_RESET;
     DOC_PARAM("theBody", "", DOC_TYPE_NODE);
     DOC_PARAM("theRay", "", DOC_TYPE_RAY);
+    DOC_RESET;
+    DOC_PARAM("theBody", "", DOC_TYPE_NODE);
+    DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
     DOC_RVAL("IntersectionInfoVector", DOC_TYPE_ARRAY)
     DOC_END;
     try {
@@ -160,7 +164,12 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             asl::Ray<float> myRay;
             convertFrom(cx, argv[1], myRay);
             y60::Scene::intersectBodies(myBodies, myRay, myIntersections);
-        } else {
+        } else if (JSBox3f::matchesClassOf(cx, argv[1])) {
+            asl::Box3<float> myBox;
+            convertFrom(cx, argv[1], myBox);
+            y60::Scene::intersectBodies(myBodies, myBox, myIntersections);
+        } 
+        else {
             JS_ReportError(cx,"JSScene::intersectBodies: bad argument type #1");
             return JS_FALSE;
         }
