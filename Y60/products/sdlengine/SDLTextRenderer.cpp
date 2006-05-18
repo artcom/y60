@@ -689,25 +689,25 @@ namespace y60 {
                     AC_TRACE << "  Pos:   " << myXPos << " x " << myYPos << endl;
                 )
 
-                unsigned myLineY = myWord.surface->h;
-                if (myLineY + myYPos > mySurfaceHeight-_myBottomPadding) {
-                    myLineY = mySurfaceHeight-_myBottomPadding-myYPos;
+                unsigned mySrcHeight = myWord.surface->h;
+                unsigned mySrcWidth  = myWord.surface->w;
+                if (mySrcHeight + myYPos > mySurfaceHeight-_myBottomPadding) {
+                    mySrcHeight = mySurfaceHeight-_myBottomPadding-myYPos;
                 }
 
-                DB2(
-                    cerr << "  Blit: " << srcRectangle.x << ", " << srcRectangle.y << ", "
-                        << srcRectangle.w << ", " << srcRectangle.h
-                        << "  ->  " << destRectangle.x << ", " << destRectangle.y << ", "
-                        << destRectangle.w << ", " << destRectangle.h << endl;
-                )
+                mySrcWidth = asl::minimum(mySrcWidth, unsigned(_myTextureSurface->w - myXPos));
+                mySrcHeight = asl::minimum(mySrcHeight, unsigned(_myTextureSurface->h - myYPos));
+
+                // [CH] We use a custom blitting function, because SDL does not provide the right
+                // functionality.
 
                 asl::Unsigned32 * mySrcLinePtr = (asl::Unsigned32 *)myWord.surface->pixels;
                 asl::Unsigned32 * myDstLinePtr = (asl::Unsigned32 *)_myTextureSurface->pixels + myYPos * _myTextureSurface->w + myXPos;
 
-                for (unsigned i = 0; i < myLineY; ++i) {
+                for (unsigned i = 0; i < mySrcHeight; ++i) {
                     asl::Unsigned32 * mySrcPixelPtr = mySrcLinePtr;
                     asl::Unsigned32 * myDstPixelPtr = myDstLinePtr;
-                    for (unsigned j = 0; j < myWord.surface->w; ++j) {
+                    for (unsigned j = 0; j < mySrcWidth; ++j) {
                         if (*mySrcPixelPtr >> 24) {
                             *myDstPixelPtr = *mySrcPixelPtr;
                         }
