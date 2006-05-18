@@ -1645,12 +1645,12 @@ SDL_Surface *TTF_RenderUNICODE_Blended(TTF_Font *font,
 
     DB(printf("Textbuffer size: %d %d\n", width, height);)
 	textbuf = SDL_AllocSurface(SDL_SWSURFACE, width, height, 32,
-                  0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+                  0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 	if ( textbuf == NULL ) {
 		return(NULL);
 	}
 
-	pixel = (fg.r<<16)|(fg.g<<8)|fg.b;
+	pixel = (fg.b<<16)|(fg.g<<8)|fg.r;
 
 	/* Initialize the destination surface with the text color to avoid
 	   OpenGL texture filtering artefacts [ART+COM Patch] */
