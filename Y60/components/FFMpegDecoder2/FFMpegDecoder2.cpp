@@ -184,9 +184,9 @@ namespace y60 {
             avcodec_flush_buffers(_myAStream->codec);
         }
         decodeFrame();
-        readAudio();
         if (_myAStream && getAudioFlag())
         {
+            readAudio();
 //            AC_INFO << "Start Audio";
             _myAudioSink->play();
         }
@@ -547,7 +547,10 @@ namespace y60 {
                 // Be sure we don't have a lock acquired here.
                 return;
             }
-            readAudio();
+            if (_myAStream && getAudioFlag())
+            {
+                readAudio();
+            }
             
 			AC_TRACE << "---- end of loop";
         }
