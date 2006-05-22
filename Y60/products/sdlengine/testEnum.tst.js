@@ -56,6 +56,11 @@ TestEnum.prototype.Constructor = function(obj, theName) {
             default:
                 FAILURE("switch");
         }
+        print(obj.myMaterial);
+        ENSURE( obj.myMaterial.properties.targetbuffers.depth);
+        obj.myMaterial.properties.targetbuffers.depth = false;
+        ENSURE( ! obj.myMaterial.properties.targetbuffers.depth);
+
 
     }
 };

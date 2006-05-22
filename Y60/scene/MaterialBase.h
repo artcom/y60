@@ -53,6 +53,7 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfString, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
     DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, BlendEquation, BLENDEQUATION_PROPERTY, EQUATION_ADD);
     DEFINE_MATERIAL_PROPERTY_TAG(LineWidthTag, float, LINEWIDTH_PROPERTY, float(1.0));
+    DEFINE_MATERIAL_PROPERTY_TAG(PointSizeTag, asl::Vector3f, POINTSIZE_PROPERTY, asl::Vector3f(1,1,1));
     DEFINE_MATERIAL_PROPERTY_TAG(LineSmoothTag, bool, LINESMOOTH_PROPERTY, bool(false));
 
 
@@ -71,6 +72,7 @@ namespace y60 {
         public TargetBuffersTag::Plug,
         public BlendEquationTag::Plug,
         public LineWidthTag::Plug,
+        public PointSizeTag::Plug,
         public LineSmoothTag::Plug
     {
         public:
@@ -86,6 +88,7 @@ namespace y60 {
                 TargetBuffersTag::Plug(this),
                 BlendEquationTag::Plug(this),
                 LineWidthTag::Plug(this),
+                PointSizeTag::Plug(this),
                 LineSmoothTag::Plug(this)
             {}
             IMPLEMENT_FACADE(MaterialPropertiesFacade);

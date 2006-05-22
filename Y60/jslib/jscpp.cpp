@@ -237,6 +237,9 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSBitset<y60::RenderStyles>::initClass(cx, theGlobalObject)) {
         return false;
     }
+    if (!JSBitset<y60::TargetBuffers>::initClass(cx, theGlobalObject)) {
+        return false;
+    }
 
     if (!JS_DefineFunctions(cx,theGlobalObject, JSFileFunctions::Functions())) {
         return false;

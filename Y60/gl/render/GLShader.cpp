@@ -190,14 +190,10 @@ namespace y60 {
             glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());
         }
 
-        dom::NodePtr myPointSizeProp = myMaterialPropFacade->getProperty(POINTSIZE_PROPERTY);
-        if (myPointSizeProp) {
-            const asl::Vector3f & myPointSizeParams = myPointSizeProp->nodeValueAs<asl::Vector3f>();
-            glPointSize(myPointSizeParams[0]);
-
-            glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, myPointSizeParams[1]);
-            glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
-        }
+        const asl::Vector3f & myPointSizeParams = myMaterialPropFacade->get<PointSizeTag>();
+        glPointSize(myPointSizeParams[0]);
+        glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, myPointSizeParams[1]);
+        glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
 
         dom::NodePtr myPointAttenuationProp = myMaterialPropFacade->getProperty(POINTATTENUATION_PROPERTY);
         if (myPointAttenuationProp) {

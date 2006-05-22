@@ -120,7 +120,7 @@ jsval as_jsval(JSContext *cx, JSLineSegment::NativeValuePtr theLine);
 
 template <class NATIVE_LINE>
 static JSBool
-toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+lineToString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("returns a string representation. e.g. '[[0,0,0],[100,100,100]]'");
     DOC_END;
     std::string myStringRep = asl::as_string(JSGenericLine<NATIVE_LINE>::getJSWrapper(cx,obj).getNative());
@@ -135,7 +135,7 @@ JSGenericLine<NATIVE_LINE>::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<std::endl;
     static JSFunctionSpec myFunctions[] = {
         /* name                native          nargs    */
-        {"toString",           &toString<NATIVE_LINE>,                0},
+        {"toString",           &lineToString<NATIVE_LINE>,                0},
         {0}
     };
     return myFunctions;

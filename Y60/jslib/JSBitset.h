@@ -48,6 +48,7 @@ class JSBitset : public JSWrapper<BITSET> {
             static std::string myClassName = buildClassName( BITSET::getName());
             return myClassName.c_str();
         };
+        static JSFunctionSpec * Functions();
 
         virtual unsigned long length() const {
             return BITSET::Flags::MAX;
@@ -180,6 +181,29 @@ class JSBitset : public JSWrapper<BITSET> {
     private:
 };
 
+template<class BITSET>
+static JSBool
+bitsetToString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("returns string representation of the Bitset.");
+    DOC_RVAL("", DOC_TYPE_STRING);
+    DOC_END;
+    std::string myStringRep = asl::as_string(JSBitset<BITSET>::getJSWrapper(cx,obj).getNative());
+    *rval = as_jsval(cx, myStringRep);
+    return JS_TRUE;
+}
+
+template <class BITSET>
+JSFunctionSpec *
+JSBitset<BITSET>::Functions() {
+    AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<std::endl;
+    static JSFunctionSpec myFunctions[] = {
+        /* name                native          nargs    */
+        {"toString",           &bitsetToString<BITSET>,              0},
+        {0}
+    };
+    return myFunctions;
+}
+
 template <class ENUM>
 struct JSClassTraits<asl::Bitset<ENUM> > : public JSClassTraitsWrapper<asl::Bitset<ENUM>, JSBitset<asl::Bitset<ENUM> > > {};
 
@@ -229,7 +253,8 @@ bool convertFrom(JSContext *cx, jsval theValue,
 template <class BITSET>
 JSObject *
 JSBitset<BITSET>::initClass(JSContext *cx, JSObject *theGlobalObject) {
-    JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0, 0, 0, 0, 0);
+    JSObject * myClassObject = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, 0, 
+            Functions(), 0, 0, 0);
     if (myClassObject) {
         uintN myFlags = JSPROP_ENUMERATE | JSPROP_PERMANENT;
         for (unsigned i = 0; i < BITSET::Flags::MAX; ++i) {
