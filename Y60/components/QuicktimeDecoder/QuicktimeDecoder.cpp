@@ -192,7 +192,10 @@ namespace y60 {
         myMovie->set<ImageWidthTag>(movieBounds.right);
         myMovie->set<ImageHeightTag>(movieBounds.bottom);
 
-        _myFrameTimeStep = ((myMovie->get<FrameRateTag>() == 50) ? 12:24);
+        TimeValue   myTimeBase = GetMovieTimeScale(_myMovie);//GetMovieTimeBase(_myMovie);// we want video samples
+        AC_INFO << "myTimeBase : " << myTimeBase;
+
+        _myFrameTimeStep = myTimeBase/ myMovie->get<FrameRateTag>();//((myMovie->get<FrameRateTag>() == 50) ? 12:24);
 
         // Setup video size and image matrix
         float myXResize = float(movieBounds.right) / asl::nextPowerOfTwo(movieBounds.right);
@@ -258,7 +261,7 @@ namespace y60 {
 
     double
     QuicktimeDecoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
-        AC_INFO << "Read frame: " << theFrame << ", last decoded frame: " << _myLastDecodedFrame;
+        AC_INFO << "Timestamp : " << theTime << "Read frame: " << theFrame << ", last decoded frame: " << _myLastDecodedFrame;
 
         if (theFrame >= getFrameCount() -1) {
             setEOF(true);
@@ -292,6 +295,7 @@ namespace y60 {
             myFlags |= nextTimeEdgeOK;
         }
         ::TimeValue myDesiredMovieTime = theFrameNumber * _myFrameTimeStep;
+        AC_INFO << "myDesiredMovieTime: " << myDesiredMovieTime;
 
         // skip to the next interesting time and get the duration for that frame
         GetMovieNextInterestingTime(_myMovie,
