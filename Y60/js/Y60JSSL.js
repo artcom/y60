@@ -748,4 +748,23 @@ function easeOut(theValue) {
 function easeIn(theValue) {
     return 2*easeInOut(theValue/2);
 }
+function gaussianBox_Mueller(theMean, theDeviation) {    
+	var x1, x2, w, y1;
+	do {
+		x1 = 2.0 * Math.random() - 1.0;
+		x2 = 2.0 * Math.random() - 1.0;
+		w = x1 * x1 + x2 * x2;
+	} while ( w >= 1.0 );
 
+	w = Math.sqrt( (-2.0 * Math.log( w ) ) / w );
+	y1 = x1 * w;
+
+	return( theMean + y1 * theDeviation );
+}
+function gaussianRandom() {
+    var myGaussianRandom = gaussianBox_Mueller(0.5, 0.5)
+    while (myGaussianRandom >1.0 || myGaussianRandom < 0.0) {
+        myGaussianRandom = gaussianBox_Mueller(0.5, 0.5)
+    }
+    return myGaussianRandom;
+}
