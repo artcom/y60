@@ -101,7 +101,7 @@ namespace y60 {
 
 #ifdef GL_ARB_texture_compression
 
-            glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_ARB, &isCompressed);
+            glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_ARB, (GLint*)&isCompressed);
             if (isCompressed == GL_TRUE) {
     #ifdef GL_TEXTURE_IMAGE_SIZE_ARB
                 glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_IMAGE_SIZE_ARB,
@@ -111,7 +111,7 @@ namespace y60 {
 
     #ifdef GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB
                 glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB,
-                        &compressedSize);
+                        (GLint*)&compressedSize);
                 AC_DEBUG << "Retrieved size (b): " << compressedSize <<endl;
     #endif
                 unsigned myCurrentBufferSize = theDestBlock.size();

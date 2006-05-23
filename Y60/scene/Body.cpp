@@ -111,7 +111,7 @@ namespace y60 {
             
             const Matrix4f & myBodyMatrix = get<GlobalMatrixTag>();
             
-            Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitives[i]->getConstLockingPositionsAccessor();
+            asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitives[i]->getConstLockingPositionsAccessor();
             const VertexData3f & myPositions = myPositionAccessor->get();
             AC_DEBUG << " have " << myPositions.size() << " positions " << endl; 
             AC_DEBUG << " applying global transform " << myBodyMatrix << endl; 

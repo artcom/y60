@@ -53,7 +53,14 @@
 namespace AssurePolicy {
     
     DEFINE_NESTED_EXCEPTION(AssurePolicy, Violation, asl::Exception)
-#undef check
+
+#ifdef check
+	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+		#warning Symbol 'check' defined as macro, undefining. (Outrageous namespace pollution by Apple's AssertMacros.h, revealing arrogance and incompetence)
+	#endif
+	#undef check
+#endif
+
     struct Throw {
             static void check( bool myExpressionResult, const char * myExpression, 
                     const char * mySourceFileName, unsigned long mySourceLine)

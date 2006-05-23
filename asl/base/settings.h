@@ -33,6 +33,9 @@
  * diferences.
  */
 
+// set to supress warnings about #undef'ing colliding symbols from system headers
+#define _SETTING_NO_UNDEF_WARNING_ 1
+
 #ifdef _GNU_SOURCE
     #if (__GNUC__ < 3)
         #define __SETTING_FORCE_STRSTREAM___

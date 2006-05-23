@@ -324,6 +324,9 @@ public abstract class CommandLineLinker extends AbstractLinker
         for (int i = 0; i < endargs.length; i++) {
           allArgs[index++] = decorateLinkerOption(buf, endargs[i]);
         }
+//        for (int i = 0; i < allArgs.length; i++) {
+//			System.out.println("prepareArguments: arg["+i+"]="+allArgs[i]);
+//		}
         return allArgs;
     }
 

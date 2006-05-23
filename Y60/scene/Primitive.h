@@ -45,7 +45,11 @@
 //    #endif
 #endif
 
+#ifdef OSX
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 #include <y60/DataTypes.h>
 #include <asl/Exception.h>

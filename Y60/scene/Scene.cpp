@@ -194,7 +194,7 @@ namespace y60 {
             setupEmptyDocument(*_mySceneDom, "");
         }
 
-        Ptr<ISceneDecoder> myDecoder =
+        asl::Ptr<ISceneDecoder> myDecoder =
             DecoderManager::get().findDecoder<ISceneDecoder>(theFilename, theSource);
         if (myDecoder) {
             myDecoder->setProgressNotifier(theNotifier);
@@ -958,11 +958,11 @@ namespace y60 {
         return visitBodys(myVisitor, getWorldRoot());
     }
     bool
-    Scene::intersectWorld(const Line<float> & theStick,
+    Scene::intersectWorld(const asl::Line<float> & theStick,
                           IntersectionInfoVector & theIntersections)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_Line);
-        IntersectBodyVisitor<Line<float> > myVisitor (theStick, theIntersections);
+        IntersectBodyVisitor<asl::Line<float> > myVisitor (theStick, theIntersections);
         return visitBodys(myVisitor, getWorldRoot() );
     }
 
@@ -991,11 +991,11 @@ namespace y60 {
         return visitBodys(myVisitor, theRootNode);
     }
     bool
-    Scene::intersectBodies(dom::NodePtr theRootNode, const Line<float> & theStick,
+    Scene::intersectBodies(dom::NodePtr theRootNode, const asl::Line<float> & theStick,
                           IntersectionInfoVector & theIntersections)
     {
         MAKE_SCOPE_TIMER(Scene_intersect_Line);
-        IntersectBodyVisitor<Line<float> > myVisitor (theStick, theIntersections);
+        IntersectBodyVisitor<asl::Line<float> > myVisitor (theStick, theIntersections);
         return visitBodys(myVisitor, theRootNode );
     }
     template <class VISITOR>
@@ -1188,7 +1188,7 @@ namespace y60 {
 
         DocumentPtr mySceneDom(new dom::Document());
         setupEmptyDocument(*mySceneDom, "");
-        Ptr<ISceneDecoder> myDecoder =
+        asl::Ptr<ISceneDecoder> myDecoder =
             DecoderManager::get().findDecoder<ISceneDecoder>(theFilename, &*mySource);
         if (myDecoder) {
             myDecoder->decodeScene(*mySource, mySceneDom);

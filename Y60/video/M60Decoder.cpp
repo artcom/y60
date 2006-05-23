@@ -18,6 +18,7 @@
 //=============================================================================
 #include "M60Decoder.h"
 #include "MovieEncoding.h"
+#include <asl/Ptr.h>
 #include <asl/RunLengthEncoder.h>
 
 using namespace std;
@@ -51,7 +52,7 @@ namespace y60 {
 
     void
     M60Decoder::load(const std::string & theFilename) {
-        _myMovieBlock = Ptr<ReadableStream>(new ConstMappedBlock(theFilename));
+        _myMovieBlock = asl::Ptr<ReadableStream>(new ConstMappedBlock(theFilename));
         M60Header myHeader(*_myMovieBlock);
 
         if (!myHeader.checkMagicNumber()) {

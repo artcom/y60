@@ -222,7 +222,9 @@ class Enum {
          * any error is detected. Tries to print helpful error messages.
          */
 #ifdef verify
-#warning verify defined as macro, undefining
+	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+		#warning Symbol 'verify' defined as macro, undefining. (Outrageous namespace pollution by Apple's AssertMacros.h, revealing arrogance and incompetence)
+	#endif
 #undef verify
 #endif
         static bool verify(const char * theFile, unsigned theLine) {

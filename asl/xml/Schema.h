@@ -105,15 +105,11 @@ class Schema : public DocumentFragment {
 		const NodePtr findTopLevelAttributeDeclaration(const DOMString & theName) const;
 		dom::NodePtr addDocument(const Node & theDocument, const DOMString & theNSPrefix);
 		void preprocess(const NodePtr theNewBranch, const DOMString & theNSPrefix);
-// XXX Someone (probably at Apple's) defined a symbol named 'check'
-//     which clashes with  the method check below.
-//     This is a workaround for this situation. TODO: find out what
-//     is going on exactly
-#ifdef OSX
 #ifdef check
-#undef check
-#warning Symbol 'check' allready defined. Undefining.
-#endif
+	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+		#warning Symbol 'check' defined as macro, undefining. (Outrageous namespace pollution by Apple's AssertMacros.h, revealing arrogance and incompetence)
+	#endif
+	#undef check
 #endif
 		void check() const;
 		void dump() const;

@@ -263,10 +263,10 @@ namespace y60 {
         const VertexData3f::VertexDataVector & myNormals =
             getVertexData(NORMALS).getVertexDataCast<asl::Vector3f>();
 #else
-        Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
         const VertexData3f & myNormals = myNormalsAccessor->get();
 #endif
         // get two sides of the triangle
@@ -299,7 +299,7 @@ namespace y60 {
         VertexData2f::VertexDataVector & myUVSet
 			= _myVertexData[myRole]->VertexDataBase::getVertexDataCast<asl::Vector2f>();
 #else
-        Ptr<VertexDataAccessor<Vector2f> > myUVSetAccessor =
+        asl::Ptr<VertexDataAccessor<Vector2f> > myUVSetAccessor =
             _myVertexData[myRole]->VertexDataBase::getVertexDataAccessor<asl::Vector2f>();
         VertexData2f & myUVSet = myUVSetAccessor->get();
 #endif
@@ -474,10 +474,10 @@ namespace y60 {
         _myBoundingBoxTree = BoundingBoxTreePtr(new BoundingBoxTree);
         BoundingBoxTreeBuilder myBuilder(*_myBoundingBoxTree);
 
-        Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         scanElements(myBuilder, myPositions, myNormals);
@@ -644,10 +644,10 @@ namespace y60 {
     bool
     Primitive::intersect(const asl::LineSegment<float> & theStick,  IntersectionList & theIntersectionInfo) {
 
-        Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         IntersectTriangleDetector<asl::LineSegment<float> > myDetector(theStick, theIntersectionInfo);
@@ -660,10 +660,10 @@ namespace y60 {
     bool
     Primitive::intersect(const asl::Ray<float> & theStick,  IntersectionList & theIntersectionInfo) {
 
-        Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         IntersectTriangleDetector<asl::Ray<float> > myDetector(theStick, theIntersectionInfo);
@@ -677,10 +677,10 @@ namespace y60 {
     bool
     Primitive::intersect(const asl::Line<float> & theStick,  IntersectionList & theIntersectionInfo) {
 
-        Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         IntersectTriangleDetector<asl::Line<float> > myDetector(theStick, theIntersectionInfo);
@@ -796,10 +796,10 @@ namespace y60 {
         //updateNormalPositionColorPointers();
         SweptSphereAllContactsDetector myDetector(theSphere, theMotion, theSphereSpaceTransform, theCollisionInfo);
 
-        Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         return scanElements(myDetector, myPositions, myNormals);
@@ -910,10 +910,10 @@ namespace y60 {
 
         SweptSphereFirstContactDetector myDetector(theSphere, theMotion, theSphereSpaceTransform, theCurrentContact, theNewContactInfo);
 
-        Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         return scanElements(myDetector, myPositions, myNormals);
@@ -979,85 +979,85 @@ namespace y60 {
         return 0;
     }
 #else
-    Ptr<VertexDataAccessor<Vector3f> >
+    asl::Ptr<VertexDataAccessor<Vector3f> >
     Primitive::getLockingPositionsAccessor() {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(POSITIONS));
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector3f>();
         }
-        return Ptr<VertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector3f> >(0);
     }
 
-    Ptr<ConstVertexDataAccessor<Vector3f> >
+    asl::Ptr<ConstVertexDataAccessor<Vector3f> >
     Primitive::getConstLockingPositionsAccessor() const {
         const y60::VertexDataBasePtr myVertices = getVertexDataPtr(VertexDataRole(POSITIONS));
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector3f>();
         }
-        return Ptr<ConstVertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<ConstVertexDataAccessor<Vector3f> >(0);
     }
 
-    Ptr<VertexDataAccessor<Vector3f> >
+    asl::Ptr<VertexDataAccessor<Vector3f> >
     Primitive::getLockingNormalsAccessor() {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(NORMALS));
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector3f>();
         }
-        return Ptr<VertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector3f> >(0);
     }
 
-    Ptr<ConstVertexDataAccessor<Vector3f> >
+    asl::Ptr<ConstVertexDataAccessor<Vector3f> >
     Primitive::getConstLockingNormalsAccessor() const {
         const y60::VertexDataBasePtr myVertices = getVertexDataPtr(VertexDataRole(NORMALS));
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector3f>();
         }
-        return Ptr<ConstVertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<ConstVertexDataAccessor<Vector3f> >(0);
     }
 
-    Ptr<VertexDataAccessor<Vector4f> >
+    asl::Ptr<VertexDataAccessor<Vector4f> >
     Primitive::getLockingColorsAccessor() {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(COLORS));
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector4f>();
         }
-        return Ptr<VertexDataAccessor<Vector4f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector4f> >(0);
     }
 
-    Ptr<ConstVertexDataAccessor<Vector4f> >
+    asl::Ptr<ConstVertexDataAccessor<Vector4f> >
     Primitive::getConstLockingColorsAccessor() const {
         const y60::VertexDataBasePtr myVertices = getVertexDataPtr(VertexDataRole(COLORS));
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector4f>();
         }
-        return Ptr<ConstVertexDataAccessor<Vector4f> >(0);
+        return asl::Ptr<ConstVertexDataAccessor<Vector4f> >(0);
     }
 
-    Ptr<VertexDataAccessor<float> >
+    asl::Ptr<VertexDataAccessor<float> >
     Primitive::getLockingTexCoord1fAccessor(unsigned theSlot) {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(TEXCOORD0+theSlot));
         if (myVertices) {
             return myVertices->getVertexDataAccessor<float>();
         }
-        return Ptr<VertexDataAccessor<float> >(0);
+        return asl::Ptr<VertexDataAccessor<float> >(0);
     }
 
-    Ptr<VertexDataAccessor<Vector2f> >
+    asl::Ptr<VertexDataAccessor<Vector2f> >
     Primitive::getLockingTexCoord2fAccessor(unsigned theSlot) {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(TEXCOORD0+theSlot));
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector2f>();
         }
-        return Ptr<VertexDataAccessor<Vector2f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector2f> >(0);
     }
 
-    Ptr<VertexDataAccessor<Vector3f> >
+    asl::Ptr<VertexDataAccessor<Vector3f> >
     Primitive::getLockingTexCoord3fAccessor(unsigned theSlot) {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(TEXCOORD0+theSlot));
         if (myVertices) {
             return myVertices->getVertexDataAccessor<asl::Vector3f>();
         }
-        return Ptr<VertexDataAccessor<Vector3f> >(0);
+        return asl::Ptr<VertexDataAccessor<Vector3f> >(0);
     }
 
     void

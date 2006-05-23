@@ -24,10 +24,19 @@
     #undef max
 #endif
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
+#ifdef OSX
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
+	#include <OpenGL/glext.h>
+	#include <OpenGL/OpenGL.h>
+#else
+	#include <GL/gl.h>
+	#include <GL/glu.h>
+	#include <GL/glext.h>
+#endif
 
+
+// window system extensions
 #ifdef WIN32
 #   include <GL/glh_extensions.h>
 #   include <GL/glh_genext.h>
@@ -36,6 +45,15 @@
     #include <GL/glx.h>
     #include <GL/glxext.h>
 #endif
+#ifdef OSX
+	#include <GL/glh_extensions.h>
+	#include <GL/glh_genext.h>
+	#include <AGL/agl.h>
+//	#include <OpenGL/OpenGL.h>
+//    #include <OpenGL/glx.h>
+//    #include <OpenGL/glxext.h>
+#endif
+
 
 namespace y60 {
     DEFINE_EXCEPTION(OpenGLException, asl::Exception);
@@ -52,6 +70,12 @@ struct GLExceptionHelper {
 };
 
 }
+
+#ifdef _N_OSX
+
+	#include <AGL/agl.h>
+
+#else
 
 /* we have to define our own function pointers
  * we give them private names and
@@ -204,6 +228,7 @@ DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
 #define glGenerateMipmapEXT _ac_glGenerateMipmapEXT
 #endif
 
+
 // Swap interval
 #ifdef WIN32
     DEF_PROC_ADDRESS( PFNWGLSWAPINTERVALEXTPROC, wglSwapIntervalEXT );
@@ -219,6 +244,9 @@ DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
 #endif
 
 } // extern C
+
+#endif // not OSX
+
 
 #ifndef GL_ARB_point_sprite
 #define GL_ARB_point_sprite

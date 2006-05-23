@@ -35,7 +35,7 @@ public class GccLinker extends AbstractLdLinker {
     private static String[] linkerOptions = new String[]{"-bundle",
             "-dynamiclib", "-nostartfiles", "-nostdlib", "-prebind", "-s",
             "-static", "-shared", "-symbolic", "-Xlinker",
-            "--export-all-symbols", "-static-libgcc",};
+            "--export-all-symbols", "-static-libgcc", "-install_name"};
     private static final GccLinker dllLinker = new GccLinker("gcc", objFiles,
             discardFiles, "lib", ".so", false, new GccLinker("gcc", objFiles,
                     discardFiles, "lib", ".so", true, null));
@@ -77,6 +77,7 @@ public class GccLinker extends AbstractLdLinker {
      *            linker argument
      */
     public String decorateLinkerOption(StringBuffer buf, String arg) {
+// System.out.println("GccLinker.decorateLinkerOption"+buf);
         String decoratedArg = arg;
         if (arg.length() > 1 && arg.charAt(0) == '-') {
             switch (arg.charAt(1)) {
@@ -98,9 +99,18 @@ public class GccLinker extends AbstractLdLinker {
                 default :
                     boolean known = false;
                     for (int i = 0; i < linkerOptions.length; i++) {
-                        if (linkerOptions[i].equals(arg)) {
-                            known = true;
-                            break;
+  //System.out.println("GccLinker.decorateLinkerOption linkerOptions[i]="+linkerOptions[i]+", arg="+arg);
+                        //if (linkerOptions[i].equals(arg)) {
+						String myOption = linkerOptions[i];
+						int myLength =  myOption.length();
+						if (arg.length() > myLength) {
+							String myArg =arg.substring(0,myLength);
+//System.out.println("GccLinker.decorateLinkerOption myOption = "+myOption+", myArg="+myArg);
+                        	if (myOption.equals(myArg)) {
+//System.out.println("GccLinker.decorateLinkerOption comparison true");
+                            	known = true;
+                            	break;
+							}
                         }
                     }
                     if (!known) {

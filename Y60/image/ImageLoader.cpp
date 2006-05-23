@@ -114,17 +114,17 @@ namespace y60 {
         // theFrontFileName + "|" + theRightFileName + "|" + theBackFileName + "|" + theLeftFileName + "|"
 		// + theTopFileName + "|" + theBottomFileName;
         vector<string> myFilenames = asl::splitString(theFilename, "|");
-        vector<Ptr<ReadableBlock> > myBlocks;
+        vector<asl::Ptr<ReadableBlock> > myBlocks;
 
         // Check if files exist
         for (unsigned i = 0; i < myFilenames.size(); ++i) {
-            Ptr<ReadableBlock> myBlock;
+            asl::Ptr<ReadableBlock> myBlock;
             if (thePackageManager) {
                 myBlock = thePackageManager->openFile(myFilenames[i]);
             }
             // fall back to simply try to open the file
             if (!myBlock && fileExists(myFilenames[i])) {
-                myBlock = Ptr<ReadableBlock>(new ConstMappedBlock(myFilenames[i]));
+                myBlock = asl::Ptr<ReadableBlock>(new ConstMappedBlock(myFilenames[i]));
             }
             if (!myBlock) {
                 if (thePackageManager) {
@@ -147,7 +147,7 @@ namespace y60 {
         }
     }
 
-    ImageLoader::ImageLoader(Ptr<ReadableBlock> theInputData,
+    ImageLoader::ImageLoader(asl::Ptr<ReadableBlock> theInputData,
             const std::string & theFileDescription,
             const ITextureManagerPtr & theTextureManager,
             unsigned /*theDepth*/) :
@@ -173,7 +173,7 @@ namespace y60 {
     }
 
     void
-    ImageLoader::loadSingleImage(Ptr<ReadableBlock> theImageBlock) {
+    ImageLoader::loadSingleImage(asl::Ptr<ReadableBlock> theImageBlock) {
         I60Header myHeader;
         theImageBlock->readData(myHeader, 0);
 
@@ -204,7 +204,7 @@ namespace y60 {
     }
 
     void
-    ImageLoader::loadCubemap(std::vector<Ptr<ReadableBlock> > & theBlocks, unsigned theDepth) {
+    ImageLoader::loadCubemap(std::vector<asl::Ptr<ReadableBlock> > & theBlocks, unsigned theDepth) {
 
         for (unsigned i = 0; i < 6; ++i) {
             string myDescription = string("Face")+as_string(i)+"_"+_myFilename;
@@ -256,7 +256,7 @@ namespace y60 {
     }
 
     void
-    ImageLoader::loadI60File(Ptr<ReadableBlock> theImageBlock) {
+    ImageLoader::loadI60File(asl::Ptr<ReadableBlock> theImageBlock) {
         _myImageMatrix.makeIdentity();
         I60Header myHeader;
         theImageBlock->readData(myHeader, 0);
@@ -360,7 +360,7 @@ namespace y60 {
         unsigned myLineStride = GetBytesPerLine();
 
 #if 0
-        Ptr<Block> myWritableData = dynamic_cast_Ptr<Block>(_myData);
+        asl::Ptr<Block> myWritableData = dynamic_cast_Ptr<Block>(_myData);
         if (!myWritableData) {
             throw ImageLoaderException(string("Non-writable block: ") +
                     _myFilename, PLUS_FILE_LINE);
@@ -436,7 +436,7 @@ namespace y60 {
             unsigned myWidth  = GetWidth();
             unsigned myLineStride = GetBytesPerLine();
 
-            Ptr<Block> myDestinationBlock = Ptr<Block>(new Block());
+            asl::Ptr<Block> myDestinationBlock = asl::Ptr<Block>(new Block());
             myDestinationBlock->resize(myHeight * myWidth * 3);
 
             unsigned char ** myLineArray   = GetLineArray();

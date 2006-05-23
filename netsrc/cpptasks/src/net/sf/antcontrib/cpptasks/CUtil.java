@@ -364,7 +364,7 @@ public class CUtil {
                         myArgs[j] = "-" + myArgs[j];
                         myVector.add(myArgs[j]);
                     }
-                } else if (cmdline[i].indexOf("-framework") == 0) {
+                } else if ((cmdline[i].indexOf("-framework") == 0) || (cmdline[i].indexOf("-install_name") == 0))  {
                     String[] myArgs = cmdline[i].split(" ");
                     for(int j=0;j<myArgs.length;++j) {
                         myVector.add(myArgs[j]);

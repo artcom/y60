@@ -41,7 +41,8 @@ public class GppLinker extends AbstractLdLinker {
             ".lib", ".dll", ".so", ".sl"};
     private static String[] linkerOptions = new String[]{"-bundle", "-dylib",
             "-dynamic", "-dynamiclib", "-nostartfiles", "-nostdlib",
-            "-prebind", "-s", "-static", "-shared", "-symbolic", "-Xlinker"};
+            "-prebind", "-s", "-static", "-shared", "-symbolic", "-Xlinker",
+            "-install_name"}; // added for OSX - pavel
     private static final GppLinker instance = new GppLinker("g++", objFiles,
             discardFiles, "", "", false, null);
     private static final GppLinker machDllLinker = new GppLinker("g++",
@@ -101,6 +102,7 @@ public class GppLinker extends AbstractLdLinker {
      *            linker argument
      */
     public String decorateLinkerOption(StringBuffer buf, String arg) {
+//System.out.println("GppLinker.decorateLinkerOption arg="+arg);
         String decoratedArg = arg;
         if (arg.length() > 1 && arg.charAt(0) == '-') {
             switch (arg.charAt(1)) {
@@ -117,14 +119,25 @@ public class GppLinker extends AbstractLdLinker {
                 case 'l' :
                 case 'L' :
                 case 'u' :
+//System.out.println("GppLinker.decorateLinkerOption first char true");
                     break;
                 default :
                     boolean known = false;
                     for (int i = 0; i < linkerOptions.length; i++) {
-                        if (linkerOptions[i].equals(arg)) {
-                            known = true;
-                            break;
-                        }
+//System.out.println("GppLinker.decorateLinkerOption linkerOptions[i]="+linkerOptions[i]+", arg="+arg);
+                        //if (linkerOptions[i].equals(arg)) {
+						String myOption = linkerOptions[i];
+						int myLength =  myOption.length();
+						if (arg.length() > myLength) {
+							String myArg =arg.substring(0,myLength);
+//System.out.println("GppLinker.decorateLinkerOption myOption = "+myOption+", myArg="+myArg);
+                        	if (myOption.equals(myArg)) {
+//System.out.println("GppLinker.decorateLinkerOption comparison true");
+                            	known = true;
+
+                            	break;
+                        	}
+						}
                     }
                     if (!known) {
                         buf.setLength(0);
@@ -135,6 +148,7 @@ public class GppLinker extends AbstractLdLinker {
                     break;
             }
         }
+//System.out.println("GppLinker.decorateLinkerOption decoratedArg="+decoratedArg);
         return decoratedArg;
     }
     /**

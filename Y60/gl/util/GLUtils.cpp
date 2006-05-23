@@ -523,6 +523,15 @@ namespace y60 {
     }
 #endif
 
+#ifdef OSX
+#define SET_PROC_ADDRESS(p,x) \
+    _ac_ ## x = (p)  aglGetProcAddress( #x ); \
+    if (!x) { \
+        x = Missing_ ## x; \
+    }
+#endif
+
+
     void
     initGLExtensions(unsigned int /*theNeededExtensions*/,
                      bool /*theVerboseFlag*/)

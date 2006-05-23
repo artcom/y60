@@ -86,7 +86,12 @@ namespace asl {
  
 // some assholes at Microsoft define max as macro, so if we want
 // to use std::numeric_traits::max() we have to get rid of it.
+#ifdef max
+	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+		#warning Symbol 'max' defined as macro, undefining. (Outrageous namespace pollution by Microsoft, revealing arrogance and incompetence)
+	#endif
 #undef max
+#endif
 
     /**
      * Reads the environment variables 'AC_LOG_VERBOSITY' and 'AC_MODULE_VERBOSITY'
