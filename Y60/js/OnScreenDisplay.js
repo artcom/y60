@@ -65,6 +65,7 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
                 _myMessage             = [];
                 _myNextMessageLine     = 0;
             }
+            
             _myOverlay.position = new Vector2f((window.width - _myOverlay.width) / 2,
                                                (window.height - _myOverlay.height) / 2);
         }

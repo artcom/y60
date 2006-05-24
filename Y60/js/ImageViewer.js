@@ -256,6 +256,10 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 _myDragStart = new Vector2f(theX, theY);
             } else {
                 _myDragStart = null;
+                if (_myImageOverlay) {
+                    print("Color: " + _myImageOverlay.image.firstChild.firstChild.nodeValue.
+                        getPixel(theX-_myImageOverlay.position.x,theY-_myImageOverlay.position.y));
+                }
             }
         }
 
