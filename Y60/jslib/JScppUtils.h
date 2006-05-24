@@ -307,6 +307,11 @@ jsval as_jsval(JSContext *cx, const Glib::ustring & theUTF8String) {
     return as_jsval(cx, theUTF8String.data());
 }
 
+inline
+jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String) {
+    JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<const jschar*>(theUTF16String.c_str()));
+    return STRING_TO_JSVAL(myString);    
+}
 
 template <class T>
 jsval as_jsval(JSContext *cx, const std::vector<T> & theVector) {
