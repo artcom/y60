@@ -38,11 +38,14 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
         return myImageNode;
     }
 
-    obj.createMovie = function(theSource) {
+    obj.createMovie = function(theSource, theDecoderHint) {
         var myMovie = Node.createElement("movie");
         _myBaseViewer.getImages().appendChild(myMovie);
         myMovie.src = theSource;
         myMovie.name = theSource;
+        if (theDecoderHint) {
+            myMovie.decoderhint = theDecoderHint;
+        }
         window.scene.loadMovieFrame(myMovie);
         return myMovie;
     }

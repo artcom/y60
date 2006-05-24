@@ -221,9 +221,8 @@ namespace y60 {
         if (getState() != STOP) {
             AC_DEBUG << "Joining FFMpegDecoder Thread";
             join();
-            if (_myAStream && getAudioFlag())
-            {
-                _myAudioSink->stop();
+            if (_myAudioSink) {
+                _myAudioSink->stop();   
             }
             _myFrameRecycler.close();
             _myDemux->clearPacketCache();
