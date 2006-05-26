@@ -16,6 +16,7 @@
 #include <iostream>
 #include <asl/Auto.h>
 #include <asl/settings.h>
+#include <asl/Logger.h>
 #include <asl/string_functions.h>
 
 #define MAX_PES_SIZE (4*1024)
@@ -58,14 +59,18 @@ DvbTeleText::~DvbTeleText()
 
 void
 DvbTeleText::run(){
-    if ((_myDemuxFd = open(_myDemuxDeviceName.c_str(), O_RDWR)) < 0){
-        throw(DvbTeleTextException(string("Cannot open: "+_myDemuxDeviceName), PLUS_FILE_LINE));
-    }
+    try {
+        if ((_myDemuxFd = open(_myDemuxDeviceName.c_str(), O_RDWR)) < 0){
+            throw(DvbTeleTextException(string("Cannot open: "+_myDemuxDeviceName), PLUS_FILE_LINE));
+        }
 
-    set_filter();
+        set_filter();
     
-    while(!shouldTerminate()){
-        processStream();
+        while (!shouldTerminate()){
+            processStream();
+        }
+    } catch (asl::Exception & ex) {
+	AC_ERROR << "Exception in DvbTeleText::run() " << ex;
     }
 }
 
@@ -80,7 +85,9 @@ DvbTeleText::startDecoderThread(const int & thePid){
 
 void
 DvbTeleText::stopDecoderThread(){
-    join();
+    if (isActive()){
+       join();
+    }
 }
 
 basic_string<Unsigned16>
@@ -126,9 +133,9 @@ DvbTeleText::safe_read(void *buf, int count){
                 throw(DvbTeleTextException(string("Cannor Read from: ")+_myDemuxDeviceName, PLUS_FILE_LINE));
             }
         }
-        else if (bytes == 0) {
-            throw(DvbTeleTextException("Got EOF on demux device?!", PLUS_FILE_LINE));
-        }
+        // else if (bytes == 0) {
+        //     throw(DvbTeleTextException("Got EOF on demux device?!", PLUS_FILE_LINE));
+        // }
     } while (bytes < count);
 }
 
