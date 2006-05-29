@@ -141,27 +141,29 @@ DvbTuner::getPage(const unsigned & thePageNumber){
 
 void
 DvbTuner::check_frontend(){
-    fe_status_t status;
-    uint16_t snr, signal;
-    uint32_t ber, uncorrected_blocks;
+    fe_status_t myStatus;
+    // uint16_t snr, signal;
+    // uint32_t ber, uncorrected_blocks;
+    Unsigned16 mySnr, mySignalStrength;
+    Unsigned32 myBer, myUncorrectedBlocks;
 
     bool myHasLock = false;
     
     do {
-        ioctl(_myFrontendFd, FE_READ_STATUS, &status);
-        ioctl(_myFrontendFd, FE_READ_SIGNAL_STRENGTH, &signal);
-        ioctl(_myFrontendFd, FE_READ_SNR, &snr);
-        ioctl(_myFrontendFd, FE_READ_BER, &ber);
-        ioctl(_myFrontendFd, FE_READ_UNCORRECTED_BLOCKS, &uncorrected_blocks);
+        ioctl(_myFrontendFd, FE_READ_STATUS, &myStatus);
+        ioctl(_myFrontendFd, FE_READ_SIGNAL_STRENGTH, &mySignalStrength);
+        ioctl(_myFrontendFd, FE_READ_SNR, &mySnr);
+        ioctl(_myFrontendFd, FE_READ_BER, &myBer);
+        ioctl(_myFrontendFd, FE_READ_UNCORRECTED_BLOCKS, &myUncorrectedBlocks);
         
-        AC_DEBUG << std::hex << "status 0x" << status
-                  << " signal 0x" << signal
-                  << " snr 0x" << snr
-                  << " ber 0x" << ber
-                  << " uncBlocks 0x" << uncorrected_blocks
-		  << ((status & FE_HAS_LOCK) ? " FE_HAS_LOCK" : "");
+        AC_DEBUG << std::hex << "status 0x" << myStatus
+                  << " signal 0x" << mySignalStrength
+                  << " snr 0x" << mySnr
+                  << " ber 0x" << myBer
+                  << " uncBlocks 0x" << myUncorrectedBlocks
+		  << ((myStatus & FE_HAS_LOCK) ? " FE_HAS_LOCK" : "");
         
-        if (status & FE_HAS_LOCK) {
+        if (myStatus & FE_HAS_LOCK) {
             myHasLock = true;
         }
         
