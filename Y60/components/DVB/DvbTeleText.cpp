@@ -109,7 +109,7 @@ void
 DvbTeleText::set_filter(){
     struct dmx_pes_filter_params f;
     
-    f.pid = (uint16_t) _myPid;
+    f.pid = _myPid;
     f.input = DMX_IN_FRONTEND;
     f.output = DMX_OUT_TAP;
     f.pes_type = DMX_PES_OTHER; /* DMX_PES_TELETEXT if you want vbi insertion */
