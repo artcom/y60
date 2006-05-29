@@ -45,7 +45,7 @@ SensorArray::addSensor(unsigned thePortId, unsigned theControllerId, unsigned th
 
 
 void
-SensorArray::createEvents(std::vector<asl::Vector2i> & theEventList,
+SensorArray::createCookedEvents(std::vector<asl::Vector2i> & theEventList,
                           unsigned thePortId, unsigned theControllerId, unsigned theBitMask)
 {
     for (unsigned bit = 0; bit < 8; ++bit) {
@@ -56,6 +56,17 @@ SensorArray::createEvents(std::vector<asl::Vector2i> & theEventList,
             if (iter != _mySensorMap.end()) {
                 theEventList.push_back(iter->second);
             }
+        }
+    }
+}
+void
+SensorArray::createRawEvents(std::vector<asl::Vector2i> & theEventList,
+                          unsigned thePortId, unsigned theControllerId, unsigned theBitMask)
+{
+    for (unsigned bit = 0; bit < 8; ++bit) {
+
+        if (theBitMask & (1 << bit)) {
+             theEventList.push_back(asl::Vector2i(theControllerId, 1 << bit));
         }
     }
 }

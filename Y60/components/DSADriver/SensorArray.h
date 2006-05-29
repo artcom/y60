@@ -48,7 +48,9 @@ public:
     void addSensor(unsigned thePortId, unsigned theControllerId, unsigned theBitNumber,
                    const asl::Vector2i & theCoordinate);
 
-    void createEvents(std::vector<asl::Vector2i> & theEventList,
+    void createCookedEvents(std::vector<asl::Vector2i> & theEventList,
+                      unsigned thePortId, unsigned theControllerId, unsigned theBitMask);
+    void createRawEvents(std::vector<asl::Vector2i> & theEventList,
                       unsigned thePortId, unsigned theControllerId, unsigned theBitMask);
 
 private:

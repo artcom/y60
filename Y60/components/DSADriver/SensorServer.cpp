@@ -20,6 +20,7 @@
 #include "SensorServer.h"
 
 #include <asl/SerialDeviceFactory.h>
+#include <asl/Logger.h>
 #include <sstream>
 #include <memory>
 

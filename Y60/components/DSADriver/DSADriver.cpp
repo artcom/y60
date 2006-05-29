@@ -59,47 +59,54 @@ void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
             unsigned myArrayID = asl::as<int>(myArrayNode->getAttribute("id")->nodeValue());
             std::string myArrayName = myArrayNode->getAttribute("name")->nodeValue();
 
-            const asl::Vector2i myGridSize = asl::as<asl::Vector2i>(myArrayNode->getAttribute("gridsize")->nodeValue());
 
             if (myArrayNode->getAttribute("interpolate")) {
                 _myInterpolateFlag = asl::as<bool>(myArrayNode->getAttribute("interpolate")->nodeValue());
             }
             AC_DEBUG << "DSADriver: interpolate=" << _myInterpolateFlag;
 
-            SensorArrayPtr mySensorArray(new SensorArray(myArrayName,myGridSize));
+            SensorArrayPtr mySensorArray;
+            asl::Vector2i myGridSize(0,0);
+
+            if (myArrayNode->getAttribute("gridsize")) {
+                myGridSize = asl::as<asl::Vector2i>(myArrayNode->getAttribute("gridsize")->nodeValue());
+            }
+            mySensorArray = SensorArrayPtr(new SensorArray(myArrayName,myGridSize));
             _mySensorArray[myArrayID] = mySensorArray;
 
             /*
              * regular grid
              * [portID,controllerID,bitNumber]
              */
-            std::string myData = (*myArrayNode)("#text").nodeValue();
-            typedef std::vector< std::vector< asl::Vector3i > > VectorOfVectorOfVector3i;
-            VectorOfVectorOfVector3i mySensorMapping = asl::as<VectorOfVectorOfVector3i>(myData);
+            if (myGridSize[1] && myGridSize[2]) {
+                std::string myData = (*myArrayNode)("#text").nodeValue();
+                typedef std::vector< std::vector< asl::Vector3i > > VectorOfVectorOfVector3i;
+                VectorOfVectorOfVector3i mySensorMapping = asl::as<VectorOfVectorOfVector3i>(myData);
 
-            for (unsigned row = 0; row < myGridSize[1]; ++row) {
-                for (unsigned col = 0; col < myGridSize[0]; ++col) {
+                for (unsigned row = 0; row < myGridSize[1]; ++row) {
+                    for (unsigned col = 0; col < myGridSize[0]; ++col) {
 
-                    unsigned myPortId, myControllerId, myBitNumber;
-                    myPortId = mySensorMapping[row][col][0];
-                    myControllerId = mySensorMapping[row][col][1];
-                    myBitNumber = mySensorMapping[row][col][2];
-                    if (myPortId == (unsigned)-1 ||
-                        myControllerId == (unsigned)-1 ||
-                        myBitNumber == (unsigned)-1) {
-                        AC_WARNING << "DSADriver: Ignoring sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber;
-                        continue;
-                    }
+                        unsigned myPortId, myControllerId, myBitNumber;
+                        myPortId = mySensorMapping[row][col][0];
+                        myControllerId = mySensorMapping[row][col][1];
+                        myBitNumber = mySensorMapping[row][col][2];
+                        if (myPortId == (unsigned)-1 ||
+                                myControllerId == (unsigned)-1 ||
+                                myBitNumber == (unsigned)-1) {
+                            AC_WARNING << "DSADriver: Ignoring sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber;
+                            continue;
+                        }
 
-                    SensorServerList::iterator it = _mySensorServers.find(myPortId);
-                    if (it == _mySensorServers.end()) {
-                        AC_WARNING << "DSADriver: No such port for sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber << "; sensor ignored";
-                    }
-                    else {
-                        mySensorArray->addSensor(myPortId,
-                                                 myControllerId,
-                                                 myBitNumber,
-                                                 asl::Vector2i(col,row));
+                        SensorServerList::iterator it = _mySensorServers.find(myPortId);
+                        if (it == _mySensorServers.end()) {
+                            AC_WARNING << "DSADriver: No such port for sensor " << myPortId << "/" << myControllerId << "/" << myBitNumber << "; sensor ignored";
+                        }
+                        else {
+                            mySensorArray->addSensor(myPortId,
+                                    myControllerId,
+                                    myBitNumber,
+                                    asl::Vector2i(col,row));
+                        }
                     }
                 }
             }
@@ -122,12 +129,21 @@ vector<y60::EventPtr> DSADriver::poll()
             std::vector<asl::Vector2i> myRawEvents;
             for(SensorServer::SensorData::iterator sdi = mySensorData.begin();
                 sdi != mySensorData.end(); ++sdi) {
-
-                sali->second->createEvents(myRawEvents,
+                if (sali->second->getGridSize()[0] == 0 &&
+                    sali->second->getGridSize()[1] == 0) 
+                {
+                    sali->second->createRawEvents(myRawEvents,
                                            ssli->first, // thePortId
                                            sdi->first,  // theControllerId
                                            sdi->second  // theBitMask
                                            );
+                } else {
+                    sali->second->createCookedEvents(myRawEvents,
+                                           ssli->first, // thePortId
+                                           sdi->first,  // theControllerId
+                                           sdi->second  // theBitMask
+                                           );
+                }
             }
 
             // interpolate neighboring events
