@@ -472,7 +472,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (!_myShutter) {
             print("Creating shutter");
             _myShutter = new Shutter(self, new Vector4f(0,0,0,0));
-            self.registerSettingsListener(_myShutter, "Global");
+            self.registerSettingsListener(_myShutter, "Shutter");
         }
     }
 

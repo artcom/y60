@@ -70,7 +70,7 @@ namespace y60 {
     Body::getShape() { 
         dom::NodePtr myShapeNode = getNode().getElementById(get<ShapeTag>());
         if (!myShapeNode) {
-            throw asl::Exception(string("Could not find shape with id: ") + get<ShapeTag>(), PLUS_FILE_LINE);
+            throw asl::Exception(string("Body ") + get<NameTag>() + ": Could not find shape with id: " + get<ShapeTag>(), PLUS_FILE_LINE);
         } else {
             return *(myShapeNode->getFacade<Shape>());
         }         
@@ -80,7 +80,7 @@ namespace y60 {
     Body::getShape() const { 
         const dom::NodePtr myShapeNode = getNode().getElementById(get<ShapeTag>());
         if (!myShapeNode) {
-            throw asl::Exception(string("Could not find shape with id: ") + get<ShapeTag>(), PLUS_FILE_LINE);
+            throw asl::Exception(string("Body ") + get<NameTag>() + ": Could not find shape with id: " + get<ShapeTag>(), PLUS_FILE_LINE);
         } else {
             return *(myShapeNode->getFacade<Shape>());
         }         

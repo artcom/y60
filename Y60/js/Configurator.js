@@ -18,13 +18,13 @@
 
 function Configurator(theSceneViewer, theSettingsFile) {
     this.Constructor(this, theSceneViewer, theSettingsFile);
-}
+}       
 
 Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFile) {
     const DISPLAY_DURATION  = 3;
     const FADE_DURATION     = 1;
     const BOX_SIZE          = [600,100];
-
+    
     function Setting(theNode) {
         var _myNode = theNode;
         var _myArrayPos  = null;
@@ -38,7 +38,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             _myArrayFlag = (_myValue[0] == "[");
             _myArray     = stringToArray(_myValue);
         }
-
+        
         this.name = function() {
             var myName = _myNode.nodeName
             if (_myArrayFlag) {
@@ -46,7 +46,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             }
             return myName;
         }
-
+        
         this.value = function() {
             if (_myArrayFlag) {
                 return Number(_myArray[_myArrayPos]);
@@ -228,11 +228,13 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         if (!_mySettings) {
             return;
         }
+        
         if (theSection) {
             var mySection = _mySettings.childNode(theSection);
             if (!mySection) {
                 throw new Exception("Section " + theSection + " does not exist in " + theSettingsFile, fileline());
             }
+            
             theListener.onUpdateSettings(mySection);
         } else {
             theListener.onUpdateSettings(_mySettings);

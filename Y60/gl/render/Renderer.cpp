@@ -940,7 +940,7 @@ namespace y60 {
                 if (!myGeometryNode) {
                     throw RendererException(string("Can not find geometry '")+myPlaneIds[i]+
                         "' for node " + theNode->nodeName() + " with id '" +
-                        theNode->getAttributeString(ID_ATTRIB)+"'!", PLUS_FILE_LINE);
+                        theNode->getAttributeString(ID_ATTRIB)+ "' named '" + theNode->getAttributeString(NAME_ATTRIB) + "'!", PLUS_FILE_LINE);
                 }
                 GeometryPtr myGeometry = myGeometryNode->getFacade<Geometry>();
                 theClippingPlanes.push_back( myGeometry->get<GeometryGlobalPlaneTag>());
