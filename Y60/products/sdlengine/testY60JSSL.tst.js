@@ -46,7 +46,23 @@ Y60JSSLUnitTest.prototype.Constructor = function(obj, theName) {
         }
     }
 
+    function testAngleFunctions() {
+        ENSURE( 'degBetween(0,0) == 0');
+        ENSURE( 'degBetween(0, 90) == -90 ' );
+        ENSURE( 'degBetween(90, 0) == 90 ' );
+        
+        ENSURE( 'degBetween(370, 350) == 20 ' );
+        ENSURE( 'degBetween(10, 350) == 20 ' );
+        
+        ENSURE( 'degBetween(350, 370) == -20 ' );
+        ENSURE( 'degBetween(350, 10) == -20 ' );
+        
+        ENSURE( 'degBetween(190, 170) == 20 ' );
+        ENSURE( 'degBetween(170, 190) == -20 ' );
+    }
+
     obj.run = function() {
+        testAngleFunctions();
         testRemoveElement([], []);
         testRemoveElement([0], []);
         testRemoveElement([0,0], []);
