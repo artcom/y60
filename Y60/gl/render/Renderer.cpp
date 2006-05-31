@@ -1082,6 +1082,7 @@ namespace y60 {
             }
             glPopMatrix();
             _myState->setScissorTest(false);
+            _myState->setClippingPlanes(std::vector<asl::Planef>());
         }
 
         glPopClientAttrib();
