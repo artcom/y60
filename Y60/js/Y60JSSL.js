@@ -87,6 +87,26 @@ function radFromDeg(theDegree) {
     return theDegree * (Math.PI / 180.0);
 }
 
+function angleBetween(a,b, theHalfCircle) {
+    var d = a - b;
+    while (d > theHalfCircle) {
+        d -= theHalfCircle * 2;
+    }
+    while (d < -theHalfCircle) {
+        d += theHalfCircle*2;
+    }
+    return d;
+}
+
+function radBetween(a,b) {
+    return angleBetween(a,b, Math.PI);
+}
+function degBetween(a,b) {
+    return angleBetween(a,b, 180);
+}
+
+
+
 function clamp(theValue, theMin, theMax) {
     if (theValue < theMin) {
         return theMin;
