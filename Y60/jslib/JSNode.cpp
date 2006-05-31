@@ -635,6 +635,32 @@ getElementById(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     return JS_TRUE;
 }
 static JSBool
+getNodesByAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Does a deep search in all child nodes, returns an array of matching nodes.");
+    DOC_PARAM("theElementName", "", DOC_TYPE_STRING);
+    DOC_PARAM("theAttributeName", "", DOC_TYPE_STRING);
+    DOC_PARAM("theAttributeValue", "", DOC_TYPE_STRING);
+    DOC_RVAL("Array of matching nodes (may be empty)", DOC_TYPE_ARRAY);
+    DOC_END;
+    dom::DOMString myElementName;
+    dom::DOMString myAttributeName;
+    dom::DOMString myAttributeValue;
+    dom::NodePtr myNode;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj),myNode);
+    if (argc == 3) {
+        convertFrom(cx, argv[0], myElementName);
+        convertFrom(cx, argv[1], myAttributeName);
+        convertFrom(cx, argv[2], myAttributeValue);
+    } else {
+        JS_ReportError(cx,"JSNode::getNodesByAttribute: wrong number of parameters: %d, 3 expected", argc);
+        return JS_FALSE;
+    }
+    std::vector<dom::NodePtr> myResults;
+    myNode->getNodesByAttribute(myElementName, myAttributeName, myAttributeValue, myResults);
+    *rval = as_jsval(cx, myResults);
+    return JS_TRUE;
+}
+static JSBool
 getAttribute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Retrieves an attribute value by name.");
     DOC_PARAM("Name", "", DOC_TYPE_STRING);
@@ -701,6 +727,7 @@ JSNode::Functions() {
         {"childNode",        childNode,       2},
         {"childNodesLength", childNodesLength,1},
         {"getElementById",   getElementById,  2},
+        {"getNodesByAttribute",   getNodesByAttribute,  3},
         {"getAttribute",     getAttribute,    1},
         {"addEventListener",     addEventListener,       3},
         {"removeEventListener",  removeEventListener,    3},
