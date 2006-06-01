@@ -82,7 +82,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
             myBuildGeometry = true;
             myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
             myShapeBuilder = new ShapeBuilder();
-            myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material);   
+            myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material.id);   
         }
         
         var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
@@ -232,14 +232,14 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
         _myText = asUnicodeString(theText);
         _myCharacters = theCharacterSoup.createUnicodeText(_myText, theFontSize);
-        var myMaterialId = theCharacterSoup.getAlphabetMap(theFontSize).material;
+        var myMaterialId = theCharacterSoup.getAlphabetMap(theFontSize).material.id;
         var myMaterial = window.scene.dom.getElementById(myMaterialId);        
         var myTextures = getDescendantByTagName(myMaterial, "textures", false);
         _myTextureCount = myTextures.childNodesLength();
         if (thePrebuildFlag) {
             var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);  	 
             var myShapeBuilder = new ShapeBuilder(); 	 
-            var myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material); 	 
+            var myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material.id); 	 
       	 
             var myCharacterPos = new Vector3f(-0.5, -0.5, 0.0); 	 
             var myCharacterSize = new Vector3f(1.0, 1.0, 0.0); 	 

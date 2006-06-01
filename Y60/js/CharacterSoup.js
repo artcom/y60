@@ -195,7 +195,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         theSceneViewer.getMaterials().appendChild(myMaterial);
 
         _myAlphabetMap[theSize] = [];
-        _myAlphabetMap[theSize].material = myMaterial.id;
+        _myAlphabetMap[theSize].material = myMaterial;
         _myAlphabetMap[theSize].cellsize = myCellSize;
         _myAlphabetMap[theSize].nextCharSlot = new Vector2f(1,0);
         _myAlphabetMap[theSize].fontimage = myFontImage;
