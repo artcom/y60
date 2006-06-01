@@ -76,6 +76,8 @@ public:
     void stopTeleTextDecoder();
     std::basic_string<asl::Unsigned16> getPage(const unsigned & thePageNumber);
 
+    static bool deviceAvailable(const std::string & theDeviceName); 
+    
 private:
     void openDevice();
 

@@ -39,6 +39,13 @@ function compactString(theString){
 try {
     var myConfig = new Node();
     myConfig.parseFile("channels.de.berlin.xml");
+    
+    var myDeviceName = "/dev/dvb/adapter0";
+
+    if (!DvbTuner.deviceAvailable(myDeviceName)) {
+        print("Device "+myDeviceName+" not available.");
+        exit(1);
+    }
 
     var myDvb = new DvbTuner(myConfig, "/dev/dvb/adapter0");
     myDvb.tuneChannel("ZDF"); 

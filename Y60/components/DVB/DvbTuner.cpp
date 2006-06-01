@@ -18,6 +18,18 @@ using namespace asl;
 using namespace std;
 using namespace dom;
 
+bool
+DvbTuner::deviceAvailable(const string & theDeviceName) {
+    int myDeviceFd = 0;
+    string myFrontendDeviceName = string(theDeviceName) + "/frontend0";
+    if (( myDeviceFd = open(myFrontendDeviceName.c_str(), O_RDWR)) < 0) {
+        return false;
+    }
+
+    close(myDeviceFd);
+    return true;
+}
+
 DvbTuner::DvbTuner(const dom::NodePtr & theChannelConfig, const string & theDeviceName)
 : _myAdapter(0)
 , _myFrontend(0)
@@ -64,7 +76,6 @@ DvbTuner::setParameters(const std::string & theChannelName){
     NodePtr myChannels = _myChannelConfig->childNode("dvb_channel_list");
 
     if (myChannels) {
-        // *myChannels["name"].nodeValue();
         for (int i=0; i<myChannels->childNodesLength(); ++i){
             if (myChannels->childNode(i)->getAttributeString("name") == theChannelName) {
                 Node myNode = *(myChannels->childNode(i));
@@ -119,7 +130,6 @@ DvbTuner::tuneChannel(const std::string & theChannelName) {
     AC_DEBUG << "video pid 0x" << std::hex << _myVpid << " audio pid 0x" << _myApid;
 
     set_pesfilter();
-        
     check_frontend();
 }
 
@@ -142,8 +152,6 @@ DvbTuner::getPage(const unsigned & thePageNumber){
 void
 DvbTuner::check_frontend(){
     fe_status_t myStatus;
-    // uint16_t snr, signal;
-    // uint32_t ber, uncorrected_blocks;
     Unsigned16 mySnr, mySignalStrength;
     Unsigned32 myBer, myUncorrectedBlocks;
 
@@ -157,11 +165,11 @@ DvbTuner::check_frontend(){
         ioctl(_myFrontendFd, FE_READ_UNCORRECTED_BLOCKS, &myUncorrectedBlocks);
         
         AC_DEBUG << std::hex << "status 0x" << myStatus
-                  << " signal 0x" << mySignalStrength
-                  << " snr 0x" << mySnr
-                  << " ber 0x" << myBer
-                  << " uncBlocks 0x" << myUncorrectedBlocks
-		  << ((myStatus & FE_HAS_LOCK) ? " FE_HAS_LOCK" : "");
+                 << " signal 0x" << mySignalStrength
+                 << " snr 0x" << mySnr
+                 << " ber 0x" << myBer
+                 << " uncBlocks 0x" << myUncorrectedBlocks
+                 << ((myStatus & FE_HAS_LOCK) ? " FE_HAS_LOCK" : "");
         
         if (myStatus & FE_HAS_LOCK) {
             myHasLock = true;
@@ -177,7 +185,6 @@ DvbTuner::setup_frontend(void)
     struct dvb_frontend_info fe_info;
     
     if (ioctl(_myFrontendFd, FE_GET_INFO, &fe_info) < 0) {
-        // std::cerr << "ioctl FE_GET_INFO failed: " << _myFrontendFd << std::endl;
         throw(DvbTunerException("FE_GET_INFO failed. Check Dvb Device Settings", PLUS_FILE_LINE));
         return;
     }
@@ -186,8 +193,6 @@ DvbTuner::setup_frontend(void)
         throw(DvbTunerException("frontend device is not a OFDM (DVB-T) device", PLUS_FILE_LINE));
         return;
     }
-    
-    // std::cout << "tuning to " << _myFrontendParams.frequency << " Hz" << std::endl;
     
     if (ioctl(_myFrontendFd, FE_SET_FRONTEND, &_myFrontendParams) < 0) {
         throw(DvbTunerException("ioctl FE_SET_FRONTEND failed", PLUS_FILE_LINE));

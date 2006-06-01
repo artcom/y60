@@ -78,6 +78,28 @@ getPage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval){
     return Method<JSDvbTuner::NATIVE>::call(&JSDvbTuner::NATIVE::getPage, cx, obj, argc, argv, rval);
 }
 
+static JSBool
+deviceAvailable(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Check if a certain dvbdevice is currently available.");
+    DOC_PARAM("theDeviceName", "the device to check for. example: [/dev/dvb/adapter0]", DOC_TYPE_INTEGER);
+    DOC_RVAL("true if device can be used, false otherwise.", DOC_TYPE_STRING);
+    DOC_END;
+
+    try {
+        string myDeviceString;
+        if (argc == 1) {
+            if (!convertFrom(cx, argv[0], myDeviceString)) {
+                JS_ReportError(cx, "JSDvbTuner::deviceAvailable: argument #1 must be a string");
+                return JS_FALSE;
+            }
+        } else {
+            JS_ReportError(cx, "JSDvbTuner::deviceAvailable: need one argument");
+            return JS_FALSE;
+        }
+        *rval = as_jsval(cx, DvbTuner::deviceAvailable(myDeviceString));
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
 
 JSDvbTuner::~JSDvbTuner() {
 }
@@ -122,6 +144,8 @@ JSDvbTuner::StaticProperties() {
 JSFunctionSpec *
 JSDvbTuner::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
+        // name             native           nargs
+        {"deviceAvailable", deviceAvailable, 1},
         {0}
     };
     return myFunctions;
@@ -217,7 +241,7 @@ JSDvbTuner::ConstIntProperties() {
 
 JSObject *
 JSDvbTuner::initClass(JSContext *cx, JSObject *theGlobalObject) {
-    JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties());
+    JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties(), 0, StaticFunctions());
     DOC_MODULE_CREATE("Components", JSDvbTuner);
     return myClass;
 }
