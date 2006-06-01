@@ -12,6 +12,7 @@
 #define ACGTK_CONSOLE_VIEW_INCLUDED
 
 #include <gtkmm/textview.h>
+#include <asl/Vector234.h>
 
 namespace acgtk {
 
@@ -20,11 +21,13 @@ class ConsoleView : public Gtk::TextView {
         ConsoleView();
         virtual ~ConsoleView();
 
-        void append(const Glib::ustring & theText);
+        void append(const Glib::ustring & theText, const Glib::ustring & theTagName = "");
 
         void setScrollback(unsigned theLineCount);
         unsigned getScrollback() const;
 
+        void addTag(const Glib::ustring & theTagName, const asl::Vector3f & theTextColor,
+                const asl::Vector3f & theBackgroundColor);
     private:
         unsigned _myScrollback;
         unsigned _myCurrentLineCount;
