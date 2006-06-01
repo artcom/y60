@@ -41,7 +41,7 @@ Append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
     
-    ensureParamCount(argc, 1);
+    ensureParamCount(argc, 1, 2);
     
     acgtk::ConsoleView * myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL( obj ), myNative);
@@ -49,7 +49,37 @@ Append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     Glib::ustring myText;
     convertFrom(cx, argv[0], myText);
 
-    myNative->append( myText );
+    std::string myTagName;
+    if (argc == 2) {
+        convertFrom(cx, argv[1], myTagName);
+    }
+
+    myNative->append( myText, myTagName );
+    return JS_TRUE;
+}
+
+static JSBool
+AddTag(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    
+    ensureParamCount(argc, 2, 3);
+    
+    acgtk::ConsoleView * myNative(0);
+    convertFrom(cx, OBJECT_TO_JSVAL( obj ), myNative);
+
+    std::string myTagName;
+    convertFrom(cx, argv[0], myTagName);
+
+    asl::Vector3f myForegroundColor;
+    convertFrom(cx, argv[1], myForegroundColor);
+
+    asl::Vector3f myBackgroundColor(1.0, 1.0, 1.0);
+    if (argc == 3) {
+        convertFrom(cx, argv[2], myBackgroundColor);
+    }
+
+    myNative->addTag( myTagName, myForegroundColor, myBackgroundColor );
     return JS_TRUE;
 }
 
@@ -59,7 +89,8 @@ JSConsoleView::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
-        {"append",               Append,                  1},
+        {"append",               Append,                  2},
+        {"addTag",               AddTag,                  3},
         {0}
     };
     return myFunctions;
