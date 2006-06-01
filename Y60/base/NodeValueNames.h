@@ -323,7 +323,7 @@ namespace y60 {
     };
 
     //=== Image filter =====================================================
-    static const char * IMAGE_FILTER_NONE                = "none";
+    static const char * IMAGE_FILTER_NONE                = "";
     static const char * IMAGE_FILTER_HEIGHT_TO_NORMALMAP = "heightToNormal";
 
     enum ImageFilter {
