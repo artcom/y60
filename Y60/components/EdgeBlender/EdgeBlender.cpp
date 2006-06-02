@@ -127,6 +127,7 @@ class EdgeBlender :
         unsigned _myNumSubdivisions;
 
         float _myBlackLevel;
+        asl::Vector2f _myBlPosOffset;
         float _myPower;
         float _myGamma;
 
@@ -150,6 +151,7 @@ EdgeBlender::EdgeBlender(asl::DLHandle theDLHandle) :
     _myBlendWidth = 0.2f;
     _myNumSubdivisions = 32;
     _myBlackLevel = 0.1f;
+    _myBlPosOffset = asl::Vector2f(0.0f, 0.0f);
     _myPower = 1.5f;
     _myGamma = 1.2f;
     _myRowCount = 1;
@@ -288,6 +290,7 @@ EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     _myBlendWidth = getSetting(theSettings, "blendwidth", _myBlendWidth);
     _myNumSubdivisions = getSetting(theSettings, "subdivisions", _myNumSubdivisions);
     _myBlackLevel = getSetting(theSettings, "blacklevel", _myBlackLevel);
+    _myBlPosOffset = getSetting(theSettings, "blacklevelposoffset", _myBlPosOffset);
     _myPower = getSetting(theSettings, "power", _myPower);
     _myGamma = getSetting(theSettings, "gamma", _myGamma);
 
@@ -297,6 +300,7 @@ EdgeBlender::onUpdateSettings(dom::NodePtr theSettings) {
     _myBlackLevelFlag = (int) getSetting(theSettings, "blacklevelFlag", (int) _myBlackLevelFlag);
     _myCopyFrameBufferFlag = (int) getSetting(theSettings, "copyFrameBufferFlag", (int) _myCopyFrameBufferFlag);
     _myFrameBufferArea = getSetting(theSettings, "frameBufferArea", _myFrameBufferArea);
+    
 }
 
 void
@@ -388,7 +392,11 @@ EdgeBlender::renderMultiScreen()
             if (i < _myRowCount-1) {
                 myY1 -= _myBlendWidth;
             }
-
+            if (_myBlackLevelFlag) {
+                myY0 += i > 0 ? _myBlPosOffset[1] : 0.0f;
+                myY1 -= i < _myRowCount-1 ? _myBlPosOffset[1] : 0.0f;
+            }
+            
             for(unsigned j = 0; j < _myColumnCount; ++j) {
                 float myX  = float(j) / _myColumnCount;
                 float myX0 = (j > 0 ? myX + _myBlendWidth : myX);
@@ -398,6 +406,8 @@ EdgeBlender::renderMultiScreen()
                 }
 
                 if (_myBlackLevelFlag) {
+                    myX0 += j > 0 ? _myBlPosOffset[0] : 0.0f;
+                    myX1 -= j < _myColumnCount-1 ? _myBlPosOffset[0] : 0.0f;
                     drawBlackLevel(myX0, myY0, myX1, myY1);
                 }
 

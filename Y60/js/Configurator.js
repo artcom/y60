@@ -142,7 +142,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
                     myValue = myMax;
                 }
             }
-            myValue = myValue.toFixed(3);
+            myValue = myValue.toFixed(5);
             if (_myArrayFlag) {
                 _myArray[_myArrayPos] = myValue;
                 myValue = "[" + _myArray.join(",") + "]";
@@ -175,7 +175,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
                     myValue = myMin;
                 }
             }
-            myValue = myValue.toFixed(3);
+            myValue = myValue.toFixed(5);
             if (_myArrayFlag) {
                 _myArray[_myArrayPos] = myValue;
                 myValue = "[" + _myArray.join(",") + "]";
