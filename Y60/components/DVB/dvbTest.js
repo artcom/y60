@@ -48,22 +48,23 @@ try {
     }
 
     var myDvb = new DvbTuner(myConfig, "/dev/dvb/adapter0");
-    myDvb.tuneChannel("ZDF"); 
+    myDvb.tuneChannel("Das Erste"); 
 
     // exec("cat /dev/dvb/adapter0/dvr0 | mplayer - &");
 
-    myDvb.startTeleTextDecoder();
+//    myDvb.startTeleTextDecoder();
     
     var myOutString = "";
     for (var i=0; i<100; ++i){
-        msleep(250); 
-        
-        var mySubtitle = myDvb.getPage(777);
-        var myCompactSubtitle = compactString(mySubtitle);
-        if (myCompactSubtitle) {
-            var myFormattedString = compactString(mySubtitle);
-            print(myFormattedString);
-        }
+        msleep(20000); 
+        print("tuning 'Das Erste'");
+	myDvb.tuneChannel("Das Erste");
+//        var mySubtitle = myDvb.getPage(777);
+//        var myCompactSubtitle = compactString(mySubtitle);
+//        if (myCompactSubtitle) {
+//            var myFormattedString = compactString(mySubtitle);
+//            print(myFormattedString);
+//        }
     }   
         
 //    exec("killall mplayer");

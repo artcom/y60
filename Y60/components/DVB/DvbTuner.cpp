@@ -49,6 +49,8 @@ DvbTuner::~DvbTuner(void){
     close(_myFrontendFd);
     close(_myVideoFd);
     close(_myAudioFd);
+    close(_myPmtFd);
+    close(_myNullFd);
 }
 
 void
@@ -58,6 +60,14 @@ DvbTuner::openDevice(){
 
     if (( _myFrontendFd = open(myFrontendDeviceName.c_str(), O_RDWR)) < 0) {
         throw(DvbTunerException(string("failed to open frontend device:")+myFrontendDeviceName , PLUS_FILE_LINE));
+    }
+
+    if ((_myPmtFd = open(myDemuxDeviceName.c_str(), O_RDWR)) < 0) {
+        throw(DvbTunerException(string("failed to open demux device: ")+myDemuxDeviceName+ " for the pmt_pid setup" , PLUS_FILE_LINE));
+    }
+
+    if ((_myNullFd = open(myDemuxDeviceName.c_str(), O_RDWR)) < 0) {
+        throw(DvbTunerException(string("failed to open demux device: ")+myDemuxDeviceName+ " for the null_pid setup" , PLUS_FILE_LINE));
     }
 
     if ((_myVideoFd = open(myDemuxDeviceName.c_str(), O_RDWR)) < 0) {
@@ -109,6 +119,7 @@ DvbTuner::setParameters(const std::string & theChannelName){
                 _myVpid = as<int>(myNode.getAttributeString("video_pid"));
                 _myApid = as<int>(myNode.getAttributeString("audio_pid"));
                 _myVTpid = as<int>(myNode.getAttributeString("video_text_pid"));                            
+                _myPmtPid = as<int>(myNode.getAttributeString("pmt_pid"));                            
 
                 return;
             }
@@ -202,6 +213,28 @@ DvbTuner::setup_frontend(void)
 
 void
 DvbTuner::set_pesfilter(){
+    cerr << "setting null_pid" << endl;
+
+    struct dmx_sct_filter_params flt;
+    ioctl(_myPmtFd, DMX_STOP);
+    memset(&flt, 0, sizeof(struct dmx_sct_filter_params));
+    flt.flags = DMX_IMMEDIATE_START;
+    flt.pid = 0;
+    if (ioctl(_myNullFd, DMX_SET_FILTER, &flt) < 0) {
+        throw(DvbTunerException("ioctl DMX_SET_FILTER failed for null_pid", PLUS_FILE_LINE));
+    }
+
+    cerr << "setting pmt_pid" << endl;
+
+    // struct dmx_sct_filter_params flt;
+    ioctl(_myPmtFd, DMX_STOP);
+    memset(&flt, 0, sizeof(struct dmx_sct_filter_params));
+    flt.flags = DMX_IMMEDIATE_START;
+    flt.pid = _myPmtPid;
+    if (ioctl(_myPmtFd, DMX_SET_FILTER, &flt) < 0) {
+        throw(DvbTunerException("ioctl DMX_SET_FILTER failed for pmt_pid", PLUS_FILE_LINE));
+    }
+
     struct dmx_pes_filter_params pesfilterAudio;
     if ( _myApid <= 0 || _myApid >= 0x1fff){
         throw(DvbTunerException("Invalid AudioPID", PLUS_FILE_LINE));
@@ -230,9 +263,11 @@ DvbTuner::set_pesfilter(){
     pesfilterVideo.flags = DMX_IMMEDIATE_START;
     
     if (ioctl(_myVideoFd, DMX_SET_PES_FILTER, &pesfilterVideo) < 0) {
-       throw(DvbTunerException("ioctl DMX_SET_PES_FILTER failed for VideoStream", PLUS_FILE_LINE));
+        throw(DvbTunerException("ioctl DMX_SET_PES_FILTER failed for VideoStream", PLUS_FILE_LINE));
        return;
     }
+
+   // test set pmt_pid for "das erste"
 }
 
 void

@@ -111,11 +111,13 @@ private:
     int _myVpid;
     int _myApid;
     int _myVTpid;
+    int _myPmtPid;
     
     int _myFrontendFd;
     int _myAudioFd;
     int _myVideoFd;
-
+    int _myPmtFd;
+    int _myNullFd;
     DvbTeleText _myDvbTeleText;
 };
 
