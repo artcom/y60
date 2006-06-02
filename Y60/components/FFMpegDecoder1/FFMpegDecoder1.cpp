@@ -57,8 +57,10 @@ namespace y60 {
 
     std::string
     FFMpegDecoder1::canDecode(const std::string & theUrl, asl::ReadableStream * theStream) {
+        string myFilename = asl::toLowerCase(asl::getFilenamePart(theUrl));
         if (asl::toLowerCase(asl::getExtension(theUrl)) == "mpg" ||
-            asl::toLowerCase(asl::getExtension(theUrl)) == "m2v") {
+            asl::toLowerCase(asl::getExtension(theUrl)) == "m2v" ||
+            myFilename == "dvr0") {
             AC_INFO << "FFMpegDecoder1 can decode :" << theUrl << endl;
             return MIME_TYPE_MPG;
         } else {
@@ -215,30 +217,33 @@ namespace y60 {
         int64_t myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
         int64_t myTimePerFrame = (int64_t)(myTimeUnitsPerSecond / getFrameRate());
 
-        if (_myLastVideoTimestamp != AV_NOPTS_VALUE &&
-            (theTimestamp < _myLastVideoTimestamp || theTimestamp > 
-             _myLastVideoTimestamp + (2*myTimePerFrame)))
-        {
+
+        if (_myVStream->index_entries != NULL) {
+            if (_myLastVideoTimestamp != AV_NOPTS_VALUE &&
+                (theTimestamp < _myLastVideoTimestamp || theTimestamp > 
+                 _myLastVideoTimestamp + (2*myTimePerFrame)))
+            {
 //            cout <<"seek, theTimeStanp: " << theTimestamp << " last timestamp : " 
 //                  << _myLastVideoTimestamp << " Frametime : " << myTimePerFrame <<endl;
-
-            // [ch] If we seek directly to the seek timestamp the packet sometimes cannot be decoded afterwards.
-            // Therefore this workaround seeks a bit (0.01 Frames) before the requested timestamp
-            int64_t mySeekTimestamp = theTimestamp-myTimePerFrame/100;
-            if (mySeekTimestamp < 0) {
-                mySeekTimestamp = 0;
-            }
+                
+                // [ch] If we seek directly to the seek timestamp the packet sometimes cannot be decoded afterwards.
+                // Therefore this workaround seeks a bit (0.01 Frames) before the requested timestamp
+                int64_t mySeekTimestamp = theTimestamp-myTimePerFrame/100;
+                if (mySeekTimestamp < 0) {
+                    mySeekTimestamp = 0;
+                }
 //            int64_t mySeekTimestamp = theTimestamp;
-            AC_DEBUG << "SEEK timestamp=" << theTimestamp << " lastVideoTimestamp=" 
-                    << _myLastVideoTimestamp << " seek=" << mySeekTimestamp;
-
-            int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, mySeekTimestamp, 
-                    AVSEEK_FLAG_BACKWARD);
-            if (myResult < 0) {
-                AC_ERROR << "Could not seek to timestamp " << mySeekTimestamp;
+                AC_DEBUG << "SEEK timestamp=" << theTimestamp << " lastVideoTimestamp=" 
+                         << _myLastVideoTimestamp << " seek=" << mySeekTimestamp;
+                
+                int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, mySeekTimestamp, 
+                                             AVSEEK_FLAG_BACKWARD);
+                if (myResult < 0) {
+                    AC_ERROR << "Could not seek to timestamp " << mySeekTimestamp;
+                }
             }
         }
-
+        
         VideoFramePtr myVideoFrame(0);
 
         AVPacket myPacket;
