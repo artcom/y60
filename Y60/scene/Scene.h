@@ -356,7 +356,8 @@ namespace y60 {
             AnimationManager         _myAnimationManager;
 
             LightVector              _myLights;
-            dom::DocumentPtr         _mySceneDom;            
+            dom::DocumentPtr         _mySceneDom;
+            dom::NodePtr             _mySceneRoot;
             MaterialIdMap            _myMaterials;
             Statistics               _myStatistics;
             
