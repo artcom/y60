@@ -45,7 +45,7 @@ DvbTuner::DvbTuner(const dom::NodePtr & theChannelConfig, const string & theDevi
     openDevice();
 }
 
-DvbTuner::~DvbTuner(void){
+DvbTuner::~DvbTuner(void) {
     close(_myFrontendFd);
     close(_myVideoFd);
     close(_myAudioFd);
@@ -54,7 +54,7 @@ DvbTuner::~DvbTuner(void){
 }
 
 void
-DvbTuner::openDevice(){
+DvbTuner::openDevice() {
     string myFrontendDeviceName = string(_myDeviceName) + "/frontend0";
     string myDemuxDeviceName = string(_myDeviceName) + "/demux0";
 
@@ -80,7 +80,7 @@ DvbTuner::openDevice(){
 }
 
 void
-DvbTuner::setParameters(const std::string & theChannelName){
+DvbTuner::setParameters(const std::string & theChannelName) {
     memset(&_myFrontendParams, 0, sizeof(struct dvb_frontend_parameters));
 
     NodePtr myChannels = _myChannelConfig->childNode("dvb_channel_list");
@@ -145,23 +145,23 @@ DvbTuner::tuneChannel(const std::string & theChannelName) {
 }
 
 void
-DvbTuner::startTeleTextDecoder(){
+DvbTuner::startTeleTextDecoder() {
     _myDvbTeleText.startDecoderThread(_myVTpid);
 }
 
 void
-DvbTuner::stopTeleTextDecoder(){
+DvbTuner::stopTeleTextDecoder() {
     _myDvbTeleText.stopDecoderThread();       
 }
 
 basic_string<Unsigned16>
-DvbTuner::getPage(const unsigned & thePageNumber){
+DvbTuner::getPage(const unsigned & thePageNumber) {
     return _myDvbTeleText.getPage(thePageNumber);
 }
 
 
 void
-DvbTuner::check_frontend(){
+DvbTuner::check_frontend() {
     fe_status_t myStatus;
     Unsigned16 mySnr, mySignalStrength;
     Unsigned32 myBer, myUncorrectedBlocks;
@@ -191,8 +191,7 @@ DvbTuner::check_frontend(){
 }
 
 void
-DvbTuner::setup_frontend(void)
-{
+DvbTuner::setup_frontend(void) {
     struct dvb_frontend_info fe_info;
     
     if (ioctl(_myFrontendFd, FE_GET_INFO, &fe_info) < 0) {
@@ -212,9 +211,7 @@ DvbTuner::setup_frontend(void)
 }
 
 void
-DvbTuner::set_pesfilter(){
-    cerr << "setting null_pid" << endl;
-
+DvbTuner::set_pesfilter() {
     struct dmx_sct_filter_params flt;
     ioctl(_myPmtFd, DMX_STOP);
     memset(&flt, 0, sizeof(struct dmx_sct_filter_params));
@@ -224,9 +221,6 @@ DvbTuner::set_pesfilter(){
         throw(DvbTunerException("ioctl DMX_SET_FILTER failed for null_pid", PLUS_FILE_LINE));
     }
 
-    cerr << "setting pmt_pid" << endl;
-
-    // struct dmx_sct_filter_params flt;
     ioctl(_myPmtFd, DMX_STOP);
     memset(&flt, 0, sizeof(struct dmx_sct_filter_params));
     flt.flags = DMX_IMMEDIATE_START;
@@ -266,12 +260,10 @@ DvbTuner::set_pesfilter(){
         throw(DvbTunerException("ioctl DMX_SET_PES_FILTER failed for VideoStream", PLUS_FILE_LINE));
        return;
     }
-
-   // test set pmt_pid for "das erste"
 }
 
 void
-DvbTuner::setupConstants(void){
+DvbTuner::setupConstants(void) {
     _myConstants["INVERSION_OFF"]  = static_cast<int>(INVERSION_OFF);
     _myConstants["INVERSION_ON"]   = static_cast<int>(INVERSION_ON);
     _myConstants["INVERSION_AUTO"] = static_cast<int>(INVERSION_AUTO);

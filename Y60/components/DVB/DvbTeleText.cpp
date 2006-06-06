@@ -70,7 +70,7 @@ DvbTeleText::run(){
             processStream();
         }
     } catch (asl::Exception & ex) {
-	AC_ERROR << "Exception in DvbTeleText::run() " << ex;
+        AC_ERROR << "Exception in DvbTeleText::run() " << ex;
     }
 }
 
@@ -97,11 +97,6 @@ DvbTeleText::getPage( const unsigned thePageNumber ) {
     basic_string<Unsigned16> myReturnString =  _myTeleTextBuffer[thePageNumber];
     _myTeleTextBuffer[thePageNumber].clear();
 
-    // for (unsigned i = 0; i < myReturnString.size(); ++i) {
-    //     cout << dec <<  "\033[0;34m" << (char)myReturnString[i] << "\033[0m" << hex << myReturnString[i];
-    // }
-    // cout << dec << endl;
-    
     return myReturnString;
 }
 
