@@ -22,6 +22,7 @@ namespace asl {
     /**
      * BSpline class.
      * Based on BSpline.js code. [Rev 5374]
+     * Note: this is not a BSpline but a Bezier curve...
      */
     template<class T>
     class BSpline {
@@ -142,6 +143,20 @@ namespace asl {
         void setControlPoints(const std::vector< Vector3<T> > & thePoints) {
             setControlPoints(thePoints[0], thePoints[1],
                              thePoints[2], thePoints[3]);
+        }
+
+        /**
+         * Setup spline from a set of points.
+         * The points are named 'before', 'start', 'end', and 'past'.
+         */
+        void setupFromPoints(const std::vector< Vector3<T> > & thePoints, float theSize) {
+            Vector3<T> myDir1 = normalized(thePoints[2] - thePoints[0]) * theSize;
+            Vector3<T> myStartHandle = thePoints[1] + myDir1;
+
+            Vector3<T> myDir2 = normalized(thePoints[1] - thePoints[3]) * theSize;
+            Vector3<T> myEndHandle = thePoints[2] + myDir2;
+
+            setControlPoints(thePoints[1], myStartHandle, thePoints[2], myEndHandle);
         }
 
         /**

@@ -69,6 +69,41 @@ namespace jslib {
     }
 
     static JSBool
+    setupFromPoints(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+    {
+        DOC_BEGIN("Setup BSpline from points.");
+        DOC_PARAM("thePoints", "'Points'", DOC_TYPE_VECTOROFVECTOR3F);
+        DOC_PARAM("theSize", "Size.", DOC_TYPE_FLOAT);
+        DOC_END;
+
+        JSBSpline::NATIVE * myNative = 0;
+        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+            JS_ReportError(cx, "JSBSpline: self is not a BSpline");
+            return JS_FALSE;
+        }
+
+        if (argc != 2) {
+            JS_ReportError(cx, "JSBSpline::setupFromPoints: bad number of arguments: expected 2");
+            return JS_FALSE;
+        }
+
+        std::vector<asl::Vector3f> myPoints;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPoints)) {
+            JS_ReportError(cx, "JSBSpline: argument #1 must be a vectorofvector");
+            return JS_FALSE;
+        }
+
+        float mySize;
+        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], mySize)) {
+            JS_ReportError(cx, "JSBSpline: argument #2 must be a float");
+            return JS_FALSE;
+        }
+
+        myNative->setupFromPoints(myPoints, mySize);
+        return JS_TRUE;
+    }
+
+    static JSBool
     calculate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     {
         DOC_BEGIN("Sample the spline a number of times.");
@@ -248,6 +283,7 @@ namespace jslib {
         static JSFunctionSpec myFunctions[] = {
             //{"name", native, nargs},
             {"setControlPoints", setControlPoints, 4},
+            {"setupFromPoints", setupFromPoints, 2},
             {"calculate", calculate, 3},
             {"evaluate", evaluate, 3},
             {"getArcLength", getArcLength, 0},
