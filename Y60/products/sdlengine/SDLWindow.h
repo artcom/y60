@@ -115,6 +115,10 @@ namespace y60 {
             void setSwapInterval(unsigned theInterval);
             int getSwapInterval();
 
+            // Sets the number of multisampling samples (e.g. 1, 2, 4, 8)
+            void setMultisampling(unsigned theSize);
+            unsigned getMultisampling();
+
             //////////////////////////////////////////////////////////////////////////
 
             /// Set EventRecorder mode to STOP/PLAY/RECORD.
@@ -161,6 +165,7 @@ namespace y60 {
             SDL_Surface * _myScreen;
             unsigned    _mySwapInterval;
             unsigned    _myLastSwapCounter;
+            unsigned    _myMultiSampleSize;
     };
 
 }

@@ -425,6 +425,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         // set the window behavior while sleeping
         window.renderWhileSleep = false;
 
+        // You could turn on multisampling here, if you like
+        //window.multisamplingFactor = 8;
+
         self.setupWindow(window, _mySetDefaultRenderingCap);
         var myScene;
         if (theScene) {

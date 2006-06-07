@@ -77,7 +77,8 @@ SDLWindow::SDLWindow() :
     _myStandardCursor(0),
     _myAutoPauseFlag(false),
     _mySwapInterval(0),
-    _myLastSwapCounter(0)
+    _myLastSwapCounter(0),
+    _myMultiSampleSize(0)
 {
     setGLContext(GLContextPtr(new GLContext()));
 }
@@ -486,7 +487,34 @@ void SDLWindow::ensureSDLSubsystem() {
         SDL_GL_SetAttribute( SDL_GL_ACCUM_GREEN_SIZE, 16 );
         SDL_GL_SetAttribute( SDL_GL_ACCUM_BLUE_SIZE, 16 );*/
         SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+
+        if (_myMultiSampleSize) {
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, _myMultiSampleSize);
+        }
     }
+}
+
+void
+SDLWindow::setMultisampling(unsigned theSize) {
+    if (SDL_WasInit(SDL_INIT_VIDEO)) {
+        AC_WARNING << "Sorry, setting the multisampling size will take no effect after the sdl window has been initialized!";
+        return;
+    }
+
+    _myMultiSampleSize = theSize;
+}
+
+unsigned
+SDLWindow::getMultisampling() {
+    if (!SDL_WasInit(SDL_INIT_VIDEO)) {
+        return _myMultiSampleSize;
+    } else {
+        int mySize;
+        SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &mySize);
+        return unsigned(mySize);
+    }
+
 }
 
 void SDLWindow::setShowMouseCursor(bool theShowMouseCursor) {
@@ -650,7 +678,7 @@ SDLWindow::mainLoop() {
 #ifdef WIN32
         if (_myAutoPauseFlag && isOnTop == false) {
             unsigned long mySleepDuration = 40; // in millisec
-            asl::msleep(mySleepDuration); 
+            asl::msleep(mySleepDuration);
         }
 #endif
         if (jslib::JSApp::getQuitFlag() == JS_TRUE) {
@@ -717,7 +745,7 @@ void SDLWindow::saveEvents(const std::string & theFilename) {
 }
 
 
-void 
+void
 SDLWindow::setSwapInterval(unsigned theInterval)
 {
     if (!_myRenderer) {
@@ -734,7 +762,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
         }
     } else {
         AC_WARNING << "setSwapInterval(): wglSwapInterval not supported.";
-    }    
+    }
 #else
     if (glXGetVideoSyncSGI && glXWaitVideoSyncSGI) {
         if (_mySwapInterval == 0 && theInterval != 0) {
@@ -770,7 +798,7 @@ SDLWindow::getSwapInterval() {
         return wglGetSwapIntervalEXT();
     } else {
         AC_WARNING << "getSwapInterval(): wglSwapInterval Extension not supported.";
-    }    
+    }
 #else
     if (glXGetVideoSyncSGI) {
         return _mySwapInterval;
