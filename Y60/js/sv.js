@@ -21,6 +21,9 @@
     use("Exception.js");
     use("SceneViewer.js");
 
+    window = new RenderWindow();
+    window.multisamplingFactor = 8;
+
     var ourShow = new SceneViewer(arguments);
     var myModel = ourShow.getModelName();
 
