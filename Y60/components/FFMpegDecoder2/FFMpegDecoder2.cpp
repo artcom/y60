@@ -247,6 +247,10 @@ namespace y60 {
             _myVStreamIndex = -1;
             _myVStream = 0;
         }
+        if (_myFrame) {
+            av_free(_myFrame);
+            _myFrame = 0;
+        }
         if (_myAStream) {
             avcodec_close(_myAStream->codec);
             _myAStreamIndex = -1;
@@ -325,7 +329,7 @@ namespace y60 {
 
     bool FFMpegDecoder2::decodeFrame() {
         AC_DEBUG << "---- FFMpegDecoder2::decodeFrame";
-        AVPacket * myPacket;
+        AVPacket * myPacket = 0;
         
         int64_t myStartTime = 0;
         if (_myVStream->start_time != AV_NOPTS_VALUE) {
@@ -336,6 +340,10 @@ namespace y60 {
         bool myEndOfFileFlag = false;
         while (!myEndOfFileFlag) {
             AC_TRACE << "---- FFMpegDecoder2::decodeFrame: getPacket";
+            if (myPacket) { // XXX: move to bottom of loop
+                av_free_packet(myPacket);
+                delete myPacket;
+            }
             myPacket = _myDemux->getPacket(_myVStreamIndex); 
             if (myPacket == 0) {
                 myEndOfFileFlag = true;

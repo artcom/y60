@@ -51,10 +51,12 @@ AVPacket * Demux::getPacket(int theStreamIndex)
         do {
             AC_TRACE << "Demux::getPacket: read.";
             myPacket = new AVPacket;
+            memset(myPacket, 0, sizeof(AVPacket));
+            
             myEndOfFileFlag = (av_read_frame(_myFormatContext, myPacket) < 0);
             if (myEndOfFileFlag) {
                 AC_DEBUG << "Demux::getPacket: end of file.";
-//                av_free_packet(myPacket);
+                av_free_packet(myPacket);
                 delete myPacket;
                 myPacket = 0;
                 return 0;

@@ -132,6 +132,7 @@ vector<y60::EventPtr> DSADriver::poll()
                 if (sali->second->getGridSize()[0] == 0 &&
                     sali->second->getGridSize()[1] == 0) 
                 {
+                    // TODO: Raw Events for multiple Ports
                     sali->second->createRawEvents(myRawEvents,
                                            ssli->first, // thePortId
                                            sdi->first,  // theControllerId
@@ -146,11 +147,11 @@ vector<y60::EventPtr> DSADriver::poll()
                 }
             }
 
-            // interpolate neighboring events
             for (unsigned int i = 0; i < myRawEvents.size(); ++i) {
 
                 asl::Vector2f myPosition((float)myRawEvents[i][0], (float)myRawEvents[i][1]);
                 unsigned int myCount = 1;
+                // interpolate neighboring events
                 if (_myInterpolateFlag) {
                     for (unsigned int j = 0; j < myRawEvents.size(); ++j) {
                         if (i == j) {
