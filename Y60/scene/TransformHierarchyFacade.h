@@ -29,7 +29,6 @@
 
 #include <dom/Facade.h>
 #include <dom/AttributePlug.h>
-#include <dom/PrivatePlug.h>
 
 #include <asl/Matrix4.h>
 #include <asl/Box.h>
@@ -85,7 +84,7 @@ namespace y60 {
 
             asl::Vector3f getViewVector() const;
             asl::Vector3f getUpVector() const;
-            asl::Vector3f getRightVector() const;            
+            asl::Vector3f getRightVector() const;
             virtual void registerDependenciesRegistrators();
         protected:
             void registerDependenciesForLocalMatrix();
@@ -100,7 +99,7 @@ namespace y60 {
             void recalculateInverseGlobalMatrix();
         private:
             void getLocalMatrix(asl::Matrix4f & theLocalMatrix) const;
-        
+
     };
 
     typedef asl::Ptr<TransformHierarchyFacade, dom::ThreadingModel> TransformHierarchyFacadePtr;
