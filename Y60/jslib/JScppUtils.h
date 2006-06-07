@@ -46,6 +46,10 @@
 //#warning undefined nil to undo Apple namespace pollution
 #endif
 
+#ifdef DestroyNotify
+#undef DestroyNotify
+//#warning undefined data to undo Apple namespace pollution
+#endif
 
 #include <glibmm.h>
 

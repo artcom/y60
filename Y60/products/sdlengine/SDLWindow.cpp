@@ -21,7 +21,6 @@
 
 #include <y60/JScppUtils.h>
 
-
 #include <SDL/SDL.h>
 
 #ifdef WIN32_LEAN_AND_MEAN
