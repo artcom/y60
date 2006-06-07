@@ -224,6 +224,14 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         }
     }
 
+    obj.removeListener = function(theListener) {
+        for (var i=_myListeners.length-1; i >= 0; --i) {
+            if (theListener == _myListeners[i].obj) {
+                _myListeners.splice(i, 1);
+            }
+        }
+    }
+    
     obj.addListener = function(theListener, theSection) {
         if (!_mySettings) {
             return;

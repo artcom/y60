@@ -75,6 +75,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     self.registerSettingsListener = function(theListener, theSection) {
         _myConfigurator.addListener(theListener, theSection);
     }
+    self.deregisterSettingsListener = function(theListener) {
+        _myConfigurator.removeListener(theListener);
+    }
 
     self.setPBufferSize = function(theWidth, theHeight) {
         _myPBufferHeight = theHeight;
