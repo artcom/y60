@@ -14,6 +14,11 @@
 #include <asl/Vector234.h>
 #include <dom/Nodes.h>
 
+#ifdef OSX
+#undef check
+#undef nil
+#endif
+
 #include <gtkmm/drawingarea.h>
 #include <sigc++/sigc++.h>
 

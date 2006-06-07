@@ -19,6 +19,7 @@
 
 #include "CGShader.h"
 
+#include <y60/GLUtils.h>
 #include <y60/NodeNames.h>
 
 using namespace std;

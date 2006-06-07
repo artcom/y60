@@ -241,7 +241,7 @@ ReadFileAsString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
             JS_ReportError(cx, "readFile(): argument #1 must be a string (relative filename)");
             return JS_FALSE;
         }
-        Ptr<ReadableBlock> myBlock;
+        asl::Ptr<ReadableBlock> myBlock;
         if (argc == 1) {
             myBlock = JSApp::getPackageManager()->openFile(myFilename);
         } else {

@@ -35,7 +35,7 @@ using namespace asl;
 
 namespace jslib {
 
-Ptr<MessageAcceptor<LocalPolicy> > JSGtkMain::ourAppAcceptor;
+asl::Ptr<MessageAcceptor<LocalPolicy> > JSGtkMain::ourAppAcceptor;
 sigc::connection JSGtkMain::ourAcceptorTimeout;
 JSGtkMain::OtherInstanceSignal JSGtkMain::ourOtherInstanceSignal; 
     
@@ -264,7 +264,7 @@ JSGtkMain::on_idle( JSContext * cx, JSObject * theJSObject, std::string theMetho
     
 bool 
 JSGtkMain::onAcceptorTimeout() {
-    Ptr<MessageAcceptor<LocalPolicy>::Message> myMessage;
+    asl::Ptr<MessageAcceptor<LocalPolicy>::Message> myMessage;
     while (myMessage = JSGtkMain::ourAppAcceptor->popIncomingMessage()) {
         AC_DEBUG << "received '" << myMessage->as_string() << "'";
         JSGtkMain::ourAppAcceptor->pushOutgoingMessage(myMessage->server, "ACK");
@@ -317,14 +317,14 @@ SetSingleInstance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
         // generate a pipe name from the session id to ensure the app is
         // run only once per login session.
         try {
-            JSGtkMain::ourAppAcceptor = Ptr<MessageAcceptor<LocalPolicy> >(
+            JSGtkMain::ourAppAcceptor = asl::Ptr<MessageAcceptor<LocalPolicy> >(
                     new MessageAcceptor<LocalPolicy>(theApplicationName));
         } catch (const ConduitInUseException &) {
             if (!JSGtkMain::sendToPrevInstance(theApplicationName, theProjectFilename)) {
 #ifdef LINUX            
                 // delete dead socket and try again
                 deleteFile(UnixAddress::PIPE_PREFIX + theApplicationName);
-                JSGtkMain::ourAppAcceptor = Ptr<MessageAcceptor<LocalPolicy> >(
+                JSGtkMain::ourAppAcceptor = asl::Ptr<MessageAcceptor<LocalPolicy> >(
                         new MessageAcceptor<LocalPolicy>(theApplicationName));
 #endif
             }

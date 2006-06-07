@@ -28,7 +28,7 @@
 
 using namespace std;
 
-#ifdef LINUX
+#ifdef AC_USE_X11
 // hack to allow old glx header without the prototypes as well as new ones
 extern "C" {   
 #ifndef PFNGLXALLOCATEMEMORYNVPROC
@@ -62,10 +62,19 @@ namespace asl
         glFlushVertexArrayRangeNV = (PFNGLFLUSHVERTEXARRAYRANGENVPROC) wglGetProcAddress("glFlushVertexArrayRangeNV");
         return (wglAllocateMemoryNV && wglFreeMemoryNV && glVertexArrayRangeNV && glFlushVertexArrayRangeNV);
 #else
+#ifdef AC_USE_X11
         return (glXAllocateMemoryNV != NULL &&
                 glXFreeMemoryNV != NULL &&
                 glVertexArrayRangeNV != NULL &&
                 glFlushVertexArrayRangeNV != NULL);
+#else
+#ifdef AC_USE_X11
+		return false;
+        //glVertexArrayRangeNV = (PFNGLVERTEXARRAYRANGENVPROC) wglGetProcAddress("glVertexArrayRangeNV");
+        //glFlushVertexArrayRangeNV = (PFNGLFLUSHVERTEXARRAYRANGENVPROC) wglGetProcAddress("glFlushVertexArrayRangeNV");
+        //return (wglAllocateMemoryNV && wglFreeMemoryNV && glVertexArrayRangeNV && glFlushVertexArrayRangeNV);
+#endif
+#endif
 #endif
     }
 
@@ -92,8 +101,14 @@ namespace asl
         return (void*)(wglAllocateMemoryNV(
             theSize, theReadFrequency, theWriteFrequency, thePriority));
 #else
+#ifdef AC_USE_X11
         return (void*)(glXAllocateMemoryNV(
             theSize, theReadFrequency, theWriteFrequency, thePriority));
+#else
+#ifdef AC_USE_OSX_CGL
+		return 0;
+#endif
+#endif
 #endif
     }
     void gfxFreeMemoryNV(void * theMemory) {
@@ -103,7 +118,12 @@ namespace asl
             wglFreeMemoryNV(theMemory);
         }
 #else
+#ifdef AC_USE_X11
         glXFreeMemoryNV(theMemory);
+#else
+#ifdef AC_USE_OSX_CGL
+#endif
+#endif
 #endif
     }
 

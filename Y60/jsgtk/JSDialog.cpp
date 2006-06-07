@@ -179,7 +179,7 @@ JSDialog::getPropertySwitch(NATIVE & theNative, unsigned long theID,
     switch (theID) {
         case PROP_vbox:
             {
-                * vp = as_jsval(cx, Ptr<Gtk::VBox>(0), theNative.get_vbox());
+                * vp = as_jsval(cx, asl::Ptr<Gtk::VBox>(0), theNative.get_vbox());
                 return JS_TRUE;
             }
         case PROP_has_separator:

@@ -17,6 +17,7 @@
 //=============================================================================
 
 #include "CgProgramInfo.h"
+
 #include "Renderer.h"
 
 #include <y60/GLUtils.h>

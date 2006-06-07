@@ -39,7 +39,7 @@ static JSBool
 trigger(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    Ptr<TestSubject> myNative(0);
+    asl::Ptr<TestSubject> myNative(0);
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
     myNative->trigger();
     return JS_TRUE;

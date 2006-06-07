@@ -40,8 +40,11 @@ namespace y60 {
 #ifdef WIN32
         : _myHdc(0), _myHglrc(0)
 #endif
-#ifdef LINUX
+#ifdef AC_USE_X11
         : _myDisplay(0), _myDrawable(0), _myGLXContext(0)  
+#endif
+#ifdef AC_USE_OSX_CGL
+		: _myGLIContext(0)
 #endif
     { 
         _myStateCache = RenderStatePtr(new RenderState());
@@ -56,10 +59,13 @@ namespace y60 {
         _myHdc   = wglGetCurrentDC();
         _myHglrc = wglGetCurrentContext();
 #endif
-#ifdef LINUX
+#ifdef AC_USE_X11
         _myDisplay = glXGetCurrentDisplay();
         _myDrawable = glXGetCurrentDrawable();
         _myGLXContext = glXGetCurrentContext();
+#endif
+#ifdef AC_USE_OSX_CGL
+		_myCGLContext = CGLGetCurrentContext();
 #endif
         return true;
     }
@@ -74,7 +80,7 @@ namespace y60 {
             return false;
         }
 #endif
-#ifdef LINUX
+#ifdef AC_USE_X11
         if (!glXMakeCurrent(_myDisplay, _myDrawable, _myGLXContext )) {
             checkLastError(PLUS_FILE_LINE);
             AC_ERROR << "could not make opengl context current!" << endl;
@@ -87,8 +93,12 @@ namespace y60 {
     bool GLContext::isActive() {
 #ifdef WIN32
         return (_myHdc && _myHglrc);
-#else
+#endif
+#ifdef AC_USE_X11
         return (_myDisplay && _myDrawable && _myGLXContext);
+#endif
+#ifdef AC_USE_OSX_CGL
+		return (_myGLIContext); 
 #endif
     }
     

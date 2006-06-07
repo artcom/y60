@@ -132,7 +132,7 @@ namespace y60 {
     }
 #endif
 
-#ifdef LINUX
+#ifdef AC_USE_X11
     bool queryGLXExtension(const char *extName)
     {
         Display * dpy = glXGetCurrentDisplay();
@@ -515,7 +515,7 @@ namespace y60 {
     }
 #endif
 
-#ifdef LINUX
+#ifdef AC_USE_X11
 #define SET_PROC_ADDRESS(p,x) \
     _ac_ ## x = (p) glXGetProcAddressARB((const GLubyte*) #x ); \
     if (!x) { \
@@ -523,12 +523,124 @@ namespace y60 {
     }
 #endif
 
-#ifdef OSX
+#ifdef AC_USE_OSX_CGL
+
+// see http://developer.apple.com/qa/qa2001/qa1188.html for details
+
+#ifdef _AC_USE_NSGL_
+
+#include <mach-o/dyld.h>
+#include <stdlib.h>
+#include <string.h>
+
+void * NSGLGetProcAddress (const GLubyte *name)
+{
+  NSSymbol symbol;
+  char * symbolName;
+  /* prepend a '_' for the Unix C symbol mangling convention */
+  symbolName = (char*) malloc(strlen((const char*)name) + 2);
+  strcpy(symbolName+1, (const char*)name);
+  symbolName[0] = '_';
+  symbol = NULL;
+  if (NSIsSymbolNameDefined(symbolName))
+    symbol = NSLookupAndBindSymbol(symbolName);
+  free(symbolName);
+  return symbol ? NSAddressOfSymbol(symbol) : NULL;
+}
+
+#define SET_PROC_ADDRESS(p,x) \
+    _ac_ ## x = (p)  NSGLGetProcAddress( #x ); \
+    if (!x) { \
+        x = Missing_ ## x; \
+    }
+
+#else
+
+// Apple AGL Version
+ #include <Carbon/Carbon.h>
+
+CFBundleRef gBundleRefOpenGL = NULL;
+
+// -------------------------
+
+OSStatus aglInitEntryPoints (void)
+{
+    OSStatus err = noErr;
+    const Str255 frameworkName = "OpenGL.framework";
+    FSRefParam fileRefParam;
+    FSRef fileRef;
+    CFURLRef bundleURLOpenGL;
+
+    memset(&fileRefParam, 0, sizeof(fileRefParam));
+    memset(&fileRef, 0, sizeof(fileRef));
+
+    fileRefParam.ioNamePtr  = frameworkName;
+    fileRefParam.newRef = &fileRef;
+
+    // Frameworks directory/folder
+    err = FindFolder (kSystemDomain, kFrameworksFolderType, false,
+                      &fileRefParam.ioVRefNum, &fileRefParam.ioDirID);
+    if (noErr != err) {
+        AC_ERROR << "Could not find frameworks folder";
+        return err;
+    }
+    err = PBMakeFSRefSync (&fileRefParam); // make FSRef for folder
+    if (noErr != err) {
+        AC_ERROR << "Could make FSref to frameworks folder";
+        return err;
+    }
+    // create URL to folder
+    bundleURLOpenGL = CFURLCreateFromFSRef (kCFAllocatorDefault,
+                                            &fileRef);
+    if (!bundleURLOpenGL) {
+        AC_ERROR << "Could create OpenGL Framework bundle URL";
+        return paramErr;
+    }
+    // create ref to GL's bundle
+    gBundleRefOpenGL = CFBundleCreate (kCFAllocatorDefault,
+                                       bundleURLOpenGL);
+    if (!gBundleRefOpenGL) {
+        AC_ERROR << "Could not create OpenGL Framework bundle";
+        return paramErr;
+    }
+    CFRelease (bundleURLOpenGL); // release created bundle
+    // if the code was successfully loaded, look for our function.
+    if (!CFBundleLoadExecutable (gBundleRefOpenGL)) {
+        AC_ERROR << "Could not load MachO executable";
+        return paramErr;
+    }
+    return err;
+}
+
+// -------------------------
+
+void aglDellocEntryPoints (void)
+{
+    if (gBundleRefOpenGL != NULL) {
+        // unload the bundle's code.
+        CFBundleUnloadExecutable (gBundleRefOpenGL);
+        CFRelease (gBundleRefOpenGL);
+        gBundleRefOpenGL = NULL;
+    }
+}
+
+// -------------------------
+
+void * aglGetProcAddress (char * pszProc)
+{
+    return CFBundleGetFunctionPointerForName (gBundleRefOpenGL,
+                CFStringCreateWithCStringNoCopy (NULL,
+                     pszProc, CFStringGetSystemEncoding (), NULL));
+}
+
 #define SET_PROC_ADDRESS(p,x) \
     _ac_ ## x = (p)  aglGetProcAddress( #x ); \
     if (!x) { \
         x = Missing_ ## x; \
     }
+
+#endif
+
 #endif
 
 
@@ -678,7 +790,7 @@ namespace y60 {
             SET_PROC_ADDRESS( PFNWGLGETSWAPINTERVALEXTPROC, wglGetSwapIntervalEXT );
         }
 #endif
-#ifdef LINUX
+#ifdef AC_USE_X11
         if (queryGLXExtension("GLX_SGI_video_sync")) {
             SET_PROC_ADDRESS( PFNGLXGETVIDEOSYNCSGIPROC, glXGetVideoSyncSGI );
             SET_PROC_ADDRESS( PFNGLXWAITVIDEOSYNCSGIPROC, glXWaitVideoSyncSGI );

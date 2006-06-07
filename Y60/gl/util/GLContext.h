@@ -29,6 +29,8 @@
 #include "GLUtils.h"
 #include "RenderState.h"
 
+#include <OpenGL/gliContext.h>
+
 #include <vector>
 #include <string>
 
@@ -58,11 +60,14 @@ namespace y60 {
             HDC         _myHdc;
             HGLRC       _myHglrc;
     #endif
-    #ifdef LINUX
+    #ifdef AC_USE_X11
             Display *   _myDisplay;
             GLXDrawable _myDrawable;
             GLXContext  _myGLXContext;
     #endif
+	#ifdef AC_USE_OSX_CGL
+			GLIContext           _myGLIContext;
+	#endif
             RenderStatePtr _myStateCache;
     };
 

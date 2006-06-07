@@ -3,6 +3,10 @@
 
 #include <dom/Nodes.h>
 
+#ifdef OSX
+#undef check
+#undef nil
+#endif
 #include <gtkmm/liststore.h>
 #include <gtkmm/treeview.h>
 #include <gtkmm/treemodel.h>

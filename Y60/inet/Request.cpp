@@ -232,7 +232,7 @@ namespace inet {
     }
 
     size_t
-    Request::postBlock(const Ptr<ReadableBlock> & theBlock) {
+    Request::postBlock(const asl::Ptr<ReadableBlock> & theBlock) {
         _myPostBlock = theBlock;
         DB(AC_TRACE << "Posting Block with size=" << _myPostBlock->size() << endl);
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_POST, true);
@@ -247,7 +247,7 @@ namespace inet {
     size_t
     Request::postFile(const std::string & theFilename) {
         DB(AC_TRACE << "Posting File '" << theFilename << endl);
-        Ptr<ReadableBlock> myFileBlock(new ConstMappedBlock(asl::expandEnvironment(theFilename)));
+        asl::Ptr<ReadableBlock> myFileBlock(new ConstMappedBlock(asl::expandEnvironment(theFilename)));
         return postBlock(myFileBlock);
     }
 

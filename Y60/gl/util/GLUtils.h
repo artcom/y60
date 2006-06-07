@@ -24,34 +24,38 @@
     #undef max
 #endif
 
+#if defined(LINUX) || defined(OSX)
+	#define AC_USE_X11
+#endif
+
 #ifdef OSX
+#define Cursor X11_Cursor
+#include <X11/X.h>
+#undef Cursor
+#endif
+
+#ifdef AC_USE_OSX_CGL
 	#include <OpenGL/gl.h>
 	#include <OpenGL/glu.h>
 	#include <OpenGL/glext.h>
-	#include <OpenGL/OpenGL.h>
 #else
 	#include <GL/gl.h>
 	#include <GL/glu.h>
 	#include <GL/glext.h>
 #endif
 
-
 // window system extensions
 #ifdef WIN32
 #   include <GL/glh_extensions.h>
 #   include <GL/glh_genext.h>
 #endif
-#ifdef LINUX
+#ifdef AC_USE_X11
     #include <GL/glx.h>
     #include <GL/glxext.h>
 #endif
-#ifdef OSX
-	#include <GL/glh_extensions.h>
-	#include <GL/glh_genext.h>
-	#include <AGL/agl.h>
-//	#include <OpenGL/OpenGL.h>
-//    #include <OpenGL/glx.h>
-//    #include <OpenGL/glxext.h>
+
+#ifdef AC_USE_OSX_CGL
+	//#include <AGL/agl.h>
 #endif
 
 
@@ -71,11 +75,30 @@ struct GLExceptionHelper {
 
 }
 
-#ifdef _N_OSX
+#ifdef OSX
+#undef GL_GLEXT_VERSION
+#undef GL_ARB_texture_float
+#undef GL_ARB_vertex_buffer_object
+#undef GL_ARB_texture_compression
+#undef GL_ARB_multitexture
+#undef GL_ARB_point_parameters
+#undef GL_EXT_framebuffer_object
 
-	#include <AGL/agl.h>
+#undef GL_BLEND_EQUATION_RGB
 
-#else
+#undef GL_VERSION_1_2
+#undef GL_VERSION_1_3
+#undef GL_VERSION_1_4
+#undef GL_VERSION_1_5
+#undef GL_VERSION_2_0
+
+#define GLintptr ac_GLintptr
+#define GLsizeiptr ac_GLsizeiptr
+#define GLintptrARB ac_GLintptrARB
+#define GLsizeiptrARB ac_GLsizeiptrARB
+#include <GL/nvglext.h>
+#endif
+
 
 /* we have to define our own function pointers
  * we give them private names and
@@ -103,6 +126,8 @@ DEF_PROC_ADDRESS( PFNACTESTPROC, acTestMissingExtension );
 #define acTestMissingExtension _ac_acTestMissingExtension
 DEF_PROC_ADDRESS( PFNACTESTPROC, acTestMissingFunction );
 #define acTestMissingFunction _ac_acTestMissingFunction
+
+#if 1
 
 // now the real extensions
 DEF_PROC_ADDRESS( PFNGLBINDBUFFERARBPROC, glBindBufferARB );
@@ -228,6 +253,7 @@ DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
 #define glGenerateMipmapEXT _ac_glGenerateMipmapEXT
 #endif
 
+#endif // ndef OSX
 
 // Swap interval
 #ifdef WIN32
@@ -236,7 +262,7 @@ DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
     DEF_PROC_ADDRESS( PFNWGLGETSWAPINTERVALEXTPROC, wglGetSwapIntervalEXT );
     #define wglGetSwapIntervalEXT _ac_wglGetSwapIntervalEXT
 #endif
-#ifdef LINUX
+#ifdef AC_USE_X11
     DEF_PROC_ADDRESS( PFNGLXGETVIDEOSYNCSGIPROC, glXGetVideoSyncSGI );
     #define glXGetVideoSyncSGI _ac_glXGetVideoSyncSGI
     DEF_PROC_ADDRESS( PFNGLXWAITVIDEOSYNCSGIPROC, glXWaitVideoSyncSGI );
@@ -245,7 +271,6 @@ DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
 
 } // extern C
 
-#endif // not OSX
 
 
 #ifndef GL_ARB_point_sprite
@@ -270,7 +295,7 @@ namespace y60 {
 #ifdef WIN32
     bool queryWGLExtension(const char *extension);
 #endif
-#ifdef LINUX
+#ifdef AC_USE_X11
     bool queryGLXExtension(const char *extension);
 #endif
     GLenum asGLBlendFunction(BlendFunction theFunction);

@@ -88,7 +88,7 @@ static JSBool addFileSink(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
         std::string myLogFilename;
         convertFrom(cx, argv[0], myLogFilename);
 
-        Logger::get().addMessageSink(Ptr<MessageSink>(new asl::FilePrinter(myLogFilename)));
+        Logger::get().addMessageSink(asl::Ptr<MessageSink>(new asl::FilePrinter(myLogFilename)));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 
@@ -98,7 +98,7 @@ static JSBool addFarewellSink(JSContext *cx, JSObject *obj, uintN argc, jsval *a
     DOC_END;
     try {
         ensureParamCount(argc, 0);
-        Logger::get().addMessageSink(Ptr<MessageSink>(new asl::FarewellMessageSink()));
+        Logger::get().addMessageSink(asl::Ptr<MessageSink>(new asl::FarewellMessageSink()));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 

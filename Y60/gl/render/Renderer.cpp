@@ -449,8 +449,8 @@ namespace y60 {
             glDisable(GL_LIGHTING);
             glColor3f(1.0f, .5f, 0);
 
-            Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = thePrimitive.getConstLockingPositionsAccessor();
-            Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = thePrimitive.getConstLockingNormalsAccessor();
+            asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = thePrimitive.getConstLockingPositionsAccessor();
+            asl::Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = thePrimitive.getConstLockingNormalsAccessor();
             const VertexData3f & myPositions = myPositionAccessor->get();
             const VertexData3f & myNormals = myNormalsAccessor->get();
             Vector3f myNormalTip;

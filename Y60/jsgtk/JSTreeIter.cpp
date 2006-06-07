@@ -42,7 +42,7 @@ set_value(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         ensureParamCount(argc, 2);
         // native method call
-        Ptr<Gtk::TreeIter> myNative;
+        asl::Ptr<Gtk::TreeIter> myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
         int myColNum = 0;
@@ -68,7 +68,7 @@ get_value(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         ensureParamCount(argc,1);
         // native method call
-        Ptr<Gtk::TreeIter> myNative;
+        asl::Ptr<Gtk::TreeIter> myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
         int myColNum = 0;
@@ -206,7 +206,7 @@ jsval as_jsval(JSContext *cx, JSTreeIter::OWNERPTR theOwner, JSTreeIter::NATIVE 
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, Ptr<Gtk::TreeIter> & theNativePtr) {
+bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<Gtk::TreeIter> & theNativePtr) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {

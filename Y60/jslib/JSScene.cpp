@@ -724,12 +724,12 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     JSScene * myNewObject=new JSScene(myNewPtr, &(*myNewPtr));
 
     try {
-        Ptr<ProgressCallback> myCallback;
+        asl::Ptr<ProgressCallback> myCallback;
         if (argc >= 3) {
             JSObject * myTarget = JSVAL_TO_OBJECT(argv[1]);
             string myHandler;
             convertFrom(cx, argv[2], myHandler);
-            myCallback = Ptr<ProgressCallback>(new ProgressCallback(cx, myTarget, myHandler));
+            myCallback = asl::Ptr<ProgressCallback>(new ProgressCallback(cx, myTarget, myHandler));
         }
 
         if (argc >= 1) {

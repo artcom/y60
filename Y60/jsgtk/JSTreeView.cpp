@@ -80,7 +80,7 @@ Unselect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         Gtk::TreeView * myNative=0;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = myNative->get_selection();
-        Ptr<Gtk::TreeIter> myRow;
+        asl::Ptr<Gtk::TreeIter> myRow;
         convertFrom(cx, argv[0],myRow);
         refTreeSelection->unselect(*myRow);
         return JS_TRUE;
@@ -98,7 +98,7 @@ Select(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         Gtk::TreeView * myNative=0;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = myNative->get_selection();
-        Ptr<Gtk::TreeIter> myRow;
+        asl::Ptr<Gtk::TreeIter> myRow;
         convertFrom(cx, argv[0],myRow);
         refTreeSelection->select(*myRow);
         return JS_TRUE;
@@ -310,7 +310,7 @@ JSTreeView::getPropertySwitch(NATIVE & theNative, unsigned long theID,
                 Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = theNative.get_selection();
                 Gtk::TreeModel::iterator iter = refTreeSelection->get_selected();
                 if (iter) {
-                    Ptr<Gtk::TreeIter> myRow = Ptr<Gtk::TreeIter>(new Gtk::TreeIter(iter));
+                    asl::Ptr<Gtk::TreeIter> myRow = asl::Ptr<Gtk::TreeIter>(new Gtk::TreeIter(iter));
                     *vp = as_jsval(cx, myRow, &(*myRow));
 
                 } else {
@@ -361,7 +361,7 @@ JSTreeView::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         case PROP_selected_row:
             try {
                 Glib::RefPtr<Gtk::TreeSelection> refTreeSelection = theNative.get_selection();
-                Ptr<Gtk::TreeIter> myRow;
+                asl::Ptr<Gtk::TreeIter> myRow;
                 convertFrom(cx, *vp, myRow);
                 refTreeSelection->select(*myRow);
                 return JS_TRUE;

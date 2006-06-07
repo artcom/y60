@@ -96,7 +96,7 @@ append(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        Ptr<Gtk::TreeIter> myIt = Ptr<Gtk::TreeIter>( new Gtk::TreeIter(
+        asl::Ptr<Gtk::TreeIter> myIt = asl::Ptr<Gtk::TreeIter>( new Gtk::TreeIter(
                             myNative->append(myMeasurementNode, myDisplayValue)));
         *rval = as_jsval(cx, myIt, &(*myIt));
         return JS_TRUE;
@@ -128,7 +128,7 @@ update(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-        Ptr<Gtk::TreeIter> myIt = Ptr<Gtk::TreeIter>( new Gtk::TreeIter(
+        asl::Ptr<Gtk::TreeIter> myIt = asl::Ptr<Gtk::TreeIter>( new Gtk::TreeIter(
                             myNative->update(myMeasurementNode, myDisplayValue)));
         *rval = as_jsval(cx, myIt, &(*myIt));
         return JS_TRUE;
@@ -155,7 +155,7 @@ remove(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
 
         //myNative->remove(myMeasurementNode);
-        Ptr<Gtk::TreeIter> myIt = Ptr<Gtk::TreeIter>( new Gtk::TreeIter(
+        asl::Ptr<Gtk::TreeIter> myIt = asl::Ptr<Gtk::TreeIter>( new Gtk::TreeIter(
                             myNative->remove(myMeasurementNode)));
         if (myNative->isEndIter(*myIt)) {
             *rval = JSVAL_NULL;

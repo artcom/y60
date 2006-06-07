@@ -12,6 +12,8 @@
 #define _ac_renderer_Renderer_h_
 
 #include "BodyPart.h"
+#include <y60/GLUtils.h>
+
 #include <y60/RenderState.h>
 
 #include <y60/TextRendererManager.h>
@@ -23,6 +25,7 @@
 #include <y60/MaterialBase.h>
 #include <y60/Light.h>
 #include <y60/GLContext.h>
+
 
 #include <asl/Frustum.h>
 #include <asl/Dashboard.h>

@@ -835,27 +835,27 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
         {
             CallStatus myStatus = NOT_FOUND;
 
-            typedef bool (*LineLineIntersection)(const Line<LineNumber> &,const Line<LineNumber> &, Point3<LineNumber> &);
+            typedef bool (*LineLineIntersection)(const asl::Line<LineNumber> &,const asl::Line<LineNumber> &, Point3<LineNumber> &);
             myStatus = ObjectObjectResultFunction((LineLineIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
-            typedef bool (*LinePlaneIntersection)(const Line<LineNumber> &,const Plane<PlaneNumber> &, Point3<PlaneNumber> &);
+            typedef bool (*LinePlaneIntersection)(const asl::Line<LineNumber> &,const Plane<PlaneNumber> &, Point3<PlaneNumber> &);
             myStatus = ObjectObjectResultFunction((LinePlaneIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
-            typedef bool (*PlaneLineIntersection)(const Plane<PlaneNumber> &, const Line<LineNumber> &,Point3<PlaneNumber> &);
+            typedef bool (*PlaneLineIntersection)(const Plane<PlaneNumber> &, const asl::Line<LineNumber> &,Point3<PlaneNumber> &);
             myStatus = ObjectObjectResultFunction((PlaneLineIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
-            typedef bool (*LineTriangleIntersection)(const Line<LineNumber> &,const Triangle<TriangleNumber> &, Point3<TriangleNumber> &);
+            typedef bool (*LineTriangleIntersection)(const asl::Line<LineNumber> &,const Triangle<TriangleNumber> &, Point3<TriangleNumber> &);
             myStatus = ObjectObjectResultFunction((LineTriangleIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
-            typedef bool (*TriangleLineIntersection)(const Triangle<TriangleNumber> &, const Line<LineNumber> &,Point3<TriangleNumber> &);
+            typedef bool (*TriangleLineIntersection)(const Triangle<TriangleNumber> &, const asl::Line<LineNumber> &,Point3<TriangleNumber> &);
             myStatus = ObjectObjectResultFunction((TriangleLineIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
-            typedef bool (*SphereLineIntersection)(const Sphere<LineNumber> &,const Line<SphereNumber> &, Point3<SphereNumber> &, Point3<SphereNumber> &);
+            typedef bool (*SphereLineIntersection)(const Sphere<LineNumber> &,const asl::Line<SphereNumber> &, Point3<SphereNumber> &, Point3<SphereNumber> &);
             myStatus = ObjectObjectDualResultFunction((SphereLineIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
@@ -901,10 +901,10 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
             myStatus = ObjectObjectVariableResultFunction((LineSegmentSphereIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
-            typedef bool (*LineLineSegmentIntersection)(const Line<LineNumber> &, const LineSegment<LineNumber> &, Point3<LineNumber> &);
+            typedef bool (*LineLineSegmentIntersection)(const asl::Line<LineNumber> &, const LineSegment<LineNumber> &, Point3<LineNumber> &);
             myStatus = ObjectObjectResultFunction((LineLineSegmentIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
-            typedef bool (*LineSegmentLineIntersection)(const LineSegment<LineNumber> &, const Line<LineNumber> &, Point3<LineNumber> &);
+            typedef bool (*LineSegmentLineIntersection)(const LineSegment<LineNumber> &, const asl::Line<LineNumber> &, Point3<LineNumber> &);
             myStatus = ObjectObjectResultFunction((LineSegmentLineIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
@@ -999,12 +999,12 @@ nearestDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
                 if (myStatus != NOT_FOUND) return JS_TRUE;
             }
             { // Line
-                typedef Point3<LineNumber> (*NearestPointLine)(const Point3<LineNumber> &, const Line<LineNumber> &);
+                typedef Point3<LineNumber> (*NearestPointLine)(const Point3<LineNumber> &, const asl::Line<LineNumber> &);
                 myStatus = VectorObjectFunction((NearestPointLine)&nearest, cx, myObj0, myObj1, rval);
                 if (myStatus != NOT_FOUND) return JS_TRUE;
             }
             {
-                typedef Point3<LineNumber> (*NearestLinePoint)(const Line<LineNumber> &, const Point3<LineNumber> &);
+                typedef Point3<LineNumber> (*NearestLinePoint)(const asl::Line<LineNumber> &, const Point3<LineNumber> &);
                 myStatus = ObjectVectorFunction((NearestLinePoint)&nearest, cx, myObj0, myObj1, rval);
                 if (myStatus != NOT_FOUND) return JS_TRUE;
             }

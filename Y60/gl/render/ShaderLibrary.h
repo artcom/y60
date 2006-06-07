@@ -12,9 +12,11 @@
 #include <dom/Nodes.h>
 #include <asl/Ptr.h>
 
+#ifndef _AC_NO_CG_
 // CG support
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
+#endif
 
 #include <string>
 namespace y60 {
@@ -39,12 +41,16 @@ namespace y60 {
             const std::string & getShaderDir() const { return _myShaderDirectory; };
 
             const GLShaderVector & getShaders() const { return _myShaders; };
+#ifndef _AC_NO_CG_
             CGcontext getCgContext();
+#endif
          private:
             void loadAllShaders();
             GLShaderVector  _myShaders;
             std::string     _myShaderDirectory;
+#ifndef _AC_NO_CG_
 		    CGcontext       _myCgContext;
+#endif
 		    dom::NodePtr    _myShaderList;
 
      };

@@ -21,7 +21,10 @@
 #include "ShaderLibrary.h"
 #include "ShaderLibrary_xsd.h"
 #include "FFShader.h"
+
+#ifndef _AC_NO_CG_
 #include "CGShader.h"
+#endif
 
 #include <y60/NodeNames.h>
 #include <y60/property_functions.h>
@@ -44,21 +47,30 @@ using namespace dom;
 
 namespace y60 {
 
-	ShaderLibrary::ShaderLibrary():_myCgContext(0)  {
+	ShaderLibrary::ShaderLibrary() 
+#ifndef _AC_NO_CG_
+	: _myCgContext(0)
+    {
         _myCgContext = cgCreateContext();
         assertCg("ShaderLibrary::ShaderLibrary() - cgCreateContext()", _myCgContext);
     }
+#else
+	{ }
+#endif
 
     ShaderLibrary::~ShaderLibrary()  {
         _myShaders.clear(); // destroy all shaders first
+#ifndef _AC_NO_CG_ 
         cgDestroyContext(_myCgContext);
         assertCg("ShaderLibrary::~ShaderLibrary() - cgDestroyContext()", _myCgContext);
+#endif
     }
-
+#ifndef _AC_NO_CG_
     CGcontext
 	ShaderLibrary::getCgContext() {
 		return _myCgContext;
 	}
+#endif
 
     void
     ShaderLibrary::load(const std::string & theLibraryFileName) {
@@ -109,9 +121,12 @@ namespace y60 {
             DB(AC_TRACE << "loading shader " << theShaderNode->getAttributeString("name") << endl);
             if (theShaderNode->childNode(FIXED_FUNCTION_SHADER_NODE_NAME)) {
                 myGLShader = GLShaderPtr(new FFShader(theShaderNode));
-            } else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME)) {
+            }
+#ifndef _AC_NO_CG_
+		    else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME)) {
                 myGLShader = GLShaderPtr(new CGShader(theShaderNode));
             }
+#endif
             if (myGLShader) {
                 _myShaders.push_back(myGLShader);
             } else {

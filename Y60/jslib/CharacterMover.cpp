@@ -313,10 +313,10 @@ namespace jslib {
                 VertexData3f::VertexDataVector * myPositions = myElements[i]->getPositions();
                 VertexData4f::VertexDataVector * myColors = myElements[i]->getColors();
 #else
-                Ptr<VertexDataAccessor<Vector3f> > myPositionsAccessor = myElements[i]->getLockingPositionsAccessor();
+                asl::Ptr<VertexDataAccessor<Vector3f> > myPositionsAccessor = myElements[i]->getLockingPositionsAccessor();
                 VertexData3f * myPositions = &myPositionsAccessor->get();
 
-                Ptr<VertexDataAccessor<Vector4f> > myColorsAccessor = myElements[i]->getLockingColorsAccessor();
+                asl::Ptr<VertexDataAccessor<Vector4f> > myColorsAccessor = myElements[i]->getLockingColorsAccessor();
                 VertexData4f * myColors = &myColorsAccessor->get();
 #endif                
 

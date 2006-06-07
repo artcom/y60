@@ -35,6 +35,18 @@
 #include <dom/Value.h>
 
 #include <paintlib/plexcept.h>
+
+#ifdef check
+#undef check
+//#warning undefined check to undo Apple namespace pollution
+#endif
+
+#ifdef nil
+#undef nil
+//#warning undefined nil to undo Apple namespace pollution
+#endif
+
+
 #include <glibmm.h>
 
 #include <limits>

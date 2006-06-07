@@ -8,9 +8,24 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+#ifdef OSX  // avoid X11 Cursor name clash with Apple Cursor
+//#include <y60/GLUtils.h>
+#endif
+
+#include <Carbon/Carbon.h>
+
+#ifdef OSX
+#define Cursor X11_Cursor
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#undef Cursor
+#endif
+
 #include "SDLWindow.h"
 #include "SDLTextRenderer.h"
+
 #include <y60/JScppUtils.h>
+
 
 #include <SDL/SDL.h>
 
@@ -120,7 +135,7 @@ void
 SDLWindow::postRender() {
     AbstractRenderWindow::postRender();
     MAKE_SCOPE_TIMER(SDL_GL_SwapBuffers);
-#ifdef LINUX
+#ifdef AC_USE_X11
     if (_mySwapInterval) {
         unsigned counter;
         glXWaitVideoSyncSGI(_mySwapInterval, 0, &counter);
@@ -197,7 +212,7 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
             AC_DEBUG << "keeping height=" << theTargetHeight;
         }
 
-#ifdef LINUX
+#ifdef AC_USE_X11
         SDL_SysWMinfo wminfo;
         SDL_VERSION(&wminfo.version);
         if (SDL_GetWMInfo(&wminfo) >= 0) {
@@ -260,7 +275,7 @@ SDLWindow::initDisplay() {
     // EventDispatcher::get().addSink(&_myEventDumper);
     EventDispatcher::get().addSink(this);
 
-#ifdef LINUX
+#ifdef AC_USE_X11
     if (getenv("__GL_SYNC_TO_VBLANK") == 0) {
         AC_WARNING << "__GL_SYNC_TO_VBLANK not set.";
     }
@@ -771,3 +786,4 @@ SDLWindow::getSwapInterval() {
 #endif
     return 0;
 }
+

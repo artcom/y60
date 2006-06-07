@@ -32,7 +32,7 @@ GLContextRegistry::unregisterContext(asl::WeakPtr<AbstractRenderWindow> theRende
     AC_DEBUG << "Context removed from ContextRegistry, size: " << _myContexts.size();
 }
 
-Ptr<AbstractRenderWindow>
+asl::Ptr<AbstractRenderWindow>
 GLContextRegistry::getContext() {
     cleanup();
     for (ContextSet::iterator i = _myContexts.begin(); i != _myContexts.end(); ++i) {
@@ -43,7 +43,7 @@ GLContextRegistry::getContext() {
             // TODO: We should remove it from the list for performance
         }
     }
-    return Ptr<AbstractRenderWindow>(0);
+    return asl::Ptr<AbstractRenderWindow>(0);
 }
 
 void
