@@ -29,7 +29,9 @@
 #include "GLUtils.h"
 #include "RenderState.h"
 
-#include <OpenGL/gliContext.h>
+#ifdef AC_USE_OSX_CGL
+	#include <OpenGL/gliContext.h>
+#endif
 
 #include <vector>
 #include <string>
