@@ -991,33 +991,28 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
 
 void
 MaterialExporter::stripBaseDir(std::string & theFileName) {
-    std::string myFilename = theFileName;
+    std::string myFileName = theFileName;
+    std::string myBaseName = _myBaseDirectory;
 #ifdef WIN32
-    // We need to convert basedir and filename toupper, before comparing, because under windows
-    // there are differences :( [ch]
-    std::string myUpperFileName(myFilename);
-    std::transform(myFilename.begin(), myFilename.end(),
-                   myUpperFileName.begin(), std::toupper);
-    myFilename = myUpperFileName;
-    std::string myUpperBaseName(_myBaseDirectory);
-    std::transform(_myBaseDirectory.begin(), _myBaseDirectory.end(),
-                   myUpperBaseName.begin(), std::toupper);
-    _myBaseDirectory = myUpperBaseName;
-    size_t myIndex = myUpperFileName.find(myUpperBaseName);
-#else
-    size_t myIndex = myFilename.find(_myBaseDirectory);
+    // convert basedir and filename to upper-case before comparing, because windows
+    // is case-INsensitive and therefore the comparison needs to be too :( [jb]
+    std::transform(myFileName.begin(), myFileName.end(),
+                   myFileName.begin(), std::toupper);
+    std::transform(myBaseName.begin(), myBaseName.end(),
+                   myBaseName.begin(), std::toupper);
 #endif
+    size_t myIndex = myFileName.find(myBaseName);
     if (myIndex != std::string::npos) {
         if (myIndex == 0) {
-            myFilename = myFilename.substr(_myBaseDirectory.length());
+            myFileName = theFileName.substr(myBaseName.length());
         } else {
-            myFilename = myFilename.substr(myIndex + _myBaseDirectory.length());
+            myFileName = theFileName.substr(myIndex + myBaseName.length());
         }
     } else {
         // try to find as much directories as possible from BaseDirectory
         bool myEqualFlag = true;
-        std::string myBaseRest(_myBaseDirectory);
-        std::string myFileRest(myFilename);
+        std::string myBaseRest(myBaseName);
+        std::string myFileRest(myFileName);
         while (myEqualFlag) {
             size_t mySlashBaseIndex = myBaseRest.find('/');
             size_t mySlashFilenameIndex = myFileRest.find('/');
@@ -1035,25 +1030,23 @@ MaterialExporter::stripBaseDir(std::string & theFileName) {
             }
         }
         // do we have a chance to optimize??
-        if (myBaseRest != _myBaseDirectory && myFileRest != myFilename) {
+        if (myBaseRest != _myBaseDirectory && myFileRest != myFileName) {
+#ifdef WIN32
+            // redo the case magic under windows by reconstructing the original path's case [jb]
+            myFileRest = theFileName.substr(theFileName.length() - myFileRest.length());
+#endif
             // count the directories in the rest of the base name and add some relative '..' to restfilename
             int myResult = std::count(myBaseRest.begin(), myBaseRest.end(), '/');
             for (int myCounter = 0; myCounter < myResult; myCounter++) {
                 myFileRest = std::string("../") + myFileRest;
             }
-            myFilename = myFileRest;
+            myFileName = myFileRest;
         }
         AC_DEBUG << "MaterialExporter::stripBaseDir found nothing";
     }
 
-#if 0
-#else
-    if (theFileName.find(_myBaseDirectory) == 0) {
-        theFileName = theFileName.substr(_myBaseDirectory.length());
-    }
-#endif
-    AC_DEBUG << "stripBaseDir::stripBaseDir stripped filename=" << myFilename;
-     theFileName = myFilename;
+    AC_DEBUG << "stripBaseDir::stripBaseDir stripped filename=" << myFileName;
+    theFileName = myFileName;
 }
 
 std::string
