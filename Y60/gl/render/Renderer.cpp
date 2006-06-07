@@ -71,13 +71,13 @@
 #ifdef PROFILING_LEVEL_NORMAL
 #define DBP(x)  x
 #else
-#define DBP(x)  x
+#define DBP(x) // x
 #endif
 
 #ifdef PROFILING_LEVEL_FULL
 #define DBP2(x)  x
 #else
-#define DBP2(x)  x
+#define DBP2(x) // x
 #endif
 
 using namespace std;
