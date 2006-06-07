@@ -8,13 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifdef OSX  // avoid X11 Cursor name clash with Apple Cursor
-//#include <y60/GLUtils.h>
-#endif
-
-#include <Carbon/Carbon.h>
-
 #ifdef OSX
+#include <Carbon/Carbon.h>
 #define Cursor X11_Cursor
 #include <X11/X.h>
 #include <X11/Xlib.h>
