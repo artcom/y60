@@ -623,6 +623,11 @@ namespace y60 {
         std::istringstream myRenderStylesStream(theRenderStyles);
         RenderStyles myRenderStyles;
         myRenderStylesStream >> myRenderStyles;
+        // don't use our _myState GL-State cache,
+        // instead, bypass this cache and use 
+        // glPush/PopAttrib & glEnable directly
+        // enableRenderStyles(myRenderStyles);
+        
 
 #if 1
         glPushAttrib(GL_COLOR_BUFFER_BIT | // color writemasks
@@ -634,12 +639,27 @@ namespace y60 {
 #else
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 #endif
-        glDepthMask(false);
-        glDisable(GL_DEPTH_TEST);
+        glDepthMask( myRenderStyles[NO_DEPTH_WRITES]);
+        if (myRenderStyles[IGNORE_DEPTH]) {
+            glDisable(GL_DEPTH_TEST);
+        } else {
+            glEnable(GL_DEPTH_TEST);
+        }
+        if (myRenderStyles[POLYGON_OFFSET]) {
+            glEnable(GL_POLYGON_OFFSET_POINT);
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(1.0, 1.0);
+        } else {
+            glDisable(GL_POLYGON_OFFSET_POINT);
+            glDisable(GL_POLYGON_OFFSET_LINE);
+            glDisable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(0.0, 0.0);
+        }
+        
         glDisable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
 
-        enableRenderStyles(myRenderStyles);
         glColor4fv(theColor.begin());
         glLineWidth(theWidth);
 
