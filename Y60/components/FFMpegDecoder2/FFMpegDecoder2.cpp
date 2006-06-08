@@ -386,7 +386,7 @@ namespace y60 {
         myDestPict.data[1] = theBuffer+1;
         myDestPict.data[2] = theBuffer+2;
         
-        unsigned myLineSizeBytes = getBytesRequired(getFrameWidth(), getPixelFormat());
+        unsigned myLineSizeBytes = getBytesRequired(_myFrameWidth, _myPixelEncoding);
         myDestPict.linesize[0] = myLineSizeBytes;
         myDestPict.linesize[1] = myLineSizeBytes;
         myDestPict.linesize[2] = myLineSizeBytes;
@@ -455,14 +455,16 @@ namespace y60 {
                 for (;;) {
                     myVideoFrame = _myFrameCache.pop_front();
                     AC_DEBUG << "readFrame, FrameTime=" << myVideoFrame->getTimestamp() 
-                            << ", Calculated frame #=" << myVideoFrame->getTimestamp()*getFrameRate()
+                            << ", Calculated frame #=" << myVideoFrame->getTimestamp()*_myFrameRate
                             << ", Cache size=" << _myFrameCache.size();
                     double myTimeDiff = abs(myFrameTime - myVideoFrame->getTimestamp());
                     AC_DEBUG << "TimeDiff: " << myTimeDiff;
-    				if (myTimeDiff <= 0.5/getFrameRate() || _myFrameCache.size() == 0) {
+    				if (myTimeDiff <= 0.5/_myFrameRate || _myFrameCache.size() == 0) {
+                        AC_DEBUG << "frame accepted";
                         _myFrameCache.push_front(myVideoFrame);
                         break;
                     } else {
+                        AC_DEBUG << "dropping frame";
                         _myFrameRecycler.push_back(myVideoFrame);
                     }
                 }
@@ -519,7 +521,6 @@ namespace y60 {
             return;
         }
         _myReadEOF = false;
-        double myFrameRate = getFrameRate();
 
         int64_t mySeekTimestamp = AV_NOPTS_VALUE;
 
@@ -584,7 +585,8 @@ namespace y60 {
 
         Movie * myMovie = getMovie();
         AC_TRACE << "PF=" << myMovie->get<ImagePixelFormatTag>();
-        switch (myMovie->getPixelEncoding()) {
+        _myPixelEncoding = myMovie->getPixelEncoding();
+        switch (_myPixelEncoding) {
             case y60::RGBA:
             case y60::BGRA:
                 AC_TRACE << "Using RGBA pixels";
@@ -608,22 +610,21 @@ namespace y60 {
         }
 
         // Setup size and image matrix
-        int myWidth = myVCodec->width;
-        int myHeight = myVCodec->height;
+        _myFrameWidth = myVCodec->width;
+        _myFrameHeight = myVCodec->height;
 
-        myMovie->set<ImageWidthTag>(myWidth);
-        myMovie->set<ImageHeightTag>(myHeight);
+        myMovie->set<ImageWidthTag>(_myFrameWidth);
+        myMovie->set<ImageHeightTag>(_myFrameHeight);
 
-        float myXResize = float(myWidth) / asl::nextPowerOfTwo(myWidth);
-        float myYResize = float(myHeight) / asl::nextPowerOfTwo(myHeight);
+        float myXResize = float(_myFrameWidth) / asl::nextPowerOfTwo(_myFrameWidth);
+        float myYResize = float(_myFrameHeight) / asl::nextPowerOfTwo(_myFrameHeight);
 
         asl::Matrix4f myMatrix;
         myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
         myMovie->set<ImageMatrixTag>(myMatrix);
 
-        double myFPS;
-        myFPS = (1.0 / av_q2d(myVCodec->time_base));
-        myMovie->set<FrameRateTag>(myFPS);
+        _myFrameRate = (1.0 / av_q2d(myVCodec->time_base));
+        myMovie->set<FrameRateTag>(_myFrameRate);
 
         if (_myVStream->duration == AV_NOPTS_VALUE) {
             AC_TRACE << "FFMpegDecoder2::setupVideo() " << theFilename 
@@ -634,13 +635,13 @@ namespace y60 {
                     << "' contains no valid duration";
             myMovie->set<FrameCountTag>(INT_MAX);
         } else {
-	        myMovie->set<FrameCountTag>(int(myFPS * (_myVStream->duration
+	        myMovie->set<FrameCountTag>(int(_myFrameRate * (_myVStream->duration
                     / (double) _myTimeUnitsPerSecond)));
             AC_TRACE << "FFMpegDecoder2::setupVideo(): _myVStream->duration=" << _myVStream->duration 
                     << ", _myTimeUnitsPerSecond=" << _myTimeUnitsPerSecond;
         }
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps=" 
-                << getFrameRate() << " framecount=" << getFrameCount();
+                << _myFrameRate << " framecount=" << getFrameCount();
 
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
@@ -661,7 +662,7 @@ namespace y60 {
         }
 
         AC_DEBUG << "FFMpegDecoder2::setupVideo() - Start timestamp: " << _myStartTimestamp;
-        _myTimePerFrame = (int64_t)(_myTimeUnitsPerSecond/getFrameRate());
+        _myTimePerFrame = (int64_t)(_myTimeUnitsPerSecond/_myFrameRate);
     }
 
     void
@@ -695,12 +696,14 @@ namespace y60 {
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, int64_t theTimestamp) {
 		AC_TRACE << "---- try to add frame at " << theTimestamp;
         try {
+            AC_DEBUG << "---- frame recycler size=" << _myFrameRecycler.size();
             FrameCache::VideoFramePtr myVideoFrame = _myFrameRecycler.pop_front();
             myVideoFrame->setTimestamp(theTimestamp/(double)_myTimeUnitsPerSecond);
             convertFrame(theFrame, myVideoFrame->getBuffer());
             _myFrameCache.push_back(myVideoFrame);
             AC_DEBUG << "---- Added Frame to cache, Frame # : " 
-                    << double(theTimestamp)/_myTimeUnitsPerSecond*getFrameRate();
+                    << double(theTimestamp)/_myTimeUnitsPerSecond*_myFrameRate 
+                    << " cache size=" << _myFrameCache.size();
         } catch (FrameCache::TimeoutException &) {
             AC_FATAL << "---- Semaphore Timeout";
         }

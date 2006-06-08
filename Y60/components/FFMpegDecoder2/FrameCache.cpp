@@ -75,7 +75,11 @@ FrameCache::VideoFramePtr FrameCache::back() const {
 }
 
 unsigned FrameCache::size() const {
-    return _myList.size(); 
+    _myListLock.lock();
+    unsigned myListSize = _myList.size();
+    _myListLock.unlock();
+    return myListSize;
+    //return _myList.size(); 
 }
         
 void FrameCache::close() { 
