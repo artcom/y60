@@ -396,6 +396,7 @@ Currently the following styles are supported:
 'frontfacing'     - The frontfaces of the shape are rendered
 'bounding_volume' - The bounding volumes of the shape are rendered
 'ignore_depth'    - The shape is rendered without z-Buffer testing
+'no_depth_writes' - Do not write to the z-Buffer, even if 'depth' is in the material's targetbuffers
 'polygon_offset'  - The shape is rendered with its polygons offset</xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string"/>
@@ -731,6 +732,8 @@ Example:
     <xs:element name="targetbuffers">
         <xs:annotation>
             <xs:documentation>This element contains a target buffer bitset as a text child.
+            the bits are 'red','green','blue','alpha','depth'.
+            'depth' may be overriden by the shape's renderstyle 'no_depth_writes'
 
 Example:
 &lt;targetbuffers name='targetbuffers'&gt;[red,green]&lt;/targetbuffers&gt;</xs:documentation>
