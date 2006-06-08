@@ -1083,7 +1083,7 @@ namespace y60 {
         }
 
         // (7) render bodies
-        if (myBodyParts.size()) {
+        if (! myBodyParts.empty()) {
             MAKE_SCOPE_TIMER(renderBodyParts);
             _myPreviousBody = 0;
 
@@ -1107,7 +1107,7 @@ namespace y60 {
 
         glPopClientAttrib();
         glPopAttrib();
-        glDepthMask(true);
+        _myState->setDepthWrites(true);
 
         if (_myBoundingVolumeMode & BV_HIERARCHY) {
             renderBoundingBoxHierarchy(_myScene->getWorldRoot());
