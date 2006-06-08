@@ -162,10 +162,9 @@ namespace y60 {
 
         // color,depth mask
         const TargetBuffers & myMasks = myMaterialPropFacade->get<TargetBuffersTag>();
-        glDepthMask(myMasks[y60::DEPTH_MASK]);
+        // glDepthMask(myMasks[y60::DEPTH_MASK]); Depth-writes is now part of RenderState, so set it in Renderer
         glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
                 myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
-
 #if 1
         if (myMaterialPropFacade->get<LineSmoothTag>()) {
             glEnable(GL_LINE_SMOOTH);

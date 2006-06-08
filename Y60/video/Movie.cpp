@@ -23,7 +23,7 @@
 using namespace dom;
 using namespace std;
 
-#define DB(x) x
+#define DB(x) // x
 #define DB2(x) // x
 
 
@@ -127,7 +127,7 @@ namespace y60 {
     }
 
     double Movie::decodeFrame(double theTime, unsigned theFrame) {
-        AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame;
+        DB(AC_DEBUG << "Movie::decodeFrame time=" << theTime << " frame=" << theFrame);
         double myReturnTime = _myDecoder->readFrame(theTime, theFrame, getRasterPtr());
         if (myReturnTime != theTime) {
             _myLastDecodedFrame = getFrameFromTime(myReturnTime);
@@ -158,7 +158,7 @@ namespace y60 {
 
     void
     Movie::readFrame(double theCurrentTime, bool theIgnoreCurrentTime) {
-        DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime);
+        DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime << " src=" << get<ImageSourceTag>());
         _myLastCurrentTime = theCurrentTime;
 
         if (!_myDecoder) {
@@ -320,7 +320,7 @@ namespace y60 {
 
         _myPlayMode = PLAY_MODE_STOP;
 
-        // if imagesource is an url do not take the packetmanaged or searchfiled new url
+        // if imagesource is an url do not take the packetmanager or searchfile new url
 
         string myFilename;
         if (mySourceFile.find("://") != string::npos) {
@@ -329,7 +329,7 @@ namespace y60 {
             myFilename = theUrl;
         }
         if (myFilename.empty()) {
-            AC_ERROR << "Unable to find url=" << theUrl << " filename=" << myFilename;
+            AC_ERROR << "Unable to find url='" << theUrl << "'" << ", src='" << mySourceFile << "'";
             return;
         }
         AC_INFO << "Movie::loadFile " << (void*)this << " filename=" << myFilename;

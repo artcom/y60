@@ -767,7 +767,8 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     if (glXGetVideoSyncSGI && glXWaitVideoSyncSGI) {
         if (_mySwapInterval == 0 && theInterval != 0) {
             // check if it's working
-            unsigned counter0, counter1;
+            unsigned counter0 = 0;
+            unsigned counter1 = 0;
             glXGetVideoSyncSGI(&counter0);
             asl::msleep(20);
             glXGetVideoSyncSGI(&counter1);

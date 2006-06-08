@@ -1427,6 +1427,7 @@ JSApp::run(const std::string & theScriptFilename,
     JS_ClearScope(ourJSContext, glob);
     JS_GC(ourJSContext);
     JS_DestroyContext(ourJSContext);
+    JS_DestroyRuntime(rt);
     ourLoadedPlugIns.clear();
     return result;
 }

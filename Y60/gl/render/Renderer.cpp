@@ -212,7 +212,7 @@ namespace y60 {
 
             _myState->setLighting(theViewport.get<ViewportLightingTag>() && (theMaterial.getLightingModel() != UNLIT));
             CHECK_OGL_ERROR;
-
+            
             // [CH] TODO: Material should be const.
             // The renderer should just take the scene information and render it as it is.
             // Right now in Shader.activate() the material representation is updated.
@@ -398,7 +398,7 @@ namespace y60 {
         DBP2(STOP_TIMER(renderBodyPart_getRenderStyles));
 
         DBP2(START_TIMER(renderBodyPart_render));
-        enableRenderStyles(myRenderStyles);
+        enableRenderStyles(myRenderStyles, &myMaterial);
 
         bool myRendererCullingEnabled = _myState->getBackfaceCulling();
         if (myRendererCullingEnabled) {
@@ -609,10 +609,22 @@ namespace y60 {
     }
 
     void
-    Renderer::enableRenderStyles(const RenderStyles & theRenderStyles) {
+    Renderer::enableRenderStyles(const RenderStyles & theRenderStyles, const MaterialBase * theMaterial) {
         _myState->setIgnoreDepth(theRenderStyles[IGNORE_DEPTH]);
-        _myState->setDepthWrites( ! theRenderStyles[NO_DEPTH_WRITES]);
         _myState->setPolygonOffset( theRenderStyles[POLYGON_OFFSET]);
+        
+        if (theRenderStyles[NO_DEPTH_WRITES]) {
+            _myState->setDepthWrites(false);
+        } else {
+            if (theMaterial) {
+                MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial->getChild<MaterialPropertiesTag>();
+                const TargetBuffers & myMasks = myMaterialPropFacade->get<TargetBuffersTag>();
+                _myState->setDepthWrites(myMasks[DEPTH_MASK]);
+            } else {
+                _myState->setDepthWrites(true);
+            }
+        }
+        
     }
 
     void Renderer::preDraw(const asl::Vector4f & theColor,
@@ -639,7 +651,8 @@ namespace y60 {
 #else
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 #endif
-        glDepthMask( myRenderStyles[NO_DEPTH_WRITES]);
+        glDepthMask( myRenderStyles[NO_DEPTH_WRITES]);// inside a glPushAttrib/glPopAttrib
+
         if (myRenderStyles[IGNORE_DEPTH]) {
             glDisable(GL_DEPTH_TEST);
         } else {
@@ -1106,7 +1119,7 @@ namespace y60 {
         }
 
         glPopClientAttrib();
-        glPopAttrib();
+        glPopAttrib();  // GL_TEXTURE_BIT + GL_COLOR_BUFFER_BIT
         _myState->setDepthWrites(true);
 
         if (_myBoundingVolumeMode & BV_HIERARCHY) {
@@ -1380,8 +1393,10 @@ namespace y60 {
 
         const float mySize = theCamera->get<FarPlaneTag>() / 2;
         DB(AC_TRACE << "drawing skybox. Size=" << mySize << endl;);
-        glDepthMask(GL_FALSE);
-        glDisable(GL_DEPTH_TEST);
+        //glDepthMask(GL_FALSE);
+        _myState->setDepthWrites(false);
+        //glDisable(GL_DEPTH_TEST);
+        _myState->setIgnoreDepth(true);
 
         const int zDir = -1;
 
@@ -1450,8 +1465,8 @@ namespace y60 {
         glEnd();
 
         glPopMatrix();
-        glDepthMask(GL_TRUE);
-        glEnable(GL_DEPTH_TEST);
+        //glDepthMask(GL_TRUE);
+        //glEnable(GL_DEPTH_TEST);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1495,8 +1510,9 @@ namespace y60 {
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
-        glDepthMask(GL_FALSE);
-        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE); // inside a glPushAttrib/glPopAttrib
+        glDisable(GL_DEPTH_TEST); // inside a glPushAttrib/glPopAttrib
+
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
