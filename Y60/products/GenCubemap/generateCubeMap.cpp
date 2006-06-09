@@ -77,7 +77,7 @@ printHelp() {
          << endl;
 }
 
-void copyImageData(Ptr<ImageLoader> theSource, PLBmp & theDestination, unsigned int theOffset) {
+void copyImageData(asl::Ptr<ImageLoader> theSource, PLBmp & theDestination, unsigned int theOffset) {
         PLBYTE ** mySrcLines = theSource->GetLineArray();
         PLBYTE ** myDstLines = theDestination.GetLineArray();
 
@@ -96,7 +96,7 @@ void createCubeMap(const std::string & theFace, PLBmp& theTargetBitmap, bool doS
     } else {
         throw asl::Exception(string("ERROR: No file specified for face ") + theFace );
     }
-    Ptr<ImageLoader> myFace(new ImageLoader(Ptr<ReadableBlock>(new ConstMappedBlock(myFileName)),
+    asl::Ptr<ImageLoader> myFace(new ImageLoader(asl::Ptr<ReadableBlock>(new ConstMappedBlock(myFileName)),
                 myFileName));
     if (doScaling && theSize!=myFace->GetWidth()){
         cout << "Scaling image to size " << theSize << " x " << theSize << endl;
@@ -122,7 +122,7 @@ void addCubeMapImage(const std::string & theFace, PLBmp & theTargetBitmap, bool 
     } else {
         throw asl::Exception(string("ERROR: No file specified for face ") + theFace );
     }
-    Ptr<ImageLoader> myFace(new ImageLoader(myFileName));
+    asl::Ptr<ImageLoader> myFace(new ImageLoader(myFileName));
     if (doScaling && theSize!=myFace->GetWidth()){
         cout << "Scaling image to size " << theSize << " x " << theSize << endl;
         myFace->ApplyFilter(PLFilterResizeBilinear(theSize,theSize));

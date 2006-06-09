@@ -15,7 +15,11 @@
 #include <y60/I60Header.h>
 #include <y60/PLFilterResizePadded.h>
 
-#include <GL/glut.h>
+#ifdef OSX
+	#include <GLUT/glut.h>
+#else
+	#include <GL/glut.h>
+#endif
 
 #include <asl/Arguments.h>
 #include <asl/numeric_functions.h>
@@ -339,12 +343,12 @@ writeCompressedTarget(PLAnyBmp & theSource, asl::MappedBlock & theTargetBlock,
 }
 
 void
-loadAndPreProcessSourceBitmaps(vector<Ptr<PLAnyBmp> > & theSourceBitmaps, vector<string> & theSourceFiles,
+loadAndPreProcessSourceBitmaps(vector<asl::Ptr<PLAnyBmp> > & theSourceBitmaps, vector<string> & theSourceFiles,
                                const asl::Arguments & theArguments)
 {
     PLAnyPicDecoder myDecoder;
     for(unsigned i = 0; i < theSourceFiles.size(); ++i) {
-        Ptr<PLAnyBmp> myNewBitmap(new PLAnyBmp());
+        asl::Ptr<PLAnyBmp> myNewBitmap(new PLAnyBmp());
         const string & mySourceFile = theSourceFiles[i];
 
         // assemble filename
@@ -367,7 +371,7 @@ loadAndPreProcessSourceBitmaps(vector<Ptr<PLAnyBmp> > & theSourceBitmaps, vector
 }
 
 void
-writeI60(const string & theKeyFrameSourceFile, vector<Ptr<PLAnyBmp> > theSourceBitmaps,
+writeI60(const string & theKeyFrameSourceFile, vector<asl::Ptr<PLAnyBmp> > theSourceBitmaps,
          const asl::Arguments & theArguments, dom::NodePtr theConfigNode,
          PixelEncoding thePixelEncoding)
 {
@@ -376,7 +380,7 @@ writeI60(const string & theKeyFrameSourceFile, vector<Ptr<PLAnyBmp> > theSourceB
     unsigned int myLayerCount = theSourceBitmaps.size();
 
     for (unsigned int myLayer = 0; myLayer < myLayerCount; ++myLayer) {
-        Ptr<PLAnyBmp> mySourceBitmap = theSourceBitmaps[myLayer];
+        asl::Ptr<PLAnyBmp> mySourceBitmap = theSourceBitmaps[myLayer];
         PLAnyBmp myTarget;
         createPostProcessedTarget(*mySourceBitmap, myTarget, theArguments, theConfigNode);
         if (myLayer == 0) {
@@ -418,7 +422,7 @@ convertFile(const string & theKeyFrameSourceFile, vector<string> &  theSourceFil
         cout << "Skipping image : " << theKeyFrameSourceFile << endl;
         return;
     }
-    vector<Ptr<PLAnyBmp> > mySourceBitmaps;
+    vector<asl::Ptr<PLAnyBmp> > mySourceBitmaps;
     loadAndPreProcessSourceBitmaps(mySourceBitmaps, theSourceFiles, theArguments);
     if (mySourceBitmaps.empty()) {
         return;

@@ -39,7 +39,7 @@ using namespace y60;
 //
 ////////////////////////////////////////////////////////////////////////
 
-Ptr<ImageLoader> ourPreviousFrame(0);
+asl::Ptr<ImageLoader> ourPreviousFrame(0);
 float            ourFramesPerSecond = 25.0f;
 
 void printVersion();
@@ -81,7 +81,7 @@ getTargetFilename(const string & theTargetDir, const string & theSourceFileName)
 }
 
 void writeHeader(asl::WriteableStream & theTargetBlock, MovieEncoding theCompression,
-    Ptr<ImageLoader> theFirstImage, unsigned int theTotalFrameCount)
+    asl::Ptr<ImageLoader> theFirstImage, unsigned int theTotalFrameCount)
 {
     asl::Matrix4f myImageMatrix = theFirstImage->getImageMatrix();
     asl::Vector4f mySize(float(theFirstImage->GetWidth()), float(theFirstImage->GetHeight()), 0, 0);
@@ -109,8 +109,8 @@ appendFrame(const string & theSourceFile, asl::WriteableStream & theTargetBlock,
         return;
     }
     cerr << "Loading image : " << theSourceFile << endl;
-    Ptr<ImageLoader> myFrame(new ImageLoader(
-                    Ptr<ReadableBlock>(new ConstMappedBlock(theSourceFile)),
+    asl::Ptr<ImageLoader> myFrame(new ImageLoader(
+                    asl::Ptr<ReadableBlock>(new ConstMappedBlock(theSourceFile)),
                     theSourceFile));
     if (theResizeMode != "none" ) {
         myFrame->ensurePowerOfTwo(theResizeMode, SINGLE, 1);
