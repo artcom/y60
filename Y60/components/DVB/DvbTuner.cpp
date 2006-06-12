@@ -137,7 +137,8 @@ void
 DvbTuner::tuneChannel(const std::string & theChannelName) {  
     _myDvbTeleText.setChannelLock(false);
     _myDvbTeleText.stopDecoderThread();
-    
+
+    // Stop current tuning thread
     if (isActive()) {
         join();
     }
@@ -158,28 +159,6 @@ DvbTuner::tuneChannel(const std::string & theChannelName) {
 
 void
 DvbTuner::run() {
-    checkFrontend();
-    _myDvbTeleText.setChannelLock(true);
-}
-
-void
-DvbTuner::startTeleTextDecoder() {
-    _myDvbTeleText.startDecoderThread(_myVTpid);
-}
-
-void
-DvbTuner::stopTeleTextDecoder() {
-    _myDvbTeleText.stopDecoderThread();       
-}
-
-basic_string<Unsigned16>
-DvbTuner::getPage(const unsigned & thePageNumber) {
-    return _myDvbTeleText.getPage(thePageNumber);
-}
-
-
-void
-DvbTuner::checkFrontend() {
     fe_status_t myStatus;
     Unsigned16 mySnr, mySignalStrength;
     Unsigned32 myBer, myUncorrectedBlocks;
@@ -202,10 +181,28 @@ DvbTuner::checkFrontend() {
         
         if (myStatus & FE_HAS_LOCK) {
             myHasLock = true;
+            _myDvbTeleText.setChannelLock(true);
         }
         
         usleep(500000);
-    } while (!myHasLock);
+    } while (!myHasLock && !shouldTerminate());
+
+    //pthread_exit();
+}
+
+void
+DvbTuner::startTeleTextDecoder() {
+    _myDvbTeleText.startDecoderThread(_myVTpid);
+}
+
+void
+DvbTuner::stopTeleTextDecoder() {
+    _myDvbTeleText.stopDecoderThread();       
+}
+
+basic_string<Unsigned16>
+DvbTuner::getPage(const unsigned & thePageNumber) {
+    return _myDvbTeleText.getPage(thePageNumber);
 }
 
 void

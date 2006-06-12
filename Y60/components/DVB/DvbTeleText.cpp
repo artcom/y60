@@ -66,14 +66,15 @@ DvbTeleText::setChannelLock(bool theLock) {
 
 void
 DvbTeleText::run(){
-    while(!_myChannelHasLock) {
-        cerr << "waiting for channel lock" << endl; 
-        usleep(500000);
-    }
-
-    cerr << "channel has lock" << endl; 
-
     try {
+        while (!_myChannelHasLock) {
+            if (shouldTerminate()) {
+                return;
+            } else {
+                usleep(500000);
+            }
+        }
+
         if ((_myDemuxFd = open(_myDemuxDeviceName.c_str(), O_RDWR)) < 0){
             throw(DvbTeleTextException(string("Cannot open: "+_myDemuxDeviceName), PLUS_FILE_LINE));
         }
@@ -90,25 +91,20 @@ DvbTeleText::run(){
 
 void
 DvbTeleText::startDecoderThread(const int & thePid){
-    cerr << "start teletext decoder" << endl;
     _myPid = thePid;
     
-    if(!isActive()){
+    if(!isActive()) {
         fork();
     }
-    cerr << "start teletext decoder done" << endl;
 }
 
 void
 DvbTeleText::stopDecoderThread(){
-    cerr << "stop teletext decoder (is active: " << isActive() << ")" << endl;
-    
-    if (isActive()){
+    if (isActive()) {
        join();
-       _myTeleTextBuffer.clear();
     }
-    
-    cerr << "stop teletext decoder done" << endl;
+
+    _myTeleTextBuffer.clear();
 }
 
 basic_string<Unsigned16>

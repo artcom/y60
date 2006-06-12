@@ -48,54 +48,23 @@ try {
     }
 
     var myDvb = new DvbTuner(myConfig, "/dev/dvb/adapter0");
-    myDvb.tuneChannel("Das Erste"); 
-
-    // exec("cat /dev/dvb/adapter0/dvr0 | mplayer - &");
-
-//    myDvb.startTeleTextDecoder();
+    myDvb.startTeleTextDecoder();
     
-        print("tuning 'Das Erste'");
-        myDvb.tuneChannel("ZDF");
-	msleep(20000);
+    print("tuning 'ZDF'");
+    myDvb.tuneChannel("ZDF");
 
-    var myOutString = "";
-    for (var i=0; i<100; ++i){
-        msleep(500); 
-        print("tuning 'Das Erste'");
-	myDvb.tuneChannel("Das Erste");
+    // Restart teletext decoder, because tuning stops the decoder.
+    myDvb.startTeleTextDecoder();
 
-        msleep(500);
-        print("tuning 'Das Erste'");
-        myDvb.tuneChannel("Das Erste");
-
-        msleep(8000);
-        print("tuning 'Das Erste'");
-        myDvb.tuneChannel("Das Erste");
-
-	
-        msleep(500);
-        print("tuning 'ZDF'");
-        myDvb.tuneChannel("ZDF");
-
-        msleep(500);
-        print("tuning 'ZDF'");
-        myDvb.tuneChannel("ZDF");
-
-        msleep(8000);
-        print("tuning 'ZDF'");
-        myDvb.tuneChannel("ZDF");
-
-
-//        var mySubtitle = myDvb.getPage(777);
-//        var myCompactSubtitle = compactString(mySubtitle);
-//        if (myCompactSubtitle) {
-//            var myFormattedString = compactString(mySubtitle);
-//            print(myFormattedString);
-//        }
-    }   
+    var myPageNumber = 776;
+    
+    var myPage = null;
+    do {
+        myPage = myDvb.getPage(myPageNumber);
+    } while(!myPage);
         
-//    exec("killall mplayer");
-
+    print("Teletext Page Number: " + myPageNumber + "\n" + myPage);
+        
     myDvb.stopTeleTextDecoder();
 } catch (ex) {
    reportException(ex);

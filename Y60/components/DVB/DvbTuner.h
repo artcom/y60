@@ -89,7 +89,6 @@ private:
     void find_channel(int theFd, const char *theChannelName);
     void setup_frontend(void);
     void set_pesfilter(void);
-    void checkFrontend(void);
     void run();
     
     void set_filter(void);
