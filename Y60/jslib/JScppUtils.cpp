@@ -28,7 +28,9 @@
 #include <js/jsarena.h>
 #include <js/jscntxt.h>
 #include <js/jsdbgapi.h>
+#ifndef WIN32
 #include <glib.h>
+#endif
 
 using namespace std;
 using namespace asl;
@@ -37,14 +39,22 @@ using namespace asl;
 
 namespace asl {
 
-Glib::ustring 
-as_ustring(JSContext *cx, jsval theVal) {
+std::string 
+as_string(JSContext *cx, jsval theVal) {
     JSString *myJSStr = JS_ValueToString(cx, theVal);
     if (!myJSStr) {
-        return false;
+        throw asl::Exception("Value is not a string", PLUS_FILE_LINE);
     }
     size_t srcLen = JS_GetStringLength(myJSStr);
-
+#ifdef WIN32
+    const LPWSTR myWChars = static_cast<LPWSTR>(JS_GetStringChars(myJSStr));
+    AC_SIZE_TYPE myUTF8Size = WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, 0, 0, 0, 0);
+    char * myUTF8Chars = new char[myUTF8Size];
+    WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, myUTF8Chars, myUTF8Size, 0, 0);
+    std::string myResult = std::string(myUTF8Chars);
+    delete [] myUTF8Chars;
+    return myResult;
+#else    
     // get pointer to 16-bit chars
     gunichar2 * myData = reinterpret_cast<gunichar2*>(JS_GetStringChars(myJSStr));
 
@@ -57,16 +67,12 @@ as_ustring(JSContext *cx, jsval theVal) {
         throw asl::Exception("Failed to convert UTF8 from UTF16.", PLUS_FILE_LINE);
     }
     
-    Glib::ustring myResult = Glib::ustring(myUTF8);
+    std::string myResult = std::string(myUTF8);
 
     // clean up
     g_free(myUTF8);
     return myResult;
-}
-
-std::string 
-as_string(JSContext *cx, jsval theVal) {
-    return as_ustring(cx, theVal);
+#endif    
 }
 
 std::string as_string(JSContext *cx, JSObject *theObj) {
@@ -89,6 +95,27 @@ std::string as_string(JSType theType) {
 }
 
 namespace jslib {
+
+jsval 
+as_jsval(JSContext *cx, const char * theU8String) {
+    // convert from UTF8 to WideChars/UTF16
+#ifdef WIN32
+    AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, 0, 0);
+    LPWSTR myWChars = new WCHAR[myWCharSize];
+    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, myWChars, myWCharSize);
+    JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myWChars));
+    delete [] myWChars;
+    return STRING_TO_JSVAL(myString);
+#else
+    gunichar2 * myUTF16 = g_utf8_to_utf16(theU8String, -1,0,0,0);
+    
+    JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myUTF16));
+    g_free(myUTF16);
+
+    return STRING_TO_JSVAL(myString);
+#endif    
+}
+
 
 void ensureParamCount(uintN argc, int theMinCount, int theMaxCount) {
     if (argc < theMinCount) {
@@ -454,38 +481,6 @@ JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError)
         JS_RemoveRoot(cx, &exnObject);
     return JS_TRUE;
 }
-
-JSBool
-JSA_CallFunctionName(JSContext * cx, JSObject * obj, const Glib::ustring & theName, int argc, jsval argv[], jsval* rval) {
-
-    JSBool bOK = JS_TRUE;
-    gunichar2 * myUTF16 = 0;
-    try {
-        try {
-            glong myLength = g_utf8_strlen(theName.c_str(), -1);
-            myUTF16 = g_utf8_to_utf16(theName.c_str(), -1,0,0,0);
-            jsval myVal;
-            bOK = JS_GetUCProperty(cx, obj, reinterpret_cast<jschar*>(myUTF16), myLength, &myVal);
-            if (myVal == JSVAL_VOID) {
-                AC_WARNING << "no JS function named '" << theName << "' found.";
-            } else { 
-                bOK = JS_CallFunctionValue(cx, obj, myVal, argc, argv, rval);
-                if (!bOK && !QuitFlagSingleton::get().getQuitFlag()) {
-                    AC_ERROR << "Exception while calling js function '" << theName << "'" << endl;
-                    JSA_reportUncaughtException(cx, cx->errorReporter);
-                }
-            }
-            g_free(myUTF16);
-        } catch (...) {
-            if (myUTF16) {
-                g_free(myUTF16);
-            }
-            throw;
-        }
-    } HANDLE_CPP_EXCEPTION; 
-    return bOK;
-}
-
 
 JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int argc, jsval argv[], jsval* rval) {

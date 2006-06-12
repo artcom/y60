@@ -11,21 +11,28 @@
 #ifndef __Y60_JSGTK_JSGTKUTILS_INCLUDED__
 #define __Y60_JSGTK_JSGTKUTILS_INCLUDED__
 
+#include <y60/JScppUtils.h>
 #include <y60/jssettings.h>
 #include <js/jsapi.h>
 #include <gtkmm.h>
 
 namespace jslib {
 
-// convert from glib's utf8 to JS utf-16
-// jsval as_jsval(JSContext *cx, const Glib::ustring & theUTF8String);
+JSBool
+JSA_CallFunctionName(JSContext * cx, JSObject * obj, const Glib::ustring & theName, int argc, jsval argv[], jsval* rval);
 
 
-// convert from JS utf-16 to glib's utf-8
-// bool convertFrom(JSContext *cx, jsval theValue, Glib::ustring & theTarget);
+inline
+jsval as_jsval(JSContext *cx, const Glib::ustring & theUTF8String) {
+    return as_jsval(cx, theUTF8String.data());
+}
 
-
+inline
+bool convertFrom(JSContext *cx, jsval theValue, Glib::ustring & theDest) {
+    theDest = asl::as_string(cx, theValue);
+    return true;
 }
     
+} // namespace
 #endif
 

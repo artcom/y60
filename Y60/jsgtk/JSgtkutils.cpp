@@ -11,46 +11,41 @@
 
 #include "JSgtkutils.h"
 
+#include <y60/QuitFlagSingleton.h>
 #include <asl/Logger.h>
 
 namespace jslib {
 
-/*
-jsval as_jsval(JSContext *cx, const Glib::ustring & theUTF8String) {
-    if (! g_utf8_validate(theUTF8String.data(), -1, 0) ) {
-        AC_ERROR << "String not valid UTF8";
-        return JSVAL_NULL;
-    }
-    gunichar2 * myUTF16 = g_utf8_to_utf16(theUTF8String.data(), -1,0,0,0);
-    
-    JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myUTF16));
-    g_free(myUTF16);
+JSBool
+JSA_CallFunctionName(JSContext * cx, JSObject * obj, const Glib::ustring & theName, int argc, jsval argv[], jsval* rval) {
 
-    return STRING_TO_JSVAL(myString);
+    JSBool bOK = JS_TRUE;
+    gunichar2 * myUTF16 = 0;
+    try {
+        try {
+            glong myLength = g_utf8_strlen(theName.c_str(), -1);
+            myUTF16 = g_utf8_to_utf16(theName.c_str(), -1,0,0,0);
+            jsval myVal;
+            bOK = JS_GetUCProperty(cx, obj, reinterpret_cast<jschar*>(myUTF16), myLength, &myVal);
+            if (myVal == JSVAL_VOID) {
+                AC_WARNING << "no JS function named '" << theName << "' found.";
+            } else { 
+                bOK = JS_CallFunctionValue(cx, obj, myVal, argc, argv, rval);
+                if (!bOK && !QuitFlagSingleton::get().getQuitFlag()) {
+                    AC_ERROR << "Exception while calling js function '" << theName << "'";
+                    JSA_reportUncaughtException(cx, cx->errorReporter);
+                }
+            }
+            g_free(myUTF16);
+        } catch (...) {
+            if (myUTF16) {
+                g_free(myUTF16);
+            }
+            throw;
+        }
+    } HANDLE_CPP_EXCEPTION; 
+    return bOK;
 }
-
-bool convertFrom(JSContext *cx, jsval theValue, Glib::ustring & theDest) {
-    JSString *myJSStr = JS_ValueToString(cx, theValue);
-    if (!myJSStr) {
-        return false;
-    }
-    size_t srcLen = JS_GetStringLength(myJSStr);
-  
-    // get pointer to 16-bit chars
-    gunichar2 * myData = reinterpret_cast<gunichar2*>(JS_GetStringChars(myJSStr));
-
-    // now convert to utf-8 encoded c-string
-    glong targetLen;
-    gchar * myUTF8 = g_utf16_to_utf8(myData, srcLen * sizeof(gunichar2), 0, &targetLen, 0); 
-
-    // now convert to ustring
-    theDest = Glib::ustring(myUTF8);
-
-    // clean up
-    g_free(myUTF8);
-    return true;
-};
-*/
 
 }
 
