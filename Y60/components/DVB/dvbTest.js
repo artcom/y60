@@ -54,11 +54,38 @@ try {
 
 //    myDvb.startTeleTextDecoder();
     
+        print("tuning 'Das Erste'");
+        myDvb.tuneChannel("ZDF");
+	msleep(20000);
+
     var myOutString = "";
     for (var i=0; i<100; ++i){
-        msleep(20000); 
+        msleep(500); 
         print("tuning 'Das Erste'");
 	myDvb.tuneChannel("Das Erste");
+
+        msleep(500);
+        print("tuning 'Das Erste'");
+        myDvb.tuneChannel("Das Erste");
+
+        msleep(8000);
+        print("tuning 'Das Erste'");
+        myDvb.tuneChannel("Das Erste");
+
+	
+        msleep(500);
+        print("tuning 'ZDF'");
+        myDvb.tuneChannel("ZDF");
+
+        msleep(500);
+        print("tuning 'ZDF'");
+        myDvb.tuneChannel("ZDF");
+
+        msleep(8000);
+        print("tuning 'ZDF'");
+        myDvb.tuneChannel("ZDF");
+
+
 //        var mySubtitle = myDvb.getPage(777);
 //        var myCompactSubtitle = compactString(mySubtitle);
 //        if (myCompactSubtitle) {

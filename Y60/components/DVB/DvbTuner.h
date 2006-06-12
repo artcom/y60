@@ -28,12 +28,14 @@
 #include <asl/settings.h>
 #include <dom/Nodes.h>
 
+#include <asl/PosixThread.h>
+
 #include "DvbTeleText.h"
 
 
 DEFINE_EXCEPTION(DvbTunerException, asl::Exception);
 
-class DvbTuner 
+class DvbTuner : public PosixThread
 {
 public:
     DvbTuner(const dom::NodePtr & theChannelConfig, const std::string & theDeviceName = "/dev/dvb/adapter0");
@@ -87,8 +89,9 @@ private:
     void find_channel(int theFd, const char *theChannelName);
     void setup_frontend(void);
     void set_pesfilter(void);
-    void check_frontend(void);
-
+    void checkFrontend(void);
+    void run();
+    
     void set_filter(void);
     void process_pes(void);
 

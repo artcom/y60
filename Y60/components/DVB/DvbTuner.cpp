@@ -46,6 +46,10 @@ DvbTuner::DvbTuner(const dom::NodePtr & theChannelConfig, const string & theDevi
 }
 
 DvbTuner::~DvbTuner(void) {
+    if (isActive()) {
+        join();
+    }
+    
     close(_myFrontendFd);
     close(_myVideoFd);
     close(_myAudioFd);
@@ -131,6 +135,13 @@ DvbTuner::setParameters(const std::string & theChannelName) {
 
 void
 DvbTuner::tuneChannel(const std::string & theChannelName) {  
+    _myDvbTeleText.setChannelLock(false);
+    _myDvbTeleText.stopDecoderThread();
+    
+    if (isActive()) {
+        join();
+    }
+
     AC_DEBUG << "Trying to lock " << theChannelName;
     
     _myChannelName = theChannelName;
@@ -141,7 +152,14 @@ DvbTuner::tuneChannel(const std::string & theChannelName) {
     AC_DEBUG << "video pid 0x" << std::hex << _myVpid << " audio pid 0x" << _myApid;
 
     set_pesfilter();
-    check_frontend();
+
+    fork();
+}
+
+void
+DvbTuner::run() {
+    checkFrontend();
+    _myDvbTeleText.setChannelLock(true);
 }
 
 void
@@ -161,7 +179,7 @@ DvbTuner::getPage(const unsigned & thePageNumber) {
 
 
 void
-DvbTuner::check_frontend() {
+DvbTuner::checkFrontend() {
     fe_status_t myStatus;
     Unsigned16 mySnr, mySignalStrength;
     Unsigned32 myBer, myUncorrectedBlocks;

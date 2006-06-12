@@ -51,10 +51,11 @@ public:
 
     void processStream();
     void safe_read(void *buf, int count);
-
+    void setChannelLock(bool theLock);    
 private:
     int _myDemuxFd;
     int _myPid;
+    bool _myChannelHasLock; 
 
     std::map<unsigned int, std::basic_string<asl::Unsigned16> > _myTeleTextBuffer;
 

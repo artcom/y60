@@ -48,6 +48,7 @@ DvbTeleText::DvbTeleText(const string & theDemuxDeviceName)
     , _myDemuxFd(0)
     , _myDemuxDeviceName(theDemuxDeviceName)
     , _myPid(0)
+    , _myChannelHasLock(false)
 {
     
 }
@@ -58,7 +59,20 @@ DvbTeleText::~DvbTeleText()
 }
 
 void
+DvbTeleText::setChannelLock(bool theLock) {
+    AutoLocker<ThreadLock> myLocker(_myLock);
+    _myChannelHasLock = theLock;
+}
+
+void
 DvbTeleText::run(){
+    while(!_myChannelHasLock) {
+        cerr << "waiting for channel lock" << endl; 
+        usleep(500000);
+    }
+
+    cerr << "channel has lock" << endl; 
+
     try {
         if ((_myDemuxFd = open(_myDemuxDeviceName.c_str(), O_RDWR)) < 0){
             throw(DvbTeleTextException(string("Cannot open: "+_myDemuxDeviceName), PLUS_FILE_LINE));
@@ -76,22 +90,34 @@ DvbTeleText::run(){
 
 void
 DvbTeleText::startDecoderThread(const int & thePid){
+    cerr << "start teletext decoder" << endl;
     _myPid = thePid;
-
+    
     if(!isActive()){
         fork();
     }
+    cerr << "start teletext decoder done" << endl;
 }
 
 void
 DvbTeleText::stopDecoderThread(){
+    cerr << "stop teletext decoder (is active: " << isActive() << ")" << endl;
+    
     if (isActive()){
        join();
+       _myTeleTextBuffer.clear();
     }
+    
+    cerr << "stop teletext decoder done" << endl;
 }
 
 basic_string<Unsigned16>
-DvbTeleText::getPage( const unsigned thePageNumber ) {
+DvbTeleText::getPage(const unsigned thePageNumber) {
+    if (!isActive()) {
+        basic_string<Unsigned16> myEmptyString;
+        return myEmptyString;
+    }
+
     AutoLocker<ThreadLock> myLocker(_myLock);
 
     basic_string<Unsigned16> myReturnString =  _myTeleTextBuffer[thePageNumber];
@@ -128,9 +154,6 @@ DvbTeleText::safe_read(void *buf, int count){
                 throw(DvbTeleTextException(string("Cannor Read from: ")+_myDemuxDeviceName, PLUS_FILE_LINE));
             }
         }
-        // else if (bytes == 0) {
-        //     throw(DvbTeleTextException("Got EOF on demux device?!", PLUS_FILE_LINE));
-        // }
     } while (bytes < count);
 }
 
