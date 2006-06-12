@@ -84,6 +84,10 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
         setupTrackball(null);
     }
 
+    obj.setTrackedBody = function(theBody) {
+        setupTrackball(theBody);
+    }
+
     obj.rotate = function(theDeltaX, theDeltaY) {
         _myTrackballOrientation.x += theDeltaY * TWO_PI;
         _myTrackballOrientation.y -= theDeltaX * TWO_PI;

@@ -103,9 +103,14 @@ function buildMaterialNode(theMaterialName,
 }
 
 function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
-    if (theImageId == undefined) {
-        theImageId = createUniqueId(); //"i" + theName;
+    var myImageArrayFlag = theImageId instanceof Array;
+    var myImageIds = [];
+    if (!myImageArrayFlag) {
+        myImageIds.push(theImageId);
+    } else {
+        myImageIds = theImageId ;
     }
+    
     var myWrapMode = "repeat";
     if (theWrapMode != undefined) {
         myWrapMode = theWrapMode;
@@ -116,25 +121,42 @@ function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
     myMaterialNode.name = theName;    
     var myMaterialParent = getDescendantByTagName(window.scene.dom, "materials", true);
     myMaterialParent.appendChild(myMaterialNode);
-    // add textures
-    var myTexturesString =
-        '<textures>\n' +
-        '    <texture image="' + theImageId  + '" wrapmode="' + myWrapMode + '" applymode="modulate"/>\n' + 
-        '</textures>';
+    var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
+    myMaterialNode.requires.appendChild(myTextureFeatures);
+    var myTexCoordFeatures = new Node('<feature name="texcoord">[10[]]</feature>\n').firstChild;
+    myMaterialNode.requires.appendChild(myTexCoordFeatures);
+    myMaterialNode.requires.lighting = "[10[unlit]]";
+
+    var myTexturesReqString = "[100["
+    var myTexCoordReqString = "[100["
+    var myTexturesString = '<textures>\n';
+    for (var myImageIndex = 0; myImageIndex < myImageIds.length; myImageIndex++) {
+        var myImageId = myImageIds[myImageIndex];
+        if (myImageId == undefined) {
+            myImageId = createUniqueId(); //"i" + theName;
+        }
+    
+        // add textures
+        myTexturesString += '    <texture image="' + myImageId  + '" wrapmode="' + myWrapMode + '" applymode="modulate"/>\n';
+    
+        // add requirements
+        if (myImageIndex > 0) {
+            myTexturesReqString += ",";
+            myTexCoordReqString += ",";
+        }
+        myTexturesReqString += "paint";
+        myTexCoordReqString += "uv_map";
+    }
+    myTexturesString += '</textures>';
     var myTexturesDoc = new Node(myTexturesString);
     var myTexturesNode = myTexturesDoc.firstChild;
     myMaterialNode.appendChild(myTexturesNode);
 
-    // add requirements
-    myMaterialNode.requires.lighting = "[10[unlit]]";
+    myTexturesReqString += "]]";
+    myMaterialNode.requires.textures = myTexturesReqString;
 
-    var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
-    myMaterialNode.requires.appendChild(myTextureFeatures);
-    myMaterialNode.requires.textures = "[100[paint]]";
-
-    var myTexCoordFeatures = new Node('<feature name="texcoord">[10[]]</feature>\n').firstChild;
-    myMaterialNode.requires.appendChild(myTexCoordFeatures);
-    myMaterialNode.requires.texcoord = "[100[uv_map]]";
+    myTexCoordReqString += "]]";
+    myMaterialNode.requires.texcoord = myTexCoordReqString;
 
     return myMaterialNode;
 
