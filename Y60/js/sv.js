@@ -22,7 +22,7 @@
     use("SceneViewer.js");
 
     window = new RenderWindow();
-    window.multisamplingFactor = 8;
+    window.multisamplingFactor = 4;
 
     var ourShow = new SceneViewer(arguments);
     var myModel = ourShow.getModelName();
