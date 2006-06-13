@@ -335,7 +335,7 @@ void DShowGraph::setCameraParams(unsigned long theWhiteBalanceU, unsigned long t
 
 // [CH+CM]: This code works, but the parameter passing is not implemented, yet.
 //          So please leave this block, for further improvement.
-if 0
+#if 0
 	IAMVideoProcAmp * pProcAmp = 0;
 	m_pSrcFilter->QueryInterface(IID_IAMVideoProcAmp, (void**)&pProcAmp);
 
