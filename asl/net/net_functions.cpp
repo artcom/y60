@@ -28,6 +28,7 @@
 #include <asl/settings.h>
 #include <asl/string_functions.h>
 #include <asl/file_functions.h>
+#include <asl/numeric_functions.h>
 #include <asl/Time.h>
 #include <asl/Exception.h>
 #include <asl/Logger.h>
@@ -39,6 +40,7 @@
 
 #ifdef WIN32
   #include <windows.h>
+  #include <Iphlpapi.h>
 #else
   #include <netinet/in.h>
   #include <arpa/inet.h>
@@ -128,6 +130,46 @@ namespace asl {
         return myResult;
     }
     
+    asl::Block getHardwareAddress() {
+        asl::Block myHardwareMac;
+#ifdef WIN32
+        PIP_ADAPTER_INFO pAdapterInfo;
+        PIP_ADAPTER_INFO pAdapter = NULL;
+        DWORD dwRetVal = 0;
+
+        pAdapterInfo = (IP_ADAPTER_INFO *) malloc( sizeof(IP_ADAPTER_INFO) );
+        ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
+
+        // Make an initial call to GetAdaptersInfo to get
+        // the necessary size into the ulOutBufLen variable
+        if (GetAdaptersInfo( pAdapterInfo, &ulOutBufLen) != ERROR_SUCCESS) {
+            free (pAdapterInfo);
+            pAdapterInfo = (IP_ADAPTER_INFO *) malloc (ulOutBufLen);
+        }
+
+        // iterate through all adapters. The adapter with the lowest index
+        // is the primary adapter
+        if ((dwRetVal = GetAdaptersInfo( pAdapterInfo, &ulOutBufLen)) == NO_ERROR) {
+            pAdapter = pAdapterInfo;
+            unsigned myMinIndex = NumericTraits<unsigned>::max();
+            while (pAdapter) {
+                AC_INFO << "Adapter Name:" << pAdapter->AdapterName;
+                AC_INFO << "Adapter Desc:" << pAdapter->Description;
+                AC_INFO << "Adapter Type:" << pAdapter->Type;
+                AC_INFO << "Adapter Index:" << pAdapter->Index;
+                if (pAdapter->Index < myMinIndex && pAdapter->Type == MIB_IF_TYPE_ETHERNET) {
+                    myHardwareMac.resize(pAdapter->AddressLength);
+                    for (UINT i = 0; i < pAdapter->AddressLength; i++) {
+                        myHardwareMac[i] = pAdapter->Address[i];
+                    }
+                }
+                pAdapter = pAdapter->Next;
+            }
+        }
+        free (pAdapterInfo);
+#endif
+        return myHardwareMac;
+    };
 
 } //Namespace asl
 

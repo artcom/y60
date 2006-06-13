@@ -22,6 +22,7 @@
 #define _included_asl_net_functions_
 
 #include <asl/Exception.h>
+#include <asl/Block.h>
 
 #include <string>
 #include <sys/types.h>
@@ -45,6 +46,7 @@ namespace asl {
     unsigned long from_dotted_address(const std::string & dottedAddress);
     std::string as_dotted_address(unsigned long theAdress);
 
+    asl::Block getHardwareAddress();
 } //Namespace asl
 
 #endif

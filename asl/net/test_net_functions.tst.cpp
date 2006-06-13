@@ -59,6 +59,8 @@ class net_functions_UnitTest : public UnitTest {
             DPRINT(hex<<hostaddress(localhostname()));
             DPRINT(as_dotted_address(hostaddress(localhostname())));
 
+            DPRINT(getHardwareAddress());
+            ENSURE(getHardwareAddress().size() == 6); // MACs are 48 bits
         }
 };
 
