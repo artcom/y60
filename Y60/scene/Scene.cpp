@@ -1210,7 +1210,9 @@ namespace y60 {
 
         for (unsigned i = 0; i < myOldScene->childNodesLength(); ++i) {
             NodePtr myOldChild = myOldScene->childNode(i);
-            if (myOldChild->nodeType() == dom::Node::ELEMENT_NODE) {
+            if (myOldChild->nodeType() == dom::Node::ELEMENT_NODE &&
+                myOldChild->nodeName() != CANVAS_LIST_NAME) 
+            {
                 for (unsigned j = 0; j < myNewScene->childNodesLength(); ++j) {
                     NodePtr myNewChild = myNewScene->childNode(j);
                     if (myNewChild->nodeName() == myOldChild->nodeName()) {
