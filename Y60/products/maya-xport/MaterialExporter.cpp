@@ -113,10 +113,7 @@ void
 MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextureNode,
                                     y60::MaterialBuilder & theBuilder,
                                     y60::SceneBuilder & theSceneBuilder,
-                                    asl::Vector4f theColorScale,
-                                    asl::Vector4f theColorBias,
                                     const MayaBlendMode theBlendMode,
-                                    const char* theColorGainPropertyName,
                                     float theColorGainAlpha)
 {
     MStatus myStatus;
@@ -154,21 +151,23 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
 
     std::string myStrippedFileName = myFileName.asChar();
     stripBaseDir(myStrippedFileName);
-    AC_DEBUG << "stripped filename=" << myStrippedFileName;
 
-    // color gain
-    float r = 1.0f, g = 1.0f, b = 1.0f;
-    if (theColorGainPropertyName) {
-        MPlug myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainR");
-        myColorGainPlug.getValue(r);
-        myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainG");
-        myColorGainPlug.getValue(g);
-        myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainB");
-        myColorGainPlug.getValue(b);
-        y60::setPropertyValue<asl::Vector4f>(theBuilder.getNode(),
-                "vector4f", theColorGainPropertyName,
-                asl::Vector4f(r, g, b, float(theColorGainAlpha)));
-    }
+    // color gain = scale
+    Vector4f myColorScale(1,1,1,theColorGainAlpha);
+    MPlug myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainR");
+    myColorGainPlug.getValue(myColorScale[0]);
+    myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainG");
+    myColorGainPlug.getValue(myColorScale[1]);
+    myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainB");
+    myColorGainPlug.getValue(myColorScale[2]);
+    
+    Vector4f myColorOffset(0,0,0,0);
+    MPlug myColorOffsetPlug = MFnDependencyNode(theTextureNode).findPlug("colorOffsetR");
+    myColorOffsetPlug.getValue(myColorOffset[0]);
+    myColorOffsetPlug = MFnDependencyNode(theTextureNode).findPlug("colorOffsetG");
+    myColorOffsetPlug.getValue(myColorOffset[1]);
+    myColorOffsetPlug = MFnDependencyNode(theTextureNode).findPlug("colorOffsetB");
+    myColorOffsetPlug.getValue(myColorOffset[2]);
 
     // get custom attributes
     bool myCreateMipmapsFlag = true;
@@ -193,10 +192,11 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
             displayWarning(string("Blendmode: ") + getStringFromEnum(theBlendMode, MayaBlendModesString) + " not yet implemented.");
     }
 
+    AC_PRINT << "stripped filename=" << myStrippedFileName << " Scale=" << myColorScale << ", Bias=" << myColorOffset;
     string myImageId = theBuilder.createImage(theSceneBuilder,
         MFnDependencyNode(theTextureNode).name().asChar(),
         myStrippedFileName, myUsage, myCreateMipmapsFlag,
-        theColorScale, theColorBias, SINGLE,"");
+        myColorScale, myColorOffset, SINGLE,"");
 
     // wrap
     std::string myWrapMode  = y60::TEXTURE_WRAP_REPEAT;
@@ -538,23 +538,8 @@ MaterialExporter::exportLayeredTexture(const MFnMesh * theMesh, const MObject & 
         getChildPlugByName("color", myInputPlug[i], theMultiTextureNode, myColorPlug);
         getConnectedNode(myColorPlug, myTextureNode);
 
-        asl::Vector4f myColorScale;
-        asl::Vector4f myColorBias;
-
-        if (i == myInputPlug.numElements() - 1) {
-            // Only the color gain (material color) for the bottom most texture is supported by the renderer.
-            // To blend in the color correctly we assign multiply to the bottom most texture by default.
-            myBlendMode = MAYA_BLEND_MULTIPLY;
-            calcColorScaleAndBiasFromAlpha(myAlpha, myBlendMode, myColorScale, myColorBias);
-            exportFileTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
-                    myColorScale, myColorBias, myBlendMode,
-                    theColorGainPropertyName, theColorGainAlpha);
-        } else {
-            calcColorScaleAndBiasFromAlpha(myAlpha, myBlendMode, myColorScale, myColorBias);
-            exportFileTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
-                    myColorScale, myColorBias, myBlendMode,
-                    0, theColorGainAlpha);
-        }
+        exportFileTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
+                 myBlendMode, theColorGainAlpha);
     }
 }
 
@@ -629,9 +614,7 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
             case MFn::kProjection:
             case MFn::kFileTexture:
                 exportFileTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
-                                  asl::Vector4f(1.0f,1.0f,1.0f,1.0f), asl::Vector4f(0.0f,0.0f,0.0f,0.0f),
-                                  ourDefaultBlendMode, theColorGainPropertyName,
-                                  theColorGainAlpha);
+                                  ourDefaultBlendMode, theColorGainAlpha);
                 break;
             case MFn::kBump:
                 exportBumpTexture(myTextureNode, theBuilder, theSceneBuilder);
@@ -1148,6 +1131,7 @@ MaterialExporter::checkTransparency(const MObject & theShaderNode) {
 /**
  * Transform alpha into color scale and color bias for layered textures
  * to omit the influence of a single components alpha on the entire texture
+ * @note no longer required - we now use the image's color_bias and color_scale
  *
  * @param theAlpha
  * @param theBlendMode
@@ -1155,6 +1139,7 @@ MaterialExporter::checkTransparency(const MObject & theShaderNode) {
  * @param &theColorBias
  * @return
  */
+/*
 void
 MaterialExporter::calcColorScaleAndBiasFromAlpha(const float theAlpha,
                                                  const MayaBlendMode theBlendMode,
@@ -1188,3 +1173,4 @@ MaterialExporter::calcColorScaleAndBiasFromAlpha(const float theAlpha,
     theColorScale = asl::Vector4f(myScale, myScale, myScale, myAlphaScale);
     theColorBias  = asl::Vector4f(myBias, myBias, myBias, myAlphaBias);
 }
+*/

@@ -132,8 +132,7 @@ class MaterialExporter {
 #endif        
         void exportFileTexture(const MFnMesh * theMesh, MObject & theTextureNode,
                                y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
-                               const asl::Vector4f theColorScale, const asl::Vector4f theColorBias,
-                               const MayaBlendMode theBlendMode, const char* theColorGainPropertyName,
+                               const MayaBlendMode theBlendMode,
                                float theColorGainAlpha);
 		void exportEnvCubeTexture(const MObject & theShaderNode,
 			                      const MObject & theEnvCubeNode,
@@ -155,11 +154,12 @@ class MaterialExporter {
 
         bool checkTransparency(const MObject & theShaderNode);
         bool checkAlphaTexture(const MObject & theShaderNode, const std::string thePlugName);
+        /*
         void calcColorScaleAndBiasFromAlpha(const float theAlpha,
                                             const MayaBlendMode theBlendMode,
                                             asl::Vector4f &theColorScale,
                                             asl::Vector4f &theColorBias);
-
+        */
 
         StringMap        _myMaterialNameMap;
         StringVectorMap  _myMaterialUVMappedTexturesMap;
