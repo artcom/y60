@@ -56,9 +56,6 @@
 #ifdef OSX
   #include <net/if.h>
   #include <net/ethernet.h>
-#ifndef ETH_ALEN 
-  #define ETH_ALEN ETHER_ADDR_LEN
-#endif
   #include <sys/sockio.h>
 #ifndef SIOCGIFHWADDR
   #define SIOCGIFHWADDR SIOCGLIFADDR
@@ -200,7 +197,7 @@ namespace asl {
 
         myHardwareMac.resize(ETH_ALEN);
 #ifdef OSX	
-        memcpy (&myHardwareMac[0], myInterface.ifr_addr.sa_data, ETH_ALEN);
+        memcpy (&myHardwareMac[0], myInterface.ifr_addr.sa_data, ETHER_ADDR_LEN);
 #else
         memcpy (&myHardwareMac[0], myInterface.ifr_hwaddr.sa_data, ETH_ALEN);
 #endif
