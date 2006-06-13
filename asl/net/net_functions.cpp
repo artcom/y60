@@ -53,6 +53,17 @@
   #include <linux/if_ether.h>
   #include <linux/sockios.h>
 #endif
+#ifdef OSX
+  #include <net/if.h>
+  #include <net/ethernet.h>
+#ifndef ETH_ALEN 
+  #define ETH_ALEN ETHER_ADDR_LEN
+#endif
+  #include <sys/sockio.h>
+#ifndef SIOCGIFHWADDR
+  #define SIOCGIFHWADDR SIOCGLIFADDR
+#endif
+#endif
 
 using namespace std;
 using namespace inet;
@@ -188,7 +199,11 @@ namespace asl {
         }
 
         myHardwareMac.resize(ETH_ALEN);
+#ifdef OSX	
+        memcpy (&myHardwareMac[0], myInterface.ifr_addr.sa_data, ETH_ALEN);
+#else
         memcpy (&myHardwareMac[0], myInterface.ifr_hwaddr.sa_data, ETH_ALEN);
+#endif
 #endif
         return myHardwareMac;
     };
