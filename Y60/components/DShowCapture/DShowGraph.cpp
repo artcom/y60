@@ -317,8 +317,7 @@ void DShowGraph::setCameraParams(unsigned long theWhiteBalanceU, unsigned long t
 {
     CComQIPtr<IAVTDolphinPropSet, &PROPSETID_VIDCAP_AVT> pAVTFilter(m_pSrcFilter);
 
-    if(pAVTFilter)
-    {
+    if(pAVTFilter) {
         AC_DEBUG << "Found AVT camera interface." << endl;        
         HRESULT hr;
         hr = pAVTFilter->SetWhitebalanceU(theWhiteBalanceU, 0, 0);
@@ -332,6 +331,58 @@ void DShowGraph::setCameraParams(unsigned long theWhiteBalanceU, unsigned long t
     } else {
         AC_DEBUG << "AVT camera interface not found." << endl;
     }  
+    
+
+// [CH+CM]: This code works, but the parameter passing is not implemented, yet.
+//          So please leave this block, for further improvement.
+if 0
+	IAMVideoProcAmp * pProcAmp = 0;
+	m_pSrcFilter->QueryInterface(IID_IAMVideoProcAmp, (void**)&pProcAmp);
+
+    if (pProcAmp) {
+		AC_DEBUG << "Found AMVideoProcAmp interface";
+
+        long Min, Max, Step, Default, Flags, Val;
+        pProcAmp->GetRange(VideoProcAmp_Gain, &Min, &Max, &Step, &Default, &Flags);
+        AC_DEBUG << "get gain returns: " << Min << " " << Max << " " << Step << " " << Default << " " << Flags;
+
+        pProcAmp->Get(VideoProcAmp_Brightness, &Val, &Flags);
+        AC_DEBUG << "get brightness before returns: " << Val << " " << Flags;
+
+
+        pProcAmp->Set(VideoProcAmp_Brightness, 40, VideoProcAmp_Flags_Manual);
+        pProcAmp->Set(VideoProcAmp_Contrast, 40, VideoProcAmp_Flags_Manual);
+        pProcAmp->Set(VideoProcAmp_Hue, 18, VideoProcAmp_Flags_Manual);
+        pProcAmp->Set(VideoProcAmp_Saturation, 100, VideoProcAmp_Flags_Manual);
+        pProcAmp->Set(VideoProcAmp_Sharpness, 1, VideoProcAmp_Flags_Manual);
+        pProcAmp->Set(VideoProcAmp_WhiteBalance, 1, VideoProcAmp_Flags_Manual);
+        pProcAmp->Set(VideoProcAmp_Gamma, 1, VideoProcAmp_Flags_Manual);
+        pProcAmp->Set(VideoProcAmp_ColorEnable, 1, VideoProcAmp_Flags_Manual);
+        pProcAmp->Set(VideoProcAmp_BacklightCompensation, 0, VideoProcAmp_Flags_Manual);
+        pProcAmp->Set(VideoProcAmp_Gain, 20, VideoProcAmp_Flags_Manual);
+
+        pProcAmp->Get(VideoProcAmp_Brightness, &Val, &Flags);
+        AC_DEBUG << "get brightness returns: " << Val << " " << Flags;
+ 
+	} else {
+		AC_DEBUG << "AMVideoProcAmp interface not found.";
+	}
+
+    IAMCameraControl * pCamContr = 0;
+    m_pSrcFilter->QueryInterface(IID_IAMCameraControl , (void**)&pCamContr);
+    
+    if (pCamContr) {
+        long Min, Max, Step, Default, Flags, Val;
+        AC_DEBUG << "AMCameraControl interface found.";
+        pCamContr->Set(CameraControl_Exposure, 25, CameraControl_Flags_Manual);
+        pCamContr->Set(CameraControl_Iris, 40, CameraControl_Flags_Manual);
+        pCamContr->GetRange(CameraControl_Iris, &Min, &Max, &Step, &Default, &Flags);
+        AC_DEBUG << "get range IRIS: " << Min << " " << Max << " " << Step << " " << Default << " " << Flags;
+
+    } else {
+		AC_DEBUG << "AMCameraControl interface not found.";
+	}
+#endif
 }
 
 
