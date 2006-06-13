@@ -758,7 +758,9 @@ SDLWindow::setSwapInterval(unsigned theInterval)
         wglSwapIntervalEXT(theInterval);
         _mySwapInterval = wglGetSwapIntervalEXT();
         if (theInterval != _mySwapInterval) {
-            AC_ERROR << "setSwapInterval(): wglSwapInterval is buggy, using " << _mySwapInterval;
+            AC_WARNING << "Cannot set swap interval." <<
+                          "Vertical sync must must be set to 'application controlled' " <<
+                          "in driver settings. Using " << _mySwapInterval;
         }
     } else {
         AC_WARNING << "setSwapInterval(): wglSwapInterval not supported.";
