@@ -24,6 +24,7 @@
 #endif
 
 #include "net_functions.h"
+#include "SocketException.h"
 
 #include <asl/settings.h>
 #include <asl/string_functions.h>
@@ -45,9 +46,16 @@
   #include <netinet/in.h>
   #include <arpa/inet.h>
   #include <netdb.h>
+  #include <sys/ioctl.h>
+#endif
+#ifdef LINUX
+  #include <linux/if.h>
+  #include <linux/if_ether.h>
+  #include <linux/sockios.h>
 #endif
 
 using namespace std;
+using namespace inet;
 
 namespace asl {
 
@@ -167,6 +175,20 @@ namespace asl {
             }
         }
         free (pAdapterInfo);
+#else
+        int fd = socket (AF_INET,SOCK_DGRAM,0);
+        if (fd == -1) {
+            throw SocketException(PLUS_FILE_LINE); 
+        }
+
+        ifreq myInterface;
+        strcpy (myInterface.ifr_name, "eth0");
+        if (ioctl (fd, SIOCGIFHWADDR, &myInterface) < 0) {
+            throw SocketException(PLUS_FILE_LINE); 
+        }
+
+        myHardwareMac.resize(ETH_ALEN);
+        memcpy (&myHardwareMac[0], myInterface.ifr_hwaddr.sa_data, ETH_ALEN);
 #endif
         return myHardwareMac;
     };
