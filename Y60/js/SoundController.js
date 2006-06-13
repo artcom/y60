@@ -11,8 +11,6 @@
 const DUMMY_AUDIO_CONTROLLER = false;
 
 var ourSoundController = null;
-//initSoundController();
-
 
 if (DUMMY_AUDIO_CONTROLLER) {
     ourSoundController = [];

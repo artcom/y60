@@ -23,6 +23,8 @@ GdkGLProc gdk_gl_get_proc_address            (const char *proc_name);
 #include <asl/numeric_functions.h>
 #include <asl/Logger.h>
 
+#include <Cg/cgGL.h>
+
 using namespace std;
 
 namespace y60 {
@@ -868,5 +870,14 @@ void * aglGetProcAddress (char * pszProc)
             theTokens.push_back(myBuffer);
         }
         return theTokens.size();
+    }
+    
+    std::string
+    getLatestCgProfileString() {
+        CGprofile myVertexProfile = cgGLGetLatestProfile(CG_GL_VERTEX);
+        CGprofile myFragmentProfile = cgGLGetLatestProfile(CG_GL_FRAGMENT);
+        
+        return string("Vertex profile: ") + cgGetProfileString(myVertexProfile) + 
+           ", Fragment profile: " + cgGetProfileString(myFragmentProfile);
     }
 }

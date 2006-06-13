@@ -338,7 +338,8 @@ namespace y60 {
     std::string getGLVersionString();
     std::string getGLVendorString();
     std::string getGLRendererString();
-    unsigned int getGLExtensionStrings(std::vector<std::string> & theTokens);
+    std::string getLatestCgProfileString();
+    unsigned int getGLExtensionStrings(std::vector<std::string> & theTokens);    
 }
 
 #endif // _ac_render_GLUtils_h_
