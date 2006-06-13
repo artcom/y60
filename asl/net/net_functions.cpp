@@ -57,9 +57,6 @@
   #include <net/if.h>
   #include <net/ethernet.h>
   #include <sys/sockio.h>
-#ifndef SIOCGIFHWADDR
-  #define SIOCGIFHWADDR SIOCGLIFADDR
-#endif
 #endif
 
 using namespace std;
@@ -191,14 +188,18 @@ namespace asl {
 
         ifreq myInterface;
         strcpy (myInterface.ifr_name, "eth0");
+
+#ifdef OSX
+        if (ioctl (fd, SIOCGLIFADDR, &myInterface) < 0) {
+            throw SocketException(PLUS_FILE_LINE); 
+        }
+        myHardwareMac.resize(ETHER_ADDR_LEN);
+        memcpy (&myHardwareMac[0], myInterface.ifr_addr.sa_data, ETHER_ADDR_LEN);
+#else
         if (ioctl (fd, SIOCGIFHWADDR, &myInterface) < 0) {
             throw SocketException(PLUS_FILE_LINE); 
         }
-
         myHardwareMac.resize(ETH_ALEN);
-#ifdef OSX	
-        memcpy (&myHardwareMac[0], myInterface.ifr_addr.sa_data, ETHER_ADDR_LEN);
-#else
         memcpy (&myHardwareMac[0], myInterface.ifr_hwaddr.sa_data, ETH_ALEN);
 #endif
 #endif
