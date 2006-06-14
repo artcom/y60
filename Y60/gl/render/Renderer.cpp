@@ -80,6 +80,17 @@
 #define DBP2(x) // x
 #endif
 
+#define DB_MS
+
+#define DB_MS_ { \
+        GLboolean myDepthMask = false; \
+        glGetBooleanv(GL_DEPTH_WRITEMASK, &myDepthMask); \
+        if ( (myDepthMask == GL_TRUE) != _myState->getDepthWrites()) { \
+            AC_WARNING << "State:" << _myState->getDepthWrites() << ", gl:" << (myDepthMask == GL_TRUE); \
+        } else { \
+            AC_INFO << "State:" << _myState->getDepthWrites() << ", gl:" << (myDepthMask == GL_TRUE); \
+        }\
+}
 using namespace std;
 using namespace asl;
 
@@ -1013,6 +1024,8 @@ namespace y60 {
         _myState->setLighting(theViewport->get<ViewportLightingTag>());
         _myState->setBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
         _myState->setTexturing(theViewport->get<ViewportTexturingTag>());
+        _myState->setDepthWrites(true);
+        glDepthMask(true);
         CHECK_OGL_ERROR;
     }
 
@@ -1027,12 +1040,14 @@ namespace y60 {
         CHECK_OGL_ERROR;
 
         setupRenderState(theViewport);
+        DB_MS;
 
         // We need to push all thouse bits, that need to be reset after the main render pass (before
         // text and overlay rendering). But not thouse that are managed by the renderstate class.
         glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
+        DB_MS;
         // Render underlays
 	    renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
 
@@ -1046,6 +1061,7 @@ namespace y60 {
         bindViewMatrix(myCamera);
         CHECK_OGL_ERROR;
 
+        DB_MS;
         if (theViewport->get<ViewportCullingTag>()) {
             if (theViewport->get<ViewportDebugCullingTag>()) {
                 renderFrustum(theViewport);
@@ -1072,6 +1088,7 @@ namespace y60 {
         setProjection(theViewport);
         CHECK_OGL_ERROR;
 
+        DB_MS;
         // (3) render skybox
         {
             MAKE_SCOPE_TIMER(renderSkyBox);
@@ -1096,6 +1113,7 @@ namespace y60 {
             CHECK_OGL_ERROR;
         }
 
+        DB_MS;
         // (7) render bodies
         if (! myBodyParts.empty()) {
             MAKE_SCOPE_TIMER(renderBodyParts);
@@ -1104,6 +1122,7 @@ namespace y60 {
             glPushMatrix();
             glDisable(GL_ALPHA_TEST);
             CHECK_OGL_ERROR;
+        DB_MS;
 
             bool currentMaterialHasAlpha = false;
             for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
@@ -1119,18 +1138,21 @@ namespace y60 {
             _myState->setClippingPlanes(std::vector<asl::Planef>());
         }
 
+        DB_MS;
         {
             MAKE_SCOPE_TIMER(renderOverlays);
             renderOverlays(*theViewport, OVERLAY_LIST_NAME);
         }
-        _myState->setDepthWrites(true);
+        DB_MS;
         glPopClientAttrib();
         glPopAttrib();  // GL_TEXTURE_BIT + GL_COLOR_BUFFER_BIT
+        DB_MS;
 
         if (_myBoundingVolumeMode & BV_HIERARCHY) {
             renderBoundingBoxHierarchy(_myScene->getWorldRoot());
         }
 
+        DB_MS;
         {
             MAKE_SCOPE_TIMER(renderTextSnippets);
             glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -1140,9 +1162,13 @@ namespace y60 {
             glPopAttrib();
         }
 
+        DB_MS;
         // Set renderer into known state for drawing calls from js
         deactivatePreviousMaterial();
         _myPreviousMaterial = 0;
+        _myState->setDepthWrites(true); // XXX
+        _myState->setIgnoreDepth(false); // XXX
+        DB_MS;
     }
 
     void
@@ -1518,7 +1544,6 @@ namespace y60 {
         //_myState->setDepthWrites(false);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
         for (unsigned i = 0; i < myOverlayCount; ++i) {
             renderOverlay(theViewport, myOverlays->childNode(OVERLAY_NODE_NAME, i));
         }
