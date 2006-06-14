@@ -610,6 +610,7 @@ namespace y60 {
 
     void
     Renderer::enableRenderStyles(const RenderStyles & theRenderStyles, const MaterialBase * theMaterial) {
+        // AC_WARNING << "Renderstyle for " << theMaterial->get<IdTag>() << " is " << theRenderStyles;
         _myState->setIgnoreDepth(theRenderStyles[IGNORE_DEPTH]);
         _myState->setPolygonOffset( theRenderStyles[POLYGON_OFFSET]);
         
@@ -651,7 +652,7 @@ namespace y60 {
 #else
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 #endif
-        // inside a glPushAttrib/glPopAttrib, don'z use RenderState
+        // inside a glPushAttrib/glPopAttrib, don't use RenderState
         glDepthMask( myRenderStyles[NO_DEPTH_WRITES]);
         if (myRenderStyles[IGNORE_DEPTH]) {
             glDisable(GL_DEPTH_TEST);
@@ -1027,13 +1028,13 @@ namespace y60 {
 
         setupRenderState(theViewport);
 
-        // Render underlays
-	    renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
-
         // We need to push all thouse bits, that need to be reset after the main render pass (before
         // text and overlay rendering). But not thouse that are managed by the renderstate class.
         glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+
+        // Render underlays
+	    renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
 
         dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
                 theViewport->get<CameraTag>());
@@ -1118,6 +1119,10 @@ namespace y60 {
             _myState->setClippingPlanes(std::vector<asl::Planef>());
         }
 
+        {
+            MAKE_SCOPE_TIMER(renderOverlays);
+            renderOverlays(*theViewport, OVERLAY_LIST_NAME);
+        }
         glPopClientAttrib();
         glPopAttrib();  // GL_TEXTURE_BIT + GL_COLOR_BUFFER_BIT
         _myState->setDepthWrites(true);
@@ -1126,10 +1131,6 @@ namespace y60 {
             renderBoundingBoxHierarchy(_myScene->getWorldRoot());
         }
 
-        {
-            MAKE_SCOPE_TIMER(renderOverlays);
-            renderOverlays(*theViewport, OVERLAY_LIST_NAME);
-        }
         {
             MAKE_SCOPE_TIMER(renderTextSnippets);
             glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -1480,7 +1481,7 @@ namespace y60 {
         if (!myOverlays) {
             return;
         }
-        unsigned myOverlayCount = myOverlays->childNodesLength();
+        unsigned myOverlayCount = myOverlays->childNodesLength(OVERLAY_NODE_NAME);
         if (myOverlayCount == 0) {
             return;
         }
@@ -1510,20 +1511,19 @@ namespace y60 {
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
-        _myState->setIgnoreDepth(true);
-        _myState->setDepthWrites(false);
-
-
+        // don't force depth-buffer deactivation here - it will be done by the material
+        //_myState->setIgnoreDepth(true);
+        //_myState->setDepthWrites(false);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         for (unsigned i = 0; i < myOverlayCount; ++i) {
-            renderOverlay(theViewport, myOverlays->childNode(i));
+            renderOverlay(theViewport, myOverlays->childNode(OVERLAY_NODE_NAME, i));
         }
-
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
+        glMatrixMode(GL_MODELVIEW);
 
         glPopAttrib();
 
@@ -1589,6 +1589,9 @@ namespace y60 {
                         CHECK_OGL_ERROR;
                     }
                 }
+                // force depth buffer deactivation
+                RenderStyles myOverlayRenderStyle(BIT(IGNORE_DEPTH) | BIT(NO_DEPTH_WRITES));
+                enableRenderStyles(myOverlayRenderStyle, &(*myMaterial));
                 MaterialPropertiesFacadePtr myPropFacade = myMaterial->getChild<MaterialPropertiesTag>();
 
                 const asl::Vector4f & myColor = myPropFacade->get<SurfaceColorTag>();
@@ -1675,9 +1678,9 @@ namespace y60 {
         }
 
         // Render child overlays
-        unsigned myOverlayCount = theOverlayNode->childNodesLength();
+        unsigned myOverlayCount = theOverlayNode->childNodesLength(OVERLAY_NODE_NAME);
         for (unsigned i = 0; i < myOverlayCount; ++i) {
-             renderOverlay(theViewport, theOverlayNode->childNode(i), myAlpha);
+             renderOverlay(theViewport, theOverlayNode->childNode(OVERLAY_NODE_NAME, i), myAlpha);
         }
         glPopMatrix();
     }
