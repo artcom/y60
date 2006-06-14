@@ -1123,9 +1123,9 @@ namespace y60 {
             MAKE_SCOPE_TIMER(renderOverlays);
             renderOverlays(*theViewport, OVERLAY_LIST_NAME);
         }
+        _myState->setDepthWrites(true);
         glPopClientAttrib();
         glPopAttrib();  // GL_TEXTURE_BIT + GL_COLOR_BUFFER_BIT
-        _myState->setDepthWrites(true);
 
         if (_myBoundingVolumeMode & BV_HIERARCHY) {
             renderBoundingBoxHierarchy(_myScene->getWorldRoot());
@@ -1134,7 +1134,9 @@ namespace y60 {
         {
             MAKE_SCOPE_TIMER(renderTextSnippets);
             glPushAttrib(GL_ALL_ATTRIB_BITS);
+            //glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
             renderTextSnippets(theViewport);
+            //glPopClientAttrib();
             glPopAttrib();
         }
 
