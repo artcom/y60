@@ -1488,7 +1488,7 @@ namespace y60 {
 #if 0
         AC_PRINT << "name=" << theViewport.get<NameTag>() << " pos=" << theViewport.get<Position2DTag>() << " size=" << theViewport.get<Size2DTag>() << " pixel=" << theViewport.get<ViewportLeftTag>() << "," << theViewport.get<ViewportTopTag>() << "," << theViewport.getLower() << " " << theViewport.get<ViewportWidthTag>() << "x" << theViewport.get<ViewportHeightTag>();
 #endif
-        glPushAttrib(GL_TEXTURE_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT);
+        glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT);
         //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
         glMatrixMode(GL_PROJECTION);
@@ -1510,8 +1510,8 @@ namespace y60 {
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
-        glDepthMask(GL_FALSE); // inside a glPushAttrib/glPopAttrib
-        glDisable(GL_DEPTH_TEST); // inside a glPushAttrib/glPopAttrib
+        _myState->setIgnoreDepth(true);
+        _myState->setDepthWrites(false);
 
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
