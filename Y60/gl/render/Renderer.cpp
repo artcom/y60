@@ -651,8 +651,8 @@ namespace y60 {
 #else
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 #endif
-        glDepthMask( myRenderStyles[NO_DEPTH_WRITES]);// inside a glPushAttrib/glPopAttrib
-
+        // inside a glPushAttrib/glPopAttrib, don'z use RenderState
+        glDepthMask( myRenderStyles[NO_DEPTH_WRITES]);
         if (myRenderStyles[IGNORE_DEPTH]) {
             glDisable(GL_DEPTH_TEST);
         } else {
@@ -1488,7 +1488,7 @@ namespace y60 {
 #if 0
         AC_PRINT << "name=" << theViewport.get<NameTag>() << " pos=" << theViewport.get<Position2DTag>() << " size=" << theViewport.get<Size2DTag>() << " pixel=" << theViewport.get<ViewportLeftTag>() << "," << theViewport.get<ViewportTopTag>() << "," << theViewport.getLower() << " " << theViewport.get<ViewportWidthTag>() << "x" << theViewport.get<ViewportHeightTag>();
 #endif
-        glPushAttrib(GL_TEXTURE_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glPushAttrib(GL_TEXTURE_BIT | GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT);
         //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
         glMatrixMode(GL_PROJECTION);
