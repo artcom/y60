@@ -20,14 +20,10 @@ if [ "$OS" == "Windows_NT" ] ; then
     cp -v $PRO/lib/pthreadVC.dll "$MAYA_SDK/bin/"
     cp -v $PRO/lib/ssleay32.dll "$MAYA_SDK/bin/"
 
-    MODULE_DIR="$PROGRAMFILES/ART+COM/mayaY60export"
-    mkdir -p $MODULE_DIR/plug-ins
-    mkdir -p $MODULE_DIR/scripts
-    mkdir -p $MAYA_SDK/modules
-    echo "### INFO: Creating module file $MAYA_SDK/modules/mayaY60export.txt"
-    echo -n "+ mayaY60export 7.0 ${MODULE_DIR}" > "$MAYA_SDK/modules/mayaY60export.txt"
-    cp -v o.ANT.WIN.${VARIANT}/mayaY60-export${VARIANT}.dll "$MODULE_DIR/plug-ins/mayaY60export.mll"
-    SCRIPT_DIR="$MODULE_DIR/scripts"
+    mkdir -p $MAYA_SDK/plug-ins
+    mkdir -p $MAYA_SDK/scripts/others
+    cp -v o.ANT.WIN.${VARIANT}/mayaY60-export${VARIANT}.dll "$MAYA_SDK/bin/plug-ins/mayaY60export.mll"
+    SCRIPT_DIR="$MAYA_SDK/scripts/others"
 else
     if [ -z $MAYA_VERSION ]; then
         echo "### WARNING: MAYA_VERSION is not set"
