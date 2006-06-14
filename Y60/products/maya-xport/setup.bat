@@ -20,7 +20,7 @@ COPY /Y plug-ins\* "%ProgramFiles%\ART+COM\mayaY60export\plug-ins"
 COPY /Y *.dll "%MAYA_PATH%\bin"
 
 ECHO Creating module file %MODULE_FILE%
-ECHO + mayaY60export %MAYA_VERSION% %INSTALL_PATH% > %MODULE_FILE%
+ECHO + mayaY60export %MAYA_VERSION% %INSTALL_PATH%> %MODULE_FILE%
 
 echo done.
 
