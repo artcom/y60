@@ -1,0 +1,80 @@
+//=============================================================================
+// Copyright (C) 2005 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+/* struct vert2frag {
+   float4 position : POSITION;
+   // float2 texCoord : TEXCOORD0;
+   float pointSize : PSIZE;
+   float time;
+}; */
+
+void mainVertex(float4 thePosition   : POSITION,
+                // float4 theTexCoord   : TEXCOORD0,
+                float4 theDirection  : TEXCOORD1,
+                float4 theParameters : TEXCOORD2,
+                uniform float4x4 GL_MODELVIEW_PROJECTION,
+                uniform float4x4 GL_TEXTURE,
+                uniform float4 gravity,
+                uniform float time,
+                out float4 outPosition : POSITION,
+                out float4 outPointSize : PSIZE)
+{
+    // theParameters.x = the lifetime of a particle
+    // theParameters.y = the size of a particle
+    float myTimeToLive = theParameters.x;
+    float mySize       = theParameters.y;
+
+    // gravity -> x,y,z direction, w strength
+    // calculate the current position of the particle using 
+    // theTime.x -> frametime in seconds
+    float myStartTime = theDirection.w;
+    
+    float myPresentTime = myStartTime+time;
+
+    if (myPresentTime > myTimeToLive) {
+        float myOvertime = myPresentTime / myTimeToLive;
+        float myFloor = floor(myOvertime);
+        //float myRest = myPresentTime / myFloor;
+        myPresentTime -= myTimeToLive*myFloor;
+    } 
+
+    float4 myPosition = thePosition;
+    
+    if ( myPresentTime <= 0 ) {
+        // set particle to graveyard
+        float4 theNewPosition = float4(4000.0, 4000.0, 4000.0, 4000.0);
+        outPosition = mul(GL_MODELVIEW_PROJECTION, theNewPosition);
+    } else { 
+        // calculate particle position
+        myPosition += float4(theDirection.xyz, 0.0f) * myPresentTime +
+            0.5*gravity*myPresentTime*myPresentTime;
+        
+        outPosition = mul(GL_MODELVIEW_PROJECTION, myPosition);
+    }
+
+    // OUT.texCoord = float2(0.0, 1.0);
+    outPointSize = time;
+    //return OUT;
+}
+
+void mainFragment( float2 texCoord0 : TEXCOORD0,
+                   uniform sampler3D tex, 
+                   out float4 outColor : COLOR)
+{
+    float3 myTexCoord = float3(texCoord0, 0.1);
+
+    myTexCoord = float3(0.5, 0.1, 0.0);
+
+    outColor = tex3D(tex, float3(texCoord0, 0.0)); //myTexCoord);
+    // myColor = float4(1.0, 0.0, 0.0, 1.0); 
+    // myColor.g = IN.time / 10.0;
+    outColor.b = 1.0;
+    outColor.a = 1.0;
+} 

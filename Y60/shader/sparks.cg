@@ -10,30 +10,34 @@
 
 struct vert2frag {
     float4 position : POSITION;
-    float2 texCoord : TEXCOORD0;
+//     float2 texCoord : TEXCOORD0;
 };
 
-vert2frag mainVertex(float4 thePosition : POSITION,
-                     float4 theTexCoord : TEXCOORD0,
+vert2frag mainVertex(float4 thePosition  : POSITION,
+                     float4 theTexCoord  : TEXCOORD0,
+                     float4 theDirection : TEXCOORD1,
                      uniform float4x4 GL_MODELVIEW_PROJECTION,
                      uniform float4x4 GL_TEXTURE,
-                     uniform float4 theGravity)
+                     uniform float4 theGravity,
+                     uniform float4 theTime)
 {
     // gravity -> x,y,z direction, w strength
     // calculate the current position of the particle using 
-    thePosition = 
+    // theTime.x -> frametime in seconds
+    float4 myOffset = theDirection.xyz + theGravity.xyz;
 
+    thePosition += myOffset*theTime.xxxx; 
+    theDirection = myOffset;
+    
     vert2frag OUT;
     OUT.position = mul(GL_MODELVIEW_PROJECTION, thePosition);
-    OUT.texCoord = mul(GL_TEXTURE, theTexCoord).xy;
     return OUT;
 }
 
 float4 mainFragment(vert2frag IN,
                     uniform float2 hdr,
                     uniform sampler2D tex) : COLOR 
-{
+{ 
     float4 myColor = tex2D(tex, IN.texCoord);
-    myColor.rgb = myColor.rgb * hdr.x + hdr.y;
     return myColor; 
 } 

@@ -983,5 +983,32 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>    
+    <shader id="s126" name="particles" cost="10">
+        <supports>
+            <feature class="vertexparams" values="[particles]"/>
+            <feature class="textures" values="[paint]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="texcoord" values="[*]"/>
+        </supports>
+        <vertexshader profile="VP30" file="particles.cg" entryfunction="mainVertex">
+            <properties>
+                <vector4f name="gravity">[0,0,0,0]</vector4f>
+                <float name="time">0.0</float> 
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+                 <vector4f name="color"/>
+                 <vector2f name="texcoord0"/>
+                 <vector4f name="texcoord1"/>
+                 <vector4f name="texcoord2"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="particles.cg" entryfunction="mainFragment">
+            <properties>
+                <sampler2d name="tex">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
 </shaders>
 
