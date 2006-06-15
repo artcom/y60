@@ -1018,6 +1018,7 @@ namespace y60 {
         _myState->setBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
         _myState->setTexturing(theViewport->get<ViewportTexturingTag>());
         _myState->setDepthWrites(true);
+        _myState->setFrontFaceCCW(true);
         glDepthMask(true);
         CHECK_OGL_ERROR;
     }
@@ -1123,6 +1124,7 @@ namespace y60 {
             glPopMatrix();
             _myState->setScissorTest(false);
             _myState->setClippingPlanes(std::vector<asl::Planef>());
+            _myState->setFrontFaceCCW(true);
         }
 
         {
