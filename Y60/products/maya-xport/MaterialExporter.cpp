@@ -540,6 +540,7 @@ MaterialExporter::exportLayeredTexture(const MFnMesh * theMesh, const MObject & 
 
         exportFileTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
                  myBlendMode, theColorGainAlpha);
+        y60::setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", theColorGainPropertyName, asl::Vector4f(1,1,1,1));
     }
 }
 
@@ -615,6 +616,8 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
             case MFn::kFileTexture:
                 exportFileTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
                                   ourDefaultBlendMode, theColorGainAlpha);
+                y60::setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", 
+                        theColorGainPropertyName, asl::Vector4f(1,1,1,1));
                 break;
             case MFn::kBump:
                 exportBumpTexture(myTextureNode, theBuilder, theSceneBuilder);
