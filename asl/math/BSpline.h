@@ -133,7 +133,7 @@ namespace asl {
                 _myCoeff[2][i] = 3 * (theEndAnchor[i] - theStartAnchor[i]) - _myCoeff[1][i];
                 _myCoeff[3][i] = theEnd[i] - theStart[i] - _myCoeff[1][i] - _myCoeff[2][i];
             }
-            _myArcLength = -1;
+            clearResultCache();
         }
 
         /**
@@ -209,15 +209,21 @@ namespace asl {
          * @return The arc length.
          */
         T getArcLength() {
+            if (_myResult.empty()) {
+                throw asl::Exception("Could not get arc length, because spline is not calculated, yet.", PLUS_FILE_LINE);
+            }                        
 
-            if (_myArcLength < 0) {
-
-                Vector3<T> myStart = getValue(0);
-                Vector3<T> myEnd = getValue(1);
-                _myArcLength = getSegmentLength(0,1, myStart, myEnd, distance(myStart, myEnd));
+            // Distances are calculated lazily
+            if (_myDistances.empty()) {
+                _myDistances.resize(_myResult.size());
+                
+                _myDistances[0] = 0;
+                for (unsigned i = 1; i < _myResult.size(); ++i) {
+                    _myDistances[i] = _myDistances[i-1] + length(_myResult[i] - _myResult[i-1]);   
+                }
             }
-
-            return _myArcLength;
+            
+            return _myDistances.back();
         }
 
         /**
@@ -231,10 +237,11 @@ namespace asl {
         const std::vector< Vector3<T> > & calculate(unsigned theResolution,
                                                     T theEaseIn = 0, T theEaseOut = 0)
         {
-            _myResult.clear();
-            for (unsigned i = 0; i <= theResolution; ++i) {
+            clearResultCache();
+            _myResult.reserve(theResolution + 1);
+            for (unsigned i = 0; i < theResolution + 1; ++i) {
                 _myResult.push_back(evaluate(i / T(theResolution), theEaseIn, theEaseOut));
-            }
+            }            
 
             return _myResult;
         }
@@ -253,13 +260,31 @@ namespace asl {
             theUpVector = cross(theForwardVector, theSideVector);
             theUpVector = normalized(theUpVector);
         }
+        
+        Vector3<T> getPosition(T theDistance) {
+            if (theDistance >= getArcLength()) {
+                return _myResult.back();
+            }
+            
+            // Find the last point that is within the given distance
+            unsigned myIndex = 1;
+            while (myIndex < _myDistances.size() && _myDistances[myIndex] < theDistance) {
+                ++myIndex;
+            }
+            --myIndex;
+                                
+            T myRemainingDistance = theDistance - _myDistances[myIndex];            
+            Vector3<T> myDirection = normalized(_myResult[myIndex+1] - _myResult[myIndex]);
+            
+            return _myResult[myIndex] + myDirection * myRemainingDistance;
+        }
 
     private:
-
-        Vector3<T> _myCoeff[4];
-        T _myArcLength;
-        std::vector< Vector3<T> > _myResult;
-
+        void clearResultCache() {
+            _myResult.clear();
+            _myDistances.clear();
+        }
+    
         // evaluate at 't'
         Vector3<T> getValue(T t) const {
 
@@ -290,28 +315,14 @@ namespace asl {
 
             return myNormal;
         }
-
-        // get segment length
-        T getSegmentLength(T theLeft, T theRight,
-                           Vector3<T> theLeftPoint, Vector3<T> theRightPoint,
-                           T theChordLength)
-        {
-            const double MAX_ERROR = 0.01;
-
-            T myCenter = T(0.5) * (theLeft + theRight);
-            Vector3<T> myCenterPoint = getValue(myCenter);
-
-            T myLeftLen = distance(theLeftPoint, myCenterPoint);
-            T myRightLen = distance(theRightPoint, myCenterPoint);
-
-            T myError = ((myLeftLen + myRightLen) - theChordLength) / theChordLength;
-            if (myError > MAX_ERROR) {
-                myLeftLen = getSegmentLength(theLeft, myCenter, theLeftPoint, myCenterPoint, myLeftLen);
-                myRightLen = getSegmentLength(myCenter, theRight, myCenterPoint, theRightPoint, myRightLen);
-            }
-
-            return myLeftLen + myRightLen;
-        }
+        
+        Vector3<T> _myCoeff[4];
+        
+        // The sampled points
+        std::vector< Vector3<T> > _myResult;
+        
+        // The distance to each sampled point in _myResult from the spline start
+        std::vector<T> _myDistances;         
     };
 
     typedef BSpline<float> BSplinef;

@@ -36,6 +36,7 @@ public:
         ENSURE(myBSpline.evaluate(1) == myEnd);
         ENSURE(myBSpline.evaluate(2) == myEnd);
 
+        myBSpline.calculate(10);
         DPRINT(myBSpline.getArcLength());
         ENSURE(myBSpline.getArcLength() > 0);
 
@@ -46,6 +47,7 @@ public:
         DPRINT(myBSpline.evaluate(0.5));
         ENSURE(almostEqual(myBSpline.evaluate(0.5), Vector3<T>(1,0,0)) == true);
 
+        myBSpline.calculate(10);
         DPRINT(myBSpline.getArcLength());
         ENSURE(myBSpline.getArcLength() == 2);
 
@@ -56,6 +58,27 @@ public:
         ENSURE(myResult[2] == Vector3<T>(1,0,0));
         DPRINT(myResult[3]);
         ENSURE(myResult[4] == myEnd);
+        
+        // Test getPosition
+        {
+            Vector3<T> myStart(0,0,0);
+            Vector3<T> myEnd(2,0,0);
+    
+            BSpline<T> myBSpline(myStart, Vector3<T>(1,2,0),
+                                 myEnd, Vector3<T>(1,2,0));
+            
+            ENSURE_EXCEPTION(myBSpline.getArcLength(), asl::Exception);
+            ENSURE_EXCEPTION(myBSpline.getPosition(1), asl::Exception);
+            myBSpline.calculate(2);
+            Vector3<T> myMidPoint = myBSpline.getResult()[1];
+            T mySegmentLength = T(sqrt(3.25));
+            ENSURE(almostEqual(myBSpline.getArcLength(), 2 * mySegmentLength));                                 
+            ENSURE(almostEqual(myBSpline.getPosition(0), myStart));
+            ENSURE(almostEqual(myBSpline.getPosition(100), myEnd));
+            ENSURE(almostEqual(myBSpline.getPosition(mySegmentLength), myMidPoint));
+            ENSURE(almostEqual(myBSpline.getPosition(mySegmentLength / 2), myMidPoint / 2));
+            ENSURE(almostEqual(myBSpline.getPosition(mySegmentLength * T(1.5)), (myEnd + myMidPoint) / 2));
+        }
     }
 };
 
