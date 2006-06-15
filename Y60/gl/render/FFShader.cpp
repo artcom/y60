@@ -87,7 +87,6 @@ namespace y60 {
         DB(AC_TRACE << "FFShader::enableTextures: Material " << theMaterial.get<NameTag>() << " has " << myTextureCount << " textures." << endl);
         glMatrixMode(GL_TEXTURE);
 
-        bool alreadyHasSpriteTexture = false;
         for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {
             glActiveTexture(asGLTextureRegister(myTextureCounter));
             CHECK_OGL_ERROR;
@@ -103,6 +102,7 @@ namespace y60 {
                 myTexture.getImage()->get<ImageHeightTag>()<< "," <<
                 myTexture.getImage()->get<ImageDepthTag>() << "," <<
                 endl);
+
             // Fixed Function Shaders only support paint & skybox usage
             if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
 
@@ -122,25 +122,6 @@ namespace y60 {
                 CHECK_OGL_ERROR;
                 glEnable(myTextureType);
                 CHECK_OGL_ERROR;
-
-                if (myTexture.get<TextureSpriteTag>()) {
-                    if (!alreadyHasSpriteTexture) {
-                        glEnable(GL_POINT_SPRITE_ARB);
-                        CHECK_OGL_ERROR;
-                        if (glPointParameterfARB) {
-                            glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
-                            CHECK_OGL_ERROR;
-                        }
-                    } else {
-                        glDisable(GL_POINT_SPRITE_ARB);
-                    }
-                    glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
-                    CHECK_OGL_ERROR;
-                    alreadyHasSpriteTexture = true;
-                } else {
-                    glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
-                    CHECK_OGL_ERROR;
-                }
 
                 glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
                         GLfloat(asGLTextureFunc(myTexture.getApplyMode())));

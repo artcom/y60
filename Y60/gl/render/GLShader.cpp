@@ -229,6 +229,7 @@ namespace y60 {
         // AC_TRACE << "GLShader::enableTextures " << theMaterial.get<NameTag>() << " count=" << myTextureCount;
 
         glMatrixMode(GL_TEXTURE);
+        bool alreadyHasSpriteTexture = false;
         for (unsigned i = 0; i < myTextureCount; ++i) {
 
             const y60::Texture & myTexture = theMaterial.getTexture(i);
@@ -282,6 +283,27 @@ namespace y60 {
             glTexParameteri(myTextureType, GL_TEXTURE_MIN_FILTER,
                     asGLTextureSampleFilter(myTexture.getMinFilter(), hasMipMaps));
             CHECK_OGL_ERROR;
+
+            if (myTexture.get<TextureSpriteTag>()) {
+                if (!alreadyHasSpriteTexture) {
+                    glEnable(GL_POINT_SPRITE_ARB);
+                    CHECK_OGL_ERROR;
+                    if (glPointParameterfARB) {
+                        glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
+                        CHECK_OGL_ERROR;
+                    }
+                } else {
+                    glDisable(GL_POINT_SPRITE_ARB);
+                }
+                glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
+                CHECK_OGL_ERROR;
+                alreadyHasSpriteTexture = true;
+                cerr << "enable point sprites" << endl;
+            } else {
+                glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
+                CHECK_OGL_ERROR;
+                cerr << "disable point sprites" << endl;
+            }
         }
         glMatrixMode(GL_MODELVIEW);
     }
