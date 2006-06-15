@@ -85,7 +85,11 @@ namespace y60 {
         string myNodeRef;
         if (myAttribute) {
             myNodeRef = myAttribute->nodeValue();
-            myAnimatedNode   = theWorld->getElementById(myNodeRef);
+            myAnimatedNode = theWorld->getElementById(myNodeRef);
+            if (!myAnimatedNode) {
+                throw AnimationManagerException(string("Animation points to a node that does not exist.\n") +
+                    as_string(*theNode), PLUS_FILE_LINE);
+            }
         } else {
             throw AnimationManagerException(string("Attribute 'node' not defined in \n") +
                 as_string(*theNode), PLUS_FILE_LINE);
