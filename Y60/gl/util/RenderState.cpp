@@ -37,6 +37,18 @@ namespace y60 {
         commitBlend(_myBlendFlag);
         commitAlphaTest(_myAlphaTestFlag);
         commitCullFaces(_myCullFaces);
+        commitFrontFaceCCW(_myFrontFaceCCWFlag);
+    }
+
+    
+    void
+    RenderState::commitFrontFaceCCW(bool theFlag) {
+        if (theFlag) {
+            glFrontFace(GL_CCW);
+        } else {
+            glFrontFace(GL_CW);
+        }
+        _myFrontFaceCCWFlag = theFlag;
     }
 
     void

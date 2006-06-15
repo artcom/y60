@@ -59,6 +59,7 @@ namespace y60 {
                 _myBlendFlag(false),
                 _myAlphaTestFlag(true),
                 _myScissorTestFlag(false),
+                _myFrontFaceCCWFlag(true),
                 _myCullFaces(GL_BACK),
                 _myEnabledClippingPlanes(0),
                 _myScissorParams(0,0,1,1)
@@ -79,6 +80,7 @@ namespace y60 {
             RENDERSTATE_GETTER_SETTER(Blend);
             RENDERSTATE_GETTER_SETTER(AlphaTest);
             RENDERSTATE_GETTER_SETTER(ScissorTest);
+            RENDERSTATE_GETTER_SETTER(FrontFaceCCW);
 
             void setCullFaces(GLenum theFaces) {
                 if (theFaces != _myCullFaces) {

@@ -350,6 +350,10 @@ namespace y60 {
                 rotateBillboard(myBody, theCamera);
             }
 
+            const asl::Matrix4f &myMatrix = myBody.get<GlobalMatrixTag>();
+            float myScaleSign = myMatrix[0][0] * myMatrix[1][1] * myMatrix[2][2];
+            _myState->setFrontFaceCCW( myScaleSign > 0 );   
+            
             _myPreviousBody = &myBody;
             CHECK_OGL_ERROR;
         }
