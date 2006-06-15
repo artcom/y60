@@ -485,8 +485,8 @@ SceneExporter::exportMesh(MFnDagNode & theDagNode,
             if ( ! myShapeId.empty()) {
                 DB(AC_TRACE << "Append Body: " << myBodyName << " for shape " << myShapeId << endl;)
                 myBody = Body::create(theParentTransform.getNode(), myShapeId);
-                myBody->set<NameTag>(myBodyName);                
-                myBody->set<VisibleTag>(isVisible(theDagNode));                
+                myBody->set<NameTag>(myBodyName);
+                myBody->set<VisibleTag>(isVisible(theDagNode));
             } else {
                 throw ExportException(std::string("Shape with path '") + myPathName + "' has empty id.",
                                       PLUS_FILE_LINE);
@@ -622,7 +622,7 @@ SceneExporter::exportCamera(const MFnDagNode & theDagNode, WorldBuilderBase & th
     if (isVisible(theDagNode) || myCameraName == "perspShape") {
         CameraBuilder myCameraBuilder(myCameraName);
 
-        myCameraBuilder.setHFov(asl::degFromRad(myMCamera.horizontalFieldOfView()));
+        myCameraBuilder.setHFov(float(asl::degFromRad(myMCamera.horizontalFieldOfView())));
         myCameraId = theParentTransform.appendObject(myCameraBuilder);
 
         // just get the default perspective camera

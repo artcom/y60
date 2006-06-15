@@ -284,30 +284,28 @@ findSkinCluster(const MFnDagNode & theMesh, MObject & theConnectedSkin) {
     return true;
 }
 
-void 
-displayString(const std::string theMessage) {
-    cerr << theMessage << endl;
-    MGlobal::displayInfo(MString(theMessage.c_str()));
-}
-
 vector<string> ourWarnings;
 vector<string> ourErrors;
 
 void
 displayError(const std::string theMessage) {
-    displayString(string("### ERROR ") + theMessage);
+    string myError = string("### ERROR ") + theMessage;
+    cerr << myError << endl;
+    MGlobal::displayInfo(MString(myError.c_str()));
     ourErrors.push_back(theMessage);
 }
 
 void
 displayWarning(const std::string theMessage) {
-    displayString(string("### WARNING ") + theMessage);
+    string myWarning = string("### WARNING ") + theMessage;
+    cerr << myWarning << endl;
+    MGlobal::displayWarning(MString(myWarning.c_str()));
     ourWarnings.push_back(theMessage);
 }
 
 // This can only be called once per export, because we want the errors/warnings to be cleared for the
 // next export.
-bool 
+bool
 displayProblemSummary() {
     if (ourWarnings.size() || ourErrors.size()) {
         cerr << "+------------------------------------   Summary of Problems   -------------------------------------" << endl;

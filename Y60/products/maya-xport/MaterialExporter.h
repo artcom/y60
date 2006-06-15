@@ -123,13 +123,13 @@ class MaterialExporter {
                             float theColorGainAlpha);
 
         void exportBumpTexture(const MObject & theBumpNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
-#if 0        
+#if 0
         void exportProjectedTexture(const MObject & theProjectionNode,
                                     y60::MaterialBuilder & theBuilder,
                                     y60::SceneBuilder & theSceneBuilder,
                                     const float theAlpha, const MayaBlendMode theBlendMode,
                                     const char* theColorGainPropertyName, float theColorGainAlpha);
-#endif        
+#endif
         void exportFileTexture(const MFnMesh * theMesh, MObject & theTextureNode,
                                y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
                                const MayaBlendMode theBlendMode,
@@ -150,16 +150,10 @@ class MaterialExporter {
         void exportUnlitFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
 
 		std::string getStrippedTextureFilename(const MPlug & theTexturePlug);
-        void stripBaseDir(std::string & theFileName);
-
+        std::string findRelativeFilePath(const std::string & theFileName);
+        std::string findFile(const std::string & theFileName);
         bool checkTransparency(const MObject & theShaderNode);
         bool checkAlphaTexture(const MObject & theShaderNode, const std::string thePlugName);
-        /*
-        void calcColorScaleAndBiasFromAlpha(const float theAlpha,
-                                            const MayaBlendMode theBlendMode,
-                                            asl::Vector4f &theColorScale,
-                                            asl::Vector4f &theColorBias);
-        */
 
         StringMap        _myMaterialNameMap;
         StringVectorMap  _myMaterialUVMappedTexturesMap;

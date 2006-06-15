@@ -139,18 +139,16 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
     MString myFileName("");
     if (myTextureMapping == y60::TEXCOORD_UV_MAP) {
         _myMaterialUVMappedTexturesMap[myMaterialName].push_back(myTextureName);
-        
+
     } else { // generative mapping
         MPlug myImagePlug = MFnDependencyNode(theTextureNode).findPlug("image");
         getConnectedNode(myImagePlug, myImageNode);
     }
-    
+
     MPlug myFilenamePlug = MFnDependencyNode(myImageNode).findPlug("fileTextureName");
     myFilenamePlug.getValue(myFileName);
-        
 
-    std::string myStrippedFileName = myFileName.asChar();
-    stripBaseDir(myStrippedFileName);
+    std::string myStrippedFileName = findRelativeFilePath(myFileName.asChar());
 
     // color gain = scale
     Vector4f myColorScale(1,1,1,theColorGainAlpha);
@@ -160,7 +158,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
     myColorGainPlug.getValue(myColorScale[1]);
     myColorGainPlug = MFnDependencyNode(theTextureNode).findPlug("colorGainB");
     myColorGainPlug.getValue(myColorScale[2]);
-    
+
     Vector4f myColorOffset(0,0,0,0);
     MPlug myColorOffsetPlug = MFnDependencyNode(theTextureNode).findPlug("colorOffsetR");
     myColorOffsetPlug.getValue(myColorOffset[0]);
@@ -192,7 +190,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
             displayWarning(string("Blendmode: ") + getStringFromEnum(theBlendMode, MayaBlendModesString) + " not yet implemented.");
     }
 
-    AC_PRINT << "stripped filename=" << myStrippedFileName << " Scale=" << myColorScale << ", Bias=" << myColorOffset;
+    AC_DEBUG << "stripped filename=" << myStrippedFileName << " Scale=" << myColorScale << ", Bias=" << myColorOffset;
     string myImageId = theBuilder.createImage(theSceneBuilder,
         MFnDependencyNode(theTextureNode).name().asChar(),
         myStrippedFileName, myUsage, myCreateMipmapsFlag,
@@ -227,7 +225,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
 
         // fetch placement matrix
         MTransformationMatrix myTransform = myMatrixData.transformation();
-        MMatrix myMayaMatrix = myTransform.asMatrix(); 
+        MMatrix myMayaMatrix = myTransform.asMatrix();
 
         asl::Matrix4f myMatrix;
         myMatrix.assign(
@@ -288,20 +286,13 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
             asl::Vector3f myScale, myShear, myRotation, myTranslation;
             myMatrix.decompose(myScale, myShear, myRotation, myTranslation);
 
-            cout << "scale=" << myScale << endl;
-            myScale[0] *= myBBoxSize.x * 0.5f;
-            myScale[1] *= myBBoxSize.y * 0.5f;
-            myScale[2] *= myBBoxSize.z * 0.5f;
-            cout << "scale=" << myScale << endl;
+            myScale[0] *= float(myBBoxSize.x * 0.5);
+            myScale[1] *= float(myBBoxSize.y * 0.5);
+            myScale[2] *= float(myBBoxSize.z * 0.5f);
 
-            cout << "translation=" << myTranslation << endl;
             myTranslation[0] /= myScale[0] * 2.0f;
             myTranslation[1] /= myScale[1] * 2.0f;
             myTranslation[2] /= myScale[2] * 2.0f;
-            cout << "translation=" << myTranslation << endl;
- 
-            cout << "euler=" << myRotation << endl;
-            cout << "***" << endl;
 
             // texture scaling
             asl::Matrix4f myScaleMatrix;
@@ -369,13 +360,12 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
 
         myTextureMatrix.makeScaling(asl::Vector3f(float(myRepeatU), float(myRepeatV), 1));
     }
-    cout << "texture matrix=" << myTextureMatrix << endl;
 
     theBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode,
             myTextureMapping, myTextureMatrix, 100, false, 50);
 }
 
-string 
+string
 MaterialExporter::getTextureMappingType(const MObject & theTextureNode) {
     string myResult;
     double myProjectionType = 0;
@@ -385,7 +375,7 @@ MaterialExporter::getTextureMappingType(const MObject & theTextureNode) {
     if (myMappingIndex < 0 || myMappingIndex > 8 ) {
         throw ExportException(string("Sorry, mapping mode not supported: ") + asl::as_string(myMappingIndex), PLUS_FILE_LINE);
     }
- 
+
     /*
      * Note:
      * - Mayas concentric mode is not supported, instead a spatial mode is authored.
@@ -409,18 +399,8 @@ MaterialExporter::exportBumpTexture(const MObject & theBumpNode,
     DB2(cerr << "MaterialExporter::exportBumpTexture() - name: " << MFnDependencyNode(theBumpNode).name().asChar() << endl);
     DB(dumpAttributes(theBumpNode));
     MPlug myBumpPlug = MFnDependencyNode(theBumpNode).findPlug("bumpValue");
-    MObject myBumpFileNode;
-    getConnectedNode(myBumpPlug, myBumpFileNode);
 
-    DB(AC_TRACE << "MaterialExporter::exportBumpTexture(): myBumpFileNode:" <<endl);
-    DB(dumpAttributes(myBumpFileNode));
-
-    MString myFileName("");
-    MPlug myFilenamePlug = MFnDependencyNode(myBumpFileNode).findPlug("fileTextureName");
-    myFilenamePlug.getValue(myFileName);
-
-    std::string myStrippedFileName = myFileName.asChar();
-    stripBaseDir(myStrippedFileName);
+    std::string myFileName = getStrippedTextureFilename(myBumpPlug);
 
     std::string myApplyMode = y60::TEXTURE_APPLY_DECAL;
     std::string myUsage     = y60::TEXTURE_USAGE_BUMP;
@@ -428,7 +408,7 @@ MaterialExporter::exportBumpTexture(const MObject & theBumpNode,
 
     string myImageId = theBuilder.createImage(theSceneBuilder,
         MFnDependencyNode(theBumpNode).name().asChar(),
-        myStrippedFileName, myUsage, false, asl::Vector4f(1.0f,1.0f,1.0f,1.0f),
+        myFileName, myUsage, false, asl::Vector4f(1.0f,1.0f,1.0f,1.0f),
         asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE, "");
 
     theBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode, TEXCOORD_UV_MAP, asl::Matrix4f::Identity(), 100, false, 0);
@@ -436,8 +416,6 @@ MaterialExporter::exportBumpTexture(const MObject & theBumpNode,
     std::string myMaterialName = theBuilder.getName();
     std::string myTextureName(MFnDependencyNode(theBumpNode).name().asChar());
     _myMaterialUVMappedTexturesMap[myMaterialName].push_back(myTextureName);
-
-    DB(AC_TRACE << "MaterialExporter::exportBumpTexture() - Exporting texture: " << endl << myFileName.asChar());
 }
 
 void
@@ -463,17 +441,17 @@ MaterialExporter::exportEnvCubeTexture(const MObject & theShaderNode,
 
     float myReflectivity = MFnPhongShader(theShaderNode).reflectivity(& myStatus);
     asl::Vector4f myColorScale = asl::Vector4f(1, 1, 1, myReflectivity);
-    
+
     MColor mySpecularColor = MFnReflectShader(theShaderNode).specularColor(& myStatus);
-    
+
     theBuilder.appendCubemap(theSceneBuilder,
             MFnDependencyNode(theEnvCubeNode).name().asChar(),
             frontFileName, rightFileName, backFileName,
             leftFileName, topFileName, bottomFileName,
             myApplyMode, myColorScale);
 
-    //NOTE: specular colors are added to the diffuse colors. 
-    //      no alpha value support for specular colors therefore means 
+    //NOTE: specular colors are added to the diffuse colors.
+    //      no alpha value support for specular colors therefore means
     //      setting the specular alpha to zero.
     asl::Vector4f myY60SpecColor(mySpecularColor.r, mySpecularColor.g, mySpecularColor.b, 0); //mySpecularColor.a
     setPropertyValue<asl::Vector4f>(theBuilder.getNode(),
@@ -483,7 +461,7 @@ MaterialExporter::exportEnvCubeTexture(const MObject & theShaderNode,
     // Convert to 0 - 128 range of OpenGL
     myShininess = (myShininess / 100) * 128;
     setPropertyValue<float>(theBuilder.getNode(), "float", y60::SHININESS_PROPERTY, myShininess);
-*/                      
+*/
 }
 
 void
@@ -556,8 +534,7 @@ MaterialExporter::exportTextures(const MFnMesh * theMesh, const MObject & theSha
         return exportMaps(theMesh, theShaderNode,theBuilder, theSceneBuilder,
                 thePlugName.c_str(), theColorGainPropertyName, theColorGainAlpha);
     } catch (const ExportException & ex) {
-        MGlobal::displayError(MString((std::string("Can not export Texture: ")
-                                      + ex.what() + " at " + ex.where()).c_str()));
+        displayError(std::string("Can not export Texture: ") + ex.what() + " at " + ex.where());
         return false;
     }
 }
@@ -570,8 +547,7 @@ MaterialExporter::exportBumpMaps(const MFnMesh * theMesh, const MObject & theSha
     try {
         return exportMaps(theMesh, theShaderNode,theBuilder, theSceneBuilder, "normalCamera", y60::DIFFUSE_PROPERTY, theColorGainAlpha);
     } catch (const ExportException & ex) {
-        MGlobal::displayError(MString((std::string("Can not export Texture: ")
-                                      + ex.what() + " at " + ex.where()).c_str()));
+        displayError((std::string("Can not export Texture: ") + ex.what() + " at " + ex.where()));
         return false;
     }
 }
@@ -756,7 +732,7 @@ MaterialExporter::exportPhongEFeatures(const MFnMesh * theMesh, const MObject & 
     exportReflectiveFeatures(theMesh, theShaderNode, theBuilder, theSceneBuilder);
     MStatus myStatus;
     float myHightlightSize = MFnPhongEShader(theShaderNode).highlightSize(& myStatus);
-    
+
     float myShininess = asl::maximum(0.0f, 128.0f - (myHightlightSize * 100.0f)); // experimental
     setPropertyValue<float>(theBuilder.getNode(), "float", y60::SHININESS_PROPERTY, myShininess);
 }
@@ -800,7 +776,7 @@ MaterialExporter::exportBlinnFeatures(const MFnMesh * theMesh, const MObject & t
 }
 
 std::string
-MaterialExporter::createMaterial(const MFnMesh * theMesh, const MObject & theShaderNode, 
+MaterialExporter::createMaterial(const MFnMesh * theMesh, const MObject & theShaderNode,
                                  y60::SceneBuilder & theSceneBuilder, const SpecialFeatures & theSpecialFeatures)
 {
     std::string myMaterialName(MFnDependencyNode(theShaderNode).name().asChar());
@@ -819,7 +795,7 @@ MaterialExporter::createMaterial(const MFnMesh * theMesh, const MObject & theSha
 
     // Add special features collected in shape exporter
     for (unsigned i = 0; i < theSpecialFeatures.size(); ++i) {
-        myMaterialBuilder.addFeature(theSpecialFeatures[i].classname, 
+        myMaterialBuilder.addFeature(theSpecialFeatures[i].classname,
                VectorOfRankedFeature(1, RankedFeature(100, theSpecialFeatures[i].values)));
     }
 
@@ -917,7 +893,7 @@ MaterialExporter::getMaterial(MIntArray & theIndices, MObjectArray & theShadingG
 }
 
 std::string
-MaterialExporter::createFaceMaterial(const MFnMesh * theMesh, const MObject & theMaterialNode, 
+MaterialExporter::createFaceMaterial(const MFnMesh * theMesh, const MObject & theMaterialNode,
                                      y60::SceneBuilder & theSceneBuilder, const SpecialFeatures & theSpecialFeatures)
 {
     std::string myMaterialName = std::string(MFnDependencyNode(theMaterialNode).name().asChar());
@@ -955,7 +931,7 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
     if (theDirectory.length() > 0 && theDirectory[1] != '/') {
 #endif
         if (theDirectory[0] == '.' && theDirectory[1] == '/') {
-            _myBaseDirectory = normalizeDirectory(getCWD(), false) + 
+            _myBaseDirectory = normalizeDirectory(getCWD(), false) +
                                normalizeDirectory(theDirectory.substr(2,theDirectory.length()) , false);
         } else {
             _myBaseDirectory = normalizeDirectory(getCWD(), false) + '/' + normalizeDirectory(theDirectory, false);
@@ -975,27 +951,50 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
 
 }
 
-void
-MaterialExporter::stripBaseDir(std::string & theFileName) {
-    std::string myFileName = theFileName;
+std::string
+MaterialExporter::findFile(const std::string & theFileName) {
+    if (fileExists(theFileName)) {
+        return theFileName;
+    } else {
+        // If the file does not exist we have to try to find it...
+        string myDirectoryPart = theFileName;
+        size_t mySlashIndex = myDirectoryPart.rfind('/');
+        while (mySlashIndex != string::npos) {
+            string myFilePart = theFileName.substr(mySlashIndex + 1, theFileName.length());
+            myDirectoryPart = myDirectoryPart.substr(0, mySlashIndex);
+
+            string myTestPath = _myBaseDirectory + myFilePart;
+            if (fileExists(myTestPath)) {
+                return myTestPath;
+            }
+            mySlashIndex = myDirectoryPart.rfind('/');
+        }
+
+        throw ExportException(string("Could not find file: ") + theFileName, PLUS_FILE_LINE);
+    }
+}
+
+std::string
+MaterialExporter::findRelativeFilePath(const std::string & theFileName) {
+    string myFoundFileName = findFile(theFileName);
+    std::string myFileName = myFoundFileName;
     std::string myBaseName = _myBaseDirectory;
 #ifdef WIN32
-    // convert basedir and filename to upper-case before comparing, because windows
+    // Convert basedir and filename to upper-case before comparing, because windows
     // is case-INsensitive and therefore the comparison needs to be too :( [jb]
     std::transform(myFileName.begin(), myFileName.end(),
                    myFileName.begin(), std::toupper);
     std::transform(myBaseName.begin(), myBaseName.end(),
                    myBaseName.begin(), std::toupper);
 #endif
+
+    // Strip the base directory
     size_t myIndex = myFileName.find(myBaseName);
     if (myIndex != std::string::npos) {
-        if (myIndex == 0) {
-            myFileName = theFileName.substr(myBaseName.length());
-        } else {
-            myFileName = theFileName.substr(myIndex + myBaseName.length());
-        }
+        // If the base directory is a part of the filename, just strip it.
+        return myFoundFileName.substr(myIndex + myBaseName.length());
     } else {
-        // try to find as much directories as possible from BaseDirectory
+        // Try to find as much equal directories as possible from BaseDirectory
         bool myEqualFlag = true;
         std::string myBaseRest(myBaseName);
         std::string myFileRest(myFileName);
@@ -1005,6 +1004,7 @@ MaterialExporter::stripBaseDir(std::string & theFileName) {
             if (mySlashBaseIndex != std::string::npos && mySlashFilenameIndex != std::string::npos) {
                 std::string myBaseDir = myBaseRest.substr(0, mySlashBaseIndex);
                 std::string myFilenameDir = myFileRest.substr(0, mySlashFilenameIndex);
+
                 if (myBaseDir == myFilenameDir) {
                     myBaseRest = myBaseRest.substr(mySlashBaseIndex+1, myBaseRest.length());
                     myFileRest = myFileRest.substr(mySlashFilenameIndex+1, myFileRest.length());
@@ -1015,38 +1015,36 @@ MaterialExporter::stripBaseDir(std::string & theFileName) {
                 myEqualFlag = false;
             }
         }
-        // do we have a chance to optimize??
+
+        // Check if we have common root directories
         if (myBaseRest != _myBaseDirectory && myFileRest != myFileName) {
 #ifdef WIN32
             // redo the case magic under windows by reconstructing the original path's case [jb]
-            myFileRest = theFileName.substr(theFileName.length() - myFileRest.length());
+            myFileRest = myFoundFileName.substr(myFoundFileName.length() - myFileRest.length());
 #endif
             // count the directories in the rest of the base name and add some relative '..' to restfilename
             int myResult = std::count(myBaseRest.begin(), myBaseRest.end(), '/');
-            for (int myCounter = 0; myCounter < myResult; myCounter++) {
+            for (unsigned i = 0; i < myResult; ++i) {
                 myFileRest = std::string("../") + myFileRest;
             }
-            myFileName = myFileRest;
+            AC_DEBUG << "MaterialExporter::findRelativeFilePath stripped filename=" << myFileRest;
+            return myFileRest;
         }
-        AC_DEBUG << "MaterialExporter::stripBaseDir found nothing";
+        AC_DEBUG << "MaterialExporter::findRelativeFilePath nothing to do.";
+        return myFoundFileName;
     }
-
-    AC_DEBUG << "stripBaseDir::stripBaseDir stripped filename=" << myFileName;
-    theFileName = myFileName;
 }
 
 std::string
 MaterialExporter::getStrippedTextureFilename(const MPlug & theTexturePlug) {
-    MObject theFileNode;
-    getConnectedNode(theTexturePlug, theFileNode);
+    MObject myFileNode;
+    getConnectedNode(theTexturePlug, myFileNode);
     MString myFileName("");
-    MPlug myFilenamePlug = MFnDependencyNode(theFileNode).findPlug("fileTextureName");
+    MPlug myFilenamePlug = MFnDependencyNode(myFileNode).findPlug("fileTextureName");
 
     myFilenamePlug.getValue(myFileName);
 
-    std::string myFilename(myFileName.asChar());
-    stripBaseDir(myFilename);
-    return myFilename;
+    return findRelativeFilePath(myFileName.asChar());
 }
 
 bool
@@ -1131,49 +1129,3 @@ MaterialExporter::checkTransparency(const MObject & theShaderNode) {
     return myTransparencyFlag;
 }
 
-/**
- * Transform alpha into color scale and color bias for layered textures
- * to omit the influence of a single components alpha on the entire texture
- * @note no longer required - we now use the image's color_bias and color_scale
- *
- * @param theAlpha
- * @param theBlendMode
- * @param &theColorScale
- * @param &theColorBias
- * @return
- */
-/*
-void
-MaterialExporter::calcColorScaleAndBiasFromAlpha(const float theAlpha,
-                                                 const MayaBlendMode theBlendMode,
-                                                 asl::Vector4f &theColorScale,
-                                                 asl::Vector4f &theColorBias)
-{
-    float myAlphaScale = 1.0f;
-    float myAlphaBias  = 0.0f;
-    float myScale      = 1.0f;
-    float myBias       = 0.0f;
-
-    switch (theBlendMode) {
-        case MAYA_BLEND_MULTIPLY:
-            myScale = theAlpha;
-            myBias  = 1 - theAlpha;
-            break;
-        case MAYA_BLEND_ADD:
-            myScale = theAlpha;
-            break;
-        case MAYA_BLEND_NONE:
-            //nothing to be done
-            break;
-        case MAYA_BLEND_OVER:
-            myAlphaScale = theAlpha;
-            break;
-        default:
-            displayWarning(string("calcColorScaleAndBiasFromAlpha: not yet implemented for blendmode: ")
-                           + getStringFromEnum(theBlendMode, MayaBlendModesString));
-    }
-
-    theColorScale = asl::Vector4f(myScale, myScale, myScale, myAlphaScale);
-    theColorBias  = asl::Vector4f(myBias, myBias, myBias, myAlphaBias);
-}
-*/
