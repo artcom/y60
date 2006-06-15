@@ -298,11 +298,9 @@ namespace y60 {
                 glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
                 CHECK_OGL_ERROR;
                 alreadyHasSpriteTexture = true;
-                cerr << "enable point sprites" << endl;
             } else {
                 glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
                 CHECK_OGL_ERROR;
-                cerr << "disable point sprites" << endl;
             }
         }
         glMatrixMode(GL_MODELVIEW);
