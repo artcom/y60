@@ -79,7 +79,7 @@ namespace asl {
 
     template<class Number>
 	Vector3<Number> projection(const Vector3<Number> & d, const Plane<Number> & j) {
-		return (d - (dot(d,j.normal) * j.normal)) - (j.normal * j.offset);
+		return d - (dot(d,j.normal) * j.normal);
 	}
 
 	//nearest point to p on a plane p
