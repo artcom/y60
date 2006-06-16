@@ -72,6 +72,14 @@ using namespace asl;
 using namespace y60;
 using namespace dom;
 
+#ifdef LINUX
+
+#if __GNUC__ != 3 || __GNUC_MINOR__ != 3
+#error "gcc 3.3.x must be used to create maya 7.0 plugins"
+#endif
+
+#endif
+
 SceneExporter::SceneExporter() : _myInitialCamera("c0") {
 }
 
