@@ -97,8 +97,7 @@ function findIntersectionsByBox(theRootNode, myBox) {
 // this function will dispatch according to the type of myLineSegment.
 // it may be a LineSegment or a Ray
 function nearestIntersection(theRootNode, myLineSegment) {
-    var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment);
-    
+    var myIntersectionInfo = Scene.intersectBodies(theRootNode, myLineSegment);    
     if (myIntersectionInfo) {
         return findNearestIntersection(myIntersectionInfo, myLineSegment.origin);
     }

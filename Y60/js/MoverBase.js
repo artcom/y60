@@ -57,7 +57,6 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
         _myInitialOrientation = new Quaternionf(theMoverObject.orientation);
         _myMoverObject = theMoverObject;
         obj.reset();
-        obj.setup();
     }
 
     obj.setup = function() {
@@ -129,7 +128,6 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     }
 
     obj.update = function(theScreenTranslation, theWorldHeading) {
-        //Scene.updateGlobalMatrix(_myMoverObject);
         var myGlobalMatrix = new Matrix4f(_myMoverObject.globalmatrix);
         var myWorldPosition  = myGlobalMatrix.getRow(3);
 
@@ -152,9 +150,10 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
 
     //////////////////////////////////////////////////////////////////////
 
-    obj.reset = function() {
+    obj.reset = function() {        
         _myMoverObject.position    = _myInitialPosition;
         _myMoverObject.orientation = _myInitialOrientation;
+        obj.setup();        
     }
 
     obj.onKey = function(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {

@@ -108,6 +108,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
         myWorldTranslation.y = - theDeltaY * myWorldSize * myPanFactor / PAN_SPEED;
         _myTrackballBody = null;
         obj.update(myWorldTranslation, 0);
+        
     }
 
     obj.onMouseMotion = function(theX, theY) {
@@ -134,11 +135,11 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
 
     function getDistanceDependentFactor(){
         var d = Math.min(MAX_DISTANCE_FACTOR,
-                magnitude(difference(window.camera.position, _myTrackballCenter)) / obj.getWorldSize());
+                magnitude(difference(window.camera.globalmatrix.getTranslation(), _myTrackballCenter)) / obj.getWorldSize());
         return d;
     }
 
-    function setupTrackball(theBody) {
+    function setupTrackball(theBody) {  
         if (theBody) {
             _myTrackballBody = theBody;
         } else {
@@ -146,44 +147,48 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
         }
 
         _myTrackballCenter = getTrackballCenter();
-
-        var myTrackballRadius = magnitude(difference(obj.getMoverObject().position, _myTrackballCenter));
-        var myPosition  = obj.getMoverObject().position;
-        if (myTrackballRadius > 0) {
-            var myPosition = product(difference(obj.getMoverObject().position, _myTrackballCenter), 1 / myTrackballRadius);
-        }
-
-        var myLocalMatrix = obj.getMoverObject().localmatrix;
-        if (myLocalMatrix.getRow(1).y > 0) {
-            _myTrackballOrientation.x = - Math.asin(myPosition.y);
-            _myTrackballOrientation.y = Math.atan2(myPosition.x, myPosition.z);
+        var myGlobalPosition = obj.getMoverObject().globalmatrix.getTranslation();       
+        var myRadiusVector = normalized(difference(myGlobalPosition, _myTrackballCenter));
+        
+        if (obj.getMoverObject().globalmatrix.getRow(1).y > 0) {
+            _myTrackballOrientation.x = - Math.asin(myRadiusVector.y);
+            _myTrackballOrientation.y = Math.atan2(myRadiusVector.x, myRadiusVector.z);
         } else {
-            _myTrackballOrientation.x = Math.PI + Math.asin(myPosition.y);
-            _myTrackballOrientation.y = Math.atan2(myPosition.x, myPosition.z) - Math.PI;
-        }
-
+            _myTrackballOrientation.x = Math.PI + Math.asin(myRadiusVector.y);
+            _myTrackballOrientation.y = Math.atan2(myRadiusVector.x, myRadiusVector.z) - Math.PI;
+        }   
+        
         calculateTrackball();
     }
 
     function calculateTrackball() {
-        var myTrackballRadius = magnitude(difference(obj.getMoverObject().position, _myTrackballCenter));
+        var myTrackballRadius = magnitude(difference(obj.getMoverObject().globalmatrix.getTranslation(), _myTrackballCenter));
         var myX = myTrackballRadius * Math.cos(- _myTrackballOrientation.x) * Math.sin(_myTrackballOrientation.y);
         var myY = myTrackballRadius * Math.sin(- _myTrackballOrientation.x);
         var myZ = myTrackballRadius * Math.cos(- _myTrackballOrientation.x) * Math.cos(_myTrackballOrientation.y);
-        obj.getMoverObject().position    = sum(_myTrackballCenter, new Vector3f(myX, myY, myZ));
-        obj.getMoverObject().orientation = Quaternionf.createFromEuler(_myTrackballOrientation);
+        var myGlobalMatrix = new Matrix4f(Quaternionf.createFromEuler(_myTrackballOrientation));
+        myGlobalMatrix.translate(sum(_myTrackballCenter, new Vector3f(myX, myY, myZ)));
+        
+        var myParentMatrix = new Matrix4f(obj.getMoverObject().parentNode.globalmatrix);
+        myParentMatrix.invert();
+        myGlobalMatrix.postMultiply(myParentMatrix);
+        
+        var myDecomposition = myGlobalMatrix.decompose();
+        obj.getMoverObject().orientation = myDecomposition.orientation;
+        obj.getMoverObject().position    = myDecomposition.position;
     }
 
+    // Returns center in global coordinates
     function getTrackballCenter() {
         if (_myCenteredFlag) {
             return new Point3f(0,0,0);
         }
 
         if (_myTrackballBody) {
-            return difference(_myTrackballBody.boundingbox.center, obj.getMoverObject().parentNode.globalmatrix.getTranslation());
+            return _myTrackballBody.boundingbox.center;
         } else {
             var myViewVector = product(obj.getMoverObject().globalmatrix.getRow(2).xyz, -1);
-            var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();
+            var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();            
             var myCenterRay  = new Ray(myPosition, myViewVector);
             var myTrackballRadius = 1;
             var myIntersection = nearestIntersection(obj.getWorld(), myCenterRay);
@@ -211,7 +216,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
 
     	var myWorldNearPos = product(myClipNearPos, myProjectionMatrix);
     	var myWorldFarPos = product(myClipFarPos, myProjectionMatrix);
-    	var myCameraPos = new Point3f(myCamera.globalmatrix.getTranslation());
+    	//var myCameraPos = new Point3f(myCamera.globalmatrix.getTranslation());
         var myMouseRay = new Ray(myWorldNearPos, myWorldFarPos);
         var myIntersection = nearestIntersection(obj.getWorld(), myMouseRay);
         if (myIntersection) {
