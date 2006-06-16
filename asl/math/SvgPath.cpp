@@ -347,7 +347,7 @@ namespace asl {
     }
 
     void SvgPath::push(BSpline<float> * theSpline) {
-
+/*
         unsigned myNumSegments;
         if (_mySegmentLength <= 0.0f) {
             myNumSegments = _myNumSegments;
@@ -359,10 +359,12 @@ namespace asl {
                 myNumSegments = MAX_SPLINE_SEGMENTS;
             }
         }
-
+*/
+        // [CH]: There is no good way to find out the curvature of the spline,
+        //       so we just go for the best resolution.
         Point3f myP = theSpline->evaluate(0.0f);
-        for (unsigned i = 1; i <= myNumSegments; ++i) {
-            Point3f myP1 = theSpline->evaluate(i / (float) myNumSegments);
+        for (unsigned i = 1; i <= MAX_SPLINE_SEGMENTS; ++i) {
+            Point3f myP1 = theSpline->evaluate(i / (float) MAX_SPLINE_SEGMENTS);
             push(new LineSegment<float>(myP, myP1));
             myP = myP1;
         }
@@ -420,7 +422,7 @@ namespace asl {
         renderPathParts(myParts);
     }
 
-    std::vector<std::string> SvgPath::splitPathDefinition(const std::string & thePathDefinition) const { 
+    std::vector<std::string> SvgPath::splitPathDefinition(const std::string & thePathDefinition) const {
         std::vector<std::string> myParts;
         std::string myPart;
 
