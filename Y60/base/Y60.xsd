@@ -1644,7 +1644,21 @@ Usually 'a' plus a number, such as 'a0'.</xs:documentation>
                     <xs:documentation>Name of the attribute to be animated (e.g. position, orientation)</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="node" type="xs:IDREF">
+            <xs:attribute name="property" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Name of a property to be animated (e.g. surfacecolor).
+Will only be active if the 'attribute' attribute is not set.
+Properties are searched within a 'property' node under the node specified by the 'node' attribute. E.g.:
+&lt;material&gt;
+    &lt;properties&gt;
+        &lt;vector4f name="surfacecolor"&gt;[1,1,1,1]&lt;/vector4f&gt;
+
+    &lt;/properties&gt;
+&lt;material&gt;
+</xs:documentation>
+                </xs:annotation>
+             </xs:attribute>
+             <xs:attribute name="node" type="xs:IDREF">
                 <xs:annotation>
                     <xs:documentation>Id of the node to be animated, must be inside the world node.</xs:documentation>
                 </xs:annotation>

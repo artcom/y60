@@ -41,7 +41,7 @@ namespace y60 {
                                         bool & theAngleAttributeFlag)
     {
         string myAttributeName = theAttributeRef;
-
+        
         if (theAttributeRef[theAttributeRef.length() - 2] == '.') {
             char myLastChar = tolower(theAttributeRef[theAttributeRef.length() - 1]);
             switch (myLastChar) {
@@ -68,12 +68,13 @@ namespace y60 {
         }
 
         dom::NodePtr myAnimatedAttribute = theNode->getAttribute(myAttributeName);
+        // dom::NodePtr myAnimatedAttribute = theNode->getProperty(myAttributeName);
+        
         if (!myAnimatedAttribute) {
             throw AnimationManagerException(string("Animated attribute '") + myAttributeName +
                 "' not found in \n" + as_string(*theNode), PLUS_FILE_LINE);
         }
-        // theAngleAttributeFlag = (myAttributeName == "orientation");
-        //return myAnimatedAttribute->nodeValueWrapperPtr();
+
         return myAnimatedAttribute;
     }
 
@@ -96,20 +97,42 @@ namespace y60 {
         }
 
         // Find attribute to be animated
-        //dom::ValuePtr   myNodeValue;
-        dom::NodePtr   myAnimatedAttribute;
+        dom::NodePtr    myAnimatedAttribute;
         string          myAttributeRef;
         bool            myAngleAttribute = false;
         AnimationBase::VectorComponent myVectorComponent = AnimationBase::SCALAR;
         myAttribute = theNode->getAttribute(ANIM_ATTRIBUTE_ATTRIB);
+
         if (myAttribute) {
             myAttributeRef = myAttribute->nodeValue();
             myAnimatedAttribute = findAnimatedValue(myAnimatedNode, myAttributeRef, myVectorComponent, myAngleAttribute);
         } else {
-            throw AnimationManagerException(string("Attribute 'attribute' not defined in \n") +
-                as_string(*theNode), PLUS_FILE_LINE);
-        }
+            dom::NodePtr myProperty = theNode->getAttribute(ANIM_PROPERTY_ATTRIB);
+            if (myProperty) {
+                myAttributeRef = myProperty->nodeValue();
 
+                // myAnimatedAttribute = findAnimatedValue(myAnimatedNode, myAttributeRef, myVectorComponent, myAngleAttribute);
+                dom::NodePtr myPropPtr = myAnimatedNode->childNode(PROPERTY_LIST_NAME);
+
+                dom::NodePtr myNode;
+                for (int i=0; i<myPropPtr->childNodes().length(); ++i) {
+                    myNode = myPropPtr->childNode(i);
+                    if (myNode->getAttribute("name")->nodeValue() == myAttributeRef) {
+                        myAnimatedAttribute = myNode->firstChild();
+                    }
+                }
+
+                if (!myNode) {
+                    throw AnimationManagerException(string("Property ") + myAttributeRef + " not defined in \n" +
+                                                    as_string(*myPropPtr), PLUS_FILE_LINE);
+                }
+                
+            } else {
+                throw AnimationManagerException(string("Attribute 'attribute' or 'property' not defined in \n") +
+                                                as_string(*theNode), PLUS_FILE_LINE);
+            }
+        }
+        
         // Get type of animated values
         dom::NodePtr myValueList(0);
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {

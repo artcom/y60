@@ -174,6 +174,7 @@ namespace y60 {
 
     static const char * ANIM_ENABLED_ATTRIB         = "enabled";
     static const char * ANIM_ATTRIBUTE_ATTRIB       = "attribute";
+    static const char * ANIM_PROPERTY_ATTRIB        = "property";
     static const char * ANIM_NODEREF_ATTRIB         = "node";
     static const char * ANIM_BEGIN_ATTRIB           = "begin";
     static const char * ANIM_DURATION_ATTRIB        = "duration";

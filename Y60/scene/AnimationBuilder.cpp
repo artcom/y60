@@ -37,6 +37,7 @@ namespace y60 {
             myNode->appendAttribute(NAME_ATTRIB, "");
             myNode->appendAttribute(ANIM_ENABLED_ATTRIB, myEnabled);
             myNode->appendAttribute(ANIM_ATTRIBUTE_ATTRIB, "");
+            myNode->appendAttribute(ANIM_PROPERTY_ATTRIB, "");
             myNode->appendAttribute(ANIM_NODEREF_ATTRIB, "");
             myNode->appendAttribute(ANIM_BEGIN_ATTRIB, 0.0f);
             myNode->appendAttribute(ANIM_DURATION_ATTRIB, 0.0f);

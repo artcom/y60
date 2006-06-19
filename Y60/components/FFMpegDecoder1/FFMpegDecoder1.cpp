@@ -40,15 +40,18 @@ namespace y60 {
     FFMpegDecoder1::FFMpegDecoder1(asl::DLHandle theDLHandle) :
         PlugInBase(theDLHandle),
         _myFormatContext(0), _myFrame(0),
-        _myVStreamIndex(-1), _myVStream(0),
+        _myVStream(0),
+        _myLastVStreamIndex(-1),
         _myStartTimestamp(0),
-        _myLastVideoTimestamp(0), _myEOFVideoTimestamp(INT_MIN)
+        _myLastVideoTimestamp(0),
+        _myEOFVideoTimestamp(INT_MIN)
     {
         DB(AC_DEBUG << "instantiated an FFMpegDecoder1...");
     }
 
     FFMpegDecoder1::~FFMpegDecoder1() {
         closeMovie();
+        DB(AC_DEBUG << "destructing an FFMpegDecoder1...");
     }
 
     asl::Ptr<MovieDecoderBase> FFMpegDecoder1::instance() const {
@@ -74,7 +77,7 @@ namespace y60 {
         AC_DEBUG << "FFMpegDecoder1::closeMovie";
         if (_myVStream) {
             avcodec_close(_myVStream->codec);
-            _myVStreamIndex = -1;
+            _myLastVStreamIndex = -1;
             _myVStream = 0;
         }
 
@@ -87,6 +90,23 @@ namespace y60 {
         _myFormatContext = 0;
     }
 
+    void
+    FFMpegDecoder1::setMovieParameters(int myIndex) {
+        AVStream * myVStream = _myFormatContext->streams[myIndex];
+
+        if (myVStream == 0) {
+            return;
+        }
+        
+        Movie * myMovie = getMovie();
+        
+        int myWidth, myHeight;
+        myWidth = myVStream->codec->width;
+        myHeight = myVStream->codec->height;
+        myMovie->set<ImageWidthTag>(myWidth);
+        myMovie->set<ImageHeightTag>(myHeight);
+    }
+    
     void
     FFMpegDecoder1::load(const std::string & theFilename) {
         asl::Time myLoadStartTime;
@@ -111,16 +131,19 @@ namespace y60 {
         }
 
         // find video/audio streams
+        int myIndex = 0;
         for (unsigned i = 0; i < _myFormatContext->nb_streams; ++i) {
             int myCodecType;
             myCodecType = _myFormatContext->streams[i]->codec->codec_type;
-            if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
-                _myVStreamIndex = i;
+            // if (_myVStreamIndex == -1 && myCodecType == CODEC_TYPE_VIDEO) {
+            if (myCodecType == CODEC_TYPE_VIDEO) {
+                myIndex = i;
                 _myVStream = _myFormatContext->streams[i];
+                break;
             }
-        }
+        } 
 
-        if (_myVStreamIndex < 0) {
+        if (_myVStream == 0) {
             throw FFMpegDecoderException(std::string("No video stream found: ") + theFilename, PLUS_FILE_LINE);
         }
 
@@ -137,13 +160,12 @@ namespace y60 {
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
 
-        Movie * myMovie = getMovie();
+        setMovieParameters(myIndex);
 
+        Movie * myMovie = getMovie();        
         int myWidth, myHeight;
         myWidth = _myVStream->codec->width;
         myHeight = _myVStream->codec->height;
-        myMovie->set<ImageWidthTag>(myWidth);
-        myMovie->set<ImageHeightTag>(myHeight);
 
         // Setup size and image matrix
         float myXResize = float(myWidth) / asl::nextPowerOfTwo(myWidth);
@@ -159,17 +181,14 @@ namespace y60 {
         myMovie->set<FrameRateTag>(myFPS);
 
         // duration
-        if (_myVStream->duration == AV_NOPTS_VALUE ||
-            int(myFPS * (_myVStream->duration) <= 0)) {
-            AC_WARNING << "url='" << theFilename << "' contains no valid duration";
+        if (_myVStream->duration == AV_NOPTS_VALUE || int(myFPS * (_myVStream->duration) <= 0)) {
             myMovie->set<FrameCountTag>(INT_MAX);
         } else {
             myMovie->set<FrameCountTag>(int(myFPS * _myVStream->duration 
-                        * av_q2d(_myVStream->time_base)));
+                                            * av_q2d(_myVStream->time_base)));
         }
 
-        AC_DEBUG << "url='" << theFilename << "' fps=" << myFPS << " framecount=" << getFrameCount();
-
+        
         _myLastVideoTimestamp = 0;
         _myEOFVideoTimestamp = INT_MIN;
 
@@ -236,7 +255,7 @@ namespace y60 {
                 AC_DEBUG << "SEEK timestamp=" << theTimestamp << " lastVideoTimestamp=" 
                          << _myLastVideoTimestamp << " seek=" << mySeekTimestamp;
                 
-                int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, mySeekTimestamp, 
+                int myResult = av_seek_frame(_myFormatContext, _myLastVStreamIndex, mySeekTimestamp, 
                                              AVSEEK_FLAG_BACKWARD);
                 if (myResult < 0) {
                     AC_ERROR << "Could not seek to timestamp " << mySeekTimestamp;
@@ -249,12 +268,11 @@ namespace y60 {
         AVPacket myPacket;
         memset(&myPacket, 0, sizeof(myPacket));
 
-        AVCodecContext * myVCodec = _myVStream->codec;
-
         // until a frame is found or eof
         while (true) {
             // EOF handling
-            if (av_read_frame(_myFormatContext, &myPacket) < 0) {
+            int myError;
+            if ((myError = av_read_frame(_myFormatContext, &myPacket)) < 0) {
                 av_free_packet(&myPacket);
 #if 0
                 // Remember the end of file timestamp
@@ -268,7 +286,7 @@ namespace y60 {
                  * chance to get the last frame of the video
                  */
                 int frameFinished = 0;
-                int myLen = avcodec_decode_video(myVCodec, _myFrame, &frameFinished, NULL, 0);
+                int myLen = avcodec_decode_video(_myVStream->codec, _myFrame, &frameFinished, NULL, 0);
                 if (frameFinished) {
                     _myLastVideoTimestamp += myTimePerFrame;
 //                    _myEOFVideoTimestamp = _myLastVideoTimestamp;
@@ -280,18 +298,26 @@ namespace y60 {
                         continue;
                     }
                 }
-                AC_DEBUG << "eof reached";
 #endif
+                AC_DEBUG << "eof reached : error: " << myError << " " << (myError==-11);
+
                 return false;
             }
 
-            if (myPacket.stream_index == _myVStreamIndex) {
+            //       if (myPacket.stream_index == _myVStreamIndex) {
+            int myCodecType;
+            myCodecType = _myFormatContext->streams[myPacket.stream_index]->codec->codec_type;
+            if (myCodecType == CODEC_TYPE_VIDEO) {
+                if (_myLastVStreamIndex != myPacket.stream_index) {
+                    setMovieParameters(myPacket.stream_index);
+                }
+
                 int frameFinished = 0;
                 unsigned char* myData = myPacket.data;
                 int myDataLen = myPacket.size;
 
                 while (frameFinished == 0 && myDataLen > 0) {
-                    int myLen = avcodec_decode_video(myVCodec,
+                    int myLen = avcodec_decode_video(_myVStream->codec,
                                                      _myFrame, &frameFinished,
                                                      myData, myDataLen);
                     if (myLen < 0) {
@@ -325,6 +351,8 @@ namespace y60 {
         AC_DEBUG << "Packet dts: " << myPacket.dts << ", pts: " << myPacket.pts;
         av_free_packet(&myPacket);
 
+        _myLastVStreamIndex = myPacket.stream_index;
+        
         return true;
     }
 

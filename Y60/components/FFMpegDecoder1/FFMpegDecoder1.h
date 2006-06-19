@@ -99,6 +99,7 @@ namespace y60 {
         const char * getName() const { return "y60FFMpegDecoder1"; }
 
     private:
+        void setMovieParameters(int myIndex);
         void closeMovie();
 
         /// Decode frame at theTimestamp into theTargetRaster. Returns true if EOF was met.
@@ -111,8 +112,9 @@ namespace y60 {
         AVFormatContext * _myFormatContext;
         AVFrame *         _myFrame;
 
-        int               _myVStreamIndex;
+        // int               _myVStreamIndex;
         AVStream *        _myVStream;
+        int               _myLastVStreamIndex;
 
         // All Timestamp variables are in movie time units (We've seen 1/90000 and 1/25 second
         // time units in movies).
