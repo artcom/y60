@@ -1006,7 +1006,7 @@
         </vertexshader>
         <fragmentshader profile="FP30" file="particles.cg" entryfunction="mainFragment">
             <properties>
-                <sampler2d name="tex">0</sampler2d>
+                <sampler3d name="tex">0</sampler3d>
             </properties>
         </fragmentshader>
     </shader>
