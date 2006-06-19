@@ -200,20 +200,25 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
     var _myListeners        = [];
     var _myKeyDown          = null;
 
-    if (fileExists(theSettingsFile)) {
-        print("Parsing settings from '" + theSettingsFile + "'");
-        var mySettingsDom = new Node();
-        mySettingsDom.parseFile(theSettingsFile);
-        _mySettings = mySettingsDom.firstChild;
-        var myHostSettingsFile = "settings-" + hostname() + ".xml";
-        if (fileExists(myHostSettingsFile)) {
-            print("Merging settings with '" + myHostSettingsFile + "'");
-            mergeHostSpecificSettings(myHostSettingsFile);
-        }
+    setup(obj, theSceneViewer, theSettingsFile);
 
-        _myCurrentSection   = _mySettings.firstChild;
-        _myCurrentSetting   = new Setting(_myCurrentSection.firstChild);
-        _myOriginalSettings = _mySettings.cloneNode(true);
+
+    function setup(obj, theSceneViewer, theSettingsFile) {
+        if (fileExists(theSettingsFile)) {
+            print("Parsing settings from '" + theSettingsFile + "'");
+            var mySettingsDom = new Node();
+            mySettingsDom.parseFile(theSettingsFile);
+            _mySettings = mySettingsDom.firstChild;
+            var myHostSettingsFile = "settings-" + hostname() + ".xml";
+            if (fileExists(myHostSettingsFile)) {
+                print("Merging settings with '" + myHostSettingsFile + "'");
+                mergeHostSpecificSettings(myHostSettingsFile);
+            }
+    
+            _myCurrentSection   = _mySettings.firstChild;
+            _myCurrentSetting   = new Setting(_myCurrentSection.firstChild);
+            _myOriginalSettings = _mySettings.cloneNode(true);
+        }
     }
 
     obj.getSettings = function() {
@@ -222,6 +227,10 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         } else {
             throw new Exception("No settings found (Configurator.js)", fileline());
         }
+    }
+
+    obj.setSettingsFile = function(theSettingsFile) {
+        setup(obj, theSceneViewer, theSettingsFile);
     }
 
     obj.removeListener = function(theListener) {
@@ -411,6 +420,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             }
         }
     }
+
 }
 
 //
