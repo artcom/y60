@@ -72,6 +72,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         return _myConfigurator.getSettings();
     }
 
+    self.getConfigurator = function() {
+        return _myConfigurator;
+    }
+
     self.registerSettingsListener = function(theListener, theSection) {
         _myConfigurator.addListener(theListener, theSection);
     }
