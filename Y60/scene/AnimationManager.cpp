@@ -103,7 +103,7 @@ namespace y60 {
         AnimationBase::VectorComponent myVectorComponent = AnimationBase::SCALAR;
         myAttribute = theNode->getAttribute(ANIM_ATTRIBUTE_ATTRIB);
 
-        if (myAttribute) {
+        if (myAttribute && (myAttribute->nodeValue() != "")) {
             myAttributeRef = myAttribute->nodeValue();
             myAnimatedAttribute = findAnimatedValue(myAnimatedNode, myAttributeRef, myVectorComponent, myAngleAttribute);
         } else {

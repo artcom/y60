@@ -72,6 +72,11 @@ namespace y60 {
     }
 
     void
+    AnimationBuilder::setProperty(const std::string & theProperty) {
+        getNode()->getAttribute(ANIM_PROPERTY_ATTRIB)->nodeValue(theProperty);
+    }
+
+    void
     AnimationBuilder::setBegin(float theBegin) {
         getNode()->getAttribute(ANIM_BEGIN_ATTRIB)->nodeValueAssign(theBegin);
     }

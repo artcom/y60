@@ -39,6 +39,7 @@ namespace y60 {
             void setName(const std::string & theName);
             void setNodeRef(const std::string & theNodeRef);
             void setAttribute(const std::string & theAttribute);
+            void setProperty(const std::string & theProperty);
             void setDuration(float theDuration);
             void setEnable(bool theEnable);
             void setBegin(float theBegin);
