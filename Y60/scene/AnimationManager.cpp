@@ -81,11 +81,11 @@ namespace y60 {
     AnimationPtr
     AnimationManager::createAnimation(const dom::NodePtr theNode, dom::NodePtr theWorld) {
         // Find node to be animated
-        dom::NodePtr myAnimatedNode;
-        dom::NodePtr myAttribute = theNode->getAttribute(ANIM_NODEREF_ATTRIB);
+        dom::NodePtr myAnimatedNode;        
+		dom::NodePtr myNodeRefAttribute = theNode->getAttribute(ANIM_NODEREF_ATTRIB);
         string myNodeRef;
-        if (myAttribute) {
-            myNodeRef = myAttribute->nodeValue();
+        if (myNodeRefAttribute) {
+			myNodeRef = myNodeRefAttribute->nodeValue();
             myAnimatedNode = theWorld->getElementById(myNodeRef);
             if (!myAnimatedNode) {
                 throw AnimationManagerException(string("Animation points to a node that does not exist.\n") +
@@ -101,7 +101,7 @@ namespace y60 {
         string          myAttributeRef;
         bool            myAngleAttribute = false;
         AnimationBase::VectorComponent myVectorComponent = AnimationBase::SCALAR;
-        myAttribute = theNode->getAttribute(ANIM_ATTRIBUTE_ATTRIB);
+		dom::NodePtr    myAttribute = theNode->getAttribute(ANIM_ATTRIBUTE_ATTRIB);
 
         if (myAttribute && (myAttribute->nodeValue() != "")) {
             myAttributeRef = myAttribute->nodeValue();
@@ -111,7 +111,6 @@ namespace y60 {
             if (myProperty) {
                 myAttributeRef = myProperty->nodeValue();
 
-                // myAnimatedAttribute = findAnimatedValue(myAnimatedNode, myAttributeRef, myVectorComponent, myAngleAttribute);
                 dom::NodePtr myPropPtr = myAnimatedNode->childNode(PROPERTY_LIST_NAME);
 
                 dom::NodePtr myNode;
@@ -122,7 +121,7 @@ namespace y60 {
                     }
                 }
 
-                if (!myNode) {
+                if (!myAnimatedAttribute) {
                     throw AnimationManagerException(string("Property ") + myAttributeRef + " not defined in \n" +
                                                     as_string(*myPropPtr), PLUS_FILE_LINE);
                 }

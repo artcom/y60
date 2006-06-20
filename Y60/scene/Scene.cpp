@@ -664,15 +664,15 @@ namespace y60 {
             updateMaterials(); //ok
         }
 
-        if (theUpdateFlags & ANIMATIONS) {
-            AC_TRACE << "updateAnimations";
-            MAKE_SCOPE_TIMER(updateAnimations);
-            _myAnimationManager.update();
-        } else if (theUpdateFlags & ANIMATIONS_LOAD) {
+        if (theUpdateFlags & ANIMATIONS_LOAD) {
             AC_TRACE << "updateAnimationsReload";
             MAKE_SCOPE_TIMER(updateAnimationsReload);
             loadAnimations();
-        }
+        } else if (theUpdateFlags & ANIMATIONS) {
+            AC_TRACE << "updateAnimations";
+            MAKE_SCOPE_TIMER(updateAnimations);
+            _myAnimationManager.update();
+        }            
 
         if (theUpdateFlags & SHAPES) {
             AC_TRACE << "updateShapes";
