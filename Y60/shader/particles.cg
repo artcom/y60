@@ -20,7 +20,8 @@ vert2frag mainVertex(float4 thePosition   : POSITION,
                      uniform float4x4 GL_MODELVIEW_PROJECTION,
                      uniform float4x4 GL_TEXTURE,
                      uniform float4 gravity,
-                     uniform float time)
+                     uniform float time,
+                     uniform float stoptime)
 {
     // theParameters.x = the lifetime of a particle
     // theParameters.y = the size of a particle
@@ -33,23 +34,29 @@ vert2frag mainVertex(float4 thePosition   : POSITION,
     // gravity -> x,y,z direction, w strength
     // calculate the current position of the particle using 
     // theTime.x -> frametime in seconds
-    float myStartTime = theDirection.w;
-    
-    float myPresentTime = myStartTime+time;
+    float myStartTime = theDirection.w;    
+    float myPresentTime = myStartTime + time;
+    float myStopTime    = myStartTime + stoptime;
 
+    // wrap around
     if (myPresentTime > myTimeToLive) {
         float myOvertime = myPresentTime / myTimeToLive;
         float myFloor = floor(myOvertime);
-        //float myRest = myPresentTime / myFloor;
         myPresentTime -= myTimeToLive*myFloor;
+    
+        float myStopFloor = floor(myStopTime / myTimeToLive);
+        if (myFloor > myStopFloor) {
+            myPresentTime = -1;
+        }
     } 
 
     float4 myPosition = thePosition;
     
     if ( myPresentTime <= 0 ) {
         // set particle to graveyard
-        float4 theNewPosition = float4(4000.0, 4000.0, 4000.0, 4000.0);
-        OUT.position = mul(GL_MODELVIEW_PROJECTION, theNewPosition);
+        //float4 theNewPosition = float4(4000.0, 4000.0, 4000.0, 4000.0);
+        //mul(GL_MODELVIEW_PROJECTION, theNewPosition);
+        OUT.position = float4(0,0,1,1); 
     } else { 
         // calculate particle position
         myPosition += float4(theDirection.xyz, 0.0f) * mySpeed * myPresentTime +
@@ -58,7 +65,6 @@ vert2frag mainVertex(float4 thePosition   : POSITION,
         OUT.position = mul(GL_MODELVIEW_PROJECTION, myPosition);
     }
 
-    // OUT.texCoord = float2(0.0, 1.0);
     OUT.time.x = myPresentTime / myTimeToLive;
     pointSize = -8.0 * time * time + 8*time;
     
