@@ -49,7 +49,7 @@ namespace y60 {
             virtual const VectorOfString * getFeatures(const std::string & theFeatureClass) const;
             virtual bool hasFeature(const std::string & theFeatureClass) const;
             
-            virtual void activate(MaterialBase & theMaterial);
+            virtual void activate(MaterialBase & theMaterial, const Viewport & theViewport);
             virtual void deactivate(const MaterialBase & theMaterial);
             
             virtual void enableTextures(const MaterialBase & theMaterial);

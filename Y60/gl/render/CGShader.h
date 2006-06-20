@@ -41,7 +41,7 @@ namespace y60 {
             virtual const MaterialParameterVector & getVertexParameters() const;
             virtual const VertexRegisterFlags & getVertexRegisterFlags() const;
 
-            virtual void activate(MaterialBase & theMaterial);
+            virtual void activate(MaterialBase & theMaterial, const Viewport & theViewport);
             virtual void deactivate(const MaterialBase & theMaterial);
             virtual void enableTextures(const MaterialBase & theMaterial);
             virtual void disableTextures(const MaterialBase & theMaterial);

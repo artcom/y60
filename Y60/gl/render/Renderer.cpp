@@ -217,7 +217,7 @@ namespace y60 {
             // The renderer should just take the scene information and render it as it is.
             // Right now in Shader.activate() the material representation is updated.
             // The scene should be responsible for that.
-            myShader->activate(const_cast<MaterialBase &>(theMaterial));
+            myShader->activate(const_cast<MaterialBase &>(theMaterial), theViewport);
             CHECK_OGL_ERROR;
         }
 

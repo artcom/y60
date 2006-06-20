@@ -55,8 +55,8 @@ namespace y60 {
     }
 
     void
-    FFShader::activate(MaterialBase & theMaterial) {
-        GLShader::activate(theMaterial);
+    FFShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
+        GLShader::activate(theMaterial, theViewport);
 		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         if (theMaterial.getLightingModel() != UNLIT) {
             glMaterialfv(GL_FRONT, GL_DIFFUSE,  myMaterialPropFacade->get<MaterialDiffuseTag>().begin());

@@ -170,7 +170,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
             myMover.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
         }
         if (!theAltFlag) {
-            _myDebugVisual.onKey(theKey, theKeyState);
+            _myDebugVisual.onKey(theKey, theKeyState, theShiftFlag);
             self.getLightManager().onKey(theKey, theKeyState, theShiftFlag);
             _myAnimationManager.onKey(theKey, theKeyState, theShiftFlag);
             _myConfigurator.onKey(theKey, theKeyState, theShiftFlag);

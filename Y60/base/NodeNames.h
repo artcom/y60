@@ -198,6 +198,7 @@ namespace y60 {
     static const char * VIEWPORT_LIGHTING_ATTRIB    = "lighting";
     static const char * VIEWPORT_FLATSHADING_ATTRIB = "flatshading";
     static const char * VIEWPORT_TEXTURING_ATTRIB   = "texturing";
+    static const char * VIEWPORT_GLOW_ATTRIB        = "glow";
     static const char * VIEWPORT_CULLING_ATTRIB     = "culling";
     static const char * VIEWPORT_DEBUGCULLING_ATTRIB= "debugculling";
     static const char * VIEWPORT_FRUSTUM_ATTRIB     = "frustum";

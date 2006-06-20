@@ -48,6 +48,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ViewportCullingTag,         bool,          VIEWPORT_CULLING_ATTRIB,         true);
     DEFINE_ATTRIBUT_TAG(ViewportDebugCullingTag,    bool,          VIEWPORT_DEBUGCULLING_ATTRIB,    false);
     DEFINE_ATTRIBUT_TAG(ViewportTexturingTag,       bool,          VIEWPORT_TEXTURING_ATTRIB,       true);
+    DEFINE_ATTRIBUT_TAG(ViewportDrawGlowTag,        bool,          VIEWPORT_GLOW_ATTRIB,            false);
     DEFINE_ATTRIBUT_TAG(ViewportDrawNormalsTag,     bool,          VIEWPORT_DRAWNORMALS_ATTRIB,     false);
     DEFINE_ATTRIBUT_TAG(ViewportFrustumTag,         asl::Frustum,  VIEWPORT_FRUSTUM_ATTRIB,         TYPE());
 
@@ -67,6 +68,7 @@ namespace y60 {
 		public ViewportCullingTag::Plug,
 		public ViewportDebugCullingTag::Plug,
         public ViewportDrawNormalsTag::Plug,
+        public ViewportDrawGlowTag::Plug,
         public dom::DynamicAttributePlug<ViewportTopTag, Viewport>,
         public dom::DynamicAttributePlug<ViewportLeftTag, Viewport>,
         public dom::DynamicAttributePlug<ViewportHeightTag, Viewport>,
@@ -90,6 +92,7 @@ namespace y60 {
                   ViewportTexturingTag::Plug(theNode),
                   ViewportCullingTag::Plug(theNode),
                   ViewportDebugCullingTag::Plug(theNode),
+                  ViewportDrawGlowTag::Plug(theNode),
                   ViewportDrawNormalsTag::Plug(theNode),
                   dom::DynamicAttributePlug<ViewportTopTag, Viewport>(this, &Viewport::getTop),
                   dom::DynamicAttributePlug<ViewportLeftTag, Viewport>(this, &Viewport::getLeft),

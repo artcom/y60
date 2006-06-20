@@ -31,6 +31,7 @@ namespace y60 {
     static const char * LINESMOOTH_PROPERTY        = "linesmooth";
     static const char * BLENDFUNCTION_PROPERTY     = "blendfunction";
     static const char * BLENDEQUATION_PROPERTY     = "blendequation";
+    static const char * GLOW_PROPERTY              = "glow";
     static const char * POINTSIZE_PROPERTY         = "pointsize"; // PointSize, PointSizeMin, PointSizeMax 
                                                                   // (last two work with attenuation)
     static const char * POINTATTENUATION_PROPERTY  = "pointattenuation"; // v[0] + v[1] * d + v[2] * d ^ 2;

@@ -1048,6 +1048,11 @@ Debug culling is disabled by default.</xs:documentation>
                     enabled, a small line is draw for each vertex to visualize its normal.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="glow" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>Turns rendering of glow on/off.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
             <xs:sequence minOccurs="0" maxOccurs="unbounded">
                 <xs:element ref="underlays">
                     <xs:annotation>

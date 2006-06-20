@@ -186,6 +186,10 @@ DEF_PROC_ADDRESS( PFNGLVERTEXARRAYRANGENVPROC, glVertexArrayRangeNV );
 
 DEF_PROC_ADDRESS( PFNGLBLENDEQUATIONPROC, glBlendEquation );
 #define glBlendEquation _ac_glBlendEquation
+DEF_PROC_ADDRESS( PFNGLBLENDFUNCSEPARATEPROC, glBlendFuncSeparate );
+#define glBlendFuncSeparate _ac_glBlendFuncSeparate
+DEF_PROC_ADDRESS( PFNGLBLENDCOLORPROC, glBlendColor );
+#define glBlendColor _ac_glBlendColor
 
 //texture compression
 DEF_PROC_ADDRESS( PFNGLCOMPRESSEDTEXIMAGE1DARBPROC, glCompressedTexImage1DARB );

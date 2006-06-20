@@ -32,6 +32,7 @@
 #include <y60/PropertyNames.h>
 #include <y60/DataTypes.h>
 #include <y60/Body.h>
+#include <y60/Viewport.h>
 
 #include <y60/property_functions.h>
 #include <y60/glExtensions.h>
@@ -156,7 +157,7 @@ namespace y60 {
     }
 
     void
-    GLShader::activate(MaterialBase & theMaterial) {
+    GLShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
         //AC_DEBUG << "GLShader::activate " << theMaterial.getName();
         MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
@@ -207,7 +208,14 @@ namespace y60 {
             BlendFunction myDstFunc = BlendFunction( asl::getEnumFromString(myBlendFunction[1],
                                                                             BlendFunctionStrings));
 
-            glBlendFunc(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc));
+            if (theViewport.get<ViewportDrawGlowTag>()) {
+                float myGlow = myMaterialPropFacade->get<GlowTag>();
+                glBlendFuncSeparate(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc), 
+                        GL_CONSTANT_ALPHA, GL_ZERO);
+                glBlendColor(1.0f,1.0f,1.0f, myGlow);
+            } else {
+                glBlendFunc(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc)); 
+            }
         } else {
             throw ShaderException(string("Blendfunction for material '") + theMaterial.get<NameTag>() + " has "
                     + asl::as_string(myBlendFunction.size()) + " elements. Expected two.", PLUS_FILE_LINE);

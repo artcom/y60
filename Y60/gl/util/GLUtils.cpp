@@ -785,6 +785,12 @@ void * aglGetProcAddress (char * pszProc)
 #endif
 
         SET_PROC_ADDRESS( PFNGLBLENDEQUATIONPROC, glBlendEquation );
+        if (queryOGLExtension("GL_EXT_blend_func_separate")) {
+            SET_PROC_ADDRESS( PFNGLBLENDFUNCSEPARATEPROC, glBlendFuncSeparate );
+        }
+        if (queryOGLExtension("GL_EXT_blend_color")) {
+            SET_PROC_ADDRESS( PFNGLBLENDCOLORPROC, glBlendColor );
+        }
 
 #ifdef WIN32
         if (queryWGLExtension("WGL_EXT_swap_control")) {

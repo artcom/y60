@@ -71,13 +71,15 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
         }
     }
 
-    obj.onKey = function(theKey, theKeyState, theX, theY) {
+    obj.onKey = function(theKey, theKeyState, theShiftFlag) {
         if (!theKeyState) {
             return;
         }
         switch (theKey) {
             case 'g':
-                obj.showAllCoordinates(!_isEnabled);
+                if (theShiftFlag) {
+                    obj.showAllCoordinates(!_isEnabled);
+                }
                 break;
             case 'h':
             case 'H':
@@ -114,6 +116,6 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
 
     function printHelp() {
          print("Debug:");
-         print("    g    toggle coordinate system");
+         print("    G    toggle coordinate system");
     }
 }

@@ -60,7 +60,7 @@ namespace y60 {
             virtual void load(IShaderLibrary & theShaderLibrary) = 0;
 
             // will be called once per material change
-            virtual void activate(MaterialBase & theMaterial) {};
+            virtual void activate(MaterialBase & theMaterial, const Viewport & theViewport) {};
             virtual void enableTextures(const MaterialBase & theMaterial) {};
             virtual void disableTextures(const MaterialBase & theMaterial) {};
             virtual void deactivate(const y60::MaterialBase & theMaterial) {};

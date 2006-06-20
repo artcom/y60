@@ -192,8 +192,8 @@ namespace y60 {
     }
 
     void
-    CGShader::activate(MaterialBase & theMaterial) {
-        GLShader::activate(theMaterial);
+    CGShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
+        GLShader::activate(theMaterial, theViewport);
         if (_myVertexProgram) {
             _myVertexProgram->enableProfile();
         }
