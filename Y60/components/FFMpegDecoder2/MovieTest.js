@@ -94,8 +94,8 @@ function FFMpegTest(theArguments) {
         "setupPauseTest()",
         "setupPauseStopTest()",
         "setupStopPauseTest()",
-//        "setupSeekBackTest()",
-//        "setupSeekFwdTest()",
+        "setupSeekBackTest()",
+        "setupSeekFwdTest()",
             //                "setupLongTest(true)"
     ];
 
@@ -176,8 +176,8 @@ function FFMpegTest(theArguments) {
         window.swapInterval = 10;
         window.setTimeout("testPlaying", 1000);
         window.setTimeout("stopSwapInterval", 9000);
-        window.setTimeout("testStopped", 13000);
-        window.setTimeout("nextTest", 13100);
+        window.setTimeout("testStopped", 10000);
+        window.setTimeout("nextTest", 10100);
     }
 
     function setupStopTest() {
@@ -190,7 +190,7 @@ function FFMpegTest(theArguments) {
 
     function setupPauseTest() {
         setupTest("Play, Pause, Play again", "../FFMpegDecoder/testfiles/counter_short.mpg");
-        window.setTimeout("pause", 1000);
+        window.setTimeout("pause", 500);
         window.setTimeout("play", 2000);
         window.setTimeout("stop", 3000);
         window.setTimeout("nextTest", 4000);

@@ -22,6 +22,7 @@
 #include <asl/file_functions.h>
 
 #include <iostream>
+#include <stdlib.h>
 
 #define DB(x) //x
 #define DB2(x) //x
@@ -65,6 +66,8 @@ namespace y60 {
         _myFrameCache(SEMAPHORE_TIMEOUT), 
         _myFrameRecycler(SEMAPHORE_TIMEOUT),
         _myResampleContext(0),
+        _myNumFramesDecoded(0),
+        _myNumIFramesDecoded(0),
         _myReadEOF(false)
     {
     }
@@ -264,7 +267,11 @@ namespace y60 {
 
     void FFMpegDecoder2::readAudio() {
         AC_TRACE << "---- FFMpegDecoder2::readAudio:";
-        while (double(_myAudioSink->getBufferedTime()) < AUDIO_BUFFER_SIZE) {
+        double myDestBufferedTime = _myAudioSink->getBufferedTime()+2/getFrameRate();
+        if (myDestBufferedTime > AUDIO_BUFFER_SIZE) {
+            myDestBufferedTime = AUDIO_BUFFER_SIZE;
+        }
+        while (double(_myAudioSink->getBufferedTime()) < myDestBufferedTime) {
             AC_TRACE << "---- FFMpegDecoder2::readAudio: getBufferedTime=" 
                     << _myAudioSink->getBufferedTime();
 //            AC_DEBUG << "---- FFMpegDecoder2::readAudio: getPacket()";
@@ -359,11 +366,17 @@ namespace y60 {
                 }
 
                 if (myFrameCompleteFlag) {
-                    // The presentation timestamp is not always set by ffmpeg, so we calculate
-                    // it ourself. ffplay uses the same technique.
-                    _myNextPacketTimestamp += _myTimePerFrame;
+                    // The following line used to calculate the presentation timestamp
+                    // by hand, assuming that ffmpeg made errors in the calculation.
+                    // That breaks seeks, so I've removed it - uz.
+                    // _myNextPacketTimestamp += _myTimePerFrame;
+                    _myNextPacketTimestamp = (myPacket->dts-_myStartTimestamp);
 		            AC_TRACE << "---- add frame";
                     addCacheFrame(_myFrame, _myNextPacketTimestamp);
+                    _myNumFramesDecoded++;
+                    if (_myFrame->pict_type == FF_I_TYPE) {
+                        _myNumIFramesDecoded++;
+                    }
                     break;
                 }                 
             }
@@ -426,7 +439,6 @@ namespace y60 {
         while (_myFrameRecycler.size() < FRAME_CACHE_SIZE+1) {
             _myFrameRecycler.push_back(FrameCache::VideoFramePtr(new FrameCache::VideoFrame(myBufferSize)));
         }
-        _myFrameCache.push_back(FrameCache::VideoFramePtr(new FrameCache::VideoFrame(myBufferSize)));
     }
 
     void
@@ -437,7 +449,9 @@ namespace y60 {
     }
     
     double
-    FFMpegDecoder2::readFrame(double theTime, unsigned /*theFrame*/, dom::ResizeableRasterPtr theTargetRaster) {
+    FFMpegDecoder2::readFrame(double theTime, unsigned /*theFrame*/, 
+            dom::ResizeableRasterPtr theTargetRaster) 
+    {
         AC_DEBUG << "FFMpegDecoder2::readFrame, Time wanted=" << theTime;
         ASSURE(!getEOF());
         if (theTargetRaster == 0) {
@@ -445,39 +459,62 @@ namespace y60 {
         }
         try {
             FrameCache::VideoFramePtr myVideoFrame(0);
-            if (getPlayMode() != y60::PLAY_MODE_PLAY) {
+            if (getPlayMode() == y60::PLAY_MODE_STOP) {
                 AC_DEBUG << "readFrame: not playing.";
                 return theTime;
             }
             double myFrameTime = _myStartTimestamp/_myTimeUnitsPerSecond + theTime;
-            AC_TRACE << "Time=" << theTime << " - Reading FrameTimestamp: " << myFrameTime << " from Cache.";
-            {
-                for (;;) {
-                    myVideoFrame = _myFrameCache.pop_front();
-                    AC_DEBUG << "readFrame, FrameTime=" << myVideoFrame->getTimestamp() 
-                            << ", Calculated frame #=" << myVideoFrame->getTimestamp()*_myFrameRate
-                            << ", Cache size=" << _myFrameCache.size();
-                    double myTimeDiff = abs(myFrameTime - myVideoFrame->getTimestamp());
-                    AC_DEBUG << "TimeDiff: " << myTimeDiff;
-    				if (myTimeDiff <= 0.5/_myFrameRate || _myFrameCache.size() == 0) {
-                        AC_DEBUG << "frame accepted";
-                        _myFrameCache.push_front(myVideoFrame);
-                        break;
-                    } else {
-                        AC_DEBUG << "dropping frame";
-                        _myFrameRecycler.push_back(myVideoFrame);
+            AC_TRACE << "Time=" << theTime << " - Reading FrameTimestamp: " << myFrameTime 
+                    << " from Cache.";
+            if (shouldSeek(_myFrameCache.front()->getTimestamp(), theTime)) {
+
+                AC_DEBUG << "Seek: Joining FFMpegDecoder Thread";
+                join();
+                if (_myAudioSink) {
+                    _myAudioSink->stop();   
+                }
+                _myFrameRecycler.close();
+                _myDemux->clearPacketCache();
+                _myFrameCache.clear();
+                _myFrameCache.reset();
+                createPacketCache();
+                
+                int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, 
+                        int64_t(theTime*_myTimeUnitsPerSecond)+_myStartTimestamp,
+                        AVSEEK_FLAG_BACKWARD);
+                decodeFrame();
+                if (_myAStream && getAudioFlag())
+                {
+                    //            AC_INFO << "Start Audio";
+                    _myAudioSink->setCurrentTime(theTime);
+                    if (getState() == RUN) {
+                        readAudio();
+                        _myAudioSink->play();
                     }
                 }
+
+                AC_DEBUG << "Forking FFMpegDecoder Thread";
+                PosixThread::fork();
             }
-			AC_TRACE << "readFrame trying to acquire lock";
+            
+            for (;;) {
+                myVideoFrame = _myFrameCache.pop_front();
+                AC_DEBUG << "readFrame, FrameTime=" << myVideoFrame->getTimestamp() 
+                    << ", Calculated frame #=" << myVideoFrame->getTimestamp()*getFrameRate()
+                    << ", Cache size=" << _myFrameCache.size();
+                double myTimeDiff = abs(myFrameTime - myVideoFrame->getTimestamp());
+                AC_DEBUG << "TimeDiff: " << myTimeDiff;
+                if (myTimeDiff <= 0.5/getFrameRate() || _myFrameCache.size() == 0) {
+                    _myFrameCache.push_front(myVideoFrame);
+                    break;
+                } else {
+                    _myFrameRecycler.push_back(myVideoFrame);
+                }
+            }
             AutoLocker<ThreadLock> myLock(_myLock);
-			AC_TRACE << "readFrame acquired lock";
             if (_myReadEOF && _myFrameCache.size() <= 1) {
-                AC_TRACE << "Readframe: EOF Write down";
                 _myReadEOF = false;
-                AC_TRACE << "Setting Movie to EOF";
                 setEOF(true);
-				AC_TRACE << "readFrame (1) release lock";
                 return theTime;
             }
 
@@ -492,9 +529,7 @@ namespace y60 {
                 AC_DEBUG << "readFrame, empty frame.";
                 memset(theTargetRaster->pixels().begin(), 0, theTargetRaster->pixels().size());
             }
-            AC_TRACE << "ReadFrame ending.";
             getMovie()->set<CacheSizeTag>(_myFrameCache.size());
-            AC_TRACE << "ReadFrame, timestamp=" << myVideoFrame->getTimestamp();
 
 /*
             // Hack to correct the frame count in case the movie itself contains a bogus frame
@@ -503,7 +538,6 @@ namespace y60 {
                 getMovie()->set<FrameCountTag>(int(myVideoFrame->getTimestamp()*getFrameRate()+1));
             }
 */            
-			AC_TRACE << "readFrame (2) release lock";
         } catch (asl::ThreadSemaphore::ClosedException &) {
             AC_WARNING << "Semaphore Destroyed while in readframe";
             return theTime;
@@ -554,8 +588,8 @@ namespace y60 {
                     yield();
                 }
             } catch (asl::ThreadSemaphore::ClosedException &) {
+                // This should never happen.
                 AC_WARNING << "---- Semaphore destroyed while in run. Terminating Thread.";
-                // Be sure we don't have a lock acquired here.
                 return;
             }
             if (_myAStream && getAudioFlag())
@@ -637,8 +671,9 @@ namespace y60 {
         } else {
 	        myMovie->set<FrameCountTag>(int(_myFrameRate * (_myVStream->duration
                     / (double) _myTimeUnitsPerSecond)));
-            AC_TRACE << "FFMpegDecoder2::setupVideo(): _myVStream->duration=" << _myVStream->duration 
-                    << ", _myTimeUnitsPerSecond=" << _myTimeUnitsPerSecond;
+            AC_TRACE << "FFMpegDecoder2::setupVideo(): _myVStream->duration=" 
+                    << _myVStream->duration << ", _myTimeUnitsPerSecond=" 
+                    << _myTimeUnitsPerSecond;
         }
         AC_INFO << "FFMpegDecoder2::setupVideo() " << theFilename << " fps=" 
                 << _myFrameRate << " framecount=" << getFrameCount();
@@ -650,7 +685,8 @@ namespace y60 {
         AVPacket myPacket;
         bool myEndOfFileFlag = (av_read_frame(_myFormatContext, &myPacket) < 0);
         //_myFirstTimeStamp = myPacket.dts;
-        AC_TRACE << "FFMpegDecoder2::setupVideo() - First packet has timestamp: " << myPacket.dts;
+        AC_TRACE << "FFMpegDecoder2::setupVideo() - First packet has timestamp: " 
+                << myPacket.dts;
         av_free_packet(&myPacket);
         avcodec_flush_buffers(_myVStream->codec);
 
@@ -708,4 +744,23 @@ namespace y60 {
             AC_FATAL << "---- Semaphore Timeout";
         }
     }
+
+    // Uses a heuristic based on the number of I-Frames in the video to determine
+    // if the two times are far enough apart to warrant a seek.
+    // TODO: Test this with lots of different videos.
+    bool FFMpegDecoder2::shouldSeek(double theCurrentTime, double theDestTime) {
+        int myDistance = int((theDestTime-theCurrentTime)*getFrameRate());
+/*
+        cerr << "Dest=" << theDestTime << ", Curr=" << theCurrentTime 
+                << ", myDistance=" << myDistance << endl;
+        cerr << "_myNumFramesDecoded=" << _myNumFramesDecoded << ", _myNumIFramesDecoded="
+                << _myNumIFramesDecoded << endl;
+*/                
+        if (_myNumIFramesDecoded < 2) {
+            return myDistance>100 || myDistance < -1;
+        } else {
+            return myDistance>2*(_myNumFramesDecoded/_myNumIFramesDecoded) || myDistance < -1;
+        }
+    }
+    
 }

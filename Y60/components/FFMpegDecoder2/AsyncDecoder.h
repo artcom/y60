@@ -36,9 +36,9 @@ namespace y60 {
     class AsyncDecoder : public MovieDecoderBase {
         public:
             AsyncDecoder() :
-                _myState(STOP)
+                _myState(STOP),
+                _myLastAudioTime(0)
             {}
-
 
             /**
              * @return true if the file currently decoded has audio
@@ -60,8 +60,22 @@ namespace y60 {
                     AC_TRACE << "No Audio returning " << MovieDecoderBase::getMovieTime(theSystemTime);
                     return MovieDecoderBase::getMovieTime(theSystemTime);
                 } else {
-                    AC_TRACE << " returning audio time " << _myAudioSink->getCurrentTime();
-                    return _myAudioSink->getCurrentTime();
+                    if (_myAudioSink->getState() == asl::HWSampleSink::STOPPED &&
+                            getState() != STOP)
+                    {
+                        // We only get here if video is running way behind audio, resulting in
+                        // the AudioSink being stopped and the video still running. In that
+                        // case, we return a time just after the last audio time that was 
+                        // reported. This is just after the last frame and causes everything
+                        // to be played back.
+                        AC_DEBUG << "AsyncDecoder::getMovieTime: audio eof, returning "
+                                << _myLastAudioTime+0.5;
+                        return _myLastAudioTime+0.5;
+                    } else {
+                        AC_TRACE << " returning audio time " << _myAudioSink->getCurrentTime();
+                        _myLastAudioTime = _myAudioSink->getCurrentTime();
+                        return _myAudioSink->getCurrentTime();
+                    }
                 }
             }
 
@@ -88,7 +102,7 @@ namespace y60 {
              * Resumes from pause
              */
             void resumeMovie(double theStartTime) {
-                AC_DEBUG << "resumeMovie";
+                AC_DEBUG << "AsyncDecoder::resumeMovie";
                 MovieDecoderBase::resumeMovie(theStartTime);
                 if (_myAudioSink) {            
                     _myAudioSink->play();
@@ -137,10 +151,11 @@ namespace y60 {
             }
             
         protected:
-            asl::HWSampleSinkPtr  _myAudioSink;
+            asl::HWSampleSinkPtr _myAudioSink;
 
         private:
-            DecoderState      _myState;
+            DecoderState _myState;
+            double _myLastAudioTime;
 
     };
 }

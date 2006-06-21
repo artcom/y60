@@ -133,12 +133,12 @@ namespace y60 {
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
         void copyFrame(FrameCache::VideoFramePtr theVideoFrame, 
                 dom::ResizeableRasterPtr theTargetRaster);
+        bool shouldSeek(double theCurrentTime, double theDestTime);
 
         AVFormatContext * _myFormatContext;
 
         int _myVStreamIndex;
         AVStream * _myVStream;
-        int64_t _myStartTimestamp;
 
         int _myAStreamIndex;
         AVStream * _myAStream;
@@ -149,6 +149,7 @@ namespace y60 {
 
         DemuxPtr _myDemux;
         
+        int64_t _myStartTimestamp;
         int64_t _myNextPacketTimestamp;
         int64_t _myTimePerFrame;
         int _myDestinationPixelFormat;
@@ -157,6 +158,9 @@ namespace y60 {
         static asl::Block _mySamples;
         static asl::Block _myResampledSamples;
 
+        int _myNumFramesDecoded;
+        int _myNumIFramesDecoded;
+        
         //XXX: Since time_base is specified per stream by ffmpeg, we should really be 
         //     calculating this per stream and not per file.
         int64_t _myTimeUnitsPerSecond;
