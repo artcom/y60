@@ -72,7 +72,7 @@ namespace y60 {
                                 << _myLastAudioTime+0.5;
                         return _myLastAudioTime+0.5;
                     } else {
-                        AC_TRACE << " returning audio time " << _myAudioSink->getCurrentTime();
+                        AC_DEBUG << " returning audio time " << _myAudioSink->getCurrentTime();
                         _myLastAudioTime = _myAudioSink->getCurrentTime();
                         return _myAudioSink->getCurrentTime();
                     }

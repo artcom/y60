@@ -499,11 +499,11 @@ namespace y60 {
             
             for (;;) {
                 myVideoFrame = _myFrameCache.pop_front();
-                AC_DEBUG << "readFrame, FrameTime=" << myVideoFrame->getTimestamp() 
-                    << ", Calculated frame #=" << myVideoFrame->getTimestamp()*getFrameRate()
-                    << ", Cache size=" << _myFrameCache.size();
+//                AC_DEBUG << "FFMpegDecoder2::readFrame, FrameTime=" 
+//                    << myVideoFrame->getTimestamp() 
+//                    << ", Calculated frame #=" << myVideoFrame->getTimestamp()*getFrameRate()
+//                    << ", Cache size=" << _myFrameCache.size();
                 double myTimeDiff = abs(myFrameTime - myVideoFrame->getTimestamp());
-                AC_DEBUG << "TimeDiff: " << myTimeDiff;
                 if (myTimeDiff <= 0.5/getFrameRate() || _myFrameCache.size() == 0) {
                     _myFrameCache.push_front(myVideoFrame);
                     break;
@@ -732,7 +732,7 @@ namespace y60 {
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, int64_t theTimestamp) {
 		AC_TRACE << "---- try to add frame at " << theTimestamp;
         try {
-            AC_DEBUG << "---- frame recycler size=" << _myFrameRecycler.size();
+//            AC_DEBUG << "---- frame recycler size=" << _myFrameRecycler.size();
             FrameCache::VideoFramePtr myVideoFrame = _myFrameRecycler.pop_front();
             myVideoFrame->setTimestamp(theTimestamp/(double)_myTimeUnitsPerSecond);
             convertFrame(theFrame, myVideoFrame->getBuffer());
