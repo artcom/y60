@@ -262,6 +262,16 @@ namespace jslib {
     }
 
     static JSBool
+    getPosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+    {
+        DOC_BEGIN("Returns the position along the spline for a given distance. It returns the last point on the spline, if the distance is greater than the spline length");
+        DOC_PARAM("theDistance", "The distance along the spline (in meter), where to get the point from.", DOC_TYPE_FLOAT);
+        DOC_RVAL("Position on the Spline.", DOC_TYPE_VECTOR3F);
+        DOC_END;
+        return Method<JSBSpline::NATIVE>::call(&JSBSpline::NATIVE::getPosition, cx, obj, argc, argv, rval);
+    }
+
+    static JSBool
     getResult(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     {
         DOC_BEGIN("Returns sampled points.");
@@ -287,6 +297,7 @@ namespace jslib {
             {"calculate", calculate, 3},
             {"evaluate", evaluate, 3},
             {"getArcLength", getArcLength, 0},
+            {"getPosition", getPosition, 1},
             {"getResult", getResult, 0},
             {0}
         };
