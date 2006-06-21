@@ -194,6 +194,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
 
     var _mySceneViewer      = theSceneViewer;
     var _mySettings         = null;
+    var _mySettingsFile     = null;
     var _myOriginalSettings = null;
     var _myCurrentSection   = null;
     var _myCurrentSetting   = null;
@@ -204,10 +205,11 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
 
 
     function setup(obj, theSceneViewer, theSettingsFile) {
-        if (fileExists(theSettingsFile)) {
-            print("Parsing settings from '" + theSettingsFile + "'");
+        _mySettingsFile = theSettingsFile;
+        if (fileExists(_mySettingsFile)) {
+            print("Parsing settings from '" + _mySettingsFile + "'");
             var mySettingsDom = new Node();
-            mySettingsDom.parseFile(theSettingsFile);
+            mySettingsDom.parseFile(_mySettingsFile);
             _mySettings = mySettingsDom.firstChild;
             var myHostSettingsFile = "settings-" + hostname() + ".xml";
             if (fileExists(myHostSettingsFile)) {
@@ -218,6 +220,8 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             _myCurrentSection   = _mySettings.firstChild;
             _myCurrentSetting   = new Setting(_myCurrentSection.firstChild);
             _myOriginalSettings = _mySettings.cloneNode(true);
+        } else {
+            print("Settings-file not found");    
         }
     }
 
@@ -249,7 +253,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         if (theSection) {
             var mySection = _mySettings.childNode(theSection);
             if (!mySection) {
-                throw new Exception("Section " + theSection + " does not exist in " + theSettingsFile, fileline());
+                throw new Exception("Section " + theSection + " does not exist in " + _mySettingsFile, fileline());
             }
             
             theListener.onUpdateSettings(mySection);
@@ -320,8 +324,8 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
                 if (theShiftFlag) {
                     restoreSettings();
                 } else {
-                    _mySettings.saveFile(theSettingsFile);
-                    displayMessage("Settings saved to " + theSettingsFile);
+                    _mySettings.saveFile(_mySettingsFile);
+                    displayMessage("Settings saved to " + _mySettingsFile);
                 }
                 break;
             case "h":
