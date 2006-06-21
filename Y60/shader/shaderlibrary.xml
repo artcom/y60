@@ -995,6 +995,7 @@
                 <vector4f name="gravity">[0,0,0,0]</vector4f>
                 <float name="time">0.0</float> 
                 <float name="stoptime">10000000000000.0</float> 
+                <float name="timetolive">3.0</float> 
             </properties>
             <vertexparameters>
                  <vector4f name="position"/>

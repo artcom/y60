@@ -21,11 +21,12 @@ vert2frag mainVertex(float4 thePosition   : POSITION,
                      uniform float4x4 GL_TEXTURE,
                      uniform float4 gravity,
                      uniform float time,
-                     uniform float stoptime)
+                     uniform float stoptime,
+                     uniform float timetolive)
 {
     // theParameters.x = the lifetime of a particle
     // theParameters.y = the size of a particle
-    float myTimeToLive = theParameters.x;
+    // float myTimeToLive = theParameters.x;
     float mySize       = theParameters.y;
     float mySpeed      = theParameters.z;
 
@@ -34,17 +35,17 @@ vert2frag mainVertex(float4 thePosition   : POSITION,
     // gravity -> x,y,z direction, w strength
     // calculate the current position of the particle using 
     // theTime.x -> frametime in seconds
-    float myStartTime = theDirection.w;    
+    float myStartTime = theDirection.w * timetolive;    
     float myPresentTime = myStartTime + time;
     float myStopTime    = myStartTime + stoptime;
 
     // wrap around
-    if (myPresentTime > myTimeToLive) {
-        float myOvertime = myPresentTime / myTimeToLive;
+    if (myPresentTime > timetolive) {
+        float myOvertime = myPresentTime / timetolive;
         float myFloor = floor(myOvertime);
-        myPresentTime -= myTimeToLive*myFloor;
+        myPresentTime -= timetolive*myFloor;
     
-        float myStopFloor = floor(myStopTime / myTimeToLive);
+        float myStopFloor = floor(myStopTime / timetolive);
         if (myFloor > myStopFloor) {
             myPresentTime = -1;
         }
@@ -65,7 +66,7 @@ vert2frag mainVertex(float4 thePosition   : POSITION,
         OUT.position = mul(GL_MODELVIEW_PROJECTION, myPosition);
     }
 
-    OUT.time.x = myPresentTime / myTimeToLive;
+    OUT.time.x = myPresentTime / timetolive;
     pointSize = -8.0 * time * time + 8*time;
     
     return OUT;
