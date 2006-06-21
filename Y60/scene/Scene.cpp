@@ -631,7 +631,6 @@ namespace y60 {
                 DB(AC_TRACE << " CANVASES");
             }
             if (myAnimationsElement->nodeVersion() > _myPreviousDomVersion) {
-                myUpdateFlags|=Scene::ANIMATIONS_LOAD;
                 myUpdateFlags|=Scene::ANIMATIONS;
                 DB(AC_TRACE << " ANIMATIONS");
             }
