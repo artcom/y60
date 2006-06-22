@@ -55,8 +55,8 @@ namespace y60 {
         _myFormatContext(0), 
         _myFrame(0),
         _myVStreamIndex(-1), 
-        _myVStream(0), 
-        _myStartTimestamp(0),
+        _myVStream(0),
+        _myStartTimestamp(-1),
         _myAStreamIndex(-1), 
         _myAStream(0),
         _myDemux(0),
@@ -186,6 +186,7 @@ namespace y60 {
         if (_myAStream) {
             avcodec_flush_buffers(_myAStream->codec);
         }
+
         decodeFrame();
         if (_myAStream && getAudioFlag())
         {
@@ -337,11 +338,6 @@ namespace y60 {
     bool FFMpegDecoder2::decodeFrame() {
         AC_DEBUG << "---- FFMpegDecoder2::decodeFrame";
         AVPacket * myPacket = 0;
-        
-        int64_t myStartTime = 0;
-        if (_myVStream->start_time != AV_NOPTS_VALUE) {
-            myStartTime = _myVStream->start_time;
-        } 
 
         // until a frame is found or eof
         bool myEndOfFileFlag = false;
@@ -351,11 +347,12 @@ namespace y60 {
                 av_free_packet(myPacket);
                 delete myPacket;
             }
-            myPacket = _myDemux->getPacket(_myVStreamIndex); 
+            myPacket = _myDemux->getPacket(_myVStreamIndex);
             if (myPacket == 0) {
                 myEndOfFileFlag = true;
                 AC_DEBUG << "---- FFMpegDecoder2::decodeFrame: eof";
             } else {
+                AC_DEBUG << "myPacket->dts=" << myPacket->dts;
                 int myFrameCompleteFlag = 0;
                 int myLen = avcodec_decode_video(_myVStream->codec, _myFrame, 
                         &myFrameCompleteFlag, myPacket->data, myPacket->size);
@@ -366,6 +363,10 @@ namespace y60 {
                 }
 
                 if (myFrameCompleteFlag) {
+                    if (_myStartTimestamp == -1) {
+                        _myStartTimestamp = myPacket->dts;
+                        AC_DEBUG << "Set StartTimestamp to packet timestamp, = " << _myStartTimestamp;
+                    }
                     // The following line used to calculate the presentation timestamp
                     // by hand, assuming that ffmpeg made errors in the calculation.
                     // That breaks seeks, so I've removed it - uz.
@@ -463,7 +464,10 @@ namespace y60 {
                 AC_DEBUG << "readFrame: not playing.";
                 return theTime;
             }
-            double myFrameTime = _myStartTimestamp/_myTimeUnitsPerSecond + theTime;
+            double myFrameTime = theTime;
+            if (_myStartTimestamp != -1) {
+                myFrameTime += _myStartTimestamp/_myTimeUnitsPerSecond; 
+            }
             AC_TRACE << "Time=" << theTime << " - Reading FrameTimestamp: " << myFrameTime 
                     << " from Cache.";
             if (shouldSeek(_myFrameCache.front()->getTimestamp(), theTime)) {
@@ -499,10 +503,10 @@ namespace y60 {
             
             for (;;) {
                 myVideoFrame = _myFrameCache.pop_front();
-//                AC_DEBUG << "FFMpegDecoder2::readFrame, FrameTime=" 
-//                    << myVideoFrame->getTimestamp() 
-//                    << ", Calculated frame #=" << myVideoFrame->getTimestamp()*getFrameRate()
-//                    << ", Cache size=" << _myFrameCache.size();
+                AC_DEBUG << "FFMpegDecoder2::readFrame, FrameTime=" 
+                    << myVideoFrame->getTimestamp() 
+                    << ", Calculated frame #=" << myVideoFrame->getTimestamp()*getFrameRate()
+                    << ", Cache size=" << _myFrameCache.size();
                 double myTimeDiff = abs(myFrameTime - myVideoFrame->getTimestamp());
                 if (myTimeDiff <= 0.5/getFrameRate() || _myFrameCache.size() == 0) {
                     _myFrameCache.push_front(myVideoFrame);
@@ -559,7 +563,7 @@ namespace y60 {
         int64_t mySeekTimestamp = AV_NOPTS_VALUE;
 
         // decoder loop
-        while (!shouldTerminate()) {
+        while (!shouldTerminate() && !getReadEOF()) {
 			AC_TRACE << "---- FFMpegDecoder2::loop";
             if (_myFrameCache.size() >= FRAME_CACHE_SIZE) {
                 // do nothing...
@@ -567,25 +571,15 @@ namespace y60 {
                 yield();
                 continue;
             }
-			AC_TRACE << "---- FFMpeg-Thread acquiring lock";
-	        _myLock.lock();
-			AC_TRACE << "---- FFMpeg-Thread lock acquired.";
-            if (_myReadEOF) {
-				_myLock.unlock();
-                asl::msleep(500);
-				AC_TRACE << "---- EOF read.";
-                continue;
-            }
-			_myLock.unlock();
-
             AC_TRACE << "---- Updating cache";
             try {
                 if (!decodeFrame()) {
-					_myLock.lock();
-                    _myReadEOF = true;
-					_myLock.unlock();
+                    {
+                        AutoLocker<ThreadLock> myLock(_myLock);
+                        _myReadEOF = true;
+                    }
 					AC_DEBUG << "---- EOF Yielding Thread.";
-                    yield();
+                    continue;
                 }
             } catch (asl::ThreadSemaphore::ClosedException &) {
                 // This should never happen.
@@ -680,24 +674,7 @@ namespace y60 {
 
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
-
-        // Get first timestamp
-        AVPacket myPacket;
-        bool myEndOfFileFlag = (av_read_frame(_myFormatContext, &myPacket) < 0);
-        //_myFirstTimeStamp = myPacket.dts;
-        AC_TRACE << "FFMpegDecoder2::setupVideo() - First packet has timestamp: " 
-                << myPacket.dts;
-        av_free_packet(&myPacket);
-        avcodec_flush_buffers(_myVStream->codec);
-
-        // Get starttime
-        if (_myVStream->start_time != AV_NOPTS_VALUE) {
-            _myStartTimestamp = _myVStream->start_time;
-        } else {
-            _myStartTimestamp = 0;
-        }
-
-        AC_DEBUG << "FFMpegDecoder2::setupVideo() - Start timestamp: " << _myStartTimestamp;
+        _myStartTimestamp = -1;
         _myTimePerFrame = (int64_t)(_myTimeUnitsPerSecond/_myFrameRate);
     }
 
@@ -761,6 +738,11 @@ namespace y60 {
         } else {
             return myDistance>2*(_myNumFramesDecoded/_myNumIFramesDecoded) || myDistance < -1;
         }
+    }
+        
+    bool FFMpegDecoder2::getReadEOF() {
+        AutoLocker<ThreadLock> myLock(_myLock);
+        return _myReadEOF;
     }
     
 }

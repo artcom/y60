@@ -134,6 +134,7 @@ namespace y60 {
         void copyFrame(FrameCache::VideoFramePtr theVideoFrame, 
                 dom::ResizeableRasterPtr theTargetRaster);
         bool shouldSeek(double theCurrentTime, double theDestTime);
+        bool getReadEOF();
 
         AVFormatContext * _myFormatContext;
 
@@ -148,7 +149,7 @@ namespace y60 {
         AVFrame * _myFrame;
 
         DemuxPtr _myDemux;
-        
+       
         int64_t _myStartTimestamp;
         int64_t _myNextPacketTimestamp;
         int64_t _myTimePerFrame;
