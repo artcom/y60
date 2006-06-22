@@ -201,6 +201,8 @@ namespace y60 {
             _myFragmentProgram->enableProfile();
         }
         bindMaterialParams(theMaterial);
+
+        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
     }
 
     void
@@ -211,6 +213,8 @@ namespace y60 {
         if (_myFragmentProgram) {
             _myFragmentProgram->disableProfile();
         }
+        
+        glDisable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
     }
 
     void
