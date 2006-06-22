@@ -631,7 +631,7 @@ MaterialExporter::exportUnlitFeatures(const MFnMesh * theMesh, const MObject & t
                                      y60::MaterialBuilder & theBuilder,
                                      y60::SceneBuilder & theSceneBuilder)
 {
-    DB(AC_TRACE << "MaterialExporter::exportUnliFeatures()");
+    DB(AC_TRACE << "MaterialExporter::exportUnlitFeatures()");
     MStatus myStatus;
 
     try {
@@ -703,6 +703,14 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     //setPropertyValue<asl::Vector4f>(theBuilder.getNode(),"vector4f", y60::DIFFUSE_PROPERTY, asl::Vector4f(1.0, 1.0, 1.0, 1.0));
     setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", y60::AMBIENT_PROPERTY,
             asl::Vector4f(myAmbientColor.r, myAmbientColor.g, myAmbientColor.b, myAmbientColor.a));
+
+    float myGlowFactor = MFnLambertShader(theShaderNode).glowIntensity( & myStatus );
+    if (myStatus == MStatus::kFailure) {
+        throw ExportException("Could not get glow from node",
+                "MaterialExporter::exportLambertFeatures");
+    }
+    setPropertyValue<float>(theBuilder.getNode(), "float", y60::GLOW_PROPERTY, myGlowFactor);
+
 }
 
 void
