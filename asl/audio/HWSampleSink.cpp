@@ -286,7 +286,12 @@ void HWSampleSink::deliverData(AudioBufferBase& theBuffer) {
         _myVolumeFader->apply(theBuffer, _myFrameCount);
     }
     _myFrameCount += theBuffer.getNumFrames();
-    addFramesToTime(theBuffer.getNumFrames());
+    if (_myState != STOPPING_FADE_OUT) {
+        // Keep sample-accurate track of time spent playing. 
+        // In state STOPPING_FADE_OUT, time is set to 0 immediately. It stays 
+        // that way while in that state unless set from the outside (e.g. a seek happens).
+        addFramesToTime(theBuffer.getNumFrames());
+    }
 //    theBuffer.dumpSamples(cerr, 0, 512);
 /*
     // This is code to insert debug samples into a stream. By enabling this, you can 
