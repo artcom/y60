@@ -257,7 +257,7 @@ void PosixThread::fork () {
 
 void PosixThread::join () {
     if (!isActive()) {
-        AC_WARNING << "PosixThread::join() : thread not active" << endl;
+        AC_DEBUG << "PosixThread::join() : thread not active" << endl;
     }
     DB(AC_TRACE << "#INFO : PosixThread::join() called for thread id " <<getThreadID() << endl);
     void * myThreadRetVal=0;
