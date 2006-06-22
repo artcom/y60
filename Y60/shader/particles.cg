@@ -11,18 +11,20 @@
 struct vert2frag {
     float4 position : POSITION;
     float time      : TEXCOORD1;
+    float pointSize : PSIZE;
 }; 
 
 vert2frag mainVertex(float4 thePosition   : POSITION,
                      float4 theDirection  : TEXCOORD1,
                      float4 theParameters : TEXCOORD2,
-                     out float pointSize  : PSIZE,
+                     float pointSizeIn    : PSIZE,
                      uniform float4x4 GL_MODELVIEW_PROJECTION,
                      uniform float4x4 GL_TEXTURE,
                      uniform float4 gravity,
                      uniform float time,
                      uniform float stoptime,
-                     uniform float timetolive)
+                     uniform float timetolive,
+                     uniform float3 size)
 {
     // theParameters.x = the lifetime of a particle
     // theParameters.y = the size of a particle
@@ -67,7 +69,14 @@ vert2frag mainVertex(float4 thePosition   : POSITION,
     }
 
     OUT.time.x = myPresentTime / timetolive;
-    pointSize = -8.0 * time * time + 8*time;
+
+    float normZ = 1.0-(OUT.position.z / OUT.position.w);
+
+    // size.x = size, y=quad, z=lin
+    OUT.pointSize = size.x + size.x*size.y*normZ + size.x*size.z*(normZ*normZ) ;
+
+    if (OUT.pointSize < size.y ) OUT.pointSize = size.y;
+    if (OUT.pointSize > size.z ) OUT.pointSize = size.z;
     
     return OUT;
 }
