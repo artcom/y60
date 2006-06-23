@@ -35,7 +35,10 @@ public:
     };
 
     enum PropertyNumbers {
-        PROP_length = -100
+        PROP_start = -100,
+        PROP_end,        
+        PROP_starthandle,
+        PROP_endhandle
     };
 
     static JSFunctionSpec * Functions();

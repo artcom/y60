@@ -283,7 +283,10 @@ namespace jslib {
     JSPropertySpec * JSBSpline::Properties()
     {
         static JSPropertySpec myProperties[] = {
-            {"length", PROP_length, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
+            {"start", PROP_start, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
+            {"end", PROP_end, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
+            {"starthandle", PROP_starthandle, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
+            {"endhandle", PROP_endhandle, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
             {0}
         };
         return myProperties;
@@ -323,9 +326,18 @@ namespace jslib {
     JSBool
     JSBSpline::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         switch (theID) {
-        case PROP_length:
-            //*vp = as_jsval(cx, getNative().getArcLength());
-            return JS_TRUE;
+            case PROP_start:
+                *vp = as_jsval(cx, getNative().getStart());
+                return JS_TRUE;
+            case PROP_end:
+                *vp = as_jsval(cx, getNative().getEnd());
+                return JS_TRUE;
+            case PROP_starthandle:
+                *vp = as_jsval(cx, getNative().getStartHandle());
+                return JS_TRUE;
+            case PROP_endhandle:
+                *vp = as_jsval(cx, getNative().getEndHandle());
+                return JS_TRUE;
         }
         JS_ReportError(cx,"JSBSpline::getProperty: index %d out of range", theID);
         return JS_FALSE;
