@@ -17,6 +17,8 @@
 #include "TTFTextRenderer.h"
 #include "TTFFontInfo.h"
 
+#include <y60/Viewport.h>
+
 #include <asl/Ptr.h>
 #include <asl/Vector234.h>
 #include <asl/Box.h>
@@ -34,8 +36,7 @@ namespace y60 {
             TextRendererManager();
             virtual ~TextRendererManager();
             void setTTFRenderer(const TTFTextRendererPtr & theTTFRenderer);
-            void render(const asl::Matrix4f & theWindowMatrix);
-            void updateWindow(const unsigned int & _myWindowWidth, const unsigned int & _myWindowHeight);
+            void render(ViewportPtr theViewport);
             void addText(const asl::Vector2f & thePos, const std::string & theString,
                     const std::string & theFont);
             void setColor(const asl::Vector4f & theTextColor);
@@ -69,8 +70,6 @@ namespace y60 {
             BitmapTextRenderer      _myBitmapRenderer;
             TTFTextRendererPtr      _myTTFRenderer;
             std::vector<TextPtr>    _myTextSnippets;
-            unsigned int            _myWindowWidth;
-            unsigned int            _myWindowHeight;
     };
 
 } // namespace y60

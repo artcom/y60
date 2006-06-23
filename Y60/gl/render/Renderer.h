@@ -136,7 +136,6 @@ namespace y60 {
             void renderOverlays(const Viewport & theViewport,
                                 const std::string & theRootNodeName);
             void renderOverlay(const Viewport & theViewport, dom::NodePtr theOverlayNode, float theAlpha = 1);
-            void renderTextSnippets(ViewportPtr theViewport);
 
             void renderBox(const asl::Point3f & theLTF, const asl::Point3f & theRBF,
                            const asl::Point3f & theRTF, const asl::Point3f & theLBF,

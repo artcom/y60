@@ -203,22 +203,22 @@ namespace y60 {
         DBP(MAKE_SCOPE_TIMER(switchMaterial));
         DBP(COUNT(materialChange));
 
-        IShaderPtr myShader = theMaterial.getShader();
+        IShaderPtr myShader = theMaterial.getShader();    
         deactivatePreviousMaterial();
-
         {
             // activate new material
             DBP(MAKE_SCOPE_TIMER(activateShader));
 
             _myState->setLighting(theViewport.get<ViewportLightingTag>() && (theMaterial.getLightingModel() != UNLIT));
             CHECK_OGL_ERROR;
-            
+
             // [CH] TODO: Material should be const.
             // The renderer should just take the scene information and render it as it is.
             // Right now in Shader.activate() the material representation is updated.
             // The scene should be responsible for that.
             myShader->activate(const_cast<MaterialBase &>(theMaterial), theViewport);
-            CHECK_OGL_ERROR;
+            
+            CHECK_OGL_ERROR;             
         }
 
         VertexRegisterFlags myVertexRegisterFlags;
@@ -281,6 +281,7 @@ namespace y60 {
         if (_myState->getTexturing()) {
             myShader->enableTextures(theMaterial);
         }
+
         CHECK_OGL_ERROR;
 
         _myPreviousMaterial        = &theMaterial;
@@ -326,8 +327,7 @@ namespace y60 {
         const y60::Shape & myShape = theBodyPart.getShape();
         bool myBodyHasChanged = (_myPreviousBody != &myBody);
         DBP2(STOP_TIMER(renderBodyPart_pre));
-
-        DBP(START_TIMER(renderBodyPart_bodyChanged));
+        DBP(START_TIMER(renderBodyPart_bodyChanged));        
         if (myBodyHasChanged) {
             glPopMatrix();
 
@@ -436,7 +436,7 @@ namespace y60 {
         }
         CHECK_OGL_ERROR;
         DBP2(STOP_TIMER(renderBodyPart_render));
-
+        
         DBP2(START_TIMER(renderBodyPart_setupBoundingVolume));
         if (myRenderStyles[BOUNDING_VOLUME] || (_myBoundingVolumeMode & BV_SHAPE)) {
             const asl::Box3f & myBoundingBox = myShape.get<BoundingBoxTag>();
@@ -1134,24 +1134,17 @@ namespace y60 {
         glPopClientAttrib();
         glPopAttrib();  // GL_TEXTURE_BIT + GL_COLOR_BUFFER_BIT
 
-        if (_myBoundingVolumeMode & BV_HIERARCHY) {
-            renderBoundingBoxHierarchy(_myScene->getWorldRoot());
-        }
-
-        {
-            MAKE_SCOPE_TIMER(renderTextSnippets);
-            glPushAttrib(GL_ALL_ATTRIB_BITS);
-            //glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-            renderTextSnippets(theViewport);
-            //glPopClientAttrib();
-            glPopAttrib();
-        }
-
         // Set renderer into known state for drawing calls from js
         deactivatePreviousMaterial();
         _myPreviousMaterial = 0;
         _myState->setDepthWrites(true);
         _myState->setIgnoreDepth(false);
+        
+        if (_myBoundingVolumeMode & BV_HIERARCHY) {
+            renderBoundingBoxHierarchy(_myScene->getWorldRoot());
+        }
+
+        _myTextRendererManager.render(theViewport);        
     }
 
     void
@@ -1351,26 +1344,6 @@ namespace y60 {
         }
 
         return 0.0;
-    }
-
-    void
-    Renderer::renderTextSnippets(ViewportPtr theViewport) {
-        glActiveTexture(asGLTextureRegister(0));
-        glClientActiveTexture(asGLTextureRegister(0));
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        CHECK_OGL_ERROR;
-
-        _myTextRendererManager.updateWindow(theViewport->get<ViewportWidthTag>(),
-                theViewport->get<ViewportHeightTag>());
-
-        Matrix4f myRotationMatrix;
-        if (theViewport->get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
-            myRotationMatrix.makeZRotating(float(asl::PI_2));
-        } else {
-            myRotationMatrix.makeIdentity();
-        }
-
-        _myTextRendererManager.render(myRotationMatrix);
     }
 
     void

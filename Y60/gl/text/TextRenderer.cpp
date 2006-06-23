@@ -64,7 +64,7 @@ namespace y60 {
 
 
     void
-    TextRenderer::updateWindow(const unsigned int & theWindowWidth,
+    TextRenderer::setWindowSize(const unsigned int & theWindowWidth,
                                const unsigned int & theWindowHeight)
     {
         _myWindowWidth  = theWindowWidth;

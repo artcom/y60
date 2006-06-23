@@ -48,7 +48,7 @@ namespace y60 {
             virtual TextPtr createText(const asl::Vector2f & thePos,
                                        const std::string & theString,
                                        const std::string & theFont);
-            void updateWindow(const unsigned int & _myWindowWidth, const unsigned int & _myWindowHeight);
+            void setWindowSize(const unsigned int & _myWindowWidth, const unsigned int & _myWindowHeight);
             virtual bool haveFont(const std::string theFontName) = 0;
             virtual void renderText(TextPtr & theText) = 0;
             void setColor(const asl::Vector4f & theTextColor);

@@ -37,35 +37,49 @@ namespace y60 {
     }
 
     void
-    TextRendererManager::render(const asl::Matrix4f & theScreenMatrix) {
+    TextRendererManager::render(ViewportPtr theViewport) {
         if (_myTextSnippets.empty()) {
             return;
         }
-        DB(AC_TRACE << "TextRendererManager:: setup render pass" << endl);
         MAKE_SCOPE_TIMER(renderTextSnippets);
 
+        unsigned myWindowWidth = theViewport->get<ViewportWidthTag>();
+        unsigned myWindowHeight = theViewport->get<ViewportHeightTag>();
+        _myBitmapRenderer.setWindowSize(myWindowWidth, myWindowHeight);
+        if (_myTTFRenderer) {
+            _myTTFRenderer->setWindowSize(myWindowWidth, myWindowHeight);
+        }
+        
+        glPushAttrib(GL_ALL_ATTRIB_BITS);       
+        glActiveTexture(asGLTextureRegister(0));
+        glClientActiveTexture(asGLTextureRegister(0));
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        CHECK_OGL_ERROR;
+        
+        //glMatrixMode(GL_TEXTURE);
+        //glLoadIdentity();
+        
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        gluOrtho2D(0.0, double(_myWindowWidth), double(_myWindowHeight), 0.0);
+        gluOrtho2D(0.0, double(myWindowWidth), double(myWindowHeight), 0.0);
 
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
-
         Matrix4f myScreenMatrix;
-        myScreenMatrix.makeTranslating(Vector3f(-float(_myWindowWidth)/2, -float(_myWindowHeight)/2,0));
-        myScreenMatrix.postMultiply(theScreenMatrix);
-        myScreenMatrix.translate(Vector3f(float(_myWindowWidth)/2, float(_myWindowHeight)/2,0));
+        myScreenMatrix.makeTranslating(Vector3f(-float(myWindowWidth)/2, -float(myWindowHeight)/2,0));
+        if (theViewport->get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
+            Matrix4f myRotationMatrix;        
+            myRotationMatrix.makeZRotating(float(asl::PI_2));            
+            myScreenMatrix.postMultiply(myRotationMatrix);
+        }
+        myScreenMatrix.translate(Vector3f(float(myWindowWidth)/2, float(myWindowHeight)/2,0));
         glLoadMatrixf(static_cast<const GLfloat *>(myScreenMatrix.getData()));
-
-        // TODO: Workaround: switchMaterial enables vertex arrays for all vertex registers
-        // but overlays do not use arrays
 
         glDepthMask(GL_FALSE);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
-        DB(AC_TRACE << "TextRendererManager:: setup setup done" << endl);
-
+        
         for (unsigned myTextIndex=0; myTextIndex!=_myTextSnippets.size(); ++myTextIndex) {
             // TODO, refactor
             DB(AC_TRACE << "TextRendererManager:: rendering text #" << myTextIndex << endl);
@@ -78,18 +92,9 @@ namespace y60 {
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
-
+        
+        glPopAttrib();
         CHECK_OGL_ERROR;
-    }
-
-    void
-    TextRendererManager::updateWindow(const unsigned int & theWindowWidth, const unsigned int & theWindowHeight) {
-        _myWindowWidth  = theWindowWidth;
-        _myWindowHeight = theWindowHeight;
-        _myBitmapRenderer.updateWindow(theWindowWidth, theWindowHeight);
-        if (_myTTFRenderer) {
-            _myTTFRenderer->updateWindow(theWindowWidth, theWindowHeight);
-        }
     }
 
     TextRenderer &
