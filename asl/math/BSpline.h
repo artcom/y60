@@ -117,23 +117,29 @@ namespace asl {
         /**
          * Setup spline.
          * @param theStart Start point.
-         * @param theStartAnchor Start point anchor.
+         * @param theStartHandle Start point anchor.
          * @param theEnd End point.
-         * @param theEndAnchor End point anchor.
+         * @param theEndHandle End point anchor.
          */
         void setControlPoints(const Vector3<T> & theStart,
-                              const Vector3<T> & theStartAnchor,
+                              const Vector3<T> & theStartHandle,
                               const Vector3<T> & theEnd,
-                              const Vector3<T> & theEndAnchor)
+                              const Vector3<T> & theEndHandle)
         {
             // setup polynom coefficients
             for (unsigned i = 0; i < 3; ++i) {
                 _myCoeff[0][i] = theStart[i];
-                _myCoeff[1][i] = 3 * (theStartAnchor[i] - theStart[i]);
-                _myCoeff[2][i] = 3 * (theEndAnchor[i] - theStartAnchor[i]) - _myCoeff[1][i];
+                _myCoeff[1][i] = 3 * (theStartHandle[i] - theStart[i]);
+                _myCoeff[2][i] = 3 * (theEndHandle[i] - theStartHandle[i]) - _myCoeff[1][i];
                 _myCoeff[3][i] = theEnd[i] - theStart[i] - _myCoeff[1][i] - _myCoeff[2][i];
             }
+            
             clearResultCache();
+
+            _myStart       = theStart;
+            _myEnd         = theEnd;
+            _myStartHandle = theStartHandle;
+            _myEndHandle   = theEndHandle;
         }
 
         /**
@@ -157,6 +163,22 @@ namespace asl {
             Vector3<T> myEndHandle = thePoints[2] + myDir2;
 
             setControlPoints(thePoints[1], myStartHandle, thePoints[2], myEndHandle);
+        }
+
+        const Vector3<T> & getStart() const {
+            return _myStart;
+        }
+        
+        const Vector3<T> & getEnd() const {
+            return _myEnd;
+        }
+        
+        const Vector3<T> & getStartHandle() const {
+            return _myStartHandle;
+        }
+        
+        const Vector3<T> & getEndHandle() const {
+            return _myEndHandle;
         }
 
         /**
@@ -317,6 +339,12 @@ namespace asl {
         }
         
         Vector3<T> _myCoeff[4];
+        
+        Vector3<T> _myStart;
+        Vector3<T> _myEnd;
+        Vector3<T> _myStartHandle;
+        Vector3<T> _myEndHandle;
+
         
         // The sampled points
         std::vector< Vector3<T> > _myResult;
