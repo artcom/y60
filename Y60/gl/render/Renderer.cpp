@@ -505,7 +505,11 @@ namespace y60 {
                         break;
                 }
                 CHECK_OGL_ERROR;
-            }
+			} else {
+				throw RendererException(string("Body Part of shape: ") + theBodyPart.getShape().get<IdTag>() + 
+					" does not contain required vertexdata of role: " + 
+					getStringFromEnum(myParameter.getRole(), GLRegisterString), PLUS_FILE_LINE);
+			}
         }
 
         DBP2(
