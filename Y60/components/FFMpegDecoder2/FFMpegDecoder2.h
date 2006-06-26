@@ -100,9 +100,6 @@ namespace y60 {
         const char * getName() const { return "y60FFMpegDecoder2"; }
         
     private:
-        /**
-         * Thread run method.
-         */
         void run();
 
         void setupVideo(const std::string & theFilename);
@@ -114,8 +111,6 @@ namespace y60 {
         void readAudio();
         /**
          * Add theFrame to the framecache with the timestamp theTimestamp.
-         * @warn this method blocks until the cache has room to take the
-         *       given frame
          * @throws asl::ThreadSemaphore::ClosedException
          * @param theFrame frame to put into the cache
          * @param theTimestamp timestamp to use
@@ -134,6 +129,7 @@ namespace y60 {
         void copyFrame(FrameCache::VideoFramePtr theVideoFrame, 
                 dom::ResizeableRasterPtr theTargetRaster);
         bool shouldSeek(double theCurrentTime, double theDestTime);
+        void seek(double theDestTime);
         bool getReadEOF();
 
         AVFormatContext * _myFormatContext;

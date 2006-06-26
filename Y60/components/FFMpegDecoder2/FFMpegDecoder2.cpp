@@ -345,10 +345,6 @@ namespace y60 {
         bool myEndOfFileFlag = false;
         while (!myEndOfFileFlag) {
             AC_TRACE << "---- FFMpegDecoder2::decodeFrame: getPacket";
-            if (myPacket) { // XXX: move to bottom of loop
-                av_free_packet(myPacket);
-                delete myPacket;
-            }
             myPacket = _myDemux->getPacket(_myVStreamIndex);
             if (myPacket == 0) {
                 myEndOfFileFlag = true;
@@ -383,11 +379,9 @@ namespace y60 {
                     }
                     break;
                 }                 
+                av_free_packet(myPacket);
+                delete myPacket;
             }
-        }
-        if (myPacket) {
-            av_free_packet(myPacket);
-            delete myPacket;
         }
         return !myEndOfFileFlag;
     }
@@ -476,34 +470,7 @@ namespace y60 {
             if (shouldSeek(_myFrameCache.front()->getTimestamp(), theTime) &&
                     getPlayMode() == y60::PLAY_MODE_PAUSE) 
             {
-                AC_DEBUG << "FFMpegDecoder2:Seek: Joining FFMpegDecoder Thread";
-                join();
-                if (_myAudioSink) {
-                    _myAudioSink->stop();   
-                }
-                _myFrameRecycler.close();
-                _myDemux->clearPacketCache();
-                _myFrameCache.clear();
-                _myFrameCache.reset();
-                createPacketCache();
-                
-                int64_t mySeekTime = int64_t(theTime*_myTimeUnitsPerSecond)+_myStartTimestamp;
-                AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
-                int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, 
-                        mySeekTime, AVSEEK_FLAG_BACKWARD);
-                decodeFrame();
-                if (_myAStream && getAudioFlag())
-                {
-                    //            AC_INFO << "Start Audio";
-                    _myAudioSink->setCurrentTime(theTime);
-                    if (getState() == RUN) {
-                        readAudio();
-                        _myAudioSink->play();
-                    }
-                }
-
-                AC_DEBUG << "Forking FFMpegDecoder Thread";
-                PosixThread::fork();
+                seek(theTime);
             }
             
             for (;;) {
@@ -753,4 +720,35 @@ namespace y60 {
         return _myReadEOF;
     }
     
+    void FFMpegDecoder2::seek(double theDestTime) {
+        AC_DEBUG << "seek: Joining FFMpegDecoder Thread";
+        join();
+        if (_myAudioSink) {
+            _myAudioSink->stop();   
+        }
+        _myFrameRecycler.close();
+        _myDemux->clearPacketCache();
+        _myFrameCache.clear();
+        _myFrameCache.reset();
+        createPacketCache();
+
+        int64_t mySeekTime = int64_t(theDestTime*_myTimeUnitsPerSecond)+_myStartTimestamp;
+        AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
+        int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, 
+                mySeekTime, AVSEEK_FLAG_BACKWARD);
+        decodeFrame();
+        if (_myAStream && getAudioFlag())
+        {
+            //            AC_INFO << "Start Audio";
+            _myAudioSink->setCurrentTime(theDestTime);
+            if (getState() == RUN) {
+                readAudio();
+                _myAudioSink->play();
+            }
+        }
+
+        AC_DEBUG << "seek: Forking FFMpegDecoder Thread";
+        PosixThread::fork();
+    }
+
 }
