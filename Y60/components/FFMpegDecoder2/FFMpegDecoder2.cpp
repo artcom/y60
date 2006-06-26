@@ -145,6 +145,7 @@ namespace y60 {
             }
         }
         _myTimeUnitsPerSecond = (int64_t)(1/ av_q2d(_myVStream->time_base));
+        AC_DEBUG << "FFMpegDecoder2::_myTimeUnitsPerSecond=" << _myTimeUnitsPerSecond;
         if (_myVStream) {
             setupVideo(theFilename);
         } else {
@@ -179,6 +180,7 @@ namespace y60 {
         _myNextPacketTimestamp = 0;
 
         // seek to start
+        // TODO: only do this on loop.
         int myResult = av_seek_frame(_myFormatContext, -1, 
                 int64_t(theStartTime*_myTimeUnitsPerSecond)+_myStartTimestamp, 
                 AVSEEK_FLAG_BACKWARD);
@@ -376,6 +378,7 @@ namespace y60 {
                     addCacheFrame(_myFrame, _myNextPacketTimestamp);
                     _myNumFramesDecoded++;
                     if (_myFrame->pict_type == FF_I_TYPE) {
+                        AC_DEBUG << "***** I_FRAME *****";
                         _myNumIFramesDecoded++;
                     }
                     break;
@@ -470,9 +473,10 @@ namespace y60 {
             }
             AC_TRACE << "Time=" << theTime << " - Reading FrameTimestamp: " << myFrameTime 
                     << " from Cache.";
-            if (shouldSeek(_myFrameCache.front()->getTimestamp(), theTime)) {
-
-                AC_DEBUG << "Seek: Joining FFMpegDecoder Thread";
+            if (shouldSeek(_myFrameCache.front()->getTimestamp(), theTime) &&
+                    getPlayMode() == y60::PLAY_MODE_PAUSE) 
+            {
+                AC_DEBUG << "FFMpegDecoder2:Seek: Joining FFMpegDecoder Thread";
                 join();
                 if (_myAudioSink) {
                     _myAudioSink->stop();   
@@ -483,9 +487,10 @@ namespace y60 {
                 _myFrameCache.reset();
                 createPacketCache();
                 
+                int64_t mySeekTime = int64_t(theTime*_myTimeUnitsPerSecond)+_myStartTimestamp;
+                AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
                 int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, 
-                        int64_t(theTime*_myTimeUnitsPerSecond)+_myStartTimestamp,
-                        AVSEEK_FLAG_BACKWARD);
+                        mySeekTime, AVSEEK_FLAG_BACKWARD);
                 decodeFrame();
                 if (_myAStream && getAudioFlag())
                 {
@@ -507,12 +512,12 @@ namespace y60 {
                     << myVideoFrame->getTimestamp() 
                     << ", Calculated frame #=" << myVideoFrame->getTimestamp()*getFrameRate()
                     << ", Cache size=" << _myFrameCache.size();
-                double myTimeDiff = abs(myFrameTime - myVideoFrame->getTimestamp());
-                if (myTimeDiff <= 0.5/getFrameRate() || _myFrameCache.size() == 0) {
+                double myTimeDiff = (myFrameTime - myVideoFrame->getTimestamp())*getFrameRate();
+                if ((myTimeDiff > 0.5 || myTimeDiff < -0.9) && _myFrameCache.size() != 0) {
+                    _myFrameRecycler.push_back(myVideoFrame);
+                } else {
                     _myFrameCache.push_front(myVideoFrame);
                     break;
-                } else {
-                    _myFrameRecycler.push_back(myVideoFrame);
                 }
             }
             AutoLocker<ThreadLock> myLock(_myLock);
@@ -727,17 +732,20 @@ namespace y60 {
     // TODO: Test this with lots of different videos.
     bool FFMpegDecoder2::shouldSeek(double theCurrentTime, double theDestTime) {
         int myDistance = int((theDestTime-theCurrentTime)*getFrameRate());
-/*
-        cerr << "Dest=" << theDestTime << ", Curr=" << theCurrentTime 
-                << ", myDistance=" << myDistance << endl;
-        cerr << "_myNumFramesDecoded=" << _myNumFramesDecoded << ", _myNumIFramesDecoded="
-                << _myNumIFramesDecoded << endl;
-*/                
+        bool myShouldSeek;
         if (_myNumIFramesDecoded < 2) {
-            return myDistance>100 || myDistance < -1;
+            myShouldSeek = myDistance>100 || myDistance < -1;
         } else {
-            return myDistance>2*(_myNumFramesDecoded/_myNumIFramesDecoded) || myDistance < -1;
+            myShouldSeek = myDistance>2*(_myNumFramesDecoded/_myNumIFramesDecoded)
+                    || myDistance < -0.5;
         }
+        if (myShouldSeek) {
+            AC_DEBUG << "Dest=" << theDestTime << ", Curr=" << theCurrentTime 
+                << ", myDistance=" << myDistance;
+            AC_DEBUG << "_myNumFramesDecoded=" << _myNumFramesDecoded << ", _myNumIFramesDecoded="
+                << _myNumIFramesDecoded;
+        }
+        return  myShouldSeek;
     }
         
     bool FFMpegDecoder2::getReadEOF() {
