@@ -100,15 +100,31 @@ namespace y60 {
         const char * getName() const { return "y60FFMpegDecoder2"; }
         
     private:
+        // Called from main thread
         void run();
-
+        
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
+        void createFrameCache();
+        void dumpCaches();
+        void copyFrame(FrameCache::VideoFramePtr theVideoFrame, 
+                dom::ResizeableRasterPtr theTargetRaster);
+        bool shouldSeek(double theCurrentTime, double theDestTime);
+        void seek(double theDestTime);
+       
+        
+        // Called from both threads
         /**
          *  updates the Framecache depending on the current position
          */
         bool decodeFrame();
         void readAudio();
+        /**
+         * Add an audio packet to the buffered source.
+         * @param thePacket packet to add
+         * @retval true if successful
+         */
+        void addAudioPacket(const AVPacket & thePacket);
         /**
          * Add theFrame to the framecache with the timestamp theTimestamp.
          * @throws asl::ThreadSemaphore::ClosedException
@@ -116,24 +132,18 @@ namespace y60 {
          * @param theTimestamp timestamp to use
          */
         void addCacheFrame(AVFrame* theFrame, int64_t theTimestamp);
-        /**
-         * Add an audio packet to the buffered source.
-         * @param thePacket packet to add
-         * @retval true if successful
-         */
-        void addAudioPacket(const AVPacket & thePacket);
-        void createPacketCache();
-        void dumpCaches();
-        
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
-        void copyFrame(FrameCache::VideoFramePtr theVideoFrame, 
-                dom::ResizeableRasterPtr theTargetRaster);
-        bool shouldSeek(double theCurrentTime, double theDestTime);
-        void seek(double theDestTime);
+
+        
+        // Called from decoder thread
         bool getReadEOF();
 
+        
+        // Used in main thread
+        
+        
+        // Used in both threads
         AVFormatContext * _myFormatContext;
-
         int _myVStreamIndex;
         AVStream * _myVStream;
 
@@ -147,8 +157,6 @@ namespace y60 {
         DemuxPtr _myDemux;
        
         int64_t _myStartTimestamp;
-        int64_t _myNextPacketTimestamp;
-        int64_t _myTimePerFrame;
         int _myDestinationPixelFormat;
 
         ReSampleContext * _myResampleContext;

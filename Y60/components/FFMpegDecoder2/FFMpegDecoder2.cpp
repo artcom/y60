@@ -60,8 +60,6 @@ namespace y60 {
         _myAStreamIndex(-1), 
         _myAStream(0),
         _myDemux(0),
-        _myNextPacketTimestamp(0),
-        _myTimePerFrame(0), 
         _myDestinationPixelFormat(0),
         _myFrameCache(SEMAPHORE_TIMEOUT), 
         _myFrameRecycler(SEMAPHORE_TIMEOUT),
@@ -168,7 +166,7 @@ namespace y60 {
         if (_myAStreamIndex != -1) {
             _myDemux->enableStream(_myAStreamIndex);
         }
-        createPacketCache();
+        createFrameCache();
     }
 
     void FFMpegDecoder2::startMovie(double theStartTime) {
@@ -177,8 +175,6 @@ namespace y60 {
         AutoLocker<ThreadLock> myLock(_myLock);
         _myReadEOF = false;
         
-        _myNextPacketTimestamp = 0;
-
         // seek to start
         // TODO: only do this on loop.
         int myResult = av_seek_frame(_myFormatContext, -1, 
@@ -204,7 +200,6 @@ namespace y60 {
         } else {
             AC_INFO << "Thread already running. No forking.";
         }
-        AC_TRACE << "Movie starting. _myStartTimestamp is " << _myStartTimestamp;
         AsyncDecoder::startMovie(theStartTime);
     }
 
@@ -218,7 +213,6 @@ namespace y60 {
         } else {
             AC_INFO << "Thread already running. No forking.";
         }
-        AC_TRACE << "Movie resuming. _myStartTimestamp is " << _myStartTimestamp;
         AsyncDecoder::resumeMovie(theStartTime);
     }
 
@@ -236,7 +230,7 @@ namespace y60 {
             _myFrameCache.clear();
             _myFrameCache.reset();
             dumpCaches();
-            createPacketCache();
+            createFrameCache();
             AsyncDecoder::stopMovie();
         }
     }
@@ -369,9 +363,9 @@ namespace y60 {
                     // by hand, assuming that ffmpeg made errors in the calculation.
                     // That breaks seeks, so I've removed it - uz.
                     // _myNextPacketTimestamp += _myTimePerFrame;
-                    _myNextPacketTimestamp = (myPacket->dts-_myStartTimestamp);
+                    int64_t myNextPacketTimestamp = (myPacket->dts-_myStartTimestamp);
 		            AC_TRACE << "---- add frame";
-                    addCacheFrame(_myFrame, _myNextPacketTimestamp);
+                    addCacheFrame(_myFrame, myNextPacketTimestamp);
                     _myNumFramesDecoded++;
                     if (_myFrame->pict_type == FF_I_TYPE) {
                         AC_DEBUG << "***** I_FRAME *****";
@@ -416,8 +410,8 @@ namespace y60 {
                 theTargetRaster->pixels().size());
     }
 
-    void FFMpegDecoder2::createPacketCache() {
-        AC_DEBUG << "createPacketCache";
+    void FFMpegDecoder2::createFrameCache() {
+        AC_DEBUG << "createFrameCache";
         _myFrameRecycler.clear();
         _myFrameRecycler.reset();
 
@@ -647,7 +641,6 @@ namespace y60 {
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
         _myStartTimestamp = -1;
-        _myTimePerFrame = (int64_t)(_myTimeUnitsPerSecond/_myFrameRate);
     }
 
     void
@@ -730,7 +723,7 @@ namespace y60 {
         _myDemux->clearPacketCache();
         _myFrameCache.clear();
         _myFrameCache.reset();
-        createPacketCache();
+        createFrameCache();
 
         int64_t mySeekTime = int64_t(theDestTime*_myTimeUnitsPerSecond)+_myStartTimestamp;
         AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
