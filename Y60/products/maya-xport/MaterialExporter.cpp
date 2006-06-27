@@ -936,7 +936,7 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
 #ifdef WIN32
     if (theDirectory.length() > 1 && theDirectory[1] != ':') {
 #else
-    if (theDirectory.length() > 0 && theDirectory[1] != '/') {
+    if (theDirectory.length() > 0 && theDirectory[0] != '/') {
 #endif
         if (theDirectory[0] == '.' && theDirectory[1] == '/') {
             _myBaseDirectory = normalizeDirectory(getCWD(), false) +
@@ -949,6 +949,7 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
         _myBaseDirectory = normalizeDirectory(getCWD(), false);
         _myBaseDirectory += '/';
     } else {
+        // absolute path
         _myBaseDirectory = theDirectory;
     }
     // be sure to end with a slash
@@ -956,7 +957,6 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
         _myBaseDirectory += '/';
     }
     AC_DEBUG << "MaterialExporter::setBaseDirectory _myBaseDirectory=" << _myBaseDirectory << ", was:" << theDirectory;
-
 }
 
 std::string
@@ -982,10 +982,24 @@ MaterialExporter::findFile(const std::string & theFileName) {
     }
 }
 
+char convertBackToForwardSlash(char theCharacter) {
+    if (theCharacter == '\\') {
+        theCharacter = '/';
+    }
+    return theCharacter;
+}
+
 std::string
 MaterialExporter::findRelativeFilePath(const std::string & theFileName) {
-    string myFoundFileName = findFile(theFileName);
-    std::string myFileName = myFoundFileName;
+
+    // convert backslash to forward slash
+    std::string myFileName = theFileName;
+    std::transform(theFileName.begin(), theFileName.end(),
+                   myFileName.begin(), convertBackToForwardSlash);
+
+    // find file relative to base directory
+    string myFoundFileName = findFile(myFileName);
+    myFileName = myFoundFileName;
     std::string myBaseName = _myBaseDirectory;
 #ifdef WIN32
     // Convert basedir and filename to upper-case before comparing, because windows
