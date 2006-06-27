@@ -173,11 +173,12 @@ namespace y60 {
         bool _myReadEOF;
         asl::ThreadLock _myLock;
 
-        // worker thread value to prevent dom access
+        // worker thread values to prevent dom access and thus race conditions.
         double _myFrameRate;
         int _myFrameWidth;
         int _myFrameHeight;
         PixelEncoding _myPixelEncoding;
+        bool _myAudioFlag;
     };
     typedef asl::Ptr<FFMpegDecoder2> FFMpegDecoder2Ptr;
 }

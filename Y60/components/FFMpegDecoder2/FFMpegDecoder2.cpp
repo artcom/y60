@@ -151,7 +151,7 @@ namespace y60 {
             _myVStream = 0;
             _myVStreamIndex = -1;
         }
-        if (_myAStream && getAudioFlag()) {
+        if (_myAStream && _myAudioFlag) {
             setupAudio(theFilename);
         } else {
             AC_INFO << "FFMpegDecoder2::load " << theFilename << " no audio stream found or disabled";
@@ -186,7 +186,7 @@ namespace y60 {
         }
 
         decodeFrame();
-        if (_myAStream && getAudioFlag())
+        if (_myAStream && _myAudioFlag)
         {
             readAudio();
 //            AC_INFO << "Start Audio";
@@ -264,7 +264,7 @@ namespace y60 {
 
     void FFMpegDecoder2::readAudio() {
         AC_TRACE << "---- FFMpegDecoder2::readAudio:";
-        double myDestBufferedTime = _myAudioSink->getBufferedTime()+2/getFrameRate();
+        double myDestBufferedTime = _myAudioSink->getBufferedTime()+2/_myFrameRate;
         if (myDestBufferedTime > AUDIO_BUFFER_SIZE) {
             myDestBufferedTime = AUDIO_BUFFER_SIZE;
         }
@@ -325,10 +325,12 @@ namespace y60 {
         } // while
 
         // adjust volume
+/*
         float myVolume = getMovie()->get<VolumeTag>();
         if (!asl::almostEqual(Pump::get().getVolume(), myVolume)) {
             Pump::get().setVolume(myVolume);
         } //if
+*/
     }
 
     bool FFMpegDecoder2::decodeFrame() {
@@ -552,7 +554,7 @@ namespace y60 {
                 AC_WARNING << "---- Semaphore destroyed while in run. Terminating Thread.";
                 return;
             }
-            if (_myAStream && getAudioFlag())
+            if (_myAStream && _myAudioFlag)
             {
                 readAudio();
             }
@@ -668,6 +670,7 @@ namespace y60 {
         }
         AC_TRACE << "FFMpegDecoder2::setupAudio() done. resampling " 
             << (_myResampleContext != 0);
+        _myAudioFlag = getAudioFlag();
 
     }
 
@@ -730,7 +733,7 @@ namespace y60 {
         int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, 
                 mySeekTime, AVSEEK_FLAG_BACKWARD);
         decodeFrame();
-        if (_myAStream && getAudioFlag())
+        if (_myAStream && _myAudioFlag)
         {
             //            AC_INFO << "Start Audio";
             _myAudioSink->setCurrentTime(theDestTime);
