@@ -1061,7 +1061,7 @@
             </properties>
         </fragmentshader>
     </shader>    
-    <shader id="s128" name="nightgrinder_without_lightmap" cost="10">
+    <shader id="s129" name="nightgrinder_without_lightmap" cost="10">
         <supports>
             <feature class="vertexparams" values="[nightgrinder]"/>
             <feature class="textures" values="[paint,paint]"/>
