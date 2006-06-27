@@ -58,25 +58,47 @@ void OffscreenRenderArea::handle(y60::EventPtr theEvent) {
 void OffscreenRenderArea::initDisplay() {
 }
 
+void
+OffscreenRenderArea::activate() {
+    ImagePtr myTexture = getImage();
+    if ( ! myTexture) {
+        AC_ERROR << "OffscreenRenderArea::activate has no canvas / image to render... ignoring";
+        return;
+    }
+    y60::OffscreenBuffer::activate(myTexture);
+}
+
+void
+OffscreenRenderArea::deactivate(bool theCopyToImageFlag) {
+    ImagePtr myTexture = getImage();
+    if ( ! myTexture) {
+        AC_ERROR << "OffscreenRenderArea::deactivate has no canvas / image to render... ignoring";
+        return;
+    }
+    y60::OffscreenBuffer::deactivate(myTexture, theCopyToImageFlag);
+}
+    
 void 
 OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
     AC_TRACE << "OffscreenRenderArea::renderToCanvas ";
+    
     ImagePtr myTexture = getImage();
     if ( ! myTexture) {
         AC_ERROR << "OffscreenRenderArea::renderToCanvas has no canvas / image to render... ignoring";
         return;
     }
-    onFrame();
 
+    onFrame();
     _myScene->updateAllModified();
 
-    preOffscreenRender(myTexture);
-
+    y60::OffscreenBuffer::activate(myTexture);
+    clearBuffers( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
     preRender();
     render();
     postRender();
-
-    postOffscreenRender(myTexture, theCopyToImageFlag);
+    
+    y60::OffscreenBuffer::deactivate(myTexture, theCopyToImageFlag);
 }    
 
 void 
@@ -153,16 +175,6 @@ OffscreenRenderArea::getImage() {
         AC_WARNING << "No canvas.";
         return ImagePtr(0);
     }
-}
-
-int
-OffscreenRenderArea::getWidth() const {
-    return _myWidth;
-}
-
-int
-OffscreenRenderArea::getHeight() const {
-    return _myHeight;
 }
 
 ResizeableRasterPtr

@@ -126,10 +126,10 @@ float4 mainFragment(vert2frag   IN,
     float4 myDecalTexel = IN.primaryColor;
 #endif // PAINT
 
+    float4 mySpecColor = float4(0,0,0,0);
 #ifdef LIGHTING
     float4 myDiffuseColor = float4(0,0,0,0);
-    float4 mySpecColor = float4(0,0,0,0);
-
+    
     float3 P = IN.worldPosition;
     float3 N = normalize(IN.worldNormal);
     float3 V = normalize(AC_CAMERA_POSITION - P);

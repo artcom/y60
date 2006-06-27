@@ -33,7 +33,7 @@ namespace y60 {
         public:
             static asl::Ptr<SDLWindow> create();
 
-            void postRender();
+            virtual void swapBuffers();
             virtual void onResize(Event & theEvent);
 
             void setVideoMode(unsigned theTargetWidth=0, unsigned theTargetHeight=0,
@@ -58,7 +58,7 @@ namespace y60 {
             asl::Vector2i getPosition() const {
                 return asl::Vector2i(_myWindowPosX, _myWindowPosY);
             }
-
+        
             /// Get window width.
             virtual int getWidth() const;
 

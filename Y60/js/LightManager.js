@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: LightManager.js,v $
-//   $Author: christian $
-//   $Revision: 1.26 $
-//   $Date: 2005/04/20 16:49:06 $
-//
-//
-//=============================================================================
 
 use("SunPosition.js");
 
@@ -24,6 +16,9 @@ function LightManager(theWorld, theLightSources) {
 }
 
 LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
+
+    var _myEnabledFlag  = true;
+    
     var _myScene        = theScene;
     var _myWorld        = theWorld;
     var _myLightSources = getDescendantByTagName(theScene.dom,'lightsources', false);
@@ -108,6 +103,10 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
         }
     }
 
+    obj.setEnabled setter = function(theFlag) {
+        _myEnabledFlag = theFlag;
+    }
+    
     obj.registerHeadlightWithViewport = function(theViewportNode, theLightNode) {
         _myViewportHeadlights[theViewportNode.id] = theLightNode;
         _myViewportHeadlightsEnabled[theViewportNode.id] = true;
@@ -192,7 +191,6 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
                     obj.enableHeadlight(!_myHeadLightFlag);
                     print("Headlight : " + (_myHeadLightFlag? "on" : "off"));
                 }
-
                 break;
             case 'j':
                 if (theShiftFlag) {
@@ -215,14 +213,12 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
     }
 
     obj.onPreViewport = function(theViewport) {
-        if (_myHeadLightFlag && theViewport.id in _myViewportHeadlights) {
-             //print ("activatng light "+_myViewportHeadlights[theViewport.id].id+" for VP "+theViewport.id);
+        if (_myEnabledFlag && _myHeadLightFlag && theViewport.id in _myViewportHeadlights) {
             _myViewportHeadlights[theViewport.id].visible = _myViewportHeadlightsEnabled[theViewport.id];
         }
     }
     obj.onPostViewport = function(theViewport) {
-        if (_myHeadLightFlag && theViewport.id in _myViewportHeadlights) {
-            //print ("deactivating light "+_myViewportHeadlights[theViewport.id].id+" for VP "+theViewport.id);
+        if (_myEnabledFlag && _myHeadLightFlag && theViewport.id in _myViewportHeadlights) {
             _myViewportHeadlights[theViewport.id].visible = false;
         }
     }
@@ -293,7 +289,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
 
     function attachHeadlightToCamera(theCamera, theHeadlightNode) {
         //if (!theHeadlightNode.parentNode || theHeadlightNode.parentNode.id != theCamera.id) {
-        if (!theHeadlightNode.parentNode || !theHeadlightNode.parentNode.isSameNode(theCamera)) {
+        if (theHeadlightNode && (!theHeadlightNode.parentNode || !theHeadlightNode.parentNode.isSameNode(theCamera))) {
             Logger.trace("Attaching Headlight " + theHeadlightNode + " to Camera " + theCamera.id);
             theCamera.appendChild(theHeadlightNode);
         } else {
@@ -304,7 +300,6 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
 
     function createHeadlight(theLightName) {
         return myHeadLight;
-
     }
 
     function printHelp() {

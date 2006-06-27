@@ -33,18 +33,18 @@ namespace y60 {
             virtual ~OffscreenBuffer() {}
 
             /**
-            * prepares GL-things to render a scene
-            * onto theTexture  
+            * activate the image as render target and initializes FBO 
+            * if necessary  
             */
-            void preOffscreenRender(asl::Ptr<Image, dom::ThreadingModel> theTexture); 
+            void activate(asl::Ptr<Image, dom::ThreadingModel> theImage); 
             /**
-            * finishes GL-things to render a scene
-            * onto theTexture  
+            * 
+            * deactivates the image as render target   
             * @param theCopyToImageFlag if true 
             * the underlying raster value is ignored
             * else the texture is copied into the raster.
             */
-            void postOffscreenRender(asl::Ptr<Image, dom::ThreadingModel> theImage, 
+            void deactivate(asl::Ptr<Image, dom::ThreadingModel> theImage, 
                     bool theCopyToImageFlag = false); 
 
             /**

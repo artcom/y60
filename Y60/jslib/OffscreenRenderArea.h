@@ -8,14 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $RCSfile: $
-//
-//   $Author: $
-//
-//   $Revision: $
-//
-//=============================================================================
 
 #ifndef _ac_jslib_OffscreenRenderArea_h_
 #define _ac_jslib_OffscreenRenderArea_h_
@@ -58,7 +50,6 @@ class OffscreenRenderArea : public y60::OffscreenBuffer,
          */
         void renderToCanvas(bool theCopyToImageFlag = false); 
 
-
         /**
          * sets my canvas (calling base function)
          * the canvas SHOULD have a target attribute pointing to an existing image.
@@ -84,8 +75,12 @@ class OffscreenRenderArea : public y60::OffscreenBuffer,
          void downloadFromViewport(const dom::NodePtr & theImageNode);
 
         // IFrameBuffer
-        virtual int getWidth() const;
-        virtual int getHeight() const;
+        virtual int getWidth() const {
+            return _myWidth;
+        }
+        virtual int getHeight() const {
+            return _myHeight;
+        }
 
         // IEventSink
         virtual void handle(y60::EventPtr theEvent);
@@ -99,6 +94,10 @@ class OffscreenRenderArea : public y60::OffscreenBuffer,
         virtual void setRenderingCaps(unsigned int theRenderingCaps);
 
         //TODO make some stuff from AbstractRenderWindow private
+    
+        // activates the offscreen buffer as render target
+        void activate(); 
+        void deactivate(bool theCopyToImageFlag = false);
 
     protected:
         // AbstractRenderWindow
@@ -114,7 +113,6 @@ class OffscreenRenderArea : public y60::OffscreenBuffer,
 
         unsigned _myWidth;
         unsigned _myHeight;
-
 };
 
 }

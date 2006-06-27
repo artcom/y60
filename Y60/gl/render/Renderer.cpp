@@ -134,11 +134,6 @@ namespace y60 {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // This prevents translucent pixels from being drawn. This way the
-        // background can shine through.
-        glAlphaFunc(GL_GREATER, 0.0);
-        glEnable(GL_ALPHA_TEST);
-
         // setup initial camera position
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -1004,13 +999,12 @@ namespace y60 {
         }
     }
     void
-    Renderer::preRender(const CanvasPtr & theCanvas) {
+    Renderer::clearBuffers(const CanvasPtr & theCanvas, unsigned int theBuffersMask) {
         MAKE_SCOPE_TIMER(Renderer_preRender);
         // called once per canvas per frame
         const asl::Vector4f & backgroundColor = theCanvas->get<CanvasBackgroundColorTag>();
         glClearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
-        glColor4f(1,1,1,1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear( theBuffersMask );
     }
 
     void
@@ -1023,7 +1017,20 @@ namespace y60 {
         _myState->setTexturing(theViewport->get<ViewportTexturingTag>());
         _myState->setDepthWrites(true);
         _myState->setFrontFaceCCW(true);
-        glDepthMask(true);
+
+#if 0
+        // XXX UH: need to think on this some more
+        // This prevents translucent pixels from being drawn. This way the
+        // background can shine through.
+        if (theViewport->get<ViewportDrawGlowTag>()) {
+            glDisable(GL_ALPHA_TEST);
+        } else {
+            glAlphaFunc(GL_GREATER, 0.0);
+            glEnable(GL_ALPHA_TEST);
+        }
+#endif
+
+        glColor4f(1,1,1,1);
         CHECK_OGL_ERROR;
     }
 
@@ -1045,7 +1052,7 @@ namespace y60 {
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
         // Render underlays
-	    renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
+        renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
 
         dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
                 theViewport->get<CameraTag>());
@@ -1126,6 +1133,7 @@ namespace y60 {
                 renderBodyPart(it->second, *theViewport, *myCamera);
             }
             glPopMatrix();
+
             _myState->setScissorTest(false);
             _myState->setClippingPlanes(std::vector<asl::Planef>());
             _myState->setFrontFaceCCW(true);
@@ -1135,6 +1143,7 @@ namespace y60 {
             MAKE_SCOPE_TIMER(renderOverlays);
             renderOverlays(*theViewport, OVERLAY_LIST_NAME);
         }
+
         glPopClientAttrib();
         glPopAttrib();  // GL_TEXTURE_BIT + GL_COLOR_BUFFER_BIT
 
@@ -1149,10 +1158,6 @@ namespace y60 {
         }
 
         _myTextRendererManager.render(theViewport);        
-    }
-
-    void
-    Renderer::postRender() {
     }
 
     void

@@ -710,7 +710,6 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
                 "MaterialExporter::exportLambertFeatures");
     }
     setPropertyValue<float>(theBuilder.getNode(), "float", y60::GLOW_PROPERTY, myGlowFactor);
-
 }
 
 void

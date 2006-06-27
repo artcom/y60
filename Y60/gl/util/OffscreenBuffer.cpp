@@ -38,13 +38,13 @@ OffscreenBuffer::OffscreenBuffer(bool theUseGLFramebufferObject) :
     _myFrameBufferObjectId(0), _myDepthBufferId(0), _myColorBufferId(0)
 {}
 
-void OffscreenBuffer::preOffscreenRender(ImagePtr theImage) {
+void OffscreenBuffer::activate(ImagePtr theImage) {
     if (_myUseGLFramebufferObject) {
         bindOffscreenFrameBuffer(theImage);
     }
 }
 
-void OffscreenBuffer::postOffscreenRender(ImagePtr theImage, bool theCopyToImageFlag) {
+void OffscreenBuffer::deactivate(ImagePtr theImage, bool theCopyToImageFlag) {
     if (_myUseGLFramebufferObject) {
 #ifdef GL_EXT_framebuffer_object
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -52,18 +52,19 @@ void OffscreenBuffer::postOffscreenRender(ImagePtr theImage, bool theCopyToImage
         glBindTexture(GL_TEXTURE_2D, theImage->getGraphicsId());
 #ifdef GL_EXT_framebuffer_object
         if (glGenerateMipmapEXT && theImage->get<ImageMipmapTag>()) {
-            AC_TRACE << "OffscreenBuffer::postOffscreenRender: generating mipmap levels";
+            AC_TRACE << "OffscreenBuffer::deactivate: generating mipmap levels";
             glGenerateMipmapEXT(GL_TEXTURE_2D);
         }
 #endif
     } else {
         copyFrameBufferToTexture(theImage);
+        if (theCopyToImageFlag) {
+            copyFrameBufferToImage(theImage);
+        }
+ 
     }
 
-    if (theCopyToImageFlag) {
-        copyFrameBufferToImage(theImage);
-    }
- 
+    
     // cleanly unbind the texture
     if (_myUseGLFramebufferObject) {
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -139,7 +140,7 @@ void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
 void OffscreenBuffer::copyFrameBufferToTexture(ImagePtr theImage) {
     glBindTexture (GL_TEXTURE_2D, theImage->getGraphicsId() );
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
-            0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>() );
+            0, 0.0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>() );
     glBindTexture (GL_TEXTURE_2D, 0);
 }
 

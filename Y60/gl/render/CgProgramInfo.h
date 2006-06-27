@@ -161,17 +161,17 @@ namespace y60 {
             CgProgramInfo();
             CgProgramInfo(const CgProgramInfo &); // disable copy constructor
             CgProgramInfo & operator=(const CgProgramInfo &);     // disable assignment op
+
             void processParameters();
             void setCgVectorParameter(const CgProgramAutoParam & theParam, const asl::Vector3f & theValue);
             void setCgVectorParameter(const CgProgramAutoParam & theParam, const asl::Vector4f & theValue);
             void setCgMatrixParameter(const CgProgramAutoParam & theParam, const asl::Matrix4f & theValue);
             void setCgArrayVector3fParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector3f> & theValue);
             void setCgArrayVector4fParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector4f> & theValue);
-            void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam,
-                const std::vector<asl::Vector3f> & theValue);
-            void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam,
-                const std::vector<asl::Vector4f> & theValue);
-
+        
+            void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector3f> & theValue);
+            void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector4f> & theValue);
+        
             ShaderDescription           _myShader;
             CGprogram                   _myCgProgramID;
             CGcontext                   _myContext;

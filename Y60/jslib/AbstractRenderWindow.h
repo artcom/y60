@@ -229,13 +229,18 @@ namespace jslib {
         y60::GLContextPtr getGLContext() const {
             return _myGLContext;
         }
+        
+        virtual void clearBuffers(unsigned int theBufferMask);
+        virtual void preRender();
+        virtual void render();
+        virtual void postRender();
+        virtual void swapBuffers() { }
+
     protected:
         AbstractRenderWindow(const JSErrorReporter & theErrorReporter);
-        virtual void preRender();
         virtual void preViewport(const dom::NodePtr & theViewport);
-        virtual void render();
         virtual void postViewport(const dom::NodePtr & theViewport);
-        virtual void postRender();
+        
         virtual void handle(y60::EventPtr theEvent);
         virtual void onFrame();
         virtual void onKey(y60::Event & theEvent);

@@ -90,6 +90,10 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             PROP_GL_UNSIGNED_INT,
             PROP_GL_INT,
             PROP_GL_FLOAT,
+            PROP_GL_COLOR_BUFFER_BIT,
+            PROP_GL_DEPTH_BUFFER_BIT,
+            PROP_GL_STENCIL_BUFFER_BIT,
+            PROP_GL_ACCUM_BUFFER_BIT,
             PROP_END
         };
 
@@ -656,6 +660,55 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             return JS_TRUE;
         }
 
+        static JSBool
+        clearBuffers(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Clear the specified buffers.");
+            DOC_PARAM("theBufferMask", "", DOC_TYPE_INTEGER);
+            DOC_END;
+            typedef void (DERIVED::*MyMethod)(unsigned int);
+            return Method<DERIVED>::call((MyMethod)&DERIVED::clearBuffers,cx,obj,argc,argv,rval);
+        }
+
+        static JSBool
+        preRender(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Execute the pre-render JavaScript and component functions.");
+            DOC_END;
+            DERIVED * mySelf;
+            convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+            mySelf->preRender();
+            return JS_TRUE;
+        }
+
+        static JSBool
+        render(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Render the scene to all viewports, calls pre- and post-viewport JavaScript functions.");
+            DOC_END;
+            DERIVED * mySelf;
+            convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+            mySelf->render();
+            return JS_TRUE;
+        }
+
+        static JSBool
+        postRender(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Execute the post-render JavaScript and component functions.");
+            DOC_END;
+            DERIVED * mySelf;
+            convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+            mySelf->postRender();
+            return JS_TRUE;
+        }
+
+        static JSBool
+        swapBuffers(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+            DOC_BEGIN("Swap back and front buffers.");
+            DOC_END;
+            DERIVED * mySelf;
+            convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+            mySelf->swapBuffers();
+            return JS_TRUE;
+        }
+        
         static JSFunctionSpec * BaseStaticFunctions() {
             AC_DEBUG << "Registering class '"<< JSWrapper<DERIVED, asl::Ptr<DERIVED>, StaticAccessProtocol>::ClassName()<<"'";
             static JSFunctionSpec myFunctions[] = {
@@ -708,6 +761,12 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 {"stopCharacter",      stopCharacter,            1},
                 {"activateGLContext",  activateGLContext,        0},
                 {"deactivateGLContext",  deactivateGLContext,    0},
+                // rendering
+                {"clearBuffers",  clearBuffers,    1},
+                {"preRender",  preRender,          0},
+                {"render",  render,                0},
+                {"postRender",  postRender,        0},
+                {"swapBuffers",  swapBuffers,      0},
                 {0}
             };
             return myFunctions;
@@ -734,6 +793,11 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
                 DEFINE_GL_ENUM(GL_UNSIGNED_INT),
                 DEFINE_GL_ENUM(GL_INT),
                 DEFINE_GL_ENUM(GL_FLOAT),
+
+                DEFINE_GL_ENUM(GL_COLOR_BUFFER_BIT),
+                DEFINE_GL_ENUM(GL_DEPTH_BUFFER_BIT),
+                DEFINE_GL_ENUM(GL_STENCIL_BUFFER_BIT),
+                DEFINE_GL_ENUM(GL_ACCUM_BUFFER_BIT),
                 {0}
             };
             return myProperties;
@@ -986,6 +1050,3 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
 }
 
 #endif
-
-
-

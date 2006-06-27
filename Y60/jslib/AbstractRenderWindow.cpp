@@ -442,9 +442,14 @@ namespace jslib {
     }
 
     void
+    AbstractRenderWindow::clearBuffers(unsigned int theBuffersMask) {
+        _myRenderer->clearBuffers(_myCanvas->getFacade<Canvas>(), theBuffersMask);
+    }
+                                                                    
+    void
     AbstractRenderWindow::preRender() {
         try {
-            MAKE_SCOPE_TIMER(onPreRender);
+            MAKE_SCOPE_TIMER(preRender);
             if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPreRender")) {
                 jsval argv[1], rval;
                 MAKE_SCOPE_TIMER(onPreRender_JSCallback);
@@ -462,8 +467,6 @@ namespace jslib {
                     AC_ERROR << "Unknown exception while calling " << myName;
                 }
             }
-            _myRenderer->preRender(_myCanvas->getFacade<Canvas>());
-
         } catch (const asl::Exception & ex) {
             AC_ERROR << "ASL exception caught in AbstractRenderWindow::preRender(): " << ex;
         } catch (const std::exception & ex) {
@@ -476,7 +479,7 @@ namespace jslib {
     void
     AbstractRenderWindow::preViewport(const dom::NodePtr & theViewport) {
         try {
-            MAKE_SCOPE_TIMER(onPreViewport);
+            MAKE_SCOPE_TIMER(preViewport);
             if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPreViewport")) {
                 jsval argv[1], rval;
                 argv[0] = as_jsval(_myJSContext, theViewport);
@@ -505,7 +508,7 @@ namespace jslib {
     void
     AbstractRenderWindow::postViewport(const dom::NodePtr & theViewport) {
         try {
-            MAKE_SCOPE_TIMER(onPostViewport);
+            MAKE_SCOPE_TIMER(postViewport);
             if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPostViewport")) {
                 jsval argv[1], rval;
                 argv[0] = as_jsval(_myJSContext, theViewport);
@@ -524,8 +527,6 @@ namespace jslib {
     AbstractRenderWindow::postRender() {
         try {
             MAKE_SCOPE_TIMER(postRender);
-            _myRenderer->postRender();
-#if 1
             // UH: changed calling order so that objects drawn from JS are
             // available for post-render components
             if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPostRender")) {
@@ -545,25 +546,6 @@ namespace jslib {
                     AC_ERROR << "Unknown exception while calling " << myName;
                 }
             }
-#else
-            for (ExtensionList::iterator i = _myExtensions.begin(); i != _myExtensions.end(); ++i) {
-                const std::string myName = (*i)->getName() + "::onPostRender";
-                try {
-                    MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
-                    (*i)->onPostRender(this);
-                } catch (const asl::Exception & ex) {
-                    AC_ERROR << "Exception while calling " << myName << ": " << ex;
-                } catch (...) {
-                    AC_ERROR << "Unknown exception while calling " << myName;
-                }
-            }
-
-            if (_myEventListener && JSA_hasFunction(_myJSContext, _myEventListener, "onPostRender")) {
-                MAKE_SCOPE_TIMER(onPostRender);
-                jsval argv[1], rval;
-                JSA_CallFunctionName(_myJSContext, _myEventListener, "onPostRender", 0, argv, &rval);
-            }
-#endif
 
             if (_myJSContext) {
                 MAKE_SCOPE_TIMER(gc);
@@ -577,7 +559,7 @@ namespace jslib {
             AC_ERROR << "Unknown exception in Y60Render::postRender()";
         }
     }
-
+                                                                    
     void
     AbstractRenderWindow::handle(y60::EventPtr theEvent) {
         MAKE_SCOPE_TIMER(handleEvents);

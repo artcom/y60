@@ -19,26 +19,26 @@ namespace jslib {
 typedef jslib::AbstractRenderWindow BASE;
 
 static JSBool
-    renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        try {
-            DOC_BEGIN("Renders my current scene onto the texture given by the target attribute of my canvas. ");
-            DOC_PARAM_OPT("theCopyToImageFlag", "if true the underlying image is updated.", DOC_TYPE_BOOLEAN, false);
-            DOC_END;
+renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Render scene to texture given by the target attribute of canvas. ");
+    DOC_PARAM_OPT("theCopyToImageFlag", "if true the underlying image is updated.", DOC_TYPE_BOOLEAN, false);
+    DOC_END;
+    
+    try {
+        ensureParamCount(argc, 0, 1);
 
-            ensureParamCount(argc, 0, 1);
-
-            OffscreenRenderArea * myNative(0);
-            convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-            if (argc > 0) {
-                bool myCopyToImageFlag;
-                convertFrom(cx, argv[0], myCopyToImageFlag);
-                myNative->renderToCanvas(myCopyToImageFlag);
-            } else {
-                myNative->renderToCanvas();
-            }
-            return JS_TRUE;
-        } HANDLE_CPP_EXCEPTION;
-    }
+        OffscreenRenderArea * myNative(0);
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+        if (argc > 0) {
+            bool myCopyToImageFlag;
+            convertFrom(cx, argv[0], myCopyToImageFlag);
+            myNative->renderToCanvas(myCopyToImageFlag);
+        } else {
+            myNative->renderToCanvas();
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
 
 static JSBool
 setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -97,6 +97,41 @@ downloadFromViewport(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+activate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Activate as render target.");
+    DOC_END;
+    try {
+        OffscreenRenderArea * mySelf;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+        mySelf->activate();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+deactivate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Deactivate as render target and optionally copy result to attached image.");
+    DOC_PARAM_OPT("theCopyToImageFlag", "if true the underlying image is updated.", DOC_TYPE_BOOLEAN, false);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 0, 1);
+
+        OffscreenRenderArea * mySelf;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), mySelf);
+
+        if (argc > 0) {
+            bool myCopyToImageFlag;
+            convertFrom(cx, argv[0], myCopyToImageFlag);
+            mySelf->deactivate(myCopyToImageFlag);
+        } else {
+            mySelf->deactivate();
+        }
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+    
 JSFunctionSpec *
 JSOffscreenRenderArea::Functions() {
     static JSFunctionSpec myFunctions[] = {
@@ -105,6 +140,8 @@ JSOffscreenRenderArea::Functions() {
         {"setWidth",             setWidth,             1},
         {"setHeight",            setHeight,            1},
         {"downloadFromViewport", downloadFromViewport, 1},
+        {"activate",             activate,             0},
+        {"deactivate",           deactivate,           1},
         {0}
     };
     return myFunctions;

@@ -2003,6 +2003,11 @@ linesmooth   - enable/disable line smoothing
                         <xs:documentation>Property of type Matrix4f</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element ref="vectoroffloat">
+                    <xs:annotation>
+                        <xs:documentation>Property of type vector of float</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element ref="vectorofvector2f">
                     <xs:annotation>
                         <xs:documentation>Property of type vector of Vector2f</xs:documentation>

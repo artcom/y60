@@ -1011,7 +1011,30 @@
             </properties>
         </fragmentshader>
     </shader>
-    <shader id="s127" name="nightgrinder_with_lightmap" cost="10">
+    <shader id="s127" name="glow" cost="10">
+        <supports>
+            <feature class="textures" values="[glow]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="texcoord" values="[*]"/>
+        </supports>
+        <vertexshader profile="VP40" file="glow.cg" entryfunction="mainVertex">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP40" file="glow.cg" entryfunction="mainFragment">
+            <properties>
+                <sampler2d name="tex">0</sampler2d>
+                <vector3f name="texelSize">[0,0,0]</vector3f>
+                <vectoroffloat name="blurKernel">[0.1]</vectoroffloat>
+                <float name="glowScale">1.0</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s128" name="nightgrinder_with_lightmap" cost="10">
         <supports>
             <feature class="vertexparams" values="[nightgrinder]"/>
             <feature class="textures" values="[paint,paint,paint]"/>
@@ -1065,4 +1088,3 @@
         </fragmentshader>
     </shader>    
 </shaders>
-

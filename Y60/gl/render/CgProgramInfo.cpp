@@ -432,7 +432,7 @@ namespace y60 {
     CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
         AC_DEBUG << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
 
-		const MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
+        const MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         const Facade::PropertyMap & myProperties = myPropFacade->getProperties();
         Facade::PropertyMap::const_iterator it = myProperties.begin();
         for (; it != myProperties.end(); ++it) {
@@ -469,7 +469,7 @@ namespace y60 {
                 continue;
             }
             LightSourcePtr myLightSource = myLight->getLightSource();
-			LightPropertiesFacadePtr myLightPropFacade = myLightSource->getChild<LightPropertiesTag>();
+            LightPropertiesFacadePtr myLightPropFacade = myLightSource->getChild<LightPropertiesTag>();
             switch (myLightSource->getType()) {
                 case POSITIONAL :
                     myPositionalLights.push_back(myLight->get<GlobalMatrixTag>().getTranslation());
@@ -583,7 +583,7 @@ namespace y60 {
                                           const std::string & thePropertyName,
                                           const MaterialBase & theMaterial)
     {
-        AC_DEBUG << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode.nodeName() <<" property=" << thePropertyName << " material=" << theMaterial.get<NameTag>();
+        AC_DEBUG << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode.nodeName() << " value=" << theNode.nodeValue() << " property=" << thePropertyName << " material=" << theMaterial.get<NameTag>();
 
         switch(TypeId(asl::getEnumFromString(theNode.parentNode()->nodeName(), TypeIdStrings))) {
             case FLOAT:
@@ -611,6 +611,13 @@ namespace y60 {
                     Vector4f myValueV = theNode.nodeValueAs<Vector4f>();
                     float * myValue = myValueV.begin();
                     cgGLSetParameter4fv(theCgParameter, myValue);
+                    break;
+                }
+            case VECTOR_OF_FLOAT:
+                {
+                    VectorOfFloat myValueV = theNode.nodeValueAs<VectorOfFloat>();
+                    float * myValue = &myValueV[0];
+                    cgGLSetParameterArray1f(theCgParameter, 0, myValueV.size(), myValue);
                     break;
                 }
             case VECTOR_OF_VECTOR2F:

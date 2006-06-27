@@ -126,10 +126,11 @@ SDLWindow::getHeight() const {
     return _myScreen ? _myScreen->h : 0;
 }
 
+
 void
-SDLWindow::postRender() {
-    AbstractRenderWindow::postRender();
+SDLWindow::swapBuffers() {
     MAKE_SCOPE_TIMER(SDL_GL_SwapBuffers);
+    AbstractRenderWindow::swapBuffers();
 #ifdef AC_USE_X11
     if (_mySwapInterval) {
         unsigned counter;
@@ -650,41 +651,50 @@ SDLWindow::mainLoop() {
             isOnTop = (myTopWindow == myRenderGirlWindow);
         }
 #endif
-
         // Call onProtoFrame (a second onframe that can be used to automatically run tutorials)
-        if (_myEventListener && jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
+        if ( jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onProtoFrame")) {
             jsval argv[1], rval;
             argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
             jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onProtoFrame", 1, argv, &rval);
         }
+
         onFrame();
 
         START_TIMER(dispatchEvents);
         EventDispatcher::get().dispatch();
         STOP_TIMER(dispatchEvents);
-
+        
         START_TIMER(handleRequests);
         _myRequestManager.handleRequests();
         STOP_TIMER(handleRequests);
-
+        
         if (_myRenderer && _myRenderer->getCurrentScene()) {
             _myRenderer->getCurrentScene()->updateAllModified();
 
-            preRender();
-            render();
-            postRender();
+            if (jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onRender")) {
+                jsval argv[1], rval;
+                argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
+                jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onRender", 1, argv, &rval);
+            } else {
+                clearBuffers( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                preRender();
+                render();
+                postRender();
+                swapBuffers();
+            }
         }
-
+        
         asl::AGPMemoryFlushSingleton::get().resetGLAGPMemoryFlush();
+        if (jslib::JSApp::getQuitFlag() == JS_TRUE) {
+            _myAppQuitFlag = true;
+        }
+        
 #ifdef WIN32
         if (_myAutoPauseFlag && isOnTop == false) {
             unsigned long mySleepDuration = 40; // in millisec
             asl::msleep(mySleepDuration);
         }
 #endif
-        if (jslib::JSApp::getQuitFlag() == JS_TRUE) {
-            _myAppQuitFlag = true;
-        }
 
         STOP_TIMER(frames);
         asl::getDashboard().cycle();

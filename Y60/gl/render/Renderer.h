@@ -61,9 +61,9 @@ namespace y60 {
             Renderer(GLContextPtr theGLContext, unsigned int theRenderingCaps = -1 /*get em all*/);
             virtual ~Renderer();
 
-            void preRender(const y60::CanvasPtr & theCanvas);
+            void clearBuffers(const y60::CanvasPtr & theCanvas, unsigned int theBuffersMask);
             void render(y60::ViewportPtr theViewport);
-            void postRender();
+            
 
             void preloadShader();
             IShaderLibraryPtr getShaderLibrary();
