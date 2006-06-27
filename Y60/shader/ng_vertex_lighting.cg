@@ -1,0 +1,100 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//  Description: vertex based lighting for nightgrinders
+//=============================================================================
+
+#define DIRECTIONAL_LIGHT_COUNT 1
+#define POSITIONAL_LIGHT_COUNT  1
+
+struct app2vert {
+    float3 Position  : POSITION;
+    float3 Normal    : NORMAL;
+    float4 texCoord0 : TEXCOORD0;
+    float4 texCoord1 : TEXCOORD1;
+#ifdef HAS_LIGHTMAP
+    float4 texCoord2 : TEXCOORD2;
+#endif
+};
+
+struct vert2frag {
+    float4 homPosition : POSITION;
+    float4 primColor   : COLOR0;
+    float2 texCoord0   : TEXCOORD0;
+    float2 texCoord1   : TEXCOORD1;
+#ifdef HAS_LIGHTMAP
+    float2 texCoord2   : TEXCOORD2;
+#endif
+};
+
+vert2frag mainVertex(app2vert IN,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 AC_OBJECTWORLD,
+                     uniform float4x4 AC_OBJECTWORLD_IT,
+                     uniform float3   AC_CAMERA_POSITION,
+                     uniform float3   AC_DIRECTIONAL_LIGHTS[],
+                     // uniform float4   AC_DIRECTIONAL_LIGHT_COLORS[],
+                     uniform float3   AC_POSITIONAL_LIGHTS[],
+                     // uniform float4   AC_POSITIONAL_LIGHT_COLORS[],
+                     uniform float4   AC_AMBIENT_LIGHT_COLOR,
+                     uniform float4x4 GL_TEXTURE
+                     )
+{
+    vert2frag OUT;
+		
+	  float4 diffuse = float4(1.0f);
+	  float4 ambient = float4(1.0f);
+		
+		OUT.texCoord0 = mul(GL_TEXTURE, IN.texCoord0).xy;
+		OUT.texCoord1 = IN.texCoord1.xy;
+
+#ifdef HAS_LIGHTMAP
+		OUT.texCoord2 = IN.texCoord2; 
+#endif
+		
+	  // compute position
+    OUT.homPosition = mul(GL_MODELVIEW_PROJECTION, float4(IN.Position, 1));
+
+    float3 myWorldPosition = mul(AC_OBJECTWORLD, float4(IN.Position,1)).xyz;
+    float3 myWorldNormal = normalize(mul(AC_OBJECTWORLD_IT, float4(IN.Normal,1)).xyz);
+
+    float4 myDiffuse = float4(0,0,0,1);
+
+		// positional lights
+    for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
+        float3 posLightDirection = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
+        myDiffuse += max(0, dot(myWorldNormal, posLightDirection)) * 1.0f; // AC_POSITIONAL_LIGHT_COLORS[i];
+    }
+
+    OUT.primColor = myDiffuse*diffuse; // + AC_AMBIENT_LIGHT_COLOR*ambient;
+
+    return OUT;
+}
+
+float4 mainFragment(vert2frag IN,
+                    uniform sampler2D tex0,
+                    uniform sampler2D tex1
+#ifdef HAS_LIGHTMAP
+										,uniform sampler2D tex2
+#endif
+                    ): COLOR
+{
+		float4 color0 = tex2D(tex0, IN.texCoord0);
+		float4 color1 = tex2D(tex1, IN.texCoord1);
+
+#ifdef HAS_LIGHTMAP
+		IN.primColor += tex2D(tex2, IN.texCoord2) * 2.0f;
+#endif
+ 
+ 		// return IN.primColor;
+ 	  // return tex2D(tex0, IN.texCoord0);
+		// return float4(1.0, 0.0, 0.0, 1.0);
+    return IN.primColor*color1 + (float4(1.0) - IN.primColor)*color0;
+}
+  
