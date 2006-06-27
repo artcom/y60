@@ -64,6 +64,52 @@ intersect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+distance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Calculates the distance between a given point and the plane.");
+        DOC_PARAM("thePoint", "The point to calcluate the distance for", DOC_TYPE_VECTOR3F);
+        DOC_RVAL("The unsigend distance to the plane", DOC_TYPE_FLOAT);
+        DOC_END;
+        ensureParamCount(argc, 1);
+        NATIVE myPlane;        
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myPlane);
+        
+        asl::Point3f myPoint;                
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPoint)) {
+            JS_ReportError(cx, "JSPlane::distance(): Argument #1 must be a point");
+            return JS_FALSE;
+        }
+        
+        float myDistance = asl::distance(myPoint, myPlane);
+        *rval = as_jsval(cx, myDistance);
+        return JS_TRUE;    
+    } HANDLE_CPP_EXCEPTION;        
+}
+
+static JSBool
+signedDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Calculates the signed distance between a given point and the plane.");
+    DOC_PARAM("thePoint", "The point to calcluate the distance for", DOC_TYPE_VECTOR3F);
+    DOC_RVAL("The signed distance to the plane", DOC_TYPE_FLOAT);
+    DOC_END
+    try {
+        ensureParamCount(argc, 1);
+        NATIVE myPlane;        
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myPlane);
+        
+        asl::Point3f myPoint;                
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPoint)) {
+            JS_ReportError(cx, "JSPlane::signedDistance(): Argument #1 must be a point");
+            return JS_FALSE;
+        }
+        
+        float myDistance = asl::signedDistance(myPoint, myPlane);
+        *rval = as_jsval(cx, myDistance);
+        return JS_TRUE;    
+    } HANDLE_CPP_EXCEPTION;        
+}
+
 JSFunctionSpec *
 JSPlane::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -72,6 +118,8 @@ JSPlane::Functions() {
         {"normalize",          normalize,               0},
         {"toString",           toString,                0},
         {"intersect",          intersect,               1},
+        {"distance",           distance,                1},
+        {"signedDistance",     signedDistance,          1},
         {0}
     };
     return myFunctions;
@@ -139,12 +187,13 @@ JSPlane::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
 JSBool
 JSPlane::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Construct a plane from normal/point, with normal/distance, from another plane or construct an empty one.");
-    DOC_PARAM("theVector3", "", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theVector3", "The normal of the plane", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theVector3", "A point on the plane", DOC_TYPE_VECTOR3F);
     DOC_RESET;
-    DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);
+    DOC_PARAM("thePlane", "The other plane", DOC_TYPE_PLANE);
     DOC_RESET;
-    DOC_PARAM("theDistance", "", DOC_TYPE_FLOAT);
-    DOC_PARAM("theNormal", "", DOC_TYPE_VECTOR3F);
+    DOC_PARAM("theDistance", "The distance of the plane to the origin.", DOC_TYPE_FLOAT);
+    DOC_PARAM("theNormal", "The normal of the plane", DOC_TYPE_VECTOR3F);
     DOC_END;
     IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
     if (JSA_GetClass(cx,obj) != Class()) {
