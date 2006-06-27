@@ -152,3 +152,21 @@ function drawIntersection(theIntersectionInfo, theIntersection) {
     // Reset backface culling to previous state
     renderer.backfaceCulling = myCulling;
 }
+
+function pickBody(theX, theY) {
+    // TODO: This is not portrait orientation aware.
+    var myViewport = window.scene.canvas.childNode("viewport");
+    var myPosX = 2 * (theX-myViewport.left) / myViewport.width  - 1;
+    var myPosY = - (2 * (theY-myViewport.top) / myViewport.height - 1);
+    var myClipNearPos = new Point3f(myPosX, myPosY, -1);
+    var myClipFarPos = new Point3f(myPosX, myPosY, +1);
+    var myProjectionMatrix = myViewport.projectionmatrix;
+    myProjectionMatrix.invert();
+    myProjectionMatrix.postMultiply(window.camera.globalmatrix);
+
+	var myWorldNearPos = product(myClipNearPos, myProjectionMatrix);
+	var myWorldFarPos  = product(myClipFarPos, myProjectionMatrix);
+    var myMouseRay     = new Ray(myWorldNearPos, myWorldFarPos);
+
+	return nearestIntersection(window.scene.world, myMouseRay);
+}

@@ -258,7 +258,6 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
 
     	var myWorldNearPos = product(myClipNearPos, myProjectionMatrix);
     	var myWorldFarPos = product(myClipFarPos, myProjectionMatrix);
-    	var myCameraPos = new Point3f(myCamera.globalmatrix.getTranslation());
         var myMouseRay = new Ray(myWorldNearPos, myWorldFarPos);
 
         var myWorld = obj.getWorld();

@@ -20,6 +20,7 @@ use("AnimationManager.js");
 function StateMachine(theInitalState, theDefaultState, theAnimationMgr, theCharacterName) {
     this.Constructor(this, theInitalState, theDefaultState, theAnimationMgr, theCharacterName);
 }
+
 StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultState, theAnimationMgr, theCharacterName) {
     var _myInitialState         = theInitalState; // remember the initial state
     var _myAnimationManager     = theAnimationMgr;
@@ -41,22 +42,26 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
     }
 
     obj.pushState = function(theDestState) {
-        var mySourceState = _myStateQueue[_myStateQueue.length - 1];
-
-        if (mySourceState in _myStateChangeAnims) {
-            if (theDestState in _myStateChangeAnims[mySourceState]) {
-                _myStateQueue.push(theDestState);
-            } else if (_myDefaultState in _myStateChangeAnims[mySourceState] &&
-                       theDestState in _myStateChangeAnims[_myDefaultState]) {
-                _myStateQueue.push(_myDefaultState);
-                _myStateQueue.push(theDestState);
-
-            }
+        var myPreviousState = _myStateQueue[_myStateQueue.length - 1];
+        //print("push state: " + myPreviousState + " -> "+ theDestState);
+        
+        if (myPreviousState in _myStateChangeAnims && 
+            theDestState in _myStateChangeAnims[myPreviousState])
+        {
+            // A fitting state change is registered
+            _myStateQueue.push(theDestState);
+        } else if (theDestState in _myStateChangeAnims[_myDefaultState]) {
+            // A default state change is registered
+            _myStateQueue.push(_myDefaultState);
+            _myStateQueue.push(theDestState);
+        } else {
+            Logger.warning("Impossible state change from: " + myPreviousState + " to " + theDestState);
         }
 
         if (_myStateQueue.length > TRIM_QUEUE_LENGTH) {
             trimQueue();
         }
+        //print("queue: " + _myStateQueue);
     }
 
     obj.onFrame = function() {
@@ -66,9 +71,9 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
     }
 
     obj.switchToState = function(theState) {
+        //print("Switch to state: " + theState);
         _myAnimationManager.stop(_myCharacterName);
         _myStateQueue = new Array(theState);
-        //print("Switched to state: " + theState);
     }
 
     // add a statechange and a corresponding animation
@@ -86,6 +91,9 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
         _myStateQueue =  new Array(theInitalState);
     }
 
+    obj.getCurrentState = function() {
+        return _myStateQueue[0];
+    }
 
     /////////////////////////////////////
     // private methods
@@ -95,14 +103,15 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
         var myQueueLength = _myStateQueue.length;
         if (myQueueLength == 1) {
             var myState = _myStateQueue[0];
-            if (myState in _myStateAnims && _myStateAnims[myState] != undefined) {
+            if (myState in _myStateAnims && _myStateAnims[myState] != undefined) {                
                 changeClip(_myStateAnims[myState]);
             }
+            //print("quequed state: "+myState);
         } else {
             var mySrcState  = _myStateQueue.shift();
             var myDestState = _myStateQueue[0];
             if (mySrcState in _myStateChangeAnims && myDestState in _myStateChangeAnims[mySrcState]) {
-                //print("Statechange : from: " + mySrcState + " to: " + myDestState + " ");
+                //print("  Statechange: " + mySrcState + " -> " + myDestState);
                 changeClip(_myStateChangeAnims[mySrcState][myDestState], _myStateChangeParams[mySrcState][myDestState]);
             } else {
                 print("### WARNING Statechange from: " + mySrcState + " to: " + myDestState + " does not have a clip");
