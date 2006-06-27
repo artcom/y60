@@ -22,7 +22,6 @@ function StateMachine(theInitalState, theDefaultState, theAnimationMgr, theChara
 }
 
 StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultState, theAnimationMgr, theCharacterName) {
-    var _myInitialState         = theInitalState; // remember the initial state
     var _myAnimationManager     = theAnimationMgr;
     var _myCharacterName        = theCharacterName;
 
@@ -32,13 +31,29 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
 
     var _myStateChangeAnims     = [];  // a array of possible statechanges and animations
     var _myStateChangeParams    = [];  // a array of possible statechanges and params
-
+    var _mySyncClips            = [];  // Clips that are played back synchronized in another character
+    
     var _myDefaultState         = theDefaultState;
+    
     const TRIM_QUEUE_LENGTH = 2;
 
-    // add a state and a corresponding animation.
-    obj.addState = function(theState, theAnimation) {
-        _myStateAnims[theState] = theAnimation;
+    // add a state and a corresponding loop animation.
+    // theLoopAnimation can be undefined or a string or a list of animations, 
+    // devided by '|'
+    obj.addState = function(theState, theLoopAnimation) {
+        var myAnimations = null;
+        if (theLoopAnimation) {
+            myAnimations = theLoopAnimation.split("|");
+            if (myAnimations.length == 0) {
+                myAnimations = [theLoopAnimation];
+            }
+        }
+        _myStateAnims[theState] = myAnimations;
+    }
+
+    // Allows you to register clips that are started syncronously with the main clip
+    obj.connectClip = function(theClip, theOtherCharacter, theOtherClip) {
+        _mySyncClips[theClip] = {character: theOtherCharacter, clip: theOtherClip};
     }
 
     obj.pushState = function(theDestState) {
@@ -103,8 +118,8 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
         var myQueueLength = _myStateQueue.length;
         if (myQueueLength == 1) {
             var myState = _myStateQueue[0];
-            if (myState in _myStateAnims && _myStateAnims[myState] != undefined) {                
-                changeClip(_myStateAnims[myState]);
+            if (myState in _myStateAnims && _myStateAnims[myState]) {                
+                changeClip(randomElement(_myStateAnims[myState]));
             }
             //print("quequed state: "+myState);
         } else {
@@ -123,15 +138,25 @@ StateMachine.prototype.Constructor = function(obj, theInitalState, theDefaultSta
         if (theAnimName != "") {
             //print("change clip " + theAnimName);
             if (theReverseState == undefined || !theReverseState) {
-                //print("   forward");
-                _myAnimationManager.setClipForwardDirection(_myCharacterName, theAnimName, true);
+                startClip(theAnimName, true)
             } else {
-                //print("   reverse");
-                _myAnimationManager.setClipForwardDirection(_myCharacterName, theAnimName, false);
-            }
-            _myAnimationManager.setClipLoops(_myCharacterName, theAnimName, 1);
-            _myAnimationManager.startClip(_myCharacterName, theAnimName);
+                startClip(theAnimName, false)
+            }            
         }
+    }
+    
+    function startClip(theAnimName, theDirection) {
+        //print("startClip " + theAnimName);
+        _myAnimationManager.setClipForwardDirection(_myCharacterName, theAnimName, theDirection);
+        _myAnimationManager.setClipLoops(_myCharacterName, theAnimName, 1);
+        _myAnimationManager.startClip(_myCharacterName, theAnimName);     
+        
+        if (theAnimName in _mySyncClips) {
+            var mySyncClip = _mySyncClips[theAnimName];
+            _myAnimationManager.setClipForwardDirection(mySyncClip.character, mySyncClip.clip, theDirection);
+            _myAnimationManager.setClipLoops(mySyncClip.character, mySyncClip.clip, 1);
+            _myAnimationManager.startClip(mySyncClip.character, mySyncClip.clip);                 
+        }   
     }
 
     function stateChangeExist(theSourceState, theDestState) {
