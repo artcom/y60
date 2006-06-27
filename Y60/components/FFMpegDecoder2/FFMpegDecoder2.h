@@ -178,7 +178,6 @@ namespace y60 {
         int _myFrameWidth;
         int _myFrameHeight;
         PixelEncoding _myPixelEncoding;
-        bool _myAudioFlag;
     };
     typedef asl::Ptr<FFMpegDecoder2> FFMpegDecoder2Ptr;
 }

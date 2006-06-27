@@ -151,7 +151,7 @@ namespace y60 {
             _myVStream = 0;
             _myVStreamIndex = -1;
         }
-        if (_myAStream && _myAudioFlag) {
+        if (_myAStream && getAudioFlag()) {
             setupAudio(theFilename);
         } else {
             AC_INFO << "FFMpegDecoder2::load " << theFilename << " no audio stream found or disabled";
@@ -186,10 +186,10 @@ namespace y60 {
         }
 
         decodeFrame();
-        if (_myAStream && _myAudioFlag)
+        if (hasAudio())
         {
             readAudio();
-//            AC_INFO << "Start Audio";
+            AC_INFO << "Start Audio";
             _myAudioSink->play();
         }
 
@@ -554,7 +554,7 @@ namespace y60 {
                 AC_WARNING << "---- Semaphore destroyed while in run. Terminating Thread.";
                 return;
             }
-            if (_myAStream && _myAudioFlag)
+            if (hasAudio())
             {
                 readAudio();
             }
@@ -670,8 +670,6 @@ namespace y60 {
         }
         AC_TRACE << "FFMpegDecoder2::setupAudio() done. resampling " 
             << (_myResampleContext != 0);
-        _myAudioFlag = getAudioFlag();
-
     }
 
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, int64_t theTimestamp) {
@@ -733,9 +731,9 @@ namespace y60 {
         int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex, 
                 mySeekTime, AVSEEK_FLAG_BACKWARD);
         decodeFrame();
-        if (_myAStream && _myAudioFlag)
+        if (hasAudio())
         {
-            //            AC_INFO << "Start Audio";
+            AC_DEBUG << "seek: Start Audio";
             _myAudioSink->setCurrentTime(theDestTime);
             if (getState() == RUN) {
                 readAudio();
