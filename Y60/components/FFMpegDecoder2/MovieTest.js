@@ -96,7 +96,7 @@ function FFMpegTest(theArguments) {
         "setupStopPauseTest()",
         "setupSeekBackTest()",
         "setupSeekFwdTest()",
-            //                "setupLongTest(true)"
+//                "setupLongTest(true)"
     ];
 
     Public.nextTest = function() {
