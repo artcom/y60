@@ -360,6 +360,15 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
     public:
         LinearAlgebraUnitTest() : LinearAlgebraTestBase("LinearAlgebraUnitTest") {  }
         virtual ~LinearAlgebraUnitTest() {}
+
+        void
+        testOrientationFromDirection(const Vector3f & theViewVector, const Vector3f & theUpVector) {
+            Quaternionf myQ = getOrientationFromDirection(theViewVector, theUpVector);
+            DPRINT(Point3f(0,0,-1) * myQ);
+            ENSURE(almostEqual(Point3f(0,0,-1) * myQ, theViewVector));
+            ENSURE(almostEqual(Point3f(0,0,1) * myQ, theViewVector * -1));
+        }
+
         void run() {
 			// brainless types, not yet born
 			PairOf<double> myPair;
@@ -424,7 +433,14 @@ class LinearAlgebraUnitTest : public LinearAlgebraTestBase {
 			// check almost equal: different size, different types (valid and not valid)
 			// check distances and nearest points
 
-
+            { // Test getOrientationFromDirection
+                testOrientationFromDirection(Vector3f(1,0,0), Vector3f(0,1,0));
+                testOrientationFromDirection(Vector3f(0,1,0), Vector3f(0,1,0));
+                testOrientationFromDirection(Vector3f(0,0,1), Vector3f(0,1,0));
+                testOrientationFromDirection(Vector3f(1,0,0), normalized(Vector3f(1,1,1)));
+                testOrientationFromDirection(Vector3f(0,1,0), normalized(Vector3f(1,1,1)));
+                testOrientationFromDirection(Vector3f(0,0,1), normalized(Vector3f(1,1,1)));
+            }
         }
 
     void

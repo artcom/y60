@@ -52,9 +52,9 @@ namespace asl {
 
     /** Transforms a Box3 with a Matrix4. Retrieves the corners of the box and
      * transforms them with the Matrix4. The transformed corners are added to
-     * an empty box. The box containing these transformed corner points is 
+     * an empty box. The box containing these transformed corner points is
      * returned.
-     * @relates Box3 */ 
+     * @relates Box3 */
     template <class Number>
     Box3<Number> product(const Box3<Number> & theBox, const Matrix4<Number> & theMatrix) {
         if (!theBox.hasPosition()) {
@@ -81,8 +81,8 @@ namespace asl {
         return product(theBox, theMatrix);
     }
 
-    /** Transforms a Line with a Matrix4. 
-     * @relates Line */ 
+    /** Transforms a Line with a Matrix4.
+     * @relates Line */
     template <class Number>
     Line<Number> product(const Line<Number> & theLine, const Matrix4<Number> & theMatrix) {
         Line<Number> myResult(theLine.origin * theMatrix,
@@ -91,14 +91,14 @@ namespace asl {
         return myResult;
     }
     /** Product operator for Line and Matrix4
-     * @relates Line */ 
+     * @relates Line */
     template<class Number>
     Line<Number> operator*(const Line<Number> & theLine, const Matrix4<Number> & theMatrix) {
         return product(theLine, theMatrix);
     }
 
-    /** Transforms a Ray with a Matrix4. 
-     * @relates Ray */ 
+    /** Transforms a Ray with a Matrix4.
+     * @relates Ray */
     template <class Number>
     Ray<Number> product(const Ray<Number> & theRay, const Matrix4<Number> & theMatrix) {
         Ray<Number> myResult(theRay.origin * theMatrix,
@@ -107,28 +107,28 @@ namespace asl {
         return myResult;
     }
     /** Product operator for Ray and Matrix4
-     * @relates Ray */ 
+     * @relates Ray */
     template<class Number>
     Ray<Number> operator*(const Ray<Number> & theRay, const Matrix4<Number> & theMatrix) {
         return product(theRay, theMatrix);
     }
 
-    /** Transforms a LineSegment with a Matrix4. 
-     * @relates LineSegment */ 
+    /** Transforms a LineSegment with a Matrix4.
+     * @relates LineSegment */
     template <class Number>
     LineSegment<Number> product(const LineSegment<Number> & theLine, const Matrix4<Number> & theMatrix) {
         return LineSegment<Number>(theLine.origin * theMatrix,
                                    theLine.end * theMatrix);
     }
     /** Product operator for LineSegment and Matrix4
-     * @relates LineSegment */ 
+     * @relates LineSegment */
     template<class Number>
     LineSegment<Number> operator*(const LineSegment<Number> & theLine, const Matrix4<Number> & theMatrix) {
         return product(theLine, theMatrix);
     }
 
-    /** Transforms a Plane with a Matrix4. 
-     * @relates Plane */ 
+    /** Transforms a Plane with a Matrix4.
+     * @relates Plane */
     template <class Number>
     Plane<Number> product(const Plane<Number> & thePlane, const Matrix4<Number> & theMatrix) {
         Plane<Number> myResult;
@@ -149,14 +149,14 @@ namespace asl {
         return myResult;
     }
     /** Product operator for Plane and Matrix4
-     * @relates Plane */ 
+     * @relates Plane */
     template <class Number>
     Plane<Number> operator*(const Plane<Number> & thePlane, const Matrix4<Number> & theMatrix) {
         return product(thePlane, theMatrix);
     }
 
-    /** Transforms a Triangle with a Matrix4. 
-     * @relates Triangle */ 
+    /** Transforms a Triangle with a Matrix4.
+     * @relates Triangle */
     template <class Number>
     Triangle<Number> product(const Triangle<Number> & theTriangle, const Matrix4<Number> & theMatrix) {
         return Triangle<Number> (
@@ -165,7 +165,7 @@ namespace asl {
             theTriangle[2] * theMatrix);
     }
     /** Product operator for Triangle and Matrix4
-     * @relates Triangle */ 
+     * @relates Triangle */
     template<class Number>
     Triangle<Number> operator*(const Triangle<Number> & theTriangle, const Matrix4<Number> & theMatrix) {
         return product(theTriangle, theMatrix);
@@ -198,7 +198,7 @@ namespace asl {
         myResult.sub(asVector(b));
         return myResult;
     }
-    
+
     template <class NUMBER>
     Vector4<NUMBER> difference(const Point4<NUMBER> & a, const Point4<NUMBER> & b) {
         Vector4<NUMBER> myResult = asVector(a);
@@ -212,14 +212,14 @@ namespace asl {
         myResult.mult(b);
         return myResult;
     }
-    
+
     template <class NUMBER>
     Point3<NUMBER> product(const Point3<NUMBER> & a, const Vector3<NUMBER> & b) {
         Point3<NUMBER> myResult = a;
         myResult.mult(b);
         return myResult;
     }
-    
+
     template <class NUMBER>
     Point4<NUMBER> product(const Point4<NUMBER> & a, const Vector4<NUMBER> & b) {
         Point4<NUMBER> myResult = a;
@@ -239,41 +239,61 @@ namespace asl {
     //=================================================
 
     template <class NUMBER>
-    asl::Vector4<NUMBER> product(const Quaternion<NUMBER> & theQuaternion, 
-                                 const asl::Vector4<NUMBER> & theVector) 
+    asl::Vector4<NUMBER> product(const Quaternion<NUMBER> & theQuaternion,
+                                 const asl::Vector4<NUMBER> & theVector)
     {
         // TODO: find out which product(Vector*Quaternion)  matches
         throw asl::Exception("Quaternion * Vector is illegal, use Vector * Quaternion instead", PLUS_FILE_LINE);
     }
 
     template <class NUMBER>
-    asl::Vector4<NUMBER> product(const asl::Vector4<NUMBER> & theVector, 
-                                 const Quaternion<NUMBER> & theQuaternion) 
+    asl::Vector4<NUMBER> product(const asl::Vector4<NUMBER> & theVector,
+                                 const Quaternion<NUMBER> & theQuaternion)
     {
     	asl::Matrix4<NUMBER> myMatrix(theQuaternion);
     	return product(theVector, myMatrix );
     }
 
     template <class NUMBER>
-    asl::Vector4<NUMBER> operator * (const asl::Vector4<NUMBER> & theVector, 
-                                     const Quaternion<NUMBER> & theQuaternion) 
+    asl::Vector4<NUMBER> operator * (const asl::Vector4<NUMBER> & theVector,
+                                     const Quaternion<NUMBER> & theQuaternion)
     {
         return product(theVector, theQuaternion);
     }
-    
+
     template <class NUMBER>
-    asl::Point3<NUMBER> product(const asl::Point3<NUMBER> & thePoint, 
-                                const Quaternion<NUMBER> & theQuaternion) 
+    asl::Point3<NUMBER> product(const asl::Point3<NUMBER> & thePoint,
+                                const Quaternion<NUMBER> & theQuaternion)
     {
     	asl::Matrix4<NUMBER> myMatrix(theQuaternion);
     	return product(thePoint, myMatrix );
     }
 
     template <class NUMBER>
-    asl::Point3<NUMBER> operator * (const asl::Point3<NUMBER> & thePoint, 
-                                    const Quaternion<NUMBER> & theQuaternion) 
+    asl::Point3<NUMBER> operator * (const asl::Point3<NUMBER> & thePoint,
+                                    const Quaternion<NUMBER> & theQuaternion)
     {
         return product(thePoint, theQuaternion);
+    }
+
+
+    // NOTE: normalized vectors required
+    inline
+    asl::Quaternionf
+    getOrientationFromDirection(const asl::Vector3f & theViewVector, const asl::Vector3f & theUpVector) {
+        asl::Vector3f myUpVector = asl::normalized(projection(theUpVector, asl::Planef(theViewVector, 0)));
+        asl::Vector3f myRightVector = asl::cross(theViewVector, myUpVector);
+
+        asl::Matrix4f myMatrix;
+        myMatrix.assign(myRightVector[0], myRightVector[1],  myRightVector[2],  0,
+                       myUpVector[0],     myUpVector[1],     myUpVector[2],     0,
+                       -theViewVector[0], -theViewVector[1], -theViewVector[2], 0,
+                       0, 0, 0, 1,
+                       asl::Matrix4f::ROTATING);
+        asl::Quaternionf   myOrientation;
+        asl::Vector3f myPosition;
+        myMatrix.decompose(myUpVector, myRightVector, myOrientation, myPosition);
+        return myOrientation;
     }
 
     /* @} */
