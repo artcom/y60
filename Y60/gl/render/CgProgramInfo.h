@@ -49,7 +49,7 @@ namespace y60 {
         POSITIONAL_LIGHTS, DIRECTIONAL_LIGHTS,
         POSITIONAL_LIGHTS_DIFFUSE_COLOR, DIRECTIONAL_LIGHTS_DIFFUSE_COLOR,
         POSITIONAL_LIGHTS_SPECULAR_COLOR, DIRECTIONAL_LIGHTS_SPECULAR_COLOR,
-        AMBIENT_LIGHT_COLOR, MAX_AUTO_PARAMETER
+        AMBIENT_LIGHT_COLOR, TEXTURE_MATRICES, MAX_AUTO_PARAMETER
     };
     static const char * CGAutoParamterString[] = {
         "AC_OBJECTWORLD",
@@ -67,6 +67,7 @@ namespace y60 {
         "AC_POSITIONAL_LIGHTS_SPECULAR_COLOR",
         "AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR",
         "AC_AMBIENT_LIGHT_COLOR",
+        "AC_TEXTURE_MATRICES",
         0
     };
 
@@ -90,7 +91,8 @@ namespace y60 {
             static CGprofile asCgProfile(const ShaderDescription & theShader);
 
             void bindMaterialParams(const MaterialBase & theMaterial);
-            void bindBodyParams(const y60::LightVector & theLightInstances,
+            void bindBodyParams(const MaterialBase & theMaterial,
+                        const y60::LightVector & theLightInstances,
                         const Viewport & theViewport,
                         const y60::Body & theBody,
                         const y60::Camera & theCamera);
@@ -107,10 +109,6 @@ namespace y60 {
             void createAndCompileProgram();
 
             void setCGGLParameters();
-            void setAutoParameters(const y60::LightVector & theLightInstances,
-                        const Viewport & theViewport,
-                        const y60::Body & theBody,
-                        const y60::Camera & theCamera);
 
             struct CgProgramGlParam {
                 CgProgramGlParam(const std::string & myParamName,
@@ -168,10 +166,10 @@ namespace y60 {
             void setCgMatrixParameter(const CgProgramAutoParam & theParam, const asl::Matrix4f & theValue);
             void setCgArrayVector3fParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector3f> & theValue);
             void setCgArrayVector4fParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector4f> & theValue);
-        
+
             void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector3f> & theValue);
             void setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam, const std::vector<asl::Vector4f> & theValue);
-        
+
             ShaderDescription           _myShader;
             CGprogram                   _myCgProgramID;
             CGcontext                   _myContext;

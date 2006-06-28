@@ -68,7 +68,7 @@ vert2frag mainVertex(app2vert IN,
 
 		// positional lights
     for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
-        float3 posLightDirection = normalize(AC_POSITIONAL_LIGHTS[i]-myWorldPosition);
+        float3 posLightDirection = normalize(AC_POSITIONAL_LIGHTS[i] - myWorldPosition);
         myDiffuse += max(0, dot(myWorldNormal, posLightDirection)) * 1.0f; // AC_POSITIONAL_LIGHT_COLORS[i];
     }
 
@@ -89,12 +89,12 @@ float4 mainFragment(vert2frag IN,
 		float4 color1 = tex2D(tex1, IN.texCoord1);
 
 #ifdef HAS_LIGHTMAP
-		IN.primColor += tex2D(tex2, IN.texCoord2) * 2.0f;
+		float4 color2 = tex2D(tex2, IN.texCoord2);
 #endif
- 
  		// return IN.primColor;
- 	  // return tex2D(tex0, IN.texCoord0);
+ 		// return IN.primColor * IN.primColor;
+ 	  // return tex2D(tex2, IN.texCoord2);
 		// return float4(1.0, 0.0, 0.0, 1.0);
-    return IN.primColor*color1 + (float4(1.0) - IN.primColor)*color0;
+    return IN.primColor*IN.primColor*color1; // + (float4(1.0) - IN.primColor)*color0 + color2;
 }
   

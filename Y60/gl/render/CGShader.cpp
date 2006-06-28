@@ -250,28 +250,14 @@ namespace y60 {
         GLShader::bindBodyParams(theMaterial, theViewport, theLights, theBody, theCamera);
 
         if (_myVertexProgram) {
-            DBP2(MAKE_SCOPE_TIMER(CGShader_bindBodyParams_VP));
-            DBP2(START_TIMER(CGShader_bindBodyParams_VP_reload));
             bool b = _myVertexProgram->reloadIfRequired(theLights, theMaterial);
-            DBP2(STOP_TIMER(CGShader_bindBodyParams_VP_reload));
-            DBP2(START_TIMER(CGShader_bindBodyParams_VP_bindParams));
-            _myVertexProgram->bindBodyParams(theLights, theViewport, theBody, theCamera);
-            DBP2(STOP_TIMER(CGShader_bindBodyParams_VP_bindParams));
-            DBP2(START_TIMER(CGShader_bindBodyParams_VP_bindProgram));
+            _myVertexProgram->bindBodyParams(theMaterial, theLights, theViewport, theBody, theCamera);
             _myVertexProgram->bind();
-            DBP2(STOP_TIMER(CGShader_bindBodyParams_VP_bindProgram));
         }
         if (_myFragmentProgram) {
-            DBP2(MAKE_SCOPE_TIMER(CGShader_bindBodyParams_FP));
-            DBP2(START_TIMER(CGShader_bindBodyParams_FP_reload));
             bool b = _myFragmentProgram->reloadIfRequired(theLights, theMaterial);
-            DBP2(STOP_TIMER(CGShader_bindBodyParams_FP_reload));
-            DBP2(START_TIMER(CGShader_bindBodyParams_FP_bindParams));
-            _myFragmentProgram->bindBodyParams(theLights, theViewport, theBody, theCamera);
-            DBP2(STOP_TIMER(CGShader_bindBodyParams_FP_bindParams));
-            DBP2(START_TIMER(CGShader_bindBodyParams_FP_bindProgram));
+            _myFragmentProgram->bindBodyParams(theMaterial, theLights, theViewport, theBody, theCamera);
             _myFragmentProgram->bind();
-            DBP2(STOP_TIMER(CGShader_bindBodyParams_FP_bindProgram));
         }
     }
 

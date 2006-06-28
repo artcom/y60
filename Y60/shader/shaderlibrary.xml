@@ -966,7 +966,7 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="textures" values="[paint,paint]"/>
             <feature class="texcoord" values="[uv_map,uv_map]"/>
-            <feature class="vertexparams" values="[color]"/>            
+            <feature class="vertexparams" values="[color]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
@@ -977,10 +977,10 @@
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
-                <vector3f name="color"/>                
+                <vector3f name="color"/>
             </vertexparameters>
          </fixedfunctionshader>
-    </shader> 
+    </shader>
     <shader id="s126" name="particles" cost="10">
         <supports>
             <feature class="vertexparams" values="[particles]"/>
@@ -992,9 +992,9 @@
             <properties>
                 <vector4f name="gravity">[0,0,0,0]</vector4f>
                 <vector3f name="size">[16,0,64]</vector3f>
-                <float name="time">0.0</float> 
-                <float name="stoptime">10000000000000.0</float> 
-                <float name="timetolive">3.0</float> 
+                <float name="time">0.0</float>
+                <float name="stoptime">10000000000000.0</float>
+                <float name="timetolive">3.0</float>
             </properties>
             <vertexparameters>
                  <vector4f name="position"/>
@@ -1036,55 +1036,29 @@
     </shader>
     <shader id="s128" name="nightgrinder_with_lightmap" cost="10">
         <supports>
-            <feature class="vertexparams" values="[nightgrinder]"/>
             <feature class="textures" values="[paint,paint,paint]"/>
-            <feature class="texcoord" values="[*,*,*]"/> 
+            <feature class="texcoord" values="[*,*,*]"/>
             <feature class="lighting" values="[unlit]"/>
+            <feature class="vertexparams" values="[nightgrinder]"/>
         </supports>
-        <vertexshader profile="VP30" file="ng_vertex_lighting.cg" entryfunction="mainVertex" compilerargs="-DHAS_LIGHTMAP">
-            <properties> 
+        <vertexshader profile="VP30" file="ng_fragment_lighting.cg" entryfunction="mainVertex" compilerargs="-DHAS_LIGHTMAP">
+            <properties>
 <!--           <vector4f name="diffuse">[0,0,0,0]</vector4f><vector4f name="ambient">[0,0,0,0]</vector4f> -->
             </properties>
             <vertexparameters>
                  <vector4f name="position"/>
                  <vector3f name="normal"/>
                  <vector4f name="texcoord0"/>
-                 <vector4f name="texcoord1"/> 
-                 <vector4f name="texcoord2"/> 
+                 <vector4f name="texcoord1"/>
+                 <vector4f name="texcoord2"/>
             </vertexparameters>
         </vertexshader>
-        <fragmentshader profile="FP30" file="ng_vertex_lighting.cg" entryfunction="mainFragment" compilerargs="-DHAS_LIGHTMAP">
+        <fragmentshader profile="FP30" file="ng_fragment_lighting.cg" entryfunction="mainFragment" compilerargs="-DHAS_LIGHTMAP">
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
-                <sampler2d name="tex1">1</sampler2d> 
-                <sampler2d name="tex2">2</sampler2d> 
+                <sampler2d name="tex1">1</sampler2d>
+                <sampler2d name="tex2">2</sampler2d>
             </properties>
         </fragmentshader>
-    </shader>    
-    <shader id="s129" name="nightgrinder_without_lightmap" cost="10">
-        <supports>
-            <feature class="vertexparams" values="[nightgrinder]"/>
-            <feature class="textures" values="[paint,paint]"/>
-            <feature class="texcoord" values="[*,*]"/> 
-            <feature class="lighting" values="[unlit]"/>
-        </supports>
-        <vertexshader profile="VP30" file="ng_vertex_lighting.cg" entryfunction="mainVertex">
-            <properties> 
-<!--           <vector4f name="diffuse">[0,0,0,0]</vector4f>
-	 	           <vector4f name="ambient">[0,0,0,0]</vector4f> -->
-            </properties>
-            <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="normal"/>
-                 <vector2f name="texcoord0"/>
-                 <vector2f name="texcoord1"/> 
-            </vertexparameters>
-        </vertexshader>
-        <fragmentshader profile="FP30" file="ng_vertex_lighting.cg" entryfunction="mainFragment">
-            <properties>
-                <sampler2d name="tex0">0</sampler2d>
-                <sampler2d name="tex1">1</sampler2d> 
-            </properties>
-        </fragmentshader>
-    </shader>    
+    </shader>
 </shaders>

@@ -132,6 +132,8 @@ namespace y60 {
         _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
         _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = 0;
 
+        _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = 0;
+
         //VS: 100 punkte
         cgSetAutoCompile(_myContext, CG_COMPILE_MANUAL);
         createAndCompileProgram();
@@ -380,6 +382,8 @@ namespace y60 {
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = myDirectionalLightCount;
 
+            _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = theMaterial.getTextureCount();
+
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
             createAndCompileProgram();
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
@@ -406,6 +410,7 @@ namespace y60 {
 
     void
     CgProgramInfo::bindBodyParams(
+            const MaterialBase & theMaterial,
             const LightVector & theLightInstances,
             const Viewport & theViewport,
             const Body & theBody,
@@ -413,44 +418,7 @@ namespace y60 {
     {
         DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_bindBodyParams));
         setCGGLParameters();
-        setAutoParameters(theLightInstances, theViewport, theBody, theCamera);
-    }
-
-    void
-    CgProgramInfo::bindOverlayParams() {
-        setCGGLParameters();
-
-        for (CgProgramAutoParams::iterator myIter = _myAutoParams.begin();
-                myIter != _myAutoParams.end(); ++myIter)
-        {
-            CgProgramAutoParam curParam = myIter->second;
-            AC_WARNING << "Cg parameter " << curParam._myName << " is not supported for overlays, yet.";
-        }
-    }
-
-    void
-    CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
-        AC_DEBUG << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
-
-        const MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
-        const Facade::PropertyMap & myProperties = myPropFacade->getProperties();
-        Facade::PropertyMap::const_iterator it = myProperties.begin();
-        for (; it != myProperties.end(); ++it) {
-            CGparameter myCgParameter = cgGetNamedParameter(_myCgProgramID, it->first.c_str());
-            if (myCgParameter) {
-                setCgMaterialParameter(myCgParameter, *(it->second), it->first, theMaterial);
-            }
-        }
-    }
-
-    void
-    CgProgramInfo::setAutoParameters(
-            const LightVector & theLightInstances,
-            const Viewport & theViewport,
-            const Body & theBody,
-            const Camera & theCamera)
-    {
-        //AC_DEBUG << "CgProgramInfo::setAutoParameters";
+       //AC_DEBUG << "CgProgramInfo::setAutoParameters";
 
         std::vector<Vector3f> myPositionalLights;
         std::vector<Vector4f> myPositionalLightDiffuseColors;
@@ -567,12 +535,49 @@ namespace y60 {
                         setCgMatrixParameter(curParam, myTransposedMatrix);
                         break;
                     }
+                case TEXTURE_MATRICES:
+                    {
+                        int mySize = cgGetArraySize(curParam._myParameter, 0);
+                        for (unsigned i = 0; i < mySize; ++i) {
+                            CGparameter myElement = cgGetArrayParameter(curParam._myParameter, i);
+                            Matrix4f myTextureMatrix = theMaterial.getTexture(i).get<TextureMatrixTag>();
+                            cgGLSetMatrixParameterfc(myElement, myTextureMatrix.getData());
+                        }
+                        break;
+                    }
                 default:
                     myParamValueFoundFlag = false;
                     break;
             }
             if (!myParamValueFoundFlag) {
                 AC_WARNING << "no value for cg auto parameter " << curParam._myName << endl;
+            }
+        }
+    }
+
+    void
+    CgProgramInfo::bindOverlayParams() {
+        setCGGLParameters();
+
+        for (CgProgramAutoParams::iterator myIter = _myAutoParams.begin();
+                myIter != _myAutoParams.end(); ++myIter)
+        {
+            CgProgramAutoParam curParam = myIter->second;
+            AC_WARNING << "Cg parameter " << curParam._myName << " is not supported for overlays, yet.";
+        }
+    }
+
+    void
+    CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
+        AC_DEBUG << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
+
+        const MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
+        const Facade::PropertyMap & myProperties = myPropFacade->getProperties();
+        Facade::PropertyMap::const_iterator it = myProperties.begin();
+        for (; it != myProperties.end(); ++it) {
+            CGparameter myCgParameter = cgGetNamedParameter(_myCgProgramID, it->first.c_str());
+            if (myCgParameter) {
+                setCgMaterialParameter(myCgParameter, *(it->second), it->first, theMaterial);
             }
         }
     }
