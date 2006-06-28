@@ -88,7 +88,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             print("Nothing to show!");
             exit(0);
         }
-
         updateFileView();
         createTextOverlay();
     }
@@ -539,11 +538,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         }
 
         _myCaptureNode.src = theURL;
-        if (!window.scene.loadCaptureFrame(_myCaptureNode)) {
-            self.getImages().removeChild(_myCaptureNode);
-            exit(0);
-        }
-
+        window.scene.loadCaptureFrame(_myCaptureNode)
         _myCaptureNode.playmode = "play";
         _myMovieOverlay.width  = _myCaptureNode.width;
         _myMovieOverlay.height = _myCaptureNode.height;
@@ -658,6 +653,7 @@ try {
         ourImageViewerApp.setup(800, 600, "ImageViewer");
         window.backgroundColor = [0.5,0.5,0.5];
         ourImageViewerApp.go();
+        print("done");
     }
 } catch (ex) {
     reportException(ex);
