@@ -220,8 +220,6 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             _myCurrentSection   = _mySettings.firstChild;
             _myCurrentSetting   = new Setting(_myCurrentSection.firstChild);
             _myOriginalSettings = _mySettings.cloneNode(true);
-        } else {
-            print("Settings-file not found");    
         }
     }
 
