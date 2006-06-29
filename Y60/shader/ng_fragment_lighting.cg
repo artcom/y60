@@ -94,19 +94,19 @@ float4 mainFragment(vert2frag IN,
     }
 
     if (myLightDistance >= near) {
-        myDiffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
-    } else if (myLightDistance <= far) {
         myDiffuse = float4(0.0f, 0.0f, 0.0f, 1.0f);
-        myDiffuse.w = 1.0f;
+    } else if (myLightDistance <= far) {
+        myDiffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
     } else {
-        myDiffuse = float4( (lerp( myDiffuse, 1.0, (myLightDistance-far) / (near - far))).xxx, 1.0);
+        myDiffuse = float4( (lerp( 1.0, myDiffuse, (myLightDistance-far) / (near - far))).xxx, 1.0);
     }
 
-//     myDiffuse *= myDiffuse2;
+    myDiffuse*=myDiffuse2;
 
-    float4 myReturn = myDiffuse*color1*myLightmap
-                        + myDiffuse*color1*0.7f
-                        + (float4(1.0f)-myDiffuse)*color0;
+    float4 myReturn = myDiffuse*color0
+                         +(float4(1.0f)-myDiffuse)*color1
+                         +(float4(1.0f)-myDiffuse)*color1*myLightmap;
+    myReturn.a = 1.0f;
 
     return myReturn;
 }
