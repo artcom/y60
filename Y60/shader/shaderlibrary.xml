@@ -1044,6 +1044,7 @@
         <vertexshader profile="VP30" file="ng_fragment_lighting.cg" entryfunction="mainVertex" compilerargs="-DHAS_LIGHTMAP">
             <properties>
 <!--           <vector4f name="diffuse">[0,0,0,0]</vector4f><vector4f name="ambient">[0,0,0,0]</vector4f> -->
+                <vector2f name="nearFar">[20.0, 15.0]</vector2f>
             </properties>
             <vertexparameters>
                  <vector4f name="position"/>

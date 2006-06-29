@@ -64,11 +64,12 @@ float4 mainFragment(vert2frag IN,
 #endif
                     uniform float3 AC_POSITIONAL_LIGHTS[],
                     uniform float4x4 AC_OBJECTWORLD,
-                    uniform float4x4 AC_OBJECTWORLD_IT
+                    uniform float4x4 AC_OBJECTWORLD_IT,
+                    uniform float2 nearFar
                     ): COLOR
 {
-    float near = 30.0f;
-    float far  = 20.0f;
+    float near = nearFar.x; // 30.0f;
+    float far  = nearFar.y; //20.0f;
 
     float4 color0 = tex2D(tex0, IN.texCoord0);
     float4 color1 = tex2D(tex1, IN.texCoord1);
