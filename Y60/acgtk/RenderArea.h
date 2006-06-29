@@ -49,6 +49,9 @@ class RenderArea : public Gtk::DrawingArea, public jslib::AbstractRenderWindow {
         int getHeight() const;
         void setIdleMode(bool theEnabledFlag);
         GdkGLContext * getGdkGlContext() const;
+
+        virtual void swapBuffers();
+    
     protected:
         // Gtk callbacks
         bool on_expose_event (GdkEventExpose *event);

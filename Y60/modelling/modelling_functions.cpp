@@ -462,8 +462,7 @@ namespace y60 {
     }
 
     void
-    appendTexture(SceneBuilder & theSceneBuilder,
-                  ScenePtr theScene,
+    appendTexture(ScenePtr theScene,
                   MaterialBuilder & theMaterialBuilder,
                   const std::string & theTextureFilename,
                   bool theSpriteFlag,
@@ -486,12 +485,12 @@ namespace y60 {
         string myImageId;
         if (theMaterialBuilder.isMovie(theTextureFilename)) {
             unsigned myLoopCount = 0;
-            myImageId = theMaterialBuilder.createMovie(theSceneBuilder, myTexName,
+            myImageId = theMaterialBuilder.createMovie(*(theScene->getSceneBuilder()), myTexName,
                                                        theTextureFilename, myLoopCount,
                                                        myColorScale, myColorBias,
                                                        "");
         } else {
-            myImageId = theMaterialBuilder.createImage(theSceneBuilder, myTexName,
+            myImageId = theMaterialBuilder.createImage(*(theScene->getSceneBuilder()), myTexName,
                                                        theTextureFilename, myUsage,
                                                        myCreateMipmapFlag, myColorScale,
                                                        myColorBias, SINGLE, "", IMAGE_RESIZE_PAD, theDepth, false);
@@ -554,7 +553,7 @@ namespace y60 {
 
         appendPhongProperties(myMaterialBuilder, thePhongProperties);
         appendBlendFunction(myMaterialBuilder);
-        appendTexture(*(theScene->getSceneBuilder()), theScene, myMaterialBuilder, theTextureFilename, theSpriteFlag, theDepth);
+        appendTexture(theScene, myMaterialBuilder, theTextureFilename, theSpriteFlag, theDepth);
 
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();
@@ -571,8 +570,8 @@ namespace y60 {
         appendBlendFunction(myMaterialBuilder);
 
         if ( ! theTextureFilename.empty()) {
-            appendTexture(*(theScene->getSceneBuilder()), theScene, myMaterialBuilder,
-                            theTextureFilename, theSpriteFlag, theDepth);
+            appendTexture(theScene, myMaterialBuilder,
+                          theTextureFilename, theSpriteFlag, theDepth);
         }
         myMaterialBuilder.addFeature("vertexparams", VectorOfRankedFeature(1, RankedFeature(100,"color")));
         myMaterialBuilder.computeRequirements();
@@ -624,8 +623,8 @@ namespace y60 {
         appendBlendFunction(myMaterialBuilder);
 
         if ( ! theTextureFilename.empty()) {
-            appendTexture(*(theScene->getSceneBuilder()), theScene, myMaterialBuilder,
-                            theTextureFilename, theSpriteFlag, theDepth);
+            appendTexture( theScene, myMaterialBuilder,
+                           theTextureFilename, theSpriteFlag, theDepth);
         }
         myMaterialBuilder.computeRequirements();
         return myMaterialBuilder.getNode();

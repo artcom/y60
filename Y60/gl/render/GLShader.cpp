@@ -209,9 +209,9 @@ namespace y60 {
                                                                             BlendFunctionStrings));
 
             if (theViewport.get<ViewportDrawGlowTag>()) {
-                float myGlow = myMaterialPropFacade->get<GlowTag>();
                 glBlendFuncSeparate(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc), 
-                        GL_CONSTANT_ALPHA, GL_ZERO);
+                                    GL_CONSTANT_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                float myGlow = myMaterialPropFacade->get<GlowTag>();
                 glBlendColor(1.0f,1.0f,1.0f, myGlow);
             } else {
                 glBlendFunc(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc)); 

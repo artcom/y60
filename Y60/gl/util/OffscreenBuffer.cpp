@@ -140,7 +140,7 @@ void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
 void OffscreenBuffer::copyFrameBufferToTexture(ImagePtr theImage) {
     glBindTexture (GL_TEXTURE_2D, theImage->getGraphicsId() );
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
-            0, 0.0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>() );
+            0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>() );
     glBindTexture (GL_TEXTURE_2D, 0);
 }
 

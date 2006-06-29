@@ -216,12 +216,6 @@ namespace jslib {
             static std::string myDefaultFont = "Screen15";
             return myDefaultFont;
         }
-        /*
-        template <typename P>
-        void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, P & theValue) {
-            throw RenderWindowException("Format not supported", PLUS_FILE_LINE);
-        }
-        */
 
         void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, asl::Unsigned8 & theValue);
         void getPixel(unsigned int theXPos, unsigned int theYPos, GLenum theFormat, float & theValue);
@@ -234,8 +228,16 @@ namespace jslib {
         virtual void preRender();
         virtual void render();
         virtual void postRender();
-        virtual void swapBuffers() { }
+        virtual void swapBuffers() {};
 
+        /**
+         * Standard render function.
+         * - updates all modified
+         * - checks if 'onRender' is implemented and calls that
+         * - else does a regular render with clear/pre/render/post/swap
+         */
+        void renderFrame();
+        
     protected:
         AbstractRenderWindow(const JSErrorReporter & theErrorReporter);
         virtual void preViewport(const dom::NodePtr & theViewport);

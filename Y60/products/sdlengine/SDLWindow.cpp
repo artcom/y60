@@ -669,19 +669,7 @@ SDLWindow::mainLoop() {
         STOP_TIMER(handleRequests);
         
         if (_myRenderer && _myRenderer->getCurrentScene()) {
-            _myRenderer->getCurrentScene()->updateAllModified();
-
-            if (jslib::JSA_hasFunction(_myJSContext, _myEventListener, "onRender")) {
-                jsval argv[1], rval;
-                argv[0] = jslib::as_jsval(_myJSContext, _myElapsedTime);
-                jslib::JSA_CallFunctionName(_myJSContext, _myEventListener, "onRender", 1, argv, &rval);
-            } else {
-                clearBuffers( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                preRender();
-                render();
-                postRender();
-                swapBuffers();
-            }
+            renderFrame();
         }
         
         asl::AGPMemoryFlushSingleton::get().resetGLAGPMemoryFlush();

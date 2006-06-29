@@ -1090,53 +1090,57 @@ namespace y60 {
         setProjection(theViewport);
         CHECK_OGL_ERROR;
 
-        // (3) render skybox
-        {
-            MAKE_SCOPE_TIMER(renderSkyBox);
-            renderSkyBox(*theViewport, myCamera);
-            CHECK_OGL_ERROR;
-        }
+        // don't render anything if world isn't visible
+        if (_myScene->getWorldRoot()->getFacade<TransformHierarchyFacade>()->get<VisibleTag>()) {
 
-        // (4) Setup camera
-        bindViewMatrix(myCamera);
-
-        // (5) activate all visible lights
-        {
-            MAKE_SCOPE_TIMER(enableVisibleLights);
-            enableVisibleLights();
-            CHECK_OGL_ERROR;
-        }
-
-        // (6) enable fog
-        {
-            MAKE_SCOPE_TIMER(enableFog);
-            enableFog();
-            CHECK_OGL_ERROR;
-        }
-
-        // (7) render bodies
-        if (! myBodyParts.empty()) {
-            MAKE_SCOPE_TIMER(renderBodyParts);
-            _myPreviousBody = 0;
-
-            glPushMatrix();
-            glDisable(GL_ALPHA_TEST);
-            CHECK_OGL_ERROR;
-
-            bool currentMaterialHasAlpha = false;
-            for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
-                if (!currentMaterialHasAlpha && it->first.getTransparencyFlag()) {
-                    glEnable(GL_ALPHA_TEST);
-                    currentMaterialHasAlpha = true;
-                }
-
-                renderBodyPart(it->second, *theViewport, *myCamera);
+            // (3) render skybox
+            {
+                MAKE_SCOPE_TIMER(renderSkyBox);
+                renderSkyBox(*theViewport, myCamera);
+                CHECK_OGL_ERROR;
             }
-            glPopMatrix();
 
-            _myState->setScissorTest(false);
-            _myState->setClippingPlanes(std::vector<asl::Planef>());
-            _myState->setFrontFaceCCW(true);
+            // (4) Setup camera
+            bindViewMatrix(myCamera);
+
+            // (5) activate all visible lights
+            {
+                MAKE_SCOPE_TIMER(enableVisibleLights);
+                enableVisibleLights();
+                CHECK_OGL_ERROR;
+            }
+
+            // (6) enable fog
+            {
+                MAKE_SCOPE_TIMER(enableFog);
+                enableFog();
+                CHECK_OGL_ERROR;
+            }
+
+            // (7) render bodies
+            if (! myBodyParts.empty()) {
+                MAKE_SCOPE_TIMER(renderBodyParts);
+                _myPreviousBody = 0;
+
+                glPushMatrix();
+                glDisable(GL_ALPHA_TEST);
+                CHECK_OGL_ERROR;
+
+                bool currentMaterialHasAlpha = false;
+                for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
+                    if (!currentMaterialHasAlpha && it->first.getTransparencyFlag()) {
+                        glEnable(GL_ALPHA_TEST);
+                        currentMaterialHasAlpha = true;
+                    }
+
+                    renderBodyPart(it->second, *theViewport, *myCamera);
+                }
+                glPopMatrix();
+
+                _myState->setScissorTest(false);
+                _myState->setClippingPlanes(std::vector<asl::Planef>());
+                _myState->setFrontFaceCCW(true);
+            }
         }
 
         {

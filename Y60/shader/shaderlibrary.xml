@@ -1028,9 +1028,11 @@
         <fragmentshader profile="FP40" file="glow.cg" entryfunction="mainFragment">
             <properties>
                 <sampler2d name="tex">0</sampler2d>
+                <sampler2d name="blurKernel">1</sampler2d>
                 <vector3f name="texelSize">[0,0,0]</vector3f>
-                <vectoroffloat name="blurKernel">[0.1]</vectoroffloat>
                 <float name="glowScale">1.0</float>
+                <float name="kernelSize">1</float>
+                <float name="blurKernelTexSize">1</float>
             </properties>
         </fragmentshader>
     </shader>

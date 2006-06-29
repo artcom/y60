@@ -138,6 +138,17 @@ RenderArea::getGdkGlContext() const {
     return gtk_widget_get_gl_context (GTK_WIDGET(gobj()));
 }
 
+//virtual
+void 
+RenderArea::swapBuffers() {
+    GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (GTK_WIDGET(gobj()));
+    if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
+        gdk_gl_drawable_swap_buffers (gldrawable);
+    } else {
+        glFlush ();
+    }
+}
+
 bool
 RenderArea::on_expose_event (GdkEventExpose *event) {
     try {
@@ -164,23 +175,15 @@ RenderArea::on_expose_event (GdkEventExpose *event) {
             _myRequestManager.handleRequests();
             STOP_TIMER(handleRequests);
 
-            _myScene->updateAllModified();
-
-            preRender();
-            render();
-            postRender();
+            renderFrame();
 
             /** done rendering **/
         } else {
             // nothing to render... just clear the buffer to avoid pixel garbage
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            swapBuffers();
         }
 
-        if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
-            gdk_gl_drawable_swap_buffers (gldrawable);
-        } else {
-            glFlush ();
-        }
     } catch (const asl::Exception & ex) {
         AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {

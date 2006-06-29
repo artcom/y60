@@ -588,7 +588,7 @@ namespace y60 {
                                           const std::string & thePropertyName,
                                           const MaterialBase & theMaterial)
     {
-        AC_DEBUG << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode.nodeName() << " value=" << theNode.nodeValue() << " property=" << thePropertyName << " material=" << theMaterial.get<NameTag>();
+        AC_DEBUG << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode.nodeName() << " value=" << theNode.nodeValue() << " property=" << thePropertyName << " material=" << theMaterial.get<NameTag>() << " type=" << theNode.parentNode()->nodeName();
 
         switch(TypeId(asl::getEnumFromString(theNode.parentNode()->nodeName(), TypeIdStrings))) {
             case FLOAT:

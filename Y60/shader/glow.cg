@@ -27,32 +27,39 @@ vert2frag mainVertex(float4 thePosition : POSITION,
 
 float4 mainFragment(vert2frag IN,
                     uniform float3 texelSize,
-                    uniform float blurKernel[21],
                     uniform float glowScale,
-                    uniform sampler2D tex) : COLOR 
+                    uniform float kernelSize,
+                    uniform float blurKernelTexSize,
+                    uniform sampler2D tex,
+                    uniform sampler2D blurKernel) : COLOR 
 {
     float3 myGlowColor = float3(0,0,0);
-    float halfKernelSize = (blurKernel.length-1) * 0.5;
+    float halfKernelSize = (kernelSize-1) * 0.5;
     float2 myTexCoord = float2(IN.texCoord);
+    int myKernelSize = int(kernelSize);
     if( texelSize.z > 0.0 ) {
         // blur Y
-        for (int i = 0; i < blurKernel.length; ++i) {
+        for (int i = 0; i < myKernelSize; ++i) {
             int myOffset = i - halfKernelSize;
+            float2 sampleCoord = float2( i/ blurKernelTexSize,0); 
             myTexCoord.y = IN.texCoord.y + (myOffset*texelSize.y);
+            float myValue = tex2D(blurKernel, sampleCoord).r;
             //myTexCoord.y = clamp(myTexCoord.y, -1, 0);
-            myGlowColor.rgb += tex2D(tex, myTexCoord).rgb * blurKernel[i];
+            myGlowColor.rgb += tex2D(tex, myTexCoord).rgb * myValue;
         }
     } else { 
         // blur X
-        for (int i = 0; i < blurKernel.length; ++i) {
+        for (int i = 0; i < myKernelSize; ++i) {
             int myOffset = i - halfKernelSize;
             myTexCoord.x = IN.texCoord.x + (myOffset*texelSize.x);
+            float2 sampleCoord = float2( i/ blurKernelTexSize, 0); 
             //myTexCoord = max(myTexCoord, float2(0,0));
             //if( myTexCoord.x >= 0.0 && myTexCoord.x <= (1.0 - texelSize.x)) {
             //myTexCoord.x = clamp(myTexCoord.x, 0, 0.781);
             //myTexCoord.y = clamp(myTexCoord.y, -1, 0);
             float4 myTexValues = tex2D(tex, myTexCoord);
-            myGlowColor.rgb += myTexValues.rgb * myTexValues.a * blurKernel[i];
+            float myValue = tex2D(blurKernel, sampleCoord).r;
+            myGlowColor.rgb += myTexValues.rgb * myTexValues.a * myValue;
         }
         myGlowColor.rgb *= glowScale;
     }
