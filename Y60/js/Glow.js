@@ -29,6 +29,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
     var _myOffscreenRenderArea = null;
     var _myBlurXRenderArea = null;
     var _myBlurYRenderArea = null;
+    const OFFSCREEN_RESOLUTION_RATIO = 4;
     
     obj.setEnabled = function(theFlag) {
         _myGlowEnabled = theFlag;
@@ -141,7 +142,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
             sum += myWeights[x];
         }
         
-        print("sum = " +  sum);
+        //print("sum = " +  sum);
         //printf("gaussian weights, s = %f, n = %d\n", s, n);
         for(var y=0; y<size; y++) {
             myWeights[y] /= sum;
@@ -165,13 +166,21 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         
         var myMipmapFlag = false;
         
-        var myOffscreenSize = new Vector2i(nextPowerOfTwo(window.width), nextPowerOfTwo(window.height));
-        var myWidth = myOffscreenSize[0] / 4;
-        var myHeight = myOffscreenSize[1] / 4;
-
+        var myOffscreenSize = new Vector2i(window.width, window.height); 
+        var myWidth = nextPowerOfTwo(myOffscreenSize[0]) / OFFSCREEN_RESOLUTION_RATIO;
+        var myHeight = nextPowerOfTwo(myOffscreenSize[1]) / OFFSCREEN_RESOLUTION_RATIO;
+        
         var myMirrorMatrix = new Matrix4f;
-        myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
-  
+        myMirrorMatrix.scale(new Vector3f(1,-1,1));
+        myMirrorMatrix.translate( new Vector3f(0.0,1.0,0.0));
+        
+        // make sure glow is off for main canvas
+        var myViewport = getDescendantByTagName(window.canvas, "viewport");
+        if (myViewport.glow == true) {
+            Logger.warning("Disabling glow on viewport '" + myViewport.name + "' id=" + myViewport.id);
+            myViewport.glow = false;
+        }
+
         // blurKernelImage
         var myBlurKernel = generateGaussianWeights( theKernelSize );
         theKernelSize = myBlurKernel.length;
@@ -183,7 +192,6 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         window.scene.images.appendChild(myBlurKernelImage);
         window.scene.update(Scene.MATERIALS);
 
-        
         var myRaster = myBlurKernelImage.firstChild.firstChild.nodeValue;
         for (var i = 0; i < theKernelSize; ++i) {
             myRaster.setPixel(i,0,
@@ -202,28 +210,29 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myOffscreenImage = window.scene.createImage(myOffscreenSize[0], myOffscreenSize[1], "RGBA");
         myOffscreenImage.id = createUniqueId();
         myOffscreenImage.name = "Offscreen";
-        window.scene.images.appendChild(myOffscreenImage);
+        myOffscreenImage.resize = "pad";
         myOffscreenImage.matrix.postMultiply(myMirrorMatrix);
-        myOffscreenImage.matrix.translate( new Vector3f(0.0,1.0,0.0));
+        window.scene.images.appendChild(myOffscreenImage);
         
         var myOffscreenCanvas = cloneCanvas(window.canvas, "Offscreen");
-        myOffscreenCanvas.backgroundcolor = [0.0,0.0,0.0,0];
+        myOffscreenCanvas.backgroundcolor = [0,0,0,1];
         myOffscreenCanvas.target = myOffscreenImage.id;
 
         var myOffscreenViewport = getDescendantByTagName(myOffscreenCanvas, "viewport");
         myOffscreenViewport.glow = 1;
-        myOffscreenViewport.size = new Vector2f(window.width / myOffscreenSize[0], (window.height / myOffscreenSize[1]) - 1/(window.height));
         
         var myHeadlight = getDescendantByTagName(window.camera, "light");
         theViewer.getLightManager().registerHeadlightWithViewport(myOffscreenViewport, myHeadlight);
 
         _myOffscreenRenderArea = new OffscreenRenderArea();
-        //_myOffscreenRenderArea.renderingCaps = Renderer.FRAMEBUFFER_SUPPORT;
         _myOffscreenRenderArea.setSceneAndCanvas( window.scene, myOffscreenCanvas);
         _myOffscreenRenderArea.eventListener = theViewer;
 
         _myOffscreenOverlay = new ImageOverlay(window.scene, myOffscreenImage, null, getDescendantByTagName(myOffscreenCanvas, "overlays", true));
         _myOffscreenOverlay.name = "Offscreen";
+        _myOffscreenOverlay.srcsize = new Vector2f(myOffscreenImage.width / nextPowerOfTwo(myOffscreenImage.width),
+                                                   myOffscreenImage.height / nextPowerOfTwo(myOffscreenImage.height));
+        _myOffscreenOverlay.srcorigin = new Vector2f( 0, 1 - myOffscreenImage.height / nextPowerOfTwo(myOffscreenImage.height));
         _myOffscreenOverlay.material.name = "Offscreen";
         _myOffscreenOverlay.material.properties.blendfunction = "[one,zero]";
         var myTextures = getDescendantByTagName(_myOffscreenOverlay.material, "textures", false);
@@ -234,13 +243,12 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
          * renders myOffscreenImage into myBlurXImage, with X blur
          * shader enabled
          */
-
         var myBlurXImage = window.scene.createImage(myWidth, myHeight, "RGB");
         myBlurXImage.id = createUniqueId();
         myBlurXImage.name = "BlurX";
+        myBlurXImage.resize = "pad";
         myBlurXImage.mipmap = myMipmapFlag;
         myBlurXImage.matrix.postMultiply(myMirrorMatrix);
-        myBlurXImage.matrix.translate( new Vector3f(0.0,1.0,0.0));
         window.scene.images.appendChild(myBlurXImage);
         
         var myBlurXCanvas = cloneCanvas(window.canvas, "BlurX");
@@ -261,14 +269,11 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myBlurXMaterial = _myBlurXOverlay.material;
         myBlurXMaterial.name = "BlurX";
         myBlurXMaterial.requires.textures = "[10[glow]]";
-        //myBlurXMaterial.requires.texcoord = "[10[uv_map]]";
-
         
         var myTexture = new Node("<texture/>").firstChild;
         myTexture.image = myBlurKernelImage.id;
         var myBlurXTextures  = getDescendantByTagName(myBlurXMaterial, "textures");
         myBlurXTextures.appendChild(myTexture);
-        
         
         window.scene.update(Scene.MATERIALS);
         myBlurXMaterial.properties.texelSize = new Vector3f( 1/myBlurXImage.width, 1/myBlurXImage.height, 0.0);
@@ -277,8 +282,6 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurXMaterial.properties.blurKernelTexSize = myBlurKernelImage.width;
         var myTextures = getDescendantByTagName(myBlurXMaterial, "textures", false);
         myTextures.firstChild.wrapmode="clamp";
-        
-        
 
         /*
          * Blur_Y
@@ -287,9 +290,9 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myBlurYImage = window.scene.createImage(myWidth, myHeight, "RGB");
         myBlurYImage.id = createUniqueId();
         myBlurYImage.name = "BlurY";
+        myBlurYImage.resize = "pad";
         myBlurYImage.mipmap = myMipmapFlag;
         myBlurYImage.matrix.postMultiply(myMirrorMatrix);
-        myBlurYImage.matrix.translate( new Vector3f(0.0,1.0,0.0));
         window.scene.images.appendChild(myBlurYImage);
 
         var myBlurYCanvas =  cloneCanvas(window.canvas, "BlurY");
@@ -308,14 +311,11 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myBlurYMaterial = _myBlurYOverlay.material;
         myBlurYMaterial.name = "BlurY";
         myBlurYMaterial.requires.textures = "[10[glow]]";
-        //myBlurYMaterial.requires.texcoord = "[10[uv_map]]";
 
-        
         var myTexture = new Node("<texture/>").firstChild;
         myTexture.image = myBlurKernelImage.id;
         var myBlurYTextures  = getDescendantByTagName(myBlurYMaterial, "textures");
         myBlurYTextures.appendChild(myTexture);
-        
         
         window.scene.update(Scene.MATERIALS);
         myBlurYMaterial.properties.texelSize = new Vector3f( 1/myBlurYImage.width, 1/myBlurYImage.height,1.0);
@@ -335,6 +335,9 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myGlowOverlay.width = _myOffscreenOverlay.width;
         _myGlowOverlay.height = _myOffscreenOverlay.height;
         _myGlowOverlay.material.properties.blendfunction = "[one,one]";
+        _myGlowOverlay.srcsize = new Vector2f(myOffscreenImage.width / nextPowerOfTwo(myOffscreenImage.width),
+                                                   myOffscreenImage.height / nextPowerOfTwo(myOffscreenImage.height));
+        _myGlowOverlay.srcorigin = new Vector2f( 0, 1 - myOffscreenImage.height / nextPowerOfTwo(myOffscreenImage.height));
         
         // prepare compositing
         window.scene.overlays.appendChild(_myOffscreenOverlay.node);
