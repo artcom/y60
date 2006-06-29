@@ -29,7 +29,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
     var _myOffscreenRenderArea = null;
     var _myBlurXRenderArea = null;
     var _myBlurYRenderArea = null;
-
+    
     obj.setEnabled = function(theFlag) {
         _myGlowEnabled = theFlag;
     }
@@ -65,6 +65,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
             window.scene.world.visible = false; 
 
             // render blur_x
+            
             _myBlurXOverlay.visible = true;
             _myBlurXRenderArea.activate();
             _myBlurXRenderArea.clearBuffers( RenderWindow.GL_COLOR_BUFFER_BIT | RenderWindow.GL_DEPTH_BUFFER_BIT );
@@ -79,7 +80,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
             _myBlurYRenderArea.render();
             _myBlurYRenderArea.deactivate();
             _myBlurYOverlay.visible = false;
-
+            
             // compositing
             if (_myDebugOverlay) {
                 _myDebugOverlay.visible = true;
@@ -203,6 +204,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myOffscreenImage.name = "Offscreen";
         window.scene.images.appendChild(myOffscreenImage);
         myOffscreenImage.matrix.postMultiply(myMirrorMatrix);
+        myOffscreenImage.matrix.translate( new Vector3f(0.0,1.0,0.0));
         
         var myOffscreenCanvas = cloneCanvas(window.canvas, "Offscreen");
         myOffscreenCanvas.backgroundcolor = [0.0,0.0,0.0,0];
@@ -224,7 +226,9 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myOffscreenOverlay.name = "Offscreen";
         _myOffscreenOverlay.material.name = "Offscreen";
         _myOffscreenOverlay.material.properties.blendfunction = "[one,zero]";
-
+        var myTextures = getDescendantByTagName(_myOffscreenOverlay.material, "textures", false);
+        myTextures.firstChild.wrapmode="clamp";
+        
         /*
          * Blur_X
          * renders myOffscreenImage into myBlurXImage, with X blur
@@ -236,6 +240,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurXImage.name = "BlurX";
         myBlurXImage.mipmap = myMipmapFlag;
         myBlurXImage.matrix.postMultiply(myMirrorMatrix);
+        myBlurXImage.matrix.translate( new Vector3f(0.0,1.0,0.0));
         window.scene.images.appendChild(myBlurXImage);
         
         var myBlurXCanvas = cloneCanvas(window.canvas, "BlurX");
@@ -270,7 +275,9 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurXMaterial.properties.glowScale = theGlowScale;
         myBlurXMaterial.properties.kernelSize = theKernelSize;
         myBlurXMaterial.properties.blurKernelTexSize = myBlurKernelImage.width;
-
+        var myTextures = getDescendantByTagName(myBlurXMaterial, "textures", false);
+        myTextures.firstChild.wrapmode="clamp";
+        
         
 
         /*
@@ -282,6 +289,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurYImage.name = "BlurY";
         myBlurYImage.mipmap = myMipmapFlag;
         myBlurYImage.matrix.postMultiply(myMirrorMatrix);
+        myBlurYImage.matrix.translate( new Vector3f(0.0,1.0,0.0));
         window.scene.images.appendChild(myBlurYImage);
 
         var myBlurYCanvas =  cloneCanvas(window.canvas, "BlurY");
@@ -315,7 +323,9 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurYMaterial.properties.kernelSize = theKernelSize;
         myBlurYMaterial.properties.blurKernelTexSize = myBlurKernelImage.width;
         myBlurYMaterial.properties.blendfunction = "[one,one]";
-
+        var myTextures = getDescendantByTagName(myBlurYMaterial, "textures", false);
+        myTextures.firstChild.wrapmode="clamp";
+        
         /*
          * Glow
          * renders myBlurYImage onto screen
@@ -335,6 +345,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         } else {
             window.scene.overlays.appendChild(_myGlowOverlay.node);
         }
+                
     }
     
  
