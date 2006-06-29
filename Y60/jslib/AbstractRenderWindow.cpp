@@ -19,7 +19,6 @@
 #include <y60/ButtonEvent.h>
 #include <y60/TouchEvent.h>
 #include <y60/ScopedGLContext.h>
-#include <y60/RenderStatistic.h>
 #include <y60/Image.h>
 #include <y60/Movie.h>
 #include <y60/Capture.h>
@@ -445,7 +444,7 @@ namespace jslib {
     AbstractRenderWindow::clearBuffers(unsigned int theBuffersMask) {
         _myRenderer->clearBuffers(_myCanvas->getFacade<Canvas>(), theBuffersMask);
     }
-                                                                    
+
     void
     AbstractRenderWindow::preRender() {
         try {
@@ -577,7 +576,7 @@ namespace jslib {
             swapBuffers();
         }
     }
-    
+
     void
     AbstractRenderWindow::handle(y60::EventPtr theEvent) {
         MAKE_SCOPE_TIMER(handleEvents);

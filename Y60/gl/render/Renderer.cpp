@@ -196,9 +196,9 @@ namespace y60 {
         }
 
         DBP(MAKE_SCOPE_TIMER(switchMaterial));
-        DBP(COUNT(materialChange));
+        COUNT(materialChange);
 
-        IShaderPtr myShader = theMaterial.getShader();    
+        IShaderPtr myShader = theMaterial.getShader();
         deactivatePreviousMaterial();
         {
             // activate new material
@@ -212,8 +212,8 @@ namespace y60 {
             // Right now in Shader.activate() the material representation is updated.
             // The scene should be responsible for that.
             myShader->activate(const_cast<MaterialBase &>(theMaterial), theViewport);
-            
-            CHECK_OGL_ERROR;             
+
+            CHECK_OGL_ERROR;
         }
 
         VertexRegisterFlags myVertexRegisterFlags;
@@ -322,7 +322,7 @@ namespace y60 {
         const y60::Shape & myShape = theBodyPart.getShape();
         bool myBodyHasChanged = (_myPreviousBody != &myBody);
         DBP2(STOP_TIMER(renderBodyPart_pre));
-        DBP(START_TIMER(renderBodyPart_bodyChanged));        
+        DBP(START_TIMER(renderBodyPart_bodyChanged));
         if (myBodyHasChanged) {
             glPopMatrix();
 
@@ -347,8 +347,8 @@ namespace y60 {
 
             const asl::Matrix4f &myMatrix = myBody.get<GlobalMatrixTag>();
             float myScaleSign = myMatrix[0][0] * myMatrix[1][1] * myMatrix[2][2];
-            _myState->setFrontFaceCCW( myScaleSign > 0 );   
-            
+            _myState->setFrontFaceCCW( myScaleSign > 0 );
+
             _myPreviousBody = &myBody;
             CHECK_OGL_ERROR;
         }
@@ -431,7 +431,7 @@ namespace y60 {
         }
         CHECK_OGL_ERROR;
         DBP2(STOP_TIMER(renderBodyPart_render));
-        
+
         DBP2(START_TIMER(renderBodyPart_setupBoundingVolume));
         if (myRenderStyles[BOUNDING_VOLUME] || (_myBoundingVolumeMode & BV_SHAPE)) {
             const asl::Box3f & myBoundingBox = myShape.get<BoundingBoxTag>();
@@ -501,8 +501,8 @@ namespace y60 {
                 }
                 CHECK_OGL_ERROR;
 			} else {
-				throw RendererException(string("Body Part of shape: ") + theBodyPart.getShape().get<IdTag>() + 
-					" does not contain required vertexdata of role: " + 
+				throw RendererException(string("Body Part of shape: ") + theBodyPart.getShape().get<IdTag>() +
+					" does not contain required vertexdata of role: " +
 					getStringFromEnum(myParameter.getRole(), GLRegisterString), PLUS_FILE_LINE);
 			}
         }
@@ -616,7 +616,7 @@ namespace y60 {
         // AC_WARNING << "Renderstyle for " << theMaterial->get<IdTag>() << " is " << theRenderStyles;
         _myState->setIgnoreDepth(theRenderStyles[IGNORE_DEPTH]);
         _myState->setPolygonOffset( theRenderStyles[POLYGON_OFFSET]);
-        
+
         if (theRenderStyles[NO_DEPTH_WRITES]) {
             _myState->setDepthWrites(false);
         } else {
@@ -628,7 +628,7 @@ namespace y60 {
                 _myState->setDepthWrites(true);
             }
         }
-        
+
     }
 
     void Renderer::preDraw(const asl::Vector4f & theColor,
@@ -640,10 +640,10 @@ namespace y60 {
         RenderStyles myRenderStyles;
         myRenderStylesStream >> myRenderStyles;
         // don't use our _myState GL-State cache,
-        // instead, bypass this cache and use 
+        // instead, bypass this cache and use
         // glPush/PopAttrib & glEnable directly
         // enableRenderStyles(myRenderStyles);
-        
+
 
 #if 1
         glPushAttrib(GL_COLOR_BUFFER_BIT | // color writemasks
@@ -673,7 +673,7 @@ namespace y60 {
             glDisable(GL_POLYGON_OFFSET_FILL);
             glPolygonOffset(0.0, 0.0);
         }
-        
+
         glDisable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
 
@@ -1156,12 +1156,12 @@ namespace y60 {
         _myPreviousMaterial = 0;
         _myState->setDepthWrites(true);
         _myState->setIgnoreDepth(false);
-        
+
         if (_myBoundingVolumeMode & BV_HIERARCHY) {
             renderBoundingBoxHierarchy(_myScene->getWorldRoot());
         }
 
-        _myTextRendererManager.render(theViewport);        
+        _myTextRendererManager.render(theViewport);
     }
 
     void

@@ -23,7 +23,6 @@
 #include "JSRenderWindow.h"
 
 #include <y60/GLAlloc.h>
-#include <y60/RenderStatistic.h>
 #include <y60/Renderer.h>
 
 #include <y60/Event.h>
