@@ -31,7 +31,12 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
     var _myOverlay          = null;
     var _myMessage          = [];
     var _myNextMessageLine  = 0;
-
+    var _myFontname         = "Screen15";
+    
+    self.setFontname = function(theFontname) {
+        _myFontname = theFontname;
+    }
+    
     self.setMessage = function(theMessage, theLine) {
         if (!_myOverlay) {
             _myOverlay = createTextOverlay();
@@ -60,10 +65,7 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
             } else if (myDisplayDuration <= DISPLAY_DURATION + FADE_DURATION) {
                 _myOverlay.alpha = 1 - (myDisplayDuration - DISPLAY_DURATION) / FADE_DURATION;
             } else {
-                _myOverlay.visible     = false;
-                _myDisplayStartTime    = 0;
-                _myMessage             = [];
-                _myNextMessageLine     = 0;
+                self.hide();
             }
             
             _myOverlay.position = new Vector2f((window.width - _myOverlay.width) / 2,
@@ -71,6 +73,12 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
         }
     }
 
+    self.hide = function() {
+        _myOverlay.visible     = false;
+        _myDisplayStartTime    = 0;
+        _myMessage             = [];
+        _myNextMessageLine     = 0;
+    }
     self.onPostRender = function() {
         if (_myOverlay && _myMessage.length) {
             var myXPos = (window.width  - BOX_WIDTH + 140) / 2;
@@ -86,13 +94,13 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
             for (var i = _myNextMessageLine; i < _myMessage.length; ++i) {
                 var myGreyValue = 1 - (_myMessage.length - myLine) * (0.3 / LINE_COUNT);
                 window.setTextColor([myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha]);
-                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], "Screen15");
+                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], _myFontname);
                 myLine++;
             }
             for (i = 0; i < _myNextMessageLine; ++i) {
                 var myGreyValue = 1 - (_myMessage.length - myLine) * (0.3 / LINE_COUNT);
                 window.setTextColor([myGreyValue,myGreyValue,myGreyValue,_myOverlay.alpha]);
-                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], "Screen15");
+                window.renderText(new Vector2f(myXPos, (myYPos + (myLine * 24))), _myMessage[i], _myFontname);
                 myLine++;
             }
             window.setTextColor([1,1,1,1]);

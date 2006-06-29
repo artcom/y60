@@ -114,6 +114,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
         _myOnScreenDisplay.setMessage(theMessage, theLine);
     }
+    self.getOSD = function() {
+        return _myOnScreenDisplay;
+    }
 
     self.BaseViewer.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
