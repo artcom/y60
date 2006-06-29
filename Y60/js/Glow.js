@@ -18,7 +18,7 @@ function Glow(theViewer, theKernelSize, theGlowScale) {
 
 Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScale) {
 
-    var _myGlowEnabled = false;
+    var _myGlowEnabled = true;
     
     var _myOffscreenOverlay = null;
     var _myBlurXOverlay = null;
