@@ -572,6 +572,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
          print("    X          dumps scene on console");
          print("    u          toggle used memory display");
          print("    e          re-evaluate all include-files");
+         print("    i          Cycles window swap interval");
          print("    +          increase zoom factor");
          print("    -          decrease zoom factor");
          print("    ,          switch to previous camera");
