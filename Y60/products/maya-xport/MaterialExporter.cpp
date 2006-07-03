@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: MaterialExporter.cpp,v $
-//   $Author: jens $
-//   $Revision: 1.81 $
-//   $Date: 2005/04/27 16:29:55 $
-//
-//  Description: This class implements a polygon exporter plugin for maya.
-//
-//=============================================================================
 
 #include "MayaHelpers.h"
 #include "MaterialExporter.h"
@@ -46,7 +37,6 @@
 #include <maya/MItDependencyGraph.h>
 #include <maya/MFnPhongShader.h>
 #include <maya/MFnPhongEShader.h>
-//#include <maya/MFn.h>
 #include <maya/MFnBlinnShader.h>
 #include <maya/MFnMesh.h>
 #include <maya/MFnTransform.h>
@@ -640,7 +630,7 @@ MaterialExporter::exportUnlitFeatures(const MFnMesh * theMesh, const MObject & t
         float myColorGainAlpha;
         myTransparencyPlug.getValue(myColorGainAlpha);
         myColorGainAlpha = 1.0f - myColorGainAlpha;
-        if ( ! exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "outColor", y60::SURFACE_COLOR_PROPERTY, myColorGainAlpha)) {
+        if (!exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "outColor", y60::SURFACE_COLOR_PROPERTY, myColorGainAlpha)) {
             DB(dumpAttributes(theShaderNode));
             float r, g, b;
             MPlug myColorPlug = MFnDependencyNode(theShaderNode).findPlug("outColorR");
@@ -668,46 +658,52 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     DB(AC_TRACE << "MaterialExporter::exportLambertFeatures()");
     MStatus myStatus;
 
+    // transparency, alpha
+    MColor myTransparency = MFnLambertShader(theShaderNode).transparency(& myStatus);
+    float myAlpha = 1.0f - myTransparency.r;
+    DB(AC_TRACE << "myTransp="<< asl::Vector4f(myTransparency.r, myTransparency.g, myTransparency.b, myTransparency.a) << " alpha=" << myAlpha);
+
+    // ambient color
+    MColor myAmbientColor = MFnLambertShader(theShaderNode).ambientColor(& myStatus);
+    if (myStatus == MStatus::kFailure) {
+        throw ExportException("Could not get ambient color from node", "MaterialExporter::exportLambertFeatures");
+    }
+    setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", y60::AMBIENT_PROPERTY,
+            asl::Vector4f(myAmbientColor.r, myAmbientColor.g, myAmbientColor.b, myAmbientColor.a));
+
+    // diffuse color
+    MColor myColor = MFnLambertShader(theShaderNode).color(&myStatus);
+    if (myStatus == MStatus::kFailure) {
+        throw ExportException("Could not get color from node", "MaterialExporter::exportLambertFeatures");
+    }
+
+    // texture
     try {
-        // If no textures were found, we can export the diffuse color value instead
-        MColor myTransparency = MFnLambertShader(theShaderNode).transparency(& myStatus);
-        DB(AC_TRACE << "myTransp = "<< asl::Vector4f(myTransparency.r, myTransparency.g, myTransparency.b, myTransparency.a) << endl);
-       if ( ! exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "color",
-            y60::DIFFUSE_PROPERTY, 1.0f - myTransparency.r ))
-       {
-            MColor myColor = MFnLambertShader(theShaderNode).color(& myStatus);
-            if (myStatus == MStatus::kFailure) {
-                throw ExportException("Could not get color from node",
-                        "MaterialExporter::exportLambertFeatures");
-            }
-
-            DB(AC_TRACE << "myColor  = "<< asl::Vector4f(myColor.r, myColor.g, myColor.b, myColor.a) << endl);
-
-            setPropertyValue<asl::Vector4f>(theBuilder.getNode(),
-                    "vector4f",
-                    y60::DIFFUSE_PROPERTY,
-                    asl::Vector4f(myColor.r, myColor.g, myColor.b, float(1.0f - myTransparency.r)));
+        if (exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "color", y60::DIFFUSE_PROPERTY, myAlpha)) {
+            // assume color=[1,1,1,1] when using texture
+            myColor = MColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
-        exportBumpMaps(theMesh, theShaderNode, theBuilder, theSceneBuilder, 1.0f - myTransparency.r);
+        exportBumpMaps(theMesh, theShaderNode, theBuilder, theSceneBuilder, myAlpha);
     } catch(asl::Exception & ex) {
         ex; // avoid unreferenced variable warning
         DB(AC_TRACE << ex);
         throw;
     }
 
-    MColor myAmbientColor = MFnLambertShader(theShaderNode).ambientColor(& myStatus);
+    // calculate diffuse color
+    float myDiffuseCoeff = MFnLambertShader(theShaderNode).diffuseCoeff(& myStatus);
     if (myStatus == MStatus::kFailure) {
-        throw ExportException("Could not get color from node",
-                "MaterialExporter::exportLambertFeatures");
+        throw ExportException("Could not get diffuse coefficient from node", "MaterialExporter::exportLambertFeatures");
     }
-    //setPropertyValue<asl::Vector4f>(theBuilder.getNode(),"vector4f", y60::DIFFUSE_PROPERTY, asl::Vector4f(1.0, 1.0, 1.0, 1.0));
-    setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", y60::AMBIENT_PROPERTY,
-            asl::Vector4f(myAmbientColor.r, myAmbientColor.g, myAmbientColor.b, myAmbientColor.a));
 
+    myColor = myAmbientColor + (myColor - myAmbientColor) * myDiffuseCoeff;
+    asl::Vector4f myDiffuseColor = asl::Vector4f(myColor.r, myColor.g, myColor.b, myAlpha);
+    setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", y60::DIFFUSE_PROPERTY, myDiffuseColor);
+
+    // glow
     float myGlowFactor = MFnLambertShader(theShaderNode).glowIntensity( & myStatus );
     if (myStatus == MStatus::kFailure) {
-        throw ExportException("Could not get glow from node",
-                "MaterialExporter::exportLambertFeatures");
+        throw ExportException("Could not get glow from node", "MaterialExporter::exportLambertFeatures");
     }
     setPropertyValue<float>(theBuilder.getNode(), "float", y60::GLOW_PROPERTY, myGlowFactor);
 }

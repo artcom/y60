@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Logger.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.12 $
-//   $Date: 2005/04/29 08:09:22 $
-//
-//  Description: Collects statistics about the render state
-//
-//=============================================================================
 
 #include "Logger.h"
 #include "LogMessageFormatters.h"
@@ -23,6 +14,14 @@
 
 #include "error_functions.h"
 #include "string_functions.h"
+
+//#define DEBUG
+#ifdef DEBUG
+#warning asl::Logger debugging is enable
+#include "Dashboard.h"
+#else
+#define MAKE_SCOPE_TIMER(NAME) 
+#endif
 
 namespace asl {
 
@@ -166,6 +165,7 @@ smallest id-range takes precedence.
 */
 bool
 Logger::IfLog(Severity theSeverity, const char * theModule, int theId) {
+    MAKE_SCOPE_TIMER(Logger_IfLog);
     Severity myVerbosity = _myGlobalVerbosity;
     if (!_myVerbositySettings.empty()) {
         const std::string myModule(file_string(theModule)); // remove everything before the last backslash

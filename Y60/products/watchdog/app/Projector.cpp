@@ -24,6 +24,7 @@
 #include <asl/Exception.h>
 #include <dom/Nodes.h>
 
+
 Projector* Projector::getProjector(const std::string& theType, int thePortNum, int theBaud)
 {
     Projector* projector = 0;
@@ -122,10 +123,16 @@ Projector::command(const std::string & theCommand)
 
     AC_PRINT << "Projector::command '" << theCommand << "'";
     if (theCommand == "projector_on") {
-        power(true);
+        // power on: I tell you three times...
+        for (unsigned i = 0; i < 3; ++i) {
+            power(true);
+        }
     }
     else if (theCommand == "projector_off") {
-        power(false);
+        // power off: I tell you three times...
+        for (unsigned i = 0; i < 3; ++i) {
+            power(false);
+        }
     }
     else if (theCommand == "projector_shutter_open") {
         shutter(true);

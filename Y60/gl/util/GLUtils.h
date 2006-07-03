@@ -108,7 +108,7 @@ struct GLExceptionHelper {
 #ifdef _ac_render_GLUtils_cpp_
     #define DEF_PROC_ADDRESS(T,X) \
     extern const char _name_ ## X [] = #X; \
-    extern T Missing_ ## X = (T)&y60::GLExceptionHelper< _name_ ##X>::throwMissingExtension; \
+    T Missing_ ## X = (T)&y60::GLExceptionHelper< _name_ ##X>::throwMissingExtension; \
     T  _ac_ ## X = Missing_ ## X;
 #else
     #define DEF_PROC_ADDRESS(T,X) \

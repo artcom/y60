@@ -296,28 +296,31 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         var myFilename = urlDecode(myEntry.href);
         _myCurrentMediaType = myEntry.mediaType;
         print("Now showing " + myFilename);
+
         /// plug audio and capture plugs, video is handled inside y60 engine via decoderhint
         var myPlaylist = new Playlist();
-        switch (myPlaylist.getMediaHintFromURL(myFilename)) {
-            case AUDIO_MEDIA:
-                print("Media: audio");
-                if (!_myWMAPlugged) {
-                    plug("y60WMADecoder");
-                    _myWMAPlugged = true;
-                }
-                break;
-            case CAPTURE_MEDIA:
-                print("Media: Capture Video");
-                if (myFilename.search(/^video:\/\//i) != -1 && !_myVFWCapturePlugged) {
-                    plug("y60VFWCapture");
-                    print("VideoForWindows dshow");
-                    _myVFWCapturePlugged = true;
-                } else if (myFilename.search(/^dshow:\/\//i) != -1 && !_myDShowCapturePlugged) {
-                    _myDShowCapturePlugged = true;
-                    plug("y60DShowCapture");
-                    print("plugged dshow");
-                }
-                break;
+        if (OS == "Win32") {
+            switch (myPlaylist.getMediaHintFromURL(myFilename)) {
+                case AUDIO_MEDIA:
+                    print("Media: audio");
+                    if (!_myWMAPlugged) {
+                        plug("y60WMADecoder");
+                        _myWMAPlugged = true;
+                    }
+                    break;
+                case CAPTURE_MEDIA:
+                    print("Media: Capture Video");
+                    if (myFilename.search(/^video:\/\//i) != -1 && !_myVFWCapturePlugged) {
+                        plug("y60VFWCapture");
+                        print("VideoForWindows dshow");
+                        _myVFWCapturePlugged = true;
+                    } else if (myFilename.search(/^dshow:\/\//i) != -1 && !_myDShowCapturePlugged) {
+                        _myDShowCapturePlugged = true;
+                        plug("y60DShowCapture");
+                        print("plugged dshow");
+                    }
+                    break;
+            }
         }
 
         switch (myEntry.mediaType) {

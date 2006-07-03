@@ -4,6 +4,10 @@ use MakedistTools;
 $PRODUCT_NAME   = "sdlengine";
 $ICON_FILE      = "rendergirl.ico";
 $PRODUCT_CODE   = "6e6f3569-d80d-4e2e-855c-7be2d3b980ed";
+$VERSION        = "0.1"; # XXX should be revision?!?
+
+sub runLocalMakeTarball($) {
+}
 
 sub runLocalMakedist($) {
     my $theDistDir = $_[0];
@@ -32,8 +36,11 @@ sub runLocalMakedist($) {
     }
 
     # Install dependencies
-    depends("Y60/js", "Y60/shader", "y60/components", "Y60/products/watchdog/app");
-
+    if ($ourPlatform eq "WIN") {
+        depends("Y60/js", "Y60/shader", "y60/components", "Y60/products/watchdog/app");
+    } else {
+        depends("Y60/js", "Y60/shader", "y60/components");
+    }
 }
 
 sub runLocalMakeInstaller() {

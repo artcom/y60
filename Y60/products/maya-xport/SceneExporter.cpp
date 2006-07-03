@@ -1,20 +1,11 @@
 //=============================================================================
-// Copyright (C) 2000-2002, ART+COM AG Berlin
+// Copyright (C) 2004-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: SceneExporter.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.100 $
-//   $Date: 2005/04/29 14:09:10 $
-//
-//  Description: This class implements a polygon exporter plugin for maya.
-//
 //=============================================================================
 
 #include "SceneExporter.h"
@@ -101,7 +92,7 @@ MStatus
 initializePlugin(MObject theObject) {
     DB(AC_TRACE << "SceneExporter::initializePlugin()" << endl);
     MStatus myStatus;
-    MFnPlugin myPlugin(theObject, "Art+Com XML exporter plugin", ourRevision.c_str(), "Any");
+    MFnPlugin myPlugin(theObject, "ART+COM XML exporter plugin", ourRevision.c_str(), "Any");
 
     // Register the translator with the system
     //
@@ -193,17 +184,15 @@ SceneExporter::writer(const MFileObject& theFile,
             int myLastDot = myFileName.rindex('.');
             if (myLastDot >= 0) {
                 MString myExtension = myFileName.substring(myLastDot+1,myFileName.length()-1);
-                if (myOptions.binaryFlag && myExtension != "b60") {
-                    myFileName = myFileName + ".b60";
-                } else if (!myOptions.binaryFlag && myExtension != "x60") {
-                    myFileName = myFileName + ".x60";
+                if (myExtension == "mb" || myExtension == "x60" || myExtension == "b60") {
+                    // strip extension
+                    myFileName = myFileName.substring(0, myLastDot-1);
                 }
+            }
+            if (myOptions.binaryFlag) {
+                myFileName = myFileName + ".b60";
             } else {
-                if (myOptions.binaryFlag) {
-                    myFileName = myFileName + ".b60";
-                } else {
-                    myFileName = myFileName + ".x60";
-                }
+                myFileName = myFileName + ".x60";
             }
 
             myProgressBar.setStatus("Writing file to disk");
@@ -263,13 +252,13 @@ SceneExporter::writer(const MFileObject& theFile,
             if (myProblemsReported) {
                 MGlobal::displayInfo("### There were problems during export. Please check log.");
             } else {
-                cerr << "Export to " << myFileName.asChar() << " successful!" << endl;
+                //cerr << "Export to " << myFileName.asChar() << " successful!" << endl;
                 MGlobal::displayInfo("Export to " + myFileName + " successful!");
             }
         }
     }
 
-    msleep(500);
+    //msleep(500);
 
     return myStatus;
 }

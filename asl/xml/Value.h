@@ -85,27 +85,27 @@ namespace dom {
     typedef asl::Ptr<ValueBase,ThreadingModel> ValuePtr;
 
     class ValueBase : protected asl::WriteableBlock, public Field {
-	public:
+    public:
         friend class Node;
 
-		virtual const char * name() const = 0;
-		virtual const std::type_info & getTypeInfo() const = 0;
-		virtual const DOMString & getString() const = 0;
-		virtual void setString(const DOMString & theValue) = 0;
-		virtual ValuePtr clone(Node * theNode) const = 0;
+        virtual const char * name() const = 0;
+        virtual const std::type_info & getTypeInfo() const = 0;
+        virtual const DOMString & getString() const = 0;
+        virtual void setString(const DOMString & theValue) = 0;
+        virtual ValuePtr clone(Node * theNode) const = 0;
         /// create default constructed value
-		virtual ValuePtr create(Node * theNode) const = 0;
+        virtual ValuePtr create(Node * theNode) const = 0;
         ///create Value from string
-		virtual ValuePtr create(const DOMString & theValue,Node * theNode) const = 0;
+        virtual ValuePtr create(const DOMString & theValue,Node * theNode) const = 0;
         ///create Value from binary representation
-		virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const = 0;
-		virtual void bumpVersion() = 0;
+        virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const = 0;
+        virtual void bumpVersion() = 0;
 
         virtual void set(const ReadableBlock & theBlock) {
             assign(theBlock);
             bumpVersion();
         }
-		virtual void update() const = 0;
+        virtual void update() const = 0;
         virtual asl::WriteableBlock & openWriteableBlock() = 0;
         virtual void closeWriteableBlock() = 0;
         virtual bool isBlockWriteable() const = 0;
@@ -124,7 +124,7 @@ namespace dom {
         virtual void reparent() const {
             const_cast<ValueBase*>(this)->bumpVersion();
         }
-	};
+    };
 
 
     template <class VALUE>
@@ -297,29 +297,29 @@ namespace dom {
    };
 
     class StringValue : public ValueBase {
-	public:
+    public:
         StringValue(Node * theNode) : _isBlockWriteable(false), _myNode(theNode) {
             // intentionally no call to update() or bumpversion() here
         }
-		StringValue(const asl::ReadableBlock & theValue, Node * theNode)
+        StringValue(const asl::ReadableBlock & theValue, Node * theNode)
             : _myStringValue(theValue.strbegin(),theValue.size()), _isBlockWriteable(false), _myNode(theNode)
         {
             update();
             bumpVersion();
         }
-		StringValue(const DOMString & theStringValue, Node * theNode)
+        StringValue(const DOMString & theStringValue, Node * theNode)
             : _myStringValue(theStringValue), _isBlockWriteable(false), _myNode(theNode)
         {
             update();
             bumpVersion();
         }
-		virtual const char * name() const {
-			return typeid(DOMString).name();
-		}
-		virtual const std::type_info & getTypeInfo() const {
-			return typeid(DOMString);
-		}
-		virtual void bumpVersion();
+        virtual const char * name() const {
+            return typeid(DOMString).name();
+        }
+        virtual const std::type_info & getTypeInfo() const {
+            return typeid(DOMString);
+        }
+        virtual void bumpVersion();
         virtual void binarize(asl::WriteableStream & theDest) const {
             onGetValue();
             theDest.appendCountedString(_myStringValue);
@@ -338,64 +338,64 @@ namespace dom {
             return debinarizeGeneric(theVector, theSource, thePos);
         };
     protected:
-		virtual unsigned char * begin() {
+        virtual unsigned char * begin() {
             if (!this->isBlockWriteable()) {
                 throw ValueNotBlockWriteable(JUST_FILE_LINE);
             }
-			return reinterpret_cast<unsigned char*>(&(*_myStringValue.begin()));
-		}
+            return reinterpret_cast<unsigned char*>(&(*_myStringValue.begin()));
+        }
         virtual unsigned char * end() {
             if (!this->isBlockWriteable()) {
                 throw ValueNotBlockWriteable(JUST_FILE_LINE);
             }
             return reinterpret_cast<unsigned char*>(&(*_myStringValue.end()));
         }
-		virtual const unsigned char * begin() const {
-			return reinterpret_cast<const unsigned char*>(&(*_myStringValue.begin()));
-		}
-		virtual const unsigned char * end() const {
-			return reinterpret_cast<const unsigned char*>(&(*_myStringValue.end()));
-		}
+        virtual const unsigned char * begin() const {
+            return reinterpret_cast<const unsigned char*>(&(*_myStringValue.begin()));
+        }
+        virtual const unsigned char * end() const {
+            return reinterpret_cast<const unsigned char*>(&(*_myStringValue.end()));
+        }
         operator bool() const {
             return true;
         }
     public:
-		virtual asl::AC_SIZE_TYPE size() const {
+        virtual asl::AC_SIZE_TYPE size() const {
             onGetValue();
-			return _myStringValue.size();
-		}
-		virtual const DOMString & getString() const {
+            return _myStringValue.size();
+        }
+        virtual const DOMString & getString() const {
             onGetValue();
-			return _myStringValue;
-		}
-		virtual void setString(const DOMString & theValue) {
-			_myStringValue = theValue;
+            return _myStringValue;
+        }
+        virtual void setString(const DOMString & theValue) {
+            _myStringValue = theValue;
             update();
             bumpVersion();
             onSetValue();
-	    }
-		virtual ValuePtr clone(Node * theNode) const {
+        }
+        virtual ValuePtr clone(Node * theNode) const {
             onGetValue();
-			return ValuePtr(new StringValue(_myStringValue, theNode));
-		}
-		virtual ValuePtr create(Node * theNode) const {
-			return ValuePtr(new StringValue(theNode));
-		}
-		virtual ValuePtr create(const DOMString & theValue, Node * theNode) const {
-			return ValuePtr(new StringValue(theValue, theNode));
-		}
-		virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const {
-			return ValuePtr(new StringValue(theValue, theNode));
-		}
+            return ValuePtr(new StringValue(_myStringValue, theNode));
+        }
+        virtual ValuePtr create(Node * theNode) const {
+            return ValuePtr(new StringValue(theNode));
+        }
+        virtual ValuePtr create(const DOMString & theValue, Node * theNode) const {
+            return ValuePtr(new StringValue(theValue, theNode));
+        }
+        virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const {
+            return ValuePtr(new StringValue(theValue, theNode));
+        }
         virtual void update() const {
         }
-		virtual void assign(const asl::ReadableBlock & myOtherBlock) {
-			_myStringValue.resize(myOtherBlock.size());
-			std::copy(myOtherBlock.begin(),myOtherBlock.end(),&_myStringValue[0]);
+        virtual void assign(const asl::ReadableBlock & myOtherBlock) {
+            _myStringValue.resize(myOtherBlock.size());
+            std::copy(myOtherBlock.begin(),myOtherBlock.end(),&_myStringValue[0]);
             update();
             bumpVersion();
             onSetValue();
-		}
+        }
         virtual asl::WriteableBlock & openWriteableBlock() {
             if (this->isBlockWriteable()) {
                 throw ValueAlreadyBlockWriteable(JUST_FILE_LINE);
@@ -416,28 +416,28 @@ namespace dom {
         virtual bool isBlockWriteable() const {
             return _isBlockWriteable;
         }
-	protected:
-		virtual void setMutableString(const DOMString & theValue) const {
-			const_cast<DOMString&>(_myStringValue) = theValue;
-		}
+    protected:
+        virtual void setMutableString(const DOMString & theValue) const {
+            const_cast<DOMString&>(_myStringValue) = theValue;
+        }
         virtual void setBlockWriteable(bool theState) {
             _isBlockWriteable = theState;
         }
         virtual void setNodePtr(Node * theNode) {
             _myNode = theNode;
         }
-		virtual const DOMString & getStringDirect() const {
-			return _myStringValue;
-		}
+        virtual const DOMString & getStringDirect() const {
+            return _myStringValue;
+        }
     public:
         virtual Node * getNodePtr() {
             return _myNode;
         }
     private:
-		DOMString _myStringValue;
+        DOMString _myStringValue;
         bool _isBlockWriteable;
         mutable Node * _myNode;
-	};
+    };
 
     class NodeIDRegistry {
     public:
@@ -464,36 +464,36 @@ namespace dom {
         IDValue(Node * theNode) : StringValue(theNode) {
             // intentionally no call to update() or bumpversion() here
         }
-		IDValue(const asl::ReadableBlock & theValue, Node * theNode) : StringValue(theValue, theNode)
+        IDValue(const asl::ReadableBlock & theValue, Node * theNode) : StringValue(theValue, theNode)
         {
             update();
         }
-		IDValue(const DOMString & theValue, Node * theNode) : StringValue(theValue, theNode)
+        IDValue(const DOMString & theValue, Node * theNode) : StringValue(theValue, theNode)
         {
             update();
         }
         ~IDValue();
-		virtual const char * name() const {
-			return typeid(IDValue).name();
-		}
-		virtual const std::type_info & getTypeInfo() const {
-			return typeid(IDValue);
-		}
-		virtual void update() const;
-		virtual void reparent() const;
- 		virtual ValuePtr clone(Node * theNode) const {
+        virtual const char * name() const {
+            return typeid(IDValue).name();
+        }
+        virtual const std::type_info & getTypeInfo() const {
+            return typeid(IDValue);
+        }
+        virtual void update() const;
+        virtual void reparent() const;
+        virtual ValuePtr clone(Node * theNode) const {
             onGetValue();
-			return ValuePtr(new IDValue(getString(), theNode));
-		}
-		virtual ValuePtr create(Node * theNode) const {
-			return ValuePtr(new IDValue(theNode));
-		}
-		virtual ValuePtr create(const DOMString & theValue, Node * theNode) const {
-			return ValuePtr(new IDValue(theValue, theNode));
-		}
-		virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const {
-			return ValuePtr(new IDValue(theValue, theNode));
-		}
+            return ValuePtr(new IDValue(getString(), theNode));
+        }
+        virtual ValuePtr create(Node * theNode) const {
+            return ValuePtr(new IDValue(theNode));
+        }
+        virtual ValuePtr create(const DOMString & theValue, Node * theNode) const {
+            return ValuePtr(new IDValue(theValue, theNode));
+        }
+        virtual ValuePtr create(const asl::ReadableBlock & theValue, Node * theNode) const {
+            return ValuePtr(new IDValue(theValue, theNode));
+        }
         virtual void setNodePtr(Node * theNode);
     protected:
         virtual void registerID(const DOMString & theCurrentValue) const;
@@ -503,8 +503,8 @@ namespace dom {
         mutable NodeIDRegistryWeakPtr _myRegistry;
     };
 
-	DEFINE_EXCEPTION(SizeMismatch,asl::Exception);
-	DEFINE_PARSE_EXCEPTION(ConversionFailed,ParseException);
+    DEFINE_EXCEPTION(SizeMismatch,asl::Exception);
+    DEFINE_PARSE_EXCEPTION(ConversionFailed,ParseException);
 
     template <class T>
     class Value : public StringValue {
@@ -529,29 +529,29 @@ namespace dom {
     };
 
     template <class T>
-	T * dynamic_cast_and_openWriteableValue(ValueBase * theValueBase) {
-		Value<T> * myValuePtr = dynamic_cast<Value<T>*>(theValueBase);
-		if (myValuePtr) {
-			return &myValuePtr->openWriteableValue();
-		}
-		return 0;
-	}
+    T * dynamic_cast_and_openWriteableValue(ValueBase * theValueBase) {
+        Value<T> * myValuePtr = dynamic_cast<Value<T>*>(theValueBase);
+        if (myValuePtr) {
+            return &myValuePtr->openWriteableValue();
+        }
+        return 0;
+    }
     template <class T>
-	void dynamic_cast_and_closeWriteableValue(ValueBase * theValueBase) {
-		Value<T> * myValuePtr = dynamic_cast<Value<T>*>(theValueBase);
-		if (myValuePtr) {
-			myValuePtr->closeWriteableValue();
-		}
-	}
+    void dynamic_cast_and_closeWriteableValue(ValueBase * theValueBase) {
+        Value<T> * myValuePtr = dynamic_cast<Value<T>*>(theValueBase);
+        if (myValuePtr) {
+            myValuePtr->closeWriteableValue();
+        }
+    }
 
-	template <class T>
-	const T * dynamic_cast_Value(const ValueBase * theValueBase) {
-		const Value<T> * myValuePtr = dynamic_cast<const Value<T>*>(theValueBase);
-		if (myValuePtr) {
-			return &myValuePtr->getValue();
-		}
-		return 0;
-	}
+    template <class T>
+    const T * dynamic_cast_Value(const ValueBase * theValueBase) {
+        const Value<T> * myValuePtr = dynamic_cast<const Value<T>*>(theValueBase);
+        if (myValuePtr) {
+            return &myValuePtr->getValue();
+        }
+        return 0;
+    }
 
     DEFINE_EXCEPTION(ValueNotNativeWriteable, asl::Exception);
     DEFINE_EXCEPTION(ValueAlreadyNativeWriteable, asl::Exception);
@@ -632,7 +632,7 @@ namespace dom {
         virtual bool isValueWriteable() const {
             return _isValueWriteable;
         }
-	protected:
+    protected:
        virtual void setValueWriteable(bool theState) {
             _isValueWriteable = theState;
         }
@@ -733,7 +733,7 @@ namespace dom {
     };
 
     struct AccessibleVector {
-		virtual const char * elementName() const = 0;
+        virtual const char * elementName() const = 0;
         virtual asl::AC_SIZE_TYPE length() const = 0;
         virtual ValuePtr getElement(asl::AC_SIZE_TYPE theIndex) const = 0;
         virtual bool setElement(asl::AC_SIZE_TYPE theIndex, const ValueBase & theValue) = 0;
@@ -981,7 +981,7 @@ namespace dom {
         typedef typename T::value_type ELEM;
 
         MakeAccessibleVector(VECTOR_VALUE & theVectorValue) : _myVectorValue(theVectorValue) {}
-		const char * elementName() const {
+        const char * elementName() const {
             return typeid(ELEM).name();
         }
 
@@ -1023,7 +1023,7 @@ namespace dom {
         typedef typename T::value_type ELEM;
 
         MakeResizeableVector(VECTOR_VALUE & theVectorValue) : _myVectorValue(theVectorValue) {}
-		const char * elementName() const {
+        const char * elementName() const {
             return typeid(ELEM).name();
         }
 
@@ -1521,34 +1521,34 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Block, VectorValue);
 
     class ValueFactory {
-	public:
-		ValueFactory();
-		ValuePtr createValue(const DOMString & theType, Node * theNode) const;
-		ValuePtr createValue(const DOMString & theType, const DOMString & theValue, Node * theNode) const;
-		ValuePtr createValue(const DOMString & theType, const asl::ReadableBlock & theValue, Node * theNode) const;
-		void registerPrototype(const DOMString & theType, ValuePtr thePrototype);
-		const ValuePtr findPrototype(const DOMString & theType) const;
+    public:
+        ValueFactory();
+        ValuePtr createValue(const DOMString & theType, Node * theNode) const;
+        ValuePtr createValue(const DOMString & theType, const DOMString & theValue, Node * theNode) const;
+        ValuePtr createValue(const DOMString & theType, const asl::ReadableBlock & theValue, Node * theNode) const;
+        void registerPrototype(const DOMString & theType, ValuePtr thePrototype);
+        const ValuePtr findPrototype(const DOMString & theType) const;
 
-		template <class T>
-		const DOMString getValueName() const {
-		    const std::type_info & myType = typeid(T);
+        template <class T>
+        const DOMString getValueName() const {
+            const std::type_info & myType = typeid(T);
 
-		    ProtoMap::const_iterator it = _myPrototypes.begin();
-		    while(it != _myPrototypes.end()) {
-		        if (it->second->getTypeInfo() == myType) {
-		            return it->first;
-		        }
-		        ++it;
-		    }
+            ProtoMap::const_iterator it = _myPrototypes.begin();
+            while(it != _myPrototypes.end()) {
+                if (it->second->getTypeInfo() == myType) {
+                    return it->first;
+                }
+                ++it;
+            }
             return "";
-		}
-		void dump() const;
-	private:
-		typedef std::map<DOMString,ValuePtr > ProtoMap;
-		ProtoMap _myPrototypes;
-	};
+        }
+        void dump() const;
+    private:
+        typedef std::map<DOMString,ValuePtr > ProtoMap;
+        ProtoMap _myPrototypes;
+    };
 
-	extern void registerStandardTypes(ValueFactory & theFactory);
+    extern void registerStandardTypes(ValueFactory & theFactory);
 
     /* @} */
 } //Namespace dom
