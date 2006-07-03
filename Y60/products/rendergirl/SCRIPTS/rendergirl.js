@@ -309,7 +309,7 @@ ourHandler.on_sunlight_activate = function(theMenuItem) {
 }
 
 ourHandler.on_quit_activate = function() {
-    Logger.warning("Quit");
+    Logger.info("Quit");
     ourViewer.finalize();
     GtkMain.quit();
 }
