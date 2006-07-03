@@ -112,8 +112,19 @@ JSCheckMenuItem::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *ar
     JSCheckMenuItem * myNewObject = 0;
 
     if (argc == 0) {
-        newNative = 0; // Abstract
+        newNative = new NATIVE();
         myNewObject = new JSCheckMenuItem(OWNERPTR(newNative), newNative);
+    } else if ( argc == 2 ) {
+        try {
+            Glib::ustring myName;
+            convertFrom(cx, argv[0], myName);
+
+            bool myState;
+            convertFrom( cx, argv[1], myState);
+
+            newNative = new NATIVE( myName, myState );
+            myNewObject = new JSCheckMenuItem(OWNERPTR(newNative), newNative);
+        } HANDLE_CPP_EXCEPTION;
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
         return JS_FALSE;

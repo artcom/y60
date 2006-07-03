@@ -26,6 +26,7 @@ use("LightManager.js");
 use("picking_functions.js");
 use("HeartbeatThrober.js");
 use("Playlist.js");
+use("SwitchNodeHandler.js");
 
 
 function BaseViewer(theArguments) {
@@ -469,6 +470,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _mySkyboxMaterial        = null;
     var _myHeartbeatThrober      = null;
     var _myPicking               = null;
+    
+    var _mySwitchNodes = new Array();
 
     self.__defineGetter__('_myPicking', function(){ return _myPicking; });
 
@@ -541,8 +544,27 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     }
 
-    self.prepareScene = function (theScene, theCanvas) {
+    function collectSwitchNodes( theNode ) {
+        for (var i = 0; i < theNode.childNodesLength(); ++i) {
+            var myName = new String( theNode.childNode(i).name );
+            if ( myName.match(/^switch_.*/)) {
+                _mySwitchNodes.push( new SwitchNodeHandler( theNode.childNode(i)) );
+            }
+            collectSwitchNodes( theNode.childNode( i ) );
+        }
+    }
 
+    function collectAllSwitchNodes( theScene ) {
+        var mySceneNode = theScene.dom;
+        var myWorld = mySceneNode.childNode("worlds").childNode("world");
+        collectSwitchNodes( myWorld );
+    }
+
+    self.getSwitchNodes = function() {
+        return _mySwitchNodes;
+    }        
+
+    self.prepareScene = function (theScene, theCanvas) {
         if (theScene) {
             // Cache main scene nodes for fast access
             var myWorlds    = getDescendantByTagName(theScene.dom, "worlds", false);
@@ -563,6 +585,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             } else {
                 self.setCanvas(_myRenderWindow.canvas);
             }
+            
+            collectAllSwitchNodes(theScene);
+            
         } else {
             Logger.trace("prepareScene has no scene");
 

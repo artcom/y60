@@ -15,6 +15,7 @@ use("ClassicTrackballMover.js");
 use("FlyMover.js");
 use("WalkMover.js");
 use("GUIUtils.js");
+use("SwitchNodeMenu.js");
 
 var ourHandler           = {};
 
@@ -102,9 +103,10 @@ ourHandler.on_open_activate = function(theArguments) {
         ourViewer.setModelName(myFilename);
         var myScene = new Scene(myFilename);
         myScene.setup();        
-        ourViewer.setScene(myScene);
+        //ourViewer.setScene(myScene);
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
-        ourViewer.setCanvas(myCanvas);
+        //ourViewer.setCanvas(myCanvas);
+        ourViewer.prepareScene(myScene, myCanvas);
         ourStatusBar.set("Opened scene: " + myFilename);
         setupGUI();
         window.queue_draw();
@@ -120,9 +122,6 @@ ourHandler.on_save_screenshot_activate = function(theArguments) {
         window.saveBuffer(myFilename);
         ourStatusBar.set("Saved screenshot: " + myFilename);
     }
-}
-ourHandler.on_quit_activate = function() {
-    GtkMain.quit();
 }
 
 //=================================================
@@ -309,6 +308,12 @@ ourHandler.on_sunlight_activate = function(theMenuItem) {
     window.queue_draw();
 }
 
+ourHandler.on_quit_activate = function() {
+    Logger.warning("Quit");
+    ourViewer.finalize();
+    GtkMain.quit();
+}
+
 //=================================================
 // Tools Menu Item Handlers
 //=================================================
@@ -461,11 +466,17 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
+
     self.onPostRender = function() {
         if (RenderTest) {
             RenderTest.onPostRender();
         }
     }
+
+    self.setupSwitchNodeMenu = function() {
+        _mySwitchNodeMenu.setup( self );
+    }
+
 /*
     self.BaseViewer.onMouseButton = self.onMouseButton;
     self.onMouseButton = function(theButton, theState, theX, theY) {
@@ -479,6 +490,12 @@ Viewer.prototype.Constructor = function(self, theArguments) {
     }
 
 */
+
+    self.finalize = function() {
+        _mySwitchNodeMenu.finalize();
+    }
+
+    var _mySwitchNodeMenu = new SwitchNodeMenu( self );
 }
 
 //===========================================
@@ -535,6 +552,7 @@ function main(argv) {
         ourViewer = new Viewer(ourHandler.arguments);
         ourMainWindow.signal_key_press_event.connect(ourViewer, "onKeyDown");
         ourMainWindow.signal_key_release_event.connect(ourViewer, "onKeyUp");
+        ourMainWindow.signal_delete_event.connect(ourHandler, "on_quit_activate");
         ourViewer.setupWindow(window);
 
         var myScene = new Scene(ourViewer.getModelName());
@@ -555,11 +573,13 @@ function main(argv) {
     }
 }
 
+
 function setupGUI() {
     ourAnimationManager.setup();
     ourViewer.setMover(ClassicTrackballMover, window.canvas.childNode('viewport'));
     ourPreferenceDialog.apply();
     setupCameraComboBox();
+    ourViewer.setupSwitchNodeMenu();
 }
 
 if (main(arguments) != 0 || GtkMain.exitCode != 0) {
