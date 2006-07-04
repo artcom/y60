@@ -586,4 +586,3 @@ if (main(arguments) != 0 || GtkMain.exitCode != 0) {
     exit(1);
 };
 
-
