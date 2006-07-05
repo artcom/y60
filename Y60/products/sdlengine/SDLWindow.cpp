@@ -280,7 +280,9 @@ SDLWindow::initDisplay() {
     AC_INFO  << "GL Version:     " << glGetString(GL_VERSION);
     AC_INFO  << "   Vendor:      " << glGetString(GL_VENDOR);
     AC_INFO  << "   Renderer :   " << glGetString(GL_RENDERER);
+#ifndef _AC_NO_CG_
     AC_INFO  << "   CG Profiles: " << getLatestCgProfileString();
+#endif
     AC_DEBUG << "   Extensions:  " << glGetString(GL_EXTENSIONS);
 
     // retrieve standard cursor

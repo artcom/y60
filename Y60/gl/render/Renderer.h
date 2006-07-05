@@ -41,8 +41,10 @@
 #include <GL/gl.h>
 
 // CG support
-#include <Cg/cg.h>
-#include <Cg/cgGL.h>
+#ifndef _AC_NO_CG_
+	#include <Cg/cg.h>
+	#include <Cg/cgGL.h>
+#endif
 
 #include <string>
 #include <vector>

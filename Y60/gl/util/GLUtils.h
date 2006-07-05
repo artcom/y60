@@ -342,7 +342,9 @@ namespace y60 {
     std::string getGLVersionString();
     std::string getGLVendorString();
     std::string getGLRendererString();
+#ifndef _AC_NO_CG_
     std::string getLatestCgProfileString();
+#endif
     unsigned int getGLExtensionStrings(std::vector<std::string> & theTokens);    
 }
 
