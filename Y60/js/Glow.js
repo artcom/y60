@@ -342,7 +342,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         // prepare compositing
         window.scene.overlays.appendChild(_myOffscreenOverlay.node);
 
-        _myDebugOverlay = null;//_myBlurXOverlay.node;
+        _myDebugOverlay = null;// _myBlurXOverlay.node;
         if (_myDebugOverlay) {
             window.scene.overlays.appendChild(_myDebugOverlay);
         } else {
