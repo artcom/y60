@@ -100,19 +100,13 @@ ourHandler.on_open_activate = function(theArguments) {
         myFilename = getFilenameDialog("Open Scene", FileChooserDialog.ACTION_OPEN);
     }
     if (myFilename) {
-        ourViewer.setModelName(myFilename);
-        var myScene = new Scene(myFilename);
-        myScene.setup();        
-        //ourViewer.setScene(myScene);
-        var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
-        //ourViewer.setCanvas(myCanvas);
-        ourViewer.prepareScene(myScene, myCanvas);
-        ourStatusBar.set("Opened scene: " + myFilename);
-        setupGUI();
-        window.queue_draw();
+        ourViewer.loadModel( myFilename );
     }
     window.pause = isPaused;
 }
+
+
+
 ourHandler.on_save_screenshot_activate = function(theArguments) {
     var myFilename = theArguments;
     if (typeof(myFilename) == "object") {
@@ -416,6 +410,19 @@ Viewer.prototype.Constructor = function(self, theArguments) {
     BaseViewer.prototype.Constructor(self, theArguments);
     self.BaseViewer = [];
 
+    self.loadModel = function( theFilename ) {
+        self.setModelName(theFilename);
+        var myScene = new Scene(theFilename);
+        
+        myScene.setup();  
+        var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
+        ourViewer.setScene(myScene, myCanvas);
+
+        ourStatusBar.set("Opened scene: " + theFilename);
+        setupGUI();
+        window.queue_draw();
+    }
+
     self.onFrame = function(theTime) {
         if (RenderTest) {
             RenderTest.onFrame(theTime);
@@ -474,6 +481,12 @@ Viewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.setupSwitchNodeMenu = function() {
+        if (_mySwitchNodeMenu) {
+            _mySwitchNodeMenu.finalize();
+            _mySwitchNodeMenu = null;
+            gc();
+        }
+        _mySwitchNodeMenu = new SwitchNodeMenu();
         _mySwitchNodeMenu.setup( self );
     }
 
@@ -495,7 +508,7 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         _mySwitchNodeMenu.finalize();
     }
 
-    var _mySwitchNodeMenu = new SwitchNodeMenu( self );
+    var _mySwitchNodeMenu = null; /*new SwitchNodeMenu( self );*/
 }
 
 //===========================================
@@ -555,17 +568,39 @@ function main(argv) {
         ourMainWindow.signal_delete_event.connect(ourHandler, "on_quit_activate");
         ourViewer.setupWindow(window);
 
+
+
+        /*
+        self.setModelName(myFilename);
+        var myScene = new Scene(myFilename);
+        myScene.setup();        
+        //ourViewer.setScene(myScene);
+        var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
+        //ourViewer.setCanvas(myCanvas);
+        self.prepareScene(myScene, myCanvas);
+        ourStatusBar.set("Opened scene: " + myFilename);
+        setupGUI();
+        window.queue_draw();
+*/
+
+        ourViewer.registerMover(ClassicTrackballMover);
+        ourViewer.registerMover(FlyMover);
+        ourViewer.registerMover(WalkMover);
+        ourAnimationManager = new GtkAnimationManager(ourViewer);
+
+
+        ourViewer.loadModel( ourViewer.getModelName());
+
+
+
+/*
         var myScene = new Scene(ourViewer.getModelName());
         myScene.setup();
         ourViewer.setScene(myScene);
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         ourViewer.setCanvas(myCanvas);
-        ourViewer.registerMover(ClassicTrackballMover);
-        ourViewer.registerMover(FlyMover);
-        ourViewer.registerMover(WalkMover);
-        ourAnimationManager = new GtkAnimationManager(ourViewer);
         setupGUI();
-
+  */      
         return GtkMain.run(ourMainWindow);
     } catch (ex) {
         print("### Exception: " + ex);

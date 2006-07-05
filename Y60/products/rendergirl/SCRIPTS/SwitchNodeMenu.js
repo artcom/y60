@@ -92,6 +92,7 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
                 _myHandlers.push( new GtkSwitchNodeHandler( mySwitchNodes[i],
                             _mySwitchNodeMenu ) );
             }
+            _mySwitchNodeMenuItem.sensitive = true;
         } else {
             _mySwitchNodeMenuItem.sensitive = false;
         }
