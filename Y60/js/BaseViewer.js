@@ -555,6 +555,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     function collectAllSwitchNodes( theScene ) {
+        _mySwitchNodes = new Array();
+
         var mySceneNode = theScene.dom;
         var myWorld = mySceneNode.childNode("worlds").childNode("world");
         collectSwitchNodes( myWorld );
@@ -585,7 +587,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             } else {
                 self.setCanvas(_myRenderWindow.canvas);
             }
-            
+
             collectAllSwitchNodes(theScene);
             
         } else {
