@@ -9,7 +9,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//   $RCSfile: DShowCapture.h,v $
+//   $RCSfile: DC1394.h,v $
 //
 //   $Author: thomas $
 //
@@ -17,28 +17,24 @@
 //
 //=============================================================================
 
-#ifndef _ac_DShowCapture_DShowCapture_h_
-#define _ac_DShowCapture_DShowCapture_h_
+#ifndef _ac_DC1394
+#define _ac_DC1394
 
 #include <y60/CaptureDevice.h>
 #include <asl/PlugInBase.h>
 #include <asl/ThreadLock.h>
-#include "DXSampleGrabber.h"
-#include "DShowGraph.h"
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+#include <libraw1394/raw1394.h>
+#include <dc1394/dc1394_control.h>
 
 namespace y60 {
-/*! @addtogroup Y60componentsDShowCapture */
+/*! @addtogroup Y60componentsDC1394 */
 /*  @{ */
     const std::string MIME_TYPE_CAMERA = "video/camera";
-    class DShowCapture : public CaptureDevice, public asl::PlugInBase {
+    class DC1394 : public CaptureDevice, public asl::PlugInBase {
     public:
-        DShowCapture(asl::DLHandle theDLHandle);
-        ~DShowCapture();
+        DC1394(asl::DLHandle theDLHandle);
+        ~DC1394();
         virtual asl::Ptr<CaptureDevice> instance() const;
         std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0);
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster);
@@ -48,7 +44,17 @@ namespace y60 {
         virtual void stopCapture();
         virtual void pauseCapture();
     private:
-        DShowGraph *      _myGraph;
+        dc1394camera_t ** _myDevices;
+        const dc1394camera_t & getDeviceHandle() const { return (*_myDevices)[getDevice()]; };
+        dc1394camera_t & getDeviceHandle() { return (*_myDevices)[getDevice()]; };
+        unsigned int _myDeviceCount;
+        bool _hasRingBuffer;
+        bool _isTransmitting;
+        // raw1394handle_t _myFirewire;
+
+        void scanBus();
+        void initRingBuffer();
+        void freeRingBuffer();
     };
 /* @} */
 }

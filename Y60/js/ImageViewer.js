@@ -47,8 +47,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _mySoundId	        = -1;
     var _myMasterVolume     = 1.0;
     var _myWMAPlugged       = false;
-    var _myVFWCapturePlugged= false;
-    var _myDShowCapturePlugged = false;
+    var _myVideoCapturePlugged= false;
     var _myMissedFrameCounter = 0;
     var _myMaxMissedFrame     = 0;
     var _myLastFrame          = 0;
@@ -299,56 +298,58 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
         /// plug audio and capture plugs, video is handled inside y60 engine via decoderhint
         var myPlaylist = new Playlist();
-        if (OS == "Win32") {
-            switch (myPlaylist.getMediaHintFromURL(myFilename)) {
-                case AUDIO_MEDIA:
-                    print("Media: audio");
-                    if (!_myWMAPlugged) {
-                        plug("y60WMADecoder");
-                        _myWMAPlugged = true;
-                    }
-                    break;
-                case CAPTURE_MEDIA:
-                    print("Media: Capture Video");
-                    if (myFilename.search(/^video:\/\//i) != -1 && !_myVFWCapturePlugged) {
-                        plug("y60VFWCapture");
-                        print("VideoForWindows dshow");
-                        _myVFWCapturePlugged = true;
-                    } else if (myFilename.search(/^dshow:\/\//i) != -1 && !_myDShowCapturePlugged) {
-                        _myDShowCapturePlugged = true;
-                        plug("y60DShowCapture");
-                        print("plugged dshow");
-                    }
-                    break;
-            }
+        switch (myPlaylist.getMediaHintFromURL(myFilename)) {
+            case AUDIO_MEDIA:
+                print("Media: audio");
+                if (OS == "Win32" && !_myWMAPlugged) {
+                    plug("y60WMADecoder");
+                    _myWMAPlugged = true;
+                }
+                break;
+            case CAPTURE_MEDIA:
+                print("Media: Capture Video");
+                if (!_myVideoCapturePlugged && 
+                        (myFilename.search(/^video:\/\//i) != -1 ||
+                         myFilename.search(/^dshow:\/\//i) != -1) )
+                        {
+                            if (OS == "Linux") {
+                                plug("y60DC1394");
+                                print("plugged dc1394");
+                            } else {
+                                plug("y60VFWCapture");
+                                print("plugged dshow");
+                            }
+                            _myVideoCapturePlugged  = true;
+                        }
+                break;
         }
 
         switch (myEntry.mediaType) {
-        case IMAGE_MEDIA:
-            showImage(myFilename);
-            if (_myMovieOverlay) {
-                _myMovieOverlay.visible = false;
-            }
-            break;
-        case VIDEO_MEDIA:
-            var mySeekableFlag = false;
-            showMovie(myFilename, myPlaylist.getVideoDecoderHintFromURL(myFilename, mySeekableFlag));
-            if (_myImageOverlay) {
-               _myImageOverlay.visible = false;
-            }
-            break;
-        case AUDIO_MEDIA:
-            _mySoundId = playSound(myFilename, 1.0, false);
-            if (_mySoundId == -1) {
-                print("Sorry, File not found : " + myFilename);
-            }
-            break;
-        case CAPTURE_MEDIA:
-            showCapture(myFilename);
-            if (_myImageOverlay) {
-               _myImageOverlay.visible = false;
-            }
-            break;
+            case IMAGE_MEDIA:
+                showImage(myFilename);
+                if (_myMovieOverlay) {
+                    _myMovieOverlay.visible = false;
+                }
+                break;
+            case VIDEO_MEDIA:
+                var mySeekableFlag = false;
+                showMovie(myFilename, myPlaylist.getVideoDecoderHintFromURL(myFilename, mySeekableFlag));
+                if (_myImageOverlay) {
+                    _myImageOverlay.visible = false;
+                }
+                break;
+            case AUDIO_MEDIA:
+                _mySoundId = playSound(myFilename, 1.0, false);
+                if (_mySoundId == -1) {
+                    print("Sorry, File not found : " + myFilename);
+                }
+                break;
+            case CAPTURE_MEDIA:
+                showCapture(myFilename);
+                if (_myImageOverlay) {
+                    _myImageOverlay.visible = false;
+                }
+                break;
         }
     }
 

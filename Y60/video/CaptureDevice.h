@@ -71,6 +71,7 @@ namespace y60 {
             return asl::Ptr<CaptureDevice>(0);
         }
 
+        void parseOptions(const std::string & theURL);
 
         virtual std::string canDecode(const std::string & theUrl, asl::ReadableStream * theStream = 0) {
             return "";
@@ -113,7 +114,17 @@ namespace y60 {
         unsigned getDevice() const {
             return _myParent->get<DeviceTag>();
         }
+        template <class T>
+        bool getOption(const std::string & theOption, T & theValue) {
+            std::map<std::string, std::string>::iterator it = _myOptions.find(theOption);
+            if (it == _myOptions.end()) {
+                return false;
+            }
+            theValue = asl::as<T>(it->second);
+            return true;
+        };
     private:
+        std::map<std::string, std::string> _myOptions;
         Capture *   _myParent;
     };
 

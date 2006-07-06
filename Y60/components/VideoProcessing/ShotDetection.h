@@ -27,7 +27,7 @@ namespace y60 {
 
 			ShotDetectionAlgorithm();
 				       
-			void onFrame(const BGRRaster & theFrame, double theTime);
+		    virtual void onFrame(dom::ValuePtr theRaster, double t);
 			void configure(const dom::Node & theNode);
 			const dom::Node & result() const;
 
@@ -49,3 +49,4 @@ namespace y60 {
 }
 
 #endif
+

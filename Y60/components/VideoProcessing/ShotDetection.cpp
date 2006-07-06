@@ -22,7 +22,8 @@ namespace y60 {
 	}
 
 	void 
-	ShotDetectionAlgorithm::onFrame(const BGRRaster & theFrame, double theTime) {
+    ShotDetectionAlgorithm::onFrame(dom::ValuePtr theRaster, double theTime) {
+    	const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*theRaster);
 		static int n = 0;
 
 		//clear current histogram
@@ -32,7 +33,7 @@ namespace y60 {
 		int myScaled;
 		int myFactors[] = {1, BINS_PER_CHANNEL, BINS_PER_CHANNEL*BINS_PER_CHANNEL };
 		BGRRaster::const_iterator it;
-		for (it = theFrame.begin(); it != theFrame.end(); ++it) {
+		for (it = myFrame->begin(); it != myFrame->end(); ++it) {
 			int myBin = 0;
 			for (int c = 0; c < 3; ++c) {
 				myScaled = (BINS_PER_CHANNEL * int((*it)[c])) / 256;
@@ -58,7 +59,7 @@ namespace y60 {
 		//printHistogram(n);
 
 		//compute difference to histogram of last frame
-		float myDifference = float(intersectHistograms())/theFrame.size();
+		float myDifference = float(intersectHistograms())/myFrame->size();
 		double myLength = theTime - _myLastShotTime;
 	    
 		if (_myResultNode.childNodesLength() > 0) {

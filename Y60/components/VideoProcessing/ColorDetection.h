@@ -21,7 +21,7 @@ namespace y60 {
             ColorDetection();
 
 			static std::string getName() { return "colordetection"; }
-			void onFrame(const BGRRaster & theFrame, double t);
+		    void onFrame(dom::ValuePtr theRaster, double t);
 
             void configure(const dom::Node & theNode);
 	        const dom::Node & result() const { 
@@ -62,3 +62,4 @@ namespace y60 {
 }
 
 #endif
+

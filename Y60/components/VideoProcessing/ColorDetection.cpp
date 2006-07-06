@@ -32,10 +32,11 @@ namespace y60 {
     }
 
 	void 
-	ColorDetection::onFrame(const BGRRaster & theFrame, double t) {
+	ColorDetection::onFrame(dom::ValuePtr theRaster, double t) {
+    	const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*theRaster);
         std::vector<unsigned> myHistogram(360);
         Vector3f myHSV;
-		for (BGRRaster::const_iterator it = theFrame.begin(); it != theFrame.end(); ++it) {
+		for (BGRRaster::const_iterator it = myFrame->begin(); it != myFrame->end(); ++it) {
             rgb_to_hsl((*it)[2], (*it)[1], (*it)[0], myHSV);
             if (myHSV[1] > _myThreshold) {
                 int myHue = int(floor(myHSV[0]));
@@ -61,3 +62,4 @@ namespace y60 {
         _myResultNode("histogram")("#text").nodeValue(asl::as_string(myHistogram));
 	}
 }
+

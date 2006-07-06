@@ -17,6 +17,7 @@
 namespace y60 {
 
 	typedef asl::raster<asl::BGR> BGRRaster;
+	typedef asl::raster<asl::RGB> RGBRaster;
 
 	/**
 	* @ingroup Y60video
@@ -35,7 +36,7 @@ namespace y60 {
 			static dom::Node dummy;
 			return dummy;
 		}
-		virtual void onFrame(const BGRRaster & theFrame, double t) = 0;
+		virtual void onFrame(dom::ValuePtr theRaster, double t) = 0;
 	};
 
 	typedef asl::Ptr<Algorithm> AlgorithmPtr;
@@ -47,16 +48,18 @@ namespace y60 {
 	public:
 		static std::string getName() { return "test"; }
 
-		void onFrame(const BGRRaster & theFrame, double t) {
+		void onFrame(dom::ValuePtr theRaster, double t) {
 			int x = 0, y = 0;
-			std::cout << "raster size " << theFrame.xsize() << "x" << theFrame.ysize() 
+			const BGRRaster * myFrame = dom::dynamic_cast_Value<BGRRaster>(&*theRaster);
+			std::cout << "raster size " << myFrame->xsize() << "x" << myFrame->ysize() 
 				<< " value " << x << "," << y << " = " 
-				<< int( getRedValue(theFrame(x,y)) ) << "," 
-				<< int( getGreenValue(theFrame(x,y)) )<< ","   
-				<< int( getBlueValue(theFrame(x,y)) ) 
+				<< int( getRedValue((*myFrame)(x,y)) ) << "," 
+				<< int( getGreenValue((*myFrame)(x,y)) )<< ","   
+				<< int( getBlueValue((*myFrame)(x,y)) ) 
 				<< std::endl;
 		}
 	};
 }
 
 #endif
+

@@ -21,6 +21,7 @@
 
 #include "ShotDetection.h"
 #include "ColorDetection.h"
+#include "Histogram.h"
 #include "Algorithm.h"
 
 #include <y60/JSNode.h>
@@ -53,6 +54,7 @@ namespace y60 {
 
 	AlgorithmPtr createAlgorithm(const string & theName) {
 		REGISTER_ALGORITHM(ColorDetection);
+		REGISTER_ALGORITHM(Histogram);
 		REGISTER_ALGORITHM(TestAlgorithm);
 		REGISTER_ALGORITHM(ShotDetectionAlgorithm);
 
@@ -152,15 +154,9 @@ namespace y60 {
 	void
 	VideoProcessingExtension::onFrame(AbstractRenderWindow * theWindow , double t) {
 		if (_myAlgorithm && _myImage) {
-			const BGRRaster * myRaster = dynamic_cast_Value<BGRRaster>(&*_myImage->getRasterValue());
-	                      
-			if (myRaster) { 
-				double myMovieTime = 0; //_myImage->get<CurrentFrameTag>() / _myImage->get<FrameRateTag>();
-				_myAlgorithm->onFrame(*myRaster, myMovieTime);
-			} else {
-				AC_ERROR << "null ptr for raster BGR " << myRaster;
-			}
-
+       		double myMovieTime = 0; //_myImage->get<CurrentFrameTag>() / _myImage->get<FrameRateTag>();
+    		_myAlgorithm->onFrame(_myImage->getRasterValue(), myMovieTime);
+            return;
 		}
 	}
 
