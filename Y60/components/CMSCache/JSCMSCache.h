@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: JSCMSPackage.h,v $
+//   $RCSfile: JSCMSCache.h,v $
 //   $Author: martin $
 //   $Revision: 1.5 $
 //   $Date: 2005/03/31 13:12:12 $
@@ -16,29 +16,29 @@
 //
 //=============================================================================
 
-#ifndef _ac_y60_components_jsCMSPackage_h_
-#define _ac_y60_components_jsCMSPackage_h_
+#ifndef _ac_y60_components_jsCMSCache_h_
+#define _ac_y60_components_jsCMSCache_h_
 
-#include "CMSPackage.h"
+#include "CMSCache.h"
 #include <y60/JSWrapper.h>
 
 namespace jslib {
     
-class JSCMSPackage : public jslib::JSWrapper<y60::CMSPackage, asl::Ptr<y60::CMSPackage> , jslib::StaticAccessProtocol> {
-        JSCMSPackage() {}
+class JSCMSCache : public jslib::JSWrapper<y60::CMSCache, asl::Ptr<y60::CMSCache> , jslib::StaticAccessProtocol> {
+        JSCMSCache() {}
     public:
-        typedef y60::CMSPackage NATIVE;
+        typedef y60::CMSCache NATIVE;
         typedef asl::Ptr<NATIVE> OWNERPTR;
         typedef jslib::JSWrapper<NATIVE,OWNERPTR, jslib::StaticAccessProtocol> Base;
 
-        JSCMSPackage(OWNERPTR theOwner, NATIVE * theNative)
+        JSCMSCache(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
         {}
 
-        virtual ~JSCMSPackage() {};
+        virtual ~JSCMSCache() {};
         
         static const char * ClassName() {
-            return "CMSPackage";
+            return "CMSCache";
         }
         static JSFunctionSpec * Functions();
         static JSFunctionSpec * StaticFunctions();
@@ -66,20 +66,20 @@ class JSCMSPackage : public jslib::JSWrapper<y60::CMSPackage, asl::Ptr<y60::CMSP
         static jslib::JSConstIntPropertySpec * ConstIntProperties();
         static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
 
-        static JSCMSPackage & getObject(JSContext *cx, JSObject * obj) {
-            return dynamic_cast<JSCMSPackage &>(JSCMSPackage::getJSWrapper(cx,obj));
+        static JSCMSCache & getObject(JSContext *cx, JSObject * obj) {
+            return dynamic_cast<JSCMSCache &>(JSCMSCache::getJSWrapper(cx,obj));
         }
 };
 
 template <>
-struct JSClassTraits<JSCMSPackage::NATIVE> 
-    : public JSClassTraitsWrapper<JSCMSPackage::NATIVE, JSCMSPackage> {};
+struct JSClassTraits<JSCMSCache::NATIVE> 
+    : public JSClassTraitsWrapper<JSCMSCache::NATIVE, JSCMSCache> {};
 
 
-bool convertFrom(JSContext *cx, jsval theValue, JSCMSPackage::OWNERPTR & theCMSPackage);
+bool convertFrom(JSContext *cx, jsval theValue, JSCMSCache::OWNERPTR & theCMSCache);
 
-jsval as_jsval(JSContext *cx, JSCMSPackage::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSCMSPackage::OWNERPTR theOwner, JSCMSPackage::NATIVE * theCMSPackage);
+jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner);
+jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner, JSCMSCache::NATIVE * theCMSCache);
 
 } // namespace jslib
 #endif

@@ -8,12 +8,11 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //==============================================================================
 
-#include "CMSPackage.h"
+#include "CMSCache.h"
 
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
 #include <y60/Request.h>
-
 
 using namespace std;
 using namespace asl;
@@ -21,7 +20,7 @@ using namespace inet;
 
 namespace y60 {
 
-CMSPackage::CMSPackage(const std::string & theServerURI,
+CMSCache::CMSCache(const std::string & theServerURI,
                        const string & theLocalPath,
                        const string & thePresentationURI,                       
                        const std::string & theUsername,
@@ -36,12 +35,12 @@ CMSPackage::CMSPackage(const std::string & theServerURI,
     _myPresentationFile->parseFile(_myPresentationURI);
 }
 
-CMSPackage::~CMSPackage() {
+CMSCache::~CMSCache() {
     //AC_DEBUG << "closing Zip " << _myZipFilename;
 }
 
 void
-CMSPackage::login() {
+CMSCache::login() {
     std::string someAsset = _myAssets.begin()->second->getAttributeString("uri");
     
     //OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
@@ -60,14 +59,15 @@ CMSPackage::login() {
 
     if (myLoginRequest->getResponseCode() != 200 ||
         myLoginRequest->getResponseHeader("Set-Cookie").size() == 0) {
-            throw CMSPackageException("Login failed for user '"+_myUsername+"' at URL '"+someAsset+"'.", PLUS_FILE_LINE);
+            throw CMSCacheException("Login failed for user '"+_myUsername+"' at URL '"+someAsset+"'.", PLUS_FILE_LINE);
     }
     
     _mySessionCookie = myLoginRequest->getResponseHeader("Set-Cookie");
 }
 
+/*
 void
-CMSPackage::loginCMS() {
+CMSCache::loginCMS() {
    // std::string someAsset = _myAssets[0]->getAttributeString("uri");
     
     //OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
@@ -82,16 +82,17 @@ CMSPackage::loginCMS() {
 
     if (myLoginRequest->getResponseCode() != 200 ||
         myLoginRequest->getResponseHeader("Set-Cookie").size() == 0) {
-            throw CMSPackageException("Login failed for user '"+_myUsername+"' at URL '"+_myServerURI+"'.", PLUS_FILE_LINE);
+            throw CMSCacheException("Login failed for user '"+_myUsername+"' at URL '"+_myServerURI+"'.", PLUS_FILE_LINE);
     }
     
     _mySessionCookie = myLoginRequest->getResponseHeader("Set-Cookie");
 }
+*/
 
 void
-CMSPackage::collectExternalAssetList() {
+CMSCache::collectExternalAssetList() {
     if ( ! _myPresentationFile || _myPresentationFile->childNodesLength() == 0 ) {
-        throw CMSPackageException("No presentation file. Bailing out.", PLUS_FILE_LINE);
+        throw CMSCacheException("No presentation file. Bailing out.", PLUS_FILE_LINE);
     }
     
     dom::NodePtr myRoot;
@@ -102,7 +103,7 @@ CMSPackage::collectExternalAssetList() {
     }
     
     if ( ! myRoot ) {
-        throw CMSPackageException("Failed to find themepool", PLUS_FILE_LINE);
+        throw CMSCacheException("Failed to find themepool", PLUS_FILE_LINE);
     }
     
     collectAssets(myRoot);
@@ -111,7 +112,7 @@ CMSPackage::collectExternalAssetList() {
 }
 
 void
-CMSPackage::collectAssets(dom::NodePtr theParent) {
+CMSCache::collectAssets(dom::NodePtr theParent) {
     for (unsigned i = 0; i < theParent->childNodesLength(); ++i) {
         dom::NodePtr myChild = theParent->childNode( i );
         if (myChild->nodeName() == "externalcontent") {
@@ -125,17 +126,18 @@ CMSPackage::collectAssets(dom::NodePtr theParent) {
 }
 
 void
-CMSPackage::addAssetRequest(dom::NodePtr theAsset) {
-    AC_PRINT << "Fetching " << theAsset->getAttributeString("path");
-    RequestPtr myRequest(new Request( theAsset->getAttributeString("uri"),
-                                      "Wget/0.0"));
-    myRequest->setCookie(_mySessionCookie, true);
+CMSCache::addAssetRequest(dom::NodePtr theAsset) {
+    std::string myLocalPath = _myLocalPath + "/" + theAsset->getAttributeString("path");
+    AC_PRINT << "Fetching " << myLocalPath;
+    AssetRequestPtr myRequest(new AssetRequest( theAsset->getAttributeString("uri"),
+                                      myLocalPath, _mySessionCookie));
+    //myRequest->setCookie(_mySessionCookie, true);
     _myAssetRequests.insert(std::make_pair( & ( * theAsset), myRequest));
     _myRequestManager.performRequest(myRequest);
 }
 
 void
-CMSPackage::synchronize() {
+CMSCache::synchronize() {
 
     collectExternalAssetList();
 
@@ -150,7 +152,7 @@ CMSPackage::synchronize() {
 }
 
 void
-CMSPackage::collectOutdatedAssets() {
+CMSCache::collectOutdatedAssets() {
     std::map<std::string, dom::NodePtr>::iterator myIter = _myAssets.begin();
     for (; myIter != _myAssets.end(); myIter++) {
         if ( isOutdated( myIter->second )) {
@@ -162,7 +164,7 @@ CMSPackage::collectOutdatedAssets() {
 }
 
 bool
-CMSPackage::isOutdated( dom::NodePtr theAsset ) {
+CMSCache::isOutdated( dom::NodePtr theAsset ) {
     std::string myFile = _myLocalPath + "/" + theAsset->getAttributeString("path");
     if ( fileExists( myFile )) {
         time_t myLocalTimestamp = getLastModified( myFile );
@@ -175,7 +177,7 @@ CMSPackage::isOutdated( dom::NodePtr theAsset ) {
 }
 
 void
-CMSPackage::fillRequestQueue() {
+CMSCache::fillRequestQueue() {
     for (unsigned i = _myAssetRequests.size(); i < MAX_REQUESTS; ++i) {
         if ( ! _myOutdatedAssets.empty()) {
             dom::NodePtr myAsset = _myOutdatedAssets.back();
@@ -188,23 +190,25 @@ CMSPackage::fillRequestQueue() {
 }
 
 bool
-CMSPackage::isSynchronized() {
+CMSCache::isSynchronized() {
     int myRunningCount = _myRequestManager.handleRequests(); 
 
     // TODO: Error statistics and handling
     AssetRequestMap::iterator myIter = _myAssetRequests.begin();
     while (myIter != _myAssetRequests.end()) {
-        if (myIter->second->getResponseCode() != 0) {
+        if (myIter->second->isDone()) {
             int myResponseCode = myIter->second->getResponseCode();
             if ( myResponseCode == 200) {
                 std::string myFilename = _myLocalPath + "/" + myIter->first->getAttributeString("path");
+                /*
                 const asl::Block & myBlock = myIter->second->getResponseBlock();
                 AC_PRINT << "Recieved " << myFilename << " (" << myBlock.size() << "bytes).";
                 writeFile( myFilename,  myBlock);
+                */
                 time_t myTime = Request::getTimeFromHTTPDate(
                         myIter->first->getAttributeString("lastmodified"));
-                setLastModified(myFilename, myTime);
                 _myAssetRequests.erase( myIter++ );
+                setLastModified(myFilename, myTime);
             } else {
                 // TODO: retry handling
             }
@@ -219,7 +223,7 @@ CMSPackage::isSynchronized() {
 
 
 void
-CMSPackage::updateDirectoryHierarchy() {
+CMSCache::updateDirectoryHierarchy() {
     if ( ! fileExists( _myLocalPath )) {
         createPath( _myLocalPath );
     }
@@ -234,12 +238,12 @@ CMSPackage::updateDirectoryHierarchy() {
 }
 
 void
-CMSPackage::removeStalledAssets() {
+CMSCache::removeStalledAssets() {
     scanStalledEntries( _myLocalPath );
 }
 
 void
-CMSPackage::scanStalledEntries(const std::string & thePath) {
+CMSCache::scanStalledEntries(const std::string & thePath) {
     std::vector<std::string> myEntries = getDirectoryEntries(thePath);
     std::vector<std::string>::iterator myIter = myEntries.begin();
     for (; myIter != myEntries.end(); ++myIter) {

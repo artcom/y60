@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSCMSPackage.h"
+#include "JSCMSCache.h"
 
 
 #include <asl/PackageManager.h>
@@ -24,24 +24,24 @@ namespace jslib {
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    *rval = as_jsval(cx, "CMSPackage");
+    *rval = as_jsval(cx, "CMSCache");
     return JS_TRUE;
 }
 
 static JSBool
 synchronize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return Method<JSCMSPackage::NATIVE>::call(&JSCMSPackage::NATIVE::synchronize,cx,obj,argc,argv,rval);
+    return Method<JSCMSCache::NATIVE>::call(&JSCMSCache::NATIVE::synchronize,cx,obj,argc,argv,rval);
 }
 
 static JSBool
 isSynchronized(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return Method<JSCMSPackage::NATIVE>::call(&JSCMSPackage::NATIVE::isSynchronized,cx,obj,argc,argv,rval);
+    return Method<JSCMSCache::NATIVE>::call(&JSCMSCache::NATIVE::isSynchronized,cx,obj,argc,argv,rval);
 }
 
-#define DEFINE_ORIENTATION_PROP(NAME) { #NAME, PROP_ ## NAME , CMSPackage::NAME }
+#define DEFINE_ORIENTATION_PROP(NAME) { #NAME, PROP_ ## NAME , CMSCache::NAME }
 
 JSConstIntPropertySpec *
-JSCMSPackage::ConstIntProperties() {
+JSCMSCache::ConstIntProperties() {
 
     static JSConstIntPropertySpec myProperties[] = {
         {0}
@@ -50,7 +50,7 @@ JSCMSPackage::ConstIntProperties() {
 };
 
 JSFunctionSpec *
-JSCMSPackage::Functions() {
+JSCMSCache::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
@@ -62,7 +62,7 @@ JSCMSPackage::Functions() {
 }
 
 JSFunctionSpec *
-JSCMSPackage::StaticFunctions() {
+JSCMSCache::StaticFunctions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         {0}
@@ -72,7 +72,7 @@ JSCMSPackage::StaticFunctions() {
 
 
 JSPropertySpec *
-JSCMSPackage::Properties() {
+JSCMSCache::Properties() {
     static JSPropertySpec myProperties[] = {
         {0}
     };
@@ -81,28 +81,28 @@ JSCMSPackage::Properties() {
 
 // getproperty handling
 JSBool
-JSCMSPackage::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSCMSCache::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
         case 0:
         default:
-            JS_ReportError(cx,"JSCMSPackage::getProperty: index %d out of range", theID);
+            JS_ReportError(cx,"JSCMSCache::getProperty: index %d out of range", theID);
             return JS_FALSE;
     }
 }
 
 // setproperty handling
 JSBool
-JSCMSPackage::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+JSCMSCache::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
         case 0:
         default:
-            JS_ReportError(cx,"JSCMSPackage::setPropertySwitch: index %d out of range", theID);
+            JS_ReportError(cx,"JSCMSCache::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
     }
 }
 
 JSBool
-JSCMSPackage::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
         return JS_FALSE;
@@ -134,30 +134,30 @@ JSCMSPackage::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     
     switch (argc) {
         case 3:
-            myNewNative = OWNERPTR(new CMSPackage(myServerURL, myLocalPath, myPresentationFile));
+            myNewNative = OWNERPTR(new CMSCache(myServerURL, myLocalPath, myPresentationFile));
             break;    
         case 5:
-            myNewNative = OWNERPTR(new CMSPackage(myServerURL, myLocalPath, myPresentationFile,
+            myNewNative = OWNERPTR(new CMSCache(myServerURL, myLocalPath, myPresentationFile,
                                                   myUsername, myPassword));
             break;
     }
 
-    JSCMSPackage * myNewObject = new JSCMSPackage(myNewNative, &(*myNewNative));
+    JSCMSCache * myNewObject = new JSCMSCache(myNewNative, &(*myNewNative));
     JS_SetPrivate(cx, obj, myNewObject);
     return JS_TRUE;
 }
 
 JSObject *
-JSCMSPackage::initClass(JSContext *cx, JSObject *theGlobalObject) {
+JSCMSCache::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties(), 0, StaticFunctions());
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, JSCMSPackage::OWNERPTR & theCMSPackage) {
+bool convertFrom(JSContext *cx, jsval theValue, JSCMSCache::OWNERPTR & theCMSCache) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSCMSPackage::NATIVE >::Class()) {
-                theCMSPackage = JSClassTraits<JSCMSPackage::NATIVE>::getNativeOwner(cx,myArgument);
+            if (JSA_GetClass(cx,myArgument) == JSClassTraits<JSCMSCache::NATIVE >::Class()) {
+                theCMSCache = JSClassTraits<JSCMSCache::NATIVE>::getNativeOwner(cx,myArgument);
                 return true;
             }
         }
@@ -165,13 +165,13 @@ bool convertFrom(JSContext *cx, jsval theValue, JSCMSPackage::OWNERPTR & theCMSP
     return false;
 }
 
-jsval as_jsval(JSContext *cx, JSCMSPackage::OWNERPTR theOwner) {
-    JSObject * myReturnObject = JSCMSPackage::Construct(cx, theOwner, &(*theOwner));
+jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner) {
+    JSObject * myReturnObject = JSCMSCache::Construct(cx, theOwner, &(*theOwner));
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-jsval as_jsval(JSContext *cx, JSCMSPackage::OWNERPTR theOwner, JSCMSPackage::NATIVE * theCMSPackage) {
-    JSObject * myObject = JSCMSPackage::Construct(cx, theOwner, theCMSPackage);
+jsval as_jsval(JSContext *cx, JSCMSCache::OWNERPTR theOwner, JSCMSCache::NATIVE * theCMSCache) {
+    JSObject * myObject = JSCMSCache::Construct(cx, theOwner, theCMSCache);
     return OBJECT_TO_JSVAL(myObject);
 }
 

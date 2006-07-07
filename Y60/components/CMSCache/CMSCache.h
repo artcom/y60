@@ -9,26 +9,28 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //==============================================================================
 
-#ifndef __y60__CMSPackage_h_included__
-#define __y60__CMSPackage_h_included__
+#ifndef __y60__CMSCache_h_included__
+#define __y60__CMSCache_h_included__
+
+#include "AssetRequest.h"
 
 #include <y60/RequestManager.h>
 #include <dom/Nodes.h>
 
 #include <map>
 
-DEFINE_EXCEPTION (CMSPackageException, asl::Exception);
+DEFINE_EXCEPTION (CMSCacheException, asl::Exception);
 
 namespace y60 {
 
-class CMSPackage {
+class CMSCache {
     public:
-        CMSPackage(const std::string & theServerURI,
+        CMSCache(const std::string & theServerURI,
                    const std::string & theLocalPath,
                    const std::string & thePresentationURI,
                    const std::string & theUsername = "",
                    const std::string & thePassword = "");
-        ~CMSPackage();
+        ~CMSCache();
         void synchronize();
         bool isSynchronized();
 
@@ -61,7 +63,7 @@ class CMSPackage {
         std::map<std::string, dom::NodePtr> _myAssets;
         std::vector<dom::NodePtr> _myOutdatedAssets;
         
-        typedef std::map<dom::Node *, inet::RequestPtr> AssetRequestMap;
+        typedef std::map<dom::Node *, AssetRequestPtr> AssetRequestMap;
         AssetRequestMap _myAssetRequests;
 };
 

@@ -10,23 +10,23 @@
 //============================================================================
 
 
-#include "JSCMSPackage.h"
+#include "JSCMSCache.h"
 
 #include <y60/IScriptablePlugin.h>
 #include <asl/PlugInBase.h>
 
 namespace y60 {
-	class CMSPackagePlugIn :
+	class CMSCachePlugIn :
 		public asl::PlugInBase,
         public jslib::IScriptablePlugin
 	{
 	public:
-		CMSPackagePlugIn (asl::DLHandle theDLHandle);
-		virtual ~CMSPackagePlugIn();
+		CMSCachePlugIn (asl::DLHandle theDLHandle);
+		virtual ~CMSCachePlugIn();
 
    		void initClasses(JSContext * theContext, JSObject *theGlobalObject);
         const char * ClassName() {
-            static const char * myClassName = "CMSPackagePlugIn";
+            static const char * myClassName = "CMSCachePlugIn";
             return myClassName;
         }
 
@@ -40,24 +40,24 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
-CMSPackagePlugIn :: CMSPackagePlugIn(DLHandle theDLHandle) :
+CMSCachePlugIn :: CMSCachePlugIn(DLHandle theDLHandle) :
 			PlugInBase(theDLHandle)
 {
     //DJDecoderRegistration::registerCodecs();
 }
 
-CMSPackagePlugIn :: ~CMSPackagePlugIn() {
+CMSCachePlugIn :: ~CMSCachePlugIn() {
     //DJDecoderRegistration::cleanup();
 }
 
 void 
-CMSPackagePlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
-    jslib::JSCMSPackage::initClass(theContext, theGlobalObject);
+CMSCachePlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
+    jslib::JSCMSCache::initClass(theContext, theGlobalObject);
 }
 
 
 
 extern "C"
-EXPORT PlugInBase* y60CMSPackage_instantiatePlugIn(DLHandle myDLHandle) {
-	return new y60::CMSPackagePlugIn(myDLHandle);
+EXPORT PlugInBase* y60CMSCache_instantiatePlugIn(DLHandle myDLHandle) {
+	return new y60::CMSCachePlugIn(myDLHandle);
 }
