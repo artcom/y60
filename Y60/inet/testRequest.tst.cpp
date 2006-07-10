@@ -91,7 +91,8 @@ class RequestTest : public UnitTest {
             TestRequestPtr myServerTimeoutRequest = TestRequestPtr(new TestRequest(myServer+"/Timeout"));
             myServerTimeoutRequest->setTimeoutParams(1, 5); // 5 sec timeout
 
-            TestRequestPtr myBaseAuthentRequest = TestRequestPtr(new TestRequest("http://bacon/testBaseAuthent/index.html"));
+            TestRequestPtr myBaseAuthentRequest = TestRequestPtr(
+                    new TestRequest("http://bacon.intern.artcom.de/testBaseAuthent/index.html"));
             myBaseAuthentRequest->setCredentials("Aladdin", "open sesame");
 
             /*
