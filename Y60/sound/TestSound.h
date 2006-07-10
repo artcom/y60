@@ -460,7 +460,7 @@ class TestVolume: public SoundTestBase {
                 mySound->setVolume(0.5f);
                 msleep(200);
                 ENSURE(almostEqual(mySound->getVolume(), 0.5));
-                mySound->fadeToVolume(1, 0.3);
+                mySound->fadeToVolume(1, 0.2);
                 msleep(400);
                 ENSURE(almostEqual(mySound->getVolume(), 1));
                 mySound->stop();
