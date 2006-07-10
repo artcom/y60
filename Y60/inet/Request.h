@@ -23,6 +23,7 @@
 #endif
 
 #include <asl/Exception.h>
+#include <asl/Revision.h>
 #include <asl/Block.h>
 #include <asl/Ptr.h>
 
@@ -45,11 +46,12 @@ namespace inet {
         friend class RequestManager;
 
         public:
-            Request(const std::string & theURL, const std::string & theUserAgent = "Art+Com Y60");
+            Request(const std::string & theURL, const std::string & theUserAgent = std::string("Y60/")+asl::ourRevision);
             virtual ~Request();
             CURL * getHandle() const;
             long getResponseCode() const;
-            const std::string & getResponseString() const;
+            std::string getResponseString() const;
+            const asl::Block & getResponseBlock() const;
             std::string getErrorString() const;
             const std::string & getURL() const;
             void setLowSpeedLimit(unsigned theBytesPerSec);
@@ -58,10 +60,12 @@ namespace inet {
             void setVerbose(bool theVerboseFlag);
             void setSSLCertificate(const std::string & theCertificateFilename);
             void verifyPeer(bool theFlag);
-            void setCookie(const std::string & theCookie);
+            void setCookie(const std::string & theCookie, bool theSessionCookieFlag = false);
             void setResume(long theResumeOffset);
             void setProxy(const std::string & theProxyServer, bool theTunnelFlag = false);
-
+            void setCredentials(const std::string & theUsername, const std::string & thePassword);
+            void setFollowLocation(bool theFollowFlag);
+            
             // request-method type methods
             size_t post(const std::string & thePostData);
             size_t postFile(const std::string & theFilename);
@@ -75,11 +79,15 @@ namespace inet {
             unsigned getLowSpeedTimeout(void) const;
 
             void addHttpHeader(const std::string & theKey, const std::string & theValue);
-            void addHttpHeaderAsDate(const std::string & theKey, time_t & theValue);
+            void addHttpHeaderAsDate(const std::string & theKey, const time_t & theValue);
 
             //TODO: I'm not sure if this function is in the right place...
             static std::string urlEncode(const std::string & theUrl);
             static std::string urlDecode(const std::string & theUrl);
+
+            static time_t getTimeFromHTTPDate(const std::string & theHTTPDate );
+
+
 
         protected:
             // callback hooks
@@ -111,12 +119,13 @@ namespace inet {
             struct curl_slist * _myHttpHeaderList;
             std::string         _myPostBuffer;
             asl::Ptr<asl::ReadableBlock> _myPostBlock;
-            std::string         _myResponse;
+            asl::Block          _myResponseBlock;
             std::vector<char>   _myErrorBuffer;
             std::string         _mySSLCertificateFilename;
             std::multimap<std::string, std::string> _myResponseHeaders;
             std::vector<std::string> _myHttpHeaderBuffers;
             std::string         _myCookieBuffer;
+            std::string         _myAuthentData;
     };
 
     typedef asl::Ptr<Request> RequestPtr;

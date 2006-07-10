@@ -17,6 +17,7 @@
 #include <asl/Time.h>
 #include <asl/UnitTest.h>
 #include <asl/net.h>
+#include <asl/file_functions.h>
 #include <iostream>
 #include <sstream>
 
@@ -90,6 +91,9 @@ class RequestTest : public UnitTest {
             TestRequestPtr myServerTimeoutRequest = TestRequestPtr(new TestRequest(myServer+"/Timeout"));
             myServerTimeoutRequest->setTimeoutParams(1, 5); // 5 sec timeout
 
+            TestRequestPtr myBaseAuthentRequest = TestRequestPtr(new TestRequest("http://bacon/testBaseAuthent/index.html"));
+            myBaseAuthentRequest->setCredentials("Aladdin", "open sesame");
+
             /*
             TestRequestPtr myPostRequest = TestRequestPtr(new TestRequest("http://himmel/~martin/upload.php"));
             myPostRequest->addHttpHeader("X-Filename", "myFilename");
@@ -98,6 +102,7 @@ class RequestTest : public UnitTest {
             
             myRequestManager.performRequest(myPostRequest);
             */
+            myRequestManager.performRequest(myBaseAuthentRequest);
             myRequestManager.performRequest(myNoServerRequest);
             myRequestManager.performRequest(myPageNotFoundRequest);
             myRequestManager.performRequest(myLongRequest);
@@ -114,6 +119,11 @@ class RequestTest : public UnitTest {
                 myRunningCount = myRequestManager.handleRequests(); 
                 msleep(10);
             } while (myRunningCount);
+
+            ENSURE(myBaseAuthentRequest->_myDataReceivedFlag);
+            ENSURE(myBaseAuthentRequest->_myErrorCalledFlag == false);
+            ENSURE(myBaseAuthentRequest->_myDoneCalledFlag == true);
+            ENSURE(myBaseAuthentRequest->getResponseCode() == 200);
 
             ENSURE(myLongRequest->_myDataReceivedFlag);
             ENSURE(myLongRequest->_myErrorCalledFlag == false);

@@ -124,9 +124,14 @@ namespace inet {
         return myResponseCode;
     }
 
-    const std::string &
+    std::string
     Request::getResponseString() const {
-        return _myResponse;
+        return as_string(_myResponseBlock);
+    };
+
+    const asl::Block &
+    Request::getResponseBlock() const {
+        return _myResponseBlock;
     };
 
     void
@@ -181,12 +186,36 @@ namespace inet {
 
     time_t
     Request::getResponseHeaderAsDate(const string & theHeader) const {
-        return curl_getdate(getResponseHeader(theHeader).c_str(), 0);
+        return getTimeFromHTTPDate( getResponseHeader(theHeader).c_str());
+    }
+    
+    time_t
+    Request::getTimeFromHTTPDate(const std::string & theHTTPDate ) {
+        return curl_getdate(theHTTPDate.c_str(), 0);    
     }
 
     string
     Request::getErrorString() const {
         return string(&(*_myErrorBuffer.begin()));
+    }
+
+    void
+    Request::setCredentials(const std::string & theUsername, const std::string & thePassword) {
+        _myAuthentData = theUsername + ":" + thePassword;
+
+        // set the credentials for basic/digest authentication [jb]
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_USERPWD, _myAuthentData.c_str());
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        // CURLAUTH_ANY: tries basic authentication before digest authentication [jb]
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    }
+
+    void 
+    Request::setFollowLocation(bool theFollowFlag) {
+        // follow the "Location"-header field on response codes 3xx (redirection) [jb]
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_FOLLOWLOCATION, theFollowFlag);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
     void
@@ -198,7 +227,7 @@ namespace inet {
     }
 
     void
-    Request::addHttpHeaderAsDate(const std::string & theKey, time_t & theValue) {
+    Request::addHttpHeaderAsDate(const std::string & theKey, const time_t & theValue) {
         // change to RFC1162 date formatted string
         struct tm * myTimeStruct = gmtime(&theValue);
         char myBuffer[128];
@@ -271,16 +300,19 @@ namespace inet {
     }
 
     void
-    Request::setCookie(const std::string & theCookie) {
+    Request::setCookie(const std::string & theCookie, bool theSessionCookieFlag) {
         _myCookieBuffer = theCookie;
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_COOKIE, _myCookieBuffer.c_str());
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        // starting a new session with theCookie and ignore any deprecated session cookies [jb]
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_COOKIESESSION, theSessionCookieFlag);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
     // virtual callback hooks
     size_t
     Request::onData(const char * theData, size_t theReceivedByteCount) {
-        _myResponse += theData;
+        _myResponseBlock.append(theData, theReceivedByteCount);
         return theReceivedByteCount;
     }
 

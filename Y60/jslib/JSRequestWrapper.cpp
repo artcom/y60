@@ -18,6 +18,7 @@
 
 #include "JSRequestWrapper.h"
 #include "JScppUtils.h"
+#include "JSBlock.h"
 #include <iostream>
 
 using namespace std;
@@ -87,18 +88,56 @@ setTimeoutParams(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     return Method<inet::Request>::call(&inet::Request::setTimeoutParams,cx,obj,argc,argv,rval);
 }
 
+static JSBool
+setCredentials(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets the username and password for the base and digest authentication methods.");
+    DOC_PARAM("theUsername", "", DOC_TYPE_STRING);
+    DOC_PARAM("thePassword", "", DOC_TYPE_STRING);
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::setCredentials,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+setCookie(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets a cookie with the given string. The flag indicates a new session cookie.");
+    DOC_PARAM("theString", "", DOC_TYPE_STRING);
+    DOC_PARAM("theSessionCookieFlag", "", DOC_TYPE_INTEGER);
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::setCookie,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+getTimeFromHTTPDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Converts a HTTP Date String to a Time object");
+    DOC_PARAM("theHTTPDate", "", DOC_TYPE_STRING);
+    DOC_RVAL("Time object", DOC_TYPE_OBJECT);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        std::string myHTTPDateString;
+        convertFrom(cx, argv[0], myHTTPDateString);
+
+        time_t myTime = inet::Request::getTimeFromHTTPDate( myHTTPDateString );
+
+        *rval = as_jsval(cx, myTime);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
 JSFunctionSpec *
 JSRequestWrapper::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
-        {"toString",             toString,                0},
-        {"get",                  get,                     0},
-        {"post",                 post,                    1},
-        {"postFile",             postFile,                1},
-        {"addHttpHeader",        addHttpHeader,           2},
-        {"getResponseHeader",    getResponseHeader,       1},
-        {"setTimeoutParams",     setTimeoutParams,        2},
+        {"toString",          toString,            0},
+        {"get",               get,                 0},
+        {"post",              post,                1},
+        {"postFile",          postFile,            1},
+        {"addHttpHeader",     addHttpHeader,       2},
+        {"getResponseHeader", getResponseHeader,   1},
+        {"setTimeoutParams",  setTimeoutParams,    2},
+        {"setCredentials",    setCredentials,      2},
+        {"setCookie",    setCookie,      1},
         {0}
     };
     return myFunctions;
@@ -109,6 +148,7 @@ JSRequestWrapper::Properties() {
     static JSPropertySpec myProperties[] = {
         {"responseCode", PROP_responseCode, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"responseString", PROP_responseString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"responseBlock", PROP_responseBlock, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"errorString", PROP_errorString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"URL", PROP_URL, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
@@ -130,7 +170,9 @@ JSRequestWrapper::StaticProperties() {
 
 JSFunctionSpec *
 JSRequestWrapper::StaticFunctions() {
-    static JSFunctionSpec myFunctions[] = {{0}};
+    static JSFunctionSpec myFunctions[] = {
+        {"getTimeFromHTTPDate",         getTimeFromHTTPDate,         1},
+        {0}};
     return myFunctions;
 }
 
@@ -143,6 +185,9 @@ JSRequestWrapper::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject
                 return JS_TRUE;
             case PROP_responseString:
                 *vp = as_jsval(cx, getNative().getResponseString());
+                return JS_TRUE;
+            case PROP_responseBlock:
+                *vp = as_jsval(cx, getNative().getResponseBlock());
                 return JS_TRUE;
             case PROP_errorString:
                 *vp = as_jsval(cx, getNative().getErrorString());
@@ -231,7 +276,8 @@ JSRequestWrapper::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
 JSObject *
 JSRequestWrapper::initClass(JSContext *cx, JSObject *theGlobalObject) {
     DOC_CREATE(JSRequestWrapper);
-    return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
+    return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(),
+                ConstIntProperties(), 0, StaticFunctions());
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, JSRequestWrapper::NATIVE & theRequest) {
