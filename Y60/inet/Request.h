@@ -71,6 +71,7 @@ namespace inet {
             size_t postFile(const std::string & theFilename);
             size_t postBlock(const asl::Ptr<asl::ReadableBlock> & theBlock);
             void get();
+            void head();
 
             const std::multimap<std::string,std::string> & getResponseHeaders() const;
             std::string getResponseHeader(const std::string & theHeader) const;

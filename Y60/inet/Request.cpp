@@ -126,7 +126,7 @@ namespace inet {
 
     std::string
     Request::getResponseString() const {
-        return as_string(_myResponseBlock);
+        return std::string((char *)_myResponseBlock.begin());
     };
 
     const asl::Block &
@@ -283,6 +283,12 @@ namespace inet {
     void
     Request::get() {
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_HTTPGET, true);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    }
+
+   void
+    Request::head() {
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_NOBODY, true);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
