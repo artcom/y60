@@ -22,17 +22,22 @@ namespace y60 {
 
 CMSCache::CMSCache(const std::string & theServerURI,
                        const string & theLocalPath,
-                       const string & thePresentationURI,                       
+                       dom::NodePtr thePresentationDocument,
                        const std::string & theUsername,
                        const std::string & thePassword) :
      _myServerURI(theServerURI),
-     _myPresentationURI(thePresentationURI),
+     _myPresentationDocument(thePresentationDocument),
      _myLocalPath( theLocalPath ),
      _myUsername(theUsername),
      _myPassword(thePassword),
-     _myPresentationFile(new dom::Document())
+     _myStatusDocument( new dom::Document())
 {
-    _myPresentationFile->parseFile(_myPresentationURI);
+    dom::NodePtr myReport = dom::NodePtr( new dom::Element("report") );
+    _myStatusDocument->appendChild( myReport );
+    _myAssetReportNode = dom::NodePtr( new dom::Element("assets") );
+    myReport->appendChild( _myAssetReportNode );
+    _myStalledFilesNode = dom::NodePtr( new dom::Element("stalledfiles") );
+    myReport->appendChild( _myStalledFilesNode );
 }
 
 CMSCache::~CMSCache() {
@@ -45,12 +50,12 @@ CMSCache::login() {
     
     //OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
     RequestPtr myLoginRequest(new Request( someAsset, "Wget/1.10.2"));
+    myLoginRequest->head();
     if (_myUsername.size() && _myPassword.size()) {
         myLoginRequest->setCredentials(_myUsername, _myPassword);
     }
     _myRequestManager.performRequest(myLoginRequest);
     
-    // TODO: timeouts
     int myRunningCount = 0;
     do {
         myRunningCount = _myRequestManager.handleRequests(); 
@@ -59,7 +64,8 @@ CMSCache::login() {
 
     if (myLoginRequest->getResponseCode() != 200 ||
         myLoginRequest->getResponseHeader("Set-Cookie").size() == 0) {
-            throw CMSCacheException("Login failed for user '"+_myUsername+"' at URL '"+someAsset+"'.", PLUS_FILE_LINE);
+            throw CMSCacheException("Login failed for user '" + _myUsername + 
+                    "' at URL '" + someAsset + "'.", PLUS_FILE_LINE);
     }
     
     _mySessionCookie = myLoginRequest->getResponseHeader("Set-Cookie");
@@ -91,15 +97,15 @@ CMSCache::loginCMS() {
 
 void
 CMSCache::collectExternalAssetList() {
-    if ( ! _myPresentationFile || _myPresentationFile->childNodesLength() == 0 ) {
+    if ( ! _myPresentationDocument || _myPresentationDocument->childNodesLength() == 0 ) {
         throw CMSCacheException("No presentation file. Bailing out.", PLUS_FILE_LINE);
     }
     
     dom::NodePtr myRoot;
-    if (_myPresentationFile->childNode(0)->nodeType() == dom::Node::PROCESSING_INSTRUCTION_NODE) {
-        myRoot = _myPresentationFile->childNode(1)->childNode("themepool", 0);
+    if (_myPresentationDocument->childNode(0)->nodeType() == dom::Node::PROCESSING_INSTRUCTION_NODE) {
+        myRoot = _myPresentationDocument->childNode(1)->childNode("themepool", 0);
     } else {
-        myRoot = _myPresentationFile->childNode(0)->childNode("themepool", 0);
+        myRoot = _myPresentationDocument->childNode(0)->childNode("themepool", 0);
     }
     
     if ( ! myRoot ) {
@@ -118,7 +124,14 @@ CMSCache::collectAssets(dom::NodePtr theParent) {
         if (myChild->nodeName() == "externalcontent") {
             const std::string & myPath = myChild->getAttributeString("path");
             if (_myAssets.find( myPath ) == _myAssets.end()) {
-                _myAssets.insert( std::make_pair(myPath, myChild ));
+                if ( myChild->getAttributeString("uri").empty() ) {
+                    AC_WARNING << "Asset has no URI: " << * myChild;
+                } else {
+                    dom::NodePtr myClone = myChild->cloneNode( dom::Node::DEEP );
+                    _myAssetReportNode->appendChild( myClone );
+                    myClone->appendAttribute("status", "uptodate");
+                    _myAssets.insert( std::make_pair(myPath, myClone ));
+                }
             }
         }
         collectAssets( myChild );
@@ -127,12 +140,11 @@ CMSCache::collectAssets(dom::NodePtr theParent) {
 
 void
 CMSCache::addAssetRequest(dom::NodePtr theAsset) {
-    std::string myLocalPath = _myLocalPath + "/" + theAsset->getAttributeString("path");
-    AC_PRINT << "Fetching " << myLocalPath;
-    AssetRequestPtr myRequest(new AssetRequest( theAsset->getAttributeString("uri"),
-                                      myLocalPath, _mySessionCookie));
-    //myRequest->setCookie(_mySessionCookie, true);
+    AC_PRINT << "Fetching " << _myLocalPath + "/" + theAsset->getAttributeString("path");
+    AssetRequestPtr myRequest(new AssetRequest( theAsset, _myLocalPath, _mySessionCookie));
     _myAssetRequests.insert(std::make_pair( & ( * theAsset), myRequest));
+    theAsset->getAttribute("status")->nodeValue("downloading");
+    theAsset->appendAttribute("progress", "0.0");
     _myRequestManager.performRequest(myRequest);
 }
 
@@ -140,7 +152,6 @@ void
 CMSCache::synchronize() {
 
     collectExternalAssetList();
-
     updateDirectoryHierarchy();
     removeStalledAssets();
     
@@ -158,6 +169,7 @@ CMSCache::collectOutdatedAssets() {
         if ( isOutdated( myIter->second )) {
             AC_PRINT << "Asset " << myIter->second->getAttributeString("path")
                      << " is outtdated.";
+            myIter->second->getAttribute("status")->nodeValue("outdated");
             _myOutdatedAssets.push_back( myIter->second );
         }
     }
@@ -168,7 +180,8 @@ CMSCache::isOutdated( dom::NodePtr theAsset ) {
     std::string myFile = _myLocalPath + "/" + theAsset->getAttributeString("path");
     if ( fileExists( myFile )) {
         time_t myLocalTimestamp = getLastModified( myFile );
-        time_t myServerTimestamp = Request::getTimeFromHTTPDate( theAsset->getAttributeString("lastmodified"));
+        time_t myServerTimestamp = Request::getTimeFromHTTPDate(
+                    theAsset->getAttributeString("lastmodified"));
         if (myServerTimestamp <= myLocalTimestamp) {
             return false;
         } 
@@ -199,19 +212,15 @@ CMSCache::isSynchronized() {
         if (myIter->second->isDone()) {
             int myResponseCode = myIter->second->getResponseCode();
             if ( myResponseCode == 200) {
-                std::string myFilename = _myLocalPath + "/" + myIter->first->getAttributeString("path");
-                /*
-                const asl::Block & myBlock = myIter->second->getResponseBlock();
-                AC_PRINT << "Recieved " << myFilename << " (" << myBlock.size() << "bytes).";
-                writeFile( myFilename,  myBlock);
-                */
+                std::string myFilename = _myLocalPath + "/" +
+                        myIter->first->getAttributeString("path");
                 time_t myTime = Request::getTimeFromHTTPDate(
                         myIter->first->getAttributeString("lastmodified"));
-                _myAssetRequests.erase( myIter++ );
                 setLastModified(myFilename, myTime);
             } else {
                 // TODO: retry handling
             }
+            _myAssetRequests.erase( myIter++ );
         } else {
             ++myIter;
         }
@@ -229,7 +238,8 @@ CMSCache::updateDirectoryHierarchy() {
     }
     std::map<std::string, dom::NodePtr>::iterator myIter = _myAssets.begin();
     while (myIter != _myAssets.end()) {
-        std::string myPath = _myLocalPath + "/" + getDirectoryPart(myIter->second->getAttributeString("path"));
+        std::string myPath = _myLocalPath + "/" +
+                getDirectoryPart(myIter->second->getAttributeString("path"));
         if ( ! fileExists( myPath )) {
             createPath( myPath );
         }
@@ -251,14 +261,23 @@ CMSCache::scanStalledEntries(const std::string & thePath) {
         if (isDirectory(myEntry)) {
             scanStalledEntries(myEntry);
         } else {
-            std::string myFilename = myEntry.substr(_myLocalPath.size() + 1, myEntry.size() - _myLocalPath.size());
+            std::string myFilename = myEntry.substr(_myLocalPath.size() + 1,
+                        myEntry.size() - _myLocalPath.size());
             if (_myAssets.find(myFilename) == _myAssets.end()) {
                 AC_PRINT << "Removing '" << myFilename << "'.";
+                dom::NodePtr myFileNode( new dom::Element("file"));
+                myFileNode->appendAttribute("path", myFilename );
+                myFileNode->appendAttribute("status", "removed");
+                _myStalledFilesNode->appendChild( myFileNode );
                 deleteFile(_myLocalPath + "/" + myFilename);
             }
         }
     }
 }
 
+dom::NodePtr
+CMSCache::getStatusReport() {
+    return _myStatusDocument;
+}
 
 }

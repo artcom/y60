@@ -27,12 +27,14 @@ class CMSCache {
     public:
         CMSCache(const std::string & theServerURI,
                    const std::string & theLocalPath,
-                   const std::string & thePresentationURI,
+                   dom::NodePtr thePresentationDocument,
                    const std::string & theUsername = "",
                    const std::string & thePassword = "");
         ~CMSCache();
         void synchronize();
         bool isSynchronized();
+
+        dom::NodePtr getStatusReport();
 
         enum RequestCount {
             MAX_REQUESTS = 10
@@ -51,7 +53,6 @@ class CMSCache {
         void scanStalledEntries(const std::string & thePath);
     
         std::string _myServerURI;
-        std::string _myPresentationURI;
         std::string _myLocalPath;
         std::string _myUsername;
         std::string _myPassword;
@@ -59,7 +60,10 @@ class CMSCache {
         std::string _mySessionCookie;
         inet::RequestManager _myRequestManager;
         
-        dom::DocumentPtr _myPresentationFile;
+        dom::NodePtr _myPresentationDocument;
+        dom::DocumentPtr _myStatusDocument;
+        dom::NodePtr     _myAssetReportNode;
+        dom::NodePtr     _myStalledFilesNode;
         std::map<std::string, dom::NodePtr> _myAssets;
         std::vector<dom::NodePtr> _myOutdatedAssets;
         

@@ -9,22 +9,28 @@
 //==============================================================================
 
 #include <y60/Request.h>
+#include <dom/Nodes.h>
 
 namespace y60 {
 
 class AssetRequest : public inet::Request {
     public:
-        AssetRequest(const std::string & theURL,
-                     const std::string & theLocalFile,
+        AssetRequest(dom::NodePtr theAssetNode,
+                     const std::string & theBaseDir,
                      const std::string & theSessionCookie);
 
         bool isDone() const;
 
     protected:
         size_t onData( const char * theData, size_t theReceivedByteCount );
+        bool onProgress(double theDownloadTotal, double theCurrentDownload,
+            double theUploadTotal, double theCurrentUpdate);
+
+        void onError(CURLcode theCode);
         void onDone();
 
     private:
+        dom::NodePtr            _myAssetNode;
         std::string             _myLocalFile;
         asl::Ptr<std::ofstream> _myOutputFile;
         bool                    _myIsDoneFlag;

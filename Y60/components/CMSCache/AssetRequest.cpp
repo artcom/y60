@@ -17,15 +17,17 @@ using namespace asl;
 
 namespace y60 {
 
-AssetRequest::AssetRequest(const std::string & theURL,
-                           const std::string & theLocalFile,
+AssetRequest::AssetRequest(dom::NodePtr theAssetNode,
+                           const std::string & theBaseDir,
                            const std::string & theSessionCookie) :
         // OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
-        inet::Request(theURL, "Wget/1.10.2"),
-        _myLocalFile(theLocalFile),
-        _myIsDoneFlag( false )
+        inet::Request(theAssetNode->getAttributeString("uri"), "Wget/1.10.2"),
+        _myIsDoneFlag( false ),
+        _myAssetNode( theAssetNode )
 {
     setCookie( theSessionCookie, true);
+    _myLocalFile = theBaseDir + "/" + theAssetNode->getAttributeString("path");
+    //setTimeoutParams(100, 60);
 }
 
 size_t
@@ -35,7 +37,6 @@ AssetRequest::onData(const char * theData, size_t theReceivedByteCount) {
         AC_WARNING << "Error:" << myResponseCode << ":" << getURL() << endl;
         return 0;
     }
-    AC_PRINT << "save to: '" << _myLocalFile << "'";
     if ( ! _myOutputFile) {
         _myOutputFile = Ptr<ofstream>(new ofstream(_myLocalFile.c_str(),
                     ios::binary | ios::trunc | ios::out));
@@ -47,11 +48,57 @@ AssetRequest::onData(const char * theData, size_t theReceivedByteCount) {
     return theReceivedByteCount;
 }
 
+void
+AssetRequest::onError(CURLcode theCode) {
+    if (_myIsDoneFlag) {
+        AC_INFO << "aborted download.";
+        return;
+    }
+    _myIsDoneFlag = true;
+    Request::onError(theCode);
+    if (getResponseCode() == 401) {
+        AC_ERROR << "Access denied for '" << getURL() << "'.";
+    } else {
+        AC_ERROR << "CURLerror for URL '" << getURL() << "': " << getErrorString();
+        switch (theCode) {
+            case CURLE_URL_MALFORMAT:
+            case CURLE_COULDNT_RESOLVE_HOST:
+            case CURLE_COULDNT_CONNECT:
+            case CURLE_PARTIAL_FILE:
+            case CURLE_OPERATION_TIMEOUTED:
+            //case CURLE_HTTP_RANGE_ERROR:
+            //case CURLE_BAD_PASSWORD_ENTERED:
+            //case CURLE_LOGIN_DENIED:
+            case CURLE_GOT_NOTHING:
+            case CURLE_RECV_ERROR:
+            case CURLE_BAD_CONTENT_ENCODING:
+            case CURLE_FILESIZE_EXCEEDED:
+                break;
+        }
+    }
+}    
+
+
 void 
 AssetRequest::onDone() {
     _myIsDoneFlag = true;
     _myOutputFile = asl::Ptr<ofstream>(0);
 }
+
+bool
+AssetRequest::onProgress(double theDownloadTotal, double theCurrentDownload,
+            double theUploadTotal, double theCurrentUpdate)
+{
+    if ( ! _myAssetNode->getAttribute("total") && theDownloadTotal > 0) {
+        _myAssetNode->appendAttribute("total", as_string(theDownloadTotal));
+    }
+
+    _myAssetNode->getAttribute("progress")->nodeValue(as_string( theCurrentDownload ));
+
+    return Request::onProgress(theDownloadTotal, theCurrentDownload,
+                                theUploadTotal, theCurrentUpdate);
+}
+
 bool
 AssetRequest::isDone() const {
     return _myIsDoneFlag;

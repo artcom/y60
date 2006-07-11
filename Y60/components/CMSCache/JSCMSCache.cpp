@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "JSCMSCache.h"
+#include <y60/JSNode.h>
 
 
 #include <asl/PackageManager.h>
@@ -74,6 +75,8 @@ JSCMSCache::StaticFunctions() {
 JSPropertySpec *
 JSCMSCache::Properties() {
     static JSPropertySpec myProperties[] = {
+        {"statusReport", PROP_statusReport,
+                JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY},
         {0}
     };
     return myProperties;
@@ -82,8 +85,11 @@ JSCMSCache::Properties() {
 // getproperty handling
 JSBool
 JSCMSCache::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj); 
     switch (theID) {
-        case 0:
+        case PROP_statusReport:
+            *vp = as_jsval( cx, static_cast_Ptr<dom::Node>( myObj.getNative().getStatusReport()));
+            return JS_TRUE;
         default:
             JS_ReportError(cx,"JSCMSCache::getProperty: index %d out of range", theID);
             return JS_FALSE;
@@ -114,7 +120,7 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     std::string myPassword;
     std::string myServerURL;
     std::string myLocalPath;
-    std::string myPresentationFile;
+    dom::NodePtr myPresentationDoc;
         
     switch (argc) {
         case 5:
@@ -124,7 +130,7 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         case 3:
             convertFrom(cx, argv[0], myServerURL);
             convertFrom(cx, argv[1], myLocalPath);
-            convertFrom(cx, argv[2], myPresentationFile);
+            convertFrom(cx, argv[2], myPresentationDoc);
             break;
         default:
             JS_ReportError(cx, "Constructor for %s: bad number of arguments: expected three or five "
@@ -134,10 +140,10 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     
     switch (argc) {
         case 3:
-            myNewNative = OWNERPTR(new CMSCache(myServerURL, myLocalPath, myPresentationFile));
+            myNewNative = OWNERPTR(new CMSCache(myServerURL, myLocalPath, myPresentationDoc));
             break;    
         case 5:
-            myNewNative = OWNERPTR(new CMSCache(myServerURL, myLocalPath, myPresentationFile,
+            myNewNative = OWNERPTR(new CMSCache(myServerURL, myLocalPath, myPresentationDoc,
                                                   myUsername, myPassword));
             break;
     }
