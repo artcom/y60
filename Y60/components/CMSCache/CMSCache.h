@@ -25,14 +25,16 @@ namespace y60 {
 
 class CMSCache {
     public:
-        CMSCache(const std::string & theServerURI,
-                   const std::string & theLocalPath,
+        CMSCache(const std::string & theLocalPath,
                    dom::NodePtr thePresentationDocument,
                    const std::string & theUsername = "",
                    const std::string & thePassword = "");
         ~CMSCache();
         void synchronize();
         bool isSynchronized();
+
+        bool getVerboseFlag() const { return _myVerboseFlag; }
+        void setVerboseFlag(bool theFlag) { _myVerboseFlag = theFlag; }
 
         dom::NodePtr getStatusReport();
 
@@ -52,7 +54,6 @@ class CMSCache {
         void removeStalledAssets();
         void scanStalledEntries(const std::string & thePath);
     
-        std::string _myServerURI;
         std::string _myLocalPath;
         std::string _myUsername;
         std::string _myPassword;
@@ -69,6 +70,8 @@ class CMSCache {
         
         typedef std::map<dom::Node *, AssetRequestPtr> AssetRequestMap;
         AssetRequestMap _myAssetRequests;
+
+        bool _myVerboseFlag;
 };
 
 }

@@ -15,6 +15,8 @@ function CMSHandle( theConfigFile) {
 }
 
 CMSHandle.USER_AGNET = "Wget/1.10.2";
+CMSHandle.VERBOSE_ZOPE_SESSION = false;
+CMSHandle.VERBOSE_BACKEND_SESSION = false;
 
 CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
@@ -22,16 +24,22 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         return _myPresentation;
     }
 
-    obj.getSychronizer = function() {
+    obj.synchronize = function() {
         var myCMSConfig = _myConfig.childNode("cmscache", 0);
-        return new CMSCache( myCMSConfig.baseurl, myCMSConfig.localdir,
-                _myPresentation, _myConfig.username, _myConfig.password );
-
+        _myCMSCache = new CMSCache(myCMSConfig.localdir, _myPresentation,
+                            _myConfig.username, _myConfig.password );
+        _myCMSCache.verbose = CMSHandle.VERBOSE_BACKEND_SESSION;
+        _myCMSCache.synchronize();
     }
 
-    obj.getAssetDir = function() {
-        return _myConfig.childNode("cmscache",0).localdir;
+    obj.isSynchronized = function() {
+        return _myCMSCache.isSynchronized();
     }
+
+    obj.__defineGetter__('statusReport',
+            function() { return ( _myCMSCache ? _myCMSCache.statusReport : null ) } );
+    obj.__defineGetter__('assetDir',
+            function() { return _myConfig.childNode("cmscache",0).localdir; } );
 
     function fetchPresentation() {
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
@@ -47,16 +55,18 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             msleep( 10 );
         }
 
+        verboseZope("Login request response code: " + myLoginRequest.responseCode );
         if ( myLoginRequest.responseCode == 200 || myLoginRequest.responseCode == 302 ) {
             if ( ! myLoginRequest.getResponseHeader("Set-Cookie")) {
-                Logger.error("Failed to get zope session cookie.");
-                // TODO: throw or something ....
-                return;
+                //Logger.error("Failed to get zope session cookie.");
+                throw "Failed to get zope session cookie at " + fileline() + ".";
             }
             var myPresentationRequest = new Request( myZopeConfig.baseurl + "/" + myZopeConfig.presentationpage,
                     CMSHandle.USER_AGNET );
             var myCookies = myLoginRequest.getAllResponseHeaders("Set-Cookie");
+            verboseZope("Login request cookies:");
             for (var i = 0; i < myCookies.length; ++i) {
+                verboseZope("   " + myCookies[i]);
                 myPresentationRequest.setCookie( myCookies[i] );
             }
 
@@ -65,18 +75,19 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                 _myRequestManager.handleRequests();
                 msleep( 10 );
             }
+            verboseZope("Presentation request response code: " + myPresentationRequest.responseCode );
             if ( myPresentationRequest.responseCode != 200 ) {
-                Logger.error("Failed to get presentation file.");
-                // TODO: throw or something ....
-                return;
+                //Logger.error("Failed to get presentation file.");
+                throw "Failed to get presentation file at " + fileline() + ".";
             }
             _myPresentation = Node.createDocument();
             _myPresentation.parse( myPresentationRequest.responseString );
 
         } else {
-            Logger.error("Login failed on zope server '" + myLoginRequest.URL + "': " +
-                    myLoginRequest.errorString );
-            // TODO: throw or something ....
+            var myMessage = "Login failed on zope server '" + myLoginRequest.URL + "': " +
+                    myLoginRequest.errorString + " at " + fileline() + ".";
+            //Logger.error( myMessage );
+            throw myMessage;
         }
     }
 
@@ -88,11 +99,18 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         fetchPresentation();
     }
 
+    function verboseZope( theMessage ) {
+        if (CMSHandle.VERBOSE_ZOPE_SESSION) {
+            print( theMessage );
+        }
+    }
+
     var _myConfigFile = theConfigFile;
     var _myRequestManager = new RequestManager();
     var _myConfigDoc = null;
     var _myConfig = null;
     var _myPresentation = null;
+    var _myCMSCache = null;
 
     setup();
 }
@@ -101,17 +119,14 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
 try {
     var myCMS = new CMSHandle("CMSConfig.xml");
-    var mySychronizer = myCMS.getSychronizer();
-
-    mySychronizer.synchronize();
-    while ( ! mySychronizer.isSynchronized() ) {
+    myCMS.synchronize();
+    while ( ! myCMS.isSynchronized() ) {
         msleep(10);
     }
 
-    print( mySychronizer.statusReport );
+    print( myCMS.statusReport );
 
-    includePath( myCMS.getAssetDir() );
+    includePath( myCMS.assetDir );
 } catch (ex) {
-    print("==================");
-    print(ex);
+    Logger.error( ex );
 }

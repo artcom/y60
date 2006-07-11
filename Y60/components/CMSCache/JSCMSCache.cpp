@@ -43,7 +43,6 @@ isSynchronized(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
 JSConstIntPropertySpec *
 JSCMSCache::ConstIntProperties() {
-
     static JSConstIntPropertySpec myProperties[] = {
         {0}
     };
@@ -77,6 +76,7 @@ JSCMSCache::Properties() {
     static JSPropertySpec myProperties[] = {
         {"statusReport", PROP_statusReport,
                 JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY},
+        {"verbose", PROP_verbose, JSPROP_ENUMERATE | JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -90,6 +90,9 @@ JSCMSCache::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
         case PROP_statusReport:
             *vp = as_jsval( cx, static_cast_Ptr<dom::Node>( myObj.getNative().getStatusReport()));
             return JS_TRUE;
+        case PROP_verbose:
+            *vp = as_jsval( cx,  myObj.getNative().getVerboseFlag());
+            return JS_TRUE;
         default:
             JS_ReportError(cx,"JSCMSCache::getProperty: index %d out of range", theID);
             return JS_FALSE;
@@ -99,8 +102,15 @@ JSCMSCache::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
 // setproperty handling
 JSBool
 JSCMSCache::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj); 
     switch (theID) {
-        case 0:
+        case PROP_verbose:
+            try {
+                bool myVerboseFlag;
+                convertFrom(cx, *vp, myVerboseFlag );
+                myObj.getNative().setVerboseFlag( myVerboseFlag );
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
         default:
             JS_ReportError(cx,"JSCMSCache::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
@@ -118,19 +128,17 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     
     std::string myUsername;
     std::string myPassword;
-    std::string myServerURL;
     std::string myLocalPath;
     dom::NodePtr myPresentationDoc;
         
     switch (argc) {
-        case 5:
-            convertFrom(cx, argv[3], myUsername);
-            convertFrom(cx, argv[4], myPassword);
+        case 4:
+            convertFrom(cx, argv[2], myUsername);
+            convertFrom(cx, argv[3], myPassword);
             // XXX don't break here
-        case 3:
-            convertFrom(cx, argv[0], myServerURL);
-            convertFrom(cx, argv[1], myLocalPath);
-            convertFrom(cx, argv[2], myPresentationDoc);
+        case 2:
+            convertFrom(cx, argv[0], myLocalPath);
+            convertFrom(cx, argv[1], myPresentationDoc);
             break;
         default:
             JS_ReportError(cx, "Constructor for %s: bad number of arguments: expected three or five "
@@ -139,11 +147,11 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     }
     
     switch (argc) {
-        case 3:
-            myNewNative = OWNERPTR(new CMSCache(myServerURL, myLocalPath, myPresentationDoc));
+        case 2:
+            myNewNative = OWNERPTR(new CMSCache(myLocalPath, myPresentationDoc));
             break;    
-        case 5:
-            myNewNative = OWNERPTR(new CMSCache(myServerURL, myLocalPath, myPresentationDoc,
+        case 4:
+            myNewNative = OWNERPTR(new CMSCache(myLocalPath, myPresentationDoc,
                                                   myUsername, myPassword));
             break;
     }

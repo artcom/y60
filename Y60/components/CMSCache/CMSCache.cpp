@@ -18,19 +18,20 @@ using namespace std;
 using namespace asl;
 using namespace inet;
 
+#define VERBOSE_PRINT \
+    _myVerboseFlag && AC_PRINT 
 namespace y60 {
 
-CMSCache::CMSCache(const std::string & theServerURI,
-                       const string & theLocalPath,
+CMSCache::CMSCache(const string & theLocalPath,
                        dom::NodePtr thePresentationDocument,
                        const std::string & theUsername,
                        const std::string & thePassword) :
-     _myServerURI(theServerURI),
      _myPresentationDocument(thePresentationDocument),
      _myLocalPath( theLocalPath ),
      _myUsername(theUsername),
      _myPassword(thePassword),
-     _myStatusDocument( new dom::Document())
+     _myStatusDocument( new dom::Document()),
+     _myVerboseFlag( false )
 {
     dom::NodePtr myReport = dom::NodePtr( new dom::Element("report") );
     _myStatusDocument->appendChild( myReport );
@@ -71,30 +72,6 @@ CMSCache::login() {
     _mySessionCookie = myLoginRequest->getResponseHeader("Set-Cookie");
 }
 
-/*
-void
-CMSCache::loginCMS() {
-   // std::string someAsset = _myAssets[0]->getAttributeString("uri");
-    
-    //OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
-    RequestPtr myLoginRequest(new Request("http://welt.bmw.artcom.de:8080/logged_in?__ac_name=zope&__ac_password=zope31", "Wget/1.10.2"));
-    _myRequestManager.performRequest(myLoginRequest);
-    
-    int myRunningCount = 0;
-    do {
-        myRunningCount = _myRequestManager.handleRequests(); 
-        asl::msleep(10);
-    } while (myRunningCount);
-
-    if (myLoginRequest->getResponseCode() != 200 ||
-        myLoginRequest->getResponseHeader("Set-Cookie").size() == 0) {
-            throw CMSCacheException("Login failed for user '"+_myUsername+"' at URL '"+_myServerURI+"'.", PLUS_FILE_LINE);
-    }
-    
-    _mySessionCookie = myLoginRequest->getResponseHeader("Set-Cookie");
-}
-*/
-
 void
 CMSCache::collectExternalAssetList() {
     if ( ! _myPresentationDocument || _myPresentationDocument->childNodesLength() == 0 ) {
@@ -114,7 +91,7 @@ CMSCache::collectExternalAssetList() {
     
     collectAssets(myRoot);
 
-    AC_PRINT << "Found " << _myAssets.size() << " assets.";
+    VERBOSE_PRINT << "Found " << _myAssets.size() << " assets.";
 }
 
 void
@@ -140,7 +117,7 @@ CMSCache::collectAssets(dom::NodePtr theParent) {
 
 void
 CMSCache::addAssetRequest(dom::NodePtr theAsset) {
-    AC_PRINT << "Fetching " << _myLocalPath + "/" + theAsset->getAttributeString("path");
+    VERBOSE_PRINT << "Fetching " << _myLocalPath + "/" + theAsset->getAttributeString("path");
     AssetRequestPtr myRequest(new AssetRequest( theAsset, _myLocalPath, _mySessionCookie));
     _myAssetRequests.insert(std::make_pair( & ( * theAsset), myRequest));
     theAsset->getAttribute("status")->nodeValue("downloading");
@@ -167,7 +144,7 @@ CMSCache::collectOutdatedAssets() {
     std::map<std::string, dom::NodePtr>::iterator myIter = _myAssets.begin();
     for (; myIter != _myAssets.end(); myIter++) {
         if ( isOutdated( myIter->second )) {
-            AC_PRINT << "Asset " << myIter->second->getAttributeString("path")
+            VERBOSE_PRINT << "Asset " << myIter->second->getAttributeString("path")
                      << " is outtdated.";
             myIter->second->getAttribute("status")->nodeValue("outdated");
             _myOutdatedAssets.push_back( myIter->second );
@@ -264,7 +241,7 @@ CMSCache::scanStalledEntries(const std::string & thePath) {
             std::string myFilename = myEntry.substr(_myLocalPath.size() + 1,
                         myEntry.size() - _myLocalPath.size());
             if (_myAssets.find(myFilename) == _myAssets.end()) {
-                AC_PRINT << "Removing '" << myFilename << "'.";
+                VERBOSE_PRINT << "Removing '" << myFilename << "'.";
                 dom::NodePtr myFileNode( new dom::Element("file"));
                 myFileNode->appendAttribute("path", myFilename );
                 myFileNode->appendAttribute("status", "removed");
