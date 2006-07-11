@@ -53,6 +53,7 @@ SocketUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.mySocket2.read() == "AB\0CD"');
 
         ENSURE('obj.mySocket2.write("bello") == 5');
+        msleep(10);
         obj.waitingCount = obj.mySocket1.peek(100);       
         ENSURE('obj.mySocket1.peek(100) == 5');
         DPRINT('obj.waitingCount');
