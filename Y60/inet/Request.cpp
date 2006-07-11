@@ -184,6 +184,19 @@ namespace inet {
         return "";
     }
 
+    std::vector<std::string>
+    Request::getAllResponseHeaders(const string & theHeader) const {
+        multimap<string,string>::const_iterator it = _myResponseHeaders.begin();
+        std::vector<std::string> myResults;
+        while (it != _myResponseHeaders.end()) {
+            if (it->first == theHeader) {
+                myResults.push_back( it->second );
+            }
+            ++it;
+        }
+        return myResults;
+    }
+
     time_t
     Request::getResponseHeaderAsDate(const string & theHeader) const {
         return getTimeFromHTTPDate( getResponseHeader(theHeader).c_str());

@@ -75,6 +75,7 @@ namespace inet {
 
             const std::multimap<std::string,std::string> & getResponseHeaders() const;
             std::string getResponseHeader(const std::string & theHeader) const;
+            std::vector<std::string> getAllResponseHeaders(const std::string & theHeader) const;
             time_t getResponseHeaderAsDate(const std::string & theHeader) const;
             unsigned getLowSpeedLimit(void) const;
             unsigned getLowSpeedTimeout(void) const;

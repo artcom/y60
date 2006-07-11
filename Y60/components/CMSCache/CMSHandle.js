@@ -38,7 +38,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         var myLoginRequest = new Request( myZopeConfig.baseurl + "/" + myZopeConfig.loginpage,
                                     CMSHandle.USER_AGNET );
         myLoginRequest.post("__ac_name=" + _myConfig.username +
-                       "&__ac_password=" + _myConfig.password);
+                       "&__ac_password=" + _myConfig.password + "&proxy=" + _myConfig.password);
 
         _myRequestManager.performRequest( myLoginRequest );
 
@@ -55,7 +55,10 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             }
             var myPresentationRequest = new Request( myZopeConfig.baseurl + "/" + myZopeConfig.presentationpage,
                     CMSHandle.USER_AGNET );
-            myPresentationRequest.setCookie( myLoginRequest.getResponseHeader("Set-Cookie"));
+            var myCookies = myLoginRequest.getAllResponseHeaders("Set-Cookie");
+            for (var i = 0; i < myCookies.length; ++i) {
+                myPresentationRequest.setCookie( myCookies[i] );
+            }
 
             _myRequestManager.performRequest( myPresentationRequest );
             while ( _myRequestManager.activeCount ) {

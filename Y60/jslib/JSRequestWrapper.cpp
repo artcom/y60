@@ -124,6 +124,16 @@ getTimeFromHTTPDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+getAllResponseHeaders(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Get all response headers matching theKey");
+    DOC_PARAM("theKey", "", DOC_TYPE_STRING);
+    DOC_RVAL("VectorOfString", DOC_TYPE_OBJECT);
+    DOC_END;
+    return Method<inet::Request>::call(&inet::Request::getAllResponseHeaders,cx,obj,argc,argv,rval);
+
+}
+
 JSFunctionSpec *
 JSRequestWrapper::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
@@ -135,6 +145,7 @@ JSRequestWrapper::Functions() {
         {"postFile",          postFile,            1},
         {"addHttpHeader",     addHttpHeader,       2},
         {"getResponseHeader", getResponseHeader,   1},
+        {"getAllResponseHeaders", getAllResponseHeaders,   1},
         {"setTimeoutParams",  setTimeoutParams,    2},
         {"setCredentials",    setCredentials,      2},
         {"setCookie",    setCookie,      1},
