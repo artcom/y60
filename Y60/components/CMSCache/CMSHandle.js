@@ -58,7 +58,6 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         verboseZope("Login request response code: " + myLoginRequest.responseCode );
         if ( myLoginRequest.responseCode == 200 || myLoginRequest.responseCode == 302 ) {
             if ( ! myLoginRequest.getResponseHeader("Set-Cookie")) {
-                //Logger.error("Failed to get zope session cookie.");
                 throw "Failed to get zope session cookie at " + fileline() + ".";
             }
             var myPresentationRequest = new Request( myZopeConfig.baseurl + "/" + myZopeConfig.presentationpage,
@@ -77,7 +76,6 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             }
             verboseZope("Presentation request response code: " + myPresentationRequest.responseCode );
             if ( myPresentationRequest.responseCode != 200 ) {
-                //Logger.error("Failed to get presentation file.");
                 throw "Failed to get presentation file at " + fileline() + ".";
             }
             _myPresentation = Node.createDocument();
@@ -86,7 +84,6 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         } else {
             var myMessage = "Login failed on zope server '" + myLoginRequest.URL + "': " +
                     myLoginRequest.errorString + " at " + fileline() + ".";
-            //Logger.error( myMessage );
             throw myMessage;
         }
     }
