@@ -23,6 +23,8 @@
 
 #include <y60/PixelEncoding.h>
 #include <paintlib/plpngenc.h>
+#include <paintlib/pljpegenc.h>
+#include <paintlib/plbmpenc.h>
 #include <paintlib/pltiffenc.h>
 #include <paintlib/planybmp.h>
 
@@ -138,6 +140,18 @@ namespace y60 {
             case PL_FT_PNG:
                 {
                     PLPNGEncoder myEncoder;
+                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
+                }
+                break;
+            case PL_FT_JPEG:
+                {
+                    PLJPEGEncoder myEncoder;
+                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
+                }
+                break;
+            case PL_FT_WINBMP:
+                {
+                    PLBmpEncoder myEncoder;
                     myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
                 }
                 break;

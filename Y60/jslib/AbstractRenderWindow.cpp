@@ -235,7 +235,17 @@ namespace jslib {
                 _myCanvas->getFacade<Canvas>()->getHeight(), 4);
         myBufferWriter.performAction(FRAME_BUFFER);
         // see GLBufferAdapter.h for possible format consts
-        myBufferWriter.saveBufferAsImage(PL_FT_PNG, theFilename);
+        string myExt = toUpperCase(theFilename.substr(theFilename.rfind('.')+1));
+        if (myExt == "JPG") {
+            myBufferWriter.saveBufferAsImage(PL_FT_JPEG, theFilename);
+        } else if (myExt == "BMP") {
+            myBufferWriter.saveBufferAsImage(PL_FT_WINBMP, theFilename);
+        } else {
+            if (myExt != "PNG") {
+                AC_WARNING << "AbstractRenderWindow::saveBuffer: Unknown extension " << myExt << ". Saving as png.";
+            }
+            myBufferWriter.saveBufferAsImage(PL_FT_PNG, theFilename);
+        } 
     }
 
     void
