@@ -76,9 +76,9 @@ function CreateTestMovie(theArguments) {
     Public.onFrame = function(theTime) {
         Base.onFrame(theTime);
         
-        var myMinutes = Math.floor(theTime / 60);
-        var mySeconds = Math.floor(theTime) % 60;
-        var myFrames  = Math.floor(theTime* FRAMERATE) % FRAMERATE;
+        var myMinutes = Math.floor((theTime+FIXED_FRAME_TIME/2) / 60);
+        var mySeconds = Math.floor(theTime+FIXED_FRAME_TIME/2) % 60;
+        var myFrames  = Math.floor((theTime+FIXED_FRAME_TIME/2)* FRAMERATE) % FRAMERATE;
 
         var myMinutesString = padStringFront(myMinutes, "0", 2);
         var mySecondsString = padStringFront(mySeconds, "0", 2);
