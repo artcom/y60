@@ -83,8 +83,18 @@ function FFMpegTest(theArguments) {
         }
         _myMovie = myMovie;
     }
+    
+    /*  
+        needed movie:
+        - only iframes
+        
+        needed tests:
+        - intensive seek
+        
+    */
 
     var _myTests = [
+        "setupIntensiveSeekTest()",
         "setupPlayTest()",
         "setupStopTest()",
         "setupLoopTest()",
@@ -94,7 +104,7 @@ function FFMpegTest(theArguments) {
         "setupPauseStopTest()",
         "setupStopPauseTest()",
 
-            //                "setupLongTest(true)"
+            // "setupLongTest(true)"
     ];
 
     Public.nextTest = function() {
@@ -181,6 +191,19 @@ function FFMpegTest(theArguments) {
         window.setTimeout("nextTest", 10100);
     }
 
+    function setupIntensiveSeekTest() {
+        setupTest("IntensiveSeek", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        _myMovie.loopcount = 1;
+        _mySeekDest = 1;
+        window.setTimeout("seek", 500);
+        window.setTimeout("seek", 1000);
+        window.setTimeout("seek", 1500);
+        window.setTimeout("seek", 2000);
+        window.setTimeout("seek", 2500);
+        window.setTimeout("seek", 3000);
+        window.setTimeout("nextTest", 8000);
+    }
+    
     function setupSeekBackTest() {
         setupTest("SeekBack", "../FFMpegDecoder/testfiles/counter_short.mpg");
         _myMovie.loopcount = 1;
