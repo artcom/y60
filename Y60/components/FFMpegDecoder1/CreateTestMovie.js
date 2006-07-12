@@ -27,8 +27,8 @@ theRequest["MOVIE_LENGTH"] = arguments[3];
 
 const MOVIE_WIDTH  = theRequest["MOVIE_WIDTH"];
 const MOVIE_HEIGHT = theRequest["MOVIE_HEIGHT"];
-const FRAMERATE    = 25;
-const MOVIE_LENGTH = 10; // seconds
+const FRAMERATE    = theRequest["FRAMERATE"];
+const MOVIE_LENGTH = theRequest["MOVIE_LENGTH"]; // seconds
 
 const SWAP_INTERVAL = 0;
 const FIXED_FRAME_TIME = 1/FRAMERATE;
