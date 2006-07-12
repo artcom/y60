@@ -758,6 +758,10 @@ namespace y60 {
                                               const vector<asl::Vector3f> & theValue)
     {
         int mySize = cgGetArraySize(theParam._myParameter, 0);
+        if (mySize != theValue.size()) {
+            AC_ERROR << "BUG 391: Cg Array " << theParam._myName << " expects " << mySize <<
+                " elements, have " << theValue.size();
+        }
         for(int i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
             //AC_DEBUG << "setting component " << i << " to " << theValue[i];
@@ -771,6 +775,10 @@ namespace y60 {
                                               const vector<asl::Vector4f> & theValue)
     {
         int mySize = cgGetArraySize(theParam._myParameter, 0);
+        if (mySize != theValue.size()) {
+            AC_ERROR << "BUG 391: Cg Array " << theParam._myName << " expects " << mySize <<
+                " elements, have " << theValue.size();
+        }
         for(unsigned i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
             //AC_DEBUG << "setting component " << i << " to " << theValue[i];
