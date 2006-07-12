@@ -25,10 +25,10 @@ theRequest["MOVIE_HEIGHT"] = arguments[1];
 theRequest["FRAMERATE"]    = arguments[2];
 theRequest["MOVIE_LENGTH"] = arguments[3];
 
-const MOVIE_WIDTH  = theRequest["MOVIE_WIDTH"];
-const MOVIE_HEIGHT = theRequest["MOVIE_HEIGHT"];
-const FRAMERATE    = theRequest["FRAMERATE"];
-const MOVIE_LENGTH = theRequest["MOVIE_LENGTH"]; // seconds
+const MOVIE_WIDTH  = Number(theRequest["MOVIE_WIDTH"]);
+const MOVIE_HEIGHT = Number(theRequest["MOVIE_HEIGHT"]);
+const FRAMERATE    = Number(theRequest["FRAMERATE"]);
+const MOVIE_LENGTH = Number(theRequest["MOVIE_LENGTH"]); // seconds
 
 const SWAP_INTERVAL = 0;
 const FIXED_FRAME_TIME = 1/FRAMERATE;
@@ -46,7 +46,7 @@ function CreateTestMovie(theArguments) {
     var _myTestName = "";
     var _myCurTestIndex = -1;
     var _myFrameCount = 0;
-    var _myDirectory = "testmovies";
+    var _myDirectory = "testmovies/tmp";
 
     Base.setup = Public.setup;
     Public.setup = function() {
@@ -96,7 +96,7 @@ function CreateTestMovie(theArguments) {
             _myBody.visible =  false;
         }
         
-        if (mySeconds >= MOVIE_LENGTH){
+        if (theTime >= MOVIE_LENGTH) {
             print("images created");
             exit(0);    
         }
@@ -109,7 +109,7 @@ function CreateTestMovie(theArguments) {
         
         var myFileName = _myDirectory + "/" + MOVIE_WIDTH + "x" + MOVIE_HEIGHT + "_frame";
         myFileName += padStringFront(_myFrameCount, "0", 7);
-        myFileName += ".bmp";
+        myFileName += ".png";
         window.saveBuffer(myFileName);
         _myFrameCount++;
         
