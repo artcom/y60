@@ -19,12 +19,18 @@ use("SceneViewer.js");
 use("VideoRecorder.js");
 plug("y60JSSound");
 
-const MOVIE_WIDTH = 160;
-const MOVIE_HEIGHT = 120;
-const USE_AUDIO = false;
+var theRequest = [];
+theRequest["MOVIE_WIDTH"]  = arguments[0];
+theRequest["MOVIE_HEIGHT"] = arguments[1];
+theRequest["FRAMERATE"]    = arguments[2];
+theRequest["MOVIE_LENGTH"] = arguments[3];
+
+const MOVIE_WIDTH  = theRequest["MOVIE_WIDTH"];
+const MOVIE_HEIGHT = theRequest["MOVIE_HEIGHT"];
+const FRAMERATE    = 25;
+const MOVIE_LENGTH = 10; // seconds
 
 const SWAP_INTERVAL = 0;
-const FRAMERATE = 25;
 const FIXED_FRAME_TIME = 1/FRAMERATE;
 
 
@@ -47,13 +53,15 @@ function CreateTestMovie(theArguments) {
         Public.setSplashScreen(false);
         Base.setup(MOVIE_WIDTH, MOVIE_HEIGHT);
         window.eventListener = Public;
+        
+        print("creating images");
+        
         var myNoisyString = expandEnvironment("${Y60_NOISY_SOUND_TESTS}");
         if (myNoisyString == "") {
             var mySoundManager = new SoundManager();
             mySoundManager.volume = 0.0;
         }
         
-
         _myMaterial = window.scene.createColorMaterial([1,1,1,1]);
         _myShape    = window.scene.createQuadShape(_myMaterial, [-1,-1,-5], [1,1,-5]);
         _myBody     = window.scene.createBody(_myShape);
@@ -87,6 +95,12 @@ function CreateTestMovie(theArguments) {
         } else {
             _myBody.visible =  false;
         }
+        
+        if (mySeconds >= MOVIE_LENGTH){
+            print("images created");
+            exit(0);    
+        }
+        
     }
 
     Base.onPostRender = Public.onPostRender;
@@ -98,6 +112,7 @@ function CreateTestMovie(theArguments) {
         myFileName += ".bmp";
         window.saveBuffer(myFileName);
         _myFrameCount++;
+        
     }
 
 
