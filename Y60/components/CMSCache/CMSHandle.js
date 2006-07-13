@@ -119,7 +119,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     setup();
 }
 
-//=== XXX ===========
+/*=== USAGE SAMPLE =============
 
 try {
     var myCMS = new CMSHandle("CMSConfig.xml");
@@ -134,3 +134,4 @@ try {
 } catch (ex) {
     Logger.error( ex );
 }
+*/

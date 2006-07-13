@@ -86,6 +86,7 @@ AssetRequest::onDone() {
     _myIsDoneFlag = true;
     _myOutputFile = asl::Ptr<ofstream>(0);
     _myAssetNode->getAttribute("status")->nodeValue("done");
+    _myAssetNode->getAttribute("progress")->nodeValue( _myAssetNode->getAttributeString("total") );
 }
 
 bool
