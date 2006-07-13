@@ -143,7 +143,7 @@ float4 mainFragment(vert2frag   IN,
     myDiffuseColor *= diffuse * myShadowTexel;
 
     float4 myBaseColor = ambient + myDiffuseColor;
-    float3 myEnvColor  = (myEnvTexel.rgb * IN.reflectionFactor + myEmissiveTexel.rgb) * myShadowTexel.r;
+    float3 myEnvColor  = (myEnvTexel.rgb * IN.reflectionFactor + myEmissiveTexel.rgb) * 2.0 * myShadowTexel.r;
 
     float  myEnvIntensity = (myEnvColor.r + myEnvColor.g + myEnvColor.b) / 3.0;
     float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvColor, myEnvIntensity);
@@ -151,30 +151,34 @@ float4 mainFragment(vert2frag   IN,
     // *************** Some debug options *********************
 
     // The specular color
-    //return float4(mySpecColor.rgb, 1);
+    // return float4(mySpecColor.rgb, 1);
 
     // The shadow map
-    //return float4(myShadowTexel.rgb, 1);
+    // return float4(myShadowTexel.rrr, 1);
 
     // The diffuse color
-    //return float4(diffuse.rgb, 1);
+    // return float4(diffuse.rgb, 1);
+    // return float4(myDiffuseColor.rgb, 1);
 
-    //return diffuse + (myEmissiveTexel + myEnvTexel) * IN.reflectionFactor;
+    // return diffuse + (myEmissiveTexel + myEnvTexel) * IN.reflectionFactor;
 
     // The color plus emissive environment
-    //return myColor + myEmissiveTexel * IN.reflectionFactor;
+    // return myColor + myEmissiveTexel * IN.reflectionFactor;
 
     // The emissive color
-    //return float4(myEmissiveTexel.rgb,1);
+    // return float4(myEmissiveTexel.rgb,1);
 
     // The environment color
-    //return float4(myEnvTexel.rgb, 1);
+    // return float4(myEnvTexel.rgb, 1);
 
     // The lit color
-    //return float4(myBaseColor.rgb, 1);
+    // return float4(myBaseColor.rgb, 1);
 
     // The environment
-    //return float4(myEnvColor,1);
+    // return float4(myEnvColor,1);
+
+    // return float4(myBaseColor.rgb,1);
+    //return float4(myBaseColor.r, myEnvColor.r, myEnvIntensity, 1);
 
     return float4(myBlendedColor, myShadowTexel.a);
 }
