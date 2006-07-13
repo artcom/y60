@@ -175,7 +175,7 @@ function FFMpegTest(theArguments) {
         setupTest("Play, slow swapInterval", "../FFMpegDecoder/testfiles/counter_short.mpg");
         window.swapInterval = 5;
         window.setTimeout("testPlaying", 1000);
-        window.setTimeout("stopSwapInterval", 9000);
+        window.setTimeout("stopSwapInterval", 8000);
         window.setTimeout("testStopped", 10000);
         window.setTimeout("nextTest", 10100);
     }
