@@ -23,10 +23,25 @@ DEFINE_EXCEPTION (CMSCacheException, asl::Exception);
 
 namespace y60 {
 
+enum BackendTypeEnum {
+    OCS,
+    SVN,
+    BackendTypeEnum_MAX
+};
+
+static const char * BackendTypeStrings[] = {
+    "OCS",
+    "SVN",
+    ""
+};
+
+DEFINE_ENUM(BackendType, BackendTypeEnum);
+
 class CMSCache {
     public:
         CMSCache(const std::string & theLocalPath,
                    dom::NodePtr thePresentationDocument,
+                   BackendType theBackendType,
                    const std::string & theUsername = "",
                    const std::string & thePassword = "");
         ~CMSCache();
@@ -43,7 +58,8 @@ class CMSCache {
         };
     private:
         void login();
-        void loginCMS();
+        void loginOCS();
+
         void collectExternalAssetList();
         void collectAssets(dom::NodePtr theParent);
         void addAssetRequest(dom::NodePtr theAsset);
@@ -72,6 +88,7 @@ class CMSCache {
         AssetRequestMap _myAssetRequests;
 
         bool _myVerboseFlag;
+        BackendType _myBackendType;
 };
 
 }

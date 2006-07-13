@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "JSCMSCache.h"
+#include <y60/JSEnum.h>
 #include <y60/JSNode.h>
 
 
@@ -126,19 +127,21 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
 
     OWNERPTR myNewNative;
     
-    std::string myUsername;
-    std::string myPassword;
     std::string myLocalPath;
     dom::NodePtr myPresentationDoc;
+    y60::BackendType myBackendType;
+    std::string myUsername;
+    std::string myPassword;
         
     switch (argc) {
-        case 4:
-            convertFrom(cx, argv[2], myUsername);
-            convertFrom(cx, argv[3], myPassword);
+        case 5:
+            convertFrom(cx, argv[3], myUsername);
+            convertFrom(cx, argv[4], myPassword);
             // XXX don't break here
-        case 2:
+        case 3:
             convertFrom(cx, argv[0], myLocalPath);
             convertFrom(cx, argv[1], myPresentationDoc);
+            convertFrom(cx, argv[2], myBackendType);
             break;
         default:
             JS_ReportError(cx, "Constructor for %s: bad number of arguments: expected three or five "
@@ -147,12 +150,13 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     }
     
     switch (argc) {
-        case 2:
-            myNewNative = OWNERPTR(new CMSCache(myLocalPath, myPresentationDoc));
-            break;    
-        case 4:
+        case 3:
             myNewNative = OWNERPTR(new CMSCache(myLocalPath, myPresentationDoc,
-                                                  myUsername, myPassword));
+                                                myBackendType));
+            break;    
+        case 5:
+            myNewNative = OWNERPTR(new CMSCache(myLocalPath, myPresentationDoc,
+                                                myBackendType, myUsername, myPassword));
             break;
     }
 

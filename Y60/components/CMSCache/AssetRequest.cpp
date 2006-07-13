@@ -25,7 +25,9 @@ AssetRequest::AssetRequest(dom::NodePtr theAssetNode,
         _myIsDoneFlag( false ),
         _myAssetNode( theAssetNode )
 {
-    setCookie( theSessionCookie, true);
+    if ( ! theSessionCookie.empty() ) {
+        setCookie( theSessionCookie, true);
+    }
     _myLocalFile = theBaseDir + "/" + theAssetNode->getAttributeString("path");
     //setTimeoutParams(100, 60);
 }
@@ -83,6 +85,7 @@ void
 AssetRequest::onDone() {
     _myIsDoneFlag = true;
     _myOutputFile = asl::Ptr<ofstream>(0);
+    _myAssetNode->getAttribute("status")->nodeValue("done");
 }
 
 bool

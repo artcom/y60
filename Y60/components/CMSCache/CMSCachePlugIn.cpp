@@ -13,7 +13,12 @@
 #include "JSCMSCache.h"
 
 #include <y60/IScriptablePlugin.h>
+#include <y60/JSEnum.h>
 #include <asl/PlugInBase.h>
+
+namespace dom {
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::BackendType, SimpleValue);
+};
 
 namespace y60 {
 	class CMSCachePlugIn :
@@ -43,16 +48,15 @@ using namespace y60;
 CMSCachePlugIn :: CMSCachePlugIn(DLHandle theDLHandle) :
 			PlugInBase(theDLHandle)
 {
-    //DJDecoderRegistration::registerCodecs();
 }
 
 CMSCachePlugIn :: ~CMSCachePlugIn() {
-    //DJDecoderRegistration::cleanup();
 }
 
 void 
 CMSCachePlugIn::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     jslib::JSCMSCache::initClass(theContext, theGlobalObject);
+    jslib::JSEnum<y60::BackendType>::initClass( theContext, theGlobalObject);
 }
 
 

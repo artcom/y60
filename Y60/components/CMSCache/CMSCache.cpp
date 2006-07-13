@@ -20,10 +20,14 @@ using namespace inet;
 
 #define VERBOSE_PRINT \
     _myVerboseFlag && AC_PRINT 
+
+IMPLEMENT_ENUM( y60::BackendType, y60::BackendTypeStrings);
+
 namespace y60 {
 
 CMSCache::CMSCache(const string & theLocalPath,
                        dom::NodePtr thePresentationDocument,
+                       BackendType theBackendType,
                        const std::string & theUsername,
                        const std::string & thePassword) :
      _myPresentationDocument(thePresentationDocument),
@@ -31,7 +35,8 @@ CMSCache::CMSCache(const string & theLocalPath,
      _myUsername(theUsername),
      _myPassword(thePassword),
      _myStatusDocument( new dom::Document()),
-     _myVerboseFlag( false )
+     _myVerboseFlag( false ),
+     _myBackendType( theBackendType )
 {
     dom::NodePtr myReport = dom::NodePtr( new dom::Element("report") );
     _myStatusDocument->appendChild( myReport );
@@ -42,21 +47,35 @@ CMSCache::CMSCache(const string & theLocalPath,
 }
 
 CMSCache::~CMSCache() {
-    //AC_DEBUG << "closing Zip " << _myZipFilename;
 }
 
 void
 CMSCache::login() {
+    switch ( _myBackendType ) {
+        case OCS:
+            loginOCS();
+            break;
+        case SVN:
+            // nothing to do here for svn ...
+            // we just send our credentials with each request
+            break;
+        default:
+            AC_ERROR << "Unknown backend type '" << _myBackendType << "'";
+    }
+}
+
+void
+CMSCache::loginOCS() {
+    VERBOSE_PRINT << "Using OCS backend.";
     std::string someAsset = _myAssets.begin()->second->getAttributeString("uri");
-    
+
     //OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
     RequestPtr myLoginRequest(new Request( someAsset, "Wget/1.10.2"));
+    // just do a head request ... no need to download the whole asset now.
     myLoginRequest->head();
-    if (_myUsername.size() && _myPassword.size()) {
-        myLoginRequest->setCredentials(_myUsername, _myPassword);
-    }
+    myLoginRequest->setCredentials(_myUsername, _myPassword);
     _myRequestManager.performRequest(myLoginRequest);
-    
+
     int myRunningCount = 0;
     do {
         myRunningCount = _myRequestManager.handleRequests(); 
@@ -64,11 +83,11 @@ CMSCache::login() {
     } while (myRunningCount);
 
     if (myLoginRequest->getResponseCode() != 200 ||
-        myLoginRequest->getResponseHeader("Set-Cookie").size() == 0) {
-            throw CMSCacheException("Login failed for user '" + _myUsername + 
-                    "' at URL '" + someAsset + "'.", PLUS_FILE_LINE);
+            myLoginRequest->getResponseHeader("Set-Cookie").size() == 0) {
+        throw CMSCacheException("Login failed for user '" + _myUsername + 
+                "' at URL '" + someAsset + "'.", PLUS_FILE_LINE);
     }
-    
+
     _mySessionCookie = myLoginRequest->getResponseHeader("Set-Cookie");
 }
 
@@ -119,6 +138,9 @@ void
 CMSCache::addAssetRequest(dom::NodePtr theAsset) {
     VERBOSE_PRINT << "Fetching " << _myLocalPath + "/" + theAsset->getAttributeString("path");
     AssetRequestPtr myRequest(new AssetRequest( theAsset, _myLocalPath, _mySessionCookie));
+    if (_myBackendType == SVN) {
+        myRequest->setCredentials(_myUsername, _myPassword);
+    }
     _myAssetRequests.insert(std::make_pair( & ( * theAsset), myRequest));
     theAsset->getAttribute("status")->nodeValue("downloading");
     theAsset->appendAttribute("progress", "0.0");
@@ -128,12 +150,18 @@ CMSCache::addAssetRequest(dom::NodePtr theAsset) {
 void
 CMSCache::synchronize() {
 
+    if ( ! fileExists( _myLocalPath )) {
+        createPath( _myLocalPath );
+    }
+
     collectExternalAssetList();
-    updateDirectoryHierarchy();
     removeStalledAssets();
+    updateDirectoryHierarchy();
     
     if ( ! _myAssets.empty()) {
-        login();
+        if ( ! _myUsername.empty() && ! _myPassword.empty()) {
+            login();
+        }
         collectOutdatedAssets();
         fillRequestQueue();
     }
@@ -145,9 +173,12 @@ CMSCache::collectOutdatedAssets() {
     for (; myIter != _myAssets.end(); myIter++) {
         if ( isOutdated( myIter->second )) {
             VERBOSE_PRINT << "Asset " << myIter->second->getAttributeString("path")
-                     << " is outtdated.";
+                     << " is outdated.";
             myIter->second->getAttribute("status")->nodeValue("outdated");
             _myOutdatedAssets.push_back( myIter->second );
+        } else {
+            VERBOSE_PRINT << "Asset " << myIter->second->getAttributeString("path")
+                     << " is uptodate.";
         }
     }
 }
@@ -210,9 +241,6 @@ CMSCache::isSynchronized() {
 
 void
 CMSCache::updateDirectoryHierarchy() {
-    if ( ! fileExists( _myLocalPath )) {
-        createPath( _myLocalPath );
-    }
     std::map<std::string, dom::NodePtr>::iterator myIter = _myAssets.begin();
     while (myIter != _myAssets.end()) {
         std::string myPath = _myLocalPath + "/" +
@@ -229,6 +257,11 @@ CMSCache::removeStalledAssets() {
     scanStalledEntries( _myLocalPath );
 }
 
+bool
+isDirectoryEmpty(const std::string & theDirectory) {
+    return getDirectoryEntries( theDirectory ).empty();
+}
+
 void
 CMSCache::scanStalledEntries(const std::string & thePath) {
     std::vector<std::string> myEntries = getDirectoryEntries(thePath);
@@ -237,6 +270,10 @@ CMSCache::scanStalledEntries(const std::string & thePath) {
         std::string myEntry = thePath + "/" + (*myIter);
         if (isDirectory(myEntry)) {
             scanStalledEntries(myEntry);
+            if ( isDirectoryEmpty( myEntry )) {
+                VERBOSE_PRINT << "Removing empty directory '" << myEntry << "'.";
+                removeDirectory( myEntry );
+            }
         } else {
             std::string myFilename = myEntry.substr(_myLocalPath.size() + 1,
                         myEntry.size() - _myLocalPath.size());
@@ -246,7 +283,7 @@ CMSCache::scanStalledEntries(const std::string & thePath) {
                 myFileNode->appendAttribute("path", myFilename );
                 myFileNode->appendAttribute("status", "removed");
                 _myStalledFilesNode->appendChild( myFileNode );
-                deleteFile(_myLocalPath + "/" + myFilename);
+                deleteFile( _myLocalPath + "/" + myFilename );
             }
         }
     }

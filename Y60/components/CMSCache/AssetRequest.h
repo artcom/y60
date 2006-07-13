@@ -8,6 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //==============================================================================
 
+#include <asl/Enum.h>
 #include <y60/Request.h>
 #include <dom/Nodes.h>
 
