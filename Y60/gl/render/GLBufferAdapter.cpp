@@ -27,6 +27,7 @@
 #include <paintlib/plbmpenc.h>
 #include <paintlib/pltiffenc.h>
 #include <paintlib/planybmp.h>
+#include <paintlib/Filter/plfilterfliprgb.h>
 
 #include <iostream>
 
@@ -146,12 +147,21 @@ namespace y60 {
             case PL_FT_JPEG:
                 {
                     PLJPEGEncoder myEncoder;
+                    myBmp.ApplyFilter(PLFilterFlipRGB());
                     myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
                 }
                 break;
             case PL_FT_WINBMP:
                 {
                     PLBmpEncoder myEncoder;
+                    myBmp.ApplyFilter(PLFilterFlipRGB());
+                    myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
+                }
+                break;
+            case PL_FT_TIFF:
+                {
+                    PLTIFFEncoder myEncoder;
+                    myBmp.ApplyFilter(PLFilterFlipRGB());
                     myEncoder.MakeFileFromBmp(myPath.toLocale().c_str(), &myBmp);               
                 }
                 break;

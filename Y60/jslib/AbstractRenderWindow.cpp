@@ -240,6 +240,8 @@ namespace jslib {
             myBufferWriter.saveBufferAsImage(PL_FT_JPEG, theFilename);
         } else if (myExt == "BMP") {
             myBufferWriter.saveBufferAsImage(PL_FT_WINBMP, theFilename);
+        } else if (myExt == "TIFF" || myExt == "TIF") {
+            myBufferWriter.saveBufferAsImage(PL_FT_TIFF, theFilename);
         } else {
             if (myExt != "PNG") {
                 AC_WARNING << "AbstractRenderWindow::saveBuffer: Unknown extension " << myExt << ". Saving as png.";

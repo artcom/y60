@@ -164,11 +164,11 @@ function FFMpegTest(theArguments) {
     }
 
     function setupPlayTest() {
-        setupTest("Play to End", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        setupTest("Play to End", "../FFMpegDecoder/testfiles/counter_1sec.mpg");
         window.swapInterval = 0;
-        window.setTimeout("testPlaying", 1000);
-        window.setTimeout("testStopped", 10000);
-        window.setTimeout("nextTest", 10100);
+        window.setTimeout("testPlaying", 300);
+        window.setTimeout("testStopped", 5000);
+        window.setTimeout("nextTest", 5100);
     }
 
     function setupSlowPlayTest() {

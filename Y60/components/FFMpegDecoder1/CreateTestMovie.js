@@ -76,9 +76,9 @@ function CreateTestMovie(theArguments) {
     Public.onFrame = function(theTime) {
         Base.onFrame(theTime);
         
-        var myMinutes = Math.floor((theTime+FIXED_FRAME_TIME/2) / 60);
-        var mySeconds = Math.floor(theTime+FIXED_FRAME_TIME/2) % 60;
-        var myFrames  = Math.floor((theTime+FIXED_FRAME_TIME/2)* FRAMERATE) % FRAMERATE;
+        var myMinutes = Math.floor(_myFrameCount/(60*FRAMERATE));
+        var mySeconds = Math.floor(_myFrameCount/FRAMERATE) % 60;
+        var myFrames  = _myFrameCount % FRAMERATE;
 
         var myMinutesString = padStringFront(myMinutes, "0", 2);
         var mySecondsString = padStringFront(mySeconds, "0", 2);
@@ -96,11 +96,6 @@ function CreateTestMovie(theArguments) {
             _myBody.visible =  false;
         }
         
-        if (theTime >= MOVIE_LENGTH) {
-            print("images created");
-            exit(0);    
-        }
-        
     }
 
     Base.onPostRender = Public.onPostRender;
@@ -111,8 +106,12 @@ function CreateTestMovie(theArguments) {
         myFileName += padStringFront(_myFrameCount, "0", 7);
         myFileName += ".png";
         window.saveBuffer(myFileName);
-        _myFrameCount++;
         
+        if (_myFrameCount >= MOVIE_LENGTH*FRAMERATE) {
+            print("images created");
+            exit(0);    
+        }
+        _myFrameCount++;
     }
 
 
