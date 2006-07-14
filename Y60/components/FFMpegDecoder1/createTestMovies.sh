@@ -10,8 +10,21 @@ MOVIE_WIDTH=$1
 MOVIE_HEIGHT=$2
 FRAMERATE=$3
 
+function calculateSingleFrameSeconds {
+    FRAMERATE=$1
+    # calculate seconds for a single frame
+    if [ ${FRAMERATE} -lt 10 ]
+    then 
+        ZERO_STRG=""
+    else
+        ZERO_STRG="0"
+    fi
+    SINGLE_FRAME=".${ZERO_STRG}$((10000/${FRAMERATE}))"
+    #echo "result is ${SINGLE_FRAME}"
+}
+
 function createImages {
-    y60 CreateTestMovie.js $MOVIE_WIDTH $MOVIE_HEIGHT $FRAMERATE 10
+    y60 CreateTestMovie.js $MOVIE_WIDTH $MOVIE_HEIGHT $FRAMERATE 60
 }
 
 function createMovie {
@@ -20,8 +33,6 @@ function createMovie {
     USE_AUDIO=$2
     USE_ONLY_IFRAMES=$3
  
-    echo --- Generating ${MOVIE_FILENAME}
-
     MOVIE_FILENAME="testmovies/${MOVIE_WIDTH}x${MOVIE_HEIGHT}_${FRAMERATE}_${MOVIE_LENGTH_IN_SECONDS}"
     if [ "$USE_AUDIO" = "true" ]
     then
@@ -46,11 +57,16 @@ function createMovie {
         IFRAME_PARAMS=""
     fi
     MOVIE_FILENAME=${MOVIE_FILENAME}.mpg
-    ffmpeg ${AUDIO_PARAMS} -t ${MOVIE_LENGTH_IN_SECONDS}.04 -b 500 -i testmovies/tmp/${MOVIE_WIDTH}x${MOVIE_HEIGHT}_frame%07d.png ${IFRAME_PARAMS} -y -r ${FRAMERATE} -vcodec mpeg2video ${MOVIE_FILENAME} 
+    calculateSingleFrameSeconds ${FRAMERATE}
+    echo "--- Generating ${MOVIE_FILENAME}"
+    FFMPEG_PARAMS="${AUDIO_PARAMS} -t ${MOVIE_LENGTH_IN_SECONDS}${SINGLE_FRAME} -b 500 -i testmovies/tmp/${MOVIE_WIDTH}x${MOVIE_HEIGHT}_frame%07d.png ${IFRAME_PARAMS} -y -r ${FRAMERATE} -vcodec mpeg2video ${MOVIE_FILENAME}"
+    echo "ffmpeg ${FFMPEG_PARAMS}"
+    ffmpeg ${FFMPEG_PARAMS}
 }
 
 createImages 
 
+# syntax: createMovie LENGTH USEAUDIO IFRAMESONLY
 createMovie 1 true true
 #createMovie 10 true true
 #createMovie 60 true true
