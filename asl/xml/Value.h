@@ -1412,7 +1412,7 @@ namespace dom {
             _myBlockVersion = 0;
        }
         void updateString() const {
-            onGetValue();
+            this->onGetValue();
             if ((_myStringVersion >= _myValueVersion) &&
                 (_myStringVersion >= _myBlockVersion))
             {
