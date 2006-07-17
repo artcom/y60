@@ -146,26 +146,29 @@ namespace y60 {
                                             unsigned int theTargetWidth,
                                             unsigned int theTargetHeight)
     {
+        MAKE_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage);
         TTF_SetTracking(_myTracking);
+
+        ImagePtr myImage = theImageNode->getFacade<y60::Image>();
+
+        if (myImage->getRasterEncoding() != y60::RGBA) {
+            myImage->createRaster(1, 1, 1, y60::RGBA);
+        }
 
         Vector2i myTextSize = createTextSurface(theText, theFontName, getTextColor(),
             theTargetWidth, theTargetHeight);
 
-        ImagePtr myImage = theImageNode->getFacade<y60::Image>();
-        unsigned myOldWidth = myImage->get<ImageWidthTag>();
-        unsigned myOldHeight = myImage->get<ImageHeightTag>();
         unsigned int myImageDataSize = _myTextureSurface->w * _myTextureSurface->h * sizeof(asl::RGBA);
-        myImage->createRaster(_myTextureSurface->w, _myTextureSurface->h, 1, y60::RGBA,
+
+        if ((_myTextureSurface->w != myImage->get<ImageWidthTag>()) ||
+            (_myTextureSurface->h != myImage->get<ImageHeightTag>()))
+        {
+            myImage->triggerUpload();
+        }
+
+        myImage->getRasterPtr()->assign(_myTextureSurface->w, _myTextureSurface->h,
                         ReadableBlockAdapter((unsigned char*)_myTextureSurface->pixels,
                         (unsigned char*)_myTextureSurface->pixels + myImageDataSize));
-        if ((_myTextureSurface->w == myOldWidth) && (_myTextureSurface->h == myOldHeight)) {
-            // reuse glTexture
-            theTextureManager.updateImageData(myImage);
-        } else {
-            // resize glTexture
-            myImage->set<ImageColorBiasTag>(myImage->get<ImageColorBiasTag>()); // trigger new upload
-            //theTextureManager.rebind(myImage);
-        }
 
 #ifdef DUMP_TEXT_AS_PNG
         PLAnyBmp myBmp;
@@ -616,7 +619,6 @@ namespace y60 {
                                        unsigned int theTargetWidth,
                                        unsigned int theTargetHeight)
     {
-        MAKE_SCOPE_TIMER(SDLTextRenderer_createTextSurface);
         unsigned mySurfaceWidth  = 0;
         unsigned mySurfaceHeight = 0;
         DB2(
