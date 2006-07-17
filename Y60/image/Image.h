@@ -62,8 +62,8 @@ namespace y60 {
         public dom::FacadeAttributePlug<ImageWidthTag>,
         public dom::FacadeAttributePlug<ImageHeightTag>,
         public dom::FacadeAttributePlug<LoadCountTag>,
-        protected dom::FacadeAttributePlug<ImageInternalFormatTag>,
-        protected dom::FacadeAttributePlug<TextureIdTag>
+        public dom::FacadeAttributePlug<ImageInternalFormatTag>,
+        public dom::FacadeAttributePlug<TextureIdTag>
     {
         public:
             Image(dom::Node & theNode);

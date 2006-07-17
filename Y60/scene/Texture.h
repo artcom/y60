@@ -71,7 +71,7 @@ namespace y60 {
         public TextureMinFilterTag::Plug, 
         public TextureMagFilterTag::Plug, 
         public TextureMatrixTag::Plug,
-        protected dom::FacadeAttributePlug<TextureImageTag>
+        public dom::FacadeAttributePlug<TextureImageTag>
     {
         public:
             Texture(dom::Node & theNode);
