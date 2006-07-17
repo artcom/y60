@@ -15,8 +15,8 @@
 #include "error_functions.h"
 #include "string_functions.h"
 
-//#define DEBUG
-#ifdef DEBUG
+//#define DEBUG_LOGGER
+#ifdef DEBUG_LOGGER
 #warning asl::Logger debugging is enable
 #include "Dashboard.h"
 #else

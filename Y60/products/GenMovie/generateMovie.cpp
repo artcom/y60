@@ -338,6 +338,10 @@ int main( int argc, char *argv[])  {
             }
         }
         cerr << "----------------------------------------------------" << endl;
+
+        // Force destruction of ourPreviousFrame before main exits, otherwise there is 
+        // no logger left to log the imageloader destruction.
+        ourPreviousFrame = asl::Ptr<ImageLoader>(0);
     }
     catch (asl::Exception & e) {
         cerr << "### ERROR: " << e << endl;

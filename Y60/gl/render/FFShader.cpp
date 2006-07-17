@@ -84,51 +84,53 @@ namespace y60 {
     void
     FFShader::enableTextures(const y60::MaterialBase & theMaterial) {
         unsigned myTextureCount = theMaterial.getTextureCount();
-        DB(AC_TRACE << "FFShader::enableTextures: Material " << theMaterial.get<NameTag>() << " has " << myTextureCount << " textures." << endl);
-        glMatrixMode(GL_TEXTURE);
+        if (myTextureCount) {
+            DB(AC_TRACE << "FFShader::enableTextures: Material " << theMaterial.get<NameTag>() << " has " << myTextureCount << " textures." << endl);
+            glMatrixMode(GL_TEXTURE);
 
-        for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {
-            glActiveTexture(asGLTextureRegister(myTextureCounter));
-            CHECK_OGL_ERROR;
-            const y60::Texture & myTexture = theMaterial.getTexture(myTextureCounter);
-            TextureUsage
-                myTextureUsage = theMaterial.getTextureUsage(myTextureCounter);
+            for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {
+                glActiveTexture(asGLTextureRegister(myTextureCounter));
+                CHECK_OGL_ERROR;
+                const y60::Texture & myTexture = theMaterial.getTexture(myTextureCounter);
+                TextureUsage myTextureUsage = theMaterial.getTextureUsage(myTextureCounter);
 
-            unsigned myId = myTexture.getId();
-            DB(AC_TRACE << "FFShader::enableTextures: texture index=" << myTextureCounter <<
-                ", gl-id = " << myTexture.getId() <<
-                ", image id =" << myTexture.getImage()->get<IdTag>() <<", size = " <<
-                myTexture.getImage()->get<ImageWidthTag>() << "," <<
-                myTexture.getImage()->get<ImageHeightTag>()<< "," <<
-                myTexture.getImage()->get<ImageDepthTag>() << "," <<
-                endl);
+                unsigned myId = myTexture.getImage()->ensureTextureId(); 
+                
+                DB(AC_TRACE << "FFShader::enableTextures: texture index=" << myTextureCounter <<
+                    ", gl-id = " << myTexture.getId() <<
+                    ", image id =" << myTexture.getImage()->get<IdTag>() <<", size = " <<
+                    myTexture.getImage()->get<ImageWidthTag>() << "," <<
+                    myTexture.getImage()->get<ImageHeightTag>()<< "," <<
+                    myTexture.getImage()->get<ImageDepthTag>() << "," <<
+                    endl);
 
-            // Fixed Function Shaders only support paint & skybox usage
-            if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
+                // Fixed Function Shaders only support paint & skybox usage
+                if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
 
-                GLenum myTextureType;
-                switch (myTexture.getImage()->getType()) {
-                case SINGLE:
-                    myTextureType = myTexture.getImage()->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
-                    break;
-                case CUBEMAP:
-                    myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
-                    break;
-                default :
-                    throw ShaderException(std::string("Unknown texture type '")+
-                            myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
+                    GLenum myTextureType;
+                    switch (myTexture.getImage()->getType()) {
+                    case SINGLE:
+                        myTextureType = myTexture.getImage()->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
+                        break;
+                    case CUBEMAP:
+                        myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
+                        break;
+                    default :
+                        throw ShaderException(std::string("Unknown texture type '")+
+                                myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
+                    }
+                    glBindTexture(myTextureType, myId);
+                    CHECK_OGL_ERROR;
+                    glEnable(myTextureType);
+                    CHECK_OGL_ERROR;
+
+                    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
+                            GLfloat(asGLTextureFunc(myTexture.getApplyMode())));
                 }
-                glBindTexture(myTextureType, myId);
-                CHECK_OGL_ERROR;
-                glEnable(myTextureType);
-                CHECK_OGL_ERROR;
-
-                glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
-                        GLfloat(asGLTextureFunc(myTexture.getApplyMode())));
             }
+            glMatrixMode(GL_MODELVIEW);
+            GLShader::enableTextures(theMaterial);
         }
-        glMatrixMode(GL_MODELVIEW);
-        GLShader::enableTextures(theMaterial);
     }
 
     void

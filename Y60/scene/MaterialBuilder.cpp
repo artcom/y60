@@ -123,7 +123,7 @@ namespace y60 {
 
     void
     MaterialBuilder::addFeature(const std::string & theClass, const VectorOfRankedFeature & theValue) {
-        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, theClass.c_str(),                                 theValue, REQUIRES_LIST_NAME);
+        setPropertyValue<VectorOfRankedFeature>(getNode(), FEATURE_NODE_NAME, theClass.c_str(), theValue, REQUIRES_LIST_NAME);
     }
 /*
         dom::NodePtr myFeatureListNode = getNode()->childNode(REQUIRES_LIST_NAME);
@@ -175,7 +175,7 @@ namespace y60 {
 #else
         //TODO: activate this when Texture is a Facade
         TexturePtr myTexture = myTextureNode->getFacade<Texture>();
-        myTexture->set<TextureImageTag>(theImageId);
+        myTexture->set<TextureImageIdTag>(theImageId);
         myTexture->set<TextureApplyModeTag>(theApplyMode);
         myTexture->set<TextureWrapModeTag>(theWrapMode);
         myTexture->set<TextureSpriteTag>(asl::as_string(theSpriteFlag));

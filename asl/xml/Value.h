@@ -758,15 +758,11 @@ namespace dom {
         virtual void sub(const ValueBase & theRasterArg) = 0;
         virtual void clear() = 0;
         virtual asl::Vector4<float> getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const = 0;
-        virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, float r, float g, float b, float a) = 0;
+        virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const asl::Vector4f & theColor) = 0;
 
-//        virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const asl::Vector4<float> & theColor) = 0;
         virtual void fillRect(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
                               asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
-                              float r, float g, float b, float a) = 0;
-//        virtual void fillRect(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
-//                              asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
-//                              const asl::Vector4<float> & theColor) = 0;
+                              const asl::Vector4<float> & theColor) = 0;
 
         /*
         virtual ValuePtr getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const = 0;
@@ -821,6 +817,8 @@ namespace dom {
                                               (const unsigned char*)&(*_myRasterValue.getValue().end())));
             return _myPixels;
         }
+        // [ch] This interface does not respect the open/close protocol, it therefore does not
+        // trigger a bumpversion or an raster dependency update.
         asl::WriteableBlock & pixels() {
             asl::WriteableBlockAdapter myAdapter((unsigned char*)&(*_myRasterValue.getValue().begin()),
                                                  (unsigned char*)&(*_myRasterValue.getValue().end()));
@@ -838,41 +836,41 @@ namespace dom {
         }
 
         virtual void clear() {
-            std::fill(pixels().begin(), pixels().end(), 0);
+            T & myNativeRaster = _myRasterValue.openWriteableValue();
+            std::fill((unsigned char*)myNativeRaster.begin(), (unsigned char*)myNativeRaster.end(), 0);
+            _myRasterValue.closeWriteableValue();
         }
 
         virtual asl::Vector4<float> getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const {
             const T & myNativeRaster = _myRasterValue.getValue();
             PIXEL myPixel = myNativeRaster(x,y);
-            asl::Vector4<float> myColor((float)asl::getRedValue(myPixel), (float)asl::getGreenValue(myPixel),
-                                        (float)asl::getBlueValue(myPixel), (float)asl::getAlphaValue(myPixel));
+            asl::Vector4<float> myColor(asl::getRedValue(myPixel)   / 255.f, 
+                                        asl::getGreenValue(myPixel) / 255.f,
+                                        asl::getBlueValue(myPixel)  / 255.f, 
+                                        asl::getAlphaValue(myPixel) / 255.f);
             return myColor;
         }
-        virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, float r, float g, float b, float a) {
-//        virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const asl::Vector4<float> & thePixel) {
+
+        virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const asl::Vector4f & thePixel) {
             const T & myNativeReadOnlyRaster = _myRasterValue.getValue();
             if (x < myNativeReadOnlyRaster.hsize() &&
-                y < myNativeReadOnlyRaster.vsize()) {
+                y < myNativeReadOnlyRaster.vsize()) 
+            {
                 T & myNativeRaster = _myRasterValue.openWriteableValue();
-                asl::Vector4<float> thePixel(r,g,b,a);
                 setPixel(myNativeRaster(x,y), thePixel);
                 _myRasterValue.closeWriteableValue();
             }
         }
         void setPixel(PIXEL & thePixel, const asl::Vector4<float> & theColor) {
-            asl::setRedValue(thePixel, asl::pchar(theColor[0]));
-            asl::setGreenValue(thePixel, asl::pchar(theColor[1]));
-            asl::setBlueValue(thePixel, asl::pchar(theColor[2]));
-            asl::setAlphaValue(thePixel, asl::pchar(theColor[3]));
+            asl::setRedValue(thePixel, asl::pchar(theColor[0] * 255));
+            asl::setGreenValue(thePixel, asl::pchar(theColor[1] * 255));
+            asl::setBlueValue(thePixel, asl::pchar(theColor[2] * 255));
+            asl::setAlphaValue(thePixel, asl::pchar(theColor[3] * 255));
         }
         virtual void fillRect(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
                               asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
-                              float r, float g, float b, float a)
-//        virtual void fillRect(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
-//                              asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
-//                              const asl::Vector4<float> & theColor)
+                              const asl::Vector4<float> & theColor)
         {
-            asl::Vector4<float> theColor(r,g,b,a);
             T & myNativeRaster = _myRasterValue.openWriteableValue();
             PIXEL myPixel;
             setPixel(myPixel, theColor);
@@ -1414,6 +1412,7 @@ namespace dom {
             _myBlockVersion = 0;
        }
         void updateString() const {
+            onGetValue();
             if ((_myStringVersion >= _myValueVersion) &&
                 (_myStringVersion >= _myBlockVersion))
             {
@@ -1483,7 +1482,6 @@ namespace dom {
     struct ValueWrapper<std::string> {
         typedef StringValue Type;
     };
-
 
 #define DEFINE_VALUE_WRAPPER_TEMPLATE(TYPE, WRAPPER)\
     template <>\

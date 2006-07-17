@@ -222,7 +222,6 @@ JSRenderer::ConstIntProperties() {
             DEFINE_SCENE_FLAG(ANIMATIONS),
             DEFINE_SCENE_FLAG(ANIMATIONS_LOAD),
             DEFINE_SCENE_FLAG(WORLD),
-            DEFINE_SCENE_FLAG(IMAGES),
             DEFINE_SCENE_FLAG(ALL),        // end of deprecated scene flags
             DEFINE_FONT_FLAG(BOLD),
             DEFINE_FONT_FLAG(ITALIC),

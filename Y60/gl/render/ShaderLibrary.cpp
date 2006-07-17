@@ -24,6 +24,7 @@
 
 #ifndef _AC_NO_CG_
 #include "CGShader.h"
+#include "SkinAndBonesShader.h"
 #endif
 
 #include <y60/NodeNames.h>
@@ -123,9 +124,12 @@ namespace y60 {
                 myGLShader = GLShaderPtr(new FFShader(theShaderNode));
             }
 #ifndef _AC_NO_CG_
-		    else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME)) {
+		    else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME) && 
+                     theShaderNode->getAttributeString(NAME_ATTRIB) == "SkinAndBones") {
+                myGLShader = GLShaderPtr(new SkinAndBonesShader(theShaderNode));
+            } else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME)) {
                 myGLShader = GLShaderPtr(new CGShader(theShaderNode));
-            }
+            }  
 #endif
             if (myGLShader) {
                 _myShaders.push_back(myGLShader);

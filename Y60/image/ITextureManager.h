@@ -20,7 +20,9 @@
 #ifndef _ac_y60_ITextureManager_h_
 #define _ac_y60_ITextureManager_h_
 
+
 #include <asl/Ptr.h>
+#include <dom/typedefs.h>
 
 namespace y60 {
     static const char * Y60_TEXTURE_SIZE_LIMIT_ENV = "Y60_TEXTURE_SIZE_LIMIT";
@@ -61,6 +63,12 @@ namespace y60 {
          * @return the maximum texture size supported by the current hardware
          */
         virtual int getMaxTextureSize(int theDimensions) const = 0; 
+
+        /**
+         * @upload image data
+         */
+        //virtual void uploadTexture(asl::Ptr<Image, dom::ThreadingModel> theImage) = 0;
+
     };
 
     typedef asl::Ptr<ITextureManager> ITextureManagerPtr;

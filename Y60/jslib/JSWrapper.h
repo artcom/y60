@@ -16,6 +16,8 @@
 #include <js/jspubtd.h>
 #include <js/jsapi.h>
 #include <js/jscntxt.h>
+#include <js/jsgc.h>
+#include <js/jslock.h>
 #include <js/jsnum.h>
 #include <dom/Nodes.h>
 #include <asl/Singleton.h>
@@ -508,6 +510,7 @@ struct Method {
     static JSBool
     call(METHOD theMethod, JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         try {
+            JSRuntime * myRuntime=JS_GetRuntime(cx);
             JSCallArgs myJSArgs( cx, obj, argc, argv, rval);
             MethodType<CLASS, METHOD>::callMethodType(theMethod, myJSArgs);
             return JS_TRUE;

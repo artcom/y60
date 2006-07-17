@@ -167,8 +167,6 @@ TextureAnimation.prototype.Constructor = function(obj, theImageNode, theImageInd
         while (_myImageNode.firstChild) {
             _myImageNode.removeChild(_myImageNode.firstChild);
         }
-        window.scene.update(Scene.IMAGES);
-        // window.reloadImage(_myImageNode);
     }
 }
 

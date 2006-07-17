@@ -95,7 +95,7 @@ namespace y60 {
     }
 
     ImageLoader::ImageLoader(const string & theFilename,
-            PackageManager * thePackageManager,
+            PackageManagerPtr thePackageManager,
             const ITextureManagerPtr & theTextureManager,
             unsigned /*theDepth*/) :
         PLBmp(),

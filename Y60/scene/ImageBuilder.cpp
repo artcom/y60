@@ -60,7 +60,7 @@ namespace y60 {
             myNode->appendAttribute(IMAGE_COLOR_SCALE_ATTRIB, asl::Vector4f(1.0f,1.0f,1.0f,1.0f));
             myNode->appendAttribute(IMAGE_COLOR_BIAS_ATTRIB, asl::Vector4f(0.0f,0.0f,0.0f,0.0f));
             myNode->appendAttribute(IMAGE_TILE_ATTRIB, asl::Vector2i(1,1));
-            myNode->appendAttribute(IMAGE_INTERNAL_FORMAT_ATTRIB, "");
+            myNode->appendAttribute(IMAGE_TEXTURE_PIXELFORMAT_ATTRIB, "");
 		} else {
             myNode->getFacade<Image>()->set<NameTag>(theName);
 		}
@@ -71,23 +71,30 @@ namespace y60 {
         return getNode()->getAttribute(NAME_ATTRIB)->nodeValue();
     }
 
+    void
+    ImageBuilder::setImage(const std::string & theFileName, const std::string & theFilter, 
+                           const std::string & theResizeMode) 
+    {
+        // We do not create a facade, if it is not nessessary, because the facade always
+        // adds an raster on creation
+        dom::NodePtr myNode = getNode();
+        myNode->appendAttribute(IMAGE_SRC_ATTRIB, theFileName);
+        myNode->appendAttribute(IMAGE_FILTER_ATTRIB, theFilter);
+        myNode->appendAttribute(IMAGE_RESIZE_ATTRIB, theResizeMode);
+    }
 
     void
     ImageBuilder::inlineImage(const std::string & theFileName, ImageFilter theFilter, const std::string & theResizeMode) {
         MAKE_SCOPE_TIMER(ImageBuilder_inlineImage);
+        setImage(theFileName, asl::getStringFromEnum(theFilter, ImageFilterStrings), theResizeMode);
 
+        // Accessing the facade will load the image
         ImagePtr myImage = getNode()->getFacade<Image>();
-        myImage->set<ImageSourceTag>(theFileName);
-        myImage->set<ImageFilterTag>(asl::getStringFromEnum(theFilter, ImageFilterStrings));
-        myImage->set<ImageResizeTag>(theResizeMode);
-        myImage->load();
     }
 
     void
     ImageBuilder::createFileReference(const std::string & theFileName, const std::string & theResizeMode) {
-        ImagePtr myImage = getNode()->getFacade<Image>();
-        myImage->set<ImageSourceTag>(theFileName);
-        myImage->set<ImageResizeTag>(theResizeMode);
+        setImage(theFileName, "", theResizeMode);
     }
 
     void
@@ -97,7 +104,7 @@ namespace y60 {
 
     void
     ImageBuilder::setInternalFormat(const std::string & theType) {
-        getNode()->getAttribute(IMAGE_INTERNAL_FORMAT_ATTRIB)->nodeValue(theType);
+        getNode()->getAttribute(IMAGE_TEXTURE_PIXELFORMAT_ATTRIB)->nodeValue(theType);
     }
 
     void

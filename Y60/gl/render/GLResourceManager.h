@@ -165,7 +165,7 @@ namespace y60 {
          * This function re-binds the texture by unbinding it and calling setupTexture.
          * @param theImage Image to rebind.
          */
-        void rebindTexture(ImagePtr theImage);
+        //void rebindTexture(ImagePtr theImage);
 
         /**
          * Delete the texture object for the given Image.
@@ -197,7 +197,6 @@ namespace y60 {
 
     private:
         static PixelEncodingInfo getInternalTextureFormat(ImagePtr theImage);
-        static PixelEncodingInfo getInternalTextureFormat(Image * theImage);
 
         /**
          * Setup a 2D/3D texture.
@@ -205,7 +204,7 @@ namespace y60 {
          * @throws TextureException theImage was invalid or contained no raster info
          * @return 
          */
-        unsigned setupSingleTexture(ImagePtr theImage);
+        unsigned setupSingleTexture(ImagePtr theImage, unsigned theTextureId);
 
         /// Update 2D texture from image.
         void update2DTexture(ImagePtr theImage);
@@ -219,7 +218,7 @@ namespace y60 {
          * @return 
          * @throws TextureException theImage was not a cubemap or invalid
          */
-        unsigned setupCubemap(ImagePtr theImage);
+        unsigned setupCubemap(ImagePtr theImage,  unsigned theTextureId);
 
         /// Update cubemap from image.
         void updateCubemap(ImagePtr theImage);

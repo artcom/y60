@@ -81,7 +81,7 @@ function buildMaterialNode(theMaterialName,
     if (theLightingFeatures != undefined && theLightingFeatures != null) {
         myMaterialNode.requires.lighting = theLightingFeatures;
     }
-    if (theTextureFeatures != undefined && theTextureFeatures != null) {        
+    if (theTextureFeatures != undefined && theTextureFeatures != null) {
         var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
         myMaterialNode.requires.appendChild(myTextureFeatures);
         myMaterialNode.requires.textures = theTextureFeatures;
@@ -92,7 +92,7 @@ function buildMaterialNode(theMaterialName,
 
         var myTexturesString =
             '<textures>\n' +
-            '    <texture image="i' + theName + '" wrapmode="' + theWrapMode + '" applymode="modulate"/>\n' + 
+            '    <texture image="i' + theName + '" wrapmode="' + theWrapMode + '" applymode="modulate"/>\n' +
             '</textures>';
         var myTexturesDoc = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
@@ -110,7 +110,7 @@ function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
     } else {
         myImageIds = theImageId ;
     }
-    
+
     var myWrapMode = "repeat";
     if (theWrapMode != undefined) {
         myWrapMode = theWrapMode;
@@ -118,7 +118,7 @@ function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
 
     var myMaterialNode = Node.createElement('material');
     myMaterialNode.id = createUniqueId(); //"m" + theName;
-    myMaterialNode.name = theName;    
+    myMaterialNode.name = theName;
     var myMaterialParent = getDescendantByTagName(window.scene.dom, "materials", true);
     myMaterialParent.appendChild(myMaterialNode);
     var myTextureFeatures = new Node('<feature name="textures">[10[]]</feature>\n').firstChild;
@@ -135,10 +135,10 @@ function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
         if (myImageId == undefined) {
             myImageId = createUniqueId(); //"i" + theName;
         }
-    
+
         // add textures
         myTexturesString += '    <texture image="' + myImageId  + '" wrapmode="' + myWrapMode + '" applymode="modulate"/>\n';
-    
+
         // add requirements
         if (myImageIndex > 0) {
             myTexturesReqString += ",";
@@ -199,7 +199,7 @@ function buildImageNode(theName, theFilename, theMipMapFlag)
     var myType = "single";
 
     var myImage = "";
-    myImage += "<image name=\"" + theName + "\" id=\"i" + theName + "\" src=\"" + theFilename + "\" pixelformat=\"" + myPixelFormat + "\" type=\"" + myType + "\" mipmap=\"" + theMipMapFlag + "\"/>";
+    myImage += "<image name=\"" + theName + "\" id=\"i" + theName + "\" src=\"" + theFilename + "\" type=\"" + myType + "\" mipmap=\"" + theMipMapFlag + "\"/>";
 
     var myImageDoc = new Node(myImage);
     return myImageDoc.childNodes[0];
@@ -208,9 +208,9 @@ function buildImageNode(theName, theFilename, theMipMapFlag)
 // build a <movie> node
 function buildMovieNode(theName, theFilename)
 {
-    var myDecoderHint = new Playlist().getVideoDecoderHintFromURL(theFilename, false); 
+    var myDecoderHint = new Playlist().getVideoDecoderHintFromURL(theFilename, false);
     var myMovie = '<movie name="' + theName + '" id="i' + theName + '" src="' + theFilename + '" decoderhint="' + myDecoderHint + '"/>';
-           
+
     var myMovieDoc = new Node(myMovie);
     return myMovieDoc.childNodes[0];
 }

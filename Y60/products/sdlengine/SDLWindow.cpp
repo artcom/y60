@@ -88,6 +88,9 @@ SDLWindow::~SDLWindow() {
     if (_myScene) {
         // unbind all created textures while we still have a valid context
         _myScene->getTextureManager()->unbindTextures();
+        // We do not have a valid GLContext after SLD_Quit
+        _myScene->getTextureManager()->validateGLContext(false);
+        
     }
     SDL_Quit();
 }
@@ -240,11 +243,23 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
 				myShaderLibrary->reload();
 			}
         }
+        // reinit all extensions, because since the context is reset all opengl bound stuff is invalid
+        for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
+            std::string myName = (*it)->getName() + "::onStartup";
+            try {
+                (*it)->onStartup(this);
+            } catch (const asl::Exception & ex) {
+                AC_ERROR << "Exception while calling " << myName << ": " << ex;
+            } catch (...) {
+                AC_ERROR << "Unknown exception while calling " << myName;
+            }
+        }
+
         if (_myScene) {
             _myScene->clearShapes();
             _myScene->updateAllModified();
             _myScene->update(Scene::SHAPES);
-            _myScene->getTextureManager()->setupTextures();
+            _myScene->getTextureManager()->reloadTextures();
         }
     }
     _myFullscreenFlag = theFullscreenFlag;
@@ -673,8 +688,8 @@ SDLWindow::mainLoop() {
         if (_myRenderer && _myRenderer->getCurrentScene()) {
             renderFrame();
         }
-        
         asl::AGPMemoryFlushSingleton::get().resetGLAGPMemoryFlush();
+        
         if (jslib::JSApp::getQuitFlag() == JS_TRUE) {
             _myAppQuitFlag = true;
         }

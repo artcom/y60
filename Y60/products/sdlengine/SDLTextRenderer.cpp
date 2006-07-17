@@ -155,7 +155,7 @@ namespace y60 {
         unsigned myOldWidth = myImage->get<ImageWidthTag>();
         unsigned myOldHeight = myImage->get<ImageHeightTag>();
         unsigned int myImageDataSize = _myTextureSurface->w * _myTextureSurface->h * sizeof(asl::RGBA);
-        myImage->set(_myTextureSurface->w, _myTextureSurface->h, 1, y60::RGBA,
+        myImage->createRaster(_myTextureSurface->w, _myTextureSurface->h, 1, y60::RGBA,
                         ReadableBlockAdapter((unsigned char*)_myTextureSurface->pixels,
                         (unsigned char*)_myTextureSurface->pixels + myImageDataSize));
         if ((_myTextureSurface->w == myOldWidth) && (_myTextureSurface->h == myOldHeight)) {
@@ -163,7 +163,8 @@ namespace y60 {
             theTextureManager.updateImageData(myImage);
         } else {
             // resize glTexture
-            theTextureManager.rebind(myImage);
+            myImage->set<ImageColorBiasTag>(myImage->get<ImageColorBiasTag>()); // trigger new upload
+            //theTextureManager.rebind(myImage);
         }
 
 #ifdef DUMP_TEXT_AS_PNG

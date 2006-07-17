@@ -14,7 +14,7 @@
 
 #define LIGHTING
 
-//#define PHONG_SPECULAR // use Phong instead of Blinn specular term
+#define PHONG_SPECULAR // use Phong instead of Blinn specular term
 
 
 struct app2vert {
@@ -72,8 +72,10 @@ float4 mainFragment(vert2frag   IN,
         uniform samplerCUBE emmissiveEnvTex,
         uniform float3 AC_CAMERA_POSITION,
         uniform float3 AC_DIRECTIONAL_LIGHTS[],
+        uniform float4 AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
         uniform float4 AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[],
         uniform float3 AC_POSITIONAL_LIGHTS[],
+        uniform float4 AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
         uniform float4 AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[],
         uniform float4 ambient,
         uniform float4 diffuse,
@@ -83,7 +85,7 @@ float4 mainFragment(vert2frag   IN,
 {
     float4 myEnvTexel      = texCUBE(envTex, IN.reflectVector);
     float4 myEmissiveTexel = texCUBE(emmissiveEnvTex, IN.reflectVector);
-    float4 myShadowTexel   = tex2D(decalTex, IN.texCoord0);
+    float4 myOcclusionTexel   = tex2D(decalTex, IN.texCoord0);
 
     float4 myDiffuseColor = float4(0,0,0,0);
     float4 mySpecColor = float4(0,0,0,0);
@@ -98,9 +100,8 @@ float4 mainFragment(vert2frag   IN,
 
         // diffuse term
         float diffuseTerm = max(dot(N,L),0);
-        myDiffuseColor += AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;
+        myDiffuseColor += AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[i] * diffuseTerm;
 
-/*
         // specular term
         if (diffuseTerm > 0.0) {
 #ifdef PHONG_SPECULAR
@@ -112,7 +113,6 @@ float4 mainFragment(vert2frag   IN,
 #endif
             mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
-*/
     }
 
     for (int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
@@ -120,9 +120,8 @@ float4 mainFragment(vert2frag   IN,
 
         // diffuse term
         float diffuseTerm = max(dot(N,L),0);
-        myDiffuseColor += AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;
+        myDiffuseColor += AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[i] * diffuseTerm;
 
-/*
         // specular term
         if (diffuseTerm > 0.0) {
 #ifdef PHONG_SPECULAR
@@ -134,27 +133,35 @@ float4 mainFragment(vert2frag   IN,
 #endif
             mySpecColor += specularTerm * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
-*/
     }
 
-    //mySpecColor *= specular;
 #endif
 
-    myDiffuseColor *= diffuse * myShadowTexel;
+	// Lighting
+	//return float4(myDiffuseColor.rgb, 1);
 
-    float4 myBaseColor = ambient + myDiffuseColor;
-    float3 myEnvColor  = (myEnvTexel.rgb * IN.reflectionFactor + myEmissiveTexel.rgb) * 2.0 * myShadowTexel.r;
+
+    float4 myBaseColor = ambient + myDiffuseColor * diffuse + mySpecColor * specular;
+    float3 myEnvColor  = myEnvTexel.rgb * IN.reflectionFactor + myEmissiveTexel.rgb;
 
     float  myEnvIntensity = (myEnvColor.r + myEnvColor.g + myEnvColor.b) / 3.0;
     float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvColor, myEnvIntensity);
 
+    return float4(myBlendedColor * myOcclusionTexel.r, 1);
+
     // *************** Some debug options *********************
+
+	// Lackfarbe plus occlusion
+	//return float4((diffuse * myOcclusionTexel).rgb, 1);
+
+	// Lit diffuse color plus occlusion
+	//return float4(myDiffuseColor.rgb, 1);
 
     // The specular color
     // return float4(mySpecColor.rgb, 1);
 
-    // The shadow map
-    // return float4(myShadowTexel.rrr, 1);
+    // The occlusion map
+    //return float4(myOcclusionTexel.rgb, 1);
 
     // The diffuse color
     // return float4(diffuse.rgb, 1);
@@ -176,9 +183,4 @@ float4 mainFragment(vert2frag   IN,
 
     // The environment
     // return float4(myEnvColor,1);
-
-    // return float4(myBaseColor.rgb,1);
-    //return float4(myBaseColor.r, myEnvColor.r, myEnvIntensity, 1);
-
-    return float4(myBlendedColor, myShadowTexel.a);
 }

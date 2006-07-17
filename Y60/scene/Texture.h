@@ -20,24 +20,40 @@
 #ifndef AC_Y60_TEXTURE_INCLUDED
 #define AC_Y60_TEXTURE_INCLUDED
 
+#include "TextureManager.h"
 #include <y60/Image.h>
 #include <y60/NodeValueNames.h>
+#include <y60/ITextureManager.h>
 
 #include <asl/Exception.h>
 #include <asl/Matrix4.h>
+#include <asl/Ptr.h>
 
 #include <dom/AttributePlug.h>
 #include <dom/Facade.h>
 
 #include <string>
+namespace dom {
+    template <>
+    struct ValueWrapper<y60::ImageWeakPtr> {
+        typedef dom::SimpleValue<y60::ImageWeakPtr> Type;
+    };
 
+    inline
+    std::ostream& operator<<(std::ostream& os, const y60::ImageWeakPtr& i) {
+        return os << "[ImageWeakPtr]";
+    }
+
+    inline
+    std::istream& operator>>(std::istream& is,y60::ImageWeakPtr &i) {
+        return is;
+    }
+}
 namespace y60 {
-    class TextureManager;
 
-// TODO: we are working on IT : make this a facade ...
-
-    //                  theTagName           theType        theAttributeName      theDefault
-    DEFINE_ATTRIBUT_TAG(TextureImageTag,     std::string,   TEXTURE_IMAGE_ATTRIB,      "");
+    //                  theTagName           theType        theAttributeName           theDefault
+    DEFINE_ATTRIBUT_TAG(TextureImageTag,     ImageWeakPtr,  "texture_image_tag",       ImagePtr(0));
+    DEFINE_ATTRIBUT_TAG(TextureImageIdTag,   std::string,   TEXTURE_IMAGE_ATTRIB,      "");
     DEFINE_ATTRIBUT_TAG(TextureApplyModeTag, std::string,   TEXTURE_APPLYMODE_ATTRIB,  "modulate");
     DEFINE_ATTRIBUT_TAG(TextureWrapModeTag,  std::string,   TEXTURE_WRAPMODE_ATTRIB,   "clamp");
     DEFINE_ATTRIBUT_TAG(TextureMinFilterTag, std::string,   TEXTURE_MIN_FILTER_ATTRIB, "linear");
@@ -48,23 +64,21 @@ namespace y60 {
     DEFINE_EXCEPTION(TextureException, asl::Exception);
     class Texture :
         public dom::Facade,
-        /*public IdTag::Plug,*/
-        public TextureImageTag::Plug,
+        public TextureImageIdTag::Plug,
         public TextureApplyModeTag::Plug,
         public TextureWrapModeTag::Plug,
         public TextureSpriteTag::Plug,
         public TextureMinFilterTag::Plug, 
         public TextureMagFilterTag::Plug, 
-        public TextureMatrixTag::Plug 
+        public TextureMatrixTag::Plug,
+        protected dom::FacadeAttributePlug<TextureImageTag>
     {
         public:
-            //Texture(dom::Node & theNode, int theFoo) {}
             Texture(dom::Node & theNode);
             IMPLEMENT_FACADE(Texture);
             virtual ~Texture();
 
-            //you have to call update after construction !
-            bool update(const TextureManager & theTextureManager);
+            void setTextureManager(const asl::Ptr<TextureManager> theTextureManager);
 
             void setUsage(TextureUsage theUsage) {}
 
@@ -75,11 +89,18 @@ namespace y60 {
             bool getSpriteMode() const;
 
             unsigned      getId() const;
-            ImagePtr getImage() const;
+            ImagePtr  getImage() const;
 
+            virtual void registerDependenciesRegistrators();
+    
+        protected:
+            virtual void registerDependenciesForImageTag();
         private:
+            void update();
+
             Texture();
-            ImageWeakPtr               _myImage;
+            asl::Ptr<TextureManager>      _myTextureManager;
+            //ImageWeakPtr                  _myImage;
     };
 
     typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;

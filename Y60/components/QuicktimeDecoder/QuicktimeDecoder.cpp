@@ -48,8 +48,8 @@ namespace y60 {
     }
 
     asl::Ptr<MovieDecoderBase> QuicktimeDecoder::instance() const {
-        InitializeQTML(0);        
-        EnterMovies();        
+        InitializeQTML(0);
+        EnterMovies();
         return asl::Ptr<MovieDecoderBase>(new QuicktimeDecoder(getDLHandle()));
     }
 
@@ -90,39 +90,39 @@ namespace y60 {
     void
     QuicktimeDecoder::load(const std::string & theFilename) {
         asl::Time myLoadStartTime;
-        
+
         OSErr                   myErr;
-        short                   myFileRefNum;            
-        char                    myFullPath[255];        
-        
-        //_myMovie = QTURL_NewMovieFromURL((char*)theFilename.c_str()); 
-        
-        // qt can not handle filepaths like this: "./foo.mov", 
+        short                   myFileRefNum;
+        char                    myFullPath[255];
+
+        //_myMovie = QTURL_NewMovieFromURL((char*)theFilename.c_str());
+
+        // qt can not handle filepaths like this: "./foo.mov",
         // which comes from the PacketManager -> cut it off
         if (theFilename.size() > 2 && theFilename.substr(0,2) == "./" ) {
             std::string myNewFilename = theFilename.substr(2,theFilename.size() - 2);
-            strcpy (myFullPath, myNewFilename.c_str());            
+            strcpy (myFullPath, myNewFilename.c_str());
         } else {
             strcpy (myFullPath, theFilename.c_str());
-        }        
+        }
         c2pstr( (char*)myFullPath );
-        FSSpec sfFile;        
-        FSMakeFSSpec (0, 0L, ConstStr255Param(myFullPath), &sfFile); 
-                   
+        FSSpec sfFile;
+        FSMakeFSSpec (0, 0L, ConstStr255Param(myFullPath), &sfFile);
+
         myErr = OpenMovieFile (&sfFile, &myFileRefNum, fsRdPerm);
         if (myErr != noErr) {
             throw QuicktimeDecoderException(string("Movie ") + theFilename +
                 " could not be loaded, check existence.", PLUS_FILE_LINE);
         }
-        
-        myErr = NewMovieFromFile (&_myMovie, myFileRefNum, 0, 0, newMovieActive, 0);    
+
+        myErr = NewMovieFromFile (&_myMovie, myFileRefNum, 0, 0, newMovieActive, 0);
         if (myErr != noErr) {
             throw QuicktimeDecoderException(string("Movie ") + theFilename +
                 " could not be loaded, check existence.", PLUS_FILE_LINE);
         }
 
         CloseMovieFile(myFileRefNum);
-                  
+
         Rect movieBounds;
         GetMovieBox(_myMovie, &movieBounds);
 
@@ -143,7 +143,7 @@ namespace y60 {
             case k32ABGRPixelFormat:
                 myQTTargetPixelFormat = k32BGRAPixelFormat;
                 AC_TRACE << "Using BGRA pixels";
-                myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGRA, PixelEncodingString));
+                myMovie->createRaster(movieBounds.right, movieBounds.bottom, 1, y60::BGRA);
                 break;
             case k24BGRPixelFormat:
             case k16LE555PixelFormat:
@@ -161,17 +161,7 @@ namespace y60 {
             default:
                 AC_TRACE << "Using BGR pixels";
                 myQTTargetPixelFormat = k24BGRPixelFormat;
-                myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGR, PixelEncodingString));
-                break;
-        }
-        // override pixelformat in case of demanded use of GRAY or ALPHA texture
-        switch (myMovie->getPixelEncoding()) {
-            case y60::ALPHA:
-                myQTTargetPixelFormat = k24BGRPixelFormat ;
-                myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::ALPHA, PixelEncodingString));
-            case y60::GRAY:
-                myMovie->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::GRAY, PixelEncodingString));
-                myQTTargetPixelFormat = k24BGRPixelFormat ;
+                myMovie->createRaster(movieBounds.right, movieBounds.bottom, 1, y60::BGR);
                 break;
         }
 
@@ -185,17 +175,13 @@ namespace y60 {
                 ": could not get framecount and framerate.", PLUS_FILE_LINE);
             //myFrameRate = 25;
         }
-        
 
-//        myMovie->setPixelEncoding(PixelEncoding(RGBA));
         myMovie->set<FrameRateTag>(myFrameRate);
-        myMovie->set<ImageWidthTag>(movieBounds.right);
-        myMovie->set<ImageHeightTag>(movieBounds.bottom);
 
-        TimeValue   myTimeBase = GetMovieTimeScale(_myMovie);//GetMovieTimeBase(_myMovie);// we want video samples
-        AC_INFO << "myTimeBase : " << myTimeBase;
+        TimeValue   myTimeScale = GetMovieTimeScale(_myMovie);
+        AC_INFO << "myTimeScale : " << myTimeScale;
 
-        _myFrameTimeStep = myTimeBase/ myMovie->get<FrameRateTag>();//((myMovie->get<FrameRateTag>() == 50) ? 12:24);
+        _myFrameTimeStep = myTimeScale/ myMovie->get<FrameRateTag>();
 
         // Setup video size and image matrix
         float myXResize = float(movieBounds.right) / asl::nextPowerOfTwo(movieBounds.right);
@@ -205,25 +191,23 @@ namespace y60 {
         myMatrix.makeScaling(asl::Vector3f(myXResize, myYResize, 1.0f));
         myMovie->set<ImageMatrixTag>(myMatrix);
 
-
         double myDurationInSeconds = float(GetMovieDuration(_myMovie)) / GetMovieTimeScale(_myMovie);
         myMovie->set<FrameCountTag>(long(myDurationInSeconds * myFrameRate));
-        
-        
+
         SetGWorld(_myOffScreenWorld, NULL);
         SetMovieGWorld(_myMovie, _myOffScreenWorld, NULL);
-        
+
         asl::Time myLoadEndTime;
         AC_INFO << "Load file:" << theFilename << ", time " << (myLoadEndTime - myLoadStartTime) << "s";
     }
 
-    unsigned int 
+    unsigned int
     QuicktimeDecoder::getDurationInMilliseconds(){
         TimeScale ts = GetMovieTimeScale(_myMovie);
         return (GetMovieDuration(_myMovie)*1000)/ts;
     }
 
-    unsigned int 
+    unsigned int
     QuicktimeDecoder::getFramecount() {
         int      frameCount = 0;
         OSType      whichMediaType = VIDEO_TYPE;
@@ -231,8 +215,8 @@ namespace y60 {
         TimeValue   duration;
         TimeValue   theTime = 0;
 
-        // due to a bug in QuickTime 6 we        
-        // must task the movie first  
+        // due to a bug in QuickTime 6 we
+        // must task the movie first
         //MoviesTask( _myMovie, 0 );
 
         while (theTime >= 0) {
@@ -275,21 +259,21 @@ namespace y60 {
         if (theFrame != _myLastDecodedFrame) {
             decodeFrame(theFrame, theTargetRaster);
         }
-        
+
         theTargetRaster->resize(getFrameWidth(), getFrameHeight());
         return theTime;
     }
 
     void QuicktimeDecoder::decodeFrame(unsigned theFrameNumber, dom::ResizeableRasterPtr theTargetRaster)
-    {    
+    {
         TimeValue myDuration;
-        
+
         SetGWorld(_myOffScreenWorld, NULL);
-        
+
         // get the next frame of the source movie
         short   myFlags     = nextTimeMediaSample;
         OSType  myMediaType = FOUR_CHAR_CODE('vide');//VIDEO_TYPE;
-        
+
         // if this is the first frame, include the frame we are currently on
         if (theFrameNumber == 0) {
             myFlags |= nextTimeEdgeOK;
@@ -308,30 +292,15 @@ namespace y60 {
                   &myDuration);
         // set the time for the frame and give time to the movie toolbox
         SetMovieTimeValue(_myMovie, _myInternalMovieTime);
-        
+
         // *** this does the actual drawing into the GWorld ***
         MoviesTask(_myMovie,0);
-        Ptr baseAddr = GetPixBaseAddr(GetGWorldPixMap(_myOffScreenWorld)); 
+        Ptr baseAddr = GetPixBaseAddr(GetGWorldPixMap(_myOffScreenWorld));
         QTGetPixMapHandleRowBytes(GetGWorldPixMap(_myOffScreenWorld));
-        
-        // since i did not find a suitable 8bit qt pixelformat for use in alpha and gray textures 
-        // -> use a rgb texture and manually stride the frame into a 8-bit targetraster (vs)
-        Movie * myMovie = getMovie();
-        if (myMovie->getPixelEncoding() == y60::ALPHA || myMovie->getPixelEncoding() == y60::GRAY) {
-            unsigned char * myRasterbegin = theTargetRaster->pixels().begin();
-            unsigned char * myQTWorldBegin = (unsigned char *)baseAddr;
-            for (int x = 0; x <  myMovie->get<ImageWidthTag>(); x++) {
-                for (int y = 0; y <  myMovie->get<ImageHeightTag>(); y++) {
-                    *myRasterbegin++ = *myQTWorldBegin;
-                    myQTWorldBegin += 3;
-                }
-            }
-        } else {
-            memcpy(theTargetRaster->pixels().begin(), baseAddr, theTargetRaster->pixels().size());
-        }
-        _myLastDecodedFrame = theFrameNumber;
 
-    }    
+        memcpy(theTargetRaster->pixels().begin(), baseAddr, theTargetRaster->pixels().size());
+        _myLastDecodedFrame = theFrameNumber;
+    }
 }
 
 Movie QTURL_NewMovieFromURL (char *theURL)
@@ -344,7 +313,7 @@ Movie QTURL_NewMovieFromURL (char *theURL)
   cout << " mySize: " << mySize << endl;
   myHandle = NewHandleClear(mySize);
   BlockMove(theURL, *myHandle, mySize);
-  
+
   NewMovieFromDataRef(&myMovie, newMovieActive, 0, myHandle, URLDataHandlerSubType);
 
   if (myHandle != NULL) {
@@ -353,4 +322,4 @@ Movie QTURL_NewMovieFromURL (char *theURL)
 
   return myMovie;
 
-}   
+}

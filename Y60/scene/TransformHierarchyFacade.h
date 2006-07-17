@@ -87,6 +87,7 @@ namespace y60 {
             asl::Vector3f getRightVector() const;
             virtual void registerDependenciesRegistrators();
         protected:
+            void registerDependenciesForMaterialupdate();
             void registerDependenciesForLocalMatrix();
             void registerDependenciesForGlobalMatrix();
             void registerDependenciesForBoundingBox();

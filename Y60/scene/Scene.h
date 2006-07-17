@@ -20,6 +20,8 @@
 #ifndef _ac_scene_Scene_h_
 #define _ac_scene_Scene_h_
 
+#include <y60/IScene.h>
+
 #include "IShader.h"
 #include "MaterialBase.h"
 #include "AnimationManager.h"
@@ -74,7 +76,7 @@ namespace y60 {
      * 3D Scene object.
      *
      */
-    class Scene {
+    class Scene : public dom::Facade, public IScene {
         public:
             struct Statistics {
                 Statistics();
@@ -84,7 +86,7 @@ namespace y60 {
                 unsigned long lightCount;
             };
 
-            typedef std::map<std::string, MaterialBasePtr> MaterialIdMap;
+            //typedef std::map<std::string, MaterialBasePtr> MaterialIdMap;
 
             DEFINE_NESTED_EXCEPTION(Scene,Exception,asl::Exception);
             DEFINE_NESTED_EXCEPTION(Scene,IOError,Exception);
@@ -97,7 +99,8 @@ namespace y60 {
              * Constructs a Scene object
              * @param theShaderLibrary Library of shaders, constructed from an XML file
              */
-            Scene();
+            Scene(dom::Node & theNode);
+            IMPLEMENT_FACADE(Scene);
             virtual ~Scene();
 
             /**
@@ -110,10 +113,9 @@ namespace y60 {
              * @param useSchema use a schema to decode?
              * @see DecoderManager
              */
-            void load(const std::string & theFilename, asl::PackageManagerPtr thePackageManager,
+            static asl::Ptr<Scene,dom::ThreadingModel> load(const std::string & theFilename, asl::PackageManagerPtr thePackageManager,
                       const IProgressNotifierPtr & theNotifier = IProgressNotifierPtr(0),
                       bool useSchema = true);
-
             /**
              * Imports the {B|X}60-File at theFilename of thePackageManager into the current Scene. It's
              * world node is inserted under theRoot.
@@ -133,7 +135,7 @@ namespace y60 {
              * @param useSchema use a schema to decode?
              * @see DecoderManager
              */
-            void load(asl::ReadableStream * theSource, const std::string & theFilename, 
+            static asl::Ptr<Scene,dom::ThreadingModel> load(asl::ReadableStream * theSource, const std::string & theFilename, 
                       const IProgressNotifierPtr & theNotifier = IProgressNotifierPtr(0),
                       bool useSchema = true);
 
@@ -141,7 +143,7 @@ namespace y60 {
              * Creates the stub nodes for the current (empty) scene.
              * @param thePackageManager Sets the PackageManger of the scene. The Packagemanger is used to load textures and stuff
              */
-            void createStubs(asl::PackageManagerPtr thePackageManager);
+            static asl::Ptr<Scene,dom::ThreadingModel> createStubs(asl::PackageManagerPtr thePackageManager);
             /**
              * Sets up an empty scene document
              * @param theDomDocument Document to setup
@@ -164,8 +166,7 @@ namespace y60 {
                 ANIMATIONS_LOAD   = 4,
                 SHAPES            = 8,
                 WORLD             = 16,
-                IMAGES            = 32,
-                ALL               = 63
+                ALL               = 31
             };
 
             /**
@@ -189,11 +190,6 @@ namespace y60 {
             void saveSchema(const std::string & theFilename,
                             int theSchemaIndex,
                             bool theBinaryFlag);
-
-            const MaterialBasePtr getMaterial(const std::string & theMaterialId) const;
-            const MaterialIdMap & getMaterials() const {
-                return _myMaterials;
-            }
 
             LightVector & getLights() {
                 return _myLights;
@@ -219,7 +215,7 @@ namespace y60 {
             const dom::NodePtr getMaterialsRoot() const;
 
             float getWorldSize(const dom::NodePtr & theActiveCamera) const;
-
+            
             dom::NodePtr getWorldRoot();
             const dom::NodePtr getWorldRoot() const;
 
@@ -228,6 +224,9 @@ namespace y60 {
 
             SceneBuilderPtr getSceneBuilder() {
                 return _mySceneBuilder;
+            }
+            void setSceneBuilder(SceneBuilderPtr theSceneBuilder) {
+                _mySceneBuilder = theSceneBuilder;
             }
             const AnimationManager & getAnimationManager() const {
                 return _myAnimationManager;
@@ -306,13 +305,11 @@ namespace y60 {
              */
             void deregisterResourceManager();
 
-            const ResourceManager * getResourceManager() const;
-            ResourceManager * getResourceManager();
-
-            // static void parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles );
-            // static void parseRenderStyles(const VectorOfString & theStyles, std::vector<RenderStyleType> & theRenderStyles );
+            const IResourceManager * getResourceManager() const;
+            IResourceManager * getResourceManager();
 
         private:
+            void setSceneDom(dom::DocumentPtr theDocument);
             void updateReferences(dom::NodePtr theRootNode,
                 std::map<std::string, std::string> & theOldToNewIdMap);
             void createUniqueIds(dom::NodePtr theDocument, dom::NodePtr theNode,
@@ -324,7 +321,7 @@ namespace y60 {
             void reloadMaterial(dom::NodePtr theMaterialNode, MaterialBasePtr theMaterial);
             void loadAnimations();
             void updateMaterials();
-
+            
             void collectGarbage();
             void collectReferences(dom::NodePtr theNode, std::set<std::string> & theReferences);
             void removeDangelingNodes(dom::NodePtr theNode, dom::NodePtr theDocument);
@@ -352,19 +349,17 @@ namespace y60 {
             void setupShaderLibrary();
 
             SceneBuilderPtr          _mySceneBuilder;
-            asl::Ptr<TextureManager> _myTextureManager;
+            TextureManagerPtr        _myTextureManager;
             AnimationManager         _myAnimationManager;
 
             LightVector              _myLights;
             dom::DocumentPtr         _mySceneDom;
-            dom::NodePtr             _mySceneRoot;
-            MaterialIdMap            _myMaterials;
             Statistics               _myStatistics;
             
             unsigned long long       _myPreviousDomVersion;
     };
 
-    typedef asl::Ptr<Scene> ScenePtr;
+    typedef asl::Ptr<Scene,dom::ThreadingModel> ScenePtr;
 }
 
 #endif

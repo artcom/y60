@@ -50,6 +50,8 @@ namespace y60 {
             ImageBuilder(const std::string & theNodeName, const std::string & theName, bool theCreateMipmapFlag);
         private:
 			void init(const std::string & theName, bool theCreateMipmapFlag);
+            void setImage(const std::string & theFileName, const std::string & theFilter, 
+                const std::string & theResizeMode);
     };
 
     typedef asl::Ptr<ImageBuilder, dom::ThreadingModel>  ImageBuilderPtr;

@@ -195,6 +195,7 @@ bool FFMpegAudioDecoder::decode() {
         int myBytesDecoded = 0;
         unsigned char* myData = myPacket.data;
         int myDataLen = myPacket.size;
+        
         int myLen = 0;
         while (myDataLen > 0) {
             myLen = avcodec_decode_audio(myCodec, (int16_t*)_mySamples.begin(), 

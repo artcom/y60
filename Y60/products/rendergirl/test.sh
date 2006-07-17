@@ -29,12 +29,16 @@ if [ "$MAYA_SDK" == "" ] ; then
 fi
 
 rm -f TEST_IMAGES/*
-rm -f TESTMODELS/*.x60
+rm -f TESTMODELS/test_save.x60
+rm -f TESTMODELS/test_save_as.x60
 
-cd ../maya-xport
-./install_maya
-cd -
-maya2x60 TESTMODELS/testcube.mb
+if [ ! -f TESTMODELS/testcube.x60 ]; then
+    cd ../maya-xport
+    ./install_maya
+    cd -
+    maya2x60 TESTMODELS/testcube.mb
+fi
+
 cp TESTMODELS/testcube.x60 TESTMODELS/test_save.x60
 acgtkshell -I "SCRIPTS;$PRO/src/Y60/js;$PRO/src/Y60/shader;$PRO/lib" ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60
 

@@ -11,6 +11,7 @@
 #ifndef _ac_y60_TextureManager_h_
 #define _ac_y60_TextureManager_h_
 
+#include <y60/IResourceManager.h>
 #include <y60/ITextureManager.h>
 #include <asl/Exception.h>
 #include <asl/PackageManager.h>
@@ -35,14 +36,13 @@ namespace y60 {
      */
     class TextureManager : public ITextureManager {
         public:
-            // TextureManager(const std::string & theTexturePath);
             virtual ~TextureManager();
 
             void setSelf(const asl::Ptr<ITextureManager> & theSelf);
             asl::WeakPtr<ITextureManager> getSelf() const;
             void setImageList(dom::NodePtr theImageListNode);
 
-            void setupTextures();
+            void reloadTextures();
             void loadMovieFrame(asl::Ptr<Movie, dom::ThreadingModel> theMovie,
                                 double theCurrentTime = -1);
             void loadCaptureFrame(asl::Ptr<Capture, dom::ThreadingModel> theCapture);
@@ -52,18 +52,10 @@ namespace y60 {
 
             virtual int getMaxTextureSize(int theDimensions) const; 
             void updateImageData(asl::Ptr<Image, dom::ThreadingModel> theImage);
-            void rebind(asl::Ptr<Image, dom::ThreadingModel> theImage);
             void setPriority(Image * theImage, float thePriority);           
             void unbindTexture(Image * theImage);
             void unbindTextures();
-            void update();
-            asl::PackageManagerPtr getPackageManager() const {
-                return _myPackageManager;
-            }
-
-            void setPackageManager(asl::PackageManagerPtr thePackageManager) {
-                _myPackageManager = thePackageManager;
-            }
+            void validateGLContext(bool theFlag);
 
             static asl::Ptr<TextureManager> create(); 
             /**
@@ -77,6 +69,7 @@ namespace y60 {
             int registerResourceManager(ResourceManager* theResourceManager); 
             ResourceManager * getResourceManager() { return _myResourceManager; }
             const ResourceManager * getResourceManager() const { return _myResourceManager; }
+
         protected:
             virtual unsigned setupImage(asl::Ptr<Image, dom::ThreadingModel> theImage); 
             dom::NodePtr  _myImageList;
@@ -84,9 +77,8 @@ namespace y60 {
             int _myResourceManagerCount;
         private:
             TextureManager();
-            void uploadTexture(asl::Ptr<Image, dom::ThreadingModel> theImage);
             asl::WeakPtr<ITextureManager> _mySelf;
-            asl::PackageManagerPtr _myPackageManager;
+            //asl::PackageManagerPtr _myPackageManager;
             unsigned _myMaxTextureSize;
             MemoryResourceManagerPtr _myMemoryResourceManager;
     };

@@ -241,7 +241,7 @@ namespace asl {
             if (hasSize()) {
                 return (Point2<Number>(this->val[MAX][0] - this->val[MIN][0], this->val[MAX][1] - this->val[MIN][1]));
             } else {
-                return Vector2<Number>(0.0,0.0);
+                return Vector2<Number>(Number(0),Number(0));
             }
         }
         /** Sets the size of the box while keeping its center.

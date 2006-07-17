@@ -12,7 +12,6 @@
 
 #include "IShader.h"
 #include "Primitive.h"
-#include "SkinAndBones.h"
 #include "Facades.h"
 #include "Body.h"
 #include "ISceneDecoder.h"
@@ -40,18 +39,19 @@
 #include <dom/Schema.h>
 #include <iostream>
 #include <fstream>
+#include <set>
 
 using namespace asl;
 using namespace std;
 using namespace dom;
 
-#define DB(x) x
+#define DB(x) //x
 
 namespace y60 {
 
-    Scene::Scene() :
+    Scene::Scene(dom::Node & theNode) :
+        Facade(theNode),
         _myTextureManager(TextureManager::create()),
-        _mySceneDom(new Document()),
         _myPreviousDomVersion(0)
     {
         // Add the y60 decoder by default
@@ -59,11 +59,7 @@ namespace y60 {
         AC_TRACE << "Scene CTOR for " << this;
     }
 
-    Scene::~Scene() {
-        if (_mySceneDom->childNodesLength()) {
-            AC_DEBUG << "Scene DTOR for " << this;
-        }
-    }
+    Scene::~Scene() {}
 
     //////////////////////////////////////////////////////////////////////////////////////
     // Scene saving
@@ -161,72 +157,88 @@ namespace y60 {
         }
     }
 
-    void
+    ScenePtr
     Scene::load(const std::string & theFilename, PackageManagerPtr thePackageManager,
             const IProgressNotifierPtr & theNotifier,
             bool useSchema)
     {
-        _myTextureManager->setPackageManager(thePackageManager);
+        //_myTextureManager->setPackageManager(thePackageManager);
         if (theFilename.empty() || theFilename == "null") {
-            load(0, "empty scene", theNotifier, useSchema);
+            return load(0, "empty scene", theNotifier, useSchema);
         } else {
             asl::Ptr<ReadableBlock> mySource = thePackageManager->openFile(theFilename);
             if (!mySource) {
                 throw IOError(std::string("Can not open or read scene file '") + theFilename + "'", PLUS_FILE_LINE);
             }
             try {
-                load(&(*mySource), theFilename, theNotifier, useSchema);
+                return load(&(*mySource), theFilename, theNotifier, useSchema);
             } catch (asl::Exception & ex) {
                 ex.appendWhat(string("while opening '")+theFilename+"'");
                 throw ex;
             }
         }
+        return ScenePtr(0);
     }
 
-    void
+    ScenePtr
     Scene::load(asl::ReadableStream * theSource, const std::string & theFilename,
                const IProgressNotifierPtr & theNotifier,
                bool useSchema)
     {
         asl::Time loadStart;
 
+        dom::DocumentPtr mySceneDom(new Document());
         if (useSchema) {
-            setupEmptyDocument(*_mySceneDom, "");
+
+            setupEmptyDocument(*mySceneDom, "");
         }
 
         asl::Ptr<ISceneDecoder> myDecoder =
             DecoderManager::get().findDecoder<ISceneDecoder>(theFilename, theSource);
         if (myDecoder) {
             myDecoder->setProgressNotifier(theNotifier);
-            myDecoder->decodeScene(*theSource, _mySceneDom);
+            myDecoder->decodeScene(*theSource, mySceneDom);
             myDecoder->setProgressNotifier(IProgressNotifierPtr(0));
         } else {
             throw SceneException(std::string("Unknown extension '") + getExtension(theFilename) + "'", PLUS_FILE_LINE);
         }
-        _myPreviousDomVersion = 0;
-        _mySceneBuilder = SceneBuilderPtr(new SceneBuilder(_mySceneDom));
-        _mySceneRoot = _mySceneDom->childNode(SCENE_ROOT_NAME);
+        //_myPreviousDomVersion = 0;
+        //_mySceneBuilder = SceneBuilderPtr(new SceneBuilder(_mySceneDom));
+        //getNode() = _mySceneDom->childNode(SCENE_ROOT_NAME);
 
         asl::Time loadEnd;
         AC_INFO << "  Total load time: " << (loadEnd - loadStart) << " sec";
-        //setup();
+
+        ScenePtr myNewScene(mySceneDom->firstChild()->getFacade<Scene>());
+        myNewScene->setSceneDom(mySceneDom);
+        myNewScene->setSceneBuilder(SceneBuilderPtr(new SceneBuilder(mySceneDom)));
+        return myNewScene;
     }
 
-    void
+    void 
+    Scene::setSceneDom(dom::DocumentPtr theDocument) {
+        _mySceneDom = theDocument;
+    }
+
+    ScenePtr
     Scene::createStubs(asl::PackageManagerPtr thePackageManager) {
-        _myTextureManager->setPackageManager(thePackageManager);
-        setupEmptyDocument(*_mySceneDom, "");
-        _mySceneBuilder = SceneBuilderPtr(new SceneBuilder(_mySceneDom));
-        _mySceneRoot = _mySceneDom->childNode(SCENE_ROOT_NAME);
+        dom::DocumentPtr mySceneDom(new Document());
+        setupEmptyDocument(*mySceneDom, "");
+        SceneBuilderPtr mySceneBuilder(SceneBuilderPtr(new SceneBuilder(mySceneDom)));
+        //getNode() = _mySceneDom->childNode(SCENE_ROOT_NAME);
 
         WorldBuilder myWorldBuilder;
-        _mySceneBuilder->appendWorld(myWorldBuilder);
+        mySceneBuilder->appendWorld(myWorldBuilder);
 
         CameraBuilder myCameraBuilder("myCamera");
         const std::string & myCameraId = myWorldBuilder.appendObject(myCameraBuilder);
 
-        _mySceneBuilder->getMainViewportNode()->getFacade<Viewport>()->set<CameraTag>(myCameraId);
-        setup();
+        mySceneBuilder->getMainViewportNode()->getFacade<Viewport>()->set<CameraTag>(myCameraId);
+        ScenePtr myNewScene = mySceneDom->firstChild()->getFacade<Scene>();
+        myNewScene->setSceneDom(mySceneDom);
+        myNewScene->setup();
+        myNewScene->setSceneBuilder(mySceneBuilder);
+        return myNewScene;
     }
 
     IShaderLibraryPtr
@@ -255,13 +267,11 @@ namespace y60 {
         asl::Time setupStart;
         AC_INFO << "Loading images...";
         _myTextureManager->setImageList(getImagesRoot());
-        update(IMAGES);
 
         setupShaderLibrary();
 
         AC_INFO << "Loading materials...";
-        _myMaterials.clear();
-        NodePtr myMaterialList = _mySceneRoot->childNode(MATERIAL_LIST_NAME);
+        NodePtr myMaterialList = getNode().childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
         for (unsigned i = 0; i < myMaterialCount; ++i) {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
@@ -270,13 +280,6 @@ namespace y60 {
 
         AC_INFO << "Loading world...";
         update(ANIMATIONS_LOAD|SHAPES|WORLD);
-
-        // The skin and bones shader needs to know some things about the world
-        NodePtr mySceneNode = _mySceneRoot;
-        for (MaterialIdMap::iterator it = _myMaterials.begin(); it != _myMaterials.end(); ++it) {
-            it->second->setup(mySceneNode);
-        }
-
         asl::Time setupEnd;
         AC_INFO << "Total setup time: " << (setupEnd-setupStart) << " sec";
     }
@@ -292,8 +295,8 @@ namespace y60 {
 				const std::string & myProp = myPropertiesNode->childNode(i)->getAttributeString("name");
 			}
 		}
-
-		MaterialBasePtr myMaterial = MaterialBasePtr(new MaterialBase(*theMaterialNode));
+        MaterialBasePtr myMaterial = theMaterialNode->getFacade<MaterialBase>();
+//		MaterialBasePtr myMaterial = MaterialBasePtr(new MaterialBase(*theMaterialNode));
 		IShaderPtr myShader;
 		if (getShaderLibrary()) {
 			// 2. ask shaderlib for shaderdefinition
@@ -307,12 +310,6 @@ namespace y60 {
 			// 3. decide which material to build
 			// 4. load material from node
 			// 5. give material the found shaderdefinition
-			const VectorOfString * myPhysicsFeatures = myShader->getFeatures("physics");
-			if (myPhysicsFeatures && myShader->isCGShader() &&
-				std::find(myPhysicsFeatures->begin(), myPhysicsFeatures->end(), "skin") !=  myPhysicsFeatures->end())
-			{
-				myMaterial = MaterialBasePtr(new SkinAndBones(*theMaterialNode));
-			}
 		}
 		myMaterial->setShader(myShader);
 		DB(AC_TRACE << "Scene::loadMaterial(): Load material " << endl << *theMaterialNode <<
@@ -334,11 +331,10 @@ namespace y60 {
 				}
 			}
         }
-		myMaterial->load(*_myTextureManager);
-
+		myMaterial->load(_myTextureManager);
         DB(AC_TRACE << "Scene::loadMaterial() - id: " << myMaterial->get<IdTag>()
                     << ", name: " << myMaterial->get<NameTag>());
-        _myMaterials[myMaterial->get<IdTag>()] = myMaterial;
+//        _myMaterials[myMaterial->get<IdTag>()] = myMaterial;
     }
 
     void
@@ -360,8 +356,8 @@ namespace y60 {
         }
 
         loadMaterial(theMaterialNode);
-        MaterialBasePtr myNewMaterial = _myMaterials[theMaterial->get<IdTag>()];
         for (unsigned i = 0; i < myAffectedPrimitives.size(); ++i) {
+            MaterialBasePtr myNewMaterial = theMaterialNode->getFacade<MaterialBase>();
             myAffectedPrimitives[i]->setMaterial(myNewMaterial);
         }
     }
@@ -441,23 +437,8 @@ namespace y60 {
             _myStatistics.primitiveCount += myShape->getPrimitives().size();
         }
     }
-    /*
-    void
-    Scene::parseRenderStyles(dom::NodePtr theNode, std::vector<RenderStyleType> & theRenderStyles ) {
-        if (theNode->getAttribute(RENDER_STYLE_ATTRIB)) {
-            parseRenderStyles(theNode->getAttributeValue<VectorOfString>(RENDER_STYLE_ATTRIB), theRenderStyles);
-        }
-    }
 
     void
-    Scene::parseRenderStyles(const VectorOfString & theStyles, std::vector<RenderStyleType> & theRenderStyles ) {
-        for (int i = 0; i< theStyles.size(); i++) {
-            RenderStyleType myRenderType = (RenderStyleType)getEnumFromString(theStyles[i],RenderStylesSL);
-            theRenderStyles.push_back(myRenderType);
-        }
-    }
-    */
-	void
 	Scene::buildShape(ShapePtr theShape) {
 		NodePtr myShapeNode = theShape->getXmlNode();
         theShape->clear();
@@ -474,7 +455,7 @@ namespace y60 {
                 std::string myMaterialId =
                     myElementsNode->getAttributeString(MATERIAL_REF_ATTRIB);
                 PrimitiveType myPrimitiveType = Primitive::getTypeFromNode(myElementsNode);
-                MaterialBasePtr myMaterial = getMaterial(myMaterialId);
+                MaterialBaseFacadePtr myMaterial = myElementsNode->getElementById(myMaterialId)->getFacade<MaterialBase>();//getMaterial(myMaterialId);
                 if (!myMaterial) {
                     throw SceneException(std::string("Could not find material with id: ") +
                                             myMaterialId, PLUS_FILE_LINE);
@@ -509,7 +490,8 @@ namespace y60 {
                         const string & myName = myIndicesNode->getAttributeString(VERTEX_DATA_ATTRIB);
                         NodePtr myDataNode = getVertexDataNode(myShapeNode, myName);
 
-                        myPrimitive.load(getResourceManager(), myIndicesNode, myDataNode, myBegin, myEnd);
+                        ResourceManager * myResourceManager = _myTextureManager->getResourceManager();
+                        myPrimitive.load(myResourceManager, myIndicesNode, myDataNode, myBegin, myEnd);
                     }
 
                     myShapeVertexCount += myPrimitive.size();
@@ -589,74 +571,53 @@ namespace y60 {
 
     void
     Scene::loadAnimations() {
-        NodePtr myAnimationNodes = _mySceneRoot->childNode(ANIMATION_LIST_NAME);
+        NodePtr myAnimationNodes = getNode().childNode(ANIMATION_LIST_NAME);
         _myAnimationManager.loadGlobals(myAnimationNodes, getWorldRoot());
 
-        NodePtr myCharacterNodes = _mySceneRoot->childNode(CHARACTER_LIST_NAME);
+        NodePtr myCharacterNodes = getNode().childNode(CHARACTER_LIST_NAME);
         _myAnimationManager.loadCharacters(myCharacterNodes, getWorldRoot());
     }
 
     void
     Scene::updateAllModified() {
-        dom::NodePtr mySceneElement = _mySceneRoot;
-        if (mySceneElement) {
-            //printChangedNodes(mySceneElement, _myPreviousDomVersion, 0);
-            dom::NodePtr myWorldListElement = mySceneElement->childNode(WORLD_LIST_NAME);
-            dom::NodePtr myWorldElement = myWorldListElement ? myWorldListElement->childNode(WORLD_NODE_NAME) : dom::NodePtr(0);
-            dom::NodePtr myLightsElement = mySceneElement->childNode(LIGHTSOURCE_LIST_NAME);
-            dom::NodePtr myImagesElement = mySceneElement->childNode(IMAGE_LIST_NAME);
-            dom::NodePtr myShapesElement = mySceneElement->childNode(SHAPE_LIST_NAME);
-            dom::NodePtr myCanvasesElement = mySceneElement->childNode(CANVAS_LIST_NAME);
-            dom::NodePtr myMaterialsElement = mySceneElement->childNode(MATERIAL_LIST_NAME);
-            dom::NodePtr myAnimationsElement = mySceneElement->childNode(ANIMATION_LIST_NAME);
+        dom::Node & mySceneElement = getNode();
+        //printChangedNodes(mySceneElement, _myPreviousDomVersion, 0);
+        dom::NodePtr myWorldListElement = mySceneElement.childNode(WORLD_LIST_NAME);
+        dom::NodePtr myWorldElement = myWorldListElement ? myWorldListElement->childNode(WORLD_NODE_NAME) : dom::NodePtr(0);
+        dom::NodePtr myLightsElement = mySceneElement.childNode(LIGHTSOURCE_LIST_NAME);
+        dom::NodePtr myShapesElement = mySceneElement.childNode(SHAPE_LIST_NAME);
+        dom::NodePtr myCanvasesElement = mySceneElement.childNode(CANVAS_LIST_NAME);
+        dom::NodePtr myMaterialsElement = mySceneElement.childNode(MATERIAL_LIST_NAME);
+        dom::NodePtr myAnimationsElement = mySceneElement.childNode(ANIMATION_LIST_NAME);
 
-            short myUpdateFlags = 0;
-            if (myImagesElement->nodeVersion() > _myPreviousDomVersion) {
-                myUpdateFlags|=Scene::IMAGES;
-                DB(AC_TRACE << " IMAGES");
-            }
-            if (myMaterialsElement->nodeVersion() > _myPreviousDomVersion) {
-                myUpdateFlags|=Scene::MATERIALS;
-                DB(AC_TRACE << " MATERIALS");
-            }
-            if (myShapesElement->nodeVersion() > _myPreviousDomVersion) {
-                myUpdateFlags|=Scene::SHAPES;
-                DB(AC_TRACE << " SHAPES");
-            }
-            if (myWorldElement->nodeVersion() > _myPreviousDomVersion) {
-                myUpdateFlags|=Scene::WORLD;
-                DB(AC_TRACE << " WORLD");
-            }
-            if (myCanvasesElement->nodeVersion() > _myPreviousDomVersion) {
-                DB(AC_TRACE << " CANVASES");
-            }
-            if (myAnimationsElement->nodeVersion() > _myPreviousDomVersion) {
-                myUpdateFlags|=Scene::ANIMATIONS;
-                DB(AC_TRACE << " ANIMATIONS");
-            }
-            update(myUpdateFlags);
-
-            // TODO: Create material-facades and update skin-and-bones materials only,
-            // if the attached joint-globalmatrices have changend.
-            for (MaterialIdMap::iterator it = _myMaterials.begin(); it != _myMaterials.end(); ++it) {
-                if (dynamic_cast_Ptr<SkinAndBones>(it->second)) {
-                    it->second->update(*_myTextureManager, getImagesRoot());
-                }
-            }
-
-            _myPreviousDomVersion = _mySceneDom->nodeVersion();
+        short myUpdateFlags = 0;
+        if (myMaterialsElement->nodeVersion() > _myPreviousDomVersion) {
+            myUpdateFlags|=Scene::MATERIALS;
+            DB(AC_TRACE << " MATERIALS");
         }
+        if (myShapesElement->nodeVersion() > _myPreviousDomVersion) {
+            myUpdateFlags|=Scene::SHAPES;
+            DB(AC_TRACE << " SHAPES");
+        }
+        if (myWorldElement->nodeVersion() > _myPreviousDomVersion) {
+            myUpdateFlags|=Scene::WORLD;
+            DB(AC_TRACE << " WORLD");
+        }
+        if (myCanvasesElement->nodeVersion() > _myPreviousDomVersion) {
+            DB(AC_TRACE << " CANVASES");
+        }
+        if (myAnimationsElement->nodeVersion() > _myPreviousDomVersion) {
+            myUpdateFlags|=Scene::ANIMATIONS;
+            DB(AC_TRACE << " ANIMATIONS");
+        }
+        update(myUpdateFlags);
+
+        _myPreviousDomVersion = _mySceneDom->nodeVersion();
     }
 
     void
     Scene::update(unsigned short theUpdateFlags) {
         MAKE_SCOPE_TIMER(updateScene);
-        if (theUpdateFlags & IMAGES) {
-            AC_TRACE << "_myTextureManager->update()";
-            MAKE_SCOPE_TIMER(updateImages);
-            _myTextureManager->update(); //ok
-        }
-
         if (theUpdateFlags & MATERIALS) {
             AC_TRACE << "updateMaterials";
             MAKE_SCOPE_TIMER(updateMaterials);
@@ -691,38 +652,21 @@ namespace y60 {
 
     void
     Scene::updateMaterials() {
-        NodePtr myMaterialList = _mySceneRoot->childNode(MATERIAL_LIST_NAME);
+        NodePtr myMaterialList = getNode().childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
 
         AC_DEBUG << "Scene::updateMaterials() - material count: " << myMaterialCount;
-
-        // Collect current materials
-        set<string> myMaterialIds;
-        for (MaterialIdMap::iterator it = _myMaterials.begin(); it != _myMaterials.end(); ++it) {
-            myMaterialIds.insert(it->first);
-        }
-
         for (unsigned i = 0; i < myMaterialCount; ++i) {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
-            const std::string myMaterialId = myMaterialNode->getAttributeString("id");
-            MaterialBasePtr myMaterial = getMaterial(myMaterialId);
-
+            MaterialBaseFacadePtr myMaterial = myMaterialNode->getFacade<MaterialBase>();
             if (myMaterial) {
-                myMaterialIds.erase(myMaterialId);
                 if (myMaterial->reloadRequired()) {
                     reloadMaterial(myMaterialNode, myMaterial);
-                } else {
-                    myMaterial->update(*_myTextureManager, getImagesRoot());
                 }
             } else {
+                const std::string myMaterialId = myMaterialNode->getAttributeString("id");
                 AC_TRACE << "could not find material " << myMaterialId << ", loading";
-                loadMaterial(myMaterialNode);
             }
-        }
-
-        // Remove materials from cache that have been removed from dom
-        for (set<string>::iterator it = myMaterialIds.begin(); it != myMaterialIds.end(); ++it) {
-            _myMaterials.erase(*it);
         }
     }
 
@@ -733,63 +677,53 @@ namespace y60 {
 
     NodePtr
     Scene::getImagesRoot() {
-        return _mySceneRoot->childNode(IMAGE_LIST_NAME);
+        return getNode().childNode(IMAGE_LIST_NAME);
     }
 
     const NodePtr
     Scene::getImagesRoot() const {
-        return _mySceneRoot->childNode(IMAGE_LIST_NAME);
+        return getNode().childNode(IMAGE_LIST_NAME);
     }
 
 
     NodePtr
     Scene::getWorldRoot() {
-        return _mySceneRoot->childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
+        return getNode().childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
     }
 
     const NodePtr
     Scene::getWorldRoot() const {
-        return _mySceneRoot->childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
+        return getNode().childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
     }
 
     NodePtr
     Scene::getShapesRoot() {
-        return _mySceneRoot->childNode(SHAPE_LIST_NAME);
+        return getNode().childNode(SHAPE_LIST_NAME);
     }
 
     const NodePtr
     Scene::getShapesRoot() const {
-        return _mySceneRoot->childNode(SHAPE_LIST_NAME);
+        return getNode().childNode(SHAPE_LIST_NAME);
     }
 
     NodePtr
     Scene::getCanvasRoot() {
-        return _mySceneRoot->childNode(CANVAS_LIST_NAME);
+        return getNode().childNode(CANVAS_LIST_NAME);
     }
 
     const NodePtr
     Scene::getCanvasRoot() const {
-        return _mySceneRoot->childNode(CANVAS_LIST_NAME);
+        return getNode().childNode(CANVAS_LIST_NAME);
     }
 
     NodePtr
     Scene::getMaterialsRoot() {
-        return _mySceneRoot->childNode(MATERIAL_LIST_NAME);
+        return getNode().childNode(MATERIAL_LIST_NAME);
     }
 
     const NodePtr
     Scene::getMaterialsRoot() const {
-        return _mySceneRoot->childNode(MATERIAL_LIST_NAME);
-    }
-
-    const MaterialBasePtr
-    Scene::getMaterial(const std::string & theMaterialId) const {
-        MaterialIdMap::const_iterator myIt = _myMaterials.find(theMaterialId);
-        if (myIt == _myMaterials.end()) {
-            return MaterialBasePtr(0);
-        } else {
-            return myIt->second;
-        }
+        return getNode().childNode(MATERIAL_LIST_NAME);
     }
 
     float
@@ -837,7 +771,7 @@ namespace y60 {
                     collectGarbage();
                 }
                 if (myInclude->get<IncludeSrcTag>() != "") {
-                    import(myInclude->get<IncludeSrcTag>(), _myTextureManager->getPackageManager(), theNode);
+                    import(myInclude->get<IncludeSrcTag>(), AppPackageManager::get().getPtr(), theNode);
                 }
             }
         }
@@ -855,7 +789,7 @@ namespace y60 {
 
     void
     Scene::collectCameras(NodeList & theCameras) const {
-        NodePtr myStartNode = _mySceneRoot->childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
+        NodePtr myStartNode = getNode().childNode(WORLD_LIST_NAME)->childNode(WORLD_NODE_NAME);
         collectCameras(theCameras, myStartNode);
     }
 
@@ -1309,13 +1243,13 @@ namespace y60 {
         //     for all other, collect IDREFs
         // (6) Iterate over image list and remove all images with ids not in IDREF-list
 
-        NodePtr mySceneNode = _mySceneRoot;
-        set<string> myReferences;
-        removeDangelingNodes(mySceneNode->childNode(CANVAS_LIST_NAME), _mySceneDom);
-        removeDangelingNodes(mySceneNode->childNode(CHARACTER_LIST_NAME), _mySceneDom);
-        removeDangelingNodes(mySceneNode->childNode(ANIMATION_LIST_NAME), _mySceneDom);
+        Node & mySceneNode = getNode();
+        std::set<string> myReferences;
+        removeDangelingNodes(mySceneNode.childNode(CANVAS_LIST_NAME), _mySceneDom);
+        removeDangelingNodes(mySceneNode.childNode(CHARACTER_LIST_NAME), _mySceneDom);
+        removeDangelingNodes(mySceneNode.childNode(ANIMATION_LIST_NAME), _mySceneDom);
 
-        collectReferences(mySceneNode->childNode(CANVAS_LIST_NAME), myReferences);
+        collectReferences(mySceneNode.childNode(CANVAS_LIST_NAME), myReferences);
         collectReferences(getWorldRoot(), myReferences);
 
         removeUnreferencedNodes(getShapesRoot(), myReferences);
@@ -1326,7 +1260,7 @@ namespace y60 {
     }
 
     void
-    Scene::collectReferences(NodePtr theNode, set<string> & theReferences) {
+        Scene::collectReferences(NodePtr theNode, std::set<string> & theReferences) {
         for (unsigned i = 0; i < theNode->attributes().length(); ++i) {
             NodePtr myAttribute = theNode->attributes().item(i);
             if (myAttribute->nodeValueTypeName() == "IDREF") {
@@ -1374,7 +1308,7 @@ namespace y60 {
     }
 
     void
-    Scene::removeUnreferencedNodes(NodePtr theNode, const set<string> & theReferences) {
+        Scene::removeUnreferencedNodes(NodePtr theNode, const std::set<string> & theReferences) {
         vector<NodePtr> myNodesToRemove;
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
             NodePtr myChild = theNode->childNode(i);
@@ -1409,12 +1343,12 @@ namespace y60 {
         }
     }
 
-    const ResourceManager *
+    const IResourceManager *
     Scene::getResourceManager() const {
         return _myTextureManager->getResourceManager();
     }
 
-    ResourceManager *
+    IResourceManager *
     Scene::getResourceManager() {
         return _myTextureManager->getResourceManager();
     }
@@ -1430,7 +1364,7 @@ namespace y60 {
     Scene::getStatistics() const {
         Scene::Statistics myStatistics = _myStatistics;
         myStatistics.lightCount     = _myLights.size();
-        myStatistics.materialCount  = _myMaterials.size();
+        myStatistics.materialCount  =  getNode().childNode(MATERIAL_LIST_NAME)->childNodesLength();
         return myStatistics;
     }
 }

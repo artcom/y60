@@ -35,7 +35,6 @@
     }
 
     ourShow.setup(1024,768);
-
     ourShow.go();
 } catch (ex) {
     reportException(ex);

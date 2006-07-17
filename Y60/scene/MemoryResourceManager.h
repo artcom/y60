@@ -31,7 +31,7 @@ class MemoryResourceManager : public ResourceManager {
         MemoryResourceManager() {initVertexDataFactories();}
         int getMaxTextureSize(int theDimensions) const { return 0; }
         void updateTextureData(ImagePtr theImage) {}
-        void rebindTexture(ImagePtr theImage) {}
+        //void rebindTexture(ImagePtr theImage) {}
 
         /**
          * Sets the Priority of the Texture theImage to thePriority. The Texture priority

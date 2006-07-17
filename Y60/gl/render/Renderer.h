@@ -66,8 +66,6 @@ namespace y60 {
             void clearBuffers(const y60::CanvasPtr & theCanvas, unsigned int theBuffersMask);
             void render(y60::ViewportPtr theViewport);
             
-
-            void preloadShader();
             IShaderLibraryPtr getShaderLibrary();
 
             bool getStatisticsOn() const;

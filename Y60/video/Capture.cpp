@@ -105,8 +105,8 @@ namespace y60 {
          */
         _myLoadedFilename = get<ImageSourceTag>(); // theUrl;
 
-        Image::createRaster(_myDevice->getPixelFormat());
-        getRasterPtr()->resize(get<ImageWidthTag>(), get<ImageHeightTag>());
+        Image::createRaster(get<ImageWidthTag>(), get<ImageHeightTag>(), 1, getRasterEncoding());
+
         if (_myPlayMode == PLAY_MODE_PLAY) {
             _myDevice->startCapture();
         }

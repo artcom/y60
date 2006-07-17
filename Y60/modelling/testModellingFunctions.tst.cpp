@@ -42,8 +42,8 @@ class ProxyGeometryUnitTest : public UnitTest {
     public:
         ProxyGeometryUnitTest() : UnitTest("ProxyGeometryUnitTest") {}
 
-        bool positionsEqual(const VectorOfVector3f & theCandidate, 
-                            const VectorOfVector3f & theReference, 
+        bool positionsEqual(const VectorOfVector3f & theCandidate,
+                            const VectorOfVector3f & theReference,
                             const Matrix4f & theCameraMatrix) {
             bool myResult = true;
             if (theCandidate.size() != theReference.size()) {
@@ -55,7 +55,7 @@ class ProxyGeometryUnitTest : public UnitTest {
                 Point3f myPoint = Point3f(theReference[i]);
                 Vector3f myTransformedReference = product(myPoint, myTransformation);
                 if (!almostEqual(theCandidate[i], myTransformedReference)) {
-                    AC_WARNING << "Candidate " << i << " is " << theCandidate[i] << 
+                    AC_WARNING << "Candidate " << i << " is " << theCandidate[i] <<
                         " but it is expected to be " << myTransformedReference;
                     //return false;
                     myResult = false;
@@ -81,8 +81,8 @@ class ProxyGeometryUnitTest : public UnitTest {
 
         void run() {
             PackageManagerPtr myPackageManager( new PackageManager );
-            ScenePtr myScene( new Scene );
-            myScene->createStubs(myPackageManager);
+            ScenePtr myScene = Scene::createStubs(myPackageManager);
+
             dom::NodePtr myMaterial = createColorMaterial(myScene, Vector4f(0.8f,0.8f,0.6f,1.0f));
 
             Box3f myVoxelBox;

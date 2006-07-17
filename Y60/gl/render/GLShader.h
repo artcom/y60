@@ -83,7 +83,7 @@ namespace y60 {
             std::vector<dom::NodePtr> _myPropertyNodes;
     };
 
-    typedef asl::Ptr<GLShader> GLShaderPtr;
+    typedef asl::Ptr<GLShader, dom::ThreadingModel> GLShaderPtr;
     typedef std::vector<GLShaderPtr> GLShaderVector;
 
 } // namespace y60

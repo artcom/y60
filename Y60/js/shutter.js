@@ -85,8 +85,6 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
             }
         }
 
-        window.scene.update(Scene.IMAGES);
-
         _myLeftOverlay   = new ImageOverlay(theSceneViewer.getOverlayManager(), _myPixelImage);
         _myRightOverlay  = new ImageOverlay(theSceneViewer.getOverlayManager(), _myPixelImage);
         _myTopOverlay    = new ImageOverlay(theSceneViewer.getOverlayManager(), _myPixelImage);
@@ -97,7 +95,6 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
         // cursor
         var myCursorImage = theSceneViewer.getImageManager().getImageNode("ShutterCursor");
         myCursorImage.src = CURSOR_IMAGE;
-        window.scene.update(Scene.IMAGES);
 
         _myCursor = new ImageOverlay(theSceneViewer.getOverlayManager(), myCursorImage);
         _myCursor.width = CURSOR_SIZE;
@@ -348,7 +345,6 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
             }
         }
         */
-        window.scene.update(Scene.IMAGES);
     }
 
     function refresh() {
@@ -372,8 +368,6 @@ Shutter.prototype.Constructor = function(self, theSceneViewer, theSize, theCusto
         _myInteractiveOverlay.width  = window.width;
         _myInteractiveOverlay.height  = window.height;
         _myInteractiveOverlay.position = new Vector2i(-10,-10);
-
-        window.scene.update(Scene.IMAGES);
     }
 
     self.setup(SHUTTER_OVERLAY, theCustomShutterFile);

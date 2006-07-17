@@ -87,7 +87,6 @@ namespace y60 {
             virtual void load(asl::Ptr<asl::ReadableStream> theSource, 
                     const std::string & theFilename);
 
-            PixelEncoding getPixelFormat() const; 
             unsigned getFrameCount() const; 
             unsigned getFrameWidth() const; 
             unsigned getFrameHeight() const; 

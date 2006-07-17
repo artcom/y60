@@ -271,7 +271,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         } else {
             var myImageId = createUniqueId();
             var mySkyboxImageString =
-                '<image name="' + theFileName + '" id="' + myImageId + '" src="' + theFileName + '" type="cubemap" pixelformat="bgr" mipmap="0" tile="' + theTile + '"/>\n';
+                '<image name="' + theFileName + '" id="' + myImageId + '" src="' + theFileName + '" type="cubemap" mipmap="0" tile="' + theTile + '"/>\n';
             var mySkyboxImageDoc = new Node(mySkyboxImageString);
             var mySkyboxImage = mySkyboxImageDoc.firstChild;
             self.getImages().appendChild(mySkyboxImage);
@@ -470,7 +470,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _mySkyboxMaterial        = null;
     var _myHeartbeatThrober      = null;
     var _myPicking               = null;
-    
+
     var _mySwitchNodes = new Array();
 
     self.__defineGetter__('_myPicking', function(){ return _myPicking; });
@@ -564,7 +564,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.getSwitchNodes = function() {
         return _mySwitchNodes;
-    }        
+    }
 
     self.prepareScene = function (theScene, theCanvas) {
         if (theScene) {
@@ -589,7 +589,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             }
 
             collectAllSwitchNodes(theScene);
-            
+
         } else {
             Logger.trace("prepareScene has no scene");
 

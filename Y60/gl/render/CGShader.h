@@ -68,7 +68,7 @@ namespace y60 {
             CgProgramInfoPtr      _myVertexProgram;
             CgProgramInfoPtr      _myFragmentProgram;
     };
-    typedef asl::Ptr<CGShader> CGShaderPtr;
+    typedef asl::Ptr<CGShader, dom::ThreadingModel> CGShaderPtr;
 } // namespace y60
 
 #endif // AC_Y60_RENDERER_GLSHADER_INCLUDED

@@ -59,7 +59,7 @@ namespace y60 {
                     unsigned theDepth = 1);
         //! Creates and loads a bitmap, using an optional package manager to search for the file.
         ImageLoader(const std::string & theFilename, 
-               asl::PackageManager * thePackageManager = 0, 
+               asl::Ptr<asl::PackageManager> thePackageManager = asl::Ptr<asl::PackageManager>(0), 
                const ITextureManagerPtr & theTextureManager = ITextureManagerPtr(0), 
                unsigned theDepth = 1);
 

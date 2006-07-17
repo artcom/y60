@@ -60,10 +60,6 @@ namespace y60 {
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster) = 0;
         virtual void load(const std::string & theFilename) = 0;
 
-        PixelEncoding getPixelFormat() const {
-            return PixelEncoding(asl::getEnumFromString(_myParent->get<ImagePixelFormatTag>(), PixelEncodingString));
-        }
-
         /**
         * @return new instance of the concrete CaptureDevice.
         */
@@ -100,7 +96,7 @@ namespace y60 {
             _myParent->set<FrameRateTag>(theFrameRate);
         }
         void setPixelFormat(const PixelEncoding thePixelFormat) {
-            _myParent->set<ImagePixelFormatTag>(asl::getStringFromEnum(thePixelFormat, PixelEncodingString));
+            _myParent->set<RasterPixelFormatTag>(asl::getStringFromEnum(thePixelFormat, PixelEncodingString));
         }
         void setImageMatrix(const asl::Matrix4f & theMatrix) {
             _myParent->set<ImageMatrixTag>(theMatrix);

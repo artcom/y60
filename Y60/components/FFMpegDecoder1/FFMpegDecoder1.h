@@ -121,6 +121,9 @@ namespace y60 {
         int64_t           _myStartTimestamp;
         int64_t           _myLastVideoTimestamp;
         int64_t           _myEOFVideoTimestamp;
+        int               _myDestinationPixelFormat;
+        unsigned          _myBytesPerPixel;
+
     };
 
     typedef asl::Ptr<FFMpegDecoder1> FFMpegDecoder1Ptr;

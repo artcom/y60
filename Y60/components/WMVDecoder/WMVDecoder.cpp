@@ -563,16 +563,6 @@ namespace y60 {
             }
 
             if (myMediaType->formattype == WMFORMAT_VideoInfo) {
-                // Setup pixel format
-                GUID mySubType = myMediaType->subtype;
-                if (mySubType == WMMEDIASUBTYPE_RGB24) {
-                    myMovie->setPixelEncoding(BGR);
-                } else if (mySubType == WMMEDIASUBTYPE_RGB32) {
-                    myMovie->setPixelEncoding(BGRA);
-                } else {
-                    throw WindowsMediaException("Unsupported pixel format", PLUS_FILE_LINE);
-                }
-
                 // Setup frame size
                 WMVIDEOINFOHEADER * myVideoHeader = (WMVIDEOINFOHEADER *)myMediaType->pbFormat;
                 BITMAPINFOHEADER myBmiHeader = myVideoHeader->bmiHeader;
@@ -581,6 +571,16 @@ namespace y60 {
                 myVideoHeight = myBmiHeader.biHeight;
                 if (myVideoHeader->AvgTimePerFrame > 0) {
                     _myFrameRate = 1.0f / (myVideoHeader->AvgTimePerFrame / 10000000.0f);
+                }
+
+                // Setup pixel format
+                GUID mySubType = myMediaType->subtype;
+                if (mySubType == WMMEDIASUBTYPE_RGB24) {
+                    myMovie->createRaster(myVideoWidth, myVideoHeight, 1, y60::BGR);
+                } else if (mySubType == WMMEDIASUBTYPE_RGB32) {
+                    myMovie->createRaster(myVideoWidth, myVideoHeight, 1, y60::BGRA);
+                } else {
+                    throw WindowsMediaException("Unsupported pixel format", PLUS_FILE_LINE);
                 }
             } else if (myMediaType->formattype == WMFORMAT_WaveFormatEx) {
                 WAVEFORMATEX * myAudioInfo = (WAVEFORMATEX *)myMediaType->pbFormat;
@@ -621,8 +621,6 @@ namespace y60 {
         myMovie->set<FrameRateTag>(_myFrameRate);
 
         // Setup video size and image matrix
-        myMovie->set<ImageWidthTag>(myVideoWidth);
-        myMovie->set<ImageHeightTag>(myVideoHeight);
         float myXResize = float(myVideoWidth) / asl::nextPowerOfTwo(myVideoWidth);
         float myYResize = float(myVideoHeight) / asl::nextPowerOfTwo(myVideoHeight);
 
@@ -631,7 +629,7 @@ namespace y60 {
         myMatrix.translate(asl::Vector3f(0, myYResize, 0));
         myMovie->set<ImageMatrixTag>(myMatrix);
 
-        AC_DEBUG << "Video: frame=" << myVideoWidth << "x" << myVideoHeight << " pixelFormat=" << asl::getStringFromEnum(getPixelFormat(), y60::PixelEncodingString);
+        AC_DEBUG << "Video: frame=" << myVideoWidth << "x" << myVideoHeight << " pixelFormat=" << asl::getStringFromEnum(myMovie->getRasterEncoding(), y60::PixelEncodingString);
         AC_DEBUG << "       fps=" << _myFrameRate << " duration=" << myDuration / 10000000.f << " s" << " frameCount=" << getFrameCount();
 
         // Cleanup audio buffer

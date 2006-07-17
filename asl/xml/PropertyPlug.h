@@ -6,16 +6,6 @@
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: LightSource.h,v $
-//   $Author: christian $
-//   $Revision: 1.9 $
-//   $Date: 2004/11/15 10:05:49 $
-//
-//  Description: This class is the base of all lights.
-//
-//=============================================================================
 
 #ifndef _ac_dom_PropertyPlug_h_
 #define _ac_dom_PropertyPlug_h_

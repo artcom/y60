@@ -109,12 +109,8 @@ OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theImageNode) {
     ImagePtr myImage = theImageNode->getFacade<Image>();
     ResizeableRasterPtr myRaster = myImage->getRasterPtr();
 
-    if (!myRaster) {
-        myImage->set(getWidth(), getHeight(), 1, myImage->getEncoding());
-        myRaster = myImage->getRasterPtr();
-    }
-    if (myImage->get<ImageWidthTag>() != myRaster->width() ||
-        myImage->get<ImageHeightTag>() != myRaster->height())
+    if (myRaster->width() != getWidth() ||
+        myRaster->height() != getHeight())
     {
         myRaster->resize(getWidth(), getHeight());
     }
@@ -145,7 +141,7 @@ OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
         ImagePtr myImage = getImage();
         if (myImage) { 
-            ensureRaster(myImage);
+//            ensureRaster(myImage);
             _myWidth  = myImage->get<ImageWidthTag>();
             _myHeight = myImage->get<ImageHeightTag>();
         } else {
@@ -175,26 +171,6 @@ OffscreenRenderArea::getImage() {
         AC_WARNING << "No canvas.";
         return ImagePtr(0);
     }
-}
-
-ResizeableRasterPtr
-OffscreenRenderArea::ensureRaster(ImagePtr theImage) {
-    if ( ! theImage ) {
-        throw OffscreenRendererException("No image.", PLUS_FILE_LINE);
-    }
-    ResizeableRasterPtr myRaster = theImage->getRasterPtr();
-
-    if (!myRaster) {
-        theImage->set(theImage->get<ImageWidthTag>(),
-                      theImage->get<ImageHeightTag>(), 1, theImage->getEncoding());
-        myRaster = theImage->getRasterPtr();
-    }
-    if (theImage->get<ImageWidthTag>() != myRaster->width() ||
-        theImage->get<ImageHeightTag>() != myRaster->height())
-    {
-        myRaster->resize(theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>());
-    }
-    return myRaster;
 }
 
 } //namespace jslib

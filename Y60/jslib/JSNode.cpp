@@ -32,6 +32,7 @@
 #include <asl/os_functions.h>
 #include <asl/Logger.h>
 #include <y60/DataTypes.h>
+#include <y60/Image.h>
 
 #include <iostream>
 #include <fstream>
@@ -1081,6 +1082,15 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                         return JS_TRUE;
 					}
 
+                    // Finally we check for the raster property in images, because there
+                    // is just no way to stick the polymophic raster values in one of the 
+                    // plugs above. If you know one, let me know.
+                    if (myProperty == "raster") {
+                        y60::ImagePtr myImage = myNode->getFacade<y60::Image>();
+                        if (myImage) {
+                            *vp = as_jsval(cx, myImage->getRasterValue());
+                        }
+                    }
                 }
             }
 

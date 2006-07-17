@@ -62,7 +62,7 @@ Canvas::setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer) {
 }
 
 ImagePtr
-Canvas::getTarget(asl::Ptr<Scene> theScene) {
+Canvas::getTarget(asl::Ptr<Scene,dom::ThreadingModel> theScene) {
     dom::NodePtr myImageNode = theScene->getSceneDom()->getElementById( get<CanvasTargetTag>() );
     if (myImageNode) {
         return myImageNode->getFacade<Image>();

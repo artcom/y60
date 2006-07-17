@@ -221,7 +221,8 @@ namespace y60 {
     static const char * IMAGE_LIST_NAME                   = "images";
     static const char * IMAGE_NODE_NAME                   = "image";
     static const char * IMAGE_SRC_ATTRIB                  = "src";
-    static const char * IMAGE_PIXELFORMAT_ATTRIB          = "pixelformat";
+    static const char * IMAGE_RASTER_PIXELFORMAT_ATTRIB   = "rasterpixelformat";
+    static const char * IMAGE_TEXTURE_PIXELFORMAT_ATTRIB  = "texturepixelformat";
     static const char * IMAGE_INTERNAL_FORMAT_ATTRIB      = "internal_format";
     static const char * IMAGE_MIPMAP_ATTRIB               = "mipmap";
     static const char * IMAGE_TYPE_ATTRIB                 = "type"; // "single" | "cubemap", see NodeValueNames.h
@@ -233,6 +234,9 @@ namespace y60 {
     static const char * IMAGE_COLOR_SCALE_ATTRIB          = "color_scale";
     static const char * IMAGE_COLOR_BIAS_ATTRIB           = "color_bias";
     static const char * IMAGE_BYTESPERPIXEL_ATTRIB        = "bytesperpixel";
+    static const char * IMAGE_TEXTURE_ID_ATTRIB           = "textureid";
+    static const char * IMAGE_RASTER_ATTRIB               = "raster"; // for easy raster access
+    static const char * IMAGE_LOAD_COUNT_ATTRIB           = "loadcount"; // for debug purposes
 
     static const char * MOVIE_NODE_NAME             = "movie";
     static const char * MOVIE_FRAME_ATTRIB          = "currentframe";

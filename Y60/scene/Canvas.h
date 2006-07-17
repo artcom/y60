@@ -59,7 +59,7 @@ namespace y60 {
             bool setFrameBuffer(asl::Ptr<IFrameBuffer> theFrameBuffer);
 
             bool hasRenderTarget() const;
-            asl::Ptr<Image, dom::ThreadingModel> getTarget(asl::Ptr<Scene> theScene);
+            asl::Ptr<Image, dom::ThreadingModel> getTarget(asl::Ptr<Scene, dom::ThreadingModel> theScene);
 
             IMPLEMENT_FACADE(Canvas);
         private:

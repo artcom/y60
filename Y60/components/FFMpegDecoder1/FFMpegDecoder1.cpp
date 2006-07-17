@@ -44,7 +44,9 @@ namespace y60 {
         _myLastVStreamIndex(-1),
         _myStartTimestamp(0),
         _myLastVideoTimestamp(0),
-        _myEOFVideoTimestamp(INT_MIN)
+        _myEOFVideoTimestamp(INT_MIN),
+        _myDestinationPixelFormat(PIX_FMT_BGR24),
+        _myBytesPerPixel(0)
     {
         DB(AC_DEBUG << "instantiated an FFMpegDecoder1...");
     }
@@ -97,16 +99,16 @@ namespace y60 {
         if (myVStream == 0) {
             return;
         }
-        
+
         Movie * myMovie = getMovie();
-        
+
         int myWidth, myHeight;
         myWidth = myVStream->codec->width;
         myHeight = myVStream->codec->height;
         myMovie->set<ImageWidthTag>(myWidth);
         myMovie->set<ImageHeightTag>(myHeight);
     }
-    
+
     void
     FFMpegDecoder1::load(const std::string & theFilename) {
         asl::Time myLoadStartTime;
@@ -141,7 +143,7 @@ namespace y60 {
                 _myVStream = _myFormatContext->streams[i];
                 break;
             }
-        } 
+        }
 
         if (_myVStream == 0) {
             throw FFMpegDecoderException(std::string("No video stream found: ") + theFilename, PLUS_FILE_LINE);
@@ -160,12 +162,37 @@ namespace y60 {
         // allocate frame for YUV data
         _myFrame = avcodec_alloc_frame();
 
-        setMovieParameters(myIndex);
+        int myWidth = _myVStream->codec->width;
+        int myHeight = _myVStream->codec->height;
 
-        Movie * myMovie = getMovie();        
-        int myWidth, myHeight;
-        myWidth = _myVStream->codec->width;
-        myHeight = _myVStream->codec->height;
+        // pixelformat stuff
+        Movie * myMovie = getMovie();
+        TextureInternalFormat myTextureFormat = myMovie->getInternalEncoding();
+        switch (myTextureFormat) {
+            case TEXTURE_IFMT_RGBA8:
+                AC_TRACE << "Using TEXTURE_IFMT_RGBA8 pixels";
+                _myDestinationPixelFormat = PIX_FMT_RGBA32;
+                _myBytesPerPixel = 4;
+                myMovie->createRaster(myWidth, myHeight, 1, y60::RGBA);
+                break;
+            case TEXTURE_IFMT_ALPHA:
+            case TEXTURE_IFMT_LUMINANCE8:
+                AC_TRACE << "Using GRAY pixels";
+                _myDestinationPixelFormat = PIX_FMT_GRAY8;
+                _myBytesPerPixel = 1;
+                myMovie->createRaster(myWidth, myHeight, 1, y60::ALPHA);
+                break;
+            case TEXTURE_IFMT_RGB8:
+            default:
+                AC_TRACE << "Using BGR pixels";
+                _myDestinationPixelFormat = PIX_FMT_BGR24;
+                _myBytesPerPixel = 3;
+                myMovie->createRaster(myWidth, myHeight, 1, y60::BGR);
+                break;
+        }
+
+        myMovie->getRasterPtr()->clear();
+
 
         // Setup size and image matrix
         float myXResize = float(myWidth) / asl::nextPowerOfTwo(myWidth);
@@ -184,11 +211,11 @@ namespace y60 {
         if (_myVStream->duration == AV_NOPTS_VALUE || int(myFPS * (_myVStream->duration) <= 0)) {
             myMovie->set<FrameCountTag>(INT_MAX);
         } else {
-            myMovie->set<FrameCountTag>(int(myFPS * _myVStream->duration 
+            myMovie->set<FrameCountTag>(int(myFPS * _myVStream->duration
                                             * av_q2d(_myVStream->time_base)));
         }
 
-        
+
         _myLastVideoTimestamp = 0;
         _myEOFVideoTimestamp = INT_MIN;
 
@@ -239,12 +266,12 @@ namespace y60 {
 
         if (_myVStream->index_entries != NULL) {
             if (_myLastVideoTimestamp != AV_NOPTS_VALUE &&
-                (theTimestamp < _myLastVideoTimestamp || theTimestamp > 
+                (theTimestamp < _myLastVideoTimestamp || theTimestamp >
                  _myLastVideoTimestamp + (2*myTimePerFrame)))
             {
-//            cout <<"seek, theTimeStanp: " << theTimestamp << " last timestamp : " 
+//            cout <<"seek, theTimeStanp: " << theTimestamp << " last timestamp : "
 //                  << _myLastVideoTimestamp << " Frametime : " << myTimePerFrame <<endl;
-                
+
                 // [ch] If we seek directly to the seek timestamp the packet sometimes cannot be decoded afterwards.
                 // Therefore this workaround seeks a bit (0.01 Frames) before the requested timestamp
                 int64_t mySeekTimestamp = theTimestamp-myTimePerFrame/100;
@@ -252,17 +279,17 @@ namespace y60 {
                     mySeekTimestamp = 0;
                 }
 //            int64_t mySeekTimestamp = theTimestamp;
-                AC_DEBUG << "SEEK timestamp=" << theTimestamp << " lastVideoTimestamp=" 
+                AC_DEBUG << "SEEK timestamp=" << theTimestamp << " lastVideoTimestamp="
                          << _myLastVideoTimestamp << " seek=" << mySeekTimestamp;
-                
-                int myResult = av_seek_frame(_myFormatContext, _myLastVStreamIndex, mySeekTimestamp, 
+
+                int myResult = av_seek_frame(_myFormatContext, _myLastVStreamIndex, mySeekTimestamp,
                                              AVSEEK_FLAG_BACKWARD);
                 if (myResult < 0) {
                     AC_ERROR << "Could not seek to timestamp " << mySeekTimestamp;
                 }
             }
         }
-        
+
         VideoFramePtr myVideoFrame(0);
 
         AVPacket myPacket;
@@ -352,7 +379,7 @@ namespace y60 {
         av_free_packet(&myPacket);
 
         _myLastVStreamIndex = myPacket.stream_index;
-        
+
         return true;
     }
 
@@ -362,7 +389,7 @@ namespace y60 {
             AC_ERROR << "FFMpegDecoder1::decodeVideoFrame invalid AVFrame";
             return;
         }
-        unsigned int myLineSizeBytes = getBytesRequired(getFrameWidth(), getPixelFormat());
+        unsigned int myLineSizeBytes = getFrameWidth() * _myBytesPerPixel;
 
         AVPicture myDestPict;
         myDestPict.data[0] = theTargetRaster->pixels().begin();
@@ -373,31 +400,9 @@ namespace y60 {
         myDestPict.linesize[1] = myLineSizeBytes;
         myDestPict.linesize[2] = myLineSizeBytes;
 
-        // pixelformat stuff
-        int myDestFmt;
-        switch (getMovie()->getPixelEncoding()) {
-        case y60::RGBA:
-        case y60::BGRA:
-            AC_TRACE << "Using RGBA pixels";
-            getMovie()->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::RGBA, PixelEncodingString));
-            myDestFmt = PIX_FMT_RGBA32;
-            break;
-        case y60::ALPHA:
-        case y60::GRAY:
-            AC_TRACE << "Using GRAY pixels";
-            myDestFmt = PIX_FMT_GRAY8;
-            break;
-        case y60::RGB:
-        case y60::BGR:
-        default:
-            AC_TRACE << "Using BGR pixels";
-            myDestFmt = PIX_FMT_BGR24;
-            getMovie()->set<ImagePixelFormatTag>(asl::getStringFromEnum(y60::BGR, PixelEncodingString));
-            break;
-        }
 
         AVCodecContext * myVCodec = _myVStream->codec;
-        img_convert(&myDestPict, myDestFmt, (AVPicture*)theFrame,
+        img_convert(&myDestPict, _myDestinationPixelFormat, (AVPicture*)theFrame,
                     myVCodec->pix_fmt, myVCodec->width, myVCodec->height);
     }
 }

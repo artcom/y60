@@ -44,6 +44,5 @@ namespace y60 {
         bool     compressedFlag;
     };
     PixelEncodingInfo getDefaultGLTextureParams(PixelEncoding theEncoding);
-
 }
 #endif

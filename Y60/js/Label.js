@@ -114,7 +114,6 @@ function LabelBase(Public, Protected, theScene,
     Public.setImage = function(theSource) {
         var myImage = Protected.getImageNode();
         myImage.src = theSource;
-        window.scene.update(Scene.IMAGES);
         var mySize = getImageSize(myImage);
         Public.width  = mySize.x;
         Public.height = mySize.y;

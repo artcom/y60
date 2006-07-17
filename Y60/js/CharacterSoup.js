@@ -26,7 +26,7 @@ function CharacterSoup(theSceneViewer, theFontname, theFontFilename, theSizes, t
 }
 
 CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname, theFontFilename, theSizes, theGlurRadi) {
-    
+
     var _myAlphabetMap = [];
     var _myGlurRadi    = new Array();
     var _myTracking    = 0.0;
@@ -150,12 +150,12 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                     _myAlphabetMap[theSize].nextCharSlot.y += myCellSize;
                     if (_myAlphabetMap[theSize].nextCharSlot.y > myFontImage.height - (2*myCellSize)) {
                         Logger.error("Sorry, alphabet reached " + (CHARACTERS_PER_LINE*CHARACTERS_PER_LINE)  + " chars.");
-                        exit(1);                            
+                        exit(1);
                     }
                 }
 
                 myCharacter = new Character(myChar, myTexCoord, myTexSize, myMetric);
-                _myAlphabetMap[theSize][myChar] = myCharacter;                    
+                _myAlphabetMap[theSize][myChar] = myCharacter;
             } else {
                 myCharacter = _myAlphabetMap[theSize][myChar];
             }
@@ -166,7 +166,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
         return myCharacters;
     }
-    
+
     self.setupFont = function(theSize) {
 
         if (theSize in _myAlphabetMap) {
@@ -184,7 +184,6 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
         var myFontImageSize = myCellSize * CHARACTERS_PER_LINE;
         var myFontImage = window.scene.createImage(myFontImageSize, myFontImageSize, "RGBA");
-        window.scene.update(Scene.IMAGES);
         myFontImage.mipmap = false;
 
         var myMaterial = buildUnlitTextureMaterialNode(myFontName + "_material", myFontImage.id);
@@ -202,7 +201,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         _myAlphabetMap[theSize].fontname = myFontName;
         _myAlphabetMap[theSize].fontmetrics = myFontMetrics;
 
-        window.scene.update(Scene.MATERIALS);        
+        window.scene.update(Scene.MATERIALS);
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -234,7 +233,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         }
         var s = "[1.0,1.0,1.0,0.0," + a + "]";
         theImageNode.filter_params = s;
-        applyImageFilter(theImageNode, "glur", theImageNode.filter_params);      
+        applyImageFilter(theImageNode, "glur", theImageNode.filter_params);
     }
 
     function setup() {
@@ -243,12 +242,12 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
             _myGlurRadi[theSizes[i]] = [];
             if (theGlurRadi == undefined || theGlurRadi.length < theSizes.length) {
                 if (theGlurRadi && theGlurRadi.length >0) {
-                    // take the first for all sizes                    
+                    // take the first for all sizes
                     _myGlurRadi[theSizes[i]] = theGlurRadi[0];
                 } else {
                     // we do not want any glur
                     _myGlurRadi[theSizes[i]] = 0;
-                }                
+                }
             } else {
                 // we glurradi for all different sizes
                 _myGlurRadi[theSizes[i]] = theGlurRadi[i];

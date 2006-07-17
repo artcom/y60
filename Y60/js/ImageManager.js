@@ -18,18 +18,17 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
     var _myBaseViewer = theBaseViewer;
 
     // public methods
-    obj.getImageNode = function(theImageName) {
+    obj.getImageNode = function(theImageName, theEncoding) {
         var myImageNode = getDescendantByName(_myBaseViewer.getImages(), theImageName, false);
         if (!myImageNode) {
-            myImageNode = Node.createElement("image");
-            _myBaseViewer.getImages().appendChild(myImageNode);
+            var myEncoding = (theEncoding != undefined) ? theEncoding.toUpperCase() : "RGB";
+            myImageNode = window.scene.createImage(1,1,myEncoding);
             myImageNode.name = theImageName;
-            myImageNode.resize = "pad";
         }
         return myImageNode;
     }
 
-    obj.createImage = function(theSource) {
+    obj.createImage = function(theSource, theEncoding) {
         var myImageNode = Node.createElement("image");
         _myBaseViewer.getImages().appendChild(myImageNode);
         myImageNode.name = theSource;
@@ -52,9 +51,12 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
 }
 
 function getImageSize(theImage) {
+    if (theImage.src=="" && theImage.childNodes.length == 0) {
+        print("### ERROR: src attribute must be set, before getting size for image: "+ theImage.id);
+    }
+    var mySize = new Vector3f(theImage.width, theImage.height, 0);
     var myImageMatrix = new Matrix4f(theImage.matrix);
     myImageMatrix.setRow(3, [0,0,0,1]);
-    var mySize = new Vector3f(theImage.width, theImage.height, 0);
     mySize = product(mySize, myImageMatrix);
     return new Vector2i(Math.abs(Math.round(mySize.x)), Math.abs(Math.round(mySize.y)));
 }

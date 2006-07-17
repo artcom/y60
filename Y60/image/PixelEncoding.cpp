@@ -94,4 +94,35 @@ bool mapFormatToPixelEncoding(const PLPixelFormat & theFormat,
     return true;
 }
 
+TextureInternalFormat
+getInternalPixelFormat(PixelEncoding theEncoding) {
+    switch (theEncoding) {
+        case y60::DEPTH: return TEXTURE_IFMT_DEPTH; 
+        case y60::ALPHA: return TEXTURE_IFMT_ALPHA; 
+        case y60::GRAY: return TEXTURE_IFMT_LUMINANCE8;
+        case y60::GRAY16: return TEXTURE_IFMT_LUMINANCE16;
+        case y60::GRAYS16:return TEXTURE_IFMT_LUMINANCE16;
+        case y60::GRAY32: return TEXTURE_IFMT_INTENSITY;
+        case y60::RGB:  return TEXTURE_IFMT_RGB8;
+        case y60::BGR:  return TEXTURE_IFMT_RGB8;
+        case y60::RGBA: return TEXTURE_IFMT_RGBA8;
+        case y60::BGRA: return TEXTURE_IFMT_RGBA8;
+        case y60::GENERIC_RGB:             return TEXTURE_IFMT_COMPRESSED_RGB_ARB;
+        case y60::GENERIC_RGBA:            return TEXTURE_IFMT_COMPRESSED_RGBA_ARB;
+        case y60::GENERIC_ALPHA:           return TEXTURE_IFMT_COMPRESSED_ALPHA_ARB;
+        case y60::GENERIC_LUMINANCE:       return TEXTURE_IFMT_COMPRESSED_LUMINANCE_ARB;
+        case y60::GENERIC_LUMINANCE_ALPHA: return TEXTURE_IFMT_COMPRESSED_LUMINANCE_ALPHA_ARB;
+        case y60::GENERIC_INTENSITY:       return TEXTURE_IFMT_COMPRESSED_INTENSITY_ARB;
+        case y60::S3TC_DXT1:               return TEXTURE_IFMT_COMPRESSED_RGB_S3TC_DXT1_EXT;
+        case y60::S3TC_DXT1A:              return TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+        case y60::S3TC_DXT3:               return TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+        case y60::S3TC_DXT5:               return TEXTURE_IFMT_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+        case y60::RGBA_HALF:               return TEXTURE_IFMT_RGBA_HALF;
+        case y60::RGB_HALF:                return TEXTURE_IFMT_RGB_HALF;
+        default:
+            throw asl::Exception(std::string("Unsupported texture pixelformat ") +
+                    asl::getStringFromEnum(theEncoding, y60::PixelEncodingString), PLUS_FILE_LINE);
+    }
+}
+
 }

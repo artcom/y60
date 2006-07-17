@@ -36,7 +36,9 @@
 #include "Shape.h"
 #include "IncludeFacade.h"
 #include "Geometry.h"
+#include "Scene.h"
 
+#include "Texture.h"
 #include <y60/Image.h>
 #include <y60/Movie.h>
 #include <y60/Capture.h>
@@ -136,6 +138,7 @@ namespace y60 {
     typedef asl::Ptr<JointFacade, dom::ThreadingModel> JointFacadePtr;
 
     inline void registerSceneFacades(dom::FacadeFactoryPtr theFactory) {
+        theFactory->registerPrototype("scene", dom::FacadePtr(new Scene(dom::Node::Prototype)));
         theFactory->registerPrototype("world", dom::FacadePtr(new WorldFacade(dom::Node::Prototype)));
         theFactory->registerPrototype("body", dom::FacadePtr(new Body(dom::Node::Prototype)));
         theFactory->registerPrototype("transform", dom::FacadePtr(new TransformFacade(dom::Node::Prototype)));
@@ -148,6 +151,7 @@ namespace y60 {
         theFactory->registerPrototype("canvas", dom::FacadePtr(new Canvas(dom::Node::Prototype)));
         theFactory->registerPrototype("viewport", dom::FacadePtr(new Viewport(dom::Node::Prototype)));
         theFactory->registerPrototype("overlay", dom::FacadePtr(new Overlay(dom::Node::Prototype)));
+        theFactory->registerPrototype("texture", dom::FacadePtr(new Texture(dom::Node::Prototype)));
         theFactory->registerPrototype("image", dom::FacadePtr(new Image(dom::Node::Prototype)));
         theFactory->registerPrototype("movie", dom::FacadePtr(new Movie(dom::Node::Prototype)));
         theFactory->registerPrototype("capture", dom::FacadePtr(new Capture(dom::Node::Prototype)));

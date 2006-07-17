@@ -25,6 +25,7 @@
 #include "Schema.h"
 #include "SchemaStrings.h"
 
+#include <asl/Time.h>
 #include <asl/Logger.h>
 #include <asl/string_functions.h>
 #include <asl/numeric_functions.h>
@@ -2783,14 +2784,16 @@ Node::getFacade() const {
 void
 Node::nodeValueWrapperPtr(ValuePtr theValue) {
     if (checkValueTypeFits(*theValue)) {
-        if (theValue) {
-            theValue->setSelf(theValue);
-            if (_myValue) {
-                theValue->transferDependenciesFrom(*_myValue);
+        ValuePtr myOldValue = _myValue;
+        _myValue = theValue;
+
+        if (_myValue) {
+            _myValue->setSelf(_myValue);
+            _myValue->setNodePtr(this);
+            if (myOldValue) {
+                _myValue->transferDependenciesFrom(*myOldValue);
             }
         }
-        _myValue = theValue;
-        _myValue->setNodePtr(this);
     } else {
         ensureValue();
         _myValue->setString(theValue->getString());

@@ -25,6 +25,7 @@
 #include <js/jsapi.h>
 #include <js/jscntxt.h>
 #include <js/jsnum.h>
+#include <js/jslock.h>
 
 #include <asl/settings.h>
 #include <asl/string_functions.h>
@@ -102,15 +103,23 @@ namespace jslib {
 
 #define HANDLE_CPP_EXCEPTION\
     catch (asl::Exception & ex) {\
+        JSRuntime * myRuntime=JS_GetRuntime(cx);\
+        JS_ENABLE_GC(myRuntime);\
         JS_ReportError(cx,"%s", asl::as_string(ex).c_str());\
         return JS_FALSE;\
     } catch (std::exception & ex) {\
+        JSRuntime * myRuntime=JS_GetRuntime(cx);\
+        JS_ENABLE_GC(myRuntime);\
         JS_ReportError(cx,"%s", ex.what());\
         return JS_FALSE;\
     } catch (const PLTextException & ex) {\
+        JSRuntime * myRuntime=JS_GetRuntime(cx);\
+        JS_ENABLE_GC(myRuntime);\
         JS_ReportError(cx,"%s", asl::as_string(ex).c_str());\
         return JS_FALSE;\
     } catch (...) {\
+        JSRuntime * myRuntime=JS_GetRuntime(cx);\
+        JS_ENABLE_GC(myRuntime);\
         JS_ReportError(cx,"Unknown Exception caught");\
         return JS_FALSE;\
     }

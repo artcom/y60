@@ -466,10 +466,6 @@ ClusterExtension::updateRenderer(jslib::AbstractRenderWindow * theWindow,
                 myUpdateFlags|=Scene::WORLD;
                 DB(AC_TRACE << " WORLD");
             }
-            if (myImagesElement->nodeVersion() > thePreviousDocumentVersion) {
-                myUpdateFlags|=Scene::IMAGES;
-                DB(AC_TRACE << " IMAGES");
-            }
             if (myShapesElement->nodeVersion() > thePreviousDocumentVersion) {
                 myUpdateFlags|=Scene::SHAPES;
                 DB(AC_TRACE << " SHAPES");

@@ -10,11 +10,14 @@
 
 #include "Image.h"
 #include "ImageLoader.h"
-#include "ITextureManager.h"
+
+
+#include <y60/IScene.h>
+#include <y60/IResourceManager.h>
+
+#include <dom/Field.h>
 
 #include <asl/string_functions.h>
-#include <asl/RunLengthEncoder.h>
-#include <asl/MappedBlock.h>
 #include <asl/PackageManager.h>
 
 #include <asl/subraster.h>
@@ -36,20 +39,16 @@ using namespace std;
 
 namespace y60 {
 
-    const char * I60_MAGIC_NUMBER = "a+c ";
-
     DEFINE_EXCEPTION(UnknownEncodingException, asl::Exception);
+
+    const char * I60_MAGIC_NUMBER = "a+c ";
 
     Image::Image(dom::Node & theNode) :
         Facade(theNode),
         IdTag::Plug(theNode),
         NameTag::Plug(theNode),
-        ImageWidthTag::Plug(theNode),
-        ImageHeightTag::Plug(theNode),
-        ImageDepthTag::Plug(theNode),
         ImageSourceTag::Plug(theNode),
-        ImagePixelFormatTag::Plug(theNode),
-        ImageInternalFormatTag::Plug(theNode),
+        TexturePixelFormatTag::Plug(theNode),
         ImageTypeTag::Plug(theNode),
         ImageMipmapTag::Plug(theNode),
         ImageResizeTag::Plug(theNode),
@@ -59,207 +58,198 @@ namespace y60 {
         ImageTileTag::Plug(theNode),
         ImageColorScaleTag::Plug(theNode),
         ImageColorBiasTag::Plug(theNode),
+        ImageDepthTag::Plug(theNode),
         dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
+        dom::FacadeAttributePlug<TextureIdTag>(this),
+        dom::FacadeAttributePlug<RasterPixelFormatTag>(this),
+        dom::FacadeAttributePlug<ImageInternalFormatTag>(this),
+        dom::FacadeAttributePlug<ImageWidthTag>(this),
+        dom::FacadeAttributePlug<ImageHeightTag>(this),
+        dom::FacadeAttributePlug<LoadCountTag>(this),
         _myRefCount(0),
-        _myTexId(0), _myPixelBufferId(0),
-        _myLoadedFilename(""),
-        _myTextureImageVersion(0),
-        _myTextureWidth(0), _myTextureHeight(0), _myTextureDepth(0)
-    {
-        if (theNode) {
-            _myLoadedFilename      = get<ImageSourceTag>();
-            _myAppliedFilter       = get<ImageFilterTag>();
-            _myAppliedFilterParams = get<ImageFilterParamsTag>();
-            _myAppliedColorBias    = get<ImageColorBiasTag>();
-            _myAppliedColorScale   = get<ImageColorScaleTag>();
-            _myAppliedInternalFormat = get<ImageInternalFormatTag>();
-            _myAppliedPixelFormat  = get<ImagePixelFormatTag>();
-            _myAppliedMipmap       = get<ImageMipmapTag>();
-        }
-    }
+        _myTextureId(0), 
+        _myPixelBufferId(0),
+        _myReuseRaster(false)            
+    {}
 
     Image::~Image() {
-        if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
-            myTextureManager->unbindTexture(this);
+        if (getNode().parentNode()) {
+            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+            myScene->getResourceManager()->unbindTexture(this);
         }
     }
 
-    void
-    Image::setTextureManager(const ITextureManager & theTextureManager) {
-        _myTextureManager = theTextureManager.getSelf();
-    }
-
-    void
-    Image::registerTexture() {
-        AC_TRACE << "registerTexture " << _myLoadedFilename << " refcount: " << _myRefCount;
-        if (_myRefCount == 0) {
-            AC_TRACE << "first use of " << _myLoadedFilename;
-            if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
-                myTextureManager->setPriority(this, TEXTURE_PRIORITY_IN_USE);
-            }
-        }
-        ++_myRefCount;
-    }
-
-    void
-    Image::deregisterTexture() {
-        AC_TRACE << "deregisterTexture " << _myLoadedFilename << " refcount: " << _myRefCount;
-        --_myRefCount;
-        if (_myRefCount==0) {
-            AC_TRACE << "last use of " << _myLoadedFilename;
-            if (asl::Ptr<ITextureManager> myTextureManager = _myTextureManager.lock()) {
-                myTextureManager->setPriority(this, TEXTURE_PRIORITY_IDLE);
-            }
-        }
-    }
-
-    bool
-    Image::usePixelBuffer() const {
-        // not much use for regular images
-        return false;
-    }
-
-    DEFINE_EXCEPTION(BadRasterValue, asl::Exception);
-
-    void
-    Image::createRaster(PixelEncoding theEncoding) {
-        dom::DOMString myRasterName = RasterElementNames[theEncoding];
-
-        if (getNode().childNodes().size()) {
-            getNode().childNodes().clear();
-        }
-        dom::NodePtr myRasterChild = getNode().appendChild(dom::NodePtr(new dom::Element(myRasterName)));
-        dom::NodePtr myTextChild = myRasterChild->appendChild(dom::NodePtr(new dom::Text()));
-    }
-
-    void
-    Image::set(unsigned int theNewWidth,
-               unsigned int theNewHeight,
-               unsigned int theNewDepth,
-               PixelEncoding theEncoding)
+    dom::ResizeableRasterPtr
+    Image::createRaster(unsigned theWidth,
+                        unsigned theHeight,
+                        unsigned theDepth,
+                        PixelEncoding theEncoding) 
     {
-        set<ImageWidthTag>(theNewWidth);
-        set<ImageHeightTag>(theNewHeight);
-        set<ImageDepthTag>(theNewDepth);
-        set<ImagePixelFormatTag>(getStringFromEnum(theEncoding, PixelEncodingString));
+        return setRasterValue(createRasterValue(theEncoding, theWidth, theHeight), theEncoding, theDepth);
+    }
 
-        set<ImageBytesPerPixelTag>(float(getBytesRequired(4, theEncoding))/4.0f);
-        createRaster(theEncoding);
 
-        //update applied members
-        _myAppliedPixelFormat  = get<ImagePixelFormatTag>();
+    dom::ResizeableRasterPtr
+    Image::createRaster(unsigned theWidth,
+                        unsigned theHeight,
+                        unsigned theDepth,
+                        PixelEncoding theEncoding,
+                        const asl::ReadableBlock & thePixels) 
+    {
+        return setRasterValue(createRasterValue(theEncoding, theWidth, theHeight, thePixels), theEncoding, theDepth);
     }
 
     void
-    Image::set(unsigned int theNewWidth,
-               unsigned int theNewHeight,
-               unsigned int theNewDepth,
-               PixelEncoding theEncoding,
-               const asl::ReadableBlock & thePixels)
-    {
-        set(theNewWidth, theNewHeight, theNewDepth, theEncoding);
-        dom::ResizeableRasterPtr myRaster = getRasterPtr();
-        if (!myRaster) {
-            throw BadRasterValue(JUST_FILE_LINE);
-        }
-        myRaster->assign(theNewWidth, theNewHeight * theNewDepth, thePixels);
-    }
+    Image::registerDependenciesRegistrators() {
+        Facade::registerDependenciesRegistrators();
 
-    void
-    Image::blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage, const asl::Vector2i & theTargetPos,
-            const asl::Box2i * theSourceRect)
-    {
-        if (get<ImageDepthTag>() != theSourceImage->get<ImageDepthTag>() ||
-            get<ImagePixelFormatTag>() != theSourceImage->get<ImagePixelFormatTag>()) {
-            // depth and encoding must match
-              throw ImageException(std::string("Image::blitImage(): Sourceimage and subimage must have same depth and encoding."), PLUS_FILE_LINE);
-        }
-        int sourceWidth = theSourceRect ? theSourceRect->getSize()[0] : theSourceImage->get<ImageWidthTag>();
-        int sourceHeight = theSourceRect ? theSourceRect->getSize()[1] : theSourceImage->get<ImageHeightTag>();
-        dom::ResizeableRasterPtr myRaster = getRasterPtr();
-        if (theTargetPos[0] + sourceWidth <= get<ImageWidthTag>() &&
-            theTargetPos[1] + sourceHeight <= get<ImageHeightTag>())
-        {
-            // everything super, subimage fits without resizing the image
-            if (!myRaster) {
-                throw BadRasterValue(JUST_FILE_LINE);
-            }
-            dom::ValuePtr mySourceRaster = theSourceImage->getNode().childNode(0)->childNode(0)->nodeValueWrapperPtr();
-            if ( theSourceRect ) {
-                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
-                                      *mySourceRaster,
-                                      theSourceRect->getMin()[0], theSourceRect->getMin()[1],
-                                      theSourceRect->getSize()[0], theSourceRect->getSize()[1]);
-            } else {
-                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
-                                      *mySourceRaster);
-            }
+        TextureIdTag::Plug::setReconnectFunction(&Image::registerDependenciesForTextureUpdate);
+        ImageInternalFormatTag::Plug::setReconnectFunction(&Image::registerDependenciesForImageFormatUpdate);
+
+        dom::ValuePtr myRasterValue = getRasterValue();
+        if (myRasterValue) {
+            PixelEncoding myEncoding = PixelEncoding(getEnumFromString(
+                getNode().firstChild()->nodeName(), RasterElementNames));
+            set<RasterPixelFormatTag>(getStringFromEnum(myEncoding, PixelEncodingString));
+            set<ImageBytesPerPixelTag>(float(getBytesRequired(4, myEncoding))/4.0f);   
+
+            registerDependenciesForRasterValueUpdate();
         } else {
-            // image must be resized to fit new size
-            //set(theNewWidth, theNewHeight, theNewDepth, theEncoding);
-            //myRaster->assign(theWidth, theHeight * theNewDepth, thePixels);
-              throw ImageException(std::string("Image::blitImage(): Sourceimage does not fit into targetimage."), PLUS_FILE_LINE);
+            // Load the raster value, and register dependency update functions
+            load();            
         }
 
+        ImageWidthTag::Plug::setReconnectFunction(&Image::registerDependenciesForImageWidthUpdate);
+        ImageHeightTag::Plug::setReconnectFunction(&Image::registerDependenciesForImageHeightUpdate);
     }
 
     void
-    Image::set(unsigned int theNewWidth,
-               unsigned int theNewHeight,
-               unsigned int theNewDepth,
-               PixelEncoding theEncoding,
-               dom::ValuePtr theRaster)
-    {
-        set(theNewWidth, theNewHeight, theNewDepth, theEncoding);
-        setRasterValue(theRaster);
-    }
-
-    ImageType
-    Image::getType() const {
-        return ImageType(getEnumFromString(get<ImageTypeTag>(), ImageTypeStrings));
-    }
-
-    PixelEncoding
-    Image::getEncoding() const {
-        return PixelEncoding(getEnumFromString(get<ImagePixelFormatTag>(), PixelEncodingString));
+    Image::registerDependenciesForRasterValueUpdate() {        
+        if (getNode()) {
+            dom::ValuePtr myRasterValue = getRasterValue();
+            myRasterValue->registerPrecursor(ImageSourceTag::Plug::getValuePtr());
+            myRasterValue->registerPrecursor(ImageResizeTag::Plug::getValuePtr());
+            myRasterValue->registerPrecursor(ImageFilterTag::Plug::getValuePtr());
+            myRasterValue->registerPrecursor(ImageFilterParamsTag::Plug::getValuePtr());
+            myRasterValue->setCalculatorFunction(dynamic_cast_Ptr<Image>(getSelf()), 
+                &Image::load);
+            myRasterValue->setClean();
+        }
     }
 
     void
-    Image::load(PackageManager & thePackageManager) {
-        loadFromFile(thePackageManager);
+    Image::registerDependenciesForTextureUpdate() {        
+        if (getNode()) {
+            // The rastervalue dependency has to be registered first, because getRasterValue()
+            // might trigger an image reload, which clears the raster value node and 
+            // destroys the dependency.
+            TextureIdTag::Plug::dependsOn(getRasterValue());
+            TextureIdTag::Plug::dependsOn<ImageColorBiasTag>(*this);  
+            TextureIdTag::Plug::dependsOn<ImageColorScaleTag>(*this); 
+            TextureIdTag::Plug::dependsOn<ImageTileTag>(*this);
+            TextureIdTag::Plug::dependsOn<ImageMipmapTag>(*this);
+            TextureIdTag::Plug::dependsOn<ImageInternalFormatTag>(*this);
+            TextureIdTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Image>(getSelf()), &Image::uploadTexture);
+        }
     }
 
     void
-    Image::load(const std::string & theImagePath) {
-        PackageManager myPackageManager;
-        myPackageManager.add(theImagePath);
-        loadFromFile(myPackageManager);
+    Image::registerDependenciesForImageWidthUpdate() {        
+        if (getNode()) {
+            ImageWidthTag::Plug::dependsOn(getRasterValue());
+            ImageWidthTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Image>(getSelf()), &Image::calculateWidth);
+        }
     }
 
     void
-    Image::loadFromFile(asl::PackageManager & thePackageManager) {
-        _myLoadedFilename      = get<ImageSourceTag>();
-        _myAppliedFilter       = get<ImageFilterTag>();
-        _myAppliedFilterParams = get<ImageFilterParamsTag>();
-        _myAppliedColorBias    = get<ImageColorBiasTag>();
-        _myAppliedColorScale   = get<ImageColorScaleTag>();
-        _myAppliedPixelFormat  = get<ImagePixelFormatTag>();
-        _myAppliedInternalFormat = get<ImageInternalFormatTag>();
-        _myAppliedMipmap       = get<ImageMipmapTag>();
+    Image::registerDependenciesForImageHeightUpdate() {        
+        if (getNode()) {
+            ImageHeightTag::Plug::dependsOn(getRasterValue());
+            ImageHeightTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Image>(getSelf()), &Image::calculateHeight);
+        }
+    }
 
+    void
+    Image::registerDependenciesForImageFormatUpdate() {        
+        if (getNode()) {
+            ImageInternalFormatTag::Plug::dependsOn<ImageColorBiasTag>(*this);
+            ImageInternalFormatTag::Plug::dependsOn<ImageColorScaleTag>(*this);
+            ImageInternalFormatTag::Plug::dependsOn<TexturePixelFormatTag>(*this);
+            ImageInternalFormatTag::Plug::dependsOn<RasterPixelFormatTag>(*this);
+            ImageInternalFormatTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Image>(getSelf()), &Image::calculateInternalPixelFormat);
+        }
+    }
+
+
+    void 
+    Image::uploadTexture() {
+        IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+        if (_myReuseRaster) { 
+            myScene->getResourceManager()->updateTextureData(dynamic_cast_Ptr<Image>(getSelf()));
+        } else {
+            if (_myTextureId) {
+                // In order to prevent a texture leak, we need to unbind the texture before setupImage()
+                myScene->getResourceManager()->unbindTexture(this);
+            }
+            _myTextureId = myScene->getResourceManager()->setupTexture(dynamic_cast_Ptr<Image>(getSelf()));
+            set<TextureIdTag>(_myTextureId);
+            _myReuseRaster = true;
+        }
+    }
+
+    void
+    Image::calculateWidth() {
+        set<ImageWidthTag>(getRasterPtr()->width());
+    }
+
+    void
+    Image::calculateHeight() {
+        set<ImageHeightTag>(getRasterPtr()->height());
+    }
+
+    void 
+    Image::calculateInternalPixelFormat() {
+        PixelEncoding myRasterFormat = getRasterEncoding();
+        const std::string & myTextureFormat = get<TexturePixelFormatTag>();     
+        bool myAlphaChannelRequired = !(almostEqual(get<ImageColorScaleTag>()[3], 1) && 
+            almostEqual(get<ImageColorBiasTag>()[3], 0));
+        if (myTextureFormat.size()) {
+            // If there is an texture pixel format set from outside, we use it
+            set<ImageInternalFormatTag>(myTextureFormat);
+        } else if ((myRasterFormat == y60::RGB || myRasterFormat == y60::BGR) && myAlphaChannelRequired) {
+            // If a change in colorscale introduces an alpha channel ensure
+            // that internal format has alpha
+            set<ImageInternalFormatTag>(getStringFromEnum(TEXTURE_IFMT_RGBA8, TextureInternalFormatStrings));
+        } else {
+            TextureInternalFormat myInternalFormat = getInternalPixelFormat(myRasterFormat);
+            set<ImageInternalFormatTag>(getStringFromEnum(myInternalFormat, TextureInternalFormatStrings));
+        }        
+    }
+
+    void
+    Image::load() {
+        std::string mySrcAttrib = get<ImageSourceTag>();
         if (get<ImageSourceTag>() == "") {
-            //throw ImageException(string("Image ") + get<NameTag>() + " has empty source attribute", PLUS_FILE_LINE);
-            //TODO: we need clarify the image loading concept here:
             AC_INFO << "Image '" << get<NameTag>() << " has not been loaded because of empty source attribute";
+            dom::ValuePtr myRasterValue = getRasterValue();
+            if (!myRasterValue) {
+                // Create default raster
+                createRaster(1,1,1,GRAY);
+            }
             return;
         }
 
         unsigned myDepth = get<ImageDepthTag>();
-        ImageLoader myImageLoader(get<ImageSourceTag>(), &thePackageManager, _myTextureManager.lock(), myDepth);
+        ImageLoader myImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(), 
+            ITextureManagerPtr(0), myDepth);
 
         string myFilter = get<ImageFilterTag>();
         if (!myFilter.empty()) {
-            AC_DEBUG << "Image::loadFromFile() filter=" << myFilter;
+            AC_DEBUG << "Image::load() filter=" << myFilter;
             VectorOfFloat myFilterParams = get<ImageFilterParamsTag>();
             myImageLoader.applyCustomFilter(myFilter, myFilterParams);
         }
@@ -279,11 +269,138 @@ namespace y60 {
             myImageLoader.removeUnusedAlpha();
         }
 
-        set(myImageLoader.GetWidth(),
-            myImageLoader.GetHeight()/myDepth, myDepth,
-            myImageLoader.getEncoding(),
-            myImageLoader.getData());
-        set<ImageMatrixTag>(myImageLoader.getImageMatrix());
+        set<ImageMatrixTag>(myImageLoader.getImageMatrix());    
+        setRasterValue(myImageLoader.getData(), myImageLoader.getEncoding(), myDepth);
+        set<LoadCountTag>(get<LoadCountTag>() + 1);
+    }
+
+    dom::ResizeableRasterPtr
+    Image::setRasterValue(dom::ValuePtr theRaster, PixelEncoding theEncoding, unsigned theDepth) {
+        // Remove existing raster
+        if (getNode().childNodes().size()) {
+            getNode().childNodes().clear();
+        }
+
+        // Setup raster attributes
+        set<ImageDepthTag>(theDepth);
+        set<RasterPixelFormatTag>(getStringFromEnum(theEncoding, PixelEncodingString));
+        set<ImageBytesPerPixelTag>(float(getBytesRequired(4, theEncoding))/4.0f);   
+
+        // Setup raster nodes
+        dom::DOMString myRasterName = RasterElementNames[theEncoding];
+        dom::NodePtr myRasterChild = getNode().appendChild(dom::NodePtr(new dom::Element(myRasterName)));
+        dom::NodePtr myTextChild = myRasterChild->appendChild(dom::NodePtr(new dom::Text()));
+
+        myTextChild->nodeValueWrapperPtr(theRaster);
+
+        // We have to reconnect the dependency graph, because the value has changed
+        registerDependenciesForRasterValueUpdate();        
+
+        _myReuseRaster = false;
+        return dynamic_cast_Ptr<dom::ResizeableRaster>(theRaster);
+    }
+
+    ImageType
+    Image::getType() const {
+        return ImageType(getEnumFromString(get<ImageTypeTag>(), ImageTypeStrings));
+    }
+
+    PixelEncoding
+    Image::getRasterEncoding() const {
+        return PixelEncoding(getEnumFromString(get<RasterPixelFormatTag>(), PixelEncodingString));
+    }
+
+    TextureInternalFormat
+    Image::getInternalEncoding() const {
+        return TextureInternalFormat(getEnumFromString(get<ImageInternalFormatTag>(), TextureInternalFormatStrings));
+    }
+
+    void 
+    Image::triggerUpload() {
+        _myReuseRaster = false;
+        TextureIdTag::Plug::getValuePtr()->setDirty();
+    }
+
+    bool 
+    Image::isUploaded() const {
+        return _myReuseRaster;
+    }
+
+    void 
+    Image::removeTextureFromResourceManager() {
+        if (_myTextureId) {
+            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+            myScene->getResourceManager()->unbindTexture(this);
+            unbind();
+        }
+    }
+
+    void 
+    Image::unbind() {
+        _myTextureId = 0;
+        TextureIdTag::Plug::getValuePtr()->setDirty();
+    }
+
+    void
+    Image::registerTexture() {
+        if (_myRefCount == 0) {
+            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+            myScene->getResourceManager()->setTexturePriority(this, TEXTURE_PRIORITY_IN_USE);
+        }
+        ++_myRefCount;
+    }
+
+    void
+    Image::deregisterTexture() {
+        --_myRefCount;
+        if (_myRefCount==0) {
+            if (getNode().parentNode() && getNode().parentNode()->parentNode()) {
+                IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+                myScene->getResourceManager()->setTexturePriority(this, TEXTURE_PRIORITY_IDLE);
+            }
+        }
+    }
+
+    bool
+    Image::usePixelBuffer() const {
+        // not much use for regular images
+        return false;
+    }
+
+    void
+    Image::blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage, const asl::Vector2i & theTargetPos,
+            const asl::Box2i * theSourceRect)
+    {
+        if (get<ImageDepthTag>() != theSourceImage->get<ImageDepthTag>() ||
+            get<RasterPixelFormatTag>() != theSourceImage->get<RasterPixelFormatTag>()) {
+            // depth and encoding must match
+              throw ImageException(std::string("Image::blitImage(): Sourceimage and subimage must have same depth and encoding."), PLUS_FILE_LINE);
+        }
+        int sourceWidth = theSourceRect ? theSourceRect->getSize()[0] : theSourceImage->get<ImageWidthTag>();
+        int sourceHeight = theSourceRect ? theSourceRect->getSize()[1] : theSourceImage->get<ImageHeightTag>();
+        dom::ResizeableRasterPtr myRaster = getRasterPtr();
+        if (theTargetPos[0] + sourceWidth <= get<ImageWidthTag>() &&
+            theTargetPos[1] + sourceHeight <= get<ImageHeightTag>())
+        {
+            // everything super, subimage fits without resizing the image
+            if (!myRaster) {
+                throw asl::Exception("Bad raster value", PLUS_FILE_LINE);
+            }
+            dom::ValuePtr mySourceRaster = theSourceImage->getNode().childNode(0)->childNode(0)->nodeValueWrapperPtr();
+            if ( theSourceRect ) {
+                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
+                                      *mySourceRaster,
+                                      theSourceRect->getMin()[0], theSourceRect->getMin()[1],
+                                      theSourceRect->getSize()[0], theSourceRect->getSize()[1]);
+            } else {
+                myRaster->pasteRaster(asl::AC_SIZE_TYPE(theTargetPos[0]), asl::AC_SIZE_TYPE(theTargetPos[1]),
+                                      *mySourceRaster);
+            }
+        } else {
+            // image must be resized to fit new size
+            throw ImageException(std::string("Image::blitImage(): Sourceimage does not fit into targetimage."), PLUS_FILE_LINE);
+        }
+
     }
 
     void
@@ -291,14 +408,13 @@ namespace y60 {
         PixelEncoding mySourceEncoding;
         mapFormatToPixelEncoding(theBitmap.GetPixelFormat(), mySourceEncoding);
 
-        if (getEncoding() != mySourceEncoding) {
+        if (getRasterEncoding() != mySourceEncoding) {
             throw ImageException(std::string("Image::convertFromPLBmp(): Encoding do not match: destination : ") +
-                getStringFromEnum(getEncoding(), PixelEncodingString) + " source : " + getStringFromEnum(mySourceEncoding, PixelEncodingString), PLUS_FILE_LINE);
+                getStringFromEnum(getRasterEncoding(), PixelEncodingString) + " source : " + 
+                getStringFromEnum(mySourceEncoding, PixelEncodingString), PLUS_FILE_LINE);
 
         }
         getRasterPtr()->resize(theBitmap.GetWidth(), theBitmap.GetHeight());
-        set<ImageWidthTag>(theBitmap.GetWidth());
-        set<ImageHeightTag>(theBitmap.GetHeight());
         PLBYTE ** mySrcLines = theBitmap.GetLineArray();
 
         unsigned myFaceHeight = theBitmap.GetHeight();
@@ -309,21 +425,17 @@ namespace y60 {
         for (int y = 0; y < myFaceHeight; ++y) {
             memcpy(myData + myBytesPerLine *y, mySrcLines[y], myLineSize);
         }
-
-   }
+    }
 
     void
     Image::convertToPLBmp(PLAnyBmp & theBitmap) {
         int myWidth = get<ImageWidthTag>();
         int myHeight = get<ImageHeightTag>();
-        // save 3d textures as one long stripe
-        if (get<ImageDepthTag>() > 1) {
-            myHeight *= get<ImageDepthTag>();
-        }
+
         PLPixelFormat myPixelFormat;
-        if (!mapPixelEncodingToFormat(getEncoding(), myPixelFormat)) {
+        if (!mapPixelEncodingToFormat(getRasterEncoding(), myPixelFormat)) {
               throw ImageException(std::string("Image::convertToPLBmp(): Unsupported Encoding: ") +
-                      asl::as_string(getEncoding()), PLUS_FILE_LINE);
+                      asl::as_string(getRasterEncoding()), PLUS_FILE_LINE);
         }
         theBitmap.Create(myWidth, myHeight, myPixelFormat, NULL, 0, PLPoint(72, 72));
         PLBYTE **myLineArray = theBitmap.GetLineArray();
@@ -409,131 +521,6 @@ namespace y60 {
 
         PLPNGEncoder myPNGEncoder;
         myPNGEncoder.MakeFileFromBmp(Path(theImagePath, UTF8).toLocale().c_str(), &myBmp);
-    }
-
-    void Image::storeTextureVersion()
-    {
-        _myTextureImageVersion = getValueVersion();
-        _myTextureWidth = get<ImageWidthTag>();
-        _myTextureHeight = get<ImageHeightTag>();
-        _myTextureDepth = get<ImageDepthTag>();
-        _myTexturePixelFormat = get<ImagePixelFormatTag>();
-        _myAppliedPixelFormat = get<ImagePixelFormatTag>(); // WTF?
-        _myAppliedInternalFormat = get<ImageInternalFormatTag>();
-        _myAppliedColorBias    = get<ImageColorBiasTag>();
-        _myAppliedColorScale   = get<ImageColorScaleTag>();
-        _myAppliedMipmap   = get<ImageMipmapTag>();
-    }
-
-    /// Reload *from file* required?
-    bool
-    Image::reloadRequired() const {
-
-        bool myReloadRequired = !getRasterValue() ||
-            !getRasterPtr() || !getRasterPtr()->pixels().size() ||
-            _myLoadedFilename != get<ImageSourceTag>() ||
-            _myAppliedFilter != get<ImageFilterTag>() ||
-            _myAppliedFilterParams != get<ImageFilterParamsTag>();
-
-        /*
-         * want to check what condition the condition is in ?
-         *  Ask theDude or try this:
-         */
-#if 0
-if (myReloadRequired) {
-
-        bool b1 = getRasterValue();
-        bool b2 = getRasterPtr();
-        bool b3 = getRasterPtr() && getRasterPtr()->pixels().size();
-        const string s1 = get<ImageSourceTag>();
-        bool b4 = _myLoadedFilename != get<ImageSourceTag>();
-        bool b5 = _myAppliedFilterParams != get<ImageFilterParamsTag>();
-        bool b6 = _myAppliedColorScale != get<ImageColorScaleTag>();
-        bool b7 =_myAppliedColorBias != get<ImageColorBiasTag>();
-        bool b8 =getGraphicsId() == 0;
-        bool b9 = _myAppliedPixelFormat != get<ImagePixelFormatTag>();
-        bool b10= _myAppliedInternalFormat != get<ImageInternalFormatTag>();
-
-
-        AC_PRINT
-<< "b1 = " << b1 << " "
-<< "b2 = " << b2 << " "
-<< "b3 = " << b3 << " "
-<< "b4 = " << b4 << " "
-<< "b5 = " << b5 << " "
-<< "b6 = " << b6 << " "
-<< "b7 = " << b7 << " "
-<< "b8 = " << b8 << " "
-<< "b9 = " << b9 << " "
-<< "b10 = " << b10 << " "
-<< "s1 = " << s1;
-
-}
-#endif
-
-        return myReloadRequired;
-    }
-
-    /// Texture upload required?
-    bool
-    Image::textureUploadRequired() const {
-
-        // if colorscale introduces an alpha channel ensure
-        // that internal format has alpha
-#if 1
-        const std::string & myExternalFormat = get<ImagePixelFormatTag>();
-        if ((_myAppliedColorScale != get<ImageColorScaleTag>()) &&
-            (myExternalFormat == "RGB" || myExternalFormat == "BGR")) {
-            const asl::Vector4f & myColorScale = get<ImageColorScaleTag>();
-            if (!asl::almostEqual(myColorScale[3], 1.0f)) {
-                const_cast<Image*>(this)->set<ImageInternalFormatTag>("RGBA");
-                AC_TRACE << "Using internalFormat '" << get<ImageInternalFormatTag>() << "'";
-            }
-        }
-#else
-        if (_myAppliedColorScale != get<ImageColorScaleTag>() ||
-            _myAppliedColorBias != get<ImageColorBiasTag>()) {
-
-            const asl::Vector4f & myColorScale = get<ImageColorScaleTag>();
-            if (!asl::almostEqual(myColorScale[3], 1.0f)) {
-                const std::string & myExternalFormat = get<ImagePixelFormatTag>();
-                if (myExternalFormat == "RGB" || myExternalFormat == "BGR") {
-                    const_cast<Image*>(this)->set<ImageInternalFormatTag>("RGBA");
-                    AC_TRACE << "Using internalFormat '" << get<ImageInternalFormatTag>() << "'";
-                }
-            }
-        }
-#endif
-
-        return getGraphicsId() == 0 ||
-            _myAppliedColorScale != get<ImageColorScaleTag>() ||
-            _myAppliedColorBias != get<ImageColorBiasTag>() ||
-            _myAppliedPixelFormat != get<ImagePixelFormatTag>() ||
-            !canReuseTexture();
-    }
-
-    /// Applied texture parameters are compatible with DOM values.
-    bool
-    Image::canReuseTexture() const {
-        bool myCanReuseFlag = (getGraphicsId() != 0 &&
-            _myTextureWidth == get<ImageWidthTag>() &&
-            _myTextureHeight == get<ImageHeightTag>() &&
-            _myTextureDepth == get<ImageDepthTag>() &&
-            _myTexturePixelFormat == get<ImagePixelFormatTag>() &&
-            _myAppliedInternalFormat == get<ImageInternalFormatTag>() &&
-            _myAppliedMipmap == get<ImageMipmapTag>());
-#if 0
-        if (!myCanReuseFlag) {
-            AC_PRINT << "Graphics ID " << getGraphicsId();
-            AC_PRINT << "Width: Texture " << _myTextureWidth << ", Image " << get<ImageWidthTag>();
-            AC_PRINT << "Height: Texture " << _myTextureHeight << ", Image " << get<ImageHeightTag>();
-            AC_PRINT << "Depth: Texture " << _myTextureDepth << ", Image " << get<ImageDepthTag>();
-            AC_PRINT << "PixelFormat: Texture " << _myTexturePixelFormat << ", Image " << get<ImagePixelFormatTag>();
-            AC_PRINT << "InternalFormat: Applied " << _myAppliedInternalFormat << ", Image " << get<ImageInternalFormatTag>();
-            AC_PRINT << "MipMap: Applied " << _myAppliedMipmap << ", Image " << get<ImageMipmapTag>();
-        }
-#endif
-        return myCanReuseFlag;
     }
 }
 

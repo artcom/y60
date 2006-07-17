@@ -20,6 +20,8 @@
 #ifndef _ac_scene_ResourceManager_h_
 #define _ac_scene_ResourceManager_h_
 
+#include <y60/IResourceManager.h>
+
 #include <asl/Ptr.h>
 #include <y60/Image.h>
 #include "IShader.h"
@@ -35,31 +37,11 @@ class TextureManager;
  *
  * @ingroup Y60scene
  */ 
-class ResourceManager {
+class ResourceManager : public IResourceManager{
     public:
-        virtual int getMaxTextureSize(int theDimensions) const = 0;
-        virtual void updateTextureData(ImagePtr theImage) = 0;
-        virtual void rebindTexture(ImagePtr theImage) = 0;
-
-        /**
-         * Sets the Priority of the Texture theImage to thePriority. The Texture priority
-         * is used to determine which texture should be removed from the graphics hardware
-         * and which one should be there.
-         * A priority of TEXTURE_PRIORITY_IDLE means that the texture can be safely removed
-         * while a priority of TEXTURE_PRIORITY_IN_USE means it is currently in use.
-         *
-         * @param theImage Image to set the priority for
-         * @param thePriority priority to set.
-         */
-        virtual void setTexturePriority(Image * theImage, float thePriority) = 0;
-        /**
-         * unbinds the Texture given in theImage from the graphics hardware.
-         * @param theImage texture to unbind.
-         */
-        virtual void unbindTexture(Image * theImage) = 0;
-        virtual unsigned setupTexture(ImagePtr theImage) = 0;
-
         virtual IShaderLibraryPtr getShaderLibrary() const { return IShaderLibraryPtr(0); }
+        virtual bool hasGLContext() const { return _myHaveValidGLContextFlag;}
+        virtual void validateGLContext(bool theFlag) { _myHaveValidGLContextFlag = theFlag;}
         virtual void loadShaderLibrary(const std::string & theShaderLibraryFile) {};
 
         VertexDataFactory1f & getVertexDataFactory1f() { return _myVertexDataFactory1f; }
@@ -72,6 +54,8 @@ class ResourceManager {
         VertexDataFactory3f _myVertexDataFactory3f;
         VertexDataFactory4f _myVertexDataFactory4f;        
     private:
+        bool _myHaveValidGLContextFlag;
+
 };
 
 typedef asl::Ptr<ResourceManager> ResourceManagerPtr;

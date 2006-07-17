@@ -20,7 +20,7 @@
 */
 
 #include "ImageLoader.h"
-
+#include <asl/PackageManager.h>
 #include <asl/string_functions.h>
 #include <asl/UnitTest.h>
 #include <iostream>
@@ -50,11 +50,11 @@ class ImageLoaderTest : public UnitTest {
             PLAnyBmp myReferenceBmp;
             myDecoder.MakeBmpFromFile("../../testfiles/testbild00.rgb", &myReferenceBmp, PLPixelFormat::X8R8G8B8);
 
-            ImageLoader myAdapter("../../testfiles/testbild00.rgb",0,ITextureManagerPtr(0),1);
+            ImageLoader myAdapter("../../testfiles/testbild00.rgb");
 
             ENSURE(myReferenceBmp == myAdapter);
 
-            ImageLoader my3DAdapter("../../testfiles/test3dtexture.jpg", 0, ITextureManagerPtr(0), 8);
+            ImageLoader my3DAdapter("../../testfiles/test3dtexture.jpg", PackageManagerPtr(0), ITextureManagerPtr(0), 8);
             my3DAdapter.ensurePowerOfTwo(IMAGE_RESIZE_SCALE, SINGLE, 8);
             SUCCESS("Loaded 3D-Texture image");
         }

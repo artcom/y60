@@ -49,7 +49,7 @@ void OffscreenBuffer::deactivate(ImagePtr theImage, bool theCopyToImageFlag) {
 #ifdef GL_EXT_framebuffer_object
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 #endif
-        glBindTexture(GL_TEXTURE_2D, theImage->getGraphicsId());
+        glBindTexture(GL_TEXTURE_2D, theImage->ensureTextureId());
 #ifdef GL_EXT_framebuffer_object
         if (glGenerateMipmapEXT && theImage->get<ImageMipmapTag>()) {
             AC_TRACE << "OffscreenBuffer::deactivate: generating mipmap levels";
@@ -81,20 +81,11 @@ void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
     }
 #endif
  
-    PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(theImage->getEncoding());
+    PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(theImage->getRasterEncoding());
+    myPixelEncodingInfo.internalformat = asGLTextureInternalFormat(theImage->getInternalEncoding());
 
-    AC_DEBUG << "RGBA: " << (myPixelEncodingInfo.externalformat==GL_RGBA);
-    AC_DEBUG << "RGB:  " << (myPixelEncodingInfo.externalformat==GL_RGB);
-    AC_DEBUG << "DEPTH:" << (myPixelEncodingInfo.externalformat==GL_DEPTH_COMPONENT);
-    AC_DEBUG << "pixeltype is GLFLOAT: " << (myPixelEncodingInfo.pixeltype==GL_FLOAT);
-    AC_DEBUG << "bytes-per-pixel=" << myPixelEncodingInfo.bytesPerPixel;
-    
-    // If the target image node does not contain data, yet, create the neccessary raster.
-    if (!theImage->getRasterPtr()) {
-        theImage->createRaster(theImage->getEncoding());
-        dom::ResizeableRasterPtr myRaster = theImage->getRasterPtr();
-        myRaster->resize(theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>());
-    }
+    AC_DEBUG << "pixelformat" << theImage->get<RasterPixelFormatTag>();
+    AC_DEBUG << "size" << theImage->get<ImageWidthTag>() << " " << theImage->get<ImageHeightTag>();
 
     glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
@@ -138,7 +129,7 @@ void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
 }
 
 void OffscreenBuffer::copyFrameBufferToTexture(ImagePtr theImage) {
-    glBindTexture (GL_TEXTURE_2D, theImage->getGraphicsId() );
+    glBindTexture (GL_TEXTURE_2D, theImage->ensureTextureId() );
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0 /*MIPMAP level*/, 0, 0,
             0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>() );
     glBindTexture (GL_TEXTURE_2D, 0);
@@ -152,7 +143,7 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage) {
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _myFrameBufferObjectId);
 
-        _myColorBufferId = theImage->getGraphicsId();
+        _myColorBufferId = theImage->ensureTextureId();
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
             GL_TEXTURE_2D, _myColorBufferId, 0);
         
@@ -171,8 +162,8 @@ void OffscreenBuffer::bindOffscreenFrameBuffer(ImagePtr theImage) {
 
         // If the target image changed between two frames the framebuffer texture needs
         // to be bound again
-        if (theImage->getGraphicsId() != _myColorBufferId) {
-            _myColorBufferId = theImage->getGraphicsId();
+        if (theImage->ensureTextureId() != _myColorBufferId) {
+            _myColorBufferId = theImage->ensureTextureId(); 
             glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
                 GL_TEXTURE_2D, _myColorBufferId, 0);            
         }

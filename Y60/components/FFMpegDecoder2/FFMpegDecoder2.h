@@ -177,7 +177,7 @@ namespace y60 {
         double _myFrameRate;
         int _myFrameWidth;
         int _myFrameHeight;
-        PixelEncoding _myPixelEncoding;
+        unsigned  _myBytesPerPixel;
     };
     typedef asl::Ptr<FFMpegDecoder2> FFMpegDecoder2Ptr;
 }

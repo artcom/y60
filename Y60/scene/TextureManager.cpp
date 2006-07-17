@@ -8,7 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-
 #include "TextureManager.h"
 
 #include <y60/Image.h>
@@ -65,9 +64,12 @@ namespace y60 {
         _mySelf = asl::WeakPtr<ITextureManager>(theSelf);
     }
 
+    void 
+    TextureManager::validateGLContext(bool theFlag) {
+        _myResourceManager->validateGLContext(theFlag);
+    }
     void
     TextureManager::unbindTextures() {
-        AC_TRACE << "TextureManager::unbindTextures()" << endl;
         unsigned myImageCount = _myImageList->childNodesLength();
         for (unsigned i = 0; i < myImageCount; ++i) {
             dom::NodePtr myImageNode = _myImageList->childNode(i);
@@ -75,56 +77,6 @@ namespace y60 {
                 ImagePtr myImage = myImageNode->getFacade<Image>();
                 unbindTexture(&(*myImage));
             }
-        }
-    }
-
-    void
-    TextureManager::update() {
-        unsigned myImageCount = _myImageList->childNodesLength();
-        AC_TRACE << "TextureManager::update() on " << myImageCount << " images" << endl;
-        for (unsigned i = 0; i < myImageCount; ++i) {
-            dom::NodePtr myImageNode = _myImageList->childNode(i);
-            if (myImageNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                ImagePtr myImage = myImageNode->getFacade<Image>();
-                AC_TRACE << "TextureManager::update() checking image '" << myImage->get<NameTag>() << "'" << endl;
-                myImage->setTextureManager(*this);
-
-                bool reloadRequired = myImage->reloadRequired();
-                if (reloadRequired) {
-                    myImage->load(*_myPackageManager);
-                }
-
-                bool textureUploadRequired = myImage->textureUploadRequired();
-                bool isNewerThanTexture = myImage->isImageNewerThanTexture();
-                AC_DEBUG << myImage->get<NameTag>() << " reload=" << reloadRequired << " upload=" << textureUploadRequired <<
-                         " newer=" << isNewerThanTexture;
-                //AC_PRINT << " tUR=" << myImage->textureUploadRequired() << " iINTT=" << myImage->isImageNewerThanTexture();
-
-                if (reloadRequired || textureUploadRequired || isNewerThanTexture) {
-                    uploadTexture(myImage);
-                } else {
-                    AC_TRACE << "Texture not uploaded.";
-                }
-            }
-        }
-    }
-
-    void
-    TextureManager::uploadTexture(ImagePtr theImage) {
-        //MAKE_SCOPE_TIMER(TextureManager_uploadTexture);
-        AC_TRACE << "TextureManager::uploadTexture('" << theImage->get<NameTag>() << "')";
-        if (theImage->canReuseTexture()) {
-            AC_TRACE << "Reusing texture, just uploading image data.";
-            MAKE_SCOPE_TIMER(TextureManager_updateImageData);
-            updateImageData(theImage);
-        } else {
-            AC_TRACE << "Replacing texture.";
-            MAKE_SCOPE_TIMER(TextureManager_replacingTexture);
-            if (theImage->getGraphicsId()) {
-                // In order to prevent a texture leak, we need to unbind the texture before setupImage()
-                unbindTexture(&*theImage);
-            }
-            setupImage(theImage);
         }
     }
 
@@ -146,11 +98,11 @@ namespace y60 {
         if (theMovie->reloadRequired()) {
             MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame_movieLoad);
             try {
-                theMovie->load(_myPackageManager->getSearchPath());
+                theMovie->load(AppPackageManager::get().getPtr()->getSearchPath());
             } catch (asl::Exception & ex) {
                 ex.appendWhat(string("while loading movie src='") +
                         theMovie->get<ImageSourceTag>() + "', "+
-                        "searching in '"+_myPackageManager->getSearchPath()+"'");
+                        "searching in '"+AppPackageManager::get().getPtr()->getSearchPath()+"'");
                 throw ex;
             }
         }
@@ -163,19 +115,6 @@ namespace y60 {
                 theMovie->readFrame(theCurrentTime);
             }
         }
-
-        // load/subload texture
-        {
-            MAKE_SCOPE_TIMER(TextureManager_loadMovieFrame_updateImage);
-            ImagePtr myMovieImage = dynamic_cast_Ptr<Image>(theMovie);
-            if (theMovie->getGraphicsId()) {
-                if (theMovie->isImageNewerThanTexture()) {
-                    updateImageData(myMovieImage);
-                }
-            } else {
-                setupImage(myMovieImage);
-            }
-        }
     }
 
     void
@@ -185,34 +124,24 @@ namespace y60 {
         // First time load, or source has changed
         if (theCapture->reloadRequired()) {
             try {
-                theCapture->load(_myPackageManager->getSearchPath());
+                theCapture->load(AppPackageManager::get().getPtr()->getSearchPath());
             } catch (asl::Exception & ex) {
                 ex.appendWhat(string("while loading movie src='") +
                         theCapture->get<ImageSourceTag>() + "', "+
-                        "searching in '"+_myPackageManager->getSearchPath()+"'");
+                        "searching in '"+AppPackageManager::get().getPtr()->getSearchPath()+"'");
                 throw ex;
             }
         }
         theCapture->readFrame();
-
-        // load/subload texture
-        ImagePtr myCaptureImage = dynamic_cast_Ptr<Image>(theCapture);
-        if (theCapture->getGraphicsId()) {
-            if (theCapture->isImageNewerThanTexture()) {
-                updateImageData(myCaptureImage);
-            }
-        } else {
-            setupImage(myCaptureImage);
-        }
     }
 
     void
-    TextureManager::setupTextures() {
+    TextureManager::reloadTextures() {
         unsigned myImageCount = _myImageList->childNodesLength();
         for (unsigned i = 0; i < myImageCount; ++i) {
             dom::NodePtr myImageNode = _myImageList->childNode(i);
             if (myImageNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                setupImage(myImageNode->getFacade<Image>());
+                myImageNode->getFacade<Image>()->triggerUpload();
             }
         }
     }
@@ -229,6 +158,7 @@ namespace y60 {
 
     ImagePtr
     TextureManager::findImage(const std::string & theImageId) const {
+
         dom::NodePtr myImageNode = _myImageList->getElementById(theImageId);
         if (myImageNode) {
              return myImageNode->getFacade<Image>();
@@ -242,11 +172,6 @@ namespace y60 {
         _myResourceManager->updateTextureData(theImage);
     }
 
-    void TextureManager::rebind(ImagePtr theImage) {
-        // Delegate to my ResourceManager
-        _myResourceManager->rebindTexture(theImage);
-    }
-
     void TextureManager::setPriority(Image * theImage, float thePriority) {
         // Delegate to my ResourceManager
         _myResourceManager->setTexturePriority(theImage, thePriority);
@@ -254,8 +179,9 @@ namespace y60 {
 
     void TextureManager::unbindTexture(Image * theImage) {
         // Delegate to my ResourceManager
-        AC_TRACE << "Unbinding Texture " << theImage->getGraphicsId();
-        _myResourceManager->unbindTexture(theImage);
+        AC_TRACE << "Unbinding Texture " << theImage->get<TextureIdTag>();
+        theImage->removeTextureFromResourceManager();
+        //_myResourceManager->unbindTexture(theImage);
     }
 
     asl::Ptr<TextureManager> TextureManager::create() {

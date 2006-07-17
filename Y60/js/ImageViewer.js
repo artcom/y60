@@ -93,79 +93,84 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
     Base.onKey = self.onKey;
     self.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
-        if (theCtrlFlag) {
-            Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
-            return;
-        }
-
-        if (theShiftFlag) {
-            theKey = theKey.toUpperCase();
-        }
-        if (theState) {
-            switch (theKey) {
-                case "space":
-                    _myTextOverlay.visible = !_myTextOverlay.visible;
-                    break;
-                case "right":
-                    nextFile();
-                    break;
-                case "left":
-                    previousFile();
-                    break;
-                case "up":
-                    setVolume(true);
-                    break;
-                case "down":
-                    setVolume(false);
-                    break;
-                case "[+]":
-                    if (theShiftFlag) {
-                        if (_myMovieNode && _myMovieOverlay.visible) {
-                            _myMovieNode.avdelay += 0.01;
-                        }
-                    } else {
-                        setPlaySpeed(true);
-                    }
-                    break;
-                case "[-]":
-                    if (theShiftFlag) {
-                        if (_myMovieNode && _myMovieOverlay.visible) {
-                            _myMovieNode.avdelay -= 0.01;
-                        }
-                    } else {
-                        setPlaySpeed(false);
-                    }
-                    break;
-                case "p":
-                case "s":
-                    setPlayMode(theKey);
-                    break;
-                case "f":
-                    _myFullSizeMode = !_myFullSizeMode;
-                    updateFileView();
-                    break;
-                case "page up":
-                    stepFrame(true);
-                    break;
-                case "page down":
-                    stepFrame(false);
-                    break;
-                case "h":
-                    self.setMessage("ImageViewer help:");
-                    self.setMessage("   space           - show/hide text overlay");
-                    self.setMessage("   right           - next file");
-                    self.setMessage("   left            - previous file");
-                    self.setMessage("   f               - show in full size mode");
-                    self.setMessage("   right-button    - pan");
-                    self.setMessage("   mouse-wheel     - zoom");
-                    self.setMessage("MoviePlayer help:");
-                    self.setMessage("   +/- (Numberpad) - increase/decrease playbackspeed");
-                    self.setMessage("   pageup/pagedown - next/previous image during pause");
-                    self.setMessage("   p/p             - play/pause");
-                    self.setMessage("   s               - stop");
-                    self.setMessage("   arrow up/down   - increase/decrease volume");
-                    break;
+        try {
+            if (theCtrlFlag) {
+                Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
+                return;
             }
+
+            if (theShiftFlag) {
+                theKey = theKey.toUpperCase();
+            }
+            if (theState) {
+                switch (theKey) {
+                    case "space":
+                        _myTextOverlay.visible = !_myTextOverlay.visible;
+                        break;
+                    case "right":
+                        nextFile();
+                        break;
+                    case "left":
+                        previousFile();
+                        break;
+                    case "up":
+                        setVolume(true);
+                        break;
+                    case "down":
+                        setVolume(false);
+                        break;
+                    case "[+]":
+                        if (theShiftFlag) {
+                            if (_myMovieNode && _myMovieOverlay.visible) {
+                                _myMovieNode.avdelay += 0.01;
+                            }
+                        } else {
+                            setPlaySpeed(true);
+                        }
+                        break;
+                    case "[-]":
+                        if (theShiftFlag) {
+                            if (_myMovieNode && _myMovieOverlay.visible) {
+                                _myMovieNode.avdelay -= 0.01;
+                            }
+                        } else {
+                            setPlaySpeed(false);
+                        }
+                        break;
+                    case "p":
+                    case "s":
+                        setPlayMode(theKey);
+                        break;
+                    case "f":
+                        _myFullSizeMode = !_myFullSizeMode;
+                        updateFileView();
+                        break;
+                    case "page up":
+                        stepFrame(true);
+                        break;
+                    case "page down":
+                        stepFrame(false);
+                        break;
+                    case "h":
+                        self.setMessage("ImageViewer help:");
+                        self.setMessage("   space           - show/hide text overlay");
+                        self.setMessage("   right           - next file");
+                        self.setMessage("   left            - previous file");
+                        self.setMessage("   f               - show in full size mode");
+                        self.setMessage("   right-button    - pan");
+                        self.setMessage("   mouse-wheel     - zoom");
+                        self.setMessage("MoviePlayer help:");
+                        self.setMessage("   +/- (Numberpad) - increase/decrease playbackspeed");
+                        self.setMessage("   pageup/pagedown - next/previous image during pause");
+                        self.setMessage("   p/p             - play/pause");
+                        self.setMessage("   s               - stop");
+                        self.setMessage("   arrow up/down   - increase/decrease volume");
+                        break;
+                }
+            }
+        } catch (ex) {
+            reportException(ex);
+            exit(1);
         }
     }
 
@@ -354,8 +359,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     }
 
     self.setFilter = function (filter, filter_params) {
-        getImageNode().filter = filter;
-        getImageNode().filter_params = filter_params;
+        _myImageNode.filter = filter;
+        _myImageNode.filter_params = filter_params;
     }
 
     ////////////// private members ////////////
@@ -447,7 +452,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     function createTextOverlay() {
         var myImage = self.getImageManager().getImageNode("OSD_Overlay");
         myImage.src = "shadertex/one_white_pixel.png";
-        window.scene.update(Scene.IMAGES);
 
         _myTextOverlay = new ImageOverlay(self.getOverlayManager(), myImage);
         _myTextOverlay.width  = 200;
@@ -495,8 +499,11 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             }
 
             var mySize = getSize();
-            myString += "\nSize:         " + mySize.x + "x" + mySize.y +"\n";
-            myString += "Encoding:     " + myNode.pixelformat +"\n";
+            myString += "\n";
+            myString += "Size:                 " + mySize.x + "x" + mySize.y +"\n";
+            myString += "Raster Pixelformat:   " + myNode.rasterpixelformat +"\n";
+            myString += "Texture Pixelformat:  " + myNode.texturepixelformat +"\n";
+            myString += "Internal Pixelformat: " + myNode.internal_format +"\n";
             if (myNode.nodeName == "movie") {
                 myString += "Frame:        " + (myNode.currentframe + 1) + " / " + myNode.framecount +"\n";
                 myString += "Framerate:    " + myNode.fps.toPrecision(5) +"\n";
@@ -506,10 +513,10 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 myString += "cachesize:    " + myNode.cachesize +"\n";
                 myString += "avdelay:      " + myNode.avdelay.toPrecision(3) + "\n";
                 myString += "Total frames: " + _myFrameCounter + "\n";
-                myString += "Decoder     : " + myNode.decoder + "\n";
-                myString += "Misses:       sum: " + _myMissedFrameCounter + ", max: " + _myMaxMissedFrame + "\n";
+                myString += "Decoder:      " + myNode.decoder + "\n";
+                myString += "Misses:  sum: " + _myMissedFrameCounter + ", max: " + _myMaxMissedFrame + "\n";
             }
-            myString += "Zoom:         " + (_myZoomFactor*100).toFixed(1) + "%\n";
+            myString += "Zoom:                 " + (_myZoomFactor*100).toFixed(1) + "%\n";
         }
         return myString.split("\n");
     }
@@ -560,8 +567,10 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
             _myMovieNode.audio = 0;
+
             _myMovieNode.decoderhint = theDecoderHint;
-            _myMovieOverlay = new MovieOverlay(self.getOverlayManager(), _myMovieNode);
+            _myMovieNode.src = theFilename;
+            _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
         }
 
         if (_myFullSizeMode) {
@@ -586,25 +595,22 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         applyViewport();
     }
 
-    function getImageNode() {
+    function showImage(theFilename) {
         if (!_myImageNode) {
             _myImageNode    = self.getImageManager().getImageNode("IVImageNode");
             _myImageNode.resize = "pad";
+            _myImageNode.src = theFilename;
             _myImageOverlay = new ImageOverlay(self.getOverlayManager(), _myImageNode);
             _myImageOverlay.leftborder   = 1;
             _myImageOverlay.rightborder  = 1;
             _myImageOverlay.bottomborder = 1;
             _myImageOverlay.topborder    = 1;
         }
-        return _myImageNode;
-    }
 
-    function showImage(theFilename) {
-        var myImageNode = getImageNode();
-        myImageNode.src = theFilename;
-        window.scene.update(Scene.IMAGES);
+        _myImageNode.src = theFilename;
+
         if (_myFullSizeMode) {
-            myImageNode.matrix = new Matrix4f();
+            _myImageNode.matrix = new Matrix4f();
         }
         _myImageOverlay.visible = true;
         applyViewport();
@@ -657,7 +663,6 @@ try {
         ourImageViewerApp.setup(800, 600, "ImageViewer");
         window.backgroundColor = [0.5,0.5,0.5];
         ourImageViewerApp.go();
-        print("done");
     }
 } catch (ex) {
     reportException(ex);

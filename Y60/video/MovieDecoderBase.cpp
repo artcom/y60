@@ -74,12 +74,6 @@ namespace y60 {
         throw asl::NotYetImplemented(JUST_FILE_LINE);
     }
 
-    PixelEncoding MovieDecoderBase::getPixelFormat() const
-    {
-        return PixelEncoding(asl::getEnumFromString(
-                    _myMovie->get<ImagePixelFormatTag>(), PixelEncodingString));
-    }
-
     unsigned MovieDecoderBase::getFrameCount() const {
         return _myMovie->get<FrameCountTag>();
     }

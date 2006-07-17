@@ -2023,7 +2023,7 @@ linesmooth   - enable/disable line smoothing
                         <xs:documentation>Property of type vector of String</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                
+
                 <xs:element ref="sampler2d">
                     <xs:annotation>
                         <xs:documentation>Property that references a CG texture</xs:documentation>
@@ -2301,7 +2301,7 @@ Example:
     </xs:element>
     <xs:element name="blendequation">
         <xs:annotation>
-            <xs:documentation>Property that defines a blend equation as a text child 
+            <xs:documentation>Property that defines a blend equation as a text child
 
 Example:
 &lt;blendequation name='blendequation'&gt;max&lt;/blendequation&gt;</xs:documentation>
@@ -2525,9 +2525,9 @@ If the image is not inlined, it will be loaded from this file.</xs:documentation
 all uv-coordiates. (In addition to the texture matrix). It is useful to scale non-power-of-two textures to the right dimensions.</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="pixelformat" type="xs:string">
+        <xs:attribute name="texturepixelformat" type="xs:string">
             <xs:annotation>
-                <xs:documentation>Pixelformat of the image. Possible values are:
+                <xs:documentation>Pixelformat which will be send to gl. Leave emtpy, to use default. Possible values are:
 RGB, BGR,RGBA,BGRA,GRAY,GRAY16,GRAY32,DEPTH,GENERIC_RGB,GENERIC_RGBA,GENERIC_ALPHA,GENERIC_LUMINANCE,
 GENERIC_LUMINANCE_ALPHA,GENERIC_INTENSITY,S3TC_DXT1,S3TC_DXT1A,S3TC_DXT3,S3TC_DXT5,GRAYS16</xs:documentation>
             </xs:annotation>
@@ -2693,7 +2693,7 @@ Default is zero for ffmpeg and 0.3 for wmv decoding.</xs:documentation>
                 <xs:annotation>
                     <xs:documentation>Use this decoder if available. Otherwise any matching decoder will be used.
 Among possible values are:
-'y60FFMpegDecoder'   
+'y60FFMpegDecoder'
 'y60QuicktimeDecoder'
 'y60WMVDecoder'
                     </xs:documentation>

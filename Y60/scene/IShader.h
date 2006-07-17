@@ -31,7 +31,7 @@ namespace y60 {
 
     DEFINE_EXCEPTION(ShaderException, asl::Exception);
     class MaterialBase;
-    typedef asl::Ptr<MaterialBase>       MaterialBasePtr;
+    typedef asl::Ptr<MaterialBase, dom::ThreadingModel>       MaterialBasePtr;
     class IShaderLibrary;
     class Viewport;
     class Body;
@@ -59,6 +59,9 @@ namespace y60 {
 
             virtual void load(IShaderLibrary & theShaderLibrary) = 0;
 
+            // will be called, when material is loaded
+            virtual void setup(MaterialBase & theMaterial) {}
+
             // will be called once per material change
             virtual void activate(MaterialBase & theMaterial, const Viewport & theViewport) {};
             virtual void enableTextures(const MaterialBase & theMaterial) {};
@@ -70,11 +73,11 @@ namespace y60 {
             virtual void bindBodyParams(const y60::MaterialBase & theMaterial,
                                         const Viewport & theViewport,
                                         const LightVector & theLights,
-                                        const Body & theBody, 
+                                        const Body & theBody,
                                         const Camera & theCamera) = 0;
             virtual void bindOverlayParams(const MaterialBase & theMaterial) = 0;
     };
-    typedef asl::Ptr<IShader> IShaderPtr;
+    typedef asl::Ptr<IShader, dom::ThreadingModel> IShaderPtr;
 
     class IShaderLibrary {
     public:

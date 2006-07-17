@@ -71,8 +71,11 @@ namespace jslib {
             // is not added to the graphics-memory.
             // To startup the renderer and copy the scene data into the gl-memory
             // you must call go()
-            _myScene = y60::ScenePtr(new y60::Scene());
-            _myScene->createStubs(JSApp::getPackageManager());
+            PackageManagerPtr myPackageManager = JSApp::getPackageManager();
+            _myScene = y60::Scene::createStubs(myPackageManager);
+
+            //_myScene = y60::ScenePtr(new y60::Scene());
+            //_myScene->createStubs(JSApp::getPackageManager());
             setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
         }
     }
@@ -99,7 +102,6 @@ namespace jslib {
     // TODO: do something with the extensions
     bool
     AbstractRenderWindow::setSceneAndCanvas(const y60::ScenePtr & theScene, const dom::NodePtr & theCanvas) {
-
         if (!_mySelf) {
             throw asl::Exception("ERROR: AbstractRenderWindow::_mySelf is 0! Did you use the proper factory method?", PLUS_FILE_LINE);
         }
@@ -129,11 +131,12 @@ namespace jslib {
                 dom::NodePtr myCanvas = _myScene->getCanvasRoot()->childNode("canvas");
                 setCanvas(_myScene->getCanvasRoot()->childNode("canvas"));
             } else {
-                AC_WARNING << "Scene has multiple canvases. No canvas set automatically.";
+                //AC_WARNING << "Scene has multiple canvases. No canvas set automatically.";
             }
 
             for (ExtensionList::iterator it = _myExtensions.begin(); it != _myExtensions.end(); ++it) {
                 std::string myName = (*it)->getName() + "::onSceneLoaded";
+
                 try {
                     MAKE_NAMED_SCOPE_TIMER(myTimer, myName);
                     (*it)->onSceneLoaded(this);
@@ -353,7 +356,6 @@ namespace jslib {
 
     void
     AbstractRenderWindow::onFrame() {
-
         asl::NanoTime myTime = asl::NanoTime();
         if (_myStartTime < 0.0) {
             _myStartTime = myTime.seconds();
@@ -829,7 +831,7 @@ namespace jslib {
                 const unsigned char * myData = myImage->getRasterPtr()->pixels().begin();
                 if (myData) {
                     const unsigned char * myPixelPtr = myData +
-                        getBytesRequired(theY * myImage->get<ImageWidthTag>() + theX, myImage->getEncoding());
+                        getBytesRequired(theY * myImage->get<ImageWidthTag>() + theX, myImage->getRasterEncoding());
                     asl::Vector4i myColor(*myPixelPtr, *(myPixelPtr + 1), *(myPixelPtr + 2), *(myPixelPtr + 3));
                     return myColor;
                 }
@@ -850,9 +852,9 @@ namespace jslib {
                 unsigned char * myData = myImage->getRasterPtr()->pixels().begin();
                 if (myData) {
                     unsigned char * myPixelPtr = myData +
-                        getBytesRequired(theY * myImage->get<ImageWidthTag>() + theX, myImage->getEncoding());
+                        getBytesRequired(theY * myImage->get<ImageWidthTag>() + theX, myImage->getRasterEncoding());
 
-                    unsigned myUsedBytesPerPixel = getBytesRequired(1, myImage->getEncoding());
+                    unsigned myUsedBytesPerPixel = getBytesRequired(1, myImage->getRasterEncoding());
                     for (unsigned i = 0; i < myUsedBytesPerPixel; ++i) {
                         *(myPixelPtr + i) = theColor[i];
                     }

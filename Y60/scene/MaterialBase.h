@@ -134,6 +134,7 @@ namespace y60 {
             MaterialBase(dom::Node & theNode);
             IMPLEMENT_PARENT_FACADE(MaterialBase);
 
+            void registerDependenciesRegistrators();
             virtual ~MaterialBase();
 
             MaterialBase(dom::Node & theNode, dom::Node & theDefaults);
@@ -141,11 +142,9 @@ namespace y60 {
             virtual unsigned getTextureCount() const;
             virtual const Texture & getTexture(unsigned myIndex) const;
 
-            virtual void load(TextureManager & theTextureMananger);
+            virtual void load(asl::Ptr<TextureManager> theTextureMananger);
 
-            virtual void setup(dom::NodePtr theSceneNode) {}
-
-            virtual void update(TextureManager & theTextureManager, const dom::NodePtr theImages);
+            //virtual void update(TextureManagerPtr theTextureManager, const dom::NodePtr theImages);
 
             const MaterialParameterVector & getVertexParameters() const;
             virtual bool reloadRequired() const;
@@ -179,13 +178,15 @@ namespace y60 {
             TexGenParamsList getTexGenParams() const {
                 return _myTexGenParams;
             }
+            void doTheUpdate();
 
         protected:
+            virtual void registerDependenciesForMaterialupdate();    
             IShaderPtr                 _myShader;
         private:
             void addTextures(const dom::NodePtr theTextureListNode,
-                    TextureManager & theTextureMananger);
-            void addTexture(dom::NodePtr theTextureNode, TextureManager & theTextureManager);
+                asl::Ptr<TextureManager> theTextureMananger);
+            void addTexture(dom::NodePtr theTextureNode, asl::Ptr<TextureManager> theTextureManager);
 
             std::vector<TexturePtr> _myTextures;
             LightingModel           _myLightingModel;
@@ -199,9 +200,10 @@ namespace y60 {
     };
 
 
-    typedef asl::Ptr<MaterialBase>       MaterialBasePtr;
+    //typedef asl::Ptr<MaterialBase>       MaterialBasePtr;
     typedef std::vector<MaterialBasePtr> MaterialBasePtrVector;
     typedef asl::Ptr<MaterialBase, dom::ThreadingModel> MaterialBaseFacadePtr;
+    typedef asl::Ptr<MaterialBase, dom::ThreadingModel> MaterialBasePtr;
 }
 
 #endif

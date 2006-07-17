@@ -143,23 +143,14 @@ ShapeExporter::appendToScene(y60::SceneBuilder & theSceneBuilder,
 {
     MAKE_SCOPE_TIMER(ShapeExporter_appendToScene);
     MDagPath firstPath;
-    {
-        MAKE_SCOPE_TIMER(ShapeExporter_getAPathTo);
-        MDagPath::getAPathTo(_myMesh->object(), firstPath);
-    }
-    MStatus status;
-    string myPathName;
-    {
-        MAKE_SCOPE_TIMER(ShapeExporter_fullPathName);
-        myPathName = firstPath.fullPathName(&status).asChar();
-    }
+    MDagPath::getAPathTo(_myMesh->object(), firstPath);
 
-    {
-        MAKE_SCOPE_TIMER(ShapeExporter_ShapeAlreadyExists);
-        // if we already have this mesh we are done ...
-        if (thePathToIdMap.find(myPathName) != thePathToIdMap.end()) {
-            return;
-        }
+    MStatus status;
+    string myPathName = firstPath.fullPathName(&status).asChar();
+
+    // if we already have this mesh we are done ...
+    if (thePathToIdMap.find(myPathName) != thePathToIdMap.end()) {
+        return;
     }
 
     extractGeometry();

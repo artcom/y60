@@ -362,10 +362,6 @@ namespace y60 {
          * _myLoadedFilename against ImageSourceTag and finds them to differ.
          */
         _myLoadedFilename = get<ImageSourceTag>();
-
-        Image::createRaster(_myDecoder->getPixelFormat());
-        getRasterPtr()->resize(get<ImageWidthTag>(), get<ImageHeightTag>());
-        getRasterPtr()->clear();
     }
 
     bool

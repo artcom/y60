@@ -40,7 +40,10 @@ namespace dom {
         }
         _mySelf = theSelf;
         registerDependenciesRegistrators();
-        markAllDirty();
+        
+        // [CH]: This should not be neccessary. It causes all images to be loaded twice. If anybody
+        // has strange effects, please talk to me :-)
+        //markAllDirty();
     }
  
     void 

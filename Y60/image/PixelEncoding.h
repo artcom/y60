@@ -251,6 +251,7 @@ namespace y60 {
             PLPixelFormat & theFormat);
     bool mapFormatToPixelEncoding(const PLPixelFormat & theFormat,
             PixelEncoding & theEncoding);
+    TextureInternalFormat getInternalPixelFormat(PixelEncoding theEncoding);
 }
 
 #endif

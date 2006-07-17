@@ -32,11 +32,11 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
     var _myMessage          = [];
     var _myNextMessageLine  = 0;
     var _myFontname         = "Screen15";
-    
+
     self.setFontname = function(theFontname) {
         _myFontname = theFontname;
     }
-    
+
     self.setMessage = function(theMessage, theLine) {
         if (!_myOverlay) {
             _myOverlay = createTextOverlay();
@@ -67,7 +67,7 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
             } else {
                 self.hide();
             }
-            
+
             _myOverlay.position = new Vector2f((window.width - _myOverlay.width) / 2,
                                                (window.height - _myOverlay.height) / 2);
         }
@@ -111,7 +111,6 @@ OnScreenDisplay.prototype.Constructor = function(self, theSceneViewer) {
         var myImage = theSceneViewer.getImageManager().getImageNode("OSD_Overlay");
         myImage.src = "shadertex/on_screen_display.rgb";
         myImage.resize = "pad";
-        window.scene.update(Scene.IMAGES);
 
         var myBoxOverlay = new ImageOverlay(theSceneViewer.getOverlayManager(), myImage);
         myBoxOverlay.width  = BOX_WIDTH;

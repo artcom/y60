@@ -54,19 +54,11 @@ public:
 
         {
             DTITLE("Starting Y60 Schema tests");
-            dom::Document mySchema(ourY60xsd);
-            ENSURE(mySchema);
-            dom::Document myDocument;
-            myDocument.setValueFactory(asl::Ptr<dom::ValueFactory>(new dom::ValueFactory()));
-            dom::registerStandardTypes(*myDocument.getValueFactory());
-            myDocument.addSchema(mySchema,"");
-            SUCCESS("added Schema");
-            Scene myScene;
             PackageManagerPtr myPackageManager(new PackageManager());
-            myScene.createStubs(myPackageManager);
+            ScenePtr myScene = Scene::createStubs(myPackageManager);
             
-            ENSURE(myScene.getWorldRoot());
-            NodePtr myWorldNode = myScene.getWorldRoot();
+            ENSURE(myScene->getWorldRoot());
+            NodePtr myWorldNode = myScene->getWorldRoot();
             TransformHierarchyFacadePtr myWorld = myWorldNode->getFacade<TransformHierarchyFacade>();
             ENSURE(myWorld);
 

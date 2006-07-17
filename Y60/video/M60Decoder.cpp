@@ -80,11 +80,11 @@ namespace y60 {
         _myEncoding = MovieEncoding(myHeader.compression);
 
         Movie * myMovie = getMovie();
-        myMovie->set<FrameCountTag>(myHeader.framecount);
-        myMovie->set<ImageWidthTag>(myHeader.framewidth);
-        myMovie->set<ImageHeightTag>(myHeader.frameheight);
-        myMovie->setPixelEncoding(PixelEncoding(myHeader.pixelformat));
+
+        myMovie->createRaster(myHeader.framewidth, myHeader.frameheight, 1, PixelEncoding(myHeader.pixelformat));
+        myMovie->getRasterPtr()->clear();
         myMovie->set<FrameRateTag>(myHeader.fps);
+        myMovie->set<FrameCountTag>(myHeader.framecount);
 
         // Setup size and image matrix
         float myXResize = float(myHeader.width) / myHeader.framewidth;

@@ -159,11 +159,9 @@ function setupOffscreenRendering() {
     // Create target image for offscreen rendering
     var myTargetImage = getDescendantByName(window.scene.images, "offscreen", false);
     if (!myTargetImage) {
-        myTargetImage = window.scene.images.appendChild(new Node("<image/>").firstChild);
+        myTargetImage = window.scene.createImage(800, 520, "RGB");
         myTargetImage.name = "offscreen"
         myTargetImage.mipmap = false;
-        myTargetImage.width  = 800;
-        myTargetImage.height = 520;
     }
 
     // Copy main canvas to offscreen canvas

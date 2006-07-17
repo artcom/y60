@@ -81,7 +81,7 @@ JSBool
 toString(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns a string representation of the scene's dom.");
     DOC_END;
-    std::string myStringRep = asl::as_string(JSScene::getJSWrapper(cx,obj).getNative().getSceneDom());
+    std::string myStringRep = asl::as_string(*(JSScene::getJSWrapper(cx,obj).getNative().getSceneDom()));
     *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
@@ -234,6 +234,13 @@ update(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+updateAllModified(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Updates all modified parts of the scene. You need this, if you implement your own render loop");
+    DOC_END;
+    return Method<NATIVE>::call(&NATIVE::updateAllModified,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 bodyVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Calculates the volume of a given body.");
     DOC_PARAM("theBody", "", DOC_TYPE_NODE);
@@ -263,6 +270,7 @@ CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsv
     try {
         ensureParamCount(argc, 0, 2);
         JSScene::OWNERPTR myNative;
+
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         dom::NodePtr myResult;
         if (argc == 0) {
@@ -435,11 +443,12 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
                 JS_ReportError(cx, "JSScene::createImage(): argument #3 must be a string (pixelencoding)");
                 return JS_FALSE;
             }
+            myPixelEncoding = asl::toUpperCase(myPixelEncoding);
             dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
                 dom::NodePtr(new dom::Element("image")));
             y60::ImagePtr myImage = myResult->getFacade<y60::Image>();
-            myImage->set(myWidth, myHeight, 1, PixelEncoding(getEnumFromString(myPixelEncoding, PixelEncodingString)));
-            myImage->getRasterPtr()->resize(myWidth, myHeight);
+            myImage->createRaster(myWidth, myHeight, 1, 
+                PixelEncoding(getEnumFromString(myPixelEncoding, PixelEncodingString)));
             memset(myImage->getRasterPtr()->pixels().begin(), 0, myImage->getRasterPtr()->pixels().size());
             *rval = as_jsval(cx, myResult);
 
@@ -538,6 +547,7 @@ JSScene::Functions() {
     static JSFunctionSpec myFunctions[] = {
         /* name                 native               nargs    */
         {"update",              update,              1},
+        {"updateAllModified",   updateAllModified,   1},            
         {"clear",               clear,               0},
         {"bodyVolume",          bodyVolume,          1},
         {"save",                save,                2},
@@ -568,7 +578,6 @@ JSScene::ConstIntProperties() {
         DEFINE_SCENE_FLAG(ANIMATIONS),
         DEFINE_SCENE_FLAG(ANIMATIONS_LOAD),
         DEFINE_SCENE_FLAG(WORLD),
-        DEFINE_SCENE_FLAG(IMAGES),
         DEFINE_SCENE_FLAG(ALL),
         {0}
     };
@@ -720,8 +729,11 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
         return JS_FALSE;
     }
-    OWNERPTR myNewPtr = OWNERPTR(new y60::Scene());
-    JSScene * myNewObject=new JSScene(myNewPtr, &(*myNewPtr));
+    asl::Ptr<y60::Scene, dom::ThreadingModel> myNewPtr = OWNERPTR(0);;
+
+    //OWNERPTR myNewPtr = OWNERPTR(0);
+    //OWNERPTR myNewPtr = OWNERPTR(new y60::Scene());
+    JSScene * myNewObject;//=new JSScene(myNewPtr, &(*myNewPtr));
 
     try {
         asl::Ptr<ProgressCallback> myCallback;
@@ -736,16 +748,18 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             if (argv[0] == JSVAL_NULL) {
                 AC_INFO << "no filename, creating scene stubs";
                 PackageManagerPtr myPackageManager = JSApp::getPackageManager();
-                myNewPtr->createStubs(myPackageManager);
+                myNewPtr = y60::Scene::createStubs(myPackageManager);
             } else {
                 std::string myFilename = as_string(cx, argv[0]);
                 PackageManagerPtr myPackageManager = JSApp::getPackageManager();
                 AC_INFO << "Loading Scene " << getFilenamePart(myFilename) << " from " << getDirectoryPart(myFilename);
                 myPackageManager->add(asl::getDirectoryPart(myFilename));
-                myNewPtr->load(getFilenamePart(myFilename), myPackageManager, myCallback);
+                //myNewPtr->load(getFilenamePart(myFilename), myPackageManager, myCallback);
+                myNewPtr = y60::Scene::load(getFilenamePart(myFilename), myPackageManager, myCallback);
             }
         }
 
+        myNewObject = new JSScene(myNewPtr, &(*myNewPtr));
         if (myNewObject) {
             JS_SetPrivate(cx,obj,myNewObject);
             return JS_TRUE;
@@ -766,7 +780,7 @@ JSScene::initClass(JSContext *cx, JSObject *theGlobalObject) {
     return myClass;
 }
 
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Scene> & theScene) {
+bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Scene, dom::ThreadingModel> & theScene) {
     if (JSVAL_IS_OBJECT(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
@@ -779,7 +793,7 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Scene> & theScene)
     return false;
 }
 
-jsval as_jsval(JSContext *cx, asl::Ptr<y60::Scene> theScene) {
+jsval as_jsval(JSContext *cx, asl::Ptr<y60::Scene, dom::ThreadingModel> theScene) {
     if (theScene) {
         JSObject * myReturnObject = JSScene::Construct(cx, theScene, &(*theScene));
         return OBJECT_TO_JSVAL(myReturnObject);

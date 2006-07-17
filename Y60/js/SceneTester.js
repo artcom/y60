@@ -117,7 +117,11 @@ SceneTester.prototype.Constructor = function(obj, theArguments) {
         if (_myOutputImageName) {
             if (theFrameCount == _myTestDurationInFrames) {
                 obj.saveTestImage();
-                obj.testSaveLoad();
+
+                // Test env is very large and takes minutes in debug mode
+                if (_myOutputImageName != "TestImages/testEnv") {
+                    obj.testSaveLoad();
+                }
                 exit(0);
             }
         }

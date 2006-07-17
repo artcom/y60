@@ -216,8 +216,7 @@ namespace dom {
             template <class CONNECTOR>
             void setReconnectFunction(void (CONNECTOR::*theConnectFunction)()) {
                 FacadePtr mySelf = dynamic_cast<CONNECTOR*>(this)->getSelf();
-                getValuePtr()->setReconnectFunction(
-                    asl::Ptr<CallBackBase, ThreadingModel>(
+                getValuePtr()->setReconnectFunction(CallBackPtr(
                         new CallBack<CONNECTOR>(dynamic_cast_Ptr<CONNECTOR>(mySelf), theConnectFunction)));
             }
 

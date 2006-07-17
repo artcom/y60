@@ -119,21 +119,15 @@ namespace y60 {
                 return _myPlayMode;
             }
 
-            void setPixelEncoding(const PixelEncoding thePixelEncoding) {
-                set<ImagePixelFormatTag>(asl::getStringFromEnum(thePixelEncoding, PixelEncodingString));
-            }
-
-            PixelEncoding getPixelEncoding() {
-                return PixelEncoding(asl::getEnumFromString(get<ImagePixelFormatTag>(), PixelEncodingString));
-            }
-
             bool getMovieTime(double & theTime) const;
             bool getDecoderName(std::string & theName) const;
         private:
             Movie();
 
+            // Overwrite the Image::load() method to avoid auto-loading mechanism
+            void load() {}
+            
             void setup();
-
             void stop();
             void restart();
             void setPlayMode(MoviePlayMode thePlayMode);
@@ -148,7 +142,6 @@ namespace y60 {
 
             void postLoad();
 
-
             asl::Ptr<MovieDecoderBase>  getDecoder(const std::string theFilename);
 
             asl::Ptr<MovieDecoderBase> _myDecoder;
@@ -158,7 +151,6 @@ namespace y60 {
             unsigned                   _myLastDecodedFrame;
             double                     _myLastCurrentTime;
             unsigned                   _myCurrentLoopCount;
-
             dom::ValuePtr _myStreamData;
     };
 

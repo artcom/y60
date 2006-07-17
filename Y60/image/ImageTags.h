@@ -31,7 +31,8 @@ namespace y60 {
 
     //                  theTagName              theType             theAttributeName                   theDefault
     DEFINE_ATTRIBUT_TAG(ImageSourceTag,         std::string,        IMAGE_SRC_ATTRIB,             "");
-    DEFINE_ATTRIBUT_TAG(ImagePixelFormatTag,    std::string,        IMAGE_PIXELFORMAT_ATTRIB,     "RGB");
+    DEFINE_ATTRIBUT_TAG(RasterPixelFormatTag,   std::string,        IMAGE_RASTER_PIXELFORMAT_ATTRIB,  "RGB");
+    DEFINE_ATTRIBUT_TAG(TexturePixelFormatTag,  std::string,        IMAGE_TEXTURE_PIXELFORMAT_ATTRIB, "");
     DEFINE_ATTRIBUT_TAG(ImageInternalFormatTag, std::string,        IMAGE_INTERNAL_FORMAT_ATTRIB, "");
     DEFINE_ATTRIBUT_TAG(ImageWidthTag,          unsigned,           WIDTH_ATTRIB,                 0);
     DEFINE_ATTRIBUT_TAG(ImageHeightTag,         unsigned,           HEIGHT_ATTRIB,                0);
@@ -46,5 +47,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ImageColorScaleTag,     asl::Vector4f,      IMAGE_COLOR_SCALE_ATTRIB,     asl::Vector4f(1, 1, 1, 1));
     DEFINE_ATTRIBUT_TAG(ImageTileTag,           asl::Vector2i,      IMAGE_TILE_ATTRIB,            asl::Vector2i(1,1));
     DEFINE_ATTRIBUT_TAG(ImageBytesPerPixelTag,  float,              IMAGE_BYTESPERPIXEL_ATTRIB,   0);
+    DEFINE_ATTRIBUT_TAG(TextureIdTag,           unsigned,           IMAGE_TEXTURE_ID_ATTRIB,      0);
+    DEFINE_ATTRIBUT_TAG(LoadCountTag,           unsigned,           IMAGE_LOAD_COUNT_ATTRIB,      0);    
 }
 #endif

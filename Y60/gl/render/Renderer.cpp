@@ -142,20 +142,6 @@ namespace y60 {
         glEnableClientState(GL_VERTEX_ARRAY);
     }
 
-    void
-    Renderer::preloadShader() {
-        const Scene::MaterialIdMap & myMaterials = _myScene->getMaterials();
-        AC_INFO << "Renderer::preloadShader(): preloading " << myMaterials.size() << " shaders" << endl;
-        for (Scene::MaterialIdMap::const_iterator it = myMaterials.begin(); it != myMaterials.end(); ++it) {
-            GLShaderPtr myShader = dynamic_cast_Ptr<GLShader>(it->second->getShader());
-            if (myShader) {
-                myShader->load(*getShaderLibrary());
-                AC_INFO << "Renderer::preloadShader(): using shader '" << myShader->getName() <<
-                           "' for material '"<<it->second->get<NameTag>()<<"'" << endl;
-            }
-        }
-    }
-
     IShaderLibraryPtr
     Renderer::getShaderLibrary() {
         return GLResourceManager::get().getShaderLibrary();
@@ -1369,7 +1355,8 @@ namespace y60 {
         }
 
         std::string myMaterialId = myWorld->get<SkyBoxMaterialTag>();
-        MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
+        MaterialBasePtr myMaterial = _myScene->getMaterialsRoot()->getElementById(myMaterialId)->getFacade<MaterialBase>();
+        //MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
         if (!myMaterial) {
             AC_ERROR << "Could not find SkyBox material: " << myMaterialId << endl;
             return;
@@ -1568,7 +1555,9 @@ namespace y60 {
 
             const std::string & myMaterialId = myOverlay.get<MaterialTag>();
             if (myMaterialId.empty() == false) {
-                MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
+                MaterialBasePtr myMaterial = _myScene->getMaterialsRoot()->getElementById(myMaterialId)->getFacade<MaterialBase>();
+
+                //MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
                 AC_TRACE << "renderOverlay " << myOverlay.get<NameTag>() << " with material " << myMaterialId << endl;
                 if (!myMaterial) {
                     AC_WARNING << "renderOverlay() material:" << myMaterialId << " not found." << endl;

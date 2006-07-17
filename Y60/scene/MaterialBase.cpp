@@ -45,10 +45,16 @@ namespace y60 {
     }
 
     void
-    MaterialBase::update(TextureManager & theTextureManager, const dom::NodePtr theImages) {
-        for (unsigned i = 0 ; i <_myTextures.size(); ++i) {
-            _myTextures[i]->update(theTextureManager);
-        }
+    MaterialBase::registerDependenciesRegistrators() {
+        Facade::registerDependenciesRegistrators();
+    }
+
+    void
+    MaterialBase::registerDependenciesForMaterialupdate() {}
+
+    void
+    MaterialBase::doTheUpdate() {
+        AC_INFO << "MaterialBase::doTheUpdate!" << endl;
     }
 
     bool
@@ -61,7 +67,7 @@ namespace y60 {
     }
 
     void
-    MaterialBase::load(TextureManager & theTextureManager) {
+    MaterialBase::load(TextureManagerPtr theTextureManager) {
         addTextures(getNode().childNode(TEXTURE_LIST_NAME), theTextureManager);
 
         if (_myShader) {
@@ -72,6 +78,7 @@ namespace y60 {
                 throw ShaderException("Shader has none or more than one lightingmodels.I do not know how to light this buddy.",
                     PLUS_FILE_LINE);
             } 
+            _myShader->setup(*this);
         } else {
             _myLightingModel = UNLIT;
         }
@@ -124,8 +131,9 @@ namespace y60 {
     
     void
     MaterialBase::addTextures(const dom::NodePtr theTextureListNode,
-                               TextureManager & theTextureManager)
+                               TextureManagerPtr theTextureManager)
     {
+        _myTextures.clear();
         // first thing is to check if the chosen shader can handle textures of this mode
         // if not, do not load the texture
         if (_myShader && _myShader->hasFeature(TEXTURE_FEATURE)) {
@@ -164,12 +172,16 @@ namespace y60 {
     }
 
     void
-    MaterialBase::addTexture(dom::NodePtr theTextureNode, TextureManager & theTextureManager) {
+    MaterialBase::addTexture(dom::NodePtr theTextureNode, TextureManagerPtr theTextureManager) {
         unsigned myMaxUnits = _myShader->getMaxTextureUnits();
         if (_myTextures.size() < myMaxUnits) {            
-			TexturePtr myTexture = TexturePtr(new Texture(*theTextureNode));
-			myTexture->update(theTextureManager);
+            TexturePtr myTexture = theTextureNode->getFacade<Texture>();
+			myTexture->setTextureManager(theTextureManager);
             _myTextures.push_back(myTexture);
+            ImagePtr myImage = myTexture->getImage();
+            if (myImage) {
+                myImage->triggerUpload();
+            }
         } else {
             AC_WARNING << "Your OpenGL implementation only supports " 
                  << asl::as_string(myMaxUnits) << " texture units, "

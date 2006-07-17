@@ -7,7 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-
 use("BaseViewer.js");
 use("PreferenceDialog.js");
 use("DebugVisual.js");

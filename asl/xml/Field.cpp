@@ -43,6 +43,8 @@ namespace dom {
         asl::findAndReplace(myResult, "dom::", "");
         asl::findAndReplace(myResult, "asl::", "");
         asl::findAndReplace(myResult, "MakeAccessibleVector,", "");
+        asl::findAndReplace(myResult, "MakeResizeableRaster,", "");
+        asl::findAndReplace(myResult, ",std::allocator<BGR_t<unsigned char> >,int", "");
         return myResult;
     }
 
@@ -80,18 +82,20 @@ namespace dom {
 
         _myCalculator = theField._myCalculator;
         _myConnector = theField._myConnector;
-        theField._myCalculator = asl::Ptr<CallBackBase, ThreadingModel>(0);
-        theField._myConnector = asl::Ptr<CallBackBase, ThreadingModel>(0);
+        theField._myCalculator = CallBackPtr(0);
+        theField._myConnector = CallBackPtr(0);
         _hasOutdatedDependencies = theField._hasOutdatedDependencies;
-        _isRecalculating = theField._isRecalculating;
+        
+        _isRecalculating = true;
         onSetValue();
+        _isRecalculating = theField._isRecalculating;
     }
 
     void 
     Field::clearPrecursorFields() {
         if (_myCalculator || _myPrecursorFields.size()) {
             DB(AC_TRACE << "clearPrecursorFields() on "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
-            _myCalculator = asl::Ptr<CallBackBase, ThreadingModel>(0);
+            _myCalculator = CallBackPtr(0);
 
             for (int i = 0; i < _myPrecursorFields.size(); ++i)  {
                 FieldPtr myPrecursorField = _myPrecursorFields[i];
@@ -136,12 +140,12 @@ namespace dom {
         DB(AC_TRACE << "registerPrecursor() "<<filteredName(typeid(*theField).name())<< "@"
             <<(void*)theField.getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
         if (hasPrecursor(theField)) {
-            AC_ERROR << "Field::registerPrecursor: theField "<<(void*)theField.getNativePtr() << " is already registered, ignored";
+            AC_ERROR << "Field::registerPrecursor: theField "<<(void*)theField.getNativePtr() << 
+                " is already registered, ignored";
         } else {
             _myPrecursorFields.push_back(theField);
             theField->registerDependend(_mySelf.lock());
-            _isDirty = true;
-            setDependentsDirty();
+            setDirty();
         }
     }
 
@@ -159,7 +163,8 @@ namespace dom {
             _myPrecursorFields.erase(_myPrecursorFields.begin() + i);
             return;
         }
-        AC_ERROR << "unregisterPrecursor() "<<filteredName(typeid(*theField).name())<< "@"<<(void*)theField.getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
+        AC_ERROR << "unregisterPrecursor() "<<filteredName(typeid(*theField).name())<< "@"
+            <<(void*)theField.getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
     }
 
     void 
@@ -175,32 +180,16 @@ namespace dom {
             _myPrecursorFields.erase(_myPrecursorFields.begin() + i);
             return;
         }
-        AC_ERROR << "erasePrecursor() "<<filteredName(typeid(*theField).name())<< "@"<<(void*)theField.getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
-        return;
-    }
-
-    void 
-    Field::unregisterDependend(FieldWeakPtr theField) {
-         if (!theField) {
-            AC_ERROR << "Field::unregisterDependend: theField is null, ignored";
-            throw InvalidNullPointerPassed(JUST_FILE_LINE);
-        }
-        DB(AC_TRACE << "unregisterDependend() "<<filteredName(typeid(*theField.lock()).name())<< "@"
-            <<(void*)theField.lock().getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
-        unsigned i = findDependend(theField.lock());
-        if (i < _myDependendFields.size()) {
-            _myDependendFields[i].lock()->erasePrecursor(_mySelf.lock());
-            _myDependendFields.erase(_myDependendFields.begin() + i);
-            return;
-        }
-        AC_ERROR << "unregisterDependend() "<<filteredName(typeid(*theField.lock()).name())<< "@"<<(void*)theField.lock().getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
+        AC_ERROR << "erasePrecursor() "<<filteredName(typeid(*theField).name())<< "@"
+            <<(void*)theField.getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
     }
 
     void 
     Field::eraseDependend(FieldWeakPtr theField) {
         DB(
         if (theField) {
-            AC_TRACE << "eraseDependend() "<<filteredName(typeid(*theField.lock()).name())<< "@"<<(void*)theField.lock().getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
+            AC_TRACE << "eraseDependend() "<<filteredName(typeid(*theField.lock()).name())<< "@"
+                <<(void*)theField.lock().getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
         } else {
             AC_TRACE << "eraseDependend() of zero weak ptr at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
         })
@@ -209,7 +198,9 @@ namespace dom {
             _myDependendFields.erase(_myDependendFields.begin() + i);
             return;
         }
-        AC_ERROR << "eraseDependend() "<<filteredName(typeid(*theField.lock()).name())<< "@"<<(void*)theField.lock().getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
+        AC_ERROR << "eraseDependend() "<<filteredName(typeid(*theField.lock()).name())<< "@"
+            <<(void*)theField.lock().getNativePtr()<<" not found at "<<filteredName(typeid(*this).name())
+            << "@"<<(void*)this;
     }
 
     unsigned 
@@ -221,6 +212,7 @@ namespace dom {
         }
         return _myDependendFields.size();
     }
+
     unsigned 
     Field::findPrecursor(FieldPtr theField) const {
         for (unsigned i = 0; i < _myPrecursorFields.size(); ++i)  {
@@ -238,7 +230,8 @@ namespace dom {
                 <<(void*)theField.getNativePtr()<<" at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
             if (hasDependend(theField)) {
                 AC_WARNING << "registerDependend():the field "<<filteredName(typeid(*theField).name())
-                    << "@"<<(void*)theField.getNativePtr()<<" is already registered at "<<filteredName(typeid(*this).name())<< "@"<<(void*)this;
+                    << "@"<<(void*)theField.getNativePtr()<<" is already registered at "
+                    <<filteredName(typeid(*this).name())<< "@"<<(void*)this;
             } else {
                 _myDependendFields.push_back(theField);
             }
@@ -301,9 +294,11 @@ namespace dom {
 
     void 
     Field::onSetValue() {
-        ensureDependencies();
+        // [CH]: This is not neccessary, because ensureDependencies only updates precursors, not the dependents.
+        // This might also be the reason, why in some rare cases, the dependency network does not work.
+        //ensureDependencies();
         if (_myCalculator && !_isRecalculating) {
-            AC_WARNING << "onSetValue: you should not set dependent values manually, only in recalculate callback";
+            //AC_WARNING << "onSetValue: you should not set dependent values manually, only in recalculate callback";
         }
         DB(
         if (_isDirty) {
@@ -314,39 +309,45 @@ namespace dom {
         _isDirty = false;
         setDependentsDirty();
     }
+
     void
     Field::ensureDependencies() const {
         DB2(AC_TRACE << "ensureDependencies() of "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
         if (_hasOutdatedDependencies && _myConnector) {
-            const_cast<Field*>(this)->reconnect();
+            if (_isReconnecting) {
+                throw InfiniteRecursion(std::string("Reconnect can not be called during reconnecting: ") + 
+                    std::string(typeid(*this).name()), PLUS_FILE_LINE);
+            }
+            _isReconnecting = true;
+            const_cast<Field*>(this)->_myConnector->callback();
+            _isReconnecting = false;
+            _hasOutdatedDependencies = false;
         }
     }
 
-
     void 
-    Field::onGetValue() const {
-        ensureDependencies();
+    Field::onGetValue() const {        
         if (_isDirty) {
-            _isRecalculating = true;
-            const_cast<Field*>(this)->recalculate();
-            _isRecalculating = false;
+            ensureDependencies();
+            // this is highly experimental, (vs)
             _isDirty = false;
+            if (_myCalculator) {
+                if (_isRecalculating) {
+                    throw InfiniteRecursion(std::string("Recalculate can not be called during recalculating: ") + 
+                        std::string(typeid(*this).name()), PLUS_FILE_LINE);
+                }
+                _isRecalculating = true;
+                const_cast<Field*>(this)->_myCalculator->callback();
+                _isRecalculating = false;
+            }
+            //_isDirty = false;
         }
     }
 
-    void 
-    Field::setDirty() {
-        DB(AC_TRACE << "setDirty() of "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
-        ensureDependencies();
-        if (!_isDirty) {
-            _isDirty = true;
-            setDependentsDirty();
-        }
-    }
     void
     Field::setDependentsDirty() {
         DB(AC_TRACE << "setDependentsDirty() of "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
-        for (int i = 0; i < _myDependendFields.size(); ++i)  {
+        for (unsigned i = 0; i < _myDependendFields.size(); ++i)  {
             FieldPtr myDependantField = _myDependendFields[i].lock();
             if (myDependantField) {
                 myDependantField->setDirty();
@@ -358,18 +359,10 @@ namespace dom {
     }
 
     void 
-    Field::setReconnectFunction(asl::Ptr<CallBackBase, ThreadingModel> theCallBack) {
+    Field::setReconnectFunction(CallBackPtr theCallBack) {
         DB(AC_TRACE << "setReconnectFunction() on "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
         _myConnector = theCallBack;
-        _hasOutdatedDependencies = true;
-    }
-    void 
-    Field::reconnect() {
-        DB(AC_TRACE << "reconnect() of "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
-        if (_myConnector) {
-            DB(AC_TRACE << "reconnect() callback() "<<filteredName(typeid(*this).name())<< "@"<<(void*)this);
-            _myConnector->callback();
-        }
-    }
+        markPrecursorDependenciesOutdated();
+    }    
 }
 

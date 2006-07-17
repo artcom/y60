@@ -36,8 +36,6 @@ namespace y60 {
      */
     DEFINE_EXCEPTION(RasterValueDoesNotExist, ImageException);
 
-    class ITextureManager;
-
     /**
      * @ingroup y60image
      * Facade for an image node in the dom.
@@ -47,12 +45,9 @@ namespace y60 {
         public dom::Facade,
         public IdTag::Plug,
         public NameTag::Plug,
-        public ImageWidthTag::Plug,
-        public ImageHeightTag::Plug,
         public ImageDepthTag::Plug,
         public ImageSourceTag::Plug,
-        public ImagePixelFormatTag::Plug,
-        public ImageInternalFormatTag::Plug,
+        public TexturePixelFormatTag::Plug,
         public ImageTypeTag::Plug,
         public ImageMipmapTag::Plug,
         public ImageResizeTag::Plug,
@@ -62,7 +57,13 @@ namespace y60 {
         public ImageColorBiasTag::Plug,
         public ImageColorScaleTag::Plug,
         public ImageTileTag::Plug,
-        public dom::FacadeAttributePlug<ImageBytesPerPixelTag>
+        public dom::FacadeAttributePlug<RasterPixelFormatTag>,   
+        public dom::FacadeAttributePlug<ImageBytesPerPixelTag>,        
+        public dom::FacadeAttributePlug<ImageWidthTag>,
+        public dom::FacadeAttributePlug<ImageHeightTag>,
+        public dom::FacadeAttributePlug<LoadCountTag>,
+        protected dom::FacadeAttributePlug<ImageInternalFormatTag>,
+        protected dom::FacadeAttributePlug<TextureIdTag>
     {
         public:
             Image(dom::Node & theNode);
@@ -70,16 +71,8 @@ namespace y60 {
 
             virtual ~Image();
 
-            void storeTextureVersion();
-
-            void setGraphicsId(unsigned theId) {
-                _myTexId = theId;
-            }
-
-            unsigned getGraphicsId() const {
-                return _myTexId;
-            }
-
+            void unbind();
+            void removeTextureFromResourceManager();
             virtual bool usePixelBuffer() const;
             void setPixelBufferId(unsigned theId) {
                 _myPixelBufferId = theId;
@@ -89,36 +82,53 @@ namespace y60 {
                 return _myPixelBufferId;
             }
 
-            void setTextureManager(const ITextureManager & theTextureManager);
+            // Gets graphics id, without uploading it. Id is 0 if image has not been uploaded
+            unsigned getGraphicsId() const {
+                return _myTextureId;
+            }
+
+            // Uploads the image if neccessary.
+            unsigned ensureTextureId() {
+                return get<TextureIdTag>();
+            }
+
+            // Dirty hack.
+            void triggerUpload();
+
             void registerTexture();
             void deregisterTexture();
 
-            void set(unsigned int theNewWidth,
-                    unsigned int theNewHeight,
-                    unsigned int theNewDepth,
-                    PixelEncoding theEncoding);
-            void set(unsigned int theNewWidth,
-                    unsigned int theNewHeight,
-                    unsigned int theNewDepth,
-                    PixelEncoding theEncoding,
-                    const asl::ReadableBlock & thePixels);
+            virtual void load();
+
+
+            /**
+             * Creates a new empty raster with the given properties
+             */
+            dom::ResizeableRasterPtr createRaster(unsigned theWidth,
+                                                  unsigned theHeight,
+                                                  unsigned theDepth,
+                                                  PixelEncoding theEncoding); 
+
+            /**
+             * Creates a new raster with the given properties and pixels
+             */
+            dom::ResizeableRasterPtr createRaster(unsigned theWidth,
+                                                  unsigned theHeight,
+                                                  unsigned theDepth,
+                                                  PixelEncoding theEncoding,
+                                                  const asl::ReadableBlock & thePixels); 
+
             void blitImage(const asl::Ptr<Image, dom::ThreadingModel> & theSourceImage,
                            const asl::Vector2i & theTargetPos,
                            const asl::Box2i * theSourceRect = 0);
-            void set(unsigned int theNewWidth,
-                    unsigned int theNewHeight,
-                    unsigned int theNewDepth,
-                    PixelEncoding theEncoding,
-                    dom::ValuePtr theRaster);
-            void createRaster(PixelEncoding theEncoding);
-
-
-            virtual void load(asl::PackageManager & thePackageManager);
-            virtual void load(const std::string & theImagePath = ".");
 
             ImageType getType() const;
 
-            PixelEncoding getEncoding() const;
+            // Returns the pixel encoding of the raster image 
+            PixelEncoding getRasterEncoding() const;
+
+            // Returns the pixel encoding of the texture 
+            TextureInternalFormat getInternalEncoding() const;
 
             unsigned getMemUsed() const{
                 if (getRasterPtr()) {
@@ -126,38 +136,6 @@ namespace y60 {
                 } else {
                     return 0;
                 }
-            }
-
-            // Image data access
-            //unsigned char * getWritableData();
-            //const unsigned char * getData(unsigned int theLayer = 0,
-            //                              unsigned int theLayerNum = 1) const;
-            void deleteData();
-
-            /**
-             * Checks if a reload from the source is required.
-             * @retval true if a reload to the ResourceManager is required.
-             */
-            virtual bool reloadRequired() const;
-
-            /**
-             * Check if a texture upload is required since relevant
-             * Image node values have changed.
-             * @return true if an upload is required, else false.
-             */
-            virtual bool textureUploadRequired() const;
-
-            /**
-             * Checks if the applied texture and current Image node
-             * parameters are compatible so that the texture can be
-             * reused.
-             * @retval true if the texture can be safely reused.
-             * @retval false if the texture cannot be reused.
-             */
-            bool canReuseTexture() const;
-            bool isImageNewerThanTexture() const {
-                unsigned long long myNewVersion = getValueVersion();
-                return _myTextureImageVersion < myNewVersion;
             }
 
             /** Saves the image to disk using the PNG format. 
@@ -187,66 +165,64 @@ namespace y60 {
                 }
                 return dom::NodePtr(0);
             }
-            dom::ValuePtr getRasterValue() {
-                dom::NodePtr myValueNode = getRasterValueNode();
-                if (myValueNode) {
-                    return myValueNode->nodeValueWrapperPtr();
-                }
-                return dom::ValuePtr(0);
-            }
+
             const dom::ValuePtr getRasterValue() const {
                 dom::NodePtr myValueNode = getRasterValueNode();
                 if (myValueNode) {
-                    return myValueNode->nodeValueWrapperPtr();
+                    dom::ValuePtr myValue = myValueNode->nodeValueWrapperPtr();
+                    if (myValue->isDirty()) {
+                        // Trigger raster reload
+                        myValue->accessReadableBlock();
+
+                        // Get node again, because reload might have changed the raster node in dom
+                        myValueNode = getRasterValueNode();
+                        if (myValueNode) {
+                            return myValueNode->nodeValueWrapperPtr();
+                        } 
+                    } else {
+                        return myValue;
+                    }
                 }
                 return dom::ValuePtr(0);
             }
-            void setRasterValue(dom::ValuePtr theRasterValue) {
-                dom::NodePtr myValueNode = getRasterValueNode();
-                if (myValueNode) {
-                    myValueNode->nodeValueWrapperPtr(theRasterValue);
-                    return;
-                }
-                throw RasterValueDoesNotExist(JUST_FILE_LINE);
-            }
+
             dom::ResizeableRasterPtr getRasterPtr() {
                 return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue());
             }
+
             const dom::ResizeableRasterPtr getRasterPtr() const {
                 return dynamic_cast_Ptr<dom::ResizeableRaster>(getRasterValue());
             }
 
-        protected:
-            // This is necessary to detect when the src-Attribute does not correspond to the
-            // loaded data. Hopefully we can find a more elegant solution with xml-events, soon.
-            std::string                  _myLoadedFilename;
-            std::string                  _myAppliedFilter;
-            ImageFilterParamsTag::TYPE   _myAppliedFilterParams;
-            asl::Vector4f                _myAppliedColorScale;
-            asl::Vector4f                _myAppliedColorBias;
-            std::string                  _myAppliedPixelFormat;
-            std::string                  _myAppliedInternalFormat;
-            bool                         _myAppliedMipmap;
+            virtual void registerDependenciesRegistrators();
+            bool isUploaded() const;
 
         private:
             Image();
-            void loadFromFile(asl::PackageManager & thePackageManager);
+
+            void registerDependenciesForRasterValueUpdate();
+            void registerDependenciesForImageWidthUpdate();
+            void registerDependenciesForImageHeightUpdate();
+            void registerDependenciesForImageFormatUpdate();
+            void registerDependenciesForTextureUpdate();
+
+            void uploadTexture();
+            void calculateInternalPixelFormat();
+            void calculateWidth();
+            void calculateHeight();
+
+            dom::ResizeableRasterPtr setRasterValue(dom::ValuePtr theRaster, 
+                PixelEncoding theEncoding, unsigned theDepth);
+
             void convertToPLBmp(PLAnyBmp & theBitmap);
             void convertFromPLBmp(PLAnyBmp & theBitmap);
 
-
-            unsigned                      _myTexId;
+            bool                          _myReuseRaster;
+            unsigned                      _myTextureId;
             unsigned                      _myPixelBufferId;
 
             int                           _myRefCount;
-            asl::WeakPtr<ITextureManager> _myTextureManager;
-            unsigned long long            _myTextureImageVersion;
-
-            // used to detect texture size changes
-            std::string                   _myTexturePixelFormat; // XXX how's this different from _myAppliedPixelFormat?!?!
-            unsigned                      _myTextureWidth;
-            unsigned                      _myTextureHeight;
-            unsigned                      _myTextureDepth;
+            asl::Ptr<asl::PackageManager> _myPackageManager;
     };
 
     typedef asl::Ptr<Image, dom::ThreadingModel> ImagePtr;
