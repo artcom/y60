@@ -454,6 +454,12 @@ namespace y60 {
             throw FFMpegDecoder2Exception("TargetRasterPtr is null.", PLUS_FILE_LINE);
         }
         try {
+            if (_myReadEOF && _myFrameCache.size() <= 1) {
+                _myReadEOF = false;
+                setEOF(true);
+                return theTime;
+            }
+
             FrameCache::VideoFramePtr myVideoFrame(0);
             if (getPlayMode() == y60::PLAY_MODE_STOP) {
                 AC_DEBUG << "readFrame: not playing.";
@@ -486,12 +492,6 @@ namespace y60 {
                 }
             }
             AutoLocker<ThreadLock> myLock(_myLock);
-            if (_myReadEOF && _myFrameCache.size() <= 1) {
-                _myReadEOF = false;
-                setEOF(true);
-                return theTime;
-            }
-
             // convert frame
             theTargetRaster->resize(getFrameWidth(), getFrameHeight());
             if (myVideoFrame) {
@@ -503,6 +503,7 @@ namespace y60 {
                 AC_DEBUG << "readFrame, empty frame.";
                 memset(theTargetRaster->pixels().begin(), 0, theTargetRaster->pixels().size());
             }
+
             getMovie()->set<CacheSizeTag>(_myFrameCache.size());
 
 /*
@@ -638,7 +639,7 @@ namespace y60 {
         } else {
 	        myMovie->set<FrameCountTag>(int(_myFrameRate * (_myVStream->duration
                     / (double) _myTimeUnitsPerSecond)));
-            AC_TRACE << "FFMpegDecoder2::setupVideo(): _myVStream->duration="
+            AC_DEBUG << "FFMpegDecoder2::setupVideo(): _myVStream->duration="
                     << _myVStream->duration << ", _myTimeUnitsPerSecond="
                     << _myTimeUnitsPerSecond;
         }
