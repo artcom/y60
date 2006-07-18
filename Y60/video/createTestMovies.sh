@@ -4,7 +4,7 @@ USAGE=${USAGE}"    Movie length is exactly one frame longer than the number of s
 ARGS=3        # Number of arguments expected.
 E_BADARGS=65  # Exit value if incorrect number of args passed.
 
-MAX_MOVIE_LENGTH=10 # Length of longest movie in seconds
+MAX_MOVIE_LENGTH=60 # Length of longest movie in seconds
 
 test $# -ne $ARGS && echo -e $USAGE && exit $E_BADARGS
 
@@ -26,7 +26,7 @@ function calculateSingleFrameSeconds {
 }
 
 function createImages {
-    y60 CreateTestMovie.js ${MOVIE_WIDTH} ${MOVIE_HEIGHT} ${FRAMERATE} 10 
+    y60 CreateTestMovie.js ${MOVIE_WIDTH} ${MOVIE_HEIGHT} ${FRAMERATE} ${MAX_MOVIE_LENGTH}
 }
 
 function createMovie {
@@ -43,7 +43,7 @@ function createMovie {
     then
         if [ ${MOVIE_LENGTH_IN_SECONDS} -ge 2 ]
         then  
-            sox testmovies/material/OneSecondClick.wav testmovies/tmp/tmp.wav repeat ${MOVIE_LENGTH_IN_SECONDS}
+            sox testmovies/material/TenSecondClick.wav testmovies/tmp/tmp.wav repeat ${MOVIE_LENGTH_IN_SECONDS}
         else
             cp testmovies/material/OneSecondClick.wav testmovies/tmp/tmp.wav
         fi
@@ -55,7 +55,9 @@ function createMovie {
     fi
     MOVIE_FILENAME=${MOVIE_FILENAME}.${ENCODER_EXTENSION}
     calculateSingleFrameSeconds ${FRAMERATE}
-    echo "--- Generating ${MOVIE_FILENAME}"
+    echo "-------------------------------------------------------------------------"
+    echo "   Generating ${MOVIE_FILENAME}"
+    echo "-------------------------------------------------------------------------"
     FFMPEG_PARAMS="${AUDIO_PARAMS} -t ${MOVIE_LENGTH_IN_SECONDS}${SINGLE_FRAME} -i testmovies/tmp/${MOVIE_WIDTH}x${MOVIE_HEIGHT}_frame%07d.png -y -r ${FRAMERATE} -b 9000 ${ENCODER_PARAMS} ${MOVIE_FILENAME}"
     echo "ffmpeg ${FFMPEG_PARAMS}"
     if [ ${NUM_PASSES} -eq 1 ]
@@ -86,7 +88,8 @@ function createMovies {
 
 createImages 
 
-rm testmovies/*
+rm testmovies/*.*
+
 
 createMovies mpeg4 "-vcodec mpeg4" avi 2
 #createMovies msmpeg4v1 "-vcodec msmpeg4v1" avi                # broken
