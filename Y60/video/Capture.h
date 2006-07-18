@@ -83,6 +83,9 @@ namespace y60 {
     private:
         Capture();
 
+        // Overwrite the Image::load() method to avoid auto-loading mechanism
+        void load() {}
+
         void stop();
         void setPlayMode(MoviePlayMode thePlayMode);
         void open(const std::string & theSourceFile);

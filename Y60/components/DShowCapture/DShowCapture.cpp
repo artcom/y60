@@ -43,8 +43,8 @@ namespace y60 {
     void DShowCapture::load(const std::string & theFilename) {
         AC_DEBUG << "DShowCapture::load " << theFilename;
 
-        int myFrameWidth = getFrameWidth();
-        int myFrameHeight = getFrameHeight();
+        int myFrameWidth = 0;//getFrameWidth();
+        int myFrameHeight = 0;//getFrameHeight();
         unsigned myFrameRate = (unsigned)getFrameRate();
         unsigned myInputPinNumber = 0;
         unsigned myDeviceId = getDevice();
@@ -110,6 +110,8 @@ namespace y60 {
         if (myDeviceId >= myDevices.size()) {
             throw DShowCapture::Exception("No such Device. Highest available DeviceId is: " + myDevices.size()-1, PLUS_FILE_LINE);
         } 
+
+
 
         setName(myDevices[myDeviceId]);
         setFrameRate(myFrameRate);

@@ -581,7 +581,14 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             }
             myImage.texturepixelformat = thePixelFormat;
         }
-        window.scene.loadMovieFrame(myImage);
+        var myNodeName = myImage.nodeName;
+        if (myNodeName == "movie") {
+            window.scene.loadMovieFrame(myImage);
+        } else if (myNodeName == "capture") {
+                window.scene.loadCaptureFrame(myImage);
+        } else {
+            throw new Exception("Unknown movie image node name: " + myNodeName, fileline());
+        }
 
         var mySize = null;
         if (myImage.src.search(/\.m60/) != -1) {

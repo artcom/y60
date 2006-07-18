@@ -96,6 +96,11 @@ namespace y60 {
         _myDevice = myDevice->instance();
 
         _myDevice->initialize(this);
+        dom::ValuePtr myRasterValue = getRasterValue();
+        if (!myRasterValue) {
+            // Create default raster
+            createRaster(1,1,1,GRAY);
+        }
         _myDevice->load(theUrl);
 
         /*

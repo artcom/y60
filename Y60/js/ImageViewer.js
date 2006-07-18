@@ -321,8 +321,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                                 plug("y60DC1394");
                                 print("plugged dc1394");
                             } else {
-                                plug("y60VFWCapture");
-                                print("plugged dshow");
+                                plug("y60DShowCapture");
+                                plug("y60DShowCapture");
                             }
                             _myVideoCapturePlugged  = true;
                         }
@@ -541,13 +541,13 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myCaptureNode.name = "IVCaptureNode";
             _myCaptureNode.id = createUniqueId();
             _myCaptureNode.playmode = "play";
+            _myCaptureNode.src = theURL;
             _myMovieOverlay = new MovieOverlay(self.getOverlayManager(), _myCaptureNode);
         }
 
         if (_myFullSizeMode) {
             _myCaptureNode.matrix = new Matrix4f();
         }
-
         _myCaptureNode.src = theURL;
         window.scene.loadCaptureFrame(_myCaptureNode)
         _myCaptureNode.playmode = "play";
