@@ -19,16 +19,10 @@ use("SceneViewer.js");
 use("VideoRecorder.js");
 plug("y60JSSound");
 
-var theRequest = [];
-theRequest["MOVIE_WIDTH"]  = arguments[0];
-theRequest["MOVIE_HEIGHT"] = arguments[1];
-theRequest["FRAMERATE"]    = arguments[2];
-theRequest["MOVIE_LENGTH"] = arguments[3];
-
-const MOVIE_WIDTH  = Number(theRequest["MOVIE_WIDTH"]);
-const MOVIE_HEIGHT = Number(theRequest["MOVIE_HEIGHT"]);
-const FRAMERATE    = Number(theRequest["FRAMERATE"]);
-const MOVIE_LENGTH = Number(theRequest["MOVIE_LENGTH"]); // seconds
+const MOVIE_WIDTH  = Number(arguments[0]);
+const MOVIE_HEIGHT = Number(arguments[1]);
+const FRAMERATE    = Number(arguments[2]);
+const MOVIE_LENGTH = Number(arguments[3]); // seconds
 
 const SWAP_INTERVAL = 0;
 const FIXED_FRAME_TIME = 1/FRAMERATE;
@@ -41,8 +35,13 @@ function CreateTestMovie(theArguments) {
     SceneViewer.prototype.Constructor(Public, theArguments);
 
     var _myMaterial = null;
-    var _myShape = null;
-    var _myBody = null;
+    var _myShape    = null;
+    var _myBody     = null;
+    
+    var _my10secMaterial = null;
+    var _my10secShape    = null;
+    var _my10secBody     = null;
+
     var _myTestName = "";
     var _myCurTestIndex = -1;
     var _myFrameCount = 0;
@@ -66,6 +65,11 @@ function CreateTestMovie(theArguments) {
         _myShape    = window.scene.createQuadShape(_myMaterial, [-1,-1,-5], [1,1,-5]);
         _myBody     = window.scene.createBody(_myShape);
         _myBody.visible =  false;
+
+        _my10secMaterial = window.scene.createColorMaterial([0,1,0,1]);
+        _my10secShape    = window.scene.createQuadShape(_my10secMaterial, [-1,-1,-5], [1,1,-5]);
+        _my10secBody     = window.scene.createBody(_my10secShape);
+        _my10secBody.visible =  false;
         
         window.swapInterval = SWAP_INTERVAL;
         window.fixedFrameTime = FIXED_FRAME_TIME;
@@ -91,9 +95,14 @@ function CreateTestMovie(theArguments) {
         window.renderText(myPos, myTimeString, "Screen15");
         
         if(myFrames < 0.1) {
-            _myBody.visible =  true;
+            if (mySeconds % 10 == 0){
+                _my10secBody.visible = true;
+            } else {
+                _myBody.visible = true;
+            }
         } else {
-            _myBody.visible =  false;
+            _myBody.visible = false;
+            _my10secBody.visible = false;
         }
         
     }
