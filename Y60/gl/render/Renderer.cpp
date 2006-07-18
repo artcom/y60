@@ -1522,7 +1522,6 @@ namespace y60 {
         if (!myOverlay.get<VisibleTag>()) {
             return;
         }
-        MAKE_SCOPE_TIMER(renderOverlay);
 
         // do the transformation
         glPushMatrix();

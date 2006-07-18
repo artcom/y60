@@ -49,16 +49,16 @@ namespace y60 {
         if (_myTTFRenderer) {
             _myTTFRenderer->setWindowSize(myWindowWidth, myWindowHeight);
         }
-        
-        glPushAttrib(GL_ALL_ATTRIB_BITS);       
+
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
         glActiveTexture(asGLTextureRegister(0));
         glClientActiveTexture(asGLTextureRegister(0));
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         CHECK_OGL_ERROR;
-        
+
         //glMatrixMode(GL_TEXTURE);
         //glLoadIdentity();
-        
+
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
@@ -69,8 +69,8 @@ namespace y60 {
         Matrix4f myScreenMatrix;
         myScreenMatrix.makeTranslating(Vector3f(-float(myWindowWidth)/2, -float(myWindowHeight)/2,0));
         if (theViewport->get<ViewportOrientationTag>() == PORTRAIT_ORIENTATION) {
-            Matrix4f myRotationMatrix;        
-            myRotationMatrix.makeZRotating(float(asl::PI_2));            
+            Matrix4f myRotationMatrix;
+            myRotationMatrix.makeZRotating(float(asl::PI_2));
             myScreenMatrix.postMultiply(myRotationMatrix);
         }
         myScreenMatrix.translate(Vector3f(float(myWindowWidth)/2, float(myWindowHeight)/2,0));
@@ -79,7 +79,7 @@ namespace y60 {
         glDepthMask(GL_FALSE);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
-        
+
         for (unsigned myTextIndex=0; myTextIndex!=_myTextSnippets.size(); ++myTextIndex) {
             // TODO, refactor
             DB(AC_TRACE << "TextRendererManager:: rendering text #" << myTextIndex << endl);
@@ -92,7 +92,7 @@ namespace y60 {
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
-        
+
         glPopAttrib();
         CHECK_OGL_ERROR;
     }
