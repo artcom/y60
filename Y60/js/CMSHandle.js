@@ -17,7 +17,7 @@ function CMSHandle( theConfigFile) {
 CMSHandle.USER_AGNET = "Wget/1.10.2";
 CMSHandle.VERBOSE_ZOPE_SESSION = true;
 CMSHandle.VERBOSE_BACKEND_SESSION = true;
-CMSHandle.DUMMY_PRESENTATION_FILE = "dummy_presentation.xml";
+CMSHandle.DUMMY_PRESENTATION_FILE = "CONFIG/dummy_presentation.xml";
 
 CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
@@ -30,10 +30,15 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         _myCMSCache = new CMSCache(myCMSConfig.localdir, _myPresentation,
                             myCMSConfig.backend, _myConfig.username, _myConfig.password );
         _myCMSCache.verbose = CMSHandle.VERBOSE_BACKEND_SESSION;
-        _myCMSCache.synchronize();
+        if ( !("DUMMY_PRESENTATION_FILE" in CMSHandle) ) {
+            _myCMSCache.synchronize();
+        }
     }
 
     obj.isSynchronized = function() {
+        if ( "DUMMY_PRESENTATION_FILE" in CMSHandle ) {
+            return true; 
+        }
         return _myCMSCache.isSynchronized();
     }
 
