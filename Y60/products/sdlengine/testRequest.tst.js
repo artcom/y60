@@ -36,10 +36,15 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
     obj.myManager = new RequestManager();
 
     obj.run = function() {
-        obj.myTestServer = new TestServer("localhost",2345);
+        var myPort = Number(expandEnvironment("${AC_TEST_PORT_START}"));
+        if (myPort == 0) {
+            myPort = 2345;
+        }
+        
+        obj.myTestServer = new TestServer("localhost",myPort);
         obj.myTestServer.start();
 
-        obj.myRequest = new Request("http://localhost:2345/ShortRequest");
+        obj.myRequest = new Request("http://localhost:"+myPort+"/ShortRequest");
 
        obj.myRequest.onDone = function() {
             print ("onDone called on "+this);
@@ -65,7 +70,7 @@ RequestUnitTest.prototype.Constructor = function(obj, theName) {
         obj.myBadRequest = new Request("http://www.server.invalid");
         obj.myManager.performRequest(obj.myBadRequest);
 
-        obj.myTimeoutRequest = new Request("http://localhost:2345/Timeout");
+        obj.myTimeoutRequest = new Request("http://localhost:"+myPort+"/Timeout");
         obj.myTimeout = 5;
         obj.myTimeoutRequest.setTimeoutParams(1, obj.myTimeout);
         obj.myTimeoutRequest.onError = function(theErrorCode) {
