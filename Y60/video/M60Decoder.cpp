@@ -17,6 +17,8 @@
 //
 //=============================================================================
 #include "M60Decoder.h"
+
+#include "Movie.h"
 #include "MovieEncoding.h"
 #include <asl/Ptr.h>
 #include <asl/RunLengthEncoder.h>

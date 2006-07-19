@@ -44,6 +44,7 @@
 #include "FFMpegPixelEncoding.h"
 #include "DecoderContext.h"
 
+#include <y60/Movie.h>
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
 #include <asl/Pump.h>

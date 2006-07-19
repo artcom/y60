@@ -12,19 +12,18 @@
 #include "FFMpegURLProtocol.h"
 #include "Demux.h"
 
+#include <y60/Movie.h>
 #include <y60/SoundManager.h>
 #include <asl/Ptr.h>
 #include <asl/Auto.h>
 #include <asl/Pump.h> //must come before Assure.h
-#include <asl/Block.h>
 #include <asl/Logger.h>
-#include <asl/Assure.h>
 #include <asl/file_functions.h>
 
 #include <iostream>
 #include <stdlib.h>
 
-#define DB(x) //x
+#define DB(x) //x 
 #define DB2(x) //x
 
 using namespace std;
@@ -661,7 +660,7 @@ namespace y60 {
         {
             // For some codec, the duration value is not set. For MPEG1 and MPEG2,
             // ffmpeg gives a consistently wrong value.
-            AC_WARNING << "FFMpegDecoder2::setupVideo(): '" << theFilename
+            AC_DEBUG << "FFMpegDecoder2::setupVideo(): '" << theFilename
                     << "' contains no valid duration";
             myMovie->set<FrameCountTag>(-1);
         } else {

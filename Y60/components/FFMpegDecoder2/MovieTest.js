@@ -203,7 +203,6 @@ function FFMpegTest(theArguments) {
                 print("  Play to end...");
                 initMovie(theMovieName);
                 _myMovie.playmode = "play";
-                print(_myMovie.framecount);
                 assure_msg(_myMovie.framecount == 26 || _myMovie.framecount == -1, 
                         "Movie framecount is correct.");
                 break;

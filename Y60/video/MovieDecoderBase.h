@@ -19,7 +19,6 @@
 #ifndef _ac_y60_MovieDecoderBase_h_
 #define _ac_y60_MovieDecoderBase_h_
 
-#include "Movie.h"
 #include <y60/PixelEncoding.h>
 #include <y60/NodeValueNames.h>
 #include <y60/IDecoder.h>
@@ -35,6 +34,7 @@ namespace asl {
 }
 
 namespace y60 {
+    class Movie;
     /**
      * @ingroup Y60video
      * Abstract base class for Movie Decoders.
