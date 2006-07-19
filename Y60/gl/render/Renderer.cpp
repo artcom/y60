@@ -1233,8 +1233,8 @@ namespace y60 {
             case POSITIONAL:
             case SPOT:
                 break;
-	 case AMBIENT:
-		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, myLightPropFacade->get<LightAmbientTag>().begin());
+	        case AMBIENT:
+		        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, myLightPropFacade->get<LightAmbientTag>().begin());
                 return;
             case UNSUPPORTED:
                 return;
@@ -1266,6 +1266,7 @@ namespace y60 {
                 // get the Z-Axis to set the light direction
                 asl::QuadrupleOf<float> myTmpVec = theLight->get<GlobalMatrixTag>().getRow(2); // Z-axis
                 asl::Vector3f myLightDirection(myTmpVec.begin());
+                myLightDirection = asl::product(myLightDirection, asl::Vector3f(-1,-1,-1));
                 glLightfv(gl_lightid, GL_SPOT_DIRECTION, &(myLightDirection[0]));
 
                 asl::Vector3f myLightTranslation = theLight->get<GlobalMatrixTag>().getTranslation();
