@@ -1233,8 +1233,8 @@ namespace y60 {
             case POSITIONAL:
             case SPOT:
                 break;
-			case AMBIENT:
-				glLightModelfv(GL_LIGHT_MODEL_AMBIENT, myLightPropFacade->get<LightAmbientTag>().begin());
+	 case AMBIENT:
+		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, myLightPropFacade->get<LightAmbientTag>().begin());
                 return;
             case UNSUPPORTED:
                 return;
@@ -1267,6 +1267,9 @@ namespace y60 {
                 asl::QuadrupleOf<float> myTmpVec = theLight->get<GlobalMatrixTag>().getRow(2); // Z-axis
                 asl::Vector3f myLightDirection(myTmpVec.begin());
                 glLightfv(gl_lightid, GL_SPOT_DIRECTION, &(myLightDirection[0]));
+
+                asl::Vector3f myLightTranslation = theLight->get<GlobalMatrixTag>().getTranslation();
+                myGLLightPos = asl::Vector4f(myLightTranslation[0], myLightTranslation[1], myLightTranslation[2],1.0f);
                 break;
             }
         }
