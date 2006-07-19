@@ -17,7 +17,6 @@
 
 use("SceneViewer.js");
 use("VideoRecorder.js");
-plug("y60JSSound");
 
 const MOVIE_WIDTH  = Number(arguments[0]);
 const MOVIE_HEIGHT = Number(arguments[1]);
@@ -42,8 +41,6 @@ function CreateTestMovie(theArguments) {
     var _my10secShape    = null;
     var _my10secBody     = null;
 
-    var _myTestName = "";
-    var _myCurTestIndex = -1;
     var _myFrameCount = 0;
     var _myDirectory = "testmovies/tmp";
 
@@ -54,12 +51,6 @@ function CreateTestMovie(theArguments) {
         window.eventListener = Public;
         
         print("creating images");
-        
-        var myNoisyString = expandEnvironment("${Y60_NOISY_SOUND_TESTS}");
-        if (myNoisyString == "") {
-            var mySoundManager = new SoundManager();
-            mySoundManager.volume = 0.0;
-        }
         
         _myMaterial = window.scene.createColorMaterial([1,1,1,1]);
         _myShape    = window.scene.createQuadShape(_myMaterial, [-1,-1,-5], [1,1,-5]);

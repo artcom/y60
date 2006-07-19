@@ -43,7 +43,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(AVDelayTag,      double,      MOVIE_AVDELAY_ATTRIB,     0);
     DEFINE_ATTRIBUT_TAG(CacheSizeTag,    int,         MOVIE_FRAME_CACHE_ATTRIB, 0);
     DEFINE_ATTRIBUT_TAG(CurrentFrameTag, int,         MOVIE_FRAME_ATTRIB,       0);
-    DEFINE_ATTRIBUT_TAG(FrameCountTag,   unsigned,    MOVIE_FRAMECOUNT_ATTRIB,  0);
+    DEFINE_ATTRIBUT_TAG(FrameCountTag,   int,         MOVIE_FRAMECOUNT_ATTRIB,  0);
     DEFINE_ATTRIBUT_TAG(FrameRateTag,    double,      MOVIE_FRAMERATE_ATTRIB,   25);
     DEFINE_ATTRIBUT_TAG(PlaySpeedTag,    float,       MOVIE_PLAYSPEED_ATTRIB,   1);
     DEFINE_ATTRIBUT_TAG(PlayModeTag,     std::string, MOVIE_PLAYMODE_ATTRIB,    "play");
@@ -129,7 +129,7 @@ namespace y60 {
             
             void setup();
             void stop();
-            void restart();
+            void restart(double theCurrentTime);
             void setPlayMode(MoviePlayMode thePlayMode);
 
             double decodeFrame(double theTime, unsigned theFrame);

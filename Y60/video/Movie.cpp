@@ -23,7 +23,7 @@
 using namespace dom;
 using namespace std;
 
-#define DB(x) // x
+#define DB(x) x
 #define DB2(x) // x
 
 
@@ -91,11 +91,12 @@ namespace y60 {
     }
 
     void
-    Movie::restart() {
+    Movie::restart(double theCurrentTime) {
         AC_DEBUG  << "Movie::restart";
         _myDecoder->stopMovie();
         _myDecoder->startMovie(0);
-        decodeFrame(0.0, 0);
+        double myMovieTime = _myDecoder->getMovieTime(theCurrentTime);
+        decodeFrame(myMovieTime, 0);
     }
 
     void
@@ -139,16 +140,25 @@ namespace y60 {
     }
 
     double Movie::getTimeFromFrame(unsigned theFrame) const {
-        return (double)(theFrame % get<FrameCountTag>()) / get<FrameRateTag>();
+        int FrameCount = get<FrameCountTag>();
+        if (FrameCount == -1) {
+            return (double)(theFrame) / get<FrameRateTag>();
+        } else {
+            return (double)(theFrame % get<FrameCountTag>()) / get<FrameRateTag>();
+        }
     }
 
     unsigned Movie::getFrameFromTime(double theTime) const {
         double myFrameHelper = theTime * get<FrameRateTag>();
         int myFrame = int(asl::round(myFrameHelper));
-        while (myFrame < 0) {
-            myFrame += get<FrameCountTag>();
+        if (get<FrameCountTag>() == -1) {
+            return (unsigned)myFrame;
+        } else {
+            while (myFrame < 0) {
+                myFrame += get<FrameCountTag>();
+            }
+            return (unsigned)(myFrame % get<FrameCountTag>());
         }
-        return (unsigned)(myFrame % get<FrameCountTag>());
     }
 
     void
@@ -159,6 +169,7 @@ namespace y60 {
     void
     Movie::readFrame(double theCurrentTime, bool theIgnoreCurrentTime) {
         DB(AC_DEBUG << "Movie::readFrame time=" << theCurrentTime << " src=" << get<ImageSourceTag>());
+        DB(AC_DEBUG << "                 theIgnoreCurrentTime=" << theIgnoreCurrentTime);
         _myLastCurrentTime = theCurrentTime;
 
         if (!_myDecoder) {
@@ -200,7 +211,7 @@ namespace y60 {
             setPlayMode(PLAY_MODE_STOP);
         }
 
-        DB(AC_TRACE << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
+        DB(AC_DEBUG << "Next Frame: " << myNextFrame << ", lastDecodedFrame: " << _myLastDecodedFrame << ", MovieTime: " << myMovieTime;)
         if (myNextFrame != _myLastDecodedFrame) {
             double myDecodedTime = decodeFrame(myMovieTime, myNextFrame);
             /*if (!asl::almostEqual(myDecodedTime, myMovieTime, 0.04)) {
@@ -213,7 +224,7 @@ namespace y60 {
             AC_DEBUG << "Movie has EOF, loopCount=" << _myCurrentLoopCount;
             _myDecoder->setEOF(false);
             if (get<LoopCountTag>() == 0 || ++_myCurrentLoopCount < get<LoopCountTag>()) {
-                restart();
+                restart(theCurrentTime);
             } else {
                 setPlayMode(PLAY_MODE_STOP);
             }

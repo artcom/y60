@@ -108,7 +108,7 @@ namespace y60 {
 
     void
     FFMpegDecoder2::load(const std::string & theFilename) {
-        AC_DEBUG << "load(" << theFilename << ")";
+        AC_INFO << "load(" << theFilename << ")";
         AutoLocker<ThreadLock> myLock(_myLock);
 
         // register all formats and codecs
@@ -155,7 +155,8 @@ namespace y60 {
         if (_myAStream && getAudioFlag()) {
             setupAudio(theFilename);
         } else {
-            AC_INFO << "FFMpegDecoder2::load " << theFilename << " no audio stream found or disabled";
+            AC_DEBUG << "FFMpegDecoder2::load " << theFilename 
+                    << " no audio stream found or disabled";
             _myAudioSink = HWSampleSinkPtr(0);
             _myAStream = 0;
             _myAStreamIndex = -1;
@@ -171,21 +172,11 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::startMovie(double theStartTime) {
-        AC_DEBUG << "startMovie, time: " << theStartTime;
+        AC_INFO << "startMovie, time: " << theStartTime;
 
         AutoLocker<ThreadLock> myLock(_myLock);
         _myReadEOF = false;
-
-        // seek to start
-        // TODO: only do this on loop.
-        int myResult = av_seek_frame(_myFormatContext, -1,
-                int64_t(theStartTime*_myTimeUnitsPerSecond)+_myStartTimestamp,
-                AVSEEK_FLAG_BACKWARD);
-        avcodec_flush_buffers(_myVStream->codec);
-        if (_myAStream) {
-            avcodec_flush_buffers(_myAStream->codec);
-        }
-
+ 
         decodeFrame();
         if (hasAudio())
         {
@@ -196,7 +187,7 @@ namespace y60 {
 
         setState(RUN);
         if (!isActive()) {
-            AC_DEBUG << "Forking FFMpegDecoder Thread";
+            AC_INFO << "Forking FFMpegDecoder Thread";
             PosixThread::fork();
         } else {
             AC_INFO << "Thread already running. No forking.";
@@ -205,7 +196,7 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::resumeMovie(double theStartTime) {
-        AC_DEBUG << "resumeMovie, time: " << theStartTime;
+        AC_INFO << "resumeMovie, time: " << theStartTime;
         AutoLocker<ThreadLock> myLock(_myLock);
         setState(RUN);
         if (!isActive()) {
@@ -218,10 +209,20 @@ namespace y60 {
     }
 
     void FFMpegDecoder2::stopMovie() {
-        AC_DEBUG << "stopMovie";
+        AC_INFO << "stopMovie";
         if (getState() != STOP) {
-            AC_DEBUG << "Joining FFMpegDecoder Thread";
+            AC_INFO << "Joining FFMpegDecoder Thread";
             join();
+            
+            // seek to start
+            // TODO: only do this on loop?
+            int myResult = av_seek_frame(_myFormatContext, -1, 0,
+                    AVSEEK_FLAG_BACKWARD);
+            avcodec_flush_buffers(_myVStream->codec);
+            if (_myAStream) {
+                avcodec_flush_buffers(_myAStream->codec);
+            }
+
             if (_myAudioSink) {
                 _myAudioSink->stop();
             }
@@ -238,7 +239,7 @@ namespace y60 {
 
     void
     FFMpegDecoder2::closeMovie() {
-        AC_DEBUG << "closeMovie";
+        AC_INFO << "closeMovie";
         // stop thread
         stopMovie();
 
@@ -326,6 +327,7 @@ namespace y60 {
         } // while
 
         // adjust volume
+        // XXX: This should adjust the movie volume, _not_ the global volume!
 /*
         float myVolume = getMovie()->get<VolumeTag>();
         if (!asl::almostEqual(Pump::get().getVolume(), myVolume)) {
@@ -345,7 +347,33 @@ namespace y60 {
             myPacket = _myDemux->getPacket(_myVStreamIndex);
             if (myPacket == 0) {
                 myEndOfFileFlag = true;
+
+                // Usually, we're done at this point. mpeg1 and mpeg2, however,
+                // deliver another frame...
                 AC_DEBUG << "---- FFMpegDecoder2::decodeFrame: eof";
+                int myFrameCompleteFlag = 0;
+                int myLen = avcodec_decode_video(_myVStream->codec, _myFrame,
+                        &myFrameCompleteFlag, 0, 0);
+                if (myFrameCompleteFlag) {
+		            AC_TRACE << "---- add frame";
+                    // the only way to get the timestamp of this frame is to take
+                    // _myFrame->coded_picture_number and calculate it from that.
+                    // Yuck.
+                    int64_t myFrameTimestamp = int64_t(_myFrame->coded_picture_number*
+                            _myTimeUnitsPerSecond/_myFrameRate);
+                    addCacheFrame(_myFrame, myFrameTimestamp);
+                    _myNumFramesDecoded++;
+                    if (_myFrame->pict_type == FF_I_TYPE) {
+                        AC_DEBUG << "***** I_FRAME *****";
+                        _myNumIFramesDecoded++;
+                    }
+
+//                    cerr << "Last frame: coded_picture_number=" <<
+//                            _myFrame->coded_picture_number << ", display_picture_number=" << 
+//                            _myFrame->display_picture_number << ", frame pts=" <<
+//                            _myFrame->pts << endl;
+                    break;
+                }
             } else {
                 AC_DEBUG << "myPacket->dts=" << myPacket->dts;
                 int myFrameCompleteFlag = 0;
@@ -362,10 +390,6 @@ namespace y60 {
                         _myStartTimestamp = myPacket->dts;
                         AC_DEBUG << "Set StartTimestamp to packet timestamp, = " << _myStartTimestamp;
                     }
-                    // The following line used to calculate the presentation timestamp
-                    // by hand, assuming that ffmpeg made errors in the calculation.
-                    // That breaks seeks, so I've removed it - uz.
-                    // _myNextPacketTimestamp += _myTimePerFrame;
                     int64_t myNextPacketTimestamp = (myPacket->dts-_myStartTimestamp);
 		            AC_TRACE << "---- add frame";
                     addCacheFrame(_myFrame, myNextPacketTimestamp);
@@ -374,6 +398,10 @@ namespace y60 {
                         AC_DEBUG << "***** I_FRAME *****";
                         _myNumIFramesDecoded++;
                     }
+//                    cerr << "dts=" << myPacket->dts << ", coded_picture_number=" <<
+//                            _myFrame->coded_picture_number << ", display_picture_number=" << 
+//                            _myFrame->display_picture_number << ", frame pts=" <<
+//                            _myFrame->pts << endl;
                     break;
                 }
                 av_free_packet(myPacket);
@@ -491,11 +519,11 @@ namespace y60 {
                     break;
                 }
             }
-            AutoLocker<ThreadLock> myLock(_myLock);
+            AutoLocker<ThreadLock> myLock(_myLock);   // XXX Why is this needed?
             // convert frame
             theTargetRaster->resize(getFrameWidth(), getFrameHeight());
             if (myVideoFrame) {
-                AC_DEBUG << "readFrame: Frame delivered. wanted=" << theTime
+                AC_INFO << "readFrame: Frame delivered. wanted=" << theTime
                         << ", got=" << myVideoFrame->getTimestamp();
                 theTime = myVideoFrame->getTimestamp();
                 copyFrame(myVideoFrame, theTargetRaster);
@@ -505,7 +533,6 @@ namespace y60 {
             }
 
             getMovie()->set<CacheSizeTag>(_myFrameCache.size());
-
 /*
             // Hack to correct the frame count in case the movie itself contains a bogus frame
             // count.
@@ -628,14 +655,15 @@ namespace y60 {
         _myFrameRate = (1.0 / av_q2d(myVCodec->time_base));
         myMovie->set<FrameRateTag>(_myFrameRate);
 
-        if (_myVStream->duration == AV_NOPTS_VALUE) {
-            AC_TRACE << "FFMpegDecoder2::setupVideo() " << theFilename
-                    << " has no valid duration";
-        }
-        if (_myVStream->duration == AV_NOPTS_VALUE || _myVStream->duration <= 0) {
+        if (_myVStream->duration == AV_NOPTS_VALUE || _myVStream->duration <= 0 ||
+                myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || 
+                myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
+        {
+            // For some codec, the duration value is not set. For MPEG1 and MPEG2,
+            // ffmpeg gives a consistently wrong value.
             AC_WARNING << "FFMpegDecoder2::setupVideo(): '" << theFilename
                     << "' contains no valid duration";
-            myMovie->set<FrameCountTag>(INT_MAX);
+            myMovie->set<FrameCountTag>(-1);
         } else {
 	        myMovie->set<FrameCountTag>(int(_myFrameRate * (_myVStream->duration
                     / (double) _myTimeUnitsPerSecond)));

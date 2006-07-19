@@ -2634,10 +2634,10 @@ Possible values are:
                     <xs:documentation>The current frame of the movie</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="framecount" type="xs:unsignedInt">
+            <xs:attribute name="framecount" type="xs:int">
                 <xs:annotation>
                     <xs:documentation>The total framecount of the movie
-Note: MPEG-Movies often contain an invalid value.</xs:documentation>
+MPEG1 and MPEG2 Movies return -1 as framecount since the number of frames is impossible to determine.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="fps" type="xs:double">
