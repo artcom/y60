@@ -23,6 +23,7 @@
 #include <asl/Pump.h>
 #include <asl/Logger.h>
 #include <asl/os_functions.h>
+#include <y60/Movie.h>
 #include <typeinfo>
 
 #include <atlbase.h> //for CComPtr and CComQIPtr
