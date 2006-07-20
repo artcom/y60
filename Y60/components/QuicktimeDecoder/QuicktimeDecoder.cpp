@@ -24,6 +24,7 @@
 
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
+#include <y60/Movie.h>
 
 #define DB(x) //x
 
