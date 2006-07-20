@@ -19,13 +19,14 @@
 
 #include "WMVDecoder.h"
 
+#include <y60/Movie.h>
+
 #include <asl/Auto.h>
 #include <asl/Pump.h>
 #include <asl/Logger.h>
 #include <asl/os_functions.h>
-#include <y60/Movie.h>
-#include <typeinfo>
 
+#include <typeinfo>
 #include <atlbase.h> //for CComPtr and CComQIPtr
 #include <dsound.h> //For the DSSPEAKER_5POINT1 value
 #include <mmreg.h> //For WAVEFORMATEXTENSIBLE (if you use it)
