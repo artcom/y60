@@ -19,12 +19,14 @@
 
 #include "QuicktimeDecoder.h"
 
-#include <qt/QTML.h>
-#include <qt/TextUtils.h>
+#include <y60/Movie.h>
 
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
 #include <y60/Movie.h>
+
+#include <qt/QTML.h>
+#include <qt/TextUtils.h>
 
 #define DB(x) //x
 
@@ -168,9 +170,10 @@ namespace y60 {
 
         QTNewGWorld(&_myOffScreenWorld, myQTTargetPixelFormat, &movieBounds, 0, 0, 0);
 
-        unsigned myFrameCount = getFramecount();
+        int myFrameCount = getFramecount();
         unsigned myDuration = getDurationInMilliseconds();
-        unsigned myFrameRate = floor(double(myFrameCount)/ double((myDuration/1000)));
+        unsigned myFrameRate = (unsigned)floor(double(myFrameCount)/ 
+                double((myDuration/1000)));
         if (!myFrameRate) {
             throw QuicktimeDecoderException(string("Movie ") + theFilename +
                 ": could not get framecount and framerate.", PLUS_FILE_LINE);
@@ -182,7 +185,7 @@ namespace y60 {
         TimeValue   myTimeScale = GetMovieTimeScale(_myMovie);
         AC_INFO << "myTimeScale : " << myTimeScale;
 
-        _myFrameTimeStep = myTimeScale/ myMovie->get<FrameRateTag>();
+        _myFrameTimeStep = (TimeValue)(myTimeScale/ myMovie->get<FrameRateTag>());
 
         // Setup video size and image matrix
         float myXResize = float(movieBounds.right) / asl::nextPowerOfTwo(movieBounds.right);
