@@ -21,15 +21,6 @@ void FrameCache::push_back(VideoFramePtr theFrame) {
     AC_DEBUG << "} push_back";
 }
 
-void FrameCache::push_front(VideoFramePtr theFrame) {
-    AC_DEBUG << "push_front {";
-    _myListLock.lock();
-    _myList.push_front(theFrame);
-    _mySemaphore.post();
-    _myListLock.unlock();
-    AC_DEBUG << "} push_front";
-}
-
 FrameCache::VideoFramePtr FrameCache::pop_front() {
     AC_DEBUG << "pop_front {";
     if (!_mySemaphore.wait(_myErrorTimeout)) {
@@ -42,21 +33,6 @@ FrameCache::VideoFramePtr FrameCache::pop_front() {
     _myList.pop_front();
     _myListLock.unlock();
     AC_DEBUG << "} pop_front";
-    return myPopper;
-}
-
-FrameCache::VideoFramePtr FrameCache::pop_back() {
-    AC_DEBUG << "pop_back {";
-    if (!_mySemaphore.wait(_myErrorTimeout)) {
-        throw FrameCache::TimeoutException("Timeout", PLUS_FILE_LINE);
-    }
-    // XXX We should lock atomically in the wait here. This does not work if multiple threads
-    // call pop_xxx on the Cache!
-    _myListLock.lock();
-    VideoFramePtr myPopper = _myList.back();
-    _myList.pop_back();
-    _myListLock.unlock();
-    AC_DEBUG << "} pop_back";
     return myPopper;
 }
 

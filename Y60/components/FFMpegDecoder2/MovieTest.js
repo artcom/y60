@@ -18,6 +18,8 @@
 use("SceneViewer.js");
 plug("y60JSSound");
 
+const ENDLESS_TEST = false;
+
 function FFMpegTest(theArguments) {
     var Public = this;
     var Base   = {};
@@ -113,8 +115,16 @@ function FFMpegTest(theArguments) {
                 _myMovie.removeFromScene();
                 delete _myMovie;
                 _myMovie = 0;
-                print ("Tests succeeded: "+_mySuccessCount);
-                print ("Tests failed: "+_myFailCount);
+            }
+            print ("Tests succeeded: "+_mySuccessCount);
+            print ("Tests failed: "+_myFailCount);
+            if (ENDLESS_TEST) {
+                if (_myFailCount > 0) {
+                    exit(_myFailCount);
+                } else {
+                    _myCurMovieIndex = 0;
+                }
+            } else {
                 exit(_myFailCount);
             }
         }

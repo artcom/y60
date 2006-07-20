@@ -105,8 +105,7 @@ namespace y60 {
         
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
-        void createFrameCache();
-        void dumpCaches();
+        void dumpCache();
         void copyFrame(FrameCache::VideoFramePtr theVideoFrame, 
                 dom::ResizeableRasterPtr theTargetRaster);
         bool shouldSeek(double theCurrentTime, double theDestTime);
@@ -133,7 +132,7 @@ namespace y60 {
          */
         void addCacheFrame(AVFrame* theFrame, int64_t theTimestamp);
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
-
+        FrameCache::VideoFramePtr createFrame();
         
         // Called from decoder thread
         bool getReadEOF();
@@ -151,7 +150,6 @@ namespace y60 {
         AVStream * _myAStream;
 
         FrameCache _myFrameCache;
-        FrameCache _myFrameRecycler;
         AVFrame * _myFrame;
 
         DemuxPtr _myDemux;

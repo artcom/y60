@@ -69,11 +69,6 @@ namespace y60 {
          */
         void push_back(VideoFramePtr theFrame);
         /**
-         * adds theFrame to the cache. Wakes up thread waiting in pop_back or pop_front.
-         * @param theFrame frame to add to the cache
-         */
-        void push_front(VideoFramePtr theFrame);
-        /**
          * Retrieves the top element of the cache and removes it. If the cache
          * is empty, blocks until an element is there.
          * @throws TimeoutException if the waiting timed out in the time given at
@@ -82,15 +77,6 @@ namespace y60 {
          * @return popped VideoFrame
          */
         VideoFramePtr pop_front();
-        /**
-         * Retrieves the last element of the cache and removes it. If the cache
-         * is empty, blocks until an element is there.
-         * @throws TimeoutException if the waiting timed out in the time given at
-         *         construction of this object.
-         * @throws asl::ThreadSemaphore::ClosedException if close is called while in wait.
-         * @return popped VideoFrame
-         */
-        VideoFramePtr pop_back();
         /**
          * @return Item in the front of the cache or VideoFramePtr(NULL) if the cache is empty.
          */

@@ -62,7 +62,6 @@ namespace y60 {
         _myDemux(0),
         _myDestinationPixelFormat(0),
         _myFrameCache(SEMAPHORE_TIMEOUT),
-        _myFrameRecycler(SEMAPHORE_TIMEOUT),
         _myResampleContext(0),
         _myNumFramesDecoded(0),
         _myNumIFramesDecoded(0),
@@ -168,7 +167,6 @@ namespace y60 {
         if (_myAStreamIndex != -1) {
             _myDemux->enableStream(_myAStreamIndex);
         }
-        createFrameCache();
     }
 
     void FFMpegDecoder2::startMovie(double theStartTime) {
@@ -226,13 +224,11 @@ namespace y60 {
             if (_myAudioSink) {
                 _myAudioSink->stop();
             }
-            _myFrameRecycler.close();
             _myDemux->clearPacketCache();
             setState(STOP);
             _myFrameCache.clear();
             _myFrameCache.reset();
-            dumpCaches();
-            createFrameCache();
+            dumpCache();
             AsyncDecoder::stopMovie();
         }
     }
@@ -441,33 +437,27 @@ namespace y60 {
                 theTargetRaster->pixels().size());
     }
 
-    void FFMpegDecoder2::createFrameCache() {
-        AC_DEBUG << "createFrameCache";
-        _myFrameRecycler.clear();
-        _myFrameRecycler.reset();
+    FrameCache::VideoFramePtr FFMpegDecoder2::createFrame() {
+        AC_DEBUG << "createFrame";
 
-        // create cache
-        unsigned myBufferSize = 0;
+        int myBufferSize;
         switch (_myDestinationPixelFormat) {
             case PIX_FMT_RGBA32:
-                myBufferSize = getFrameWidth() * getFrameHeight() * 4;
+                myBufferSize = _myFrameWidth * _myFrameHeight * 4;
                 break;
             case PIX_FMT_GRAY8:
-                myBufferSize = getFrameWidth() * getFrameHeight() * 1;
+                myBufferSize = _myFrameWidth * _myFrameHeight * 1;
                 break;
             default:
-                myBufferSize = getFrameWidth() * getFrameHeight() * 3;
+                myBufferSize = _myFrameWidth * _myFrameHeight * 3;
                 break;
         }
-        while (_myFrameRecycler.size() < FRAME_CACHE_SIZE+1) {
-            _myFrameRecycler.push_back(FrameCache::VideoFramePtr(new FrameCache::VideoFrame(myBufferSize)));
-        }
+        return FrameCache::VideoFramePtr(new FrameCache::VideoFrame(myBufferSize));
     }
 
     void
-    FFMpegDecoder2::dumpCaches() {
+    FFMpegDecoder2::dumpCache() {
         AC_DEBUG << "FrameCache size: " << _myFrameCache.size();
-        AC_DEBUG << "FrameRecycler size: " << _myFrameRecycler.size();
         _myDemux->dump();
     }
 
@@ -492,26 +482,23 @@ namespace y60 {
             << " from Cache.";
 
         try {
-            if (_myLastVideoFrame && 
-                    shouldSeek(_myLastVideoFrame->getTimestamp(), myStreamTime) &&
-                    getPlayMode() == y60::PLAY_MODE_PAUSE)
-            {
-                seek(theTime);
-            }
-            double myFrameTime;
-            double myTimeDiff;
+            bool useLastVideoFrame = false;
             if (_myLastVideoFrame) {
-                myFrameTime = _myLastVideoFrame->getTimestamp();
-                myTimeDiff = (myFrameTime-myStreamTime)*getFrameRate();
-            }
-            if (_myLastVideoFrame && myTimeDiff < 0.5 && myTimeDiff > -0.9) {
-                AC_DEBUG << "readFrame: Reusing last frame. myFrameTime=" << myFrameTime
-                        << ", myStreamTime=" << myStreamTime;
-                myVideoFrame = _myLastVideoFrame;
-            } else {
-                if (_myLastVideoFrame) {
-                    _myFrameRecycler.push_back(_myLastVideoFrame);
+                if (shouldSeek(_myLastVideoFrame->getTimestamp(), myStreamTime) &&
+                        getPlayMode() == y60::PLAY_MODE_PAUSE)
+                {
+                    seek(theTime);
                 }
+                double myFrameTime = _myLastVideoFrame->getTimestamp();
+                double myTimeDiff = (myStreamTime-myFrameTime)*getFrameRate();
+                if (myTimeDiff < 0.5 && myTimeDiff > -0.9) {
+                    AC_DEBUG << "readFrame: Reusing last frame. myFrameTime=" << myFrameTime
+                        << ", myStreamTime=" << myStreamTime;
+                    myVideoFrame = _myLastVideoFrame;
+                    useLastVideoFrame = true;
+                }
+            }
+            if (!useLastVideoFrame) {
                 while (true) {
                     while (!_myReadEOF && _myFrameCache.size() == 0) {
                         // XXX: Change this so the FrameCache contains an eof packet at the 
@@ -534,7 +521,6 @@ namespace y60 {
                             || (myTimeDiff < 0.5 && myTimeDiff > -0.9)) {
                         break;
                     }
-                    _myFrameRecycler.push_back(myVideoFrame);
                 }
             }
             _myLastVideoFrame = myVideoFrame;
@@ -719,8 +705,7 @@ namespace y60 {
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, int64_t theTimestamp) {
 		AC_DEBUG << "---- try to add frame at " << theTimestamp;
         try {
-//            AC_DEBUG << "---- frame recycler size=" << _myFrameRecycler.size();
-            FrameCache::VideoFramePtr myVideoFrame = _myFrameRecycler.pop_front();
+            FrameCache::VideoFramePtr myVideoFrame = createFrame();
             myVideoFrame->setTimestamp(theTimestamp/(double)_myTimeUnitsPerSecond);
             convertFrame(theFrame, myVideoFrame->getBuffer());
             _myFrameCache.push_back(myVideoFrame);
@@ -764,11 +749,9 @@ namespace y60 {
         if (_myAudioSink) {
             _myAudioSink->stop();
         }
-        _myFrameRecycler.close();
         _myDemux->clearPacketCache();
         _myFrameCache.clear();
         _myFrameCache.reset();
-        createFrameCache();
 
         int64_t mySeekTime = int64_t(theDestTime*_myTimeUnitsPerSecond)+_myStartTimestamp;
         AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
