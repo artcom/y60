@@ -44,7 +44,6 @@ function FFMpegTest(theArguments) {
         "msmpeg4v2_160x120_25_1_audio.avi",
 //        "realvideo_160x120_25_1_audio.rm",
         "xvid_160x120_25_1_audio.avi",
-        "xvid_160x120_25_1_audio.mov",
         "xvid_160x120_25_1_noaudio.avi",
     ];
 

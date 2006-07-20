@@ -140,7 +140,7 @@ namespace y60 {
 
         
         // Used in main thread
-        
+        FrameCache::VideoFramePtr _myLastVideoFrame;
         
         // Used in both threads
         AVFormatContext * _myFormatContext;
