@@ -28,6 +28,7 @@ function FFMpegTest(theArguments) {
     var _myCurMovieIndex = -1;
     var _myCurTestIndex = -1;
     var _myTestFrameCount = 0;
+    var _mySuccessCount = 0;
     var _myFailCount = 0;
 
     var _myTestMovies = [
@@ -88,7 +89,7 @@ function FFMpegTest(theArguments) {
             var myText  = getFilenamePart(_myMovie.src) + " " + _myMovie.playmode
             window.renderText([10, myPos], myText, "Screen15");
             myPos += 20;
-            var myText  = " Frame " + _myMovie.currentframe + " of " + _myMovie.framecount;
+            myText  = " Frame " + _myMovie.currentframe + " of " + _myMovie.framecount;
             window.renderText([10, myPos], myText, "Screen15");
         }
     }
@@ -112,6 +113,8 @@ function FFMpegTest(theArguments) {
                 _myMovie.removeFromScene();
                 delete _myMovie;
                 _myMovie = 0;
+                print ("Tests succeeded: "+_mySuccessCount);
+                print ("Tests failed: "+_myFailCount);
                 exit(_myFailCount);
             }
         }
@@ -245,6 +248,7 @@ function FFMpegTest(theArguments) {
             _myFailCount++;
         } else {
             print("    SUCCESS: "+theMsg);
+            _mySuccessCount++;
         }
     }
 }
