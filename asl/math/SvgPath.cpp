@@ -104,6 +104,26 @@ namespace asl {
         _myLastPos = myEnd;
     }
 
+    /// Cubic bezier spline from points. 
+    void SvgPath::cbezierFromPoints(const Vector3f & theBeforeStartPoint,
+                                    const Vector3f & theStartPoint,
+                                    const Vector3f & theEndPoint,
+                                    const Vector3f & theAfterEndPoint,
+                                    float theHandleSize,
+                                    bool theRelativeFlag)
+    {
+
+        // calculate handles
+        Vector3f myDir1 = normalized(theEndPoint - theBeforeStartPoint) * theHandleSize;
+        Vector3f myDir2 = normalized(theStartPoint - theAfterEndPoint) * theHandleSize;
+        Vector3f myStartAnchor = theStartPoint + myDir1;
+        Vector3f myEndAnchor   = theEndPoint + myDir2;
+
+        //setControlPoints(thePoints[1], myStartHandle, thePoints[2], myEndHandle);
+
+        cbezier( myStartAnchor, myEndAnchor, theEndPoint, theRelativeFlag );
+    }
+
     /// Close path to origin or position of last move.
     void SvgPath::close()
     {

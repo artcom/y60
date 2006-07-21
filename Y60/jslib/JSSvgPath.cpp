@@ -172,7 +172,7 @@ namespace jslib {
     static JSBool
     cbezier(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     {
-        DOC_BEGIN("Draw cubic bezier curve.");
+        DOC_BEGIN("Draw cubic bezier curve from anchors and end point.");
         DOC_PARAM("theStartAnchor", "Start point anchor.", DOC_TYPE_VECTOR3F);
         DOC_PARAM("theEndAnchor", "End point anchor.", DOC_TYPE_VECTOR3F);
         DOC_PARAM("theEnd", "End point.", DOC_TYPE_VECTOR3F);
@@ -212,6 +212,65 @@ namespace jslib {
 
         return JS_TRUE;
     }
+
+    static JSBool
+    cbezierFromPoints(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+    {
+        DOC_BEGIN("Draw cubic bezier curve from points.");
+        DOC_PARAM("theBeforeStartPoint", "Point before start point. (used for calculation)", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("theStartPoint", "Start point.", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("theEndPoint", "End point.", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("theAfterEndPoint", "Point after end point. (used for calculation)", DOC_TYPE_VECTOR3F);
+        DOC_PARAM("theHandleSize", "Size of calculated handles.", DOC_TYPE_FLOAT);
+        DOC_PARAM("theRelativeFlag", "Relative-or-absolute position.", DOC_TYPE_BOOLEAN);
+        DOC_END;
+
+        ensureParamCount(argc, 4,6);
+
+        asl::Vector3f myBeforeStartPoint, myStartPoint, myEndPoint, myAfterEndPoint;
+        float myHandleSize = 3; // default ok?
+        bool myRelativeFlag = false;
+
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myBeforeStartPoint)) {
+            JS_ReportError(cx, "JSSvgPath::cbezierFromPoints: argument #1 must be a vector");
+            return JS_FALSE;
+        }
+        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myStartPoint)) {
+            JS_ReportError(cx, "JSSvgPath::cbezierFromPoints: argument #2 must be a vector");
+            return JS_FALSE;
+        }
+        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myEndPoint)) {
+            JS_ReportError(cx, "JSSvgPath::cbezierFromPoints: argument #3 must be a vector");
+            return JS_FALSE;
+        }
+        if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], myAfterEndPoint)) {
+            JS_ReportError(cx, "JSSvgPath::cbezierFromPoints: argument #4 must be a vector");
+            return JS_FALSE;
+        }
+        if (argc > 4) {
+            if (JSVAL_IS_VOID(argv[4]) || !convertFrom(cx, argv[4], myHandleSize)) {
+                JS_ReportError(cx, "JSSvgPath::cbezierFromPoints: argument #5 must be a float");
+                return JS_FALSE;
+            }
+            if (JSVAL_IS_VOID(argv[5]) || !convertFrom(cx, argv[5], myRelativeFlag)) {
+                JS_ReportError(cx, "JSSvgPath::cbezierFromPoints: argument #6 must be a boolean");
+                return JS_FALSE;
+            }
+        }
+
+        JSSvgPath::NATIVE * myNative = 0;
+        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+            JS_ReportError(cx, "JSSvgPath::cbezierFromPoints: self is not a SvgPath");
+            return JS_FALSE;
+        }
+        myNative->cbezierFromPoints(myBeforeStartPoint, myStartPoint, myEndPoint, myAfterEndPoint, myHandleSize, myRelativeFlag);
+
+        return JS_TRUE;
+    }
+
+
+
+
 
 
     static JSBool
@@ -550,6 +609,7 @@ namespace jslib {
             { "hline",   hline,   2 },
             { "vline",   vline,   2 },
             { "cbezier", cbezier, 3 },
+            { "cbezierFromPoints", cbezierFromPoints, 4 },
             { "close",   close,   0 },
             { "revert",  revert,  0 },
             { "getNumElements", getNumElements, 0 },

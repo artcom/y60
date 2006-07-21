@@ -79,11 +79,19 @@ namespace asl {
         /// Vertical line to position.
         void vline(float theY, bool theRelativeFlag = false);
 
-        /// Cubic bezier spline.
+        /// Cubic bezier spline from anchors and end point.
         void cbezier(const Vector3f & theStartAnchor,
                      const Vector3f & theEndAnchor,
                      const Vector3f & theEnd,
                      bool theRelativeFlag = false);
+
+        /// Cubic bezier spline from points.
+        void cbezierFromPoints(const Vector3f & theBeforeStartPoint,
+                               const Vector3f & theStartPoint,
+                               const Vector3f & theEndPoint,
+                               const Vector3f & theAfterEndPoint,
+                               float theHandleSize,
+                               bool theRelativeFlag = false);
 
         /// Close path to origin or position of last move.
         void close();
