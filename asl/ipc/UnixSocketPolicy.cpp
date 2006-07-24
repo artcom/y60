@@ -55,6 +55,15 @@ UnixAddress::UnixAddress() {
     *sun_path = 0;
 }
 
+std::ostream & 
+UnixAddress::print(std::ostream & os) const {
+    return os << sun_path;
+}
+
+std::ostream & operator << (std::ostream & os, const UnixAddress & theAddress) {
+    return theAddress.print(os);
+}
+
 UnixSocketPolicy::Handle 
 UnixSocketPolicy::connectTo(Endpoint theRemoteEndpoint) {
     Handle myHandle = socket(AF_UNIX,SOCK_STREAM,0);   
@@ -83,17 +92,20 @@ UnixSocketPolicy::Handle
 UnixSocketPolicy::startListening(Endpoint theEndpoint, unsigned theMaxConnectionCount) {
     Handle myHandle=socket(AF_UNIX,SOCK_STREAM,0);    
     if (myHandle == INVALID_SOCKET) {
-        throw ConduitException(string("UnixSocketPolicy::ctor: create - ") + 
-                inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
+        throw ConduitException(string("UnixSocketPolicy::startListening") + 
+                inet::getSocketErrorMessage(inet::getLastSocketError()) + 
+                "'" + as_string(theEndpoint)+"'", PLUS_FILE_LINE);
     }
 
     if (bind(myHandle,(struct sockaddr*)&theEndpoint,sizeof(theEndpoint))<0) {
         int myLastError = inet::getLastSocketError();
         if (myLastError == EADDRINUSE) {
-            throw ConduitInUseException(string("UnixSocketPolicy::ctor create"), PLUS_FILE_LINE);
+            throw ConduitInUseException(string("UnixSocketPolicy::bind") + "'" + 
+                    as_string(theEndpoint)+"'", PLUS_FILE_LINE);
         } else {
             throw ConduitException(string("UnixSocketPolicy::UnixSocketPolicy bind - ")+
-                    inet::getSocketErrorMessage(inet::getLastSocketError()), PLUS_FILE_LINE);
+                    inet::getSocketErrorMessage(inet::getLastSocketError()) +
+                    "'" + as_string(theEndpoint)+"'", PLUS_FILE_LINE);
         }
     }
 

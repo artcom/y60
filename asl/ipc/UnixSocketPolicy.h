@@ -39,7 +39,9 @@ class UnixAddress : public sockaddr_un {
         UnixAddress(const char * thePath);
         UnixAddress();
         static const std::string PIPE_PREFIX;
+        std::ostream & print(std::ostream & os) const;
 };
+std::ostream & operator << (std::ostream & os, const UnixAddress & theAddress);
     
 class UnixSocketPolicy : public SocketPolicy {
     public:
