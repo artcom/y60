@@ -34,8 +34,6 @@ function FFMpegTest(theArguments) {
     var _myCurTestIndex = -1;
     var _mySeekDest = null;
     var _myTests = [
-        "setupSeekFwdTest()",
-        "setupRandomSeekTest()",
         "setupPlayTest()",
         "setupStopTest()",
         "setupLoopTest()",
@@ -44,6 +42,7 @@ function FFMpegTest(theArguments) {
         "setupSeekFwdTest()",
         "setupPauseStopTest()",
         "setupStopPauseTest()",
+        "setupRandomSeekTest()"
 
         //"setupLongTest(true)"
     ];
