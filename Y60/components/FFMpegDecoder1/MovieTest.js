@@ -18,6 +18,11 @@
 use("SceneViewer.js");
 plug("y60JSSound");
 
+
+//const MOVIE_FILE = "../FFMpegDecoder/testfiles/counter_short.mpg";
+const MOVIE_FILE = "./testmovies/mpeg2intra_160x120_25_10_noaudio.mpg"; // movie with iframes only, no sound
+const MOVIE_FRAMERATE = 25;
+
 function FFMpegTest(theArguments) {
     var Public = this;
     var Base   = {};
@@ -27,6 +32,21 @@ function FFMpegTest(theArguments) {
     var _myMovie = null;
     var _myTestName = "";
     var _myCurTestIndex = -1;
+    var _mySeekDest = null;
+    var _myTests = [
+        "setupSeekFwdTest()",
+        "setupRandomSeekTest()",
+        "setupPlayTest()",
+        "setupStopTest()",
+        "setupLoopTest()",
+        "setupPauseTest()",
+        "setupSeekBackTest()",
+        "setupSeekFwdTest()",
+        "setupPauseStopTest()",
+        "setupStopPauseTest()",
+
+        //"setupLongTest(true)"
+    ];
 
     Base.setup = Public.setup;
     Public.setup = function() {
@@ -62,50 +82,6 @@ function FFMpegTest(theArguments) {
         }
     }
 
-    function setupTest(theName, theFile, theUseSound) {
-        _myTestName = theName;
-        if (_myMovie) {
-            _myMovie.removeFromScene();
-            delete _myMovie;
-            _myMovie = 0;
-        }
-        print ("Starting test: "+theName);
-        var myMovie = new MovieOverlay(Public.getOverlayManager(), theFile,
-                new Vector2f(300, 70), null, theUseSound, null, "y60FFMpegDecoder1");
-        myMovie.playspeed = 1;
-        myMovie.loopcount = 1;
-        myMovie.avdelay   = 0;
-
-        if (myMovie.width > 480) {
-            var myAspect = myMovie.width / myMovie.height;
-            myMovie.width  = 480;
-            myMovie.height = myMovie.width / myAspect;
-        }
-        _myMovie = myMovie;
-    }
-    
-    /*  
-        needed movie:
-        - only iframes
-        
-        needed tests:
-        - intensive seek
-        
-    */
-
-    var _myTests = [
-        "setupIntensiveSeekTest()",
-        "setupPlayTest()",
-        "setupStopTest()",
-        "setupLoopTest()",
-        "setupPauseTest()",
-        "setupSeekBackTest()",
-        "setupSeekFwdTest()",
-        "setupPauseStopTest()",
-        "setupStopPauseTest()",
-
-            // "setupLongTest(true)"
-    ];
 
     Public.nextTest = function() {
         if (_myTestName) {
@@ -149,25 +125,55 @@ function FFMpegTest(theArguments) {
         _myMovie.playmode = "pause";
     }
 
-    var _mySeekDest;
-
     Public.seek = function() {
         print ("Seek to second " + _mySeekDest);
         _myMovie.playmode = "pause";
-        _myMovie.currentframe = _mySeekDest*25;
+        _myMovie.currentframe = _mySeekDest * MOVIE_FRAMERATE;
         window.scene.loadMovieFrame(_myMovie.movie);
         _myMovie.playmode = "play";
     }
 
+    Public.seekRandom = function() {
+        _mySeekDest = Math.floor( Math.random(0,1) * _myMovie.framecount);
+        print ("Seek to frame " + _mySeekDest);
+        _myMovie.playmode = "pause";
+        _myMovie.currentframe = _mySeekDest;
+        window.scene.loadMovieFrame(_myMovie.movie);
+        _myMovie.playmode = "play";
+    }
+
+
+    function setupTest(theName, theFile) {
+        _myTestName = theName;
+        if (_myMovie) {
+            _myMovie.removeFromScene();
+            delete _myMovie;
+            _myMovie = 0;
+        }
+        print ("Starting test: " + theName);
+        var myMovie = new MovieOverlay(Public.getOverlayManager(), theFile,
+                new Vector2f(300, 70), null, false, null, "y60FFMpegDecoder1");
+        myMovie.playspeed = 1;
+        myMovie.loopcount = 1;
+        myMovie.avdelay   = 0;
+
+        if (myMovie.width > 480) {
+            var myAspect = myMovie.width / myMovie.height;
+            myMovie.width  = 480;
+            myMovie.height = myMovie.width / myAspect;
+        }
+        _myMovie = myMovie;
+    }
+
     function setupPlayTest() {
-        setupTest("Play to End", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        setupTest("Play to End", MOVIE_FILE);
         window.setTimeout("testPlaying", 1000);
-        window.setTimeout("testStopped", 10000);
-        window.setTimeout("nextTest", 10100);
+        window.setTimeout("testStopped", 11000);
+        window.setTimeout("nextTest", 12000);
     }
 
     function setupStopTest() {
-        setupTest("Play, Stop, Play again", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        setupTest("Play, Stop, Play again", MOVIE_FILE);
         window.setTimeout("stop", 1000);
         window.setTimeout("play", 2000);
         window.setTimeout("stop", 3000);
@@ -175,7 +181,7 @@ function FFMpegTest(theArguments) {
     }
 
     function setupPauseTest() {
-        setupTest("Play, Pause, Play again", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        setupTest("Play, Pause, Play again", MOVIE_FILE);
         window.setTimeout("pause", 1000);
         window.setTimeout("play", 2000);
         window.setTimeout("stop", 3000);
@@ -183,29 +189,16 @@ function FFMpegTest(theArguments) {
     }
 
     function setupLoopTest() {
-        setupTest("Loop", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        setupTest("Loop", MOVIE_FILE);
         _myMovie.loopcount = 0;
         window.setTimeout("testPlaying", 1000);
-        window.setTimeout("testPlaying", 10000);
-        window.setTimeout("stop", 10050);
-        window.setTimeout("nextTest", 10100);
+        window.setTimeout("testPlaying", 12000);
+        window.setTimeout("stop", 13000);
+        window.setTimeout("nextTest", 14000);
     }
 
-    function setupIntensiveSeekTest() {
-        setupTest("IntensiveSeek", "../FFMpegDecoder/testfiles/counter_short.mpg");
-        _myMovie.loopcount = 1;
-        _mySeekDest = 1;
-        window.setTimeout("seek", 500);
-        window.setTimeout("seek", 1000);
-        window.setTimeout("seek", 1500);
-        window.setTimeout("seek", 2000);
-        window.setTimeout("seek", 2500);
-        window.setTimeout("seek", 3000);
-        window.setTimeout("nextTest", 8000);
-    }
-    
     function setupSeekBackTest() {
-        setupTest("SeekBack", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        setupTest("SeekBack", MOVIE_FILE);
         _myMovie.loopcount = 1;
         _mySeekDest = 1;
         window.setTimeout("seek", 2000);
@@ -214,15 +207,27 @@ function FFMpegTest(theArguments) {
     }
 
     function setupSeekFwdTest() {
-        setupTest("SeekFwd", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        setupTest("SeekFwd", MOVIE_FILE);
         _myMovie.loopcount = 1;
-        _mySeekDest = 3;
+        
+        _mySeekDest = 1;
         window.setTimeout("seek", 1000);
         window.setTimeout("nextTest", 2000);
+
+        // BUG: seek to a frame that is larger than the number of recognized frames does not work
+        // Description: The movie.framecount is set correctly but the movie shows frame 1 instead
+        // Testmovie: "./testmovies/mpeg2intra_160x120_25_10_noaudio.mpg" // movie with iframes only
+        /*
+        _mySeekDest = 5;
+        window.setTimeout("pause", 0);
+        window.setTimeout("seek", 1000);
+        window.setTimeout("pause", 1001);
+        window.setTimeout("nextTest", 999000);
+        */
     }
 
     function setupPauseStopTest() {
-        setupTest("PauseStop", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        setupTest("PauseStop", MOVIE_FILE);
         _myMovie.loopcount = 1;
         window.setTimeout("pause", 1000);
         window.setTimeout("stop", 1200);
@@ -232,13 +237,27 @@ function FFMpegTest(theArguments) {
     }
 
     function setupStopPauseTest() {
-        setupTest("StopPause", "../FFMpegDecoder/testfiles/counter_short.mpg");
+        setupTest("StopPause", MOVIE_FILE);
         _myMovie.loopcount = 1;
         window.setTimeout("stop", 1000);
         window.setTimeout("pause", 1200);
         window.setTimeout("play", 1400);
         window.setTimeout("stop", 1600);
         window.setTimeout("nextTest", 2000);
+    }
+
+    function setupRandomSeekTest() {
+        setupTest("RandomSeek", MOVIE_FILE);
+        _myMovie.loopcount = 1;
+
+        var timeBetweenSeeks = 300; // msec
+        var randomSeekIterations = 50;
+        
+        for (var i=0; i < randomSeekIterations; i++){
+            window.setTimeout("seekRandom", i * timeBetweenSeeks);
+        }
+        window.setTimeout("testPlaying", (randomSeekIterations + 1) * timeBetweenSeeks);
+        window.setTimeout("nextTest", (randomSeekIterations + 2) * timeBetweenSeeks);
     }
 
     function setupLongTest() {
