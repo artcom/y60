@@ -7,13 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: testMovies.js,v $
-//   $Author: danielk $
-//   $Revision: 1.11 $
-//   $Date: 2005/03/17 20:31:50 $
-//
-//=============================================================================
 
 use("SceneViewer.js");
 plug("y60JSSound");

@@ -205,7 +205,7 @@ Playlist.prototype.Constructor = function(self) {
         if (theUrl.search(/\.wmv$/i)  != -1 ||
             theUrl.search(/\.avi$/i)  != -1) {
             if (operatingSystem() == "Linux") {
-                myDecoderHint = "y60FFMpegDecoder";
+                myDecoderHint = "y60FFMpegDecoder2";
             } else {
                 myDecoderHint = "y60WMVDecoder";
             }

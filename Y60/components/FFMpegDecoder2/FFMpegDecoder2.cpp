@@ -32,8 +32,6 @@ using namespace asl;
 #define USE_RGBA 0
 #define USE_GRAY 1
 
-const long SEMAPHORE_TIMEOUT = asl::ThreadSemaphore::WAIT_INFINITE; //1000 * 60 * 1;
-
 extern "C"
 EXPORT asl::PlugInBase * y60FFMpegDecoder2_instantiatePlugIn(asl::DLHandle myDLHandle) {
 	return new y60::FFMpegDecoder2(myDLHandle);
@@ -61,11 +59,9 @@ namespace y60 {
         _myAStream(0),
         _myDemux(0),
         _myDestinationPixelFormat(0),
-        _myFrameCache(SEMAPHORE_TIMEOUT),
         _myResampleContext(0),
         _myNumFramesDecoded(0),
         _myNumIFramesDecoded(0),
-        _myReadEOF(false),
         _myBytesPerPixel(1)
     {
     }
@@ -173,7 +169,6 @@ namespace y60 {
         AC_INFO << "startMovie, time: " << theStartTime;
 
         AutoLocker<ThreadLock> myLock(_myLock);
-        _myReadEOF = false;
  
         decodeFrame();
         if (hasAudio())
@@ -226,8 +221,8 @@ namespace y60 {
             }
             _myDemux->clearPacketCache();
             setState(STOP);
-            _myFrameCache.clear();
-            _myFrameCache.reset();
+            _myMsgQueue.clear();
+            _myMsgQueue.reset();
             dumpCache();
             AsyncDecoder::stopMovie();
         }
@@ -429,15 +424,7 @@ namespace y60 {
                     myVCodec->width, myVCodec->height);
     }
 
-    void FFMpegDecoder2::copyFrame(FrameCache::VideoFramePtr theVideoFrame,
-                                   dom::ResizeableRasterPtr theTargetRaster)
-    {
-        theTargetRaster->resize(getFrameWidth(), getFrameHeight());
-        memcpy(theTargetRaster->pixels().begin(), theVideoFrame->getBuffer(),
-                theTargetRaster->pixels().size());
-    }
-
-    FrameCache::VideoFramePtr FFMpegDecoder2::createFrame() {
+    VideoMsgPtr FFMpegDecoder2::createFrame(double theTimestamp) {
         AC_DEBUG << "createFrame";
 
         int myBufferSize;
@@ -452,12 +439,12 @@ namespace y60 {
                 myBufferSize = _myFrameWidth * _myFrameHeight * 3;
                 break;
         }
-        return FrameCache::VideoFramePtr(new FrameCache::VideoFrame(myBufferSize));
+        return VideoMsgPtr(new VideoMsg(VideoMsg::MSG_FRAME, theTimestamp, myBufferSize)); 
     }
 
     void
     FFMpegDecoder2::dumpCache() {
-        AC_DEBUG << "FrameCache size: " << _myFrameCache.size();
+        AC_DEBUG << "VideoMsgQueue size: " << _myMsgQueue.size();
         _myDemux->dump();
     }
 
@@ -473,7 +460,7 @@ namespace y60 {
             AC_DEBUG << "readFrame: not playing.";
             return theTime;
         }
-        FrameCache::VideoFramePtr myVideoFrame(0);
+        VideoMsgPtr theVideoMsg(0);
         double myStreamTime = theTime;
         if (_myStartTimestamp != -1) {
             myStreamTime += _myStartTimestamp/_myTimeUnitsPerSecond;
@@ -494,54 +481,57 @@ namespace y60 {
                 if (myTimeDiff < 0.5 && myTimeDiff > -0.9) {
                     AC_DEBUG << "readFrame: Reusing last frame. myFrameTime=" << myFrameTime
                         << ", myStreamTime=" << myStreamTime;
-                    myVideoFrame = _myLastVideoFrame;
+                    theVideoMsg = _myLastVideoFrame;
                     useLastVideoFrame = true;
                 }
             }
             if (!useLastVideoFrame) {
                 while (true) {
-                    while (!_myReadEOF && _myFrameCache.size() == 0) {
-                        // XXX: Change this so the FrameCache contains an eof packet at the 
+/*                    
+                    while (!_myReadEOF && _myMsgQueue.size() == 0) {
+                        // XXX: Change this so the VideoMsgQueue contains an eof packet at the 
                         // end!
                         msleep(10);
                     }
-                    if (_myReadEOF && _myFrameCache.size() == 0) {
+                    if (_myReadEOF && _myMsgQueue.size() == 0) {
                         // EOF: no frame returned.
                         _myReadEOF = false;
+                    }
+*/                    
+                    theVideoMsg = _myMsgQueue.pop_front();
+                    if (theVideoMsg->getType() == VideoMsg::MSG_EOF) {
                         setEOF(true);
                         return theTime;
                     }
-                    myVideoFrame = _myFrameCache.pop_front();
+                    double myTimestamp = theVideoMsg->getTimestamp();
                     AC_DEBUG << "FFMpegDecoder2::readFrame, FrameTime="
-                        << myVideoFrame->getTimestamp()
-                        << ", Calculated frame #=" << myVideoFrame->getTimestamp()*getFrameRate()
-                        << ", Cache size=" << _myFrameCache.size();
-                    double myTimeDiff = (myStreamTime - myVideoFrame->getTimestamp())*getFrameRate();
-                    if ((_myFrameCache.size() == 0 && _myReadEOF)
-                            || (myTimeDiff < 0.5 && myTimeDiff > -0.9)) {
+                        << theVideoMsg->getTimestamp()
+                        << ", Calculated frame #=" << myTimestamp*getFrameRate()
+                        << ", Cache size=" << _myMsgQueue.size();
+                    double myTimeDiff = (myStreamTime - myTimestamp)*getFrameRate();
+                    if (myTimeDiff < 0.5 && myTimeDiff > -0.9) {
                         break;
                     }
                 }
             }
-            _myLastVideoFrame = myVideoFrame;
-            // Current frame is in myVideoFrame now. Convert to a format that Y60 can use.
+            _myLastVideoFrame = theVideoMsg;
+            // Current frame is in theVideoMsg now. Convert to a format that Y60 can use.
             AutoLocker<ThreadLock> myLock(_myLock);   // XXX Why is this needed?
             theTargetRaster->resize(getFrameWidth(), getFrameHeight());
-            if (myVideoFrame) {
+            if (theVideoMsg) {
                 AC_DEBUG << "readFrame: Frame delivered. wanted=" << theTime
-                        << ", got=" << myVideoFrame->getTimestamp();
-                theTime = myVideoFrame->getTimestamp();
-                copyFrame(myVideoFrame, theTargetRaster);
+                        << ", got=" << theVideoMsg->getTimestamp();
+                theTime = theVideoMsg->getTimestamp();
+                memcpy(theTargetRaster->pixels().begin(), theVideoMsg->getBuffer(),
+                        theTargetRaster->pixels().size());
             } else {
-                AC_DEBUG << "readFrame, empty frame.";
+                // TODO: Figure out if/why this happens
+                AC_WARNING << "readFrame, empty frame.";
                 memset(theTargetRaster->pixels().begin(), 0, theTargetRaster->pixels().size());
             }
-
-            getMovie()->set<CacheSizeTag>(_myFrameCache.size());
+            getMovie()->set<CacheSizeTag>(_myMsgQueue.size());
         } catch (asl::ThreadSemaphore::ClosedException &) {
             AC_WARNING << "Semaphore Destroyed while in readframe";
-        } catch (FrameCache::TimeoutException &) {
-            AC_FATAL << "Semaphore Timeout";
         }
         return theTime;
     }
@@ -552,14 +542,13 @@ namespace y60 {
 			AC_WARNING << "---- Neither audio nor video stram in FFMpegDecoder2::run";
             return;
         }
-        _myReadEOF = false;
-
         int64_t mySeekTimestamp = AV_NOPTS_VALUE;
 
         // decoder loop
-        while (!shouldTerminate() && !getReadEOF()) {
+        bool isDone = false;
+        while (!shouldTerminate() && !isDone) {
 			AC_TRACE << "---- FFMpegDecoder2::loop";
-            if (_myFrameCache.size() >= FRAME_CACHE_SIZE) {
+            if (_myMsgQueue.size() >= FRAME_CACHE_SIZE) {
                 // do nothing...
                 asl::msleep(10);
                 yield();
@@ -570,7 +559,8 @@ namespace y60 {
                 if (!decodeFrame()) {
                     {
                         AutoLocker<ThreadLock> myLock(_myLock);
-                        _myReadEOF = true;
+                        _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF)));
+                        isDone = true;
                     }
 					AC_DEBUG << "---- EOF Yielding Thread.";
                     continue;
@@ -704,17 +694,12 @@ namespace y60 {
 
     void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, int64_t theTimestamp) {
 		AC_DEBUG << "---- try to add frame at " << theTimestamp;
-        try {
-            FrameCache::VideoFramePtr myVideoFrame = createFrame();
-            myVideoFrame->setTimestamp(theTimestamp/(double)_myTimeUnitsPerSecond);
-            convertFrame(theFrame, myVideoFrame->getBuffer());
-            _myFrameCache.push_back(myVideoFrame);
-            AC_DEBUG << "---- Added Frame to cache, Frame # : "
-                    << double(theTimestamp)/_myTimeUnitsPerSecond*_myFrameRate
-                    << " cache size=" << _myFrameCache.size();
-        } catch (FrameCache::TimeoutException &) {
-            AC_FATAL << "---- Semaphore Timeout";
-        }
+        VideoMsgPtr myVideoFrame = createFrame(theTimestamp/(double)_myTimeUnitsPerSecond);
+        convertFrame(theFrame, myVideoFrame->getBuffer());
+        _myMsgQueue.push_back(myVideoFrame);
+        AC_DEBUG << "---- Added Frame to cache, Frame # : "
+            << double(theTimestamp)/_myTimeUnitsPerSecond*_myFrameRate
+            << " cache size=" << _myMsgQueue.size();
     }
 
     // Uses a heuristic based on the number of I-Frames in the video to determine
@@ -738,11 +723,6 @@ namespace y60 {
         return  myShouldSeek;
     }
 
-    bool FFMpegDecoder2::getReadEOF() {
-        AutoLocker<ThreadLock> myLock(_myLock);
-        return _myReadEOF;
-    }
-
     void FFMpegDecoder2::seek(double theDestTime) {
         AC_DEBUG << "seek: Joining FFMpegDecoder Thread";
         join();
@@ -750,8 +730,8 @@ namespace y60 {
             _myAudioSink->stop();
         }
         _myDemux->clearPacketCache();
-        _myFrameCache.clear();
-        _myFrameCache.reset();
+        _myMsgQueue.clear();
+        _myMsgQueue.reset();
 
         int64_t mySeekTime = int64_t(theDestTime*_myTimeUnitsPerSecond)+_myStartTimestamp;
         AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;

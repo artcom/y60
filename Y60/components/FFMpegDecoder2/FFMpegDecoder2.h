@@ -12,7 +12,7 @@
 #define _ac_y60_FFMpegDecoder2_h_
 
 #include "AsyncDecoder.h"
-#include "FrameCache.h"
+#include "VideoMsgQueue.h"
 #include "Demux.h"
 
 #include <y60/MovieEncoding.h>
@@ -106,8 +106,6 @@ namespace y60 {
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
         void dumpCache();
-        void copyFrame(FrameCache::VideoFramePtr theVideoFrame, 
-                dom::ResizeableRasterPtr theTargetRaster);
         bool shouldSeek(double theCurrentTime, double theDestTime);
         void seek(double theDestTime);
        
@@ -132,14 +130,10 @@ namespace y60 {
          */
         void addCacheFrame(AVFrame* theFrame, int64_t theTimestamp);
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
-        FrameCache::VideoFramePtr createFrame();
-        
-        // Called from decoder thread
-        bool getReadEOF();
-
+        VideoMsgPtr createFrame(double theTimestamp);
         
         // Used in main thread
-        FrameCache::VideoFramePtr _myLastVideoFrame;
+        VideoMsgPtr _myLastVideoFrame;
         
         // Used in both threads
         AVFormatContext * _myFormatContext;
@@ -149,7 +143,7 @@ namespace y60 {
         int _myAStreamIndex;
         AVStream * _myAStream;
 
-        FrameCache _myFrameCache;
+        VideoMsgQueue _myMsgQueue;
         AVFrame * _myFrame;
 
         DemuxPtr _myDemux;
@@ -168,7 +162,6 @@ namespace y60 {
         //     calculating this per stream and not per file.
         int64_t _myTimeUnitsPerSecond;
        
-        bool _myReadEOF;
         asl::ThreadLock _myLock;
 
         // worker thread values to prevent dom access and thus race conditions.
