@@ -22,4 +22,10 @@ fi
 
 echo $COMMAND
 $COMMAND
+
+ARGS="-I $PRO/lib;$PRO/src/Y60/js testImageMovieLeak.js $PRO/src/Y60/shader/shaderlibrary.xml"
+COMMAND="$APP $ARGS"
+echo $COMMAND
+$COMMAND
+
 exit $?
