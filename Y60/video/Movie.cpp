@@ -14,6 +14,7 @@
 
 #include <y60/PixelEncoding.h>
 #include <y60/DecoderManager.h>
+#include <y60/IScene.h>
 #include <asl/Logger.h>
 #include <asl/PackageManager.h>
 #include <asl/PlugInManager.h>
@@ -51,7 +52,9 @@ namespace y60 {
         _myPlayMode(PLAY_MODE_STOP)
     {
         AC_DEBUG  << "Movie::Movie " << (void*)this;
-        setup();
+        if (getNode()) {
+            setup();
+        }
     }
 
     void Movie::setup() {
@@ -247,6 +250,8 @@ namespace y60 {
         AC_DEBUG << "Movie::getDecoderName got " << theName;
         return true;
     }
+
+    void Movie::load() {}
 
     void Movie::load(asl::PackageManager & thePackageManager) {
         /*

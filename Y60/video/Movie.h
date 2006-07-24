@@ -104,7 +104,8 @@ namespace y60 {
              * loads a movie from the file given in theTexturePath
              * @param theTexturePath movie file to load
              */
-            virtual void load(const std::string & theTexturePath = ".");
+            virtual void load(const std::string & theTexturePath);
+//            virtual void load(const std::string & theTexturePath = ".");
             /**
              * @retval true, if a reload of the movie is required
              * (due to a change in the src attribute for example)
@@ -125,7 +126,7 @@ namespace y60 {
             Movie();
 
             // Overwrite the Image::load() method to avoid auto-loading mechanism
-            void load() {}
+            void load();
             
             void setup();
             void stop();

@@ -13,7 +13,6 @@
 
 
 #include <y60/IScene.h>
-#include <y60/IResourceManager.h>
 
 #include <dom/Field.h>
 
@@ -69,13 +68,27 @@ namespace y60 {
         _myRefCount(0),
         _myTextureId(0), 
         _myPixelBufferId(0),
-        _myReuseRaster(false)            
-    {}
+        _myReuseRaster(false),
+        _myRessourceManager(0)            
+    {
+        if (getNode()) {
+            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+            _myRessourceManager = myScene->getResourceManager();
+        }
+    }
 
     Image::~Image() {
-        if (getNode().parentNode()) {
-            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
-            myScene->getResourceManager()->unbindTexture(this);
+        if (_myRessourceManager) {
+            _myRessourceManager->unbindTexture(this);
+        }
+    }
+
+    void
+    Image::unregisterRasterValue() {
+        dom::ValuePtr myRasterValue = getRasterValue();
+        if (myRasterValue) {
+            ImageWidthTag::Plug::noLongerDependsOn(getRasterValue());
+            ImageHeightTag::Plug::noLongerDependsOn(getRasterValue());
         }
     }
 
@@ -96,6 +109,7 @@ namespace y60 {
                         PixelEncoding theEncoding,
                         const asl::ReadableBlock & thePixels) 
     {
+        unregisterRasterValue();
         return setRasterValue(createRasterValue(theEncoding, theWidth, theHeight, thePixels), theEncoding, theDepth);
     }
 
@@ -187,15 +201,14 @@ namespace y60 {
 
     void 
     Image::uploadTexture() {
-        IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
         if (_myReuseRaster) { 
-            myScene->getResourceManager()->updateTextureData(dynamic_cast_Ptr<Image>(getSelf()));
+            _myRessourceManager->updateTextureData(dynamic_cast_Ptr<Image>(getSelf()));
         } else {
             if (_myTextureId) {
                 // In order to prevent a texture leak, we need to unbind the texture before setupImage()
-                myScene->getResourceManager()->unbindTexture(this);
+                _myRessourceManager->unbindTexture(this);
             }
-            _myTextureId = myScene->getResourceManager()->setupTexture(dynamic_cast_Ptr<Image>(getSelf()));
+            _myTextureId = _myRessourceManager->setupTexture(dynamic_cast_Ptr<Image>(getSelf()));
             set<TextureIdTag>(_myTextureId);
             _myReuseRaster = true;
         }
@@ -329,8 +342,7 @@ namespace y60 {
     void 
     Image::removeTextureFromResourceManager() {
         if (_myTextureId) {
-            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
-            myScene->getResourceManager()->unbindTexture(this);
+            _myRessourceManager->unbindTexture(this);
             unbind();
         }
     }
@@ -344,8 +356,7 @@ namespace y60 {
     void
     Image::registerTexture() {
         if (_myRefCount == 0) {
-            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
-            myScene->getResourceManager()->setTexturePriority(this, TEXTURE_PRIORITY_IN_USE);
+            _myRessourceManager->setTexturePriority(this, TEXTURE_PRIORITY_IN_USE);
         }
         ++_myRefCount;
     }
@@ -354,10 +365,7 @@ namespace y60 {
     Image::deregisterTexture() {
         --_myRefCount;
         if (_myRefCount==0) {
-            if (getNode().parentNode() && getNode().parentNode()->parentNode()) {
-                IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
-                myScene->getResourceManager()->setTexturePriority(this, TEXTURE_PRIORITY_IDLE);
-            }
+            _myRessourceManager->setTexturePriority(this, TEXTURE_PRIORITY_IDLE);
         }
     }
 

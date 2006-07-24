@@ -15,6 +15,7 @@
 #include "ImageTags.h"
 #include <y60/CommonTags.h>
 #include <y60/NodeValueNames.h>
+#include <y60/IResourceManager.h>
 
 #include <dom/AttributePlug.h>
 #include <dom/Facade.h>
@@ -206,6 +207,8 @@ namespace y60 {
             void registerDependenciesForImageFormatUpdate();
             void registerDependenciesForTextureUpdate();
 
+            void unregisterRasterValue();
+
             void uploadTexture();
             void calculateInternalPixelFormat();
             void calculateWidth();
@@ -223,6 +226,8 @@ namespace y60 {
 
             int                           _myRefCount;
             asl::Ptr<asl::PackageManager> _myPackageManager;
+        protected:
+            IResourceManager *            _myRessourceManager;
     };
 
     typedef asl::Ptr<Image, dom::ThreadingModel> ImagePtr;

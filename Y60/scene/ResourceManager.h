@@ -39,6 +39,7 @@ class TextureManager;
  */ 
 class ResourceManager : public IResourceManager{
     public:
+        ResourceManager() :_myHaveValidGLContextFlag(false) {}
         virtual IShaderLibraryPtr getShaderLibrary() const { return IShaderLibraryPtr(0); }
         virtual bool hasGLContext() const { return _myHaveValidGLContextFlag;}
         virtual void validateGLContext(bool theFlag) { _myHaveValidGLContextFlag = theFlag;}

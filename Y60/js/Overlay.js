@@ -433,10 +433,11 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             } else {
                 // theSource is a string
                 myImage = Node.createElement("image");
-                theScene.images.appendChild(myImage);
                 myImage.src  = expandEnvironment(theSource);
-                myImage.name = mySource;
                 myImage.resize = "pad";
+                myImage.mipmap = false;
+                theScene.images.appendChild(myImage);
+                myImage.name = mySource;
                 //ourImageCache[mySource] = myImage;
             }
         } else if (typeof(theSource) == "object" && "previousSibling" in theSource) {
@@ -563,10 +564,10 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
             myImage = theSource;
         } else {
             myImage = Node.createElement("movie");
-            theScene.images.appendChild(myImage);
-            myImage.src  = expandEnvironment(theSource);
             myImage.name = theSource;
             myImage.resize = "pad";
+            myImage.src  = expandEnvironment(theSource);
+            theScene.images.appendChild(myImage);
             if (theAudioFlag == undefined) {
                 theAudioFlag = true;
             }

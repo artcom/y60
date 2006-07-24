@@ -571,6 +571,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
             _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
+            
         }
 
         if (_myFullSizeMode) {

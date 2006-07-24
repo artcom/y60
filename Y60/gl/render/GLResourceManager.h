@@ -109,6 +109,7 @@ namespace y60 {
         DEFINE_NESTED_EXCEPTION(GLResourceManager, TextureException, asl::Exception);
 
         GLResourceManager() : _myShaderLibrary(ShaderLibraryPtr(0)) {
+            validateGLContext(true);
         }
 
         void initVertexDataFactories() {
