@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,22 +7,18 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Request.h,v $
-//   $Author: pavel $
-//   $Revision: 1.16 $
-//   $Date: 2005/03/07 20:32:55 $
-//
-//
-//=============================================================================
+
 #ifndef _Y60_INET_REQUEST_INCLUDED_
 #define _Y60_INET_REQUEST_INCLUDED_
 
 #ifdef WIN32
     #include <winsock2.h>
+    // undefine the windows macro max (thanx bill) [jb]
+    #undef max
 #endif
 
 #include <asl/Exception.h>
+#include <asl/Enum.h>
 #include <asl/Revision.h>
 #include <asl/Block.h>
 #include <asl/Ptr.h>
@@ -35,6 +31,22 @@
 namespace inet {
 
     DEFINE_EXCEPTION(INetException, asl::Exception);
+
+    enum AuthentTypeEnum {
+        BASIC,
+        DIGEST,
+        ANY,
+        AuthentTypeEnum_MAX
+    };
+    
+    static const char * AuthentTypeStrings[] = {
+        "BASIC",
+        "DIGEST",
+        "ANY",
+        ""
+    };
+
+    DEFINE_ENUM(AuthentType, AuthentTypeEnum);
 
     class RequestManager;
 
@@ -63,7 +75,8 @@ namespace inet {
             void setCookie(const std::string & theCookie, bool theSessionCookieFlag = false);
             void setResume(long theResumeOffset);
             void setProxy(const std::string & theProxyServer, bool theTunnelFlag = false);
-            void setCredentials(const std::string & theUsername, const std::string & thePassword);
+            void setCredentials(const std::string & theUsername, const std::string & thePassword,
+                                AuthentType theAuthentType = ANY);
             void setFollowLocation(bool theFollowFlag);
             
             // request-method type methods

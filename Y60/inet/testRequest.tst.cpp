@@ -93,7 +93,7 @@ class RequestTest : public UnitTest {
 
             TestRequestPtr myBaseAuthentRequest = TestRequestPtr(
                     new TestRequest("http://bacon.intern.artcom.de/testBaseAuthent/index.html"));
-            myBaseAuthentRequest->setCredentials("Aladdin", "open sesame");
+            myBaseAuthentRequest->setCredentials("Aladdin", "open sesame", BASIC);
 
             /*
             TestRequestPtr myPostRequest = TestRequestPtr(new TestRequest("http://himmel/~martin/upload.php"));

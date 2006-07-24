@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,17 +7,10 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSRequestWrapper.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSRequestWrapper.h"
 #include "JScppUtils.h"
+#include "JSEnum.h"
 #include "JSBlock.h"
 #include <iostream>
 
@@ -93,6 +86,7 @@ setCredentials(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_BEGIN("Sets the username and password for the base and digest authentication methods.");
     DOC_PARAM("theUsername", "", DOC_TYPE_STRING);
     DOC_PARAM("thePassword", "", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theAuthentMethod", "The authentication methode.", DOC_TYPE_STRING, "ANY");
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::setCredentials,cx,obj,argc,argv,rval);
 }

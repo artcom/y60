@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: Request.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.18 $
-//   $Date: 2005/04/24 00:41:19 $
-//
-//
 //=============================================================================
 
 #include "Request.h"
@@ -24,11 +16,14 @@
 #include <asl/string_functions.h>
 #include <asl/os_functions.h>
 
+
 using namespace std;
 using namespace asl;
 
 #define CURL_VERBOSE 0
 #define DB(x) // x
+
+IMPLEMENT_ENUM(inet::AuthentType, inet::AuthentTypeStrings);
 
 namespace inet {
 
@@ -213,14 +208,29 @@ namespace inet {
     }
 
     void
-    Request::setCredentials(const std::string & theUsername, const std::string & thePassword) {
+    Request::setCredentials(const std::string & theUsername, const std::string & thePassword, AuthentType theAuthentType) {
         _myAuthentData = theUsername + ":" + thePassword;
 
         // set the credentials for basic/digest authentication [jb]
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_USERPWD, _myAuthentData.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        // CURLAUTH_ANY: tries basic authentication before digest authentication [jb]
-        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+        unsigned myOption;
+        switch (theAuthentType) {
+            case BASIC:
+                myOption = CURLAUTH_BASIC;
+                break;
+            case DIGEST:
+                myOption = CURLAUTH_DIGEST;
+                break;
+            case ANY:
+                // ANY: tries basic authentication before digest authentication [jb]
+                myOption = CURLAUTH_ANY;
+                break;
+            default:
+                throw INetException("Unkown authentication method '" + as_string(theAuthentType) + "'.", PLUS_FILE_LINE);
+
+        }
+        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_HTTPAUTH, myOption);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
