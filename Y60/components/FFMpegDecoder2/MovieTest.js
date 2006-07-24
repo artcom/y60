@@ -47,7 +47,9 @@ function FFMpegTest(theArguments) {
         testPlayToEnd,
         testStop,
         testPause,
-        testLoop
+        testLoop,
+        testPauseStop,
+        testStopPause
     ];
     
     Base.setup = Public.setup;
@@ -125,83 +127,6 @@ function FFMpegTest(theArguments) {
         nextTest();
     }
 
-    function testLoop(theTestFrame, theMovieName) {
-        if (theTestFrame > 0) {
-//            print ("TestFrame: "+theTestFrame+", Movie.currentframe: "+_myMovie.currentframe);
-        }
-        switch(theTestFrame) {
-            case 0:
-                print("  Loop...");
-                initMovie(theMovieName);
-                _myMovie.loopcount = 0;
-                _myMovie.playmode = "play";
-                break;
-            case 26:
-                assure_msg(_myMovie.playmode == "play", "Movie is playing last frame.");
-                assure_msg(_myMovie.currentframe == 25, "Current frame is last frame.");
-                break;
-            case 27:
-                assure_msg(_myMovie.playmode == "play", "Movie is playing.");
-                assure_msg(_myMovie.currentframe == 0, "Current frame is first frame.");
-                break;
-            case 30:
-                assure_msg(_myMovie.currentframe == 3, "Current frame is frame 3.");
-                _myMovie.playmode = "stop";
-                nextTest();
-                break;
-        }
-    }
-    
-    function testPause(theTestFrame, theMovieName) {
-        switch(theTestFrame) {
-            case 0:
-                print("  Play, pause, play again...");
-                initMovie(theMovieName);
-                _myMovie.playmode = "play";
-                break;
-            case 3:
-                _myMovie.playmode = "pause";
-                break;
-            case 4:
-                assure_msg(_myMovie.playmode == "pause", "Movie has paused.");
-                break;
-            case 6:
-                _myMovie.playmode = "play";
-                break;
-            case 9:
-                assure_msg(_myMovie.currentframe == 4, "Movie has played 4 frames.");
-                _myMovie.playmode = "stop";
-                nextTest();
-                break;
-        }
-//        print ("TestFrame: "+theTestFrame+", Movie.currentframe: "+_myMovie.currentframe);
-    }
-    
-    function testStop(theTestFrame, theMovieName) {
-        switch(theTestFrame) {
-            case 0:
-                print("  Play, stop, play again...");
-                initMovie(theMovieName);
-                _myMovie.playmode = "play";
-                break;
-            case 3:
-                _myMovie.playmode = "stop";
-                break;
-            case 4:
-                assure_msg(_myMovie.playmode == "stop", "Movie has stopped.");
-                break;
-            case 6:
-                _myMovie.playmode = "play";
-                break;
-            case 10:
-                assure_msg(_myMovie.currentframe == 3, "Movie has played 3 frames.");
-                _myMovie.playmode = "stop";
-                nextTest();
-                break;
-        }
-//        print ("TestFrame: "+theTestFrame+", Movie.currentframe: "+_myMovie.currentframe);
-    }
-    
     function testPlayToEnd(theTestFrame, theMovieName) {
         switch(theTestFrame) {
             case 0:
@@ -231,6 +156,156 @@ function FFMpegTest(theArguments) {
 //        print (_myTestFrameCount, _myMovie.currentframe);
     }
 
+    function testStop(theTestFrame, theMovieName) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Play, stop, play again...");
+                initMovie(theMovieName);
+                _myMovie.playmode = "play";
+                break;
+            case 3:
+                _myMovie.playmode = "stop";
+                break;
+            case 4:
+                assure_msg(_myMovie.playmode == "stop", "Movie has stopped.");
+                break;
+            case 6:
+                _myMovie.playmode = "play";
+                break;
+            case 10:
+                assure_msg(_myMovie.currentframe == 3, "Movie has played 3 frames.");
+                _myMovie.playmode = "stop";
+                nextTest();
+                break;
+        }
+//        print ("TestFrame: "+theTestFrame+", Movie.currentframe: "+_myMovie.currentframe);
+    }
+    
+    function testPause(theTestFrame, theMovieName) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Play, pause, play again...");
+                initMovie(theMovieName);
+                _myMovie.playmode = "play";
+                break;
+            case 3:
+                _myMovie.playmode = "pause";
+                break;
+            case 4:
+                assure_msg(_myMovie.playmode == "pause", "Movie has paused.");
+                break;
+            case 6:
+                _myMovie.playmode = "play";
+                break;
+            case 9:
+                assure_msg(_myMovie.currentframe == 4, "Movie has played 4 frames.");
+                _myMovie.playmode = "stop";
+                nextTest();
+                break;
+        }
+//        print ("TestFrame: "+theTestFrame+", Movie.currentframe: "+_myMovie.currentframe);
+    }
+    
+    function testLoop(theTestFrame, theMovieName) {
+        if (theTestFrame > 0) {
+//            print ("TestFrame: "+theTestFrame+", Movie.currentframe: "+_myMovie.currentframe);
+        }
+        switch(theTestFrame) {
+            case 0:
+                print("  Loop...");
+                initMovie(theMovieName);
+                _myMovie.loopcount = 0;
+                _myMovie.playmode = "play";
+                break;
+            case 26:
+                assure_msg(_myMovie.playmode == "play", "Movie is playing last frame.");
+                assure_msg(_myMovie.currentframe == 25, "Current frame is last frame.");
+                break;
+            case 27:
+                assure_msg(_myMovie.playmode == "play", "Movie is playing.");
+                assure_msg(_myMovie.currentframe == 0, "Current frame is first frame.");
+                break;
+            case 30:
+                assure_msg(_myMovie.currentframe == 3, "Current frame is frame 3.");
+                _myMovie.playmode = "stop";
+                nextTest();
+                break;
+        }
+    }  
+  
+    function testPauseStop(theTestFrame, theMovieName) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Play, pause, stop again...");
+                initMovie(theMovieName);
+                _myMovie.playmode = "play";
+                break;
+            case 3:
+                _myMovie.playmode = "pause";
+                break;
+            case 4:
+                assure_msg(_myMovie.playmode == "pause", "Movie has paused.");
+                break;
+            case 6:
+                _myMovie.playmode = "stop";
+                break;
+            case 7:
+                assure_msg(_myMovie.playmode == "stop", "Movie has stopped.");
+                assure_msg(_myMovie.currentframe == 0, "Current frame is 0");
+                break;
+            case 9:
+                _myMovie.playmode = "play";
+                break;
+            case 11:
+                assure_msg(_myMovie.playmode == "play", "Movie is playing again.");
+                assure_msg(_myMovie.currentframe == 1, "Current frame is 1");
+                break;
+            case 12:
+                assure_msg(_myMovie.currentframe == 2, "Movie has played 3 frames.");
+                _myMovie.playmode = "stop";
+                nextTest();
+                break;
+        }
+//        print ("TestFrame: "+theTestFrame+", Movie.currentframe: "+_myMovie.currentframe);
+    }
+    
+    function testStopPause(theTestFrame, theMovieName) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Play, stop, pause, play again...");
+                initMovie(theMovieName);
+                _myMovie.playmode = "play";
+                break;
+            case 3:
+                _myMovie.playmode = "stop";
+                break;
+            case 4:
+                assure_msg(_myMovie.playmode == "stop", "Movie has stopped.");
+                break;
+            case 5:
+                _myMovie.playmode = "pause";
+                break;
+            case 6:
+                assure_msg(_myMovie.playmode == "pause", "Movie has paused.");
+                assure_msg(_myMovie.currentframe == 0, "Current frame is 0");
+                break;
+            case 7:
+                _myMovie.playmode = "play";
+                break;
+            case 9:
+                assure_msg(_myMovie.playmode == "play", "Movie is playing again.");
+                print(_myMovie.currentframe);
+                assure_msg(_myMovie.currentframe == 1, "Current frame is 1");
+                break;
+            case 10:
+                assure_msg(_myMovie.currentframe == 2, "Movie has played 3 frames.");
+                _myMovie.playmode = "stop";
+                nextTest();
+                break;
+        }
+//        print ("TestFrame: "+theTestFrame+", Movie.currentframe: "+_myMovie.currentframe);
+    }
+    
     function initMovie(theMovieName) {
         if (_myMovie) {
             _myMovie.removeFromScene();
