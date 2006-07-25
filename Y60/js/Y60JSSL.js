@@ -27,6 +27,7 @@ var PI_4 = Math.PI / 4;
 var PI_180 = Math.PI / 180;
 var TWO_PI = Math.PI * 2.0;
 
+// This only works with native js objects
 function clone(theObject) {
     var myNewObject = [];
     for (i in theObject) {
@@ -149,7 +150,7 @@ function asColor(theHexString, theAlpha) {
     var myRed   = eval("0x" + theHexString[0] + theHexString[1]);
     var myGreen = eval("0x" + theHexString[2] + theHexString[3]);
     var myBlue  = eval("0x" + theHexString[4] + theHexString[5]);
-    return new Vector4f(myRed / 255, myGreen / 255, myBlue / 255, theAlpha);
+    return [myRed / 255, myGreen / 255, myBlue / 255, theAlpha];
 }
 
 // returns a string represenation of an (nested) array
@@ -768,7 +769,7 @@ function easeOut(theValue) {
 function easeIn(theValue) {
     return 2*easeInOut(theValue/2);
 }
-function gaussianBox_Mueller(theMean, theDeviation) {    
+function gaussianBox_Mueller(theMean, theDeviation) {
 	var x1, x2, w, y1;
 	do {
 		x1 = 2.0 * Math.random() - 1.0;

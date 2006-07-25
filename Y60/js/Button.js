@@ -64,9 +64,9 @@ function ButtonBase(Public, Protected, theScene, theId,
 
     Public.setPressed = function(theFlag) {
         if (theFlag) {
-            Public.color = Protected.style.selectedColor;
+            Public.color = Public.style.selectedColor;
         } else {
-            Public.color = Protected.style.color;
+            Public.color = Public.style.color;
         }
         Protected.isPressed = theFlag;
     }
@@ -89,10 +89,10 @@ function ButtonBase(Public, Protected, theScene, theId,
     Public.enabled setter = function(theFlag) {
         if (Protected.enabled != theFlag) {
             Protected.enabled = theFlag;
-            if (!theFlag && "disabledColor" in Protected.style) {
-                Public.color = Protected.style.disabledColor;
+            if (!theFlag && "disabledColor" in Public.style) {
+                Public.color = Public.style.disabledColor;
             } else {
-                Public.color = Protected.style.color;
+                Public.color = Public.style.color;
             }
         }
     }
@@ -194,10 +194,10 @@ function DualImageButton(theScene, theId, theSources,
     Base.setPressed = Public.setPressed;
     Public.setPressed = function(theFlag) {
         if (theFlag) {
-            Public.color = Protected.style.selectedColor;
+            Public.color = Public.style.selectedColor;
             Public.setImage(theSources[1]);
         } else {
-            Public.color = Protected.style.color;
+            Public.color = Public.style.color;
             Public.setImage(theSources[0]);
         }
         Base.setPressed(theFlag);

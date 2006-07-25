@@ -48,9 +48,9 @@ function LabelBase(Public, Protected, theScene,
 
         var myStyle = null;
         if (theStyle) {
-            myStyle = theStyle;
+            myStyle = clone(theStyle);
         } else {
-            myStyle = Protected.style;
+            myStyle = Public.style;
         }
 
         var topPad     = "topPad"      in myStyle ? myStyle.topPad : 0;
@@ -125,7 +125,7 @@ function LabelBase(Public, Protected, theScene,
     // Protected
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    Protected.style = theStyle;
+    Public.style = clone(theStyle);
 
     Protected.getImageNode = function() {
         if (Public.image == null) {
@@ -179,7 +179,7 @@ function LabelBase(Public, Protected, theScene,
     }
 
     function setup() {
-        Public.color = Protected.style.color;
+        Public.color = Public.style.color;
         if (theSize) {
             Public.width  = theSize[0];
             Public.height = theSize[1];
