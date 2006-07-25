@@ -34,11 +34,4 @@ fi
 echo $COMMAND
 $COMMAND
 
-
-JS_APP="$APP_DIR/testImageMovieLeak.js"
-ARGS="-I $Y60_DIR/js;$PLUGIN_DIR $JS_APP $SHADERLIB"
-COMMAND="$APP $ARGS"
-echo $COMMAND
-$COMMAND
-
 exit $?
