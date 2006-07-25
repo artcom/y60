@@ -162,8 +162,6 @@ namespace y60 {
         //     calculating this per stream and not per file.
         int64_t _myTimeUnitsPerSecond;
        
-        asl::ThreadLock _myLock;
-
         // worker thread values to prevent dom access and thus race conditions.
         double _myFrameRate;
         int _myFrameWidth;

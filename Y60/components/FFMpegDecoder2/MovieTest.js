@@ -114,11 +114,11 @@ function FFMpegTest(theArguments) {
             print ("Tests succeeded: "+_mySuccessCount);
             print ("Tests failed: "+_myFailCount);
             if (ENDLESS_TEST) {
-                if (_myFailCount > 0) {
-                    exit(_myFailCount);
-                } else {
+//                if (_myFailCount > 0) {
+//                    exit(_myFailCount);
+//                } else {
                     _myCurMovieIndex = 0;
-                }
+//                }
             } else {
                 exit(_myFailCount);
             }
@@ -294,7 +294,6 @@ function FFMpegTest(theArguments) {
                 break;
             case 9:
                 assure_msg(_myMovie.playmode == "play", "Movie is playing again.");
-                print(_myMovie.currentframe);
                 assure_msg(_myMovie.currentframe == 1, "Current frame is 1");
                 break;
             case 10:

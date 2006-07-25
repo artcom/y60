@@ -104,7 +104,6 @@ namespace y60 {
     void
     FFMpegDecoder2::load(const std::string & theFilename) {
         AC_INFO << "load(" << theFilename << ")";
-        AutoLocker<ThreadLock> myLock(_myLock);
 
         // register all formats and codecs
         static bool avRegistered = false;
@@ -168,7 +167,6 @@ namespace y60 {
     void FFMpegDecoder2::startMovie(double theStartTime) {
         AC_INFO << "startMovie, time: " << theStartTime;
 
-        AutoLocker<ThreadLock> myLock(_myLock);
  
         decodeFrame();
         if (hasAudio())
@@ -190,7 +188,6 @@ namespace y60 {
 
     void FFMpegDecoder2::resumeMovie(double theStartTime) {
         AC_INFO << "resumeMovie, time: " << theStartTime;
-        AutoLocker<ThreadLock> myLock(_myLock);
         setState(RUN);
         if (!isActive()) {
             AC_TRACE << "Forking FFMpegDecoder Thread";
@@ -487,17 +484,6 @@ namespace y60 {
             }
             if (!useLastVideoFrame) {
                 while (true) {
-/*                    
-                    while (!_myReadEOF && _myMsgQueue.size() == 0) {
-                        // XXX: Change this so the VideoMsgQueue contains an eof packet at the 
-                        // end!
-                        msleep(10);
-                    }
-                    if (_myReadEOF && _myMsgQueue.size() == 0) {
-                        // EOF: no frame returned.
-                        _myReadEOF = false;
-                    }
-*/                    
                     theVideoMsg = _myMsgQueue.pop_front();
                     if (theVideoMsg->getType() == VideoMsg::MSG_EOF) {
                         setEOF(true);
@@ -516,7 +502,6 @@ namespace y60 {
             }
             _myLastVideoFrame = theVideoMsg;
             // Current frame is in theVideoMsg now. Convert to a format that Y60 can use.
-            AutoLocker<ThreadLock> myLock(_myLock);   // XXX Why is this needed?
             theTargetRaster->resize(getFrameWidth(), getFrameHeight());
             if (theVideoMsg) {
                 AC_DEBUG << "readFrame: Frame delivered. wanted=" << theTime
@@ -557,11 +542,8 @@ namespace y60 {
             AC_TRACE << "---- Updating cache";
             try {
                 if (!decodeFrame()) {
-                    {
-                        AutoLocker<ThreadLock> myLock(_myLock);
-                        _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF)));
-                        isDone = true;
-                    }
+                    _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF)));
+                    isDone = true;
 					AC_DEBUG << "---- EOF Yielding Thread.";
                     continue;
                 }
