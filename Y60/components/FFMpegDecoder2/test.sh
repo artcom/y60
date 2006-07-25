@@ -1,4 +1,15 @@
+Y60_DIR="$PRO/src/Y60"
+APP_DIR=`dirname $0`
+PLUGIN_DIR="$PRO/lib"
+
+if [ "$USE_CG" == "1" ]; then
+SHADERLIB="$Y60_DIR/shader/shaderlibrary.xml"
+else
+SHADERLIB="$Y60_DIR/shader/shaderlibrary_nocg.xml"
+fi
+
 APP=y60
+
 if [ "$DEBUG" = "1" ] ; then
     APP=$PRO/bin/y60DBG
 fi
@@ -23,7 +34,9 @@ fi
 echo $COMMAND
 $COMMAND
 
-ARGS="-I $PRO/lib;$PRO/src/Y60/js testImageMovieLeak.js $PRO/src/Y60/shader/shaderlibrary.xml"
+
+APP="$APP_DIR/testImageMovieLeak.js"
+ARGS="-I $Y60_DIR/js;$PLUGIN_DIR $APP $SHADERLIB"
 COMMAND="$APP $ARGS"
 echo $COMMAND
 $COMMAND
