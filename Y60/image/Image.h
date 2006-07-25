@@ -208,6 +208,7 @@ namespace y60 {
             void registerDependenciesForTextureUpdate();
 
             void unregisterRasterValue();
+            void ensureResourceManager();
 
             void uploadTexture();
             void calculateInternalPixelFormat();

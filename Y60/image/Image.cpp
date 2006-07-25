@@ -71,10 +71,6 @@ namespace y60 {
         _myReuseRaster(false),
         _myRessourceManager(0)            
     {
-        if (getNode()) {
-            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
-            _myRessourceManager = myScene->getResourceManager();
-        }
     }
 
     Image::~Image() {
@@ -198,9 +194,17 @@ namespace y60 {
         }
     }
 
+    void
+    Image::ensureResourceManager() {
+        if (!_myRessourceManager && getNode()) {
+            IScenePtr myScene = getNode().parentNode()->parentNode()->getFacade<IScene>();                
+            _myRessourceManager = myScene->getResourceManager();
+        }
+    }
 
     void 
     Image::uploadTexture() {
+        ensureResourceManager();
         if (_myReuseRaster) { 
             _myRessourceManager->updateTextureData(dynamic_cast_Ptr<Image>(getSelf()));
         } else {
@@ -342,6 +346,7 @@ namespace y60 {
     void 
     Image::removeTextureFromResourceManager() {
         if (_myTextureId) {
+            ensureResourceManager();
             _myRessourceManager->unbindTexture(this);
             unbind();
         }
@@ -356,6 +361,7 @@ namespace y60 {
     void
     Image::registerTexture() {
         if (_myRefCount == 0) {
+            ensureResourceManager();
             _myRessourceManager->setTexturePriority(this, TEXTURE_PRIORITY_IN_USE);
         }
         ++_myRefCount;
@@ -365,6 +371,7 @@ namespace y60 {
     Image::deregisterTexture() {
         --_myRefCount;
         if (_myRefCount==0) {
+            ensureResourceManager();
             _myRessourceManager->setTexturePriority(this, TEXTURE_PRIORITY_IDLE);
         }
     }
