@@ -12,6 +12,7 @@
 
 #include <asl/UnitTest.h>
 #include <iostream>
+#include <math.h>
 
 using namespace std;
 using namespace asl;
@@ -70,6 +71,27 @@ public:
             SvgPath * mySubPath = myPath.createSubPath(Vector3f(10,0,0), Vector3f(90,0,0));
             DPRINT(mySubPath->getLength());
             ENSURE(mySubPath->getLength() == 80.0f);
+            
+            SvgPath myBezierPath;
+            myBezierPath.move(Vector3f(0,0,0));
+            myBezierPath.cbezier(Vector3f( 10, 10, 0), Vector3f( 90, 10, 0), Vector3f(100,0,0));
+            DPRINT(myBezierPath.getLength());
+            ENSURE(almostEqual(myBezierPath.getLength(), 102.275f));
+            myBezierPath.cbezier(Vector3f(110,-10, 0), Vector3f(190,-10, 0), Vector3f(200,0,0));
+            DPRINT(myBezierPath.getLength());
+            ENSURE(almostEqual(myBezierPath.getLength(), 204.55f));
+            
+            SvgPath myBezierFromPointsPath;
+            float myHandleLength = sqrt(10.0f * 10.0f + 10.0f * 10.0f);
+            myBezierFromPointsPath.move(Vector3f(0,0,0));
+            myBezierFromPointsPath.cbezierFromPoints(Vector3f(0,-50,0), Vector3f(100,0,0), Vector3f(200,50,0), Vector3f(300,150,0), myHandleLength);
+            DPRINT(myBezierFromPointsPath.getLength());
+            ENSURE(almostEqual(myBezierFromPointsPath.getLength(), 207.781f));
+            myBezierFromPointsPath.cbezierFromPoints(Vector3f(100,0,0), Vector3f(200,50,0), Vector3f(300,150,0), Vector3f(400,100,0), myHandleLength);
+            DPRINT(myBezierFromPointsPath.getLength());
+            ENSURE(almostEqual(myBezierFromPointsPath.getLength(), 349.56f));
+            
+            
         }
     }
 };
