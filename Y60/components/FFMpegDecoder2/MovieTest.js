@@ -49,7 +49,8 @@ function FFMpegTest(theArguments) {
         testPause,
         testLoop,
         testPauseStop,
-        testStopPause
+        testStopPause,
+        testSeek
     ];
     
     Base.setup = Public.setup;
@@ -114,11 +115,11 @@ function FFMpegTest(theArguments) {
             print ("Tests succeeded: "+_mySuccessCount);
             print ("Tests failed: "+_myFailCount);
             if (ENDLESS_TEST) {
-//                if (_myFailCount > 0) {
-//                    exit(_myFailCount);
-//                } else {
+                if (_myFailCount > 0) {
+                    exit(_myFailCount);
+                } else {
                     _myCurMovieIndex = 0;
-//                }
+                }
             } else {
                 exit(_myFailCount);
             }
@@ -299,6 +300,44 @@ function FFMpegTest(theArguments) {
             case 10:
                 assure_msg(_myMovie.currentframe == 2, "Movie has played 3 frames.");
                 _myMovie.playmode = "stop";
+                nextTest();
+                break;
+        }
+//        print ("TestFrame: "+theTestFrame+", Movie.currentframe: "+_myMovie.currentframe);
+    }
+
+    function testSeek(theTestFrame, theMovieName) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Seek...");
+                initMovie(theMovieName);
+                _myMovie.playmode = "play";
+                break;
+            case 3:
+                _myMovie.playmode = "pause";
+                _myMovie.currentframe = 15;
+                window.scene.loadMovieFrame(_myMovie.movie);
+                _myMovie.playmode = "play";
+                break;
+            case 4:
+                print (_myMovie.currentframe);
+                assure_msg(_myMovie.currentframe == 15, "Seek forward ok");
+                break;
+            case 8:
+                print (_myMovie.currentframe);
+                assure_msg(_myMovie.currentframe == 19, "Playback after seek forward ok.");
+                _myMovie.playmode = "pause";
+                _myMovie.currentframe = 4;
+                window.scene.loadMovieFrame(_myMovie.movie);
+                _myMovie.playmode = "play";
+                break;
+            case 9:
+                print (_myMovie.currentframe);
+                assure_msg(_myMovie.currentframe == 4, "Seek backward ok.");
+                break;
+            case 12:
+                print (_myMovie.currentframe);
+                assure_msg(_myMovie.currentframe == 7, "Playback after seek backward ok.");
                 nextTest();
                 break;
         }

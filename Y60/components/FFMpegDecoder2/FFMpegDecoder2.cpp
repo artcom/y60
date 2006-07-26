@@ -212,7 +212,6 @@ namespace y60 {
             if (_myAStream) {
                 avcodec_flush_buffers(_myAStream->codec);
             }
-
             if (_myAudioSink) {
                 _myAudioSink->stop();
             }
@@ -714,11 +713,18 @@ namespace y60 {
         _myDemux->clearPacketCache();
         _myMsgQueue.clear();
         _myMsgQueue.reset();
-
+/*
         int64_t mySeekTime = int64_t(theDestTime*_myTimeUnitsPerSecond)+_myStartTimestamp;
         AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
         int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex,
                 mySeekTime, AVSEEK_FLAG_BACKWARD);
+*/
+        int64_t mySeekTime = (int64_t(theDestTime)+_myStartTimestamp/_myTimeUnitsPerSecond)
+                *AV_TIME_BASE;
+        AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
+        int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex,
+                mySeekTime, AVSEEK_FLAG_BACKWARD);
+        
         decodeFrame();
         if (hasAudio())
         {
