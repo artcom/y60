@@ -47,6 +47,7 @@ CMSCache::CMSCache(const string & theLocalPath,
     myReport->appendChild( _myAssetReportNode );
     _myStalledFilesNode = dom::NodePtr( new dom::Element("stalledfiles") );
     myReport->appendChild( _myStalledFilesNode );
+    //dumpPresentationToFile("dump.txt");
 }
 
 CMSCache::~CMSCache() {
