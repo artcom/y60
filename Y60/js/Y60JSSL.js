@@ -789,3 +789,28 @@ function gaussianRandom() {
     }
     return myGaussianRandom;
 }
+
+function convertQuatToEuler(q) {
+    var q1 = product(q, new Quaternionf(1,0,0,0));
+    var sqw = q1[3]*q1[3];
+    var sqx = q1[0]*q1[0];
+    var sqy = q1[1]*q1[1];
+    var sqz = q1[2]*q1[2];
+    var unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
+    var test = q1[0]*q1[1] + q1[2]*q1[3];
+    if (test > 0.499*unit) { // singularity at north pole
+        heading = 2 * Math.atan2(q1[0],q1[3]);
+        attitude = Math.PI/2;
+        bank = 0;
+        return new Vector3f(heading, bank, attitude);
+    }
+    if (test < -0.499*unit) { // singularity at south pole
+        heading = -2 * Math.atan2(q1[0],q1[3]);
+        attitude = -Math.PI/2;
+        bank = 0;
+    }
+    var heading = Math.atan2(2*q1[1]*q1[3]-2*q1[0]*q1[2] , sqx - sqy - sqz + sqw);
+    var attitude = Math.asin(2*test/unit);
+    var bank = -Math.atan2(2*q1[0]*q1[3]-2*q1[1]*q1[2] , -sqx + sqy - sqz + sqw)
+    return new Vector3f(heading, bank, attitude);
+}

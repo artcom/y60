@@ -22,18 +22,33 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
     obj.synchronize = function() {
         var myCMSConfig = _myConfig.childNode("cmscache", 0);
+        var myUsername = _myConfig.username;
+        if ("domain" in myCMSConfig && myCMSConfig.domain.length) {
+             myUsername += "@" + myCMSConfig.domain;
+        }
         _myCMSCache = new CMSCache(myCMSConfig.localdir, _myPresentation,
-                            myCMSConfig.backend, _myConfig.username, _myConfig.password );
-        _myCMSCache.verbose = _myVerbosityFlag;
-        if ( !_myDummyPresentation ) {
+                            myCMSConfig.backend, myUsername, _myConfig.password, _myOCSCookie );
+        _myCMSCache.verbose = _myCMSVerbosityFlag;
+        if ("maxrequests" in myCMSConfig &&
+            myCMSConfig.maxrequests)
+        {
+            _myCMSCache.maxRequests = Number(myCMSConfig.maxrequests);
+        }
+        if ("useragent" in myCMSConfig &&
+            myCMSConfig.useragent)
+        {
+            _myCMSCache.useragent = myCMSConfig.useragent;
+        }
+        if ( _mySyncFlag ) {
             _myCMSCache.synchronize();
         }
     }
 
     obj.isSynchronized = function() {
-        if ( _myDummyPresentation ) {
+        if ( !_mySyncFlag ) {
             return true; 
         }
+
         return _myCMSCache.isSynchronized();
     }
 
@@ -46,15 +61,15 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         _myPresentation = Node.createDocument();
         if ( _myDummyPresentation ) {
             _myPresentation.parseFile( _myDummyPresentation );
+            Logger.info("Using dummy presentation file '" + _myConfig.dummypresentation + "'");
             return; 
         }
         
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
         var myLoginRequest = new Request( myZopeConfig.baseurl + "/" + myZopeConfig.loginpage,
                                     _myUserAgent );
-        myLoginRequest.post("__ac_name=" + _myConfig.username +
-                       "&__ac_password=" + _myConfig.password + "&proxy=" + _myConfig.password);
-
+        myLoginRequest.post("__ac_name=" + _myConfig.username + 
+                            "&__ac_password=" + _myConfig.password + "&proxy=" + _myConfig.password);
         _myRequestManager.performRequest( myLoginRequest );
 
         while ( _myRequestManager.activeCount ) {
@@ -85,6 +100,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             if ( myPresentationRequest.responseCode != 200 ) {
                 throw "Failed to get presentation file at " + fileline() + ".";
             }
+            _myOCSCookie = myPresentationRequest.getResponseHeader("Set-Cookie");
             _myPresentation.parse( myPresentationRequest.responseString );
             //_myPresentation.saveFile("dummy_presentation.xml");
 
@@ -98,23 +114,29 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     function setup() {
         _myConfigDoc = Node.createDocument();
         _myConfigDoc.parseFile( _myConfigFile );
-        _myConfig = _myConfigDoc.childNode(0);
+        _myConfig = _myConfigDoc.childNode("cmsconfig");
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
+        var myCMSConfig = _myConfig.childNode("cmscache", 0);
         
         _myZopeVerbosityFlag = (myZopeConfig && "verbose" in myZopeConfig && myZopeConfig.verbose != 0);
-        _myVerbosityFlag = ("verbose" in _myConfig && _myConfig.verbose != 0);
+        _myCMSVerbosityFlag = ("verbose" in myCMSConfig && myCMSConfig.verbose != 0);
         if ("dummypresentation" in _myConfig &&
             _myConfig.dummypresentation.length &&
             fileExists(_myConfig.dummypresentation))
         {
             _myDummyPresentation = _myConfig.dummypresentation;
+            
         }
         if ("useragent" in _myConfig &&
             _myConfig.useragent.length)
         {
             _myUserAgent = _myConfig.useragent;
         }
-
+        if ("sync" in myCMSConfig &&
+            myCMSConfig.sync)
+        {
+            _mySyncFlag = Number(myCMSConfig.sync) > 0;
+        }
         fetchPresentation();
     }
 
@@ -126,16 +148,19 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
     var _myConfigFile = theConfigFile;
     var _myZopeVerbosityFlag = false;
-    var _myVerbosityFlag = false;
+    var _myCMSVerbosityFlag = false;
     var _myRequestManager = new RequestManager();
     var _myConfigDoc = null;
     var _myConfig = null;
     var _myPresentation = null;
     var _myDummyPresentation = null;
+    var _mySyncFlag = true;
     var _myCMSCache = null;
     var _myUserAgent = null;
+    var _myOCSCookie = null;
 
     setup();
+
 }
 
 /*=== USAGE SAMPLE =============
