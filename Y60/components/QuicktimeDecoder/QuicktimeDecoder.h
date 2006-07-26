@@ -84,7 +84,7 @@ namespace y60 {
              */
             double readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster);
     
-            const char * getName() const { return "QuicktimeDecoder"; }
+            const char * getName() const { return "y60QuicktimeDecoder"; }
         private:
             void closeMovie();
             void decodeFrame(unsigned theFrameNumber, dom::ResizeableRasterPtr theTargetRaster);
