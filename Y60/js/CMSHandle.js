@@ -179,3 +179,12 @@ try {
     Logger.error( ex );
 }
 */
+
+/*=== SAMPLE CMSConfig.xml=============
+
+<cmsconfig username="y60" password="acclienty60" useragent="Wget/1.10.2" dummypresentation="CONFIG/dummy_presentation.xml">
+    <zopeconfig baseurl="http://welt.bmw.artcom.de:8080" loginpage="login/logged_in"
+                presentationpage="exportXML" verbose="0"/>
+    <cmscache localdir="C:/tmp/cmsmirror" backend="OCS" verbose="0" domain="bmw" maxrequests="5" sync="1" />
+</cmsconfig>
+*/
