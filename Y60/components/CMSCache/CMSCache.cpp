@@ -77,7 +77,7 @@ CMSCache::loginOCS() {
     // just do a head request ... no need to download the whole asset now.
     myLoginRequest->head();
     myLoginRequest->setCredentials(_myUsername, _myPassword, DIGEST);
-    myLoginRequest->setVerbose(true);
+    //myLoginRequest->setVerbose(true);
 
     _myRequestManager.performRequest(myLoginRequest);
 
@@ -166,7 +166,9 @@ CMSCache::synchronize() {
     }
 
     collectExternalAssetList();
-    removeStalledAssets();
+    if (_myCleanupFlag) {
+        removeStalledAssets();
+    }
     updateDirectoryHierarchy();
     
     if ( ! _myAssets.empty()) {

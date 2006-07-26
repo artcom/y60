@@ -46,6 +46,7 @@ class JSCMSCache : public jslib::JSWrapper<y60::CMSCache, asl::Ptr<y60::CMSCache
         enum PropertyNumbers {
             PROP_statusReport =  -100,
             PROP_verbose,
+            PROP_cleanup,
             PROP_maxRequests,
             PROP_userAgent,
             PROP_END

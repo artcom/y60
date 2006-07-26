@@ -52,6 +52,9 @@ class CMSCache {
         bool getVerboseFlag() const { return _myVerboseFlag; }
         void setVerboseFlag(bool theFlag) { _myVerboseFlag = theFlag; }
 
+        bool getCleanupFlag() const { return _myCleanupFlag; }
+        void setCleanupFlag(bool theFlag) { _myCleanupFlag = theFlag; }
+
         unsigned getMaxRequestCount() const { return _myMaxRequestCount; }
         void setMaxRequestCount(unsigned theMaxCount) { _myMaxRequestCount = theMaxCount; }
         
@@ -95,6 +98,7 @@ class CMSCache {
         AssetRequestMap _myAssetRequests;
 
         bool _myVerboseFlag;
+        bool _myCleanupFlag;
         BackendType _myBackendType;
         unsigned _myMaxRequestCount;
         std::string _myUserAgent;

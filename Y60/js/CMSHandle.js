@@ -8,6 +8,48 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //==============================================================================
 
+/*=====================USAGE SAMPLE=====================
+try {
+    var myCMS = new CMSHandle("CMSConfig.xml");
+    myCMS.synchronize();
+    while ( ! myCMS.isSynchronized() ) {
+        msleep(10);
+    }
+    print( myCMS.statusReport );
+    includePath( myCMS.assetDir );
+} catch (ex) {
+    Logger.error( ex );
+}
+========================================================*/
+
+/*=============CMSConfig elements/attributes=============
+    cmsconfig:
+     - username, password
+     - useragent: HTTP User-Agent field string
+    zopeconfig:
+     - baseurl: server URL[:portnumber]
+     - loginpage: URL part to post login data to
+     - presentationpage: URL part to envoke XML export
+     - verbose: ZOPE verbosity on/off [0|1]
+     - localfallback: relative path to a local fallback presentation file (read/write)
+    cmscache:
+     - localdir: base directory for local chache
+     - backend: backend type [OCS|SVN]
+     - verbose: backend verbosity on/off [0|1]
+     - domain: domain/organisation name to be added to the username for login
+     - maxrequests: maximum number of concurrent HTTP requests
+     - sync: perform asset synchronization [0|1]
+     - cleanup: remove stalled assets from local cache
+========================================================*/
+
+/*=================SAMPLE CMSConfig.xml=================
+<cmsconfig username="y60" password="acclienty60" useragent="Wget/1.10.2">
+    <zopeconfig baseurl="http://welt.bmw.artcom.de:8080" loginpage="login/logged_in"
+                presentationpage="exportXML" localfallback="CONFIG/presentation.xml"/>
+    <cmscache localdir="C:/tmp/cmsmirror" backend="OCS" domain="bmw" maxrequests="5"/>
+</cmsconfig>
+========================================================*/
+
 plug("y60CMSCache");
 
 function CMSHandle( theConfigFile) {
@@ -26,19 +68,29 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         if ("domain" in myCMSConfig && myCMSConfig.domain.length) {
              myUsername += "@" + myCMSConfig.domain;
         }
+
         _myCMSCache = new CMSCache(myCMSConfig.localdir, _myPresentation,
                             myCMSConfig.backend, myUsername, _myConfig.password, _myOCSCookie );
         _myCMSCache.verbose = _myCMSVerbosityFlag;
+
+        if ("cleanup" in myCMSConfig &&
+            myCMSConfig.cleanup)
+        {
+            _myCMSCache.cleanup = Number(myCMSConfig.cleanup) > 0;
+        }
+
         if ("maxrequests" in myCMSConfig &&
             myCMSConfig.maxrequests)
         {
             _myCMSCache.maxRequests = Number(myCMSConfig.maxrequests);
         }
+
         if ("useragent" in myCMSConfig &&
             myCMSConfig.useragent)
         {
             _myCMSCache.useragent = myCMSConfig.useragent;
         }
+
         if ( _mySyncFlag ) {
             _myCMSCache.synchronize();
         }
@@ -54,17 +106,16 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
     obj.__defineGetter__('statusReport',
             function() { return ( _myCMSCache ? _myCMSCache.statusReport : null ) } );
+            
+    obj.__defineGetter__('localFallback',
+            function() { return (_mySyncFlag ? _myLocalFallback : null) } );            
+            
     obj.__defineGetter__('assetDir',
             function() { return _myConfig.childNode("cmscache",0).localdir; } );
 
     function fetchPresentation() {
         _myPresentation = Node.createDocument();
-        if ( _myDummyPresentation ) {
-            _myPresentation.parseFile( _myDummyPresentation );
-            Logger.info("Using dummy presentation file '" + _myConfig.dummypresentation + "'");
-            return; 
-        }
-        
+        var myErrorOccurred = false;
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
         var myLoginRequest = new Request( myZopeConfig.baseurl + "/" + myZopeConfig.loginpage,
                                     _myUserAgent );
@@ -80,7 +131,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         verboseZope("Login request response code: " + myLoginRequest.responseCode );
         if ( myLoginRequest.responseCode == 200 || myLoginRequest.responseCode == 302 ) {
             if ( ! myLoginRequest.getResponseHeader("Set-Cookie")) {
-                throw "Failed to get zope session cookie at " + fileline() + ".";
+                Logger.error("No ZOPE cookie in server response.");
+                myErrorOccurred = true;
             }
             var myPresentationRequest = new Request( myZopeConfig.baseurl + "/" + myZopeConfig.presentationpage,
                     _myUserAgent );
@@ -98,16 +150,29 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             }
             verboseZope("Presentation request response code: " + myPresentationRequest.responseCode );
             if ( myPresentationRequest.responseCode != 200 ) {
-                throw "Failed to get presentation file at " + fileline() + ".";
+                Logger.error("Failed to get presentation file. Server response code " +
+                                    myPresentationRequest.responseCode + ".");
+                myErrorOccurred = true;
             }
             _myOCSCookie = myPresentationRequest.getResponseHeader("Set-Cookie");
-            _myPresentation.parse( myPresentationRequest.responseString );
-            //_myPresentation.saveFile("dummy_presentation.xml");
-
         } else {
-            var myMessage = "Login failed on zope server '" + myLoginRequest.URL + "': " +
-                    myLoginRequest.errorString + " at " + fileline() + ".";
-            throw myMessage;
+            Logger.error("Login failed on zope server '" + myLoginRequest.URL + "': " +
+                    myLoginRequest.errorString + ".", fileline());
+            myErrorOccurred = true;
+        }
+
+        if ( myErrorOccurred ) {
+            if ( _myLocalFallback && fileExists(myZopeConfig.localfallback) ) {
+                Logger.warning("Using local fallback presentation file '" + _myLocalFallback + "'.");
+                _myPresentation.parseFile( _myLocalFallback );
+                // do not remove new content, when syncing with 'old' local fallback presentation file:
+                _mySyncFlag    = false;
+            } else {
+                throw new Exception("No local fallback presentation file available.", fileline());
+            }
+        } else {
+            _myPresentation.parse( myPresentationRequest.responseString );
+            _myPresentation.saveFile( _myLocalFallback );
         }
     }
 
@@ -120,23 +185,25 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         
         _myZopeVerbosityFlag = (myZopeConfig && "verbose" in myZopeConfig && myZopeConfig.verbose != 0);
         _myCMSVerbosityFlag = ("verbose" in myCMSConfig && myCMSConfig.verbose != 0);
-        if ("dummypresentation" in _myConfig &&
-            _myConfig.dummypresentation.length &&
-            fileExists(_myConfig.dummypresentation))
+        if ( "localfallback" in myZopeConfig &&
+             myZopeConfig.localfallback.length )
         {
-            _myDummyPresentation = _myConfig.dummypresentation;
+            _myLocalFallback = myZopeConfig.localfallback;
             
         }
+
         if ("useragent" in _myConfig &&
             _myConfig.useragent.length)
         {
             _myUserAgent = _myConfig.useragent;
         }
+
         if ("sync" in myCMSConfig &&
             myCMSConfig.sync)
         {
             _mySyncFlag = Number(myCMSConfig.sync) > 0;
         }
+
         fetchPresentation();
     }
 
@@ -153,7 +220,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     var _myConfigDoc = null;
     var _myConfig = null;
     var _myPresentation = null;
-    var _myDummyPresentation = null;
+    var _myLocalFallback = null;
     var _mySyncFlag = true;
     var _myCMSCache = null;
     var _myUserAgent = null;
@@ -162,29 +229,3 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     setup();
 
 }
-
-/*=== USAGE SAMPLE =============
-
-try {
-    var myCMS = new CMSHandle("CMSConfig.xml");
-    myCMS.synchronize();
-    while ( ! myCMS.isSynchronized() ) {
-        msleep(10);
-    }
-
-    print( myCMS.statusReport );
-
-    includePath( myCMS.assetDir );
-} catch (ex) {
-    Logger.error( ex );
-}
-*/
-
-/*=== SAMPLE CMSConfig.xml=============
-
-<cmsconfig username="y60" password="acclienty60" useragent="Wget/1.10.2" dummypresentation="CONFIG/dummy_presentation.xml">
-    <zopeconfig baseurl="http://welt.bmw.artcom.de:8080" loginpage="login/logged_in"
-                presentationpage="exportXML" verbose="0"/>
-    <cmscache localdir="C:/tmp/cmsmirror" backend="OCS" verbose="0" domain="bmw" maxrequests="5" sync="1" />
-</cmsconfig>
-*/
