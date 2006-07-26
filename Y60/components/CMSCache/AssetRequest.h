@@ -18,8 +18,9 @@ class AssetRequest : public inet::Request {
     public:
         AssetRequest(dom::NodePtr theAssetNode,
                      const std::string & theBaseDir,
-                     const std::string & theSessionCookie);
-
+                     const std::string & theSessionCookie,
+                     // OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
+                     const std::string & theUserAgent = "Wget/1.10.2");
         bool isDone() const;
 
     protected:

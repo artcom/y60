@@ -156,6 +156,7 @@ JSRequestWrapper::Properties() {
         {"responseBlock", PROP_responseBlock, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"errorString", PROP_errorString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"URL", PROP_URL, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"verbose", PROP_verbose, JSPROP_ENUMERATE | JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -200,6 +201,9 @@ JSRequestWrapper::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject
             case PROP_URL:
                 *vp = as_jsval(cx, getNative().getURL());
                 return JS_TRUE;
+            case PROP_verbose:
+                *vp = as_jsval(cx, getNative().getVerbose());
+                return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSRequestWrapper::getProperty: index %d out of range", theID);
                 return JS_FALSE;
@@ -209,11 +213,17 @@ JSRequestWrapper::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject
 // setproperty handling
 JSBool
 JSRequestWrapper::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj); 
     switch (theID) {
         case PROP_responseCode:
-            //jsval dummy;
-            //return Method<NATIVE>::call(&NATIVE::isOpen, cx, obj, 1, vp, &dummy);
             return JS_FALSE;
+        case PROP_verbose:
+            try {
+                bool myVerboseFlag;
+                convertFrom(cx, *vp, myVerboseFlag );
+                myObj.getNative().setVerbose( myVerboseFlag );
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
         default:
             JS_ReportError(cx,"JSRequestWrapper::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;

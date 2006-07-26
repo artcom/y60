@@ -19,24 +19,25 @@ namespace y60 {
 
 AssetRequest::AssetRequest(dom::NodePtr theAssetNode,
                            const std::string & theBaseDir,
-                           const std::string & theSessionCookie) :
-        // OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
-        inet::Request(theAssetNode->getAttributeString("uri"), "Wget/1.10.2"),
+                           const std::string & theSessionCookie,
+                           const string & theUserAgent) :
+        inet::Request(theAssetNode->getAttributeString("uri"), theUserAgent),
         _myIsDoneFlag( false ),
         _myAssetNode( theAssetNode )
 {
     if ( ! theSessionCookie.empty() ) {
-        setCookie( theSessionCookie, true);
+        setCookie( theSessionCookie, true );
     }
     _myLocalFile = theBaseDir + "/" + theAssetNode->getAttributeString("path");
+    //setVerbose(true);
     //setTimeoutParams(100, 60);
 }
 
 size_t
 AssetRequest::onData(const char * theData, size_t theReceivedByteCount) {
     long myResponseCode = getResponseCode();
-    if (myResponseCode >= 400) {
-        AC_WARNING << "Error:" << myResponseCode << ":" << getURL() << endl;
+    if (myResponseCode >= 400 /*&& myResponseCode != 401*/) {
+        AC_WARNING << "Error code " << myResponseCode << " returned for '" << getURL() << "'." << endl;
         return 0;
     }
     if ( ! _myOutputFile) {
@@ -44,7 +45,7 @@ AssetRequest::onData(const char * theData, size_t theReceivedByteCount) {
                     ios::binary | ios::trunc | ios::out));
     }
 
-    AC_TRACE << "onData called, byteCount=" << theReceivedByteCount;
+    AC_TRACE << "onData called, # of bytes read: " << theReceivedByteCount;
 
     _myOutputFile->write(theData, theReceivedByteCount);
     return theReceivedByteCount;
@@ -86,7 +87,11 @@ AssetRequest::onDone() {
     _myIsDoneFlag = true;
     _myOutputFile = asl::Ptr<ofstream>(0);
     _myAssetNode->getAttribute("status")->nodeValue("done");
-    _myAssetNode->getAttribute("progress")->nodeValue( _myAssetNode->getAttributeString("total") );
+    if ( _myAssetNode->getAttribute("total") ) {
+        _myAssetNode->getAttribute("progress")->nodeValue( _myAssetNode->getAttributeString("total") );
+    }
+
+    AC_TRACE << "Request done: " << _myAssetNode->getAttributeString("path");
 }
 
 bool

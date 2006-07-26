@@ -78,6 +78,8 @@ JSCMSCache::Properties() {
         {"statusReport", PROP_statusReport,
                 JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY},
         {"verbose", PROP_verbose, JSPROP_ENUMERATE | JSPROP_PERMANENT},
+        {"maxRequests", PROP_maxRequests, JSPROP_ENUMERATE | JSPROP_PERMANENT},
+        {"userAgent", PROP_userAgent, JSPROP_ENUMERATE | JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -93,6 +95,12 @@ JSCMSCache::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
             return JS_TRUE;
         case PROP_verbose:
             *vp = as_jsval( cx,  myObj.getNative().getVerboseFlag());
+            return JS_TRUE;
+        case PROP_maxRequests:
+            *vp = as_jsval( cx,  myObj.getNative().getMaxRequestCount());
+            return JS_TRUE;
+        case PROP_userAgent:
+            *vp = as_jsval( cx,  myObj.getNative().getUserAgent());
             return JS_TRUE;
         default:
             JS_ReportError(cx,"JSCMSCache::getProperty: index %d out of range", theID);
@@ -110,6 +118,20 @@ JSCMSCache::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
                 bool myVerboseFlag;
                 convertFrom(cx, *vp, myVerboseFlag );
                 myObj.getNative().setVerboseFlag( myVerboseFlag );
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
+        case PROP_maxRequests:
+            try {
+                unsigned myMaxRequestCount;
+                convertFrom(cx, *vp, myMaxRequestCount );
+                myObj.getNative().setMaxRequestCount( myMaxRequestCount );
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
+        case PROP_userAgent:
+            try {
+                string myUserAgent;
+                convertFrom(cx, *vp, myUserAgent );
+                myObj.getNative().setUserAgent( myUserAgent );
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         default:
@@ -132,8 +154,11 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     y60::BackendType myBackendType;
     std::string myUsername;
     std::string myPassword;
+    std::string mySessionCookie;
         
     switch (argc) {
+        case 6:
+            convertFrom(cx, argv[5], mySessionCookie);
         case 5:
             convertFrom(cx, argv[3], myUsername);
             convertFrom(cx, argv[4], myPassword);
@@ -157,6 +182,11 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
         case 5:
             myNewNative = OWNERPTR(new CMSCache(myLocalPath, myPresentationDoc,
                                                 myBackendType, myUsername, myPassword));
+            break;
+        case 6:
+            myNewNative = OWNERPTR(new CMSCache(myLocalPath, myPresentationDoc,
+                                                myBackendType, myUsername, myPassword,
+                                                mySessionCookie));
             break;
     }
 

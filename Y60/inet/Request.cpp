@@ -28,7 +28,8 @@ IMPLEMENT_ENUM(inet::AuthentType, inet::AuthentTypeStrings);
 namespace inet {
 
     Request::Request(const string & theURL, const string & theUserAgent) :
-        _myErrorBuffer(CURL_ERROR_SIZE, '\0'), _myURL(theURL), _myUserAgent(theUserAgent), _myHttpHeaderList(0)
+        _myErrorBuffer(CURL_ERROR_SIZE, '\0'), _myURL(theURL), _myUserAgent(theUserAgent),
+        _myHttpHeaderList(0)
 
         {
             CURLcode myStatus;
@@ -131,7 +132,8 @@ namespace inet {
 
     void
     Request::setVerbose(bool theVerboseFlag) {
-        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_VERBOSE, theVerboseFlag);
+        _myVerboseFlag = theVerboseFlag;
+        CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_VERBOSE, _myVerboseFlag);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 

@@ -43,7 +43,8 @@ class CMSCache {
                    dom::NodePtr thePresentationDocument,
                    BackendType theBackendType,
                    const std::string & theUsername = "",
-                   const std::string & thePassword = "");
+                   const std::string & thePassword = "",
+                   const std::string & theSessionCookie = "");
         ~CMSCache();
         void synchronize();
         bool isSynchronized();
@@ -51,11 +52,17 @@ class CMSCache {
         bool getVerboseFlag() const { return _myVerboseFlag; }
         void setVerboseFlag(bool theFlag) { _myVerboseFlag = theFlag; }
 
+        unsigned getMaxRequestCount() const { return _myMaxRequestCount; }
+        void setMaxRequestCount(unsigned theMaxCount) { _myMaxRequestCount = theMaxCount; }
+        
+        std::string getUserAgent() const { return _myUserAgent; }
+        void setUserAgent(const std::string & theUserAgent) { _myUserAgent = theUserAgent; }
+
+        void dumpPresentation();
+        void dumpPresentationToFile(const std::string & theFilename);
+
         dom::NodePtr getStatusReport();
 
-        enum RequestCount {
-            MAX_REQUESTS = 10
-        };
     private:
         void login();
         void loginOCS();
@@ -89,6 +96,8 @@ class CMSCache {
 
         bool _myVerboseFlag;
         BackendType _myBackendType;
+        unsigned _myMaxRequestCount;
+        std::string _myUserAgent;
 };
 
 }
