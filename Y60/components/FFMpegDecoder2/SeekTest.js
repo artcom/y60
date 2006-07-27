@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("MovieTestBase.js");
+use("../../video/MovieTestBase.js");
 
 const ENDLESS_TEST = false;
 
@@ -16,7 +16,7 @@ function SeekTest(theArguments) {
     var Public = this;
     var Base   = {};
 
-    MovieTestBase(Public, theArguments);
+    MovieTestBase(Public, theArguments, "y60FFMpegDecoder2");
 
     var _myTestMovies = [
         "mjpeg_160x120_25_10_audio.avi",

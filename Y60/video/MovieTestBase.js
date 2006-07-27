@@ -11,7 +11,7 @@
 use("SceneViewer.js");
 plug("y60JSSound");
 
-function MovieTestBase(Public, theArguments) {
+function MovieTestBase(Public, theArguments, theDecoderName) {
     var Base   = {};
 
     SceneViewer.prototype.Constructor(Public, theArguments);
@@ -22,6 +22,7 @@ function MovieTestBase(Public, theArguments) {
     var _myTestFrameCount = 0;
     var _mySuccessCount = 0;
     var _myFailCount = 0;
+    var _myDecoderName = theDecoderName;
 
     var _myMovies;
     var _myTests;
@@ -81,7 +82,7 @@ function MovieTestBase(Public, theArguments) {
         }
         _myMovie = new MovieOverlay(Public.getOverlayManager(), 
                 "../../video/testmovies/"+theMovieName,
-                new Vector2f(80, 60), null, false, null, "y60FFMpegDecoder2");
+                new Vector2f(80, 60), null, false, null, _myDecoderName);
         
         _myMovie.playspeed = 1;
         _myMovie.loopcount = 1;

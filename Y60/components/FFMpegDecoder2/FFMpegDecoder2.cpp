@@ -626,7 +626,7 @@ namespace y60 {
                 myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || 
                 myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
         {
-            // For some codec, the duration value is not set. For MPEG1 and MPEG2,
+            // For some codecs, the duration value is not set. For MPEG1 and MPEG2,
             // ffmpeg gives a consistently wrong value.
             AC_DEBUG << "FFMpegDecoder2::setupVideo(): '" << theFilename
                     << "' contains no valid duration";
