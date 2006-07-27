@@ -575,7 +575,7 @@ namespace y60 {
             throw FFMpegDecoder2Exception(std::string("Unable to open video codec: ")
                     + theFilename, PLUS_FILE_LINE);
         }
-
+ 
         Movie * myMovie = getMovie();
         AC_TRACE << "PF=" << myMovie->get<RasterPixelFormatTag>();
         
@@ -713,18 +713,18 @@ namespace y60 {
         _myDemux->clearPacketCache();
         _myMsgQueue.clear();
         _myMsgQueue.reset();
-/*
+
         int64_t mySeekTime = int64_t(theDestTime*_myTimeUnitsPerSecond)+_myStartTimestamp;
         AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
         int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex,
                 mySeekTime, AVSEEK_FLAG_BACKWARD);
-*/
+/*
         int64_t mySeekTime = (int64_t(theDestTime)+_myStartTimestamp/_myTimeUnitsPerSecond)
                 *AV_TIME_BASE;
         AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
         int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex,
                 mySeekTime, AVSEEK_FLAG_BACKWARD);
-        
+*/
         decodeFrame();
         if (hasAudio())
         {
