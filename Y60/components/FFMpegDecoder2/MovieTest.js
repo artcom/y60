@@ -353,7 +353,7 @@ function FFMpegTest(theArguments) {
             _myMovie = 0;
         }
         _myMovie = new MovieOverlay(Public.getOverlayManager(), 
-                "../../../../video/testmovies/"+theMovieName,
+                "../../video/testmovies/"+theMovieName,
                 new Vector2f(80, 60), null, false, null, "y60FFMpegDecoder2");
         _myMovie.playspeed = 1;
         _myMovie.loopcount = 1;
