@@ -73,7 +73,13 @@ function FFMpegTest(theArguments) {
         Base.onFrame(theTime);
         _myTestFrameCount++;
         var myMovieName = _myTestMovies[_myCurMovieIndex];
-        _myTests[_myCurTestIndex](_myTestFrameCount, myMovieName);
+        try {
+            _myTests[_myCurTestIndex](_myTestFrameCount, myMovieName);
+        } catch (e) {
+            print(e);
+            assure_msg(false, "Exception caught.");
+            nextTest();
+        }
     }
 
     Base.onPostRender = Public.onPostRender;
@@ -320,11 +326,9 @@ function FFMpegTest(theArguments) {
                 _myMovie.playmode = "play";
                 break;
             case 4:
-                print (_myMovie.currentframe);
                 assure_msg(_myMovie.currentframe == 15, "Seek forward ok");
                 break;
             case 8:
-                print (_myMovie.currentframe);
                 assure_msg(_myMovie.currentframe == 19, "Playback after seek forward ok.");
                 _myMovie.playmode = "pause";
                 _myMovie.currentframe = 4;
@@ -332,11 +336,9 @@ function FFMpegTest(theArguments) {
                 _myMovie.playmode = "play";
                 break;
             case 9:
-                print (_myMovie.currentframe);
                 assure_msg(_myMovie.currentframe == 4, "Seek backward ok.");
                 break;
             case 12:
-                print (_myMovie.currentframe);
                 assure_msg(_myMovie.currentframe == 7, "Playback after seek backward ok.");
                 nextTest();
                 break;
@@ -351,7 +353,7 @@ function FFMpegTest(theArguments) {
             _myMovie = 0;
         }
         _myMovie = new MovieOverlay(Public.getOverlayManager(), 
-                "../../video/testmovies/"+theMovieName,
+                "../../../../video/testmovies/"+theMovieName,
                 new Vector2f(80, 60), null, false, null, "y60FFMpegDecoder2");
         _myMovie.playspeed = 1;
         _myMovie.loopcount = 1;
