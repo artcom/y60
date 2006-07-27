@@ -120,7 +120,6 @@ namespace y60 {
         // time units in movies).
         int64_t           _myStartTimestamp;
         int64_t           _myLastVideoTimestamp;
-        int64_t           _myEOFVideoTimestamp;
         int               _myDestinationPixelFormat;
         unsigned          _myBytesPerPixel;
 

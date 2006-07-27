@@ -7,269 +7,249 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: testMovies.js,v $
-//   $Author: danielk $
-//   $Revision: 1.11 $
-//   $Date: 2005/03/17 20:31:50 $
-//
-//=============================================================================
 
-use("SceneViewer.js");
-plug("y60JSSound");
+use("../../video/MovieTestBase.js");
 
-
-//const MOVIE_FILE = "../FFMpegDecoder/testfiles/counter_short.mpg";
-const MOVIE_FILE = "./testmovies/mpeg2intra_160x120_25_10_noaudio.mpg"; // movie with iframes only, no sound
-const MOVIE_FRAMERATE = 25;
+const ENDLESS_TEST = false;
+const RANDOM_SEEK_ITERATIONS = 50;
 
 function FFMpegTest(theArguments) {
     var Public = this;
     var Base   = {};
 
-    SceneViewer.prototype.Constructor(Public, theArguments);
+    MovieTestBase(Public, theArguments, "y60FFMpegDecoder1");
 
-    var _myMovie = null;
-    var _myTestName = "";
-    var _myCurTestIndex = -1;
-    var _mySeekDest = null;
-    var _myTests = [
-        "setupPlayTest()",
-        "setupStopTest()",
-        "setupLoopTest()",
-        "setupPauseTest()",
-        "setupSeekBackTest()",
-        "setupSeekFwdTest()",
-        "setupPauseStopTest()",
-        "setupStopPauseTest()",
-        "setupRandomSeekTest()"
-
-        //"setupLongTest(true)"
+    var _myTestMovies = [
+        "huffyuv_160x120_25_1_audio.avi",
+        "mjpeg_160x120_25_1_audio.avi",
+        "mpeg2intra_160x120_25_1_audio.mpg",
+//        "xvid_160x120_25_1_audio.mov"
     ];
 
-    Base.setup = Public.setup;
-    Public.setup = function() {
-        Public.setSplashScreen(false);
-        Base.setup(840, 500);
-        window.eventListener = Public;
-        var myNoisyString = expandEnvironment("${Y60_NOISY_SOUND_TESTS}");
-        if (myNoisyString == "") {
-            var mySoundManager = new SoundManager();
-            mySoundManager.volume = 0.0;
-        }
-        Public.nextTest();
-    }
+    var _myTests = [
+        testPlayToEnd,
+        testStop,
+        testPause,
+        testLoop,
+        testPauseStop,
+        testStopPause,
+        testSeek,
+        testRandomSeek
+    ];
 
-    Base.onFrame = Public.onFrame;
-    Public.onFrame = function(theTime) {
-        Base.onFrame(theTime);
-    }
-
-    Base.onPostRender = Public.onPostRender;
-    Public.onPostRender = function() {
-        Base.onPostRender();
-        var myPos = 42;
-        window.setTextColor([1,1,1,1]);
-        window.renderText([10, myPos], _myTestName, "Screen15");
-
-        if (_myMovie) {
-            myPos += 20;
-            var myText  = getFilenamePart(_myMovie.src) + " " + _myMovie.playmode + " " +
-                    _myMovie.currentframe + "/" + _myMovie.framecount;
-            window.renderText([10, myPos], myText, "Screen15");
-            myPos += 10;
-        }
-    }
-
-
-    Public.nextTest = function() {
-        if (_myTestName) {
-            print ("Test finished: "+_myTestName);
-        }
-        _myCurTestIndex++;
-        if (_myCurTestIndex < _myTests.length) {
-            var myTestFunc = _myTests[_myCurTestIndex];
-            print(myTestFunc);
-            eval(myTestFunc);
-        } else {
-            if (_myMovie) {
-                _myMovie.removeFromScene();
-                delete _myMovie;
-                _myMovie = 0;
-            }
-            exit(0);
+    this.initTests(_myTestMovies, _myTests);
+    
+    function testPlayToEnd(This, theTestFrame, theMovieName, theMovie) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Play to end...");
+                This.assure_msg(theMovie.framecount == 26 || theMovie.framecount == -1, 
+                        "Movie framecount is correct.");
+                break;
+            case 1:
+                This.assure_msg(theMovie.playmode == "play", "Movie is playing.");
+                break;
+            case 3:
+                This.assure_msg(theMovie.currentframe == 3, "Current frame is correct.");
+                break;
+            case 25:
+                This.assure_msg(theMovie.playmode == "play", "Movie is playing last frame.");
+                This.assure_msg(theMovie.currentframe == 25, "Current frame is last frame.");
+                break;
+            case 26:
+                This.assure_msg(theMovie.playmode == "stop", "Movie has stopped.");
+                break;
+            case 27:
+                This.nextTest();
+                break;
         }
     }
 
-    Public.testPlaying = function() {
-        assure_msg(_myMovie.playmode == "play", "Movie is still playing.");
-    }
-
-    Public.testStopped = function() {
-        assure_msg(_myMovie.playmode == "stop", "Movie has stopped.");
-    }
-
-    Public.play = function() {
-        print("Starting playback.");
-        _myMovie.playmode = "play";
-    }
-
-    Public.stop = function() {
-        print("Stopping playback.");
-        _myMovie.playmode = "stop";
-    }
-
-    Public.pause = function() {
-        print("Pausing playback.");
-        _myMovie.playmode = "pause";
-    }
-
-    Public.seek = function() {
-        print ("Seek to second " + _mySeekDest);
-        _myMovie.playmode = "pause";
-        _myMovie.currentframe = _mySeekDest * MOVIE_FRAMERATE;
-        window.scene.loadMovieFrame(_myMovie.movie);
-        _myMovie.playmode = "play";
-    }
-
-    Public.seekRandom = function() {
-        _mySeekDest = Math.floor( Math.random(0,1) * _myMovie.framecount);
-        print ("Seek to frame " + _mySeekDest);
-        _myMovie.playmode = "pause";
-        _myMovie.currentframe = _mySeekDest;
-        window.scene.loadMovieFrame(_myMovie.movie);
-        _myMovie.playmode = "play";
-    }
-
-
-    function setupTest(theName, theFile) {
-        _myTestName = theName;
-        if (_myMovie) {
-            _myMovie.removeFromScene();
-            delete _myMovie;
-            _myMovie = 0;
+    function testStop(This, theTestFrame, theMovieName, theMovie) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Play, stop, play again...");
+                break;
+            case 2:
+                theMovie.playmode = "stop";
+                break;
+            case 3:
+                This.assure_msg(theMovie.playmode == "stop", "Movie has stopped.");
+                break;
+            case 5:
+                theMovie.playmode = "play";
+                break;
+            case 9:
+                This.assure_msg(theMovie.currentframe == 3, "Movie has played 3 frames.");
+                theMovie.playmode = "stop";
+                This.nextTest();
+                break;
         }
-        print ("Starting test: " + theName);
-        var myMovie = new MovieOverlay(Public.getOverlayManager(), theFile,
-                new Vector2f(300, 70), null, false, null, "y60FFMpegDecoder1");
-        myMovie.playspeed = 1;
-        myMovie.loopcount = 1;
-        myMovie.avdelay   = 0;
-
-        if (myMovie.width > 480) {
-            var myAspect = myMovie.width / myMovie.height;
-            myMovie.width  = 480;
-            myMovie.height = myMovie.width / myAspect;
+    }
+    
+    function testPause(This, theTestFrame, theMovieName, theMovie) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Play, pause, play again...");
+                break;
+            case 2:
+                theMovie.playmode = "pause";
+                break;
+            case 3:
+                This.assure_msg(theMovie.playmode == "pause", "Movie has paused.");
+                break;
+            case 5:
+                theMovie.playmode = "play";
+                break;
+            case 8:
+                This.assure_msg(theMovie.currentframe == 4, "Movie has played 4 frames.");
+                theMovie.playmode = "stop";
+                This.nextTest();
+                break;
         }
-        _myMovie = myMovie;
     }
-
-    function setupPlayTest() {
-        setupTest("Play to End", MOVIE_FILE);
-        window.setTimeout("testPlaying", 1000);
-        window.setTimeout("testStopped", 11000);
-        window.setTimeout("nextTest", 12000);
-    }
-
-    function setupStopTest() {
-        setupTest("Play, Stop, Play again", MOVIE_FILE);
-        window.setTimeout("stop", 1000);
-        window.setTimeout("play", 2000);
-        window.setTimeout("stop", 3000);
-        window.setTimeout("nextTest", 4000);
-    }
-
-    function setupPauseTest() {
-        setupTest("Play, Pause, Play again", MOVIE_FILE);
-        window.setTimeout("pause", 1000);
-        window.setTimeout("play", 2000);
-        window.setTimeout("stop", 3000);
-        window.setTimeout("nextTest", 4000);
-    }
-
-    function setupLoopTest() {
-        setupTest("Loop", MOVIE_FILE);
-        _myMovie.loopcount = 0;
-        window.setTimeout("testPlaying", 1000);
-        window.setTimeout("testPlaying", 12000);
-        window.setTimeout("stop", 13000);
-        window.setTimeout("nextTest", 14000);
-    }
-
-    function setupSeekBackTest() {
-        setupTest("SeekBack", MOVIE_FILE);
-        _myMovie.loopcount = 1;
-        _mySeekDest = 1;
-        window.setTimeout("seek", 2000);
-        window.setTimeout("seek", 6000);
-        window.setTimeout("nextTest", 8000);
-    }
-
-    function setupSeekFwdTest() {
-        setupTest("SeekFwd", MOVIE_FILE);
-        _myMovie.loopcount = 1;
-        
-        _mySeekDest = 1;
-        window.setTimeout("seek", 1000);
-        window.setTimeout("nextTest", 2000);
-
-        // BUG: seek to a frame that is larger than the number of recognized frames does not work
-        // Description: The movie.framecount is set correctly but the movie shows frame 1 instead
-        // Testmovie: "./testmovies/mpeg2intra_160x120_25_10_noaudio.mpg" // movie with iframes only
-        /*
-        _mySeekDest = 5;
-        window.setTimeout("pause", 0);
-        window.setTimeout("seek", 1000);
-        window.setTimeout("pause", 1001);
-        window.setTimeout("nextTest", 999000);
-        */
-    }
-
-    function setupPauseStopTest() {
-        setupTest("PauseStop", MOVIE_FILE);
-        _myMovie.loopcount = 1;
-        window.setTimeout("pause", 1000);
-        window.setTimeout("stop", 1200);
-        window.setTimeout("play", 1400);
-        window.setTimeout("stop", 1600);
-        window.setTimeout("nextTest", 2000);
-    }
-
-    function setupStopPauseTest() {
-        setupTest("StopPause", MOVIE_FILE);
-        _myMovie.loopcount = 1;
-        window.setTimeout("stop", 1000);
-        window.setTimeout("pause", 1200);
-        window.setTimeout("play", 1400);
-        window.setTimeout("stop", 1600);
-        window.setTimeout("nextTest", 2000);
-    }
-
-    function setupRandomSeekTest() {
-        setupTest("RandomSeek", MOVIE_FILE);
-        _myMovie.loopcount = 1;
-
-        var timeBetweenSeeks = 300; // msec
-        var randomSeekIterations = 50;
-        
-        for (var i=0; i < randomSeekIterations; i++){
-            window.setTimeout("seekRandom", i * timeBetweenSeeks);
+    
+    function testLoop(This, theTestFrame, theMovieName, theMovie) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Loop...");
+                theMovie.loopcount = 0;
+                break;
+            case 25:
+                This.assure_msg(theMovie.playmode == "play", "Movie is playing last frame.");
+                This.assure_msg(theMovie.currentframe == 25, "Current frame is last frame.");
+                break;
+            case 26:
+                This.assure_msg(theMovie.playmode == "play", "Movie is playing.");
+                This.assure_msg(theMovie.currentframe == 0, "Current frame is first frame.");
+                break;
+            case 29:
+                This.assure_msg(theMovie.currentframe == 3, "Current frame is frame 3.");
+                theMovie.playmode = "stop";
+                This.nextTest();
+                break;
         }
-        window.setTimeout("testPlaying", (randomSeekIterations + 1) * timeBetweenSeeks);
-        window.setTimeout("nextTest", (randomSeekIterations + 2) * timeBetweenSeeks);
+    }  
+  
+    function testPauseStop(This, theTestFrame, theMovieName, theMovie) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Play, pause, stop again...");
+                break;
+            case 3:
+                theMovie.playmode = "pause";
+                break;
+            case 4:
+                This.assure_msg(theMovie.playmode == "pause", "Movie has paused.");
+                break;
+            case 6:
+                theMovie.playmode = "stop";
+                break;
+            case 7:
+                This.assure_msg(theMovie.playmode == "stop", "Movie has stopped.");
+                This.assure_msg(theMovie.currentframe == 0, "Current frame is 0");
+                break;
+            case 9:
+                theMovie.playmode = "play";
+                break;
+            case 11:
+                This.assure_msg(theMovie.playmode == "play", "Movie is playing again.");
+                This.assure_msg(theMovie.currentframe == 1, "Current frame is 1");
+                break;
+            case 12:
+                This.assure_msg(theMovie.currentframe == 2, "Movie has played 3 frames.");
+                theMovie.playmode = "stop";
+                This.nextTest();
+                break;
+        }
+    }
+    
+    function testStopPause(This, theTestFrame, theMovieName, theMovie) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Play, stop, pause, play again...");
+                break;
+            case 3:
+                theMovie.playmode = "stop";
+                break;
+            case 4:
+                This.assure_msg(theMovie.playmode == "stop", "Movie has stopped.");
+                break;
+            case 5:
+                theMovie.playmode = "pause";
+                break;
+            case 6:
+                This.assure_msg(theMovie.playmode == "pause", "Movie has paused.");
+                This.assure_msg(theMovie.currentframe == 0, "Current frame is 0");
+                break;
+            case 7:
+                theMovie.playmode = "play";
+                break;
+            case 9:
+                This.assure_msg(theMovie.playmode == "play", "Movie is playing again.");
+                This.assure_msg(theMovie.currentframe == 1, "Current frame is 1");
+                break;
+            case 10:
+                This.assure_msg(theMovie.currentframe == 2, "Movie has played 3 frames.");
+                theMovie.playmode = "stop";
+                This.nextTest();
+                break;
+        }
     }
 
-    function setupLongTest() {
-        setupTest("Almost Endless test", "/tmp/FantFour.mpg");
-        _myMovie.loopcount = 0;
+    function testSeek(This, theTestFrame, theMovieName, theMovie) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Seek...");
+                if (theMovieName == "mpeg1_160x120_25_1_audio.mpg" ||
+                    theMovieName == "mpeg2_160x120_25_1_audio.mpg" ||
+                    theMovieName == "mpeg2intra_160x120_25_1_audio.mpg") 
+                {
+                    This.nextTest();
+                }
+                break;
+            case 3:
+                theMovie.playmode = "pause";
+                theMovie.currentframe = 15;
+                window.scene.loadMovieFrame(theMovie.movie);
+                theMovie.playmode = "play";
+                break;
+            case 4:
+                This.assure_msg(theMovie.currentframe == 15, "Seek forward ok.");
+                break;
+            case 8:
+                This.assure_msg(theMovie.currentframe == 19, "Playback after seek forward ok.");
+                theMovie.playmode = "pause";
+                theMovie.currentframe = 4;
+                window.scene.loadMovieFrame(theMovie.movie);
+                theMovie.playmode = "play";
+                break;
+            case 9:
+                This.assure_msg(theMovie.currentframe == 4, "Seek backward ok.");
+                break;
+            case 12:
+                This.assure_msg(theMovie.currentframe == 7, "Playback after seek backward ok.");
+                This.nextTest();
+                break;
+        }
     }
-
-    function assure_msg(theCondition, theMsg) {
-        if (!theCondition) {
-            print("FAILED : "+theMsg);
-            exit(5);
-        } else {
-            print("SUCCESS: "+theMsg);
+    
+    function testRandomSeek(This, theTestFrame, theMovieName, theMovie) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Random seek...");
+                break;
+            case 53:
+                This.assure_msg(theMovie.playmode == "play", "Playback after random seeks.");
+                This.nextTest();
+                break;
+        }
+        if (theTestFrame > 0 && theTestFrame < RANDOM_SEEK_ITERATIONS) {
+            theMovie.playmode = "pause";
+            var mySeekDest = Math.floor( Math.random()*26);
+            theMovie.currentframe = mySeekDest;
+            window.scene.loadMovieFrame(theMovie.movie);
+            theMovie.playmode = "play";
         }
     }
 }
@@ -277,5 +257,4 @@ function FFMpegTest(theArguments) {
 var ourShow = new FFMpegTest(arguments);
 ourShow.setup();
 ourShow.go();
-
 

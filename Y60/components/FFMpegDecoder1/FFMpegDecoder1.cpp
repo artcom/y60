@@ -46,7 +46,6 @@ namespace y60 {
         _myLastVStreamIndex(-1),
         _myStartTimestamp(0),
         _myLastVideoTimestamp(0),
-        _myEOFVideoTimestamp(INT_MIN),
         _myDestinationPixelFormat(PIX_FMT_BGR24),
         _myBytesPerPixel(0)
     {
@@ -210,8 +209,11 @@ namespace y60 {
         myMovie->set<FrameRateTag>(myFPS);
 
         // duration
-        if (_myVStream->duration == AV_NOPTS_VALUE || int(myFPS * (_myVStream->duration) <= 0)) {
-            myMovie->set<FrameCountTag>(INT_MAX);
+        AVCodecContext * myVCodec = _myVStream->codec;
+        if (_myVStream->duration == AV_NOPTS_VALUE || _myVStream->duration <= 0 ||
+                myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || 
+                myVCodec->codec_id == CODEC_ID_MPEG2VIDEO ) {
+            myMovie->set<FrameCountTag>(-1);
         } else {
             myMovie->set<FrameCountTag>(int(myFPS * _myVStream->duration
                                             * av_q2d(_myVStream->time_base)));
@@ -219,7 +221,6 @@ namespace y60 {
 
 
         _myLastVideoTimestamp = 0;
-        _myEOFVideoTimestamp = INT_MIN;
 
         // Get Starttime
         if (_myVStream->start_time != AV_NOPTS_VALUE) {
@@ -245,11 +246,6 @@ namespace y60 {
 
         if (!decodeFrame(myFrameTimestamp, theTargetRaster)) {
             AC_DEBUG << "EOF reached for timestamp=" << myFrameTimestamp;
-            if (getFrameCount() == INT_MAX) {
-                unsigned myLastFrame = asl::round((_myEOFVideoTimestamp - _myStartTimestamp) * getFrameRate() / AV_TIME_BASE);
-                getMovie()->set<FrameCountTag>(myLastFrame + 1);
-                AC_DEBUG << "Set framecount=" << getFrameCount();
-            }
             setEOF(true);
         } else {
             DB(AC_TRACE << "FFMpegDecoder1::readFrame decoded timestamp=" << myFrameTimestamp);
@@ -303,12 +299,7 @@ namespace y60 {
             int myError;
             if ((myError = av_read_frame(_myFormatContext, &myPacket)) < 0) {
                 av_free_packet(&myPacket);
-#if 0
-                // Remember the end of file timestamp
-                if (_myEOFVideoTimestamp == INT_MIN) {
-                    _myEOFVideoTimestamp = _myLastVideoTimestamp;
-                }
-
+#if 1 
                 /*
                  * Some codecs, such as MPEG, transmit the I and P frame with a
                  * latency of one frame. You must do the following to have a
@@ -318,7 +309,6 @@ namespace y60 {
                 int myLen = avcodec_decode_video(_myVStream->codec, _myFrame, &frameFinished, NULL, 0);
                 if (frameFinished) {
                     _myLastVideoTimestamp += myTimePerFrame;
-//                    _myEOFVideoTimestamp = _myLastVideoTimestamp;
 
                     // last frame found
                     if (_myLastVideoTimestamp >= theTimestamp) {
