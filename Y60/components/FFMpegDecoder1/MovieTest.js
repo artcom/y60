@@ -27,12 +27,12 @@ function FFMpegTest(theArguments) {
     ];
 
     var _myTests = [
-        testPlayToEnd,
-        testStop,
-        testPause,
-        testLoop,
-        testPauseStop,
-        testStopPause,
+//        testPlayToEnd,
+//        testStop,
+//        testPause,
+//        testLoop,
+//        testPauseStop,
+//        testStopPause,
         testSeek,
         testRandomSeek
     ];
@@ -246,7 +246,7 @@ function FFMpegTest(theArguments) {
         }
         if (theTestFrame > 0 && theTestFrame < RANDOM_SEEK_ITERATIONS) {
             theMovie.playmode = "pause";
-            var mySeekDest = Math.floor( Math.random()*26);
+            var mySeekDest = Math.floor(Math.random()*20);
             theMovie.currentframe = mySeekDest;
             window.scene.loadMovieFrame(theMovie.movie);
             theMovie.playmode = "play";
