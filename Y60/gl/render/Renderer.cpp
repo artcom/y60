@@ -1523,7 +1523,8 @@ namespace y60 {
             return;
         }
         const y60::Overlay & myOverlay = *(theOverlayNode->getFacade<y60::Overlay>());
-        if (!myOverlay.get<VisibleTag>()) {
+        float myAlpha  = theAlpha * myOverlay.get<AlphaTag>();
+        if (!myOverlay.get<VisibleTag>() || myAlpha <= 0.0f) {
             return;
         }
 
@@ -1552,7 +1553,6 @@ namespace y60 {
 
         float myWidth  = myOverlay.get<WidthTag>();
         float myHeight = myOverlay.get<HeightTag>();
-        float myAlpha  = theAlpha * myOverlay.get<AlphaTag>();
 
         if (myWidth > 0.0f && myHeight > 0.0f && myAlpha > 0.0f) {
 

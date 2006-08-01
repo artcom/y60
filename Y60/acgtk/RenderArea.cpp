@@ -59,7 +59,7 @@ RenderArea::RenderArea(RenderAreaPtr theContext) : AbstractRenderWindow(jslib::J
         throw asl::Exception("can't init gl",PLUS_FILE_LINE);
     }
 
-    // If another render area is supplied as constructor paramter, this render area is uses as 
+    // If another render area is supplied as constructor paramter, this render area is uses as
     // source for a shared y60-gl-context and gdk-gl-context.
     GdkGLContext * myGdkGLContext = 0;
     if (theContext) {
@@ -139,7 +139,7 @@ RenderArea::getGdkGlContext() const {
 }
 
 //virtual
-void 
+void
 RenderArea::swapBuffers() {
     GdkGLDrawable *gldrawable = gtk_widget_get_gl_drawable (GTK_WIDGET(gobj()));
     if (gdk_gl_drawable_is_double_buffered (gldrawable)) {
@@ -184,6 +184,10 @@ RenderArea::on_expose_event (GdkEventExpose *event) {
             swapBuffers();
         }
 
+        if (_myJSContext) {
+            MAKE_SCOPE_TIMER(gc);
+            JS_GC(_myJSContext);
+        }
     } catch (const asl::Exception & ex) {
         AC_FATAL << "Exception caught: " << ex;
     } catch (const exception & ex) {

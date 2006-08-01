@@ -90,7 +90,7 @@ SDLWindow::~SDLWindow() {
         _myScene->getTextureManager()->unbindTextures();
         // We do not have a valid GLContext after SLD_Quit
         _myScene->getTextureManager()->validateGLContext(false);
-        
+
     }
     SDL_Quit();
 }
@@ -680,20 +680,26 @@ SDLWindow::mainLoop() {
         START_TIMER(dispatchEvents);
         EventDispatcher::get().dispatch();
         STOP_TIMER(dispatchEvents);
-        
+
         START_TIMER(handleRequests);
         _myRequestManager.handleRequests();
         STOP_TIMER(handleRequests);
-        
+
         if (_myRenderer && _myRenderer->getCurrentScene()) {
             renderFrame();
         }
+
+        if (_myJSContext) {
+            MAKE_SCOPE_TIMER(gc);
+            JS_GC(_myJSContext);
+        }
+
         asl::AGPMemoryFlushSingleton::get().resetGLAGPMemoryFlush();
-        
+
         if (jslib::JSApp::getQuitFlag() == JS_TRUE) {
             _myAppQuitFlag = true;
         }
-        
+
 #ifdef WIN32
         if (_myAutoPauseFlag && isOnTop == false) {
             unsigned long mySleepDuration = 40; // in millisec

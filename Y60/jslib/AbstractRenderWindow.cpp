@@ -250,7 +250,7 @@ namespace jslib {
                 AC_WARNING << "AbstractRenderWindow::saveBuffer: Unknown extension " << myExt << ". Saving as png.";
             }
             myBufferWriter.saveBufferAsImage(PL_FT_PNG, theFilename);
-        } 
+        }
     }
 
     void
@@ -558,11 +558,6 @@ namespace jslib {
                 } catch (...) {
                     AC_ERROR << "Unknown exception while calling " << myName;
                 }
-            }
-
-            if (_myJSContext) {
-                MAKE_SCOPE_TIMER(gc);
-                JS_GC(_myJSContext);
             }
         } catch (const asl::Exception & ex) {
             AC_ERROR << "ASL exception caught in Y60Render::postRender(): " << ex;
