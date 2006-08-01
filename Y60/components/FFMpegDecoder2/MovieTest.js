@@ -238,9 +238,6 @@ function FFMpegTest(theArguments) {
             case 4:
                 This.assure_msg(theMovie.currentframe == 15, "Seek forward ok.");
                 break;
-            case 6:
-                This.nextTest();
-                break;
             case 8:
                 This.assure_msg(theMovie.currentframe == 19, "Playback after seek forward ok.");
                 theMovie.playmode = "pause";
