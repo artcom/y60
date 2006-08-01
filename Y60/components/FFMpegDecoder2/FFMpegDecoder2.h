@@ -128,7 +128,7 @@ namespace y60 {
          * @param theFrame frame to put into the cache
          * @param theTimestamp timestamp to use
          */
-        void addCacheFrame(AVFrame* theFrame, int64_t theTimestamp);
+        void addCacheFrame(AVFrame* theFrame, double theTime);
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
         VideoMsgPtr createFrame(double theTimestamp);
         
@@ -149,6 +149,7 @@ namespace y60 {
         DemuxPtr _myDemux;
        
         int64_t _myStartTimestamp;
+        double _myLastFrameTime;  // Only used for mpeg1/2 end of file handling.
         int _myDestinationPixelFormat;
 
         ReSampleContext * _myResampleContext;

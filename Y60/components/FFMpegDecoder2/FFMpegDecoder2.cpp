@@ -62,7 +62,8 @@ namespace y60 {
         _myResampleContext(0),
         _myNumFramesDecoded(0),
         _myNumIFramesDecoded(0),
-        _myBytesPerPixel(1)
+        _myBytesPerPixel(1),
+        _myLastFrameTime(0)
     {
     }
 
@@ -206,12 +207,14 @@ namespace y60 {
             
             // seek to start
             // TODO: only do this on loop?
-            int myResult = av_seek_frame(_myFormatContext, -1, 0,
+            int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp,
                     AVSEEK_FLAG_BACKWARD);
+/*            
             avcodec_flush_buffers(_myVStream->codec);
             if (_myAStream) {
                 avcodec_flush_buffers(_myAStream->codec);
             }
+*/            
             if (_myAudioSink) {
                 _myAudioSink->stop();
             }
@@ -343,12 +346,13 @@ namespace y60 {
                         &myFrameCompleteFlag, 0, 0);
                 if (myFrameCompleteFlag) {
 		            AC_DEBUG << "---- decodeFrame: Last frame.";
-                    // the only way to get the timestamp of this frame is to take
-                    // _myFrame->coded_picture_number and calculate it from that.
+                    // The only way to get the timestamp of this frame is to take
+                    // the timestamp of the previous frame and add an appropriate
+                    // amount.
+                    // (_myFrame->coded_picture_number contains garbage on the second
+                    // and successive loops.)
                     // Yuck.
-                    int64_t myFrameTimestamp = int64_t(_myFrame->coded_picture_number*
-                            _myTimeUnitsPerSecond/_myFrameRate);
-                    addCacheFrame(_myFrame, myFrameTimestamp);
+                    addCacheFrame(_myFrame, _myLastFrameTime+1.0/_myFrameRate);
                     _myNumFramesDecoded++;
                     if (_myFrame->pict_type == FF_I_TYPE) {
                         AC_DEBUG << "***** I_FRAME *****";
@@ -379,7 +383,9 @@ namespace y60 {
                     }
                     int64_t myNextPacketTimestamp = (myPacket->dts-_myStartTimestamp);
 		            AC_DEBUG << "---- add frame";
-                    addCacheFrame(_myFrame, myNextPacketTimestamp);
+                    double myFrameTime = (double)myNextPacketTimestamp/_myTimeUnitsPerSecond;
+                    addCacheFrame(_myFrame, myFrameTime);
+                    _myLastFrameTime = myFrameTime;
                     _myNumFramesDecoded++;
                     if (_myFrame->pict_type == FF_I_TYPE) {
                         AC_DEBUG << "***** I_FRAME *****";
@@ -461,18 +467,18 @@ namespace y60 {
         if (_myStartTimestamp != -1) {
             myStreamTime += _myStartTimestamp/_myTimeUnitsPerSecond;
         }
-        AC_DEBUG << "Time=" << theTime << " - Reading Frame Timestamp: " << myStreamTime
-            << " from Cache.";
+        AC_DEBUG << "Time=" << theTime << " - Reading frame timestamp: " << myStreamTime
+            << " from queue.";
 
         try {
             bool useLastVideoFrame = false;
             if (_myLastVideoFrame) {
-                if (shouldSeek(_myLastVideoFrame->getTimestamp(), myStreamTime) &&
+                if (shouldSeek(_myLastVideoFrame->getTime(), myStreamTime) &&
                         getPlayMode() == y60::PLAY_MODE_PAUSE)
                 {
                     seek(theTime);
                 }
-                double myFrameTime = _myLastVideoFrame->getTimestamp();
+                double myFrameTime = _myLastVideoFrame->getTime();
                 double myTimeDiff = (myStreamTime-myFrameTime)*getFrameRate();
                 if (myTimeDiff < 0.5 && myTimeDiff > -0.9) {
                     AC_DEBUG << "readFrame: Reusing last frame. myFrameTime=" << myFrameTime
@@ -488,13 +494,14 @@ namespace y60 {
                         setEOF(true);
                         return theTime;
                     }
-                    double myTimestamp = theVideoMsg->getTimestamp();
-                    AC_DEBUG << "FFMpegDecoder2::readFrame, FrameTime="
-                        << theVideoMsg->getTimestamp()
+                    double myTimestamp = theVideoMsg->getTime();
+                    AC_DEBUG << "readFrame: FrameTime="
+                        << theVideoMsg->getTime()
                         << ", Calculated frame #=" << myTimestamp*getFrameRate()
                         << ", Cache size=" << _myMsgQueue.size();
                     double myTimeDiff = (myStreamTime - myTimestamp)*getFrameRate();
-                    if (myTimeDiff < 0.5 && myTimeDiff > -0.9) {
+                    AC_DEBUG << "           myTimeDiff=" << myTimeDiff; 
+                    if (myTimeDiff < 0.5 /*&& myTimeDiff > -0.9*/) {
                         break;
                     }
                 }
@@ -504,12 +511,12 @@ namespace y60 {
             theTargetRaster->resize(getFrameWidth(), getFrameHeight());
             if (theVideoMsg) {
                 AC_DEBUG << "readFrame: Frame delivered. wanted=" << theTime
-                        << ", got=" << theVideoMsg->getTimestamp();
-                theTime = theVideoMsg->getTimestamp();
+                        << ", got=" << theVideoMsg->getTime();
+                theTime = theVideoMsg->getTime();
                 memcpy(theTargetRaster->pixels().begin(), theVideoMsg->getBuffer(),
                         theTargetRaster->pixels().size());
             } else {
-                // TODO: Figure out if/why this happens
+                // TODO: Figure out if/why this happens. Delete?
                 AC_WARNING << "readFrame, empty frame.";
                 memset(theTargetRaster->pixels().begin(), 0, theTargetRaster->pixels().size());
             }
@@ -673,13 +680,13 @@ namespace y60 {
             << (_myResampleContext != 0);
     }
 
-    void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, int64_t theTimestamp) {
-		AC_DEBUG << "---- try to add frame at " << theTimestamp;
-        VideoMsgPtr myVideoFrame = createFrame(theTimestamp/(double)_myTimeUnitsPerSecond);
+    void FFMpegDecoder2::addCacheFrame(AVFrame* theFrame, double theTime) {
+		AC_DEBUG << "---- try to add frame at " << theTime;
+        VideoMsgPtr myVideoFrame = createFrame(theTime);
         convertFrame(theFrame, myVideoFrame->getBuffer());
         _myMsgQueue.push_back(myVideoFrame);
         AC_DEBUG << "---- Added Frame to cache, Frame # : "
-            << double(theTimestamp)/_myTimeUnitsPerSecond*_myFrameRate
+            << double(theTime)*_myFrameRate
             << " cache size=" << _myMsgQueue.size();
     }
 

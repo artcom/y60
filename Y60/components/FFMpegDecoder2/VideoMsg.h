@@ -24,17 +24,18 @@ public:
         MSG_EOF
     };
     
-    VideoMsg(VideoMsgType theType, double theTimestamp = 0, 
+    // Time is in seconds.
+    VideoMsg(VideoMsgType theType, double theTime = 0, 
             unsigned theFrameSize = 0);
     ~VideoMsg();
 
     VideoMsgType getType() const;
-    double getTimestamp() const;
+    double getTime() const;
     unsigned char * getBuffer() const;
 
 private:
     VideoMsgType _myType;
-    double _myTimestamp;
+    double _myTime;
     unsigned _myFrameSize;
     unsigned char * _myFrame;
 };

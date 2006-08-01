@@ -48,7 +48,8 @@ function MovieTestBase(Public, theArguments, theDecoderName) {
         _myTestFrameCount++;
         var myMovieName = _myMovies[_myCurMovieIndex];
         try {
-//            print (_myTestFrameCount, _myMovie.currentframe);
+//            print();
+//            print("----- Test frame: "+_myTestFrameCount+", Movie frame: "+_myMovie.currentframe+" -----");
             _myTests[_myCurTestIndex](Public, _myTestFrameCount, myMovieName, _myMovie);
         } catch (e) {
             print(e);

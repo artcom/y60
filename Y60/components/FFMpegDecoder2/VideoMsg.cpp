@@ -15,10 +15,10 @@ namespace y60 {
 
 using namespace dom;
     
-VideoMsg::VideoMsg(VideoMsgType theType, double theTimestamp, 
+VideoMsg::VideoMsg(VideoMsgType theType, double theTime, 
             unsigned theFrameSize)
     : _myType(theType),
-      _myTimestamp(theTimestamp),
+      _myTime(theTime),
       _myFrameSize(theFrameSize)
 {
     if (_myFrameSize) {
@@ -36,8 +36,8 @@ VideoMsg::VideoMsgType VideoMsg::getType() const {
     return _myType;
 }
 
-double VideoMsg::getTimestamp() const {
-    return _myTimestamp;
+double VideoMsg::getTime() const {
+    return _myTime;
 }
 
 unsigned char * VideoMsg::getBuffer() const {

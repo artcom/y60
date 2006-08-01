@@ -27,12 +27,12 @@ function FFMpegTest(theArguments) {
     ];
 
     var _myTests = [
-//        testPlayToEnd,
-//        testStop,
-//        testPause,
-//        testLoop,
-//        testPauseStop,
-//        testStopPause,
+        testPlayToEnd,
+        testStop,
+        testPause,
+        testLoop,
+        testPauseStop,
+        testStopPause,
         testSeek,
         testRandomSeek
     ];

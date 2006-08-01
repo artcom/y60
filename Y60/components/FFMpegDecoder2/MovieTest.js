@@ -18,6 +18,11 @@ function FFMpegTest(theArguments) {
 
     MovieTestBase(Public, theArguments, "y60FFMpegDecoder2");
 
+/*
+    var _myTestMovies = [
+        "1.1.mpg"
+    ];
+*/
     var _myTestMovies = [
         "huffyuv_160x120_25_1_audio.avi",
         "mjpeg_160x120_25_1_audio.avi",
@@ -36,6 +41,12 @@ function FFMpegTest(theArguments) {
         "xvid_160x120_25_1_noaudio.avi",
     ];
 
+/*
+    var _myTests = [
+        testSeek
+    ];
+*/    
+    
     var _myTests = [
         testPlayToEnd,
         testStop,
@@ -221,10 +232,14 @@ function FFMpegTest(theArguments) {
                 theMovie.playmode = "pause";
                 theMovie.currentframe = 15;
                 window.scene.loadMovieFrame(theMovie.movie);
+//                theMovie.currentframe = 16;
                 theMovie.playmode = "play";
                 break;
             case 4:
                 This.assure_msg(theMovie.currentframe == 15, "Seek forward ok.");
+                break;
+            case 6:
+                This.nextTest();
                 break;
             case 8:
                 This.assure_msg(theMovie.currentframe == 19, "Playback after seek forward ok.");

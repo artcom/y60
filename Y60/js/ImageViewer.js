@@ -74,7 +74,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         Base.setup(theWidth, theHeight, false, theTitle);
         for(var i=1; i<theArguments.length; ++i) {
             switch(theArguments[i]) {
-            case "recursive": // would like to use '--recursive' but that's rejected by the acxpshell options
+            case "recursive": // would like to use '--recursive' but that is rejected by the acxpshell options
                 _myPlaylist.setRecursiveFlag(true);
                 break;
             default:
