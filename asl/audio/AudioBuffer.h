@@ -16,7 +16,7 @@
 #include "AudioBufferBase.h"
 #include "SampleFormat.h"
 
-#define ASSURE_POLICY AssurePolicy::Exit
+//#define ASSURE_POLICY AssurePolicy::Exit
 #include <asl/Block.h>
 #include <asl/Logger.h>
 #include <asl/Assure.h>
