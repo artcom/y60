@@ -45,7 +45,9 @@ function LabelBase(Public, Protected, theScene,
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     Public.setText = function(theText, theStyle) {
-
+        if (theText == "") {
+            theText = " ";
+        }
         var myStyle = null;
         if (theStyle) {
             myStyle = clone(theStyle);
