@@ -368,9 +368,9 @@ namespace y60 {
 
         theTimestamp = myPacket.dts;
         AC_DEBUG << "Packet dts: " << myPacket.dts << ", pts: " << myPacket.pts;
-        av_free_packet(&myPacket);
 
         _myLastVStreamIndex = myPacket.stream_index;
+        av_free_packet(&myPacket);
 
         return true;
     }
