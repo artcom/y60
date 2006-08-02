@@ -88,8 +88,7 @@ namespace y60 {
         private:
             void closeMovie();
             void decodeFrame(unsigned theFrameNumber, dom::ResizeableRasterPtr theTargetRaster);
-            unsigned int getFramecount();
-            unsigned int getDurationInMilliseconds();
+            unsigned int getFramecount(::Movie theMovie);
 
             ::Movie                  _myMovie;    
             unsigned                 _myLastDecodedFrame;

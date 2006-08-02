@@ -36,7 +36,6 @@ extern "C"
 EXPORT asl::PlugInBase * y60QuicktimeDecoder_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new y60::QuicktimeDecoder(myDLHandle);
 }
-Movie QTURL_NewMovieFromURL (char *theURL);
 
 namespace y60 {
     #include <qt/MoviesFormat.h>
@@ -48,6 +47,8 @@ namespace y60 {
 
     QuicktimeDecoder::~QuicktimeDecoder() {
         closeMovie();
+        ExitMovies();
+        TerminateQTML();
     }
 
     asl::Ptr<MovieDecoderBase> QuicktimeDecoder::instance() const {
@@ -70,6 +71,10 @@ namespace y60 {
     void
     QuicktimeDecoder::closeMovie() {
         AC_DEBUG << "QuicktimeDecoder::closeMovie";
+        PixMapHandle myPixMap = GetGWorldPixMap(_myOffScreenWorld);
+        DisposeScreenBuffer(myPixMap);
+        DisposeGWorld(_myOffScreenWorld);
+
     }
 
     void
@@ -97,8 +102,6 @@ namespace y60 {
         OSErr                   myErr;
         short                   myFileRefNum;
         char                    myFullPath[255];
-
-        //_myMovie = QTURL_NewMovieFromURL((char*)theFilename.c_str());
 
         // qt can not handle filepaths like this: "./foo.mov",
         // which comes from the PacketManager -> cut it off
@@ -136,6 +139,7 @@ namespace y60 {
         GWorldPtr myOrigGWorld = NULL;
         GetMovieGWorld(_myMovie, &myOrigGWorld, NULL);
         PixMapHandle myPortPixMap = myOrigGWorld->portPixMap;
+        AllowPurgePixels(myPortPixMap);
         OSType myMoviePixelType = (*myPortPixMap)->pixelFormat;
 
         myQTTargetPixelFormat = myMoviePixelType;
@@ -170,8 +174,10 @@ namespace y60 {
 
         QTNewGWorld(&_myOffScreenWorld, myQTTargetPixelFormat, &movieBounds, 0, 0, 0);
 
-        int myFrameCount = getFramecount();
-        unsigned myDuration = getDurationInMilliseconds();
+        int myFrameCount = getFramecount(_myMovie);
+        TimeScale ts = GetMovieTimeScale(_myMovie);
+        unsigned myDuration = (GetMovieDuration(_myMovie)*1000)/ts;
+
         unsigned myFrameRate = (unsigned)floor(double(myFrameCount)/ 
                 double((myDuration/1000)));
         if (!myFrameRate) {
@@ -203,29 +209,22 @@ namespace y60 {
 
         asl::Time myLoadEndTime;
         AC_INFO << "Load file:" << theFilename << ", time " << (myLoadEndTime - myLoadStartTime) << "s";
+        
+
     }
 
     unsigned int
-    QuicktimeDecoder::getDurationInMilliseconds(){
-        TimeScale ts = GetMovieTimeScale(_myMovie);
-        return (GetMovieDuration(_myMovie)*1000)/ts;
-    }
-
-    unsigned int
-    QuicktimeDecoder::getFramecount() {
+    QuicktimeDecoder::getFramecount(::Movie theMovie) {
         int      frameCount = 0;
         OSType      whichMediaType = VIDEO_TYPE;
         unsigned int flags = nextTimeMediaSample + nextTimeEdgeOK; // nextTimeStep;
         TimeValue   duration;
         TimeValue   theTime = 0;
 
-        // due to a bug in QuickTime 6 we
-        // must task the movie first
-        //MoviesTask( _myMovie, 0 );
 
         while (theTime >= 0) {
             frameCount++;
-            GetMovieNextInterestingTime(_myMovie,
+            GetMovieNextInterestingTime(theMovie,
                                 flags,
                                 1,
                                 &whichMediaType,
@@ -297,33 +296,17 @@ namespace y60 {
         // set the time for the frame and give time to the movie toolbox
         SetMovieTimeValue(_myMovie, _myInternalMovieTime);
 
+
         // *** this does the actual drawing into the GWorld ***
         MoviesTask(_myMovie,0);
-        Ptr baseAddr = GetPixBaseAddr(GetGWorldPixMap(_myOffScreenWorld));
-        QTGetPixMapHandleRowBytes(GetGWorldPixMap(_myOffScreenWorld));
+
+        PixMapHandle myPixMap = GetGWorldPixMap(_myOffScreenWorld);
+        Ptr baseAddr = GetPixBaseAddr(myPixMap);
 
         memcpy(theTargetRaster->pixels().begin(), baseAddr, theTargetRaster->pixels().size());
+
         _myLastDecodedFrame = theFrameNumber;
+        
     }
 }
 
-Movie QTURL_NewMovieFromURL (char *theURL)
-{
-  Movie    myMovie = NULL;
-  Handle    myHandle = NULL;
-  Size    mySize = 0;
-
-  mySize = (Size)strlen(theURL) + 1;
-  cout << " mySize: " << mySize << endl;
-  myHandle = NewHandleClear(mySize);
-  BlockMove(theURL, *myHandle, mySize);
-
-  NewMovieFromDataRef(&myMovie, newMovieActive, 0, myHandle, URLDataHandlerSubType);
-
-  if (myHandle != NULL) {
-    DisposeHandle(myHandle);
-  }
-
-  return myMovie;
-
-}
