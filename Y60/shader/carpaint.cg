@@ -14,7 +14,7 @@
 
 #define LIGHTING
 
-#define PHONG_SPECULAR // use Phong instead of Blinn specular term
+//#define PHONG_SPECULAR // use Phong instead of Blinn specular term
 
 
 struct app2vert {
