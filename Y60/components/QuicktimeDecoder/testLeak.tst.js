@@ -28,8 +28,7 @@ var myVideoCount = 100;
 
 var myMovieLeak =  myVideoCount * 8 * 1024; // each qt movie leaks 8kb per movie (not per frame, tolerable)
 
-var myMovieBaseMemoryUsage =  50*1024*1024; // (due to some basic memory allocation, i.e. plugin-ctor code, SomImageFactory)
-//var myMovieBaseMemoryUsage =  5*1024*1024; // (due to some basic memory allocation, i.e. plugin-ctor code, SomImageFactory)
+var myMovieBaseMemoryUsage =  25*1024*1024; // (due to some basic memory allocation, i.e. plugin-ctor code, SomImageFactory)
 var myAllowedMemoryUsage = myMovieBaseMemoryUsage + myMovieLeak;
 
 
