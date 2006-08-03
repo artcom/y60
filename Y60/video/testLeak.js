@@ -37,19 +37,27 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
     var _myMovie   = null;
     var _myFrameCount = 0;
     var _myStartMemory = 0;
+    var _myLastMemory = 0;
     UnitTest.prototype.Constructor(obj, theName);
     //while(true) {toggleMovie();}
     obj.run = function() {    
         window.onFrame = function(theTime) {
+            var myMem = getProcessMemoryUsage();
             if (_myFrameCount == START_FRAMES) {
                 _myStartMemory = getProcessMemoryUsage();
             } else if (_myFrameCount > START_FRAMES && _myFrameCount < START_FRAMES + theVideoCount) {
                 toggleMovie();
                 var myText = "Loop : " + (_myFrameCount - START_FRAMES) + "/" + theVideoCount; 
                 window.renderText([500,100], myText, "Screen15");                
+                window.renderText([500,200], myMem, "Screen15");                
+                window.renderText([500,400], myMem-_myLastMemory, "Screen15");
             } else if (_myFrameCount == START_FRAMES + theVideoCount){
+                toggleMovie();
+            } else if (_myFrameCount == START_FRAMES + theVideoCount + 200) {
+                toggleMovie();
+            } else if (_myFrameCount == START_FRAMES + theVideoCount + 400) {
                 remove();
-            } else if (_myFrameCount >= START_FRAMES + theVideoCount + END_FRAMES) {
+            } else if (_myFrameCount >= START_FRAMES + theVideoCount + END_FRAMES + 400) {
                 gc();
                 //window.scene.save("empty.xml", false);
                 var myUsedMemory = getProcessMemoryUsage();
@@ -66,12 +74,14 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 ENSURE('obj.myMemoryDifff < obj.AllowedMemoryUsage');                
                 window.stop();
             }
-            _myFrameCount++;            
+            _myFrameCount++; 
+            _myLastMemory = myMem;           
         }
         window.go();
     }
     function remove() {
         if (_myMovie != null) {
+            //print("removed :" + _myMovie.src + " from scene");
             _myMovie.removeFromScene();
             _myMovie = null;
             gc();
