@@ -619,7 +619,7 @@ namespace y60 {
 
     void Renderer::preDraw(const asl::Vector4f & theColor,
                            const asl::Matrix4f & theTransformation,
-                           float theWidth,
+                           float theSize,
                            const std::string & theRenderStyles)
    {
         std::istringstream myRenderStylesStream(theRenderStyles);
@@ -664,7 +664,8 @@ namespace y60 {
         glDisable(GL_TEXTURE_2D);
 
         glColor4fv(theColor.begin());
-        glLineWidth(theWidth);
+        glLineWidth(theSize);
+        glPointSize(theSize);
 
         glPushMatrix();
         glMultMatrixf(theTransformation.getData());
@@ -677,13 +678,29 @@ namespace y60 {
     }
 
     template <>
+    void Renderer::draw(const asl::Vector3f & thePoint,
+                        const asl::Vector4f & theColor,
+                        const asl::Matrix4f & theTransformation,
+                        float theSize,
+                        const std::string & theRenderStyles)
+    {
+        preDraw(theColor, theTransformation, theSize,theRenderStyles);
+
+        glBegin(GL_POINTS);
+            glVertex3fv(thePoint.begin());
+        glEnd();
+
+        postDraw();
+    }
+
+    template <>
     void Renderer::draw(const asl::LineSegment<float> & theLine,
                         const asl::Vector4f & theColor,
                         const asl::Matrix4f & theTransformation,
-                        float theWidth,
+                        float theSize,
                         const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth,theRenderStyles);
+        preDraw(theColor, theTransformation, theSize,theRenderStyles);
 
         glBegin(GL_LINES);
             glVertex3fv(theLine.origin.begin());
@@ -697,10 +714,10 @@ namespace y60 {
     void Renderer::draw(const asl::Sphere<float> & theSphere,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            float theWidth,
+            float theSize,
             const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
+        preDraw(theColor, theTransformation, theSize, theRenderStyles);
 
         const float TwoPI = float(asl::PI) * 2.0f;
         const unsigned mySegments = 32;
@@ -734,10 +751,10 @@ namespace y60 {
     void Renderer::draw(const asl::Box3<float> & theBox,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            float theWidth,
+            float theSize,
             const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
+        preDraw(theColor, theTransformation, theSize, theRenderStyles);
 
         Point3f myLTF, myRBF, myRTF, myLBF;
         Point3f myLTBK, myRBBK, myRTBK, myLBBK;
@@ -753,10 +770,10 @@ namespace y60 {
     void Renderer::draw(const asl::Triangle<float> & theTriangle,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            float theWidth,
+            float theSize,
             const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
+        preDraw(theColor, theTransformation, theSize, theRenderStyles);
 
         glBegin(GL_TRIANGLES);
             glVertex3fv(theTriangle[0].begin());
@@ -771,10 +788,10 @@ namespace y60 {
     void Renderer::draw(const asl::BSpline<float> & theBSpline,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            float theWidth,
+            float theSize,
             const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
+        preDraw(theColor, theTransformation, theSize, theRenderStyles);
 
         glBegin(GL_LINE_STRIP);
         unsigned myNumSegments = 16;
@@ -791,15 +808,15 @@ namespace y60 {
     void Renderer::draw(const asl::SvgPath & thePath,
             const asl::Vector4f & theColor,
             const asl::Matrix4f & theTransformation,
-            float theWidth,
+            float theSize,
             const std::string & theRenderStyles)
     {
-        preDraw(theColor, theTransformation, theWidth, theRenderStyles);
+        preDraw(theColor, theTransformation, theSize, theRenderStyles);
 
         glBegin(GL_LINE_STRIP);
         asl::Vector3f myLastPos;
         for (unsigned i = 0; i < thePath.getNumElements(); ++i) {
-            const asl::SvgPath::LineSegmentPtr mySegment = thePath.getElement(i);
+            const LineSegmentPtr mySegment = thePath.getElement(i);
             if (i == 0 || !asl::almostEqual(mySegment->origin, myLastPos)) {
                 // discontinuous
                 if (i > 0) {

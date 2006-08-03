@@ -38,7 +38,8 @@ public:
         PROP_start = -100,
         PROP_end,        
         PROP_starthandle,
-        PROP_endhandle
+        PROP_endhandle,
+        PROP_isLineSegment
     };
 
     static JSFunctionSpec * Functions();

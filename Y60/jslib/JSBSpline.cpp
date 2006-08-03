@@ -287,6 +287,7 @@ namespace jslib {
             {"end", PROP_end, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
             {"starthandle", PROP_starthandle, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
             {"endhandle", PROP_endhandle, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
+            {"isLineSegment", PROP_isLineSegment, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT|JSPROP_SHARED},
             {0}
         };
         return myProperties;
@@ -337,6 +338,9 @@ namespace jslib {
                 return JS_TRUE;
             case PROP_endhandle:
                 *vp = as_jsval(cx, getNative().getEndHandle());
+                return JS_TRUE;
+            case PROP_isLineSegment:
+                *vp = as_jsval(cx, getNative().isLineSegment());
                 return JS_TRUE;
         }
         JS_ReportError(cx,"JSBSpline::getProperty: index %d out of range", theID);

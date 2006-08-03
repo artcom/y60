@@ -13,6 +13,7 @@
 
 #include "Vector234.h"
 #include <math.h>
+#include <asl/Ptr.h>
 
 namespace asl {
 
@@ -300,6 +301,10 @@ namespace asl {
             
             return _myResult[myIndex] + myDirection * myRemainingDistance;
         }
+        
+        bool isLineSegment() const {
+            return almostEqual( _myStart, _myStartHandle) && almostEqual( _myEnd, _myEndHandle );
+        }
 
     private:
         void clearResultCache() {
@@ -355,6 +360,7 @@ namespace asl {
 
     typedef BSpline<float> BSplinef;
     typedef BSpline<double> BSplined;
+    typedef Ptr<BSplinef> BSplinePtr; // a little bit dirty ... should be BSplinefPtr
 
     template <class T>
     std::ostream & operator<<(std::ostream & os, const asl::BSpline<T> & theSpline) {
@@ -367,6 +373,7 @@ namespace asl {
     }
 
     /* @} */
+    
 
 } // namespace asl
 #endif

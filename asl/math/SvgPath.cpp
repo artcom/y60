@@ -17,6 +17,11 @@
 
 namespace asl {
 
+    BSplinePtr createLinearBezier( const Vector3f & theStart, const Vector3f & theEnd ) {
+        return BSplinePtr( new BSplinef( theStart, theStart, theEnd, theEnd));
+    }
+
+
     SvgPath::SvgPath() {
         AC_DEBUG << "SvgPath::SvgPath";
         setup();
@@ -26,7 +31,7 @@ namespace asl {
     {
         AC_DEBUG << "SvgPath::SvgPath d='" << thePathDefinition << "' len=" << theSegmentLength;
         setup();
-        if (thePathDefinition.size()) {
+        if ( ! thePathDefinition.empty()) {
             parsePathDefinition(thePathDefinition);
         }
         _mySegmentLength = theSegmentLength;
@@ -40,54 +45,47 @@ namespace asl {
     SvgPath::~SvgPath()
     {
         AC_DEBUG << "SvgPath::~SvgPath";
-        for (unsigned i = 0; i < _myElements.size(); ++i) {
-            //delete _myElements[i];
-        }
     }
 
     /// Move to position.
     void SvgPath::move(const Vector3f & thePos, bool theRelativeFlag)
     {
-        Vector3f myEnd = (theRelativeFlag ? sum(_myLastPos, thePos) : thePos);;
-        _myOrigin = myEnd;
-        _myLastPos = myEnd;
-        AC_TRACE << "move " << myEnd;
+        _myOrigin = resolveRelative( thePos, theRelativeFlag );
+        AC_TRACE << "move " << thePos;
     }
 
     /// Line to position.
     void SvgPath::line(const Vector3f & thePos, bool theRelativeFlag)
     {
-        Vector3f myEnd = (theRelativeFlag ? sum(_myLastPos, thePos) : thePos);
-        push(new LineSegment<float>(_myLastPos, myEnd));
-        _myLastPos = myEnd;
+        Vector3f myEnd = resolveRelative( thePos, theRelativeFlag );
+
+        appendBezierSegment( createLinearBezier( getLastPosition(), myEnd));
         AC_TRACE << "line " << myEnd;
     }
 
     /// Horizontal line to position.
     void SvgPath::hline(float theX, bool theRelativeFlag)
     {
-        Vector3f myEnd = _myLastPos;
+        Vector3f myEnd = getLastPosition();
         if (theRelativeFlag) {
             myEnd[0] += theX;
         } else {
             myEnd[0] = theX;
         }
-        push(new LineSegment<float>(_myLastPos, myEnd));
-        _myLastPos = myEnd;
+        appendBezierSegment( createLinearBezier( getLastPosition(), myEnd));
         AC_TRACE << "hline " << myEnd;
     }
 
     /// Vertical line to position.
     void SvgPath::vline(float theY, bool theRelativeFlag)
     {
-        Vector3f myEnd = _myLastPos;
+        Vector3f myEnd = getLastPosition();
         if (theRelativeFlag) {
             myEnd[1] += theY;
         } else {
             myEnd[1] = theY;
         }
-        push(new LineSegment<float>(_myLastPos, myEnd));
-        _myLastPos = myEnd;
+        appendBezierSegment( createLinearBezier( getLastPosition(), myEnd));
         AC_TRACE << "vline " << myEnd;
     }
 
@@ -97,11 +95,19 @@ namespace asl {
                           const Vector3f & theEnd,
                           bool theRelativeFlag)
     {
-        Vector3f myStartAnchor = (theRelativeFlag ? sum(_myLastPos, theStartAnchor) : theStartAnchor);
-        Vector3f myEndAnchor = (theRelativeFlag ? sum(_myLastPos, theEndAnchor) : theEndAnchor);
-        Vector3f myEnd = (theRelativeFlag ? sum(_myLastPos, theEnd) : theEnd);
-        push(new BSpline<float>(_myLastPos, myStartAnchor, myEnd, myEndAnchor));
-        _myLastPos = myEnd;
+        Vector3f myStart;
+        if (_myBezierSegments.empty()) {
+            myStart = _myOrigin;
+        } else {
+            myStart = getLastPosition();
+        }
+        
+        AC_DEBUG << "cbezier: start: " << myStart << " cp0: " << theStartAnchor << " cp1: " << theEndAnchor << " end: " << theEnd;
+        BSplinePtr myBezier( new BSplinef(myStart,
+                            resolveRelative(theStartAnchor, theRelativeFlag),
+                            resolveRelative(theEnd, theRelativeFlag),
+                            resolveRelative(theEndAnchor, theRelativeFlag)));
+        appendBezierSegment( myBezier );
     }
 
     /// Cubic bezier spline from points. 
@@ -119,16 +125,18 @@ namespace asl {
         Vector3f myStartAnchor = theStartPoint + myDir1;
         Vector3f myEndAnchor   = theEndPoint + myDir2;
 
-        //setControlPoints(thePoints[1], myStartHandle, thePoints[2], myEndHandle);
-
         cbezier( myStartAnchor, myEndAnchor, theEndPoint, theRelativeFlag );
     }
 
     /// Close path to origin or position of last move.
     void SvgPath::close()
     {
-        push(new LineSegment<float>(_myLastPos, _myOrigin));
-        _myLastPos = _myOrigin;
+        if (_myBezierSegments.empty()) {
+            // TODO: throw: Can't close empty path
+        }
+        Vector3f myCurrentPoint = getLastPosition();
+        
+        appendBezierSegment( createLinearBezier( myCurrentPoint, _myOrigin));
         AC_TRACE << "close " << _myOrigin;
     }
 
@@ -339,8 +347,10 @@ namespace asl {
 
     void SvgPath::setup() {
         _myLength = 0.0f;
-        _myLastPos = Vector3f(0.0f, 0.0f, 0.0f);
         _myOrigin = Vector3f(0.0f, 0.0f, 0.0f);
+        _myPreviousCommand.token = NONE;
+        _myPreviousCommand.command = ' ';
+        _myPreviousCommand.numArgs= 0; 
         _mySegmentLength = 2.0f;
         _myNumSegments = 2;
     }
@@ -349,85 +359,73 @@ namespace asl {
     void SvgPath::assign(const SvgPath & thePath) {
         AC_DEBUG << "SvgPath::assign";
         _myLength = thePath._myLength;
-        _myLastPos = thePath._myLastPos;
         _myOrigin = thePath._myOrigin;
-        _myCp0 = thePath._myCp0;
-        _myCp1 = thePath._myCp1;
+        _myPreviousCommand = thePath._myPreviousCommand;
         _mySegmentLength = thePath._mySegmentLength;
         _myNumSegments = thePath._myNumSegments;
         for (unsigned i = 0; i < thePath._myElements.size(); ++i) {
-            _myElements.push_back(thePath._myElements[i]);
+            _myElements.push_back( thePath._myElements[i] );
         }
     }
 
-    // push element
-    void SvgPath::push(LineSegment<float> * theElement) {
-        _myElements.push_back(LineSegmentPtr(theElement));
-        _myLength += magnitude(difference(theElement->end, theElement->origin));
-    }
-
-    void SvgPath::push(BSpline<float> * theSpline) {
-/*
-        unsigned myNumSegments;
-        if (_mySegmentLength <= 0.0f) {
-            myNumSegments = _myNumSegments;
+ 
+    void SvgPath::appendBezierSegment( BSplinePtr theSpline) {
+        _myBezierSegments.push_back( theSpline );
+        
+        if ( theSpline->isLineSegment() ) {
+            LineSegmentPtr myElement( new LineSegment<float>( theSpline->getStart(), theSpline->getEnd()));
+            _myElements.push_back( myElement );
+            _myLength += magnitude(difference(myElement->end, myElement->origin));
         } else {
-            myNumSegments = (unsigned)(theSpline->getArcLength() / _mySegmentLength);
-            if (myNumSegments < MIN_SPLINE_SEGMENTS) {
-                myNumSegments = MIN_SPLINE_SEGMENTS;
-            } else if (myNumSegments > MAX_SPLINE_SEGMENTS) {
-                myNumSegments = MAX_SPLINE_SEGMENTS;
+            // [CH]: There is no good way to find out the curvature of the spline,
+            //       so we just go for the best resolution.
+            Point3f myP = theSpline->evaluate(0.0f);
+            for (unsigned i = 1; i <= MAX_SPLINE_SEGMENTS; ++i) {
+                Point3f myP1 = theSpline->evaluate(i / (float) MAX_SPLINE_SEGMENTS);
+                LineSegmentPtr myElement( new LineSegment<float>(myP, myP1));
+
+                _myElements.push_back( myElement );
+                _myLength += magnitude(difference(myElement->end, myElement->origin));
+
+                myP = myP1;
             }
         }
-*/
-        // [CH]: There is no good way to find out the curvature of the spline,
-        //       so we just go for the best resolution.
-        Point3f myP = theSpline->evaluate(0.0f);
-        for (unsigned i = 1; i <= MAX_SPLINE_SEGMENTS; ++i) {
-            Point3f myP1 = theSpline->evaluate(i / (float) MAX_SPLINE_SEGMENTS);
-            push(new LineSegment<float>(myP, myP1));
-            myP = myP1;
-        }
-
-        // no longer needed
-        delete theSpline;
     }
-
     bool SvgPath::isCommand(char theChar) const {
 
         switch (tolower(theChar)) {
-        case 'm':
-        case 'l':
-        case 'h':
-        case 'v':
-        case 't':
-        case 'q':
-        case 's':
-        case 'c':
-        case 'a':
-        case 'z':
-            return true;
+            case 'm':
+            case 'l':
+            case 'h':
+            case 'v':
+            case 't':
+            case 'q':
+            case 's':
+            case 'c':
+            case 'a':
+            case 'z':
+                return true;
         }
         return false;
     }
 
     bool SvgPath::isPrefix(char theChar) const {
         switch (theChar) {
-        case '+':
-        case '-':
-            return true;
+            case '+':
+            case '-':
+                return true;
         }
         return false;
     }
 
     bool SvgPath::isWhiteSpace(char theChar) const {
         switch (theChar) {
-        case ' ':
-        case ',':
-        case '\r':
-        case '\n':
-        case '\t':
-            return true;
+            case ' ':
+            case ',':
+            case '\r':
+            case '\n':
+            case '\t':
+                return true;
         }
         return false;
     }
@@ -438,12 +436,14 @@ namespace asl {
 
     void SvgPath::parsePathDefinition(const std::string & thePathDefinition) {
 
-        std::vector<std::string> myParts = splitPathDefinition(thePathDefinition);
+        std::vector<std::string> myParts;
+        splitPathDefinition(myParts, thePathDefinition);
         renderPathParts(myParts);
     }
 
-    std::vector<std::string> SvgPath::splitPathDefinition(const std::string & thePathDefinition) const {
-        std::vector<std::string> myParts;
+    void SvgPath::splitPathDefinition(std::vector<std::string> & theParts,
+                                      const std::string & thePathDefinition) const
+    {
         std::string myPart;
 
         for (unsigned i = 0; i < thePathDefinition.size(); ++i) {
@@ -452,11 +452,11 @@ namespace asl {
             if (isSeparator(myChar)) {
 
                 if (myPart.size()) {
-                    myParts.push_back(myPart);
+                    theParts.push_back(myPart);
                     myPart.clear();
                 }
                 if (isCommand(myChar)) {
-                    myParts.push_back(std::string(1, myChar));
+                    theParts.push_back(std::string(1, myChar));
                     continue;
                 } else if (isWhiteSpace(myChar)) {
                     continue;
@@ -468,10 +468,8 @@ namespace asl {
 
         // push last part
         if (myPart.size()) {
-            myParts.push_back(myPart);
+            theParts.push_back(myPart);
         }
-
-        return myParts;
     }
 
     SvgPath::SvgPathCommand SvgPath::_ourPathCommands[] = {
@@ -539,48 +537,64 @@ namespace asl {
             bool theRelativeFlag)
     {
         switch (theCommand->token) {
-        case MOVE_TO:
-            move(Vector3f(theArgs[0], theArgs[1], 0.0f), theRelativeFlag);
-            break;
-        case LINE_TO:
-            line(Vector3f(theArgs[0], theArgs[1], 0.0f), theRelativeFlag);
-            break;
-        case VERTICAL_LINE:
-            vline(theArgs[0], theRelativeFlag);
-            break;
-        case HORIZONTAL_LINE:
-            hline(theArgs[0], theRelativeFlag);
-            break;
-        case SHORTHAND_QUADRATIC_BEZIER:
-            // XXX this is wrong. Our BSpline is cubic.
-            // mirror last Cp1
-            _myCp1 = sum(_myLastPos, product(difference(_myCp1, _myLastPos), -1.0f));
-            cbezier(_myCp1, _myCp1, Vector3f(theArgs[0], theArgs[1], 0.0f), theRelativeFlag);
-            break;
-        case QUADRATIC_BEZIER:
-            // XXX this is wrong. Our BSpline is cubic.
-            _myCp1 = Vector3f(theArgs[0], theArgs[1], 0.0f);
-            cbezier(_myCp1, _myCp1, Vector3f(theArgs[2], theArgs[3], 0.0f), theRelativeFlag);
-            break;
-        case SHORTHAND_CUBIC_BEZIER:
-            // mirror last cp1
-            _myCp0 = sum(_myLastPos, product(difference(_myCp1, _myLastPos), -1.0f));
-            _myCp1 = Vector3f(theArgs[0], theArgs[1], 0.0f);
-            cbezier(_myCp0, _myCp1, Vector3f(theArgs[2], theArgs[3], 0.0f), theRelativeFlag);
-            break;
-        case CUBIC_BEZIER:
-            _myCp0 = Vector3f(theArgs[0], theArgs[1], 0.0f);
-            _myCp1 = Vector3f(theArgs[2], theArgs[3], 0.0f);
-            cbezier(_myCp0, _myCp1, Vector3f(theArgs[4], theArgs[5], 0.0f), theRelativeFlag);
-            break;
-        case ARC:
-            // XXX just so we're ending up in the right position
-            line(Vector3f(theArgs[5], theArgs[6], 0.0f), theRelativeFlag);
-            break;
-        case RETURN_TO_ORIGIN:
-            close();
-            break;
+            // TODO: refactor the linear stuff too [RS, DS]
+            case MOVE_TO:
+                move( Vector3f(theArgs[0], theArgs[1], 0.0f), theRelativeFlag);
+                break;
+            case LINE_TO:
+                line(Vector3f(theArgs[0], theArgs[1], 0.0f), theRelativeFlag);
+                break;
+            case VERTICAL_LINE:
+                vline(theArgs[0], theRelativeFlag);
+                break;
+            case HORIZONTAL_LINE:
+                hline(theArgs[0], theRelativeFlag);
+                break;
+            case SHORTHAND_QUADRATIC_BEZIER:
+                {
+                    // XXX this is not really a quadradic bezier since our BSpline is cubic.
+                    Vector3f myMirroredControlPoint = getShorthandControlPoint( theRelativeFlag );
+                    Vector3f myEnd = Vector3f(theArgs[0], theArgs[1], 0.0f);
+                    cbezier( myMirroredControlPoint, myMirroredControlPoint, myEnd, theRelativeFlag );
+                }
+                break;
+            case QUADRATIC_BEZIER:
+                {
+                    // XXX this is not really a quadradic bezier since our BSpline is cubic.
+                    Vector3f myCp1 = Vector3f(theArgs[0], theArgs[1], 0.0f); 
+                    Vector3f myEnd = Vector3f(theArgs[2], theArgs[3], 0.0f);
+                    cbezier( myCp1, myCp1, myEnd, theRelativeFlag );
+
+                }
+                break;
+            case SHORTHAND_CUBIC_BEZIER:
+                {
+                    Vector3f myMirroredControlPoint = getShorthandControlPoint( theRelativeFlag );
+                    Vector3f myCp1 = Vector3f(theArgs[0], theArgs[1], 0.0f);
+                    Vector3f myEnd = Vector3f(theArgs[2], theArgs[3], 0.0f);
+                    cbezier(myMirroredControlPoint, myCp1, myEnd, theRelativeFlag);
+
+                }
+                break;
+            case CUBIC_BEZIER:
+                {
+                    Vector3f myCp0 = Vector3f(theArgs[0], theArgs[1], 0.0f);
+                    Vector3f myCp1 = Vector3f(theArgs[2], theArgs[3], 0.0f);
+                    Vector3f myEnd = Vector3f(theArgs[4], theArgs[5], 0.0f);
+
+                    //AC_PRINT << "c cp0: " << myCp0 << " cp1: " << myCp1;
+                    cbezier(myCp0, myCp1, myEnd, theRelativeFlag );
+                }
+                break;
+            case ARC:
+                // XXX just so we're ending up in the right position
+                line(Vector3f(theArgs[5], theArgs[6], 0.0f), theRelativeFlag);
+                break;
+            case RETURN_TO_ORIGIN:
+                close();
+                break;
         }
+        _myPreviousCommand = * theCommand;
     }
 
     SvgPath * SvgPath::createSubPath(const PathPoint3f & theStart,
@@ -645,6 +659,43 @@ namespace asl {
 
         return myPath;
     }
+    
+    asl::Vector3f
+    SvgPath::resolveRelative( const asl::Vector3f & thePos, bool theFlag) const {
+        if (theFlag) {
+            if (_myPreviousCommand.token == MOVE_TO || _myBezierSegments.empty()) {
+                return sum( _myOrigin, thePos);
+            }
+            return sum( _myBezierSegments.back()->getEnd(), thePos);
+        }
+        return thePos;
+    }
+
+    Vector3f 
+    SvgPath::getShorthandControlPoint( bool theRelativeFlag) {
+        if ( _myPreviousCommand.token == MOVE_TO || _myBezierSegments.empty()) {
+            return _myOrigin;
+        }
+        if (_myBezierSegments.back()->isLineSegment()) {
+            return _myBezierSegments.back()->getEnd();
+        } else {
+            Vector3f myOldControlPoint = _myBezierSegments.back()->getEndHandle();
+            Vector3f myOldEndPoint = _myBezierSegments.back()->getEnd();
+            Vector3f myMirroredControlPoint = product(difference(myOldControlPoint, myOldEndPoint), -1.0f);
+            if ( ! theRelativeFlag) {
+                myMirroredControlPoint = sum(myOldEndPoint, myMirroredControlPoint);
+            }
+            return myMirroredControlPoint;
+        }
+    }
+
+    Vector3f
+    SvgPath::getLastPosition() {
+        if (_myPreviousCommand.token == MOVE_TO || _myBezierSegments.empty()) {
+            return _myOrigin;
+        }
+        return _myBezierSegments.back()->getEnd();
+    }
 
     std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath) {
         os << "[";
@@ -652,7 +703,7 @@ namespace asl {
             if (i > 0) {
                 os << ",";
             }
-            SvgPath::LineSegmentPtr myLineSegment = thePath.getElement(i);
+            LineSegmentPtr myLineSegment = thePath.getElement(i);
             if (myLineSegment) {
                 os << *myLineSegment;
             }

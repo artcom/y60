@@ -380,6 +380,19 @@ struct JSVector  {
         return *myJSWrapper;
     }
 
+    static
+    bool matchesClassOf(JSContext *cx, jsval theVal) {
+        JSObject * myObj;
+        if (JSVAL_IS_VOID(theVal)) {
+            JS_ReportError(cx,"matchesClassOf: passed 'undefined' as object");
+            return false;
+        }
+        if (!JSVAL_IS_OBJECT(theVal) || !JS_ValueToObject(cx, theVal, &myObj)) {
+            return false;
+        }
+        return (JSA_GetClass(cx,myObj) == Class());
+    }
+
     // This functions must be called only on JSObjects containing the correct
     // native ValueBase pointer in their private field
     static

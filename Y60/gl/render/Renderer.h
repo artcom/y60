@@ -146,7 +146,7 @@ namespace y60 {
             /// setup immediate draw
             void preDraw(const asl::Vector4f & theColor,
                          const asl::Matrix4f & theTransformation,
-                         float theWidth = 1.0f,
+                         float theSize = 1.0f,
                          const std::string & theRenderStyle = "");
 
             /// restore from immediate draw

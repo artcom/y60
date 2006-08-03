@@ -24,6 +24,10 @@ namespace asl {
     /**
      * SvgPath class.
      * Based on SvgPath.js code. [Rev 5376]
+     *
+     * Refactored in Rev 7453: [RS, DS]
+     *   - linear path segments are now stored as bezier snippets, too.
+     *  
      */
     class SvgPath {
     public:
@@ -50,8 +54,6 @@ namespace asl {
             PathPoint3f nearest;
         };
 
-        /// LineSegment.
-        typedef Ptr<LineSegment<float> > LineSegmentPtr;
 
         /// Constructor.
         SvgPath();
@@ -138,6 +140,17 @@ namespace asl {
             return LineSegmentPtr(0);
         }
 
+        unsigned getNumBezierSegments() const  {
+            return _myBezierSegments.size();
+        }
+
+        BSplinePtr getBezierSegment(unsigned theIndex) {
+            if (theIndex >= 0 && theIndex < _myBezierSegments.size()) {
+                return _myBezierSegments[theIndex];
+            }
+            return BSplinePtr(0);
+        }
+
         /// Find point on path closest to position.
         PathPoint3f nearest(const Vector3f & thePos) const;
 
@@ -186,19 +199,6 @@ namespace asl {
                                 bool theShortestPathFlag = false);
 
     private:
-        // path
-        float _myLength;
-        std::vector<LineSegmentPtr> _myElements;
-
-        // state
-        Vector3f _myLastPos;
-        Vector3f _myOrigin;
-        Vector3f _myCp0;
-        Vector3f _myCp1;
-
-        // BSpline segmentation
-        float _mySegmentLength;
-        unsigned _myNumSegments;
         enum {
             MIN_SPLINE_SEGMENTS = 4,
             MAX_SPLINE_SEGMENTS = 32
@@ -215,7 +215,8 @@ namespace asl {
             SHORTHAND_CUBIC_BEZIER,
             CUBIC_BEZIER,
             ARC,
-            RETURN_TO_ORIGIN
+            RETURN_TO_ORIGIN,
+            NONE
         };
 
         struct SvgPathCommand {
@@ -224,47 +225,33 @@ namespace asl {
             unsigned numArgs;
         };
 
+
+        float _myLength;
+        std::vector< BSplinePtr > _myBezierSegments; // contains the whole path as bezier segments
+        std::vector< LineSegmentPtr > _myElements;   // contains the sampled path as line segments
+        Vector3f _myOrigin;
+        float _mySegmentLength;
+        unsigned _myNumSegments;
         static SvgPathCommand _ourPathCommands[];
+        SvgPathCommand _myPreviousCommand;
 
-        // object setup
         void setup();
-
-        // assignment
         void assign(const SvgPath & thePath);
-
-        // push element
-        void push(LineSegment<float> * theElement);
-        void push(BSpline<float> * theSpline);
-
-        // 'true' if theChar is a supported command
+        void appendBezierSegment(BSplinePtr theSpline);
         bool isCommand(char theChar) const;
-
-        // 'true' if theChar is a number prefix. (Prefixes act as separators.)
         bool isPrefix(char theChar) const;
-
-        // 'true' if theChar is a whitespace
         bool isWhiteSpace(char theChar) const;
-
-        // 'true' if theChar is any kind of separator
         bool isSeparator(char theChar) const;
-
-        // parse path definition
         void parsePathDefinition(const std::string & thePathDefinition);
-
-        // split path definition into parts
-        std::vector<std::string> splitPathDefinition(const std::string & thePathDefinition) const;
-
-        // fetch SVG path command definition
+        void splitPathDefinition(std::vector<std::string> & theParts,
+                                 const std::string & thePathDefinition) const;
         const SvgPathCommand * getSvgPathCommand(char theCommand) const;
-
-        // render path parts into elements
         void renderPathParts(const std::vector<std::string> & theParts);
-
-        // render path command into elements
         void renderPathCommand(const SvgPathCommand * theCommand,
                                const std::vector<float> & theArgs,
                                bool theRelativeFlag);
 
+        // What's that? Should this be public? [DS, RS]
         /**
          * Create path from 'theStart' to 'theEnd' and
          * abort when the created path length exceeds 'theMaxLength'.
@@ -272,6 +259,12 @@ namespace asl {
         SvgPath * createSubPath(const PathPoint3f & theStart,
                                 const PathPoint3f & theEnd,
                                 float theMaxLength = -1.0f);
+    
+    
+        asl::Vector3f resolveRelative( const asl::Vector3f & thePos, bool theFlag) const;
+        Vector3f getShorthandControlPoint( bool theRelativeFlag);
+        Vector3f getLastPosition();
+        
     };
 
     std::ostream & operator<<(std::ostream & os, const asl::SvgPath & thePath);

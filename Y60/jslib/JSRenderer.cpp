@@ -19,6 +19,7 @@
 #include "JSRenderer.h"
 #include "JScppUtils.h"
 #include "JSBox.h"
+#include "JSVector.h"
 #include "JSLine.h"
 #include "JSTriangle.h"
 #include "JSSphere.h"
@@ -94,40 +95,49 @@ drawHelper(JSContext * cx, JSObject * obj, uintN argc, jsval * argv)
 
 static JSBool
 draw(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Draws a line segment, triangle, sphere or box in a given color and transformation matrix.");
+    DOC_BEGIN("Draws a point, line segment, triangle, sphere or box in a given "
+              "color and transformation matrix.");
+    DOC_PARAM("thePoint", "The Point to draw", DOC_TYPE_LINESEGMENT);
+    DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
+    DOC_PARAM("theSize", "Point- and Linesize", DOC_TYPE_FLOAT);
+    DOC_RESET;
     DOC_PARAM("theLineSegment", "Line Segment to draw", DOC_TYPE_LINESEGMENT);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
-    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
+    DOC_PARAM("theSize", "Point- and Linesize", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theTriangle", "", DOC_TYPE_TRIANGLE);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
-    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
+    DOC_PARAM("theSize", "Point- and Linesize", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
-    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
+    DOC_PARAM("theSize", "Point- and Linesize", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("theTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
-    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
+    DOC_PARAM("theSize", "Point- and Linesize", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theBSpline", "", DOC_TYPE_BSPLINE);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
-    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
+    DOC_PARAM("theSize", "Point- and Linesize", DOC_TYPE_FLOAT);
     DOC_RESET;
     DOC_PARAM("theSvgPath", "", DOC_TYPE_SVGPATH);
     DOC_PARAM("theColor", "Drawing color", DOC_TYPE_VECTOR4F);
     DOC_PARAM("thTransformation", "Transformation matrix", DOC_TYPE_MATRIX4F);
-    DOC_PARAM("theWidth", "Linewidth", DOC_TYPE_FLOAT);
+    DOC_PARAM("theWidth", "Point- and Linesize", DOC_TYPE_FLOAT);
     DOC_END;
     try {
         ensureParamCount(argc, 1,5);
 
+        if (JSVector<asl::Vector3f>::matchesClassOf(cx, argv[0])) {
+            return drawHelper<asl::Vector3f >(cx, obj, argc, argv);
+        }
         if (JSLineSegment::matchesClassOf(cx, argv[0])) {
             return drawHelper<asl::LineSegment<float> >(cx, obj, argc, argv);
         }

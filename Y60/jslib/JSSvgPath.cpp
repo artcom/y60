@@ -12,6 +12,7 @@
 #include "JSVector.h"
 #include "JSLine.h"
 #include "JSSphere.h"
+#include "JSBSpline.h"
 
 #include <asl/string_functions.h>
 
@@ -50,8 +51,9 @@ namespace jslib {
             JS_ReportError(cx, "JSSvgPath::move: argument #1 must be a vector");
             return JS_FALSE;
         }
+        
         if (argc > 1) {
-            if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myPosition)) {
+            if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myRelativeFlag)) {
                 JS_ReportError(cx, "JSSvgPath::move: argument #1 must be a boolean");
                 return JS_FALSE;
             }
@@ -179,7 +181,7 @@ namespace jslib {
         DOC_PARAM("theRelativeFlag", "Relative-or-absolute position.", DOC_TYPE_BOOLEAN);
         DOC_END;
 
-        ensureParamCount(argc, 3,4);
+        ensureParamCount(argc, 3, 4);
 
         asl::Vector3f myStartAnchor, myEndAnchor, myEnd;
         bool myRelativeFlag = false;
@@ -269,10 +271,6 @@ namespace jslib {
     }
 
 
-
-
-
-
     static JSBool
     close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     {
@@ -320,11 +318,54 @@ namespace jslib {
             return JS_FALSE;
         }
 
-        asl::SvgPath::LineSegmentPtr myElement = myNative->getElement(myIndex);
+        asl::LineSegmentPtr myElement = myNative->getElement(myIndex);
         if (!myElement) {
             *rval = JSVAL_NULL;
         } else {
             *rval = as_jsval(cx, *(myElement.getNativePtr()));
+        }
+
+        return JS_TRUE;
+    }
+
+    static JSBool
+    getNumBezierSegments(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+    {
+        DOC_BEGIN("Get number of bezier segments in path. Even linear parts are expressed as "
+                  "bezier segments.");
+        DOC_RVAL("Number of elements.", DOC_TYPE_INTEGER);
+        DOC_END;
+        return Method<JSSvgPath::NATIVE>::call(&JSSvgPath::NATIVE::getNumBezierSegments,
+                        cx,obj,argc,argv,rval);
+    }
+
+    static JSBool
+    getBezierSegment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+    {
+        DOC_BEGIN("Get a bezier segment from the path.");
+        DOC_PARAM("theIndex", "Element index.", DOC_TYPE_INTEGER);
+        DOC_RVAL("Bezier Segment (BSpline).", DOC_TYPE_OBJECT);
+        DOC_END;
+
+        ensureParamCount(argc, 1);
+
+        JSSvgPath::NATIVE * myNative = 0;
+        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+            JS_ReportError(cx, "JSSvgPath::getElement: self is not a SvgPath");
+            return JS_FALSE;
+        }
+
+        unsigned myIndex;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myIndex)) {
+            JS_ReportError(cx, "JSSvgPath::getElement: argument #1 must be an int");
+            return JS_FALSE;
+        }
+
+        asl::BSplinePtr mySegment = myNative->getBezierSegment(myIndex);
+        if ( ! mySegment) {
+            *rval = JSVAL_NULL;
+        } else {
+            *rval = as_jsval(cx, mySegment);
         }
 
         return JS_TRUE;
@@ -620,6 +661,8 @@ namespace jslib {
             { "intersect",      intersect,      1 },
             { "createPerpendicularPath", createPerpendicularPath, 3 },
             { "createSubPath",           createSubPath,           3 },
+            { "getNumBezierSegments", getNumBezierSegments, 0 },
+            { "getBezierSegment",     getBezierSegment,     1 },
             {0}
         };
         return myFunctions;
