@@ -79,7 +79,6 @@ AVPacket * Demux::getPacket(int theStreamIndex)
             }
         } while (!myPacket || myPacket->stream_index != theStreamIndex);
         AC_TRACE << "Demux::getPacket: end.";
-        av_dup_packet(myPacket);
         return myPacket; 
     }
 }
