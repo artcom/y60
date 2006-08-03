@@ -49,8 +49,8 @@ MovieLeakUnitTest.prototype.Constructor = function(obj, theName, theFiles, theDe
                 toggleMovie();
                 var myText = "Loop : " + (_myFrameCount - START_FRAMES) + "/" + theVideoCount; 
                 window.renderText([500,100], myText, "Screen15");                
-                window.renderText([500,200], myMem, "Screen15");                
-                window.renderText([500,400], myMem-_myLastMemory, "Screen15");
+                window.renderText([500,150], "Delta memory usage: " + (myMem-_myLastMemory), "Screen15");
+                window.renderText([500,200], "Total memory usage: " + myMem, "Screen15");                
             } else if (_myFrameCount == START_FRAMES + theVideoCount){
                 toggleMovie();
             } else if (_myFrameCount == START_FRAMES + theVideoCount + 200) {
