@@ -26,3 +26,11 @@ CMD="$SHELL -I $Y60_DIR/js;$PLUGIN_DIR $APP $SHADERLIB $*"
 
 echo "### $CMD"
 $CMD
+
+
+
+APP="$APP_DIR/testImageMovieLeak.tst.js"
+CMD="$SHELL -I $Y60_DIR/js;$PLUGIN_DIR $APP $SHADERLIB $*"
+
+echo "### $CMD"
+$CMD
