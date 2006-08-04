@@ -61,7 +61,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         if (theWidth == null) {
             theWidth = 1.0;
         }
- 
+
         // shape building
         var myShapeBuilder = new ShapeBuilder();
         var myShapeElement = null;
@@ -133,7 +133,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
             }
 
             // begin new shape element when start/end positions don't match
-            if (myShapeElement == null || 
+            if (myShapeElement == null ||
                 (myLastElement && !almostEqual(myLastElement.end, myElement.origin))) {
                 if (myShapeElement) {
                     // finish previous strip
@@ -144,7 +144,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
                 if (myLastElement && !almostEqual(myLastElement.end, myElement.origin)) {
                     myLastPos = myElement.origin;
                 }
- 
+
                 // begin new strip
                 //print("begin");
                 myShapeElement = myShapeBuilder.appendElement("quadstrip", _myMaterial.id);
@@ -199,7 +199,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
             myLastRightVector = myRightVector;
             myLastLeftLine = myLeftLine;
             myLastRightLine = myRightLine;
-            myU += myUDelta;            
+            myU += myUDelta;
         }
 
         // finish
@@ -212,10 +212,10 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
 
         // delete body, shape
         if (_myBody) {
-            theSceneViewer.getWorld().removeChild(_myBody);
+            theSceneViewer.getScene().world.removeChild(_myBody);
         }
         if (_myShape) {
-            theSceneViewer.getShapes().removeChild(_myShape);
+            theSceneViewer.getScene().shapes.removeChild(_myShape);
         }
 
         // create shape, body
@@ -224,11 +224,11 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         theSceneViewer.getShapes().appendChild(_myShape);
         _myBody = theSceneViewer.getScene().createBody(_myShape);
         theSceneViewer.getScene().update(Scene.SHAPES | Scene.MATERIALS);
-        
+
     }
 
     /**********************************************************************
-     * 
+     *
      * Private
      *
      **********************************************************************/

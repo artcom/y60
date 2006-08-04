@@ -97,10 +97,12 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.getImageManager = function() {
+        Logger.warning("ImageManager is deprecated.");
         return _myImageManager;
     }
 
     self.getOverlayManager = function() {
+        Logger.warning("OverlayManager is deprecated.");
         return _myOverlayManager;
     }
 
@@ -386,7 +388,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
-    self.onAxis = function(device, axis, value) {
+    self.onAxis = function(theDevice, theAxis, theValue) {
     }
 
     self.onButton = function(theDevice, theButton, theState) {
@@ -460,10 +462,14 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         self.setMover(ClassicTrackballMover, myViewport);
         self.setActiveCamera(window.scene.dom.getElementById(myViewport.camera), myViewport);
 
-        _myDebugVisual = new DebugVisual(self.getWorld(), self);
+        _myDebugVisual = new DebugVisual(myScene.world, self);
 
         _myAnimationManager = new AnimationManager(self);
+
+        // [CH]: Deprecated, should be removed someday
         _myImageManager = new ImageManager(self);
+
+        // [CH]: Deprecated, should be removed someday
         _myOverlayManager = new OverlayManager(self.getScene(), myViewport);
 
         _myConfigurator = new Configurator(self, SETTINGS_FILE_NAME);

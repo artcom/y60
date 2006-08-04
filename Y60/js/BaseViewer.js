@@ -52,26 +52,34 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         return _myModelName;
     }
 
+    // [CH]: Depricated, use window.scene.world (etc.) instead.
     // Use these functions for fast access to the scene graph
     self.getWorld = function() {
+        Logger.warning("getWorld() is depricated, use window.scene.world instead");
         return _myWorld;
     }
     self.getMaterials = function() {
+        Logger.warning("getMaterials() is depricated, use window.scene.materials instead");
         return _myMaterials;
     }
     self.getLightSources = function() {
+        Logger.warning("getLightSources() is depricated, use window.scene.lightsources instead");
         return _myLightSources;
     }
     self.getShapes = function() {
+        Logger.warning("getShapes() is depricated, use window.scene.shapes instead");
         return _myShapes;
     }
     self.getAnimations = function() {
+        Logger.warning("getAnimations() is depricated, use window.scene.animations instead");
         return _myAnimations;
     }
     self.getCharacters = function() {
+        Logger.warning("getCharacters() is depricated, use window.scene.characters instead");
         return _myCharacters;
     }
     self.getImages = function() {
+        Logger.warning("getImages() is depricated, use window.scene.images instead");
         return _myImages;
     }
 
@@ -267,7 +275,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             var mySkyboxImage = _mySkyboxMaterial.getElementById(_mySkyboxMaterial.childNode("textures").firstChild.image);
             mySkyboxImage.src = theFileName;
             mySkyboxImage.tile = theTile;
-            self.getWorld().skyboxmaterial = _mySkyboxMaterial.id;
+            _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterial.id;
         } else {
             var myImageId = createUniqueId();
             var mySkyboxImageString =
@@ -280,7 +288,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.removeSkyBox = function() {
-        self.getWorld().skyboxmaterial = "";
+        _myRenderWindow.scene.world.skyboxmaterial = "";
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
@@ -473,7 +481,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     var _mySwitchNodes = new Array();
 
-    self.__defineGetter__('_myPicking', function(){ return _myPicking; });
+    self.__defineGetter__('_myPicking', function() { return _myPicking; });
 
     function getSingleViewport() {
         if (_myRenderWindow.canvas.childNodesLength("viewport") == 1) {

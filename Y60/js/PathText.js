@@ -77,20 +77,20 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
         var myShapeBuilder = null;
         var myElement = null;
         var myUVCoordX = 0;
-        
+
         if (!_myShape) {
             myBuildGeometry = true;
             myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
             myShapeBuilder = new ShapeBuilder();
-            myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material.id);   
+            myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material.id);
         }
-        
+
         var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
         var myFontMetrics = theCharacterSoup.getFontMetrics(theFontSize);
         //print("font metrics:", "height=" + myFontMetrics.height, "ascent=" + myFontMetrics.ascent, "descent=" + myFontMetrics.descent);
 
         var myWidth = 0.0;
-        
+
         for (var i = theFirstCharacter; i < theLastCharacter; ++i) {
             var myChar = _myText[i];
             if (myChar == "\n" || myChar == "\r" ) {
@@ -101,7 +101,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
                         //print("found carriage return AND a newline");
                         myNewLineOffset = 1;
                     }
-                }                
+                }
                 return i + myNewLineOffset;
             }
             var myCharacter = _myCharacters[i];
@@ -153,7 +153,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
                     break;
                 case BOTTOM_ALIGNMENT:
                     myTop = myFontMetrics.ascent - myFontMetrics.descent;
-                    myBottom = 0; 
+                    myBottom = 0;
                     break;
                 case CENTER_ALIGNMENT:
                     myTop = myAlphabetMap.cellsize * 0.5 - (myAlphabetMap.cellsize - myFontMetrics.height) * 0.5;
@@ -176,7 +176,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
             myPositions.push(sum(myEnd, myBottomOffset));
             myPositions.push(sum(myEnd, myTopOffset));
             myPositions.push(sum(myStart, myTopOffset));
-            
+
             if (myBuildGeometry) {
                 var myCharacter = _myCharacters[i];
                 //print("char=" + myCharacter.unicode, "uv=" + myCharacter.uv, "uvsize=" + myCharacter.uvsize);
@@ -185,31 +185,31 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
                 var myXDelta = (1.0/_myText.length);
                 for(var myTextureIndex = 1; myTextureIndex < _myTextureCount; myTextureIndex++) {
                     myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX,1), myTextureIndex);
-                    myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,1), myTextureIndex);                
+                    myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,1), myTextureIndex);
                     myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,0), myTextureIndex);
                     myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX ,0), myTextureIndex);
                     myUVCoordX += myXDelta;
-                }                                       
+                }
             } else {
                 var myVertexPositions = getDescendantByAttribute(_myShape, "name", "position", true);
-                var myShapeVertexPositions = myVertexPositions.childNode('#text')[1]; // firstChild.nodeValue;                
+                var myShapeVertexPositions = myVertexPositions.childNode('#text')[1]; // firstChild.nodeValue;
                 myShapeVertexPositions[j + 0] = myPositions[0];
                 myShapeVertexPositions[j + 1] = myPositions[1];
                 myShapeVertexPositions[j + 2] = myPositions[2];
                 myShapeVertexPositions[j + 3] = myPositions[3];
             }
-            
+
         }
         if (myBuildGeometry) {
             var myName = "Text_";// + urlEncode(_myText);
-    
+
             _myShape = myShapeBuilder.buildNode();
             _myShape.name = myName;
             theSceneViewer.getShapes().appendChild(_myShape);
-    
+
             _myBody = buildBodyNode(myName, _myShape.id);
             _myBody.insensible = true;
-            theSceneViewer.getWorld().appendChild(_myBody);
+            theSceneViewer.getScene().world.appendChild(_myBody);
         }
         return myAlignedCharacter;
     }
@@ -227,53 +227,53 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
     var _myShape = null;
     var _myBody = null;
     var _myTextureCount = 1;
-    
+
     function setup() {
 
         _myText = asUnicodeString(theText);
         _myCharacters = theCharacterSoup.createUnicodeText(_myText, theFontSize);
         var myMaterialId = theCharacterSoup.getAlphabetMap(theFontSize).material.id;
-        var myMaterial = window.scene.dom.getElementById(myMaterialId);        
+        var myMaterial = window.scene.dom.getElementById(myMaterialId);
         var myTextures = getDescendantByTagName(myMaterial, "textures", false);
         _myTextureCount = myTextures.childNodesLength();
         if (thePrebuildFlag) {
-            var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);  	 
-            var myShapeBuilder = new ShapeBuilder(); 	 
-            var myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material.id); 	 
-      	 
-            var myCharacterPos = new Vector3f(-0.5, -0.5, 0.0); 	 
-            var myCharacterSize = new Vector3f(1.0, 1.0, 0.0); 	 
+            var myAlphabetMap = theCharacterSoup.getAlphabetMap(theFontSize);
+            var myShapeBuilder = new ShapeBuilder();
+            var myElement = myShapeBuilder.appendElement("quads", myAlphabetMap.material.id);
+
+            var myCharacterPos = new Vector3f(-0.5, -0.5, 0.0);
+            var myCharacterSize = new Vector3f(1.0, 1.0, 0.0);
       	    var myUVCoordX = 0.0;
-      	    
-            for (var i = 0; i < _myText.length; ++i) { 	 
-                var myCharacter = _myCharacters[i]; 	 
-                //print("char=" + myCharacter.unicode, "uv=" + myCharacter.uv, "uvsize=" + myCharacter.uvsize); 	 
-                    myShapeBuilder.appendQuadWithCustomTexCoords(myElement, 	 
-                        myCharacterPos, myCharacterSize, 	 
-                        myCharacter.uv, myCharacter.uvsize, false); 	
+
+            for (var i = 0; i < _myText.length; ++i) {
+                var myCharacter = _myCharacters[i];
+                //print("char=" + myCharacter.unicode, "uv=" + myCharacter.uv, "uvsize=" + myCharacter.uvsize);
+                    myShapeBuilder.appendQuadWithCustomTexCoords(myElement,
+                        myCharacterPos, myCharacterSize,
+                        myCharacter.uv, myCharacter.uvsize, false);
                     var myXDelta = (1.0/_myText.length);
                     for(var myTextureIndex = 1; myTextureIndex < _myTextureCount; myTextureIndex++) {
                         myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX,1), myTextureIndex);
-                        myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,1), myTextureIndex);                
+                        myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,1), myTextureIndex);
                         myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX + myXDelta,0), myTextureIndex);
                         myShapeBuilder.appendTexCoord(myElement, new Vector2f(myUVCoordX ,0), myTextureIndex);
                         myUVCoordX += myXDelta;
-                    }                                       
-                         
-            } 	 
-      	 
-            var myName = "Text_";// + urlEncode(_myText); 	 
-    	 
-            _myShape = myShapeBuilder.buildNode(); 	 
-            _myShape.name = myName; 	 
-            theSceneViewer.getShapes().appendChild(_myShape); 	 
-      	 
-            _myBody = buildBodyNode(myName, _myShape.id); 	 
-            _myBody.insensible = true; 	 
-            theSceneViewer.getWorld().appendChild(_myBody);       
+                    }
+
+            }
+
+            var myName = "Text_";// + urlEncode(_myText);
+
+            _myShape = myShapeBuilder.buildNode();
+            _myShape.name = myName;
+            theSceneViewer.getScene().shapes.appendChild(_myShape);
+
+            _myBody = buildBodyNode(myName, _myShape.id);
+            _myBody.insensible = true;
+            theSceneViewer.getScene().world.appendChild(_myBody);
         }
-        
-    }    
+
+    }
     if (thePrebuildFlag == undefined) {
         thePrebuildFlag = true;
     }
@@ -291,7 +291,7 @@ function test_PathText() {
     var mySvgPath = null;
     var myPos = null;
 
-    if (0) { 
+    if (0) {
         const __PATHTEXT_TEST = [
             'M 0 0 l 200 0 l 200 200Z',
             'M 0,0 C 75,0 75,50 150,50 h 100 Z',
@@ -301,7 +301,7 @@ function test_PathText() {
     } else {
         var mySvgFile = readFileAsString(expandEnvironment("${PRO}/testmodels/curves.svg"));
         var mySvgNode = new Node(mySvgFile);
- 
+
         var mySvgPaths = []
         var myPaths = getDescendantsByTagName(mySvgNode, "path", true);
         for (var i = 0; i < myPaths.length; ++i) {
