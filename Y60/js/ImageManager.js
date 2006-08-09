@@ -19,7 +19,7 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
 
     // public methods
     obj.getImageNode = function(theImageName, theEncoding) {
-        var myImageNode = getDescendantByName(_myBaseViewer.getImages(), theImageName, false);
+        var myImageNode = getDescendantByName(window.scene.images, theImageName, false);
         if (!myImageNode) {
             var myEncoding = (theEncoding != undefined) ? theEncoding.toUpperCase() : "RGB";
             myImageNode = window.scene.createImage(1,1,myEncoding);
@@ -30,7 +30,7 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
 
     obj.createImage = function(theSource, theEncoding) {
         var myImageNode = Node.createElement("image");
-        _myBaseViewer.getImages().appendChild(myImageNode);
+        window.scene.images.appendChild(myImageNode);
         myImageNode.name = theSource;
         myImageNode.src = theSource;
         myImageNode.resize = "pad";
@@ -39,7 +39,7 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
 
     obj.createMovie = function(theSource, theDecoderHint) {
         var myMovie = Node.createElement("movie");
-        _myBaseViewer.getImages().appendChild(myMovie);
+        window.scene.images.appendChild(myMovie);
         myMovie.src = theSource;
         myMovie.name = theSource;
         if (theDecoderHint) {

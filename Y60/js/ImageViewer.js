@@ -524,12 +524,12 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     function stopMovie() {
         if (_myMovieNode) {
             print("Removing MovieNode");
-            self.getImages().removeChild(_myMovieNode);
+            window.scene.images.removeChild(_myMovieNode);
             _myMovieNode = null;
         }
         if (_myCaptureNode) {
             print("Removing MovieNode");
-            self.getImages().removeChild(_myCaptureNode);
+            window.scene.images.removeChild(_myCaptureNode);
             _myCaptureNode = null;
         }
     }
@@ -537,7 +537,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     function showCapture(theURL) {
         if (!_myCaptureNode) {
             _myCaptureNode = Node.createElement("capture");
-            self.getImages().appendChild(_myCaptureNode);
+            window.scene.images.appendChild(_myCaptureNode);
             _myCaptureNode.name = "IVCaptureNode";
             _myCaptureNode.id = createUniqueId();
             _myCaptureNode.playmode = "play";
@@ -561,7 +561,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     function showMovie(theFilename, theDecoderHint) {
         if (!_myMovieNode) {
             _myMovieNode = Node.createElement("movie");
-            self.getImages().appendChild(_myMovieNode);
+            window.scene.images.appendChild(_myMovieNode);
             _myMovieNode.name = "IVMovieNode";
             _myMovieNode.id = createUniqueId();
             _myMovieNode.playmode = "play";
@@ -582,7 +582,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         try {
             window.scene.loadMovieFrame(_myMovieNode);
         } catch (ex) {
-            self.getImages().removeChild(_myMovieNode);
+            window.scene.images.removeChild(_myMovieNode);
             print(ex);
             print("### ERROR: loadMovieFrame faild for file: " + theFilename);
             return;

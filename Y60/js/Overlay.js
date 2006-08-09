@@ -590,7 +590,6 @@ function MovieOverlayBase(Public, Protected, theScene, theSource, thePosition, t
         } else {
             throw new Exception("Unknown movie image node name: " + myNodeName, fileline());
         }
-
         var mySize = null;
         if (myImage.src.search(/\.m60/) != -1) {
             mySize = getImageSize(myImage);
