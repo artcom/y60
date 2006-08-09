@@ -26,7 +26,10 @@
 #include <GL/glu.h>
 
 #include "Renderer.h"
+
+#ifndef _AC_NO_CG
 #include "CGShader.h"
+#endif
 
 #include <y60/TransformHierarchyFacade.h>
 #include <y60/LodFacade.h>

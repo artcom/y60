@@ -23,6 +23,11 @@ using namespace asl;
 #define CURL_VERBOSE 0
 #define DB(x) // x
 
+#ifdef verify
+// OSX macro pollution
+#undef verify
+#endif
+
 IMPLEMENT_ENUM(inet::AuthentType, inet::AuthentTypeStrings);
 
 namespace inet {
