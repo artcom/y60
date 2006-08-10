@@ -97,7 +97,7 @@ class numeric_functions_UnitTest : public UnitTest {
             ENSURE(!powerOfTwo(9));
             ENSURE(!powerOfTwo(10));
 
-            ENSURE( nextPowerOfTwo(0) == 1);
+            ENSURE( nextPowerOfTwo(0) == 0);
             ENSURE( nextPowerOfTwo(1) == 1);
             ENSURE( nextPowerOfTwo(2) == 2);
             ENSURE( nextPowerOfTwo(3) == 4);

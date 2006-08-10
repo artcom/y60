@@ -27,6 +27,7 @@
 #include <signal.h>
 
 
+namespace asl {
 /*! \addtogroup aslbase */
 /* @{ */
 
@@ -85,8 +86,8 @@ class PosixThread {
 
 };
 
-
 /* @} */
 
+}
 
 #endif

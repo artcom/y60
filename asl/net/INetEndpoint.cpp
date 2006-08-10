@@ -47,4 +47,12 @@ namespace asl {
         memset(this, 0, sizeof(*this));
         sin_family=AF_INET;
     }
+    std::ostream & 
+    INetEndpoint::print(std::ostream & os) const {
+        return os << as_dotted_address(ntohl(sin_addr.s_addr)) << ":" << ntohs(sin_port);
+    }
+
+    std::ostream & operator << (std::ostream & os, const INetEndpoint & theEndpoint) {
+        return theEndpoint.print(os);
+    }
 }

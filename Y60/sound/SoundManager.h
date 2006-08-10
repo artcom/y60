@@ -25,7 +25,7 @@
 
 namespace y60 {
 
-    class SoundManager : public asl::Singleton<SoundManager>, private PosixThread {
+    class SoundManager : public asl::Singleton<SoundManager>, private asl::PosixThread {
         friend class asl::SingletonManager;
     public:
         virtual ~SoundManager();

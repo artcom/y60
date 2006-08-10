@@ -87,11 +87,11 @@ namespace y60 {
         double myParseTime = processingEnd - parseStart;
         double myProcessingTime = processingEnd - loadStart;
 
-        AC_DEBUG << "  Parse time: " << myParseTime << " sec, " << long(myFileSize/myParseTime/1024) << " kb/sec";
+        AC_INFO<< "  Parse time: " << myParseTime << " sec, " << long(myFileSize/myParseTime/1024) << " kb/sec";
         unsigned long myNodeCount = countNodes(*theDocument);
-        AC_DEBUG << "  Number of XML-Nodes: " << myNodeCount << ", "<< long(myNodeCount/myParseTime)
+        AC_INFO << "  Number of XML-Nodes: " << myNodeCount << ", "<< long(myNodeCount/myParseTime)
             << " nodes/sec, " << long(myFileSize/myNodeCount)<<" bytes/node";
-        AC_DEBUG << "  Total XML processing time: " << myProcessingTime << " sec, "
+        AC_INFO << "  Total XML processing time: " << myProcessingTime << " sec, "
             << long(myFileSize/myProcessingTime/1024)<<" kb/sec";
         return true;
     }

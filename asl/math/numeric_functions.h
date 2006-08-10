@@ -21,9 +21,12 @@
 #ifndef _included_asl_numeric_functions_
 #define _included_asl_numeric_functions_
 
+#include <asl/settings.h> 
+
 #include <cmath>
 #include <limits>
 #include <string>
+
 
 namespace asl {
 
@@ -104,16 +107,70 @@ NUM sign(NUM a) {
 
 inline
 bool powerOfTwo(unsigned long n) {
-    while (n > 1) {
-        if (n & 1) {
-            return false;
-        }
-        n >>= 1;
-    }
-    return true;
+    return (n & (n - 1)) == 0;
 }
 
-
+inline
+Signed16 nextPowerOfTwo(Signed16 n) {
+    --n;
+    n |= (n >> 1);
+    n |= (n >> 2);
+    n |= (n >> 4);
+    n |= (n >> 8);
+    return ++n;
+}
+inline
+Unsigned16 nextPowerOfTwo(Unsigned16 n) {
+    --n;
+    n |= (n >> 1);
+    n |= (n >> 2);
+    n |= (n >> 4);
+    n |= (n >> 8);
+    return ++n;
+}
+inline
+Signed32 nextPowerOfTwo(Signed32 n) {
+    --n;
+    n |= (n >> 1);
+    n |= (n >> 2);
+    n |= (n >> 4);
+    n |= (n >> 8);
+    n |= (n >> 16);
+    return ++n;
+}
+inline
+Unsigned32 nextPowerOfTwo(Unsigned32 n) {
+    --n;
+    n |= (n >> 1);
+    n |= (n >> 2);
+    n |= (n >> 4);
+    n |= (n >> 8);
+    n |= (n >> 16);
+    return ++n;
+}
+inline
+Signed64 nextPowerOfTwo(Signed64 n) {
+    --n;
+    n |= (n >> 1);
+    n |= (n >> 2);
+    n |= (n >> 4);
+    n |= (n >> 8);
+    n |= (n >> 16);
+    n |= (n >> 32);
+    return ++n;
+}
+inline
+Unsigned64 nextPowerOfTwo(Unsigned64 n) {
+    --n;
+    n |= (n >> 1);
+    n |= (n >> 2);
+    n |= (n >> 4);
+    n |= (n >> 8);
+    n |= (n >> 16);
+    n |= (n >> 32);
+    return ++n;
+}
+/*
 inline
 unsigned long nextPowerOfTwo(unsigned long n) {
     unsigned long myPowerOfTwo = 1;
@@ -122,7 +179,7 @@ unsigned long nextPowerOfTwo(unsigned long n) {
     }
     return myPowerOfTwo;
 }
-
+*/
 inline long
 squareroot(long n) {
     long r    = 1;

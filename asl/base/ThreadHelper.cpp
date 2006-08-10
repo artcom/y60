@@ -27,7 +27,8 @@
 
 #include <iostream>
 
-using namespace std;  // automatically added!
+using namespace std;
+using namespace asl;
 
 bool
 threadPriorityFromStrings (const string & thePriorityClassName, const string & thePriorityName,

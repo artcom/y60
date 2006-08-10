@@ -35,7 +35,7 @@
 
 DEFINE_EXCEPTION(DvbTeleTextException, asl::Exception);
 
-class DvbTeleText: public PosixThread {
+class DvbTeleText: public asl::PosixThread {
 public:
     DvbTeleText(const std::string & theDemuxDeviceName);
     ~DvbTeleText();

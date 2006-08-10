@@ -32,9 +32,9 @@
 
 using namespace std;
 
-
-
 #define DB(x) // x
+
+namespace asl {
 
 void *
 threadFunc (void * This) {
@@ -328,5 +328,7 @@ PosixThread::run() {
     }
     DB(AC_TRACE << "************ PosixThread::run() called" << endl);
     _myWorkFunc(*this);
+}
+
 }
 

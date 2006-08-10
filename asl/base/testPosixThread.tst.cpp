@@ -26,7 +26,8 @@
 #include <sys/types.h>
 #include <errno.h>
 
-using namespace std;  // automatically added!
+using namespace std;
+using namespace asl;
 
 class DerivedThread: public PosixThread {
 public:    

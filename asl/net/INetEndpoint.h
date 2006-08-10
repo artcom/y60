@@ -39,6 +39,8 @@
     #include <netinet/in.h>
 #endif
 
+#include <ostream>
+
 namespace asl {
 
     // This is a POD type. Don't add virtual functions.
@@ -47,7 +49,9 @@ namespace asl {
             INetEndpoint(const char * myHost, asl::Unsigned16 myPort);
             INetEndpoint(asl::Unsigned32 myHost, asl::Unsigned16 myPort);
             INetEndpoint();
+            std::ostream & print(std::ostream & os) const;
     };
 
+    std::ostream & operator << (std::ostream & os, const INetEndpoint & theEndpoint);
 }
 #endif

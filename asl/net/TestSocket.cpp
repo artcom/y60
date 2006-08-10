@@ -112,6 +112,8 @@ void TestSocket::testHostAddressMethods () {
 
     ENSURE(addr2Str(inHostAddress) == string(inHostDotName));
 
+    INetEndpoint myEndpoint("localhost",3000);
+    DPRINT(myEndpoint);
 }
 
 void TestSocket::BaseTest() {

@@ -35,7 +35,7 @@
 
 DEFINE_EXCEPTION(DvbTunerException, asl::Exception);
 
-class DvbTuner : public PosixThread
+class DvbTuner : public asl::PosixThread
 {
 public:
     DvbTuner(const dom::NodePtr & theChannelConfig, const std::string & theDeviceName = "/dev/dvb/adapter0");

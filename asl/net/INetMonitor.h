@@ -35,7 +35,7 @@ typedef void CURL;
 
 namespace inet {
 
-    class INetMonitor: private PosixThread {
+    class INetMonitor: private asl::PosixThread {
         public:
             static void setHostList(std::vector<std::string>& myHostNames);
             static bool isInternetAvailable();

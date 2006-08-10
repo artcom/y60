@@ -58,7 +58,7 @@ namespace y60 {
      */
     class FFMpegDecoder2 :
         public AsyncDecoder,
-        public PosixThread,
+        public asl::PosixThread,
         public asl::PlugInBase
     {
         static const unsigned FRAME_CACHE_SIZE;  ///< Number of frames to cache in the Framecache.
