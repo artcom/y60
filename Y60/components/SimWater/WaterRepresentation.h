@@ -1,0 +1,335 @@
+//=============================================================================
+//
+// Copyright (C) 2000-2002, ART+COM AG Berlin
+//
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+
+#ifndef _WaterRepresentation_h_
+#define _WaterRepresentation_h_
+
+#include <asl/Vector234.h>
+#include <asl/string_functions.h>
+//#include "Crack.h"
+
+#include <GL/gl.h>
+#include <stdio.h>
+#include <iostream>
+#include <stdlib.h>
+#include <time.h>
+#include <cmath>
+#include <assert.h>
+#include <string>
+#include <map>
+
+
+namespace video {
+
+class BufferAllocator {
+public:
+    BufferAllocator() {}
+    virtual ~BufferAllocator(){}
+    
+    virtual void *  allocateSingleBuffer(unsigned int numBytes) = 0;
+    virtual bool    freeSingleBuffer() = 0;
+};
+
+const int NUM_VAR_BUFFERS = 10;
+// 3 vertex position
+// 3 vertex normal
+// 2 texture coords
+// 4 vertex color+alpha :
+const int VERTEX_DATA_STRIDE = 12;
+
+
+class WaterSimulation;
+
+
+class WaterRepresentation {
+    
+public:
+    enum TextureClass { first = 1, floormaps = 1, surfacemaps = 2, cubemaps = 3, 
+                        puzzlemaps = 4 , last = 4
+                      };
+    // do not forget to add name when adding new values to TextureClass enum
+    static const std::string TextureClassNames[];
+
+    static std::string TextureClassName(TextureClass c) {
+        if (c < first && c > last) {
+            return asl::as_string(short(c));
+        }
+        return TextureClassNames[c];
+    }
+
+    WaterRepresentation();
+    
+    ~WaterRepresentation();
+
+//  make sure that (height % NUM_BUFFERS == 0) !!!
+
+    // init internal data to fit water array size
+    void    init(WaterSimulation * waterSim, int width, int height, 
+                 int dataOffsetX, int dataOffsetY,
+                 int sceneDisplayWidth, int sceneDisplayHeight,
+                 int displayWidth, int displayHeight,
+                 int displayOffsetX, int displayOffsetY,
+                 BufferAllocator * bufferAllocator=0);
+    
+    void    reset();
+    void    resetParameters();
+
+    // update water data
+    void    update();
+    
+    // render in opengl
+    void    preRender();    // setup data and vertex buffer
+    void    render();
+
+    bool loadTexture(TextureClass theClassID, short theObjectID, const char * theTextureFileName);
+    bool loadCubeMapTexture(TextureClass theClassID, short theObjectID, const std::string textureFileNames[]);
+
+    bool activateTexture(TextureClass theClassID, short newObjectID);
+    bool activateTextureIndex(TextureClass theClassID, int newIndex);
+    bool getTextureIndex(TextureClass theClassID, short whichObjectID, int & theResultIndex); 
+    bool activateOtherTexture(TextureClass theClassID, int theIndexOffset);
+
+    bool hasTexture(TextureClass theClassID, short whichObjectID) {
+        int myIndex;
+        return getTextureIndex(theClassID,whichObjectID,myIndex);
+    }
+
+    /*
+    void    setSceneObjects(const SceneSyncMaster::SceneObject 
+                            theObjects[SceneSyncMaster::NUM_SCENE_OBJECTS]);
+    
+
+    bool    addCrack(float theIntensity, const Vector2f & theOrigin, const Vector2f & theDirection, 
+                     int theNumSegments, float theSegmentSize = 80, float theVariation = 50);
+    void    clearCracks();
+    
+    //void    setCracks(CrackList & theCracks);
+    */
+
+    void    enableSurface(bool doEnable) {
+        _renderSurfaceEnabled = doEnable;
+    }
+    bool    surfaceEnabled() const {
+        return _renderSurfaceEnabled;
+    }
+    void    drawCrackField(bool doDraw) {
+        _renderCrackField = doDraw;
+    }
+    
+    void   setCrackWidth(float theCrackWidth) {
+        _crackWidth = theCrackWidth;
+    }
+    void   setInnerIceThickness(float theValue) {
+        _innerIceThickness = theValue;
+    }
+    void    setOuterIceThickness(float theValue) {
+        _outerIceThickness = theValue;
+    }
+    void    setSurfaceOpacity(float theValue) {
+        _surfaceOpacity= theValue;
+    }
+    
+    
+    float   getReflectionAlphaBias() const {
+        return _reflectionAlphaBias;
+    }
+    void    setReflectionAlphaBias(float value) {
+        _reflectionAlphaBias = value;
+    }
+    float   getReflectionAlphaScale() const {
+        return _reflectionAlphaScale;
+    }
+    void    setReflectionAlphaScale(float value) {
+        _reflectionAlphaScale = value;
+    }
+    float   getReflectionNormalScale() const {
+        return _reflectionNormalScale;
+    }
+    void    setReflectionNormalScale(float value) {
+        _reflectionNormalScale= value;
+    }
+    
+    bool    getDrawWireFrame() const {
+        return _drawWireFrame;
+    }
+    void    setDrawWireFrame(bool value) {
+        _drawWireFrame = value;
+    }
+   
+    bool    getDrawCaustics() const {
+        return _drawCaustics;
+    }
+    void    setDrawCaustics(bool value) {
+        _drawCaustics = value;
+    }
+    
+    bool    getDrawReflections() const {
+        return _drawReflections;
+    }
+    void    setDrawReflections(bool value) {
+        _drawReflections= value;
+    }
+    
+    bool    getDrawRefractions() const {
+        return _drawRefractions;
+    }
+    void    setDrawRefractions(bool value) {
+        _drawRefractions= value;
+    }
+    
+    float   getRefractionScale() const {
+        return _refractionScale;
+    }
+    void    setRefractionScale(float value) {
+        _refractionScale= value;
+    }
+    
+    float   getCausticBias() const {
+        return _causticBias;
+    }
+    void    setCausticBias(float value) {
+        _causticBias = value;
+    }
+    float   getCausticScale() const {
+        return _causticScale;
+    }
+    void    setCausticScale(float value) {
+        _causticScale = value;
+    }
+    float   getCausticSqrScale() const {
+        return _causticSqrScale;
+    }
+    void    setCausticSqrScale(float value) {
+        _causticSqrScale = value;
+    }
+    float   getCausticNegativeScale() const {
+        return _causticNegativeScale;
+    }
+    void    setCausticNegativeScale(float value) {
+        _causticNegativeScale = value;
+    }
+    // TODO: following sizes are not really used any more
+    enum Sizes {
+        MAX_GROUND_TEXTURES = 64,
+        MAX_SURFACE_TEXTURES = 64,
+        MAX_SPRITE_TEXTURES = 64,
+        MAX_CUBE_TEXTURE_SETS = 64
+    };
+
+    struct Texture {
+        GLuint              myID;
+        int                 myWidth;
+        int                 myHeight;
+    };
+
+    typedef short   ObjectID;
+
+    Texture & currentTexture(TextureClass theClassID) {
+        return _myTextures[theClassID][_currentID[theClassID]];
+    }
+
+    // remove any "special" GL state settings
+    virtual void    setDefaultGLState();
+    
+private:
+    BufferAllocator *   _bufferAllocator;
+    GLfloat *           _vertexBuffer;
+    WaterSimulation *   _waterSimulation;
+
+    std::map<TextureClass,std::map<ObjectID,Texture> > _myTextures;
+    std::map<TextureClass,ObjectID> _currentID;
+
+    //SceneSyncMaster::SceneObject    _mySceneObject[SceneSyncMaster::NUM_SCENE_OBJECTS];
+    double              _objectPosScaleX;
+    double              _objectPosScaleY;
+    double              _objectPosOffsetX;
+    double              _objectPosOffsetY;
+
+    bool                _drawCaustics;
+    bool                _drawReflections;
+    bool                _drawRefractions;
+    bool                _drawWireFrame;
+    int                 _dataOffsetX;
+    int                 _dataOffsetY;
+    int                 _dataWidth;
+    int                 _dataHeight;
+    int                 _displayWidth;
+    int                 _displayHeight;
+    int                 _displayOffsetX;
+    int                 _displayOffsetY;
+    float               _reflectionAlphaBias;
+    float               _reflectionAlphaScale;
+    float               _reflectionNormalScale;
+    float               _refractionScale;
+    float               _causticBias;
+    float               _causticScale;
+    float               _causticSqrScale;
+    float               _causticNegativeScale;
+    float               _normalMax;
+
+    GLuint              _cubeMapSideID[6];
+
+    struct VAR_Buffer {
+        GLfloat *   _pointer;
+        GLuint      _fence;
+    };
+    VAR_Buffer          _varBuffer[NUM_VAR_BUFFERS];
+    GLuint *            _stripIndices;
+    //CrackList           _cracks;
+    bool                _renderSurfaceEnabled; 
+    float               _crackWidth;
+    float               _innerIceThickness;
+    float               _outerIceThickness;
+    bool                _renderCrackField;
+    float               _surfaceOpacity;
+    
+    //CrackSimulator<480, 240>    _crackSimulator;
+
+    bool            initRender();
+    bool            initExtensions(char* extension);
+
+    inline int      computeNumLinesPerBuffer() const {
+        return _dataHeight / NUM_VAR_BUFFERS;
+    }
+
+    inline int      computeStripLength() const {
+        return 2 + 2 * (_dataWidth - 1);
+    }
+    
+    void    copyWaterDataToVertexBuffer();
+    void    copyWaterDataToVertexBuffer(int currentBuffer);
+
+    void    dataCoordToScreenCoord(const asl::Vector2f & theDataCoord, asl::Vector2f & screenCoord);
+
+    //void    renderSceneObjects();
+    //void    eraseCracks();
+    //void    renderCracks();
+    void    renderSurface();
+
+    /*
+    void    eraseCrackSegment(CrackSegment & theCrackSegment, 
+                              CrackSegment & theNextCrackSegment, float pos);
+    void    drawCrackSegment(CrackSegment & theCrackSegment, 
+                             CrackSegment & theNextCrackSegment, float pos);
+    void    eraseCrack(Crack & theCrack);
+    void    drawCrack(Crack & theCrack);
+    */
+};
+
+
+}; // namespace video
+
+
+#endif
+
+
+
+

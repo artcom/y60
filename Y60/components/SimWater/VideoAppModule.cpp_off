@@ -1,0 +1,945 @@
+// ----------------------------------------------------------------------------
+//
+// Copyright (C) 2002-2002, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//
+// ----------------------------------------------------------------------------
+//
+// Name: viewCompressedTex
+//
+// Purpose:
+//
+// $RCSfile: VideoAppModule.cpp,v $
+// $Revision: 1.2 $
+// $Date: 2002/09/06 18:17:29 $
+// $Author: valentin $
+//
+// $Log $
+//
+// ----------------------------------------------------------------------------
+
+#define DEBUG_LEVEL 0
+#define DEBUG_TIME 
+
+#include "RenderApp.h"
+#include "VideoAppModule.h"
+
+#include <asl/Debug.h>
+#include <asl/Arguments.h>
+#include <asl/numeric_functions.h>
+#include <asl/file_functions.h>
+#include <Yr/Time.h>
+#include <Yr/Sockets.h>
+
+#define  GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+//#include <GL/glut.h>
+#include <net/glut.h>
+
+#include <iostream.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>  
+#include <vector>
+
+#include <video/CompressionType.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sched.h> 
+
+#include <video/FileBasedMovie.h>
+#include <video/MovieScreen.h>
+#include <video/GrabberBasedMovie.h>
+#include <video/EffectManager.h>
+#include <video/ScaleEffect.h>
+#include <video/BlendEffect.h>
+#include <video/PanEffect.h>
+#include <video/RotateEffect.h>
+#include <video/ScreenRegion.h>
+#include <video/ZoomEffect.h>
+#include <asl/ThreadSemFactory.h>
+
+
+#ifdef _SETTING_USE_STRSTREAM_INSTEAD_OF_STRINGSTREAM_
+#  include <strstream.h>
+#else
+#  include <sstream>
+
+
+using namespace std;  // automatically added!
+
+
+#endif
+
+#define PAN     1
+#define ROT     2
+#define ZOOM    3
+
+using namespace video;
+using namespace TextureCompression;
+
+namespace video_module {
+    
+
+
+// ----------------------------------------------------------------------------
+
+int gDesiredWindowWidth = 128;
+int gDesiredWindowHeight = 96;
+
+static float defaultPosX = 0;
+static float defaultPosY = 0;
+static float defaultScaleX = 1.0;
+static float defaultScaleY = 1.0;
+static float defaultTransX[] = {0.0, 0.0, 0.0, 0.0};
+static float defaultTransY[] = {0.0, 0.0, 0.0, 0.0};
+
+// ----------------------------------------------------------------------------
+
+static float deltaScale = 0.0;
+static float deltaTranslationX = 0.0, deltaTranslationY = 0.0;
+static float deltaRotationX = 0, deltaRotationY = 0;
+
+static int ox = -1, oy = -1;
+static int mot = 0;
+
+static bool globalAsyncload = false;
+
+// ----------------------------------------------------------------------------
+
+vector<MovieScreen*> globalMovieScreens;
+vector<MovieBase*>   globalMovies;
+vector<long>         globalMovieDirections;
+
+// ----------------------------------------------------------------------------
+
+yrTime* haltTime = 0;
+yrTime* startTime = 0;
+double runningTime = 0.0;
+int singleStepSize = 0;
+
+
+
+void computeMovieScreensDefault () {
+    AC_DB("computeMovieScreensDefault()");
+
+    if ( globalMovieScreens.size() > 1) {
+        // compute scaling and positioning of moviescreens
+        // in relation to number of screens
+        defaultScaleX = 0.5;
+        defaultScaleY = 0.5;
+
+        defaultTransX[0] = -0.214; 
+        defaultTransX[1] =  0.226;
+        defaultTransX[2] = -0.214;
+        defaultTransX[3] =  0.226;
+
+        defaultTransY[0] =  0.226;
+        defaultTransY[1] = -0.224;
+        defaultTransY[2] = -0.224;
+        defaultTransY[3] =  0.226;
+    } else if ( globalMovieScreens.size() == 1) {
+        if (RenderApp::instance().getFullscreen()) {
+    
+            int screenWidth = RenderApp::instance().getScreenWidth();
+            int screenHeight = RenderApp::instance().getScreenHeight();
+            
+            AC_DB("computeMovieScreensDefault() screenWidth= " << screenWidth << 
+                  " screenHeight=" << screenHeight);
+            
+            // compute scaling and positioning of moviescreens
+            // in relation to real screen size
+            defaultScaleX =  (float) globalMovies[0]->getWidthAspect() / (float) screenWidth;
+            defaultScaleY =  (float) globalMovies[0]->getHeightAspect() / (float) screenHeight;
+
+            defaultTransX [0] = 
+                (float) (
+                         - screenWidth / 2 
+                         + defaultPosX 
+                         + globalMovies[0]->getWidthAspect() /  2
+                        ) / screenWidth / defaultScaleX;
+            defaultTransY [0] = 
+                (float) (
+                         - screenHeight / 2 
+                         + defaultPosY  
+                         + globalMovies[0]->getHeightAspect() / 2  
+                        ) / screenHeight / defaultScaleY;
+        } else {
+            defaultScaleX = 1.0;
+            defaultScaleY = 1.0;
+
+            defaultTransX [0] = 0.0;
+            defaultTransY [0] = 0.0;
+        }
+    } else if ( globalMovieScreens.size() == 0) {
+        defaultScaleX = 1.0;
+        defaultScaleY = 1.0;
+
+        defaultTransX [0] = 0.0;
+        defaultTransY [0] = 0.0;
+    }
+}
+
+void setMovieScreensDefault () {
+    AC_DB("setMovieScreensDefault()");
+    for (int screen = 0; screen < globalMovieScreens.size() ; screen++) {
+        globalMovieScreens[screen]->setPosition(defaultTransX[screen%4], 
+                                             defaultTransY[screen%4], 0.0f );
+        globalMovieScreens[screen]->scaleScreen(defaultScaleX, defaultScaleY);
+        globalMovieScreens[screen]->rotateScreen(0.0, 0.0, 0.0);
+        globalMovieScreens[screen]->setBlendFactor(1.0);
+        globalMovieScreens[screen]->setBlendMode(BlendEffect::NO_BLEND);
+    }
+}
+
+void resetUI() {
+    AC_DB("resetUI()");
+
+    setMovieScreensDefault ();
+
+    if (startTime && !haltTime) {
+        delete startTime;
+        startTime = new yrTime();      
+    }
+
+    deltaScale = 0.0;
+    deltaTranslationX = 0.0;
+    deltaTranslationY = 0.0;
+    deltaRotationX = 0;
+    deltaRotationY = 0;
+    ox = -1; 
+    oy = -1;
+    mot = 0;
+}
+
+
+asl::Arguments::AllowedOption ourOptions[] = {
+    {"--play-acm",       "%s"},
+    {"--framegrabber",   ""  },
+    {"--asyncload",      ""  },
+    {"--pos-x",          "%d"},
+    {"--pos-y",          "%d"},
+    {"",                 ""  }
+};
+
+asl::Arguments ourArguments(ourOptions);
+
+    
+void
+pan(int x, int y)
+{
+    deltaTranslationX= (x - ox) / 500.;
+    deltaTranslationY= (y - oy) / -500.;
+    ox = x;
+    oy = y;
+}
+
+void
+zoom(int x, int y)
+{
+  deltaScale = (y - oy) / 500.;
+  oy = y;
+}
+
+
+void
+rotate(int x, int y)
+{
+    deltaRotationX = x - ox;
+    deltaRotationY = y - oy;
+    ox = x;
+    oy = y;
+}
+
+void
+motion(int x, int y)
+{
+  //  DBG_LOG << " motion(): x " << x << " y " << y << endl;
+  if (mot == PAN)
+    pan(x, y);
+  else if (mot == ROT)
+    rotate(x, y);
+  else if (mot == ZOOM)
+    zoom(x, y);
+    glutPostRedisplay();
+}
+
+void
+mouse(int button, int state, int x, int y)
+{
+
+    if (state == GLUT_DOWN) {
+        switch (button) {
+            case GLUT_LEFT_BUTTON:
+                mot = PAN;
+                motion(ox = x, oy = y);
+                break;
+            case GLUT_MIDDLE_BUTTON:
+                mot = ROT;
+                motion(ox = x, oy = y);
+                break;
+            case GLUT_RIGHT_BUTTON:
+                mot = ZOOM;
+                motion(ox = x, oy = y);
+                break;
+        }
+    } else if (state == GLUT_UP) {
+        mot = 0;
+    }
+}
+
+
+void
+toggleBlendMode() {
+    for (int movies = 0; movies < globalMovieScreens.size() ; movies++) {
+        int newBlendMode = (globalMovieScreens[movies]->getBlendMode() + 1) % 3;
+        globalMovieScreens[movies]->setBlendMode(newBlendMode);
+    }
+}
+
+void
+incrementBlendFactor() {
+    for (int movies = 0; movies < globalMovieScreens.size() ; movies++) {
+        float newBlendFactor = globalMovieScreens[movies]->getBlendFactor() + 0.01;
+        if (newBlendFactor > 1.0) {
+            newBlendFactor = 1.0;
+        }
+        globalMovieScreens[movies]->setBlendFactor(newBlendFactor);
+    }
+}
+
+void
+decrementBlendFactor() {
+    for (int movies = 0; movies < globalMovieScreens.size() ; movies++) {
+        float newBlendFactor = globalMovieScreens[movies]->getBlendFactor() - 0.01;
+        if (newBlendFactor < 0.0) {
+            newBlendFactor = 0.0;
+        }
+        globalMovieScreens[movies]->setBlendFactor(newBlendFactor);
+    }
+}
+
+
+
+
+void display(void) {
+    AC_DB("video_module::display()");
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    for (int movies = 0; movies < globalMovieScreens.size() ; movies++) {
+
+        double myPos[3];
+        globalMovieScreens[movies]->getPosition( myPos[0], myPos[1], myPos[2] );
+
+        globalMovieScreens[movies]->setPosition(myPos[0] + deltaTranslationX,
+                myPos[1] + deltaTranslationY, 
+                myPos[2] );
+
+        double myScale[2];
+        globalMovieScreens[movies]->getScale (myScale[0], myScale[1]);
+        globalMovieScreens[movies]->scaleScreen(myScale[0] + deltaScale, myScale[1] + deltaScale);
+
+        double myRot[3];
+        globalMovieScreens[movies]->getRotation( myRot[0], myRot[1], myRot[2] );
+        globalMovieScreens[movies]->rotateScreen(myRot[0] + deltaRotationX, 
+                myRot[1] + deltaRotationY, 
+                myRot[2]);
+
+        ((MovieScreen*)(globalMovieScreens[movies]))->draw();
+    }
+
+    // reset interactive delta values
+    deltaTranslationX = 0.0;
+    deltaTranslationY = 0.0;
+    deltaScale  = 0.0;
+    deltaRotationX        = 0.0;
+    deltaRotationY        = 0.0;
+}
+
+void reshape(int w, int h) {
+    AC_DB("video_module::reshape()");
+    glViewport (0, 0, (GLsizei) w, (GLsizei) h);
+}
+
+
+void findBiggestAspect (MovieBase * theMovie, int & theMaxWidth, int & theMaxHeight) {
+
+    // XXX check aspect against actual screen/window size
+
+    // find the biggest aspects
+    if ((theMovie->getWidthAspect() > theMaxWidth) || 
+        (theMovie->getHeightAspect() >  theMaxHeight)) 
+    {
+        theMaxHeight = theMovie->getHeightAspect();
+        theMaxWidth  = theMovie->getWidthAspect();
+    }
+
+}
+
+bool openGrabberBasedMovie ( ) {
+    AC_DB("video_module::openGrabberBasedMovie()");
+    
+    MovieScreen * theMovieScreen = 0;
+    MovieBase *   theMovie = 0;
+
+    theMovie = new GrabberBasedMovie(RenderApp::instance().getVerbose());
+    if (!theMovie->init()) {
+
+        DBG_LOG <<"### ERROR Could not init FrameGrabberBased Movie -> not showing" <<endl;
+    } else {
+        globalMovies.push_back( theMovie );
+        globalMovieDirections.push_back(1);
+        
+        if (RenderApp::instance().getFps()) {
+            theMovie->setFPS(RenderApp::instance().getFps());
+        }
+        
+        theMovieScreen = new MovieScreen(MovieScreen::QUAD);
+        theMovieScreen->init( );
+        theMovieScreen->setCurrentFrame( theMovie );
+
+        theMovieScreen->setPosition(defaultTransX[0],
+                                        defaultTransY[0], 
+                                        0.0f );
+        theMovieScreen->scaleScreen(defaultScaleX, defaultScaleY);
+        theMovieScreen->rotateScreen(0.0, 0.0, 0.0);
+        globalMovieScreens.push_back( theMovieScreen );
+
+        findBiggestAspect (theMovie, gDesiredWindowWidth, gDesiredWindowHeight);
+    }
+}
+
+void clearFilebasedMovies () {
+    AC_DB("video_module::clearFilebasedMovies()");
+
+    for (int movies = 0; movies < globalMovieScreens.size(); movies++) {
+        assert(globalMovies[movies]);
+        delete globalMovies[movies];
+        
+        assert(globalMovieScreens [movies]);
+        delete globalMovieScreens [movies];
+    }
+
+    globalMovies.clear();
+    globalMovieScreens.clear();
+    globalMovieDirections.clear();
+}
+
+
+bool openFilebasedMovie (const char * myFileName) {
+    AC_DB("video_module::openFilebasedMovie( " << myFileName << " )");
+
+    MovieScreen * theMovieScreen = 0;
+    MovieBase *   theMovie = 0;
+
+    theMovie = new video::FileBasedMovie(myFileName, RenderApp::instance().getStatistic());
+    
+    if (globalAsyncload) {
+        theMovie->enableAsyncLoad(true) ;
+        static_cast<video::FileBasedMovie*>(theMovie)->allowDuplicateRequests(false);
+    }
+
+    globalMovieDirections.push_back(1);
+    
+
+
+    if (!theMovie->init()) {
+        return false;
+    } else {
+        globalMovies.push_back( theMovie );
+        if (RenderApp::instance().getFps()) {
+            theMovie->setFPS(RenderApp::instance().getFps());
+        }
+        theMovieScreen = new MovieScreen(MovieScreen::QUAD);
+
+        theMovieScreen->init( );
+        theMovieScreen->setCurrentFrame( theMovie );
+        theMovieScreen->setPosition(defaultTransX[globalMovieScreens.size() ],
+                    defaultTransY[globalMovieScreens.size()], 
+                    0.0f );
+        theMovieScreen->scaleScreen(defaultScaleX, defaultScaleY);
+        theMovieScreen->rotateScreen(0.0, 0.0, 0.0);
+        globalMovieScreens.push_back( theMovieScreen );
+
+        findBiggestAspect (theMovie, gDesiredWindowWidth, gDesiredWindowHeight);
+
+        return true;
+    }
+}
+
+void periodic(double theRunningTime, 
+    SceneSyncMaster::SceneSyncPacket * newSyncPacket, bool & hasChanged) 
+{
+    //AC_DB("video_module::periodic()");
+    
+    if (haltTime) {
+
+        // MODE: INTERACTIVE SINGLE FRAME CONTROL
+
+        for (int movies = 0; movies < globalMovieScreens.size() ; movies++) {
+            unsigned long nextFrame = globalMovies[movies]->getCurrentFrame() + singleStepSize;
+            nextFrame = static_cast<video::FileBasedMovie*>(globalMovies[movies])->getClampedFrame(nextFrame);
+
+            if ( globalMovies[movies]->updateToFrame (nextFrame)) {
+                hasChanged = true;
+                if (RenderApp::instance().getVerbose()) {
+                    DBG_LOG << "periodic(): stepped to frame # " << nextFrame << endl;
+                }
+            }
+        }
+        if (hasChanged) {
+            for (int moviescreens = 0; moviescreens < globalMovieScreens.size() ; 
+                 moviescreens++) 
+            {
+                if ( globalMovieScreens[moviescreens]->update()) {
+                }
+            }
+        }
+
+        singleStepSize = 0;
+
+    } else if (newSyncPacket) {
+
+        // MODE: EXTERNAL SYNC CONTROL
+        SceneSyncMaster::SceneSyncPacket * currentSyncPacket = 
+                    & RenderApp::instance().getCurrentSyncPacket();
+                    
+        AC_DB2 ( "packet: " << newSyncPacket->_header._packetNumber) ;
+        
+        if (newSyncPacket->_header._packetNumber != 
+                currentSyncPacket->_header._packetNumber) 
+        {
+            bool newMovieLoaded = false;
+
+            if ((strlen (newSyncPacket->_filename) != 0) &&
+                (strcmp (newSyncPacket->_filename, currentSyncPacket->_filename) != 0)) 
+            {
+                if (RenderApp::instance().getVerbose()) {
+                    DBG_LOG <<" periodic(): "
+                        << "current moviefile '" << currentSyncPacket->_filename << "' - " 
+                        << "request for moviefile '" << newSyncPacket->_filename << "'"<< endl;
+                }
+
+                clearFilebasedMovies ();
+                if (! openFilebasedMovie (newSyncPacket->_filename)) {
+                    DBG_LOG <<"### ERROR Could not load movie '" 
+                        << newSyncPacket->_filename << "'" << endl;
+                }
+                computeMovieScreensDefault ();
+                setMovieScreensDefault ();
+
+                newMovieLoaded = true;
+            }
+
+            for (int movies = 0; 
+                 movies < globalMovieScreens.size() ; movies++) {
+                 // cout <<"SyncPacket currentFrame: "<<newSyncPacket->_currentFrameNumber<<endl;
+                 // cout <<"SyncPacket nextFrame: "<<newSyncPacket->_nextFrameNumber<<endl;
+                 
+                 long directionalSpeed = long(newSyncPacket->_nextFrameNumber) - 
+                                         long(newSyncPacket->_currentFrameNumber);
+                 if (directionalSpeed != globalMovieDirections[movies] ) {
+                        static_cast<video::FileBasedMovie*>(globalMovies[movies])->
+                                    setAsyncLoadStrategy(video::FileBasedMovie::PRECISE);
+                         globalMovieDirections[movies] = directionalSpeed;            
+                      //   cout <<"######################## PRECISE #######################"<<endl;            
+                 }
+                 else {
+                        static_cast<video::FileBasedMovie*>(globalMovies[movies])->
+                                    setAsyncLoadStrategy(video::FileBasedMovie::STEADY);
+                       //  cout <<"######################## STEADY #######################"<<endl;            
+                 }
+                 
+                 if (newMovieLoaded && movies == globalMovieScreens.size()-1) {
+                        static_cast<video::FileBasedMovie*>(globalMovies[movies])->
+                                    setAsyncLoadStrategy(video::FileBasedMovie::PRECISE);
+                        //cout <<"######################## PRECISE (2) #######################"<<endl;            
+                  }
+                 
+                static_cast<video::FileBasedMovie*> (globalMovies[movies])->
+                      setPredictionStrategy(video::FileBasedMovie::CONST_DELTA, directionalSpeed );
+                if(globalMovies[movies]->updateToFrame(newSyncPacket->_currentFrameNumber) ) {
+                    hasChanged = true;
+                }
+/*
+                if (globalMovies[movies]->supportsAsyncLoad()) {
+                // XXX
+                    if ( globalMovies[movies]->updateToFrameAsync(
+                                newSyncPacket->_currentFrameNumber)) 
+                    {
+                        hasChanged = true;
+                        if (RenderApp::instance().getVerbose()) {
+                            DBG_LOG << "periodic(): ";
+                            DBG_LOG << "movie # " << movies << ", " 
+                                << "async loading current frame # "
+                                << newSyncPacket->_currentFrameNumber << endl;
+                        }
+                    }
+                   // for (int currentPreloadFrame = 0; currentPreloadFrame < 4; 
+                   //         currentPreloadFrame++) 
+                   // {
+                        if (newSyncPacket->_nextFrameNumber[currentPreloadFrame] == UINT_MAX) {
+                            continue;
+                        }
+                        if ( globalMovies[movies]->updateToFrameAsync(
+                                    newSyncPacket->_nextFrameNumber[currentPreloadFrame])) 
+                        {
+                            hasChanged = true;
+                            if (RenderApp::instance().getVerbose()) {
+                                DBG_LOG << "periodic(): ";
+                                DBG_LOG << "movie # " << movies << ", " 
+                                    << "async preloading frame # "
+                                    <<newSyncPacket->_nextFrameNumber[currentPreloadFrame]
+                                    << endl;
+                            }
+                        }
+                    //}
+
+                    const double MAX_TIME_DIFF = 0.0001;    // 10.000 Hz                                                                                            
+                    yrTime startTime;
+                    if (globalMovies[movies]->waitForFrameAsync(
+                                newSyncPacket->_currentFrameNumber)) 
+                    {
+                        double diffTime = (double) yrTime() - startTime ;
+
+                        if (diffTime > MAX_TIME_DIFF) {
+                            AC_WARNING ("periodic(): async loading time by " << diffTime 
+                                    << " seconds, frame # " 
+                                    << newSyncPacket->_currentFrameNumber);
+                        }
+
+                        if (RenderApp::instance().getVerbose()) {
+                            DBG_LOG << "periodic(): ";
+                            DBG_LOG << "movie # " << movies << ", updated to frame # " 
+                                << newSyncPacket->_currentFrameNumber << endl;
+                        }
+                    } else {
+                        DBG_LOG << "periodic(): WARNING waitForFrameAsync() "
+                            "waiting for specific frame failed (OK if first frame)" << endl;
+                    }
+                } else {
+                    assert(globalMovies[movies]);
+                // XXX
+
+                    yrTime startTime;
+                    if ( globalMovies[movies]->updateToFrame(
+                                newSyncPacket->_currentFrameNumber)) 
+                    {
+                        double diffTimeMax = 1. / RenderApp::instance().getFps() * 0.8;
+                        double diffTime = (double) yrTime() - startTime ;
+                        if (diffTime > diffTimeMax) {
+                            if (! newMovieLoaded) {
+                                AC_WARNING ("periodic(): synchronous frame load - frame #" 
+                                        << newSyncPacket->_currentFrameNumber 
+                                        << " took " << diffTime << " seconds");
+                            } 
+                        } 
+                        hasChanged = true;
+
+                        AC_DB2 ("periodic() movie # " << movies << ", updated to frame # " 
+                                << newSyncPacket->_currentFrameNumber << " within " 
+                                << diffTime << " seconds");
+                    }
+                }*/
+                if ( globalMovieScreens[movies]->update()) {
+                    hasChanged = true;
+                }
+
+            }
+
+            newMovieLoaded = false;
+
+        } else {
+            // waiting for framesync UDPs... force buffer swap
+            // sync number updated in display only!
+            hasChanged = true;
+        }
+    } else { 
+
+        // MODE: CONTINUOUS PLAYING MODE
+
+        for (int movies = 0; movies < globalMovieScreens.size() ; movies++) {
+            if ( globalMovies[movies]->updateToTime(theRunningTime)) {
+                hasChanged = true;
+            }
+        }
+        if (hasChanged) {
+            for (int moviescreens = 0; moviescreens < globalMovieScreens.size() ; moviescreens++) {
+                if ( globalMovieScreens[moviescreens]->updateToTime(theRunningTime)) {
+                    //hasChanged = true;
+                }
+            }
+        }
+    }
+}
+
+
+void
+shutdown() {
+    AC_DB("video_module::shutdown()");
+
+    clearFilebasedMovies ();
+}
+
+bool
+key(unsigned char key, int x, int y) {
+    AC_DB("video_module::key( " << int(key) << " )");
+    
+    switch (key) {
+
+        case 'r':
+            resetUI();
+            break;
+        case 's':
+            for (int screen = 0; screen < globalMovieScreens.size(); screen++) {
+                globalMovieScreens[screen]->setStatistic(!globalMovieScreens[screen]->getStatistic());  
+            }
+            break;
+        case 'b':
+            toggleBlendMode();
+            break;
+        case '+':
+            incrementBlendFactor();
+            break;
+        case '-':
+            decrementBlendFactor();
+            break;
+        case ' ':
+            if (!RenderApp::instance().isRemotelyControlled()) { 
+                // single frame control only if external sync control is disabled
+
+                if (!haltTime) {
+                    haltTime = new yrTime();
+                    singleStepSize = 0;
+                    if (RenderApp::instance().getVerbose()) {
+                        DBG_LOG << "key(): " 
+                             << "single step mode - current frame# " << 
+                                globalMovies[0]->getCurrentFrame() << endl;
+                    }
+                } else {
+                    yrTime nowTime;
+                    *startTime = *startTime + nowTime - *haltTime;
+                    delete haltTime;
+                    haltTime = 0;
+                    if (RenderApp::instance().getVerbose()) {
+                        DBG_LOG << "key(): " << "continuous playing mode" << endl;
+                    }
+                }
+            }
+            break;
+
+        case '/':
+            singleStepSize = -1;
+            break;
+
+        case '*':
+            singleStepSize = +1;
+            break;
+
+        default:
+            DBG_LOG << "*** WARNING key(): unknown key '" << key << "'" << endl;
+            return false;
+    }
+    glutPostRedisplay();
+    return true;
+}
+
+void updateWindow() {
+    AC_DB("video_module::updateWindow()");
+
+    glClearColor (0.0, 0.0, 0.0, 0.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-0.5, 0.5, -0.5, 0.5, -1.0, 1.0);
+    glEnable(GL_TEXTURE_2D);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glMatrixMode(GL_MODELVIEW);
+};
+
+void initWindow() {
+    AC_DB("video_module::initWindow()");
+
+    computeMovieScreensDefault ();
+    setMovieScreensDefault ();
+
+    updateWindow();
+};
+
+
+
+
+
+void main(asl::Arguments & ourArguments) {
+
+    AC_DB("video_module::main( -- arguments -- )");
+    
+    if (ourArguments.haveOption("--asyncload")) {
+        globalAsyncload = 1;
+    }
+
+    // CREATE movies and theaters nearby you
+
+    clearFilebasedMovies ();
+
+
+    // CREATE framegrabber
+    // start with the framegrabber, since it will be drawn first, cause NO alpha!!
+    if (ourArguments.haveOption("--framegrabber")) {
+        openGrabberBasedMovie ();
+    }
+
+    // CREATE filebased movies
+#if 0
+    for (int i = 0 ; i <  ourArguments.getCount(); i++) {
+        if (! openFilebasedMovie (ourArguments.getArgument(i).c_str())) {
+            DBG_LOG <<"### ERROR Could not open movie '" 
+                << ourArguments.getArgument(i).c_str()
+                <<"' -> not showing " << endl;
+        }
+    }
+#endif
+
+    if (ourArguments.haveOption("--play-acm")) {
+        if (! openFilebasedMovie (ourArguments.getOptionArgument("--play-acm").c_str())) {
+            DBG_LOG <<"### ERROR Could not open movie '" 
+                << ourArguments.getOptionArgument("--play-acm").c_str()
+                <<"' -> not showing " << endl;
+        }
+    }
+    
+    // COMPUTE SCREEN DEFAULTS 
+
+    if (ourArguments.haveOption("--pos-x")) {
+        defaultPosX = asl::as<int>( ourArguments.getOptionArgument("--pos-x"));
+    }
+    if (ourArguments.haveOption("--pos-y")) {
+        defaultPosY = asl::as<int>( ourArguments.getOptionArgument("--pos-y"));
+    }
+    //computeMovieScreensDefault ();
+    //setMovieScreensDefault ();
+
+    if (RenderApp::instance().isRemotelyControlled()) {
+        if (globalMovieScreens.size() > 0) {
+            clearFilebasedMovies ();
+            DBG_LOG << "*** WARNING Ignoring filname-based movies from command line" << endl;
+        }
+    }
+    
+    RenderApp::instance().setDesiredWindowSize(gDesiredWindowWidth, gDesiredWindowHeight);
+
+}
+
+}; // namespace video_module
+
+
+
+
+
+namespace video {
+    
+VideoAppModule::VideoAppModule(RenderApp & theRenderApp) : 
+    RenderAppModule(theRenderApp, "video")
+{
+    AC_DB("VideoAppModule::VideoAppModule()");
+}
+
+VideoAppModule::~VideoAppModule() {
+    AC_DB("VideoAppModule::~VideoAppModule()");
+}
+
+bool
+VideoAppModule::shutdown(bool isFinalShutdown) {
+    video_module::shutdown();
+    return true;
+} 
+
+
+void
+VideoAppModule::addAllowedOptions(asl::Arguments & theArguments) {
+    AC_DB("VideoAppModule::addAllowedOptions()");
+    theArguments.addAllowedOptions(&video_module::ourOptions[0]);
+}
+
+bool
+VideoAppModule::init(asl::Arguments & theArguments) { 
+    AC_DB("VideoAppModule::init()");
+    video_module::main(theArguments);
+    return true; 
+}
+
+void
+VideoAppModule::renderPreSync() {
+    video_module::display();
+}
+
+void
+VideoAppModule::handleReshape(int w, int h) {
+    video_module::reshape(w, h);
+}
+
+bool
+VideoAppModule::handleKeyboard(unsigned char key, int x, int y) {
+    return video_module::key(key, x, y);
+}
+
+void
+VideoAppModule::handleMouse(int button, int state, int x, int y) {
+    video_module::mouse(button, state, x, y);
+}
+
+void
+VideoAppModule::handleMotion(int x, int y) {
+    video_module::motion(x, y);
+}
+
+void
+VideoAppModule::handlePeriodic(double theRunningTime, 
+    SceneSyncMaster::SceneSyncPacket * theNewSyncPacket, bool & theNeedsRedraw)
+{
+    video_module::periodic(theRunningTime, theNewSyncPacket, theNeedsRedraw);
+}
+
+// called during startup
+void
+VideoAppModule::initWindow() {
+    AC_DB("VideoAppModule::initWindow()");
+    video_module::initWindow();
+}
+
+void
+VideoAppModule::updateWindow() {
+    AC_DB("VideoAppModule::updateWindow()");
+    video_module::updateWindow();
+}
+
+//  called when activated
+bool
+VideoAppModule::activate() {
+    AC_DB("VideoAppModule::activate()");
+    return true; 
+}
+
+//  called when deactivated
+bool
+VideoAppModule::deactivate() { 
+    AC_DB("VideoAppModule::deactivate()");
+    return true; 
+}
+
+
+
+
+}; // namespace video
+
