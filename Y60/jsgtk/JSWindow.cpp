@@ -47,7 +47,7 @@ Resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
     try {
-        ensureParamCount(argc, 2);
+        ensureParamCount(argc, 2, 3);
         // native method call
         Gtk::Window * myNative=0;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
@@ -56,6 +56,15 @@ Resize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         convertFrom(cx, argv[0], theWidth);
         convertFrom(cx, argv[1], theHeight);
         myNative->resize(theWidth, theHeight);
+        if (argc == 3 ) {
+            bool myFullScreenFlag = false;
+            convertFrom(cx, argv[2], myFullScreenFlag);
+            if (myFullScreenFlag) {
+                myNative->fullscreen();
+            } else {
+                myNative->unfullscreen();
+            }
+        }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
