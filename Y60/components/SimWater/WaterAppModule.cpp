@@ -1,14 +1,13 @@
-//=============================================================================
+//============================================================================
 //
-// Copyright (C) 2000-2002, ART+COM AG Berlin
-//
+// Copyright (C) 2002-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-
+//============================================================================
 
 #include "WaterAppModule.h"
 #include "RenderApp.h"
@@ -120,16 +119,6 @@ unsigned int    gLastFrame = 0; // for UDP sync tracking
 unsigned long   gLastEvent = 0;
 dom::Node       gConfig;
 
-/*
-typedef vector<SceneSyncMaster::Event>  EventList;
-EventList      gEventList;
-
-SceneSyncMaster::FileObject     gFileObject[SceneSyncMaster::NUM_FILE_OBJECTS];
-SceneSyncMaster::SceneObject    gSceneObject[SceneSyncMaster::NUM_SCENE_OBJECTS];
-*/
-
-//=======================================
-
 //const int gSimulationWidth = 600;
 //const int gSimulationHeight = 300;
 
@@ -164,7 +153,6 @@ const float h = 2*float(0.1*c*sqrt(2.f));//grid cell width (min for stability, a
 
 float   gRunSimulation = true;
 bool    gDrawWireframe = false;
-bool    gTestMarker = false;
 float   gWaterDamping = 0.9993f;
 #ifdef TEST_WATER   
 bool    gTestWater = false;
@@ -202,25 +190,7 @@ int     gScreenHeight= 0;
 
 string gDataDir = "data";
 
-#if 0
-//These are the textures for the skybox.
-const char *const GroundTextureName = "ground.png";
-
-
-
-//These are the textures for the skybox.
-const char *const SkyboxTexturesNames[6] = {
-	"cube_right.png",
-	"cube_left.png",
-	"cube_top.png",
-	"cube_bottom.png",
-	"cube_roof.png",
-	"cube_ground.png"
-};
-#endif
-
 const char * const cubeSides[6] = {"right","left","top","bottom","front","back"};
-
 
 int     gCrackSegmentSize = 4;
 int     gNumSegmentsPerCrack = 8;
@@ -271,188 +241,6 @@ asl::Arguments::AllowedOption ourOptions[] = {
 #define SQR(x) ((x)*(x))
 #endif
 
-#if 0
-void
-handleEvents(int currentFrame, EventList & theEventList) {
-    int i=0;
-    while (i < theEventList.size()) {
-        //if (theEventList[i]._frameNumber <= gLastFrame) {
-        if (theEventList[i]._frameNumber <= currentFrame) {
-            //if (theEventList[i]._frameNumber > gLastFrame) {
-
-            int frameNumber = theEventList[i]._frameNumber;
-            int xPos = theEventList[i]._xPos;
-            int yPos = theEventList[i]._yPos;
-            int splashMagnitude = (int) (theEventList[i]._intensity * gSplashIntensityFactor);
-            int splashRadius = (int) (float(theEventList[i]._intensity) * gSplashRadiusFactor);
-
-            float eventIntensity = min(max(0.f, theEventList[i]._intensity), 2.f);
-            float crackIntensity = eventIntensity * gCrackIntensityFactor +
-                                   SQR(eventIntensity) * gCrackSqrIntensityFactor;
-            
-            theEventList.erase(&theEventList[i]);
-
-            if (frameNumber == currentFrame) {
-                //AC_DEBUG << "Splash _on_time_ (now " << (theEventList.size()) 
-                //    << " in saved list) :\n  ";
-            } else {
-                //AC_DEBUG << "< Late splash (now " << (theEventList.size()) 
-                //    << " in saved list) :\n< ";
-            }
-
-            //AC_DEBUG << "    splash frame #" << frameNumber << "  intensity= "
-            //    << theEventList[i]._intensity << "  splashRadius= " << splashRadius
-            //    << "  x= " << xPos << "  y= " << yPos << endl;
-           
-            srand48(((frameNumber % 0xff) << 24) | 
-                    ((frameNumber % 0xff) << 16) |
-                    ((frameNumber % 0xff) << 8) |
-                    (frameNumber % 0xff));
-            
-            if ((gWaterRepresentation) && (gWaterRepresentation->surfaceEnabled()) &&
-                gEnableSurfaceCracks) 
-            {
-                
-                for (int i=0; i < gNumCracksPerSplash; i++) {
-
-                    float directionX = random(-100, 100);
-                    float directionY = random(-100, 100);
-                    
-                    gWaterRepresentation->addCrack(crackIntensity,
-                            Vec2(xPos, yPos), Vec2(directionX, directionY),
-                            gNumSegmentsPerCrack, 
-                            (1. + eventIntensity) * gCrackSegmentSize, 
-                            gCrackVariation);
-
-                    gWaterRepresentation->addCrack(crackIntensity,
-                            Vec2(xPos, yPos), Vec2(-directionX, -directionY),
-                            gNumSegmentsPerCrack, 
-                            (1. + eventIntensity) * gCrackSegmentSize, 
-                            gCrackVariation);
-                }
-            }
-
-            gWaterSimulation->sinoidSplash(xPos, yPos, splashMagnitude, splashRadius);
-
-            i = 0;
-            continue;
-        }
-        i++;
-    }
-}
-
-void
-extractEvents(int currentFrame, const SceneSyncMaster::SceneSyncPacket & mySyncPacket, 
-              EventList & theEventList) 
-{
-
-    //AC_DEBUG << "num splashes: " << mySyncPacket._numEvents << endl;
-
-    for (int i = mySyncPacket._numEvents-1; i >= 0; i--) {
-
-        if (mySyncPacket._event[i]._eventType != SceneSyncMaster::Event::Splash) {
-            continue;
-        }
-        
-        int frameNumber = mySyncPacket._event[i]._frameNumber;
-        //int xPos = mySyncPacket._event[i]._xPos;
-        //int yPos = mySyncPacket._event[i]._yPos;
-        int xPos = (int) (float(mySyncPacket._event[i]._xPos) / 10000. * float(gSimulationWidth));
-        int yPos = (int) (float(mySyncPacket._event[i]._yPos) / 10000. * float(gSimulationHeight));
-
-        int magnitude = (int) (mySyncPacket._event[i]._intensity * 4.);
-        int radius = (int) (mySyncPacket._event[i]._intensity * 4.);
-/*                         
-                if (mySyncPacket._event[i]._frameNumber > currentFrame) {
-                    
-                    theEventList.push_back(mySyncPacket._event[i]);
-                    AC_DEBUG << "> Saving splash for later (now " << theEventList.size() 
-                         << " in saved list):\n> ";
-                    
-                } else 
-                if (theEventList[i]._frameNumber > gLastFrame) {
-                    AC_DEBUG << "Splashing now:\n";
-                    gWaterSimulation->sinoidSplash(xPos, yPos, 
-                            magnitude, radius);
-                }
-*/              
-        bool    isDuplicate = false;
-        int j=0;
-        while (j < theEventList.size()) {
-            if (theEventList[i]._eventNumber == 
-                    mySyncPacket._event[i]._eventNumber) 
-            {
-                isDuplicate = true;
-                break;
-            }
-            j++;
-        }
-        if (isDuplicate) {
-            // if we already have that one forget it!
-            //AC_DEBUG << "DUPLICATE:";
-        } else {
-            theEventList.push_back(mySyncPacket._event[i]);
-
-            SceneSyncMaster::Event * event = &theEventList.back();
-            assert(event); 
-            // res-scale the event coordinates from 10000/10000 to simulation width
-        
-            event->_xPos = xPos;
-            event->_yPos = yPos;
-        }
-        //AC_DEBUG << i << "# : splash frame #" << frameNumber << " intensity= " 
-        //    << magnitude << "  radius= " << radius
-        //    << "  x= " << xPos << "  y= " << yPos << endl;
-    }
-
-}
-#endif
-
-void
-createTestMarker() {
-    /*
-    if (gWaterRepresentation) {
-        for (int i=0; i<10; i++) {
-            gSceneObject[i]._classID = SceneSyncMaster::SceneObject::Marker;
-            gSceneObject[i]._objectID = i;
-            gSceneObject[i]._fileClassID = WaterRepresentation::puzzlemaps;
-            gSceneObject[i]._fileObjectID = i % 4 + 1;
-            gSceneObject[i]._xPos = int((double(i) * (10000. / 9.)));
-            gSceneObject[i]._yPos = int((double(i) * (10000. / 9.)));
-            gSceneObject[i]._zPos = 0; // directly at water surface
-//            gSceneObject[i]._zPos = 220; // above ice/surface (above 210)
-            gSceneObject[i]._xSize = (i+2) * 150;
-            gSceneObject[i]._ySize = (i+2) * 300;
-            gSceneObject[i]._zSize = 0;
-            gSceneObject[i]._heading = short(random(0., 3600));
-        }
-        gWaterRepresentation->setSceneObjects(gSceneObject);
-    }
-    */
-}
-
-void
-clearTestMarker() {
-    /*
-    if (gWaterRepresentation) {
-        for (int i=0; i< 10; i++) {
-            gSceneObject[i]._classID = SceneSyncMaster::SceneObject::NoObject;
-        }
-        gWaterRepresentation->setSceneObjects(gSceneObject);
-    }
-    */
-}
-
-#ifdef TEST_WATER   
-
-void
-createTestWater() {
-}
-
-void
-clearTestWater() {
-}
-
 double random(double min, double max) {
     return drand48() * (max - min) + min;
 }
@@ -473,7 +261,6 @@ const int WATER_PFEILUNG = 40;
 void
 updateTestWater(float pos) {
 
-    //AC_DEBUG << "updateTestWater( " << pos << " )" << endl;
     if (!gWaterSimulation) {
         return;
     }
@@ -489,148 +276,15 @@ updateTestWater(float pos) {
                 grandom(WATER_PFEILUNG/2, WATER_PFEILUNG) * 0.5f);
         int yPos = int(float(gSimulationHeight/ 2) + (2 - i) * grandom(0, waterRandomY1) + 
                 grandom(-waterRandomY2, waterRandomY2));
-//AC_DEBUG << i << "#" << endl;
-//AC_DEBUG << "x= " << xPos << "  y= " << yPos << endl;
         gWaterSimulation->sinoidSplash(xPos, yPos, 
                 int( gTestWaterDropIntensity * grandom(gSplashIntensityFactor*.5, gSplashIntensityFactor)), 
                 int( gTestWaterDropSize * grandom(gSplashRadiusFactor*.5, gSplashRadiusFactor*1.5)));
     }
 }
 
-/*
-void
-updateTestWater(float pos) {
-
-    AC_DEBUG << "updateTestWater( " << pos << " )" << endl;
-    if (!gWaterSimulation) {
-        return;
-    }
-   
-    static int runCount = -1;
-    
-    for (int i=-1; i < 2; i++) {
-//        int xPos = int(10240 * (1.f - pos));
-//        int yPos = 5000 + i * 2500;
-        int xPos = (int)(160 * (1.f - pos)) + i * i * 17;
-        int yPos = 60 + i * 30 + runCount * i * 23 - runCount * i * 7;
-        gWaterSimulation->sinoidSplash(xPos, yPos, gSplashIntensityFactor, 
-                gSplashRadiusFactor);
-    }
-    runCount++;
-    if (runCount > 1) {
-        runCount = -1;
-    }
-}
-*/
-
-#if 0
-
-const int WATER_OBJECT = 10;
-const int WATER_TEXTURE_ID = 100;
-void
-createTestWater() {
-    if (gWaterRepresentation) {
-        gSceneObject[WATER_OBJECT]._classID = SceneSyncMaster::SceneObject::Marker;
-        gSceneObject[WATER_OBJECT]._objectID = WATER_OBJECT;
-        gSceneObject[WATER_OBJECT]._fileClassID = WaterRepresentation::puzzlemaps;
-        gSceneObject[WATER_OBJECT]._fileObjectID = WATER_TEXTURE_ID;
-        //gSceneObject[WATER_OBJECT]._xPos = 1024;
-        //gSceneObject[WATER_OBJECT]._yPos = 10000;
-        gSceneObject[WATER_OBJECT]._zPos = 100; //  0 is directly at water surface
-        //            gSceneObject[i]._zPos = 220; // above ice/surface (above 210)
-        gSceneObject[WATER_OBJECT]._xSize = 6000;
-        gSceneObject[WATER_OBJECT]._ySize = 32767;
-        gSceneObject[WATER_OBJECT]._zSize = 0;
-        gSceneObject[WATER_OBJECT]._heading = 900; // short(random(0., 3600));
-
-        gWaterRepresentation->setSceneObjects(gSceneObject);
-    }
-}
-
-void
-clearTestWater() {
-    if (gWaterRepresentation) {
-        gSceneObject[WATER_OBJECT]._classID = SceneSyncMaster::SceneObject::NoObject;
-        gWaterRepresentation->setSceneObjects(gSceneObject);
-    }
-}
-
-void
-updateTestWater(float pos) {
-    if (gWaterRepresentation) {
-        
-        gSceneObject[WATER_OBJECT]._xPos = int(10240 * (1.f - pos));
-        gSceneObject[WATER_OBJECT]._yPos = 5000;
-        gSceneObject[WATER_OBJECT]._pitch = int(pos * 10000.);
-        
-        gWaterRepresentation->setSceneObjects(gSceneObject);
-    }    
-}
-#endif
-
-#endif
-
-
-/*
-void
-updateObjects(int currentFrame, const SceneSyncMaster::SceneSyncPacket & mySyncPacket) {
-    for (int i=0; i< SceneSyncMaster::NUM_FILE_OBJECTS; i++) {
-        
-        gFileObject[i] = mySyncPacket._fileObject[i];
-//AC_DEBUG << i << ":\n##################### C " << theNewSyncPacket->_fileObject[i]._fileClassID<<endl;
-//AC_DEBUG << "##################### I " << theNewSyncPacket->_fileObject[i]._fileID << endl;
-        if ((gFileObject[i]._fileClassID == SceneSyncMaster::FileObject::GroundTexture) && 
-            (gWaterRepresentation)) 
-        {
-            //TODO: shall be activateTexture and not activateTextureIndex
-            gWaterRepresentation->activateTexture(WaterRepresentation::floormaps,gFileObject[i]._fileID);
-        }
-        if ((gFileObject[i]._fileClassID == SceneSyncMaster::FileObject::CubeMap) && 
-            (gWaterRepresentation)) 
-        {
-            //gWaterRepresentation->activateCubeTextureIndex(gFileObject[i]._fileID);
-            //TODO: shall be activateTexture and not activateTextureIndex
-            gWaterRepresentation->activateTexture(WaterRepresentation::cubemaps,gFileObject[i]._fileID);
-        }
-        if ((gFileObject[i]._fileClassID == SceneSyncMaster::FileObject::SurfaceTexture) && 
-            (gWaterRepresentation)) 
-        {
-            //gWaterRepresentation->activateCubeTextureIndex(gFileObject[i]._fileID);
-            //TODO: shall be activateTexture and not activateTextureIndex
-            gWaterRepresentation->activateTexture(WaterRepresentation::surfacemaps,gFileObject[i]._fileID);
-        }
-    }
-    for (int i=0; i< SceneSyncMaster::NUM_SCENE_OBJECTS; i++) {
-        //AC_DEBUG << "scene object " << i << "\t posx: " << mySyncPacket._sceneObject[i]._xPos << "\t posy: " 
-        //     << mySyncPacket._sceneObject[i]._yPos << endl;
-        
-        gSceneObject[i] = mySyncPacket._sceneObject[i];
-    }
-
-    if (gTestMarker) {
-        createTestMarker();
-    }
-#ifdef TEST_WATER       
-    if (gTestWater) {
-        createTestWater();
-    }
-#endif    
-    if (gWaterRepresentation) {
-        gWaterRepresentation->setSceneObjects(gSceneObject);
-    }
-}
-    */
-
 void
 handleResetCommand() {
     gWaterSimulation->reset();
-    //water_module::gWaterRepresentation->clearCracks();
-
-/*
-    while (gEventList.size() > 0) {
-        gEventList.erase(&gEventList[0]);
-    }
-    */
 }
 
 
@@ -648,28 +302,6 @@ periodic(double theRunningTime,
         int currentFrame = gLastFrame + 1;
         //AC_DEBUG << "current frame= " << currentFrame << "  ==========================\n";
 
-/*
-        if (theNewSyncPacket->_header._packetNumber > (gLastFrame + 1)) {
-            AC_DEBUG << "MISSED FRAMES (UDP packets): " << (theNewSyncPacket->_header._packetNumber - 
-                    (gLastFrame + 1)) << endl;
-        }
-        if (theNewSyncPacket->_sceneCmd == SceneSyncMaster::SceneSyncPacket::RESET_CMD) {
-            gWaterSimulation->reset();
-            gWaterRepresentation->clearCracks();
-            
-            while (gEventList.size() > 0) {
-                gEventList.erase(&gEventList[0]);
-            }
-        }
-        bool showSurface = (theNewSyncPacket->_moduleIntParam & 1);
-        gEnableSurfaceCracks = (theNewSyncPacket->_moduleIntParam & 2);
-        bool resetWater = (theNewSyncPacket->_moduleIntParam & 4);
-        bool freezeWater = (theNewSyncPacket->_moduleIntParam & 8);
-        bool freeWater = (theNewSyncPacket->_moduleIntParam & 16);
-        bool testWater = (theNewSyncPacket->_moduleIntParam & 32);
-        bool specialDampWater = (theNewSyncPacket->_moduleIntParam & 64);
-        
-*/        
         // XXX dunno yet
         bool showSurface = false; //(theNewSyncPacket->_moduleIntParam & 1);
         gEnableSurfaceCracks = false; //(theNewSyncPacket->_moduleIntParam & 2);
@@ -686,14 +318,6 @@ periodic(double theRunningTime,
             gTestWater = testWater;
         }
 
-        /*
-        if (theNewSyncPacket->_moduleFloatParam >= 0.f) {
-            gSurfaceOpacity = theNewSyncPacket->_moduleFloatParam;
-            AC_DB2("INFO: WaterAppModule::periodic() remote is setting ice opacity to " 
-                    << gSurfaceOpacity);
-        }
-        */
-        
         if (gWaterRepresentation) {
             gWaterRepresentation->enableSurface(showSurface);
             gWaterRepresentation->setSurfaceOpacity(gSurfaceOpacity);
@@ -721,12 +345,7 @@ periodic(double theRunningTime,
                 gWaterSimulation->setDefaultDampingCoefficient(gWaterDamping);
             }
         }
-        //extractEvents(currentFrame, *theNewSyncPacket, gEventList);
         gWaterSimulation->sinoidSplash(100, 100, 5, 50); // XXX
-        //handleEvents(currentFrame, gEventList);
-        //updateObjects(currentFrame, *theNewSyncPacket);
-
-        //gLastFrame = theNewSyncPacket->_header._packetNumber;
         gLastFrame += 1; // XXX
 
     }
@@ -822,13 +441,6 @@ generateSplash(float theIntensity, int splashX, int splashY) {
                 float directionX = random(-10, +10);
                 float directionY = random(-10, +10);
 
-                /*
-                gWaterRepresentation->addCrack(intensity, Vec2(splashX, splashY),
-                        Vec2(directionX, directionY),
-                        gNumSegmentsPerCrack, 
-                        (1. + theIntensity) * gCrackSegmentSize, 
-                        gCrackVariation);
-                */
             }
         }
     } 
@@ -893,19 +505,7 @@ setWaterProjection() {
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 
-/*
-    float   left = -((float)(gDisplayWidth)) / 2.f;
-    float   right = ((float)gDisplayWidth) / 2.f-1.f;
-    float   top = -((float)gDisplayHeight) / 2.f;
-    float   bottom = ((float)gDisplayHeight) / 2.f;
-*/    
 #if 1
-/*
-    float   left = (-((float)(gDisplayWidth)) / 2.f);
-    float   right = (((float)gDisplayWidth) / 2.f-1.f);
-    float   top = (-((float)gDisplayHeight) / 2.f);
-    float   bottom = (((float)gDisplayHeight) / 2.f);
-*/    
     float   left = (-((float)(gDisplayWidth)) / 2.f) + gDisplayOffsetX;
     float   right = (((float)gDisplayWidth) / 2.f-1.f) + gDisplayOffsetX;
     float   top = (-((float)gDisplayHeight) / 2.f) + gDisplayOffsetY;
@@ -956,8 +556,6 @@ display() {
     glRotatef(rotz, 0.,0.,1.);
 
     glColor4f(1, 1, 1, 1);
-
-    //glutWireTeapot(1.);
 
     assert(gWaterRepresentation);
     
@@ -1083,14 +681,14 @@ loadTexturesFromConfig(const dom::Node & theConfig, WaterRepresentation::Texture
             assert(loadOK);
         }
     } catch (const asl::Exception & ex) {
-        AC_DEBUG << "#ERROR: Water:: in loadTexturesFromConfig():" << endl;
-        AC_DEBUG << ex.what() << " AT " << ex.where() << endl;
-        AC_DEBUG << "Aborting" << endl;
+        AC_ERROR << "Water:: in loadTexturesFromConfig():" << endl;
+        AC_ERROR << ex.what() << " AT " << ex.where() << endl;
+        AC_ERROR << "Aborting" << endl;
         exit(1);
     }
     catch (...) {
-        AC_DEBUG << "#ERROR: Water:: in loadTexturesFromConfig():" << endl;
-        AC_DEBUG << "Aborting" << endl;
+        AC_ERROR << "#ERROR: Water:: in loadTexturesFromConfig():" << endl;
+        AC_ERROR << "Aborting" << endl;
         exit(1);
     }
 }
@@ -1212,15 +810,6 @@ initWindow() {
 	gWaterRepresentation->activateTextureIndex(WaterRepresentation::cubemaps,0);
 	gWaterRepresentation->activateTextureIndex(WaterRepresentation::surfacemaps,0);
    
-    
-    if (gTestMarker) {
-        createTestMarker();
-    }
-#ifdef TEST_WATER   
-    if (gTestWater) {
-        createTestWater();
-    }
-#endif      
     AC_DEBUG << ("water_module::initWindow finished");
 }
 
@@ -1243,7 +832,6 @@ activate() {
         gWaterSimulation->resetDamping();
     }
     if (gWaterRepresentation) {
-        //gWaterRepresentation->clearCracks();
         gWaterRepresentation->setDefaultGLState();
     }
 }
@@ -1316,29 +904,29 @@ timeSimulation() {
 void
 printParameters() {
 
-    AC_DEBUG << "============================\n";
-    AC_DEBUG << "gTimeStep = " << gTimeStep << endl;
-    AC_DEBUG << "gDrawReflection is " << (int) gDrawReflection << endl;
-    AC_DEBUG << "gDrawRefraction is " << (int) gDrawRefraction << endl;
-    AC_DEBUG << "gDrawCaustics is " << (int)gDrawCaustics << endl;
-    AC_DEBUG << "ReflectionAlphaBias = " << 
+    AC_PRINT << "============================\n";
+    AC_PRINT << "gTimeStep = " << gTimeStep << endl;
+    AC_PRINT << "gDrawReflection is " << (int) gDrawReflection << endl;
+    AC_PRINT << "gDrawRefraction is " << (int) gDrawRefraction << endl;
+    AC_PRINT << "gDrawCaustics is " << (int)gDrawCaustics << endl;
+    AC_PRINT << "ReflectionAlphaBias = " << 
         gWaterRepresentation->getReflectionAlphaBias() << endl;
-    AC_DEBUG << "ReflectionAlphaScale = " << 
+    AC_PRINT << "ReflectionAlphaScale = " << 
         gWaterRepresentation->getReflectionAlphaScale() << endl;
 
 
-    AC_DEBUG << "RefractionScale = " << 
+    AC_PRINT << "RefractionScale = " << 
         gWaterRepresentation->getRefractionScale() << endl;
-    AC_DEBUG << "CausticBias= " << 
+    AC_PRINT << "CausticBias= " << 
         gWaterRepresentation->getCausticBias() << endl;
-    AC_DEBUG << "CausticScale= " << 
+    AC_PRINT << "CausticScale= " << 
         gWaterRepresentation->getCausticScale() << endl;
-    AC_DEBUG << "CausticSqrScale= " << 
+    AC_PRINT << "CausticSqrScale= " << 
         gWaterRepresentation->getCausticSqrScale() << endl;
-    AC_DEBUG << "CausticNegativeScale= " << 
+    AC_PRINT << "CausticNegativeScale= " << 
         gWaterRepresentation->getCausticNegativeScale() << endl;
-    AC_DEBUG << "NumIntegrationsPerFrame= " << gNumIntegrationsPerFrame << endl;
-    AC_DEBUG << "============================\n";
+    AC_PRINT << "NumIntegrationsPerFrame= " << gNumIntegrationsPerFrame << endl;
+    AC_PRINT << "============================\n";
 
 }
 
@@ -1366,11 +954,11 @@ keyboard( unsigned char key, int x, int y ) {
             break;
         case '*':
             gTimeStep *=1.2;
-            AC_DEBUG << "gTimeStep now " << gTimeStep << endl;
+            AC_PRINT << "gTimeStep now " << gTimeStep << endl;
             break;
         case '+':
             gTimeStep /=1.2;
-            AC_DEBUG << "gTimeStep now " << gTimeStep << endl;
+            AC_PRINT << "gTimeStep now " << gTimeStep << endl;
             break;
         case '<': 
             {
@@ -1380,7 +968,7 @@ keyboard( unsigned char key, int x, int y ) {
                     refractionScale= 0.01f;
                 }
                 gWaterRepresentation->setRefractionScale(refractionScale);
-                AC_DEBUG << "refractionScale now " << refractionScale << endl;
+                AC_PRINT << "refractionScale now " << refractionScale << endl;
             }
             break;
         case '>': 
@@ -1394,7 +982,7 @@ keyboard( unsigned char key, int x, int y ) {
                     refractionScale= 10.f;
                 }
                 gWaterRepresentation->setRefractionScale(refractionScale);
-                AC_DEBUG << "refractionScale now " << refractionScale << endl;
+                AC_PRINT << "refractionScale now " << refractionScale << endl;
             }
             break;
         case 'A':
@@ -1409,7 +997,7 @@ keyboard( unsigned char key, int x, int y ) {
                     reflectionAlphaBias = 1.f;
                 }
                 gWaterRepresentation->setReflectionAlphaBias(reflectionAlphaBias);
-                AC_DEBUG << "reflectionAlphaBias now " << reflectionAlphaBias << endl;
+                AC_PRINT << "reflectionAlphaBias now " << reflectionAlphaBias << endl;
             }
             break;
         case 'a':
@@ -1421,7 +1009,7 @@ keyboard( unsigned char key, int x, int y ) {
                     reflectionAlphaBias = 0.f;
                 }
                 gWaterRepresentation->setReflectionAlphaBias(reflectionAlphaBias);
-                AC_DEBUG << "reflectionAlphaBias now " << reflectionAlphaBias << endl;
+                AC_PRINT << "reflectionAlphaBias now " << reflectionAlphaBias << endl;
             }
             break;
         case 'S':
@@ -1435,7 +1023,7 @@ keyboard( unsigned char key, int x, int y ) {
                     reflectionAlphaScale = 2.f;
                 }
                 gWaterRepresentation->setReflectionAlphaScale(reflectionAlphaScale);
-                AC_DEBUG << "reflectionAlphaScale now " << reflectionAlphaScale << endl;
+                AC_PRINT << "reflectionAlphaScale now " << reflectionAlphaScale << endl;
             }
             break;
         case 's':
@@ -1446,7 +1034,7 @@ keyboard( unsigned char key, int x, int y ) {
                     reflectionAlphaScale = 0.f;
                 }
                 gWaterRepresentation->setReflectionAlphaScale(reflectionAlphaScale);
-                AC_DEBUG << "reflectionAlphaScale now " << reflectionAlphaScale << endl;
+                AC_PRINT << "reflectionAlphaScale now " << reflectionAlphaScale << endl;
             }
             break;
 
@@ -1459,7 +1047,7 @@ keyboard( unsigned char key, int x, int y ) {
                     causticBias = 0.01f;
                 }
                 gWaterRepresentation->setCausticBias(causticBias);
-                AC_DEBUG << "causticBias now " << causticBias<< endl;
+                AC_PRINT << "causticBias now " << causticBias<< endl;
             }
             break;
         case 'M': 
@@ -1473,7 +1061,7 @@ keyboard( unsigned char key, int x, int y ) {
                     causticBias= 5.f;
                 }
                 gWaterRepresentation->setCausticBias(causticBias);
-                AC_DEBUG << "causticBias now " << causticBias << endl;
+                AC_PRINT << "causticBias now " << causticBias << endl;
             }
             break;
 
@@ -1485,7 +1073,7 @@ keyboard( unsigned char key, int x, int y ) {
                     causticScale= 0.01f;
                 }
                 gWaterRepresentation->setCausticScale(causticScale);
-                AC_DEBUG << "causticScaleSqr now " << causticScale<< endl;
+                AC_PRINT << "causticScaleSqr now " << causticScale<< endl;
             }
             break;
         case ';': 
@@ -1499,7 +1087,7 @@ keyboard( unsigned char key, int x, int y ) {
                     causticScale= 10.f;
                 }
                 gWaterRepresentation->setCausticScale(causticScale);
-                AC_DEBUG << "causticScale now " << causticScale<< endl;
+                AC_PRINT << "causticScale now " << causticScale<< endl;
             }
             break;
 
@@ -1511,7 +1099,7 @@ keyboard( unsigned char key, int x, int y ) {
                     causticSqrScale= 0.01f;
                 }
                 gWaterRepresentation->setCausticSqrScale(causticSqrScale);
-                AC_DEBUG << "causticSqrScale now " << causticSqrScale<< endl;
+                AC_PRINT << "causticSqrScale now " << causticSqrScale<< endl;
             }
             break;
         case ':': 
@@ -1525,7 +1113,7 @@ keyboard( unsigned char key, int x, int y ) {
                     causticSqrScale= 10.f;
                 }
                 gWaterRepresentation->setCausticSqrScale(causticSqrScale);
-                AC_DEBUG << "causticSqrScale now " << causticSqrScale<< endl;
+                AC_PRINT << "causticSqrScale now " << causticSqrScale<< endl;
             }
             break;
 
@@ -1537,7 +1125,7 @@ keyboard( unsigned char key, int x, int y ) {
                     causticNegativeScale= 0.01f;
                 }
                 gWaterRepresentation->setCausticNegativeScale(causticNegativeScale);
-                AC_DEBUG << "causticNegativeScalenow " << causticNegativeScale<< endl;
+                AC_PRINT << "causticNegativeScalenow " << causticNegativeScale<< endl;
             }
             break;
         case '_': 
@@ -1551,7 +1139,7 @@ keyboard( unsigned char key, int x, int y ) {
                     causticNegativeScale= 10.f;
                 }
                 gWaterRepresentation->setCausticNegativeScale(causticNegativeScale);
-                AC_DEBUG << "causticNegativeScale now " << causticNegativeScale<< endl;
+                AC_PRINT << "causticNegativeScale now " << causticNegativeScale<< endl;
             }
             break;
 
@@ -1559,13 +1147,13 @@ keyboard( unsigned char key, int x, int y ) {
             if (gNumIntegrationsPerFrame>1) {
                 gNumIntegrationsPerFrame = gNumIntegrationsPerFrame - 1;
             }
-            AC_DEBUG << "Num integrations per frame: " << gNumIntegrationsPerFrame << endl;
+            AC_PRINT << "Num integrations per frame: " << gNumIntegrationsPerFrame << endl;
             break;
         case ')':
             if (gNumIntegrationsPerFrame<40) {
                 gNumIntegrationsPerFrame = gNumIntegrationsPerFrame + 1;
             }
-            AC_DEBUG << "Num integrations per frame: " << gNumIntegrationsPerFrame << endl;
+            AC_PRINT << "Num integrations per frame: " << gNumIntegrationsPerFrame << endl;
             break;
         case 'i':
             gWaterSimulation->reset();
@@ -1578,7 +1166,7 @@ keyboard( unsigned char key, int x, int y ) {
             gWaterSimulation->resetDamping(true);
             break;
         case 'I':
-            AC_DEBUG << "Resetting simulation parameters!\n";
+            AC_PRINT << "Resetting simulation parameters!\n";
             gWaterRepresentation->resetParameters();
             break;
         case 'p':
@@ -1587,25 +1175,25 @@ keyboard( unsigned char key, int x, int y ) {
         case 'r':
             gDrawReflection = !gDrawReflection;
             gWaterRepresentation->setDrawReflections(gDrawReflection);
-            AC_DEBUG << "gDrawReflection is " << (int) gDrawReflection << endl;
+            AC_PRINT << "gDrawReflection is " << (int) gDrawReflection << endl;
             break;
         case 'R':
             gDrawRefraction = !gDrawRefraction;
             gWaterRepresentation->setDrawRefractions(gDrawRefraction);
-            AC_DEBUG << "gDrawRefraction is " << (int) gDrawRefraction << endl;
+            AC_PRINT << "gDrawRefraction is " << (int) gDrawRefraction << endl;
             break;
         case 'c':
             gDrawCaustics = !gDrawCaustics;
             gWaterRepresentation->setDrawCaustics(gDrawCaustics);
-            AC_DEBUG << "gDrawCaustics is " << (int)gDrawCaustics << endl;
+            AC_PRINT << "gDrawCaustics is " << (int)gDrawCaustics << endl;
             break;
         case '#':
             gRunSimulation= !gRunSimulation;
-            AC_DEBUG << "gRunSimulation is " << (int) gRunSimulation << endl;
+            AC_PRINT << "gRunSimulation is " << (int) gRunSimulation << endl;
             break;
         case 'o':
             gUseSeparateThread= !gUseSeparateThread;
-            AC_DEBUG << "gUseSeparateThread is " << (int) gUseSeparateThread << endl;
+            AC_PRINT << "gUseSeparateThread is " << (int) gUseSeparateThread << endl;
             break;
         case 'C':
             gDrawCrackField = !gDrawCrackField;
@@ -1622,8 +1210,8 @@ keyboard( unsigned char key, int x, int y ) {
             break;
         default:
             if (key >= '0' && key <= '9') {
-                //AC_DEBUG << "ox= " << ox << endl;
-                //AC_DEBUG << "oy= " << oy << endl;
+                //AC_PRINT << "ox= " << ox << endl;
+                //AC_PRINT << "oy= " << oy << endl;
              
                 gKeyIntensity = float(key - '0') / 9.;
                 generateSplash(gKeyIntensity, gMousePositionX, gMousePositionY);
@@ -1672,26 +1260,6 @@ handleSpecialKeys( int key, int x, int y ) {
             gWaterRepresentation->enableSurface(true);
             gCrackVariation += 0.2;
             break;
-
-        case GLUT_KEY_F9:
-            gTestMarker = !gTestMarker;
-            if (gTestMarker) {
-                createTestMarker();
-            } else {
-                clearTestMarker();
-            }
-            break;
-#ifdef TEST_WATER   
-        case GLUT_KEY_F10:
-            gTestWater = !gTestWater;
-            if (gTestWater) {
-                gTestWaterRunTime = 0.f;
-                createTestWater();
-            } else {
-                clearTestWater();
-            }
-            break;
-#endif
         default:
             return false;
     }
@@ -1849,31 +1417,31 @@ main(asl::Arguments & ourArguments) {
         gUseSeparateThread = ourArguments.haveOption("--multithread");
 #endif        
 
-        AC_DEBUG << "\nWater Keyboard Control:" << endl;
-        AC_DEBUG << " ESC = exit" << endl;
-        AC_DEBUG << " t   = time the simulation algorithm performance" << endl;
-        AC_DEBUG << " u   = toggle sync over UDP" << endl;
-        AC_DEBUG << "\nSimulation Parameters:\n" << endl;
-        AC_DEBUG << " #   = toggle simulation" << endl;
-        AC_DEBUG << " i   = reset water simulation" << endl;
-        AC_DEBUG << "\nGraphics Parameters:\n" << endl;
-        AC_DEBUG << " w   = toggle wireframe" << endl;
-        AC_DEBUG << " SPC = reset view\n" << endl;
-        AC_DEBUG << " p   = print parameters" << endl;
-        AC_DEBUG << " r   = toggle reflections" << endl;
-        AC_DEBUG << " R   = toggle refractions" << endl;
-        AC_DEBUG << " c   = toggle caustics" << endl;
-        AC_DEBUG << " */+ = increment/decrement timestep" << endl;
-        AC_DEBUG << " </> = decrement/decrement refraction scale" << endl;
-        AC_DEBUG << " A/s = increment/decrement alpha bias" << endl;
-        AC_DEBUG << " S/s = increment/decrement alpha scale" << endl;
-        AC_DEBUG << " M/m = increment/decrement caustic bias" << endl;
-        AC_DEBUG << " ,/; = increment/decrement caustic scale" << endl;
-        AC_DEBUG << " :/. = increment/decrement caustic square scale" << endl;
-        AC_DEBUG << " _/- = increment/decrement caustic negative scale" << endl;
-        AC_DEBUG << " (/) = decrement/increment num iterations per frame" << endl;
-        AC_DEBUG << " I   = reset water representation" << endl;
-        AC_DEBUG << "\n\n";
+        AC_PRINT << "\nWater Keyboard Control:" << endl;
+        AC_PRINT << " ESC = exit" << endl;
+        AC_PRINT << " t   = time the simulation algorithm performance" << endl;
+        AC_PRINT << " u   = toggle sync over UDP" << endl;
+        AC_PRINT << "\nSimulation Parameters:\n" << endl;
+        AC_PRINT << " #   = toggle simulation" << endl;
+        AC_PRINT << " i   = reset water simulation" << endl;
+        AC_PRINT << "\nGraphics Parameters:\n" << endl;
+        AC_PRINT << " w   = toggle wireframe" << endl;
+        AC_PRINT << " SPC = reset view\n" << endl;
+        AC_PRINT << " p   = print parameters" << endl;
+        AC_PRINT << " r   = toggle reflections" << endl;
+        AC_PRINT << " R   = toggle refractions" << endl;
+        AC_PRINT << " c   = toggle caustics" << endl;
+        AC_PRINT << " */+ = increment/decrement timestep" << endl;
+        AC_PRINT << " </> = decrement/decrement refraction scale" << endl;
+        AC_PRINT << " A/s = increment/decrement alpha bias" << endl;
+        AC_PRINT << " S/s = increment/decrement alpha scale" << endl;
+        AC_PRINT << " M/m = increment/decrement caustic bias" << endl;
+        AC_PRINT << " ,/; = increment/decrement caustic scale" << endl;
+        AC_PRINT << " :/. = increment/decrement caustic square scale" << endl;
+        AC_PRINT << " _/- = increment/decrement caustic negative scale" << endl;
+        AC_PRINT << " (/) = decrement/increment num iterations per frame" << endl;
+        AC_PRINT << " I   = reset water representation" << endl;
+        AC_PRINT << "\n\n";
 
 
         if (ourArguments.haveOption("--simulation-width")) {
@@ -1917,87 +1485,86 @@ main(asl::Arguments & ourArguments) {
             string configFile = asl::as<string>(ourArguments.getOptionArgument("--water-xml-config"));
             string theDocumentFile = asl::readFile(configFile);
             if (theDocumentFile.length() == 0) {
-                AC_DEBUG << "WaterAppModule: could not find xml file " << configFile << endl;
+                AC_PRINT << "WaterAppModule: could not find xml file " << configFile << endl;
             }
             gConfig = dom::Document(theDocumentFile);
             cerr << gConfig;
             if (!gConfig) {
-                AC_DEBUG << "WaterAppModule: could not parse xml file" << configFile  << endl;
+                AC_PRINT << "WaterAppModule: could not parse xml file" << configFile  << endl;
             }
 //AC_DEBUG << gConfig << endl;       
         } else {
-            AC_DEBUG << "##WARNING: WaterAppModule: no xml configuration file sprecified" << endl;
+            AC_WARNING << "WaterAppModule: no xml configuration file sprecified" << endl;
 
         }
         gDrawWireframe = ourArguments.haveOption("--wireframe");
-        gTestMarker = ourArguments.haveOption("--test-marker");
 #ifdef TEST_WATER   
         gTestWater = ourArguments.haveOption("--test-water");
 #endif
         gFreezeWater = ourArguments.haveOption("--freeze-water");
     }
     catch (const asl::Exception & ex) {
-        AC_DEBUG << "Water::Internal error in parameter handling:" << endl;
-        //AC_DEBUG << ex.what() << " AT " << ex.where << endl;
-        AC_DEBUG << "Aborting" << endl;
+        AC_ERROR << "Water::Internal error in parameter handling:" << endl;
+        //AC_ERROR << ex.what() << " AT " << ex.where << endl;
+        AC_ERROR << "Aborting" << endl;
         exit(1);
     }
 
-    AC_DEBUG << "\nSimulation configuration:\n";
-    AC_DEBUG << "==========================\n";
-    AC_DEBUG << "simulation-width    (W+2) = " << gSimulationWidth << endl;
-    AC_DEBUG << "simulation-height   (H+2) = " << gSimulationHeight << endl;
-    AC_DEBUG << "simulation-offset-x ( >0) = " << gSimulationOffsetX << endl;
+    AC_PRINT << "\nSimulation configuration:\n";
+    AC_PRINT << "==========================\n";
+    AC_PRINT << "simulation-width    (W+2) = " << gSimulationWidth << endl;
+    AC_PRINT << "simulation-height   (H+2) = " << gSimulationHeight << endl;
+    AC_PRINT << "simulation-offset-x ( >0) = " << gSimulationOffsetX << endl;
     if (gSimulationOffsetX <= 0) {
         gSimulationOffsetX = 1;
-        AC_DEBUG << "simulation-offset-x CORRECTED TO = " << gSimulationOffsetX << endl;
+        AC_WARNING << "simulation-offset-x CORRECTED TO = " << gSimulationOffsetX << endl;
     }
     
-    AC_DEBUG << "simulation-offset-y ( >0) = " << gSimulationOffsetY << endl;
+    AC_PRINT << "simulation-offset-y ( >0) = " << gSimulationOffsetY << endl;
     if (gSimulationOffsetY <= 0) {
         gSimulationOffsetY = 1;
-        AC_DEBUG << "simulation-offset-y CORRECTED TO = " << gSimulationOffsetY << endl;
+        AC_WARNING << "simulation-offset-y CORRECTED TO = " << gSimulationOffsetY << endl;
     }
-    AC_DEBUG << "display-width       = " << gDisplayWidth << endl;
+    AC_PRINT << "display-width       = " << gDisplayWidth << endl;
     if ((gDisplayWidth <= 0) || (gDisplayWidth > gSimulationWidth)) {
         gDisplayWidth = gSimulationWidth-gSimulationOffsetX-1;
-        AC_DEBUG << "display-width CORRECTED TO = " << gDisplayWidth << endl;
+        AC_WARNING << "display-width CORRECTED TO = " << gDisplayWidth << endl;
     }
-    AC_DEBUG << "display-height      = " << gDisplayHeight << endl;
+    AC_PRINT << "display-height      = " << gDisplayHeight << endl;
     if ((gDisplayHeight <= 0) || (gDisplayHeight > gSimulationHeight)) {
         gDisplayHeight = gSimulationHeight-gSimulationOffsetY-1;
-        AC_DEBUG << "display-height CORRECTED TO = " << gDisplayHeight << endl;
+        AC_WARNING << "display-height CORRECTED TO = " << gDisplayHeight << endl;
     }
 
     assert(gSimulationWidth - (gSimulationOffsetX + gDisplayWidth) >= 1);
     assert(gSimulationHeight - (gSimulationOffsetY + gDisplayHeight) >= 1);
     
-    AC_DEBUG << "display-offset-x    = " << gDisplayOffsetX << endl;
-    AC_DEBUG << "display-offset-y    = " << gDisplayOffsetY << endl;
-    AC_DEBUG << endl;
+    AC_PRINT << "display-offset-x    = " << gDisplayOffsetX << endl;
+    AC_PRINT << "display-offset-y    = " << gDisplayOffsetY << endl;
+    AC_PRINT << endl;
     
     try {
         //initialize the scene and objects
         if (gConfig) {
             if (!initScene(gConfig("renderslave-config"))) {
-                AC_DEBUG << "Internal error in initScene(gConfig)" << endl;
+                AC_ERROR << "Internal error in initScene(gConfig)" << endl;
                 return -1;
             }
         } else if (! initScene(gConfig) ) {
-            AC_DEBUG << "Internal error in initScene(NULL):" << endl;
+            AC_ERROR << "Internal error in initScene(NULL):" << endl;
             return -1;
         }
         return 0;
     }
     catch (const asl::Exception & ex) {
-        AC_DEBUG << "Water:: Internal error in initScene():" << endl;
-        AC_DEBUG << ex.what() << " AT " << ex.where() << endl;
-        AC_DEBUG << "Aborting" << endl;
+        AC_ERROR << "Water:: Internal error in initScene():" << endl;
+        AC_ERROR << ex.what() << " AT " << ex.where() << endl;
+        AC_ERROR << "Aborting" << endl;
         exit(1);
     }
     catch (...) {
-        AC_DEBUG << "Water:: unidentified internal error in initScene():" << endl;
-        AC_DEBUG << "Aborting" << endl;
+        AC_ERROR << "Water:: unidentified internal error in initScene():" << endl;
+        AC_ERROR << "Aborting" << endl;
         exit(1);
     }
     return -1;
@@ -2127,9 +1694,6 @@ WaterAppModule::deactivate() {
     AC_DEBUG << ("WaterAppModule::deactivate()");
     return true; 
 }
-
-
-
 
 }; // namespace video
 

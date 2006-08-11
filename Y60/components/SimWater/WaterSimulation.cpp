@@ -1,14 +1,13 @@
-//=============================================================================
+//============================================================================
 //
-// Copyright (C) 2000-2002, ART+COM AG Berlin
-//
+// Copyright (C) 2002-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-
+//============================================================================
 
 #include <stdio.h>
 #include <iostream>
@@ -23,7 +22,6 @@
 
 #include "WaterSimulation.h"
 #include <asl/ThreadSemaphore.h>
-//#include <asl/ThreadSemFactory.h>
 
 using namespace std;  // automatically added!
 
@@ -411,18 +409,10 @@ WaterSimulation::simulationMultiStepInThread(asl::ThreadSemaphore & threadLock, 
     // now executing computeThread
 }
 
-
-
-
-
-
-
-
 void
 WaterSimulation::switchBuffers() {
     _currentBuffer = 1 - _currentBuffer;
 }
-
 
 void 
 WaterSimulation::parabolicSplash(int xpos, int ypos, int magnitude, int radius) {

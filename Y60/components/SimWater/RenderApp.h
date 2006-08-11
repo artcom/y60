@@ -1,26 +1,13 @@
-// ----------------------------------------------------------------------------
+//============================================================================
 //
-// Copyright (C) 2002-2002, ART+COM AG Berlin
+// Copyright (C) 2002-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//
-// ----------------------------------------------------------------------------
-//
-// Name: viewCompressedTex
-//
-// Purpose:
-//
-// $RCSfile: RenderApp.h,v $
-// $Revision: 1.2 $
-// $Date: 2002/09/06 18:17:28 $
-// $Author: valentin $
-//
-// ----------------------------------------------------------------------------
-
+//============================================================================
 
 #ifndef AC_Y60_RENDER_APP_INCLUDED
 #define AC_Y60_RENDER_APP_INCLUDED
@@ -72,7 +59,6 @@ public:
     virtual void    handlePeriodic(); 
     virtual void    handleVisible(bool isVisible);
     virtual void    handleSpecialKeys(int key, int x, int y);
-    virtual void    handleSceneCommand(int theSceneCommand);
 
     bool    getVerbose() const 
     { return _verbose; }
@@ -92,20 +78,8 @@ public:
     double  getStartTime() const
     { return _startTime; }
 
-    /*
-    SceneSyncMaster::SceneSyncPacket &  getCurrentSyncPacket()
-    { return _currentSyncPacket; }
-    
-    SceneSyncMaster::SceneSyncPacket &  getNewSyncPacket()
-    { return _newSyncPacket; }
-    
-    SceneSyncSlave *                    getSyncSlave() {
-        return _syncSlave;
-    }
-    */
-    bool                                isRemotelyControlled() const {
+    bool isRemotelyControlled() const {
         return false;
-        //return (_syncSlave != 0);
     }
 
 
@@ -127,9 +101,6 @@ private:
     
     static RenderApp *_instance;
     
-    //EdgeBlender         _edgeBlender;
-    //ColorCorrection33   _colorCorrection;
-
     RenderModuleMap     _renderModules;
     IRenderAppModule *  _currentRenderModule;
     
@@ -153,9 +124,6 @@ private:
                         _blueValue, _alphaValue;
     std::string              _colorCorrectionFileName;
                             
-    //SceneSyncMaster::SceneSyncPacket    _currentSyncPacket;
-    //SceneSyncMaster::SceneSyncPacket    _newSyncPacket;
-    //SceneSyncSlave *                    _syncSlave;
     double                              _fps;
     asl::Time                           _startTime;
     bool                                _showCursor;
@@ -172,8 +140,6 @@ private:
 
     void    printUsage();
 
-    //void    setGamma(EdgeBlender::BORDER border, float gamma);
-
     void    registerGlutCallbacks();
 
     // static GLUT callbacks
@@ -186,9 +152,6 @@ private:
     static void visible(int vis);
     static void specialKeys(int key, int x, int y);
 };
-
-
-
 
 };
 

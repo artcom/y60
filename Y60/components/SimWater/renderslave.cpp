@@ -1,49 +1,29 @@
-// ----------------------------------------------------------------------------
+//============================================================================
 //
-// Copyright (C) 2002-2002, ART+COM AG Berlin
+// Copyright (C) 2002-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//
-// ----------------------------------------------------------------------------
-//
-// Name: viewCompressedTex
-//
-// Purpose:
-//
-// $RCSfile: renderslave.cpp,v $
-// $Revision: 1.2 $
-// $Date: 2002/09/06 18:17:30 $
-// $Author: valentin $
-//
-// $Log $
-//
-// ----------------------------------------------------------------------------
+//============================================================================
 
 #define DEBUG_LEVEL 1
 #define DEBUG_TIME 
 
 #include "RenderAppModule.h"
 #include "RenderApp.h"
-//#include "VideoAppModule.h"
 #include "WaterAppModule.h"
 
-//#include <asl/Debug.h>
-
-
 using namespace std;  // automatically added!
-
-
 
 int main( int argc, char *argv[] ) {
 
     try {
         asl::Arguments arguments;
 
-        arguments.parse(argc, argv /*, asl::Arguments::IgnoreErrors*/);
+        arguments.parse(argc, argv );
 
         video::RenderApp * renderApp = new video::RenderApp();
         
@@ -53,10 +33,7 @@ int main( int argc, char *argv[] ) {
         for (int i=0; i< arguments.getCount(); i++) {
             string arg = arguments.getArgument(i);
 
-            if (arg == "video") {
-                //video::IRenderAppModule * videoModule = new video::VideoAppModule(*renderApp);
-                //renderApp->registerModule(*videoModule);
-            } else if (arg == "water") {
+            if (arg == "water") {
                 video::IRenderAppModule * waterModule = new video::WaterAppModule(*renderApp);
                 renderApp->registerModule(*waterModule);
             }
@@ -89,14 +66,14 @@ int main( int argc, char *argv[] ) {
 
         // will never return here...
     } catch (const asl::Exception & ex) {
-        AC_DEBUG << "#ERROR: renderslave caught exception" << endl;
-        AC_DEBUG << ex.what() << " AT " << ex.where() << endl;
-        AC_DEBUG << "Aborting" << endl;
+        AC_PRINT << "#ERROR: renderslave caught exception" << endl;
+        AC_PRINT << ex.what() << " AT " << ex.where() << endl;
+        AC_PRINT << "Aborting" << endl;
         exit(-4);
     }
     catch (...) {
-        AC_DEBUG << "#ERROR: renderslave caught unknown exception" << endl;
-        AC_DEBUG << "Aborting" << endl;
+        AC_PRINT << "#ERROR: renderslave caught unknown exception" << endl;
+        AC_PRINT << "Aborting" << endl;
         exit(-5);
     }
     

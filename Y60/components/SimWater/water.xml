@@ -17,6 +17,8 @@
         <file objectid="11" name="wood02.png"/>
 
         <file objectid="100" name="ground.png"/>
+        <file objectid="101" name="black.png"/>
+        <file objectid="102" name="grey.png"/>
     </floormaps>
     <surfacemaps classid="&surfacemap;">
         <file objectid="1" name="ice01.png"/>

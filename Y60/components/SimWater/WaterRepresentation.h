@@ -1,20 +1,19 @@
-//=============================================================================
+//============================================================================
 //
-// Copyright (C) 2000-2002, ART+COM AG Berlin
-//
+// Copyright (C) 2002-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
+//============================================================================
 
 #ifndef _WaterRepresentation_h_
 #define _WaterRepresentation_h_
 
 #include <asl/Vector234.h>
 #include <asl/string_functions.h>
-//#include "Crack.h"
 
 #include <GL/gl.h>
 #include <stdio.h>
@@ -101,18 +100,6 @@ public:
         int myIndex;
         return getTextureIndex(theClassID,whichObjectID,myIndex);
     }
-
-    /*
-    void    setSceneObjects(const SceneSyncMaster::SceneObject 
-                            theObjects[SceneSyncMaster::NUM_SCENE_OBJECTS]);
-    
-
-    bool    addCrack(float theIntensity, const Vector2f & theOrigin, const Vector2f & theDirection, 
-                     int theNumSegments, float theSegmentSize = 80, float theVariation = 50);
-    void    clearCracks();
-    
-    //void    setCracks(CrackList & theCracks);
-    */
 
     void    enableSurface(bool doEnable) {
         _renderSurfaceEnabled = doEnable;
@@ -283,7 +270,6 @@ private:
     };
     VAR_Buffer          _varBuffer[NUM_VAR_BUFFERS];
     GLuint *            _stripIndices;
-    //CrackList           _cracks;
     bool                _renderSurfaceEnabled; 
     float               _crackWidth;
     float               _innerIceThickness;
@@ -291,8 +277,6 @@ private:
     bool                _renderCrackField;
     float               _surfaceOpacity;
     
-    //CrackSimulator<480, 240>    _crackSimulator;
-
     bool            initRender();
     bool            initExtensions(char* extension);
 
@@ -309,19 +293,8 @@ private:
 
     void    dataCoordToScreenCoord(const asl::Vector2f & theDataCoord, asl::Vector2f & screenCoord);
 
-    //void    renderSceneObjects();
-    //void    eraseCracks();
-    //void    renderCracks();
     void    renderSurface();
 
-    /*
-    void    eraseCrackSegment(CrackSegment & theCrackSegment, 
-                              CrackSegment & theNextCrackSegment, float pos);
-    void    drawCrackSegment(CrackSegment & theCrackSegment, 
-                             CrackSegment & theNextCrackSegment, float pos);
-    void    eraseCrack(Crack & theCrack);
-    void    drawCrack(Crack & theCrack);
-    */
 };
 
 

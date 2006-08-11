@@ -1,13 +1,13 @@
-//=============================================================================
+//============================================================================
 //
-// Copyright (C) 2000-2002, ART+COM AG Berlin
-//
+// Copyright (C) 2002-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
+//============================================================================
 
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
@@ -278,13 +278,6 @@ WaterRepresentation::init(WaterSimulation * waterSim, int width, int height,
         }
     }
 
-    /*
-    fill(_mySceneObject, _mySceneObject + SceneSyncMaster::NUM_SCENE_OBJECTS, 
-         SceneSyncMaster::SceneObject());
-    */
-    
-    //_objectPosScaleX = (double(_dataWidth) / 10000.);
-    //_objectPosScaleY = (double(_dataHeight) / 10000.);
     _objectPosScaleX = (double(sceneDisplayWidth) / 10000.);
     _objectPosScaleY = (double(sceneDisplayHeight) / 10000.);
     
@@ -304,50 +297,9 @@ WaterRepresentation::init(WaterSimulation * waterSim, int width, int height,
 
 void
 WaterRepresentation::dataCoordToScreenCoord(const Vector2f & theDataCoord, Vector2f & screenCoord) {
-    //screenCoord.x = theDataCoord.x - float(_dataWidth)/2. + _displayOffsetX;
-    //screenCoord.y = theDataCoord.y - float(_dataHeight)/2. + _displayOffsetY;
     screenCoord[0] = theDataCoord[0] - float(_dataWidth)/2. + _displayOffsetX - _dataOffsetX;
     screenCoord[1] = theDataCoord[1] - float(_dataHeight)/2. + _displayOffsetY - _dataOffsetY;
 }
-
-
-/*
-void
-WaterRepresentation::setSceneObjects(const SceneSyncMaster::SceneObject 
-                                     theObjects[SceneSyncMaster::NUM_SCENE_OBJECTS])
-{
-    copy(theObjects, theObjects + SceneSyncMaster::NUM_SCENE_OBJECTS, _mySceneObject);
-}
-
-bool
-WaterRepresentation::addCrack(float theIntensity, const Vector2f & theOrigin, 
-        const Vector2f & theDirection, int theNumSegments, float theSegmentSize, 
-        float theVariation)
-{
-    //cerr << "WaterRepresentation::addCrack origin= " << theOrigin.x << "," << theOrigin.y << endl;
-    
-    _crackSimulator.addCrackPair(theIntensity, theOrigin, theDirection, theNumSegments, 
-            theSegmentSize, theVariation);
-    //cerr << "    numCracks= " << _crackSimulator.getNumCracks() 
-    //     << " (num segments=" << _crackSimulator.computeNumCrackSegments() << endl;
-     return true;
- }
-
-void
-WaterRepresentation::clearCracks() {
-    _crackSimulator.clear();
-    _crackSimulator.getCrackList().clear();
-}
-
-void
-WaterRepresentation::setCracks(CrackList & theCracks) {
-    _crackSimulator.getCrackList().clear();
-    CrackList::iterator it = theCracks.begin();
-    while (it != theCracks.end()) {
-        _crackSimulator.getCrackList().push_back(*it++);
-    }
-}
-*/
 
 void
 WaterRepresentation::copyWaterDataToVertexBuffer() {
@@ -406,20 +358,6 @@ WaterRepresentation::copyWaterDataToVertexBuffer(int currentBuffer) {
 			normalX = waterDataLine[i-1] - waterDataLine[i + 1];
 			normalY = prevWaterDataLine[i] - nextWaterDataLine[i];
 
-//            float normalX = ((*z1)[j][i-3] * .5f + (*z1)[j][i-2]) - 
-//                            ((*z1)[j][i-1]   + (*z1)[j][i] * .5f);
-//            float normalY = ((*z1)[j-3][i] * .5f + (*z1)[j-2][i]) -
-//                            ((*z1)[j-1][i]   + (*z1)[j][i] * .5f);
-//            normalX = ((*z1)[j-2][i-3] + (*z1)[j-1][i-2]) - 
-//                      ((*z1)[j][i-1]   + (*z1)[j][i]);
-//            normalY = ((*z1)[j-3][i-2]   + (*z1)[j-2][i-1]) -
-//                      ((*z1)[j-1][i]   + (*z1)[j][i]);
-                            
-//			float normalX = ((*z1)[j-1][i-1] - (*z1)[j-1][i-1]);
-//			float normalY = ((*z1)[j-1][i] - (*z1)[j][i]);
-
-            //const float normalMax = .5f;
-  
             normalX = clamp(normalX, -_normalMax, _normalMax);
             normalY = clamp(normalY, -_normalMax, _normalMax);
           
@@ -435,14 +373,7 @@ WaterRepresentation::copyWaterDataToVertexBuffer(int currentBuffer) {
                             (_displayHeight-j))+  
                             (normalY * _refractionScale * waterDataLine[i])) * texFactorY;
 
-//vertexLinePtr[6] = ((float)i) * texFactorX;
-//vertexLinePtr[7] = ((float)(_displayHeight-j)) * texFactorY;
-
             float heightValue = maximum(-1.f, minimum(1.f, waterDataLine[i]));
-            //float colorValue = .75f + .5f * ((heightValue > 0) ? 
-            //                   (SQR(heightValue)) :
-            //                   -(SQR(heightValue)));
-            //float colorValue1 = .75f + 0.25f * heightValue;
             float colorValue = _causticBias + ((heightValue > 0) ? 
                                         (_causticScale * heightValue +
                                         _causticSqrScale * SQR(heightValue)) :
@@ -631,11 +562,6 @@ WaterRepresentation::activateTextureIndex(TextureClass theClassID, int newIndex)
         return false;
     }
 
-    /*
-    cerr << "#INFO : WaterRepresentation::activateTextureIndex: activating map index= " << index 
-             << " class " << (void*) TextureClassNames[theClassID] << endl;
-             */
-
     map<short,Texture>::iterator it = _myTextures[theClassID].begin(); 
     for (int i = 0; i < newIndex ; ++i) {
         if (it == _myTextures[theClassID].end()) {
@@ -664,8 +590,6 @@ bool WaterRepresentation::getTextureIndex(TextureClass theClassID,
              << TextureClassName(theClassID) << endl;
         return false;
     }
-    //cerr << "#INFO :  WaterRepresentation::getTextureIndex: looking up map index for object = " << whichObjectID
-    //         << " class " << TextureClassName(theClassID) << endl;
 
     int myIndex = 0;
     for (map<short,Texture>::iterator it = _myTextures[theClassID].begin();
@@ -770,649 +694,6 @@ WaterRepresentation::preRender() {
     copyWaterDataToVertexBuffer();
 }
 
-#if 0
-void 
-WaterRepresentation::renderSceneObjects() {
-    
-    //float pixelToScreenX = float(_dataWidth) / float(_displayWidth);
-    //float pixelToScreenY = float(_dataHeight) / float(_displayHeight);
-    //float pixelToScreenX = float(_displayWidth) / float(_dataWidth);
-    //float pixelToScreenY = float(_displayHeight) / float(_dataHeight);
-    
-    //cerr << "pixelToScreenX= " << pixelToScreenX << endl;
-    //cerr << "pixelToScreenY= " << pixelToScreenY << endl;
-    
-    float pixelToScreenX = _objectPosScaleX;
-    float pixelToScreenY = _objectPosScaleY;
-    float pixelToScreenZ = 1.0;
-    int numSceneObjectsRendered = 0;
-
-
-    for (int i=0; i < SceneSyncMaster::NUM_SCENE_OBJECTS; i++) {
-
-        if (_mySceneObject[i]._classID == SceneSyncMaster::SceneObject::NoObject) {
-            continue;
-        }
-
-        float minV[3];
-        float maxV[3];
-        if (_mySceneObject[i]._classID != SceneSyncMaster::SceneObject::NoObject) {
-            //cerr << "Scene object #" << i << " has xpos: " << _mySceneObject[i]._xPos 
-            //     << " and ypos: " << _mySceneObject[i]._yPos
-            //     << " and zpos: " << _mySceneObject[i]._zPos << endl;
-
-            float   xPos = _mySceneObject[i]._xPos;
-            float   yPos = 10000.f - _mySceneObject[i]._yPos;
-            float   zPos = _mySceneObject[i]._zPos;
-            
-            minV[0] = (float(xPos-_mySceneObject[i]._xSize/2.)) * 
-                        pixelToScreenX + _objectPosOffsetX;
-            minV[1] = (float(yPos-_mySceneObject[i]._ySize/2.)) *
-                        pixelToScreenY + _objectPosOffsetY;
-            minV[2] = float(zPos-_mySceneObject[i]._zSize/2.) * 
-                        pixelToScreenZ;
-            maxV[0] = (float(xPos+_mySceneObject[i]._xSize/2.)) * 
-                        pixelToScreenX + _objectPosOffsetX;
-            maxV[1] = (float(yPos+_mySceneObject[i]._ySize/2.)) *
-                        pixelToScreenY + _objectPosOffsetY;
-            maxV[2] = float(zPos+_mySceneObject[i]._zSize/2.) * 
-                        pixelToScreenZ;
-        }
-        
-        minV[2] = 0;
-        
-        float zOffset = WATER_LEVEL;
-        
-        switch (_mySceneObject[i]._classID) {
-            case SceneSyncMaster::SceneObject::Marker:
-
-                numSceneObjectsRendered++;
-
-                //glDepthFunc(GL_ALWAYS);
-//                glEnable( GL_DEPTH_TEST );
-
-                //glDisable( GL_BLEND );
-                glColor4f(1,1,1,1.0);
-
-                //cerr << "x1= " << (_mySceneObject[i]._xPos-_mySceneObject[i]._xSize/2) * 
-                //        pixelToScreenX << endl;
-                //cerr << "y1= " << (_mySceneObject[i]._yPos-_mySceneObject[i]._ySize/2) * 
-                //        pixelToScreenY << endl;
-                /*
-                   glRectf(float(_mySceneObject[i]._xPos-_mySceneObject[i]._xSize/2.) * pixelToScreenX, 
-                   float(_mySceneObject[i]._yPos-_mySceneObject[i]._ySize/2.) * pixelToScreenY,
-                   float(_mySceneObject[i]._xPos+_mySceneObject[i]._xSize/2.) * pixelToScreenX, 
-                   float(_mySceneObject[i]._yPos+_mySceneObject[i]._ySize/2.) * pixelToScreenY);
-                 */
-                if (_mySceneObject[i]._fileClassID) {
-                    if (hasTexture(TextureClass(_mySceneObject[i]._fileClassID),_mySceneObject[i]._fileObjectID)) {
-                        // set up texture
-                        Texture & myTexture = _myTextures[TextureClass(_mySceneObject[i]._fileClassID)][_mySceneObject[i]._fileObjectID];
-                        glActiveTextureARB(GL_TEXTURE0_ARB);
-                        glEnable(GL_TEXTURE_2D);
-
-                        if (_drawRefractions) {
-                            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-                        } else{ 
-                            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-                        }
-                        assert( myTexture.myID);
-                        glBindTexture(GL_TEXTURE_2D, myTexture.myID);
-                    } else {
-                        cerr << "#WARNING: WaterRepresentation::renderSceneObjects(): can't find fileObject class "
-                            << TextureClassName(TextureClass(_mySceneObject[i]._fileClassID))
-                            << " id " << _mySceneObject[i]._fileObjectID 
-                            << " referenced in " << i << "th object with class " << _mySceneObject[i]._classID
-                            << " id " << _mySceneObject[i]._objectID << endl;
-
-                    }
-                } else {
-                    glActiveTextureARB(GL_TEXTURE0_ARB);
-                    glDisable(GL_TEXTURE_2D);
-                }
-
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glAlphaFunc(GL_GREATER, 0.1f);
-                glEnable(GL_ALPHA_TEST);
-
-                glBegin(GL_POLYGON);
-                glTexCoord2f(0.f, 0.f);
-                glVertex3f(minV[0],minV[1],minV[2] + zOffset);
-                glTexCoord2f(1.f, 0.f);
-                glVertex3f(maxV[0],minV[1],minV[2] + zOffset);
-                glTexCoord2f(1.f, 1.f);
-                glVertex3f(maxV[0],maxV[1],minV[2] + zOffset);
-                glTexCoord2f(0.f, 1.f);
-                glVertex3f(minV[0],maxV[1],minV[2] + zOffset);
-                glTexCoord2f(0.f, 0.f);
-                glVertex3f(minV[0],minV[1],minV[2] + zOffset);
-                glEnd();
-
-//                glDepthFunc( GL_LEQUAL );
-                glEnable( GL_BLEND );
-                glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
-                glAlphaFunc(GL_ALWAYS, 0.0f);
-                glDisable(GL_ALPHA_TEST);
-
-                break;
-            case SceneSyncMaster::SceneObject::NoObject:
-                break;
-            default:
-                cerr << "#WARNING: unknown scene object type " << _mySceneObject[i]._objectID 
-                    << " ignored." << endl;
-                break;
-        }
-    }
-
-    //AC_DB("Rendered " << numSceneObjectsRendered << " scene objects");
-}
-#endif
-
-#if 0
-void 
-WaterRepresentation::renderSceneObjects() {
-        
-    float pixelToScreenX = _objectPosScaleX;
-    float pixelToScreenY = _objectPosScaleY;
-    float pixelToScreenZ = 1.0;
-    int numSceneObjectsRendered = 0;
-
-
-    for (int i=0; i < SceneSyncMaster::NUM_SCENE_OBJECTS; i++) {
-
-        if (_mySceneObject[i]._classID == SceneSyncMaster::SceneObject::NoObject) {
-            continue;
-        }
-
-        float minV[3];
-        float maxV[3];
-        Vec3  objCenter;
-
-        
-        if (_mySceneObject[i]._classID != SceneSyncMaster::SceneObject::NoObject) {
-            //cerr << "Scene object #" << i << " has xpos: " << _mySceneObject[i]._xPos 
-            //     << " and ypos: " << _mySceneObject[i]._yPos
-            //     << " and zpos: " << _mySceneObject[i]._zPos << endl;
-
-            objCenter.x = _mySceneObject[i]._xPos;
-            objCenter.y = 10000.f - _mySceneObject[i]._yPos;
-            objCenter.z = _mySceneObject[i]._zPos;
-
-            //float   xPos = _mySceneObject[i]._xPos;
-            //float   yPos = 10000.f - _mySceneObject[i]._yPos;
-            //float   zPos = _mySceneObject[i]._zPos;
-            
-            minV[0] = float(-_mySceneObject[i]._xSize/2.);
-            minV[1] = float(-_mySceneObject[i]._ySize/2.);
-            minV[2] = float(-_mySceneObject[i]._zSize/2.);
-            maxV[0] = float(_mySceneObject[i]._xSize/2.);
-            maxV[1] = float(_mySceneObject[i]._ySize/2.);
-            maxV[2] = float(_mySceneObject[i]._zSize/2.);
-        }
-        
-        glPushMatrix();
-
-        glTranslatef(_objectPosOffsetX, _objectPosOffsetY, 0);
-        glTranslatef(objCenter.x * pixelToScreenX, objCenter.y * pixelToScreenY, 
-                objCenter.z * pixelToScreenZ);
-        glRotatef(float(_mySceneObject[i]._heading) / 10.f, 0, 0, 1.);
-        glScalef(pixelToScreenX, pixelToScreenY, pixelToScreenZ);
-       
-        minV[2] = 0;
-        float zOffset = WATER_LEVEL;          
-        float alphaValue = 1.f;
-
-#ifdef RUNNING_WATER_TEST
-        alphaValue = 1.f - float(_mySceneObject[i]._pitch) / 10000.f;
-#endif
-      
-        switch (_mySceneObject[i]._classID) {
-            case SceneSyncMaster::SceneObject::Marker:
-
-                numSceneObjectsRendered++;
-
-                //glDepthFunc(GL_ALWAYS);
-//                glEnable( GL_DEPTH_TEST );
-
-                //glDisable( GL_BLEND );
-
-                glColor4f(1, 1, 1, alphaValue);
-
-                //cerr << "x1= " << (_mySceneObject[i]._xPos-_mySceneObject[i]._xSize/2) * 
-                //        pixelToScreenX << endl;
-                //cerr << "y1= " << (_mySceneObject[i]._yPos-_mySceneObject[i]._ySize/2) * 
-                //        pixelToScreenY << endl;
-                /*
-                   glRectf(float(_mySceneObject[i]._xPos-_mySceneObject[i]._xSize/2.) * pixelToScreenX, 
-                   float(_mySceneObject[i]._yPos-_mySceneObject[i]._ySize/2.) * pixelToScreenY,
-                   float(_mySceneObject[i]._xPos+_mySceneObject[i]._xSize/2.) * pixelToScreenX, 
-                   float(_mySceneObject[i]._yPos+_mySceneObject[i]._ySize/2.) * pixelToScreenY);
-                 */
-                if (_mySceneObject[i]._fileClassID) {
-                    if (hasTexture(TextureClass(_mySceneObject[i]._fileClassID),_mySceneObject[i]._fileObjectID)) {
-                        // set up texture
-                        Texture & myTexture = _myTextures[TextureClass(_mySceneObject[i]._fileClassID)][_mySceneObject[i]._fileObjectID];
-                        glActiveTextureARB(GL_TEXTURE0_ARB);
-                        if (!_drawWireFrame) {
-                            glEnable(GL_TEXTURE_2D);
-                        }
-
-                        //if (_drawRefractions) {
-                        //    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-                        //} else{ 
-                            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-                        //}
-                        assert( myTexture.myID);
-                        glBindTexture(GL_TEXTURE_2D, myTexture.myID);
-                    } else {
-                        cerr << "#WARNING: WaterRepresentation::renderSceneObjects(): can't find fileObject class "
-                            << TextureClassName(TextureClass(_mySceneObject[i]._fileClassID))
-                            << " id " << _mySceneObject[i]._fileObjectID 
-                            << " referenced in " << i << "th object with class " << _mySceneObject[i]._classID
-                            << " id " << _mySceneObject[i]._objectID << endl;
-
-                    }
-                } else {
-                    glActiveTextureARB(GL_TEXTURE0_ARB);
-                    glDisable(GL_TEXTURE_2D);
-                }
-
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glAlphaFunc(GL_GREATER, 0.01f);
-                glEnable(GL_ALPHA_TEST);
-
-                glBegin(GL_POLYGON);
-                glTexCoord2f(0.f, 0.f);
-                //glVertex3f(minV[0],minV[1],minV[2] + zOffset);
-                glVertex3f(maxV[0],maxV[1],minV[2] + zOffset);
-                glTexCoord2f(1.f, 0.f);
-                glVertex3f(maxV[0],minV[1],minV[2] + zOffset);
-                glTexCoord2f(1.f, 1.f);
-                //glVertex3f(maxV[0],maxV[1],minV[2] + zOffset);
-                glVertex3f(minV[0],minV[1],minV[2] + zOffset);
-                glTexCoord2f(0.f, 1.f);
-                glVertex3f(minV[0],maxV[1],minV[2] + zOffset);
-                glTexCoord2f(0.f, 0.f);
-                //glVertex3f(minV[0],minV[1],minV[2] + zOffset);
-                glVertex3f(maxV[0],maxV[1],minV[2] + zOffset);
-                glEnd();
-
-//                glDepthFunc( GL_LEQUAL );
-                glEnable( GL_BLEND );
-                glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
-                glAlphaFunc(GL_ALWAYS, 0.0f);
-                glDisable(GL_ALPHA_TEST);
-
-                break;
-            case SceneSyncMaster::SceneObject::NoObject:
-                break;
-            default:
-                cerr << "#WARNING: unknown scene object type " << _mySceneObject[i]._objectID 
-                    << " ignored." << endl;
-                break;
-        }
-        
-        glPopMatrix();
-        
-    }
-
-    //AC_DB("Rendered " << numSceneObjectsRendered << " scene objects");
-}
-
-
-
-
-void
-WaterRepresentation::eraseCrackSegment(CrackSegment & theCrackSegment, 
-                                       CrackSegment & theNextCrackSegment, float pos)
-{
-    
-    float xOrigin = theCrackSegment._myOrigin.x;
-    float yOrigin = theCrackSegment._myOrigin.y;
-    float xDestination = theCrackSegment._myDestination.x;
-    float yDestination = theCrackSegment._myDestination.y;
-    float startThickness = theCrackSegment._thickness;
-    float endThickness = theNextCrackSegment._thickness;
-    
-    video::Vector2f v[4];
-    bool startVertical = fabs(xDestination - xOrigin) > fabs(yDestination - yOrigin);
-    bool endVertical = 
-            (fabs(theNextCrackSegment._myDestination.x - theNextCrackSegment._myOrigin.x) > 
-             fabs(theNextCrackSegment._myDestination.y - theNextCrackSegment._myOrigin.y));
-    
-    if (startVertical) {
-        // thickness is "vertical"   
-
-        v[0].x = xOrigin;
-        v[0].y = yOrigin - _crackWidth * startThickness * _innerIceThickness;
-        v[1].x = xOrigin;
-        v[1].y = yOrigin + _crackWidth * startThickness * _innerIceThickness;
-    } else {
-        v[0].x = xOrigin - _crackWidth * startThickness * _innerIceThickness;
-        v[0].y = yOrigin;
-        v[1].x = xOrigin + _crackWidth * startThickness * _innerIceThickness;
-        v[1].y = yOrigin;
-    }
-
-    if (endVertical) {
-        v[2].x = xDestination;
-        v[2].y = yDestination + _crackWidth * endThickness * _innerIceThickness;
-        v[3].x = xDestination;
-        v[3].y = yDestination - _crackWidth * endThickness * _innerIceThickness;
-    } else {
-        v[2].x = xDestination + _crackWidth * endThickness * _innerIceThickness;
-        v[2].y = yDestination;
-        v[3].x = xDestination - _crackWidth * endThickness * _innerIceThickness;
-        v[3].y = yDestination;
-    }
-    
-    Vector2f    screenCoord;
-    
-    glBegin(GL_POLYGON);
-    for (int i=0; i< 4; i++) {
-        dataCoordToScreenCoord(v[i], screenCoord);
-        glVertex3f(screenCoord.x, screenCoord.y, RAISED_CRACK_LEVEL);
-    }
-    glEnd();
-
-    if (_renderCrackField) {
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-        // visualize center of cracks
-        glLineWidth(3.);
-        glBegin(GL_LINES);
-        dataCoordToScreenCoord(Vector2f(xOrigin, yOrigin), screenCoord);
-        glColor4f(1,0,0,1);
-        glVertex3f(screenCoord.x+0.5, screenCoord.y+0.5, RAISED_CRACK_LEVEL+2);
-        dataCoordToScreenCoord(Vector2f(xDestination, yDestination), screenCoord);
-        glColor4f(0,0,1,1);
-        glVertex3f(screenCoord.x+0.5, screenCoord.y+0.5, RAISED_CRACK_LEVEL+2);
-        glEnd();
-        glLineWidth(1.);
-        glColor4f(0,1,0,1);
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
-    }
-}
-
-void
-WaterRepresentation::eraseCrack(Crack & theCrack) {
-    int segmentCount = theCrack.getNumSegments();
-    for (int i=0; i < segmentCount-1; i++) {
-        eraseCrackSegment(theCrack.getSegment(i), theCrack.getSegment(i+1),
-                          float(i) / float(segmentCount));
-    }
-    if (segmentCount > 0) {
-        Vector2f            endPos(theCrack.getSegment(segmentCount-1)._myDestination);
-        CrackSegment    tempSegment(endPos, endPos, 0., 0, 0);
-        
-        eraseCrackSegment(theCrack.getSegment(segmentCount-1), 
-                         tempSegment, 1);        
-    }
-}
-
-void
-WaterRepresentation::drawCrackSegment(CrackSegment & theCrackSegment, 
-                                      CrackSegment & theNextCrackSegment, float pos) 
-{
-
-    float xOrigin = theCrackSegment._myOrigin.x;
-    float yOrigin = theCrackSegment._myOrigin.y;
-    float xDestination = theCrackSegment._myDestination.x;
-    float yDestination = theCrackSegment._myDestination.y;
-    float startThickness = theCrackSegment._thickness;
-    float endThickness = theNextCrackSegment._thickness;
-    
-    static video::Vec3  v[8];
-    static float        intensity[8];
-    static float        alpha[8];
-    static bool         initialized = false;
-
-    if (!initialized) {
-        initialized = true;
-        float minIntensity = .35f;
-        float maxIntensity = 1.f;
-
-        intensity[0] = maxIntensity;
-        intensity[1] = minIntensity;
-        intensity[2] = minIntensity;
-        intensity[3] = maxIntensity;
-        intensity[4] = maxIntensity;
-        intensity[5] = minIntensity;
-        intensity[6] = minIntensity;
-        intensity[7] = maxIntensity;
-
-        float minAlpha = 0.f;
-        float maxAlpha = .75f;
-        alpha[0] = minAlpha; 
-        alpha[1] = maxAlpha; 
-        alpha[2] = maxAlpha; 
-        alpha[3] = minAlpha; 
-        alpha[4] = minAlpha; 
-        alpha[5] = maxAlpha; 
-        alpha[6] = maxAlpha; 
-        alpha[7] = minAlpha; 
-        
-        v[0].z = CRACK_EDGE_LEVEL_LOW; 
-        v[1].z = CRACK_EDGE_LEVEL_HIGH; 
-        v[2].z = CRACK_EDGE_LEVEL_HIGH; 
-        v[3].z = CRACK_EDGE_LEVEL_LOW; 
-        v[4].z = CRACK_EDGE_LEVEL_LOW; 
-        v[5].z = CRACK_EDGE_LEVEL_HIGH; 
-        v[6].z = CRACK_EDGE_LEVEL_HIGH; 
-        v[7].z = CRACK_EDGE_LEVEL_LOW; 
-
-    }
-
-    bool startVertical = fabs(xDestination - xOrigin) > fabs(yDestination - yOrigin);
-    bool endVertical = 
-            (fabs(theNextCrackSegment._myDestination.x - theNextCrackSegment._myOrigin.x) > 
-             fabs(theNextCrackSegment._myDestination.y - theNextCrackSegment._myOrigin.y));
-    
-    float   innerStartWidth = _crackWidth * startThickness * _innerIceThickness;
-    float   outerStartWidth = min(float(innerStartWidth) + 5.f, 
-                                  _crackWidth * startThickness * _outerIceThickness);
-    //if (outerStartWidth - innerStartWidth > 0.1) {
-    //    outerStartWidth = min(float(innerStartWidth) + 5.f,
-    //                          3.f * outerStartWidth + (outerStartWidth - innerStartWidth));
-    //}
-    
-    if (startVertical) {
-        // thickness is "vertical"   
-
-        v[0].x = xOrigin;
-        v[0].y = yOrigin - outerStartWidth;
-        v[1].x = xOrigin;
-        v[1].y = yOrigin - innerStartWidth;
-        
-        v[4].x = xOrigin;
-        v[4].y = yOrigin + outerStartWidth;
-        v[5].x = xOrigin;
-        v[5].y = yOrigin + innerStartWidth;
-    } else {
-        v[0].x = xOrigin - outerStartWidth;
-        v[0].y = yOrigin;
-        v[1].x = xOrigin - innerStartWidth;
-        v[1].y = yOrigin;
-
-        v[4].x = xOrigin + outerStartWidth;
-        v[4].y = yOrigin;
-        v[5].x = xOrigin + innerStartWidth;
-        v[5].y = yOrigin;
-    }
-
-    float   innerEndWidth = _crackWidth * endThickness * _innerIceThickness;
-    float   outerEndWidth = min(float(innerEndWidth)+10.f,
-                                _crackWidth * endThickness * _outerIceThickness);
-    //if (outerEndWidth - innerEndWidth > 0.1) {
-    //    outerEndWidth = min(float(innerEndWidth) + 5.f,
-    //                          3.f * outerEndWidth + (outerEndWidth - innerEndWidth));
-    //}
-    if (endVertical) {
-        v[2].x = xDestination;
-        v[2].y = yDestination - innerEndWidth;
-        v[3].x = xDestination;
-        v[3].y = yDestination - outerEndWidth;
-        
-        v[6].x = xDestination;
-        v[6].y = yDestination + innerEndWidth;
-        v[7].x = xDestination;
-        v[7].y = yDestination + outerEndWidth;
-    } else {
-        v[2].x = xDestination - innerEndWidth;
-        v[2].y = yDestination;
-        v[3].x = xDestination - outerEndWidth;
-        v[3].y = yDestination;
-        
-        v[6].x = xDestination + innerEndWidth;
-        v[6].y = yDestination;
-        v[7].x = xDestination + outerEndWidth;
-        v[7].y = yDestination;
-    }
-    
-    Vector2f    screenCoord;
-    
-    glBegin(GL_POLYGON);
-    for (int i=0; i< 4; i++) {
-        glColor4f(intensity[i], intensity[i], intensity[i], alpha[i]);
-        dataCoordToScreenCoord(Vector2f(v[i].x, v[i].y), screenCoord);
-        glVertex3f(screenCoord.x, screenCoord.y, v[i].z);
-    }
-    glEnd();
-    glBegin(GL_POLYGON);
-    for (int i=4; i< 8; i++) {
-        glColor4f(intensity[i], intensity[i], intensity[i], alpha[i]);
-        dataCoordToScreenCoord(Vector2f(v[i].x, v[i].y), screenCoord);
-        glVertex3f(screenCoord.x, screenCoord.y, v[i].z);
-    }
-    glEnd();
-
-}
-
-
-
-void
-WaterRepresentation::drawCrack(Crack & theCrack) {
-    int segmentCount = theCrack.getNumSegments();
-    for (int i=0; i < segmentCount-1; i++) {
-        drawCrackSegment(theCrack.getSegment(i), theCrack.getSegment(i+1),
-                         float(i) / float(segmentCount));
-    }
-    if (segmentCount > 0) {
-        Vector2f            endPos(theCrack.getSegment(segmentCount-1)._myDestination);
-        CrackSegment    tempSegment(endPos, endPos, 0., 0, 0);
-        
-        drawCrackSegment(theCrack.getSegment(segmentCount-1), 
-                         tempSegment, 1);        
-    }
-}
-
-
-void 
-WaterRepresentation::eraseCracks() {
-    //cerr << "#cracks= " << _crackSimulator.getCrackList().size() << endl;
-#if 0
-/*
-    float   x1 = _displayOffsetX - (_dataWidth / 2);
-    float   y1 = _displayOffsetY - (_dataHeight / 2);
-    float   x2 = _displayOffsetX + (_dataWidth / 2);
-    float   y2 = _displayOffsetY + (_dataHeight / 2);
-*/    
-    float   z = CLEAR_LEVEL;
-    
-    glDisable(GL_ALPHA_TEST);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND );
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
-
-    Vector2f    v0, v1;
-    dataCoordToScreenCoord(Vector2f(_dataOffsetX, _dataOffsetY), v0);
-    dataCoordToScreenCoord(Vector2f(_dataOffsetX+_dataWidth, _dataOffsetY+_dataHeight), v1);
-            
-    glColor4f(0, 1, 0, 0);
-    glBegin(GL_POLYGON);
-    glVertex3f(v0.x, v0.y, z);
-    glVertex3f(v1.x, v0.y, z);
-    glVertex3f(v1.x, v1.y, z);
-    glVertex3f(v0.x, v1.y, z);
-    glEnd();
-/*    
-    glColor4f(0, 1, 0, 0);
-    glBegin(GL_POLYGON);
-    glVertex3f(x1, y1, z);
-    glVertex3f(x2, y1, z);
-    glVertex3f(x2, y2, z);
-    glVertex3f(x1, y2, z);
-    glEnd();
-*/    
-#endif
-    glDisable(GL_BLEND );
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
-    glAlphaFunc(GL_ALWAYS, 0.0f);
-    glDisable(GL_ALPHA_TEST);
-    
-    CrackList::iterator it = _crackSimulator.getCrackList().begin();
-    
-    glDisable(GL_TEXTURE_2D);
-    glColor4f(0., 1., 0., 1);  
-
-    if (it != _crackSimulator.getCrackList().end()) {
-        glColor4f(0., 1., 0., 0.1 + 2. * it->getSegment(0)._thickness);
-        while (it != _crackSimulator.getCrackList().end()) {
-
-            eraseCrack(*it);
-            it++;
-        }
-    }
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glEnable(GL_ALPHA_TEST);
-    glEnable(GL_DEPTH_TEST);
-    glEnable( GL_BLEND );
-}
-
-void
-WaterRepresentation::renderCracks() {
-    
-    CrackList::iterator it = _crackSimulator.getCrackList().begin();
-    
-    glDisable(GL_TEXTURE_2D);
-    glColor4f(0.1, .1, .1, .8);  
-
-    int crackCount = 0;
-    
-    while (it != _crackSimulator.getCrackList().end()) {
-        if (++crackCount > MAX_DRAWABLE_CRACKS) {
-            break;
-        }
-        drawCrack(*it);
-        it++;
-    }
-
-    // visualize crack field
-    if (_renderCrackField) {
-        glColor4f(0.1, 1, .1, .6);  
-
-        for (int j=0; j<_crackSimulator.getHeight(); j++) {
-            for (int i=0; i<_crackSimulator.getWidth(); i++) {
-                if (_crackSimulator.getCrackField(i, j)._crackIndex>= 0) {
-                    Vector2f    screenCoord1;
-                    Vector2f    screenCoord2;
-
-                    dataCoordToScreenCoord(Vector2f(i, j), screenCoord1);
-                    dataCoordToScreenCoord(Vector2f(i+1, j+1), screenCoord2);
-        
-                    glBegin(GL_POLYGON);
-                    glVertex3f(screenCoord1.x+0.5, screenCoord1.y+0.5, RAISED_CRACK_LEVEL+1);
-                    glVertex3f(screenCoord2.x+0.5, screenCoord1.y+0.5, RAISED_CRACK_LEVEL+1);
-                    glVertex3f(screenCoord2.x+0.5, screenCoord2.y+0.5, RAISED_CRACK_LEVEL+1);
-                    glVertex3f(screenCoord1.x+0.5, screenCoord2.y+0.5, RAISED_CRACK_LEVEL+1);
-                    glEnd();
-                }
-            }
-        }
-    }
-}
-
-#endif
-
 void 
 WaterRepresentation::renderSurface() {
     
@@ -1460,8 +741,6 @@ WaterRepresentation::renderSurface() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 }
-
-
 
 void 
 WaterRepresentation::render() {
@@ -1539,8 +818,6 @@ WaterRepresentation::render() {
         glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
     }
     
-    //renderSceneObjects();
-    
     if (_drawReflections) {
         
         glActiveTextureARB(GL_TEXTURE0_ARB);
@@ -1563,22 +840,6 @@ WaterRepresentation::render() {
         Texture & currentEnvironmentMap = currentTexture(cubemaps);
         glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, currentEnvironmentMap.myID);
 
-        //-------
-        //if (_surfaceTextureID[_currentSurfaceIndex]) {  
-/*
-        if (currentTexture(surfacemaps).myID) {  
-            glActiveTextureARB(GL_TEXTURE1_ARB);
-            glClientActiveTextureARB(GL_TEXTURE1_ARB);
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glEnable(GL_TEXTURE_2D);
-
-//        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-            glBindTexture(GL_TEXTURE_2D, currentTexture(surfacemaps).myID);
-        }
-*/        
-        //-------
-        
         glEnableClientState(GL_COLOR_ARRAY);
 
         Texture & currentSurface = currentTexture(surfacemaps);
@@ -1619,22 +880,10 @@ WaterRepresentation::render() {
         glDisable(GL_TEXTURE_GEN_S);
         glDisable(GL_TEXTURE_GEN_T);
         glDisable(GL_TEXTURE_GEN_R);
-/*
-        if (currentTexture(surfacemaps).myID) {  
-            glActiveTextureARB(GL_TEXTURE1_ARB);
-            glClientActiveTextureARB(GL_TEXTURE1_ARB);
-            glDisable(GL_TEXTURE_2D);
-        
-            glActiveTextureARB(GL_TEXTURE0_ARB);
-        }
-*/        
     }
 
     if (_renderSurfaceEnabled) {
-        //eraseCracks();
         renderSurface();
-        //renderCracks();
-        //renderSceneObjects();
     }
 }
 
@@ -1659,7 +908,6 @@ WaterRepresentation::setDefaultGLState() {
     glDisable(GL_TEXTURE_GEN_T);
     glDisable(GL_TEXTURE_GEN_R);
     
-    //glDisable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);
     
@@ -1678,8 +926,5 @@ WaterRepresentation::setDefaultGLState() {
 
     glActiveTextureARB(GL_TEXTURE0_ARB);
 }
-
-
-
 
 }; // namespace video
