@@ -23,7 +23,7 @@ class Projector;
 #include <vector>
 
 class Application;
-class UDPCommandListenerThread : public PosixThread {
+class UDPCommandListenerThread : public asl::PosixThread {
     public:
         UDPCommandListenerThread(std::vector<Projector *> theProjectors,
                                  Application & theApplication,
