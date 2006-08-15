@@ -140,7 +140,6 @@ namespace y60 {
     static const char * SCALE_ATTRIB                = "scale";
     static const char * ORIENTATION_ATTRIB          = "orientation";
     static const char * JOINT_ORIENTATION_ATTRIB    = "jointorientation";
-    static const char * SHEAR_ATTRIB                = "shear";
     static const char * PIVOT_ATTRIB                = "pivot";
     static const char * VIEW_DIRECTION_ATTRIB       = "viewdirection";
     static const char * EYE_POINT_ATTRIB            = "eyepoint";
@@ -168,7 +167,6 @@ namespace y60 {
     static const char * DEPTH_TEST_ATTRIB           = "depthtest";
     static const char * INSENSIBLE_ATTRIB           = "insensible";
     static const char * SKELETON_ATTRIB             = "skeleton";
-    static const char * PIVOT_TRANSLATION_ATTRIB    = "pivottranslation";
     static const char * CLIPPING_PLANES_ATTRIB      = "clippingplanes";
     static const char * SCISSOR_ATTRIB              = "scissor";
 

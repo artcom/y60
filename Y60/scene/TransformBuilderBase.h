@@ -20,11 +20,9 @@ namespace y60 {
             void setOrientation(const asl::Vector3f & theOrientation);
             void setOrientation(const asl::Quaternionf & theOrientation);
             void setScale(const asl::Vector3f & theScale);
-            void setShear(const asl::Vector3f & theShear);
             void setPivot(const asl::Vector3f & thePivot);
             void setBillboard(const BillboardType theBillboardType);
             void setSensor(const SensorType theSensorType, float theSensorRadius);
-			void setPivotTranslation(const asl::Vector3f & thePivotTranslation);
 
         protected:
             TransformBuilderBase(const dom::NodePtr & theNode) :

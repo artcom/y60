@@ -40,9 +40,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(PositionTag,         asl::Vector3f,    POSITION_ATTRIB,          asl::Vector3f(0,0,0));
     DEFINE_ATTRIBUT_TAG(OrientationTag,      asl::Quaternionf, ORIENTATION_ATTRIB,       asl::Quaternionf(0,0,0,1));
     DEFINE_ATTRIBUT_TAG(ScaleTag,            asl::Vector3f,    SCALE_ATTRIB,             asl::Vector3f(1,1,1));
-    DEFINE_ATTRIBUT_TAG(ShearTag,            asl::Vector3f,    SHEAR_ATTRIB,             asl::Vector3f(0,0,0));
     DEFINE_ATTRIBUT_TAG(PivotTag,            asl::Vector3f,    PIVOT_ATTRIB,             asl::Vector3f(0,0,0));
-    DEFINE_ATTRIBUT_TAG(PivotTranslationTag, asl::Vector3f,    PIVOT_TRANSLATION_ATTRIB, asl::Vector3f(0,0,0));
     DEFINE_ATTRIBUT_TAG(InsensibleTag,       bool,             INSENSIBLE_ATTRIB,        false);
     DEFINE_ATTRIBUT_TAG(LocalMatrixTag,      asl::Matrix4f,    LOCAL_MATRIX_ATTRIB,      asl::Matrix4f::Identity());
     DEFINE_ATTRIBUT_TAG(GlobalMatrixTag,     asl::Matrix4f,    GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
@@ -63,9 +61,7 @@ namespace y60 {
         public PositionTag::Plug,
         public OrientationTag::Plug,
         public ScaleTag::Plug,
-        public ShearTag::Plug,
         public PivotTag::Plug,
-        public PivotTranslationTag::Plug,
         public BillboardTag::Plug,
         public SensorTag::Plug,
         public SensorRadiusTag::Plug,

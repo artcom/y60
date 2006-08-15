@@ -131,7 +131,7 @@ namespace y60 {
             myMatrix.postMultiply(myRotation);
             asl::Matrix4f myJointRotation(get<JointOrientationTag>());
             myMatrix.postMultiply(myJointRotation);
-            myMatrix.translate(get<PositionTag>() + get<PivotTag>() + get<PivotTranslationTag>());
+            myMatrix.translate(get<PositionTag>() + get<PivotTag>());
             set<LocalMatrixTag>(myMatrix);
         }
     };

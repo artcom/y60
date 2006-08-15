@@ -33,9 +33,7 @@ namespace y60 {
             getNode()->appendAttribute(POSITION_ATTRIB, asl::Vector3f(0,0,0));
             getNode()->appendAttribute(SCALE_ATTRIB, asl::Vector3f(1,1,1));
             getNode()->appendAttribute(ORIENTATION_ATTRIB, asl::Quaternionf(0,0,0,1));
-            getNode()->appendAttribute(SHEAR_ATTRIB, asl::Vector3f(0,0,0));
             getNode()->appendAttribute(PIVOT_ATTRIB, asl::Vector3f(0,0,0));
-            getNode()->appendAttribute(PIVOT_TRANSLATION_ATTRIB, asl::Vector3f(0,0,0));
             getNode()->appendAttribute(BILLBOARD_ATTRIB, "");
             getNode()->appendAttribute(SENSOR_ATTRIB, "");
         } else {
@@ -98,18 +96,8 @@ namespace y60 {
     }
 
     void
-    TransformBuilderBase::setShear(const asl::Vector3f & theShear) {
-        getNode()->getAttribute(SHEAR_ATTRIB)->nodeValueAssign(theShear);
-    }
-
-    void
     TransformBuilderBase::setPivot(const asl::Vector3f & thePivot) {
         getNode()->getAttribute(PIVOT_ATTRIB)->nodeValueAssign(thePivot);
     }
-
-	void
-	TransformBuilderBase::setPivotTranslation(const asl::Vector3f & thePivotTranslation) {
-		getNode()->getAttribute(PIVOT_TRANSLATION_ATTRIB)->nodeValueAssign(thePivotTranslation);
-	}
 }
 

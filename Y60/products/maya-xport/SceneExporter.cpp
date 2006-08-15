@@ -379,9 +379,9 @@ SceneExporter::exportTransformBase(const MObject & theObject, TransformBuilderBa
     MVector myTranslation;
     MPoint  myPivot;
     MVector myPivotTranslation;
+    MVector myScalePivotTranslation;
     double  myScale[3];
     asl::Quaternionf myRotation;
-    double  myShear[3];
 
     int myBillboard = 0;
     if (getCustomAttribute(theObject, "ac_billboard", myBillboard)) {
@@ -413,11 +413,11 @@ SceneExporter::exportTransformBase(const MObject & theObject, TransformBuilderBa
         myPivotTranslation = myTransform.rotatePivotTranslation(MSpace::kTransform, &myStatus);
     }
     if (myStatus) {
-        myStatus = myTransform.getShear(myShear);
+        myScalePivotTranslation = myTransform.scalePivotTranslation(MSpace::kTransform, &myStatus);
     }
 
     if (myStatus != MS::kSuccess) {
-        throw ExportException("Can't get scale/position/rotation/pivot/pivot translation from node",
+        throw ExportException("Can't get scale/position/rotation/pivot/pivot-translation/scale-pivot-translation from node",
                 "SceneExporter::exportTransform()");
     }
 
@@ -428,12 +428,13 @@ SceneExporter::exportTransformBase(const MObject & theObject, TransformBuilderBa
         convertToMeter(myPivot);
         convertToMeter(myPivotTranslation);
 
-        theTransformBuilder.setPosition(asl::Vector3f(float(myPosition.x), float(myPosition.y), float(myPosition.z)));
+        // Add the pivot translation to the position, because it is just a correction factor that will not be used
+        // outside maya.
+        theTransformBuilder.setPosition(asl::Vector3f(float(myPivotTranslation[0]), float(myPivotTranslation[1]), float(myPivotTranslation[2])) +
+            asl::Vector3f(float(myPosition.x), float(myPosition.y), float(myPosition.z)));
 
         theTransformBuilder.setOrientation(myRotation);
         theTransformBuilder.setScale(asl::Vector3f(float(myScale[0]), float(myScale[1]), float(myScale[2])));
-        theTransformBuilder.setShear(asl::Vector3f(float(myShear[0]), float(myShear[1]), float(myShear[2])));
-        theTransformBuilder.setPivotTranslation(asl::Vector3f(float(myPivotTranslation[0]), float(myPivotTranslation[1]), float(myPivotTranslation[2])));
 
         // if transform is child of a joint, do not export pivots
         if (!dynamic_cast<JointBuilder *>(&theParentTransform)) {

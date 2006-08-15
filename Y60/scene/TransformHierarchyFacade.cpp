@@ -13,8 +13,8 @@
 //
 //   $Revision: 1.5 $
 //
-//   Description: 
-// 
+//   Description:
+//
 //
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
@@ -29,12 +29,12 @@ using namespace dom;
 
 
 namespace y60 {
- 
+
 #if 1
     // do not print debug messages
     #define PRINTMESSAGE(theNode, theMessage, theColor)
     #define DB(x) // x
-#else   
+#else
     // print debug messages
     #define PRINTMESSAGE(theNode, theMessage, theColor) \
             if (AC_DEBUG_ON) cerr << theNode.nodeName() << " (" << theNode.getAttributeString("name") << "): "\
@@ -43,7 +43,7 @@ namespace y60 {
 #endif
 
 
- 
+
     TransformHierarchyFacade::TransformHierarchyFacade(dom::Node & theNode) : dom::Facade(theNode),
         IdTag::Plug(theNode),
         NameTag::Plug(theNode),
@@ -52,9 +52,7 @@ namespace y60 {
         PositionTag::Plug(theNode),
         OrientationTag::Plug(theNode),
         ScaleTag::Plug(theNode),
-        ShearTag::Plug(theNode),
         PivotTag::Plug(theNode),
-        PivotTranslationTag::Plug(theNode),
         BillboardTag::Plug(theNode),
         SensorTag::Plug(theNode),
         SensorRadiusTag::Plug(theNode),
@@ -64,12 +62,12 @@ namespace y60 {
         dom::FacadeAttributePlug<BoundingBoxTag>(this),
         dom::FacadeAttributePlug<GlobalMatrixTag>(this),
         dom::FacadeAttributePlug<LocalMatrixTag>(this),
-        dom::FacadeAttributePlug<InverseGlobalMatrixTag>(this)        
+        dom::FacadeAttributePlug<InverseGlobalMatrixTag>(this)
     {}
 
     void
     TransformHierarchyFacade::registerDependenciesRegistrators() {
-        AC_TRACE << "TransformHierarchyFacade::registerDependenciesRegistrators: this ="<<(void*)this; 
+        AC_TRACE << "TransformHierarchyFacade::registerDependenciesRegistrators: this ="<<(void*)this;
         LocalMatrixTag::Plug::setReconnectFunction(&TransformHierarchyFacade::registerDependenciesForLocalMatrix);
         GlobalMatrixTag::Plug::setReconnectFunction(&TransformHierarchyFacade::registerDependenciesForGlobalMatrix);
         BoundingBoxTag::Plug::setReconnectFunction(&TransformHierarchyFacade::registerDependenciesForBoundingBox);
@@ -84,9 +82,7 @@ namespace y60 {
             LocalMatrixTag::Plug::dependsOn<PositionTag>(*this);
             LocalMatrixTag::Plug::dependsOn<OrientationTag>(*this);
             LocalMatrixTag::Plug::dependsOn<ScaleTag>(*this);
-            LocalMatrixTag::Plug::dependsOn<ShearTag>(*this);
             LocalMatrixTag::Plug::dependsOn<PivotTag>(*this);
-            LocalMatrixTag::Plug::dependsOn<PivotTranslationTag>(*this);  
 
             LocalMatrixTag::Plug::setCalculatorFunction(&TransformHierarchyFacade::recalculateLocalMatrix);
         }
@@ -99,8 +95,8 @@ namespace y60 {
             GlobalMatrixTag::Plug::dependsOn<LocalMatrixTag>(*this);
 
             if (myNode.parentNode() && myNode.parentNode()->nodeName() != WORLD_LIST_NAME) {
-                TransformHierarchyFacadePtr myParent = myNode.parentNode()->getFacade<TransformHierarchyFacade>();                
-                GlobalMatrixTag::Plug::dependsOn<GlobalMatrixTag>(*myParent);                  
+                TransformHierarchyFacadePtr myParent = myNode.parentNode()->getFacade<TransformHierarchyFacade>();
+                GlobalMatrixTag::Plug::dependsOn<GlobalMatrixTag>(*myParent);
                 GlobalMatrixTag::Plug::setCalculatorFunction(&TransformHierarchyFacade::recalculateGlobalMatrix);
             } else {
                 GlobalMatrixTag::Plug::setCalculatorFunction(&TransformHierarchyFacade::copyLocalToGlobalMatrix);
@@ -113,20 +109,20 @@ namespace y60 {
         Node & myNode = getNode();
         if (myNode) {
             // bounding box
-            BoundingBoxTag::Plug::dependsOn<GlobalMatrixTag>(*this);  
-            BoundingBoxTag::Plug::dependsOn<VisibleTag>(*this);  
+            BoundingBoxTag::Plug::dependsOn<GlobalMatrixTag>(*this);
+            BoundingBoxTag::Plug::dependsOn<VisibleTag>(*this);
 
 #ifdef OLD_PARENT_DEPENDENCY_UPDATE
             if (myNode.parentNode() && myNode.parentNode()->nodeName() != WORLD_LIST_NAME) {
-                TransformHierarchyFacadePtr myParent = myNode.parentNode()->getFacade<TransformHierarchyFacade>();                
-                BoundingBoxTag::Plug::affects<BoundingBoxTag>(*myParent);  
+                TransformHierarchyFacadePtr myParent = myNode.parentNode()->getFacade<TransformHierarchyFacade>();
+                BoundingBoxTag::Plug::affects<BoundingBoxTag>(*myParent);
             }
 #else
             for (unsigned i = 0; i < myNode.childNodesLength(); ++i) {
                 NodePtr myChildNode = myNode.childNode(i);
                 if (myChildNode->nodeType() == dom::Node::ELEMENT_NODE) {
-                    TransformHierarchyFacadePtr myChild = myChildNode->getFacade<TransformHierarchyFacade>();                
-                    BoundingBoxTag::Plug::dependsOn<BoundingBoxTag>(*myChild);  
+                    TransformHierarchyFacadePtr myChild = myChildNode->getFacade<TransformHierarchyFacade>();
+                    BoundingBoxTag::Plug::dependsOn<BoundingBoxTag>(*myChild);
                 }
             }
 #endif
@@ -139,7 +135,7 @@ namespace y60 {
         Node & myNode = getNode();
         if (myNode) {
             // inverse global matrix
-            InverseGlobalMatrixTag::Plug::dependsOn<GlobalMatrixTag>(*this);  
+            InverseGlobalMatrixTag::Plug::dependsOn<GlobalMatrixTag>(*this);
             InverseGlobalMatrixTag::Plug::setCalculatorFunction(&TransformHierarchyFacade::recalculateInverseGlobalMatrix);
 
             DB(if (AC_TRACE_ON){
@@ -149,7 +145,7 @@ namespace y60 {
             })
         }
     }
-   
+
     asl::Vector3f
     TransformHierarchyFacade::getViewVector() const {
         const asl::Vector4f & myViewVector = get<GlobalMatrixTag>().getRow(2);
@@ -168,19 +164,19 @@ namespace y60 {
         return normalized(asl::Vector3f(myViewVector[0], myViewVector[1], -1.0f * myViewVector[2]));
     }
 
-    void 
+    void
     TransformHierarchyFacade::recalculateLocalMatrix() {
         PRINTMESSAGE(getNode(), "Recalculating local matrix (copy local to global) @ " << (Field*)(&*LocalMatrixTag::Plug::getValuePtr()), TTYRED);
-        asl::Matrix4f myMatrix = Matrix4f::Identity(); 
+        asl::Matrix4f myMatrix = Matrix4f::Identity();
         myMatrix.scale(get<ScaleTag>());
         myMatrix.translate(-get<PivotTag>());
         Matrix4f myRotation(get<OrientationTag>());
         myMatrix.postMultiply(myRotation);
-        myMatrix.translate(get<PositionTag>() + get<PivotTag>() + get<PivotTranslationTag>());
+        myMatrix.translate(get<PivotTag>() + get<PositionTag>());
         set<LocalMatrixTag>(myMatrix);
     }
 
-    void 
+    void
     TransformHierarchyFacade::copyLocalToGlobalMatrix() {
         PRINTMESSAGE(getNode(), "Recalculating global matrix (copy local to global) @ " << (Field*)(&*GlobalMatrixTag::Plug::getValuePtr()), TTYRED);
         set<GlobalMatrixTag>(get<LocalMatrixTag>());
@@ -193,11 +189,11 @@ namespace y60 {
 
         TransformHierarchyFacadePtr myParent = getNode().parentNode()->getFacade<TransformHierarchyFacade>();
         if (myParent) {
-            myMatrix.postMultiply(myParent->get<GlobalMatrixTag>());  
+            myMatrix.postMultiply(myParent->get<GlobalMatrixTag>());
             set<GlobalMatrixTag>(myMatrix);
         }
     }
-    
+
     void
     TransformHierarchyFacade::recalculateBoundingBox() {
         PRINTMESSAGE(getNode(), "Recalculating bounding matrix @ " << (Field*)(&*BoundingBoxTag::Plug::getValuePtr()), TTYGREEN);
@@ -211,9 +207,9 @@ namespace y60 {
                 myBoundingBox.extendBy(myChild->get<BoundingBoxTag>());
             }
         }
-        set<BoundingBoxTag>(myBoundingBox);        
+        set<BoundingBoxTag>(myBoundingBox);
     }
-    
+
     void
     TransformHierarchyFacade::recalculateInverseGlobalMatrix() {
         PRINTMESSAGE(getNode(), "Recalculating inverse global matrix @ " << (Field*)(&*InverseGlobalMatrixTag::Plug::getValuePtr()), TTYYELLOW);
