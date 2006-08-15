@@ -1064,4 +1064,27 @@
             </properties>
         </fragmentshader>
     </shader>
+    <shader id="s129" name="flow" cost="10">
+        <supports>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="textures" values="[flow]"/>
+            <feature class="texcoord" values="[*,*]"/>
+        </supports>
+        <vertexshader profile="VP30" file="flow.cg" entryfunction="mainVertex">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="flow.cg" entryfunction="mainFragment">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    
 </shaders>

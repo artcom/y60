@@ -1,0 +1,51 @@
+//=============================================================================
+// Copyright (C) 2006 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+
+struct vert2frag {
+    float4 position : POSITION;
+    float2 texCoord0 : TEXCOORD0;
+    float2 texCoord1 : TEXCOORD1;
+};
+
+vert2frag mainVertex(float4 thePosition : POSITION,
+                     float4 theTexCoord0 : TEXCOORD0,
+                     float4 theTexCoord1 : TEXCOORD1,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 GL_TEXTURE)
+{
+    vert2frag OUT;
+    OUT.position = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    OUT.texCoord0 = mul(GL_TEXTURE, theTexCoord0).xy;
+    OUT.texCoord1 = mul(GL_TEXTURE, theTexCoord1).xy;
+    return OUT;
+}
+
+float4 mainFragment(vert2frag IN,
+                    uniform sampler2D tex0,
+                    uniform sampler2D tex1) : COLOR 
+{
+    //float2 pos = IN.texCoord1 - tex2D( tex1, IN.texCoord1);
+
+    float4 myFlowField      = tex2D( tex0, IN.texCoord0);
+    float4 myRGBA      = tex2D( tex1, IN.texCoord1);
+    
+    //myRGBA.r += 0.001;
+    //myRGBA.gb -= 0.0001;
+    //myRGBA.rgba = 0.001;
+    //myFlowField.rgba = 0.001;
+    //float4 myOUTColor;
+    //myOUTColor.rgb = myFlowField.rgb;
+    //myOUTColor.rgb *= 0.5;
+
+    //return myFlowField;
+    return myRGBA;
+} 
+
