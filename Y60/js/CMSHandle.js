@@ -32,6 +32,8 @@ try {
      - presentationpage: URL part to envoke XML export
      - verbose: ZOPE verbosity on/off [0|1]
      - localfallback: relative path to a local fallback presentation file (read/write)
+     - fallback: force local fallback to the local presentation file defined in 'localfallback' (read/write)
+     - versiontag: version tag name i.e. "head", "stable", "testing" (read/write)
     cmscache:
      - localdir: base directory for local chache
      - backend: backend type [OCS|SVN]
@@ -63,8 +65,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     }
 
     obj.synchronize = function() {
-        var myCMSConfig = _myConfig.childNode("cmscache", 0);
-        var myUsername = _myConfig.username;
+        var myCMSConfig  = _myConfig.childNode("cmscache", 0);
+        var myUsername   = _myConfig.username;
         if ("domain" in myCMSConfig && myCMSConfig.domain.length) {
              myUsername += "@" + myCMSConfig.domain;
         }
@@ -112,6 +114,12 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             
     obj.__defineGetter__('assetDir',
             function() { return _myConfig.childNode("cmscache",0).localdir; } );
+            
+    obj.__defineGetter__('versionTag',
+            function() { return _myVersionTag; } );
+            
+    obj.__defineSetter__('versionTag',
+            function(theVersionTag) { _myVersionTag = theVersionTag; } );
 
     function fetchPresentation() {
         _myPresentation = Node.createDocument();
@@ -134,8 +142,12 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                 Logger.error("No ZOPE cookie in server response.");
                 myErrorOccurred = true;
             }
-            var myPresentationRequest = new Request( myZopeConfig.baseurl + "/" + myZopeConfig.presentationpage,
-                    _myUserAgent );
+            
+            var myRequestURI = myZopeConfig.baseurl + "/" + myZopeConfig.presentationpage;
+            if (_myVersionTag && _myVersionTag.length) {
+                myRequestURI += "?versionTag=" + _myVersionTag;
+            }
+            var myPresentationRequest = new Request( myRequestURI, _myUserAgent );
             var myCookies = myLoginRequest.getAllResponseHeaders("Set-Cookie");
             verboseZope("Login request cookies:");
             for (var i = 0; i < myCookies.length; ++i) {
@@ -204,6 +216,12 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             _mySyncFlag = Number(myCMSConfig.sync) > 0;
         }
 
+        if ("versiontag" in myZopeConfig &&
+            myZopeConfig.versiontag)
+        {
+            _myVersionTag = myZopeConfig.versiontag;
+        }
+
         fetchPresentation();
     }
 
@@ -224,6 +242,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     var _mySyncFlag = true;
     var _myCMSCache = null;
     var _myUserAgent = null;
+    var _myVersionTag = null;
     var _myOCSCookie = null;
 
     setup();
