@@ -49,23 +49,32 @@ void DInputExtension::init() {
     hr = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION,
                             IID_IDirectInput8, (void**)&_myDI, NULL );
     if (FAILED(hr)) {
-        AC_WARNING << "DirectInput8Create() failed. Joysticks will not be available.";
+        AC_WARNING << "DirectInput8Create() failed. DInput devices will not be available.";
         _myDI = 0;
         return;
     }
 
     hr = _myDI->EnumDevices(DI8DEVCLASS_GAMECTRL,
                             EnumJoysticksCallback,
-                            this, DIEDFL_ATTACHEDONLY);  // DIEFL_ALLDEVICES?
+                            this, DIEDFL_ATTACHEDONLY);
     if (FAILED(hr)) {
-        AC_ERROR << "DirectInput8::EnumDevices() failed. Joysticks will not be available.";
+        AC_ERROR << "DirectInput8::EnumDevices() failed. Joystick will not be available.";
+        _myDI = 0;
+        return;
+    }
+
+    hr = _myDI->EnumDevices(DI8DEVTYPE_DRIVING,
+                            EnumJoysticksCallback,
+                            this, DIEDFL_ATTACHEDONLY);
+    if (FAILED(hr)) {
+        AC_ERROR << "DirectInput8::EnumDevices() failed. Driving device will not be available.";
         _myDI = 0;
         return;
     }
 
     // Make sure we got a joystick
     if(_myJoysticks.size() == 0) {
-        AC_WARNING << "DInputExtension - No joysticks found.";
+        AC_WARNING << "DInputExtension - No DInput device found.";
         return;
     }
 
@@ -230,7 +239,7 @@ DInputExtension::poll() {
 
 void
 DInputExtension::printErrorState(const string & theCall, HRESULT hr) {
-    AC_ERROR << theCall << " failed, reason:";
+    AC_ERROR << theCall << " failed, reason (" << hr << "):";
     switch (hr) {
         case DIERR_INPUTLOST:
             AC_ERROR << "Access to the input device has been lost. It must be reacquired.";
