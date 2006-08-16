@@ -18,9 +18,9 @@
 #include <asl/numeric_functions.h>
 #include <asl/file_functions.h>
 
-#define  GL_GLEXT_PROTOTYPES
+//#define  GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
-#include <GL/glut.h>
+//#include <GL/glut.h>
 
 #include <iostream>
 #include <stdio.h>
@@ -36,12 +36,6 @@
 
 
 using namespace std;  // automatically added!
-
-
-// glut internal definition
-extern int __glutScreenHeight;
-extern int __glutScreenWidth;
-
 
 namespace video {
 
@@ -215,6 +209,7 @@ RenderApp::printUsage()
 }
 
 void debugGLUT  () {
+    /*
     AC_PRINT  << "debugGLUT ():" << endl
         << "\tcurrent window id: " << glutGetWindow ()
         << endl ;
@@ -234,6 +229,7 @@ void debugGLUT  () {
         << "\tGLUT_GAME_MODE_DISPLAY_CHANGED : " 
         << glutGameModeGet (GLUT_GAME_MODE_DISPLAY_CHANGED) 
         << endl ;
+    */
 }
 
 void
@@ -266,6 +262,7 @@ RenderApp::handleDisplay(void) {
     }
     
     // do the color correction
+    /*
     if (_colorCorrectionActive) {
 
         glMatrixMode( GL_PROJECTION );
@@ -293,8 +290,9 @@ RenderApp::handleDisplay(void) {
     if (_currentRenderModule) {
         _currentRenderModule->renderPostEdgeBlend();
     }
+    */
     
-    glutSwapBuffers();
+    //glutSwapBuffers();
 }
 
 void 
@@ -327,7 +325,7 @@ RenderApp::handlePeriodic() {
     }
     
     if (needsRedraw) { 
-        glutPostRedisplay();
+        //glutPostRedisplay();
     }
 }
 
@@ -339,9 +337,9 @@ RenderApp::handleVisible(bool isVisible) {
     }
     
 	if (isVisible) {
-		glutIdleFunc( periodic );
+		//glutIdleFunc( periodic );
 	} else {
-		glutIdleFunc( NULL );
+		//glutIdleFunc( NULL );
 	}
 }
 
@@ -395,7 +393,7 @@ RenderApp::handleKeyboard(unsigned char key, int x, int y) {
     switch (key) {
         case 'c':
             _showCursor = !_showCursor;
-            glutSetCursor( _showCursor ? GLUT_CURSOR_INHERIT : GLUT_CURSOR_NONE);
+            //glutSetCursor( _showCursor ? GLUT_CURSOR_INHERIT : GLUT_CURSOR_NONE);
             break;
         case 'd':
             debugGLUT();
@@ -409,7 +407,7 @@ RenderApp::handleKeyboard(unsigned char key, int x, int y) {
         default:
             break;
     }
-    glutPostRedisplay();
+    //glutPostRedisplay();
 }
 
 
@@ -417,6 +415,7 @@ void
 RenderApp::initWindow() {
     AC_DEBUG << "RenderApp::initWindow()";
 
+    /*
     if (_verbose) {
         AC_DEBUG << "initWindow():" << endl
             << "\tcurrent window id " << glutGetWindow () << endl
@@ -453,12 +452,14 @@ RenderApp::initWindow() {
         // is always borderless and maximized.
         glutGameModeString("1280x1024:16@60");
 
-        _screenWidth = __glutScreenWidth;
-        _screenHeight = __glutScreenHeight;
+        // XXX 
+        _screenWidth = 1280;
+        _screenHeight = 1024;
         
         _originalWindow = glutEnterGameMode ();
 
     }
+    */
     
     if (!_windowInitialized) {
         registerGlutCallbacks();
@@ -473,7 +474,7 @@ RenderApp::initWindow() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glutSetCursor( _showCursor ? GLUT_CURSOR_INHERIT : GLUT_CURSOR_NONE);
+    //glutSetCursor( _showCursor ? GLUT_CURSOR_INHERIT : GLUT_CURSOR_NONE);
     
     RenderModuleMap::iterator iter(_renderModules.begin());
     while (iter != _renderModules.end()) {
@@ -504,7 +505,7 @@ RenderApp::handleArguments(int argc, char *argv[]) {
     }
     
     // INIT GLUT
-    glutInit(&argc, argv);       
+    //glutInit(&argc, argv);       
 
     return true;
 }
@@ -570,7 +571,7 @@ RenderApp::startMainLoop() {
 
     if (_currentRenderModule) {
         AC_DEBUG << "    current module is " << _currentRenderModule->getName();
-        glutMainLoop();
+        //glutMainLoop();
     } else {
         AC_DEBUG << "RenderApp::startMainLoop(): No module running";
     }
@@ -647,7 +648,7 @@ RenderApp::init() {
         setupColorCorrection();
     }
 
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    //glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 
     // FRAME SYNC FACILITY 
 
@@ -669,6 +670,7 @@ RenderApp::init() {
 
 void
 RenderApp::registerGlutCallbacks() {
+    /*
     glutReshapeFunc(reshape);
     glutDisplayFunc(display);
     glutKeyboardFunc(key);
@@ -677,6 +679,7 @@ RenderApp::registerGlutCallbacks() {
     glutMotionFunc(motion);
     glutIdleFunc(periodic);
     glutVisibilityFunc(visible);
+    */
 }
 
 void 
@@ -711,7 +714,7 @@ RenderApp::key(unsigned char key, int x, int y) {
 
 void 
 RenderApp::visible( int vis ) {
-    RenderApp::instance().handleVisible(vis == GLUT_VISIBLE);
+    //RenderApp::instance().handleVisible(vis == GLUT_VISIBLE);
 }
 
 void 

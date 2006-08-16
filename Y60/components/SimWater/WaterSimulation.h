@@ -12,6 +12,12 @@
 #ifndef _WaterSimulation_h_
 #define _WaterSimulation_h_
 
+#include <asl/Ptr.h>
+#include <asl/Vector234.h>
+#include <asl/PosixThread.h>
+#include <asl/ThreadLock.h>
+#include <asl/ThreadSemaphore.h>
+
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
@@ -20,16 +26,12 @@
 #include <list>
 #include <vector>
 
-#include <asl/PosixThread.h>
-#include <asl/ThreadLock.h>
-#include <asl/ThreadSemaphore.h>
-
-namespace video {
+namespace y60 {
     
 class WaterSimulation {
 public:
 
-    WaterSimulation(int numColumns, int numRows, float defaultDampingCoefficent=0.9993f);
+    WaterSimulation( asl::Vector2i theSimulationSize, float defaultDampingCoefficent=0.9993f);
 
     ~WaterSimulation();
 
@@ -50,10 +52,10 @@ public:
 
 
     inline int getNumRows() const {
-        return _numRows;
+        return _mySize[1];
     }
     inline int getNumColumns() const {
-        return _numColumns;
+        return _mySize[0];
     }
 
     //  we allocated an array that is slightly larger (for computation of normals!)
@@ -82,8 +84,6 @@ public:
         assert(y < _numAllocatedRows);
         return *(_waterArray[buffer] + (y+1) * _numAllocatedColumns + (x+1));
     }
-
-
     
     inline float   * getDampingArray() {
         return _dampingArray;
@@ -109,8 +109,7 @@ public:
     }
     
 private:
-    int     _numRows;
-    int     _numColumns;
+    asl::Vector2i _mySize;
     int     _numAllocatedRows;
     int     _numAllocatedColumns;
     int     _currentBuffer;
@@ -175,8 +174,9 @@ private:
     asl::ThreadSemaphore *   _computeLock;
 };   
 
+typedef asl::Ptr<WaterSimulation> WaterSimulationPtr;
 
-}; // namespace video
+}; // namespace y60
 
 #endif
 

@@ -9,18 +9,15 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-#include <GL/glext.h>
-#include <GL/glx.h>
+#include <y60/GLUtils.h>
 
 #include "WaterRepresentation.h"
 #include "WaterSimulation.h"
 
+#include <asl/Dashboard.h>
 #include <asl/Logger.h>
 #include <asl/numeric_functions.h>
 
-#include <GL/glut.h>
 #include <paintlib/plpngenc.h>
 #include <paintlib/planybmp.h>
 #include <paintlib/planydec.h>
@@ -49,8 +46,7 @@ using namespace asl;  // manually added!
 #endif
 
 
-namespace video {
-
+namespace y60 {
 
 // FOR THE FAMOUS WHISKY THING:
 #define RUNNING_WATER_TEST
@@ -73,35 +69,10 @@ const float CRACK_EDGE_LEVEL_LOW = 3;
 // will only be erased (sharp edges)
 const int MAX_DRAWABLE_CRACKS = 2000;
 
-struct Vec3 {
-    Vec3(float theX=0, float theY=0, float theZ=0) :
-        x(theX), y(theY), z(theZ)
-    {
-    }
-    float x, y, z;
-};
-
-
 // special NVIDIA extension, ins special NVIDIA GL/gl.h:
-extern "C" {
-void glVertexArrayRangeNV (GLsizei size, const GLvoid *pointer);
-}
-
-inline float minimum(float a, float b) {
-	return a < b ? a : b;
-}
-inline float maximum(float a, float b) {
-	return a > b ? a : b;
-}
-inline float clamp(float v, float min, float max) {
-    if (v > max) {
-        v = max;
-    } else
-    if (v < min) {
-        v = min;
-    }
-    return v;
-}
+//extern "C" {
+//void glVertexArrayRangeNV (GLsizei size, const GLvoid *pointer);
+//}
 
 WaterRepresentation::WaterRepresentation() :
     _vertexBuffer(0),
@@ -116,7 +87,7 @@ WaterRepresentation::WaterRepresentation() :
     _bufferAllocator(0),
     _waterSimulation(0),
     _stripIndices(0),
-    _drawWireFrame(false),
+    _drawWireFrame( false ),
     _drawCaustics(true),
     _drawReflections(true),
     _drawRefractions(false), //  done by caustics
@@ -153,13 +124,14 @@ WaterRepresentation::~WaterRepresentation() {
             _bufferAllocator->freeSingleBuffer();
             _vertexBuffer = 0;
         } else {
-            free(_bufferAllocator);
+            //free(_bufferAllocator);
+            _bufferAllocator = BufferAllocatorPtr(0);
             _vertexBuffer= 0;
         }
     }
     if (_bufferAllocator) {
-        delete _bufferAllocator;
-        _bufferAllocator = 0;
+        //delete _bufferAllocator;
+        _bufferAllocator = BufferAllocatorPtr(0);
     }
     if (_stripIndices) {
         delete[] _stripIndices;
@@ -183,12 +155,12 @@ WaterRepresentation::resetParameters() {
 
 // init internal data to fit water array size
 void    
-WaterRepresentation::init(WaterSimulation * waterSim, int width, int height,
+WaterRepresentation::init(WaterSimulationPtr waterSim, int width, int height,
                           int dataOffsetX, int dataOffsetY, 
                           int sceneDisplayWidth, int sceneDisplayHeight,
                           int displayWidth, int displayHeight,
                           int displayOffsetX, int displayOffsetY,
-                          BufferAllocator * bufferAllocator) 
+                          BufferAllocatorPtr bufferAllocator) 
 {
     cerr << "WaterRepresentation::init " << endl
          << "dataWidth=" << width << ", dataHeight= " << height << endl
@@ -398,13 +370,10 @@ WaterRepresentation::copyWaterDataToVertexBuffer(int currentBuffer) {
 #endif
 }
 
-
-
-
 bool
 WaterRepresentation::initExtensions(char* extension) {
-  if (!glutExtensionSupported(extension)) {
-    cout <<"requires the "<<extension<<" OpenGL extension to work.\n";
+  if ( ! queryOGLExtension(extension)) {
+    AC_ERROR << "requires the " << extension << " OpenGL extension to work.";
     return false;
   }
   return true;
@@ -653,7 +622,7 @@ WaterRepresentation::initRender() {
     if (!initExtensions("GL_ARB_texture_env_add")) {
         return false;
     }
- 	
+
     glShadeModel( GL_SMOOTH );
 
 	glEnable( GL_DEPTH_TEST );
@@ -664,15 +633,15 @@ WaterRepresentation::initRender() {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY_RANGE_NV);
+
     glVertexArrayRangeNV((_dataHeight+1)*(_dataWidth+1)*VERTEX_DATA_STRIDE*sizeof(GLfloat), 
                          _vertexBuffer);
 
-#ifdef USE_VAR_FENCE
+#ifdef USE_VAR_FENCE // XXX never defined
     for(int i=0; i < NUM_VAR_BUFFERS; i++) {
         glGenFencesNV(1, &_varBuffer[i]._fence);
     }
 #endif
-
 
     _cubeMapSideID[0] = GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB;
     _cubeMapSideID[1] = GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB;
@@ -701,7 +670,7 @@ WaterRepresentation::renderSurface() {
         // set up texture
         Texture & myTexture = currentTexture(surfacemaps);
 
-        glActiveTextureARB(GL_TEXTURE0_ARB);
+        glActiveTexture(GL_TEXTURE0_ARB);
         glEnable(GL_TEXTURE_2D);
 
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // GL_DECAL);
@@ -711,7 +680,7 @@ WaterRepresentation::renderSurface() {
         cerr << "#WARNING: WaterRepresentation::renderSurface(): can't find fileObject class "
             << TextureClassName(surfacemaps)
             << " id " <<  _currentID[surfacemaps] << endl;
-        glActiveTextureARB(GL_TEXTURE0_ARB);
+        glActiveTexture(GL_TEXTURE0_ARB);
         glDisable(GL_TEXTURE_2D);
     }
 
@@ -745,6 +714,8 @@ WaterRepresentation::renderSurface() {
 void 
 WaterRepresentation::render() {
 
+    MAKE_SCOPE_TIMER(WaterRepresentation_render);
+
     setDefaultGLState();
 
     if (_drawWireFrame) {
@@ -755,7 +726,9 @@ WaterRepresentation::render() {
         glPolygonMode( GL_BACK, GL_FILL );
     }
     
-    glActiveTextureARB(GL_TEXTURE0_ARB);
+
+    
+    glActiveTexture(GL_TEXTURE0_ARB);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY_RANGE_NV);
@@ -769,8 +742,8 @@ WaterRepresentation::render() {
 
     if ((_drawCaustics) || (_drawRefractions)) {
 
-        glActiveTextureARB(GL_TEXTURE0_ARB);
-        glClientActiveTextureARB(GL_TEXTURE0_ARB);
+        glActiveTexture(GL_TEXTURE0_ARB);
+        glClientActiveTexture(GL_TEXTURE0_ARB);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glEnable(GL_TEXTURE_2D);
 
@@ -786,6 +759,25 @@ WaterRepresentation::render() {
 
         glTranslatef(0, 0, WATER_DEPTH);
         
+
+
+#if 0
+    // XXX
+    glColor4f(1, 1, 1, 1);
+    glBegin(GL_TRIANGLES);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f( 20, 20, 0);
+
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f( 0, 20, 0);
+
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f( 20, 0, 0);
+    glEnd();
+#endif 
+
+
+
         //  although currently not used, we keep the code to be able to reenable it again
         for (int currentBuffer = 0; currentBuffer < NUM_VAR_BUFFERS; currentBuffer ++) {
 
@@ -820,8 +812,8 @@ WaterRepresentation::render() {
     
     if (_drawReflections) {
         
-        glActiveTextureARB(GL_TEXTURE0_ARB);
-        glClientActiveTextureARB(GL_TEXTURE1_ARB);
+        glActiveTexture(GL_TEXTURE0_ARB);
+        glClientActiveTexture(GL_TEXTURE1_ARB);
         //Enable cube mapping.
         glEnable(GL_TEXTURE_CUBE_MAP_ARB);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -874,8 +866,8 @@ WaterRepresentation::render() {
 
     if (_drawReflections) {
         //Disable cube mapping
-        glActiveTextureARB(GL_TEXTURE0_ARB);
-        glClientActiveTextureARB(GL_TEXTURE0_ARB);
+        glActiveTexture(GL_TEXTURE0_ARB);
+        glClientActiveTexture(GL_TEXTURE0_ARB);
         glDisable(GL_TEXTURE_CUBE_MAP_ARB);
         glDisable(GL_TEXTURE_GEN_S);
         glDisable(GL_TEXTURE_GEN_T);
@@ -901,8 +893,8 @@ WaterRepresentation::setDefaultGLState() {
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY_RANGE_NV);
     
-    glActiveTextureARB(GL_TEXTURE0_ARB);
-    glClientActiveTextureARB(GL_TEXTURE0_ARB);
+    glActiveTexture(GL_TEXTURE0_ARB);
+    glClientActiveTexture(GL_TEXTURE0_ARB);
     glDisable(GL_TEXTURE_CUBE_MAP_ARB);
     glDisable(GL_TEXTURE_GEN_S);
     glDisable(GL_TEXTURE_GEN_T);
@@ -915,8 +907,8 @@ WaterRepresentation::setDefaultGLState() {
 
     // texture unit 2
     
-    glActiveTextureARB(GL_TEXTURE1_ARB);
-    glClientActiveTextureARB(GL_TEXTURE1_ARB);
+    glActiveTexture(GL_TEXTURE1_ARB);
+    glClientActiveTexture(GL_TEXTURE1_ARB);
     
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     
@@ -924,7 +916,7 @@ WaterRepresentation::setDefaultGLState() {
     glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, 0);
 
-    glActiveTextureARB(GL_TEXTURE0_ARB);
+    glActiveTexture(GL_TEXTURE0_ARB);
 }
 
-}; // namespace video
+}; // namespace y60

@@ -1512,9 +1512,9 @@ main(asl::Arguments & ourArguments) {
 
     AC_PRINT << "\nSimulation configuration:\n";
     AC_PRINT << "==========================\n";
-    AC_PRINT << "simulation-width    (W+2) = " << gSimulationWidth << endl;
-    AC_PRINT << "simulation-height   (H+2) = " << gSimulationHeight << endl;
-    AC_PRINT << "simulation-offset-x ( >0) = " << gSimulationOffsetX << endl;
+    AC_PRINT << "simulation-width    (W+2) = " << gSimulationWidth;
+    AC_PRINT << "simulation-height   (H+2) = " << gSimulationHeight;
+    AC_PRINT << "simulation-offset-x ( >0) = " << gSimulationOffsetX;
     if (gSimulationOffsetX <= 0) {
         gSimulationOffsetX = 1;
         AC_WARNING << "simulation-offset-x CORRECTED TO = " << gSimulationOffsetX << endl;

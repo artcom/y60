@@ -12,6 +12,9 @@
 #ifndef _WaterRepresentation_h_
 #define _WaterRepresentation_h_
 
+#include "WaterSimulation.h"
+
+#include <asl/Ptr.h>
 #include <asl/Vector234.h>
 #include <asl/string_functions.h>
 
@@ -26,7 +29,7 @@
 #include <map>
 
 
-namespace video {
+namespace y60 {
 
 class BufferAllocator {
 public:
@@ -37,6 +40,8 @@ public:
     virtual bool    freeSingleBuffer() = 0;
 };
 
+typedef asl::Ptr<BufferAllocator> BufferAllocatorPtr;
+
 const int NUM_VAR_BUFFERS = 10;
 // 3 vertex position
 // 3 vertex normal
@@ -45,7 +50,7 @@ const int NUM_VAR_BUFFERS = 10;
 const int VERTEX_DATA_STRIDE = 12;
 
 
-class WaterSimulation;
+//class WaterSimulation;
 
 
 class WaterRepresentation {
@@ -71,12 +76,12 @@ public:
 //  make sure that (height % NUM_BUFFERS == 0) !!!
 
     // init internal data to fit water array size
-    void    init(WaterSimulation * waterSim, int width, int height, 
+    void    init(WaterSimulationPtr waterSim, int width, int height, 
                  int dataOffsetX, int dataOffsetY,
                  int sceneDisplayWidth, int sceneDisplayHeight,
                  int displayWidth, int displayHeight,
                  int displayOffsetX, int displayOffsetY,
-                 BufferAllocator * bufferAllocator=0);
+                 BufferAllocatorPtr bufferAllocator = BufferAllocatorPtr(0) );
     
     void    reset();
     void    resetParameters();
@@ -227,9 +232,9 @@ public:
     virtual void    setDefaultGLState();
     
 private:
-    BufferAllocator *   _bufferAllocator;
+    BufferAllocatorPtr  _bufferAllocator;
     GLfloat *           _vertexBuffer;
-    WaterSimulation *   _waterSimulation;
+    WaterSimulationPtr  _waterSimulation;
 
     std::map<TextureClass,std::map<ObjectID,Texture> > _myTextures;
     std::map<TextureClass,ObjectID> _currentID;
@@ -297,8 +302,9 @@ private:
 
 };
 
+typedef asl::Ptr<WaterRepresentation> WaterRepresentationPtr;
 
-}; // namespace video
+}; // namespace y60
 
 
 #endif

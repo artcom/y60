@@ -36,7 +36,7 @@
 #include <Yr/Time.h>
 #include <Yr/Sockets.h>
 
-#define  GL_GLEXT_PROTOTYPES
+//#define  GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
 //#include <GL/glut.h>
 #include <net/glut.h>

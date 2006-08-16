@@ -33,13 +33,12 @@ using namespace std;  // automatically added!
 #define ABS(a) (((a) < 0) ? (-(a)) : (a))
 #endif
 
-namespace video {
+namespace y60 {
 
 //#define DAMPING_TEST
 
-WaterSimulation::WaterSimulation(int numColumns, int numRows, float defaultDampingCoefficent) :
-    _numRows(numRows),
-    _numColumns(numColumns),
+WaterSimulation::WaterSimulation(asl::Vector2i theSimulationSize, float defaultDampingCoefficent) :
+    _mySize( theSimulationSize ),
     _currentBuffer(0),
     _dampingArray(0),
     _defaultDampingCoefficient(defaultDampingCoefficent),
@@ -47,8 +46,8 @@ WaterSimulation::WaterSimulation(int numColumns, int numRows, float defaultDampi
     _computeLock(0)
 {
     //  we allocate an array that is slightly larger (for computation of normals!)
-    _numAllocatedRows = _numRows + 2;
-    _numAllocatedColumns = _numColumns + 2;
+    _numAllocatedRows = _mySize[1] + 2;
+    _numAllocatedColumns = _mySize[0] + 2;
     
     _waterArray[0] = (float*) malloc(_numAllocatedRows * _numAllocatedColumns * sizeof(float));
     _waterArray[1] = (float*) malloc(_numAllocatedRows * _numAllocatedColumns * sizeof(float));
@@ -222,7 +221,7 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
     register const float B = 2.f - 4.f*A;// - 4*AD;
 
     //assert(stripSize >= numSteps);
-    //assert(_numRows % stripSize == 2);
+    //assert(_mySize[1] % stripSize == 2);
 
     int startLine = 0;
     int endLine = 0;
@@ -233,7 +232,7 @@ WaterSimulation::simulationMultiStep(float dt, int numSteps, int stripSize) {
 
 
     int currentStrip = 0;
-    int numStrips = (_numRows / stripSize);
+    int numStrips = (_mySize[1] / stripSize);
     
     // Phase 1: First strip
 //cerr << "P1\n";
@@ -425,7 +424,7 @@ WaterSimulation::parabolicSplash(int xpos, int ypos, int magnitude, int radius) 
 			if (distance <= radius) {
 				float weight = 1.0 - distance/radius;
 				weight *= weight;
-				if (x >= 0 && x <= _numColumns && y >= 0 && y <= _numRows) {
+				if (x >= 0 && x <= _mySize[0] && y >= 0 && y <= _mySize[1]) {
 //					(*z)[y][x] = (*z1)[y][x] = -weight * magnitude;
 					getWaterValue(0, x, y) = getWaterValue(1, x, y) = 
                         -weight * magnitude;
@@ -437,10 +436,13 @@ WaterSimulation::parabolicSplash(int xpos, int ypos, int magnitude, int radius) 
 
 void 
 WaterSimulation::sinoidSplash(int xpos, int ypos, int magnitude, int radius, int frequency) {
-    
-    //cerr << "WaterSimulation::sinoidSplash()" << endl;
-    
-	for ( int x = xpos - radius; x < xpos + radius; ++x) {
+
+    cerr << "WaterSimulation::sinoidSplash() x: " << xpos << " y: " << ypos
+        << " magnitude: " << magnitude << " radius: " << radius 
+        << " frequency: " << frequency << endl;
+
+
+    for ( int x = xpos - radius; x < xpos + radius; ++x) {
 		for (int y = ypos - radius; y < ypos + radius; ++y) {
 			double dx = xpos - x;
 			double dy = ypos - y;
@@ -448,7 +450,7 @@ WaterSimulation::sinoidSplash(int xpos, int ypos, int magnitude, int radius, int
 			if (distance <= radius) {
 				float weight = 1.0 - distance/radius;
 				weight *= weight;
-				if (x >= 0 && x < _numColumns && y >= 0 && y < _numRows ) {
+				if (x >= 0 && x < _mySize[0] && y >= 0 && y < _mySize[1] ) {
 //#ifdef AIR_SPLASH
 //					(*z)[y][x] = (*z1)[y][x] = (*z)[y][x] -sin(weight*frequency*3.14159/2) * magnitude;
 					getWaterValue(0, x, y) = getWaterValue(1, x, y) = 
@@ -494,5 +496,5 @@ WaterSimulation::ComputeThread::run() {
 
 
 
-}; // namespace video
+}; // namespace y60
 
