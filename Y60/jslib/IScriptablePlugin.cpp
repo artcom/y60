@@ -12,9 +12,18 @@
 #include "JSScriptablePlugin.h"
 
 namespace jslib {
+
+
+    JSFunctionSpec * 
+    IScriptablePlugin::Functions() { 
+        return 0;
+    }
+
+
     void
     IScriptablePlugin::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
-	    JSScriptablePlugin::initClass(theContext, theGlobalObject, ClassName());
+	    JSScriptablePlugin::initClass(theContext, theGlobalObject, ClassName(),
+                Functions());
     }
 }
 

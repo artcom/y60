@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo "#### call testRendererExtension.sh"
-testRendererExtension.sh
-exit 0
+./testRendererExtension.sh
+exit $?

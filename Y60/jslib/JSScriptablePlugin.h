@@ -34,12 +34,15 @@ namespace jslib {
             }
 
             static JSBool Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-            static void initClass(JSContext *cx, JSObject *theGlobalObject, const char * theClassName);
+            static void initClass(JSContext *cx, JSObject *theGlobalObject, const char * theClassName,
+                    JSFunctionSpec * theFunctions = 0);
 
             static IScriptablePluginPtr & getNative(JSContext *cx, JSObject *obj);
             static JSObject * Construct(JSContext *cx, IScriptablePluginPtr theNative);
 
         private:
+            static std::vector<JSFunctionSpec> mergeFunctions( JSFunctionSpec * theFunctions);
+
             static JSClass * Class(const char * theClassName);
 
             IScriptablePluginPtr _myNative;
@@ -47,6 +50,12 @@ namespace jslib {
 
     jsval as_jsval(JSContext *cx, IScriptablePluginPtr theOwner);
     bool convertFrom(JSContext *cx, jsval theValue, IScriptablePluginPtr & theDest);
+
+    template <class T>
+    asl::Ptr<T> getNativeAs(JSContext *cx, JSObject *obj) {
+            return dynamic_cast_Ptr<T>(JSScriptablePlugin::getNative(cx, obj));
+    }
+
 }
 
 #endif

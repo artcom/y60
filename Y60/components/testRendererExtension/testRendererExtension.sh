@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 Y60_DIR="$PRO/src/Y60"
 APP_DIR=`dirname $0`
@@ -28,9 +28,9 @@ fi
 #
 # debug or release mode
 #
-SHELL="acxpshellOPT"
+SHELL="y60"
 if [ ! -z "$DEBUG" -a "$DEBUG" != "0" ]; then
-    SHELL="acxpshellDBG"
+    SHELL="y60DBG"
 fi
 
 APP="$APP_DIR/testRendererExtension.tst.js"

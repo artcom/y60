@@ -28,9 +28,10 @@ namespace jslib {
 
     static JSBool
     toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Prints 'JSScriptablePlugin'");
+        DOC_BEGIN("Prints the actual classname for ScriptablePlugin.");
         DOC_END;
-        *rval = as_jsval(cx, "JSScriptablePlugin");
+        JSClass * myClass = JS_GetClass( obj );
+        *rval = as_jsval(cx, myClass->name);
         return JS_TRUE;
     }
 
@@ -144,9 +145,9 @@ namespace jslib {
 
     JSBool
     JSScriptablePlugin::Constructor(JSContext *cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
-        AC_TRACE << "JSScriptablePlugin::Constructor: " << JSA_GetClass(cx,obj)->name;
         DOC_BEGIN("Constructs a ScriptablePlugin.");
         DOC_END;
+        AC_TRACE << "JSScriptablePlugin::Constructor: " << JSA_GetClass(cx,obj)->name;
         try {
             const char * myClassName = JSA_GetClass(cx,obj)->name;
             if (JSA_GetClass(cx,obj) != Class(myClassName)) {
@@ -249,16 +250,39 @@ namespace jslib {
         return myNewObj;
     }
 
+
+   std::vector<JSFunctionSpec>
+   JSScriptablePlugin::mergeFunctions( JSFunctionSpec * theFunctions) {
+        std::vector<JSFunctionSpec> myResult;
+        JSFunctionSpec * myFunctions = Functions();
+        while ( myFunctions && myFunctions->name ) {
+            myResult.push_back( * myFunctions );
+            myFunctions++;
+        }
+        myFunctions = theFunctions;
+        while (myFunctions && myFunctions->name) {
+            myResult.push_back( * myFunctions );
+            myFunctions++;
+        }
+        JSFunctionSpec myLastFunction;
+        myLastFunction.name = 0;
+        myResult.push_back(myLastFunction);
+        return myResult;
+   }
+
     void
-    JSScriptablePlugin::initClass(JSContext *cx, JSObject * theGlobalObject, const char * theClassName) {
+    JSScriptablePlugin::initClass(JSContext *cx, JSObject * theGlobalObject, const char * theClassName,
+            JSFunctionSpec * theFunctions)
+    {
         AC_DEBUG << "JSScriptablePlugin::initClass for class " << theClassName;
 
+        std::vector<JSFunctionSpec> myFunctions = mergeFunctions( theFunctions );
         JSObject * myClassObject = JS_InitClass(cx, theGlobalObject, NULL, Class(theClassName),
-                Constructor, 0, Properties(), Functions(), 0, 0);
+                Constructor, 0, Properties(), & ( * myFunctions.begin()), 0, 0);
 
         //document the plugin mechanism and not the plugin named theClassName itself...
         createClassModuleDocumentation("Global", "JSScriptablePlugin", Properties(),
-                                       Functions(), ConstIntProperties(),
+                                       & ( * myFunctions.begin()), ConstIntProperties(),
                                        StaticProperties(), StaticFunctions(), "");
         documentConstructor("Global", "JSScriptablePlugin", Constructor);
 

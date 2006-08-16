@@ -12,6 +12,7 @@
 #define _ac_jslib_IScriptablePlugin_h_
 
 #include "PropertyValue.h"
+#include <js/jsapi.h>
 #include <asl/Ptr.h>
 #include <asl/Logger.h>
 #include <dom/Nodes.h>
@@ -24,6 +25,9 @@ namespace jslib {
     struct IScriptablePlugin {
         virtual ~IScriptablePlugin() {}
         virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject);
+
+
+        virtual JSFunctionSpec * Functions();
 
         /**
          * Return the name under which the class is visible in js.
@@ -85,6 +89,7 @@ namespace jslib {
             return asl::as<T>(myValue.nodeValue());
         }
     };
+
 
     typedef asl::Ptr<IScriptablePlugin> IScriptablePluginPtr;
 }
