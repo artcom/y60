@@ -63,44 +63,12 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             }            
         }
 
-        function isValidNode(theNode) {
-            return (theNode.nodeType == Node.ELEMENT_NODE);
-        }
-
-        function nextNode() {
-            var myNode = null;
-            while (!myNode || (!isValidNode(myNode) && !myNode.isSameNode(_myNode))) {
-                if (!myNode) {
-                    myNode = _myNode;
-                }
-                if (myNode.nextSibling) {
-                    myNode = myNode.nextSibling;
-                } else {
-                    myNode = myNode.parentNode.firstChild;
-                }
-            }
-            return myNode;
-        }
-        function previousNode() {
-            var myNode = null;
-            while (!myNode || (!isValidNode(myNode) && !myNode.isSameNode(_myNode))) {
-                if (!myNode) {
-                    myNode = _myNode;
-                }
-                if (myNode.previousSibling) {
-                    myNode = myNode.previousSibling;
-                } else {
-                    myNode = myNode.parentNode.lastChild;
-                }
-            }
-            return myNode;
-        }
 
         this.next = function() {
             if (_myArrayFlag && _myArrayPos < _myArray.length - 1) {
                 _myArrayPos++;
             } else {
-                _myNode = nextNode();
+                _myNode = nextNode(_myNode);
                 setup();
             }
         }
@@ -109,7 +77,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
             if (_myArrayFlag && _myArrayPos > 0) {
                 _myArrayPos--;
             } else {
-                _myNode = previousNode();
+                _myNode = previousNode(_myNode);
                 setup();
                 if (_myArrayFlag) {
                     _myArrayPos = _myArray.length - 1;
@@ -186,7 +154,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         }
 
         if (!isValidNode(_myNode)) {
-            _myNode = nextNode();
+            _myNode = nextNode(_myNode);
         } else {
             setup();
         }
@@ -203,6 +171,42 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
 
     setup(obj, theSceneViewer, theSettingsFile);
 
+    function isValidNode(theNode) {
+        if (!theNode) {
+            return false;
+        }
+        return (theNode.nodeType == Node.ELEMENT_NODE);
+    }
+
+    function nextNode(theNode) {
+        var myNode = theNode;
+        do {
+            if (myNode.nextSibling) {
+                myNode = myNode.nextSibling;
+            } else {
+                myNode = myNode.parentNode.firstChild;
+            }
+            if ( isValidNode(myNode) ) {
+                return myNode;
+            }
+        } while (myNode != theNode);
+        return theNode;
+    }
+
+    function previousNode(theNode) {
+        var myNode = theNode;
+        do {
+            if (myNode.previousSibling) {
+                myNode = myNode.previousSibling;
+            } else {
+                myNode = myNode.parentNode.lastChild;
+            }
+            if ( isValidNode(myNode) ) {
+                return myNode;
+            }
+        } while (myNode != theNode);
+        return theNode;
+    }
 
     function setup(obj, theSceneViewer, theSettingsFile) {
         _mySettingsFile = theSettingsFile;
@@ -299,21 +303,13 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
                 break;
             case "\\":
             case "page up":
-                if (_myCurrentSection.previousSibling) {
-                    _myCurrentSection = _myCurrentSection.previousSibling;
-                } else {
-                    _myCurrentSection = _myCurrentSection.parentNode.lastChild;
-                }
+                _myCurrentSection = previousNode(_myCurrentSection);
                 _myCurrentSetting = new Setting(_myCurrentSection.firstChild);
                 updateOnScreenDisplay();
                 break;
             case "]":
             case "page down":
-                if (_myCurrentSection.nextSibling) {
-                    _myCurrentSection = _myCurrentSection.nextSibling;
-                } else {
-                    _myCurrentSection = _myCurrentSection.parentNode.firstChild;
-                }
+                _myCurrentSection = nextNode(_myCurrentSection);
                 _myCurrentSetting = new Setting(_myCurrentSection.firstChild);
                 updateOnScreenDisplay();
                 break;
