@@ -23,9 +23,9 @@ use("UnitTest.js");
 
 plug("ProcFunctions");
 
-const START_FRAMES = 199;
-const END_FRAMES   = 200;
-const IMAGE_COUNT  = 10000;
+const START_FRAMES = 10;
+const END_FRAMES   = 10;
+const IMAGE_COUNT  = 1000;
 
 const IMAGE_1 = "../../../../shader/shadertex/ac_logo.png";
 const IMAGE_2 = "../../../../shader/shadertex/hatch.jpg";
@@ -56,8 +56,7 @@ ImageLeakUnitTest.prototype.Constructor = function(obj, theName) {
                 //window.scene.save("empty.xml", false);
                 var myUsedMemory = getProcessMemoryUsage();
                 obj.myMemoryDifff =  myUsedMemory - _myStartMemory;
-                obj.ImageBaseMemoryUsage =  3*1024*1024;//3000000;
-                obj.AllowedMemoryUsage = obj.ImageBaseMemoryUsage;
+                obj.AllowedMemoryUsage = 2*1024*1024;//4000000;
 
                 print("Memory at first image construction time : " + _myStartMemory);
                 print("Memory at app end                       : " + myUsedMemory);
