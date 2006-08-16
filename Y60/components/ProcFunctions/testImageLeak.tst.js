@@ -42,8 +42,8 @@ ImageLeakUnitTest.prototype.Constructor = function(obj, theName) {
     var _myFrameCount = 0;
     var _myStartMemory = 0;
     UnitTest.prototype.Constructor(obj, theName);
-    
-    obj.run = function() {    
+
+    obj.run = function() {
         window.onFrame = function(theTime) {
             if (_myFrameCount == START_FRAMES) {
                 _myStartMemory = getProcessMemoryUsage();
@@ -56,16 +56,16 @@ ImageLeakUnitTest.prototype.Constructor = function(obj, theName) {
                 //window.scene.save("empty.xml", false);
                 var myUsedMemory = getProcessMemoryUsage();
                 obj.myMemoryDifff =  myUsedMemory - _myStartMemory;
-                obj.AllowedMemoryUsage = 2*1024*1024;//4000000;
+                obj.AllowedMemoryUsage = 3*1024*1024;//3000000;
 
                 print("Memory at first image construction time : " + _myStartMemory);
                 print("Memory at app end                       : " + myUsedMemory);
                 print("Difference                              : " + obj.myMemoryDifff);
                 print("allowed difference                      : " + obj.AllowedMemoryUsage + " ,(due to some basic memory allocation, i.e. SomImageFactory)");
-                ENSURE('obj.myMemoryDifff < obj.AllowedMemoryUsage');                
+                ENSURE('obj.myMemoryDifff < obj.AllowedMemoryUsage');
                 window.stop();
             }
-            _myFrameCount++;            
+            _myFrameCount++;
         }
         window.go();
     }
@@ -79,11 +79,11 @@ ImageLeakUnitTest.prototype.Constructor = function(obj, theName) {
     function toggleImage() {
         remove();
         if (_myToggle) {
-            _myImage    = new ImageOverlay(window.scene, IMAGE_1);            
+            _myImage    = new ImageOverlay(window.scene, IMAGE_1);
         } else {
             _myImage    = new ImageOverlay(window.scene, IMAGE_2);
         }
-        _myToggle = !_myToggle;                    
+        _myToggle = !_myToggle;
     }
 
 
