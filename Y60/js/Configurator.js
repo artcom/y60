@@ -64,7 +64,7 @@ Configurator.prototype.Constructor = function(obj, theSceneViewer, theSettingsFi
         }
 
         function isValidNode(theNode) {
-            return (theNode.nodeName != "#comment");
+            return (theNode.nodeType == Node.ELEMENT_NODE);
         }
 
         function nextNode() {
