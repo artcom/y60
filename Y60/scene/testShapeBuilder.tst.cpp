@@ -331,7 +331,6 @@ cerr << *myShapeNode << endl;
             myTransformBuilder1.setPosition(asl::Vector3f(1,2,3));
             myTransformBuilder1.setOrientation(asl::Vector3f(0,0,0));
             myTransformBuilder1.setScale(asl::Vector3f(7,8,9));
-            myTransformBuilder1.setShear(asl::Vector3f(10,11,12));
             myTransformBuilder1.setPivot(asl::Vector3f(13,14,15));
             myTransformBuilder2.setPosition(asl::Vector3f(9,9,9));
             myBodyBuilder1.setPosition(asl::Vector3f(9,9,9));
@@ -343,7 +342,6 @@ cerr << *myShapeNode << endl;
             ENSURE(myTransformNode1->getAttribute("position")->nodeValue() == "[1,2,3]");
             ENSURE(myTransformNode1->getAttribute("orientation")->nodeValue() == "[0,0,0,1]");
             ENSURE(myTransformNode1->getAttribute("scale")->nodeValue() == "[7,8,9]");
-            ENSURE(myTransformNode1->getAttribute("shear")->nodeValue() == "[10,11,12]");
             ENSURE(myTransformNode1->getAttribute("pivot")->nodeValue() == "[13,14,15]");
 
             dom::NodePtr myTransformNode2 = mySceneNode->childNode("worlds")->childNode("world")->childNode(1);

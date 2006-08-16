@@ -145,7 +145,6 @@ class LightBuilderUnitTest : public UnitTest {
             ENSURE(myLightNode->getAttribute("position")->nodeValue() == "[1,2,3]");
             ENSURE(myLightNode->getAttribute("scale")->nodeValue() == "[1,1,1]");
             ENSURE(myLightNode->getAttribute("orientation")->nodeValue() == "[0,0,0,1]");
-            ENSURE(myLightNode->getAttribute("shear")->nodeValue() == "[0,0,0]");
             ENSURE(myLightNode->getAttribute("pivot")->nodeValue() == "[0,0,0]");
         }
 };
