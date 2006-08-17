@@ -46,8 +46,6 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(GlobalMatrixTag,     asl::Matrix4f,    GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
     DEFINE_ATTRIBUT_TAG(InverseGlobalMatrixTag, asl::Matrix4f, INVERSE_GLOBAL_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
     DEFINE_ATTRIBUT_TAG(BillboardTag,        std::string,      BILLBOARD_ATTRIB,         "");
-    DEFINE_ATTRIBUT_TAG(SensorTag,           std::string,      SENSOR_ATTRIB,            "");
-    DEFINE_ATTRIBUT_TAG(SensorRadiusTag,     float,            SENSOR_RADIUS_ATTRIB,     0);
     DEFINE_ATTRIBUT_TAG(CullableTag,         bool,             CULLABLE_ATTRIB,          true);
     DEFINE_ATTRIBUT_TAG(ClippingPlanesTag,   VectorOfString,   CLIPPING_PLANES_ATTRIB,   VectorOfString());
     DEFINE_ATTRIBUT_TAG(ScissorTag,          std::string,      SCISSOR_ATTRIB,           "");
@@ -63,8 +61,6 @@ namespace y60 {
         public ScaleTag::Plug,
         public PivotTag::Plug,
         public BillboardTag::Plug,
-        public SensorTag::Plug,
-        public SensorRadiusTag::Plug,
         public CullableTag::Plug,
         public ClippingPlanesTag::Plug,
         public ScissorTag::Plug,

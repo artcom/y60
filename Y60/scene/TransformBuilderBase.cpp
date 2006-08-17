@@ -35,7 +35,6 @@ namespace y60 {
             getNode()->appendAttribute(ORIENTATION_ATTRIB, asl::Quaternionf(0,0,0,1));
             getNode()->appendAttribute(PIVOT_ATTRIB, asl::Vector3f(0,0,0));
             getNode()->appendAttribute(BILLBOARD_ATTRIB, "");
-            getNode()->appendAttribute(SENSOR_ATTRIB, "");
         } else {
             TransformHierarchyFacadePtr myTransform = getNode()->getFacade<TransformHierarchyFacade>();
             myTransform->set<NameTag>(theName);
@@ -59,21 +58,6 @@ namespace y60 {
         getNode()->getAttribute(BILLBOARD_ATTRIB)->nodeValue(myType);
 
     }
-
-    void
-    TransformBuilderBase::setSensor(const SensorType theSensorType, float theSensorRadius) {
-        std::string myType = "";
-        if (theSensorType == SENSOR_APPROXIMATION) {
-            myType = "approximation";
-//            getNode()->appendAttribute(SENSOR_RADIUS_ATTRIB, theSensorRadius);
-            getNode()->getAttribute(SENSOR_RADIUS_ATTRIB)->nodeValue(asl::as_string(theSensorRadius));
-        } else {
-            return;
-        }
-//        getNode()->appendAttribute(SENSOR_ATTRIB, myType);
-        getNode()->getAttribute(SENSOR_ATTRIB)->nodeValue(myType);
-
-	}
 
     void
     TransformBuilderBase::setPosition(const asl::Vector3f & thePosition) {

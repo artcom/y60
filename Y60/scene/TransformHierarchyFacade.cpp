@@ -54,8 +54,6 @@ namespace y60 {
         ScaleTag::Plug(theNode),
         PivotTag::Plug(theNode),
         BillboardTag::Plug(theNode),
-        SensorTag::Plug(theNode),
-        SensorRadiusTag::Plug(theNode),
         CullableTag::Plug(theNode),
         ClippingPlanesTag::Plug(theNode),
         ScissorTag::Plug(theNode),

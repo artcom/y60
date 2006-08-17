@@ -161,8 +161,6 @@ namespace y60 {
     static const char * LOCAL_MATRIX_ATTRIB         = "localmatrix";
     static const char * RENDER_STYLE_ATTRIB         = "renderstyle";
     static const char * BILLBOARD_ATTRIB            = "billboard";
-    static const char * SENSOR_RADIUS_ATTRIB        = "sensorradius";
-    static const char * SENSOR_ATTRIB               = "sensor";
     static const char * TRANSPARENCY_ATTRIB         = "transparent";
     static const char * DEPTH_TEST_ATTRIB           = "depthtest";
     static const char * INSENSIBLE_ATTRIB           = "insensible";

@@ -388,13 +388,6 @@ SceneExporter::exportTransformBase(const MObject & theObject, TransformBuilderBa
         theTransformBuilder.setBillboard(static_cast<TransformBuilderBase::BillboardType>(myBillboard));
     }
 
-    int mySensor       = 0;
-    int mySensorRadius = 0;
-    if (getCustomAttribute(theObject, "ac_sensor", mySensor) &&
-            getCustomAttribute(theObject, "ac_sensor_radius", mySensorRadius)) {
-        theTransformBuilder.setSensor(static_cast<TransformBuilderBase::SensorType>(mySensor), float(mySensorRadius));
-    }
-
     myStatus = myTransform.getScale(myScale);
     if (myStatus) {
         // MTransformationMatrix::RotationOrder myOrder = MTransformationMatrix::kXYZ;
