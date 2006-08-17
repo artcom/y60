@@ -913,6 +913,11 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
             myStatus = ObjectObjectFunction((BoxFrustumIntersection)&intersection, cx, myObj0, myObj1, rval);
             if (myStatus != NOT_FOUND) return JS_TRUE;
 
+            // LineSegment / Box
+            typedef bool (*LineSegmentBox)(const LineSegment<LineNumber>&, const Box3<LineNumber> &, float &, float &);
+            myStatus = ObjectObjectDualResultFunction((LineSegmentBox)&intersection, cx, myObj0, myObj1, rval);
+            if (myStatus != NOT_FOUND) return JS_TRUE;
+
             JS_ReportError(cx,"intersectionDispatcher: no 'intersection' function found for this two argument types");
         } else {
             JS_ReportError(cx,"intersectionDispatcher: both arguments for 'intersection' arguments must be objects");
