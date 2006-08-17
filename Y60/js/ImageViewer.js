@@ -88,7 +88,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             exit(0);
         }
         updateFileView();
-        createTextOverlay();
+        _myTextOverlay = new Overlay(window.scene, [0,0,0,0.6], [0,0], [200,200]);
     }
 
     Base.onKey = self.onKey;
@@ -313,7 +313,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 break;
             case CAPTURE_MEDIA:
                 print("Media: Capture Video");
-                if (!_myVideoCapturePlugged && 
+                if (!_myVideoCapturePlugged &&
                         (myFilename.search(/^video:\/\//i) != -1 ||
                          myFilename.search(/^dshow:\/\//i) != -1) )
                         {
@@ -449,16 +449,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
     }
 
-    function createTextOverlay() {
-        var myImage = self.getImageManager().getImageNode("OSD_Overlay");
-        myImage.src = "shadertex/one_white_pixel.png";
-
-        _myTextOverlay = new ImageOverlay(self.getOverlayManager(), myImage);
-        _myTextOverlay.width  = 200;
-        _myTextOverlay.height = 200;
-        _myTextOverlay.color = new Vector4f(0,0,0,0.6);
-    }
-
     function getSize() {
         if (_myImageOverlay && _myImageOverlay.visible) {
             return getImageSize(_myImageNode);
@@ -571,7 +561,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
             _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
-            
+
         }
 
         if (_myFullSizeMode) {
@@ -598,14 +588,12 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
     function showImage(theFilename) {
         if (!_myImageNode) {
-            _myImageNode    = self.getImageManager().getImageNode("IVImageNode");
-            _myImageNode.resize = "pad";
-            _myImageNode.src = theFilename;
-            _myImageOverlay = new ImageOverlay(self.getOverlayManager(), _myImageNode);
+            _myImageOverlay = new ImageOverlay(window.scene, theFilename);
             _myImageOverlay.leftborder   = 1;
             _myImageOverlay.rightborder  = 1;
             _myImageOverlay.bottomborder = 1;
             _myImageOverlay.topborder    = 1;
+            _myImageNode = _myImageOverlay.image;
         }
 
         _myImageNode.src = theFilename;
