@@ -121,6 +121,9 @@ jsval as_jsval(JSContext *cx,
 jsval as_jsval(JSContext *cx,
                const y60::IntersectionInfo  & theInfo)
 {
+    if (theInfo._myShape == 0) {
+        return JSVAL_VOID;
+    }
     JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
     jsval rval = OBJECT_TO_JSVAL(myReturnObject);
     if (!JS_DefineProperty(cx, myReturnObject, "body",              as_jsval(cx, theInfo._myBody),                  0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
@@ -199,6 +202,9 @@ jsval as_jsval(JSContext *cx,
 jsval as_jsval(JSContext *cx,
                const y60::CollisionInfo & theInfo)
 {
+    if (theInfo._myShape == 0) {
+        return JSVAL_VOID;
+    }
     JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
     jsval rval = OBJECT_TO_JSVAL(myReturnObject);
     if (!JS_DefineProperty(cx, myReturnObject, "body",              as_jsval(cx, theInfo._myBody),                   0,0, JSPROP_ENUMERATE)) return JSVAL_VOID;
