@@ -15,13 +15,12 @@
 #include "WaterRepresentation.h"
 
 
-#include <GL/glx.h>
+#include <y60/GLUtils.h>
 
 #define USE_AGP_MEMORY
-#define AC_USE_X11
+//#define AC_USE_X11
 
 
-// XXX this is a hack ... the code is stolen from GLAlloc.cpp
 #ifdef AC_USE_X11
 // hack to allow old glx header without the prototypes as well as new ones
 extern "C" {   

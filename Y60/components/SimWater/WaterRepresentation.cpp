@@ -48,9 +48,6 @@ using namespace asl;  // manually added!
 
 namespace y60 {
 
-// FOR THE FAMOUS WHISKY THING:
-#define RUNNING_WATER_TEST
-
 const string WaterRepresentation::TextureClassNames[] = 
 { "#nomap", "floormaps", "surfacemaps", "cubemaps", "puzzlemaps" };
 
@@ -63,16 +60,6 @@ const float RAISED_CRACK_LEVEL = 10.;
 const float SURFACE_LEVEL = 2.;
 const float CRACK_EDGE_LEVEL_HIGH = 5;
 const float CRACK_EDGE_LEVEL_LOW = 3;
-
-
-// only this number of cracks will be rendered with smooth corners, the others
-// will only be erased (sharp edges)
-const int MAX_DRAWABLE_CRACKS = 2000;
-
-// special NVIDIA extension, ins special NVIDIA GL/gl.h:
-//extern "C" {
-//void glVertexArrayRangeNV (GLsizei size, const GLvoid *pointer);
-//}
 
 WaterRepresentation::WaterRepresentation() :
     _vertexBuffer(0),
@@ -390,8 +377,6 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
    cerr << "#INFO : loading cube texture map class " << TextureClassName(theClassID) 
          << " into map object= " << theObjectID << endl;
 
-    //glEnable(GL_TEXTURE_CUBE_MAP_ARB);
-
     Texture & myTexture = _myTextures[theClassID][theObjectID];
 
     if (!myTexture.myID) {
@@ -432,11 +417,11 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
 		glTexImage2D(_cubeMapSideID[i], 0, 
                      GL_RGB8, myBmp->GetWidth(), 
                      myBmp->GetHeight(),
-					 0, GL_RGBA, GL_UNSIGNED_BYTE, myBmp->GetPixels());
+					 0, GL_BGRA, GL_UNSIGNED_BYTE, myBmp->GetPixels());
 
         if (imageWidth) {
             if ((imageWidth != myBmp->GetWidth()) || (imageHeight != myBmp->GetHeight())) {
-                cerr << "#ERROR : Cubve map images MUST all be of same size!";
+                cerr << "#ERROR : Cubemap images MUST all be of same size!";
                 exit(-1);
             }
         }
@@ -455,8 +440,8 @@ WaterRepresentation::loadTexture(TextureClass theClassID,
                                  const char * theTextureFileName)
 {
 
-    cerr << "#INFO : loading texture map class " << TextureClassName(theClassID) 
-         << " into map object= " << theObjectID << endl;
+    AC_PRINT << "#INFO : loading texture map class " << TextureClassName(theClassID) 
+         << " into map object= " << theObjectID;
 
     Texture & myTexture = _myTextures[theClassID][theObjectID];
 
@@ -495,7 +480,7 @@ WaterRepresentation::loadTexture(TextureClass theClassID,
     glTexImage2D(GL_TEXTURE_2D, 0, 
             (myBmp->HasAlpha()) ? GL_RGBA8 : GL_RGB8, myBmp->GetWidth(), 
             myBmp->GetHeight(),
-            0, (myBmp->HasAlpha()) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, myBmp->GetPixels());
+            0, (myBmp->HasAlpha()) ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, myBmp->GetPixels());
 
     myTexture.myWidth = myBmp->GetWidth();
     myTexture.myHeight = myBmp->GetHeight();
@@ -716,8 +701,10 @@ WaterRepresentation::render() {
 
     MAKE_SCOPE_TIMER(WaterRepresentation_render);
 
-    setDefaultGLState();
+    // XXX dunno yet
+    //setDefaultGLState();
 
+    /*
     if (_drawWireFrame) {
         glPolygonMode( GL_FRONT, GL_LINE );
         glPolygonMode( GL_BACK, GL_LINE );
@@ -725,6 +712,7 @@ WaterRepresentation::render() {
         glPolygonMode( GL_FRONT, GL_FILL );//solid
         glPolygonMode( GL_BACK, GL_FILL );
     }
+    */
     
 
     
@@ -759,25 +747,6 @@ WaterRepresentation::render() {
 
         glTranslatef(0, 0, WATER_DEPTH);
         
-
-
-#if 0
-    // XXX
-    glColor4f(1, 1, 1, 1);
-    glBegin(GL_TRIANGLES);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f( 20, 20, 0);
-
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f( 0, 20, 0);
-
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f( 20, 0, 0);
-    glEnd();
-#endif 
-
-
-
         //  although currently not used, we keep the code to be able to reenable it again
         for (int currentBuffer = 0; currentBuffer < NUM_VAR_BUFFERS; currentBuffer ++) {
 

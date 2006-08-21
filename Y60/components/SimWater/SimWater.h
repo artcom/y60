@@ -38,12 +38,17 @@ class SimWater :
         const char * ClassName();
         
         void splash(const asl::Vector2i & thePosition, int theMagnitude, int theRadius);
+        int addFloormap(const std::string & theFilename);
+        int addCubemap(const std::string theFilenames[]);
+        void reset();
 
     private:
         SimWater();
         void loadTexturesFromConfig(const dom::Node & theConfig,
                                     y60::WaterRepresentation::TextureClass theClassID);
         void setWaterProjection();
+
+        asl::Vector2i convertMouseCoordsToSimulation( const asl::Vector2i & theMousePos );
 
         y60::WaterSimulationPtr     _myWaterSimulation;
         y60::WaterRepresentationPtr _myWaterRepresentation;
@@ -52,12 +57,17 @@ class SimWater :
         asl::Vector2i _mySimulationOffset;
         asl::Vector2i _myDisplaySize;
         asl::Vector2i _myDisplayOffset;
+        asl::Vector2i _myViewportSize;
         float _myWaterDamping;
 
         asl::Time _myStartTime;
         bool _myRunSimulationFlag;
         int _myIntegrationsPerFrame;
         float _myTimeStep;
+
+        int _myFloormapCounter;    
+        int _myCubemapCounter;    
+
 };
 #endif // Y60_SIM_WATER_INCLUDED
 

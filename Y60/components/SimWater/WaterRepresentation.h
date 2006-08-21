@@ -106,6 +106,7 @@ public:
         return getTextureIndex(theClassID,whichObjectID,myIndex);
     }
 
+    /*
     void    enableSurface(bool doEnable) {
         _renderSurfaceEnabled = doEnable;
     }
@@ -128,7 +129,7 @@ public:
     void    setSurfaceOpacity(float theValue) {
         _surfaceOpacity= theValue;
     }
-    
+    */
     
     float   getReflectionAlphaBias() const {
         return _reflectionAlphaBias;
@@ -226,6 +227,11 @@ public:
 
     Texture & currentTexture(TextureClass theClassID) {
         return _myTextures[theClassID][_currentID[theClassID]];
+    }
+
+    int getCurrentTextureIndex( TextureClass theClassID ) const {
+        std::map<TextureClass, ObjectID>::const_iterator myIt = _currentID.find( theClassID );
+        return myIt->second;
     }
 
     // remove any "special" GL state settings

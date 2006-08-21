@@ -1,5 +1,13 @@
-
-
+//============================================================================
+//
+// Copyright (C) 2002-2006, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//============================================================================
 
 #include "SimWater.h"
 #include "AGPBufferAllocator.h"
@@ -7,8 +15,10 @@
 #include <y60/JSVector.h>
 #include <y60/AbstractRenderWindow.h>
 
-const int SIMULATION_WIDTH = 480;
-const int SIMULATION_HEIGHT = 240;
+//const int SIMULATION_WIDTH = 480;
+//const int SIMULATION_HEIGHT = 240;
+const int SIMULATION_WIDTH = 160;
+const int SIMULATION_HEIGHT = 320;
 const std::string DATA_DIR("data");
 const char * const ourCubeSides[6] = {"right","left","top","bottom","front","back"};
 
@@ -22,12 +32,15 @@ SimWater::SimWater(DLHandle theDLHandle) :
     IRendererExtension("SimWater"),
     _mySimulationSize( SIMULATION_WIDTH + 2 , SIMULATION_HEIGHT + 2),
     _mySimulationOffset( 1, 1 ),
-    _myDisplaySize(SIMULATION_WIDTH / 3, SIMULATION_HEIGHT / 2), // grouse like 3:2 display
+    _myDisplaySize(SIMULATION_WIDTH, SIMULATION_HEIGHT / 2),
     _myDisplayOffset(0, 0), // used for tiled rendering (grouse)
     _myWaterDamping(0.9993),
     _myRunSimulationFlag( true ),
     _myIntegrationsPerFrame( 3 ),
-    _myTimeStep( 0.1 )
+    _myTimeStep( 0.1 ),
+    _myViewportSize(0, 0),
+    _myFloormapCounter(0),
+    _myCubemapCounter(0)
 {}
 
 SimWater::~SimWater() {
@@ -35,26 +48,56 @@ SimWater::~SimWater() {
 
 void 
 SimWater::onUpdateSettings(dom::NodePtr theConfiguration) {
-    AC_PRINT << "SimWater::onUpdateSettings()";
 };
 
 void 
 SimWater::onGetProperty(const std::string & thePropertyName,
         PropertyValue & theReturnValue) const
 {
-    AC_PRINT << "SimWater::onGetProperty()";
+    AC_TRACE << "SimWater::onGetProperty(): " << thePropertyName;
+    if (thePropertyName == "activeFloormap") {
+        theReturnValue.set( _myWaterRepresentation->getCurrentTextureIndex( WaterRepresentation::floormaps ));
+        return;
+    }
+    if (thePropertyName == "floormapCount") {
+        theReturnValue.set( _myFloormapCounter );
+        return;
+    }
+    if (thePropertyName == "activeCubemap") {
+        theReturnValue.set( _myWaterRepresentation->getCurrentTextureIndex( WaterRepresentation::cubemaps ));
+        return;
+    }
+    if (thePropertyName == "cubemapCount") {
+        theReturnValue.set( _myCubemapCounter );
+        return;
+    }
+    AC_WARNING << "SimWater::onGetProperty(): Unknown property '" << thePropertyName << "'.";
 };
 
 void 
 SimWater::onSetProperty(const std::string & thePropertyName,
         const PropertyValue & thePropertyValue)
 {
-    AC_PRINT << "SimWater::onSetProperty()";
+    AC_TRACE << "SimWater::onSetProperty()";
+    if (thePropertyName == "activeFloormap") {
+        short myIndex = short(thePropertyValue.get<int>());
+        _myWaterRepresentation->activateTexture( WaterRepresentation::floormaps, myIndex );
+        return;
+    }
+    if (thePropertyName == "activeCubemap") {
+        short myIndex = short(thePropertyValue.get<int>());
+        _myWaterRepresentation->activateTexture( WaterRepresentation::cubemaps, myIndex );
+        return;
+    }
+    AC_WARNING << "SimWater::onSetProperty(): Unknown property '" << thePropertyName << "'.";
 };
 
 void 
 SimWater::onStartup(jslib::AbstractRenderWindow * theWindow)  {
     AC_PRINT << "SimWater::onStartup()";
+
+    _myViewportSize[0] = theWindow->getWidth();
+    _myViewportSize[1] = theWindow->getHeight();
 
     _myWaterSimulation = WaterSimulationPtr(
             new WaterSimulation( _mySimulationSize, _myWaterDamping ));
@@ -69,58 +112,6 @@ SimWater::onStartup(jslib::AbstractRenderWindow * theWindow)  {
             theWindow->getWidth(), theWindow->getHeight(),
             _myDisplayOffset[0], _myDisplayOffset[1],
             BufferAllocatorPtr( new AGPBufferAllocator ) );
-
-
-    try {
-        // XXX hardcoded filename
-        dom::DocumentPtr myDoc( new dom::Document());
-        myDoc->parseFile( "texturepool.xml" );
-        dom::NodePtr myTextureNode = myDoc->childNode("texturepool");
-
-        if (myTextureNode) {
-            AC_PRINT << "Loading textures:";
-            loadTexturesFromConfig( * myTextureNode, WaterRepresentation::floormaps );
-
-
-            int numCubeTextures = (*myTextureNode)("cubemaps").childNodesLength("fileset");
-            for (int i = 0; i < numCubeTextures; ++i) {
-                string fileNames[6];
-
-                const dom::Node & myFileSetNode = (*myTextureNode)("cubemaps")("fileset",i); 
-                short objectID = asl::as<short>(myFileSetNode["objectid"].nodeValue());
-
-                for (int s=0; s<6; s++) {
-                    string fileName = myFileSetNode(ourCubeSides[s])["name"].nodeValue();
-                    if (!fileName.size()) {
-                        AC_DEBUG << "name for cubemap side " << ourCubeSides[s] << " not found" << endl;
-                        assert(0);
-                    }
-                    fileNames[s] = DATA_DIR + "/" + fileName;
-                }
-                bool loadOK = _myWaterRepresentation->loadCubeMapTexture(
-                        WaterRepresentation::cubemaps,objectID,fileNames);
-                assert(loadOK);
-            }
-
-        } else {
-            AC_ERROR << "No textures found." << endl;
-        }
-
-    
-    } catch (const asl::Exception & ex) {
-        AC_ERROR << "#ERROR: SimWater::onStartup():" << endl
-                 << ex << endl
-                 << "Aborting";
-        exit(1);
-    } catch (...) {
-        AC_ERROR << "#ERROR: Unknown exception in SimWater::onStartup():" << endl
-                 << "Aborting" << endl;
-        exit(1);
-    }
-
-    _myWaterRepresentation->setDrawWireFrame( false );
-	_myWaterRepresentation->activateTextureIndex(WaterRepresentation::floormaps,0);
-	_myWaterRepresentation->activateTextureIndex(WaterRepresentation::cubemaps,0);
 
     _myStartTime.setNow();
 
@@ -166,6 +157,10 @@ SimWater::handle(jslib::AbstractRenderWindow * theWindow, y60::EventPtr theEvent
 void 
 SimWater::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
     AC_DEBUG << "SimWater::onFrame()";
+
+    _myViewportSize[0] = theWindow->getWidth();
+    _myViewportSize[1] = theWindow->getHeight();
+    
     asl::Time myCurrentTime;
     myCurrentTime.setNow();
     double myRunTime = myCurrentTime - _myStartTime;
@@ -207,6 +202,8 @@ void
 SimWater::onPostRender(jslib::AbstractRenderWindow * theRenderer) {
     AC_DEBUG << "SimWater::onPostRender()";
 
+    glPushAttrib( GL_ALL_ATTRIB_BITS );
+    glPushClientAttrib( GL_CLIENT_ALL_ATTRIB_BITS );
 
     {
         glDisable(GL_CULL_FACE); // XXX the whole water thingy seems to be backfacing
@@ -229,41 +226,50 @@ SimWater::onPostRender(jslib::AbstractRenderWindow * theRenderer) {
 
         assert(_myWaterRepresentation);
 
-        //AC_DEBUG << "gWaterRepresentation->render()" << endl;
         _myWaterRepresentation->render();
-
-        //setEdgeProjection();
-
-        /*
-        glMatrixMode( GL_MODELVIEW );
-
-        glLoadIdentity();
-
-        glColor4f(1, 1, 1, 1);
-        glDisable(GL_DEPTH_TEST);
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_LIGHTING);
-        glPushAttrib(GL_DEPTH_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
-        glLineWidth(1.);
-        */
-
     }
 
-    //glPopClientAttrib();
-    //glPopAttrib();
+    glPopClientAttrib();
+    glPopAttrib();
 
     CHECK_OGL_ERROR;
 };
 
+Vector2i 
+SimWater::convertMouseCoordsToSimulation( const Vector2i & theMousePos ) {
+    Vector2i myResult;
+    myResult[0] = max( 0, min( _myDisplaySize[0] - 1, 
+                (theMousePos[0] * _myDisplaySize[0] / _myViewportSize[0])- _myDisplayOffset[0]));
+    myResult[1] = max (0, min( _myDisplaySize[1] - 1,
+                ((_myViewportSize[1] - theMousePos[1])  * _myDisplaySize[1] / _myViewportSize[1])- _myDisplayOffset[1]));
+
+    return myResult;
+}
+
+int 
+SimWater::addFloormap(const std::string & theFilename) {
+    bool loadOk = _myWaterRepresentation->loadTexture(WaterRepresentation::floormaps, _myFloormapCounter, theFilename.c_str());
+    _myWaterRepresentation->activateTexture(WaterRepresentation::floormaps, _myFloormapCounter );
+    return _myFloormapCounter++;
+}
+
+int 
+SimWater::addCubemap(const std::string theFilenames[]) {
+    bool loadOk = _myWaterRepresentation->loadCubeMapTexture(WaterRepresentation::cubemaps, _myCubemapCounter,
+            theFilenames);
+    _myWaterRepresentation->activateTexture(WaterRepresentation::cubemaps, _myCubemapCounter );
+    return _myCubemapCounter++;
+}
+
+void 
+SimWater::reset() {
+    _myWaterSimulation->reset();
+}
+
 void 
 SimWater::splash(const asl::Vector2i & thePosition, int theMagnitude, int theRadius) {
-     AC_PRINT << "=== SPLASH ===";
-     _myWaterSimulation->sinoidSplash(thePosition[0], thePosition[1], theMagnitude, theRadius);
+     Vector2i myCoord = convertMouseCoordsToSimulation( thePosition );
+     _myWaterSimulation->sinoidSplash(myCoord[0], myCoord[1], theMagnitude, theRadius);
 }
 
 const char *
@@ -297,11 +303,69 @@ Splash(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+//=== Wrapper Functions ===============================
+
+static JSBool
+Reset(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+
+    asl::Ptr<SimWater> myNative = getNativeAs<SimWater>(cx, obj);
+    if (myNative) {
+        myNative->reset();
+    } else {
+        assert(myNative);
+    }
+
+    return JS_TRUE;
+}
+
+static JSBool
+AddFloormap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+
+    std::string myFilename;
+    convertFrom(cx, argv[0], myFilename);
+
+    asl::Ptr<SimWater> myNative = getNativeAs<SimWater>(cx, obj);
+    if (myNative) {
+        myNative->addFloormap( myFilename );
+    } else {
+        assert(myNative);
+    }
+
+    return JS_TRUE;
+}
+
+static JSBool
+AddCubemap(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+
+    std::string myFilenames[6];
+    for (unsigned i = 0; i < 6; ++i) {
+        convertFrom(cx, argv[i], myFilenames[i]);
+    }
+
+    asl::Ptr<SimWater> myNative = getNativeAs<SimWater>(cx, obj);
+    if (myNative) {
+        myNative->addCubemap( myFilenames );
+    } else {
+        assert(myNative);
+    }
+
+    return JS_TRUE;
+}
+
 
 JSFunctionSpec *
 SimWater::Functions() {
     static JSFunctionSpec myFunctions[] = {
-        {"splash", Splash, 4},
+        {"addFloormap", AddFloormap, 1},
+        {"addCubemap", AddCubemap, 6},
+        {"splash", Splash, 3},
+        {"reset", Reset, 0},
         {0}
     };
     return myFunctions;

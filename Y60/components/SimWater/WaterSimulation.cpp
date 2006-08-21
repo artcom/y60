@@ -437,9 +437,11 @@ WaterSimulation::parabolicSplash(int xpos, int ypos, int magnitude, int radius) 
 void 
 WaterSimulation::sinoidSplash(int xpos, int ypos, int magnitude, int radius, int frequency) {
 
+    /*
     cerr << "WaterSimulation::sinoidSplash() x: " << xpos << " y: " << ypos
         << " magnitude: " << magnitude << " radius: " << radius 
         << " frequency: " << frequency << endl;
+*/
 
 
     for ( int x = xpos - radius; x < xpos + radius; ++x) {
