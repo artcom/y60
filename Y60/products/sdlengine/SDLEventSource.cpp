@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -71,6 +71,7 @@ SDLEventSource::poll() {
                         if (sdlEvent.type == SDL_MOUSEBUTTONDOWN) {
                             myEvents.push_back(createMouseWheelEvent(Event::MOUSE_WHEEL, sdlEvent));
                         }
+                        break;
                     default:
                         myEvents.push_back(createMouseButtonEvent(sdlEvent.type == SDL_MOUSEBUTTONDOWN ? Event::MOUSE_BUTTON_DOWN : Event::MOUSE_BUTTON_UP, sdlEvent));
                 }
