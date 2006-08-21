@@ -41,6 +41,11 @@ namespace jslib {
             static JSObject * Construct(JSContext *cx, IScriptablePluginPtr theNative);
 
         private:
+
+            static JSBool getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+            static JSBool setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+            static bool isFunction( JSContext * cx, JSObject * obj, const std::string & theProperty );
+
             static std::vector<JSFunctionSpec> mergeFunctions( JSFunctionSpec * theFunctions);
 
             static JSClass * Class(const char * theClassName);

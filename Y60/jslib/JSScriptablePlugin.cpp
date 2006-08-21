@@ -111,8 +111,27 @@ namespace jslib {
         return myFunctions;
     }
 
-    static JSBool
-    getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    bool 
+    JSScriptablePlugin::isFunction(JSContext * cx, JSObject * obj, const std::string & theProperty ) {
+        JSFunctionSpec * myFunctions = Functions();
+        while ( myFunctions && myFunctions->name ) {
+            if ( theProperty == myFunctions->name ) {
+                return true;
+            }
+            myFunctions++;
+        }
+        myFunctions = getNative(cx, obj)->Functions();
+        while ( myFunctions && myFunctions->name ) {
+            if ( theProperty == myFunctions->name ) {
+                return true;
+            }
+            myFunctions++;
+        }
+        return false;
+    }
+
+    JSBool
+    JSScriptablePlugin::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         try {
             if (JSVAL_IS_INT(id)) {
                 int myIndex = JSVAL_TO_INT(id);
@@ -120,15 +139,20 @@ namespace jslib {
             } else {
                 JSString * myJSStr = JS_ValueToString(cx, id);
                 std::string myProperty = JS_GetStringBytes(myJSStr);
-                PropertyValue myPropertyValue(cx, vp);
-                JSScriptablePlugin::getNative(cx, obj)->onGetProperty(myProperty, myPropertyValue);
+                // only call onGetProperty if the property isn't a function
+                if ( ! isFunction( cx, obj, myProperty ) ) {
+                    PropertyValue myPropertyValue(cx, vp);
+                    getNative(cx, obj)->onGetProperty(myProperty, myPropertyValue);
+                } else {
+                    AC_DEBUG << "Property '" << myProperty << "' is a function.";
+                }
             }
         } HANDLE_CPP_EXCEPTION;
         return JS_TRUE;
     }
 
-    static JSBool
-    setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    JSBool
+    JSScriptablePlugin::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         try {
             if (JSVAL_IS_INT(id)) {
                 int myIndex = JSVAL_TO_INT(id);
@@ -137,7 +161,7 @@ namespace jslib {
                 JSString * myJSStr = JS_ValueToString(cx, id);
                 std::string myProperty = JS_GetStringBytes(myJSStr);
                 PropertyValue myPropertyValue(cx, vp);
-                JSScriptablePlugin::getNative(cx, obj)->onSetProperty(myProperty, myPropertyValue);
+                getNative(cx, obj)->onSetProperty(myProperty, myPropertyValue);
             }
         } HANDLE_CPP_EXCEPTION;
         return JS_TRUE;
