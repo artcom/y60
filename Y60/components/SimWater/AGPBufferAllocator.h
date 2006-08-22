@@ -14,12 +14,18 @@
 
 #include "WaterRepresentation.h"
 
+#if defined(LINUX) || defined(OSX)
+    #include <GL/glx.h>
+#endif
 
-#include <y60/GLUtils.h>
+//#include <y60/GLUtils.h>
 
 #define USE_AGP_MEMORY
-//#define AC_USE_X11
 
+#if defined(LINUX) || defined(OSX)
+    #define AC_USE_X11
+#endif
+    
 
 #ifdef AC_USE_X11
 // hack to allow old glx header without the prototypes as well as new ones
@@ -69,16 +75,25 @@ public:
 
         float priority = .5f;
 
+#ifdef WIN32
+        _buffer = (GLfloat *)wglAllocateMemoryNV(numBytes, 0, 0, priority);
+#else
         _buffer = (GLfloat *)glXAllocateMemoryNV(numBytes, 0, 0, priority);
+#endif
+        
         if(_buffer) {
             AC_DEBUG << "Allocated " << megabytes << " megabytes of fast AGP memory";
             _isAGPMem = true;
             memset(_buffer, 0, numBytes);
             return _buffer;
         }
-
         if(!_buffer) {
+#ifdef WIN32
+            _buffer = (GLfloat *)wglAllocateMemoryNV(numBytes, 0, 0, 1.f);
+#else
             _buffer = (GLfloat *)glXAllocateMemoryNV(numBytes, 0, 0, 1.f);
+#endif
+
         }
 
         if(_buffer) {

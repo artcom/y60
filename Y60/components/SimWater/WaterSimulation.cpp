@@ -9,13 +9,25 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
+
+#ifdef WIN32
+    #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN 1
+    #endif
+    #include <windows.h>
+    #undef max
+#endif
+
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
 #include <cmath>
 #include <assert.h>
-#include <unistd.h>
+
+#if defined(LINUX) || defined(OSX)
+    #include <unistd.h>
+#endif
 
 #include <GL/gl.h>
 

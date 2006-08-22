@@ -15,10 +15,11 @@
 #include <y60/JSVector.h>
 #include <y60/AbstractRenderWindow.h>
 
-//const int SIMULATION_WIDTH = 480;
-//const int SIMULATION_HEIGHT = 240;
+#include <y60/GLAlloc.h>
+
 const int SIMULATION_WIDTH = 160;
 const int SIMULATION_HEIGHT = 320;
+
 const std::string DATA_DIR("data");
 const char * const ourCubeSides[6] = {"right","left","top","bottom","front","back"};
 
@@ -41,7 +42,9 @@ SimWater::SimWater(DLHandle theDLHandle) :
     _myViewportSize(0, 0),
     _myFloormapCounter(0),
     _myCubemapCounter(0)
-{}
+{
+//    initGLExtensions(0);
+}
 
 SimWater::~SimWater() {
 }
@@ -95,7 +98,8 @@ SimWater::onSetProperty(const std::string & thePropertyName,
 void 
 SimWater::onStartup(jslib::AbstractRenderWindow * theWindow)  {
     AC_PRINT << "SimWater::onStartup()";
-
+    initGLExtensions(0, true, false);
+    initializeGLMemoryExtensions();
     _myViewportSize[0] = theWindow->getWidth();
     _myViewportSize[1] = theWindow->getHeight();
 
@@ -146,6 +150,7 @@ SimWater::loadTexturesFromConfig(const dom::Node & theConfig, WaterRepresentatio
 bool 
 SimWater::onSceneLoaded(jslib::AbstractRenderWindow * theWindow) {
     AC_PRINT << "SimWater::onSceneLoaded()";
+
     return true;
 };
 

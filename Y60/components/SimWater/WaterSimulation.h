@@ -26,6 +26,7 @@
 #include <list>
 #include <vector>
 
+#define M_SQRT2 sqrt(2.0f)
 namespace y60 {
     
 class WaterSimulation {
@@ -137,7 +138,7 @@ private:
 
 
     
-    class ComputeThread: public PosixThread {
+    class ComputeThread: public asl::PosixThread {
     public:    
             ComputeThread (WaterSimulation & simulation) : PosixThread(),
                           _simulation(simulation), 

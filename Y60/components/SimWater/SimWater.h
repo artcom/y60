@@ -1,6 +1,8 @@
 #ifndef Y60_SIM_WATER_INCLUDED
 #define Y60_SIM_WATER_INCLUDED
 
+#include <y60/GLUtils.h>
+
 #include "WaterSimulation.h"
 #include "WaterRepresentation.h"
 

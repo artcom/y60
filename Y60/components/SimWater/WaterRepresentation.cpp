@@ -25,7 +25,7 @@
 
 
 #include <stdio.h>
-#include <values.h>
+//#include <values.h>
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
@@ -386,9 +386,14 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
 	//Bind the texture.
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, myTexture.myID);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	//glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//N.B.!! LOOK HERE! Auto mipmap extension used.
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+	//glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
+                    GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
+                    GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	PLAnyPicDecoder myDecoder;
 
@@ -401,12 +406,12 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
     imageHeight = 0;
 
 	for(unsigned int i=0; i<6; i++) {
-        PLAnyBmp *  myBmp = new PLAnyBmp;
+        PLAnyBmp myBmp;
         
         cerr << "Loading bitmap for cube map '" 
             << textureFileNames[i].c_str() << "'..." << flush;
         try {
-            myDecoder.MakeBmpFromFile (textureFileNames[i].c_str(), myBmp);
+            myDecoder.MakeBmpFromFile (textureFileNames[i].c_str(), &myBmp);
         } catch (...) {
             cerr << "FAILED" << endl;
             return false;
@@ -414,20 +419,26 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
         cerr << "OK" << endl;
 
 		//Store that section.
+        std::cout <<"after loadCubeMapTexture GetWidth: " << myBmp.GetWidth() <<std::endl;
+        std::cout <<"after loadCubeMapTexture GetHeight: " << myBmp.GetHeight() <<std::endl;
+        std::cout <<"after loadCubeMapTexture _cubeMapSideID[i]: " << _cubeMapSideID[i] <<std::endl;
+        std::cout <<"after loadCubeMapTexture GetPixels: " << (void*)myBmp.GetPixels() <<std::endl;
+        
 		glTexImage2D(_cubeMapSideID[i], 0, 
-                     GL_RGB8, myBmp->GetWidth(), 
-                     myBmp->GetHeight(),
-					 0, GL_BGRA, GL_UNSIGNED_BYTE, myBmp->GetPixels());
+                     GL_RGBA8, myBmp.GetWidth(), 
+                     myBmp.GetHeight(),
+					 0, GL_BGR, GL_UNSIGNED_BYTE, myBmp.GetPixels());
 
         if (imageWidth) {
-            if ((imageWidth != myBmp->GetWidth()) || (imageHeight != myBmp->GetHeight())) {
+            if ((imageWidth != myBmp.GetWidth()) || (imageHeight != myBmp.GetHeight())) {
                 cerr << "#ERROR : Cubemap images MUST all be of same size!";
                 exit(-1);
             }
         }
-        imageWidth = myBmp->GetWidth();
-        imageHeight = myBmp->GetHeight();
-
+        imageWidth = myBmp.GetWidth();
+        std::cout <<"after loadCubeMapTexture GetWidth: " << myBmp.GetWidth() <<std::endl;
+        imageHeight = myBmp.GetHeight();
+        std::cout <<"after loadCubeMapTexture GetHeight: " << myBmp.GetHeight() <<std::endl;
 	}
 //	glDisable(GL_TEXTURE_CUBE_MAP_ARB);
     return true;
@@ -457,33 +468,33 @@ WaterRepresentation::loadTexture(TextureClass theClassID,
     //glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
 
 	PLAnyPicDecoder myDecoder;
-    PLAnyBmp *  myBmp = new PLAnyBmp;
+    PLAnyBmp myBmp;
 
     cerr << "Loading bitmap for texture '" 
          << theTextureFileName << "' .." << flush;
     try {
-        myDecoder.MakeBmpFromFile (theTextureFileName, myBmp);
+        myDecoder.MakeBmpFromFile (theTextureFileName, &myBmp);
     } catch (...) {
         cerr << "FAILED" << endl;
         return false;
     }
     cerr << "OK" << endl;
 
-    if (!asl::powerOfTwo(myBmp->GetWidth()) || !asl::powerOfTwo(myBmp->GetHeight())) {
+    if (!asl::powerOfTwo(myBmp.GetWidth()) || !asl::powerOfTwo(myBmp.GetHeight())) {
         cerr << "#WARNING: texture " << theTextureFileName << " is not 'powerOfTwo', but "
-             << myBmp->GetWidth() << "x" << myBmp->GetHeight()
+             << myBmp.GetWidth() << "x" << myBmp.GetHeight()
              << ". Resizing the texture internally..." << endl;
-        myBmp->ApplyFilter(PLFilterResizeBilinear(256, 256));
+        myBmp.ApplyFilter(PLFilterResizeBilinear(256, 256));
     }
     
     //Store that section. ..
     glTexImage2D(GL_TEXTURE_2D, 0, 
-            (myBmp->HasAlpha()) ? GL_RGBA8 : GL_RGB8, myBmp->GetWidth(), 
-            myBmp->GetHeight(),
-            0, (myBmp->HasAlpha()) ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, myBmp->GetPixels());
+            (myBmp.HasAlpha()) ? GL_RGBA8 : GL_RGB8, myBmp.GetWidth(), 
+            myBmp.GetHeight(),
+            0, (myBmp.HasAlpha()) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, myBmp.GetPixels());
 
-    myTexture.myWidth = myBmp->GetWidth();
-    myTexture.myHeight = myBmp->GetHeight();
+    myTexture.myWidth = myBmp.GetWidth();
+    myTexture.myHeight = myBmp.GetHeight();
 
 	return true;
 }
