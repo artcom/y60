@@ -670,7 +670,8 @@ void * aglGetProcAddress (char * pszProc)
 
     void
     initGLExtensions(unsigned int /*theNeededExtensions*/,
-                     bool /*theVerboseFlag*/)
+                     bool /*theVerboseFlag*/,
+                     bool theInitGLH_extension)
     {
         unsigned myVersionMajor = 0;
         unsigned myVersionMinor = 0;
@@ -751,7 +752,9 @@ void * aglGetProcAddress (char * pszProc)
         // multitexture
         if (queryOGLExtension("GL_ARB_multitexture")) {
 #ifdef WIN32
-            glh_init_extensions("GL_ARB_multitexture");
+            if (theInitGLH_extension) {
+                glh_init_extensions("GL_ARB_multitexture"); // who needs this (vs)? (gtk extension calling this crash)
+            }
 #endif
             /* Retrieve some ARB_multitexture routines. */
             SET_PROC_ADDRESS( PFNGLMULTITEXCOORD2IARBPROC, glMultiTexCoord2iARB );
@@ -768,6 +771,7 @@ void * aglGetProcAddress (char * pszProc)
         //     the token names are different but we defined these tokens ourself in
         //     glExtensions.h anyway.
         // point sprites
+
         if (queryOGLExtension("GL_ARB_point_sprite") ||
             queryOGLExtension("GL_NV_point_sprite")) {
         }

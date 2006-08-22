@@ -332,7 +332,8 @@ namespace y60 {
      * @param theNeededExtensions DEPRECATED.
      * @param theVerboseFlag DEPRECATED.
      */
-    void initGLExtensions(unsigned int theNeededExtensions, bool theVerboseFlag = true);
+    void initGLExtensions(unsigned int theNeededExtensions, bool theVerboseFlag = true,
+                          bool theInitGLH_extension = true);
 
     /// Query for supported capability.
     bool hasCap(unsigned int theCap);

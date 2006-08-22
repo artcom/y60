@@ -39,6 +39,7 @@ namespace y60 {
     class Primitive;
 }
 namespace asl {
+    bool initializeGLMemoryExtensions();
     struct AGPMemoryFlushSingleton : public asl::Singleton<AGPMemoryFlushSingleton>
     {
         void resetGLAGPMemoryFlush();
