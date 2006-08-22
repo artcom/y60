@@ -27,7 +27,12 @@ function ClassicTrackballMover(theViewport) {
     this.Constructor(this, theViewport);
 }
 
-ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
+function CenteredTrackballMover(theViewport) {
+    ClassicTrackballMover.prototype.Constructor(this, theViewport, true);
+    this.name = "CenteredTrackballMover";
+}
+
+ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCenteredFlag) {
     MoverBase.prototype.Constructor(obj, theViewport);
     obj.Mover = [];
 
@@ -37,13 +42,17 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
 
     //////////////////////////////////////////////////////////////////////
 
+    if (theCenteredFlag == undefined) {
+        theCenteredFlag = false;
+    }
+
     var _myTrackballBody        = null;
     var _myTrackballOrientation = new Vector3f(0,0,0);
     var _myTrackballCenter      = new Point3f(0,0,0);
 
     var _myMousePosX = 0;
     var _myMousePosY = 0;
-    var _myCenteredFlag         = 0;
+    var _myCenteredFlag = theCenteredFlag;
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -108,7 +117,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
         myWorldTranslation.y = - theDeltaY * myWorldSize * myPanFactor / PAN_SPEED;
         _myTrackballBody = null;
         obj.update(myWorldTranslation, 0);
-        
+
     }
 
     obj.onMouseMotion = function(theX, theY) {
@@ -139,7 +148,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
         return d;
     }
 
-    function setupTrackball(theBody) {  
+    function setupTrackball(theBody) {
         if (theBody) {
             _myTrackballBody = theBody;
         } else {
@@ -147,17 +156,17 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
         }
 
         _myTrackballCenter = getTrackballCenter();
-        var myGlobalPosition = obj.getMoverObject().globalmatrix.getTranslation();       
+        var myGlobalPosition = obj.getMoverObject().globalmatrix.getTranslation();
         var myRadiusVector = normalized(difference(myGlobalPosition, _myTrackballCenter));
-        
+
         if (obj.getMoverObject().globalmatrix.getRow(1).y > 0) {
             _myTrackballOrientation.x = - Math.asin(myRadiusVector.y);
             _myTrackballOrientation.y = Math.atan2(myRadiusVector.x, myRadiusVector.z);
         } else {
             _myTrackballOrientation.x = Math.PI + Math.asin(myRadiusVector.y);
             _myTrackballOrientation.y = Math.atan2(myRadiusVector.x, myRadiusVector.z) - Math.PI;
-        }   
-        
+        }
+
         calculateTrackball();
     }
 
@@ -168,11 +177,11 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
         var myZ = myTrackballRadius * Math.cos(- _myTrackballOrientation.x) * Math.cos(_myTrackballOrientation.y);
         var myGlobalMatrix = new Matrix4f(Quaternionf.createFromEuler(_myTrackballOrientation));
         myGlobalMatrix.translate(sum(_myTrackballCenter, new Vector3f(myX, myY, myZ)));
-        
+
         var myParentMatrix = new Matrix4f(obj.getMoverObject().parentNode.globalmatrix);
         myParentMatrix.invert();
         myGlobalMatrix.postMultiply(myParentMatrix);
-        
+
         var myDecomposition = myGlobalMatrix.decompose();
         obj.getMoverObject().orientation = myDecomposition.orientation;
         obj.getMoverObject().position    = myDecomposition.position;
@@ -188,7 +197,7 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport) {
             return _myTrackballBody.boundingbox.center;
         } else {
             var myViewVector = product(obj.getMoverObject().globalmatrix.getRow(2).xyz, -1);
-            var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();            
+            var myPosition   = obj.getMoverObject().globalmatrix.getTranslation();
             var myCenterRay  = new Ray(myPosition, myViewVector);
             var myTrackballRadius = 1;
             var myIntersection = nearestIntersection(obj.getWorld(), myCenterRay);

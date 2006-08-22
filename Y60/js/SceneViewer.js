@@ -363,6 +363,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                         print("Swap interval=" + window.swapInterval);
                     }
                     break;
+                case 'o':
+                    print("Optimizing scene...");
+                    window.scene.optimize();
+                    break;
                 default:
                     break;
             }
@@ -455,6 +459,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
         // standard movers
         var myViewport = self.getRenderWindow().canvas.childNode("viewport");
+        self.registerMover(CenteredTrackballMover);
         self.registerMover(TrackballMover);
         self.registerMover(ClassicTrackballMover);
         self.registerMover(FlyMover);
@@ -534,9 +539,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
         for (var i = 0; i < myText.length; ++i) {
             window.setTextColor([0,0,0,1]);
-            window.renderText([window.width - 161, 19 + (i * 15)], myText[i], "Screen13");
+            window.renderText([window.width - 201, 19 + (i * 15)], myText[i], "Screen13");
             window.setTextColor([1,1,1,1]);
-            window.renderText([window.width - 160.8, 19.2 + (i * 15)], myText[i], "Screen13");
+            window.renderText([window.width - 200.8, 19.2 + (i * 15)], myText[i], "Screen13");
         }
     }
 

@@ -168,7 +168,7 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             asl::Box3<float> myBox;
             convertFrom(cx, argv[1], myBox);
             y60::Scene::intersectBodies(myBodies, myBox, myIntersections);
-        } 
+        }
         else {
             JS_ReportError(cx,"JSScene::intersectBodies: bad argument type #1");
             return JS_FALSE;
@@ -447,7 +447,7 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
             dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
                 dom::NodePtr(new dom::Element("image")));
             y60::ImagePtr myImage = myResult->getFacade<y60::Image>();
-            myImage->createRaster(myWidth, myHeight, 1, 
+            myImage->createRaster(myWidth, myHeight, 1,
                 PixelEncoding(getEnumFromString(myPixelEncoding, PixelEncodingString)));
             memset(myImage->getRasterPtr()->pixels().begin(), 0, myImage->getRasterPtr()->pixels().size());
             *rval = as_jsval(cx, myResult);
@@ -482,6 +482,13 @@ setup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     ensureParamCount(argc, 0, 0);
     return Method<NATIVE>::call(&NATIVE::setup,cx,obj,argc,argv,rval);
+}
+
+static JSBool
+optimize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Optimizes the scene to one body and one shape.");
+    DOC_END;
+    return Method<NATIVE>::call(&NATIVE::optimize,cx,obj,argc,argv,rval);
 }
 
 static JSBool
@@ -547,8 +554,9 @@ JSScene::Functions() {
     static JSFunctionSpec myFunctions[] = {
         /* name                 native               nargs    */
         {"update",              update,              1},
-        {"updateAllModified",   updateAllModified,   1},            
+        {"updateAllModified",   updateAllModified,   1},
         {"clear",               clear,               0},
+        {"optimize",            optimize,            0},
         {"bodyVolume",          bodyVolume,          1},
         {"save",                save,                2},
         {"setup",               setup,                0},

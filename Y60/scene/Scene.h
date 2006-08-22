@@ -135,7 +135,7 @@ namespace y60 {
              * @param useSchema use a schema to decode?
              * @see DecoderManager
              */
-            static asl::Ptr<Scene,dom::ThreadingModel> load(asl::ReadableStream * theSource, const std::string & theFilename, 
+            static asl::Ptr<Scene,dom::ThreadingModel> load(asl::ReadableStream * theSource, const std::string & theFilename,
                       const IProgressNotifierPtr & theNotifier = IProgressNotifierPtr(0),
                       bool useSchema = true);
 
@@ -180,6 +180,10 @@ namespace y60 {
              * @param myUpdateFlags components of the scene to update.
              */
             void update(unsigned short myUpdateFlags = MATERIALS+SHAPES);
+
+            // Reduces the scene to one body with one shape
+            void optimize();
+
             /**
              * Saves the scene to the file given in theFilename
              * @param theFilename name of the file to save the scene to
@@ -215,7 +219,7 @@ namespace y60 {
             const dom::NodePtr getMaterialsRoot() const;
 
             float getWorldSize(const dom::NodePtr & theActiveCamera) const;
-            
+
             dom::NodePtr getWorldRoot();
             const dom::NodePtr getWorldRoot() const;
 
@@ -321,7 +325,7 @@ namespace y60 {
             void reloadMaterial(dom::NodePtr theMaterialNode, MaterialBasePtr theMaterial);
             void loadAnimations();
             void updateMaterials();
-            
+
             void collectGarbage();
             void collectReferences(dom::NodePtr theNode, std::set<std::string> & theReferences);
             void removeDangelingNodes(dom::NodePtr theNode, dom::NodePtr theDocument);
@@ -330,7 +334,7 @@ namespace y60 {
 
             void calculateShapeBoundingBox(ShapePtr myShape);
 
-            void updateTransformHierachy(dom::NodePtr theNode, 
+            void updateTransformHierachy(dom::NodePtr theNode,
                                          const asl::Matrix4f & theParentMatrix);
 
             Primitive & createPrimitive(int theMaterialNumber,
@@ -344,7 +348,7 @@ namespace y60 {
             dom::NodePtr getVertexDataNode(dom::NodePtr theShapeNode, const std::string & theDataName);
 
             unsigned findMaxIndexSize(dom::NodePtr theElementsNode);
-            
+
             IShaderLibraryPtr getShaderLibrary() const;
             void setupShaderLibrary();
 
@@ -355,7 +359,7 @@ namespace y60 {
             LightVector              _myLights;
             dom::DocumentPtr         _mySceneDom;
             Statistics               _myStatistics;
-            
+
             unsigned long long       _myPreviousDomVersion;
     };
 

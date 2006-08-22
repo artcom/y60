@@ -16,6 +16,7 @@
 #include "Body.h"
 #include "ISceneDecoder.h"
 #include "TextureManager.h"
+#include "SceneOptimizer.h"
 
 #include <y60/NodeNames.h>
 #include <y60/NodeValueNames.h>
@@ -215,7 +216,7 @@ namespace y60 {
         return myNewScene;
     }
 
-    void 
+    void
     Scene::setSceneDom(dom::DocumentPtr theDocument) {
         _mySceneDom = theDocument;
     }
@@ -282,6 +283,13 @@ namespace y60 {
         update(ANIMATIONS_LOAD|SHAPES|WORLD);
         asl::Time setupEnd;
         AC_INFO << "Total setup time: " << (setupEnd-setupStart) << " sec";
+    }
+
+    void
+    Scene::optimize() {
+        SceneOptimizer myOptimizer(*this);
+        myOptimizer.run();
+        update(SHAPES|WORLD);
     }
 
     void
@@ -482,7 +490,7 @@ namespace y60 {
 
 
                     // collect renderstyles for this element
-                    myPrimitive.getRenderStyles() = myElementsNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB, 
+                    myPrimitive.getRenderStyles() = myElementsNode->getAttributeValue<RenderStyles>(RENDER_STYLE_ATTRIB,
                                                             RenderStyles(0));
                     unsigned myIndicesCount = myElementsNode->childNodesLength(VERTEX_INDICES_NAME);
                     for (unsigned k = 0; k < myIndicesCount; ++k) {
@@ -632,7 +640,7 @@ namespace y60 {
             AC_TRACE << "updateAnimations";
             MAKE_SCOPE_TIMER(updateAnimations);
             _myAnimationManager.update();
-        }            
+        }
 
         if (theUpdateFlags & SHAPES) {
             AC_TRACE << "updateShapes";
@@ -843,7 +851,7 @@ namespace y60 {
             return false;
         }
     };
-    
+
     // By now we only check intersection on bb level (VS)
     // TODO extend the box intersection visit by getting real contact with the primitives
     template<>
@@ -875,7 +883,7 @@ namespace y60 {
         }
     };
 
-    
+
     bool
     Scene::intersectWorld(const LineSegment<float> & theStick,
                           IntersectionInfoVector & theIntersections)
@@ -1144,7 +1152,7 @@ namespace y60 {
         for (unsigned i = 0; i < myOldScene->childNodesLength(); ++i) {
             NodePtr myOldChild = myOldScene->childNode(i);
             if (myOldChild->nodeType() == dom::Node::ELEMENT_NODE &&
-                myOldChild->nodeName() != CANVAS_LIST_NAME) 
+                myOldChild->nodeName() != CANVAS_LIST_NAME)
             {
                 for (unsigned j = 0; j < myNewScene->childNodesLength(); ++j) {
                     NodePtr myNewChild = myNewScene->childNode(j);

@@ -70,6 +70,6 @@ function composeException(theException) {
     return myMessage;
 }
 
-function reportException(theException) {    
-    print("### " + composeException(theException));
+function reportException(theException) {
+    Logger.error(composeException(theException));
 }
