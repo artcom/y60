@@ -79,8 +79,8 @@ namespace y60 {
     template <class T>
     unsigned
     SceneOptimizer::copyVertexData(dom::NodePtr theSrcVertexData, dom::NodePtr theDstVertexData) {
-        const std::vector<T> & mySrc = theSrcVertexData->firstChild()->nodeValueRef<std::vector<T> >();
-        std::vector<T> & myDst = theDstVertexData->firstChild()->nodeValueRefOpen<std::vector<T> >();
+        const std::vector<T> & mySrc = theSrcVertexData->firstChild()->dom::Node::nodeValueRef<std::vector<T> >();
+        std::vector<T> & myDst = theDstVertexData->firstChild()->dom::Node::nodeValueRefOpen<std::vector<T> >();
         unsigned myOffset = myDst.size();
 
         myDst.resize(mySrc.size() + myOffset);
@@ -89,7 +89,7 @@ namespace y60 {
            myDst[myOffset + j] = mySrc[j];
         }
 
-        theDstVertexData->firstChild()->nodeValueRefClose<std::vector<T> >();
+        theDstVertexData->firstChild()->dom::Node::nodeValueRefClose<std::vector<T> >();
         return myOffset;
     }
 }
