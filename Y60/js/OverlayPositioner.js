@@ -99,7 +99,7 @@ OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
 
     function setup() {
         var myUnderlays = theSceneViewer.getActiveViewport().childNode("underlays");
-        while (myUnderlays.childNodesLength() > 0) {
+        while (myUnderlays && myUnderlays.childNodesLength() > 0) {
             _myOverlays.appendChild(myUnderlays.firstChild);
         }
       
