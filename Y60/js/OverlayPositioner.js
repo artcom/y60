@@ -23,7 +23,7 @@ OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
     const OVERLAY_POSITIONER_FILE = "OverlayPositions.xml";
 
     var _mySceneViewer   = theSceneViewer;
-    var _myOverlays      = theSceneViewer.getActiveViewport().firstChild;
+    var _myOverlays      = theSceneViewer.getActiveViewport().childNode("overlays");
     var _myPickedOverlay = null;
     var _myMouseStart    = null;
     var _myShiftFlag     = false;
@@ -98,6 +98,11 @@ OverlayPositioner.prototype.Constructor = function(self, theSceneViewer) {
     }
 
     function setup() {
+        var myUnderlays = theSceneViewer.getActiveViewport().childNode("underlays");
+        while (myUnderlays.childNodesLength() > 0) {
+            _myOverlays.appendChild(myUnderlays.firstChild);
+        }
+      
         if (fileExists(OVERLAY_POSITIONER_FILE)) {
             var myConfig = new Node();
             myConfig.parseFile(OVERLAY_POSITIONER_FILE);
