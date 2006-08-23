@@ -60,6 +60,7 @@ function LabelBase(Public, Protected, theScene,
         var rightPad   = "rightPad"    in myStyle ? myStyle.rightPad : 0;
         var leftPad    = "leftPad"     in myStyle ? myStyle.leftPad : 0;
         var tracking   = "tracking"    in myStyle ? myStyle.tracking : 0;
+        var lineHeight = "lineHeight"  in myStyle ? myStyle.lineHeight : 0;
         var HTextAlign = "HTextAlign"  in myStyle ? myStyle.HTextAlign : Renderer.LEFT_ALIGNMENT;
         var VTextAlign = "VTextAlign"  in myStyle ? myStyle.VTextAlign : Renderer.TOP_ALIGNMENT;
 
@@ -68,6 +69,7 @@ function LabelBase(Public, Protected, theScene,
         window.setVTextAlignment(VTextAlign);
         window.setTextColor(myStyle.textColor);
         window.setTracking(tracking);
+        window.setLineHeight(lineHeight);
 
         var myFontName = loadFont(myStyle.font, myStyle.fontsize);
 
