@@ -37,9 +37,6 @@ namespace y60 {
             void load(const dom::NodePtr theNode);
             void reload();
             virtual y60::IShaderPtr findShader(MaterialBasePtr theMaterial);
-
-            const std::string & getShaderDir() const { return _myShaderDirectory; };
-
             const GLShaderVector & getShaders() const { return _myShaders; };
 #ifndef _AC_NO_CG_
             CGcontext getCgContext();
@@ -47,12 +44,9 @@ namespace y60 {
          private:
             void loadAllShaders();
             GLShaderVector  _myShaders;
-            std::string     _myShaderDirectory;
 #ifndef _AC_NO_CG_
 		    CGcontext       _myCgContext;
 #endif
-		    dom::NodePtr    _myShaderList;
-
      };
 
     typedef asl::Ptr<ShaderLibrary> ShaderLibraryPtr;

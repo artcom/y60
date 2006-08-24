@@ -48,7 +48,7 @@ using namespace dom;
 
 namespace y60 {
 
-	ShaderLibrary::ShaderLibrary() 
+	ShaderLibrary::ShaderLibrary()
 #ifndef _AC_NO_CG_
 	: _myCgContext(0)
     {
@@ -61,7 +61,7 @@ namespace y60 {
 
     ShaderLibrary::~ShaderLibrary()  {
         _myShaders.clear(); // destroy all shaders first
-#ifndef _AC_NO_CG_ 
+#ifndef _AC_NO_CG_
         cgDestroyContext(_myCgContext);
         assertCg("ShaderLibrary::~ShaderLibrary() - cgDestroyContext()", _myCgContext);
 #endif
@@ -98,8 +98,6 @@ namespace y60 {
         myShaderLibraryXml.parse(myShaderLibraryStr);
 
         load(myShaderLibraryXml.childNode(SHADER_LIST_NAME));
-        std::string myShaderDir = asl::getDirectoryPart(myShaderLibraryFileName);
-        _myShaderDirectory = myShaderDir;
         AC_INFO << "Loaded Shaderlibrary " + myShaderLibraryFileName;
     }
 
@@ -115,21 +113,20 @@ namespace y60 {
 
     void
     ShaderLibrary::load(const dom::NodePtr theNode) {
-        _myShaderList = theNode;
-        for (int i = 0; i < _myShaderList->childNodesLength("shader"); i++) {
-            const dom::NodePtr theShaderNode =  _myShaderList->childNode("shader", i);
+        for (int i = 0; i < theNode->childNodesLength("shader"); i++) {
+            const dom::NodePtr theShaderNode = theNode->childNode("shader", i);
             GLShaderPtr myGLShader(0);
             DB(AC_TRACE << "loading shader " << theShaderNode->getAttributeString("name") << endl);
             if (theShaderNode->childNode(FIXED_FUNCTION_SHADER_NODE_NAME)) {
                 myGLShader = GLShaderPtr(new FFShader(theShaderNode));
             }
 #ifndef _AC_NO_CG_
-		    else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME) && 
+		    else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME) &&
                      theShaderNode->getAttributeString(NAME_ATTRIB) == "SkinAndBones") {
                 myGLShader = GLShaderPtr(new SkinAndBonesShader(theShaderNode));
             } else if (theShaderNode->childNode(VERTEX_SHADER_NODE_NAME)) {
                 myGLShader = GLShaderPtr(new CGShader(theShaderNode));
-            }  
+            }
 #endif
             if (myGLShader) {
                 _myShaders.push_back(myGLShader);
