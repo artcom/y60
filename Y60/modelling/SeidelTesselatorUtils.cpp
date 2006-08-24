@@ -18,6 +18,10 @@
     #include <math.h>
 #endif
 
+#ifdef LINUX
+    #include <cmath>
+#endif
+
 #define DB(x) // x
 #define DB2(x) // x
 

@@ -9,7 +9,7 @@
 //============================================================================
 
 #ifndef AC_Y60_TESSELATION_UTILS_FUNCTIONS_INCLUDED
-#define AC_Y60_TESSELATION_UTILS_FUNCTIONS_INCLUDED
+#define AC_Y60_TESSELATION_UTILS_FUNCTIONS_INCLUDED
 
 
 namespace y60 {
@@ -41,7 +41,9 @@ namespace y60 {
     #define LASTPT  2
 
 
+#ifdef WIN32
     #define INFINITY 1<<30
+#endif
     #define C_EPS 1.0e-7		/* tolerance value: Used for making */
 				    /* all decisions about collinearity or */
 				    /* left/right of segment. Decrease */
@@ -84,5 +86,5 @@ namespace y60 {
     #define FP_EQUAL(s, t) (fabs(s - t) <= C_EPS)
 
 }
-#endif // AC_Y60_TESSELATION_UTILS_FUNCTIONS_INCLUDED
+#endif // AC_Y60_TESSELATION_UTILS_FUNCTIONS_INCLUDED
 
