@@ -803,6 +803,7 @@ ObjectObjectVariableResultFunction(bool (*theFunction)(const NATIVE_A &,const NA
 static JSBool
 intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Finds the intersections between two objects.");
+    DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);           DOC_PARAM("theSphere", "", DOC_TYPE_SPHERE);           DOC_RESET;
     DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_RESET;
     DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_RESET;
     DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);             DOC_PARAM("theLine", "", DOC_TYPE_LINE);               DOC_RESET;
@@ -834,6 +835,10 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
             JS_ValueToObject(cx, argv[1], &myObj1) == JS_TRUE)
         {
             CallStatus myStatus = NOT_FOUND;
+
+            typedef bool (*SphereSphereIntersection)(const asl::Sphere<LineNumber> &,const asl::Sphere<LineNumber> &, Point3<LineNumber> &);
+            myStatus = ObjectObjectResultFunction((SphereSphereIntersection)&intersection, cx, myObj0, myObj1, rval);
+            if (myStatus != NOT_FOUND) return JS_TRUE;
 
             typedef bool (*LineLineIntersection)(const asl::Line<LineNumber> &,const asl::Line<LineNumber> &, Point3<LineNumber> &);
             myStatus = ObjectObjectResultFunction((LineLineIntersection)&intersection, cx, myObj0, myObj1, rval);

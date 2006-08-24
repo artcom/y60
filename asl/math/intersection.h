@@ -9,12 +9,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 //
-//    $RCSfile: intersection.h,v $
-//
-//     $Author: danielk $
-//
-//   $Revision: 1.5 $
-//
 // Description: intersections between point, vector, line, plane and other classes
 //
 //=============================================================================
@@ -36,6 +30,21 @@
 namespace asl {
 
     // see Graphics GEMS 1 Page 297 for some of the following functions
+
+    // Sphere/Sphere intersection
+    template<class Number>
+    bool intersection(const Sphere<Number> & s0, const Sphere<Number> & s1,
+                      Point3<Number> & P) {
+        Vector3<Number> distanceVec = s1.center - s0.center;
+        float distance = magnitude(distanceVec);
+        float radius = s0.radius + s1.radius;
+
+        if (distance <= radius) {
+            P = s0.center + normalized(distanceVec) * (s0.radius - (radius - distance) * 0.5f);
+            return true;
+        }
+        return false;
+    }
 
     // LineSegment/Sphere intersection
     template<class Number>
