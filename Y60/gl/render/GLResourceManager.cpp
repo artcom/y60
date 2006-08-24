@@ -135,12 +135,14 @@ namespace y60 {
 
     void
     GLResourceManager::setTexturePriority(Image * theImage, float thePriority) {
-        unsigned myTextureId = theImage->ensureTextureId(); 
+        unsigned myTextureId = theImage->ensureTextureId();
         glPrioritizeTextures(1, &myTextureId, &thePriority);
     }
 
     void GLResourceManager::loadShaderLibrary(const std::string & theShaderLibraryFile) {
-        _myShaderLibrary = ShaderLibraryPtr(new ShaderLibrary);
+        if (!_myShaderLibrary) {
+            _myShaderLibrary = ShaderLibraryPtr(new ShaderLibrary);
+        }
         _myShaderLibrary->load(theShaderLibraryFile);
     }
 

@@ -45,15 +45,15 @@ namespace y60 {
     public:
         VertexDataStorageTypeSetting() : _myType(VERTEX_STORAGE_IS_STD_VECTOR),
                                          _myUsageType(VERTEX_USAGE_STATIC_DRAW)
-        {   
+        {
             const char * myUsageString = getenv("Y60_VBO_USAGE");
             if (myUsageString) {
                 VertexBufferUsageType myUsageType = getVertexBufferUsageTypeFromString(myUsageString);
                 if (myUsageType !=VERTEX_USAGE_UNDEFINED) {
                     _myUsageType = myUsageType;
-                    AC_INFO << "VertexBufferUsageType '"<<myUsageString<<"' is used from Y60_VBO_USAGE environment variable."<<std::endl; 
+                    AC_INFO << "VertexBufferUsageType '"<<myUsageString<<"' is used from Y60_VBO_USAGE environment variable."<<std::endl;
                 } else {
-                    AC_WARNING << "Unknown value '"<<myUsageString<<"' in environment variable Y60_VBO_USAGE ignored."<<std::endl; 
+                    AC_WARNING << "Unknown value '"<<myUsageString<<"' in environment variable Y60_VBO_USAGE ignored."<<std::endl;
                     AC_INFO << "Recognized values are:";
                     for (int i = 0; VertexBufferUsageTypeList[i] != VERTEX_USAGE_UNDEFINED; ++i) {
                         AC_INFO << "  " << VertexBufferUsageTypeNames[i] << std::endl;
@@ -100,8 +100,8 @@ namespace y60 {
 
     /**
      * @ingroup y60render
-     * OpenGL implementation of a ResourceManager. Handles texture uploads and 
-     * vertex buffers and is some sort of representation of the graphics hardware. 
+     * OpenGL implementation of a ResourceManager. Handles texture uploads and
+     * vertex buffers and is some sort of representation of the graphics hardware.
      * It is used by the TextureManager in Scene. Implemented as a singleton.
      */
     class GLResourceManager : public ResourceManager, public asl::Singleton<GLResourceManager> {
@@ -201,9 +201,9 @@ namespace y60 {
 
         /**
          * Setup a 2D/3D texture.
-         * @param theImage 
+         * @param theImage
          * @throws TextureException theImage was invalid or contained no raster info
-         * @return 
+         * @return
          */
         unsigned setupSingleTexture(ImagePtr theImage, unsigned theTextureId);
 
@@ -215,8 +215,8 @@ namespace y60 {
 
         /**
          * Setup a cubemap texture.
-         * @param theImage 
-         * @return 
+         * @param theImage
+         * @return
          * @throws TextureException theImage was not a cubemap or invalid
          */
         unsigned setupCubemap(ImagePtr theImage,  unsigned theTextureId);
@@ -232,7 +232,7 @@ namespace y60 {
         void setupPixelTransfer(ImagePtr theImage);
 
         unsigned long _myTextureMemUsage;
-        ShaderLibraryPtr _myShaderLibrary;        
+        ShaderLibraryPtr _myShaderLibrary;
     };
 }
 
