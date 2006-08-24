@@ -127,6 +127,36 @@ CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 
     } HANDLE_CPP_EXCEPTION;
 }
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateSurface2fFromCountour(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Creates a surface from a unclosed countour, defined by a VectorOfVector2f");
+        DOC_PARAM("theScene", "", DOC_TYPE_OBJECT);
+        DOC_PARAM("theMaterialId", "", DOC_TYPE_STRING);
+        DOC_PARAM("theContour", "", DOC_TYPE_VECTOROFVECTOR2F);
+        DOC_PARAM("theSeapeName", "", DOC_TYPE_STRING);
+        DOC_RVAL("The quad shape node", DOC_TYPE_NODE);
+        DOC_END;
+
+        ensureParamCount(argc, 4);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+        string myMaterialId;
+        convertFrom(cx, argv[1], myMaterialId);
+        VectorOfVector2f myContour;
+        convertFrom(cx, argv[2], myContour);
+        string myShapeName;
+        convertFrom(cx, argv[3], myShapeName);
+
+        dom::NodePtr myResult = createSurface2fFromCountour(myScene, myMaterialId,
+                                                            myContour, myShapeName);
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateCrosshair(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
@@ -609,6 +639,7 @@ JSModellingFunctions::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
         // name                         native                       nargs
         {"createTransform",             CreateTransform,             1},
+        {"createSurface2fFromCountour", CreateSurface2fFromCountour, 4},
         {"createBody",                  CreateBody,                  2},
         {"createCanvas",                CreateCanvas,                2},
         {"createQuad",                  CreateQuad,                  2},
