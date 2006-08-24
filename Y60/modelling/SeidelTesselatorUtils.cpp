@@ -45,12 +45,5 @@ namespace y60 {
         return (int) ceil((double) 1.0*n/v);
     }
 
-    /* Return the next segment in the generated random ordering of all the */
-    /* segments in S */
-    int choose_segment()
-    {
-        static int choose_idx = 1;
-        return choose_idx++;//permute[choose_idx++];
-    }
 
 }

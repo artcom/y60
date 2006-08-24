@@ -33,94 +33,88 @@ using namespace asl;
 namespace y60 {
     
 
-    SeidelTesselator::SeidelTesselator() {
-        int n= 200;
-        for (int i = 1; i <= n; i++) {
-            seg[i].is_inserted = FALSE;
-        }
+    SeidelTesselator::SeidelTesselator(): choose_idx(1) {
     }
     SeidelTesselator::~SeidelTesselator() {
     }
 
     dom::NodePtr 
     SeidelTesselator::createSurface2DFromContour(y60::ScenePtr theScene, const string & theMaterialId,
-                               const vector<VectorOfVector2f> & theContours,
+                               const VectorOfVector2f & theContour,
                                const string & theName) {
         ShapeBuilder myShapeBuilder(theName);
         ElementBuilder myElementBuilder(PRIMITIVE_TYPE_TRIANGLES, theMaterialId);
 
         theScene->getSceneBuilder()->appendShape(myShapeBuilder);
-        int myTotalVerticesCount = 0;
-        for (int myContourIndex = 0; myContourIndex < theContours.size(); myContourIndex++) {
-            const VectorOfVector2f & myContour = theContours[myContourIndex];
-            myTotalVerticesCount += myContour.size();
-        }
+        int myTotalVerticesCount = theContour.size();
+
+        unsigned mySegmentCount =  myTotalVerticesCount+1;
+        vert.resize(mySegmentCount);
+        mon.resize(mySegmentCount);
+        seg.resize(mySegmentCount);
+
+        qs.resize(8*mySegmentCount);
+
+        tr.resize(4*mySegmentCount);
+        visited.resize(4*mySegmentCount);
+        mchain.resize(4*mySegmentCount);
 
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE, myTotalVerticesCount);
 
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, myTotalVerticesCount);
         myShapeBuilder.appendVertexData(NORMAL_ROLE, Vector3f(0,0,1));
         
-        memset((void *)seg, 0, sizeof(seg));
         unsigned mySegmentCounter = 1;
-        for (int myContourIndex = 0; myContourIndex < theContours.size(); myContourIndex++) {
-            const VectorOfVector2f & myContour = theContours[myContourIndex];
             
-            int mySegmentBeginIndex = mySegmentCounter;
-            int mySegmentEndIndex = mySegmentBeginIndex + myContour.size() - 1;
-            for (int myPointIndex = 0; myPointIndex < myContour.size(); myPointIndex++, mySegmentCounter++) {
-                Vector2f myTmp = myContour[myPointIndex];
-                myShapeBuilder.appendVertexData(POSITION_ROLE, Vector3f(myTmp[0], myTmp[1], 0.0f));
+        int mySegmentBeginIndex = mySegmentCounter;
+        int mySegmentEndIndex = mySegmentBeginIndex + theContour.size() - 1;
+        for (int myPointIndex = 0; myPointIndex < theContour.size(); myPointIndex++, mySegmentCounter++) {
+            Vector2f myTmp = theContour[myPointIndex];
+            myShapeBuilder.appendVertexData(POSITION_ROLE, Vector3f(myTmp[0], myTmp[1], 0.0f));
 
-                seg[mySegmentCounter].v0.x = myTmp[0];
-                seg[mySegmentCounter].v0.y = myTmp[1];
-                
-                if (mySegmentCounter == mySegmentEndIndex)
-                {
-                    seg[mySegmentCounter].next = mySegmentBeginIndex;
-                    seg[mySegmentCounter].prev = mySegmentCounter-1;
-                    seg[mySegmentCounter-1].v1 = seg[mySegmentCounter].v0;
-                }
-                else if (mySegmentCounter == mySegmentBeginIndex)
-                {
-                    seg[mySegmentCounter].next = mySegmentCounter+1;
-                    seg[mySegmentCounter].prev = mySegmentEndIndex;
-                    seg[mySegmentEndIndex].v1 = seg[mySegmentCounter].v0;
-                }
-                else
-                {
-                    seg[mySegmentCounter].prev = mySegmentCounter-1;
-                    seg[mySegmentCounter].next = mySegmentCounter+1;
-                    seg[mySegmentCounter-1].v1 = seg[mySegmentCounter].v0;
-                }            
-                seg[mySegmentCounter].is_inserted = FALSE;
-            }      
-        }
+            seg[mySegmentCounter].v0.x = myTmp[0];
+            seg[mySegmentCounter].v0.y = myTmp[1];
+            
+            if (mySegmentCounter == mySegmentEndIndex)
+            {
+                seg[mySegmentCounter].next = mySegmentBeginIndex;
+                seg[mySegmentCounter].prev = mySegmentCounter-1;
+                seg[mySegmentCounter-1].v1 = seg[mySegmentCounter].v0;
+            }
+            else if (mySegmentCounter == mySegmentBeginIndex)
+            {
+                seg[mySegmentCounter].next = mySegmentCounter+1;
+                seg[mySegmentCounter].prev = mySegmentEndIndex;
+                seg[mySegmentEndIndex].v1 = seg[mySegmentCounter].v0;
+            }
+            else
+            {
+                seg[mySegmentCounter].prev = mySegmentCounter-1;
+                seg[mySegmentCounter].next = mySegmentCounter+1;
+                seg[mySegmentCounter-1].v1 = seg[mySegmentCounter].v0;
+            }            
+            seg[mySegmentCounter].is_inserted = FALSE;
+        }      
 
-        for(int i = 0; i< 6;i++) {
-            cout <<" segment : " << i << endl;
-            cout <<" v0 : " << seg[i].v0.x << " / " << seg[i].v0.y << endl;
-            cout <<" v1 : " << seg[i].v1.x << " / " << seg[i].v1.y << endl;
-            cout <<" is_inserted: " << seg[i].is_inserted << endl;
-            cout <<" root0: " << seg[i].root0 << endl;
-            cout <<" root1: " << seg[i].root1 << endl;
-            cout <<" next: " << seg[i].next << endl;
-            cout <<" prev: " << seg[i].prev << endl;
-            cout <<"-------------------------" << endl;
-        }
       cout <<"-------------------------Vertexcount : " <<  myTotalVerticesCount << endl;
     
 
       construct_trapezoids(myTotalVerticesCount);
+
       int nmonpoly = monotonate_trapezoids(myTotalVerticesCount);
-      int op[SEGSIZE][3];
+
+      vector<vector<int> > op;
+      op.resize(seg.size());
+      for (int i= 0; i < seg.size(); i++) {
+          op[i].resize(3);
+      }
       int myTrianglesCount = triangulate_monotone_polygons(myTotalVerticesCount, nmonpoly, op);
 
       myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, myTotalVerticesCount);
         myElementBuilder.createIndex(NORMAL_ROLE, NORMALS, myTotalVerticesCount);
 
       for (int myTriangleIndex = 0; myTriangleIndex < myTrianglesCount; myTriangleIndex++) {
-          AC_PRINT << "Triangle : " << i << " indices = " << op[myTriangleIndex][0] << ", " << op[myTriangleIndex][1] << "," << op[myTriangleIndex][2];
+          AC_PRINT << "Triangle : " << myTriangleIndex << " indices = " << op[myTriangleIndex][0] << ", " << op[myTriangleIndex][1] << "," << op[myTriangleIndex][2];
             myElementBuilder.appendIndex(POSITIONS, op[myTriangleIndex][0]-1);
             myElementBuilder.appendIndex(POSITIONS, op[myTriangleIndex][1]-1);
             myElementBuilder.appendIndex(POSITIONS, op[myTriangleIndex][2]-1);
@@ -128,7 +122,7 @@ namespace y60 {
             myElementBuilder.appendIndex(NORMALS, 0);
             myElementBuilder.appendIndex(NORMALS, 0);
       }
-        myShapeBuilder.appendElements( myElementBuilder );
+      myShapeBuilder.appendElements( myElementBuilder );
       return myShapeBuilder.getNode();
     }
     /* Function returns TRUE if the trapezoid lies inside the polygon */
@@ -311,14 +305,15 @@ namespace y60 {
       register int i;
       int tr_start;
     
-      memset((void *)vert, 0, sizeof(vert));
-      memset((void *)visited, 0, sizeof(visited));
-      memset((void *)mchain, 0, sizeof(mchain));
-      memset((void *)mon, 0, sizeof(mon));
+      //memset((void *)vert, 0, sizeof(vert));
+      //memset((void *)visited, 0, sizeof(visited));
+      //memset((void *)mchain, 0, sizeof(mchain));
+      //memset((void *)mon, 0, sizeof(mon));
       
       /* First locate a trapezoid which lies inside the polygon */
       /* and which is triangular */
-      for (i = 0; i < TRSIZE; i++)
+      //for (i = 0; i < TRSIZE; i++)
+      for (i = 0; i < tr.size(); i++)
         if (inside_polygon(&tr[i]))
           break;
       tr_start = i;
@@ -640,7 +635,7 @@ namespace y60 {
     /* Take care not to triangulate duplicate monotone polygons */
     
     int 
-        SeidelTesselator::triangulate_monotone_polygons(int nvert, int nmonpoly, int op[][3])
+        SeidelTesselator::triangulate_monotone_polygons(int nvert, int nmonpoly, vector<vector<int> > & op)
     {
       register int i;
       point_t ymax, ymin;
@@ -733,10 +728,14 @@ namespace y60 {
      * Joseph O-Rourke, Computational Geometry in C.
      */
     int 
-        SeidelTesselator::triangulate_single_polygon(int nvert, int posmax, int side, int op[][3])
+        SeidelTesselator::triangulate_single_polygon(int nvert, int posmax, int side, vector<vector<int> > & op)
     {
       register int v;
-      int rc[SEGSIZE], ri = 0;	/* reflex chain */
+      //int rc[SEGSIZE], ri = 0;	/* reflex chain */
+      int ri = 0;	/* reflex chain */
+      std::vector<int> rc;
+      rc.resize(seg.size());
+
       int endv, tmp, vpos;
       
       if (side == TRI_RHS)		/* RHS segment is a single segment */
@@ -809,7 +808,7 @@ namespace y60 {
     /* Return a new node to be added into the query tree */
     int SeidelTesselator::newnode()
     {
-      if (q_idx < QSIZE)
+      if (q_idx < qs.size()) //QSIZE))
         return q_idx++;
       else
         {
@@ -821,7 +820,7 @@ namespace y60 {
     /* Return a free trapezoid */
     int SeidelTesselator::newtrap()
     {
-      if (tr_idx < TRSIZE)
+      if (tr_idx < tr.size()) //TRSIZE)
         {
           tr[tr_idx].lseg = -1;
           tr[tr_idx].rseg = -1;
@@ -931,8 +930,8 @@ namespace y60 {
       segment_t *s = &seg[segnum];
     
       q_idx = tr_idx = 1;
-      memset((void *)tr, 0, sizeof(tr));
-      memset((void *)qs, 0, sizeof(qs));
+      //memset((void *)tr, 0, sizeof(tr));
+      //memset((void *)qs, 0, sizeof(qs));
     
       i1 = newnode();
       qs[i1].nodetype = T_Y;
@@ -1819,5 +1818,12 @@ namespace y60 {
         add_segment(choose_segment());
     
       return 0;
-    }    
+    }
+    /* Return the next segment in the generated random ordering of all the */
+    /* segments in S */
+    int SeidelTesselator::choose_segment()
+    {
+        return choose_idx++;
+    }
+
 }

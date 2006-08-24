@@ -15,7 +15,6 @@
 namespace y60 {
     int math_logstar_n(int n);          
     int math_N(int n, int h);
-    int choose_segment();
 
     /* Node types */
 
@@ -24,14 +23,14 @@ namespace y60 {
     #define T_SINK  3
 
 
-    #define SEGSIZE 200		/* max# of segments. Determines how */
+    //#define SEGSIZE 200		/* max# of segments. Determines how */
 				    /* many points can be specified as */
 				    /* input. If your datasets have large */
 				    /* number of points, increase this */
 				    /* value accordingly. */
 
-    #define QSIZE   8*SEGSIZE	/* maximum table sizes */
-    #define TRSIZE  4*SEGSIZE	/* max# trapezoids */
+    //#define QSIZE   8*SEGSIZE	/* maximum table sizes */
+    //#define TRSIZE  4*SEGSIZE	/* max# trapezoids */
 
 
     #define TRUE  1

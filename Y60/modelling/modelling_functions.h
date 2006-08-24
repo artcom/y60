@@ -12,6 +12,7 @@
 #define AC_Y60_GEOMETRY_FUNCTIONS_INCLUDED
 
 #include "VertexIndexBuilder.h"
+#include "SeidelTesselator.h"
 
 #include <y60/Scene.h>
 #include <y60/ShapeBuilder.h>
@@ -411,6 +412,9 @@ private:
     float                 _myPower;
 };
 
+dom::NodePtr createSurface2fFromCountour(y60::ScenePtr theScene, const std::string & theMaterialId,
+                                         const VectorOfVector2f & theContours,
+                                         const std::string & theName = "Surface2DShape");
 
 // TODO:
 // - Find a way to make default functions work
