@@ -21,6 +21,7 @@
 
 #include <y60/GLUtils.h>
 #include <y60/NodeNames.h>
+#include <asl/PackageManager.h>
 
 using namespace std;
 using namespace asl;
@@ -80,7 +81,7 @@ namespace y60 {
             DB(AC_TRACE << "CGShader::loadShader(): Loading fragment shader from file '"
                     << _myFragmentShader._myFilename << "'");
             _myFragmentProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myFragmentShader,
-                    myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
+                    myShaderLibrary->getCgContext()));
             assertCg(PLUS_FILE_LINE, myShaderLibrary->getCgContext());
         }
 
@@ -89,7 +90,7 @@ namespace y60 {
             DB(AC_TRACE << "CGShader::loadShader(): Loading vertex shader from file '"
                     << _myVertexShader._myFilename << "'");
             _myVertexProgram = asl::Ptr<CgProgramInfo>(new CgProgramInfo(_myVertexShader,
-                    myShaderLibrary->getCgContext(), myShaderLibrary->getShaderDir()));
+                    myShaderLibrary->getCgContext()));
             assertCg(PLUS_FILE_LINE, myShaderLibrary->getCgContext());
         }
 
@@ -156,7 +157,13 @@ namespace y60 {
             ShaderDescription & theShader)
     {
         GLShader::loadShaderProperties(theShaderNode, theShader);
-        theShader._myFilename = theShaderNode->getAttributeString(CG_FILE_PROPERTY);
+
+        string myFilename = theShaderNode->getAttributeString(CG_FILE_PROPERTY);
+        theShader._myFilename = AppPackageManager::get().getPtr()->searchFile(myFilename);
+        if (theShader._myFilename.empty()) {
+            throw ShaderException(string("Could not find cg-shader '") + myFilename + "' in " +
+                AppPackageManager::get().getPtr()->getSearchPath(), PLUS_FILE_LINE);
+        }
         theShader._myEntryFunction = theShaderNode->getAttributeString(CG_ENTRY_FUNCTION_PROPERTY);
         string myProfile = theShaderNode->getAttributeString(CG_PROFILE_PROPERTY);
         theShader._myProfile = ShaderProfile(asl::getEnumFromString(myProfile,
@@ -213,7 +220,7 @@ namespace y60 {
         if (_myFragmentProgram) {
             _myFragmentProgram->disableProfile();
         }
-        
+
         glDisable(GL_VERTEX_PROGRAM_POINT_SIZE_ARB);
     }
 
@@ -271,13 +278,13 @@ namespace y60 {
         }
     }
 
-    void 
+    void
     CGShader::bindOverlayParams(const MaterialBase & theMaterial) {
         LightVector myEmptyLights;
         if (_myVertexProgram) {
             _myVertexProgram->reloadIfRequired(myEmptyLights, theMaterial);
             _myVertexProgram->bindOverlayParams();
-            _myVertexProgram->bind();            
+            _myVertexProgram->bind();
         }
         if (_myFragmentProgram) {
             _myFragmentProgram->reloadIfRequired(myEmptyLights, theMaterial);
@@ -286,8 +293,8 @@ namespace y60 {
         }
     }
 
-    unsigned 
-    CGShader::getMaxTextureUnits() const {        
+    unsigned
+    CGShader::getMaxTextureUnits() const {
         if (_myFragmentProgram) {
             // Fragment shader can use much more texture units than fixed function shaders
             int myMaxTexUnits;
@@ -298,6 +305,6 @@ namespace y60 {
             return unsigned(myMaxTexUnits);
         } else {
             return GLShader::getMaxTextureUnits();
-        }        
+        }
     }
-} 
+}

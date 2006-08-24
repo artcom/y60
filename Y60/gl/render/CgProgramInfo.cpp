@@ -118,11 +118,10 @@ namespace y60 {
     }
 
     CgProgramInfo::CgProgramInfo(const ShaderDescription & myShader,
-            const CGcontext theCgContext,
-            const std::string & theShaderDir)
+            const CGcontext theCgContext)
         : _myShader(myShader), _myContext(theCgContext)
     {
-        _myPathName = theShaderDir + myShader._myFilename;
+        _myPathName = myShader._myFilename;
 
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = 0;
         _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = 0;

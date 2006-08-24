@@ -78,8 +78,7 @@ namespace y60 {
     class CgProgramInfo {
         public:
             CgProgramInfo(const ShaderDescription & theShader,
-                    const CGcontext theCgContext,
-                    const std::string & theShaderDir);
+                    const CGcontext theCgContext);
             virtual ~CgProgramInfo();
             void load();
             CGprogram getCgProgramID() { return _myCgProgramID; }
