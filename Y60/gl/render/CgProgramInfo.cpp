@@ -455,6 +455,9 @@ namespace y60 {
                 case AMBIENT :
                     myAmbientLightColor = myLightPropFacade->get<LightAmbientTag>();
                     break;
+                case SPOT:
+                    // Not supported, yet.
+                    break;
                 default :
                     AC_WARNING << "unknown light type " << myLightSource->get<IdTag>();
             }
