@@ -10,11 +10,12 @@
 
 use("BuildUtils.js");
 
-function SvgPolygon(theSceneViewer ,theSvgNode,  theMaterial) {
-    this.Constructor(this, theSceneViewer, theSvgNode, theMaterial);
+
+function SvgPolygon(theSceneViewer ,theSvgNode,  theMaterial, theShapeMode) {
+    this.Constructor(this, theSceneViewer, theSvgNode, theMaterial, theShapeMode);
 }
 
-SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, theMaterial) {
+SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, theMaterial, theShapeMode) {
 
     self.getMaterial = function() {
         return _myMaterial;
@@ -26,7 +27,6 @@ SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, the
     self.getBody = function() {
         return _myBody;
     }
-
 
 
     /**********************************************************************
@@ -45,7 +45,7 @@ SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, the
         }
     }
 
-    function createShape() {
+    function createLinestripShape() {
         // shape building
         var myShapeBuilder = new ShapeBuilder();
         var myShapeElement = null;
@@ -78,6 +78,51 @@ SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, the
         //exit(1);
     }
 
+    function createPolygonShape() {
+        // shape building
+        //var myShapeBuilder = new ShapeBuilder();
+        //var myShapeElement = null;
+        //var myShapeElement = myShapeBuilder.appendElement("triangles", _myMaterial.id);
+
+        var myPointString = theSvgNode.points;
+        var myPoints = myPointString.split(" ");
+        
+        var myVector2fList = [];
+        var myYList = [];
+        
+        for(var myPointIndex = 13; myPointIndex < (myPoints.length-10); myPointIndex++) {
+            
+            var myPoint = trim(myPoints[myPointIndex]);
+            if (myPoint.length >0 ) {
+                var myCoordinates = myPoint.split(",");
+                var myVertex = new Vector2f(myCoordinates[0]*100.0, myCoordinates[1]*100.0);
+                myYList.push(myCoordinates[1]);
+                //push(myShapeBuilder, myShapeElement, myVertex);
+                myVector2fList.push(myVertex);
+                print( myVertex );
+
+            }
+        }
+
+        /* for( var j=0; j<myYList.length; ++j) { */
+            
+/*         } */
+/*         for(var myPointIndex = 14; myPointIndex < (myPoints.length-9); myPointIndex++) { */
+        //}
+
+        
+        Logger.warning(theSceneViewer.getScene() + " " + theMaterial.id + " " + myVector2fList + " " + theSvgNode.id);
+        _myShape = Modelling.createSurface2DFromCountour(theSceneViewer.getScene(), theMaterial.id, myVector2fList, "Surface2d");
+
+        Logger.warning(_myShape);
+        _myBody = window.scene.createBody(_myShape);
+        _myBody.name = "Body_" + theSvgNode.id;
+        theSceneViewer.getScene().update(Scene.SHAPES | Scene.MATERIALS);
+        
+        //window.scene.save("test.x60", false);
+        
+    }
+    
     function setup() {
         if (theMaterial == undefined) {
             _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene);
@@ -85,10 +130,17 @@ SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, the
             addMaterialRequirement(_myMaterial, "vertexparams", "[10[color]]");
         } else {
             _myMaterial = theMaterial;
+            print(_myMaterial);
         }
         _myColor = new Vector4f(1,1,1,1); // boring ol' white
+
+        print(theShapeMode);
+        if( theShapeMode == "polygon") {
+            createPolygonShape();
+        } else if (theShapeMode == "linestrip"){
+            createLinestripShape();
+        }
         
-        createShape();
     }
 
     var _myMaterial = null;
