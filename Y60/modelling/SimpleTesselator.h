@@ -22,57 +22,32 @@
 
 namespace y60 {
     DEFINE_EXCEPTION(SimpleTesselatorException, asl::Exception);
-    class Vector2d
-    {
-    public:
-      Vector2d(float x,float y)
-      {
-        Set(x,y);
-      };
-    
-      float GetX(void) const { return mX; };
-    
-      float GetY(void) const { return mY; };
-    
-      void  Set(float x,float y)
-      {
-        mX = x;
-        mY = y;
-      };
-    private:
-      float mX;
-      float mY;
-    };
-    // Typedef an STL vector of vertices which are used to represent
-    // a polygon/contour and a series of triangles.
-    typedef std::vector< Vector2d > Vector2dVector;
-
+   
     class SimpleTesselator {
         public:
-
             SimpleTesselator();
             virtual ~SimpleTesselator();
             dom::NodePtr createSurface2DFromContour(y60::ScenePtr theScene, const std::string & theMaterialId,
                                                     const VectorOfVector2f & theContour,
                                                     const std::string & theName = "Surface2DShape");
-
-          // triangulate a contour/polygon, places results in STL vector
-          // as series of triangles.
-          static bool Process(const Vector2dVector &contour, Vector2dVector &result);
         
-          // compute area of a contour/polygon
-          static float Area(const Vector2dVector &contour);
+            // triangulate a contour/polygon, places results in STL vector
+            // as series of triangles.
+            bool process(const VectorOfVector2f &contour, VectorOfVector2f &result);
         
-          // decide if point Px/Py is inside triangle defined by
-          // (Ax,Ay) (Bx,By) (Cx,Cy)
-          static bool InsideTriangle(float Ax, float Ay,
-                              float Bx, float By,
-                              float Cx, float Cy,
-                              float Px, float Py);
+            // compute area of a contour/polygon
+            float area(const VectorOfVector2f &contour);
+        
+            // decide if point Px/Py is inside triangle defined by
+            // (Ax,Ay) (Bx,By) (Cx,Cy)
+            bool insideTriangle(float Ax, float Ay,
+                                float Bx, float By,
+                                float Cx, float Cy,
+                                float Px, float Py);
         
 
         private:
-          static bool Snip(const Vector2dVector &contour,int u,int v,int w,int n,int *V);
+          bool snip(const VectorOfVector2f &contour,int u,int v,int w,int n,int *V);
 
 
     };
