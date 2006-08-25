@@ -92,6 +92,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         return _myCurrentTime;
     }
 
+    self.current_time getter = function() {
+        return _myCurrentTime;
+    }
+
     self.getAnimationManager = function() {
         return _myAnimationManager;
     }
