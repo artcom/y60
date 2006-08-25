@@ -98,11 +98,14 @@ namespace y60 {
 
       cout <<"-------------------------Vertexcount : " <<  myTotalVerticesCount << endl;
     
-
       construct_trapezoids(myTotalVerticesCount);
 
+      //AC_PRINT << theContour << theContour.size() << endl;
+      
       int nmonpoly = monotonate_trapezoids(myTotalVerticesCount);
 
+      AC_PRINT << "construct trapazoids" <<  nmonpoly;
+      
       vector<vector<int> > op;
       op.resize(seg.size());
       for (int i= 0; i < seg.size(); i++) {
@@ -111,7 +114,7 @@ namespace y60 {
       int myTrianglesCount = triangulate_monotone_polygons(myTotalVerticesCount, nmonpoly, op);
 
       myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, myTotalVerticesCount);
-        myElementBuilder.createIndex(NORMAL_ROLE, NORMALS, myTotalVerticesCount);
+      myElementBuilder.createIndex(NORMAL_ROLE, NORMALS, myTotalVerticesCount);
 
       for (int myTriangleIndex = 0; myTriangleIndex < myTrianglesCount; myTriangleIndex++) {
           AC_PRINT << "Triangle : " << myTriangleIndex << " indices = " << op[myTriangleIndex][0] << ", " << op[myTriangleIndex][1] << "," << op[myTriangleIndex][2];

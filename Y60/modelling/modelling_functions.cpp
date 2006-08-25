@@ -957,7 +957,7 @@ createVoxelProxyGeometry(ScenePtr theScene, const asl::Box3f & theVoxelBox,
     return myShape.getNode();
 }
 
-dom::NodePtr createSurface2fFromCountour(y60::ScenePtr theScene, const std::string & theMaterialId,
+dom::NodePtr createSurface2DFromCountour(y60::ScenePtr theScene, const std::string & theMaterialId,
                                          const VectorOfVector2f & theContours,
                                          const std::string & theName) {
     SeidelTesselator myTesselator;

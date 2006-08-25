@@ -412,7 +412,7 @@ private:
     float                 _myPower;
 };
 
-dom::NodePtr createSurface2fFromCountour(y60::ScenePtr theScene, const std::string & theMaterialId,
+dom::NodePtr createSurface2DFromCountour(y60::ScenePtr theScene, const std::string & theMaterialId,
                                          const VectorOfVector2f & theContours,
                                          const std::string & theName = "Surface2DShape");
 
