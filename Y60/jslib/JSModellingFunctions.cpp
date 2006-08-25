@@ -128,7 +128,7 @@ CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
     } HANDLE_CPP_EXCEPTION;
 }
 JS_STATIC_DLL_CALLBACK(JSBool)
-CreateSurface2fFromCountour(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+CreateSurface2DFromCountour(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         DOC_BEGIN("Creates a surface from a unclosed countour, defined by a VectorOfVector2f");
         DOC_PARAM("theScene", "", DOC_TYPE_OBJECT);
@@ -149,7 +149,7 @@ CreateSurface2fFromCountour(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         string myShapeName;
         convertFrom(cx, argv[3], myShapeName);
 
-        dom::NodePtr myResult = createSurface2fFromCountour(myScene, myMaterialId,
+        dom::NodePtr myResult = createSurface2DFromCountour(myScene, myMaterialId,
                                                             myContour, myShapeName);
         *rval = as_jsval(cx, myResult);
         return JS_TRUE;
@@ -639,7 +639,7 @@ JSModellingFunctions::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
         // name                         native                       nargs
         {"createTransform",             CreateTransform,             1},
-        {"createSurface2fFromCountour", CreateSurface2fFromCountour, 4},
+        {"createSurface2DFromCountour", CreateSurface2DFromCountour, 4},
         {"createBody",                  CreateBody,                  2},
         {"createCanvas",                CreateCanvas,                2},
         {"createQuad",                  CreateQuad,                  2},
