@@ -65,9 +65,6 @@ SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, the
                 }
             }
         }
-        if (myFirstVertex) {
-            push(myShapeBuilder, myShapeElement, myFirstVertex);        
-        }
         // create shape, body
         _myShape = myShapeBuilder.buildNode();
         _myShape.name = "Shape_" + theSvgNode.id;

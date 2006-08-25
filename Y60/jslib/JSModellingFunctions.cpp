@@ -128,13 +128,13 @@ CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
     } HANDLE_CPP_EXCEPTION;
 }
 JS_STATIC_DLL_CALLBACK(JSBool)
-CreateSurface2DFromCountour(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+CreateSurface2DFromContour(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         DOC_BEGIN("Creates a surface from a unclosed countour, defined by a VectorOfVector2f");
         DOC_PARAM("theScene", "", DOC_TYPE_OBJECT);
         DOC_PARAM("theMaterialId", "", DOC_TYPE_STRING);
         DOC_PARAM("theContour", "", DOC_TYPE_VECTOROFVECTOR2F);
-        DOC_PARAM("theSeapeName", "", DOC_TYPE_STRING);
+        DOC_PARAM("theShapeName", "", DOC_TYPE_STRING);
         DOC_RVAL("The quad shape node", DOC_TYPE_NODE);
         DOC_END;
 
@@ -149,8 +149,8 @@ CreateSurface2DFromCountour(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         string myShapeName;
         convertFrom(cx, argv[3], myShapeName);
 
-        dom::NodePtr myResult = createSurface2DFromCountour(myScene, myMaterialId,
-                                                            myContour, myShapeName);
+        dom::NodePtr myResult = createSurface2DFromContour(myScene, myMaterialId,
+                                                           myContour, myShapeName);
         *rval = as_jsval(cx, myResult);
         return JS_TRUE;
 
@@ -639,7 +639,7 @@ JSModellingFunctions::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
         // name                         native                       nargs
         {"createTransform",             CreateTransform,             1},
-        {"createSurface2DFromCountour", CreateSurface2DFromCountour, 4},
+        {"createSurface2DFromContour",  CreateSurface2DFromContour,  4},
         {"createBody",                  CreateBody,                  2},
         {"createCanvas",                CreateCanvas,                2},
         {"createQuad",                  CreateQuad,                  2},

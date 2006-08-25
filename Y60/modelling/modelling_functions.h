@@ -412,9 +412,9 @@ private:
     float                 _myPower;
 };
 
-dom::NodePtr createSurface2DFromCountour(y60::ScenePtr theScene, const std::string & theMaterialId,
-                                         const VectorOfVector2f & theContours,
-                                         const std::string & theName = "Surface2DShape");
+dom::NodePtr createSurface2DFromContour(y60::ScenePtr theScene, const std::string & theMaterialId,
+                                        const VectorOfVector2f & theContours,
+                                        const std::string & theName = "Surface2DShape");
 
 // TODO:
 // - Find a way to make default functions work
