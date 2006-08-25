@@ -13,6 +13,7 @@
 #include <y60/Image.h>
 #include <y60/PixelEncoding.h>
 #include <y60/PixelEncodingInfo.h>
+#include <asl/file_functions.h>
 
 #include <GL/glext.h>
 
@@ -144,6 +145,7 @@ namespace y60 {
             _myShaderLibrary = ShaderLibraryPtr(new ShaderLibrary);
         }
         _myShaderLibrary->load(theShaderLibraryFile);
+
     }
 
     IShaderLibraryPtr
