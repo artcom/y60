@@ -19,7 +19,7 @@ using namespace asl;
 using namespace inet;
 
 #define VERBOSE_PRINT \
-    _myVerboseFlag && AC_PRINT 
+    _myVerboseFlag && AC_PRINT
 
 IMPLEMENT_ENUM( y60::BackendType, y60::BackendTypeStrings);
 
@@ -84,13 +84,13 @@ CMSCache::loginOCS() {
 
     int myRunningCount = 0;
     do {
-        myRunningCount = _myRequestManager.handleRequests(); 
+        myRunningCount = _myRequestManager.handleRequests();
         asl::msleep(10);
     } while (myRunningCount);
 
     if (myLoginRequest->getResponseCode() != 200 ||
             myLoginRequest->getResponseHeader("Set-Cookie").size() == 0) {
-        throw CMSCacheException("Login failed for user '" + _myUsername + 
+        throw CMSCacheException("Login failed for user '" + _myUsername +
                 "' at URL '" + someAsset + "'.", PLUS_FILE_LINE);
     }
 
@@ -102,18 +102,18 @@ CMSCache::collectExternalAssetList() {
     if ( ! _myPresentationDocument || _myPresentationDocument->childNodesLength() == 0 ) {
         throw CMSCacheException("No presentation file. Bailing out.", PLUS_FILE_LINE);
     }
-    
+
     dom::NodePtr myRoot;
     if (_myPresentationDocument->childNode(0)->nodeType() == dom::Node::PROCESSING_INSTRUCTION_NODE) {
         myRoot = _myPresentationDocument->childNode(1)->childNode("themepool", 0);
     } else {
         myRoot = _myPresentationDocument->childNode(0)->childNode("themepool", 0);
     }
-    
+
     if ( ! myRoot ) {
         throw CMSCacheException("Failed to find themepool", PLUS_FILE_LINE);
     }
-    
+
     collectAssets(myRoot);
 
     VERBOSE_PRINT << "Found " << _myAssets.size() << " assets.";
@@ -137,7 +137,7 @@ CMSCache::collectAssets(dom::NodePtr theParent) {
             }
         }
         collectAssets( myChild );
-    }    
+    }
 }
 
 void
@@ -171,7 +171,7 @@ CMSCache::synchronize() {
         removeStalledAssets();
     }
     updateDirectoryHierarchy();
-    
+
     if ( ! _myAssets.empty()) {
         if ( ! _myUsername.empty() && ! _myPassword.empty()) {
             login();
@@ -179,6 +179,55 @@ CMSCache::synchronize() {
         collectOutdatedAssets();
         fillRequestQueue();
     }
+}
+
+bool
+CMSCache::testConsistency() {
+    cerr << "Testing CMS Consistency..." << endl;
+
+    _myAssets.clear();
+    collectExternalAssetList();
+    std::map<std::string, dom::NodePtr>::iterator it = _myAssets.begin();
+    if (!_myUsername.empty() && !_myPassword.empty()) {
+        login();
+    }
+
+    unsigned myExistingAssetCount = 0;
+    std::vector<dom::NodePtr> myMissingAssets;
+
+    for (; it != _myAssets.end(); it++) {
+        string myPath = it->second->getAttributeString("uri");
+        //OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
+        RequestPtr myRequest(new Request(myPath, "Wget/1.10.2"));
+        myRequest->setCookie(_mySessionCookie, true);
+        myRequest->head();
+        myRequest->setCredentials(_myUsername, _myPassword, DIGEST);
+        _myRequestManager.performRequest(myRequest);
+        int myRunningCount = 0;
+        do {
+            myRunningCount = _myRequestManager.handleRequests();
+            asl::msleep(10);
+        } while (myRunningCount);
+
+        if (myRequest->getResponseCode() == 200) {
+            myExistingAssetCount++;
+        } else {
+            myMissingAssets.push_back(it->second);
+        }
+        cerr << ".";
+    }
+    cerr << endl;
+
+    cout << "Results: " << endl;
+    cout << "  Existing Assets: " << myExistingAssetCount << endl;    
+    cout << "  Missing Assets: " << myMissingAssets.size() << endl << endl;    
+    for (unsigned i = 0; i < myMissingAssets.size(); ++i) {
+        cout << "Missing Asset #" << i + 1 << ":" << endl;
+        cout << "    name: " << myMissingAssets[i]->getAttributeString("name") << endl;
+        cout << "    path: " << myMissingAssets[i]->getAttributeString("path") << endl;
+    }
+
+    return (myMissingAssets.size() == 0);
 }
 
 void
@@ -206,7 +255,7 @@ CMSCache::isOutdated( dom::NodePtr theAsset ) {
                     theAsset->getAttributeString("lastmodified"));
         if (myServerTimestamp <= myLocalTimestamp) {
             return false;
-        } 
+        }
     }
     return true;
 }
@@ -226,7 +275,7 @@ CMSCache::fillRequestQueue() {
 
 bool
 CMSCache::isSynchronized() {
-    int myRunningCount = _myRequestManager.handleRequests(); 
+    int myRunningCount = _myRequestManager.handleRequests();
 
     // TODO: Error statistics and handling
     AssetRequestMap::iterator myIter = _myAssetRequests.begin();
@@ -324,7 +373,7 @@ CMSCache::dumpPresentationToFile(const string & theFilename) {
     std::ofstream myFile(myPath.toLocale().c_str());
     myFile << *_myPresentationDocument;
     if (!myFile) {
-        throw CMSCacheException("Dump to file failed for file '" + myPath.toLocale() + 
+        throw CMSCacheException("Dump to file failed for file '" + myPath.toLocale() +
                 "'.", PLUS_FILE_LINE);
     }
 }

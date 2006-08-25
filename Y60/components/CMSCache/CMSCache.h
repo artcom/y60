@@ -57,7 +57,7 @@ class CMSCache {
 
         unsigned getMaxRequestCount() const { return _myMaxRequestCount; }
         void setMaxRequestCount(unsigned theMaxCount) { _myMaxRequestCount = theMaxCount; }
-        
+
         std::string getUserAgent() const { return _myUserAgent; }
         void setUserAgent(const std::string & theUserAgent) { _myUserAgent = theUserAgent; }
 
@@ -65,6 +65,8 @@ class CMSCache {
         void dumpPresentationToFile(const std::string & theFilename);
 
         dom::NodePtr getStatusReport();
+
+        bool testConsistency();
 
     private:
         void login();
@@ -79,21 +81,21 @@ class CMSCache {
         void updateDirectoryHierarchy();
         void removeStalledAssets();
         void scanStalledEntries(const std::string & thePath);
-    
+
         std::string _myLocalPath;
         std::string _myUsername;
         std::string _myPassword;
-        
+
         std::string _mySessionCookie;
         inet::RequestManager _myRequestManager;
-        
+
         dom::NodePtr _myPresentationDocument;
         dom::DocumentPtr _myStatusDocument;
         dom::NodePtr     _myAssetReportNode;
         dom::NodePtr     _myStalledFilesNode;
         std::map<std::string, dom::NodePtr> _myAssets;
         std::vector<dom::NodePtr> _myOutdatedAssets;
-        
+
         typedef std::map<dom::Node *, AssetRequestPtr> AssetRequestMap;
         AssetRequestMap _myAssetRequests;
 

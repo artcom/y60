@@ -65,6 +65,45 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     }
 
     obj.synchronize = function() {
+        ensureCMSCache();
+
+        if ( _mySyncFlag ) {
+            _myCMSCache.synchronize();
+        }
+    }
+
+    obj.testConsistency = function() {
+        ensureCMSCache();
+        _myCMSCache.testConsistency();
+    }
+
+    obj.isSynchronized = function() {
+        if ( !_mySyncFlag ) {
+            return true;
+        }
+
+        return _myCMSCache.isSynchronized();
+    }
+
+    obj.__defineGetter__('statusReport',
+            function() { return ( _myCMSCache ? _myCMSCache.statusReport : null ) } );
+
+    obj.__defineGetter__('localFallback',
+            function() { return (_mySyncFlag ? _myLocalFallback : null) } );
+
+    obj.__defineGetter__('assetDir',
+            function() { return _myConfig.childNode("cmscache",0).localdir; } );
+
+    obj.__defineGetter__('versionTag',
+            function() { return _myVersionTag; } );
+
+    obj.__defineSetter__('versionTag',
+            function(theVersionTag) { _myVersionTag = theVersionTag; } );
+
+    function ensureCMSCache() {
+        if (_myCMSCache) {
+            return;
+        }
         var myCMSConfig  = _myConfig.childNode("cmscache", 0);
         var myUsername   = _myConfig.username;
         if ("domain" in myCMSConfig && myCMSConfig.domain.length) {
@@ -92,34 +131,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         {
             _myCMSCache.useragent = myCMSConfig.useragent;
         }
-
-        if ( _mySyncFlag ) {
-            _myCMSCache.synchronize();
-        }
     }
-
-    obj.isSynchronized = function() {
-        if ( !_mySyncFlag ) {
-            return true; 
-        }
-
-        return _myCMSCache.isSynchronized();
-    }
-
-    obj.__defineGetter__('statusReport',
-            function() { return ( _myCMSCache ? _myCMSCache.statusReport : null ) } );
-            
-    obj.__defineGetter__('localFallback',
-            function() { return (_mySyncFlag ? _myLocalFallback : null) } );            
-            
-    obj.__defineGetter__('assetDir',
-            function() { return _myConfig.childNode("cmscache",0).localdir; } );
-            
-    obj.__defineGetter__('versionTag',
-            function() { return _myVersionTag; } );
-            
-    obj.__defineSetter__('versionTag',
-            function(theVersionTag) { _myVersionTag = theVersionTag; } );
 
     function fetchPresentation() {
         _myPresentation = Node.createDocument();
@@ -127,7 +139,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
         var myLoginRequest = new Request( myZopeConfig.baseurl + "/" + myZopeConfig.loginpage,
                                     _myUserAgent );
-        myLoginRequest.post("__ac_name=" + _myConfig.username + 
+        myLoginRequest.post("__ac_name=" + _myConfig.username +
                             "&__ac_password=" + _myConfig.password + "&proxy=" + _myConfig.password);
         _myRequestManager.performRequest( myLoginRequest );
 
@@ -142,7 +154,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                 Logger.error("No ZOPE cookie in server response.");
                 myErrorOccurred = true;
             }
-            
+
             var myRequestURI = myZopeConfig.baseurl + "/" + myZopeConfig.presentationpage;
             if (_myVersionTag && _myVersionTag.length) {
                 myRequestURI += "?versionTag=" + _myVersionTag;
@@ -194,14 +206,14 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         _myConfig = _myConfigDoc.childNode("cmsconfig");
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
         var myCMSConfig = _myConfig.childNode("cmscache", 0);
-        
+
         _myZopeVerbosityFlag = (myZopeConfig && "verbose" in myZopeConfig && myZopeConfig.verbose != 0);
         _myCMSVerbosityFlag = ("verbose" in myCMSConfig && myCMSConfig.verbose != 0);
         if ( "localfallback" in myZopeConfig &&
              myZopeConfig.localfallback.length )
         {
             _myLocalFallback = myZopeConfig.localfallback;
-            
+
         }
 
         if ("useragent" in _myConfig &&

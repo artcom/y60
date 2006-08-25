@@ -40,6 +40,11 @@ isSynchronized(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     return Method<JSCMSCache::NATIVE>::call(&JSCMSCache::NATIVE::isSynchronized,cx,obj,argc,argv,rval);
 }
 
+static JSBool
+testConsistency(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    return Method<JSCMSCache::NATIVE>::call(&JSCMSCache::NATIVE::testConsistency,cx,obj,argc,argv,rval);
+}
+
 #define DEFINE_ORIENTATION_PROP(NAME) { #NAME, PROP_ ## NAME , CMSCache::NAME }
 
 JSConstIntPropertySpec *
@@ -55,8 +60,9 @@ JSCMSCache::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
-        {"synchronize",     synchronize,                0},
+        {"synchronize",        synchronize,               0},
         {"isSynchronized",     isSynchronized,            0},
+        {"testConsistency",    testConsistency,           0},
         {0}
     };
     return myFunctions;
@@ -89,7 +95,7 @@ JSCMSCache::Properties() {
 // getproperty handling
 JSBool
 JSCMSCache::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj); 
+    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     switch (theID) {
         case PROP_statusReport:
             *vp = as_jsval( cx, static_cast_Ptr<dom::Node>( myObj.getNative().getStatusReport()));
@@ -115,7 +121,7 @@ JSCMSCache::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
 // setproperty handling
 JSBool
 JSCMSCache::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj); 
+    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
     switch (theID) {
         case PROP_verbose:
             try {
@@ -158,14 +164,14 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     }
 
     OWNERPTR myNewNative;
-    
+
     std::string myLocalPath;
     dom::NodePtr myPresentationDoc;
     y60::BackendType myBackendType;
     std::string myUsername;
     std::string myPassword;
     std::string mySessionCookie;
-        
+
     switch (argc) {
         case 6:
             convertFrom(cx, argv[5], mySessionCookie);
@@ -183,12 +189,12 @@ JSCMSCache::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
                     ", got %d", ClassName(), argc);
             return JS_FALSE;
     }
-    
+
     switch (argc) {
         case 3:
             myNewNative = OWNERPTR(new CMSCache(myLocalPath, myPresentationDoc,
                                                 myBackendType));
-            break;    
+            break;
         case 5:
             myNewNative = OWNERPTR(new CMSCache(myLocalPath, myPresentationDoc,
                                                 myBackendType, myUsername, myPassword));
