@@ -9,7 +9,6 @@
 //============================================================================
 
 #include "modelling_functions.h"
-#include "SeidelTesselator.h"
 #include "SimpleTesselator.h"
 
 #include <y60/TransformBuilder.h>
