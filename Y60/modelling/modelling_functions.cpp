@@ -9,6 +9,8 @@
 //============================================================================
 
 #include "modelling_functions.h"
+#include "SeidelTesselator.h"
+#include "SimpleTesselator.h"
 
 #include <y60/TransformBuilder.h>
 #include <y60/SceneBuilder.h>
@@ -960,7 +962,8 @@ createVoxelProxyGeometry(ScenePtr theScene, const asl::Box3f & theVoxelBox,
 dom::NodePtr createSurface2DFromContour(y60::ScenePtr theScene, const std::string & theMaterialId,
                                         const VectorOfVector2f & theContours,
                                         const std::string & theName) {
-    SeidelTesselator myTesselator;
+//    SeidelTesselator myTesselator;
+    SimpleTesselator myTesselator;
     return myTesselator.createSurface2DFromContour(theScene, theMaterialId, theContours, theName);
 }
 

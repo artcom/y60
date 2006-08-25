@@ -52,13 +52,16 @@ namespace y60 {
         vert.resize(mySegmentCount);
         mon.resize(mySegmentCount);
         seg.resize(mySegmentCount);
+        permute.resize(mySegmentCount);
 
         qs.resize(8*mySegmentCount);
 
         tr.resize(4*mySegmentCount);
         visited.resize(4*mySegmentCount);
         mchain.resize(4*mySegmentCount);
-
+        
+        generate_random_ordering(myTotalVerticesCount);//mySegmentCount);
+        cout <<"generate_random_ordering o.k. " << endl;
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(POSITION_ROLE, myTotalVerticesCount);
 
         myShapeBuilder.ShapeBuilder::createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, myTotalVerticesCount);
@@ -1826,7 +1829,26 @@ namespace y60 {
     /* segments in S */
     int SeidelTesselator::choose_segment()
     {
-        return choose_idx++;
+        //return choose_idx++;
+        return permute[choose_idx++];
+    }
+
+    void SeidelTesselator::generate_random_ordering(int n)
+    {
+        vector<int> st;
+        st.resize(n+1);
+        permute.clear();
+
+        for (int i = 0; i <= n; i++) {
+            st[i] = i;
+        }
+        while (st.size()) {
+            int myRandomIndex = (float(rand())/RAND_MAX) * (st.size()-1);
+            vector<int>::iterator myIterator = st.begin();
+            myIterator +=myRandomIndex;
+            permute.push_back(st[myRandomIndex]);
+            st.erase(myIterator);
+        }
     }
 
 }

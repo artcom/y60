@@ -176,7 +176,7 @@ namespace y60 {
             int add_segment(int segnum);
             int find_new_roots(int segnum);
 
-
+            void generate_random_ordering(int n);
 
 
 
@@ -202,6 +202,7 @@ namespace y60 {
             std::vector<segment_t>  seg;		/* Segment table */
             //segment_t seg[SEGSIZE];		/* Segment table */
 
+            std::vector<int> permute;
 
     };
     typedef asl::Ptr<SeidelTesselator, dom::ThreadingModel> SeidelTesselatorPtr;
