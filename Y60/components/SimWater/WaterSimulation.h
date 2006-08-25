@@ -26,7 +26,10 @@
 #include <list>
 #include <vector>
 
-#define M_SQRT2 sqrt(2.0f)
+#ifndef M_SQRT2
+#   define M_SQRT2 sqrt(2.0f)
+#endif
+
 namespace y60 {
     
 class WaterSimulation {

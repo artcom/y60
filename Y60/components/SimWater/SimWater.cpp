@@ -74,6 +74,10 @@ SimWater::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myCubemapCounter );
         return;
     }
+    if (thePropertyName == "integrationsPerFrame") {
+        theReturnValue.set( _myIntegrationsPerFrame );
+        return;
+    }
     AC_WARNING << "SimWater::onGetProperty(): Unknown property '" << thePropertyName << "'.";
 };
 
@@ -90,6 +94,11 @@ SimWater::onSetProperty(const std::string & thePropertyName,
     if (thePropertyName == "activeCubemap") {
         short myIndex = short(thePropertyValue.get<int>());
         _myWaterRepresentation->activateTexture( WaterRepresentation::cubemaps, myIndex );
+        return;
+    }
+    if (thePropertyName == "integrationsPerFrame") {
+        short myIterationCount = short(thePropertyValue.get<int>());
+        _myIntegrationsPerFrame = myIterationCount;
         return;
     }
     AC_WARNING << "SimWater::onSetProperty(): Unknown property '" << thePropertyName << "'.";

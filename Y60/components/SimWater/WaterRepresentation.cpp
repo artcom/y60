@@ -418,12 +418,6 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
         }
         cerr << "OK" << endl;
 
-		//Store that section.
-        std::cout <<"after loadCubeMapTexture GetWidth: " << myBmp.GetWidth() <<std::endl;
-        std::cout <<"after loadCubeMapTexture GetHeight: " << myBmp.GetHeight() <<std::endl;
-        std::cout <<"after loadCubeMapTexture _cubeMapSideID[i]: " << _cubeMapSideID[i] <<std::endl;
-        std::cout <<"after loadCubeMapTexture GetPixels: " << (void*)myBmp.GetPixels() <<std::endl;
-        
 		glTexImage2D(_cubeMapSideID[i], 0, 
                      GL_RGBA8, myBmp.GetWidth(), 
                      myBmp.GetHeight(),
@@ -436,9 +430,7 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
             }
         }
         imageWidth = myBmp.GetWidth();
-        std::cout <<"after loadCubeMapTexture GetWidth: " << myBmp.GetWidth() <<std::endl;
         imageHeight = myBmp.GetHeight();
-        std::cout <<"after loadCubeMapTexture GetHeight: " << myBmp.GetHeight() <<std::endl;
 	}
 //	glDisable(GL_TEXTURE_CUBE_MAP_ARB);
     return true;
