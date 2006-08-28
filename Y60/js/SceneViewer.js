@@ -260,8 +260,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Fullscreen: " + (_myFullscreen ? "on" : "off"));
                     break;
                 case 'X':
-                    var mySceneNode = window.scene.dom;
-                    print(mySceneNode.firstChild);
+                    print(window.scene.world);
                     break;
                 case "sys req":
                 case "print screen":
