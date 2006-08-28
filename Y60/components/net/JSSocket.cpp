@@ -52,7 +52,7 @@ close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
 static JSBool
 read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    string docStr = "Read data from connected socket. (max. bytes " + asl::as_string(READ_BUFFER_SIZE) + ")";
+    string docStr = "Read utf-8 text from connected socket. (max. bytes " + asl::as_string(READ_BUFFER_SIZE) + ")";
     DOC_BEGIN(docStr);
     DOC_RVAL("number of bytes read.", DOC_TYPE_INTEGER);
     DOC_END;
@@ -66,10 +66,36 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         unsigned myBytesRead = JSSocket::getJSWrapper(cx,obj).openNative().receive(myBuffer, READ_BUFFER_SIZE);
         JSSocket::getJSWrapper(cx,obj).closeNative();
 
-        DB(cerr << "Socket::read(): " << string(myBuffer, myBytesRead) << endl;)
+        myBuffer[myBytesRead] = 0;
 
-        JSString * myString = JS_NewStringCopyN(cx, myBuffer, myBytesRead);
-        *rval = STRING_TO_JSVAL(myString);
+        DB(cerr << "Socket::read(): " << string(myBuffer) << endl;)
+
+        *rval = as_jsval(cx, myBuffer);
+        return JS_TRUE;
+    } catch(inet::SocketException &) {
+        // TODO, must be reworked once we can throw exception into javascript
+        *rval = -1;
+        return JS_TRUE;
+    }
+}
+
+static JSBool
+readBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    string docStr = "Read data from connected socket. (max. bytes " + asl::as_string(READ_BUFFER_SIZE) + ")";
+    DOC_BEGIN(docStr);
+    DOC_RVAL("number of bytes read.", DOC_TYPE_INTEGER);
+    DOC_END;
+    try {
+        if (argc != 0) {
+            JS_ReportError(cx, "JSSocket::read(): Wrong number of arguments, expected none, got %d.", argc);
+            return JS_FALSE;
+        }
+
+        asl::Ptr<asl::Block> myBuffer(new Block(READ_BUFFER_SIZE));
+        unsigned myBytesRead = JSSocket::getJSWrapper(cx,obj).openNative().receive(myBuffer->begin(), READ_BUFFER_SIZE);
+        JSSocket::getJSWrapper(cx,obj).closeNative();
+
+        *rval = as_jsval(cx, myBuffer);
         return JS_TRUE;
     } catch(inet::SocketException &) {
         // TODO, must be reworked once we can throw exception into javascript
@@ -229,6 +255,7 @@ JSSocket::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"read",                 read,                    0},
+        {"readBlock",            readBlock,               0},
         {"write",                write,                   1},
         {"peek",                 peek,                    1},
         {"close",                close,                   0},
