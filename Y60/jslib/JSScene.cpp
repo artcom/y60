@@ -487,7 +487,24 @@ setup(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 optimize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Optimizes the scene to one body and one shape.");
+    DOC_PARAM_OPT("theRootNode", "A root node in the world, where the optimizer should start.", DOC_TYPE_NODE, 0);
     DOC_END;
+     try {
+        ensureParamCount(argc, 0, 1);
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        dom::NodePtr myRootNode;
+        if (argc == 1) {
+            if (!convertFrom(cx, argv[0], myRootNode)) {
+                JS_ReportError(cx, "JSScene::optimize(): argument #1 must be a node (rootnode)");
+                return JS_FALSE;
+            }
+        }
+
+        myNative->optimize(myRootNode);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
     return Method<NATIVE>::call(&NATIVE::optimize,cx,obj,argc,argv,rval);
 }
 
