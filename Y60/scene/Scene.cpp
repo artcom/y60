@@ -286,9 +286,9 @@ namespace y60 {
     }
 
     void
-    Scene::optimize() {
+    Scene::optimize(dom::NodePtr theRootNode) {
         SceneOptimizer myOptimizer(*this);
-        myOptimizer.run();
+        myOptimizer.run(theRootNode);
         update(SHAPES|WORLD);
     }
 

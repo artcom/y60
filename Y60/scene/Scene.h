@@ -182,7 +182,7 @@ namespace y60 {
             void update(unsigned short myUpdateFlags = MATERIALS+SHAPES);
 
             // Reduces the scene to one body with one shape
-            void optimize();
+            void optimize(dom::NodePtr theRootNode = dom::NodePtr(0));
 
             /**
              * Saves the scene to the file given in theFilename

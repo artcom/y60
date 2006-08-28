@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "SceneOptimizer.h"
+#include "TransformHierarchyFacade.h"
 #include <asl/Logger.h>
 #include <y60/NodeNames.h>
 
@@ -78,28 +79,33 @@ namespace y60 {
     }
 
     void
-    SceneOptimizer::run() {
-        _myShapes.clear();
-
+    SceneOptimizer::run(dom::NodePtr theRootNode) {
         AC_INFO << "Running Scene optimizer";
-        NodePtr myWorldNode = _myScene.getWorldRoot();
+        _myShapes.clear();
+        if (!theRootNode) {
+            theRootNode = _myScene.getWorldRoot();
+        } else if (theRootNode->nodeName() != "transform") {
+            throw asl::Exception("Only transform nodes are allowed as root node for scene optimizer", PLUS_FILE_LINE);
+        }
 
         // First step: Remove invisible nodes
         AC_INFO << "  Removing invisible nodes...";
-        removeInvisibleNodes(myWorldNode);
+        removeInvisibleNodes(theRootNode);
 
         // Second step: Merge all bodies into one superbody
         AC_INFO << "  Merging bodies...";
-        mergeBodies(myWorldNode);
+        Matrix4f myInitialMatrix = theRootNode->getFacade<TransformHierarchyFacade>()->get<InverseGlobalMatrixTag>();
+        mergeBodies(theRootNode, myInitialMatrix);
 
         // Third step: Remove empty transforms and
         // merge transforms with single childs with their child
         AC_INFO << "  Cleanup Scene...";
-        cleanupScene(myWorldNode);
+        cleanupScene(theRootNode);
 
         for (SuperShapeMap::iterator it = _myShapes.begin(); it != _myShapes.end(); ++it) {
-            dom::NodePtr mySuperBody = myWorldNode->appendChild(dom::Element(BODY_NODE_NAME));
-            mySuperBody->appendAttribute(NAME_ATTRIB, "Superbody");
+            dom::NodePtr mySuperBody;
+            mySuperBody = theRootNode->appendChild(dom::Element(BODY_NODE_NAME));
+            mySuperBody->appendAttribute(NAME_ATTRIB, "Optimized Body");
             mySuperBody->appendAttribute(BODY_SHAPE_ATTRIB, it->second->getShapeId());
         }
 
@@ -108,21 +114,20 @@ namespace y60 {
         removeUnusedShapes();
     }
 
-    bool
+    void
     SceneOptimizer::cleanupScene(dom::NodePtr theNode) {
-        // Search depth first
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
-            if (cleanupScene(theNode->childNode(i))) {
+            NodePtr myChild = theNode->childNode(i);
+
+            // Search depth first
+            cleanupScene(myChild);
+
+            if (myChild->nodeName() == "transform" && myChild->childNodesLength() == 0) {
+                myChild->parentNode()->removeChild(myChild);
                 --i;
+
             }
         }
-
-        if (theNode->nodeName() == "transform" && theNode->childNodesLength() == 0) {
-            theNode->parentNode()->removeChild(theNode);
-            return true;
-        }
-
-        return false;
     }
 
     // Specialization for positions and normals
@@ -252,11 +257,11 @@ namespace y60 {
     }
 
     bool
-    SceneOptimizer::mergeBodies(dom::NodePtr theNode) {
+    SceneOptimizer::mergeBodies(dom::NodePtr theNode, const Matrix4f & theInitialMatrix) {
         // Search depth first, to avoid removing parents with unmerged children
         for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
             NodePtr myChild = theNode->childNode(i);
-            if (mergeBodies(myChild)) {
+            if (mergeBodies(myChild, theInitialMatrix)) {
                 myChild->parentNode()->removeChild(myChild);
                 --i;
             }
@@ -277,7 +282,8 @@ namespace y60 {
                     myRoles[myName] = myRole;
                 }
             }
-            Matrix4f myMatrix = myBody->get<GlobalMatrixTag>();
+            Matrix4f myMatrix = theInitialMatrix;
+            myMatrix.postMultiply(myBody->get<GlobalMatrixTag>());
             bool myFlipFlag = ((myMatrix[0][0] * myMatrix[1][1] * myMatrix[2][2]) < 0);
             std::string myRenderStyle = as_string(myShape.get<RenderStyleTag>());
             if (myRenderStyle == "[backfacing]") {

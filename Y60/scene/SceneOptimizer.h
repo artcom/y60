@@ -22,7 +22,7 @@ namespace y60 {
         public:
             SceneOptimizer(Scene & theScene);
 
-            void run();
+            void run(dom::NodePtr theRootNode = dom::NodePtr(0));
 
         private:
             typedef std::map<std::string, unsigned> VertexDataMap;
@@ -55,11 +55,11 @@ namespace y60 {
             typedef asl::Ptr<SuperShape> SuperShapePtr;
 
             void mergeChildWithParent(dom::NodePtr theNode);
-            bool cleanupScene(dom::NodePtr theNode);
+            void cleanupScene(dom::NodePtr theNode);
             void mergeVertexData(const Shape & theShape, SuperShapePtr theSuperShape, const asl::Matrix4f & theMatrix,
                 const RoleMap & theRoles, VertexDataMap & theVertexDataOffsets);
             void mergePrimitives(const Shape & theShape, SuperShapePtr theSuperShape, bool theFlipFlag, VertexDataMap & theVertexDataOffsets);
-            bool mergeBodies(dom::NodePtr theNode);
+            bool mergeBodies(dom::NodePtr theNode, const asl::Matrix4f & theMatrix);
             void removeInvisibleNodes(dom::NodePtr theNode);
             void collectShapeIds(dom::NodePtr theNode, std::set<std::string> & theIds);
             void removeUnusedShapes();
