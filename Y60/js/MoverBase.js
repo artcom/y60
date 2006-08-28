@@ -7,13 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: MoverBase.js,v $
-//   $Author: christian $
-//   $Revision: 1.21 $
-//   $Date: 2005/04/27 17:30:36 $
-//
-//=============================================================================
+
+if ((operatingSystem() == "Linux" || operatingSystem() == "MacOsX") && expandEnvironment("${Y60_POWERMATE_SUPPORT}") == 1) {
+    plug("PowermateInputExtension");
+}
+
 
 var LEFT_BUTTON   = 1;
 var MIDDLE_BUTTON = 3;
@@ -21,6 +19,7 @@ var RIGHT_BUTTON  = 2;
 
 var BUTTON_UP     = 0;
 var BUTTON_DOWN   = 1;
+
 
 function MoverBase(theViewport) {
     this.Constructor(this, theViewport);
@@ -174,7 +173,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
 
     obj.onFrame = function(theTime) { // 'pure virtual'
     }
-
+    
     var _myLastButtonTime = 0;
     obj.onMouseButton = function(theButton, theState, theX, theY) {
         switch (theButton) {
@@ -202,6 +201,9 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
     obj.onMouseWheel = function(theDeltaX, theDeltaY) {
     }
 
+    obj.onAxis = function( theDevice, theAxis, theValue) {
+    }
+    
     obj.getNormalizedScreen = function(theMousePosX, theMousePosY) {
         return new Vector3f((theMousePosX * 2 -_myViewport.width)/_myViewport.width,
             -(theMousePosY * 2 -_myViewport.height)/_myViewport.height, 0);

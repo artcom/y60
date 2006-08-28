@@ -79,48 +79,27 @@ SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, the
     }
 
     function createPolygonShape() {
-        // shape building
-        //var myShapeBuilder = new ShapeBuilder();
-        //var myShapeElement = null;
-        //var myShapeElement = myShapeBuilder.appendElement("triangles", _myMaterial.id);
-
         var myPointString = theSvgNode.points;
         var myPoints = myPointString.split(" ");
         
         var myVector2fList = [];
         var myYList = [];
         
-        for(var myPointIndex = 13; myPointIndex < (myPoints.length-10); myPointIndex++) {
+        for(var myPointIndex = 0; myPointIndex < (myPoints.length); myPointIndex++) {
             
             var myPoint = trim(myPoints[myPointIndex]);
             if (myPoint.length >0 ) {
                 var myCoordinates = myPoint.split(",");
-                var myVertex = new Vector2f(myCoordinates[0]*100.0, myCoordinates[1]*100.0);
+                var myVertex = new Vector2f(myCoordinates[0], myCoordinates[1]);
                 myYList.push(myCoordinates[1]);
-                //push(myShapeBuilder, myShapeElement, myVertex);
                 myVector2fList.push(myVertex);
-                print( myVertex );
 
             }
         }
-
-        /* for( var j=0; j<myYList.length; ++j) { */
-            
-/*         } */
-/*         for(var myPointIndex = 14; myPointIndex < (myPoints.length-9); myPointIndex++) { */
-        //}
-
-        
-        Logger.warning(theSceneViewer.getScene() + " " + theMaterial.id + " " + myVector2fList + " " + theSvgNode.id);
-        _myShape = Modelling.createSurface2DFromCountour(theSceneViewer.getScene(), theMaterial.id, myVector2fList, "Surface2d");
-
-        Logger.warning(_myShape);
+        _myShape = Modelling.createSurface2DFromContour(theSceneViewer.getScene(), theMaterial.id, myVector2fList, "Surface2d");
         _myBody = window.scene.createBody(_myShape);
         _myBody.name = "Body_" + theSvgNode.id;
         theSceneViewer.getScene().update(Scene.SHAPES | Scene.MATERIALS);
-        
-        //window.scene.save("test.x60", false);
-        
     }
     
     function setup() {
@@ -130,11 +109,11 @@ SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, the
             addMaterialRequirement(_myMaterial, "vertexparams", "[10[color]]");
         } else {
             _myMaterial = theMaterial;
-            print(_myMaterial);
+            //print(_myMaterial);
         }
         _myColor = new Vector4f(1,1,1,1); // boring ol' white
 
-        print(theShapeMode);
+        
         if( theShapeMode == "polygon") {
             createPolygonShape();
         } else if (theShapeMode == "linestrip"){

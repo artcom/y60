@@ -137,7 +137,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
         }
         _prevNormalizedMousePosition = curNormalizedMousePos;
     }
-
+    
     obj.selectBody = function(theBody) {
         _myTrackballCenter = getTrackballCenterFromBody(theBody);
         setupTrackball();

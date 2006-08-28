@@ -441,6 +441,19 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         _myHeartbeatThrober.use(true, theFrequency, theHeartbeatfile);
     }
 
+    self.onAxis = function( theDevice, theAxis, theValue) {
+        var myMover = self.getMover(self.getActiveViewport());
+        if (myMover) {
+            myMover.onAxis(theDevice, theAxis, theValue);
+        }
+    }
+
+    self.onButton = function( theDevice, theButton, theState) {
+        var myMover = self.getMover(self.getActiveViewport());
+        if (myMover) {
+            myMover.onButton(theDevice, theButton, theState);
+        }
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     // private members

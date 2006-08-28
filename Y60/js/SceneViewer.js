@@ -395,10 +395,14 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         }
     }
 
+    self.BaseViewer.onAxis = self.onAxis;
     self.onAxis = function(theDevice, theAxis, theValue) {
+        self.BaseViewer.onAxis( theDevice, theAxis, theValue);
     }
 
+    self.BaseViewer.onButton = self.onButton;
     self.onButton = function(theDevice, theButton, theState) {
+        self.BaseViewer.onButton( theDevice, theButton, theState);
     }
 
     self.onResize = function(theNewWidth, theNewHeight) {
