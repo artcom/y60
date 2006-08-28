@@ -282,8 +282,8 @@ namespace y60 {
                     myRoles[myName] = myRole;
                 }
             }
-            Matrix4f myMatrix = theInitialMatrix;
-            myMatrix.postMultiply(myBody->get<GlobalMatrixTag>());
+            Matrix4f myMatrix = myBody->get<GlobalMatrixTag>();
+            myMatrix.postMultiply(theInitialMatrix);
             bool myFlipFlag = ((myMatrix[0][0] * myMatrix[1][1] * myMatrix[2][2]) < 0);
             std::string myRenderStyle = as_string(myShape.get<RenderStyleTag>());
             if (myRenderStyle == "[backfacing]") {
