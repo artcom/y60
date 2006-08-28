@@ -52,8 +52,8 @@ namespace asl {
     class Matrix4 : protected Matrix4Base<Number> {
         typedef Matrix4Base<Number> Base;
     public:
-        // These friends of us need to access the storage directly or call 
-        // functions that take a base as an agrument. Therefore we allow 
+        // These friends of us need to access the storage directly or call
+        // functions that take a base as an agrument. Therefore we allow
         // them to call getBase()
         template<class T> friend
         std::istream & parseMatrix(std::istream & is, asl::Matrix4<T> & theMatrix,
@@ -91,7 +91,7 @@ namespace asl {
         typedef typename Matrix4Base<Number>::Row Row;
         typedef typename Matrix4Base<Number>::Column Column;
 
-        /** 
+        /**
          * - Identity: @f[ I = \left( \begin{array}{cccc}
          *                           1 & 0 & 0 & 0 \\
          *                           0 & 1 & 0 & 0 \\
@@ -141,7 +141,7 @@ namespace asl {
          *       the transpose of @f$M@f$ and @f$I@f$ is the identity matrix.
          *     - scaling * rotating = orthogonal
          *     - orthogonal * orthogonal = orthogonal
-         *    
+         *
          * - Linear: @f[ M_{linear} = \left( \begin{array}{cccc}
          *                    ? & ? & ? & 0 \\
          *                    ? & ? & ? & 0 \\
@@ -413,7 +413,7 @@ namespace asl {
             // tx ty tz 1
         }
 
-        void makeLookAt(const Vector3<Number> &theEyePos, 
+        void makeLookAt(const Vector3<Number> &theEyePos,
                         const Vector3<Number> &theCenterPos,
                         const Vector3<Number> &theUpVector) {
             Vector3<Number> f = normalized(theCenterPos - theEyePos);
@@ -425,7 +425,7 @@ namespace asl {
                    u[0], u[1], u[2], 0,
                    -f[0], -f[1], -f[2], 0,
                    -theEyePos[0], -theEyePos[1], -theEyePos[2], 1);
-            
+
         }
 
         void makePerspective(Number fovy, Number aspect, Number zNear, Number zFar) {
@@ -440,9 +440,9 @@ namespace asl {
                     0, f, 0, 0,
                     0, 0, (zFar + zNear) / (zNear - zFar), 2*zFar*zNear / (zNear - zFar),
                     0, 0, -1, 0);
-             
+
         }
-        
+
         void rotateX(Number cosAngle, Number sinAngle){
             if (_myType == IDENTITY) {
                base::makeXRotating(cosAngle, sinAngle);
@@ -1481,6 +1481,12 @@ unknown:
         Vector4<Number> result;
         multiply(v, m, result);
         return result;
+    }
+    template <class Number>
+    Matrix4<Number> product(const Matrix4<Number> & m1, const Matrix4<Number> & m2) {
+        Matrix4<Number> m(m1);
+        m.postMultiply(m2);
+        return m;
     }
     template <class Number>
     Vector4<Number> fullproduct(const Vector4<Number> & v, const Matrix4<Number> & m) {
