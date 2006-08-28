@@ -141,32 +141,27 @@ ClassicTrackballMover.prototype.Constructor = function(obj, theViewport, theCent
 
     
     obj.onAxis = function(theDevice, theAxis, theValue) {
-        if( Y60_POWERMATE_SUPPORT ) {
-            if( _myPowerMateButtonState == BUTTON_UP) {
-                _myTrackballOrientation.y += theValue / TWO_PI;
-                calculateTrackball();
-            } else if( _myPowerMateButtonState == BUTTON_DOWN ) {
-                if( theValue != 0 ) {
-                    obj.zoom(theValue / TWO_PI);
-                }
+        if( _myPowerMateButtonState == BUTTON_UP) {
+            _myTrackballOrientation.y += theValue / TWO_PI;
+            calculateTrackball();
+        } else if( _myPowerMateButtonState == BUTTON_DOWN ) {
+            if( theValue != 0 ) {
+                obj.zoom(theValue / TWO_PI);
             }
         }
     }
 
     obj.onButton = function(theDevice, theButton, theState) {
-        if( Y60_POWERMATE_SUPPORT ) {
-            switch(theState) {
-                case BUTTON_DOWN:
-                    _myPowerMateButtonState = BUTTON_DOWN;
-                    break;
-                case BUTTON_UP:
-                    _myPowerMateButtonState = BUTTON_UP;
-                    break;
-                default:
-                    break;
-            }
+        switch(theState) {
+            case BUTTON_DOWN:
+                _myPowerMateButtonState = BUTTON_DOWN;
+                break;
+            case BUTTON_UP:
+                _myPowerMateButtonState = BUTTON_UP;
+                break;
+            default:
+                break;
         }
-        
     }
 
     //////////////////////////////////////////////////////////////////////
