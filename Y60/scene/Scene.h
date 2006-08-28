@@ -183,6 +183,7 @@ namespace y60 {
 
             // Reduces the scene to one body with one shape
             void optimize(dom::NodePtr theRootNode = dom::NodePtr(0));
+            void collectGarbage();
 
             /**
              * Saves the scene to the file given in theFilename
@@ -326,7 +327,6 @@ namespace y60 {
             void loadAnimations();
             void updateMaterials();
 
-            void collectGarbage();
             void collectReferences(dom::NodePtr theNode, std::set<std::string> & theReferences);
             void removeDangelingNodes(dom::NodePtr theNode, dom::NodePtr theDocument);
             bool isDangelingNode(dom::NodePtr theNode, dom::NodePtr theDocument);

@@ -522,6 +522,14 @@ createStubs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     } HANDLE_CPP_EXCEPTION;
 }
 
+static JSBool
+collectGarbage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Removes all dangeling and non referenced nodes from the scene.");
+    DOC_END;
+    ensureParamCount(argc, 0, 0);
+    return Method<NATIVE>::call(&NATIVE::collectGarbage,cx,obj,argc,argv,rval);
+}
+
 enum PropertyNumbers {
     PROP_dom = -100,
     PROP_statistics,
@@ -573,7 +581,8 @@ JSScene::Functions() {
         {"update",              update,              1},
         {"updateAllModified",   updateAllModified,   1},
         {"clear",               clear,               0},
-        {"optimize",            optimize,            0},
+        {"optimize",            optimize,            1},
+        {"collectGarbage",      collectGarbage,      0},
         {"bodyVolume",          bodyVolume,          1},
         {"save",                save,                2},
         {"setup",               setup,                0},
