@@ -103,8 +103,8 @@ float4 mainFragment(vert2frag   IN,
         uniform float3 AC_CAMERA_POSITION,
         uniform float3 AC_DIRECTIONAL_LIGHTS[],
         uniform float4 AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[],
-        uniform float3 AC_POSITIONAL_LIGHTS[],
-        uniform float4 AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[],
+        //uniform float3 AC_POSITIONAL_LIGHTS[],
+        //uniform float4 AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[],
         uniform float4 ambient,
         uniform float4 diffuse,
         uniform float4 specular,
@@ -129,7 +129,7 @@ float4 mainFragment(vert2frag   IN,
     float4 mySpecColor = float4(0,0,0,0);
 #ifdef LIGHTING
     float4 myDiffuseColor = float4(0,0,0,0);
-    
+
     float3 P = IN.worldPosition;
     float3 N = normalize(IN.worldNormal);
     float3 V = normalize(AC_CAMERA_POSITION - P);
@@ -137,10 +137,10 @@ float4 mainFragment(vert2frag   IN,
     for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
 
         float3 L = normalize(AC_DIRECTIONAL_LIGHTS[i]);
- 
+
         // diffuse term
         float diffuseTerm = max(dot(N,L),0);
-        myDiffuseColor += AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;  
+        myDiffuseColor += AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;
 
         // specular term
 #ifdef LIGHTING_TWOSIDED
@@ -158,13 +158,14 @@ float4 mainFragment(vert2frag   IN,
             mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
     }
+/*
     for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
 
         float3 L = normalize(AC_POSITIONAL_LIGHTS[i] - P);
 
         // diffuse term
         float diffuseTerm = max(dot(N,L),0);
-        myDiffuseColor += AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;  
+        myDiffuseColor += AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;
 
         // specular term
 #ifdef LIGHTING_TWOSIDED
@@ -182,7 +183,7 @@ float4 mainFragment(vert2frag   IN,
             mySpecColor += specularTerm * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
     }
-
+*/
     myDiffuseColor *= diffuse * myDecalTexel;
     mySpecColor *= specular;
 
@@ -190,7 +191,7 @@ float4 mainFragment(vert2frag   IN,
 #else
     float4 myBaseColor = myDecalTexel;
 #endif // LIGHTING
- 
+
     //myBaseColor = float4(abs(N), 1); // visualize normals
 #ifdef PAINT_XXX
     // visualize texcoord

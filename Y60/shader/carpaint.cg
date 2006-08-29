@@ -15,7 +15,7 @@
 #define LIGHTING
 
 //#define PHONG_SPECULAR // use Phong instead of Blinn specular term
-
+//#define POSITIONAL_LIGHTS
 
 struct app2vert {
     float4 Position         : POSITION;
@@ -74,9 +74,11 @@ float4 mainFragment(vert2frag   IN,
         uniform float3 AC_DIRECTIONAL_LIGHTS[],
         uniform float4 AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
         uniform float4 AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[],
+#ifdef POSITIONAL_LIGHTS
         uniform float3 AC_POSITIONAL_LIGHTS[],
         uniform float4 AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR[],
         uniform float4 AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[],
+#endif
         uniform float4 ambient,
         uniform float4 diffuse,
         uniform float4 specular,
@@ -114,7 +116,7 @@ float4 mainFragment(vert2frag   IN,
             mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
     }
-
+#ifdef POSITIONAL_LIGHTS
     for (int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
         float3 L = normalize(AC_POSITIONAL_LIGHTS[i] - P);
 
@@ -134,7 +136,7 @@ float4 mainFragment(vert2frag   IN,
             mySpecColor += specularTerm * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
     }
-
+#endif
 #endif
 
 	// Lighting
