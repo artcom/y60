@@ -26,6 +26,7 @@ using namespace std;
 using namespace asl;
 
 
+#define EPSILON 0.0000000001f
 
 namespace y60 {
     
@@ -142,8 +143,10 @@ namespace y60 {
     
         Cx = contour[V[w]][0];
         Cy = contour[V[w]][1];
-    
-        if ( asl::almostEqual(((Bx-Ax)*(Cy-Ay)), ((By-Ay)*(Cx-Ax))) ) return false;
+
+        if ( EPSILON > (((Bx-Ax)*(Cy-Ay)) - ((By-Ay)*(Cx-Ax))) ) return false;
+
+//        if ( asl::almostEqual(((Bx-Ax)*(Cy-Ay)), ((By-Ay)*(Cx-Ax))) ) return false;
         
         for (p=0;p<n;p++) {
             if( (p == u) || (p == v) || (p == w) ) continue;
