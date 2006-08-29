@@ -228,11 +228,11 @@ namespace y60 {
                 }
 
 
-                if (myParameterType == CG_ARRAY && cgGetArraySize(myParam, 0) == 0) {
+                if (myParameterType == CG_ARRAY) { //&& cgGetArraySize(myParam, 0) == 0) {
 
 
                     int myArraySize = _myUnsizedArrayAutoParamSizes[myParamID];
-                    if (myArraySize > 0) {
+                    //if (myArraySize > 0) {
 
                         AC_DEBUG << "setting array " << myParamName << " to size " << myArraySize;
 
@@ -240,6 +240,9 @@ namespace y60 {
                         CGparameter myArray
                             = cgCreateParameterArray(_myContext, myArrayType, myArraySize);
                         assertCg(PLUS_FILE_LINE, _myContext);
+                        if (myArraySize == 0) {
+                            cgSetArraySize(myArray, 0);
+                        }
 
                         for(int i = 0; i <  myArraySize; ++i) {
 
@@ -250,8 +253,12 @@ namespace y60 {
 
                         cgConnectParameter(myArray, myParam);
                         assertCg(PLUS_FILE_LINE, _myContext);
-                        AC_DEBUG << "done. created unsized array of size " << myArraySize;
-                    }
+                        if (cgGetArraySize(myParam, 0) == myArraySize) {
+                            AC_DEBUG << "done. created unsized array of size " << myArraySize;
+                        } else {
+                            AC_ERROR << "resize failed, should be " << myArraySize << ", is " << cgGetArraySize(myParam,0);
+                        }
+                    //}
                 }
 
                 if (myParameterType == CG_ARRAY) {
