@@ -34,6 +34,12 @@ namespace y60 {
 		        ~PowermateInputExtension();
             virtual void init();
             virtual y60::EventPtrList poll();
+
+            void setLED(float thePercent, int theFileDescriptor);
+            void setLED(unsigned char theLevel, int theFileDescriptor);
+            void pulseLED(int theStaticBrightness, int thePulseSpeed, int thePulseTable, int thePulseAsleep,
+                          int thePulseAwake, int theFileDescriptor);
+            void turnLEDOff(int theFileDescriptor);
         
         private:			
 		   
@@ -41,6 +47,7 @@ namespace y60 {
             int openPowermate(const char *dev);
             void processEvent(struct input_event *ev, int theID, EventPtrList & theEventList);
             std::vector<int> _myFileDescriptorList;
+            unsigned char _myLEDLevel;
     };
     typedef asl::Ptr<PowermateInputExtension, dom::ThreadingModel> PowermateInputExtensionPtr;
     

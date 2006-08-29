@@ -153,6 +153,61 @@ PowermateInputExtension::processEvent(struct input_event *ev, int theID, EventPt
     fflush(stdout);
 }
 
+
+void
+PowermateInputExtension::pulseLED(int theStaticBrightness, int thePulseSpeed, int thePulseTable, int thePulseAsleep,
+                                  int thePulseAwake, int theFileDescriptor)
+{
+    struct input_event ev;
+    memset(&ev, 0, sizeof(struct input_event));
+    
+    theStaticBrightness &= 0xFF;
+    
+    if(thePulseSpeed < 0)
+        thePulseSpeed = 0;
+    if(thePulseSpeed > 510)
+        thePulseSpeed = 510;
+    if(thePulseTable < 0)
+        thePulseTable = 0;
+    if(thePulseTable > 2)
+        thePulseTable = 2;
+    thePulseAsleep = !!thePulseAsleep;
+		thePulseAwake = !!thePulseAwake;
+    
+    ev.type = EV_MSC;
+    ev.code = MSC_PULSELED;
+    ev.value = theStaticBrightness | (thePulseSpeed << 8) | (thePulseTable << 17) | (thePulseAsleep << 19) | (thePulseAwake << 20);
+
+    if (write(theFileDescriptor, &ev, sizeof(struct input_event)) != sizeof(struct input_event))
+        AC_ERROR << "PowerMate :: Failed to Write to Griffin PowerMate " << strerror(errno);
+}
+
+void
+PowermateInputExtension::turnLEDOff(int theFileDescriptor) {
+    setLED(0.0f, theFileDescriptor);
+}
+
+void
+PowermateInputExtension::setLED(float thePercent, int theFileDescriptor)
+{
+    setLED( (unsigned char) (255.0f * (thePercent / 100.0f)), theFileDescriptor);
+}
+
+void
+PowermateInputExtension::setLED(unsigned char theLevel, int theFileDescriptor)
+{
+    int myPulseSpeed = 255;
+    int myPulseTable = 0;
+    int myPulseAsleep = 1;
+    int myPulseAwake = 0;
+
+    pulseLED((int)theLevel, myPulseSpeed, myPulseTable, myPulseAsleep, myPulseAwake, theFileDescriptor);
+    
+    AC_DEBUG << "PowerMate :: LED Brightness to " <<  theLevel;
+}
+
+
+
 extern "C"
 EXPORT asl::PlugInBase* PowermateInputExtension_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new PowermateInputExtension(myDLHandle);
