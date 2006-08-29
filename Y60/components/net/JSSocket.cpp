@@ -94,7 +94,7 @@ readBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         asl::Ptr<asl::Block> myBuffer(new Block(READ_BUFFER_SIZE));
         unsigned myBytesRead = JSSocket::getJSWrapper(cx,obj).openNative().receive(myBuffer->begin(), READ_BUFFER_SIZE);
         JSSocket::getJSWrapper(cx,obj).closeNative();
-
+        myBuffer->resize(myBytesRead);
         *rval = as_jsval(cx, myBuffer);
         return JS_TRUE;
     } catch(inet::SocketException &) {
