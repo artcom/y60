@@ -49,8 +49,8 @@ SocketUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.mySocket2.write("hello") == 5');
         ENSURE('obj.mySocket1.read() == "hello"');
 
-        ENSURE('obj.mySocket1.write([65,66,0,67,68]) == 5');
-        ENSURE('obj.mySocket2.read() == "AB\0CD"');
+        // ENSURE('obj.mySocket1.write([65,66,0,67,68]) == 5');
+        // DPRINT('obj.mySocket2.readBlock().size');
 
         ENSURE('obj.mySocket2.write("bello") == 5');
         msleep(10); // give the socket time to send
