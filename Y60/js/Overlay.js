@@ -95,6 +95,13 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
         myParent.appendChild(_myNode);
     }
 
+    /// Moves overlay to last position in the overlay z-order
+    Public.moveToBottom = function() {
+        var myParent = _myNode.parentNode;
+        myParent.removeChild(_myNode);
+        myParent.insertBefore(_myNode, myParent.firstChild);
+    }
+
     /// This checks if the square defined by theX/theY and theSquareSize overlaps with the overlay
     //  @param theXPos        integer   X-Center of the square to check for overlap
     //  @param theXPos        integer   Y-Center of the square to check for overlap
