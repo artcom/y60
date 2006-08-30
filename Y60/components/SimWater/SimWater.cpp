@@ -17,8 +17,8 @@
 
 #include <y60/GLAlloc.h>
 
-const int SIMULATION_WIDTH = 160;
-const int SIMULATION_HEIGHT = 320;
+const int SIMULATION_WIDTH = 480;
+const int SIMULATION_HEIGHT = 240;
 
 const std::string DATA_DIR("data");
 const char * const ourCubeSides[6] = {"right","left","top","bottom","front","back"};
@@ -33,8 +33,8 @@ SimWater::SimWater(DLHandle theDLHandle) :
     IRendererExtension("SimWater"),
     _mySimulationSize( SIMULATION_WIDTH + 2 , SIMULATION_HEIGHT + 2),
     _mySimulationOffset( 1, 1 ),
-    _myDisplaySize(SIMULATION_WIDTH, SIMULATION_HEIGHT / 2),
-    _myDisplayOffset(0, 0), // used for tiled rendering (grouse)
+    _myDisplaySize(SIMULATION_WIDTH / 4 , SIMULATION_HEIGHT / 2),
+    _myDisplayOffset(0 , 0), // TODO: doesn't change anything ... find out why?
     _myWaterDamping(0.9993),
     _myRunSimulationFlag( true ),
     _myIntegrationsPerFrame( 3 ),
@@ -78,6 +78,14 @@ SimWater::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myIntegrationsPerFrame );
         return;
     }
+    if (thePropertyName == "reflectionAlphaBias") {
+        theReturnValue.set( _myWaterRepresentation->getReflectionAlphaBias() );
+        return;
+    }
+    if (thePropertyName == "reflectionAlphaScale") {
+        theReturnValue.set( _myWaterRepresentation->getReflectionAlphaScale() );
+        return;
+    }
     AC_WARNING << "SimWater::onGetProperty(): Unknown property '" << thePropertyName << "'.";
 };
 
@@ -99,6 +107,16 @@ SimWater::onSetProperty(const std::string & thePropertyName,
     if (thePropertyName == "integrationsPerFrame") {
         short myIterationCount = short(thePropertyValue.get<int>());
         _myIntegrationsPerFrame = myIterationCount;
+        return;
+    }
+    if (thePropertyName == "reflectionAlphaBias") {
+        float myValue = thePropertyValue.get<float>();
+        _myWaterRepresentation->setReflectionAlphaBias( myValue );
+        return;
+    }
+    if (thePropertyName == "reflectionAlphaScale") {
+        float myValue = thePropertyValue.get<float>();
+        _myWaterRepresentation->setReflectionAlphaScale( myValue );
         return;
     }
     AC_WARNING << "SimWater::onSetProperty(): Unknown property '" << thePropertyName << "'.";
@@ -204,6 +222,7 @@ SimWater::setWaterProjection() {
     float   top = (-((float)_myDisplaySize[1]) / 2.f) + _myDisplayOffset[1];
     float   bottom = (((float)_myDisplaySize[1]) / 2.f) + _myDisplayOffset[1];
 
+    //cerr << "l: " << left << " r: " << right << " t: " << top << " b: " << bottom << endl;
 	glOrtho( left, right, top, bottom, -100, 10000);
 }
 
@@ -230,7 +249,7 @@ SimWater::onPostRender(jslib::AbstractRenderWindow * theRenderer) {
         glLoadIdentity();
 
         // camera transformation
-        glTranslatef( 0.0, 0.0, 0.0);
+        glTranslatef( 0, 0, 0.0);
         glScalef(1.0, 1.0, 1.0);
         glRotatef(0, 1.,0.,0.);
         glRotatef(0, 0.,1.,0.);
@@ -253,9 +272,11 @@ Vector2i
 SimWater::convertMouseCoordsToSimulation( const Vector2i & theMousePos ) {
     Vector2i myResult;
     myResult[0] = max( 0, min( _myDisplaySize[0] - 1, 
-                (theMousePos[0] * _myDisplaySize[0] / _myViewportSize[0])- _myDisplayOffset[0]));
+                (theMousePos[0] * _myDisplaySize[0] / _myViewportSize[0])+ _myDisplayOffset[0]));
     myResult[1] = max (0, min( _myDisplaySize[1] - 1,
-                ((_myViewportSize[1] - theMousePos[1])  * _myDisplaySize[1] / _myViewportSize[1])- _myDisplayOffset[1]));
+                ((_myViewportSize[1] - theMousePos[1])  * _myDisplaySize[1] / _myViewportSize[1])+ _myDisplayOffset[1]));
+
+cerr << "splash at " << myResult << endl;
 
     return myResult;
 }

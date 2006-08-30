@@ -61,38 +61,53 @@ WaterSimulation::WaterSimulation(asl::Vector2i theSimulationSize, float defaultD
     _numAllocatedRows = _mySize[1] + 2;
     _numAllocatedColumns = _mySize[0] + 2;
     
+    /*
     _waterArray[0] = (float*) malloc(_numAllocatedRows * _numAllocatedColumns * sizeof(float));
     _waterArray[1] = (float*) malloc(_numAllocatedRows * _numAllocatedColumns * sizeof(float));
     _dampingArray = (float*) malloc(_numAllocatedRows * _numAllocatedColumns * sizeof(float));
+    */
+    _waterArray[0] = new float[_numAllocatedRows * _numAllocatedColumns];
+    _waterArray[1] = new float[_numAllocatedRows * _numAllocatedColumns];
+    _dampingArray = new float[_numAllocatedRows * _numAllocatedColumns];
 
 }
 
 WaterSimulation::~WaterSimulation() {
+    cerr << "================== DTOR ========================" << endl;
     
     if (_computeThread) {
+        cerr << "deleting thread" << endl;
         _computeThread->join();
         delete _computeThread;
         _computeThread = 0;
     }
     
     if (_waterArray[0]) {
-        free(_waterArray[0]);
-        _waterArray[0] = 0;
+        cerr << "deleting water[0]" << endl;
+        //free(_waterArray[0]);
+        //_waterArray[0] = 0;
+        delete [] _waterArray[0];
     }
     
     if (_waterArray[1]) {
-        free(_waterArray[1]);
-        _waterArray[1] = 0;
+        cerr << "deleting water[1]" << endl;
+        //free(_waterArray[1]);
+        //_waterArray[1] = 0;
+        delete [] _waterArray[1];
     }
     
     if (_dampingArray) {
-        free(_dampingArray);
-        _dampingArray = 0;
+        cerr << "deleting damping array" << endl;
+        //free(_dampingArray);
+        //_dampingArray = 0;
+        delete [] _dampingArray;
     }
     if (_computeLock) {
+        cerr << "deleting compute lock" << endl;
         // XXX asl::ThreadSemFactory::instance()->freeLock(_computeLock);
         _computeLock = 0;
     }
+    cerr << "=== DTOR DONE ===" << endl;
 }
 
 void

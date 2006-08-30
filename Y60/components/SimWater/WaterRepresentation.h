@@ -106,31 +106,6 @@ public:
         return getTextureIndex(theClassID,whichObjectID,myIndex);
     }
 
-    /*
-    void    enableSurface(bool doEnable) {
-        _renderSurfaceEnabled = doEnable;
-    }
-    bool    surfaceEnabled() const {
-        return _renderSurfaceEnabled;
-    }
-    void    drawCrackField(bool doDraw) {
-        _renderCrackField = doDraw;
-    }
-    
-    void   setCrackWidth(float theCrackWidth) {
-        _crackWidth = theCrackWidth;
-    }
-    void   setInnerIceThickness(float theValue) {
-        _innerIceThickness = theValue;
-    }
-    void    setOuterIceThickness(float theValue) {
-        _outerIceThickness = theValue;
-    }
-    void    setSurfaceOpacity(float theValue) {
-        _surfaceOpacity= theValue;
-    }
-    */
-    
     float   getReflectionAlphaBias() const {
         return _reflectionAlphaBias;
     }
