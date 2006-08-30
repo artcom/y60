@@ -413,7 +413,8 @@ private:
 
 dom::NodePtr createSurface2DFromContour(y60::ScenePtr theScene, const std::string & theMaterialId,
                                         const VectorOfVector2f & theContours,
-                                        const std::string & theName = "Surface2DShape");
+                                        const std::string & theName = "Surface2DShape",
+                                        float theEqualPointsThreshold = 1e-5);
 
 // TODO:
 // - Find a way to make default functions work

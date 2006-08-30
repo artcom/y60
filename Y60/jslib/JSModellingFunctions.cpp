@@ -135,22 +135,32 @@ CreateSurface2DFromContour(JSContext * cx, JSObject * obj, uintN argc, jsval *ar
         DOC_PARAM("theMaterialId", "", DOC_TYPE_STRING);
         DOC_PARAM("theContour", "", DOC_TYPE_VECTOROFVECTOR2F);
         DOC_PARAM("theShapeName", "", DOC_TYPE_STRING);
+        DOC_PARAM_OPT("theEqualThreshold", "", DOC_TYPE_FLOAT, 1e-5);
         DOC_RVAL("The quad shape node", DOC_TYPE_NODE);
         DOC_END;
 
-        ensureParamCount(argc, 4);
-
-        y60::ScenePtr myScene(0);
-        convertFrom(cx, argv[0], myScene);
-        string myMaterialId;
-        convertFrom(cx, argv[1], myMaterialId);
-        VectorOfVector2f myContour;
-        convertFrom(cx, argv[2], myContour);
-        string myShapeName;
-        convertFrom(cx, argv[3], myShapeName);
-
-        dom::NodePtr myResult = createSurface2DFromContour(myScene, myMaterialId,
-                                                           myContour, myShapeName);
+        ensureParamCount(argc, 4, 5);
+        dom::NodePtr myResult;
+        if (argc == 4 || argc == 5) {
+            y60::ScenePtr myScene(0);
+            convertFrom(cx, argv[0], myScene);
+            string myMaterialId;
+            convertFrom(cx, argv[1], myMaterialId);
+            VectorOfVector2f myContour;
+            convertFrom(cx, argv[2], myContour);
+            string myShapeName;
+            convertFrom(cx, argv[3], myShapeName);
+            if (argc == 4) {
+                myResult = createSurface2DFromContour(myScene, myMaterialId,
+                                                      myContour, myShapeName);
+            } else {
+                float myThreshold;
+                convertFrom(cx, argv[4], myThreshold);
+                myResult = createSurface2DFromContour(myScene, myMaterialId,
+                                                      myContour, myShapeName, myThreshold);
+            }
+        }        
+        
         *rval = as_jsval(cx, myResult);
         return JS_TRUE;
 

@@ -29,7 +29,8 @@ namespace y60 {
             virtual ~SimpleTesselator();
             dom::NodePtr createSurface2DFromContour(y60::ScenePtr theScene, const std::string & theMaterialId,
                                                     const VectorOfVector2f & theContour,
-                                                    const std::string & theName = "Surface2DShape");
+                                                    const std::string & theName = "Surface2DShape",
+                                                    float theEqualPointsThreshold = 1e-5);
         
             // triangulate a contour/polygon, places results in STL vector
             // as series of triangles.

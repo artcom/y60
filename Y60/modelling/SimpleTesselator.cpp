@@ -38,7 +38,8 @@ namespace y60 {
     dom::NodePtr 
     SimpleTesselator::createSurface2DFromContour(y60::ScenePtr theScene, const string & theMaterialId,
                                                  const VectorOfVector2f & theContour,
-                                                 const string & theName) {
+                                                 const string & theName,
+                                                 float theEqualPointsThreshold) {
         ShapeBuilder myShapeBuilder(theName);
         ElementBuilder myElementBuilder(PRIMITIVE_TYPE_TRIANGLES, theMaterialId);
         
@@ -56,7 +57,17 @@ namespace y60 {
         
         for (int myPointIndex = 0; myPointIndex < theContour.size(); myPointIndex++, mySegmentCounter++) {
             Vector2f myTmp = theContour[myPointIndex];
-            a.push_back(Vector2f(myTmp[0], myTmp[1]));
+            bool myAlreadyInListFlag = false;            
+            for (int j = 0; j < a.size(); j++) {
+                if (almostEqual(a[j], myTmp, theEqualPointsThreshold)) {
+                    AC_TRACE << "points equal at index:  " << j << " liste : " << a[j] <<  " new point" <<  myTmp;
+                    myAlreadyInListFlag = true;
+                    break;
+                } 
+            } 
+            if (!myAlreadyInListFlag) {
+                a.push_back(myTmp);
+            }
         }      
         
         myElementBuilder.createIndex(POSITION_ROLE, POSITIONS, myTotalVerticesCount);
