@@ -32,7 +32,9 @@ using namespace std;
 
 namespace asl {
 
+#ifdef WIN32
     WinExceptionFilter WinExceptionFilter::_myExceptionFilter;
+#endif
 
     // TODO: make this a static function
     bool abortOnThrow() {
