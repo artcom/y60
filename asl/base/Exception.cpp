@@ -23,10 +23,14 @@
 #include "Exception.h"
 #include "string_functions.h"
 #include "os_functions.h"
+#include "WinExceptionFilter.h"
 
 using namespace std;
 
 namespace asl {
+
+    WinExceptionFilter WinExceptionFilter::_myExceptionFilter;
+
     // TODO: make this a static function
     bool abortOnThrow() {
         bool myDummy;
