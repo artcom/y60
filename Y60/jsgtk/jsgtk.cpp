@@ -68,6 +68,7 @@
 #include "JSProgressBar.h"
 #include "JSVRuler.h"
 #include "JSHRuler.h"
+#include "JSFixed.h"
 #include "JSTable.h"
 #include "JSComboBox.h"
 #include "JSComboBoxText.h"
@@ -272,6 +273,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
     if (!JSVRuler::initClass(cx, theGlobalObject)) {
         return false;
     }
+    if (!JSFixed::initClass(cx, theGlobalObject)) {
+        return false;
+    }
     if (!JSTable::initClass(cx, theGlobalObject)) {
         return false;
     }
@@ -467,6 +471,7 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::ProgressBar );
     TRY_DYNAMIC_CAST(Gtk::HRuler);
     TRY_DYNAMIC_CAST(Gtk::VRuler);
+    TRY_DYNAMIC_CAST(Gtk::Fixed);
     TRY_DYNAMIC_CAST(Gtk::Table);
     TRY_DYNAMIC_CAST(Gtk::ComboBox);
     TRY_DYNAMIC_CAST(Gtk::VScale);
@@ -638,6 +643,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
                 return true;
             } else if (castFrom<Gtk::VRuler>(cx, myArgument, theTarget)) {
                 return true;
+            } else if (castFrom<Gtk::Fixed>(cx, myArgument, theTarget)) {
+                return true;
             } else if (castFrom<Gtk::Table>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::ComboBox>(cx, myArgument, theTarget)) {
@@ -748,6 +755,7 @@ CONVERT_FROM_GLIB_OBJECT(Gtk::ColorSelectionDialog);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Ruler);
 CONVERT_FROM_GLIB_OBJECT(Gtk::HRuler);
 CONVERT_FROM_GLIB_OBJECT(Gtk::VRuler);
+CONVERT_FROM_GLIB_OBJECT(Gtk::Fixed);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Table);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ComboBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ComboBoxText);
