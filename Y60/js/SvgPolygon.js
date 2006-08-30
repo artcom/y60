@@ -11,11 +11,11 @@
 use("BuildUtils.js");
 
 
-function SvgPolygon(theSceneViewer ,theSvgNode,  theMaterial, theShapeMode) {
-    this.Constructor(this, theSceneViewer, theSvgNode, theMaterial, theShapeMode);
+function SvgPolygon(theSvgNode,  theMaterial, theShapeMode, theOffset) {
+    this.Constructor(this, theSvgNode, theMaterial, theShapeMode, theOffset);
 }
 
-SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, theMaterial, theShapeMode) {
+SvgPolygon.prototype.Constructor = function(self, theSvgNode, theMaterial, theShapeMode, theOffset) {
 
     self.getMaterial = function() {
         return _myMaterial;
@@ -72,34 +72,35 @@ SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, the
 
         _myBody = window.scene.createBody(_myShape);
         _myBody.name = "Body_" + theSvgNode.id;
-        theSceneViewer.getScene().update(Scene.SHAPES | Scene.MATERIALS);
+        window.scene.update(Scene.SHAPES | Scene.MATERIALS);
         
         //window.scene.save("test.x60", false);
         //exit(1);
     }
 
-    function createPolygonShape() {
+    function createPolygonShape(theOffset) {
+        if (theOffset == undefined) {
+            theOffset = new Vector2f(0,0);
+        }
         var myPointString = theSvgNode.points;
         var myPoints = myPointString.split(" ");
         
         var myVector2fList = [];
-        var myYList = [];
-        
+        var myMin = new Vector2f(1E+20, 1E+20);
+        var myMax = new Vector2f(-1E+20, -1E+20);
         for(var myPointIndex = 0; myPointIndex < (myPoints.length); myPointIndex++) {
             
             var myPoint = trim(myPoints[myPointIndex]);
             if (myPoint.length >0 ) {
                 var myCoordinates = myPoint.split(",");
-                var myVertex = new Vector2f(myCoordinates[0], myCoordinates[1]);
-                myYList.push(myCoordinates[1]);
+                var myVertex = new Vector2f(Number(myCoordinates[0]) + theOffset.x, Number(myCoordinates[1]) + theOffset.y);
                 myVector2fList.push(myVertex);
-
             }
-        }
-        _myShape = Modelling.createSurface2DFromContour(theSceneViewer.getScene(), theMaterial.id, myVector2fList, "Surface2d");
+        }        
+        _myShape = Modelling.createSurface2DFromContour(window.scene, theMaterial.id, myVector2fList, "Surface2d");
         _myBody = window.scene.createBody(_myShape);
         _myBody.name = "Body_" + theSvgNode.id;
-        theSceneViewer.getScene().update(Scene.SHAPES | Scene.MATERIALS);
+        window.scene.update(Scene.SHAPES | Scene.MATERIALS);
     }
     
     function setup() {
@@ -115,7 +116,7 @@ SvgPolygon.prototype.Constructor = function(self, theSceneViewer,theSvgNode, the
 
         
         if( theShapeMode == "polygon") {
-            createPolygonShape();
+            createPolygonShape(theOffset);
         } else if (theShapeMode == "linestrip"){
             createLinestripShape();
         }
