@@ -53,7 +53,7 @@ void PowermateInputExtension::init() {
     
     AC_PRINT << "found powermates " << _myFileDescriptorList.size();
     
-}
+ }
 
 
 EventPtrList
@@ -73,6 +73,7 @@ PowermateInputExtension::poll() {
                 processEvent(&ibuffer[myEventIndex], i, curEvents);
             }
         }
+        //setLED(100.0f, _myFileDescriptorList[i]);
     }
     
     return curEvents;
@@ -99,9 +100,10 @@ PowermateInputExtension::findPowermates()
 int
 PowermateInputExtension::openPowermate(const char *dev)
 {
-    int fd = open(dev, O_NONBLOCK|O_RDONLY);
+    int fd = open(dev, O_NONBLOCK|O_RDWR);
     char name[255];
-    
+
+    AC_PRINT << "filedes" << fd;
     if(fd < 0){
         return -1;
     }
