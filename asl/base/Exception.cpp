@@ -23,7 +23,10 @@
 #include "Exception.h"
 #include "string_functions.h"
 #include "os_functions.h"
+
+#ifdef WIN32
 #include "WinExceptionFilter.h"
+#endif
 
 using namespace std;
 
