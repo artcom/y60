@@ -389,7 +389,7 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
 	//glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	//N.B.!! LOOK HERE! Auto mipmap extension used.
-	//glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
     glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
                     GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
