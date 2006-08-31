@@ -50,6 +50,10 @@ as_string(JSContext *cx, jsval theVal) {
 #ifdef WIN32
     const LPWSTR myWChars = static_cast<LPWSTR>(JS_GetStringChars(myJSStr));
     AC_SIZE_TYPE myUTF8Size = WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, 0, 0, 0, 0);
+    if (myUTF8Size == 0) {
+        DWORD myLastError = GetLastError();
+        throw jslib::UnicodeException(errorDescription(myLastError), PLUS_FILE_LINE); 
+    }
     char * myUTF8Chars = new char[myUTF8Size];
     WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, myUTF8Chars, myUTF8Size, 0, 0);
     std::string myResult = std::string(myUTF8Chars);
@@ -65,7 +69,7 @@ as_string(JSContext *cx, jsval theVal) {
 
     // now convert to std::string
     if ( ! myUTF8) {
-        throw asl::Exception("Failed to convert UTF8 from UTF16.", PLUS_FILE_LINE);
+        throw jslib::UnicodeException("Failed to convert UTF8 from UTF16.", PLUS_FILE_LINE);
     }
     
     std::string myResult = std::string(myUTF8);
@@ -104,7 +108,7 @@ as_jsval(JSContext *cx, const char * theU8String) {
     AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, 0, 0);
     if (myWCharSize == 0) {
         DWORD myLastError = GetLastError();
-        throw UnicodeException(errorDescription(myLastError), PLUS_FILE_LINE); 
+        throw jslib::UnicodeException(errorDescription(myLastError), PLUS_FILE_LINE); 
     }
     LPWSTR myWChars = new WCHAR[myWCharSize];
     MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, myWChars, myWCharSize);
@@ -113,6 +117,9 @@ as_jsval(JSContext *cx, const char * theU8String) {
     return STRING_TO_JSVAL(myString);
 #else
     gunichar2 * myUTF16 = g_utf8_to_utf16(theU8String, -1,0,0,0);
+    if ( ! myUTF16) {
+        throw jslib::UnicodeException("Failed to convert UTF8 to UTF16.", PLUS_FILE_LINE);
+    }
     
     JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myUTF16));
     g_free(myUTF16);
