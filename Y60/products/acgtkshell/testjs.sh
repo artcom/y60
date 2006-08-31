@@ -1,8 +1,8 @@
 #!/bin/bash
 if [[ "$1" == "" ]] ; then
-    JSCRIPT=../../testGTK.tst.js
+    JSCRIPTS=../../*.tst.js
 else
-    JSCRIPT=../../$1
+    JSCRIPTS=../../$1
 fi
 
 PLUGIN_DIR="$PRO/lib"
@@ -23,10 +23,11 @@ else
     cd o.ANT.${PLATFORM}.OPT/tests
 fi
 
-echo $APPLICATION -I "$PRO/src/Y60/js;$PLUGIN_DIR" $JSCRIPT $*
-$APPLICATION -I "$PRO/src/Y60/js;$PLUGIN_DIR" $JSCRIPT $*
-
-if [ "$?" != "0" ] ; then
-echo "test {$JSCRIPT} failed"
-exit -1
-fi
+for JSCRIPT in $JSCRIPTS ; do
+    echo $APPLICATION -I "$PRO/src/Y60/js;$PLUGIN_DIR" $JSCRIPT $*
+    $APPLICATION -I "$PRO/src/Y60/js;$PLUGIN_DIR" $JSCRIPT $*
+    if [ "$?" != "0" ] ; then
+        echo "test {$JSCRIPT} failed"
+        exit 1
+    fi
+done    

@@ -40,7 +40,8 @@ class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, StaticAccessP
 
         enum PropertyNumbers {
             PROP_size = -100,
-            PROP_capacity
+            PROP_capacity,
+            PROP_bytes
         };
 
         static JSPropertySpec * Properties();

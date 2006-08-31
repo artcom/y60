@@ -19,6 +19,7 @@
 #include "QuitFlagSingleton.h"
 #include "JScppUtils.h"
 
+#include <asl/error_functions.h>
 #include <js/jsapi.h>
 #include <js/jsprf.h>
 #include <js/jsparse.h>
@@ -101,6 +102,10 @@ as_jsval(JSContext *cx, const char * theU8String) {
     // convert from UTF8 to WideChars/UTF16
 #ifdef WIN32
     AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, 0, 0);
+    if (myWCharSize == 0) {
+        DWORD myLastError = GetLastError();
+        throw UnicodeException(errorDescription(myLastError), PLUS_FILE_LINE); 
+    }
     LPWSTR myWChars = new WCHAR[myWCharSize];
     MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, myWChars, myWCharSize);
     JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myWChars));

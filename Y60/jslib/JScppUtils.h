@@ -124,6 +124,7 @@ namespace jslib {
 
 
 DEFINE_EXCEPTION(JSArgMismatch, asl::Exception);
+DEFINE_EXCEPTION(UnicodeException, asl::Exception);
 
 #define ENSURE_ARG(TYPE, VARNAME, INDEX) \
     TYPE VARNAME; \

@@ -16,6 +16,8 @@
 //
 //=============================================================================
 
+Logger.error("This is now obsolete and should not be used. All strings are internally stored as UTF-8");
+
 var UNICODE = [];
 UNICODE["Ä"] = String.fromCharCode(195,132);
 UNICODE["Ö"] = String.fromCharCode(195,150);

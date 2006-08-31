@@ -30,9 +30,11 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Converts the block into a string.");
     DOC_END;
-    const ReadableBlock & myBlock = JSBlock::getJSWrapper(cx,obj).getNative();
-    std::string myStringRep(myBlock.strbegin(), myBlock.strend());
-*rval = as_jsval(cx, myStringRep);
+    try {
+        const ReadableBlock & myBlock = JSBlock::getJSWrapper(cx,obj).getNative();
+        std::string myStringRep(myBlock.strbegin(), myBlock.strend());
+        *rval = as_jsval(cx, myStringRep);
+    } HANDLE_CPP_EXCEPTION;
     return JS_TRUE;
 }
 
@@ -63,6 +65,13 @@ JSBlock::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
     switch (theID) {
         case PROP_size:
             *vp = as_jsval(cx, getNative().size());
+            return JS_TRUE;
+        case PROP_bytes:
+            {
+                std::vector<asl::Unsigned8> myBytes(getNative().size());
+                std::copy(getNative().begin(), getNative().end(), myBytes.begin());
+                *vp = as_jsval(cx, myBytes);
+            }
             return JS_TRUE;
         case PROP_capacity:
             *vp = as_jsval(cx, getNative().capacity());
@@ -107,20 +116,24 @@ JSBlock::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             JS_ReportError(cx,"JSBlock::Constructor: bad argument #1 (undefined)");
             return JS_FALSE;
         }
-
+        
+        OWNERPTR myNewBlock = OWNERPTR(new asl::Block());
+        std::vector<asl::Unsigned8> myBytes;
         string myFilename = "";
-        if (!convertFrom(cx, argv[0], myFilename)) {
+
+        if (convertFrom(cx, argv[0], myBytes)) {
+            myNewBlock->resize(myBytes.size());
+            std::copy(myBytes.begin(), myBytes.end(), myNewBlock->begin());
+        } else if (convertFrom(cx, argv[0], myFilename)) {
+            bool myResult = readFile(myFilename, *myNewBlock);
+            if (!myResult) {
+                JS_ReportError(cx, "Constructor for %s: Could not read file %s",ClassName(), myFilename.c_str());
+                return JS_FALSE;
+            }
+        } else {
             JS_ReportError(cx, "JSBlock::Constructor: argument #1 must be a string (filename)");
             return JS_FALSE;
         }
-
-        OWNERPTR myNewBlock = OWNERPTR(new asl::Block());
-        bool myResult = readFile(myFilename, *myNewBlock);
-        if (!myResult) {
-            JS_ReportError(cx, "Constructor for %s: Could not read file %s",ClassName(), myFilename.c_str());
-            return JS_FALSE;
-        }
-
         myNewObject = new JSBlock(myNewBlock, &(*myNewBlock));
     } else {
         JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected 1 (filename) %d",ClassName(), argc);
