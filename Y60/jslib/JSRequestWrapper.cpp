@@ -193,7 +193,10 @@ JSRequestWrapper::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject
                 *vp = as_jsval(cx, getNative().getResponseString());
                 return JS_TRUE;
             case PROP_responseBlock:
-                *vp = as_jsval(cx, getNative().getResponseBlock());
+                {
+                    asl::Ptr<asl::Block> myBlock(new Block(getNative().getResponseBlock()));
+                    *vp = as_jsval(cx, myBlock);
+                }
                 return JS_TRUE;
             case PROP_errorString:
                 *vp = as_jsval(cx, getNative().getErrorString());

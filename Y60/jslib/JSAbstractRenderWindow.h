@@ -449,7 +449,7 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         }
         static JSBool
         setLineHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-            DOC_BEGIN("Sets line height in pixel for text paragraphs");
+            DOC_BEGIN("Sets line height in pixel for text paragraphs. Set to 0 to use default spacing.");
             DOC_PARAM("theLineHeight", "", DOC_TYPE_INTEGER);
             DOC_END;
             typedef void (DERIVED::*MyMethod)(unsigned);
