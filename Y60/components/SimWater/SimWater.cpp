@@ -205,7 +205,6 @@ SimWater::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
         assert( _myWaterRepresentation);
         _myWaterRepresentation->preRender();
     }
-            
 
 };
 
