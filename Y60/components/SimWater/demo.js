@@ -41,7 +41,7 @@ SimWaterTestApp.prototype.Constructor = function(self, theArguments) {
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theTitle) {
         Base.setup(theWidth, theHeight, false, theTitle);
-        window.resize(600, 600);
+        window.resize(256,256);//600, 600);
         _myWater = new SimWater();
         window.addExtension(_myWater);
         _myWater.addFloormap( "data/whiskeyglas2.png" );

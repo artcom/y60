@@ -145,7 +145,6 @@ SimWater::onStartup(jslib::AbstractRenderWindow * theWindow)  {
             BufferAllocatorPtr( new AGPBufferAllocator ) );
 
     _myStartTime.setNow();
-
 };
 
 void
