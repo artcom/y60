@@ -26,6 +26,11 @@ int main(int argc, char *argv[])
     SoundTestSuite mySuite(argv[0], argc, argv, true);
 
     try {
+/*
+        while(true) {
+            mySuite.run();
+        }
+*/
         mySuite.run();
 #ifdef USE_DASHBOARD
         Dashboard::get().print(cerr);

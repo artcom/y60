@@ -159,6 +159,7 @@ unsigned Pump::getNumUnderruns () const
 }
 
 unsigned Pump::getNumSinks () const {
+    AutoLocker<Pump> myLocker(*(const_cast<Pump*>(this)));
     const_cast<Pump*>(this)->removeDeadSinks();
     return _mySampleSinks.size();
 }
@@ -279,7 +280,7 @@ Pump::run() {
 //            Dashboard::get().cycle();
         }
     } catch (const Exception & e) {
-        AC_ERROR << "Pump::run: Unhandled exception.";
+        AC_ERROR << "Pump::run: Unhandled asl::exception.";
         AC_ERROR << e;
     } catch (const std::exception & e) {
         AC_ERROR << "Pump::run: Unhandled std::exception.";
