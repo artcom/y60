@@ -41,40 +41,40 @@ public:
         : UnitTest(strdup(string(string("PixelUnitTest<")+myTypeName+">").c_str())) {  }
     void run() {
         PIX blackPixel;
-        DPRINT(&blackPixel);
+        //DPRINT(&blackPixel);
         fill(begin(blackPixel),end(blackPixel),0);
-        DPRINT(blackPixel);
+        //DPRINT(blackPixel);
         PIX firstPixel = blackPixel;
-        DPRINT(firstPixel);
+        //DPRINT(firstPixel);
         ENSURE(firstPixel == blackPixel);
 
         PIX secondPixel = firstPixel + blackPixel;
-        DPRINT(secondPixel);
+        //DPRINT(secondPixel);
         ENSURE(secondPixel == blackPixel);
 
         PIX productPixel = firstPixel * blackPixel;
-        DPRINT(productPixel);
+        //DPRINT(productPixel);
         ENSURE(productPixel == blackPixel);
 
         fill(begin(firstPixel),end(firstPixel),1);
-        DPRINT(firstPixel);
+        //DPRINT(firstPixel);
         ENSURE(firstPixel != blackPixel);
         secondPixel = firstPixel;
-        DPRINT(secondPixel);
+        //DPRINT(secondPixel);
         ENSURE(secondPixel == firstPixel);
 
         secondPixel *= firstPixel;
-        DPRINT(secondPixel);
+        //DPRINT(secondPixel);
         ENSURE(secondPixel == firstPixel);
 
         secondPixel /= firstPixel;
-        DPRINT(secondPixel);
+        //DPRINT(secondPixel);
         ENSURE(secondPixel == firstPixel);
 
         secondPixel += firstPixel;
-        DPRINT(secondPixel);
+        //DPRINT(secondPixel);
         fill(begin(firstPixel), end(firstPixel), 2);
-        DPRINT(firstPixel);
+        //DPRINT(firstPixel);
         ENSURE(secondPixel == firstPixel);
 
         std::multiplies<PIX> myMultiplier;
@@ -82,14 +82,14 @@ public:
 
 /*
         iota(begin(firstPixel),end(firstPixel),1);
-        DPRINT(firstPixel);
+        //DPRINT(firstPixel);
         iota(begin(secondPixel),end(secondPixel),1);
-        DPRINT(firstPixel);
+        //DPRINT(firstPixel);
         ENSURE(secondPixel == firstPixel);
   */
         sort(begin(firstPixel),end(firstPixel));
         ENSURE(secondPixel == firstPixel);
-        DPRINT(firstPixel);
+        //DPRINT(firstPixel);
     }
 private:
 };
