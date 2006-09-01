@@ -53,6 +53,7 @@ JSPropertySpec *
 JSBlock::Properties() {
     static JSPropertySpec myProperties[] = {
         {"size", PROP_size, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"bytes", PROP_bytes, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"capacity", PROP_capacity, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
     };
@@ -82,7 +83,7 @@ JSBlock::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
     }
 }
 
-JSBool 
+JSBool
 JSBlock::getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     *vp = as_jsval(cx, getNative()[theIndex]);
     return JS_TRUE;
@@ -101,7 +102,7 @@ JSBlock::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             return JS_FALSE;
     }
 }
-JSBool 
+JSBool
 JSBlock::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     unsigned char myArg;
     if (convertFrom(cx, *vp, myArg)) {
@@ -133,7 +134,7 @@ JSBlock::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
             JS_ReportError(cx,"JSBlock::Constructor: bad argument #1 (undefined)");
             return JS_FALSE;
         }
-        
+
         OWNERPTR myNewBlock = OWNERPTR(new asl::Block());
         std::vector<asl::Unsigned8> myBytes;
         string myFilename = "";

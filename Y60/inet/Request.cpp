@@ -103,13 +103,13 @@ namespace inet {
         return _myURL;
     }
 
-    void 
+    void
     Request::setResume(long theResumeOffset) {
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_RESUME_FROM, theResumeOffset);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
-    void 
+    void
     Request::setProxy(const std::string & theProxyServer, bool theTunnelFlag) {
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_PROXY, theProxyServer.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
@@ -127,7 +127,7 @@ namespace inet {
 
     std::string
     Request::getResponseString() const {
-        return std::string((char *)_myResponseBlock.begin());
+        return std::string((char *)_myResponseBlock.begin(), _myResponseBlock.size());
     };
 
     const asl::Block &
@@ -203,10 +203,10 @@ namespace inet {
     Request::getResponseHeaderAsDate(const string & theHeader) const {
         return getTimeFromHTTPDate( getResponseHeader(theHeader).c_str());
     }
-    
+
     time_t
     Request::getTimeFromHTTPDate(const std::string & theHTTPDate ) {
-        return curl_getdate(theHTTPDate.c_str(), 0);    
+        return curl_getdate(theHTTPDate.c_str(), 0);
     }
 
     string
@@ -241,7 +241,7 @@ namespace inet {
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
-    void 
+    void
     Request::setFollowLocation(bool theFollowFlag) {
         // follow the "Location"-header field on response codes 3xx (redirection) [jb]
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_FOLLOWLOCATION, theFollowFlag);
