@@ -82,6 +82,12 @@ JSBlock::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
     }
 }
 
+JSBool 
+JSBlock::getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    *vp = as_jsval(cx, getNative()[theIndex]);
+    return JS_TRUE;
+}
+
 // setproperty handling
 JSBool
 JSBlock::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
@@ -95,6 +101,17 @@ JSBlock::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             return JS_FALSE;
     }
 }
+JSBool 
+JSBlock::setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    unsigned char myArg;
+    if (convertFrom(cx, *vp, myArg)) {
+        openNative()[theIndex] = myArg;
+        closeNative();
+        return JS_TRUE;
+    }
+    return JS_TRUE;
+}
+
 
 JSBool
 JSBlock::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

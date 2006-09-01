@@ -53,7 +53,9 @@ class JSBlock : public JSWrapper<asl::Block, asl::Ptr<asl::Block>, StaticAccessP
         }
 
         virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+        virtual JSBool getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
         virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+        virtual JSBool setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
 
         static JSBool
         Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);

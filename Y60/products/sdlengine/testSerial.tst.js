@@ -33,16 +33,16 @@ SerialUnitTest.prototype.Constructor = function(obj, theName) {
         //print("read Frame: '" + theFrame + "'");
         var myDecodedFrame = "";
         var isCode = false;
-        for (var i = 0; i < theFrame.length; ++i) {
-            if (theFrame.charCodeAt(i) > 122 || theFrame.charCodeAt(i) < 32) {
-                myDecodedFrame += "|" + theFrame.charCodeAt(i);
+        for (var i = 0; i < theFrame.size; ++i) {
+            if (theFrame[i] > 122 || theFrame[i] < 32) {
+                myDecodedFrame += "|" + theFrame[i];
                 isCode = true;
             } else {
                 if (isCode) {
                      myDecodedFrame += "|";
                      isCode = false;
                 }
-                myDecodedFrame += theFrame[i];
+                myDecodedFrame += String.fromCharCode(theFrame[i]);
             }
         }
         myDecodedFrame += "|";
@@ -110,28 +110,28 @@ SerialUnitTest.prototype.Constructor = function(obj, theName) {
         obj.mySerialDevice.sendPacket("air in a bottle");
         ENSURE('obj.mySerialDevice.receivePacket() == "air in a bottle"');
         obj.mySerialDevice.sendPacket("air in a bottle");
-        printFrame(obj.mySerialDevice.read());
+        printFrame(obj.mySerialDevice.readBlock());
 
         obj.mySerialDevice.setPacketFormat(201, 202, 0, SerialDevice.NO_CHECKING);
         obj.mySerialDevice.printPacketFormat();
         obj.mySerialDevice.sendPacket("house in a bottle");
         ENSURE('obj.mySerialDevice.receivePacket() == "house in a bottle"');
         obj.mySerialDevice.sendPacket("house in a bottle");
-        printFrame(obj.mySerialDevice.read());
+        printFrame(obj.mySerialDevice.readBlock());
 
         obj.mySerialDevice.setPacketFormat(203, 204, 31, SerialDevice.CHECKSUM_CHECKING);
         obj.mySerialDevice.printPacketFormat();
         obj.mySerialDevice.sendPacket("nothing interesting in a bottle");
         ENSURE('obj.mySerialDevice.receivePacket() == "nothing interesting in a bottle"');
         obj.mySerialDevice.sendPacket("nothing interesting in a bottle");
-        printFrame(obj.mySerialDevice.read());
+        printFrame(obj.mySerialDevice.readBlock());
 
         obj.mySerialDevice.setPacketFormat(255, 254, 0, SerialDevice.CRC8_CHECKING);
         obj.mySerialDevice.printPacketFormat();
         obj.mySerialDevice.sendPacket("ch in a bottle");
         ENSURE('obj.mySerialDevice.receivePacket() == "ch in a bottle"');
         obj.mySerialDevice.sendPacket("ch in a bottle");
-        printFrame(obj.mySerialDevice.read());
+        printFrame(obj.mySerialDevice.readBlock());
 
         obj.mySerialDevice.setPacketFormat(65, 66, 12, SerialDevice.CHECKSUM_CHECKING);
         obj.mySerialDevice.printPacketFormat();

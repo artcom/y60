@@ -18,6 +18,7 @@
 
 #include "JSSerial.h"
 #include "JScppUtils.h"
+#include "JSBlock.h"
 
 #include <asl/SerialDeviceFactory.h>
 #include <asl/DebugPort.h>
@@ -202,7 +203,7 @@ setPacketFormat(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 static JSBool
 read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Reads data from serial device");
+    DOC_BEGIN("Reads text (utf-8) data from serial device");
     DOC_PARAM_OPT("theSize", "Bytes to read", DOC_TYPE_INTEGER, READ_BUFFER_SIZE);
     DOC_RVAL("Bufferdata", DOC_TYPE_STRING);
     DOC_END;
@@ -228,6 +229,42 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             JSSerial::getJSWrapper(cx,obj).openNative().read(myBuffer, myReadBytes);
             JSSerial::getJSWrapper(cx,obj).closeNative();
             myResult.append(myBuffer, myReadBytes);
+        } while (myReadBytes == READ_BUFFER_SIZE);
+
+        *rval = as_jsval(cx, myResult);
+
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+readBlock(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Reads binary data from serial device");
+    DOC_PARAM_OPT("theSize", "Bytes to read", DOC_TYPE_INTEGER, READ_BUFFER_SIZE);
+    DOC_RVAL("Bufferdata", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        if (argc > 1) {
+            JS_ReportError(cx, "JSSerial::read(): Wrong number of arguments, expected one or none, got %d.", argc);
+            return JS_FALSE;
+        }
+
+        size_t myReadBytes = READ_BUFFER_SIZE;
+        if (argc == 1) {
+             if (!convertFrom(cx, argv[0], myReadBytes)) {
+                JS_ReportError(cx, "JSSerial::read(): Argument #1 must be a unsigned (bytes to read)");
+                return JS_FALSE;
+            }
+        }
+
+
+        asl::Ptr<asl::Block> myResult(new Block());
+        char myBuffer[READ_BUFFER_SIZE];
+
+        do {
+            JSSerial::getJSWrapper(cx,obj).openNative().read(myBuffer, myReadBytes);
+            JSSerial::getJSWrapper(cx,obj).closeNative();
+            myResult->append(myBuffer, myReadBytes);
         } while (myReadBytes == READ_BUFFER_SIZE);
 
         *rval = as_jsval(cx, myResult);
@@ -416,6 +453,7 @@ JSSerial::Functions() {
         {"open",                 open,                    5},
         {"close",                close,                   0},
         {"read",                 read,                    1},
+        {"readBlock",            readBlock,               1},
         {"peek",                 peek,                    0},
         {"write",                write,                   1},
         {"receivePacket",        receivePacket,           0},
