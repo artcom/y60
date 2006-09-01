@@ -183,7 +183,7 @@ RunLengthEncoderUnitTest::testNumberCoder(unsigned long theNumber) {
 
 void
 RunLengthEncoderUnitTest::testStringCompression(const string & theData) {
-    cerr << "Compressing: " << theData << endl;
+    cerr << "Compressing: " << theData.size() << " bytes" << endl;
     asl::Block myBlock;
     myBlock.appendString(theData);
 
@@ -192,7 +192,7 @@ RunLengthEncoderUnitTest::testStringCompression(const string & theData) {
 
 void
 RunLengthEncoderUnitTest::testDataCompression(unsigned char * theData, unsigned theSize) {
-    cerr << "Compressing: " << theData << endl;
+    cerr << "Compressing: " << theSize << " bytes" << endl;
     asl::Block myBlock;
     myBlock.append(theData, theSize);
 
