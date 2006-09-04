@@ -157,8 +157,6 @@ namespace y60 {
 
         if ( EPSILON > (((Bx-Ax)*(Cy-Ay)) - ((By-Ay)*(Cx-Ax))) ) return false;
 
-//        if ( asl::almostEqual(((Bx-Ax)*(Cy-Ay)), ((By-Ay)*(Cx-Ax))) ) return false;
-        
         for (p=0;p<n;p++) {
             if( (p == u) || (p == v) || (p == w) ) continue;
             Px = contour[V[p]][0];
