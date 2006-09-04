@@ -27,7 +27,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
     self.getBody = function() {
         return _myBody;
     }
-    
+   
     self.createPolygonShapeByVectorList = function(theId, theVector2fList) {
         _myShape = Modelling.createSurface2DFromContour(window.scene, theMaterial.id, theVector2fList, "Surface2d");
         //print(theVector2fList);
@@ -42,7 +42,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
         var myShapeElement = myShapeBuilder.appendElement("linestrip", _myMaterial.id);
         for(var myPointIndex = 0; myPointIndex < theVector2fList.length; myPointIndex++) {
             var myVertex = new Vector3f(theVector2fList[myPointIndex].x, theVector2fList[myPointIndex].y, 0);            
-            push(myShapeBuilder, myShapeElement, myVertex);            
+            push(myShapeBuilder, myShapeElement, myVertex);
         }
         // create shape, body
         _myShape = myShapeBuilder.buildNode();
@@ -75,6 +75,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
         _myBody = window.scene.createBody(_myShape);
         _myBody.name = "Body_" + theSvgNode.id;
         window.scene.update(Scene.SHAPES | Scene.MATERIALS);
+        return myVector2fList;
     }
 
    self.createLinestripShapeByNode = function(theSvgNode, theOffset) {
@@ -89,6 +90,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
         var myPointString = theSvgNode.points;
         var myPoints = myPointString.split(" ");
         var myFirstVertex = null;
+        var myVector2fList = [];
         for(var myPointIndex = 0; myPointIndex < myPoints.length; myPointIndex++) {
             var myPoint = trim(myPoints[myPointIndex]);
             if (myPoint.length >0 ) {
@@ -98,6 +100,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
                 if ( myPointIndex == 0) {
                     myFirstVertex = myVertex;
                 }
+                myVector2fList.push(myVertex);
             }
         }
         // create shape, body
@@ -108,7 +111,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
         _myBody = window.scene.createBody(_myShape);
         _myBody.name = "Body_" + theSvgNode.id;
         window.scene.update(Scene.SHAPES | Scene.MATERIALS);
-        
+        return myVector2fList;
         //window.scene.save("test.x60", false);
         //exit(1);
     }
