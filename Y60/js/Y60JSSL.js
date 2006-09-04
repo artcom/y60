@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2006, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -7,16 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: Y60JSSL.js,v $
-//   $Author: jens $
-//   $Revision: 1.39 $
-//   $Date: 2005/04/26 15:15:13 $
-//
-//
-//=============================================================================
-
-//==============================================================================
 // Y60 JSSL - Y60 JavaScript Standard Library
 // Content:
 //     - JavaScript helper functions
@@ -814,3 +804,21 @@ function convertQuatToEuler(q) {
     var bank = -Math.atan2(2*q1[0]*q1[3]-2*q1[1]*q1[2] , -sqx + sqy - sqz + sqw)
     return new Vector3f(heading, bank, attitude);
 }
+
+// The practical motivation for currying is that very often the functions
+// you get by supplying some but not all of the arguments to a curried function are useful.
+// Intuitively speaking: 'If you fix some arguments,
+// you get a function of the remaining arguments.'
+// P.S.: It's 'Schoenfinkeln' in german
+function curry(theFunction) {
+ return (function innerCurry(theArgCount, theArguments) {
+     if (theArgCount == 0) {
+         return theFunction.apply(theFunction, theArguments);
+     } else {
+         return function(theExtractedArgument) {
+             return innerCurry(theArgCount-1, theArguments.concat([theExtractedArgument]))
+         };
+     }
+ })(theFunction.length || theArguments[1] || 0, []);
+}
+         
