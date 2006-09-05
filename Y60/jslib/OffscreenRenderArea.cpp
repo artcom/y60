@@ -77,31 +77,37 @@ OffscreenRenderArea::deactivate(bool theCopyToImageFlag) {
     }
     y60::OffscreenBuffer::deactivate(myTexture, theCopyToImageFlag);
 }
-    
-void 
+
+void
 OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
     AC_TRACE << "OffscreenRenderArea::renderToCanvas ";
-    
+    MAKE_SCOPE_TIMER(OffscreenRenderArea_renderToCanvas);
+
     ImagePtr myTexture = getImage();
     if ( ! myTexture) {
         AC_ERROR << "OffscreenRenderArea::renderToCanvas has no canvas / image to render... ignoring";
         return;
     }
 
-    onFrame();
-    _myScene->updateAllModified();
+    {
+        MAKE_SCOPE_TIMER(OffscreenRenderArea_onframe_sceneupdate);
+        _myScene->updateAllModified();
+    }
 
     y60::OffscreenBuffer::activate(myTexture);
     clearBuffers( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    preRender();
-    render();
-    postRender();
-    
-    y60::OffscreenBuffer::deactivate(myTexture, theCopyToImageFlag);
-}    
 
-void 
+    {
+        MAKE_SCOPE_TIMER(OffscreenRenderArea_render);
+        preRender();
+        render();
+        postRender();
+    }
+
+    y60::OffscreenBuffer::deactivate(myTexture, theCopyToImageFlag);
+}
+
+void
 OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theImageNode) {
     if ( ! theImageNode ) {
         throw OffscreenRendererException("No Image.", PLUS_FILE_LINE);
@@ -118,7 +124,7 @@ OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theImageNode) {
     copyFrameBufferToImage( myImage );
 }
 
-void 
+void
 OffscreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
     AbstractRenderWindow::setRenderingCaps(theRenderingCaps);
     OffscreenBuffer::setUseGLFramebufferObject(theRenderingCaps & y60::FRAMEBUFFER_SUPPORT);
@@ -136,11 +142,11 @@ OffscreenRenderArea::setHeight(unsigned theHeight) {
     _myHeight = theHeight;
 }
 
-bool 
+bool
 OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
         ImagePtr myImage = getImage();
-        if (myImage) { 
+        if (myImage) {
 //            ensureRaster(myImage);
             _myWidth  = myImage->get<ImageWidthTag>();
             _myHeight = myImage->get<ImageHeightTag>();
