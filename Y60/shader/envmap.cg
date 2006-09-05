@@ -103,8 +103,8 @@ float4 mainFragment(vert2frag   IN,
         uniform float3 AC_CAMERA_POSITION,
         uniform float3 AC_DIRECTIONAL_LIGHTS[],
         uniform float4 AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[],
-        //uniform float3 AC_POSITIONAL_LIGHTS[],
-        //uniform float4 AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[],
+        uniform float3 AC_POSITIONAL_LIGHTS[],
+        uniform float4 AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[],
         uniform float4 ambient,
         uniform float4 diffuse,
         uniform float4 specular,
@@ -158,7 +158,7 @@ float4 mainFragment(vert2frag   IN,
             mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
     }
-/*
+
     for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
 
         float3 L = normalize(AC_POSITIONAL_LIGHTS[i] - P);
@@ -183,7 +183,7 @@ float4 mainFragment(vert2frag   IN,
             mySpecColor += specularTerm * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
     }
-*/
+
     myDiffuseColor *= diffuse * myDecalTexel;
     mySpecColor *= specular;
 

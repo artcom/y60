@@ -158,7 +158,7 @@ namespace y60 {
 
     void
     CgProgramInfo::processParameters() {
-        AC_DEBUG << "processParameters";
+        AC_TRACE << "processParameters";
 
         _myGlParams.clear();
         _myAutoParams.clear();
@@ -172,7 +172,7 @@ namespace y60 {
             //CGenum myParamVariability = cgGetParameterVariability(myParam);
             CGenum myParamVariability = CG_UNIFORM;
             CGtype myParameterType    = cgGetParameterType(myParam);
-            AC_DEBUG << "processing " << myParamName;
+            AC_TRACE << "processing " << myParamName;
 
             assertCg(PLUS_FILE_LINE, _myContext);
 
@@ -228,46 +228,29 @@ namespace y60 {
                 }
 
 
-                if (myParameterType == CG_ARRAY && cgGetArraySize(myParam, 0) == 0) {
-
-
+                if (myParameterType == CG_ARRAY) /* && cgGetArraySize(myParam, 0) == 0)*/ {
                     int myArraySize = _myUnsizedArrayAutoParamSizes[myParamID];
-                    if (myArraySize > 0) {
+                    AC_TRACE << "setting array " << myParamName << " to size " << myArraySize;
 
-                        AC_DEBUG << "setting array " << myParamName << " to size " << myArraySize;
+                    CGtype myArrayType = cgGetArrayType(myParam);
+                    CGparameter myArray
+                        = cgCreateParameterArray(_myContext, myArrayType, myArraySize);
+                    assertCg(PLUS_FILE_LINE, _myContext);
 
-                        CGtype myArrayType = cgGetArrayType(myParam);
-                        CGparameter myArray
-                            = cgCreateParameterArray(_myContext, myArrayType, myArraySize);
-                        assertCg(PLUS_FILE_LINE, _myContext);
+                    for(int i = 0; i <  myArraySize; ++i) {
 
-                        for(int i = 0; i <  myArraySize; ++i) {
-
-                            CGparameter myArrayElement
-                                = cgCreateParameter(_myContext, myArrayType);
-                            cgConnectParameter(myArrayElement, cgGetArrayParameter(myArray, i));
-                        }
-
-                        cgConnectParameter(myArray, myParam);
-                        assertCg(PLUS_FILE_LINE, _myContext);
-                        AC_DEBUG << "done. created unsized array of size " << myArraySize;
+                        CGparameter myArrayElement
+                            = cgCreateParameter(_myContext, myArrayType);
+                        cgConnectParameter(myArrayElement, cgGetArrayParameter(myArray, i));
                     }
+
+                    cgConnectParameter(myArray, myParam);
+                    assertCg(PLUS_FILE_LINE, _myContext);
+                    AC_TRACE << "done. created unsized array of size " << myArraySize;
                 }
-
-                if (myParameterType == CG_ARRAY) {
-                    AC_DEBUG << "array " << myParamName << " size " << cgGetArraySize(myParam, 0);
-                }
-
-                if (true || myParameterType == CG_ARRAY || cgIsParameterReferenced(myParam)) {
-
-                    AC_DEBUG << "adding auto param " << myParamName << ":" << myParamID << endl;
-                    _myAutoParams[myParamID]
-                        = CgProgramAutoParam(myParamName, myParam, myParamID, myParameterType);
-
-                } else {
-                    AC_WARNING << "skipping non-referenced AC-CG parameter "
-                        << myParamName << endl;
-                }
+                AC_TRACE << "adding auto param " << myParamName << ":" << myParamID << endl;
+                _myAutoParams[myParamID] =
+                    CgProgramAutoParam(myParamName, myParam, myParamID, myParameterType);
             }
             // scan for sampler params
             if (myParameterType == CG_SAMPLER1D ||
@@ -299,7 +282,7 @@ namespace y60 {
         //AC_DEBUG << "CgProgramInfo::setCGGLParameters";
         for (unsigned i=0; i<_myGlParams.size(); ++i) {
             CgProgramGlParam myParam = _myGlParams[i];
-            AC_DEBUG << "setting CgGL parameter " << myParam._myParamName << " type=" << myParam._myStateMatrixType << " transform=" << myParam._myTransform;
+            AC_TRACE << "setting CgGL parameter " << myParam._myParamName << " type=" << myParam._myStateMatrixType << " transform=" << myParam._myTransform;
             cgGLSetStateMatrixParameter(myParam._myParameter,
                                         myParam._myStateMatrixType,
                                         myParam._myTransform);
@@ -347,7 +330,8 @@ namespace y60 {
         DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_pos_lights));
         int myLightType = POSITIONAL_LIGHTS;
         if (_myAutoParams.find(myLightType) != _myAutoParams.end()) {
-            unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
+            unsigned myLastCount = _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS];
+            //unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
             if (myLastCount != myPositionalLightCount) {
                 DBP2(COUNT(CgProgramInfo_posLightCount_differ));
                 DBP2(COUNT_N(CgProgramInfo_posLightCountLast, myLastCount));
@@ -360,7 +344,8 @@ namespace y60 {
         DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
         myLightType = DIRECTIONAL_LIGHTS;
         if (_myAutoParams.find(myLightType) != _myAutoParams.end()) {
-            unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
+            // unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
+            unsigned myLastCount = _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS];
             if (myLastCount != myDirectionalLightCount)  {
                 DBP2(COUNT(CgProgramInfo_dirLightCount_differ));
                 DBP2(COUNT_N(CgProgramInfo_dirLightCountLast, myLastCount));
@@ -371,6 +356,7 @@ namespace y60 {
         DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
 
         if (myReload) {
+            // AC_INFO << "reload required";
             DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_reloadIfRequired_reload));
             //change unsized array sizes here
             _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = myPositionalLightCount;
@@ -471,14 +457,14 @@ namespace y60 {
             bool myParamValueFoundFlag = true;
 
             CgProgramAutoParam curParam = myIter->second;
-            AC_DEBUG << "setting parameter " << curParam._myName;
+            AC_TRACE << "setting parameter " << curParam._myName;
 
             switch (curParam._myID) {
                 case CAMERA_POSITION :
                     setCgVectorParameter(curParam, theCamera.get<GlobalMatrixTag>().getTranslation());
                     break;
                 case POSITIONAL_LIGHTS :
-                    AC_DEBUG << "setting POSITIONAL_LIGHTS to " << myPositionalLights;
+                    AC_TRACE << "setting POSITIONAL_LIGHTS to " << myPositionalLights;
                     setCgUnsizedArrayParameter(curParam, myPositionalLights);
                     break;
                 case POSITIONAL_LIGHTS_DIFFUSE_COLOR :
@@ -488,7 +474,7 @@ namespace y60 {
                     setCgUnsizedArrayParameter(curParam, myPositionalLightSpecularColors);
                     break;
                 case DIRECTIONAL_LIGHTS :
-                    AC_DEBUG << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;
+                    AC_TRACE << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;
                     setCgUnsizedArrayParameter(curParam, myDirectionalLights);
                     break;
                 case DIRECTIONAL_LIGHTS_DIFFUSE_COLOR :
@@ -571,7 +557,7 @@ namespace y60 {
 
     void
     CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
-        AC_DEBUG << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
+        AC_TRACE << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
 
         const MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         const Facade::PropertyMap & myProperties = myPropFacade->getProperties();
@@ -590,7 +576,7 @@ namespace y60 {
                                           const std::string & thePropertyName,
                                           const MaterialBase & theMaterial)
     {
-        AC_DEBUG << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode.nodeName() << " value=" << theNode.nodeValue() << " property=" << thePropertyName << " material=" << theMaterial.get<NameTag>() << " type=" << theNode.parentNode()->nodeName();
+        AC_TRACE << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode.nodeName() << " value=" << theNode.nodeValue() << " property=" << thePropertyName << " material=" << theMaterial.get<NameTag>() << " type=" << theNode.parentNode()->nodeName();
 
         switch(TypeId(asl::getEnumFromString(theNode.parentNode()->nodeName(), TypeIdStrings))) {
             case FLOAT:
@@ -648,7 +634,7 @@ namespace y60 {
                     unsigned myTextureIndex = theNode.nodeValueAs<unsigned>();
                     if (myTextureIndex  < theMaterial.getTextureCount()) {
                         const Texture & myTexture = theMaterial.getTexture(myTextureIndex);
-                        AC_DEBUG << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTexture.getId();
+                        AC_TRACE << "cgGLSetTextureParameter param=" << theCgParameter << " texid=" << myTexture.getId();
                         cgGLSetTextureParameter( theCgParameter, myTexture.getId());
                         DB(AC_TRACE << "cgGLSetTextureParameter: Texture index: "<< as_string(myTextureIndex)
                                 << " , glid : " << myTexture.getId()
@@ -726,7 +712,7 @@ namespace y60 {
     {
         if (theParam._myType == CG_ARRAY) {
             int mySize = cgGetArraySize(theParam._myParameter, 0);
-            AC_DEBUG << "setting array 3f size " << mySize;
+            AC_TRACE << "setting array 3f size " << mySize;
             if (mySize) {
                 cgGLSetParameterArray3f(theParam._myParameter, 0,
                         mySize, theValue.begin()->begin());
@@ -759,15 +745,18 @@ namespace y60 {
     CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam,
                                               const vector<asl::Vector3f> & theValue)
     {
-        int mySize = cgGetArraySize(theParam._myParameter, 0);
+        int mySize = _myUnsizedArrayAutoParamSizes[theParam._myID];
+        // int mySize = cgGetArraySize(theParam._myParameter, 0);
         if (mySize != theValue.size()) {
             AC_ERROR << "BUG 391: Cg Array " << theParam._myName << " expects " << mySize <<
-                " elements, have " << theValue.size();
+                " elements, have " << theValue.size() << "(" << _myPathName << ")";
         }
         for(int i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
-            //AC_DEBUG << "setting component " << i << " to " << theValue[i];
-            cgSetParameter3f(myElement, theValue[i][0], theValue[i][1], theValue[i][2]);
+            //AC_TRACE << "setting component " << i << " to " << theValue[i];
+            if (i < theValue.size()) {
+                cgSetParameter3f(myElement, theValue[i][0], theValue[i][1], theValue[i][2]);
+            }
         }
         assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
     }
@@ -776,14 +765,15 @@ namespace y60 {
     CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam,
                                               const vector<asl::Vector4f> & theValue)
     {
-        int mySize = cgGetArraySize(theParam._myParameter, 0);
+        int mySize = _myUnsizedArrayAutoParamSizes[theParam._myID];
+        // int mySize = cgGetArraySize(theParam._myParameter, 0);
         if (mySize != theValue.size()) {
             AC_ERROR << "BUG 391: Cg Array " << theParam._myName << " expects " << mySize <<
                 " elements, have " << theValue.size();
         }
         for(unsigned i = 0; i < mySize; ++i) {
             CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
-            //AC_DEBUG << "setting component " << i << " to " << theValue[i];
+            //AC_TRACE << "setting component " << i << " to " << theValue[i];
             cgSetParameter4f(myElement, theValue[i][0], theValue[i][1], theValue[i][2], theValue[i][3]);
         }
         assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
@@ -791,7 +781,7 @@ namespace y60 {
 
     void
     CgProgramInfo::bind() {
-        //AC_DEBUG << "CgProgramInfo::bind " << _myShader._myEntryFunction;
+        //AC_TRACE << "CgProgramInfo::bind " << _myShader._myEntryFunction;
         CHECK_OGL_ERROR;
         DB(AC_TRACE << "binding " << _myShader._myEntryFunction << ":" <<_myCgProgramID << endl;)
         cgGLBindProgram(_myCgProgramID);
@@ -800,13 +790,13 @@ namespace y60 {
 
     void
     CgProgramInfo::enableTextures() {
-        //AC_DEBUG << "CgProgramInfo::enableTextures";
+        //AC_TRACE << "CgProgramInfo::enableTextures";
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
 
             GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
             glActiveTexture(myTexUnit);
 
-            // AC_DEBUG << "CgProgramInfo::enableTextures paramName=" << _myTextureParams[i]._myParamName
+            // AC_TRACE << "CgProgramInfo::enableTextures paramName=" << _myTextureParams[i]._myParamName
             //          << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
             cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
             glEnable(GL_TEXTURE_2D); // Huh? What's that? What if the texture is 3D or Cube or something else? [DS]
@@ -816,13 +806,13 @@ namespace y60 {
 
     void
     CgProgramInfo::disableTextures() {
-        //AC_DEBUG << "CgProgramInfo::disableTextures";
+        //AC_TRACE << "CgProgramInfo::disableTextures";
         for (unsigned i=0; i < _myTextureParams.size(); ++i) {
 
             GLenum myTexUnit = cgGLGetTextureEnum(_myTextureParams[i]._myParameter);
             glActiveTexture(myTexUnit);
 
-            //AC_DEBUG << "CgProgramInfo::disableTextures paramName=" << _myTextureParams[i]._myParamName << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
+            //AC_TRACE << "CgProgramInfo::disableTextures paramName=" << _myTextureParams[i]._myParamName << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
             cgGLDisableTextureParameter(_myTextureParams[i]._myParameter);
             glDisable(GL_TEXTURE_2D);
             CHECK_OGL_ERROR;

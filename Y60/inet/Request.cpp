@@ -127,7 +127,7 @@ namespace inet {
 
     std::string
     Request::getResponseString() const {
-        return std::string((char *)_myResponseBlock.begin(), _myResponseBlock.size());
+        return std::string(_myResponseBlock.strbegin(), _myResponseBlock.strend());
     };
 
     const asl::Block &
