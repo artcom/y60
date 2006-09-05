@@ -58,7 +58,11 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
      * - if given, start at character 'theFirstCharacter'; default is 0.
      * - if given, end at character 'theLastCharacter'; default is last character in text.
      */
-    self.align = function(thePathAlign, thePos, theFirstCharacter, theLastCharacter, doTheWrapAroundFlag) {
+    self.align = function(thePathAlign, thePos, theFirstCharacter, theLastCharacter, doTheWrapAroundFlag, theFlipFlag) {
+        var myXMirror = 1;
+        if (theFlipFlag != undefined) {
+            myXMirror = theFlipFlag ? -1:1;
+        }
         if (thePos != undefined) {
             thePathAlign.setCurrentPosition(thePos);
         }
@@ -165,8 +169,8 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
                     break;
             }
             //print("top=" + myTop, "bottom=" + myBottom, "sum=" + (myTop - myBottom));
-            var myTopOffset = product(myLeftVector, myTop);
-            var myBottomOffset = product(myLeftVector, myBottom);
+            var myTopOffset = product(myLeftVector, myXMirror*myTop);
+            var myBottomOffset = product(myLeftVector, myXMirror*myBottom);
 
             var myStart = mySegment.start;
             var myEnd = sum(myStart, myForwardVector);
@@ -230,7 +234,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
     function setup() {
 
-        _myText = asUnicodeString(theText);
+        _myText = theText;//asUnicodeString(theText);
         _myCharacters = theCharacterSoup.createUnicodeText(_myText, theFontSize);
         var myMaterialId = theCharacterSoup.getAlphabetMap(theFontSize).material.id;
         var myMaterial = window.scene.dom.getElementById(myMaterialId);

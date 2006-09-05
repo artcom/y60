@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-use("Unicode.js");
+//use("Unicode.js");
 use("ShapeBuilder.js");
 use("BuildUtils.js");
 plug("GlurFilter");
@@ -117,7 +117,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                     myBlitPos.x = 0;
                 }
                 blitImage(myTmpImage, myFontImage, myBlitPos);
-                theSceneViewer.getImages().removeChild(myTmpImage);
+                window.scene.images.removeChild(myTmpImage);
 
                 // texture coordinates
                 myTexCoord[0] = myTargetUVPosition.x / myFontImage.width;
@@ -191,7 +191,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         addMaterialRequirement(myMaterial, "vertexparams", "[10[color]]");
         myMaterial.transparent = true;
         myMaterial.properties.targetbuffers = "[red,green,blue,alpha]"
-        theSceneViewer.getMaterials().appendChild(myMaterial);
+        window.scene.materials.appendChild(myMaterial);
 
         _myAlphabetMap[theSize] = [];
         _myAlphabetMap[theSize].material = myMaterial;
