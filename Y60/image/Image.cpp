@@ -251,7 +251,7 @@ namespace y60 {
     Image::load() {
         std::string mySrcAttrib = get<ImageSourceTag>();
         if (get<ImageSourceTag>() == "") {
-            AC_INFO << "Image '" << get<NameTag>() << " has not been loaded because of empty source attribute";
+            AC_DEBUG << "Image '" << get<NameTag>() << " has not been loaded because of empty source attribute";
             dom::ValuePtr myRasterValue = getRasterValue();
             if (!myRasterValue) {
                 // Create default raster

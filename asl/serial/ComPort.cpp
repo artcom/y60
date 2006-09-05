@@ -286,7 +286,7 @@ namespace asl {
             FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
                           FORMAT_MESSAGE_IGNORE_INSERTS, NULL, myRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                           (LPTSTR) & myMessageBuffer, 0, NULL);
-            string myErrorString(getDeviceName() + ": ");
+            string myErrorString = string("'")+getDeviceName() + "': ";
             myErrorString.append((LPTSTR) myMessageBuffer);
             LocalFree(myMessageBuffer);
             SetLastError(0);
