@@ -234,7 +234,7 @@ namespace y60 {
 
                     CGtype myArrayType = cgGetArrayType(myParam);
                     CGparameter myArray
-                        = cgCreateParameterArray(_myContext, myArrayType, myArraySize);
+                        = cgCreateParameterArray(_myContext, myArrayType, myArraySize ? myArraySize : 1);
                     assertCg(PLUS_FILE_LINE, _myContext);
 
                     for(int i = 0; i <  myArraySize; ++i) {
