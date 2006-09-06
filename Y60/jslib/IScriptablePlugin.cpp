@@ -18,12 +18,15 @@ namespace jslib {
     IScriptablePlugin::Functions() { 
         return 0;
     }
-
+    JSFunctionSpec * 
+    IScriptablePlugin::StaticFunctions() { 
+        return 0;
+    }
 
     void
     IScriptablePlugin::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
 	    JSScriptablePlugin::initClass(theContext, theGlobalObject, ClassName(),
-                Functions());
+                Functions(), StaticFunctions());
     }
 }
 

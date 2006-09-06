@@ -35,7 +35,7 @@ namespace jslib {
 
             static JSBool Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
             static void initClass(JSContext *cx, JSObject *theGlobalObject, const char * theClassName,
-                    JSFunctionSpec * theFunctions = 0);
+                    JSFunctionSpec * theFunctions = 0, JSFunctionSpec * theStaticFunctions = 0);
 
             static IScriptablePluginPtr & getNative(JSContext *cx, JSObject *obj);
             static JSObject * Construct(JSContext *cx, IScriptablePluginPtr theNative);
@@ -46,7 +46,7 @@ namespace jslib {
             static JSBool setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp);
             static bool isFunction( JSContext * cx, JSObject * obj, const std::string & theProperty );
 
-            static std::vector<JSFunctionSpec> mergeFunctions( JSFunctionSpec * theFunctions);
+            static std::vector<JSFunctionSpec> mergeFunctions( JSFunctionSpec * theFunctions, JSFunctionSpec * theOtherFunctions);
 
             static JSClass * Class(const char * theClassName);
 

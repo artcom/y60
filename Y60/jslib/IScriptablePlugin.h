@@ -27,6 +27,8 @@ namespace jslib {
         virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject);
 
 
+        virtual JSFunctionSpec * StaticFunctions();
+
         virtual JSFunctionSpec * Functions();
 
         /**

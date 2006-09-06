@@ -276,17 +276,15 @@ namespace jslib {
 
 
    std::vector<JSFunctionSpec>
-   JSScriptablePlugin::mergeFunctions( JSFunctionSpec * theFunctions) {
+   JSScriptablePlugin::mergeFunctions( JSFunctionSpec * theFunctions, JSFunctionSpec * theOtherFunctions) {
         std::vector<JSFunctionSpec> myResult;
-        JSFunctionSpec * myFunctions = Functions();
-        while ( myFunctions && myFunctions->name ) {
-            myResult.push_back( * myFunctions );
-            myFunctions++;
+        while ( theOtherFunctions && theOtherFunctions->name ) {
+            myResult.push_back( * theOtherFunctions );
+            theOtherFunctions++;
         }
-        myFunctions = theFunctions;
-        while (myFunctions && myFunctions->name) {
-            myResult.push_back( * myFunctions );
-            myFunctions++;
+        while (theFunctions && theFunctions->name) {
+            myResult.push_back( * theFunctions );
+            theFunctions++;
         }
         JSFunctionSpec myLastFunction;
         myLastFunction.name = 0;
@@ -296,13 +294,15 @@ namespace jslib {
 
     void
     JSScriptablePlugin::initClass(JSContext *cx, JSObject * theGlobalObject, const char * theClassName,
-            JSFunctionSpec * theFunctions)
+            JSFunctionSpec * theFunctions, JSFunctionSpec * theStaticFunctions)
     {
         AC_DEBUG << "JSScriptablePlugin::initClass for class " << theClassName;
 
-        std::vector<JSFunctionSpec> myFunctions = mergeFunctions( theFunctions );
+        std::vector<JSFunctionSpec> myFunctions = mergeFunctions( theFunctions, Functions());
+        std::vector<JSFunctionSpec> myStaticFunctions = mergeFunctions( theStaticFunctions, StaticFunctions());
         JSObject * myClassObject = JS_InitClass(cx, theGlobalObject, NULL, Class(theClassName),
-                Constructor, 0, Properties(), & ( * myFunctions.begin()), 0, 0);
+                Constructor, 0, Properties(), & ( * myFunctions.begin()), 0,
+                & ( * myStaticFunctions.begin()));
 
         //document the plugin mechanism and not the plugin named theClassName itself...
         createClassModuleDocumentation("Global", "JSScriptablePlugin", Properties(),
