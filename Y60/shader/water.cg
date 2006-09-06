@@ -50,9 +50,9 @@ vert2frag main(
             uniform float4   WaterPlane,            // .xyz=normal, w=offset to origin
 #ifndef CONST
 #ifdef DIRECTIONAL_LIGHT
-            uniform float3 AC_DIRECTIONAL_LIGHTS[1],         // Light Direction
+            uniform float3 AC_DIRECTIONAL_LIGHTS[],         // Light Direction
 #else
-            uniform float3 AC_POSITIONAL_LIGHTS[1],         // Light Position
+            uniform float3 AC_POSITIONAL_LIGHTS[],         // Light Position
 #endif
 #endif
             uniform float4   Wave1Params,

@@ -12,9 +12,9 @@ vert2frag mainVertex(float4 position : POSITION,
                      float2 texcoord0 : TEXCOORD0,
 
 #ifdef DIRECTIONAL_LIGHT
-                  uniform float4 AC_DIRECTIONAL_LIGHTS[1],         // Light Direction
+                  uniform float4 AC_DIRECTIONAL_LIGHTS[],         // Light Direction
 #else
-                  uniform float4 AC_POSITIONAL_LIGHTS[1],         // Light Position
+                  uniform float4 AC_POSITIONAL_LIGHTS[],         // Light Position
 #endif
                      uniform float4x4 GL_MODELVIEW_PROJECTION,
                      uniform float4x4 GL_MODELVIEW,

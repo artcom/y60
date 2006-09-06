@@ -37,15 +37,21 @@ struct vert2frag {
 
 vert2frag mainVertex(app2vert IN,
                      uniform float4x4 GL_MODELVIEW_PROJECTION,
-                     uniform float4x4 AC_TEXTURE_MATRICES[3]
+                     uniform float4x4 AC_TEXTURE_MATRICES[]
                      )
 {
     vert2frag OUT;
 
-    OUT.texCoord0 = mul(AC_TEXTURE_MATRICES[0], IN.texCoord0).xy;
-    OUT.texCoord1 = mul(AC_TEXTURE_MATRICES[1], IN.texCoord1).xy;
+    if (AC_TEXTURE_MATRICES.length >= 1) {
+        OUT.texCoord0 = mul(AC_TEXTURE_MATRICES[0], IN.texCoord0).xy;
+    }
+    if (AC_TEXTURE_MATRICES.length >= 2) {
+        OUT.texCoord1 = mul(AC_TEXTURE_MATRICES[1], IN.texCoord1).xy;
+    }
 #ifdef HAS_LIGHTMAP
-    OUT.texCoord2 = mul(AC_TEXTURE_MATRICES[2], IN.texCoord2).xy;
+    if (AC_TEXTURE_MATRICES.length >= 3) {
+        OUT.texCoord2 = mul(AC_TEXTURE_MATRICES[2], IN.texCoord2).xy;
+    }
 #endif
 
     // compute position
