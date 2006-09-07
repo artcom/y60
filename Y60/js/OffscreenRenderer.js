@@ -10,7 +10,7 @@
 
 use("Y60JSSL.js");
 
-function OffscreenRenderer(theSize, theCamera) {
+function OffscreenRenderer(theSize, theCamera, thePixelFormat) {
     const DUMP_IMAGE = false;
 
     function setup(theSize) {
@@ -28,7 +28,11 @@ function OffscreenRenderer(theSize, theCamera) {
             theSize = [window.width, window.height];
         }
 
-        self.image = window.scene.createImage(theSize[0], theSize[1], "rgba");
+        if (thePixelFormat == undefined) {
+            thePixelFormat = "rgba";
+        }
+        
+        self.image = window.scene.createImage(theSize[0], theSize[1], thePixelFormat);
         self.image.name = "Offscreen Buffer";
 
         // Flip vertically since framebuffer content is upside-down
