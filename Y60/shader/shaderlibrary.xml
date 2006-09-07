@@ -421,49 +421,24 @@
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[uv_map]"/>
         </supports>
+        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex">
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                 <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
         <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment">
             <properties>
                 <samplerCUBE name="envTex">0</samplerCUBE>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex">
-            <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-            </properties>
-            <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="normal"/>
-            </vertexparameters>
-        </vertexshader>
-    </shader>
-    <shader id="s15" name="chrometex" cost="10" >
-        <supports>
-            <feature class="textures" values="[paint,environment]"/>
-            <feature class="texcoord" values="[uv_map,uv_map]"/>
-            <feature class="lighting" values="[unlit]"/>
-        </supports>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
-            <properties>
-                <sampler2d name="decalTex">0</sampler2d>
-                <samplerCUBE name="envTex">1</samplerCUBE>
-                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-            </properties>
-        </fragmentshader>
-        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
-            <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-            </properties>
-            <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="normal"/>
-                 <vector2f name="texcoord0"/>
-            </vertexparameters>
-        </vertexshader>
     </shader>
     <shader id="s150" name="carpaint" cost="10" >
         <supports>
@@ -471,6 +446,19 @@
             <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
             <feature class="lighting" values="[unlit]"/>
         </supports>
+        <vertexshader profile="VP30" file="carpaint.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
         <fragmentshader profile="FP30" file="carpaint.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
@@ -479,18 +467,6 @@
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
-        <vertexshader profile="VP30" file="carpaint.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
-            <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-            </properties>
-            <vertexparameters>
-                 <vector4f name="position"/>
-                 <vector3f name="normal"/>
-                 <vector2f name="texcoord0"/>
-            </vertexparameters>
-        </vertexshader>
     </shader>
     <shader id="s16" name="glassdbltex" cost="10" >
         <supports>
@@ -498,20 +474,13 @@
             <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT=2, -DTEXGEN0={texcoord[0]}">
-            <properties>
-                <sampler2d name="decalTex">0</sampler2d>
-                <sampler2d name="emmisiveTex">1</sampler2d>
-                <samplerCUBE name="envTex">2</samplerCUBE>
-                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-            </properties>
-        </fragmentshader>
         <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT=2">
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
                  <vector4f name="position"/>
@@ -520,6 +489,14 @@
                  <vector2f name="texcoord1"/>
             </vertexparameters>
         </vertexshader>
+        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT=2, -DTEXGEN0={texcoord[0]}">
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+                <sampler2d name="emmisiveTex">1</sampler2d>
+                <samplerCUBE name="envTex">2</samplerCUBE>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+        </fragmentshader>
     </shader>
     <shader id="s17" name="skybox" cost="100">
         <supports>
@@ -674,18 +651,12 @@
             <feature class="texcoord" values="[uv_map,uv_map]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
-            <properties>
-                <sampler2d name="decalTex">0</sampler2d>
-                <samplerCUBE name="envTex">1</samplerCUBE>
-                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-            </properties>
-        </fragmentshader>
         <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
             <properties>
-                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
-                 <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
                  <vector4f name="position"/>
@@ -693,6 +664,13 @@
                  <vector2f name="texcoord0"/>
             </vertexparameters>
         </vertexshader>
+        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+                <samplerCUBE name="envTex">1</samplerCUBE>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+        </fragmentshader>
     </shader>
     <shader id="s25" name="litchrome" cost="10">
         <supports>
@@ -700,12 +678,6 @@
             <feature class="lighting" values="[lambert]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>
-        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" >
-            <properties>
-                <samplerCUBE name="envTex">0</samplerCUBE>
-                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
-            </properties>
-        </fragmentshader>
         <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" >
             <properties>
                  <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
@@ -713,12 +685,19 @@
                  <vector4f name="specular">[0,0,0,1]</vector4f>
                  <float name="shininess">32</float>
                  <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                 <float name="reflectivity">1</float>
             </properties>
             <vertexparameters>
                  <vector4f name="position"/>
                  <vector3f name="normal"/>
             </vertexparameters>
         </vertexshader>
+        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" >
+            <properties>
+                <samplerCUBE name="envTex">0</samplerCUBE>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+        </fragmentshader>
     </shader>
     <shader id="s26" name="generictex_lambert" cost="120">
         <supports>
@@ -1086,5 +1065,5 @@
             </properties>
         </fragmentshader>
     </shader>
-    
+
 </shaders>

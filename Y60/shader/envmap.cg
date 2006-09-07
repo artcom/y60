@@ -8,11 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#define FRESNEL // experimental
-
 #define FRESNEL_POWER  1.0
-#define FRESNEL_SCALE  1.0
-#define FRESNEL_BIAS   0.0
+#define FRESNEL_SCALE  0.8
+#define FRESNEL_BIAS   0.2
 
 #define LIGHTING
 
@@ -44,9 +42,7 @@ struct vert2frag {
     float3 refractVector : TEXCOORD5;
     float4 lighting      : TEXCOORD6;
     float4 primaryColor    : COLOR0;
-#ifdef FRESNEL
     float reflectionFactor : COLOR1;
-#endif
 };
 
 vert2frag mainVertex(app2vert IN,
@@ -54,7 +50,8 @@ vert2frag mainVertex(app2vert IN,
         uniform float4x4 AC_OBJECTWORLD_IT,
         uniform float4x4 AC_OBJECTWORLD,
         uniform float3 AC_CAMERA_POSITION,
-        uniform float4 diffuse
+        uniform float4 diffuse,
+        uniform float reflectivity
         )
 {
     vert2frag OUT;
@@ -70,15 +67,13 @@ vert2frag mainVertex(app2vert IN,
 
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
+    OUT.reflectionFactor = (FRESNEL_BIAS + FRESNEL_SCALE *
+        pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER)) * reflectivity;
 
 #ifdef PAINT
     OUT.texCoord0 = IN.texCoord0;
 #if PAINT==2
     OUT.texCoord1 = IN.texCoord1;
-#ifdef FRESNEL
-    OUT.reflectionFactor = FRESNEL_BIAS + FRESNEL_SCALE *
-        pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER);
-#endif // FRESNEL
 #endif
 #endif // PAINT
 
@@ -111,16 +106,12 @@ float4 mainFragment(vert2frag   IN,
         uniform float shininess
         ) : COLOR
 {
-    float4 myEnvTexel = texCUBE(envTex, IN.reflectVector);
+    float3 myEnvTexel = texCUBE(envTex, IN.reflectVector).rgb * IN.reflectionFactor;;
 #ifdef PAINT
     float4 myDecalTexel = tex2D(decalTex, IN.texCoord0);
 #if PAINT==2
     float4 myEmissiveTexel = tex2D(emissiveTex, IN.texCoord1);
-#ifdef FRESNEL
-    myEnvTexel.rgb = lerp(myEmissiveTexel.rgb, myEnvTexel.rgb, (1-myEmissiveTexel.a)*IN.reflectionFactor);
-#else
-    myEnvTexel.rgb = lerp(myEnvTexel.rgb, myEmissiveTexel.rgb, myEmissiveTexel.a);
-#endif // FRESNEL
+    myEnvTexel.rgb = lerp(myEmissiveTexel.rgb, myEnvTexel, (1-myEmissiveTexel.a));
 #endif
 #else
     float4 myDecalTexel = IN.primaryColor;
@@ -134,8 +125,7 @@ float4 mainFragment(vert2frag   IN,
     float3 N = normalize(IN.worldNormal);
     float3 V = normalize(AC_CAMERA_POSITION - P);
 
-    for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
-
+    for (int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
         float3 L = normalize(AC_DIRECTIONAL_LIGHTS[i]);
 
         // diffuse term
@@ -159,7 +149,7 @@ float4 mainFragment(vert2frag   IN,
         }
     }
 
-    for(int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
+    for (int i = 0; i < AC_POSITIONAL_LIGHTS.length ; ++i) {
 
         float3 L = normalize(AC_POSITIONAL_LIGHTS[i] - P);
 
@@ -184,25 +174,47 @@ float4 mainFragment(vert2frag   IN,
         }
     }
 
-    myDiffuseColor *= diffuse * myDecalTexel;
     mySpecColor *= specular;
+    float4 myBaseColor = ambient + myDiffuseColor * diffuse * myDecalTexel;
 
-    float4 myBaseColor = ambient + myDiffuseColor;
 #else
     float4 myBaseColor = myDecalTexel;
 #endif // LIGHTING
 
-    //myBaseColor = float4(abs(N), 1); // visualize normals
-#ifdef PAINT_XXX
-    // visualize texcoord
-    myBaseColor.r = IN.texCoord0.x;
-    myBaseColor.g = IN.texCoord0.y;
-#endif
-
     // blend with environment intensity
-    float myEnvIntensity = (myEnvTexel.r + myEnvTexel.g + myEnvTexel.b) / 3.0;
-    float4 myBlendedColor = lerp(myBaseColor, myEnvTexel, myEnvIntensity);
-    float4 myColor = float4(lerp(myBaseColor, myBlendedColor, myEnvTexel.a).rgb, myDecalTexel.a) + mySpecColor;
+    //float myEnvIntensity = (myEnvTexel.r + myEnvTexel.g + myEnvTexel.b) / 3.0;
+    //float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvTexel, myEnvIntensity);
 
-    return myColor;
+    return float4((myBaseColor.rgb + myEnvTexel) + mySpecColor.rgb, diffuse.a);
+
+    // Old code
+    //float4 myColor = float4(lerp(myBaseColor, myBlendedColor, myEnvTexel.a).rgb, myDecalTexel.a) + mySpecColor;
+
+    //return float4(myBlendedColor + mySpecColor.rgb, myBaseColor.a);
+
+    // *************** Some debug options *********************
+
+    // Base color
+    //return myBaseColor;
+
+    // Base + Specular color
+    //return myBaseColor + mySpecColor;
+
+    // Enviroment map mit fresneleffect
+    //return float4(myEnvTexel, 1);
+
+    // Base plus environment
+    //return float4((myBaseColor.rgb + myEnvTexel), myDecalTexel.a);
+
+    // Blended color
+    //return float4(myBlendedColor, 1);
+
+    // Enviroment map
+    //return texCUBE(envTex, IN.reflectVector);
+
+    // Environment Intensität
+    //return float4(myEnvIntensity, myEnvIntensity, myEnvIntensity, 1);
+
+    //  Fresneleffect und Reflectivity
+    //return float4(IN.reflectionFactor, IN.reflectionFactor,IN.reflectionFactor,1);
 }

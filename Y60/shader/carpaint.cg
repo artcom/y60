@@ -9,7 +9,7 @@
 //=============================================================================
 
 #define FRESNEL_POWER  1.0
-#define FRESNEL_SCALE  0.5
+#define FRESNEL_SCALE  0.8
 #define FRESNEL_BIAS   0.2
 
 #define LIGHTING
@@ -40,7 +40,8 @@ vert2frag mainVertex(app2vert IN,
         uniform float4x4 AC_OBJECTWORLD_IT,
         uniform float4x4 AC_OBJECTWORLD,
         uniform float3 AC_CAMERA_POSITION,
-        uniform float4 diffuse
+        uniform float4 diffuse,
+        uniform float reflectivity
         )
 {
    vert2frag OUT;
@@ -57,10 +58,10 @@ vert2frag mainVertex(app2vert IN,
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
 
-    OUT.texCoord0 = IN.texCoord0;
+    OUT.texCoord0    = IN.texCoord0;
     OUT.primaryColor = diffuse;
-    OUT.reflectionFactor = FRESNEL_BIAS + FRESNEL_SCALE *
-        pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER);
+    OUT.reflectionFactor = (FRESNEL_BIAS + FRESNEL_SCALE *
+        pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER)) * reflectivity;
 
     return OUT;
 }
@@ -85,12 +86,12 @@ float4 mainFragment(vert2frag   IN,
         uniform float shininess
         ) : COLOR
 {
-    float4 myEnvTexel      = texCUBE(envTex, IN.reflectVector);
-    float4 myEmissiveTexel = texCUBE(emmissiveEnvTex, IN.reflectVector);
-    float4 myOcclusionTexel   = tex2D(decalTex, IN.texCoord0);
+    float4 myEnvTexel       = texCUBE(envTex, IN.reflectVector);
+    float4 myEmissiveTexel  = texCUBE(emmissiveEnvTex, IN.reflectVector);
+    float4 myOcclusionTexel = tex2D(decalTex, IN.texCoord0);
 
-    float4 myDiffuseColor = float4(0,0,0,0);
-    float4 mySpecColor = float4(0,0,0,0);
+    float4 myDiffuseColor   = float4(0,0,0,0);
+    float4 mySpecColor      = float4(0,0,0,0);
 
 #ifdef LIGHTING
     float3 P = IN.worldPosition;
@@ -139,19 +140,23 @@ float4 mainFragment(vert2frag   IN,
 #endif
 #endif
 
+    float4 myBaseColor = ambient + myDiffuseColor * diffuse + mySpecColor * specular;
+    float3 myEnvColor  = (myEnvTexel.rgb + myEmissiveTexel.rgb) * IN.reflectionFactor;
+
+    return float4((myBaseColor.rgb + myEnvColor) * myOcclusionTexel.r, myBaseColor.a);
+
+    //float  myEnvIntensity = (myEnvColor.r + myEnvColor.g + myEnvColor.b) / 3.0;
+    //float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvColor, myEnvIntensity);
+
+    //return float4(myBlendedColor * myOcclusionTexel.r, 1);
+
+    // *************** Some debug options *********************
+
 	// Lighting
 	//return float4(myDiffuseColor.rgb, 1);
 
-
-    float4 myBaseColor = ambient + myDiffuseColor * diffuse + mySpecColor * specular;
-    float3 myEnvColor  = myEnvTexel.rgb * IN.reflectionFactor + myEmissiveTexel.rgb;
-
-    float  myEnvIntensity = (myEnvColor.r + myEnvColor.g + myEnvColor.b) / 3.0;
-    float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvColor, myEnvIntensity);
-
-    return float4(myBlendedColor * myOcclusionTexel.r, 1);
-
-    // *************** Some debug options *********************
+    // Fresnel Effect
+    //return float4(IN.reflectionFactor, IN.reflectionFactor,IN.reflectionFactor,1);
 
 	// Lackfarbe plus occlusion
 	//return float4((diffuse * myOcclusionTexel).rgb, 1);
