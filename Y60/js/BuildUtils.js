@@ -157,7 +157,7 @@ function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
 
     myTexCoordReqString += "]]";
     myMaterialNode.requires.texcoord = myTexCoordReqString;
-
+    myMaterialNode.properties.surfacecolor = new Vector4f(1,1,1,1);
     return myMaterialNode;
 
 }
