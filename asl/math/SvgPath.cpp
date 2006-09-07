@@ -37,6 +37,18 @@ namespace asl {
         _mySegmentLength = theSegmentLength;
     }
 
+    SvgPath::SvgPath(const std::string & thePathDefinition, const asl::Matrix4f & theMatrix,
+                    float theSegmentLength)
+    {
+        AC_DEBUG << "SvgPath::SvgPath d='" << thePathDefinition << "' len=" << theSegmentLength;
+        setup();
+        _myMatrix = theMatrix;
+        if ( ! thePathDefinition.empty()) {
+            parsePathDefinition(thePathDefinition);
+        }
+        _mySegmentLength = theSegmentLength;
+    }
+
     SvgPath::SvgPath(const SvgPath & thePath) {
         AC_DEBUG << "SvgPath::SvgPath";
         assign(thePath);
@@ -346,6 +358,7 @@ namespace asl {
      **********************************************************************/
 
     void SvgPath::setup() {
+        _myMatrix.makeIdentity();
         _myLength = 0.0f;
         _myOrigin = Vector3f(0.0f, 0.0f, 0.0f);
         _myPreviousCommand.token = NONE;
@@ -434,11 +447,21 @@ namespace asl {
         return isPrefix(theChar) || isWhiteSpace(theChar) || isCommand(theChar);
     }
 
+    void
+    SvgPath::transformPathElements() {
+        if (_myMatrix.getType() != Matrix4f::IDENTITY) {
+            for (unsigned i = 0; i < _myElements.size(); ++i) {
+                (*_myElements[i]) = product(  (*_myElements[i]), _myMatrix );
+            }
+        }
+    }
+
     void SvgPath::parsePathDefinition(const std::string & thePathDefinition) {
 
         std::vector<std::string> myParts;
         splitPathDefinition(myParts, thePathDefinition);
         renderPathParts(myParts);
+        transformPathElements();
     }
 
     void SvgPath::splitPathDefinition(std::vector<std::string> & theParts,
@@ -662,13 +685,15 @@ namespace asl {
     
     asl::Vector3f
     SvgPath::resolveRelative( const asl::Vector3f & thePos, bool theFlag) const {
+        asl::Vector3f myResult = thePos;
         if (theFlag) {
             if (_myPreviousCommand.token == MOVE_TO || _myBezierSegments.empty()) {
-                return sum( _myOrigin, thePos);
+                myResult = sum( _myOrigin, thePos);
+            } else {
+                myResult = sum( _myBezierSegments.back()->getEnd(), thePos);
             }
-            return sum( _myBezierSegments.back()->getEnd(), thePos);
         }
-        return thePos;
+        return myResult;
     }
 
     Vector3f 

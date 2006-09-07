@@ -15,6 +15,7 @@
 #include "BSpline.h"
 #include "Line.h"
 #include "Sphere.h"
+#include "Matrix4.h"
 
 #include <asl/Ptr.h>
 #include <vector>
@@ -58,6 +59,8 @@ namespace asl {
         /// Constructor.
         SvgPath();
         SvgPath(const std::string & thePathDefinition, float theSegmentLength = 16.0f);
+        SvgPath(const std::string & thePathDefinition, const asl::Matrix4f & theMatrix,
+                float theSegmentLength = 16.0f);
         SvgPath(const SvgPath & thePath);
 
         /// Destructor.
@@ -234,6 +237,7 @@ namespace asl {
         unsigned _myNumSegments;
         static SvgPathCommand _ourPathCommands[];
         SvgPathCommand _myPreviousCommand;
+        asl::Matrix4f _myMatrix;
 
         void setup();
         void assign(const SvgPath & thePath);
@@ -250,6 +254,7 @@ namespace asl {
         void renderPathCommand(const SvgPathCommand * theCommand,
                                const std::vector<float> & theArgs,
                                bool theRelativeFlag);
+        void transformPathElements();
 
         // What's that? Should this be public? [DS, RS]
         /**
