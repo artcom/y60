@@ -429,23 +429,23 @@ MaterialExporter::exportEnvCubeTexture(const MObject & theShaderNode,
 
     std::string myApplyMode = y60::TEXTURE_APPLY_MODULATE;
 
-    float myReflectivity = MFnPhongShader(theShaderNode).reflectivity(& myStatus);
-    asl::Vector4f myColorScale = asl::Vector4f(1, 1, 1, myReflectivity);
-
-    MColor mySpecularColor = MFnReflectShader(theShaderNode).specularColor(& myStatus);
-
     theBuilder.appendCubemap(theSceneBuilder,
             MFnDependencyNode(theEnvCubeNode).name().asChar(),
             frontFileName, rightFileName, backFileName,
             leftFileName, topFileName, bottomFileName,
-            myApplyMode, myColorScale);
+            myApplyMode, asl::Vector4f(1,1,1,1));
 
     //NOTE: specular colors are added to the diffuse colors.
     //      no alpha value support for specular colors therefore means
     //      setting the specular alpha to zero.
+    MColor mySpecularColor = MFnReflectShader(theShaderNode).specularColor(& myStatus);
     asl::Vector4f myY60SpecColor(mySpecularColor.r, mySpecularColor.g, mySpecularColor.b, 0); //mySpecularColor.a
     setPropertyValue<asl::Vector4f>(theBuilder.getNode(),
                     "vector4f", y60::SPECULAR_PROPERTY, myY60SpecColor);
+
+    float myReflectivity = MFnPhongShader(theShaderNode).reflectivity(& myStatus);
+    setPropertyValue<float>(theBuilder.getNode(), "float", "reflectivity", myReflectivity);
+
 /*
     float myShininess = MFnPhongShader(theShaderNode).cosPower(& myStatus);
     // Convert to 0 - 128 range of OpenGL
@@ -582,7 +582,7 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
             case MFn::kFileTexture:
                 exportFileTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
                                   ourDefaultBlendMode, theColorGainAlpha);
-                y60::setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", 
+                y60::setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f",
                         theColorGainPropertyName, asl::Vector4f(1,1,1,1));
                 break;
             case MFn::kBump:
