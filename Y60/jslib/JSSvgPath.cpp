@@ -10,6 +10,7 @@
 
 #include "JSSvgPath.h"
 #include "JSVector.h"
+#include "JSMatrix.h"
 #include "JSLine.h"
 #include "JSSphere.h"
 #include "JSBSpline.h"
@@ -745,13 +746,37 @@ namespace jslib {
             }
         }
 
-        if (argc > 1) {
+        if (argc > 2) {
+            asl::Matrix4f myMatrix;
+            if ( ! convertFrom(cx, argv[1], myMatrix)) {
+                JS_ReportError(cx, "JSSvgPath: argument #3 must be a matrix");
+                return JS_FALSE;
+            }
             float mySegmentLength;
-            if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], mySegmentLength)) {
+            if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[1], mySegmentLength)) {
                 JS_ReportError(cx, "JSSvgPath: argument #2 must be a float");
                 return JS_FALSE;
             }
-            mySvgPath = OWNERPTR(new asl::SvgPath(myPathDefinition, mySegmentLength));
+            mySvgPath = OWNERPTR(new asl::SvgPath(myPathDefinition, myMatrix, mySegmentLength));
+        } else if (argc > 1) {
+            asl::Matrix4f myMatrix;
+            bool isMatrix = false;
+            if ( convertFrom(cx, argv[1], myMatrix)) {
+                isMatrix = true;
+            }
+
+            float mySegmentLength;
+            if ( ! isMatrix ) {
+                if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], mySegmentLength)) {
+                    JS_ReportError(cx, "JSSvgPath: argument #2 must be a float or a matrix");
+                    return JS_FALSE;
+                }
+            }
+            if (isMatrix) {
+                mySvgPath = OWNERPTR(new asl::SvgPath(myPathDefinition, myMatrix));
+            } else {
+                mySvgPath = OWNERPTR(new asl::SvgPath(myPathDefinition, mySegmentLength));
+            }
         } else {
             mySvgPath = OWNERPTR(new asl::SvgPath(myPathDefinition));
         }
