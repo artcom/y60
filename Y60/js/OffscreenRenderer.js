@@ -13,6 +13,14 @@ use("Y60JSSL.js");
 function OffscreenRenderer(theSize, theCamera, thePixelFormat) {
     const DUMP_IMAGE = false;
 
+    this.overlays getter = function() {
+        return _myCanvas.firstChild.childNode("overlays"); 
+    }
+
+    this.underlays getter = function() {
+        return _myCanvas.firstChild.childNode("underlays"); 
+    }
+    
     function setup(theSize) {
         //add our own camera
         if (theCamera == undefined) {
