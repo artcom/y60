@@ -88,6 +88,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat) {
         _myHiddenNodes.push(theNode);
     }
 
+    this.setCamera = function(theCamera) {
+        self.camera = theCamera;
+        _myCanvas.firstChild.camera = self.camera.id;
+    }
+
     this.render = function() {
         var myVisibleNodes = [];
         for (var i = 0; i < window.scene.world.childNodesLength(); ++i) {
