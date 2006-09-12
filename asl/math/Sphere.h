@@ -59,6 +59,10 @@ namespace asl {
         const Point3<Number> & getCenter() const {
             return center;
         }
+        // Returns the radius of a sphere
+        Number getRadius() const {
+            return radius;
+        }
 
         // Extends Sphere if necessary to contain given 3D point
         void extendBy(const Point3<Number> & pt) {
