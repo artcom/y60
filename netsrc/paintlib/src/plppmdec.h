@@ -78,7 +78,7 @@ private:
     );
 
 
-  PLPixel32 PLPPMDecoder::readASCIIPixel32
+  PLPixel32 readASCIIPixel32
     ( int MaxGrayValue,
       PLDataSource * pDataSrc
     );

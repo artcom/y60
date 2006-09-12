@@ -72,7 +72,7 @@ private:
       PLDataSource * pDataSrc
     );
 
-  PLBYTE PLPGMDecoder::readASCIIPixel8
+  PLBYTE readASCIIPixel8
     ( int MaxGrayValue,
       PLDataSource * pDataSrc
     );
