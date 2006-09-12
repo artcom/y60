@@ -94,6 +94,17 @@ function findIntersectionsByBox(theRootNode, myBox) {
     return myResult;
 }
 
+function findIntersectionsByBoxCenter(theRootNode, myBox) {
+    var myIntersectionInfo = Scene.intersectBodyCenters(theRootNode, myBox);
+    var myResult= [];
+    if (myIntersectionInfo && myIntersectionInfo.length >0) {
+        for (var i = 0; i < myIntersectionInfo.length; ++i) {
+            myResult.push(myIntersectionInfo[i].body);
+        }        
+    }
+    return myResult;
+}
+
 // this function will dispatch according to the type of myLineSegment.
 // it may be a LineSegment or a Ray
 function nearestIntersection(theRootNode, myLineSegment) {

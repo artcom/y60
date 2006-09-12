@@ -54,6 +54,12 @@ namespace y60 {
     DEFINE_EXCEPTION(SomError, asl::Exception);
 
     struct BodyInfo {
+        BodyInfo() {};
+        BodyInfo( dom::NodePtr theBody, y60::ShapePtr theShape, const asl::Matrix4f & theTransformation,
+                const asl::Matrix4f & theInverseTransformation ) :
+                _myBody( theBody ), _myShape( theShape ), _myTransformation( theTransformation ),
+                _myInverseTransformation( theInverseTransformation )
+        {}
         dom::NodePtr _myBody;
         y60::ShapePtr _myShape;
         asl::Matrix4f _myTransformation;
@@ -61,6 +67,14 @@ namespace y60 {
     };
 
     struct IntersectionInfo : public BodyInfo {
+        IntersectionInfo() : BodyInfo() {};
+        IntersectionInfo( dom::NodePtr theBody, y60::ShapePtr theShape,
+                const asl::Matrix4f & theTransformation,
+                const asl::Matrix4f & theInverseTransformation,
+                asl::Ptr<Primitive::IntersectionList> thePrimitiveIntersections ) :
+                BodyInfo( theBody, theShape, theTransformation, theInverseTransformation ),
+                _myPrimitiveIntersections( thePrimitiveIntersections )
+        {}
         asl::Ptr<Primitive::IntersectionList> _myPrimitiveIntersections;
     };
 
@@ -268,6 +282,9 @@ namespace y60 {
                                   const asl::Vector3<float> & theMotion,
                                   CollisionInfo & theCollision);
 
+            static bool intersectBodyCenters(dom::NodePtr theRootNode,
+                                 const asl::Box3<float> & theBox,
+                                 IntersectionInfoVector & theIntersections);
             static bool intersectBodies(dom::NodePtr theRootNode,
                                  const asl::Box3<float> & theBox,
                                  IntersectionInfoVector & theIntersections);

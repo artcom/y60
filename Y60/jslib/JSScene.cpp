@@ -133,7 +133,7 @@ loadCaptureFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *r
 
 static JSBool
 intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Returns the intersections of a body with a given line, line segment or ray.");
+    DOC_BEGIN("Returns the intersections of a body with a given line, line segment, ray or box.");
     DOC_PARAM("theBody", "", DOC_TYPE_NODE);
     DOC_PARAM("theLine", "", DOC_TYPE_LINE);
     DOC_RESET;
@@ -173,6 +173,25 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             JS_ReportError(cx,"JSScene::intersectBodies: bad argument type #1");
             return JS_FALSE;
         }
+        *rval = as_jsval(cx, myIntersections);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+intersectBodyCenters(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+    try {
+        ensureParamCount(argc, 2);
+        dom::NodePtr myBodies;
+        y60::IntersectionInfoVector myIntersections;
+        convertFrom(cx, argv[0], myBodies);
+
+        asl::Box3<float> myBox;
+        convertFrom(cx, argv[1], myBox);
+        y60::Scene::intersectBodyCenters(myBodies, myBox, myIntersections);
+
         *rval = as_jsval(cx, myIntersections);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -567,6 +586,7 @@ JSScene::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
         // name                    native          nargs
         {"intersectBodies",        intersectBodies,        2},
+        {"intersectBodyCenters",   intersectBodyCenters,   2},
         {"collideWithBodies",      collideWithBodies,      3},
         {"collideWithBodiesOnce",  collideWithBodiesOnce,  3},
         {0}

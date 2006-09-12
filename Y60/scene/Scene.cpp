@@ -825,7 +825,7 @@ namespace y60 {
             _myStick(theStick), _myList(theList) {
         }
 
-        bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible) {
+        virtual bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible, bool isLeafNode) {
             return (!isInsensible && asl::intersection(_myStick, myBoundingBox));
         }
 
@@ -839,17 +839,13 @@ namespace y60 {
             // try shape
             if (theShape->intersect(myShapeSpaceStick, *myPrimitiveIntersections)) {
                 // store intersection information
-                _myList.push_back(y60::IntersectionInfo());
-                y60::IntersectionInfo & myIntersection = _myList.back();
-                myIntersection._myBody = theNode;
-                myIntersection._myShape = theShape;
-                myIntersection._myTransformation = theTransformation;
-                myIntersection._myInverseTransformation = myInverseTransformation;
-                myIntersection._myPrimitiveIntersections = myPrimitiveIntersections;
+                _myList.push_back(y60::IntersectionInfo( theNode, theShape, theTransformation,
+                        myInverseTransformation, myPrimitiveIntersections));
                 return true;
             }
             return false;
         }
+
     };
 
     // By now we only check intersection on bb level (VS)
@@ -863,7 +859,7 @@ namespace y60 {
             _myBox(theBox), _myList(theList) {
         }
 
-        bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible) {
+        virtual bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible, bool isLeafNode) {
             return (!isInsensible && _myBox.intersects(myBoundingBox));
         }
 
@@ -872,17 +868,30 @@ namespace y60 {
             asl::Matrix4f myInverseTransformation = asl::inverse(theTransformation);
             asl::Ptr<Primitive::IntersectionList> myPrimitiveIntersections =
                 asl::Ptr<Primitive::IntersectionList>(new Primitive::IntersectionList);
-            _myList.push_back(y60::IntersectionInfo());
-            y60::IntersectionInfo & myIntersection = _myList.back();
-            myIntersection._myBody = theNode;
-            myIntersection._myShape = theShape;
-            myIntersection._myTransformation = theTransformation;
-            myIntersection._myInverseTransformation = myInverseTransformation;
-            myIntersection._myPrimitiveIntersections = myPrimitiveIntersections;
+
+
+            _myList.push_back(y60::IntersectionInfo( theNode, theShape, theTransformation,
+                        myInverseTransformation, myPrimitiveIntersections));
+
             return true;
         }
     };
 
+    struct IntersectBoundingBoxCenterVisitor : public IntersectBodyVisitor< asl::Box3<float> > {
+        IntersectBoundingBoxCenterVisitor(const asl::Box3<float> & theBox, IntersectionInfoVector & theList) :
+            IntersectBodyVisitor<asl::Box3<float> >( theBox, theList )
+        { }
+
+        virtual bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible, bool isLeafNode) {
+            //return (!isInsensible && _myBox.contains( myBoundingBox.getCenter()));
+            if ( isLeafNode ) {
+                bool myContainsFlag = _myBox.contains( myBoundingBox.getCenter());
+                return (!isInsensible && myContainsFlag);
+            } else {
+                return (!isInsensible && _myBox.intersects(myBoundingBox));
+            }
+        }
+    };
 
     bool
     Scene::intersectWorld(const LineSegment<float> & theStick,
@@ -909,6 +918,14 @@ namespace y60 {
         return visitBodys(myVisitor, getWorldRoot() );
     }
 
+    bool
+    Scene::intersectBodyCenters(dom::NodePtr theRootNode, const asl::Box3<float> & theBox,
+                          IntersectionInfoVector & theIntersections)
+    {
+        MAKE_SCOPE_TIMER(Scene_intersect_Box3f_center);
+        IntersectBoundingBoxCenterVisitor myVisitor(theBox, theIntersections);
+        return visitBodys(myVisitor, theRootNode);
+    }
     bool
     Scene::intersectBodies(dom::NodePtr theRootNode, const asl::Box3<float> & theBox,
                           IntersectionInfoVector & theIntersections)
@@ -951,7 +968,8 @@ namespace y60 {
         TransformHierarchyFacadePtr myTransform = theNode->Node::getFacade<y60::TransformHierarchyFacade>();
         bool isInsensible = myTransform->TransformHierarchyFacade::get<y60::InsensibleTag>();
         Box3f myBoundingBox = myTransform->TransformHierarchyFacade::get<BoundingBoxTag>();
-        if (theVisitor.hitBoundingBox(myBoundingBox, isInsensible)) {
+        bool isLeafNode = theNode->childNodesLength() == 0;
+        if (theVisitor.hitBoundingBox(myBoundingBox, isInsensible, isLeafNode) ) {
             //AC_WARNING << "hit BB " << myTransform->get<NameTag>();
             // check bounding box hierarchy first
             if (theNode->nodeName() == BODY_NODE_NAME) {
@@ -990,7 +1008,7 @@ namespace y60 {
             _mySphere(theSphere), _myMotion(theMotion), _myList(theList) {
         }
 
-        bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible) {
+        bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible, bool isLeafNode) {
             if (isInsensible) {
                 return false;
             }
@@ -1039,7 +1057,7 @@ namespace y60 {
             _mySphere(theSphere), _myMotion(theMotion), _myCollision(theCollision) {
         }
 
-        bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible) {
+        bool hitBoundingBox(const asl::Box3f & myBoundingBox, bool isInsensible, bool isLeafNode) {
             // TODO: Capsule / Box intersection.
             // we approximate the capsule with a box for now
             Point3f myEndCenter = _mySphere.center+_myMotion;
