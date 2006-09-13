@@ -103,7 +103,7 @@ public:
     void createPalette () const;
     void applyAttenuationMap (const PLRect& srcRect, const PLPoint& resultSize, 
         PLBmp & resultBmp) ;
-    void TerrainTexGen::dumpRect (const std::string& myName, const PLRect& myRect);
+    void dumpRect (const std::string& myName, const PLRect& myRect);
 
     const TextureDefinitionMap& _myTextureDefinitionMap;
     TextureDefinition * _myMissingTexDef;  // Red error texture.
