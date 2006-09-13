@@ -23,6 +23,8 @@
 #define _asl_fixedVector_h_
 
 #include "VectorManipulator.h"
+#include "numeric_functions.h"
+
 #include <iostream>
 
 #include <cmath> // TODO: replace abs with apropriate C++ function
