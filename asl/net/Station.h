@@ -103,8 +103,8 @@ public:
     static unsigned short defaultBroadcastPort();
     static unsigned long defaultIgnoreAddress();
     static unsigned long defaultNetworkID();
-    static unsigned long Station::defaultOwnIPAddress();
-    static unsigned long Station::defaultStationID();
+    static unsigned long defaultOwnIPAddress();
+    static unsigned long defaultStationID();
 
     union Descriptor {
         unsigned long long _together;
