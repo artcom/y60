@@ -180,7 +180,7 @@ intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
 
 static JSBool
 intersectBodyCenters(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
+    DOC_BEGIN("Returns all bodies where the center of the bounding box is inside the given box");
     DOC_END;
     try {
         ensureParamCount(argc, 2);
