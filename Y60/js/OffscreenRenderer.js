@@ -25,6 +25,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat) {
         //add our own camera
         if (theCamera == undefined) {
             self.camera = window.camera.cloneNode(true);
+            self.camera.name = "OffscreenBuffer_Camera";
             adjustNodeIds(self.camera);
             self.camera = window.scene.world.appendChild(self.camera);
         } else {
