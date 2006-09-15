@@ -449,6 +449,36 @@ namespace jslib {
     }
 
     static JSBool
+    pointOnPathFast(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
+    {
+        DOC_BEGIN("Find point on path by percentage of path length.");
+        DOC_PARAM("thePercentage", "Percentage [0..1].", DOC_TYPE_FLOAT);
+        DOC_PARAM("theUpVector", "Up-vector.", DOC_TYPE_VECTOR3F);
+        DOC_RVAL("{point, element}", DOC_TYPE_OBJECT);
+        DOC_END;
+
+        ensureParamCount(argc, 1);
+
+        JSSvgPath::NATIVE * myNative = 0;
+        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+            JS_ReportError(cx, "JSSvgPath::pointOnPathFast: self is not a SvgPath");
+            return JS_FALSE;
+        }
+
+        float myPercentage;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myPercentage)) {
+            JS_ReportError(cx, "JSSvgPath::pointOnPathFast: argument #1 must be a float");
+            return JS_FALSE;
+        }
+
+        asl::Vector3f myPathPoint = myNative->pointOnPathFast(myPercentage);
+
+        *rval = as_jsval(cx, myPathPoint);
+
+        return JS_TRUE;
+    }
+
+    static JSBool
     pointOnPath(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     {
         DOC_BEGIN("Find point on path by percentage of path length.");
@@ -659,6 +689,7 @@ namespace jslib {
             { "nearest",        nearest,        1 },
             { "normal",         normal,         2 },
             { "pointOnPath",    pointOnPath,    1 },
+            { "pointOnPathFast",    pointOnPathFast,    1 },
             { "intersect",      intersect,      1 },
             { "createPerpendicularPath", createPerpendicularPath, 3 },
             { "createSubPath",           createSubPath,           3 },
@@ -749,12 +780,12 @@ namespace jslib {
         if (argc > 2) {
             asl::Matrix4f myMatrix;
             if ( ! convertFrom(cx, argv[1], myMatrix)) {
-                JS_ReportError(cx, "JSSvgPath: argument #3 must be a matrix");
+                JS_ReportError(cx, "JSSvgPath: argument #2 must be a matrix");
                 return JS_FALSE;
             }
             float mySegmentLength;
-            if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[1], mySegmentLength)) {
-                JS_ReportError(cx, "JSSvgPath: argument #2 must be a float");
+            if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], mySegmentLength)) {
+                JS_ReportError(cx, "JSSvgPath: argument #3 must be a float");
                 return JS_FALSE;
             }
             mySvgPath = OWNERPTR(new asl::SvgPath(myPathDefinition, myMatrix, mySegmentLength));
