@@ -242,6 +242,37 @@ namespace asl {
         return myPoint;
     }
 
+    asl::Vector3f
+    SvgPath::pointOnPathFast(float thePercentage) const {
+        Vector3f myPoint;
+
+        if (thePercentage <= 0.0f) {
+            myPoint = _myElements[0]->origin;
+        } else if (thePercentage >= 1.0f) {
+            myPoint = _myElements[_myElements.size()-1]->end;
+        } else {
+
+            float myPathLength = thePercentage * _myLength;
+            float myAccumLength = 0.0f;
+
+            for (unsigned i = 0; i < _myElements.size(); ++i) {
+
+                LineSegmentPtr myElement = _myElements[i];
+                Vector3f myElementVector = myElement->end - myElement->origin;
+                float myElementLength = magnitude(myElementVector);
+
+                if ((myAccumLength + myElementLength) >= myPathLength) {
+
+                    float myRemainLength = myPathLength - myAccumLength;
+                    myPoint = sum(myElement->origin, product(normalized(myElementVector), myRemainLength));
+                    break;
+                }
+                myAccumLength += myElementLength;
+            }
+        }
+        return myPoint;
+    }
+
     std::vector<SvgPath::PathPoint3f> SvgPath::intersect(const LineSegment<float> & theElement) const
     {
         std::vector<SvgPath::PathPoint3f> myIsect;

@@ -169,6 +169,11 @@ namespace asl {
         /// Return point on path by percentage of path length.
         PathPoint3f pointOnPath(float thePercentage) const;
 
+        /** Return point on path by percentage of path length. Just return the position
+         * to save time specially in JS where garbage collection is expensive [DS]
+         */
+        asl::Vector3f pointOnPathFast(float thePercentage) const;
+
         /**
          * Intersect path with given element.
          * @param theElement Element to intersect with.
