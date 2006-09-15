@@ -105,7 +105,7 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     /// This checks if the square defined by theX/theY and theSquareSize overlaps with the overlay
     //  @param theXPos        integer   X-Center of the square to check for overlap
     //  @param theXPos        integer   Y-Center of the square to check for overlap
-    //  @param theSquareSize  Array[2]  Size of the square to check for overlay (optional, default is [1,1])
+    //  @param theSquareSize  float     Size of the square to check for overlay (optional, default is 1)
     //  @rval  true, if overlay overlaps with the square, false, if it does not
     Public.touches = function(theXPos, theYPos, theSquareSize) {
         var myParent = Public.node.parentNode;
@@ -117,8 +117,8 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
 
         var myParentMatrix = new Matrix4f();
         while (myParent.nodeName == "overlay") {
-            myParentMatrix.makeScaling(new Vector3f(myParent.scale.x, myParent.scale.y,1.0));
-
+            myParentMatrix.makeIdentity();
+            myParentMatrix.scale(new Vector3f(myParent.scale.x, myParent.scale.y,1.0));
             myParentMatrix.rotateZ(myParent.rotation);
             myParentMatrix.translate(new Vector3f(myParent.position.x,myParent.position.y,0));
             myMatrix.postMultiply(myParentMatrix);
@@ -127,22 +127,17 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
         }
 
         myMatrix.invert();
-        var myNewPoint = product(new Vector3f(theXPos, theYPos,0), myMatrix);
+        var myInPoint = new Vector3f(theXPos, theYPos, 0.0);
+        var myNewPoint = product(myInPoint, myMatrix);
 
-        if (theSquareSize != undefined) {
-            var myOverlayBox = new Box3f([0, 0, 0],
-                [_myNode.width - 1, _myNode.height - 1, 1]);
-            var myMouseBox = new Box3f([myNewPoint[0] - theSquareSize, myNewPoint[1] - theSquareSize, 0],
-                [myNewPoint[0] + theSquareSize, myNewPoint[1] + theSquareSize, 1]);
-            return myMouseBox.intersects(myOverlayBox);
-        } else {
-            if (0 <= myNewPoint[0] && 0 <= myNewPoint[1] &&
-                _myNode.width > myNewPoint[0] && _myNode.height > myNewPoint[1])
-            {
-                return true;
-            }
+        if (theSquareSize == undefined) {
+            theSquareSize = 1.0;
         }
-        return false;
+
+        var myOverlayBox = new Box3f([0, 0, 0], [_myNode.width - 1, _myNode.height - 1, 1]);
+        var myMouseBox = new Box3f([myNewPoint[0] - theSquareSize, myNewPoint[1] - theSquareSize, 0],
+                                   [myNewPoint[0] + theSquareSize, myNewPoint[1] + theSquareSize, 1]);
+        return myMouseBox.intersects(myOverlayBox);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

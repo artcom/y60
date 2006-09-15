@@ -74,24 +74,31 @@ function LabelBase(Public, Protected, theScene,
         var myFontName = loadFont(myStyle.font, myStyle.fontsize);
 
         var myImage = Protected.getImageNode();
-        var mySize = window.renderTextAsImage(myImage, theText, myFontName,
+        _myTextSize = window.renderTextAsImage(myImage, theText, myFontName,
                         theSize&&theSize[0]>0?Public.width:null,
                         theSize&&theSize[1]>0?Public.height:null);
 
-        Public.srcsize.x = mySize[0] / myImage.width;
-        Public.srcsize.y = mySize[1] / myImage.height;
+        Public.srcsize.x = _myTextSize[0] / myImage.width;
+        Public.srcsize.y = _myTextSize[1] / myImage.height;
         window.setHTextAlignment(Renderer.LEFT_ALIGNMENT);
         window.setVTextAlignment(Renderer.TOP_ALIGNMENT);
         window.setTextPadding(0,0,0,0);
 
         if (theSize == null) {
-            Public.width = mySize[0];
-            Public.height = mySize[1];
+            Public.width = _myTextSize[0];
+            Public.height = _myTextSize[1];
         } else if (theSize[0] <= 0) {
-            Public.width = mySize[0];
+            Public.width = _myTextSize[0];
         } else if (theSize[1] <= 0) {
-            Public.height = mySize[1];
+            Public.height = _myTextSize[1];
         }
+
+        return _myTextSize;
+    }
+
+    // Get the size of the rendered text.
+    Public.getTextSize = function() {
+        return _myTextSize;
     }
 
     // Use this function if you need a foreground text that is independently
@@ -196,6 +203,7 @@ function LabelBase(Public, Protected, theScene,
     }
 
     var _myChildLabel = null;
+    var _myTextSize = [-1,-1];
 
     setup();
 }
