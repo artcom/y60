@@ -11,6 +11,7 @@
 //use("Unicode.js");
 use("ShapeBuilder.js");
 use("BuildUtils.js");
+
 plug("GlurFilter");
 
 
@@ -21,11 +22,11 @@ function Character(theUnicode, theUV, theUVSize, theGlyphMetric) {
     this.metric  = theGlyphMetric;
 }
 
-function CharacterSoup(theSceneViewer, theFontname, theFontFilename, theSizes, theGlurRadi) {
-    this.Constructor(this, theSceneViewer, theFontname, theFontFilename, theSizes, theGlurRadi);
+function CharacterSoup(theFontname, theFontFilename, theSizes, theGlurRadi) {
+    this.Constructor(this, theFontname, theFontFilename, theSizes, theGlurRadi);
 }
 
-CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname, theFontFilename, theSizes, theGlurRadi) {
+CharacterSoup.prototype.Constructor = function(self, theFontname, theFontFilename, theSizes, theGlurRadi) {
 
     var _myAlphabetMap = [];
     var _myGlurRadi    = new Array();
@@ -100,7 +101,6 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
                 var myTmpImage = window.scene.createImage(myGlyphSize.x, myGlyphSize.y, "RGBA");
                 var myCharSize = window.renderTextAsImage(myTmpImage, myChar, myFontName, 0, 0);
-
                 var myFontMetrics = _myAlphabetMap[theSize].fontmetrics;
                 //print("char=" + myChar, "glyphsize=" + myGlyphSize, "charsize=" + myCharSize, "height=" + myFontMetrics.height, myFontMetrics.ascent, myFontMetrics.descent);
 
@@ -112,6 +112,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
                 var myBlitPos = new Vector2f(myTargetUVPosition);
                 myBlitPos.x += myMetric.min[0];
+
                 if (myBlitPos.x < 0) {
                     Logger.error("Blit pos < 0");
                     myBlitPos.x = 0;
@@ -120,10 +121,18 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                 window.scene.images.removeChild(myTmpImage);
 
                 // texture coordinates
-                myTexCoord[0] = myTargetUVPosition.x / myFontImage.width;
-                myTexCoord[1] = myTargetUVPosition.y / myFontImage.height;
-                myTexSize[0] = (myCharSize[0] + _myGlurRadi[theSize] * 0.6) / myFontImage.width;
-                myTexSize[1] = (myCharSize[1] + _myGlurRadi[theSize] * 0.6) / myFontImage.height;
+                /*myTargetUVPosition.x -= myMetric.min[0];
+                myTargetUVPosition.y += myMetric.min[1];
+                if (myTargetUVPosition.y < 0) {
+                    myTargetUVPosition.y = 0;
+                }
+                */
+                myTexCoord[0] = (myTargetUVPosition.x) / myFontImage.width;
+                myTexCoord[1] = (myTargetUVPosition.y)/ myFontImage.height;
+                myTexSize[0] = (myCharSize[0] - + _myGlurRadi[theSize] * 0.6) / myFontImage.width;
+                myTexSize[1] = (myCharSize[1] - 2 + _myGlurRadi[theSize] * 0.6) / myFontImage.height;
+                //myTexSize[0] = (myGlyphSize[0] -1 + _myGlurRadi[theSize] * 0.6) / myFontImage.width;
+                //myTexSize[1] = (myGlyphSize[1] -1 + _myGlurRadi[theSize] * 0.6) / myFontImage.height;
 
                 //XXX
                 if (0) {
@@ -133,20 +142,16 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
                     var myW = myTexSize[0] * myFontImage.width;
                     var myH = myTexSize[1] * myFontImage.height;
                     for (var y = 0; y < myH; ++y) {
-                        myRasterData.setPixel(myX, myY+y,
-                                255,0,0,255);
-                        myRasterData.setPixel(myX + myW, myY+y,
-                                255,255,0,255);
-
-                        myRasterData.setPixel(myX + myCharSize[0], myY+y,
-                                0,255,0,255);
+                        myRasterData.setPixel(myX, myY+y, new Vector4f(1.0,0,0,1.0));
+                        myRasterData.setPixel(myX + myW, myY+y,new Vector4f(1,1,0,1));
+                        myRasterData.setPixel(myX + myCharSize[0], myY+y,new Vector4f(0,1,0,1));
                     }
                 }
 
                 // position of next character
                 _myAlphabetMap[theSize].nextCharSlot.x += nextPowerOfTwo(myMetric.advance); //myCellSize;
                 if (_myAlphabetMap[theSize].nextCharSlot.x > (myFontImage.width - myCellSize)) {
-                    _myAlphabetMap[theSize].nextCharSlot.x = 1;
+                    _myAlphabetMap[theSize].nextCharSlot.x = 0;
                     _myAlphabetMap[theSize].nextCharSlot.y += myCellSize;
                     if (_myAlphabetMap[theSize].nextCharSlot.y > myFontImage.height - (2*myCellSize)) {
                         Logger.error("Sorry, alphabet reached " + (CHARACTERS_PER_LINE*CHARACTERS_PER_LINE)  + " chars.");
@@ -196,7 +201,7 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
         _myAlphabetMap[theSize] = [];
         _myAlphabetMap[theSize].material = myMaterial;
         _myAlphabetMap[theSize].cellsize = myCellSize;
-        _myAlphabetMap[theSize].nextCharSlot = new Vector2f(1,0);
+        _myAlphabetMap[theSize].nextCharSlot = new Vector2f(0,0); // was (1,0) ???? (vs)
         _myAlphabetMap[theSize].fontimage = myFontImage;
         _myAlphabetMap[theSize].fontname = myFontName;
         _myAlphabetMap[theSize].fontmetrics = myFontMetrics;
@@ -258,3 +263,19 @@ CharacterSoup.prototype.Constructor = function(self, theSceneViewer, theFontname
 
     setup();
 }
+
+
+function test() {
+    use("SceneViewer.js");
+
+    var mySceneViewer = new SceneViewer(null);
+    mySceneViewer.setup(800, 600, false, "PathText");    
+    window.setTextPadding(0,0,0,0);    
+    const FONT_FILE_INVERSE = "FONTS/TxCaAc__.ttf"; 
+    const TICKERFONT_SIZE = 24;    
+    var _myCharacterSoup = new CharacterSoup("Ticker", FONT_FILE_INVERSE, [TICKERFONT_SIZE]);        
+    _myCharacterSoup.createUnicodeText("Schweden",  TICKERFONT_SIZE);  
+
+}
+
+//test();
