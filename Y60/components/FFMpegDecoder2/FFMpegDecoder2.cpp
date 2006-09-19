@@ -207,8 +207,7 @@ namespace y60 {
             
             // seek to start
             // TODO: only do this on loop?
-            int myResult = av_seek_frame(_myFormatContext, -1, _myStartTimestamp,
-                    AVSEEK_FLAG_BACKWARD);
+            doSeek(0);
 /*            
             avcodec_flush_buffers(_myVStream->codec);
             if (_myAStream) {
@@ -700,7 +699,7 @@ namespace y60 {
             myShouldSeek = myDistance>100 || myDistance < -1;
         } else {
             myShouldSeek = myDistance>2*(_myNumFramesDecoded/_myNumIFramesDecoded)
-                    || myDistance < -0.5;
+                    || myDistance < -0.5 || myDistance > 10;
         }
         if (myShouldSeek) {
             AC_DEBUG << "Dest=" << theDestTime << ", Curr=" << theCurrentTime
@@ -721,17 +720,8 @@ namespace y60 {
         _myMsgQueue.clear();
         _myMsgQueue.reset();
 
-        int64_t mySeekTime = int64_t(theDestTime*_myTimeUnitsPerSecond)+_myStartTimestamp;
-        AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
-        int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex,
-                mySeekTime, AVSEEK_FLAG_BACKWARD);
-/*
-        int64_t mySeekTime = (int64_t(theDestTime)+_myStartTimestamp/_myTimeUnitsPerSecond)
-                *AV_TIME_BASE;
-        AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
-        int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex,
-                mySeekTime, AVSEEK_FLAG_BACKWARD);
-*/
+        doSeek(theDestTime);
+
         decodeFrame();
         if (hasAudio())
         {
@@ -747,4 +737,20 @@ namespace y60 {
         PosixThread::fork();
     }
 
+    // Calls ffmpeg seek, flushes buffers etc.
+    void FFMpegDecoder2::doSeek(double theDestTime) {
+        int64_t mySeekTime = int64_t(theDestTime*_myTimeUnitsPerSecond); //+_myStartTimestamp;
+        AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
+        int myResult = av_seek_frame(_myFormatContext, _myVStreamIndex,
+                mySeekTime, AVSEEK_FLAG_BACKWARD);
+                
+//        int64_t mySeekTime = int64_t(theDestTime*AV_TIME_BASE);
+//        AC_DEBUG << "FFMpegDecoder2::mySeekTime=" << mySeekTime;
+//        int myResult = av_seek_frame(_myFormatContext, -1,
+//                mySeekTime, AVSEEK_FLAG_BACKWARD);
+        avcodec_flush_buffers(_myVStream->codec);
+        if (_myAStream) {
+            avcodec_flush_buffers(_myAStream->codec);
+        }
+    }
 }

@@ -11,6 +11,7 @@
 use("../../video/MovieTestBase.js");
 
 const ENDLESS_TEST = false;
+const RANDOM_SEEK_ITERATIONS = 50;
 
 function FFMpegTest(theArguments) {
     var Public = this;
@@ -20,9 +21,10 @@ function FFMpegTest(theArguments) {
 
 /*
     var _myTestMovies = [
-        "1.1.mpg"
+        "mpeg2_160x120_25_1_audio.mpg",
     ];
 */
+    
     var _myTestMovies = [
         "huffyuv_160x120_25_1_audio.avi",
         "mjpeg_160x120_25_1_audio.avi",
@@ -54,7 +56,8 @@ function FFMpegTest(theArguments) {
         testLoop,
         testPauseStop,
         testStopPause,
-        testSeek
+        testSeek,
+        testRandomSeek
     ];
 
     this.initTests(_myTestMovies, _myTests);
@@ -221,12 +224,6 @@ function FFMpegTest(theArguments) {
         switch(theTestFrame) {
             case 0:
                 print("  Seek...");
-                if (theMovieName == "mpeg1_160x120_25_1_audio.mpg" ||
-                    theMovieName == "mpeg2_160x120_25_1_audio.mpg" ||
-                    theMovieName == "mpeg2intra_160x120_25_1_audio.mpg") 
-                {
-                    This.nextTest();
-                }
                 break;
             case 3:
                 theMovie.playmode = "pause";
@@ -252,6 +249,33 @@ function FFMpegTest(theArguments) {
                 This.assure_msg(theMovie.currentframe == 7, "Playback after seek backward ok.");
                 This.nextTest();
                 break;
+        }
+    }
+    
+    function testRandomSeek(This, theTestFrame, theMovieName, theMovie) {
+        switch(theTestFrame) {
+            case 0:
+                print("  Random seek...");
+/*
+                if (theMovieName == "mpeg1_160x120_25_1_audio.mpg" ||
+                    theMovieName == "mpeg2_160x120_25_1_audio.mpg" ||
+                    theMovieName == "mpeg2intra_160x120_25_1_audio.mpg") 
+                {
+                    This.nextTest();
+                }
+*/                
+                break;
+            case RANDOM_SEEK_ITERATIONS+3:
+                This.assure_msg(theMovie.playmode == "play", "Playback after random seeks.");
+                This.nextTest();
+                break;
+        }
+        if (theTestFrame > 0 && theTestFrame < RANDOM_SEEK_ITERATIONS) {
+            theMovie.playmode = "pause";
+            var mySeekDest = Math.floor(Math.random()*20);
+            theMovie.currentframe = mySeekDest;
+            window.scene.loadMovieFrame(theMovie.movie);
+            theMovie.playmode = "play";
         }
     }
 }

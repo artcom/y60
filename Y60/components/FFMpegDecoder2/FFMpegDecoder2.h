@@ -108,6 +108,7 @@ namespace y60 {
         void dumpCache();
         bool shouldSeek(double theCurrentTime, double theDestTime);
         void seek(double theDestTime);
+        void doSeek(double theSeekTime);
        
         
         // Called from both threads
