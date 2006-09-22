@@ -10,7 +10,7 @@
 
 use("Y60JSSL.js");
 
-function OffscreenRenderer(theSize, theCamera, thePixelFormat) {
+function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
     const DUMP_IMAGE = false;
 
     this.overlays getter = function() {
@@ -20,7 +20,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat) {
     this.underlays getter = function() {
         return _myCanvas.firstChild.childNode("underlays"); 
     }
-    
+       
     function setup(theSize) {
         //add our own camera
         if (theCamera == undefined) {
@@ -41,9 +41,13 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat) {
             thePixelFormat = "rgba";
         }
         
-        self.image = window.scene.createImage(theSize[0], theSize[1], thePixelFormat);
-        self.image.name = "Offscreen Buffer";
+        if (theImage == undefined) {
+            theImage = window.scene.createImage(theSize[0], theSize[1], thePixelFormat);
+        }
 
+        self.image = theImage;    
+        self.image.name = "Offscreen Buffer";
+        
         // Flip vertically since framebuffer content is upside-down
         var myMirrorMatrix = new Matrix4f;
         myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
@@ -80,6 +84,17 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat) {
         _myCanvas.firstChild.childNode("underlays").appendChild(theNode);
     }
 
+    this.setImage = function(theImage) {
+        self.image = theImage;
+        _myCanvas.target = self.image.id;
+
+        // Flip vertically since framebuffer content is upside-down
+        var myMirrorMatrix = new Matrix4f;
+        myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
+        self.image.matrix.makeIdentity();
+        self.image.matrix.postMultiply(myMirrorMatrix);
+    }
+    
     this.setBody = function(theNode) {
         _myOffscreenNodes.push(theNode);
         this.render();
