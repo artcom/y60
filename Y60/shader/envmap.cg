@@ -8,10 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#define FRESNEL_POWER  1.0
-#define FRESNEL_SCALE  0.8
-#define FRESNEL_BIAS   0.2
-
 #define LIGHTING
 
 //#define PHONG_SPECULAR // use Phong instead of Blinn specular term
@@ -67,8 +63,7 @@ vert2frag mainVertex(app2vert IN,
 
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
-    OUT.reflectionFactor = (FRESNEL_BIAS + FRESNEL_SCALE *
-        pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER)) * reflectivity;
+    OUT.reflectionFactor = reflectivity;
 
 #ifdef PAINT
     OUT.texCoord0 = IN.texCoord0;
