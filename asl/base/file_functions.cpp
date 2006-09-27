@@ -305,9 +305,7 @@ getHostPart(const std::string & theURI) {
         return "";
     }
 
-
-/// read a complete file into a string
-
+    /// read a complete file into a string
     bool readFile(const std::string & theUTF8Filename, std::string & theContent) {
         std::ifstream inFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), std::ios::binary);
         if (inFile) {
@@ -566,16 +564,17 @@ std::string
 normalizeDirectory(const std::string & theDirectory, bool stripTrailingSlash) { 
     std::string myDirectory(theDirectory);
     // replace backslashes with forward slashes
-    string::size_type myBackslashPos;
-    while (string::npos != (myBackslashPos = myDirectory.find("\\"))) {
+    std::string::size_type myBackslashPos;
+    while (std::string::npos != (myBackslashPos = myDirectory.find("\\"))) {
         myDirectory.replace(myBackslashPos, 1, "/");
     }
     // replace double-slashes with single slashes        
-    string::size_type myDoubleSlash;
-    while (string::npos != (myDoubleSlash = myDirectory.find("//"))) {
+    std::string::size_type myDoubleSlash;
+    while (std::string::npos != (myDoubleSlash = myDirectory.find("//"))) {
         myDirectory.replace(myDoubleSlash, 2, "/");
     }
-    while (stripTrailingSlash) { // strip all trailing slashes
+    // strip all trailing slashes
+    while (stripTrailingSlash) {
         size_t myLen = myDirectory.size();
         if (myLen == 0) {
             break;
@@ -598,6 +597,50 @@ bool isDirectory(const std::string & theUTF8Path) {
     return false;
 }
 
+std::string
+evaluateRelativePath(const std::string & theBaseDirectory,
+                     const std::string & theAbsolutePath,
+                     bool theForceRelativePathFlag)
+{
+    // split into components
+    std::vector<std::string> myBaseParts = splitString(normalizeDirectory(theBaseDirectory, true), "/");
+    std::vector<std::string> myAbsoluteParts = splitString(normalizeDirectory(theAbsolutePath, true), "/");
+
+    // count matching parts
+    unsigned sameCount = 0;
+    for (int i = 0; i < Minimum(myBaseParts.size(), myAbsoluteParts.size()); ++i) {
+#ifdef WIN32
+        if (strcasecmp(myBaseParts[i].c_str(), myAbsoluteParts[i].c_str()) != 0)
+#else
+        if (myBaseParts[i] != myAbsoluteParts[i])
+#endif
+        {
+            break;
+        }
+        ++sameCount;
+    }
+    if (theForceRelativePathFlag == false && sameCount == 0) {
+        return theAbsolutePath;
+    }
+
+    // assemble relative path
+    std::string myRelativePath = "";
+    for (int i = sameCount; i < myBaseParts.size(); ++i) {
+        if (i > sameCount) {
+            myRelativePath += "/";
+        }
+        myRelativePath += "..";
+    }
+    if (myRelativePath.size() == 0) {
+        myRelativePath = ".";
+    }
+    for (int i = sameCount; i < myAbsoluteParts.size(); ++i) {
+        myRelativePath += "/";
+        myRelativePath += myAbsoluteParts[i];
+    }
+
+    return myRelativePath;
+}
 
 } // namespace asl
 

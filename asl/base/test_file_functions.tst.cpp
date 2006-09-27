@@ -126,6 +126,11 @@ class file_functions_UnitTest : public UnitTest {
 
             createPath("myTestPath/myTestDir");
             ENSURE(isDirectory("myTestPath/myTestDir"));
+
+            ENSURE(evaluateRelativePath("/usr/bin", "/bin") == "/bin");
+            ENSURE(evaluateRelativePath("/usr/bin", "/usr/lib/bin") == "../lib/bin");
+            ENSURE(evaluateRelativePath("/usr/bin", "/bin", true) == "../../bin");
+
             //FAILURE("test");
         }
 

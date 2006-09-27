@@ -117,6 +117,9 @@ std::string getHostPart(const std::string & theURI);
 /// splits a delimited path list (semicolon or colon delimited) into its components
 unsigned splitPaths(const std::string & theDelimitedPaths, std::vector<std::string> & thePathVector);
 
+/// return relative path from base directory to absolute path.
+std::string evaluateRelativePath(const std::string & theBaseDirectory, const std::string & theAbsolutePath, bool theForceRelativePathFlag = false);
+
 /// searches a file in a semicolon-seperated list of pathes, 
 /// returns the path + file. Embedded environment variables 
 /// in the form ${VARNAME} are expanded.
