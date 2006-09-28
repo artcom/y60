@@ -610,7 +610,8 @@ evaluateRelativePath(const std::string & theBaseDirectory,
     unsigned sameCount = 0;
     for (int i = 0; i < Minimum(myBaseParts.size(), myAbsoluteParts.size()); ++i) {
 #ifdef WIN32
-        if (strcasecmp(myBaseParts[i].c_str(), myAbsoluteParts[i].c_str()) != 0)
+        // why should we use something standard like 'strcasecmp' when we can make up our own names instead?
+        if (stricmp(myBaseParts[i].c_str(), myAbsoluteParts[i].c_str()) != 0)
 #else
         if (myBaseParts[i] != myAbsoluteParts[i])
 #endif
