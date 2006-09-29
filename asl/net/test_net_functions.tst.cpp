@@ -56,7 +56,7 @@ class net_functions_UnitTest : public UnitTest {
             ENSURE(hostaddress("gibt-es-nicht.xyz.bla") == 0);
         
             ENSURE(hostaddress(localhostname()));
-            DPRINT(hex<<hostaddress(localhostname()));
+            DPRINT(hex << hostaddress(localhostname()) << dec);
             DPRINT(as_dotted_address(hostaddress(localhostname())));
 
             DPRINT(getHardwareAddress());

@@ -54,9 +54,8 @@
   #include <linux/sockios.h>
 #endif
 #ifdef OSX
-  #include <net/if.h>
-  #include <net/ethernet.h>
-  #include <sys/sockio.h>
+  #include <ifaddrs.h>
+  #include <net/if_dl.h>
 #endif
 
 using namespace std;
@@ -186,16 +185,32 @@ namespace asl {
             throw SocketException(PLUS_FILE_LINE); 
         }
 
-        ifreq myInterface;
-        strcpy (myInterface.ifr_name, "eth0");
-
 #ifdef OSX
-        if (ioctl (fd, SIOCGLIFADDR, &myInterface) < 0) {
+        struct ifaddrs *ifap0 = 0;
+        if (getifaddrs(&ifap0) < 0) {
             throw SocketException(PLUS_FILE_LINE); 
         }
-        myHardwareMac.resize(ETHER_ADDR_LEN);
-        memcpy (&myHardwareMac[0], myInterface.ifr_addr.sa_data, ETHER_ADDR_LEN);
+        struct ifaddrs * ifap = ifap0;
+
+        bool myFoundIfFlag = false;
+        while (ifap && myFoundIfFlag == false) {
+            if (strcmp(ifap->ifa_name, "en0") == 0 && ifap->ifa_addr->sa_family == AF_LINK) {
+                struct sockaddr_dl * dl = (struct sockaddr_dl *) ifap->ifa_addr;
+                unsigned myIfNameLen = strlen("en0");
+                /*AC_PRINT << ifap->ifa_name << " index=" << dl->sdl_index << " len=" << (int)(dl->sdl_alen) << " data=" << dl->sdl_data;
+                for (unsigned i = 0; i < dl->sdl_alen; ++i) {
+                    AC_PRINT << hex << (unsigned)(dl->sdl_data[myIfNameLen + i]) << dec;
+                }*/
+                myHardwareMac.resize(dl->sdl_alen);
+                memcpy (&myHardwareMac[0], dl->sdl_data + myIfNameLen, dl->sdl_alen);
+                myFoundIfFlag = true;
+            }
+            ifap = ifap->ifa_next;
+        }
+        freeifaddrs(ifap0);
 #else
+        ifreq myInterface;
+        strcpy (myInterface.ifr_name, "eth0");
         if (ioctl (fd, SIOCGIFHWADDR, &myInterface) < 0) {
             throw SocketException(PLUS_FILE_LINE); 
         }
@@ -207,5 +222,3 @@ namespace asl {
     };
 
 } //Namespace asl
-
-
