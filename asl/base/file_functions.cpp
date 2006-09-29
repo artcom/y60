@@ -183,82 +183,78 @@ namespace asl {
         return theFileName;
     }
 
-/// returns the Host:Port part of an URI
-// URI's are formated as protocol://login/path
-// where login = [username:password@]hostport
-// and hostport = host[:port]
-
-void
-parseURI(const std::string & theURI, std::string * theProtocol, std::string * theLogin, std::string * thePath) {
-    std::string::size_type myProtocolLoginDelimit = theURI.find("://");
-    if (myProtocolLoginDelimit == string::npos && theURI[1] == ':') {
-        // we have a DOS-type path 'C:\foo\bar'
-        if (thePath) {
-            *thePath = theURI;
+    /// returns the Host:Port part of an URI
+    // URI's are formated as protocol://login/path
+    // where login = [username:password@]hostport
+    // and hostport = host[:port]
+    void parseURI(const std::string & theURI, std::string * theProtocol, std::string * theLogin, std::string * thePath) {
+        std::string::size_type myProtocolLoginDelimit = theURI.find("://");
+        if (myProtocolLoginDelimit == string::npos && theURI[1] == ':') {
+            // we have a DOS-type path 'C:\foo\bar'
+            if (thePath) {
+                *thePath = theURI;
+            }
+            return;
         }
+
+        string::size_type myLoginStartDelimiter = string::npos; // position of "//"
+        string::size_type myLoginPathDelimit = string::npos;
+
+        if (myProtocolLoginDelimit != string::npos) {
+            if (theProtocol) {
+                *theProtocol = theURI.substr(0, myProtocolLoginDelimit);
+            }
+            myLoginStartDelimiter = myProtocolLoginDelimit+1;
+        } else if (theURI.substr(0,2) == "\\\\")  {
+            // we have MS-URI  \\server\path
+            myLoginStartDelimiter = 0;
+        }
+
+        if (myLoginStartDelimiter != string::npos) {
+            std::string::size_type myLoginStartPos = myLoginStartDelimiter+2;
+
+            myLoginPathDelimit = theURI.find("/", myLoginStartPos );
+
+            if (theLogin) {
+                if (myLoginPathDelimit != string::npos) {
+                    *theLogin = theURI.substr(myLoginStartPos, myLoginPathDelimit-myLoginStartPos);
+                } else {
+                    *theLogin = theURI.substr(myLoginStartPos);
+                }
+            }
+        }
+
+        std::string::size_type myPathStartPos = (myLoginPathDelimit == std::string::npos ? 0 : myLoginPathDelimit); 
+        if (thePath) {
+            *thePath = theURI.substr(myPathStartPos);
+        }
+
         return;
     }
 
-    string::size_type myLoginStartDelimiter = string::npos; // position of "//"
-    string::size_type myLoginPathDelimit = string::npos;
-
-    if (myProtocolLoginDelimit != string::npos) {
-        if (theProtocol) {
-            *theProtocol = theURI.substr(0, myProtocolLoginDelimit);
+    /// returns the Host part of an URI
+    std::string getHostPortPart(const std::string & theURI) {
+        std::string myLogin;
+        parseURI(theURI, 0, &myLogin, 0);
+        string::size_type myCredentialServerDelimiter = myLogin.find("@");
+        if (myCredentialServerDelimiter == string::npos) {
+            return myLogin;
         }
-        myLoginStartDelimiter = myProtocolLoginDelimit+1;
-    } else if (theURI.substr(0,2) == "\\\\")  {
-        // we have MS-URI  \\server\path
-        myLoginStartDelimiter = 0;
+        return myLogin.substr(myCredentialServerDelimiter+1);
     }
 
-    if (myLoginStartDelimiter != string::npos) {
-        std::string::size_type myLoginStartPos = myLoginStartDelimiter+2;
-
-        myLoginPathDelimit = theURI.find("/", myLoginStartPos );
-        
-        if (theLogin) {
-            if (myLoginPathDelimit != string::npos) {
-                *theLogin = theURI.substr(myLoginStartPos, myLoginPathDelimit-myLoginStartPos);
-            } else {
-                *theLogin = theURI.substr(myLoginStartPos);
-            }
+    /// returns the Host part of an URI
+    std::string getHostPart(const std::string & theURI) {
+        string myHostPort = getHostPortPart(theURI);
+        string::size_type myHostPortDelimiter = myHostPort.find(":");
+        if (myHostPortDelimiter == string::npos) {
+            return myHostPort;
         }
-    }
-    
-    std::string::size_type myPathStartPos = (myLoginPathDelimit == std::string::npos ? 0 : myLoginPathDelimit); 
-    if (thePath) {
-        *thePath = theURI.substr(myPathStartPos);
+        return myHostPort.substr(0, myHostPortDelimiter);
     }
 
-    return;
-}
-
-/// returns the Host part of an URI
-std::string 
-getHostPortPart(const std::string & theURI) {
-    std::string myLogin;
-    parseURI(theURI, 0, &myLogin, 0);
-    string::size_type myCredentialServerDelimiter = myLogin.find("@");
-    if (myCredentialServerDelimiter == string::npos) {
-        return myLogin;
-    }
-    return myLogin.substr(myCredentialServerDelimiter+1);
-}
-/// returns the Host part of an URI
-std::string 
-getHostPart(const std::string & theURI) {
-    string myHostPort = getHostPortPart(theURI);
-    string::size_type myHostPortDelimiter = myHostPort.find(":");
-    if (myHostPortDelimiter == string::npos) {
-        return myHostPort;
-    }
-    return myHostPort.substr(0, myHostPortDelimiter);
-}
-
-    unsigned
-    splitPaths(const std::string & theDelimitedPaths,
-               std::vector<std::string> & thePathVector)
+    unsigned splitPaths(const std::string & theDelimitedPaths,
+            std::vector<std::string> & thePathVector)
     {
         thePathVector.clear();
         std::string mySearchPath = expandEnvironment(theDelimitedPaths);
@@ -269,6 +265,7 @@ getHostPart(const std::string & theURI) {
         static const char * myDelimiters = ";";
 #endif
 
+        // XXX maybe use splitString from string_functions.cpp
         std::string::size_type myEndPos = mySearchPath.find_first_of(myDelimiters);
         while (myEndPos != std::string::npos) {
             std::string myPath = mySearchPath.substr(0, myEndPos);
@@ -321,31 +318,25 @@ getHostPart(const std::string & theURI) {
         return inFile.eof() && !inFile.bad();
     }
 
-    namespace {
-        // we don't want to drag in numeric_functions. so we define it here
-        unsigned long Minimum(unsigned long a, unsigned long b) {
-            if (a > b) return a ; else return b;
-        }
-    }
-
     bool readFile(const std::string & theUTF8Filename, asl::ResizeableBlock & theContent) {
-        const int myChunksize = 65536;
         unsigned long myFileSize = getFileSize(theUTF8Filename);
         theContent.resize(myFileSize);
         DB(AC_TRACE << "myFileSize = " << myFileSize);
         std::ifstream inFile(Path(theUTF8Filename, UTF8).toLocale().c_str(), std::ios::binary);
-        unsigned long myPos = 0;
-        if (inFile) {
-            while (inFile && myPos < theContent.size()) {
-                DB(AC_TRACE << "myPos = " << myPos << ", chunk = " << Minimum(myChunksize,theContent.size()-myPos));
-                inFile.read(&(*(theContent.strbegin()+myPos)),Minimum(myChunksize,theContent.size()-myPos));
-                myPos += inFile.gcount();
-            }
-        } else {
+        if (!inFile) {
             return false;
         }
+
+        const unsigned CHUNK_SIZE = 65536;
+        unsigned long myPos = 0;
+        while (inFile && myPos < theContent.size()) {
+            unsigned myChunkSize = theContent.size() - myPos;
+            //myChunkSize = (myChunkSize > CHUNK_SIZE ? CHUNK_SIZE : myChunkSize); // UH: temporarily disabled
+            inFile.read(&(*(theContent.strbegin()+myPos)), myChunkSize);
+            myPos += inFile.gcount();
+        }
         DB(AC_TRACE << "ready, myPos = " << myPos);
-       if (theContent.size()!=myPos) {
+        if (theContent.size()!=myPos) {
             theContent.resize(myPos);
             return false;
         }
@@ -607,8 +598,9 @@ evaluateRelativePath(const std::string & theBaseDirectory,
     std::vector<std::string> myAbsoluteParts = splitString(normalizeDirectory(theAbsolutePath, true), "/");
 
     // count matching parts
+    unsigned numParts = (myBaseParts.size() < myAbsoluteParts.size() ? myBaseParts.size() : myAbsoluteParts.size());
     unsigned sameCount = 0;
-    for (int i = 0; i < Minimum(myBaseParts.size(), myAbsoluteParts.size()); ++i) {
+    for (unsigned i = 0; i < numParts; ++i) {
 #ifdef WIN32
         // why should we use something standard like 'strcasecmp' when we can make up our own names instead?
         if (stricmp(myBaseParts[i].c_str(), myAbsoluteParts[i].c_str()) != 0)
@@ -626,7 +618,7 @@ evaluateRelativePath(const std::string & theBaseDirectory,
 
     // assemble relative path
     std::string myRelativePath = "";
-    for (int i = sameCount; i < myBaseParts.size(); ++i) {
+    for (unsigned i = sameCount; i < myBaseParts.size(); ++i) {
         if (i > sameCount) {
             myRelativePath += "/";
         }
@@ -635,7 +627,7 @@ evaluateRelativePath(const std::string & theBaseDirectory,
     if (myRelativePath.size() == 0) {
         myRelativePath = ".";
     }
-    for (int i = sameCount; i < myAbsoluteParts.size(); ++i) {
+    for (unsigned i = sameCount; i < myAbsoluteParts.size(); ++i) {
         myRelativePath += "/";
         myRelativePath += myAbsoluteParts[i];
     }
