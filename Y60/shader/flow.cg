@@ -9,6 +9,9 @@
 //=============================================================================
 
 
+#define WINDOW_WIDTH 512
+#define WINDOW_HEIGHT 512
+
 struct vert2frag {
     float4 position : POSITION;
     float2 texCoord0 : TEXCOORD0;
@@ -28,24 +31,79 @@ vert2frag mainVertex(float4 thePosition : POSITION,
     return OUT;
 }
 
-float4 mainFragment(vert2frag IN,
-                    uniform sampler2D tex0,
-                    uniform sampler2D tex1) : COLOR 
+
+/*
+float4 f4texRECTbilerp(samplerRECT tex, float2 s)
 {
-    //float2 pos = IN.texCoord1 - tex2D( tex1, IN.texCoord1);
+  float2 currentPos = floor(s * 512);
+  float texelSize = 1.0 / 512.0;
+  float texelHalfSize = texelSize * 0.5;
+  float texelQuarterSize = texelHalfSize * 0.5;
+  
+  float4 st;
+  //st.xy = s - 0.5) + 0.5; // + texelHalfSize;
+  //st.zw = st.xy + 1;
+  
+  st.x = s.x - texelHalfSize;
+  st.y = s.y - texelQuarterSize; // - texelSize;
+  st.w = s.x + texelHalfSize;
+  st.w = s.y + texelQuarterSize; // + texelSize;
+  
+  
+  float2 t = s - st.xy; //interpolating factors 
+  
+  //st = st / 512.0;
+  
+  float4 tex11 = tex2D(tex, st.xy);
+  float4 tex21 = tex2D(tex, st.zy);
+  float4 tex12 = tex2D(tex, st.xw);
+  float4 tex22 = tex2D(tex, st.zw);
 
-    float4 myFlowField      = tex2D( tex0, IN.texCoord0);
-    float4 myRGBA      = tex2D( tex1, IN.texCoord1);
+  // bilinear interpolation
+  //return tex21;
+  return lerp(lerp(tex11, tex21, t.x), lerp(tex12, tex22, t.x), t.y);
+}
+*/
+
+float4 f4texRECTbilerp(samplerRECT tex, float2 s)
+{
+  float4 st;
+  st.xy = floor(s - 0.5) + 0.5;
+  st.zw = st.xy + 1;
+  
+  float2 t = s - st.xy; //interpolating factors 
     
-    //myRGBA.r += 0.001;
-    //myRGBA.gb -= 0.0001;
-    //myRGBA.rgba = 0.001;
-    //myFlowField.rgba = 0.001;
-    //float4 myOUTColor;
-    //myOUTColor.rgb = myFlowField.rgb;
-    //myOUTColor.rgb *= 0.5;
+  float4 tex11 = f4texRECT(tex, st.xy);
+  float4 tex21 = f4texRECT(tex, st.zy);
+  float4 tex12 = f4texRECT(tex, st.xw);
+  float4 tex22 = f4texRECT(tex, st.zw);
 
-    //return myFlowField;
-    return myRGBA;
+  // bilinear interpolation
+  return lerp(lerp(tex11, tex21, t.x), lerp(tex12, tex22, t.x), t.y);
+}
+
+float4 mainFragment(vert2frag IN,
+                    uniform samplerRECT tex0,
+                    uniform samplerRECT tex1) : COLOR 
+{
+    float2 coord = float2( IN.texCoord1.x, 512.0 - IN.texCoord1.y);
+    float2 coordFlipped = float2( IN.texCoord1.x,IN.texCoord1.y);
+    
+    float timeStep = 0.6;
+    float gridSize = 1.0 / 3.0;
+    float2 velocity = f2texRECT( tex1, coordFlipped); // * 10.0;
+    float2 pos = coord - gridSize * timeStep * velocity;
+
+    //pos.x = 1;
+    //pos.y = 2;
+    //float4 myFlowField      = tex2D( tex0, pos);
+    
+    //float4 myRGBA      = texRECT( tex1, coord);
+    
+    //float4 myColor = float4( 0.0, velocity.y, 0.0,1.0);
+    
+    float4 myFlowField = f4texRECTbilerp(tex0, pos);
+    return myFlowField; //float4(pos.x, pos.y, 0.0,1.0);
+    //return myColor;
 } 
 

@@ -1062,8 +1062,59 @@
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <sampler2d name="tex1">1</sampler2d>
+                <vector3f name="gausscolor">[0,0,0]</vector3f>
+                <vector2f name="gaussposition">[0,0]</vector2f>
+                <float name="gaussradius">0.0</float>
+                <vector2f name="windowDims">[0,0]</vector2f>
             </properties>
         </fragmentshader>
     </shader>
-
+    <shader id="s130" name="splat" cost="10">
+        <supports>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="textures" values="[splat]"/>
+            <feature class="texcoord" values="[*]"/>
+        </supports>
+        <vertexshader profile="VP30" file="splat.cg" entryfunction="mainVertex">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="splat.cg" entryfunction="mainFragment">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <vector3f name="gausscolor">[0,0,0]</vector3f>
+                <vector2f name="gaussposition">[0,0]</vector2f>
+                <float name="gaussradius">0.0</float>
+                <vector2f name="windowDims">[0,0]</vector2f>
+            </properties>
+        </fragmentshader>
+    </shader>
+     <shader id="s131" name="blur" cost="10">
+       <supports>
+            <feature class="textures" values="[blur]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="texcoord" values="[*]"/>
+        </supports>
+        <vertexshader profile="VP40" file="blur.cg" entryfunction="mainVertex">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP40" file="blur.cg" entryfunction="mainFragment">
+            <properties>
+                <sampler2d name="tex">0</sampler2d>
+                <sampler2d name="blurKernel">1</sampler2d>
+                <vector3f name="texelSize">[0,0,0]</vector3f>
+                <float name="kernelSize">1</float>
+                <float name="blurKernelTexSize">1</float>
+            </properties>
+        </fragmentshader>
+    </shader>
 </shaders>
