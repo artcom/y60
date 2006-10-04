@@ -9,12 +9,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 //
-//    $RCSfile: os_functions.cpp,v $
-//
-//   $Revision: 1.5 $
-//
 // Description: misc operating system & environment helper functions
-//
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
@@ -24,6 +19,7 @@
 #endif
 
 #include "os_functions.h"
+#include "os_functions.impl"
 #include "Exception.h"
 #include "string_functions.h"
 #include "file_functions.h"
@@ -49,6 +45,15 @@
 using namespace std;
 
 namespace asl {
+
+    template bool get_environment_var_as(const std::string & theVariable, double& theValue);
+    template bool get_environment_var_as(const std::string & theVariable, int& theValue);
+    template bool get_environment_var_as(const std::string & theVariable, 
+            unsigned int& theValue);
+    template bool get_environment_var_as(const std::string & theVariable, string& theValue);
+    template bool get_environment_var_as(const std::string & theVariable, 
+            asl::Unsigned16& theValue);
+    template bool get_environment_var_as(const std::string & theVariable, bool& theValue);
 
 #ifdef WIN32
     // This is executed once on program start.
@@ -302,7 +307,6 @@ namespace asl {
  }
 
 #endif
-
 
 } //Namespace asl
 

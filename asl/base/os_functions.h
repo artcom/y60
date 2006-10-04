@@ -91,16 +91,8 @@ namespace asl {
     void set_environment_var(const std::string & theVariable, const std::string & theValue);
 
     template <class T>
-    bool get_environment_var_as(const std::string & theVariable, T& theValue) {
-        std::string myStringValue;
-        if (get_environment_var(theVariable, myStringValue)) {
-            theValue = as<T>(myStringValue);
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
+    bool get_environment_var_as(const std::string & theVariable, T& theValue);
+
 #ifdef WIN32
 		bool hResultIsOk(HRESULT hr, std::string & theMessage);
 #endif		

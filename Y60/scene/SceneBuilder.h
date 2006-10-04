@@ -82,8 +82,8 @@ namespace y60 {
             void binarize(asl::WriteableStream & theBlock) const;
             std::ostream & serialize(std::ostream & theOutStream) const;
 
-            void SceneBuilder::setInitialCamera(const std::string & theCameraId);
-            dom::NodePtr SceneBuilder::getMainViewportNode() const;
+            void setInitialCamera(const std::string & theCameraId);
+            dom::NodePtr getMainViewportNode() const;
         private:
             dom::DocumentPtr _myDocument;
 

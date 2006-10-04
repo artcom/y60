@@ -156,7 +156,7 @@ namespace y60 {
             void mergeProperties(const dom::NodePtr & thePropertyNode);
             const LightingModel getLightingModel() const { return _myLightingModel; }
 
-            TextureUsage MaterialBase::getTextureUsage(unsigned theTextureSlot) const;
+            TextureUsage getTextureUsage(unsigned theTextureSlot) const;
 
             bool getDepthBufferWrite() const;
             void setDepthBufferWrite(const bool theFlag);
