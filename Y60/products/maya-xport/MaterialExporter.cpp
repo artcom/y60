@@ -771,11 +771,19 @@ MaterialExporter::exportBlinnFeatures(const MFnMesh * theMesh, const MObject & t
         throw ExportException("Could not get shininess from node",
                               "MaterialExporter::exportBlinnFeatures");
     }
+    float mySpecularRolloff = MFnBlinnShader(theShaderNode).specularRollOff(& myStatus);
+    if (myStatus == MStatus::kFailure) {
+        throw ExportException("Could not get specular rolloff from node",
+                              "MaterialExporter::exportBlinnFeatures");
+    }
 
-    // Convert to 0 - 128 range of OpenGL
-    float myShininess = (1.0f-myEccentricity) * 128;
-
-    setPropertyValue<float>(theBuilder.getNode(), "float", y60::SHININESS_PROPERTY, myShininess);
+    // experimentally found.        
+    if (myEccentricity) {
+        setPropertyValue<float>(theBuilder.getNode(), "float", "eccentricity", 1/(pow(myEccentricity,2.5f)));
+    } else {
+        setPropertyValue<float>(theBuilder.getNode(), "float", "eccentricity", 10000000.0f);
+    }
+    setPropertyValue<float>(theBuilder.getNode(), "float", "specularrolloff", mySpecularRolloff);
 }
 
 std::string
@@ -845,7 +853,7 @@ MaterialExporter::exportShader(const MFnMesh * theMesh, const MObject & theShade
             break;
         }
         case MFn::kBlinn: {
-            createLightingFeature(theLightingFeature, y60::PHONG);
+            createLightingFeature(theLightingFeature, y60::BLINN);
             exportLambertFeatures(theMesh, theShaderNode, theMaterialBuilder, theSceneBuilder);
             exportBlinnFeatures(theMesh, theShaderNode, theMaterialBuilder, theSceneBuilder);
             break;

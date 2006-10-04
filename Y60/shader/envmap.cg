@@ -10,9 +10,6 @@
 
 #define LIGHTING
 
-//#define PHONG_SPECULAR // use Phong instead of Blinn specular term
-
-
 struct app2vert {
     float4 Position         : POSITION;
     float4 Normal           : NORMAL;
@@ -98,7 +95,12 @@ float4 mainFragment(vert2frag   IN,
         uniform float4 ambient,
         uniform float4 diffuse,
         uniform float4 specular,
+#ifdef PHONG_SPECULAR        
         uniform float shininess
+#else
+        uniform float eccentricity,
+        uniform float specularrolloff 
+#endif        
         ) : COLOR
 {
     float3 myEnvTexel = texCUBE(envTex, IN.reflectVector).rgb * IN.reflectionFactor;;
@@ -138,7 +140,7 @@ float4 mainFragment(vert2frag   IN,
             float specularTerm = pow(max(dot(R, V), 0), shininess);
 #else
             float3 H = normalize(L + V);
-            float specularTerm = pow(max(dot(N, H), 0), shininess);
+            float specularTerm = specularrolloff * pow(max(dot(N, H), 0), eccentricity);
 #endif
             mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
@@ -163,7 +165,7 @@ float4 mainFragment(vert2frag   IN,
             float specularTerm = pow(max(dot(R, V), 0), shininess);
 #else
             float3 H = normalize(L + V);
-            float specularTerm = pow(max(dot(N, H), 0), shininess);
+            float specularTerm = specularrolloff * pow(max(dot(N, H), 0), eccentricity);
 #endif
             mySpecColor += specularTerm * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i];
         }

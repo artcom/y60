@@ -386,7 +386,7 @@
                  <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
                  <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
                  <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
-                 <float name="shininess">1.0</float>
+                 <float name="shininess">0.5</float>
                  <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
              </properties>
             <vertexparameters>

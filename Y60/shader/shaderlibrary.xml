@@ -645,11 +645,38 @@
             </properties>
         </fragmentshader>
     </shader>
-    <shader id="s24" name="lit_painted_environment" cost="10" >
+    <shader id="s24" name="phong_painted_environment" cost="10" >
         <supports>
             <feature class="textures" values="[paint,environment]"/>
             <feature class="texcoord" values="[uv_map,uv_map]"/>
-            <feature class="lighting" values="[lambert]"/>
+            <feature class="lighting" values="[phong]"/>
+        </supports>
+        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT, -DPHONG_SPECULAR">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[0.5,0.5,1.0,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT, -DPHONG_SPECULAR">
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+                <samplerCUBE name="envTex">1</samplerCUBE>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s24b" name="blinn_painted_environment" cost="10" >
+        <supports>
+            <feature class="textures" values="[paint,environment]"/>
+            <feature class="texcoord" values="[uv_map,uv_map]"/>
+            <feature class="lighting" values="[blinn]"/>
         </supports>
         <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
             <properties>
