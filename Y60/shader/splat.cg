@@ -1,0 +1,49 @@
+//=============================================================================
+// Copyright (C) 2006 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+struct vert2frag {
+    float4 position : POSITION;
+    float2 texCoord0 : TEXCOORD0;
+};
+
+vert2frag mainVertex(float4 thePosition : POSITION,
+                     float4 theTexCoord0 : TEXCOORD0,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 GL_TEXTURE)
+{
+    vert2frag OUT;
+    OUT.position = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    OUT.texCoord0 = mul(GL_TEXTURE, theTexCoord0).xy;
+    return OUT;
+}
+
+
+
+half gaussian(half2 pos, half radius)
+{
+  return exp(-dot(pos, pos) / radius);
+}
+
+
+
+float4 mainFragment( vert2frag IN,  
+      uniform float3       gausscolor,
+      uniform float2       gaussposition,
+      uniform float        gaussradius,
+      uniform float2       windowDims,
+      uniform samplerRECT tex0) : COLOR
+{
+  half2 pos = windowDims * gaussposition - IN.texCoord0;
+  half  rad = windowDims.x * gaussradius;
+      
+  float4 outColor;
+  outColor.xyzw = h4texRECT(tex0, IN.texCoord0) + gausscolor.xyzz * gaussian(pos, rad);
+  return outColor;
+} 
