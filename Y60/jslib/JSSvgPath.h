@@ -68,12 +68,6 @@ public:
     static JSObject * initClass(JSContext *cx, JSObject * theGlobalObject);
 };
 
-template <>
-struct JSClassTraits<asl::SvgPath>
-    : public JSClassTraitsWrapper<asl::SvgPath, JSSvgPath> 
-{
-};
-
 bool convertFrom(JSContext * cx, jsval theValue, asl::SvgPath *& theSvgPath);
 bool convertFrom(JSContext * cx, jsval theValue, asl::SvgPath & theSvgPath);
 

@@ -13,6 +13,12 @@
 
 namespace jslib {
 
+    template <>
+    struct JSClassTraits<asl::BSpline<BSplineNumber> >
+        : public JSClassTraitsWrapper<asl::BSpline<BSplineNumber>, JSBSpline> 
+    {
+    };
+
     static JSBool
     setControlPoints(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     {

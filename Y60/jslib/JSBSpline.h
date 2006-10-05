@@ -72,12 +72,6 @@ public:
     static JSObject * initClass(JSContext *cx, JSObject * theGlobalObject);
 };
 
-template <>
-struct JSClassTraits<asl::BSpline<BSplineNumber> >
-    : public JSClassTraitsWrapper<asl::BSpline<BSplineNumber>, JSBSpline> 
-{
-};
-
 bool convertFrom(JSContext * cx, jsval theValue, JSBSpline::NATIVE *& theBSpline);
 bool convertFrom(JSContext * cx, jsval theValue, JSBSpline::NATIVE & theBSpline);
 

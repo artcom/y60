@@ -8,14 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $RCSfile: $
-//
-//   $Author: $
-//
-//   $Revision: $
-//
-//=============================================================================
 
 #ifndef _ac_jslib_JSOffscreenRenderArea_h_
 #define _ac_jslib_JSOffscreenRenderArea_h_
@@ -79,16 +71,6 @@ class JSOffscreenRenderArea : public jslib::JSWrapper<jslib::OffscreenRenderArea
 
     private:
 };
-
-
-
-template <>
-struct JSClassTraits<OffscreenRenderArea> : public JSClassTraitsWrapper<OffscreenRenderArea, JSOffscreenRenderArea> {
-    static JSClass * Class() {
-        return JSOffscreenRenderArea::Base::Class();
-    }
-};    
-
 
 bool convertFrom(JSContext *cx, jsval theValue, OffscreenRenderArea *& theRenderArea);
     

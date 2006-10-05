@@ -18,6 +18,13 @@ namespace jslib {
 
 typedef jslib::AbstractRenderWindow BASE;
 
+template <>
+struct JSClassTraits<OffscreenRenderArea> : public JSClassTraitsWrapper<OffscreenRenderArea, JSOffscreenRenderArea> {
+    static JSClass * Class() {
+        return JSOffscreenRenderArea::Base::Class();
+    }
+};    
+
 static JSBool
 renderToCanvas(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Render scene to texture given by the target attribute of canvas. ");

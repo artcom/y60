@@ -19,6 +19,12 @@
 
 namespace jslib {
 
+    template <>
+    struct JSClassTraits<asl::SvgPath>
+        : public JSClassTraitsWrapper<asl::SvgPath, JSSvgPath> 
+    {
+    };
+
     JSConstIntPropertySpec * JSSvgPath::ConstIntProperties() {
         static JSConstIntPropertySpec myProperties[] = {
             {0}
