@@ -159,15 +159,15 @@ SceneExporter::writer(const MFileObject& theFile,
     MStatus myStatus = MS::kSuccess;
     {
         MAKE_SCOPE_TIMER(SceneExporter_writer);
-        DB(AC_TRACE <<"SceneExporter::writer()" << endl);
 
         ExportOptions myOptions = parseOptions(theOptionString);
         ProgressBar myProgressBar(myOptions.enableProgressBar);
-        MString myFileName = theFile.fullName();
+        MString myFileName = theFile.resolvedFullName();
+
         try {
             dom::DocumentPtr myDocument(new dom::Document);
-            SceneBuilder      mySceneBuilder(myDocument);
-            MaterialExporter  myMaterialExporter(myOptions.inlineTexturesFlag);
+            SceneBuilder     mySceneBuilder(myDocument);
+            MaterialExporter myMaterialExporter(myOptions.inlineTexturesFlag);
 
             myMaterialExporter.setBaseDirectory(asl::getDirectoryPart(std::string(myFileName.asChar())));
             clearCurveMaterials();
@@ -198,6 +198,7 @@ SceneExporter::writer(const MFileObject& theFile,
                 myFileName = myFileName + ".x60";
             }
 
+            //AC_PRINT << "write filename=" << myFileName << " cwd=" << getCWD();
             myProgressBar.setStatus("Writing file to disk");
             if (myOptions.binaryFlag) {
                 MAKE_SCOPE_TIMER(writer_binary);

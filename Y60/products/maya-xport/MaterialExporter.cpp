@@ -777,7 +777,7 @@ MaterialExporter::exportBlinnFeatures(const MFnMesh * theMesh, const MObject & t
                               "MaterialExporter::exportBlinnFeatures");
     }
 
-    // experimentally found.        
+    // experimentally found.
     if (myEccentricity) {
         setPropertyValue<float>(theBuilder.getNode(), "float", "eccentricity", 1/(pow(myEccentricity,2.5f)));
     } else {
