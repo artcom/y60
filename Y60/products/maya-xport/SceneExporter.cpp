@@ -63,12 +63,15 @@ using namespace asl;
 using namespace y60;
 using namespace dom;
 
+#if MAYA_API_VERSION < 700 || MAYA_API_VERSION > 800
+    #error "Y60 Maya exporter not yet released for this Maya version"
+#endif
 #ifdef LINUX
-
-// #if __GNUC__ != 3 || __GNUC_MINOR__ != 3
-// #error "gcc 3.3.x must be used to create maya 7.0 plugins"
-// #endif
-
+#if MAYA_API_VERSION < 800 && __GNUC__ == 3 && __GNUC_MINOR__ != 3
+    #error "gcc 3.3.x must be used to create Maya 7.0 plugins"
+#elif MAYA_API_VERSION == 800 && __GNUC__ == 4 && __GNUC_MINOR__ != 0
+    #error "gcc 4.0.x must be used to create Maya 8.0 plugins"
+#endif
 #endif
 
 SceneExporter::SceneExporter() : _myInitialCamera("c0") {
@@ -246,9 +249,8 @@ SceneExporter::writer(const MFileObject& theFile,
         _myIdMap.clear();
         _mySkinAndBonesMap.clear();
 
-        bool myProblemsReported = displayProblemSummary();
-
         if (myStatus) {
+            bool myProblemsReported = displayProblemSummary();
             if (myProblemsReported) {
                 MGlobal::displayInfo("### There were problems during export. Please check log.");
             } else {
@@ -258,8 +260,6 @@ SceneExporter::writer(const MFileObject& theFile,
         }
     }
 
-    //msleep(500);
-
     return myStatus;
 }
 
@@ -268,12 +268,10 @@ SceneExporter::haveWriteMethod() const {
     return true;
 }
 
-
 bool
 SceneExporter::haveReadMethod() const {
     return false;
 }
-
 
 bool
 SceneExporter::canBeOpened() const {

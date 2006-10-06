@@ -151,7 +151,7 @@ class MaterialExporter {
 
 		std::string getStrippedTextureFilename(const MPlug & theTexturePlug);
         std::string findRelativeFilePath(const std::string & theFileName);
-        std::string findFile(const std::string & theFileName);
+
         bool checkTransparency(const MObject & theShaderNode);
         bool checkAlphaTexture(const MObject & theShaderNode, const std::string thePlugName);
 

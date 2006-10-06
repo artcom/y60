@@ -941,6 +941,7 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
 #else
     if (theDirectory.length() > 0 && theDirectory[0] != '/') {
 #endif
+        // not an absolute path
         if (theDirectory[0] == '.' && theDirectory[1] == '/') {
             _myBaseDirectory = normalizeDirectory(getCWD(), false) +
                                normalizeDirectory(theDirectory.substr(2,theDirectory.length()) , false);
@@ -955,109 +956,42 @@ MaterialExporter::setBaseDirectory(const std::string & theDirectory) {
         // absolute path
         _myBaseDirectory = theDirectory;
     }
+
+#ifndef WIN32
+    char myRealPath[PATH_MAX];
+    if (realpath(_myBaseDirectory.c_str(), myRealPath)) {
+        _myBaseDirectory = std::string(myRealPath);
+    }
+#endif
+
     // be sure to end with a slash
     if (_myBaseDirectory[_myBaseDirectory.length()-1] != '/') {
         _myBaseDirectory += '/';
     }
+
     AC_DEBUG << "MaterialExporter::setBaseDirectory _myBaseDirectory=" << _myBaseDirectory << ", was:" << theDirectory;
-}
-
-std::string
-MaterialExporter::findFile(const std::string & theFileName) {
-    if (fileExists(theFileName)) {
-        return theFileName;
-    } else {
-        // If the file does not exist we have to try to find it...
-        string myDirectoryPart = theFileName;
-        size_t mySlashIndex = myDirectoryPart.rfind('/');
-        while (mySlashIndex != string::npos) {
-            string myFilePart = theFileName.substr(mySlashIndex + 1, theFileName.length());
-            myDirectoryPart = myDirectoryPart.substr(0, mySlashIndex);
-
-            string myTestPath = _myBaseDirectory + myFilePart;
-            if (fileExists(myTestPath)) {
-                return myTestPath;
-            }
-            mySlashIndex = myDirectoryPart.rfind('/');
-        }
-
-        throw ExportException(string("Could not find file: ") + theFileName, PLUS_FILE_LINE);
-    }
-}
-
-char convertBackToForwardSlash(char theCharacter) {
-    if (theCharacter == '\\') {
-        theCharacter = '/';
-    }
-    return theCharacter;
 }
 
 std::string
 MaterialExporter::findRelativeFilePath(const std::string & theFileName) {
 
-    // convert backslash to forward slash
+    AC_DEBUG << "MaterialExporter::findRelativeFilePath " << theFileName;
+
     std::string myFileName = theFileName;
-    std::transform(theFileName.begin(), theFileName.end(),
-                   myFileName.begin(), convertBackToForwardSlash);
-
-    // find file relative to base directory
-    string myFoundFileName = findFile(myFileName);
-    myFileName = myFoundFileName;
-    std::string myBaseName = _myBaseDirectory;
-#ifdef WIN32
-    // Convert basedir and filename to upper-case before comparing, because windows
-    // is case-INsensitive and therefore the comparison needs to be too :( [jb]
-    std::transform(myFileName.begin(), myFileName.end(),
-                   myFileName.begin(), std::toupper);
-    std::transform(myBaseName.begin(), myBaseName.end(),
-                   myBaseName.begin(), std::toupper);
-#endif
-
-    // Strip the base directory
-    size_t myIndex = myFileName.find(myBaseName);
-    if (myIndex != std::string::npos) {
-        // If the base directory is a part of the filename, just strip it.
-        return myFoundFileName.substr(myIndex + myBaseName.length());
+#ifndef WIN32
+    // resolve symlinks
+    char myRealPath[PATH_MAX];
+    if (realpath(myFileName.c_str(), myRealPath)) {
+        myFileName = std::string(myRealPath);
     } else {
-        // Try to find as much equal directories as possible from BaseDirectory
-        bool myEqualFlag = true;
-        std::string myBaseRest(myBaseName);
-        std::string myFileRest(myFileName);
-        while (myEqualFlag) {
-            size_t mySlashBaseIndex = myBaseRest.find('/');
-            size_t mySlashFilenameIndex = myFileRest.find('/');
-            if (mySlashBaseIndex != std::string::npos && mySlashFilenameIndex != std::string::npos) {
-                std::string myBaseDir = myBaseRest.substr(0, mySlashBaseIndex);
-                std::string myFilenameDir = myFileRest.substr(0, mySlashFilenameIndex);
-
-                if (myBaseDir == myFilenameDir) {
-                    myBaseRest = myBaseRest.substr(mySlashBaseIndex+1, myBaseRest.length());
-                    myFileRest = myFileRest.substr(mySlashFilenameIndex+1, myFileRest.length());
-                } else {
-                    myEqualFlag = false;
-                }
-            } else {
-                myEqualFlag = false;
-            }
-        }
-
-        // Check if we have common root directories
-        if (myBaseRest != _myBaseDirectory && myFileRest != myFileName) {
-#ifdef WIN32
-            // redo the case magic under windows by reconstructing the original path's case [jb]
-            myFileRest = myFoundFileName.substr(myFoundFileName.length() - myFileRest.length());
-#endif
-            // count the directories in the rest of the base name and add some relative '..' to restfilename
-            int myResult = std::count(myBaseRest.begin(), myBaseRest.end(), '/');
-            for (unsigned i = 0; i < myResult; ++i) {
-                myFileRest = std::string("../") + myFileRest;
-            }
-            AC_DEBUG << "MaterialExporter::findRelativeFilePath stripped filename=" << myFileRest;
-            return myFileRest;
-        }
-        AC_DEBUG << "MaterialExporter::findRelativeFilePath nothing to do.";
-        return myFoundFileName;
+        AC_WARNING << "MaterialExporter::findRelativeFilePath unable to resolve path '" << myFileName << "'";
     }
+#endif
+
+    myFileName = evaluateRelativePath(_myBaseDirectory, myFileName);
+    //AC_PRINT << "+++ findRelativeFilePath in=" << theFileName << " base=" << _myBaseDirectory << " out=" << myFileName;
+
+    return myFileName;
 }
 
 std::string
