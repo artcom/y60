@@ -45,6 +45,7 @@ using namespace asl;  // manually added!
 #define ABS(a) (((a) < 0) ? (-(a)) : (a))
 #endif
 
+#define DB(x) //x
 
 namespace y60 {
 
@@ -385,15 +386,19 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
 
 	//Bind the texture.
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, myTexture.myID);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	//glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//N.B.!! LOOK HERE! Auto mipmap extension used.
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+
+    //N.B.!! LOOK HERE! Auto mipmap extension used.
+	//glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+	//glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
     glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
                     GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
                     GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
+                    GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	PLAnyPicDecoder myDecoder;
 
@@ -417,12 +422,13 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
             return false;
         }
         cerr << "OK" << endl;
-
+        DB(cerr << "image alpha : " << myBmp.HasAlpha() << endl);
+        DB(cerr << "image width : " << myBmp.GetWidth() << endl);
+        DB(cerr << "image height : " << myBmp.GetHeight() << endl);
 		glTexImage2D(_cubeMapSideID[i], 0, 
                      GL_RGBA8, myBmp.GetWidth(), 
                      myBmp.GetHeight(),
 					 0, GL_BGR, GL_UNSIGNED_BYTE, myBmp.GetPixels());
-
         if (imageWidth) {
             if ((imageWidth != myBmp.GetWidth()) || (imageHeight != myBmp.GetHeight())) {
                 cerr << "#ERROR : Cubemap images MUST all be of same size!";

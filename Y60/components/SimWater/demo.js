@@ -50,13 +50,14 @@ SimWaterTestApp.prototype.Constructor = function(self, theArguments) {
         print( "active floormap: " + _myWater.activeFloormap  + " of " + _myWater.floormapCount );
         _myWater.activeFloormap = 1;
 
-        _myWater.addCubemap( "data/cube_top.png", "data/cube_left.png", "data/cube_bottom.png", 
-                             "data/cube_right.png", "data/cube_roof.png", "data/cube_ground.png" ); 
+        _myWater.addCubemap( "data/forest_2_front.png", "data/forest_2_left.png", "data/forest_2_back.png", 
+                             "data/forest_2_right.png", "data/forest_2_top.png", "data/forest_2_bottom.png" ); 
 
         print( "active cubemap: " + _myWater.activeCubemap  + " of " + _myWater.cubemapCount );
 
-        _myWater.addCubemap( "data/forest_2_front.jpg", "data/forest_2_left.jpg", "data/forest_2_back.jpg", 
-                             "data/forest_2_right.jpg", "data/forest_2_top.jpg", "data/forest_2_bottom.jpg" ); 
+
+        _myWater.addCubemap( "data/cube_top.png", "data/cube_left.png", "data/cube_bottom.png", 
+                             "data/cube_right.png", "data/cube_roof.png", "data/cube_ground.png" ); 
 
         print( "active cubemap: " + _myWater.activeCubemap  + " of " + _myWater.cubemapCount );
         _myWater.activeCubemap = 0;
