@@ -162,7 +162,11 @@ SceneExporter::writer(const MFileObject& theFile,
 
         ExportOptions myOptions = parseOptions(theOptionString);
         ProgressBar myProgressBar(myOptions.enableProgressBar);
+#if MAYA_API_VERSION == 800
         MString myFileName = theFile.resolvedFullName();
+#else
+        MString myFileName = theFile.fullName();
+#endif
 
         try {
             dom::DocumentPtr myDocument(new dom::Document);
