@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSNodeList.h,v $
-//   $Author: pavel $
-//   $Revision: 1.5 $
-//   $Date: 2005/04/24 00:41:19 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACXPSHELL_JSNODELIST_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSNODELIST_H_INCLUDED_
@@ -22,10 +14,9 @@
 #include "JSWrapper.h"
 #include "JSNode.h"
 
-#include <dom/Value.h>
+// #include <dom/Value.h>
 #include <dom/Nodes.h>
 #include <dom/NodeList.h>
-#include <iostream>
 
 namespace jslib {
 

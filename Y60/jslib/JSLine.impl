@@ -8,9 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#ifndef _Y60_ACXPSHELL_JSLine_H_INCLUDED_
-#define _Y60_ACXPSHELL_JSLine_H_INCLUDED_
-
 #include "JSWrapper.h"
 #include "JSVector.h"
 
