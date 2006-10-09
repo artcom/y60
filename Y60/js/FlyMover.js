@@ -52,6 +52,8 @@ FlyMover.prototype.Constructor = function(self) {
         _myFlySpeed = 0;
         _myCurrentStartSpeed = 1;
     }
+    
+    self.stop = function() {_myFlySpeed = 0;}
 
     self.onFrame = function(theTime) {
         if (!_myLastIdleTime) {

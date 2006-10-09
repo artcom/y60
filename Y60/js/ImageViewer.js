@@ -556,12 +556,14 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.id = createUniqueId();
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
-            _myMovieNode.audio = 0;
+            _myMovieNode.audio = 1;
 
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
             _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
 
+            //_myMovieOverlay = new MovieOverlay(window.scene, theFilename, [0,0], null, false);//, "GRAY");
+            //_myMovieNode= _myMovieOverlay.movie;
         }
 
         if (_myFullSizeMode) {

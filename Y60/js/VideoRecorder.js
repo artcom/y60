@@ -43,6 +43,7 @@ function VideoRecorder(theFramesPerSecond, theDirectory) {
             myFileName += padStringFront(_myFrameCount++, "0", 5);
             myFileName += ".png";
             window.saveBuffer(myFileName);
+            print(myFileName);
         }
     }
 

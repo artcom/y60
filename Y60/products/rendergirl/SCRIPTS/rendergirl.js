@@ -62,7 +62,7 @@ ourHandler.on_mainWindow_realize = function() {
 
 ourHandler.on_new_activate = function() {
     ourViewer.setModelName("");
-    var myScene = new Scene(null);
+    var myScene = new Scene();
     myScene.setup();
     ourViewer.setScene(myScene);
     var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
@@ -586,7 +586,6 @@ function main(argv) {
         ourViewer.registerMover(FlyMover);
         ourViewer.registerMover(WalkMover);
         ourAnimationManager = new GtkAnimationManager(ourViewer);
-
 
         ourViewer.loadModel( ourViewer.getModelName());
 

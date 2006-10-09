@@ -453,7 +453,12 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
         if (theScene) {
             myScene = theScene;
         } else {
-            myScene = new Scene(self.getModelName());
+            var myModelname = self.getModelName();
+            if (myModelname) {
+                myScene = new Scene(myModelname);
+            } else {
+                myScene = new Scene();
+            }
             self.preprocessScene(myScene);
             myScene.setup();
         }

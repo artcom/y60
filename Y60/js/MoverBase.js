@@ -60,7 +60,7 @@ MoverBase.prototype.Constructor = function(obj, theViewport) {
 
     obj.setup = function() {
     }
-
+    obj.stop = function() {}
     obj.setInitialPose = function() {
         if (_myMoverObject) {
             _myInitialPosition    = _myMoverObject.position.value;

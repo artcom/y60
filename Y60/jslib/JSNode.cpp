@@ -1324,7 +1324,7 @@ JSNode::Class() {
 
 JSObject *
 JSNode::Construct(JSContext *cx, dom::NodePtr theNode) {
-    JSObject * myNewObj = JS_ConstructObject(cx, Class(), 0, 0);
+JSObject * myNewObj = JS_ConstructObject(cx, Class(), 0, 0);
     dom::NodePtr & myNode = JSNode::getNodePtrRef(cx,myNewObj);
     myNode = theNode;
     return myNewObj;
