@@ -21,6 +21,7 @@
 #include "JSRenderArea.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSVector.h>
 #include <iostream>
 #include "JSSignalProxies.h"
 #include "JSGdkCursor.h"

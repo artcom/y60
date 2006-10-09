@@ -40,7 +40,6 @@
 #include <y60/JSVector.h>
 #include <y60/JSMatrix.h>
 #include <y60/JSNode.h>
-#include <y60/JSNodeList.h>
 #include <y60/JSScriptablePlugin.h>
 #include <y60/JSApp.h>
 #include <y60/JScppUtils.h>

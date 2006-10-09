@@ -40,7 +40,6 @@
 #include <y60/JSVector.h>
 #include <y60/JSMatrix.h>
 #include <y60/JSNode.h>
-#include <y60/JSNodeList.h>
 #include <y60/JSAbstractRenderWindow.h>
 #include <y60/JSAbstractRenderWindow.impl>
 

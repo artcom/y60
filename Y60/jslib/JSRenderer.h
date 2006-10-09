@@ -28,7 +28,6 @@
 #include "JSVector.h"
 #include "JSMatrix.h"
 #include "JSNode.h"
-#include "JSNodeList.h"
 
 #include <y60/Renderer.h>
 

@@ -14,7 +14,6 @@
 #include "PropertyValue.h"
 #include <js/jsapi.h>
 #include <asl/Ptr.h>
-#include <asl/Logger.h>
 #include <dom/Nodes.h>
 
 struct JSContext;

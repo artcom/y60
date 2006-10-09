@@ -19,6 +19,7 @@
 #include "JSConsoleView.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSVector.h>
 #include <iostream>
 
 using namespace std;

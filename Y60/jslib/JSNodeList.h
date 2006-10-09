@@ -34,146 +34,42 @@ class JSNodeListBase : public JSWrapper<NATIVE_LIST,dom::NodePtr,StaticAccessPro
 public:
     typedef JSWrapper<NATIVE_LIST,dom::NodePtr,StaticAccessProtocol> Base;
 
-    static const char * ClassName() {
-        return "NodeList";
-    }
+    static const char * ClassName();
     static JSBool
-    item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Returns a node with a given index from the nodelist");
-        DOC_PARAM("theIndex", "Index of the node to retrieve", DOC_TYPE_INTEGER);
-        DOC_RVAL("The node from the nodelist at the specified index", DOC_TYPE_NODE);
-        DOC_END;
-        typedef dom::NodePtr (NATIVE_LIST::*MyMethod)(int);
-        return Method<NATIVE_LIST>::call((MyMethod)&NATIVE_LIST::item,cx,obj,argc,argv,rval);
-    }
-    static JSBool
-    appendNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Appends a node to the node list");
-        DOC_PARAM("theNode", "The xml node to append", DOC_TYPE_NODE);
-        DOC_RVAL("The appended node", DOC_TYPE_NODE);
-        DOC_END;
-        typedef dom::NodePtr (NATIVE_LIST::*MyMethod)(int);
-        return Method<NATIVE_LIST>::call((MyMethod)&NATIVE_LIST::append,cx,obj,argc,argv,rval);
-    }
+    item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
-    static JSFunctionSpec * Functions() {
-        AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<std::endl;
-        static JSFunctionSpec myFunctions[] = {
-            /* name         native          nargs    */
-            {"item",             item,            1},
-            {"appendNode",       appendNode,      1},
-            //{"replaceChild",     replaceChild,    1},
-            //{"setAllNodeValues", setAllNodeValues,    1},
-            {0}
-        };
-        return myFunctions;
-    }
+    static JSBool
+    appendNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+
+    static JSFunctionSpec * Functions();
     enum PropertyNumbers {PROP_length = -100};
-
-    static JSPropertySpec * Properties() {
-        static JSPropertySpec myProperties[] = {
-            {"length", PROP_length, JSPROP_ENUMERATE|JSPROP_READONLY|JSPROP_PERMANENT},   // readonly attribute unsigned long
-            {0}
-        };
-        return myProperties;
-    }
-
-    static JSConstIntPropertySpec * ConstIntProperties() {
-        static JSConstIntPropertySpec myProperties[] = {{0}};
-        return myProperties;
-    }
-
-    static JSPropertySpec * StaticProperties() {
-        static JSPropertySpec myProperties[] = {{0}};
-        return myProperties;
-    }
-
-    static JSFunctionSpec * StaticFunctions() {
-        static JSFunctionSpec myFunctions[] = {{0}};
-        return myFunctions;
-    }
-
-    virtual unsigned long length() const {
-        return this->getNative().length();
-    }
-
-    // getproperty handling
-    virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-        switch (theID) {
-            case PROP_length:
-                *vp = as_jsval(cx, this->getNative().length());
-                return JS_TRUE;
-            default:
-                JS_ReportError(cx,"JSNodeListBase::getProperty: index %d out of range", theID);
-                return JS_FALSE;
-        }
-    };
-    virtual JSBool getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-        *vp = as_jsval(cx, this->getNative().item(theIndex));
-        return JS_TRUE;
-    };
-
-    // setproperty handling
-    virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-        JS_ReportError(cx,"JSNodeListBase::setPropertySwitch: index %d out of range", theID);
-        return JS_FALSE;
-    };
-    virtual JSBool setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-        dom::NodePtr myArgNode1 = JSNode::getNodePtr(cx, *vp);
-        this->openNative().item(theIndex) = myArgNode1;
-        this->closeNative();
-        return JS_TRUE;
-    };
-
+    static JSPropertySpec * Properties();
+    static JSConstIntPropertySpec * ConstIntProperties();
+    static JSPropertySpec * StaticProperties();
+    static JSFunctionSpec * StaticFunctions();
+    virtual unsigned long length() const;
+    virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, 
+            jsval id, jsval *vp); 
+    virtual JSBool getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, 
+            jsval id, jsval *vp); 
+    virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
+            jsval id, jsval *vp);
+    virtual JSBool setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, 
+            jsval id, jsval *vp);
     static JSBool
-    Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Creates a new node list");
-        DOC_END;
+    Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+    static JSObject * Construct(JSContext *cx, dom::NodePtr theNode, 
+            NATIVE_LIST * theList);
 
-        if (JSA_GetClass(cx,obj) != Base::Class()) {
-            JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
-            return JS_FALSE;
-        }
-        JSNodeListBase * myNewObject = 0;
-        dom::NodePtr myNewNode = dom::NodePtr(new dom::Node);
-        if (argc == 0) {
-            myNewObject=new JSNodeListBase(myNewNode, &(myNewNode->childNodes()));
-        } else {
-            JS_ReportError(cx,"Constructor for %s: superflous argument ignored",ClassName());
-            myNewObject=new JSNodeListBase(myNewNode, &(myNewNode->childNodes()));
-        }
-        if (myNewObject) {
-            JS_SetPrivate(cx,obj,myNewObject);
-            return JS_TRUE;
-        }
-        JS_ReportError(cx,"JSVector::Constructor: bad parameters");
-        return JS_FALSE;
-    }
-    static
-    JSObject * Construct(JSContext *cx, dom::NodePtr theNode, NATIVE_LIST * theList) {
-        return Base::Construct(cx, theNode, theList);
-    }
-    JSNodeListBase(dom::NodePtr theNode, NATIVE_LIST * theNodeList)
-        : Base(theNode, theNodeList)
-    {}
-    static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject) {
-        JSObject * myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), 0, 0, 0);
-        DOC_CREATE(JSNodeListBase);
-        return myClass;
-    }
+    JSNodeListBase(dom::NodePtr theNode, NATIVE_LIST * theNodeList);
+
+    static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject); 
 };
 
 typedef JSNodeListBase<dom::NodeList> JSNodeList;
 
-template <>
-struct JSClassTraits<dom::NodeList>
-    : public JSClassTraitsWrapper<dom::NodeList, JSNodeList> {};
+jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList);
 
-inline
-jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList) {
-    JSObject * myObject = JSNodeList::Construct(cx, theNode, theNodeList);
-    return OBJECT_TO_JSVAL(myObject);
-}
 }
 
 #endif

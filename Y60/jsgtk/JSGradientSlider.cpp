@@ -20,6 +20,8 @@
 #include "JSSignal0.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSVector.h>
+#include <y60/JSNode.h>
 #include <iostream>
 
 using namespace std;
