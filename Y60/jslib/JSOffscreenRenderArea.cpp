@@ -8,16 +8,17 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSOffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.h"
+#include "JSOffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.impl"
 
 using namespace std;
 using namespace asl;
 
+
 namespace jslib {
 
-template JSAbstractRenderWindow<OffscreenRenderArea>;
+template class JSAbstractRenderWindow<OffscreenRenderArea>;
 
 typedef jslib::AbstractRenderWindow BASE;
 

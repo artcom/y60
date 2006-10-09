@@ -22,7 +22,7 @@ using namespace asl;
 
 namespace jslib {
 
-template JSAbstractRenderWindow<acgtk::RenderArea>;
+template class JSAbstractRenderWindow<acgtk::RenderArea>;
 
 typedef JSAbstractRenderWindow<acgtk::RenderArea> JSY60BASE;
 typedef JSWidget JSGTKBASE;

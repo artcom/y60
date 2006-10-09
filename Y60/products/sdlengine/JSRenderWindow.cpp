@@ -55,7 +55,7 @@ typedef jslib::AbstractRenderWindow BASE;
 typedef jslib::JSAbstractRenderWindow<SDLWindow> JSBASE;
 
 namespace jslib {
-    template JSAbstractRenderWindow<NATIVE>;
+    template class JSAbstractRenderWindow<NATIVE>;
 }
 
 // =============== Wrapper Implementation
