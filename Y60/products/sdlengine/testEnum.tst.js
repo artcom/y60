@@ -42,7 +42,7 @@ TestEnum.prototype.Constructor = function(obj, theName) {
         }
 
         ENSURE('obj.myEnum == "max"');
-        obj.myScene = new Scene(null);
+        obj.myScene = new Scene();
         obj.myScene.setup();
         obj.myMaterial = Modelling.createUnlitTexturedMaterial(obj.myScene, "", "Foo", false);
         ENSURE("obj.myMaterial.properties.blendequation == BlendEquation.add");

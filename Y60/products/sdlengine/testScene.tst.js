@@ -60,6 +60,14 @@ MyClassUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1.1,2.2,3.3))');
         obj.myScene.world.position = ["1","2","3"];
         ENSURE('almostEqual(obj.myScene.world.position, new Vector3f(1,2,3))');
+        
+        /*var myTimeStart = millisec();
+        var myIterations = 10000;
+        for (var i = 0; i < myIterations; i++) {
+            var myImages = obj.myScene.images;            
+        }
+        print("Duration for " + myIterations + " : " + ((millisec() - myTimeStart) / 1000));
+        */
     }
 }
 
