@@ -8,6 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+#include <iostream>
+
 namespace jslib {
 
     template <class NATIVE_LIST>
@@ -150,7 +152,7 @@ namespace jslib {
     }
 
     template <class NATIVE_LIST>
-    JSNodeListBase<NATIVE_LIST>::JSNodeListBase<NATIVE_LIST>(dom::NodePtr theNode, 
+    JSNodeListBase<NATIVE_LIST>::JSNodeListBase(dom::NodePtr theNode, 
             NATIVE_LIST * theNodeList)
         : Base(theNode, theNodeList)
     {}
