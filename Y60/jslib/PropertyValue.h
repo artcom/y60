@@ -24,21 +24,13 @@ public:
     {}
 
     template<class T>
-    T get() const {
-        T myRet;
-        jslib::convertFrom(_myCx, *_myJsVal, myRet);
-        return myRet;
-    }
+    T get() const;
 
     template<class T>
-    bool get(T & theReturnValue) const {
-        return jslib::convertFrom(_myCx, *_myJsVal, theReturnValue);
-    }
+    bool get(T & theReturnValue) const;
 
     template<class T>
-    void set(const T & theValue) {
-        *_myJsVal = jslib::as_jsval(_myCx, theValue);
-    }
+    void set(const T & theValue); 
     
 private:
     PropertyValue() {}

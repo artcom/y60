@@ -17,6 +17,7 @@
 //=============================================================================
 
 #include "JSNodeList.h"
+#include "JSNodeList.impl"
 #include "JSNamedNodeMap.h"
 #include <iostream>
 

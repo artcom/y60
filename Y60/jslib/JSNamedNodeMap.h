@@ -20,16 +20,14 @@
 #define _Y60_ACXPSHELL_NAMEDNODEMAP_H_INCLUDED_
 
 #include "JSNode.h"
-#include "JSNamedNodeMap.h"
 #include "JScppUtils.h"
-
+#include "JSNodeList.h"
 
 namespace jslib {
 
-class JSNamedNodeMap : public JSNodeListBase<dom::NamedNodeMap> {
+class JSNamedNodeMap : public JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol> {
 public:
-    typedef JSNodeListBase<dom::NamedNodeMap> Base;
-    typedef Base::Base Wrapper;
+    typedef JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol> Base;
 
     static const char * ClassName() {
         return "NamedNodeMap";
@@ -57,7 +55,7 @@ public:
     {}
     static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject) {
         DOC_CREATE(JSNamedNodeMap);
-        return Wrapper::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
+        return Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions());
     }
 };
 
