@@ -11,6 +11,7 @@
 #include "JSAbstractRenderWindow.h"
 #include "JSOffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.impl"
+#include "JSNode.h"
 
 using namespace std;
 using namespace asl;

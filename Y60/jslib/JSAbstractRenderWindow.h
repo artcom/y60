@@ -13,17 +13,7 @@
 
 #include "JSWrapper.h"
 #include "AbstractRenderWindow.h"
-#include "JSRenderer.h"
-#include "JSintersection_functions.h"
-#include "IScriptablePlugin.h"
-#include "JSScriptablePlugin.h"
-#include "JSScene.h"
-#include "IRendererExtension.h"
-
 #include <y60/Viewport.h>
-#include <y60/ScopedGLContext.h>
-#include <asl/string_functions.h>
-#include <asl/os_functions.h>
 
 namespace jslib {
 
@@ -182,6 +172,10 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
 
         static JSBool getPropertySwitch(DERIVED & theNative, unsigned long theID,
                 JSContext *cx, JSObject *obj, jsval id, jsval *vp);
+
+        static JSBool setPropertySwitch(NATIVE & theNative, unsigned long theID, JSContext *cx,
+                JSObject *obj, jsval id, jsval *vp);
+
         template <class T>
         static JSBool setViewportAttribute(NATIVE & theNative, JSContext * cx, jsval * vp) {
             y60::ViewportPtr myViewport = theNative.getSingleViewport();
@@ -193,9 +187,6 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
             myViewport->y60::Viewport::set<T>(theFlag);
             return JS_TRUE;
         }
-
-        static JSBool setPropertySwitch(NATIVE & theNative, unsigned long theID, JSContext *cx,
-                JSObject *obj, jsval id, jsval *vp);
     };
 }
 

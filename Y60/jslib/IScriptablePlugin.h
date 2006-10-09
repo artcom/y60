@@ -72,24 +72,7 @@ namespace jslib {
          */
         template <class T>
         T getSetting(const dom::NodePtr & theSettings,
-                     const std::string & theSettingName, T theDefault)
-        {
-            if (!theSettings) {
-                AC_ERROR << "Settings node is invalid";
-                return theDefault;
-            }
-            const dom::NodePtr & mySetting = theSettings->childNode(theSettingName);
-            if (!mySetting) {
-                AC_WARNING << "No such setting '" << theSettingName << "'";
-                return theDefault;
-            }
-            const dom::Node myValue = (*mySetting)("#text");
-            if (!myValue) {
-                AC_ERROR << "Setting '" << theSettingName << "' has no value";
-                return theDefault;
-            }
-            return asl::as<T>(myValue.nodeValue());
-        }
+                     const std::string & theSettingName, T theDefault);
     };
 
 

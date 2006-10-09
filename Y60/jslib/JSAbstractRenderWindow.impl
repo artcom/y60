@@ -9,6 +9,16 @@
 //=============================================================================
 
 #include "JSAbstractRenderWindow.h"
+#include "JSRenderer.h"
+#include "JSintersection_functions.h"
+#include "IScriptablePlugin.h"
+#include "JSScriptablePlugin.h"
+#include "JSScene.h"
+#include "IRendererExtension.h"
+
+#include <y60/ScopedGLContext.h>
+#include <asl/string_functions.h>
+#include <asl/os_functions.h>
 
 namespace jslib {
 
