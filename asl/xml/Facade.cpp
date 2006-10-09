@@ -136,4 +136,9 @@ namespace dom {
         }
 	}
 
+    void 
+    Facade::setNode( Node & theNode) {
+        _myNode = theNode;
+    }
+
 }

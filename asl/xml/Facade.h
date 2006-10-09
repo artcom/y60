@@ -67,28 +67,27 @@ namespace dom {
             void markPrecursorDependenciesOutdated();
             void markAllDirty();
 
-        protected:
-            Facade(Node & theNode);
-
-        private:
-            Node &                         _myNode;
-            FacadeWeakPtr                  _mySelf; 
-        
-        /*****************************************************************
-        * Parent Facade
-        \****************************************************************/
-        public:
             void appendChild(NodePtr theChild);
             const NodePtr getChildNode(const std::string & theChildName) const;
             
             typedef std::map<std::string, NodePtr> PropertyMap;
             PropertyMap & getProperties() const;
             NodePtr getProperty(const std::string & theName) const;
+
         protected:
+            Facade(Node & theNode);
             virtual void ensureProperties() const {};
             mutable PropertyMap   _myPropertyNodes; 
+            
+            void setNode( Node & theNode);
+
         private:
+            Facade(); // no default constructor. Otherwise the member
+                      // _myNode points to nirvana [DS]
+
             std::map<std::string, NodePtr> _myChildren;             
+            Node &                         _myNode;
+            FacadeWeakPtr                  _mySelf; 
     }; 
 
 #define IMPLEMENT_FACADE(CLASS) \
