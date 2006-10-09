@@ -492,7 +492,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myHeartbeatThrober      = null;
     var _myPicking               = null;
 
-    var _mySwitchNodes = new Array();
+    var _mySwitchNodes  = new Array();
+    var _myMSwitchNodes = new Array();
+    var _myTSwitchNodes = new Array();
 
     self.__defineGetter__('_myPicking', function() { return _myPicking; });
 
@@ -567,11 +569,28 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     function collectSwitchNodes( theNode ) {
         for (var i = 0; i < theNode.childNodesLength(); ++i) {
-            var myName = new String( theNode.childNode(i).name );
-            if ( myName.match(/^switch_.*/)) {
-                _mySwitchNodes.push( new SwitchNodeHandler( theNode.childNode(i)) );
+            var myChild = theNode.childNode(i);
+            if ( !("name" in myChild) ) {
+                continue;
             }
-            collectSwitchNodes( theNode.childNode( i ) );
+            var myName = new String( myChild.name );
+            if ( myName.match(/^switch_.*/)) {
+                _mySwitchNodes.push( new SwitchNodeHandler( myChild ) );
+            }
+            if ( myName.match(/^mswitch_.*/)) {
+                _myMSwitchNodes.push( new MSwitchNodeHandler( myChild ) );
+            }
+            collectSwitchNodes( myChild );
+        }
+    }
+
+    function collectTSwitchNodes( theNode ) {
+        for (var i = 0; i < theNode.childNodesLength(); ++i) {
+            var myName = new String( theNode.childNode(i).name );
+            if ( myName.match(/^tswitch_.*/)) {
+                _myTSwitchNodes.push( new TSwitchNodeHandler( theNode.childNode(i)) );
+            }
+            collectTSwitchNodes( theNode.childNode( i ) );
         }
     }
 
@@ -581,10 +600,19 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         var mySceneNode = theScene.dom;
         var myWorld = mySceneNode.childNode("worlds").childNode("world");
         collectSwitchNodes( myWorld );
+        //collectTSwitchNodes( mySceneNode.childNode("materials") );
     }
 
     self.getSwitchNodes = function() {
         return _mySwitchNodes;
+    }
+
+    self.getMaterialSwitchNodes = function() {
+        return _myMSwitchNodes;
+    }
+
+    self.getTextureSwitchNodes = function() {
+        return _myTSwitchNodes;
     }
 
     self.prepareScene = function (theScene, theCanvas) {
