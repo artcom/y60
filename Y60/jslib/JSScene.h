@@ -68,6 +68,13 @@ public:
     static JSBool
     save(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
+    /*
+    static JSObject *
+    ConstructWithArgs(JSContext * cx, OWNERPTR theOwner, NATIVE * theNative, 
+            uintN argc, jsval * argv);
+    */
+
+    
 private:
     JSBool JSScene::getStatistics(JSContext *cx, jsval *vp);
 

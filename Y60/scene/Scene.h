@@ -113,7 +113,7 @@ namespace y60 {
              * Constructs a Scene object
              * @param theShaderLibrary Library of shaders, constructed from an XML file
              */
-            Scene(dom::Node & theNode);
+            Scene(dom::Node & theNode = dom::Node::Prototype);
             IMPLEMENT_FACADE(Scene);
             virtual ~Scene();
 

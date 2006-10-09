@@ -527,7 +527,7 @@ optimize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return Method<NATIVE>::call(&NATIVE::optimize,cx,obj,argc,argv,rval);
 }
 
-static JSBool
+/*static JSBool
 createStubs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Create a minimal empty world.");
     DOC_END;
@@ -540,7 +540,7 @@ createStubs(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
-
+*/
 static JSBool
 collectGarbage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Removes all dangeling and non referenced nodes from the scene.");
@@ -589,6 +589,7 @@ JSScene::StaticFunctions() {
         {"intersectBodyCenters",   intersectBodyCenters,   2},
         {"collideWithBodies",      collideWithBodies,      3},
         {"collideWithBodiesOnce",  collideWithBodiesOnce,  3},
+//        {"createStubs",         createStubs,         0},
         {0}
     };
     return myFunctions;
@@ -606,7 +607,6 @@ JSScene::Functions() {
         {"bodyVolume",          bodyVolume,          1},
         {"save",                save,                2},
         {"setup",               setup,                0},
-        {"createStubs",         createStubs,         0},
         {"createLambertMaterial", CreateLambertMaterial, 2},
         {"createColorMaterial",   CreateColorMaterial,   1},
         {"createTexturedMaterial",CreateTexturedMaterial,1},
@@ -785,34 +785,37 @@ JSScene::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     }
     asl::Ptr<y60::Scene, dom::ThreadingModel> myNewPtr = OWNERPTR(0);;
 
-    //OWNERPTR myNewPtr = OWNERPTR(0);
-    //OWNERPTR myNewPtr = OWNERPTR(new y60::Scene());
-    JSScene * myNewObject;//=new JSScene(myNewPtr, &(*myNewPtr));
+    JSScene * myNewObject = 0;
 
     try {
-        asl::Ptr<ProgressCallback> myCallback;
-        if (argc >= 3) {
-            JSObject * myTarget = JSVAL_TO_OBJECT(argv[1]);
-            string myHandler;
-            convertFrom(cx, argv[2], myHandler);
-            myCallback = asl::Ptr<ProgressCallback>(new ProgressCallback(cx, myTarget, myHandler));
-        }
-
-        if (argc >= 1) {
-            if (argv[0] == JSVAL_NULL) {
+        if (!isCalledForConversion(cx, argc,argv)) {
+            if (argc == 0) {
                 AC_INFO << "no filename, creating scene stubs";
                 PackageManagerPtr myPackageManager = JSApp::getPackageManager();
                 myNewPtr = y60::Scene::createStubs(myPackageManager);
-            } else {
+            }
+            asl::Ptr<ProgressCallback> myCallback;
+            if (argc >= 3) {
+                JSObject * myTarget = JSVAL_TO_OBJECT(argv[1]);
+                string myHandler;
+                convertFrom(cx, argv[2], myHandler);
+                myCallback = asl::Ptr<ProgressCallback>(new ProgressCallback(cx, myTarget,
+                        myHandler));
+            }
+
+            if (argc >= 1) {
                 std::string myFilename = as_string(cx, argv[0]);
+
                 PackageManagerPtr myPackageManager = JSApp::getPackageManager();
-                AC_INFO << "Loading Scene " << getFilenamePart(myFilename) << " from " << getDirectoryPart(myFilename);
+                AC_INFO << "Loading Scene " << getFilenamePart(myFilename) << " from "
+                        << getDirectoryPart(myFilename);
                 myPackageManager->add(asl::getDirectoryPart(myFilename));
                 //myNewPtr->load(getFilenamePart(myFilename), myPackageManager, myCallback);
-                myNewPtr = y60::Scene::load(getFilenamePart(myFilename), myPackageManager, myCallback);
+                myNewPtr = y60::Scene::load(getFilenamePart(myFilename), myPackageManager,
+                            myCallback);
             }
-        }
 
+        }
         myNewObject = new JSScene(myNewPtr, &(*myNewPtr));
         if (myNewObject) {
             JS_SetPrivate(cx,obj,myNewObject);
@@ -849,7 +852,7 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<y60::Scene, dom::Thread
 
 jsval as_jsval(JSContext *cx, asl::Ptr<y60::Scene, dom::ThreadingModel> theScene) {
     if (theScene) {
-        JSObject * myReturnObject = JSScene::Construct(cx, theScene, &(*theScene));
+        JSObject * myReturnObject = JSScene::asJSVal(cx, theScene, &(*theScene) );
         return OBJECT_TO_JSVAL(myReturnObject);
     }
     return JSVAL_NULL;

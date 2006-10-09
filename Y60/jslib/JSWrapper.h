@@ -910,6 +910,28 @@ public:
          myJSWrapper._myNative = theNative;
          return myNewObj;
     }
+    static JSObject *
+    ConstructWithArgs(JSContext * cx, OWNERPTR theOwner, NATIVE * theNative, 
+                uintN argc, jsval * argv)
+    {
+        JSObject * myNewObj = JS_ConstructObjectWithArguments(cx, Class(),
+                0, 0, argc, argv);
+        JSWrapper & myJSWrapper = getJSWrapper(cx,myNewObj);
+        myJSWrapper._myOwner = theOwner;
+        myJSWrapper._myNative = theNative;
+
+        return myNewObj;
+    }
+
+    static JSObject *
+    asJSVal(JSContext * cx, OWNERPTR theOwner, NATIVE * theNative) {
+        jsval myArg = STRING_TO_JSVAL(JS_NewStringCopyZ(cx, "CALLED_FROM_AS_JSVAL"));
+        JSObject * myReturnObject = ConstructWithArgs(cx, theOwner, & ( * theNative),
+                1, & myArg);
+        return myReturnObject;
+    }
+
+
 
 protected:
     JSWrapper(OWNERPTR theOwner, NATIVE * theNative)
@@ -1023,6 +1045,18 @@ checkArguments(const std::string & theMethodName, uintN argc, jsval *argv, unsig
     }
 
     checkForUndefinedArguments(theMethodName, argc, argv);
+}
+
+inline bool
+isCalledForConversion(JSContext * cx, uintN argc, jsval * argv) {
+    if (JSVAL_IS_STRING(argv[0])) {
+        JSString * myJSString = JSVAL_TO_STRING(argv[0]);
+        if (!strcmp(js_GetStringBytes(myJSString), "CALLED_FROM_AS_JSVAL")) {
+            JS_RemoveRoot(cx,&myJSString);
+            return true;
+        }
+    }
+    return false;
 }
 
 }
