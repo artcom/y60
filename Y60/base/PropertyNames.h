@@ -25,6 +25,10 @@ namespace y60 {
     static const char * SPECULAR_PROPERTY          = "specular";
     static const char * SHININESS_PROPERTY         = "shininess";
     static const char * EMISSIVE_PROPERTY          = "emissive";
+    // blinn parameters
+    static const char * ECCENTRICITY_PROPERTY      = "eccentricity";
+    static const char * SPECULAR_CUTOFF_PROPERTY   = "specularcutoff";
+
     static const char * ATTENUATION_PROPERTY       = "attenuation";
     static const char * LINEWIDTH_PROPERTY         = "linewidth";
     static const char * LINESTIPPLE_PROPERTY       = "linestipple";
