@@ -21,7 +21,6 @@
 #include "JSSignal2.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
-#include <y60/JSAbstractRenderWindow.h>
 #include <iostream>
 
 using namespace std;

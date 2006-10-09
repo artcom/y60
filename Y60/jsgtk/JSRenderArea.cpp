@@ -13,6 +13,7 @@
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
 #include <y60/JSAbstractRenderWindow.h>
+#include <y60/JSAbstractRenderWindow.impl>
 #include <iostream>
 #include <y60/GLContextRegistry.h>
 
@@ -20,6 +21,8 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template JSAbstractRenderWindow<acgtk::RenderArea>;
 
 typedef JSAbstractRenderWindow<acgtk::RenderArea> JSY60BASE;
 typedef JSWidget JSGTKBASE;

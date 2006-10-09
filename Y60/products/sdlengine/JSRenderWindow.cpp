@@ -42,6 +42,7 @@
 #include <y60/JSNode.h>
 #include <y60/JSNodeList.h>
 #include <y60/JSAbstractRenderWindow.h>
+#include <y60/JSAbstractRenderWindow.impl>
 
 #define DB(x) // x
 
@@ -52,6 +53,10 @@ using namespace jslib;
 typedef SDLWindow NATIVE;
 typedef jslib::AbstractRenderWindow BASE;
 typedef jslib::JSAbstractRenderWindow<SDLWindow> JSBASE;
+
+namespace jslib {
+    template JSAbstractRenderWindow<NATIVE>;
+}
 
 // =============== Wrapper Implementation
 

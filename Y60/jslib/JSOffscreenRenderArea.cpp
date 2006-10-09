@@ -10,11 +10,14 @@
 
 #include "JSOffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.h"
+#include "JSAbstractRenderWindow.impl"
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template JSAbstractRenderWindow<jslib::OffscreenRenderArea>;
 
 typedef jslib::AbstractRenderWindow BASE;
 
