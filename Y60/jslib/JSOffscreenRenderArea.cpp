@@ -17,7 +17,7 @@ using namespace asl;
 
 namespace jslib {
 
-template jslib::JSAbstractRenderWindow<jslib::OffscreenRenderArea>;
+template JSAbstractRenderWindow<OffscreenRenderArea>;
 
 typedef jslib::AbstractRenderWindow BASE;
 
