@@ -50,11 +50,7 @@
 #endif
 
 #ifdef LINUX
-#ifdef __x86_64__
     #include <asm/atomic.h>
-#else
-    typedef struct { volatile asl::Signed32 counter; } atomic_t;
-#endif
 #endif    
 
 /*! \addtogroup aslbase */
