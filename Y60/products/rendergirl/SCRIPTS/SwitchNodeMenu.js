@@ -50,9 +50,21 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
 
     function collectSwitchNodeChildren( theHandler, theSubMenu ) {
         var myNode = theHandler.getNode();
+        var myGroupItem = null;
+        
         for (var i = 0; i < myNode.childNodesLength(); ++i) {
             var myChild = myNode.childNode( i );
-            var myItem = new CheckMenuItem( myChild.name, myChild.visible );
+            // var myItem = new CheckMenuItem( myChild.name, myChild.visible );
+            
+            var myItem;
+            if (myGroupItem == null) {
+                myGroupItem = new RadioMenuItem(myChild.name, myChild.visible);
+                myItem = myGroupItem;
+            } else {
+                myItem = new RadioMenuItem(myChild.name, myChild.visible);
+                myItem.setGroupFromItem(myGroupItem);
+            }
+
             if (String(myNode.name).match(/^mswitch_.*/) && i == 0) {
                 // switch to first material switch there is
                 myItem.active = true;
@@ -62,7 +74,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
             myItem.show();
 
             _myChildren[ myChild.name ] = myItem;
-            theSubMenu.append( myItem );
+            theSubMenu.append(myItem);
 
             var myFunctionString = 'this.onSwitchNodeSwitched(\'' + myChild.name + '\');';
             obj['_myGtkSwitchNodeHandler_'+myChild.name] = new Function (myFunctionString);

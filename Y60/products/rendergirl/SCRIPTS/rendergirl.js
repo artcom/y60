@@ -411,8 +411,15 @@ Viewer.prototype.Constructor = function(self, theArguments) {
 
     self.loadModel = function( theFilename ) {
         self.setModelName(theFilename);
-        var myScene = new Scene(theFilename);
         
+        var myScene;
+        if (theFilename == null) {
+            myScene = new Scene();
+            theFilename = "empty scene";
+        } else {
+            myScene = new Scene(theFilename);
+        }
+
         myScene.setup();  
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         ourViewer.setScene(myScene, myCanvas);
