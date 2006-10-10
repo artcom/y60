@@ -18,6 +18,7 @@
 #include <asl/Ptr.h>
 #include <asl/Matrix4.h>
 #include <asl/Stream.h>
+#include <asl/PackageManager.h>
 
 // Dumb hack since paintlib is installed as a non-debug variant
 #ifdef _DEBUG
@@ -28,11 +29,12 @@
 #include <paintlib/plbitmap.h>
 #endif
 
+/*
 namespace asl {
     //class ReadableStream;
     class PackageManager;
 }
-
+*/
 namespace y60 {
     typedef std::vector<ImageFilter> VectorOfImageFilter;
 
