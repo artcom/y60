@@ -362,10 +362,24 @@ namespace asl {
     };
 
     template <class Threading> class PtrAllocator;
-    template <>
-    class PtrAllocator<SingleThreaded> : public PtrFreeListChunkAllocator<SingleThreaded> {};
+
+// the PtrFreeListChunkAllocator does not work correct in a shared environment, i.e. plugins, because of its
+// static member '_theFreeListHead_', which will than be different pointers -> multiple freelists -> MEMORY LEAK
+// Solution: By default the heap allocator is always used, no matter if you use
+// MultiProcessor, SingleProcessor or SingleThreaed policy, performance measurements did not show any difference.
+// To get the true variance define 'USE_NON_SHARED_ENVIRONMENT_ONLY_ALLOCATOR' (vs)
+
+#ifdef USE_NON_SHARED_ENVIRONMENT_ONLY_ALLOCATOR
     template <>
     class PtrAllocator<SingleProcessor> : public PtrThreadSpecificFreeListAllocator<SingleProcessor> {};
+    template <>
+    class PtrAllocator<SingleThreaded> : public PtrFreeListChunkAllocator<SingleThreaded> {};
+#else
+    template <>
+    class PtrAllocator<SingleProcessor> : public PtrHeapAllocator<SingleProcessor> {};
+    template <>
+    class PtrAllocator<SingleThreaded> : public PtrHeapAllocator<SingleThreaded> {};
+#endif
     // template <>
     // class PtrAllocator<MultiProcessor> : public PtrThreadSpecificFreeListChunkAllocator {};
      
