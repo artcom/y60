@@ -45,7 +45,7 @@ public:
         ENSURE_EQUAL(myCount , 2);
         ENSURE(!myCount.decrement_and_test());
         ENSURE_EQUAL(myCount , 1);
-	long myValue = myCount.post_increment();
+	    long myValue = myCount.post_increment();
         ENSURE_EQUAL(myValue , 1);
         ENSURE_EQUAL(myCount , 2);
         ENSURE(!myCount.decrement_and_test());
@@ -65,6 +65,9 @@ public:
         ENSURE_EQUAL(myCount , 0);
         myCount.set(1);
         ENSURE(myCount.conditional_increment());
+        ENSURE_EQUAL(myCount , 2);
+	    myValue = myCount.post_increment();
+        ENSURE_EQUAL(myValue , 2);
     }
 };
 
