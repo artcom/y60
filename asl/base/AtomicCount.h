@@ -49,6 +49,14 @@
     #include <libkern/OSAtomic.h>
 #endif
 
+#ifdef LINUX
+#ifdef __x86_64__
+    #include <asm/atomic.h>
+#else
+    typedef struct { volatile asl::Signed32 counter; } atomic_t;
+#endif
+#endif    
+
 /*! \addtogroup aslbase */
 /* @{ */
 
@@ -59,9 +67,7 @@
 	#define UNIX_X86
 #endif
 
-#ifdef UNIX_X86 
-
-typedef struct { volatile asl::Signed32 counter; } atomic_t;
+#if defined(UNIX_X86)
 
 #define ATOMIC_INIT(i)	{ (i) }
 
@@ -86,6 +92,7 @@ typedef struct { volatile asl::Signed32 counter; } atomic_t;
 #define ATOMIC_INIT(i)	{ (i) }
 #define atomic_read(v)		((v)->counter)
 
+#if 0
 static __inline__ int atomic_dec_and_test(atomic_t *v)
 {
 	unsigned char c;
@@ -104,7 +111,7 @@ static __inline__ void atomic_inc(atomic_t *v)
 		:"=m" (v->counter)
 		:"m" (v->counter));
 }
-
+#endif
 static __inline__ int atomic_post_inc(atomic_t *v)
 {
    register int result = 1; 
@@ -498,7 +505,7 @@ namespace asl
             }
 	        inline
 	    	void increment() {
-#ifdef UNIX_X86
+#ifdef UNIX_X86 
                	atomic_inc_SingleProcessor(&value);
 #endif
 #ifdef WIN32
@@ -628,7 +635,11 @@ namespace asl
 				return OSAtomicAdd32(1, (int32_t*)&value)-1;
 #endif
 #ifdef LINUX
+#ifdef __x86_64__
+                return atomic_inc_return(&value)-1;
+#else
                	return atomic_post_inc(&value);
+#endif                
 #endif
 #ifdef WIN32
         		return InterlockedIncrement(&value)-1;
