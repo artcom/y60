@@ -25,6 +25,7 @@
 #include "JSSignalProxies.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JScppUtils.impl>
 #include <iostream>
 
 using namespace std;
@@ -32,6 +33,7 @@ using namespace asl;
 
 namespace jslib {
 
+template jsval as_jsval(JSContext *cx, const std::vector<Glib::ustring> & theVector);
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

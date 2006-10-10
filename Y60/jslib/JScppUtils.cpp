@@ -10,6 +10,7 @@
 
 #include "QuitFlagSingleton.h"
 #include "JScppUtils.h"
+#include "JScppUtils.impl"
 
 #include <asl/error_functions.h>
 #include <js/jsapi.h>
@@ -159,6 +160,14 @@ jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF1
     JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<const jschar*>(theUTF16String.c_str()));
     return STRING_TO_JSVAL(myString);    
 }
+
+template jsval as_jsval(JSContext *cx, const std::vector<bool> & theVector);
+template jsval as_jsval(JSContext *cx, const std::vector<unsigned char> & theVector);
+template jsval as_jsval(JSContext *cx, const std::vector<int> & theVector);
+template jsval as_jsval(JSContext *cx, const std::vector<unsigned int> & theVector);
+template jsval as_jsval(JSContext *cx, const std::vector<float> & theVector);
+template jsval as_jsval(JSContext *cx, const std::vector<double> & theVector);
+template jsval as_jsval(JSContext *cx, const std::vector<std::string> & theVector);
 
 void ensureParamCount(uintN argc, int theMinCount, int theMaxCount) {
     if (argc < theMinCount) {

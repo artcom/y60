@@ -12,6 +12,7 @@
 
 #include "jscpp.h"
 #include "JScppUtils.h"
+#include "JScppUtils.impl"
 #include "JSNode.h"
 #include "JSBlock.h"
 #include "JSVector.h"
@@ -990,6 +991,9 @@ jsval as_jsval(JSContext *cx, const ObjectDocumentation & theDocumentation) {
     return rval;
 }
 
+template jsval as_jsval(JSContext *cx, const std::vector<ParameterDescription> & theVector);
+template jsval as_jsval(JSContext *cx, const std::vector<FunctionDescription> & theVector);
+    
 JS_STATIC_DLL_CALLBACK(JSBool)
 getDocumentedModules(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Collects all currently documented modules.");

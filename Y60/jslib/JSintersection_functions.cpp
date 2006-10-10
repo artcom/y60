@@ -7,13 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSintersection_functions.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.3 $
-//   $Date: 2005/04/18 19:59:30 $
-//
-//=============================================================================
 
 #include "JSintersection_functions.h"
 
@@ -23,6 +16,8 @@
 #include "JSVector.h"
 #include "JSMatrix.h"
 #include "JSNode.h"
+#include "JScppUtils.h"
+#include "JScppUtils.impl"
 
 /*
 found at http://www.gamedev.net/columns/hardcore/dxshader2/page3.asp
@@ -49,6 +44,9 @@ N = transpose( inverse(M) )
 
 // return intersection point and primitive
 namespace jslib {
+    
+template jsval as_jsval(JSContext *cx, const std::vector<y60::IntersectionInfo> & theVector);
+template jsval as_jsval(JSContext *cx, const std::vector<y60::CollisionInfo> & theVector);
 
 static bool fillPrimitiveElement(JSContext *cx, JSObject * myObject,
                                  const y60::Primitive::Element & theElement,

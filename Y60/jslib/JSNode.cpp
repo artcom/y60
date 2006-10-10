@@ -11,6 +11,8 @@
 #include "JSNode.h"
 #include "JSNodeList.h"
 #include "JSNamedNodeMap.h"
+#include "JScppUtils.h"
+#include "JScppUtils.impl"
 
 #include "JSBox.h"
 #include "JSTriangle.h"
@@ -44,6 +46,8 @@ using namespace asl;
 namespace jslib {
 
 #define DB(x)  x
+
+template jsval as_jsval(JSContext *cx, const std::vector<dom::NodePtr> & theVector);
 
 struct TypeConverterMap {
     static std::map<std::string,int> ourKnownTypes;

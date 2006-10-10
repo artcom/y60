@@ -7,16 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSintersection_functions.h,v $
-//   $Author: martin $
-//   $Revision: 1.1 $
-//   $Date: 2004/11/10 13:34:26 $
-//
-//   Description: Base class wrapper for AbstractRenderWindow
-//   TODO: this is not (yet) used by the SDL-based app
-//
-//=============================================================================
 
 #ifndef __y60_jslib_jsintersection_functions_h_included_
 #define __y60_jslib_jsintersection_functions_h_included_

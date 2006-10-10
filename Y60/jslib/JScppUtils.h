@@ -270,16 +270,7 @@ jsval as_jsval(JSContext *cx, const std::string & theValue);
 jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String);
 
 template <class T>
-jsval as_jsval(JSContext *cx, const std::vector<T> & theVector) {
-    JSObject * myReturnObject = JS_NewArrayObject(cx, 0, NULL);
-    for (unsigned i = 0; i < theVector.size(); ++i) {
-        jsval myValue = as_jsval(cx, theVector[i]);
-        if (!myValue || !JS_SetElement(cx, myReturnObject, i, &myValue)) {
-            return JS_FALSE;
-        }
-    }
-    return OBJECT_TO_JSVAL(myReturnObject);
-}
+jsval as_jsval(JSContext *cx, const std::vector<T> & theVector);
 
 template <class T> struct JSClassTraits;
 

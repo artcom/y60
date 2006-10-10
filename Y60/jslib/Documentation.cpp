@@ -17,6 +17,7 @@
 //=============================================================================
 
 #include "Documentation.h"
+
 #include <asl/Logger.h>
 #include <asl/string_functions.h>
 

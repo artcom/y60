@@ -20,6 +20,7 @@
 #include "JSTaskWindow.h"
 #include <y60/JSRenderer.h>
 #include <y60/JScppUtils.h>
+#include <y60/JScppUtils.impl>
 
 #include <iostream>
 
@@ -229,4 +230,7 @@ JSTask::StaticFunctions() {
         JSObject * myObject = JSTask::Construct(cx, theOwner, theNative);
         return OBJECT_TO_JSVAL(myObject);
     }
+    
+    template jsval as_jsval(JSContext *cx, const std::vector<JSTaskWindow::OWNERPTR> & theVector);
+
 }
