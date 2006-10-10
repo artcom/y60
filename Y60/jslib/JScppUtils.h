@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JScppUtils.h,v $
-//   $Author: pavel $
-//   $Revision: 1.12 $
-//   $Date: 2005/04/24 00:41:19 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_JSCPPUTILS_INCLUDED_
 #define _Y60_JSCPPUTILS_INCLUDED_
@@ -37,19 +29,17 @@
 
 #include <paintlib/plexcept.h>
 
+// Undefine stuff to undo Apple namespace pollution
 #ifdef check
 #undef check
-//#warning undefined check to undo Apple namespace pollution
 #endif
 
 #ifdef nil
 #undef nil
-//#warning undefined nil to undo Apple namespace pollution
 #endif
 
 #ifdef DestroyNotify
 #undef DestroyNotify
-//#warning undefined data to undo Apple namespace pollution
 #endif
 
 //#include <glibmm.h>
@@ -268,55 +258,16 @@ struct JValueTypeTraits<unsigned int> {
     enum {SIZE = 1};
 };
 
-inline
-jsval as_jsval(JSContext *cx, bool theValue) {
-    return BOOLEAN_TO_JSVAL(theValue);
-}
-
-inline
-jsval as_jsval(JSContext *cx, double theValue) {
-    jsval myReturnValue;
-    JS_NewDoubleValue(cx,theValue,&myReturnValue);
-    return myReturnValue;
-}
-
-inline
-jsval as_jsval(JSContext *cx, float theValue) {
-    return as_jsval(cx, double(theValue));
-}
-
-inline
-jsval as_jsval(JSContext *cx, long theValue) {
-    return as_jsval(cx, double(theValue));
-}
-
-inline
-jsval as_jsval(JSContext *cx, unsigned long theValue) {
-    return as_jsval(cx, double(theValue));
-}
-
-inline
-jsval as_jsval(JSContext *cx, unsigned int theValue) {
-    return as_jsval(cx, double(theValue));
-}
-
-inline
-jsval as_jsval(JSContext *cx, int theValue) {
-    return INT_TO_JSVAL(theValue);
-}
-
+jsval as_jsval(JSContext *cx, bool theValue);
+jsval as_jsval(JSContext *cx, double theValue);
+jsval as_jsval(JSContext *cx, float theValue); 
+jsval as_jsval(JSContext *cx, long theValue);
+jsval as_jsval(JSContext *cx, unsigned long theValue); 
+jsval as_jsval(JSContext *cx, unsigned int theValue); 
+jsval as_jsval(JSContext *cx, int theValue); 
 jsval as_jsval(JSContext *cx, const char * theU8String);
-
-inline
-jsval as_jsval(JSContext *cx, const std::string & theValue) {
-    return as_jsval(cx, theValue.c_str());
-}
-
-inline
-jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String) {
-    JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<const jschar*>(theUTF16String.c_str()));
-    return STRING_TO_JSVAL(myString);    
-}
+jsval as_jsval(JSContext *cx, const std::string & theValue); 
+jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String);
 
 template <class T>
 jsval as_jsval(JSContext *cx, const std::vector<T> & theVector) {
@@ -346,167 +297,18 @@ bool convertFrom(JSContext *cx, jsval theValue, typename dom::ValueWrapper<T>::T
     return false;
 }
 
-inline
-bool convertFrom(JSContext *cx, jsval theValue, double & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
-        !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        theDest = double(myDoubleDest);
-        return true;
-    }
-    //theDest = asl::Time::double(theValue);
-    return false;
-}
-
-inline
-bool convertFrom(JSContext *cx, jsval theValue, float & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
-        !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        theDest = (float)myDoubleDest;
-        return true;
-    }
-    return false;
-}
-
-inline
-bool convertFrom(JSContext *cx, jsval theValue, unsigned short & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
-        !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        if ((myDoubleDest < std::numeric_limits<unsigned short>::min()) ||
-            (myDoubleDest > std::numeric_limits<unsigned short>::max()))
-        {
-            JS_ReportError(cx, "#WARNING convertFrom: -> unsigned short: value out of range: %g", myDoubleDest);
-        }
-        theDest = (unsigned short)(myDoubleDest);
-        return true;
-    }
-    return false;
-}
-
-inline
-bool convertFrom(JSContext *cx, jsval theValue, int & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
-        !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        if ((myDoubleDest < asl::NumericTraits<int>::min()) ||
-            (myDoubleDest > asl::NumericTraits<int>::max()))
-        {
-            AC_ERROR << "min="<< asl::NumericTraits<int>::min();
-            AC_ERROR << "max="<< asl::NumericTraits<int>::max();
-            JS_ReportError(cx, "#WARNING convertFrom: -> int: value out of range: %g", myDoubleDest);
-        }
-        theDest = (int)(myDoubleDest);
-        return true;
-    }
-    return false;
-}
-
-inline
-bool convertFrom(JSContext *cx, jsval theValue, unsigned int & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
-        !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        if ((myDoubleDest < asl::NumericTraits<unsigned int>::min()) ||
-            (myDoubleDest > asl::NumericTraits<unsigned int>::max()))
-        {
-            AC_ERROR << "min="<< asl::NumericTraits<unsigned int>::min();
-            AC_ERROR << "max="<< asl::NumericTraits<unsigned int>::max();
-
-            JS_ReportError(cx, "#WARNING convertFrom: -> unsigned int: value out of range: %g", myDoubleDest);
-        }
-        theDest = (unsigned int)(myDoubleDest);
-        return true;
-    }
-    return false;
-}
-inline
-bool convertFrom(JSContext *cx, jsval theValue, unsigned long & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
-        !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        if ((myDoubleDest < asl::NumericTraits<unsigned long>::min()) ||
-            (myDoubleDest > asl::NumericTraits<unsigned long>::max()))
-        {
-            JS_ReportError(cx, "#WARNING convertFrom: -> unsigned long: value out of range: %g", myDoubleDest);
-        }
-        theDest = (unsigned long)(myDoubleDest);
-        return true;
-    }
-    return false;
-}
-
-inline
-bool convertFrom(JSContext *cx, jsval theValue, long & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
-        !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        if ((myDoubleDest < asl::NumericTraits<long>::min()) ||
-            (myDoubleDest > asl::NumericTraits<long>::max()))
-        {
-            JS_ReportError(cx, "#WARNING convertFrom: -> long: value out of range: %g", myDoubleDest);
-        }
-        theDest = long(myDoubleDest);
-        return true;
-    }
-    return false;
-}
-
-inline
-bool convertFrom(JSContext *cx, jsval theValue, bool & theDest) {
-    JSBool myBool;
-    if (JS_ValueToBoolean(cx, theValue, &myBool))
-    {
-        theDest = bool(myBool);
-        return true;
-    }
-    return false;
-}
-
-inline
-bool convertFrom(JSContext *cx, jsval theValue, std::string & theDest) {
-    theDest = asl::as_string(cx, theValue);
-    return true;
-}
-
-inline
-bool convertFrom(JSContext *cx, jsval theValue, JSObject * & theDest) {
-    if (JSVAL_IS_OBJECT(theValue)) {
-        JSObject * myArgument;
-        if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            theDest = myArgument;
-            return true;
-        }
-    }
-    return false;
-}
-
-inline
-bool convertFrom(JSContext *cx, jsval theValue, unsigned char & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) && !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        if ((myDoubleDest < asl::NumericTraits<unsigned char>::min()) ||
-            (myDoubleDest > asl::NumericTraits<unsigned char>::max()))
-        {
-            AC_ERROR << "min="<< asl::NumericTraits<unsigned char>::min();
-            AC_ERROR << "max="<< asl::NumericTraits<unsigned char>::max();
-
-            JS_ReportError(cx, "#WARNING convertFrom: -> unsigned char: value out of range: %g", myDoubleDest);
-        }
-        theDest = (unsigned char)(myDoubleDest);
-        return true;
-    }
-    return false;
-}
+bool convertFrom(JSContext *cx, jsval theValue, double & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, float & theDest);
+bool convertFrom(JSContext *cx, jsval theValue, unsigned short & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, int & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, unsigned int & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, unsigned long & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, long & theDest);
+bool convertFrom(JSContext *cx, jsval theValue, bool & theDest);
+bool convertFrom(JSContext *cx, jsval theValue, std::string & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, JSObject * & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, unsigned char & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest); 
 
 template <class T>
 bool convertFrom(JSContext *cx, jsval theValue, std::vector<T> & theDest) {
@@ -536,16 +338,6 @@ bool convertFrom(JSContext *cx, jsval theValue, std::vector<T> & theDest) {
     return false;
 }
 
-inline
-bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) && !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        theDest = asl::Time(myDoubleDest);
-        return true;
-    }
-    return false;
-}
 
 JSBool JSA_charArrayToString(JSContext *cx, jsval *argv, std::string & theResult);
 

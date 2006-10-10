@@ -23,46 +23,25 @@ namespace jslib {
 
 template<class NATIVE_VECTOR> struct JSVector;
 
-template <class VECTOR_NF>
-class Converter {
-    template <template <class> class VECTOR, class NUMBER>
-    static
-    bool convertFromVN(JSContext *cx, jsval theValue, VECTOR<NUMBER> & theVector);
-public:
-    static
-    bool convertFrom(JSContext *cx, jsval theValue, VECTOR_NF & theVector) {
-        return convertFromVN(cx,theValue,theVector);
-    }
-};
-#define DEFINE_CONVERT_FROM(THE_TYPE) \
-inline \
-bool convertFrom(JSContext *cx, jsval theValue, THE_TYPE & theVector) { \
-    return Converter<THE_TYPE>::convertFrom(cx,theValue,theVector); \
-}
+bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2i & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3i & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4i & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2f & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3f & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4f & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Vector2d & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Vector3d & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Vector4d & theVector);
 
-DEFINE_CONVERT_FROM(asl::Vector2f)
-DEFINE_CONVERT_FROM(asl::Vector3f)
-DEFINE_CONVERT_FROM(asl::Vector4f)
-
-DEFINE_CONVERT_FROM(asl::Vector2d)
-DEFINE_CONVERT_FROM(asl::Vector3d)
-DEFINE_CONVERT_FROM(asl::Vector4d)
-
-DEFINE_CONVERT_FROM(asl::Vector2i)
-DEFINE_CONVERT_FROM(asl::Vector3i)
-DEFINE_CONVERT_FROM(asl::Vector4i)
-
-DEFINE_CONVERT_FROM(asl::Point2f)
-DEFINE_CONVERT_FROM(asl::Point3f)
-DEFINE_CONVERT_FROM(asl::Point4f)
-
-DEFINE_CONVERT_FROM(asl::Point2d)
-DEFINE_CONVERT_FROM(asl::Point3d)
-DEFINE_CONVERT_FROM(asl::Point4d)
-
-DEFINE_CONVERT_FROM(asl::Point2i)
-DEFINE_CONVERT_FROM(asl::Point3i)
-DEFINE_CONVERT_FROM(asl::Point4i)
+bool convertFrom(JSContext *cx, jsval theValue, asl::Point2i & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Point3i & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Point4i & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Point2f & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Point3f & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Point4f & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Point2d & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Point3d & theVector);
+bool convertFrom(JSContext *cx, jsval theValue, asl::Point4d & theVector);
 
 template <template<class> class NATIVE_VECTOR, class NUMBER>
 jsval as_jsval(JSContext *cx, const NATIVE_VECTOR<NUMBER> & theValue) {
@@ -558,32 +537,6 @@ DEFINE_VECTOR_CLASS_TRAITS(asl::Point4d)
 DEFINE_VECTOR_CLASS_TRAITS(asl::Point2i)
 DEFINE_VECTOR_CLASS_TRAITS(asl::Point3i)
 DEFINE_VECTOR_CLASS_TRAITS(asl::Point4i)
-
-template <class VECTOR_NF>
-template <template <class> class VECTOR, class NUMBER>
-bool Converter<VECTOR_NF>::convertFromVN(JSContext *cx, jsval theValue,
-    VECTOR<NUMBER> & theVector)
-{
-    if (JSVAL_IS_OBJECT(theValue)) {
-        JSObject * myValObj = JSVAL_TO_OBJECT(theValue);
-        if (JSVector<VECTOR<NUMBER> >::Class() != JSA_GetClass(cx, myValObj)) {
-            myValObj = JSVector<VECTOR<NUMBER> >::Construct(cx, theValue);
-        }
-        if (myValObj) {
-            const VECTOR<NUMBER> & myNativeArg = JSVector<VECTOR<NUMBER> >::getJSWrapper(cx, myValObj).getNative();
-            theVector = myNativeArg;
-            return true;
-        } else {
-            // [CH] The caller should be responsible for error reporting, otherwise we cannot overload functions, properly
-            /*
-            JS_ReportError(cx,"convertFrom VECTOR<NUMBER>: bad argument type, Vector of size %d expected",
-                    JValueTypeTraits<VECTOR<NUMBER> >::SIZE);
-            */
-            return false;
-        }
-    }
-    return false;
-}
 
 } // namespace
 
