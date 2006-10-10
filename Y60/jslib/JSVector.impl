@@ -88,7 +88,7 @@ namespace jslib {
     }
 
     template<class NATIVE_VECTOR>
-    typename const JSVector<NATIVE_VECTOR>::NativeValuePtr & JSVector<NATIVE_VECTOR>::getOwner() const {
+    const typename JSVector<NATIVE_VECTOR>::NativeValuePtr & JSVector<NATIVE_VECTOR>::getOwner() const {
         return _myOwner;
     }
 
@@ -560,7 +560,7 @@ namespace jslib {
     }
 
     template<class NATIVE_VECTOR>
-    typename JSVector<NATIVE_VECTOR> & 
+    JSVector<NATIVE_VECTOR> & 
     JSVector<NATIVE_VECTOR>::operator=(const JSVector<NATIVE_VECTOR> & theVector) {
         _myOwner = theVector.getOwner();
         return *this;
