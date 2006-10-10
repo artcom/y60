@@ -8,104 +8,25 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSWrapper.h"
-#include "JSVector.h"
-
-#include <asl/Vector234.h>
-#include <asl/numeric_functions.h>
-#include <asl/linearAlgebra.h>
-#include <asl/Line.h>
-#include <dom/Value.h>
-
+#include "JSLine.h"
 
 namespace jslib {
 
-typedef float LineNumber;
-typedef float RayNumber;
-typedef float LineSegmentNumber;
+template <class NATIVE_LINE>
+JSObject * JSGenericLine<NATIVE_LINE>::Construct(JSContext *cx, typename JSGenericLine<NATIVE_LINE>::NativeValuePtr theValue) {
+    return Base::Construct(cx, theValue, 0);
+}
 
 template <class NATIVE_LINE>
-class JSGenericLine : public JSWrapper<NATIVE_LINE>
-{
-    typedef JSWrapper<NATIVE_LINE> Base;
-    JSGenericLine() {}
-public:
-    static const char * ClassName();
-    static JSFunctionSpec * Functions();
-
-    enum PropertyNumbers {
-        PROP_origin = -100,
-        PROP_direction,
-        PROP_end
-    };
-    static JSPropertySpec * Properties();
-    static JSConstIntPropertySpec * ConstIntProperties();
-    static JSPropertySpec * StaticProperties();
-    static JSFunctionSpec * StaticFunctions();
-
-
-    // getproperty handling
-    virtual JSBool getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-    //virtual JSBool getPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-
-    // setproperty handling
-    virtual JSBool setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-    //virtual JSBool setPropertyIndex(unsigned long theIndex, JSContext *cx, JSObject *obj, jsval id, jsval *vp);
-
-    static JSBool
-    Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
-
-    static
-    JSObject * Construct(JSContext *cx, typename JSGenericLine<NATIVE_LINE>::NativeValuePtr theValue) {
-        return Base::Construct(cx, theValue, 0);
-    }
-    static
-    JSObject * Construct(JSContext *cx, const NATIVE_LINE & theLine) {
-        typename JSGenericLine<NATIVE_LINE>::NativeValuePtr myValue(new dom::SimpleValue<NATIVE_LINE >(theLine, 0));
-        return Base::Construct(cx, myValue, 0);
-    }
-    JSGenericLine(typename JSGenericLine<NATIVE_LINE>::NativeValuePtr theValue)
-        : Base(theValue, 0)
-    {}
-
-
-    static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
-};
-
-
-typedef JSGenericLine<asl::Line<LineNumber> > JSLine;
-typedef JSGenericLine<asl::Ray<LineNumber> > JSRay;
-typedef JSGenericLine<asl::LineSegment<LineNumber> > JSLineSegment;
+JSObject * JSGenericLine<NATIVE_LINE>::Construct(JSContext *cx, const NATIVE_LINE & theLine) {
+    typename JSGenericLine<NATIVE_LINE>::NativeValuePtr myValue(new dom::SimpleValue<NATIVE_LINE >(theLine, 0));
+    return Base::Construct(cx, myValue, 0);
+}
 
 template <class NATIVE_LINE>
-struct JSLineClassTraits : public JSClassTraitsWrapper<NATIVE_LINE, JSGenericLine<NATIVE_LINE> > {};
-
-template <>
-struct JSClassTraits<asl::Line<LineNumber> > : public JSLineClassTraits<asl::Line<LineNumber> > {
-};
-template <>
-struct JSClassTraits<asl::Ray<LineNumber> > : public JSLineClassTraits<asl::Ray<LineNumber> > {
-};
-template <>
-struct JSClassTraits<asl::LineSegment<LineNumber> > : public JSLineClassTraits<asl::LineSegment<LineNumber> > {
-};
-
-
-bool convertFrom(JSContext *cx, jsval theValue, asl::Line<LineNumber> & theLine);
-jsval as_jsval(JSContext *cx, const asl::Line<LineNumber>  & theValue);
-//jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Line<LineNumber> * theLine);
-jsval as_jsval(JSContext *cx, JSLine::NativeValuePtr theLine);
-
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ray<LineNumber> & theLine);
-jsval as_jsval(JSContext *cx, const asl::Ray<LineNumber>  & theValue);
-//jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Ray<LineNumber> * theLine);
-jsval as_jsval(JSContext *cx, JSRay::NativeValuePtr theLine);
-
-bool convertFrom(JSContext *cx, jsval theValue, asl::LineSegment<LineNumber> & theLine);
-jsval as_jsval(JSContext *cx, const asl::LineSegment<LineNumber> & theValue);
-//jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::LineSegment<LineNumber> * theLine);
-jsval as_jsval(JSContext *cx, JSLineSegment::NativeValuePtr theLine);
-
+JSGenericLine<NATIVE_LINE>::JSGenericLine(typename JSGenericLine<NATIVE_LINE>::NativeValuePtr theValue)
+    : Base(theValue, 0)
+{}
 
 template <class NATIVE_LINE>
 static JSBool
@@ -116,7 +37,6 @@ lineToString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
-
 
 template <class NATIVE_LINE>
 JSFunctionSpec *
@@ -161,7 +81,6 @@ JSGenericLine<NATIVE_LINE>::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {{0}};
     return myFunctions;
 }
- 
 
 template<>
 JSPropertySpec *
@@ -297,6 +216,4 @@ JSGenericLine<NATIVE_LINE>::initClass(JSContext *cx, JSObject *theGlobalObject) 
 }
 
 }
-
-#endif
 

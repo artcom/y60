@@ -7,25 +7,19 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSLine.cpp,v $
-//   $Author: ulrich $
-//   $Revision: 1.3 $
-//   $Date: 2004/10/06 10:12:55 $
-//
-//
-//=============================================================================
 
-#include "JSVector.h"
 #include "JSLine.h"
+#include "JSLine.impl"
+#include "JSVector.h"
 #include <iostream>
 
 using namespace std;
 
 namespace jslib {
 
-typedef LineNumber Number;
-
+template class JSGenericLine<asl::Line<LineNumber> >;
+template class JSGenericLine<asl::Ray<LineNumber> >;
+template class JSGenericLine<asl::LineSegment<LineNumber> >;
 
 template<>
 const char *
