@@ -507,7 +507,6 @@ Viewer.prototype.Constructor = function(self, theArguments) {
             self.BaseViewer.onMouseButton(theButton, theState, theX, theY);
         }
     }
-
 */
 
     self.finalize = function() {
@@ -574,8 +573,6 @@ function main(argv) {
         ourMainWindow.signal_delete_event.connect(ourHandler, "on_quit_activate");
         ourViewer.setupWindow(window);
 
-
-
         /*
         self.setModelName(myFilename);
         var myScene = new Scene(myFilename);
@@ -587,7 +584,7 @@ function main(argv) {
         ourStatusBar.set("Opened scene: " + myFilename);
         setupGUI();
         window.queue_draw();
-*/
+        */
 
         ourViewer.registerMover(ClassicTrackballMover);
         ourViewer.registerMover(FlyMover);
@@ -595,17 +592,20 @@ function main(argv) {
         ourAnimationManager = new GtkAnimationManager(ourViewer);
 
         ourViewer.loadModel( ourViewer.getModelName());
-
-
-
-/*
+        
+        /*
         var myScene = new Scene(ourViewer.getModelName());
         myScene.setup();
         ourViewer.setScene(myScene);
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         ourViewer.setCanvas(myCanvas);
         setupGUI();
-  */      
+        */      
+
+        // enable lighting
+        ourViewer.getLightManager().enableHeadlight(true);
+        ourViewer.getLightManager().enableSunlight(true);
+        
         return GtkMain.run(ourMainWindow);
     } catch (ex) {
         print("### Exception: " + ex);

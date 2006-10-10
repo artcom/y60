@@ -69,6 +69,9 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
                 // switch to first material switch there is
                 myItem.active = true;
             } else {
+                if (myChild.visible) {
+                    myGroupItem.active = false; 
+                }
                 myItem.active = myChild.visible;
             }
             myItem.show();
