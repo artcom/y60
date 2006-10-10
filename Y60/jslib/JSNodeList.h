@@ -20,10 +20,9 @@
 
 namespace jslib {
 
-template <class NATIVE_LIST>
-class JSNodeListBase : public JSWrapper<NATIVE_LIST,dom::NodePtr,StaticAccessProtocol> {
+class JSNodeList: public JSWrapper<dom::NodeList,dom::NodePtr,StaticAccessProtocol> {
 public:
-    typedef JSWrapper<NATIVE_LIST,dom::NodePtr,StaticAccessProtocol> Base;
+    typedef JSWrapper<dom::NodeList,dom::NodePtr,StaticAccessProtocol> Base;
 
     static const char * ClassName();
     static JSBool
@@ -50,14 +49,12 @@ public:
     static JSBool
     Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
     static JSObject * Construct(JSContext *cx, dom::NodePtr theNode, 
-            NATIVE_LIST * theList);
+            dom::NodeList * theList);
 
-    JSNodeListBase(dom::NodePtr theNode, NATIVE_LIST * theNodeList);
+    JSNodeList(dom::NodePtr theNode, dom::NodeList * theNodeList);
 
     static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject); 
 };
-
-typedef JSNodeListBase<dom::NodeList> JSNodeList;
 
 jsval as_jsval(JSContext *cx, dom::NodePtr theNode, dom::NodeList * theNodeList);
 

@@ -17,11 +17,11 @@
 //=============================================================================
 
 #include "JSNodeList.h"
-#include "JSNodeList.impl"
 #include "JSNamedNodeMap.h"
 #include <iostream>
 
 using namespace std;
+using namespace dom;
 
 namespace jslib {
 
@@ -31,16 +31,38 @@ JSNamedNodeMap::Functions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         /* name         native          nargs    */
-        {"item",             JSNodeListBase<dom::NodeList>::item,            1}, // gcc does not allow function pointers to inherited functions
-        {"appendNode",       JSNodeListBase<dom::NodeList>::appendNode,      1},
+        {"item",             JSNamedNodeMap::item,            1}, // gcc does not allow function pointers to inherited functions
+        {"appendNode",       JSNamedNodeMap::appendNode,      1},
         //{"replaceChild",     replaceChild,    1},
-//        {"setAllNodeValues",  JSNodeListBase<dom::NodeList>::setAllNodeValues,    1},
+//        {"setAllNodeValues",  JSNamedNodeMap::setAllNodeValues,    1},
         {0}
     };
     return myFunctions;
 }
 
 enum PropertyNumbers {PROP_length = -100};
+
+JSBool
+JSNamedNodeMap::item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, 
+        jsval *rval) 
+{
+    DOC_BEGIN("Returns a node with a given index from the nodelist");
+    DOC_PARAM("theIndex", "Index of the node to retrieve", DOC_TYPE_INTEGER);
+    DOC_RVAL("The node from the nodelist at the specified index", DOC_TYPE_NODE);
+    DOC_END;
+    typedef dom::NodePtr (NamedNodeMap::*MyMethod)(int);
+    return Method<NamedNodeMap>::call((MyMethod)&NamedNodeMap::item,cx,obj,argc,argv,rval);
+}
+
+JSBool
+JSNamedNodeMap::appendNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Appends a node to the node list");
+    DOC_PARAM("theNode", "The xml node to append", DOC_TYPE_NODE);
+    DOC_RVAL("The appended node", DOC_TYPE_NODE);
+    DOC_END;
+    typedef dom::NodePtr (NamedNodeMap::*MyMethod)(int);
+    return Method<NamedNodeMap>::call((MyMethod)&NamedNodeMap::append,cx,obj,argc,argv,rval);
+}
 
 static JSPropertySpec * Properties() {
     static JSPropertySpec myProperties[] = {

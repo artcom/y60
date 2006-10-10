@@ -32,6 +32,11 @@ public:
     static const char * ClassName() {
         return "NamedNodeMap";
     }
+    static JSBool
+    item(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
+
+    static JSBool
+    appendNode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
     static JSFunctionSpec * Functions();
     static JSPropertySpec * Properties();
