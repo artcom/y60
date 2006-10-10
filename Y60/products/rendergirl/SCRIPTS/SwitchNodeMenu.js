@@ -32,26 +32,32 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
     }
 
     function buildMenuItem(theHandler, theMenu, theLabel) {
-        if (_myItem && _mySubMenu) {
+        if (_myItem) {
             removeMenuItem();
         }
         
-        var myLabel = theHandler.getSwitchName();
+        var myLabel = theHandler.switchName;
         if (theLabel != undefined) {
             myLabel = theLabel;
         }
         _myItem = new MenuItem( myLabel );
-        _myItem.show();
         theMenu.append( _myItem );
+        _myItem.show();       
         _mySubMenu = new Menu();
         _myItem.submenu = _mySubMenu;
         collectSwitchNodeChildren( theHandler, _mySubMenu );
     }
 
     function collectSwitchNodeChildren( theHandler, theSubMenu ) {
-        var myNode = theHandler.getNode();
+        var myNode = theHandler.node;
         var myGroupItem = null;
-        
+
+        // texture switches not yet implemented in rendergirl
+        if (String(myNode.name).match(/^tswitch_.*/)) {
+            theSubMenu = null;
+            return;
+        }
+                    
         for (var i = 0; i < myNode.childNodesLength(); ++i) {
             var myChild = myNode.childNode( i );
             // var myItem = new CheckMenuItem( myChild.name, myChild.visible );
@@ -88,9 +94,14 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
     }
 
     obj.onSwitchNodeSwitched = function( theName ) {
+        if ( _myHandlers.length <= 0 ||
+             _myHandlers[0].activeName == theName) {
+            return;
+        }
+        
         if ( _myChildren[ theName ].active ) {
             // get previous item and disable it.
-            _myChildren[ _myHandlers[0].getActiveName() ].active = false;
+            _myChildren[ _myHandlers[0].activeName ].active = false;
             // activate new one.
             for (var i=0; i < _myHandlers.length; ++i) {
                 _myHandlers[i].setActiveChildByName( theName );
@@ -111,10 +122,10 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
         // unfortunately there is no other way of changing the menuitem label
         // than to destroy it and make new one [jb]
         buildMenuItem(theSwitchHandler, theParentMenu, 
-                _myHandlers[0].getSwitchName()+ " (" + String(_myHandlers.length) + ")");
+                _myHandlers[0].switchName + " (" + String(_myHandlers.length) + ")");
 
         // make sure all similar nodes added to this menu item are in the same condition as the first one
-        _myHandlers[_myHandlers.length - 1].setActiveChild(_myHandlers[0].getActiveIndex());
+        _myHandlers[_myHandlers.length - 1].setActiveChild(_myHandlers[0].activeIndex);
     }
 
     var _myHandlers = [];
@@ -135,9 +146,9 @@ function SwitchNodeMenu( ) {
 SwitchNodeMenu.prototype.Constructor = function( obj ) {
 
     function sortSwitchNodesByName(a,b) {
-        if (a.getSwitchName() > b.getSwitchName()) {
+        if (a.switchName > b.switchName) {
             return 1;
-        } else if (a.getSwitchName() < b.getSwitchName()) {
+        } else if (a.switchName < b.switchName) {
             return -1;
         } else {
             return 0;
@@ -145,11 +156,11 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
     }
 
     function areEqualSwitchNodes(a,b) {
-        if (a.getSwitchName() == b.getSwitchName()) {
+        if (a.switchName == b.switchName) {
             var i = 0;
-            while (i < a.getChildCount()) {
-                var myName = a.getNode().childNode(i).name;
-                var myMatch = getDescendantByName(b.getNode(), myName);  //b.getNode().childNode(myName);
+            while (i < a.childCount) {
+                var myName = a.node.childNode(i).name;
+                var myMatch = getDescendantByName(b.node, myName);
                 if ( !(myMatch) ) {
                     return false;
                 }
@@ -162,7 +173,6 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
     }
     
     obj.setup = function( theViewer ) {
-
         _mySwitchNodeMenuItem = ourGlade.get_widget("switchnode_menu");
         _mySwitchNodeMenu = new Menu();
         _mySwitchNodeMenu.show();

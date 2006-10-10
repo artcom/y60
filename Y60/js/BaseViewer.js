@@ -580,17 +580,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             if ( myName.match(/^mswitch_.*/)) {
                 _myMSwitchNodes.push( new MSwitchNodeHandler( myChild ) );
             }
-            collectSwitchNodes( myChild );
-        }
-    }
-
-    function collectTSwitchNodes( theNode ) {
-        for (var i = 0; i < theNode.childNodesLength(); ++i) {
-            var myName = new String( theNode.childNode(i).name );
             if ( myName.match(/^tswitch_.*/)) {
                 _myTSwitchNodes.push( new TSwitchNodeHandler( theNode.childNode(i)) );
             }
-            collectTSwitchNodes( theNode.childNode( i ) );
+            collectSwitchNodes( myChild );
         }
     }
 
@@ -600,7 +593,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         var mySceneNode = theScene.dom;
         var myWorld = mySceneNode.childNode("worlds").childNode("world");
         collectSwitchNodes( myWorld );
-        //collectTSwitchNodes( mySceneNode.childNode("materials") );
+        collectSwitchNodes( mySceneNode.childNode("materials") );
     }
 
     self.getSwitchNodes = function() {

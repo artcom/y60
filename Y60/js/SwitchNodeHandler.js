@@ -9,137 +9,140 @@
 //=============================================================================
 
 
+function SwitchNodeHandlerBase( Public, Protected, theNode) {
+
+    Public.__defineGetter__('node',
+            function() { return _myNode; } );
+
+    Public.__defineGetter__('switchName',
+            function() { return _myNode.name; } );
+
+    Public.__defineGetter__('childCount',
+            function() { return _myNode.childNodesLength(); } );
+
+    Public.__defineGetter__('activeChild',
+            function() { return _myNode.childNode( _myActiveChild ); } );
+
+    Public.__defineGetter__('activeIndex',
+            function() { return _myActiveChild; } );
+    Public.__defineSetter__('activeIndex',
+            function(theIndex) { _myActiveChild = theIndex; } );
+
+    Public.__defineGetter__('activeName',
+            function() { return _myNode.childNode( _myActiveChild ).name; } );
+
+    var _myNode = theNode;
+    var _myActiveChild = 0;
+}
+
+/***********************************************************
+ *                                                         *
+ *               Geometry switch handler                   *
+ *                                                         *
+ ***********************************************************/
 function SwitchNodeHandler( theNode, theActiveIndex) {
     this.Constructor( this, theNode, theActiveIndex);
 }
 
-
 SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex) {
+    var Public    = obj;
+    var Protected = {}
+    
+    SwitchNodeHandlerBase(Public, Protected, theNode);
 
     function setup( theActiveChild ) {
-        var myName = new String( _myNode.name );
+        var myName = new String( Public.switchName );
         if ( ! myName.match(/^switch_.*/)) {
-            Logger.warning("Switch node '" + _myNode.name + " doesn't obey the " +
+            Logger.warning("Switch node '" + Public.switchName + " doesn't obey the " +
                 "naming conventions. Name should start with 'switch_'.");
         }
         if ( theActiveChild == undefined) {
             var myActiveChildCount = 0;
-            for (var i = 0; i < _myNode.childNodesLength(); ++i) {
-                if (_myNode.childNode( i ).visible) {
+            for (var i = 0; i < Public.childCount; ++i) {
+                if (Public.node.childNode( i ).visible) {
                     if (myActiveChildCount > 1) {
-                        Logger.warning("Switch node '" + _myNode.name + "' has more " +
+                        Logger.warning("Switch node '" + Public.switchName + "' has more " +
                                 "than one active child. Using first.");
                     } else {
-                        _myActiveChild = i;
+                        Public.activeIndex = i;
+                        //_myActiveChild = i;
                     }
                     myActiveChildCount += 1;
                 }
             }
         } else {
-            for (var i = 0; i < _myNode.childNodesLength(); ++i) {
+            for (var i = 0; i < Public.childCount; ++i) {
                 if ( i == theActiveChild) {
-                    _myNode.childNode( i ).visible = true;
+                    Public.node.childNode( i ).visible = true;
                 } else {
-                    _myNode.childNode( i ).visible = false;
+                    Public.node.childNode( i ).visible = false;
                 }
             }
         }
     }
-    
-    obj.getSwitchName = function() {
-        return _myNode.name;
-    }
 
-    obj.getChildCount = function() {
-        return _myNode.childNodesLength();
+    Public.setActiveChild = function( theIndex ) {
+        Public.activeChild.visible.visible = false;
+        Public.activeIndex = theIndex;
+        //_myActiveChild = theIndex;
+        Public.activeChild.visible = true;
     }
-    obj.getNode = function() {
-        return _myNode;
-    }
-
-    obj.getActiveChild = function() {
-        return _myNode.childNode( _myActiveChild );
-    }
-    obj.getActiveIndex = function() {
-        return _myActiveChild;
-    }
-    obj.getActiveName = function() {
-        return _myNode.childNode( _myActiveChild ).name;
-    }
-
-    obj.setActiveChild = function( theIndex ) {
-        _myNode.childNode( _myActiveChild ).visible = false;
-        _myActiveChild = theIndex;
-        _myNode.childNode( _myActiveChild ).visible = true;
-    }
-    obj.setActiveChildByName = function( theName ) {
-        _myNode.childNode( _myActiveChild ).visible = false;
-        for (var i = 0; i < _myNode.childNodesLength(); ++i) {
-            if (_myNode.childNode( i ).name == theName) {
-                _myActiveChild = i;
+    Public.setActiveChildByName = function( theName ) {
+        Public.activeChild.visible = false;
+        for (var i = 0; i < Public.childCount; ++i) {
+            if (Public.node.childNode( i ).name == theName) {
+                Public.activeIndex = i;
+                //_myActiveChild = i;
                 break;
             }
         }
-        _myNode.childNode( _myActiveChild ).visible = true;
+        Public.activeChild.visible = true;
     }
-
-    var _myNode = theNode;
-    var _myActiveChild = 0;
 
     setup( theActiveIndex );
 }
 
 
 
+/***********************************************************
+ *                                                         *
+ *               Material switch handler                   *
+ *                                                         *
+ ***********************************************************/
 function MSwitchNodeHandler( theNode ) {
     this.Constructor( this, theNode );
 }
 
 
 MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
+    var Public    = obj;
+    var Protected = {}
+    
+    SwitchNodeHandlerBase(Public, Protected, theNode);
 
     function setup() {
         _myTargetMaterial = findTargetMaterial();
     }
         
-    obj.getSwitchName = function() {
-        return _myNode.name;
+    Public.setActiveChild = function( theIndex ) {
+        setMaterial(Public.activeChild.name);
+        Public.activeIndex = theIndex;
+        //_myActiveChild = theIndex;
     }
-
-    obj.getChildCount = function() {
-        return _myNode.childNodesLength();
-    }
-    obj.getNode = function() {
-        return _myNode;
-    }
-
-    obj.getActiveChild = function() {
-        return _myNode.childNode( _myActiveChild );
-    }
-    obj.getActiveIndex = function() {
-        return _myActiveChild;
-    }
-    obj.getActiveName = function() {
-        return _myNode.childNode( _myActiveChild ).name;
-    }
-
-    obj.setActiveChild = function( theIndex ) {
-        setMaterial(_myNode.childNode( _myActiveChild ).name);
-        _myActiveChild = theIndex;
-    }
-    obj.setActiveChildByName = function( theName ) {
+    Public.setActiveChildByName = function( theName ) {
         setMaterial( theName );
-        for (var i = 0; i < _myNode.childNodesLength(); ++i) {
-            if (_myNode.childNode( i ).name == theName) {
-                _myActiveChild = i;
+        for (var i = 0; i < Public.childCount; ++i) {
+            if (Public.node.childNode( i ).name == theName) {
+                Public.activeIndex = i;
+                //_myActiveChild = i;
                 break;
             }
         }
     }
 
     function findTargetMaterial() {
-        var myUnderlineIndex = _myNode.name.search(/_/);
-        var myTargetMaterialName = _myNode.name.substring(myUnderlineIndex + 1);
+        var myUnderlineIndex = Public.switchName.search(/_/);
+        var myTargetMaterialName = Public.switchName.substring(myUnderlineIndex + 1);
         var myTargetMaterial = getDescendantByName(window.scene.materials, myTargetMaterialName, false);
         if (!myTargetMaterial) {
             // Try adding an 'M'
@@ -147,19 +150,19 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         }
 
         if (!myTargetMaterial) {
-            Logger.error("Could not find target material: " + myTargetMaterialName + " for material switch " + _myNode.name);
+            Logger.error("Could not find target material: " + myTargetMaterialName + " for material switch " + Public.switchName);
         }
         
         return myTargetMaterial;
     }
     
     function setMaterial(theMaterialCode) {
-        //print("switchMaterials(", theMaterialCode, " ", _myNode);
+        //print("switchMaterials(", theMaterialCode, " ", Public.node);
         // First Step: Search inside the switch for the material with the materialcode
         
         var myNewMaterial = null;
-        for (var i = 0; i < _myNode.childNodes.length; ++i) {
-            var myChild = _myNode.childNodes[i];
+        for (var i = 0; i < Public.childCount; ++i) {
+            var myChild = Public.node.childNode( i );
             if (myChild.name == theMaterialCode) {
                 var myShapeId = "";
                 if (myChild.nodeName == "body") {
@@ -172,7 +175,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                 } else {
                     continue;
                 }
-                var myShape = _myNode.getElementById(myShapeId);
+                var myShape = Public.node.getElementById(myShapeId);
                 if (!myShape) {
                     Logger.warning("Could not find shape with id: " + myShapeId);
                     return;
@@ -220,34 +223,54 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         //print("target mat: " + myTargetMaterial);
     }
 
-    var _myNode = theNode;
-    var _myActiveChild = 0;
     var _myTargetMaterial = null;
 
     setup();
 }
 
 
+/***********************************************************
+ *                                                         *
+ *                Texture switch handler                   *
+ *                                                         *
+ ***********************************************************/
 function TSwitchNodeHandler( theNode ) {
     this.Constructor( this, theNode );
 }
 
 
 TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
+    var Public    = obj;
+    var Protected = {}
+    
+    SwitchNodeHandlerBase(Public, Protected, theNode);
 
     function setup() {
-    }
-        
-    obj.getSwitchName = function() {
-        return _myNode.name;
+        //print("---");
+        //print(theNode);
     }
 
-    obj.getNode = function() {
-        return _myNode;
+/*
+    // taken from BMW/Welt/CLIENT/SCRIPTS/CarConfigurator.js [jb]
+    function switchToTextureCode(theName) {
+        //print("switchToTextureCode", theName, myModelCode);
+        var myColorSettings = getDescendantByAttribute(myTSwitches, "code", theName, true);
+        //print("found color setting: " + myColorSettings);
+        for (var i = 0; i < myColorSettings.attributes.length; ++i) {
+            var myAttribute = myColorSettings.attributes[i];
+            var myMaterialName = "tswitch_" + myAttribute.nodeName;
+
+            var myMaterial = getDescendantByName(window.scene.materials, myMaterialName, false);
+            if (myMaterial) {
+                var myTextureNode = getDescendantByTagName(myMaterial, "texture", true);
+                var myImageNode = myTextureNode.getElementById(myTextureNode.image);
+                //print("before: " + myImageNode.src);
+                myImageNode.src = "MODELS/"+myModelCode+"/TEX/_" + theName + "_" + myAttribute.nodeValue + ".jpg";
+                //print("after: " + myImageNode.src);
+            }
+        }
     }
-
-
-    var _myNode = theNode;
+*/
 
     setup();
 }
