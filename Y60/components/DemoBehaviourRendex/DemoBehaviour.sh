@@ -17,15 +17,6 @@ unset __GL_FSAA_MODE
 export __GL_SYNC_TO_VBLANK=1
 
 #
-# spidermonkey and kernel 2.6 pthreads need this to
-# avoid a floating point exception on loading
-#
-if uname -r | grep -q "^2.6" ; then
-    export LD_ASSUME_KERNEL="2.4.99"
-    echo "setting LD_ASSUME_KERNEL=$LD_ASSUME_KERNEL"
-fi
-
-#
 # debug or release mode
 #
 SHELL="acxpshellOPT"

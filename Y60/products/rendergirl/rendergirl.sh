@@ -21,15 +21,6 @@ if [ "$DEBUG" == "1" ] ; then
     APPLICATION=acgtkshellDBG
 fi
 
-#
-# spidermonkey and kernel 2.6 pthreads need this to
-# avoid a floating point exception on loading
-#
-if uname -r | grep -q "^2.6" ; then
-    export LD_ASSUME_KERNEL="2.4.99"
-    echo "setting LD_ASSUME_KERNEL=2.4.99"
-fi
-
 SCRIPT="$BASEDIR/SCRIPTS/rendergirl.js"
 
 BASENAME=${MODELNAME%.*}

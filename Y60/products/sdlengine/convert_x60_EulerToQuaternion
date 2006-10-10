@@ -6,15 +6,6 @@ if [ "$DEBUG" == "1" ] ; then
     APPLICATION=y60DBG
 fi
 
-#
-# spidermonkey and kernel 2.6 pthreads need this to
-# avoid a floating point exception on loading
-#
-if uname -r | grep -q "^2.6" ; then
-    export LD_ASSUME_KERNEL="2.4.99"
-    echo "setting LD_ASSUME_KERNEL=2.4.99"
-fi
-
 echo $APPLICATION -I $PRO/src/Y60/js $PRO/src/Y60/js/convert_x60_EulerToQuaternion.js  $*
 $APPLICATION -I $PRO/src/Y60/js $PRO/src/Y60/js/convert_x60_EulerToQuaternion.js $*
 exit $?
