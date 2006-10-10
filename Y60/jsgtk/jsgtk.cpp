@@ -39,6 +39,7 @@
 #include "JSMenuItem.h"
 #include "JSSeparatorMenuItem.h"
 #include "JSCheckMenuItem.h"
+#include "JSRadioMenuItem.h"
 #include "JSEntry.h"
 #include "JSSpinButton.h"
 #include "JSRadioButton.h"
@@ -178,6 +179,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSCheckMenuItem::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSRadioMenuItem::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSSeparatorMenuItem::initClass(cx, theGlobalObject)) {
@@ -446,6 +450,7 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::VButtonBox );
     TRY_DYNAMIC_CAST(Gtk::SeparatorMenuItem );
     TRY_DYNAMIC_CAST(Gtk::CheckMenuItem );
+    TRY_DYNAMIC_CAST(Gtk::RadioMenuItem );
     TRY_DYNAMIC_CAST(Gtk::MenuItem );
     TRY_DYNAMIC_CAST(Gtk::EventBox );
     TRY_DYNAMIC_CAST(Gtk::SpinButton );
@@ -584,6 +589,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
             } else if (castFrom<Gtk::SeparatorMenuItem>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::CheckMenuItem>(cx, myArgument, theTarget)) {
+                return true;
+            } else if (castFrom<Gtk::RadioMenuItem>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::MenuItem>(cx, myArgument, theTarget)) {
                 return true;
@@ -727,6 +734,7 @@ CONVERT_FROM_GLIB_OBJECT(Gtk::HButtonBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::VButtonBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::SeparatorMenuItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::CheckMenuItem);
+CONVERT_FROM_GLIB_OBJECT(Gtk::RadioMenuItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::MenuItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::SpinButton);
 CONVERT_FROM_GLIB_OBJECT(Gtk::RadioButton);
