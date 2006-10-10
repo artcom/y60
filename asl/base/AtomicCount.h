@@ -107,7 +107,6 @@ static __inline__ void atomic_inc(atomic_t *v)
 		:"=m" (v->counter)
 		:"m" (v->counter));
 }
-#endif
 static __inline__ int atomic_post_inc(atomic_t *v)
 {
    register int result = 1; 
@@ -118,6 +117,7 @@ static __inline__ int atomic_post_inc(atomic_t *v)
             : "memory" );
     return result;
 }
+#endif
 
 inline int atomic_conditional_increment(atomic_t * pw )
 {
@@ -528,7 +528,7 @@ namespace asl
                	return atomic_post_inc_SingleProcessor(&value);
 #endif
 #ifdef WIN32
-        		return InterlockedIncrement(&value)-1;
+      		return InterlockedIncrement(&value)-1;
 #endif
 #ifdef OSX_PPC
                 return atomic_inc(&value) - 1;
@@ -628,17 +628,13 @@ namespace asl
             inline
             long post_increment() {
 #ifdef OSX_X86
-				return OSAtomicAdd32(1, (int32_t*)&value)-1;
+		return OSAtomicAdd32(1, (int32_t*)&value)-1;
 #endif
 #ifdef LINUX
-#ifdef __x86_64__
                 return atomic_inc_return(&value)-1;
-#else
-               	return atomic_post_inc(&value);
-#endif                
 #endif
 #ifdef WIN32
-        		return InterlockedIncrement(&value)-1;
+       		return InterlockedIncrement(&value)-1;
 #endif
 #ifdef OSX_PPC
                	return atomic_inc(&value) - 1;
