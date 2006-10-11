@@ -237,41 +237,43 @@ class string_functions_UnitTest : public UnitTest {
             testBase64();
 		}
 
-#define TEST_BASE_64_ENCODE(IN, OUT, CB) \
-    { \
-        string myIn(IN); \
-        string myOut(OUT); \
-        string myDestination1; \
-        string myDestination2; \
-        myDestination2.resize(myIn.size()); \
-        binToBase64((unsigned char *)&myIn[0], myIn.size(), myDestination1, CB); \
-        ENSURE(myDestination1 == myOut); \
-        unsigned mySize = base64ToBin(myDestination1, (unsigned char *)&myDestination2[0], myIn.size()); \
-        ENSURE(mySize == myIn.size()); \
-        myDestination2.resize(mySize); \
-        ENSURE(myDestination2 == myIn); \
-    } 
+        void testBase64Encode(const char * IN, const char * OUT, const char * CB) {
+            testBase64Encode(string(IN), string(OUT), CB);
+        }
+        void testBase64Encode(const string & theIn, const string & theOut, const char * CB) {
+            string myIn(theIn); 
+            string myOut(theOut); 
+            string myDestination1; 
+            string myDestination2; 
+            myDestination2.resize(myIn.size()); 
+            binToBase64((unsigned char *)&myIn[0], myIn.size(), myDestination1, CB); 
+            ENSURE_EQUAL(myDestination1, myOut); 
+            unsigned mySize = base64ToBin(myDestination1, (unsigned char *)&myDestination2[0], myIn.size()); 
+            ENSURE_EQUAL(mySize, myIn.size()); 
+            myDestination2.resize(mySize);
+            ENSURE_EQUAL(myDestination2, myIn); 
+        } 
 
         void testBase64() {
             // case 0: Empty file:
-            TEST_BASE_64_ENCODE("", "", cb64);
+            testBase64Encode("", "", cb64);
 
             // case 1: One input character:
-            TEST_BASE_64_ENCODE("A", "QQƒƒ", cb67);
+            testBase64Encode("A", "QQƒƒ", cb67);
 
             // case 1: One input character:
-            TEST_BASE_64_ENCODE("A", "QQƒƒ", cb67);            
+            testBase64Encode("A", "QQƒƒ", cb67);            
 
             // case 2: Two input characters:
-            TEST_BASE_64_ENCODE("AB", "QUI=", cb64);
+            testBase64Encode("AB", "QUI=", cb64);
 
             // case 3: Three input characters:
-            TEST_BASE_64_ENCODE("ABC", "QUJD", cb67);
+            testBase64Encode("ABC", "QUJD", cb67);
 
             // case 4: Four input characters:
-            TEST_BASE_64_ENCODE("ABCD", "QUJDRA==", cb64);
+            testBase64Encode("ABCD", "QUJDRA==", cb64);
 
-            TEST_BASE_64_ENCODE("ABCABCD", "QUJDQUJDRA==", cb64);
+            testBase64Encode("ABCABCD", "QUJDQUJDRA==", cb64);
  
             // case 5: All chars from 0 to ff, linesize set to 50:
             {
@@ -290,7 +292,7 @@ class string_functions_UnitTest : public UnitTest {
                     "2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7"
                     "/P3+/w==";
 
-                TEST_BASE_64_ENCODE(myInput, myOutput, cb64);
+                testBase64Encode(myInput, myOutput, cb64);
 
                 myOutput =
                     "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIj"
@@ -301,7 +303,7 @@ class string_functions_UnitTest : public UnitTest {
                     "tLW2t7i5uru8vb6þwMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX"
                     "2Nna29zd3tþg4eLj5OXm5øjp6uvs7e7v8PHy8þT19vf4øfr7"
                     "þP3øþwƒƒ";
-                TEST_BASE_64_ENCODE(myInput, myOutput, cb67);
+                testBase64Encode(myInput, myOutput, cb67);
             }
 
             // case 6: test all possible exceptions
