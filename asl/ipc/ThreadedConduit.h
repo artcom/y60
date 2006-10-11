@@ -32,7 +32,7 @@ class ThreadedConduit : protected Conduit<POLICY> {
     public:
         /// create a new client connected to theRemoteEndpoint
         ThreadedConduit(typename POLICY::Endpoint theRemoteEndpoint) 
-            : Conduit<POLICY>(theRemoteEndpoint), _myThread(0)
+            : Conduit<POLICY>(theRemoteEndpoint), _myThread(0), _cancelFlag(false)
         {};
         virtual ~ThreadedConduit() {
             if (_myThread) {
@@ -48,8 +48,11 @@ class ThreadedConduit : protected Conduit<POLICY> {
         bool stop() {
             bool mySuccessFlag = false;
             if (_myThread) {
-                pthread_cancel(_myThread);
+	    	AC_WARNING << "cancelling thread";
+		_cancelFlag = true;
+                // pthread_cancel(_myThread);
                 mySuccessFlag = !pthread_join(_myThread, NULL);
+	    	AC_WARNING << "canceled " << mySuccessFlag;
                 _myThread = 0;
             }
             return mySuccessFlag;
@@ -80,6 +83,8 @@ virtual bool processData() {
           **/
         virtual bool processData()  = 0;
     private:
+    	bool _cancelFlag;
+
         // hide default ctors
         ThreadedConduit();
         ThreadedConduit(const ThreadedConduit<POLICY> &);
@@ -90,22 +95,25 @@ virtual bool processData() {
         static void * threadMainLoop(void * theThisPointer) {
             int myResult = 0;
             int myOldCancelState = 0;
-            pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &myOldCancelState);
-            pthread_cleanup_push(onThreadDone, theThisPointer);
+            //pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &myOldCancelState);
+            //pthread_cleanup_push(onThreadDone, theThisPointer);
             ThreadedConduit<POLICY> * mySelf = 
                 reinterpret_cast<ThreadedConduit<POLICY>*>(theThisPointer);
             try {
                 do {
-                    pthread_testcancel();
+		    if (mySelf->_cancelFlag) {
+		    	break;
+		    }
                 } while (mySelf->isValid() && mySelf->processData());
             } catch (ConduitException & ex) {
                 AC_ERROR << ex;
             }
-            pthread_cleanup_pop(1);
-            pthread_setcancelstate(myOldCancelState,0);
+            //pthread_cleanup_pop(1);
+            //pthread_setcancelstate(myOldCancelState,0);
             return (void*)static_cast<ptrdiff_t>(myResult);
         }
         static void onThreadDone(void * theThisPointer) {
+	AC_WARNING << "onThreadDone";
         }
 };
 
