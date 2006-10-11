@@ -100,23 +100,23 @@ namespace asl {
         return true;
     }
 
-	std::vector<std::string> splitString(const std::string & theString, const std::string & theSeparators) {
-		std::vector<std::string> theResult;
-		theResult.push_back("");
-		for (int i = 0; i < theString.size();++i) {
-			if (theSeparators.find(theString[i]) == std::string::npos) {
-				theResult.back().push_back(theString[i]);
-			} else {
-				if (theResult.back().size() > 0) {
-					theResult.push_back("");
-				}
-			}
-		}
-		if (theResult.back().size() == 0) {
-			theResult.pop_back();
-		}
-		return theResult;
-	}
+    std::vector<std::string> splitString(const std::string & theString, const std::string & theSeparators) {
+        std::vector<std::string> theResult;
+        theResult.push_back("");
+        for (int i = 0; i < theString.size();++i) {
+            if (theSeparators.find(theString[i]) == std::string::npos) {
+                theResult.back().push_back(theString[i]);
+            } else {
+                if (theResult.back().size() > 0) {
+                    theResult.push_back("");
+                }
+            }
+        }
+        if (theResult.back().size() == 0) {
+            theResult.pop_back();
+        }
+        return theResult;
+    }
 
     int
     getEnumFromString(const std::string & theString, const char * theStringList[]) {
@@ -193,20 +193,20 @@ namespace asl {
 
     // decode 4 '6-bit' characters into 3 8-bit binary bytes
     static void decodeBase64(const unsigned char in[4], unsigned char out[3], unsigned int maxLength) {
-		// attention: unusual switch construct
-		switch (maxLength) {
-			default:
-			case 3:
-				out[2] = (unsigned char) (((in[2] << 6) & 0xc0) | in[3]);
-			case 2:
-				out[1] = (unsigned char) (in[1] << 4 | in[2] >> 2);
-			case 1:
-				out[0] = (unsigned char) (in[0] << 2 | in[1] >> 4);
-				break;
-			case 0:
-			    throw BufferTooSmall("zero sized buffer passed as argument", PLUS_FILE_LINE);
-		}
-	}
+        // attention: unusual switch construct
+        switch (maxLength) {
+            default:
+            case 3:
+                out[2] = (unsigned char) (((in[2] << 6) & 0xc0) | in[3]);
+            case 2:
+                out[1] = (unsigned char) (in[1] << 4 | in[2] >> 2);
+            case 1:
+                out[0] = (unsigned char) (in[0] << 2 | in[1] >> 4);
+                break;
+            case 0:
+                throw BufferTooSmall("zero sized buffer passed as argument", PLUS_FILE_LINE);
+        }
+    }
 
     void
     binToBase64(const unsigned char * theData, unsigned int theLength, string & theDest, const char * theCodeTable) {
@@ -262,7 +262,7 @@ namespace asl {
             }
             decodeBase64(in, theDest, maxLength);
             theDest += 3;
-		maxLength -=3;
+            maxLength -=3;
         }
 
         return myDestinationSize;

@@ -244,12 +244,17 @@ class string_functions_UnitTest : public UnitTest {
             string myIn(theIn);
             string myOut(theOut); 
             string myDestination1; 
-            string myDestination2; 
-            myDestination2.resize(myIn.size()); 
+            string myDestination2;
             binToBase64((unsigned char *)&myIn[0], myIn.size(), myDestination1, CB); 
-            ENSURE_EQUAL(myDestination1, myOut); 
-            unsigned mySize = base64ToBin(myDestination1, (unsigned char *)&myDestination2[0], myIn.size()); 
-            ENSURE_EQUAL(mySize, myIn.size()); 
+            ENSURE_EQUAL(myDestination1, myOut);
+
+            const char SENTINAL = '@';
+            myDestination2.resize(myIn.size()+1);
+            myDestination2[myIn.size()] = SENTINAL;
+            
+            unsigned mySize = base64ToBin(myDestination1, (unsigned char *)&myDestination2[0], myIn.size());
+            ENSURE_EQUAL(mySize, myIn.size());
+            ENSURE_EQUAL(myDestination2[myIn.size()], SENTINAL);
             myDestination2.resize(mySize);
             ENSURE_EQUAL(myDestination2, myIn); 
         } 
@@ -271,9 +276,9 @@ class string_functions_UnitTest : public UnitTest {
             testBase64Encode("ABC", "QUJD", cb67);
 
             // case 4: Four input characters:
-            testBase64Encode("ABCABCD", "QUJDQUJDRA==", cb64);
+    	    testBase64Encode("ABCD", "QUJDRA==", cb64);
             
-	    testBase64Encode("ABCD", "QUJDRA==", cb64);
+            testBase64Encode("ABCABCD", "QUJDQUJDRA==", cb64);
  
             // case 5: All chars from 0 to ff, linesize set to 50:
             {
