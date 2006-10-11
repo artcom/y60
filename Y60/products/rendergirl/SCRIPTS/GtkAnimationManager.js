@@ -91,7 +91,7 @@ GtkAnimationManager.prototype.Constructor = function(self, theViewer) {
 
     self.setup = function() {
         // Turn off all animation widgets, if we do not need them
-        if (_myViewer.getAnimations().childNodes.length == 0 && _myViewer.getCharacters().childNodes.length == 0) {
+        if (window.scene.animations.childNodes.length == 0 && window.scene.characters.childNodes.length == 0) {
             ourGlade.get_widget("animation_toolbar").hide();
             ourGlade.get_widget("animation_menu").hide();
             _myActive = false;
@@ -106,8 +106,8 @@ GtkAnimationManager.prototype.Constructor = function(self, theViewer) {
         _mySlider = new AnimationSlider(ourGlade.get_widget("animation_slider"));
 
         // Only display combo boxes if we have characters
-        if (_myViewer.getCharacters().childNodes.length == 0) {
-            _mySlider.setLimits(_myViewer.getAnimations());
+        if (window.scene.characters.childNodes.length == 0) {
+            _mySlider.setLimits(window.scene.animations);
             return;
         }
 
@@ -115,11 +115,11 @@ GtkAnimationManager.prototype.Constructor = function(self, theViewer) {
         _myCharacterComboBox = new ComboBoxText();
         _myCharacterComboBox.show();
 
-        if (_myViewer.getAnimations().childNodes.length) {
+        if (window.scene.animations.childNodes.length) {
             _myCharacterComboBox.append_text(GLOBAL_ANIMATIONS);
         }
 
-        var myCharacters = _myViewer.getCharacters();
+        var myCharacters = window.scene.characters;
         for (var i = 0; i < myCharacters.childNodes.length; ++i) {
             var myCharacter = myCharacters.childNode(i);
             for (var j = 0; j < myCharacter.childNodes.length; ++j) {
@@ -137,13 +137,13 @@ GtkAnimationManager.prototype.Constructor = function(self, theViewer) {
             self.reset();
 
             if (this.active_text == GLOBAL_ANIMATIONS) {
-                _mySlider.setLimits(_myViewer.getAnimations());
+                _mySlider.setLimits(window.scene.animations);
                 _myCurrentCharacter = null;
             } else {
                 var mySplitText = this.active_text.split(" | ");
                 _myCurrentCharacter = mySplitText[0];
                 _myCurrentClip      = mySplitText[1];
-                _mySlider.setLimits(getDescendantByName(_myViewer.getCharacters(), _myCurrentClip, true));
+                _mySlider.setLimits(getDescendantByName(window.scene.characters, _myCurrentClip, true));
             }
         }
 
