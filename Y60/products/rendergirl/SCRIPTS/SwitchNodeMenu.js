@@ -60,14 +60,14 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
                     
         for (var i = 0; i < myNode.childNodesLength(); ++i) {
             var myChild = myNode.childNode( i );
-            // var myItem = new CheckMenuItem( myChild.name, myChild.visible );
             
             var myItem;
+            var myLabelString = myChild.name.replace(/_/g, " ");
             if (myGroupItem == null) {
-                myGroupItem = new RadioMenuItem(myChild.name, myChild.visible);
+                myGroupItem = new RadioMenuItem(myLabelString, myChild.visible);
                 myItem = myGroupItem;
             } else {
-                myItem = new RadioMenuItem(myChild.name, myChild.visible);
+                myItem = new RadioMenuItem(myLabelString, myChild.visible);
                 myItem.setGroupFromItem(myGroupItem);
             }
 
