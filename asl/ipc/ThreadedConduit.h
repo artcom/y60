@@ -105,9 +105,11 @@ virtual bool processData() {
                     if (!mySelf->isValid()) {
                         break;
                     }
+                    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE,0);
                     if (!mySelf->processData()) {
                         break;
                     }
+                    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &myOldCancelState);
                 } while (true);
             } catch (ConduitException & ex) {
                 AC_ERROR << ex;
