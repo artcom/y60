@@ -36,8 +36,6 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
             removeMenuItem();
         }
         
-        print("__"+theLabel);
-
         var myLabel = theHandler.switchName;
         if (theLabel != undefined) {
             myLabel = theLabel;
