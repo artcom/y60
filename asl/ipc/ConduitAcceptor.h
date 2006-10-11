@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <list>
 
-#define DB(x) // x;
+#define DB(x) x;
 
 namespace asl {
     
@@ -116,7 +116,7 @@ class ConduitAcceptor {
         void processNewConnections(int theTimeout) {
             typename POLICY::Handle myServerHandle = POLICY::createOnConnect(
                     _myListenHandle, _myMaxConnectionCount, theTimeout);
-            DB(AC_TRACE << " createOnConnect ret " << myServerHandle << std::endl);
+            //DB(AC_TRACE << " createOnConnect ret " << myServerHandle << std::endl);
             if (myServerHandle) {
                 typename ConduitServer<POLICY>::Ptr 
                         myNewServer(_createServerProc(myServerHandle));
@@ -125,9 +125,9 @@ class ConduitAcceptor {
                 _myServers.push_back(myNewServer);
                 myNewServer->start();
             }
-            DB(AC_TRACE << "ACCEPTOR: purge invalid servers" << std::endl);
+            //DB(AC_TRACE << "ACCEPTOR: purge invalid servers" << std::endl);
             _myServers.remove_if(isBroken);
-            DB(AC_TRACE << "ACCEPTOR: still active servers:" << _myServers.size() << std::endl);
+            //DB(AC_TRACE << "ACCEPTOR: still active servers:" << _myServers.size() << std::endl);
         };
         
         static void * mainAcceptorLoop(void * theThisPointer) {
