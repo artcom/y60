@@ -241,7 +241,7 @@ class string_functions_UnitTest : public UnitTest {
             testBase64Encode(string(IN), string(OUT), CB);
         }
         void testBase64Encode(const string & theIn, const string & theOut, const char * CB) {
-            string myIn(theIn); 
+            string myIn(theIn);
             string myOut(theOut); 
             string myDestination1; 
             string myDestination2; 
@@ -271,9 +271,9 @@ class string_functions_UnitTest : public UnitTest {
             testBase64Encode("ABC", "QUJD", cb67);
 
             // case 4: Four input characters:
-            testBase64Encode("ABCD", "QUJDRA==", cb64);
-
             testBase64Encode("ABCABCD", "QUJDQUJDRA==", cb64);
+            
+	    testBase64Encode("ABCD", "QUJDRA==", cb64);
  
             // case 5: All chars from 0 to ff, linesize set to 50:
             {
