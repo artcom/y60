@@ -155,12 +155,29 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
         }
     }
 
+    function hasDescendantWithCode(theNode, theCode) {
+        if ((theNode.name.search(/_(.+?)_/) != -1) && (theCode == RegExp.$1)) {
+            return true;
+        }
+
+        for (var i=0; i<theNode.childNodesLength(); ++i) {
+            var myChildNode = theNode.childNode(i);
+            if (hasDescendantWithCode(myChildNode, theCode)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function areEqualSwitchNodes(a,b) {
         if (a.switchName == b.switchName) {
             var i = 0;
             while (i < a.childCount) {
                 var myName = a.node.childNode(i).name;
-                var myMatch = getDescendantByName(b.node, myName);
+                var myCodePosition = a.node.childNode(i).name.search(/_(.+?)_/);
+                var myCode = RegExp.$1;
+                var myMatch = hasDescendantWithCode(b.node, myCode);
                 if ( !(myMatch) ) {
                     return false;
                 }
