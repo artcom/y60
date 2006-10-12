@@ -881,6 +881,7 @@ int TTF_SizeUTF8(TTF_Font *font, const char *text, int *w, int *h)
 double getKerning(TTF_Font * theFont, FT_UInt thePreviousIndex, FT_UInt theCurrentIndex) {
 	double kerning = 0.0;
 
+    printf("face-flags:%d, kerning-bit:%d\n", theFont->face->face_flags, FT_FACE_FLAG_KERNING);
     if (FT_HAS_KERNING( theFont->face ) && thePreviousIndex && theCurrentIndex ) {
         FT_Vector delta;
         if (TTF_fontfitting) {
@@ -890,8 +891,11 @@ double getKerning(TTF_Font * theFont, FT_UInt thePreviousIndex, FT_UInt theCurre
             FT_Get_Kerning( theFont->face, thePreviousIndex, theCurrentIndex, ft_kerning_unfitted, &delta );
             kerning = (delta.x / 64.0);
         }
+    } else {
+        printf("font has no kerning\n");
     }
-
+    
+    printf("kerning: %d/%d=%f\n", thePreviousIndex, theCurrentIndex, kerning);
     return kerning;
 }
 
