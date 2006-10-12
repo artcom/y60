@@ -182,7 +182,7 @@ float4 mainFragment(vert2frag   IN,
     //float myEnvIntensity = (myEnvTexel.r + myEnvTexel.g + myEnvTexel.b) / 3.0;
     //float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvTexel, myEnvIntensity);
 
-    return float4((myBaseColor.rgb + myEnvTexel) + mySpecColor.rgb, diffuse.a);
+    return float4((myBaseColor.rgb + myEnvTexel) + mySpecColor.rgb, myDecalTexel.a);
 
     // Old code
     //float4 myColor = float4(lerp(myBaseColor, myBlendedColor, myEnvTexel.a).rgb, myDecalTexel.a) + mySpecColor;
