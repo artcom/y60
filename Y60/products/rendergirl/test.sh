@@ -3,6 +3,8 @@ PASSED=0
 FAILED=0
 FAILED_IMAGES=""
 
+ulimit -c unlimited
+
 compareSceneImages() {
     local BASELINE_IMAGE=$1
     local BASENAME=`basename $BASELINE_IMAGE`
@@ -32,12 +34,10 @@ rm -f TEST_IMAGES/*
 rm -f TESTMODELS/test_save.x60
 rm -f TESTMODELS/test_save_as.x60
 
-if [ ! -f TESTMODELS/testcube.x60 ]; then
-    cd ../maya-xport
-    ./install_maya
-    cd -
-    maya2x60 TESTMODELS/testcube.mb
-fi
+cd ../maya-xport
+./install_maya
+cd -
+maya2x60 TESTMODELS/testcube.mb
 
 cp TESTMODELS/testcube.x60 TESTMODELS/test_save.x60
 acgtkshell -I "SCRIPTS;$PRO/src/Y60/js;$PRO/src/Y60/shader;$PRO/lib" ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60
