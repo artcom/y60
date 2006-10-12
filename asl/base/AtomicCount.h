@@ -48,10 +48,6 @@
 #ifdef OSX_X86
     #include <libkern/OSAtomic.h>
 #endif
-#ifdef LINUX
-    typedef struct { asl::Signed32 counter; } atomic_t;
-#endif
-
 
 /*! \addtogroup aslbase */
 /* @{ */
@@ -60,7 +56,8 @@
 //            machines because I don't have one. (HINT!) DS
 
 #if defined(LINUX) || defined(OSX_X86)
-	#define UNIX_X86
+    #define UNIX_X86
+    typedef struct { asl::Signed32 counter; } atomic_t;
 #endif
 
 #if defined(UNIX_X86)
