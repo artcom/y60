@@ -1158,21 +1158,25 @@ urlDecode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     if (argc == 1) {
         if (JSVAL_IS_VOID(argv[0])) {
-            JS_ReportError(cx, "urlEncode(): Argument #%d is undefined", 1);
+            JS_ReportError(cx, "urlDecode(): Argument #%d is undefined", 1);
             return JS_FALSE;
         }
 
         string myString;
         if (!convertFrom(cx, argv[0], myString)) {
-            JS_ReportError(cx, "urlEncode(): argument #1 must be a string");
+            JS_ReportError(cx, "urlDecode(): argument #1 must be a string");
             return JS_FALSE;
         }
 
-        // Here we cannot use the JS_NewUCStringCopyN function, because the result from urlDecode is
-        // encoded in Latin-1
         string myDecodedString = inet::Request::urlDecode(myString);
+#if 1
+        // KH,UH: the other code is not symmetric with urlEncode and results in non-UTF8 strings
+        *rval = as_jsval(cx, myDecodedString);
+#else
+        // Here we cannot use the JS_NewUCStringCopyN function, because the result from urlDecode is encoded in Latin-1
         JSString * myJsString = JS_NewStringCopyN(cx, myDecodedString.c_str(), myDecodedString.size());
         *rval = STRING_TO_JSVAL(myJsString);
+#endif
         return JS_TRUE;
     }
     JS_ReportError(cx,"urlDecode: bad number of arguments - should be one, got %d", argc);

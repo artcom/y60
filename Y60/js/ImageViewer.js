@@ -78,7 +78,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 _myPlaylist.setRecursiveFlag(true);
                 break;
             default:
-                print("adding entry: " + theArguments[i]);
+                //print("adding entry: " + theArguments[i]);
                 _myPlaylist.addEntry(theArguments[i]);
                 break;
             }
@@ -299,7 +299,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
         var myFilename = urlDecode(myEntry.href);
         _myCurrentMediaType = myEntry.mediaType;
-        print("Now showing " + myFilename);
+        print("Now showing '" + myFilename + "'");
 
         /// plug audio and capture plugs, video is handled inside y60 engine via decoderhint
         var myPlaylist = new Playlist();

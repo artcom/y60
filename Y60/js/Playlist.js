@@ -220,7 +220,6 @@ Playlist.prototype.Constructor = function(self) {
         if (theMediaHint == undefined) {
             theMediaHint = self.getMediaHintFromURL(theUrl);
         }
-        //print("pushEntry:" + theUrl);
         var myEntryNodeString = '<Entry href="' + urlEncode(theUrl) + '" title="' + urlEncode(theTitle) + '" mediaType="' + theMediaHint + '"/>';
         var myEntryNode = new Node(myEntryNodeString);
         _myPlaylist.push(myEntryNode.firstChild);
