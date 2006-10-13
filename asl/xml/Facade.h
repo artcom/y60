@@ -130,7 +130,13 @@ namespace dom {
     asl::Ptr< typename TAG::CHILDFACADE, dom::ThreadingModel> getChild() { \
         TAG::Plug::ensureDependencies(); \
         return TAG::Plug::getChildNode(getNode())->dom::Node::getFacade<typename TAG::CHILDFACADE>(); \
+    }\
+    template <class TAG> \
+    void forceRebindChild() { \
+        TAG::Plug::ensureDependencies(); \
+        TAG::Plug::forceRebindChild(); \
     }
+
 
 #define IMPLEMENT_DYNAMIC_FACADE(CLASS) \
     IMPLEMENT_FACADE(CLASS) \

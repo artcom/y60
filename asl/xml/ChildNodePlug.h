@@ -61,7 +61,8 @@ namespace dom {
 				return *_myChild;
 			}
 			void ensureDependencies() const {}
-
+            void forceRebindChild() { _myChild = NodePtr(0); }
+            
 			const NodePtr getChildNode(const Node & theNode) const { 
                 if (!_myChild) {
                     ensureChild(theNode);
