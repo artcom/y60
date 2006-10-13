@@ -422,7 +422,7 @@ namespace inet {
         }
         if (myHeader.size()) {
             if (myRequest->onResponseHeader(myHeader) == false) {
-                return -1; // abort transfer
+                return (size_t) -1; // abort transfer
             }
         }
         return theBlockCount*theBlockSize;
