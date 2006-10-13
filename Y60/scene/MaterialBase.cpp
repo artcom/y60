@@ -68,6 +68,7 @@ namespace y60 {
 
     void
     MaterialBase::load(TextureManagerPtr theTextureManager) {
+
         addTextures(getNode().childNode(TEXTURE_LIST_NAME), theTextureManager);
 
         if (_myShader) {
@@ -230,6 +231,7 @@ namespace y60 {
 
     void
     MaterialBase::updateParams() {
+
         // check node version if update is necessary
 		MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
         if (!getNode() ||
@@ -237,9 +239,14 @@ namespace y60 {
             return;
         }
 
+        // force childnodes to reconnect
+        forceRebindChild<MaterialPropertiesTag>();
+        forceRebindChild<MaterialRequirementTag>();
+
         _myMaterialVersion = getNode().nodeVersion();
         _myRequiresVersion = myReqFacade->getNode().nodeVersion();
         AC_DEBUG << "Updating params for material " << get<NameTag>() << " materialVersion:" << _myMaterialVersion << " requiresVersion:" << _myRequiresVersion;
+
 
         _myTexGenModes.clear();
         _myTexGenParams.clear();

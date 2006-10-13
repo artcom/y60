@@ -158,6 +158,8 @@ namespace y60 {
 
     void
     GLShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
+         theMaterial.updateParams();
+
         //AC_DEBUG << "GLShader::activate " << theMaterial.getName();
         MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
@@ -227,7 +229,6 @@ namespace y60 {
             glBlendEquation(myEquation);
         }
 
-        theMaterial.updateParams();
     }
 
     void
