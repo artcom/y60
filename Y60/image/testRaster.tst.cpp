@@ -88,7 +88,9 @@ class RasterTest : public UnitTest {
                 PLAnyPicDecoder myDecoder;
                 PLAnyBmp myReferenceBmp;
                 myDecoder.MakeBmpFromFile(theFileName.c_str(), &myReferenceBmp);
+		myReferenceBmp.SetResolution(PLPoint(0,0)); // ignore dpi in file
                 ImageLoader myImageLoader(theFileName);
+                ENSURE_EQUAL(myReferenceBmp.GetBitsPerPixel(), myImageLoader.GetBitsPerPixel());
                 ENSURE(myReferenceBmp == myImageLoader);
 
                 ResizeableRasterPtr myRaster = myImageLoader.getRaster();
