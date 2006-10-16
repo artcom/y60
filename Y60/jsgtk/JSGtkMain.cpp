@@ -162,10 +162,9 @@ connect_timeout(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
             return JS_FALSE;
         }
 
-        SigC::Slot0<bool> mySlot = sigc::bind<JSContext*, JSObject*, std::string>(
-                sigc::ptr_fun( & JSGtkMain::on_timeout ), cx, myTarget, myMethodName);
         JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new SigC::Connection);
-        *myConnection = Glib::signal_timeout().connect( mySlot, myInterval);
+        *myConnection = Glib::signal_timeout().connect( sigc::bind<JSContext*, JSObject*, std::string>(
+                sigc::ptr_fun( & JSGtkMain::on_timeout ), cx, myTarget, myMethodName), myInterval);
 
         // register our target object with the GCObserver
         GCObserver::FinalizeSignal myFinalizer = GCObserver::get().watchObject(myTarget);
@@ -203,10 +202,11 @@ connect_idle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
     DOC_BEGIN("Install Gtk idle callbacks");
     DOC_END;
     try {
-        if (argc != 3) {
-            JS_ReportError(cx, "GtkMain.connect_idle(obj, func, prio) needs three arguments.");
+        if (argc != 2) {
+            JS_ReportError(cx, "GtkMain.connect_idle(obj, func) needs two arguments.");
             return JS_FALSE;
         }
+
         JSObject * myTarget;
         if ( ! convertFrom(cx, argv[0], myTarget)) {
             JS_ReportError(cx, "GtkMain.connect_idle() first argument is not an object.");
@@ -219,16 +219,16 @@ connect_idle(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
             return JS_FALSE;
         }
 
+        /* TODO: wrap glibmm priority enum
         unsigned myInterval;
         if ( ! convertFrom(cx, argv[2], myInterval)) {
             JS_ReportError(cx, "GtkMain.connect_idle() third argument is not a number.");
             return JS_FALSE;
-        }
+        }*/
 
-        SigC::Slot0<int> mySlot = sigc::bind<JSContext*, JSObject*, std::string>(
-                sigc::ptr_fun( & JSGtkMain::on_idle ), cx, myTarget, myMethodName);
         JSSigConnection::OWNERPTR myConnection = JSSigConnection::OWNERPTR(new SigC::Connection);
-        *myConnection = Glib::signal_idle().connect( mySlot, myInterval);
+        *myConnection = Glib::signal_idle().connect( sigc::bind<JSContext*, JSObject*, std::string>(
+                sigc::ptr_fun( & JSGtkMain::on_idle ), cx, myTarget, myMethodName), Glib::PRIORITY_DEFAULT_IDLE);
 
         // register our target object with the GCObserver
         GCObserver::FinalizeSignal myFinalizer = GCObserver::get().watchObject(myTarget);
