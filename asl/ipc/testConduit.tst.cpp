@@ -143,6 +143,9 @@ class ConduitTest : public TemplateUnitTest {
                         myLowercaseServer<POLICY>::create));
             ENSURE(_myAcceptor->start());
             
+             // XXX uncomment this to play with telnet
+             //while (true);
+
             // start client
             {
                 CharBuffer myInputBuffer;
@@ -183,7 +186,7 @@ class ConduitTest : public TemplateUnitTest {
                 ENSURE_MSG(strncmp(&myInputBuffer[0],myExpectedReply.c_str(),myInputBuffer.size())==0, " iterations.");
             }
             setSilentSuccess(false);
-            // now start two clients simutaneously
+            // now start two clients simultaneously
             {
                 CharBuffer myInputBuffer1;
                 typename Conduit<POLICY>::Ptr myClient1(new Conduit<POLICY>(_myLocalEndpoint));
