@@ -1,0 +1,284 @@
+//=============================================================================
+// Copyright (C) 2006 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+//
+// SwitchEditor
+//
+//=============================================================================
+
+source "libBubbleSort.mel";
+
+string $geometrySwitchList[];
+
+// find 'value' in 'stringList'; returns index of 'value' or -1 if not found.
+proc int findNodeByName(string $value, string $stringList[])
+{
+    int $i;
+    for ($i = 0; $i < size($stringList); $i++) {
+        if (strcmp($value, $stringList[$i]) == 0) {
+            return $i;
+        }
+    }
+    return -1;
+}
+
+// append 'value' to 'stringList'; returns index of 'value'.
+proc int append(string $value, string $stringList[])
+{
+    int $i = size($stringList);
+    $stringList[$i] = $value;
+    return $i;
+}
+
+// append 'nodePath' to 'stringList' if not already there; returns index of 'nodePath'.
+proc int appendUnique(string $nodePath, string $stringList[])
+{
+    int $i = findNodeByName($nodePath, $stringList);
+    if ($i == -1) {
+        $i = append($nodePath, $stringList);
+    }
+    return $i;
+}
+
+// compare two nodes by their last path part.
+global proc int nodePathCompare(string $s0, string $s1)
+{
+    string $s0List[];
+    tokenize($s0, "|", $s0List);
+
+    string $s1List[];
+    tokenize($s1, "|", $s1List);
+
+    return strcmp($s0List[size($s0List)-1], $s1List[size($s1List)-1]);
+}
+
+// collect all nodes from 'selection' that match 'pattern' into 'nodeList'.
+proc int collectNodes(string $selection[], string $pattern, string $nodeList[])
+{
+    for ($node in $selection) {
+
+        string $pathList[];
+        tokenize($node, "|", $pathList);
+
+        string $nodePath = "";
+        for ($pathPart in $pathList) {
+            $nodePath += "|" + $pathPart;
+
+            if (match($pattern, $pathPart) != "") {
+                appendUnique($nodePath, $nodeList);
+            }
+        }
+    }
+
+    // sort by last part of path
+    bubbleSortString($nodeList, "nodePathCompare");
+
+    return size($nodeList);
+}
+
+// on all nodes matching 'switchName' show child matching 'childName' and hide all others; returns number of shown nodes.
+global proc int setSwitch(string $switchName, string $childName)
+{
+    global string $geometrySwitchList[];
+
+    print("setSwitch '" + $switchName + "' to '" + $childName + "'\n");
+
+    // collect all switch nodes matching 'switchName'
+    string $switchNodes[];
+    for ($node in $geometrySwitchList) {
+
+        string $pathList[];
+        tokenize($node, "|", $pathList);
+        if (match($switchName, $pathList[size($pathList)-1]) != "") {
+            append($node, $switchNodes);
+        }
+    }
+
+    int $found = 0;
+    for ($node in $switchNodes) {
+
+        string $children[] = `listRelatives -c $node`;
+        for ($child in $children) {
+
+            string $childNode = $node + "|" + $child;
+            if (match($childName, $child) != "") {
+                //print("show:" + $childNode + "\n");
+                showHidden $childNode;
+                $found += 1;
+            } else {
+                //print("hide:" + $childNode + "\n");
+                hide $childNode;
+            }
+        }
+    }
+
+    return $found;
+}
+
+// get state of 'childName' of switch 'switchName'; returns 1 if shown, else 0.
+global proc int getSwitch(string $switchName, string $childName)
+{
+    global string $geometrySwitchList[];
+
+    print("getSwitch '" + $switchName + "' to '" + $childName + "'\n");
+
+    // collect all switch nodes matching 'switchName'
+    string $switchNodes[];
+    for ($node in $geometrySwitchList) {
+
+        string $pathList[];
+        tokenize($node, "|", $pathList);
+        if (match($switchName, $pathList[size($pathList)-1]) != "") {
+            append($node, $switchNodes);
+        }
+    }
+
+    int $found = false;
+    for ($node in $switchNodes) {
+
+        string $children[] = `listRelatives -c $node`;
+        for ($child in $children) {
+
+            string $childNode = $node + "|" + $child;
+            if (match($childName, $child) != "") {
+                $found = true;
+
+                int $visibility = eval("getAttr " + $childNode + ".visibility");
+                //print($childNode + ":" + $visibility + "\n");
+                if ($visibility == false) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    // if we didn't find a matching node return false
+    return $found;
+}
+
+// add submenu called 'name' containing subitems 'childList' to menu 'parent'; returns submenu.
+proc string addChildMenu(string $name, int $nameCount, string $childList[], string $parent)
+{
+    string $menuName = $name;
+    if ($nameCount > 1) {
+        $menuName += " (" + $nameCount + ")";
+    }
+    print("Adding menu '" + $menuName + "' with " + size($childList) + " children\n");
+
+    // sort children
+    bubbleSortString($childList, "strcmp");
+
+    // create submenu, add children
+    string $subMenu = `menuItem -label $menuName -parent $parent -subMenu true`;
+    for ($child in $childList) {
+        string $command = "setSwitch(\"" + $name + "\",\"" + $child + "\")";
+        int $state = getSwitch($name, $child);
+        menuItem -label $child -parent $subMenu -command $command -checkBox $state;
+    }
+
+    return $subMenu;
+}
+
+// update switches and build menu.
+global proc string buildListMenu(string $menu)
+{
+    print("Building switches menu\n");
+
+    global string $geometrySwitchList[];
+    waitCursor -state on;
+
+    // remove previous items
+    menu -e -deleteAllItems $menu;
+
+    // select absolute path of transform objects
+    string $selection[] = `ls -l -tr`;
+    clear($geometrySwitchList);
+    collectNodes($selection, "^switch_*", $geometrySwitchList);
+
+    // build menu
+    string $lastName = "";
+    int $nameCount = 0;
+    string $childNodeList[];
+
+    for ($node in $geometrySwitchList) {
+        string $pathList[];
+        tokenize($node, "|", $pathList);
+        string $name = $pathList[size($pathList)-1];
+
+        if ($lastName == "") {
+            $lastName = $name;
+        }
+        if (strcmp($name, $lastName) != 0) {
+            addChildMenu($lastName, $nameCount, $childNodeList, $menu);
+            $lastName = $name;
+            $nameCount = 0;
+            clear($childNodeList);
+        } else {
+            $nameCount++;
+        }
+
+        // add children of the current node to list
+        string $children[] = `listRelatives -c $node`;
+        for ($child in $children) {
+            // extract '_.*_'
+            string $parts[];
+            tokenize($child, "_", $parts);
+            if (size($parts) >= 3) {
+                $child = "_" + $parts[0] + "_";
+            }
+            appendUnique($child, $childNodeList);
+        }
+    }
+
+    if (size($childNodeList) > 0) {
+        addChildMenu($lastName, $nameCount, $childNodeList, $menu);
+    }
+
+    waitCursor -state off;
+
+    return $menu;
+}
+
+// post 'About' menu.
+global proc string postAboutMenu(string $parent)
+{
+    string $acSwitchEditorVersion = "0.3";
+
+    string $msg = "acSwitchEditor\nShow/hide 'switch_' nodes in the hierarchy\nCopyright (c)2006 ART+COM AG Berlin\nVersion " + $acSwitchEditorVersion + "\n";
+    string $result = `confirmDialog -parent $parent -title "About acSwitchEditor" -message $msg -messageAlign "left" -button "Close"`;
+
+    return $result;
+}
+
+// ENTRY
+global proc int acSwitchEditor()
+{
+    if (!`window -exists winSwitchEditor`) {
+
+        print("Creating acSwitchEditor UI\n");
+
+        // create UI
+        string $win = `window -menuBar true -title "Switch Editor" -width 256 -height 128 winSwitchEditor`;
+
+        // switches menu
+        string $switchMenu = `menu -label "Switches" -parent $win`;
+        string $cmd = "buildListMenu(\"" + $switchMenu + "\")";
+        menu -e -postMenuCommand $cmd $switchMenu;
+
+        // help menu
+        string $helpMenu = `menu -label Help -parent $win -helpMenu true`;
+        $cmd = "postAboutMenu(\"" + $helpMenu + "\")";
+        menuItem -label "About" -parent $helpMenu -command $cmd;
+    }
+
+    // show
+    showWindow winSwitchEditor;
+
+    return 0;
+}

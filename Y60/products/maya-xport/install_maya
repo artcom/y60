@@ -38,10 +38,9 @@ else
     SCRIPT_DIR="${DIR}/scripts"
 fi
 
+SCRIPTS=`ls *.mel`
 echo "### INFO: Installing scripts to $SCRIPT_DIR"
 mkdir -p "$SCRIPT_DIR"
-cp -vf acY60XmlExportOptions.mel ${SCRIPT_DIR}
-cp -vf acCreateObjectAttributes.mel ${SCRIPT_DIR}
-cp -vf acCreateMaterialAttributes.mel ${SCRIPT_DIR}
-cp -vf acCreateTextureAttributes.mel ${SCRIPT_DIR}
-cp -vf acCreateLineAttributes.mel ${SCRIPT_DIR}
+for SCRIPT in $SCRIPTS ; do
+    cp -vf ${SCRIPT} "$SCRIPT_DIR"
+done

@@ -20,7 +20,6 @@ global proc acCreateLineAttributes() {
 
             addAttr -ln ac_blendfunc -dt "string" $dagnode;
             eval("setAttr -type \"string\"" + $dagnode + ".ac_blendfunc \"[src_alpha, one_minus_src_alpha]\"");
-
         }
         $myResult = 1;
     }
