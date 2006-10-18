@@ -27,6 +27,9 @@ namespace jslib {
     asl::Vector2f IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
             const std::string & theSettingName, asl::Vector2f theDefault);
     template
+    asl::Vector3f IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
+            const std::string & theSettingName, asl::Vector3f theDefault);
+    template
     asl::Vector4f IScriptablePlugin::getSetting(const dom::NodePtr & theSettings,
             const std::string & theSettingName, asl::Vector4f theDefault);
     template

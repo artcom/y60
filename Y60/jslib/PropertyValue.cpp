@@ -22,6 +22,8 @@ template bool PropertyValue::get() const;
 template float PropertyValue::get() const;
 template std::string PropertyValue::get() const;
 template asl::Vector2i PropertyValue::get() const;
+template asl::Vector3f PropertyValue::get() const;
+template std::vector<std::string> PropertyValue::get() const;
 template dom::NodePtr PropertyValue::get() const;
 
 template bool PropertyValue::get(int& theReturnValue) const;
@@ -30,6 +32,8 @@ template bool PropertyValue::get(bool& theReturnValue) const;
 template bool PropertyValue::get(float& theReturnValue) const;
 template bool PropertyValue::get(std::string& theReturnValue) const;
 template bool PropertyValue::get(asl::Vector2i& theReturnValue) const;
+template bool PropertyValue::get(asl::Vector3f& theReturnValue) const;
+template bool PropertyValue::get(std::vector<std::string> & theReturnValue) const;
 template bool PropertyValue::get(dom::NodePtr& theReturnValue) const;
 
 template void PropertyValue::set(const int & theValue);
@@ -38,6 +42,8 @@ template void PropertyValue::set(const bool & theValue);
 template void PropertyValue::set(const float & theValue);
 template void PropertyValue::set(const std::string & theValue);
 template void PropertyValue::set(const asl::Vector2i & theValue);
+template void PropertyValue::set(const asl::Vector3f & theValue);
+template void PropertyValue::set(const std::vector<std::string> & theValue);
 template void PropertyValue::set(const dom::NodePtr & theValue);
 
 }
