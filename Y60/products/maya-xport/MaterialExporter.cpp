@@ -987,11 +987,27 @@ MaterialExporter::findRelativeFilePath(const std::string & theFileName) {
         AC_WARNING << "MaterialExporter::findRelativeFilePath unable to resolve path '" << myFileName << "'";
     }
 #endif
+    
+    std::string myRelativeFileName = evaluateRelativePath(_myBaseDirectory, myFileName);
+    if (fileExists(myRelativeFileName)) {
+        return myRelativeFileName;
+    }
 
-    myFileName = evaluateRelativePath(_myBaseDirectory, myFileName);
-    //AC_PRINT << "+++ findRelativeFilePath in=" << theFileName << " base=" << _myBaseDirectory << " out=" << myFileName;
+    // find filename from base
+    std::string myAbsoluteFileName = myRelativeFileName;
+    unsigned mySlashPos = std::string::npos;
+    do {
+        mySlashPos = myAbsoluteFileName.rfind("/", mySlashPos);
+        if (mySlashPos == std::string::npos) {
+            AC_ERROR << "Unable to find '" << myAbsoluteFileName << "' relative to '" << _myBaseDirectory << "'";
+            return myAbsoluteFileName;
+        }
+        myRelativeFileName = myAbsoluteFileName.substr(mySlashPos+1);
+        myFileName = _myBaseDirectory + myRelativeFileName;
+        mySlashPos--;
+    } while (!fileExists(myFileName));
 
-    return myFileName;
+    return myRelativeFileName;
 }
 
 std::string
