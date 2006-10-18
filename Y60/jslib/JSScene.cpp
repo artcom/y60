@@ -86,50 +86,6 @@ toString(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
-JSBool
-loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Updates a movie node.");
-    DOC_PARAM("theMovieNode", "The movie node to update.", DOC_TYPE_NODE);
-    DOC_PARAM_OPT("theCurrentTime", "The time for which the matching frame should be loaded.", DOC_TYPE_FLOAT, 0);
-    DOC_END;
-    try {
-        if (argc < 1) {
-            throw asl::Exception(string("Not enough arguments"));
-        }
-
-        dom::NodePtr myNode;
-        convertFrom(cx, argv[0], myNode);
-
-        JSScene::OWNERPTR myNative;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        if (argc == 1) {
-            myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>());
-        } else {
-            float myTime;
-            convertFrom(cx, argv[1], myTime);
-            myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>(), myTime);
-        }
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-JSBool
-loadCaptureFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Updates a capture node.");
-    DOC_PARAM("theCaptureNode", "Capture node to update", DOC_TYPE_NODE);
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1);
-        dom::NodePtr myNode;
-        convertFrom(cx, argv[0], myNode);
-
-        JSScene::OWNERPTR myNative;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-
-        myNative->getTextureManager()->loadCaptureFrame(myNode->getFacade<Capture>());
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
 
 static JSBool
 intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -279,205 +235,6 @@ bodyVolume(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
-static JSBool
-CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates an untextured lambert shaded materail.");
-    DOC_PARAM_OPT("theDiffuseColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
-    DOC_PARAM_OPT("theAmbientColor", "", DOC_TYPE_VECTOR4F, "[0,0,0,1]");
-    DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
-    DOC_END;
-    try {
-        ensureParamCount(argc, 0, 2);
-        JSScene::OWNERPTR myNative;
-
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        dom::NodePtr myResult;
-        if (argc == 0) {
-            myResult = y60::createLambertMaterial(myNative);
-        } else {
-            asl::Vector4f myDiffuseColor;
-            convertFrom(cx, argv[0], myDiffuseColor);
-            if (argc == 1) {
-                myResult = y60::createLambertMaterial(myNative, myDiffuseColor);
-            } else {
-                asl::Vector4f myAmbientColor;
-                convertFrom(cx, argv[1], myAmbientColor);
-                myResult = y60::createLambertMaterial(myNative, myDiffuseColor, myAmbientColor);
-            }
-        }
-
-        *rval = as_jsval(cx, myResult);
-        return JS_TRUE;
-
-    } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
-CreateTexturedMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates a textured, unlit material.");
-    DOC_PARAM("theTextureFilename", "", DOC_TYPE_STRING);
-    DOC_RESET;
-    DOC_PARAM("theImageNode", "A image node that should be attached to the material", DOC_TYPE_NODE);
-    DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1, 1);
-        JSScene::OWNERPTR myNative;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        dom::NodePtr myResult;
-        dom::NodePtr myImageNode;
-        if (convertFrom(cx, argv[0], myImageNode)) {
-            myResult = y60::createUnlitTexturedMaterial(myNative, myImageNode);
-        } else {
-            string myTextureFilename;
-            if (convertFrom(cx, argv[0], myTextureFilename)) {
-                myResult = y60::createUnlitTexturedMaterial(myNative, myTextureFilename);
-            } else {
-                JS_ReportError(cx, "JSScene::createTexturedMaterial(): argument #1 must be a string (File path) or a image node");
-                return JS_FALSE;
-            }
-        }
-        *rval = as_jsval(cx, myResult);
-        return JS_TRUE;
-
-    } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
-CreateColorMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates an untextured and unlit colored material.");
-    DOC_PARAM_OPT("theColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
-    DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
-    DOC_END;
-    try {
-        ensureParamCount(argc, 0, 1);
-        JSScene::OWNERPTR myNative;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        dom::NodePtr myResult;
-        if (argc == 0) {
-            myResult = y60::createColorMaterial(myNative);
-        } else {
-            asl::Vector4f myColor;
-            convertFrom(cx, argv[0], myColor);
-            myResult = y60::createColorMaterial(myNative, myColor);
-        }
-
-        *rval = as_jsval(cx, myResult);
-        return JS_TRUE;
-
-    } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
-CreateQuadShape(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates a single quad.");
-    DOC_PARAM("theMaterial", "", DOC_TYPE_NODE);
-    DOC_PARAM("theTopLeftCorner", "", DOC_TYPE_VECTOR3F);
-    DOC_PARAM("theBottomRightCorner", "", DOC_TYPE_VECTOR3F);
-    DOC_RVAL("theQuadShape", DOC_TYPE_NODE)
-    DOC_END;
-    try {
-        ensureParamCount(argc, 3, 3);
-        JSScene::OWNERPTR myNative;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        dom::NodePtr myMaterial;
-        convertFrom(cx, argv[0], myMaterial);
-        asl::Vector3f myTopLeftCorner;
-        convertFrom(cx, argv[1], myTopLeftCorner);
-        asl::Vector3f myBottomRightCorner;
-        convertFrom(cx, argv[2], myBottomRightCorner);
-        dom::NodePtr myResult = y60::createQuad(myNative, myMaterial->getAttributeString("id"), myTopLeftCorner, myBottomRightCorner);
-        *rval = as_jsval(cx, myResult);
-        return JS_TRUE;
-
-    } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
-CreateBody(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates a body inside the scene");
-    DOC_PARAM("theShape", "A shape node inside the scene for this body", DOC_TYPE_NODE);
-    DOC_PARAM_OPT("theParent", "A parent node inside the world hierarchy", DOC_TYPE_NODE, "toplevel node");
-    DOC_RVAL("The new body", DOC_TYPE_NODE)
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1, 2);
-        JSScene::OWNERPTR myNative;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        dom::NodePtr myShapeNode;
-        convertFrom(cx, argv[0], myShapeNode);
-        dom::NodePtr myParent = myNative->getWorldRoot();
-        if (argc == 2) {
-            convertFrom(cx, argv[1], myParent);
-        }
-
-        //using the facade we make sure we generate an ID if none was given
-        ShapePtr myShape = myShapeNode->getFacade<Shape>();
-
-        dom::NodePtr myResult = y60::createBody(myParent, myShape->get<IdTag>());
-        *rval = as_jsval(cx, myResult);
-        return JS_TRUE;
-
-    } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
-CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Creates an image inside the scene");
-    DOC_PARAM("theImageSource", "Path to image file", DOC_TYPE_NODE);
-    DOC_RESET;
-    DOC_PARAM("theWidth", "Image width", DOC_TYPE_INTEGER);
-    DOC_PARAM("theHeight", "Image height", DOC_TYPE_INTEGER);
-    DOC_PARAM("thePixelEncoding", "Pixel encoding", DOC_TYPE_STRING);
-    //
-    DOC_RVAL("The new image", DOC_TYPE_NODE)
-    DOC_END;
-    try {
-        JSScene::OWNERPTR myNative;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
-        if (argc == 1) {
-            std::string myImageSrc;
-            if (!convertFrom(cx, argv[0], myImageSrc)) {
-                JS_ReportError(cx, "JSScene::createImage(): argument #1 must be a string (File path)");
-                return JS_FALSE;
-            }
-
-            dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
-                dom::NodePtr(new dom::Element("image")));
-            myResult->appendAttribute(IMAGE_SRC_ATTRIB, myImageSrc);
-            *rval = as_jsval(cx, myResult);
-        } else if (argc ==3) {
-            unsigned myWidth;
-            if (!convertFrom(cx, argv[0], myWidth)) {
-                JS_ReportError(cx, "JSScene::createImage(): argument #1 must be a int (imagewidth)");
-                return JS_FALSE;
-            }
-            unsigned myHeight;
-            if (!convertFrom(cx, argv[1], myHeight)) {
-                JS_ReportError(cx, "JSScene::createImage(): argument #2 must be a int (imageheight)");
-                return JS_FALSE;
-            }
-            std::string myPixelEncoding;
-            if (!convertFrom(cx, argv[2], myPixelEncoding)) {
-                JS_ReportError(cx, "JSScene::createImage(): argument #3 must be a string (pixelencoding)");
-                return JS_FALSE;
-            }
-            myPixelEncoding = asl::toUpperCase(myPixelEncoding);
-            dom::NodePtr myResult = myNative->getImagesRoot()->appendChild(
-                dom::NodePtr(new dom::Element("image")));
-            y60::ImagePtr myImage = myResult->getFacade<y60::Image>();
-            myImage->createRaster(myWidth, myHeight, 1,
-                PixelEncoding(getEnumFromString(myPixelEncoding, PixelEncodingString)));
-            memset(myImage->getRasterPtr()->pixels().begin(), 0, myImage->getRasterPtr()->pixels().size());
-            *rval = as_jsval(cx, myResult);
-
-        } else {
-            throw asl::Exception(string("Not enough arguments, must be 1 (filename) or 3(width,height,encoding)."));
-        }
-        return JS_TRUE;
-
-    } HANDLE_CPP_EXCEPTION;
-}
 
 static JSBool
 getWorldSize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -549,6 +306,58 @@ collectGarbage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     return Method<NATIVE>::call(&NATIVE::collectGarbage,cx,obj,argc,argv,rval);
 }
 
+static JSBool
+loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Updates a movie node.");
+     DOC_PARAM("theMovieNode", "The movie node to update.", DOC_TYPE_NODE);
+    DOC_PARAM_OPT("theCurrentTime", "The time for which the matching frame should be loaded.", DOC_TYPE_FLOAT, 0);
+    DOC_END;
+    try {
+        if (argc < 2) {
+            throw asl::Exception(string("Not enough arguments"));
+        }
+
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+
+        dom::NodePtr myNode;
+        convertFrom(cx, argv[0], myNode);
+
+        ensureParamCount(argc, 2);
+
+        if (argc == 1) {
+            myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>());
+        } else {
+            float myTime;
+            convertFrom(cx, argv[2], myTime);
+            myNative->getTextureManager()->loadMovieFrame(myNode->getFacade<Movie>(), myTime);
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+static JSBool
+loadCaptureFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
+  DOC_BEGIN("Updates a capture node.");
+  DOC_PARAM("theCaptureNode", "Capture node to update", DOC_TYPE_NODE);
+    DOC_END;
+    try {
+
+      ensureParamCount(argc, 1);
+
+      JSScene::OWNERPTR myNative;
+      convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+      dom::NodePtr myNode;
+      convertFrom(cx, argv[2], myNode);
+
+      myNative->getTextureManager()->loadCaptureFrame(myNode->getFacade<Capture>());
+      return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
 enum PropertyNumbers {
     PROP_dom = -100,
     PROP_statistics,
@@ -606,16 +415,10 @@ JSScene::Functions() {
         {"collectGarbage",      collectGarbage,      0},
         {"bodyVolume",          bodyVolume,          1},
         {"save",                save,                2},
-        {"setup",               setup,                0},
-        {"createLambertMaterial", CreateLambertMaterial, 2},
-        {"createColorMaterial",   CreateColorMaterial,   1},
-        {"createTexturedMaterial",CreateTexturedMaterial,1},
-        {"createBody",            CreateBody,            2},
-        {"createImage",           CreateImage,           3},
-        {"createQuadShape",       CreateQuadShape,       3},
-        {"loadMovieFrame",        loadMovieFrame,        1},
-        {"loadCaptureFrame",      loadCaptureFrame,      1},
-        {"getWorldSize",          getWorldSize,          1},
+        {"setup",               setup,               0},
+        {"getWorldSize",        getWorldSize,        1},
+        {"loadMovieFrame",      loadMovieFrame,      1},
+        {"loadCaptureFrame",    loadCaptureFrame,    2},
         {0}
     };
     return myFunctions;

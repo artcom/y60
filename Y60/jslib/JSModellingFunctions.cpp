@@ -127,6 +127,7 @@ CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 
     } HANDLE_CPP_EXCEPTION;
 }
+
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateSurface2DFromContour(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
@@ -427,6 +428,136 @@ CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv
 
 }
 
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates an image inside the scene");
+    DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);    
+    DOC_PARAM("theImageSource", "Path to image file", DOC_TYPE_NODE);
+    DOC_RESET;
+    DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);    
+    DOC_PARAM("theWidth", "Image width", DOC_TYPE_INTEGER);
+    DOC_PARAM("theHeight", "Image height", DOC_TYPE_INTEGER);
+    DOC_PARAM("thePixelEncoding", "Pixel encoding", DOC_TYPE_STRING);
+    DOC_RVAL("The new image", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+
+        ensureParamCount(argc, 2, 4);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+
+        if (argc == 2) {
+            std::string myImageSrc;
+            if (!convertFrom(cx, argv[1], myImageSrc)) {
+                JS_ReportError(cx, "JSScene::createImage(): argument #2 must be a string (File path)");
+                return JS_FALSE;
+            }
+
+            dom::NodePtr myResult = myScene->getImagesRoot()->appendChild(
+                dom::NodePtr(new dom::Element("image")));
+            myResult->appendAttribute(IMAGE_SRC_ATTRIB, myImageSrc);
+            *rval = as_jsval(cx, myResult);
+        } else if (argc ==4) {
+            unsigned myWidth;
+            if (!convertFrom(cx, argv[1], myWidth)) {
+                JS_ReportError(cx, "JSScene::createImage(): argument #2 must be a int (imagewidth)");
+                return JS_FALSE;
+            }
+            unsigned myHeight;
+            if (!convertFrom(cx, argv[2], myHeight)) {
+                JS_ReportError(cx, "JSScene::createImage(): argument #3 must be a int (imageheight)");
+                return JS_FALSE;
+            }
+            std::string myPixelEncoding;
+            if (!convertFrom(cx, argv[3], myPixelEncoding)) {
+                JS_ReportError(cx, "JSScene::createImage(): argument #4 must be a string (pixelencoding)");
+                return JS_FALSE;
+            }
+            myPixelEncoding = asl::toUpperCase(myPixelEncoding);
+            dom::NodePtr myResult = myScene->getImagesRoot()->appendChild(
+                dom::NodePtr(new dom::Element("image")));
+            y60::ImagePtr myImage = myResult->getFacade<y60::Image>();
+            myImage->createRaster(myWidth, myHeight, 1,
+                PixelEncoding(getEnumFromString(myPixelEncoding, PixelEncodingString)));
+            memset(myImage->getRasterPtr()->pixels().begin(), 0, myImage->getRasterPtr()->pixels().size());
+            *rval = as_jsval(cx, myResult);
+
+        } else {
+            throw asl::Exception(string("Not enough arguments, must be 2 (scene,filename) or 4(scene,width,height,encoding)."));
+        }
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateColorMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates an untextured and unlit colored material.");
+    DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);    
+    DOC_PARAM_OPT("theColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
+    DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1, 2);
+
+        y60::ScenePtr myScene(0);
+        convertFrom(cx, argv[0], myScene);
+
+        dom::NodePtr myResult;
+        if (argc == 1) {
+            myResult = y60::createColorMaterial(myScene);
+        } else {
+            asl::Vector4f myColor;
+            convertFrom(cx, argv[1], myColor);
+            myResult = y60::createColorMaterial(myScene, myColor);
+        }
+
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
+JS_STATIC_DLL_CALLBACK(JSBool)
+CreateLambertMaterial(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Creates an untextured lambert shaded materail.");
+    DOC_PARAM("theScene", "The scene to create the material inside", DOC_TYPE_SCENE);
+    DOC_PARAM_OPT("theDiffuseColor", "", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
+    DOC_PARAM_OPT("theAmbientColor", "", DOC_TYPE_VECTOR4F, "[0,0,0,1]");
+    DOC_RVAL("theMaterialNode", DOC_TYPE_NODE)
+    DOC_END;
+    try {
+      ensureParamCount(argc, 1, 3);
+      
+      y60::ScenePtr myScene(0);
+      convertFrom(cx, argv[0], myScene);
+
+        dom::NodePtr myResult;
+        if (argc == 1) {
+            myResult = y60::createLambertMaterial(myScene);
+        } else {
+            asl::Vector4f myDiffuseColor;
+            convertFrom(cx, argv[1], myDiffuseColor);
+            if (argc == 2) {
+                myResult = y60::createLambertMaterial(myScene, myDiffuseColor);
+            } else {
+                asl::Vector4f myAmbientColor;
+                convertFrom(cx, argv[2], myAmbientColor);
+                myResult = y60::createLambertMaterial(myScene, myDiffuseColor, myAmbientColor);
+            }
+        }
+
+        *rval = as_jsval(cx, myResult);
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
@@ -436,8 +567,15 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         DOC_PARAM_OPT("theName", "Material name", DOC_TYPE_STRING, "ColorMaterial");
         DOC_PARAM_OPT("theTransparencyFlag", "Does the texture contain transparent pixels", DOC_TYPE_BOOLEAN, false);
         DOC_PARAM_OPT("theSpriteFlag", "Use the material as sprite (for particles)", DOC_TYPE_BOOLEAN, false);
-        DOC_PARAM_OPT("theDepth", "The Depth of the texture (for 3D-Textures)", DOC_TYPE_INTEGER, 1);
         DOC_PARAM_OPT("theColor", "Surfacecolor of the material", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
+        DOC_PARAM_OPT("theDepth", "The Depth of the texture (for 3D-Textures)", DOC_TYPE_INTEGER, 1);
+        DOC_RESET;
+        DOC_PARAM_OPT("theImageNode", "Image node to use for as texture", DOC_TYPE_NODE, 0);
+        DOC_PARAM_OPT("theName", "Material name", DOC_TYPE_STRING, "ColorMaterial");
+        DOC_PARAM_OPT("theTransparencyFlag", "Does the texture contain transparent pixels", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("theSpriteFlag", "Use the material as sprite (for particles)", DOC_TYPE_BOOLEAN, false);
+        DOC_PARAM_OPT("theColor", "Surfacecolor of the material", DOC_TYPE_VECTOR4F, "[1,1,1,1]");
+
         DOC_RVAL("The new created material", DOC_TYPE_NODE);
         DOC_END;
 
@@ -448,9 +586,12 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
 
         dom::NodePtr myResult;
 
+        dom::NodePtr myImageNode(0);
         string myTextureFilename;
         if (argc > 1) {
+          if (!convertFrom(cx, argv[1], myImageNode)) {
             convertFrom(cx, argv[1], myTextureFilename);
+          }
         }
         string myName;
         if (argc > 2) {
@@ -464,43 +605,68 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         if (argc > 4) {
             convertFrom(cx, argv[4], mySpriteFlag);
         }
-        unsigned myDepth;
-        if (argc > 5) {
-            convertFrom(cx, argv[5], myDepth);
-        }
         Vector4f myColor;
-        if (argc > 6) {
-            convertFrom(cx, argv[6], myColor);
+        if (argc > 5) {
+            convertFrom(cx, argv[5], myColor);
         }
-
+        unsigned myDepth;
+        if (argc > 6) {
+            convertFrom(cx, argv[6], myDepth);
+            if (myImageNode) {
+              AC_WARNING << "Ignoring depth value, because image node already has one.";
+            }
+        }
 
         switch (argc) {
-            case 1:
-                myResult = createUnlitTexturedMaterial(myScene,"");
-                break;
-            case 2:
-                myResult = createUnlitTexturedMaterial(myScene,myTextureFilename);
-                break;
-            case 3:
-                myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,myName);
-                break;
-            case 4:
-                myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,
-                        myName,myTransparencyFlag);
-                break;
-            case 5:
-                myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,
-                        myName,myTransparencyFlag,mySpriteFlag);
-                break;
-            case 6:
-                myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,
-                        myName,myTransparencyFlag,mySpriteFlag,myDepth);
-                break;
-            case 7:
-                myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,
-                        myName,myTransparencyFlag,mySpriteFlag,myDepth, myColor);
-                break;
-
+        case 1:
+          myResult = createUnlitTexturedMaterial(myScene,"");
+          break;
+        case 2:
+          if (myImageNode) {
+            myResult = createUnlitTexturedMaterial(myScene,myImageNode);
+          } else {
+            myResult = createUnlitTexturedMaterial(myScene,myTextureFilename);
+          }
+          break;
+        case 3:
+          if (myImageNode) {
+            myResult = createUnlitTexturedMaterial(myScene,myImageNode, myName);
+          } else {
+            myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,myName);
+          }
+          break;
+        case 4:
+          if (myImageNode) {
+            myResult = createUnlitTexturedMaterial(myScene,myImageNode,myName,myTransparencyFlag);
+          } else {
+            myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,
+                                                   myName,myTransparencyFlag);
+          }
+          break;
+        case 5:
+          if (myImageNode) {
+          myResult = createUnlitTexturedMaterial(myScene,myImageNode,
+                                                 myName,myTransparencyFlag,mySpriteFlag);
+          } else {
+            myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,
+                                                 myName,myTransparencyFlag,mySpriteFlag);
+          }
+          break;
+        case 6:
+          if (myImageNode) {
+            myResult = createUnlitTexturedMaterial(myScene,myImageNode,
+                                                   myName,myTransparencyFlag,mySpriteFlag, myColor);
+          } else {
+            myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,
+                                                 myName,myTransparencyFlag,mySpriteFlag, myDepth, myColor);
+          }
+          break;
+        case 7:
+          if (!myImageNode) {
+            myResult = createUnlitTexturedMaterial(myScene,myTextureFilename,
+                                                   myName,myTransparencyFlag,mySpriteFlag,myDepth, myColor );
+          }
+          break;
         }
 
         *rval = as_jsval(cx, myResult);
@@ -624,6 +790,8 @@ SetAlpha(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     } HANDLE_CPP_EXCEPTION;
 }
 
+
+
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns string representation fo the modelling functions");
@@ -661,6 +829,9 @@ JSModellingFunctions::StaticFunctions() {
         {"createQuadStrip",             CreateQuadStrip,             4},
         {"createTriangleStrip",         CreateTriangleStrip,         4},
         {"createQuadStack",             CreateQuadStack,             5},
+        {"createImage",                 CreateImage,                 4},
+        {"createLambertMaterial",       CreateLambertMaterial,       3},
+        {"createColorMaterial",         CreateColorMaterial,         3},
         {"createUnlitTexturedMaterial", CreateUnlitTexturedMaterial, 7},
         {"createVoxelProxyGeometry",    CreateVoxelProxyGeometry,    7},
         {"setAlpha",                    SetAlpha,                    2},
