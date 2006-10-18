@@ -12,7 +12,7 @@
 //    $RCSfile: testMyClass.tst.js,v $
 //
 //   $Revision: 1.5 $
-//
+p//
 // Description: Utility Classes and Macros for easy unit testing
 //
 //
@@ -21,12 +21,12 @@
 
 use("UnitTest.js");
 
-function MyClassUnitTest() {
-    this.Constructor(this, "MyClassUnitTest");
+function MySceneUnitTest() {
+    this.Constructor(this, "MySceneUnitTest");
 }
 
 
-MyClassUnitTest.prototype.Constructor = function(obj, theName) {
+MySceneUnitTest.prototype.Constructor = function(obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
@@ -71,10 +71,10 @@ MyClassUnitTest.prototype.Constructor = function(obj, theName) {
     }
 }
 
-var myTestName = "testMyClass.tst.js";
+var myTestName = "testScene.tst.js";
 var mySuite = new UnitTestSuite(myTestName);
 
-mySuite.addTest(new MyClassUnitTest());
+mySuite.addTest(new MySceneUnitTest());
 mySuite.run();
 
 print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
