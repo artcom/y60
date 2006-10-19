@@ -178,7 +178,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myViewport = getDescendantByTagName(window.canvas, "viewport");
         if (myViewport.glow == true) {
             Logger.warning("Disabling glow on viewport '" + myViewport.name + "' id=" + myViewport.id);
-            myViewport.glow = false;
+            //myViewport.glow = false;
         }
 
         // blurKernelImage
