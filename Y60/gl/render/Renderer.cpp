@@ -1024,7 +1024,7 @@ namespace y60 {
         _myState->setDepthWrites(true);
         _myState->setFrontFaceCCW(true);
 
-#if 0
+#if 1
         // XXX UH: need to think on this some more
         // This prevents translucent pixels from being drawn. This way the
         // background can shine through.
@@ -1138,7 +1138,6 @@ namespace y60 {
                         glEnable(GL_ALPHA_TEST);
                         currentMaterialHasAlpha = true;
                     }
-
                     renderBodyPart(it->second, *theViewport, *myCamera);
                 }
                 glPopMatrix();
