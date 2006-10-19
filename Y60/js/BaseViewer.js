@@ -297,6 +297,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    self.recollectSwitchNodes = function() {
+        collectAllSwitchNodes(self.getScene());
+    }
+
     self.onExit = function() {
         if (_myProfileNode) {
             _myProfileNode.name = self.getModelName();
