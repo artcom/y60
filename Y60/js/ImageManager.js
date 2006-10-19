@@ -22,7 +22,7 @@ ImageManager.prototype.Constructor = function(obj, theBaseViewer) {
         var myImageNode = getDescendantByName(window.scene.images, theImageName, false);
         if (!myImageNode) {
             var myEncoding = (theEncoding != undefined) ? theEncoding.toUpperCase() : "RGB";
-            myImageNode = window.scene.createImage(1,1,myEncoding);
+            myImageNode = Modelling.createImage(window.scene, 1,1,myEncoding);
             myImageNode.name = theImageName;
         }
         return myImageNode;

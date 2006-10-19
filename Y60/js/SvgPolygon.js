@@ -31,7 +31,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
     self.createPolygonShapeByVectorList = function(theId, theVector2fList) {
         _myShape = Modelling.createSurface2DFromContour(window.scene, theMaterial.id, theVector2fList, "Surface2d");
         //print(theVector2fList);
-        _myBody = window.scene.createBody(_myShape);
+        _myBody = Modelling.createBody(window.scene, _myShape.id);
         _myBody.name = "Body_" + theId;
         window.scene.update(Scene.SHAPES | Scene.MATERIALS);
     }
@@ -49,7 +49,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
         _myShape.name = "Shape_" + theId;
         window.scene.shapes.appendChild(_myShape);
 
-        _myBody = window.scene.createBody(_myShape);
+       _myBody = Modelling..createBody(window.scene, _myShape.id);
         _myBody.name = "Body_" + theId;
         window.scene.update(Scene.SHAPES | Scene.MATERIALS);        
     }
@@ -72,7 +72,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
             }
         }        
         _myShape = Modelling.createSurface2DFromContour(window.scene, theMaterial.id, myVector2fList, "Surface2d");
-        _myBody = window.scene.createBody(_myShape);
+        _myBody = Modelling.createBody(window.scene, _myShape.id);
         _myBody.name = "Body_" + theSvgNode.id;
         window.scene.update(Scene.SHAPES | Scene.MATERIALS);
         return myVector2fList;
@@ -108,7 +108,7 @@ SvgPolygon.prototype.Constructor = function(self, theMaterial) {
         _myShape.name = "Shape_" + theSvgNode.id;
         window.scene.shapes.appendChild(_myShape);
 
-        _myBody = window.scene.createBody(_myShape);
+       _myBody = Modelling.createBody(window.scene, _myShape.id);
         _myBody.name = "Body_" + theSvgNode.id;
         window.scene.update(Scene.SHAPES | Scene.MATERIALS);
         return myVector2fList;

@@ -222,7 +222,7 @@ PathStrip.prototype.Constructor = function(self, theSceneViewer, theMaterial) {
         _myShape = myShapeBuilder.buildNode();
         _myShape.name = "PathStrip_"+_myMaterial.id;
         theSceneViewer.getShapes().appendChild(_myShape);
-        _myBody = theSceneViewer.getScene().createBody(_myShape);
+        _myBody = Modelling.createBody(theSceneViewer.getScene(), _myShape.id);
         theSceneViewer.getScene().update(Scene.SHAPES | Scene.MATERIALS);
 
     }

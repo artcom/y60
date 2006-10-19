@@ -99,7 +99,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname, theFontFilenam
                 //print("char=" + myChar, "max=" + myMetric.max,"min="+myMetric.min,"advance="+myMetric.advance, "found="+myFound);
                 var myGlyphSize = difference(myMetric.max, myMetric.min);
 
-                var myTmpImage = window.scene.createImage(myGlyphSize.x, myGlyphSize.y, "RGBA");
+                var myTmpImage = Modelling.createImage(window.scene, myGlyphSize.x, myGlyphSize.y, "RGBA");
                 var myCharSize = window.renderTextAsImage(myTmpImage, myChar, myFontName, 0, 0);
                 var myFontMetrics = _myAlphabetMap[theSize].fontmetrics;
                 //print("char=" + myChar, "glyphsize=" + myGlyphSize, "charsize=" + myCharSize, "height=" + myFontMetrics.height, myFontMetrics.ascent, myFontMetrics.descent);
@@ -188,7 +188,7 @@ CharacterSoup.prototype.Constructor = function(self, theFontname, theFontFilenam
         Logger.info("CharacterSoup.setupFont " + theFontname, "size=" + theSize, "cellsize=" + myCellSize);
 
         var myFontImageSize = myCellSize * CHARACTERS_PER_LINE;
-        var myFontImage = window.scene.createImage(myFontImageSize, myFontImageSize, "RGBA");
+        var myFontImage = Modelling.createImage(window.scene, myFontImageSize, myFontImageSize, "RGBA");
         myFontImage.mipmap = false;
 
         var myMaterial = buildUnlitTextureMaterialNode(myFontName + "_material", myFontImage.id);

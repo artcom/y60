@@ -185,7 +185,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myBlurKernel = generateGaussianWeights( theKernelSize );
         theKernelSize = myBlurKernel.length;
 
-        var myBlurKernelImage = window.scene.createImage(nextPowerOfTwo(theKernelSize),1,"RGBA");
+        var myBlurKernelImage = Modelling.createImage(window.scene, nextPowerOfTwo(theKernelSize),1,"RGBA");
         myBlurKernelImage.id = createUniqueId();
         myBlurKernelImage.name = "BlurKernel";
         myBlurKernelImage.resize = 'scale';
@@ -206,7 +206,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
          * Offscreen
          * renders scene into myOffscreenImage
          */
-        var myOffscreenImage = window.scene.createImage(myOffscreenSize[0], myOffscreenSize[1], "RGBA");
+        var myOffscreenImage = Modelling.createImage(window.scene, myOffscreenSize[0], myOffscreenSize[1], "RGBA");
         myOffscreenImage.id = createUniqueId();
         myOffscreenImage.name = "Offscreen";
         myOffscreenImage.resize = "pad";
@@ -242,7 +242,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
          * renders myOffscreenImage into myBlurXImage, with X blur
          * shader enabled
          */
-        var myBlurXImage = window.scene.createImage(myWidth, myHeight, "RGB");
+        var myBlurXImage = Modelling.createImage(window.scene, myWidth, myHeight, "RGB");
         myBlurXImage.id = createUniqueId();
         myBlurXImage.name = "BlurX";
         myBlurXImage.resize = "pad";
@@ -286,7 +286,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
          * Blur_Y
          * renders myBlurXImage into myBlurYImage, with Y blur shader enabled
          */
-        var myBlurYImage = window.scene.createImage(myWidth, myHeight, "RGB");
+        var myBlurYImage = Modelling.createImage(window.scene, myWidth, myHeight, "RGB");
         myBlurYImage.id = createUniqueId();
         myBlurYImage.name = "BlurY";
         myBlurYImage.resize = "pad";

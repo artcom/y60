@@ -32,7 +32,7 @@ DebugVisual.prototype.Constructor = function(obj, theWorld, theSceneViewer) {
 
     obj.setup = function() {
         if (getDescendantById(_mySceneViewer.getMaterials(), "mCoordinateSystem") == null) {
-            _myMaterial = _mySceneViewer.getScene().createColorMaterial([1,1,1,1]);
+            _myMaterial = Modelling.createColorMaterial(_mySceneViewer.getScene(),[1,1,1,1]);
             var myVertexparamsFeatures = new Node('<feature name="vertexparams">[0[]]</feature>\n').firstChild;
             _myMaterial.requires.appendChild(myVertexparamsFeatures);
             _myMaterial.requires.vertexparams = "[100[color]]";

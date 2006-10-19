@@ -42,7 +42,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
         }
         
         if (theImage == undefined) {
-            theImage = window.scene.createImage(theSize[0], theSize[1], thePixelFormat);
+            theImage = Modelling.createImage(window.scene, theSize[0], theSize[1], thePixelFormat);
         }
 
         self.image = theImage;    
