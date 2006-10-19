@@ -587,7 +587,9 @@ namespace y60 {
                                 bool theSpriteFlag,
                                 const Vector4f & theColor)
     {
-        MaterialBuilder myMaterialBuilder(theName, false);
+      // enforce image load
+      theImageNode->getFacade<Image>()->get<ImageWidthTag>();
+      MaterialBuilder myMaterialBuilder(theName, false);
         string myMaterialId = theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
         myMaterialBuilder.setTransparencyFlag(theTransparencyFlag);
         appendUnlitProperties(myMaterialBuilder, theColor);
