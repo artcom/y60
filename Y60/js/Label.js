@@ -232,7 +232,7 @@ function BackgroundImageLabel(theScene, theText, theBackgroundImageSrc, theSize,
     Protected.getImageNode = function() {
         if (Public.image == null) {
             Protected.addImage(theBackgroundImageSrc);
-            var myImage = theScene.createImage("");
+            var myImage = Modelling.createImage(theScene, "");
             Protected.addImage(myImage);
         }
         return Public.images[Public.images.length - 1];
