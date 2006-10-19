@@ -52,14 +52,14 @@ function CreateTestMovie(theArguments) {
         
         print("creating images");
         
-        _myMaterial = window.scene.createColorMaterial([1,1,1,1]);
-        _myShape    = window.scene.createQuadShape(_myMaterial, [-1,-1,-5], [1,1,-5]);
-        _myBody     = window.scene.createBody(_myShape);
+        _myMaterial = Modelling.createColorMaterial(window.scene, [1,1,1,1]);
+        _myShape    = Modelling.createQuad(window.scene, _myMaterial.id, [-1,-1,-5], [1,1,-5]);
+        _myBody     = Modelling.createBody(window.scene.world, _myShape.id);
         _myBody.visible =  false;
 
-        _my10secMaterial = window.scene.createColorMaterial([0,1,0,1]);
-        _my10secShape    = window.scene.createQuadShape(_my10secMaterial, [-1,-1,-5], [1,1,-5]);
-        _my10secBody     = window.scene.createBody(_my10secShape);
+        _my10secMaterial = Modelling.createColorMaterial(window.scene, [0,1,0,1]);
+        _my10secShape    = Modelling.createQuad(window.scene, _my10secMaterial.id, [-1,-1,-5], [1,1,-5]);
+        _my10secBody     = Modelling.createBody(window.scene.world, _my10secShape.id);
         _my10secBody.visible =  false;
         
         window.swapInterval = SWAP_INTERVAL;
