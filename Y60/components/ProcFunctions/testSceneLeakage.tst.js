@@ -10,9 +10,9 @@ function createObjects(theTime) {
     for (var i = 0; i < OBJECTS_PER_FRAME; ++i) {
         ourCounter++;
         ourObjects[i] = {};
-        ourObjects[i].material = window.scene.createColorMaterial([Math.sin(theTime),Math.cos(theTime),1,1]);
-        ourObjects[i].shape    = window.scene.createQuadShape(ourObjects[i].material, [-1 + myPos,-1,-10], [1 + myPos,1,-10]);
-        ourObjects[i].body     = window.scene.createBody(ourObjects[i].shape);
+        ourObjects[i].material = Modelling.createColorMaterial(window.scene, [Math.sin(theTime),Math.cos(theTime),1,1]);
+        ourObjects[i].shape    = Modelling.createQuad(window.scene, ourObjects[i].material.id, [-1 + myPos,-1,-10], [1 + myPos,1,-10]);
+        ourObjects[i].body     = Modelling.createBody(window.scene.world, ourObjects[i].shape.id);
 
         //ourObjects[i].image = Node.createElement("image");
         //window.scene.images.appendChild(ourObjects[i].image);
@@ -38,7 +38,6 @@ window.onKey = function(theKey) {
         ourExitFlag = true;
     }
 }
-
 window.onFrame = function(theTime) {
     removeObjects();
     createObjects(theTime);

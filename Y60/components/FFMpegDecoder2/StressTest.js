@@ -30,7 +30,7 @@ function setup(theViewer) {
     _myMovieImage = theViewer.getImageManager().createMovie("../FFMpegDecoder/testfiles/counter_short.mpg", "y60FFMpegDecoder2");
     _myMovieImage.playmode = "play";
     _myMovieImage.audio = false;
-    _myMovieMaterial = theViewer.getScene().createTexturedMaterial(_myMovieImage);  
+    _myMovieMaterial = Modelling.createUnlitTexturedMaterial(theViewer.getScene(), _myMovieImage);  
     _myMovieQuad = Modelling.createQuad(theViewer.getScene(), _myMovieMaterial.id, [-100,-100,0], [100,100,0]);
     _myMovieBody = Modelling.createBody(theViewer.getScene().world, _myMovieQuad.id);
     _myMovieBody.position.z = -100;

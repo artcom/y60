@@ -39,9 +39,9 @@ OpenEXRUnitTest.prototype.Constructor = function(obj, theName) {
 
         //var myScene = new Scene();
         var myScene = window.scene;
-        var myMaterial = myScene.createTexturedMaterial("../../testimages/Desk.exr");
-        var myShape    = myScene.createQuadShape(myMaterial, [-0.4,-0.4,0], [0.4,0.4,0]);
-        var myBody     = myScene.createBody(myShape);
+        var myMaterial = Modelling.createUnlitTexturedMaterial(myScene, "../../testimages/Desk.exr");
+        var myShape    = Modelling.createQuad(myScene, myMaterial.id, [-0.4,-0.4,0], [0.4,0.4,0]);
+        var myBody     = Modelling.createBody(myScene.world, myShape.id);
 
         var myImage = myScene.images.firstChild;
         myImage.resize = "pad";
