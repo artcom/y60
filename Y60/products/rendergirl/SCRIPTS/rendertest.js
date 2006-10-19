@@ -159,7 +159,7 @@ function setupOffscreenRendering() {
     // Create target image for offscreen rendering
     var myTargetImage = getDescendantByName(window.scene.images, "offscreen", false);
     if (!myTargetImage) {
-        myTargetImage = window.scene.createImage(800, 520, "RGB");
+        myTargetImage = Modelling.createImage(window.scene, 800, 520, "RGB");
         myTargetImage.name = "offscreen"
         myTargetImage.mipmap = false;
     }
