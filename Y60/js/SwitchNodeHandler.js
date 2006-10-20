@@ -11,25 +11,33 @@
 
 function SwitchNodeHandlerBase( Public, Protected, theNode) {
 
-    Public.__defineGetter__('node',
-            function() { return _myNode; } );
+    Public.node getter = function() {
+        return _myNode;
+    }
 
-    Public.__defineGetter__('switchName',
-            function() { return _myNode.name; } );
+    Public.switchName getter = function() {
+        return _myNode.name;
+    }
 
-    Public.__defineGetter__('childCount',
-            function() { return _myNode.childNodesLength(); } );
+    Public.childCount getter = function() {
+        return _myNode.childNodesLength();
+    }
+    
+    Public.activeChild getter = function() {
+        return _myNode.childNode( _myActiveChild ); 
+    }
 
-    Public.__defineGetter__('activeChild',
-            function() { return _myNode.childNode( _myActiveChild ); } );
+    Public.activeIndex getter = function() {
+        return _myActiveChild;
+    }
 
-    Public.__defineGetter__('activeIndex',
-            function() { return _myActiveChild; } );
-    Public.__defineSetter__('activeIndex',
-            function(theIndex) { _myActiveChild = theIndex; } );
-
-    Public.__defineGetter__('activeName',
-            function() { return _myNode.childNode( _myActiveChild ).name; } );
+    Public.activeName getter = function() { 
+        return _myNode.childNode( _myActiveChild ).name;
+    }
+    
+    Public.activeIndex setter = function(theIndex) {
+        _myActiveChild = theIndex;
+    }
 
     var _myNode = theNode;
     var _myActiveChild = 0;
