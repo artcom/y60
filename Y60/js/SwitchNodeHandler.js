@@ -87,6 +87,7 @@ SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex
         //_myActiveChild = theIndex;
         Public.activeChild.visible = true;
     }
+
     Public.setActiveChildByName = function( theName ) {
         Public.activeChild.visible = false;
         for (var i = 0; i < Public.childCount; ++i) {
@@ -97,6 +98,19 @@ SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex
             }
         }
         Public.activeChild.visible = true;
+    }
+
+    Public.setActiveChildBySubName = function( theString ) {
+        Public.activeChild.visible = false;
+        for (var i = 0; i < Public.childCount; ++i) {
+            if (Public.node.childNode( i ).name.indexOf(theString) != -1) {
+                Public.activeIndex = i;
+                //_myActiveChild = i;
+                break;
+            }
+        }
+        Public.activeChild.visible = true;
+        
     }
 
     setup( theActiveIndex );
