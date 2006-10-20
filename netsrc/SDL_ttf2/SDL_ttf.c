@@ -892,7 +892,7 @@ double getKerning(TTF_Font * theFont, FT_UInt thePreviousIndex, FT_UInt theCurre
             kerning = (delta.x / 64.0);
         }
     } else {
-        DB(printf("font has no kerning\n"));
+        DB(printf("Font %s/%s has no kerning\n", TTF_FontFaceFamilyName(theFont), TTF_FontFaceStyleName(theFont)));
     }
     
     DB(printf("kerning: %d/%d=%f\n", thePreviousIndex, theCurrentIndex, kerning));

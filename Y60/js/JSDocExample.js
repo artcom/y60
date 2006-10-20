@@ -32,7 +32,7 @@ function Shape(theName, theId) {
     /**
      * Sets the shape name
      * @param {string} theName Specifies the shape name
-     * @depricated You should no use this member function
+     * @deprecated You should no use this member function
      */
     this.setName = function(theName) {
         _myName = theName;
