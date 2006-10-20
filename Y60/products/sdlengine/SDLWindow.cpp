@@ -136,13 +136,16 @@ SDLWindow::swapBuffers() {
 #ifdef AC_USE_X11
     if (_mySwapInterval) {
         unsigned counter;
+        glXGetVideoSyncSGI(&counter);
         glXWaitVideoSyncSGI(_mySwapInterval, 0, &counter);
+        /*
         if (_myLastSwapCounter == 0) {
             _myLastSwapCounter = counter;
         }
         if ((counter - _myLastSwapCounter) != _mySwapInterval) {
             AC_DEBUG << "Missed frame diff=" << (counter - _myLastSwapCounter);
         }
+        */
         _myLastSwapCounter = counter;
     }
 #endif
@@ -285,9 +288,9 @@ SDLWindow::initDisplay() {
     // EventDispatcher::get().addSink(&_myEventDumper);
     EventDispatcher::get().addSink(this);
 
-#ifdef AC_USE_X11
+#ifdef LINUX
     if (getenv("__GL_SYNC_TO_VBLANK") == 0) {
-        AC_WARNING << "__GL_SYNC_TO_VBLANK not set.";
+        AC_INFO << "__GL_SYNC_TO_VBLANK not set.";
     }
 #endif
 
@@ -792,9 +795,9 @@ SDLWindow::setSwapInterval(unsigned theInterval)
             // check if it's working
             unsigned counter0 = 0;
             unsigned counter1 = 0;
-            glXGetVideoSyncSGI(&counter0);
-            asl::msleep(20);
-            glXGetVideoSyncSGI(&counter1);
+            glXWaitVideoSyncSGI(1, 0, &counter0);
+            glXWaitVideoSyncSGI(1, 0, &counter1);
+            glXWaitVideoSyncSGI(1, 0, &counter1);
             if (counter1 <= counter0) {
                 AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working properly (counter1=" << counter1 << ", counter0=" << counter0 << "), disabling";
                 theInterval = 0;

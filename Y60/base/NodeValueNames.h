@@ -288,6 +288,7 @@ namespace y60 {
     static const char * TEXCOORD_SPHERICAL       = "spherical_projection";
     static const char * TEXCOORD_CYLINDRICAL     = "cylindrical_projection";
     static const char * TEXCOORD_UV_MAP          = "uv_map";
+    static const char * TEXCOORD_REFLECTIVE      = "reflective";
     static const char * TEXCOORD_SPATIAL         = "spatial_projection"; // cinemax modes, do not
     static const char * TEXCOORD_SHRINKMAP       = "shrinkmap_projection"; // know how to map in opengl
 
@@ -299,6 +300,7 @@ namespace y60 {
         FRONTAL_PROJECTION,
         SPATIAL_PROJECTION,
         UV_MAP,
+        REFLECTIVE,
         SHRINKMAP_PROJECTION,
         PERSPECTIVE_PROJECTION
     };
@@ -311,6 +313,7 @@ namespace y60 {
         TEXCOORD_FRONTAL,
         TEXCOORD_SPATIAL,
         TEXCOORD_UV_MAP,
+        TEXCOORD_REFLECTIVE,
         TEXCOORD_SHRINKMAP,
         TEXCOORD_PERSPECTIVE,
         0
@@ -334,13 +337,15 @@ namespace y60 {
     static const char * TEXTURE_USAGE_SKYBOX       = "skybox";
     static const char * TEXTURE_USAGE_ENVIRONMENT  = "environment";
     static const char * TEXTURE_USAGE_DISPLACEMENT = "displacement";
+    static const char * TEXTURE_USAGE_EMISSIVE     = "emissive";
 
     enum TextureUsage {
         PAINT,
         BUMP,
         SKYBOX,
         ENVIRONMENT,
-        DISPLACEMENT
+        DISPLACEMENT,
+        EMISSIVE
     };
 
 
@@ -350,6 +355,7 @@ namespace y60 {
         TEXTURE_USAGE_SKYBOX,
         TEXTURE_USAGE_ENVIRONMENT,
         TEXTURE_USAGE_DISPLACEMENT,
+        TEXTURE_USAGE_EMISSIVE,
         0
     };
 

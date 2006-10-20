@@ -228,7 +228,7 @@ namespace jslib {
         virtual void preRender();
         virtual void render();
         virtual void postRender();
-        virtual void swapBuffers() {};
+        virtual void swapBuffers() {}
 
         /**
          * Standard render function.
