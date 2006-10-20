@@ -241,8 +241,6 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         if ("glow" in myNewProperties) {
             myTargetProperties.glow = myNewProperties.glow;
         }
-
-        //print("target mat: " + myTargetMaterial);
     }
 
     var _myTargetMaterial = null;
@@ -267,32 +265,97 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
     
     SwitchNodeHandlerBase(Public, Protected, theNode);
 
-    function setup() {
-        //print("---");
-        //print(theNode);
+    // overwrite some getters and setters because they have to
+    // be handled different from model/materialswitches
+    Public.childCount getter = function() {
+        Logger.error("Implement me!");
+    }
+    
+    Public.activeChild getter = function() {
+        return _myActiveChild;
     }
 
-/*
-    // taken from BMW/Welt/CLIENT/SCRIPTS/CarConfigurator.js [jb]
-    function switchToTextureCode(theName) {
-        //print("switchToTextureCode", theName, myModelCode);
-        var myColorSettings = getDescendantByAttribute(myTSwitches, "code", theName, true);
-        //print("found color setting: " + myColorSettings);
-        for (var i = 0; i < myColorSettings.attributes.length; ++i) {
-            var myAttribute = myColorSettings.attributes[i];
-            var myMaterialName = "tswitch_" + myAttribute.nodeName;
+    Public.activeIndex getter = function() {
+        Logger.error("Implement me!"); 
+    }
 
-            var myMaterial = getDescendantByName(window.scene.materials, myMaterialName, false);
-            if (myMaterial) {
-                var myTextureNode = getDescendantByTagName(myMaterial, "texture", true);
-                var myImageNode = myTextureNode.getElementById(myTextureNode.image);
-                //print("before: " + myImageNode.src);
-                myImageNode.src = "MODELS/"+myModelCode+"/TEX/_" + theName + "_" + myAttribute.nodeValue + ".jpg";
-                //print("after: " + myImageNode.src);
+    Public.activeName getter = function() { 
+        return _myActiveChild.name;
+    }
+    
+    function setup() {
+        var myName = new String( Public.switchName );
+        if ( ! myName.match(/^tswitch_.*/)) {
+            Logger.warning("TSwitch node '" + Public.switchName + " doesn't obey the " +
+                "naming conventions. Name should start with 'tswitch_'.");
+        }
+        
+        // find the transform node with the texture references first
+        var myReferenceNode = getDescendantByName(window.scene.world, "textureswitches", true);
+        if (!myReferenceNode) {
+            Logger.error("Could not find reference node for textureswitches");
+            return;
+        }
+        
+        for (var i=0; i<myReferenceNode.childNodesLength(); ++i) {
+            var myNode = myReferenceNode.childNode(i);
+            if (myNode.name.indexOf(myName) != -1) {
+                _mySwitches = myNode;
+                continue;
+            }
+        }
+
+        if (!_mySwitches) {
+            Logger.error("Could not find reference node for textureswitch: " + Public.switchName);
+            return;
+        }
+    }
+    
+    function switchTexture(theNode) {
+        _myActiveChild = theNode;
+      
+        // get image id for the new texture
+        var myShape = theNode.getElementById(theNode.shape);
+        var myMaterialId = myShape.childNode("primitives").childNode("elements").material;
+        
+        var myMaterial = theNode.getElementById(myMaterialId);
+        var myImage = myMaterial.childNode("textures").firstChild.image;
+
+        // set new image 
+        Public.node.childNode("textures").firstChild.image = myImage;
+    }
+
+    Public.setActiveChildByName = function(theName) {
+        if (!_mySwitches) {
+            return;
+        }
+    
+        var myNode = getDescendantByName(_mySwitches, theName, true);
+        if (!myNode) {
+            Logger.error("Could not find corresponding texture reference for: " + theName);
+            return;
+        }
+
+        switchTexture(myNode);
+    }
+    
+    Public.setActiveChildBySubName = function(theSubName) {
+        if (!_mySwitches) {
+            return;
+        }
+
+        var myNode = null;
+        for (var i=0; i<_mySwitches.childNodesLength(); ++i) {
+            myNode = _mySwitches.childNode(i);
+            if (myNode.name.indexOf(theSubName) != -1) {
+                switchTexture(myNode);
+                break;
             }
         }
     }
-*/
+
+    var _mySwitches = null;
+    var _myActiveChild = null;
 
     setup();
 }

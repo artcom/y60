@@ -584,7 +584,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             if ( myName.match(/^mswitch_.*/)) {
                 _myMSwitchNodes.push( new MSwitchNodeHandler( myChild ) );
             }
-            if ( myName.match(/^tswitch_.*/)) {
+            if ( myName.match(/^tswitch_.*/) && myChild.nodeName == "material") {
                 _myTSwitchNodes.push( new TSwitchNodeHandler( theNode.childNode(i)) );
             }
             collectSwitchNodes( myChild );
