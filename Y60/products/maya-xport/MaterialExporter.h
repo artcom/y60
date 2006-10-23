@@ -106,7 +106,9 @@ class MaterialExporter {
         bool exportMaps(const MFnMesh * theMesh, const MObject & theShaderNode,
                         y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
                         const char * thePlugName,
-                        const char* theColorGainPropertyName, float theColorGainAlpha);
+                        const std::string & theUsageMode,
+                        const std::string & theColorGainPropertyName,
+                        float theColorGainAlpha);
 #if 0
         void exportVertexParameters(y60::MaterialBuilder & theBuilder);
 #endif
@@ -117,7 +119,9 @@ class MaterialExporter {
         bool exportTextures(const MFnMesh * theMesh, const MObject & theShaderNode,
                             y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
                             const std::string & thePlugName,
-                            const char* theColorGainPropertyName, float theColorGainAlpha);
+                            const std::string & theUsageMode,
+                            const std::string & theColorGainPropertyName,
+                            float theColorGainAlpha);
         bool exportBumpMaps(const MFnMesh * theMesh, const MObject & theShaderNode,
                             y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
                             float theColorGainAlpha);
@@ -131,19 +135,24 @@ class MaterialExporter {
                                     const char* theColorGainPropertyName, float theColorGainAlpha);
 #endif
         void exportFileTexture(const MFnMesh * theMesh, MObject & theTextureNode,
-                               y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
+                               y60::MaterialBuilder & theBuilder,
+                               y60::SceneBuilder & theSceneBuilder,
+                               const std::string & theUsageMode,
                                const MayaBlendMode theBlendMode,
                                float theColorGainAlpha);
-		void exportEnvCubeTexture(const MObject & theShaderNode,
-			                      const MObject & theEnvCubeNode,
-                                    y60::MaterialBuilder & theBuilder,
-                                    y60::SceneBuilder & theSceneBuilder);
+        void exportEnvCubeTexture(const MObject & theShaderNode, const MObject & theEnvCubeNode,
+                                  y60::MaterialBuilder & theBuilder,
+                                  y60::SceneBuilder & theSceneBuilder,
+                                  const std::string & theUsageMode);
         void exportLayeredTexture(const MFnMesh * theMesh, const MObject & theTextureNode,
-                                  y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
-                                  const char* theColorGainPropertyName, float theColorGainAlpha);
+                y60::MaterialBuilder & theBuilder,
+                y60::SceneBuilder & theSceneBuilder,
+                const std::string & theColorGainPropertyName,
+                float theColorGainAlpha);
 
         void exportLambertFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
         void exportReflectiveFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
+        void exportEmissiveFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
         void exportPhongFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
         void exportPhongEFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
         void exportBlinnFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);

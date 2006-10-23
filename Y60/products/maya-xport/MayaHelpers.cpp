@@ -100,12 +100,13 @@ dumpAttributes(const MObject & theObject) {
         MString myStringValue;
 
         if (!myPlug.isArray() ) {
-            if (myPlug.getValue(myDoubleValue)) {
+            cerr << ", apiType='" << myAttribute.apiTypeStr() << "'";
+            if (myPlug.getValue(myStringValue)) {
+                cerr << ", type='MString', value='" << myStringValue.asChar() << "'";
+            } else if (myPlug.getValue(myDoubleValue)) {
                 cerr << ", type='double' value='" << myDoubleValue << "'";
             } else if (myPlug.getValue(myCharValue)) {
                 cerr << ", type='char' value='" << myCharValue << "'";
-            } else if (myPlug.getValue(myStringValue)) {
-                cerr << ", type='MString', value='" << myStringValue.asChar() << "'";
             } else if (myPlug.getValue(myObject)) {
                 cerr << ", MObject type='" << myObject.apiTypeStr() << "'";
             }

@@ -66,7 +66,6 @@ bool getCustomAttribute(const MObject & theDagNode, const std::string & theAttri
                     "SceneExporter::exportCustomAttribute()");
         }
 
-
         myPlug.getValue(myValue);
         return true;
     }
