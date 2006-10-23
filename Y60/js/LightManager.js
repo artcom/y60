@@ -52,7 +52,7 @@ LightManager.prototype.Constructor = function(obj, theScene, theWorld) {
             _mySunLight.name = "Sun";
             _mySunLight.lightsource = mySunLightSource.id;
             // calculate the local sunlight direction
-            _mySunLight.orientation = Quaternionf.createFromEuler(_mySunPosition.getDirection());
+            _mySunLight.orientation = Quaternionf.createFromEuler(_mySunPosition.getRotation());
             _myWorld.appendChild(_mySunLight);
             theScene.update(Scene.ALL);
         }

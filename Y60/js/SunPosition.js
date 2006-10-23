@@ -319,6 +319,10 @@ SunPositioner.prototype.Constructor = function(self) {
         _mySunsetTime = myHour + ":" + myMinute;
     }
 
+    self.getRotation = function() {
+        return new Vector3f(-radFromDeg(_myAltitude), radFromDeg(_myAzimuth), 0.0);
+    }
+
     self.getDirection = function() {
         return new Vector3f(Math.sin(radFromDeg(_myAzimuth)),
                             Math.sin(radFromDeg(_myAltitude)),
