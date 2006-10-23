@@ -53,8 +53,8 @@ namespace y60 {
                                        const std::string & theMappingMode,
                                        const asl::Matrix4f & theTextureMatrix,
                                        float theRanking,
-                                       bool  isFallback,
-                                       float theFallbackRanking,
+                                       bool  isFallback = false,
+                                       float theFallbackRanking = 0.0f,
                                        bool  theSpriteFlag = false);
 
         const std::string & createMovie(SceneBuilder & theSceneBuilder,
@@ -96,6 +96,7 @@ namespace y60 {
 
         void appendCubemap(SceneBuilder & theSceneBuilder,
                            const std::string & theName,
+                           const std::string & theUsage,
                            const std::string & theFrontFileName,
                            const std::string & theRightFileName,
                            const std::string & theBackFileName,

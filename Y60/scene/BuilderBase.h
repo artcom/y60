@@ -7,19 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $Id: BuilderBase.h,v 1.1 2005/03/24 23:35:56 christian Exp $
-//   $RCSfile: BuilderBase.h,v $
-//   $Author: christian $
-//   $Revision: 1.1 $
-//   $Date: 2005/03/24 23:35:56 $
-//
-//
-//  Description: XML-File-Export Plugin
-//
-// (CVS log at the bottom of this file)
-//
-//=============================================================================
 
 #ifndef _ac_BuilderBase_h_
 #define _ac_BuilderBase_h_

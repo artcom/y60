@@ -525,6 +525,8 @@ namespace y60 {
                 return GL_EYE_LINEAR;
             case SPHERE_MAP:
                 return GL_SPHERE_MAP;
+            case REFLECTION:
+                return GL_REFLECTION_MAP_EXT;
             default:
                 throw asl::Exception(std::string("Unkown TexCoordMode ") + asl::as_string(theMode), PLUS_FILE_LINE);
         }

@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
-
 <shaders>
-
     <shader id="s1" name="tex_phong" cost="120">
         <supports>
             <feature class="textures" values="[paint]"/>
@@ -339,9 +337,9 @@
     </shader>
     <shader id="s13" name="background" cost="100">
         <supports>
-            <feature class="textures" values="[environment]"/>
+            <feature class="textures" values="[paint]"/>
             <feature class="lighting" values="[unlit]"/>
-            <feature class="texcoord" values="[*]"/>
+            <feature class="texcoord" values="[reflective]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
@@ -355,9 +353,9 @@
     </shader>
     <shader id="s14" name="pseudo_chrome" cost="10">
         <supports>
-            <feature class="textures" values="[environment]"/>
+            <feature class="textures" values="[paint]"/>
             <feature class="lighting" values="[lambert]"/>
-            <feature class="texcoord" values="[*]"/>
+            <feature class="texcoord" values="[reflective]"/>
         </supports>
         <fixedfunctionshader>
             <properties>
@@ -376,8 +374,8 @@
     </shader>
     <shader id="s15" name="pseudo_chrometex" cost="10" >
         <supports>
-            <feature class="textures" values="[paint,environment]"/>
-            <feature class="texcoord" values="[uv_map,uv_map]"/>
+            <feature class="textures" values="[paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,reflective]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
         <fixedfunctionshader>
@@ -398,8 +396,8 @@
     </shader>
     <shader id="s150" name="pseudo_carpaint" cost="10" >
         <supports>
-            <feature class="textures" values="[paint,environment,environment]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
+            <feature class="textures" values="[paint,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,reflective,reflective]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
         <fixedfunctionshader>
@@ -420,8 +418,8 @@
     </shader>
     <shader id="s16" name="pseudo_glassdbltex" cost="10" >
         <supports>
-            <feature class="textures" values="[paint,paint,environment]"/>
-            <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
+            <feature class="textures" values="[paint,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,uv_map,reflective]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>
         <fixedfunctionshader>

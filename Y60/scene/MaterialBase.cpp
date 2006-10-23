@@ -32,9 +32,9 @@ namespace y60 {
         
         IdTag::Plug(theNode),
         NameTag::Plug(theNode),
-		TransparencyTag::Plug(theNode),
-		MaterialPropertiesTag::Plug(this),
-		MaterialRequirementTag::Plug(this),      
+        TransparencyTag::Plug(theNode),
+        MaterialPropertiesTag::Plug(this),
+        MaterialRequirementTag::Plug(this),      
         Facade(theNode),
         _myShader(0),
         _myLightingModel(LAMBERT),
@@ -59,7 +59,7 @@ namespace y60 {
 
     bool
     MaterialBase::reloadRequired() const {
-		MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
+        MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
         if (myReqFacade->getNode().nodeVersion() != _myRequiresVersion) {
             return true;
         }
@@ -99,24 +99,24 @@ namespace y60 {
             return;
         }
 
-		MaterialPropertiesFacadePtr myReqFacade = getChild<MaterialPropertiesTag>();
+        MaterialPropertiesFacadePtr myReqFacade = getChild<MaterialPropertiesTag>();
         const Facade::PropertyMap & myPropertyMap = myReqFacade->getProperties();
-		
-		dom::NodePtr myMaterialProperty = 
+        
+        dom::NodePtr myMaterialProperty = 
             myReqFacade->getProperty(theShaderPropertyNode->getAttributeString(NAME_ATTRIB));
 
-		if (!myMaterialProperty) {
-			// the shader has properties not in the material liste, add'em
-			if (theShaderPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
-				theShaderPropertyNode->nodeName() != "#comment") 
+        if (!myMaterialProperty) {
+            // the shader has properties not in the material liste, add'em
+            if (theShaderPropertyNode->nodeType() == dom::Node::ELEMENT_NODE &&
+                theShaderPropertyNode->nodeName() != "#comment") 
             {
-				getNode().childNode(PROPERTY_LIST_NAME)->appendChild(
-						        theShaderPropertyNode->cloneNode(Node::DEEP));
-			}
-		} else {
-			// set the value of the material with the shaders value
+                getNode().childNode(PROPERTY_LIST_NAME)->appendChild(
+                                theShaderPropertyNode->cloneNode(Node::DEEP));
+            }
+        } else {
+            // set the value of the material with the shaders value
             myMaterialProperty->nodeValue((*theShaderPropertyNode)("#text").nodeValue());
-		}
+        }
     }
 
     TextureUsage MaterialBase::getTextureUsage(unsigned theTextureSlot) const {
@@ -141,7 +141,7 @@ namespace y60 {
             if (theTextureListNode) {
                 unsigned myTextureCount = theTextureListNode->childNodesLength(TEXTURE_NODE_NAME);
                 for (unsigned i = 0; i < myTextureCount; ++i) {
-					dom::NodePtr myTextureNode = theTextureListNode->childNode(TEXTURE_NODE_NAME,i);
+                    dom::NodePtr myTextureNode = theTextureListNode->childNode(TEXTURE_NODE_NAME,i);
                     addTexture(myTextureNode, theTextureManager);
                 }
             }
@@ -177,7 +177,7 @@ namespace y60 {
         unsigned myMaxUnits = _myShader->getMaxTextureUnits();
         if (_myTextures.size() < myMaxUnits) {            
             TexturePtr myTexture = theTextureNode->getFacade<Texture>();
-			myTexture->setTextureManager(theTextureManager);
+            myTexture->setTextureManager(theTextureManager);
             _myTextures.push_back(myTexture);
             ImagePtr myImage = myTexture->getImage();
             if (myImage) {
@@ -233,7 +233,7 @@ namespace y60 {
     MaterialBase::updateParams() {
 
         // check node version if update is necessary
-		MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
+        MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
         if (!getNode() ||
             (getNode().nodeVersion() == _myMaterialVersion && myReqFacade->getNode().nodeVersion() == _myRequiresVersion)) {
             return;
@@ -247,11 +247,10 @@ namespace y60 {
         _myRequiresVersion = myReqFacade->getNode().nodeVersion();
         AC_DEBUG << "Updating params for material " << get<NameTag>() << " materialVersion:" << _myMaterialVersion << " requiresVersion:" << _myRequiresVersion;
 
-
         _myTexGenModes.clear();
         _myTexGenParams.clear();
         _myTexGenFlag = false;
-        
+
         NodePtr myMappingRequirement = myReqFacade->getProperty(MAPPING_FEATURE);
         if (myMappingRequirement) {
 
@@ -266,53 +265,57 @@ namespace y60 {
                     TexCoordMapping myTexCoordMode = TexCoordMapping( 
                             asl::getEnumFromString(myTexCoordFeature[myTexUnit], TexCoordMappingStrings));
 
+                    // if any texunit has non-uvmap then texgen is on for the material
+                    if (myTexCoordMode != UV_MAP) {
+                        _myTexGenFlag = true;
+                    }
+
                     switch (myTexCoordMode) {
                         case PLANAR_PROJECTION:
-                            //AC_DEBUG << "PLANAR_PROJECTION" << endl;
-                            myTexGenModes.push_back(OBJECT_LINEAR); // generate s
-                            myTexGenModes.push_back(OBJECT_LINEAR); // and t
-                            myTexGenModes.push_back(OBJECT_LINEAR); // and r
-                            _myTexGenFlag = true;
-                            break;
                         case CUBE_PROJECTION:
-                            //AC_DEBUG << "CUBE_PROJECTION" << endl;
+                            //AC_DEBUG << "CUBE or PLANAR_PROJECTION";
                             myTexGenModes.push_back(OBJECT_LINEAR); // generate s
                             myTexGenModes.push_back(OBJECT_LINEAR); // and t
                             myTexGenModes.push_back(OBJECT_LINEAR); // and r
-                            _myTexGenFlag = true;
                             break;
                         case FRONTAL_PROJECTION:
-                            //AC_DEBUG << "FRONTAL_PROJECTION" << endl;
+                            //AC_DEBUG << "FRONTAL_PROJECTION";
                             myTexGenModes.push_back(EYE_LINEAR); // generate s
                             myTexGenModes.push_back(EYE_LINEAR); // and t
                             myTexGenModes.push_back(EYE_LINEAR); // and r
-                            _myTexGenFlag = true;
                             break;
                         case SPHERICAL_PROJECTION:
-                            //AC_DEBUG << "SPHERICAL_PROJECTION" << endl;
+                            //AC_DEBUG << "SPHERICAL_PROJECTION";
                             myTexGenModes.push_back(SPHERE_MAP);
                             myTexGenModes.push_back(SPHERE_MAP);
-                            _myTexGenFlag = true;
                             break;
                         case CYLINDRICAL_PROJECTION:
-                            //AC_DEBUG << "CYLINDRICAL_PROJECTION" << endl;
+                            //AC_DEBUG << "CYLINDRICAL_PROJECTION";
                             myTexGenModes.push_back(SPHERE_MAP);
                             myTexGenModes.push_back(OBJECT_LINEAR);
-                            _myTexGenFlag = true;
                             break;
                         case UV_MAP:
                             // do not use any texgen mode at all
                             // do not generate uvcoords at all
                             myTexGenModes.push_back(NONE);
                             break;
+                        case REFLECTIVE:
+                            //AC_DEBUG << "REFLECTIVE";
+                            myTexGenModes.push_back(REFLECTION); // generate s
+                            myTexGenModes.push_back(REFLECTION); // and t
+                            myTexGenModes.push_back(REFLECTION); // and r
+                            break;
                         case PERSPECTIVE_PROJECTION:
                         default:
                             throw ShaderException(string("Invalid texgenmode '") + myTexCoordFeature[myTexUnit] + 
                                     "' in material " + get<NameTag>(), PLUS_FILE_LINE);
                     }
-                    
-                    if (myTexCoordMode != UV_MAP && myTexCoordMode != SPHERICAL_PROJECTION) {
-                    
+
+                    // the following modes do not use texgenparams
+                    if (myTexCoordMode != UV_MAP &&
+                        myTexCoordMode != SPHERICAL_PROJECTION &&
+                        myTexCoordMode != REFLECTIVE) {
+ 
                         // fetch texgen params
                         MaterialPropertiesFacadePtr myPropertyFacade = getChild<MaterialPropertiesTag>();
                         string myTexGenParamName = string("texgenparam") + asl::as_string(myTexUnit);

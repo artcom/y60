@@ -7,15 +7,7 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: M60Decoder.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.1 $
-//   $Date: 2005/03/24 23:36:04 $
-//
-//  Description: A simple scene class.
-//
-//=============================================================================
+
 #include "M60Decoder.h"
 
 #include "Movie.h"
@@ -107,7 +99,7 @@ namespace y60 {
 
     double
     M60Decoder::readFrame(double theTime, unsigned theFrame, dom::ResizeableRasterPtr theTargetRaster) {
-        DB(cerr << "Read frame: " << theFrame << ", last decoded frame: " << _myLastDecodedFrame << endl);
+        DB(AC_DEBUG << "Read frame: " << theFrame << ", count: " << getFrameCount() << ", last decoded frame: " << _myLastDecodedFrame);
 
         if (theFrame >= getFrameCount()) {
             setEOF(true);
@@ -138,15 +130,25 @@ namespace y60 {
                 decodeFrame(theFrame, theTargetRaster);
             }
         }
+
+#if 0
+        // UH: need to set EOF if this was the last frame
+        // otherwise the layer above will wrap-around and we never get EOF and hence
+        // looping doesn't work
+        if (theFrame >= (getFrameCount()-1)) {
+            setEOF(true);
+        }
+#endif
+
         return theTime;
     }
 
     void
     M60Decoder::decodeFrame(unsigned theFrameNumber, dom::ResizeableRasterPtr theTargetRaster) {
-        DB(cerr << "M60Decoder::decodeFrame: " << theFrameNumber << endl);
+        DB(AC_TRACE << "M60Decoder::decodeFrame: " << theFrameNumber);
         asl::AC_SIZE_TYPE myFrameSize;
         _myFilePos = _myMovieBlock->readUnsigned32(myFrameSize, _myFilePos);
-        DB(cerr << "    frame size: " << myFrameSize << " file position: " << _myFilePos << endl);
+        DB(AC_TRACE << "    frame size: " << myFrameSize << " file position: " << _myFilePos);
 
 #ifdef USE_MAPPEDBLOCK_MOVIE
         const unsigned char * myFrameData = _myMovieBlock->begin() + _myFilePos;

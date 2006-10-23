@@ -7,15 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: CgProgramInfo.h,v $
-//   $Author: danielk $
-//   $Revision: 1.6 $
-//   $Date: 2005/03/17 18:22:40 $
-//
-//  Description: C++ representation of a Cg program
-//
-//=============================================================================
 
 #ifndef _ac_renderer_CgProgramInfo_h_
 #define _ac_renderer_CgProgramInfo_h_
@@ -60,12 +51,16 @@ namespace y60 {
         "AC_CAMERA_I",
         "AC_CAMERA_T",
         "AC_VIEWPROJECTION",
+        // light position
         "AC_POSITIONAL_LIGHTS",
         "AC_DIRECTIONAL_LIGHTS",
+        // light diffuse color
         "AC_POSITIONAL_LIGHTS_DIFFUSE_COLOR",
         "AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR",
+        // light specular color
         "AC_POSITIONAL_LIGHTS_SPECULAR_COLOR",
         "AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR",
+        // ambient color
         "AC_AMBIENT_LIGHT_COLOR",
         "AC_TEXTURE_MATRICES",
         0

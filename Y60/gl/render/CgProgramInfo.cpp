@@ -7,17 +7,8 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: CgProgramInfo.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.17 $
-//   $Date: 2005/04/24 00:41:18 $
-//
-//  Description: C++ representation of a Cg program
-//=============================================================================
 
 #include "CgProgramInfo.h"
-
 #include "Renderer.h"
 
 #include <y60/GLUtils.h>

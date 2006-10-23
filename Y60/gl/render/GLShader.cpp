@@ -168,7 +168,8 @@ namespace y60 {
         // glDepthMask(myMasks[y60::DEPTH_MASK]); Depth-writes is now part of RenderState, so set it in Renderer
         glColorMask(myMasks[y60::RED_MASK], myMasks[y60::GREEN_MASK],
                 myMasks[y60::BLUE_MASK], myMasks[y60::ALPHA_MASK]);
-#if 1
+
+        // line smooth, line width
         if (myMaterialPropFacade->get<LineSmoothTag>()) {
             glEnable(GL_LINE_SMOOTH);
         } else {
@@ -177,18 +178,11 @@ namespace y60 {
 
         float myLineWidth = myMaterialPropFacade->get<LineWidthTag>();
         glLineWidth(myLineWidth);
-#else
-        dom::NodePtr myLineWidthProp = myMaterialPropFacade->getProperty(LINEWIDTH_PROPERTY);
-        if (myLineWidthProp) {
-            glEnable(GL_LINE_SMOOTH);
-            glLineWidth(myLineWidthProp->nodeValueAs<float>());
-        }
-#endif
 
+        // line stipple
         dom::NodePtr myLineStippleProp = myMaterialPropFacade->getProperty(LINESTIPPLE_PROPERTY);
         if (myLineStippleProp) {
             glEnable(GL_LINE_STIPPLE);
-            //glEnable(GL_LINE_SMOOTH);
             glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());
         }
 
@@ -210,6 +204,18 @@ namespace y60 {
             BlendFunction myDstFunc = BlendFunction( asl::getEnumFromString(myBlendFunction[1],
                                                                             BlendFunctionStrings));
 
+#if 0
+            // we do NOT want this version since then a non-glowing material (myGlow=0)
+            // does not overwrite a glowing material behind it.
+            float myGlow = myMaterialPropFacade->get<GlowTag>();
+            if (myGlow > 0.0f && theViewport.get<ViewportDrawGlowTag>()) {
+                glBlendFuncSeparate(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc), 
+                                    GL_CONSTANT_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glBlendColor(1.0f,1.0f,1.0f, myGlow);
+            } else {
+                glBlendFunc(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc)); 
+            }
+#else
             if (theViewport.get<ViewportDrawGlowTag>()) {
                 glBlendFuncSeparate(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc), 
                                     GL_CONSTANT_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -218,6 +224,7 @@ namespace y60 {
             } else {
                 glBlendFunc(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc)); 
             }
+#endif
         } else {
             throw ShaderException(string("Blendfunction for material '") + theMaterial.get<NameTag>() + " has "
                     + asl::as_string(myBlendFunction.size()) + " elements. Expected two.", PLUS_FILE_LINE);
@@ -395,7 +402,7 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        // AC_DEBUG << "bindBodyParams " << theMaterial.get<NameTag>();
+        //AC_DEBUG << "GLShader.bindBodyParams " << theMaterial.get<NameTag>();
         DBP2(MAKE_SCOPE_TIMER(GLShader_bindBodyParams));
         if (theMaterial.hasTexGen()) {
 
@@ -413,7 +420,7 @@ namespace y60 {
 
                 for (unsigned i = 0; i < myModes.size(); ++i) {
 
-                    //AC_DEBUG << " mode=" << myModes[i] << " params=" << myParams[i];
+                    //AC_DEBUG << "unit=" << myTexUnit << " mode=" << myModes[i] << " params=" << myParams[i];
 
                     // set texgen plane params
                     if (myModes[i] == NONE) {

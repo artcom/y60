@@ -23,7 +23,8 @@ using namespace std;
 using namespace asl;
 using namespace y60;
 
-#define DB(x) x
+#define DB(x) //x
+
 namespace y60 {
 
     FFShader::FFShader(const dom::NodePtr theNode) :
@@ -56,9 +57,11 @@ namespace y60 {
 
     void
     FFShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
+
         GLShader::activate(theMaterial, theViewport);
 		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         if (theMaterial.getLightingModel() != UNLIT) {
+
             glMaterialfv(GL_FRONT, GL_DIFFUSE,  myMaterialPropFacade->get<MaterialDiffuseTag>().begin());
 
             // Vertexcolor always goes into the ambient color for lit materials
@@ -119,6 +122,7 @@ namespace y60 {
                         throw ShaderException(std::string("Unknown texture type '")+
                                 myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
                     }
+
                     glBindTexture(myTextureType, myId);
                     CHECK_OGL_ERROR;
                     glEnable(myTextureType);
@@ -167,7 +171,6 @@ namespace y60 {
             }
         }
         glDisable(GL_POINT_SPRITE_ARB);
-        //glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
     }
 
 } // namespace y60

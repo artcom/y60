@@ -278,7 +278,7 @@ namespace y60 {
         const Vector3f & myPivot = theBody.get<PivotTag>();
         glTranslatef(myPivot[0], myPivot[1], myPivot[2]);
         if (theBody.get<BillboardTag>() == AXIS_BILLBOARD) {
-            MAKE_SCOPE_TIMER(update_billboards);
+            DBP(MAKE_SCOPE_TIMER(update_billboards));
             Matrix4f myBillboardTransform = theBody.get<GlobalMatrixTag>();
             myBillboardTransform.translate(theBody.get<PivotTag>());
             double myRotation = getBillboardRotation(myBillboardTransform,
@@ -513,10 +513,12 @@ namespace y60 {
            );
 
         DBP(COUNT(VertexArrays));
-        DBP(MAKE_SCOPE_TIMER(glDrawArrays));
 
-        glDrawArrays(getPrimitiveGLType(myPrimitive.getType()), 0, myPrimitive.size());
-        CHECK_OGL_ERROR;
+        {
+            DBP(MAKE_SCOPE_TIMER(glDrawArrays));
+            glDrawArrays(getPrimitiveGLType(myPrimitive.getType()), 0, myPrimitive.size());
+            CHECK_OGL_ERROR;
+        }
     }
 
     void
@@ -877,7 +879,7 @@ namespace y60 {
     }
 
     void
-    Renderer::createRenderList(dom::NodePtr theNode, BodyPartMap & theBodyParts,
+    Renderer::createRenderList(const dom::NodePtr & theNode, BodyPartMap & theBodyParts,
                                const CameraPtr theCamera,
                                const Matrix4f & theEyeSpaceTransform,
                                ViewportPtr theViewport,
@@ -885,50 +887,62 @@ namespace y60 {
                                std::vector<asl::Planef> theClippingPlanes,
                                asl::Box2f theScissorBox)
     {
-        // Skip undefined nodes
-        if (!theNode) {
-            return;
-        }
+        TransformHierarchyFacadePtr myFacade;
+        {
+            DBP(MAKE_SCOPE_TIMER(createRenderList_prologue));
+            // Skip undefined nodes
+            if (!theNode) {
+                return;
+            }
 
-        // Skip non element nodes
-        if (!(theNode->nodeType() == dom::Node::ELEMENT_NODE)) {
-            return;
-        }
+            // Skip non element nodes
+            if (!(theNode->nodeType() == dom::Node::ELEMENT_NODE)) {
+                return;
+            }
 
-        // Skip comments
-        if (theNode->nodeName() == "#comment") {
-            return;
-        }
+            // Skip comments
+            if (theNode->nodeName() == "#comment") {
+                return;
+            }
 
-        TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
-        //AC_PRINT << myFacade->get<NameTag>() << " vis=" << myFacade->get<VisibleTag>();
+            myFacade = theNode->getFacade<TransformHierarchyFacade>();
 
-        // Skip invisible nodes
-        if (!(myFacade->get<VisibleTag>())) {
-            return;
-        }
-
-        collectClippingPlanes(theNode, theClippingPlanes);
-        collectScissorBox(theNode, theScissorBox);
-
-        // Check for lodding
-        if (theNode->nodeName() == LOD_NODE_NAME) {
-            createRenderList(getActiveLodChild(theNode, theCamera), theBodyParts, theCamera, theEyeSpaceTransform,
-                    theViewport, theOverlapFrustumFlag, theClippingPlanes, theScissorBox);
-            return;
+            // Skip invisible nodes
+            if (!(myFacade->get<VisibleTag>())) {
+                return;
+            }
         }
 
         // Check culling
         bool myOverlapFrustumFlag = true;
         const Frustum & myFrustum = theViewport->get<ViewportFrustumTag>();
-        if (theViewport->get<ViewportCullingTag>() && theOverlapFrustumFlag && myFacade->get<CullableTag>()) {
-            if (!intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
-                return;
+        {
+            DBP(MAKE_SCOPE_TIMER(createRenderList_cull));
+            if (theOverlapFrustumFlag && theViewport->get<ViewportCullingTag>() && myFacade->get<CullableTag>()) {
+                if (!intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
+                    return;
+                }
             }
+        }
+
+        // Collect clipping planes and scissoring
+        {
+            DBP(MAKE_SCOPE_TIMER(createRenderList_collectClippingScissor));
+            collectClippingPlanes(theNode, theClippingPlanes);
+            collectScissorBox(theNode, theScissorBox);
+        }
+
+        // Check for lodding
+        if (theNode->nodeName() == LOD_NODE_NAME) {
+            DBP(MAKE_SCOPE_TIMER(createRenderList_lod));
+            createRenderList(getActiveLodChild(theNode, theCamera), theBodyParts, theCamera, theEyeSpaceTransform,
+                    theViewport, theOverlapFrustumFlag, theClippingPlanes, theScissorBox);
+            return;
         }
 
         // Add remaining bodies to render list
         if (theNode->nodeName() == BODY_NODE_NAME) {
+            DBP(MAKE_SCOPE_TIMER(createRenderList_insertBody));
             const Body & myBody = *(dynamic_cast_Ptr<Body>(myFacade));
 
             // Split the body in bodyparts to make material sorted rendering possible
@@ -962,9 +976,12 @@ namespace y60 {
             COUNT(RenderedBodies);
         }
 
-        for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
-            createRenderList(theNode->childNode(i), theBodyParts, theCamera, theEyeSpaceTransform,
-                    theViewport, myOverlapFrustumFlag, theClippingPlanes, theScissorBox);
+        {
+            DBP(MAKE_SCOPE_TIMER(createRenderList_recurse));
+            for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
+                createRenderList(theNode->childNode(i), theBodyParts, theCamera, theEyeSpaceTransform,
+                        theViewport, myOverlapFrustumFlag, theClippingPlanes, theScissorBox);
+            }
         }
     }
 
@@ -975,6 +992,10 @@ namespace y60 {
         TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
 
         const VectorOfString & myPlaneIds = myFacade->get<ClippingPlanesTag>();
+        if (myPlaneIds.size() == 0) {
+            return;
+        }
+
         dom::NodePtr myGeometryNode;
         for (unsigned i = 0; i < myPlaneIds.size(); ++i) {
             // XXX Workaround for Bug 91
@@ -998,6 +1019,10 @@ namespace y60 {
         TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
 
         const string & myScissorId = myFacade->get<ScissorTag>();
+        if (myScissorId == "") {
+            return;
+        }
+
         dom::NodePtr myBoxNode = theNode->getElementById(myScissorId);
         if (myBoxNode) {
             const asl::Box2f & myBox = myBoxNode->childNode("#text")->nodeValueAs<asl::Box2f>();
@@ -1024,8 +1049,6 @@ namespace y60 {
         _myState->setDepthWrites(true);
         _myState->setFrontFaceCCW(true);
 
-#if 1
-        // XXX UH: need to think on this some more
         // This prevents translucent pixels from being drawn. This way the
         // background can shine through.
         if (theViewport->get<ViewportDrawGlowTag>()) {
@@ -1034,7 +1057,6 @@ namespace y60 {
             glAlphaFunc(GL_GREATER, 0.0);
             glEnable(GL_ALPHA_TEST);
         }
-#endif
 
         glColor4f(1,1,1,1);
         CHECK_OGL_ERROR;
@@ -1058,10 +1080,12 @@ namespace y60 {
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
         // Render underlays
-        renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
+        {
+            MAKE_SCOPE_TIMER(renderUnderlays);
+            renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
+        }
 
-        dom::NodePtr myCameraNode = theViewport->getNode().getElementById(
-                theViewport->get<CameraTag>());
+        dom::NodePtr myCameraNode = theViewport->getNode().getElementById(theViewport->get<CameraTag>());
         if (!myCameraNode) {
             throw RendererException(string("Can not find camera '")+theViewport->get<CameraTag>()+
                     "' for viewport '"+theViewport->get<IdTag>()+"'!", PLUS_FILE_LINE);
@@ -1078,17 +1102,6 @@ namespace y60 {
             }
         }
 
-        // (2) Create lists of render objects
-        BodyPartMap myBodyParts;
-        {
-            MAKE_SCOPE_TIMER(createRenderList_lod_cull);
-            Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
-            asl::Box2f myScissorBox;
-            myScissorBox.makeFull();
-            createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera, myEyeSpaceTransform,
-                    theViewport, true, std::vector<asl::Planef>(), myScissorBox);
-        }
-
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         CHECK_OGL_ERROR;
@@ -1098,6 +1111,17 @@ namespace y60 {
 
         // don't render anything if world isn't visible
         if (_myScene->getWorldRoot()->getFacade<TransformHierarchyFacade>()->get<VisibleTag>()) {
+
+            // (2) Create lists of render objects
+            BodyPartMap myBodyParts;
+            {
+                MAKE_SCOPE_TIMER(createRenderList);
+                Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
+                asl::Box2f myScissorBox;
+                myScissorBox.makeFull();
+                createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera, myEyeSpaceTransform,
+                        theViewport, true, std::vector<asl::Planef>(), myScissorBox);
+            }
 
             // (3) render skybox
             {
@@ -1264,7 +1288,7 @@ namespace y60 {
 
         switch (myType) {
             case DIRECTIONAL: {
-                // GL directional lights: xyz is direction, w=0.0
+                // GL directional lights: xyz is (0,0,1) rotated by orientation, w=0.0
                 asl::QuadrupleOf<float> myLightDirection = theLight->get<GlobalMatrixTag>().getRow(2);
                 myGLLightPos = asl::Vector4f(myLightDirection[0], myLightDirection[1], myLightDirection[2], 0.0f);
                 break;
@@ -1285,7 +1309,8 @@ namespace y60 {
                 // get the Z-Axis to set the light direction
                 asl::QuadrupleOf<float> myTmpVec = theLight->get<GlobalMatrixTag>().getRow(2); // Z-axis
                 asl::Vector3f myLightDirection(myTmpVec.begin());
-                myLightDirection = asl::product(myLightDirection, asl::Vector3f(-1,-1,-1));
+                //myLightDirection = asl::product(myLightDirection, asl::Vector3f(-1,-1,-1));
+                myLightDirection = asl::product(myLightDirection, -1.0f);
                 glLightfv(gl_lightid, GL_SPOT_DIRECTION, &(myLightDirection[0]));
 
                 asl::Vector3f myLightTranslation = theLight->get<GlobalMatrixTag>().getTranslation();

@@ -70,7 +70,7 @@ vert2frag mainVertex(app2vert IN,
 float4 mainFragment(vert2frag   IN,
         uniform sampler2D decalTex,
         uniform samplerCUBE envTex,
-        uniform samplerCUBE emmissiveEnvTex,
+        uniform samplerCUBE emissiveEnvTex,
         uniform float3 AC_CAMERA_POSITION,
         uniform float3 AC_DIRECTIONAL_LIGHTS[],
         uniform float4 AC_DIRECTIONAL_LIGHTS_DIFFUSE_COLOR[],
@@ -87,7 +87,7 @@ float4 mainFragment(vert2frag   IN,
         ) : COLOR
 {
     float4 myEnvTexel       = texCUBE(envTex, IN.reflectVector);
-    float4 myEmissiveTexel  = texCUBE(emmissiveEnvTex, IN.reflectVector);
+    float4 myEmissiveTexel  = texCUBE(emissiveEnvTex, IN.reflectVector);
     float4 myOcclusionTexel = tex2D(decalTex, IN.texCoord0);
 
     float4 myDiffuseColor   = float4(0,0,0,0);

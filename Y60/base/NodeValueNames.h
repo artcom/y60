@@ -323,6 +323,7 @@ namespace y60 {
         OBJECT_LINEAR,
         EYE_LINEAR,
         SPHERE_MAP,
+        REFLECTION,
         NONE
     };
 

@@ -116,7 +116,7 @@ namespace y60 {
 
             dom::NodePtr getActiveLodChild(dom::NodePtr theNode, const y60::CameraPtr theCamera);
 
-            void createRenderList(dom::NodePtr theNode, BodyPartMap & theBodyParts,
+            void createRenderList(const dom::NodePtr & theNode, BodyPartMap & theBodyParts,
                                   const y60::CameraPtr theCamera,
                                   const asl::Matrix4f & theEyeSpaceTransform,
                                   ViewportPtr theViewport,

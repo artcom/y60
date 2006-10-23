@@ -202,7 +202,6 @@ namespace y60 {
 
             _myMappingRequirements[1]._myFeature.push_back(theMappingMode);
             _myMappingRequirements[1]._myRanking = theFallbackRanking;
-
         }
 
         _myTextureRequirements[0]._myFeature.push_back(theUsage);
@@ -317,6 +316,7 @@ namespace y60 {
     void
     MaterialBuilder::appendCubemap(SceneBuilder & theSceneBuilder,
                                    const std::string & theName,
+                                   const std::string & theUsage,
                                    const std::string & theFrontFileName,
                                    const std::string & theRightFileName,
                                    const std::string & theBackFileName,
@@ -331,12 +331,13 @@ namespace y60 {
             + theBackFileName + "|" + theLeftFileName + "|"
             + theTopFileName + "|" + theBottomFileName;
 
-        const string & myId = createImage(theSceneBuilder, theName, myFileName, TEXTURE_USAGE_ENVIRONMENT, false,
-                                          theColorScale, asl::Vector4f(0.0f,0.0f,0.0f,0.0f), CUBEMAP,
-                                          "");
-        // default applay mode: TEXTURE_APPLY_DECAL
-        createTextureNode(myId, theApplyMode, TEXTURE_USAGE_ENVIRONMENT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP,
-                          Matrix4f::Identity(), 10.0f, false, 0.0f, false);
+        const string & myId = createImage(theSceneBuilder, theName, myFileName,
+                theUsage, false,
+                theColorScale, asl::Vector4f(0.0f,0.0f,0.0f,0.0f),
+                CUBEMAP, "");
+        createTextureNode(myId, theApplyMode, theUsage,
+                TEXTURE_WRAP_CLAMP, TEXCOORD_REFLECTIVE,
+                Matrix4f::Identity(), 10.0f, false, 0.0f, false);
     }
 
     void
