@@ -510,7 +510,7 @@ struct Method {
     static JSBool
     call(METHOD theMethod, JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         try {
-            JSRuntime * myRuntime=JS_GetRuntime(cx);
+            //JSRuntime * myRuntime=JS_GetRuntime(cx);
             JSCallArgs myJSArgs( cx, obj, argc, argv, rval);
             MethodType<CLASS, METHOD>::callMethodType(theMethod, myJSArgs);
             return JS_TRUE;
