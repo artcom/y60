@@ -593,7 +593,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     function collectAllSwitchNodes( theScene ) {
         _mySwitchNodes = new Array();
-
+        _myMSwitchNodes = new Array();
+        _myTSwitchNodes = new Array();
+    
         var mySceneNode = theScene.dom;
         var myWorld = mySceneNode.childNode("worlds").childNode("world");
         collectSwitchNodes( myWorld );

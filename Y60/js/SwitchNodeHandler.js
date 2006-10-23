@@ -267,10 +267,6 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
 
     // overwrite some getters and setters because they have to
     // be handled different from model/materialswitches
-    Public.childCount getter = function() {
-        Logger.error("Implement me!");
-    }
-    
     Public.activeChild getter = function() {
         return _myActiveChild;
     }
@@ -280,7 +276,10 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
     }
 
     Public.activeName getter = function() { 
-        return _myActiveChild.name;
+        if (_myActiveChild && "name" in _myActiveChild) {
+            return _myActiveChild.name;
+        }
+        return null;
     }
     
     function setup() {
