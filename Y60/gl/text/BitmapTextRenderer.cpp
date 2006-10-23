@@ -62,8 +62,8 @@ namespace y60 {
 	    glColor4fv(theText->_myTextColor.begin());
         glDisable(GL_LIGHTING);
 
-        unsigned int myXPos = (unsigned int) (theText->_myPos[0] * getWindowWidth());
-        unsigned int myYPos = (unsigned int) (theText->_myPos[1] * getWindowHeight());
+        unsigned int myXPos = (unsigned int) (theText->_myPos[0] * getWindowWidth() + 0.5);
+        unsigned int myYPos = (unsigned int) (theText->_myPos[1] * getWindowHeight() + 0.5);
 
 	    glRasterPos2i(myXPos, myYPos);
 
