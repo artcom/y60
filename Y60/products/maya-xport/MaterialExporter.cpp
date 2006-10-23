@@ -111,9 +111,9 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
 
     std::string myMaterialName = theBuilder.getName();
     std::string myTextureName(MFnDependencyNode(theTextureNode).name().asChar());
-    DB(AC_PRINT << "dumping texture '" << myTextureName << "'");
-    DB(dumpAttributes(theTextureNode));
     DB(
+        AC_PRINT << "dumping texture '" << myTextureName << "'";
+        dumpAttributes(theTextureNode);
         MPlugArray myConnections;
         MFnDependencyNode(theTextureNode).getConnections(myConnections);
         for(int i = 0;i < myConnections.length(); ++i) {
@@ -421,7 +421,7 @@ MaterialExporter::exportEnvCubeTexture(const MObject & theShaderNode,
                                        y60::SceneBuilder & theSceneBuilder,
                                        const std::string & theUsageMode)
 {
-    AC_PRINT << "MaterialExporter::exportEnvCubeTexture(" << MFnDependencyNode(theShaderNode).name().asChar() << ", usage=" << theUsageMode << ")";
+    AC_DEBUG << "MaterialExporter::exportEnvCubeTexture(" << MFnDependencyNode(theShaderNode).name().asChar() << ", usage=" << theUsageMode << ")";
 
     std::string frontFileName  = getStrippedTextureFilename(getPlug(theEnvCubeNode,"front"));
     std::string rightFileName  = getStrippedTextureFilename(getPlug(theEnvCubeNode,"right"));
@@ -563,7 +563,7 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
                              const std::string & theColorGainPropertyName,
                              float theColorGainAlpha)
 {
-    AC_PRINT << "MaterialExporter::exportMaps(shader=" << MFnDependencyNode(theShaderNode).name().asChar() << ", plug=" << thePlugName << ")";
+    AC_DEBUG << "MaterialExporter::exportMaps(shader=" << MFnDependencyNode(theShaderNode).name().asChar() << ", plug=" << thePlugName << ")";
 
     bool hasTextures = false;
     MStatus myStatus;
@@ -586,7 +586,7 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
 
         MObject myTextureNode(myPlugArray[0].node());
         MFn::Type myTextureType = myTextureNode.apiType();
-        AC_PRINT << "TextureType " << myTextureNode.apiTypeStr();
+        AC_DEBUG << "TextureType " << myTextureNode.apiTypeStr();
         switch (myTextureType) {
             case MFn::kLayeredTexture:
                 exportLayeredTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
@@ -672,7 +672,7 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
                                         y60::MaterialBuilder & theBuilder,
                                         y60::SceneBuilder & theSceneBuilder)
 {
-    AC_PRINT << "MaterialExporter::exportLambertFeatures(shader=" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
+    AC_DEBUG << "MaterialExporter::exportLambertFeatures(shader=" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
     MStatus myStatus;
 
     // transparency, alpha
@@ -754,7 +754,7 @@ MaterialExporter::exportEmissiveFeatures(const MFnMesh *, const MObject & theSha
                                          y60::MaterialBuilder & theBuilder,
                                          y60::SceneBuilder & theSceneBuilder)
 {
-    AC_PRINT << "MaterialExporter::exportEmissiveFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
+    AC_DEBUG << "MaterialExporter::exportEmissiveFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
     if (!exportTextures(0, theShaderNode, theBuilder, theSceneBuilder, "ac_emissive",
                 y60::TEXTURE_USAGE_EMISSIVE, y60::DIFFUSE_PROPERTY, 1.0)) {
     }
