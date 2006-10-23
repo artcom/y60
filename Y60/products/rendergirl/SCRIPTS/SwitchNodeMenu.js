@@ -13,7 +13,6 @@ function GtkSwitchNodeGroupHandler( theSwitchHandler, theParentMenu ) {
     this.Constructor( this, theSwitchHandler, theParentMenu );
 }
 
-
 GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandler, theParentMenu ) {
     
     function setup() {
@@ -52,23 +51,40 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
         var myNode = theHandler.node;
         var myGroupItem = null;
 
-        // texture switches not yet implemented in rendergirl
+        // texture switch nodes
         if (String(myNode.name).match(/^tswitch_.*/)) {
-            theSubMenu = null;
+            // find the transform node with the texture references first
+            var myReferenceNode = getDescendantByName(window.scene.world, "textureswitches", true);
+            if (!myReferenceNode) {
+                Logger.error("Could not find reference node for textureswitch " + myNode.name);
+                return;
+            }
+
+            for (var i=0; i<myReferenceNode.childNodesLength(); ++i) {
+                var myChildNode = myReferenceNode.childNode(i);
+                if (myChildNode.name.indexOf(myNode.name) != -1) {
+                   
+                    for (var j=0; j<myChildNode.childNodesLength(); ++j) {
+                        var myChild = myChildNode.childNode(j);
+                        var myItem = createSubmenuItem(myChild, theSubMenu, myGroupItem);
+                        if(myGroupItem == null) {
+                            myGroupItem = myItem;
+                        }
+                    }
+                    
+                    return;
+                }
+            }
+
             return;
         }
                     
+        // material and geometry switches
         for (var i = 0; i < myNode.childNodesLength(); ++i) {
             var myChild = myNode.childNode( i );
-            
-            var myItem;
-            var myLabelString = myChild.name.replace(/_/g, " ");
-            if (myGroupItem == null) {
-                myGroupItem = new RadioMenuItem(myLabelString, myChild.visible);
-                myItem = myGroupItem;
-            } else {
-                myItem = new RadioMenuItem(myLabelString, myChild.visible);
-                myItem.setGroupFromItem(myGroupItem);
+            var myItem = createSubmenuItem(myChild, theSubMenu, myGroupItem);
+            if(myGroupItem == null) {
+                myGroupItem = myItem;
             }
 
             if (String(myNode.name).match(/^mswitch_.*/) && i == 0) {
@@ -80,17 +96,29 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
                 }
                 myItem.active = myChild.visible;
             }
-            myItem.show();
-
-            _myChildren[ myChild.name ] = myItem;
-            theSubMenu.append(myItem);
-
-            var myFunctionString = 'this.onSwitchNodeSwitched(\'' + myChild.name + '\');';
-            obj['_myGtkSwitchNodeHandler_'+myChild.name] = new Function (myFunctionString);
-
-            _mySignalHandlers[ myChild.name ] =
-                    myItem.signal_activate.connect( obj, "_myGtkSwitchNodeHandler_" + myChild.name);
         }
+    }
+
+    function createSubmenuItem(theNode, theSubMenu, theGroupItem) {
+        var myLabelString = theNode.name.replace(/_/g, " ");
+        var myItem = new RadioMenuItem(myLabelString, false);
+        
+        if (theGroupItem) {
+            myItem.setGroupFromItem(theGroupItem);
+        }
+        myItem.active = false;
+        myItem.show();
+        theSubMenu.append(myItem);
+
+        _myChildren[ theNode.name ] = myItem;
+
+        var myFunctionString = 'this.onSwitchNodeSwitched(\'' + theNode.name + '\');';
+        obj['_myGtkSwitchNodeHandler_'+theNode.name] = new Function (myFunctionString);
+    
+        _mySignalHandlers[ theNode.name ] =
+            myItem.signal_activate.connect( obj, "_myGtkSwitchNodeHandler_" + theNode.name);
+
+        return myItem;
     }
 
     obj.onSwitchNodeSwitched = function( theName ) {
@@ -98,10 +126,13 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
              _myHandlers[0].activeName == theName) {
             return;
         }
-        
+       
         if ( _myChildren[ theName ].active ) {
             // get previous item and disable it.
-            _myChildren[ _myHandlers[0].activeName ].active = false;
+            if (_myHandlers[0].activeName) {
+                _myChildren[ _myHandlers[0].activeName ].active = false;
+            }
+            
             // activate new one.
             for (var i=0; i < _myHandlers.length; ++i) {
                 _myHandlers[i].setActiveChildByName( theName );
