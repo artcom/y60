@@ -56,6 +56,26 @@ template jsval as_jsval(JSContext *cx, const std::vector<Point2d> & theVector);
 template jsval as_jsval(JSContext *cx, const std::vector<Point3d> & theVector);
 template jsval as_jsval(JSContext *cx, const std::vector<Point4d> & theVector);
 
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Vector2i> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Vector3i> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Vector4i> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Vector2f> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Vector3f> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Vector4f> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Vector2d> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Vector3d> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Vector4d> & theVector);
+
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Point2i> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Point3i> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Point4i> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Point2f> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Point3f> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Point4f> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Point2d> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Point3d> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<Point4d> & theVector);
+
 template <class VECTOR_NF>
 class Converter {
     template <template <class> class VECTOR, class NUMBER>

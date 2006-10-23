@@ -18,6 +18,7 @@
 
 #include "JSKeyframe.h"
 #include "JScppUtils.h"
+#include "JScppUtils.impl"
 #include "JSNode.h"
 #include "JSVector.h"
 #include "JSQuaternion.h"
@@ -31,6 +32,7 @@ namespace jslib {
 
 typedef asl::QuaternionKeyframe NATIVE;
 
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<QuaternionKeyframe> & theVector);
 
 JSFunctionSpec *
 JSKeyframe::Functions() {

@@ -8,6 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+#include <dom/Value.h>
 
 namespace jslib {
 
@@ -21,6 +22,34 @@ jsval as_jsval(JSContext *cx, const std::vector<T> & theVector) {
         }
     }
     return OBJECT_TO_JSVAL(myReturnObject);
+}
+
+template <class T>
+bool convertFrom(JSContext *cx, jsval theValue, std::vector<T> & theDest) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            jsuint myArrayLength = 0;
+            if (JS_HasArrayLength(cx,myArgument,&myArrayLength)) {
+                theDest.resize(myArrayLength);
+                jsval myArgElem;
+                for (int i = 0; i < myArrayLength; ++i) {
+                    if (JS_GetElement(cx, myArgument, i, &myArgElem)) {
+                        T myResult;
+                        if (convertFrom(cx, myArgElem, myResult)) {
+                            theDest[i] = myResult;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 }

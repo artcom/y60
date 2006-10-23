@@ -850,4 +850,17 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest) {
     return false;
 }
 
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<double> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<float> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned short> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<int> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned int> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned long> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<long> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<bool> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<std::string> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<JSObject *> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<unsigned char> & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<asl::Time> & theVector);
+
 }
