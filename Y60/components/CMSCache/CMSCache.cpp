@@ -12,6 +12,7 @@
 
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
+#include <asl/os_functions.h>
 #include <y60/Request.h>
 
 using namespace std;
@@ -32,7 +33,6 @@ CMSCache::CMSCache(const string & theLocalPath,
                        const std::string & thePassword,
                        const std::string & theSessionCookie) :
      _myPresentationDocument(thePresentationDocument),
-     _myLocalPath( theLocalPath ),
      _myUsername(theUsername),
      _myPassword(thePassword),
      _myStatusDocument( new dom::Document()),
@@ -47,6 +47,7 @@ CMSCache::CMSCache(const string & theLocalPath,
     myReport->appendChild( _myAssetReportNode );
     _myStalledFilesNode = dom::NodePtr( new dom::Element("stalledfiles") );
     myReport->appendChild( _myStalledFilesNode );
+    _myLocalPath = asl::expandEnvironment(theLocalPath);
     //dumpPresentationToFile("dump.txt");
 }
 
@@ -253,6 +254,8 @@ CMSCache::isOutdated( dom::NodePtr theAsset ) {
         time_t myLocalTimestamp = getLastModified( myFile );
         time_t myServerTimestamp = Request::getTimeFromHTTPDate(
                     theAsset->getAttributeString("lastmodified"));
+        VERBOSE_PRINT << myFile << ": " << myLocalTimestamp << "(local), "
+                      << myServerTimestamp << "(server)";
         if (myServerTimestamp <= myLocalTimestamp) {
             return false;
         }
