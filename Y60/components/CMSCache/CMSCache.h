@@ -49,6 +49,8 @@ class CMSCache {
         void synchronize();
         bool isSynchronized();
 
+        std::string getLocalPath() const { return _myLocalPath; }
+
         bool getVerboseFlag() const { return _myVerboseFlag; }
         void setVerboseFlag(bool theFlag) { _myVerboseFlag = theFlag; }
 

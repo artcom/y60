@@ -83,6 +83,8 @@ JSCMSCache::Properties() {
     static JSPropertySpec myProperties[] = {
         {"statusReport", PROP_statusReport,
                 JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY},
+        {"localPath", PROP_localPath,
+                JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY},
         {"verbose", PROP_verbose, JSPROP_ENUMERATE | JSPROP_PERMANENT},
         {"cleanup", PROP_cleanup, JSPROP_ENUMERATE | JSPROP_PERMANENT},
         {"maxRequests", PROP_maxRequests, JSPROP_ENUMERATE | JSPROP_PERMANENT},
@@ -99,6 +101,9 @@ JSCMSCache::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj,
     switch (theID) {
         case PROP_statusReport:
             *vp = as_jsval( cx, static_cast_Ptr<dom::Node>( myObj.getNative().getStatusReport()));
+            return JS_TRUE;
+        case PROP_localPath:
+            *vp = as_jsval( cx, myObj.getNative().getLocalPath());
             return JS_TRUE;
         case PROP_verbose:
             *vp = as_jsval( cx,  myObj.getNative().getVerboseFlag());

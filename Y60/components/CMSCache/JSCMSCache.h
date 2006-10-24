@@ -44,7 +44,8 @@ class JSCMSCache : public jslib::JSWrapper<y60::CMSCache, asl::Ptr<y60::CMSCache
         static JSFunctionSpec * StaticFunctions();
 
         enum PropertyNumbers {
-            PROP_statusReport =  -100,
+            PROP_statusReport = -100,
+            PROP_localPath,
             PROP_verbose,
             PROP_cleanup,
             PROP_maxRequests,
