@@ -32,6 +32,7 @@ CMSCache::CMSCache(const string & theLocalPath,
                        const std::string & theUsername,
                        const std::string & thePassword,
                        const std::string & theSessionCookie) :
+     _myLocalPath(theLocalPath),
      _myPresentationDocument(thePresentationDocument),
      _myUsername(theUsername),
      _myPassword(thePassword),
@@ -47,7 +48,6 @@ CMSCache::CMSCache(const string & theLocalPath,
     myReport->appendChild( _myAssetReportNode );
     _myStalledFilesNode = dom::NodePtr( new dom::Element("stalledfiles") );
     myReport->appendChild( _myStalledFilesNode );
-    _myLocalPath = asl::expandEnvironment(theLocalPath);
     //dumpPresentationToFile("dump.txt");
 }
 

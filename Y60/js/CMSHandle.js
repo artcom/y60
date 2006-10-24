@@ -91,8 +91,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     obj.__defineGetter__('localFallback',
             function() { return (_mySyncFlag ? _myLocalFallback : null) } );
 
-    obj.__defineGetter__('assetDir',
-            function() { return _myConfig.childNode("cmscache",0).localdir; } );
+    obj.__defineGetter__('assetDir', function() { return _myLocalPath; } );
 
     obj.__defineGetter__('versionTag',
             function() { return _myVersionTag; } );
@@ -110,7 +109,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
              myUsername += "@" + myCMSConfig.domain;
         }
 
-        _myCMSCache = new CMSCache(myCMSConfig.localdir, _myPresentation,
+        _myCMSCache = new CMSCache(_myLocalPath, _myPresentation,
                             myCMSConfig.backend, myUsername, _myConfig.password, _myOCSCookie );
         _myCMSCache.verbose = _myCMSVerbosityFlag;
 
@@ -207,6 +206,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         var myZopeConfig = _myConfig.childNode("zopeconfig", 0);
         var myCMSConfig = _myConfig.childNode("cmscache", 0);
 
+        _myLocalPath = expandEnvironment(myCMSConfig.localdir);
         _myZopeVerbosityFlag = (myZopeConfig && "verbose" in myZopeConfig && myZopeConfig.verbose != 0);
         _myCMSVerbosityFlag = ("verbose" in myCMSConfig && myCMSConfig.verbose != 0);
         if ( "localfallback" in myZopeConfig &&
@@ -251,6 +251,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
     var _myConfig = null;
     var _myPresentation = null;
     var _myLocalFallback = null;
+    var _myLocalPath = null;
     var _mySyncFlag = true;
     var _myCMSCache = null;
     var _myUserAgent = null;
