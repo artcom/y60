@@ -33,12 +33,13 @@
 #include <y60/DataTypes.h>
 #include <y60/Body.h>
 #include <y60/Viewport.h>
+#include <y60/Camera.h>
 
 #include <y60/property_functions.h>
 #include <y60/glExtensions.h>
 #include <y60/GLUtils.h>
 
-#include <asl/file_functions.h>
+//#include <asl/file_functions.h>
 #include <asl/string_functions.h>
 #include <asl/Logger.h>
 
@@ -158,9 +159,10 @@ namespace y60 {
 
     void
     GLShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
-         theMaterial.updateParams();
 
-        //AC_DEBUG << "GLShader::activate " << theMaterial.getName();
+        //AC_DEBUG << "GLShader::activate " << theMaterial.get<NameTag>();
+        theMaterial.updateParams();
+
         MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
         // color,depth mask
@@ -329,7 +331,7 @@ namespace y60 {
 
     void
     GLShader::deactivate(const MaterialBase & theMaterial) {
-        //AC_DEBUG << "deactivate " << theMaterial.getName();
+        //AC_DEBUG << "GLShader::deactivate " << theMaterial.get<NameTag>();
         if (theMaterial.hasTexGen()) {
             // disable texture coordinate generation
             for (unsigned myTexUnit = 0; myTexUnit < theMaterial.getTexGenModes().size(); ++myTexUnit) {
@@ -422,29 +424,32 @@ namespace y60 {
 
                     //AC_DEBUG << "unit=" << myTexUnit << " mode=" << myModes[i] << " params=" << myParams[i];
 
-                    // set texgen plane params
                     if (myModes[i] == NONE) {
                         continue;
                     }
 
+                    // set texgen plane params
                     if (myModes[i] == EYE_LINEAR) {
 
+                        // push modelview matrix
                         if (mustRestoreMatrix == false) {
                             glPushMatrix();
+#if 1
                             glLoadIdentity();
+#else
+                            // UH: should we load the camera global matrix instead of identity?
+                            glLoadMatrixf(static_cast<const GLfloat *>(theCamera.get<GlobalMatrixTag>().getData()));
+#endif
                             mustRestoreMatrix = true;
                         }
 
-                        glTexGenfv(ourTexGenCoord[i], GL_EYE_PLANE,
-                                &(*(myParams[i]).begin()));
+                        glTexGenfv(ourTexGenCoord[i], GL_EYE_PLANE, &(*(myParams[i]).begin()));
                     } else if (myModes[i] == OBJECT_LINEAR) {
-                        glTexGenfv(ourTexGenCoord[i], GL_OBJECT_PLANE,
-                                &(*(myParams[i]).begin()));
+                        glTexGenfv(ourTexGenCoord[i], GL_OBJECT_PLANE, &(*(myParams[i]).begin()));
                     }
 
                     // set texgen mode
-                    glTexGeni(ourTexGenCoord[i], GL_TEXTURE_GEN_MODE,
-                            asGLTexCoordMode(myModes[i]));
+                    glTexGeni(ourTexGenCoord[i], GL_TEXTURE_GEN_MODE, asGLTexCoordMode(myModes[i]));
                     glEnable(ourTexGenToken[i]);
                 }
                 CHECK_OGL_ERROR;

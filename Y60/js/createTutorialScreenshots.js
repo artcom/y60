@@ -23,6 +23,7 @@ if (!fileExists(ourTutorialPath) || !isDirectory(ourTargetDirectory)) {
 RenderWindow.prototype.onProtoFrame = function(theTime) {
     this.fixedFrameTime = 0.04;
     if (ourFrameCount == 0) {
+        print("Resizing window to " + ourScreenshotSize);
         this.resize(ourScreenshotSize[0], ourScreenshotSize[1]);
     } else if (ourFrameCount == ourFrameBreak) {
         var myTutorial = getFilenamePart(ourTutorialPath);

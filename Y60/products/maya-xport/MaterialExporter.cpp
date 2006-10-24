@@ -361,8 +361,7 @@ MaterialExporter::getTextureMappingType(const MObject & theTextureNode) {
     MStatus myStatus;
     MPlug myProjectionTypePlug = MFnDependencyNode(theTextureNode).findPlug("projType", &myStatus);
     if (myStatus != MStatus::kSuccess) {
-        AC_WARNING << "Unable to get 'projType' for node '" << MFnDependencyNode(theTextureNode).name().asChar() << "'";
-        //return "*";
+        AC_INFO << "Unable to get 'projType' for node '" << MFnDependencyNode(theTextureNode).name().asChar() << "'";
     }
 
     double myProjectionType = 0;

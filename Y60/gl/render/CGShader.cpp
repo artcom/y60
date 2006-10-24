@@ -214,6 +214,9 @@ namespace y60 {
 
     void
     CGShader::deactivate(const MaterialBase & theMaterial) {
+
+        GLShader::deactivate(theMaterial);
+
         if (_myVertexProgram) {
             _myVertexProgram->disableProfile();
         }
