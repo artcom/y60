@@ -10,7 +10,7 @@
 
 #include "JSScriptablePlugin.h"
 #include "IFactoryPlugin.h"
-#include <Y60/JSNode.h>
+#include "JSNode.h"
 
 #include <asl/PlugInManager.h>
 #include <asl/Ptr.h>

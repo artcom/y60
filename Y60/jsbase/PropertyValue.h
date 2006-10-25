@@ -11,7 +11,6 @@
 #ifndef _PROPERTY_VALUE_INCLUDED
 #define _PROPERTY_VALUE_INCLUDED
 
-//#include <Y60/JSNode.h>
 #include "JScppUtils.h"
 #include <js/jsapi.h>
 
