@@ -78,6 +78,7 @@ Time FFMpegAudioDecoder::getDuration() const {
 
 void FFMpegAudioDecoder::seek (Time thePosition)
 {
+    AC_DEBUG << "FFMpegAudioDecoder::seek(" << thePosition << ")";
 #if (LIBAVCODEC_BUILD < 4738)
     int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE));
 #else
