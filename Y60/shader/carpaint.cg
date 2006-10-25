@@ -68,7 +68,9 @@ vert2frag mainVertex(app2vert IN,
 
 
 float4 mainFragment(vert2frag   IN,
+#ifndef NO_OCCLUSION
         uniform sampler2D decalTex,
+#endif
         uniform samplerCUBE envTex,
         uniform samplerCUBE emissiveEnvTex,
         uniform float3 AC_CAMERA_POSITION,
@@ -88,7 +90,11 @@ float4 mainFragment(vert2frag   IN,
 {
     float4 myEnvTexel       = texCUBE(envTex, IN.reflectVector);
     float4 myEmissiveTexel  = texCUBE(emissiveEnvTex, IN.reflectVector);
+#ifdef NO_OCCLUSION
+    float4 myOcclusionTexel = float4(1,0,0,1);
+#else
     float4 myOcclusionTexel = tex2D(decalTex, IN.texCoord0);
+#endif
 
     float4 myDiffuseColor   = float4(0,0,0,0);
     float4 mySpecColor      = float4(0,0,0,0);
@@ -142,13 +148,10 @@ float4 mainFragment(vert2frag   IN,
 
     float4 myBaseColor = ambient + myDiffuseColor * diffuse + mySpecColor * specular;
     float3 myEnvColor  = (myEnvTexel.rgb + myEmissiveTexel.rgb) * IN.reflectionFactor;
+    float  myEnvIntensity = (myEnvColor.r + myEnvColor.g + myEnvColor.b) / 3.0;
+    float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvColor, myEnvIntensity);
 
-    return float4((myBaseColor.rgb + myEnvColor) * myOcclusionTexel.r, myBaseColor.a);
-
-    //float  myEnvIntensity = (myEnvColor.r + myEnvColor.g + myEnvColor.b) / 3.0;
-    //float3 myBlendedColor = lerp(myBaseColor.rgb, myEnvColor, myEnvIntensity);
-
-    //return float4(myBlendedColor * myOcclusionTexel.r, 1);
+    return float4(myBlendedColor * myOcclusionTexel.r, 1);
 
     // *************** Some debug options *********************
 

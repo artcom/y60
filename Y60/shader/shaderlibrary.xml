@@ -468,6 +468,34 @@
             </properties>
         </fragmentshader>
     </shader>
+    <shader id="s151" name="carpaint_no_occlusion" cost="10" >
+        <supports>
+            <feature class="textures" values="[paint,emissive]"/>
+            <feature class="texcoord" values="[reflective,reflective]"/>
+            <feature class="lighting" values="[unlit]"/>
+        </supports>
+        <vertexshader profile="VP30" file="carpaint.cg" entryfunction="mainVertex" compilerargs="-DPAINT -DNO_OCCLUSION">
+            <properties>
+                <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector3f name="normal"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="carpaint.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
+            <properties>
+                <sampler2d name="decalTex">0</sampler2d>
+                <samplerCUBE name="envTex">1</samplerCUBE>
+                <samplerCUBE name="emissiveEnvTex">2</samplerCUBE>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+        </fragmentshader>
+    </shader>
     <shader id="s16" name="glassdbltex" cost="10" >
         <supports>
             <feature class="textures" values="[paint,paint,paint]"/>
