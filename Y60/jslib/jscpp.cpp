@@ -8,27 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSSphere.h"
-#include "JSBox.h"
-#include "JSBox2f.h"
-#include "JSLine.h"
-#include "JSPlane.h"
-#include "JSTriangle.h"
-#include "JSVector.h"
-#include "JSQuaternion.h"
-#include "JSMatrix.h"
-#include "JSNode.h"
-#include "JSNodeList.h"
-#include "JSNamedNodeMap.h"
-#include "JSResizeableVector.h"
-#include "JSResizeableRaster.h"
-#include "JSAccessibleVector.h"
-#include "JSSerial.h"
-#include "JSGlobal.h"
 #include "JSStringMover.h"
 #include "JSRequestWrapper.h"
 #include "JSRequestManager.h"
-#include "JSEvent.h"
 #include "JSRenderer.h"
 #include "JSKeyframe.h"
 #include "JSCoordSpline.h"
@@ -37,23 +19,46 @@
 #include "JSLocale.h"
 #include "JSfile_functions.h"
 #include "JSScene.h"
-#include "JSFrustum.h"
 #include "JSGLResourceManager.h"
 #include "JSOffscreenRenderArea.h"
-#include "JSBlock.h"
 #include "JSZipWriter.h"
 #include "JSTestServer.h"
 #include "JSBSpline.h"
 #include "JSSvgPath.h"
 #include "JSPerlinNoise.h"
-#include "JSEnum.h"
-#include "JSBitset.h"
+#include "JSBox2f.h"
+#include "JSSerial.h"
 
 #include "jscpp.h"
+
+#include <Y60/JSSphere.h>
+#include <Y60/JSBox.h>
+#include <Y60/JSLine.h>
+#include <Y60/JSPlane.h>
+#include <Y60/JSTriangle.h>
+#include <Y60/JSVector.h>
+#include <Y60/JSQuaternion.h>
+#include <Y60/JSMatrix.h>
+#include <Y60/JSNode.h>
+#include <Y60/JSNodeList.h>
+#include <Y60/JSNamedNodeMap.h>
+#include <Y60/JSResizeableVector.h>
+#include <Y60/JSResizeableRaster.h>
+#include <Y60/JSAccessibleVector.h>
+#include <Y60/JSGlobal.h>
+#include <Y60/JSEvent.h>
+#include <Y60/JSFrustum.h>
+#include <Y60/JSBlock.h>
+#include <Y60/JSEnum.h>
+#include <Y60/JSBitset.h>
+#include <Y60/JSWrapper.impl>
 
 #include <y60/NodeValueNames.h>
 
 namespace jslib {
+
+template class JSWrapper<y60::RenderStyles>;
+template class JSWrapper<y60::TargetBuffers>;
 
 bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
 
