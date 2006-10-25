@@ -442,7 +442,7 @@
     </shader>
     <shader id="s150" name="carpaint" cost="10" >
         <supports>
-            <feature class="textures" values="[paint,paint,paint]"/>
+            <feature class="textures" values="[paint,paint,emissive]"/>
             <feature class="texcoord" values="[uv_map,reflective,reflective]"/>
             <feature class="lighting" values="[unlit]"/>
         </supports>
@@ -463,7 +463,7 @@
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
                 <samplerCUBE name="envTex">1</samplerCUBE>
-                <samplerCUBE name="emmissiveEnvTex">2</samplerCUBE>
+                <samplerCUBE name="emissiveEnvTex">2</samplerCUBE>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>

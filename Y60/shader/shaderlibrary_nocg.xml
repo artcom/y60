@@ -396,7 +396,7 @@
     </shader>
     <shader id="s150" name="pseudo_carpaint" cost="10" >
         <supports>
-            <feature class="textures" values="[paint,paint,paint]"/>
+            <feature class="textures" values="[paint,paint,emissive]"/>
             <feature class="texcoord" values="[uv_map,reflective,reflective]"/>
             <feature class="lighting" values="[lambert]"/>
         </supports>

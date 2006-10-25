@@ -585,7 +585,7 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
 
         MObject myTextureNode(myPlugArray[0].node());
         MFn::Type myTextureType = myTextureNode.apiType();
-        AC_DEBUG << "TextureType " << myTextureNode.apiTypeStr();
+        //AC_DEBUG << "TextureType " << myTextureNode.apiTypeStr();
         switch (myTextureType) {
             case MFn::kLayeredTexture:
                 exportLayeredTexture(theMesh, myTextureNode, theBuilder, theSceneBuilder,
@@ -671,7 +671,7 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
                                         y60::MaterialBuilder & theBuilder,
                                         y60::SceneBuilder & theSceneBuilder)
 {
-    AC_DEBUG << "MaterialExporter::exportLambertFeatures(shader=" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
+    AC_DEBUG << "MaterialExporter::exportLambertFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
     MStatus myStatus;
 
     // transparency, alpha
@@ -724,19 +724,17 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     if (myGlowFactor > 0.0f) {
         setPropertyValue<float>(theBuilder.getNode(), "float", y60::GLOW_PROPERTY, myGlowFactor);
     }
-
-    // emissive
-    exportEmissiveFeatures(theMesh, theShaderNode, theBuilder, theSceneBuilder);
 }
 
 void
 MaterialExporter::exportReflectiveFeatures(const MFnMesh * theMesh, const MObject & theShaderNode,
                                            y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder)
 {
-    DB(AC_TRACE << "MaterialExporter::exportReflectiveFeatures()");
-    MStatus myStatus;
+    AC_DEBUG << "MaterialExporter::exportReflectiveFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
+
     if (!exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "reflectedColor",
                         y60::TEXTURE_USAGE_PAINT, y60::DIFFUSE_PROPERTY, 1.0)) {
+        MStatus myStatus;
         MColor mySpecularColor = MFnReflectShader(theShaderNode).specularColor(& myStatus);
         if (myStatus == MStatus::kFailure) {
             throw ExportException("Could not get specular color from node",
@@ -749,12 +747,12 @@ MaterialExporter::exportReflectiveFeatures(const MFnMesh * theMesh, const MObjec
 }
 
 void
-MaterialExporter::exportEmissiveFeatures(const MFnMesh *, const MObject & theShaderNode,
-                                         y60::MaterialBuilder & theBuilder,
-                                         y60::SceneBuilder & theSceneBuilder)
+MaterialExporter::exportIncandescenceFeatures(const MFnMesh *, const MObject & theShaderNode,
+                                              y60::MaterialBuilder & theBuilder,
+                                              y60::SceneBuilder & theSceneBuilder)
 {
-    AC_DEBUG << "MaterialExporter::exportEmissiveFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
-    if (!exportTextures(0, theShaderNode, theBuilder, theSceneBuilder, "ac_emissive",
+    AC_DEBUG << "MaterialExporter::exportIncandescenceFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
+    if (!exportTextures(0, theShaderNode, theBuilder, theSceneBuilder, "incandescence",
                 y60::TEXTURE_USAGE_EMISSIVE, y60::DIFFUSE_PROPERTY, 1.0)) {
     }
 }
@@ -765,6 +763,7 @@ MaterialExporter::exportPhongEFeatures(const MFnMesh * theMesh, const MObject & 
                                         y60::SceneBuilder & theSceneBuilder)
 {
     exportReflectiveFeatures(theMesh, theShaderNode, theBuilder, theSceneBuilder);
+
     MStatus myStatus;
     float myHightlightSize = MFnPhongEShader(theShaderNode).highlightSize(& myStatus);
 
@@ -778,6 +777,7 @@ MaterialExporter::exportPhongFeatures(const MFnMesh * theMesh, const MObject & t
                                         y60::SceneBuilder & theSceneBuilder)
 {
     exportReflectiveFeatures(theMesh, theShaderNode, theBuilder, theSceneBuilder);
+
     MStatus myStatus;
     float myShininess = MFnPhongShader(theShaderNode).cosPower(& myStatus);
     if (myStatus == MStatus::kFailure) {
@@ -797,6 +797,7 @@ MaterialExporter::exportBlinnFeatures(const MFnMesh * theMesh, const MObject & t
                                         y60::SceneBuilder & theSceneBuilder)
 {
     exportReflectiveFeatures(theMesh, theShaderNode, theBuilder, theSceneBuilder);
+
     MStatus myStatus;
     float myEccentricity = MFnBlinnShader(theShaderNode).eccentricity(& myStatus);
     if (myStatus == MStatus::kFailure) {
@@ -892,7 +893,6 @@ MaterialExporter::exportShader(const MFnMesh * theMesh, const MObject & theShade
             exportBlinnFeatures(theMesh, theShaderNode, theMaterialBuilder, theSceneBuilder);
             break;
         }
-
         case MFn::kLayeredShader: {
             // dumpAttributes(theShaderNode);
             MPlug myInputPlug = getPlug(theShaderNode,"inputs");
@@ -913,11 +913,11 @@ MaterialExporter::exportShader(const MFnMesh * theMesh, const MObject & theShade
             }
             break;
         }
-
         default:
             throw ExportException(std::string("Unsupported shader: ") + theShaderNode.apiTypeStr(),
                                   "MaterialExporter::exportShader()");
     }
+    exportIncandescenceFeatures(theMesh, theShaderNode, theMaterialBuilder, theSceneBuilder);
 }
 
 
