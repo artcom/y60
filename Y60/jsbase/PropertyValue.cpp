@@ -10,8 +10,8 @@
 
 #include "PropertyValue.h"
 
-#include <Y60/JSVector.h>
-#include <Y60/JSNode.h>
+#include "JSVector.h"
+#include "JSNode.h"
 #include "PropertyValue.impl"
 
 namespace y60 {
