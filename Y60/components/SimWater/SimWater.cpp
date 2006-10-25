@@ -274,8 +274,6 @@ SimWater::convertMouseCoordsToSimulation( const Vector2i & theMousePos ) {
     myResult[1] = max (0, min( _myDisplaySize[1] - 1,
                 ((_myViewportSize[1] - theMousePos[1])  * _myDisplaySize[1] / _myViewportSize[1])+ _myDisplayOffset[1]));
 
-cerr << "splash at " << myResult << endl;
-
     return myResult;
 }
 
