@@ -158,7 +158,9 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
     self.onPreRender = function() {
     }
 
+    self.BaseViewer.onPostRender = self.onPostRender;
     self.onPostRender = function() {
+        self.BaseViewer.onPostRender();
         if (_myAnimationManager) {
             _myAnimationManager.onPostRender();
         }

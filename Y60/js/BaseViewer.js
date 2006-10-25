@@ -371,6 +371,9 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.onResize = function() {
     }
 
+    self.onPostRender = function() {
+    }
+
     self.onFrame = function(theTime) {
         if (_myProfileNode) {
             var myFPS = _myRenderWindow.fps;
