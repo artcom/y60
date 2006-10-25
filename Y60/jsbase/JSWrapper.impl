@@ -226,14 +226,14 @@ JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::newResolve(JSContext *cx, JSObject
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-JSClass * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::Class(const char * theName = 0) {
+JSClass * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::Class(const char * theName) {
     return JSClassSingleton::get().getClass(theName);
 }
 
 
 template <class NATIVE, class OWNERPTR,
           template <class, class> class ACCESS_PROTOCOL>
-const char * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::ClassName(const char * theName = 0) {
+const char * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::ClassName(const char * theName) {
     return JSClassSingleton::get().getClass(theName)->name;
 }
 
@@ -301,9 +301,9 @@ JSObject * JSWrapper<NATIVE, OWNERPTR, ACCESS_PROTOCOL>::initClass(JSContext *cx
     JSNative theConstructor,
     JSPropertySpec * theProperties,
     JSFunctionSpec * theFunctions,
-    JSConstIntPropertySpec * theConstIntProperties = 0,
-    JSPropertySpec * theStaticProperties = 0,
-    JSFunctionSpec * theStaticFunctions = 0 )
+    JSConstIntPropertySpec * theConstIntProperties,
+    JSPropertySpec * theStaticProperties,
+    JSFunctionSpec * theStaticFunctions)
 {
     //createClassDocumentation(theClassName, theProperties, theFunctions, theConstIntProperties, theStaticProperties, theStaticFunctions);
 
