@@ -214,14 +214,12 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
         }
 
 #ifdef AC_USE_X11
-        {
-            SDL_SysWMinfo wminfo;
-            SDL_VERSION(&wminfo.version);
-            if (SDL_GetWMInfo(&wminfo) >= 0) {
-                wminfo.info.x11.lock_func();
-                XSync(wminfo.info.x11.display, true);
-                wminfo.info.x11.unlock_func();
-            }
+        SDL_SysWMinfo wminfo;
+        SDL_VERSION(&wminfo.version);
+        if (SDL_GetWMInfo(&wminfo) >= 0) {
+            wminfo.info.x11.lock_func();
+            XSync(wminfo.info.x11.display, true);
+            wminfo.info.x11.unlock_func();
         }
 #endif
 
@@ -232,22 +230,18 @@ SDLWindow::setVideoMode(unsigned theTargetWidth, unsigned theTargetHeight,
 
         DB(AC_TRACE << "SDL_SetVideoMode(" << theTargetWidth << ", " << theTargetHeight <<
                 ", FS=" << theFullscreenFlag << ", Deco=" << _myWinDecoFlag << ")" << endl);
-        if ((_myScreen = SDL_SetVideoMode(theTargetWidth, theTargetHeight, 32, myFlags)) ==
-                NULL)
-        {
+        if ((_myScreen = SDL_SetVideoMode(theTargetWidth, theTargetHeight, 32, myFlags)) == NULL) {
             throw SDLWindowException(string("Couldn't set SDL-GL mode: ") + SDL_GetError(), PLUS_FILE_LINE);
         }
+
 #ifdef AC_USE_X11
-        {
-            SDL_SysWMinfo wminfo;
-            SDL_VERSION(&wminfo.version);
-            if (SDL_GetWMInfo(&wminfo) >= 0) {
-                wminfo.info.x11.lock_func();
-                XSync(wminfo.info.x11.display, true);
-                wminfo.info.x11.unlock_func();
-            }
+        if (SDL_GetWMInfo(&wminfo) >= 0) {
+            wminfo.info.x11.lock_func();
+            XSync(wminfo.info.x11.display, true);
+            wminfo.info.x11.unlock_func();
         }
 #endif
+
         // if we are resetting the video mode (e.g. Fullscreen toggle), then the GL context
         // will be lost. Reinit GL and setup the textures again
         if (_myRenderer) {

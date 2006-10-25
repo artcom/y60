@@ -446,9 +446,6 @@ MaterialExporter::exportEnvCubeTexture(const MObject & theShaderNode,
     setPropertyValue<asl::Vector4f>(theBuilder.getNode(),
                     "vector4f", y60::SPECULAR_PROPERTY, myY60SpecColor);
 
-    float myReflectivity = MFnPhongShader(theShaderNode).reflectivity(& myStatus);
-    setPropertyValue<float>(theBuilder.getNode(), "float", "reflectivity", myReflectivity);
-
 /*
     float myShininess = MFnPhongShader(theShaderNode).cosPower(& myStatus);
     // Convert to 0 - 128 range of OpenGL
@@ -718,10 +715,7 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
 
     // glow
     float myGlowFactor = MFnLambertShader(theShaderNode).glowIntensity( & myStatus );
-    if (myStatus == MStatus::kFailure) {
-        throw ExportException("Could not get glow from node", "MaterialExporter::exportLambertFeatures");
-    }
-    if (myGlowFactor > 0.0f) {
+    if (myStatus == MStatus::kSuccess && myGlowFactor > 0.0f) {
         setPropertyValue<float>(theBuilder.getNode(), "float", y60::GLOW_PROPERTY, myGlowFactor);
     }
 }
@@ -730,19 +724,22 @@ void
 MaterialExporter::exportReflectiveFeatures(const MFnMesh * theMesh, const MObject & theShaderNode,
                                            y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder)
 {
-    AC_DEBUG << "MaterialExporter::exportReflectiveFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
+    MFnReflectShader myReflectShader(theShaderNode);
+    AC_DEBUG << "MaterialExporter::exportReflectiveFeatures(" << myReflectShader.name().asChar() << ")";
 
+    MStatus myStatus;
     if (!exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "reflectedColor",
                         y60::TEXTURE_USAGE_PAINT, y60::DIFFUSE_PROPERTY, 1.0)) {
-        MStatus myStatus;
-        MColor mySpecularColor = MFnReflectShader(theShaderNode).specularColor(& myStatus);
-        if (myStatus == MStatus::kFailure) {
-            throw ExportException("Could not get specular color from node",
-                                "MaterialExporter::exportReflectiveFeatures");
+        MColor mySpecularColor = myReflectShader.specularColor(& myStatus);
+        if (myStatus == MStatus::kSuccess) {
+            setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", y60::SPECULAR_PROPERTY,
+                    asl::Vector4f(mySpecularColor.r, mySpecularColor.g, mySpecularColor.b, mySpecularColor.a));
         }
+    }
 
-        setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", y60::SPECULAR_PROPERTY,
-            asl::Vector4f(mySpecularColor.r, mySpecularColor.g, mySpecularColor.b, mySpecularColor.a));
+    float myReflectivity = myReflectShader.reflectivity(& myStatus);
+    if (myStatus == MStatus::kSuccess && myReflectivity > 0.0f) {
+        setPropertyValue<float>(theBuilder.getNode(), "float", "reflectivity", myReflectivity);
     }
 }
 
@@ -754,6 +751,13 @@ MaterialExporter::exportIncandescenceFeatures(const MFnMesh *, const MObject & t
     AC_DEBUG << "MaterialExporter::exportIncandescenceFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
     if (!exportTextures(0, theShaderNode, theBuilder, theSceneBuilder, "incandescence",
                 y60::TEXTURE_USAGE_EMISSIVE, y60::DIFFUSE_PROPERTY, 1.0)) {
+
+        /*
+        MStatus myStatus;
+        MColor myIncandescenceColor = MFnReflectShader(theShaderNode).incandescence(& myStatus);
+        if (myStatus == MStatus::kSuccess) {
+        }
+        */
     }
 }
 
@@ -1029,7 +1033,7 @@ MaterialExporter::findRelativeFilePath(const std::string & theFileName) {
 
     // find filename from base
     std::string myAbsoluteFileName = myRelativeFileName;
-    unsigned mySlashPos = std::string::npos;
+    std::size_t mySlashPos = std::string::npos;
     do {
         mySlashPos = myAbsoluteFileName.rfind("/", mySlashPos);
         if (mySlashPos == std::string::npos) {
