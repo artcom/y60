@@ -124,6 +124,9 @@ void HWSampleSink::stop(bool theRunUntilEmpty) {
                 _myPosInInputBuffer = 0;
                 _myStopWhenEmpty = false;
                 break;
+            case STOPPED:
+                _myBufferQueue.clear();
+                break;
             default:
                 AC_DEBUG << "HWSampleSink::stop: stop received in state " << 
                         stateToString(getState()) << ". Ignored.";
