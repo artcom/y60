@@ -11,7 +11,7 @@
 #ifndef _Y60_ACXPSHELL_JSCURL_INCLUDED_
 #define _Y60_ACXPSHELL_JSCURL_INCLUDED_
 
-#include <Y60/JSWrapper.h>
+#include <y60/JSWrapper.h>
 #include "JSRequest.h"
 
 #include <asl/string_functions.h>

@@ -14,7 +14,7 @@
 
 #include <asl/Logger.h>
 #include <asl/Ptr.h>
-#include <Y60/JSWrapper.h>
+#include <y60/JSWrapper.h>
 
 namespace jslib {
 

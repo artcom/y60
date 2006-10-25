@@ -11,7 +11,7 @@
 #ifndef _Y60_JSLIB_JSRENDERWINDOW_INCLUDED_
 #define _Y60_JSLIB_JSRENDERWINDOW_INCLUDED_
 
-#include <Y60/JSWrapper.h>
+#include <y60/JSWrapper.h>
 #include "AbstractRenderWindow.h"
 #include <y60/Viewport.h>
 

@@ -11,7 +11,7 @@
 #ifndef _Y60_ACXPSHELL_JSREQUEST_MANAGER_INCLUDED_
 #define _Y60_ACXPSHELL_JSREQUEST_MANAGER_INCLUDED_
 
-#include <Y60/JSWrapper.h>
+#include <y60/JSWrapper.h>
 #include <y60/RequestManager.h>
 #include <asl/Ptr.h>
 #include <asl/string_functions.h>

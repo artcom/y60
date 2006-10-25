@@ -11,7 +11,7 @@
 #ifndef _Y60_ACXPSHELL_JSBOX2_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSBOX2_H_INCLUDED_
 
-#include <Y60/JSWrapper.h>
+#include <y60/JSWrapper.h>
 
 #include <asl/Vector234.h>
 #include <asl/numeric_functions.h>

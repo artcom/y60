@@ -11,13 +11,13 @@
 #ifndef _Y60_JSLIB_JSRENDERER_INCLUDED_
 #define _Y60_JSLIB_JSRENDERER_INCLUDED_
 
-#include <Y60/JSWrapper.h>
-#include <Y60/JSLine.h>
-#include <Y60/JSTriangle.h>
-#include <Y60/JSSphere.h>
-#include <Y60/JSVector.h>
-#include <Y60/JSMatrix.h>
-#include <Y60/JSNode.h>
+#include <y60/JSWrapper.h>
+#include <y60/JSLine.h>
+#include <y60/JSTriangle.h>
+#include <y60/JSSphere.h>
+#include <y60/JSVector.h>
+#include <y60/JSMatrix.h>
+#include <y60/JSNode.h>
 
 #include <y60/Renderer.h>
 

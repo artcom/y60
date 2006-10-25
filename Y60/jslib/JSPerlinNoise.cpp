@@ -9,9 +9,9 @@
 //=============================================================================
 
 #include "JSPerlinNoise.h"
-#include <Y60/JScppUtils.h>
-#include <Y60/JSVector.h>
-#include <Y60/JSWrapper.impl>
+#include <y60/JScppUtils.h>
+#include <y60/JSVector.h>
+#include <y60/JSWrapper.impl>
 
 #include <iostream>
 

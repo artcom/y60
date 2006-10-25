@@ -8,17 +8,17 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <Y60/JSVector.h>
-#include <Y60/JSNode.h>
-#include <Y60/JSNodeList.h>
-#include <Y60/JSLine.h>
-#include <Y60/JSBox.h>
-#include <Y60/JSSphere.h>
-#include <Y60/JSMatrix.h>
+#include <y60/JSVector.h>
+#include <y60/JSNode.h>
+#include <y60/JSNodeList.h>
+#include <y60/JSLine.h>
+#include <y60/JSBox.h>
+#include <y60/JSSphere.h>
+#include <y60/JSMatrix.h>
 #include "JSintersection_functions.h"
 #include "JSScene.h"
 #include "JSApp.h"
-#include <Y60/JSWrapper.impl>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 #include <asl/Logger.h>

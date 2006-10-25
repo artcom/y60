@@ -12,7 +12,7 @@
 #ifndef _ac_jslib_JSLocale_h_
 #define _ac_jslib_JSLocale_h_
 
-#include <Y60/JSWrapper.h>
+#include <y60/JSWrapper.h>
 #include <locale>
 
 namespace jslib {

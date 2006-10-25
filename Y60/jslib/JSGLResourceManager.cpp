@@ -10,7 +10,7 @@
 
 #include "JSGLResourceManager.h"
 #include "JSApp.h"
-#include <Y60/JSWrapper.impl>
+#include <y60/JSWrapper.impl>
 #include <y60/GLResourceManager.h>
 #include <asl/os_functions.h>
 

@@ -11,7 +11,7 @@
 #ifndef _Y60_JSSVGPATH_H_
 #define _Y60_JSSVGPATH_H_
 
-#include <Y60/JSWrapper.h>
+#include <y60/JSWrapper.h>
 
 #include <asl/SvgPath.h>
 #include <dom/Value.h>

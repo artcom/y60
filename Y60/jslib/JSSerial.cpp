@@ -9,9 +9,9 @@
 //=============================================================================
 
 #include "JSSerial.h"
-#include <Y60/JScppUtils.h>
-#include <Y60/JSBlock.h>
-#include <Y60/JSWrapper.impl>
+#include <y60/JScppUtils.h>
+#include <y60/JSBlock.h>
+#include <y60/JSWrapper.impl>
 
 #include <asl/SerialDeviceFactory.h>
 #include <asl/DebugPort.h>

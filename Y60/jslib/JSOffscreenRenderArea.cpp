@@ -11,8 +11,8 @@
 #include "JSAbstractRenderWindow.h"
 #include "JSOffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.impl"
-#include <Y60/JSWrapper.impl>
-#include <Y60/JSNode.h>
+#include <y60/JSWrapper.impl>
+#include <y60/JSNode.h>
 
 using namespace std;
 using namespace asl;

@@ -11,7 +11,7 @@
 #ifndef _Y60_ACXPSHELL_JSSERIAL_INCLUDED_
 #define _Y60_ACXPSHELL_JSSERIAL_INCLUDED_
 
-#include <Y60/JSWrapper.h>
+#include <y60/JSWrapper.h>
 
 #include <asl/SerialDevice.h>
 #include <asl/uCCP.h>

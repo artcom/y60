@@ -9,10 +9,10 @@
 //=============================================================================
 
 #include "JSRequestWrapper.h"
-#include <Y60/JScppUtils.h>
-#include <Y60/JSEnum.h>
-#include <Y60/JSBlock.h>
-#include <Y60/JSWrapper.impl>
+#include <y60/JScppUtils.h>
+#include <y60/JSEnum.h>
+#include <y60/JSBlock.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;

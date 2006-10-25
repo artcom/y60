@@ -9,9 +9,9 @@
 //=============================================================================
 
 #include "JSCoordSpline.h"
-#include <Y60/JSVector.h>
+#include <y60/JSVector.h>
 #include "JSKeyframe.h"
-#include <Y60/JSWrapper.impl>
+#include <y60/JSWrapper.impl>
 
 #include <iostream>
 

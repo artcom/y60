@@ -9,9 +9,9 @@
 //=============================================================================
 
 #include "JSfile_functions.h"
-#include <Y60/Documentation.h>
+#include <y60/Documentation.h>
 #include "JSApp.h"
-#include <Y60/JSBlock.h>
+#include <y60/JSBlock.h>
 
 #include <asl/Block.h>
 #include <asl/file_functions.h>

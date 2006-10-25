@@ -19,7 +19,7 @@
 #ifndef _Y60_ACXPSHELL_JSREQUEST_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSREQUEST_H_INCLUDED_
 
-#include <Y60/JScppUtils.h> 
+#include <y60/JScppUtils.h> 
 
 #include <y60/Request.h>
 

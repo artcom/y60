@@ -11,7 +11,7 @@
 #ifndef __y60_jslib_jsintersection_functions_h_included_
 #define __y60_jslib_jsintersection_functions_h_included_
 
-#include <Y60/JScppUtils.h>
+#include <y60/JScppUtils.h>
 
 #include <y60/Primitive.h>
 #include <y60/Scene.h>

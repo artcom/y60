@@ -31,27 +31,27 @@
 
 #include "jscpp.h"
 
-#include <Y60/JSSphere.h>
-#include <Y60/JSBox.h>
-#include <Y60/JSLine.h>
-#include <Y60/JSPlane.h>
-#include <Y60/JSTriangle.h>
-#include <Y60/JSVector.h>
-#include <Y60/JSQuaternion.h>
-#include <Y60/JSMatrix.h>
-#include <Y60/JSNode.h>
-#include <Y60/JSNodeList.h>
-#include <Y60/JSNamedNodeMap.h>
-#include <Y60/JSResizeableVector.h>
-#include <Y60/JSResizeableRaster.h>
-#include <Y60/JSAccessibleVector.h>
-#include <Y60/JSGlobal.h>
-#include <Y60/JSEvent.h>
-#include <Y60/JSFrustum.h>
-#include <Y60/JSBlock.h>
-#include <Y60/JSEnum.h>
-#include <Y60/JSBitset.h>
-#include <Y60/JSWrapper.impl>
+#include <y60/JSSphere.h>
+#include <y60/JSBox.h>
+#include <y60/JSLine.h>
+#include <y60/JSPlane.h>
+#include <y60/JSTriangle.h>
+#include <y60/JSVector.h>
+#include <y60/JSQuaternion.h>
+#include <y60/JSMatrix.h>
+#include <y60/JSNode.h>
+#include <y60/JSNodeList.h>
+#include <y60/JSNamedNodeMap.h>
+#include <y60/JSResizeableVector.h>
+#include <y60/JSResizeableRaster.h>
+#include <y60/JSAccessibleVector.h>
+#include <y60/JSGlobal.h>
+#include <y60/JSEvent.h>
+#include <y60/JSFrustum.h>
+#include <y60/JSBlock.h>
+#include <y60/JSEnum.h>
+#include <y60/JSBitset.h>
+#include <y60/JSWrapper.impl>
 
 #include <y60/NodeValueNames.h>
 

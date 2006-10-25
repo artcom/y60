@@ -9,12 +9,12 @@
 //=============================================================================
 
 #include "JSSvgPath.h"
-#include <Y60/JSVector.h>
-#include <Y60/JSMatrix.h>
-#include <Y60/JSLine.h>
-#include <Y60/JSSphere.h>
+#include <y60/JSVector.h>
+#include <y60/JSMatrix.h>
+#include <y60/JSLine.h>
+#include <y60/JSSphere.h>
 #include "JSBSpline.h"
-#include <Y60/JSWrapper.impl>
+#include <y60/JSWrapper.impl>
 
 #include <asl/string_functions.h>
 
