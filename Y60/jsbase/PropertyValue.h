@@ -12,7 +12,7 @@
 #define _PROPERTY_VALUE_INCLUDED
 
 //#include <Y60/JSNode.h>
-#include <Y60/JScppUtils.h>
+#include "JScppUtils.h"
 #include <js/jsapi.h>
 
 namespace y60 {
