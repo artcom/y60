@@ -12,6 +12,7 @@
 #include "JSButtonBox.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
@@ -19,6 +20,7 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<Gtk::HButtonBox, asl::Ptr<Gtk::HButtonBox>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

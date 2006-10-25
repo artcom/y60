@@ -7,17 +7,10 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSLogger.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.8 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSLogger.h"
-#include "Documentation.h"
+#include <Y60/Documentation.h>
+#include <Y60/JSWrapper.impl>
 #include <asl/LogMessageSinks.h>
 #include <iostream>
 
@@ -25,6 +18,9 @@ using namespace asl;
 using namespace std;
 
 namespace jslib {
+
+template class JSWrapper<asl::Logger, asl::Ptr<asl::Logger>,
+         StaticAccessProtocol>;
 
 static JSBool log(asl::Severity theSeverity, JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     try {

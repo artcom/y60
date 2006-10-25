@@ -11,6 +11,7 @@
 #include "JSCMSCache.h"
 #include <y60/JSEnum.h>
 #include <y60/JSNode.h>
+#include <y60/JSWrapper.impl>
 
 
 #include <asl/PackageManager.h>
@@ -23,6 +24,8 @@ using namespace y60;
 #define DB(x) // x
 
 namespace jslib {
+
+template class JSWrapper<y60::CMSCache, asl::Ptr<y60::CMSCache> , jslib::StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

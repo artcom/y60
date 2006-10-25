@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSEmbeddedToggle.h,v $
-//   $Author: martin $
-//   $Revision: 1.6 $
-//   $Date: 2005/03/30 15:54:32 $
-//
-//
-//=============================================================================
 
 #ifndef TNT_JS_EMBEDDED_TOGGLE
 #define TNT_JS_EMBEDDED_TOGGLE

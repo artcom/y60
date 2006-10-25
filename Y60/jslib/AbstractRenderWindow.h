@@ -11,7 +11,6 @@
 #ifndef _y60_abstractrenderwindow_included_
 #define _y60_abstractrenderwindow_included_
 
-#include "JSWrapper.h"
 #include "IRendererExtension.h"
 #include "Timeout.h"
 #include "JSRequestWrapper.h"

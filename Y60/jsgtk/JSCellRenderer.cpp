@@ -7,26 +7,21 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSCellRenderer.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.2 $
-//   $Date: 2005/02/02 14:48:38 $
-//
-//
-//=============================================================================
 
 #include "JSCellRenderer.h"
 #include "JSWindow.h"
 #include "JSRenderArea.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<Gtk::CellRenderer, asl::Ptr<Gtk::CellRenderer>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

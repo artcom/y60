@@ -7,18 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSPerlinNoise.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.6 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSPerlinNoise.h"
-#include "JScppUtils.h"
-#include "JSVector.h"
+#include <Y60/JScppUtils.h>
+#include <Y60/JSVector.h>
+#include <Y60/JSWrapper.impl>
 
 #include <iostream>
 
@@ -27,6 +20,8 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<asl::PerlinNoise3D, asl::Ptr<asl::PerlinNoise3D>, StaticAccessProtocol>;
+    
 static JSBool
 noise(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Calculates an noise value for given position");

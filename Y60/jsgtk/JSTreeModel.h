@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSTreeModel.h,v $
-//   $Author: martin $
-//   $Revision: 1.4 $
-//   $Date: 2004/11/27 16:22:00 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSTREEMODEL_INCLUDED_
 #define _Y60_ACGTKSHELL_JSTREEMODEL_INCLUDED_

@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSDialog.h,v $
-//   $Author: david $
-//   $Revision: 1.3 $
-//   $Date: 2005/01/27 14:29:04 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSDIALOG_INCLUDED_
 #define _Y60_ACGTKSHELL_JSDIALOG_INCLUDED_

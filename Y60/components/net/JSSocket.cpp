@@ -17,6 +17,7 @@
 #include <asl/os_functions.h>
 #include <asl/net_functions.h>
 #include <y60/JSBlock.h>
+#include <y60/JSWrapper.impl>
 
 #include <iostream>
 

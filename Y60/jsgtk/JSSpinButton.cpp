@@ -7,26 +7,21 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSSpinButton.cpp,v $
-//   $Author: david $
-//   $Revision: 1.5 $
-//   $Date: 2005/03/21 12:01:44 $
-//
-//
-//=============================================================================
 
 #include "JSSpinButton.h"
 #include "JSSignalProxies.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
 #include <y60/JSVector.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<Gtk::SpinButton, asl::Ptr<Gtk::SpinButton>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

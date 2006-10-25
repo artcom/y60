@@ -9,7 +9,8 @@
 //=============================================================================
 
 #include "JSLocale.h"
-#include "Documentation.h"
+#include <Y60/Documentation.h>
+#include <Y60/JSWrapper.impl>
 #include <locale>
 #include <iostream>
 
@@ -17,6 +18,9 @@ using namespace asl;
 using namespace std;
 
 namespace jslib {
+
+template class JSWrapper<std::locale, asl::Ptr<std::locale>, StaticAccessProtocol>; 
+
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("current locale in string representation.");

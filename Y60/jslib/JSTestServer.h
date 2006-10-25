@@ -11,7 +11,7 @@
 #ifndef _Y60_ACXPSHELL_JSTESTSERVER_INCLUDED_
 #define _Y60_ACXPSHELL_JSTESTSERVER_INCLUDED_
 
-#include "JSWrapper.h"
+#include <Y60/JSWrapper.h>
 #include <y60/TestServer.h>
 
 #include <asl/string_functions.h>

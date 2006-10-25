@@ -2,7 +2,7 @@
 #define _IJEXTENSION_INCLUDED
 
 #include <asl/Ptr.h>
-#include "PropertyValue.h"
+#include <Y60/PropertyValue.h>
 
 struct JSContext;
 struct JSObject;

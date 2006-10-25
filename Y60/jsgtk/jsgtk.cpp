@@ -104,6 +104,7 @@
 // just for unit tests
 #include "JSTestSubject.h"
 
+#include <y60/JSWrapper.impl>
 #include <iostream>
 #include <asl/Exception.h>
 #include <asl/string_functions.h>
@@ -112,6 +113,15 @@ using namespace jslib;
 using namespace std;
 using namespace asl;
 
+namespace jslib {
+    INSTANTIATE_SIGNAL0_WRAPPER(void);
+    INSTANTIATE_SIGNAL1_WRAPPER(void, float);
+    INSTANTIATE_SIGNAL1_WRAPPER(void, double);
+    INSTANTIATE_SIGNAL1_WRAPPER(bool, double);
+    INSTANTIATE_SIGNAL1_WRAPPER(void, const std::string &);
+    INSTANTIATE_SIGNAL2_WRAPPER(void, double, double);
+    INSTANTIATE_SIGNAL3_WRAPPER(void, double, double, unsigned int);
+}
 
 // add all non-abstract JS Wrapper classes here
 bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {

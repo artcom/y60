@@ -7,20 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSCoordSpline.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.5 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSCoordSpline.h"
-//#include "JScppUtils.h"
-//#include "JSNode.h"
-#include "JSVector.h"
+#include <Y60/JSVector.h>
 #include "JSKeyframe.h"
+#include <Y60/JSWrapper.impl>
 
 #include <iostream>
 
@@ -28,6 +19,8 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<asl::CoordSpline, asl::Ptr<asl::CoordSpline>, StaticAccessProtocol>;
 
 typedef asl::CoordSpline NATIVE;
 

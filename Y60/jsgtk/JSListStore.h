@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSListStore.h,v $
-//   $Author: martin $
-//   $Revision: 1.2 $
-//   $Date: 2004/11/27 16:22:00 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSLISTSTORE_INCLUDED_
 #define _Y60_ACGTKSHELL_JSLISTSTORE_INCLUDED_

@@ -7,19 +7,12 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSStringMover.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.10 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSStringMover.h"
-#include "JScppUtils.h"
-#include "JSNode.h"
-#include "JSVector.h"
+#include <Y60/JScppUtils.h>
+#include <Y60/JSNode.h>
+#include <Y60/JSVector.h>
+#include <Y60/JSWrapper.impl>
 
 #include <iostream>
 
@@ -27,6 +20,8 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<StringMover, asl::Ptr<StringMover>, StaticAccessProtocol>;
 
 static JSBool
 onFrame(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

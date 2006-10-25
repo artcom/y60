@@ -11,7 +11,7 @@
 #ifndef _Y60_JSLIB_JSMODELLING_FUNCTIONS_INCLUDED_
 #define _Y60_JSLIB_JSMODELLING_FUNCTIONS_INCLUDED_
 
-#include "JSWrapper.h"
+#include <Y60/JSWrapper.h>
 
 DEFINE_EXCEPTION(JSModellingFunctionException, asl::Exception);
 

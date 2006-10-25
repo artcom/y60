@@ -9,15 +9,18 @@
 //=============================================================================
 
 #include "JSRequestWrapper.h"
-#include "JScppUtils.h"
-#include "JSEnum.h"
-#include "JSBlock.h"
+#include <Y60/JScppUtils.h>
+#include <Y60/JSEnum.h>
+#include <Y60/JSBlock.h>
+#include <Y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<JSRequest, JSRequestPtr, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

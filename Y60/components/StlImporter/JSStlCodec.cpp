@@ -3,6 +3,7 @@
 #include <asl/PackageManager.h>
 #include <y60/JSNode.h>
 #include <y60/JSBlock.h>
+#include <y60/JSWrapper.impl>
 
 using namespace asl;
 using namespace y60;
@@ -10,6 +11,9 @@ using namespace std;
 using namespace dom;
 
 namespace jslib {
+
+template class JSWrapper<y60::StlCodec, asl::Ptr<y60::StlCodec>, 
+         jslib::StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

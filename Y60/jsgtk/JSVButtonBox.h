@@ -8,7 +8,6 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-
 #ifndef _Y60_ACGTKSHELL_JSVBUTTONBOX_INCLUDED_
 #define _Y60_ACGTKSHELL_JSVBUTTONBOX_INCLUDED_
 

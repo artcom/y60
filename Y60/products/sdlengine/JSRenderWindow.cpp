@@ -14,6 +14,7 @@
 
 #include <y60/jssettings.h>
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 
 #include "SDLApp.h"
 #include "SDLFontInfo.h"
@@ -54,6 +55,9 @@ typedef jslib::AbstractRenderWindow BASE;
 typedef jslib::JSAbstractRenderWindow<SDLWindow> JSBASE;
 
 namespace jslib {
+    template class JSWrapper<SDLWindow, asl::Ptr<SDLWindow>, 
+         StaticAccessProtocol>;
+
     template class JSAbstractRenderWindow<NATIVE>;
 }
 

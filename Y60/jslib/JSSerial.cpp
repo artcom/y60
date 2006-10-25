@@ -7,18 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSSerial.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.6 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSSerial.h"
-#include "JScppUtils.h"
-#include "JSBlock.h"
+#include <Y60/JScppUtils.h>
+#include <Y60/JSBlock.h>
+#include <Y60/JSWrapper.impl>
 
 #include <asl/SerialDeviceFactory.h>
 #include <asl/DebugPort.h>
@@ -28,6 +21,8 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<asl::SerialDevice, asl::Ptr<asl::SerialDevice>, StaticAccessProtocol>;
 
 const unsigned DEFAULT_BAUD_RATE    = 9600;
 const unsigned DEFAULT_BITS         = 8;

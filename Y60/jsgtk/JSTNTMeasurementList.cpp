@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSTNTMeasurementList.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.9 $
-//   $Date: 2005/04/21 16:25:03 $
-//
-//
-//=============================================================================
 
 #include "JSTNTMeasurementList.h"
 #include "JSTreeIter.h"
@@ -22,6 +14,7 @@
 #include "jsgtk.h"
 #include <y60/JSNode.h>
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
@@ -29,6 +22,8 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<acgtk::TNTMeasurementList, asl::Ptr<acgtk::TNTMeasurementList>, 
+        StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -237,15 +232,15 @@ JSTNTMeasurementList::getPropertySwitch(NATIVE & theNative, unsigned long theID,
     switch (theID) {
         case PROP_signal_visible_toggled:
             {
-                JSSignal1<void, Glib::ustring>::OWNERPTR mySignal( new
-                        JSSignal1<void, Glib::ustring>::NATIVE(theNative.signal_visible_toggled()));
+                asl::Ptr<sigc::signal1<void, Glib::ustring> > mySignal( new
+                        sigc::signal1<void, Glib::ustring>(theNative.signal_visible_toggled()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }
         case PROP_signal_editable_toggled:
             {
-                JSSignal1<void, Glib::ustring>::OWNERPTR mySignal( new
-                        JSSignal1<void, Glib::ustring>::NATIVE(theNative.signal_editable_toggled()));
+                asl::Ptr<sigc::signal1<void, Glib::ustring> > mySignal( new
+                        sigc::signal1<void, Glib::ustring>(theNative.signal_editable_toggled()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }
@@ -258,8 +253,8 @@ JSTNTMeasurementList::getPropertySwitch(NATIVE & theNative, unsigned long theID,
             }
         case PROP_signal_name_changed:
             {
-                JSSignal2<void, Glib::ustring, Glib::ustring>::OWNERPTR mySignal(new
-                        JSSignal2<void, Glib::ustring, Glib::ustring>::NATIVE(theNative.signal_name_changed()));
+                asl::Ptr<sigc::signal2<void, Glib::ustring, Glib::ustring> > mySignal(new
+                        sigc::signal2<void, Glib::ustring, Glib::ustring>(theNative.signal_name_changed()));
                 *vp = jslib::as_jsval(cx, mySignal);
                 return JS_TRUE;
             }

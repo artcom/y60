@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSTCPServer.h,v $
-//   $Author: valentin $
-//   $Revision: 1.1 $
-//   $Date: 2004/12/15 14:23:21 $
-//
-//
-//=============================================================================
 
 #ifndef _ac_jslib_JSTCPServer_h_
 #define _ac_jslib_JSTCPServer_h_

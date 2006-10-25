@@ -11,12 +11,16 @@
 #include "JSSoundManager.h"
 #include "JSSound.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 
 using namespace std;
 using namespace asl;
 using namespace y60;
 
 namespace jslib {
+
+    template class JSWrapper<y60::SoundManager, 
+            y60::SoundManager *, jslib::StaticAccessProtocol>;
 
     static JSBool
     stopAll(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

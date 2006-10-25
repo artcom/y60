@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSStockID.h,v $
-//   $Author: david $
-//   $Revision: 1.2 $
-//   $Date: 2005/01/18 18:21:20 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSSTOCKID_INCLUDED_
 #define _Y60_ACGTKSHELL_JSSTOCKID_INCLUDED_

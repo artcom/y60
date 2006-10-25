@@ -23,6 +23,7 @@
 #include <asl/Logger.h>
 #include <asl/os_functions.h>
 #include <asl/Time.h>
+#include <y60/JSWrapper.impl>
 
 
 using namespace std;
@@ -36,6 +37,10 @@ using namespace y60;
 #define JIF(x) if (FAILED(hr=(x))) {return hr;}
 #endif
 
+namespace jslib {   
+    template class JSWrapper<y60::WMPPlayer, asl::Ptr<y60::WMPPlayer>,
+             jslib::StaticAccessProtocol>;
+}
 namespace y60 {
 
     HWND getActiveWindow();

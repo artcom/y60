@@ -10,16 +10,16 @@
 
 #include "JSApp.h"
 
-#include "jscpp.h"
-#include "JScppUtils.h"
-#include "JScppUtils.impl"
-#include "JSNode.h"
-#include "JSBlock.h"
-#include "JSVector.h"
-#include "IScriptablePlugin.h"
-#include "IFactoryPlugin.h"
-#include "QuitFlagSingleton.h"
-#include "Documentation.h"
+#include <Y60/jscpp.h>
+#include <Y60/JScppUtils.h>
+#include <Y60/JScppUtils.impl>
+#include <Y60/JSNode.h>
+#include <Y60/JSBlock.h>
+#include <Y60/JSVector.h>
+#include <Y60/IScriptablePlugin.h>
+#include <Y60/IFactoryPlugin.h>
+#include <Y60/QuitFlagSingleton.h>
+#include <Y60/Documentation.h>
 
 #include <asl/string_functions.h>
 #include <asl/file_functions.h>

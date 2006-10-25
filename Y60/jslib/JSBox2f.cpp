@@ -7,17 +7,10 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSBox.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.6 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
-#include "JSVector.h"
+#include <Y60/JSVector.h>
 #include "JSBox2f.h"
+#include <Y60/JSWrapper.impl>
 #include <asl/Box.h>
 
 #include <iostream>
@@ -25,6 +18,8 @@
 using namespace std;
 
 namespace jslib {
+
+template class JSWrapper<asl::Box2<BoxNumber> >;
 
 typedef BoxNumber Number;
 typedef asl::Box2<Number> NATIVE;

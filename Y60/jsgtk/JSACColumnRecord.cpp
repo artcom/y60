@@ -7,18 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSACColumnRecord.cpp,v $
-//   $Author: david $
-//   $Revision: 1.3 $
-//   $Date: 2005/01/18 18:21:20 $
-//
-//
-//=============================================================================
 
 #include "JSACColumnRecord.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
@@ -26,6 +19,7 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<ACColumnRecord, asl::Ptr<ACColumnRecord>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

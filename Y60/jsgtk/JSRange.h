@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSRange.h,v $
-//   $Author: david $
-//   $Revision: 1.1 $
-//   $Date: 2005/03/03 17:28:53 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSRANGE_INCLUDED_
 #define _Y60_ACGTKSHELL_JSRANGE_INCLUDED_

@@ -9,14 +9,15 @@
 //=============================================================================
 
 #include "JSModellingFunctions.h"
-#include "JScppUtils.h"
+#include <Y60/JScppUtils.h>
 
-#include "JSNode.h"
-#include "JSVector.h"
-#include "JSBox.h"
-#include "JSMatrix.h"
+#include <Y60/JSNode.h>
+#include <Y60/JSVector.h>
+#include <Y60/JSBox.h>
+#include <Y60/JSMatrix.h>
 
 #include "JSScene.h"
+#include <Y60/JSWrapper.impl>
 #include <y60/modelling_functions.h>
 #include <y60/Body.h>
 
@@ -28,6 +29,8 @@ using namespace asl;
 using namespace y60;
 
 namespace jslib {
+
+template class JSWrapper<DummyT,asl::Ptr<DummyT>, StaticAccessProtocol>;
 
 JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {

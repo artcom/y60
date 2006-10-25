@@ -9,13 +9,17 @@
 //=============================================================================
 
 #include "JSTestServer.h"
-#include "JScppUtils.h"
+#include <Y60/JScppUtils.h>
+#include <Y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<asl::ConduitAcceptor<asl::TCPPolicy>, 
+        asl::Ptr<asl::ConduitAcceptor<asl::TCPPolicy> >, StaticAccessProtocol>;
 
 typedef JSTestServer::NATIVE NATIVE;
 

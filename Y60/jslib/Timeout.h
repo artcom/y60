@@ -14,7 +14,7 @@
 #include <asl/Time.h>
 #include <asl/Ptr.h>
 
-#include "jssettings.h"
+#include <Y60/jssettings.h>
 #include <js/jsapi.h>
 
 #include <string>

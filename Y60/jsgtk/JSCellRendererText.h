@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSCellRendererText.h,v $
-//   $Author: david $
-//   $Revision: 1.1 $
-//   $Date: 2005/01/25 11:58:15 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSCELL_RENDERER_TEXT_INCLUDED_
 #define _Y60_ACGTKSHELL_JSCELL_RENDERER_TEXT_INCLUDED_

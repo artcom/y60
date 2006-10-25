@@ -7,15 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   Description: Wrapper for JSGLResourceManager Singelton 
-//
-//=============================================================================
 
 #ifndef _Y60_JSLIB_JSGLRESOURCEMANAGER_INCLUDED_
 #define _Y60_JSLIB_JSGLRESOURCEMANAGER_INCLUDED_
 
-#include "JSWrapper.h"
+#include <Y60/JSWrapper.h>
 
 #include <y60/GLResourceManager.h>
 

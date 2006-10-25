@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSComboBox.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/22 16:28:57 $
-//
-//
-//=============================================================================
 
 // this is actually a wrapper of a combobox which holds only one column of text
 
@@ -25,6 +17,7 @@
 #include "JSSignalProxy0.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 #include <gtkmm/liststore.h>
@@ -34,6 +27,7 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<Gtk::ComboBox, asl::Ptr<Gtk::ComboBox>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

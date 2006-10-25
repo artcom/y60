@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSTCPServer.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/28 17:12:57 $
-//
-//
-//=============================================================================
 
 #include "JSTCPServer.h"
 #include "JSSocket.h"
@@ -24,6 +16,7 @@
 #include <asl/TCPSocket.h>
 #include <asl/os_functions.h>
 #include <asl/net_functions.h>
+#include <y60/JSWrapper.impl>
 
 #include <iostream>
 
@@ -33,6 +26,11 @@ using namespace jslib;
 
 
 #define DB(x) // x
+
+namespace jslib {
+    template class JSWrapper<inet::TCPServer, asl::Ptr<inet::TCPServer>, 
+             jslib::StaticAccessProtocol>;
+}
 
 static JSBool
 waitForConnection(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

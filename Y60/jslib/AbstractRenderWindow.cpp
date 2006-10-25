@@ -10,7 +10,7 @@
 
 #include "AbstractRenderWindow.h"
 #include "JSApp.h"
-#include "JSNode.h"
+#include <Y60/JSNode.h>
 
 #include <y60/WindowEvent.h>
 #include <y60/KeyEvent.h>

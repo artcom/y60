@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSMisc.h,v $
-//   $Author: david $
-//   $Revision: 1.2 $
-//   $Date: 2005/02/07 18:17:21 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSMISC_INCLUDED_
 #define _Y60_ACGTKSHELL_JSMISC_INCLUDED_

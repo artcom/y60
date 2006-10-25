@@ -7,24 +7,19 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSTooltips.cpp,v $
-//   $Author: david $
-//   $Revision: 1.3 $
-//   $Date: 2005/01/25 11:58:15 $
-//
-//
-//=============================================================================
 
 #include "JSTooltips.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<Gtk::Tooltips, asl::Ptr<Gtk::Tooltips>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

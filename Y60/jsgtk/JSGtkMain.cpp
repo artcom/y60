@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSGtkMain.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.8 $
-//   $Date: 2005/04/28 17:29:13 $
-//
-//
-//=============================================================================
 
 #include "JSGtkMain.h"
 #include "JSWindow.h"
@@ -26,6 +18,7 @@
 
 #include <acgtk/GCObserver.h>
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 #include <gtkmm/main.h>
 #include <sigc++/slot.h>
@@ -34,6 +27,8 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<int, asl::Ptr<int>, StaticAccessProtocol>;
 
 asl::Ptr<MessageAcceptor<LocalPolicy> > JSGtkMain::ourAppAcceptor;
 sigc::connection JSGtkMain::ourAcceptorTimeout;

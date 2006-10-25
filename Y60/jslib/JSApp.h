@@ -19,7 +19,7 @@
 #ifndef __Y60_JSAPP_INCLUDED__
 #define __Y60_JSAPP_INCLUDED__
 
-#include "jssettings.h"
+#include <Y60/jssettings.h>
 #include <js/jsapi.h>
 
 #include <asl/PlugInBase.h>

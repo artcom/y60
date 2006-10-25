@@ -7,14 +7,7 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSSigConnection.h,v $
-//   $Author: david $
-//   $Revision: 1.1 $
-//   $Date: 2005/04/13 12:12:27 $
-//
-//
-//=============================================================================
+
 #ifndef _Y60_ACGTKSHELL_JS_SIGNAL_CONNECTION_INCLUDED_
 #define _Y60_ACGTKSHELL_JS_SIGNAL_CONNECTION_INCLUDED_
 

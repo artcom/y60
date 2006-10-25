@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSSpinButton.h,v $
-//   $Author: david $
-//   $Revision: 1.3 $
-//   $Date: 2005/03/21 12:01:44 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSSPINBUTTON_INCLUDED_
 #define _Y60_ACGTKSHELL_JSSPINBUTTON_INCLUDED_

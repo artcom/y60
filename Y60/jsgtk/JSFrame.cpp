@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSFrame.cpp,v $
-//   $Author: david $
-//   $Revision: 1.7 $
-//   $Date: 2005/03/03 17:28:53 $
-//
-//
-//=============================================================================
 
 #include "JSSignalProxies.h"
 #include "JSFrame.h"
@@ -22,6 +14,7 @@
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
 #include <y60/JSVector.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
@@ -29,6 +22,7 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<Gtk::Frame, asl::Ptr<Gtk::Frame>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

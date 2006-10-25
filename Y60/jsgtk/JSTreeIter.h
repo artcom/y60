@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSTreeIter.h,v $
-//   $Author: martin $
-//   $Revision: 1.3 $
-//   $Date: 2004/12/22 17:30:14 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSTREEITER_INCLUDED_
 #define _Y60_ACGTKSHELL_JSTREEITER_INCLUDED_

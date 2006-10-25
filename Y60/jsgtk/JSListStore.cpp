@@ -7,25 +7,20 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSListStore.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/21 16:25:02 $
-//
-//
-//=============================================================================
 
 #include "JSListStore.h"
 #include "jsgtk.h"
 #include "JSTreeIter.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<Gtk::ListStore, Glib::RefPtr<Gtk::ListStore>, StaticAccessProtocol>;
 
 typedef Gtk::ListStore NATIVE;
 typedef Glib::RefPtr<NATIVE> OWNERPTR;

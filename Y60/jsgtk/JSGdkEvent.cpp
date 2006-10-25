@@ -7,17 +7,10 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSGdkEvent.cpp,v $
-//   $Author: david $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/13 15:24:13 $
-//
-//
-//=============================================================================
 
 #include "JSGdkEvent.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 #include <gdk/gdkkeysyms.h>
 
@@ -25,6 +18,9 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<GdkEvent, asl::Ptr<GdkEvent>, StaticAccessProtocol>;
+
 JSBool
 JSGdkEvent::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");

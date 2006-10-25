@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSSignalProxy1.h,v $
-//   $Author: david $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/13 12:12:27 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSSIGNAL_1_INCLUDED_
 #define _Y60_ACGTKSHELL_JSSIGNAL_1_INCLUDED_
@@ -223,6 +215,10 @@ jsval as_jsval(JSContext *cx, asl::Ptr<sigc::signal1<R, P0> > & theValue) {
     JSObject * myObject = JSSignal1<R, P0>::Construct(cx, theValue);
     return OBJECT_TO_JSVAL(myObject);
 }
+
+#define INSTANTIATE_SIGNAL1_WRAPPER(R, P0) \
+    template class JSWrapper<sigc::signal1<R, P0>, asl::Ptr<sigc::signal1<R, P0> >, \
+        StaticAccessProtocol>;
 
 }
 

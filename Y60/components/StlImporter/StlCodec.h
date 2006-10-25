@@ -8,14 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $RCSfile: $
-//
-//   $Author: $
-//
-//   $Revision: $
-//
-//=============================================================================
 
 #ifndef _ac_StlImporter_StlCodec_h_
 #define _ac_StlImporter_StlCodec_h_

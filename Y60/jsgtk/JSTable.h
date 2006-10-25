@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSTable.h,v $
-//   $Author: martin $
-//   $Revision: 1.1 $
-//   $Date: 2005/01/20 11:40:37 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSTABLE_INCLUDED_
 #define _Y60_ACGTKSHELL_JSTABLE_INCLUDED_

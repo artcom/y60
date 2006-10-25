@@ -10,11 +10,14 @@
 
 #include "JSSound.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+    template class JSWrapper<y60::Sound, y60::SoundPtr, jslib::StaticAccessProtocol>;
 
     static JSBool
     play(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

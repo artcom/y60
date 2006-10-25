@@ -11,7 +11,7 @@
 #ifndef __y60_jslib_jsfile_functions_h_included_
 #define __y60_jslib_jsfile_functions_h_included_
 
-#include "JScppUtils.h"
+#include <Y60/JScppUtils.h>
 
 namespace jslib {
 

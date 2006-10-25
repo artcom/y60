@@ -11,8 +11,8 @@
 #include "JSAbstractRenderWindow.h"
 #include "JSRenderer.h"
 #include "JSintersection_functions.h"
-#include "IScriptablePlugin.h"
-#include "JSScriptablePlugin.h"
+#include <Y60/IScriptablePlugin.h>
+#include <Y60/JSScriptablePlugin.h>
 #include "JSScene.h"
 #include "IRendererExtension.h"
 

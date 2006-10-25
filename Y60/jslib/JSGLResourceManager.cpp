@@ -10,6 +10,7 @@
 
 #include "JSGLResourceManager.h"
 #include "JSApp.h"
+#include <Y60/JSWrapper.impl>
 #include <y60/GLResourceManager.h>
 #include <asl/os_functions.h>
 
@@ -18,6 +19,9 @@ using namespace asl;
 using namespace y60;
 
 namespace jslib {
+
+template class JSWrapper<GLResourceManager, asl::Ptr<GLResourceManager>, 
+         StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

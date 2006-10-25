@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSMenu.h,v $
-//   $Author: martin $
-//   $Revision: 1.1 $
-//   $Date: 2005/03/30 15:54:32 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSMENU_INCLUDED_
 #define _Y60_ACGTKSHELL_JSMENU_INCLUDED_

@@ -14,11 +14,16 @@
 
 #include <y60/IScriptablePlugin.h>
 #include <y60/JSEnum.h>
+#include <y60/JSWrapper.impl>
 #include <asl/PlugInBase.h>
 
 namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::BackendType, SimpleValue);
 };
+
+namespace jslib {
+    template class JSWrapper<y60::BackendType>;
+}
 
 namespace y60 {
 	class CMSCachePlugIn :

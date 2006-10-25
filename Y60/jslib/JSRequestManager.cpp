@@ -7,24 +7,19 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSRequestManager.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.3 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSRequestWrapper.h"
 #include "JSRequestManager.h"
-#include "JScppUtils.h"
+#include <Y60/JScppUtils.h>
+#include <Y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<inet::RequestManager, asl::Ptr<inet::RequestManager>, StaticAccessProtocol >;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

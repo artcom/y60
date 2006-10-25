@@ -7,25 +7,18 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSScene.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.6 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
-#include "JSVector.h"
-#include "JSNode.h"
-#include "JSNodeList.h"
-#include "JSLine.h"
-#include "JSBox.h"
-#include "JSSphere.h"
-#include "JSMatrix.h"
+#include <Y60/JSVector.h>
+#include <Y60/JSNode.h>
+#include <Y60/JSNodeList.h>
+#include <Y60/JSLine.h>
+#include <Y60/JSBox.h>
+#include <Y60/JSSphere.h>
+#include <Y60/JSMatrix.h>
 #include "JSintersection_functions.h"
 #include "JSScene.h"
 #include "JSApp.h"
+#include <Y60/JSWrapper.impl>
 #include <iostream>
 
 #include <asl/Logger.h>
@@ -42,6 +35,8 @@ using namespace asl;
 using namespace std;
 
 namespace jslib {
+
+template class JSWrapper<y60::Scene, asl::Ptr<y60::Scene, dom::ThreadingModel>, StaticAccessProtocol>;
 
 class ProgressCallback : public y60::IProgressNotifier {
     public:

@@ -14,6 +14,7 @@
 #include <y60/JScppUtils.h>
 #include <y60/JSAbstractRenderWindow.h>
 #include <y60/JSAbstractRenderWindow.impl>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 #include <y60/GLContextRegistry.h>
 
@@ -22,6 +23,7 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<acgtk::RenderArea, asl::Ptr<acgtk::RenderArea>, StaticAccessProtocol>;
 template class JSAbstractRenderWindow<acgtk::RenderArea>;
 
 typedef JSAbstractRenderWindow<acgtk::RenderArea> JSY60BASE;

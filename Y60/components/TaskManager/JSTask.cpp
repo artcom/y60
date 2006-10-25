@@ -21,6 +21,7 @@
 #include <y60/JSRenderer.h>
 #include <y60/JScppUtils.h>
 #include <y60/JScppUtils.impl>
+#include <y60/JSWrapper.impl>
 
 #include <iostream>
 
@@ -31,6 +32,8 @@ using namespace y60;
 #define DB(x) // x
 
 namespace jslib {
+
+    template class JSWrapper<y60::Task, asl::Ptr<y60::Task> , jslib::StaticAccessProtocol>;
 
     static JSBool
     terminate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

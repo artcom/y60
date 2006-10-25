@@ -7,21 +7,14 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSKeyframe.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.4 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSKeyframe.h"
-#include "JScppUtils.h"
-#include "JScppUtils.impl"
-#include "JSNode.h"
-#include "JSVector.h"
-#include "JSQuaternion.h"
+#include <Y60/JScppUtils.h>
+#include <Y60/JScppUtils.impl>
+#include <Y60/JSNode.h>
+#include <Y60/JSVector.h>
+#include <Y60/JSQuaternion.h>
+#include <Y60/JSWrapper.impl>
 
 #include <iostream>
 
@@ -29,6 +22,9 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<QuaternionKeyframe, asl::Ptr<QuaternionKeyframe>, 
+         StaticAccessProtocol>;
 
 typedef asl::QuaternionKeyframe NATIVE;
 

@@ -8,11 +8,11 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-
 #include "JSVBox.h"
 #include "JSBox.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
@@ -20,6 +20,7 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<Gtk::VBox, asl::Ptr<Gtk::VBox>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

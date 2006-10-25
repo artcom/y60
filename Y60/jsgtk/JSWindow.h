@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSWindow.h,v $
-//   $Author: christian $
-//   $Revision: 1.8 $
-//   $Date: 2005/04/24 17:54:19 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSWINDOW_INCLUDED_
 #define _Y60_ACGTKSHELL_JSWINDOW_INCLUDED_

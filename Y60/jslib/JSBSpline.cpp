@@ -8,10 +8,14 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include "JSVector.h"
+#include <Y60/JSVector.h>
 #include "JSBSpline.h"
+#include <Y60/JSWrapper.impl>
 
 namespace jslib {
+
+    template class JSWrapper<asl::BSpline<BSplineNumber>, asl::Ptr<asl::BSpline<BSplineNumber> >,
+             StaticAccessProtocol>;
 
     template <>
     struct JSClassTraits<asl::BSpline<BSplineNumber> >

@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSComboBoxText.h,v $
-//   $Author: christian $
-//   $Revision: 1.1 $
-//   $Date: 2005/04/21 17:58:32 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSCOMBOBOXTEXT_INCLUDED_
 #define _Y60_ACGTKSHELL_JSCOMBOBOXTEXT_INCLUDED_

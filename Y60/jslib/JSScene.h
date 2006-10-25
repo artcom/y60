@@ -7,19 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSScene.h,v $
-//   $Author: martin $
-//   $Revision: 1.1 $
-//   $Date: 2005/03/30 15:54:32 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_JSLIB_JSSCENE_INCLUDED_
 #define _Y60_JSLIB_JSSCENE_INCLUDED_
 
-#include "JSWrapper.h"
+#include <Y60/JSWrapper.h>
 
 #include <y60/Scene.h>
 

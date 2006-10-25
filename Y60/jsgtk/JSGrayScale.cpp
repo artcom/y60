@@ -7,20 +7,12 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSGrayScale.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.11 $
-//   $Date: 2005/04/21 16:25:02 $
-//
-//
-//=============================================================================
-
 
 #include "JSGrayScale.h"
 #include "JSSignal1.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
@@ -28,6 +20,8 @@ using namespace asl;
 using namespace acgtk;
 
 namespace jslib {
+
+template class JSWrapper<acgtk::GrayScale, asl::Ptr<acgtk::GrayScale>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

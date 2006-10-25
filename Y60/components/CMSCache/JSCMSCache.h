@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSCMSCache.h,v $
-//   $Author: martin $
-//   $Revision: 1.5 $
-//   $Date: 2005/03/31 13:12:12 $
-//
-//
-//=============================================================================
 
 #ifndef _ac_y60_components_jsCMSCache_h_
 #define _ac_y60_components_jsCMSCache_h_

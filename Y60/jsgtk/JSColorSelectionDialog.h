@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSColorSelectionDialog.h,v $
-//   $Author: danielk $
-//   $Revision: 1.1 $
-//   $Date: 2005/01/14 14:36:27 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSCOLOR_SELECTION_DIALOG_INCLUDED_
 #define _Y60_ACGTKSHELL_JSCOLOR_SELECTION_DIALOG_INCLUDED_

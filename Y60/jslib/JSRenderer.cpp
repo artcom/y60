@@ -7,24 +7,17 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSRenderer.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.15 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSRenderer.h"
-#include "JScppUtils.h"
-#include "JSBox.h"
-#include "JSVector.h"
-#include "JSLine.h"
-#include "JSTriangle.h"
-#include "JSSphere.h"
+#include <Y60/JScppUtils.h>
+#include <Y60/JSBox.h>
+#include <Y60/JSVector.h>
+#include <Y60/JSLine.h>
+#include <Y60/JSTriangle.h>
+#include <Y60/JSSphere.h>
 #include "JSBSpline.h"
 #include "JSSvgPath.h"
+#include <Y60/JSWrapper.impl>
 
 #include <iostream>
 
@@ -33,6 +26,8 @@ using namespace asl;
 using namespace y60;
 
 namespace jslib {
+
+template class JSWrapper<y60::Renderer,asl::Ptr<y60::Renderer>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

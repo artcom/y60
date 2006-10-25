@@ -7,19 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSBox.h,v $
-//   $Author: christian $
-//   $Revision: 1.5 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACXPSHELL_JSBOX2_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSBOX2_H_INCLUDED_
 
-#include "JSWrapper.h"
+#include <Y60/JSWrapper.h>
 
 #include <asl/Vector234.h>
 #include <asl/numeric_functions.h>

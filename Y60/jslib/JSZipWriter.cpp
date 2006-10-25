@@ -7,18 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSZipWriter.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.6 $
-//   $Date: 2005/04/28 17:12:58 $
-//
-//
-//=============================================================================
 
 #include "JSZipWriter.h"
-#include "JScppUtils.h"
-#include "JSBlock.h"
+#include <Y60/JScppUtils.h>
+#include <Y60/JSBlock.h>
+#include <Y60/JSWrapper.impl>
 
 #include <asl/file_functions.h>
 
@@ -27,6 +20,8 @@ using namespace asl;
 using namespace jslib;
 
 namespace jslib {
+
+template class JSWrapper<asl::ZipWriter, asl::Ptr<asl::ZipWriter>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

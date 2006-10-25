@@ -11,13 +11,17 @@
 #include "JSAbstractRenderWindow.h"
 #include "JSOffscreenRenderArea.h"
 #include "JSAbstractRenderWindow.impl"
-#include "JSNode.h"
+#include <Y60/JSWrapper.impl>
+#include <Y60/JSNode.h>
 
 using namespace std;
 using namespace asl;
 
 
 namespace jslib {
+
+template class JSWrapper<OffscreenRenderArea, asl::Ptr<OffscreenRenderArea>, 
+         StaticAccessProtocol>;
 
 template class JSAbstractRenderWindow<OffscreenRenderArea>;
 

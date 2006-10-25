@@ -7,20 +7,13 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSColorButton.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/13 10:38:06 $
-//
-//
-//=============================================================================
 
 #include "JSColorButton.h"
 #include "JSSignalProxies.h"
 #include "jsgtk.h"
 #include <y60/JSVector.h>
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
@@ -28,6 +21,7 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<Gtk::ColorButton, asl::Ptr<Gtk::ColorButton>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

@@ -9,15 +9,18 @@
 //=============================================================================
 
 #include "JSSvgPath.h"
-#include "JSVector.h"
-#include "JSMatrix.h"
-#include "JSLine.h"
-#include "JSSphere.h"
+#include <Y60/JSVector.h>
+#include <Y60/JSMatrix.h>
+#include <Y60/JSLine.h>
+#include <Y60/JSSphere.h>
 #include "JSBSpline.h"
+#include <Y60/JSWrapper.impl>
 
 #include <asl/string_functions.h>
 
 namespace jslib {
+
+    template class JSWrapper<asl::SvgPath, asl::Ptr<asl::SvgPath>, StaticAccessProtocol>;
 
     template <>
     struct JSClassTraits<asl::SvgPath>

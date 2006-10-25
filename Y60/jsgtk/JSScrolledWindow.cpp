@@ -7,18 +7,11 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSScrolledWindow.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.10 $
-//   $Date: 2005/04/24 17:54:19 $
-//
-//
-//=============================================================================
 
 #include "JSScrolledWindow.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 #include <gdkmm/general.h>
 
@@ -26,6 +19,9 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<Gtk::ScrolledWindow, asl::Ptr<Gtk::ScrolledWindow>, 
+        StaticAccessProtocol>;
 
 typedef Gtk::ScrolledWindow NATIVE;
 

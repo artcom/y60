@@ -11,7 +11,7 @@
 #ifndef _Y60_JSBSPLINE_H_
 #define _Y60_JSBSPLINE_H_
 
-#include "JSWrapper.h"
+#include <Y60/JSWrapper.h>
 
 #include <asl/Vector234.h>
 #include <asl/BSpline.h>

@@ -19,6 +19,7 @@
 #include "JSTaskWindow.h"
 #include <y60/JScppUtils.h>
 #include <y60/JSVector.h>
+#include <y60/JSWrapper.impl>
 
 #include <iostream>
 
@@ -29,6 +30,8 @@ using namespace y60;
 #define DB(x) // x
 
 namespace jslib {
+
+    template class JSWrapper<y60::TaskWindow, y60::TaskWindowPtr, StaticAccessProtocol>;
 
     static JSBool
     setAlwaysOnTop(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

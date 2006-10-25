@@ -7,27 +7,17 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSRenderer.h,v $
-//   $Author: christian $
-//   $Revision: 1.3 $
-//   $Date: 2005/02/10 19:59:31 $
-//
-//   Description: Base class wrapper for RenderWindow
-//   TODO: this is not (yet) used by the SDL-based app
-//
-//=============================================================================
 
 #ifndef _Y60_JSLIB_JSRENDERER_INCLUDED_
 #define _Y60_JSLIB_JSRENDERER_INCLUDED_
 
-#include "JSWrapper.h"
-#include "JSLine.h"
-#include "JSTriangle.h"
-#include "JSSphere.h"
-#include "JSVector.h"
-#include "JSMatrix.h"
-#include "JSNode.h"
+#include <Y60/JSWrapper.h>
+#include <Y60/JSLine.h>
+#include <Y60/JSTriangle.h>
+#include <Y60/JSSphere.h>
+#include <Y60/JSVector.h>
+#include <Y60/JSMatrix.h>
+#include <Y60/JSNode.h>
 
 #include <y60/Renderer.h>
 

@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSFileChooserDialog.h,v $
-//   $Author: danielk $
-//   $Revision: 1.1 $
-//   $Date: 2005/01/12 17:22:01 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSFILECHOOSERDIALOG_INCLUDED_
 #define _Y60_ACGTKSHELL_JSFILECHOOSERDIALOG_INCLUDED_

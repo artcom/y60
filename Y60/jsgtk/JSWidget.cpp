@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSWidget.cpp,v $
-//   $Author: david $
-//   $Revision: 1.16 $
-//   $Date: 2005/04/13 15:24:13 $
-//
-//
-//=============================================================================
 
 #include "JSWidget.h"
 #include "JSWindow.h"
@@ -22,6 +14,7 @@
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
 #include <y60/JSVector.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 #include "JSSignalProxies.h"
 #include "JSGdkCursor.h"
@@ -30,6 +23,8 @@ using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<Gtk::Widget, asl::Ptr<Gtk::Widget>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

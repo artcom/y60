@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSDragButton.h,v $
-//   $Author: martin $
-//   $Revision: 1.6 $
-//   $Date: 2005/03/30 15:54:32 $
-//
-//
-//=============================================================================
 
 #ifndef TNT_JS_DRAG_BUTTON
 #define TNT_JS_DRAG_BUTTON

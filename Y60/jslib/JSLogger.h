@@ -8,22 +8,13 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//   $RCSfile: JSLogger.h,v $
-//
-//   $Author: jens $
-//
-//   $Revision: 1.2 $
-//
-//=============================================================================
 
 #ifndef _ac_jslib_JSLogger_h_
 #define _ac_jslib_JSLogger_h_
 
 #include <asl/Logger.h>
 #include <asl/Ptr.h>
-#include "JSWrapper.h"
-
+#include <Y60/JSWrapper.h>
 
 namespace jslib {
 

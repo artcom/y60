@@ -7,24 +7,19 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSMessageDialog.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/21 16:25:02 $
-//
-//
-//=============================================================================
 
 #include "JSMessageDialog.h"
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
 using namespace asl;
 
 namespace jslib {
+
+template class JSWrapper<Gtk::MessageDialog, asl::Ptr<Gtk::MessageDialog>, StaticAccessProtocol>;
 
 typedef Gtk::MessageDialog NATIVE;
 

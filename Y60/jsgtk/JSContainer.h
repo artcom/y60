@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSContainer.h,v $
-//   $Author: david $
-//   $Revision: 1.6 $
-//   $Date: 2005/04/06 16:47:31 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACGTKSHELL_JSCONTAINER_INCLUDED_
 #define _Y60_ACGTKSHELL_JSCONTAINER_INCLUDED_

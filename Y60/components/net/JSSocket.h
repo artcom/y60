@@ -7,21 +7,12 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSSocket.h,v $
-//   $Author: martin $
-//   $Revision: 1.5 $
-//   $Date: 2005/02/25 14:58:30 $
-//
-//
-//=============================================================================
 
 #ifndef _ac_jslib_JSSocket_h_
 #define _ac_jslib_JSSocket_h_
 
 #include <y60/JSWrapper.h>
 #include <asl/Socket.h>
-
 
 class JSSocket : public jslib::JSWrapper<inet::Socket, asl::Ptr<inet::Socket> , jslib::StaticAccessProtocol> {
         JSSocket() {}

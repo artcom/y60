@@ -15,6 +15,7 @@
 #include "jsgtk.h"
 #include <y60/JScppUtils.h>
 #include <y60/JSVector.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
@@ -22,6 +23,7 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<Gtk::ColorSelection, asl::Ptr<Gtk::ColorSelection>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

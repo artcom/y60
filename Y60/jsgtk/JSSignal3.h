@@ -232,6 +232,9 @@ jsval as_jsval(JSContext *cx, asl::Ptr<sigc::signal3<R, P0, P1, P2> > & theValue
     return OBJECT_TO_JSVAL(myObject);
 }
 
+#define INSTANTIATE_SIGNAL3_WRAPPER(R, P0, P1, P2) \
+    template class JSWrapper<sigc::signal3<R, P0, P1, P2>, asl::Ptr<sigc::signal3<R, P0, P1, P2> >, \
+        StaticAccessProtocol>;
 }
 
 #endif

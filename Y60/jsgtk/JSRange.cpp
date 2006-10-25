@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSRange.cpp,v $
-//   $Author: martin $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/21 16:25:02 $
-//
-//
-//=============================================================================
 
 #include "JSRange.h"
 #include "JSWidget.h"
@@ -22,6 +14,7 @@
 #include "jsgtk.h"
 #include <y60/JSVector.h>
 #include <y60/JScppUtils.h>
+#include <y60/JSWrapper.impl>
 #include <iostream>
 
 using namespace std;
@@ -29,6 +22,7 @@ using namespace asl;
 
 namespace jslib {
 
+template class JSWrapper<Gtk::Range, asl::Ptr<Gtk::Range>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
