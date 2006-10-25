@@ -59,7 +59,7 @@ window.onFrame = function(theTime) {
             exit(1);
         }
         var myMemoryIncrease = (myMemory - ourInitialMemory) / 1024;
-        if (myMemoryIncrease > 500) {
+        if (myMemoryIncrease > 550) {
             Logger.error("Memory usage increased by: " + myMemoryIncrease + " KB");
             exit(1);
         } else {
