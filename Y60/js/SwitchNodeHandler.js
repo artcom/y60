@@ -92,39 +92,24 @@ SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex
     Public.setActiveChild = function( theIndex ) {
         Public.activeChild.visible.visible = false;
         Public.activeIndex = theIndex;
-        //_myActiveChild = theIndex;
         Public.activeChild.visible = true;
     }
 
-    Public.setActiveChildByName = function( theName ) {
+    Public.setActiveChildByName = function(theName, theSubnameFlag) {
         Public.activeChild.visible = false;
         for (var i = 0; i < Public.childCount; ++i) {
-            if (Public.node.childNode( i ).name == theName) {
+            if ((Public.node.childNode(i).name == theName) 
+                 || (theSubnameFlag && Public.node.childNode(i).name.indexOf(theName) != -1)) 
+            {
                 Public.activeIndex = i;
-                //_myActiveChild = i;
                 break;
             }
         }
         Public.activeChild.visible = true;
-    }
-
-    Public.setActiveChildBySubName = function( theString ) {
-        Public.activeChild.visible = false;
-        for (var i = 0; i < Public.childCount; ++i) {
-            if (Public.node.childNode( i ).name.indexOf(theString) != -1) {
-                Public.activeIndex = i;
-                //_myActiveChild = i;
-                break;
-            }
-        }
-        Public.activeChild.visible = true;
-        
     }
 
     setup( theActiveIndex );
 }
-
-
 
 /***********************************************************
  *                                                         *
@@ -134,7 +119,6 @@ SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex
 function MSwitchNodeHandler( theNode ) {
     this.Constructor( this, theNode );
 }
-
 
 MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
     var Public    = obj;
@@ -151,12 +135,14 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         Public.activeIndex = theIndex;
         //_myActiveChild = theIndex;
     }
-    Public.setActiveChildByName = function( theName ) {
-        setMaterial( theName );
-        for (var i = 0; i < Public.childCount; ++i) {
-            if (Public.node.childNode( i ).name == theName) {
+    
+    Public.setActiveChildByName = function(theName, theSubnameFlag) {
+        setMaterial(theName);
+        for (var i=0; i<Public.childCount; ++i) {
+            if ((Public.node.childNode(i).name == theName) 
+                 || (theSubnameFlag && Public.node.childNode(i).name.indexOf(theName) != -1)) 
+            {
                 Public.activeIndex = i;
-                //_myActiveChild = i;
                 break;
             }
         }
@@ -179,13 +165,13 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
     }
     
     function setMaterial(theMaterialCode) {
-        //print("switchMaterials(", theMaterialCode, " ", Public.node);
+        // print("switchMaterials(", theMaterialCode, " ", Public.node);
         // First Step: Search inside the switch for the material with the materialcode
         
         var myNewMaterial = null;
         for (var i = 0; i < Public.childCount; ++i) {
             var myChild = Public.node.childNode( i );
-            if (myChild.name == theMaterialCode) {
+            if (myChild.name.indexOf(theMaterialCode) != -1) {
                 var myShapeId = "";
                 if (myChild.nodeName == "body") {
                     myShapeId = myChild.shape;
@@ -207,14 +193,14 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
             }
         }
 
-        //print("new mat: " + myNewMaterial);
+        // print("new mat: " + myNewMaterial);
 
         if (!myNewMaterial) {
             Logger.warning("Could not find material: " + theMaterialCode);
             return;
         }
 
-        //print("target mat: " + myTargetMaterial);
+        // print("target mat: " + _myTargetMaterial);
         // Third step: Setup target material
         var myNewProperties = myNewMaterial.properties;
         var myTargetProperties = _myTargetMaterial.properties;
@@ -241,6 +227,8 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         if ("glow" in myNewProperties) {
             myTargetProperties.glow = myNewProperties.glow;
         }
+   
+        // print("target mat(after copy): " + _myTargetMaterial);
     }
 
     var _myTargetMaterial = null;
@@ -324,8 +312,13 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         Public.node.childNode("textures").firstChild.image = myImage;
     }
 
-    Public.setActiveChildByName = function(theName) {
+    Public.setActiveChildByName = function(theName, theSubnameFlag) {
         if (!_mySwitches) {
+            return;
+        }
+        
+        if (theSubnameFlag) {
+            Public.setActiveChildBySubName(theName);
             return;
         }
     
@@ -339,10 +332,6 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
     }
     
     Public.setActiveChildBySubName = function(theSubName) {
-        if (!_mySwitches) {
-            return;
-        }
-
         var myNode = null;
         for (var i=0; i<_mySwitches.childNodesLength(); ++i) {
             myNode = _mySwitches.childNode(i);
