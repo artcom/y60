@@ -45,9 +45,12 @@ namespace jslib {
 
 #define DB(x)  x
 
-template class JSWrapper<asl::Bitset<class asl::Enum<enum y60::RenderStyleEnum,6> > >;
-//template class JSWrapper<asl::Bitset<class asl::Enum<enum y60::TargetBuffersEnum,6> > >;
-//template class JSWrapper<asl::Bitset<class asl::Enum<enum y60::BlendEquationEnum,6> > >;
+template class JSWrapper<asl::Bitset<class asl::Enum<enum y60::RenderStyleEnum,
+         y60::RenderStyleEnum_MAX> > >;
+template class JSWrapper<asl::Bitset<class asl::Enum<enum y60::TargetBuffersEnum,
+         y60::TargetBuffersEnum_MAX> > >;
+template class JSWrapper<class asl::Enum<enum y60::BlendEquationEnum,
+         y60::BlendEquationEnum_MAX> >;
 
 template jsval as_jsval(JSContext *cx, const std::vector<dom::NodePtr> & theVector);
 
