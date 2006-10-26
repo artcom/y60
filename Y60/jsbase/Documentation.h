@@ -29,20 +29,20 @@
 
 #define DOC_BEGIN(DESCRIPTION) \
     if ( ! cx) {\
-        reinterpret_cast<FunctionDescription*>(obj)->description = DESCRIPTION;
+        reinterpret_cast<jslib::FunctionDescription*>(obj)->description = DESCRIPTION;
 
 #define DOC_PARAM(NAME, DESCRIPTION, TYPE) \
-        describeFunctionParameter(reinterpret_cast<FunctionDescription*>(obj), NAME, DESCRIPTION, TYPE, "");
+        describeFunctionParameter(reinterpret_cast<jslib::FunctionDescription*>(obj), NAME, DESCRIPTION, TYPE, "");
 
 #define DOC_PARAM_OPT(NAME, DESCRIPTION, TYPE, DEFAULT_VALUE) \
-        describeFunctionParameter(reinterpret_cast<FunctionDescription*>(obj), NAME, DESCRIPTION, TYPE, asl::as_string(DEFAULT_VALUE));
+        describeFunctionParameter(reinterpret_cast<jslib::FunctionDescription*>(obj), NAME, DESCRIPTION, TYPE, asl::as_string(DEFAULT_VALUE));
 
 #define DOC_RVAL(DESCRIPTION, TYPE) \
-        reinterpret_cast<FunctionDescription*>(obj)->return_value = DESCRIPTION; \
-        reinterpret_cast<FunctionDescription*>(obj)->return_type = DocTypeDescription[TYPE];
+        reinterpret_cast<jslib::FunctionDescription*>(obj)->return_value = DESCRIPTION; \
+        reinterpret_cast<jslib::FunctionDescription*>(obj)->return_type = DocTypeDescription[TYPE];
 
 #define DOC_RESET \
-        describeFunctionParameter(reinterpret_cast<FunctionDescription*>(obj), "", "", DOC_TYPE_INTERN, "");
+        describeFunctionParameter(reinterpret_cast<jslib::FunctionDescription*>(obj), "", "", DOC_TYPE_INTERN, "");
 
 
 #define DOC_END \
