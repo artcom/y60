@@ -343,7 +343,7 @@ class XmlSchemaUnitTest : public UnitTest {
         XmlSchemaUnitTest() : UnitTest("XmlSchemaUnitTest") {  }
         void run() {
             try {
-#if 0
+#if 1
                 dom::Schema::Exception ex("what","where");
                 ENSURE(ex.what() == "what");
                 ENSURE(ex.where() == "where");
@@ -457,9 +457,9 @@ class XmlSchemaUnitTest : public UnitTest {
                     ENSURE(*dom::dynamic_cast_Value<int>(&myDocument("scene")("shapes")("#text").nodeValueWrapper()) == 12345);
 
                     ENSURE(myDocument("scene")["version"].nodeValue() == "214");
-                    ENSURE(dom::dynamic_cast_Value<unsigned long>(&myDocument("scene")["version"].nodeValueWrapper()));
-                    ENSURE(*dom::dynamic_cast_Value<unsigned long>(&myDocument("scene")["version"].nodeValueWrapper()) == 214);
-                    ENSURE(myDocument("scene")["version"].nodeValueAs<unsigned long>() == 214);
+                    ENSURE(dom::dynamic_cast_Value<asl::Unsigned64>(&myDocument("scene")["version"].nodeValueWrapper()));
+                    ENSURE(*dom::dynamic_cast_Value<asl::Unsigned64>(&myDocument("scene")["version"].nodeValueWrapper()) == 214);
+                    ENSURE(myDocument("scene")["version"].nodeValueAs<asl::Unsigned64>() == 214);
                     ENSURE(myDocument("scene")["version"].nodeValueAs<int>() == 214);
                     ENSURE(myDocument("scene")["version"].nodeValueAs<int>() == 214);
 
@@ -494,6 +494,7 @@ myDocument.getValueFactory()->dump();
                     dom::DOMString myOriginalXml = asl::as_string(myDocument);
                     myDocument.binarize(myBinaryRep);
                     SUCCESS("binarized dom");
+                    DPRINT(myBinaryRep.size());
                     ENSURE(myBinaryRep.size());
 
                     dom::Document rebinDocument;
@@ -518,8 +519,8 @@ myDocument.getValueFactory()->dump();
                     ENSURE(*dom::dynamic_cast_Value<int>(&rebinDocument("scene")("shapes")("#text").nodeValueWrapper()) == 12345);
 
                     ENSURE(rebinDocument("scene")["version"].nodeValue() == "214");
-                    ENSURE(dom::dynamic_cast_Value<unsigned long>(&rebinDocument("scene")["version"].nodeValueWrapper()));
-                    ENSURE(*dom::dynamic_cast_Value<unsigned long>(&rebinDocument("scene")["version"].nodeValueWrapper()) == 214);
+                    ENSURE(dom::dynamic_cast_Value<asl::Unsigned64>(&rebinDocument("scene")["version"].nodeValueWrapper()));
+                    ENSURE(*dom::dynamic_cast_Value<asl::Unsigned64>(&rebinDocument("scene")["version"].nodeValueWrapper()) == 214);
                 }
 
                 {
@@ -1215,11 +1216,11 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
 #if 1
-        addTest(new XmlDomUnitTest);
-        addTest(new XmlDomEventsUnitTest);
+        //addTest(new XmlDomUnitTest);
+        //addTest(new XmlDomEventsUnitTest);
         addTest(new XmlSchemaUnitTest);
 #endif
-        addTest(new XmlPatchUnitTest);
+        //addTest(new XmlPatchUnitTest);
     }
 };
 

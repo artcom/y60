@@ -41,10 +41,10 @@ namespace dom {
 
 
     struct Entry : public asl::MemoryPool<Entry> {
-        Entry(const std::string & theName, unsigned long theIndex) 
+        Entry(const std::string & theName, unsigned int theIndex) 
             :  _myName(theName), _myIndex(theIndex) {}
         DOMString _myName;    
-        unsigned long _myIndex;
+        unsigned int _myIndex;
     };
 
     typedef asl::Ptr<Entry,ThreadingModel> EntryPtr;
@@ -57,7 +57,7 @@ namespace dom {
         DEFINE_NESTED_EXCEPTION(Dictionary,IndexOutOfRange,asl::Exception);
 
         Dictionary() {}
-        bool enterName(const DOMString & theName, unsigned long & theIndex) {
+        bool enterName(const DOMString & theName, unsigned int & theIndex) {
             EntryMap::const_iterator it = _myMap.find(theName);
             if (it != _myMap.end()) {
                 theIndex = it->second->_myIndex;
@@ -70,7 +70,7 @@ namespace dom {
                return true;
             }
         }
-        const std::string & lookupName(unsigned long theIndex) {
+        const std::string & lookupName(unsigned int theIndex) {
             if (theIndex>_myList.size()) {
                 throw IndexOutOfRange(JUST_FILE_LINE);
             }

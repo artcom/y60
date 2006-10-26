@@ -114,8 +114,8 @@ namespace asl {
     // TODO: 64-bit streams and blocks
     // not ready yet - have to also think about
     // 64-bit file i/o
-    typedef unsigned long long AC_SIZE_TYPE;
-    typedef signed long long AC_OFFSET_TYPE;
+    typedef Unsigned32 AC_SIZE_TYPE;
+    typedef Unsigned32 AC_OFFSET_TYPE;
 #endif    
 
 /* @} */

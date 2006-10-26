@@ -235,12 +235,12 @@ void dom::registerStandardTypes(ValueFactory & theFactory) {
 
 	theFactory.registerPrototype("decimal", ValuePtr(new SimpleValue<double>(0, 0))); // TODO: make special type for this
 
-	theFactory.registerPrototype("long", ValuePtr(new SimpleValue<long>(0, 0)));
+	theFactory.registerPrototype("long", ValuePtr(new SimpleValue<asl::Signed64>(0, 0))); // keep this arch independent
 	theFactory.registerPrototype("int", ValuePtr(new SimpleValue<int>(0, 0)));
 	theFactory.registerPrototype("short", ValuePtr(new SimpleValue<short>(0, 0)));
 	theFactory.registerPrototype("byte", ValuePtr(new SimpleValue<char>(0, 0)));
 
-	theFactory.registerPrototype("unsignedLong", ValuePtr(new SimpleValue<unsigned long>(0, 0)));
+	theFactory.registerPrototype("unsignedLong", ValuePtr(new SimpleValue<asl::Unsigned64>(0, 0))); // keep this arch independent
 	theFactory.registerPrototype("unsignedInt", ValuePtr(new SimpleValue<unsigned int>(0, 0)));
 	theFactory.registerPrototype("unsignedShort", ValuePtr(new SimpleValue<unsigned short>(0, 0)));
 	theFactory.registerPrototype("unsignedByte", ValuePtr(new SimpleValue<unsigned char>(0, 0)));

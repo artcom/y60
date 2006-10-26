@@ -44,6 +44,7 @@
 #define _asl_base_Enum_h_included_
 
 #include "Exception.h"
+#include "settings.h"
 
 #include <vector>
 #include <bitset>
@@ -260,11 +261,16 @@ class Enum {
 template <class THE_ENUM>
 class Bitset : public std::bitset<THE_ENUM::MAX> {
     public:
+        typedef Unsigned32 int_type; 
         typedef THE_ENUM Flags;
 
-        Bitset(unsigned long theValue = 0) :
+        Bitset(int_type theValue = 0) :
             std::bitset<THE_ENUM::MAX>(theValue) 
         {}
+
+        operator int_type () const {
+            return this->to_ulong();
+        }
 
         std::istream & parse(std::istream & is) {
             this->reset();
@@ -325,6 +331,7 @@ class Bitset : public std::bitset<THE_ENUM::MAX> {
             return _ourName;
         }
     private:
+        operator long() const;
         static const char * _ourName ;
 };
 

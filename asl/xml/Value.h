@@ -154,7 +154,7 @@ namespace dom {
 #ifdef UNCOMPRESSED_VECTORS
     template <class T>
         void binarize(const std::vector<T> & myValue, asl::WriteableStream & theDest) {
-            theDest.appendUnsigned(myValue.size());
+            theDest.appendUnsigned(asl::AC_SIZE_TYPE(myValue.size()));
             for (int i = 0; i < myValue.size(); ++i) {
                 binarize(myValue[i],theDest);
             }
@@ -181,7 +181,7 @@ namespace dom {
 
    template <class T>
         void binarizeGeneric(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
-            theDest.appendUnsigned(theVector.size());
+            theDest.appendUnsigned(asl::AC_SIZE_TYPE(theVector.size()));
             unsigned int i = 0;
             bool equalSequence = true;
             while (i < theVector.size()) {
@@ -257,7 +257,7 @@ namespace dom {
         };
     template <class T>
         void binarizePODT(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
-            theDest.appendUnsigned(theVector.size());
+            theDest.appendUnsigned(asl::AC_SIZE_TYPE(theVector.size()));
             unsigned int i = 0;
             bool equalSequence = true;
             while (i < theVector.size()) {

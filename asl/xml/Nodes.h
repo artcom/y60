@@ -1383,8 +1383,8 @@ Dependent on node type allowed children are:<p>
         const DOMString & new_attribute_value);
 
     inline
-    unsigned long countNodes(const Node & theDom) {
-        unsigned long myNodeCount = 1 + theDom.attributesLength();
+    unsigned int countNodes(const Node & theDom) {
+        unsigned int myNodeCount = 1 + theDom.attributesLength();
         for (int i = 0; i < theDom.childNodesLength();++i) {
             myNodeCount += countNodes(*theDom.childNode(i));
         }

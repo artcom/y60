@@ -31,6 +31,7 @@
 
 #include "Ptr.h"
 #include "Path.h"
+#include "Enum.h"
 
 #include <fstream>
 #include <vector>
@@ -179,6 +180,17 @@ namespace asl {
         /// copies sizeof(TX) bytes to theDest starting at theOffset
         virtual size_type readBytes(void * theDest, size_type theSize, size_type theReadOffset) const = 0;
         
+        /// read specialized for asl::Bitsets. Arch independent data size 
+        template <class T>
+        size_type readData(asl::Bitset<T> & theDest, size_type theReadOffset) const {
+            typename asl::Bitset<T>::int_type myValue;
+            size_type myResult = readBytes(&myValue, sizeof(myValue), theReadOffset);
+            NumberReader<typename Arranger::self, typename asl::Bitset<T>::int_type, 
+                            sizeof(typename asl::Bitset<T>::int_type)>::swapBytes(myValue);
+            theDest = myValue;
+            return myResult;
+        }
+
         /// copies sizeof(TX) bytes to theDest starting at theOffset
         template <class TX>
         size_type readData(TX & theDest, size_type theReadOffset, size_type theSize=0) const {
@@ -455,6 +467,11 @@ namespace asl {
         WriteableStream & appendData(const T & thePlainOldData) {
             return append(&thePlainOldData, sizeof(thePlainOldData));
         }
+        template <class T>
+        WriteableStream & appendData(const asl::Bitset<T> & theBitset) {
+            typename asl::Bitset<T>::int_type myValue = theBitset;
+            return append(&myValue, sizeof(myValue));
+        }
         template <class TN>
         WriteableStream & appendPackedNumber(TN theNumber, size_type theNumberSize) {
             if (theNumberSize <= sizeof(theNumber)) {
@@ -597,7 +614,7 @@ namespace asl {
             return append(&(*theString.begin()), theString.size());
         }
         WriteableStream & appendCountedString(const std::string & theString) {
-            appendUnsigned(theString.size());
+            appendUnsigned(SIZE_TYPE(theString.size()));
             return appendString(theString);
         }
         virtual operator bool() const = 0;

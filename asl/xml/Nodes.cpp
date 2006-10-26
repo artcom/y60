@@ -225,7 +225,7 @@ namespace dom {
     bool is_decimal_number(const String & s, unsigned int & r, unsigned int max_value = MAX_CHAR_VALUE) {
         if (s.size() == 0)
             return false;
-        unsigned long result = 0;
+        unsigned int result = 0;
         for (unsigned int i = 0; i< s.size();++i) {
             if (is_digit(s[i])) {
                 result*=10;
@@ -242,7 +242,7 @@ namespace dom {
     bool is_hex_number(const String & s, unsigned int & r, unsigned int max_value = MAX_CHAR_VALUE) {
         if (s.size() == 0)
             return false;
-        unsigned long result = 0;
+        unsigned int result = 0;
         for (unsigned int i = 0; i< s.size();++i) {
             unsigned int num;
             if (hex_to_num(s[i],num)) {
@@ -1297,7 +1297,7 @@ dom::Node::print(std::ostream& os, const String& indent) const {
 
                     const NodePtr myAttribute = _myAttributes.item(attr);
                     DOMString myAttributeValue;
-                    unsigned long myChildCount = myAttribute->childNodes().length();
+                    unsigned int myChildCount = myAttribute->childNodes().length();
                     if (myChildCount == 0) {
                         myAttributeValue = myAttribute->nodeValue();
                     }
@@ -2446,7 +2446,7 @@ dom::Node::binarize(asl::WriteableStream & theDest, Dictionaries * theDicts, asl
         myNodeType|=isPatch;
     }
 
-    unsigned long myNameIndex = 0;
+    unsigned int myNameIndex = 0;
     if (nodeName().size() &&
         !(myNodeType&isUnmodifiedProxy) &&
         nodeType()!=TEXT_NODE && 
@@ -2597,12 +2597,12 @@ dom::Node::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE t
         } else {
             thePos = theSource.readCountedString(_myName, thePos);
             if (_myType == ELEMENT_NODE) {
-                unsigned long myIndex = 0;
+                unsigned int myIndex = 0;
                 if (!theDicts->_myElementNames.enterName(_myName, myIndex)) {
                     throw FormatCorrupted("Name is already in _myElementNames Dictionary",PLUS_FILE_LINE);
                 }
             } else if (_myType == ATTRIBUTE_NODE) {
-                unsigned long myIndex = 0;
+                unsigned int myIndex = 0;
                 if (!theDicts->_myAttributeNames.enterName(_myName, myIndex)) {
                     throw FormatCorrupted("Name is already in _myAttributeNames Dictionary",PLUS_FILE_LINE);
                 }

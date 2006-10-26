@@ -174,7 +174,7 @@ dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TY
 	thePos = theSource.readUnsigned(mySize,thePos);
     DB(AC_TRACE << "dom::NodeList::debinarize count = " << mySize << endl);
     if (!thePatchFlag) {
-	    for (unsigned long n=0; n < mySize; ++n) {
+	    for (asl::AC_SIZE_TYPE n=0; n < mySize; ++n) {
 		    NodePtr newNode(new Node);
             if (_myShell) {
  	            newNode->reparent(_myShell, _myShell);
@@ -187,9 +187,9 @@ dom::NodeList::debinarize(const asl::ReadableStream & theSource, asl::AC_SIZE_TY
 	    }
     } else {
         // patch mode
-        unsigned long di = 0; // destination index
-	    for (unsigned long si=0; si < mySize; ) { // src index
-            unsigned long theNewPos = thePos;
+        asl::AC_SIZE_TYPE di = 0; // destination index
+	    for (asl::AC_SIZE_TYPE si=0; si < mySize; ) { // src index
+            asl::AC_SIZE_TYPE theNewPos = thePos;
             DB(AC_TRACE << "NodeList::debinarize si = " << si << ", length = " << length() << endl);
             bool myUnmodifiedProxyFlag = false;
             if (di < length()) {
