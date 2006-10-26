@@ -10,7 +10,7 @@
 
 #include "JSApp.h"
 
-#include <y60/jscpp.h>
+#include "jscpp.h"
 #include <y60/JScppUtils.h>
 #include <y60/JScppUtils.impl>
 #include <y60/JSNode.h>
