@@ -18,12 +18,15 @@
 
 #include "JSNodeList.h"
 #include "JSNamedNodeMap.h"
+#include "JSWrapper.impl"
 #include <iostream>
 
 using namespace std;
 using namespace dom;
 
 namespace jslib {
+
+template class JSWrapper<dom::NamedNodeMap,dom::NodePtr,StaticAccessProtocol>;
 
 // TODO: add namedItem getter and setter functions
 JSFunctionSpec *

@@ -22,6 +22,7 @@
 #include "JSNode.h"
 #include "JScppUtils.h"
 #include "JSNodeList.h"
+#include "JSWrapper.h"
 
 namespace jslib {
 
