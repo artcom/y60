@@ -13,6 +13,7 @@
 #include "JSNamedNodeMap.h"
 #include "JScppUtils.h"
 #include "JScppUtils.impl"
+#include "JSWrapper.impl"
 
 #include "JSBox.h"
 #include "JSTriangle.h"
@@ -29,7 +30,6 @@
 #include "JSEnum.h"
 #include "JSBitset.h"
 
-
 #include <asl/os_functions.h>
 #include <asl/Logger.h>
 #include <y60/Image.h>
@@ -44,6 +44,10 @@ using namespace asl;
 namespace jslib {
 
 #define DB(x)  x
+
+template class JSWrapper<asl::Bitset<class asl::Enum<enum y60::RenderStyleEnum,6> > >;
+//template class JSWrapper<asl::Bitset<class asl::Enum<enum y60::TargetBuffersEnum,6> > >;
+//template class JSWrapper<asl::Bitset<class asl::Enum<enum y60::BlendEquationEnum,6> > >;
 
 template jsval as_jsval(JSContext *cx, const std::vector<dom::NodePtr> & theVector);
 
@@ -184,11 +188,10 @@ public:
         REGISTER_BYREFERENCE_CONVERTER(Frustum);
         REGISTER_BYREFERENCE_CONVERTER(Box3f);
         REGISTER_BYREFERENCE_CONVERTER(Triangle<TriangleNumber>);
-// The following lines introduce a dependency from jsbase to y60::Renderer. If they're 
-// needed, they need to be somewhere else.
-//        REGISTER_BYREFERENCE_CONVERTER(y60::RenderStyles);
-//        REGISTER_BYREFERENCE_CONVERTER(y60::BlendEquation);
-//        REGISTER_BYREFERENCE_CONVERTER(y60::TargetBuffers);
+        // XXX: The following lines introduce a dependency from jsbase to y60::base. 
+        REGISTER_BYREFERENCE_CONVERTER(y60::RenderStyles);
+        REGISTER_BYREFERENCE_CONVERTER(y60::BlendEquation);
+        REGISTER_BYREFERENCE_CONVERTER(y60::TargetBuffers);
 
     }
 };
