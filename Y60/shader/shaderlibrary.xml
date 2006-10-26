@@ -1172,4 +1172,27 @@
             </properties>
         </fragmentshader>
     </shader>
+     <shader id="s132" name="fade" cost="10">
+       <supports>
+            <feature class="textures" values="[fade]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="texcoord" values="[*]"/>
+        </supports>
+        <vertexshader profile="VP30" file="fade.cg" entryfunction="mainVertex">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="fade.cg" entryfunction="mainFragment">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+                <float name="weight">1</float>
+            </properties>
+        </fragmentshader>
+    </shader>
+
 </shaders>
