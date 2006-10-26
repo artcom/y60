@@ -1035,18 +1035,24 @@ MaterialExporter::findRelativeFilePath(const std::string & theFileName) {
     // find filename from base
     std::string myAbsoluteFileName = myRelativeFileName;
     std::size_t mySlashPos = std::string::npos;
-    do {
+    while (mySlashPos != 0) {
         mySlashPos = myAbsoluteFileName.rfind("/", mySlashPos);
         if (mySlashPos == std::string::npos) {
-            AC_ERROR << "Unable to find '" << myAbsoluteFileName << "' relative to '" << _myBaseDirectory << "'";
-            return myAbsoluteFileName;
+            break;
         }
         myRelativeFileName = myAbsoluteFileName.substr(mySlashPos+1);
         myFileName = _myBaseDirectory + myRelativeFileName;
-        mySlashPos--;
-    } while (!fileExists(myFileName));
+        if (fileExists(myFileName)) {
+            AC_DEBUG << "Found '" << myFileName << "' relative=" << myRelativeFileName;
+            return myRelativeFileName;
+        }
+        if (mySlashPos > 0) {
+            mySlashPos--;
+        }
+    }
 
-    return myRelativeFileName;
+    AC_ERROR << "Unable to find '" << myAbsoluteFileName << "' relative to '" << _myBaseDirectory << "'";
+    return myAbsoluteFileName;
 }
 
 std::string
