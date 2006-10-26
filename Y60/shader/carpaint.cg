@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2003-2005 ART+COM AG Berlin
+// Copyright (C) 2003-2006 ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -91,7 +91,7 @@ float4 mainFragment(vert2frag   IN,
     float4 myEnvTexel       = texCUBE(envTex, IN.reflectVector);
     float4 myEmissiveTexel  = texCUBE(emissiveEnvTex, IN.reflectVector);
 #ifdef NO_OCCLUSION
-    float4 myOcclusionTexel = float4(1,0,0,1);
+    float4 myOcclusionTexel = float4(1,1,1,1);
 #else
     float4 myOcclusionTexel = tex2D(decalTex, IN.texCoord0);
 #endif

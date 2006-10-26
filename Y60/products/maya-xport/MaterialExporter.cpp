@@ -708,6 +708,7 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     if (myStatus == MStatus::kFailure) {
         throw ExportException("Could not get diffuse coefficient from node", "MaterialExporter::exportLambertFeatures");
     }
+    //setPropertyValue<float>(theBuilder.getNode(), "float", "diffuseCoeff", myDiffuseCoeff); // UH experimental
 
     myColor = myAmbientColor + (myColor - myAmbientColor) * myDiffuseCoeff;
     asl::Vector4f myDiffuseColor = asl::Vector4f(myColor.r, myColor.g, myColor.b, myAlpha);
