@@ -15,6 +15,7 @@ use("FlyMover.js");
 use("WalkMover.js");
 use("GUIUtils.js");
 use("SwitchNodeMenu.js");
+use("MaterialEditorFunctions.js");
 
 var ourHandler           = {};
 
@@ -27,13 +28,15 @@ var window               = new RenderArea();
 
 var ourGlade             = null;
 var ourViewer            = null;
-var ourMainWindow        = null
+var ourMainWindow        = null;
 var ourPreferenceDialog  = null;
 var ourCameraPopup       = null;
 var ourAnimationManager  = null;
 
 var ourCoordinateSystem  = null;
 var ourStatusBar         = null;
+var ourMaterialComboBox  = null;
+var ourFloatPropsComboBox = null;
 
 var GLADE_FILE = "../GLADE/rendergirl.glade";
 
@@ -91,6 +94,7 @@ ourHandler.on_save_as_activate = function(theArguments) {
         ourStatusBar.set("Saved scene as: " + myFilename);
     }
 }
+
 ourHandler.on_open_activate = function(theArguments) {
     var isPaused = window.pause;
     window.pause = true;
@@ -310,7 +314,62 @@ ourHandler.on_quit_activate = function() {
 //=================================================
 // Tools Menu Item Handlers
 //=================================================
+// Tools->Material Editor
+//=================================================
+ourHandler.on_material_dlg_close_clicked = function() {
+    var myMaterialEditor = ourGlade.get_widget("dlgMaterialEditor");
+    myMaterialEditor.hide();
+}
 
+ourHandler.on_float_slider_value_changed = function() {
+    var myMaterial = getSelectedMaterial();
+    if (!myMaterial) {
+        return;
+    }
+    var myProperty = getDescendantByName(myMaterial, ourFloatPropsComboBox.active_text, true);
+    if (!myProperty) {
+        return;
+    }
+        
+    updateMaterial(myProperty.name);
+}
+
+ourHandler.on_material_editor_activate = function() {
+    ourStatusBar.set("Material Editor started.");
+   
+    var myMaterialEditor = ourGlade.get_widget("dlgMaterialEditor");
+
+    ourMaterialComboBox = new ComboBoxText();
+    ourGlade.get_widget("material_box").pack_end(ourMaterialComboBox, false, false);
+    
+    ourMaterialComboBox.signal_changed.connect(ourMaterialComboBox, "on_changed");
+    ourMaterialComboBox.on_changed = function() {
+        for (i = 0; i < window.scene.materials.childNodesLength(); ++i) {
+            if (window.scene.materials.childNode(i).name == this.active_text) {
+                updateMaterialEditor();
+            }
+        }
+    }
+    
+    ourMaterialComboBox.show();
+
+    // fill material choice rolldown with all available materials
+    var i=0;
+    for (i=0; i<window.scene.materials.childNodesLength(); ++i) {
+        ourMaterialComboBox.append_text(window.scene.materials.childNode(i).name);
+    }
+
+    // enable first element
+    if (i>0) {
+        ourMaterialComboBox.active_text = window.scene.materials.firstChild.name;
+    }
+    
+    myMaterialEditor.show();
+}
+
+//=================================================
+// Tools->Bounding boxes
+//=================================================
 ourHandler.on_bb_off_activate = function() {
     window.getRenderer().boundingVolumeMode = Renderer.BV_NONE;
     ourStatusBar.set("Bounding volume mode: off");
