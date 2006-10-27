@@ -134,22 +134,22 @@ namespace dom {
     void binarize(const T & myValue, asl::WriteableStream & theDest) {
         typedef typename ValueWrapper<T>::Type CheckType; // make sure only wrapped native values get automatically binarized
         theDest.appendData(myValue);
-    };
+    }
 
     template <class T>
     asl::AC_SIZE_TYPE debinarize(T & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0) {
         typedef typename ValueWrapper<T>::Type CheckType; // make sure only wrapped native values get automatically binarized
         return theSource.readData(myValue,thePos);
-    };
+    }
 
     inline
     void binarize(const std::string & myValue, asl::WriteableStream & theDest) {
         theDest.appendCountedString(myValue);
-    };
+    }
     inline
     asl::AC_SIZE_TYPE debinarize(std::string & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0) {
         return theSource.readCountedString(myValue,thePos);
-    };
+    }
 
 #ifdef UNCOMPRESSED_VECTORS
     template <class T>
@@ -158,7 +158,7 @@ namespace dom {
             for (int i = 0; i < myValue.size(); ++i) {
                 binarize(myValue[i],theDest);
             }
-        };
+        }
     template <class T>
         asl::AC_SIZE_TYPE debinarize(std::vector<T> & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0) {
             asl::AC_SIZE_TYPE myCount;
@@ -168,16 +168,16 @@ namespace dom {
                 thePos = debinarize(myValue[i],theSource,thePos);
             }
             return thePos;
-        };
+        }
 #else
     template <class T>
     void binarize(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
         return ValueWrapper<T>::Type::binarizeVector(theVector, theDest);
-    };
+    }
     template <class T>
     asl::AC_SIZE_TYPE debinarize(std::vector<T> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0) {
         return ValueWrapper<T>::Type::debinarizeVector(theVector, theSource, thePos);
-    };
+    }
 
    template <class T>
         void binarizeGeneric(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
@@ -202,7 +202,7 @@ namespace dom {
                     equalSequence = true;
                 }
             }
-        };
+        }
     template <class T>
         asl::AC_SIZE_TYPE debinarizeGeneric(std::vector<T> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             asl::AC_SIZE_TYPE myCount;
@@ -228,7 +228,7 @@ namespace dom {
                 }
             }
             return thePos;
-        };
+        }
 
     template <class T>
         asl::AC_SIZE_TYPE debinarizePODT(std::vector<T> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
@@ -254,7 +254,7 @@ namespace dom {
                 }
             }
             return thePos;
-        };
+        }
     template <class T>
         void binarizePODT(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
             theDest.appendUnsigned(asl::AC_SIZE_TYPE(theVector.size()));
@@ -277,14 +277,14 @@ namespace dom {
                 }
                 i = j;
             }
-        };
+        }
 #endif
    template <class T, class Alloc, class D>
    void binarize(const asl::raster<T, Alloc, D> & myValue, asl::WriteableStream & theDest) {
        theDest.appendUnsigned(myValue.hsize());
        theDest.appendUnsigned(myValue.vsize());
        binarize(myValue.getDataVector(), theDest);
-   };
+   }
    template <class T, class Alloc, class D>
    asl::AC_SIZE_TYPE debinarize(asl::raster<T, Alloc, D> & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0) {
        asl::AC_SIZE_TYPE hsize;
@@ -294,11 +294,13 @@ namespace dom {
        myValue.resize(hsize, vsize);
        thePos = debinarize(myValue.getDataVector(),theSource,thePos);
        return thePos;
-   };
+   }
 
     class StringValue : public ValueBase {
     public:
-        StringValue(Node * theNode) : _isBlockWriteable(false), _myNode(theNode) {
+        StringValue(Node * theNode)
+            : _myStringValue(""), _isBlockWriteable(false), _myNode(theNode)
+        {
             // intentionally no call to update() or bumpversion() here
         }
         StringValue(const asl::ReadableBlock & theValue, Node * theNode)
@@ -333,10 +335,10 @@ namespace dom {
         }
         static void binarizeVector(const std::vector<DOMString> & theVector, asl::WriteableStream & theDest) {
             binarizeGeneric(theVector, theDest);
-        };
+        }
         static asl::AC_SIZE_TYPE debinarizeVector(std::vector<DOMString> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             return debinarizeGeneric(theVector, theSource, thePos);
-        };
+        }
     protected:
         virtual unsigned char * begin() {
             if (!this->isBlockWriteable()) {
@@ -522,7 +524,7 @@ namespace dom {
             if (!asl::fromString(theValue,theResult)) {
                 throw ConversionFailed("could not convert string value '"+theValue+"' to type '"+typeid(T).name()+"'",
                     "Value<T>::asT()");
-            };
+            }
             return theResult;
         }
 
@@ -587,10 +589,10 @@ namespace dom {
         }
         static void binarizeVector(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
             binarizePODT(theVector, theDest);
-        };
+        }
         static asl::AC_SIZE_TYPE debinarizeVector(std::vector<T> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             return debinarizePODT(theVector, theSource, thePos);
-        };
+        }
     protected:
         // This initialization is used only when a derived VectorValue has instantiated this class
         // with a non-simple stl-container as T; we must make sure that _myValue is initialized as
@@ -622,13 +624,13 @@ namespace dom {
             return _myValue;
         }
         virtual void closeWriteableValue() {
-           if (!isValueWriteable()) {
+            if (!isValueWriteable()) {
                 throw ValueNotNativeWriteable(JUST_FILE_LINE);
             }
             setValueWriteable(false);
             this->bumpVersion();
             this->onSetValue();
-       }
+        }
         virtual bool isValueWriteable() const {
             return _isValueWriteable;
         }
@@ -661,7 +663,7 @@ namespace dom {
                 throw asl::BlockSizeMismatch("Blocks have different size","SimpleValue::Assign()");
             }
             this->bumpVersion();
-       }
+        }
     public:
         virtual asl::AC_SIZE_TYPE size() const {
             return sizeof(T);
@@ -706,25 +708,27 @@ namespace dom {
         virtual void update() const {
             updateValueFromString();
             updateStringFromValue();
-        };
+        }
     protected:
-            void updateValueFromString() const {
-                if (_myStringHasChanged) {
-                    _myValue = Value<T>::asT(StringValue::getString());
-                    _myValueHasChanged = false;
-                    _myStringHasChanged = true; // make sure we get a fresh formatted string
-                }
+        // UH: I believe _myStringHasChanged is deprecated (it's nowhere set to true)
+        // and can be removed, so updateValueFromString can also be removed.
+        void updateValueFromString() const {
+            if (_myStringHasChanged) {
+                _myValue = Value<T>::asT(StringValue::getString());
+                _myValueHasChanged = true;
+                _myStringHasChanged = false; // make sure we get a fresh formatted string
             }
-            void updateStringFromValue() const {
-                if (_myValueHasChanged) {
-                    StringValue::setMutableString(asl::as_string(_myValue));
-                    _myValueHasChanged = false;
-                    _myStringHasChanged = false;
-                }
+        }
+        void updateStringFromValue() const {
+            if (_myValueHasChanged) {
+                StringValue::setMutableString(asl::as_string(_myValue));
+                _myValueHasChanged = false;
+                _myStringHasChanged = false;
             }
-            void setValueHasChanged(bool theFlag) {
-                _myValueHasChanged = theFlag;
-            }
+        }
+        void setValueHasChanged(bool theFlag) {
+            _myValueHasChanged = theFlag;
+        }
     private:
         mutable T _myValue;
         mutable bool _myValueHasChanged;
@@ -747,7 +751,7 @@ namespace dom {
     };
 
     struct ResizeableRaster {
-        virtual ~ResizeableRaster() {};
+        virtual ~ResizeableRaster() {}
         virtual asl::AC_SIZE_TYPE width() const = 0;
         virtual asl::AC_SIZE_TYPE height() const = 0;
         virtual const asl::ReadableBlock & pixels() const = 0;
@@ -1191,10 +1195,10 @@ namespace dom {
         }
         static void binarizeVector(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
             binarizeGeneric(theVector, theDest);
-        };
+        }
         static asl::AC_SIZE_TYPE debinarizeVector(std::vector<T> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             return debinarizeGeneric(theVector, theSource, thePos);
-        };
+        }
     protected:
         virtual unsigned char * begin() {
             return reinterpret_cast<unsigned char*>(&(*_myLockedValue->begin()));
@@ -1236,11 +1240,11 @@ namespace dom {
     inline
     void binarize(const asl::ReadableBlock & myValue, asl::WriteableStream & theDest) {
         theDest.append(myValue);
-    };
+    }
     inline
     asl::AC_SIZE_TYPE debinarize(asl::WriteableBlock & myValue, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos = 0) {
         return theSource.readBlock(myValue,thePos);
-    };
+    }
 
     template <
         class T,
@@ -1324,10 +1328,10 @@ namespace dom {
         }
         static void binarizeVector(const std::vector<T> & theVector, asl::WriteableStream & theDest) {
             binarizeGeneric(theVector, theDest);
-        };
+        }
         static asl::AC_SIZE_TYPE debinarizeVector(std::vector<T> & theVector, const asl::ReadableStream & theSource, asl::AC_SIZE_TYPE thePos) {
             return debinarizeGeneric(theVector, theSource, thePos);
-        };
+        }
     protected:
        virtual void setValueWriteable(bool theState) {
             _isValueWriteable = theState;
