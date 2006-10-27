@@ -34,14 +34,36 @@ rm -f TEST_IMAGES/*
 rm -f TESTMODELS/test_save.x60
 rm -f TESTMODELS/test_save_as.x60
 
+# export maya file
 (cd $PRO/src/Y60/products/maya-xport && ./install_maya)
 maya2x60 TESTMODELS/testcube.mb
 cp TESTMODELS/testcube.x60 TESTMODELS/test_save.x60
 
+# run acgtkshell with test
 APP="acgtkshell"
-#APP="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes ${APP}"
+if [ "X$DEBUG" = "X1" ]; then
+    APP="${APP}DBG"
+fi
+if [ ! -z $VG ]; then
+    TOOLARGS=""
+    case "$VG" in
+    heap*)
+        TOOL="massif"
+        ;;
+    call*)
+        TOOL="callgrind"
+        ;;
+    *)
+        TOOL="memcheck"
+        TOOLARGS="--leak-check=yes --show-reachable=yes"
+        ;;
+    esac
+    APP="valgrind --tool=${TOOL} ${TOOLARGS} ${APP}"
+    echo "VALGRINDING:${APP}"
+fi
 ${APP} -I "SCRIPTS;$PRO/src/Y60/js;$PRO/src/Y60/shader;$PRO/lib" ./SCRIPTS/rendertest.js TESTMODELS/test_save.x60
 
+# compare resulting images
 for BASELINE_IMAGE in BASELINE_IMAGES/* ; do
     compareSceneImages $BASELINE_IMAGE
 done
@@ -50,20 +72,19 @@ echo "=================   TEST RESULTS   ======================"
 echo "PASSED: $PASSED"
 echo "FAILED: ${FAILED}$FAILED_TUTORIALS"
 
-EXITCODE=1;
+EXITCODE=1
 if [ $FAILED == 0 ] ; then
     if [ $PASSED == 0 ] ; then
         echo "### WARNING: No tests executed"
-        EXITCODE=1;
+        EXITCODE=1
     else
         echo "### SUCCESS: All tests passed"
-        EXITCODE=0;
+        EXITCODE=0
     fi
 else
     echo "### FAILED: $((FAILED)) test failed."
-    EXITCODE=2;
+    EXITCODE=2
 fi
 
 echo "========================================================="
-exit $EXITCODE;
-
+exit $EXITCODE
