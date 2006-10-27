@@ -60,6 +60,7 @@ class SimWater :
         asl::Vector2i _myDisplaySize;
         asl::Vector2i _myDisplayOffset;
         asl::Vector2i _myViewportSize;
+
         float _myWaterDamping;
 
         asl::Time _myStartTime;

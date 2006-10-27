@@ -86,6 +86,11 @@ SimWater::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myWaterRepresentation->getReflectionAlphaScale() );
         return;
     }
+    if (thePropertyName == "timestep") {
+        theReturnValue.set( _myTimeStep);
+        return;
+    }
+    
     AC_WARNING << "SimWater::onGetProperty(): Unknown property '" << thePropertyName << "'.";
 };
 
@@ -119,6 +124,11 @@ SimWater::onSetProperty(const std::string & thePropertyName,
         _myWaterRepresentation->setReflectionAlphaScale( myValue );
         return;
     }
+    if (thePropertyName == "timestep") {
+       _myTimeStep = thePropertyValue.get<float>();
+       return;
+    }
+
     AC_WARNING << "SimWater::onSetProperty(): Unknown property '" << thePropertyName << "'.";
 };
 
@@ -203,6 +213,7 @@ SimWater::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
             _myWaterSimulation->simulationMultiStep(_myTimeStep, _myIntegrationsPerFrame, 5);
         }
         assert( _myWaterRepresentation);
+
         _myWaterRepresentation->preRender();
     }
 
@@ -273,7 +284,6 @@ SimWater::convertMouseCoordsToSimulation( const Vector2i & theMousePos ) {
                 (theMousePos[0] * _myDisplaySize[0] / _myViewportSize[0])+ _myDisplayOffset[0]));
     myResult[1] = max (0, min( _myDisplaySize[1] - 1,
                 ((_myViewportSize[1] - theMousePos[1])  * _myDisplaySize[1] / _myViewportSize[1])+ _myDisplayOffset[1]));
-
     return myResult;
 }
 

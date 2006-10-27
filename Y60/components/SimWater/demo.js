@@ -7,7 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-
 if (__main__ == undefined) var __main__ = "SimWaterTest";
 
 use("SceneViewer.js");
@@ -41,7 +40,7 @@ SimWaterTestApp.prototype.Constructor = function(self, theArguments) {
     Base.setup = self.setup;
     self.setup = function(theWidth, theHeight, theTitle) {
         Base.setup(theWidth, theHeight, false, theTitle);
-        window.resize(256,256);//600, 600);
+        window.resize(theWidth, theHeight);
         _myWater = new SimWater();
         window.addExtension(_myWater);
         _myWater.addFloormap( "data/whiskeyglas2.png" );
@@ -82,6 +81,14 @@ SimWaterTestApp.prototype.Constructor = function(self, theArguments) {
             return;
         }
         switch (theKey) {
+            case 'left':
+                _myWater.timestep -= 0.001;
+                print(_myWater.timestep);
+                break;
+            case 'right':
+                _myWater.timestep += 0.001;
+                print(_myWater.timestep);
+                break;
             case 'space':
                 var myIndex = _myWater.activeCubemap + 1;
                 if (myIndex == _myWater.cubemapCount) {
@@ -100,6 +107,7 @@ SimWaterTestApp.prototype.Constructor = function(self, theArguments) {
     }
 
     var _myWater = null;
+    var _myScale = 1.0;
 }
 
 if (__main__ == "SimWaterTest") {
@@ -107,7 +115,7 @@ if (__main__ == "SimWaterTest") {
     try {
         var ourSimWaterTestApp = new SimWaterTestApp(
                 [expandEnvironment("${PRO}") + "/src/Y60/shader/shaderlibrary_nocg.xml"]);
-        ourSimWaterTestApp.setup(320, 200, "SimWaterTest");
+        ourSimWaterTestApp.setup(600, 600, "SimWaterTest");
         ourSimWaterTestApp.go();
     } catch (ex) {
         print("-------------------------------------------------------------------------------");
