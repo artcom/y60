@@ -1278,6 +1278,7 @@ namespace y60 {
         collectReferences(mySceneNode.childNode(CANVAS_LIST_NAME), myReferences);
         collectReferences(getWorldRoot(), myReferences);
 
+        removeUnreferencedNodes(getNode().childNode(LIGHTSOURCE_LIST_NAME), myReferences);
         removeUnreferencedNodes(getShapesRoot(), myReferences);
         collectReferences(getShapesRoot(), myReferences);
         removeUnreferencedNodes(getMaterialsRoot(), myReferences);
