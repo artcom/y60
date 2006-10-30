@@ -36,7 +36,6 @@ var ourAnimationManager  = null;
 var ourCoordinateSystem  = null;
 var ourStatusBar         = null;
 var ourMaterialComboBox  = null;
-var ourFloatPropsComboBox = null;
 
 var GLADE_FILE = "../GLADE/rendergirl.glade";
 
@@ -316,32 +315,67 @@ ourHandler.on_quit_activate = function() {
 //=================================================
 // Tools->Material Editor
 //=================================================
+ourHandler.on_material_dlg_save_clicked = function() {
+    var isPaused = window.pause;
+    window.pause = true;
+    var myFilename = getFilenameDialog("Save Material", FileChooserDialog.ACTION_SAVE);
+    
+    var myMaterial = getSelectedMaterial();
+    if (myMaterial && myFilename) {
+        if (myFilename.indexOf("xml") == -1) {
+            myFilename = myFilename+".xml";
+        }
+        
+        var myNode = myMaterial.childNode("properties"); //.cloneNode(true);
+        myNode.saveFile(myFilename, false);
+    }
+
+    window.pause = isPaused;
+}
+
+ourHandler.on_material_dlg_load_clicked = function() {
+    var isPaused = window.pause;
+    window.pause = true;
+    var myFilename = getFilenameDialog("Open Material", FileChooserDialog.ACTION_OPEN);
+     
+    if (!myFilename) {
+        window.pause = isPaused;
+        ourStatusBar.set("Invalid or Incomplete Filename");
+        return;
+    }    
+
+    var myNode = Node.createDocument();
+    myNode.parseFile(myFilename);
+    if (!myNode) {
+        ourStatusBar.set("File is no XML Node");
+        return;
+    }
+    var myMaterial = getSelectedMaterial();
+    myMaterial.replaceChild(myNode.firstChild, myMaterial.childNode("properties"));
+
+    window.pause = isPaused;
+}
+
 ourHandler.on_material_dlg_close_clicked = function() {
     var myMaterialEditor = ourGlade.get_widget("dlgMaterialEditor");
     myMaterialEditor.hide();
 }
 
-ourHandler.on_float_slider_value_changed = function() {
-    var myMaterial = getSelectedMaterial();
-    if (!myMaterial) {
-        return;
-    }
-    var myProperty = getDescendantByName(myMaterial, ourFloatPropsComboBox.active_text, true);
-    if (!myProperty) {
-        return;
-    }
-        
-    updateMaterial(myProperty.name);
-}
-
 ourHandler.on_material_editor_activate = function() {
+    if (window.scene.materials.childNodesLength() == 0) {
+        ourStatusBar.set("No Materials in Scene.");
+        return;
+    }
+  
     ourStatusBar.set("Material Editor started.");
-   
+  
     var myMaterialEditor = ourGlade.get_widget("dlgMaterialEditor");
 
     ourMaterialComboBox = new ComboBoxText();
     ourGlade.get_widget("material_box").pack_end(ourMaterialComboBox, false, false);
-    
+   
+    hideFloatSliders();
+
     ourMaterialComboBox.signal_changed.connect(ourMaterialComboBox, "on_changed");
     ourMaterialComboBox.on_changed = function() {
         for (i = 0; i < window.scene.materials.childNodesLength(); ++i) {
@@ -354,16 +388,22 @@ ourHandler.on_material_editor_activate = function() {
     ourMaterialComboBox.show();
 
     // fill material choice rolldown with all available materials
+    var myLabelsArray = new Array();
     var i=0;
     for (i=0; i<window.scene.materials.childNodesLength(); ++i) {
-        ourMaterialComboBox.append_text(window.scene.materials.childNode(i).name);
+        myLabelsArray.push(window.scene.materials.childNode(i).name);
+    }
+    myLabelsArray.sort();
+
+    for (i=0; i<myLabelsArray.length; ++i) {
+        ourMaterialComboBox.append_text(myLabelsArray[i]);
     }
 
     // enable first element
     if (i>0) {
-        ourMaterialComboBox.active_text = window.scene.materials.firstChild.name;
+        ourMaterialComboBox.active_text = myLabelsArray[0];
     }
-    
+  
     myMaterialEditor.show();
 }
 

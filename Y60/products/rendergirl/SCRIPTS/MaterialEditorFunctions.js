@@ -15,37 +15,54 @@ function getSelectedMaterial() {
     return mySelectedMaterial;
 }
 
+function hideFloatSliders() {
+    for (var i=0; i<10; ++i) {
+        ourGlade.get_widget("float_slider"+i).hide();      
+        ourGlade.get_widget("float_label"+i).text = "inactive";
+        ourGlade.get_widget("float_label"+i).hide();
+    }
+}
+
 function updateMaterialEditor() {
     var mySelectedMaterial = getSelectedMaterial();
-    ourFloatPropsComboBox = new ComboBoxText();
-    ourGlade.get_widget("float_box").pack_end(ourFloatPropsComboBox, false, false);
-    ourFloatPropsComboBox.show();
+    var myActiveFloatValue = 0;
 
-    ourFloatPropsComboBox.signal_changed.connect(ourFloatPropsComboBox, "on_changed");
-    ourFloatPropsComboBox.on_changed = function() {
-        var myProperty = getDescendantByName(getSelectedMaterial(), ourFloatPropsComboBox.active_text, true);
-        ourGlade.get_widget("float_slider").value = myProperty.firstChild.nodeValue;
-    }
+    hideFloatSliders();
 
-    var myFloatValueFound = false;
     for (var i=0; i<mySelectedMaterial.properties.childNodesLength(); ++i) {
         var myChildNode = mySelectedMaterial.properties.childNode(i);
         // handle vector4f  
         if (myChildNode.nodeName == "vector4f") {
             updateColorElement(myChildNode);
         } else if (myChildNode.nodeName == "float") {
-            ourFloatPropsComboBox.append_text(myChildNode.name); 
-            if (!myFloatValueFound) {
-                ourFloatPropsComboBox.active_text = myChildNode.name; 
-                var myProperty = getDescendantByName(mySelectedMaterial, myChildNode.name, true);
-                ourGlade.get_widget("float_slider").value = myProperty.firstChild.nodeValue;
-            }
-            myFloatValueFound = true; 
+            eval("ourHandler.on_float_slider"+myActiveFloatValue+"_value_changed = function() {\n"+
+                 "    var myMaterial = getSelectedMaterial();\n"+
+                 "    if (!myMaterial) {\n"+
+                 "        return;\n"+
+                 "    }\n"+
+                 "    var myProperty = getDescendantByName(myMaterial, '"+myChildNode.name+"', true);\n"+
+                 "    if (myProperty) {\n"+
+                 "        var myValue = ourGlade.get_widget(\"float_slider"+myActiveFloatValue+"\").value;\n"+
+                 "        updateMaterial(myProperty.name, myValue);\n"+
+                 "    }\n"+
+                 "}\n");
+            
+            var mySlider = ourGlade.get_widget("float_slider"+myActiveFloatValue);
+            var myLabel  = ourGlade.get_widget("float_label"+myActiveFloatValue);
+            
+            var myProperty = getDescendantByName(getSelectedMaterial(), myChildNode.name, true);
+            mySlider.value = myProperty.firstChild.nodeValue;
+       
+            mySlider.show();
+            myLabel.show();
+            myLabel.text = " "+myChildNode.name;
+
+            myActiveFloatValue++;
         }
     }
 }
 
-function updateMaterial(thePropertyName) {
+function updateMaterial(thePropertyName, theValue) {
     var myMaterial = getSelectedMaterial();
     var myPropertyNode = getDescendantByName(myMaterial.childNode("properties"), thePropertyName);
     if (myPropertyNode.nodeName == "vector4f") {
@@ -60,8 +77,7 @@ function updateMaterial(thePropertyName) {
 
         myPropertyNode.firstChild.nodeValue = myColorPicker.color;
     } else if (myPropertyNode.nodeName == "float") {
-        var myFloatSlider = ourGlade.get_widget("float_slider");
-        myPropertyNode.firstChild.nodeValue = myFloatSlider.value;
+        myPropertyNode.firstChild.nodeValue = theValue;
     }
 }
 
