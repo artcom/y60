@@ -62,6 +62,7 @@ namespace jslib {
     template struct ArgumentHolder<asl::Time>;
     
     template struct ArgumentHolder<std::vector<unsigned int> const &>;
+    template struct ArgumentHolder<std::vector<std::string> const &>;
 
     template struct ArgumentHolder<asl::Quaternion<float> const &>;
     template struct ArgumentHolder<asl::Sphere<float> const &>;
@@ -69,6 +70,7 @@ namespace jslib {
     template struct ArgumentHolder<asl::Box3<float> const &>;
     template struct ArgumentHolder<asl::Matrix4<float> const &>;
 
+    template struct ArgumentHolder<std::string>;
     template struct ArgumentHolder<std::string const &>;
     template struct ArgumentHolder<dom::NodePtr>;
     template struct ArgumentHolder<dom::NodePtr const>;
