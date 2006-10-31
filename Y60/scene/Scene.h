@@ -341,6 +341,7 @@ namespace y60 {
             void updateShapes();
             void loadMaterial(dom::NodePtr theMaterialNode);
             void reloadMaterial(dom::NodePtr theMaterialNode, MaterialBasePtr theMaterial);
+            void rebindMaterials();            
             void loadAnimations();
             void updateMaterials();
 

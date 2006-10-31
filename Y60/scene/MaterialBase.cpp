@@ -38,7 +38,7 @@ namespace y60 {
         Facade(theNode),
         _myShader(0),
         _myLightingModel(LAMBERT),
-        _myTexGenFlag(false), _myMaterialVersion(0), _myRequiresVersion(0)
+        _myTexGenFlag(false), _myMaterialVersion(0), _myRequiresVersion(0), _myIdTagVersion(0)
     {}
 
     MaterialBase::~MaterialBase() {
@@ -64,6 +64,16 @@ namespace y60 {
             return true;
         }
         return false;
+    }
+    
+    bool 
+    MaterialBase::rebindRequired() {
+        if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
+            _myIdTagVersion = getNode().getAttribute(ID_ATTRIB)->nodeVersion();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     void
@@ -245,6 +255,7 @@ namespace y60 {
 
         _myMaterialVersion = getNode().nodeVersion();
         _myRequiresVersion = myReqFacade->getNode().nodeVersion();
+        _myIdTagVersion    = getNode().getAttribute(ID_ATTRIB)->nodeVersion();
         AC_DEBUG << "Updating params for material " << get<NameTag>() << " materialVersion:" << _myMaterialVersion << " requiresVersion:" << _myRequiresVersion;
 
         _myTexGenModes.clear();

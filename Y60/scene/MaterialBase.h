@@ -148,7 +148,8 @@ namespace y60 {
 
             const MaterialParameterVector & getVertexParameters() const;
             virtual bool reloadRequired() const;
-
+            virtual bool rebindRequired();
+            
             void setShader(IShaderPtr theShader);
             const IShaderPtr getShader() const { return _myShader; };
             IShaderPtr getShader() { return _myShader; };
@@ -193,6 +194,7 @@ namespace y60 {
 
             asl::Unsigned64   _myMaterialVersion;
             asl::Unsigned64   _myRequiresVersion;
+            asl::Unsigned64   _myIdTagVersion;
 
             bool              _myTexGenFlag;
             TexGenModeList    _myTexGenModes;

@@ -344,7 +344,31 @@ namespace y60 {
                     << ", name: " << myMaterial->get<NameTag>());
 //        _myMaterials[myMaterial->get<IdTag>()] = myMaterial;
     }
-
+    
+    void
+    Scene::rebindMaterials() {
+        PrimitiveVector myAffectedPrimitives;
+        NodePtr myShapeListNode = getShapesRoot();
+        unsigned myShapeCount = myShapeListNode->childNodesLength();
+        for (unsigned i = 0; i < myShapeCount; ++i) {
+            NodePtr myShapeNode = myShapeListNode->childNode(i);
+            ShapePtr myShape = myShapeNode->getFacade<Shape>();
+            
+            NodePtr myPrimitiveListNode = myShapeNode->childNode(PRIMITIVE_LIST_NAME);
+            if (myPrimitiveListNode) {
+                unsigned myPrimitiveCount = myPrimitiveListNode->childNodesLength(ELEMENTS_NODE_NAME);
+                for (unsigned j = 0; j < myPrimitiveCount; ++j) {
+                    NodePtr myElementsNode = myPrimitiveListNode->childNode(ELEMENTS_NODE_NAME, j);
+                    // get new Material of the affected primitive
+                    std::string myMaterialId = myElementsNode->getAttributeString(MATERIAL_REF_ATTRIB);
+                    MaterialBaseFacadePtr myNewMaterial = myElementsNode->getElementById(myMaterialId)->getFacade<MaterialBase>();
+                    Primitive & myPrimitive = *(myShape->getPrimitives()[j]);
+                    myPrimitive.setMaterial(myNewMaterial);
+                }
+            }
+        }        
+    }
+    
     void
     Scene::reloadMaterial(NodePtr theMaterialNode, MaterialBasePtr theMaterial) {
         // Find all primitives that reference the material
@@ -662,7 +686,7 @@ namespace y60 {
     Scene::updateMaterials() {
         NodePtr myMaterialList = getNode().childNode(MATERIAL_LIST_NAME);
         unsigned myMaterialCount = myMaterialList->childNodesLength();
-
+        bool myMaterialRebindFlag = false;
         AC_DEBUG << "Scene::updateMaterials() - material count: " << myMaterialCount;
         for (unsigned i = 0; i < myMaterialCount; ++i) {
             NodePtr myMaterialNode = myMaterialList->childNode(i);
@@ -671,10 +695,19 @@ namespace y60 {
                 if (myMaterial->reloadRequired()) {
                     reloadMaterial(myMaterialNode, myMaterial);
                 }
+                // check for a rebind (i.e. if the id has changed and alle primitives must be rebind)
+                if (myMaterial->rebindRequired()) {
+                    myMaterialRebindFlag = true;
+                }
+                
             } else {
                 const std::string myMaterialId = myMaterialNode->getAttributeString("id");
                 AC_TRACE << "could not find material " << myMaterialId << ", loading";
             }
+        }
+        // check if one material forces a material rebind
+        if (myMaterialRebindFlag) {
+            rebindMaterials();
         }
     }
 
