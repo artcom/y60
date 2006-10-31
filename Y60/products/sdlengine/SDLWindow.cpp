@@ -51,7 +51,7 @@ using namespace std;
 using namespace y60;
 
 namespace jslib {
-    template class ResultConverter<y60::EventRecorder::Mode>;
+    template struct ResultConverter<y60::EventRecorder::Mode>;
 }
 
 #define DB(x) //x

@@ -71,6 +71,7 @@ namespace jslib {
 
     template struct ArgumentHolder<std::string const &>;
     template struct ArgumentHolder<dom::NodePtr>;
+    template struct ArgumentHolder<dom::NodePtr const>;
     template struct ArgumentHolder<dom::NodePtr &>;
     template struct ArgumentHolder<dom::NodePtr const &>;
     template struct ArgumentHolder<dom::Node::CloneDepth>;
