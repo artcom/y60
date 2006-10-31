@@ -11,7 +11,7 @@
 */
 
 #include "WinExceptionFilter.h"
-
+#include "SingletonManager.h"
 #include "string_functions.h"
 #include "Logger.h"
 
@@ -122,11 +122,19 @@ LONG WINAPI AcUnhandledExceptionFilter(_EXCEPTION_POINTERS * theExceptionInfo) {
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
+BOOL WINAPI AcCtrlBreakHandler(DWORD dwCtrlType) {
+    AC_FATAL << "Console break detected.";
+    asl::SingletonManager::get().destroyAllSingletons();
+    return FALSE;
+}
+
 namespace asl {
 
 WinExceptionFilter::WinExceptionFilter() {
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
     SetUnhandledExceptionFilter(&AcUnhandledExceptionFilter);
+    SetConsoleCtrlHandler(&AcCtrlBreakHandler, true);
 }
 
 }
+

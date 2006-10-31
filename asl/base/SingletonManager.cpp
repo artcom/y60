@@ -22,13 +22,17 @@
 #include "SingletonManager.h"
 #include "Logger.h"
 
-#define DB(x) // x
-
 using namespace std;
 
 namespace asl {
 
 SingletonManager::~SingletonManager() {
+    AC_DEBUG << "Destroying SingletonManager";
+    destroyAllSingletons();
+}
+
+void
+SingletonManager::destroyAllSingletons() {
     _mySingletonMap.clear();
 
     // Call stop on all singletons to give them a chance to shut down correctly, while
@@ -37,13 +41,13 @@ SingletonManager::~SingletonManager() {
         (*it)->stop();
     }
 
-
     // destroy singletons in reverse order of construction
     _mySingletonList.reverse();
     for (SingletonList::iterator it = _mySingletonList.begin(); it != _mySingletonList.end(); ) {
         // Delete logger last, to allow other singletons to use the logger in their destructor
         if (dynamic_cast_Ptr<Logger>(*it) == 0) {
-            DB(AC_TRACE << "  destroying singleton " << typeid(**it).name() << " size: " << _mySingletonList.size() << endl);
+            AC_DEBUG << "  destroying singleton " << typeid(**it).name() << " size: " 
+                    << _mySingletonList.size();
             it = _mySingletonList.erase(it);
         } else {
             ++it;
@@ -63,9 +67,9 @@ void
 SingletonManager::setDelegate(SingletonManager * theDelegate) {
     if (theDelegate != this) {
         _myDelegate = theDelegate;
-        DB(AC_TRACE << "delegating SingletonManager from " << this << " > " << theDelegate << std::endl);
+        AC_DEBUG << "delegating SingletonManager from " << this << " > " << theDelegate;
     } else {
-        DB(AC_TRACE << "delegation to self ignored." << std::endl);
+        AC_DEBUG << "delegation to self ignored.";
     }
 }
 
