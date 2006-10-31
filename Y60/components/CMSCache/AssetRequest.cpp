@@ -41,7 +41,7 @@ AssetRequest::onData(const char * theData, size_t theReceivedByteCount) {
         return 0;
     }
     if ( ! _myOutputFile) {
-        _myOutputFile = Ptr<ofstream>(new ofstream(_myLocalFile.c_str(),
+        _myOutputFile = asl::Ptr<ofstream>(new ofstream(_myLocalFile.c_str(),
                     ios::binary | ios::trunc | ios::out));
     }
 

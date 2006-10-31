@@ -96,7 +96,7 @@ namespace y60 {
     }
 
     void
-    FFMpegDecoder2::load(Ptr<ReadableStream> theSource, const string & theFilename) {
+    FFMpegDecoder2::load(asl::Ptr<ReadableStream> theSource, const string & theFilename) {
         string theStreamID = string("acstream://") + theFilename;
         registerStream(theStreamID, theSource);
         load(theStreamID);

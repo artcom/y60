@@ -62,8 +62,8 @@ namespace y60 {
             const PrimitiveType & myType = myPrimitive.getType();
             switch (myType) {
             case GL_TRIANGLES: {
-                Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
-                Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
+                asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
+                asl::Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
                 const VertexData3f & myVertexData = myPositionAccessor->get();
                 const VertexData3f & myNormalData = myNormalsAccessor->get();
                 int myVSize = myVertexData.size();
@@ -90,8 +90,8 @@ namespace y60 {
                                }
                 break;
             case GL_QUADS: {
-                Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
-                Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
+                asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
+                asl::Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
                 const VertexData3f & myVertexData = myPositionAccessor->get();
                 const VertexData3f & myNormalData = myNormalsAccessor->get();
                 int myVSize = myVertexData.size();
@@ -161,8 +161,8 @@ namespace y60 {
                 for (unsigned i = 0; i < myPrimitiveVector.size(); ++i) {
                     const Primitive & myPrimitive = (*myPrimitiveVector[i]);
                     const PrimitiveType & myType = myPrimitive.getType();
-                    Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
-                    Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
+                    asl::Ptr<ConstVertexDataAccessor<Vector3f> > myPositionAccessor = myPrimitive.getConstLockingPositionsAccessor();
+                    asl::Ptr<ConstVertexDataAccessor<Vector3f> > myNormalsAccessor = myPrimitive.getConstLockingNormalsAccessor();
                     const VertexData3f & myVertexData = myPositionAccessor->get();
                     int myVSize = myVertexData.size();
                     switch (myType) {

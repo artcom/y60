@@ -211,10 +211,10 @@ DEFINE_EXCEPTION(NoShapeFacade, asl::Exception)
 		VertexData3f::VertexDataVector * myVertexPositionsPtr = myPrimitives[i].getPositions();
 		VertexData2f::VertexDataVector * myUVCoordsPtr = myPrimitives[i].getTexCoords2f(0);
 #else
-		Ptr<VertexDataAccessor<Vector3f> > myPositionsAccessor = myPrimitives[i]->getLockingPositionsAccessor();
+		asl::Ptr<VertexDataAccessor<Vector3f> > myPositionsAccessor = myPrimitives[i]->getLockingPositionsAccessor();
 		VertexData3f * myVertexPositionsPtr = &myPositionsAccessor->get();
 
-		Ptr<VertexDataAccessor<Vector2f> > myTexCoordsAccessor = myPrimitives[i]->getLockingTexCoord2fAccessor(0);
+		asl::Ptr<VertexDataAccessor<Vector2f> > myTexCoordsAccessor = myPrimitives[i]->getLockingTexCoord2fAccessor(0);
 		VertexData2f * myUVCoordsPtr = &myTexCoordsAccessor->get();
 #endif
 		if (myVertexPositionsPtr && myUVCoordsPtr) {

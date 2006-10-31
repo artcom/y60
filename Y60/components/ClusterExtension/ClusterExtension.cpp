@@ -304,7 +304,7 @@ ClusterExtension::collectScene(jslib::AbstractRenderWindow * theWindow,
 void
 ClusterExtension::serveRequests(AbstractRenderWindow * theWindow) {
     if (_myAcceptor) {
-        Ptr<MessageAcceptor<POLICY>::Message> myMessage;
+        asl::Ptr<MessageAcceptor<POLICY>::Message> myMessage;
         while (myMessage = _myAcceptor->popIncomingMessage()) {
             DB(AC_TRACE << "ClusterExtension::serveRequests: incoming message:"<<endl<<myMessage->as_string()<<endl);
             dom::Document myRequest(myMessage->as_string());

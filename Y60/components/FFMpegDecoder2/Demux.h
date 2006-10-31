@@ -12,13 +12,15 @@
 #define _ac_y60_Demux_h_
 
 #include <asl/Ptr.h>
-
 #ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable:4244)
 #define EMULATE_INTTYPES
 #endif
 
+#ifdef OSX
+#include <Carbon/Carbon.h>
+#endif
 #include <ffmpeg/avformat.h>
 
 #ifdef WIN32

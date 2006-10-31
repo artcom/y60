@@ -27,7 +27,7 @@ using namespace asl;
 
 namespace jslib {
 
-template class JSWrapper<Block, Ptr<Block>, StaticAccessProtocol>;
+template class JSWrapper<Block, asl::Ptr<Block>, StaticAccessProtocol>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

@@ -9,11 +9,17 @@
 //==============================================================================
 
 #include "CMSCache.h"
-
 #include <asl/Logger.h>
 #include <asl/file_functions.h>
 #include <asl/os_functions.h>
 #include <y60/Request.h>
+
+#ifdef verify
+	#ifndef _SETTING_NO_UNDEF_WARNING_ 
+		#warning Symbol 'verify' defined as macro, undefining. (Outrageous namespace pollution by Apples AssertMacros.h, revealing arrogance and incompetence)
+	#endif
+#undef verify
+#endif
 
 using namespace std;
 using namespace asl;

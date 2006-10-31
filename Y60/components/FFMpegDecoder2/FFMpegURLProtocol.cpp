@@ -126,7 +126,7 @@ URLProtocol acstream_protocol = {
 };
 
 
-void registerStream(string theUrl, Ptr<ReadableStream> theSource) {
+void registerStream(string theUrl, asl::Ptr<ReadableStream> theSource) {
     
     static bool avRegistered = false;
     if (!avRegistered) {

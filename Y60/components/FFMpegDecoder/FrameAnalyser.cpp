@@ -10,6 +10,10 @@
 
 #include "FrameAnalyser.h"
 
+#ifdef OSX
+#include <Carbon/Carbon.h>
+#endif
+
 #ifdef WIN32
 #pragma warning( disable : 4244 ) // Disable ffmpeg warning
 #define EMULATE_INTTYPES

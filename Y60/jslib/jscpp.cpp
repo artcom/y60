@@ -8,6 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
+#include <y60/GLUtils.h>
+
 #include "JSStringMover.h"
 #include "JSRequestWrapper.h"
 #include "JSRequestManager.h"

@@ -18,14 +18,6 @@ using namespace std;
 
 namespace jslib {
 
-template class JSWrapper<asl::Line<LineNumber> >;
-template class JSWrapper<asl::Ray<LineNumber> >;
-template class JSWrapper<asl::LineSegment<LineNumber> >;
-
-template class JSGenericLine<asl::Line<LineNumber> >;
-template class JSGenericLine<asl::Ray<LineNumber> >;
-template class JSGenericLine<asl::LineSegment<LineNumber> >;
-
 template<>
 const char *
 JSLine::ClassName() {
@@ -43,6 +35,14 @@ const char *
 JSLineSegment::ClassName() {
     return "LineSegment";
 }
+
+template class JSWrapper<asl::Line<LineNumber> >;
+template class JSWrapper<asl::Ray<LineNumber> >;
+template class JSWrapper<asl::LineSegment<LineNumber> >;
+
+template class JSGenericLine<asl::Line<LineNumber> >;
+template class JSGenericLine<asl::Ray<LineNumber> >;
+template class JSGenericLine<asl::LineSegment<LineNumber> >;
 
 template<>
 JSPropertySpec *
