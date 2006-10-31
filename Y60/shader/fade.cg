@@ -26,11 +26,10 @@ vert2frag mainVertex(float4 thePosition : POSITION,
 
 float4 mainFragment(vert2frag IN,
                     uniform sampler2D tex0,
-                    uniform sampler2D tex1,
-                    uniform float weight) : COLOR
+                    uniform float4 offset) : COLOR
 {
     float4 myResult =
-        tex2D(tex0, IN.texCoord) + tex2D(tex1, IN.texCoord) * weight;
+        tex2D(tex0, IN.texCoord) - offset;
 
     return myResult;
 }

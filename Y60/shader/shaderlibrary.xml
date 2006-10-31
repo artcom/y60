@@ -1189,8 +1189,7 @@
         <fragmentshader profile="FP30" file="fade.cg" entryfunction="mainFragment">
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
-                <sampler2d name="tex1">1</sampler2d>
-                <float name="weight">1</float>
+                <vector4f name="offset">[0,0,0,0]</vector4f>
             </properties>
         </fragmentshader>
     </shader>
