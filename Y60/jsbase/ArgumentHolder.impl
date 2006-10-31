@@ -1,0 +1,32 @@
+//=============================================================================
+// Copyright (C) 1993-2005, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+#include "JSWrapper.h"
+
+namespace jslib {
+
+template<class T>
+ArgumentHolder<T>::ArgumentHolder(JSCallArgs & theArgs, int n) {
+    if(!convertFrom(theArgs.cx, theArgs.argv[n], _myArg)) {
+        throw ArgumentConversionFailed(JUST_FILE_LINE);
+    }
+}
+
+template<class T>
+typename ArgumentHolder<T>::PLAIN_TYPE & ArgumentHolder<T>::getArg() {
+    return _myArg;
+};
+
+template <class T>
+void ResultConverter<T>::storeResult(JSCallArgs & theJSArgs, const T & theResult) {
+    *theJSArgs.rval = as_jsval(theJSArgs.cx, theResult);
+}
+
+}
