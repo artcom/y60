@@ -8,9 +8,9 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 
-#include <y60/JSVector.h>
+#include "JSVector.h"
 #include "JSBox2f.h"
-#include <y60/JSWrapper.impl>
+#include "JSWrapper.impl"
 #include <asl/Box.h>
 
 #include <iostream>

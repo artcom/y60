@@ -93,7 +93,7 @@
 #include "JSGtkEnums.h"
 #include "JSSigConnection.h"
 #include "JSSignalProxies.h"
-#include "JSSignals.h"
+#include "JSSignals.impl"
 #include "JSGdkEvent.h"
 #include "JSGdkCursor.h"
 #include "JSSeparator.h"

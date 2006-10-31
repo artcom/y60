@@ -711,6 +711,22 @@ bool convertFrom(JSContext *cx, jsval theValue, float & theDest) {
     return false;
 }
 
+bool convertFrom(JSContext *cx, jsval theValue, short & theDest) {
+    jsdouble myDoubleDest = -1;
+    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
+        !JSDOUBLE_IS_NaN(myDoubleDest) )
+    {
+        if ((myDoubleDest < std::numeric_limits<short>::min()) ||
+            (myDoubleDest > std::numeric_limits<short>::max()))
+        {
+            JS_ReportError(cx, "#WARNING convertFrom: -> unsigned short: value out of range: %g", myDoubleDest);
+        }
+        theDest = (short)(myDoubleDest);
+        return true;
+    }
+    return false;
+}
+
 bool convertFrom(JSContext *cx, jsval theValue, unsigned short & theDest) {
     jsdouble myDoubleDest = -1;
     if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&

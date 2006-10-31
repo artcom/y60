@@ -25,6 +25,9 @@
 namespace jslib {
 
 template <class R, class P0, class P1>
+bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<sigc::signal2<R, P0, P1> > & theOwner);
+
+template <class R, class P0, class P1>
 class JSSignalAdapter2 : public JSSignalAdapterBase {
     public:
         static R on_signal(P0 theParam0, P1 theParam1,
@@ -197,34 +200,12 @@ if (!JSSignal2<RVAL, PARAM0, PARAM1>::initClass(cx, theGlobalObject)) { \
 }
 
 template <class R, class P0, class P1>
-bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<sigc::signal2<R, P0, P1> > & theOwner) {
-    if (JSVAL_IS_OBJECT(theValue)) {
-        JSObject * myArgument;
-        if (JS_ValueToObject(cx, theValue, &myArgument)) {
-            if (JSA_GetClass(cx,myArgument) ==
-                        JSClassTraits<typename JSSignal2<R, P0, P1>::NATIVE >::Class())
-            {
-                theOwner =
-                    JSClassTraits<typename JSSignal2<R, P0, P1>::NATIVE>::getNativeOwner(cx,myArgument);
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-
-template <class R, class P0, class P1>
 jsval as_jsval(JSContext *cx, asl::Ptr<sigc::signal2<R, P0, P1> > & theValue) {
     JSObject * myObject = JSSignal2<R, P0, P1>::Construct(cx, theValue);
     return OBJECT_TO_JSVAL(myObject);
 }
 
-#define INSTANTIATE_SIGNAL2_WRAPPER(R, P0, P1) \
-    template class JSWrapper<sigc::signal2<R, P0, P1>, asl::Ptr<sigc::signal2<R, P0, P1> >, \
-        StaticAccessProtocol>;
 }
-
 #endif
 
 

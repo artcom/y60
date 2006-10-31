@@ -35,7 +35,7 @@ namespace y60 {
 
             void loadFont(const std::string & theName, const std::string & theFileName,
                     int theHeight, TTFFontInfo::FONTTYPE theFontType);
-            TextPtr SDLTextRenderer::createText(const asl::Vector2f & thePos,
+            TextPtr createText(const asl::Vector2f & thePos,
                     const std::string & theString,
                     const std::string & theFontName);
 

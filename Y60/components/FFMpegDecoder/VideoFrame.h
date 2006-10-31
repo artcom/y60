@@ -18,7 +18,7 @@ namespace y60 {
 
     class VideoFrame {
         public:
-            VideoFrame::VideoFrame(unsigned theWidth, unsigned theHeight, unsigned theBPP) {
+            VideoFrame(unsigned theWidth, unsigned theHeight, unsigned theBPP) {
                 _myBuffer = asl::Ptr<asl::Block>(new asl::Block( theWidth * theHeight * theBPP));
             }
 

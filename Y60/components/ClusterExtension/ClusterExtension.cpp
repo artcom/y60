@@ -130,7 +130,7 @@ protected:
         return myAcceptor;
     }
 
-    static ClientPtr ClusterExtension::connectClient(const EndPoint & myRemoteEndPoint) {
+    static ClientPtr connectClient(const EndPoint & myRemoteEndPoint) {
         ClientPtr myClient(new Conduit<POLICY>(myRemoteEndPoint));
         return myClient;
     }

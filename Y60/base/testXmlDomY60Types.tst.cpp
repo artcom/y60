@@ -21,6 +21,7 @@
 //
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
+
 #include "DataTypes.h"
 #include "Y60xsd.h"
 
@@ -178,7 +179,6 @@ public:
         // [DS] try to trigger bug 91 ... to be continued
         //y60::VectorOfString myEmptyStringVector;
         //addTest(new XmlVectorValueUnitTest<y60::VectorOfString>("VectorOfString",myEmptyStringVector));
-
    
         std::string myFeatureString = "[10[bla,blub],11[huhu],23[none]]";
         y60::VectorOfRankedFeature myFeatureVector = asl::as<y60::VectorOfRankedFeature>(myFeatureString);

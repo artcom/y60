@@ -72,28 +72,22 @@ struct Argument<NoResult> {
 
 DEFINE_EXCEPTION(ArgumentConversionFailed, asl::Exception);
 
-template <class T, unsigned N>
+template <class T>
 struct ArgumentHolder {
     typedef T ARG_TYPE;
     typedef typename Argument<T>::PlainType PLAIN_TYPE;
 
-    ArgumentHolder(JSCallArgs & theArgs) {
-        if(!convertFrom(theArgs.cx, theArgs.argv[N], _myArg)) {
-            throw ArgumentConversionFailed(JUST_FILE_LINE);
-        }
-    }
-    PLAIN_TYPE & getArg() {
-        return _myArg;
-    };
+    ArgumentHolder(JSCallArgs & theArgs, int n);
+    PLAIN_TYPE & getArg(); 
+
 private:
     PLAIN_TYPE _myArg;
 };
 
-template <unsigned N>
-struct ArgumentHolder<NoArgument,N> {
-    ArgumentHolder(JSCallArgs & theArgs) {}
+template <>
+struct ArgumentHolder<NoArgument> {
+    ArgumentHolder(JSCallArgs & theArgs, int n) {}
     typedef void ARG_TYPE;
-    enum { n = N };
     enum { exists = false };
     NoArgument & getArg() {
         static NoArgument _ourNoArgument;
@@ -102,13 +96,13 @@ struct ArgumentHolder<NoArgument,N> {
 };
 #if 1
 extern bool convertFrom(JSContext *cx, jsval theValue, const dom::Node * & theNode);
-template <unsigned N>
-struct ArgumentHolder<const dom::Node &, N> {
+template <>
+struct ArgumentHolder<const dom::Node &> {
     typedef const dom::Node & ARG_TYPE;
     typedef const dom::Node & PLAIN_TYPE;
 
-    ArgumentHolder(JSCallArgs & theArgs) {
-        if(!convertFrom(theArgs.cx, theArgs.argv[N], _myArg)) {
+    ArgumentHolder(JSCallArgs & theArgs, int n) {
+        if(!convertFrom(theArgs.cx, theArgs.argv[n], _myArg)) {
             throw ArgumentConversionFailed(JUST_FILE_LINE);
         }
     }
@@ -123,9 +117,7 @@ private:
 template <class T>
 struct ResultConverter {
     static void
-    storeResult(JSCallArgs & theJSArgs, const T & theResult) {
-        *theJSArgs.rval = as_jsval(theJSArgs.cx, theResult);
-    }
+    storeResult(JSCallArgs & theJSArgs, const T & theResult);
 };
 
 template <class CLASS, class METHOD, class RESULT>
@@ -284,14 +276,14 @@ struct AdapterCall {
         :
         _myClass(JSClassTraits<CLASS>::openNativeRef(theJSArgs.cx, theJSArgs.obj)),
         _myMethod(theMethod),
-        _myArgHolder0(theJSArgs),
-        _myArgHolder1(theJSArgs),
-        _myArgHolder2(theJSArgs),
-        _myArgHolder3(theJSArgs),
-        _myArgHolder4(theJSArgs),
-        _myArgHolder5(theJSArgs),
-        _myArgHolder6(theJSArgs),
-        _myArgHolder7(theJSArgs)
+        _myArgHolder0(theJSArgs, 0),
+        _myArgHolder1(theJSArgs, 1),
+        _myArgHolder2(theJSArgs, 2),
+        _myArgHolder3(theJSArgs, 3),
+        _myArgHolder4(theJSArgs, 4),
+        _myArgHolder5(theJSArgs, 5),
+        _myArgHolder6(theJSArgs, 6),
+        _myArgHolder7(theJSArgs, 7)
     {
         IfResult<CLASS, METHOD, PlainResult>::call(theJSArgs, _myClass, _myMethod,
             _myArgHolder0.getArg(),
@@ -311,14 +303,14 @@ struct AdapterCall {
 
 private:
     METHOD _myMethod;
-    ArgumentHolder<ARG0,0> _myArgHolder0;
-    ArgumentHolder<ARG1,1> _myArgHolder1;
-    ArgumentHolder<ARG2,2> _myArgHolder2;
-    ArgumentHolder<ARG3,3> _myArgHolder3;
-    ArgumentHolder<ARG4,4> _myArgHolder4;
-    ArgumentHolder<ARG5,5> _myArgHolder5;
-    ArgumentHolder<ARG6,6> _myArgHolder6;
-    ArgumentHolder<ARG7,7> _myArgHolder7;
+    ArgumentHolder<ARG0> _myArgHolder0;
+    ArgumentHolder<ARG1> _myArgHolder1;
+    ArgumentHolder<ARG2> _myArgHolder2;
+    ArgumentHolder<ARG3> _myArgHolder3;
+    ArgumentHolder<ARG4> _myArgHolder4;
+    ArgumentHolder<ARG5> _myArgHolder5;
+    ArgumentHolder<ARG6> _myArgHolder6;
+    ArgumentHolder<ARG7> _myArgHolder7;
     CLASS & _myClass;
 };
 
@@ -340,14 +332,14 @@ struct ConstAdapterCall {
         :
         _myClass(JSClassTraits<CLASS>::getNativeRef(theJSArgs.cx, theJSArgs.obj)),
         _myMethod(theMethod),
-        _myArgHolder0(theJSArgs),
-        _myArgHolder1(theJSArgs),
-        _myArgHolder2(theJSArgs),
-        _myArgHolder3(theJSArgs),
-        _myArgHolder4(theJSArgs),
-        _myArgHolder5(theJSArgs),
-        _myArgHolder6(theJSArgs),
-        _myArgHolder7(theJSArgs)
+        _myArgHolder0(theJSArgs, 0),
+        _myArgHolder1(theJSArgs, 1),
+        _myArgHolder2(theJSArgs, 2),
+        _myArgHolder3(theJSArgs, 3),
+        _myArgHolder4(theJSArgs, 4),
+        _myArgHolder5(theJSArgs, 5),
+        _myArgHolder6(theJSArgs, 6),
+        _myArgHolder7(theJSArgs, 7)
     {
         IfResult<const CLASS, METHOD, PlainResult>::call(theJSArgs, _myClass, _myMethod,
             _myArgHolder0.getArg(),
@@ -366,14 +358,14 @@ struct ConstAdapterCall {
 
 private:
     METHOD _myMethod;
-    ArgumentHolder<ARG0,0> _myArgHolder0;
-    ArgumentHolder<ARG1,1> _myArgHolder1;
-    ArgumentHolder<ARG2,2> _myArgHolder2;
-    ArgumentHolder<ARG3,3> _myArgHolder3;
-    ArgumentHolder<ARG4,4> _myArgHolder4;
-    ArgumentHolder<ARG5,5> _myArgHolder5;
-    ArgumentHolder<ARG6,6> _myArgHolder6;
-    ArgumentHolder<ARG7,7> _myArgHolder7;
+    ArgumentHolder<ARG0> _myArgHolder0;
+    ArgumentHolder<ARG1> _myArgHolder1;
+    ArgumentHolder<ARG2> _myArgHolder2;
+    ArgumentHolder<ARG3> _myArgHolder3;
+    ArgumentHolder<ARG4> _myArgHolder4;
+    ArgumentHolder<ARG5> _myArgHolder5;
+    ArgumentHolder<ARG6> _myArgHolder6;
+    ArgumentHolder<ARG7> _myArgHolder7;
     const CLASS & _myClass;
 };
 

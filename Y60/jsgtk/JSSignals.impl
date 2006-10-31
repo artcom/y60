@@ -1,0 +1,108 @@
+//=============================================================================
+// Copyright (C) 1993-2005, ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+#include "JSSignals.h"
+
+namespace jslib {
+
+template <class R>
+bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<sigc::signal0<R> > & theOwner) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) ==
+                        JSClassTraits<typename JSSignal0<R>::NATIVE >::Class())
+            {
+                theOwner =
+                    JSClassTraits<typename JSSignal0<R>::NATIVE>::getNativeOwner(cx,myArgument);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+template <class R, class P0>
+bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<sigc::signal1<R, P0> > & theOwner) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) ==
+                        JSClassTraits<typename JSSignal1<R, P0>::NATIVE >::Class())
+            {
+                theOwner =
+                    JSClassTraits<typename JSSignal1<R, P0>::NATIVE>::getNativeOwner(cx,myArgument);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+template <class R, class P0, class P1>
+bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<sigc::signal2<R, P0, P1> > & theOwner) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) ==
+                        JSClassTraits<typename JSSignal2<R, P0, P1>::NATIVE >::Class())
+            {
+                theOwner =
+                    JSClassTraits<typename JSSignal2<R, P0, P1>::NATIVE>::getNativeOwner(cx,myArgument);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+template <class R, class P0, class P1, class P2>
+bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<sigc::signal3<R, P0, P1, P2> > & theOwner) {
+    if (JSVAL_IS_OBJECT(theValue)) {
+        JSObject * myArgument;
+        if (JS_ValueToObject(cx, theValue, &myArgument)) {
+            if (JSA_GetClass(cx,myArgument) ==
+                        JSClassTraits<typename JSSignal3<R, P0, P1, P2>::NATIVE >::Class())
+            {
+                theOwner =
+                    JSClassTraits<typename JSSignal3<R, P0, P1, P2>::NATIVE>::getNativeOwner(cx,myArgument);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
+#define INSTANTIATE_SIGNAL0_WRAPPER(R) \
+    template class JSWrapper<sigc::signal0<R>, asl::Ptr<sigc::signal0<R> >, \
+            StaticAccessProtocol>; \
+    template bool convertFrom(JSContext *cx, jsval theValue, \
+            asl::Ptr<sigc::signal0<R> > & theOwner);
+
+#define INSTANTIATE_SIGNAL1_WRAPPER(R, P0) \
+    template class JSWrapper<sigc::signal1<R, P0>, asl::Ptr<sigc::signal1<R, P0> >, \
+        StaticAccessProtocol>; \
+    template bool convertFrom(JSContext *cx, jsval theValue, \
+            asl::Ptr<sigc::signal1<R, P0> > & theOwner);
+
+#define INSTANTIATE_SIGNAL2_WRAPPER(R, P0, P1) \
+    template class JSWrapper<sigc::signal2<R, P0, P1>, asl::Ptr<sigc::signal2<R, P0, P1> >, \
+        StaticAccessProtocol>; \
+    template bool convertFrom(JSContext *cx, jsval theValue, \
+            asl::Ptr<sigc::signal2<R, P0, P1> > & theOwner);
+
+
+#define INSTANTIATE_SIGNAL3_WRAPPER(R, P0, P1, P2) \
+    template class JSWrapper<sigc::signal3<R, P0, P1, P2>, asl::Ptr<sigc::signal3<R, P0, P1, P2> >, \
+        StaticAccessProtocol>; \
+    template bool convertFrom(JSContext *cx, jsval theValue, \
+            asl::Ptr<sigc::signal3<R, P0, P1, P2> > & theOwner);
+}

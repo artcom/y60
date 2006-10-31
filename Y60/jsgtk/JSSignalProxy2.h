@@ -33,6 +33,9 @@
 namespace jslib {
 
 template <class R, class P0, class P1>
+bool convertFrom(JSContext *cx, jsval theValue, asl::Ptr<Glib::SignalProxy2<R, P0, P1> > & theOwner);
+
+template <class R, class P0, class P1>
 class JSSignalProxy2 : public JSWrapper<Glib::SignalProxy2<R, P0, P1>, asl::Ptr<Glib::SignalProxy2<R, P0, P1> >,
                                         StaticAccessProtocol>
 {

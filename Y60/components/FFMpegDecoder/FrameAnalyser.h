@@ -24,7 +24,7 @@ namespace y60 {
 
     class FrameAnalyser {
         public:
-            FrameAnalyser::FrameAnalyser(AVFormatContext * theFormatContext, AVStream * theVStream, int theVStreamIndex);
+            FrameAnalyser(AVFormatContext * theFormatContext, AVStream * theVStream, int theVStreamIndex);
 
             void printPacketInfo(AVPacket & thePacket);
             void printFrameInfo(AVFrame & theFrame);

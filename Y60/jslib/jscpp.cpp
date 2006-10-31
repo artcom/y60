@@ -26,13 +26,13 @@
 #include "JSBSpline.h"
 #include "JSSvgPath.h"
 #include "JSPerlinNoise.h"
-#include "JSBox2f.h"
 #include "JSSerial.h"
 
 #include "jscpp.h"
 
 #include <y60/JSSphere.h>
 #include <y60/JSBox.h>
+#include <y60/JSBox2f.h>
 #include <y60/JSLine.h>
 #include <y60/JSPlane.h>
 #include <y60/JSTriangle.h>

@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSRequest.cpp,v $
-//   $Author: pavel $
-//   $Revision: 1.5 $
-//   $Date: 2005/04/24 00:41:19 $
-//
-//
-//=============================================================================
 
 #include "JSRequest.h"
 

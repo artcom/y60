@@ -21,6 +21,7 @@
 #ifndef _ac_y60_stream_functions_h_
 #define _ac_y60_stream_functions_h_
 
+#include "RankedFeature.h" // Needed to make sure [de]binarize(RankedFeature) gets called :-(.
 #include "typedefs.h"
 
 #include <asl/Block.h>

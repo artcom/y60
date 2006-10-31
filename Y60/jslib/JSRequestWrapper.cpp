@@ -13,6 +13,7 @@
 #include <y60/JSEnum.h>
 #include <y60/JSBlock.h>
 #include <y60/JSWrapper.impl>
+#include <y60/ArgumentHolder.impl>
 #include <iostream>
 
 using namespace std;
@@ -21,6 +22,8 @@ using namespace asl;
 namespace jslib {
 
 template class JSWrapper<JSRequest, JSRequestPtr, StaticAccessProtocol>;
+template struct ArgumentHolder<JSRequestPtr const &>;
+template struct ArgumentHolder<inet::RequestPtr>;
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

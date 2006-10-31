@@ -60,7 +60,7 @@ namespace jslib {
          *         window.
          * @warn Currently, theScene may not be Ptr(0)!
          */
-        bool AbstractRenderWindow::setSceneAndCanvas(const y60::ScenePtr & theScene,
+        bool setSceneAndCanvas(const y60::ScenePtr & theScene,
                 const dom::NodePtr & theCanvas = dom::NodePtr(0));
 
         /**
@@ -71,7 +71,7 @@ namespace jslib {
          * @warn Currently, theScene may not be Ptr(0)!
          * @deprecated use setSceneAndCanvas
          */
-        bool AbstractRenderWindow::setScene(const y60::ScenePtr & theScene);
+        bool setScene(const y60::ScenePtr & theScene);
 
         /**
          * Creates the renderer and opens the renderwindow, if this has not been

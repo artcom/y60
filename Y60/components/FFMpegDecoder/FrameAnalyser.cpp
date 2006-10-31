@@ -203,7 +203,7 @@ namespace y60 {
         }
 
 #if LIBAVCODEC_BUILD >= 0x5100
-        int64_t myHalfFrame = av_q2d(_myVStream->time_base) / 2;
+        int64_t myHalfFrame = int64_t(av_q2d(_myVStream->time_base) / 2);
         int64_t myTimestamp = theFrame * (int64_t)av_q2d(_myVStream->time_base) + _myVStream->start_time;
 #else
         int64_t myHalfFrame = int64_t(AV_TIME_BASE) * _myVStream->r_frame_rate_base / 

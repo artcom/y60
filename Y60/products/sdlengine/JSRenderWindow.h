@@ -72,7 +72,7 @@ public:
 
     static jslib::JSConstIntPropertySpec * ConstIntProperties();
 
-    static void JSRenderWindow::addClassProperties(JSContext * cx, JSObject * theClassProto);
+    static void addClassProperties(JSContext * cx, JSObject * theClassProto);
     static JSObject * initClass(JSContext *cx, JSObject *theGlobalObject);
 };
 

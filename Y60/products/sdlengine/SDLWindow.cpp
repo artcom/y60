@@ -45,9 +45,14 @@
 #include <y60/JScppUtils.h>
 #include <y60/GLAlloc.h>
 #include <y60/ShaderLibrary.h>
+#include <y60/ArgumentHolder.impl>
 
 using namespace std;
 using namespace y60;
+
+namespace jslib {
+    template class ResultConverter<y60::EventRecorder::Mode>;
+}
 
 #define DB(x) //x
 

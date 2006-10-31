@@ -17,11 +17,11 @@ namespace y60 {
 
     class AudioFrame {
         public:
-            AudioFrame::AudioFrame(unsigned theFrameSize) : _myTimestamp(0), _mySizeInBytes(0) {
+            AudioFrame(unsigned theFrameSize) : _myTimestamp(0), _mySizeInBytes(0) {
                 _myBuffer = new unsigned char[theFrameSize];
             }
 
-            AudioFrame::~AudioFrame() {
+            ~AudioFrame() {
                 if (_myBuffer) {
                     delete[] _myBuffer;
                     _myBuffer = 0;

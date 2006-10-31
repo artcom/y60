@@ -68,7 +68,7 @@ public:
 
     
 private:
-    JSBool JSScene::getStatistics(JSContext *cx, jsval *vp);
+    JSBool getStatistics(JSContext *cx, jsval *vp);
 
 };
 

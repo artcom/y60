@@ -290,6 +290,7 @@ bool convertFrom(JSContext *cx, jsval theValue, typename dom::ValueWrapper<T>::T
 
 bool convertFrom(JSContext *cx, jsval theValue, double & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, float & theDest);
+bool convertFrom(JSContext *cx, jsval theValue, short & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, unsigned short & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, int & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, unsigned int & theDest); 

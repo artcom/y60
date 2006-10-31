@@ -7,14 +7,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
-//
-//   $RCSfile: JSRequest.h,v $
-//   $Author: uzadow $
-//   $Revision: 1.3 $
-//   $Date: 2004/11/25 18:06:06 $
-//
-//
-//=============================================================================
 
 #ifndef _Y60_ACXPSHELL_JSREQUEST_H_INCLUDED_
 #define _Y60_ACXPSHELL_JSREQUEST_H_INCLUDED_
@@ -44,7 +36,7 @@ class JSRequest : public inet::Request {
         void onDone();
     private:
         JSRequest();
-        bool JSRequest::hasCallback(const char * theName);
+        bool hasCallback(const char * theName);
         JSObject * _myJSListener;
         JSContext * _myJSContext;
 };
