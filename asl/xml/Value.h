@@ -420,7 +420,9 @@ namespace dom {
         }
     protected:
         virtual void setMutableString(const DOMString & theValue) const {
-            const_cast<DOMString&>(_myStringValue) = theValue;
+            // no more const_cast here, instead declare
+            // as mutable. this is an attempt to fix bug 470
+            _myStringValue = theValue;
         }
         virtual void setBlockWriteable(bool theState) {
             _isBlockWriteable = theState;
@@ -436,7 +438,7 @@ namespace dom {
             return _myNode;
         }
     private:
-        DOMString _myStringValue;
+        mutable DOMString _myStringValue;
         bool _isBlockWriteable;
         mutable Node * _myNode;
     };
