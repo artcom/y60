@@ -61,12 +61,6 @@ namespace asl {
 class SingletonManager {  
 public:  
     ~SingletonManager();
-
-    // This function is called by the destructor. It is also called by the windows ctrl-break
-    // handler to make sure that all singletons are destroyed even if the (static)
-    // SingletonManager isn't.
-    void destroyAllSingletons();
-
     // The SingletonManager itself is a classic Singleton  
     // (Under Windows it will be instantiated once per module/dll/plugin)  
     static SingletonManager & get();  
@@ -75,7 +69,7 @@ public:
     // to delegate singleton lookup to the one and only  
     // SingletonManager in charge for the running process.  
     void setDelegate(SingletonManager * theDelegate); 
-
+  
     template<class T>  
     T& getSingletonInstance() const {  
         // NOTE: this is only called once per module and Singleton class,  

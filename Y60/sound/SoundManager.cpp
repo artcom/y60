@@ -47,9 +47,7 @@ SoundManager::~SoundManager() {
     if (_mySounds.size() != 0) {
         AC_DEBUG << "Deleting SoundManager, but " << _mySounds.size() << 
                 " sounds are still active.";
-        // XXX This is called in the context of a Windows Ctrl-Break handler. In this
-        // context, threading seems to be already broken and stopAll borks horribly.
-//        stopAll();
+        stopAll();
     }
     join();
     unregisterDecoderFactory(_myFFMpegAudioDecoderFactory);
