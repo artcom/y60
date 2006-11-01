@@ -25,7 +25,9 @@ struct app2vert {
 
 struct vert2frag {
     float4 homPosition   : POSITION;
+#ifndef NO_OCCLUSION    
     float2 texCoord0     : TEXCOORD0;
+#endif
     float3 worldPosition : TEXCOORD2;
     float3 worldNormal   : TEXCOORD3;
     float3 reflectVector : TEXCOORD4;
@@ -57,8 +59,9 @@ vert2frag mainVertex(app2vert IN,
 
     OUT.reflectVector = reflect(myViewVector, myWorldNormal);
     OUT.reflectVector.z = -OUT.reflectVector.z; // inside-out transformation
-
+#ifndef NO_OCCLUSION
     OUT.texCoord0    = IN.texCoord0;
+#endif    
     OUT.primaryColor = diffuse;
     OUT.reflectionFactor = (FRESNEL_BIAS + FRESNEL_SCALE *
         pow(1+dot(myViewVector, myWorldNormal), FRESNEL_POWER)) * reflectivity;

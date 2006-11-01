@@ -416,6 +416,27 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
+    <shader id="s151" name="pseudo_carpaint_no_occlusion" cost="10" >
+        <supports>
+            <feature class="textures" values="[paint,emissive]"/>
+            <feature class="texcoord" values="[reflective,reflective]"/>
+            <feature class="lighting" values="[lambert]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+             </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
     <shader id="s16" name="pseudo_glassdbltex" cost="10" >
         <supports>
             <feature class="textures" values="[paint,paint,paint]"/>
