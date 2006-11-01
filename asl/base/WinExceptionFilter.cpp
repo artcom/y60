@@ -133,7 +133,7 @@ namespace asl {
 WinExceptionFilter::WinExceptionFilter() {
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
     SetUnhandledExceptionFilter(&AcUnhandledExceptionFilter);
-//    SetConsoleCtrlHandler(&AcCtrlBreakHandler, true);
+    SetConsoleCtrlHandler(&AcCtrlBreakHandler, true);
 }
 
 }
