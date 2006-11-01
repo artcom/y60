@@ -74,6 +74,22 @@ ourHandler.on_new_activate = function() {
     window.queue_draw();
 }
 
+ourHandler.on_include_activate = function() {
+    var isPaused = window.pause;
+    window.pause = true;
+    var myFilename = getFilenameDialog("Include Scene", FileChooserDialog.ACTION_OPEN);
+    
+    if (myFilename) {
+        var myIncludeNode = new Node("<include/>").firstChild;
+        myIncludeNode.src = myFilename;
+        window.scene.world.appendChild(myIncludeNode);
+        window.scene.update(Scene.WORLD);
+    }
+    ourViewer.recollectSwitchNodes(); 
+    ourViewer.setupSwitchNodeMenu();
+    window.pause = false;
+}
+
 ourHandler.on_save_activate = function() {
     var myFilename = ourViewer.getModelName();
     var myBinaryFlag = (myFilename.search(/\.b60$/i) != -1);
@@ -523,7 +539,18 @@ Viewer.prototype.Constructor = function(self, theArguments) {
         var myCanvas = getDescendantByTagName(myScene.dom, 'canvas', true);
         ourViewer.setScene(myScene, myCanvas);
 
-        ourStatusBar.set("Opened scene: " + theFilename);
+        if (window.scene.lightsources.childNodesLength() > 2) {
+            // disable default lighting
+            ourViewer.getLightManager().enableHeadlight(false);
+            ourViewer.getLightManager().enableSunlight(false);
+            ourStatusBar.set("Opened scene: " + theFilename + ". Default lighting is disabled.");
+        } else {
+            // enable
+            ourViewer.getLightManager().enableHeadlight(true);
+            ourViewer.getLightManager().enableSunlight(true);
+            ourStatusBar.set("Opened scene: " + theFilename + ". Default lighting is enabled.");
+        } 
+
         setupGUI();
         window.queue_draw();
     }
