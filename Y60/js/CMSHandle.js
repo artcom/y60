@@ -26,13 +26,13 @@ try {
     cmsconfig:
      - username, password
      - useragent: HTTP User-Agent field string
+     - sync: perform cms synchronization [0|1]
     zopeconfig:
      - baseurl: server URL[:portnumber]
      - loginpage: URL part to post login data to
      - presentationpage: URL part to envoke XML export
      - verbose: ZOPE verbosity on/off [0|1]
-     - localfallback: relative path to a local fallback presentation file (read/write)
-     - fallback: force local fallback to the local presentation file defined in 'localfallback' (read/write)
+     - localfallback: local fallback presentation file path (read/write)
      - versiontag: version tag name i.e. "head", "stable", "testing" (read/write)
     cmscache:
      - localdir: base directory for local chache
@@ -40,7 +40,6 @@ try {
      - verbose: backend verbosity on/off [0|1]
      - domain: domain/organisation name to be added to the username for login
      - maxrequests: maximum number of concurrent HTTP requests
-     - sync: perform asset synchronization [0|1]
      - cleanup: remove stalled assets from local cache
 ========================================================*/
 
@@ -185,13 +184,14 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         }
 
         if ( myErrorOccurred ) {
-            if ( _myLocalFallback && fileExists(myZopeConfig.localfallback) ) {
+            if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
                 Logger.warning("Using local fallback presentation file '" + _myLocalFallback + "'.");
                 _myPresentation.parseFile( _myLocalFallback );
                 // do not remove new content, when syncing with 'old' local fallback presentation file:
-                _mySyncFlag    = false;
+                _mySyncFlag = false;
             } else {
-                throw new Exception("No local fallback presentation file available.", fileline());
+                throw new Exception("Local fallback presentation file not found at '" +
+                                    _myLocalFallback+"'.", fileline());
             }
         } else {
             _myPresentation.parse( myPresentationRequest.responseString );
@@ -222,10 +222,10 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             _myUserAgent = _myConfig.useragent;
         }
 
-        if ("sync" in myCMSConfig &&
-            myCMSConfig.sync)
+        if ("sync" in _myConfig &&
+            _myConfig.sync)
         {
-            _mySyncFlag = Number(myCMSConfig.sync) > 0;
+            _mySyncFlag = Number(_myConfig.sync) > 0;
         }
 
         if ("versiontag" in myZopeConfig &&
@@ -234,7 +234,18 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             _myVersionTag = myZopeConfig.versiontag;
         }
 
-        fetchPresentation();
+        if ( _mySyncFlag ) {
+            fetchPresentation();
+        } else if ( _myLocalFallback && fileExists(_myLocalFallback) ) {
+           Logger.warning("CMS synchronization disabled.");
+           Logger.warning("Using local fallback presentation file '" + _myLocalFallback + "'.");
+            _myPresentation = Node.createDocument();
+            _myPresentation.parseFile( _myLocalFallback );
+        } else {
+            throw new Exception("Local fallback presentation file not found at '" +
+                                _myLocalFallback+"'.", fileline());
+        }
+
     }
 
     function verboseZope( theMessage ) {
