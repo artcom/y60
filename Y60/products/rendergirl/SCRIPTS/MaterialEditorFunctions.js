@@ -34,7 +34,7 @@ function updateMaterialEditor() {
         // handle vector4f  
         if (myChildNode.nodeName == "vector4f") {
             updateColorElement(myChildNode);
-        } else if (myChildNode.nodeName == "float") {
+        } else if (myChildNode.nodeName == "float" && myChildNode.name != "shininess") {
             eval("ourHandler.on_float_slider"+myActiveFloatValue+"_value_changed = function() {\n"+
                  "    var myMaterial = getSelectedMaterial();\n"+
                  "    if (!myMaterial) {\n"+

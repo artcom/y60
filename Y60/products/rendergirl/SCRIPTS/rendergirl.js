@@ -423,6 +423,10 @@ ourHandler.on_material_editor_activate = function() {
     myMaterialEditor.show();
 }
 
+ourHandler.on_spinbutton1_value_changed = function() {
+   updateMaterial("shininess", ourGlade.get_widget("spinbutton1").value);
+}
+
 //=================================================
 // Tools->Bounding boxes
 //=================================================
