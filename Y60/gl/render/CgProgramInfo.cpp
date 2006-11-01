@@ -633,7 +633,7 @@ namespace y60 {
                                 << " to parameter : "<< cgGetParameterName(theCgParameter) << endl);
                     } else {
                         throw ShaderException(string("Texture Index ") + as_string(myTextureIndex) +
-                                " not found. Material has " + as_string(theMaterial.getTextureCount()) + " texture(s)",
+                                " not found. Material (" + theMaterial.get<IdTag>() + ") has " + as_string(theMaterial.getTextureCount()) + " texture(s)",
                                 "CgProgramInfo::setCgMaterialParameter()");
                     }
                     break;
