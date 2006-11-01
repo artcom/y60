@@ -54,6 +54,7 @@ window.onFrame = function(theTime) {
         removeObjects();
         print("Objects created: " + ourCounter);
         var myNodeCount = countNodes(window.scene.dom);
+        print("myNodeCount=" + myNodeCount);
         if (myNodeCount != ourInitialNodeCount) {
             Logger.error("Nodecount increased by: " + (myNodeCount - ourInitialNodeCount));
             exit(1);
@@ -64,7 +65,7 @@ window.onFrame = function(theTime) {
             exit(1);
         } else {
             Logger.trace(window.scene.dom);
-            Logger.info("Memory usage increased by: " + myMemoryIncrease + " KB");
+            print("Memory usage increased by: " + myMemoryIncrease + " KB");
         }
         exit(0);
     }
