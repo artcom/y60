@@ -172,7 +172,7 @@ ALSAPump::setHWParams(snd_pcm_t * theDevice, int myNumChannels) {
     _myFramesPerBuffer = myBufferSize;
 
     myRetVal = snd_pcm_hw_params_set_periods
-            (theDevice, myHWParams, 2, 0);
+            (theDevice, myHWParams, 4, 0);
     if (myRetVal < 0) {
         AC_WARNING << "Unable to set number of buffers";
     }

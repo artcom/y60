@@ -13,6 +13,7 @@
 
 #include "Documentation.h"
 #include "JScppUtils.h"
+#include "ArgumentHolder.h"
 #include <js/jspubtd.h>
 #include <js/jsapi.h>
 #include <js/jscntxt.h>
@@ -26,99 +27,6 @@
 
 
 namespace jslib {
-
-template<class T>
-struct Argument {
-    typedef T PlainType;
-    typedef T FullType;
-};
-
-template<class T>
-struct Argument<T&> {
-    typedef T PlainType;
-    typedef T & FullType;
-};
-
-template<class T>
-struct Argument<const T &> {
-    typedef T PlainType;
-    typedef const T & FullType;
-};
-
-#if 0
-struct Argument<const dom::Node &> {
-    typedef dom::Node * const PlainType;
-    typedef const dom::Node & FullType;
-};
-#endif
-
-template<class T>
-struct Argument<const T> {
-    typedef T PlainType;
-    typedef const T FullType;
-};
-
-struct NoArgument {};
-
-struct NoResult {
-    template <class T> NoResult(T) {}
-};
-
-template <>
-struct Argument<NoResult> {
-    typedef void PlainType;
-    typedef NoResult FullType;
-};
-
-DEFINE_EXCEPTION(ArgumentConversionFailed, asl::Exception);
-
-template <class T>
-struct ArgumentHolder {
-    typedef T ARG_TYPE;
-    typedef typename Argument<T>::PlainType PLAIN_TYPE;
-
-    ArgumentHolder(JSCallArgs & theArgs, int n);
-    PLAIN_TYPE & getArg(); 
-
-private:
-    PLAIN_TYPE _myArg;
-};
-
-template <>
-struct ArgumentHolder<NoArgument> {
-    ArgumentHolder(JSCallArgs & theArgs, int n) {}
-    typedef void ARG_TYPE;
-    enum { exists = false };
-    NoArgument & getArg() {
-        static NoArgument _ourNoArgument;
-        return _ourNoArgument;
-    };
-};
-#if 1
-extern bool convertFrom(JSContext *cx, jsval theValue, const dom::Node * & theNode);
-template <>
-struct ArgumentHolder<const dom::Node &> {
-    typedef const dom::Node & ARG_TYPE;
-    typedef const dom::Node & PLAIN_TYPE;
-
-    ArgumentHolder(JSCallArgs & theArgs, int n) {
-        if(!convertFrom(theArgs.cx, theArgs.argv[n], _myArg)) {
-            throw ArgumentConversionFailed(JUST_FILE_LINE);
-        }
-    }
-	const dom::Node & getArg() const {
-        return *_myArg;
-    };
-private:
-	dom::Node const * _myArg; // pointer to const Node, same as const dom::Node * _myArg
-};
-#endif
-
-template <class T>
-struct ResultConverter {
-    static void
-    storeResult(JSCallArgs & theJSArgs, const T & theResult);
-};
 
 template <class CLASS, class METHOD, class RESULT>
 struct IfResult {
