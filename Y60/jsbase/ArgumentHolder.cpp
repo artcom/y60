@@ -34,6 +34,7 @@ namespace jslib {
     template struct ArgumentHolder<unsigned long>;
     template struct ArgumentHolder<unsigned long const &>;
     template struct ArgumentHolder<float>;
+    template struct ArgumentHolder<float const &>;
     template struct ArgumentHolder<double>;
     template struct ArgumentHolder<double const &>;
     template struct ArgumentHolder<asl::Vector2<int> >;
