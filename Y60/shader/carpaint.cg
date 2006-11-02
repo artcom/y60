@@ -123,7 +123,7 @@ float4 mainFragment(vert2frag   IN,
             float3 H = normalize(L + V);
             float specularTerm = pow(max(dot(N, H), 0), shininess);
 #endif
-            mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i];
+            mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i] * diffuseTerm;
         }
     }
 #ifdef POSITIONAL_LIGHTS
