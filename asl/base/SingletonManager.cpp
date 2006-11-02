@@ -27,7 +27,7 @@ using namespace std;
 namespace asl {
 
 SingletonManager::~SingletonManager() {
-    cerr << "Destroying SingletonManager";
+//    cerr << "Destroying SingletonManager";
     destroyAllSingletons();
 }
 
@@ -46,8 +46,8 @@ SingletonManager::destroyAllSingletons() {
     for (SingletonList::iterator it = _mySingletonList.begin(); it != _mySingletonList.end(); ) {
         // Delete logger last, to allow other singletons to use the logger in their destructor
         if (dynamic_cast_Ptr<Logger>(*it) == 0) {
-            cerr << "  destroying singleton " << typeid(**it).name() << " size: " 
-                    << _mySingletonList.size();
+//            cerr << "  destroying singleton " << typeid(**it).name() << " size: " 
+//                    << _mySingletonList.size();
             it = _mySingletonList.erase(it);
         } else {
             ++it;
@@ -55,7 +55,7 @@ SingletonManager::destroyAllSingletons() {
     }
 
     _mySingletonList.clear();
-    cerr << "All singletons destroyed.";
+//    cerr << "All singletons destroyed.";
 }
 
 SingletonManager &
