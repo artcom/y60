@@ -852,10 +852,14 @@ MaterialExporter::createMaterial(const MFnMesh * theMesh, const MObject & theSha
     exportShader(theMesh, theShaderNode, myMaterialBuilder, theSceneBuilder, myLightingFeature);
 
     myMaterialBuilder.setType(myLightingFeature);
-    if (myMaterialBuilder.getTransparencyFlag() == false) {
+    if (myMaterialBuilder.getTransparencyFlag() == false && checkTransparency(theShaderNode)) {
         // if no texture has set the transparency flag, do our checks
-        myMaterialBuilder.setTransparencyFlag(checkTransparency(theShaderNode));
-    }
+        TargetBuffers myTB = TargetBuffers(((1<<RED_MASK)|(1<<GREEN_MASK)|(1<<BLUE_MASK)|(1<<ALPHA_MASK)|(0<<DEPTH_MASK)));
+        setPropertyValue<TargetBuffers>(myMaterialBuilder.getNode(), TARGETBUFFERS_PROPERTY, "targetbuffers", myTB);
+    
+        myMaterialBuilder.setTransparencyFlag(true);
+    } 
+    
     _myMaterialNameMap[myMaterialName] = myMaterialId;
 
     return myMaterialId;
