@@ -29,6 +29,7 @@ AssetRequest::AssetRequest(dom::NodePtr theAssetNode,
         setCookie( theSessionCookie, true );
     }
     _myLocalFile = theBaseDir + "/" + theAssetNode->getAttributeString("path");
+    verifyPeer(false); // don't bother to authenticate server, just encrypt
     //setVerbose(true);
     //setTimeoutParams(100, 60);
 }

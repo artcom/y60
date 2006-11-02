@@ -47,6 +47,7 @@ using namespace std;
 using namespace dom;
 
 #define DB(x) //x
+#define DONT_USE_MAPPED_BLOCK_IO
 
 namespace y60 {
 

@@ -35,12 +35,17 @@ TestServer::sendSlowly(const std::string theData) {
 
 void 
 TestServer::sendResponseHeader(int theResponseCode) {
+    sendResponseHeader(theResponseCode, "utf-8");
+}
+
+void
+TestServer::sendResponseHeader(int theResponseCode, const std::string & theCharset) {
     std::stringstream myDate;
     myDate << Time();
     sendSlowly("HTTP/1.1 "+as_string(theResponseCode)+"\n");
     sendSlowly("Date: "+myDate.str()+"\n");
     sendSlowly("Server: ASL Conduit\n");
-    sendSlowly("Content-Type: text/plain\n");
+    sendSlowly("Content-Type: text/plain; charset="+theCharset+"\n");
 }
 
 void 
@@ -73,6 +78,9 @@ TestServer::processData() {
             asl::msleep(10*1000);
             sendResponseHeader(200);
             sendResponseBody("timeout");
+        } else if (myURL == "utf8") {
+            sendResponseHeader(200, "utf-8");
+            sendResponseBody("\xc3\x84"); // set A-Umlaut
         } else {
             sendResponseHeader(404);
             sendResponseBody("not found");

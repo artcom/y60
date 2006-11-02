@@ -48,6 +48,7 @@ namespace inet {
             checkCurlStatus(myStatus, PLUS_FILE_LINE);
 
             setVerbose(CURL_VERBOSE);
+            verifyPeer(true); // default: check ssl cert
 
             // curl handles can save a single user-data char *
             // we abuse this to save a this backpointer
@@ -331,6 +332,7 @@ namespace inet {
 
     void
     Request::verifyPeer(bool theFlag) {
+        _myVerifyPeerFlag = theFlag;
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_SSL_VERIFYPEER, theFlag);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }

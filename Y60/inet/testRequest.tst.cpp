@@ -88,6 +88,8 @@ class RequestTest : public UnitTest {
             TestRequestPtr myShortRequest = TestRequestPtr(new TestRequest(myServer+"/ShortRequest"));
             TestRequestPtr myPageNotFoundRequest = TestRequestPtr(new TestRequest(myServer+"/404"));
             TestRequestPtr myNoServerRequest = TestRequestPtr(new TestRequest("http://server.invalid"));
+            TestRequestPtr myUTF8Request = TestRequestPtr(new TestRequest(myServer+"/utf8"));
+            myUTF8Request->setVerbose(true);
             TestRequestPtr myServerTimeoutRequest = TestRequestPtr(new TestRequest(myServer+"/Timeout"));
             myServerTimeoutRequest->setTimeoutParams(1, 5); // 5 sec timeout
 
@@ -105,6 +107,7 @@ class RequestTest : public UnitTest {
             myRequestManager.performRequest(myBaseAuthentRequest);
             */
             myRequestManager.performRequest(myNoServerRequest);
+            myRequestManager.performRequest(myUTF8Request);
             myRequestManager.performRequest(myPageNotFoundRequest);
             myRequestManager.performRequest(myLongRequest);
             myRequestManager.performRequest(myShortRequest);
@@ -135,6 +138,7 @@ class RequestTest : public UnitTest {
             ENSURE(myShortRequest->_myErrorCalledFlag == false);
             ENSURE(myShortRequest->_myDoneCalledFlag == true);
             ENSURE(myShortRequest->getResponseCode() == 200);
+            ENSURE(myShortRequest->getResponseString().size());
             
             ENSURE(myPageNotFoundRequest->_myDataReceivedFlag);
             ENSURE(myPageNotFoundRequest->_myErrorCalledFlag == false);
@@ -146,6 +150,9 @@ class RequestTest : public UnitTest {
             ENSURE(myNoServerRequest->_myDoneCalledFlag == false);
             DPRINT(myNoServerRequest->getResponseCode());
             ENSURE(myNoServerRequest->getResponseCode() == 0);
+
+            DPRINT(myUTF8Request->getResponseString().size());
+            ENSURE(myUTF8Request->getResponseString().size() == 2);
             
             ENSURE(myServerTimeoutRequest->_myDataReceivedFlag == false);
             ENSURE(myServerTimeoutRequest->_myErrorCalledFlag == true);

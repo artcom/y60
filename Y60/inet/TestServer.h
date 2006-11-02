@@ -25,6 +25,7 @@ class TestServer : public asl::ConduitServer<asl::TCPPolicy> {
         TestServer(asl::TCPPolicy::Handle theHandle);
         void sendSlowly(const std::string theData);
         void sendResponseHeader(int theResponseCode);
+        void sendResponseHeader(int theResponseCode, const std::string & theCharset);
         void sendResponseBody(const std::string & theBody);
         std::string getUrl(const std::string & theRequest);
         virtual bool processData();

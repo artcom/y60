@@ -71,6 +71,7 @@ namespace inet {
             void setTimeoutParams(unsigned theBytesPerSec, unsigned theSeconds);
             void setVerbose(bool theVerboseFlag);
             bool getVerbose() const { return _myVerboseFlag; }
+            bool getVerifyPeer() const { return _myVerifyPeerFlag; }
             void setSSLCertificate(const std::string & theCertificateFilename);
             void verifyPeer(bool theFlag);
             void setCookie(const std::string & theCookie, bool theSessionCookieFlag = false);
@@ -143,6 +144,7 @@ namespace inet {
             std::string         _myCookieBuffer;
             std::string         _myAuthentData;
             bool                _myVerboseFlag;
+            bool                _myVerifyPeerFlag;
     };
 
     typedef asl::Ptr<Request> RequestPtr;

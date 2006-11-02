@@ -139,6 +139,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                                     _myUserAgent );
         myLoginRequest.post("__ac_name=" + _myConfig.username +
                             "&__ac_password=" + _myConfig.password + "&proxy=" + _myConfig.password);
+        myLoginRequest.verifyPeer = false;
         _myRequestManager.performRequest( myLoginRequest );
 
         while ( _myRequestManager.activeCount ) {
@@ -166,6 +167,8 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
             }
 
             _myRequestManager.performRequest( myPresentationRequest );
+            myPresentationRequest.verifyPeer = false;
+            myPresentationRequest.verbose = true;
             while ( _myRequestManager.activeCount ) {
                 _myRequestManager.handleRequests();
                 msleep( 10 );
