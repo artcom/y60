@@ -9,7 +9,7 @@
 //=============================================================================
 
 
-function SwitchNodeHandlerBase( Public, Protected, theNode) {
+function SwitchNodeHandlerBase( Public, Protected, theNode ) {
 
     Public.node getter = function() {
         return _myNode;
@@ -48,15 +48,15 @@ function SwitchNodeHandlerBase( Public, Protected, theNode) {
  *               Geometry switch handler                   *
  *                                                         *
  ***********************************************************/
-function SwitchNodeHandler( theNode, theActiveIndex) {
-    this.Constructor( this, theNode, theActiveIndex);
+function SwitchNodeHandler( theNode, theActiveIndex ) {
+    this.Constructor( this, theNode, theActiveIndex );
 }
 
-SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex) {
+SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex ) {
     var Public    = obj;
     var Protected = {}
     
-    SwitchNodeHandlerBase(Public, Protected, theNode);
+    SwitchNodeHandlerBase( Public, Protected, theNode );
 
     function setup( theActiveChild ) {
         var myName = new String( Public.switchName );
@@ -73,7 +73,6 @@ SwitchNodeHandler.prototype.Constructor = function( obj, theNode, theActiveIndex
                                 "than one active child. Using first.");
                     } else {
                         Public.activeIndex = i;
-                        //_myActiveChild = i;
                     }
                     myActiveChildCount += 1;
                 }
@@ -127,21 +126,20 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
     SwitchNodeHandlerBase(Public, Protected, theNode);
 
     function setup() {
-        _myTargetMaterial = findTargetMaterial();
     }
         
     Public.setActiveChild = function( theIndex ) {
         setMaterial(Public.activeChild.name);
         Public.activeIndex = theIndex;
-        //_myActiveChild = theIndex;
     }
     
     Public.setActiveChildByName = function(theName, theSubnameFlag) {
-        setMaterial(theName);
         for (var i=0; i<Public.childCount; ++i) {
-            if ((Public.node.childNode(i).name == theName) 
-                 || (theSubnameFlag && Public.node.childNode(i).name.indexOf(theName) != -1)) 
+            var myChildNode = Public.node.childNode(i);
+            if ((myChildNode.name == theName) 
+                 || (theSubnameFlag && myChildNode.name.indexOf(theName) != -1)) 
             {
+                setMaterial(myChildNode.name);
                 Public.activeIndex = i;
                 break;
             }
@@ -158,20 +156,90 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         }
 
         if (!myTargetMaterial) {
-            Logger.error("Could not find target material: " + myTargetMaterialName + " for material switch " + Public.switchName);
+            Logger.error("Could not find target material: " + myTargetMaterialName + " for material switch " +
+                         Public.switchName);
         }
         
         return myTargetMaterial;
     }
+
+    function matchTextureCoordCount(theId, theCount) {
+        var myShapesNode = window.scene.shapes;
+        for (var i = 0; i < myShapesNode.childNodesLength("shape"); ++i) {
+            var myPrimitives = myShapesNode.childNode("shape", i).childNode("primitives");
+            for (var j = 0; j < myPrimitives.childNodesLength("elements"); ++j) {
+                var myElements = myPrimitives.childNode("elements", j)
+                if (myElements.material = theId) {
+                    var myTextureCoordCount = 0;
+                    for (var k = 0; k < myElements.childNodesLength("indices"); ++k) {
+                        var myIndicesNode = myElements.childNode("indices", k);
+                        if (String(myIndicesNode.role).indexOf("texcoord") != -1) {
+                            myTextureCoordCount++;
+                        }
+                    }
+                    if (myTextureCoordCount < theCount) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
+    function replaceMaterialIds(theOldId, theNewId) {
+        var myNodes = window.scene.shapes.getNodesByAttribute("elements", "material", theOldId);        
+        for (var i = 0; i < myNodes.length; ++i) {
+            myNodes[i].material = theNewId;
+        }
+    }
+    
+    function findOcclusionMap(theMaterial) {
+        var myTexturesNode = theMaterial.childNode("textures");
+        for (var i = 0; i < myTexturesNode.childNodesLength(); ++i) {
+            var myTexture = myTexturesNode.childNode(i);
+            var myImage = theMaterial.getElementById(myTexture.image);
+            if (myImage.src.search(/shadowmap/i) != -1) {
+                return myTexture;
+            }
+        }
+        
+        return null;
+    }
+        
+    function prependFeature(theFeatureList, theValue) {
+        var myRegExp = /\[(\d{1,3})\[(.*)\]\]/;
+        var myResults = myRegExp.exec(theFeatureList);
+        if (myResults && myResults.length) {
+            var myFeatures = myResults[2].split(",");
+            myFeatures.unshift(theValue);
+            return "[" + myResults[1] + "[" + myFeatures.toString() + "]]";
+        }
+    }
+    
+    function getNumTexcoordCount(theFeatureList) {
+        var myCount = 0;
+        var myRegExp = /\[\d{1,3}\[(.*)\]\]/;
+        var myResults = myRegExp.exec(theFeatureList);
+        if (myResults && myResults.length) {
+            var myFeatures = myResults[1].split(",");
+            for (var i = 0; i < myFeatures.length; ++i) {
+                if (myFeatures[i] == "uv_map") {
+                    myCount++;
+                }
+            }
+            return myCount;
+        }
+    }
     
     function setMaterial(theMaterialCode) {
-        // print("switchMaterials(", theMaterialCode, " ", Public.node);
+        //print("switchMaterials(", theMaterialCode, " ", Public.node);
         // First Step: Search inside the switch for the material with the materialcode
         
-        var myNewMaterial = null;
+        var mySwitchMat = null;
         for (var i = 0; i < Public.childCount; ++i) {
             var myChild = Public.node.childNode( i );
-            if (myChild.name.indexOf(theMaterialCode) != -1) {
+            if (myChild.name.indexOf(theMaterialCode) != -1 &&
+                myChild.name.indexOf("dark") == -1) {
                 var myShapeId = "";
                 if (myChild.nodeName == "body") {
                     myShapeId = myChild.shape;
@@ -186,52 +254,86 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                 var myShape = Public.node.getElementById(myShapeId);
                 if (!myShape) {
                     Logger.warning("Could not find shape with id: " + myShapeId);
-                    return;
+                    return false;
                 }
                 var myElement = getDescendantByTagName(myShape, "elements", true);
-                myNewMaterial = myElement.getElementById(myElement.material);
+                mySwitchMat = myElement.getElementById(myElement.material);
             }
         }
 
-        // print("new mat: " + myNewMaterial);
-
-        if (!myNewMaterial) {
+        if (!mySwitchMat) {
             Logger.warning("Could not find material: " + theMaterialCode);
-            return;
+            return false;
         }
 
-        // print("target mat: " + _myTargetMaterial);
+        //print("switch mat: " + mySwitchMat);
+
+        var myOldTargetMat = findTargetMaterial();
+        // NOTE: the old way [jb]
+        myOldTargetMat.replaceChild(mySwitchMat.childNode("properties").cloneNode(true),
+                                    myOldTargetMat.childNode("properties"));
+/*
+        // NOTE: the new way
+        //save the occlusion map (if there is one) before replacing the textures
+        var myOcclusionMap = findOcclusionMap(myOldTargetMat);
+
+        //print("old target ma: " + myOldTargetMat);
+
         // Third step: Setup target material
-        var myNewProperties = myNewMaterial.properties;
-        var myTargetProperties = _myTargetMaterial.properties;
+        var myNewTargetMat = myOldTargetMat.cloneNode(true);
+        myNewTargetMat.id = createUniqueId();
 
-        myTargetProperties.ambient       = myNewProperties.ambient;
-        myTargetProperties.diffuse       = myNewProperties.diffuse;
-        myTargetProperties.specular      = myNewProperties.specular;
-        myTargetProperties.shininess     = myNewProperties.shininess;
-        myTargetProperties.emissive      = myNewProperties.emissive;
-        myTargetProperties.surfacecolor  = myNewProperties.surfacecolor;
-        myTargetProperties.blendfunction = myNewProperties.blendfunction;
-        myTargetProperties.linewidth     = myNewProperties.linewidth;
-        myTargetProperties.pointsize     = myNewProperties.pointsize;
-        myTargetProperties.linesmooth    = myNewProperties.linesmooth;
-        if ("reflectivity" in myNewProperties) {
-            myTargetProperties.reflectivity = myNewProperties.reflectivity;
+        // replace the "properties" node and remove sampler properties
+        myNewTargetMat.replaceChild(mySwitchMat.childNode("properties").cloneNode(true),
+                                    myNewTargetMat.childNode("properties"));
+        var myProperties = myNewTargetMat.childNode("properties");
+        var i = 0;
+        while ( i < myProperties.childNodesLength() ) {        
+            if (myProperties.childNode(i).nodeName.indexOf("sampler") == 0) {
+                myProperties.removeChild(myProperties.childNode(i));
+            } else {
+                ++i;
+            }
         }
-        if ("eccentricity" in myNewProperties) {
-            myTargetProperties.eccentricity = myNewProperties.eccentricity;
+        
+        // replace the "textures" node
+        myNewTargetMat.replaceChild(mySwitchMat.childNode("textures").cloneNode(true),
+                                    myNewTargetMat.childNode("textures"));
+
+        // replace the "requires" node
+        myNewTargetMat.replaceChild(mySwitchMat.childNode("requires").cloneNode(true),
+                                    myNewTargetMat.childNode("requires"));
+
+        // append the saved occlusion map as "textures" node's first child
+        if (myOcclusionMap) {
+            var myOtherOcclusionMap = findOcclusionMap(mySwitchMat);
+            if (myOtherOcclusionMap) {
+                // there is already an occlusion map in the new material, replace it
+                myNewTargetMat.childNode("textures").replaceChild(myOcclusionMap.cloneNode(),
+                                                                     myOtherOcclusionMap);
+            } else {
+                //add occlusion map and adjust the requirements
+                myNewTargetMat.childNode("textures").insertBefore(myOcclusionMap,
+                        myNewTargetMat.childNode("textures").firstChild);
+                //myNewTargetMat.requires.textures = prependFeature(myOldTargetMat.requires.textures, "paint");
+                //myNewTargetMat.requires.texcoord = prependFeature(myOldTargetMat.requires.texcoord, "uv_map");
+            }
         }
-        if ("specularrolloff" in myNewProperties) {
-            myTargetProperties.specularrolloff = myNewProperties.specularrolloff;
-        }
-        if ("glow" in myNewProperties) {
-            myTargetProperties.glow = myNewProperties.glow;
-        }
-   
-        // print("target mat(after copy): " + _myTargetMaterial);
+
+        //print(myNewTargetMat);
+
+        window.scene.materials.appendChild(myNewTargetMat);
+        //myNewTargetMat.requires.textures = "[10[paint,emissive]]";
+        //myNewTargetMat.requires.texcoord = "[10[reflective,reflective]]";
+        replaceMaterialIds(myOldTargetMat.id, myNewTargetMat.id);
+        window.scene.update(Scene.MATERIALS);
+        window.scene.update(Scene.SHAPES);
+        window.scene.materials.removeChild(myOldTargetMat);
+*/
+        //print("new target mat: " + myNewTargetMat);
+
+        return true;
     }
-
-    var _myTargetMaterial = null;
 
     setup();
 }
