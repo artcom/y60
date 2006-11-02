@@ -163,6 +163,7 @@ JSRequestWrapper::Properties() {
         {"errorString", PROP_errorString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"URL", PROP_URL, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"verbose", PROP_verbose, JSPROP_ENUMERATE | JSPROP_PERMANENT},
+        {"verifyPeer", PROP_verifyPeer, JSPROP_ENUMERATE | JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -213,6 +214,9 @@ JSRequestWrapper::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject
             case PROP_verbose:
                 *vp = as_jsval(cx, getNative().getVerbose());
                 return JS_TRUE;
+            case PROP_verifyPeer:
+                *vp = as_jsval(cx, getNative().getVerifyPeer());
+                return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSRequestWrapper::getProperty: index %d out of range", theID);
                 return JS_FALSE;
@@ -231,6 +235,13 @@ JSRequestWrapper::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject
                 bool myVerboseFlag;
                 convertFrom(cx, *vp, myVerboseFlag );
                 myObj.getNative().setVerbose( myVerboseFlag );
+                return JS_TRUE;
+            } HANDLE_CPP_EXCEPTION;
+        case PROP_verifyPeer:
+            try {
+                bool myFlag;
+                convertFrom(cx, *vp, myFlag );
+                myObj.getNative().verifyPeer( myFlag );
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         default:

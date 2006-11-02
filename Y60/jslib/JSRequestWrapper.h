@@ -37,6 +37,7 @@ class JSRequestWrapper : public JSWrapper<JSRequest, JSRequestPtr, StaticAccessP
             PROP_responseBlock,
             PROP_responseCode,
             PROP_verbose,
+            PROP_verifyPeer,
             PROP_END
         };
         static JSPropertySpec * Properties();
