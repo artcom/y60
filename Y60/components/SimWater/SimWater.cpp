@@ -90,6 +90,18 @@ SimWater::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myTimeStep);
         return;
     }
+    if (thePropertyName == "simulationOffset") {
+        theReturnValue.set( _mySimulationOffset);
+        return;
+    }
+    if (thePropertyName == "displayOffset") {
+        theReturnValue.set( _myDisplayOffset);
+        return;
+    }
+    if (thePropertyName == "simulationSize") {
+        theReturnValue.set( Vector2i(SIMULATION_WIDTH, SIMULATION_HEIGHT));
+        return;
+    }
     
     AC_WARNING << "SimWater::onGetProperty(): Unknown property '" << thePropertyName << "'.";
 };
@@ -127,6 +139,16 @@ SimWater::onSetProperty(const std::string & thePropertyName,
     if (thePropertyName == "timestep") {
        _myTimeStep = thePropertyValue.get<float>();
        return;
+    }
+    if (thePropertyName == "simulationOffset") {
+        _mySimulationOffset = thePropertyValue.get<Vector2i>();
+        _myWaterRepresentation->setDataOffset( _mySimulationOffset );
+        return;
+    }
+    if (thePropertyName == "displayOffset") {
+        _myDisplayOffset = thePropertyValue.get<Vector2i>();
+        _myWaterRepresentation->setDisplayOffset( _myDisplayOffset );
+        return;
     }
 
     AC_WARNING << "SimWater::onSetProperty(): Unknown property '" << thePropertyName << "'.";
@@ -284,7 +306,7 @@ SimWater::convertMouseCoordsToSimulation( const Vector2i & theMousePos ) {
                 (theMousePos[0] * _myDisplaySize[0] / _myViewportSize[0])+ _myDisplayOffset[0]));
     myResult[1] = max (0, min( _myDisplaySize[1] - 1,
                 ((_myViewportSize[1] - theMousePos[1])  * _myDisplaySize[1] / _myViewportSize[1])+ _myDisplayOffset[1]));
-    return myResult;
+    return myResult + _mySimulationOffset;
 }
 
 int 

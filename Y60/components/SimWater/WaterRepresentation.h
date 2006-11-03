@@ -83,6 +83,9 @@ public:
                  int displayOffsetX, int displayOffsetY,
                  BufferAllocatorPtr bufferAllocator = BufferAllocatorPtr(0) );
     
+    void setDataOffset(const asl::Vector2i & theOffset);
+    void setDisplayOffset(const asl::Vector2i & theOffset);
+
     void    reset();
     void    resetParameters();
 

@@ -256,6 +256,18 @@ WaterRepresentation::init(WaterSimulationPtr waterSim, int width, int height,
 }
 
 void
+WaterRepresentation::setDataOffset( const Vector2i & theOffset ) {
+    _dataOffsetX = theOffset[0];
+    _dataOffsetY = theOffset[1];
+}
+
+void
+WaterRepresentation::setDisplayOffset( const Vector2i & theOffset ) {
+    _displayOffsetX = theOffset[0];
+    _displayOffsetY = theOffset[1];
+}
+
+void
 WaterRepresentation::dataCoordToScreenCoord(const Vector2f & theDataCoord, Vector2f & screenCoord) {
     screenCoord[0] = theDataCoord[0] - float(_dataWidth)/2. + _displayOffsetX - _dataOffsetX;
     screenCoord[1] = theDataCoord[1] - float(_dataHeight)/2. + _displayOffsetY - _dataOffsetY;
