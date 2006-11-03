@@ -270,14 +270,15 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
 
         var myOldTargetMat = findTargetMaterial();
         // NOTE: the old way [jb]
-        myOldTargetMat.replaceChild(mySwitchMat.childNode("properties").cloneNode(true),
-                                    myOldTargetMat.childNode("properties"));
-/*
+ //       myOldTargetMat.replaceChild(mySwitchMat.childNode("properties").cloneNode(true),
+ //                                    myOldTargetMat.childNode("properties"));
+
         // NOTE: the new way
         //save the occlusion map (if there is one) before replacing the textures
         var myOcclusionMap = findOcclusionMap(myOldTargetMat);
 
-        //print("old target ma: " + myOldTargetMat);
+        //print("OLD material *********************************************** : \n" + myOldTargetMat);
+        //print("merging with SWITCH material *********************************************** : \n" + mySwitchMat);
 
         // Third step: Setup target material
         var myNewTargetMat = myOldTargetMat.cloneNode(true);
@@ -314,7 +315,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
             } else {
                 //add occlusion map and adjust the requirements
                 myNewTargetMat.childNode("textures").insertBefore(myOcclusionMap,
-                        myNewTargetMat.childNode("textures").firstChild);
+                    myNewTargetMat.childNode("textures").firstChild);
                 //myNewTargetMat.requires.textures = prependFeature(myOldTargetMat.requires.textures, "paint");
                 //myNewTargetMat.requires.texcoord = prependFeature(myOldTargetMat.requires.texcoord, "uv_map");
             }
@@ -322,15 +323,14 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
 
         //print(myNewTargetMat);
 
-        window.scene.materials.appendChild(myNewTargetMat);
+        // FIXME BUG 478: we convert to string & parse again to strip off any facades
+        window.scene.materials.appendChild(new Node(myNewTargetMat.toString()).firstChild);
         //myNewTargetMat.requires.textures = "[10[paint,emissive]]";
         //myNewTargetMat.requires.texcoord = "[10[reflective,reflective]]";
         replaceMaterialIds(myOldTargetMat.id, myNewTargetMat.id);
-        window.scene.update(Scene.MATERIALS);
-        window.scene.update(Scene.SHAPES);
         window.scene.materials.removeChild(myOldTargetMat);
-*/
-        //print("new target mat: " + myNewTargetMat);
+        //print("results in NEW material *********************************************** : \n" + myNewTargetMat);
+
 
         return true;
     }

@@ -60,10 +60,10 @@ namespace y60 {
     bool
     MaterialBase::reloadRequired() const {
         MaterialRequirementFacadePtr myReqFacade = getChild<MaterialRequirementTag>();
-        if (myReqFacade->getNode().nodeVersion() != _myRequiresVersion) {
-            return true;
+        if (myReqFacade && myReqFacade->getNode().nodeVersion() == _myRequiresVersion) {
+            return false;
         }
-        return false;
+        return true;
     }
     
     bool 
