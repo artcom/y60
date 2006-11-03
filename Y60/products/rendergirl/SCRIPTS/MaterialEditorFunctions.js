@@ -20,6 +20,7 @@ function hideFloatSliders() {
         ourGlade.get_widget("float_slider"+i).hide();      
         ourGlade.get_widget("float_label"+i).text = "inactive";
         ourGlade.get_widget("float_label"+i).hide();
+        ourGlade.get_widget("float_value"+i).hide();
     }
 }
 
@@ -44,17 +45,20 @@ function updateMaterialEditor() {
                  "    if (myProperty) {\n"+
                  "        var myValue = ourGlade.get_widget(\"float_slider"+myActiveFloatValue+"\").value;\n"+
                  "        updateMaterial(myProperty.name, myValue);\n"+
+                 "        ourGlade.get_widget(\"float_value"+myActiveFloatValue+"\").text = \" \"+(myValue.toFixed(3));"+
                  "    }\n"+
                  "}\n");
             
             var mySlider = ourGlade.get_widget("float_slider"+myActiveFloatValue);
             var myLabel  = ourGlade.get_widget("float_label"+myActiveFloatValue);
+            var myValue  = ourGlade.get_widget("float_value"+myActiveFloatValue);
             
             var myProperty = getDescendantByName(getSelectedMaterial(), myChildNode.name, true);
             mySlider.value = myProperty.firstChild.nodeValue;
        
             mySlider.show();
             myLabel.show();
+            myValue.show();
             myLabel.text = " "+myChildNode.name;
 
             myActiveFloatValue++;
