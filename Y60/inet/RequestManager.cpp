@@ -19,6 +19,7 @@
 #include "RequestManager.h"
 
 #include <asl/string_functions.h>
+#include <asl/Logger.h>
 
 #include <curl/curl.h>
 
@@ -103,9 +104,32 @@ namespace inet {
     
     int 
     RequestManager::handleRequests() {
-        int myRunningHandles;
         CURLMcode myStatus;
+#if 0        
+        fd_set myReadHandles;
+        fd_set myWriteHandles;
+        fd_set myExceptHandles;
+        int myMaxFd;
 
+        struct timeval tv;
+        /* Wait up to one seconds. */
+        tv.tv_sec = 5;
+        tv.tv_usec = 0;
+
+        FD_ZERO(&myReadHandles);
+        FD_ZERO(&myWriteHandles);
+        FD_ZERO(&myExceptHandles);
+        myStatus = curl_multi_fdset(_myCurlMultiHandle,
+                            &myReadHandles, &myWriteHandles,&myExceptHandles,
+                            &myMaxFd);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        //AC_WARNING << "selecting " << myMaxFd;
+        if (myMaxFd != -1) {
+            select(myMaxFd+1, &myReadHandles, &myWriteHandles, &myExceptHandles, &tv);
+        }
+        //AC_WARNING << "selected";
+#endif
+        int myRunningHandles;
         do {
             myStatus = curl_multi_perform(_myCurlMultiHandle, &myRunningHandles);
             checkCurlStatus(myStatus, PLUS_FILE_LINE);
