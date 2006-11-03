@@ -452,6 +452,8 @@
                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
                 <float name="reflectivity">1</float>
+                <float name="specularrolloff">1</float>
+                <float name="eccentricity">1</float>
             </properties>
             <vertexparameters>
                 <vector4f name="position"/>
