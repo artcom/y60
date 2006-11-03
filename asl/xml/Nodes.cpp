@@ -2752,9 +2752,9 @@ Node::hasFacade() const {
         FacadeFactoryPtr myFactory = getFacadeFactory();
         if (myFactory) {
             _myFacade = FacadePtr(myFactory->createFacade(nodeName(), *const_cast<Node*>(this)));
-			if (!_myFacade) {
-				_myFacade = FacadePtr(myFactory->createFacade(nodeName(), 
-					                  *const_cast<Node*>(this), parentNode()->nodeName()));
+			if (!_myFacade && parentNode()) {
+                _myFacade = FacadePtr(myFactory->createFacade(nodeName(), 
+                    *const_cast<Node*>(this), parentNode()->nodeName()));
 			}
         }
         if (_myFacade) {

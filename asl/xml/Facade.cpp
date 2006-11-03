@@ -70,13 +70,14 @@ namespace dom {
     FacadeFactory::createFacade(const DOMString & theType, Node & theNode, 
 	                            const DOMString & theParentNodeName) const 
     {
+    	DB(AC_TRACE << "FacadeFactory::createFacade('"<<theType<<"','"<<theParentNodeName<<"')"; )
     	FacadePtr myPrototype = findPrototype(FacadeKey(theType, theParentNodeName)); 
     	if (myPrototype) {
-    		DB(AC_TRACE << "FacadeFactory::createValue('" << theType << ", " 
-				        << theParentNodeName<<"') returns value"<<endl;)
+    		DB(AC_TRACE << "FacadeFactory::createFacade('" << theType << ", " 
+				        << theParentNodeName<<"') returns value";)
             return myPrototype->createNew(theNode);
     	}
-    	DB(AC_TRACE << "FacadeFactory::createValue('"<<theType<<"',) returns 0"<<endl;)
+    	DB(AC_TRACE << "FacadeFactory::createFacade('"<<theType<<"') returns 0";)
     	return 0;
     }	
 
