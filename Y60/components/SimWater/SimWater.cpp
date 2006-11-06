@@ -102,6 +102,10 @@ SimWater::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( Vector2i(SIMULATION_WIDTH, SIMULATION_HEIGHT));
         return;
     }
+    if (thePropertyName == "displaySize") {
+        theReturnValue.set( _myDisplaySize );
+        return;
+    }
     
     AC_WARNING << "SimWater::onGetProperty(): Unknown property '" << thePropertyName << "'.";
 };

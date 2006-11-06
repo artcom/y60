@@ -17,6 +17,7 @@
 #include <asl/PosixThread.h>
 #include <asl/ThreadLock.h>
 #include <asl/ThreadSemaphore.h>
+#include <asl/Logger.h>
 
 #include <stdio.h>
 #include <iostream>
