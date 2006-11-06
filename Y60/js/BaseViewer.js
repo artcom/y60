@@ -27,6 +27,7 @@ use("picking_functions.js");
 use("HeartbeatThrober.js");
 use("Playlist.js");
 use("SwitchNodeHandler.js");
+use("AutoClicker.js");
 
 
 function BaseViewer(theArguments) {
@@ -44,7 +45,20 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.getShaderLibrary = function() {
         return _myShaderLibrary;
     }
-
+    self.autoClicker getter = function() {
+        if (!_myAutoClicker) {
+            _myAutoClicker = new AutoClicker(self);
+        }
+        return _myAutoClicker;
+    }
+        
+    self.enableAutoClicker = function(theFlag) {
+        if (!_myAutoClicker) {
+            _myAutoClicker = new AutoClicker(self);
+        }
+        _myAutoClicker.enabled = theFlag;
+    }
+    
     self.setModelName = function(theModelName) {
         _myModelName = theModelName;
     }
@@ -391,6 +405,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (_myHeartbeatThrober != null) {
             _myHeartbeatThrober.throb(theTime);
         }
+        if (_myAutoClicker != null) {
+            _myAutoClicker.onFrame();
+        }
+        
         _myLightManager.onFrame(theTime);
     }
 
@@ -498,7 +516,8 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _mySkyboxMaterial        = null;
     var _myHeartbeatThrober      = null;
     var _myPicking               = null;
-
+    var _myAutoClicker           = null;
+    
     var _mySwitchNodes  = new Array();
     var _myMSwitchNodes = new Array();
     var _myTSwitchNodes = new Array();

@@ -229,6 +229,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     window.debugCulling = !window.debugCulling;
                     print("Debug culling: " + (window.debugCulling ? "on" : "off"));
                     break;
+                case 'V':
+                    self.enableAutoClicker(true);
+                    self.autoClicker.interval = 4;
+                    break;
                 case 'v':
                     cycleBoundingVolumeMode();
                     break;
