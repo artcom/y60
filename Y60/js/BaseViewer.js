@@ -51,14 +51,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         return _myAutoClicker;
     }
-        
-    self.enableAutoClicker = function(theFlag) {
-        if (!_myAutoClicker) {
-            _myAutoClicker = new AutoClicker(self);
-        }
-        _myAutoClicker.enabled = theFlag;
-    }
-    
+            
     self.setModelName = function(theModelName) {
         _myModelName = theModelName;
     }

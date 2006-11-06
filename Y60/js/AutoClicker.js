@@ -19,11 +19,13 @@ function AutoClicker(theViewer, theInterval) {
     // Public
     //////////////////////////////////////////////////////////////////////
     Public.onFrame = function() {
-        var myNow = millisec();
-        var myTimeDelta = myNow - _myStartTime;
-        if (myTimeDelta >= _myInterval * 1000) {
-            _myStartTime = myNow;
-            click();
+        if (_myEnabledFlag) {
+            var myNow = millisec();
+            var myTimeDelta = myNow - _myStartTime;
+            if (myTimeDelta >= _myInterval * 1000) {
+                _myStartTime = myNow;
+                click();
+            }
         }
     }
     
@@ -31,6 +33,9 @@ function AutoClicker(theViewer, theInterval) {
         _myInterval = theInterval;
     }
         
+    Public.enabled getter = function() {
+        return _myEnabledFlag;
+    }
     Public.enabled setter = function(theFlag) {
         _myEnabledFlag = theFlag;
         if (_myEnabledFlag) {

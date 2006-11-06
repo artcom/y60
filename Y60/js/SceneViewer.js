@@ -230,7 +230,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     print("Debug culling: " + (window.debugCulling ? "on" : "off"));
                     break;
                 case 'V':
-                    self.enableAutoClicker(true);
+                    self.autoClicker.enabled = !self.autoClicker.enabled;
                     self.autoClicker.interval = 4;
                     break;
                 case 'v':
@@ -590,6 +590,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
          print("    m          switch to next mover");
          print("    M          toggles mouse cursor visibility");
          print("    f          toggles fullscreen");
+         print("    V          toggles autoClicker");
          print("    v          toggles bounding box visualization");
          print("    c          toggles culling");
          print("    C          toggles culling debug mode");
