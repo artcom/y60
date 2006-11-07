@@ -87,6 +87,17 @@ getString(const String & theC4dString) {
 	return myString;
 }
 
+const String 
+getTreeName(BaseObject * theNode) {
+    BaseObject* myNode = theNode;
+    String myTreeName = myNode->GetName();
+    while (myNode->GetUp()) {
+        myNode = myNode->GetUp();
+        myTreeName = myNode->GetName()+ "/" + myTreeName;
+    }
+    return myTreeName;
+}
+
 void
 displayChannelProperties(BaseChannel * theChannel) {
 	BaseContainer myBaseContainer = theChannel->GetData();

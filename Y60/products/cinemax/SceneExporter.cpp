@@ -238,7 +238,7 @@ SceneExporter::writeLight(y60::WorldBuilderBasePtr theTransformBuilder,
 BaseObject *
 SceneExporter::polygonizeObject(BaseObject * theNode)
 {
-    GePrint("+++ Polygonizing '" + theNode->GetName() + "'");
+    GePrint("+++ Polygonizing '" + getTreeName(theNode) + "'");
 
     ModelingCommandData myNodeCommand;
     myNodeCommand.doc = _myDocument;
@@ -254,7 +254,7 @@ SceneExporter::polygonizeObject(BaseObject * theNode)
     if (myNumResults == 0) {
         throw ExportException("Polygonalization returned 0 objects", "SceneExporter::polygonizeObject()");
     } else if (myNumResults > 1) {
-        GePrint("Polygonalization of '" + theNode->GetName() + "' returned " + LongToString(myNumResults) + " results");
+        GePrint("Polygonalization of '" + getTreeName(theNode) + "' returned " + LongToString(myNumResults) + " results");
     }
     myPolygonNode = (BaseObject*)myNodeCommand.result->GetIndex(0);
     if (myPolygonNode != myNodeCommand.result_ex) {
@@ -439,7 +439,7 @@ SceneExporter::writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
         }
     }
 	bool myTraverseChilrden = true;
-    StatusSetText("Exporting '" + theNode->GetName() + "'");
+    StatusSetText("Exporting '" + getTreeName(theNode) + "'");
     LONG myNodeId = theNode->GetNodeID();
     LONG myNodeType = theNode->GetType();
     y60::WorldBuilderBasePtr myParentBuilder;

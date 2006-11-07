@@ -29,6 +29,7 @@ void displayMessage(const String & theMessage);
 void displayMessage(const char * theMessage);
 
 const std::string & getString(const String & theC4dString);
+const String getTreeName(BaseObject * theNode);
 
 void displayChannelProperties(BaseChannel * theColorContainer);
 

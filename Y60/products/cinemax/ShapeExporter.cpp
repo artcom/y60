@@ -43,7 +43,7 @@ std::vector<std::string>
 ShapeExporter::writeShape(BaseObject * theNode, BaseObject * thePolygonNode, bool theForceFrontBackFacing)
 {
     std::vector<std::string> myShapeIdList;
-    StatusSetText("Exporting shape: " + theNode->GetName());
+    StatusSetText("Exporting shape: " + getTreeName(theNode));
 
     // collect SelectionTags
     std::vector<SelectionTag*> mySelectionList;
