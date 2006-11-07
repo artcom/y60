@@ -816,11 +816,12 @@ MaterialExporter::exportBlinnFeatures(const MFnMesh * theMesh, const MObject & t
     }
 
     // experimentally found.
-    if (myEccentricity) {
-        setPropertyValue<float>(theBuilder.getNode(), "float", "eccentricity", 1/(pow(myEccentricity,2.5f)));
-    } else {
-        setPropertyValue<float>(theBuilder.getNode(), "float", "eccentricity", 10000000.0f);
-    }
+    // if (myEccentricity) {
+    //    setPropertyValue<float>(theBuilder.getNode(), "float", "eccentricity", 1/(pow(myEccentricity,2.5f)));
+    // } else {
+    //    setPropertyValue<float>(theBuilder.getNode(), "float", "eccentricity", 10000000.0f);
+    // }
+    setPropertyValue<float>(theBuilder.getNode(), "float", "eccentricity", myEccentricity);
     setPropertyValue<float>(theBuilder.getNode(), "float", "specularrolloff", mySpecularRolloff);
 }
 
