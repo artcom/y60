@@ -127,7 +127,7 @@ float4 mainFragment(vert2frag   IN,
             float specularTerm = pow(max(dot(R, V), 0), shininess);
 #else
             float3 H = normalize(L + V);
-            float specularTerm = specularrolloff * pow(saturate(dot(N,H)), 1/eccentricity);
+            float specularTerm = specularrolloff * pow(saturate(dot(N,H)), 1/pow(eccentricity, 2.5));
 #endif
             mySpecColor += specularTerm * AC_DIRECTIONAL_LIGHTS_SPECULAR_COLOR[i]; // * diffuseTerm;
         }
@@ -147,7 +147,7 @@ float4 mainFragment(vert2frag   IN,
             float specularTerm = pow(max(dot(R, V), 0), shininess);
 #else
             float3 H = normalize(L + V);
-            float specularTerm = specularrolloff * pow(saturate(dot(N,H)), 1/eccentricity);
+            float specularTerm = specularrolloff * pow(saturate(dot(N,H)), 1/pow(eccentricity, 2.5));
 #endif
             mySpecColor += specularTerm * AC_POSITIONAL_LIGHTS_SPECULAR_COLOR[i];
         }
