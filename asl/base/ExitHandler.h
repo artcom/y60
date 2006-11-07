@@ -18,8 +18,8 @@ namespace asl {
 // This class exists so the constructor gets called once on initialization
 // of the program and sets windows exception handling stuff appropriately.
 // There is only one instance and that instance is declared statically in the
-// cpp file.
-class __declspec(dllexport) ExitHandler {
+// cpp file. 
+class ExitHandler {
 public:
     ExitHandler();
 

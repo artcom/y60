@@ -15,14 +15,16 @@
 #include "string_functions.h"
 #include "Logger.h"
 
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-
+#ifdef WIN32
 LONG WINAPI AcUnhandledExceptionFilter(_EXCEPTION_POINTERS * theExceptionInfo) {
     _EXCEPTION_RECORD * myRecord = theExceptionInfo->ExceptionRecord;
     string myMessage;
@@ -123,6 +125,7 @@ LONG WINAPI AcUnhandledExceptionFilter(_EXCEPTION_POINTERS * theExceptionInfo) {
     asl::SingletonManager::get().destroyAllSingletons();
     return EXCEPTION_EXECUTE_HANDLER;
 }
+#endif
 
 void exitFunction() {
 //    cerr << "exitFunction" << endl;
@@ -132,8 +135,10 @@ void exitFunction() {
 namespace asl {
 
 ExitHandler::ExitHandler() {
+#ifdef WIN32    
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
     SetUnhandledExceptionFilter(&AcUnhandledExceptionFilter);
+#endif    
     atexit(exitFunction);
 //    SetConsoleCtrlHandler(&AcCtrlBreakHandler, true);
 }

@@ -36,7 +36,7 @@ SingletonManager::destroyAllSingletons() {
     // Note that using the Logger here is unsafe. The Logger itself is a singleton that
     // will be destroyed at some point.
     cerr << "Destroying singletons." << endl;
-    static mySingletonManagerDestroyed = false;
+    static bool mySingletonManagerDestroyed = false;
     if (mySingletonManagerDestroyed) {
         // XXX: This happens if the SingletonManager destructor and another handler 
         //      both call destroyAllSingletons. In that case, this is invalid in the
