@@ -181,11 +181,25 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
             return 1;
         } else if (a.switchName < b.switchName) {
             return -1;
+        } 
+        return 0;
+    }
+
+    function sortSwitchNodes(a,b) {
+        if (a.switchName > b.switchName) {
+            return 1;
+        } else if (a.switchName < b.switchName) {
+            return -1;
         } else {
+            if (a.childCount > b. childCount) {
+                return 1;
+            } else if (a.childCount < b. childCount){
+                return -1;
+            } 
             return 0;
         }
     }
-
+    
     function hasDescendantWithCode(theNode, theCode) {
         if ((theNode.name.search(/_(.+?)_/) != -1) && (theCode == RegExp.$1)) {
             return true;
@@ -202,6 +216,10 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
     }
 
     function areEqualSwitchNodes(a,b) {
+        if (a.childCount != b.childCount) {
+            return false;
+        }
+        
         if (a.switchName == b.switchName) {
             var i = 0;
             while (i < a.childCount) {
@@ -235,7 +253,7 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
         
         //material switches
         if ( myMSwitchNodes.length > 0) {
-            myMSwitchNodes.sort(sortSwitchNodesByName);
+            myMSwitchNodes.sort(sortSwitchNodes);
             for (var i = 0; i < myMSwitchNodes.length; ++i) {
                 _myHandlers.push( new GtkSwitchNodeGroupHandler( myMSwitchNodes[i],
                                             _mySwitchNodeMenu ) );
@@ -247,8 +265,11 @@ SwitchNodeMenu.prototype.Constructor = function( obj ) {
 
         //geometry switches
         if ( mySwitchNodes.length > 0) {
-            mySwitchNodes.sort(sortSwitchNodesByName);
+            mySwitchNodes.sort(sortSwitchNodes);
+            
+            var mySwitchNodesSameName;
             for (var i = 0; i < mySwitchNodes.length; ++i) {
+                
                 if (i > 0 && areEqualSwitchNodes(mySwitchNodes[i], mySwitchNodes[i-1])) {
                     _myHandlers[_myHandlers.length - 1].addSwitchNode(mySwitchNodes[i]);
                 } else {
