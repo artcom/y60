@@ -409,9 +409,23 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
         
         var myMaterial = theNode.getElementById(myMaterialId);
         var myImage = myMaterial.childNode("textures").firstChild.image;
+        
+        var myTexturesLength = Public.node.childNode("textures").childNodesLength();
+        var myNewTexturesLength = myMaterial.childNode("textures").childNodesLength();
 
-        // set new image 
-        Public.node.childNode("textures").firstChild.image = myImage;
+        // calculate textures offset
+        var myTextureOffset = myTexturesLength - myNewTexturesLength;
+        if (myTextureOffset < 0) {
+            Logger.error("Textureswitching error. The Switchnode has " +myNewTexturesLength+
+                         " textures while the original Material has " + myTexturesLength);
+            return;
+        }
+
+        // set new images
+        for (var i=0; i<myMaterial.childNode("textures").childNodesLength(); ++i) {
+            var myImage = myMaterial.childNode("textures").childNode(i).image;
+            Public.node.childNode("textures").childNode(i+myTextureOffset).image = myImage;  
+        }
     }
 
     Public.setActiveChildByName = function(theName, theSubnameFlag) {
