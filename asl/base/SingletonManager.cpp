@@ -27,12 +27,24 @@ using namespace std;
 namespace asl {
 
 SingletonManager::~SingletonManager() {
-//    cerr << "Destroying SingletonManager";
+//    cerr << "Destroying SingletonManager" << endl;
     destroyAllSingletons();
 }
 
 void
 SingletonManager::destroyAllSingletons() {
+    // Note that using the Logger here is unsafe. The Logger itself is a singleton that
+    // will be destroyed at some point.
+    cerr << "Destroying singletons." << endl;
+    static mySingletonManagerDestroyed = false;
+    if (mySingletonManagerDestroyed) {
+        // XXX: This happens if the SingletonManager destructor and another handler 
+        //      both call destroyAllSingletons. In that case, this is invalid in the
+        //      second call. 
+//        cerr << "  --- Already gone" << endl;
+        return;
+    }
+    mySingletonManagerDestroyed = true;
     _mySingletonMap.clear();
 
     // Call stop on all singletons to give them a chance to shut down correctly, while
@@ -47,7 +59,7 @@ SingletonManager::destroyAllSingletons() {
         // Delete logger last, to allow other singletons to use the logger in their destructor
         if (dynamic_cast_Ptr<Logger>(*it) == 0) {
 //            cerr << "  destroying singleton " << typeid(**it).name() << " size: " 
-//                    << _mySingletonList.size();
+//                    << _mySingletonList.size() << endl;
             it = _mySingletonList.erase(it);
         } else {
             ++it;
@@ -55,7 +67,7 @@ SingletonManager::destroyAllSingletons() {
     }
 
     _mySingletonList.clear();
-//    cerr << "All singletons destroyed.";
+//  cerr << "All singletons destroyed." << endl;
 }
 
 SingletonManager &

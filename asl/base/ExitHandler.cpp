@@ -10,7 +10,7 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#include "WinExceptionFilter.h"
+#include "ExitHandler.h"
 #include "SingletonManager.h"
 #include "string_functions.h"
 #include "Logger.h"
@@ -35,7 +35,8 @@ LONG WINAPI AcUnhandledExceptionFilter(_EXCEPTION_POINTERS * theExceptionInfo) {
             } else {
                 myMessage = "The thread tried to write to the virtual address ";
             }
-            myMessage += asl::as_string((void*)(myRecord->ExceptionInformation[1])) + " for which it does not have the appropriate access.";
+            myMessage += asl::as_string((void*)(myRecord->ExceptionInformation[1])) 
+                    + " for which it does not have the appropriate access.";
             break;
         case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
             myName = "EXCEPTION_ARRAY_BOUNDS_EXCEEDED";
@@ -119,21 +120,27 @@ LONG WINAPI AcUnhandledExceptionFilter(_EXCEPTION_POINTERS * theExceptionInfo) {
         "Exception code: " << (void*)(myRecord->ExceptionCode) << "\n" <<
         "Exception adress: " << myRecord->ExceptionAddress << "\n" <<
         "" << myName << ": " << myMessage << "\n";
+    asl::SingletonManager::get().destroyAllSingletons();
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-BOOL WINAPI AcCtrlBreakHandler(DWORD dwCtrlType) {
-    AC_FATAL << "Console break detected.";
+void exitFunction() {
+//    cerr << "exitFunction" << endl;
     asl::SingletonManager::get().destroyAllSingletons();
-    return FALSE;
 }
 
 namespace asl {
 
-WinExceptionFilter::WinExceptionFilter() {
+ExitHandler::ExitHandler() {
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
     SetUnhandledExceptionFilter(&AcUnhandledExceptionFilter);
+    atexit(exitFunction);
 //    SetConsoleCtrlHandler(&AcCtrlBreakHandler, true);
+}
+
+void ExitHandler::segFault() {
+    int * p = (int*)0;
+    *p = 0;
 }
 
 }

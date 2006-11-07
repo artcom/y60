@@ -25,7 +25,7 @@
 #include "os_functions.h"
 
 #ifdef WIN32
-#include "WinExceptionFilter.h"
+#include "ExitHandler.h"
 #endif
 
 using namespace std;
@@ -33,7 +33,7 @@ using namespace std;
 namespace asl {
 
 #ifdef WIN32
-    WinExceptionFilter WinExceptionFilter::_myExceptionFilter;
+    ExitHandler ExitHandler::_myExitHandler;
 #endif
 
     // TODO: make this a static function

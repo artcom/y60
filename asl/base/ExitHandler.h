@@ -10,23 +10,26 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _included_asl_WinExceptionFilter_
-#define _included_asl_WinExceptionFilter_
+#ifndef _included_asl_ExitHandler_
+#define _included_asl_ExitHandler_
 
 namespace asl {
 
 // This class exists so the constructor gets called once on initialization
 // of the program and sets windows exception handling stuff appropriately.
-// There is only one instance and that instance is declared statically in 
-// Exception.cpp.
-class __declspec(dllexport) WinExceptionFilter {
+// There is only one instance and that instance is declared statically in the
+// cpp file.
+class __declspec(dllexport) ExitHandler {
 public:
-    WinExceptionFilter();
+    ExitHandler();
+
+    // Call this to test exception handling.
+    static void segFault();
 
 private:
     // XXX This variable is initialized in Exception.cpp (!). For some reason,
     // that prevents the Linker from optimizing it away.
-    static WinExceptionFilter _myExceptionFilter;
+    static ExitHandler _myExitHandler;
 };
 
 }
