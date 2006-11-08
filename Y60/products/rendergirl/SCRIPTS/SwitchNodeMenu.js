@@ -62,7 +62,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
 
             for (var i=0; i<myReferenceNode.childNodesLength(); ++i) {
                 var myChildNode = myReferenceNode.childNode(i);
-                if (myChildNode.name.indexOf(myNode.name) != -1) {
+                if ((myChildNode.name.indexOf(myNode.name) != -1) || ((myChildNode.name+"M").indexOf(myNode.name) != -1)) {
                    
                     for (var j=0; j<myChildNode.childNodesLength(); ++j) {
                         var myChild = myChildNode.childNode(j);
