@@ -163,33 +163,29 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         return myTargetMaterial;
     }
 
-    function matchTextureCoordCount(theId, theCount) {
-        var myShapesNode = window.scene.shapes;
-        for (var i = 0; i < myShapesNode.childNodesLength("shape"); ++i) {
-            var myPrimitives = myShapesNode.childNode("shape", i).childNode("primitives");
-            for (var j = 0; j < myPrimitives.childNodesLength("elements"); ++j) {
-                var myElements = myPrimitives.childNode("elements", j)
-                if (myElements.material = theId) {
-                    var myTextureCoordCount = 0;
-                    for (var k = 0; k < myElements.childNodesLength("indices"); ++k) {
-                        var myIndicesNode = myElements.childNode("indices", k);
-                        if (String(myIndicesNode.role).indexOf("texcoord") != -1) {
-                            myTextureCoordCount++;
-                        }
-                    }
-                    if (myTextureCoordCount < theCount) {
-                        return false;
-                    }
-                }
+    function matchTextureCoordCount(theElementsNode, theCount) {
+        var myTextureCoordCount = 0;
+        for (var i = 0; i < theElementsNode.childNodesLength("indices"); ++i) {
+            var myIndicesNode = theElementsNode.childNode("indices", i);
+            if (String(myIndicesNode.role).indexOf("texcoord") != -1) {
+                myTextureCoordCount++;
             }
+        }
+        if (myTextureCoordCount < theCount) {
+            return false;
         }
         return true;
     }
     
-    function replaceMaterialIds(theOldId, theNewId) {
-        var myNodes = window.scene.shapes.getNodesByAttribute("elements", "material", theOldId);        
+    function replaceMaterialIds(theOldId, theNewId, theCount) {
+        var myNodes = window.scene.shapes.getNodesByAttribute("elements", "material", theOldId);
         for (var i = 0; i < myNodes.length; ++i) {
-            myNodes[i].material = theNewId;
+            if (theCount == undefined ||
+                (theCount && matchTextureCoordCount(myNodes[i], theCount))) {
+                myNodes[i].material = theNewId;
+            } else if (theCount) {
+                Logger.warning("Too few texcoord sets in shape '" + parentNode.parentNode.name + "'.");
+            }
         }
     }
     
@@ -216,10 +212,12 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         }
     }
     
-    function getNumTexcoordCount(theFeatureList) {
+    function getTexcoordCount(theMaterialNode) {
+        var myRequires = theMaterialNode.childNode('requires');
+        var myFeatureList = getDescendantByName(myRequires, 'texcoord').childNode("#text").nodeValue;
         var myCount = 0;
         var myRegExp = /\[\d{1,3}\[(.*)\]\]/;
-        var myResults = myRegExp.exec(theFeatureList);
+        var myResults = myRegExp.exec(myFeatureList);
         if (myResults && myResults.length) {
             var myFeatures = myResults[1].split(",");
             for (var i = 0; i < myFeatures.length; ++i) {
@@ -273,16 +271,11 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
             return;
         }
 
-        // NOTE: the old way [jb]
- //       myOldTargetMat.replaceChild(mySwitchMat.childNode("properties").cloneNode(true),
- //                                    myOldTargetMat.childNode("properties"));
-
-        // NOTE: the new way
         //save the occlusion map (if there is one) before replacing the textures
         var myOcclusionMap = findOcclusionMap(myOldTargetMat);
 
-        print("OLD material *********************************************** : \n" + myOldTargetMat);
-        print("merging with SWITCH material *********************************************** : \n" + mySwitchMat);
+        //print("OLD material *********************************************** : \n" + myOldTargetMat);
+        //print("merging with SWITCH material *********************************************** : \n" + mySwitchMat);
 
         // Third step: Setup target material
         var myNewTargetMat = myOldTargetMat.cloneNode(true);
@@ -330,12 +323,9 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
 
         // FIXME BUG 478: we convert to string & parse again to strip off any facades
         window.scene.materials.appendChild(new Node(myNewTargetMat.toString()).firstChild);
-        //myNewTargetMat.requires.textures = "[10[paint,emissive]]";
-        //myNewTargetMat.requires.texcoord = "[10[reflective,reflective]]";
-        replaceMaterialIds(myOldTargetMat.id, myNewTargetMat.id);
+        replaceMaterialIds(myOldTargetMat.id, myNewTargetMat.id, getTexcoordCount(myNewTargetMat));
         window.scene.materials.removeChild(myOldTargetMat);
-        print("results in NEW material *********************************************** : \n" + myNewTargetMat);
-
+        //print("results in NEW material *********************************************** : \n" + myNewTargetMat);
 
         return true;
     }
