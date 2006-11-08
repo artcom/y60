@@ -32,12 +32,33 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+setRange(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("");
+    DOC_END;
+
+    try {
+        ensureParamCount(argc, 2);
+        // native method call
+        Gtk::Scale * myNative=0;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        double myMin, myMax;
+        convertFrom(cx, argv[0], myMin);
+        convertFrom(cx, argv[1], myMax);
+        myNative->set_range(myMin, myMax);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    return JS_FALSE;
+}
+
 JSFunctionSpec *
 JSScale::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"setRange",             setRange,                2},
         {0}
     };
     return myFunctions;

@@ -668,6 +668,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
                 return true;
             } else if (castFrom<Gtk::ComboBoxText>(cx, myArgument, theTarget)) {
                 return true;
+            } else if (castFrom<Gtk::Scale>(cx, myArgument, theTarget)) {
+                return true;
             } else if (castFrom<Gtk::VScale>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::HScale>(cx, myArgument, theTarget)) {
@@ -778,6 +780,7 @@ CONVERT_FROM_GLIB_OBJECT(Gtk::Table);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ComboBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ComboBoxText);
 CONVERT_FROM_GLIB_OBJECT(Gtk::Range);
+CONVERT_FROM_GLIB_OBJECT(Gtk::Scale);
 CONVERT_FROM_GLIB_OBJECT(Gtk::VScale);
 CONVERT_FROM_GLIB_OBJECT(Gtk::HScale);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ProgressBar);
