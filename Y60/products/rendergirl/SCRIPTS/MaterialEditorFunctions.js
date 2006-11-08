@@ -21,8 +21,8 @@ function hideFloatSliders() {
         ourGlade.get_widget("float_label"+i).text = "inactive";
         ourGlade.get_widget("float_label"+i).hide();
         ourGlade.get_widget("float_value"+i).hide();
-        ourGlade.get_widget("float_slider"+i).setRange(0.0, 1.0);
-    }
+        eval("ourHandler.on_float_slider"+i+"_value_changed = function() {}");
+   }
 }
 
 function updateMaterialEditor() {
@@ -37,6 +37,24 @@ function updateMaterialEditor() {
         if (myChildNode.nodeName == "vector4f") {
             updateColorElement(myChildNode);
         } else if (myChildNode.nodeName == "float") {
+            var mySlider = ourGlade.get_widget("float_slider"+myActiveFloatValue);
+            var myLabel  = ourGlade.get_widget("float_label"+myActiveFloatValue);
+            var myValue  = ourGlade.get_widget("float_value"+myActiveFloatValue);
+            
+            if (myChildNode.name == "shininess") {
+                mySlider.setRange(2.0,100.0);
+            } else {
+                mySlider.setRange(0.0,1.0);
+            }
+            
+            var myProperty = getDescendantByName(getSelectedMaterial(), myChildNode.name, true);
+            mySlider.value = myProperty.firstChild.nodeValue;
+       
+            mySlider.show();
+            myLabel.show();
+            myValue.show();
+            myLabel.text = " "+myChildNode.name;
+
             eval("ourHandler.on_float_slider"+myActiveFloatValue+"_value_changed = function() {\n"+
                  "    var myMaterial = getSelectedMaterial();\n"+
                  "    if (!myMaterial) {\n"+
@@ -50,22 +68,6 @@ function updateMaterialEditor() {
                  "    }\n"+
                  "}\n");
             
-            var mySlider = ourGlade.get_widget("float_slider"+myActiveFloatValue);
-            var myLabel  = ourGlade.get_widget("float_label"+myActiveFloatValue);
-            var myValue  = ourGlade.get_widget("float_value"+myActiveFloatValue);
-            
-            if (myChildNode.name == "shininess") {
-                mySlider.setRange(2.0,100.0);
-            }
-            
-            var myProperty = getDescendantByName(getSelectedMaterial(), myChildNode.name, true);
-            mySlider.value = myProperty.firstChild.nodeValue;
-       
-            mySlider.show();
-            myLabel.show();
-            myValue.show();
-            myLabel.text = " "+myChildNode.name;
-
             myActiveFloatValue++;
         }
     }

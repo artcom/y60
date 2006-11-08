@@ -397,10 +397,7 @@ ourHandler.on_material_editor_activate = function() {
         for (i = 0; i < window.scene.materials.childNodesLength(); ++i) {
             if (window.scene.materials.childNode(i).name == this.active_text) {
                 updateMaterialEditor();
-                // print(window.scene.materials.childNode(i));
                 var myMaterial = window.scene.materials.childNode(i);
-                // myMaterial.properties.targetbuffers = "[red,green,blue,alpha]";
-                // print(myMaterial.properties.targetbuffers);
             }
         }
     }
