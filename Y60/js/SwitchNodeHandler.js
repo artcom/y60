@@ -269,6 +269,10 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         //print("switch mat: " + mySwitchMat);
 
         var myOldTargetMat = findTargetMaterial();
+        if (!myOldTargetMat) {
+            return;
+        }
+
         // NOTE: the old way [jb]
  //       myOldTargetMat.replaceChild(mySwitchMat.childNode("properties").cloneNode(true),
  //                                    myOldTargetMat.childNode("properties"));
@@ -277,8 +281,8 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         //save the occlusion map (if there is one) before replacing the textures
         var myOcclusionMap = findOcclusionMap(myOldTargetMat);
 
-        //print("OLD material *********************************************** : \n" + myOldTargetMat);
-        //print("merging with SWITCH material *********************************************** : \n" + mySwitchMat);
+        print("OLD material *********************************************** : \n" + myOldTargetMat);
+        print("merging with SWITCH material *********************************************** : \n" + mySwitchMat);
 
         // Third step: Setup target material
         var myNewTargetMat = myOldTargetMat.cloneNode(true);
@@ -316,12 +320,13 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
                 //add occlusion map and adjust the requirements
                 myNewTargetMat.childNode("textures").insertBefore(myOcclusionMap,
                     myNewTargetMat.childNode("textures").firstChild);
-                //myNewTargetMat.requires.textures = prependFeature(myOldTargetMat.requires.textures, "paint");
-                //myNewTargetMat.requires.texcoord = prependFeature(myOldTargetMat.requires.texcoord, "uv_map");
+                var myRequires = myNewTargetMat.childNode('requires');
+                getDescendantByName(myRequires, 'textures').childNode("#text").nodeValue = 
+                    prependFeature(mySwitchMat.requires.textures, "paint");
+                getDescendantByName(myRequires, 'texcoord').childNode("#text").nodeValue = 
+                    prependFeature(mySwitchMat.requires.texcoord, "uv_map");
             }
         }
-
-        //print(myNewTargetMat);
 
         // FIXME BUG 478: we convert to string & parse again to strip off any facades
         window.scene.materials.appendChild(new Node(myNewTargetMat.toString()).firstChild);
@@ -329,7 +334,7 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         //myNewTargetMat.requires.texcoord = "[10[reflective,reflective]]";
         replaceMaterialIds(myOldTargetMat.id, myNewTargetMat.id);
         window.scene.materials.removeChild(myOldTargetMat);
-        //print("results in NEW material *********************************************** : \n" + myNewTargetMat);
+        print("results in NEW material *********************************************** : \n" + myNewTargetMat);
 
 
         return true;
