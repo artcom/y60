@@ -727,7 +727,33 @@
             </properties>
         </fragmentshader>
     </shader>
-    <shader id="s25" name="litchrome" cost="10">
+    <shader id="s25a" name="litchrome_blinn" cost="10">
+        <supports>
+            <feature class="textures" values="[paint]"/>
+            <feature class="lighting" values="[blinn]"/>
+            <feature class="texcoord" values="[reflective]"/>
+        </supports>
+        <vertexshader profile="VP30" file="envmap.cg" entryfunction="mainVertex" compilerargs="">
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="specular">[0,0,0,1]</vector4f>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+                 <float name="reflectivity">1</float>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector3f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="">
+            <properties>
+                <samplerCUBE name="envTex">0</samplerCUBE>
+                <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s25b" name="litchrome_phong" cost="10">
         <supports>
             <feature class="textures" values="[paint]"/>
             <feature class="lighting" values="[phong]"/>
