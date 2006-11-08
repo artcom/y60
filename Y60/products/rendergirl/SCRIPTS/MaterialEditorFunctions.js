@@ -21,6 +21,7 @@ function hideFloatSliders() {
         ourGlade.get_widget("float_label"+i).text = "inactive";
         ourGlade.get_widget("float_label"+i).hide();
         ourGlade.get_widget("float_value"+i).hide();
+        ourGlade.get_widget("float_slider"+i).setRange(0.0, 1.0);
     }
 }
 
@@ -52,6 +53,10 @@ function updateMaterialEditor() {
             var mySlider = ourGlade.get_widget("float_slider"+myActiveFloatValue);
             var myLabel  = ourGlade.get_widget("float_label"+myActiveFloatValue);
             var myValue  = ourGlade.get_widget("float_value"+myActiveFloatValue);
+            
+            if (myChildNode.name == "shininess") {
+                mySlider.setRange(2.0,100.0);
+            }
             
             var myProperty = getDescendantByName(getSelectedMaterial(), myChildNode.name, true);
             mySlider.value = myProperty.firstChild.nodeValue;
