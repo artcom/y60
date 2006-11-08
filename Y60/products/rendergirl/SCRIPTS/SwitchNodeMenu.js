@@ -40,9 +40,13 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
             myLabel = theLabel;
         }
         _myItem = new MenuItem( myLabel );
-        theMenu.append( _myItem );
+
+        _myTearOff = new TearoffMenuItem();
+        _myTearOff.show();
+        theMenu.append(_myItem);
         _myItem.show();       
         _mySubMenu = new Menu();
+        _mySubMenu.append(_myTearOff);
         _myItem.submenu = _mySubMenu;
         collectSwitchNodeChildren( theHandler, _mySubMenu );
     }
@@ -162,6 +166,7 @@ GtkSwitchNodeGroupHandler.prototype.Constructor = function( obj, theSwitchHandle
     var _myHandlers = [];
     var _myItem = null;
     var _mySubMenu = null;
+    var _myTearOff = null;
     var _myChildren = {};
     var _mySignalHandlers = {};
 

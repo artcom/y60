@@ -37,6 +37,7 @@
 #include "JSWindow.h"
 #include "JSScrolledWindow.h"
 #include "JSMenuItem.h"
+#include "JSTearoffMenuItem.h"
 #include "JSSeparatorMenuItem.h"
 #include "JSCheckMenuItem.h"
 #include "JSRadioMenuItem.h"
@@ -195,6 +196,9 @@ bool initGtkClasses(JSContext *cx, JSObject *theGlobalObject) {
         return false;
     }
     if (!JSSeparatorMenuItem::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSTearoffMenuItem::initClass(cx, theGlobalObject)) {
         return false;
     }
     if (!JSMenuItem::initClass(cx, theGlobalObject)) {
@@ -458,6 +462,7 @@ jsval gtk_jsval(JSContext *cx, Gtk::Widget * theWidget, bool takeOwnership) {
     TRY_DYNAMIC_CAST(Gtk::VBox );
     TRY_DYNAMIC_CAST(Gtk::HButtonBox );
     TRY_DYNAMIC_CAST(Gtk::VButtonBox );
+    TRY_DYNAMIC_CAST(Gtk::TearoffMenuItem );
     TRY_DYNAMIC_CAST(Gtk::SeparatorMenuItem );
     TRY_DYNAMIC_CAST(Gtk::CheckMenuItem );
     TRY_DYNAMIC_CAST(Gtk::RadioMenuItem );
@@ -595,6 +600,8 @@ ConvertFrom<TARGET>::convert(JSContext *cx, jsval theValue, TARGET *& theTarget)
             } else if (castFrom<Gtk::HButtonBox>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::VButtonBox>(cx, myArgument, theTarget)) {
+                return true;
+            } else if (castFrom<Gtk::TearoffMenuItem>(cx, myArgument, theTarget)) {
                 return true;
             } else if (castFrom<Gtk::SeparatorMenuItem>(cx, myArgument, theTarget)) {
                 return true;
@@ -744,6 +751,7 @@ CONVERT_FROM_GLIB_OBJECT(Gtk::VBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::ButtonBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::HButtonBox);
 CONVERT_FROM_GLIB_OBJECT(Gtk::VButtonBox);
+CONVERT_FROM_GLIB_OBJECT(Gtk::TearoffMenuItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::SeparatorMenuItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::CheckMenuItem);
 CONVERT_FROM_GLIB_OBJECT(Gtk::RadioMenuItem);
