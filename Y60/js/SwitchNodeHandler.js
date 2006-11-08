@@ -373,7 +373,8 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
     }
     
     function setup() {
-        var myName = new String( Public.switchName );
+        var myName = new String(Public.switchName);
+        
         if ( ! myName.match(/^tswitch_.*/)) {
             Logger.warning("TSwitch node '" + Public.switchName + " doesn't obey the " +
                 "naming conventions. Name should start with 'tswitch_'.");
@@ -385,10 +386,10 @@ TSwitchNodeHandler.prototype.Constructor = function( obj, theNode) {
             Logger.error("Could not find reference node for textureswitches");
             return;
         }
-        
+       
         for (var i=0; i<myReferenceNode.childNodesLength(); ++i) {
             var myNode = myReferenceNode.childNode(i);
-            if (myNode.name.indexOf(myName) != -1) {
+            if ((myNode.name.indexOf(myName) != -1) || ((myNode.name+"M").indexOf(myName) != -1)) {
                 _mySwitches = myNode;
                 continue;
             }
