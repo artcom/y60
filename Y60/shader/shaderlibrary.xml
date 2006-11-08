@@ -520,7 +520,7 @@
         <fragmentshader profile="FP30" file="envmap.cg" entryfunction="mainFragment" compilerargs="-DPAINT=2, -DTEXGEN0={texcoord[0]}">
             <properties>
                 <sampler2d name="decalTex">0</sampler2d>
-                <sampler2d name="emmisiveTex">1</sampler2d>
+                <sampler2d name="emissiveTex">1</sampler2d>
                 <samplerCUBE name="envTex">2</samplerCUBE>
                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
