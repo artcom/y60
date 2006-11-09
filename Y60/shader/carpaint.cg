@@ -113,8 +113,6 @@ float4 mainFragment(vert2frag   IN,
     float3 N = normalize(IN.worldNormal);
     float3 V = normalize(AC_CAMERA_POSITION - P);
 
-    return float4(1);
-
     for(int i = 0; i < AC_DIRECTIONAL_LIGHTS.length ; ++i) {
         float3 L = normalize(AC_DIRECTIONAL_LIGHTS[i]);
 
