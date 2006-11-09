@@ -236,8 +236,8 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         var mySwitchMat = null;
         for (var i = 0; i < Public.childCount; ++i) {
             var myChild = Public.node.childNode( i );
-            if (myChild.name.indexOf(theMaterialCode) != -1 &&
-                myChild.name.indexOf("dark") == -1) {
+            if (myChild.name.indexOf(theMaterialCode) != -1 /*&&
+                myChild.name.indexOf("dark") == -1*/) {
                 var myShapeId = "";
                 if (myChild.nodeName == "body") {
                     myShapeId = myChild.shape;
