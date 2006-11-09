@@ -177,16 +177,24 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
         return true;
     }
     
-    function replaceMaterialIds(theOldId, theNewId, theCount) {
+    function replaceMaterialIds(theOldId, theNewId, theRequiredCount) {
         var myNodes = window.scene.shapes.getNodesByAttribute("elements", "material", theOldId);
+        var skippedAnyNodes = false;
         for (var i = 0; i < myNodes.length; ++i) {
-            if (theCount == undefined ||
-                (theCount && matchTextureCoordCount(myNodes[i], theCount))) {
+            var myUVCountOkFlag = (theRequiredCount === undefined);
+
+            if (!myUVCountOkFlag && matchTextureCoordCount(myNodes[i], theRequiredCount)) {
+                myUVCountOkFlag = true;
+            }
+
+            if (myUVCountOkFlag) {
                 myNodes[i].material = theNewId;
-            } else if (theCount) {
+            } else {
+                skippedAnyNodes = true;
                 Logger.warning("Too few texcoord sets in shape '" + parentNode.parentNode.name + "'.");
             }
         }
+        return skippedAnyNodes == false;
     }
     
     function findOcclusionMap(theMaterial) {
@@ -321,12 +329,13 @@ MSwitchNodeHandler.prototype.Constructor = function( obj, theNode ) {
             }
         }
 
+        //print("results in NEW material *********************************************** : \n" + myNewTargetMat);
         // FIXME BUG 478: we convert to string & parse again to strip off any facades
         window.scene.materials.appendChild(new Node(myNewTargetMat.toString()).firstChild);
-        replaceMaterialIds(myOldTargetMat.id, myNewTargetMat.id, getTexcoordCount(myNewTargetMat));
-        window.scene.materials.removeChild(myOldTargetMat);
-        //print("results in NEW material *********************************************** : \n" + myNewTargetMat);
-
+        if (replaceMaterialIds(myOldTargetMat.id, myNewTargetMat.id, getTexcoordCount(myNewTargetMat))) {
+            window.scene.materials.removeChild(myOldTargetMat);
+        }
+        //window.scene.save("test.x60", false);
         return true;
     }
 
