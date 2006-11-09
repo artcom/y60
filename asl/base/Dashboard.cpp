@@ -228,7 +228,9 @@ namespace asl {
                 unsigned long myCycleCount = _myGroupCounters[myCounter.getGroup()].getCount();
                 myCounterTable.setField("countername",it->first);
                 if (myCycleCount > 1) {
-                    myCounterTable.setField("count",as_string(myCounter.getCount() / myCycleCount ));
+                    myCounterTable.setField("count",as_string(myCounter.getCount()));
+                    // we do not want an averaged counter (vs)
+                    //myCounterTable.setField("count",as_string(myCounter.getCount() / myCycleCount ));
                     myCounterTable.setField("cycles",as_string(myCycleCount));
                 } else {
                     myCounterTable.setField("count",as_string(myCounter.getCount()));
