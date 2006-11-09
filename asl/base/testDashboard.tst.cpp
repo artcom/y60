@@ -1,127 +1,59 @@
-/* __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
+//==============================================================================
 //
-// Copyright (C) 1993-2005, ART+COM AG Berlin, Germany
+// Copyright (C) 2005, ART+COM AG Berlin 
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-//    $RCSfile: testDashboard.tst.cpp,v $
-//
-//   $Revision: 1.2 $
-//
-// Description: unit test template file - change Time to whatever
-//              you want to test and add the apprpriate tests.
-//
-//
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-*/
-
+//==============================================================================
 
 #include "Dashboard.h"
-
 #include "UnitTest.h"
-//#include <asl/UnitTest.h>
-#include "Time.h"
-#include <string>
-#include <iostream>
 
 using namespace std;
 using namespace asl;
 
 class DashboardUnitTest : public UnitTest {
 public:
-    DashboardUnitTest() : UnitTest("DashboardUnitTest") {}
+    explicit DashboardUnitTest() : UnitTest("DashboardUnitTest") {}
     void run() {
-        for (int f = 0; f < 4; ++f) {
-            if (f == 0) {
-                ENSURE(getDashboard().getCounterValue("run") == 0);
-            } else {
-                ENSURE(getDashboard().getCounterValue("run") == 5);
-            }
-            TimerPtr runTimer = getDashboard().getTimer("run");
-            CounterPtr runCounter = getDashboard().getCounter("run");
-            runTimer->start();
-            ENSURE(runCounter->getCount() == 0);
-            NanoTime myTime = runTimer->getElapsed();
-            for (int i = 0; i < 5; ++i) {
-                msleep(1);
-                NanoTime myNewTime = runTimer->getElapsed();
-                DPRINT(myNewTime.ticks());      
-
-// [CH:] Right now we cannot make this test work properly on athlon 64 windows system.
-// So I disabled the test till we find a solution.
-// The problem is, that the QueryPerformanceCounter sometimes runs backwards on Athlon 
-// and/or Dual CPU machines.
-#ifndef WIN32
-                ENSURE(myNewTime.ticks() > myTime.ticks());
-#endif                
-                myTime = myNewTime;
-                runCounter->count();
-            }
-            ENSURE(runCounter->getCount() == 5);
-            runTimer->stop();
-            myTime = runTimer->getElapsed();
-            for (int i = 0; i < 5; ++i) {
-                msleep(1);
-                NanoTime myNewTime = runTimer->getElapsed().ticks();
-                ENSURE(myNewTime.ticks() == myTime.ticks());
-            }
-            TimerPtr runTimerSibling = getDashboard().getTimer("runsibling");
-            runTimerSibling->start();
-            ENSURE(runTimerSibling->getParent() == 0);
-            runTimer->start();
-            TimerPtr runTimerChild = getDashboard().getTimer("runTimerChild");
-            runTimerChild->start();
-            ENSURE(runTimerChild->getParent() == runTimer);
-            {
-                MAKE_SCOPE_TIMER(level3);
-                MAKE_SCOPE_TIMER(level4);
-                {
-                    MAKE_SCOPE_TIMER(level5a);
-                }
-                for (int i = 0; i<1000;++i) {
-                    {
-                        MAKE_SCOPE_TIMER(level5b);
-                    }
-                    {
-                        MAKE_SCOPE_TIMER(level5c);
-                    }
-                }
-                SCOPE_TIMER(level3)->stop();
-                MAKE_SCOPE_TIMER(level4a);
-            }
-            getDashboard().print(std::cerr);
-            getDashboard().cycle();
+        ENSURE(true);
+        int myCountCycles = 10000;
+        for (int i = 0; i < myCountCycles; i++) {
+            COUNT(CyclesTest);
         }
-
-        getDashboard().print(std::cerr);
-    }
-};
-
-
-class MyTestSuite : public UnitTestSuite {
-public:
-    MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
-    void setup() {
-        UnitTestSuite::setup(); // called to print a launch message
-        addTest(new DashboardUnitTest);
+        
+        asl::Dashboard & myDashboard = getDashboard();
+        myDashboard.cycle();
+        unsigned long myCounterResult = myDashboard.getCounterValue("CyclesTest");
+        AC_PRINT << "Counter result: " << myCounterResult;
     }
 };
 
 
 int main(int argc, char *argv[]) {
 
-    MyTestSuite mySuite(argv[0], argc, argv);
+    UnitTestSuite mySuite(argv[0], argc, argv);
 
-    mySuite.run();
+    try {
+        mySuite.addTest(new DashboardUnitTest);
+        mySuite.run();
+    }
+    catch (...) {
+        cerr << "## An unknown exception occured during execution." << endl;
+        mySuite.incrementFailedCount();
+    }
 
-    cerr << ">> Finished test suite '" << argv[0] << "'"
-         << ", return status = " << mySuite.returnStatus() << endl;
-
-    return mySuite.returnStatus();
+    int returnStatus = -1;
+    if (mySuite.getPassedCount() != 0) {
+        returnStatus = 0;
+    } else {
+        cerr << "## No tests." << endl;
+        
+    }
+    cerr << ">> Finsihed test suite '" << argv[0] << "', return status = " << returnStatus << endl;
+    return returnStatus;
 
 }
