@@ -53,10 +53,17 @@ namespace y60 {
         }
     };
     template <class LOCKABLE, class ACCESSIBLE>
-    class LockingAccessor : public asl::AutoLocker<LOCKABLE> {
+    class LockingAccessor /*: public asl::AutoLocker<LOCKABLE> */{
     public:
-        LockingAccessor(LOCKABLE & theLockable, ACCESSIBLE & theAccessible) 
-            : asl::AutoLocker<LOCKABLE>(theLockable), _myAccessible(theAccessible) {}
+        LockingAccessor(LOCKABLE & theLockable, ACCESSIBLE & theAccessible,
+                        bool forWriting, bool  forReading) 
+            : /*asl::AutoLocker<LOCKABLE>(theLockable),*/ _myAccessible(theAccessible) 
+        {
+            _myAccessible.lock(forWriting, forReading);
+        }
+        ~LockingAccessor() {
+            _myAccessible.unlock();
+        }
         ACCESSIBLE & get() {
             return _myAccessible;
         }
@@ -74,17 +81,22 @@ namespace y60 {
     template <class T>
     struct VertexDataAccessor : public LockingAccessor<VertexDataBase, VertexData<T> > {
         typedef LockingAccessor<VertexDataBase, VertexData<T> > self;
-        VertexDataAccessor(VertexDataBase & theLockable, VertexData<T> & theAccessible) 
-            : LockingAccessor<VertexDataBase, VertexData<T> >(theLockable, theAccessible) {}
+        VertexDataAccessor(VertexDataBase & theLockable, VertexData<T> & theAccessible,
+                           bool forWriting, bool  forReading) 
+            : LockingAccessor<VertexDataBase, VertexData<T> >(theLockable, theAccessible, 
+                                                              forWriting, forReading) {}
     };
+    
     template <class T>
     struct ConstVertexDataAccessor : public LockingAccessor<VertexDataBase, const VertexData<T> > {
         typedef LockingAccessor<const VertexDataBase, VertexData<T> > self;
-        ConstVertexDataAccessor(VertexDataBase & theLockable, const VertexData<T> & theAccessible) 
-            : LockingAccessor<VertexDataBase, const VertexData<T> >(theLockable, theAccessible) {}
+        ConstVertexDataAccessor(VertexDataBase & theLockable, const VertexData<T> & theAccessible,
+                                bool forWriting, bool  forReading) 
+            : LockingAccessor<VertexDataBase, const VertexData<T> >(theLockable, theAccessible,
+                                                                    forWriting, forReading) {}
     };
 
-    class VertexDataBase : public asl::Lockable {
+    class VertexDataBase  {
         public:
             VertexDataBase(const TypeId & theType) : _myType(theType)  {};
             virtual ~VertexDataBase() {};
@@ -113,17 +125,21 @@ namespace y60 {
             /// returns an accessor object that automatically keeps a lock on the resource that it automatically
             /// released when the accessor object is destroyed
             template <class T>
-            asl::Ptr<VertexDataAccessor<T> > getVertexDataAccessor() {
+            asl::Ptr<VertexDataAccessor<T> > getVertexDataAccessor(bool forWriting = true, bool  forReading = false) {
                 return asl::Ptr<VertexDataAccessor<T> >(
-                    new VertexDataAccessor<T>(*this, dynamic_cast<VertexData<T>&>(*this)));
+                    new VertexDataAccessor<T>(*this, dynamic_cast<VertexData<T>&>(*this), forWriting, forReading));
             }
 
             template <class T>
             asl::Ptr<ConstVertexDataAccessor<T> > getVertexDataAccessor() const {
                 return asl::Ptr<ConstVertexDataAccessor<T> >(
-                    new ConstVertexDataAccessor<T>(const_cast<VertexDataBase&>(*this), dynamic_cast<const VertexData<T>&>(*this)));
+                    new ConstVertexDataAccessor<T>(const_cast<VertexDataBase&>(*this), 
+                                                   dynamic_cast<const VertexData<T>&>(*this), false, true)); // readonly access
             }
 #endif
+            virtual void unlock() const = 0;
+            virtual void lock(bool forWriting, bool forReading) const = 0;
+            
             virtual void useAsPosition() const = 0;
             virtual void useAsNormal() const = 0;
             virtual void useAsColor() const = 0;
@@ -169,13 +185,14 @@ namespace y60 {
     template <class T>
     class VertexDataFactory {
         public:
-            typedef asl::Ptr<VertexData<T> > (*FactoryMethod)(); 
+            typedef asl::Ptr<VertexData<T> > (*FactoryMethod)(const VertexBufferUsage &); 
 
             VertexDataFactory() : _myFactoryMethod(0) {};
             
-            asl::Ptr<VertexData<T> > create() {
+            asl::Ptr<VertexData<T> > create(const VertexBufferUsage & theUsage) {
+
                 if (_myFactoryMethod) {
-                    return (*_myFactoryMethod)();
+                    return (*_myFactoryMethod)(theUsage);
                 } else {
                     return asl::Ptr<VertexData<T> >(0);
                     //throw asl::Exception("No Data Factories added yet!", PLUS_FILE_LINE);

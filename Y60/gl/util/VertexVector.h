@@ -33,59 +33,35 @@ namespace y60 {
     DEFINE_EXCEPTION(TooManyVertexVectorUnlocks,VertexVectorException);  
     DEFINE_EXCEPTION(CanNotBindLockedVertexVector,VertexVectorException);  
 
-    enum VertexBufferUsageType {
-        VERTEX_USAGE_STREAM_DRAW  = GL_STREAM_DRAW_ARB,
-        VERTEX_USAGE_STREAM_READ  = GL_STREAM_READ_ARB,
-        VERTEX_USAGE_STREAM_COPY  = GL_STREAM_COPY_ARB,
-        VERTEX_USAGE_STATIC_DRAW  = GL_STATIC_DRAW_ARB,
-        VERTEX_USAGE_STATIC_READ  = GL_STATIC_READ_ARB,
-        VERTEX_USAGE_STATIC_COPY  = GL_STATIC_COPY_ARB,
-        VERTEX_USAGE_DYNAMIC_DRAW = GL_DYNAMIC_DRAW_ARB,
-        VERTEX_USAGE_DYNAMIC_READ = GL_DYNAMIC_READ_ARB,
-        VERTEX_USAGE_DYNAMIC_COPY = GL_DYNAMIC_COPY_ARB,
-        VERTEX_USAGE_DISABLED = 1,
-        VERTEX_USAGE_UNDEFINED = 0
-    };
-
-    //Y60_VBO_USAGE env variable
-    static const char * VertexBufferUsageTypeNames[]= {
-            "STREAM_DRAW",
-            "STREAM_READ",
-            "STREAM_COPY",
-            "STATIC_DRAW",
-            "STATIC_READ",
-            "STATIC_COPY",
-            "DYNAMIC_DRAW",
-            "DYNAMIC_READ",
-            "DYNAMIC_COPY",
-            "DISABLED"
-    };
-
-    static const VertexBufferUsageType VertexBufferUsageTypeList[]= {
-        VERTEX_USAGE_STREAM_DRAW,
-        VERTEX_USAGE_STREAM_READ,
-        VERTEX_USAGE_STREAM_COPY,
-        VERTEX_USAGE_STATIC_DRAW,
-        VERTEX_USAGE_STATIC_READ,
-        VERTEX_USAGE_STATIC_COPY,
-        VERTEX_USAGE_DYNAMIC_DRAW,
-        VERTEX_USAGE_DYNAMIC_READ,
-        VERTEX_USAGE_DYNAMIC_COPY,
-        VERTEX_USAGE_DISABLED,
-        VERTEX_USAGE_UNDEFINED
-    };
-
-    inline VertexBufferUsageType getVertexBufferUsageTypeFromString(const std::string & theUsageName) {
-        for (int i = 0; VertexBufferUsageTypeList[i] != VERTEX_USAGE_UNDEFINED; ++i) {
-            if (theUsageName == VertexBufferUsageTypeNames[i]) {
-                return VertexBufferUsageTypeList[i];
-            }
+    inline GLenum asGLEnum(VertexBufferUsage & theEnum) {
+        switch (theEnum) {
+            case VERTEX_USAGE_STREAM_DRAW:                
+                return GL_STREAM_DRAW_ARB;
+            case VERTEX_USAGE_STREAM_READ:
+                return GL_STREAM_READ_ARB;
+            case VERTEX_USAGE_STREAM_COPY:
+                return GL_STREAM_COPY_ARB; 
+            case VERTEX_USAGE_STATIC_DRAW:
+                return GL_STATIC_DRAW_ARB;
+            case VERTEX_USAGE_STATIC_READ:
+                return GL_STATIC_READ_ARB;
+            case VERTEX_USAGE_STATIC_COPY:
+                return GL_STATIC_COPY_ARB;
+            case VERTEX_USAGE_DYNAMIC_DRAW:
+                return GL_DYNAMIC_DRAW_ARB;
+            case VERTEX_USAGE_DYNAMIC_READ:
+                return GL_DYNAMIC_READ_ARB;
+            case VERTEX_USAGE_DYNAMIC_COPY:
+                return GL_DYNAMIC_COPY_ARB;
+            default:
+                throw VertexVectorException(std::string("Unknown VBO usage flag '") + theEnum.asString() + "'", PLUS_FILE_LINE);
+                break;                        
         }
-        return VERTEX_USAGE_UNDEFINED;
+        return GLenum(0);   
     }
-
+    
     template <class T>
-    class VertexVector : public asl::Lockable {
+    class VertexVector {
     public:
         typedef ptrdiff_t D;
         typedef T value_type;
@@ -109,8 +85,8 @@ namespace y60 {
         unsigned int _mySize;
         unsigned int _myCapacity;
         mutable T *  _myLockedData;
-        int          _myLockCount;
-        VertexBufferUsageType _myUsageType;
+        mutable int          _myLockCount;
+        VertexBufferUsage _myUsageType;
 
         static unsigned int getNewId() {
             unsigned int myId = 0;
@@ -130,8 +106,8 @@ namespace y60 {
             glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
             CHECK_OGL_ERROR;
         }
-        static void resizeAnduploadAll(const T * theData, unsigned long theSize, VertexBufferUsageType theUsageType) {
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, theSize * sizeof(T), theData, theUsageType);
+        static void resizeAnduploadAll(const T * theData, unsigned long theSize, VertexBufferUsage theUsageType) {
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, theSize * sizeof(T), theData, asGLEnum(theUsageType));
             CHECK_OGL_ERROR;
         }
         static void uploadPart(const T * theData, unsigned long theSize, unsigned long theOffset) {
@@ -142,8 +118,8 @@ namespace y60 {
             glGetBufferSubDataARB(GL_ARRAY_BUFFER_ARB, theOffset * sizeof(T), theSize * sizeof(T), theData);
             CHECK_OGL_ERROR;
         }
-        static void destructiveResize(unsigned long theSize, VertexBufferUsageType theUsageType) {
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, theSize * sizeof(T), 0, theUsageType);
+        static void destructiveResize(unsigned long theSize, VertexBufferUsage theUsageType) {
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, theSize * sizeof(T), 0, asGLEnum(theUsageType));
             CHECK_OGL_ERROR;
         }
 
@@ -168,13 +144,13 @@ namespace y60 {
             bindMe();
         }
         // Lockable implementation
-        void lock() {
+        void lock(bool forWriting = true, bool forReading = false) const {
             if (_myLockCount == 0) {
-                lockBuffer();
+                lockBuffer(forWriting, forReading);
             }
             ++_myLockCount;
         }
-        void unlock() {
+        void unlock() const {
             --_myLockCount;
             if (_myLockCount == 0) {
                 unlockBuffer();
@@ -187,7 +163,7 @@ namespace y60 {
             return _myLockCount != 0;
         }
     protected:
-        T * lockBuffer(bool forReading = true, bool forWriting = true) {
+        T * lockBuffer( bool forWriting, bool forReading) const {
             unsigned myFlags = 0;
             if (forReading) {
                 if (forWriting) {
@@ -200,7 +176,7 @@ namespace y60 {
             }
             glBindBufferARB(GL_ARRAY_BUFFER_ARB, _myId);
             CHECK_OGL_ERROR;
-            _myLockedData = (T*)glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_READ_ONLY);
+            _myLockedData = (T*)glMapBufferARB(GL_ARRAY_BUFFER_ARB, myFlags);
             CHECK_OGL_ERROR;
             glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
             CHECK_OGL_ERROR;
@@ -258,7 +234,7 @@ namespace y60 {
             deleteBuffer();
         }
 
-        void setUsage(VertexBufferUsageType theUsageType) {
+        void setUsage(VertexBufferUsage theUsageType) {
             _myUsageType = theUsageType;
         };
 

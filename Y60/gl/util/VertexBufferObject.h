@@ -28,13 +28,13 @@ namespace y60 {
     class VertexBufferObject : public VertexDataImpl<T, VertexVector<T> > {
         typedef VertexVector<T> VertexDataVector;
     public:
-        VertexBufferObject(VertexBufferUsageType theUsageType) {
+        VertexBufferObject(VertexBufferUsage theUsageType) {
             this->getDataVector().setUsage(theUsageType);
         }
-        void lock() {
-            this->getDataVector().lock();
+        void lock(bool forWriting = true, bool forReading = false) const {
+            this->getDataVector().lock(forWriting, forReading);
         }
-        void unlock() {
+        void unlock() const {
             this->getDataVector().unlock();
         }
         void useAsPosition() const {

@@ -21,6 +21,7 @@
 
 #include <y60/NodeNames.h>
 #include <y60/VertexDataRoles.h>
+#include <y60/NodeValueNames.h>
 #include <asl/string_functions.h>
 #include <asl/Triangle.h>
 #include <asl/linearAlgebra.h>
@@ -69,7 +70,15 @@ namespace y60 {
         VertexDataRole myRole = VertexDataRole(getEnumFromString(myRoleString, VertexDataRoleString));
 
         TypeId myTypeId = TypeId(getEnumFromString(theDataNode->nodeName(), TypeIdStrings));
-        VertexDataBasePtr myVertexData = createVertexDataBin(theResourceManager, myTypeId, myRole);
+        
+        VertexBufferUsage myUsage = VERTEX_USAGE_STATIC_DRAW;
+        if (theDataNode->getAttribute(VERTEX_BUFFER_USAGE_ATTRIB)) {
+            myUsage = theDataNode->getAttributeValue<VertexBufferUsage>(VERTEX_BUFFER_USAGE_ATTRIB);
+        }
+        AC_TRACE << "Primitive::load " << theDataNode->parentNode()->parentNode()->getAttributeString(NAME_ATTRIB) 
+                 << ", usage:" << myUsage << " for role: " << myRoleString;
+        
+        VertexDataBasePtr myVertexData = createVertexDataBin(theResourceManager, myTypeId, myRole, myUsage);
         if (myVertexData) {
             DB(AC_TRACE << "uploading Vertex Data role=" << myRole);
             myVertexData->load(myIndices, myDataNode, theBeginIndex, theEndIndex);
@@ -114,11 +123,13 @@ namespace y60 {
     }
 
     VertexDataBasePtr
-    Primitive::createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType, VertexDataRole theRole) {
+    Primitive::createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType, VertexDataRole theRole, 
+                                   const VertexBufferUsage & theUsage) 
+   {
         switch (theBinType) {
             case VECTOR_OF_VECTOR2F:
                 if (theResourceManager) {
-                    _myVertexData[theRole] = theResourceManager->getVertexDataFactory2f().create();
+                    _myVertexData[theRole] = theResourceManager->getVertexDataFactory2f().create(theUsage);
                 } else {
                     // XXX Workaround for non-existent ResourceManager
                     _myVertexData[theRole] = asl::Ptr<VertexData2f>(0);
@@ -126,7 +137,7 @@ namespace y60 {
                 break;
             case VECTOR_OF_VECTOR3F:
                 if (theResourceManager) {
-                    _myVertexData[theRole] = theResourceManager->getVertexDataFactory3f().create();
+                    _myVertexData[theRole] = theResourceManager->getVertexDataFactory3f().create(theUsage);
                 } else {
                     // XXX Workaround for non-existent ResourceManager
                     _myVertexData[theRole] = asl::Ptr<VertexData3f>(0);
@@ -134,7 +145,7 @@ namespace y60 {
                 break;
             case VECTOR_OF_VECTOR4F:
                 if (theResourceManager) {
-                    _myVertexData[theRole] = theResourceManager->getVertexDataFactory4f().create();
+                    _myVertexData[theRole] = theResourceManager->getVertexDataFactory4f().create(theUsage);
                 } else {
                     // XXX Workaround for non-existent ResourceManager
                     _myVertexData[theRole] = asl::Ptr<VertexData4f>(0);
@@ -980,10 +991,10 @@ namespace y60 {
     }
 #else
     asl::Ptr<VertexDataAccessor<Vector3f> >
-    Primitive::getLockingPositionsAccessor() {
+    Primitive::getLockingPositionsAccessor(bool forWriting, bool  forReading) {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(POSITIONS));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<asl::Vector3f>();
+            return myVertices->getVertexDataAccessor<asl::Vector3f>(forWriting, forReading);
         }
         return asl::Ptr<VertexDataAccessor<Vector3f> >(0);
     }
@@ -992,16 +1003,16 @@ namespace y60 {
     Primitive::getConstLockingPositionsAccessor() const {
         const y60::VertexDataBasePtr myVertices = getVertexDataPtr(VertexDataRole(POSITIONS));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<asl::Vector3f>();
+            return myVertices->getVertexDataAccessor<asl::Vector3f>(); // read-only
         }
         return asl::Ptr<ConstVertexDataAccessor<Vector3f> >(0);
     }
 
     asl::Ptr<VertexDataAccessor<Vector3f> >
-    Primitive::getLockingNormalsAccessor() {
+    Primitive::getLockingNormalsAccessor(bool forWriting, bool  forReading) {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(NORMALS));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<asl::Vector3f>();
+            return myVertices->getVertexDataAccessor<asl::Vector3f>(forWriting, forReading);
         }
         return asl::Ptr<VertexDataAccessor<Vector3f> >(0);
     }
@@ -1016,10 +1027,10 @@ namespace y60 {
     }
 
     asl::Ptr<VertexDataAccessor<Vector4f> >
-    Primitive::getLockingColorsAccessor() {
+    Primitive::getLockingColorsAccessor(bool forWriting, bool  forReading) {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(COLORS));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<asl::Vector4f>();
+            return myVertices->getVertexDataAccessor<asl::Vector4f>(forWriting, forReading);
         }
         return asl::Ptr<VertexDataAccessor<Vector4f> >(0);
     }
@@ -1034,28 +1045,28 @@ namespace y60 {
     }
 
     asl::Ptr<VertexDataAccessor<float> >
-    Primitive::getLockingTexCoord1fAccessor(unsigned theSlot) {
+    Primitive::getLockingTexCoord1fAccessor(unsigned theSlot, bool forWriting, bool  forReading) {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(TEXCOORD0+theSlot));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<float>();
+            return myVertices->getVertexDataAccessor<float>(forWriting, forReading);
         }
         return asl::Ptr<VertexDataAccessor<float> >(0);
     }
 
     asl::Ptr<VertexDataAccessor<Vector2f> >
-    Primitive::getLockingTexCoord2fAccessor(unsigned theSlot) {
+    Primitive::getLockingTexCoord2fAccessor(unsigned theSlot, bool forWriting, bool  forReading) {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(TEXCOORD0+theSlot));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<asl::Vector2f>();
+            return myVertices->getVertexDataAccessor<asl::Vector2f>(forWriting, forReading);
         }
         return asl::Ptr<VertexDataAccessor<Vector2f> >(0);
     }
 
     asl::Ptr<VertexDataAccessor<Vector3f> >
-    Primitive::getLockingTexCoord3fAccessor(unsigned theSlot) {
+    Primitive::getLockingTexCoord3fAccessor(unsigned theSlot, bool forWriting, bool  forReading) {
         y60::VertexDataBasePtr myVertices = const_cast<Primitive*>(this)->getVertexDataPtr(VertexDataRole(TEXCOORD0+theSlot));
         if (myVertices) {
-            return myVertices->getVertexDataAccessor<asl::Vector3f>();
+            return myVertices->getVertexDataAccessor<asl::Vector3f>(forWriting, forReading);
         }
         return asl::Ptr<VertexDataAccessor<Vector3f> >(0);
     }

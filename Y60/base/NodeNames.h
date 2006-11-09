@@ -126,6 +126,8 @@ namespace y60 {
     static const char * PRIMITIVE_TYPE_QUAD_STRIP      = "quadstrip";
     static const char * PRIMITIVE_TYPE_POLYGON         = "polygon";
 
+    static const char * VERTEX_BUFFER_USAGE_ATTRIB     = "vertexbufferusage";
+    
     static const char * TEXTURE_APPLYMODE_ATTRIB    = "applymode";
     static const char * TEXTURE_WRAPMODE_ATTRIB     = "wrapmode";
     static const char * TEXTURE_MIN_FILTER_ATTRIB   = "min_filter";

@@ -552,6 +552,39 @@ namespace y60 {
         "stop",
         0
     };
+    
+    // === VBO usage ====================================================
+    enum VertexBufferUsageEnum {
+        VERTEX_USAGE_UNDEFINED = 0,
+        VERTEX_USAGE_DISABLED = 1,
+        VERTEX_USAGE_STREAM_DRAW,
+        VERTEX_USAGE_STREAM_READ,
+        VERTEX_USAGE_STREAM_COPY,
+        VERTEX_USAGE_STATIC_DRAW,
+        VERTEX_USAGE_STATIC_READ,
+        VERTEX_USAGE_STATIC_COPY,
+        VERTEX_USAGE_DYNAMIC_DRAW,
+        VERTEX_USAGE_DYNAMIC_READ,
+        VERTEX_USAGE_DYNAMIC_COPY,
+        VertexBufferUsageEnum_MAX
+    };
+
+    //Y60_VBO_USAGE env variable
+    static const char * VertexBufferUsageStrings[]= {
+            "undefined",
+            "disabled",
+            "stream_draw",
+            "stream_read",
+            "stream_copy",
+            "static_draw",
+            "static_read",
+            "static_copy",
+            "dynamic_draw",
+            "dynamic_read",
+            "dynamic_copy", 
+            ""
+    };
+    DEFINE_ENUM(VertexBufferUsage, VertexBufferUsageEnum);   
 }
 
 #endif

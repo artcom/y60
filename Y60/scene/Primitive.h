@@ -202,17 +202,17 @@ namespace y60 {
             }
 
             //TODO: make complete
-            asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingPositionsAccessor();
-            asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingNormalsAccessor();
-            asl::Ptr<VertexDataAccessor<asl::Vector4f> > getLockingColorsAccessor();
+            asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingPositionsAccessor(bool forWriting = true, bool  forReading = false);
+            asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingNormalsAccessor(bool forWriting = true, bool  forReading = false);
+            asl::Ptr<VertexDataAccessor<asl::Vector4f> > getLockingColorsAccessor(bool forWriting = true, bool  forReading = false);
 
             asl::Ptr<ConstVertexDataAccessor<asl::Vector3f> > getConstLockingPositionsAccessor() const; 
             asl::Ptr<ConstVertexDataAccessor<asl::Vector3f> > getConstLockingNormalsAccessor() const;
             asl::Ptr<ConstVertexDataAccessor<asl::Vector4f> > getConstLockingColorsAccessor() const;
     
-            asl::Ptr<VertexDataAccessor<float> >         getLockingTexCoord1fAccessor(unsigned theSlot);
-            asl::Ptr<VertexDataAccessor<asl::Vector2f> > getLockingTexCoord2fAccessor(unsigned theSlot);
-            asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingTexCoord3fAccessor(unsigned theSlot);
+            asl::Ptr<VertexDataAccessor<float> >         getLockingTexCoord1fAccessor(unsigned theSlot, bool forWriting = true, bool  forReading = false);
+            asl::Ptr<VertexDataAccessor<asl::Vector2f> > getLockingTexCoord2fAccessor(unsigned theSlot, bool forWriting = true, bool  forReading = false);
+            asl::Ptr<VertexDataAccessor<asl::Vector3f> > getLockingTexCoord3fAccessor(unsigned theSlot, bool forWriting = true, bool  forReading = false);
 
             bool intersect(const asl::LineSegment<float> & theStick,  IntersectionList & theIntersectionInfo);
             bool intersect(const asl::Ray<float> & theStick,  IntersectionList & theIntersectionInfo);
@@ -255,8 +255,10 @@ namespace y60 {
 
             template <class T>
             void assureTexCoords(const MaterialParameter & theParameter);    
-
-            VertexDataBasePtr createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType, VertexDataRole theRole);
+          
+            VertexDataBasePtr createVertexDataBin(ResourceManager* theResourceManager, TypeId theBinType, 
+                                                  VertexDataRole theRole, const VertexBufferUsage & theUsage);
+                                                  
             void generateMesh(dom::NodePtr theIndicesNode);
 
             // TODO: this should be a functor or something like that

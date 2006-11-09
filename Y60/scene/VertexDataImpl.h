@@ -75,8 +75,8 @@ namespace y60 {
                 mySource[theIndices[i]] = _myData[i];
             }        
         }
-        void lock() {}
-        void unlock() {}
+        void lock(bool forWriting = true, bool forReading = false) const {}
+        void unlock() const {}
 
         virtual void useAsPosition() const = 0;
         virtual void useAsNormal() const = 0;

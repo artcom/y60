@@ -43,25 +43,21 @@ namespace y60 {
      */
     class VertexDataStorageTypeSetting : public asl::Singleton<VertexDataStorageTypeSetting> {
     public:
-        VertexDataStorageTypeSetting() : _myType(VERTEX_STORAGE_IS_STD_VECTOR),
-                                         _myUsageType(VERTEX_USAGE_STATIC_DRAW)
+        VertexDataStorageTypeSetting() : _myType(VERTEX_STORAGE_IS_STD_VECTOR)
         {
             const char * myUsageString = getenv("Y60_VBO_USAGE");
+            bool myVBOUsage = true;
             if (myUsageString) {
-                VertexBufferUsageType myUsageType = getVertexBufferUsageTypeFromString(myUsageString);
-                if (myUsageType !=VERTEX_USAGE_UNDEFINED) {
-                    _myUsageType = myUsageType;
-                    AC_INFO << "VertexBufferUsageType '"<<myUsageString<<"' is used from Y60_VBO_USAGE environment variable."<<std::endl;
-                } else {
-                    AC_WARNING << "Unknown value '"<<myUsageString<<"' in environment variable Y60_VBO_USAGE ignored."<<std::endl;
-                    AC_INFO << "Recognized values are:";
-                    for (int i = 0; VertexBufferUsageTypeList[i] != VERTEX_USAGE_UNDEFINED; ++i) {
-                        AC_INFO << "  " << VertexBufferUsageTypeNames[i] << std::endl;
-                    }
+                try {
+                    myVBOUsage = asl::as<bool>(myUsageString);
+                } catch (const std::exception & e) {
+                    AC_WARNING << "Y60_VBO_USAGE environment must be 0 or 1; " << e.what();
+                } catch (const asl::Exception & e) {
+                    AC_WARNING << "Y60_VBO_USAGE environment must be 0 or 1; " << e;
                 }
             }
-
-            if ((_myUsageType != VERTEX_USAGE_DISABLED) &&
+            //AC_PRINT << "ENV: " << std::string(myUsageString ? myUsageString: "not defined") << " -> " << myVBOUsage;
+            if (myVBOUsage &&
                 (queryOGLExtension("GL_ARB_vertex_buffer_object", true) ||
                  queryOGLExtension("GL_EXT_vertex_buffer_object", true)))
             {
@@ -82,18 +78,8 @@ namespace y60 {
             return _myType;
         }
 
-        /**
-         * Return VertexBuffer usage type.
-         * @return VertexBuffer usage type, e.g. VERTEX_USAGE_STREAM_DRAW.
-         * @note This is only valid if VertexData storage type is VERTEX_STORAGE_IS_VBO_VECTOR.
-         * @see getType
-         */
-        VertexBufferUsageType getUsageType() const {
-            return _myUsageType;
-        }
     private:
         VertexDataStorageType _myType;
-        VertexBufferUsageType _myUsageType;
     };
 
     struct PixelEncodingInfo; // Forward Declaration. Defined in PixelEncodingInfo.h
@@ -124,7 +110,7 @@ namespace y60 {
          * @return Pointer to VertexData<T> object.
          */
         template<class T>
-        static asl::Ptr<VertexData<T> > create() {
+        static asl::Ptr<VertexData<T> > create(const VertexBufferUsage & theUsage) {
             const VertexDataStorageTypeSetting & mySettings = VertexDataStorageTypeSetting::get();
             switch (mySettings.getType()) {
                 case VERTEX_STORAGE_IS_STD_VECTOR:
@@ -132,7 +118,7 @@ namespace y60 {
                 case VERTEX_STORAGE_IS_GFX_VECTOR:
                     return asl::Ptr<VertexData<T> >(new VertexArray<T>());
                 case VERTEX_STORAGE_IS_VBO_VECTOR:
-                    return asl::Ptr<VertexData<T> >(new VertexBufferObject<T>(mySettings.getUsageType()));
+                    return asl::Ptr<VertexData<T> >(new VertexBufferObject<T>(theUsage));
                 default:
                     throw asl::Exception(JUST_FILE_LINE);
             }

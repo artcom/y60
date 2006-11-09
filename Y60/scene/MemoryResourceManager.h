@@ -60,7 +60,7 @@ class MemoryResourceManager : public ResourceManager {
         }
     private:
         template<class T>
-        static asl::Ptr<VertexData<T> > create() {
+        static asl::Ptr<VertexData<T> > create(const VertexBufferUsage & theUsage) {
             return asl::Ptr<VertexData<T> >(new VertexMemoryBase<T>());
         };
 };

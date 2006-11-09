@@ -144,6 +144,7 @@ namespace y60 {
         theFactory.registerPrototype("RenderStyle", dom::ValuePtr(new dom::SimpleValue<y60::RenderStyle>(FRONT,0)));
         theFactory.registerPrototype("RenderStyles", dom::ValuePtr(new dom::SimpleValue<y60::RenderStyles>(y60::RenderStyles(0),0)));
         theFactory.registerPrototype("TargetBuffers", dom::ValuePtr(new dom::SimpleValue<y60::TargetBuffers>(y60::TargetBuffers(0),0)));
+        theFactory.registerPrototype("VertexBufferUsage", dom::ValuePtr(new dom::SimpleValue<y60::VertexBufferUsage>(y60::VertexBufferUsage(VERTEX_USAGE_STATIC_DRAW),0)));
     }
 
     void registerSomTypes(dom::ValueFactory & theFactory) {
