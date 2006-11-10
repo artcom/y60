@@ -49,7 +49,7 @@ namespace y60 {
             ShapePtr myShape = getNode()->getFacade<Shape>();
             myShape->set<NameTag>(theName);
         }
-        RenderStyles myDefaultStyle(BIT(FRONT) | BIT(BACK));
+        RenderStyles myDefaultStyle(BIT(FRONT));
         if (!myNode->hasFacade()) {
 	        myNode->appendAttribute(RENDER_STYLE_ATTRIB, as_string(myDefaultStyle));
         } else {
