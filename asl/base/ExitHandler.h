@@ -17,8 +17,8 @@ namespace asl {
 
 // This class exists so the constructor gets called once on initialization
 // of the program and sets windows exception handling stuff appropriately.
-// There is only one instance and that instance is declared statically in the
-// cpp file. 
+// There is only one instance and that instance is declared statically in 
+// Exception.cpp. 
 class ExitHandler {
 public:
     ExitHandler();
@@ -31,7 +31,6 @@ private:
     // that prevents the Linker from optimizing it away.
     static ExitHandler _myExitHandler;
 };
-
 }
 
 #endif

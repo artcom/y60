@@ -35,7 +35,6 @@ void
 SingletonManager::destroyAllSingletons() {
     // Note that using the Logger here is unsafe. The Logger itself is a singleton that
     // will be destroyed at some point.
-    cerr << "Destroying singletons." << endl;
     static bool mySingletonManagerDestroyed = false;
     if (mySingletonManagerDestroyed) {
         // XXX: This happens if the SingletonManager destructor and another handler 
@@ -44,6 +43,7 @@ SingletonManager::destroyAllSingletons() {
 //        cerr << "  --- Already gone" << endl;
         return;
     }
+    cerr << "Destroying singletons." << endl;
     mySingletonManagerDestroyed = true;
     _mySingletonMap.clear();
 

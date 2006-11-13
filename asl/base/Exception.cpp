@@ -24,17 +24,13 @@
 #include "string_functions.h"
 #include "os_functions.h"
 
-#ifdef WIN32
 #include "ExitHandler.h"
-#endif
 
 using namespace std;
 
 namespace asl {
 
-#ifdef WIN32
-    ExitHandler ExitHandler::_myExitHandler;
-#endif
+    ExitHandler _ourExitHandler;
 
     // TODO: make this a static function
     bool abortOnThrow() {

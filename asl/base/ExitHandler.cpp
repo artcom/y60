@@ -139,8 +139,7 @@ ExitHandler::ExitHandler() {
     SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX);
     SetUnhandledExceptionFilter(&AcUnhandledExceptionFilter);
 #endif    
-    atexit(exitFunction);
-//    SetConsoleCtrlHandler(&AcCtrlBreakHandler, true);
+//    atexit(exitFunction);
 }
 
 void ExitHandler::segFault() {
