@@ -171,7 +171,6 @@ class ShapeBuilderUnitTest : public UnitTest {
             // Position tests
             //==============================================================================
             dom::NodePtr myVertexDataNode = myShapeNode->childNode("vertexdata");
-cerr << *myShapeNode << endl;
             dom::NodePtr myPositionListNode = getVertexDataNode(myVertexDataNode, "position");
             ENSURE(myPositionListNode->childNodesLength() == 1);
             VectorOfVector3f myPositions = myPositionListNode->childNode(0)->nodeValueAs<VectorOfVector3f>();
