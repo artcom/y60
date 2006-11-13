@@ -151,7 +151,7 @@ class ShapeBuilderUnitTest : public UnitTest {
             //==============================================================================
             RenderStyles myStyle; 
             myStyle.set(FRONT);
-            myStyle.set(BACK); // default FRONT & BACK
+            //myStyle.set(BACK); // default FRONT & BACK
             DPRINT(myOptShapeBuilder.getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue());
             ENSURE(myOptShapeBuilder.getNode()->getAttribute(RENDER_STYLE_ATTRIB)->nodeValue() == as_string(myStyle));
             myOptShapeBuilder.setBackFacing(false); // turn off back, front should still be set
