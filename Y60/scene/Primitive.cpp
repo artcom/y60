@@ -274,10 +274,10 @@ namespace y60 {
         const VertexData3f::VertexDataVector & myNormals =
             getVertexData(NORMALS).getVertexDataCast<asl::Vector3f>();
 #else
-        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor(false, true);
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor(false, true);
         const VertexData3f & myNormals = myNormalsAccessor->get();
 #endif
         // get two sides of the triangle
@@ -485,10 +485,10 @@ namespace y60 {
         _myBoundingBoxTree = BoundingBoxTreePtr(new BoundingBoxTree);
         BoundingBoxTreeBuilder myBuilder(*_myBoundingBoxTree);
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor(false, true);
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor(false, true);
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         scanElements(myBuilder, myPositions, myNormals);
@@ -655,10 +655,10 @@ namespace y60 {
     bool
     Primitive::intersect(const asl::LineSegment<float> & theStick,  IntersectionList & theIntersectionInfo) {
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor(false, true);
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor(false, true);
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         IntersectTriangleDetector<asl::LineSegment<float> > myDetector(theStick, theIntersectionInfo);
@@ -671,10 +671,10 @@ namespace y60 {
     bool
     Primitive::intersect(const asl::Ray<float> & theStick,  IntersectionList & theIntersectionInfo) {
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor(false, true);
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor(false, true);
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         IntersectTriangleDetector<asl::Ray<float> > myDetector(theStick, theIntersectionInfo);
@@ -688,10 +688,10 @@ namespace y60 {
     bool
     Primitive::intersect(const asl::Line<float> & theStick,  IntersectionList & theIntersectionInfo) {
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor(false, true);
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor(false, true);
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         IntersectTriangleDetector<asl::Line<float> > myDetector(theStick, theIntersectionInfo);
@@ -807,10 +807,10 @@ namespace y60 {
         //updateNormalPositionColorPointers();
         SweptSphereAllContactsDetector myDetector(theSphere, theMotion, theSphereSpaceTransform, theCollisionInfo);
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor(false, true);
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor(false, true);
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         return scanElements(myDetector, myPositions, myNormals);
@@ -921,10 +921,10 @@ namespace y60 {
 
         SweptSphereFirstContactDetector myDetector(theSphere, theMotion, theSphereSpaceTransform, theCurrentContact, theNewContactInfo);
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myPositionAccessor = getLockingPositionsAccessor(false, true);
         const VertexData3f & myPositions = myPositionAccessor->get();
 
-        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor();
+        asl::Ptr<VertexDataAccessor<Vector3f> > myNormalsAccessor = getLockingNormalsAccessor(false, true);
         const VertexData3f * myNormals = myNormalsAccessor ? &myNormalsAccessor->get() : 0;
 
         return scanElements(myDetector, myPositions, myNormals);
