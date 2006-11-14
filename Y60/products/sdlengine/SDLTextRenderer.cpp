@@ -509,6 +509,12 @@ namespace y60 {
 
         for (unsigned i = 0; i < theWords.size(); ++i) {
             const Word & myWord = theWords[i];
+            if (theLines.back().width + myWord.surface->w > theLineWidth) {
+                // start new line
+                theLines.push_back(Line());
+                theLines.back().indent = _myIndentation;
+                theLines.back().width = _myIndentation;
+            }
 
             // Update line metrics
             theLines.back().wordCount++;
