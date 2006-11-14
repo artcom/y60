@@ -72,11 +72,11 @@ function LabelBase(Public, Protected, theScene,
         window.setLineHeight(lineHeight);
 
         var myFontName = loadFont(myStyle.font, myStyle.fontsize);
-
         var myImage = Protected.getImageNode();
         _myTextSize = window.renderTextAsImage(myImage, theText, myFontName,
                         theSize&&theSize[0]>0?Public.width:null,
-                        theSize&&theSize[1]>0?Public.height:null);
+                        theSize&&theSize[1]>0?Public.height:null,
+                        Public.textCursorPos);
 
         Public.srcsize.x = _myTextSize[0] / myImage.width;
         Public.srcsize.y = _myTextSize[1] / myImage.height;
@@ -137,6 +137,7 @@ function LabelBase(Public, Protected, theScene,
     // Protected
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    Public.textCursorPos = new Vector2i(0,0);
     Public.style = clone(theStyle);
 
     Protected.getImageNode = function() {
