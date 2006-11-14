@@ -137,6 +137,15 @@ namespace y60 {
         }
     }
 
+    const asl::Vector2i &
+    TextRendererManager::getTextCursorPosition() const {
+        if (_myTTFRenderer) {
+            return _myTTFRenderer->getTextCursorPosition();
+        } else {
+            return _myBitmapRenderer.getTextCursorPosition();
+        }
+    }
+
 	void
 	TextRendererManager::setPadding(int topPadding, int bottomPadding, int leftpadding, int rightpadding) {
         _myBitmapRenderer.setPadding(topPadding, bottomPadding, leftpadding, rightpadding);
@@ -144,8 +153,8 @@ namespace y60 {
             _myTTFRenderer->setPadding(topPadding, bottomPadding, leftpadding, rightpadding);
         }
     }
-
-	void
+	
+    void
 	TextRendererManager::setIndentation(int theIndentation) {
         _myBitmapRenderer.setIndentation(theIndentation);
         if (_myTTFRenderer) {
@@ -172,11 +181,12 @@ namespace y60 {
     TextRendererManager::renderTextAsImage(TextureManager & theTextureManager, dom::NodePtr theImageNode,
                                   const std::string & theString,
                                   const std::string & theFont,
-                                  unsigned int theTargetWidth, unsigned int theTargetHeight)
+                                  unsigned int theTargetWidth, unsigned int theTargetHeight,
+                                  const asl::Vector2i & theCursorPos)
     {
         return _myTTFRenderer->renderTextAsImage(theTextureManager,
                                               theImageNode, theString, theFont,
-                                              theTargetWidth, theTargetHeight);
+                                              theTargetWidth, theTargetHeight, theCursorPos);
 	}
 
 	void

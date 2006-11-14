@@ -144,7 +144,8 @@ namespace y60 {
                                             const string & theText,
                                             const string & theFontName,
                                             unsigned int theTargetWidth,
-                                            unsigned int theTargetHeight)
+                                            unsigned int theTargetHeight,
+                                            const asl::Vector2i & theCursorPos)
     {
         MAKE_SCOPE_TIMER(SDLTextRenderer_renderTextAsImage);
         TTF_SetTracking(_myTracking);
@@ -155,6 +156,7 @@ namespace y60 {
             myImage->createRaster(1, 1, 1, y60::RGBA);
         }
 
+        _myCursorPos = theCursorPos;
         Vector2i myTextSize = createTextSurface(theText, theFontName, getTextColor(),
             theTargetWidth, theTargetHeight);
 
@@ -274,7 +276,7 @@ namespace y60 {
         }
         switch(_myHorizontalAlignment) {
             case LEFT_ALIGNMENT:
-                return _myLeftPadding - theMinX + (theLine.indent ? _myIndentation : 0);
+                return _myLeftPadding - theMinX + (theLine.indent);
             case RIGHT_ALIGNMENT:
                 return theSurfaceWidth-_myRightPadding-theLine.width;
             case CENTER_ALIGNMENT:
@@ -501,6 +503,9 @@ namespace y60 {
         DB2(AC_TRACE << "-------  Create lines  -------" << endl;)
         unsigned myNewlineCount = 0;
         theLines.push_back(Line());
+        theLines.back().width = _myCursorPos[0];
+        theLines.back().indent = _myCursorPos[0];
+        _myCursorPos[0] = 0;
 
         for (unsigned i = 0; i < theWords.size(); ++i) {
             const Word & myWord = theWords[i];
@@ -522,7 +527,7 @@ namespace y60 {
                         " wordcount: "<< theLines.back().wordCount << endl;)
                     // start new line
                     theLines.push_back(Line());
-                    theLines.back().indent = true;
+                    theLines.back().indent = _myIndentation;
                     theLines.back().width = _myIndentation;
                 }
             }
@@ -662,13 +667,13 @@ namespace y60 {
                     mySurfaceWidth-_myLeftPadding-_myRightPadding, myLineHeight);
         if (theTargetHeight == 0) {
             DB2(AC_TRACE << "Set auto-height to " << myTotalLineHeight << endl;)
-            mySurfaceHeight = myTotalLineHeight + _myTopPadding + _myBottomPadding;
+            mySurfaceHeight = myTotalLineHeight + _myTopPadding +_myCursorPos[1]+ _myBottomPadding;
         }
 
         createTargetSurface(nextPowerOfTwo(mySurfaceWidth), nextPowerOfTwo(mySurfaceHeight), theTextColor);
 
         DB2(
-            AC_TRACE << "-------- Text puzzel ----------" << endl;
+            AC_TRACE << "-------- Text puzzle ----------" << endl;
             AC_TRACE << "Target surface size: " << mySurfaceWidth << " x " << mySurfaceHeight << endl;
             AC_TRACE << "Number of lines: " << myLines.size() << endl;
             AC_TRACE << "Total line height: " << myTotalLineHeight << endl << endl;
@@ -676,7 +681,7 @@ namespace y60 {
 
         // Render lines
         unsigned myWordCount = 0;
-        int myYPos = calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) + _myParagraphTopOffset;
+        int myYPos = calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) + _myParagraphTopOffset + _myCursorPos[1];
 
         for (unsigned i = 0; i < myLines.size(); ++i) {
             int myMinX = myLines[i].wordCount ? myWords[myWordCount].minx : 0;
@@ -728,11 +733,13 @@ namespace y60 {
                 myXPos += myWord.surface->w;
                 SDL_FreeSurface(myWord.surface);
             }
+            _myCursorPos[0] = myXPos - _myRightPadding;
 
-            myYPos += myLineHeight;
             if (myLines[i].newline) {
                 myYPos += _myParagraphBottomOffset + _myParagraphTopOffset;
             }
+            _myCursorPos[1] = myYPos - calcVerticalAlignment(mySurfaceHeight, myTotalLineHeight) - _myParagraphTopOffset;
+            myYPos += myLineHeight;
         }
 
         return Vector2i(mySurfaceWidth, mySurfaceHeight);

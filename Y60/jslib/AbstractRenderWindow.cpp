@@ -885,12 +885,18 @@ namespace jslib {
         _myRenderer->getTextManager().setColor(theTextColor);
     }
 
+    const asl::Vector2i & AbstractRenderWindow::getTextCursorPosition() const
+    {
+        return _myRenderer->getTextManager().getTextCursorPosition();
+    }
+
     asl::Vector2i AbstractRenderWindow::renderTextAsImage(dom::NodePtr theImageNode,
                                  const std::string & theString, const std::string & theFont,
-                                 const unsigned int & theTargetWidth, const unsigned int & theTargetHeight)
+                                 const unsigned int & theTargetWidth, const unsigned int & theTargetHeight,
+                                 const asl::Vector2i & theCursorPos)
     {
         return _myRenderer->getTextManager().renderTextAsImage(*(_myScene->getTextureManager()),
-                        theImageNode, theString, theFont, theTargetWidth, theTargetHeight);
+                        theImageNode, theString, theFont, theTargetWidth, theTargetHeight, theCursorPos);
     }
 
     void AbstractRenderWindow::setTextPadding(int topPadding, int bottomPadding, int leftPadding, int rightPadding) {

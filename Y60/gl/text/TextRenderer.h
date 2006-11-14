@@ -51,8 +51,13 @@ namespace y60 {
             void setWindowSize(const unsigned int & _myWindowWidth, const unsigned int & _myWindowHeight);
             virtual bool haveFont(const std::string theFontName) = 0;
             virtual void renderText(TextPtr & theText) = 0;
+            const asl::Vector2i & getTextCursorPosition() const {
+                return _myCursorPos;
+            
+            }
             void setColor(const asl::Vector4f & theTextColor);
             void setPadding(int theTop, int theBottom, int theLeft, int theRight);
+            void setCursor(asl::Vector2i thePosition);
             void setIndentation(int theIndent);
         	void setVTextAlignment(TextRenderer::TextAligment theVAlignment);
 	        void setHTextAlignment(TextRenderer::TextAligment theHAlignment);
@@ -82,6 +87,7 @@ namespace y60 {
         	unsigned      _myParagraphBottomOffset;
             float         _myTracking;
             int           _myIndentation;
+            asl::Vector2i _myCursorPos;
         private:
             unsigned int  _myWindowWidth;
             unsigned int  _myWindowHeight;

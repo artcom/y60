@@ -49,7 +49,8 @@ namespace y60 {
         _myRightPadding(0),
         _myLeftPadding(0),
         _myIndentation(0),
-        _myTracking(0.0f)
+        _myTracking(0.0f),
+        _myCursorPos(0,0)
     {}
 
     TextRenderer::~TextRenderer() {}
@@ -83,6 +84,11 @@ namespace y60 {
         _myBottomPadding = theBottom;
         _myLeftPadding = theLeft;
         _myRightPadding = theRight;
+    }
+
+    void
+    TextRenderer::setCursor(asl::Vector2i thePosition) {
+        _myCursorPos = thePosition;
     }
 
     void

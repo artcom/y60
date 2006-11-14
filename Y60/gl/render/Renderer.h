@@ -77,6 +77,10 @@ namespace y60 {
                 return _myTextRendererManager;
             }
 
+            const TextRendererManager & getTextManager() const {
+                return _myTextRendererManager;
+            }
+
             enum {
                 BV_NONE      = 0,
                 BV_SHAPE     = 1,

@@ -112,6 +112,8 @@ class JSAbstractRenderWindow :  public JSWrapper<DERIVED, asl::Ptr<DERIVED>, Sta
         static JSBool
         setTextPadding(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
         static JSBool
+        getTextCursorPosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
+        static JSBool
         setTextIndentation(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 
         static JSBool
         setHTextAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval); 

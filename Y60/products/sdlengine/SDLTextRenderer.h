@@ -44,7 +44,8 @@ namespace y60 {
             asl::Vector2i renderTextAsImage(TextureManager & theTextureManager,
                     dom::NodePtr theImageNode,
                     const std::string & theText, const std::string & theFontName,
-                    unsigned int theTextureWidth = 0, unsigned int theTextureHeight = 0);
+                    unsigned int theTextureWidth = 0, unsigned int theTextureHeight = 0,
+                    const asl::Vector2i & theCursorPos = asl::Vector2i(0,0));
 
             bool getFontMetrics(const std::string & theFontName,
                     int & theFontHeight,
@@ -86,12 +87,12 @@ namespace y60 {
             };
 
             struct Line {
-                Line() : width(0), wordCount(0), newline(false), indent(false) {}
+                Line() : width(0), wordCount(0), newline(false), indent(0) {}
 
                 unsigned width;
                 unsigned wordCount;
                 bool     newline;
-                bool     indent;
+                unsigned indent;
             };
 
             asl::Vector2i createTextSurface(const std::string & theText, const std::string & theFontName,

@@ -350,10 +350,83 @@ JSAbstractRenderWindow<DERIVED>::renderTextAsImage(JSContext *cx, JSObject *obj,
     DOC_PARAM("theFontName", "The font name", DOC_TYPE_STRING);
     DOC_PARAM("theTextBoxWidth", "The textbox width, 0 to fit text", DOC_TYPE_INTEGER);
     DOC_PARAM("theTextBoxHeight", "The textbox height, 0 to fit text", DOC_TYPE_INTEGER);
+    DOC_PARAM("theCursorPos", "where to place the text cursor. default is (0,0)", DOC_TYPE_VECTOR2I);
     DOC_RVAL("theFilledTextBoxSize", DOC_TYPE_VECTOR2I);
     DOC_END;
-    typedef asl::Vector2i (DERIVED::*MyMethod)(dom::NodePtr, const std::string &, const std::string &, const unsigned int &, const unsigned int &);
-    return Method<DERIVED>::call((MyMethod)&DERIVED::renderTextAsImage,cx,obj,argc,argv,rval);
+    dom::NodePtr theImageNode;
+    std::string theTextString;
+    std::string theFontName;
+    unsigned int theTextBoxWidth;
+    unsigned int theTextBoxHeight;
+    asl::Vector2i theCursorPos;
+    asl::Vector2i myBoxSize;
+
+    if (argc >= 1) {
+        if (!convertFrom(cx,argv[0],theImageNode)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 1 must be an image node");
+            return JS_FALSE;
+        }
+    }
+    if (argc >= 2) {
+        if (!convertFrom(cx,argv[1],theTextString)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 2 must be a string");
+            return JS_FALSE;
+        }
+    }
+    if (argc >= 3) {
+        if (!convertFrom(cx,argv[2],theFontName)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 3 must be a string");
+            return JS_FALSE;
+        }
+    }
+    if (argc >= 4) {
+        if (!convertFrom(cx,argv[3],theTextBoxWidth)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 4 must be an int");
+            return JS_FALSE;
+        }
+    }
+    if (argc >= 5) {
+        if (!convertFrom(cx,argv[4],theTextBoxHeight)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 5 must be an int");
+            return JS_FALSE;
+        }
+    }
+    if (argc >= 6) {
+        if (!convertFrom(cx,argv[5],theCursorPos)) {
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: parameter 6 must be a vector2i ");
+            return JS_FALSE;
+        }
+    }
+
+    try {
+    switch (argc) {
+        case 3:
+            myBoxSize = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).
+                renderTextAsImage(theImageNode, theTextString, theFontName);
+            jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+            break;
+        case 4:
+            myBoxSize = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).
+                renderTextAsImage(theImageNode, theTextString, theFontName, theTextBoxWidth);
+            jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+            break;
+        case 5:
+            myBoxSize = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).
+                renderTextAsImage(theImageNode, theTextString, theFontName, theTextBoxWidth, theTextBoxHeight);
+            jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+            break;
+        case 6:
+            myBoxSize = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).
+                renderTextAsImage(theImageNode, theTextString, theFontName, theTextBoxWidth, theTextBoxHeight, theCursorPos);
+            jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+            break;
+        default:
+            JS_ReportError(cx,"JSRenderWindow::renderTextAsImage: wrong number of arguments, 3 to 6 expected ");
+            return JS_FALSE;
+    }
+    *rval = as_jsval(cx, myBoxSize);
+    return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 template<class DERIVED>
@@ -367,6 +440,20 @@ JSAbstractRenderWindow<DERIVED>::setTextPadding(JSContext *cx, JSObject *obj, ui
     DOC_END;
     typedef void (DERIVED::*MyMethod)(int, int, int, int);
     return Method<DERIVED>::call((MyMethod)&DERIVED::setTextPadding,cx,obj,argc,argv,rval);
+}
+
+template<class DERIVED>
+JSBool
+JSAbstractRenderWindow<DERIVED>::getTextCursorPosition(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Gets the text cursor position. Can be used after calling renderTextAsImage to be used in subsequent calls.");
+    DOC_RVAL("thePosition", DOC_TYPE_VECTOR2I);
+    DOC_END;
+    try {
+        const asl::Vector2i & myPos = jslib::JSClassTraits<DERIVED>::openNativeRef(cx, obj).getTextCursorPosition();
+        *rval = as_jsval(cx, myPos);
+        jslib::JSClassTraits<DERIVED>::closeNativeRef(cx,obj);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 template<class DERIVED>
@@ -714,6 +801,7 @@ JSFunctionSpec * JSAbstractRenderWindow<DERIVED>::BaseFunctions() {
         {"renderText",         renderText,               3},
         {"setTextColor",       setTextColor,             1},
         {"renderTextAsImage",  renderTextAsImage,        5},
+        {"getTextCursorPosition", getTextCursorPosition, 0},
         {"setTextPadding",     setTextPadding,           4},
         {"setTextIndentation", setTextIndentation,       1},
         {"setHTextAlignment",  setHTextAlignment,        1},

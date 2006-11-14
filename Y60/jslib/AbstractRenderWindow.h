@@ -123,9 +123,11 @@ namespace jslib {
 
         asl::Vector2i renderTextAsImage(dom::NodePtr theImageNode,
                 const std::string & theString, const std::string & theFont,
-                const unsigned int & theTargetWidth, const unsigned int & theTargetHeight);
+                const unsigned int & theTargetWidth=0, const unsigned int & theTargetHeight=0,
+                const asl::Vector2i & theCursorPos=asl::Vector2i(0,0));
         void setTextStyle(unsigned int theStyle);
 
+        const asl::Vector2i & getTextCursorPosition() const;
         void setTextPadding(int topPadding, int bottomPadding, int leftPadding, int rightPadding);
         void setTextIndentation(int theIndentation);
 

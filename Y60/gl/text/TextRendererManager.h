@@ -51,7 +51,9 @@ namespace y60 {
             asl::Vector2i renderTextAsImage(TextureManager & theTextureManager, dom::NodePtr theImageNode,
                     const std::string & theString,
                     const std::string & theFont,
-                    unsigned int theTargetWidth, unsigned int theTargetHeight);
+                    unsigned int theTargetWidth, unsigned int theTargetHeight,
+                    const asl::Vector2i & theCursorPos = asl::Vector2i(0,0));
+            const asl::Vector2i & getTextCursorPosition() const;
 
             bool getFontMetrics(const std::string & theFontName,
                     int & theFontHeight,
