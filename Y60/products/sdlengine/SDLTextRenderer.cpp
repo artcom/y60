@@ -545,9 +545,7 @@ namespace y60 {
             // Make sure the last is rendered all the way to the bottom
             myTotalHeight += theWords[0].surface->h;
         }
-        if (theWords.size() > 1) {
-            myTotalHeight += (theLines.size() - 1) * theLineHeight;
-        }
+        myTotalHeight += (theLines.size() - 1) * theLineHeight;
         return myTotalHeight;
     }
 
