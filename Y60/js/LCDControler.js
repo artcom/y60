@@ -1,5 +1,6 @@
+
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 2003, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -8,7 +9,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
 //
-//   $RCSfile: LCDControler.js,v $
+//   $RCSfile: LCDControlerBase.js,v $
 //   $Author: david $
 //   $Revision: 1.3 $
 //   $Date: 2004/06/03 16:45:55 $
@@ -16,115 +17,120 @@
 //
 //=============================================================================
 
-function LCDControler(theSerialPortNum) {
+use("LCDControler_NT3881D.js");
+use("LCDControler_EASER202NRW.js");
+
+function createLCDControler(theModel, theSerialPortNum) {
+    if (theModel == "NT3881D") {
+        return new LCDControler_NT3881D(theSerialPortNum);
+    } else if (theModel == "EASER202NRW") {
+        return new LCDControler_EASER202NRW(theSerialPortNum);
+    } else {
+        print("### ERROR ### LCD model " + theModel + " not supported.");
+        return null;
+    }
+}
+
+
+function LCDControlerBase(theSerialPortNum) {
     this.Constructor(this, theSerialPortNum);
 }
 
-LCDControler.prototype.Constructor = function(obj, theSerialPortNum) {
+LCDControlerBase.prototype.Constructor = function(self, theSerialPortNum) {
     // private members
     var _mySerialDevice = new SerialDevice(theSerialPortNum);
+    self._mySerialDevice = _mySerialDevice; //protected
 
     // public methods
-    obj.setup = function() {
-        // we need rts/cts for the LCD terminal
-        _mySerialDevice.open(19200);
-        if ( ! _mySerialDevice.isOpen ) {
-            print("Failed to open serial port.");
+    self.setup = function(theBaudRate) {
+        if ( _mySerialDevice.isOpen ) {
+            print("### WARNING #### Serial port already open. Skipping setup");
+            return;
         }
+
+        // we need rts/cts for the LCD terminal
+        if (theBaudRate == undefined) {
+            theBaudRate = 19200;
+        }
+        _mySerialDevice.open(theBaudRate);
+        if ( ! _mySerialDevice.isOpen ) {
+            print("### ERROR #### Failed to open serial port.");
+        }
+        //self.reset();
     }
 
-    obj.setBacklight = function(theBacklightFlag) {
-        if ( theBacklightFlag ) {
-            _mySerialDevice.write("\x1BLB1;");
-        } else {
-            _mySerialDevice.write("\x1BLB0;");
-        }
+    self.reset = function() {
+        print("### WARNING ####LCDControler method not supported.");
+    }
+
+    self.setBacklight = function(theBacklightFlag) {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
     // theContrast : 0-15
-    obj.setContrast = function(theContrast) {
-        _mySerialDevice.write("\x1BLK" + theContrast + ";");
+    self.setContrast = function(theContrast) {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
 
-    obj.clear = function() {
-        // the *real* clear sequence somehow crashes the terminal
-        // so I had to roll my own. Unfortunately this one has to take
-        // a little nap because the terminal does not accept the commands
-        // fast enough. :-( DS
-        // _mySerialDevice.write("\x1BLL");
-        obj.setCursorPos(2,1);
-        msleep(5);
-        obj.clearLine();
-        msleep(5);
-        obj.setCursorPos(1,1);
-        msleep(5);
-        obj.clearLine();
-        msleep(5);
+    self.clear = function() {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
-    obj.clearLine = function() {
-        _mySerialDevice.write("\x1BLl");
+    self.clearLine = function() {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
-    obj.write = function(theText) {
+    self.write = function(theText) {
         _mySerialDevice.write(theText);
     }
 
-    obj.setUserChar = function(theCharCode, theGlyph) {
-        var myGlyphCommand = "\x1BLZ"+theCharCode+","+(theCharCode+0x90);
-        for (var i=0; i<8; i++) {
-            myGlyphCommand += "," + theGlyph[i];
-        }
-        myGlyphCommand += ";";
-        // print (myGlyphCommand);
-        obj.write(myGlyphCommand);
-        msleep(10);
+    self.setUserChar = function(theCharCode, theGlyph) {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
-    obj.uploadFont = function(theFont) {
-        obj.clear();
+    self.uploadFont = function(theFont) {
+        self.clear();
         for (var i=0; i<theFont.length; ++i) {
-            obj.setUserChar(i, theFont[i]);
+            self.setUserChar(i+1, theFont[i]); //char code 0 is evil, you cannot use it in strings...
         }
     }
 
     
-    obj.setText = function(theText) {
-        obj.clear();
-        obj.write(theText);
+    self.setText = function(theText) {
+        self.clear();
+        self.write(theText);
     }
 
-    // theStyle can be
-    //      0 unchanged
-    //      1 cursor off
-    //      2 cursor underscore
-    //      3 blinking block
-    obj.setCursorStyle = function(theStyle) {
-        _mySerialDevice.write("\x1BLC,," + theStyle + ";");
+    // theStyle depends on the model, but the following are common 
+    //      "OFF"
+    //      "BLINKING_BLOCK"
+    //      "UNDERSCORE"
+    self.setCursorStyle = function(theStyle) {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
-    obj.setCursorPos = function(theLine, theChar) {
-        _mySerialDevice.write("\x1BLC" + theLine + "," + theChar + ",0;");
+    self.setCursorPos = function(theLine, theChar) {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
-    obj.setResolution = function(theLineCount, theCharsPerLine) {
-        _mySerialDevice.write("\x1BLA" + theLineCount + "," + theCharsPerLine + ";");
+    self.setResolution = function(theLineCount, theCharsPerLine) {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
-    obj.reset = function() {
-        _mySerialDevice.write("\x1BKr;");
+    self.reset = function() {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
-    obj.restoreDefaults = function() {
-        _mySerialDevice.write("\x1BKR;");
+    self.restoreDefaults = function() {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
-    obj.saveConfig = function() {
-        _mySerialDevice.write("\x1BKS;");
+    self.saveConfig = function() {
+        print("### WARNING ####LCDControler method not supported.");
     }
 
-    obj.shutdown = function() {
+    self.shutdown = function() {
         _mySerialDevice.close();
     }
 }
@@ -141,7 +147,7 @@ function createFont(thePixmaps) {
                     myRowBits |= 1<<x;
                 }
             }
-            // print (y + ":" + myLine + "="+ myRowBits);
+            //print (y + ":" + myLine + "="+ myRowBits);
             myLCDChar.push(myRowBits);
         }
         myLCDFont.push(myLCDChar);
