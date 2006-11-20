@@ -162,6 +162,7 @@ jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF1
 }
 
 template jsval as_jsval(JSContext *cx, const std::vector<bool> & theVector);
+template jsval as_jsval(JSContext *cx, const std::vector<y60::AcBool> & theVector);
 template jsval as_jsval(JSContext *cx, const std::vector<unsigned char> & theVector);
 template jsval as_jsval(JSContext *cx, const std::vector<int> & theVector);
 template jsval as_jsval(JSContext *cx, const std::vector<unsigned int> & theVector);

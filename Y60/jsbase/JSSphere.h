@@ -89,7 +89,9 @@ struct JSClassTraits<asl::Sphere<SphereNumber> >
 
 bool convertFrom(JSContext *cx, jsval theValue, asl::Sphere<SphereNumber>  & theSphere);
 
-jsval as_jsval(JSContext *cx, const asl::Sphere<SphereNumber>  & theValue);
+// jsval as_jsval(JSContext *cx, const asl::Sphere<SphereNumber>  & theValue);
+
+jsval as_jsval(JSContext *cx, asl::Sphere<SphereNumber> theValue);
 
 jsval as_jsval(JSContext *cx, dom::ValuePtr theValue, asl::Sphere<SphereNumber>  * theSphere);
 

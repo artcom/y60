@@ -25,6 +25,7 @@
 #include <asl/numeric_functions.h>
 #include <asl/Time.h>
 #include <asl/Logger.h>
+#include <y60/AcBool.h>
 #include <dom/Value.h>
 
 #include <paintlib/plexcept.h>

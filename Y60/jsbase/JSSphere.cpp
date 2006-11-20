@@ -11,6 +11,7 @@
 #include "JSVector.h"
 #include "JSSphere.h"
 #include "JSWrapper.impl"
+#include "JScppUtils.impl"
 #include <iostream>
 
 using namespace std;
@@ -327,8 +328,13 @@ bool convertFrom(JSContext *cx, jsval theValue, asl::Sphere<Number>  & theSphere
     }
     return false;
 }
-
+/*
 jsval as_jsval(JSContext *cx, const asl::Sphere<Number>  & theValue) {
+    JSObject * myReturnObject = JSSphere::Construct(cx, theValue);
+    return OBJECT_TO_JSVAL(myReturnObject);
+}
+*/
+jsval as_jsval(JSContext *cx, asl::Sphere<SphereNumber> theValue) {
     JSObject * myReturnObject = JSSphere::Construct(cx, theValue);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
@@ -337,5 +343,9 @@ jsval as_jsval(JSContext *cx, JSSphere::NativeValuePtr theValue) {
     JSObject * myObject = JSSphere::Construct(cx, theValue);
     return OBJECT_TO_JSVAL(myObject);
 }
+
+
+template jsval as_jsval(JSContext *cx, const std::vector<asl::Sphere<float> > & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<asl::Sphere<float> > & theVector);
 
 }
