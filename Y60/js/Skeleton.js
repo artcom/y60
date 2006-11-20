@@ -26,20 +26,10 @@ function Skeleton(theArguments, theWidth, theHeight, theTitle) {
     Public.Constructor = function() {
         window = new RenderWindow();
         window.position = [0, 0];
-        window.decorations = false;
 
         // Call base class setup
-        Public.setSplashScreen(Public.getReleaseMode());
         Public.setup(theWidth, theHeight, false, theTitle);
-        window.showTaskbar = !Public.getReleaseMode();
-        window.backgroundColor = [0.8, 0.8, 0.8];
-        window.showMouseCursor = !Public.getReleaseMode();
-        window.swapInterval    = 1;
-
-        // Add your own setup here
-
-        // Some dummy code for fun
-        _myCrossHair = new ImageOverlay(window.scene, "shadertex/crosshair.png", [100, 100]);
+        window.swapInterval    = 0;
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -67,20 +57,13 @@ function Skeleton(theArguments, theWidth, theHeight, theTitle) {
     // Will be called on a mouse move
     Base.onMouseMotion = Public.onMouseMotion;
     Public.onMouseMotion = function(theX, theY) {
-        if (_myMoverEnabled) {
-            Base.onMouseMotion(theX, theY);
-        }
-
-        // Some dummy code for fun
-        _myCrossHair.position = [theX- _myCrossHair.width / 2, theY - _myCrossHair.height / 2];
+        Base.onMouseMotion(theX, theY);
     }
 
     // Will be called on a mouse button
     Base.onMouseButton = Public.onMouseButton;
     Public.onMouseButton = function(theButton, theState, theX, theY) {
-        if (_myMoverEnabled) {
-            Base.onMouseButton(theButton, theState, theX, theY);
-        }
+        Base.onMouseButton(theButton, theState, theX, theY);
     }
 
     // Will be called on a keyboard event
@@ -88,23 +71,7 @@ function Skeleton(theArguments, theWidth, theHeight, theTitle) {
     Public.onKey = function(theKey, theKeyState, theX, theY,
                          theShiftFlag, theControlFlag, theAltFlag)
     {
-        if (theControlFlag) {
-            Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
-        } else if (theKeyState) {
-            if (theShiftFlag) {
-                theKey = theKey.toUpperCase();
-            }
-
-            switch (theKey) {
-                case "m":
-                    _myMoverEnabled = !_myMoverEnabled;
-                    print("Mover " + (_myMoverEnabled ? "enabled" : "disabled"));
-                    break;
-                case "h":
-                    printHelp();
-                    break;
-            }
-        }
+        Base.onKey(theKey, theKeyState, theX, theY, theShiftFlag, theControlFlag, theAltFlag);
     }
 
     // Will be called on a mouse wheel event
@@ -140,14 +107,6 @@ function Skeleton(theArguments, theWidth, theHeight, theTitle) {
     //////////////////////////////////////////////////////////////////////
     // Private
     //////////////////////////////////////////////////////////////////////
-
-    function printHelp() {
-        print("Skeleton help:");
-        print("   m    - Enable/Disable mover");
-    }
-
-    var _myMoverEnabled = false;
-    var _myCrossHair    = null;
 
     Public.Constructor();
 }
