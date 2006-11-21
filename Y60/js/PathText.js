@@ -209,7 +209,7 @@ PathText.prototype.Constructor = function(self, theSceneViewer, theText, theFont
 
             _myShape = myShapeBuilder.buildNode();
             _myShape.name = myName;
-            theSceneViewer.getShapes().appendChild(_myShape);
+            window.scene.shapes.appendChild(_myShape);
 
             _myBody = buildBodyNode(myName, _myShape.id);
             _myBody.insensible = true;
