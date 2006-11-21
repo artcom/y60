@@ -53,7 +53,7 @@ static bool fillPrimitiveElement(JSContext *cx, JSObject * myObject,
                                  const asl::Matrix4f * theTransformation)
 {
     //const y60::VertexData3f::VertexDataVector & myPositions = theElement._myPrimitive->getVertexData(y60::POSITIONS).getVertexDataCast<asl::Vector3f>();
-    asl::Ptr<y60::VertexDataAccessor<asl::Vector3f> > myPositionAccessor = theElement._myPrimitive->getLockingPositionsAccessor();
+    const asl::Ptr<y60::ConstVertexDataAccessor<asl::Vector3f> > myPositionAccessor = theElement._myPrimitive->getConstLockingPositionsAccessor();
     const y60::VertexData3f & myPositions = myPositionAccessor->get();
 
     if (theElement._myVertexCount == 3) {
