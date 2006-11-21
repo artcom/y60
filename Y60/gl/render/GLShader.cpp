@@ -233,7 +233,7 @@ namespace y60 {
         }
 
         if (glBlendEquation != Missing_glBlendEquation) {
-            const BlendEquation & myBlendEquation= myMaterialPropFacade->get<BlendEquationTag>();
+            const BlendEquation & myBlendEquation = myMaterialPropFacade->get<BlendEquationTag>();
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
             glBlendEquation(myEquation);
         }

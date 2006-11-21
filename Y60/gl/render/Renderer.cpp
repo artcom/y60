@@ -71,6 +71,9 @@
 #define DB2(x) //x
 
 // profiling
+//#define PROFILING_LEVEL_FULL
+//#define PROFILING_LEVEL_NORMAL
+
 #ifdef PROFILING_LEVEL_NORMAL
 #define DBP(x)  x
 #else
@@ -183,7 +186,7 @@ namespace y60 {
         } else if (_myPreviousMaterial == 0) {
             _myLastVertexRegisterFlags.reset();
         }
-
+MAKE_SCOPE_TIMER(switchMaterial);
         DBP(MAKE_SCOPE_TIMER(switchMaterial));
         COUNT(materialChange);
 
@@ -211,7 +214,6 @@ namespace y60 {
         } else {
             myVertexRegisterFlags = myShader->getVertexRegisterFlags();
         }
-
         for (unsigned myRegister = 0; myRegister < MAX_REGISTER; ++myRegister) {
             bool myEnable = false;
 
@@ -360,9 +362,9 @@ namespace y60 {
         DBP2(START_TIMER(renderBodyPart_materialChanged));
         if (myBodyHasChanged || myMaterialHasChanged) {
             DBP2(MAKE_SCOPE_TIMER(renderBodyPart20));
-            DBP2(START_TIMER(renderBodyPart_getShader));
+            //DBP2(START_TIMER(renderBodyPart_getShader));
             IShaderPtr myShader = myMaterial.getShader();
-            DBP2(STOP_TIMER(renderBodyPart_getShader));
+            //DBP2(STOP_TIMER(renderBodyPart_getShader));
             if (myShader) {
                 DBP2(MAKE_SCOPE_TIMER(renderBodyPart_bindBodyParams));
                 myShader->bindBodyParams(myMaterial, theViewport, _myScene->getLights(), myBody, theCamera);
