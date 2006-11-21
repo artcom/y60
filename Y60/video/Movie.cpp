@@ -18,6 +18,7 @@
 #include <asl/Logger.h>
 #include <asl/PackageManager.h>
 #include <asl/PlugInManager.h>
+#include <asl/Assure.h>
 
 #include <string.h>
 
@@ -150,6 +151,22 @@ namespace y60 {
             return (double)(theFrame % get<FrameCountTag>()) / get<FrameRateTag>();
         }
     }
+    
+    void 
+    Movie::ensureMovieFramecount() {
+        int myFrameCount = get<FrameCountTag>();
+        if (myFrameCount == -1) {
+            int myFrame = -1;
+            while (!_myDecoder->getEOF()) {
+                myFrame++;
+                double myMovieTime = getTimeFromFrame(myFrame);
+                decodeFrame(myMovieTime, myFrame);                                
+            }
+            set<FrameCountTag>(myFrame-1);
+            _myDecoder->setEOF(false);     
+            restart(0);       
+        } 
+    }
 
     unsigned Movie::getFrameFromTime(double theTime) const {
         double myFrameHelper = theTime * get<FrameRateTag>();
@@ -193,6 +210,13 @@ namespace y60 {
                 // next frame from currentframe attribute in movie node
                 myNextFrame = get<CurrentFrameTag>();
                 while (myNextFrame < 0) {
+                    if (get<FrameCountTag>() == -1) {
+                        std::string myErrorMsg = string("Movie: ") + get<NameTag>() + " has negative currentframe and a invalid framecount, " + 
+                                                 "trying a wraparound with invalid framecount will fail-> calling " + 
+                                                 "explicit ensureFramecount will help";
+                        ASSURE_MSG(get<FrameCountTag>() != -1, myErrorMsg.c_str());
+                        return;
+                    }
                     myNextFrame += get<FrameCountTag>();
                 }
                 myMovieTime = getTimeFromFrame(myNextFrame);

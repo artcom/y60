@@ -338,7 +338,8 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
                 break;
             case VIDEO_MEDIA:
                 var mySeekableFlag = false;
-                showMovie(myFilename, myPlaylist.getVideoDecoderHintFromURL(myFilename, mySeekableFlag));
+                var myEnsureFramecount = true;
+                showMovie(myFilename, myPlaylist.getVideoDecoderHintFromURL(myFilename, mySeekableFlag), myEnsureFramecount);
                 if (_myImageOverlay) {
                     _myImageOverlay.visible = false;
                 }
@@ -548,7 +549,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         applyViewport();
     }
 
-    function showMovie(theFilename, theDecoderHint) {
+    function showMovie(theFilename, theDecoderHint, theEnsureFrameCount) {
         if (!_myMovieNode) {
             _myMovieNode = Node.createElement("movie");
             window.scene.images.appendChild(_myMovieNode);
@@ -557,10 +558,13 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.playmode = "play";
             _myMovieNode.loopcount = 0;
             _myMovieNode.audio = 1;
-
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.src = theFilename;
             _myMovieOverlay = new MovieOverlay(window.scene, _myMovieNode);
+            
+            if (theEnsureFrameCount) {
+                window.scene.ensureMovieFramecount(_myMovieNode);
+            }
 
             //_myMovieOverlay = new MovieOverlay(window.scene, theFilename, [0,0], null, false);//, "GRAY");
             //_myMovieNode= _myMovieOverlay.movie;

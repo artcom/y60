@@ -109,6 +109,9 @@ namespace y60 {
 
     void MovieDecoderBase::setEOF(bool theEndOfFileFlag) {
         _myEndOfFileFlag = theEndOfFileFlag;
+        if (_myEndOfFileFlag && _myMovie->get<FrameCountTag>() == -1) {
+            _myMovie->set<FrameCountTag>(_myMovie->get<CurrentFrameTag>());            
+        }
     }
 
     void MovieDecoderBase::startMovie(double theStartTime) {

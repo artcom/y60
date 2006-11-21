@@ -332,6 +332,26 @@ loadMovieFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rva
 }
 
 static JSBool
+ensureMovieFramecount(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Ensure a movie node has the correct framecount.");
+    DOC_PARAM("theMovieNode", "The movie node to ensure.", DOC_TYPE_NODE);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+
+        JSScene::OWNERPTR myNative;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
+
+        dom::NodePtr myNode;
+        convertFrom(cx, argv[0], myNode);
+        myNode->getFacade<Movie>()->ensureMovieFramecount();
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+}
+
+
+
+static JSBool
 loadCaptureFrame(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
   DOC_BEGIN("Updates a capture node.");
   DOC_PARAM("theCaptureNode", "Capture node to update", DOC_TYPE_NODE);
@@ -401,18 +421,19 @@ JSFunctionSpec *
 JSScene::Functions() {
     AC_DEBUG << "Accessing functions for class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
-        /* name                 native               nargs    */
-        {"update",              update,              1},
-        {"updateAllModified",   updateAllModified,   1},
-        {"clear",               clear,               0},
-        {"optimize",            optimize,            1},
-        {"collectGarbage",      collectGarbage,      0},
-        {"bodyVolume",          bodyVolume,          1},
-        {"save",                save,                2},
-        {"setup",               setup,               0},
-        {"getWorldSize",        getWorldSize,        1},
-        {"loadMovieFrame",      loadMovieFrame,      1},
-        {"loadCaptureFrame",    loadCaptureFrame,    2},
+        /* name                   native               nargs    */
+        {"update",                update,              1},
+        {"updateAllModified",     updateAllModified,   1},
+        {"clear",                 clear,               0},
+        {"optimize",              optimize,            1},
+        {"collectGarbage",        collectGarbage,      0},
+        {"bodyVolume",            bodyVolume,          1},
+        {"save",                  save,                2},
+        {"setup",                 setup,               0},
+        {"getWorldSize",          getWorldSize,        1},
+        {"loadMovieFrame",        loadMovieFrame,      1},
+        {"ensureMovieFramecount", ensureMovieFramecount,      1},
+        {"loadCaptureFrame",      loadCaptureFrame,    2},
         {0}
     };
     return myFunctions;

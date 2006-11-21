@@ -113,6 +113,11 @@ namespace y60 {
             virtual bool reloadRequired() const;
 
             /**
+             * @ ensures that the movie has correct framecount
+             */
+            void ensureMovieFramecount();
+            
+            /**
              * @return locally cached playmode. It is set in the dom setter and
              * cached inside the object.
              */
