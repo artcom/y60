@@ -154,7 +154,8 @@ namespace y60 {
         _myGlParams.clear();
         _myAutoParams.clear();
         _myTextureParams.clear();
-
+        _myMiscParams.clear();
+        
         for (CGparameter myParam = cgGetFirstParameter(_myCgProgramID, CG_PROGRAM);
                 myParam != 0;  myParam = cgGetNextParameter(myParam))
         {
@@ -201,9 +202,8 @@ namespace y60 {
                 }
                 _myGlParams.push_back(
                         CgProgramGlParam(myParamName, myParam, myParamType, myParamTransform));
-            }
+            } else if (myParamName.compare(0, 3, "AC_") == 0) {
             // scan for reserved AC_ prefix
-            if (myParamName.compare(0, 3, "AC_") == 0) {
                 if (myParamVariability != CG_UNIFORM) {
                     throw RendererException ("Error in " + _myPathName + ": Parameter " + myParamName
                             + " not uniform.", "CgProgramInfo::processParameters()");
@@ -242,13 +242,14 @@ namespace y60 {
                 AC_TRACE << "adding auto param " << myParamName << ":" << myParamID << endl;
                 _myAutoParams[myParamID] =
                     CgProgramAutoParam(myParamName, myParam, myParamID, myParameterType);
-            }
-            // scan for sampler params
-            if (myParameterType == CG_SAMPLER1D ||
+            } else if (myParameterType == CG_SAMPLER1D ||
+                    // scan for sampler params
                     myParameterType == CG_SAMPLER2D ||
                     myParameterType == CG_SAMPLER3D ||
                     myParameterType == CG_SAMPLERCUBE ) {
-                _myTextureParams.push_back(CgProgramTextureParam(myParamName, myParam));
+                _myTextureParams.push_back(CgProgramNamedParam(myParamName, myParam));
+            } else {
+                _myMiscParams.push_back(CgProgramNamedParam(myParamName, myParam));
             }
             assertCg(PLUS_FILE_LINE, _myContext);
         }
@@ -549,16 +550,22 @@ namespace y60 {
     void
     CgProgramInfo::bindMaterialParams(const MaterialBase & theMaterial) {
         AC_TRACE << "CgProgramInfo::bindMaterialParams shader filename=" << _myShader._myFilename << " entry=" << _myShader._myEntryFunction << " material=" << theMaterial.get<NameTag>();
-
         const MaterialPropertiesFacadePtr myPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         const Facade::PropertyMap & myProperties = myPropFacade->getProperties();
-        Facade::PropertyMap::const_iterator it = myProperties.begin();
-        for (; it != myProperties.end(); ++it) {
-            CGparameter myCgParameter = cgGetNamedParameter(_myCgProgramID, it->first.c_str());
-            if (myCgParameter) {
-                setCgMaterialParameter(myCgParameter, *(it->second), it->first, theMaterial);
+        for (unsigned i=0; i < _myMiscParams.size(); ++i) {
+            Facade::PropertyMap::const_iterator myIter = myProperties.find(_myMiscParams[i]._myParamName);
+            if (myIter != myProperties.end()) {
+                setCgMaterialParameter(_myMiscParams[i]._myParameter, *(myIter->second), 
+                                       _myMiscParams[i]._myParamName, theMaterial);                
             }
         }
+        for (unsigned i=0; i < _myTextureParams.size(); ++i) {
+            Facade::PropertyMap::const_iterator myIter = myProperties.find(_myTextureParams[i]._myParamName);
+            if (myIter != myProperties.end()) {
+                setCgMaterialParameter(_myTextureParams[i]._myParameter, *(myIter->second), 
+                                       _myTextureParams[i]._myParamName, theMaterial);                
+            }
+        }                        
     }
 
     void

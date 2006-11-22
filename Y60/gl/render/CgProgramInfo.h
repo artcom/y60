@@ -120,6 +120,7 @@ namespace y60 {
                 CGGLenum _myTransform;
             };
             typedef std::vector<CgProgramGlParam> CgProgramGlParamVector;
+
             struct CgProgramAutoParam {
                 CgProgramAutoParam() {}
                 CgProgramAutoParam(const std::string & myName,
@@ -139,8 +140,8 @@ namespace y60 {
             typedef std::map<int,CgProgramAutoParam> CgProgramAutoParams;
 
 
-            struct CgProgramTextureParam {
-                CgProgramTextureParam(const std::string & myParamName,
+            struct CgProgramNamedParam {
+                CgProgramNamedParam(const std::string & myParamName,
                                  CGparameter myParameter)
                     : _myParamName(myParamName),
                       _myParameter(myParameter)
@@ -148,7 +149,7 @@ namespace y60 {
                 std::string         _myParamName;
                 CGparameter         _myParameter;
             };
-            typedef std::vector<CgProgramTextureParam> CgProgramTextureParamVector;
+            typedef std::vector<CgProgramNamedParam> CgProgramNamedParamVector;
 
             CgProgramInfo();
             CgProgramInfo(const CgProgramInfo &); // disable copy constructor
@@ -168,10 +169,11 @@ namespace y60 {
             CGprogram                   _myCgProgramID;
             CGcontext                   _myContext;
             std::string                 _myPathName;
-            CgProgramGlParamVector      _myGlParams;  // GL-State to CG parameters
-            CgProgramAutoParams         _myAutoParams;// other automatic CG parameters (e.g. CameraPosition)
-            CgProgramTextureParamVector _myTextureParams;// Texture parameters
-
+            CgProgramGlParamVector      _myGlParams;       // GL-State to CG parameters
+            CgProgramAutoParams         _myAutoParams;     // other automatic CG parameters (e.g. CameraPosition)
+            CgProgramNamedParamVector   _myTextureParams;  // Texture parameters
+            CgProgramNamedParamVector   _myMiscParams;     // material parameter
+            
             std::map<int,int> _myUnsizedArrayAutoParamSizes;
 
             std::vector<const char *> _myCachedCompilerArgs;
