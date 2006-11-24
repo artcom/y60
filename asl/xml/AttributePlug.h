@@ -22,6 +22,7 @@
 #define _xml_AttributePlug_h_
 
 #include "Nodes.h"
+#include "PlugHelper.h"
 #include "PropertyPlug.h"
 
 namespace dom {
@@ -37,44 +38,6 @@ namespace dom {
 		static const TYPE getDefault() { return theDefault; } \
     };
 
-
-    template <class VALUE, class WRAPPER>
-    struct ValueHelper {
-       typedef asl::Ptr<WRAPPER,ThreadingModel> WrapperPtr;
-
-       static const VALUE & getValue(const ValuePtr theValueHolder) {
-           const WrapperPtr myTypedValuePtr = static_cast_Ptr<WRAPPER>(theValueHolder);
-           return myTypedValuePtr->getValue();
-       }
-       static const VALUE & setValue(ValuePtr theValueHolder, const VALUE & theValue) {
-           WrapperPtr myTypedValuePtr = static_cast_Ptr<WRAPPER>(theValueHolder);
-           myTypedValuePtr->setValue(theValue);
-           return myTypedValuePtr->getValue();
-       }
-       static bool checkValueType(const ValuePtr theValueHolder) {
-           const WrapperPtr myTypedValuePtr = dynamic_cast_Ptr<WRAPPER>(theValueHolder);
-           return myTypedValuePtr;
-       }
-    };
-
-    template <>
-    struct ValueHelper <std::string,StringValue> {
-        typedef asl::Ptr<StringValue,ThreadingModel> WrapperPtr;
-
-        static const std::string & getValue(const ValuePtr theValueHolder) {
-            const WrapperPtr myTypedValuePtr = static_cast_Ptr<StringValue>(theValueHolder);
-            return myTypedValuePtr->getString();
-        }
-        static const std::string & setValue(ValuePtr theValueHolder, const std::string & theValue) {
-            WrapperPtr myTypedValuePtr = static_cast_Ptr<StringValue>(theValueHolder);
-            myTypedValuePtr->setString(theValue);
-            return myTypedValuePtr->getString();
-        }
-        static bool checkValueType(const ValuePtr theValueHolder) {
-           const WrapperPtr myTypedValuePtr = dynamic_cast_Ptr<StringValue>(theValueHolder);
-           return myTypedValuePtr;
-        }
-    };
 
     class Connector {
     public:

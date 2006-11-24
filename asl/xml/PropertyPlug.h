@@ -11,6 +11,7 @@
 #define _ac_dom_PropertyPlug_h_
 
 #include <dom/Nodes.h>
+#include "PlugHelper.h"
 #include "AttributePlug.h"
 
 namespace dom {
