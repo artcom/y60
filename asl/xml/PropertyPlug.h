@@ -40,6 +40,10 @@ namespace dom {
                 ensureTextChild(theFacade->getNode());
             }
 
+            ValuePtr getValuePtr() {
+                return _myTextChild->nodeValueWrapperPtr();
+            }
+            
             const VALUE & getValue(const Node & theNode) const {
                 ensureTextChild(theNode);
                 return ValueHelper<VALUE, WRAPPER>::getValue(_myTextChild->nodeValueWrapperPtr());

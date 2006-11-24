@@ -22,6 +22,7 @@
 #define _xml_AttributePlug_h_
 
 #include "Nodes.h"
+#include "PropertyPlug.h"
 
 namespace dom {
 
@@ -180,6 +181,10 @@ namespace dom {
 
             template <class THE_OTHER_TAG>
             void dependsOn(AttributePlug<THE_OTHER_TAG> & theOtherTag) {
+                Connector::dependsOn(*this, theOtherTag);
+            }
+            template <class THE_OTHER_TAG, class THE_FACADE>
+            void dependsOn(PropertyPlug<THE_OTHER_TAG,THE_FACADE> & theOtherTag) {
                 Connector::dependsOn(*this, theOtherTag);
             }
             template <class THE_OTHER_TAG>
