@@ -18,4 +18,6 @@ IMPLEMENT_BITSET(y60::TargetBuffers, y60::TargetBuffer, y60::TargetBuffersString
 IMPLEMENT_ENUM(y60::BlendEquation, y60::BlendEquationStrings);
 IMPLEMENT_BITSET(y60::RenderStyles, y60::RenderStyle, y60::RenderStyleStrings);
 IMPLEMENT_ENUM(y60::VertexBufferUsage, y60::VertexBufferUsageStrings);
+IMPLEMENT_ENUM(y60::BlendFunction, y60::BlendFunctionStrings);
+
 

@@ -121,7 +121,7 @@ namespace y60 {
     }
 
     void
-    SkinAndBonesShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
+    SkinAndBonesShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
         VectorOfVector4f * myBoneMatrixProperty = _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrOpen<VectorOfVector4f>();
         if (!myBoneMatrixProperty) {
             throw SkinAndBonesShaderException("SkinAndBones shader update has been called before setup", PLUS_FILE_LINE);
@@ -143,6 +143,6 @@ namespace y60 {
         _myBoneMatrixPropertyNode->dom::Node::nodeValuePtrClose<VectorOfVector4f>();
         _myBoundingBoxNode->nodeValuePtrClose<Box3f>();
 
-        CGShader::activate(theMaterial, theViewport);
+        CGShader::activate(theMaterial, theViewport, 0);
    }
 }

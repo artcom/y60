@@ -18,6 +18,8 @@
 #include <asl/Logger.h> 
 #include <asl/string_functions.h>
 
+#include "zlib.h"
+
 #include <algorithm>
 
 #define DB(x) // x
@@ -34,7 +36,7 @@ namespace y60 {
         NameTag::Plug(theNode),
         TransparencyTag::Plug(theNode),
         MaterialPropertiesTag::Plug(this),
-        MaterialRequirementTag::Plug(this),      
+        MaterialRequirementTag::Plug(this),   
         Facade(theNode),
         _myShader(0),
         _myLightingModel(LAMBERT),
@@ -44,13 +46,17 @@ namespace y60 {
     MaterialBase::~MaterialBase() {
     }
 
+
     void
     MaterialBase::registerDependenciesRegistrators() {
-        Facade::registerDependenciesRegistrators();
+        Facade::registerDependenciesRegistrators();        
+        getChild<MaterialPropertiesTag>()->registerDependenciesRegistrators();
+        
     }
 
     void
     MaterialBase::registerDependenciesForMaterialupdate() {}
+    
 
     void
     MaterialBase::doTheUpdate() {
@@ -65,7 +71,12 @@ namespace y60 {
         }
         return true;
     }
-    
+
+    int
+    MaterialBase::getGroup1Hash() const {
+        return getChild<MaterialPropertiesTag>()->get<MaterialPropGroup1HashTag>();
+    }
+
     bool 
     MaterialBase::rebindRequired() {
         if (getNode().getAttribute(ID_ATTRIB)->nodeVersion() != _myIdTagVersion) {
@@ -352,4 +363,57 @@ namespace y60 {
             AC_DEBUG << "No such feature '" << MAPPING_FEATURE << "' for material " << get<NameTag>();
         }
     }
+
+    void
+    MaterialPropertiesFacade::registerDependenciesRegistrators() {
+        MaterialPropGroup1HashTag::Plug::setReconnectFunction(&MaterialPropertiesFacade::registerDependenciesForMaterialPropGroup1HashTag);
+        int myHash = get<MaterialPropGroup1HashTag>();
+    }
+
+    void
+    MaterialPropertiesFacade::registerDependenciesForMaterialPropGroup1HashTag() {
+        MaterialPropGroup1HashTag::Plug::dependsOn<TargetBuffersTag,MaterialPropertiesFacade>(*this);  
+        MaterialPropGroup1HashTag::Plug::dependsOn<BlendFunctionTag,MaterialPropertiesFacade>(*this);  
+        MaterialPropGroup1HashTag::Plug::dependsOn<BlendEquationTag,MaterialPropertiesFacade>(*this);  
+        MaterialPropGroup1HashTag::Plug::dependsOn<GlowTag,MaterialPropertiesFacade>(*this);  
+        MaterialPropGroup1HashTag::Plug::dependsOn<LineWidthTag,MaterialPropertiesFacade>(*this);  
+        MaterialPropGroup1HashTag::Plug::dependsOn<PointSizeTag,MaterialPropertiesFacade>(*this);  
+        MaterialPropGroup1HashTag::Plug::dependsOn<LineSmoothTag,MaterialPropertiesFacade>(*this);  
+
+        MaterialPropertiesFacadePtr mySelf = dynamic_cast_Ptr<MaterialPropertiesFacade>(getSelf());
+        MaterialPropGroup1HashTag::Plug::getValuePtr()->setCalculatorFunction(mySelf, &MaterialPropertiesFacade::updateGroup1Hash);
+        
+    }
+    template<class T>
+    void
+    appendCRC32( unsigned long & theCRC, const T & theValue) {
+        const Bytef * myValuePtr = (const Bytef*)(&theValue);
+        theCRC = crc32(theCRC, myValuePtr, sizeof(T));
+        //AC_PRINT << theValue;
+    }
+
+    void
+    MaterialPropertiesFacade::updateGroup1Hash() {
+        unsigned long myCRC32 = crc32(0L, Z_NULL, 0);
+        const TargetBuffers & myMasks = get<TargetBuffersTag>();
+        appendCRC32(myCRC32, myMasks[RED_MASK]);
+        appendCRC32(myCRC32, myMasks[GREEN_MASK]);
+        appendCRC32(myCRC32, myMasks[BLUE_MASK]);
+        appendCRC32(myCRC32, myMasks[ALPHA_MASK]);
+        const VectorOfBlendFunction & myBlendFunction = get<BlendFunctionTag>();
+        appendCRC32(myCRC32, myBlendFunction[0]);
+        appendCRC32(myCRC32, myBlendFunction[1]);
+        //appendCRC32(myCRC32, get<BlendFunctionTag>());
+        appendCRC32(myCRC32, get<BlendEquationTag>());
+        appendCRC32(myCRC32, get<GlowTag>());
+        appendCRC32(myCRC32, get<LineWidthTag>());
+        appendCRC32(myCRC32, get<PointSizeTag>());
+        appendCRC32(myCRC32, get<LineSmoothTag>());        
+
+        string myMaterialName = getNode().parentNode()->getFacade<MaterialBase>()->get<NameTag>();
+        //AC_PRINT << "MaterialPropertiesFacade::updateGroup1Hash!: " << myMaterialName << " -> " << myCRC32;
+        
+        set<MaterialPropGroup1HashTag>(myCRC32);
+    }
+
 }

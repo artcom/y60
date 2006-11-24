@@ -63,7 +63,7 @@ namespace y60 {
             virtual void setup(MaterialBase & theMaterial) {}
 
             // will be called once per material change
-            virtual void activate(MaterialBase & theMaterial, const Viewport & theViewport) {};
+            virtual void activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {};
             virtual void enableTextures(const MaterialBase & theMaterial) {};
             virtual void disableTextures(const MaterialBase & theMaterial) {};
             virtual void deactivate(const y60::MaterialBase & theMaterial) {};

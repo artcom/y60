@@ -71,6 +71,30 @@ Example:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="VectorOfBlendFunction">
+        <xs:annotation>
+            <xs:documentation>Type for a vector of blendfunction enum values. Legal values:
+One of the following Enum values:
+- one
+- zero
+- dst_color
+- src_color
+- one_minus_dst_color
+- one_minus_src_color
+- src_alpha
+- one_minus_src_alpha
+- dst_alpha
+- one_minus_dst_alpha
+- src_alpha_saturate
+- constant_color
+- one_minus_constant_color
+- constant_alpha
+- one_minus_constant_alpha
+Example:
+[src_alpha, one_minus_src_alpha]</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:simpleType name="VectorOfSignedInt">
         <xs:annotation>
             <xs:documentation>Type for a vector of signed integer values.
@@ -384,6 +408,27 @@ Example:
 - add
 - subtract
 - reverse_subtract</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    <xs:simpleType name="BlendFunction">
+        <xs:annotation>
+             <xs:documentation>One of the following Enum values:
+- one
+- zero
+- dst_color
+- src_color
+- one_minus_dst_color
+- one_minus_src_color
+- src_alpha
+- one_minus_src_alpha
+- dst_alpha
+- one_minus_dst_alpha
+- src_alpha_saturate
+- constant_color
+- one_minus_constant_color
+- constant_alpha
+- one_minus_constant_alpha</xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
@@ -737,10 +782,8 @@ Example:
     <xs:element name="vectorofstring">
         <xs:annotation>
             <xs:documentation>This element contains a vector of strings as text child.
-The example shows how the element is used to set the blendfunction of a material.
-
 Example:
-&lt;vectorofstring name='blendfunction'&gt;[src_alpha,one_minus_src_alpha]&lt;/vectorofstring&gt;</xs:documentation>
+&lt;vectorofstring name='example'&gt;[foo,bar]&lt;/vectorofstring&gt;</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:simpleContent>
@@ -2065,6 +2108,11 @@ linesmooth   - enable/disable line smoothing
                         <xs:documentation>Property that defines a blend equation</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element ref="vectorofblendfunction">
+                    <xs:annotation>
+                        <xs:documentation>Property that defines a vector of blend function</xs:documentation>
+                    </xs:annotation>
+                </xs:element>                
                 <xs:element ref="targetbuffers">
                     <xs:annotation>
                         <xs:documentation>Property that references a set of target buffers</xs:documentation>
@@ -2335,6 +2383,20 @@ Example:
                             <xs:documentation>Name of the property</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="vectorofblendfunction">
+        <xs:annotation>
+            <xs:documentation>This element contains a vector of blendfunction enum values as text child.
+Example:
+&lt;vectorofblendfunction&gt;[src_alpha, one_minus_src_alpha]&lt;/vectorofblendfunction&gt;</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="VectorOfBlendFunction">
+                    <xs:attribute name="name" type="xs:string"/>
                 </xs:extension>
             </xs:simpleContent>
         </xs:complexType>

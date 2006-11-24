@@ -158,11 +158,7 @@ namespace y60 {
     }
 
     void
-    GLShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
-
-        //AC_DEBUG << "GLShader::activate " << theMaterial.get<NameTag>();
-        theMaterial.updateParams();
-
+    GLShader::activateGroup1(MaterialBase & theMaterial, const Viewport & theViewport) {
         MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
 
         // color,depth mask
@@ -181,31 +177,13 @@ namespace y60 {
         float myLineWidth = myMaterialPropFacade->get<LineWidthTag>();
         glLineWidth(myLineWidth);
 
-        // line stipple
-        dom::NodePtr myLineStippleProp = myMaterialPropFacade->getProperty(LINESTIPPLE_PROPERTY);
-        if (myLineStippleProp) {
-            glEnable(GL_LINE_STIPPLE);
-            glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());
-        }
-
         const asl::Vector3f & myPointSizeParams = myMaterialPropFacade->get<PointSizeTag>();
         glPointSize(myPointSizeParams[0]);
         glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, myPointSizeParams[1]);
         glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
 
-        dom::NodePtr myPointAttenuationProp = myMaterialPropFacade->getProperty(POINTATTENUATION_PROPERTY);
-        if (myPointAttenuationProp) {
-            glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,
-                                  myPointAttenuationProp->nodeValueAs<asl::Vector3f>().begin());
-        }
-
-        const VectorOfString & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
+        const VectorOfBlendFunction & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
         if (myBlendFunction.size() == 2) {
-            BlendFunction mySrcFunc = BlendFunction( asl::getEnumFromString(myBlendFunction[0],
-                                                                            BlendFunctionStrings));
-            BlendFunction myDstFunc = BlendFunction( asl::getEnumFromString(myBlendFunction[1],
-                                                                            BlendFunctionStrings));
-
 #if 0
             // we do NOT want this version since then a non-glowing material (myGlow=0)
             // does not overwrite a glowing material behind it.
@@ -219,12 +197,12 @@ namespace y60 {
             }
 #else
             if (theViewport.get<ViewportDrawGlowTag>()) {
-                glBlendFuncSeparate(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc), 
+                glBlendFuncSeparate(asGLBlendFunction(myBlendFunction[0]), asGLBlendFunction(myBlendFunction[1]), 
                                     GL_CONSTANT_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 float myGlow = myMaterialPropFacade->get<GlowTag>();
                 glBlendColor(1.0f,1.0f,1.0f, myGlow);
             } else {
-                glBlendFunc(asGLBlendFunction(mySrcFunc), asGLBlendFunction(myDstFunc)); 
+                glBlendFunc(asGLBlendFunction(myBlendFunction[0]), asGLBlendFunction(myBlendFunction[1])); 
             }
 #endif
         } else {
@@ -237,6 +215,33 @@ namespace y60 {
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
             glBlendEquation(myEquation);
         }
+
+    }
+
+    void
+    GLShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
+
+        //AC_DEBUG << "GLShader::activate " << theMaterial.get<NameTag>();
+
+        theMaterial.updateParams();
+
+        MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
+
+
+        // line stipple
+        dom::NodePtr myLineStippleProp = myMaterialPropFacade->getProperty(LINESTIPPLE_PROPERTY);
+        if (myLineStippleProp) {
+            glEnable(GL_LINE_STIPPLE);
+            glLineStipple(1, myLineStippleProp->nodeValueAs<unsigned int>());
+        }
+
+
+        dom::NodePtr myPointAttenuationProp = myMaterialPropFacade->getProperty(POINTATTENUATION_PROPERTY);
+        if (myPointAttenuationProp) {
+            glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,
+                                  myPointAttenuationProp->nodeValueAs<asl::Vector3f>().begin());
+        }
+
 
     }
 

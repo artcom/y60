@@ -56,9 +56,13 @@ namespace y60 {
     }
 
     void
-    FFShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
+    FFShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
+        GLShader::activate(theMaterial, theViewport, 0); // activate stipple && attenuation
 
-        GLShader::activate(theMaterial, theViewport);
+        if (!theLastMaterial || theLastMaterial->getGroup1Hash() != theMaterial.getGroup1Hash()) {
+            GLShader::activateGroup1(theMaterial, theViewport); // activate exotic properties, like linewidth, glow, etc.
+        }
+
 		MaterialPropertiesFacadePtr myMaterialPropFacade = theMaterial.getChild<MaterialPropertiesTag>();
         if (theMaterial.getLightingModel() != UNLIT) {
 
@@ -71,6 +75,7 @@ namespace y60 {
             glMaterialfv(GL_FRONT, GL_SPECULAR, myMaterialPropFacade->get<MaterialSpecularTag>().begin());
             glMaterialf(GL_FRONT, GL_SHININESS, myMaterialPropFacade->get<ShininessTag>());
             glMaterialfv(GL_FRONT, GL_EMISSION, myMaterialPropFacade->get<MaterialEmissiveTag>().begin());
+
         } else {
             glColor4fv(myMaterialPropFacade->get<SurfaceColorTag>().begin());
         }

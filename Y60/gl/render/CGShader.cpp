@@ -199,8 +199,13 @@ namespace y60 {
     }
 
     void
-    CGShader::activate(MaterialBase & theMaterial, const Viewport & theViewport) {
-        GLShader::activate(theMaterial, theViewport);
+    CGShader::activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial) {
+        GLShader::activate(theMaterial, theViewport, 0); // activate stipple && attenuation
+
+        if (!theLastMaterial || theLastMaterial->getGroup1Hash() != theMaterial.getGroup1Hash()) {
+            GLShader::activateGroup1(theMaterial, theViewport); // activate exotic properties, like linewidth, glow, etc.
+        }
+
         if (_myVertexProgram) {
             _myVertexProgram->enableProfile();
         }

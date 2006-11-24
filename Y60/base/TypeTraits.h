@@ -53,7 +53,9 @@ namespace y60 {
                   VECTOR_OF_RANKED_FEATURE,
                   BLEND_EQUATION,
                   RENDER_STYLES,
-                  TARGETBUFFERS
+                  TARGETBUFFERS,
+                  BLENDFUNCTION,
+                  VECTOR_OF_BLENDFUNCTION
     }; // TODO: move me up when file format compatibility isn't an issue
 
     static const char * TypeIdStrings[] =
@@ -82,6 +84,8 @@ namespace y60 {
         "blendequation",
         "renderstyles",
         "targetbuffers",
+        "blendfunction",
+        "vectorofblendfunction",
         0
     };
 
@@ -156,6 +160,20 @@ namespace y60 {
     struct TypeIdTraits<TargetBuffers> {
         static const TypeId type_id() {
             return TARGETBUFFERS;
+        }
+    };
+
+    template <>
+    struct TypeIdTraits<BlendFunction> {
+        static const TypeId type_id() {
+            return BLENDFUNCTION;
+        }
+    };
+
+    template <>
+    struct TypeIdTraits<VectorOfBlendFunction> {
+        static const TypeId type_id() {
+            return VECTOR_OF_BLENDFUNCTION;
         }
     };
 
@@ -234,6 +252,15 @@ namespace y60 {
             return SOM_VECTOR_QUATERNIONF_NAME;
         }
     };
+
+    template <>
+    struct VectorTypeNameTrait<y60::BlendFunction> {
+        static const char * name() {
+            return SOM_VECTOR_BLEND_FUNCTION_NAME;
+        }
+    };
+
+
 }
 
 #endif

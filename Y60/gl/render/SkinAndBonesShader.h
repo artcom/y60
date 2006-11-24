@@ -35,7 +35,7 @@ namespace y60 {
     			CGShader(theShaderLibrary), _myBoundingBoxNode(0) {}
             virtual ~SkinAndBonesShader() {}
 
-            void activate(MaterialBase & theMaterial, const Viewport & theViewport);
+            void activate(MaterialBase & theMaterial, const Viewport & theViewport, const MaterialBase * theLastMaterial);
             void setup(MaterialBase & theMaterial);
 
         private:

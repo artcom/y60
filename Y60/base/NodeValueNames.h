@@ -433,7 +433,7 @@ namespace y60 {
     };
     DEFINE_BITSET(RenderStyles, RenderStyle, RenderStyleEnum);
 
-    enum BlendFunction {
+    enum BlendFunctionEnum {
         ONE,
         ZERO,
         DST_COLOR,
@@ -448,7 +448,8 @@ namespace y60 {
         CONSTANT_COLOR,
         ONE_MINUS_CONSTANT_COLOR,
         CONSTANT_ALPHA,
-        ONE_MINUS_CONSTANT_ALPHA
+        ONE_MINUS_CONSTANT_ALPHA,
+        BlendFunctionEnum_MAX
     };
 
     static const char * BlendFunctionStrings[] = {
@@ -467,8 +468,9 @@ namespace y60 {
         "one_minus_constant_color",
         "constant_alpha",
         "one_minus_constant_alpha",
-        0
+        ""
     };
+    DEFINE_ENUM(BlendFunction, BlendFunctionEnum);
     
     enum TargetBuffersEnum {
         RED_MASK,

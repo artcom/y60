@@ -33,10 +33,10 @@ namespace y60 {
     class TextureManager;
 
     DEFINE_EXCEPTION(MaterialBaseException, asl::Exception);
-    static y60::VectorOfString getDefaultBlendFunction() {
-        y60::VectorOfString myResult;
-        myResult.push_back("src_alpha");
-        myResult.push_back("one_minus_src_alpha");
+    static y60::VectorOfBlendFunction getDefaultBlendFunction() {
+        y60::VectorOfBlendFunction myResult;
+        myResult.push_back(SRC_ALPHA);
+        myResult.push_back(ONE_MINUS_SRC_ALPHA);
         return myResult;
     }
 
@@ -50,12 +50,13 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(SurfaceColorTag, asl::Vector4f, SURFACE_COLOR_PROPERTY, asl::Vector4f(0.0f,0.0f,0.0f,1));
     DEFINE_MATERIAL_PROPERTY_TAG(ShininessTag, float, SHININESS_PROPERTY, float(1.0));
     DEFINE_MATERIAL_PROPERTY_TAG(TargetBuffersTag, y60::TargetBuffers, TARGETBUFFERS_PROPERTY, TargetBuffers((1<<RED_MASK)|(1<<GREEN_MASK)|(1<<BLUE_MASK)|(1<<ALPHA_MASK)|(1<<DEPTH_MASK)));
-    DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfString, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
+    DEFINE_MATERIAL_PROPERTY_TAG(BlendFunctionTag, y60::VectorOfBlendFunction, BLENDFUNCTION_PROPERTY, getDefaultBlendFunction());
     DEFINE_MATERIAL_PROPERTY_TAG(BlendEquationTag, BlendEquation, BLENDEQUATION_PROPERTY, EQUATION_ADD);
     DEFINE_MATERIAL_PROPERTY_TAG(GlowTag, float, GLOW_PROPERTY, 0.0f);
     DEFINE_MATERIAL_PROPERTY_TAG(LineWidthTag, float, LINEWIDTH_PROPERTY, float(1.0));
     DEFINE_MATERIAL_PROPERTY_TAG(PointSizeTag, asl::Vector3f, POINTSIZE_PROPERTY, asl::Vector3f(1,1,1));
     DEFINE_MATERIAL_PROPERTY_TAG(LineSmoothTag, bool, LINESMOOTH_PROPERTY, bool(false));
+    DEFINE_ATTRIBUT_TAG(MaterialPropGroup1HashTag, int, "material_prop_group1_hash_tag", 0);
 
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,
@@ -75,7 +76,8 @@ namespace y60 {
         public BlendEquationTag::Plug,
         public LineWidthTag::Plug,
         public PointSizeTag::Plug,
-        public LineSmoothTag::Plug
+        public LineSmoothTag::Plug,
+        public dom::FacadeAttributePlug<MaterialPropGroup1HashTag>
     {
         public:
             MaterialPropertiesFacade(dom::Node & theNode) :
@@ -92,9 +94,16 @@ namespace y60 {
                 BlendEquationTag::Plug(this),
                 LineWidthTag::Plug(this),
                 PointSizeTag::Plug(this),
-                LineSmoothTag::Plug(this)
+                LineSmoothTag::Plug(this),
+                dom::FacadeAttributePlug<MaterialPropGroup1HashTag>(this)
             {}
             IMPLEMENT_FACADE(MaterialPropertiesFacade);
+            void registerDependenciesRegistrators();
+            void updateGroup1Hash();
+            
+        protected:
+            virtual void registerDependenciesForMaterialPropGroup1HashTag();
+            
     };
     typedef asl::Ptr<MaterialPropertiesFacade, dom::ThreadingModel> MaterialPropertiesFacadePtr;
 
@@ -149,7 +158,8 @@ namespace y60 {
             const MaterialParameterVector & getVertexParameters() const;
             virtual bool reloadRequired() const;
             virtual bool rebindRequired();
-            
+            int getGroup1Hash() const;
+
             void setShader(IShaderPtr theShader);
             const IShaderPtr getShader() const { return _myShader; };
             IShaderPtr getShader() { return _myShader; };

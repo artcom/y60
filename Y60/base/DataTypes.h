@@ -56,6 +56,7 @@ namespace y60 {
 namespace dom {
 
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::AcBool, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::BlendFunction, SimpleValue);
 
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Vector2i, VectorValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::Vector2f, VectorValue);
@@ -134,7 +135,8 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::BlendEquation, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::RenderStyles, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::VertexBufferUsage, SimpleValue);
-
+    DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfBlendFunction, VectorValue, dom::MakeResizeableVector);
+    
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGB, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGBA, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::BGR, SimpleValue);

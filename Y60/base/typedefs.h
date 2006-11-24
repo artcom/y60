@@ -26,6 +26,7 @@
 #define _ac_y60_typedefs_h_
 
 #include "AcBool.h"
+#include "NodeValueNames.h"
 
 #include <asl/Vector234.h>
 #include <asl/Quaternion.h>
@@ -36,6 +37,8 @@
 #include <vector>
 
 namespace y60 {
+
+    typedef std::vector<BlendFunction>         VectorOfBlendFunction;
 
     typedef std::vector<AcBool>                VectorOfBool;
     typedef std::vector<unsigned int>          VectorOfUnsignedInt;
