@@ -36,7 +36,8 @@ namespace inet {
             RequestManager();
             ~RequestManager();
             void performRequest(RequestPtr theRequest);
-            int handleRequests();
+            /// must be called periodically
+            int handleRequests(bool theBlockingFlag = false);
             int getActiveCount() const { return _myRequests.size(); };
         private:
             CURLM * getHandle() { return _myCurlMultiHandle; };

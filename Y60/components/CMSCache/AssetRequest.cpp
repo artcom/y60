@@ -10,28 +10,41 @@
 
 #include "AssetRequest.h"
 
+#include "RequestThread.h"
 #include <asl/Logger.h>
+#include <asl/file_functions.h>
+#include <asl/MappedBlock.h>
 
 using namespace std;
 using namespace asl;
 
 namespace y60 {
 
-AssetRequest::AssetRequest(dom::NodePtr theAssetNode,
+AssetRequest::AssetRequest(RequestThread * theParent,
+                           const std::string & theLocalPath,
+                           const std::string & theRemoteURI,
                            const std::string & theBaseDir,
-                           const std::string & theSessionCookie,
+                           const inet::CookieJar & theCookies,
                            const string & theUserAgent) :
-        inet::Request(theAssetNode->getAttributeString("uri"), theUserAgent),
+        _myParent(theParent),
+        inet::Request(theRemoteURI, theUserAgent),
         _myIsDoneFlag( false ),
-        _myAssetNode( theAssetNode )
+        _myTotalReceived (0),
+        _myLocalPath (theLocalPath)
 {
-    if ( ! theSessionCookie.empty() ) {
-        setCookie( theSessionCookie, true );
+    if ( ! theCookies.empty() ) {
+        setCookies( theCookies );
     }
-    _myLocalFile = theBaseDir + "/" + theAssetNode->getAttributeString("path");
+    _myLocalFile = theBaseDir + "/" + _myLocalPath;
+    _myPartialFile = theBaseDir + "/" + _myLocalPath+".partial";
     verifyPeer(false); // don't bother to authenticate server, just encrypt
+    if (fileExists(_myLocalFile)) {
+        time_t myLastModified = getLastModified(_myLocalFile);
+        addHttpHeaderAsDate("If-Modified-Since", myLastModified);
+    }
     //setVerbose(true);
     //setTimeoutParams(100, 60);
+    
 }
 
 size_t
@@ -42,13 +55,16 @@ AssetRequest::onData(const char * theData, size_t theReceivedByteCount) {
         return 0;
     }
     if ( ! _myOutputFile) {
-        _myOutputFile = asl::Ptr<ofstream>(new ofstream(_myLocalFile.c_str(),
+        _myParent->sendStatusMsg(StatusMsg(_myLocalPath, "status", "downloading"));
+        _myParent->sendStatusMsg(StatusMsg(_myLocalPath, "progress", "0.0"));
+        _myOutputFile = asl::Ptr<ofstream>(new ofstream(_myPartialFile.c_str(),
                     ios::binary | ios::trunc | ios::out));
     }
 
     AC_TRACE << "onData called, # of bytes read: " << theReceivedByteCount;
 
     _myOutputFile->write(theData, theReceivedByteCount);
+    _myTotalReceived += theReceivedByteCount;
     return theReceivedByteCount;
 }
 
@@ -86,24 +102,36 @@ AssetRequest::onError(CURLcode theCode) {
 void 
 AssetRequest::onDone() {
     _myIsDoneFlag = true;
-    _myOutputFile = asl::Ptr<ofstream>(0);
-    _myAssetNode->getAttribute("status")->nodeValue("done");
-    if ( _myAssetNode->getAttribute("total") ) {
-        _myAssetNode->getAttribute("progress")->nodeValue( _myAssetNode->getAttributeString("total") );
+    if (_myOutputFile) {
+        _myOutputFile = asl::Ptr<ofstream>(0);
+        deleteFile(_myLocalFile);
+        moveFile(_myPartialFile, _myLocalFile);
     }
+    _myParent->sendStatusMsg(StatusMsg(_myLocalPath, "status", "done"));
+    _myParent->sendStatusMsg(StatusMsg(_myLocalPath, "progress", as_string(_myTotalReceived)));
+}
 
-    AC_TRACE << "Request done: " << _myAssetNode->getAttributeString("path");
+bool
+AssetRequest::onResponseHeader(const string & theHeader) {
+    string::size_type myColon = theHeader.find(":");
+    if (myColon != string::npos) {
+        string myKey = theHeader.substr(0,myColon);
+        string myValue = theHeader.substr(myColon+2);
+        if (myKey == "Set-Cookie") {
+            _myParent->addToCookieJar(myValue);
+        }
+    }
+    return Request::onResponseHeader(theHeader);
 }
 
 bool
 AssetRequest::onProgress(double theDownloadTotal, double theCurrentDownload,
             double theUploadTotal, double theCurrentUpdate)
 {
-    if ( ! _myAssetNode->getAttribute("total") && theDownloadTotal > 0) {
-        _myAssetNode->appendAttribute("total", as_string(theDownloadTotal));
+    if ( theDownloadTotal > 0) {
+        _myParent->sendStatusMsg(StatusMsg(_myLocalPath, "total", as_string(theDownloadTotal)));
     }
-
-    _myAssetNode->getAttribute("progress")->nodeValue(as_string( theCurrentDownload ));
+    _myParent->sendStatusMsg(StatusMsg(_myLocalPath, "progress", as_string(theCurrentDownload)));
 
     return Request::onProgress(theDownloadTotal, theCurrentDownload,
                                 theUploadTotal, theCurrentUpdate);

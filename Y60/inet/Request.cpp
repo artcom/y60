@@ -337,14 +337,29 @@ namespace inet {
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
     }
 
-    void
-    Request::setCookie(const std::string & theCookie, bool theSessionCookieFlag) {
-        _myCookieBuffer = theCookie;
+    void 
+    Request::setCookie(const std::string & theCookie) {
+        if ( !_myCookieBuffer.empty()) {
+            _myCookieBuffer += ";";
+        }
+
+        string::size_type myDelimit = theCookie.find(";");
+        if (myDelimit == string::npos) {
+            _myCookieBuffer += theCookie;
+        } else {
+            _myCookieBuffer += theCookie.substr(0, myDelimit);
+        }
+
         CURLcode myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_COOKIE, _myCookieBuffer.c_str());
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        // starting a new session with theCookie and ignore any deprecated session cookies [jb]
-        myStatus = curl_easy_setopt(_myCurlHandle, CURLOPT_COOKIESESSION, theSessionCookieFlag);
-        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    };
+
+    void 
+    Request::setCookies(const CookieJar & theCookies) {
+        _myCookieBuffer = "";
+        for (CookieJar::const_iterator i=theCookies.begin(); i != theCookies.end(); ++i) {
+            setCookie(i->first + "=" + i->second);
+        }
     }
 
     // virtual callback hooks

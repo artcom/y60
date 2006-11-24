@@ -8,17 +8,24 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //==============================================================================
 
+#ifndef __y60__AssetRequest__included
+#define __y60__AssetRequest__included
+
 #include <asl/Enum.h>
 #include <y60/Request.h>
 #include <dom/Nodes.h>
 
 namespace y60 {
 
+class RequestThread;    
+
 class AssetRequest : public inet::Request {
     public:
-        AssetRequest(dom::NodePtr theAssetNode,
+        AssetRequest(RequestThread * theParent,
+                     const std::string & theLocalPath,
+                     const std::string & theRemoteURI,
                      const std::string & theBaseDir,
-                     const std::string & theSessionCookie,
+                     const inet::CookieJar & theCookies,
                      // OCS doesn't like foreign user agents, that's why we claim to be wget! [jb,ds]
                      const std::string & theUserAgent = "Wget/1.10.2");
         bool isDone() const;
@@ -30,10 +37,14 @@ class AssetRequest : public inet::Request {
 
         void onError(CURLcode theCode);
         void onDone();
+        bool onResponseHeader(const std::string & theHeader);
 
     private:
-        dom::NodePtr            _myAssetNode;
+        RequestThread *         _myParent;
+        unsigned int            _myTotalReceived;
         std::string             _myLocalFile;
+        std::string             _myPartialFile;
+        std::string             _myLocalPath;
         asl::Ptr<std::ofstream> _myOutputFile;
         bool                    _myIsDoneFlag;
 };
@@ -42,3 +53,4 @@ typedef asl::Ptr<AssetRequest> AssetRequestPtr;
 
 }
 
+#endif

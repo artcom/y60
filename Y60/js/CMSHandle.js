@@ -20,6 +20,7 @@ try {
 } catch (ex) {
     Logger.error( ex );
 }
+
 ========================================================*/
 
 /*=============CMSConfig elements/attributes=============
@@ -140,6 +141,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
         myLoginRequest.post("__ac_name=" + _myConfig.username +
                             "&__ac_password=" + _myConfig.password + "&proxy=" + _myConfig.password);
         myLoginRequest.verifyPeer = false;
+        myLoginRequest.verbose = true;
         _myRequestManager.performRequest( myLoginRequest );
 
         while ( _myRequestManager.activeCount ) {
@@ -168,7 +170,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
 
             _myRequestManager.performRequest( myPresentationRequest );
             myPresentationRequest.verifyPeer = false;
-            myPresentationRequest.verbose = true;
+            myPresentationRequest.verbose = false;
             while ( _myRequestManager.activeCount ) {
                 _myRequestManager.handleRequests();
                 msleep( 10 );
@@ -179,7 +181,7 @@ CMSHandle.prototype.Constructor = function(obj, theConfigFile) {
                                     myPresentationRequest.responseCode + ".");
                 myErrorOccurred = true;
             }
-            _myOCSCookie = myPresentationRequest.getResponseHeader("Set-Cookie");
+            //_myOCSCookie = myPresentationRequest.getResponseHeader("Set-Cookie");
         } else {
             Logger.error("Login failed on zope server '" + myLoginRequest.URL + "': " +
                     myLoginRequest.errorString + ".", fileline());

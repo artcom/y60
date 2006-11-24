@@ -12,9 +12,8 @@
 #ifndef __y60__CMSCache_h_included__
 #define __y60__CMSCache_h_included__
 
-#include "AssetRequest.h"
+#include "RequestThread.h"
 
-#include <y60/RequestManager.h>
 #include <dom/Nodes.h>
 
 #include <map>
@@ -47,7 +46,12 @@ class CMSCache {
                    const std::string & theSessionCookie = "");
         ~CMSCache();
         void synchronize();
-        bool isSynchronized();
+        bool isSynchronized() {
+            if (! _myRequestThread ) {
+                return true;
+            }
+            return _myRequestThread->getRemainingCount() == 0;
+        };
 
         std::string getLocalPath() const { return _myLocalPath; }
 
@@ -68,44 +72,40 @@ class CMSCache {
 
         dom::NodePtr getStatusReport();
 
-        bool testConsistency();
+        // bool testConsistency();
 
     private:
-        void login();
-        void loginOCS();
+        RequestThreadPtr _myRequestThread;
+        // void login();
+        // void loginOCS();
 
         void collectExternalAssetList();
         void collectAssets(dom::NodePtr theParent);
-        void addAssetRequest(dom::NodePtr theAsset);
-        void collectOutdatedAssets();
+        void collectOutdatedAssets(std::vector<std::pair<std::string, std::string> > & theOutdatedAssets);
         bool isOutdated( dom::NodePtr theAsset );
-        void fillRequestQueue();
         void updateDirectoryHierarchy();
         void removeStalledAssets();
         void scanStalledEntries(const std::string & thePath);
 
-        std::string _myLocalPath;
-        std::string _myUsername;
-        std::string _myPassword;
-
         std::string _mySessionCookie;
-        inet::RequestManager _myRequestManager;
 
         dom::NodePtr _myPresentationDocument;
         dom::DocumentPtr _myStatusDocument;
         dom::NodePtr     _myAssetReportNode;
         dom::NodePtr     _myStalledFilesNode;
         std::map<std::string, dom::NodePtr> _myAssets;
-        std::vector<dom::NodePtr> _myOutdatedAssets;
 
-        typedef std::map<dom::Node *, AssetRequestPtr> AssetRequestMap;
-        AssetRequestMap _myAssetRequests;
 
         bool _myVerboseFlag;
         bool _myCleanupFlag;
         BackendType _myBackendType;
         unsigned _myMaxRequestCount;
+
         std::string _myUserAgent;
+        std::string _myLocalPath;
+        std::string _myUsername;
+        std::string _myPassword;
+
 };
 
 }

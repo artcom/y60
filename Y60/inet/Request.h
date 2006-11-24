@@ -30,6 +30,8 @@
 
 namespace inet {
 
+    typedef std::map<std::string, std::string> CookieJar;
+
     DEFINE_EXCEPTION(INetException, asl::Exception);
 
     enum AuthentTypeEnum {
@@ -74,7 +76,8 @@ namespace inet {
             bool getVerifyPeer() const { return _myVerifyPeerFlag; }
             void setSSLCertificate(const std::string & theCertificateFilename);
             void verifyPeer(bool theFlag);
-            void setCookie(const std::string & theCookie, bool theSessionCookieFlag = false);
+            void setCookies(const CookieJar & theCookies);
+            void setCookie(const std::string & theCookie);
             void setResume(long theResumeOffset);
             void setProxy(const std::string & theProxyServer, bool theTunnelFlag = false);
             void setCredentials(const std::string & theUsername, const std::string & thePassword,

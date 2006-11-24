@@ -45,7 +45,8 @@ isSynchronized(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
 static JSBool
 testConsistency(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    return Method<JSCMSCache::NATIVE>::call(&JSCMSCache::NATIVE::testConsistency,cx,obj,argc,argv,rval);
+    return JS_FALSE;
+    // return Method<JSCMSCache::NATIVE>::call(&JSCMSCache::NATIVE::testConsistency,cx,obj,argc,argv,rval);
 }
 
 #define DEFINE_ORIENTATION_PROP(NAME) { #NAME, PROP_ ## NAME , CMSCache::NAME }

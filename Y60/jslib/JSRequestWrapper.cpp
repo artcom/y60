@@ -99,12 +99,12 @@ setCredentials(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
 
 static JSBool
 setCookie(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("Sets a cookie with the given string. The flag indicates a new session cookie.");
+    DOC_BEGIN("Sets a cookie with the given string.");
     DOC_PARAM("theString", "", DOC_TYPE_STRING);
-    DOC_PARAM("theSessionCookieFlag", "", DOC_TYPE_INTEGER);
     DOC_END;
     return Method<inet::Request>::call(&inet::Request::setCookie,cx,obj,argc,argv,rval);
 }
+
 
 static JSBool
 getTimeFromHTTPDate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {

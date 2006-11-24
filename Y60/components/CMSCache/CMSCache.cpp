@@ -58,8 +58,11 @@ CMSCache::CMSCache(const string & theLocalPath,
 }
 
 CMSCache::~CMSCache() {
+    if (_myRequestThread) {
+        _myRequestThread->join();
+    }
 }
-
+/*
 void
 CMSCache::login() {
     switch ( _myBackendType ) {
@@ -74,7 +77,8 @@ CMSCache::login() {
             AC_ERROR << "Unknown backend type '" << _myBackendType << "'";
     }
 }
-
+*/
+/*
 void
 CMSCache::loginOCS() {
     VERBOSE_PRINT << "Using OCS backend with credentials:" << _myUsername << ", " << _myPassword;
@@ -103,7 +107,7 @@ CMSCache::loginOCS() {
 
     _mySessionCookie = myLoginRequest->getResponseHeader("Set-Cookie");
 }
-
+*/
 void
 CMSCache::collectExternalAssetList() {
     if ( ! _myPresentationDocument || _myPresentationDocument->childNodesLength() == 0 ) {
@@ -123,7 +127,7 @@ CMSCache::collectExternalAssetList() {
 
     collectAssets(myRoot);
 
-    VERBOSE_PRINT << "Found " << _myAssets.size() << " assets.";
+    AC_INFO << "Found " << _myAssets.size() << " assets.";
 }
 
 void
@@ -148,25 +152,6 @@ CMSCache::collectAssets(dom::NodePtr theParent) {
 }
 
 void
-CMSCache::addAssetRequest(dom::NodePtr theAsset) {
-    VERBOSE_PRINT << "Fetching " << _myLocalPath + "/" + theAsset->getAttributeString("path");
-    AssetRequestPtr myRequest;
-    if (_myUserAgent.empty()) {
-        myRequest = AssetRequestPtr(new AssetRequest( theAsset, _myLocalPath, _mySessionCookie));
-    } else {
-        myRequest = AssetRequestPtr(new AssetRequest( theAsset, _myLocalPath, _mySessionCookie, _myUserAgent));
-    }
-
-    if (_myBackendType == SVN) {
-        myRequest->setCredentials(_myUsername, _myPassword, DIGEST);
-    }
-    _myAssetRequests.insert(std::make_pair( & ( * theAsset), myRequest));
-    theAsset->getAttribute("status")->nodeValue("downloading");
-    theAsset->appendAttribute("progress", "0.0");
-    _myRequestManager.performRequest(myRequest);
-}
-
-void
 CMSCache::synchronize() {
 
     if ( ! fileExists( _myLocalPath )) {
@@ -178,16 +163,28 @@ CMSCache::synchronize() {
         removeStalledAssets();
     }
     updateDirectoryHierarchy();
+    AC_INFO << "asset count " << _myAssets.size();
 
     if ( ! _myAssets.empty()) {
+        /*
         if ( ! _myUsername.empty() && ! _myPassword.empty()) {
             login();
         }
-        collectOutdatedAssets();
-        fillRequestQueue();
+        */
+        AC_INFO << "creating request thread";
+
+// theAsset->getAttributeString("path"), theAsset->getAttributeString("uri")
+    
+        std::vector<std::pair<std::string, std::string> > myOutdatedAssets;
+        collectOutdatedAssets(myOutdatedAssets);
+        _myRequestThread = RequestThreadPtr(new RequestThread(_myLocalPath, _myUsername, _myPassword, 
+                    _myUserAgent, myOutdatedAssets, _myMaxRequestCount));
+        // fillRequestQueue();
+        AC_INFO << "forking";
+        _myRequestThread->fork();
     }
 }
-
+#if 0
 bool
 CMSCache::testConsistency() {
     cerr << "Testing CMS Consistency..." << endl;
@@ -195,9 +192,11 @@ CMSCache::testConsistency() {
     _myAssets.clear();
     collectExternalAssetList();
     std::map<std::string, dom::NodePtr>::iterator it = _myAssets.begin();
+    /*
     if (!_myUsername.empty() && !_myPassword.empty()) {
         login();
     }
+    */
 
     unsigned myExistingAssetCount = 0;
     std::vector<dom::NodePtr> myMissingAssets;
@@ -236,85 +235,30 @@ CMSCache::testConsistency() {
 
     return (myMissingAssets.size() == 0);
 }
-
+#endif
 void
-CMSCache::collectOutdatedAssets() {
+CMSCache::collectOutdatedAssets(std::vector<std::pair<std::string, std::string> > & theOutdatedAssets) {
+
     std::map<std::string, dom::NodePtr>::iterator myIter = _myAssets.begin();
     for (; myIter != _myAssets.end(); myIter++) {
         if ( isOutdated( myIter->second )) {
             VERBOSE_PRINT << "Asset " << myIter->second->getAttributeString("path")
-                     << " is outdated.";
+                     << " may be outdated.";
             myIter->second->getAttribute("status")->nodeValue("outdated");
-            _myOutdatedAssets.push_back( myIter->second );
+            theOutdatedAssets.push_back( make_pair(myIter->second->getAttributeString("path"), myIter->second->getAttributeString("uri")));
         } else {
             VERBOSE_PRINT << "Asset " << myIter->second->getAttributeString("path")
                      << " is uptodate.";
         }
     }
+
 }
 
 bool
 CMSCache::isOutdated( dom::NodePtr theAsset ) {
-    std::string myFile = _myLocalPath + "/" + theAsset->getAttributeString("path");
-    if ( fileExists( myFile )) {
-        time_t myLocalTimestamp = getLastModified( myFile );
-        time_t myServerTimestamp = Request::getTimeFromHTTPDate(
-                    theAsset->getAttributeString("lastmodified"));
-        VERBOSE_PRINT << myFile << ": " << myLocalTimestamp << "(local), "
-                      << myServerTimestamp << "(server)";
-        if (myServerTimestamp <= myLocalTimestamp) {
-            return false;
-        }
-    }
+    // always check by issuing a request
     return true;
 }
-
-void
-CMSCache::fillRequestQueue() {
-    for (unsigned i = _myAssetRequests.size(); i < _myMaxRequestCount; ++i) {
-        if ( ! _myOutdatedAssets.empty()) {
-            dom::NodePtr myAsset = _myOutdatedAssets.back();
-            _myOutdatedAssets.pop_back();
-            addAssetRequest( myAsset );
-        } else {
-            break;
-        }
-    }
-}
-
-bool
-CMSCache::isSynchronized() {
-    int myRunningCount = _myRequestManager.handleRequests();
-
-    // TODO: Error statistics and handling
-    AssetRequestMap::iterator myIter = _myAssetRequests.begin();
-    while (myIter != _myAssetRequests.end()) {
-        if (myIter->second->isDone()) {
-            int myResponseCode = myIter->second->getResponseCode();
-            if ( myResponseCode == 200) {
-                std::string myFilename = _myLocalPath + "/" +
-                        myIter->first->getAttributeString("path");
-                time_t myTime = Request::getTimeFromHTTPDate(
-                        myIter->first->getAttributeString("lastmodified"));
-                setLastModified(myFilename, myTime);
-            } else {
-                string myReason = myIter->second->getResponseHeader("X-ORA-CONTENT-Info");
-                if (!myReason.empty()) {
-                    AC_PRINT << "OCS server reason: '" << myReason << "' .";
-                }
-                // TODO: retry handling
-            }
-            _myAssetRequests.erase( myIter++ );
-        } else {
-            AC_TRACE << "  still running:" << myIter->second->getResponseCode() << ":" << myIter->first->getAttributeString("path");
-            ++myIter;
-        }
-    }
-
-    fillRequestQueue();
-    return _myOutdatedAssets.empty() && _myAssetRequests.empty() && (myRunningCount == 0);
-}
-
 
 void
 CMSCache::updateDirectoryHierarchy() {
@@ -368,6 +312,21 @@ CMSCache::scanStalledEntries(const std::string & thePath) {
 
 dom::NodePtr
 CMSCache::getStatusReport() {
+    // update asset report
+    StatusMsg myStatusMsg("","","");
+    while (_myRequestThread && _myRequestThread->popStatusMsg(myStatusMsg)) {
+       std::map<std::string, dom::NodePtr>::iterator it = _myAssets.find(myStatusMsg.path);
+       if (it == _myAssets.end()) {
+            AC_WARNING << myStatusMsg.path << " not found in asset list";
+       } else {
+            if (it->second->getAttribute(myStatusMsg.attribute)) {
+                it->second->getAttribute(myStatusMsg.attribute)->nodeValue(myStatusMsg.value);
+            } else {
+                it->second->appendAttribute(myStatusMsg.attribute, myStatusMsg.value);
+            }
+       }
+    }
+    
     return _myStatusDocument;
 }
 
