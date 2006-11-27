@@ -192,7 +192,9 @@ namespace asl {
                         return when.tv_sec * 1000L + when.tv_usec/1000L;
                 }
                 inline std::ostream& print(std::ostream& s) const;
+                bool parse(const std::string & theString);
         };
+
 
         inline std::ostream& Time::print(std::ostream& s) const
         {

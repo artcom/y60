@@ -66,6 +66,29 @@ public:
         const char * myFormatString("%Y-%M-%D-%h:%m:%s.%u");
         cerr << "formatted '" << myFormatString << "': "
              << asl::formatTime(myFormatString) << now << endl;
+
+        {
+            string myDateString = "Wed, 02 Aug 2006 14:16:26 GMT";
+            asl::Time myParsedTime;
+            myParsedTime.parse(myDateString);
+            DPRINT(myParsedTime);
+            ENSURE_EQUAL(myParsedTime, asl::Time(1154528186.0));
+        }
+        {
+            string myDateString = "Wed, 02 Aug 2006 15:16:26 CET";
+            asl::Time myParsedTime;
+            myParsedTime.parse(myDateString);
+            DPRINT(myParsedTime);
+            ENSURE_EQUAL(myParsedTime, asl::Time(1154528186.0));
+        }
+        {
+            string myDateString = "Wed, 02 Aug 2006 16:16:26 CEST";
+            asl::Time myParsedTime;
+            myParsedTime.parse(myDateString);
+            DPRINT(myParsedTime);
+            ENSURE_EQUAL(myParsedTime, asl::Time(1154528186.0));
+        }
+
     }
 };
 class NanoTimeUnitTest : public UnitTest {

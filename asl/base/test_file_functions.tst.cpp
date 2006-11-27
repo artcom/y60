@@ -20,6 +20,7 @@
 */
 
 #include "file_functions.h"
+#include "Time.h"
 
 #include "UnitTest.h"
 #include <iostream>
@@ -220,6 +221,35 @@ public:
         ENSURE(!isDirectory("nonexistingdir"));
         ENSURE(!isDirectory("../../testdir/a"));
 //        ENSURE(isDirectory("../../testdir/.svn"));
+
+        // last modified stuff
+        std::string myFile = "../../testdir/dates.tst";
+        writeFile(myFile, "foo");
+        
+        time_t myZeroTime = 0;
+        tm myTimeStruct = *localtime(&myZeroTime);
+        {
+            myTimeStruct.tm_year = 100;
+            myTimeStruct.tm_mon = 1;
+
+            time_t myTime = mktime(&myTimeStruct);  
+            setLastModified(myFile, myTime); 
+
+            DPRINT(myTime);
+            ENSURE_EQUAL(myTime, getLastModified(myFile));
+        }
+        {
+            myTimeStruct.tm_year = 100;
+            myTimeStruct.tm_mon = 7;
+
+            time_t myTime = mktime(&myTimeStruct);  
+            setLastModified(myFile, myTime); 
+
+            DPRINT(myTime);
+            ENSURE_EQUAL(myTime, getLastModified(myFile));
+        }
+
+        
     }
 };
 
