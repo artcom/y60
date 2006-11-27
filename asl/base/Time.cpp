@@ -17,6 +17,11 @@
 #include <ctype.h>
 #include <string.h>
 
+#ifndef WINDOWS
+#include <strings.h>
+#define stricmp strcasecmp 
+#endif
+
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for strtol() */
 #endif
@@ -173,14 +178,14 @@ static int checkday(char *check, size_t len)
 {
   int i;
   const char * const *what;
-  bool found= FALSE;
+  bool found= false;
   if(len > 3)
     what = &weekday[0];
   else
     what = &Curl_wkday[0];
   for(i=0; i<7; i++) {
     if(!stricmp(check, what[0])) {
-      found=TRUE;
+      found=true;
       break;
     }
     what++;
@@ -192,12 +197,12 @@ static int checkmonth(char *check)
 {
   int i;
   const char * const *what;
-  bool found= FALSE;
+  bool found= false;
 
   what = &Curl_month[0];
   for(i=0; i<12; i++) {
     if(!stricmp(check, what[0])) {
-      found=TRUE;
+      found=true;
       break;
     }
     what++;
@@ -212,12 +217,12 @@ static int checktz(char *check)
 {
   unsigned int i;
   const struct tzinfo *what;
-  bool found= FALSE;
+  bool found= false;
 
   what = tz;
   for(i=0; i< sizeof(tz)/sizeof(tz[0]); i++) {
     if(!stricmp(check, what->name)) {
-      found=TRUE;
+      found=true;
       break;
     }
     what++;
@@ -267,7 +272,7 @@ static time_t Curl_parsedate(const char *date)
 #endif
 
   while(*date && (part < 6)) {
-    bool found=FALSE;
+    bool found=false;
 
     skip(&date);
 
@@ -281,19 +286,19 @@ static time_t Curl_parsedate(const char *date)
       if(wdaynum == -1) {
         wdaynum = checkday(buf, len);
         if(wdaynum != -1)
-          found = TRUE;
+          found = true;
       }
       if(!found && (monnum == -1)) {
         monnum = checkmonth(buf);
         if(monnum != -1)
-          found = TRUE;
+          found = true;
       }
 
       if(!found && (tzoff == -1)) {
         /* this just must be a time zone string */
         tzoff = checktz(buf);
         if(tzoff != -1)
-          found = TRUE;
+          found = true;
       }
 
       if(!found)
@@ -309,7 +314,7 @@ static time_t Curl_parsedate(const char *date)
          (3 == sscanf(date, "%02d:%02d:%02d", &hournum, &minnum, &secnum))) {
         /* time stamp! */
         date += 8;
-        found = TRUE;
+        found = true;
       }
       else {
         val = (int)strtol(date, &end, 10);
@@ -321,7 +326,7 @@ static time_t Curl_parsedate(const char *date)
            ((date[-1] == '+' || date[-1] == '-'))) {
           /* four digits and a value less than 1300 and it is preceeded with
              a plus or minus. This is a time zone indication. */
-          found = TRUE;
+          found = true;
           tzoff = (val/100 * 60 + val%100)*60;
 
           /* the + and - prefix indicates the local time compared to GMT,
@@ -334,7 +339,7 @@ static time_t Curl_parsedate(const char *date)
            (monnum == -1) &&
            (mdaynum == -1)) {
           /* 8 digits, no year, month or day yet. This is YYYYMMDD */
-          found = TRUE;
+          found = true;
           yearnum = val/10000;
           monnum = (val%10000)/100-1; /* month is 0 - 11 */
           mdaynum = val%100;
@@ -343,14 +348,14 @@ static time_t Curl_parsedate(const char *date)
         if(!found && (dignext == DATE_MDAY) && (mdaynum == -1)) {
           if((val > 0) && (val<32)) {
             mdaynum = val;
-            found = TRUE;
+            found = true;
           }
           dignext = DATE_YEAR;
         }
 
         if(!found && (dignext == DATE_YEAR) && (yearnum == -1)) {
           yearnum = val;
-          found = TRUE;
+          found = true;
           if(yearnum < 1900) {
             if (yearnum > 70)
               yearnum += 1900;
@@ -425,7 +430,11 @@ static time_t Curl_parsedate(const char *date)
 
     /* Add the time zone diff (between the given timezone and GMT) and the
        diff between the local time zone and GMT. */
+#ifdef WINDOWS
     delta = (long)((tzoff!=-1?tzoff:0)/* + (t - t2)*/);
+#else    
+    delta = (long)((tzoff!=-1?tzoff:0) + (t - t2));
+#endif    
 
     if((delta>0) && (t + delta < t))
       return -1; /* time_t overflow */
