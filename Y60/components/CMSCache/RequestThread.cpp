@@ -80,6 +80,7 @@ RequestThread::handleRequests() {
                 std::string myFilename = _myLocalPath + "/" + myIter->first;
                 time_t myTime = Request::getTimeFromHTTPDate(
                          myIter->second->getResponseHeader("Last-Modified"));
+                AC_DEBUG << "setLastModified for " << myFilename << " to " << myTime;
                 setLastModified(myFilename, myTime);
             }  else if ( myResponseCode == 304) { 
                 // not modified, everything ok
