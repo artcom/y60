@@ -10,8 +10,7 @@ var myPresentation='<?xml version=\'1.0\' encoding=\'UTF-8\'?>'+
 '                    <externalcontent mimetype="image/png" name="de_leftImage_Designphilosophie_1" language="de" lastmodified="Wed, 25 Oct 2006 13:27:02 +0000" uri="http://himmel.intern.artcom.de/big.b60" field="leftImage" path="big.b60" id="3PV/SdlS0UE="/>'+
 '                </content> </screen> </theme> </themepool> </presentation>';
 
-
-var myCMSCache = new CMSCache("/tmp/cmstest", new Node(myPresentation),
+var myCMSCache = new CMSCache(getTempDirectory()+"/cmstest", new Node(myPresentation),
                            "OCS", "", "", "" );
 myCMSCache.verbose = true;
 Logger.info("start");
