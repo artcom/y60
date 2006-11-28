@@ -20,10 +20,10 @@ IMPLEMENT_BITSET(y60::RenderStyles, y60::RenderStyle, y60::RenderStyleStrings);
 IMPLEMENT_ENUM(y60::VertexBufferUsage, y60::VertexBufferUsageStrings);
 IMPLEMENT_ENUM(y60::BlendFunction, y60::BlendFunctionStrings);
 
-IMPLEMENT_ENUM(y60::TextureApplyMode, TextureApplyModeStrings);
-IMPLEMENT_ENUM(y60::TextureSampleFilter, TextureSampleFilterStrings);
-IMPLEMENT_ENUM(y60::TextureWrapMode, TextureWrapModeStrings);
-IMPLEMENT_ENUM(y60::TextureUsage, TextureUsageStrings);
+IMPLEMENT_ENUM(y60::TextureApplyMode, y60::TextureApplyModeStrings);
+IMPLEMENT_ENUM(y60::TextureSampleFilter, y60::TextureSampleFilterStrings);
+IMPLEMENT_ENUM(y60::TextureWrapMode, y60::TextureWrapModeStrings);
+IMPLEMENT_ENUM(y60::TextureUsage, y60::TextureUsageStrings);
 
 
 

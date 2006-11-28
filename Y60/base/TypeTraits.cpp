@@ -8,7 +8,7 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
-#include "typeTraits.h"
+#include "TypeTraits.h"
 
 IMPLEMENT_ENUM(y60::TypeId, y60::TypeIdStrings);
 
