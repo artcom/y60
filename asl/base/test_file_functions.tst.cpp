@@ -223,7 +223,7 @@ public:
 //        ENSURE(isDirectory("../../testdir/.svn"));
 
         // last modified stuff
-        std::string myFile = "../../testdir/dates.tst";
+        std::string myFile = "../../dates.tst";
         writeFile(myFile, "foo");
         
         time_t myZeroTime = 0;
