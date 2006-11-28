@@ -17,7 +17,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#ifndef WINDOWS
+#ifndef WIN32
 #include <strings.h>
 #define stricmp strcasecmp 
 #endif
@@ -430,7 +430,7 @@ static time_t Curl_parsedate(const char *date)
 
     /* Add the time zone diff (between the given timezone and GMT) and the
        diff between the local time zone and GMT. */
-#ifdef WINDOWS
+#ifdef XXWIN32
     delta = (long)((tzoff!=-1?tzoff:0)/* + (t - t2)*/);
 #else    
     delta = (long)((tzoff!=-1?tzoff:0) + (t - t2));

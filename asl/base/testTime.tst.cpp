@@ -28,9 +28,49 @@
 
 using namespace std;
 
+class TimeParserTest : public UnitTest {
+public:
+    TimeParserTest() : UnitTest("TimeParserTest") {  }
+    void testParser(const std::string & theString, int theSecs) {
+        asl::Time myParsedTime;
+        myParsedTime.parse(theString);
+        DPRINT(myParsedTime);
+        ENSURE_EQUAL(myParsedTime, asl::Time(double(theSecs)));
+    }
+    void run() {
+        int mySecs = 1154528186;
+        //unsetenv("TZ");
+        tzset();
+        testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
+        testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
+        testParser("Wed, 02 Aug 2006 16:16:26 CEST", mySecs);
+        putenv("TZ=UTC");
+        tzset();
+        testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
+        testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
+        testParser("Wed, 02 Aug 2006 16:16:26 CEST", mySecs);
+        putenv("TZ=MEZ");
+        tzset();
+        testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
+        testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
+        testParser("Wed, 02 Aug 2006 16:16:26 CEST", mySecs);
+        putenv("TZ=MESZ");
+        tzset();
+        testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
+        testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
+        testParser("Wed, 02 Aug 2006 16:16:26 CEST", mySecs);
+        putenv("TZ=UTC+2");
+        tzset();
+        testParser("Wed, 02 Aug 2006 14:16:26 GMT", mySecs);
+        testParser("Wed, 02 Aug 2006 15:16:26 CET", mySecs);
+        testParser("Wed, 02 Aug 2006 16:16:26 CEST", mySecs);
+    }
+};
+
 class TimeUnitTest : public UnitTest {
 public:
     TimeUnitTest() : UnitTest("TimeUnitTest") {  }
+
     void run() {
         cout << "hej!" << endl;
         asl::Time now;
@@ -66,28 +106,6 @@ public:
         const char * myFormatString("%Y-%M-%D-%h:%m:%s.%u");
         cerr << "formatted '" << myFormatString << "': "
              << asl::formatTime(myFormatString) << now << endl;
-
-        {
-            string myDateString = "Wed, 02 Aug 2006 14:16:26 GMT";
-            asl::Time myParsedTime;
-            myParsedTime.parse(myDateString);
-            DPRINT(myParsedTime);
-            ENSURE_EQUAL(myParsedTime, asl::Time(1154528186.0));
-        }
-        {
-            string myDateString = "Wed, 02 Aug 2006 15:16:26 CET";
-            asl::Time myParsedTime;
-            myParsedTime.parse(myDateString);
-            DPRINT(myParsedTime);
-            ENSURE_EQUAL(myParsedTime, asl::Time(1154528186.0));
-        }
-        {
-            string myDateString = "Wed, 02 Aug 2006 16:16:26 CEST";
-            asl::Time myParsedTime;
-            myParsedTime.parse(myDateString);
-            DPRINT(myParsedTime);
-            ENSURE_EQUAL(myParsedTime, asl::Time(1154528186.0));
-        }
 
     }
 };
