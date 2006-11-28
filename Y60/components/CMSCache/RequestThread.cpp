@@ -13,6 +13,12 @@
 #include <asl/file_functions.h>
 #include <asl/os_functions.h>
 
+#include <curl/curl.h>
+
+#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 using namespace std;
 using namespace asl;
 using namespace inet;
@@ -80,8 +86,11 @@ RequestThread::handleRequests() {
                 std::string myFilename = _myLocalPath + "/" + myIter->first;
                 time_t myTime = Request::getTimeFromHTTPDate(
                          myIter->second->getResponseHeader("Last-Modified"));
+                AC_DEBUG << "Last-Modified Header '" << myIter->second->getResponseHeader("Last-Modified") << "'";
+                AC_DEBUG << "$TZ '" << expandEnvironment("${TZ}") << "'";
                 AC_DEBUG << "setLastModified for " << myFilename << " to " << myTime;
                 setLastModified(myFilename, myTime);
+                AC_DEBUG << "lastModified is now " << getLastModified(myFilename);
             }  else if ( myResponseCode == 304) { 
                 // not modified, everything ok
             } else {

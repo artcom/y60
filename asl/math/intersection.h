@@ -773,6 +773,12 @@ namespace asl {
         return intersection(b,r,tmin,tmax);
     }
     template<class Number>
+    bool intersection(const Box3<Number> & b, const LineSegment<Number> & r, Number & tmin)
+    {
+        Number tmax;
+        return intersection(b,r,tmin,tmax);
+    }
+    template<class Number>
     bool intersection(const LineSegment<Number> & r, const Box3<Number> & b) {
         return intersection(b, r);
     }

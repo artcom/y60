@@ -68,6 +68,25 @@ size_t eatWebsite(void* buffer, size_t size, size_t memb, void* userp) {
     return size*memb;
 }
 
+class DateTest : public UnitTest {
+
+    public:
+        DateTest() : UnitTest("DateTest") {};
+        
+        void run() {
+            string myDateString = "Wed, 02 Aug 2006 14:16:26 GMT";
+            time_t myTime = Request::getTimeFromHTTPDate(myDateString);
+            DPRINT(myDateString);
+            DPRINT(myTime);
+            struct tm * myTimeStruct = gmtime(&myTime);
+            char myBuffer[128];
+            strftime(myBuffer, 128, "%a, %d %b %Y %H:%M:%S GMT", myTimeStruct);
+            string myTimeString(myBuffer);
+            // this failed in curl 7.12, windows
+            ENSURE_EQUAL(myTimeString, myDateString);
+        }
+};
+
 class RequestTest : public UnitTest {
 
     public:
@@ -185,6 +204,7 @@ public:
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
         addTest(new RequestTest);
+        addTest(new DateTest);
     }
 };
 

@@ -207,7 +207,9 @@ namespace inet {
 
     time_t
     Request::getTimeFromHTTPDate(const std::string & theHTTPDate ) {
-        return curl_getdate(theHTTPDate.c_str(), 0);
+        Time myTime;
+        myTime.parse(theHTTPDate);
+        return static_cast<time_t>(myTime);
     }
 
     string
