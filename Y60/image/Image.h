@@ -58,6 +58,9 @@ namespace y60 {
         public ImageColorBiasTag::Plug,
         public ImageColorScaleTag::Plug,
         public ImageTileTag::Plug,
+        public TextureWrapModeTag::Plug,
+        public TextureMinFilterTag::Plug, 
+        public TextureMagFilterTag::Plug, 
         public dom::FacadeAttributePlug<RasterPixelFormatTag>,   
         public dom::FacadeAttributePlug<ImageBytesPerPixelTag>,        
         public dom::FacadeAttributePlug<ImageWidthTag>,
@@ -100,6 +103,10 @@ namespace y60 {
             void deregisterTexture();
 
             virtual void load();
+
+            TextureWrapMode   getWrapMode() const;
+            TextureSampleFilter  getMinFilter() const;
+            TextureSampleFilter  getMagFilter() const;
 
 
             /**
@@ -197,7 +204,7 @@ namespace y60 {
 
             virtual void registerDependenciesRegistrators();
             bool isUploaded() const;
-
+            static bool allowInlineFlag;
         private:
             Image();
 
@@ -227,6 +234,7 @@ namespace y60 {
 
             int                           _myRefCount;
             asl::Ptr<asl::PackageManager> _myPackageManager;
+            bool                          _myLoadOnFacadeCtorFlag;
         protected:
             IResourceManager *            _myRessourceManager;
     };

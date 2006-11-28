@@ -168,7 +168,9 @@ namespace y60 {
 
             const string & myRole = it->second;
             NodePtr myDstVertexData = theSuperShape->getVertexData(mySrcVertexData->nodeName(), myRole);
-            TypeId myTypeId = TypeId(getEnumFromString(mySrcVertexData->nodeName(), TypeIdStrings));
+            TypeId myTypeId;
+            myTypeId.fromString(mySrcVertexData->nodeName());
+            //= TypeId(getEnumFromString(mySrcVertexData->nodeName(), TypeIdStrings));
             switch (myTypeId) {
                 case VECTOR_OF_VECTOR2F:
                     theVertexDataOffsets[myRole] = copyVertexData<Vector2f>(mySrcVertexData, myDstVertexData);

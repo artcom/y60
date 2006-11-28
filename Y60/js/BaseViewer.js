@@ -260,7 +260,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         // add textures
         var myTexturesString =
             '<textures>\n' +
-            '    <texture image="' + theImageNode.id + '" applymode="decal" wrapmode="repeat" />\n' +
+            '    <texture image="' + theImageNode.id + '" applymode="decal"/>\n' +
             '</textures>';
         var myTexturesDoc  = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
@@ -286,7 +286,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         } else {
             var myImageId = createUniqueId();
             var mySkyboxImageString =
-                '<image name="' + theFileName + '" id="' + myImageId + '" src="' + theFileName + '" type="cubemap" mipmap="0" tile="' + theTile + '"/>\n';
+                '<image name="' + theFileName + '" id="' + myImageId + '" src="' + theFileName + '" type="cubemap" mipmap="0" wrapmode="repeat" tile="' + theTile + '"/>\n';
             var mySkyboxImageDoc = new Node(mySkyboxImageString);
             var mySkyboxImage = mySkyboxImageDoc.firstChild;
             self.getImages().appendChild(mySkyboxImage);

@@ -69,7 +69,9 @@ namespace y60 {
         const string & myRoleString = theIndicesNode->getAttributeString(VERTEX_DATA_ROLE_ATTRIB);
         VertexDataRole myRole = VertexDataRole(getEnumFromString(myRoleString, VertexDataRoleString));
 
-        TypeId myTypeId = TypeId(getEnumFromString(theDataNode->nodeName(), TypeIdStrings));
+        TypeId myTypeId;
+        myTypeId.fromString(theDataNode->nodeName());
+        //= TypeId(getEnumFromString(theDataNode->nodeName(), TypeIdStrings));
         
         VertexBufferUsage myUsage = VERTEX_USAGE_STATIC_DRAW;
         if (theDataNode->getAttribute(VERTEX_BUFFER_USAGE_ATTRIB)) {

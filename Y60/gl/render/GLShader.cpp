@@ -247,8 +247,8 @@ namespace y60 {
 
     void
     GLShader::enableTextures(const y60::MaterialBase & theMaterial) {
-
         unsigned myTextureCount = theMaterial.getTextureCount();
+
         // AC_TRACE << "GLShader::enableTextures " << theMaterial.get<NameTag>() << " count=" << myTextureCount;
 
         glMatrixMode(GL_TEXTURE);
@@ -256,7 +256,9 @@ namespace y60 {
         for (unsigned i = 0; i < myTextureCount; ++i) {
 
             const y60::Texture & myTexture = theMaterial.getTexture(i);
-            bool hasMipMaps = myTexture.getImage()->get<ImageMipmapTag>();
+
+            GLenum myTexUnit = asGLTextureRegister(i);
+            glActiveTexture(myTexUnit);
 
             GLenum myTextureType = 0;
             switch (myTexture.getImage()->getType()) {
@@ -270,43 +272,24 @@ namespace y60 {
                 throw ShaderException(string("Invalid image type in material '") + theMaterial.get<NameTag>() + "'", PLUS_FILE_LINE);
                 break;
             }
-            GLenum myTexUnit = asGLTextureRegister(i);
-            AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.get<NameTag>() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId() << " wrap=" << myTexture.getWrapMode();
+            unsigned myId = myTexture.getImage()->ensureTextureId(); 
 
-            glActiveTexture(myTexUnit);
-            glBindTexture(myTextureType, myTexture.getId());
+            AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.get<NameTag>() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId();
+
+            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
+
+            // [VS;DS] please explain this
+            if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
+                glBindTexture(myTextureType, myTexture.getId());
+                glEnable(myTextureType);
+            }
 
             // load texture matrix
             asl::Matrix4f myMatrix = myTexture.getImage()->get<ImageMatrixTag>();
             myMatrix.postMultiply(myTexture.get<TextureMatrixTag>());
-            //AC_TRACE << "TM " << myTexture.get<TextureMatrixTag>();
-            //AC_TRACE << "MM " << myMatrix;
             glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
 
-            // [DS] this isn't necessary. Filtering and wrapmode are stored
-            // as part of the texture object. Instead we should set it once
-            // at creation time to make the texture usable even if it is not
-            // rendered at all. Some kind of dirty notification would be necessary.
-            glTexParameteri(myTextureType, GL_TEXTURE_WRAP_S,
-                    asGLTextureWrapmode(myTexture.getWrapMode()));
-            CHECK_OGL_ERROR;
-            glTexParameteri(myTextureType, GL_TEXTURE_WRAP_T,
-                    asGLTextureWrapmode(myTexture.getWrapMode()));
-            CHECK_OGL_ERROR;
-            if (myTextureType == GL_TEXTURE_3D) {
-                glTexParameteri(myTextureType, GL_TEXTURE_WRAP_R,
-                        asGLTextureWrapmode(myTexture.getWrapMode()));
-                CHECK_OGL_ERROR;
-            }
-
-            glTexParameteri(myTextureType, GL_TEXTURE_MAG_FILTER,
-                    asGLTextureSampleFilter(myTexture.getMagFilter(), false));
-            CHECK_OGL_ERROR;
-            // only minification can use mipmaps
-            glTexParameteri(myTextureType, GL_TEXTURE_MIN_FILTER,
-                    asGLTextureSampleFilter(myTexture.getMinFilter(), hasMipMaps));
-            CHECK_OGL_ERROR;
-
+            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, asGLTextureFunc(myTexture.getApplyMode())); 
             if (myTexture.get<TextureSpriteTag>()) {
                 if (!alreadyHasSpriteTexture) {
                     glEnable(GL_POINT_SPRITE_ARB);
@@ -332,6 +315,37 @@ namespace y60 {
     void
     GLShader::disableTextures(const y60::MaterialBase & theMaterial) {
         // nothing to do
+        unsigned myTextureCount = theMaterial.getTextureCount();
+        // AC_TRACE << "current texcount:" << myMaterial->getTextureCount() << ", prev:" << myPreviousTextureCount << endl;
+        for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {
+            const y60::Texture & myTexture = theMaterial.getTexture(myTextureCounter);
+            TextureUsage myTextureUsage = theMaterial.getTextureUsage(myTextureCounter);
+
+            // Fixed Function Shaders only support paint & skybox usage
+            if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
+                glActiveTexture(asGLTextureRegister(myTextureCounter));
+                glClientActiveTexture(asGLTextureRegister(myTextureCounter));
+
+                switch (myTexture.getImage()->getType()) {
+                    case SINGLE :
+                        break;
+                    case CUBEMAP :
+                        glDisable(GL_TEXTURE_CUBE_MAP_ARB);
+                        break;
+                    default :
+                        throw ShaderException(std::string("Unknown texture type '")+
+                                myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
+                }
+                if (myTexture.getImage()->get<ImageDepthTag>()==1) {
+                    glBindTexture(GL_TEXTURE_2D, 0);
+                    glDisable(GL_TEXTURE_2D);
+                } else {
+                    glBindTexture(GL_TEXTURE_3D, 0);
+                    glDisable(GL_TEXTURE_3D);
+                }
+            }
+        }
+        glDisable(GL_POINT_SPRITE_ARB);
     }
 
     void
@@ -368,7 +382,9 @@ namespace y60 {
             if (myParameterNode->nodeType() != dom::Node::COMMENT_NODE) {
                 const string & myPropertyName = myParameterNode->getAttributeString("name");
                 const string & myPropertyTypeString = myParameterNode->nodeName();
-                TypeId myPropertyType = TypeId(asl::getEnumFromString(myPropertyTypeString, TypeIdStrings));
+                TypeId myPropertyType;
+                myPropertyType.fromString(myPropertyTypeString);
+                //= TypeId(asl::getEnumFromString(myPropertyTypeString, TypeIdStrings));
 
                 VertexDataRole myPropertyRole =
                     VertexDataRole(asl::getEnumFromString(myPropertyName, VertexDataRoleString));
@@ -474,6 +490,10 @@ namespace y60 {
     const VectorOfString *
     GLShader::getFeatures(const string & theFeatureClass) const {
         return _myFeatureSet.getFeatures(theFeatureClass);
+    }
+    const VectorOfTextureUsage &
+    GLShader::getTextureFeature() const {
+        return _myFeatureSet.getTextureFeature();
     }
 
     bool GLShader::hasFeature(const string & theFeatureClass) const {

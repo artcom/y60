@@ -170,6 +170,8 @@ namespace y60 {
     Renderer::deactivatePreviousMaterial() const  {
         // clean up previous material
         if (_myPreviousMaterial) {
+MAKE_SCOPE_TIMER(deactivatePreviousMaterial)
+
             DBP(MAKE_SCOPE_TIMER(deactivatePreviousMaterial));
             IShaderPtr myPreviousShader = _myPreviousMaterial->getShader();
             myPreviousShader->disableTextures(*_myPreviousMaterial);

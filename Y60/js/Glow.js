@@ -212,6 +212,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myOffscreenImage.resize = "pad";
         myOffscreenImage.matrix.postMultiply(myMirrorMatrix);
         window.scene.images.appendChild(myOffscreenImage);
+        myOffscreenImage.wrapmode = "clamp";
 
         var myOffscreenCanvas = cloneCanvas(window.canvas, "Offscreen");
         myOffscreenCanvas.backgroundcolor = [0,0,0,1];
@@ -235,7 +236,6 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myOffscreenOverlay.material.name = "Offscreen";
         _myOffscreenOverlay.material.properties.blendfunction = "[one,zero]";
         var myTextures = getDescendantByTagName(_myOffscreenOverlay.material, "textures", false);
-        myTextures.firstChild.wrapmode="clamp";
 
         /*
          * Blur_X
@@ -248,6 +248,8 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurXImage.resize = "pad";
         myBlurXImage.mipmap = myMipmapFlag;
         myBlurXImage.matrix.postMultiply(myMirrorMatrix);
+        myBlurXImage.wrapmode="clamp";
+        
         window.scene.images.appendChild(myBlurXImage);
 
         var myBlurXCanvas = cloneCanvas(window.canvas, "BlurX");
@@ -267,7 +269,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
 
         var myBlurXMaterial = _myBlurXOverlay.material;
         myBlurXMaterial.name = "BlurX";
-        myBlurXMaterial.requires.textures = "[10[glow]]";
+        myBlurXMaterial.requires.textures = "[10[glow,glow]]";
 
         var myTexture = new Node("<texture/>").firstChild;
         myTexture.image = myBlurKernelImage.id;
@@ -280,7 +282,6 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurXMaterial.properties.kernelSize = theKernelSize;
         myBlurXMaterial.properties.blurKernelTexSize = myBlurKernelImage.width;
         var myTextures = getDescendantByTagName(myBlurXMaterial, "textures", false);
-        myTextures.firstChild.wrapmode="clamp";
 
         /*
          * Blur_Y
@@ -292,6 +293,8 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurYImage.resize = "pad";
         myBlurYImage.mipmap = myMipmapFlag;
         myBlurYImage.matrix.postMultiply(myMirrorMatrix);
+        myBlurYImage.wrapmode="clamp";
+        
         window.scene.images.appendChild(myBlurYImage);
 
         var myBlurYCanvas =  cloneCanvas(window.canvas, "BlurY");
@@ -309,7 +312,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
 
         var myBlurYMaterial = _myBlurYOverlay.material;
         myBlurYMaterial.name = "BlurY";
-        myBlurYMaterial.requires.textures = "[10[glow]]";
+        myBlurYMaterial.requires.textures = "[10[glow,glow]]";
 
         var myTexture = new Node("<texture/>").firstChild;
         myTexture.image = myBlurKernelImage.id;
@@ -323,7 +326,6 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurYMaterial.properties.blurKernelTexSize = myBlurKernelImage.width;
         myBlurYMaterial.properties.blendfunction = "[one,one]";
         var myTextures = getDescendantByTagName(myBlurYMaterial, "textures", false);
-        myTextures.firstChild.wrapmode="clamp";
 
         /*
          * Glow

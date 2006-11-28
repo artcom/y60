@@ -51,7 +51,6 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
 
         self.image = theImage;    
         self.image.name = "Offscreen Buffer";
-        
         // Flip vertically since framebuffer content is upside-down
         var myMirrorMatrix = new Matrix4f;
         myMirrorMatrix.makeScaling(new Vector3f(1,-1,1));
@@ -167,6 +166,5 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
     var _myHiddenNodes         = [];
     var _myOffscreenNodes      = [];
     var _myCanvas              = null;
-
     setup(theSize);
 }

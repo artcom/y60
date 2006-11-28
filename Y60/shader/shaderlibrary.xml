@@ -1073,7 +1073,7 @@
     </shader>
     <shader id="s127" name="glow" cost="10">
         <supports>
-            <feature class="textures" values="[glow]"/>
+            <feature class="textures" values="[glow,glow]"/>
             <feature class="lighting" values="[unlit]"/>
             <feature class="texcoord" values="[*]"/>
         </supports>

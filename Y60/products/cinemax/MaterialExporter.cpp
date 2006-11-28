@@ -34,7 +34,9 @@ MaterialExporter::MaterialExporter(y60::SceneBuilderPtr theSceneBuilder,
                                    const Filename & theDocumentPath, bool theInlineTextures) :
     _mySceneBuilder(theSceneBuilder), _myDocumentPath(theDocumentPath), _myInlineTextures(theInlineTextures),
     _myMaterialBuilder(0), _myDefaultMaterialBuilder(0)
-{}
+{
+    Image::allowInlineFlag = _myInlineTextures;
+}
 
 void
 MaterialExporter::getColor(BaseChannel * theColorChannel, Vector4f & theColor) {
@@ -76,7 +78,7 @@ bool
 MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr theMaterialBuilder,
                                 y60::SceneBuilder & theSceneBuilder,
                                 BaseContainer * theContainer,
-                                const std::string & theUsage, TextureTag * theTextureTag,
+                                const TextureUsage & theUsage, TextureTag * theTextureTag,
                                 const asl::Vector3f & theMinCoord, const asl::Vector3f & theMaxCoord,
 								bool isAlphaChannel, bool isEnvMap)
 {
@@ -87,23 +89,23 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
     }
 
     bool myDiffuseColorFlag = false;
-    std::string myApplyMode = y60::TEXTURE_APPLY_DECAL;
+    TextureApplyMode myApplyMode = y60::DECAL;
 
-    if (theUsage == y60::TEXTURE_USAGE_BUMP) {
-        myApplyMode = y60::TEXTURE_APPLY_DECAL;
+    if (theUsage == y60::BUMP) {
+        myApplyMode = y60::DECAL;
     } else {
         LONG myMixMode = theContainer->GetReal(BASECHANNEL_MIXMODE_EX);
         switch (myMixMode) {
             case MATERIAL_TEXTUREMIXING_NORMAL:
-                myApplyMode = y60::TEXTURE_APPLY_MODULATE;
+                myApplyMode = y60::MODULATE;
                 break;
             case MATERIAL_TEXTUREMIXING_MULTIPLY:
                 GePrint(myMaterialName + ": Texture mixmode MULTIPLY not implemented; using MODULATE");
-                myApplyMode = y60::TEXTURE_APPLY_MODULATE;
+                myApplyMode = y60::MODULATE;
                 myDiffuseColorFlag = true;
                 break;
             case MATERIAL_TEXTUREMIXING_ADD:
-                myApplyMode = y60::TEXTURE_APPLY_ADD;
+                myApplyMode = y60::ADD;
                 break;
             case MATERIAL_TEXTUREMIXING_SUBTRACT:
                 GePrint(myMaterialName + ": Texture mixmode SUBTRACT not implemented; using DECAL");
@@ -159,12 +161,16 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
             myImageId = theMaterialBuilder->createMovie(theSceneBuilder, getString(myTextureName), myTextureFilename,
 			                                            myLoopCount, myColorScale, myColorBias, myInternalFormat);
         } else {
-            bool myCreateMipmapFlag = (theUsage == TEXTURE_USAGE_PAINT);
+            bool myCreateMipmapFlag = (theUsage == PAINT);
+
+            // wrap mode
+            TextureWrapMode myWrapMode = REPEAT; // TODO: extract wrap mode
+
             myImageId = theMaterialBuilder->createImage(theSceneBuilder,
                                                         getString(myTextureName), myTextureFilename,
                                                         theUsage, myCreateMipmapFlag,
                                                         myColorScale, myColorBias,
-                                                        SINGLE, myInternalFormat);
+                                                        SINGLE, myWrapMode, myInternalFormat);
         }
     }
 
@@ -272,10 +278,8 @@ MaterialExporter::exportTexture(Material* theMaterial, y60::MaterialBuilderPtr t
         }
     }
 
-    // wrap mode
-    std::string myWrapMode = TEXTURE_WRAP_REPEAT; // TODO: extract wrap mode
 
-    theMaterialBuilder->createTextureNode(myImageId, myApplyMode, theUsage, myWrapMode,
+    theMaterialBuilder->createTextureNode(myImageId, myApplyMode, theUsage,
                                           myTextureMappingMode, myTextureMatrix, 100, false, 0.0);
     return myDiffuseColorFlag;
 }
@@ -323,7 +327,7 @@ MaterialExporter::exportShader(PluginShader * theShader,
                     BaseContainer *  myColorContainer = theColorContainer ? theColorContainer : theShader->GetDataInstance();
                     myDiffuseColorFlag |= exportTexture(theMaterial, theMaterialBuilder,
                                                         theSceneBuilder, myColorContainer,
-                                                        y60::TEXTURE_USAGE_PAINT, theTextureTag,
+                                                        y60::PAINT, theTextureTag,
                                                         theMinCoord, theMaxCoord,
                                                         isAlphaChannel, isEnvMap);
                 }
@@ -598,7 +602,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
 #if 1
                         GePrint("### " + myMaterial->GetName() + ": Bumpmap is not supported: " + myBumpMapName);
 #else
-                        exportTexture(myMaterial, _myMaterialBuilder, theSceneBuilder, &myContainer, y60::TEXTURE_USAGE_BUMP, myTextureTag, theMinCoord, theMaxCoord, false);
+                        exportTexture(myMaterial, _myMaterialBuilder, theSceneBuilder, &myContainer, y60::BUMP, myTextureTag, theMinCoord, theMaxCoord, false);
                         _myMaterialBuilder->needTextureFallback(true);
 #endif
                     }
@@ -615,7 +619,7 @@ MaterialExporter::writeMaterial(const ExportedMaterialInfo & theMaterialInfo, Ba
                     if (myTextureName.GetLength() ) {
                         exportTexture(myMaterial,
                                       _myMaterialBuilder, theSceneBuilder,
-                                      &myContainer, y60::TEXTURE_USAGE_PAINT,
+                                      &myContainer, y60::PAINT,
                                       myTextureTag, theMinCoord, theMaxCoord, false, true);
                     }
                 }

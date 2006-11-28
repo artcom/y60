@@ -22,6 +22,7 @@
 #include <y60/NodeValueNames.h>
 #include <y60/PropertyNames.h>
 #include <y60/property_functions.h>
+#include <y60/Image.h>
 
 #include <asl/file_functions.h>
 #include <asl/string_functions.h>
@@ -103,7 +104,7 @@ void
 MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextureNode,
                                     y60::MaterialBuilder & theBuilder,
                                     y60::SceneBuilder & theSceneBuilder,
-                                    const std::string & theUsageMode,
+                                    const TextureUsage & theUsageMode,
                                     const MayaBlendMode theBlendMode,
                                     float theColorGainAlpha)
 {
@@ -162,32 +163,26 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
     bool myCreateMipmapsFlag = true;
     getCustomAttribute(theTextureNode, "ac_mipmaps", myCreateMipmapsFlag);
 
-    std::string myApplyMode = y60::TEXTURE_APPLY_MODULATE;
+    TextureApplyMode myApplyMode = y60::MODULATE;
     switch (theBlendMode) {
         case MAYA_BLEND_NONE:
-            myApplyMode = y60::TEXTURE_APPLY_REPLACE;
+            myApplyMode = y60::REPLACE;
             break;
         case MAYA_BLEND_OVER:
-            myApplyMode = y60::TEXTURE_APPLY_DECAL;
+            myApplyMode = y60::DECAL;
             break;
         case MAYA_BLEND_MULTIPLY:
-            myApplyMode = y60::TEXTURE_APPLY_MODULATE;
+            myApplyMode = y60::MODULATE;
             break;
         case MAYA_BLEND_ADD:
-            myApplyMode = y60::TEXTURE_APPLY_ADD;
+            myApplyMode = y60::ADD;
             break;
         default:
             displayWarning(string("Blendmode: ") + getStringFromEnum(theBlendMode, MayaBlendModesString) + " not yet implemented.");
     }
 
-    //AC_DEBUG << "stripped filename=" << myStrippedFileName << " Scale=" << myColorScale << ", Bias=" << myColorOffset;
-    string myImageId = theBuilder.createImage(theSceneBuilder,
-        MFnDependencyNode(theTextureNode).name().asChar(),
-        myStrippedFileName, theUsageMode, myCreateMipmapsFlag,
-        myColorScale, myColorOffset, SINGLE,"");
-
     // wrap
-    std::string myWrapMode  = y60::TEXTURE_WRAP_REPEAT;
+    TextureWrapMode myWrapMode  = y60::REPEAT;
     bool myWrapU = false;
     MPlug myWarpUPlug = MFnDependencyNode(myImageNode).findPlug("wrapU");
     if (myWarpUPlug.getValue(myWrapU) != MStatus::kSuccess) {
@@ -200,8 +195,15 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         AC_WARNING << "No wrapV";
     }
     if (!myWrapU && !myWrapV) {
-        myWrapMode = TEXTURE_WRAP_CLAMP;
+        myWrapMode = CLAMP;
     }
+
+    //AC_DEBUG << "stripped filename=" << myStrippedFileName << " Scale=" << myColorScale << ", Bias=" << myColorOffset;
+    string myImageId = theBuilder.createImage(theSceneBuilder,
+        MFnDependencyNode(theTextureNode).name().asChar(),
+        myStrippedFileName, theUsageMode, myCreateMipmapsFlag,
+        myColorScale, myColorOffset, SINGLE, myWrapMode, "");
+
 
     // texture matrix
     asl::Matrix4f myTextureMatrix;
@@ -351,7 +353,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         myTextureMatrix.makeScaling(asl::Vector3f(float(myRepeatU), float(myRepeatV), 1));
     }
 
-    theBuilder.createTextureNode(myImageId, myApplyMode, theUsageMode, myWrapMode,
+    theBuilder.createTextureNode(myImageId, myApplyMode, theUsageMode,
             myTextureMapping, myTextureMatrix, 100, false, 50);
 }
 
@@ -397,16 +399,16 @@ MaterialExporter::exportBumpTexture(const MObject & theBumpNode,
 
     std::string myFileName = getStrippedTextureFilename(myBumpPlug);
 
-    std::string myApplyMode = y60::TEXTURE_APPLY_DECAL;
-    std::string myUsage     = y60::TEXTURE_USAGE_BUMP;
-    std::string myWrapMode  = y60::TEXTURE_WRAP_REPEAT;
+    TextureApplyMode myApplyMode = y60::DECAL;
+    TextureUsage myUsage         = y60::BUMP;
+    TextureWrapMode myWrapMode   = y60::REPEAT;
 
     string myImageId = theBuilder.createImage(theSceneBuilder,
         MFnDependencyNode(theBumpNode).name().asChar(),
         myFileName, myUsage, false, asl::Vector4f(1.0f,1.0f,1.0f,1.0f),
-        asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE, "");
+        asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE, myWrapMode, "");
 
-    theBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode, TEXCOORD_UV_MAP, asl::Matrix4f::Identity(), 100, false, 0);
+    theBuilder.createTextureNode(myImageId, myApplyMode, myUsage, TEXCOORD_UV_MAP, asl::Matrix4f::Identity(), 100, false, 0);
     theBuilder.needTextureFallback(true);
     std::string myMaterialName = theBuilder.getName();
     std::string myTextureName(MFnDependencyNode(theBumpNode).name().asChar());
@@ -418,7 +420,7 @@ MaterialExporter::exportEnvCubeTexture(const MObject & theShaderNode,
                                        const MObject & theEnvCubeNode,
                                        y60::MaterialBuilder & theBuilder,
                                        y60::SceneBuilder & theSceneBuilder,
-                                       const std::string & theUsageMode)
+                                       const TextureUsage & theUsageMode)
 {
     AC_DEBUG << "MaterialExporter::exportEnvCubeTexture(" << MFnDependencyNode(theShaderNode).name().asChar() << ", usage=" << theUsageMode << ")";
 
@@ -429,7 +431,7 @@ MaterialExporter::exportEnvCubeTexture(const MObject & theShaderNode,
     std::string topFileName    = getStrippedTextureFilename(getPlug(theEnvCubeNode,"top"));
     std::string bottomFileName = getStrippedTextureFilename(getPlug(theEnvCubeNode,"bottom"));
 
-    std::string myApplyMode = y60::TEXTURE_APPLY_MODULATE;
+    TextureApplyMode myApplyMode = y60::MODULATE;
     theBuilder.appendCubemap(theSceneBuilder,
             MFnDependencyNode(theEnvCubeNode).name().asChar(),
             theUsageMode,
@@ -509,7 +511,7 @@ MaterialExporter::exportLayeredTexture(const MFnMesh * theMesh,
 
         exportFileTexture(theMesh, myTextureNode,
                 theBuilder, theSceneBuilder,
-                y60::TEXTURE_USAGE_PAINT, myBlendMode,
+                y60::PAINT, myBlendMode,
                 theColorGainAlpha);
         y60::setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", theColorGainPropertyName.c_str(), asl::Vector4f(1,1,1,1));
     }
@@ -520,7 +522,7 @@ MaterialExporter::exportTextures(const MFnMesh * theMesh, const MObject & theSha
                                  y60::MaterialBuilder & theBuilder,
                                  y60::SceneBuilder & theSceneBuilder,
                                  const std::string & thePlugName,
-                                 const std::string & theUsageMode,
+                                 const TextureUsage & theUsageMode,
                                  const std::string & theColorGainPropertyName,
                                  float theColorGainAlpha)
 {
@@ -542,7 +544,7 @@ MaterialExporter::exportBumpMaps(const MFnMesh * theMesh, const MObject & theSha
     try {
         return exportMaps(theMesh,
             theShaderNode,theBuilder, theSceneBuilder, "normalCamera",
-            y60::TEXTURE_USAGE_PAINT, y60::DIFFUSE_PROPERTY, theColorGainAlpha);
+            y60::PAINT, y60::DIFFUSE_PROPERTY, theColorGainAlpha);
     } catch (const ExportException & ex) {
         displayError((std::string("Can not export Texture: ") + ex.what() + " at " + ex.where()));
         return false;
@@ -555,7 +557,7 @@ MaterialExporter::exportMaps(const MFnMesh * theMesh, const MObject & theShaderN
                              y60::MaterialBuilder & theBuilder,
                              y60::SceneBuilder & theSceneBuilder,
                              const char * thePlugName,
-                             const std::string & theUsageMode,
+                             const TextureUsage & theUsageMode,
                              const std::string & theColorGainPropertyName,
                              float theColorGainAlpha)
 {
@@ -643,7 +645,7 @@ MaterialExporter::exportUnlitFeatures(const MFnMesh * theMesh, const MObject & t
         myTransparencyPlug.getValue(myColorGainAlpha);
         myColorGainAlpha = 1.0f - myColorGainAlpha;
         if (!exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "outColor",
-                            y60::TEXTURE_USAGE_PAINT, y60::SURFACE_COLOR_PROPERTY, myColorGainAlpha)) {
+                            y60::PAINT, y60::SURFACE_COLOR_PROPERTY, myColorGainAlpha)) {
             DB(dumpAttributes(theShaderNode));
             float r, g, b;
             MPlug myColorPlug = MFnDependencyNode(theShaderNode).findPlug("outColorR");
@@ -692,7 +694,7 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     // texture
     try {
         if (exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "color",
-                           y60::TEXTURE_USAGE_PAINT, y60::DIFFUSE_PROPERTY, myAlpha)) {
+                           y60::PAINT, y60::DIFFUSE_PROPERTY, myAlpha)) {
             // assume color=[1,1,1,1] when using texture
             myColor = MColor(1.0f, 1.0f, 1.0f, 1.0f);
         }
@@ -730,7 +732,7 @@ MaterialExporter::exportReflectiveFeatures(const MFnMesh * theMesh, const MObjec
 
     MStatus myStatus;
     if (!exportTextures(theMesh, theShaderNode, theBuilder, theSceneBuilder, "reflectedColor",
-                        y60::TEXTURE_USAGE_PAINT, y60::DIFFUSE_PROPERTY, 1.0)) {
+                        y60::PAINT, y60::DIFFUSE_PROPERTY, 1.0)) {
         MColor mySpecularColor = myReflectShader.specularColor(& myStatus);
         if (myStatus == MStatus::kSuccess) {
             setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", y60::SPECULAR_PROPERTY,
@@ -751,7 +753,7 @@ MaterialExporter::exportIncandescenceFeatures(const MFnMesh *, const MObject & t
 {
     AC_DEBUG << "MaterialExporter::exportIncandescenceFeatures(" << MFnDependencyNode(theShaderNode).name().asChar() << ")";
     if (!exportTextures(0, theShaderNode, theBuilder, theSceneBuilder, "incandescence",
-                y60::TEXTURE_USAGE_EMISSIVE, y60::DIFFUSE_PROPERTY, 1.0)) {
+                y60::EMISSIVE, y60::DIFFUSE_PROPERTY, 1.0)) {
 
         /*
         MStatus myStatus;
@@ -831,6 +833,8 @@ MaterialExporter::createMaterial(const MFnMesh * theMesh, const MObject & theSha
 {
     std::string myMaterialName(MFnDependencyNode(theShaderNode).name().asChar());
     y60::MaterialBuilder myMaterialBuilder(myMaterialName, _myInlineTexturesFlag);
+    Image::allowInlineFlag = _myInlineTexturesFlag;
+
     std::string myMaterialId = theSceneBuilder.appendMaterial(myMaterialBuilder);
 
     DB(AC_TRACE << "MaterialExporter::createMaterial() - Exporting material: " << theShaderNode.apiTypeStr()

@@ -75,6 +75,8 @@ namespace y60 {
                 throw TextureException(std::string("Unknown texture type '")+
                         theImage->get<NameTag>() + "'", PLUS_FILE_LINE);
         }
+
+        setupTextureParams(theImage);
         glPopAttrib();
         CHECK_OGL_ERROR;
         return myId;
@@ -422,6 +424,44 @@ namespace y60 {
         }
     }
 
+    void 
+    GLResourceManager::setupTextureParams(ImagePtr theImage) {
+        bool hasMipMaps = theImage->get<ImageMipmapTag>();
+        GLenum myTextureType = 0;
+        switch (theImage->getType()) {
+        case SINGLE:
+            myTextureType = theImage->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
+            break;
+        case CUBEMAP:
+            myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
+            break;
+        default:
+            throw TextureException(string("Invalid image type in '") + theImage->get<NameTag>() + "'", PLUS_FILE_LINE);
+            break;
+        }
+
+
+        glTexParameteri(myTextureType, GL_TEXTURE_WRAP_S,
+                asGLTextureWrapmode(theImage->getWrapMode()));
+        CHECK_OGL_ERROR;
+        glTexParameteri(myTextureType, GL_TEXTURE_WRAP_T,
+                asGLTextureWrapmode(theImage->getWrapMode()));
+        CHECK_OGL_ERROR;
+        if (myTextureType == GL_TEXTURE_3D) {
+            glTexParameteri(myTextureType, GL_TEXTURE_WRAP_R,
+                    asGLTextureWrapmode(theImage->getWrapMode()));
+            CHECK_OGL_ERROR;
+        }
+
+        glTexParameteri(myTextureType, GL_TEXTURE_MAG_FILTER,
+                asGLTextureSampleFilter(theImage->getMagFilter(), false));
+        CHECK_OGL_ERROR;
+        // only minification can use mipmaps
+        glTexParameteri(myTextureType, GL_TEXTURE_MIN_FILTER,
+                asGLTextureSampleFilter(theImage->getMinFilter(), hasMipMaps));
+        CHECK_OGL_ERROR;
+
+    }
     /*
      * Cubemap texture
      */

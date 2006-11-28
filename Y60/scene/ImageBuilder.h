@@ -43,6 +43,8 @@ namespace y60 {
             void setColorBias(asl::Vector4f theColorBias);
             void setTiling(asl::Vector2i theTiling);
             void setDepth(unsigned int theDepth);
+            void setWrapMode(TextureWrapMode theWrapMode);
+
             const std::string & getName() const;
 			void setInternalFormat(const std::string & theType);
 

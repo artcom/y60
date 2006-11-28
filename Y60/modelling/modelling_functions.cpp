@@ -470,18 +470,18 @@ namespace y60 {
                   unsigned theDepth)
     {
         // Texture code
-        string myTexName           = theMaterialBuilder.getName() + "_tex";
-        string myApplyMode         = TEXTURE_APPLY_MODULATE;
-        string myUsage             = TEXTURE_USAGE_PAINT;
-        string myWrapMode          = TEXTURE_WRAP_CLAMP;
-        string myUVMappingMode     = TEXCOORD_UV_MAP;
-        float myRanking            = 100.0f;
-        bool myIsFallback          = true;
-        float myFallbackRanking    = 100.0f;
-        bool myCreateMipmapFlag    = true;
-        asl::Vector4f myColorScale = asl::Vector4f(1.0f,1.0f,1.0f,1.0f);
-        asl::Vector4f myColorBias  = asl::Vector4f(0.0f,0.0f,0.0f,0.0f);
-        bool  mySpriteFlag         = theSpriteFlag;
+        string myTexName             = theMaterialBuilder.getName() + "_tex";
+        TextureApplyMode myApplyMode = MODULATE;
+        TextureUsage myUsage         = PAINT;
+        TextureWrapMode myWrapMode   = CLAMP;
+        string myUVMappingMode       = TEXCOORD_UV_MAP;
+        float myRanking              = 100.0f;
+        bool myIsFallback            = true;
+        float myFallbackRanking      = 100.0f;
+        bool myCreateMipmapFlag      = true;
+        asl::Vector4f myColorScale   = asl::Vector4f(1.0f,1.0f,1.0f,1.0f);
+        asl::Vector4f myColorBias    = asl::Vector4f(0.0f,0.0f,0.0f,0.0f);
+        bool  mySpriteFlag           = theSpriteFlag;
 
         string myImageId;
         if (theMaterialBuilder.isMovie(theTextureFilename)) {
@@ -494,10 +494,11 @@ namespace y60 {
             myImageId = theMaterialBuilder.createImage(*(theScene->getSceneBuilder()), myTexName,
                                                        theTextureFilename, myUsage,
                                                        myCreateMipmapFlag, myColorScale,
-                                                       myColorBias, SINGLE, "", IMAGE_RESIZE_PAD, theDepth, false);
+                                                       myColorBias, SINGLE, myWrapMode, 
+                                                       "", IMAGE_RESIZE_PAD, theDepth, false);
         }
 
-        theMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode, myUVMappingMode,
+        theMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myUVMappingMode,
                                              Matrix4f::Identity(), myRanking, myIsFallback,
                                              myFallbackRanking, mySpriteFlag);
     }
@@ -596,17 +597,16 @@ namespace y60 {
         appendBlendFunction(myMaterialBuilder);
 
         // Texture code
-        string myApplyMode         = TEXTURE_APPLY_MODULATE;
-        string myUsage             = TEXTURE_USAGE_PAINT;
-        string myWrapMode          = TEXTURE_WRAP_CLAMP;
-        string myUVMappingMode     = TEXCOORD_UV_MAP;
-        float myRanking            = 100.0f;
-        bool myIsFallback          = true;
-        float myFallbackRanking    = 100.0f;
-        bool  mySpriteFlag         = theSpriteFlag;
+        TextureApplyMode myApplyMode  = MODULATE;
+        TextureUsage myUsage          = PAINT;
+        string myUVMappingMode        = TEXCOORD_UV_MAP;
+        float myRanking               = 100.0f;
+        bool myIsFallback             = true;
+        float myFallbackRanking       = 100.0f;
+        bool  mySpriteFlag            = theSpriteFlag;
 
         string myImageId = theImageNode->getAttributeString(ID_ATTRIB);
-        myMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myWrapMode, myUVMappingMode,
+        myMaterialBuilder.createTextureNode(myImageId, myApplyMode, myUsage, myUVMappingMode,
                                              Matrix4f::Identity(), myRanking, myIsFallback,
                                              myFallbackRanking, mySpriteFlag);
 

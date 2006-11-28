@@ -38,12 +38,14 @@ class ShaderFeatureSet {
         ShaderFeatureSet();
         virtual ~ShaderFeatureSet();
         const VectorOfString * getFeatures(const std::string & theFeatureClass) const;
+        const VectorOfTextureUsage & getTextureFeature() const;
         bool hasFeature(const std::string & theFeatureClass) const;
         void load(const dom::NodePtr theNode);
         unsigned getFeatureCount() const;
         
     private:
         FeatureMap _myFeatureMap;
+        VectorOfTextureUsage _myTextureFeature;
 };
 
 } // namespace y60

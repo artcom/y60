@@ -58,6 +58,11 @@ ShaderFeatureSet::getFeatures(const string & theFeatureClass) const {
     }
 }
 
+const VectorOfTextureUsage & 
+ShaderFeatureSet::getTextureFeature() const {
+    return _myTextureFeature;
+}
+
 void
 ShaderFeatureSet::load(const dom::NodePtr theNode) {
     string myNodeName = theNode->nodeName();
@@ -66,6 +71,14 @@ ShaderFeatureSet::load(const dom::NodePtr theNode) {
             dom::NodePtr myFeatureNode = theNode->childNode("feature", i);
             string myFeatureClass = myFeatureNode->getAttributeString("class");
             VectorOfString myFeatures = myFeatureNode->getAttributeValue<VectorOfString>("values");
+            if (myFeatureClass == TEXTURE_LIST_NAME) {
+                _myTextureFeature.clear();
+                for (int i = 0; i< myFeatures.size(); i++) {
+                    TextureUsage myUsage;
+                    myUsage.fromString(myFeatures[i]);
+                    _myTextureFeature.push_back(myUsage);
+                }
+            }
             _myFeatureMap[myFeatureClass] = myFeatures;
         }
     } else {

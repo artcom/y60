@@ -58,8 +58,7 @@ function buildBillboardNode(theBodyName, theShapeId, theType) {
 // build a <material> node
 function buildMaterialNode(theMaterialName,
                            theDiffuseColor, theAmbientColor,
-                           theTextureFeatures, theLightingFeatures,
-                           theWrapmode)
+                           theTextureFeatures, theLightingFeatures,)
 {
     var myMaterialNode = Node.createElement('material');
     myMaterialNode.id = createUniqueId(); //"m" + theMaterialName;
@@ -86,13 +85,9 @@ function buildMaterialNode(theMaterialName,
         myMaterialNode.requires.appendChild(myTextureFeatures);
         myMaterialNode.requires.textures = theTextureFeatures;
 
-        if (theWrapmode == undefined) {
-            theWrapMode = "repeat";
-        }
-
         var myTexturesString =
             '<textures>\n' +
-            '    <texture image="i' + theName + '" wrapmode="' + theWrapMode + '" applymode="modulate"/>\n' +
+            '    <texture image="i' + theName + '" applymode="modulate"/>\n' +
             '</textures>';
         var myTexturesDoc = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
@@ -102,7 +97,7 @@ function buildMaterialNode(theMaterialName,
     return myMaterialNode;
 }
 
-function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
+function buildUnlitTextureMaterialNode(theName, theImageId) {
     var myImageArrayFlag = theImageId instanceof Array;
     var myImageIds = [];
     if (!myImageArrayFlag) {
@@ -111,10 +106,6 @@ function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
         myImageIds = theImageId ;
     }
 
-    var myWrapMode = "repeat";
-    if (theWrapMode != undefined) {
-        myWrapMode = theWrapMode;
-    }
 
     var myMaterialNode = Node.createElement('material');
     myMaterialNode.id = createUniqueId(); //"m" + theName;
@@ -137,7 +128,7 @@ function buildUnlitTextureMaterialNode(theName, theImageId, theWrapMode) {
         }
 
         // add textures
-        myTexturesString += '    <texture image="' + myImageId  + '" wrapmode="' + myWrapMode + '" applymode="modulate"/>\n';
+        myTexturesString += '    <texture image="' + myImageId  + '" applymode="modulate"/>\n';
 
         // add requirements
         if (myImageIndex > 0) {

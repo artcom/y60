@@ -470,7 +470,29 @@ Currently the following usage flags are supported:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
-
+    <xs:simpleType name="TextureApplyMode">
+        <xs:annotation>
+             <xs:documentation>Texture apply mode.
+'modulate','decal','replace','blend','add'</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    
+    <xs:simpleType name="TextureSampleFilter">
+        <xs:annotation>
+             <xs:documentation>Texture sample filter.
+'nearest','linear'</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+    
+    <xs:simpleType name="TextureWrapMode">
+        <xs:annotation>
+             <xs:documentation>Texture wrap mode.
+'clamp','clamp_to_edge','repeat'</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
     <xs:element name="rasterofrgb">
         <xs:annotation>
             <xs:documentation>This element contains a image data as text child.
@@ -2428,7 +2450,7 @@ and contains the reference to an image node.</xs:documentation>
                     <xs:documentation>Id of the image node referenced by this texture</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="applymode" type="xs:string">
+            <xs:attribute name="applymode" type="TextureApplyMode">
                 <xs:annotation>
                     <xs:documentation>Defines how the texture is applied (blended) with the texture or color below
 
@@ -2438,35 +2460,6 @@ Possible values are (see also OpenGL documentation on GL_TEXTURE_ENV_MODE):
 'replace'    - Color and alpha values are replaced
 'blend'      - Color values are blended, alpha values are multiplied
 'add'        - Color and alpha values are added</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="wrapmode" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>The wrapmode of the texture. That is how the texture will be continued,
-after the edge (for texture coordinates greater one or less than zero).
-
-Possible values are:
-'repeat'         - The texture is repeated
-'clamp'          - The last pixel at the border of the texture is repeated
-'clamp_to_edge'  - The last pixel at the border, but not the border itself is repeated</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="min_filter" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>The interpolation filter used for minification.
-
-Possible values are:
-'linear' (default) - bilinear interpolation (trilinear when mipmaps are used)
-'nearest'          - nearest neighbor</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="mag_filter" type="xs:string">
-                <xs:annotation>
-                    <xs:documentation>The interpolation filter used for magnification.
-
-Possible values are:
-'linear' (default) - bilinear interpolation
-'nearest'          - nearest neighbor</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
             <xs:attribute name="sprite" type="xs:boolean">
@@ -2602,6 +2595,36 @@ If the image is not inlined, it will be loaded from this file.</xs:documentation
                 <xs:documentation>Number of layers in the image (for 3D-textures)</xs:documentation>
             </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="wrapmode" type="TextureWrapMode">
+            <xs:annotation>
+                <xs:documentation>The wrapmode of the texture. That is how the texture will be continued,
+after the edge (for texture coordinates greater one or less than zero).
+
+Possible values are:
+'repeat'         - The texture is repeated
+'clamp'          - The last pixel at the border of the texture is repeated
+'clamp_to_edge'  - The last pixel at the border, but not the border itself is repeated</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="min_filter" type="TextureSampleFilter">
+            <xs:annotation>
+                <xs:documentation>The interpolation filter used for minification.
+
+Possible values are:
+'linear' (default) - bilinear interpolation (trilinear when mipmaps are used)
+'nearest'          - nearest neighbor</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="mag_filter" type="TextureSampleFilter">
+            <xs:annotation>
+                <xs:documentation>The interpolation filter used for magnification.
+
+Possible values are:
+'linear' (default) - bilinear interpolation
+'nearest'          - nearest neighbor</xs:documentation>
+            </xs:annotation>
+            </xs:attribute>
+        
         <xs:attribute name="matrix" type="Matrix4f">
             <xs:annotation>
                 <xs:documentation>UV-coordiante matrix. This matrix will be multiplied with

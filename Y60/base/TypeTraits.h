@@ -30,7 +30,7 @@ namespace y60 {
     //
     //======================================================================
 
-    enum TypeId { BOOL,
+    enum TypeIdEnum { BOOL,
                   INT,
                   VECTOR2I,
                   VECTOR3I,
@@ -55,7 +55,12 @@ namespace y60 {
                   RENDER_STYLES,
                   TARGETBUFFERS,
                   BLENDFUNCTION,
-                  VECTOR_OF_BLENDFUNCTION
+                  VECTOR_OF_BLENDFUNCTION,
+                  TEXTURE_APPLYMODE,
+                  TEXTURE_SAMPLEFILTER,
+                  TEXTURE_WRAPMODE,
+                  TypeIdEnum_MAX
+
     }; // TODO: move me up when file format compatibility isn't an issue
 
     static const char * TypeIdStrings[] =
@@ -86,8 +91,12 @@ namespace y60 {
         "targetbuffers",
         "blendfunction",
         "vectorofblendfunction",
-        0
+        "textureapplymode",
+        "texturesamplefilter",
+        "texturewrapmode",
+        ""
     };
+    DEFINE_ENUM(TypeId, TypeIdEnum);   
 
     template <class T> struct NO_SUCH_SPECIALIZATION;
 
@@ -169,6 +178,26 @@ namespace y60 {
             return BLENDFUNCTION;
         }
     };
+
+    template <>
+    struct TypeIdTraits<TextureApplyMode> {
+        static const TypeId type_id() {
+            return TEXTURE_APPLYMODE;
+        }
+    };
+    template <>
+    struct TypeIdTraits<TextureSampleFilter> {
+        static const TypeId type_id() {
+            return TEXTURE_SAMPLEFILTER;
+        }
+    };
+    template <>
+    struct TypeIdTraits<TextureWrapMode> {
+        static const TypeId type_id() {
+            return TEXTURE_WRAPMODE;
+        }
+    };
+
 
     template <>
     struct TypeIdTraits<VectorOfBlendFunction> {

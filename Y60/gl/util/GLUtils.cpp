@@ -193,7 +193,7 @@ namespace y60 {
         }
         return myTexSampleFilter;
     }
-
+    
     GLenum
     asGLTextureFunc(TextureApplyMode theApplyMode) {
         switch(theApplyMode) {

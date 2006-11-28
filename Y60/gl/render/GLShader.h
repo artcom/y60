@@ -47,6 +47,7 @@ namespace y60 {
             virtual const dom::NodePtr getPropertyNode(unsigned theIndex);
             virtual const dom::NodePtr getDefaultTextures();
             virtual const VectorOfString * getFeatures(const std::string & theFeatureClass) const;
+            const VectorOfTextureUsage & getTextureFeature() const;
             virtual bool hasFeature(const std::string & theFeatureClass) const;
 
             virtual void activateGroup1(MaterialBase & theMaterial, const Viewport & theViewport);

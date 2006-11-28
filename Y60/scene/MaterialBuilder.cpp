@@ -45,6 +45,7 @@ namespace y60 {
         (*myNode)(PROPERTY_LIST_NAME);
         (*myNode)(TEXTURE_LIST_NAME);
         (*myNode)(REQUIRES_LIST_NAME);
+
     }
 
     MaterialBuilder::~MaterialBuilder() {
@@ -148,9 +149,8 @@ namespace y60 {
 
     dom::NodePtr
     MaterialBuilder::createTextureNode(const std::string & theImageId,
-                                       const std::string & theApplyMode,
-                                       const std::string & theUsage,
-                                       const std::string & theWrapMode,
+                                       const TextureApplyMode & theApplyMode,
+                                       const TextureUsage & theUsage,
                                        const std::string & theMappingMode,
                                        const asl::Matrix4f & theTextureMatrix,
                                        float theRanking,
@@ -162,7 +162,7 @@ namespace y60 {
 
         dom::NodePtr myTextureNode = dom::NodePtr(new dom::Element(TEXTURE_NODE_NAME));
         myTextureListNode->appendChild(myTextureNode);
-#if 1
+#if 0
         myTextureNode->appendAttribute(TEXTURE_IMAGE_ATTRIB, theImageId);
 
         if (!theApplyMode.empty()) {
@@ -177,8 +177,7 @@ namespace y60 {
         TexturePtr myTexture = myTextureNode->getFacade<Texture>();
         myTexture->set<TextureImageIdTag>(theImageId);
         myTexture->set<TextureApplyModeTag>(theApplyMode);
-        myTexture->set<TextureWrapModeTag>(theWrapMode);
-        myTexture->set<TextureSpriteTag>(asl::as_string(theSpriteFlag));
+        myTexture->set<TextureSpriteTag>(theSpriteFlag);
         myTexture->set<TextureMatrixTag>(theTextureMatrix);
 #endif
         if (_myTextureRequirements.empty()) {
@@ -197,14 +196,14 @@ namespace y60 {
                 _myMappingRequirements.push_back(myFirstMappingSet);
 
             }
-            _myTextureRequirements[1]._myFeature.push_back(theUsage);
+            _myTextureRequirements[1]._myFeature.push_back(theUsage.asString());
             _myTextureRequirements[1]._myRanking = theFallbackRanking;
 
             _myMappingRequirements[1]._myFeature.push_back(theMappingMode);
             _myMappingRequirements[1]._myRanking = theFallbackRanking;
         }
 
-        _myTextureRequirements[0]._myFeature.push_back(theUsage);
+        _myTextureRequirements[0]._myFeature.push_back(theUsage.asString());
         _myTextureRequirements[0]._myRanking = theRanking;
 
         _myMappingRequirements[0]._myFeature.push_back(theMappingMode);
@@ -217,11 +216,12 @@ namespace y60 {
     MaterialBuilder::createImage(SceneBuilder & theSceneBuilder,
                                  const std::string & theName,
                                  const std::string & theFileName,
-                                 const std::string & theUsage,
+                                 const TextureUsage & theUsage,
                                  bool  theCreateMipmapsFlag,
                                  asl::Vector4f theColorScale,
                                  asl::Vector4f theColorBias,
                                  ImageType theType,
+                                 const TextureWrapMode & theWrapMode,
                                  const std::string & theInternalFormat,
                                  const std::string & theResizeMode,
                                  unsigned theDepth,
@@ -248,13 +248,13 @@ namespace y60 {
             myImageBuilder.setColorBias(theColorBias);
             myImageBuilder.setType(theType);
             myImageBuilder.setDepth(theDepth);
+            myImageBuilder.setWrapMode(theWrapMode);
 
             if (theType == CUBEMAP) {
                 myImageBuilder.setTiling(Vector2i(1,6));
             }
 
-            TextureUsage myUsage = TextureUsage(getEnumFromString(theUsage, TextureUsageStrings));
-            ImageFilter myFilter = lookupFilter(myUsage);
+            ImageFilter myFilter = lookupFilter(theUsage);
 
             if (_myInlineTextureFlag || myFilter != NO_FILTER) {
                 myImageBuilder.inlineImage(myFileName, myFilter, theResizeMode);
@@ -266,6 +266,7 @@ namespace y60 {
             return myId;
         }
     }
+
 
     const std::string &
     MaterialBuilder::createMovie(SceneBuilder & theSceneBuilder,
@@ -316,14 +317,14 @@ namespace y60 {
     void
     MaterialBuilder::appendCubemap(SceneBuilder & theSceneBuilder,
                                    const std::string & theName,
-                                   const std::string & theUsage,
+                                   const TextureUsage & theUsage,
                                    const std::string & theFrontFileName,
                                    const std::string & theRightFileName,
                                    const std::string & theBackFileName,
                                    const std::string & theLeftFileName,
                                    const std::string & theTopFileName,
                                    const std::string & theBottomFileName,
-                                   const std::string & theApplyMode,
+                                   const TextureApplyMode & theApplyMode,
                                    const asl::Vector4f theColorScale)
     {
         checkState();
@@ -334,9 +335,9 @@ namespace y60 {
         const string & myId = createImage(theSceneBuilder, theName, myFileName,
                 theUsage, false,
                 theColorScale, asl::Vector4f(0.0f,0.0f,0.0f,0.0f),
-                CUBEMAP, "");
+                CUBEMAP, CLAMP, "");
         createTextureNode(myId, theApplyMode, theUsage,
-                TEXTURE_WRAP_CLAMP, TEXCOORD_REFLECTIVE,
+                TEXCOORD_REFLECTIVE,
                 Matrix4f::Identity(), 10.0f, false, 0.0f, false);
     }
 

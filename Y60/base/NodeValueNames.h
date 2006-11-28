@@ -62,12 +62,13 @@ namespace y60 {
     static const char * TEXTURE_APPLY_BLEND      = "blend";
     static const char * TEXTURE_APPLY_ADD        = "add";
 
-    enum TextureApplyMode {
+    enum TextureApplyModeEnum {
         MODULATE,
         DECAL,
         REPLACE,
         BLEND,
-        ADD
+        ADD,
+        TextureApplyModeEnum_MAX
     };
 
     static const char * TextureApplyModeStrings[] = {
@@ -76,40 +77,46 @@ namespace y60 {
         TEXTURE_APPLY_REPLACE,
         TEXTURE_APPLY_BLEND,
         TEXTURE_APPLY_ADD,
-        0
+        ""
     };
+    DEFINE_ENUM(TextureApplyMode, TextureApplyModeEnum);
 
     //=== Texture magnification filters =====================================================
     static const char * TEXTURE_SAMPLE_FILTER_NEAREST       = "nearest";
     static const char * TEXTURE_SAMPLE_FILTER_LINEAR        = "linear";
 
-    enum TextureSampleFilter {
+    enum TextureSampleFilterEnum {
         NEAREST,
-        LINEAR
+        LINEAR,
+        TextureSampleFilterEnum_MAX
     };
+    
 
     static const char * TextureSampleFilterStrings[] = {
         TEXTURE_SAMPLE_FILTER_NEAREST,
         TEXTURE_SAMPLE_FILTER_LINEAR,
-        0
+        ""
     };
+    DEFINE_ENUM(TextureSampleFilter, TextureSampleFilterEnum);
     //=== Texture repeat modes =====================================================
     static const char * TEXTURE_WRAP_CLAMP           = "clamp";
     static const char * TEXTURE_WRAP_CLAMP_TO_EDGE   = "clamp_to_edge";
     static const char * TEXTURE_WRAP_REPEAT          = "repeat";
 
-    enum TextureWrapMode {
+    enum TextureWrapModeEnum {
         CLAMP,
         CLAMP_TO_EDGE,
-        REPEAT
+        REPEAT,
+        TextureWrapModeEnum_MAX
     };
 
     static const char * TextureWrapModeStrings[] = {
         TEXTURE_WRAP_CLAMP,
         TEXTURE_WRAP_CLAMP_TO_EDGE,
         TEXTURE_WRAP_REPEAT,
-        0
+        ""
     };
+    DEFINE_ENUM(TextureWrapMode, TextureWrapModeEnum);
 
     //=== Texture Internal Formats ============================================
     static const char * TEXTURE_INTERNAL_FORMAT_DEPTH               = "DEPTH";
@@ -334,31 +341,52 @@ namespace y60 {
 
     //=== Texture usage =====================================================
     static const char * TEXTURE_USAGE_PAINT        = "paint";
+    static const char * TEXTURE_USAGE_HDR_PAINT    = "hdr_paint";
     static const char * TEXTURE_USAGE_BUMP         = "bump";
     static const char * TEXTURE_USAGE_SKYBOX       = "skybox";
     static const char * TEXTURE_USAGE_ENVIRONMENT  = "environment";
     static const char * TEXTURE_USAGE_DISPLACEMENT = "displacement";
     static const char * TEXTURE_USAGE_EMISSIVE     = "emissive";
+    static const char * TEXTURE_USAGE_GLOW         = "glow";
+    static const char * TEXTURE_USAGE_FLOW         = "flow";
+    static const char * TEXTURE_USAGE_SPLAT        = "splat";
+    static const char * TEXTURE_USAGE_BLUR         = "blur";
+    static const char * TEXTURE_USAGE_FADE         = "fade";
 
-    enum TextureUsage {
+    enum TextureUsageEnum {
         PAINT,
+        HDR_PAINT,
         BUMP,
         SKYBOX,
         ENVIRONMENT,
         DISPLACEMENT,
-        EMISSIVE
+        EMISSIVE,
+        GLOW,
+        FLOW,
+        SPLAT,
+        BLUR,
+        FADE,
+        TextureUsageEnum_MAX
     };
 
 
     static const char * TextureUsageStrings[] = {
         TEXTURE_USAGE_PAINT,
+        TEXTURE_USAGE_HDR_PAINT,
         TEXTURE_USAGE_BUMP,
         TEXTURE_USAGE_SKYBOX,
         TEXTURE_USAGE_ENVIRONMENT,
         TEXTURE_USAGE_DISPLACEMENT,
         TEXTURE_USAGE_EMISSIVE,
-        0
+        TEXTURE_USAGE_GLOW,
+        TEXTURE_USAGE_FLOW,
+        TEXTURE_USAGE_SPLAT,
+        TEXTURE_USAGE_BLUR,
+        TEXTURE_USAGE_FADE,
+        ""
     };
+    DEFINE_ENUM(TextureUsage, TextureUsageEnum);
+    typedef std::vector<TextureUsageEnum> VectorOfTextureUsage;
 
     //=== Image filter =====================================================
     static const char * IMAGE_FILTER_NONE                = "";

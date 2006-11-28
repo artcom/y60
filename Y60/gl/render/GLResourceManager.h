@@ -217,6 +217,11 @@ namespace y60 {
          */
         void setupPixelTransfer(ImagePtr theImage);
 
+        /**
+         * Sets up texture wrap and min, map filter
+         */
+        void setupTextureParams(ImagePtr theImage);
+
         unsigned long _myTextureMemUsage;
         ShaderLibraryPtr _myShaderLibrary;
     };

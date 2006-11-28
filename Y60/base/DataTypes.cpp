@@ -148,7 +148,12 @@ namespace y60 {
         theFactory.registerPrototype("RenderStyles", dom::ValuePtr(new dom::SimpleValue<y60::RenderStyles>(y60::RenderStyles(0),0)));
         theFactory.registerPrototype("TargetBuffers", dom::ValuePtr(new dom::SimpleValue<y60::TargetBuffers>(y60::TargetBuffers(0),0)));
         theFactory.registerPrototype("VertexBufferUsage", dom::ValuePtr(new dom::SimpleValue<y60::VertexBufferUsage>(y60::VertexBufferUsage(VERTEX_USAGE_STATIC_DRAW),0)));
+
+        theFactory.registerPrototype("TextureApplyMode", dom::ValuePtr(new dom::SimpleValue<y60::TextureApplyMode>(y60::TextureApplyMode(MODULATE),0)));
+        theFactory.registerPrototype("TextureSampleFilter", dom::ValuePtr(new dom::SimpleValue<y60::TextureSampleFilter>(y60::TextureSampleFilter(LINEAR),0)));
+        theFactory.registerPrototype("TextureWrapMode", dom::ValuePtr(new dom::SimpleValue<y60::TextureWrapMode>(y60::TextureWrapMode(REPEAT),0)));
     }
+
 
     void registerSomTypes(dom::ValueFactory & theFactory) {
         registerSomMathTypes(theFactory);

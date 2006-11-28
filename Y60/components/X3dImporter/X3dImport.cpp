@@ -551,12 +551,12 @@ namespace y60 {
 
         std::string myImageId =
             theMaterialBuilder.createImage(*_mySceneBuilder, myTextureName, myImageName,
-                                           y60::TEXTURE_USAGE_PAINT, false,
+                                           y60::PAINT, false,
                                            asl::Vector4f(1,1,1,1),
                                            asl::Vector4f(0,0,0,0),
-                                           y60::SINGLE, "");
+                                           y60::SINGLE, y60::CLAMP, "");
 
-        std::string myApplyMode = y60::TEXTURE_APPLY_MODULATE;
+        TextureApplyMode myApplyMode = y60::MODULATE;
 
         //X3D texture coords start at the BOTTOM left of the image
         asl::Matrix4f myTextureTransform;
@@ -565,7 +565,7 @@ namespace y60 {
         myTextureTransform.setScale(asl::Vector3f(1.0,-1.0,1.0));
 
         theMaterialBuilder.createTextureNode(myImageId, myApplyMode,
-                y60::TEXTURE_USAGE_PAINT, y60::TEXTURE_WRAP_CLAMP, y60::TEXCOORD_UV_MAP, myTextureTransform,
+                y60::PAINT, y60::TEXCOORD_UV_MAP, myTextureTransform,
                 100, false, 60);
     }
 

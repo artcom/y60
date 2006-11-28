@@ -12,7 +12,7 @@
 
 #include <dom/Nodes.h>
 #include "PlugHelper.h"
-#include "AttributePlug.h"
+//#include "AttributePlug.h"
 
 namespace dom {
 

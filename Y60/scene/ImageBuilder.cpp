@@ -75,12 +75,10 @@ namespace y60 {
     ImageBuilder::setImage(const std::string & theFileName, const std::string & theFilter, 
                            const std::string & theResizeMode) 
     {
-        // We do not create a facade, if it is not nessessary, because the facade always
-        // adds an raster on creation
-        dom::NodePtr myNode = getNode();
-        myNode->appendAttribute(IMAGE_SRC_ATTRIB, theFileName);
-        myNode->appendAttribute(IMAGE_FILTER_ATTRIB, theFilter);
-        myNode->appendAttribute(IMAGE_RESIZE_ATTRIB, theResizeMode);
+        getNode()->getFacade<Image>()->set<ImageSourceTag>(theFileName);
+        getNode()->getFacade<Image>()->set<ImageFilterTag>(theFilter);
+        getNode()->getFacade<Image>()->set<ImageResizeTag>(theResizeMode);
+
     }
 
     void
@@ -88,41 +86,55 @@ namespace y60 {
         MAKE_SCOPE_TIMER(ImageBuilder_inlineImage);
         setImage(theFileName, asl::getStringFromEnum(theFilter, ImageFilterStrings), theResizeMode);
 
-        // Accessing the facade will load the image
-        ImagePtr myImage = getNode()->getFacade<Image>();
+        getNode()->getFacade<Image>()->load();
     }
 
     void
     ImageBuilder::createFileReference(const std::string & theFileName, const std::string & theResizeMode) {
         setImage(theFileName, "", theResizeMode);
+        // A Facade adds an raster on creation, remove it, since we need to control inlining
+        //getNode()->removeChild(getNode()->childNode(0));
     }
 
     void
     ImageBuilder::setType(ImageType theType) {
-        getNode()->getAttribute(IMAGE_TYPE_ATTRIB)->nodeValue(asl::getStringFromEnum(theType, ImageTypeStrings));
+//        getNode()->getAttribute(IMAGE_TYPE_ATTRIB)->nodeValue(asl::getStringFromEnum(theType, ImageTypeStrings));
+        getNode()->getFacade<Image>()->set<ImageTypeTag>(asl::getStringFromEnum(theType, ImageTypeStrings));
     }
 
     void
     ImageBuilder::setInternalFormat(const std::string & theType) {
-        getNode()->getAttribute(IMAGE_TEXTURE_PIXELFORMAT_ATTRIB)->nodeValue(theType);
+//        getNode()->getAttribute(IMAGE_TEXTURE_PIXELFORMAT_ATTRIB)->nodeValue(theType);
+        getNode()->getFacade<Image>()->set<TexturePixelFormatTag>(theType);
     }
 
     void
     ImageBuilder::setColorScale(asl::Vector4f theColorScale) {
-        getNode()->getAttribute(IMAGE_COLOR_SCALE_ATTRIB)->nodeValueAssign(theColorScale);
+//        getNode()->getAttribute(IMAGE_COLOR_SCALE_ATTRIB)->nodeValueAssign(theColorScale);
+        getNode()->getFacade<Image>()->set<ImageColorScaleTag>(theColorScale);
     }
 
     void
     ImageBuilder::setColorBias(asl::Vector4f theColorBias) {
-        getNode()->getAttribute(IMAGE_COLOR_BIAS_ATTRIB)->nodeValueAssign(theColorBias);
+        //getNode()->getAttribute(IMAGE_COLOR_BIAS_ATTRIB)->nodeValueAssign(theColorBias);
+        getNode()->getFacade<Image>()->set<ImageColorBiasTag>(theColorBias);
     }
 
     void
     ImageBuilder::setDepth(unsigned int theDepth) {
-        getNode()->getAttribute(DEPTH_ATTRIB)->nodeValueAssign(theDepth);
+//        getNode()->getAttribute(DEPTH_ATTRIB)->nodeValueAssign(theDepth);
+        getNode()->getFacade<Image>()->set<ImageDepthTag>(theDepth);
     }
+
+    void
+    ImageBuilder::setWrapMode(TextureWrapMode theWrapMode) {
+        getNode()->getFacade<Image>()->set<TextureWrapModeTag>(theWrapMode);
+        //getNode()->getAttribute(TEXTURE_WRAPMODE_ATTRIB)->nodeValueAssign(theWrapMode.asString());
+    }
+
     void
     ImageBuilder::setTiling(asl::Vector2i theTiling) {
-        getNode()->getAttribute(IMAGE_TILE_ATTRIB)->nodeValueAssign(theTiling);
+        getNode()->getFacade<Image>()->set<ImageTileTag>(theTiling);
+//        getNode()->getAttribute(IMAGE_TILE_ATTRIB)->nodeValueAssign(theTiling);
     }
 }

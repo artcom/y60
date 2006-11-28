@@ -74,6 +74,9 @@ namespace y60 {
 
     int
     MaterialBase::getGroup1Hash() const {
+        /*static bool myToggle = false;
+        myToggle = !myToggle;
+        return myToggle ? 0:1;*/
         return getChild<MaterialPropertiesTag>()->get<MaterialPropGroup1HashTag>();
     }
 
@@ -141,14 +144,13 @@ namespace y60 {
     }
 
     TextureUsage MaterialBase::getTextureUsage(unsigned theTextureSlot) const {
-        const VectorOfString * myFeatures = _myShader->getFeatures(TEXTURE_FEATURE);
-        if (!myFeatures || theTextureSlot >= myFeatures->size()) {
+        VectorOfTextureUsage myFeatures = _myShader->getTextureFeature();
+        if (theTextureSlot >= myFeatures.size()) {
             throw ShaderException(string("Shader '" + _myShader->getName() 
                         + "' cannot handle " + asl::as_string(theTextureSlot) + " textures\n")
-                    //+ "Material:\n" + as_string(*_myMaterialNode) + "\nShader Features: "
-                    + as_string(*myFeatures), PLUS_FILE_LINE);
+                    + as_string(myFeatures), PLUS_FILE_LINE);
         }
-        return TextureUsage(getEnumFromString((*myFeatures)[theTextureSlot], TextureUsageStrings));
+        return myFeatures[theTextureSlot];
     }
     
     void

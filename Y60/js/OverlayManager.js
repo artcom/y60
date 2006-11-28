@@ -79,7 +79,7 @@ function OverlayManager(theScene, theViewport) {
                 myApplymode = "modulate";
             }
             myTexturesString +=
-            '        <texture image="' + theImageIds[i] + '" applymode="' + myApplymode + '" wrapmode="repeat"/>\n';
+            '        <texture image="' + theImageIds[i] + '" applymode="' + myApplymode + '" />\n';
         }
         var myTexturesDoc = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
@@ -110,7 +110,7 @@ function OverlayManager(theScene, theViewport) {
        // add textures
         var myTexturesString =
             '<textures>\n' +
-            '    <texture image="' + theImageId + '" wrapmode="repeat" applymode="modulate"/>\n' +
+            '    <texture image="' + theImageId + '"  applymode="modulate"/>\n' +
             '</textures>';
         var myTexturesDoc = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
@@ -154,7 +154,6 @@ function OverlayManager(theScene, theViewport) {
             if ( i == myTextures.childNodes.length) {
                 myTexture = Node.createElement("texture");
                 myTexture.applymode = "decal";
-                myTexture.wrapmode = "repeat";
                 myTextures.appendChild(myTexture);
             } else {
                 myTexture = myTextures.childNodes[i];

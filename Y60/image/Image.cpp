@@ -41,7 +41,7 @@ namespace y60 {
     DEFINE_EXCEPTION(UnknownEncodingException, asl::Exception);
 
     const char * I60_MAGIC_NUMBER = "a+c ";
-
+    bool Image::allowInlineFlag = true;
     Image::Image(dom::Node & theNode) :
         Facade(theNode),
         IdTag::Plug(theNode),
@@ -58,6 +58,9 @@ namespace y60 {
         ImageColorScaleTag::Plug(theNode),
         ImageColorBiasTag::Plug(theNode),
         ImageDepthTag::Plug(theNode),
+        TextureWrapModeTag::Plug(theNode),
+        TextureMinFilterTag::Plug(theNode),
+        TextureMagFilterTag::Plug(theNode),
         dom::FacadeAttributePlug<ImageBytesPerPixelTag>(this),
         dom::FacadeAttributePlug<TextureIdTag>(this),
         dom::FacadeAttributePlug<RasterPixelFormatTag>(this),
@@ -69,7 +72,7 @@ namespace y60 {
         _myTextureId(0), 
         _myPixelBufferId(0),
         _myReuseRaster(false),
-        _myRessourceManager(0)            
+        _myRessourceManager(0)
     {
     }
 
@@ -249,6 +252,11 @@ namespace y60 {
 
     void
     Image::load() {
+        // facade contruction will always lead to a rasterctor, 
+        // we do not want this behaviour for inlining textures
+        if (!allowInlineFlag) {
+            return;
+        }
         std::string mySrcAttrib = get<ImageSourceTag>();
         if (get<ImageSourceTag>() == "") {
             AC_DEBUG << "Image '" << get<NameTag>() << " has not been loaded because of empty source attribute";
@@ -351,6 +359,22 @@ namespace y60 {
             unbind();
         }
     }
+
+    TextureWrapMode
+    Image::getWrapMode() const {
+        return get<TextureWrapModeTag>();
+    }
+
+    TextureSampleFilter
+    Image::getMinFilter() const {
+        return get<TextureMinFilterTag>();
+    }
+    
+    TextureSampleFilter
+    Image::getMagFilter() const {
+        return get<TextureMagFilterTag>();
+    }
+    
 
     void 
     Image::unbind() {

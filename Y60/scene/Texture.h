@@ -54,10 +54,7 @@ namespace y60 {
     //                  theTagName           theType        theAttributeName           theDefault
     DEFINE_ATTRIBUT_TAG(TextureImageTag,     ImageWeakPtr,  "texture_image_tag",       ImagePtr(0));
     DEFINE_ATTRIBUT_TAG(TextureImageIdTag,   std::string,   TEXTURE_IMAGE_ATTRIB,      "");
-    DEFINE_ATTRIBUT_TAG(TextureApplyModeTag, std::string,   TEXTURE_APPLYMODE_ATTRIB,  "modulate");
-    DEFINE_ATTRIBUT_TAG(TextureWrapModeTag,  std::string,   TEXTURE_WRAPMODE_ATTRIB,   "clamp");
-    DEFINE_ATTRIBUT_TAG(TextureMinFilterTag, std::string,   TEXTURE_MIN_FILTER_ATTRIB, "linear");
-    DEFINE_ATTRIBUT_TAG(TextureMagFilterTag, std::string,   TEXTURE_MAG_FILTER_ATTRIB, "linear");
+    DEFINE_ATTRIBUT_TAG(TextureApplyModeTag, TextureApplyMode,   TEXTURE_APPLYMODE_ATTRIB,  MODULATE);
     DEFINE_ATTRIBUT_TAG(TextureSpriteTag,    bool,          TEXTURE_SPRITE_ATTRIB,     false);
     DEFINE_ATTRIBUT_TAG(TextureMatrixTag,    asl::Matrix4f, TEXTURE_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
 
@@ -66,10 +63,7 @@ namespace y60 {
         public dom::Facade,
         public TextureImageIdTag::Plug,
         public TextureApplyModeTag::Plug,
-        public TextureWrapModeTag::Plug,
         public TextureSpriteTag::Plug,
-        public TextureMinFilterTag::Plug, 
-        public TextureMagFilterTag::Plug, 
         public TextureMatrixTag::Plug,
         public dom::FacadeAttributePlug<TextureImageTag>
     {
@@ -83,9 +77,6 @@ namespace y60 {
             void setUsage(TextureUsage theUsage) {}
 
             TextureApplyMode  getApplyMode() const;
-            TextureWrapMode   getWrapMode() const;
-            TextureSampleFilter  getMinFilter() const;
-            TextureSampleFilter  getMagFilter() const;
             bool getSpriteMode() const;
 
             unsigned      getId() const;
@@ -100,7 +91,6 @@ namespace y60 {
 
             Texture();
             asl::Ptr<TextureManager>      _myTextureManager;
-            //ImageWeakPtr                  _myImage;
     };
 
     typedef asl::Ptr<Texture, dom::ThreadingModel> TexturePtr;

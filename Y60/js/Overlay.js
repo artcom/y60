@@ -370,7 +370,6 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
         }
         var myTexture  = _myTextures.appendChild(Node.createElement("texture"));
         myTexture.applymode = "modulate";
-        myTexture.wrapmode  = "repeat";
         myTexture.image     = theImageId;
         addTextureRequirements(_myTextures.childNodesLength());
         return myTexture;
@@ -445,6 +444,8 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
                 myImage.mipmap = false;
                 theScene.images.appendChild(myImage);
                 myImage.name = mySource;
+                myImage.wrapmode  = "repeat";
+                
                 //ourImageCache[mySource] = myImage;
             }
         } else if (typeof(theSource) == "object" && "previousSibling" in theSource) {

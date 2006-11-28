@@ -27,6 +27,7 @@
 #include "TransformBuilder.h"
 #include "BodyBuilder.h"
 #include <y60/DataTypes.h>
+#include <y60/Image.h>
 
 #include <asl/string_functions.h>
 #include <asl/UnitTest.h>
@@ -109,6 +110,7 @@ class ShapeBuilderUnitTest : public UnitTest {
             myElementBuilder.appendIndex(getTextureRole(1), 2);
 
             MaterialBuilder myMaterialBuilder("shinymaterial", false);
+            y60::Image::allowInlineFlag = false;
             mySceneBuilder.appendMaterial(myMaterialBuilder);
 
             VectorOfRankedFeature myRankings;
@@ -119,16 +121,16 @@ class ShapeBuilderUnitTest : public UnitTest {
             myMaterialBuilder.setType(myRankings);
 
             {
-                string myImageId = myMaterialBuilder.createImage(mySceneBuilder, "testTexture1", "tex\\testtexture.jpg", TEXTURE_USAGE_PAINT, false,
-                                                                 asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE,"");
-                myMaterialBuilder.createTextureNode(myImageId, "SOME_APPLY_MODE", TEXTURE_USAGE_PAINT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, Matrix4f::Identity(), 100, false, 60);
+                string myImageId = myMaterialBuilder.createImage(mySceneBuilder, "testTexture1", "tex\\testtexture.jpg", PAINT, false,
+                                                                 asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE, CLAMP, "");
+                myMaterialBuilder.createTextureNode(myImageId, MODULATE, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 100, false, 60);
 
-                myImageId = myMaterialBuilder.createImage(mySceneBuilder, "testTexture2", "glossypattern.jpg", TEXTURE_USAGE_PAINT, false,
-                                                          asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE,"");
-                myMaterialBuilder.createTextureNode(myImageId, "OTHER_APPLY_MODE", TEXTURE_USAGE_PAINT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
+                myImageId = myMaterialBuilder.createImage(mySceneBuilder, "testTexture2", "glossypattern.jpg", PAINT, false,
+                                                          asl::Vector4f(1.0f,1.0f,1.0f,0.5f),asl::Vector4f(0.0f,0.0f,0.0f,0.0f), SINGLE, CLAMP, "");
+                myMaterialBuilder.createTextureNode(myImageId, DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
 
                 string myMovieId = myMaterialBuilder.createMovie(mySceneBuilder, "testTexture3", "mymovie.mpg", 0, asl::Vector4f(1,1,1,1), asl::Vector4f(0,0,0,0), "");
-                myMaterialBuilder.createTextureNode(myMovieId, "OTHER_APPLY_MODE", TEXTURE_USAGE_PAINT, TEXTURE_WRAP_CLAMP, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
+                myMaterialBuilder.createTextureNode(myMovieId, DECAL, PAINT, TEXCOORD_UV_MAP, Matrix4f::Identity(), 60, false, 50);
             }
 
             //==============================================================================
@@ -278,14 +280,14 @@ class ShapeBuilderUnitTest : public UnitTest {
             string myImageId = myTextureNode->getAttribute("image")->nodeValue();
             dom::NodePtr myImageNode = mySceneNode->childNode("images")->getElementById(myImageId);
             ENSURE(myImageNode->getAttribute("src")->nodeValue() == "tex/testtexture.jpg");
-            ENSURE(myTextureNode->getAttribute("applymode")->nodeValue() == "SOME_APPLY_MODE");
+            ENSURE(myTextureNode->getAttribute("applymode")->nodeValueAs<TextureApplyMode>() == MODULATE);
 
             myTextureNode = myTextureListNode->childNode(1);
             myImageId = myTextureNode->getAttribute("image")->nodeValue();
             myImageNode = mySceneNode->childNode("images")->getElementById(myImageId);
 
             ENSURE(myImageNode->getAttribute("src")->nodeValue() == "glossypattern.jpg");
-            ENSURE(myTextureNode->getAttribute("applymode")->nodeValue() == "OTHER_APPLY_MODE");
+            ENSURE(myTextureNode->getAttribute("applymode")->nodeValueAs<TextureApplyMode>() == DECAL);
 
             myTextureNode = myTextureListNode->childNode(2);
             myImageId = myTextureNode->getAttribute("image")->nodeValue();

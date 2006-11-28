@@ -83,7 +83,7 @@ class MaterialExporter {
         bool exportTexture(Material* theMaterial,
                            y60::MaterialBuilderPtr theMaterialBuilder,
                            y60::SceneBuilder & theSceneBuilder, 
-                           BaseContainer * theContainer, const std::string & theUsage, TextureTag * theTextureTag,
+                           BaseContainer * theContainer, const TextureUsage & theUsage, TextureTag * theTextureTag,
 						   const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord,
                            bool isAlphaChannel = false, bool isEnvMap = false);
 

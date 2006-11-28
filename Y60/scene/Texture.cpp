@@ -31,11 +31,8 @@ namespace y60 {
         Facade(theNode),
         TextureImageIdTag::Plug(theNode),
         TextureApplyModeTag::Plug(theNode),
-        TextureWrapModeTag::Plug(theNode),
         TextureSpriteTag::Plug(theNode),
 		TextureMatrixTag::Plug(theNode),
-        TextureMinFilterTag::Plug(theNode),
-        TextureMagFilterTag::Plug(theNode),
         dom::FacadeAttributePlug<TextureImageTag>(this)
     {
     }
@@ -91,46 +88,16 @@ namespace y60 {
 
     TextureApplyMode
     Texture::getApplyMode() const {
-        return TextureApplyMode(getEnumFromString( get<TextureApplyModeTag>(), TextureApplyModeStrings));
+        return get<TextureApplyModeTag>();
 	}
 	
-    TextureWrapMode
-    Texture::getWrapMode() const {
-        return TextureWrapMode(getEnumFromString( get<TextureWrapModeTag>(), TextureWrapModeStrings));
-    }
-
-    TextureSampleFilter
-    Texture::getMinFilter() const {
-        return TextureSampleFilter(getEnumFromString( get<TextureMinFilterTag>(), TextureSampleFilterStrings));
-    }
-    
-    TextureSampleFilter
-    Texture::getMagFilter() const {
-        return TextureSampleFilter(getEnumFromString( get<TextureMagFilterTag>(), TextureSampleFilterStrings));
-    }
-    
     ImagePtr
     Texture::getImage() const {
         AC_TRACE << "Texture::getImage";
 		return get<TextureImageTag>().lock();
-/*        if (_myImage) {
-            return _myImage.lock();
-        } else {            
-            throw TextureException(std::string("Invalid image in texture: ") + asl::as_string(getNode()), PLUS_FILE_LINE);
-        }*/
     }
 
-    /*Image & 
-    Texture::getImageRef() { 
-        ImagePtr myImageNode = getImage();
-        if (!myImageNode) {
-            throw asl::Exception(string("Texure ") + get<NameTag>() + ": Could not find image with id: " + get<TextureImageTag>(), PLUS_FILE_LINE);
-        } else {
-            return *(myImageNode->getFacade<Image>());
-        }         
-    }*/
-
-	unsigned
+    unsigned
     Texture::getId() const {
         ImagePtr myImage = getImage();
         if (myImage) {

@@ -136,6 +136,9 @@ namespace dom {
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::RenderStyles, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(y60::VertexBufferUsage, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE2(y60::VectorOfBlendFunction, VectorValue, dom::MakeResizeableVector);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TextureApplyMode, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TextureSampleFilter, SimpleValue);
+    DEFINE_VALUE_WRAPPER_TEMPLATE(y60::TextureWrapMode, SimpleValue);
     
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGB, SimpleValue);
     DEFINE_VALUE_WRAPPER_TEMPLATE(asl::RGBA, SimpleValue);

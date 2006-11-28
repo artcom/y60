@@ -22,6 +22,7 @@
 
 #include "MaterialParameter.h"
 #include <y60/DataTypes.h>
+#include <y60/NodeValueNames.h>
 
 #include <asl/Ptr.h>
 #include <string>
@@ -45,6 +46,7 @@ namespace y60 {
             virtual const dom::NodePtr getPropertyNode(unsigned theIndex)=0;
             virtual const dom::NodePtr getDefaultTextures()=0;
             virtual const VectorOfString * getFeatures(const std::string & theFeatureClass) const = 0;
+            virtual const VectorOfTextureUsage & getTextureFeature() const = 0;
             virtual bool hasFeature(const std::string & theFeatureClass) const = 0;
             virtual const MaterialParameterVector & getVertexParameters() const = 0;
             virtual const VertexRegisterFlags & getVertexRegisterFlags() const = 0;

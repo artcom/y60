@@ -575,8 +575,10 @@ namespace y60 {
                                           const MaterialBase & theMaterial)
     {
         AC_TRACE << "CgProgramInfo::setCgMaterialParameter: cgparam=" << theCgParameter << " node=" << theNode.nodeName() << " value=" << theNode.nodeValue() << " property=" << thePropertyName << " material=" << theMaterial.get<NameTag>() << " type=" << theNode.parentNode()->nodeName();
-
-        switch(TypeId(asl::getEnumFromString(theNode.parentNode()->nodeName(), TypeIdStrings))) {
+        TypeId myType;
+        myType.fromString(theNode.parentNode()->nodeName());
+//        switch(TypeId(asl::getEnumFromString(theNode.parentNode()->nodeName(), TypeIdStrings))) {
+        switch(myType) {
             case FLOAT:
                 {
                     float myValue = theNode.nodeValueAs<float>();
@@ -797,7 +799,6 @@ namespace y60 {
             // AC_TRACE << "CgProgramInfo::enableTextures paramName=" << _myTextureParams[i]._myParamName
             //          << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
             cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
-            glEnable(GL_TEXTURE_2D); // Huh? What's that? What if the texture is 3D or Cube or something else? [DS]
             CHECK_OGL_ERROR;
         }
     }
@@ -812,7 +813,6 @@ namespace y60 {
 
             //AC_TRACE << "CgProgramInfo::disableTextures paramName=" << _myTextureParams[i]._myParamName << " param=" << _myTextureParams[i]._myParameter << " unit=" << hex << myTexUnit << dec;
             cgGLDisableTextureParameter(_myTextureParams[i]._myParameter);
-            glDisable(GL_TEXTURE_2D);
             CHECK_OGL_ERROR;
         }
     }

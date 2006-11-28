@@ -47,9 +47,8 @@ namespace y60 {
         void addFeature(const std::string & theClass, const VectorOfRankedFeature & theValue);
 
         dom::NodePtr createTextureNode(const std::string & theImageId,
-                                       const std::string & theApplyMode,
-                                       const std::string & theUsage,
-                                       const std::string & theWrapMode,
+                                       const TextureApplyMode & theApplyMode,
+                                       const TextureUsage & theUsage,
                                        const std::string & theMappingMode,
                                        const asl::Matrix4f & theTextureMatrix,
                                        float theRanking,
@@ -68,11 +67,12 @@ namespace y60 {
         const std::string & createImage(SceneBuilder & theSceneBuilder,
                                         const std::string & theName,
                                         const std::string & theFileName,
-                                        const std::string & theUsage,
+                                        const TextureUsage & theUsage,
                                         bool  theCreateMipmapsFlag,
                                         const asl::Vector4f theColorScale,
                                         const asl::Vector4f theColorBias,
                                         ImageType theType,
+                                        const TextureWrapMode & theWrapMode,
 										const std::string & theInternalFormat,
 										const std::string & theResizeMode = IMAGE_RESIZE_SCALE,
                                         unsigned theDepth = 1,
@@ -96,14 +96,14 @@ namespace y60 {
 
         void appendCubemap(SceneBuilder & theSceneBuilder,
                            const std::string & theName,
-                           const std::string & theUsage,
+                           const TextureUsage & theUsage,
                            const std::string & theFrontFileName,
                            const std::string & theRightFileName,
                            const std::string & theBackFileName,
                            const std::string & theLeftFileName,
                            const std::string & theTopFileName,
                            const std::string & theBottomFileName,
-                           const std::string & theApplyMode,
+                           const TextureApplyMode & theApplyMode,
                            const asl::Vector4f theColorScale);
 
         void setTextureUVRepeat(const std::string & theTextureName, double theRepeatU, double theRepeatV);

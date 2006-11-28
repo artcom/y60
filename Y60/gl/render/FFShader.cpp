@@ -19,6 +19,9 @@
 #include <y60/NodeNames.h>
 #include <y60/PropertyNames.h>
 
+
+#include <asl/Dashboard.h>
+
 using namespace std;
 using namespace asl;
 using namespace y60;
@@ -91,91 +94,12 @@ namespace y60 {
 
     void
     FFShader::enableTextures(const y60::MaterialBase & theMaterial) {
-        unsigned myTextureCount = theMaterial.getTextureCount();
-        if (myTextureCount) {
-            DB(AC_TRACE << "FFShader::enableTextures: Material " << theMaterial.get<NameTag>() << " has " << myTextureCount << " textures." << endl);
-            glMatrixMode(GL_TEXTURE);
-
-            for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {
-                glActiveTexture(asGLTextureRegister(myTextureCounter));
-                CHECK_OGL_ERROR;
-                const y60::Texture & myTexture = theMaterial.getTexture(myTextureCounter);
-                TextureUsage myTextureUsage = theMaterial.getTextureUsage(myTextureCounter);
-
-                unsigned myId = myTexture.getImage()->ensureTextureId(); 
-                
-                DB(AC_TRACE << "FFShader::enableTextures: texture index=" << myTextureCounter <<
-                    ", gl-id = " << myTexture.getId() <<
-                    ", image id =" << myTexture.getImage()->get<IdTag>() <<", size = " <<
-                    myTexture.getImage()->get<ImageWidthTag>() << "," <<
-                    myTexture.getImage()->get<ImageHeightTag>()<< "," <<
-                    myTexture.getImage()->get<ImageDepthTag>() << "," <<
-                    endl);
-
-                // Fixed Function Shaders only support paint & skybox usage
-                if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
-
-                    GLenum myTextureType;
-                    switch (myTexture.getImage()->getType()) {
-                    case SINGLE:
-                        myTextureType = myTexture.getImage()->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
-                        break;
-                    case CUBEMAP:
-                        myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
-                        break;
-                    default :
-                        throw ShaderException(std::string("Unknown texture type '")+
-                                myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
-                    }
-
-                    glBindTexture(myTextureType, myId);
-                    CHECK_OGL_ERROR;
-                    glEnable(myTextureType);
-                    CHECK_OGL_ERROR;
-
-                    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
-                            GLfloat(asGLTextureFunc(myTexture.getApplyMode())));
-                }
-            }
-            glMatrixMode(GL_MODELVIEW);
-            GLShader::enableTextures(theMaterial);
-        }
+        GLShader::enableTextures(theMaterial);
     }
 
     void
     FFShader::disableTextures(const y60::MaterialBase & theMaterial) {
         GLShader::disableTextures(theMaterial);
-        unsigned myTextureCount = theMaterial.getTextureCount();
-        // AC_TRACE << "current texcount:" << myMaterial->getTextureCount() << ", prev:" << myPreviousTextureCount << endl;
-        for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {
-            const y60::Texture & myTexture = theMaterial.getTexture(myTextureCounter);
-            TextureUsage myTextureUsage = theMaterial.getTextureUsage(myTextureCounter);
-
-            // Fixed Function Shaders only support paint & skybox usage
-            if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
-                glActiveTexture(asGLTextureRegister(myTextureCounter));
-                glClientActiveTexture(asGLTextureRegister(myTextureCounter));
-
-                switch (myTexture.getImage()->getType()) {
-                    case SINGLE :
-                        break;
-                    case CUBEMAP :
-                        glDisable(GL_TEXTURE_CUBE_MAP_ARB);
-                        break;
-                    default :
-                        throw ShaderException(std::string("Unknown texture type '")+
-                                myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
-                }
-                if (myTexture.getImage()->get<ImageDepthTag>()==1) {
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                    glDisable(GL_TEXTURE_2D);
-                } else {
-                    glBindTexture(GL_TEXTURE_3D, 0);
-                    glDisable(GL_TEXTURE_3D);
-                }
-            }
-        }
-        glDisable(GL_POINT_SPRITE_ARB);
     }
 
 } // namespace y60
