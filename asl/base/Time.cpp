@@ -259,18 +259,6 @@ static time_t Curl_parsedate(const char *date)
   const char *indate = date; /* save the original pointer */
   int part = 0; /* max 6 parts */
 
-#ifdef WIN32
-  /*
-   * On Windows, we need an odd work-around for the case when no TZ variable
-   * is set. If it isn't set and "automatic DST adjustment" is enabled, the
-   * time functions below will return values one hour off! As reported and
-   * investigated in bug report #1230118.
-  */
-  const char *env = getenv("TZ");
-  if(!env)
-    putenv("TZ=GMT");
-#endif
-
   while(*date && (part < 6)) {
     bool found=false;
 
@@ -409,32 +397,27 @@ static time_t Curl_parsedate(const char *date)
      03:14:07 UTC, January 19, 2038. (Such as AIX 5100-06)
   */
   t = mktime(&tm);
+  AC_TRACE << "mktime returned " << t;
 
   /* time zone adjust */
   if(-1 != t) {
-    struct tm *gmt;
+    struct tm * gmt;
     long delta;
     time_t t2;
 
-#ifdef HAVE_GMTIME_R
     /* thread-safe version */
     struct tm keeptime2;
     gmt = (struct tm *)gmtime_r(&t, &keeptime2);
-#else
-    gmt = gmtime(&t); /* use gmtime_r() if available */
-#endif
     if(!gmt)
       return -1; /* illegal date/time */
-
     t2 = mktime(gmt);
+
+    AC_TRACE << "mktime(gmt) returned " << t2;
 
     /* Add the time zone diff (between the given timezone and GMT) and the
        diff between the local time zone and GMT. */
-#ifdef XXWIN32
-    delta = (long)((tzoff!=-1?tzoff:0)/* + (t - t2)*/);
-#else    
     delta = (long)((tzoff!=-1?tzoff:0) + (t - t2));
-#endif    
+    AC_TRACE << "tzoff / diff is " << tzoff << "/" << (t-t2);
 
     if((delta>0) && (t + delta < t))
       return -1; /* time_t overflow */

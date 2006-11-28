@@ -143,6 +143,7 @@ public:
     MyTestSuite(const char * myName, int argc, char *argv[]) : UnitTestSuite(myName, argc, argv) {}
     void setup() {
         UnitTestSuite::setup(); // called to print a launch message
+        addTest(new TimeParserTest);
         addTest(new TimeUnitTest,100);
        
         // Note: the CPU's TSC is not reliable on multi-core systems, but the new HPEC is not yet widely
