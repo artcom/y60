@@ -338,9 +338,17 @@ MAKE_SCOPE_TIMER(switchMaterial);
                 rotateBillboard(myBody, theCamera);
             }
 
+            // 
             const asl::Matrix4f &myMatrix = myBody.get<GlobalMatrixTag>();
-            float myScaleSign = myMatrix[0][0] * myMatrix[1][1] * myMatrix[2][2];
-            _myState->setFrontFaceCCW( myScaleSign > 0 );
+            const asl::Vector3f & myXVector = asVector3(myMatrix[0][0]);
+            const asl::Vector3f & myYVector = asVector3(myMatrix[1][0]);
+            const asl::Vector3f & myZVector = asVector3(myMatrix[2][0]);
+
+            bool myNegativeScaleFlag = false;
+            if (dot(myXVector, cross(myYVector, myZVector)) < 0) {
+                myNegativeScaleFlag = true;
+            }
+            _myState->setFrontFaceCCW( ! myNegativeScaleFlag );
 
             _myPreviousBody = &myBody;
             CHECK_OGL_ERROR;
