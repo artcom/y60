@@ -55,6 +55,9 @@ namespace jslib {
 INSTANTIATE_BITSET_WRAPPER(y60::RenderStyleEnum);
 INSTANTIATE_BITSET_WRAPPER(y60::TargetBuffersEnum);
 INSTANTIATE_ENUM_WRAPPER(y60::BlendEquationEnum);
+INSTANTIATE_ENUM_WRAPPER(y60::TextureWrapModeEnum);
+INSTANTIATE_ENUM_WRAPPER(y60::BlendFunctionEnum);
+INSTANTIATE_ENUM_WRAPPER(y60::VertexBufferUsageEnum);
 
 template jsval as_jsval(JSContext *cx, const std::vector<dom::NodePtr> & theVector);
 
@@ -199,6 +202,10 @@ public:
         REGISTER_BYREFERENCE_CONVERTER(y60::RenderStyles);
         REGISTER_BYREFERENCE_CONVERTER(y60::BlendEquation);
         REGISTER_BYREFERENCE_CONVERTER(y60::TargetBuffers);
+
+        REGISTER_BYREFERENCE_CONVERTER(y60::TextureWrapMode);
+        REGISTER_BYREFERENCE_CONVERTER(y60::BlendFunction);
+        REGISTER_BYREFERENCE_CONVERTER(y60::VertexBufferUsage);
 
     }
 };

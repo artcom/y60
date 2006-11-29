@@ -240,6 +240,15 @@ bool initCppClasses(JSContext *cx, JSObject *theGlobalObject) {
     }
     if (!JSEnum<y60::BlendEquation>::initClass(cx, theGlobalObject)) {
         return false;
+    }   
+    if (!JSEnum<y60::TextureWrapMode>::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSEnum<y60::BlendFunction>::initClass(cx, theGlobalObject)) {
+        return false;
+    }
+    if (!JSEnum<y60::VertexBufferUsage>::initClass(cx, theGlobalObject)) {
+        return false;
     }
     if (!JSBitset<y60::RenderStyles>::initClass(cx, theGlobalObject)) {
         return false;

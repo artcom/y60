@@ -444,7 +444,7 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
                 myImage.mipmap = false;
                 theScene.images.appendChild(myImage);
                 myImage.name = mySource;
-                myImage.wrapmode  = "repeat";
+                myImage.wrapmode  = TextureWrapMode.repeat;
                 
                 //ourImageCache[mySource] = myImage;
             }

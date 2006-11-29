@@ -152,6 +152,7 @@ namespace y60 {
         theFactory.registerPrototype("TextureApplyMode", dom::ValuePtr(new dom::SimpleValue<y60::TextureApplyMode>(y60::TextureApplyMode(MODULATE),0)));
         theFactory.registerPrototype("TextureSampleFilter", dom::ValuePtr(new dom::SimpleValue<y60::TextureSampleFilter>(y60::TextureSampleFilter(LINEAR),0)));
         theFactory.registerPrototype("TextureWrapMode", dom::ValuePtr(new dom::SimpleValue<y60::TextureWrapMode>(y60::TextureWrapMode(REPEAT),0)));
+        theFactory.registerPrototype("TextureUsage", dom::ValuePtr(new dom::SimpleValue<y60::TextureUsage>(y60::TextureUsage(PAINT),0)));        
     }
 
 
@@ -159,6 +160,6 @@ namespace y60 {
         registerSomMathTypes(theFactory);
         registerSomVectorTypes(theFactory);
         registerSomImageTypes(theFactory);
-        registerEnumBitsetTypes(theFactory);
+        registerEnumBitsetTypes(theFactory);        
     }
 }

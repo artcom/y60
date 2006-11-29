@@ -49,7 +49,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ImageBytesPerPixelTag,  float,              IMAGE_BYTESPERPIXEL_ATTRIB,   0);
     DEFINE_ATTRIBUT_TAG(TextureIdTag,           unsigned,           IMAGE_TEXTURE_ID_ATTRIB,      0);
     DEFINE_ATTRIBUT_TAG(LoadCountTag,           unsigned,           IMAGE_LOAD_COUNT_ATTRIB,      0);    
-    DEFINE_ATTRIBUT_TAG(TextureWrapModeTag,  TextureWrapMode,       TEXTURE_WRAPMODE_ATTRIB,   CLAMP);
+    DEFINE_ATTRIBUT_TAG(TextureWrapModeTag,  TextureWrapMode,       TEXTURE_WRAPMODE_ATTRIB,   REPEAT);
     DEFINE_ATTRIBUT_TAG(TextureMinFilterTag, TextureSampleFilter,   TEXTURE_MIN_FILTER_ATTRIB, LINEAR);
     DEFINE_ATTRIBUT_TAG(TextureMagFilterTag, TextureSampleFilter,   TEXTURE_MAG_FILTER_ATTRIB, LINEAR);
 

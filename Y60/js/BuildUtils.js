@@ -58,7 +58,7 @@ function buildBillboardNode(theBodyName, theShapeId, theType) {
 // build a <material> node
 function buildMaterialNode(theMaterialName,
                            theDiffuseColor, theAmbientColor,
-                           theTextureFeatures, theLightingFeatures,)
+                           theTextureFeatures, theLightingFeatures)
 {
     var myMaterialNode = Node.createElement('material');
     myMaterialNode.id = createUniqueId(); //"m" + theMaterialName;
