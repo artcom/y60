@@ -500,6 +500,13 @@ MaterialExporter::exportLayeredTexture(const MFnMesh * theMesh,
 
         MayaBlendMode myBlendMode = MayaBlendMode(myBlendModeValue);
 
+        // fix bug 476
+        // the first (bottom-most) texture should be applied as modulate
+        // otherwise we loose lighting effects
+        if ((i == myInputPlug.numElements() - 1) && myBlendMode == MAYA_BLEND_NONE) {
+            myBlendMode = MAYA_BLEND_MULTIPLY;
+        }
+
         DB(AC_TRACE << "MaterialExporter::exportLayeredTexture() - alpha: " << myAlpha << ", blendmode: "
             << getStringFromEnum(myBlendMode, MayaBlendModesString));
 
@@ -513,7 +520,8 @@ MaterialExporter::exportLayeredTexture(const MFnMesh * theMesh,
                 theBuilder, theSceneBuilder,
                 y60::PAINT, myBlendMode,
                 theColorGainAlpha);
-        y60::setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", theColorGainPropertyName.c_str(), asl::Vector4f(1,1,1,1));
+        y60::setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", 
+                        theColorGainPropertyName.c_str(), asl::Vector4f(1,1,1,1));
     }
 }
 
