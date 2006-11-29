@@ -61,6 +61,7 @@ namespace y60 {
         public TextureWrapModeTag::Plug,
         public TextureMinFilterTag::Plug, 
         public TextureMagFilterTag::Plug, 
+        public dom::FacadeAttributePlug<TextureParamChangedTag>,   
         public dom::FacadeAttributePlug<RasterPixelFormatTag>,   
         public dom::FacadeAttributePlug<ImageBytesPerPixelTag>,        
         public dom::FacadeAttributePlug<ImageWidthTag>,
@@ -212,6 +213,7 @@ namespace y60 {
             void registerDependenciesForImageWidthUpdate();
             void registerDependenciesForImageHeightUpdate();
             void registerDependenciesForImageFormatUpdate();
+            void registerDependenciesForTextureParamChanged();
             void registerDependenciesForTextureUpdate();
 
             void unregisterRasterValue();
@@ -221,6 +223,7 @@ namespace y60 {
             void calculateInternalPixelFormat();
             void calculateWidth();
             void calculateHeight();
+            void updateTextureParams();
 
             dom::ResizeableRasterPtr setRasterValue(dom::ValuePtr theRaster, 
                 PixelEncoding theEncoding, unsigned theDepth);

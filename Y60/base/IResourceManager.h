@@ -36,6 +36,7 @@ namespace y60 {
             virtual void loadShaderLibrary(const std::string & theShaderLibraryFile)  = 0;
         
             virtual void updateTextureData(ImagePtr theImage) = 0;
+            virtual void updateTextureParams(ImagePtr theImage) = 0;
 
             /**
              * unbinds the Texture given in theImage from the graphics hardware.

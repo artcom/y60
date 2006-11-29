@@ -183,9 +183,9 @@ namespace y60 {
         IShaderLibraryPtr getShaderLibrary() const;
 
         /**
-         * Sets up texture wrap and min, map filter
+         * update texture wrap and min, map filter
          */
-        void setupTextureParams(ImagePtr theImage);
+        void updateTextureParams(ImagePtr theImage);
 
     private:
         static PixelEncodingInfo getInternalTextureFormat(ImagePtr theImage);
@@ -222,6 +222,11 @@ namespace y60 {
          */
         void setupPixelTransfer(ImagePtr theImage);
 
+        GLenum getTextureType(ImagePtr theImage);
+        /**
+         * Sets up texture wrap and min, map filter
+         */
+        void setupTextureParams(ImagePtr theImage, GLenum theTextureType);
 
         unsigned long _myTextureMemUsage;
         ShaderLibraryPtr _myShaderLibrary;

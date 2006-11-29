@@ -68,6 +68,7 @@ namespace y60 {
         dom::FacadeAttributePlug<ImageWidthTag>(this),
         dom::FacadeAttributePlug<ImageHeightTag>(this),
         dom::FacadeAttributePlug<LoadCountTag>(this),
+        dom::FacadeAttributePlug<TextureParamChangedTag>(this),        
         _myRefCount(0),
         _myTextureId(0), 
         _myPixelBufferId(0),
@@ -115,6 +116,8 @@ namespace y60 {
     void
     Image::registerDependenciesRegistrators() {
         Facade::registerDependenciesRegistrators();
+
+        TextureParamChangedTag::Plug::setReconnectFunction(&Image::registerDependenciesForTextureParamChanged);
 
         TextureIdTag::Plug::setReconnectFunction(&Image::registerDependenciesForTextureUpdate);
         ImageInternalFormatTag::Plug::setReconnectFunction(&Image::registerDependenciesForImageFormatUpdate);
@@ -186,6 +189,17 @@ namespace y60 {
     }
 
     void
+    Image::registerDependenciesForTextureParamChanged() {        
+        if (getNode()) {
+            TextureParamChangedTag::Plug::dependsOn<TextureWrapModeTag>(*this);
+            TextureParamChangedTag::Plug::dependsOn<TextureMinFilterTag>(*this);
+            TextureParamChangedTag::Plug::dependsOn<TextureMagFilterTag>(*this);
+            TextureParamChangedTag::Plug::getValuePtr()->setCalculatorFunction(
+                dynamic_cast_Ptr<Image>(getSelf()), &Image::updateTextureParams);
+        }
+    }
+
+    void
     Image::registerDependenciesForImageFormatUpdate() {        
         if (getNode()) {
             ImageInternalFormatTag::Plug::dependsOn<ImageColorBiasTag>(*this);
@@ -248,6 +262,11 @@ namespace y60 {
             TextureInternalFormat myInternalFormat = getInternalPixelFormat(myRasterFormat);
             set<ImageInternalFormatTag>(getStringFromEnum(myInternalFormat, TextureInternalFormatStrings));
         }        
+    }
+
+    void
+    Image::updateTextureParams() {
+        _myRessourceManager->updateTextureParams(dynamic_cast_Ptr<Image>(getSelf()));
     }
 
     void

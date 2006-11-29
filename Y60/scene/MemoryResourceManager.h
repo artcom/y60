@@ -49,6 +49,8 @@ class MemoryResourceManager : public ResourceManager {
          * @param theImage texture to unbind.
          */
         void unbindTexture(Image * theImage) {}
+        void updateTextureParams(ImagePtr theImage) {};
+
         unsigned setupTexture(ImagePtr theImage) {return 0;}
         IShaderLibraryPtr getShaderLibrary() const { return IShaderLibraryPtr(0); }
 

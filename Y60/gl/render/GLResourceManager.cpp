@@ -76,10 +76,27 @@ namespace y60 {
                         theImage->get<NameTag>() + "'", PLUS_FILE_LINE);
         }
 
-        setupTextureParams(theImage);
+        setupTextureParams(theImage, getTextureType(theImage));
         glPopAttrib();
         CHECK_OGL_ERROR;
         return myId;
+    }
+    
+    GLenum 
+    GLResourceManager::getTextureType(ImagePtr theImage) {
+        GLenum myTextureType = 0;
+        switch (theImage->getType()) {
+        case SINGLE:
+            myTextureType = theImage->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
+            break;
+        case CUBEMAP:
+            myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
+            break;
+        default:
+            throw TextureException(string("Invalid image type in '") + theImage->get<NameTag>() + "'", PLUS_FILE_LINE);
+            break;
+        }
+        return myTextureType;
     }
 
     void
@@ -423,41 +440,34 @@ namespace y60 {
                     myPixelEncoding.pixeltype, myImageData);
         }
     }
+    void 
+    GLResourceManager::updateTextureParams(ImagePtr theImage) {
+        GLenum myTextureType = getTextureType(theImage);
+        setupTextureParams(theImage, myTextureType);
+    }
 
     void 
-    GLResourceManager::setupTextureParams(ImagePtr theImage) {
+    GLResourceManager::setupTextureParams(ImagePtr theImage, GLenum theTextureType) {
         bool hasMipMaps = theImage->get<ImageMipmapTag>();
-        GLenum myTextureType = 0;
-        switch (theImage->getType()) {
-        case SINGLE:
-            myTextureType = theImage->get<ImageDepthTag>() > 1 ? GL_TEXTURE_3D : GL_TEXTURE_2D;
-            break;
-        case CUBEMAP:
-            myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
-            break;
-        default:
-            throw TextureException(string("Invalid image type in '") + theImage->get<NameTag>() + "'", PLUS_FILE_LINE);
-            break;
-        }
 
 
-        glTexParameteri(myTextureType, GL_TEXTURE_WRAP_S,
+        glTexParameteri(theTextureType, GL_TEXTURE_WRAP_S,
                 asGLTextureWrapmode(theImage->getWrapMode()));
         CHECK_OGL_ERROR;
-        glTexParameteri(myTextureType, GL_TEXTURE_WRAP_T,
+        glTexParameteri(theTextureType, GL_TEXTURE_WRAP_T,
                 asGLTextureWrapmode(theImage->getWrapMode()));
         CHECK_OGL_ERROR;
-        if (myTextureType == GL_TEXTURE_3D) {
-            glTexParameteri(myTextureType, GL_TEXTURE_WRAP_R,
+        if (theTextureType == GL_TEXTURE_3D) {
+            glTexParameteri(theTextureType, GL_TEXTURE_WRAP_R,
                     asGLTextureWrapmode(theImage->getWrapMode()));
             CHECK_OGL_ERROR;
         }
 
-        glTexParameteri(myTextureType, GL_TEXTURE_MAG_FILTER,
+        glTexParameteri(theTextureType, GL_TEXTURE_MAG_FILTER,
                 asGLTextureSampleFilter(theImage->getMagFilter(), false));
         CHECK_OGL_ERROR;
         // only minification can use mipmaps
-        glTexParameteri(myTextureType, GL_TEXTURE_MIN_FILTER,
+        glTexParameteri(theTextureType, GL_TEXTURE_MIN_FILTER,
                 asGLTextureSampleFilter(theImage->getMinFilter(), hasMipMaps));
         CHECK_OGL_ERROR;
 

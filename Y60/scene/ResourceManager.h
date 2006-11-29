@@ -44,6 +44,7 @@ class ResourceManager : public IResourceManager{
         virtual bool hasGLContext() const { return _myHaveValidGLContextFlag;}
         virtual void validateGLContext(bool theFlag) { _myHaveValidGLContextFlag = theFlag;}
         virtual void loadShaderLibrary(const std::string & theShaderLibraryFile) {};
+        virtual void updateTextureParams(ImagePtr theImage) {};
 
         VertexDataFactory1f & getVertexDataFactory1f() { return _myVertexDataFactory1f; }
         VertexDataFactory2f & getVertexDataFactory2f() { return _myVertexDataFactory2f; }

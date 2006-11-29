@@ -282,7 +282,10 @@ namespace y60 {
             if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
                 glBindTexture(myTextureType, myTexture.getId());
                 glEnable(myTextureType);
+                // trigger wrapmode and min/mag filter update
+                myTexture.getImage()->get<TextureParamChangedTag>();
             }
+
 
             // load texture matrix
             asl::Matrix4f myMatrix = myTexture.getImage()->get<ImageMatrixTag>();
