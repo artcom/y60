@@ -295,6 +295,10 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
                     window.showMouseCursor = !window.showMouseCursor;
                     print("Mouse cursor: " + (window.showMouseCursor ? "on" : "off"));
                     break;
+                case "g":
+                    self.glow = !self.glow;
+                    print("glow: " + (self.glow ? "on" : "off"));
+                    break;
                 case "t":
                     window.texturing = !window.texturing;
                     print("Texturing: " + (window.texturing ? "on" : "off"));

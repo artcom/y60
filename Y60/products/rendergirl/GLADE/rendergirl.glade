@@ -74,7 +74,7 @@
 				  <accelerator key="n" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 				  <child internal-child="image">
-				    <widget class="GtkImage" id="image92">
+				    <widget class="GtkImage" id="image96">
 				      <property name="visible">True</property>
 				      <property name="stock">gtk-new</property>
 				      <property name="icon_size">1</property>
@@ -116,7 +116,7 @@
 				  <accelerator key="s" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 				  <child internal-child="image">
-				    <widget class="GtkImage" id="image93">
+				    <widget class="GtkImage" id="image97">
 				      <property name="visible">True</property>
 				      <property name="stock">gtk-save</property>
 				      <property name="icon_size">1</property>
@@ -137,7 +137,7 @@
 				  <signal name="activate" handler="on_save_as_activate" last_modification_time="Tue, 19 Apr 2005 18:02:01 GMT"/>
 
 				  <child internal-child="image">
-				    <widget class="GtkImage" id="image94">
+				    <widget class="GtkImage" id="image98">
 				      <property name="visible">True</property>
 				      <property name="stock">gtk-save-as</property>
 				      <property name="icon_size">1</property>
@@ -302,13 +302,24 @@
 			      </child>
 
 			      <child>
+				<widget class="GtkCheckMenuItem" id="glow">
+				  <property name="visible">True</property>
+				  <property name="label" translatable="yes">_Glow</property>
+				  <property name="use_underline">True</property>
+				  <property name="active">False</property>
+				  <signal name="activate" handler="on_glow_activate" last_modification_time="Mon, 04 Dec 2006 14:27:48 GMT"/>
+				  <accelerator key="g" modifiers="0" signal="activate"/>
+				</widget>
+			      </child>
+
+			      <child>
 				<widget class="GtkCheckMenuItem" id="koordinatensystem1">
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">_Coordinate System</property>
 				  <property name="use_underline">True</property>
 				  <property name="active">False</property>
 				  <signal name="activate" handler="on_coordinate_system_activate" last_modification_time="Tue, 19 Apr 2005 14:35:06 GMT"/>
-				  <accelerator key="g" modifiers="0" signal="activate"/>
+				  <accelerator key="g" modifiers="GDK_SHIFT_MASK" signal="activate"/>
 				</widget>
 			      </child>
 
@@ -373,7 +384,7 @@
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">_Picking Trackball</property>
 				  <property name="use_underline">True</property>
-				  <property name="active">False</property>
+				  <property name="active">True</property>
 				  <signal name="activate" handler="on_picking_trackball_activate" last_modification_time="Wed, 20 Apr 2005 09:54:39 GMT"/>
 				</widget>
 			      </child>
@@ -383,7 +394,7 @@
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">_Centered Trackball</property>
 				  <property name="use_underline">True</property>
-				  <property name="active">False</property>
+				  <property name="active">True</property>
 				  <property name="group">picking_trackball</property>
 				  <signal name="activate" handler="on_centered_trackball_activate" last_modification_time="Wed, 20 Apr 2005 09:54:39 GMT"/>
 				</widget>
@@ -394,7 +405,7 @@
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">_Fly Mover</property>
 				  <property name="use_underline">True</property>
-				  <property name="active">False</property>
+				  <property name="active">True</property>
 				  <property name="group">picking_trackball</property>
 				  <signal name="activate" handler="on_fly_mover_activate" last_modification_time="Tue, 19 Apr 2005 14:35:06 GMT"/>
 				</widget>
@@ -596,7 +607,7 @@
 					  <property name="visible">True</property>
 					  <property name="label" translatable="yes">_Off</property>
 					  <property name="use_underline">True</property>
-					  <property name="active">False</property>
+					  <property name="active">True</property>
 					  <signal name="activate" handler="on_bb_off_activate" last_modification_time="Tue, 19 Apr 2005 14:53:52 GMT"/>
 					</widget>
 				      </child>
@@ -606,7 +617,7 @@
 					  <property name="visible">True</property>
 					  <property name="label" translatable="yes">_Body</property>
 					  <property name="use_underline">True</property>
-					  <property name="active">False</property>
+					  <property name="active">True</property>
 					  <property name="group">off1</property>
 					  <signal name="activate" handler="on_bb_body_activate" last_modification_time="Tue, 19 Apr 2005 14:53:52 GMT"/>
 					</widget>
@@ -617,7 +628,7 @@
 					  <property name="visible">True</property>
 					  <property name="label" translatable="yes">_Shape</property>
 					  <property name="use_underline">True</property>
-					  <property name="active">False</property>
+					  <property name="active">True</property>
 					  <property name="group">off1</property>
 					  <signal name="activate" handler="on_bb_shape_activate" last_modification_time="Tue, 19 Apr 2005 14:53:52 GMT"/>
 					</widget>
@@ -1244,7 +1255,7 @@
 	  <child>
 	    <widget class="GtkFrame" id="frame4">
 	      <property name="visible">True</property>
-	      <property name="label_xalign">0.04</property>
+	      <property name="label_xalign">0.0399999991059</property>
 	      <property name="label_yalign">0.5</property>
 	      <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
 
@@ -1442,7 +1453,7 @@
 	  <child>
 	    <widget class="GtkFrame" id="frame3">
 	      <property name="visible">True</property>
-	      <property name="label_xalign">0.04</property>
+	      <property name="label_xalign">0.0399999991059</property>
 	      <property name="label_yalign">0.5</property>
 	      <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
 
@@ -1602,7 +1613,7 @@
 		      <property name="max_length">0</property>
 		      <property name="text" translatable="yes"></property>
 		      <property name="has_frame">True</property>
-		      <property name="invisible_char" translatable="yes">*</property>
+		      <property name="invisible_char">*</property>
 		      <property name="activates_default">False</property>
 		    </widget>
 		    <packing>

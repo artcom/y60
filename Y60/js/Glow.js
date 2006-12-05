@@ -25,18 +25,24 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
     var _myBlurYOverlay = null;
     var _myGlowOverlay = null;
     var _myDebugOverlay = null;
+    var _myDebugImage = null;
 
     var _myOffscreenRenderArea = null;
     var _myBlurXRenderArea = null;
     var _myBlurYRenderArea = null;
-    const OFFSCREEN_RESOLUTION_RATIO = 4;
 
-    obj.setEnabled = function(theFlag) {
-        _myGlowEnabled = theFlag;
-    }
+    var _myBufferBits = null; 
+    const OFFSCREEN_RESOLUTION_RATIO = 4;
 
     obj.getEnabled = function() {
         return _myGlowEnabled;
+    }
+    obj.setEnabled = function(theFlag) {
+        _myGlowEnabled = theFlag;
+        if (!_myGlowEnabled) {
+            _myGlowOverlay.visible = false;
+            _myOffscreenOverlay.visible = false;
+        }
     }
 
     obj.onResize = function(theWidth, theHeight) {
@@ -51,25 +57,28 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myGlowOverlay.visible = false;
 
         if (_myGlowEnabled) {
-
             // copy viewport attributes from main viewport
             _myOffscreenRenderArea.canvas.firstChild.lighting = window.lighting;
             _myOffscreenRenderArea.canvas.firstChild.texturing = window.texturing;
 
             // render scene
             _myOffscreenRenderArea.activate();
-            _myOffscreenRenderArea.clearBuffers( RenderWindow.GL_COLOR_BUFFER_BIT | RenderWindow.GL_DEPTH_BUFFER_BIT );
+            _myOffscreenRenderArea.clearBuffers( _myOffscreenRenderArea.constructor.GL_COLOR_BUFFER_BIT | _myOffscreenRenderArea.constructor.GL_DEPTH_BUFFER_BIT );
             _myOffscreenRenderArea.preRender();
             _myOffscreenRenderArea.render();
             _myOffscreenRenderArea.postRender();
             _myOffscreenRenderArea.deactivate();
             window.scene.world.visible = false;
 
+            if (_myDebugImage) {
+                _myOffscreenRenderArea.downloadFromViewport(_myDebugImage);
+                saveImage(_myDebugImage, "debug.png");
+            }
             // render blur_x
 
             _myBlurXOverlay.visible = true;
             _myBlurXRenderArea.activate();
-            _myBlurXRenderArea.clearBuffers( RenderWindow.GL_COLOR_BUFFER_BIT | RenderWindow.GL_DEPTH_BUFFER_BIT );
+            _myBlurXRenderArea.clearBuffers( _myBufferBits );
             _myBlurXRenderArea.render();
             _myBlurXRenderArea.deactivate();
             _myBlurXOverlay.visible = false;
@@ -77,7 +86,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
             // render blur_y
             _myBlurYOverlay.visible = true;
             _myBlurYRenderArea.activate();
-            _myBlurYRenderArea.clearBuffers( RenderWindow.GL_COLOR_BUFFER_BIT | RenderWindow.GL_DEPTH_BUFFER_BIT );
+            _myBlurYRenderArea.clearBuffers( _myBufferBits );
             _myBlurYRenderArea.render();
             _myBlurYRenderArea.deactivate();
             _myBlurYOverlay.visible = false;
@@ -91,7 +100,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
             }
         }
 
-        window.clearBuffers( RenderWindow.GL_COLOR_BUFFER_BIT | RenderWindow.GL_DEPTH_BUFFER_BIT );
+        window.clearBuffers( _myBufferBits );
         window.preRender();
         window.render();
         window.postRender();
@@ -185,6 +194,8 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         var myBlurKernel = generateGaussianWeights( theKernelSize );
         theKernelSize = myBlurKernel.length;
 
+        // _myDebugImage = Modelling.createImage(window.scene, nextPowerOfTwo(window.width), nextPowerOfTwo(window.height),"RGBA");
+
         var myBlurKernelImage = Modelling.createImage(window.scene, nextPowerOfTwo(theKernelSize),1,"RGBA");
         myBlurKernelImage.id = createUniqueId();
         myBlurKernelImage.name = "BlurKernel";
@@ -227,6 +238,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myOffscreenRenderArea = new OffscreenRenderArea();
         _myOffscreenRenderArea.setSceneAndCanvas( window.scene, myOffscreenCanvas);
         _myOffscreenRenderArea.eventListener = theViewer;
+        _myBufferBits = _myOffscreenRenderArea.constructor.GL_COLOR_BUFFER_BIT | _myOffscreenRenderArea.constructor.GL_DEPTH_BUFFER_BIT;
 
         _myOffscreenOverlay = new ImageOverlay(window.scene, myOffscreenImage, null, getDescendantByTagName(myOffscreenCanvas, "overlays", true));
         _myOffscreenOverlay.name = "Offscreen";
@@ -343,7 +355,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         // prepare compositing
         window.scene.overlays.appendChild(_myOffscreenOverlay.node);
 
-        _myDebugOverlay = null;// _myBlurXOverlay.node;
+        _myDebugOverlay = null;//_myOffscreenOverlay.node; // _myBlurXOverlay.node;
         if (_myDebugOverlay) {
             window.scene.overlays.appendChild(_myDebugOverlay);
         } else {

@@ -160,6 +160,11 @@ ourHandler.on_texturing_activate = function(theMenuItem) {
     window.queue_draw();
 }
 
+ourHandler.on_glow_activate = function(theMenuItem) {
+    ourViewer.glow = theMenuItem.active;
+    ourStatusBar.set("Glow " + (theMenuItem.active ? "on" : "off"));
+    window.queue_draw();
+}
 
 ourHandler.on_flatshading_activate = function(theMenuItem) {
     window.flatshading = theMenuItem.active;

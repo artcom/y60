@@ -54,7 +54,7 @@ RenderArea::RenderArea(RenderAreaPtr theContext) : AbstractRenderWindow(jslib::J
     _isFirstFrame(true)
 {
     GdkGLConfig * myGLConfig = gdk_gl_config_new_by_mode(
-            GdkGLConfigMode(GDK_GL_MODE_RGB | GDK_GL_MODE_DEPTH | GDK_GL_MODE_DOUBLE));
+                GdkGLConfigMode(GDK_GL_MODE_RGBA | GDK_GL_MODE_DEPTH | GDK_GL_MODE_DOUBLE | GDK_GL_MODE_ALPHA));
     if (myGLConfig == 0) {
         throw asl::Exception("can't init gl",PLUS_FILE_LINE);
     }

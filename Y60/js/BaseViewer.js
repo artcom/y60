@@ -26,6 +26,7 @@ use("LightManager.js");
 use("picking_functions.js");
 use("HeartbeatThrober.js");
 use("Playlist.js");
+use("Glow.js");
 use("SwitchNodeHandler.js");
 use("AutoClicker.js");
 
@@ -37,6 +38,22 @@ function BaseViewer(theArguments) {
 BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.getReleaseMode = function() {
         return _myReleaseMode;
+    }
+
+    self.glow getter = function() {
+        return _myGlow ? _myGlow.getEnabled() : false; 
+    }
+    self.glow setter = function(theMode) {
+        if (theMode) {
+            if (_myGlow === null) {
+                _myGlow = new Glow(self, 5, 2.5);
+            }
+            self.onRender = _myGlow.onRender;
+        } else {
+            delete self.onRender;
+        }
+        _activeViewport.glow = theMode;
+        _myGlow.setEnabled(theMode);
     }
     self.getProfileMode = function() {
         return (_myProfileNode != null);
@@ -484,6 +501,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myShaderLibrary         = null;
     var _myReleaseMode           = true;
     var _myLightManager          = null;
+    var _myGlow                  = null;
 
     const PROFILE_FILENAME = "profile.xml";
     var _myProfileFilename = null;
