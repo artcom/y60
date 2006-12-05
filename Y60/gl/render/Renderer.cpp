@@ -1415,7 +1415,13 @@ MAKE_SCOPE_TIMER(switchMaterial);
         }
 
         std::string myMaterialId = myWorld->get<SkyBoxMaterialTag>();
-        MaterialBasePtr myMaterial = _myScene->getMaterialsRoot()->getElementById(myMaterialId)->getFacade<MaterialBase>();
+        dom::NodePtr myMaterialNode = _myScene->getMaterialsRoot()->getElementById(myMaterialId);
+        if (!myMaterialNode) {
+            AC_ERROR << "Could not find SkyBox material: " << myMaterialId << endl;
+            return;
+        }
+
+        MaterialBasePtr myMaterial = myMaterialNode->getFacade<MaterialBase>();
         //MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
         if (!myMaterial) {
             AC_ERROR << "Could not find SkyBox material: " << myMaterialId << endl;

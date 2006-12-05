@@ -270,9 +270,10 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     }
 
     self.addSkyBoxFromImage = function(theImageNode) {
-        _mySkyboxMaterial = Node.createElement('material');
-        _mySkyboxMaterial.name = "skyboxmaterial";
-        self.getMaterials().appendChild(_mySkyboxMaterial);
+        var mySkyboxMaterial = Node.createElement('material');
+        mySkyboxMaterial.name = "skyboxmaterial";
+        _myRenderWindow.scene.materials.appendChild(mySkyboxMaterial);
+        _mySkyboxMaterialId = mySkyboxMaterial.id;
 
         // add textures
         var myTexturesString =
@@ -281,32 +282,32 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             '</textures>';
         var myTexturesDoc  = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
-        _mySkyboxMaterial.appendChild(myTexturesNode);
+        mySkyboxMaterial.appendChild(myTexturesNode);
 
         // add texture requirement
         var myTextureFeatures = new Node('<feature name="textures">[100[skybox]]</feature>\n').firstChild;
-        _mySkyboxMaterial.requires.appendChild(myTextureFeatures);
+        mySkyboxMaterial.requires.appendChild(myTextureFeatures);
 
-        self.getWorld().skyboxmaterial = _mySkyboxMaterial.id;
+        _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterialId;
     }
 
     self.addSkyBoxFromFile = function(theFileName, theTile) {
         if (theTile == undefined) {
             theTile = new Vector2i(1,6);
         }
-
-        if (_mySkyboxMaterial) {
-            var mySkyboxImage = _mySkyboxMaterial.getElementById(_mySkyboxMaterial.childNode("textures").firstChild.image);
+        var mySkyboxMaterial = _myRenderWindow.scene.world.getElementById(_mySkyboxMaterialId);
+        if (mySkyboxMaterial) {
+            var mySkyboxImage = mySkyboxMaterial.getElementById(mySkyboxMaterial.childNode("textures").firstChild.image);
             mySkyboxImage.src = theFileName;
             mySkyboxImage.tile = theTile;
-            _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterial.id;
+            _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterialId;
         } else {
             var myImageId = createUniqueId();
             var mySkyboxImageString =
                 '<image name="' + theFileName + '" id="' + myImageId + '" src="' + theFileName + '" type="cubemap" mipmap="0" wrapmode="repeat" tile="' + theTile + '"/>\n';
             var mySkyboxImageDoc = new Node(mySkyboxImageString);
             var mySkyboxImage = mySkyboxImageDoc.firstChild;
-            self.getImages().appendChild(mySkyboxImage);
+            _myRenderWindow.scene.images.appendChild(mySkyboxImage);
             self.addSkyBoxFromImage(mySkyboxImage);
         }
     }
@@ -524,7 +525,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myAnimations            = null;
     var _myImages                = null;
 
-    var _mySkyboxMaterial        = null;
+    var _mySkyboxMaterialId      = null;
     var _myHeartbeatThrober      = null;
     var _myPicking               = null;
     var _myAutoClicker           = null;
