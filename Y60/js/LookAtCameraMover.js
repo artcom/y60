@@ -31,7 +31,8 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
     var _myLookAtPosition    = new Vector3f(0,0,0);
     var _myLookAtOffset      = new Vector3f(0,0,0);
     var _myEyePositionOffset = new Vector3f(10,2,0);
-    
+    var _myOrientation       = null;
+
     var _mySpringStrength = 1;
     var _myLastTime = null;
 
@@ -56,7 +57,11 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
     obj.setSpringStrength = function(theSpringStrength) {
         _mySpringStrength = theSpringStrength;
     }
-        
+       
+    obj.setOrientation = function(theOrientation) {
+        _myOrientation = theOrientation;        
+    }
+
     obj.getCamera = function() {
         return _myCamera;
     }
@@ -70,9 +75,15 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
         _myLastTime = theTime;
         
         var myMatrix = _myNodeToFollow.globalmatrix;
-        var myRotationMatrix = new Matrix4f(_myNodeToFollow.orientation);
+
+        var myRotationMatrix = null;
+        if (_myOrientation) {
+            myRotationMatrix = new Matrix4f(_myOrientation);
+        } else {
+            myRotationMatrix = new Matrix4f(_myNodeToFollow.orientation);
+        }
+
         var myNodePosition = _myNodeToFollow.boundingbox.center;
- 
         var myMotionFactor = _mySpringStrength * myDeltaTime;
         if (myMotionFactor > 1) {
             myMotionFactor = 1;
