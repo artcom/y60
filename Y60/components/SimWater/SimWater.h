@@ -39,7 +39,7 @@ class SimWater :
 
         const char * ClassName();
         
-        void splash(const asl::Vector2i & thePosition, int theMagnitude, int theRadius);
+        void splash(const asl::Vector2i & thePosition, float theMagnitude, int theRadius);
         int addFloormap(const std::string & theFilename);
         int addCubemap(const std::string theFilenames[]);
         void reset();
@@ -61,7 +61,7 @@ class SimWater :
         asl::Vector2i _myDisplayOffset;
         asl::Vector2i _myViewportSize;
 
-        float _myWaterDamping;
+        //float _myWaterDamping;
 
         asl::Time _myStartTime;
         bool _myRunSimulationFlag;

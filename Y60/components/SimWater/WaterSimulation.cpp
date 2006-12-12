@@ -113,7 +113,7 @@ WaterSimulation::~WaterSimulation() {
 void
 WaterSimulation::init() {
     reset();
-    resetDamping(false);
+    setDamping(_defaultDampingCoefficient);
 }
 
 void    
@@ -132,21 +132,26 @@ WaterSimulation::reset() {
 }
 
 void    
-WaterSimulation::resetDamping(bool freeze) {
+WaterSimulation::setDamping(float theDampingValue) {
     
-    float   dampValue = freeze ? 0.f : _defaultDampingCoefficient;
+    //float   dampValue = freeze ? 0.f : _defaultDampingCoefficient;
     
     for(int j = 0; j < _numAllocatedRows ; j++ ) {
 
         GLfloat * dampBufferLine = _dampingArray + j * _numAllocatedColumns;
         
-        for( int i=0 ; i < _numAllocatedColumns ; i++ ) {
+        for( int i= 0 ; i < _numAllocatedColumns ; i++ ) {
             
-            dampBufferLine[i] = dampValue;
+            
+            dampBufferLine[i] = theDampingValue;
         }
     }
 }
 
+float
+WaterSimulation::getDamping() const {
+		return _dampingArray[0];
+}
 
 #if 0   // THE ORIGINAL
 
@@ -191,7 +196,6 @@ WaterSimulation::simulationStep(const float dt) {
     //precalculate coefficients
 //    const float A = (c*dt/_h)*(_c*dt/_h);
     register const float A = SQR(waveSpeed() * dt / waveCoefficient());
-    
     //	const float AD = A/sqrt(2);
     register const float B = 2.f - 4.f*A;// - 4*AD;
 
@@ -209,7 +213,6 @@ WaterSimulation::simulationStep(const float dt) {
           
         for( int i=1 ; i<_numAllocatedColumns-1 ; i++ ) {
             
-//            thisLine[i] = (A*( (*prevLine++) + (*nextLine++) + currLine[i-1] + currLine[i+1] ) +
             thisLine[i] = (A*( prevLine[i] + nextLine[i] + currLine[i-1] + currLine[i+1] ) +
                 + B * currLine[i]
                 - thisLine[i]) * dampingLine[i];
@@ -449,7 +452,7 @@ WaterSimulation::parabolicSplash(int xpos, int ypos, int magnitude, int radius) 
 			double dy = ypos - y;
 			double distance = sqrt(dx * dx + dy * dy);
 			if (distance <= radius) {
-				float weight = 1.0 - distance/radius;
+				float weight = 1.0f - float(distance/radius);
 				weight *= weight;
 				if (x >= 0 && x <= _mySize[0] && y >= 0 && y <= _mySize[1]) {
 //					(*z)[y][x] = (*z1)[y][x] = -weight * magnitude;
@@ -462,7 +465,7 @@ WaterSimulation::parabolicSplash(int xpos, int ypos, int magnitude, int radius) 
 }
 
 void 
-WaterSimulation::sinoidSplash(int xpos, int ypos, int magnitude, int radius, int frequency) {
+WaterSimulation::sinoidSplash(int xpos, int ypos, float magnitude, int radius, int frequency) {
 
     /*
     cerr << "WaterSimulation::sinoidSplash() x: " << xpos << " y: " << ypos
@@ -477,13 +480,13 @@ WaterSimulation::sinoidSplash(int xpos, int ypos, int magnitude, int radius, int
 			double dy = ypos - y;
 			double distance = sqrt(dx * dx + dy * dy);
 			if (distance <= radius) {
-				float weight = 1.0 - distance/radius;
+				float weight = 1.0f - float(distance/radius);
 				weight *= weight;
 				if (x >= 0 && x < _mySize[0] && y >= 0 && y < _mySize[1] ) {
 //#ifdef AIR_SPLASH
 //					(*z)[y][x] = (*z1)[y][x] = (*z)[y][x] -sin(weight*frequency*3.14159/2) * magnitude;
 					getWaterValue(0, x, y) = getWaterValue(1, x, y) = 
-                        getWaterValue(0, x, y) - sin(weight*frequency*3.14159/2) * magnitude;
+                        getWaterValue(0, x, y) - float(sin(weight*frequency*3.14159/2)) * magnitude;
                     getDampingValue(x, y) = _defaultDampingCoefficient;
 //#else
 //					(*z)[y][x] = (*z1)[y][x] = -sin(weight*frequency*3.14159/2) * magnitude;

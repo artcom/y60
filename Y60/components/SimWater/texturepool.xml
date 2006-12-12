@@ -11,6 +11,14 @@
         <file objectid="10000" name="ground.png"/>
         <file objectid="10100" name="black.png"/>
         <file objectid="10200" name="grey.png"/>
+        
+        <file objectid="10300" name="black_and_stripe.png"/>
+        <file objectid="10301" name="gravel.png"/>
+        <file objectid="10302" name="gravel_dark.png"/>
+        <file objectid="10303" name="gravel_dark_stripes.png"/>
+        <file objectid="10304" name="gravel_stripes.png"/>
+        <file objectid="10305" name="gravel_water_edge.png"/>
+        <file objectid="10306" name="grey_and_stripe.png"/>
     </floormaps>
     <cubemaps classid="&cubemap;">
         <fileset objectid="1">

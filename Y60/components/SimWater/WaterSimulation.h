@@ -42,7 +42,8 @@ public:
 
     void    init();
     void    reset();
-    void    resetDamping(bool freeze=false);
+    void    setDamping(float theDampingValue);
+    float   getDamping() const;
 
     void    simulationStep(float gTimeStep);
 
@@ -103,7 +104,7 @@ public:
     }
 
     void    parabolicSplash(int xpos, int ypos, int magnitude, int radius);
-    void    sinoidSplash(int xpos, int ypos, int magnitude, int radius, int frequency = 1);
+    void    sinoidSplash(int xpos, int ypos, float magnitude, int radius, int frequency = 1);
 
     asl::ThreadSemaphore &    getComputeLock() {
         return * _computeLock;

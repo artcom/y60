@@ -83,19 +83,19 @@ WaterRepresentation::WaterRepresentation() :
     _normalMax(.5f),
     _reflectionAlphaScale(1.f -  0.05f),
     _refractionScale(1.f),
-    _reflectionNormalScale(.2),
+    _reflectionNormalScale(0.2f),
     _causticBias(.75f),
     _causticScale(0.f),
     _causticSqrScale(1.f),
     _causticNegativeScale(0.25f),
-    _objectPosScaleX(1.),
-    _objectPosScaleY(1.),
-    _objectPosOffsetX(0.),
-    _objectPosOffsetY(0.),
+    _objectPosScaleX(1.0f),
+    _objectPosScaleY(1.0f),
+    _objectPosOffsetX(0.0f),
+    _objectPosOffsetY(0.0f),
     _renderSurfaceEnabled(false),
-    _crackWidth(.5),
-    _innerIceThickness(2.),
-    _outerIceThickness(4.),
+    _crackWidth(0.5f),
+    _innerIceThickness(2.0f),
+    _outerIceThickness(4.0f),
     _renderCrackField(false),
     _surfaceOpacity(0.95f)
 {
@@ -133,7 +133,7 @@ WaterRepresentation::resetParameters() {
     _normalMax = .5f;
     _reflectionAlphaScale = 1.f -  0.05f;
     _refractionScale = 1.f;
-    _reflectionNormalScale = .2;
+    _reflectionNormalScale = .2f;
     _causticBias = .75f;
     _causticScale = 0.f;
     _causticSqrScale = 1.f;
@@ -224,7 +224,7 @@ WaterRepresentation::init(WaterSimulationPtr waterSim, int width, int height,
             for (int i=0; i<= _dataWidth; i++) {
                 vertexLinePtr[0] = i - ((float)(_dataWidth)/ 2.f);  // xpos
                 vertexLinePtr[1] = currentBuffer * numLinesPerBuffer + j - 
-                                    ((double)(_dataHeight) / 2.f);  // ypos
+                                    ((float)(_dataHeight) / 2.f);  // ypos
 
                 vertexLinePtr[0] += (float) _displayOffsetX;
                 vertexLinePtr[1] += (float) _displayOffsetY;
@@ -269,8 +269,8 @@ WaterRepresentation::setDisplayOffset( const Vector2i & theOffset ) {
 
 void
 WaterRepresentation::dataCoordToScreenCoord(const Vector2f & theDataCoord, Vector2f & screenCoord) {
-    screenCoord[0] = theDataCoord[0] - float(_dataWidth)/2. + _displayOffsetX - _dataOffsetX;
-    screenCoord[1] = theDataCoord[1] - float(_dataHeight)/2. + _displayOffsetY - _dataOffsetY;
+    screenCoord[0] = theDataCoord[0] - float(_dataWidth)/2.0f + _displayOffsetX - _dataOffsetX;
+    screenCoord[1] = theDataCoord[1] - float(_dataHeight)/2.0f + _displayOffsetY - _dataOffsetY;
 }
 
 void
@@ -440,7 +440,7 @@ WaterRepresentation::loadCubeMapTexture(TextureClass theClassID,
 		glTexImage2D(_cubeMapSideID[i], 0, 
                      GL_RGBA8, myBmp.GetWidth(), 
                      myBmp.GetHeight(),
-					 0, GL_BGR, GL_UNSIGNED_BYTE, myBmp.GetPixels());
+					 0,  (myBmp.HasAlpha()) ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, myBmp.GetPixels());
         if (imageWidth) {
             if ((imageWidth != myBmp.GetWidth()) || (imageHeight != myBmp.GetHeight())) {
                 cerr << "#ERROR : Cubemap images MUST all be of same size!";
@@ -498,10 +498,16 @@ WaterRepresentation::loadTexture(TextureClass theClassID,
     }
     
     //Store that section. ..
+    /*
     glTexImage2D(GL_TEXTURE_2D, 0, 
             (myBmp.HasAlpha()) ? GL_RGBA8 : GL_RGB8, myBmp.GetWidth(), 
             myBmp.GetHeight(),
             0, (myBmp.HasAlpha()) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, myBmp.GetPixels());
+    */
+    glTexImage2D(GL_TEXTURE_2D, 0, 
+            (myBmp.HasAlpha()) ? GL_RGBA8 : GL_RGB8, myBmp.GetWidth(), 
+            myBmp.GetHeight(),
+            0, (myBmp.HasAlpha()) ? GL_BGRA : GL_BGR, GL_UNSIGNED_BYTE, myBmp.GetPixels());
 
     myTexture.myWidth = myBmp.GetWidth();
     myTexture.myHeight = myBmp.GetHeight();
@@ -696,8 +702,8 @@ WaterRepresentation::renderSurface() {
     float   z = SURFACE_LEVEL;
 
     Vector2f    v0, v1;
-    dataCoordToScreenCoord(Vector2f(_dataOffsetX, _dataOffsetY), v0);
-    dataCoordToScreenCoord(Vector2f(_dataOffsetX+_dataWidth, _dataOffsetY+_dataHeight), v1);
+    dataCoordToScreenCoord(Vector2f(float(_dataOffsetX), float(_dataOffsetY)), v0);
+    dataCoordToScreenCoord(Vector2f(float(_dataOffsetX + _dataWidth), float(_dataOffsetY+_dataHeight)), v1);
             
     glColor4f(1, 1, 1, _surfaceOpacity); 
     glBegin(GL_POLYGON);

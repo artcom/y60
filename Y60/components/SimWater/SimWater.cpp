@@ -17,8 +17,14 @@
 
 #include <y60/GLAlloc.h>
 
-const int SIMULATION_WIDTH = 480;
-const int SIMULATION_HEIGHT = 240;
+//const int SIMULATION_WIDTH = 480;
+//const int SIMULATION_HEIGHT = 240;
+
+const int SIMULATION_WIDTH = 240;
+const int SIMULATION_HEIGHT = 480;
+
+//const int SIMULATION_WIDTH = 256;
+//const int SIMULATION_HEIGHT = 512;
 
 const std::string DATA_DIR("data");
 const char * const ourCubeSides[6] = {"right","left","top","bottom","front","back"};
@@ -33,12 +39,13 @@ SimWater::SimWater(DLHandle theDLHandle) :
     IRendererExtension("SimWater"),
     _mySimulationSize( SIMULATION_WIDTH + 2 , SIMULATION_HEIGHT + 2),
     _mySimulationOffset( 1, 1 ),
-    _myDisplaySize(SIMULATION_WIDTH / 4 , SIMULATION_HEIGHT / 2),
+    //_myDisplaySize(SIMULATION_WIDTH / 4 , SIMULATION_HEIGHT / 2),
+    _myDisplaySize(SIMULATION_WIDTH , SIMULATION_WIDTH),
     _myDisplayOffset(0 , 0), // TODO: doesn't change anything ... find out why?
-    _myWaterDamping(0.9993),
+    //_myWaterDamping(0.9993),
     _myRunSimulationFlag( true ),
     _myIntegrationsPerFrame( 3 ),
-    _myTimeStep( 0.1 ),
+    _myTimeStep( 0.1f ),
     _myViewportSize(0, 0),
     _myFloormapCounter(0),
     _myCubemapCounter(0)
@@ -106,7 +113,10 @@ SimWater::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myDisplaySize );
         return;
     }
-    
+    if (thePropertyName == "damping") {
+    	theReturnValue.set( _myWaterSimulation->getDamping() );
+    	return;
+    }
     AC_WARNING << "SimWater::onGetProperty(): Unknown property '" << thePropertyName << "'.";
 };
 
@@ -154,6 +164,10 @@ SimWater::onSetProperty(const std::string & thePropertyName,
         _myWaterRepresentation->setDisplayOffset( _myDisplayOffset );
         return;
     }
+    if (thePropertyName == "damping") {
+    	_myWaterSimulation->setDamping( thePropertyValue.get<float>() );
+    	return;
+    }
 
     AC_WARNING << "SimWater::onSetProperty(): Unknown property '" << thePropertyName << "'.";
 };
@@ -167,10 +181,10 @@ SimWater::onStartup(jslib::AbstractRenderWindow * theWindow)  {
     _myViewportSize[1] = theWindow->getHeight();
 
     _myWaterSimulation = WaterSimulationPtr(
-            new WaterSimulation( _mySimulationSize, _myWaterDamping ));
+            new WaterSimulation( _mySimulationSize, 0.9993f ));
     _myWaterSimulation->init();
-    _myWaterSimulation->resetDamping( false );
-
+    //_myWaterSimulation->resetDamping( false );
+		_myWaterSimulation->setDamping(0.9993f);
     _myWaterRepresentation = WaterRepresentationPtr( new WaterRepresentation() );
     dom::NodePtr myCanvas = theWindow->getCanvas();
     _myWaterRepresentation->init( _myWaterSimulation, _myDisplaySize[0], _myDisplaySize[1],
@@ -334,7 +348,7 @@ SimWater::reset() {
 }
 
 void 
-SimWater::splash(const asl::Vector2i & thePosition, int theMagnitude, int theRadius) {
+SimWater::splash(const asl::Vector2i & thePosition, float theMagnitude, int theRadius) {
      Vector2i myCoord = convertMouseCoordsToSimulation( thePosition );
      _myWaterSimulation->sinoidSplash(myCoord[0], myCoord[1], theMagnitude, theRadius);
 }
@@ -354,7 +368,7 @@ Splash(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     asl::Vector2i myPosition;
     convertFrom(cx, argv[0], myPosition);
 
-    int myMagnitude;
+    float myMagnitude;
     convertFrom(cx, argv[1], myMagnitude);
 
     int myRadius;
