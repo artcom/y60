@@ -145,7 +145,7 @@ function LabelBase(Public, Protected, theScene,
             var myImage = theScene.images.appendChild(new Node("<image/>").firstChild);
             myImage.resize = "pad";
             Protected.addImage(myImage);
-            Public.textures.lastChild.applymode = "modulate";
+            Public.textures.lastChild.applymode = TextureApplyMode.modulate;
         }
         return Public.image;
     }

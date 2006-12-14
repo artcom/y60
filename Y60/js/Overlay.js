@@ -369,7 +369,7 @@ function TextureOverlay(Public, Protected, theScene, thePosition, theParent) {
             _myTextures = Public.material.appendChild(Node.createElement("textures"));
         }
         var myTexture  = _myTextures.appendChild(Node.createElement("texture"));
-        myTexture.applymode = "modulate";
+        myTexture.applymode = TextureApplyMode.modulate;
         myTexture.image     = theImageId;
         addTextureRequirements(_myTextures.childNodesLength());
         return myTexture;

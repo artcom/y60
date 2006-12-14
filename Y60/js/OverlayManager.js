@@ -76,7 +76,7 @@ function OverlayManager(theScene, theViewport) {
         for (var i = 0; i < theImageIds.length; ++i) {
             var myApplymode = "decal";
             if (i == 0) {
-                myApplymode = "modulate";
+                myApplymode = TextureApplyMode.modulate;
             }
             myTexturesString +=
             '        <texture image="' + theImageIds[i] + '" applymode="' + myApplymode + '" />\n';
