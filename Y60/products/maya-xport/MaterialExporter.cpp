@@ -327,8 +327,10 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
             myTexGenParams.push_back(myMatrix.getColumn(1));
             myTexGenParams.push_back(myMatrix.getColumn(2));
             myTexGenParams.push_back(myMatrix.getColumn(3));
+            string myTexUnitString = string("texgenparam") + asl::as_string(theBuilder.getTextureCount());
+            
             setPropertyValue<VectorOfVector4f>(theBuilder.getNode(),
-                    "vectorofvector4f", "texgenparam0", myTexGenParams);
+                    "vectorofvector4f", myTexUnitString.c_str(), myTexGenParams);
 
         } else {
             /*
@@ -353,6 +355,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         myTextureMatrix.makeScaling(asl::Vector3f(float(myRepeatU), float(myRepeatV), 1));
     }
 
+    
     theBuilder.createTextureNode(myImageId, myApplyMode, theUsageMode,
             myTextureMapping, myTextureMatrix, 100, false, 50);
 }
