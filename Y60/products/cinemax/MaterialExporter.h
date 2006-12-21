@@ -57,13 +57,13 @@ class MaterialExporter {
 
 		ExportedMaterialInfo  initiateExport(BaseObject * theNode, TextureList theTextureList,
                                              y60::SceneBuilder & theSceneBuilder);
-		
+
 		void writeMaterial(const ExportedMaterialInfo & theMaterialId, BaseObject * theNode, TextureList theTextureList,
-			               y60::SceneBuilder & theSceneBuilder, 
+			               y60::SceneBuilder & theSceneBuilder,
 						   const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord);
 
-		void writeMaterial(const ExportedMaterialInfo & theMaterialId, BaseObject * theNode, 
-			               y60::SceneBuilder & theSceneBuilder, 
+		void writeMaterial(const ExportedMaterialInfo & theMaterialId, BaseObject * theNode,
+			               y60::SceneBuilder & theSceneBuilder,
 						   const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord);
 
     private:
@@ -82,18 +82,18 @@ class MaterialExporter {
 
         bool exportTexture(Material* theMaterial,
                            y60::MaterialBuilderPtr theMaterialBuilder,
-                           y60::SceneBuilder & theSceneBuilder, 
-                           BaseContainer * theContainer, const TextureUsage & theUsage, TextureTag * theTextureTag,
+                           y60::SceneBuilder & theSceneBuilder,
+                           BaseContainer * theContainer, const y60::TextureUsage & theUsage, TextureTag * theTextureTag,
 						   const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord,
                            bool isAlphaChannel = false, bool isEnvMap = false);
 
-        bool exportShader(PluginShader * theShader, 
-                          y60::MaterialBuilderPtr theMaterialBuilder, 
-                          Material* theMaterial, 
+        bool exportShader(PluginShader * theShader,
+                          y60::MaterialBuilderPtr theMaterialBuilder,
+                          Material* theMaterial,
                           y60::SceneBuilder & theSceneBuilder,
                           BaseContainer * theColorContainer,
-						  TextureTag * theTextureTag, 
-						  const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord, 
+						  TextureTag * theTextureTag,
+						  const asl::Vector3f & theMinCoord, const asl::Vector3f & myMaxCoord,
 						  bool isAlphaChannel = false, bool isEnvMap = false);
 
         ExportedMaterialInfo createDefaultMaterial();
