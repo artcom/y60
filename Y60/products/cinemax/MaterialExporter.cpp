@@ -17,6 +17,7 @@
 #include <y60/property_functions.h>
 #include <y60/ShapeBuilder.h>
 #include <y60/PropertyNames.h>
+#include <y60/Image.h>
 
 #if API_VERSION >= 8500
 #include <Xbitmap.h>
