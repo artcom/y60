@@ -183,9 +183,13 @@ std::string ShapeExporter::writeSelection(BaseObject * theNode, BaseObject * the
     std::string myName = getString(theNode->GetName() + "_" + theSelection->GetName());
 
     PolygonObject * myPolygon = ToPoly(thePolygonNode);
+#if API_VERSION >= 9800
+	const Vector  * myVertices      = myPolygon->GetPointR();
+	const Polygon * myPolygons      = myPolygon->GetPolygonR();
+#else
 	Vector  * myVertices      = myPolygon->GetPoint();
 	Polygon * myPolygons      = myPolygon->GetPolygon();
-
+#endif
     // ShapeBuilder
     y60::ShapeBuilder myShapeBuilder(myName);
     myShapeBuilder.createVertexDataBin<Vector3f>(POSITION_ROLE, 1);
@@ -467,10 +471,14 @@ ShapeExporter::setupNormalBuilder(asl::VertexNormalBuilder<float> & theVertexNor
     PolygonObject * myPolygon = ToPoly(theNode);
 
     LONG      myVertexCount   = myPolygon->GetPointCount();
-	Vector  * myVertices      = myPolygon->GetPoint();
-
-    LONG      myPolygonCount  = myPolygon->GetPolygonCount();
+#if API_VERSION >= 9800    
+	const Polygon * myPolygons      = myPolygon->GetPolygonR();
+	const Vector  * myVertices      = myPolygon->GetPointR();
+#else
 	Polygon * myPolygons      = myPolygon->GetPolygon();
+	Vector  * myVertices      = myPolygon->GetPoint();
+#endif
+    LONG      myPolygonCount  = myPolygon->GetPolygonCount();
 
 	for (LONG i = 0; i < myVertexCount; ++i) {
 		theVertexNormalBuilder.addVertex(Vector3f(myVertices[i].x, myVertices[i].y, (-1) * myVertices[i].z));
