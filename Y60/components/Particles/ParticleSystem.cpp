@@ -67,22 +67,22 @@ computeScattering(const asl::Vector3f & theDirection, float theScatteringAngle) 
     Vector3f myOrthoVector1(1.0, 1.0, 1.0);
 
     if ((theDirection[2] >= 0.5) || (theDirection[2] <= -0.5)) {
-        myOrthoVector1[2] = - (theDirection[0] + theDirection[1]) / theDirection[2]; 
+        myOrthoVector1[2] = - (theDirection[0] + theDirection[1]) / theDirection[2];
     } else if ((theDirection[0] >= 0.5) || (theDirection[0] <= -0.5) ) {
-        myOrthoVector1[0] = - (theDirection[1] + theDirection[2]) / theDirection[0]; 
+        myOrthoVector1[0] = - (theDirection[1] + theDirection[2]) / theDirection[0];
     } else {
-        myOrthoVector1[1] = - (theDirection[2] + theDirection[0]) / theDirection[1]; 
+        myOrthoVector1[1] = - (theDirection[2] + theDirection[0]) / theDirection[1];
     }
 
     myOrthoVector1 = myOrthoVector1.normalize();
 
     Vector3f myOrthoVector2 = cross(myOrthoVector1, theDirection);
     myOrthoVector2 = myOrthoVector2.normalize();
-        
+
     Vector3f myScatteredVector;
-    float myAxisRotation = getRandomNumber(0, PI*2);
-    float myRadScatteringAngle = radFromDeg(theScatteringAngle); 
-    
+    float myAxisRotation = getRandomNumber(0, float(PI*2.0));
+    float myRadScatteringAngle = float(radFromDeg(theScatteringAngle));
+
     myScatteredVector[1] = cos(-myRadScatteringAngle) * sin(myAxisRotation);
     myScatteredVector[2] = sin(-myRadScatteringAngle);
     myScatteredVector[0] = cos(-myRadScatteringAngle) * cos(myAxisRotation);
@@ -93,7 +93,7 @@ computeScattering(const asl::Vector3f & theDirection, float theScatteringAngle) 
     myScatteredVector = myScatteredVector[0] * myOrthoVector1 +
                         myScatteredVector[1] * myOrthoVector2 +
                         myScatteredVector[2] * theDirection;
-   
+
     myScatteredVector = myScatteredVector.normalize();
     return myScatteredVector;
 }
@@ -122,7 +122,7 @@ ParticleSystem::create(dom::NodePtr theParentNode,
                        string theTextureName,
                        asl::Vector3f theInitialDirection,
                        asl::Vector2f theScatteringRange,
-                       asl::Vector2f theSpeedRange)                            
+                       asl::Vector2f theSpeedRange)
 {
     DB(AC_DEBUG << "ParticleSystem::create: fill vertexbuffer with particles data");
 
@@ -141,7 +141,7 @@ ParticleSystem::create(dom::NodePtr theParentNode,
 
     // create material
     _myMaterialNode = createUnlitTexturedColoredMaterial(_myScene, theTextureName, "ParticleSystemBaseTexture", true, 64);
-    
+
     MaterialBaseFacadePtr myMaterial = _myMaterialNode->getFacade<MaterialBase>();
     MaterialPropertiesFacadePtr myPropFacade = myMaterial->getChild<MaterialPropertiesTag>();
     myPropFacade->set<PointSizeTag>(_myPointSize);
@@ -161,8 +161,8 @@ ParticleSystem::create(dom::NodePtr theParentNode,
     myProperties->appendChild(dom::Node("<vector3f name='gravity'>[0.0, 0.0, 0.0]</vector3f>").firstChild());
     myProperties->appendChild(dom::Node("<vector3f name='size'>[8.0, 2.0, 640.0]</vector3f>").firstChild());
 
-    string myMaterialNodeId = _myMaterialNode->getAttribute("id")->nodeValue(); 
-    
+    string myMaterialNodeId = _myMaterialNode->getAttribute("id")->nodeValue();
+
     TargetBuffers & myTargetBuffers = myPropFacade->getProperty(TARGETBUFFERS_PROPERTY)->nodeValueRefOpen<TargetBuffers>();
     myTargetBuffers = TargetBuffers((1<<RED_MASK)|(1<<GREEN_MASK)|(1<<BLUE_MASK)|(1<<ALPHA_MASK));
     myPropFacade->getProperty(TARGETBUFFERS_PROPERTY)->nodeValueRefClose<TargetBuffers>();
@@ -171,7 +171,7 @@ ParticleSystem::create(dom::NodePtr theParentNode,
     asl::Vector3f & myValue = myPropFacade->getProperty(POINTATTENUATION_PROPERTY)->nodeValueRefOpen<asl::Vector3f>();
     myValue = asl::Vector3f(1.0, 1.0, 32.0);
     myPropFacade->getProperty(POINTATTENUATION_PROPERTY)->nodeValueRefClose<asl::Vector3f>();
-    myMaterial->set<TransparencyTag>(true);            
+    myMaterial->set<TransparencyTag>(true);
 
     // set shader into vertex params
     dom::Node & myRequiresNode = *(_myMaterialNode->childNode("requires"));
@@ -180,54 +180,54 @@ ParticleSystem::create(dom::NodePtr theParentNode,
     }
 
     // turn on sprite in texture
-    dom::NodePtr myTextures = _myMaterialNode->childNode("textures"); 
-    dom::NodePtr myTexture = myTextures->childNode("texture"); 
-    myTexture->getAttribute("sprite")->nodeValue("1"); 
+    dom::NodePtr myTextures = _myMaterialNode->childNode("textures");
+    dom::NodePtr myTexture = myTextures->childNode("texture");
+    myTexture->getAttribute("sprite")->nodeValue("1");
 
     // turn off mipmap in image
-    _myImageNode = _myScene->getWorldRoot()->getElementById(myTexture->getAttributeString("image")); 
-    _myImageNode->getAttribute("mipmap")->nodeValue("0"); 
+    _myImageNode = _myScene->getWorldRoot()->getElementById(myTexture->getAttributeString("image"));
+    _myImageNode->getAttribute("mipmap")->nodeValue("0");
 
-    // setup vertices 
-    ShapeBuilder myShapeBuilder("Particles"); 
-    _myScene->getSceneBuilder()->appendShape(myShapeBuilder); 
+    // setup vertices
+    ShapeBuilder myShapeBuilder("Particles");
+    _myScene->getSceneBuilder()->appendShape(myShapeBuilder);
 
-    myShapeBuilder.createVertexDataBin<asl::Vector3f>(POSITION_ROLE, _myParticleCount); 
-    myShapeBuilder.createVertexDataBin<asl::Vector4f>(COLOR_ROLE, _myParticleCount); 
-    myShapeBuilder.createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, 1); 
-    myShapeBuilder.createVertexDataBin<asl::Vector4f>(TEXCOORD0_ROLE, 1); // texture 
-    myShapeBuilder.createVertexDataBin<asl::Vector4f>(TEXCOORD1_ROLE, _myParticleCount); // start direction (xyz) time (w) 
+    myShapeBuilder.createVertexDataBin<asl::Vector3f>(POSITION_ROLE, _myParticleCount);
+    myShapeBuilder.createVertexDataBin<asl::Vector4f>(COLOR_ROLE, _myParticleCount);
+    myShapeBuilder.createVertexDataBin<asl::Vector3f>(NORMAL_ROLE, 1);
+    myShapeBuilder.createVertexDataBin<asl::Vector4f>(TEXCOORD0_ROLE, 1); // texture
+    myShapeBuilder.createVertexDataBin<asl::Vector4f>(TEXCOORD1_ROLE, _myParticleCount); // start direction (xyz) time (w)
     myShapeBuilder.createVertexDataBin<asl::Vector4f>(TEXCOORD2_ROLE, _myParticleCount); // additional parameters (lifetime, size, speed)
 
-    asl::Vector3f myNormal(1.0f,0.0f,0.0f); 
+    asl::Vector3f myNormal(1.0f,0.0f,0.0f);
     myShapeBuilder.appendVertexData(NORMAL_ROLE, myNormal);
 
     asl::Vector4f myUvCoord(0.0f, 0.0f, 0.0f, 0.0f);
     myShapeBuilder.appendVertexData(TEXCOORD0_ROLE, myUvCoord);
 
     for (unsigned myIndex = 0; myIndex < _myParticleCount; ++myIndex) {
-        myShapeBuilder.appendVertexData(COLOR_ROLE, asl::Vector4f(1.0f,1.0f,1.0f,1.0f));          
-        
+        myShapeBuilder.appendVertexData(COLOR_ROLE, asl::Vector4f(1.0f,1.0f,1.0f,1.0f));
+
         myPosition = asl::Vector3f(0.0f, 0.0f, 0.0f); // getRandomVector(0, 10);
         myShapeBuilder.appendVertexData(POSITION_ROLE, myPosition);
 
         float myScattering = getRandomNumber(theScatteringRange[0], theScatteringRange[1]);
         Vector3f myNewDirection = computeScattering(_myInitialDirection, myScattering);
-        
+
         Vector4f myDirectionVector;
         myDirectionVector[0] = myNewDirection[0];
         myDirectionVector[1] = myNewDirection[1];
         myDirectionVector[2] = myNewDirection[2];
-        myDirectionVector[3] = -(float(myIndex)/float(_myParticleCount)); 
+        myDirectionVector[3] = -(float(myIndex)/float(_myParticleCount));
 
         myShapeBuilder.appendVertexData(TEXCOORD1_ROLE, myDirectionVector);
 
         float mySpeed = getRandomNumber(_mySpeedRange[0], _mySpeedRange[1]);
-        
+
         Vector4f myParameters(/*theTimeToLive*/ 0.0f, theSize, mySpeed, 0.0f);
         myShapeBuilder.appendVertexData(TEXCOORD2_ROLE, myParameters);
     }
-    
+
     ElementBuilderPtr myElement = ElementBuilderPtr(new ElementBuilder("points", myMaterial->get<IdTag>()));
     myElement->createIndex(POSITION_ROLE, POSITIONS);
     myElement->createIndex(NORMAL_ROLE, NORMALS);
@@ -235,7 +235,7 @@ ParticleSystem::create(dom::NodePtr theParentNode,
     myElement->createIndex(TEXCOORD1_ROLE, TEXCOORD1);
     myElement->createIndex(TEXCOORD2_ROLE, TEXCOORD2);
     myElement->createIndex(COLOR_ROLE, COLORS);
-    
+
     for (unsigned myIndex = 0; myIndex < _myParticleCount; ++myIndex) {
         myElement->appendIndex(POSITIONS, myIndex);
         myElement->appendIndex(NORMALS, 0);
@@ -245,15 +245,15 @@ ParticleSystem::create(dom::NodePtr theParentNode,
         myElement->appendIndex(COLORS, myIndex);
     }
     myShapeBuilder.appendElements(*myElement);
-    
+
     dom::NodePtr myShapeNode = myShapeBuilder.getNode();
     _myShape = myShapeNode->getFacade<Shape>();
 
     // _myBodyNode = createBody(_myScene->getWorldRoot(), _myShape->get<IdTag>());
     _myBodyNode = createBody(_myParentNode, _myShape->get<IdTag>());
-    
+
     dom::NodePtr myVertexDataNode = myShapeNode->childNode("vertexdata");
-    _myParticleVertexDataPtr = myVertexDataNode->childNodeByAttribute("vectorofvector3f", "name", "position")->firstChild();    
+    _myParticleVertexDataPtr = myVertexDataNode->childNodeByAttribute("vectorofvector3f", "name", "position")->firstChild();
 
     // build animation node
     y60::AnimationBuilder myAnimationBuilder;
@@ -263,7 +263,7 @@ ParticleSystem::create(dom::NodePtr theParentNode,
     myAnimationBuilder.setProperty("time");
     myAnimationBuilder.setDuration(1000000000.0f);
     myAnimationBuilder.setEnable(true);
-    
+
     VectorOfFloat myFloatValues;
     myFloatValues.push_back(0.0f);
     myFloatValues.push_back(1000000000.0f);
