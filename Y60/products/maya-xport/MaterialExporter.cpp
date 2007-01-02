@@ -219,6 +219,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         MTransformationMatrix myTransform = myMatrixData.transformation();
         MMatrix myMayaMatrix = myTransform.asMatrix();
 
+        cout << "maya matrix " << myMayaMatrix << endl;
         asl::Matrix4f myMatrix;
         myMatrix.assign(
             float(myMayaMatrix[0][0]), float(myMayaMatrix[0][1]), float(myMayaMatrix[0][2]), float(myMayaMatrix[0][3]),
@@ -267,8 +268,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
             //cout << "bbox="  << myBBox.width() << "x" << myBBox.height() << "x" << myBBox.depth() << endl;
             MPoint myBBoxSize(myBBox.width(), myBBox.height(), myBBox.depth());
             //convertToMeter(myBBoxSize);
-            cout << "bbox size=" << myBBoxSize.x << "," << myBBoxSize.y << "," << myBBoxSize.z << endl;
-
+                        
             asl::Matrix4f myNormalizationMatrix;
             myNormalizationMatrix.makeIdentity();
             myNormalizationMatrix.scale(asl::Vector3f(1.0f, -1.0f, 1.0f));
@@ -278,10 +278,16 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
             asl::Vector3f myScale, myShear, myRotation, myTranslation;
             myMatrix.decompose(myScale, myShear, myRotation, myTranslation);
 
-            myScale[0] *= float(myBBoxSize.x * 0.5);
-            myScale[1] *= float(myBBoxSize.y * 0.5);
-            myScale[2] *= float(myBBoxSize.z * 0.5f);
-
+            if( myBBoxSize.x > 0.0) {
+                myScale[0] *= float(myBBoxSize.x * 0.5);
+            }
+            if( myBBoxSize.y > 0.0) {
+                myScale[1] *= float(myBBoxSize.y * 0.5);
+            }
+            if(myBBoxSize.z > 0.0) {
+                myScale[2] *= float(myBBoxSize.z * 0.5f);
+            }
+            
             myTranslation[0] /= myScale[0] * 2.0f;
             myTranslation[1] /= myScale[1] * 2.0f;
             myTranslation[2] /= myScale[2] * 2.0f;
@@ -318,7 +324,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
             myMatrix.postMultiply(myPosMatrix);
             myMatrix.postMultiply(myScaleMatrix);
 #endif
-            cout << "pre-norm=" << myMatrix << endl;
+            cout << "pre-norm=" << myMatrix << " rot " << myRotMatrix << " scale " << myScaleMatrix << " pos " << myPosMatrix << endl;
             myMatrix.postMultiply(myNormalizationMatrix);
             cout << "final=" << myMatrix << endl;
 
