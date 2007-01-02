@@ -219,7 +219,7 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
         MTransformationMatrix myTransform = myMatrixData.transformation();
         MMatrix myMayaMatrix = myTransform.asMatrix();
 
-        cout << "maya matrix " << myMayaMatrix << endl;
+        //cout << "maya matrix " << myMayaMatrix << endl;
         asl::Matrix4f myMatrix;
         myMatrix.assign(
             float(myMayaMatrix[0][0]), float(myMayaMatrix[0][1]), float(myMayaMatrix[0][2]), float(myMayaMatrix[0][3]),
@@ -239,24 +239,24 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
 
             double mayaScale[3];
             myTransform.getScale(mayaScale, MSpace::kWorld);
-            cout << "+++ maya scale=" << mayaScale[0] << "," << mayaScale[1] << "," << mayaScale[2] << endl;
+            //cout << "+++ maya scale=" << mayaScale[0] << "," << mayaScale[1] << "," << mayaScale[2] << endl;
 
             MVector mayaTrans = myTransform.translation(MSpace::kWorld);
-            cout << "+++ maya trans=" << mayaTrans[0] << "," << mayaTrans[1] << "," << mayaTrans[2] << endl;
+            //cout << "+++ maya trans=" << mayaTrans[0] << "," << mayaTrans[1] << "," << mayaTrans[2] << endl;
 
             MEulerRotation mayaEuler = myTransform.eulerRotation();
-            cout << "+++ maya euler=" << mayaEuler[0] << "," << mayaEuler[1] << "," << mayaEuler[2] << endl;
+            //cout << "+++ maya euler=" << mayaEuler[0] << "," << mayaEuler[1] << "," << mayaEuler[2] << endl;
 
             /*
              * Calculate texgen matrix
              */
-            cout << "***" << endl;
-            cout << __DATE__ << " " << __TIME__ << endl;
-            cout << "mtx=" << myMatrix << endl;
+            //cout << "***" << endl;
+            //cout << __DATE__ << " " << __TIME__ << endl;
+            //cout << "mtx=" << myMatrix << endl;
 #if 0
             asl::Matrix4f myMtxInv = myMatrix;
             myMtxInv.invert();
-            cout << "inv=" << myMtxInv << endl;
+            //cout << "inv=" << myMtxInv << endl;
 #endif
 
             // object bounding-box for size normalization
@@ -324,9 +324,9 @@ MaterialExporter::exportFileTexture(const MFnMesh * theMesh, MObject & theTextur
             myMatrix.postMultiply(myPosMatrix);
             myMatrix.postMultiply(myScaleMatrix);
 #endif
-            cout << "pre-norm=" << myMatrix << " rot " << myRotMatrix << " scale " << myScaleMatrix << " pos " << myPosMatrix << endl;
+            //cout << "pre-norm=" << myMatrix << " rot " << myRotMatrix << " scale " << myScaleMatrix << " pos " << myPosMatrix << endl;
             myMatrix.postMultiply(myNormalizationMatrix);
-            cout << "final=" << myMatrix << endl;
+            //cout << "final=" << myMatrix << endl;
 
             VectorOfVector4f myTexGenParams;
             myTexGenParams.push_back(myMatrix.getColumn(0));
