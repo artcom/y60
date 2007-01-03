@@ -9,7 +9,7 @@
 //=============================================================================
 
 use("SceneViewer.js");
-plug("Particles");
+plug("GPUParticles");
 
 function ParticlesTest(theArguments) {
     this.Constructor(this, theArguments);
@@ -50,7 +50,8 @@ ParticlesTest.prototype.Constructor = function(self, theArguments) {
         window.camera.orientation = [0.615412, 0, 0, 0.788205]; 
 
         // create particles
-        _myParticleSystem = new ParticleSystem(window.scene);
+        _myParticleSystem = new GPUParticles(window.scene);
+        print("_myParticleSystem: "+_myParticleSystem);
         _myParticleSystem.create( window.scene.world, 
                                   50, // number of particles
                                   "3.png", // 3d texture
@@ -61,7 +62,7 @@ ParticlesTest.prototype.Constructor = function(self, theArguments) {
         _myParticleSystem.material.properties.timetolive = 3.0;
         _myParticleSystem.material.properties.gravity = [0.0, 0.0, 0.0];
         _myParticleSystem.material.properties.size = [20.0, 2.0, 640.0];
-        window.scene.update(Scene.ANIMATIONS_LOAD);
+        window.scene.update(Scene.ANIMATIONS_LOAD); 
     }
 
     self.onPostRender = function() {

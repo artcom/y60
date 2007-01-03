@@ -106,23 +106,25 @@ var myZ = myTrackballRadius * Math.cos(- _myTrackballOrientation.x) * Math.cos(_
 
 /*******************************************************************************/
 
-ParticleSystem::ParticleSystem(y60::ScenePtr theScene)
+ParticleSystem::ParticleSystem(const y60::ScenePtr & theScene)
     : _myParticleCount(0)
     , _myPointSize(5.0f, 0.0f, 64.0f)
     , _myScene(theScene)
 {}
 
 ParticleSystem::~ParticleSystem()
-{}
+{
+    _myParticleCount = 0;
+}
 
 
 void
-ParticleSystem::create(dom::NodePtr theParentNode,
+ParticleSystem::create(const dom::NodePtr & theParentNode,
                        unsigned theParticleCount,
-                       string theTextureName,
-                       asl::Vector3f theInitialDirection,
-                       asl::Vector2f theScatteringRange,
-                       asl::Vector2f theSpeedRange)
+                       const string & theTextureName,
+                       const asl::Vector3f & theInitialDirection,
+                       const asl::Vector2f & theScatteringRange,
+                       const asl::Vector2f & theSpeedRange)
 {
     DB(AC_DEBUG << "ParticleSystem::create: fill vertexbuffer with particles data");
 
@@ -132,8 +134,8 @@ ParticleSystem::create(dom::NodePtr theParentNode,
     _mySpeedRange = theSpeedRange;
     _myParentNode = theParentNode;
 
-    theScatteringRange[0] = (theScatteringRange[0]+180)/2;
-    theScatteringRange[1] = (theScatteringRange[1]+180)/2;
+    asl::Vector2f myScatteringRange = asl::Vector2f(((theScatteringRange[0]+180)/2),
+                                                    ((theScatteringRange[1]+180)/2));
 
     asl::Vector3f myPosition(0.0f, 0.0f, 0.0f);
 
@@ -208,10 +210,10 @@ ParticleSystem::create(dom::NodePtr theParentNode,
     for (unsigned myIndex = 0; myIndex < _myParticleCount; ++myIndex) {
         myShapeBuilder.appendVertexData(COLOR_ROLE, asl::Vector4f(1.0f,1.0f,1.0f,1.0f));
 
-        myPosition = asl::Vector3f(0.0f, 0.0f, 0.0f); // getRandomVector(0, 10);
+        myPosition = asl::Vector3f(0.0f, 0.0f, 0.0f); 
         myShapeBuilder.appendVertexData(POSITION_ROLE, myPosition);
 
-        float myScattering = getRandomNumber(theScatteringRange[0], theScatteringRange[1]);
+        float myScattering = getRandomNumber(myScatteringRange[0], myScatteringRange[1]);
         Vector3f myNewDirection = computeScattering(_myInitialDirection, myScattering);
 
         Vector4f myDirectionVector;
@@ -224,7 +226,7 @@ ParticleSystem::create(dom::NodePtr theParentNode,
 
         float mySpeed = getRandomNumber(_mySpeedRange[0], _mySpeedRange[1]);
 
-        Vector4f myParameters(/*theTimeToLive*/ 0.0f, theSize, mySpeed, 0.0f);
+        Vector4f myParameters( 0.0f, theSize, mySpeed, 0.0f);
         myShapeBuilder.appendVertexData(TEXCOORD2_ROLE, myParameters);
     }
 
@@ -249,7 +251,6 @@ ParticleSystem::create(dom::NodePtr theParentNode,
     dom::NodePtr myShapeNode = myShapeBuilder.getNode();
     _myShape = myShapeNode->getFacade<Shape>();
 
-    // _myBodyNode = createBody(_myScene->getWorldRoot(), _myShape->get<IdTag>());
     _myBodyNode = createBody(_myParentNode, _myShape->get<IdTag>());
 
     dom::NodePtr myVertexDataNode = myShapeNode->childNode("vertexdata");
@@ -273,5 +274,6 @@ ParticleSystem::create(dom::NodePtr theParentNode,
 
 void
 ParticleSystem::remove() {
+    // TODO: implement me.
 }
 

@@ -23,8 +23,6 @@ using namespace std;
 using namespace asl;
 using namespace jslib;
 
-#define DB(x) x
-
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns information about the ParticleSystem."); DOC_END;
@@ -150,8 +148,6 @@ JSParticleSystem::StaticProperties() {
     };
     return myProperties;
 }
-// std::string&)’
-
 
 JSFunctionSpec *
 JSParticleSystem::StaticFunctions() {
@@ -189,9 +185,6 @@ JSBool
 JSParticleSystem::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     
     switch (theID) {
-        case 0:
-            // To avoid compiler warnings
-            return JS_FALSE;    
         default:
             JS_ReportError(cx,"JSParticleSystem::setPropertySwitch: index %d out of range", theID);
             return JS_FALSE;
@@ -206,13 +199,10 @@ JSParticleSystem::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
     
     try{
         ensureParamCount(argc, 1);
-        
         if (JSA_GetClass(cx,obj) != Class()) {
             JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
             return JS_FALSE;
         }
-        
-        JSParticleSystem * myNewObject = 0;
         
         y60::ScenePtr myScene;
         if (!convertFrom(cx, argv[0], myScene)) {
@@ -221,12 +211,13 @@ JSParticleSystem::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
         }
     
         OWNERPTR myParticleSystem = OWNERPTR(new ParticleSystem(myScene));
-        myNewObject = new JSParticleSystem(myParticleSystem, &(*myParticleSystem));
+        JSParticleSystem * myNewObject = new JSParticleSystem(myParticleSystem, &(*myParticleSystem));
     
         if (myNewObject) {
             JS_SetPrivate(cx, obj, myNewObject);
+            AC_PRINT << "constructed";
             return JS_TRUE;
-        }
+        } 
     
         JS_ReportError(cx,"JSParticleSystem::Constructor: bad parameters");
 
@@ -244,7 +235,8 @@ JSParticleSystem::ConstIntProperties() {
 
 JSObject *
 JSParticleSystem::initClass(JSContext *cx, JSObject *theGlobalObject) {
-    JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), Functions(), ConstIntProperties(), 0, StaticFunctions());
+    JSObject *myClass = Base::initClass(cx, theGlobalObject, ClassName(), Constructor, Properties(), 
+                                        Functions(), ConstIntProperties(), 0, StaticFunctions());
     DOC_MODULE_CREATE("Components", JSParticleSystem);
     return myClass;
 }

@@ -29,7 +29,7 @@ public:
     virtual ~JSParticleSystem();
     
     static const char * ClassName() {
-            return "ParticleSystem";
+            return "GPUParticles";
     }
     
     static JSFunctionSpec * Functions();
@@ -38,7 +38,7 @@ public:
         PROP_material = -100,
         PROP_body,
         PROP_animation,
-        PROP_image
+        PROP_image 
     };
     
     static JSPropertySpec * Properties();

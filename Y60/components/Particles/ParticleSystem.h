@@ -19,15 +19,15 @@
 
 class ParticleSystem {
 public:
-    ParticleSystem(y60::ScenePtr theScene);
+    ParticleSystem(const y60::ScenePtr & theScene);
     ~ParticleSystem();
 
-    void create( dom::NodePtr theParentNode,
+    void create( const dom::NodePtr & theParentNode,
                  unsigned theParticleCount=1000,
-                 std::string theTextureName="1.png",
-                 asl::Vector3f theInitialDirection=asl::Vector3f(0.0f, 1.0f, 0.0f),
-                 asl::Vector2f theScattering=asl::Vector2f(0.0f, 45.0f),
-                 asl::Vector2f theSpeedRange=asl::Vector2f(10.0, 20.0) );
+                 const std::string & theTextureName="1.png",
+                 const asl::Vector3f & theInitialDirection=asl::Vector3f(0.0f, 1.0f, 0.0f),
+                 const asl::Vector2f & theScattering=asl::Vector2f(0.0f, 45.0f),
+                 const asl::Vector2f & theSpeedRange=asl::Vector2f(10.0, 20.0) );
 
     void remove();
         
