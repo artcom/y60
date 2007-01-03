@@ -62,6 +62,12 @@ class SceneExporter : public SceneSaverData {
 
         BaseObject * polygonizeObject(BaseObject * theNode);
 
+        bool writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
+  	                     BaseObject * & theNode,
+                         y60::WorldBuilderBasePtr & theParentBuilder,
+                         bool theTransformFlag = true,
+                         bool theForceFrontBackFacing = false);
+
         void writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
 	                      BaseObject * theNode,
                           bool theTransformFlag = true,

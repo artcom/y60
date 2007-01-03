@@ -438,26 +438,46 @@ SceneExporter::writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
             return;
         }
     }
-	bool myTraverseChilrden = true;
+    y60::WorldBuilderBasePtr myParentBuilder;
+    if (writeObject(theTransformBuilder, theNode, myParentBuilder,
+                    theTransformFlag, theForceFrontBackFacing)) {
+        // Recurse over child nodes
+        if (myParentBuilder) {
+            BaseObject * myChildNode = theNode->GetDown();
+            while (myChildNode) {
+                writeObjects(myParentBuilder, myChildNode, true, theForceFrontBackFacing);
+                myChildNode = myChildNode->GetNext();
+            }
+        }
+   }
+}
+
+bool 
+SceneExporter::writeObject(y60::WorldBuilderBasePtr theTransformBuilder,
+	                        BaseObject * & theNode,
+                            y60::WorldBuilderBasePtr & theParentBuilder,
+                            bool theTransformFlag,
+                            bool theForceFrontBackFacing) {
     StatusSetText("Exporting '" + getTreeName(theNode) + "'");
     LONG myNodeId = theNode->GetNodeID();
     LONG myNodeType = theNode->GetType();
-    y60::WorldBuilderBasePtr myParentBuilder;
 
     switch (myNodeType) {
         case Olight:
             {
-                myParentBuilder = writeLight(theTransformBuilder, theNode);
+                theParentBuilder = writeLight(theTransformBuilder, theNode);
             }
             break;
         case Ocamera:
             {
-                myParentBuilder = writeCamera(theTransformBuilder, (CameraObject*)theNode);
+                theParentBuilder = writeCamera(theTransformBuilder, (CameraObject*)theNode);
             }
             break;
         case Onull:
             {
-                myParentBuilder = writeTransform(theTransformBuilder, theNode);
+                if (theTransformFlag) {
+                    theParentBuilder = writeTransform(theTransformBuilder, theNode);
+                }
             }
             break;
         case Oinstance:
@@ -467,32 +487,33 @@ SceneExporter::writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
                 BaseObject    * myLinkedObject = myContainer->GetObjectLink(INSTANCEOBJECT_LINK, _myDocument);
                 if (myLinkedObject == 0) {
                     displayMessage("Instance '" + theNode->GetName() + "' references invalid object");
-                    return;
+                    return false;
                 }
 
                 // Write referenced object hierachy
-                myParentBuilder = writeTransform(theTransformBuilder, theNode);
-                theNode = myLinkedObject;
-
-                /*
-                 * If the linked object has no children nothing will be written later on.
-                 * Since we already have applied the requested transform we have to write the
-                 * body without it's own transform...
-                 */
-                BaseObject * myChildNode = theNode->GetDown();
-                if (myChildNode == 0) {
-                    writeObjects(myParentBuilder, theNode, false, false);
-                    return;
+                if (theTransformFlag) {
+                    theParentBuilder = writeTransform(theTransformBuilder, theNode);
                 }
+                {
+                    /* we have already written the transform of the instance so export 
+                       untransformed linked object only if it is not a transform node */
+                    LONG myInstancedNodeType = myLinkedObject->GetType();
+                    if (myInstancedNodeType != Onull) {
+                        writeObject(theParentBuilder, myLinkedObject, 
+                                    theParentBuilder, false, theForceFrontBackFacing);
+                    }
+                }
+
+                theNode = myLinkedObject;
             }
             break;
         case Osymmetry:
             {
                 // Write transform
-                myParentBuilder = writeTransform(theTransformBuilder, theNode);
+                theParentBuilder = writeTransform(theTransformBuilder, theNode);
 
                 // Write symmetry transform & children
-                y60::WorldBuilderBasePtr mySymmetryBuilder = writeSymmetryTransform(myParentBuilder, theNode);
+                y60::WorldBuilderBasePtr mySymmetryBuilder = writeSymmetryTransform(theParentBuilder, theNode);
                 BaseObject * myChildNode = theNode->GetDown();
                 while (myChildNode) {
                     writeObjects(mySymmetryBuilder, myChildNode, true, true);
@@ -503,13 +524,13 @@ SceneExporter::writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
 		case Osds:
 			{
 				// Write transform
-				myParentBuilder = writeTransform(theTransformBuilder, theNode);
+				theParentBuilder = writeTransform(theTransformBuilder, theNode);
 				BaseObject * myChildNode = theNode->GetDown();
 				while (myChildNode) {
-					writeObjects(myParentBuilder, myChildNode, true, theForceFrontBackFacing);
+					writeObjects(theParentBuilder, myChildNode, true, theForceFrontBackFacing);
 					myChildNode = myChildNode->GetNext();
 				}
-				myTraverseChilrden = false;
+                return false;
 			}
 			break;
         case Obend:
@@ -531,18 +552,12 @@ SceneExporter::writeObjects(y60::WorldBuilderBasePtr theTransformBuilder,
         */
         default:
             // Export polygon objects
-            myParentBuilder = writeBody(theTransformBuilder, theNode, theTransformFlag, theForceFrontBackFacing);
+            theParentBuilder = writeBody(theTransformBuilder, theNode, theTransformFlag, theForceFrontBackFacing);
             break;
     }
 
-    // Recurse over child nodes
-    if (myParentBuilder && myTraverseChilrden) {
-        BaseObject * myChildNode = theNode->GetDown();
-        while (myChildNode) {
-            writeObjects(myParentBuilder, myChildNode, true, theForceFrontBackFacing);
-            myChildNode = myChildNode->GetNext();
-        }
-    }
+
+    return true;
 }
 
 LONG
