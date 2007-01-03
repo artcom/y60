@@ -38,7 +38,7 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(ImageHeightTag,         unsigned,           HEIGHT_ATTRIB,                0);
     DEFINE_ATTRIBUT_TAG(ImageDepthTag,          unsigned,           DEPTH_ATTRIB,                 1);
     DEFINE_ATTRIBUT_TAG(ImageMatrixTag,         asl::Matrix4f,      IMAGE_MATRIX_ATTRIB,          asl::Matrix4f::Identity());
-    DEFINE_ATTRIBUT_TAG(ImageTypeTag,           std::string,        IMAGE_TYPE_ATTRIB,            IMAGE_TYPE_SINGLE);
+    DEFINE_ATTRIBUT_TAG(ImageTypeTag,           ImageType,          IMAGE_TYPE_ATTRIB,            SINGLE);
     DEFINE_ATTRIBUT_TAG(ImageMipmapTag,         bool,               IMAGE_MIPMAP_ATTRIB,          false);
     DEFINE_ATTRIBUT_TAG(ImageResizeTag,         std::string,        IMAGE_RESIZE_ATTRIB,          IMAGE_RESIZE_PAD);
     DEFINE_ATTRIBUT_TAG(ImageFilterTag,         std::string,        IMAGE_FILTER_ATTRIB,          IMAGE_FILTER_NONE);

@@ -346,7 +346,7 @@ namespace y60 {
 
     ImageType
     Image::getType() const {
-        return ImageType(getEnumFromString(get<ImageTypeTag>(), ImageTypeStrings));
+        return get<ImageTypeTag>();
     }
 
     PixelEncoding

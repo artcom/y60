@@ -407,16 +407,18 @@ namespace y60 {
     static const char * IMAGE_TYPE_SINGLE        = "single";
     static const char * IMAGE_TYPE_CUBEMAP       = "cubemap";
 
-    enum ImageType {
+    enum ImageTypeEnum {
         SINGLE,
-        CUBEMAP
+        CUBEMAP,
+        ImageTypeEnum_MAX
     };
 
     static const char * ImageTypeStrings[] = {
         IMAGE_TYPE_SINGLE,
         IMAGE_TYPE_CUBEMAP,
-        0
+        ""
     };
+    DEFINE_ENUM(ImageType, ImageTypeEnum);
 
     //=== Light Souce types =====================================================
 

@@ -493,6 +493,13 @@ Currently the following usage flags are supported:
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
+    <xs:simpleType name="ImageType">
+        <xs:annotation>
+             <xs:documentation>Image type.
+'single','cubemap'</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>    
     <xs:element name="rasterofrgb">
         <xs:annotation>
             <xs:documentation>This element contains a image data as text child.
@@ -2643,7 +2650,7 @@ GENERIC_LUMINANCE_ALPHA,GENERIC_INTENSITY,S3TC_DXT1,S3TC_DXT1A,S3TC_DXT3,S3TC_DX
                 <xs:documentation>Format used by OpenGl internally</xs:documentation>
             </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="type" type="xs:string">
+        <xs:attribute name="type" type="ImageType">
             <xs:annotation>
                 <xs:documentation>Type of the image.
 

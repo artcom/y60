@@ -59,6 +59,7 @@ INSTANTIATE_ENUM_WRAPPER(y60::TextureWrapModeEnum);
 INSTANTIATE_ENUM_WRAPPER(y60::TextureApplyModeEnum);
 INSTANTIATE_ENUM_WRAPPER(y60::BlendFunctionEnum);
 INSTANTIATE_ENUM_WRAPPER(y60::VertexBufferUsageEnum);
+INSTANTIATE_ENUM_WRAPPER(y60::ImageTypeEnum);
 
 template jsval as_jsval(JSContext *cx, const std::vector<dom::NodePtr> & theVector);
 
@@ -208,7 +209,7 @@ public:
         REGISTER_BYREFERENCE_CONVERTER(y60::TextureApplyMode);
         REGISTER_BYREFERENCE_CONVERTER(y60::BlendFunction);
         REGISTER_BYREFERENCE_CONVERTER(y60::VertexBufferUsage);
-
+        REGISTER_BYREFERENCE_CONVERTER(y60::ImageType);
     }
 };
 

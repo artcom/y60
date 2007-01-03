@@ -92,49 +92,40 @@ namespace y60 {
     void
     ImageBuilder::createFileReference(const std::string & theFileName, const std::string & theResizeMode) {
         setImage(theFileName, "", theResizeMode);
-        // A Facade adds an raster on creation, remove it, since we need to control inlining
-        //getNode()->removeChild(getNode()->childNode(0));
     }
 
     void
     ImageBuilder::setType(ImageType theType) {
-//        getNode()->getAttribute(IMAGE_TYPE_ATTRIB)->nodeValue(asl::getStringFromEnum(theType, ImageTypeStrings));
-        getNode()->getFacade<Image>()->set<ImageTypeTag>(asl::getStringFromEnum(theType, ImageTypeStrings));
+        getNode()->getFacade<Image>()->set<ImageTypeTag>(theType);
     }
 
     void
     ImageBuilder::setInternalFormat(const std::string & theType) {
-//        getNode()->getAttribute(IMAGE_TEXTURE_PIXELFORMAT_ATTRIB)->nodeValue(theType);
         getNode()->getFacade<Image>()->set<TexturePixelFormatTag>(theType);
     }
 
     void
     ImageBuilder::setColorScale(asl::Vector4f theColorScale) {
-//        getNode()->getAttribute(IMAGE_COLOR_SCALE_ATTRIB)->nodeValueAssign(theColorScale);
         getNode()->getFacade<Image>()->set<ImageColorScaleTag>(theColorScale);
     }
 
     void
     ImageBuilder::setColorBias(asl::Vector4f theColorBias) {
-        //getNode()->getAttribute(IMAGE_COLOR_BIAS_ATTRIB)->nodeValueAssign(theColorBias);
         getNode()->getFacade<Image>()->set<ImageColorBiasTag>(theColorBias);
     }
 
     void
     ImageBuilder::setDepth(unsigned int theDepth) {
-//        getNode()->getAttribute(DEPTH_ATTRIB)->nodeValueAssign(theDepth);
         getNode()->getFacade<Image>()->set<ImageDepthTag>(theDepth);
     }
 
     void
     ImageBuilder::setWrapMode(TextureWrapMode theWrapMode) {
         getNode()->getFacade<Image>()->set<TextureWrapModeTag>(theWrapMode);
-        //getNode()->getAttribute(TEXTURE_WRAPMODE_ATTRIB)->nodeValueAssign(theWrapMode.asString());
     }
 
     void
     ImageBuilder::setTiling(asl::Vector2i theTiling) {
         getNode()->getFacade<Image>()->set<ImageTileTag>(theTiling);
-//        getNode()->getAttribute(IMAGE_TILE_ATTRIB)->nodeValueAssign(theTiling);
     }
 }

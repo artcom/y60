@@ -445,7 +445,7 @@ function ImageOverlayBase(Public, Protected, theScene, theSource, thePosition, t
                 theScene.images.appendChild(myImage);
                 myImage.name = mySource;
                 myImage.wrapmode  = TextureWrapMode.repeat;
-                
+                myImage.type = ImageType.single;                
                 //ourImageCache[mySource] = myImage;
             }
         } else if (typeof(theSource) == "object" && "previousSibling" in theSource) {
