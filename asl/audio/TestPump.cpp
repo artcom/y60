@@ -23,6 +23,7 @@
 #endif
 
 using namespace asl;
+using namespace std;
 
 const SampleFormat ourNativeSampleFormat = SF_F32;
 

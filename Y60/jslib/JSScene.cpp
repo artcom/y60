@@ -85,8 +85,7 @@ toString(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
 static JSBool
 intersectBodies(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the intersections of a body with a given line, line segment, ray or box.");
-    DOC_PARAM("theBody", "", DOC_TYPE_NODE);
-    DOC_PARAM("theLine", "", DOC_TYPE_LINE);
+    DOC_PARAM("theBody", "", DOC_TYPE_NODE);    DOC_PARAM("theLine", "", DOC_TYPE_LINE);
     DOC_RESET;
     DOC_PARAM("theBody", "", DOC_TYPE_NODE);
     DOC_PARAM("theLineSegment", "", DOC_TYPE_LINESEGMENT);

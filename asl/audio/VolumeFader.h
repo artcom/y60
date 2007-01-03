@@ -42,7 +42,7 @@ private:
                 float myFadeDuration = float(myFader->_myFadeEndFrame - myFader->_myFadeBeginFrame);
 
                 SAMPLE * curSample = theBuffer.begin();
-                Unsigned64 lastFrame = min (theAbsoluteFrame+theBuffer.getNumFrames(), 
+                Unsigned64 lastFrame = std::min (theAbsoluteFrame+theBuffer.getNumFrames(), 
                         myFader->_myFadeEndFrame);
                 
                 for (myFader->_myCurrentFrame = theAbsoluteFrame;

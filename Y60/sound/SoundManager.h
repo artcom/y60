@@ -76,7 +76,7 @@ namespace y60 {
         // Cache stuff.
         unsigned _myMaxCacheSize; // In bytes.
         unsigned _myMaxCacheItemSize;
-        typedef map<std::string, SoundCacheItemPtr> CacheMap; // Cached sounds indexed by uri.
+        typedef std::map<std::string, SoundCacheItemPtr> CacheMap; // Cached sounds indexed by uri.
         CacheMap _myCache;
     };
 }

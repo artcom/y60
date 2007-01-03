@@ -69,14 +69,12 @@ Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay)
 Pump::~Pump() {
     AC_INFO << "Pump::~Pump";
     for (unsigned i=0; i<_mySampleSinks.size(); ++i) {
-        HWSampleSinkPtr mySink = _mySampleSinks[i].lock();
+        SampleSourcePtr mySink = _mySampleSinks[i].lock();
         if (mySink) {
-            if (mySink->getState() != HWSampleSink::STOPPED &&
-                 mySink->getState() != HWSampleSink::PAUSED)
+            if (mySink->isEnabled());
             {
                 AC_WARNING << "Audio Pump being deleted, but " << 
-                    mySink->getName() << " is still active (state: " << 
-                    HWSampleSink::stateToString(mySink->getState()) << ")";
+                    mySink->getName() << " is still active (state: ";
             }
         }
     }
@@ -89,10 +87,17 @@ Pump::~Pump() {
 HWSampleSinkPtr Pump::createSampleSink (const string & theName) 
 {
     HWSampleSinkPtr mySink = HWSampleSinkPtr(new HWSampleSink(theName, 
-                getNativeSampleFormat(), getNativeSampleRate(), getNumOutputChannels()));
+                                                              getNativeSampleFormat(), getNativeSampleRate(), getNumOutputChannels()));
     mySink->setSelf(mySink);
     addSink(mySink);
     return mySink;
+}
+
+
+void Pump::addSampleSource(const SampleSourcePtr& theSampleSource) {
+
+    addSink(theSampleSource);
+
 }
 
 AudioBufferPtr Pump::createBuffer(unsigned theNumFrames)
@@ -238,14 +243,23 @@ Pump::stop() {
     }
 }
 
-HWSampleSinkPtr Pump::getSink(unsigned i) {
+// HWSampleSinkPtr Pump::getSink(unsigned i) {
+//     return _mySampleSinks[i].lock();
+// }
+SampleSourcePtr Pump::getSink(unsigned i) {
     return _mySampleSinks[i].lock();
 }
 
-void Pump::addSink(HWSampleSinkPtr theSink) {
+
+// void Pump::addSink(HWSampleSinkPtr theSink) {
+//     AutoLocker<Pump> myLocker(*this);
+//     _mySampleSinks.push_back(theSink);
+// }
+void Pump::addSink(SampleSourcePtr theSink) {
     AutoLocker<Pump> myLocker(*this);
     _mySampleSinks.push_back(theSink);
 }
+
 
 void Pump::setDeviceName(const string& theName) {
     _myDeviceName = theName;
@@ -306,14 +320,18 @@ void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
 #ifdef USE_DASHBOARD
         MAKE_SCOPE_TIMER(Mix_Pump_Lock);
 #endif        
-        std::vector <HWSampleSinkWeakPtr >::iterator it;
+        //        std::vector <HWSampleSinkWeakPtr >::iterator it;
+        std::vector <SampleSourceWeakPtr>::iterator it;
         removeDeadSinks();
         for (it = _mySampleSinks.begin(); it != _mySampleSinks.end();) {
-            HWSampleSinkPtr curSampleSink = (*it).lock();
+            //            HWSampleSinkPtr curSampleSink = (*it).lock();
+            SampleSourcePtr curSampleSink = (*it).lock();
             if (curSampleSink) {
-                AutoLocker<HWSampleSink> mySinkLocker(*curSampleSink);
-                if (curSampleSink->getState() != HWSampleSink::STOPPED &&
-                    curSampleSink->getState() != HWSampleSink::PAUSED) 
+                //                AutoLocker<HWSampleSink> mySinkLocker(*curSampleSink);
+                AutoLocker<SampleSource> mySinkLocker(*curSampleSink);
+//                 if (curSampleSink->getState() != HWSampleSink::STOPPED &&
+//                     curSampleSink->getState() != HWSampleSink::PAUSED) 
+                if (curSampleSink->isEnabled())
                 {
                     curSampleSink->deliverData(*_myTempBuffer);
                     {
@@ -351,9 +369,11 @@ void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
 }
 
 void Pump::removeDeadSinks() {
-    std::vector <HWSampleSinkWeakPtr >::iterator it;
+    //    std::vector <HWSampleSinkWeakPtr >::iterator it;
+    std::vector <SampleSourceWeakPtr >::iterator it;
     for (it = _mySampleSinks.begin(); it != _mySampleSinks.end();) {
-        HWSampleSinkPtr curSampleSink = (*it).lock();
+        //        HWSampleSinkPtr curSampleSink = (*it).lock();
+        SampleSourcePtr curSampleSink = (*it).lock();
         if (!curSampleSink) {
             it = _mySampleSinks.erase(it);
         } else {

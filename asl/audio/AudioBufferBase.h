@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-using namespace std;
+//using namespace std;
 
 namespace asl {
 
@@ -51,6 +51,12 @@ class AudioBufferBase {
                 unsigned theSrcNumChannels) = 0;
         virtual void copyToRawMem(void * theWritePtr, unsigned theStartByte,
                 unsigned theLength) = 0;
+
+        virtual void partialAdd(unsigned theDestStartFrame,
+                                const AudioBufferBase& theSrcBuffer,
+                                unsigned theSrcStartFrame, unsigned numFrames) = 0;
+
+        virtual void applyWindow(const std::vector<float> & theWindow) = 0;
 
         virtual std::ostream & print(std::ostream & s) const = 0;
         virtual void dumpSamples (std::ostream & s, int startSample, int endSample) const = 0;

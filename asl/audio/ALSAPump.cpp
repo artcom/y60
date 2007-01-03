@@ -62,7 +62,9 @@ ALSAPump::ALSAPump ()
     int myRetVal;
     static snd_output_t * myOutput = 0;
 
-    string myDeviceName = "plughw:0,0";
+    //    string myDeviceName = "plughw:0,0";
+    // xxx to get easy access to the plugin mechanism of alsa via ~/.asoundrc:
+    string myDeviceName = "default";
     get_environment_var_as("Y60_SOUND_DEVICE_NAME", myDeviceName);
     
     AC_DEBUG << "ALSA Device name: \"" << myDeviceName << "\"";

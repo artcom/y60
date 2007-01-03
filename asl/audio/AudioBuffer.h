@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <limits.h>
+#include <vector>
 
 namespace asl {
 
@@ -157,6 +158,42 @@ class AudioBuffer: public AudioBufferBase {
             }
             return *this;
         }
+
+        void partialAdd(unsigned theDestStartFrame,
+                        const AudioBufferBase& theSrcBuffer,
+                        unsigned theSrcStartFrame, unsigned numFrames) 
+        {
+            const AudioBuffer<SAMPLE>* mySrcBuffer = getBufferFromInterface(theSrcBuffer);
+            ASSURE(theSrcBuffer.getNumChannels() == getNumChannels());
+            ASSURE(theSrcBuffer.getNumFrames()-theSrcStartFrame >= numFrames);
+            ASSURE(theDestStartFrame < getNumFrames());
+            ASSURE(getNumFrames()-theDestStartFrame >= numFrames);
+            
+            SAMPLE * curOutSample = begin() + theDestStartFrame*getNumChannels();
+            const SAMPLE * curInSample = mySrcBuffer->begin() + theSrcStartFrame*getNumChannels();
+            unsigned numSamples = numFrames * getNumChannels();
+            while (numSamples--) {
+                (*curOutSample++) += (*curInSample++);
+            }
+        }
+
+        void applyWindow(const std::vector<float> & theWindow) {
+
+            unsigned thisRange = getNumFrames();
+            unsigned thatRange = theWindow.size();
+            
+            SAMPLE * curSample = begin();
+            for (unsigned i = 0; i < getNumFrames(); i++) {
+                float pos = (float)i/(float)thisRange * (float)thatRange;
+                unsigned low = (unsigned)floor(pos);
+                // linear interpolation...
+                float theWindowVal = (low != pos) ? theWindow[low] + (theWindow[low+1] - theWindow[low]) * (pos - low) : theWindow[low];
+                for (unsigned j = 0; j < getNumChannels(); j++) {
+                    (*curSample++) *= floatToSample(theWindowVal);
+                }
+            }
+        }
+
 
         void copyFrames(unsigned theDestStartFrame, const AudioBufferBase& theSrcBuffer,
                         unsigned theSrcStartFrame, unsigned numFrames)

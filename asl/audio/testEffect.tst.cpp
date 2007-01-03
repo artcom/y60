@@ -179,8 +179,8 @@ int main( int argc, char *argv[] ) {
 
     mySuite.run();
 
-    cerr << ">> Finished test '" << argv[0] << "'"
-          << ", return status = " << mySuite.returnStatus() << endl;
+    std::cerr << ">> Finished test '" << argv[0] << "'"
+              << ", return status = " << mySuite.returnStatus() << std::endl;
 
     return mySuite.returnStatus();
 }

@@ -14,10 +14,9 @@
 #define INCL_HWSAMPLESINK
 
 #include "ISampleSink.h"
-#include "SampleFormat.h"
-#include "AudioBufferBase.h"
-#include "VolumeFader.h"
 #include "AudioTimeSource.h"
+#include "SampleSource.h"
+#include "VolumeFader.h"
 
 #include <asl/Time.h>
 #include <asl/Block.h>
@@ -29,20 +28,20 @@
 
 namespace asl {
 
-// #define USE_DASHBOARD
+    // #define USE_DASHBOARD
     
-class Pump;
-class HWSampleSink;
+    class Pump;
+    class HWSampleSink;
 
-// Use this pointer as smart pointer to HWSampleSinks. If you use the default Ptr,
-// you'll get thread-specific free lists. Since lots of pointers are allocated 
-// in one thread and deleted in another, that will cause memory leaks. The 
-// PtrHeapAllocator used here is slower but works.
-typedef Ptr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkPtr;
-typedef WeakPtr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkWeakPtr;
+    // Use this pointer as smart pointer to HWSampleSinks. If you use the default Ptr,
+    // you'll get thread-specific free lists. Since lots of pointers are allocated 
+    // in one thread and deleted in another, that will cause memory leaks. The 
+    // PtrHeapAllocator used here is slower but works.
+    typedef Ptr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkPtr;
+    typedef WeakPtr<HWSampleSink, MultiProcessor, PtrHeapAllocator<MultiProcessor> > HWSampleSinkWeakPtr;
     
-class HWSampleSink: public AudioTimeSource, public ISampleSink
-{
+    class HWSampleSink: public SampleSource, public AudioTimeSource, public ISampleSink
+    {
     public:
         enum State {STOPPED,            // No sound is playing.
                     RUNNING,            // Sound is playing.
@@ -65,7 +64,7 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
         // PAUSED             RUNNING   STOPPED             ignored          illegal
 
         HWSampleSink(const std::string & myName, SampleFormat mySampleFormat, 
-                unsigned mySampleRate, unsigned numChannels);
+                     unsigned mySampleRate, unsigned numChannels);
         virtual ~HWSampleSink();
         void setSelf(const HWSampleSinkPtr& mySelf);
         virtual void play();
@@ -78,7 +77,7 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
         bool isPlaying() const;
         bool queueSamples(AudioBufferPtr& theBuffer);
         asl::Time getBufferedTime() const;
-        std::string getName() const;
+        //        std::string getName() const;
         State getState() const;
         static std::string stateToString(State theState);
         unsigned getNumUnderruns() const;
@@ -86,16 +85,16 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
         virtual void dumpState();
 
         // Interface to ALSAPump/DSSampleSink
-        void deliverData(AudioBufferBase& theBuffer);
+        virtual void deliverData(AudioBufferBase& theBuffer);
     
         void lock();
         void unlock();
 
-        unsigned getNumChannels() const;
-        unsigned getSampleRate() const;
-        unsigned getBytesPerSecond() const;
-        SampleFormat getSampleFormat() const;
-        unsigned getBytesPerFrame() const;
+        //         unsigned getNumChannels() const;
+        //         unsigned getSampleRate() const;
+        //         unsigned getBytesPerSecond() const;
+        //         SampleFormat getSampleFormat() const;
+        //         unsigned getBytesPerFrame() const;
 
     private:
         void changeState(State newState);
@@ -110,10 +109,10 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
         unsigned _numUnderruns;
         bool _isUsingBackupBuffer;
         
-        std::string  _myName;
-        unsigned _mySampleRate;
-        SampleFormat _mySampleFormat;
-        unsigned _numChannels;
+        //         std::string  _myName;
+        //         unsigned _mySampleRate;
+        //         SampleFormat _mySampleFormat;
+        //         unsigned _numChannels;
 
         State _myState;
 
@@ -131,7 +130,7 @@ class HWSampleSink: public AudioTimeSource, public ISampleSink
 
         bool _isDelayingPlay;
         asl::Time _myTimeToStart;  // Used for delayedPlay().
-};
+    };
 
 }
 

@@ -14,6 +14,7 @@
 #define INCL_AUDIO_PUMP
 
 #include "SampleFormat.h"
+#include "SampleSource.h"
 #include "HWSampleSink.h"
 #include "AudioBuffer.h"
 #include "AudioTimeSource.h"
@@ -53,6 +54,8 @@ class Pump : public AudioTimeSource, private PosixThread
         static void setUseRealPump(bool theRealPumpFlag);
         bool isRunning() const;
 
+        void addSampleSource(const SampleSourcePtr& theSampleSource);
+
         // Interface to HWSampleSink
         void lock();
         void unlock();
@@ -61,8 +64,10 @@ class Pump : public AudioTimeSource, private PosixThread
         void start();
         void stop();
 
-        HWSampleSinkPtr getSink(unsigned i);
-        void addSink(HWSampleSinkPtr theSink);
+    //        HWSampleSinkPtr getSink(unsigned i);
+        SampleSourcePtr getSink(unsigned i);
+    //        void addSink(HWSampleSinkPtr theSink);
+        void addSink(SampleSourcePtr theSink);
 
         void setDeviceName(const std::string& theName);
         const std::string& getDeviceName() const;
@@ -81,7 +86,8 @@ class Pump : public AudioTimeSource, private PosixThread
         void removeDeadSinks();
         int getSampleRateConfig();
 
-        std::vector < HWSampleSinkWeakPtr > _mySampleSinks;
+    //         std::vector < HWSampleSinkWeakPtr > _mySampleSinks;
+        std::vector < SampleSourceWeakPtr > _mySampleSinks;
         asl::ThreadLock _mySinkLock;
         Time _myLatency;
 

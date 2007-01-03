@@ -12,6 +12,7 @@
 #define _ac_y60_JSSound_h_
 
 #include "JSSoundManager.h"
+#include "JSGrainSource.h"
 
 #include <y60/Sound.h>
 #include <y60/JSWrapper.h>
@@ -19,6 +20,7 @@
 
 #include <asl/PlugInBase.h>
 #include <asl/Pump.h>
+
 
 namespace jslib {
 
@@ -96,6 +98,7 @@ namespace y60 {
             {
                 jslib::JSSound::initClass(theContext, theGlobalObject);
                 jslib::JSSoundManager::initClass(theContext, theGlobalObject);
+                jslib::JSGrainSource::initClass(theContext, theGlobalObject);
     		}
 
     		const char * ClassName() {
