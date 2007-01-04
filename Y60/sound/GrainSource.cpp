@@ -33,7 +33,7 @@ GrainSource::GrainSource(const std::string& theName, SampleFormat theSampleForma
     _myAudioData = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 0u, _numChannels, _mySampleRate));
     _myAudioData->clear();
     createOverlapBuffer(_myGrainSize);
-    createWindowBuffer(512);
+    createWindowBuffer(1024);
 }
 
 
@@ -82,8 +82,6 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
 
         unsigned myGrainFrames =(unsigned)( (float)(jitterValue(_myGrainSize, _myGrainSizeJitter)) * mySamplesPerMS);
         unsigned myRateFrames = (unsigned)( (float)(jitterValue(_myGrainRate, _myGrainRateJitter)) * mySamplesPerMS);
-        _myGrainPosition += 0.005; 
-
         unsigned myPositionFrame = (unsigned)(jitterValue(_myGrainPosition,_myGrainPositionJitter) * 
                                               _myAudioData->getNumFrames());
         ASSURE(myPositionFrame>=0);
@@ -148,12 +146,15 @@ void GrainSource::createOverlapBuffer(unsigned theGrainSize) {
 
 
 void GrainSource::createWindowBuffer(unsigned theWindowSize) {
-    _myWindowBuffer.reserve(theWindowSize*2);
+    //    _myWindowBuffer.reserve(theWindowSize*2);
+    _myWindowBuffer.reserve(theWindowSize);
     for (unsigned i = 0; i < theWindowSize; i++) {
-        _myWindowBuffer.push_back(0.5 * cos(2*3.14159265f*i/(theWindowSize-1))); // Hann Window
+        float value = 0.5 * (1.0 -cos(2*3.14159265f*i/(theWindowSize-1))); // Hann Window
+        //float value = 0.5f * 2.0f/theWindowSize * (theWindowSize*0.5f - std::abs((float)i - (theWindowSize - 1)*0.5f));
+        AC_INFO << "value: " << value;
+        _myWindowBuffer.push_back(value); 
+        //_myWindowBuffer
     }
-    std::vector<float>::iterator pos = _myWindowBuffer.begin() + theWindowSize/2;
-    _myWindowBuffer.insert(pos, theWindowSize, 1);
 }
 
 
