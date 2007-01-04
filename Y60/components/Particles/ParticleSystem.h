@@ -53,7 +53,7 @@ private:
     dom::NodePtr  _myParticleVertexDataPtr;
     
     y60::ScenePtr _myScene;
-    y60::ShapePtr _myShape;
+    dom::NodePtr  _myShapeNode;
     dom::NodePtr  _myBodyNode;
     dom::NodePtr  _myMaterialNode;
     dom::NodePtr  _myImageNode;

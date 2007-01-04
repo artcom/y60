@@ -248,12 +248,10 @@ ParticleSystem::create(const dom::NodePtr & theParentNode,
     }
     myShapeBuilder.appendElements(*myElement);
 
-    dom::NodePtr myShapeNode = myShapeBuilder.getNode();
-    _myShape = myShapeNode->getFacade<Shape>();
+    _myShapeNode = myShapeBuilder.getNode();
+    _myBodyNode = createBody(_myParentNode, _myShapeNode->getFacade<Shape>()->get<IdTag>());
 
-    _myBodyNode = createBody(_myParentNode, _myShape->get<IdTag>());
-
-    dom::NodePtr myVertexDataNode = myShapeNode->childNode("vertexdata");
+    dom::NodePtr myVertexDataNode = _myShapeNode->childNode("vertexdata");
     _myParticleVertexDataPtr = myVertexDataNode->childNodeByAttribute("vectorofvector3f", "name", "position")->firstChild();
 
     // build animation node
@@ -275,5 +273,11 @@ ParticleSystem::create(const dom::NodePtr & theParentNode,
 void
 ParticleSystem::remove() {
     // TODO: implement me.
+    // remove animation
+    _myAnimationNode->parentNode()->removeChild(_myAnimationNode);
+    _myBodyNode->parentNode()->removeChild(_myBodyNode);
+    _myMaterialNode->parentNode()->removeChild(_myMaterialNode);
+    _myImageNode->parentNode()->removeChild(_myImageNode);
+    _myShapeNode->parentNode()->removeChild(_myShapeNode);
 }
 

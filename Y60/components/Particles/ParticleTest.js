@@ -51,18 +51,24 @@ ParticlesTest.prototype.Constructor = function(self, theArguments) {
 
         // create particles
         _myParticleSystem = new GPUParticles(window.scene);
-        print("_myParticleSystem: "+_myParticleSystem);
         _myParticleSystem.create( window.scene.world, 
                                   50, // number of particles
-                                  "3.png", // 3d texture
+                                  "ahorn01.png", // 3d texture
                                   [1.0, -0.5, 0.0], // initial emitting direction
                                   [0.0, 25.0], // the scattering angles
                                   [0.5, 1.5]); // the speed range
 
-        _myParticleSystem.material.properties.timetolive = 3.0;
-        _myParticleSystem.material.properties.gravity = [0.0, 0.0, 0.0];
+        _myParticleSystem.material.properties.timetolive = 1.0;
+        _myParticleSystem.material.properties.gravity = [0.0, 0.5, 0.0];
         _myParticleSystem.material.properties.size = [20.0, 2.0, 640.0];
         window.scene.update(Scene.ANIMATIONS_LOAD); 
+
+        window.canvas.backgroundcolor = [0.6,0.6,0.75,1.0];
+    }
+
+    self.SceneViewer.onFrame = self.onFrame;
+    self.onFrame = function(theTime) {
+        self.SceneViewer.onFrame(theTime); 
     }
 
     self.onPostRender = function() {
@@ -106,7 +112,6 @@ ParticlesTest.prototype.Constructor = function(self, theArguments) {
 
     var _myPauseTime = 0;
 }
-
 
 //
 // main

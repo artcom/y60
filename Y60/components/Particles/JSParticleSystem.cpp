@@ -215,7 +215,6 @@ JSParticleSystem::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
     
         if (myNewObject) {
             JS_SetPrivate(cx, obj, myNewObject);
-            AC_PRINT << "constructed";
             return JS_TRUE;
         } 
     
