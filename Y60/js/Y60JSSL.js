@@ -821,4 +821,57 @@ function curry(theFunction) {
      }
  })(theFunction.length || theArguments[1] || 0, []);
 }
-         
+
+
+// Function that will reflect a camera on a given plane and return
+// the new camera position and orientation.
+// Useful for mirroring and reflection
+function createMirrorCamera(theCamera, thePlane) {
+    var myPlaneNormal = thePlane.normal;
+    var myInvertedPlaneNormal = product(myPlaneNormal, -1);
+    
+    var myMatrix = theCamera.globalmatrix;
+    var myRight = myMatrix.getRow(0);
+    var myUp = myMatrix.getRow(1);
+    var myFwd = myMatrix.getRow(2);
+    var myPos = myMatrix.getRow(3);
+
+    // Code to reflect a camera position on a plane
+
+    var myCamPosVec = new Vector3f(myPos.x, myPos.y, myPos.z)
+    var myCamPosPoi = new Point3f(myPos.x, myPos.y, myPos.z)
+    var myCamUpVec  = new Vector3f(myUp.x, myUp.y, myUp.z);
+    var myCamRightVec = new Vector3f(myRight.x, myRight.y, myRight.z);
+    
+    // calc new camera view
+	var myViewLine = new Line(myCamPosPoi, new Vector3f(myFwd.x, myFwd.y, myFwd.z));
+    var myNewCameraLookAt          = intersection(myViewLine, thePlane);
+
+    // reflect cameraposition
+    var myPlaneProjectedCamPosLine = new Line(myCamPosPoi, myInvertedPlaneNormal); 
+    var myCameraPlaneProjectionPos = intersection(myPlaneProjectedCamPosLine, thePlane);
+    var myCameraPlaneProjectionVec = difference(myCameraPlaneProjectionPos, myCamPosVec);
+    myCameraPlaneProjectionVec = product(myCameraPlaneProjectionVec,2);
+    var myNewCameraPos = sum(myCamPosVec, myCameraPlaneProjectionVec);
+
+    // reflect camera up
+    var myCameraUpVec = sum(myCamPosVec, normalized(myCamUpVec));
+    var myCameraUpPoi = new Point3f(myCameraUpVec.x, myCameraUpVec.y,myCameraUpVec.z);
+	
+    var myPlaneProjectedCamUpLine = new Line(myCameraUpPoi, myInvertedPlaneNormal); 
+    var myCameraPlaneProjectionUpPos = intersection(myPlaneProjectedCamUpLine, thePlane);
+    
+    var myCameraPlaneProjectionUpVec = difference(myCameraPlaneProjectionUpPos, myCameraUpVec);
+    myCameraPlaneProjectionUpVec = product(myCameraPlaneProjectionUpVec,2);
+    var myNewCameraUpVec = sum(myCameraUpVec, myCameraPlaneProjectionUpVec);
+    
+    var myNewUpVector = normalized(difference(myNewCameraUpVec, myNewCameraPos));
+    
+    // new camera specs
+    var myNewCameraView = normalized(difference(myNewCameraLookAt, myNewCameraPos));
+    
+    var myOrientation = getOrientationFromDirection(myNewCameraView, myNewUpVector);
+
+    return {orientation : myOrientation, position : myNewCameraPos};
+    
+}
