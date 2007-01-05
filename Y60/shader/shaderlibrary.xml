@@ -1198,7 +1198,7 @@
             </properties>
         </fragmentshader>
     </shader>
-     <shader id="s132" name="fade" cost="10">
+    <shader id="s132" name="fade" cost="10">
        <supports>
             <feature class="textures" values="[fade]"/>
             <feature class="lighting" values="[unlit]"/>
@@ -1219,5 +1219,26 @@
             </properties>
         </fragmentshader>
     </shader>
-
+    <shader id="s133" name="nightvision" cost="10">
+       <supports>
+            <feature class="textures" values="[paint,paint]"/>
+            <feature class="texcoord" values="[*,*]"/>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="option" values="[nightvision]"/>
+        </supports>
+        <vertexshader profile="VP30" file="nightvision.cg" entryfunction="mainVertex">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="nightvision.cg" entryfunction="mainFragment">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
 </shaders>
