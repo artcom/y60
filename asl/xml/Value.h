@@ -769,7 +769,9 @@ namespace dom {
         virtual void fillRect(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
                               asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
                               const asl::Vector4<float> & theColor) = 0;
-
+        
+        virtual void randomize(const asl::Vector4f & theMinColor, const asl::Vector4f & theMaxColor) = 0; 
+        
         /*
         virtual ValuePtr getPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y) const = 0;
         virtual bool setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const ValueBase & theValue) = 0;
@@ -857,13 +859,13 @@ namespace dom {
             return myColor;
         }
 
-        virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const asl::Vector4f & thePixel) {
+        virtual void setPixel(asl::AC_SIZE_TYPE x, asl::AC_SIZE_TYPE y, const asl::Vector4f & theColor) {
             const T & myNativeReadOnlyRaster = _myRasterValue.getValue();
             if (x < myNativeReadOnlyRaster.hsize() &&
                 y < myNativeReadOnlyRaster.vsize()) 
             {
                 T & myNativeRaster = _myRasterValue.openWriteableValue();
-                setPixel(myNativeRaster(x,y), thePixel);
+                setPixel(myNativeRaster(x,y), theColor);
                 _myRasterValue.closeWriteableValue();
             }
         }
@@ -887,6 +889,31 @@ namespace dom {
             asl::subraster<PIXEL> myRegion(myNativeRaster, cxmin, cymin, cxmax-cxmin, cymax-cymin);
             std::fill(myRegion.begin(), myRegion.end(), myPixel);
             _myRasterValue.closeWriteableValue();
+        }
+
+        virtual void randomize(const asl::Vector4f & theMinColor, 
+                               const asl::Vector4f & theMaxColor)  
+        {
+            T & myNativeRaster = _myRasterValue.openWriteableValue();
+            
+            for (unsigned x=0; x<myNativeRaster.hsize(); ++x) {
+                for (unsigned y=0; y<myNativeRaster.vsize(); ++y) {
+                    asl::Vector4f myColor = asl::Vector4f(0.0, 0.0, 0.0, 0.0);
+
+                    for (unsigned i=0; i<4; ++i) {
+                        float myRange = theMaxColor[i] - theMinColor[i];
+                        if (theMinColor[i] != theMaxColor[i]) { 
+                            float myRandomFloat = myRange * (float)(std::rand() % 1000) / 1000.f; 
+                            myColor[i] = myRandomFloat + theMinColor[i];
+                        } else {
+                            myColor[i] = theMaxColor[i];
+                        }
+                    }
+                    setPixel(myNativeRaster(x,y), myColor);
+                }
+            }
+            
+            _myRasterValue.closeWriteableValue(); 
         }
 
         virtual void pasteRaster(asl::AC_OFFSET_TYPE targetX, asl::AC_OFFSET_TYPE targetY,
