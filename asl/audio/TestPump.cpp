@@ -240,7 +240,8 @@ void TestPump::testDelayed() {
     ENSURE(mySink->getState() == HWSampleSink::RUNNING);
     msleep(600);
     curTime = mySink->getCurrentTime();
-    ENSURE(double(curTime) > 0.4 && double(curTime) < 0.8);
+    DPRINT(curTime);
+    ENSURE(double(curTime) > 0.4 && double(curTime) < 1);
     ENSURE(mySink->getState() == HWSampleSink::RUNNING);
     mySink->stop(true);
     msleep(400);
@@ -378,10 +379,12 @@ void TestPump::testSinkTimer() {
     Time curTime; 
     ENSURE(double(mySampleSink->getCurrentTime()) == 0.0);
     mySampleSink->play();
+    curTime = mySampleSink->getCurrentTime();
+    DPRINT(curTime);
     msleep(100);
     curTime = mySampleSink->getCurrentTime();
-    ENSURE(double(curTime) > 0.05 && double(curTime) < 0.2);
-//    AC_PRINT << "Time: " << curTime;
+    ENSURE(double(curTime) > 0.050 && double(curTime) < 0.250);
+    DPRINT(curTime);
     mySampleSink->stop();
 //    AC_PRINT << "Time: " << mySampleSink->getCurrentTime();
     msleep(100);
