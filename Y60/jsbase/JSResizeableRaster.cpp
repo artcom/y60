@@ -39,6 +39,16 @@ fillRect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+randomize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Fills the raster with random noise.");
+    DOC_PARAM("theMinColor", "the lower color bound (per channel)", DOC_TYPE_VECTOR4F);
+    DOC_PARAM("theMaxColor", "the upper color bound (per channel)", DOC_TYPE_VECTOR4F);
+    DOC_END;
+
+    return Method<NATIVE>::call(&NATIVE::randomize,cx,obj,argc,argv,rval);
+}
+
+static JSBool
 getPixel(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Get color of pixel.");
     DOC_PARAM("x", "x pos", DOC_TYPE_INTEGER);
@@ -146,6 +156,7 @@ JSResizeableRaster::Functions() {
         {"getPixel",    getPixel,         2},
         {"setPixel",    setPixel,         3},
         {"fillRect",    fillRect,         5},
+        {"randomize",   randomize,        2},
         {"resize",      resize,           2},
         {"clear",       clear,            0},
         {"save",        save,             1},
