@@ -51,7 +51,7 @@ Pump::Pump (SampleFormat mySF, unsigned myTimeStartDelay)
 #ifdef WIN32
     double myLatency= 0.05;
 #else
-    double myLatency= 0.04;
+    double myLatency= 0.05; // 0.04 causes hundreds of underruns in the tests, 0.05 causes none (on caspar64)
 #endif
     get_environment_var_as("Y60_SOUND_LATENCY", myLatency);
     _myLatency = myLatency;
