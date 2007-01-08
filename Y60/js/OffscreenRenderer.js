@@ -24,7 +24,11 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
     this.renderarea getter = function() {
         return _myOffscreenRenderArea;
     }
-       
+    
+    this.canvas getter = function() {
+        return _myCanvas;
+    }
+
     function setup(theSize) {
         //add our own camera
         if (theCamera == undefined) {
@@ -88,8 +92,6 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
             var myUnderlayNode = new Node("<underlays/>");
             _myCanvas.firstChild.appendChild(myUnderlayNode.firstChild);
         }
-        print(_myCanvas + "   " + theNode);
-        
         _myCanvas.firstChild.childNode("underlays").appendChild(theNode);
     }
 
