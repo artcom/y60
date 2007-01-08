@@ -67,14 +67,13 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
     }
     
     obj.update = function(theTime) {
-
         if (_myLastTime == null) {
             _myLastTime = theTime;
         }
         var myDeltaTime = theTime - _myLastTime;
         _myLastTime = theTime;
         
-        var myMatrix = _myNodeToFollow.globalmatrix;
+        // var myMatrix = _myNodeToFollow.globalmatrix;
 
         var myRotationMatrix = null;
         if (_myOrientation) {
@@ -83,19 +82,26 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
             myRotationMatrix = new Matrix4f(_myNodeToFollow.orientation);
         }
 
-        var myNodePosition = _myNodeToFollow.boundingbox.center;
-        var myMotionFactor = _mySpringStrength * myDeltaTime;
-        if (myMotionFactor > 1) {
-            myMotionFactor = 1;
+        // var myNodePosition = _myNodeToFollow.boundingbox.center;
+        var myNodePosition = _myNodeToFollow.globalmatrix.getRow(3).xyz;
+
+        if ( isFinite(_mySpringStrength) ) {
+            var myMotionFactor = _mySpringStrength * myDeltaTime;
+            if (myMotionFactor > 1) {
+                myMotionFactor = 1;
+            }
+
+            var myEyePosition    = sum(myNodePosition, product(_myEyePositionOffset, myRotationMatrix));
+            var myDistance = difference(myEyePosition, _myCamera.position);
+            _myCamera.position = sum(_myCamera.position, product(myDistance, myMotionFactor));      
+
+            var myLookAtPosition = sum(myNodePosition, product(_myLookAtOffset, myRotationMatrix));
+            myDistance = difference(myLookAtPosition, _myLookAtPosition);
+            _myLookAtPosition = sum(_myLookAtPosition, product(myDistance, myMotionFactor)); 
+        } else {
+            _myCamera.position = sum(myNodePosition, product(_myEyePositionOffset, myRotationMatrix));
+            _myLookAtPosition = sum(myNodePosition, product(_myLookAtOffset, myRotationMatrix));
         }
-
-        var myEyePosition    = sum(myNodePosition, product(_myEyePositionOffset, myRotationMatrix));
-        var myDistance = difference(myEyePosition, _myCamera.position);
-        _myCamera.position = sum(_myCamera.position, product(myDistance, myMotionFactor));      
-
-        var myLookAtPosition = sum(myNodePosition, product(_myLookAtOffset, myRotationMatrix));
-        myDistance = difference(myLookAtPosition, _myLookAtPosition);
-        _myLookAtPosition = sum(_myLookAtPosition, product(myDistance, myMotionFactor)); 
 
         // calc orientation
         var myViewVector = normalized(difference(_myLookAtPosition, _myCamera.position));
