@@ -31,8 +31,10 @@ float4 mainFragment(vert2frag IN,
 {
     float4 myScaledColor = float4(0.30, 0.59, 0.11, 1.0) * tex2D(tex0, IN.texCoord0);
     float4 myNoise       = tex2D(tex1, IN.texCoord0);
-
+    float myStripes      = sin(IN.texCoord0.g*750.0);
+    
     float myLuminance = 1 - (myScaledColor.r + myScaledColor.g + myScaledColor.b);
-    return float4( myLuminance , myLuminance, myLuminance+0.05, myScaledColor.a ) * 1.4 - float4(1.0) + myNoise + float4(1-myScaledColor.a); 
+    float4 myReturn = float4( myLuminance , myLuminance, myLuminance+0.05, 1.0/*myScaledColor.a*/ ) * 1.4 - float4(1.0, 1.0, 1.0, 0.0) + myNoise + float4(float3(myScaledColor.a), 0.0); 
+    return myReturn + (myStripes * 0.025 + 0.025);
 }
 
