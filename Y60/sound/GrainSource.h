@@ -16,6 +16,7 @@
 #include <asl/ISampleSink.h>
 #include <asl/SampleSource.h>
 #include <asl/AudioBuffer.h>
+#include <asl/VolumeFader.h>
 
 #include <vector>
 
@@ -61,16 +62,17 @@ namespace y60 {
         void setGrainPositionJitter(float theJitter);
         float getGrainPositionJitter() const;
 
-        void setTransposition(unsigned theTransposition);
-        unsigned getTransposition() const;
+//         void setTransposition(unsigned theTransposition);
+//         unsigned getTransposition() const;
 
-        void setTranspositionJitter(unsigned theJitter);
-        unsigned getTranspositionJitter() const;
+//         void setTranspositionJitter(unsigned theJitter);
+//         unsigned getTranspositionJitter() const;
 
-        unsigned jitterValue(unsigned theValue, unsigned theJitter) const;
-        float jitterValue(float theValue, float theJitter) const;
+        void setVolume(float theVolume);
+        float getVolume() const;
 
     private:
+
 
         asl::AudioBufferPtr _myAudioData;        // the buffer containing the audio data to granuralize
 
@@ -83,17 +85,21 @@ namespace y60 {
         // XXXX to be implemented yet .... (needs resampling for slower or faster playback)
         int      _myTransposition;          // transposition in cents
         int      _myTranspositionJitter;    
-        // panning ??
+        // XXXX panning stuff
+        
+        asl::VolumeFaderPtr _myVolumeFader;
 
         // some helper members
         asl::AudioBufferPtr _myOverlapBuffer;    // a little space to save overlapping samples between two deliverData calls
-        unsigned _myGrainOffset;            // offset of the first grain in our frame buffer
-        unsigned _myLastBuffersize;         // because subsequent framebuffers have different sizes, we need to store the last buffer size
+        unsigned _myGrainOffset;                 // offset of the first grain in our frame buffer
+        unsigned _myLastBuffersize;              // because subsequent framebuffers have different sizes, we need to store the last buffer size
 
-        std::vector<float> _myWindowBuffer; // window function applied to the current grain (i.e. hann window)
+        std::vector<float> _myWindowBuffer;      // window function applied to the current grain (i.e. hann window)
 
         void createOverlapBuffer(unsigned theGrainSize);
         void createWindowBuffer(unsigned theWindowSize);
+        unsigned jitterValue(unsigned theValue, unsigned theJitter) const;
+        float jitterValue(float theValue, float theJitter) const;
 
     };
 }

@@ -13,6 +13,7 @@
 
 #include "GrainSource.h"
 #include <asl/AudioBuffer.h>
+#include <asl/VolumeFader.h>
 
 using namespace asl;
 using namespace y60;
@@ -32,6 +33,8 @@ GrainSource::GrainSource(const std::string& theName, SampleFormat theSampleForma
 {
     _myAudioData = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 0u, _numChannels, _mySampleRate));
     _myAudioData->clear();
+    _myVolumeFader = VolumeFaderPtr(new VolumeFader(_mySampleFormat));
+    _myVolumeFader->setVolume(1, 0); 
     createOverlapBuffer(_myGrainSize);
     createWindowBuffer(1024);
 }
@@ -110,6 +113,7 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
         
     }
 
+    _myVolumeFader->apply(theBuffer, 0);
     // XXXXXX resize overlap buffer
     //AC_INFO << "OutBuffer: " << theBuffer;
 
@@ -150,11 +154,14 @@ void GrainSource::createWindowBuffer(unsigned theWindowSize) {
     _myWindowBuffer.reserve(theWindowSize);
     for (unsigned i = 0; i < theWindowSize; i++) {
         float value = 0.5 * (1.0 -cos(2*3.14159265f*i/(theWindowSize-1))); // Hann Window
+        //float value = 1.0f;
         //float value = 0.5f * 2.0f/theWindowSize * (theWindowSize*0.5f - std::abs((float)i - (theWindowSize - 1)*0.5f));
         AC_INFO << "value: " << value;
         _myWindowBuffer.push_back(value); 
         //_myWindowBuffer
     }
+//     std::vector<float>::iterator myPos = _myWindowBuffer.begin() + theWindowSize/2;
+//     _myWindowBuffer.insert(myPos, theWindowSize, 1.0f);
 }
 
 
@@ -219,23 +226,31 @@ float GrainSource::getGrainPositionJitter() const {
 }
 
 
-void GrainSource::setTransposition(unsigned theTransposition) {
-    _myTransposition = theTransposition;
+// void GrainSource::setTransposition(unsigned theTransposition) {
+//     _myTransposition = theTransposition;
+// }
+
+
+// unsigned GrainSource::getTransposition() const {
+//     return _myTransposition;
+// }
+
+
+// void GrainSource::setTranspositionJitter(unsigned theJitter) {
+//     _myTranspositionJitter = theJitter;
+// }
+
+
+// unsigned GrainSource::getTranspositionJitter() const {
+//     return _myTranspositionJitter;
+// }
+
+void GrainSource::setVolume(float theVolume) {
+    _myVolumeFader->setVolume(theVolume,0);
 }
 
-
-unsigned GrainSource::getTransposition() const {
-    return _myTransposition;
-}
-
-
-void GrainSource::setTranspositionJitter(unsigned theJitter) {
-    _myTranspositionJitter = theJitter;
-}
-
-
-unsigned GrainSource::getTranspositionJitter() const {
-    return _myTranspositionJitter;
+float GrainSource::getVolume() const {
+    return _myVolumeFader->getVolume();
 }
 
 
