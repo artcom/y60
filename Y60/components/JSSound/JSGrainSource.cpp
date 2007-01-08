@@ -88,6 +88,7 @@ namespace jslib {
     JSPropertySpec * 
     JSGrainSource::Properties() {
         static JSPropertySpec myProperties[] = {
+            {"volume", PROP_volume, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"size", PROP_size, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"rate", PROP_rate, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"ratejitter", PROP_ratejitter, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
@@ -113,6 +114,9 @@ namespace jslib {
     JSBool
     JSGrainSource::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         switch (theID) {
+        case PROP_volume:
+            *vp = as_jsval(cx, getNative().getVolume());
+            return JS_TRUE;
         case PROP_size:
             *vp = as_jsval(cx, getNative().getGrainSize());
             return JS_TRUE;
@@ -138,6 +142,8 @@ namespace jslib {
     JSGrainSource::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
         jsval dummy;
         switch (theID) {
+        case PROP_volume:
+            return Method<NATIVE>::call(&NATIVE::getVolume, cx, obj, 1, vp, &dummy);
         case PROP_size:
             return Method<NATIVE>::call(&NATIVE::setGrainSize, cx, obj, 1, vp, &dummy);
         case PROP_rate:

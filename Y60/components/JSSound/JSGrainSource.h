@@ -44,7 +44,8 @@ namespace jslib {
         static JSFunctionSpec * StaticFunctions();
         
         enum PropertyNumbers {
-            PROP_size = -100,
+            PROP_volume = -100,
+            PROP_size,
             PROP_rate,
             PROP_ratejitter,
             PROP_position,
