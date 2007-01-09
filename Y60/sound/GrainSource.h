@@ -31,7 +31,12 @@ namespace y60 {
 
     public:
 
-        GrainSource(const std::string& theName, asl::SampleFormat theSampleFormat, unsigned theSampleRate, unsigned theNumChannels);
+        GrainSource(const std::string& theName, 
+                    asl::SampleFormat theSampleFormat, 
+                    unsigned theSampleRate, 
+                    unsigned theNumChannels, 
+                    unsigned theGrainSize=50,
+                    unsigned theGrainRate=25);
         virtual ~GrainSource();
 
         // inherited from SampleSource

@@ -18,11 +18,16 @@
 using namespace asl;
 using namespace y60;
 
-GrainSource::GrainSource(const std::string& theName, SampleFormat theSampleFormat, unsigned theSampleRate, unsigned theNumChannels) :
+GrainSource::GrainSource(const std::string& theName, 
+                         SampleFormat theSampleFormat, 
+                         unsigned theSampleRate, 
+                         unsigned theNumChannels, 
+                         unsigned theGrainSize,
+                         unsigned theGrainRate) :
     SampleSource(theName, theSampleFormat, theSampleRate, theNumChannels),
-    _myGrainSize(50),
+    _myGrainSize(theGrainSize),
     _myGrainSizeJitter(0),
-    _myGrainRate(20),
+    _myGrainRate(theGrainRate),
     _myGrainRateJitter(0),
     _myGrainPosition(0),
     _myGrainPositionJitter(0),
@@ -53,6 +58,7 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     //AC_INFO << "GrainSource::deliverData();";
     ASSURE(getNumChannels() == theBuffer.getNumChannels());
     ASSURE(_mySampleRate == theBuffer.getSampleRate());
+    ASSURE(_myGrainSize >= 1);
     theBuffer.clear();
 
     //AC_INFO << "OldOffset: " << _myGrainOffset << " , Last Buffersize: " << _myLastBuffersize;
@@ -69,13 +75,17 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     if (myNumFrames < _myOverlapBuffer->getNumFrames()) {
         myTmpBuffer = AudioBufferPtr(_myOverlapBuffer->partialClone(myNumFrames, _myOverlapBuffer->getNumFrames()-1));
     }
+
+    // resize overlap buffer to fit to new grainsize if needed
+    unsigned myMaxGrainFrames = (unsigned)((_myGrainSize + _myGrainSizeJitter) * mySamplesPerMS);
+    if (myMaxGrainFrames > _myOverlapBuffer->getNumFrames() - myNumFrames) {
+        _myOverlapBuffer->resize(myMaxGrainFrames);
+    }
     _myOverlapBuffer->clear();
+
     // copy tmp to beginning of overlap buffer
     if (myTmpBuffer) {
         _myOverlapBuffer->copyFrames(0u, *myTmpBuffer, 0u, myTmpBuffer->getNumFrames());
-        //AC_INFO << "Temp       " << *myTmpBuffer;
-        //AC_INFO << "Overlap    " << *_myOverlapBuffer;
-        //AC_INFO << "Output     " << theBuffer;
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -108,15 +118,8 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
         // add rest (if any) to the overlap buffer
         _myOverlapBuffer->partialAdd(0u, *myGrain, myToBufferFrames, myToOverlapFrames);
         _myGrainOffset += myRateFrames; // proceed to next grain
-
-        //AC_INFO << "Overlap: " << *_myOverlapBuffer;
-        
     }
-
     _myVolumeFader->apply(theBuffer, 0);
-    // XXXXXX resize overlap buffer
-    //AC_INFO << "OutBuffer: " << theBuffer;
-
 }
 
 
@@ -166,8 +169,8 @@ void GrainSource::createWindowBuffer(unsigned theWindowSize) {
 
 
 void GrainSource::setGrainSize(unsigned theSize) {
+    ASSURE(theSize >= 1);
     _myGrainSize = theSize;
-    createOverlapBuffer(theSize);
 }
 
 
@@ -187,6 +190,7 @@ unsigned GrainSource::getGrainSizeJitter() const {
 
 
 void GrainSource::setGrainRate(unsigned theRate) {
+    ASSURE(theRate >= 1);
     _myGrainRate = theRate;
 }
 
@@ -258,7 +262,7 @@ inline unsigned GrainSource::jitterValue(unsigned theValue, unsigned theJitter) 
     AC_DEBUG << "jitterValue(<" << theValue << ">,<" << theJitter << ">)";
     if (theJitter > 0) {
         theValue = theValue + (2 * (std::rand() % theJitter) - theJitter);
-        if (theValue < 0) theValue = 0;
+        if (theValue < 0) theValue = 1;
     }
     AC_DEBUG << "result: " << theValue;
     return theValue;
