@@ -875,3 +875,8 @@ function createMirrorCamera(theCamera, thePlane) {
     return {orientation : myOrientation, position : myNewCameraPos};
     
 }
+
+function lerp(t, v, w) {
+    return v + t *(w-v);
+}
+    
