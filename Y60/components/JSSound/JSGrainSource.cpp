@@ -25,7 +25,8 @@ namespace jslib {
 
     static JSBool
     loadSoundFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("");
+        DOC_BEGIN("Load a new soundfile (everything which can be decoded by ffmpeg) into the grainsource.");
+        DOC_PARAM("path", "The path to the soundfile", DOC_TYPE_STRING);
         DOC_END;
         ensureParamCount(argc, 1);
         std::string mySoundFile;
@@ -33,7 +34,7 @@ namespace jslib {
             JS_ReportError(cx, "loadSoundFile: argument 1 is not a string");
             return JS_FALSE;
         }
-        av_register_all();
+        av_register_all(); // never forget :)
         IAudioDecoder* myDecoder = new FFMpegAudioDecoder(mySoundFile);
         JSGrainSource::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
@@ -47,9 +48,8 @@ namespace jslib {
 
     static JSBool
     enable(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Start playing the sound.");
+        DOC_BEGIN("Start granular synthesis.");
         DOC_END;
-        //        return Method<JSGrainSource::NATIVE>::call(&JSGrainSource::NATIVE::enable,cx,obj,argc,argv,rval);
         JSGrainSource::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         myNative->enable();
@@ -58,9 +58,8 @@ namespace jslib {
 
     static JSBool
     disable(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("Stop playing the sound."); 
+        DOC_BEGIN("Stop granular synthesis."); 
         DOC_END;
-        //        return Method<JSGrainSource::NATIVE>::call(&JSGrainSource::NATIVE::disable,cx,obj,argc,argv,rval);
         JSGrainSource::OWNERPTR myNative;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
         myNative->disable();
@@ -90,6 +89,7 @@ namespace jslib {
         static JSPropertySpec myProperties[] = {
             {"volume", PROP_volume, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"size", PROP_size, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
+            {"sizejitter", PROP_sizejitter, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"rate", PROP_rate, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"ratejitter", PROP_ratejitter, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"position", PROP_position, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
@@ -120,6 +120,9 @@ namespace jslib {
         case PROP_size:
             *vp = as_jsval(cx, getNative().getGrainSize());
             return JS_TRUE;
+        case PROP_sizejitter:
+            *vp = as_jsval(cx, getNative().getGrainSizeJitter());
+            return JS_TRUE;
         case PROP_rate:
             *vp = as_jsval(cx, getNative().getGrainRate());
             return JS_TRUE;
@@ -146,6 +149,8 @@ namespace jslib {
             return Method<NATIVE>::call(&NATIVE::getVolume, cx, obj, 1, vp, &dummy);
         case PROP_size:
             return Method<NATIVE>::call(&NATIVE::setGrainSize, cx, obj, 1, vp, &dummy);
+        case PROP_sizejitter:
+            return Method<NATIVE>::call(&NATIVE::setGrainSizeJitter, cx, obj, 1, vp, &dummy);
         case PROP_rate:
             return Method<NATIVE>::call(&NATIVE::setGrainRate, cx, obj, 1, vp, &dummy);
         case PROP_ratejitter:
@@ -162,7 +167,9 @@ namespace jslib {
 
     JSBool
     JSGrainSource::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("");
+        DOC_BEGIN("Create a new grain source.");
+        DOC_PARAM_OPT("grain size", "The length of a grain in ms", DOC_TYPE_INTEGER, 50);
+        DOC_PARAM_OPT("grain rate", "The time, when the next grain starts in ms", DOC_TYPE_INTEGER, 25);
         DOC_END;
         try {
             if (JSA_GetClass(cx,obj) != Class()) {
@@ -171,10 +178,30 @@ namespace jslib {
             }
 
             OWNERPTR myNewNative;
-            myNewNative = GrainSourcePtr(new GrainSource("aGrainSource",
-                                                         Pump::get().getNativeSampleFormat(),
-                                                         Pump::get().getNativeSampleRate(),
-                                                         2));
+
+            if (argc == 1) {
+                unsigned myGrainSize = 50;
+                convertFrom(cx, argv[0], myGrainSize);
+                myNewNative = GrainSourcePtr(new GrainSource("aGrainSource",
+                                                             Pump::get().getNativeSampleFormat(),
+                                                             Pump::get().getNativeSampleRate(),
+                                                             2,myGrainSize));
+            } else if (argc == 2) {
+                unsigned myGrainSize = 50;
+                unsigned myGrainRate = 25;
+                convertFrom(cx, argv[0], myGrainSize);
+                convertFrom(cx, argv[1], myGrainRate);
+                myNewNative = GrainSourcePtr(new GrainSource("aGrainSource",
+                                                             Pump::get().getNativeSampleFormat(),
+                                                             Pump::get().getNativeSampleRate(),
+                                                             2,myGrainSize, myGrainRate));
+            } else {
+                myNewNative = GrainSourcePtr(new GrainSource("aGrainSource",
+                                                             Pump::get().getNativeSampleFormat(),
+                                                             Pump::get().getNativeSampleRate(),
+                                                             2));
+            }
+
             Pump::get().addSampleSource(myNewNative);
 
             JSGrainSource * myNewObject = new JSGrainSource(myNewNative, &(*myNewNative));

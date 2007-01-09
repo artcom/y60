@@ -46,6 +46,7 @@ namespace jslib {
         enum PropertyNumbers {
             PROP_volume = -100,
             PROP_size,
+            PROP_sizejitter,
             PROP_rate,
             PROP_ratejitter,
             PROP_position,
