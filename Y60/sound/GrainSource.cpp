@@ -31,9 +31,8 @@ GrainSource::GrainSource(const std::string& theName,
     _myGrainRateJitter(0),
     _myGrainPosition(0),
     _myGrainPositionJitter(0),
-    _myTransposition(0),
-    _myTranspositionJitter(0),
     _myRatio(1.),
+    _myRatioJitter(0.),
     _myGrainOffset(0),
     _myLastBuffersize(0),
     _myAudioDataFrames(0)
@@ -46,7 +45,6 @@ GrainSource::GrainSource(const std::string& theName,
     _myWindowFunction = WindowFunctionPtr(new WindowFunction(_mySampleFormat));
     _myWindowFunction->createHannWindow(1024);
     createOverlapBuffer(_myGrainSize);
-    createWindowBuffer(1024);
 }
 
 
@@ -95,6 +93,7 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     // repeat for all grains until end of frame buffer is reached
     while (_myGrainOffset < myNumFrames) {
 
+        float myJitteredRatio = jitterValue(_myRatio, _myRatioJitter);
         unsigned myGrainFrames =(unsigned)( (float)(jitterValue(_myGrainSize, _myGrainSizeJitter)) * mySamplesPerMS);
         unsigned myRateFrames = (unsigned)( (float)(jitterValue(_myGrainRate, _myGrainRateJitter)) * mySamplesPerMS);
         unsigned myPositionFrame = (unsigned)(jitterValue(_myGrainPosition,_myGrainPositionJitter) * 
@@ -105,11 +104,10 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
         }
  
         // get grain from audio data
-        AudioBufferBase* myGrain = _myAudioData->partialClone(myPositionFrame, myPositionFrame + (unsigned)(ceil(myGrainFrames * _myRatio)));
+        AudioBufferBase* myGrain = _myAudioData->partialClone(myPositionFrame, myPositionFrame + (unsigned)(ceil(myGrainFrames * myJitteredRatio)));
 
-        _myResampler->setRatio(_myRatio);
+        _myResampler->setRatio(myJitteredRatio);
         _myResampler->apply(*myGrain,0);
-        //        AC_INFO << "Grain: " << *myGrain;
         _myWindowFunction->apply(*myGrain,0);
 
         unsigned myRemainingFrames = myNumFrames - _myGrainOffset;
@@ -155,21 +153,6 @@ inline void GrainSource::setAudioData(const AudioBufferPtr& theAudioData) {
 void GrainSource::createOverlapBuffer(unsigned theGrainSize) {
     _myOverlapBuffer = AudioBufferPtr(createAudioBuffer(_mySampleFormat, (unsigned)(theGrainSize*_mySampleRate*0.001), _numChannels, _mySampleRate));
     _myOverlapBuffer->clear();
-}
-
-
-void GrainSource::createWindowBuffer(unsigned theWindowSize) {
-    //    _myWindowBuffer.reserve(theWindowSize*2);
-    _myWindowBuffer.reserve(theWindowSize);
-    for (unsigned i = 0; i < theWindowSize; i++) {
-        float value = 0.5 * (1.0 -cos(2*3.14159265f*i/(theWindowSize-1))); // Hann Window
-        //float value = 1.0f;
-        //float value = 0.5f * 2.0f/theWindowSize * (theWindowSize*0.5f - std::abs((float)i - (theWindowSize - 1)*0.5f));
-        _myWindowBuffer.push_back(value); 
-        //_myWindowBuffer
-    }
-//     std::vector<float>::iterator myPos = _myWindowBuffer.begin() + theWindowSize/2;
-//     _myWindowBuffer.insert(myPos, theWindowSize, 1.0f);
 }
 
 
@@ -239,28 +222,38 @@ float GrainSource::getRatio() const {
 }
 
 void GrainSource::setRatio(float theRatio) {
-    _myRatio = theRatio;
+    AC_DEBUG << "GrainSource::setRatio("<<theRatio<<");";
+    ASSURE(_myRatio > 0);
+    if (theRatio > 0) {
+        _myRatio = theRatio;
+    }
+}
+
+void GrainSource::setRatioJitter(float theJitter) {
+    AC_DEBUG << "GrainSource::setRatioJitter("<<theJitter<<");";
+    ASSURE(theJitter < _myRatio);
+    if (theJitter < _myRatio) {
+        _myRatioJitter = theJitter;
+    }
 }
 
 
-// void GrainSource::setTransposition(unsigned theTransposition) {
-//     _myTransposition = theTransposition;
-// }
+float GrainSource::getRatioJitter() const {
+    return _myRatioJitter;
+}
+
+void GrainSource::setTransposition(float theTransposition) {
+    AC_DEBUG << "GrainSource::setTransposition("<<theTransposition<<");";
+    _myRatio = pow(2., theTransposition/12.);
+    ASSURE(_myRatio > 0);
+}
 
 
-// unsigned GrainSource::getTransposition() const {
-//     return _myTransposition;
-// }
-
-
-// void GrainSource::setTranspositionJitter(unsigned theJitter) {
-//     _myTranspositionJitter = theJitter;
-// }
-
-
-// unsigned GrainSource::getTranspositionJitter() const {
-//     return _myTranspositionJitter;
-// }
+float GrainSource::getTransposition() const {
+    float myTranspose = 12. * log(_myRatio)/log(2.);
+    AC_DEBUG << myTranspose << " = GrainSource::getTransposition()";
+    return myTranspose;
+}
 
 void GrainSource::setVolume(float theVolume) {
     _myVolumeFader->setVolume(theVolume,0);

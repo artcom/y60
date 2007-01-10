@@ -70,14 +70,14 @@ namespace y60 {
         void setGrainPositionJitter(float theJitter);
         float getGrainPositionJitter() const;
 
-//         void setTransposition(unsigned theTransposition);
-//         unsigned getTransposition() const;
-
-//         void setTranspositionJitter(unsigned theJitter);
-//         unsigned getTranspositionJitter() const;
+        void setTransposition(float theTransposition);
+        float getTransposition() const;
 
         void setRatio(float theRatio);
         float getRatio() const;
+
+        void setRatioJitter(float theJitter);
+        float getRatioJitter() const;
 
         void setVolume(float theVolume);
         float getVolume() const;
@@ -94,9 +94,8 @@ namespace y60 {
         float    _myGrainPosition;          // relative position in the audiobuffer where the grain is taken from 
         float    _myGrainPositionJitter;    
         // XXXX to be implemented yet .... (needs resampling for slower or faster playback)
-        int      _myTransposition;          // transposition in cents
         float    _myRatio;                  // transposition ratio
-        int      _myTranspositionJitter;    
+        float    _myRatioJitter;    
         // XXXX panning stuff
         
         // some effect(-functors) to operate on the audio buffers
@@ -110,10 +109,7 @@ namespace y60 {
         unsigned _myGrainOffset;                 // offset of the first grain in our frame buffer
         unsigned _myLastBuffersize;              // because subsequent framebuffers have different sizes, we need to store the last buffer size
 
-        std::vector<float> _myWindowBuffer;      // window function applied to the current grain (i.e. hann window)
-
         void createOverlapBuffer(unsigned theGrainSize);
-        void createWindowBuffer(unsigned theWindowSize);
         unsigned jitterValue(unsigned theValue, unsigned theJitter) const;
         float jitterValue(float theValue, float theJitter) const;
 

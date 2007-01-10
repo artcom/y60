@@ -95,6 +95,8 @@ namespace jslib {
             {"position", PROP_position, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"positionjitter", PROP_positionjitter, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"ratio", PROP_ratio, JSPROP_ENUMERATE | JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
+            {"ratiojitter", PROP_ratiojitter, JSPROP_ENUMERATE | JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
+            {"transposition", PROP_transposition, JSPROP_ENUMERATE | JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {0}
         };
         return myProperties;
@@ -139,6 +141,13 @@ namespace jslib {
         case PROP_ratio:
             *vp = as_jsval(cx, getNative().getRatio());
             return JS_TRUE;
+        case PROP_ratiojitter:
+            *vp = as_jsval(cx, getNative().getRatioJitter());
+            return JS_TRUE;
+        case PROP_transposition:
+            *vp = as_jsval(cx, getNative().getTransposition());
+            return JS_TRUE;
+
         default:
             JS_ReportError(cx, "JSGrainSource::getProperty: index %d out of range", theID);
             return JS_FALSE;
@@ -165,6 +174,10 @@ namespace jslib {
             return Method<NATIVE>::call(&NATIVE::setGrainPositionJitter, cx, obj, 1, vp, &dummy);
         case PROP_ratio:
             return Method<NATIVE>::call(&NATIVE::setRatio, cx, obj, 1, vp, &dummy);
+        case PROP_ratiojitter:
+            return Method<NATIVE>::call(&NATIVE::setRatioJitter, cx, obj, 1, vp, &dummy);
+        case PROP_transposition:
+            return Method<NATIVE>::call(&NATIVE::setTransposition, cx, obj, 1, vp, &dummy);
         default:
             JS_ReportError(cx,"JSGrainSource::setPropertySwitch: index %d out of range", theID);
         }
