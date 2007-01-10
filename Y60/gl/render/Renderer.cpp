@@ -1270,7 +1270,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
 
         // Disable remaining lights
         for (unsigned i = myActiveLightCount; i < myMaxLights; ++i) {
-            glDisable(asGLLightEnum(myActiveLightCount));
+            glDisable(asGLLightEnum(i));
         }
 
         COUNT_N(ActiveLights, myActiveLightCount);
