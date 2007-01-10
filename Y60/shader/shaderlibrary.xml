@@ -231,7 +231,7 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
-    <shader id="s8pp" name="unlitmultitexlastplanarprojection" cost="120">
+    <shader id="s8pp" name="unlitDualTexProj" cost="120">
         <supports>
             <feature class="lighting" values="[unlit]"/>
             <feature class="textures" values="[paint,paint]"/>
@@ -248,9 +248,44 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
-    <shader id="s9pp" name="unlittripletexlastplanarprojection" cost="120">
+    <shader id="s8pl" name="lambertDualTexProj" cost="120">
+        <supports>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,*]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
+    <shader id="s9pp" name="unlitTripleTexProj" cost="120">
         <supports>
             <feature class="lighting" values="[unlit]"/>
+            <feature class="textures" values="[paint,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,uv_map,*]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
+    <shader id="s9pl" name="lambertTripleTexProj" cost="120">
+        <supports>
+            <feature class="lighting" values="[lambert]"/>
             <feature class="textures" values="[paint,paint,paint]"/>
             <feature class="texcoord" values="[uv_map,uv_map,*]"/>
         </supports>

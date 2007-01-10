@@ -275,7 +275,6 @@ namespace y60 {
             unsigned myId = myTexture.getImage()->ensureTextureId(); 
 
             AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.get<NameTag>() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId();
-
             TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
 
             // [VS;DS] please explain this
@@ -293,6 +292,31 @@ namespace y60 {
             glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
 
             glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, asGLTextureFunc(myTexture.getApplyMode())); 
+#if 1
+            // UH: there's no test for this (e.g. material with three point sprite textures)
+            // but IMHO the other code is wrong. For the given case it would enable
+            // PS for the 1st, disable it for the 2nd, then re-enable it for the 3rd.
+            if (myTexture.get<TextureSpriteTag>()) {
+                if (!alreadyHasSpriteTexture) {
+                    glEnable(GL_POINT_SPRITE_ARB);
+                    CHECK_OGL_ERROR;
+                    if (glPointParameterfARB) {
+                        glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
+                        CHECK_OGL_ERROR;
+                    }
+                    alreadyHasSpriteTexture = true;
+                }
+                glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
+                CHECK_OGL_ERROR;
+            } else {
+                if (alreadyHasSpriteTexture) {
+                    glDisable(GL_POINT_SPRITE_ARB);
+                    alreadyHasSpriteTexture = false;
+                }
+                glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
+                CHECK_OGL_ERROR;
+            }
+#else
             if (myTexture.get<TextureSpriteTag>()) {
                 if (!alreadyHasSpriteTexture) {
                     glEnable(GL_POINT_SPRITE_ARB);
@@ -311,6 +335,7 @@ namespace y60 {
                 glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE );
                 CHECK_OGL_ERROR;
             }
+#endif
         }
         glMatrixMode(GL_MODELVIEW);
     }
@@ -428,7 +453,7 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        //AC_DEBUG << "GLShader.bindBodyParams " << theMaterial.get<NameTag>();
+        //AC_DEBUG << "GLShader::bindBodyParams " << theMaterial.get<NameTag>();
         DBP2(MAKE_SCOPE_TIMER(GLShader_bindBodyParams));
         if (theMaterial.hasTexGen()) {
 
@@ -446,7 +471,7 @@ namespace y60 {
 
                 for (unsigned i = 0; i < myModes.size(); ++i) {
 
-                    //AC_DEBUG << "unit=" << myTexUnit << " mode=" << myModes[i] << " params=" << myParams[i];
+                    //AC_DEBUG << "unit=" << myTexUnit << " coord=" << i << " mode=" << myModes[i];
 
                     if (myModes[i] == NONE) {
                         continue;
