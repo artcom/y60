@@ -18,6 +18,9 @@
 #include <asl/AudioBuffer.h>
 #include <asl/VolumeFader.h>
 
+#include "Resampler.h"
+#include "WindowFunction.h"
+
 #include <vector>
 
 namespace y60 {
@@ -73,6 +76,9 @@ namespace y60 {
 //         void setTranspositionJitter(unsigned theJitter);
 //         unsigned getTranspositionJitter() const;
 
+        void setRatio(float theRatio);
+        float getRatio() const;
+
         void setVolume(float theVolume);
         float getVolume() const;
 
@@ -86,16 +92,21 @@ namespace y60 {
         unsigned _myGrainRate;              // time interval when the next grain should be played (in ms)
         unsigned _myGrainRateJitter;
         float    _myGrainPosition;          // relative position in the audiobuffer where the grain is taken from 
-        float     _myGrainPositionJitter;    
+        float    _myGrainPositionJitter;    
         // XXXX to be implemented yet .... (needs resampling for slower or faster playback)
         int      _myTransposition;          // transposition in cents
+        float    _myRatio;                  // transposition ratio
         int      _myTranspositionJitter;    
         // XXXX panning stuff
         
-        asl::VolumeFaderPtr _myVolumeFader;
+        // some effect(-functors) to operate on the audio buffers
+        asl::VolumeFaderPtr    _myVolumeFader;
+        y60::ResamplerPtr      _myResampler;
+        y60::WindowFunctionPtr _myWindowFunction;
 
         // some helper members
         asl::AudioBufferPtr _myOverlapBuffer;    // a little space to save overlapping samples between two deliverData calls
+        unsigned _myAudioDataFrames;             // the size of the contained audio data
         unsigned _myGrainOffset;                 // offset of the first grain in our frame buffer
         unsigned _myLastBuffersize;              // because subsequent framebuffers have different sizes, we need to store the last buffer size
 

@@ -33,13 +33,18 @@ GrainSource::GrainSource(const std::string& theName,
     _myGrainPositionJitter(0),
     _myTransposition(0),
     _myTranspositionJitter(0),
+    _myRatio(1.),
     _myGrainOffset(0),
-    _myLastBuffersize(0)
+    _myLastBuffersize(0),
+    _myAudioDataFrames(0)
 {
     _myAudioData = AudioBufferPtr(createAudioBuffer(_mySampleFormat, 0u, _numChannels, _mySampleRate));
     _myAudioData->clear();
     _myVolumeFader = VolumeFaderPtr(new VolumeFader(_mySampleFormat));
     _myVolumeFader->setVolume(1, 0); 
+    _myResampler = ResamplerPtr(new Resampler(_mySampleFormat));
+    _myWindowFunction = WindowFunctionPtr(new WindowFunction(_mySampleFormat));
+    _myWindowFunction->createHannWindow(1024);
     createOverlapBuffer(_myGrainSize);
     createWindowBuffer(1024);
 }
@@ -54,21 +59,19 @@ GrainSource::~GrainSource() {
 //
 void GrainSource::deliverData(AudioBufferBase& theBuffer) {
 
-    //AC_INFO << "\n";
-    //AC_INFO << "GrainSource::deliverData();";
+    AC_DEBUG << "GrainSource::deliverData();";
     ASSURE(getNumChannels() == theBuffer.getNumChannels());
     ASSURE(_mySampleRate == theBuffer.getSampleRate());
     ASSURE(_myGrainSize >= 1);
     theBuffer.clear();
 
-    //AC_INFO << "OldOffset: " << _myGrainOffset << " , Last Buffersize: " << _myLastBuffersize;
     unsigned myNumFrames = theBuffer.getNumFrames();
     float mySamplesPerMS = _mySampleRate * 0.001f;
     _myGrainOffset -= _myLastBuffersize;
     _myLastBuffersize = myNumFrames;
     
     /////////////////////////////////////////////////////////////////////////////
-    // copy overlap contents to frame buffer
+    // copy samples overlapping from the last buffer to current frame buffer
     theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u, myNumFrames);
     // save remaining sample data to tmp buffer
     AudioBufferPtr myTmpBuffer = AudioBufferPtr(0);
@@ -90,29 +93,29 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
 
     /////////////////////////////////////////////////////////////////////////////
     // repeat for all grains until end of frame buffer is reached
-    //AC_INFO << "Offset: " << _myGrainOffset << " , Buffersize: " << myNumFrames;
     while (_myGrainOffset < myNumFrames) {
 
         unsigned myGrainFrames =(unsigned)( (float)(jitterValue(_myGrainSize, _myGrainSizeJitter)) * mySamplesPerMS);
         unsigned myRateFrames = (unsigned)( (float)(jitterValue(_myGrainRate, _myGrainRateJitter)) * mySamplesPerMS);
         unsigned myPositionFrame = (unsigned)(jitterValue(_myGrainPosition,_myGrainPositionJitter) * 
-                                              _myAudioData->getNumFrames());
+                                              _myAudioDataFrames);
         ASSURE(myPositionFrame>=0);
-        if (myPositionFrame>_myAudioData->getNumFrames()-myGrainFrames) {
-            myPositionFrame = _myAudioData->getNumFrames()-myGrainFrames;
+        if (myPositionFrame>_myAudioDataFrames-myGrainFrames) {
+            myPositionFrame = _myAudioDataFrames-myGrainFrames;
         }
-    
+ 
         // get grain from audio data
-        AudioBufferPtr myGrain = AudioBufferPtr(_myAudioData->partialClone(myPositionFrame, myPositionFrame + myGrainFrames));
-        //AC_INFO << "Grain: " << *myGrain;
-        // apply hann window
-        myGrain->applyWindow(_myWindowBuffer);
+        AudioBufferBase* myGrain = _myAudioData->partialClone(myPositionFrame, myPositionFrame + (unsigned)(ceil(myGrainFrames * _myRatio)));
+
+        _myResampler->setRatio(_myRatio);
+        _myResampler->apply(*myGrain,0);
+        //        AC_INFO << "Grain: " << *myGrain;
+        _myWindowFunction->apply(*myGrain,0);
 
         unsigned myRemainingFrames = myNumFrames - _myGrainOffset;
         unsigned myToBufferFrames = (myGrainFrames > myRemainingFrames) ? myRemainingFrames : myGrainFrames;
         unsigned myToOverlapFrames = myGrainFrames - myToBufferFrames;
 
-        //AC_INFO << "Remaining: " << myRemainingFrames << " , To Buffer: " << myToBufferFrames << " , To Olap: " << myToOverlapFrames;
         // add contents to the frame buffer
         theBuffer.partialAdd(_myGrainOffset, *myGrain, 0u, myToBufferFrames);
         // add rest (if any) to the overlap buffer
@@ -129,15 +132,18 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
 bool GrainSource::queueSamples(AudioBufferPtr& theBuffer) {
     unsigned myNumFrames = _myAudioData->getNumFrames();
     unsigned mySrcFrames = theBuffer->getNumFrames();
-    _myAudioData->resize(myNumFrames + mySrcFrames);
-    _myAudioData->copyFrames(myNumFrames, *theBuffer, 0u, mySrcFrames);
-    //AC_INFO << "Resized _myAudioData to : " << _myAudioData->getNumFrames() << " Frames";
+    if (_myAudioDataFrames + mySrcFrames > myNumFrames) { // doesn't fit into the current audio data buffer
+        _myAudioData->resize(_myAudioDataFrames + mySrcFrames);
+    }
+    _myAudioData->copyFrames(_myAudioDataFrames, *theBuffer, 0u, mySrcFrames);
+    _myAudioDataFrames += mySrcFrames; 
     return true;
 }
 
 
 void GrainSource::clearAudioData() {
     _myAudioData->clear();
+    _myAudioDataFrames = 0;
 }
 
 
@@ -159,7 +165,6 @@ void GrainSource::createWindowBuffer(unsigned theWindowSize) {
         float value = 0.5 * (1.0 -cos(2*3.14159265f*i/(theWindowSize-1))); // Hann Window
         //float value = 1.0f;
         //float value = 0.5f * 2.0f/theWindowSize * (theWindowSize*0.5f - std::abs((float)i - (theWindowSize - 1)*0.5f));
-        AC_INFO << "value: " << value;
         _myWindowBuffer.push_back(value); 
         //_myWindowBuffer
     }
@@ -227,6 +232,14 @@ void GrainSource::setGrainPositionJitter(float theJitter) {
 
 float GrainSource::getGrainPositionJitter() const {
     return _myGrainPositionJitter;
+}
+
+float GrainSource::getRatio() const {
+    return _myRatio;
+}
+
+void GrainSource::setRatio(float theRatio) {
+    _myRatio = theRatio;
 }
 
 
