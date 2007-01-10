@@ -177,24 +177,6 @@ class AudioBuffer: public AudioBufferBase {
             }
         }
 
-        void applyWindow(const std::vector<float> & theWindow) {
-
-            unsigned thisRange = getNumFrames();
-            unsigned thatRange = theWindow.size();
-            
-            SAMPLE * curSample = begin();
-            for (unsigned i = 0; i < getNumFrames(); i++) {
-                float pos = (float)i/(float)thisRange * (float)thatRange;
-                unsigned low = (unsigned)floor(pos);
-                // linear interpolation...
-                float theWindowVal = (low != pos) ? theWindow[low] + (theWindow[low+1] - theWindow[low]) * (pos - low) : theWindow[low];
-                for (unsigned j = 0; j < getNumChannels(); j++) {
-                    (*curSample++) *= floatToSample(theWindowVal);
-                }
-            }
-        }
-
-
         void copyFrames(unsigned theDestStartFrame, const AudioBufferBase& theSrcBuffer,
                         unsigned theSrcStartFrame, unsigned numFrames)
         {
