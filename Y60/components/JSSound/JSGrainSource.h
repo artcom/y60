@@ -50,7 +50,8 @@ namespace jslib {
             PROP_rate,
             PROP_ratejitter,
             PROP_position,
-            PROP_positionjitter
+            PROP_positionjitter,
+            PROP_ratio
         };
         static jslib::JSConstIntPropertySpec * ConstIntProperties();
         static JSPropertySpec * Properties();

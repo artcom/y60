@@ -22,7 +22,6 @@ namespace jslib {
 
     template class JSWrapper<y60::GrainSource, y60::GrainSourcePtr, jslib::StaticAccessProtocol>;
 
-
     static JSBool
     loadSoundFile(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Load a new soundfile (everything which can be decoded by ffmpeg) into the grainsource.");
@@ -40,6 +39,7 @@ namespace jslib {
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
         myDecoder->setSampleSink(&(*myNative));
+        myNative->clearAudioData();
         myDecoder->decodeEverything();
         delete myDecoder;
         JSGrainSource::getJSWrapper(cx, obj).closeNative();
@@ -94,6 +94,7 @@ namespace jslib {
             {"ratejitter", PROP_ratejitter, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"position", PROP_position, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {"positionjitter", PROP_positionjitter, JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
+            {"ratio", PROP_ratio, JSPROP_ENUMERATE | JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_SHARED},
             {0}
         };
         return myProperties;
@@ -135,6 +136,9 @@ namespace jslib {
         case PROP_positionjitter:
             *vp = as_jsval(cx, getNative().getGrainPositionJitter());
             return JS_TRUE;
+        case PROP_ratio:
+            *vp = as_jsval(cx, getNative().getRatio());
+            return JS_TRUE;
         default:
             JS_ReportError(cx, "JSGrainSource::getProperty: index %d out of range", theID);
             return JS_FALSE;
@@ -159,6 +163,8 @@ namespace jslib {
             return Method<NATIVE>::call(&NATIVE::setGrainPosition, cx, obj, 1, vp, &dummy);
         case PROP_positionjitter:
             return Method<NATIVE>::call(&NATIVE::setGrainPositionJitter, cx, obj, 1, vp, &dummy);
+        case PROP_ratio:
+            return Method<NATIVE>::call(&NATIVE::setRatio, cx, obj, 1, vp, &dummy);
         default:
             JS_ReportError(cx,"JSGrainSource::setPropertySwitch: index %d out of range", theID);
         }
