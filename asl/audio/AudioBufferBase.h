@@ -56,8 +56,6 @@ class AudioBufferBase {
                                 const AudioBufferBase& theSrcBuffer,
                                 unsigned theSrcStartFrame, unsigned numFrames) = 0;
 
-        virtual void applyWindow(const std::vector<float> & theWindow) = 0;
-
         virtual std::ostream & print(std::ostream & s) const = 0;
         virtual void dumpSamples (std::ostream & s, int startSample, int endSample) const = 0;
 
