@@ -32,6 +32,15 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
+    function getTaskWindowsWithTimeout(theTask, theTimeoutInMs) {
+        var myStartTime = millisec();
+        var myWindows = theTask.windows;
+        while(myWindows.length == 0 && (millisec() - myStartTime < theTimeoutInMs)) {
+            msleep(100);
+            myWindows = theTask.windows;
+        }
+        return myWindows;
+    }
     function testApplication(theApplication, theWindowName, theWindowCount) {
         print(">>>  Test Application: '" + theApplication);
         print("Open tasks");
@@ -43,12 +52,18 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         ENSURE('obj.myTask.windows.length == ' + theWindowCount);
         ENSURE('obj.myTask1.windows.length == 1');
         ENSURE('obj.myTask2.windows.length == 1');
+        obj.myWindows = getTaskWindowsWithTimeout(obj.myTask, 2000);
+        ENSURE('obj.myWindows.length > 0');
         obj.myWindow = obj.myTask.windows[0];
         ENSURE('obj.myWindow.windowname == "' + theWindowName + '"');
 
         // Attach first window by name
         obj.myTaskWindow  = new TaskWindow(theWindowName);
+        obj.myWindows = getTaskWindowsWithTimeout(obj.myTask1, 2000);
+        ENSURE('obj.myWindows.length > 0');
         obj.myTaskWindow1 = obj.myTask1.windows[0];
+        obj.myWindows = getTaskWindowsWithTimeout(obj.myTask2, 2000);
+        ENSURE('obj.myWindows.length > 0');
         obj.myTaskWindow2 = obj.myTask2.windows[0];
 
         print("Restore minimized tasks");                    
@@ -111,6 +126,8 @@ TaskManagerUnitTest.prototype.Constructor = function(obj, theName) {
         print("Create external window");
         var myTask3 = new Task("C:/WINDOWS/notepad.exe");
         msleep(TEST_SPEED);
+        obj.myWindows = getTaskWindowsWithTimeout(myTask3, 2000);
+        ENSURE('obj.myWindows.length > 0');        
         obj.myTaskWindow3 = myTask3.windows[0];
 
         print("Move external window");
