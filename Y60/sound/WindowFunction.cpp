@@ -29,6 +29,14 @@ namespace y60 {
         return _myWindow;
     }
 
+    void WindowFunction::setOverlapFactor(float theOverlapFactor) {
+        _myOverlapFactor = theOverlapFactor;
+    }
+
+    float WindowFunction::getOverlapFactor() {
+        return _myOverlapFactor;
+    }
+
     void WindowFunction::createHannWindow(unsigned theSize) {
         AC_DEBUG << "WindowFunction::createHannWindow()";
         _myWindow.clear();
@@ -38,5 +46,4 @@ namespace y60 {
             _myWindow.push_back(value); 
         }
     }
-
 }

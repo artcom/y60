@@ -108,6 +108,7 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
 
         _myResampler->setRatio(myJitteredRatio);
         _myResampler->apply(*myGrain,0);
+        _myWindowFunction->setOverlapFactor((float)_myGrainRate/(float)_myGrainSize);
         _myWindowFunction->apply(*myGrain,0);
 
         unsigned myRemainingFrames = myNumFrames - _myGrainOffset;

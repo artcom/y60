@@ -93,7 +93,6 @@ namespace y60 {
         unsigned _myGrainRateJitter;
         float    _myGrainPosition;          // relative position in the audiobuffer where the grain is taken from 
         float    _myGrainPositionJitter;    
-        // XXXX to be implemented yet .... (needs resampling for slower or faster playback)
         float    _myRatio;                  // transposition ratio
         float    _myRatioJitter;    
         // XXXX panning stuff

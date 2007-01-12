@@ -27,8 +27,12 @@ namespace y60 {
 
         WindowFunction(asl::SampleFormat theSampleFormat);
         
+        void setOverlapFactor(float theOverlapFactor);
+        float getOverlapFactor();
+        
         void setWindow(const std::vector<float> & theWindow);
         const std::vector<float> & getWindow() const;
+
         void createHannWindow(unsigned theSize);
 
     private:        
@@ -44,6 +48,7 @@ namespace y60 {
                 WindowFunction * myWindowFunction = dynamic_cast<WindowFunction* >(theEffect);
                 ASSURE(myWindowFunction);
                 const std::vector<float> theWindow = myWindowFunction->getWindow();
+                float theOverlapFactor = myWindowFunction->getOverlapFactor();
 
                 SAMPLE * curSample = theBuffer.begin();
                 unsigned thisRange = theBuffer.getNumFrames();
@@ -56,6 +61,7 @@ namespace y60 {
                     float theWindowVal = (low != pos) ? theWindow[low] + (theWindow[low+1] - theWindow[low]) * (pos - low) : theWindow[low];
                     for (unsigned j = 0; j < theBuffer.getNumChannels(); j++) {
                         (*curSample++) *= theBuffer.floatToSample(theWindowVal);
+                        
                         //AC_INFO << "applying windowfunction: val = " << theWindowVal << " sampleval = " << theBuffer.floatToSample(theWindowVal);
                     }
                 }
@@ -63,6 +69,7 @@ namespace y60 {
         };
         
         std::vector<float> _myWindow;
+        float _myOverlapFactor;
         
     };
 
