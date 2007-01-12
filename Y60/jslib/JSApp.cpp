@@ -16,6 +16,8 @@
 #include <y60/JSNode.h>
 #include <y60/JSBlock.h>
 #include <y60/JSVector.h>
+#include <y60/JSScriptablePlugin.h>
+#include <y60/IRendererExtension.h>
 #include <y60/IScriptablePlugin.h>
 #include <y60/IFactoryPlugin.h>
 #include <y60/QuitFlagSingleton.h>
@@ -506,6 +508,13 @@ Plug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
         ourLoadedPlugIns.push_back(myPlugIn);
 
+        // if this is a renderer extension, then return the instance ...
+        if (IRendererExtensionPtr myRendererExtension = dynamic_cast_Ptr<IRendererExtension>(myPlugIn)) {
+            IScriptablePluginPtr myScriptablePlugin = dynamic_cast_Ptr<IScriptablePlugin>( myPlugIn );
+            if (myScriptablePlugin) {
+                * rval = as_jsval(cx, myScriptablePlugin);
+            }
+        }
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
