@@ -1187,31 +1187,40 @@ static JSBool
 execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Executes a command on the system");
     DOC_PARAM("theCommand", "The command to execute", DOC_TYPE_STRING);
+    DOC_PARAM_OPT("theArgs", "Arguments", DOC_TYPE_STRING, "");
+    DOC_PARAM_OPT("theBlockMode", "Blocking mode", DOC_TYPE_BOOLEAN, true);    
     DOC_RVAL("The return code of the command", DOC_TYPE_INTEGER);
     DOC_END;
-    ensureParamCount(argc, 1, 2);
-    if (JSVAL_IS_VOID(argv[0])) {
-        JS_ReportError(cx, "exec(): Argument #%d is undefined.", 1);
-        return JS_FALSE;
+    ensureParamCount(argc, 1, 3);
+    for (unsigned i = 0; i < argc; ++i) {
+        if (JSVAL_IS_VOID(argv[i])) {
+            JS_ReportError(cx, "JSSerial::open(): Argument #%d is undefined", i + 1);
+            return JS_FALSE;
+        }
     }
+
     string myCommandString;
     if ( ! convertFrom(cx, argv[0], myCommandString)) {
         JS_ReportError(cx, "exec(): argument #1 must be a string");
         return JS_FALSE;
     }
-    string myArgs;
+    string myArgs("");
     string myCommand;
+    bool myCommandIsBlocking = true;
     if (argc > 1) {
-        if (JSVAL_IS_VOID(argv[1])) {
-            JS_ReportError(cx, "exec(): Argument #%d is undefined.", 1);
-            return JS_FALSE;
-        }
         if ( ! convertFrom(cx, argv[1], myArgs)) {
             JS_ReportError(cx, "exec(): argument #2 must be a string");
             return JS_FALSE;
         }
         myCommand = myCommandString;
-    } else {
+        if (argc > 2) {
+            if ( ! convertFrom(cx, argv[2], myCommandIsBlocking)) {
+                JS_ReportError(cx, "exec(): argument #3 must be a bool");
+                return JS_FALSE;
+            }            
+        }
+    }
+    if ( myArgs == "") {
         std::string::size_type myIndex = myCommandString.find(" ");
         if (myIndex != string::npos) {
             myCommand = myCommandString.substr(0, myIndex);
@@ -1221,15 +1230,36 @@ execute(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         }
     }
     int myRetVal;
+    string myExecutionCommand = myCommand + " " + myArgs;
 #ifdef WIN32
-    // We usually do not want a shell window to show up.
-    myRetVal = (int) ShellExecute(NULL, "open", myCommand.c_str(),
-        ( myArgs.empty() ? NULL : myArgs.c_str()), NULL, SW_HIDE);
+    string myCWD(".");
+    STARTUPINFO myStartupInfo =
+    {
+        sizeof(STARTUPINFO),
+        NULL, NULL, NULL, 0, 0, 0, 0, 0, 0,
+        0, STARTF_USESHOWWINDOW, SW_SHOWDEFAULT,
+        0, NULL, NULL, NULL, NULL
+    };    
+    PROCESS_INFORMATION myProcessInfo;    
+    DWORD myProcessResult = 0;    
+    bool myResult = CreateProcess(
+            NULL, &myExecutionCommand[0],
+            NULL, NULL, TRUE, 0,
+            NULL, myCWD.c_str(), 
+            &myStartupInfo,
+            &myProcessInfo);
+    if (myCommandIsBlocking) {
+        myProcessResult = WaitForSingleObject(myProcessInfo.hProcess, INFINITE);
+        GetExitCodeProcess(myProcessInfo.hProcess, &myProcessResult);
+    }
+    CloseHandle(myProcessInfo.hThread);
+    CloseHandle(myProcessInfo.hProcess);
+    myRetVal = myProcessResult;
     if (myRetVal > 32) {
         myRetVal = 0;
     }
 #else
-    myRetVal = system((myCommand + " " + myArgs).c_str());
+    myRetVal = system(myExecutionCommand.c_str());
     if (myRetVal && (myRetVal != -1)) {
         myRetVal = WEXITSTATUS(myRetVal);
     }
