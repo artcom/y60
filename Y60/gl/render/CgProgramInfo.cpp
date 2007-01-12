@@ -122,6 +122,14 @@ namespace y60 {
         _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
         _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = 0;
 
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIFFUSE_COLOR] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_SPECULAR_COLOR] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_CUTOFF] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_EXPONENT] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = 0;
+        
         _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = 0;
 
         //VS: 100 punkte
@@ -294,6 +302,7 @@ namespace y60 {
         //look at the number of lights to see if reload is req.
         unsigned myPositionalLightCount = 0;
         unsigned myDirectionalLightCount = 0;
+        unsigned mySpotLightCount = 0;
         DBP2(COUNT_N(CgProgramInfo_reloadIfRequired_lights, theLightInstances.size()));
         for (unsigned i = 0; i < theLightInstances.size(); ++i) {
             LightPtr myLight = theLightInstances[i];
@@ -309,6 +318,8 @@ namespace y60 {
                     ++myDirectionalLightCount;
                     break;
                 case SPOT:
+                    ++mySpotLightCount;
+                    break;
                 case AMBIENT :
                     break;
                 default :
@@ -346,6 +357,21 @@ namespace y60 {
             }
         }
         DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_dir_lights));
+        
+        DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
+        myLightType = SPOT_LIGHTS;
+
+        if (_myAutoParams.find(myLightType) != _myAutoParams.end()) {
+            // unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
+            unsigned myLastCount = _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS];
+            if (myLastCount != mySpotLightCount)  {
+                DBP2(COUNT(CgProgramInfo_spotLightCount_differ));
+                DBP2(COUNT_N(CgProgramInfo_spotLightCountLast, myLastCount));
+                DBP2(COUNT_N(CgProgramInfo_spotLightCountNew, mySpotLightCount));
+                myReload = true;
+            }
+        }
+        DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
 
         if (myReload) {
             // AC_INFO << "reload required";
@@ -358,6 +384,14 @@ namespace y60 {
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = myDirectionalLightCount;
             _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = myDirectionalLightCount;
+
+            _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS] = mySpotLightCount;
+            _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIFFUSE_COLOR] = mySpotLightCount;
+            _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_SPECULAR_COLOR] = mySpotLightCount;
+            _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_CUTOFF] = mySpotLightCount;
+            _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_EXPONENT] = mySpotLightCount;
+            _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = mySpotLightCount;
+            _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = mySpotLightCount;
 
             _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = theMaterial.getTextureCount();
 
@@ -382,7 +416,6 @@ namespace y60 {
         }
 
         return myReload;
-
     }
 
     void
@@ -404,6 +437,14 @@ namespace y60 {
         std::vector<Vector3f> myDirectionalLights;
         std::vector<Vector4f> myDirectionalLightDiffuseColors;
         std::vector<Vector4f> myDirectionalLightSpecularColors;
+
+        std::vector<Vector3f> mySpotLights;
+        std::vector<Vector4f> mySpotLightDiffuseColors;
+        std::vector<Vector4f> mySpotLightSpecularColors;
+        std::vector<Vector3f> mySpotLightDirection;
+        std::vector<float> mySpotLightCutoff;
+        std::vector<float> mySpotLightExponent;
+        std::vector<float> mySpotLightAttenuation;
 
         Vector4f myAmbientLightColor(0,0,0,1);
 
@@ -434,8 +475,28 @@ namespace y60 {
                     myAmbientLightColor = myLightPropFacade->get<LightAmbientTag>();
                     break;
                 case SPOT:
-                    // Not supported, yet.
-                    break;
+                    {
+                        Matrix4f myGlobalMatrix = myLight->get<GlobalMatrixTag>();
+
+                        mySpotLights.push_back(myGlobalMatrix.getTranslation());
+                        mySpotLightDiffuseColors.push_back(myLightPropFacade->get<LightDiffuseTag>());
+                        mySpotLightSpecularColors.push_back(myLightPropFacade->get<LightSpecularTag>());
+                        mySpotLightCutoff.push_back(myLightPropFacade->get<CutOffTag>());
+                        mySpotLightExponent.push_back(myLightPropFacade->get<ExponentTag>());
+                        mySpotLightAttenuation.push_back(myLightPropFacade->get<AttenuationTag>());
+
+                        Vector3f    myScale;
+                        Vector3f    myShear;
+                        Quaternionf myOrientation;
+                        Vector3f    myPosition;
+                        myGlobalMatrix.decompose(myScale, myShear, myOrientation, myPosition);
+
+                        Matrix4f myMatrix(myOrientation);
+                        Vector4f myDirection = product(Vector4f(0,0,-1,1), Matrix4f(myOrientation));
+                        mySpotLightDirection.push_back(normalized(Vector3f(myDirection[0], myDirection[1], myDirection[2])));
+                        AC_TRACE << "setting SPOT_LIGHT_DIRECTION to " << myDirection;
+                        break;
+                    }
                 default :
                     AC_WARNING << "unknown light type " << myLightSource->get<IdTag>();
             }
@@ -474,6 +535,28 @@ namespace y60 {
                     break;
                 case DIRECTIONAL_LIGHTS_SPECULAR_COLOR :
                     setCgUnsizedArrayParameter(curParam, myDirectionalLightSpecularColors);
+                    break;
+                case SPOT_LIGHTS :
+                    AC_TRACE << "setting SPOT_LIGHTS to " << mySpotLights;
+                    setCgUnsizedArrayParameter(curParam, mySpotLights);
+                    break;
+                case SPOT_LIGHTS_DIFFUSE_COLOR :
+                    setCgUnsizedArrayParameter(curParam, mySpotLightDiffuseColors);
+                    break;
+                case SPOT_LIGHTS_SPECULAR_COLOR :
+                    setCgUnsizedArrayParameter(curParam, mySpotLightSpecularColors);
+                    break;
+                case SPOT_LIGHTS_EXPONENT :
+                    setCgUnsizedArrayParameter(curParam, mySpotLightExponent);
+                    break;
+                case SPOT_LIGHTS_CUTOFF :
+                    setCgUnsizedArrayParameter(curParam, mySpotLightCutoff);
+                    break;
+                case SPOT_LIGHTS_DIRECTION :
+                    setCgUnsizedArrayParameter(curParam, mySpotLightDirection);
+                    break;
+                case SPOT_LIGHTS_ATTENUATION :
+                    setCgUnsizedArrayParameter(curParam, mySpotLightAttenuation);
                     break;
                 case AMBIENT_LIGHT_COLOR :
                     setCgVectorParameter(curParam, myAmbientLightColor);
@@ -737,6 +820,26 @@ namespace y60 {
         } else {
             throw RendererException ("Error in " + _myPathName + ": Parameter " + theParam._myName
                     + " should be FLOAT4[].", "CgProgramInfo::setCgArrayVector4fParameter()");
+        }
+        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
+    }
+
+    void
+    CgProgramInfo::setCgUnsizedArrayParameter(const CgProgramAutoParam & theParam,
+                                              const vector<float> & theValue)
+    {
+        int mySize = _myUnsizedArrayAutoParamSizes[theParam._myID];
+        // int mySize = cgGetArraySize(theParam._myParameter, 0);
+        if (mySize != theValue.size()) {
+            AC_ERROR << "BUG 391: Cg Array " << theParam._myName << " expects " << mySize <<
+                " elements, have " << theValue.size() << "(" << _myPathName << ")";
+        }
+        for(int i = 0; i < mySize; ++i) {
+            CGparameter myElement = cgGetArrayParameter(theParam._myParameter, i);
+            //AC_TRACE << "setting component " << i << " to " << theValue[i];
+            if (i < theValue.size()) {
+                cgSetParameter1f(myElement, theValue[i]);
+            }
         }
         assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
     }

@@ -1276,4 +1276,68 @@
             </properties>
         </fragmentshader>
     </shader>
+    <shader id="s134" name="spotlight_no_texture" cost="10">
+       <supports>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="option" values="[spotlight]"/>
+        </supports>
+        <vertexshader profile="VP30" file="spotlight.cg" entryfunction="mainVertex">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector4f name="normal"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="spotlight.cg" entryfunction="mainFragment">
+            <properties>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s135" name="spotlight_one_texture" cost="10">
+       <supports>
+            <feature class="textures" values="[paint]"/>
+            <feature class="texcoord" values="[*]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="option" values="[spotlight]"/>
+        </supports>
+        <vertexshader profile="VP30" file="spotlight.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector4f name="normal"/>
+                 <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="spotlight.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
+    <shader id="s136" name="spotlight_two_textures" cost="10">
+       <supports>
+            <feature class="textures" values="[paint,paint]"/>
+            <feature class="texcoord" values="[*,*]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="option" values="[spotlight]"/>
+        </supports>
+        <vertexshader profile="VP30" file="spotlight.cg" entryfunction="mainVertex" compilerargs="-DPAINT=2">
+            <properties>
+            </properties>
+            <vertexparameters>
+                 <vector4f name="position"/>
+                 <vector4f name="normal"/>
+                 <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profile="FP30" file="spotlight.cg" entryfunction="mainFragment" compilerargs="-DPAINT=2">
+            <properties>
+                <sampler2d name="tex0">0</sampler2d>
+                <sampler2d name="tex1">1</sampler2d>
+            </properties>
+        </fragmentshader>
+    </shader>
 </shaders>

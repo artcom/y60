@@ -8,16 +8,6 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
-//
-//    $RCSfile: JSDvbPlugin.cpp,v $
-//
-//     $Author: sebastianh $
-//
-//   $Revision: 1.0 $
-//
-// Description:
-//
-//=============================================================================
 
 #include "JSDvbTuner.h"
 

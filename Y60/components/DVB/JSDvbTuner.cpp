@@ -14,6 +14,7 @@
 #include <y60/JSBlock.h>
 #include <dom/Nodes.h>
 #include <y60/JSNode.h>
+#include <y60/JSWrapper.impl>
 
 #include <iostream>
 
