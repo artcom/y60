@@ -260,6 +260,9 @@ JSAbstractRenderWindow<DERIVED>::addExtension(JSContext *cx, JSObject *obj, uint
     DOC_END;
     try {
         if (argc == 1) {
+            // [DS] This is the place where IScriptablePlugin and IRenderExtension are intermingled.
+            // thats why you can't implement a RenderExtension without implementing a ScriptablePlugin
+            // TODO: fix this!
             IScriptablePluginPtr myScriptablePlugin;
             if (!convertFrom(cx, argv[0], myScriptablePlugin)) {
                 JS_ReportError(cx,"JSRenderWindow::addExtension: parameter 1 must be a plugin");
