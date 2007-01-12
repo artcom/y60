@@ -108,6 +108,9 @@ namespace y60 {
 
         // Handle frame wrap around
         if (_myLastDecodedFrame > theFrame) {
+            if ( _myLastDecodedFrame != UINT_MAX) {
+                setEOF(true);
+            }
             _myFilePos = _myMovieHeaderSize;
             decodeFrame(0, theTargetRaster);
         }
@@ -131,15 +134,12 @@ namespace y60 {
             }
         }
 
-#if 0
         // UH: need to set EOF if this was the last frame
         // otherwise the layer above will wrap-around and we never get EOF and hence
         // looping doesn't work
         if (theFrame >= (getFrameCount()-1)) {
             setEOF(true);
         }
-#endif
-
         return theTime;
     }
 
