@@ -40,7 +40,9 @@ JSAppUnitTest.prototype.Constructor = function(obj, theName) {
             obj.myReturnCode = exec("..\\..\\testfiles\\exec.bat", "2", false);
     		ENSURE('obj.myReturnCode == 0');
         } else if (operatingSystem() == "Linux") {
+            ENSURE('"pickytests" == "pickytests"');
         } else if (operatingSystem() == "MacOsX") {
+            ENSURE('"pickytests" == "pickytests"');
         }
         
     }
