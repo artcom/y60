@@ -105,14 +105,17 @@ namespace y60 {
             setEOF(true);
             return theTime;
         }
-
+        bool myReverseFlag = getMovie()->get<PlaySpeedTag>() < 0;
+        
         // Handle frame wrap around
         if (_myLastDecodedFrame > theFrame) {
-            if ( _myLastDecodedFrame != UINT_MAX) {
+            if ( _myLastDecodedFrame != UINT_MAX  && !myReverseFlag) {
                 setEOF(true);
+                return theTime;                
+            } else {
+                _myFilePos = _myMovieHeaderSize;
+                decodeFrame(0, theTargetRaster);
             }
-            _myFilePos = _myMovieHeaderSize;
-            decodeFrame(0, theTargetRaster);
         }
 
         if (_myEncoding == MOVIE_DRLE) {
@@ -132,13 +135,6 @@ namespace y60 {
             if (theFrame != _myLastDecodedFrame) {
                 decodeFrame(theFrame, theTargetRaster);
             }
-        }
-
-        // UH: need to set EOF if this was the last frame
-        // otherwise the layer above will wrap-around and we never get EOF and hence
-        // looping doesn't work
-        if (theFrame >= (getFrameCount()-1)) {
-            setEOF(true);
         }
         return theTime;
     }
