@@ -14,7 +14,9 @@
 #include <asl/SerialDeviceFactory.h>
 #include <asl/Assure.h>
 
+#include <y60/ImageBuilder.h>
 #include <y60/PixelEncoding.h>
+#include <y60/AbstractRenderWindow.h>
 
 #include <iostream>
 
@@ -39,7 +41,8 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     IRendererExtension("ASSDriver"),
     _myGridSize(0,0),
     _mySyncLostCounter(0),
-    _myRawRaster(0)
+    _myRawRaster(0),
+    _myScene(0)
 {
     _mySerialPort = getSerialDevice(0);
     _mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
@@ -53,6 +56,7 @@ ASSDriver::~ASSDriver() {
 
 bool
 ASSDriver::onSceneLoaded(jslib::AbstractRenderWindow * theWindow) {
+    _myScene = theWindow->getCurrentScene();
     return true;
 }
 
@@ -115,8 +119,22 @@ ASSDriver::synchronize() {
 
 void
 ASSDriver::allocateGridBuffers() {
-    _myRawRaster = dynamic_cast_Ptr<dom::ResizeableRaster>(
+    _myRawRaster = allocateRaster("ASSRawRaster");
+}
+
+dom::ResizeableRasterPtr
+ASSDriver::allocateRaster(const std::string & theName) {
+    if (_myScene) {
+        ImageBuilder myImageBuilder(theName, false);
+        _myScene->getSceneBuilder()->appendImage(myImageBuilder);
+        //myImageBuilder.getNode()->appendAttribute("id", theName);
+        myImageBuilder.getNode()->getFacade<y60::Image>()->set<y60::IdTag>( theName );
+        return myImageBuilder.getNode()->getFacade<y60::Image>()->createRaster( 
+                _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+    } else {
+        return dynamic_cast_Ptr<dom::ResizeableRaster>(
                 createRasterValue(y60::GRAY, _myGridSize[0], _myGridSize[1]));
+    }
 }
 
 void
@@ -142,7 +160,7 @@ ASSDriver::readSensorValues() {
         if ( myRowIdx == _myGridSize[1] - 1) {
             asl::Time myTime;
             double myDeltaT = myTime - _myLastFrameTime;
-            AC_PRINT << "Got Frame (dt = " << myDeltaT << ")";
+            //AC_PRINT << "Got Frame (dt = " << myDeltaT << ")";
             _myLastFrameTime = myTime;
         }
     }
@@ -216,12 +234,6 @@ ASSDriver::poll() {
     }
     return y60::EventPtrList();
 }
-
-/*
-void 
-ASSDriver::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
-}
-*/
 
 extern "C"
 EXPORT asl::PlugInBase* ASSDriver_instantiatePlugIn(asl::DLHandle myDLHandle) {

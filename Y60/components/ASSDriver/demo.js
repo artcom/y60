@@ -41,7 +41,6 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         Base.setup(theWidth, theHeight, false, theTitle);
         window.resize(theWidth, theHeight);
         _myDriver = plug("ASSDriver");
-        //_myDriver = new ASSDriver();
         window.addExtension(_myDriver);
         //self.registerSettingsListener( _myDriver, "ASSDriver" );
         print("setup done");

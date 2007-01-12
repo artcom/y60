@@ -18,6 +18,7 @@
 #include <y60/IScriptablePlugin.h>
 #include <y60/IRendererExtension.h>
 #include <y60/IEventSource.h>
+#include <y60/Scene.h>
 
 #include <iostream>
 
@@ -72,6 +73,7 @@ class ASSDriver :
         void setState( DriverState theState );
         void synchronize();
         void allocateGridBuffers();
+        dom::ResizeableRasterPtr allocateRaster(const std::string & theName);
         void readSensorValues();
 
         std::vector<unsigned char> _myBuffer;
@@ -82,6 +84,7 @@ class ASSDriver :
         unsigned       _mySyncLostCounter;
 
         dom::ResizeableRasterPtr _myRawRaster;
+        y60::ScenePtr _myScene;
 
         asl::Time   _myLastFrameTime;
 };
