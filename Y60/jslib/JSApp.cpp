@@ -9,6 +9,7 @@
 //=============================================================================
 
 #include "JSApp.h"
+#include "IRendererExtension.h"
 
 #include "jscpp.h"
 #include <y60/JScppUtils.h>
@@ -17,7 +18,6 @@
 #include <y60/JSBlock.h>
 #include <y60/JSVector.h>
 #include <y60/JSScriptablePlugin.h>
-#include <y60/IRendererExtension.h>
 #include <y60/IScriptablePlugin.h>
 #include <y60/IFactoryPlugin.h>
 #include <y60/QuitFlagSingleton.h>
