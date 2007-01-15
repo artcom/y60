@@ -104,7 +104,7 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
         }
  
         // get grain from audio data
-        AudioBufferBase* myGrain = _myAudioData->partialClone(myPositionFrame, myPositionFrame + (unsigned)(ceil(myGrainFrames * myJitteredRatio)));
+        AudioBufferPtr myGrain = AudioBufferPtr(_myAudioData->partialClone(myPositionFrame, myPositionFrame + (unsigned)(ceil(myGrainFrames * myJitteredRatio))));
 
         _myResampler->setRatio(myJitteredRatio);
         _myResampler->apply(*myGrain,0);
