@@ -63,6 +63,8 @@
 #include <list>
 #include <map>
 
+#include "IRendererExtension.h"
+
 #define DB(x) // x
 
 using namespace std;
