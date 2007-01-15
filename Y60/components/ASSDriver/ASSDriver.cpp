@@ -27,6 +27,8 @@ const unsigned char myMagicToken( 200 ); // all values above 200 are currently r
                                          // this will be changed to one escape character
                                          // (255) in a future version
 
+static const char * RAW_RASTER = "ASSRawRaster";
+
 static const char * DriverStateStrings[] = {
     "synchronizing",
     "running",
@@ -119,18 +121,23 @@ ASSDriver::synchronize() {
 
 void
 ASSDriver::allocateGridBuffers() {
-    _myRawRaster = allocateRaster("ASSRawRaster");
+    _myRawRaster = allocateRaster(RAW_RASTER);
 }
 
 dom::ResizeableRasterPtr
 ASSDriver::allocateRaster(const std::string & theName) {
     if (_myScene) {
-        ImageBuilder myImageBuilder(theName, false);
-        _myScene->getSceneBuilder()->appendImage(myImageBuilder);
-        //myImageBuilder.getNode()->appendAttribute("id", theName);
-        myImageBuilder.getNode()->getFacade<y60::Image>()->set<y60::IdTag>( theName );
-        return myImageBuilder.getNode()->getFacade<y60::Image>()->createRaster( 
-                _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+        dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(RAW_RASTER);
+        if (myImage) {
+            return myImage->getFacade<y60::Image>()->createRaster( 
+                    _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+        } else {
+            ImageBuilder myImageBuilder(theName, false);
+            _myScene->getSceneBuilder()->appendImage(myImageBuilder);
+            y60::ImagePtr myImage = myImageBuilder.getNode()->getFacade<y60::Image>();
+            myImage->set<y60::IdTag>( theName );
+            return myImage->createRaster( _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+        }
     } else {
         return dynamic_cast_Ptr<dom::ResizeableRaster>(
                 createRasterValue(y60::GRAY, _myGridSize[0], _myGridSize[1]));
@@ -141,6 +148,7 @@ void
 ASSDriver::readSensorValues() {
     //AC_PRINT << "====";
     //AC_PRINT << "pre buf size: " << _myBuffer.size();
+    bool myNewDataFlag = false;
     while ( _myGridSize[0] < _myBuffer.size() ) {
         if ( _myBuffer[0] < myMagicToken ) {
             AC_PRINT << "Sync error.";
@@ -151,10 +159,9 @@ ASSDriver::readSensorValues() {
         int myRowIdx = _myBuffer[0] - myMagicToken - 1;
         //AC_PRINT << "Got row: " << myRowIdx;
 
-        // TODO: copy data
         unsigned char * myRowPtr = _myRawRaster->pixels().begin() +
                     myRowIdx * _myGridSize[0];
-        std::copy(_myBuffer.begin(), _myBuffer.begin() + _myGridSize[0], myRowPtr);
+        std::copy(_myBuffer.begin() + 1, _myBuffer.begin() + 1 + _myGridSize[0], myRowPtr);
 
         _myBuffer.erase( _myBuffer.begin(), _myBuffer.begin() + _myGridSize[0] + 1);
         if ( myRowIdx == _myGridSize[1] - 1) {
@@ -163,6 +170,11 @@ ASSDriver::readSensorValues() {
             //AC_PRINT << "Got Frame (dt = " << myDeltaT << ")";
             _myLastFrameTime = myTime;
         }
+        myNewDataFlag = true;
+    }
+    if (myNewDataFlag && _myScene) {
+        _myScene->getSceneDom()->getElementById(RAW_RASTER)->getFacade<y60::Image>()->triggerUpload();
+        
     }
     //AC_PRINT << "post buf size: " << _myBuffer.size();
 }
@@ -189,26 +201,22 @@ void
 ASSDriver::onGetProperty(const std::string & thePropertyName,
         PropertyValue & theReturnValue) const
 {
-    /*
-    if (thePropertyName == "rawRaster") {
-        theReturnValue.set( _myRawRaster );
+    if (thePropertyName == "gridSize") {
+        theReturnValue.set( _myGridSize );
         return;
     }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
-*/
 }
 
 void
 ASSDriver::onSetProperty(const std::string & thePropertyName,
         const PropertyValue & thePropertyValue)
 {
-    /*
-    if (thePropertyName == "rawRaster") {
-        AC_ERROR << "rawRaster property is read only";
+    if (thePropertyName == "gridSize") {
+        AC_ERROR << "gridSize property is read only";
         return;
     }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
-*/
 }
 
 void

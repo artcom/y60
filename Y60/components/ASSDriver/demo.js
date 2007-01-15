@@ -28,6 +28,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
     SceneViewer.prototype.Constructor(self, theArguments);
     var Base = [];
+    var _myMaterial = null;
+    var _swappedRaster = false;
 
     //////////////////////////////////////////////////////////////////////
     //
@@ -43,6 +45,11 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myDriver = plug("ASSDriver");
         window.addExtension(_myDriver);
         //self.registerSettingsListener( _myDriver, "ASSDriver" );
+
+        _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, "testbild00.rgb");
+        var myQuad = Modelling.createQuad(window.scene, _myMaterial.id, [-200,-100,0], [200,100,0]);
+        var myBody = Modelling.createBody(window.scene.world, myQuad.id );
+        myBody.position.z = -400;
         print("setup done");
     }
 
@@ -50,7 +57,17 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     self.onFrame = function(theTime) {
         Base.onFrame(theTime);
 
-        //print("ratser: " + _myDriver.rawRaster );
+        // hack!
+        var myRaster = window.scene.dom.getElementById("ASSRawRaster");
+        if (myRaster && ! _swappedRaster) {
+            _myMaterial.childNode("textures", 0).childNode(0).image = myRaster.id;
+            var myXScale = myRaster.width / nextPowerOfTwo( myRaster.width );
+            var myYScale = myRaster.height / nextPowerOfTwo( myRaster.height );
+            myRaster.matrix.makeScaling( new Vector3f( myXScale, myYScale, 1));
+            _swappedRaster = true;
+            myRaster.min_filter = TextureSampleFilter.nearest;
+            myRaster.mag_filter = TextureSampleFilter.nearest;
+        };
     }
 
     Base.onKey = self.onKey;
