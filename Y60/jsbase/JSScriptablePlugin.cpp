@@ -11,6 +11,7 @@
 #include "JSScriptablePlugin.h"
 #include "IFactoryPlugin.h"
 #include "JSNode.h"
+#include "ClassMapSingleton.h"
 
 #include <asl/PlugInManager.h>
 #include <asl/Ptr.h>
@@ -171,7 +172,7 @@ namespace jslib {
     JSScriptablePlugin::Constructor(JSContext *cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Constructs a ScriptablePlugin.");
         DOC_END;
-        AC_TRACE << "JSScriptablePlugin::Constructor: " << JSA_GetClass(cx,obj)->name;
+        AC_PRINT << "JSScriptablePlugin::Constructor: " << JSA_GetClass(cx,obj)->name;
         try {
             const char * myClassName = JSA_GetClass(cx,obj)->name;
             if (JSA_GetClass(cx,obj) != Class(myClassName)) {
@@ -219,8 +220,9 @@ namespace jslib {
 
     JSClass *
     JSScriptablePlugin::Class(const char * theClassName) {
-        typedef std::map<const char *, JSClass> ClassMap;
-        static ClassMap _ourClassMap;
+        typedef ClassMapSingleton::ClassMap ClassMap;
+        //static ClassMap _ourClassMap;
+        ClassMap & _ourClassMap = ClassMapSingleton::get().getClassMap();
         ClassMap::iterator myIt = _ourClassMap.find(theClassName);
         if (myIt != _ourClassMap.end()) {
             return &myIt->second;
@@ -268,6 +270,7 @@ namespace jslib {
 
     JSObject *
     JSScriptablePlugin::Construct(JSContext *cx, IScriptablePluginPtr theNative) {
+        AC_PRINT << "===== JSScriptablePlugin::Construct";
         JSObject * myNewObj = JS_ConstructObject(cx, Class(theNative->ClassName()), 0, 0);
         JSScriptablePlugin * myWrapper = static_cast<JSScriptablePlugin*>(JS_GetPrivate(cx,myNewObj));
         myWrapper->_myNative = theNative;
@@ -319,6 +322,7 @@ namespace jslib {
     }
 
     jsval as_jsval(JSContext *cx, IScriptablePluginPtr theNative) {
+        AC_PRINT << "====== JSScriptablePlugin as_jsval";
         JSObject * myReturnObject = JSScriptablePlugin::Construct(cx, theNative);
         return OBJECT_TO_JSVAL(myReturnObject);
     }
