@@ -1,20 +1,11 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: AnimationManager.cpp,v $
-//   $Author: christian $
-//   $Revision: 1.20 $
-//   $Date: 2005/03/04 18:25:35 $
-//
-//  Description: This class holds all the lights.
-//
 //=============================================================================
 
 #include "AnimationManager.h"
@@ -37,8 +28,7 @@ namespace y60 {
     dom::NodePtr
     AnimationManager::findAnimatedValue(dom::NodePtr theNode,
                                         const string & theAttributeRef,
-                                        AnimationBase::VectorComponent & myVectorComponent,
-                                        bool & theAngleAttributeFlag)
+                                        AnimationBase::VectorComponent & theVectorComponent)
     {
         string myAttributeName = theAttributeRef;
         
@@ -47,22 +37,22 @@ namespace y60 {
             switch (myLastChar) {
                 case 'x':
                 case 'r':
-                    myVectorComponent = AnimationBase::X;
+                    theVectorComponent = AnimationBase::X;
                     break;
                 case 'y':
                 case 'g':
-                    myVectorComponent = AnimationBase::Y;
+                    theVectorComponent = AnimationBase::Y;
                     break;
                 case 'z':
                 case 'b':
-                    myVectorComponent = AnimationBase::Z;
+                    theVectorComponent = AnimationBase::Z;
                     break;
                 case 'w':
                 case 'a':
-                    myVectorComponent = AnimationBase::W;
+                    theVectorComponent = AnimationBase::W;
                     break;
              }
-             if (myVectorComponent != AnimationBase::SCALAR) {
+             if (theVectorComponent != AnimationBase::SCALAR) {
                 myAttributeName = myAttributeName.substr(0, myAttributeName.length() - 2);
              }
         }
@@ -105,7 +95,7 @@ namespace y60 {
 
         if (myAttribute && (myAttribute->nodeValue() != "")) {
             myAttributeRef = myAttribute->nodeValue();
-            myAnimatedAttribute = findAnimatedValue(myAnimatedNode, myAttributeRef, myVectorComponent, myAngleAttribute);
+            myAnimatedAttribute = findAnimatedValue(myAnimatedNode, myAttributeRef, myVectorComponent);
         } else {
             dom::NodePtr myProperty = theNode->getAttribute(ANIM_PROPERTY_ATTRIB);
             if (myProperty) {
@@ -247,6 +237,7 @@ namespace y60 {
 
     void
     AnimationManager::run(double theTime) {
+
         _myGlobalAnimations->run(theTime);
 
         AnimationCharacterMap::iterator myCharacterBegin = _myCharacter.begin();

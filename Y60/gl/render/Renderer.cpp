@@ -311,6 +311,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
         DBP(MAKE_SCOPE_TIMER(renderBodyPart));
         DBP2(START_TIMER(renderBodyPart_pre));
         CHECK_OGL_ERROR;
+
         const y60::Body & myBody = theBodyPart.getBody();
         const y60::Shape & myShape = theBodyPart.getShape();
         bool myBodyHasChanged = (_myPreviousBody != &myBody);

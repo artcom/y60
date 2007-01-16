@@ -61,10 +61,8 @@ void OffscreenBuffer::deactivate(ImagePtr theImage, bool theCopyToImageFlag) {
         if (theCopyToImageFlag) {
             copyFrameBufferToImage(theImage);
         }
- 
     }
-
-    
+ 
     // cleanly unbind the texture
     if (_myUseGLFramebufferObject) {
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -84,12 +82,14 @@ void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
     PixelEncodingInfo myPixelEncodingInfo = getDefaultGLTextureParams(theImage->getRasterEncoding());
     myPixelEncodingInfo.internalformat = asGLTextureInternalFormat(theImage->getInternalEncoding());
 
-    AC_DEBUG << "pixelformat" << theImage->get<RasterPixelFormatTag>();
-    AC_DEBUG << "size" << theImage->get<ImageWidthTag>() << " " << theImage->get<ImageHeightTag>();
+    AC_DEBUG << "pixelformat " << theImage->get<RasterPixelFormatTag>();
+    AC_DEBUG << "size " << theImage->get<ImageWidthTag>() << " " << theImage->get<ImageHeightTag>();
 
+    glReadBuffer(GL_BACK);
     glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
                 theImage->getRasterPtr()->pixels().begin());        
+    glReadBuffer(GL_FRONT);
 
 #ifdef DUMP_BUFFER
     PixelEncoding myEncoding;

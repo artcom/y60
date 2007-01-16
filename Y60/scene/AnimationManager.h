@@ -58,11 +58,9 @@ namespace y60 {
             AnimationCharacterMap    _myCharacter;
 
             dom::NodePtr findAnimatedValue(dom::NodePtr theNode,
-                                            const std::string & theAttributeRef,
-                                            AnimationBase::VectorComponent & myVectorComponent,
-                                            bool & theAngleAttributeFlag);
+                    const std::string & theAttributeRef,
+                    AnimationBase::VectorComponent & myVectorComponent);
     };
 }
 
 #endif
-

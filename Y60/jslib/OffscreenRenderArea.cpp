@@ -80,7 +80,7 @@ OffscreenRenderArea::deactivate(bool theCopyToImageFlag) {
 
 void
 OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag) {
-    AC_TRACE << "OffscreenRenderArea::renderToCanvas ";
+    AC_TRACE << "OffscreenRenderArea::renderToCanvas copyToImage=" << theCopyToImageFlag;
     MAKE_SCOPE_TIMER(OffscreenRenderArea_renderToCanvas);
 
     ImagePtr myTexture = getImage();

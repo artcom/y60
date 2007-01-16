@@ -28,8 +28,8 @@
 
 using namespace std;
 
-#define DB(x)  //   x
-#define DB_2(x) //  x
+#define DB(x) //x
+#define DB_2(x) //x
 
 namespace y60 {
 
@@ -129,22 +129,25 @@ namespace y60 {
     AnimationBase::calcIndicies(int & theLowerIndex, int & theUpperIndex, double & theAlpha,
                   const double & theTime, const int & theValueSize)
     {
+        AC_DEBUG << "AnimationBase::calcIndicies name=" << _myNode->getAttributeString(NAME_ATTRIB) << " t=" << theTime << " start=" << (_myBegin + _myIn);
+
         // Animation has not started, yet.
-        if (theTime < _myBegin + _myIn) {
+        if (theTime < (_myBegin + _myIn)) {
             DB(AC_DEBUG << "theTime : " << theTime << " _myBegin" << _myBegin << " _myIn : " << _myIn << endl);
             DB(AC_DEBUG << "--------------------- nothing to do " << endl);
             return 0;
         }
+
         _myEffectiveRuntime = theTime - _myBegin;
         double myAnimationTime =_myEffectiveRuntime;
         double myAnimationEndTime = calcEndTime();
 
+        DB(AC_DEBUG <<"myAnimationTime=" << myAnimationTime << " endTime=" << myAnimationEndTime);
+        DB(AC_DEBUG <<"Timing: begin: " << _myBegin << " in=" << _myIn << " out=" << _myOut);
 
-        DB(AC_DEBUG <<"myAnimationTime : " << myAnimationTime << " will end at " << myAnimationEndTime << endl);
-        DB(AC_DEBUG <<"count : " << _myCount << endl);
-        DB(AC_DEBUG <<"Timing: begin: " << _myBegin << " in : " << _myIn << " out : " << _myOut << endl);
         // Count = 0 means infinite loops -> no end
-        if (_myCount) {
+        if (_myCount > 0) {
+            DB(AC_DEBUG <<"count=" << _myCount);
             if (myAnimationTime > myAnimationEndTime) {
                 if (_myOut != 0) {
                     DB(AC_DEBUG <<"-> the Out is set and the animation is done" << endl);

@@ -1979,11 +1979,6 @@ Usually 'm' plus a number, such as 'm0'.</xs:documentation>
 Transparent materials are rendered in z-order in a second pass.</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
-            <xs:attribute name="depthtest" type="xs:boolean">
-                <xs:annotation>
-                    <xs:documentation>Turn depthbuffer testing on/off.</xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
         </xs:complexType>
     </xs:element>
     <xs:element name="requires">

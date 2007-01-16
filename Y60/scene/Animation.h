@@ -159,6 +159,11 @@ namespace y60 {
                     setToEndValue();
                     return false;
                 }
+#if 1
+                _myValueSetter.setValue(asl::interpolate(myValues[myLowerIndex],
+                            myValues[myUpperIndex], myAlpha));
+#else
+                // deprecated since the switch to quaternions
                 if (isAngleAnimation() && axisFlip(myValues[myLowerIndex], myValues[myUpperIndex])) {
                     if (myAlpha < 0.5 ) {
                         _myValueSetter.setValue(myValues[myLowerIndex]);
@@ -170,6 +175,7 @@ namespace y60 {
                                               myValues[myUpperIndex],
                                               myAlpha));
                 }
+#endif
                 return true;
             }
 
