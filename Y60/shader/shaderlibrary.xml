@@ -1337,6 +1337,7 @@
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
                 <sampler2d name="tex1">1</sampler2d>
+                <float name="penumbra">0.0</float>
             </properties>
         </fragmentshader>
     </shader>
