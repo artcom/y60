@@ -172,7 +172,7 @@ namespace jslib {
     JSScriptablePlugin::Constructor(JSContext *cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
         DOC_BEGIN("Constructs a ScriptablePlugin.");
         DOC_END;
-        AC_PRINT << "JSScriptablePlugin::Constructor: " << JSA_GetClass(cx,obj)->name;
+        AC_TRACE << "JSScriptablePlugin::Constructor: " << JSA_GetClass(cx,obj)->name;
         try {
             const char * myClassName = JSA_GetClass(cx,obj)->name;
             if (JSA_GetClass(cx,obj) != Class(myClassName)) {
@@ -270,7 +270,6 @@ namespace jslib {
 
     JSObject *
     JSScriptablePlugin::Construct(JSContext *cx, IScriptablePluginPtr theNative) {
-        AC_PRINT << "===== JSScriptablePlugin::Construct";
         JSObject * myNewObj = JS_ConstructObject(cx, Class(theNative->ClassName()), 0, 0);
         JSScriptablePlugin * myWrapper = static_cast<JSScriptablePlugin*>(JS_GetPrivate(cx,myNewObj));
         myWrapper->_myNative = theNative;
@@ -322,7 +321,6 @@ namespace jslib {
     }
 
     jsval as_jsval(JSContext *cx, IScriptablePluginPtr theNative) {
-        AC_PRINT << "====== JSScriptablePlugin as_jsval";
         JSObject * myReturnObject = JSScriptablePlugin::Construct(cx, theNative);
         return OBJECT_TO_JSVAL(myReturnObject);
     }
