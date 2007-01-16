@@ -15,7 +15,7 @@
 
 #include <map>
 
-#include <y60/jssettings.h>
+#include "jssettings.h"
 #include <js/jsapi.h>
 
 
