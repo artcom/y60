@@ -26,9 +26,9 @@ var myTestName = "y60FFMpegDecoder1 Leaktest";
 var myDecoderPlug = "y60FFMpegDecoder1";
 var myVideoCount = 500;
 
-var myMovieLeak =  myVideoCount * 50 * 1024; // each qt movie leaks 50kb per movie (not per frame, tolerable)
+var myMovieLeak =  myVideoCount * 16 * 1024; // each mpeg2 movie leaks 10kb per movie (not per frame, tolerable)
 
-var myMovieBaseMemoryUsage =  8.5*1024*1024; // (due to some basic memory allocation, i.e. plugin-ctor code, lib init code, SomImageFactory)
+var myMovieBaseMemoryUsage =  4.5*1024*1024; // (due to some basic memory allocation, i.e. plugin-ctor code, lib init code, SomImageFactory)
 var myAllowedMemoryUsage = myMovieBaseMemoryUsage + myMovieLeak;
 
 
