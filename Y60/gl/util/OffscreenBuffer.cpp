@@ -85,11 +85,9 @@ void OffscreenBuffer::copyFrameBufferToImage(ImagePtr theImage) {
     AC_DEBUG << "pixelformat " << theImage->get<RasterPixelFormatTag>();
     AC_DEBUG << "size " << theImage->get<ImageWidthTag>() << " " << theImage->get<ImageHeightTag>();
 
-    glReadBuffer(GL_BACK);
     glReadPixels(0, 0, theImage->get<ImageWidthTag>(), theImage->get<ImageHeightTag>(),
                 myPixelEncodingInfo.externalformat, myPixelEncodingInfo.pixeltype,
                 theImage->getRasterPtr()->pixels().begin());        
-    glReadBuffer(GL_FRONT);
 
 #ifdef DUMP_BUFFER
     PixelEncoding myEncoding;
