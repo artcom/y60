@@ -1264,7 +1264,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
                     break;
                 }
                 enableLight(myLights[i], myActiveLightCount);
-                DB(AC_TRACE << myLights[i]->getNode());
+                DB(AC_TRACE << "enableVisibleLights: " << myLights[i]->getNode().getAttributeString("name"));
                 myActiveLightCount++;
             }
         }
@@ -1275,7 +1275,6 @@ MAKE_SCOPE_TIMER(switchMaterial);
         }
 
         COUNT_N(ActiveLights, myActiveLightCount);
-        DB(AC_TRACE << "Enabled " << myActiveLightCount << " lights");
     }
 
     void
@@ -1299,11 +1298,19 @@ MAKE_SCOPE_TIMER(switchMaterial);
         GLenum gl_lightid = asGLLightEnum(theActiveLightIndex);
         asl::Vector4f myGLLightPos;
 
+        float mySpotCutoff = 180.0f;
+        float mySpotExponent = 0.0f;
+        float myConstantAttenuation = 1.0f;
+        float myQuadraticAttenuation = 0.0f;
+        float myLinearAttenuation = 0.0f;
+        asl::Vector3f myDirection = Vector3f(0.0, 0.0, -1.0);
+
         switch (myType) {
             case DIRECTIONAL: {
                 // GL directional lights: xyz is (0,0,1) rotated by orientation, w=0.0
                 asl::QuadrupleOf<float> myLightDirection = theLight->get<GlobalMatrixTag>().getRow(2);
                 myGLLightPos = asl::Vector4f(myLightDirection[0], myLightDirection[1], myLightDirection[2], 0.0f);
+                DB(AC_TRACE << "enabled direction light: " << theLight->getNode().getAttributeString("name"));
                 break;
             }
             case POSITIONAL:
@@ -1311,26 +1318,33 @@ MAKE_SCOPE_TIMER(switchMaterial);
                 // GL positional lights: xyz = light position, w=1.0
                 asl::Vector3f myLightTranslation = theLight->get<GlobalMatrixTag>().getTranslation();
                 myGLLightPos = asl::Vector4f(myLightTranslation[0], myLightTranslation[1], myLightTranslation[2],1.0f);
-                glLightf(gl_lightid, GL_LINEAR_ATTENUATION, myLightPropFacade->get<AttenuationTag>());
+                myLinearAttenuation = myLightPropFacade->get<AttenuationTag>();
+                DB(AC_TRACE << "enabled positional light: " << theLight->getNode().getAttributeString("name"));
                 break;
             }
             case SPOT:
             {
-                glLightf(gl_lightid, GL_SPOT_CUTOFF, myLightPropFacade->get<CutOffTag>());
-                glLightf(gl_lightid, GL_SPOT_EXPONENT, myLightPropFacade->get<ExponentTag>());
+                mySpotCutoff = myLightPropFacade->get<CutOffTag>();
+                mySpotExponent = myLightPropFacade->get<ExponentTag>();
 
                 // get the Z-Axis to set the light direction
                 asl::QuadrupleOf<float> myTmpVec = theLight->get<GlobalMatrixTag>().getRow(2); // Z-axis
                 asl::Vector3f myLightDirection(myTmpVec.begin());
-                //myLightDirection = asl::product(myLightDirection, asl::Vector3f(-1,-1,-1));
-                myLightDirection = asl::product(myLightDirection, -1.0f);
-                glLightfv(gl_lightid, GL_SPOT_DIRECTION, &(myLightDirection[0]));
+                myDirection = asl::product(myLightDirection, -1.0f);
 
                 asl::Vector3f myLightTranslation = theLight->get<GlobalMatrixTag>().getTranslation();
                 myGLLightPos = asl::Vector4f(myLightTranslation[0], myLightTranslation[1], myLightTranslation[2],1.0f);
+                DB(AC_TRACE << "enabled spotlight: " << theLight->getNode().getAttributeString("name"));
                 break;
             }
         }
+
+        glLightf(gl_lightid, GL_SPOT_CUTOFF, mySpotCutoff); // 180
+        glLightf(gl_lightid, GL_SPOT_EXPONENT, mySpotExponent); // 0
+        glLightf(gl_lightid, GL_CONSTANT_ATTENUATION, myConstantAttenuation); // 1
+        glLightf(gl_lightid, GL_QUADRATIC_ATTENUATION, myQuadraticAttenuation); // 0
+        glLightf(gl_lightid, GL_LINEAR_ATTENUATION, myLinearAttenuation); // 0
+        glLightfv(gl_lightid, GL_SPOT_DIRECTION, &(myDirection[0])); // 0.0, 0.0, -1.0
 
         glLightfv(gl_lightid, GL_POSITION, &(*myGLLightPos.begin()));
         glLightfv(gl_lightid, GL_AMBIENT,  myLightPropFacade->get<LightAmbientTag>().begin());
@@ -1624,7 +1638,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
                 MaterialBasePtr myMaterial = _myScene->getMaterialsRoot()->getElementById(myMaterialId)->getFacade<MaterialBase>();
 
                 //MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
-                AC_TRACE << "renderOverlay " << myOverlay.get<NameTag>() << " with material " << myMaterialId << endl;
+                DB(AC_TRACE << "renderOverlay " << myOverlay.get<NameTag>() << " with material " << myMaterialId << endl);
                 if (!myMaterial) {
                     AC_WARNING << "renderOverlay() material:" << myMaterialId << " not found." << endl;
                     return;
