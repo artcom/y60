@@ -87,11 +87,11 @@ function buildMaterialNode(theMaterialName,
 
         var myTexturesString =
             '<textures>\n' +
-            '    <texture image="i' + theName + '" applymode="modulate"/>\n' +
+            '    <texture image="i' + theMaterialName + '" applymode="modulate"/>\n' +
             '</textures>';
         var myTexturesDoc = new Node(myTexturesString);
         var myTexturesNode = myTexturesDoc.firstChild;
-        myMaterialNode.appendChild(myTexturesNode);
+        myMaterialNode.appendChild(myTexturesNode);        
     }
 
     return myMaterialNode;
