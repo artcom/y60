@@ -10,7 +10,7 @@
 
 use("Y60JSSL.js");
 
-function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
+function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage, theCanvas) {
     const DUMP_IMAGE = false;
 
     this.overlays getter = function() {
@@ -29,7 +29,7 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
         return _myCanvas;
     }
 
-    function setup(theSize) {
+    function setup(theSize, theCanvas) {
         //add our own camera
         if (theCamera == undefined) {
             self.camera = window.camera.cloneNode(true);
@@ -61,24 +61,29 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
         self.image.matrix.postMultiply(myMirrorMatrix);
 
         // Create canvas for offscreen render area
-        _myCanvas = window.canvas.cloneNode(true);
-        // clear overlays and underlays
-        for(var i=0; i<_myCanvas.firstChild.childNodes.length; ++i) {
-            while(_myCanvas.firstChild.childNode(i).childNodes.length) {
-                _myCanvas.firstChild.childNode(i).removeChild(_myCanvas.firstChild.childNode(i).firstChild);
+        if (theCanvas) {
+            _myCanvas = theCanvas;
+        } else {
+            _myCanvas = window.canvas.cloneNode(true);
+            // clear overlays and underlays
+            for(var i=0; i<_myCanvas.firstChild.childNodes.length; ++i) {
+                while(_myCanvas.firstChild.childNode(i).childNodes.length) {
+                    _myCanvas.firstChild.childNode(i).removeChild(_myCanvas.firstChild.childNode(i).firstChild);
+                }
             }
-        }
 
-        _myCanvas.backgroundcolor = [1,1,1,1];
-        adjustNodeIds(_myCanvas);
+            _myCanvas.backgroundcolor = [1,1,1,1];
+            adjustNodeIds(_myCanvas);
+            window.scene.canvases.appendChild(_myCanvas);
+            _myCanvas.firstChild.camera = self.camera.id;
+        }
         _myCanvas.target = self.image.id;
-        window.scene.canvases.appendChild(_myCanvas);
-        _myCanvas.firstChild.camera = self.camera.id;
 
         // Setup offscreen render area
         _myOffscreenRenderArea = new OffscreenRenderArea();
         _myOffscreenRenderArea.scene = window.scene;
         _myOffscreenRenderArea.canvas = _myCanvas;
+        print(_myOffscreenRenderArea.width + "x" + _myOffscreenRenderArea.height);
 
         _myOffscreenRenderArea.eventListener = _myOffscreenRenderArea;
     }
@@ -168,5 +173,5 @@ function OffscreenRenderer(theSize, theCamera, thePixelFormat, theImage) {
     var _myHiddenNodes         = [];
     var _myOffscreenNodes      = [];
     var _myCanvas              = null;
-    setup(theSize);
+    setup(theSize, theCanvas);
 }
