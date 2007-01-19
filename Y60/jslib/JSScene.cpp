@@ -72,6 +72,20 @@ class ProgressCallback : public y60::IProgressNotifier {
 
 typedef y60::Scene NATIVE;
 
+dom::NodePtr 
+getSingleViewport(const y60::Scene & theNative) {
+    if (theNative.getCanvasRoot()->childNodesLength(CANVAS_NODE_NAME) != 1) {
+        throw asl::Exception("single-viewport convenience call used when multiple canvases exist!",
+                PLUS_FILE_LINE);
+    }
+    dom::NodePtr myCanvas = theNative.getCanvasRoot()->childNode(CANVAS_NODE_NAME);
+    if (myCanvas->childNodesLength(VIEWPORT_NODE_NAME) != 1) {
+        throw asl::Exception("single-viewport convenience call used when multiple viewports exist!",
+                PLUS_FILE_LINE);
+    }
+    return myCanvas->childNode(VIEWPORT_NODE_NAME);
+}
+
 JSBool
 toString(JSContext *cx, JSObject *obj, uintn argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns a string representation of the scene's dom.");
@@ -536,11 +550,11 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             *vp = as_jsval(cx, getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME));
             return JS_TRUE;
         case PROP_viewport:
-            *vp = as_jsval(cx, getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME)->childNode(VIEWPORT_NODE_NAME));
+            *vp = as_jsval(cx, getSingleViewport(getNative()));
             return JS_TRUE;
         case PROP_underlays:
         {
-            dom::NodePtr myViewPort = getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME)->childNode(VIEWPORT_NODE_NAME);
+            dom::NodePtr myViewPort = getSingleViewport(getNative());
             dom::NodePtr myUnderlays = myViewPort->childNode(UNDERLAY_LIST_NAME);
             if (!myUnderlays) {
                 myUnderlays = myViewPort->appendChild(dom::Element(UNDERLAY_LIST_NAME));
@@ -549,7 +563,7 @@ JSScene::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, js
             return JS_TRUE;
         }
         case PROP_overlays:
-            *vp = as_jsval(cx, getNative().getCanvasRoot()->childNode(CANVAS_NODE_NAME)->childNode(VIEWPORT_NODE_NAME)->childNode(OVERLAY_LIST_NAME));
+            *vp = as_jsval(cx, getSingleViewport(getNative())->childNode(OVERLAY_LIST_NAME));
             return JS_TRUE;
         case PROP_materials:
             *vp = as_jsval(cx, getNative().getSceneDom()->childNode(SCENE_ROOT_NAME)->childNode(MATERIAL_LIST_NAME));
