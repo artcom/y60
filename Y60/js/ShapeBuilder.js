@@ -60,6 +60,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
             theName = "ShapeBuilder";
         }
 
+        // vertex data
         var myShapeString =
             '<shape name="' + theName + '" renderstyle="[frontfacing]">\n' +
             ' <vertexdata>\n' +
@@ -77,6 +78,7 @@ ShapeBuilder.prototype.Constructor = function(obj) {
         }
         myShapeString += ' </vertexdata>\n<primitives>\n';
 
+        // elements and indices
         for (var i = 0; i < _myElements.length; ++i) {
             var myElement = _myElements[i];
             myShapeString +=

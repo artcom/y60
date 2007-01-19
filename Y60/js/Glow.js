@@ -27,6 +27,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
     var _myDebugOverlay = null;
     var _myDebugImage = null;
 
+    var _myViewportVersion = null;
     var _myOffscreenRenderArea = null;
     var _myBlurXRenderArea = null;
     var _myBlurYRenderArea = null;
@@ -57,16 +58,29 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myGlowOverlay.visible = false;
 
         if (_myGlowEnabled) {
-            // copy viewport attributes from main viewport
-            _myOffscreenRenderArea.canvas.firstChild.lighting = window.lighting;
-            _myOffscreenRenderArea.canvas.firstChild.texturing = window.texturing;
+            // copy background color with alpha=0 so the BG doesn't glow but the color is right
+            _myOffscreenRenderArea.canvas.backgroundcolor = window.canvas.backgroundcolor;
+            _myOffscreenRenderArea.canvas.backgroundcolor[3] = 0.0;
+
+            // copy attributes from 'window'
+            const COPY_ATTRIBS = [ "backfaceculling", "wireframe", "lighting", "texturing",
+                                   "flatshading", "culling", "debugculling", "drawnormals" ];
+            var myViewport = _myOffscreenRenderArea.canvas.firstChild;
+            var myWindowViewport = theViewer.getActiveViewport(); //window.canvas.firstChild;
+            if (_myViewportVersion != myWindowViewport.nodeVersion) {
+                for (var i in COPY_ATTRIBS) {
+                    var myAttrib = COPY_ATTRIBS[i];
+                    myViewport[myAttrib] = myWindowViewport[myAttrib];
+                }
+                _myViewportVersion = myWindowViewport.nodeVersion;
+            }
 
             // render scene
             _myOffscreenRenderArea.activate();
-            _myOffscreenRenderArea.clearBuffers( _myOffscreenRenderArea.constructor.GL_COLOR_BUFFER_BIT | _myOffscreenRenderArea.constructor.GL_DEPTH_BUFFER_BIT );
-            _myOffscreenRenderArea.preRender();
+            _myOffscreenRenderArea.clearBuffers( _myBufferBits );
+            //_myOffscreenRenderArea.preRender();
             _myOffscreenRenderArea.render();
-            _myOffscreenRenderArea.postRender();
+            //_myOffscreenRenderArea.postRender();
             _myOffscreenRenderArea.deactivate();
             window.scene.world.visible = false;
 
@@ -74,8 +88,8 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
                 _myOffscreenRenderArea.downloadFromViewport(_myDebugImage);
                 saveImage(_myDebugImage, "debug.png");
             }
+ 
             // render blur_x
-
             _myBlurXOverlay.visible = true;
             _myBlurXRenderArea.activate();
             _myBlurXRenderArea.clearBuffers( _myBufferBits );
@@ -111,7 +125,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
 
     //////////////////////////////////////////////////////////////////////
     //
-    // fuConstructor
+    // Private
     //
     //////////////////////////////////////////////////////////////////////
 
@@ -265,6 +279,7 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         window.scene.images.appendChild(myBlurXImage);
 
         var myBlurXCanvas = cloneCanvas(window.canvas, "BlurX");
+        myBlurXCanvas.backgroundcolor = [0,0,0,1];
         myBlurXCanvas.target = myBlurXImage.id;
 
         var myBlurXViewport = getDescendantByTagName(myBlurXCanvas, "viewport");
@@ -305,11 +320,12 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         myBlurYImage.resize = "pad";
         myBlurYImage.mipmap = myMipmapFlag;
         myBlurYImage.matrix.postMultiply(myMirrorMatrix);
-        myBlurYImage.wrapmode="clamp";
+        myBlurYImage.wrapmode = "clamp";
         
         window.scene.images.appendChild(myBlurYImage);
 
         var myBlurYCanvas =  cloneCanvas(window.canvas, "BlurY");
+        myBlurYCanvas.backgroundcolor = [0,0,0,1];
         myBlurYCanvas.target = myBlurYImage.id;
 
         var myBlurYViewport = getDescendantByTagName(myBlurYCanvas, "viewport");
@@ -353,18 +369,16 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myGlowOverlay.srcorigin = new Vector2f( 0, 1 - myOffscreenImage.height / nextPowerOfTwo(myOffscreenImage.height));
 
         // prepare compositing
-        window.scene.overlays.appendChild(_myOffscreenOverlay.node);
+        window.scene.underlays.appendChild(_myOffscreenOverlay.node);
 
         _myDebugOverlay = null;//_myOffscreenOverlay.node; // _myBlurXOverlay.node;
+        //_myDebugOverlay = _myBlurYOverlay.node;
         if (_myDebugOverlay) {
-            window.scene.overlays.appendChild(_myDebugOverlay);
+            window.scene.underlays.appendChild(_myDebugOverlay);
         } else {
-            window.scene.overlays.appendChild(_myGlowOverlay.node);
+            window.scene.underlays.appendChild(_myGlowOverlay.node);
         }
-
     }
-
-
 
     setupGlow();
 }

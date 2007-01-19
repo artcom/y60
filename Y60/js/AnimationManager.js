@@ -1,19 +1,11 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
 // are copy protected by law. They may not be disclosed to third parties
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
-//=============================================================================
-//
-//   $RCSfile: AnimationManager.js,v $
-//   $Author: christian $
-//   $Revision: 1.34 $
-//   $Date: 2005/04/22 16:25:43 $
-//
-//
 //=============================================================================
 
 function Animation(theAnimationName, theSceneViewer) {
@@ -102,6 +94,14 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
         }
     }
 
+    obj.setDuration = function(theAnimationName, theDuration)  {
+        var myAnimation = getAnimatable(theAnimationName);
+        if (myAnimation) {
+            myAnimation.setDuration(theDuration);
+            _myUpdated = true;
+        }
+    }
+
     obj.getDuration = function(theAnimationName)  {
         var myAnimation = getAnimatable(theAnimationName);
         if (myAnimation) {
@@ -120,15 +120,6 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
         }
     }
 
-    obj.setDuration = function(theAnimationName, theDuration)  {
-        var myAnimation = getAnimatable(theAnimationName);
-        if (myAnimation) {
-            myAnimation.setDuration(theDuration);
-            _myUpdated = true;
-        }
-    }
-
-
     obj.start = function(theAnimationName, theLoops, theOffset)  {
         if (theOffset == undefined) {
             theOffset = 0;
@@ -142,6 +133,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
             _myUpdated = true;
         }
     }
+
     obj.startClip = function(theCharacterName, theClipName, allowReStart) {
         if (allowReStart == undefined) {
             allowReStart = false;
@@ -216,14 +208,14 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
                 obj.setFrame(0);
             } else {
                 obj.setFrame(_myRenderFrame);
-                print(" Time: " + theTime + " Frame : " +   _myRenderFrame);
+                //print(" Time: " + theTime + " Frame : " +   _myRenderFrame);
             }
         } else if (_myEnabled) {
             var myDiff = theTime - _myLastTime;
             if (myDiff > 0.05) {
                 //print("Animation timestep > 0.05: " + myDiff.toFixed(4));
             } else if (myDiff > 0.1) {
-                print("### WARNING: Animation timestep > 0.1: " + myDiff.toFixed(4));
+                Logger.warning("Animation timestep > 0.1: " + myDiff.toFixed(4));
             }
             _myAnimationTime += myDiff;
             window.runAnimations(_myAnimationTime);
@@ -260,7 +252,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
                 window.saveBuffer(myFilename);
                 print("saved Image:" + myFilename);
             } else {
-                print("Sorry, " + myFilename + ", does exist and no overwrite flag is set: do nothing!");
+                Logger.error("File '" + myFilename + "' does exist and no overwrite flag is set");
             }
         }
         _myRenderFrame++;
@@ -321,7 +313,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
     obj.saveStripByNodeId = function(theNodeId, thePrefix, theDirectory, theOverwriteFlag) {
         var myCameraAnimations = getDescendantsByAttribute(_mySceneViewer.getAnimations(), "node", theNodeId, true);
         if (myCameraAnimations.length == 0 ) {
-            print("Sorry, could not find animation for active NodeId: " + theNodeId);
+            Logger.error("Unable to find animation for id=" + theNodeId);
             return;
         }
         var myCurrentTime = _mySceneViewer.getCurrentTime();
@@ -406,9 +398,8 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
         if (theAnimationName in _myAnimations) {
             return _myAnimations[theAnimationName];
         } else {
-            print("AnimationManager::getAnimatable: Sorry, could not find animation: " +
-                                 theAnimationName);
-             return 0;
+            Logger.error("AnimationManager::getAnimatable: Unable find animation '" + theAnimationName + "'");
+            return 0;
         }
     }
 
@@ -419,5 +410,4 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
         print("  insert step forward in animation time");
         print("  delete step backward in animation time");
     }
-
 }
