@@ -1098,90 +1098,94 @@ MAKE_SCOPE_TIMER(switchMaterial);
             renderOverlays(*theViewport, UNDERLAY_LIST_NAME);
         }
 
-        dom::NodePtr myCameraNode = theViewport->getNode().getElementById(theViewport->get<CameraTag>());
-        if (!myCameraNode) {
-            throw RendererException(string("Can not find camera '")+theViewport->get<CameraTag>()+
-                    "' for viewport '"+theViewport->get<IdTag>()+"'!", PLUS_FILE_LINE);
-        }
-        CameraPtr myCamera = myCameraNode->getFacade<Camera>();
-        bindViewMatrix(myCamera);
-        CHECK_OGL_ERROR;
-
-        if (theViewport->get<ViewportCullingTag>()) {
-            if (theViewport->get<ViewportDebugCullingTag>()) {
-                renderFrustum(theViewport);
-            } else {
-                theViewport->updateClippingPlanes();
+        // if we have a camera, render the world
+        const std::string & myCameraId =theViewport->get<CameraTag>();
+        if ( myCameraId.length() ) {
+            dom::NodePtr myCameraNode = theViewport->getNode().getElementById(myCameraId);
+            if (!myCameraNode) {
+                throw RendererException(string("Can not find camera '")+theViewport->get<CameraTag>()+
+                        "' for viewport '"+theViewport->get<IdTag>()+"'!", PLUS_FILE_LINE);
             }
-        }
-
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        CHECK_OGL_ERROR;
-
-        setProjection(theViewport);
-        CHECK_OGL_ERROR;
-
-        // don't render anything if world isn't visible
-        if (_myScene->getWorldRoot()->getFacade<TransformHierarchyFacade>()->get<VisibleTag>()) {
-
-            // (2) Create lists of render objects
-            BodyPartMap myBodyParts;
-            {
-                MAKE_SCOPE_TIMER(createRenderList);
-                Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
-                asl::Box2f myScissorBox;
-                myScissorBox.makeFull();
-                createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera, myEyeSpaceTransform,
-                        theViewport, true, std::vector<asl::Planef>(), myScissorBox);
-            }
-
-            // (3) render skybox
-            {
-                MAKE_SCOPE_TIMER(renderSkyBox);
-                renderSkyBox(*theViewport, myCamera);
-                CHECK_OGL_ERROR;
-            }
-
-            // (4) Setup camera
+            CameraPtr myCamera = myCameraNode->getFacade<Camera>();
             bindViewMatrix(myCamera);
+            CHECK_OGL_ERROR;
 
-            // (5) activate all visible lights
-            {
-                MAKE_SCOPE_TIMER(enableVisibleLights);
-                enableVisibleLights();
-                CHECK_OGL_ERROR;
-            }
-
-            // (6) enable fog
-            {
-                MAKE_SCOPE_TIMER(enableFog);
-                enableFog();
-                CHECK_OGL_ERROR;
-            }
-
-            // (7) render bodies
-            if (! myBodyParts.empty()) {
-                MAKE_SCOPE_TIMER(renderBodyParts);
-                _myPreviousBody = 0;
-
-                glPushMatrix();
-                glDisable(GL_ALPHA_TEST);
-                CHECK_OGL_ERROR;
-
-                bool currentMaterialHasAlpha = false;
-                for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
-                    if (!currentMaterialHasAlpha && it->first.getTransparencyFlag()) {
-                        glEnable(GL_ALPHA_TEST);
-                        currentMaterialHasAlpha = true;
-                    }
-                    renderBodyPart(it->second, *theViewport, *myCamera);
+            if (theViewport->get<ViewportCullingTag>()) {
+                if (theViewport->get<ViewportDebugCullingTag>()) {
+                    renderFrustum(theViewport);
+                } else {
+                    theViewport->updateClippingPlanes();
                 }
-                glPopMatrix();
+            }
 
-                _myState->setScissorTest(false);
-                _myState->setClippingPlanes(std::vector<asl::Planef>());
-                _myState->setFrontFaceCCW(true);
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+            CHECK_OGL_ERROR;
+
+            setProjection(theViewport);
+            CHECK_OGL_ERROR;
+
+            // don't render anything if world isn't visible
+            if (_myScene->getWorldRoot()->getFacade<TransformHierarchyFacade>()->get<VisibleTag>()) {
+
+                // (2) Create lists of render objects
+                BodyPartMap myBodyParts;
+                {
+                    MAKE_SCOPE_TIMER(createRenderList);
+                    Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
+                    asl::Box2f myScissorBox;
+                    myScissorBox.makeFull();
+                    createRenderList(_myScene->getWorldRoot(), myBodyParts, myCamera, myEyeSpaceTransform,
+                            theViewport, true, std::vector<asl::Planef>(), myScissorBox);
+                }
+
+                // (3) render skybox
+                {
+                    MAKE_SCOPE_TIMER(renderSkyBox);
+                    renderSkyBox(*theViewport, myCamera);
+                    CHECK_OGL_ERROR;
+                }
+
+                // (4) Setup camera
+                bindViewMatrix(myCamera);
+
+                // (5) activate all visible lights
+                {
+                    MAKE_SCOPE_TIMER(enableVisibleLights);
+                    enableVisibleLights();
+                    CHECK_OGL_ERROR;
+                }
+
+                // (6) enable fog
+                {
+                    MAKE_SCOPE_TIMER(enableFog);
+                    enableFog();
+                    CHECK_OGL_ERROR;
+                }
+
+                // (7) render bodies
+                if (! myBodyParts.empty()) {
+                    MAKE_SCOPE_TIMER(renderBodyParts);
+                    _myPreviousBody = 0;
+
+                    glPushMatrix();
+                    glDisable(GL_ALPHA_TEST);
+                    CHECK_OGL_ERROR;
+
+                    bool currentMaterialHasAlpha = false;
+                    for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
+                        if (!currentMaterialHasAlpha && it->first.getTransparencyFlag()) {
+                            glEnable(GL_ALPHA_TEST);
+                            currentMaterialHasAlpha = true;
+                        }
+                        renderBodyPart(it->second, *theViewport, *myCamera);
+                    }
+                    glPopMatrix();
+
+                    _myState->setScissorTest(false);
+                    _myState->setClippingPlanes(std::vector<asl::Planef>());
+                    _myState->setFrontFaceCCW(true);
+                }
             }
         }
 

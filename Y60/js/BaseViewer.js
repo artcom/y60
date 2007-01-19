@@ -371,20 +371,22 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
 
     self.onPreViewport = function(theViewport) {
         var myCamera = theViewport.getElementById(theViewport.camera);
-    	// calculate near/far planes from world size and distance camera-world
-    	var myWorldSize = _myRenderWindow.scene.getWorldSize(myCamera);
-    	if (self.getMover(theViewport)) {
-            self.getMover(theViewport).setWorldSize(myWorldSize);
-        }
-        if (_myAutoNearFarFlag) {
-            var myNearPlane = 0.1;
-            var myFarPlane = 1000.0;
-            if (myWorldSize > 0.0) {
-                myNearPlane = myWorldSize / 10000.0;
-                myFarPlane = myWorldSize * 2.0;
+        if (myCamera) {
+            // calculate near/far planes from world size and distance camera-world
+            var myWorldSize = _myRenderWindow.scene.getWorldSize(myCamera);
+            if (self.getMover(theViewport)) {
+                self.getMover(theViewport).setWorldSize(myWorldSize);
             }
-            myCamera.nearplane = myNearPlane;
-            myCamera.farplane = myFarPlane;
+            if (_myAutoNearFarFlag) {
+                var myNearPlane = 0.1;
+                var myFarPlane = 1000.0;
+                if (myWorldSize > 0.0) {
+                    myNearPlane = myWorldSize / 10000.0;
+                    myFarPlane = myWorldSize * 2.0;
+                }
+                myCamera.nearplane = myNearPlane;
+                myCamera.farplane = myFarPlane;
+            }
         }
         _myLightManager.onPreViewport(theViewport);
     }
