@@ -31,6 +31,7 @@ struct vert2frag {
     float4 objectNormal   : TEXCOORD4;
     float3 worldNormal    : TEXCOORD5;
     float4 homPosition2   : TEXCOORD6;
+    float fogExponent     : TEXCOORD7;
 };
 
 vert2frag mainVertex(app2vert IN,
@@ -38,7 +39,8 @@ vert2frag mainVertex(app2vert IN,
                      uniform float4x4 GL_MODELVIEW,
                      uniform float4x4 AC_OBJECTWORLD_IT,
                      uniform float4x4 AC_OBJECTWORLD,
-                     uniform float4x4 GL_TEXTURE)
+                     uniform float4x4 GL_TEXTURE,
+                     uniform float fogDensity)
 {
     vert2frag OUT;
     
@@ -56,6 +58,9 @@ vert2frag mainVertex(app2vert IN,
 #endif
 #endif // PAINT
    
+    float myFogDistance = length(OUT.homPosition); 
+    OUT.fogExponent = fogDensity * myFogDistance;
+
     return OUT;
 }
 
@@ -78,7 +83,8 @@ float4 mainFragment(vert2frag IN,
                     uniform sampler2D tex1,
 #endif
 #endif
-                    uniform float4 diffuse) : COLOR
+                    uniform float4 diffuse,
+                    uniform float4 fogColor) : COLOR
 
 {
     float4 myDiffuse = float4(0.0, 0.0, 0.0, 1.0);
@@ -143,9 +149,13 @@ float4 mainFragment(vert2frag IN,
             }
         }
     }
+   
+    float myFogFactor = exp2(-abs(IN.fogExponent));
     
-    float4 myReturn = myDiffuse; 
+    // use fog
+    float4 myReturn = lerp(fogColor, myDiffuse, myFogFactor);
+
+    // float4 myReturn = myDiffuse; 
     // myReturn.a = 1.0f;
-    
     return myReturn;
 }
