@@ -369,15 +369,17 @@ Glow.prototype.Constructor = function(obj, theViewer, theKernelSize, theGlowScal
         _myGlowOverlay.srcorigin = new Vector2f( 0, 1 - myOffscreenImage.height / nextPowerOfTwo(myOffscreenImage.height));
 
         // prepare compositing
-        window.scene.underlays.appendChild(_myOffscreenOverlay.node);
+        var myUnderlays = getDescendantByTagName(myViewport, "underlays");
+        if (!myUnderlays) {
+            myUnderlays = new Node("<underlays/>").firstChild;
+            myViewport.appendChild(myUnderlays);
+        }
+        myUnderlays.appendChild(_myOffscreenOverlay.node);
 
+        var myDisplayOverlay = _myGlowOverlay.node;
         _myDebugOverlay = null;//_myOffscreenOverlay.node; // _myBlurXOverlay.node;
         //_myDebugOverlay = _myBlurYOverlay.node;
-        if (_myDebugOverlay) {
-            window.scene.underlays.appendChild(_myDebugOverlay);
-        } else {
-            window.scene.underlays.appendChild(_myGlowOverlay.node);
-        }
+        myUnderlays.appendChild(_myDebugOverlay ? _myDebugOverlay : _myGlowOverlay.node);
     }
 
     setupGlow();
