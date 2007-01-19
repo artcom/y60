@@ -1,3 +1,5 @@
+// blinn-phong shading using normal maps
+
 struct a2v {
 float4 Position : POSITION; //in object space 
 float3 Normal : NORMAL; //in object space 
@@ -64,6 +66,7 @@ float4 mainFragment(v2f IN,
     if (diffuseLight <= 0) specularLight = 0;
     float3 mySpecular = specular.xyz * specularLight;
 
+    float color;
     color.xyz = (myAmbient + myDiffuse + mySpecular) * myGroundColor;
     color.w = 1;
     return color;
