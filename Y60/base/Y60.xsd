@@ -3004,6 +3004,46 @@ Several bodies can use the same skeleton. (e.g. for an army of marching soldiers
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:element name="OrientedFrustum" type="OrientedFrustumType" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>Base class for camera and projector nodes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType"/>
+            </xs:complexContent>
+        </xs:complexType>                
+    </xs:element>
+    <xs:complexType name="OrientedFrustumType">
+        <xs:complexContent>
+            <xs:extension base="SceneGraphNodeType">
+                <xs:attribute name="hfov" type="xs:float">
+                    <xs:annotation>
+                        <xs:documentation>The horizontal field of view of the camera in degrees.
+The default is 54.4 degree, which is similar to the field of view of the eyes.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="width" type="xs:float">
+                    <xs:annotation>
+                        <xs:documentation>If this attribute is nonzero, the camera will be used in ortoghonal mode.
+The attribute then defines the width of the frustrum in GL/database units.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="nearplane" type="xs:float">
+                    <xs:annotation>
+                        <xs:documentation>Distance to the nearplane in units.
+Only objects beyond the nearplane will be rendered.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="farplane" type="xs:float">
+                    <xs:annotation>
+                        <xs:documentation>Distance to the farplane in units.
+Only objects closer than the farplane will be rendered.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element name="camera" substitutionGroup="SceneGraphNode">
         <xs:annotation>
             <xs:documentation>A camera is referenced by the viewport and is used to render a view of the scene.
@@ -3011,35 +3051,21 @@ It can be moved like all other scenegraph nodes, and other nodes (such as lights
         </xs:annotation>
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension base="SceneGraphNodeType">
-                    <xs:attribute name="hfov" type="xs:float">
-                        <xs:annotation>
-                            <xs:documentation>The horizontal field of view of the camera in degrees.
-The default is 54.4 degree, which is similar to the field of view of the eyes.</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="width" type="xs:float">
-                        <xs:annotation>
-                            <xs:documentation>If this attribute is nonzero, the camera will be used in ortoghonal mode.
-The attribute then defines the width of the frustrum in GL/database units.</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="nearplane" type="xs:float">
-                        <xs:annotation>
-                            <xs:documentation>Distance to the nearplane in units.
-Only objects beyond the nearplane will be rendered.</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                    <xs:attribute name="farplane" type="xs:float">
-                        <xs:annotation>
-                            <xs:documentation>Distance to the farplane in units.
-Only objects closer than the farplane will be rendered.</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-                </xs:extension>
+                <xs:extension base="OrientedFrustumType"/>
             </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
+        </xs:complexType>        
+    </xs:element>    
+    <xs:element name="projector" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>A projector is referenced by a projective material and is used to project a texture on a shape.
+It can be moved like all other scenegraph nodes, and other nodes (such as lights) can be attached to it, as child nodes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="OrientedFrustumType"/>
+            </xs:complexContent>
+        </xs:complexType>        
+    </xs:element>    
     <xs:element name="light" substitutionGroup="SceneGraphNode">
         <xs:annotation>
             <xs:documentation>Defines the position and orientation of a light inside the scene
