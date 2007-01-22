@@ -1186,6 +1186,9 @@ MAKE_SCOPE_TIMER(switchMaterial);
                     _myState->setClippingPlanes(std::vector<asl::Planef>());
                     _myState->setFrontFaceCCW(true);
                 }
+
+                // turn fog off again
+                glDisable(GL_FOG);
             }
         }
 
