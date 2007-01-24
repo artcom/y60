@@ -26,7 +26,7 @@ var myTestName = "y60FFMpegDecoder2 Leaktest";
 var myDecoderPlug = "y60FFMpegDecoder2";
 var myVideoCount = 500;
 
-var myMovieLeak =  myVideoCount * 10 * 1024; // each mpeg2 movie leaks 10kb per movie (not per frame, tolerable)
+var myMovieLeak =  myVideoCount * 15 * 1024; // each mpeg2 movie leaks 10kb per movie (not per frame, tolerable)
 
 var myMovieBaseMemoryUsage =  6.5*1024*1024; // (due to some basic memory allocation, i.e. plugin-ctor code, lib init code, SomImageFactory)
 var myAllowedMemoryUsage = myMovieBaseMemoryUsage + myMovieLeak;
