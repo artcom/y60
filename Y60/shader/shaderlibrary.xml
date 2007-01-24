@@ -264,6 +264,7 @@
                  <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
             <vertexparameters>
+              <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
@@ -299,6 +300,7 @@
                  <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
             <vertexparameters>
+              <vector3f name="normal" />
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
@@ -1295,6 +1297,9 @@
         </vertexshader>
         <fragmentshader profile="FP30" file="spotlight.cg" entryfunction="mainFragment">
             <properties>
+              <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>  	 
+                <float name="penumbra">0.0</float> 	 
+                <float name="fogDensity">0.0</float>
             </properties>
         </fragmentshader>
     </shader>
@@ -1307,6 +1312,9 @@
         </supports>
         <vertexshader profile="VP30" file="spotlight.cg" entryfunction="mainVertex" compilerargs="-DPAINT">
             <properties>
+              <float name="penumbra">0.0</float>  	 
+              <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f> 	 
+              <float name="fogDensity">0.0</float>
             </properties>
             <vertexparameters>
                  <vector4f name="position"/>
@@ -1342,6 +1350,8 @@
                 <sampler2d name="tex0">0</sampler2d>
                 <sampler2d name="tex1">1</sampler2d>
                 <float name="penumbra">0.0</float>
+                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>  	 
+                <float name="fogDensity">0.0</float>
             </properties>
         </fragmentshader>
     </shader>
