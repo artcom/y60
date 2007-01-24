@@ -147,6 +147,7 @@ namespace y60 {
         theFactory->registerPrototype("lightsource", dom::FacadePtr(new LightSource(dom::Node::Prototype)));
         theFactory->registerPrototype("properties", dom::FacadePtr(new LightPropertiesFacade(dom::Node::Prototype)), "lightsource");
         theFactory->registerPrototype("camera", dom::FacadePtr(new Camera(dom::Node::Prototype)));
+        theFactory->registerPrototype("projector", dom::FacadePtr(new Projector(dom::Node::Prototype)));
         theFactory->registerPrototype("joint", dom::FacadePtr(new JointFacade(dom::Node::Prototype)));
         theFactory->registerPrototype("canvas", dom::FacadePtr(new Canvas(dom::Node::Prototype)));
         theFactory->registerPrototype("viewport", dom::FacadePtr(new Viewport(dom::Node::Prototype)));

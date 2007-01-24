@@ -67,6 +67,10 @@ namespace y60 {
                     const Camera & theCamera);
             virtual void bindOverlayParams(const MaterialBase & theMaterial) {};            
 
+            void enableTextureProjection(const MaterialBase & theMaterial,
+                                         const Viewport & theViewport,
+                                         const Camera & theCamera);
+
        protected:
             virtual void loadShaderProperties(const dom::NodePtr theShaderNode, 
                                       ShaderDescription & theShader);
@@ -77,6 +81,9 @@ namespace y60 {
        private:
             GLShader();
             void loadFeatureSet(const dom::NodePtr theShaderNode);
+            void setupProjectorMatrix( asl::Matrix4f & theMatrix, const MaterialBase & theMaterial,
+                        const Camera & theCamera, const Texture & theTexture);
+
             std::string             _myId;
             std::string             _myName;
             float                   _myCost;

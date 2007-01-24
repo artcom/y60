@@ -24,6 +24,8 @@
 //
 #endif
 
+#include "GLShader.h"
+
 #include "ShaderLibrary.h"
 
 #include <dom/Nodes.h>
@@ -290,6 +292,7 @@ namespace y60 {
             asl::Matrix4f myMatrix = myTexture.getImage()->get<ImageMatrixTag>();
             myMatrix.postMultiply(myTexture.get<TextureMatrixTag>());
             glLoadMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
+            // XXX glMultMatrixf(static_cast<const GLfloat *>(myMatrix.getData()));
 
             glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, asGLTextureFunc(myTexture.getApplyMode())); 
 #if 1
@@ -446,6 +449,117 @@ namespace y60 {
         }
     }
 
+
+    void
+    GLShader::setupProjectorMatrix( Matrix4f & theMatrix,
+                                    const MaterialBase & theMaterial,
+                                    const Camera & theCamera,
+                                    const Texture & theTexture)
+    {
+
+        // projector model matrix
+        const std::string & myProjectorId = theTexture.get<TextureProjectorIdTag>();
+        NodePtr myProjectorNode = theTexture.getNode().getElementById(
+                myProjectorId );
+        if ( ! myProjectorNode ) {
+            throw ShaderException(std::string("Projector with id '") +
+                    myProjectorId + "' not found.", PLUS_FILE_LINE);
+        }
+        ProjectiveNodePtr myProjector = myProjectorNode->getFacade<ProjectiveNode>();
+        const Matrix4f & myProjectorModelMatrix = myProjector->get<y60::InverseGlobalMatrixTag>();
+
+        // projector projection matrix
+        Vector4f myPoTSize(theTexture.getImage()->get<ImageWidthTag>(),
+                        theTexture.getImage()->get<ImageHeightTag>(), 0, 1);
+        const Matrix4f & myImageMatrix = theTexture.getImage()->get<ImageMatrixTag>();
+        Vector4f mySize = myPoTSize * myImageMatrix;
+        float myAspect( mySize[0] / mySize[1] );
+        Frustum myFrustum;
+        myFrustum.updateCorners(myProjector->get<NearPlaneTag>(), myProjector->get<FarPlaneTag>(),
+                myProjector->get<HfovTag>(), myProjector->get<OrthoWidthTag>(), myAspect);
+        Matrix4f myProjectionMatrix;
+        myFrustum.getProjectionMatrix( myProjectionMatrix );
+        theMatrix.assign(theCamera.get<y60::GlobalMatrixTag>());
+
+        theMatrix.postMultiply( myProjectorModelMatrix);
+        theMatrix.postMultiply( myProjectionMatrix );
+
+        // magic matrix: scale and bias to apply the projection to entire frustum,
+        // not only the upper right quadrant; this also performs an y-flip so the projected image
+        // has the correct orientation
+        Matrix4f myMagicMatrix;
+        myMagicMatrix.makeScaling(Vector3f(0.5, -0.5, 0.5));
+        myMagicMatrix.translate( Vector3f(0.5, 0.5, 0.5));
+
+        theMatrix.postMultiply( myMagicMatrix );
+    }
+
+    void
+    GLShader::enableTextureProjection(const MaterialBase & theMaterial,
+            const Viewport & theViewport,
+            const Camera & theCamera)
+    {
+
+        MaterialBase::TexGenModeList myTexGenModes = theMaterial.getTexGenModes();
+        MaterialBase::TexGenParamsList myTexGenParams = theMaterial.getTexGenParams();
+
+        // enable texture coordinate generation
+        for (unsigned myTexUnit = 0; myTexUnit < myTexGenModes.size(); ++myTexUnit) {
+            bool mustRestoreMatrix = false;
+
+            glActiveTexture(asGLTextureRegister(myTexUnit));
+
+            MaterialBase::TexGenMode myModes = myTexGenModes[myTexUnit];
+            MaterialBase::TexGenParams myParams = myTexGenParams[myTexUnit];
+
+            for (unsigned i = 0; i < myModes.size(); ++i) {
+
+                //AC_DEBUG << "unit=" << myTexUnit << " coord=" << i << " mode=" << myModes[i];
+
+                if (myModes[i] == NONE) {
+                    continue;
+                }
+
+                // set texgen plane params
+                if (myModes[i] == EYE_LINEAR) {
+
+                    // push modelview matrix
+                    if (mustRestoreMatrix == false) {
+                        {
+                            glMatrixMode( GL_TEXTURE );
+
+                            const Texture & myTexture = theMaterial.getTexture( myTexUnit );
+                            const std::string & myProjectorId = myTexture.get<TextureProjectorIdTag>();
+                            if ( ! myProjectorId.empty() ) {
+                                Matrix4f myTextureMatrix;
+                                setupProjectorMatrix( myTextureMatrix, theMaterial, theCamera, myTexture );
+                                glMultMatrixf(static_cast<const GLfloat *>(myTextureMatrix.getData()));
+                            }
+
+                        }
+                        glMatrixMode( GL_MODELVIEW );
+                        glPushMatrix();
+                        glLoadIdentity();
+                        mustRestoreMatrix = true;
+
+                    }
+                    glTexGenfv(ourTexGenCoord[i], GL_EYE_PLANE, &(*(myParams[i]).begin()));
+                } else if (myModes[i] == OBJECT_LINEAR) {
+                    // TODO: think about the object linear use-cases
+                    glTexGenfv(ourTexGenCoord[i], GL_OBJECT_PLANE, &(*(myParams[i]).begin()));
+                }
+
+                // set texgen mode
+                glTexGeni(ourTexGenCoord[i], GL_TEXTURE_GEN_MODE, asGLTexCoordMode(myModes[i]));
+                glEnable(ourTexGenToken[i]);
+            }
+            if (mustRestoreMatrix) {
+                glPopMatrix();
+            }
+            CHECK_OGL_ERROR;
+        }
+}
+
     void
     GLShader::bindBodyParams(const MaterialBase & theMaterial,
             const Viewport & theViewport,
@@ -453,60 +567,10 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        //AC_DEBUG << "GLShader::bindBodyParams " << theMaterial.get<NameTag>();
+        AC_DEBUG << "GLShader::bindBodyParams " << theMaterial.get<NameTag>();
         DBP2(MAKE_SCOPE_TIMER(GLShader_bindBodyParams));
         if (theMaterial.hasTexGen()) {
-
-            bool mustRestoreMatrix = false;
-            MaterialBase::TexGenModeList myTexGenModes = theMaterial.getTexGenModes();
-            MaterialBase::TexGenParamsList myTexGenParams = theMaterial.getTexGenParams();
-
-            // enable texture coordinate generation
-            for (unsigned myTexUnit = 0; myTexUnit < myTexGenModes.size(); ++myTexUnit) {
-
-                glActiveTexture(asGLTextureRegister(myTexUnit));
-
-                MaterialBase::TexGenMode myModes = myTexGenModes[myTexUnit];
-                MaterialBase::TexGenParams myParams = myTexGenParams[myTexUnit];
-
-                for (unsigned i = 0; i < myModes.size(); ++i) {
-
-                    //AC_DEBUG << "unit=" << myTexUnit << " coord=" << i << " mode=" << myModes[i];
-
-                    if (myModes[i] == NONE) {
-                        continue;
-                    }
-
-                    // set texgen plane params
-                    if (myModes[i] == EYE_LINEAR) {
-
-                        // push modelview matrix
-                        if (mustRestoreMatrix == false) {
-                            glPushMatrix();
-#if 1
-                            glLoadIdentity();
-#else
-                            // UH: should we load the camera global matrix instead of identity?
-                            glLoadMatrixf(static_cast<const GLfloat *>(theCamera.get<GlobalMatrixTag>().getData()));
-#endif
-                            mustRestoreMatrix = true;
-                        }
-
-                        glTexGenfv(ourTexGenCoord[i], GL_EYE_PLANE, &(*(myParams[i]).begin()));
-                    } else if (myModes[i] == OBJECT_LINEAR) {
-                        glTexGenfv(ourTexGenCoord[i], GL_OBJECT_PLANE, &(*(myParams[i]).begin()));
-                    }
-
-                    // set texgen mode
-                    glTexGeni(ourTexGenCoord[i], GL_TEXTURE_GEN_MODE, asGLTexCoordMode(myModes[i]));
-                    glEnable(ourTexGenToken[i]);
-                }
-                CHECK_OGL_ERROR;
-            }
-
-            if (mustRestoreMatrix) {
-                glPopMatrix();
-            }
+            enableTextureProjection( theMaterial, theViewport, theCamera );
         }
     }
 

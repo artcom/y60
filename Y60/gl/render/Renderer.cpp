@@ -140,12 +140,12 @@ namespace y60 {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // setup initial camera position
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
         // enable vertex arrays
         glEnableClientState(GL_VERTEX_ARRAY);
+
     }
 
     IShaderLibraryPtr
@@ -371,6 +371,9 @@ MAKE_SCOPE_TIMER(switchMaterial);
         DBP2(STOP_TIMER(renderBodyPart_switchMaterial));
 
         DBP2(START_TIMER(renderBodyPart_materialChanged));
+        glMatrixMode( GL_TEXTURE );
+        glPushMatrix();
+        glMatrixMode( GL_MODELVIEW );
         if (myBodyHasChanged || myMaterialHasChanged) {
             DBP2(MAKE_SCOPE_TIMER(renderBodyPart20));
             //DBP2(START_TIMER(renderBodyPart_getShader));
@@ -441,6 +444,10 @@ MAKE_SCOPE_TIMER(switchMaterial);
             CHECK_OGL_ERROR;
         }
         DBP2(STOP_TIMER(renderBodyPart_setupBoundingVolume));
+
+        glMatrixMode( GL_TEXTURE );
+        glPopMatrix();
+        glMatrixMode( GL_MODELVIEW );
     }
 
     void
@@ -565,6 +572,55 @@ MAKE_SCOPE_TIMER(switchMaterial);
         theViewport->get<ViewportFrustumTag>().getCorners(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK);
         renderBox(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK,
                   Vector4f(0.5, 1.0, 0.5, 1.0), Vector4f(1.0, 0.5, 0.0, 1.0));
+    }
+
+    void
+    Renderer::renderFrustum( dom::NodePtr theProjectiveNode, const float & theAspect) {
+        Frustum myFrustum;
+        ProjectiveNodePtr myProjector = theProjectiveNode->getFacade<ProjectiveNode>();
+        myFrustum.updateCorners(myProjector->get<NearPlaneTag>(), myProjector->get<FarPlaneTag>(),
+                myProjector->get<HfovTag>(), myProjector->get<OrthoWidthTag>(), theAspect);
+
+        Point3f myCamPos = myProjector->get<PositionTag>();
+        Point3f myLTF, myRBF, myRTF, myLBF;
+        Point3f myLTBK, myRBBK, myRTBK, myLBBK;
+
+        myFrustum.updatePlanes( myProjector->get<GlobalMatrixTag>(), myProjector->get<InverseGlobalMatrixTag>() );
+        myFrustum.getCorners(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK);
+    /*
+    AC_PRINT <<"LTF: " << myLTF;
+    AC_PRINT <<"RBF: " << myRBF;
+    AC_PRINT <<"RTF: " << myRTF;
+    AC_PRINT <<"LBF: " << myLBF;
+    AC_PRINT <<"LTBK: " << myLTBK;
+    AC_PRINT <<"RBBK: " << myRBBK;
+    AC_PRINT <<"RTBK: " << myRTBK;
+    AC_PRINT <<"LBBK: " << myLBBK;
+    AC_PRINT << myFrustum;
+     AC_PRINT << " ------";
+        */
+        renderBox(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK,
+                  Vector4f(0.5, 1.0, 0.5, 1.0), Vector4f(1.0, 0.5, 0.0, 1.0));
+
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+        glDisable(GL_LIGHTING);
+        glColor4f(1.0, 1.0, 1.0, 0.5);
+        glBegin(GL_LINES);
+        {
+            glVertex3fv(myCamPos.begin());
+            glVertex3fv(myLTF.begin());
+
+            glVertex3fv(myCamPos.begin());
+            glVertex3fv(myLBF.begin());
+
+            glVertex3fv(myCamPos.begin());
+            glVertex3fv(myRTF.begin());
+
+            glVertex3fv(myCamPos.begin());
+            glVertex3fv(myRBF.begin());
+        }
+        glEnd();
+        glPopAttrib();
     }
 
     void

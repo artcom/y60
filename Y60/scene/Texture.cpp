@@ -30,6 +30,7 @@ namespace y60 {
     Texture::Texture(dom::Node & theNode) :
         Facade(theNode),
         TextureImageIdTag::Plug(theNode),
+        TextureProjectorIdTag::Plug(theNode),
         TextureApplyModeTag::Plug(theNode),
         TextureSpriteTag::Plug(theNode),
 		TextureMatrixTag::Plug(theNode),

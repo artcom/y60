@@ -105,6 +105,7 @@ namespace y60 {
                       float theWidth = 1.0f,
                       const std::string & theRenderStyles = "");
 
+            void renderFrustum(dom::NodePtr theProjectiveNode, const float & theAspect );
        private:
             void setupRenderState(ViewportPtr theViewport);
 
@@ -137,6 +138,7 @@ namespace y60 {
             void renderBoundingBoxHierarchy(dom::NodePtr theNode);
 
             void renderFrustum(const ViewportPtr & theViewport);
+
             void renderOverlays(const Viewport & theViewport,
                                 const std::string & theRootNodeName);
             void renderOverlay(const Viewport & theViewport, dom::NodePtr theOverlayNode, float theAlpha = 1);

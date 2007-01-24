@@ -21,12 +21,16 @@
 
 namespace y60 {
     
-    Camera::Camera(dom::Node & theNode) 
+    ProjectiveNode::ProjectiveNode(dom::Node & theNode) 
         : TransformHierarchyFacade(theNode),
         HfovTag::Plug(theNode),
         OrthoWidthTag::Plug(theNode),
         NearPlaneTag::Plug(theNode),
         FarPlaneTag::Plug(theNode)
     {}
-    Camera::~Camera() {}
+    ProjectiveNode::~ProjectiveNode() {}
+
+    Camera::Camera(dom::Node & theNode) : ProjectiveNode( theNode ) {}
+
+    Projector::Projector(dom::Node & theNode) : ProjectiveNode( theNode ) {}
 } 

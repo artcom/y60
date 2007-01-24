@@ -30,20 +30,39 @@ namespace y60 {
     DEFINE_ATTRIBUT_TAG(NearPlaneTag,     float,   NEAR_PLANE_ATTRIB,     0.1f);
     DEFINE_ATTRIBUT_TAG(FarPlaneTag,      float,   FAR_PLANE_ATTRIB,      10000.0f);
 
-    class Camera : 
+    class ProjectiveNode : 
         public TransformHierarchyFacade,
         public HfovTag::Plug,
         public OrthoWidthTag::Plug,
         public NearPlaneTag::Plug,
         public FarPlaneTag::Plug
     {
-    public:
-        Camera(dom::Node & theNode); 
-        ~Camera(); 
+        public:
+            ProjectiveNode(dom::Node & theNode); 
+            ~ProjectiveNode(); 
+
+            IMPLEMENT_FACADE(ProjectiveNode);
+    };
+
+    typedef asl::Ptr<ProjectiveNode, dom::ThreadingModel> ProjectiveNodePtr;
+
+    class Camera : public ProjectiveNode {
+        public:
+            Camera(dom::Node & theNode); 
+
             IMPLEMENT_FACADE(Camera);
-   };
+    };
 
     typedef asl::Ptr<Camera, dom::ThreadingModel> CameraPtr;
+
+    class Projector : public ProjectiveNode {
+        public:
+            Projector(dom::Node & theNode); 
+
+            IMPLEMENT_FACADE(Projector);
+    };
+
+    typedef asl::Ptr<Projector, dom::ThreadingModel> ProjectorPtr;
 } 
 
 #endif 

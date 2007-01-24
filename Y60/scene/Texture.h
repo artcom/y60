@@ -52,16 +52,18 @@ namespace dom {
 namespace y60 {
 
     //                  theTagName           theType        theAttributeName           theDefault
-    DEFINE_ATTRIBUT_TAG(TextureImageTag,     ImageWeakPtr,  "texture_image_tag",       ImagePtr(0));
-    DEFINE_ATTRIBUT_TAG(TextureImageIdTag,   std::string,   TEXTURE_IMAGE_ATTRIB,      "");
-    DEFINE_ATTRIBUT_TAG(TextureApplyModeTag, TextureApplyMode,   TEXTURE_APPLYMODE_ATTRIB,  MODULATE);
-    DEFINE_ATTRIBUT_TAG(TextureSpriteTag,    bool,          TEXTURE_SPRITE_ATTRIB,     false);
-    DEFINE_ATTRIBUT_TAG(TextureMatrixTag,    asl::Matrix4f, TEXTURE_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
+    DEFINE_ATTRIBUT_TAG(TextureImageTag,       ImageWeakPtr,  "texture_image_tag",       ImagePtr(0));
+    DEFINE_ATTRIBUT_TAG(TextureImageIdTag,     std::string,   TEXTURE_IMAGE_ATTRIB,      "");
+    DEFINE_ATTRIBUT_TAG(TextureProjectorIdTag, std::string,   TEXTURE_PROJECTOR_ATTRIB,      "");
+    DEFINE_ATTRIBUT_TAG(TextureApplyModeTag,   TextureApplyMode,   TEXTURE_APPLYMODE_ATTRIB,  MODULATE);
+    DEFINE_ATTRIBUT_TAG(TextureSpriteTag,      bool,          TEXTURE_SPRITE_ATTRIB,     false);
+    DEFINE_ATTRIBUT_TAG(TextureMatrixTag,      asl::Matrix4f, TEXTURE_MATRIX_ATTRIB,     asl::Matrix4f::Identity());
 
     DEFINE_EXCEPTION(TextureException, asl::Exception);
     class Texture :
         public dom::Facade,
         public TextureImageIdTag::Plug,
+        public TextureProjectorIdTag::Plug,
         public TextureApplyModeTag::Plug,
         public TextureSpriteTag::Plug,
         public TextureMatrixTag::Plug,
