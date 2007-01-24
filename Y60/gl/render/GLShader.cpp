@@ -536,6 +536,7 @@ namespace y60 {
                                 glMultMatrixf(static_cast<const GLfloat *>(myTextureMatrix.getData()));
                             }
 
+
                         }
                         glMatrixMode( GL_MODELVIEW );
                         glPushMatrix();

@@ -319,6 +319,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
         DBP(START_TIMER(renderBodyPart_bodyChanged));
         if (myBodyHasChanged) {
             glPopMatrix();
+            CHECK_OGL_ERROR;
 
             _myState->setClippingPlanes(theBodyPart.getClippingPlanes());
             _myState->setScissorBox(theBodyPart.getScissorBox(), theViewport);
@@ -371,9 +372,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
         DBP2(STOP_TIMER(renderBodyPart_switchMaterial));
 
         DBP2(START_TIMER(renderBodyPart_materialChanged));
-        glMatrixMode( GL_TEXTURE );
-        glPushMatrix();
-        glMatrixMode( GL_MODELVIEW );
+
         if (myBodyHasChanged || myMaterialHasChanged) {
             DBP2(MAKE_SCOPE_TIMER(renderBodyPart20));
             //DBP2(START_TIMER(renderBodyPart_getShader));
@@ -445,9 +444,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
         }
         DBP2(STOP_TIMER(renderBodyPart_setupBoundingVolume));
 
-        glMatrixMode( GL_TEXTURE );
-        glPopMatrix();
-        glMatrixMode( GL_MODELVIEW );
+        CHECK_OGL_ERROR;
     }
 
     void
@@ -587,18 +584,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
 
         myFrustum.updatePlanes( myProjector->get<GlobalMatrixTag>(), myProjector->get<InverseGlobalMatrixTag>() );
         myFrustum.getCorners(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK);
-    /*
-    AC_PRINT <<"LTF: " << myLTF;
-    AC_PRINT <<"RBF: " << myRBF;
-    AC_PRINT <<"RTF: " << myRTF;
-    AC_PRINT <<"LBF: " << myLBF;
-    AC_PRINT <<"LTBK: " << myLTBK;
-    AC_PRINT <<"RBBK: " << myRBBK;
-    AC_PRINT <<"RTBK: " << myRTBK;
-    AC_PRINT <<"LBBK: " << myLBBK;
-    AC_PRINT << myFrustum;
-     AC_PRINT << " ------";
-        */
+
         renderBox(myLTF, myRBF, myRTF, myLBF, myLTBK, myRBBK, myRTBK, myLBBK,
                   Vector4f(0.5, 1.0, 0.5, 1.0), Vector4f(1.0, 0.5, 0.0, 1.0));
 
@@ -1228,6 +1214,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
                     glDisable(GL_ALPHA_TEST);
                     CHECK_OGL_ERROR;
 
+                    int i = 0;
                     bool currentMaterialHasAlpha = false;
                     for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
                         if (!currentMaterialHasAlpha && it->first.getTransparencyFlag()) {
@@ -1237,6 +1224,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
                         renderBodyPart(it->second, *theViewport, *myCamera);
                     }
                     glPopMatrix();
+                    CHECK_OGL_ERROR;
 
                     _myState->setScissorTest(false);
                     _myState->setClippingPlanes(std::vector<asl::Planef>());
