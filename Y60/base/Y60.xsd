@@ -2452,6 +2452,12 @@ and contains the reference to an image node.</xs:documentation>
                     <xs:documentation>Id of the image node referenced by this texture</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
+            <xs:attribute name="projector" type="xs:IDREF">
+                <xs:annotation>
+                    <xs:documentation>reference to a projector node that specifies the frustum
+for projective texturing</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
             <xs:attribute name="applymode" type="TextureApplyMode">
                 <xs:annotation>
                     <xs:documentation>Defines how the texture is applied (blended) with the texture or color below
@@ -3004,7 +3010,7 @@ Several bodies can use the same skeleton. (e.g. for an army of marching soldiers
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element name="OrientedFrustum" type="OrientedFrustumType" substitutionGroup="SceneGraphNode">
+    <xs:element name="ProjectiveNode" type="ProjectiveNodeType" substitutionGroup="SceneGraphNode">
         <xs:annotation>
             <xs:documentation>Base class for camera and projector nodes.</xs:documentation>
         </xs:annotation>
@@ -3014,7 +3020,7 @@ Several bodies can use the same skeleton. (e.g. for an army of marching soldiers
             </xs:complexContent>
         </xs:complexType>                
     </xs:element>
-    <xs:complexType name="OrientedFrustumType">
+    <xs:complexType name="ProjectiveNodeType">
         <xs:complexContent>
             <xs:extension base="SceneGraphNodeType">
                 <xs:attribute name="hfov" type="xs:float">
@@ -3051,7 +3057,7 @@ It can be moved like all other scenegraph nodes, and other nodes (such as lights
         </xs:annotation>
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension base="OrientedFrustumType"/>
+                <xs:extension base="ProjectiveNodeType"/>
             </xs:complexContent>
         </xs:complexType>        
     </xs:element>    
@@ -3062,7 +3068,7 @@ It can be moved like all other scenegraph nodes, and other nodes (such as lights
         </xs:annotation>
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension base="OrientedFrustumType"/>
+                <xs:extension base="ProjectiveNodeType"/>
             </xs:complexContent>
         </xs:complexType>        
     </xs:element>    

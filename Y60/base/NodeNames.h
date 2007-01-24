@@ -73,6 +73,7 @@ namespace y60 {
     static const char * LOD_NODE_NAME             = "lod";
     static const char * JOINT_NODE_NAME           = "joint";
     static const char * CAMERA_NODE_NAME          = "camera";
+    static const char * PROJECTOR_NODE_NAME       = "projector";
     static const char * BODY_NODE_NAME            = "body";
     static const char * VERTEX_SHADER_NODE_NAME   = "vertexshader";
     static const char * FRAGMENT_SHADER_NODE_NAME = "fragmentshader";
@@ -136,6 +137,7 @@ namespace y60 {
     static const char * TEXTURE_IMAGE_ATTRIB        = "image";
     static const char * TEXTURE_SPRITE_ATTRIB       = "sprite";
     static const char * TEXTURE_MATRIX_ATTRIB       = "matrix";
+    static const char * TEXTURE_PROJECTOR_ATTRIB    = "projector";
     static const char * LIGHTSOURCE_TYPE_ATTRIB     = "type";
     static const char * BODY_SHAPE_ATTRIB           = "shape";
     static const char * CULLABLE_ATTRIB             = "cullable";
