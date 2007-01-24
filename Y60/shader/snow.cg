@@ -1,19 +1,18 @@
-// snow shader == normal mapping with ground texture, snow texture, snow normal map and an extra normal map for specular sparkles
-// to get a nice snow effect create a snow texture with alpha gradient, put it on a black layer and merge to get a nice height map, 
-// transform the height map to a normal map and pass normalmap and snow texture to the shader.
-// the sparkle map should be something like rgb noise (gimp: filter->noise->Scatter RGB)
-
 struct a2v {
-float4 Position : POSITION; //in object space 
-float3 Normal : NORMAL; //in object space 
-float2 TexCoord : TEXCOORD0;
+float4 Position : POSITION; 
+float3 Normal : NORMAL;     
+float4 TexCoord0 : TEXCOORD0;
+float4 TexCoord1 : TEXCOORD1;
+float4 TexCoord2 : TEXCOORD2;
 }; 
 
 struct v2f {
-float4 Position : POSITION; //in projection space 
-float3 TexCoord0 : TEXCOORD0;
-float3 LightDirection : TEXCOORD1; //in tangent space 
-float3 HalfAngleVector : TEXCOORD2; //in tangent space
+float4 Position : POSITION; 
+float2 TexCoord0 : TEXCOORD0;
+float2 TexCoord1 : TEXCOORD1;
+float2 TexCoord2 : TEXCOORD2;
+float3 LightDirection : TEXCOORD3;
+float3 HalfAngleVector : TEXCOORD4;
 }; 
 
 
@@ -34,22 +33,34 @@ float4 expand(float4 v) {
 }
 
 v2f mainVertex(a2v IN,
-        uniform float4x4 GL_MODELVIEW_PROJECTION,
-        uniform float4 lightPosition, //in object space 
-        uniform float4 eyePosition ) //in object space 
+               uniform float4x4 GL_MODELVIEW_PROJECTION,
+               uniform float4 lightPosition, //in object space 
+               uniform float3 AC_CAMERA_POSITION,
+               uniform float4x4 AC_TEXTURE_MATRICES[5]) //in object space 
 { 
     v2f OUT; // pass texture coordinates for
     OUT.Position = mul(GL_MODELVIEW_PROJECTION, IN.Position);
-    OUT.TexCoord0.xy = IN.TexCoord.xy;
+    OUT.TexCoord0 = mul(AC_TEXTURE_MATRICES[0], IN.TexCoord0).xy;
+    OUT.TexCoord1 = mul(AC_TEXTURE_MATRICES[1], IN.TexCoord1).xy;
+    OUT.TexCoord2 = mul(AC_TEXTURE_MATRICES[2], IN.TexCoord2).xy;
     OUT.LightDirection.xyz = normalize(lightPosition - IN.Position);
-    float3 viewVector = normalize(eyePosition.xyz - IN.Position.xyz);
-    OUT.HalfAngleVector.xyz = normalize(OUT.LightDirection.xyz + viewVector);
+
+    float3 viewVector = normalize(AC_CAMERA_POSITION - IN.Position.xyz);
+    //    OUT.HalfAngleVector.xyz = normalize(OUT.LightDirection.xyz + viewVector); // blinntype shading
+    OUT.HalfAngleVector.xyz = normalize(viewVector); // blinntype shading
+
     return OUT;
 }
 
 float4 mainFragment(v2f IN,
                     uniform sampler2D ground,
+#ifdef NOSHADOW
+                    uniform sampler2D ramp,
+#endif
                     uniform sampler2D snow,
+#ifndef NOSHADOW
+                    uniform sampler2D shadow,
+#endif
                     uniform sampler2D normalMap,
                     uniform sampler2D sparkleMap,
                     uniform float4 ambient,
@@ -58,25 +69,38 @@ float4 mainFragment(v2f IN,
                     uniform float shininess
                     ) : COLOR
 { 
-    float4 myGroundColor = tex2D(ground, IN.TexCoord0).rgba;
-    float4 mySnowColor = tex2D(snow, IN.TexCoord0).rgba;
-    float3 myNormal = tex2D(normalMap, IN.TexCoord0).xyz;
+    float4 myGroundColor = tex2D(ground, IN.TexCoord0.xy).rgba;
 
+#ifdef NOSHADOW
+    float4 myRampColor = tex2D(ramp, IN.TexCoord1.xy).rgba;
+    float4 mySnowColor = tex2D(snow, IN.TexCoord2.xy).rgba;
+    float3 myNormal = tex2D(normalMap, IN.TexCoord2.xy).xyz;
+#else
+    float4 mySnowColor = tex2D(snow, IN.TexCoord1.xy).rgba;
+    float3 myNormal = tex2D(normalMap, IN.TexCoord1.xy).xyz;
+    float3 myShadow = tex2D(shadow, IN.TexCoord2.xy).xyz;
+#endif
+
+    // apply lighting model
     float4 color = myGroundColor;
 
-    myNormal = normalize(myNormal);
+    myNormal = normalize(expand(myNormal));
     float3 mySparkleNormal = normalize(tex2D(sparkleMap, IN.TexCoord0).xyz);
 
     float3 myAmbient = ambient.xyz;
 
-    float diffuseLight = max(dot(myNormal, IN.LightDirection),0);
+    float diffuseLight = max(dot(myNormal, expand(IN.LightDirection)),0);
     float3 myDiffuse = diffuse.xyz * diffuseLight;
 
+    //float specularLight = pow(max(dot(myNormal, expand(IN.HalfAngleVector)),0), shininess);
     float specularLight = pow(max(dot(mySparkleNormal, expand(IN.HalfAngleVector)),0), shininess);
-
-    if (diffuseLight <= 0) specularLight = 0;
+    
+    //    if (diffuseLight <= 0) specularLight = 0;
     float3 mySpecular = specular.xyz * specularLight;
 
+#ifdef NOSHADOW
+    myGroundColor.rgb = myRampColor.a * myRampColor.rgb + (1 - myRampColor.a) * myGroundColor.rgb;
+#endif
     color.xyz = ((myAmbient + myDiffuse + mySpecular) * mySnowColor.rgb * mySnowColor.a) + (1-mySnowColor.a)*myGroundColor.rgb;
     color.w = 1;
 

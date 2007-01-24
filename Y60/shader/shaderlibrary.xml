@@ -264,7 +264,6 @@
                  <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
             <vertexparameters>
-                <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
             </vertexparameters>
@@ -300,7 +299,6 @@
                  <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
             <vertexparameters>
-                <vector3f name="normal"/>
                 <vector3f name="position"/>
                 <vector2f name="texcoord0"/>
                 <vector2f name="texcoord1"/>
@@ -1297,9 +1295,6 @@
         </vertexshader>
         <fragmentshader profile="FP30" file="spotlight.cg" entryfunction="mainFragment">
             <properties>
-                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>
-                <float name="penumbra">0.0</float>
-                <float name="fogDensity">0.0</float>
             </properties>
         </fragmentshader>
     </shader>
@@ -1322,9 +1317,6 @@
         <fragmentshader profile="FP30" file="spotlight.cg" entryfunction="mainFragment" compilerargs="-DPAINT">
             <properties>
                 <sampler2d name="tex0">0</sampler2d>
-                <float name="penumbra">0.0</float>
-                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>
-                <float name="fogDensity">0.0</float>
             </properties>
         </fragmentshader>
     </shader>
@@ -1350,42 +1342,73 @@
                 <sampler2d name="tex0">0</sampler2d>
                 <sampler2d name="tex1">1</sampler2d>
                 <float name="penumbra">0.0</float>
-                <vector4f name="fogColor">[0.0, 0.0, 0.0, 1.0]</vector4f>
-                <float name="fogDensity">0.0</float>
             </properties>
         </fragmentshader>
     </shader>
-    <shader id="s137" name="snow" cost="100">
+    <shader id="s137" name="snowstreet" cost="100">
         <supports>
             <feature class="lighting" values="[lambert]"/>
-            <feature class="textures" values="[paint,paint,bump,bump]"/>
-            <feature class="texcoord" values="[uv_map]"/>
+            <feature class="textures" values="[paint,paint,paint,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,uv_map,planar_projection]"/>
         </supports>
         <fragmentshader profile="FP30" file="snow.cg" entryfunction="mainFragment">
             <properties>
                  <sampler2d name="ground">0</sampler2d>
                  <sampler2d name="snow">1</sampler2d>
-                 <sampler2d name="normalMap">2</sampler2d>
-                 <sampler2d name="sparkleMap">3</sampler2d>
+                 <sampler2d name="shadow">2</sampler2d>
+                 <sampler2d name="normalMap">3</sampler2d>
+                 <sampler2d name="sparkleMap">4</sampler2d>
                  <vector4f name="diffuse">[1,1,1,1]</vector4f>
                  <vector4f name="specular">[1,1,1,1]</vector4f>
                  <vector4f name="ambient">[1,1,1,1]</vector4f>
                  <float name="shininess">1.0</float>
-                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
             </properties>
         </fragmentshader>
-        <vertexshader profile="VP20" file="phongBump.cg" entryfunction="mainVertex">
+        <vertexshader profile="VP20" file="snow.cg" entryfunction="mainVertex">
             <properties>
                  <vector4f name="lightPosition">[1.0, 1.0, 1.0, 1.0]</vector4f>
-                 <vector4f name="eyePosition">[0.0, 1.0, 2.0, 1.0]</vector4f>
             </properties>
             <vertexparameters>
                  <vector3f name="normal"/>
                  <vector3f name="position"/>
                  <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/>
             </vertexparameters>
          </vertexshader>
     </shader>
+    <shader id="s138" name="snowland" cost="100">
+        <supports>
+            <feature class="lighting" values="[unlit]"/>
+            <feature class="textures" values="[paint,paint,paint,paint,paint]"/>
+            <feature class="texcoord" values="[uv_map,uv_map,uv_map]"/>
+        </supports>
+        <fragmentshader profile="FP30" file="snow.cg" entryfunction="mainFragment" compilerargs="-DNOSHADOW">
+            <properties>
+                 <sampler2d name="ground">0</sampler2d>
+                 <sampler2d name="ramp">1</sampler2d>
+                 <sampler2d name="snow">2</sampler2d>
+                 <sampler2d name="normalMap">3</sampler2d>
+                 <sampler2d name="sparkleMap">4</sampler2d>
+                 <vector4f name="diffuse">[1,1,1,1]</vector4f>
+                 <vector4f name="specular">[1,1,1,1]</vector4f>
+                 <vector4f name="ambient">[1,1,1,1]</vector4f>
+                 <float name="shininess">1.0</float>
+            </properties>
+        </fragmentshader>
+        <vertexshader profile="VP20" file="snow.cg" entryfunction="mainVertex" compilerargs="-DNOSHADOW">
+            <properties>
+                 <vector4f name="lightPosition">[1.0, 1.0, 1.0, 1.0]</vector4f>
+            </properties>
+            <vertexparameters>
+                 <vector3f name="normal"/>
+                 <vector3f name="position"/>
+                 <vector2f name="texcoord0"/>
+                 <vector2f name="texcoord1"/>
+                 <vector2f name="texcoord2"/>
+            </vertexparameters>
+         </vertexshader>
+    </shader>
+
 
 
 </shaders>
