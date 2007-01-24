@@ -23,6 +23,7 @@
 #include "PLFilterResizePadded.h"
 
 #include <asl/numeric_functions.h>
+#include <asl/Logger.h>
 
 #include <paintlib/plpixel8.h>
 #include <paintlib/plbitmap.h>
@@ -47,11 +48,12 @@ PLFilterResizePadded::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
     PLBYTE ** pDstLineArray = theDestination->GetLineArray();
 
     unsigned myBytesPerPixel    = theSource->GetBitsPerPixel() / 8;
-    unsigned mySrcBytesPerLine  = myBytesPerPixel * theSource->GetWidth();
-    unsigned myDestBytesPerLine = myBytesPerPixel * _myNewWidth;
+    unsigned mySrcBytesPerLine  = myBytesPerPixel * (theSource->GetWidth() - 1);
+    unsigned myDestBytesPerLine = myBytesPerPixel * (_myNewWidth - 1);
     unsigned mySourceHeight     = theSource->GetHeight();
     
     int myRemainingBytes = myDestBytesPerLine - mySrcBytesPerLine;    
+    AC_PRINT << "myRemainingBytes: " << myRemainingBytes << " bytesPerPixel: " << myBytesPerPixel;
     for (unsigned y = 0; y < mySourceHeight; ++y) {
         PLBYTE * pSrcLine = pSrcLineArray[y];
         PLBYTE * pDstLine = pDstLineArray[y];
@@ -66,13 +68,13 @@ PLFilterResizePadded::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
         
         // Repeat the fist column (to prevent texture repeat artefacts)
         if (myRemainingBytes >= (myBytesPerPixel * 2)) {
-            memcpy(pDstLine + myDestBytesPerLine - myBytesPerPixel, pSrcLine, myBytesPerPixel);
+            memcpy(pDstLine + myDestBytesPerLine, pSrcLine, myBytesPerPixel);
         }
 
         // Pad the remaining columns with black pixels (to improve compression ratios)        
         if (myRemainingBytes > (myBytesPerPixel * 2)) {
             memset(pDstLine + mySrcBytesPerLine + myBytesPerPixel, 0, myRemainingBytes - (2 * myBytesPerPixel));
-        }        
+        } 
     }
     
     for (unsigned y = mySourceHeight; y < _myNewHeight; ++y) {        
@@ -87,5 +89,5 @@ PLFilterResizePadded::Apply(PLBmpBase * theSource, PLBmp * theDestination) const
             // Set the remaining lines to black (to improve compression ratios)
             memset(pDstLine, 0, myDestBytesPerLine);
         }
-    }    
+    } 
 }
