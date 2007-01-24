@@ -282,7 +282,7 @@ namespace y60 {
         //AC_DEBUG << "CgProgramInfo::setCGGLParameters";
         for (unsigned i=0; i<_myGlParams.size(); ++i) {
             CgProgramGlParam myParam = _myGlParams[i];
-            AC_TRACE << "setting CgGL parameter " << myParam._myParamName << " param=" << myParam._myParameter << " type=" << myParam._myStateMatrixType << " transform=" << myParam._myTransform;
+            // AC_TRACE << "setting CgGL parameter " << myParam._myParamName << " param=" << myParam._myParameter << " type=" << myParam._myStateMatrixType << " transform=" << myParam._myTransform;
             cgGLSetStateMatrixParameter(myParam._myParameter,
                                         myParam._myStateMatrixType,
                                         myParam._myTransform);
@@ -518,7 +518,7 @@ namespace y60 {
         {
             bool myParamValueFoundFlag = true;
 
-            CgProgramAutoParam curParam = myIter->second;
+            const CgProgramAutoParam & curParam = myIter->second;
             AC_TRACE << "setting parameter " << curParam._myName;
 
             switch (curParam._myID) {
