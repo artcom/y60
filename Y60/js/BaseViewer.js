@@ -390,7 +390,21 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     self.onResize = function() {
     }
 
+    self.drawCameraFrustums = function() {
+        var myCameras = _myRenderWindow.scene.cameras;
+        var myViewport = self.getActiveViewport();
+        var myAspect = myViewport.width / myViewport.height;
+        for (var i = 0; i < myCameras.length; ++i) {
+            if (myCameras[i].id != myViewport.camera) {
+                window.getRenderer().drawFrustum( myCameras[i], myAspect);
+            }
+        }
+    }
+
     self.onPostRender = function() {
+        if (_myDrawCameraFrustumFlag) {
+            self.drawCameraFrustums();
+        }
     }
 
     self.onFrame = function(theTime) {
@@ -527,8 +541,12 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _mySwitchNodes  = new Array();
     var _myMSwitchNodes = new Array();
     var _myTSwitchNodes = new Array();
+    var _myDrawCameraFrustumFlag = false;
 
     self.__defineGetter__('_myPicking', function() { return _myPicking; });
+
+    self.__defineGetter__('drawFrustums', function() { return _myDrawCameraFrustumFlag; });
+    self.__defineSetter__('drawFrustums', function(theFlag) { _myDrawCameraFrustumFlag = theFlag; });
 
     function getSingleViewport() {
         if (_myRenderWindow.canvas.childNodesLength("viewport") == 1) {
