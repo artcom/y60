@@ -910,6 +910,91 @@
             </vertexparameters>
          </fixedfunctionshader>
     </shader>
-    
+        <shader id="s137" name="snow" cost="100">
+        <supports>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="textures" values="[paint,paint,bump,bump]"/>
+            <feature class="texcoord" values="[uv_map]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="surfacecolor">[1.0,1.0,1.0,1]</vector4f>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+            </properties>
+            <vertexparameters>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+                <vector3f name="color"/>                
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
+    <shader id="s134" name="spotlight_no_texture" cost="10">
+       <supports>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="option" values="[spotlight]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+             </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
+    <shader id="s135" name="spotlight_one_texture" cost="10">
+       <supports>
+            <feature class="textures" values="[paint]"/>
+            <feature class="texcoord" values="[*]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="option" values="[spotlight]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+             </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
+    <shader id="s136" name="spotlight_two_textures" cost="10">
+       <supports>
+            <feature class="textures" values="[paint,paint]"/>
+            <feature class="texcoord" values="[*,*]"/>
+            <feature class="lighting" values="[lambert]"/>
+            <feature class="option" values="[spotlight]"/>
+        </supports>
+        <fixedfunctionshader>
+            <properties>
+                 <vector4f name="ambient">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="diffuse">[0.1,0.1,0.1,1]</vector4f>
+                 <vector4f name="emissive">[0.0,0.0,0.0,1]</vector4f>
+                 <vector4f name="specular">[0.0,0.0,0.0,1]</vector4f>
+                 <float name="shininess">1.0</float>
+                 <vectorofstring name="blendfunction">[src_alpha, one_minus_src_alpha]</vectorofstring>
+             </properties>
+            <vertexparameters>
+                <vector3f name="normal"/>
+                <vector3f name="position"/>
+                <vector2f name="texcoord0"/>
+                <vector2f name="texcoord1"/>
+            </vertexparameters>
+         </fixedfunctionshader>
+    </shader>
 </shaders>
 
