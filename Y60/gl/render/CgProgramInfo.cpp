@@ -282,7 +282,7 @@ namespace y60 {
         //AC_DEBUG << "CgProgramInfo::setCGGLParameters";
         for (unsigned i=0; i<_myGlParams.size(); ++i) {
             CgProgramGlParam myParam = _myGlParams[i];
-            AC_TRACE << "setting CgGL parameter " << myParam._myParamName << " type=" << myParam._myStateMatrixType << " transform=" << myParam._myTransform;
+            AC_TRACE << "setting CgGL parameter " << myParam._myParamName << " param=" << myParam._myParameter << " type=" << myParam._myStateMatrixType << " transform=" << myParam._myTransform;
             cgGLSetStateMatrixParameter(myParam._myParameter,
                                         myParam._myStateMatrixType,
                                         myParam._myTransform);
@@ -373,6 +373,14 @@ namespace y60 {
         }
         DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_spot_lights));
 
+        if (_myAutoParams.find(TEXTURE_MATRICES) != _myAutoParams.end()) {
+            unsigned myLastCount = _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES];
+            //            unsigned myLastCount = cgGetArraySize(_myAutoParams[myLightType]._myParameter,0);
+            if (myLastCount != theMaterial.getTextureCount()) {
+                myReload = true;
+            }
+        }
+
         if (myReload) {
             // AC_INFO << "reload required";
             DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_reloadIfRequired_reload));
@@ -427,6 +435,7 @@ namespace y60 {
             const Camera & theCamera)
     {
         DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_bindBodyParams));
+        assertCg(PLUS_FILE_LINE, _myContext);
         setCGGLParameters();
        //AC_DEBUG << "CgProgramInfo::setAutoParameters";
 
