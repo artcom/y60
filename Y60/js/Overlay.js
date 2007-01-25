@@ -44,6 +44,9 @@ function OverlayBase(Public, Protected, theScene, thePosition, theParent) {
     Public.rotation getter = function() { return _myNode.rotation; }
     Public.rotation setter = function(theArgument) { _myNode.rotation = theArgument; }
 
+    Public.pivot getter = function() { return _myNode.pivot; }
+    Public.pivot setter = function(theArgument) { _myNode.pivot = theArgument; }
+
     Public.srcorigin getter = function() { return _myNode.srcorigin; }
     Public.srcorigin setter = function(theArgument) { _myNode.srcorigin = theArgument; }
 

@@ -146,6 +146,9 @@ namespace y60 {
         // enable vertex arrays
         glEnableClientState(GL_VERTEX_ARRAY);
 
+#ifdef GL_MULTISAMPLE_ARB
+        glEnable(GL_MULTISAMPLE_ARB);
+#endif
     }
 
     IShaderLibraryPtr
@@ -1123,7 +1126,7 @@ MAKE_SCOPE_TIMER(switchMaterial);
             glEnable(GL_ALPHA_TEST);
         }
 
-        glColor4f(1,1,1,1);
+        //glColor4f(1,1,1,1);
         CHECK_OGL_ERROR;
     }
 
@@ -1669,24 +1672,19 @@ MAKE_SCOPE_TIMER(switchMaterial);
         // do the transformation
         glPushMatrix();
 
-        const asl::Vector2f myPosition = myOverlay.get<Position2DTag>();
+        const asl::Vector2f & myPosition = myOverlay.get<Position2DTag>();
         glTranslatef(myPosition[0], myPosition[1], 0);
 
         float myOverlayRotation2d = myOverlay.get<Rotation2DTag>();
         if (!asl::almostEqual(myOverlayRotation2d, 0.0) ) {
-#if 1
-            // overlays rotate around the upper-left corner
+            // rotate around pivot
+            const asl::Vector2f & myPivot = myOverlay.get<Pivot2DTag>();
+            glTranslatef(myPivot[0], myPivot[1], 0.0f);
             glRotatef(float(degFromRad(myOverlayRotation2d)), 0.0f,0.0f,1.0f);
-#else
-            // rotation around center
-            asl::Vector3f myPivotTranslation(myWidth * -0.5f, myHeight * -0.5f, 0.0);
-            glTranslatef(-myPivotTranslation[0], -myPivotTranslation[1], myPivotTranslation[2]);
-            glRotatef(float(degFromRad(myOverlayRotation2d)), 0.0f,0.0f,1.0f);
-            glTranslatef(myPivotTranslation[0], myPivotTranslation[1], myPivotTranslation[2]);
-#endif
+            glTranslatef(-myPivot[0], -myPivot[1], 0.0f);
         }
 
-        const asl::Vector2f myScale = myOverlay.get<Scale2DTag>();
+        const asl::Vector2f & myScale = myOverlay.get<Scale2DTag>();
         glScalef(myScale[0], myScale[1], 1.0f);
 
         float myWidth  = myOverlay.get<WidthTag>();

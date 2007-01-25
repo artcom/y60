@@ -139,7 +139,7 @@ SDLWindow::swapBuffers() {
     MAKE_SCOPE_TIMER(SDL_GL_SwapBuffers);
     AbstractRenderWindow::swapBuffers();
 #ifdef AC_USE_X11
-    if (_mySwapInterval) {
+    if (glXGetVideoSyncSGI && glXWaitVideoSyncSGI && _mySwapInterval) {
         unsigned counter;
         glXGetVideoSyncSGI(&counter);
         glXWaitVideoSyncSGI(_mySwapInterval, 0, &counter);
@@ -806,12 +806,17 @@ SDLWindow::setSwapInterval(unsigned theInterval)
             // check if it's working
             unsigned counter0 = 0;
             unsigned counter1 = 0;
+#if 0 
+            // this is broken on nvidia 8800 GTX with driver 1.0-9746
             glXWaitVideoSyncSGI(1, 0, &counter0);
             glXWaitVideoSyncSGI(1, 0, &counter1);
             glXWaitVideoSyncSGI(1, 0, &counter1);
+#endif
             if (counter1 <= counter0) {
-                AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working properly (counter1=" << counter1 << ", counter0=" << counter0 << "), disabling";
+                AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working properly (counter0=" << counter0 << ", counter1=" << counter1 << "), disabling";
                 theInterval = 0;
+                glXGetVideoSyncSGI = 0;
+                glXWaitVideoSyncSGI = 0;
             } else {
                 AC_INFO << "setSwapInterval(): glXGetVideoSyncSGI working properly";
             }
@@ -840,8 +845,6 @@ SDLWindow::getSwapInterval() {
 #else
     if (glXGetVideoSyncSGI) {
         return _mySwapInterval;
-    } else {
-        AC_WARNING << "getSwapInterval(): glXGetVideoSyncSGI not supported";
     }
 #endif
     return 0;

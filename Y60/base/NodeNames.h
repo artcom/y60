@@ -218,6 +218,7 @@ namespace y60 {
     static const char * OVERLAY_LEFTBORDER_ATTRIB   = "leftborder";
     static const char * OVERLAY_ROTATION2D_ATTRIB   = "rotation";
     static const char * OVERLAY_SCALE2D_ATTRIB      = "scale";
+    static const char * OVERLAY_PIVOT2D_ATTRIB      = "pivot";
 
     static const char * IMAGE_LIST_NAME                   = "images";
     static const char * IMAGE_NODE_NAME                   = "image";
