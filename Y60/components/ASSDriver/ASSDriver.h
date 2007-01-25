@@ -32,6 +32,17 @@ enum DriverStateEnum {
 
 DEFINE_ENUM( DriverState, DriverStateEnum );
 
+typedef dom::ValueWrapper<y60::RasterOfGRAY>::Type::ACCESS_TYPE Raster;
+typedef asl::Ptr<Raster, dom::ThreadingModel> RasterPtr;
+
+struct RasterHandle {
+    RasterHandle(dom::ValuePtr theValue) :
+        value( theValue ),
+        raster( dynamic_cast_Ptr<Raster>( theValue ) )
+    {}
+    dom::ValuePtr value;
+    RasterPtr raster;
+};
 
 class ASSDriver :
     public asl::PlugInBase,
@@ -73,8 +84,12 @@ class ASSDriver :
         void setState( DriverState theState );
         void synchronize();
         void allocateGridBuffers();
-        dom::ResizeableRasterPtr allocateRaster(const std::string & theName);
+        //dom::ResizeableRasterPtr allocateRaster(const std::string & theName);
+        RasterHandle allocateRaster(const std::string & theName);
         void readSensorValues();
+        void processSensorValues();
+        void createThresholdedRaster(RasterHandle & theInput, RasterHandle & theOutput,
+                                     const unsigned char theThreshold);
 
         std::vector<unsigned char> _myBuffer;
         asl::SerialDevice * _mySerialPort;
@@ -83,10 +98,14 @@ class ASSDriver :
         asl::Vector2i  _myGridSize;
         unsigned       _mySyncLostCounter;
 
-        dom::ResizeableRasterPtr _myRawRaster;
+        RasterHandle _myRawRaster;
+        RasterHandle _myBinaryRaster;
         y60::ScenePtr _myScene;
 
         asl::Time   _myLastFrameTime;
+        unsigned char _myThreshold;
+
+        std::vector<asl::Vector2f> _myPositions;
 };
 
 }

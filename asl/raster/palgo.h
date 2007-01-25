@@ -25,6 +25,8 @@
 #ifndef _ASL_RASTER_PALGO_H_INCLUDED_
 #define _ASL_RASTER_PALGO_H_INCLUDED_
 
+#include <asl/Vector234.h>
+
 #include <stddef.h>
 #include <algorithm>
 #include <functional>
@@ -616,6 +618,80 @@ double color_abs (const pixelType& color )
 
     return (sqrt (sum ) );
 }
+
+template <class RESULT, class RASTER>
+RESULT moment(int p, int q, const RASTER & image, RESULT init) {
+    int x, y;
+    RESULT result = init;
+    for (int y = 0; y < image.vsize(); y++) {
+        int yp = ipow(y,q);
+        for (int x = 0; x < image.hsize(); x++) {
+            int xp = ipow(x,p);
+            result += (RESULT)xp * (RESULT)yp * (RESULT) image(x,y).get();
+            //           cerr << DBG(x) << DBG(y) << DBG(xp) << DBG(yp) << DBG(image(x,y)) << DBG(result) << endl;
+        }
+
+    }     
+    return result;
+}
+
+struct MomentResults {
+    float l;
+    float w;
+    Vector2<float> center;
+    float major_angle;
+    Vector2<float> major_dir;
+    float minor_angle;
+    Vector2<float> minor_dir;
+};
+
+
+template <class RASTER>
+bool analyseMoments(const RASTER & mat, MomentResults & mom)
+{
+    //ptime mom_begin;
+    float m00 = moment(0,0,mat,float(0));
+    float m10 = moment(1,0,mat,float(0));
+    float m01 = moment(0,1,mat,float(0));
+    float m11 = moment(1,1,mat,float(0));
+    float m20 = moment(2,0,mat,float(0));
+    float m02 = moment(0,2,mat,float(0));
+    //ptime momentset_time = ptime()-mom_begin;
+
+    //cerr << DBG(m00) << DBG(m10) <<DBG(m01) <<DBG(m11) <<DBG(m20) <<DBG(m02) <<endl;
+
+    float xc = (m10/m00);
+    float yc = (m01/m00);
+
+    float cm11 = m11/m00 - xc * yc;
+    float cm20 = m20/m00 - xc * xc;
+    float cm02 = m02/m00 - yc * yc;
+
+    float major_axis_angle = 0.5 * atan( 2 * cm11 / ( cm20 - cm02));
+
+    //cerr << DBG(xc) << DBG(yc) <<DBG(cm11) <<DBG(cm20) <<DBG(cm02) <<
+    //        DBG(major_axis_angle) << endl;
+
+    float a = cm20;
+    float b = 2 * cm11;
+    float c = cm02;
+
+    mom.l = sqrt( ((a+c) + sqrt(b*b + (a-c)*(a-c)))/2);
+    mom.w = sqrt( ((a+c) - sqrt(b*b + (a-c)*(a-c)))/2);
+
+    mom.center = Vector2<float>(xc,yc);
+    mom.major_angle = major_axis_angle;
+    // TODO mom.major_dir = direction_vector(major_axis_angle);
+    // TODO mom.minor_dir = mom.major_dir.ortho();
+    // TODO mom.minor_angle = angle_of(mom.minor_dir);
+    
+    //cerr << DBG(a) << DBG(b) <<DBG(c) <<DBG(mom.l) <<DBG(mom.w) <<
+     //       DBG(gcenter) << DBG(mom.major_dir) << DBG(mom.minor_dir) <<endl;
+
+    return true;
+}
+
+
 
 } // namespace asl
 

@@ -264,8 +264,10 @@ jsval as_jsval(JSContext *cx, double theValue);
 jsval as_jsval(JSContext *cx, float theValue); 
 jsval as_jsval(JSContext *cx, long theValue);
 jsval as_jsval(JSContext *cx, unsigned long theValue); 
-jsval as_jsval(JSContext *cx, unsigned int theValue); 
 jsval as_jsval(JSContext *cx, int theValue); 
+jsval as_jsval(JSContext *cx, unsigned int theValue); 
+jsval as_jsval(JSContext *cx, char theValue); 
+jsval as_jsval(JSContext *cx, unsigned char theValue); 
 jsval as_jsval(JSContext *cx, const char * theU8String);
 jsval as_jsval(JSContext *cx, const std::string & theValue); 
 jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String);
@@ -295,12 +297,13 @@ bool convertFrom(JSContext *cx, jsval theValue, short & theDest);
 bool convertFrom(JSContext *cx, jsval theValue, unsigned short & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, int & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, unsigned int & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, unsigned long & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, long & theDest);
+bool convertFrom(JSContext *cx, jsval theValue, unsigned long & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, char & theDest); 
+bool convertFrom(JSContext *cx, jsval theValue, unsigned char & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, bool & theDest);
 bool convertFrom(JSContext *cx, jsval theValue, std::string & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, JSObject * & theDest); 
-bool convertFrom(JSContext *cx, jsval theValue, unsigned char & theDest); 
 bool convertFrom(JSContext *cx, jsval theValue, asl::Time & theDest); 
 
 template <class T>

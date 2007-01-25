@@ -9,6 +9,7 @@
 //============================================================================
 
 #include "ASSDriver.h"
+#include "ConnectedComponent.h"
 
 #include <asl/Logger.h>
 #include <asl/SerialDeviceFactory.h>
@@ -28,6 +29,7 @@ const unsigned char myMagicToken( 200 ); // all values above 200 are currently r
                                          // (255) in a future version
 
 static const char * RAW_RASTER = "ASSRawRaster";
+static const char * BINARY_RASTER = "ASSBinaryRaster";
 
 static const char * DriverStateStrings[] = {
     "synchronizing",
@@ -43,8 +45,10 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     IRendererExtension("ASSDriver"),
     _myGridSize(0,0),
     _mySyncLostCounter(0),
-    _myRawRaster(0),
-    _myScene(0)
+    _myRawRaster(dom::ValuePtr(0)),
+    _myBinaryRaster(dom::ValuePtr(0)),
+    _myScene(0),
+    _myThreshold( 100 )
 {
     _mySerialPort = getSerialDevice(0);
     _mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
@@ -122,25 +126,29 @@ ASSDriver::synchronize() {
 void
 ASSDriver::allocateGridBuffers() {
     _myRawRaster = allocateRaster(RAW_RASTER);
+    _myBinaryRaster = allocateRaster(BINARY_RASTER);
 }
 
-dom::ResizeableRasterPtr
+RasterHandle
 ASSDriver::allocateRaster(const std::string & theName) {
     if (_myScene) {
-        dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(RAW_RASTER);
+        dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(theName);
         if (myImage) {
-            return myImage->getFacade<y60::Image>()->createRaster( 
+            myImage->getFacade<y60::Image>()->createRaster( 
                     _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+            return RasterHandle( myImage->childNode(0)->childNode(0)->nodeValueWrapperPtr());
         } else {
             ImageBuilder myImageBuilder(theName, false);
             _myScene->getSceneBuilder()->appendImage(myImageBuilder);
             y60::ImagePtr myImage = myImageBuilder.getNode()->getFacade<y60::Image>();
             myImage->set<y60::IdTag>( theName );
-            return myImage->createRaster( _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+            myImage->createRaster( _myGridSize[0], _myGridSize[1], 1, y60::GRAY);
+            return RasterHandle( myImage->getNode().childNode(0)->childNode(0)->nodeValueWrapperPtr());
         }
     } else {
-        return dynamic_cast_Ptr<dom::ResizeableRaster>(
-                createRasterValue(y60::GRAY, _myGridSize[0], _myGridSize[1]));
+        RasterHandle myHandle(createRasterValue(y60::GRAY, _myGridSize[0], _myGridSize[1]));
+        return myHandle;
+                
     }
 }
 
@@ -159,7 +167,7 @@ ASSDriver::readSensorValues() {
         int myRowIdx = _myBuffer[0] - myMagicToken - 1;
         //AC_PRINT << "Got row: " << myRowIdx;
 
-        unsigned char * myRowPtr = _myRawRaster->pixels().begin() +
+        unsigned char * myRowPtr = _myRawRaster.raster->pixels().begin() +
                     myRowIdx * _myGridSize[0];
         std::copy(_myBuffer.begin() + 1, _myBuffer.begin() + 1 + _myGridSize[0], myRowPtr);
 
@@ -169,14 +177,88 @@ ASSDriver::readSensorValues() {
             double myDeltaT = myTime - _myLastFrameTime;
             //AC_PRINT << "Got Frame (dt = " << myDeltaT << ")";
             _myLastFrameTime = myTime;
+
+            processSensorValues();
         }
         myNewDataFlag = true;
     }
+
+//    *(_myRawRaster.raster->pixels().begin() + (_myGridSize[1] / 2) * _myGridSize[0] + _myGridSize[0] / 2) = 249;
     if (myNewDataFlag && _myScene) {
         _myScene->getSceneDom()->getElementById(RAW_RASTER)->getFacade<y60::Image>()->triggerUpload();
         
     }
     //AC_PRINT << "post buf size: " << _myBuffer.size();
+}
+
+template <class PixelT>
+struct threshold {
+    threshold(const PixelT & theThreshold) : _myThreshold( theThreshold ) {}
+    PixelT operator () (const PixelT & a) {
+        if (a.get() < _myThreshold.get()) {
+            return PixelT(0);
+        } else {
+            return a;
+        }
+    }
+
+    PixelT _myThreshold;
+};
+
+template <class RASTER>
+struct AnalyseMoment {
+    void operator() (const RASTER & theRaster) {
+        analyseMoments( theRaster, result );
+    }
+    MomentResults result;
+};
+
+void
+ASSDriver::createThresholdedRaster(RasterHandle & theInput,
+                                   RasterHandle & theOutput,
+                                   const unsigned char theThreshold)
+{
+    const y60::RasterOfGRAY * myInput = dom::dynamic_cast_Value<y60::RasterOfGRAY>( & * (theInput.value) );
+    y60::RasterOfGRAY * myOutput = dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (theOutput.value) );
+    std::transform( myInput->begin(), myInput->end(),
+            myOutput->begin(),
+            threshold<asl::gray<unsigned char> >( theThreshold ));
+    dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (theOutput.value) );
+}
+void
+ASSDriver::processSensorValues() {
+    createThresholdedRaster( _myRawRaster, _myBinaryRaster, _myThreshold );
+
+    // TODO: find ROIs by applying Connected Components to the thresholded data
+
+
+    BlobListPtr myROIs = connectedComponents( _myBinaryRaster.raster, 0);
+
+
+    _myPositions.clear();
+
+    typedef asl::subraster<gray<unsigned char> > SubRaster;
+    for (BlobList::iterator it = myROIs->begin(); it != myROIs->end(); ++it) {
+        Box2i myBox = (*it)->bbox();
+        Vector2i myMin = myBox[Box2i::MIN];
+        myMin -= Vector2i(1, 1);
+        Vector2i myMax = myBox[Box2i::MAX];
+        myMax += Vector2i(1, 1);
+        AnalyseMoment<SubRaster> myMomentAnalysis;
+        _myRawRaster.raster->apply( myBox[Box2i::MIN][0] - 1, myBox[Box2i::MIN][1] - 1,
+                                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+
+        Vector2f myFMin = Vector2f( myMin[0], myMin[1]) + myMomentAnalysis.result.center;
+        //AC_PRINT << "center: " << myFMin;
+        _myPositions.push_back( myFMin );
+    }
+    // apply moment
+    /*
+    AnalyseMoment<y60::RasterOfGRAY> myMomentAnalysis;
+    _myBinaryRaster.raster->apply( myMomentAnalysis );
+    AC_PRINT << "center: " << myMomentAnalysis.result.center;
+    */
+
 }
 
 void
@@ -205,6 +287,18 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myGridSize );
         return;
     }
+    if (thePropertyName == "maxOccuringValue") {
+        theReturnValue.set( myMagicToken );
+        return;
+    }
+    if (thePropertyName == "threshold") {
+        theReturnValue.set( _myThreshold );
+        return;
+    }
+    if (thePropertyName == "positions") {
+        theReturnValue.set( _myPositions );
+        return;
+    }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -214,6 +308,18 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
 {
     if (thePropertyName == "gridSize") {
         AC_ERROR << "gridSize property is read only";
+        return;
+    }
+    if (thePropertyName == "maxOccuringValue") {
+        AC_ERROR << "maxOccuringValue property is read only";
+        return;
+    }
+    if (thePropertyName == "threshold") {
+        _myThreshold = thePropertyValue.get<unsigned char>();
+        return;
+    }
+    if (thePropertyName == "positions") {
+        AC_ERROR << "positions property is read only";
         return;
     }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";

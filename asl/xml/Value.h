@@ -32,6 +32,7 @@
 #include <asl/MemoryPool.h>
 #include <asl/raster.h>
 #include <asl/subraster.h>
+#include <asl/palgo.h>
 #include <asl/standard_pixel_types.h>
 #include <asl/Vector234.h>
 
@@ -974,6 +975,32 @@ namespace dom {
         virtual void sub(const ValueBase & theRasterArg) {
             transform(theRasterArg, std::minus<typename T::value_type>());
         }
+
+
+
+        template <class FUNC>
+        void apply(asl::AC_SIZE_TYPE xmin, asl::AC_SIZE_TYPE ymin,
+                   asl::AC_SIZE_TYPE xmax, asl::AC_SIZE_TYPE ymax,
+                   FUNC & theFunction)
+        {
+            T & myNativeRaster = _myRasterValue.openWriteableValue();
+            asl::AC_OFFSET_TYPE cxmax = asl::minimum(asl::AC_SIZE_TYPE(myNativeRaster.hsize()), xmax);
+            asl::AC_OFFSET_TYPE cymax = asl::minimum(asl::AC_SIZE_TYPE(myNativeRaster.vsize()), ymax);
+            asl::AC_OFFSET_TYPE cxmin = asl::minimum(xmin, xmax);
+            asl::AC_OFFSET_TYPE cymin = asl::minimum(ymin, ymax);
+            asl::subraster<PIXEL> myRegion(myNativeRaster, cxmin, cymin, cxmax-cxmin, cymax-cymin);
+            //std::fill(myRegion.begin(), myRegion.end(), myPixel);
+            theFunction( myRegion );
+            _myRasterValue.closeWriteableValue();
+        }
+        template <class FUNC>
+        void apply( FUNC & theFunction) {
+            T & myNativeRaster = _myRasterValue.openWriteableValue();
+            theFunction(myNativeRaster);
+            _myRasterValue.closeWriteableValue();
+        }
+
+
 /*
         ValuePtr getElement(asl::AC_SIZE_TYPE theIndex) const {
             if (theIndex < length()) {

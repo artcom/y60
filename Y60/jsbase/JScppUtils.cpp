@@ -120,6 +120,14 @@ jsval as_jsval(JSContext *cx, unsigned int theValue) {
     return as_jsval(cx, double(theValue));
 }
 
+jsval as_jsval(JSContext *cx, char theValue) {
+    return as_jsval(cx, double(theValue));
+}
+
+jsval as_jsval(JSContext *cx, unsigned char theValue) {
+    return as_jsval(cx, double(theValue));
+}
+
 jsval as_jsval(JSContext *cx, int theValue) {
     return INT_TO_JSVAL(theValue);
 }
@@ -744,6 +752,41 @@ bool convertFrom(JSContext *cx, jsval theValue, unsigned short & theDest) {
     return false;
 }
 
+bool convertFrom(JSContext *cx, jsval theValue, char & theDest) {
+    jsdouble myDoubleDest = -1;
+    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
+        !JSDOUBLE_IS_NaN(myDoubleDest) )
+    {
+        if ((myDoubleDest < std::numeric_limits<char>::min()) ||
+            (myDoubleDest > std::numeric_limits<char>::max()))
+        {
+            JS_ReportError(cx, "#WARNING convertFrom: -> unsigned short: value out of range: %g", myDoubleDest);
+        }
+        theDest = (char)(myDoubleDest);
+        return true;
+    }
+    return false;
+}
+
+bool convertFrom(JSContext *cx, jsval theValue, unsigned char & theDest) {
+    jsdouble myDoubleDest = -1;
+    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) && !JSDOUBLE_IS_NaN(myDoubleDest) )
+    {
+        if ((myDoubleDest < asl::NumericTraits<unsigned char>::min()) ||
+            (myDoubleDest > asl::NumericTraits<unsigned char>::max()))
+        {
+            AC_ERROR << "min="<< asl::NumericTraits<unsigned char>::min();
+            AC_ERROR << "max="<< asl::NumericTraits<unsigned char>::max();
+
+            JS_ReportError(cx, "#WARNING convertFrom: -> unsigned char: value out of range: %g", myDoubleDest);
+        }
+        theDest = (unsigned char)(myDoubleDest);
+        return true;
+    }
+    return false;
+}
+
+
 bool convertFrom(JSContext *cx, jsval theValue, int & theDest) {
     jsdouble myDoubleDest = -1;
     if (JS_ValueToNumber(cx, theValue, &myDoubleDest) &&
@@ -835,24 +878,6 @@ bool convertFrom(JSContext *cx, jsval theValue, JSObject * & theDest) {
             theDest = myArgument;
             return true;
         }
-    }
-    return false;
-}
-
-bool convertFrom(JSContext *cx, jsval theValue, unsigned char & theDest) {
-    jsdouble myDoubleDest = -1;
-    if (JS_ValueToNumber(cx, theValue, &myDoubleDest) && !JSDOUBLE_IS_NaN(myDoubleDest) )
-    {
-        if ((myDoubleDest < asl::NumericTraits<unsigned char>::min()) ||
-            (myDoubleDest > asl::NumericTraits<unsigned char>::max()))
-        {
-            AC_ERROR << "min="<< asl::NumericTraits<unsigned char>::min();
-            AC_ERROR << "max="<< asl::NumericTraits<unsigned char>::max();
-
-            JS_ReportError(cx, "#WARNING convertFrom: -> unsigned char: value out of range: %g", myDoubleDest);
-        }
-        theDest = (unsigned char)(myDoubleDest);
-        return true;
     }
     return false;
 }
