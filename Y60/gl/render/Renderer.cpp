@@ -372,7 +372,12 @@ MAKE_SCOPE_TIMER(switchMaterial);
         DBP2(STOP_TIMER(renderBodyPart_switchMaterial));
 
         DBP2(START_TIMER(renderBodyPart_materialChanged));
-
+        for (unsigned myTexUnit = 0; myTexUnit < myMaterial.getTextureCount(); ++myTexUnit) {
+            glActiveTexture(asGLTextureRegister(myTexUnit));                
+            glMatrixMode( GL_TEXTURE );
+            glPushMatrix();
+        }
+        glMatrixMode( GL_MODELVIEW );
         if (myBodyHasChanged || myMaterialHasChanged) {
             DBP2(MAKE_SCOPE_TIMER(renderBodyPart20));
             //DBP2(START_TIMER(renderBodyPart_getShader));
@@ -443,7 +448,12 @@ MAKE_SCOPE_TIMER(switchMaterial);
             CHECK_OGL_ERROR;
         }
         DBP2(STOP_TIMER(renderBodyPart_setupBoundingVolume));
-
+        for (unsigned myTexUnit = 0; myTexUnit < myMaterial.getTextureCount(); ++myTexUnit) {
+            glActiveTexture(asGLTextureRegister(myTexUnit));
+            glMatrixMode( GL_TEXTURE );
+            glPopMatrix();
+        }
+        glMatrixMode( GL_MODELVIEW );
         CHECK_OGL_ERROR;
     }
 
