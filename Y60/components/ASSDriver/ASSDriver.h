@@ -103,7 +103,8 @@ class ASSDriver :
         y60::ScenePtr _myScene;
 
         asl::Time   _myLastFrameTime;
-        unsigned char _myThreshold;
+        unsigned char _myComponentThreshold;
+        unsigned char _myNoiseThreshold;
 
         std::vector<asl::Vector2f> _myPositions;
 };

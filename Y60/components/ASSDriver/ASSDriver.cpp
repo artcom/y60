@@ -48,7 +48,8 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     _myRawRaster(dom::ValuePtr(0)),
     _myBinaryRaster(dom::ValuePtr(0)),
     _myScene(0),
-    _myThreshold( 100 )
+    _myNoiseThreshold( 15 ),
+    _myComponentThreshold( 30 )
 {
     _mySerialPort = getSerialDevice(0);
     _mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
@@ -227,13 +228,9 @@ ASSDriver::createThresholdedRaster(RasterHandle & theInput,
 }
 void
 ASSDriver::processSensorValues() {
-    createThresholdedRaster( _myRawRaster, _myBinaryRaster, _myThreshold );
+    createThresholdedRaster( _myRawRaster, _myBinaryRaster, _myNoiseThreshold );
 
-    // TODO: find ROIs by applying Connected Components to the thresholded data
-
-
-    BlobListPtr myROIs = connectedComponents( _myBinaryRaster.raster, 0);
-
+    BlobListPtr myROIs = connectedComponents( _myBinaryRaster.raster, _myComponentThreshold);
 
     _myPositions.clear();
 
@@ -241,24 +238,17 @@ ASSDriver::processSensorValues() {
     for (BlobList::iterator it = myROIs->begin(); it != myROIs->end(); ++it) {
         Box2i myBox = (*it)->bbox();
         Vector2i myMin = myBox[Box2i::MIN];
-        myMin -= Vector2i(1, 1);
+        // myMin -= Vector2i(1, 1);
         Vector2i myMax = myBox[Box2i::MAX];
         myMax += Vector2i(1, 1);
         AnalyseMoment<SubRaster> myMomentAnalysis;
-        _myRawRaster.raster->apply( myBox[Box2i::MIN][0] - 1, myBox[Box2i::MIN][1] - 1,
+        _myBinaryRaster.raster->apply( myBox[Box2i::MIN][0] /*- 1*/, myBox[Box2i::MIN][1] /*- 1*/,
                                     myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
 
-        Vector2f myFMin = Vector2f( myMin[0], myMin[1]) + myMomentAnalysis.result.center;
-        //AC_PRINT << "center: " << myFMin;
-        _myPositions.push_back( myFMin );
+        Vector2f myPosition = Vector2f( myMin[0], myMin[1]) + myMomentAnalysis.result.center;
+        //AC_PRINT << "center: " << myPosition;
+        _myPositions.push_back( myPosition );
     }
-    // apply moment
-    /*
-    AnalyseMoment<y60::RasterOfGRAY> myMomentAnalysis;
-    _myBinaryRaster.raster->apply( myMomentAnalysis );
-    AC_PRINT << "center: " << myMomentAnalysis.result.center;
-    */
-
 }
 
 void
@@ -291,8 +281,12 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( myMagicToken );
         return;
     }
-    if (thePropertyName == "threshold") {
-        theReturnValue.set( _myThreshold );
+    if (thePropertyName == "componentThreshold") {
+        theReturnValue.set( _myComponentThreshold );
+        return;
+    }
+    if (thePropertyName == "noiseThreshold") {
+        theReturnValue.set( _myNoiseThreshold );
         return;
     }
     if (thePropertyName == "positions") {
@@ -314,8 +308,12 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         AC_ERROR << "maxOccuringValue property is read only";
         return;
     }
-    if (thePropertyName == "threshold") {
-        _myThreshold = thePropertyValue.get<unsigned char>();
+    if (thePropertyName == "componentThreshold") {
+        _myComponentThreshold = thePropertyValue.get<unsigned char>();
+        return;
+    }
+    if (thePropertyName == "noiseThreshold") {
+        _myNoiseThreshold = thePropertyValue.get<unsigned char>();
         return;
     }
     if (thePropertyName == "positions") {

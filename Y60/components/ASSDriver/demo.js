@@ -56,7 +56,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         window.addExtension(_myDriver);
         //self.registerSettingsListener( _myDriver, "ASSDriver" );
 
-        _myDriver.threshold = 80;
+        _myDriver.noiseThreshold = 12;
+        _myDriver.componentThreshold = 40;
 
         print("setup done");
     }
@@ -173,6 +174,16 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
          }
          if (!theKeyState) {
             return;
+        }
+        switch (theKey) {
+            case '+':
+                _myDriver.componentThreshold = _myDriver.componentThreshold + 5;
+                print("threshold: " + _myDriver.componentThreshold);
+                break;
+            case '-':
+                _myDriver.componentThreshold = _myDriver.componentThreshold - 5;
+                print("threshold: " + _myDriver.componentThreshold);
+                break;
         }
     }
 
