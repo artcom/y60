@@ -550,7 +550,7 @@ SceneViewer.prototype.Constructor = function(self, theArguments) {
 
     function showStatistics() {
         var myText = [];
-        myText.push(window.fps.toFixed(1));
+        myText.push(window.fps.toFixed(1) + " swap=" + window.swapInterval);
 
         if (_myOnScreenStatistics > 1) {
             var myStatistics = window.scene.statistics;
