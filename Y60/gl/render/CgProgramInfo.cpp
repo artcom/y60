@@ -434,7 +434,7 @@ namespace y60 {
             const Body & theBody,
             const Camera & theCamera)
     {
-        DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_bindBodyParams));
+        MAKE_SCOPE_TIMER(CgProgramInfo_bindBodyParams);
         assertCg(PLUS_FILE_LINE, _myContext);
         setCGGLParameters();
        //AC_DEBUG << "CgProgramInfo::setAutoParameters";
