@@ -217,7 +217,6 @@ namespace y60 {
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
             glBlendEquation(myEquation);
         }
-
     }
 
     void
@@ -243,8 +242,6 @@ namespace y60 {
             glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,
                                   myPointAttenuationProp->nodeValueAs<asl::Vector3f>().begin());
         }
-
-
     }
 
     void
@@ -279,11 +276,13 @@ namespace y60 {
             AC_DEBUG << "GLShader::enableTextures material=" << theMaterial.get<NameTag>() << " unit=" << hex << myTexUnit << dec << " texid=" << myTexture.getId();
             TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
 
-            // [VS;DS] please explain this
+            // [VS;DS;UH] someone please explain this
             if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
                 glBindTexture(myTextureType, myTexture.getId());
                 glEnable(myTextureType);
+
                 // trigger wrapmode and min/mag filter update
+                // by calling GLResourceManager::updateTextureParams
                 myTexture.getImage()->get<TextureParamChangedTag>();
             }
 
@@ -298,7 +297,7 @@ namespace y60 {
 #if 1
             // UH: there's no test for this (e.g. material with three point sprite textures)
             // but IMHO the other code is wrong. For the given case it would enable
-            // PS for the 1st, disable it for the 2nd, then re-enable it for the 3rd.
+            // PS for the 1st, and disable it for the rest
             if (myTexture.get<TextureSpriteTag>()) {
                 if (!alreadyHasSpriteTexture) {
                     glEnable(GL_POINT_SPRITE_ARB);
@@ -345,18 +344,38 @@ namespace y60 {
 
     void
     GLShader::disableTextures(const y60::MaterialBase & theMaterial) {
-        // nothing to do
+
         unsigned myTextureCount = theMaterial.getTextureCount();
         // AC_TRACE << "current texcount:" << myMaterial->getTextureCount() << ", prev:" << myPreviousTextureCount << endl;
-        for (unsigned myTextureCounter = 0; myTextureCounter < myTextureCount; ++myTextureCounter) {
-            const y60::Texture & myTexture = theMaterial.getTexture(myTextureCounter);
-            TextureUsage myTextureUsage = theMaterial.getTextureUsage(myTextureCounter);
+        for (unsigned i = 0; i < myTextureCount; ++i) {
+            const y60::Texture & myTexture = theMaterial.getTexture(i);
+            TextureUsage myTextureUsage = theMaterial.getTextureUsage(i);
 
             // Fixed Function Shaders only support paint & skybox usage
             if (myTextureUsage == PAINT || myTextureUsage == SKYBOX) {
-                glActiveTexture(asGLTextureRegister(myTextureCounter));
-                glClientActiveTexture(asGLTextureRegister(myTextureCounter));
+                glActiveTexture(asGLTextureRegister(i));
+                glClientActiveTexture(asGLTextureRegister(i));
 
+#if 1
+                GLenum myTextureType;
+                switch (myTexture.getImage()->getType()) {
+                    case SINGLE :
+                        if (myTexture.getImage()->get<ImageDepthTag>()==1) {
+                            myTextureType = GL_TEXTURE_2D;
+                        } else {
+                            myTextureType = GL_TEXTURE_3D;
+                        }
+                        break;
+                    case CUBEMAP :
+                        myTextureType = GL_TEXTURE_CUBE_MAP_ARB;
+                        break;
+                    default :
+                        throw ShaderException(std::string("Unknown texture type '")+
+                                myTexture.getImage()->get<NameTag>() + "'", PLUS_FILE_LINE);
+                }
+                glBindTexture(myTextureType, 0);
+                glDisable(myTextureType);
+#else
                 switch (myTexture.getImage()->getType()) {
                     case SINGLE :
                         break;
@@ -374,6 +393,7 @@ namespace y60 {
                     glBindTexture(GL_TEXTURE_3D, 0);
                     glDisable(GL_TEXTURE_3D);
                 }
+#endif
             }
         }
         glDisable(GL_POINT_SPRITE_ARB);

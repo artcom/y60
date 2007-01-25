@@ -440,6 +440,7 @@ namespace y60 {
                     myPixelEncoding.pixeltype, myImageData);
         }
     }
+
     void 
     GLResourceManager::updateTextureParams(ImagePtr theImage) {
         GLenum myTextureType = getTextureType(theImage);
@@ -449,7 +450,6 @@ namespace y60 {
     void 
     GLResourceManager::setupTextureParams(ImagePtr theImage, GLenum theTextureType) {
         bool hasMipMaps = theImage->get<ImageMipmapTag>();
-
 
         glTexParameteri(theTextureType, GL_TEXTURE_WRAP_S,
                 asGLTextureWrapmode(theImage->getWrapMode()));
@@ -471,26 +471,35 @@ namespace y60 {
                 asGLTextureSampleFilter(theImage->getMinFilter(), hasMipMaps));
         CHECK_OGL_ERROR;
 
+#ifdef _EXPERIMENTAL_GL_TEXTURE_MAX_ANISOTROPY_EXT
+        if (hasMipMaps) {
+            const char* maxAnisotropyEnv = getenv("Y60_MAX_ANISOTROPY");
+            if (maxAnisotropyEnv) {
+                float maxAnisotropy = atof(maxAnisotropyEnv);
+                AC_DEBUG << "setting max_anisotropy=" << maxAnisotropy;
+                glTexParameterf(theTextureType, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+                CHECK_OGL_ERROR;
+            }
+        }
+#endif
     }
+
     /*
      * Cubemap texture
      */
     unsigned
     GLResourceManager::setupCubemap(ImagePtr theImage, unsigned theTextureId)
     {
-        unsigned int myId = theTextureId;//theImage->getGraphicsId();
+        unsigned int myId = theTextureId;
         glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, myId);
         CHECK_OGL_ERROR;
-        glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
-                         GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
-                        GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+        glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         CHECK_OGL_ERROR;
 
-        glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
-                        GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB,
-                        GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         CHECK_OGL_ERROR;
 
         GLsizei myWidth  = theImage->get<ImageWidthTag>();

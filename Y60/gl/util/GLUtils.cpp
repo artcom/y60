@@ -819,6 +819,9 @@ void * aglGetProcAddress (char * pszProc)
         if (queryOGLExtension("GL_EXT_blend_color")) {
             SET_PROC_ADDRESS( PFNGLBLENDCOLORPROC, glBlendColor );
         }
+        if (queryOGLExtension("GL_EXT_texture_filter_anisotropic")) {
+            AC_INFO << "Anisotropic filter support";
+        }
 
 #ifdef WIN32
         if (queryWGLExtension("WGL_EXT_swap_control")) {

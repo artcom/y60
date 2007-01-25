@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 1993-2005, ART+COM AG Berlin
+// Copyright (C) 1993-2007, ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -47,7 +47,7 @@ namespace y60 {
         SPOT_LIGHTS_ATTENUATION,
         MAX_AUTO_PARAMETER
     };
-    static const char * CGAutoParamterString[] = {
+    static const char * CgAutoParameterString[] = {
         "AC_OBJECTWORLD",
         "AC_OBJECTWORLD_I",
         "AC_OBJECTWORLD_T",

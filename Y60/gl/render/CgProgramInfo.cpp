@@ -218,7 +218,7 @@ namespace y60 {
                 }
 
                 CgAutoParameterID myParamID = static_cast<CgAutoParameterID>(
-                        asl::getEnumFromString(myParamName, CGAutoParamterString));
+                        asl::getEnumFromString(myParamName, CgAutoParameterString));
 
                 if (myParamID >= MAX_AUTO_PARAMETER) {
                     throw RendererException ("Error in " + _myPathName +
@@ -602,9 +602,9 @@ namespace y60 {
                     {
                         int mySize = cgGetArraySize(curParam._myParameter, 0);
                         for (unsigned i = 0; i < mySize; ++i) {
-                            CGparameter myElement = cgGetArrayParameter(curParam._myParameter, i);
+                            CGparameter myParam = cgGetArrayParameter(curParam._myParameter, i);
                             Matrix4f myTextureMatrix = theMaterial.getTexture(i).get<TextureMatrixTag>();
-                            cgGLSetMatrixParameterfc(myElement, myTextureMatrix.getData());
+                            cgGLSetMatrixParameterfc(myParam, myTextureMatrix.getData());
                         }
                         break;
                     }

@@ -94,7 +94,7 @@ namespace y60 {
     public:
         DEFINE_NESTED_EXCEPTION(GLResourceManager, TextureException, asl::Exception);
 
-        GLResourceManager() : _myShaderLibrary(ShaderLibraryPtr(0)) {
+        GLResourceManager() : _myTextureMemUsage(0), _myShaderLibrary(ShaderLibraryPtr(0)) {
             validateGLContext(true);
         }
 
