@@ -183,7 +183,7 @@ ASSDriver::readSensorValues() {
         myNewDataFlag = true;
     }
 
-//    *(_myRawRaster.raster->pixels().begin() + (_myGridSize[1] / 2) * _myGridSize[0] + _myGridSize[0] / 2) = 249;
+    //*(_myRawRaster.raster->pixels().begin() + (_myGridSize[1] / 2) * _myGridSize[0] + _myGridSize[0] / 2) = 249;
     if (myNewDataFlag && _myScene) {
         _myScene->getSceneDom()->getElementById(RAW_RASTER)->getFacade<y60::Image>()->triggerUpload();
         
