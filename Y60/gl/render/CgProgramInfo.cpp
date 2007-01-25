@@ -473,9 +473,9 @@ namespace y60 {
                     break;
                 case DIRECTIONAL :
                     {
-                        const Vector4f & myTranslation = myLight->get<GlobalMatrixTag>().getRow(2);
-                        myDirectionalLights.push_back(Vector3f(myTranslation[0],
-                                    myTranslation[1],myTranslation[2]));
+                        const Vector4f & myDirection = myLight->get<GlobalMatrixTag>().getRow(2);
+                        myDirectionalLights.push_back(Vector3f(myDirection[0],
+                                    myDirection[1],myDirection[2]));
                         myDirectionalLightDiffuseColors.push_back(myLightPropFacade->get<LightDiffuseTag>());
                         myDirectionalLightSpecularColors.push_back(myLightPropFacade->get<LightSpecularTag>());
                         break;
@@ -485,25 +485,16 @@ namespace y60 {
                     break;
                 case SPOT:
                     {
-                        Matrix4f myGlobalMatrix = myLight->get<GlobalMatrixTag>();
-
+                        const Matrix4f & myGlobalMatrix = myLight->get<GlobalMatrixTag>();
+                        Vector4f myDirection = myGlobalMatrix.getRow(2);
+                        myDirection.mult(-1.0);                        
+                        mySpotLightDirection.push_back(normalized(Vector3f(myDirection[0],myDirection[1],myDirection[2])));
                         mySpotLights.push_back(myGlobalMatrix.getTranslation());
                         mySpotLightDiffuseColors.push_back(myLightPropFacade->get<LightDiffuseTag>());
                         mySpotLightSpecularColors.push_back(myLightPropFacade->get<LightSpecularTag>());
                         mySpotLightCutoff.push_back(myLightPropFacade->get<CutOffTag>());
                         mySpotLightExponent.push_back(myLightPropFacade->get<ExponentTag>());
                         mySpotLightAttenuation.push_back(myLightPropFacade->get<AttenuationTag>());
-
-                        Vector3f    myScale;
-                        Vector3f    myShear;
-                        Quaternionf myOrientation;
-                        Vector3f    myPosition;
-                        myGlobalMatrix.decompose(myScale, myShear, myOrientation, myPosition);
-
-                        Matrix4f myMatrix(myOrientation);
-                        Vector4f myDirection = product(Vector4f(0,0,-1,1), Matrix4f(myOrientation));
-                        mySpotLightDirection.push_back(normalized(Vector3f(myDirection[0], myDirection[1], myDirection[2])));
-                        AC_TRACE << "setting SPOT_LIGHT_DIRECTION to " << myDirection;
                         break;
                     }
                 default :
