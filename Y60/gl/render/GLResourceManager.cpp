@@ -476,7 +476,7 @@ namespace y60 {
             const char* maxAnisotropyEnv = getenv("Y60_MAX_ANISOTROPY");
             if (maxAnisotropyEnv) {
                 float maxAnisotropy = atof(maxAnisotropyEnv);
-                if (maxAnisotropyEnv > 1.0f) {
+                if (maxAnisotropy > 1.0f) {
                     AC_DEBUG << "setting max_anisotropy=" << maxAnisotropy;
                     glTexParameterf(theTextureType, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
                     CHECK_OGL_ERROR;
