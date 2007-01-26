@@ -471,14 +471,16 @@ namespace y60 {
                 asGLTextureSampleFilter(theImage->getMinFilter(), hasMipMaps));
         CHECK_OGL_ERROR;
 
-#ifdef _EXPERIMENTAL_GL_TEXTURE_MAX_ANISOTROPY_EXT
+#ifdef GL_TEXTURE_MAX_ANISOTROPY_EXT
         if (hasMipMaps) {
             const char* maxAnisotropyEnv = getenv("Y60_MAX_ANISOTROPY");
             if (maxAnisotropyEnv) {
                 float maxAnisotropy = atof(maxAnisotropyEnv);
-                AC_DEBUG << "setting max_anisotropy=" << maxAnisotropy;
-                glTexParameterf(theTextureType, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
-                CHECK_OGL_ERROR;
+                if (maxAnisotropyEnv > 1.0f) {
+                    AC_DEBUG << "setting max_anisotropy=" << maxAnisotropy;
+                    glTexParameterf(theTextureType, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+                    CHECK_OGL_ERROR;
+                }
             }
         }
 #endif

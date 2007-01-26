@@ -52,6 +52,7 @@ namespace y60 {
 
     void
     assertCg(const std::string & theWhere, const CGcontext theCgContext) {
+#if 0
         CGerror myCgError = cgGetError();
         if (myCgError == CG_COMPILER_ERROR && theCgContext) {
             throw RendererException(std::string("Cg compile error: ") + cgGetLastListing(theCgContext),
@@ -59,6 +60,7 @@ namespace y60 {
         } else if (myCgError != CG_NO_ERROR) {
             throw RendererException(cgGetErrorString(myCgError), theWhere);
         }
+ #endif
     }
 
 #ifdef DEBUG
@@ -413,9 +415,9 @@ namespace y60 {
             createAndCompileProgram();
             DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_compile));
 
-            DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_reload_load));
+            START_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
             cgGLLoadProgram(_myCgProgramID);
-            DBP2(STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_load));
+            STOP_TIMER(CgProgramInfo_reloadIfRequired_reload_load);
 
             AC_DEBUG << "reloaded Cg program";
             DBP2(START_TIMER(CgProgramInfo_reloadIfRequired_enableProfile));
