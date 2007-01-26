@@ -24,9 +24,7 @@
 using namespace asl;
 using namespace y60;
 
-const unsigned char myMagicToken( 200 ); // all values above 200 are currently reserved
-                                         // this will be changed to one escape character
-                                         // (255) in a future version
+const unsigned char myMagicToken( 255 ); 
 
 static const char * RAW_RASTER = "ASSRawRaster";
 static const char * BINARY_RASTER = "ASSBinaryRaster";
@@ -46,10 +44,11 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     _myGridSize(0,0),
     _mySyncLostCounter(0),
     _myRawRaster(dom::ValuePtr(0)),
-    _myBinaryRaster(dom::ValuePtr(0)),
+    _myDenoisedRaster(dom::ValuePtr(0)),
     _myScene(0),
     _myNoiseThreshold( 15 ),
-    _myComponentThreshold( 30 )
+    _myComponentThreshold( 30 ),
+    _myPower(1)
 {
     _mySerialPort = getSerialDevice(0);
     _mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
@@ -76,50 +75,52 @@ ASSDriver::synchronize() {
     static int myLineStart = -1;
     static int myLineEnd   = -1;
     static int myMaxLine = 0;
-    //AC_PRINT << "buf size: " << _myBuffer.size();
+    static bool myMagicTokenFlag = false;
     // first look for the beginning of a line
     if (myLineStart < 0) {
         for (unsigned i = 0; i < _myBuffer.size(); ++i) {
-            if (_myBuffer[i] > myMagicToken) {
+            if (myMagicTokenFlag) {
+                myMaxLine = _myBuffer[i];
+                myMagicTokenFlag = false;
                 myLineStart = i;
-                myMaxLine = _myBuffer[i] - myMagicToken;
                 break;
+            } else if (_myBuffer[i] == myMagicToken) {
+                myMagicTokenFlag = true;
             }
         }
     }
     // then find the end of that line and determine the number of columns
     if (myLineStart >= 0 && myLineEnd < 0) {
         for (unsigned i = myLineStart + 1; i < _myBuffer.size(); ++i) {
-            if (_myBuffer[i] > myMagicToken) {
+            if (_myBuffer[i] == myMagicToken) {
                 myLineEnd = i;
                 _myGridSize[0] = myLineEnd - myLineStart - 1;
-                if ( myMaxLine < _myBuffer[i] - myMagicToken ) {
-                    myMaxLine = _myBuffer[i] - myMagicToken;
-                }
                 break;
             }
         }
     }
+
     // now scan for the maximum line number to determine the number of rows
     if (_myGridSize[0] > 0 && _myGridSize[1] == 0) {
-        for (unsigned i = myLineEnd; i < _myBuffer.size(); i += _myGridSize[0] + 1) {
-            ASSURE( myMagicToken < _myBuffer[i]);
-            if (_myBuffer[i] - myMagicToken < myMaxLine) {
+        ASSURE( _myBuffer[ myLineEnd ] == myMagicToken );
+        for (unsigned i = myLineEnd; i < _myBuffer.size(); i += _myGridSize[0] + 2) {
+            ASSURE( _myBuffer[i] == myMagicToken );
+            if (_myBuffer[i + 1] == 1 && myMaxLine > 0) {
                 _myGridSize[1] = myMaxLine;
                 AC_PRINT << "Grid size: " << _myGridSize;
                 _myBuffer.erase( _myBuffer.begin(), _myBuffer.begin() + i);
-                ASSURE(_myBuffer.front() > myMagicToken);
+                ASSURE(_myBuffer.front() == myMagicToken);
                 // reset the statics so we could resynchronize ... at least in theory
                 myLineStart = -1;
                 myLineEnd = -1;
                 myMaxLine = 0;
+                myMagicTokenFlag = false;
                 allocateGridBuffers();
                 setState( RUNNING );
                 return;
             } else {
-                myMaxLine = _myBuffer[i] - myMagicToken;
+                myMaxLine = _myBuffer[i + 1];
             }
-            myLineEnd = i;
         }
     }
 }
@@ -127,7 +128,7 @@ ASSDriver::synchronize() {
 void
 ASSDriver::allocateGridBuffers() {
     _myRawRaster = allocateRaster(RAW_RASTER);
-    _myBinaryRaster = allocateRaster(BINARY_RASTER);
+    _myDenoisedRaster = allocateRaster(BINARY_RASTER);
 }
 
 RasterHandle
@@ -158,21 +159,22 @@ ASSDriver::readSensorValues() {
     //AC_PRINT << "====";
     //AC_PRINT << "pre buf size: " << _myBuffer.size();
     bool myNewDataFlag = false;
-    while ( _myGridSize[0] < _myBuffer.size() ) {
-        if ( _myBuffer[0] < myMagicToken ) {
+    while ( _myGridSize[0] + 2 < _myBuffer.size() ) {
+        if ( _myBuffer[0] != myMagicToken ) {
             AC_PRINT << "Sync error.";
             _mySyncLostCounter++;
             setState( SYNCHRONIZING );
             return;
         }
-        int myRowIdx = _myBuffer[0] - myMagicToken - 1;
+        int myRowIdx = _myBuffer[1] - 1;
         //AC_PRINT << "Got row: " << myRowIdx;
 
         unsigned char * myRowPtr = _myRawRaster.raster->pixels().begin() +
                     myRowIdx * _myGridSize[0];
-        std::copy(_myBuffer.begin() + 1, _myBuffer.begin() + 1 + _myGridSize[0], myRowPtr);
+        std::copy(_myBuffer.begin() + 2, _myBuffer.begin() + 2 + _myGridSize[0], myRowPtr);
+        //*(_myRawRaster.raster->pixels().begin() + (_myGridSize[1] / 2) * _myGridSize[0] + _myGridSize[0] / 2) = 254;
 
-        _myBuffer.erase( _myBuffer.begin(), _myBuffer.begin() + _myGridSize[0] + 1);
+        _myBuffer.erase( _myBuffer.begin(), _myBuffer.begin() + _myGridSize[0] + 2);
         if ( myRowIdx == _myGridSize[1] - 1) {
             asl::Time myTime;
             double myDeltaT = myTime - _myLastFrameTime;
@@ -184,7 +186,6 @@ ASSDriver::readSensorValues() {
         myNewDataFlag = true;
     }
 
-    //*(_myRawRaster.raster->pixels().begin() + (_myGridSize[1] / 2) * _myGridSize[0] + _myGridSize[0] / 2) = 249;
     if (myNewDataFlag && _myScene) {
         _myScene->getSceneDom()->getElementById(RAW_RASTER)->getFacade<y60::Image>()->triggerUpload();
         
@@ -193,17 +194,20 @@ ASSDriver::readSensorValues() {
 }
 
 template <class PixelT>
-struct threshold {
-    threshold(const PixelT & theThreshold) : _myThreshold( theThreshold ) {}
+struct ThresholdWithPow {
+    ThresholdWithPow(const PixelT & theThreshold, int thePower) :
+        _myThreshold( theThreshold ),
+        _myPower( thePower) {}
     PixelT operator () (const PixelT & a) {
         if (a.get() < _myThreshold.get()) {
             return PixelT(0);
         } else {
-            return a;
+            return PixelT( ipow(int(a.get()), _myPower) /  ipow(255, _myPower - 1));
         }
     }
 
     PixelT _myThreshold;
+    int _myPower;
 };
 
 template <class RASTER>
@@ -223,32 +227,47 @@ ASSDriver::createThresholdedRaster(RasterHandle & theInput,
     y60::RasterOfGRAY * myOutput = dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (theOutput.value) );
     std::transform( myInput->begin(), myInput->end(),
             myOutput->begin(),
-            threshold<asl::gray<unsigned char> >( theThreshold ));
+            ThresholdWithPow<asl::gray<unsigned char> >( theThreshold, _myPower ));
     dom::dynamic_cast_and_closeWriteableValue<y60::RasterOfGRAY>(&* (theOutput.value) );
 }
+
 void
 ASSDriver::processSensorValues() {
-    createThresholdedRaster( _myRawRaster, _myBinaryRaster, _myNoiseThreshold );
+    createThresholdedRaster( _myRawRaster, _myDenoisedRaster, _myNoiseThreshold );
 
-    BlobListPtr myROIs = connectedComponents( _myBinaryRaster.raster, _myComponentThreshold);
+    BlobListPtr myROIs = connectedComponents( _myDenoisedRaster.raster, _myComponentThreshold);
 
     _myPositions.clear();
+    _myRegions.clear();
 
+#if 1
     typedef asl::subraster<gray<unsigned char> > SubRaster;
     for (BlobList::iterator it = myROIs->begin(); it != myROIs->end(); ++it) {
         Box2i myBox = (*it)->bbox();
-        Vector2i myMin = myBox[Box2i::MIN];
-        // myMin -= Vector2i(1, 1);
-        Vector2i myMax = myBox[Box2i::MAX];
-        myMax += Vector2i(1, 1);
+        myBox[Box2i::MAX] += Vector2i(1, 1);
         AnalyseMoment<SubRaster> myMomentAnalysis;
-        _myBinaryRaster.raster->apply( myBox[Box2i::MIN][0] /*- 1*/, myBox[Box2i::MIN][1] /*- 1*/,
-                                    myBox[Box2i::MAX][0] + 1, myBox[Box2i::MAX][1] + 1, myMomentAnalysis);
+        _myDenoisedRaster.raster->apply( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1],
+                                    myBox[Box2i::MAX][0], myBox[Box2i::MAX][1], myMomentAnalysis);
 
-        Vector2f myPosition = Vector2f( myMin[0], myMin[1]) + myMomentAnalysis.result.center;
+        Vector2f myPosition = Vector2f( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1]) + myMomentAnalysis.result.center;
+
         //AC_PRINT << "center: " << myPosition;
         _myPositions.push_back( myPosition );
+        _myRegions.push_back( Box2f( Vector2f( myBox[Box2i::MIN][0], myBox[Box2i::MIN][1]),
+                                     Vector2f( myBox[Box2i::MAX][0], myBox[Box2i::MAX][1])));
     }
+
+#else // perform moment analysis on whole raster
+    if ( ! myROIs->empty()) {
+        AnalyseMoment<y60::RasterOfGRAY> myMomentAnalysis;
+        _myDenoisedRaster.raster->apply(myMomentAnalysis);
+
+        Vector2f myPosition = myMomentAnalysis.result.center;
+        //AC_PRINT << "center: " << myPosition;
+        _myPositions.push_back( myPosition );
+        _myRegions.push_back( Box2f( Vector2f( 0.0, 0.0), Vector2f( _myGridSize[0], _myGridSize[1])));
+    }
+#endif
 }
 
 void
@@ -293,6 +312,14 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myPositions );
         return;
     }
+    if (thePropertyName == "regions") {
+        theReturnValue.set( _myRegions );
+        return;
+    }
+    if (thePropertyName == "gainPower") {
+        theReturnValue.set( _myPower );
+        return;
+    }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -316,8 +343,16 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         _myNoiseThreshold = thePropertyValue.get<unsigned char>();
         return;
     }
+    if (thePropertyName == "gainPower") {
+        _myPower = thePropertyValue.get<int>();
+        return;
+    }
     if (thePropertyName == "positions") {
         AC_ERROR << "positions property is read only";
+        return;
+    }
+    if (thePropertyName == "regions") {
+        AC_ERROR << "regions property is read only";
         return;
     }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";

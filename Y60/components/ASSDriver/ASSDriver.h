@@ -99,14 +99,16 @@ class ASSDriver :
         unsigned       _mySyncLostCounter;
 
         RasterHandle _myRawRaster;
-        RasterHandle _myBinaryRaster;
+        RasterHandle _myDenoisedRaster;
         y60::ScenePtr _myScene;
 
         asl::Time   _myLastFrameTime;
         unsigned char _myComponentThreshold;
         unsigned char _myNoiseThreshold;
+        int           _myPower;
 
         std::vector<asl::Vector2f> _myPositions;
+        std::vector<asl::Box2f> _myRegions;
 };
 
 }

@@ -34,11 +34,13 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     var Base = [];
     var _myMaterial = null;
     var _myMarkers = [];
+    var _myRegions = [];
     var _myGotDataFlag = false;
     var _myDriver = null;
     var _myCrosshairShape = null;
     var _myGroup = null;
     var _myDisplaySize3D = null;
+    var _myBoxShape = null;
 
 
     //////////////////////////////////////////////////////////////////////
@@ -56,8 +58,9 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         window.addExtension(_myDriver);
         //self.registerSettingsListener( _myDriver, "ASSDriver" );
 
-        _myDriver.noiseThreshold = 12;
-        _myDriver.componentThreshold = 40;
+        _myDriver.noiseThreshold = 15;
+        _myDriver.componentThreshold = 5;
+        _myDriver.gainPower = 2;
 
         print("setup done");
     }
@@ -88,7 +91,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         var myBlueMaterial = Modelling.createUnlitTexturedMaterial(window.scene, "",
                             "Blue", true, false, 1, [0, 0, 1, 1]);        
         myBlueMaterial.properties.surfacecolor = [0, 0, 1, 1];
-        var myFrameShape = Modelling.createQuad(window.scene, myBlueMaterial.id, [0,0,0], _myDisplaySize3D);
+        var myFrameShape = Modelling.createQuad(window.scene, myBlueMaterial.id, [0,0,0],
+                    _myDisplaySize3D);
         myFrameShape.childNode("primitives", 0).childNode(0).type = "lineloop";
         myBody = Modelling.createBody(_myGroup, myFrameShape.id );
         myBody.position.z = 1;
@@ -119,6 +123,9 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         theRaster.min_filter = TextureSampleFilter.nearest;
         theRaster.mag_filter = TextureSampleFilter.nearest;
 
+        _myBoxShape = Modelling.createQuad(window.scene, myBlueMaterial.id, [-0.5, -0.5, 0],
+                    [0.5, 0.5, 0.0]);
+        _myBoxShape.childNode("primitives", 0).childNode(0).type = "lineloop";
 
     }
 
@@ -128,8 +135,8 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
         // hack!
         if ( ! _myGotDataFlag ) {
-            var myRaster = window.scene.dom.getElementById("ASSRawRaster");
-            //var myRaster = window.scene.dom.getElementById("ASSBinaryRaster");
+            //var myRaster = window.scene.dom.getElementById("ASSRawRaster");
+            var myRaster = window.scene.dom.getElementById("ASSBinaryRaster");
             if (myRaster) {
 
                 createDisplay(myRaster);
@@ -146,24 +153,33 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
             myNewMarker.position.z = 1;
             myNewMarker.scale = new Vector3f(3, 3, 3);
             _myMarkers.push( myNewMarker );
+
+            var myNewBox = Modelling.createBody( _myGroup, _myBoxShape.id );
+            myNewBox.position.z = 1;
+            myNewBox.scale = new Vector3f( DISPLAY_SCALE, DISPLAY_SCALE, DISPLAY_SCALE);
+            _myRegions.push( myNewBox );
             //print("spawn marker");
         }
         while (myPositions.length < _myMarkers.length) {
             var myOldMarker = _myMarkers.pop();
             _myGroup.removeChild( myOldMarker );
+
+            var myOldBox = _myRegions.pop();
+            _myGroup.removeChild( myOldBox );
             //print("remove marker");
         }
+
+        var myRegions = _myDriver.regions;
         for (var i = 0; i < myPositions.length; ++i) {
             var myPos = myPositions[i];
             _myMarkers[i].position.x = DISPLAY_SCALE * myPos.x + myPixelCenterOffset;
-            _myMarkers[i].position.y = _myDisplaySize3D.y - DISPLAY_SCALE * myPos.y - myPixelCenterOffset;
-            //print ("in: " + myPos + " out: " + _myMarkers[i].position.xy);
+            _myMarkers[i].position.y = _myDisplaySize3D.y - DISPLAY_SCALE * myPos.y -
+                        myPixelCenterOffset;
+            _myRegions[i].position.x = DISPLAY_SCALE * myRegions[i].center.x
+            _myRegions[i].position.y = _myDisplaySize3D.y - DISPLAY_SCALE * myRegions[i].center.y
+            _myRegions[i].scale.x = DISPLAY_SCALE * myRegions[i].size.x;
+            _myRegions[i].scale.y = DISPLAY_SCALE * myRegions[i].size.y;
         }
-        /*
-        if (_myMarkers.length) {
-            print("=====");
-        }
-        */
     }
 
     Base.onKey = self.onKey;
@@ -178,11 +194,27 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         switch (theKey) {
             case '+':
                 _myDriver.componentThreshold = _myDriver.componentThreshold + 5;
-                print("threshold: " + _myDriver.componentThreshold);
+                print("component threshold: " + _myDriver.componentThreshold);
                 break;
             case '-':
                 _myDriver.componentThreshold = _myDriver.componentThreshold - 5;
-                print("threshold: " + _myDriver.componentThreshold);
+                print("component threshold: " + _myDriver.componentThreshold);
+                break;
+            case '.':
+                _myDriver.noiseThreshold = _myDriver.noiseThreshold + 5;
+                print("noise threshold: " + _myDriver.noiseThreshold);
+                break;
+            case ',':
+                _myDriver.noiseThreshold = _myDriver.noiseThreshold - 5;
+                print("noise threshold: " + _myDriver.noiseThreshold);
+                break;
+            case 'm':
+                _myDriver.gainPower += 1;
+                print("gain power: " + _myDriver.gainPower);
+                break;
+            case 'n':
+                _myDriver.gainPower -= 1;
+                print("gain power: " + _myDriver.gainPower);
                 break;
         }
     }
