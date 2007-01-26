@@ -278,7 +278,7 @@ namespace y60 {
         }
         std::string mySrcAttrib = get<ImageSourceTag>();
         if (get<ImageSourceTag>() == "") {
-            AC_DEBUG << "Image '" << get<NameTag>() << " has not been loaded because of empty source attribute";
+            AC_DEBUG << "Image '" << get<NameTag>() << "' has not been loaded because of empty source attribute";
             dom::ValuePtr myRasterValue = getRasterValue();
             if (!myRasterValue) {
                 // Create default raster
@@ -287,13 +287,14 @@ namespace y60 {
             return;
         }
 
+        AC_TRACE << "Image::load loading '" << get<ImageSourceTag>() << "'";
         unsigned myDepth = get<ImageDepthTag>();
         ImageLoader myImageLoader(get<ImageSourceTag>(), AppPackageManager::get().getPtr(), 
             ITextureManagerPtr(0), myDepth);
 
         string myFilter = get<ImageFilterTag>();
         if (!myFilter.empty()) {
-            AC_DEBUG << "Image::load() filter=" << myFilter;
+            AC_DEBUG << "Image::load filter=" << myFilter;
             VectorOfFloat myFilterParams = get<ImageFilterParamsTag>();
             myImageLoader.applyCustomFilter(myFilter, myFilterParams);
         }

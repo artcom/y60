@@ -123,6 +123,7 @@ namespace y60 {
                 myBlock = thePackageManager->openFile(myFilenames[i]);
             }
             // fall back to simply try to open the file
+            AC_DEBUG << myBlock << " filename='" << myFilenames[i] << "'";
             if (!myBlock && fileExists(myFilenames[i])) {
                 myBlock = asl::Ptr<ReadableBlock>(new ConstMappedBlock(myFilenames[i]));
             }

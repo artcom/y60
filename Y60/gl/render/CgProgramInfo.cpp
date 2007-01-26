@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2003 ART+COM AG Berlin
+// Copyright (C) 2003-2007 ART+COM AG Berlin
 //
 // These coded instructions, statements, and computer programs contain
 // unpublished proprietary information of ART+COM AG Berlin, and
@@ -37,6 +37,7 @@
 #endif
 
 // more profiling
+//#define PROFILING_LEVEL_FULL
 #ifdef PROFILING_LEVEL_FULL
 #define DBP2(x)  x
 #else
@@ -57,6 +58,53 @@ namespace y60 {
                     theWhere);
         } else if (myCgError != CG_NO_ERROR) {
             throw RendererException(cgGetErrorString(myCgError), theWhere);
+        }
+    }
+
+#ifdef DEBUG
+#define ASSERTCG(where, what) assertCg(where, what)
+#else
+#define ASSERTCG(where, what) 
+#endif
+
+    CgProgramInfo::CgProgramInfo(const ShaderDescription & myShader,
+            const CGcontext theCgContext)
+        : _myShader(myShader), _myContext(theCgContext)
+    {
+        _myPathName = myShader._myFilename;
+
+        _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = 0;
+        _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
+        _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_SPECULAR_COLOR] = 0;
+
+        _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = 0;
+        _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
+        _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = 0;
+
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIFFUSE_COLOR] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_SPECULAR_COLOR] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_CUTOFF] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_EXPONENT] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = 0;
+        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = 0;
+        
+        _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = 0;
+
+        //VS: 100 punkte
+        cgSetAutoCompile(_myContext, CG_COMPILE_MANUAL);
+        createAndCompileProgram();
+
+        DB(AC_TRACE << "CgProgramInfo::CgProgramInfo(" << _myCgProgramID << ")" << endl;);
+    }
+
+    CgProgramInfo::~CgProgramInfo() {
+        if (cgIsProgram(_myCgProgramID)) {
+            if (cgGetProgramContext(_myCgProgramID) == _myContext) {
+                DB(AC_TRACE << "CgProgramInfo::~CgProgramInfo(" << _myCgProgramID << ")" << endl;);
+                cgDestroyProgram(_myCgProgramID);
+            }
+            assertCg("CgProgramInfo::~CgProgramInfo()", _myContext);
         }
     }
 
@@ -96,63 +144,21 @@ namespace y60 {
             _myCgProgramID = cgCreateProgram(_myContext, CG_SOURCE, _myCgProgramString.c_str(),
                     asCgProfile(_myShader), _myShader._myEntryFunction.c_str(),
                     &(*_myCachedCompilerArgs.begin()));
-
         }
-
-        CGerror myCgError = cgGetError();
         assertCg(PLUS_FILE_LINE, _myContext);
+
         DBP2(START_TIMER(CgProgramInfo_processParameters));
         processParameters();
         DBP2(STOP_TIMER(CgProgramInfo_processParameters));
+
         DBP2(MAKE_SCOPE_TIMER(CgProgramInfo_compileProgram));
         cgCompileProgram(_myCgProgramID);
-    }
-
-    CgProgramInfo::CgProgramInfo(const ShaderDescription & myShader,
-            const CGcontext theCgContext)
-        : _myShader(myShader), _myContext(theCgContext)
-    {
-        _myPathName = myShader._myFilename;
-
-        _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS] = 0;
-        _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
-        _myUnsizedArrayAutoParamSizes[POSITIONAL_LIGHTS_SPECULAR_COLOR] = 0;
-
-        _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS] = 0;
-        _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_DIFFUSE_COLOR] = 0;
-        _myUnsizedArrayAutoParamSizes[DIRECTIONAL_LIGHTS_SPECULAR_COLOR] = 0;
-
-        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS] = 0;
-        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIFFUSE_COLOR] = 0;
-        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_SPECULAR_COLOR] = 0;
-        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_CUTOFF] = 0;
-        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_EXPONENT] = 0;
-        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_DIRECTION] = 0;
-        _myUnsizedArrayAutoParamSizes[SPOT_LIGHTS_ATTENUATION] = 0;
-        
-        _myUnsizedArrayAutoParamSizes[TEXTURE_MATRICES] = 0;
-
-        //VS: 100 punkte
-        cgSetAutoCompile(_myContext, CG_COMPILE_MANUAL);
-        createAndCompileProgram();
-
-        DB(AC_TRACE << "CgProgramInfo::CgProgramInfo(" << _myCgProgramID << ")" << endl;);
     }
 
     void
     CgProgramInfo::load() {
         cgGLLoadProgram(_myCgProgramID);
         assertCg("CgProgramInfo::load()", _myContext);
-    }
-
-    CgProgramInfo::~CgProgramInfo() {
-        if (cgIsProgram(_myCgProgramID)) {
-            if (cgGetProgramContext(_myCgProgramID) == _myContext) {
-                DB(AC_TRACE << "CgProgramInfo::~CgProgramInfo(" << _myCgProgramID << ")" << endl;);
-                cgDestroyProgram(_myCgProgramID);
-            }
-        }
-        assertCg("CgProgramInfo::~CgProgramInfo()", _myContext);
     }
 
     void
@@ -435,9 +441,7 @@ namespace y60 {
             const Camera & theCamera)
     {
         MAKE_SCOPE_TIMER(CgProgramInfo_bindBodyParams);
-        assertCg(PLUS_FILE_LINE, _myContext);
         setCGGLParameters();
-       //AC_DEBUG << "CgProgramInfo::setAutoParameters";
 
         std::vector<Vector3f> myPositionalLights;
         std::vector<Vector4f> myPositionalLightDiffuseColors;
@@ -841,7 +845,7 @@ namespace y60 {
                 cgSetParameter1f(myElement, theValue[i]);
             }
         }
-        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
+        ASSERTCG(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -861,7 +865,7 @@ namespace y60 {
                 cgSetParameter3f(myElement, theValue[i][0], theValue[i][1], theValue[i][2]);
             }
         }
-        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
+        ASSERTCG(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -879,7 +883,7 @@ namespace y60 {
             //AC_TRACE << "setting component " << i << " to " << theValue[i];
             cgSetParameter4f(myElement, theValue[i][0], theValue[i][1], theValue[i][2], theValue[i][3]);
         }
-        assertCg(string("setting auto parameter ") + theParam._myName, _myContext);
+        ASSERTCG(string("setting auto parameter ") + theParam._myName, _myContext);
     }
 
     void
@@ -888,7 +892,7 @@ namespace y60 {
         CHECK_OGL_ERROR;
         DB(AC_TRACE << "binding " << _myShader._myEntryFunction << ":" <<_myCgProgramID << endl;)
         cgGLBindProgram(_myCgProgramID);
-        assertCg(string("CgProgramInfo::bind()") + _myPathName, _myContext);
+        ASSERTCG(string("CgProgramInfo::bind()") + _myPathName, _myContext);
     }
 
     void
