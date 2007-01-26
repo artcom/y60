@@ -243,18 +243,10 @@ Pump::stop() {
     }
 }
 
-// HWSampleSinkPtr Pump::getSink(unsigned i) {
-//     return _mySampleSinks[i].lock();
-// }
 SampleSourcePtr Pump::getSink(unsigned i) {
     return _mySampleSinks[i].lock();
 }
 
-
-// void Pump::addSink(HWSampleSinkPtr theSink) {
-//     AutoLocker<Pump> myLocker(*this);
-//     _mySampleSinks.push_back(theSink);
-// }
 void Pump::addSink(SampleSourcePtr theSink) {
     AutoLocker<Pump> myLocker(*this);
     _mySampleSinks.push_back(theSink);
@@ -320,17 +312,12 @@ void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
 #ifdef USE_DASHBOARD
         MAKE_SCOPE_TIMER(Mix_Pump_Lock);
 #endif        
-        //        std::vector <HWSampleSinkWeakPtr >::iterator it;
         std::vector <SampleSourceWeakPtr>::iterator it;
         removeDeadSinks();
         for (it = _mySampleSinks.begin(); it != _mySampleSinks.end();) {
-            //            HWSampleSinkPtr curSampleSink = (*it).lock();
             SampleSourcePtr curSampleSink = (*it).lock();
             if (curSampleSink) {
-                //                AutoLocker<HWSampleSink> mySinkLocker(*curSampleSink);
                 AutoLocker<SampleSource> mySinkLocker(*curSampleSink);
-//                 if (curSampleSink->getState() != HWSampleSink::STOPPED &&
-//                     curSampleSink->getState() != HWSampleSink::PAUSED) 
                 if (curSampleSink->isEnabled())
                 {
                     curSampleSink->deliverData(*_myTempBuffer);
@@ -369,10 +356,8 @@ void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
 }
 
 void Pump::removeDeadSinks() {
-    //    std::vector <HWSampleSinkWeakPtr >::iterator it;
     std::vector <SampleSourceWeakPtr >::iterator it;
     for (it = _mySampleSinks.begin(); it != _mySampleSinks.end();) {
-        //        HWSampleSinkPtr curSampleSink = (*it).lock();
         SampleSourcePtr curSampleSink = (*it).lock();
         if (!curSampleSink) {
             it = _mySampleSinks.erase(it);

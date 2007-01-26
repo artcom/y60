@@ -65,6 +65,10 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
     obj.getCamera = function() {
         return _myCamera;
     }
+
+    obj.getLookAtPosition = function() {
+        return _myLookAtPosition;
+    }
     
     obj.update = function(theTime) {
         if (_myLastTime == null) {
@@ -82,7 +86,7 @@ LookAtCameraMover.prototype.Constructor = function(obj, theCamera, theNodeToFoll
             myRotationMatrix = new Matrix4f(_myNodeToFollow.orientation);
         }
 
-        // var myNodePosition = _myNodeToFollow.boundingbox.center;
+        //var myNodePosition = _myNodeToFollow.boundingbox.center;
         var myNodePosition = _myNodeToFollow.globalmatrix.getRow(3).xyz;
 
         if ( isFinite(_mySpringStrength) ) {
