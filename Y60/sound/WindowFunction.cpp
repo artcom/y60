@@ -42,7 +42,7 @@ namespace y60 {
         _myWindow.clear();
         _myWindow.reserve(theSize);
         for (unsigned i = 0; i < theSize; i++) {
-            float value = 0.5 * (1.0 -cos(2*3.14159265f*i/(theSize-1))); // Hann Window
+            float value = 0.5f * (1.0f - cosf(2.f*3.14159265f*i/(theSize-1.f))); // Hann Window
             _myWindow.push_back(value); 
         }
     }

@@ -71,7 +71,7 @@ Pump::~Pump() {
     for (unsigned i=0; i<_mySampleSinks.size(); ++i) {
         SampleSourcePtr mySink = _mySampleSinks[i].lock();
         if (mySink) {
-            if (mySink->isEnabled());
+            if (mySink->isEnabled())
             {
                 AC_WARNING << "Audio Pump being deleted, but " << 
                     mySink->getName() << " is still active (state: ";
@@ -301,6 +301,7 @@ Pump::run() {
 }
 
 void Pump::mix(AudioBufferBase& theOutputBuffer, unsigned numFramesToDeliver) {
+    //    AC_TRACE << "Pump::mix";
 #ifdef USE_DASHBOARD
     MAKE_SCOPE_TIMER(Mix);
 #endif

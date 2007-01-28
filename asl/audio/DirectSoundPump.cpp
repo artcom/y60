@@ -183,7 +183,7 @@ void DirectSoundPump::initPrimaryBuffer() {
 }
 
 void DirectSoundPump::initSecondaryBuffer() {
-  	WAVEFORMATEX* myWF = 0; 
+    WAVEFORMATEX* myWF = 0; 
     DSBUFFERDESC dsbdesc; 
     HRESULT hr; 
  
@@ -326,7 +326,7 @@ void DirectSoundPump::writeToDS() {
 
     unsigned numBytesToDeliver ;
     if (myPlayCursor > _myWriteCursor) {
-        numBytesToDeliver = myPlayCursor-_myWriteCursor;
+        numBytesToDeliver = myPlayCursor-_myWriteCursor; 
     } else {
         numBytesToDeliver = myPlayCursor+(_myFramesPerBuffer*getOutputBytesPerFrame())
                 -_myWriteCursor;
@@ -344,9 +344,7 @@ void DirectSoundPump::writeToDS() {
     unsigned long myWriteBytes1; 
     void * myWritePtr2; 
     unsigned long myWriteBytes2; 
-
     mix(_myOutputBuffer, numFramesToDeliver);
-
     hr = _myDSBuffer->GetCurrentPosition(&myPlayCursor, &myWriteCursor);
     checkDSRetVal(hr, PLUS_FILE_LINE);
     AC_TRACE << "After mix: DS PlayCursor: " << myPlayCursor 
