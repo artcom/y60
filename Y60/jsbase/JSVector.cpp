@@ -116,6 +116,7 @@ DEFINE_CONVERT_FROM(Point2i)
 DEFINE_CONVERT_FROM(Point3i)
 DEFINE_CONVERT_FROM(Point4i)
 
+
 template <class VECTOR_NF>
 template <template <class> class VECTOR, class NUMBER>
 bool Converter<VECTOR_NF>::convertFromVN(JSContext *cx, jsval theValue,

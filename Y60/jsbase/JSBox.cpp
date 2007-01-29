@@ -12,6 +12,7 @@
 #include "JSBox.h"
 #include "JSPlane.h"
 #include "JSWrapper.impl"
+#include "JScppUtils.impl"
 #include <asl/Box.h>
 
 #include <iostream>
@@ -472,5 +473,8 @@ jsval as_jsval(JSContext *cx, JSBox3f::NativeValuePtr theValue) {
     JSObject * myObject = JSBox3f::Construct(cx, theValue);
     return OBJECT_TO_JSVAL(myObject);
 }
+
+template jsval as_jsval(JSContext *cx, const std::vector<asl::Box3<float> > & theVector);
+template bool convertFrom(JSContext *cx, jsval theValue, std::vector<asl::Box3<float> > & theVector);
 
 }
