@@ -1,6 +1,12 @@
 #!/bin/bash
     
-CheckSchema test.xsd test.xml
+APP=CheckSchema
+if [ "$DEBUG" = "1" ] ; then
+    APP=$PRO/bin/CheckSchemaDBG
+fi
+
+echo Running $APP
+$APP test.xsd test.xml
 Result=$?
 if [[ ${Result} -ne 0 ]]; then
     echo Failed
