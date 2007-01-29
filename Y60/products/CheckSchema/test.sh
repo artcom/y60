@@ -6,6 +6,13 @@ if [ "$DEBUG" = "1" ] ; then
 fi
 
 echo Running $APP
+$APP test.xsd
+Result=$?
+if [[ ${Result} -ne 0 ]]; then
+    echo Failed
+    exit ${Result}
+fi
+
 $APP test.xsd test.xml
 Result=$?
 if [[ ${Result} -ne 0 ]]; then
@@ -13,7 +20,28 @@ if [[ ${Result} -ne 0 ]]; then
     exit ${Result}
 fi
 
-#CheckSchema broken.xsd
+$APP test.xsd broken.xml
+Result=$?
+if [[ ${Result} -eq 0 ]]; then
+    echo Failed
+    exit ${Result}
+fi
+
+$APP missingfile
+Result=$?
+if [[ ${Result} -eq 0 ]]; then
+    echo Failed
+    exit ${Result}
+fi
+
+$APP test.xsd missingfile
+Result=$?
+if [[ ${Result} -eq 0 ]]; then
+    echo Failed
+    exit ${Result}
+fi
+
+#$APP broken.xsd
 #Result=$?
 #if [[ ${Result} -eq 0 ]]; then
 #    echo Failed
