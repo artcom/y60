@@ -365,7 +365,7 @@ ASSDriver::onUpdateSettings(dom::NodePtr theSettings) {
 y60::EventPtrList 
 ASSDriver::poll() {
     std::vector<unsigned char> myBuffer;
-    unsigned myByteCount = _mySerialPort->peek();
+    size_t myByteCount = _mySerialPort->peek();
     myBuffer.resize( myByteCount );
     _mySerialPort->read( reinterpret_cast<char*>(& ( * myBuffer.begin())), myByteCount );
 
