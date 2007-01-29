@@ -1,0 +1,13 @@
+    <observations>
+        <observation 
+            observer="http://cps.ccc.de/congress/2006/dylan-dumb-virtual-source" 
+            id="23" 
+            observed-object="http://cps.ccc.de/congress/2006/tag/249784" 
+            time="1.1665459e9" 
+            priority="23" 
+            min-distance="0.0e0" 
+            max-distance="34.000000e0" 
+            direction="[0,0,0]" 
+            position="[3.0e0,7.0e0,0.0e0]"/>
+    </observations>
+
