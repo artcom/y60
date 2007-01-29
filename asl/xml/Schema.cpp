@@ -25,8 +25,8 @@
 
 #include <iostream>
 
-#define DB(x) // x
-#define DB2(x)  // x
+#define DB(x)  x
+#define DB2(x) x
 
 using namespace std;
 using namespace dom;
@@ -359,7 +359,6 @@ dom::Schema::tryFindElementDeclaration(const DOMString & theParentElementName,
 			}
             myModelGroup = myGroup;
 		 }
-
         if (myModelGroup) {
             DB(AC_TRACE << "Schema::tryFindElementDeclaration: myModelGroup found" << endl;)
 			// we found a sequence node in the element type definition, so look
@@ -445,12 +444,19 @@ dom::Schema::getAttributeDeclaration(const NodePtr theElementType, const DOMStri
 		}
 		if (myContent) {															                          DB(AC_TRACE << "getAttributeDeclaration: childNodeByAttribute : myContent= "<<*myContent<<endl);
 			NodePtr myExtension = myContent->childNode(XS_EXTENSION);
-			if (myExtension) {															                      DB(AC_TRACE << "getAttributeDeclaration: childNodeByAttribute : extension = "<<*myExtension<<endl);
-				myAttrDecl = myExtension->childNodeByAttribute(XS_ATTRIBUTE,ATTR_NAME,theAttributeName);
+			NodePtr myRestriction = myContent->childNode(XS_RESTRICTION);
+            NodePtr myExOrRes;
+            if (myExtension) {
+                myExOrRes = myExtension;
+            } else if (myRestriction) {
+                myExOrRes = myRestriction;
+            }
+			if (myExOrRes) {															                      DB(AC_TRACE << "getAttributeDeclaration: childNodeByAttribute : extension/restriction = "<<*myExOrRes<<endl);
+				myAttrDecl = myExOrRes->childNodeByAttribute(XS_ATTRIBUTE,ATTR_NAME,theAttributeName);
 				if (myAttrDecl) {														                      DB(AC_TRACE << "getAttributeDeclaration: childNodeByAttribute : returning myAttrDecl = "<<*myAttrDecl<<endl);
 					return myAttrDecl;
 				}
-				NodePtr myBase = myExtension->getAttribute(ATTR_BASE);
+				NodePtr myBase = myExOrRes->getAttribute(ATTR_BASE);
 				if (myBase) {
 					NodePtr myBaseType = findTopLevelTypeDeclaration(myBase->nodeValue());
 					if (myBaseType) {
@@ -461,7 +467,7 @@ dom::Schema::getAttributeDeclaration(const NodePtr theElementType, const DOMStri
 							"dom::Schema::getAttributeDeclaration for attribute '"+theAttributeName+"'");
 					}
 				}
-			}
+			} 
 		}
 	}
 	return NodePtr(0);

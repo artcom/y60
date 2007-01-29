@@ -39,9 +39,9 @@
 
 #include <iostream>
 
-#define DB(x)  // x
+#define DB(x)  x
 #define DB2(x) //  x
-#define DBS(x)  // x
+#define DBS(x)  x
 #define DB_Y(x) // x
 
 using namespace std;
