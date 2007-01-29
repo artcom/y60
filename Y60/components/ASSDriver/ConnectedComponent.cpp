@@ -10,6 +10,13 @@
 
 #include "ConnectedComponent.h"
 
+#ifdef LINUX
+#   include <values.h>
+#else
+#   include <float.h>
+#endif
+
+
 using namespace asl;
 
 int Run::_ourLastLabel = 0;
@@ -68,8 +75,8 @@ Blob::center() {
 
 Box2i
 Blob::bbox(){
-    int x1 = __INT_MAX__;
-    int y1 = __INT_MAX__;
+    int x1 = INT_MAX;
+    int y1 = INT_MAX;
     int x2 = 0;
     int y2 = 0;
     for(RunList::iterator r = _myRuns.begin(); r != _myRuns.end(); r++){
