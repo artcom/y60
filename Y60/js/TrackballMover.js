@@ -145,6 +145,7 @@ TrackballMover.prototype.Constructor = function(obj, theViewport) {
 
     obj.setTrackballCenter = function(theCenter) {
         _myTrackballCenter = theCenter;
+        setupTrackball();
     }
 
     obj.getOrientation = function() {
