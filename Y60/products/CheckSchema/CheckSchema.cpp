@@ -58,8 +58,8 @@ main(int argc, char **argv) {
         
         string mySchemaName = argv[1];
         dom::NodePtr mySchema = dom::NodePtr(new dom::Document());
-//        mySchema->setValueFactory(myFactory);
-//        mySchema->addSchema(dom::Schema::getBuiltinSchema(), "xs");
+        mySchema->setValueFactory(myFactory);
+        mySchema->addSchema(dom::Schema::getBuiltinSchema(), "xs");
 
         bool ParseOK = parseFile(mySchemaName, mySchema);
         if (!ParseOK) {
