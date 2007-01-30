@@ -164,10 +164,12 @@ class AudioBuffer: public AudioBufferBase {
                         unsigned theSrcStartFrame, unsigned numFrames) 
         {
             const AudioBuffer<SAMPLE>* mySrcBuffer = getBufferFromInterface(theSrcBuffer);
+            unsigned theSrcNumFrames = theSrcBuffer.getNumFrames();
+            unsigned theDestNumFrames = getNumFrames();
             ASSURE(theSrcBuffer.getNumChannels() == getNumChannels());
-            ASSURE(theSrcBuffer.getNumFrames()-theSrcStartFrame >= numFrames);
-            ASSURE(theDestStartFrame < getNumFrames());
-            ASSURE(getNumFrames()-theDestStartFrame >= numFrames);
+            ASSURE(theSrcNumFrames-theSrcStartFrame >= numFrames);
+            ASSURE(theDestStartFrame < theSrcNumFrames);
+            ASSURE(theSrcNumFrames-theDestStartFrame >= numFrames);
             
             SAMPLE * curOutSample = begin() + theDestStartFrame*getNumChannels();
             const SAMPLE * curInSample = mySrcBuffer->begin() + theSrcStartFrame*getNumChannels();

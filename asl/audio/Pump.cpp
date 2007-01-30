@@ -30,6 +30,7 @@
 #include <asl/Dashboard.h>
 #endif
 
+
 using namespace std;
 
 namespace asl {
@@ -297,6 +298,7 @@ Pump::run() {
         } catch (...) {
             AC_ERROR << "Pump::run: Exception during exception handling.";
         }
+        throw; // rethrow to get some more information about the exception
     }
 }
 
