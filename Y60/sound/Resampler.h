@@ -25,14 +25,23 @@ namespace y60 {
 
         Resampler(asl::SampleFormat theSampleFormat) 
             : asl::Effect(asl::createEffectFunctor<ResamplerFunctor>(theSampleFormat)),
-              _myRatio(1.0f)
+              _myTargetFrames(441)
+              //              _myRatio(1.0f)
         {};
 
-        void setRatio(float theRatio) {
-            _myRatio = theRatio;
+//         void setRatio(float theRatio) {
+//             _myRatio = theRatio;
+//         }
+//         float getRatio() {
+//             return _myRatio;
+//         }
+
+        void setTargetFrames(unsigned theTargetFrames) {
+            _myTargetFrames = theTargetFrames;
         }
-        float getRatio() {
-            return _myRatio;
+
+        unsigned getTargetFrames() {
+            return _myTargetFrames;
         }
 
     private:
@@ -46,7 +55,8 @@ namespace y60 {
                 Resampler * myResampler = dynamic_cast<Resampler* >(theEffect);
 
                 unsigned myOldNumFrames = theBuffer.getNumFrames();
-                unsigned myNewNumFrames = (unsigned)(myOldNumFrames * (1.f/myResampler->getRatio()));
+                //                unsigned myNewNumFrames = (unsigned)(myOldNumFrames * (1.f/myResampler->getRatio()));
+                unsigned myNewNumFrames = myResampler->getTargetFrames();
                 asl::AudioBuffer<SAMPLE> theTempBuffer = asl::AudioBuffer<SAMPLE>(myNewNumFrames, theBuffer.getNumChannels(), 
                                                                                   theBuffer.getSampleRate());
 
@@ -61,13 +71,14 @@ namespace y60 {
                         float myOffset = myPosFrame - (float)myLowFrame;
 
                         //AC_INFO << "myPos: " << myPos << " myPosFrame: " << myPosFrame << " myLoFrame:  " << myLowFrame << " myOffset: " << myOffset;
-                        // linear interpolation (XXXX better resampling with lowpass filter)
+                        // linear interpolation (XXXX TODO: better resampling with lowpass filter)
                         SAMPLE * lowSample = theBuffer.begin() + myLowFrame * myNumChannels + myChannel;
                         SAMPLE * upSample = lowSample + myNumChannels;
                         *curSample++ = (SAMPLE)((*lowSample) + (*upSample - *lowSample) * myOffset); //linear interpolation
-                        //*curSample++ = *lowSample; // very simple "interpolation"
-                        AC_DEBUG << "Sample: " << *(curSample-1) << " lowSample: " << *lowSample << " upSample: " << *upSample << " myOffset: " << myOffset;
                     }
+                }
+                for (unsigned myChannel = 0; myChannel < myNumChannels; myChannel++) {
+                    *curSample++ = *(theBuffer.begin() + (myOldNumFrames-1) * myNumChannels + myChannel);
                 }
                 theBuffer.clear();
                 theBuffer.resize(theTempBuffer.getNumFrames());
@@ -75,8 +86,7 @@ namespace y60 {
             }
         };
 
-        float _myRatio;
-        int _myPitch;
+        unsigned _myTargetFrames;
 
     };
 

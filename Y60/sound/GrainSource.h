@@ -17,6 +17,8 @@
 #include <asl/SampleSource.h>
 #include <asl/AudioBuffer.h>
 #include <asl/VolumeFader.h>
+#include <asl/ThreadLock.h>
+#include <asl/settings.h>
 
 #include "Resampler.h"
 #include "WindowFunction.h"
@@ -84,6 +86,7 @@ namespace y60 {
 
     private:
 
+        asl::ThreadLock _myLock;
 
         asl::AudioBufferPtr _myAudioData;        // the buffer containing the audio data to granuralize
 

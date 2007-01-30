@@ -44,17 +44,15 @@ namespace y60 {
             
             virtual void operator()(asl::Effect* theEffect, asl::AudioBuffer<SAMPLE> & theBuffer,
                                     asl::Unsigned64 theAbsoluteFrame) {
-                AC_TRACE << "WindowFunction::operator";
+                //AC_TRACE << "WindowFunction::operator";
                 WindowFunction * myWindowFunction = dynamic_cast<WindowFunction* >(theEffect);
                 ASSURE(myWindowFunction);
-                const std::vector<float> theWindow = myWindowFunction->getWindow();
+                const std::vector<float> & theWindow = myWindowFunction->getWindow();
                 float theOverlapFactor = myWindowFunction->getOverlapFactor();
 
                 SAMPLE * curSample = theBuffer.begin();
                 unsigned thisRange = theBuffer.getNumFrames();
                 unsigned thatRange = theWindow.size();
-                AC_TRACE << "WindowFunction::operator: applying window to " << thisRange << " Bufferframes with window size: " << thatRange;
-                // unsigned currentFrame = 0;
                 
                 for (unsigned i = 0; i < thisRange; i++) {
                     float pos = (float)i/(float)thisRange * (float)thatRange;
@@ -63,11 +61,6 @@ namespace y60 {
                     float theWindowVal = (low != pos) ? theWindow[low] + (theWindow[low+1] - theWindow[low]) * (pos - low) : theWindow[low];
                     for (unsigned j = 0; j < theBuffer.getNumChannels(); j++) {
                         (*curSample++) *= theBuffer.floatToSample(theWindowVal);
-                        //SAMPLE value = theBuffer.floatToSample(theWindowVal);
-                        //                        (*curSample++) *= 0;//theBuffer.floatToSample(theWindowVal);
-                        //AC_TRACE << "Frame " << currentFrame << "of " << thisRange << " value: " << value;
-                        //currentFrame++;
-                        //AC_TRACE << "applying windowfunction: val = " << theWindowVal << " sampleval = " << theBuffer.floatToSample(theWindowVal);
                     }
                 }
             }
