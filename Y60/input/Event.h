@@ -36,7 +36,8 @@ namespace y60 {
             BUTTON_DOWN,
             RESIZE,
             QUIT,
-            TOUCH
+            TOUCH,
+            GENERIC
         };
 
         Event(Type theEventType);

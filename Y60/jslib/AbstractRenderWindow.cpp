@@ -18,6 +18,7 @@
 #include <y60/AxisEvent.h>
 #include <y60/ButtonEvent.h>
 #include <y60/TouchEvent.h>
+#include <y60/GenericEvent.h>
 #include <y60/ScopedGLContext.h>
 #include <y60/Image.h>
 #include <y60/Movie.h>
@@ -630,6 +631,9 @@ namespace jslib {
             case y60::Event::RESIZE:
                 onResize(*theEvent);
                 break;
+            case y60::Event::GENERIC:
+                onGenericEvent(*theEvent);
+                break;
             default:
                 AC_WARNING << "Unknown event type: " << asl::as_string(theEvent->type) << endl;
         }
@@ -762,6 +766,24 @@ namespace jslib {
                 argv[2] = as_jsval(_myJSContext, 1);
             }
             JSA_CallFunctionName(_myJSContext, _myEventListener, "onButton", 3, argv, &rval);
+        }
+    }
+
+    void 
+    AbstractRenderWindow::onGenericEvent(y60::Event & theEvent) {
+        y60::GenericEvent & myEvent = dynamic_cast<y60::GenericEvent&>( theEvent );
+        dom::NodePtr myEventNode = myEvent.asNode();
+        std::string myCallback( myEventNode->getAttribute("callback") ? 
+                    myEventNode->getAttributeValue<std::string>("callback") : "onEvent");
+        if (_myEventListener ) {
+            if (JSA_hasFunction(_myJSContext, _myEventListener, myCallback.c_str())) {
+                jsval arg, rval;
+                arg = as_jsval( _myJSContext, myEvent.asNode());
+                JSA_CallFunctionName(_myJSContext, _myEventListener, myCallback.c_str(), 1, & arg, & rval);
+            } else {
+                AC_WARNING << "Generic event callback '" << myCallback << "' is missing.";/* << " in class "
+                           << JSA_GetClass(_myJSContext, _myEventListener)->name;*/
+            }
         }
     }
 

@@ -254,6 +254,7 @@ namespace jslib {
         virtual void onTouch(y60::Event & theEvent);
         virtual void onResize(y60::Event & theEvent);
         virtual void onButton(y60::Event & theEvent);
+        virtual void onGenericEvent(y60::Event & theEvent); // generic XML based event handler
 
         virtual y60::TTFTextRendererPtr createTTFRenderer() = 0;
 

@@ -14,6 +14,7 @@
 #include "KeyEvent.h"
 #include "MouseEvent.h"
 #include "TouchEvent.h"
+#include "GenericEvent.h"
 
 #include <dom/Nodes.h>
 
@@ -28,7 +29,7 @@ namespace y60 {
 
     Event::Event(Type theType, const dom::NodePtr & theNode) :
         type(theType),
-        when(theNode->getAttributeValue<double>("when", 0.0))
+        when(theNode->getAttributeValue<double>("when", double(asl::Time())))
     {
     }
 
@@ -87,6 +88,8 @@ namespace y60 {
             myEventP = new MouseEvent(theNode);
         } else if (myType == "touch") {
             myEventP = new TouchEvent(theNode);
+        } else if (myType == "generic") {
+            myEventP = new GenericEvent(theNode);
         } else {
             AC_ERROR << "Unsupported event type '" << myType << "'";
         }
