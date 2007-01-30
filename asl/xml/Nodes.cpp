@@ -1958,9 +1958,9 @@ NodePtr
 dom::Node::appendAttribute(NodePtr theNewAttribute) {
     checkName(theNewAttribute->nodeName(),theNewAttribute->nodeType());
     if (attributesLength(theNewAttribute->nodeName())) {
-        throw DomException(string("Can't append attribute name " +
+        throw DomException(string("Can't append attribute name '" +
                     theNewAttribute->nodeName() +
-                    " to node type ") +
+                    "' to node type ") +
                 NodeTypeName[nodeType()]+
                 ", name = " + nodeName() +
                 " because attribute with this name already exists.",
