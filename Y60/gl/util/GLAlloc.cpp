@@ -68,11 +68,8 @@ namespace asl
                 glVertexArrayRangeNV != NULL &&
                 glFlushVertexArrayRangeNV != NULL);
 #else
-#ifdef AC_USE_X11
+#ifdef AC_USE_OSX_CGL
 		return false;
-        //glVertexArrayRangeNV = (PFNGLVERTEXARRAYRANGENVPROC) wglGetProcAddress("glVertexArrayRangeNV");
-        //glFlushVertexArrayRangeNV = (PFNGLFLUSHVERTEXARRAYRANGENVPROC) wglGetProcAddress("glFlushVertexArrayRangeNV");
-        //return (wglAllocateMemoryNV && wglFreeMemoryNV && glVertexArrayRangeNV && glFlushVertexArrayRangeNV);
 #endif
 #endif
 #endif
@@ -111,6 +108,7 @@ namespace asl
 #endif
 #endif
     }
+
     void gfxFreeMemoryNV(void * theMemory) {
         initializeGLMemoryExtensions();
 #ifdef WIN32

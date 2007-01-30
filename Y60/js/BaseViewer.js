@@ -292,6 +292,7 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
             var mySkyboxImage = mySkyboxMaterial.getElementById(mySkyboxMaterial.childNode("textures").firstChild.image);
             mySkyboxImage.src = theFileName;
             mySkyboxImage.tile = theTile;
+            mySkyboxImage.wrapmode = "clamp_to_edge";
             _myRenderWindow.scene.world.skyboxmaterial = _mySkyboxMaterialId;
         } else {
             var myImageId = createUniqueId();

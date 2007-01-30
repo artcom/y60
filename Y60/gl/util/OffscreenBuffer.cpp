@@ -51,7 +51,7 @@ void OffscreenBuffer::deactivate(ImagePtr theImage, bool theCopyToImageFlag) {
 #endif
         glBindTexture(GL_TEXTURE_2D, theImage->ensureTextureId());
 #ifdef GL_EXT_framebuffer_object
-        if (glGenerateMipmapEXT && theImage->get<ImageMipmapTag>()) {
+        if (IS_SUPPORTED(glGenerateMipmapEXT) && theImage->get<ImageMipmapTag>()) {
             AC_TRACE << "OffscreenBuffer::deactivate: generating mipmap levels";
             glGenerateMipmapEXT(GL_TEXTURE_2D);
         }

@@ -181,8 +181,10 @@ namespace y60 {
 
         const asl::Vector3f & myPointSizeParams = myMaterialPropFacade->get<PointSizeTag>();
         glPointSize(myPointSizeParams[0]);
-        glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, myPointSizeParams[1]);
-        glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
+        if (IS_SUPPORTED(glPointParameterfARB)) {
+            glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, myPointSizeParams[1]);
+            glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, myPointSizeParams[2]);
+        }
 
         const VectorOfBlendFunction & myBlendFunction = myMaterialPropFacade->get<BlendFunctionTag>();
         if (myBlendFunction.size() == 2) {
@@ -212,7 +214,7 @@ namespace y60 {
                     + asl::as_string(myBlendFunction.size()) + " elements. Expected two.", PLUS_FILE_LINE);
         }
 
-        if (glBlendEquation != Missing_glBlendEquation) {
+        if (IS_SUPPORTED(glBlendEquation)) {
             const BlendEquation & myBlendEquation = myMaterialPropFacade->get<BlendEquationTag>();
             GLenum myEquation = asGLBlendEquation(myBlendEquation);
             glBlendEquation(myEquation);
@@ -238,7 +240,7 @@ namespace y60 {
 
 
         dom::NodePtr myPointAttenuationProp = myMaterialPropFacade->getProperty(POINTATTENUATION_PROPERTY);
-        if (myPointAttenuationProp) {
+        if (IS_SUPPORTED(glPointParameterfARB) && myPointAttenuationProp) {
             glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB,
                                   myPointAttenuationProp->nodeValueAs<asl::Vector3f>().begin());
         }
@@ -302,7 +304,7 @@ namespace y60 {
                 if (!alreadyHasSpriteTexture) {
                     glEnable(GL_POINT_SPRITE_ARB);
                     CHECK_OGL_ERROR;
-                    if (glPointParameterfARB) {
+                    if (IS_SUPPORTED(glPointParameterfARB)) {
                         glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
                         CHECK_OGL_ERROR;
                     }
@@ -323,7 +325,7 @@ namespace y60 {
                 if (!alreadyHasSpriteTexture) {
                     glEnable(GL_POINT_SPRITE_ARB);
                     CHECK_OGL_ERROR;
-                    if (glPointParameterfARB) {
+                    if (IS_SUPPORTED(glPointParameterfARB)) {
                         glPointParameterfARB(GL_POINT_SPRITE_R_MODE_NV, GL_S);
                         CHECK_OGL_ERROR;
                     }

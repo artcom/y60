@@ -279,7 +279,7 @@ optimize(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative);
 
         dom::NodePtr myRootNode;
-        if (argc == 1) {
+        if (argc >= 1) {
             if (!convertFrom(cx, argv[0], myRootNode)) {
                 JS_ReportError(cx, "JSScene::optimize(): argument #1 must be a node (rootnode)");
                 return JS_FALSE;

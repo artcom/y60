@@ -112,9 +112,10 @@ struct GLExceptionHelper {
     T  _ac_ ## X = Missing_ ## X;
 #else
     #define DEF_PROC_ADDRESS(T,X) \
-    extern  T _ac_ ## X; \
+    extern T _ac_ ## X; \
     extern T Missing_ ## X;
 #endif
+#define IS_SUPPORTED(X) (X != 0 && X != Missing_ ## X)
 
 
 typedef void (*PFNACTESTPROC)(int, int);
@@ -257,7 +258,7 @@ DEF_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
 #define glGenerateMipmapEXT _ac_glGenerateMipmapEXT
 #endif
 
-#endif // ndef OSX
+#endif // OSX
 
 // Swap interval
 #ifdef WIN32

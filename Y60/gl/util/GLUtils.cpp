@@ -93,6 +93,7 @@ namespace y60 {
         if (supported == NULL) {
             return false;
         }
+        bool supportedFlag = false;
 
         /*
         ** Search for extName in the extensions string. Use of strstr()
@@ -107,14 +108,24 @@ namespace y60 {
         while (p < end) {
             int n = strcspn(p, " ");
             if ((extNameLen == n) && (strncmp(extName, p, n) == 0)) {
-                AC_DEBUG << "Extension " << extName << " is supported";
-                return true;
+                AC_DEBUG << "Extension '" << extName << "' is supported";
+                supportedFlag = true;
+                break;
             }
             p += (n + 1);
         }
 
-        AC_INFO << "Extension " << extName << " is not supported";
-        return false;
+        if (supportedFlag) {
+            const char* glQuirks = getenv("Y60_GL_QUIRKS");
+            if (glQuirks && strstr(glQuirks, extName) != 0) {
+                AC_WARNING << "Disabling quirky extension '" << extName << "'";
+                supportedFlag = false;
+            }
+        } else {
+            AC_INFO << "Extension '" << extName << "' is not supported";
+        }
+
+        return supportedFlag;
     }
 
 #ifdef WIN32
@@ -719,24 +730,23 @@ void * aglGetProcAddress (char * pszProc)
             SET_PROC_ADDRESS( PFNGLFLUSHVERTEXARRAYRANGENVPROC, glFlushVertexArrayRangeNV );
             SET_PROC_ADDRESS( PFNGLVERTEXARRAYRANGENVPROC, glVertexArrayRangeNV );
 
-            if (!(glBindBuffer &&
-                glDeleteBuffers &&
-                glGenBuffers &&
-                glIsBuffer &&
-                glBufferData &&
-                glBufferSubData &&
-                glGetBufferSubData &&
-                glMapBuffer &&
-                glUnmapBuffer &&
-                glGetBufferParameteriv &&
-                glGetBufferPointerv)) {
+            if (!(IS_SUPPORTED(glBindBuffer) &&
+                IS_SUPPORTED(glDeleteBuffers) &&
+                IS_SUPPORTED(glGenBuffers) &&
+                IS_SUPPORTED(glIsBuffer) &&
+                IS_SUPPORTED(glBufferData) &&
+                IS_SUPPORTED(glBufferSubData) &&
+                IS_SUPPORTED(glGetBufferSubData) &&
+                IS_SUPPORTED(glMapBuffer) &&
+                IS_SUPPORTED(glUnmapBuffer) &&
+                IS_SUPPORTED(glGetBufferParameteriv) &&
+                IS_SUPPORTED(glGetBufferPointerv))) {
                 AC_WARNING << "Only ARB versions of vertex_buffer_object extension available";
             }
         }
 
         // cubemap extensions
-        if (queryOGLExtension("GL_ARB_texture_cube_map") ||
-            queryOGLExtension("GL_EXT_texture_cube_map")) {
+        if (queryOGLExtension("GL_ARB_texture_cube_map") || queryOGLExtension("GL_EXT_texture_cube_map")) {
         }
 
         // texture compression
@@ -774,8 +784,7 @@ void * aglGetProcAddress (char * pszProc)
         //     glExtensions.h anyway.
         // point sprites
 
-        if (queryOGLExtension("GL_ARB_point_sprite") ||
-            queryOGLExtension("GL_NV_point_sprite")) {
+        if (queryOGLExtension("GL_ARB_point_sprite") || queryOGLExtension("GL_NV_point_sprite")) {
         }
 
         // point parameters
@@ -809,6 +818,10 @@ void * aglGetProcAddress (char * pszProc)
             SET_PROC_ADDRESS( PFNGLRENDERBUFFERSTORAGEEXTPROC, glRenderbufferStorageEXT );
             SET_PROC_ADDRESS( PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC, glCheckFramebufferStatusEXT );
             SET_PROC_ADDRESS( PFNGLGENERATEMIPMAPEXTPROC, glGenerateMipmapEXT );
+        }
+#endif
+#ifdef GL_EXT_framebuffer_multisample
+        if (queryOGLExtension("GL_EXT_framebuffer_multisample")) {
         }
 #endif
 

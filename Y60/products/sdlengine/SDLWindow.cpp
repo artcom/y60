@@ -139,7 +139,7 @@ SDLWindow::swapBuffers() {
     MAKE_SCOPE_TIMER(SDL_GL_SwapBuffers);
     AbstractRenderWindow::swapBuffers();
 #ifdef AC_USE_X11
-    if (glXGetVideoSyncSGI && glXWaitVideoSyncSGI && _mySwapInterval) {
+    if (IS_SUPPORTED(glXGetVideoSyncSGI) && IS_SUPPORTED(glXWaitVideoSyncSGI) && _mySwapInterval) {
         unsigned counter;
         glXGetVideoSyncSGI(&counter);
         glXWaitVideoSyncSGI(_mySwapInterval, 0, &counter);
@@ -789,7 +789,7 @@ SDLWindow::setSwapInterval(unsigned theInterval)
     }
 
 #ifdef WIN32
-    if (wglSwapIntervalEXT && wglGetSwapIntervalEXT) {
+    if (IS_SUPPORTED(wglSwapIntervalEXT) && IS_SUPPORTED(wglGetSwapIntervalEXT)) {
         wglSwapIntervalEXT(theInterval);
         _mySwapInterval = wglGetSwapIntervalEXT();
         if (theInterval != _mySwapInterval) {
@@ -801,17 +801,15 @@ SDLWindow::setSwapInterval(unsigned theInterval)
         AC_WARNING << "setSwapInterval(): wglSwapInterval not supported.";
     }
 #else
-    if (glXGetVideoSyncSGI && glXWaitVideoSyncSGI) {
+    if (IS_SUPPORTED(glXGetVideoSyncSGI) && IS_SUPPORTED(glXWaitVideoSyncSGI)) {
         if (_mySwapInterval == 0 && theInterval != 0) {
             // check if it's working
             unsigned counter0 = 0;
             unsigned counter1 = 0;
-#if 0 
             // this is broken on nvidia 8800 GTX with driver 1.0-9746
             glXWaitVideoSyncSGI(1, 0, &counter0);
             glXWaitVideoSyncSGI(1, 0, &counter1);
             glXWaitVideoSyncSGI(1, 0, &counter1);
-#endif
             if (counter1 <= counter0) {
                 AC_WARNING << "setSwapInterval(): glXGetVideoSyncSGI not working properly (counter0=" << counter0 << ", counter1=" << counter1 << "), disabling";
                 theInterval = 0;
@@ -837,16 +835,14 @@ SDLWindow::getSwapInterval() {
     }
 
 #ifdef WIN32
-    if (wglGetSwapIntervalEXT) {
+    if (IS_SUPPORTED(wglGetSwapIntervalEXT)) {
         return wglGetSwapIntervalEXT();
     } else {
         AC_WARNING << "getSwapInterval(): wglSwapInterval Extension not supported.";
     }
-#else
-    if (glXGetVideoSyncSGI) {
-        return _mySwapInterval;
-    }
-#endif
     return 0;
+#else
+    return _mySwapInterval;
+#endif
 }
 
