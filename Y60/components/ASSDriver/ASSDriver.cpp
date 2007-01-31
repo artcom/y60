@@ -9,7 +9,6 @@
 //============================================================================
 
 #include "ASSDriver.h"
-#include "ConnectedComponent.h"
 
 #include <asl/Logger.h>
 #include <asl/SerialDeviceFactory.h>
@@ -21,13 +20,20 @@
 
 #include <iostream>
 
+#ifdef LINUX
+#   include <values.h>
+#else
+#   include <float.h>
+#endif
+
+
 using namespace asl;
 using namespace y60;
 
 const unsigned char myMagicToken( 255 ); 
 
 static const char * RAW_RASTER = "ASSRawRaster";
-static const char * BINARY_RASTER = "ASSBinaryRaster";
+static const char * FILTERED_RASTER = "ASSFilteredRaster";
 
 static const char * DriverStateStrings[] = {
     "synchronizing",
@@ -48,7 +54,8 @@ ASSDriver::ASSDriver(DLHandle theDLHandle) :
     _myScene(0),
     _myNoiseThreshold( 15 ),
     _myComponentThreshold( 30 ),
-    _myPower(1)
+    _myPower(1),
+    _myIDCounter( 0 )
 {
     _mySerialPort = getSerialDevice(0);
     _mySerialPort->open( 57600, 8, SerialDevice::NO_PARITY, 1, false);
@@ -128,7 +135,7 @@ ASSDriver::synchronize() {
 void
 ASSDriver::allocateGridBuffers() {
     _myRawRaster = allocateRaster(RAW_RASTER);
-    _myDenoisedRaster = allocateRaster(BINARY_RASTER);
+    _myDenoisedRaster = allocateRaster(FILTERED_RASTER);
 }
 
 RasterHandle
@@ -155,10 +162,11 @@ ASSDriver::allocateRaster(const std::string & theName) {
 }
 
 void
-ASSDriver::readSensorValues() {
+ASSDriver::readSensorValues(y60::EventPtrList & theEventList) {
     //AC_PRINT << "====";
     //AC_PRINT << "pre buf size: " << _myBuffer.size();
     bool myNewDataFlag = false;
+    y60::EventPtrList myEventList;
     while ( _myGridSize[0] + 2 < _myBuffer.size() ) {
         if ( _myBuffer[0] != myMagicToken ) {
             AC_PRINT << "Sync error.";
@@ -181,7 +189,7 @@ ASSDriver::readSensorValues() {
             //AC_PRINT << "Got Frame (dt = " << myDeltaT << ")";
             _myLastFrameTime = myTime;
 
-            processSensorValues();
+            processSensorValues(theEventList, myDeltaT);
         }
         myNewDataFlag = true;
     }
@@ -232,17 +240,38 @@ ASSDriver::createThresholdedRaster(RasterHandle & theInput,
 }
 
 void
-ASSDriver::processSensorValues() {
+ASSDriver::processSensorValues(y60::EventPtrList & theEventList, double theDeltaT ) {
     createThresholdedRaster( _myRawRaster, _myDenoisedRaster, _myNoiseThreshold );
 
     BlobListPtr myROIs = connectedComponents( _myDenoisedRaster.raster, _myComponentThreshold);
 
+    std::vector<Vector2f> myPreviousPositions( _myPositions );
+
+#if 1
+
+    computeCursorPositions( myROIs );
+    correlatePositions( theEventList, myPreviousPositions );
+
+#else // perform moment analysis on whole raster
+    if ( ! myROIs->empty()) {
+        AnalyseMoment<y60::RasterOfGRAY> myMomentAnalysis;
+        _myDenoisedRaster.raster->apply(myMomentAnalysis);
+
+        Vector2f myPosition = myMomentAnalysis.result.center;
+        //AC_PRINT << "center: " << myPosition;
+        _myPositions.push_back( myPosition );
+        _myRegions.push_back( Box2f( Vector2f( 0.0, 0.0), Vector2f( _myGridSize[0], _myGridSize[1])));
+    }
+#endif
+}
+
+void
+ASSDriver::computeCursorPositions( const BlobListPtr & theROIs) {
     _myPositions.clear();
     _myRegions.clear();
 
-#if 1
     typedef asl::subraster<gray<unsigned char> > SubRaster;
-    for (BlobList::iterator it = myROIs->begin(); it != myROIs->end(); ++it) {
+    for (BlobList::const_iterator it = theROIs->begin(); it != theROIs->end(); ++it) {
         Box2i myBox = (*it)->bbox();
         myBox[Box2i::MAX] += Vector2i(1, 1);
         AnalyseMoment<SubRaster> myMomentAnalysis;
@@ -257,17 +286,81 @@ ASSDriver::processSensorValues() {
                                      Vector2f( myBox[Box2i::MAX][0], myBox[Box2i::MAX][1])));
     }
 
-#else // perform moment analysis on whole raster
-    if ( ! myROIs->empty()) {
-        AnalyseMoment<y60::RasterOfGRAY> myMomentAnalysis;
-        _myDenoisedRaster.raster->apply(myMomentAnalysis);
+}
 
-        Vector2f myPosition = myMomentAnalysis.result.center;
-        //AC_PRINT << "center: " << myPosition;
-        _myPositions.push_back( myPosition );
-        _myRegions.push_back( Box2f( Vector2f( 0.0, 0.0), Vector2f( _myGridSize[0], _myGridSize[1])));
+void 
+ASSDriver::correlatePositions( y60::EventPtrList & theEventList,
+        const std::vector<asl::Vector2f> & thePreviousPositions )
+{
+    std::vector<bool> myCorrelationFlags(thePreviousPositions.size(), false);
+    std::vector<Unsigned64> myOldIDs( _myCursorIDs );
+    _myCursorIDs.clear();
+    for (unsigned i = 0; i < _myPositions.size(); ++i) {
+        float myMinDistance = FLT_MAX;
+        int myMinDistIdx  = -1;
+        for (unsigned j = 0; j < thePreviousPositions.size(); ++j) {
+            if ( ! myCorrelationFlags[j] ) {
+                float myDistance = magnitude( _myPositions[i] - thePreviousPositions[j]);
+                if (myDistance < myMinDistance) {
+                    myMinDistance = myDistance;
+                    myMinDistIdx = j;
+                }
+            }
+        }
+        const float DISTANCE_THRESHOLD = 2.0;
+        if (myMinDistIdx >= 0 && myMinDistance < DISTANCE_THRESHOLD) {
+            // cursor moved: copy label from previous analysis
+            myCorrelationFlags[myMinDistIdx] = true;
+
+            Unsigned64 myID( myOldIDs[ myMinDistIdx ] );
+            _myCursorIDs.push_back( myID );
+            /*
+            y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent"));
+            myEvent->getNode()->appendAttribute<Unsigned64>("cursor_id", myID);
+            myEvent->getNode()->appendAttribute<string>("type", "move");
+            theEventList.push_back( myEvent );
+            */
+            theEventList.push_back( createEvent( myID, "move", _myPositions[i] ));
+        } else {
+            // new cursor: get new label
+            //AC_PRINT << "=== new cursor ===";
+            Unsigned64 myNewID( _myIDCounter++ );
+            _myCursorIDs.push_back( myNewID );
+            /*
+            y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent"));
+            myEvent->getNode()->appendAttribute<Unsigned64>("cursor_id", myNewID);
+            myEvent->getNode()->appendAttribute<string>("type", "add");
+            theEventList.push_back( myEvent );
+            */
+            theEventList.push_back( createEvent( myNewID, "add", _myPositions[i] ));
+        }
     }
-#endif
+
+    for (unsigned i = 0; i < thePreviousPositions.size(); ++i) {
+        if ( ! myCorrelationFlags[i]) {
+            //AC_PRINT << "=== cursor " << i << " removed ===";
+
+            Unsigned64 myID( myOldIDs[ i ] );
+            /*
+            y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent"));
+            myEvent->getNode()->appendAttribute<Unsigned64>("cursor_id", myID);
+            myEvent->getNode()->appendAttribute<string>("type", "remove");
+            theEventList.push_back( myEvent );
+            */
+            theEventList.push_back( createEvent( myID, "remove", thePreviousPositions[i] ));
+        }
+    }
+}
+
+y60::GenericEventPtr
+ASSDriver::createEvent( Unsigned64 theID, const std::string & theType,
+        const Vector2f & thePosition)
+{
+    y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent"));
+    myEvent->getNode()->appendAttribute<Unsigned64>("cursor_id", theID);
+    myEvent->getNode()->appendAttribute<std::string>("type", theType);
+    myEvent->getNode()->appendAttribute<Vector2f>("position", thePosition);
+    return myEvent;
 }
 
 void
@@ -355,6 +448,10 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         AC_ERROR << "regions property is read only";
         return;
     }
+    if (thePropertyName == "velocities") {
+        AC_ERROR << "velocities property is read only";
+        return;
+    }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -371,15 +468,16 @@ ASSDriver::poll() {
 
     _myBuffer.insert( _myBuffer.end(), myBuffer.begin(), myBuffer.end() );
 
+    y60::EventPtrList myEventList;
     switch (_myState) {
         case SYNCHRONIZING:
             synchronize();
             break;
         case RUNNING:
-            readSensorValues();
+            readSensorValues( myEventList );
             break;
     }
-    return y60::EventPtrList();
+    return myEventList;
 }
 
 extern "C"

@@ -50,9 +50,7 @@ class Blob {
         RunList & getRuns();
         asl::Vector2f center();
         int area();
-        //double stddev();
-        //PointList * pca();
-        asl::Box2i bbox();
+        asl::Box2i bbox() const;
         void merge( BlobPtr otherBlob);
         RunList & getList();
 

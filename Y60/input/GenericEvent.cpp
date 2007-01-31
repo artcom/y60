@@ -34,4 +34,9 @@ GenericEvent::asNode() const {
     return _myNode;
 }
 
+dom::NodePtr 
+GenericEvent::getNode() const {
+    return _myNode;
+}
+
 }

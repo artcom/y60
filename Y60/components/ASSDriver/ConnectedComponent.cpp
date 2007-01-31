@@ -39,11 +39,6 @@ Run::length() {
     return _myEndCol - _myStartCol + 1;
 }
 
-
-
-
-
-
 Blob::Blob(RunPtr theRun) {
     _myRuns.push_back(theRun);
 }
@@ -74,12 +69,12 @@ Blob::center() {
 }
 
 Box2i
-Blob::bbox(){
+Blob::bbox() const {
     int x1 = INT_MAX;
     int y1 = INT_MAX;
     int x2 = 0;
     int y2 = 0;
-    for(RunList::iterator r = _myRuns.begin(); r != _myRuns.end(); r++){
+    for(RunList::const_iterator r = _myRuns.begin(); r != _myRuns.end(); r++){
         x1 = std::min(x1, (*r)->_myStartCol);
         y1 = std::min(y1, (*r)->_myRow);
         x2 = std::max(x2, (*r)->_myEndCol);

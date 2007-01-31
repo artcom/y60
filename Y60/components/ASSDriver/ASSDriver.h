@@ -8,6 +8,8 @@
 // specific, prior written permission of ART+COM AG Berlin.
 //============================================================================
 
+#include "ConnectedComponent.h"
+
 #include <asl/SerialDevice.h>
 #include <asl/Enum.h>
 #include <asl/Vector234.h>
@@ -19,6 +21,7 @@
 #include <y60/IRendererExtension.h>
 #include <y60/IEventSource.h>
 #include <y60/Scene.h>
+#include <y60/GenericEvent.h>
 
 #include <iostream>
 
@@ -84,12 +87,16 @@ class ASSDriver :
         void setState( DriverState theState );
         void synchronize();
         void allocateGridBuffers();
-        //dom::ResizeableRasterPtr allocateRaster(const std::string & theName);
         RasterHandle allocateRaster(const std::string & theName);
-        void readSensorValues();
-        void processSensorValues();
+        void readSensorValues(y60::EventPtrList & theEventList);
+        void processSensorValues(y60::EventPtrList & theEventList, double theDeltaT);
         void createThresholdedRaster(RasterHandle & theInput, RasterHandle & theOutput,
                                      const unsigned char theThreshold);
+        void computeCursorPositions( const BlobListPtr & theROIs);
+        void correlatePositions( y60::EventPtrList & theEventList,
+                    const std::vector<asl::Vector2f> & thePreviousPositions );
+        y60::GenericEventPtr createEvent( asl::Unsigned64 theID, const std::string & theType,
+                const asl::Vector2f & thePosition);
 
         std::vector<unsigned char> _myBuffer;
         asl::SerialDevice * _mySerialPort;
@@ -107,8 +114,10 @@ class ASSDriver :
         unsigned char _myNoiseThreshold;
         int           _myPower;
 
-        std::vector<asl::Vector2f> _myPositions;
-        std::vector<asl::Box2f> _myRegions;
+        std::vector<asl::Vector2f>   _myPositions;
+        std::vector<asl::Box2f>      _myRegions;
+        std::vector<asl::Unsigned64> _myCursorIDs;
+        asl::Unsigned64              _myIDCounter;
 };
 
 }
