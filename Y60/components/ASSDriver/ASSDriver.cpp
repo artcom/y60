@@ -79,6 +79,8 @@ ASSDriver::onFrame(jslib::AbstractRenderWindow * theWindow, double theTime) {
 
 void
 ASSDriver::synchronize() {
+    // XXX not reentrant safe ... even two ASSDrivers cause problems
+    // TODO: refactor
     static int myLineStart = -1;
     static int myLineEnd   = -1;
     static int myMaxLine = 0;
@@ -247,22 +249,9 @@ ASSDriver::processSensorValues(y60::EventPtrList & theEventList, double theDelta
 
     std::vector<Vector2f> myPreviousPositions( _myPositions );
 
-#if 1
-
     computeCursorPositions( myROIs );
     correlatePositions( theEventList, myPreviousPositions );
 
-#else // perform moment analysis on whole raster
-    if ( ! myROIs->empty()) {
-        AnalyseMoment<y60::RasterOfGRAY> myMomentAnalysis;
-        _myDenoisedRaster.raster->apply(myMomentAnalysis);
-
-        Vector2f myPosition = myMomentAnalysis.result.center;
-        //AC_PRINT << "center: " << myPosition;
-        _myPositions.push_back( myPosition );
-        _myRegions.push_back( Box2f( Vector2f( 0.0, 0.0), Vector2f( _myGridSize[0], _myGridSize[1])));
-    }
-#endif
 }
 
 void
@@ -292,6 +281,16 @@ void
 ASSDriver::correlatePositions( y60::EventPtrList & theEventList,
         const std::vector<asl::Vector2f> & thePreviousPositions )
 {
+
+    typedef TransformHierarchyFacade THF;
+    Matrix4f myTransform;
+    if (_myTransform) {
+        myTransform = _myTransform->getFacade<THF>()->get<GlobalMatrixTag>();
+    } else {
+        myTransform.makeIdentity();
+    }
+
+
     std::vector<bool> myCorrelationFlags(thePreviousPositions.size(), false);
     std::vector<Unsigned64> myOldIDs( _myCursorIDs );
     _myCursorIDs.clear();
@@ -314,25 +313,13 @@ ASSDriver::correlatePositions( y60::EventPtrList & theEventList,
 
             Unsigned64 myID( myOldIDs[ myMinDistIdx ] );
             _myCursorIDs.push_back( myID );
-            /*
-            y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent"));
-            myEvent->getNode()->appendAttribute<Unsigned64>("cursor_id", myID);
-            myEvent->getNode()->appendAttribute<string>("type", "move");
-            theEventList.push_back( myEvent );
-            */
-            theEventList.push_back( createEvent( myID, "move", _myPositions[i] ));
+            theEventList.push_back( createEvent( myID, "move", _myPositions[i], myTransform ));
         } else {
             // new cursor: get new label
             //AC_PRINT << "=== new cursor ===";
             Unsigned64 myNewID( _myIDCounter++ );
             _myCursorIDs.push_back( myNewID );
-            /*
-            y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent"));
-            myEvent->getNode()->appendAttribute<Unsigned64>("cursor_id", myNewID);
-            myEvent->getNode()->appendAttribute<string>("type", "add");
-            theEventList.push_back( myEvent );
-            */
-            theEventList.push_back( createEvent( myNewID, "add", _myPositions[i] ));
+            theEventList.push_back( createEvent( myNewID, "add", _myPositions[i], myTransform ));
         }
     }
 
@@ -341,25 +328,30 @@ ASSDriver::correlatePositions( y60::EventPtrList & theEventList,
             //AC_PRINT << "=== cursor " << i << " removed ===";
 
             Unsigned64 myID( myOldIDs[ i ] );
-            /*
-            y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent"));
-            myEvent->getNode()->appendAttribute<Unsigned64>("cursor_id", myID);
-            myEvent->getNode()->appendAttribute<string>("type", "remove");
-            theEventList.push_back( myEvent );
-            */
-            theEventList.push_back( createEvent( myID, "remove", thePreviousPositions[i] ));
+            theEventList.push_back( createEvent( myID, "remove", thePreviousPositions[i], myTransform ));
         }
     }
 }
 
 y60::GenericEventPtr
 ASSDriver::createEvent( Unsigned64 theID, const std::string & theType,
-        const Vector2f & thePosition)
+        const Vector2f & thePosition, const Matrix4f & theTransform)
 {
     y60::GenericEventPtr myEvent( new GenericEvent("onASSEvent"));
     myEvent->getNode()->appendAttribute<Unsigned64>("cursor_id", theID);
     myEvent->getNode()->appendAttribute<std::string>("type", theType);
-    myEvent->getNode()->appendAttribute<Vector2f>("position", thePosition);
+    myEvent->getNode()->appendAttribute<Vector2f>("raw_position", thePosition);
+    Vector4f myHPosition;
+    myHPosition[0] = thePosition[0];
+    myHPosition[1] = thePosition[1];
+    myHPosition[2] = 0.0;
+    myHPosition[3] = 1.0;
+    myHPosition = myHPosition * theTransform;
+    Vector3f my3DPosition;
+    my3DPosition[0] = myHPosition[0];
+    my3DPosition[1] = myHPosition[1];
+    my3DPosition[2] = myHPosition[2];
+    myEvent->getNode()->appendAttribute<Vector3f>("position3D", my3DPosition);
     return myEvent;
 }
 
@@ -413,6 +405,10 @@ ASSDriver::onGetProperty(const std::string & thePropertyName,
         theReturnValue.set( _myPower );
         return;
     }
+    if (thePropertyName == "transform") {
+        theReturnValue.set( _myTransform );
+        return;
+    }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -452,6 +448,10 @@ ASSDriver::onSetProperty(const std::string & thePropertyName,
         AC_ERROR << "velocities property is read only";
         return;
     }
+    if (thePropertyName == "transform") {
+        _myTransform = thePropertyValue.get<dom::NodePtr>();
+        return;
+    }
     AC_ERROR << "Unknown property '" << thePropertyName << "'";
 }
 
@@ -484,6 +484,4 @@ extern "C"
 EXPORT asl::PlugInBase* ASSDriver_instantiatePlugIn(asl::DLHandle myDLHandle) {
     return new ASSDriver(myDLHandle);
 }
-
-
 

@@ -66,6 +66,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myDriver.gainPower = 2;
 
         print("setup done");
+        window.camera.position.z = 400;
     }
 
     function createDisplay(theRaster) {
@@ -86,7 +87,9 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
         _myGroup.orientation.assignFromEuler( new Vector3f(0, 0, ORIENTATION));
         _myGroup.position = product( product( product(_myDisplaySize3D, _myGroup.scale),
                      _myGroup.orientation), -0.5);
-        _myGroup.position.z = -400;
+        _myGroup.position.z = 0;
+
+        _myDriver.transform = _myGroup;
 
         _myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, "testbild00.rgb");
         var myQuad = Modelling.createQuad(window.scene, _myMaterial.id, [0,0,0], _myDisplaySize3D);

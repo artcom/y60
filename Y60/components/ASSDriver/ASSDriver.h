@@ -96,7 +96,7 @@ class ASSDriver :
         void correlatePositions( y60::EventPtrList & theEventList,
                     const std::vector<asl::Vector2f> & thePreviousPositions );
         y60::GenericEventPtr createEvent( asl::Unsigned64 theID, const std::string & theType,
-                const asl::Vector2f & thePosition);
+                const asl::Vector2f & thePosition, const asl::Matrix4f & theTransform);
 
         std::vector<unsigned char> _myBuffer;
         asl::SerialDevice * _mySerialPort;
@@ -118,6 +118,8 @@ class ASSDriver :
         std::vector<asl::Box2f>      _myRegions;
         std::vector<asl::Unsigned64> _myCursorIDs;
         asl::Unsigned64              _myIDCounter;
+
+        dom::NodePtr                 _myTransform;
 };
 
 }
