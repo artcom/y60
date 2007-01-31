@@ -738,6 +738,14 @@ MaterialExporter::exportLambertFeatures(const MFnMesh * theMesh, const MObject &
     if (myStatus == MStatus::kSuccess && myGlowFactor > 0.0f) {
         setPropertyValue<float>(theBuilder.getNode(), "float", y60::GLOW_PROPERTY, myGlowFactor);
     }
+
+    // emissive color
+    MColor myEmissiveColor = MFnLambertShader(theShaderNode).incandescence(& myStatus);
+    if (myStatus == MStatus::kFailure) {
+        throw ExportException("Could not get emissive (incandescence) color from node", "MaterialExporter::exportLambertFeatures");
+    }
+    setPropertyValue<asl::Vector4f>(theBuilder.getNode(), "vector4f", y60::EMISSIVE_PROPERTY,
+            asl::Vector4f(myEmissiveColor.r, myEmissiveColor.g, myEmissiveColor.b, myEmissiveColor.a));
 }
 
 void
